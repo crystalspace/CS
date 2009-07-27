@@ -124,6 +124,16 @@
     </block>
   </coercion>
   
+  <coercion from="direction_object" to="direction_world" cost="3">
+    <block location="vertexMain">
+      output =  mul (objectToWorld, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+      output =  mul (objectToWorld, float4 (input, 0)).xyz;
+    </block>
+  </coercion>
+  
   <coercion from="direction_world" to="direction_camera" cost="3">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->

@@ -173,12 +173,6 @@ namespace CS
 	          svContext->AddVariable (sv);
 	        }
 	        break;
-	      case XMLTOKEN_STATICLIGHTS:
-	        {
-	          if (!ParseStaticLightsSettings (child, staticLights))
-	           return false;
-	        }
-	        break;
 	      default:
 	        synldr->ReportBadToken (child);
 	        return false;
@@ -192,7 +186,6 @@ namespace CS
 	  layer.SetMaxLights (maxLights);
 	  layer.SetAmbient (isAmbient);
 	  layer.SetSVContext (svContext);
-	  layer.GetStaticLightsSettings (0) = staticLights;
 	  
           return true;
         }
@@ -223,6 +216,13 @@ namespace CS
 	          SingleRenderLayer layer;
 	          if (!ParseLayer (child, layer)) return false;
 	          layers.AddLayers (layer);
+	        }
+	        break;
+	      case XMLTOKEN_STATICLIGHTS:
+	        {
+	          if (!ParseStaticLightsSettings (child,
+	             layers.GetStaticLightsSettings()))
+	           return false;
 	        }
 	        break;
 	      default:

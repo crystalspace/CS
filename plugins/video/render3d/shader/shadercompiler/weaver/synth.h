@@ -53,12 +53,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     typedef csRefArray<iDocumentNode> DocNodeArray;
   protected:
     SnippetNumbers snipNums;
+    const char* shaderName;
     csArray<csArray<TechniqueGraph> > graphs;
     csArray<DocNodeArray> prePassNodes;
     csArray<Snippet*> outerSnippets;
     DocNodeArray postPassesNodes;
   public:
     Synthesizer (WeaverCompiler* compiler, 
+      const char* shaderName,
       const csArray<DocNodeArray>& prePassNodes,
       const csPDelArray<Snippet>& outerSnippets,
       const DocNodeArray& postPassesNodes);
@@ -210,7 +212,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
       void ReverseNodeArray();
       
-      void Rebuild (const TechniqueGraph& graph,
+      bool Rebuild (const TechniqueGraph& graph,
         const csArray<const Snippet::Technique*>& outputs);
         
       void Collapse (TechniqueGraph& graph);

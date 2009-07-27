@@ -107,7 +107,9 @@ struct SliceAllocator
   static const size_t valueSetsPerSlice = 32;
   static const size_t sliceSize = valueSetsPerSlice * sizeof (ValueSet);
 
-  typedef csFixedSizeAllocator<sliceSize, TempHeapAlloc> BlockAlloc;
+  typedef CS::Memory::FixedSizeAllocatorSafe<sliceSize, TempHeapAlloc>
+    BlockAlloc;
+
   CS_DECLARE_STATIC_CLASSVAR_REF (sliceAlloc, SliceAlloc, 
     BlockAlloc);
 
@@ -133,7 +135,9 @@ struct SliceAllocatorBool
   static const size_t valueSetsPerSlice = 32;
   static const size_t sliceSize = valueSetsPerSlice * sizeof (ValueSetBool);
 
-  typedef csFixedSizeAllocator<sliceSize, TempHeapAlloc> BlockAlloc;
+  typedef CS::Memory::FixedSizeAllocatorSafe<sliceSize, TempHeapAlloc>
+    BlockAlloc;
+
   CS_DECLARE_STATIC_CLASSVAR_REF (sliceAlloc, SliceAllocBool, 
     BlockAlloc);
 
@@ -934,6 +938,11 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
 				     const CS::Graphics::RenderMeshModes& modes,
 				     const csShaderVariableStack* stack)
 {
+  /* Assert we don't evaluate without an EnterEvaluation()
+     (otherwise, evaluation cache won't be cleared, causing problems down
+     the road) */
+  CS_ASSERT(evalDepth > 0);
+
   if (condition == csCondAlwaysTrue)
     return true;
   else if (condition == csCondAlwaysFalse)
@@ -1784,7 +1793,7 @@ ConditionsReader::ConditionsReader (csConditionEvaluator& evaluator,
   savedConds.SetPos (savedConds.GetSize() - sizeof (uint32));
   uint32 numCondsLE;
   if (savedConds.Read ((char*)&numCondsLE, sizeof (numCondsLE))
-    != sizeof (sizeof (numCondsLE))) return;
+    != sizeof (numCondsLE)) return;
   numCondsLE = csLittleEndian::UInt32 (numCondsLE);
   savedConds.SetPos (0);
   
@@ -2069,6 +2078,7 @@ class ValueSetBoolAlloc
   csArray<uint8*, csArrayElementHandler<uint8*>, TempHeapAlloc> blocks;
   uint8* block;
   size_t blockRemaining;
+  CS::Threading::Mutex mutex;
 public:
   ValueSetBoolAlloc() : blockRemaining (0) {}
   ~ValueSetBoolAlloc()
@@ -2079,6 +2089,7 @@ public:
   
   ValueSetBool* Alloc()
   {
+    CS::Threading::MutexScopedLock lock(mutex);
     if (blockRemaining == 0)
     {
       blockRemaining = SliceAllocatorBool::sliceSize;

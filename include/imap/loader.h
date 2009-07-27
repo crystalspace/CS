@@ -186,17 +186,21 @@ public:
 
   void MarkFinished()
   {
-    CS::Threading::MutexScopedLock lock(updateLock);
-    if(waitLock && wait)
+    if(waitLock)
+      waitLock->Lock();
+
     {
-      CS::Threading::MutexScopedLock lock(*waitLock);
+      CS::Threading::MutexScopedLock ulock(updateLock);
+
       finished = true;
-      wait->NotifyAll();
+      if(wait)
+      {
+        wait->NotifyAll();
+      }
     }
-    else
-    {
-      finished = true;
-    }
+
+    if(waitLock)
+      waitLock->Unlock();
   }
 
   void MarkSuccessful()
@@ -215,13 +219,13 @@ public:
     result = other->GetResultRefPtr();
   }
 
-  void Wait()
+  void Wait(bool process = true)
   {
     if(tm.IsValid())
     {
       csRefArray<iThreadReturn> rets;
       rets.Push(this);
-      tm->Wait(rets);
+      tm->Wait(rets, process);
     }
   }
 

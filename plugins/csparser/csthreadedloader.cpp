@@ -152,8 +152,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return false;
     }
 
-    failedMeshFacts.AttachNew(new scfStringArray());
-
     // Optional
     SndSysManager = csQueryRegistryOrLoad<iSndSysManager> (object_reg,
       "crystalspace.sndsys.manager", false);
@@ -882,7 +880,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     const char* meshfactname = (name != 0) ? name : meshfactnode->GetAttributeValue("name");
 
-    csRef<iMeshFactoryWrapper> mfw = ldr_context->FindMeshFactory(meshfactname, true);
+    csRef<iMeshFactoryWrapper> mfw = ldr_context->FindMeshFactory(meshfactname, false);
     if(mfw)
     {
       ldr_context->AddToCollection(mfw->QueryObject());
@@ -892,19 +890,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(!AddLoadingMeshFact(meshfactname))
     {
-      mfw = ldr_context->FindMeshFactory(meshfactname);
-      if(mfw)
+      // Fixme.
+      while(!mfw)
       {
-        ldr_context->AddToCollection(mfw->QueryObject());
-        ret->SetResult(scfQueryInterface<iBase>(mfw));
-        return true;
+        mfw = ldr_context->FindMeshFactory(meshfactname, false);
       }
+
+      ldr_context->AddToCollection(mfw->QueryObject());
+      ret->SetResult(scfQueryInterface<iBase>(mfw));
+      return true;
     }
 
     mfw = Engine->CreateMeshFactory(meshfactname, false);
     if(!LoadMeshObjectFactory(ldr_context, mfw, parent, meshfactnode, transf, ssource))
     {
-      failedMeshFacts->Push(meshfactname);
       return false;
     }
 
@@ -966,10 +965,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadReturns.Push(LoadLibraryFromNode (ldr_context, it->Next(), &libs, &libIDs, vfs->GetCwd()));
     }
 
-    csRef<iDocumentNodeIterator> itr = doc->GetNodes("textures");
+    csRef<iDocumentNodeIterator> itr = doc->GetNodes("plugins");
+    while(itr->HasNext())
+    {
+      ldr_context->ParseAvailablePlugins(itr->Next());
+    }
+
+    itr = doc->GetNodes("textures");
     while(itr->HasNext())
     {
       ldr_context->ParseAvailableTextures(itr->Next());
+    }
+
+    itr = doc->GetNodes("shaders");
+    while(itr->HasNext())
+    {
+      ldr_context->ParseAvailableShaders(itr->Next());
     }
 
     itr = doc->GetNodes("materials");
@@ -978,19 +989,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       ldr_context->ParseAvailableMaterials(itr->Next());
     }
 
-    itr = doc->GetNodes("meshfact");
-    while(itr->HasNext())
-    {
-      ldr_context->ParseAvailableMeshfacts(itr->Next());
-    }
-
-    itr = doc->GetNodes("sector");
-    while(itr->HasNext())
-    {
-      csRef<iDocumentNode> sector = itr->Next();
-      ldr_context->ParseAvailableMeshes(sector, 0);
-      ldr_context->ParseAvailableLights(sector);
-    }
+    ldr_context->ParseAvailableMeshfacts(doc);
 
     /// Wait for library parse to finish.
     threadman->Wait(threadReturns);
@@ -999,9 +998,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   bool csThreadedLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
     iStreamSource* ssource, iMissingLoaderData* missingdata, bool do_verbose)
   {
-    // Will be set to true if we find a <shader> section.
-    bool shader_given = false;
-
     /// Points to proxy textures ready for processing.
     csSafeCopyArray<ProxyTexture> proxyTextures;
 
@@ -1018,8 +1014,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRefArray<iDocumentNode> libs;
     csArray<csString> libIDs;
 
+    // Array for deferred libraries.
+    csRefArray<iDocumentNode> defLibs;
+
     // Parse the map to find all materials and meshfacts.
-    ParseAvailableObjects(dynamic_cast<csLoaderContext*>(ldr_context), world_node, libs, libIDs);
+    csLoaderContext* thisContext = dynamic_cast<csLoaderContext*>(ldr_context);
+    ParseAvailableObjects(thisContext, world_node, libs, libIDs);
 
     /// Main parse.
     csRef<iDocumentNodeIterator> it = world_node->GetNodes ();
@@ -1039,11 +1039,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         if (!LoadSettings (child))
           return false;
         break;
-      case XMLTOKEN_RENDERPRIORITIES:
-        ReportWarning (
-          "crystalspace.maploader.parse.region",
-          world_node, "<renderpriorities> is no longer supported!");
-        break;
       case XMLTOKEN_ADDON:
         if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false, ssource))
           return false;
@@ -1052,36 +1047,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true, ssource))
           return false;
         break;
+      case XMLTOKEN_SECTOR:
       case XMLTOKEN_MESHFACT:
         {
-          csRef<iDocumentAttribute> attr_name = child->GetAttribute ("name");
-          csRef<iDocumentAttribute> attr_file = child->GetAttribute ("file");
-          if (attr_file)
-          {
-            const char* name = attr_name->GetValue();
-            const char* filename = attr_file->GetValue ();
-            csRef<iDataBuffer> buffer = vfs->ReadFile (filename);
-            csRef<iDocument> doc;
-            if(!LoadStructuredDoc (filename, buffer, doc))
+          // Parse deferred libraries first.
+          if(!LoadDeferredLibs(defLibs, ldr_context, ssource, missingdata,
+            threadReturns, libs, libIDs, do_verbose))
               return false;
 
-            csRef<iDocumentNode> node = doc->GetRoot ()->GetNode ("meshfact");
-            if(!node.IsValid())
-              return false;
+          if(!LoadMeshfacts (thisContext, ssource, &proxyTextures, materialArray))
+            return false;
 
-            threadReturns.Push(FindOrLoadMeshFactory(name, ldr_context,
-              node, 0, 0, ssource, vfs->GetCwd()));
-          }
-          else
+          if(id == XMLTOKEN_SECTOR)
           {
-            threadReturns.Push(FindOrLoadMeshFactory(0, ldr_context, child, 0,
-              0, ssource, vfs->GetCwd()));
+            if (!ParseSector (ldr_context, child, ssource, threadReturns) ||
+              !threadman->Wait(threadReturns))
+              return false;
           }
         }
-        break;
-      case XMLTOKEN_SECTOR:
-        if (!ParseSector (ldr_context, child, ssource, threadReturns))
-          return false;
         break;
       case XMLTOKEN_SEQUENCES:
         // Defer sequence parsing to later.
@@ -1092,17 +1075,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         triggers = child;
         break;
       case XMLTOKEN_PLUGINS:
-        if (!LoadPlugins (child))
-          return false;
+        {
+          for(size_t i=0; i<thisContext->availPlugins.GetSize(); ++i)
+          {
+            LoadPlugin(thisContext->availPlugins[i].node);
+          }
+        }
         break;
       case XMLTOKEN_TEXTURES:
-        if (!ParseTextureList (ldr_context, child, proxyTextures))
-          return false;
-        break;
+        {
+          if(!LoadTextures(thisContext, &proxyTextures))
+            return false;
+          break;
+        }
       case XMLTOKEN_MATERIALS:
-        if (!ParseMaterialList (ldr_context, child, materialArray))
-          return false;
-        break;
+        {
+          if(!LoadMaterials(thisContext, &proxyTextures, materialArray))
+            return false;
+          break;
+        }
       case  XMLTOKEN_VARIABLES:
         if (!ParseVariableList (ldr_context, child))
           return false;
@@ -1113,36 +1104,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_LIBRARY:
         {
-          const char* file = child->GetAttributeValue("file");
-          const char* path = 0;
-          if(file)
-          {
-            path = child->GetAttributeValue("path");
-            if(path)
-            {
-              vfs->PushDir(path);
-            }
-          }
-          else
-          {
-            file = child->GetContentsValue();
-          }
-
-          csRef<iDocumentNode> lib = child;
-          size_t idx = libIDs.Find(file);
-          if(idx != csArrayItemNotFound)
-          {
-              lib = libs.Get(idx);
-          }
-
-          if(!LoadLibrary(ldr_context, lib, ssource, missingdata, threadReturns, libs, libIDs, false, do_verbose))
-            return false;
-
-          if(path)
-          {
-            vfs->PopDir();
-          }
-
+          defLibs.Push(child);
           break;
         }
       case XMLTOKEN_START:
@@ -1163,14 +1125,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           break;
         }
       case XMLTOKEN_SHADERS:
-        shader_given = true;
-        ParseShaderList (ldr_context, child);
+        if(!ParseShaderList (thisContext))
+          return false;
         break;
       default:
         SyntaxService->ReportBadToken (child);
         return false;
       }
     }
+
+    // Parse deferred libraries.
+    if(!LoadDeferredLibs(defLibs, ldr_context, ssource, missingdata,
+      threadReturns, libs, libIDs, do_verbose))
+        return false;
 
     // Sequences and triggers are parsed at the end because
     // all sectors and other objects need to be present.
@@ -1190,6 +1157,150 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // Wait for all jobs to finish.
     return threadman->Wait(threadReturns);
+  }
+
+  bool csThreadedLoader::LoadTextures (csLoaderContext* ldr_context,
+      csSafeCopyArray<ProxyTexture>* proxyTextures)
+  {
+    if(!ldr_context->availTextures.IsEmpty())
+    {
+      csRefArray<iThreadReturn> threadReturns;
+      for(size_t i=0; i<ldr_context->availTextures.GetSize(); ++i)
+      {
+        threadReturns.Push(ParseTexture(ldr_context, ldr_context->availTextures[i].node,
+          proxyTextures, ldr_context->availTextures[i].path));
+      }
+
+      if(!threadman->Wait(threadReturns))
+      {
+        return false;
+      }
+
+      ldr_context->availTextures.DeleteAll();
+    }
+
+    return true;
+  }
+
+  bool csThreadedLoader::LoadMaterials (csLoaderContext* ldr_context,
+    csSafeCopyArray<ProxyTexture>* proxyTextures,
+    csWeakRefArray<iMaterialWrapper> &materialArray)
+  {
+    if(!ldr_context->availMaterials.IsEmpty())
+    {
+      if(!LoadTextures(ldr_context, proxyTextures))
+        return false;
+
+      if(!ParseShaderList (ldr_context))
+        return false;
+
+      for(size_t i=0; i<ldr_context->availMaterials.GetSize(); ++i)
+      {
+        if(!ParseMaterial(ldr_context, ldr_context->availMaterials[i].node, materialArray))
+          return false;
+      }
+
+      ldr_context->availMaterials.DeleteAll();
+    }
+
+    return true;
+  }
+
+  bool csThreadedLoader::LoadMeshfacts (csLoaderContext* ldr_context,
+    iStreamSource* ssource, csSafeCopyArray<ProxyTexture>* proxyTextures,
+    csWeakRefArray<iMaterialWrapper> &materialArray)
+  {
+    if(!ldr_context->availMeshfacts.IsEmpty())
+    {
+      if(!LoadTextures(ldr_context, proxyTextures))
+        return false;
+
+      if(!LoadMaterials(ldr_context, proxyTextures, materialArray))
+        return false;
+
+      csRefArray<iThreadReturn> threadReturns;
+      for(size_t i=0; i<ldr_context->availMeshfacts.GetSize(); ++i)
+      {
+        csRef<iDocumentAttribute> attr_name = ldr_context->availMeshfacts[i].node->GetAttribute ("name");
+        csRef<iDocumentAttribute> attr_file = ldr_context->availMeshfacts[i].node->GetAttribute ("file");
+        if (attr_file && attr_file->GetValue ())
+        {
+          const char* name = attr_name->GetValue();
+          const char* filename = attr_file->GetValue ();
+          csRef<iDataBuffer> buffer = vfs->ReadFile (filename);
+          csRef<iDocument> doc;
+          if(!LoadStructuredDoc (filename, buffer, doc))
+            return false;
+
+          csRef<iDocumentNode> node = doc->GetRoot ()->GetNode ("meshfact");
+          if(!node.IsValid())
+            return false;
+
+          threadReturns.Push(FindOrLoadMeshFactory(name, ldr_context,
+            node, 0, 0, ssource, ldr_context->availMeshfacts[i].path));
+        }
+        else
+        {
+          threadReturns.Push(FindOrLoadMeshFactory(0, ldr_context, ldr_context->availMeshfacts[i].node,
+            0, 0, ssource, ldr_context->availMeshfacts[i].path));
+        }
+      }
+
+      if(!threadman->Wait(threadReturns))
+      {
+        return false;
+      }
+
+      ldr_context->availMeshfacts.DeleteAll();
+    }
+
+    return true;
+  }
+
+  bool csThreadedLoader::LoadDeferredLibs(csRefArray<iDocumentNode>& defLibs,
+    iLoaderContext* ldr_context, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    csRefArray<iThreadReturn>& threadReturns, csRefArray<iDocumentNode>& libs,
+    csArray<csString>& libIDs, bool do_verbose)
+  {
+    for(size_t i=0; i<defLibs.GetSize(); ++i)
+    {
+      const char* file = defLibs[i]->GetAttributeValue("file");
+      const char* path = 0;
+      if(file)
+      {
+        path = defLibs[i]->GetAttributeValue("path");
+        if(path)
+        {
+          vfs->PushDir(path);
+        }
+      }
+      else
+      {
+        file = defLibs[i]->GetContentsValue();
+      }
+
+      csRef<iDocumentNode> lib = defLibs[i];
+      size_t idx = libIDs.Find(file);
+      if(idx != csArrayItemNotFound)
+      {
+        lib = libs.Get(idx);
+      }
+
+      if(!LoadLibrary(ldr_context, lib, ssource, missingdata, threadReturns,
+        libs, libIDs, false, true, do_verbose))
+      {
+        return false;
+      }
+
+      if(path)
+      {
+        vfs->PopDir();
+      }
+    }
+
+    defLibs.DeleteAll();
+
+    return true;
   }
 
   THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadLibraryFromNode,
@@ -1251,7 +1362,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   bool csThreadedLoader::LoadLibrary(iLoaderContext* ldr_context, iDocumentNode* node,
     iStreamSource* ssource, iMissingLoaderData* missingdata, csRefArray<iThreadReturn>& threadReturns,
-    csRefArray<iDocumentNode>& libs, csArray<csString>& libIDs, bool loadProxyTex, bool do_verbose)
+    csRefArray<iDocumentNode>& libs, csArray<csString>& libIDs, bool loadProxyTex, bool mapLoad, bool do_verbose)
   {
     if (!Engine)
     {
@@ -1270,6 +1381,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> sequences;
     csRef<iDocumentNode> triggers;
 
+    csLoaderContext* thisContext = dynamic_cast<csLoaderContext*>(ldr_context);
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
     {
@@ -1307,7 +1419,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             lib = child;
           }
 
-          if(!LoadLibrary(ldr_context, lib, ssource, missingdata, threadReturns, libs, libIDs, false, do_verbose))
+          if(!LoadLibrary(ldr_context, lib, ssource, missingdata, threadReturns, libs, libIDs, false, mapLoad, do_verbose))
             return false;
           break;
         }
@@ -1328,17 +1440,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         triggers = child;
         break;
       case XMLTOKEN_TEXTURES:
-        // Append textures to engine.
-        if (!ParseTextureList (ldr_context, child, proxyTextures))
-          return false;
+        if(!mapLoad)
+        {
+          // Append textures to engine.
+          if (!LoadTextures (thisContext, &proxyTextures))
+            return false;
+        }
         break;
       case XMLTOKEN_MATERIALS:
-        if (!ParseMaterialList (ldr_context, child, materialArray))
-          return false;
+        if(!mapLoad)
+        {
+          if (!LoadMaterials (thisContext, &proxyTextures, materialArray))
+            return false;
+        }
         break;
       case XMLTOKEN_SHADERS:
-        if (!ParseShaderList (ldr_context, child))
-          return false;
+        if(!mapLoad)
+        {
+          if (!ParseShaderList (thisContext))
+            return false;
+        }
         break;
       case  XMLTOKEN_VARIABLES:
         if (!ParseVariableList (ldr_context, child))
@@ -1363,13 +1484,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         break;
       case XMLTOKEN_MESHFACT:
+        if(!mapLoad)
         {
-          threadReturns.Push(FindOrLoadMeshFactory(0, ldr_context, child, 0, 0, ssource, vfs->GetCwd()));
+          if(!LoadMeshfacts (thisContext, ssource, &proxyTextures, materialArray))
+            return false;
         }
         break;
       case XMLTOKEN_PLUGINS:
-        if (!LoadPlugins (child))
-          return false;
+        if(!mapLoad)
+        {
+          for(size_t i=0; i<thisContext->availPlugins.GetSize(); ++i)
+          {
+            LoadPlugin(thisContext->availPlugins[i].node);
+          }
+        }
         break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -1767,7 +1895,71 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
         break;
+    case XMLTOKEN_INSTANCES:
+      {
+        // Get the factory to be instanced.
+        csRef<iDocumentNode> instancedFact = child->GetNode("meshfact");
+        if (!instancedFact)
+          return false;
 
+        csReversibleTransform child_transf;
+        csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+        if(!FindOrLoadMeshFactoryTC(ret, false, 0, ldr_context, instancedFact, stemp, &child_transf, ssource, vfs->GetCwd()))
+        {
+          return false;
+        }
+
+        csRef<iMeshFactoryWrapper> instanceFactory = scfQueryInterface<iMeshFactoryWrapper>(ret->GetResultRefPtr());
+        stemp->SetInstanceFactory(instanceFactory);
+        instanceFactory->GetMeshObjectFactory()->SetMeshFactoryWrapper(stemp);
+
+        // Get instances.
+        csRef<iDocumentNodeIterator> instances = child->GetNodes("instance");
+        while(instances->HasNext())
+        {
+          csRef<iDocumentNode> instance = instances->Next();
+
+          // Get o2w rotation.
+          csMatrix3 rotation;
+          csRef<iDocumentNode> matrix_node = instance->GetNode ("matrix");
+          if (matrix_node)
+          {
+            if (!SyntaxService->ParseMatrix(matrix_node, rotation))
+              return false;
+          }
+
+          // Get position offset.
+          csRef<iDocumentNode> vector_node = instance->GetNode ("v");
+          if (!vector_node)
+            return false;
+          
+          csVector3 v;
+          if (!SyntaxService->ParseVector (vector_node, v))
+            return false;
+
+          stemp->AddInstance(v, rotation);
+        }
+      }
+      break;
+    case XMLTOKEN_BBOX:
+      {
+        csBox3 bbox;
+
+        csRef<iDocumentNodeIterator> vertices = child->GetNodes("v");
+        while(vertices->HasNext())
+        {
+          csRef<iDocumentNode> vertex = vertices->Next();
+
+          csVector3 v;
+          if (!SyntaxService->ParseVector (vertex, v))
+            return false;
+
+          bbox.AddBoundingVertex(v);
+        }
+
+        stemp->GetMeshObjectFactory()->GetObjectModel()->SetObjectBoundingBox(bbox);
+      }
+      break;
       case XMLTOKEN_MOVE:
         {
           if (!transf)
@@ -3208,6 +3400,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         else
           mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
       break;
+    case XMLTOKEN_NODECAL:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_NODECAL, CS_ENTITY_NODECAL);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_NODECAL, CS_ENTITY_NODECAL);
+      break;
     case XMLTOKEN_NOCLIP:
       TEST_MISSING_MESH
         if (recursive)
@@ -3729,6 +3928,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
+  void csThreadedLoader::LoadPlugin (iDocumentNode* node)
+  {
+    const char* plugin_name = node->GetAttributeValue ("name");
+    loaded_plugins.NewPlugin (plugin_name, node);
+    if (Engine->GetSaveableFlag ())
+    {
+      const char* plugin_id = loaded_plugins.FindPluginClassID (
+        plugin_name);
+      if (plugin_id)
+      {
+        csRef<iPluginReference> pluginref;
+        pluginref.AttachNew (new csPluginReference (plugin_name,
+          plugin_id));
+        object_reg->Register (pluginref,
+          csString ("_plugref_") + plugin_id);
+      }
+    }
+  }
+
   bool csThreadedLoader::LoadPlugins (iDocumentNode* node)
   {
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -3742,21 +3960,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
       case XMLTOKEN_PLUGIN:
         {
-          const char* plugin_name = child->GetAttributeValue ("name");
-          loaded_plugins.NewPlugin (plugin_name, child);
-          if (Engine->GetSaveableFlag ())
-          {
-            const char* plugin_id = loaded_plugins.FindPluginClassID (
-              plugin_name);
-            if (plugin_id)
-            {
-              csRef<iPluginReference> pluginref;
-              pluginref.AttachNew (new csPluginReference (plugin_name,
-                plugin_id));
-              object_reg->Register (pluginref,
-                csString ("_plugref_") + plugin_id);
-            }
-          }
+          LoadPlugin(child);
         }
         break;
 
@@ -4036,10 +4240,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           const char* factname = child->GetAttributeValue ("name");
           float maxdist = child->GetAttributeValueAsFloat ("maxdist");
           iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-          while(!fact && failedMeshFacts->Find(factname) == csArrayItemNotFound)
-          {
-            fact = ldr_context->FindMeshFactory (factname);
-          }
           if (!fact)
           {
             SyntaxService->ReportError (

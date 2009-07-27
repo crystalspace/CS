@@ -261,9 +261,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     iRenderBuffer* indices, iMaterialWrapper *material, const char* name, 
     uint mixmode)
   {
-    if ((subMeshes.GetSize() == 1)
-	&& (subMeshes[0] == defaultSubmesh))
+    if ((subMeshes.GetSize() == 1) && (subMeshes[0] == defaultSubmesh))
+    {
+      if(defaultSubmesh->GetMaterial() == 0)
+        defaultSubmesh->SetMaterial(material);
+
       subMeshes.Empty();
+    }
 
     csRef<SubMesh> subMesh;
     subMesh.AttachNew (new SubMesh ());
@@ -305,6 +309,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
     if (subMeshes.GetSize() == 0)
       subMeshes.Push (defaultSubmesh);
+  }
+
+  void SubMeshesContainer::SetMaterialWrapper(iMaterialWrapper* mat)
+  {
+      defaultSubmesh->SetMaterial(mat);
+      if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
+      {
+          subMeshes[0]->SetMaterial(mat);
+      }
+  }
+
+  iMaterialWrapper* SubMeshesContainer::GetMaterialWrapper() const
+  {
+      if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
+      {
+          return subMeshes[0]->GetMaterial();
+      }
+
+      return defaultSubmesh->GetMaterial();
   }
 
   //-------------------------------------------------------------------------
@@ -370,9 +393,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   void SubMeshProxiesContainer::AddSubMesh (SubMeshProxy* subMesh)
   {
-    if ((subMeshes.GetSize() == 1)
-	&& (subMeshes[0] == defaultSubmesh))
+    if ((subMeshes.GetSize() == 1) && (subMeshes[0] == defaultSubmesh))
+    {
+      if(defaultSubmesh->GetMaterial() == 0)
+        defaultSubmesh->SetMaterial(subMesh->GetMaterial());
+
       subMeshes.Empty();
+    }
 
     subMeshes.InsertSorted (subMesh, SubmeshProxySubmeshProxyCompare);
   }
@@ -391,6 +418,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       csArrayCmp<SubMeshProxy*, const char*> (name, &SubmeshProxyStringCompare));
     if (idx == csArrayItemNotFound) return 0;
     return subMeshes[idx];
+  }
+
+  void SubMeshProxiesContainer::SetMaterialWrapper(iMaterialWrapper* mat)
+  {
+      defaultSubmesh->SetMaterial(mat);
+      if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
+      {
+          subMeshes[0]->SetMaterial(mat);
+      }
+  }
+
+  iMaterialWrapper* SubMeshProxiesContainer::GetMaterialWrapper() const
+  {
+      if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
+      {
+          return subMeshes[0]->GetMaterial();
+      }
+
+      return defaultSubmesh->GetMaterial();
   }
 
   //-------------------------------------------------------------------------

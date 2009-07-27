@@ -125,7 +125,9 @@ namespace lighter
           maxSwapSize = 200;
       }
       // Check for override.
-      maxSwapSize = (size_t)(configMgr->GetInt ("lighter2.swapcachesize", (int)maxSwapSize)*1024*1024);
+      size_t maxSwapConfig = configMgr->GetInt ("lighter2.swapcachesize", maxSwapSize);
+      if ((maxSwapConfig >= 0) && (maxSwapConfig <= SIZE_MAX / (1024 * 1024)))
+        maxSwapSize = maxSwapConfig * 1024 * 1024;
       swapManager = new SwapManager (maxSwapSize);
     }
 

@@ -101,7 +101,12 @@ protected:
   };
   csArray<Clip> clips;
   // Magic SV names
-  enum { svClipPackedDist0 = ~23, svClipPackedDist1 = ~42, svClipPlane = ~43 };
+  enum
+  {
+    svClipPackedDist0 = 0xffff41,
+    svClipPackedDist1 = 0xffff42,
+    svClipPlane = 0xffff23 // must be lowest of the 'magic' values
+  };
   csRef<csShaderVariable> clipPackedDists[2];
   csRef<csShaderVariable> clipPlane[6];
   bool ParseClip (iDocumentNode* node);

@@ -200,8 +200,6 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   size_t nlights = lightInfluences.GetSize ();
 
-  csArray<iLight*> lightList (16);
-
   while (nlights-- > 0)
   {
     //iLight* light = lights->Get (nlights);
@@ -213,10 +211,6 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 
     lsvHelper.MergeAsArrayItems (stack,
       light->GetSVContext()->GetShaderVariables (), 0);
-
-    lightList.Push (light);
-    shadermgr->SetActiveLights (lightList);
-    lightList.Empty ();
 
     csSphere lightSphere (lightPos, light->GetCutoffDistance ());
     csReversibleTransform camTransR = rview->GetCamera()->GetTransform();

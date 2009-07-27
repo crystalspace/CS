@@ -351,7 +351,7 @@ enum csShaderTagPresence
  */
 struct iShaderManager : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iShaderManager, 3, 0, 2);
+  SCF_INTERFACE (iShaderManager, 4, 0, 0);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -419,17 +419,6 @@ struct iShaderManager : public virtual iShaderVariableContext
     int& count) = 0;
 
   /**
-   * Set the list of active lights.
-   * Active lights is lights that the shader should use.
-   */
-  virtual void SetActiveLights (const csArray<iLight*>& lights) = 0;
-
-  /**
-   * Get the list of active lights. 
-   */
-  virtual const csArray<iLight*>& GetActiveLights () const = 0;
-
-  /**
    * Get the stringset used for shader variable names
    */
   virtual iShaderVarStringSet* GetSVNameStringset () const = 0;
@@ -485,7 +474,7 @@ struct csShaderMetadata
  */
 struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 3, 2, 2);
+  SCF_INTERFACE(iShader, 4, 0, 0);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -509,7 +498,7 @@ struct iShader : public virtual iShaderVariableContext
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
     const csShaderVariableStack& stack) = 0;
 
-  /// Get number of passes this shader have
+  /// Get number of passes this shader has
   virtual size_t GetNumberOfPasses (size_t ticket) = 0;
 
   /// Activate a pass for rendering
@@ -529,13 +518,6 @@ struct iShader : public virtual iShaderVariableContext
   /// Completly deactivate a pass
   virtual bool DeactivatePass (size_t ticket) = 0;
 
-  /** 
-   * Get shader metadata
-   * \deprecated Deprecated in 1.3. Metadata is now same for all tickets
-   */
-  CS_DEPRECATED_METHOD_MSG("Metadata is now same for all tickets")
-  virtual const csShaderMetadata& GetMetadata (size_t ticket) const = 0;
-  
   /**
    * Request all shader variables used by a certain shader ticket.
    * \param ticket The ticket for which to retrieve the information.

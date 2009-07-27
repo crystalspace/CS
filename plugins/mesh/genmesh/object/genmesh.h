@@ -228,7 +228,6 @@ public:
 
   iVirtualClock* vc;
   csRef<iGenMeshAnimationControl> anim_ctrl;
-  csRef<iGenMeshAnimationControl1_4> anim_ctrl2;
   void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl);
   iGenMeshAnimationControl* GetAnimationControl () const { return anim_ctrl; }
   const csVector3* AnimControlGetVertices ();
@@ -306,7 +305,7 @@ public:
   virtual bool GetColor (csColor& col) const { col = base_color; return true; }
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat);
   virtual iMaterialWrapper* GetMaterialWrapper () const
-  { return subMeshes.GetDefaultSubmesh()->SubMeshProxy::GetMaterial(); }
+  { return subMeshes.GetMaterialWrapper(); }
 
   /**
    * see imesh/object.h for specification. The default implementation
@@ -487,11 +486,11 @@ public:
 
   bool SetMaterialWrapper (iMaterialWrapper* material)
   {
-    subMeshes.GetDefaultSubmesh()->SubMesh::SetMaterial (material);
+    subMeshes.SetMaterialWrapper (material);
     return true;
   }
   iMaterialWrapper* GetMaterialWrapper () const
-  { return subMeshes.GetDefaultSubmesh()->SubMesh::GetMaterial(); }
+  { return subMeshes.GetMaterialWrapper(); }
   void AddVertex (const csVector3& v,
       const csVector2& uv, const csVector3& normal,
       const csColor4& color);

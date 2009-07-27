@@ -136,6 +136,7 @@ struct csBlockAllocatorSizeObjectAlign
  *
  * \sa csArray
  * \sa csMemoryPool
+ * \sa CS::Memory::BlockAllocatorSafe for a thread-safe version
  */
 template <class T,
   typename Allocator = CS::Memory::AllocatorMalloc, 
@@ -277,6 +278,92 @@ public:
   }
 };
 
+namespace CS
+{
+  namespace Memory
+  {
+    /**
+     * Thread-safe allocator for objects of a class.
+     * Has the same purpose and interface as csBlockAllocator but is safe
+     * to be used concurrently from different threads.
+     */
+    template <class T,
+      typename Allocator = AllocatorMalloc, 
+      typename ObjectDispose = csBlockAllocatorDisposeDelete<T>,
+      typename SizeComputer = csBlockAllocatorSizeObject<T>
+    >
+    class BlockAllocatorSafe : 
+      public AllocatorSafe<csBlockAllocator<T, Allocator, ObjectDispose,
+        SizeComputer> >
+    {
+    protected:
+      typedef csBlockAllocator<T, Allocator,
+        ObjectDispose, SizeComputer> WrappedAllocatorType;
+      typedef AllocatorSafe<WrappedAllocatorType> AllocatorSafeType;
+    public:
+      BlockAllocatorSafe (size_t nelem = 32) : AllocatorSafeType (nelem)
+      {
+      }
+    
+      void Empty ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        WrappedAllocatorType::Empty ();
+      }
+    
+      void DeleteAll ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        WrappedAllocatorType::DeleteAll ();
+      }
+      
+      void Compact()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        WrappedAllocatorType::Compact();
+      }
+    
+      T* Alloc ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        return WrappedAllocatorType::Alloc ();
+      }
+    
+      template<typename A1, typename A2>
+      T* Alloc (A1& a1, A2& a2)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        return WrappedAllocatorType::Alloc (a1, a2);
+      }
+    
+      template<typename A1, typename A2, typename A3>
+      T* Alloc (A1& a1, A2& a2, A3& a3)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        return WrappedAllocatorType::Alloc (a1, a2, a3);
+      }
+    
+      template<typename A1>
+      T* Alloc (A1& a1)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        return WrappedAllocatorType::Alloc (a1);
+      }
+    
+      void Free (T* p)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        WrappedAllocatorType::Free (p);
+      }
+      bool TryFree (T* p)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        return WrappedAllocatorType::TryFree (p);
+      }
+    };
+  } // namespace Memory
+} // namespace CS
+  
 /** @} */
 
 #include "csutil/custom_new_enable.h"

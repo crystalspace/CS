@@ -135,7 +135,7 @@ namespace CS
      * \c SingleAllocation specifies whether no more than a single block is
      * allocated from the allocator at any time. Using that option saves 
      * (albeit a miniscule amount of) memory, but obviously is only safe when
-     * it's know that the single allocation constraint is satisfied (such as 
+     * it's known that the single allocation constraint is satisfied (such as 
      * allocators for csArray<>s).
      *
      * \warning The pointer returned may point into the instance data; be 
@@ -294,6 +294,114 @@ namespace CS
         #ifdef CS_DEBUG
             memset (localBuf, freePattern, localSize);
         #endif
+            if (!SingleAllocation) localBuf[localSize] = 0;
+	    return p;
+          }
+        }
+        else
+        {
+          if ((newSize <= localSize) && (SingleAllocation || !localBuf[localSize]))
+	  {
+	    memcpy (localBuf, p, newSize);
+	    ExcessAllocator::Free (p);
+            if (!SingleAllocation) localBuf[localSize] = 1;
+	    return localBuf;
+	  }
+	  else
+	    return ExcessAllocator::Realloc (p, newSize);
+        }
+      }
+
+      using ExcessAllocator::SetMemTrackerInfo;
+    };
+    
+    /**
+     * LocalBufferAllocator without safety checks, but suitable for use across
+     * modules.
+     *
+     * Since this class does not perform the same safety checks as
+     * LocalBufferAllocator it's good practice to start off with a normal
+     * (checked) LocalBufferAllocator and only move to using
+     * LocalBufferAllocatorUnchecked once you're sure there are no invalid
+     * usages.
+     */
+    template<typename T, size_t N, class ExcessAllocator = AllocatorMalloc,
+      bool SingleAllocation = false>
+    class LocalBufferAllocatorUnchecked : public ExcessAllocator
+    {
+      static const size_t localSize = N * sizeof (T);
+      uint8 localBuf[localSize + (SingleAllocation ? 0 : 1)];
+    public:
+      LocalBufferAllocatorUnchecked ()
+      {
+        if (!SingleAllocation) 
+          localBuf[localSize] = 0;
+      }
+      LocalBufferAllocatorUnchecked (const ExcessAllocator& xalloc) : 
+        ExcessAllocator (xalloc)
+      {
+        if (!SingleAllocation) 
+          localBuf[localSize] = 0;
+      }
+      T* Alloc (size_t allocSize)
+      {
+        if (SingleAllocation)
+        {
+	  if (allocSize <= localSize)
+	    return (T*)localBuf;
+	  else
+          {
+            void* p = ExcessAllocator::Alloc (allocSize);
+	    return (T*)p;
+          }
+        }
+        else
+        {
+          void* p;
+	  if ((allocSize <= localSize) && !localBuf[localSize])
+          {
+            localBuf[localSize] = 1;
+	    p = localBuf;
+          }
+	  else
+          {
+            p = ExcessAllocator::Alloc (allocSize);
+          }
+          return (T*)p;
+        }
+      }
+    
+      void Free (T* mem)
+      {
+        if (SingleAllocation)
+        {
+          if (mem != (T*)localBuf)
+	    ExcessAllocator::Free (mem);
+        }
+        else
+        {
+          if (mem != (T*)localBuf) 
+            ExcessAllocator::Free (mem);
+          else
+          {
+            localBuf[localSize] = 0;
+          }
+        }
+      }
+    
+      // The 'relevantcount' parameter should be the number of items
+      // in the old array that are initialized.
+      void* Realloc (void* p, size_t newSize)
+      {
+        if (p == 0) return Alloc (newSize);
+        if (p == localBuf)
+        {
+          if (newSize <= localSize)
+            return p;
+          else
+          {
+	    p = ExcessAllocator::Alloc (newSize);
+	    memcpy (p, localBuf, localSize);
             if (!SingleAllocation) localBuf[localSize] = 0;
 	    return p;
           }
@@ -556,6 +664,10 @@ namespace CS
       CS::Threading::RecursiveMutex mutex;
 
     public:
+      AllocatorSafe () : Allocator ()
+      {
+      }
+
       template<typename A1>
       AllocatorSafe (const A1& a1) : Allocator (a1)
       {

@@ -51,6 +51,8 @@ public:
     box = csNullmeshMeshFactory::box;
   }
 
+  virtual void SetHitBeamMeshObject (iMeshObject* mesh) {}
+
   virtual csFlags& GetFlags () { return factory_flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -102,6 +104,9 @@ public:
   {
     box = csNullmeshMeshObject::box;
   }
+
+  virtual void SetHitBeamMeshObject (iMeshObject* mesh)
+  { hitbeam_mesh = mesh; }
 
   //----------------------- iMeshObject implementation ------------------------
   virtual iMeshObjectFactory* GetFactory () const
@@ -159,6 +164,7 @@ private:
   iMeshObjectFactory* factory;
   iMeshObjectType* nullmesh_type;
   iMeshWrapper* logparent;
+  iMeshObject* hitbeam_mesh;
   csRef<iMeshObjectDrawCallback> vis_cb;
   float radius;
   csBox3 box;

@@ -42,6 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     collection(collection), missingdata(missingdata), keepFlags(keepFlags), do_verbose(do_verbose)
   {
     tm = csQueryRegistry<iTextureManager>(object_reg);
+    vfs = csQueryRegistry<iVFS>(object_reg);
   }
 
   csLoaderContext::~csLoaderContext ()
@@ -81,136 +82,114 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return s;
   }
 
-  iMaterialWrapper* csLoaderContext::FindMaterial(const char* name, bool dontWaitForLoad)
+  iMaterialWrapper* csLoaderContext::FindMaterial(const char* name, bool doLoad)
   {
     csRef<iMaterialWrapper> mat;
-    while(!mat.IsValid())
     {
+      CS::Threading::ScopedReadLock lock(loader->materialsLock);
+      for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
       {
-        CS::Threading::ScopedReadLock lock(loader->materialsLock);
-        for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
+        if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), name))
         {
-          if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), name))
-          {
-            mat = loader->loaderMaterials[i];
-            return mat;
-          }
-        }
-      }
-
-      if(!mat.IsValid() && missingdata)
-      {
-        mat = missingdata->MissingMaterial(name, name);
-      }
-
-      if(!mat.IsValid())
-      {
-        mat = Engine->FindMaterial(name, collection);
-      }
-
-      if(!mat.IsValid() && collection)
-      {
-        mat = Engine->FindMaterial(name);
-      }
-
-      if(dontWaitForLoad || !FindAvailMaterial(name))
-      {
-        break;
-      }
-    }
-    
-    // *** This is deprecated behaviour ***
-    if(!dontWaitForLoad && !mat.IsValid())
-    {
-      ReportWarning("Could not find material '%s'. Creating material. This behaviour is deprecated.", name);
-      if(missingdata)
-      {
-        mat = missingdata->MissingMaterial(name, name);
-        if(mat)
-        {
+          mat = loader->loaderMaterials[i];
           return mat;
         }
       }
+    }
 
-      iTextureWrapper* tex = FindTexture (name, false);
-      if (tex)
+    if(!mat.IsValid() && missingdata)
+    {
+      mat = missingdata->MissingMaterial(name, name);
+    }
+
+    if(!mat.IsValid())
+    {
+      mat = Engine->FindMaterial(name, collection);
+    }
+
+    if(!mat.IsValid() && collection)
+    {
+      mat = Engine->FindMaterial(name);
+    }
+    
+    if(doLoad)
+    {
+      // *** This is deprecated behaviour ***
+      if(!mat.IsValid())
       {
-        // Add a default material with the same name as the texture
-        csRef<iMaterial> material = Engine->CreateBaseMaterial (tex);
-        // First we have to extract the optional region name from the name:
-        char const* n = strchr (name, '/');
-        if (!n) n = name;
-        else n++;
-        csRef<iMaterialWrapper> mat = Engine->GetMaterialList()->CreateMaterial (material, n);
-        loader->AddMaterialToList(mat);
-
-        if(collection)
+        ReportWarning("Could not find material '%s'. Creating material. This behaviour is deprecated.", name);
+        if(missingdata)
         {
-          collection->Add(mat->QueryObject());
+          mat = missingdata->MissingMaterial(name, name);
+          if(mat)
+          {
+            return mat;
+          }
         }
 
-        tex->Register(tm);
-        return mat;
-      }
-    }
-    /// ***
+        iTextureWrapper* tex = FindTexture (name);
+        if (tex)
+        {
+          // Add a default material with the same name as the texture
+          csRef<iMaterial> material = Engine->CreateBaseMaterial (tex);
+          // First we have to extract the optional region name from the name:
+          char const* n = strchr (name, '/');
+          if (!n) n = name;
+          else n++;
+          csRef<iMaterialWrapper> mat = Engine->GetMaterialList()->CreateMaterial (material, n);
+          loader->AddMaterialToList(mat);
 
-    if(!mat.IsValid() && !dontWaitForLoad && do_verbose)
-    {
-      ReportNotify("Could not find material '%s'.", name);
+          if(collection)
+          {
+            collection->Add(mat->QueryObject());
+          }
+
+          tex->Register(tm);
+          return mat;
+        }
+      }
+      /// ***
+
+      if(!mat.IsValid() && do_verbose)
+      {
+        ReportNotify("Could not find material '%s'.", name);
+      }
     }
 
     return mat;
   }
 
-  iMeshFactoryWrapper* csLoaderContext::FindMeshFactory(const char* name, bool dontWaitForLoad)
+  iMeshFactoryWrapper* csLoaderContext::FindMeshFactory(const char* name, bool notify)
   {
     csRef<iMeshFactoryWrapper> fact;
-    while(!fact.IsValid())
     {
+      CS::Threading::ScopedReadLock lock(loader->meshfactsLock);
+      for(size_t i=0; i<loader->loaderMeshFactories.GetSize(); i++)
       {
-        CS::Threading::ScopedReadLock lock(loader->meshfactsLock);
-        for(size_t i=0; i<loader->loaderMeshFactories.GetSize(); i++)
+        if(!strcmp(loader->loaderMeshFactories[i]->QueryObject()->GetName(), name))
         {
-          if(!strcmp(loader->loaderMeshFactories[i]->QueryObject()->GetName(), name))
-          {
-            fact = loader->loaderMeshFactories[i];
-            return fact;
-          }
-        }
-      }
-
-      if(!fact.IsValid() && missingdata)
-      {
-        fact = missingdata->MissingFactory(name);
-      }
-
-      if(!fact.IsValid())
-      {
-        fact = Engine->FindMeshFactory(name, collection);
-      }
-
-      if(!fact.IsValid() && collection)
-      {
-        fact = Engine->FindMeshFactory(name);
-      }
-
-      if(dontWaitForLoad || !FindAvailMeshFact(name))
-      {
-        break;
-      }
-
-      for(size_t i=0; i<loader->failedMeshFacts->GetSize(); i++)
-      {
-        if(!strcmp(loader->failedMeshFacts->Get(i), name))
-        {
-          // Break out of the loop, it's never going to be loaded.
-          break;
+          fact = loader->loaderMeshFactories[i];
+          return fact;
         }
       }
     }
 
-    if(!fact.IsValid() && !dontWaitForLoad && do_verbose)
+    if(!fact.IsValid() && missingdata)
+    {
+      fact = missingdata->MissingFactory(name);
+    }
+
+    if(!fact.IsValid())
+    {
+      fact = Engine->FindMeshFactory(name, collection);
+    }
+
+    if(!fact.IsValid() && collection)
+    {
+      fact = Engine->FindMeshFactory(name);
+    }
+
+    if(!fact.IsValid() && notify && do_verbose)
     {
       ReportNotify("Could not find mesh factory '%s'.", name);
     }
@@ -221,50 +200,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iMeshWrapper* csLoaderContext::FindMeshObject(const char* name)
   {
     csRef<iMeshWrapper> mesh;
-    while(!mesh.IsValid())
+    csRef<iThreadReturn> itr = loader->loadingMeshObjects.Get(name, NULL);
+    if(itr.IsValid())
     {
-      csRef<iThreadReturn> itr = loader->loadingMeshObjects.Get(name, NULL);
-      if(itr.IsValid())
+      itr->Wait();
+      if(itr->WasSuccessful())
       {
-        itr->Wait();
-        if(itr->WasSuccessful())
-        {
-          mesh = scfQueryInterface<iMeshWrapper>(itr->GetResultRefPtr());
-          return mesh;
-        }            
-      }
+        mesh = scfQueryInterface<iMeshWrapper>(itr->GetResultRefPtr());
+        return mesh;
+      }            
+    }
 
+    {
+      CS::Threading::ScopedReadLock lock(loader->meshesLock);
+      for(size_t i=0; i<loader->loaderMeshes.GetSize(); i++)
       {
-        CS::Threading::ScopedReadLock lock(loader->meshesLock);
-        for(size_t i=0; i<loader->loaderMeshes.GetSize(); i++)
+        if(!strcmp(loader->loaderMeshes[i]->QueryObject()->GetName(), name))
         {
-          if(!strcmp(loader->loaderMeshes[i]->QueryObject()->GetName(), name))
-          {
-            mesh = loader->loaderMeshes[i];
-            return mesh;
-          }
+          mesh = loader->loaderMeshes[i];
+          return mesh;
         }
       }
+    }
 
-      if (!mesh.IsValid() && missingdata)
-      {
-        mesh = missingdata->MissingMesh(name);
-      }
+    if (!mesh.IsValid() && missingdata)
+    {
+      mesh = missingdata->MissingMesh(name);
+    }
 
-      if(!mesh.IsValid())
-      {
-        mesh = Engine->FindMeshObject(name, collection);
-      }
+    if(!mesh.IsValid())
+    {
+      mesh = Engine->FindMeshObject(name, collection);
+    }
 
-      if(!mesh.IsValid() && collection)
-      {
-        mesh = Engine->FindMeshObject(name);
-      }
-
-      if(!FindAvailMeshObj(name))
-      {
-        break;
-      }
+    if(!mesh.IsValid() && collection)
+    {
+      mesh = Engine->FindMeshObject(name);
     }
 
     if(!mesh.IsValid() && do_verbose)
@@ -278,49 +249,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iLight* csLoaderContext::FindLight(const char *name)
   {
     csRef<iLight> light;
-    while(!light.IsValid())
     {
-      {
-        CS::Threading::ScopedReadLock lock(loader->lightsLock);
-        light = loader->loadedLights.Get(csString(name), 0);
-      }
+      CS::Threading::ScopedReadLock lock(loader->lightsLock);
+      light = loader->loadedLights.Get(csString(name), 0);
+    }
 
-      if(!light.IsValid() && missingdata)
-      {
-        light = missingdata->MissingLight(name);
-      }
+    if(!light.IsValid() && missingdata)
+    {
+      light = missingdata->MissingLight(name);
+    }
 
-      if(!light.IsValid())
-      {
-        csRef<iLightIterator> li = Engine->GetLightIterator(collection);
+    if(!light.IsValid())
+    {
+      csRef<iLightIterator> li = Engine->GetLightIterator(collection);
 
-        while(li->HasNext())
+      while(li->HasNext())
+      {
+        light = li->Next();
+        if(!strcmp(light->QueryObject()->GetName(), name))
         {
-          light = li->Next();
-          if(!strcmp(light->QueryObject()->GetName(), name))
-          {
-            break;
-          }
+          break;
         }
       }
+    }
 
-      if(!light.IsValid() && collection)
+    if(!light.IsValid() && collection)
+    {
+      csRef<iLightIterator> li = Engine->GetLightIterator();
+
+      while(li->HasNext())
       {
-        csRef<iLightIterator> li = Engine->GetLightIterator();
-
-        while(li->HasNext())
+        light = li->Next();
+        if(!strcmp(light->QueryObject()->GetName(), name))
         {
-          light = li->Next();
-          if(!strcmp(light->QueryObject()->GetName(), name))
-          {
-            break;
-          }
+          break;
         }
-      }
-
-      if(!FindAvailLight(name))
-      {
-        break;
       }
     }
 
@@ -390,78 +353,59 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return shader;
   }
 
-  iTextureWrapper* csLoaderContext::FindTexture(const char* name, bool dontWaitForLoad)
+  iTextureWrapper* csLoaderContext::FindTexture(const char* name, bool doLoad)
   {
     csRef<iTextureWrapper> result;
-    while(!result.IsValid())
     {
+      CS::Threading::ScopedReadLock lock(loader->texturesLock);
+      for(size_t i=0; i<loader->loaderTextures.GetSize(); i++)
       {
-        CS::Threading::ScopedReadLock lock(loader->texturesLock);
-        for(size_t i=0; i<loader->loaderTextures.GetSize(); i++)
+        if(loader->loaderTextures[i]->QueryObject()->GetName() &&
+          !strcmp(loader->loaderTextures[i]->QueryObject()->GetName(), name))
         {
-          if(loader->loaderTextures[i]->QueryObject()->GetName() &&
-            !strcmp(loader->loaderTextures[i]->QueryObject()->GetName(), name))
-          {
-            result = loader->loaderTextures[i];
-            return result;
-          }
+          result = loader->loaderTextures[i];
+          return result;
         }
       }
+    }
 
-      if(!result.IsValid() && missingdata)
-      {
-        result = missingdata->MissingTexture (name, name);
-      }
+    if(!result.IsValid() && missingdata)
+    {
+      result = missingdata->MissingTexture (name, name);
+    }
 
+    if(!result.IsValid())
+    {
+      result = Engine->FindTexture(name, collection);
+    }
+
+    if(!result.IsValid() && collection)
+    {
+      result = Engine->FindTexture(name);
+    }
+
+    if(doLoad)
+    {
+      // *** This is deprecated behaviour ***
       if(!result.IsValid())
       {
-        result = Engine->FindTexture(name, collection);
+        ReportWarning("Could not find texture '%s'. Loading texture. This is deprecated behaviour.", 
+          name);
+        csRef<iThreadManager> tman = csQueryRegistry<iThreadManager>(object_reg);
+        csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(tman));
+        loader->LoadTextureTC(itr, false, loader->GetVFS()->GetCwd(), name, name, CS_TEXTURE_3D, tm, true, false, true, collection,
+          KEEP_ALL, do_verbose);
+        result = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
       }
+      // ***
 
-      if(!result.IsValid() && collection)
+      if(!result.IsValid() && do_verbose)
       {
-        result = Engine->FindTexture(name);
+        ReportNotify ("Could not find texture '%s'. Attempting to load.", name);
       }
-
-      if(dontWaitForLoad || !FindAvailTexture(name))
-      {
-        break;
-      }
-    }
-
-    // *** This is deprecated behaviour ***
-    if(!dontWaitForLoad && !result.IsValid())
-    {
-      ReportWarning("Could not find texture '%s'. Loading texture. This is deprecated behaviour.", 
-        name);
-      csRef<iThreadManager> tman = csQueryRegistry<iThreadManager>(object_reg);
-      csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(tman));
-      loader->LoadTextureTC(itr, false, loader->GetVFS()->GetCwd(), name, name, CS_TEXTURE_3D, tm, true, false, true, collection,
-        KEEP_ALL, do_verbose);
-      result = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
-    }
-    // ***
-
-    if(!result.IsValid() && !dontWaitForLoad && do_verbose)
-    {
-      ReportNotify ("Could not find texture '%s'. Attempting to load.", name);
     }
 
     return result;
-  }
-
-  iGeneralMeshSubMesh* csLoaderContext::FindSubmesh(iGeneralMeshState* state, const char* factname, const char* name)
-  {
-    csRef<iGeneralMeshSubMesh> submesh = state->FindSubMesh(name);
-    if(FindAvailSubmesh(csString(factname).AppendFmt(":%s", name)))
-    {
-      while(!submesh.IsValid())
-      {
-        submesh = state->FindSubMesh(name);
-      }
-    }
-
-    return submesh;
   }
 
   void csLoaderContext::AddToCollection(iObject* obj)
@@ -488,6 +432,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     va_end (arg);
   }
 
+  void csLoaderContext::ParseAvailablePlugins(iDocumentNode* doc)
+  {
+    csRef<iDocumentNodeIterator> itr = doc->GetNodes("plugin");
+    while(itr->HasNext())
+    {
+      csRef<iDocumentNode> plugin = itr->Next();
+      if(plugin->GetAttributeValue("name"))
+      {
+        NodeData dat;
+        dat.node = plugin;
+        dat.path = vfs->GetCwd();
+        CS::Threading::MutexScopedLock lock(pluginObjects);
+        availPlugins.Push(dat);
+      }
+    }
+  }
+
   void csLoaderContext::ParseAvailableTextures(iDocumentNode* doc)
   {
     csRef<iDocumentNodeIterator> itr = doc->GetNodes("texture");
@@ -496,9 +457,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iDocumentNode> texture = itr->Next();
       if(texture->GetAttributeValue("name"))
       {
+        NodeData dat;
+        dat.node = texture;
+        dat.path = vfs->GetCwd();
         CS::Threading::MutexScopedLock lock(textureObjects);
-        availTextures.PushSmart(texture->GetAttributeValue("name"));
+        availTextures.Push(dat);
       }
+    }
+  }
+
+  void csLoaderContext::ParseAvailableShaders(iDocumentNode* doc)
+  {
+    csRef<iDocumentNodeIterator> itr = doc->GetNodes("shader");
+    while(itr->HasNext())
+    {
+      NodeData dat;
+      dat.node = itr->Next();
+      dat.path = vfs->GetCwd();
+      CS::Threading::MutexScopedLock lock(shaderObjects);
+      availShaders.Push(dat);
     }
   }
 
@@ -510,89 +487,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iDocumentNode> material = itr->Next();
       if(material->GetAttributeValue("name"))
       {
+        NodeData dat;
+        dat.node = material;
+        dat.path = vfs->GetCwd();
         CS::Threading::MutexScopedLock lock(materialObjects);
-        availMaterials.PushSmart(material->GetAttributeValue("name"));
+        availMaterials.Push(dat);
       }
     }
   }
 
   void csLoaderContext::ParseAvailableMeshfacts(iDocumentNode* doc)
   {
-    if(doc->GetAttributeValue("name"))
-    {
-      CS::Threading::MutexScopedLock lock(meshfactObjects);
-      availMeshfacts.Push(doc->GetAttributeValue("name"));
-    }
-
-    if(doc->GetNode("params"))
-    {
-      ParseAvailableSubmeshes(doc->GetNode("params"), doc->GetAttributeValue("name"));
-    }
-
     csRef<iDocumentNodeIterator> itr = doc->GetNodes("meshfact");
     while(itr->HasNext())
     {
-      ParseAvailableMeshfacts(itr->Next());
-    }
-  }
-
-  void csLoaderContext::ParseAvailableSubmeshes(iDocumentNode* doc, const char* factname)
-  {
-    csRef<iDocumentNodeIterator> itr = doc->GetNodes("submesh");
-    while(itr->HasNext())
-    {
-      csRef<iDocumentNode> submesh = itr->Next();
-      if(submesh->GetAttributeValue("name"))
+      csRef<iDocumentNode> meshfact = itr->Next();
+      if(meshfact->GetAttributeValue("name"))
       {
-        CS::Threading::MutexScopedLock lock(submeshObjects);
-        availSubmeshes.Push(csString(factname).AppendFmt(":%s", submesh->GetAttributeValue("name")));
-      }
-    }
-  }
-
-  void csLoaderContext::ParseAvailableMeshes(iDocumentNode* doc, const char* prefix)
-  {
-    csRef<iDocumentNodeIterator> itr = doc->GetNodes("meshobj");
-    while(itr->HasNext())
-    {
-      csRef<iDocumentNode> meshobj = itr->Next();
-      const char* name = meshobj->GetAttributeValue("name");
-      csString realName = name;
-      if(name)
-      {
-        CS::Threading::MutexScopedLock lock(meshObjects);
-        if(prefix)
-        {
-          realName.Format("%s:%s", prefix, name);
-        }
-        availMeshes.Push(realName);
-      }
-      ParseAvailableMeshes(meshobj, realName);
-    }
-
-    itr = doc->GetNodes("meshref");
-    while(itr->HasNext())
-    {
-      csRef<iDocumentNode> meshobj = itr->Next();
-      const char* name = meshobj->GetAttributeValue("name");
-      if(name)
-      {
-        CS::Threading::MutexScopedLock lock(meshObjects);
-        availMeshes.Push(name);
-      }
-    }
-  }
-
-  void csLoaderContext::ParseAvailableLights(iDocumentNode* doc)
-  {
-    csRef<iDocumentNodeIterator> itr = doc->GetNodes("light");
-    while(itr->HasNext())
-    {
-      csRef<iDocumentNode> light = itr->Next();
-      if(light->GetAttributeValue("name"))
-      {
-        CS::Threading::MutexScopedLock lock(lightObjects);
-        availLights.Push(light->GetAttributeValue("name"));
+        NodeData dat;
+        dat.node = meshfact;
+        dat.path = vfs->GetCwd();
+        CS::Threading::MutexScopedLock lock(meshfactObjects);
+        availMeshfacts.Push(dat);
       }
     }
   }

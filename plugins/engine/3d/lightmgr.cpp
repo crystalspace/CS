@@ -130,32 +130,38 @@ protected:
   const csReversibleTransform& tf;
 };
 
-struct IntersectInnerBBox
+struct IntersectInnerBBoxAndLightFilter
 {
-  IntersectInnerBBox (const csBox3& box)
-    : testBox (box)
+  IntersectInnerBBoxAndLightFilter (const csBox3& box, uint lightFilter)
+    : testBox (box), lightFilter (lightFilter)
   {}
 
   bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
-    return testBox.TestIntersect (node->GetBBox ());
+    return ((node->lightTypes & lightFilter) != 0)
+      && testBox.TestIntersect (node->GetBBox ());
   }
 
   const csBox3& testBox;
+  uint lightFilter;
 };
 
 template<typename BoxSpace>
 struct LightCollectArray
 {
   LightCollectArray (const BoxSpace& boxSpace,
-    const csBox3& box, const csBox3& boxWorld,
+    const csBox3& box, const csBox3& boxWorld, 
+    uint lightFilter,
     iLightInfluenceArray* lightArray)
     : boxSpace (boxSpace), testBox (box), testBoxWorld (boxWorld),
-      lightArray (lightArray)
+      lightFilter (lightFilter), lightArray (lightArray)
   {}
 
   bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
+    if ((node->lightTypes & lightFilter) == 0)
+      return true;
+  
     if (!testBoxWorld.TestIntersect (node->GetBBox ()))
       return true;
 
@@ -172,6 +178,9 @@ struct LightCollectArray
       
       csLightInfluence newInfluence = MakeInfluence (light,
         testBox, lightSphere.GetCenter());
+      if ((lightFilter
+          & LightExtraAABBNodeData::GetLightType (newInfluence.dynamicType)) == 0)
+        continue;
       lightArray->Push (newInfluence);
     }
       
@@ -181,6 +190,7 @@ struct LightCollectArray
   const BoxSpace& boxSpace;
   const csBox3& testBox;
   const csBox3& testBoxWorld;
+  uint lightFilter;
   iLightInfluenceArray* lightArray;
 };
 
@@ -189,13 +199,17 @@ struct LightCollectCallback
 {
   LightCollectCallback (const BoxSpace& boxSpace,
     const csBox3& box, const csBox3& boxWorld,
+    uint lightFilter,
     iLightInfluenceCallback* lightCallback)
     : boxSpace (boxSpace), testBox (box), testBoxWorld (boxWorld),
-      lightCallback (lightCallback)
+      lightFilter (lightFilter), lightCallback (lightCallback)
   {}
 
   bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
+    if ((node->lightTypes & lightFilter) == 0)
+      return true;
+  
     if (!testBoxWorld.TestIntersect (node->GetBBox ()))
       return true;
 
@@ -212,6 +226,9 @@ struct LightCollectCallback
       
       csLightInfluence newInfluence = MakeInfluence (light,
         testBox, lightSphere.GetCenter());
+      if ((lightFilter
+          & LightExtraAABBNodeData::GetLightType (newInfluence.dynamicType)) == 0)
+        continue;
       lightCallback->LightInfluence (newInfluence);
     }
     return true;
@@ -220,6 +237,7 @@ struct LightCollectCallback
   const BoxSpace& boxSpace;
   const csBox3& testBox;
   const csBox3& testBoxWorld;
+  uint lightFilter;
   iLightInfluenceCallback* lightCallback;
 };
 
@@ -230,24 +248,30 @@ void csLightManager::GetRelevantLights (iSector* sector, const csBox3& boundingB
 {
   iLightList* llist = sector->GetLights ();
   csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
+  
+  uint lightFilter = 0;
+  if (flags & CS_LIGHTQUERY_GET_TYPE_STATIC)
+    lightFilter |= LightExtraAABBNodeData::ltStatic;
+  if (flags & CS_LIGHTQUERY_GET_TYPE_DYNAMIC)
+    lightFilter |= LightExtraAABBNodeData::ltDynamic;
 
   // Get the primary lights from same sector
   const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
   if (!bboxToWorld || bboxToWorld->IsIdentity())
   {
     BoxSpaceIdentity boxSpace;
-    IntersectInnerBBox inner (boundingBox);
+    IntersectInnerBBoxAndLightFilter inner (boundingBox, lightFilter);
     LightCollectArray<BoxSpaceIdentity> leaf (boxSpace, boundingBox, 
-      boundingBox, lightArray);
+      boundingBox, lightFilter, lightArray);
     aabbTree.Traverse (inner, leaf);
   }
   else
   {
     BoxSpaceTransform boxSpace (*bboxToWorld);
     csBox3 boxWorld (boxSpace.ToWorld (boundingBox));
-    IntersectInnerBBox inner (boxWorld);
+    IntersectInnerBBoxAndLightFilter inner (boxWorld, lightFilter);
     LightCollectArray<BoxSpaceTransform> leaf (boxSpace, boundingBox, 
-      boxWorld, lightArray);
+      boxWorld, lightFilter, lightArray);
     aabbTree.Traverse (inner, leaf);
   } 
 
@@ -261,23 +285,29 @@ void csLightManager::GetRelevantLights (iSector* sector, const csBox3& boundingB
   iLightList* llist = sector->GetLights ();
   csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
 
+  uint lightFilter = 0;
+  if (flags & CS_LIGHTQUERY_GET_TYPE_STATIC)
+    lightFilter |= LightExtraAABBNodeData::ltStatic;
+  if (flags & CS_LIGHTQUERY_GET_TYPE_DYNAMIC)
+    lightFilter |= LightExtraAABBNodeData::ltDynamic;
+
   // Get the primary lights from same sector
   const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
   if (!bboxToWorld || bboxToWorld->IsIdentity())
   {
     BoxSpaceIdentity boxSpace;
-    IntersectInnerBBox inner (boundingBox);
+    IntersectInnerBBoxAndLightFilter inner (boundingBox, lightFilter);
     LightCollectCallback<BoxSpaceIdentity> leaf (boxSpace, boundingBox, 
-      boundingBox, lightCallback);
+      boundingBox, lightFilter, lightCallback);
     aabbTree.Traverse (inner, leaf);
   }
   else
   {
     BoxSpaceTransform boxSpace (*bboxToWorld);
     csBox3 boxWorld (boxSpace.ToWorld (boundingBox));
-    IntersectInnerBBox inner (boxWorld);
+    IntersectInnerBBoxAndLightFilter inner (boxWorld, lightFilter);
     LightCollectCallback<BoxSpaceTransform> leaf (boxSpace, boundingBox, 
-      boxWorld, lightCallback);
+      boxWorld, lightFilter, lightCallback);
     aabbTree.Traverse (inner, leaf);
   } 
 
@@ -319,13 +349,17 @@ struct LightCollectArrayPtr
 {
   LightCollectArrayPtr (const BoxSpace& boxSpace,
     const csBox3& box, const csBox3& boxWorld,
+    uint lightFilter,
     ArrayType& arr, size_t max)
     : boxSpace (boxSpace), testBox (box), testBoxWorld (boxWorld),
-      arr (arr), max (max)
+      lightFilter (lightFilter), arr (arr), max (max)
   {}
 
   bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
+    if ((node->lightTypes & lightFilter) == 0)
+      return true;
+  
     if (!testBoxWorld.TestIntersect (node->GetBBox ()))
       return true;
 
@@ -344,6 +378,9 @@ struct LightCollectArrayPtr
       {
         csLightInfluence newInfluence = MakeInfluence (light,
           testBox, lightSphere.GetCenter());
+	if ((lightFilter
+	    & LightExtraAABBNodeData::GetLightType (newInfluence.dynamicType)) == 0)
+	  continue;
         arr.Push (newInfluence);
       }
       else
@@ -355,6 +392,7 @@ struct LightCollectArrayPtr
   const BoxSpace& boxSpace;
   const csBox3& testBox;
   const csBox3& testBoxWorld;
+  uint lightFilter;
   ArrayType& arr;
   size_t max;
 };
@@ -389,16 +427,22 @@ void csLightManager::GetRelevantLightsWorker (const BoxSpace& boxSpace,
   iLightList* llist = sector->GetLights ();
   csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
 
+  uint lightFilter = 0;
+  if (flags & CS_LIGHTQUERY_GET_TYPE_STATIC)
+    lightFilter |= LightExtraAABBNodeData::ltStatic;
+  if (flags & CS_LIGHTQUERY_GET_TYPE_DYNAMIC)
+    lightFilter |= LightExtraAABBNodeData::ltDynamic;
+
   // Get the primary lights from same sector
   //@@TODO: Implement cross-sector lookups
   const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
   csBox3 boxWorld (boxSpace.ToWorld (boundingBox));
-  IntersectInnerBBox inner (boxWorld);
+  IntersectInnerBBoxAndLightFilter inner (boxWorld, lightFilter);
   if (!tempInfluencesUsed)
   {
     tempInfluencesUsed = true;
     LightCollectArrayPtr<TempInfluences, BoxSpace> leaf (boxSpace,
-      boundingBox, boxWorld, tempInfluences, maxLights);
+      boundingBox, boxWorld, lightFilter, tempInfluences, maxLights);
     aabbTree.Traverse (inner, leaf);
     
     numLights = tempInfluences.GetSize();
@@ -414,7 +458,7 @@ void csLightManager::GetRelevantLightsWorker (const BoxSpace& boxSpace,
   {
     LightInfluenceArray tmpLightArray;
     LightCollectArrayPtr<LightInfluenceArray, BoxSpace> leaf (boxSpace,
-      boundingBox, boxWorld, tmpLightArray, maxLights);
+      boundingBox, boxWorld, lightFilter, tmpLightArray, maxLights);
     aabbTree.Traverse (inner, leaf);
     
     numLights = tmpLightArray.GetSize();

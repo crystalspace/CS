@@ -69,9 +69,9 @@ public:
 
   bool Initialize ();
   void PushFrame ();
+  void OnClose(wxCloseEvent& event);
   void OnIconize(wxIconizeEvent& event);
   void OnShow(wxShowEvent& event);
-  void Shutdown () { printer.Invalidate (); }
 
   DECLARE_EVENT_TABLE()
 };

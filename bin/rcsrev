@@ -1,0 +1,55 @@
+#/bin/sh
+
+topdir=`dirname $0`/..
+
+extract_revision()
+{
+  revstr=$(svn info $1 | grep "^Last Changed Rev: ")
+  if [ -z "$revstr" ]; then
+    revstr=$(svn info $1 | grep "^Revision: ")
+  fi
+  echo $revstr | sed -e s/^[^0-9]*//
+}
+
+compute_rel_rev()
+{
+  rev_offset=`cat $topdir/include/csver.h.template | grep "//CS_RCSREV_OFFSET" | sed -e "s/[^0-9]*//"`
+  base_rev=`extract_revision $topdir/include/csver.h.template`
+  checkout_rev=`extract_revision $topdir`
+  echo $(($checkout_rev-$base_rev+$rev_offset))
+}
+
+update_header()
+{
+  rev_offset=`cat $topdir/include/csver.h.template | grep "//CS_RCSREV_OFFSET" | sed -e "s/[^0-9]*//"`
+  csver_rev=`extract_revision $topdir/include/csver.h`
+  checkout_rev=`extract_revision $topdir`
+  if [ $checkout_rev -gt $csver_rev ] ; then
+    base_rev=`extract_revision $topdir/include/csver.h.template`
+    rel_rev=$(($checkout_rev-$base_rev+$rev_offset))
+    echo "/* ATTENTION: This file is generated from csver.h.template," > $topdir/include/csver.h
+    echo "   make changes _there_ instead */" >> $topdir/include/csver.h
+    cat $topdir/include/csver.h.template | sed -e "s/@CS_VERSION_RCSREV@/$rel_rev/" >> $topdir/include/csver.h
+  fi
+}
+
+print_help()
+{
+  echo "Syntax:"
+  echo "  $0 [print|update_header]"
+}
+
+action=$1
+case $action in
+print)
+  compute_rel_rev
+  ;;
+update_header)
+  update_header
+  ;;
+*)
+  print_help
+  exit 1
+  ;;
+esac
+

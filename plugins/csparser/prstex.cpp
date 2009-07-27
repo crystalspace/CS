@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csqint.h"
 
+#include "csgfx/imagememory.h"
 #include "cstool/vfsdirchange.h"
 #include "igraphic/animimg.h"
 #include "imap/services.h"
@@ -34,83 +35,6 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
-#define PLUGIN_LEGACY_TEXTYPE_PREFIX  "crystalspace.texture.loader."
-
-  bool csThreadedLoader::ParseMaterialList (iLoaderContext* ldr_context,
-    iDocumentNode* node, csWeakRefArray<iMaterialWrapper> &materialArray, const char* prefix)
-  {
-    if (!Engine) return false;
-
-    csRef<iDocumentNodeIterator> it = node->GetNodes ();
-    while (it->HasNext ())
-    {
-      csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      switch (id)
-      {
-      case XMLTOKEN_MATERIAL:
-        if (!ParseMaterial (ldr_context, child, materialArray, prefix))
-          return false;
-        break;
-      default:
-        SyntaxService->ReportBadToken (child);
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  bool csThreadedLoader::ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node,
-    csSafeCopyArray<ProxyTexture> &proxyTextures)
-  {
-    if (!ImageLoader)
-    {
-      SyntaxService->ReportError (
-        "crystalspace.maploader.parse.textures",
-        node, "Image loader is missing!");
-      return false;
-    }
-
-    // Array of all thread jobs created from this parse.
-    csRefArray<iThreadReturn> threadReturns;
-
-    csRef<iDocumentNodeIterator> it = node->GetNodes ();
-    while (it->HasNext ())
-    {
-      csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      switch (id)
-      {
-      case XMLTOKEN_TEXTURE:
-        threadReturns.Push(ParseTexture (ldr_context, child, &proxyTextures, vfs->GetCwd()));
-        break;
-      case XMLTOKEN_CUBEMAP:
-        if (!ParseCubemap (ldr_context, child))
-        {
-          return false;
-        }
-        break;
-      case XMLTOKEN_TEXTURE3D:
-        if (!ParseTexture3D (ldr_context, child))
-        {
-          return false;
-        }
-        break;
-      default:
-        SyntaxService->ReportBadToken (child);
-        return false;
-      }
-    }
-
-    // Wait for all jobs to finish.
-    return threadman->Wait(threadReturns);;
-  }
-
   THREADED_CALLABLE_IMPL4(csThreadedLoader, ParseTexture, csRef<iLoaderContext> ldr_context,
     csRef<iDocumentNode> node, csSafeCopyArray<ProxyTexture>* proxyTextures, const char* path)
   {
@@ -119,7 +43,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     const char* txtname = node->GetAttributeValue ("name");
 
-    iTextureWrapper* t = ldr_context->FindTexture (txtname, true);
+    iTextureWrapper* t = ldr_context->FindTexture (txtname, false);
     if (t)
     {
       ldr_context->AddToCollection(t->QueryObject ());
@@ -129,21 +53,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(!AddLoadingTexture(txtname))
     {
-      t = ldr_context->FindTexture (txtname);
-      if (t)
+      // Fixme.
+      while(!t)
       {
-        ldr_context->AddToCollection(t->QueryObject ());
-        ret->SetResult(scfQueryInterfaceSafe<iBase>(t));
-        return true;
+        t = ldr_context->FindTexture (txtname, false);
       }
-    }
 
-    static bool deprecated_warned = false;
+      ldr_context->AddToCollection(t->QueryObject ());
+      ret->SetResult(scfQueryInterfaceSafe<iBase>(t));
+      return true;
+    }
 
     csRef<iTextureWrapper> tex;
     csRef<iLoaderPlugin> plugin;
 
     csString filename = node->GetAttributeValue ("file");
+    enum { None, Filename, Color } imageSourceType = None;
+    if (!filename.IsEmpty()) imageSourceType = Filename;
+    csColor4 singleColor (0, 0, 0);
     csColor transp (0, 0, 0);
     bool do_transp = false;
     bool keep_image = false;
@@ -212,7 +139,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             RemoveLoadingTexture(txtname);
             return false;
           }
+          if (imageSourceType == Color)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.texture",
+              child, "<file> is specified, but <color> was specified earlier");
+          }
+          imageSourceType = Filename;
           filename = fname;
+        }
+        break;
+      case XMLTOKEN_COLOR:
+        {
+          if (!SyntaxService->ParseColor (child, singleColor))
+          {
+            RemoveLoadingTexture(txtname);
+            return false;
+          }
+          if (imageSourceType == Filename)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.texture",
+              child, "<color> is specified, but <file> was specified earlier");
+          }
+          imageSourceType = Color;
         }
         break;
       case XMLTOKEN_MIPMAP:
@@ -337,58 +287,61 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     csString texClass = context.GetClass();
 
-    // Proxy texture loading if the loader isn't specified
-    // and we don't need to load them immediately.
-    if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED &&
-      ldr_context->GetCollection())
+    if (imageSourceType != Color)
     {
-      if (filename.IsEmpty())
+      // Proxy texture loading if the loader isn't specified
+      // and we don't need to load them immediately.
+      if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED &&
+	ldr_context->GetCollection())
       {
-        filename = txtname;
+	if (filename.IsEmpty())
+	{
+	  filename = txtname;
+	}
+  
+	// Get absolute path (on VFS) of the file.
+	csRef<iDataBuffer> absolutePath = vfs->ExpandPath(filename);
+	filename = absolutePath->GetData();
+  
+	ProxyTexture proxTex;
+	proxTex.img.AttachNew (new ProxyImage (this, filename, object_reg));
+	proxTex.always_animate = always_animate;
+  
+	tex = Engine->GetTextureList()->CreateTexture (proxTex.img);
+	tex->SetTextureClass(context.GetClass());
+	tex->SetFlags(context.GetFlags());
+	tex->QueryObject()->SetName(txtname);
+	AddTextureToList(tex);
+	RemoveLoadingTexture(txtname);
+  
+	proxTex.alphaType = csAlphaMode::alphaNone;
+	if(overrideAlphaType)
+	{
+	  proxTex.alphaType = alphaType;
+	}
+  
+	if(keep_image)
+	  tex->SetKeepImage(true);
+  
+	proxTex.keyColour.do_transp = do_transp;
+	if(do_transp)
+	{
+	  proxTex.keyColour.colours = transp;
+	}
+  
+	proxTex.textureWrapper = tex;
+	ldr_context->AddToCollection(proxTex.textureWrapper->QueryObject());
+	proxyTextures->Push(proxTex);
+	ret->SetResult(scfQueryInterfaceSafe<iBase>(proxTex.textureWrapper));
+  
+	return true;
       }
 
-      // Get absolute path (on VFS) of the file.
-      csRef<iDataBuffer> absolutePath = vfs->ExpandPath(filename);
-      filename = absolutePath->GetData();
-
-      ProxyTexture proxTex;
-      proxTex.img.AttachNew (new ProxyImage (this, filename, object_reg));
-      proxTex.always_animate = always_animate;
-
-      tex = Engine->GetTextureList()->CreateTexture (proxTex.img);
-      tex->SetTextureClass(context.GetClass());
-      tex->SetFlags(context.GetFlags());
-      tex->QueryObject()->SetName(txtname);
-      AddTextureToList(tex);
-      RemoveLoadingTexture(txtname);
-
-      proxTex.alphaType = csAlphaMode::alphaNone;
-      if(overrideAlphaType)
+      // @@@ some more comments
+      if (type.IsEmpty () && filename.IsEmpty ())
       {
-        proxTex.alphaType = alphaType;
+	filename = txtname;
       }
-
-      if(keep_image)
-        tex->SetKeepImage(true);
-
-      proxTex.keyColour.do_transp = do_transp;
-      if(do_transp)
-      {
-        proxTex.keyColour.colours = transp;
-      }
-
-      proxTex.textureWrapper = tex;
-      ldr_context->AddToCollection(proxTex.textureWrapper->QueryObject());
-      proxyTextures->Push(proxTex);
-      ret->SetResult(scfQueryInterfaceSafe<iBase>(proxTex.textureWrapper));
-
-      return true;
-    }
-
-    // @@@ some more comments
-    if (type.IsEmpty () && filename.IsEmpty ())
-    {
-      filename = txtname;
     }
 
     iTextureManager* texman;
@@ -396,7 +349,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     int Format;
     Format = texman ? texman->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
     csRef<iLoaderPlugin> BuiltinImageTexLoader;
-    if (!filename.IsEmpty ())
+    if (imageSourceType == Color)
+    {
+      csRGBpixel singlePixel (int (singleColor.red * 255),
+        int (singleColor.green * 255),
+        int (singleColor.blue * 255),
+        int (singleColor.alpha * 255));
+      csRef<iImage> image;
+      image.AttachNew (new csImageMemory (1, 1, (const void*)&singlePixel, Format));
+      context.SetImage (image);
+    }
+    else if (!filename.IsEmpty ())
     {
       csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
       if(!LoadImageTC (ret, false, vfs->GetCwd(), filename, Format, false))
@@ -415,49 +378,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           type = PLUGIN_TEXTURELOADER_ANIMIMG;
         }
-        else
-        {
-          csImageTextureLoader* itl = new csImageTextureLoader (0);
-          itl->Initialize (object_reg);
-          BuiltinImageTexLoader.AttachNew(itl);
-          plugin = BuiltinImageTexLoader;
-        }
       }
     }
+    /* If an image but no texture type is given use the builtin image texture
+       loader */
+    if ((context.GetImage() != 0) && type.IsEmpty ())
+    {
+      csImageTextureLoader* itl = new csImageTextureLoader (0);
+      itl->Initialize (object_reg);
+      BuiltinImageTexLoader.AttachNew(itl);
+      plugin = BuiltinImageTexLoader;
+    }
 
-    iLoaderPlugin* Plug; Plug = 0;
     iBinaryLoaderPlugin* Binplug;
     if ((!type.IsEmpty ()) && !plugin)
     {
       iDocumentNode* defaults = 0;
-      if (!loaded_plugins.FindPlugin (type, Plug, Binplug, defaults))
-      {
-        if ((type == "dots") ||
-          (type == "plasma") ||
-          (type == "water") ||
-          (type == "fire"))
-        {
-          // old style proctex type
-          if (!deprecated_warned)
-          {
-            SyntaxService->Report (
-              "crystalspace.maploader.parse.texture",
-              CS_REPORTER_SEVERITY_NOTIFY,
-              node,
-              "Deprecated syntax used for proctex! "
-              "Specify a plugin classid or map the old types to their "
-              "plugin counterparts in the <plugins> node.");
-            deprecated_warned = true;
-          }
-
-          csString newtype = PLUGIN_LEGACY_TEXTYPE_PREFIX;
-          newtype += type;
-          type = newtype;
-
-          loaded_plugins.FindPlugin (type, Plug, Binplug, defaults);
-        }
-      }
-      plugin = Plug;
+      iLoaderPlugin* Plugin;
+      loaded_plugins.FindPlugin (type, Plugin, Binplug, defaults);
+      plugin = Plugin;
 
       if (defaults != 0)
       {
@@ -561,8 +500,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iDocumentNode* node, csWeakRefArray<iMaterialWrapper> &materialArray, const char *prefix)
   {
     const char* matname = node->GetAttributeValue ("name");
-
-    iMaterialWrapper* m = ldr_context->FindMaterial (matname, true);
+    iMaterialWrapper* m = ldr_context->FindMaterial (matname, false);
     if (m)
     {
       ldr_context->AddToCollection(m->QueryObject ());
@@ -571,12 +509,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(!AddLoadingMaterial(matname))
     {
-      m = ldr_context->FindMaterial (matname);
-      if(m)
+      // Fixme.
+      while(!m)
       {
-        ldr_context->AddToCollection(m->QueryObject ());
-        return true;
+        m = ldr_context->FindMaterial (matname, false);
       }
+
+      ldr_context->AddToCollection(m->QueryObject ());
+      return true;
     }
 
     csRef<iTextureWrapper> texh = 0;
@@ -632,12 +572,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             return false;
           }
         }
-        break;
-      case XMLTOKEN_DIFFUSE:
-      case XMLTOKEN_AMBIENT:
-      case XMLTOKEN_REFLECTION:
-        ReportWarning ("crystalspace.maploader.parse.material",
-          child, "Syntax not supported any more. Use shader variables instead");
         break;
       case XMLTOKEN_SHADER:
         {
@@ -738,79 +672,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     materialArray.Push(mat);
 
     return true;
-  }
-
-  /// Parse a Cubemap texture definition and add the texture to the engine
-  iTextureWrapper* csThreadedLoader::ParseCubemap (iLoaderContext* ldr_context,
-    iDocumentNode* node)
-  {
-    static bool cubemapDeprecationWarning = false;
-    if (!cubemapDeprecationWarning)
-    {
-      cubemapDeprecationWarning = true;
-      SyntaxService->Report ("crystalspace.maploader.parse.texture",
-        CS_REPORTER_SEVERITY_WARNING, node,
-        "'<cubemap>...' is deprecated, use '<texture><type>"
-        PLUGIN_TEXTURELOADER_CUBEMAP "</type><params>...' instead");
-    }
-
-    csRef<csCubemapTextureLoader> plugin;
-    plugin.AttachNew (new csCubemapTextureLoader (0));
-    plugin->Initialize (object_reg);
-
-    csRef<TextureLoaderContext> context;
-    const char* txtname = node->GetAttributeValue ("name");
-    context.AttachNew (new TextureLoaderContext (txtname));
-
-    csRef<iBase> b = plugin->Parse (node, 0/*ssource*/, ldr_context, context);
-    csRef<iTextureWrapper> tex;
-    if (b) tex = scfQueryInterface<iTextureWrapper> (b);
-
-    if (tex)
-    {
-      tex->QueryObject ()->SetName (txtname);
-      ldr_context->AddToCollection(tex->QueryObject ());
-      iTextureManager* tm = g3d ? g3d->GetTextureManager() : 0;
-      if (tm) tex->Register (tm);
-    }
-
-    return tex;
-  }
-
-  iTextureWrapper* csThreadedLoader::ParseTexture3D (iLoaderContext* ldr_context,
-    iDocumentNode* node)
-  {
-    static bool volmapDeprecationWarning = false;
-    if (!volmapDeprecationWarning)
-    {
-      volmapDeprecationWarning = true;
-      SyntaxService->Report ("crystalspace.maploader.parse.texture",
-        CS_REPORTER_SEVERITY_WARNING, node,
-        "'<texture3d>...' is deprecated, use '<texture><type>"
-        PLUGIN_TEXTURELOADER_TEX3D "</type><params>...' instead");
-    }
-
-    csRef<csTexture3DLoader> plugin;
-    plugin.AttachNew (new csTexture3DLoader (0));
-    plugin->Initialize (object_reg);
-
-    csRef<TextureLoaderContext> context;
-    const char* txtname = node->GetAttributeValue ("name");
-    context.AttachNew (new TextureLoaderContext (txtname));
-
-    csRef<iBase> b = plugin->Parse (node, 0/*ssource*/, ldr_context, context);
-    csRef<iTextureWrapper> tex;
-    if (b) tex = scfQueryInterface<iTextureWrapper> (b);
-
-    if (tex)
-    {
-      tex->QueryObject ()->SetName (txtname);
-      ldr_context->AddToCollection(tex->QueryObject ());
-      iTextureManager* tm = g3d ? g3d->GetTextureManager() : 0;
-      if (tm) tex->Register (tm);
-    }
-
-    return tex;
   }
 }
 CS_PLUGIN_NAMESPACE_END(csparser)

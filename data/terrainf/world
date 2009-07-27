@@ -26,6 +26,10 @@
         <texture name="stone4.gif">
             <file>/lib/std/stone4.gif</file>
         </texture>
+        <texture name="stone4_n.png">
+            <file>stone4_n.png</file>
+            <class>normalmap</class>
+        </texture>
         <texture name="grass.png">
             <file>/lev/terrain/grass.png</file>
         </texture>
@@ -56,10 +60,7 @@
     </textures>
     <shaders>
         <shader>
-            <file>/shader/terrain_fixed_base.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/terrain_fixed_splatting.xml</file>
+            <file>/shader/terrain/splat.xml</file>
         </shader>
         <shader>
             <file>/shader/lighting/fullbright.xml</file>
@@ -77,22 +78,23 @@
         </material>
         <material name="Base">
             <texture>materialmap_base.png</texture>
-            <shader type="ambient">terrain_fixed_base</shader>
         </material>
         <material name="Marble">
             <texture>andrew_marble4.jpg</texture>
             <shadervar name="texture scale" type="vector2">32,32</shadervar>
-            <shader type="terrain splat">terrain_fixed_splatting</shader>
+            <shader type="terrain splat">terrain_splatting</shader>
         </material>
         <material name="Stone">
             <texture>stone4.gif</texture>
-            <shadervar name="texture scale" type="vector2">128,128</shadervar>
-            <shader type="terrain splat">terrain_fixed_splatting</shader>
+            <shader type="terrain splat">terrain_splatting</shader>
+            <shadervar name="tex normal" type="texture">stone4_n.png</shadervar>
+            <shadervar name="texture scale" type="vector2">256,256</shadervar>
+            <shadervar name="specular" type="vector3">0,0,0</shadervar>
         </material>
         <material name="Grass">
             <texture>grass.png</texture>
             <shadervar name="texture scale" type="vector2">256,256</shadervar>
-            <shader type="terrain splat">terrain_fixed_splatting</shader>
+            <shader type="terrain splat">terrain_splatting</shader>
         </material>
         <material name="box1">
             <texture>grass.png</texture>
@@ -102,31 +104,31 @@
         </material>
         <material name="clouds">
             <texture>clouds</texture>
-	    <shader type="base">lighting_fullbright</shader>
+            <shader type="base">lighting_fullbright</shader>
         </material>
         <material name="sky_up">
             <texture>sky_up</texture>
-	    <shader type="base">lighting_fullbright</shader>
+            <shader type="base">lighting_fullbright</shader>
         </material>
         <material name="sky_down">
             <texture>sky_down</texture>
-	    <shader type="base">lighting_fullbright</shader>
+            <shader type="base">lighting_fullbright</shader>
         </material>
         <material name="sky_left">
             <texture>sky_left</texture>
-	    <shader type="base">lighting_fullbright</shader>
+            <shader type="base">lighting_fullbright</shader>
         </material>
         <material name="sky_right">
             <texture>sky_right</texture>
-	    <shader type="base">lighting_fullbright</shader>
+            <shader type="base">lighting_fullbright</shader>
         </material>
         <material name="sky_front">
             <texture>sky_front</texture>
-	    <shader type="base">lighting_fullbright</shader>
+            <shader type="base">lighting_fullbright</shader>
         </material>
         <material name="sky_back">
             <texture>sky_back</texture>
-	    <shader type="base">lighting_fullbright</shader>
+            <shader type="base">lighting_fullbright</shader>
         </material>
     </materials>
     <library>grass.lib</library>
@@ -135,13 +137,8 @@
     <library>tree_skimp.lib</library>
     <library>treebark_bare.lib</library>
     <library>bush2.lib</library>
-    <addon>
-        <plugin>crystalspace.renderloop.loop.loader</plugin>
-        <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
-    </addon>
     <settings>
         <clearzbuf>yes</clearzbuf>
-        <renderloop>std_rloop_terrainfixed</renderloop>
     </settings>
     <start>
         <sector>room</sector>
@@ -158,14 +155,6 @@
             </sphere>
         </params>
     </meshfact>
-    <!--
-    <addon plugin="crystalspace.terraformer.simple.loader">
-        <name>simple</name>
-        <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
-        <scale x="256" y="32" z="256" />
-        <materialmap image="/lev/terrain/materialmap.png" />
-    </addon>
-    -->
     <meshfact name="TerrainFact">
         <plugin>terrainFact</plugin>
         <params>
@@ -334,8 +323,11 @@
                     <cell>
                         <name>0</name>
                         <renderproperties>
-                            <shadervar name="texture lod distance" type="vector3">200.000000,200.000000,200.000000</shadervar>
                             <shadervar name="tex lightmap" type="texture">lightmaps_terrainf_0_png</shadervar>
+                            <shadervar name="tex lightmap dir 1" type="texture">lightmaps_terrainf_0_d1_png</shadervar>
+                            <shadervar name="texture lod distance" type="vector3">200.000000,200.000000,200.000000</shadervar>
+                            <shadervar name="tex lightmap dir 2" type="texture">lightmaps_terrainf_0_d2_png</shadervar>
+                            <shadervar name="tex lightmap dir 3" type="texture">lightmaps_terrainf_0_d3_png</shadervar>
                         </renderproperties>
                     </cell>
                 </cells>
@@ -403,14 +395,14 @@
             <geometry>
                 <factory maxdist="10" name="Grass" />
                 <factory maxdist="30" name="GrassLow" />
-                <radius>10</radius>
+                <radius>0.1</radius>
                 <density>1</density>
                 <!-- bugged? <materialfactor material="Grass" factor="1" /> -->
                 <defaultmaterialfactor>.1</defaultmaterialfactor>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="bush2" />
-                <radius>1</radius>
+                <radius>0.1</radius>
                 <density>0.4</density>
                 <materialfactor material="Marble" factor="1" />
                 <materialfactor material="Stone" factor="1" />
@@ -419,14 +411,14 @@
             <geometry>
                 <factory maxdist="10" name="TallGrass" />
                 <factory maxdist="30" name="TallGrassLow" />
-                <radius>10</radius>
+                <radius>0.1</radius>
                 <density>.1</density>
                 <!-- bugged? <materialfactor material="Grass" factor="1" /> -->
                 <defaultmaterialfactor>.1</defaultmaterialfactor>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="Rock" />
-                <radius>1</radius>
+                <radius>0.1</radius>
                 <density>.01</density>
                 <materialfactor material="Marble" factor="1" />
                 <materialfactor material="Stone" factor="0" />
@@ -434,7 +426,7 @@
             </geometry>
             <geometry>
                 <factory maxdist="30" name="RockSmall" />
-                <radius>1</radius>
+                <radius>0.1</radius>
                 <density>.10</density>
                 <materialfactor material="Marble" factor="1" />
                 <materialfactor material="Stone" factor="0" />

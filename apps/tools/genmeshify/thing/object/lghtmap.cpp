@@ -252,7 +252,7 @@ const char* csLightMap::ReadFromCache (
   SetSize (w, h);
   size_t lm_size = lwidth * lheight;
 
-  strcpy (pswanted.header, LMMAGIC);
+  memcpy (pswanted.header, LMMAGIC, 4);
   if (poly)
   {
     pswanted.x1 = csFloatToShort (spoly->Vobj (0).x);
@@ -437,101 +437,6 @@ const char* csLightMap::ReadFromCache (
 
 stop:
   return 0;
-}
-
-void csLightMap::Cache (
-  iFile* file,
-  csPolygon3D *poly,
-  csPolygon3DStatic *spoly,
-  iEngine *engine)
-{
-  (void)engine;
-
-  PolySave ps;
-
-  strcpy (ps.header, LMMAGIC);
-  if (poly)
-  {
-    ps.x1 = csLittleEndian::Convert (csFloatToShort (spoly->Vobj (0).x));
-    ps.y1 = csLittleEndian::Convert (csFloatToShort (spoly->Vobj (0).y));
-    ps.z1 = csLittleEndian::Convert (csFloatToShort (spoly->Vobj (0).z));
-    ps.x2 = csLittleEndian::Convert (csFloatToShort (spoly->Vobj (1).x));
-    ps.y2 = csLittleEndian::Convert (csFloatToShort (spoly->Vobj (1).y));
-    ps.z2 = csLittleEndian::Convert (csFloatToShort (spoly->Vobj (1).z));
-  }
-
-  if (file->Write ("lmpn", 4) != 4)
-    return;
-
-  long lm_size = lwidth * lheight;
-  ps.lm_size = csLittleEndian::Convert ((int32)lm_size);
-  ps.lm_cnt = 111;          // Dummy!
-  ps.lm_cnt = csLittleEndian::Convert (ps.lm_cnt);
-
-  //-------------------------------
-  // Write the normal lightmap data.
-  //-------------------------------
-  file->Write ((char*)&ps, sizeof (ps));
-
-  if (csPackRGB::IsRGBcolorSane())
-    file->Write (staticLmBuffer->GetData(), staticLmBuffer->GetSize());
-  else
-  {
-    const uint8* rgbData = csPackRGB::PackRGBcolorToRGB (
-      (csRGBcolor*)staticLmBuffer->GetData(), lm_size);
-    file->Write ((char*)rgbData, lm_size * 3);
-    csPackRGB::DiscardPackedRGB (rgbData);
-  }
-
-  //-------------------------------
-  // Write the dynamic data.
-  //-------------------------------
-  LightHeader lh;
-
-  csShadowMap *smap = first_smap;
-  if (smap)
-  {
-    uint8 have_dyn = 1;
-    file->Write ((char*)&have_dyn, sizeof (have_dyn));
-
-    strcpy (lh.header, "DYNL");
-    lh.dyn_cnt = 0;
-    while (smap)
-    {
-      lh.dyn_cnt++;
-      smap = smap->next;
-    }
-
-    smap = first_smap;
-
-    file->Write (lh.header, 4);
-    uint32 l = csLittleEndian::Convert (lh.dyn_cnt);
-    file->Write ((char *) &l, 4);
-
-    // unsigned long == ls.light_id.
-    uint32 size = lh.dyn_cnt * (sizeof (LightSave) + lm_size);
-    uint32 s = csLittleEndian::Convert (size);
-    file->Write ((char*)&s, sizeof (s));
-
-    while (smap)
-    {
-      iLight *light = smap->Light;
-      if (smap->map.IsValid())
-      {
-        LightSave ls;
-	memcpy (ls.light_id, light->GetLightID (), sizeof (LightSave));
-        file->Write ((char *) &ls.light_id, sizeof (LightSave));
-        file->Write (smap->map->GetData(), smap->map->GetSize());
-      }
-
-      smap = smap->next;
-    }
-  }
-  else
-  {
-    uint8 have_dyn = 0;
-    file->Write ((char*)&have_dyn, sizeof (have_dyn));
-  }
 }
 
 bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,

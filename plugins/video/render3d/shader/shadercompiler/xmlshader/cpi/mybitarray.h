@@ -31,13 +31,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   {
     typedef CS::Memory::AllocatorMalloc Allocator;
     
-    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2, 
+    typedef CS::Memory::FixedSizeAllocatorSafe<sizeof (csBitArrayStorageType) * 2,
       Allocator> BitsAlloc2Type;
+    typedef CS::Memory::FixedSizeAllocatorSafe<sizeof (csBitArrayStorageType) * 4,
+      Allocator> BitsAlloc4Type;
+
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
       BitsAlloc2, BitsAlloc2Type);
-    
-    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 4, 
-      Allocator> BitsAlloc4Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
       BitsAlloc4, BitsAlloc4Type);
   public:
@@ -65,17 +65,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       BitsAlloc4().Compact();
     }
   };
-  class MyBitArrayAllocatorTemp : TempHeapAlloc
+  class MyBitArrayAllocatorTemp : CS::Memory::AllocatorSafe<TempHeapAlloc>
   {
     typedef TempHeapAlloc Allocator;
-    
-    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2, 
+
+    typedef CS::Memory::FixedSizeAllocatorSafe<sizeof (csBitArrayStorageType) * 2,
       Allocator> BitsAlloc2Type;
+    typedef CS::Memory::FixedSizeAllocatorSafe<sizeof (csBitArrayStorageType) * 4,
+      Allocator> BitsAlloc4Type;
+
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
       BitsAlloc2, BitsAlloc2Type);
-    
-    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 4, 
-      Allocator> BitsAlloc4Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
       BitsAlloc4, BitsAlloc4Type);
   public:

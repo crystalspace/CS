@@ -84,7 +84,6 @@ class csShaderConditionResolver : public iConditionResolver
   csConditionNode* rootNode;
   size_t nextVariant;
   csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
-  bool keepVariantToConditionsMap;
   csHash<MyBitArrayTemp, size_t, TempHeapAlloc> variantConditions;
 
   const CS::Graphics::RenderMeshModes* modes;
@@ -108,8 +107,7 @@ class csShaderConditionResolver : public iConditionResolver
 public:
   csConditionEvaluator& evaluator;
 
-  csShaderConditionResolver (csConditionEvaluator& evaluator,
-    bool keepVariantToConditionsMap);
+  csShaderConditionResolver (csConditionEvaluator& evaluator);
   virtual ~csShaderConditionResolver ();
 
   virtual const char* ParseCondition (const char* str, size_t len, 
@@ -149,7 +147,8 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
 {
   friend class csShaderConditionResolver;
 
-  csRef<iDocumentNode> shaderRoot;
+  csRef<iDocumentNode> originalShaderDoc;
+  csRef<iDocumentNode> shaderRootStripped;
   char* vfsStartDir;
   int forcepriority;
 
@@ -176,49 +175,43 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
 				     
   csXMLShaderTech* activeTech;
   csShaderConditionResolver* techsResolver;
-  struct ShaderVariant
-  {
-    csXMLShaderTech* tech;
-    bool prepared;
-
-    ShaderVariant() : tech (0), prepared (false) { }
-  };
+  /* Technique variants
+     These are 'lightweight' and only store which techniques (from
+     'techniques' array) are used in a variant. */
   struct ShaderTechVariant
   {
-    struct Technique
-    {
-      int priority;
-      int minLights;
-      csRef<csWrappedDocumentNode> srcNode;
-      
-      csShaderConditionResolver* resolver;
-      csRef<iDocumentNode> techNode;
-      csArray<ShaderVariant> variants;
+    csBitArray activeTechniques;
+    bool shownError;
     
-      Technique() : resolver (0) {}
-      void Free ()
-      {
-	for (size_t i = 0; i < variants.GetSize(); i++)
-	{
-	  delete variants[i].tech;
-	}
-        delete resolver;
-      }
-    };
-  
-    bool prepared;
-    csArray<Technique> techniques;
-    
-    ShaderTechVariant() : /*resolver (0)*/prepared(false) {}
-    void Free ()
-    {
-      for (size_t i = 0; i < techniques.GetSize(); i++)
-      {
-        techniques[i].Free();
-      }
-    }
+    ShaderTechVariant() : shownError (false) {}
   };
   csArray<ShaderTechVariant> techVariants;
+  
+  // Actual techniques
+  struct Technique
+  {
+    int priority;
+    int minLights;
+
+    csShaderConditionResolver* resolver;
+    csRef<csWrappedDocumentNode> techNode;
+    
+    csBitArray variantsPrepared;
+    csArray<csXMLShaderTech*> variants;
+  
+    Technique() : resolver (0) {}
+    void Free ()
+    {
+      for (size_t i = 0; i < variants.GetSize(); i++)
+      {
+	delete variants[i];
+      }
+      delete resolver;
+    }
+  };
+  csArray<Technique> techniques;
+  size_t allTechVariantCount;
+  
   csRef<csConditionEvaluator> sharedEvaluator;
   csRef<iHierarchicalCache> shaderCache;
   csString cacheTag;
@@ -232,31 +225,55 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
   /// Identify whether a ticker refers to the fallback shader
   bool IsFallbackTicket (size_t ticket) const
   { 
-    size_t tvc = techsResolver->GetVariantCount();
-    if (tvc == 0) tvc = 1;
-    return (ticket % (tvc+1)) == 0;
+    return ticket >= allTechVariantCount;
   }
   /// Extract the fallback's ticket number
   size_t GetFallbackTicket (size_t ticket) const
   { 
-    size_t tvc = techsResolver->GetVariantCount();
-    if (tvc == 0) tvc = 1;
-    return (ticket / (tvc+1));
+    return ticket - allTechVariantCount;
   }
   bool useFallbackContext;
   
+  const Technique* TechniqueForTicket (size_t ticket, size_t* remainder = 0) const
+  {
+    for (size_t t = 0; t < techniques.GetSize(); t++)
+    {
+      size_t vc = techniques[t].resolver->GetVariantCount();
+      if (vc == 0) vc = 1;
+      if (ticket < vc)
+      {
+	if (remainder) *remainder = ticket;
+	return &(techniques[t]);
+      }
+      ticket -= vc;
+    }
+    return 0;
+  }
+
   csXMLShaderTech* TechForTicket (size_t ticket) const
   {
-    size_t tvc = techsResolver->GetVariantCount();
-    if (tvc == 0) tvc = 1;
-    size_t techVar = (ticket % (tvc+1))-1;
-    size_t techAndVar = ticket / (tvc+1);
-    if (techVar >= techVariants.GetSize()) return 0;
-    const csArray<ShaderTechVariant::Technique>& techniques =
-      techVariants[techVar].techniques;
-    if (techniques.GetSize() == 0) return 0;
-    return techniques[techAndVar % techniques.GetSize()]
-      .variants[techAndVar / techniques.GetSize()].tech;
+    size_t techVar;
+    const Technique* tech = TechniqueForTicket (ticket, &techVar);
+    if (tech == 0) return 0;
+    if (techVar >= tech->variants.GetSize()) return 0;
+    return tech->variants[techVar];
+  }
+  size_t ComputeTicket (size_t technique, size_t techVar) const
+  {
+    size_t ticket = 0;
+    for (size_t t = 0; t < technique; t++)
+    {
+      size_t vc = techniques[t].resolver->GetVariantCount();
+      if (vc == 0) vc = 1;
+      ticket += vc;
+    }
+    ticket += techVar;
+    return ticket;
+  }
+  size_t ComputeTicketForFallback (size_t nextTicket) const
+  {
+    if (nextTicket == csArrayItemNotFound) return csArrayItemNotFound;
+    return nextTicket + allTechVariantCount;
   }
 
   csShaderVariableContext globalSVContext;
@@ -274,16 +291,15 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
+  csPtr<iDocumentNode> StripShaderRoot (iDocumentNode* shaderRoot);
   void Load (iDocumentNode* source, bool forPrecache);
     
-  void PrepareTechVar (ShaderTechVariant& techVar,
-    int forcepriority);
+  void PrepareTechVars (iDocumentNode* shaderRoot, int forcepriority);
   
-  bool LoadTechniqueFromCache (ShaderTechVariant::Technique& tech,
+  bool LoadTechniqueFromCache (Technique& tech,
     iHierarchicalCache* cache);
-  void LoadTechnique (ShaderTechVariant::Technique& tech,
-    iHierarchicalCache* cacheTo, size_t dbgTechNum,
-    bool forPrecache = true);
+  void LoadTechnique (Technique& tech, iDocumentNode* srcNode,
+    size_t techIndex, iHierarchicalCache* cacheTo, bool forPrecache = true);
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 
@@ -354,11 +370,6 @@ public:
   virtual bool DeactivatePass (size_t ticket);	
 
   /// Get shader metadata
-  virtual const csShaderMetadata& GetMetadata (size_t ticket) const
-  {
-    return GetMetadata();
-  }
-
   virtual const csShaderMetadata& GetMetadata () const
   {
     return allShaderMeta;
@@ -480,7 +491,7 @@ public:
 
   /**\name iXMLShader implementation
    * @{ */
-  virtual iDocumentNode* GetShaderSource () { return shaderRoot; }
+  virtual iDocumentNode* GetShaderSource () { return originalShaderDoc; }
   /** @} */
 
   /// Set object description

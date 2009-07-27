@@ -79,7 +79,7 @@ void csThreadManager::Process(uint num)
   listQueue->ProcessQueue(num);  
 }
 
-bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
+bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool process)
 {
   bool success = true;
 
@@ -105,49 +105,48 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
 
     threadReturns[0]->SetWaitPtrs(c, m);
 
+    m->Lock();
+    while(!threadReturns[0]->IsFinished())
     {
-      MutexScopedLock lock(*m);
-      while(!threadReturns[0]->IsFinished())
+      if(IsMainThread())
       {
-        if(IsMainThread())
+        if(process && listQueue->GetQueueCount() > 0)
         {
-          if(listQueue->GetQueueCount() > 0)
-          {
-            m->Unlock();
-            listQueue->ProcessQueue(1);
-            m->Lock();
-          }
-          else
-          {
-            c->Wait(*m);
-          }
+          m->Unlock();
+          listQueue->ProcessQueue(1);
+          m->Lock();
         }
         else
         {
-          MutexScopedLock lock(waitingThreadsLock);
-          if(threadQueue->GetQueueCount() > 0)
-          {
-            waitingThreadsLock.Unlock();
-            m->Unlock();
-            threadQueue->PopAndRun();
-            m->Lock();
-            waitingThreadsLock.Lock();
-          }
-          else
-          {
-            waitingThreads.Push(c);
-            waitingThreadsLock.Unlock();
+          c->Wait(*m);
+        }
+      }
+      else
+      {
+        MutexScopedLock lock(waitingThreadsLock);
+        if(process && threadQueue->GetQueueCount() > 0)
+        {
+          waitingThreadsLock.Unlock();
+          m->Unlock();
+          threadQueue->PopAndRun();
+          m->Lock();
+          waitingThreadsLock.Lock();
+        }
+        else
+        {
+          waitingThreads.Push(c);
+          waitingThreadsLock.Unlock();
 
-            {
-              c->Wait(*m);
-            }
-
-            waitingThreadsLock.Lock();
-            waitingThreads.Delete(c);
+          {
+            c->Wait(*m);
           }
+
+          waitingThreadsLock.Lock();
+          waitingThreads.Delete(c);
         }
       }
     }
+    m->Unlock();
 
     threadReturns[0]->SetWaitPtrs(0, 0);
 

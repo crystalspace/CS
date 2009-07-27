@@ -171,7 +171,9 @@
 #endif
 
 %{
-#include "crystalspace.h"
+#include "csgeom.h"
+#include "cstool/initapp.h"
+#include "csutil.h"
 %}
 
 %include "bindings/common/allinterfaces.i"
@@ -558,6 +560,8 @@ void SetCoreSCFPointer(iSCF *scf_pointer)
 // hand made scf template wrappers
 %include "bindings/common/scf.i"
 
+// Needed to resolve THREADED_INTERFACE macros
+%include "iutil/threadmanager.h"
 %include "iutil/dbghelp.h"
 %include "iutil/cmdline.h"
 
@@ -607,6 +611,8 @@ SET_HELPER(csStringID)
 %ignore csInitializer::RequestPluginsV;
 %rename (_RequestPlugins) csInitializer::RequestPlugins(iObjectRegistry*,
   csArray<csPluginRequest> const&);
+%rename (_CreateEnvironment) csInitializer::CreateEnvironment(int,char const *const []);
+%rename (_CreateEnvironment2) csInitializer::CreateEnvironment(int,char const *const [],bool);
 
 %ignore csInitializer::SetupEventHandler (iObjectRegistry*, csEventHandlerFunc,
   const csEventID events[]);
@@ -807,13 +813,6 @@ ARRAY_OBJECT_FUNCTIONS(iStringArray,const char *)
 %include "iutil/databuff.h"
 BUFFER_RW_FUNCTIONS(iDataBuffer,GetData,GetSize,
                 char,AsBuffer)
-%include "igraphic/image.h"
-%immutable csImageIOFileFormatDescription::mime;
-%immutable csImageIOFileFormatDescription::subtype;
-%template (csImageIOFileFormatDescriptions) csArray<csImageIOFileFormatDescription const*>;
-%include "igraphic/imageio.h"
-%include "igraphic/animimg.h"
-%include "itexture/iproctex.h"
 
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
 			 // Swig already knows not to delete an SCF pointer.
@@ -992,8 +991,6 @@ csEventID _csevJoystickEvent (iObjectRegistry *);
   csColor operator + (const csColor & c) const { return *self + c; }
   csColor operator - (const csColor & c) const { return *self - c; }
 }
-
-%include "cstool/primitives.h"
 
 // functions for returning wrapped iBase objects.
 %include "bindings/common/scfsugar.i"

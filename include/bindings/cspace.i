@@ -1,4 +1,7 @@
 %module cspace
+%{
+#include "crystalspace.h"
+%}
 %include "bindings/common/core.i"
 %include "bindings/common/imap.i"
 %include "bindings/common/isndsys.i"

@@ -127,6 +127,17 @@ struct Header
   uint32 reserved001;
 };
 
+/// DDS file header for DX10.
+struct Header10
+{
+  uint32 dxgiFormat;
+  uint32 resourceDimension;
+  uint32 miscFlag;
+  uint32 arraySize;
+  uint32 reserved;
+};
+
+
 #define MakeFourCC(c1, c2, c3, c4) \
   ((uint32) c1 | ((uint32) c2<<8) | ((uint32) c3<<16) | ((uint32) c4<<24))
 
@@ -135,9 +146,10 @@ const uint32 Magic = MakeFourCC ('D','D','S',' ');
 class Loader
 {
 public:
-  /// Check whether this is a DXT1 image with alpha. Returns true if so.
-  static bool ProbeDXT1Alpha (const uint8* source, int w, int h, int depth, 
+  /// Checks whether this is a DXT1c image.
+  static bool ProbeDXT1C (const uint8* source, int w, int h, int depth, 
     size_t size);
+
   static void DecompressDXT1 (csRGBpixel* buffer, const uint8* source, 
     int w, int h, int depth, size_t size);
   static void DecompressDXT2 (csRGBpixel* buffer, const uint8* source, 

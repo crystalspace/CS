@@ -44,6 +44,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
 class csXMLShaderCompiler;
+class ForeignNodeStorage;
+class ForeignNodeReader;
 
 class csWrappedDocumentNodeIterator;
 struct WrapperStackEntry;
@@ -310,9 +312,6 @@ protected:
   csWrappedDocumentNode (csWrappedDocumentNode* parent,
     iConditionResolver* resolver,
     csWrappedDocumentNodeFactory* shared);
-    
-  class ForeignNodeStorage;
-  class ForeignNodeReader;
   
   bool StoreToCache (iFile* cacheFile, ForeignNodeStorage& foreignNodes,
     const ConditionsWriter& condWriter);
@@ -362,8 +361,10 @@ public:
 };
 
 class csTextNodeWrapper : 
-  public scfImplementationPooled<scfImplementationExt0<csTextNodeWrapper, 
-                                                       csDocumentNodeReadOnly> >
+  public scfImplementationPooled<
+  scfImplementationExt0<csTextNodeWrapper, csDocumentNodeReadOnly>,
+  CS::Memory::AllocatorMalloc,
+  true>
 {
   char* nodeText;
   csRef<iDocumentNode> realMe;
@@ -388,8 +389,9 @@ public:
 
 class csWrappedDocumentNodeIterator : 
   public scfImplementationPooled<
-    scfImplementation1<csWrappedDocumentNodeIterator, 
-                       iDocumentNodeIterator> >
+  scfImplementation1<csWrappedDocumentNodeIterator, iDocumentNodeIterator>,
+  CS::Memory::AllocatorMalloc,
+  true>
 {
   csString filter;
 

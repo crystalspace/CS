@@ -1,3 +1,5 @@
+/* ATTENTION: This file is generated from csver.h.template,
+   make changes _there_ instead */
 /*
     Copyright (C) 1998-2007 by Jorrit Tyberghein
   
@@ -27,34 +29,75 @@
 // Also update CS/configure.ac, CS/docs/texinfo/version.txi, and
 // CS/mk/autoconf/crystal.m4 when updating the version number.
 
+/*
+ * Set if this is an unstable (development) CS version.
+ * Also affects the version number - unstable versions have the RCS revision
+ *  as the 'build' version component.
+ */
+#define CS_VERSION_UNSTABLE
+
+/**
+ * Build version based off SVN revision.
+ * This is not the straight SVN revision - instead it's the difference between
+ * the "last changed" SVN revision and the revision of csver.h.template.
+ * This is done to keep the number in a relatively small range (e.g. Win32
+ * version number components usually only hold 16 bit numbers).
+ * When a version bump happens, csver.h.template is edited to reflect the new
+ * major and minor versions. This will also 'reset' the relative SVN revision
+ * number.
+ *
+ * However, in case csver.h.template is edited for a reason other than a
+ * version bump, CS_RCSREV_OFFSET is provided to allow adjustment
+ * of the relative SVN revision to avoid having it go backwards.
+ * Increment the offset by the value reported by `rcsrev print` (BEFORE
+ * committing).
+ *
+ * CS_RCSREV_OFFSET should be set to 0 again when bumping the version.
+ *
+ * The relative SVN revision is computed by the script `rcsrev`.
+ */
+//CS_RCSREV_OFFSET 10
+#ifndef CS_VERSION_RCSREV
+#define CS_VERSION_RCSREV	36
+#endif
+
 /**\name Version number definitions (numeric)
  * @{ */
 /// Major version
-#define CS_VERSION_NUM_MAJOR  1
+#define CS_VERSION_NUM_MAJOR  	1
 /// Minor version (even are stable versions, odd are development versions)
-#define CS_VERSION_NUM_MINOR  9
-/// Maintenance release / RC
-#define CS_VERSION_NUM_BUILD  0
+#define CS_VERSION_NUM_MINOR  	9
+/// Maintenance release
+// @@@ NOTE: set 77 in 1.9 for continuity reasons; reset to 0 on version bump
+#define CS_VERSION_NUM_RELEASE	77
+/**
+ * Build number.
+ * (Actually, a version number dependent on the SVN revision this version was
+ * built off.)
+ */
+#define CS_VERSION_NUM_BUILD	CS_VERSION_RCSREV
 
 /// Encode a version into a single number comparable using <, > etc.
-#define CS_VERSION_NUM_COMPARABLE(Major,Minor,Build)  \
-  ((Major)*10000 + (Minor)*100 + (Build))
+#define CS_VERSION_NUM_COMPARABLE(Major,Minor,Release,Build)  \
+  ((Major)*10000000 + (Minor)*100000 + (Release)*1000 + (Build))
 /// Current version, encode into a single number comparable using <, > etc.
-#define CS_VERSION_NUM_COMPARABLE_CURRENT         \
-  CS_VERSION_NUM_COMPARABLE(CS_VERSION_NUM_MAJOR, \
-    CS_VERSION_NUM_MINOR, CS_VERSION_NUM_BUILD)
+#define CS_VERSION_NUM_COMPARABLE_CURRENT         			\
+  CS_VERSION_NUM_COMPARABLE(CS_VERSION_NUM_MAJOR, CS_VERSION_NUM_MINOR, \
+    CS_VERSION_NUM_RELEASE, CS_VERSION_NUM_BUILD)
 /** @} */
 
 /**\name Version number definitions (strings)
  * @{ */
 /// Major version
-#define CS_VERSION_MAJOR CS_VER_QUOTE(CS_VERSION_NUM_MAJOR)
+#define CS_VERSION_MAJOR 	CS_VER_QUOTE(CS_VERSION_NUM_MAJOR)
 /// Minor version (even are stable versions, odd are development versions)
-#define CS_VERSION_MINOR CS_VER_QUOTE(CS_VERSION_NUM_MINOR)
-/// Maintenance release / RC
-#define CS_VERSION_BUILD CS_VER_QUOTE(CS_VERSION_NUM_BUILD)
+#define CS_VERSION_MINOR 	CS_VER_QUOTE(CS_VERSION_NUM_MINOR)
+/// Maintenance release
+#define CS_VERSION_RELEASE	CS_VER_QUOTE(CS_VERSION_NUM_RELEASE)
+/// Build number
+#define CS_VERSION_BUILD	CS_VER_QUOTE(CS_VERSION_NUM_BUILD)
 /// Date of release
-#define CS_RELEASE_DATE  CS_VER_QUOTE_(Mon 9-Jun-2008)
+#define CS_RELEASE_DATE		CS_VER_QUOTE_(Mon 9-Jun-2008)
 /** @} */
 
 #define CS_VER_QUOTE_(X) #X
@@ -90,7 +133,19 @@
 
 /// A complete version number
 #define CS_VERSION_NUMBER CS_VERSION_MAJOR "." CS_VERSION_MINOR "." \
-  CS_VERSION_BUILD
+  CS_VERSION_RELEASE "." CS_VERSION_BUILD
+/**
+ * A string identifying mutually (binarily) compatible versions.
+ * Stable versions with the same major and minor version are binary compatible
+ * between each other.
+ * Unstable versions are generally not binary compatible, hence builds from
+ * different SVN revisions are treated as incompatible.
+ */
+#ifdef CS_VERSION_UNSTABLE
+  #define CS_VERSION_NUMBER_COMPATIBLE	CS_VERSION_NUMBER
+#else
+  #define CS_VERSION_NUMBER_COMPATIBLE	CS_VERSION_MAJOR "." CS_VERSION_MINOR
+#endif
 
 /// A complete version string, including platform, processor and compiler
 #define CS_VERSION CS_VERSION_NUMBER \

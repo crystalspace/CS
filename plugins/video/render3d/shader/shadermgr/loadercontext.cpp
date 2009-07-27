@@ -40,7 +40,7 @@ void LoaderContext::RegisterTexture (iTextureWrapper* tex)
   if (tm) tex->Register (tm);
 }
 
-iTextureWrapper* LoaderContext::FindTexture (const char* name, bool dontWaitForLoad)
+iTextureWrapper* LoaderContext::FindTexture (const char* name, bool doLoad)
 {
   csRef<iTextureWrapper> rc = loader->LoadTexture (name, name,
     CS_TEXTURE_3D, 0, false, false);
@@ -49,8 +49,7 @@ iTextureWrapper* LoaderContext::FindTexture (const char* name, bool dontWaitForL
 }
 
 iTextureWrapper* LoaderContext::FindNamedTexture (const char* name,
-                                                  const char *filename,
-                                                  bool dontWaitForLoad)
+                                                  const char *filename)
 {
   csRef<iTextureWrapper> rc = loader->LoadTexture(name, filename,
     CS_TEXTURE_3D, 0, false, false);

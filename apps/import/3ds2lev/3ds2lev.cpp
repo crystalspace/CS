@@ -394,8 +394,17 @@ int main (int argc, char * argv[])
       csFPrintf (stderr, "Couldn't open output file '%s'!\n", outfn);
       return 1;
     }
-    fwrite (str->GetData(), 1, str->Length(), outfile);
+    const size_t length = str->Length ();
+    const size_t res = fwrite (str->GetData(), 1, length, outfile);
+    const int errcode = errno;
     fclose (outfile);
+    if (res != length)
+    {
+      csFPrintf (stderr,
+        "Could only write %zu of %zu bytes for %s (errno = %d)!\n",
+        res, length, outfn, errcode);
+      return 1;
+    }
   }
   else
   {

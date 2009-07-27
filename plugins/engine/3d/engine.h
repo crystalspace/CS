@@ -554,7 +554,7 @@ public:
   virtual void DelayedRemoveObject (csTicks delay, iBase *object);
   virtual void RemoveDelayedRemoves (bool remove = false);
 
-  virtual void DeleteAll ();
+  THREADED_CALLABLE_DECL(csEngine, DeleteAll, csThreadReturn, HIGH, true, false);
   void DeleteAllForce ();
 
   virtual void ResetWorldSpecificSettings(); 
