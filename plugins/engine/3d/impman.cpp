@@ -91,48 +91,39 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   if(!csIMesh->camera.IsValid())
     return;
 
-  // Move imposter mesh to correct sector.
-  csIMesh->mesh->GetMovable()->SetPosition(csVector3(0.0f));
-  csIMesh->mesh->GetMovable()->SetSector(csIMesh->sector);
-  csIMesh->mesh->GetMovable()->UpdateMove();
-
   // Allocate a texture image.
-  int texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
-
-  csRef<iImage> thisImage = new csImageMemory (csIMesh->texWidth, csIMesh->texHeight,
-    CS_IMGFMT_ALPHA && CS_IMGFMT_TRUECOLOR );
-  iTextureWrapper* tex = engine->GetTextureList ()->NewTexture (thisImage);
-  tex->SetFlags (tex->GetFlags() | texFlags);
-  tex->Register (engine->G3D->GetTextureManager());
-  tex->GetTextureHandle ()->SetAlphaType (csAlphaMode::alphaBinary);
-/*
-  csMesh->drawing_imposter = true;
-  csMeshOnTexture r2t(engine->GetObjectRegistry());
-  r2t.GetView()->GetCamera()->SetTransform(csIMesh->camera->GetTransform());
-  r2t.GetView()->GetCamera()->SetSector(csIMesh->sector);
-  r2t.ScaleCamera(csMesh, 8.0f);
-  r2t.Render(csMesh, tex->GetTextureHandle());
-  csMesh->drawing_imposter = false;
+  csRef<iTextureManager> texman = g3d->GetTextureManager();
+  csRef<iTextureHandle> texh = texman->CreateTexture(csIMesh->texWidth, csIMesh->texHeight,
+    csimg2D, "rgb8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+  texh->SetAlphaType (csAlphaMode::alphaBinary);
 
   csView view(engine, g3d);
   view.SetCamera(csIMesh->camera);
 
   csMesh->drawing_imposter = true;
   csRef<iRenderManagerTargets> rmTargets = scfQueryInterface<iRenderManagerTargets>(engine->renderManager);
-  rmTargets->RegisterRenderTarget(tex->GetTextureHandle(), &view, 0, iRenderManagerTargets::updateOnce);
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER);
-  engine->renderManager->RenderView(&view);
+  rmTargets->RegisterRenderTarget(texh, &view, 0, iRenderManagerTargets::updateOnce);
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN);
+  view.Draw(csMesh);
   g3d->FinishDraw();
+  g3d->Print(0);
+  rmTargets->UnregisterRenderTarget(texh);
   csMesh->drawing_imposter = false;
-*/
+
+  csRef<iTextureWrapper> tex = engine->GetTextureList()->CreateTexture(texh);
+  csIMesh->mat = engine->CreateMaterial("impostermat", tex);
+
+  // Move imposter mesh to correct sector.
+  csIMesh->mesh->GetMovable()->SetPosition(csVector3(0.0f));
+  csIMesh->mesh->GetMovable()->SetSector(csIMesh->sector);
+  csIMesh->mesh->GetMovable()->UpdateMove();
+
+  /*
   csRef<iImageIO> imageio = csQueryRegistry<iImageIO>(engine->GetObjectRegistry());
-  csRef<iDataBuffer> db = imageio->Save(thisImage, "image/png");
+  csRef<iDataBuffer> db = imageio->Save(tex->GetImageFile(), "image/png");
 
   engine->VFS->WriteFile("/this/testimage.png", db->GetData(), db->GetSize());
 
-  thisImage.Invalidate();
-
-  /*
   csBoxClipper* clip = new csBoxClipper (0, 0, csMesh->texWidth, csMesh->texHeight);
 
   //start r2t

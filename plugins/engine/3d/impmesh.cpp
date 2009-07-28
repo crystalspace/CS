@@ -272,10 +272,6 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     mesh->alphaType = csAlphaMode::alphaBinary;
     mesh->z_buf_mode = CS_ZBUF_TEST;
 
-    iTextureWrapper* tex = engine->CreateBlackTexture("impostertex", 256, 512, 0, CS_TEXTURE_3D);
-    tex->Register(engine->G3D->GetTextureManager());
-    mat = engine->CreateMaterial("impostermat", tex);
-
     csRef<iLoader> ldr = csQueryRegistry<iLoader>(engine->GetObjectRegistry());
     ldr->LoadShader("/shader/lighting/lighting_imposter.xml");
 
