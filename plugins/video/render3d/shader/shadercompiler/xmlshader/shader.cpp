@@ -1175,8 +1175,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           csXMLShaderTech*& var = tech.variants.GetExtend (vi);
           tech.variantsPrepared.SetSize (csMax (tech.variantsPrepared.GetSize(),
             vi+1));
-          //ticket = ((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
-          //ticket = vi * (techniques.GetSize()+1) + (t+1);
 	  ticket = ComputeTicket (t, vi);
 
           csRef<iHierarchicalCache> varCache;
@@ -1297,16 +1295,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           }
           ticket = ComputeTicketForFallback (
 	    GetFallbackShader()->GetTicket (modes, stack));
-          /*if (fallbackTicket != csArrayItemNotFound)
-          {
-            ticket = fallbackTicket * (techniques.GetSize()+1);
-          }
-          else
-            ticket = csArrayItemNotFound;*/
         }
-        else if (!techVar.shownError && compiler->do_verbose)
-          compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-          "No technique validated for shader '%s' TV %zu", GetName(), tvi);
+        else
+	{
+	  ticket = csArrayItemNotFound;
+	  if (!techVar.shownError && compiler->do_verbose)
+	    compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	      "No technique validated for shader '%s' TV %zu", GetName(), tvi);
+	}
       }
       techVar.shownError = true;
     }
