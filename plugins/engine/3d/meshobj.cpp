@@ -71,7 +71,6 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   factory = 0;
   zbufMode = CS_ZBUF_USE;
   using_imposter = false;
-  drawing_imposter = false;
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
 
@@ -405,7 +404,7 @@ void csMeshWrapper::SetRenderPriority (CS::Graphics::RenderPriority rp)
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  if (factory && !drawing_imposter)
+  if (factory)
   {
     csRef<iImposterFactory> factwrap = scfQueryInterfaceSafe<iImposterFactory> (factory);
     if (factwrap)

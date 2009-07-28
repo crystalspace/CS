@@ -100,7 +100,7 @@ private:
   csPoly3D cutout;
 
   // Imposter material.
-  iMaterialWrapper* mat;
+  csRef<iMaterialWrapper> mat;
 
   // The camera this mesh is being viewed through.
   csWeakRef<iCamera> camera;

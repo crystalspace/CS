@@ -100,15 +100,8 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   csView view(engine, g3d);
   view.SetCamera(csIMesh->camera);
 
-  csMesh->drawing_imposter = true;
   csRef<iRenderManagerTargets> rmTargets = scfQueryInterface<iRenderManagerTargets>(engine->renderManager);
   rmTargets->RegisterRenderTarget(texh, &view, 0, iRenderManagerTargets::updateOnce);
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN);
-  view.Draw(csMesh);
-  g3d->FinishDraw();
-  g3d->Print(0);
-  rmTargets->UnregisterRenderTarget(texh);
-  csMesh->drawing_imposter = false;
 
   csRef<iTextureWrapper> tex = engine->GetTextureList()->CreateTexture(texh);
   csIMesh->mat = engine->CreateMaterial("impostermat", tex);
