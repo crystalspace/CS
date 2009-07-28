@@ -97,11 +97,11 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
     csimg2D, "rgb8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
   texh->SetAlphaType (csAlphaMode::alphaBinary);
 
-  csView view(engine, g3d);
-  view.SetCamera(csIMesh->camera);
+  csRef<iView> newView = csPtr<iView>(new csView(engine, g3d));
+  newView->SetCamera(csIMesh->camera);
 
   csRef<iRenderManagerTargets> rmTargets = scfQueryInterface<iRenderManagerTargets>(engine->renderManager);
-  rmTargets->RegisterRenderTarget(texh, &view, 0, iRenderManagerTargets::updateOnce);
+  rmTargets->RegisterRenderTarget(texh, newView, 0, iRenderManagerTargets::updateOnce);
 
   csRef<iTextureWrapper> tex = engine->GetTextureList()->CreateTexture(texh);
   csIMesh->mat = engine->CreateMaterial("impostermat", tex);
