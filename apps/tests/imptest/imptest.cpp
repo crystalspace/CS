@@ -316,19 +316,10 @@ void ImposterTest::CreateSprites ()
   if (imeshfact == 0)
     ReportError("Error loading mesh object factory!");
 
-  iSharedVariableList* varlist = engine->GetVariableList();
-  csRef<iSharedVariable> distvar = varlist->New();
-  distvar->Set(3.0f);
-  csRef<iSharedVariable> rotvar = varlist->New();
-  rotvar->Set(0.40f);
-  csRef<iSharedVariable> camrotvar = varlist->New();
-  camrotvar->Set(0.2f);
-
-  csRef<iImposter> i = scfQueryInterface<iImposter> (imeshfact);
-  i->SetImposterActive(true);
-  i->SetMinDistance(distvar);
-  i->SetRotationTolerance(rotvar);
-  i->SetCameraRotationTolerance(camrotvar);
+  csRef<iImposterFactory> i = scfQueryInterface<iImposterFactory> (imeshfact);
+  i->SetMinDistance(3.0f);
+  i->SetRotationTolerance(0.40f);
+  i->SetCameraRotationTolerance(3.0f);
 
   look_point = csVector3 (1, 1, 1);
 

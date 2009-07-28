@@ -276,6 +276,9 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     tex->Register(engine->G3D->GetTextureManager());
     mat = engine->CreateMaterial("impostermat", tex);
 
+    csRef<iLoader> ldr = csQueryRegistry<iLoader>(engine->GetObjectRegistry());
+    ldr->LoadShader("/shader/lighting/lighting_imposter.xml");
+
     csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>(
     engine->GetObjectRegistry(), "crystalspace.shared.stringset");
     csStringID shadertype = strings->Request("base");
