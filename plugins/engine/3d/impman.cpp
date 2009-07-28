@@ -20,7 +20,8 @@
 
 #include "csgeom/polyclip.h"
 #include "csgfx/imagememory.h"
-#include "cstool/procmesh.h"
+#include "cstool/csview.h"
+#include "cstool/meshfilter.h"
 #include "iengine/camera.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
@@ -29,6 +30,8 @@
 #include "impman.h"
 #include "impmesh.h"
 #include "meshobj.h"
+
+using namespace CS::Utility;
 
 csImposterManager::csImposterManager(csEngine* engine)
 : scfImplementationType(this), engine(engine)
@@ -94,11 +97,16 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   // Allocate a texture image.
   csRef<iTextureManager> texman = g3d->GetTextureManager();
   csRef<iTextureHandle> texh = texman->CreateTexture(csIMesh->texWidth, csIMesh->texHeight,
-    csimg2D, "rgb8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+    csimg2D, "rgba8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
   texh->SetAlphaType (csAlphaMode::alphaBinary);
 
   csRef<iView> newView = csPtr<iView>(new csView(engine, g3d));
   newView->SetCamera(csIMesh->camera);
+  newView->GetMeshFilter().SetFilterMode(MESH_FILTER_INCLUDE);
+  newView->GetMeshFilter().AddFilterMesh(csMesh);
+
+  // Mark original mesh for r2t draw.
+  csMesh->drawing_imposter = scfQueryInterface<iBase>(newView);
 
   csRef<iRenderManagerTargets> rmTargets = scfQueryInterface<iRenderManagerTargets>(engine->renderManager);
   rmTargets->RegisterRenderTarget(texh, newView, 0, iRenderManagerTargets::updateOnce);

@@ -404,7 +404,7 @@ void csMeshWrapper::SetRenderPriority (CS::Graphics::RenderPriority rp)
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  if (factory)
+  if (factory && !drawing_imposter)
   {
     csRef<iImposterFactory> factwrap = scfQueryInterfaceSafe<iImposterFactory> (factory);
     if (factwrap)

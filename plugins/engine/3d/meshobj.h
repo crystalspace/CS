@@ -230,6 +230,10 @@ private:
   /// Whether or not an imposter is currently being used for this mesh.
   bool using_imposter;
 
+  /// Whether we're drawing to an imposter texture.
+  /// TODO: Work out a better way to detect this.
+  csWeakRef<iBase> drawing_imposter;
+
   // In case the mesh has CS_ENTITY_NOCLIP set then this will
   // contain the value of the last frame number and camera pointer.
   // This is used to detect if we can skip rendering the mesh.
