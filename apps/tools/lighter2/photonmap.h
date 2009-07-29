@@ -1,5 +1,33 @@
-#ifndef __JENSENPHOTONMAP_H__
-#define __JENSENPHOTONMAP_H__
+/*
+  Copyright (C) 2001 Henrik Wann Jensen / A.K. Peters Ltd.
+  Portions Copyright (C) 2009 by Seth Berrier
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+//-----------------------------------------------------------------------------
+// Based on: photonmap.cc
+// An example implementation of the photon map data structure
+//
+// Henrik Wann Jensen - February 2001
+//
+// from appendix B of 'Realistic Image Synthesis Using Photon Mapping'
+//-----------------------------------------------------------------------------
+
+#ifndef __PHOTONMAP_H__
+#define __PHOTONMAP_H__
 
 namespace lighter
 {
@@ -23,15 +51,15 @@ namespace lighter
     void balance(void);             // balance the kd-tree (before use!)
 
     void irradiance_estimate(
-      float irrad[3],               // returned irradiance
-      const float pos[3],           // surface position
-      const float normal[3],        // surface normal at pos
-      const float max_dist,         // max distance to look for photons
-      const int nphotons ) const;   // number of photons to use
+      float irrad[3],                // returned irradiance
+      const float pos[3],            // surface position
+      const float normal[3],         // surface normal at pos
+      const float max_dist,          // max distance to look for photons
+      const size_t nphotons ) const; // number of photons to use
 
     void locate_photons(
       NearestPhotons *const np,     // np is used to locate the photons
-      const int index ) const;      // call with index = 1
+      const size_t index ) const;      // call with index = 1
 
     void photon_dir(
       float *dir,                    // direction of photon (returned)
@@ -44,23 +72,23 @@ namespace lighter
     void balance_segment(
       Photon **pbal,
       Photon **porg,
-      const int index,
+      const size_t index,
 
-      const int start,
-      const int end );
+      const size_t start,
+      const size_t end );
 
     void median_split(
       Photon **p,
-      const int start,
-      const int end,
-      const int median,
+      const size_t start,
+      const size_t end,
+      const size_t median,
       const int axis );
 
     Photon *photons;
 
-    int stored_photons;
-    int half_stored_photons;
-    int max_photons;
+    size_t stored_photons;
+    size_t half_stored_photons;
+    size_t max_photons;
     int prev_scale;
 
     float bbox_min[3];     // use bbox_min;
@@ -75,4 +103,4 @@ namespace lighter
   };
 };
 
-#endif // __JENSENPHOTONMAP_H__
+#endif // __PHOTONMAP_H__

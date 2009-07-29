@@ -1,12 +1,33 @@
+/*
+  Copyright (C) 2001 Henrik Wann Jensen / A.K. Peters Ltd.
+  Portions Copyright (C) 2009 by Seth Berrier
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 //-----------------------------------------------------------------------------
-// photonmap.cc
+// Based on: photonmap.cc
 // An example implementation of the photon map data structure
 //
 // Henrik Wann Jensen - February 2001
+//
+// from appendix B of 'Realistic Image Synthesis Using Photon Mapping'
 //-----------------------------------------------------------------------------
 
 #include "common.h"
-#include "jensenphotonmap.h"
+#include "photonmap.h"
 
 namespace lighter
 {
@@ -30,9 +51,9 @@ namespace lighter
    * nearest photons
    */
   struct NearestPhotons {
-    int max;
-    int found;
-    int got_heap;
+    size_t max;
+    size_t found;
+    size_t got_heap;
     float pos[3];
     float *dist2;
     const Photon **index;
@@ -66,7 +87,7 @@ namespace lighter
     //----------------------------------------
     if(!directionTablesReady)
     {
-      for (int i=0; i<256; i++) {
+      for (size_t i=0; i<256; i++) {
         double angle = double(i)*(1.0/256.0)*PI;
         costheta[i] = cos( angle );
         sintheta[i] = sin( angle );
@@ -101,7 +122,7 @@ namespace lighter
                                          const float pos[3],            // surface position
                                          const float normal[3],         // surface normal at pos
                                          const float max_dist,          // max distance to look for photons
-                                         const int nphotons ) const     // number of photons to use
+                                         const size_t nphotons ) const     // number of photons to use
   {
     irrad[0] = irrad[1] = irrad[2] = 0.0;
 
@@ -125,7 +146,7 @@ namespace lighter
     float pdir[3];
 
     // sum irradiance from all photons
-    for (int i=1; i<=np.found; i++) {
+    for (size_t i=1; i<=np.found; i++) {
       const Photon *p = np.index[i];
       // the photon_dir call and following if can be omitted (for speed)
       // if the scene does not have any thin surfaces
@@ -149,7 +170,7 @@ namespace lighter
   */
   void PhotonMap :: locate_photons(
                                     NearestPhotons *const np,
-                                    const int index ) const
+                                    const size_t index ) const
   {
     const Photon *p = &(photons [index]);
     float dist1;
@@ -186,14 +207,14 @@ namespace lighter
         np->dist2[np->found] = dist2;
         np->index[np->found] = p;
       } else {
-        int j,parent;
+        size_t j,parent;
 
         if (np->got_heap==0) { // Do we need to build the heap?
           // Build heap
           float dst2;
           const Photon *phot;
-          int half_found = np->found>>1;
-          for ( int k=half_found; k>=1; k--) {
+          size_t half_found = np->found>>1;
+          for ( size_t k=half_found; k>=1; k--) {
             parent=k ;
             phot = np->index[k];
             dst2 = np->dist2[k];
@@ -220,7 +241,7 @@ namespace lighter
         parent=1;
 
         j = 2;
-        while ( j <- np->found ) {
+        while ( j <= np->found ) {
           if ( j < np->found && np->dist2[j] < np->dist2[j+1] )
             j++;
           if ( dist2 > np->dist2[j] )
@@ -257,7 +278,7 @@ namespace lighter
     stored_photons++;
     Photon *const node = &(photons[stored_photons]);
 
-    for (int i=0; i<3; i++) {
+    for (size_t i=0; i<3; i++) {
       node->pos[i] = pos[i];
 
       if (node->pos[i] < bbox_min[i])
@@ -291,7 +312,7 @@ namespace lighter
    */
   void PhotonMap :: scale_photon_power( const float scale )
   {
-    for (int i=prev_scale; i<=stored_photons; i++) {
+    for (size_t i=prev_scale; i<=stored_photons; i++) {
       photons[i].power[0] *= scale;
       photons[i].power[1] *= scale;
       photons[i].power[2] *= scale;
@@ -334,17 +355,17 @@ namespace lighter
       Photon **pa1 = (Photon**)malloc(sizeof(Photon*)*(stored_photons+1));
       Photon **pa2 = (Photon**)malloc(sizeof(Photon*)*(stored_photons+1));
 
-      for (int i=0; i<=stored_photons; i++)
+      for (size_t i=0; i<=stored_photons; i++)
         pa2[i] = &(photons[i]);
 
       balance_segment( pa1, pa2, 1, 1, stored_photons );
       free(pa2);
 
       // reorganize balanced kd-tree (make a heap)
-      int d, j=1, foo=1;
+      size_t d, j=1, foo=1;
       Photon foo_photon = photons[j];
 
-      for (int i=1; i<=stored_photons; i++) {
+      for (size_t i=1; i<=stored_photons; i++) {
         d=pa1[j]-photons;
         pa1[j] = NULL;
         if (d != foo)
@@ -380,18 +401,18 @@ namespace lighter
   // (inspired by routine in "Algorithms in C++" by Sedgewick)
   void PhotonMap :: median_split(
                                   Photon **p,
-                                  const int start,                // start of photon block in array
-                                  const int end,                  // end of photon block in array
-                                  const int median,               // desired median number
+                                  const size_t start,                // start of photon block in array
+                                  const size_t end,                  // end of photon block in array
+                                  const size_t median,               // desired median number
                                   const int axis )                // axis to split along
   {
-    int left = start;
-    int right = end;
+    size_t left = start;
+    size_t right = end;
 
     while ( right > left ) {
       const float v = p[right]->pos[axis] ;
-      int i=left-1;
-      int j=right;
+      size_t i=left-1;
+      size_t j=right;
       for (;;) {
         while ( p[++i]->pos[axis] < v )
           ;
@@ -416,15 +437,15 @@ namespace lighter
   void PhotonMap :: balance_segment(
                                      Photon **pbal,
                                      Photon **porg,
-                                     const int index,
-                                     const int start,
-                                     const int end )
+                                     const size_t index,
+                                     const size_t start,
+                                     const size_t end )
   {
     //--------------------
     // compute new median
     //--------------------
 
-    int median=1;
+    size_t median=1;
     while ((4*median) <= (end-start+1))
       median += median;
 

@@ -94,14 +94,8 @@ namespace lighter
     // Build per-sector KD-tree
     void BuildKDTrees ();
 
-    // Fill the lightmaps
+    // Compute all lighting components (Fill the lightmaps)
     void ComputeLighting ();
-
-    // Shoot direct lighting
-    void DoDirectLighting ();
-
-    // Do photon map samples for indirect
-    void DoIndirectIllumination();
 
     // Post-process all lightmaps
     void PostprocessLightmaps ();

@@ -25,7 +25,7 @@
 #include "object_genmesh.h"
 #include "object_terrain2.h"
 
-#include "jensenphotonmap.h"
+#include "photonmap.h"
 
 #include <functional>
 

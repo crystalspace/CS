@@ -32,7 +32,6 @@
 #include "lightcalculator.h"
 #include "directlight.h"
 #include "indirectlight.h"
-#include "globalillumination.h"
 #include "sampler.h"
 #include <csutil/floatrand.h>
 
@@ -297,14 +296,8 @@ namespace lighter
     // Build Photon Maps
     BuildPhotonMap();
    
-    // Fill the photon maps
+    // Compute all lighting components (fill lightmaps)
     ComputeLighting();
-
-    // Shoot direct lighting
-//    DoDirectLighting ();   
-
-    //@@ DO OTHER LIGHTING
-//    DoIndirectIllumination();
 
     // Postprocessing of ligthmaps
     PostprocessLightmaps ();
@@ -496,41 +489,6 @@ namespace lighter
     progBuildKDTree.SetProgress (1);
   }
 
-  void Lighter::DoDirectLighting ()
-  {
-    //progDirectLighting.SetProgress (0);
-    //if (globalConfig.GetLighterProperties ().doDirectLight)
-    //{
-    //  int numDLPasses = 
-    //    globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
-    //  const csVector3 bases[4] =
-    //  {
-    //    csVector3 (0, 0, 1),
-    //    csVector3 (/* -1/sqrt(6) */ -0.408248f, /* 1/sqrt(2) */ 0.707107f, /* 1/sqrt(3) */ 0.577350f),
-    //    csVector3 (/* sqrt(2/3) */ 0.816497f, 0, /* 1/sqrt(3) */ 0.577350f),
-    //    csVector3 (/* -1/sqrt(6) */ -0.408248f, /* -1/sqrt(2) */ -0.707107f, /* 1/sqrt(3) */ 0.577350f)
-    //  };
-    //  float sectorProgress = 
-    //    1.0f / (numDLPasses * scene->GetSectors ().GetSize());
-    //  for (int p = 0; p < numDLPasses; p++)
-    //  {
-    //    DirectLighting lighting (bases[p], p);
-
-    //    SectorHash::GlobalIterator sectIt = 
-    //      scene->GetSectors ().GetIterator ();
-    //    while (sectIt.HasNext ())
-    //    {
-    //      csRef<Sector> sect = sectIt.Next ();
-    //      Statistics::Progress* lightProg = 
-    //        progDirectLighting.CreateProgress (sectorProgress);
-    //      lighting.ShadeDirectLighting (sect, *lightProg);
-    //      delete lightProg;
-    //    }
-    //  }
-    //  progDirectLighting.SetProgress (1);
-    //}
-  }
-
   void Lighter::ComputeLighting ()
   {
     // Set task progress to 0%
@@ -597,51 +555,6 @@ namespace lighter
 
     // Set task progress to 100%
     progCalcLighting.SetProgress (1);
-  }
-
-  void Lighter::DoIndirectIllumination()
-  {
-    //// Indicate 0% progress
-    //progFinalGather.SetProgress(0);
-
-    //// Check configuration to see if indirect illumination is enabled.
-    //if (!globalConfig.GetLighterProperties().indirectLMs)
-    //{
-    //  return;
-    //}
-
-    //// Retrieve sector iterator
-    //SectorHash::GlobalIterator sectIt = 
-    //  scene->GetSectors().GetIterator();
-
-    //// Compute step size for progress updates
-    //const float progressStep = 1.0f / scene->GetSectors ().GetSize();
-
-    //// Iterate over all sectors
-    //while (sectIt.HasNext())
-    //{
-    //  // Move to next sector
-    //  csRef<Sector> sect = sectIt.Next();
-
-    //  // Setup to report progress
-    //  Statistics::Progress* lightProg =
-    //    progFinalGather.CreateProgress(progressStep);
-
-    //  // Get object iterator for current sector
-    //  ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
-
-    //  // Create global illumination object
-    //  lighter::GlobalIllumination lighting(globalConfig.GetIndirectProperties());
-
-    //  // Shade light maps with indirect light from photon maps
-    //  lighting.ShadeIndirectLighting(sect, *lightProg);
-
-    //  // Clean up
-    //  delete lightProg;
-    //}
-
-    //// Set progress to 100%
-    //progFinalGather.SetProgress(1);
   }
 
   void Lighter::PostprocessLightmaps ()
