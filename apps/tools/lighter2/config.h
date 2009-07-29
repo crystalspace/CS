@@ -116,6 +116,8 @@ namespace lighter
       int numPerSample;
       // Maximum photon recursion depth
       int maxRecursionDepth;
+      // Maximum number of neighbors to sample
+      int maxNumNeighbors;
       // The sample distance for sampling photons
       float sampleDistance;
       // Flag for Final Gather

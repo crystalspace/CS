@@ -130,9 +130,8 @@ namespace lighter
     Statistics::Progress progSaveMeshes;
     Statistics::Progress progSaveFinish;
     Statistics::Progress progBuildKDTree;
-    Statistics::Progress progDirectLighting;
+    Statistics::Progress progCalcLighting;
     Statistics::Progress progPhotonEmission;
-    Statistics::Progress progFinalGather;
     Statistics::Progress progPostproc;
     Statistics::Progress progPostprocSector;
     Statistics::Progress progPostprocLM;

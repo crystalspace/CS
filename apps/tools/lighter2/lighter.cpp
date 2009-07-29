@@ -31,6 +31,7 @@
 #include "tui.h"
 #include "lightcalculator.h"
 #include "directlight.h"
+#include "indirectlight.h"
 #include "globalillumination.h"
 #include "sampler.h"
 #include <csutil/floatrand.h>
@@ -58,9 +59,8 @@ namespace lighter
           progSaveMeshes (0, 99, &progSaveMeshesMain),
           progSaveFinish (0, 1, &progSaveMeshesMain),
         progBuildKDTree ("Building KD-Tree", 10, &progInitializeMain),
-      progDirectLighting ("Direct lighting", 60),
-      progPhotonEmission ("Emitting Photons", 50),
-      progFinalGather ("Splatting / Final Gather", 80),
+      progCalcLighting ("Calculating Lighting Components", 60),
+      progPhotonEmission ("", 50),
       progPostproc ("Postprocessing lightmaps", 10),
         progPostprocSector (0, 50, &progPostproc),
         progPostprocLM (0, 50, &progPostproc),
@@ -256,6 +256,15 @@ namespace lighter
 
   bool Lighter::LightEmUp ()
   {
+    // Check that one or more of the light components are enabled
+    if(!globalConfig.GetLighterProperties() .doDirectLight &&
+      !globalConfig.GetLighterProperties() .indirectLMs)
+    {
+      globalLighter->Report (
+          "You must enable either direct or indirect lighting (or both).");
+      return false;
+    }
+
     // Have to load to have anything to light
     if (!LoadFiles (progLoadFiles)) 
       return false;
@@ -399,8 +408,7 @@ namespace lighter
     const float progressStep = 1.0f / scene->GetSectors ().GetSize();
 
     // Create global illumination object
-    lighter::GlobalIllumination 
-      lighting(globalConfig.GetIndirectProperties());
+    IndirectLight lighting;
 
     // Retrieve sector iterator
     SectorHash::GlobalIterator sectIt = 
@@ -526,7 +534,7 @@ namespace lighter
   void Lighter::ComputeLighting ()
   {
     // Set task progress to 0%
-    progDirectLighting.SetProgress (0);
+    progCalcLighting.SetProgress (0);
 
     int numPasses = 
       globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
@@ -550,11 +558,19 @@ namespace lighter
       LightCalculator lighting (bases[p], p);
 
       // Add components to the light calculator
-      DirectLighting directComponent (bases[p], p);
-      lighting.addComponent(&directComponent, 1.0);
+      DirectLighting *directComponent = NULL;
+      IndirectLight* indirectComponent = NULL;
+      if(globalConfig.GetLighterProperties() .doDirectLight)
+      {
+        directComponent = new DirectLighting (bases[p], p);
+        lighting.addComponent(directComponent, 1.0);
+      }
 
-//      IndirectLighting indirectComponent (bases[p], p);
-//      lighting.addComponent(&indirectComponent);
+      if(globalConfig.GetLighterProperties() .indirectLMs)
+      {
+        indirectComponent = new IndirectLight();
+        lighting.addComponent(indirectComponent, 1.0);
+      }
 
       // Iterate overl all scene sectors
       SectorHash::GlobalIterator sectIt = 
@@ -566,7 +582,7 @@ namespace lighter
 
         // Create a sub-task progress
         Statistics::Progress* lightProg = 
-          progDirectLighting.CreateProgress (sectorProgress);
+          progCalcLighting.CreateProgress (sectorProgress);
 
         // Compute the lighting
         lighting.ComputeSectorStaticLighting (sect, *lightProg);
@@ -574,55 +590,58 @@ namespace lighter
         // Clean up
         delete lightProg;
       }
+
+      if(directComponent != NULL) delete directComponent;
+      if(indirectComponent != NULL) delete indirectComponent;
     }
 
     // Set task progress to 100%
-    progDirectLighting.SetProgress (1);
+    progCalcLighting.SetProgress (1);
   }
 
   void Lighter::DoIndirectIllumination()
   {
-    // Indicate 0% progress
-    progFinalGather.SetProgress(0);
+    //// Indicate 0% progress
+    //progFinalGather.SetProgress(0);
 
-    // Check configuration to see if indirect illumination is enabled.
-    if (!globalConfig.GetLighterProperties().indirectLMs)
-    {
-      return;
-    }
+    //// Check configuration to see if indirect illumination is enabled.
+    //if (!globalConfig.GetLighterProperties().indirectLMs)
+    //{
+    //  return;
+    //}
 
-    // Retrieve sector iterator
-    SectorHash::GlobalIterator sectIt = 
-      scene->GetSectors().GetIterator();
+    //// Retrieve sector iterator
+    //SectorHash::GlobalIterator sectIt = 
+    //  scene->GetSectors().GetIterator();
 
-    // Compute step size for progress updates
-    const float progressStep = 1.0f / scene->GetSectors ().GetSize();
+    //// Compute step size for progress updates
+    //const float progressStep = 1.0f / scene->GetSectors ().GetSize();
 
-    // Iterate over all sectors
-    while (sectIt.HasNext())
-    {
-      // Move to next sector
-      csRef<Sector> sect = sectIt.Next();
+    //// Iterate over all sectors
+    //while (sectIt.HasNext())
+    //{
+    //  // Move to next sector
+    //  csRef<Sector> sect = sectIt.Next();
 
-      // Setup to report progress
-      Statistics::Progress* lightProg =
-        progFinalGather.CreateProgress(progressStep);
+    //  // Setup to report progress
+    //  Statistics::Progress* lightProg =
+    //    progFinalGather.CreateProgress(progressStep);
 
-      // Get object iterator for current sector
-      ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
+    //  // Get object iterator for current sector
+    //  ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
 
-      // Create global illumination object
-      lighter::GlobalIllumination lighting(globalConfig.GetIndirectProperties());
+    //  // Create global illumination object
+    //  lighter::GlobalIllumination lighting(globalConfig.GetIndirectProperties());
 
-      // Shade light maps with indirect light from photon maps
-      lighting.ShadeIndirectLighting(sect, *lightProg);
+    //  // Shade light maps with indirect light from photon maps
+    //  lighting.ShadeIndirectLighting(sect, *lightProg);
 
-      // Clean up
-      delete lightProg;
-    }
+    //  // Clean up
+    //  delete lightProg;
+    //}
 
-    // Set progress to 100%
-    progFinalGather.SetProgress(1);
+    //// Set progress to 100%
+    //progFinalGather.SetProgress(1);
   }
 
   void Lighter::PostprocessLightmaps ()
@@ -840,6 +859,11 @@ namespace lighter
     csPrintf ("  Sets the maximum number of times a photon can scatter during\n"
               "  indirect illumination (set to -1 to use a purely random cutoff).\n");
     csPrintf ("   Default: %d\n\n", globalConfig.GetIndirectProperties ().maxRecursionDepth);
+
+    csPrintf (" --maxNumNeighbors=<number>\n");
+    csPrintf ("  Sets the maximum number of neighbors to sample when estimating\n"
+              "  irradiance using the photon map.\n");
+    csPrintf ("   Default: %d\n\n", globalConfig.GetIndirectProperties ().maxNumNeighbors);
 
     csPrintf (" --sampledistance=<threshold>\n");
     csPrintf ("  Sets the max distance to search for photons when sampling\n");

@@ -23,7 +23,9 @@
 #include "kdtree.h"
 #include "light.h"
 #include "material.h"
-#include "Photonmap.h"
+
+#include <string>
+using namespace std;
 
 namespace lighter
 {
@@ -51,19 +53,10 @@ namespace lighter
   {
   public:
     Sector (Scene* scene)
-      : kdTree (0), scene (scene)
-    {
-      photonMap = 0;
-    }
+      : kdTree (0), scene (scene), photonMap(NULL)
+    {}
 
-    ~Sector ()
-    {
-      delete kdTree;
-      if (photonMap)
-      {
-        delete photonMap;
-      }
-    }
+    ~Sector ();
 
     // Initialize any extra data in the sector
     void Initialize (Statistics::Progress& progress);
@@ -75,31 +68,15 @@ namespace lighter
 
     void SavePhotonMap(string filename);
 
-    /**
-    * Emit Photon
-    * Emits a photon in this sector and traces it through till its
-    * termination using a monte-carlo based technique to determine
-    * the termination.
-    * /param pos - the position we are starting the trace from
-    * /param dir - the direction we are tracing
-    * /param color - the color of the photon
-    * /param power - the power of the current photon
-    * /param depth - how deep this call currently is
-    * /param depth - is this photon a reflected photon or an initial emmision (default)
-    */
-    void EmitPhoton(const csVector3& pos, const csVector3& dir,
-                    const csColor& color, const csColor& power, const int& samples,
-                    const size_t& depth = 0, const RayType type = RAY_TYPE_OTHER1);
+    void InitPhotonMap();
 
-    /**
-     * DiffuseScatter
-     *    This funciton will compute a random direction in the hemisphere
-     * around the vector n (which should be the surface normal at the hit
-     * point).  The photon should be reflected in this direction to continue
-     * photon tracing.
-     * /param n - The surface normal at the phontons hit point
-     **/
-    csVector3 DiffuseScatter(const csVector3 &n);
+    void AddPhoton(const csColor power, const csVector3 pos,
+      const csVector3 dir );
+
+    void BalancePhotons();
+
+    csColor SamplePhoton(const csVector3 point, const csVector3 normal,
+                          const float searchRad);
 
     // All objects in sector
     ObjectHash allObjects;
@@ -119,10 +96,11 @@ namespace lighter
     // Sector-name
     csString sectorName;
 
-    // Photon map for GI lighting
-    PhotonMap *photonMap;
-
     Scene* scene;
+
+  protected:
+    // Photon map for indirect lighting
+    PhotonMap *photonMap;
   };
   typedef csHash<csRef<Sector>, csString> SectorHash;
 

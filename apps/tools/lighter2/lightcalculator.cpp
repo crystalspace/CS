@@ -240,9 +240,10 @@ namespace lighter
             csColor c(0, 0, 0);
             for(size_t i=0; i<component.size(); i++)
             {
-              c += componentCoefficient[i] *
-                    component[i]->ComputeElementLightingComponent(sector, ep,
-                                      masterSampler, recordInfluence, pdl);
+              if(component[i]->SupportsPDLights())
+                c += componentCoefficient[i] *
+                      component[i]->ComputeElementLightingComponent(sector, ep,
+                                        masterSampler, recordInfluence, pdl);
             }
 
             // Update this light's light map

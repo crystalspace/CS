@@ -56,6 +56,7 @@ namespace lighter
     indtLightProperties.numPhotons = 500;
     indtLightProperties.numPerSample = 50;
     indtLightProperties.maxRecursionDepth = 10;
+    indtLightProperties.maxNumNeighbors = 30;
     indtLightProperties.sampleDistance = 1.0f;
 
     indtLightProperties.finalGather = true;
@@ -117,6 +118,8 @@ namespace lighter
       indtLightProperties.numPhotons);
     indtLightProperties.maxRecursionDepth = cfgFile->GetInt("lighter2.maxRecursionDepth",
       indtLightProperties.maxRecursionDepth);
+    indtLightProperties.maxNumNeighbors = cfgFile->GetInt("lighter2.maxNumNeighbors",
+      indtLightProperties.maxNumNeighbors);
     indtLightProperties.numPerSample = cfgFile->GetInt("lighter2.photonsPerSample",
       indtLightProperties.numPerSample);
     indtLightProperties.sampleDistance = cfgFile->GetFloat("lighter2.sampleDistance",
