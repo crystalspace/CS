@@ -179,7 +179,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   public:
     FactorySubmesh ()
-      : scfImplementationType (this)
+      : scfImplementationType (this), material(0)
     {}
 
     virtual iRenderBuffer* GetIndices (size_t set)
@@ -218,6 +218,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       csRef<iRenderBuffer> boneWeightAndIndexBuffer[2];
     };
     csArray<RemappedBones> boneMapping;
+    
+    iMaterialWrapper* material;
+
+    /// Get the material
+    virtual iMaterialWrapper* GetMaterial () const { return material; }
+
+    /// Set the material, or 0 to use default.
+    virtual void SetMaterial (iMaterialWrapper* m) { material = m; }
+    
+    
   };
 
 
@@ -365,7 +375,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     public:
       Submesh (AnimeshObject* meshObject, FactorySubmesh* factorySubmesh)
         : scfImplementationType (this), meshObject (meshObject),
-        factorySubmesh (factorySubmesh), isRendering (true)
+        factorySubmesh (factorySubmesh), material(0), isRendering (true)
       {}
 
       virtual iAnimatedMeshFactorySubMesh* GetFactorySubMesh ()
@@ -385,6 +395,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       AnimeshObject* meshObject;
       FactorySubmesh* factorySubmesh;
+      iMaterialWrapper* material;
       bool isRendering;
 
       csRefArray<csShaderVariableContext> svContexts;

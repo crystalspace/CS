@@ -613,21 +613,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     const csReversibleTransform o2wt = movable->GetFullTransform ();
     //const csVector3& wo = o2wt.GetOrigin ();
-    
-    
-    // Fetch the material
-    iMaterialWrapper* mat = material;
-    if (!mat)
-      mat = factory->material;
-
-    if (!mat)
-    {
-      csPrintf ("INTERNAL ERROR: mesh used without material!\n");
-      return 0;
-    }
-
-    if (mat->IsVisitRequired ()) 
-      mat->Visit ();
 
     uint frameNum = rview->GetCurrentFrameNumber ();
 
@@ -639,6 +624,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       
       Submesh* sm = submeshes[i];
       FactorySubmesh* fsm = factory->submeshes[i];
+      
+      // Fetch the material
+      iMaterialWrapper* submat = sm->material;
+      if (!submat) submat = fsm->material;
+      if (!submat) submat = material;
+      if (!submat) submat = factory->material;
+
+      if (!submat)
+      {
+        csPrintf ("INTERNAL ERROR: mesh used without material!\n");
+        return 0;
+      }
+
+      if (submat->IsVisitRequired ()) 
+        submat->Visit ();
 
       for (size_t j = 0; j < fsm->indexBuffers.GetSize (); ++j)
       {
@@ -654,7 +654,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
         meshPtr->indexstart = 0;
         meshPtr->indexend = (unsigned int)fsm->indexBuffers[j]->GetElementCount ();
-        meshPtr->material = mat;
+        meshPtr->material = submat;
 
         meshPtr->mixmode = mixMode;
         meshPtr->buffers = sm->bufferHolders[j];
@@ -872,7 +872,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       for (size_t j = 0; j < fsm->bufferHolders.GetSize (); ++j)
       {
         csRef<csRenderBufferHolder> bufferHolder;
-        bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[i]));
+        bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[j]));
 
         // Setup the accessor to this mesh
         bufferHolder->SetAccessor (rba, 
