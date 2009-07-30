@@ -190,6 +190,9 @@ void csImposterMesh::InitMesh(iCamera* camera)
   cutout[2] = csVector3(bbox.MinX(), bbox.MinY(), z);
   cutout[3] = csVector3(bbox.MinX(), bbox.MaxY(), z);
 
+  width = (cutout[1] - cutout[0]).Norm();
+  height = (cutout[3] - cutout[0]).Norm();
+
   // Calculate texture resolution.
   /*
   float den = 2.0f*res.distance*tanf(camera->GetFOV()/2.0f);
