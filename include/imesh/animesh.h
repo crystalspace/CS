@@ -24,6 +24,7 @@
 #include "imesh/skeleton2.h"
 
 struct iRenderBuffer;
+struct iMaterialWrapper;
 
 struct iAnimatedMeshFactory;
 struct iAnimatedMeshFactorySubMesh;
@@ -392,7 +393,7 @@ struct iAnimatedMeshFactory : public virtual iBase
  */
 struct iAnimatedMeshFactorySubMesh : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshFactorySubMesh, 1, 0, 0);
+  SCF_INTERFACE(iAnimatedMeshFactorySubMesh, 1, 1, 0);
 
   /**
    * Get the index buffer for this submesh. Defines a triangle list.
@@ -408,6 +409,16 @@ struct iAnimatedMeshFactorySubMesh : public virtual iBase
    * Get the bone indices used by a given index set
    */
   virtual const csArray<unsigned int>& GetBoneIndices (size_t set) = 0;
+
+  /**
+   * Get the material
+   */
+  virtual iMaterialWrapper* GetMaterial () const = 0;
+
+  /**
+   * Set the material, or 0 to use default.
+   */
+  virtual void SetMaterial (iMaterialWrapper* material) = 0;
   
 };
 
