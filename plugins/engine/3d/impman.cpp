@@ -100,7 +100,7 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   // Allocate a texture image.
   csRef<iTextureManager> texman = g3d->GetTextureManager();
   csRef<iTextureHandle> texh = texman->CreateTexture(csIMesh->texWidth, csIMesh->texHeight,
-    csimg2D, "rgb8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+    csimg2D, "rgba8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
   texh->SetAlphaType (csAlphaMode::alphaBinary);
 
   // Set up camera.
