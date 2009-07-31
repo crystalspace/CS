@@ -134,7 +134,7 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   newView->GetMeshFilter().AddFilterMesh(csMesh);
 
   // Mark original mesh for r2t draw.
-  csMesh->drawing_imposter = scfQueryInterface<iBase>(newView);
+  csMesh->drawing_imposter = scfQueryInterface<iBase>(newCamera);
 
   // Add view and texture as a render target.
   csRef<iRenderManagerTargets> rmTargets = scfQueryInterface<iRenderManagerTargets>(engine->renderManager);
