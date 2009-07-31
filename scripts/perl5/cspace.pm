@@ -15094,6 +15094,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetIndices = *cspacec::iAnimatedMeshFactorySubMesh_GetIndices;
 *GetIndexSetCount = *cspacec::iAnimatedMeshFactorySubMesh_GetIndexSetCount;
 *GetBoneIndices = *cspacec::iAnimatedMeshFactorySubMesh_GetBoneIndices;
+*GetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_GetMaterial;
+*SetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_SetMaterial;
 *scfGetVersion = *cspacec::iAnimatedMeshFactorySubMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

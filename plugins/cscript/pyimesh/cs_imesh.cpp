@@ -15205,6 +15205,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_GetMaterial(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactorySubMesh *arg1 = (iAnimatedMeshFactorySubMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  iMaterialWrapper *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactorySubMesh_GetMaterial",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactorySubMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactorySubMesh_GetMaterial" "', argument " "1"" of type '" "iAnimatedMeshFactorySubMesh const *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactorySubMesh * >(argp1);
+  result = (iMaterialWrapper *)((iAnimatedMeshFactorySubMesh const *)arg1)->GetMaterial();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_SetMaterial(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactorySubMesh *arg1 = (iAnimatedMeshFactorySubMesh *) 0 ;
+  iMaterialWrapper *arg2 = (iMaterialWrapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactorySubMesh_SetMaterial",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactorySubMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactorySubMesh_SetMaterial" "', argument " "1"" of type '" "iAnimatedMeshFactorySubMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactorySubMesh * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iAnimatedMeshFactorySubMesh_SetMaterial" "', argument " "2"" of type '" "iMaterialWrapper *""'"); 
+  }
+  arg2 = reinterpret_cast< iMaterialWrapper * >(argp2);
+  (arg1)->SetMaterial(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -48336,6 +48388,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iAnimatedMeshFactorySubMesh_GetIndices", _wrap_iAnimatedMeshFactorySubMesh_GetIndices, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_GetIndexSetCount", _wrap_iAnimatedMeshFactorySubMesh_GetIndexSetCount, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_GetBoneIndices", _wrap_iAnimatedMeshFactorySubMesh_GetBoneIndices, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactorySubMesh_GetMaterial", _wrap_iAnimatedMeshFactorySubMesh_GetMaterial, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactorySubMesh_SetMaterial", _wrap_iAnimatedMeshFactorySubMesh_SetMaterial, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_scfGetVersion", _wrap_iAnimatedMeshFactorySubMesh_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iAnimatedMeshFactorySubMesh", _wrap_delete_iAnimatedMeshFactorySubMesh, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_swigregister", iAnimatedMeshFactorySubMesh_swigregister, METH_VARARGS, NULL},
