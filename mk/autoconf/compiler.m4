@@ -30,9 +30,12 @@
 #       COMPILER.C.TYPE, and (as an historic anomaly) COMPILER.TYPE variables
 #       in Jamconfig.  The shell variable cs_compiler_name_c is also exported.
 #-----------------------------------------------------------------------------
-AC_DEFUN([CS_PROG_CC],[
+AC_DEFUN([_CS_PROG_CC_CFLAGS_FILTER],[
     CFLAGS="$CFLAGS" # Filter undesired flags
-    AC_PROG_CC
+])
+AC_DEFUN([CS_PROG_CC],[
+    AC_REQUIRE([_CS_PROG_CC_CFLAGS_FILTER])
+    AC_REQUIRE([AC_PROG_CC])
     AS_IF([test -n "$CC"],[
 	CS_EMIT_BUILD_PROPERTY([CMD.CC], [$CC])
 	CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$CPPFLAGS $CFLAGS], [+])
@@ -66,9 +69,12 @@ AC_DEFUN([CS_PROG_CC],[
 #       COMPILER.C++.TYPE, and (as an historic anomaly) COMPILER.TYPE variables
 #       in Jamconfig. The shell variable cs_compiler_name_cxx is also exported.
 #-----------------------------------------------------------------------------
-AC_DEFUN([CS_PROG_CXX],[
+AC_DEFUN([_CS_PROG_CXX_CFLAGS_FILTER],[
     CXXFLAGS="$CXXFLAGS" # Filter undesired flags
-    AC_PROG_CXX
+])
+AC_DEFUN([CS_PROG_CXX],[
+    AC_REQUIRE([_CS_PROG_CXX_CFLAGS_FILTER])
+    AC_REQUIRE([AC_PROG_CXX])
     AS_IF([test -n "$CXX"],[
 	CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])
 	CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
