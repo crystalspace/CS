@@ -84,6 +84,7 @@ private:
   bool dirty;
 
   // Saved values for update checking.
+  csVector3 relativeDir;
   csVector3 meshLocalDir;
   csVector3 cameraLocalDir;
 

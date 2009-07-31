@@ -97,12 +97,6 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   if(!csIMesh->camera.IsValid())
     return;
 
-  // Allocate a texture image.
-  csRef<iTextureManager> texman = g3d->GetTextureManager();
-  csRef<iTextureHandle> texh = texman->CreateTexture(csIMesh->texWidth, csIMesh->texHeight,
-    csimg2D, "rgba8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
-  texh->SetAlphaType (csAlphaMode::alphaBinary);
-
   // Set up camera.
   csRef<iCustomMatrixCamera> newCamera = engine->CreateCustomMatrixCamera(csIMesh->camera);
 
@@ -110,18 +104,32 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   csVector3 mesh_pos = csMesh->GetWorldBoundingBox ().GetCenter ();
   const csVector3& cam_pos = newCamera->GetCamera()->GetTransform ().GetOrigin ();
   csVector3 camdir = mesh_pos-cam_pos;
+  camdir.Normalize();
   newCamera->GetCamera()->GetTransform ().LookAt (camdir, csVector3(0,1,0));
 
-  // Set up a new projection matrix (code from heavy portal setup).
+  // Set up a new projection matrix.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
-  float irw = 1.0f/csIMesh->texWidth;
-  float irh = 1.0f/csIMesh->texHeight;
-  int screenW = g3d->GetDriver2D()->GetWidth();
-  int screenH = g3d->GetDriver2D()->GetHeight();
+  csIMesh->texWidth = 256; //csFindNearestPowerOf2(rbox.sbox.MaxX() - rbox.sbox.MinX());
+  csIMesh->texHeight = 256; //csFindNearestPowerOf2(rbox.sbox.MaxY() - rbox.sbox.MinY());
+
+//   float irw = 1.0f/csIMesh->texWidth;
+//   float irh = 1.0f/csIMesh->texHeight;
+//   int screenW = g3d->GetDriver2D()->GetWidth();
+//   int screenH = g3d->GetDriver2D()->GetHeight();
+//
+//   CS::Math::Matrix4 projShift (
+//       screenW*irw, 0, 0, irw * (screenW-2*rbox.sbox.MinX()) - 1,
+//       0, screenH*irh, 0, irh * (screenH-2*rbox.sbox.MinY()) - 1,
+//       0, 0, 1, 0,
+//       0, 0, 0, 1);
+
+  // Calculate required projection scaling.
+  float widthScale = csIMesh->texWidth / float(rbox.sbox.MaxX() - rbox.sbox.MinX());
+  float heightScale = csIMesh->texHeight / float(rbox.sbox.MaxY() - rbox.sbox.MinY());
 
   CS::Math::Matrix4 projShift (
-      screenW*irw, 0, 0, irw * (screenW-2*rbox.sbox.MinX()) - 1,
-      0, screenH*irh, 0, irh * (screenH-2*rbox.sbox.MinY()) - 1,
+      widthScale, 0, 0, 0,
+      0, heightScale, 0, 0,
       0, 0, 1, 0,
       0, 0, 0, 1);
 
@@ -129,12 +137,19 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Set up view.
   csRef<iView> newView = csPtr<iView>(new csView(engine, g3d));
-  newView->SetCamera(newCamera->GetCamera());
+  newView->SetCustomMatrixCamera(newCamera);
+  //newView->
   newView->GetMeshFilter().SetFilterMode(MESH_FILTER_INCLUDE);
   newView->GetMeshFilter().AddFilterMesh(csMesh);
 
   // Mark original mesh for r2t draw.
   csMesh->drawing_imposter = scfQueryInterface<iBase>(newCamera);
+
+  // Allocate a texture image.
+  csRef<iTextureManager> texman = g3d->GetTextureManager();
+  csRef<iTextureHandle> texh = texman->CreateTexture(csIMesh->texWidth, csIMesh->texHeight,
+      csimg2D, "rgba8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+  texh->SetAlphaType (csAlphaMode::alphaBinary);
 
   // Add view and texture as a render target.
   csRef<iRenderManagerTargets> rmTargets = scfQueryInterface<iRenderManagerTargets>(engine->renderManager);

@@ -213,17 +213,32 @@ void csImposterMesh::InitMesh(iCamera* camera)
   csReversibleTransform objt = instances[0]->mesh->GetMovable()->GetFullTransform();
   csOrthoTransform& camt = camera->GetTransform();
 
+  relativeDir = (camt.GetOrigin() -
+      instances[0]->mesh->GetWorldBoundingBox().GetCenter());
+  relativeDir.Normalize();
+/*
   csVector3 relativeDir = (instances[0]->mesh->GetWorldBoundingBox().GetCenter()
-    - camt.GetOrigin()).Unit();
+      - camt.GetOrigin()).Unit();
 
   meshLocalDir = objt.Other2ThisRelative(relativeDir);
   cameraLocalDir = camt.Other2ThisRelative(relativeDir);
-
+*/
   dirty = true;
 }
 
 bool csImposterMesh::WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh)
 {
+  csVector3 newCameraVec = (rview->GetCamera()->GetTransform().GetOrigin() -
+      instances[0]->mesh->GetWorldBoundingBox().GetCenter());
+  newCameraVec.Normalize();
+
+  if(newCameraVec * relativeDir < 0.99999)
+      return false;
+  else
+      return true;
+
+/*
+
   csReversibleTransform objt = pmesh->GetMovable()->GetFullTransform();
   csOrthoTransform& camt = rview->GetCamera()->GetTransform();
 
@@ -243,7 +258,7 @@ bool csImposterMesh::WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh)
     }
   }
 
-  return true;
+  return true;*/
 }
 
 //static arrays that keep the imposterdata
@@ -330,7 +345,7 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     float x = 1;
     float y = 1;
 
-    // correct textels for imposter heigth/width ratio
+    // correct textels for impostor height/width ratio
     // since r2t texture is square, but billboard might not
     if (height > width)
     {
@@ -339,10 +354,10 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
       y -= (1 - height/width)/2;
     }
 
-    mesh_texels.Push (csVector2 (1-x,y));  //0 1
-    mesh_texels.Push (csVector2 (1-x,1-y));  //0 0
-    mesh_texels.Push (csVector2 (x,1-y));  //1 0
-    mesh_texels.Push (csVector2 (x,y));    //1 1
+    mesh_texels.Push (csVector2 (1,0));  //1 0
+    mesh_texels.Push (csVector2 (1,1));  //1 1
+    mesh_texels.Push (csVector2 (0,1));  //0 1
+    mesh_texels.Push (csVector2 (0,0));  //0 0
 
     csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
       4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
