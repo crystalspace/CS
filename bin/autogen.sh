@@ -24,5 +24,6 @@ fi
 cr=`echo X | tr X '\\015'`
 sed "s/^ac_cr='$cr'$/ac_cr=\`echo X | tr X '\\\015'\`/" < configure > configure.tmp
 mv configure.tmp configure
+chmod a+x configure
 
 exit $rc
