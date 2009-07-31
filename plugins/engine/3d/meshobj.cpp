@@ -1062,44 +1062,24 @@ csScreenBoxResult csMeshWrapper::GetScreenBoundingBox (iCamera *camera)
 {
   csScreenBoxResult rc;
 
-  csVector2 oneCorner;
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable.IsFullTransformIdentity ())
     tr_o2c /= movable.GetFullTransform ();
   
   rc.cbox = GetTransformedBoundingBox (tr_o2c);
 
-  // if the entire bounding box is behind the camera, we're done
-  if ((rc.cbox.MinZ () < 0) && (rc.cbox.MaxZ () < 0))
+  float minz, maxz;
+  if(!rc.cbox.ProjectBox(camera->GetTransform(), camera->GetProjectionMatrix(),
+      rc.sbox, minz, maxz, engine->G3D->GetDriver2D()->GetWidth(),
+      engine->G3D->GetDriver2D()->GetHeight()))
   {
-    rc.distance = -1;
-    return rc;
-  }
-
-  // Transform from camera to screen space.
-  if (rc.cbox.MinZ () <= 0)
-  {
-    // Mesh is very close to camera.
-    // Just return a maximum bounding box.
-    rc.sbox.Set (-10000, -10000, 10000, 10000);
+      rc.distance = -1;
   }
   else
   {
-    oneCorner = camera->Perspective (rc.cbox.Max ());
-    rc.sbox.StartBoundingBox (oneCorner);
-
-    csVector3 v (rc.cbox.MinX (), rc.cbox.MinY (), rc.cbox.MaxZ ());
-    oneCorner = camera->Perspective (v);
-    rc.sbox.AddBoundingVertexSmart (oneCorner);
-    oneCorner = camera->Perspective (rc.cbox.Min ());
-    rc.sbox.AddBoundingVertexSmart (oneCorner);
-    v.Set (rc.cbox.MaxX (), rc.cbox.MaxY (), rc.cbox.MinZ ());
-    oneCorner = camera->Perspective (v);
-    rc.sbox.AddBoundingVertexSmart (oneCorner);
+      rc.distance = rc.cbox.MaxZ ();
   }
 
-  rc.distance = rc.cbox.MaxZ ();
-  
   return rc;
 }
 

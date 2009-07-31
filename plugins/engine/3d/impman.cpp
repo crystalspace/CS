@@ -104,25 +104,28 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   texh->SetAlphaType (csAlphaMode::alphaBinary);
 
   // Set up camera.
-  csRef<iCamera> clone = csIMesh->camera->Clone();
-  csCameraBase* impl = static_cast<csCameraBase*>(&*clone);
-  csRef<iCustomMatrixCamera> newCamera = csPtr<iCustomMatrixCamera>(new csCameraCustomMatrix(impl));
+  csRef<iCustomMatrixCamera> newCamera = engine->CreateCustomMatrixCamera(csIMesh->camera);
 
+  // Move camera to look at mesh.
   csVector3 mesh_pos = csMesh->GetWorldBoundingBox ().GetCenter ();
   const csVector3& cam_pos = newCamera->GetCamera()->GetTransform ().GetOrigin ();
   csVector3 camdir = mesh_pos-cam_pos;
-
-  // Set up a new projection matrix.
-  float nearPlane = camdir.Norm();
-  float farPlane = nearPlane + (csMesh->GetWorldBoundingBox().Max()-csMesh->GetWorldBoundingBox().Min()).Norm();
-  float& w = csIMesh->width;
-  float& h = csIMesh->height;
-
-  Matrix4 m = Projections::Frustum(-w/2, w/2, -h/2, h/2, nearPlane, farPlane);
-  newCamera->SetProjectionMatrix(m);
-
-  // Move camera to look at mesh.
   newCamera->GetCamera()->GetTransform ().LookAt (camdir, csVector3(0,1,0));
+
+  // Set up a new projection matrix (code from heavy portal setup).
+  csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
+  float irw = 1.0f/csIMesh->texWidth;
+  float irh = 1.0f/csIMesh->texHeight;
+  int screenW = g3d->GetDriver2D()->GetWidth();
+  int screenH = g3d->GetDriver2D()->GetHeight();
+
+  CS::Math::Matrix4 projShift (
+      screenW*irw, 0, 0, irw * (screenW-2*rbox.sbox.MinX()) - 1,
+      0, screenH*irh, 0, irh * (screenH-2*rbox.sbox.MinY()) - 1,
+      0, 0, 1, 0,
+      0, 0, 0, 1);
+
+  newCamera->SetProjectionMatrix (projShift * newCamera->GetCamera()->GetProjectionMatrix());
 
   // Set up view.
   csRef<iView> newView = csPtr<iView>(new csView(engine, g3d));
