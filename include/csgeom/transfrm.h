@@ -559,7 +559,7 @@ public:
     t1.v_o2t = t2.m_t2o*t1.v_o2t;
     t1.v_o2t += t2.v_o2t;
     t1.m_o2t *= t2.m_o2t;
-    t1.m_t2o *= t1.m_t2o;
+    t1.m_t2o = t2.m_t2o * t1.m_t2o;
     return t1;
   }
 
