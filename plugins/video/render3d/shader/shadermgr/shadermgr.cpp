@@ -589,13 +589,5 @@ const csSet<csStringID>& csShaderManager::GetTags (csShaderTagPresence presence,
   return set;
 }
 
-
-void csShaderManager::SetActiveLights (const csArray<iLight*>& lights)
-{
-  //copy over the list
-  activeLights.Empty ();
-  activeLights = lights;
-}
-
 }
 CS_PLUGIN_NAMESPACE_END(ShaderManager)

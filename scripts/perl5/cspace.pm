@@ -10374,8 +10374,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetTagOptions = *cspacec::iShaderManager_SetTagOptions;
 *GetTagOptions = *cspacec::iShaderManager_GetTagOptions;
 *GetTags = *cspacec::iShaderManager_GetTags;
-*SetActiveLights = *cspacec::iShaderManager_SetActiveLights;
-*GetActiveLights = *cspacec::iShaderManager_GetActiveLights;
 *GetSVNameStringset = *cspacec::iShaderManager_GetSVNameStringset;
 *GetShaderCache = *cspacec::iShaderManager_GetShaderCache;
 *cachePriorityLowest = *cspacec::iShaderManager_cachePriorityLowest;
@@ -15096,6 +15094,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetIndices = *cspacec::iAnimatedMeshFactorySubMesh_GetIndices;
 *GetIndexSetCount = *cspacec::iAnimatedMeshFactorySubMesh_GetIndexSetCount;
 *GetBoneIndices = *cspacec::iAnimatedMeshFactorySubMesh_GetBoneIndices;
+*GetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_GetMaterial;
+*SetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_SetMaterial;
 *scfGetVersion = *cspacec::iAnimatedMeshFactorySubMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
