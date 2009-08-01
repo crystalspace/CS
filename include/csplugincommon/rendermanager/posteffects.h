@@ -139,6 +139,9 @@ namespace RenderManager
     /// Custom input mapping for a layer
     struct LayerInputMap
     {
+      csRef<csShaderVariable> manualInput;
+      csRef<iRenderBuffer> manualTexcoords;
+      
       /// Input layer
       Layer* inputLayer;
       /// Name of the shader variable to provide the input layer texture in
@@ -173,7 +176,7 @@ namespace RenderManager
       /// Get the shader variables for this layer.
       iShaderVariableContext* GetSVContext() { return svContext; }
       /// Get inputs to this layer
-      const csArray<LayerInputMap>& GetInputs() { return inputs; }
+      const csArray<LayerInputMap>& GetInputs() const { return inputs; }
       
       /// Get layer options
       const LayerOptions& GetOptions() const { return options; }
@@ -240,6 +243,11 @@ namespace RenderManager
     
     /// Get the output texture of a layer.
     iTextureHandle* GetLayerOutput (const Layer* layer);
+    
+    /**
+     * Get SV context used for rendering.
+     */
+    void GetLayerRenderSVs (const Layer* layer, csShaderVariableStack& svStack) const;
     
     /**
      * Set the render target used to ultimatively render to.

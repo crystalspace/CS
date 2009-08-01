@@ -236,6 +236,47 @@ iTextureHandle* PostEffectManager::GetLayerOutput (const Layer* layer)
   size_t bucket = GetBucketIndex (layer->options);
   return currentDimData->buckets[bucket].textures[layer->outTextureNum];
 }
+    
+void PostEffectManager::GetLayerRenderSVs (const Layer* layer,
+					   csShaderVariableStack& svStack) const
+{
+  layer->svContext->PushVariables (svStack);
+  
+  // Add dummy SVs for other layer stuff
+  for (size_t i = 0; i < layer->GetInputs ().GetSize(); i++)
+  {
+    const LayerInputMap& input = layer->GetInputs ()[i];
+    
+    csRef<csShaderVariable> sv;
+    if (input.manualInput.IsValid())
+    {
+      svStack[input.manualInput->GetName()] = input.manualInput;
+    }
+    else
+    {
+      size_t svName = svStrings->Request (input.textureName);
+      if (svName < svStack.GetSize())
+      {
+        sv.AttachNew (new csShaderVariable (svName));
+        sv->SetType (csShaderVariable::TEXTURE);
+        svStack[svName] = sv;
+      }
+    }
+    
+    csRenderBufferName bufferName =
+      csRenderBuffer::GetBufferNameFromDescr (input.texcoordName);
+    if (bufferName == CS_BUFFER_NONE)
+    {
+      size_t svName = svStrings->Request (input.texcoordName);
+      if (svName < svStack.GetSize())
+      {
+        sv.AttachNew (new csShaderVariable (svName));
+        sv->SetType (csShaderVariable::RENDERBUFFER);
+        svStack[svName] = sv;
+      }
+    }
+  }
+}
 
 void PostEffectManager::SetChainedOutput (PostEffectManager* nextEffects)
 {
@@ -454,18 +495,27 @@ void PostEffectManager::DimensionData::UpdateSVContexts (
     {
       const LayerInputMap& input = pfx.postLayers[l]->GetInputs ()[i];
       
-      size_t inBucket = pfx.GetBucketIndex (input.inputLayer->GetOptions ());
       csRef<csShaderVariable> sv;
-      sv.AttachNew (new csShaderVariable (pfx.svStrings->Request (
-        input.textureName)));
-      sv->SetValue (buckets[inBucket].textures[input.inputLayer->GetOutTextureNum ()]);
-      layerSVs[l]->AddVariable (sv);
+      csRef<iRenderBuffer> texcoordBuf;
+      if (input.manualInput.IsValid())
+      {
+        layerSVs[l]->AddVariable (input.manualInput);
+        texcoordBuf = input.manualTexcoords;
+      }
+      else
+      {
+        size_t inBucket = pfx.GetBucketIndex (input.inputLayer->GetOptions ());
+	sv.AttachNew (new csShaderVariable (pfx.svStrings->Request (
+	  input.textureName)));
+	sv->SetValue (buckets[inBucket].textures[input.inputLayer->GetOutTextureNum ()]);
+	layerSVs[l]->AddVariable (sv);
+	texcoordBuf = buckets[inBucket].texcoordBuf;
+      }
       
       csRenderBufferName bufferName =
         csRenderBuffer::GetBufferNameFromDescr (input.texcoordName);
       if (bufferName != CS_BUFFER_NONE)
-        buffers[l]->SetRenderBuffer (bufferName,
-          buckets[inBucket].texcoordBuf);
+        buffers[l]->SetRenderBuffer (bufferName, texcoordBuf);
       else
       {
         sv.AttachNew (new csShaderVariable (pfx.svStrings->Request (
