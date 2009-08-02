@@ -745,7 +745,8 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	[cs_cv_prog_cxx_code_gen=no
 	AS_IF([test $enable_cpu_specific_optimizations = native],
 	    [CS_CHECK_CODE_GEN_FLAG([*], [-march=native -mtune=native])])
-	AS_IF([test $enable_cpu_specific_optimizations = maximum],
+	AS_IF([test $enable_cpu_specific_optimizations = maximum \
+		-o $enable_cpu_specific_optimizations = native],
 	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon -mtune=generic])
 	    CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
 	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
