@@ -1551,8 +1551,7 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
     iDocumentNode* node, iDocumentNode* parentSV, size_t variant,
     iHierarchicalCache* cacheTo)
 {
-  if (!LoadBoilerplate (ldr_context, node, parentSV))
-    return 0;
+  bool result = LoadBoilerplate (ldr_context, node, parentSV);
 
   csRef<csMemFile> cacheFile;
   if (cacheTo)
@@ -1625,7 +1624,6 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
   //fail the whole technique
   int currentPassNr = 0;
   it = node->GetNodes (xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_PASS));
-  bool result = true;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> passNode = it->Next ();
@@ -1750,7 +1748,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadFromCache (
   if (!boilerplateNode.IsValid()) return iShaderProgram::loadFail;
   
   if (!LoadBoilerplate (ldr_context, boilerplateNode, parentSV))
-    return iShaderProgram::loadFail;
+    return iShaderProgram::loadSuccessShaderInvalid;
   
   int32 diskPassNum;
   read = cacheFile.Read ((char*)&diskPassNum, sizeof (diskPassNum));

@@ -3596,20 +3596,20 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
       }
     }
 
-    if (flags & csSimpleMeshScreenspace)
-    {
-      if (current_drawflags & CSDRAW_2DGRAPHICS)
-      {
-	// Bring it back, that old new york rap! 
-	// Or well, at least that old identity transform
-	SetWorldToCamera (csReversibleTransform ());
-      }
-    }
-
     if (!useShader)
     {
       if (mesh.texture)
 	needDisableTexture = true;
+    }
+  }
+
+  if (flags & csSimpleMeshScreenspace)
+  {
+    if (current_drawflags & CSDRAW_2DGRAPHICS)
+    {
+      // Bring it back, that old new york rap! 
+      // Or well, at least that old identity transform
+      SetWorldToCamera (csReversibleTransform ());
     }
   }
 

@@ -47,6 +47,7 @@
 #include "csutil/flags.h"
 #include "csutil/regexp.h"
 #include "csutil/scanstr.h"
+#include "csutil/set.h"
 #include "csutil/scf.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
@@ -57,6 +58,8 @@
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
+#include "iengine/portalcontainer.h"
+#include "iengine/portal.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
@@ -1121,6 +1124,39 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	    }
 	  }
       break;
+    case DEBUGCMD_PRINTPORTALS:
+        {
+          if (catcher->camera)
+          {
+            iSector* sector = catcher->camera->GetSector();
+            printf("Printing portals for sector %s:\n", sector->QueryObject()->GetName());
+            csSet<csPtrKey<iMeshWrapper> > portalms = sector->GetPortalMeshes();
+            csSet<csPtrKey<iMeshWrapper> >::GlobalIterator itr = portalms.GetIterator();
+            while(itr.HasNext())
+            {
+              iPortalContainer* portalc = itr.Next()->GetPortalContainer();
+              if(portalc)
+              {
+                for(int i=0; i<portalc->GetPortalCount(); ++i)
+                {
+                  iPortal* portal = portalc->GetPortal(i);
+                  printf("Portal name: %s\n", portal->GetName());
+                  printf("Portal warp: %s\n", portal->GetWarp().Description().GetData());
+                  if(portal->GetSector())
+                  {
+                    printf("Portal target sector: %s\n", portal->GetSector()->QueryObject()->GetName());
+                  }
+                  else
+                  {
+                    printf("Portal target sector: Not resolved\n");
+                  }
+                  printf("Portal WS plane: %s\n", portal->GetWorldPlane().Description().GetData());
+                }
+              }
+            }
+          }
+          break;
+        }
     case DEBUGCMD_COLORSECTORS:
 	Report (CS_REPORTER_SEVERITY_DEBUG,
 	    	"Color all sectors...");
@@ -2266,6 +2302,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "meshnorm"))	return DEBUGCMD_MESHNORM;
   if (!strcmp (cmd, "toggle_fps_time")) return DEBUGCMD_TOGGLEFPSTIME;
   if (!strcmp (cmd, "meshskel"))        return DEBUGCMD_MESHSKEL;
+  if (!strcmp (cmd, "printportals"))    return DEBUGCMD_PRINTPORTALS;
 
   return DEBUGCMD_UNKNOWN;
 }

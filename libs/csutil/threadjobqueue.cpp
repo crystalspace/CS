@@ -79,13 +79,15 @@ namespace Threading
     if (!job)
       return;
 
-    MutexScopedLock lock (jobMutex);
-    if(lowPriority)
-      jobQueueL.Push (job);
-    else
-      jobQueue.Push (job);
+    {
+      MutexScopedLock lock (jobMutex);
+      if(lowPriority)
+        jobQueueL.Push (job);
+      else
+        jobQueue.Push (job);
+    }
     CS::Threading::AtomicOperations::Increment (&outstandingJobs);
-    newJob.NotifyOne ();
+    newJob.NotifyAll ();
   }
 
   void ThreadedJobQueue::PullAndRun (iJob* job)

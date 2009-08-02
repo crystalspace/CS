@@ -2530,195 +2530,185 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_CS__Math__Matrix4 swig_types[7]
 #define SWIGTYPE_p_CS__Memory__AllocatorMalloc swig_types[8]
 #define SWIGTYPE_p_CS__Memory__CustomAllocated swig_types[9]
-#define SWIGTYPE_p_CS__ShaderVarStringID swig_types[10]
-#define SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t swig_types[11]
-#define SWIGTYPE_p_CS__StringIDValue swig_types[12]
-#define SWIGTYPE_p_CS__StructuredTextureFormat swig_types[13]
-#define SWIGTYPE_p_CS__Utility__StringSetT_CS__StringSetTag__General_t swig_types[14]
-#define SWIGTYPE_p_CapacityHandlerType swig_types[15]
-#define SWIGTYPE_p_ContainedType swig_types[16]
-#define SWIGTYPE_p_ElementHandlerType swig_types[17]
-#define SWIGTYPE_p_FileFormatDescription swig_types[18]
-#define SWIGTYPE_p_HashType swig_types[19]
-#define SWIGTYPE_p_KeyType swig_types[20]
-#define SWIGTYPE_p_TagType swig_types[21]
-#define SWIGTYPE_p_ThisType swig_types[22]
-#define SWIGTYPE_p_ValueType swig_types[23]
-#define SWIGTYPE_p__1_basetype swig_types[24]
-#define SWIGTYPE_p__csKeyCharType swig_types[25]
-#define SWIGTYPE_p__csKeyEventType swig_types[26]
-#define SWIGTYPE_p__csKeyModifierNumType swig_types[27]
-#define SWIGTYPE_p__csKeyModifierType swig_types[28]
-#define SWIGTYPE_p__csKeyModifiers swig_types[29]
-#define SWIGTYPE_p__csMouseCursorID swig_types[30]
-#define SWIGTYPE_p__csMouseEventType swig_types[31]
-#define SWIGTYPE_p_bool swig_types[32]
-#define SWIGTYPE_p_char swig_types[33]
-#define SWIGTYPE_p_csAlphaMode swig_types[34]
-#define SWIGTYPE_p_csArrayCapacityFixedGrowT_16_t swig_types[35]
-#define SWIGTYPE_p_csArrayCapacityVariableGrow swig_types[36]
-#define SWIGTYPE_p_csArrayT_csImageIOFileFormatDescription_const_p_t swig_types[37]
-#define SWIGTYPE_p_csArrayT_csPluginRequest_t swig_types[38]
-#define SWIGTYPE_p_csArrayT_csRefT_iShader_t_t swig_types[39]
-#define SWIGTYPE_p_csArrayT_csVector2_t swig_types[40]
-#define SWIGTYPE_p_csArrayT_csVector3_t swig_types[41]
-#define SWIGTYPE_p_csArrayT_csVector4_t swig_types[42]
-#define SWIGTYPE_p_csArrayT_iLight_p_t swig_types[43]
-#define SWIGTYPE_p_csArrayT_unsigned_int_t swig_types[44]
-#define SWIGTYPE_p_csBitArray swig_types[45]
-#define SWIGTYPE_p_csBitmapMetrics swig_types[46]
-#define SWIGTYPE_p_csBox3 swig_types[47]
-#define SWIGTYPE_p_csConfigFile swig_types[48]
-#define SWIGTYPE_p_csFlags swig_types[49]
-#define SWIGTYPE_p_csGlyphMetrics swig_types[50]
-#define SWIGTYPE_p_csGraphics3DCaps swig_types[51]
-#define SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t swig_types[52]
-#define SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t swig_types[53]
-#define SWIGTYPE_p_csImageBase swig_types[54]
-#define SWIGTYPE_p_csImageMemory swig_types[55]
-#define SWIGTYPE_p_csObject swig_types[56]
-#define SWIGTYPE_p_csPixelCoord swig_types[57]
-#define SWIGTYPE_p_csPlane3 swig_types[58]
-#define SWIGTYPE_p_csPtrT_iShaderPriorityList_t swig_types[59]
-#define SWIGTYPE_p_csRGBcolor swig_types[60]
-#define SWIGTYPE_p_csRect swig_types[61]
-#define SWIGTYPE_p_csRefArrayT_csShaderVariable_t swig_types[62]
-#define SWIGTYPE_p_csRefArrayT_iObject_t swig_types[63]
-#define SWIGTYPE_p_csRefArrayT_iShader_t swig_types[64]
-#define SWIGTYPE_p_csRefT_csRenderBufferHolder_t swig_types[65]
-#define SWIGTYPE_p_csRefT_iShaderVariableContext_t swig_types[66]
-#define SWIGTYPE_p_csRefT_iShader_t swig_types[67]
-#define SWIGTYPE_p_csRenderBufferHolder swig_types[68]
-#define SWIGTYPE_p_csRenderBufferName swig_types[69]
-#define SWIGTYPE_p_csRenderTargetAttachment swig_types[70]
-#define SWIGTYPE_p_csReversibleTransform swig_types[71]
-#define SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_t swig_types[72]
-#define SWIGTYPE_p_csShaderMetadata swig_types[73]
-#define SWIGTYPE_p_csShaderTagPresence swig_types[74]
-#define SWIGTYPE_p_csShaderVariable swig_types[75]
-#define SWIGTYPE_p_csShaderVariableStack swig_types[76]
-#define SWIGTYPE_p_csShaderVariable__CS__Graphics__AlphaTestOptions swig_types[77]
-#define SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh swig_types[78]
-#define SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh swig_types[79]
-#define SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshIndexRange swig_types[80]
-#define SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes swig_types[81]
-#define SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderPriority swig_types[82]
-#define SWIGTYPE_p_csShaderVariable__CS__Graphics__TextureComparisonMode swig_types[83]
-#define SWIGTYPE_p_csSimpleRenderMesh swig_types[84]
-#define SWIGTYPE_p_csVector2 swig_types[85]
-#define SWIGTYPE_p_csVector3 swig_types[86]
-#define SWIGTYPE_p_csVector4 swig_types[87]
-#define SWIGTYPE_p_csVertexAttrib swig_types[88]
-#define SWIGTYPE_p_float swig_types[89]
-#define SWIGTYPE_p_iAnimatedImage swig_types[90]
-#define SWIGTYPE_p_iArrayChangeAllT_csShaderVariable_p_t swig_types[91]
-#define SWIGTYPE_p_iArrayChangeElementsT_csShaderVariable_p_t swig_types[92]
-#define SWIGTYPE_p_iArrayReadOnlyT_csShaderVariable_p_t swig_types[93]
-#define SWIGTYPE_p_iBase swig_types[94]
-#define SWIGTYPE_p_iCacheManager swig_types[95]
-#define SWIGTYPE_p_iClipper2D swig_types[96]
-#define SWIGTYPE_p_iCommandLineParser swig_types[97]
-#define SWIGTYPE_p_iComponent swig_types[98]
-#define SWIGTYPE_p_iConfigFile swig_types[99]
-#define SWIGTYPE_p_iConfigIterator swig_types[100]
-#define SWIGTYPE_p_iConfigManager swig_types[101]
-#define SWIGTYPE_p_iDataBuffer swig_types[102]
-#define SWIGTYPE_p_iDebugHelper swig_types[103]
-#define SWIGTYPE_p_iDocument swig_types[104]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[105]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[106]
-#define SWIGTYPE_p_iDocumentNode swig_types[107]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[108]
-#define SWIGTYPE_p_iDocumentSystem swig_types[109]
-#define SWIGTYPE_p_iEvent swig_types[110]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[111]
-#define SWIGTYPE_p_iEventCord swig_types[112]
-#define SWIGTYPE_p_iEventHandler swig_types[113]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[114]
-#define SWIGTYPE_p_iEventOutlet swig_types[115]
-#define SWIGTYPE_p_iEventPlug swig_types[116]
-#define SWIGTYPE_p_iEventQueue swig_types[117]
-#define SWIGTYPE_p_iFactory swig_types[118]
-#define SWIGTYPE_p_iFile swig_types[119]
-#define SWIGTYPE_p_iFont swig_types[120]
-#define SWIGTYPE_p_iFontDeleteNotify swig_types[121]
-#define SWIGTYPE_p_iFontServer swig_types[122]
-#define SWIGTYPE_p_iGeneralFactoryState swig_types[123]
-#define SWIGTYPE_p_iGraphics2D swig_types[124]
-#define SWIGTYPE_p_iGraphics3D swig_types[125]
-#define SWIGTYPE_p_iHalo swig_types[126]
-#define SWIGTYPE_p_iHierarchicalCache swig_types[127]
-#define SWIGTYPE_p_iImage swig_types[128]
-#define SWIGTYPE_p_iImageIO swig_types[129]
-#define SWIGTYPE_p_iJoystickDriver swig_types[130]
-#define SWIGTYPE_p_iKeyComposer swig_types[131]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[132]
-#define SWIGTYPE_p_iLoaderContext swig_types[133]
-#define SWIGTYPE_p_iMaterial swig_types[134]
-#define SWIGTYPE_p_iMaterialWrapper swig_types[135]
-#define SWIGTYPE_p_iMouseDriver swig_types[136]
-#define SWIGTYPE_p_iNativeWindow swig_types[137]
-#define SWIGTYPE_p_iNativeWindowManager swig_types[138]
-#define SWIGTYPE_p_iObject swig_types[139]
-#define SWIGTYPE_p_iObjectIterator swig_types[140]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[141]
-#define SWIGTYPE_p_iObjectRegistry swig_types[142]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[143]
-#define SWIGTYPE_p_iPath swig_types[144]
-#define SWIGTYPE_p_iPluginIterator swig_types[145]
-#define SWIGTYPE_p_iPluginManager swig_types[146]
-#define SWIGTYPE_p_iPortalContainer swig_types[147]
-#define SWIGTYPE_p_iProcTexture swig_types[148]
-#define SWIGTYPE_p_iReporter swig_types[149]
-#define SWIGTYPE_p_iReporterIterator swig_types[150]
-#define SWIGTYPE_p_iReporterListener swig_types[151]
-#define SWIGTYPE_p_iSCF swig_types[152]
-#define SWIGTYPE_p_iShader swig_types[153]
-#define SWIGTYPE_p_iShaderCompiler swig_types[154]
-#define SWIGTYPE_p_iShaderManager swig_types[155]
-#define SWIGTYPE_p_iShaderPriorityList swig_types[156]
-#define SWIGTYPE_p_iShaderVarStringSet swig_types[157]
-#define SWIGTYPE_p_iShaderVariableAccessor swig_types[158]
-#define SWIGTYPE_p_iShaderVariableContext swig_types[159]
-#define SWIGTYPE_p_iString swig_types[160]
-#define SWIGTYPE_p_iStringArray swig_types[161]
-#define SWIGTYPE_p_iStringSet swig_types[162]
-#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__General_t swig_types[163]
-#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__ShaderVar_t swig_types[164]
-#define SWIGTYPE_p_iTextureHandle swig_types[165]
-#define SWIGTYPE_p_iTextureManager swig_types[166]
-#define SWIGTYPE_p_iThreadManager swig_types[167]
-#define SWIGTYPE_p_iThreadReturn swig_types[168]
-#define SWIGTYPE_p_iTriangleMesh swig_types[169]
-#define SWIGTYPE_p_iVFS swig_types[170]
-#define SWIGTYPE_p_iVirtualClock swig_types[171]
-#define SWIGTYPE_p_int swig_types[172]
-#define SWIGTYPE_p_int16_t swig_types[173]
-#define SWIGTYPE_p_int64_t swig_types[174]
-#define SWIGTYPE_p_int8_t swig_types[175]
-#define SWIGTYPE_p_long_long swig_types[176]
-#define SWIGTYPE_p_p_csShaderVariable swig_types[177]
-#define SWIGTYPE_p_p_iRenderBuffer swig_types[178]
-#define SWIGTYPE_p_p_iTextureHandle swig_types[179]
-#define SWIGTYPE_p_p_p_csShaderVariable swig_types[180]
-#define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[181]
-#define SWIGTYPE_p_scfImplementation1T_csImageBase_iImage_t swig_types[182]
-#define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[183]
-#define SWIGTYPE_p_scfImplementationExt0T_csImageMemory_csImageBase_t swig_types[184]
-#define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[185]
-#define SWIGTYPE_p_size_t swig_types[186]
-#define SWIGTYPE_p_uint16_t swig_types[187]
-#define SWIGTYPE_p_uint32_t swig_types[188]
-#define SWIGTYPE_p_uint64_t swig_types[189]
-#define SWIGTYPE_p_uint8_t swig_types[190]
-#define SWIGTYPE_p_unsigned_char swig_types[191]
-#define SWIGTYPE_p_unsigned_int swig_types[192]
-#define SWIGTYPE_p_unsigned_long swig_types[193]
-#define SWIGTYPE_p_unsigned_long_long swig_types[194]
-#define SWIGTYPE_p_void swig_types[195]
-#define SWIGTYPE_p_wchar_t swig_types[196]
-static swig_type_info *swig_types[198];
-static swig_module_info swig_module = {swig_types, 197, 0, 0, 0, 0};
+#define SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t swig_types[10]
+#define SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__ShaderVar_t swig_types[11]
+#define SWIGTYPE_p_CS__StructuredTextureFormat swig_types[12]
+#define SWIGTYPE_p_CS__Utility__StringSetT_CS__StringSetTag__General_t swig_types[13]
+#define SWIGTYPE_p_CapacityHandlerType swig_types[14]
+#define SWIGTYPE_p_ContainedType swig_types[15]
+#define SWIGTYPE_p_ElementHandlerType swig_types[16]
+#define SWIGTYPE_p_FileFormatDescription swig_types[17]
+#define SWIGTYPE_p_HashType swig_types[18]
+#define SWIGTYPE_p_KeyType swig_types[19]
+#define SWIGTYPE_p_TagType swig_types[20]
+#define SWIGTYPE_p_ThisType swig_types[21]
+#define SWIGTYPE_p_ValueType swig_types[22]
+#define SWIGTYPE_p__1_basetype swig_types[23]
+#define SWIGTYPE_p__csKeyCharType swig_types[24]
+#define SWIGTYPE_p__csKeyEventType swig_types[25]
+#define SWIGTYPE_p__csKeyModifierNumType swig_types[26]
+#define SWIGTYPE_p__csKeyModifierType swig_types[27]
+#define SWIGTYPE_p__csKeyModifiers swig_types[28]
+#define SWIGTYPE_p__csMouseCursorID swig_types[29]
+#define SWIGTYPE_p__csMouseEventType swig_types[30]
+#define SWIGTYPE_p_bool swig_types[31]
+#define SWIGTYPE_p_char swig_types[32]
+#define SWIGTYPE_p_csAlphaMode swig_types[33]
+#define SWIGTYPE_p_csArrayCapacityFixedGrowT_16_t swig_types[34]
+#define SWIGTYPE_p_csArrayCapacityVariableGrow swig_types[35]
+#define SWIGTYPE_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[36]
+#define SWIGTYPE_p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[37]
+#define SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[38]
+#define SWIGTYPE_p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[39]
+#define SWIGTYPE_p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[40]
+#define SWIGTYPE_p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[41]
+#define SWIGTYPE_p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[42]
+#define SWIGTYPE_p_csBitArray swig_types[43]
+#define SWIGTYPE_p_csBitmapMetrics swig_types[44]
+#define SWIGTYPE_p_csBox3 swig_types[45]
+#define SWIGTYPE_p_csConfigFile swig_types[46]
+#define SWIGTYPE_p_csFlags swig_types[47]
+#define SWIGTYPE_p_csGlyphMetrics swig_types[48]
+#define SWIGTYPE_p_csGraphics3DCaps swig_types[49]
+#define SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t swig_types[50]
+#define SWIGTYPE_p_csImageBase swig_types[51]
+#define SWIGTYPE_p_csImageMemory swig_types[52]
+#define SWIGTYPE_p_csObject swig_types[53]
+#define SWIGTYPE_p_csPixelCoord swig_types[54]
+#define SWIGTYPE_p_csPlane3 swig_types[55]
+#define SWIGTYPE_p_csPtrT_iShaderPriorityList_t swig_types[56]
+#define SWIGTYPE_p_csRGBcolor swig_types[57]
+#define SWIGTYPE_p_csRect swig_types[58]
+#define SWIGTYPE_p_csRefArrayT_csShaderVariable_t swig_types[59]
+#define SWIGTYPE_p_csRefArrayT_iObject_t swig_types[60]
+#define SWIGTYPE_p_csRefArrayT_iShader_t swig_types[61]
+#define SWIGTYPE_p_csRefT_csRenderBufferHolder_t swig_types[62]
+#define SWIGTYPE_p_csRefT_iShaderVariableContext_t swig_types[63]
+#define SWIGTYPE_p_csRefT_iShader_t swig_types[64]
+#define SWIGTYPE_p_csRenderBufferHolder swig_types[65]
+#define SWIGTYPE_p_csRenderBufferName swig_types[66]
+#define SWIGTYPE_p_csRenderTargetAttachment swig_types[67]
+#define SWIGTYPE_p_csReversibleTransform swig_types[68]
+#define SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t swig_types[69]
+#define SWIGTYPE_p_csShaderMetadata swig_types[70]
+#define SWIGTYPE_p_csShaderTagPresence swig_types[71]
+#define SWIGTYPE_p_csShaderVariable swig_types[72]
+#define SWIGTYPE_p_csShaderVariableStack swig_types[73]
+#define SWIGTYPE_p_csSimpleRenderMesh swig_types[74]
+#define SWIGTYPE_p_csVector2 swig_types[75]
+#define SWIGTYPE_p_csVector3 swig_types[76]
+#define SWIGTYPE_p_csVector4 swig_types[77]
+#define SWIGTYPE_p_csVertexAttrib swig_types[78]
+#define SWIGTYPE_p_float swig_types[79]
+#define SWIGTYPE_p_iAnimatedImage swig_types[80]
+#define SWIGTYPE_p_iArrayChangeAllT_csShaderVariable_p_t swig_types[81]
+#define SWIGTYPE_p_iArrayChangeElementsT_csShaderVariable_p_t swig_types[82]
+#define SWIGTYPE_p_iArrayReadOnlyT_csShaderVariable_p_t swig_types[83]
+#define SWIGTYPE_p_iBase swig_types[84]
+#define SWIGTYPE_p_iCacheManager swig_types[85]
+#define SWIGTYPE_p_iClipper2D swig_types[86]
+#define SWIGTYPE_p_iCommandLineParser swig_types[87]
+#define SWIGTYPE_p_iComponent swig_types[88]
+#define SWIGTYPE_p_iConfigFile swig_types[89]
+#define SWIGTYPE_p_iConfigIterator swig_types[90]
+#define SWIGTYPE_p_iConfigManager swig_types[91]
+#define SWIGTYPE_p_iDataBuffer swig_types[92]
+#define SWIGTYPE_p_iDebugHelper swig_types[93]
+#define SWIGTYPE_p_iDocument swig_types[94]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[95]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[96]
+#define SWIGTYPE_p_iDocumentNode swig_types[97]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[98]
+#define SWIGTYPE_p_iDocumentSystem swig_types[99]
+#define SWIGTYPE_p_iEvent swig_types[100]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[101]
+#define SWIGTYPE_p_iEventCord swig_types[102]
+#define SWIGTYPE_p_iEventHandler swig_types[103]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[104]
+#define SWIGTYPE_p_iEventOutlet swig_types[105]
+#define SWIGTYPE_p_iEventPlug swig_types[106]
+#define SWIGTYPE_p_iEventQueue swig_types[107]
+#define SWIGTYPE_p_iFactory swig_types[108]
+#define SWIGTYPE_p_iFile swig_types[109]
+#define SWIGTYPE_p_iFont swig_types[110]
+#define SWIGTYPE_p_iFontDeleteNotify swig_types[111]
+#define SWIGTYPE_p_iFontServer swig_types[112]
+#define SWIGTYPE_p_iGeneralFactoryState swig_types[113]
+#define SWIGTYPE_p_iGraphics2D swig_types[114]
+#define SWIGTYPE_p_iGraphics3D swig_types[115]
+#define SWIGTYPE_p_iHalo swig_types[116]
+#define SWIGTYPE_p_iHierarchicalCache swig_types[117]
+#define SWIGTYPE_p_iImage swig_types[118]
+#define SWIGTYPE_p_iImageIO swig_types[119]
+#define SWIGTYPE_p_iJoystickDriver swig_types[120]
+#define SWIGTYPE_p_iKeyComposer swig_types[121]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[122]
+#define SWIGTYPE_p_iLoaderContext swig_types[123]
+#define SWIGTYPE_p_iMaterial swig_types[124]
+#define SWIGTYPE_p_iMaterialWrapper swig_types[125]
+#define SWIGTYPE_p_iMouseDriver swig_types[126]
+#define SWIGTYPE_p_iNativeWindow swig_types[127]
+#define SWIGTYPE_p_iNativeWindowManager swig_types[128]
+#define SWIGTYPE_p_iObject swig_types[129]
+#define SWIGTYPE_p_iObjectIterator swig_types[130]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[131]
+#define SWIGTYPE_p_iObjectRegistry swig_types[132]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[133]
+#define SWIGTYPE_p_iPath swig_types[134]
+#define SWIGTYPE_p_iPluginIterator swig_types[135]
+#define SWIGTYPE_p_iPluginManager swig_types[136]
+#define SWIGTYPE_p_iPortalContainer swig_types[137]
+#define SWIGTYPE_p_iProcTexture swig_types[138]
+#define SWIGTYPE_p_iReporter swig_types[139]
+#define SWIGTYPE_p_iReporterIterator swig_types[140]
+#define SWIGTYPE_p_iReporterListener swig_types[141]
+#define SWIGTYPE_p_iSCF swig_types[142]
+#define SWIGTYPE_p_iShader swig_types[143]
+#define SWIGTYPE_p_iShaderCompiler swig_types[144]
+#define SWIGTYPE_p_iShaderManager swig_types[145]
+#define SWIGTYPE_p_iShaderPriorityList swig_types[146]
+#define SWIGTYPE_p_iShaderVarStringSet swig_types[147]
+#define SWIGTYPE_p_iShaderVariableAccessor swig_types[148]
+#define SWIGTYPE_p_iShaderVariableContext swig_types[149]
+#define SWIGTYPE_p_iString swig_types[150]
+#define SWIGTYPE_p_iStringArray swig_types[151]
+#define SWIGTYPE_p_iStringSet swig_types[152]
+#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__General_t swig_types[153]
+#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__ShaderVar_t swig_types[154]
+#define SWIGTYPE_p_iTextureHandle swig_types[155]
+#define SWIGTYPE_p_iTextureManager swig_types[156]
+#define SWIGTYPE_p_iThreadManager swig_types[157]
+#define SWIGTYPE_p_iThreadReturn swig_types[158]
+#define SWIGTYPE_p_iTriangleMesh swig_types[159]
+#define SWIGTYPE_p_iVFS swig_types[160]
+#define SWIGTYPE_p_iVirtualClock swig_types[161]
+#define SWIGTYPE_p_int swig_types[162]
+#define SWIGTYPE_p_int16_t swig_types[163]
+#define SWIGTYPE_p_int64_t swig_types[164]
+#define SWIGTYPE_p_int8_t swig_types[165]
+#define SWIGTYPE_p_long_long swig_types[166]
+#define SWIGTYPE_p_p_csShaderVariable swig_types[167]
+#define SWIGTYPE_p_p_iRenderBuffer swig_types[168]
+#define SWIGTYPE_p_p_iTextureHandle swig_types[169]
+#define SWIGTYPE_p_p_p_csShaderVariable swig_types[170]
+#define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[171]
+#define SWIGTYPE_p_scfImplementation1T_csImageBase_iImage_t swig_types[172]
+#define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[173]
+#define SWIGTYPE_p_scfImplementationExt0T_csImageMemory_csImageBase_t swig_types[174]
+#define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[175]
+#define SWIGTYPE_p_size_t swig_types[176]
+#define SWIGTYPE_p_uint16_t swig_types[177]
+#define SWIGTYPE_p_uint32_t swig_types[178]
+#define SWIGTYPE_p_uint64_t swig_types[179]
+#define SWIGTYPE_p_uint8_t swig_types[180]
+#define SWIGTYPE_p_unsigned_char swig_types[181]
+#define SWIGTYPE_p_unsigned_int swig_types[182]
+#define SWIGTYPE_p_unsigned_long swig_types[183]
+#define SWIGTYPE_p_unsigned_long_long swig_types[184]
+#define SWIGTYPE_p_void swig_types[185]
+#define SWIGTYPE_p_wchar_t swig_types[186]
+static swig_type_info *swig_types[188];
+static swig_module_info swig_module = {swig_types, 187, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -2824,6 +2814,22 @@ namespace swig {
 #include "imesh.h"
 #include "itexture.h"
 #include "ivideo.h"
+
+
+/* Funtions to set the modules global SCF pointer, this is needed
+   when working on a pure scripting environment, as then this code
+   lives in a non-cs dll, thus the pointer isnt initialized
+   by cs itself, and scf stuff wont work unless the pointer is
+   initialized manually. Use it after CreateEnvironment call. */
+void SetSCFPointer(iSCF* pscf)
+{
+  iSCF::SCF = pscf;
+}
+
+iSCF* GetSCFPointer()
+{
+  return iSCF::SCF;
+}
 
 
 PyObject *
@@ -3286,12 +3292,12 @@ SWIGINTERN int iShaderManager_scfGetVersion(){ return scfInterfaceTraits<iShader
 SWIGINTERN void delete_iShaderManager(iShaderManager *self){ if (self) self->DecRef (); }
 SWIGINTERN int iShader_scfGetVersion(){ return scfInterfaceTraits<iShader>::GetVersion(); }
 SWIGINTERN void delete_iShader(iShader *self){ if (self) self->DecRef (); }
-SWIGINTERN csRef< csShaderVariable::iShader > const &csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg____getitem__(csHash< csRef< csShaderVariable::iShader >,csStringID > *self,CS::StringID< CS::StringSetTag::General > const &key){ return self->Get(key,csRef< csShaderVariable::iShader >()); }
-SWIGINTERN bool csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg____delitem__(csHash< csRef< csShaderVariable::iShader >,csStringID > *self,CS::StringID< CS::StringSetTag::General > const &key){ return self->DeleteAll(key); }
-SWIGINTERN void csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg__clear(csHash< csRef< csShaderVariable::iShader >,csStringID > *self){ self->Empty(); }
-SWIGINTERN bool csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg____nonzero__(csHash< csRef< csShaderVariable::iShader >,csStringID > *self){ return self->IsEmpty(); }
-SWIGINTERN void csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg____setitem__(csHash< csRef< csShaderVariable::iShader >,csStringID > *self,CS::StringID< CS::StringSetTag::General > const &key,csRef< csShaderVariable::iShader > const &value){ self->PutUnique(key,value); }
-SWIGINTERN size_t csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg____len__(csHash< csRef< csShaderVariable::iShader >,csStringID > *self){ return self->GetSize(); }
+SWIGINTERN csRef< iShader > const &csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg____getitem__(csHash< csRef< iShader >,csStringID > *self,CS::StringID< CS::StringSetTag::General > const &key){ return self->Get(key,csRef< iShader >()); }
+SWIGINTERN bool csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg____delitem__(csHash< csRef< iShader >,csStringID > *self,CS::StringID< CS::StringSetTag::General > const &key){ return self->DeleteAll(key); }
+SWIGINTERN void csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg__clear(csHash< csRef< iShader >,csStringID > *self){ self->Empty(); }
+SWIGINTERN bool csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg____nonzero__(csHash< csRef< iShader >,csStringID > *self){ return self->IsEmpty(); }
+SWIGINTERN void csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg____setitem__(csHash< csRef< iShader >,csStringID > *self,CS::StringID< CS::StringSetTag::General > const &key,csRef< iShader > const &value){ self->PutUnique(key,value); }
+SWIGINTERN size_t csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg____len__(csHash< csRef< iShader >,csStringID > *self){ return self->GetSize(); }
 SWIGINTERN int iTextureHandle_scfGetVersion(){ return scfInterfaceTraits<iTextureHandle>::GetVersion(); }
 SWIGINTERN void delete_iTextureHandle(iTextureHandle *self){ if (self) self->DecRef (); }
 SWIGINTERN int iTextureManager_scfGetVersion(){ return scfInterfaceTraits<iTextureManager>::GetVersion(); }
@@ -3301,6 +3307,40 @@ SWIGINTERN void delete_iMaterial(iMaterial *self){ if (self) self->DecRef (); }
 #ifdef __cplusplus
 extern "C" {
 #endif
+SWIGINTERN PyObject *_wrap__SetSCFPointer(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSCF *arg1 = (iSCF *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"_SetSCFPointer",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSCF, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "_SetSCFPointer" "', argument " "1"" of type '" "iSCF *""'"); 
+  }
+  arg1 = reinterpret_cast< iSCF * >(argp1);
+  SetSCFPointer(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap__GetSCFPointer(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSCF *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"_GetSCFPointer",0,0)) SWIG_fail;
+  result = (iSCF *)GetSCFPointer();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iSCF, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csPixelCoord_x_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csPixelCoord *arg1 = (csPixelCoord *) 0 ;
@@ -7921,7 +7961,7 @@ SWIGINTERN PyObject *csSimpleRenderMesh_swigregister(PyObject *SWIGUNUSEDPARM(se
 
 SWIGINTERN PyObject *_wrap_TextureComparisonMode_mode_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::TextureComparisonMode *arg1 = (csShaderVariable::CS::Graphics::TextureComparisonMode *) 0 ;
+  CS::Graphics::TextureComparisonMode *arg1 = (CS::Graphics::TextureComparisonMode *) 0 ;
   CS::Graphics::TextureComparisonMode::Mode arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -7931,11 +7971,11 @@ SWIGINTERN PyObject *_wrap_TextureComparisonMode_mode_set(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"TextureComparisonMode_mode_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__TextureComparisonMode, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__TextureComparisonMode, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "TextureComparisonMode_mode_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::TextureComparisonMode *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "TextureComparisonMode_mode_set" "', argument " "1"" of type '" "CS::Graphics::TextureComparisonMode *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::TextureComparisonMode * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::TextureComparisonMode * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "TextureComparisonMode_mode_set" "', argument " "2"" of type '" "CS::Graphics::TextureComparisonMode::Mode""'");
@@ -7951,18 +7991,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_TextureComparisonMode_mode_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::TextureComparisonMode *arg1 = (csShaderVariable::CS::Graphics::TextureComparisonMode *) 0 ;
+  CS::Graphics::TextureComparisonMode *arg1 = (CS::Graphics::TextureComparisonMode *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   CS::Graphics::TextureComparisonMode::Mode result;
   
   if(!PyArg_UnpackTuple(args,(char *)"TextureComparisonMode_mode_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__TextureComparisonMode, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__TextureComparisonMode, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "TextureComparisonMode_mode_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::TextureComparisonMode *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "TextureComparisonMode_mode_get" "', argument " "1"" of type '" "CS::Graphics::TextureComparisonMode *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::TextureComparisonMode * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::TextureComparisonMode * >(argp1);
   result = (CS::Graphics::TextureComparisonMode::Mode) ((arg1)->mode);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -7973,7 +8013,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_TextureComparisonMode_function_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::TextureComparisonMode *arg1 = (csShaderVariable::CS::Graphics::TextureComparisonMode *) 0 ;
+  CS::Graphics::TextureComparisonMode *arg1 = (CS::Graphics::TextureComparisonMode *) 0 ;
   CS::Graphics::TextureComparisonMode::Function arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -7983,11 +8023,11 @@ SWIGINTERN PyObject *_wrap_TextureComparisonMode_function_set(PyObject *SWIGUNUS
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"TextureComparisonMode_function_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__TextureComparisonMode, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__TextureComparisonMode, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "TextureComparisonMode_function_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::TextureComparisonMode *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "TextureComparisonMode_function_set" "', argument " "1"" of type '" "CS::Graphics::TextureComparisonMode *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::TextureComparisonMode * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::TextureComparisonMode * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "TextureComparisonMode_function_set" "', argument " "2"" of type '" "CS::Graphics::TextureComparisonMode::Function""'");
@@ -8003,18 +8043,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_TextureComparisonMode_function_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::TextureComparisonMode *arg1 = (csShaderVariable::CS::Graphics::TextureComparisonMode *) 0 ;
+  CS::Graphics::TextureComparisonMode *arg1 = (CS::Graphics::TextureComparisonMode *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   CS::Graphics::TextureComparisonMode::Function result;
   
   if(!PyArg_UnpackTuple(args,(char *)"TextureComparisonMode_function_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__TextureComparisonMode, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__TextureComparisonMode, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "TextureComparisonMode_function_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::TextureComparisonMode *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "TextureComparisonMode_function_get" "', argument " "1"" of type '" "CS::Graphics::TextureComparisonMode *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::TextureComparisonMode * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::TextureComparisonMode * >(argp1);
   result = (CS::Graphics::TextureComparisonMode::Function) ((arg1)->function);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -8025,11 +8065,11 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_TextureComparisonMode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::TextureComparisonMode *result = 0 ;
+  CS::Graphics::TextureComparisonMode *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_TextureComparisonMode",0,0)) SWIG_fail;
-  result = (csShaderVariable::CS::Graphics::TextureComparisonMode *)new csShaderVariable::CS::Graphics::TextureComparisonMode();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable__CS__Graphics__TextureComparisonMode, SWIG_POINTER_NEW |  0 );
+  result = (CS::Graphics::TextureComparisonMode *)new CS::Graphics::TextureComparisonMode();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__TextureComparisonMode, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -8038,17 +8078,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_delete_TextureComparisonMode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::TextureComparisonMode *arg1 = (csShaderVariable::CS::Graphics::TextureComparisonMode *) 0 ;
+  CS::Graphics::TextureComparisonMode *arg1 = (CS::Graphics::TextureComparisonMode *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"delete_TextureComparisonMode",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__TextureComparisonMode, SWIG_POINTER_DISOWN |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__TextureComparisonMode, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_TextureComparisonMode" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::TextureComparisonMode *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_TextureComparisonMode" "', argument " "1"" of type '" "CS::Graphics::TextureComparisonMode *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::TextureComparisonMode * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::TextureComparisonMode * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -8060,7 +8100,7 @@ fail:
 SWIGINTERN PyObject *TextureComparisonMode_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csShaderVariable__CS__Graphics__TextureComparisonMode, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Graphics__TextureComparisonMode, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -11726,7 +11766,7 @@ SWIGINTERN PyObject *_wrap_GetFlippedCullMode(PyObject *SWIGUNUSEDPARM(self), Py
     SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "GetFlippedCullMode" "', argument " "1"" of type '" "CS::Graphics::MeshCullMode""'");
   } 
   arg1 = static_cast< CS::Graphics::MeshCullMode >(val1);
-  result = (CS::Graphics::MeshCullMode)csShaderVariable::CS::Graphics::GetFlippedCullMode(arg1);
+  result = (CS::Graphics::MeshCullMode)CS::Graphics::GetFlippedCullMode(arg1);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
@@ -11736,7 +11776,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_AlphaTestOptions_threshold_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::AlphaTestOptions *arg1 = (csShaderVariable::CS::Graphics::AlphaTestOptions *) 0 ;
+  CS::Graphics::AlphaTestOptions *arg1 = (CS::Graphics::AlphaTestOptions *) 0 ;
   float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -11746,11 +11786,11 @@ SWIGINTERN PyObject *_wrap_AlphaTestOptions_threshold_set(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"AlphaTestOptions_threshold_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__AlphaTestOptions, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__AlphaTestOptions, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AlphaTestOptions_threshold_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::AlphaTestOptions *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AlphaTestOptions_threshold_set" "', argument " "1"" of type '" "CS::Graphics::AlphaTestOptions *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::AlphaTestOptions * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::AlphaTestOptions * >(argp1);
   ecode2 = SWIG_AsVal_float(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "AlphaTestOptions_threshold_set" "', argument " "2"" of type '" "float""'");
@@ -11766,18 +11806,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_AlphaTestOptions_threshold_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::AlphaTestOptions *arg1 = (csShaderVariable::CS::Graphics::AlphaTestOptions *) 0 ;
+  CS::Graphics::AlphaTestOptions *arg1 = (CS::Graphics::AlphaTestOptions *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   float result;
   
   if(!PyArg_UnpackTuple(args,(char *)"AlphaTestOptions_threshold_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__AlphaTestOptions, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__AlphaTestOptions, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AlphaTestOptions_threshold_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::AlphaTestOptions *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AlphaTestOptions_threshold_get" "', argument " "1"" of type '" "CS::Graphics::AlphaTestOptions *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::AlphaTestOptions * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::AlphaTestOptions * >(argp1);
   result = (float) ((arg1)->threshold);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
@@ -11788,7 +11828,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_AlphaTestOptions_func_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::AlphaTestOptions *arg1 = (csShaderVariable::CS::Graphics::AlphaTestOptions *) 0 ;
+  CS::Graphics::AlphaTestOptions *arg1 = (CS::Graphics::AlphaTestOptions *) 0 ;
   CS::Graphics::AlphaTestFunction arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -11798,11 +11838,11 @@ SWIGINTERN PyObject *_wrap_AlphaTestOptions_func_set(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"AlphaTestOptions_func_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__AlphaTestOptions, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__AlphaTestOptions, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AlphaTestOptions_func_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::AlphaTestOptions *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AlphaTestOptions_func_set" "', argument " "1"" of type '" "CS::Graphics::AlphaTestOptions *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::AlphaTestOptions * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::AlphaTestOptions * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "AlphaTestOptions_func_set" "', argument " "2"" of type '" "CS::Graphics::AlphaTestFunction""'");
@@ -11818,18 +11858,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_AlphaTestOptions_func_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::AlphaTestOptions *arg1 = (csShaderVariable::CS::Graphics::AlphaTestOptions *) 0 ;
+  CS::Graphics::AlphaTestOptions *arg1 = (CS::Graphics::AlphaTestOptions *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   CS::Graphics::AlphaTestFunction result;
   
   if(!PyArg_UnpackTuple(args,(char *)"AlphaTestOptions_func_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__AlphaTestOptions, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__AlphaTestOptions, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AlphaTestOptions_func_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::AlphaTestOptions *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AlphaTestOptions_func_get" "', argument " "1"" of type '" "CS::Graphics::AlphaTestOptions *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::AlphaTestOptions * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::AlphaTestOptions * >(argp1);
   result = (CS::Graphics::AlphaTestFunction) ((arg1)->func);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -11840,11 +11880,11 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_AlphaTestOptions(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::AlphaTestOptions *result = 0 ;
+  CS::Graphics::AlphaTestOptions *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_AlphaTestOptions",0,0)) SWIG_fail;
-  result = (csShaderVariable::CS::Graphics::AlphaTestOptions *)new csShaderVariable::CS::Graphics::AlphaTestOptions();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable__CS__Graphics__AlphaTestOptions, SWIG_POINTER_NEW |  0 );
+  result = (CS::Graphics::AlphaTestOptions *)new CS::Graphics::AlphaTestOptions();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__AlphaTestOptions, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -11853,17 +11893,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_delete_AlphaTestOptions(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::AlphaTestOptions *arg1 = (csShaderVariable::CS::Graphics::AlphaTestOptions *) 0 ;
+  CS::Graphics::AlphaTestOptions *arg1 = (CS::Graphics::AlphaTestOptions *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"delete_AlphaTestOptions",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__AlphaTestOptions, SWIG_POINTER_DISOWN |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__AlphaTestOptions, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_AlphaTestOptions" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::AlphaTestOptions *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_AlphaTestOptions" "', argument " "1"" of type '" "CS::Graphics::AlphaTestOptions *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::AlphaTestOptions * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::AlphaTestOptions * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -11875,17 +11915,17 @@ fail:
 SWIGINTERN PyObject *AlphaTestOptions_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csShaderVariable__CS__Graphics__AlphaTestOptions, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Graphics__AlphaTestOptions, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
 SWIGINTERN PyObject *_wrap_new_RenderMeshModes__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *result = 0 ;
+  CS::Graphics::RenderMeshModes *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_RenderMeshModes",0,0)) SWIG_fail;
-  result = (csShaderVariable::CS::Graphics::RenderMeshModes *)new csShaderVariable::CS::Graphics::RenderMeshModes();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, SWIG_POINTER_NEW |  0 );
+  result = (CS::Graphics::RenderMeshModes *)new CS::Graphics::RenderMeshModes();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__RenderMeshModes, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -11898,7 +11938,7 @@ SWIGINTERN PyObject *_wrap_new_RenderMeshModes__SWIG_1(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  csShaderVariable::CS::Graphics::RenderMeshModes *result = 0 ;
+  CS::Graphics::RenderMeshModes *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_RenderMeshModes",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_CS__Graphics__RenderMeshModes,  0  | 0);
@@ -11909,8 +11949,8 @@ SWIGINTERN PyObject *_wrap_new_RenderMeshModes__SWIG_1(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_RenderMeshModes" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes const &""'"); 
   }
   arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
-  result = (csShaderVariable::CS::Graphics::RenderMeshModes *)new csShaderVariable::CS::Graphics::RenderMeshModes((CS::Graphics::RenderMeshModes const &)*arg1);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, SWIG_POINTER_NEW |  0 );
+  result = (CS::Graphics::RenderMeshModes *)new CS::Graphics::RenderMeshModes((CS::Graphics::RenderMeshModes const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__RenderMeshModes, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -11942,25 +11982,25 @@ SWIGINTERN PyObject *_wrap_new_RenderMeshModes(PyObject *self, PyObject *args) {
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_RenderMeshModes'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    csShaderVariable::CS::Graphics::RenderMeshModes()\n"
-    "    csShaderVariable::CS::Graphics::RenderMeshModes(CS::Graphics::RenderMeshModes const &)\n");
+    "    CS::Graphics::RenderMeshModes()\n"
+    "    CS::Graphics::RenderMeshModes(CS::Graphics::RenderMeshModes const &)\n");
   return NULL;
 }
 
 
 SWIGINTERN PyObject *_wrap_delete_RenderMeshModes(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"delete_RenderMeshModes",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, SWIG_POINTER_DISOWN |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_RenderMeshModes" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_RenderMeshModes" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -11971,7 +12011,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_z_buf_mode_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   csZBufMode arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -11981,11 +12021,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_z_buf_mode_set(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_z_buf_mode_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_z_buf_mode_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_z_buf_mode_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_z_buf_mode_set" "', argument " "2"" of type '" "csZBufMode""'");
@@ -12001,18 +12041,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_z_buf_mode_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   csZBufMode result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_z_buf_mode_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_z_buf_mode_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_z_buf_mode_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (csZBufMode) ((arg1)->z_buf_mode);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -12023,7 +12063,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_mixmode_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12033,11 +12073,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_mixmode_set(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_mixmode_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_mixmode_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_mixmode_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_mixmode_set" "', argument " "2"" of type '" "uint""'");
@@ -12053,18 +12093,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_mixmode_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   uint result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_mixmode_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_mixmode_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_mixmode_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (uint) ((arg1)->mixmode);
   resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
@@ -12075,7 +12115,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_renderPrio_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   CS::Graphics::RenderPriority arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12085,11 +12125,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_renderPrio_set(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_renderPrio_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_renderPrio_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_renderPrio_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_renderPrio_set" "', argument " "2"" of type '" "CS::Graphics::RenderPriority""'");
@@ -12105,18 +12145,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_renderPrio_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   CS::Graphics::RenderPriority result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_renderPrio_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_renderPrio_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_renderPrio_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (CS::Graphics::RenderPriority) ((arg1)->renderPrio);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -12127,7 +12167,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_cullMode_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   CS::Graphics::MeshCullMode arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12137,11 +12177,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_cullMode_set(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_cullMode_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_cullMode_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_cullMode_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_cullMode_set" "', argument " "2"" of type '" "CS::Graphics::MeshCullMode""'");
@@ -12157,18 +12197,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_cullMode_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   CS::Graphics::MeshCullMode result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_cullMode_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_cullMode_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_cullMode_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (CS::Graphics::MeshCullMode) ((arg1)->cullMode);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -12179,7 +12219,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_alphaType_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   csAlphaMode::AlphaType arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12189,11 +12229,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_alphaType_set(PyObject *SWIGUNUSEDPAR
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_alphaType_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_alphaType_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_alphaType_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_alphaType_set" "', argument " "2"" of type '" "csAlphaMode::AlphaType""'");
@@ -12209,18 +12249,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_alphaType_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   csAlphaMode::AlphaType result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_alphaType_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_alphaType_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_alphaType_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (csAlphaMode::AlphaType) ((arg1)->alphaType);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -12231,7 +12271,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_alphaTest_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   CS::Graphics::AlphaTestOptions *arg2 = (CS::Graphics::AlphaTestOptions *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12241,11 +12281,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_alphaTest_set(PyObject *SWIGUNUSEDPAR
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_alphaTest_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_alphaTest_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_alphaTest_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_CS__Graphics__AlphaTestOptions, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMeshModes_alphaTest_set" "', argument " "2"" of type '" "CS::Graphics::AlphaTestOptions *""'"); 
@@ -12261,18 +12301,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_alphaTest_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   CS::Graphics::AlphaTestOptions *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_alphaTest_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_alphaTest_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_alphaTest_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (CS::Graphics::AlphaTestOptions *)& ((arg1)->alphaTest);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__AlphaTestOptions, 0 |  0 );
   return resultobj;
@@ -12283,7 +12323,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_zoffset_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   bool arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12293,11 +12333,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_zoffset_set(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_zoffset_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_zoffset_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_zoffset_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   ecode2 = SWIG_AsVal_bool(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_zoffset_set" "', argument " "2"" of type '" "bool""'");
@@ -12313,18 +12353,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_zoffset_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_zoffset_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_zoffset_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_zoffset_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (bool) ((arg1)->zoffset);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -12335,7 +12375,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_buffers_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   csRef< csRenderBufferHolder > *arg2 = (csRef< csRenderBufferHolder > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12345,11 +12385,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_buffers_set(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_buffers_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_buffers_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_buffers_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csRefT_csRenderBufferHolder_t, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMeshModes_buffers_set" "', argument " "2"" of type '" "csRef< csRenderBufferHolder > *""'"); 
@@ -12365,18 +12405,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_buffers_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   csRef< csRenderBufferHolder > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_buffers_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_buffers_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_buffers_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (csRef< csRenderBufferHolder > *)& ((arg1)->buffers);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_csRenderBufferHolder_t, 0 |  0 );
   return resultobj;
@@ -12387,7 +12427,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_doInstancing_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   bool arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12397,11 +12437,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_doInstancing_set(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_doInstancing_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_doInstancing_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_doInstancing_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   ecode2 = SWIG_AsVal_bool(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_doInstancing_set" "', argument " "2"" of type '" "bool""'");
@@ -12417,18 +12457,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_doInstancing_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_doInstancing_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_doInstancing_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_doInstancing_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (bool) ((arg1)->doInstancing);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -12439,7 +12479,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamNum_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12449,11 +12489,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamNum_set(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParamNum_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamNum_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamNum_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_instParamNum_set" "', argument " "2"" of type '" "size_t""'");
@@ -12469,18 +12509,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamNum_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParamNum_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamNum_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamNum_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result =  ((arg1)->instParamNum);
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
@@ -12491,7 +12531,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamsTargets_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   csVertexAttrib *arg2 = (csVertexAttrib *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12501,11 +12541,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamsTargets_set(PyObject *SWIGU
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParamsTargets_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamsTargets_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamsTargets_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csVertexAttrib, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMeshModes_instParamsTargets_set" "', argument " "2"" of type '" "csVertexAttrib const *""'"); 
@@ -12521,18 +12561,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamsTargets_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   csVertexAttrib *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParamsTargets_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamsTargets_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamsTargets_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (csVertexAttrib *) ((arg1)->instParamsTargets);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csVertexAttrib, 0 |  0 );
   return resultobj;
@@ -12543,7 +12583,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_instanceNum_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12553,11 +12593,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_instanceNum_set(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instanceNum_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instanceNum_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instanceNum_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_instanceNum_set" "', argument " "2"" of type '" "size_t""'");
@@ -12573,18 +12613,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_instanceNum_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instanceNum_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instanceNum_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instanceNum_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result =  ((arg1)->instanceNum);
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
@@ -12595,7 +12635,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_instParams_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   csShaderVariable ***arg2 = (csShaderVariable ***) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12605,11 +12645,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_instParams_set(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParams_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParams_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParams_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_p_p_csShaderVariable, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMeshModes_instParams_set" "', argument " "2"" of type '" "csShaderVariable **const *""'"); 
@@ -12625,18 +12665,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshModes_instParams_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshModes *arg1 = (csShaderVariable::CS::Graphics::RenderMeshModes *) 0 ;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   csShaderVariable ***result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParams_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParams_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshModes *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParams_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshModes * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (csShaderVariable ***) ((arg1)->instParams);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_p_p_csShaderVariable, 0 |  0 );
   return resultobj;
@@ -12648,13 +12688,13 @@ fail:
 SWIGINTERN PyObject *RenderMeshModes_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshModes, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Graphics__RenderMeshModes, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
 SWIGINTERN PyObject *_wrap_RenderMeshIndexRange_start_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshIndexRange *arg1 = (csShaderVariable::CS::Graphics::RenderMeshIndexRange *) 0 ;
+  CS::Graphics::RenderMeshIndexRange *arg1 = (CS::Graphics::RenderMeshIndexRange *) 0 ;
   unsigned int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12664,11 +12704,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshIndexRange_start_set(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshIndexRange_start_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshIndexRange, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshIndexRange, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshIndexRange_start_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshIndexRange *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshIndexRange_start_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshIndexRange *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshIndexRange * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshIndexRange * >(argp1);
   ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshIndexRange_start_set" "', argument " "2"" of type '" "unsigned int""'");
@@ -12684,18 +12724,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshIndexRange_start_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshIndexRange *arg1 = (csShaderVariable::CS::Graphics::RenderMeshIndexRange *) 0 ;
+  CS::Graphics::RenderMeshIndexRange *arg1 = (CS::Graphics::RenderMeshIndexRange *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   unsigned int result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshIndexRange_start_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshIndexRange, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshIndexRange, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshIndexRange_start_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshIndexRange *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshIndexRange_start_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshIndexRange *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshIndexRange * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshIndexRange * >(argp1);
   result = (unsigned int) ((arg1)->start);
   resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
@@ -12706,7 +12746,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshIndexRange_end_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshIndexRange *arg1 = (csShaderVariable::CS::Graphics::RenderMeshIndexRange *) 0 ;
+  CS::Graphics::RenderMeshIndexRange *arg1 = (CS::Graphics::RenderMeshIndexRange *) 0 ;
   unsigned int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12716,11 +12756,11 @@ SWIGINTERN PyObject *_wrap_RenderMeshIndexRange_end_set(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshIndexRange_end_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshIndexRange, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshIndexRange, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshIndexRange_end_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshIndexRange *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshIndexRange_end_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshIndexRange *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshIndexRange * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshIndexRange * >(argp1);
   ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshIndexRange_end_set" "', argument " "2"" of type '" "unsigned int""'");
@@ -12736,18 +12776,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMeshIndexRange_end_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshIndexRange *arg1 = (csShaderVariable::CS::Graphics::RenderMeshIndexRange *) 0 ;
+  CS::Graphics::RenderMeshIndexRange *arg1 = (CS::Graphics::RenderMeshIndexRange *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   unsigned int result;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMeshIndexRange_end_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshIndexRange, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshIndexRange, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshIndexRange_end_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshIndexRange *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshIndexRange_end_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshIndexRange *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshIndexRange * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshIndexRange * >(argp1);
   result = (unsigned int) ((arg1)->end);
   resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
@@ -12758,11 +12798,11 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_RenderMeshIndexRange(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshIndexRange *result = 0 ;
+  CS::Graphics::RenderMeshIndexRange *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_RenderMeshIndexRange",0,0)) SWIG_fail;
-  result = (csShaderVariable::CS::Graphics::RenderMeshIndexRange *)new csShaderVariable::CS::Graphics::RenderMeshIndexRange();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshIndexRange, SWIG_POINTER_NEW |  0 );
+  result = (CS::Graphics::RenderMeshIndexRange *)new CS::Graphics::RenderMeshIndexRange();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__RenderMeshIndexRange, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -12771,17 +12811,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_delete_RenderMeshIndexRange(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMeshIndexRange *arg1 = (csShaderVariable::CS::Graphics::RenderMeshIndexRange *) 0 ;
+  CS::Graphics::RenderMeshIndexRange *arg1 = (CS::Graphics::RenderMeshIndexRange *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"delete_RenderMeshIndexRange",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshIndexRange, SWIG_POINTER_DISOWN |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshIndexRange, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_RenderMeshIndexRange" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMeshIndexRange *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_RenderMeshIndexRange" "', argument " "1"" of type '" "CS::Graphics::RenderMeshIndexRange *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMeshIndexRange * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshIndexRange * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12793,24 +12833,24 @@ fail:
 SWIGINTERN PyObject *RenderMeshIndexRange_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMeshIndexRange, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Graphics__RenderMeshIndexRange, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_db_mesh_name_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   char *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_db_mesh_name_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_db_mesh_name_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_db_mesh_name_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result = (char *) ((arg1)->db_mesh_name);
   resultobj = SWIG_FromCharPtr((const char *)result);
   return resultobj;
@@ -12821,11 +12861,11 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_CoreRenderMesh(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *result = 0 ;
+  CS::Graphics::CoreRenderMesh *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_CoreRenderMesh",0,0)) SWIG_fail;
-  result = (csShaderVariable::CS::Graphics::CoreRenderMesh *)new csShaderVariable::CS::Graphics::CoreRenderMesh();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, SWIG_POINTER_NEW |  0 );
+  result = (CS::Graphics::CoreRenderMesh *)new CS::Graphics::CoreRenderMesh();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__CoreRenderMesh, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -12834,17 +12874,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_delete_CoreRenderMesh(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"delete_CoreRenderMesh",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, SWIG_POINTER_DISOWN |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_CoreRenderMesh" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_CoreRenderMesh" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12855,7 +12895,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_clip_portal_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12865,11 +12905,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_clip_portal_set(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_clip_portal_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_portal_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_portal_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CoreRenderMesh_clip_portal_set" "', argument " "2"" of type '" "int""'");
@@ -12885,18 +12925,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_clip_portal_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   int result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_clip_portal_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_portal_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_portal_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result = (int) ((arg1)->clip_portal);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -12907,7 +12947,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_clip_plane_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12917,11 +12957,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_clip_plane_set(PyObject *SWIGUNUSEDPAR
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_clip_plane_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_plane_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_plane_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CoreRenderMesh_clip_plane_set" "', argument " "2"" of type '" "int""'");
@@ -12937,18 +12977,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_clip_plane_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   int result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_clip_plane_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_plane_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_plane_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result = (int) ((arg1)->clip_plane);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -12959,7 +12999,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_clip_z_plane_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -12969,11 +13009,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_clip_z_plane_set(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_clip_z_plane_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_z_plane_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_z_plane_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CoreRenderMesh_clip_z_plane_set" "', argument " "2"" of type '" "int""'");
@@ -12989,18 +13029,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_clip_z_plane_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   int result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_clip_z_plane_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_z_plane_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_clip_z_plane_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result = (int) ((arg1)->clip_z_plane);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -13011,7 +13051,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_do_mirror_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   bool arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13021,11 +13061,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_do_mirror_set(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_do_mirror_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_do_mirror_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_do_mirror_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   ecode2 = SWIG_AsVal_bool(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CoreRenderMesh_do_mirror_set" "', argument " "2"" of type '" "bool""'");
@@ -13041,18 +13081,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_do_mirror_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_do_mirror_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_do_mirror_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_do_mirror_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result = (bool) ((arg1)->do_mirror);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -13063,7 +13103,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_meshtype_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   csRenderMeshType arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13073,11 +13113,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_meshtype_set(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_meshtype_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_meshtype_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_meshtype_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CoreRenderMesh_meshtype_set" "', argument " "2"" of type '" "csRenderMeshType""'");
@@ -13093,18 +13133,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_meshtype_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   csRenderMeshType result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_meshtype_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_meshtype_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_meshtype_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result = (csRenderMeshType) ((arg1)->meshtype);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -13115,7 +13155,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_multiRanges_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   CS::Graphics::RenderMeshIndexRange *arg2 = (CS::Graphics::RenderMeshIndexRange *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13125,11 +13165,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_multiRanges_set(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_multiRanges_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_multiRanges_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_multiRanges_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_CS__Graphics__RenderMeshIndexRange, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "CoreRenderMesh_multiRanges_set" "', argument " "2"" of type '" "CS::Graphics::RenderMeshIndexRange *""'"); 
@@ -13145,18 +13185,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_multiRanges_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   CS::Graphics::RenderMeshIndexRange *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_multiRanges_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_multiRanges_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_multiRanges_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result = (CS::Graphics::RenderMeshIndexRange *) ((arg1)->multiRanges);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__RenderMeshIndexRange, 0 |  0 );
   return resultobj;
@@ -13167,7 +13207,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_rangesNum_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13177,11 +13217,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_rangesNum_set(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_rangesNum_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_rangesNum_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_rangesNum_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CoreRenderMesh_rangesNum_set" "', argument " "2"" of type '" "size_t""'");
@@ -13197,18 +13237,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_rangesNum_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_rangesNum_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_rangesNum_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_rangesNum_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result =  ((arg1)->rangesNum);
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
@@ -13219,7 +13259,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_indexstart_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   unsigned int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13229,11 +13269,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_indexstart_set(PyObject *SWIGUNUSEDPAR
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_indexstart_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_indexstart_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_indexstart_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CoreRenderMesh_indexstart_set" "', argument " "2"" of type '" "unsigned int""'");
@@ -13249,18 +13289,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_indexstart_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   unsigned int result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_indexstart_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_indexstart_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_indexstart_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result = (unsigned int) ((arg1)->indexstart);
   resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
@@ -13271,7 +13311,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_indexend_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   unsigned int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13281,11 +13321,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_indexend_set(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_indexend_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_indexend_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_indexend_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CoreRenderMesh_indexend_set" "', argument " "2"" of type '" "unsigned int""'");
@@ -13301,18 +13341,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_indexend_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   unsigned int result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_indexend_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_indexend_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_indexend_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result = (unsigned int) ((arg1)->indexend);
   resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
@@ -13323,7 +13363,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_material_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   iMaterialWrapper *arg2 = (iMaterialWrapper *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13333,11 +13373,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_material_set(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_material_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_material_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_material_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMaterialWrapper, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "CoreRenderMesh_material_set" "', argument " "2"" of type '" "iMaterialWrapper *""'"); 
@@ -13353,18 +13393,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_material_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   iMaterialWrapper *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_material_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_material_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_material_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result = (iMaterialWrapper *) ((arg1)->material);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
   return resultobj;
@@ -13375,7 +13415,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_object2world_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   csReversibleTransform arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13385,11 +13425,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_object2world_set(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_object2world_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_object2world_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_object2world_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   {
     res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csReversibleTransform,  0  | 0);
     if (!SWIG_IsOK(res2)) {
@@ -13413,18 +13453,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_object2world_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   csReversibleTransform result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_object2world_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_object2world_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_object2world_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result =  ((arg1)->object2world);
   resultobj = SWIG_NewPointerObj((new csReversibleTransform(static_cast< const csReversibleTransform& >(result))), SWIGTYPE_p_csReversibleTransform, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -13435,7 +13475,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_bbox_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   csBox3 arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13445,11 +13485,11 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_bbox_set(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_bbox_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_bbox_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_bbox_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   {
     res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csBox3,  0  | 0);
     if (!SWIG_IsOK(res2)) {
@@ -13473,18 +13513,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_bbox_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::CoreRenderMesh *arg1 = (csShaderVariable::CS::Graphics::CoreRenderMesh *) 0 ;
+  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   csBox3 result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_bbox_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_bbox_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::CoreRenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_bbox_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::CoreRenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
   result =  ((arg1)->bbox);
   resultobj = SWIG_NewPointerObj((new csBox3(static_cast< const csBox3& >(result))), SWIGTYPE_p_csBox3, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -13496,17 +13536,17 @@ fail:
 SWIGINTERN PyObject *CoreRenderMesh_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csShaderVariable__CS__Graphics__CoreRenderMesh, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Graphics__CoreRenderMesh, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
 SWIGINTERN PyObject *_wrap_new_RenderMesh(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMesh *result = 0 ;
+  CS::Graphics::RenderMesh *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_RenderMesh",0,0)) SWIG_fail;
-  result = (csShaderVariable::CS::Graphics::RenderMesh *)new csShaderVariable::CS::Graphics::RenderMesh();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, SWIG_POINTER_NEW |  0 );
+  result = (CS::Graphics::RenderMesh *)new CS::Graphics::RenderMesh();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__RenderMesh, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -13515,17 +13555,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_delete_RenderMesh(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMesh *arg1 = (csShaderVariable::CS::Graphics::RenderMesh *) 0 ;
+  CS::Graphics::RenderMesh *arg1 = (CS::Graphics::RenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"delete_RenderMesh",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, SWIG_POINTER_DISOWN |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMesh, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_RenderMesh" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_RenderMesh" "', argument " "1"" of type '" "CS::Graphics::RenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13536,7 +13576,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMesh_geometryInstance_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMesh *arg1 = (csShaderVariable::CS::Graphics::RenderMesh *) 0 ;
+  CS::Graphics::RenderMesh *arg1 = (CS::Graphics::RenderMesh *) 0 ;
   void *arg2 = (void *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13545,11 +13585,11 @@ SWIGINTERN PyObject *_wrap_RenderMesh_geometryInstance_set(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMesh_geometryInstance_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_geometryInstance_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_geometryInstance_set" "', argument " "1"" of type '" "CS::Graphics::RenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp1);
   res2 = SWIG_ConvertPtr(obj1,SWIG_as_voidptrptr(&arg2), 0, SWIG_POINTER_DISOWN);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMesh_geometryInstance_set" "', argument " "2"" of type '" "void *""'"); 
@@ -13564,18 +13604,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMesh_geometryInstance_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMesh *arg1 = (csShaderVariable::CS::Graphics::RenderMesh *) 0 ;
+  CS::Graphics::RenderMesh *arg1 = (CS::Graphics::RenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   void *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMesh_geometryInstance_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_geometryInstance_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_geometryInstance_get" "', argument " "1"" of type '" "CS::Graphics::RenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp1);
   result = (void *) ((arg1)->geometryInstance);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   return resultobj;
@@ -13586,7 +13626,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMesh_portal_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMesh *arg1 = (csShaderVariable::CS::Graphics::RenderMesh *) 0 ;
+  CS::Graphics::RenderMesh *arg1 = (CS::Graphics::RenderMesh *) 0 ;
   iPortalContainer *arg2 = (iPortalContainer *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13596,11 +13636,11 @@ SWIGINTERN PyObject *_wrap_RenderMesh_portal_set(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMesh_portal_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_portal_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_portal_set" "', argument " "1"" of type '" "CS::Graphics::RenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iPortalContainer, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMesh_portal_set" "', argument " "2"" of type '" "iPortalContainer *""'"); 
@@ -13616,18 +13656,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMesh_portal_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMesh *arg1 = (csShaderVariable::CS::Graphics::RenderMesh *) 0 ;
+  CS::Graphics::RenderMesh *arg1 = (CS::Graphics::RenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   iPortalContainer *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMesh_portal_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_portal_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_portal_get" "', argument " "1"" of type '" "CS::Graphics::RenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp1);
   result = (iPortalContainer *) ((arg1)->portal);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iPortalContainer, 0 |  0 );
   return resultobj;
@@ -13638,7 +13678,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMesh_variablecontext_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMesh *arg1 = (csShaderVariable::CS::Graphics::RenderMesh *) 0 ;
+  CS::Graphics::RenderMesh *arg1 = (CS::Graphics::RenderMesh *) 0 ;
   csRef< iShaderVariableContext > *arg2 = (csRef< iShaderVariableContext > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13648,11 +13688,11 @@ SWIGINTERN PyObject *_wrap_RenderMesh_variablecontext_set(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMesh_variablecontext_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_variablecontext_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_variablecontext_set" "', argument " "1"" of type '" "CS::Graphics::RenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csRefT_iShaderVariableContext_t, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMesh_variablecontext_set" "', argument " "2"" of type '" "csRef< iShaderVariableContext > *""'"); 
@@ -13668,18 +13708,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMesh_variablecontext_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMesh *arg1 = (csShaderVariable::CS::Graphics::RenderMesh *) 0 ;
+  CS::Graphics::RenderMesh *arg1 = (CS::Graphics::RenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   csRef< iShaderVariableContext > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMesh_variablecontext_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_variablecontext_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_variablecontext_get" "', argument " "1"" of type '" "CS::Graphics::RenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp1);
   result = (csRef< iShaderVariableContext > *)& ((arg1)->variablecontext);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShaderVariableContext_t, 0 |  0 );
   return resultobj;
@@ -13690,7 +13730,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMesh_worldspace_origin_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMesh *arg1 = (csShaderVariable::CS::Graphics::RenderMesh *) 0 ;
+  CS::Graphics::RenderMesh *arg1 = (CS::Graphics::RenderMesh *) 0 ;
   csVector3 *arg2 = (csVector3 *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13700,11 +13740,11 @@ SWIGINTERN PyObject *_wrap_RenderMesh_worldspace_origin_set(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMesh_worldspace_origin_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_worldspace_origin_set" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_worldspace_origin_set" "', argument " "1"" of type '" "CS::Graphics::RenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csVector3, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMesh_worldspace_origin_set" "', argument " "2"" of type '" "csVector3 *""'"); 
@@ -13720,18 +13760,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_RenderMesh_worldspace_origin_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csShaderVariable::CS::Graphics::RenderMesh *arg1 = (csShaderVariable::CS::Graphics::RenderMesh *) 0 ;
+  CS::Graphics::RenderMesh *arg1 = (CS::Graphics::RenderMesh *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   csVector3 *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"RenderMesh_worldspace_origin_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_worldspace_origin_get" "', argument " "1"" of type '" "csShaderVariable::CS::Graphics::RenderMesh *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMesh_worldspace_origin_get" "', argument " "1"" of type '" "CS::Graphics::RenderMesh *""'"); 
   }
-  arg1 = reinterpret_cast< csShaderVariable::CS::Graphics::RenderMesh * >(argp1);
+  arg1 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp1);
   result = (csVector3 *)& ((arg1)->worldspace_origin);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csVector3, 0 |  0 );
   return resultobj;
@@ -13743,7 +13783,7 @@ fail:
 SWIGINTERN PyObject *RenderMesh_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csShaderVariable__CS__Graphics__RenderMesh, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Graphics__RenderMesh, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -14420,60 +14460,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iFont_GetDimensions__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iFont *arg1 = (iFont *) 0 ;
-  char *arg2 = (char *) 0 ;
-  int *arg3 = 0 ;
-  int *arg4 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int temp3 ;
-  int res3 = SWIG_TMPOBJ ;
-  int temp4 ;
-  int res4 = SWIG_TMPOBJ ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  arg3 = &temp3;
-  arg4 = &temp4;
-  if(!PyArg_UnpackTuple(args,(char *)"iFont_GetDimensions",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iFont, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iFont_GetDimensions" "', argument " "1"" of type '" "iFont *""'"); 
-  }
-  arg1 = reinterpret_cast< iFont * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iFont_GetDimensions" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  (arg1)->GetDimensions((char const *)arg2,*arg3,*arg4);
-  resultobj = SWIG_Py_Void();
-  if (SWIG_IsTmpObj(res3)) {
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg3)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_int, new_flags));
-  }
-  if (SWIG_IsTmpObj(res4)) {
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg4)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags));
-  }
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iFont_GetDimensions__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iFont_GetDimensions(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iFont *arg1 = (iFont *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -14532,52 +14519,6 @@ SWIGINTERN PyObject *_wrap_iFont_GetDimensions__SWIG_1(PyObject *SWIGUNUSEDPARM(
   return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iFont_GetDimensions(PyObject *self, PyObject *args) {
-  int argc;
-  PyObject *argv[3];
-  int ii;
-  
-  if (!PyTuple_Check(args)) SWIG_fail;
-  argc = (int)PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
-    argv[ii] = PyTuple_GET_ITEM(args,ii);
-  }
-  if (argc == 2) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iFont, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        return _wrap_iFont_GetDimensions__SWIG_0(self, args);
-      }
-    }
-  }
-  if (argc == 2) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iFont, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        return _wrap_iFont_GetDimensions__SWIG_1(self, args);
-      }
-    }
-  }
-  
-fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iFont_GetDimensions'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    GetDimensions(iFont *,char const *,int &,int &)\n"
-    "    GetDimensions(iFont *,char const *,int &,int &,int &)\n");
   return NULL;
 }
 
@@ -15887,7 +15828,7 @@ SWIGINTERN PyObject *_wrap_csGetShaderVariableFromStack(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csGetShaderVariableFromStack" "', argument " "1"" of type '" "csShaderVariableStack const &""'"); 
   }
   arg1 = reinterpret_cast< csShaderVariableStack * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__ShaderVarStringID,  0  | 0);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__ShaderVar_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csGetShaderVariableFromStack" "', argument " "2"" of type '" "CS::ShaderVarStringID const &""'"); 
   }
@@ -15895,7 +15836,7 @@ SWIGINTERN PyObject *_wrap_csGetShaderVariableFromStack(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csGetShaderVariableFromStack" "', argument " "2"" of type '" "CS::ShaderVarStringID const &""'"); 
   }
   arg2 = reinterpret_cast< CS::ShaderVarStringID * >(argp2);
-  result = (csShaderVariable *)csGetShaderVariableFromStack((csShaderVariableStack const &)*arg1,(CS::ShaderVarStringID const &)*arg2);
+  result = (csShaderVariable *)csGetShaderVariableFromStack((csShaderVariableStack const &)*arg1,(CS::StringID< CS::StringSetTag::ShaderVar > const &)*arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable, 0 |  0 );
   return resultobj;
 fail:
@@ -15936,11 +15877,9 @@ fail:
 SWIGINTERN PyObject *_wrap_iShaderVariableContext_GetVariable(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShaderVariableContext *arg1 = (iShaderVariableContext *) 0 ;
-  CS::ShaderVarStringID arg2 ;
+  SwigValueWrapper< CS::StringID< CS::StringSetTag::ShaderVar > > arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   csShaderVariable *result = 0 ;
@@ -15952,17 +15891,7 @@ SWIGINTERN PyObject *_wrap_iShaderVariableContext_GetVariable(PyObject *SWIGUNUS
   }
   arg1 = reinterpret_cast< iShaderVariableContext * >(argp1);
   {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__ShaderVarStringID,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderVariableContext_GetVariable" "', argument " "2"" of type '" "CS::ShaderVarStringID""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderVariableContext_GetVariable" "', argument " "2"" of type '" "CS::ShaderVarStringID""'");
-    } else {
-      CS::ShaderVarStringID * temp = reinterpret_cast< CS::ShaderVarStringID * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
+    arg2 = (CS::ShaderVarStringID)PyLong_AsUnsignedLong(obj1);
   }
   result = (csShaderVariable *)((iShaderVariableContext const *)arg1)->GetVariable(arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable, 0 |  0 );
@@ -15975,11 +15904,9 @@ fail:
 SWIGINTERN PyObject *_wrap_iShaderVariableContext_GetVariableAdd(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShaderVariableContext *arg1 = (iShaderVariableContext *) 0 ;
-  CS::ShaderVarStringID arg2 ;
+  SwigValueWrapper< CS::StringID< CS::StringSetTag::ShaderVar > > arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   csShaderVariable *result = 0 ;
@@ -15991,17 +15918,7 @@ SWIGINTERN PyObject *_wrap_iShaderVariableContext_GetVariableAdd(PyObject *SWIGU
   }
   arg1 = reinterpret_cast< iShaderVariableContext * >(argp1);
   {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__ShaderVarStringID,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderVariableContext_GetVariableAdd" "', argument " "2"" of type '" "CS::ShaderVarStringID""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderVariableContext_GetVariableAdd" "', argument " "2"" of type '" "CS::ShaderVarStringID""'");
-    } else {
-      CS::ShaderVarStringID * temp = reinterpret_cast< CS::ShaderVarStringID * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
+    arg2 = (CS::ShaderVarStringID)PyLong_AsUnsignedLong(obj1);
   }
   result = (csShaderVariable *)(arg1)->GetVariableAdd(arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable, 0 |  0 );
@@ -16176,11 +16093,9 @@ fail:
 SWIGINTERN PyObject *_wrap_iShaderVariableContext_RemoveVariable__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShaderVariableContext *arg1 = (iShaderVariableContext *) 0 ;
-  CS::ShaderVarStringID arg2 ;
+  SwigValueWrapper< CS::StringID< CS::StringSetTag::ShaderVar > > arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   bool result;
@@ -16192,17 +16107,7 @@ SWIGINTERN PyObject *_wrap_iShaderVariableContext_RemoveVariable__SWIG_1(PyObjec
   }
   arg1 = reinterpret_cast< iShaderVariableContext * >(argp1);
   {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__ShaderVarStringID,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderVariableContext_RemoveVariable" "', argument " "2"" of type '" "CS::ShaderVarStringID""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderVariableContext_RemoveVariable" "', argument " "2"" of type '" "CS::ShaderVarStringID""'");
-    } else {
-      CS::ShaderVarStringID * temp = reinterpret_cast< CS::ShaderVarStringID * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
+    arg2 = (CS::ShaderVarStringID)PyLong_AsUnsignedLong(obj1);
   }
   result = (bool)(arg1)->RemoveVariable(arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
@@ -16242,8 +16147,9 @@ SWIGINTERN PyObject *_wrap_iShaderVariableContext_RemoveVariable(PyObject *self,
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShaderVariableContext, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__ShaderVarStringID, 0);
-      _v = SWIG_CheckState(res);
+      {
+        _v = (PyLong_Check(argv[1]) || PyInt_Check(argv[1]));
+      }
       if (_v) {
         return _wrap_iShaderVariableContext_RemoveVariable__SWIG_1(self, args);
       }
@@ -16902,65 +16808,7 @@ SWIGINTERN PyObject *_wrap_iShaderManager_GetTags(PyObject *SWIGUNUSEDPARM(self)
     csSet< csStringID > const &_result_ref = (arg1)->GetTags(arg2,*arg3);
     result = (csSet< csStringID > *) &_result_ref;
   }
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iShaderManager_SetActiveLights(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iShaderManager *arg1 = (iShaderManager *) 0 ;
-  csArray< iLight * > *arg2 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iShaderManager_SetActiveLights",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderManager_SetActiveLights" "', argument " "1"" of type '" "iShaderManager *""'"); 
-  }
-  arg1 = reinterpret_cast< iShaderManager * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_iLight_p_t,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderManager_SetActiveLights" "', argument " "2"" of type '" "csArray< iLight * > const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderManager_SetActiveLights" "', argument " "2"" of type '" "csArray< iLight * > const &""'"); 
-  }
-  arg2 = reinterpret_cast< csArray< iLight * > * >(argp2);
-  (arg1)->SetActiveLights((csArray< iLight * > const &)*arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iShaderManager_GetActiveLights(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iShaderManager *arg1 = (iShaderManager *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  csArray< iLight * > *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iShaderManager_GetActiveLights",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderManager_GetActiveLights" "', argument " "1"" of type '" "iShaderManager const *""'"); 
-  }
-  arg1 = reinterpret_cast< iShaderManager * >(argp1);
-  {
-    csArray< iLight * > const &_result_ref = ((iShaderManager const *)arg1)->GetActiveLights();
-    result = (csArray< iLight * > *) &_result_ref;
-  }
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_iLight_p_t, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18507,7 +18355,7 @@ SWIGINTERN PyObject *_wrap_new_csRefShaderStringIDHash__SWIG_0(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *result = 0 ;
+  csHash< csRef< iShader >,csStringID > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_csRefShaderStringIDHash",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   ecode1 = SWIG_AsVal_size_t(obj0, &val1);
@@ -18525,8 +18373,8 @@ SWIGINTERN PyObject *_wrap_new_csRefShaderStringIDHash__SWIG_0(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_csRefShaderStringIDHash" "', argument " "3"" of type '" "size_t""'");
   } 
   arg3 = static_cast< size_t >(val3);
-  result = (csHash< csRef< csShaderVariable::iShader >,csStringID > *)new csHash< csRef< csShaderVariable::iShader >,csStringID >(arg1,arg2,arg3);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, SWIG_POINTER_NEW |  0 );
+  result = (csHash< csRef< iShader >,csStringID > *)new csHash< csRef< iShader >,csStringID >(arg1,arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18543,7 +18391,7 @@ SWIGINTERN PyObject *_wrap_new_csRefShaderStringIDHash__SWIG_1(PyObject *SWIGUNU
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *result = 0 ;
+  csHash< csRef< iShader >,csStringID > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_csRefShaderStringIDHash",2,2,&obj0,&obj1)) SWIG_fail;
   ecode1 = SWIG_AsVal_size_t(obj0, &val1);
@@ -18556,8 +18404,8 @@ SWIGINTERN PyObject *_wrap_new_csRefShaderStringIDHash__SWIG_1(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_csRefShaderStringIDHash" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
-  result = (csHash< csRef< csShaderVariable::iShader >,csStringID > *)new csHash< csRef< csShaderVariable::iShader >,csStringID >(arg1,arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, SWIG_POINTER_NEW |  0 );
+  result = (csHash< csRef< iShader >,csStringID > *)new csHash< csRef< iShader >,csStringID >(arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18570,7 +18418,7 @@ SWIGINTERN PyObject *_wrap_new_csRefShaderStringIDHash__SWIG_2(PyObject *SWIGUNU
   size_t val1 ;
   int ecode1 = 0 ;
   PyObject * obj0 = 0 ;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *result = 0 ;
+  csHash< csRef< iShader >,csStringID > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_csRefShaderStringIDHash",1,1,&obj0)) SWIG_fail;
   ecode1 = SWIG_AsVal_size_t(obj0, &val1);
@@ -18578,8 +18426,8 @@ SWIGINTERN PyObject *_wrap_new_csRefShaderStringIDHash__SWIG_2(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_csRefShaderStringIDHash" "', argument " "1"" of type '" "size_t""'");
   } 
   arg1 = static_cast< size_t >(val1);
-  result = (csHash< csRef< csShaderVariable::iShader >,csStringID > *)new csHash< csRef< csShaderVariable::iShader >,csStringID >(arg1);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, SWIG_POINTER_NEW |  0 );
+  result = (csHash< csRef< iShader >,csStringID > *)new csHash< csRef< iShader >,csStringID >(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18588,11 +18436,11 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_csRefShaderStringIDHash__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *result = 0 ;
+  csHash< csRef< iShader >,csStringID > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_csRefShaderStringIDHash",0,0)) SWIG_fail;
-  result = (csHash< csRef< csShaderVariable::iShader >,csStringID > *)new csHash< csRef< csShaderVariable::iShader >,csStringID >();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, SWIG_POINTER_NEW |  0 );
+  result = (csHash< csRef< iShader >,csStringID > *)new csHash< csRef< iShader >,csStringID >();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18601,23 +18449,23 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_csRefShaderStringIDHash__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General > > > > *arg1 = 0 ;
+  csHash< csRef< iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< iShader >,CS::StringID< CS::StringSetTag::General > > > > *arg1 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *result = 0 ;
+  csHash< csRef< iShader >,csStringID > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_csRefShaderStringIDHash",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t,  0  | 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_csRefShaderStringIDHash" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General > > > > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_csRefShaderStringIDHash" "', argument " "1"" of type '" "csHash< csRef< iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< iShader >,CS::StringID< CS::StringSetTag::General > > > > const &""'"); 
   }
   if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_csRefShaderStringIDHash" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General > > > > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_csRefShaderStringIDHash" "', argument " "1"" of type '" "csHash< csRef< iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< iShader >,CS::StringID< CS::StringSetTag::General > > > > const &""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General > > > > * >(argp1);
-  result = (csHash< csRef< csShaderVariable::iShader >,csStringID > *)new csHash< csRef< csShaderVariable::iShader >,csStringID >((csHash< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General > > > > const &)*arg1);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, SWIG_POINTER_NEW |  0 );
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< iShader >,CS::StringID< CS::StringSetTag::General > > > > * >(argp1);
+  result = (csHash< csRef< iShader >,csStringID > *)new csHash< csRef< iShader >,csStringID >((csHash< csRef< iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< iShader >,CS::StringID< CS::StringSetTag::General > > > > const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18697,20 +18545,20 @@ SWIGINTERN PyObject *_wrap_new_csRefShaderStringIDHash(PyObject *self, PyObject 
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_csRefShaderStringIDHash'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    csHash< csRef< csShaderVariable::iShader >,csStringID >(size_t,size_t,size_t)\n"
-    "    csHash< csRef< csShaderVariable::iShader >,csStringID >(size_t,size_t)\n"
-    "    csHash< csRef< csShaderVariable::iShader >,csStringID >(size_t)\n"
-    "    csHash< csRef< csShaderVariable::iShader >,csStringID >()\n"
-    "    csHash< csRef< csShaderVariable::iShader >,csStringID >(csHash< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General > > > > const &)\n");
+    "    csHash< csRef< iShader >,csStringID >(size_t,size_t,size_t)\n"
+    "    csHash< csRef< iShader >,csStringID >(size_t,size_t)\n"
+    "    csHash< csRef< iShader >,csStringID >(size_t)\n"
+    "    csHash< csRef< iShader >,csStringID >()\n"
+    "    csHash< csRef< iShader >,csStringID >(csHash< csRef< iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< iShader >,CS::StringID< CS::StringSetTag::General > > > > const &)\n");
   return NULL;
 }
 
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Put(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
-  csRef< csShaderVariable::iShader > *arg3 = 0 ;
+  csRef< iShader > *arg3 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -18720,14 +18568,14 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Put(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_Put",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_Put" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_Put" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_Put" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -18738,15 +18586,15 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Put(PyObject *SWIGUNUSEDPARM(
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csRefT_iShader_t,  0  | 0);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash_Put" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash_Put" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
   if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_Put" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_Put" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
-  arg3 = reinterpret_cast< csRef< csShaderVariable::iShader > * >(argp3);
+  arg3 = reinterpret_cast< csRef< iShader > * >(argp3);
   {
-    csRef< csShaderVariable::iShader > &_result_ref = (arg1)->Put((CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< csShaderVariable::iShader > const &)*arg3);
-    result = (csRef< csShaderVariable::iShader > *) &_result_ref;
+    csRef< iShader > &_result_ref = (arg1)->Put((CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< iShader > const &)*arg3);
+    result = (csRef< iShader > *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
@@ -18757,20 +18605,20 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetAll__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  csArray< csRef< csShaderVariable::iShader > > result;
+  csArray< csRef< iShader > > result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_GetAll",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetAll" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetAll" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > const *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
-  result = ((csHash< csRef< csShaderVariable::iShader >,csStringID > const *)arg1)->GetAll();
-  resultobj = SWIG_NewPointerObj((new csArray< csRef< csShaderVariable::iShader > >(static_cast< const csArray< csRef< csShaderVariable::iShader > >& >(result))), SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, SWIG_POINTER_OWN |  0 );
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
+  result = ((csHash< csRef< iShader >,csStringID > const *)arg1)->GetAll();
+  resultobj = SWIG_NewPointerObj((new csArray< csRef< iShader > >(static_cast< const csArray< csRef< iShader > >& >(result))), SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18779,7 +18627,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetAll__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -18787,14 +18635,14 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetAll__SWIG_1(PyObject *SWIG
   int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  csArray< csRef< csShaderVariable::iShader > > result;
+  csArray< csRef< iShader > > result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_GetAll",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetAll" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetAll" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > const *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_GetAll" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -18803,8 +18651,8 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetAll__SWIG_1(PyObject *SWIG
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_GetAll" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
   }
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
-  result = ((csHash< csRef< csShaderVariable::iShader >,csStringID > const *)arg1)->GetAll((CS::StringID< CS::StringSetTag::General > const &)*arg2);
-  resultobj = SWIG_NewPointerObj((new csArray< csRef< csShaderVariable::iShader > >(static_cast< const csArray< csRef< csShaderVariable::iShader > >& >(result))), SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, SWIG_POINTER_OWN |  0 );
+  result = ((csHash< csRef< iShader >,csStringID > const *)arg1)->GetAll((CS::StringID< CS::StringSetTag::General > const &)*arg2);
+  resultobj = SWIG_NewPointerObj((new csArray< csRef< iShader > >(static_cast< const csArray< csRef< iShader > >& >(result))), SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18824,7 +18672,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetAll(PyObject *self, PyObje
   if (argc == 1) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       return _wrap_csRefShaderStringIDHash_GetAll__SWIG_0(self, args);
@@ -18833,7 +18681,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetAll(PyObject *self, PyObje
   if (argc == 2) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t, 0);
@@ -18847,17 +18695,17 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetAll(PyObject *self, PyObje
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csRefShaderStringIDHash_GetAll'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    GetAll(csHash< csRef< csShaderVariable::iShader >,csStringID > const *)\n"
-    "    GetAll(csHash< csRef< csShaderVariable::iShader >,csStringID > const *,CS::StringID< CS::StringSetTag::General > const &)\n");
+    "    GetAll(csHash< csRef< iShader >,csStringID > const *)\n"
+    "    GetAll(csHash< csRef< iShader >,csStringID > const *,CS::StringID< CS::StringSetTag::General > const &)\n");
   return NULL;
 }
 
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_PutUnique(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
-  csRef< csShaderVariable::iShader > *arg3 = 0 ;
+  csRef< iShader > *arg3 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -18867,14 +18715,14 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_PutUnique(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_PutUnique",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_PutUnique" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_PutUnique" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_PutUnique" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -18885,15 +18733,15 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_PutUnique(PyObject *SWIGUNUSE
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csRefT_iShader_t,  0  | 0);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash_PutUnique" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash_PutUnique" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
   if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_PutUnique" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_PutUnique" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
-  arg3 = reinterpret_cast< csRef< csShaderVariable::iShader > * >(argp3);
+  arg3 = reinterpret_cast< csRef< iShader > * >(argp3);
   {
-    csRef< csShaderVariable::iShader > &_result_ref = (arg1)->PutUnique((CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< csShaderVariable::iShader > const &)*arg3);
-    result = (csRef< csShaderVariable::iShader > *) &_result_ref;
+    csRef< iShader > &_result_ref = (arg1)->PutUnique((CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< iShader > const &)*arg3);
+    result = (csRef< iShader > *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
@@ -18904,7 +18752,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Contains(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -18915,11 +18763,11 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Contains(PyObject *SWIGUNUSED
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_Contains",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_Contains" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_Contains" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > const *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_Contains" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -18928,7 +18776,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Contains(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_Contains" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
   }
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
-  result = (bool)((csHash< csRef< csShaderVariable::iShader >,csStringID > const *)arg1)->Contains((CS::StringID< CS::StringSetTag::General > const &)*arg2);
+  result = (bool)((csHash< csRef< iShader >,csStringID > const *)arg1)->Contains((CS::StringID< CS::StringSetTag::General > const &)*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -18938,7 +18786,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_In(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -18949,11 +18797,11 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_In(PyObject *SWIGUNUSEDPARM(s
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_In",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_In" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_In" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > const *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_In" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -18962,7 +18810,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_In(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_In" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
   }
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
-  result = (bool)((csHash< csRef< csShaderVariable::iShader >,csStringID > const *)arg1)->In((CS::StringID< CS::StringSetTag::General > const &)*arg2);
+  result = (bool)((csHash< csRef< iShader >,csStringID > const *)arg1)->In((CS::StringID< CS::StringSetTag::General > const &)*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -18972,7 +18820,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetElementPointer__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -18980,14 +18828,14 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetElementPointer__SWIG_0(PyO
   int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_GetElementPointer",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetElementPointer" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetElementPointer" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > const *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_GetElementPointer" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -18996,7 +18844,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetElementPointer__SWIG_0(PyO
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_GetElementPointer" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
   }
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
-  result = (csRef< csShaderVariable::iShader > *)((csHash< csRef< csShaderVariable::iShader >,csStringID > const *)arg1)->GetElementPointer((CS::StringID< CS::StringSetTag::General > const &)*arg2);
+  result = (csRef< iShader > *)((csHash< csRef< iShader >,csStringID > const *)arg1)->GetElementPointer((CS::StringID< CS::StringSetTag::General > const &)*arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
 fail:
@@ -19006,7 +18854,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetElementPointer__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -19014,14 +18862,14 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetElementPointer__SWIG_1(PyO
   int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_GetElementPointer",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetElementPointer" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetElementPointer" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_GetElementPointer" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -19030,7 +18878,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetElementPointer__SWIG_1(PyO
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_GetElementPointer" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
   }
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
-  result = (csRef< csShaderVariable::iShader > *)(arg1)->GetElementPointer((CS::StringID< CS::StringSetTag::General > const &)*arg2);
+  result = (csRef< iShader > *)(arg1)->GetElementPointer((CS::StringID< CS::StringSetTag::General > const &)*arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
 fail:
@@ -19051,7 +18899,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetElementPointer(PyObject *s
   if (argc == 2) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t, 0);
@@ -19064,7 +18912,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetElementPointer(PyObject *s
   if (argc == 2) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t, 0);
@@ -19078,17 +18926,17 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetElementPointer(PyObject *s
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csRefShaderStringIDHash_GetElementPointer'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    GetElementPointer(csHash< csRef< csShaderVariable::iShader >,csStringID > const *,CS::StringID< CS::StringSetTag::General > const &)\n"
-    "    GetElementPointer(csHash< csRef< csShaderVariable::iShader >,csStringID > *,CS::StringID< CS::StringSetTag::General > const &)\n");
+    "    GetElementPointer(csHash< csRef< iShader >,csStringID > const *,CS::StringID< CS::StringSetTag::General > const &)\n"
+    "    GetElementPointer(csHash< csRef< iShader >,csStringID > *,CS::StringID< CS::StringSetTag::General > const &)\n");
   return NULL;
 }
 
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
-  csRef< csShaderVariable::iShader > *arg3 = 0 ;
+  csRef< iShader > *arg3 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -19098,14 +18946,14 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Get(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_Get",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_Get" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_Get" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > const *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_Get" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -19116,15 +18964,15 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Get(PyObject *SWIGUNUSEDPARM(
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csRefT_iShader_t,  0  | 0);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash_Get" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash_Get" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
   if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_Get" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_Get" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
-  arg3 = reinterpret_cast< csRef< csShaderVariable::iShader > * >(argp3);
+  arg3 = reinterpret_cast< csRef< iShader > * >(argp3);
   {
-    csRef< csShaderVariable::iShader > const &_result_ref = ((csHash< csRef< csShaderVariable::iShader >,csStringID > const *)arg1)->Get((CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< csShaderVariable::iShader > const &)*arg3);
-    result = (csRef< csShaderVariable::iShader > *) &_result_ref;
+    csRef< iShader > const &_result_ref = ((csHash< csRef< iShader >,csStringID > const *)arg1)->Get((CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< iShader > const &)*arg3);
+    result = (csRef< iShader > *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
@@ -19135,9 +18983,9 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetOrCreate__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
-  csRef< csShaderVariable::iShader > *arg3 = 0 ;
+  csRef< iShader > *arg3 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -19147,14 +18995,14 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetOrCreate__SWIG_0(PyObject 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_GetOrCreate",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetOrCreate" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetOrCreate" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_GetOrCreate" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -19165,15 +19013,15 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetOrCreate__SWIG_0(PyObject 
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csRefT_iShader_t,  0  | 0);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash_GetOrCreate" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash_GetOrCreate" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
   if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_GetOrCreate" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_GetOrCreate" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
-  arg3 = reinterpret_cast< csRef< csShaderVariable::iShader > * >(argp3);
+  arg3 = reinterpret_cast< csRef< iShader > * >(argp3);
   {
-    csRef< csShaderVariable::iShader > &_result_ref = (arg1)->GetOrCreate((CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< csShaderVariable::iShader > const &)*arg3);
-    result = (csRef< csShaderVariable::iShader > *) &_result_ref;
+    csRef< iShader > &_result_ref = (arg1)->GetOrCreate((CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< iShader > const &)*arg3);
+    result = (csRef< iShader > *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
@@ -19184,7 +19032,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetOrCreate__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -19192,14 +19040,14 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetOrCreate__SWIG_1(PyObject 
   int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_GetOrCreate",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetOrCreate" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetOrCreate" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_GetOrCreate" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -19209,8 +19057,8 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetOrCreate__SWIG_1(PyObject 
   }
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
   {
-    csRef< csShaderVariable::iShader > &_result_ref = (arg1)->GetOrCreate((CS::StringID< CS::StringSetTag::General > const &)*arg2);
-    result = (csRef< csShaderVariable::iShader > *) &_result_ref;
+    csRef< iShader > &_result_ref = (arg1)->GetOrCreate((CS::StringID< CS::StringSetTag::General > const &)*arg2);
+    result = (csRef< iShader > *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
@@ -19232,7 +19080,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetOrCreate(PyObject *self, P
   if (argc == 2) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t, 0);
@@ -19245,7 +19093,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetOrCreate(PyObject *self, P
   if (argc == 3) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t, 0);
@@ -19263,25 +19111,25 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetOrCreate(PyObject *self, P
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csRefShaderStringIDHash_GetOrCreate'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    GetOrCreate(csHash< csRef< csShaderVariable::iShader >,csStringID > *,CS::StringID< CS::StringSetTag::General > const &,csRef< csShaderVariable::iShader > const &)\n"
-    "    GetOrCreate(csHash< csRef< csShaderVariable::iShader >,csStringID > *,CS::StringID< CS::StringSetTag::General > const &)\n");
+    "    GetOrCreate(csHash< csRef< iShader >,csStringID > *,CS::StringID< CS::StringSetTag::General > const &,csRef< iShader > const &)\n"
+    "    GetOrCreate(csHash< csRef< iShader >,csStringID > *,CS::StringID< CS::StringSetTag::General > const &)\n");
   return NULL;
 }
 
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_DeleteAll__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_DeleteAll",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_DeleteAll" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_DeleteAll" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   (arg1)->DeleteAll();
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -19292,17 +19140,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Empty(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_Empty",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_Empty" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_Empty" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   (arg1)->Empty();
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -19313,7 +19161,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_DeleteAll__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -19324,11 +19172,11 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_DeleteAll__SWIG_1(PyObject *S
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_DeleteAll",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_DeleteAll" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_DeleteAll" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_DeleteAll" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -19358,7 +19206,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_DeleteAll(PyObject *self, PyO
   if (argc == 1) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       return _wrap_csRefShaderStringIDHash_DeleteAll__SWIG_0(self, args);
@@ -19367,7 +19215,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_DeleteAll(PyObject *self, PyO
   if (argc == 2) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t, 0);
@@ -19381,17 +19229,17 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_DeleteAll(PyObject *self, PyO
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csRefShaderStringIDHash_DeleteAll'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    DeleteAll(csHash< csRef< csShaderVariable::iShader >,csStringID > *)\n"
-    "    DeleteAll(csHash< csRef< csShaderVariable::iShader >,csStringID > *,CS::StringID< CS::StringSetTag::General > const &)\n");
+    "    DeleteAll(csHash< csRef< iShader >,csStringID > *)\n"
+    "    DeleteAll(csHash< csRef< iShader >,csStringID > *,CS::StringID< CS::StringSetTag::General > const &)\n");
   return NULL;
 }
 
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Delete(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
-  csRef< csShaderVariable::iShader > *arg3 = 0 ;
+  csRef< iShader > *arg3 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -19404,11 +19252,11 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Delete(PyObject *SWIGUNUSEDPA
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_Delete",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_Delete" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_Delete" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash_Delete" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -19419,13 +19267,13 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_Delete(PyObject *SWIGUNUSEDPA
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csRefT_iShader_t,  0  | 0);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash_Delete" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash_Delete" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
   if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_Delete" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash_Delete" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
-  arg3 = reinterpret_cast< csRef< csShaderVariable::iShader > * >(argp3);
-  result = (bool)(arg1)->Delete((CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< csShaderVariable::iShader > const &)*arg3);
+  arg3 = reinterpret_cast< csRef< iShader > * >(argp3);
+  result = (bool)(arg1)->Delete((CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< iShader > const &)*arg3);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -19435,19 +19283,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_GetSize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_GetSize",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetSize" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_GetSize" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > const *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
-  result = ((csHash< csRef< csShaderVariable::iShader >,csStringID > const *)arg1)->GetSize();
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
+  result = ((csHash< csRef< iShader >,csStringID > const *)arg1)->GetSize();
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
@@ -19457,19 +19305,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_IsEmpty(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_IsEmpty",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_IsEmpty" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_IsEmpty" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > const *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
-  result = (bool)((csHash< csRef< csShaderVariable::iShader >,csStringID > const *)arg1)->IsEmpty();
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
+  result = (bool)((csHash< csRef< iShader >,csStringID > const *)arg1)->IsEmpty();
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -19479,7 +19327,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___getitem__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -19487,14 +19335,14 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___getitem__(PyObject *SWIGUNU
   int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash___getitem__",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash___getitem__" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash___getitem__" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash___getitem__" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -19504,8 +19352,8 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___getitem__(PyObject *SWIGUNU
   }
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
   {
-    csRef< csShaderVariable::iShader > const &_result_ref = csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg____getitem__(arg1,(CS::StringID< CS::StringSetTag::General > const &)*arg2);
-    result = (csRef< csShaderVariable::iShader > *) &_result_ref;
+    csRef< iShader > const &_result_ref = csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg____getitem__(arg1,(CS::StringID< CS::StringSetTag::General > const &)*arg2);
+    result = (csRef< iShader > *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
@@ -19516,7 +19364,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___delitem__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -19527,11 +19375,11 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___delitem__(PyObject *SWIGUNU
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash___delitem__",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash___delitem__" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash___delitem__" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash___delitem__" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -19540,7 +19388,7 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___delitem__(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash___delitem__" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
   }
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
-  result = (bool)csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg____delitem__(arg1,(CS::StringID< CS::StringSetTag::General > const &)*arg2);
+  result = (bool)csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg____delitem__(arg1,(CS::StringID< CS::StringSetTag::General > const &)*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -19550,18 +19398,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash_clear",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_clear" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash_clear" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
-  csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg__clear(arg1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
+  csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg__clear(arg1);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -19571,19 +19419,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___nonzero__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash___nonzero__",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash___nonzero__" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash___nonzero__" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
-  result = (bool)csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg____nonzero__(arg1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
+  result = (bool)csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg____nonzero__(arg1);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -19593,9 +19441,9 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___setitem__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   CS::StringID< CS::StringSetTag::General > *arg2 = 0 ;
-  csRef< csShaderVariable::iShader > *arg3 = 0 ;
+  csRef< iShader > *arg3 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -19607,11 +19455,11 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___setitem__(PyObject *SWIGUNU
   PyObject * obj2 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash___setitem__",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash___setitem__" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash___setitem__" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csRefShaderStringIDHash___setitem__" "', argument " "2"" of type '" "CS::StringID< CS::StringSetTag::General > const &""'"); 
@@ -19622,13 +19470,13 @@ SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___setitem__(PyObject *SWIGUNU
   arg2 = reinterpret_cast< CS::StringID< CS::StringSetTag::General > * >(argp2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csRefT_iShader_t,  0  | 0);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash___setitem__" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csRefShaderStringIDHash___setitem__" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
   if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash___setitem__" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csRefShaderStringIDHash___setitem__" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
-  arg3 = reinterpret_cast< csRef< csShaderVariable::iShader > * >(argp3);
-  csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg____setitem__(arg1,(CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< iShader > const &)*arg3);
+  arg3 = reinterpret_cast< csRef< iShader > * >(argp3);
+  csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg____setitem__(arg1,(CS::StringID< CS::StringSetTag::General > const &)*arg2,(csRef< iShader > const &)*arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -19638,19 +19486,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csRefShaderStringIDHash___len__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csRefShaderStringIDHash___len__",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash___len__" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csRefShaderStringIDHash___len__" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
-  result = csHash_Sl_csRef_Sl_csShaderVariable_iShader_Sg__Sc_csStringID_Sg____len__(arg1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
+  result = csHash_Sl_csRef_Sl_iShader_Sg__Sc_csStringID_Sg____len__(arg1);
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
@@ -19660,17 +19508,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_delete_csRefShaderStringIDHash(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csHash< csRef< csShaderVariable::iShader >,csStringID > *arg1 = (csHash< csRef< csShaderVariable::iShader >,csStringID > *) 0 ;
+  csHash< csRef< iShader >,csStringID > *arg1 = (csHash< csRef< iShader >,csStringID > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"delete_csRefShaderStringIDHash",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, SWIG_POINTER_DISOWN |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csRefShaderStringIDHash" "', argument " "1"" of type '" "csHash< csRef< csShaderVariable::iShader >,csStringID > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csRefShaderStringIDHash" "', argument " "1"" of type '" "csHash< csRef< iShader >,csStringID > *""'"); 
   }
-  arg1 = reinterpret_cast< csHash< csRef< csShaderVariable::iShader >,csStringID > * >(argp1);
+  arg1 = reinterpret_cast< csHash< csRef< iShader >,csStringID > * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -19682,7 +19530,7 @@ fail:
 SWIGINTERN PyObject *csRefShaderStringIDHash_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -19696,7 +19544,7 @@ SWIGINTERN PyObject *_wrap_new_iShaderArray__SWIG_0(PyObject *SWIGUNUSEDPARM(sel
   int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  csArray< csRef< csShaderVariable::iShader > > *result = 0 ;
+  csArray< csRef< iShader > > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_iShaderArray",2,2,&obj0,&obj1)) SWIG_fail;
   ecode1 = SWIG_AsVal_size_t(obj0, &val1);
@@ -19712,8 +19560,8 @@ SWIGINTERN PyObject *_wrap_new_iShaderArray__SWIG_0(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_iShaderArray" "', argument " "2"" of type '" "csArrayCapacityFixedGrow< 16 > const &""'"); 
   }
   arg2 = reinterpret_cast< csArrayCapacityFixedGrow< 16 > * >(argp2);
-  result = (csArray< csRef< csShaderVariable::iShader > > *)new csArray< csRef< csShaderVariable::iShader > >(arg1,(csArrayCapacityFixedGrow< 16 > const &)*arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, SWIG_POINTER_NEW |  0 );
+  result = (csArray< csRef< iShader > > *)new csArray< csRef< iShader > >(arg1,(csArrayCapacityFixedGrow< 16 > const &)*arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -19726,7 +19574,7 @@ SWIGINTERN PyObject *_wrap_new_iShaderArray__SWIG_1(PyObject *SWIGUNUSEDPARM(sel
   size_t val1 ;
   int ecode1 = 0 ;
   PyObject * obj0 = 0 ;
-  csArray< csRef< csShaderVariable::iShader > > *result = 0 ;
+  csArray< csRef< iShader > > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_iShaderArray",1,1,&obj0)) SWIG_fail;
   ecode1 = SWIG_AsVal_size_t(obj0, &val1);
@@ -19734,8 +19582,8 @@ SWIGINTERN PyObject *_wrap_new_iShaderArray__SWIG_1(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_iShaderArray" "', argument " "1"" of type '" "size_t""'");
   } 
   arg1 = static_cast< size_t >(val1);
-  result = (csArray< csRef< csShaderVariable::iShader > > *)new csArray< csRef< csShaderVariable::iShader > >(arg1);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, SWIG_POINTER_NEW |  0 );
+  result = (csArray< csRef< iShader > > *)new csArray< csRef< iShader > >(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -19744,11 +19592,11 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_iShaderArray__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *result = 0 ;
+  csArray< csRef< iShader > > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_iShaderArray",0,0)) SWIG_fail;
-  result = (csArray< csRef< csShaderVariable::iShader > > *)new csArray< csRef< csShaderVariable::iShader > >();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, SWIG_POINTER_NEW |  0 );
+  result = (csArray< csRef< iShader > > *)new csArray< csRef< iShader > >();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -19769,7 +19617,7 @@ SWIGINTERN PyObject *_wrap_new_iShaderArray__SWIG_3(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
-  csArray< csRef< csShaderVariable::iShader > > *result = 0 ;
+  csArray< csRef< iShader > > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_iShaderArray",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   ecode1 = SWIG_AsVal_size_t(obj0, &val1);
@@ -19793,8 +19641,8 @@ SWIGINTERN PyObject *_wrap_new_iShaderArray__SWIG_3(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_iShaderArray" "', argument " "3"" of type '" "csArrayCapacityFixedGrow< 16 > const &""'"); 
   }
   arg3 = reinterpret_cast< csArrayCapacityFixedGrow< 16 > * >(argp3);
-  result = (csArray< csRef< csShaderVariable::iShader > > *)new csArray< csRef< csShaderVariable::iShader > >(arg1,(CS::Memory::AllocatorMalloc const &)*arg2,(csArrayCapacityFixedGrow< 16 > const &)*arg3);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, SWIG_POINTER_NEW |  0 );
+  result = (csArray< csRef< iShader > > *)new csArray< csRef< iShader > >(arg1,(CS::Memory::AllocatorMalloc const &)*arg2,(csArrayCapacityFixedGrow< 16 > const &)*arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -19803,17 +19651,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_delete_iShaderArray(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"delete_iShaderArray",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, SWIG_POINTER_DISOWN |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iShaderArray" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iShaderArray" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -19824,23 +19672,23 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_iShaderArray__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = 0 ;
+  csArray< csRef< iShader > > *arg1 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  csArray< csRef< csShaderVariable::iShader > > *result = 0 ;
+  csArray< csRef< iShader > > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_iShaderArray",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csArrayT_csRefT_iShader_t_t,  0  | 0);
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_iShaderArray" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_iShaderArray" "', argument " "1"" of type '" "csArray< csRef< iShader > > const &""'"); 
   }
   if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_iShaderArray" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_iShaderArray" "', argument " "1"" of type '" "csArray< csRef< iShader > > const &""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
-  result = (csArray< csRef< csShaderVariable::iShader > > *)new csArray< csRef< csShaderVariable::iShader > >((csArray< csRef< csShaderVariable::iShader > > const &)*arg1);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, SWIG_POINTER_NEW |  0 );
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
+  result = (csArray< csRef< iShader > > *)new csArray< csRef< iShader > >((csArray< csRef< iShader > > const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -19862,7 +19710,7 @@ SWIGINTERN PyObject *_wrap_new_iShaderArray(PyObject *self, PyObject *args) {
   }
   if (argc == 1) {
     int _v;
-    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       return _wrap_new_iShaderArray__SWIG_4(self, args);
@@ -19914,30 +19762,30 @@ SWIGINTERN PyObject *_wrap_new_iShaderArray(PyObject *self, PyObject *args) {
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_iShaderArray'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    csArray< csRef< csShaderVariable::iShader > >(size_t,csArrayCapacityFixedGrow< 16 > const &)\n"
-    "    csArray< csRef< csShaderVariable::iShader > >(size_t)\n"
-    "    csArray< csRef< csShaderVariable::iShader > >()\n"
-    "    csArray< csRef< csShaderVariable::iShader > >(size_t,CS::Memory::AllocatorMalloc const &,csArrayCapacityFixedGrow< 16 > const &)\n"
-    "    csArray< csRef< csShaderVariable::iShader > >(csArray< csRef< csShaderVariable::iShader > > const &)\n");
+    "    csArray< csRef< iShader > >(size_t,csArrayCapacityFixedGrow< 16 > const &)\n"
+    "    csArray< csRef< iShader > >(size_t)\n"
+    "    csArray< csRef< iShader > >()\n"
+    "    csArray< csRef< iShader > >(size_t,CS::Memory::AllocatorMalloc const &,csArrayCapacityFixedGrow< 16 > const &)\n"
+    "    csArray< csRef< iShader > >(csArray< csRef< iShader > > const &)\n");
   return NULL;
 }
 
 
 SWIGINTERN PyObject *_wrap_iShaderArray_GetSize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_GetSize",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_GetSize" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_GetSize" "', argument " "1"" of type '" "csArray< csRef< iShader > > const *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
-  result = ((csArray< csRef< csShaderVariable::iShader > > const *)arg1)->GetSize();
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
+  result = ((csArray< csRef< iShader > > const *)arg1)->GetSize();
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
@@ -19947,7 +19795,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Get__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -19955,22 +19803,22 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Get__SWIG_0(PyObject *SWIGUNUSEDPARM(sel
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Get",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Get" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Get" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderArray_Get" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
   {
-    csRef< csShaderVariable::iShader > &_result_ref = (arg1)->Get(arg2);
-    result = (csRef< csShaderVariable::iShader > *) &_result_ref;
+    csRef< iShader > &_result_ref = (arg1)->Get(arg2);
+    result = (csRef< iShader > *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
@@ -19981,7 +19829,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Get__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -19989,22 +19837,22 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Get__SWIG_1(PyObject *SWIGUNUSEDPARM(sel
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Get",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Get" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Get" "', argument " "1"" of type '" "csArray< csRef< iShader > > const *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderArray_Get" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
   {
-    csRef< csShaderVariable::iShader > const &_result_ref = ((csArray< csRef< csShaderVariable::iShader > > const *)arg1)->Get(arg2);
-    result = (csRef< csShaderVariable::iShader > *) &_result_ref;
+    csRef< iShader > const &_result_ref = ((csArray< csRef< iShader > > const *)arg1)->Get(arg2);
+    result = (csRef< iShader > *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
@@ -20026,7 +19874,7 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Get(PyObject *self, PyObject *args) {
   if (argc == 2) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       {
@@ -20041,7 +19889,7 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Get(PyObject *self, PyObject *args) {
   if (argc == 2) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       {
@@ -20057,17 +19905,17 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Get(PyObject *self, PyObject *args) {
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iShaderArray_Get'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    Get(csArray< csRef< csShaderVariable::iShader > > *,size_t)\n"
-    "    Get(csArray< csRef< csShaderVariable::iShader > > const *,size_t)\n");
+    "    Get(csArray< csRef< iShader > > *,size_t)\n"
+    "    Get(csArray< csRef< iShader > > const *,size_t)\n");
   return NULL;
 }
 
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Put(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   size_t arg2 ;
-  csRef< csShaderVariable::iShader > *arg3 = 0 ;
+  csRef< iShader > *arg3 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   size_t val2 ;
@@ -20079,11 +19927,11 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Put(PyObject *SWIGUNUSEDPARM(self), PyOb
   PyObject * obj2 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Put",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Put" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Put" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderArray_Put" "', argument " "2"" of type '" "size_t""'");
@@ -20091,13 +19939,13 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Put(PyObject *SWIGUNUSEDPARM(self), PyOb
   arg2 = static_cast< size_t >(val2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csRefT_iShader_t,  0  | 0);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShaderArray_Put" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShaderArray_Put" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
   if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_Put" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_Put" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
-  arg3 = reinterpret_cast< csRef< csShaderVariable::iShader > * >(argp3);
-  (arg1)->Put(arg2,(csRef< csShaderVariable::iShader > const &)*arg3);
+  arg3 = reinterpret_cast< csRef< iShader > * >(argp3);
+  (arg1)->Put(arg2,(csRef< iShader > const &)*arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -20107,8 +19955,8 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Push(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
-  csRef< csShaderVariable::iShader > *arg2 = 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
+  csRef< iShader > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -20118,20 +19966,20 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Push(PyObject *SWIGUNUSEDPARM(self), PyO
   size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Push",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Push" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Push" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csRefT_iShader_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray_Push" "', argument " "2"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray_Push" "', argument " "2"" of type '" "csRef< iShader > const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_Push" "', argument " "2"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_Push" "', argument " "2"" of type '" "csRef< iShader > const &""'"); 
   }
-  arg2 = reinterpret_cast< csRef< csShaderVariable::iShader > * >(argp2);
-  result = (arg1)->Push((csRef< csShaderVariable::iShader > const &)*arg2);
+  arg2 = reinterpret_cast< csRef< iShader > * >(argp2);
+  result = (arg1)->Push((csRef< iShader > const &)*arg2);
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
@@ -20141,18 +19989,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Pop(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   SwigValueWrapper< csRef< iShader > > result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Pop",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Pop" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Pop" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   result = (arg1)->Pop();
   {
     csRef<iShader> ref((csRef<iShader>&)result); /* explicit cast */
@@ -20173,21 +20021,21 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Top__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Top",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Top" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Top" "', argument " "1"" of type '" "csArray< csRef< iShader > > const *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   {
-    csRef< csShaderVariable::iShader > const &_result_ref = ((csArray< csRef< csShaderVariable::iShader > > const *)arg1)->Top();
-    result = (csRef< csShaderVariable::iShader > *) &_result_ref;
+    csRef< iShader > const &_result_ref = ((csArray< csRef< iShader > > const *)arg1)->Top();
+    result = (csRef< iShader > *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
@@ -20198,21 +20046,21 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Top__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  csRef< csShaderVariable::iShader > *result = 0 ;
+  csRef< iShader > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Top",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Top" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Top" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   {
-    csRef< csShaderVariable::iShader > &_result_ref = (arg1)->Top();
-    result = (csRef< csShaderVariable::iShader > *) &_result_ref;
+    csRef< iShader > &_result_ref = (arg1)->Top();
+    result = (csRef< iShader > *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iShader_t, 0 |  0 );
   return resultobj;
@@ -20234,7 +20082,7 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Top(PyObject *self, PyObject *args) {
   if (argc == 1) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       return _wrap_iShaderArray_Top__SWIG_1(self, args);
@@ -20243,7 +20091,7 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Top(PyObject *self, PyObject *args) {
   if (argc == 1) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       return _wrap_iShaderArray_Top__SWIG_0(self, args);
@@ -20253,17 +20101,17 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Top(PyObject *self, PyObject *args) {
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iShaderArray_Top'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    Top(csArray< csRef< csShaderVariable::iShader > > const *)\n"
-    "    Top(csArray< csRef< csShaderVariable::iShader > > *)\n");
+    "    Top(csArray< csRef< iShader > > const *)\n"
+    "    Top(csArray< csRef< iShader > > *)\n");
   return NULL;
 }
 
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Insert(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   size_t arg2 ;
-  csRef< csShaderVariable::iShader > *arg3 = 0 ;
+  csRef< iShader > *arg3 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   size_t val2 ;
@@ -20276,11 +20124,11 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Insert(PyObject *SWIGUNUSEDPARM(self), P
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Insert",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Insert" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Insert" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderArray_Insert" "', argument " "2"" of type '" "size_t""'");
@@ -20288,13 +20136,13 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Insert(PyObject *SWIGUNUSEDPARM(self), P
   arg2 = static_cast< size_t >(val2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csRefT_iShader_t,  0  | 0);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShaderArray_Insert" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShaderArray_Insert" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
   if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_Insert" "', argument " "3"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_Insert" "', argument " "3"" of type '" "csRef< iShader > const &""'"); 
   }
-  arg3 = reinterpret_cast< csRef< csShaderVariable::iShader > * >(argp3);
-  result = (bool)(arg1)->Insert(arg2,(csRef< csShaderVariable::iShader > const &)*arg3);
+  arg3 = reinterpret_cast< csRef< iShader > * >(argp3);
+  result = (bool)(arg1)->Insert(arg2,(csRef< iShader > const &)*arg3);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -20304,8 +20152,8 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Contains(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
-  csRef< csShaderVariable::iShader > *arg2 = 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
+  csRef< iShader > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -20315,20 +20163,20 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Contains(PyObject *SWIGUNUSEDPARM(self),
   size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Contains",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Contains" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Contains" "', argument " "1"" of type '" "csArray< csRef< iShader > > const *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csRefT_iShader_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray_Contains" "', argument " "2"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray_Contains" "', argument " "2"" of type '" "csRef< iShader > const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_Contains" "', argument " "2"" of type '" "csRef< csShaderVariable::iShader > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_Contains" "', argument " "2"" of type '" "csRef< iShader > const &""'"); 
   }
-  arg2 = reinterpret_cast< csRef< csShaderVariable::iShader > * >(argp2);
-  result = ((csArray< csRef< csShaderVariable::iShader > > const *)arg1)->Contains((csRef< csShaderVariable::iShader > const &)*arg2);
+  arg2 = reinterpret_cast< csRef< iShader > * >(argp2);
+  result = ((csArray< csRef< iShader > > const *)arg1)->Contains((csRef< iShader > const &)*arg2);
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
@@ -20338,17 +20186,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_DeleteAll(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_DeleteAll",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_DeleteAll" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_DeleteAll" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   (arg1)->DeleteAll();
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -20359,7 +20207,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Truncate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -20369,11 +20217,11 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Truncate(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Truncate",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Truncate" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Truncate" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderArray_Truncate" "', argument " "2"" of type '" "size_t""'");
@@ -20389,17 +20237,17 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_Empty(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Empty",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Empty" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Empty" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   (arg1)->Empty();
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -20410,19 +20258,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_IsEmpty(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_IsEmpty",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_IsEmpty" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_IsEmpty" "', argument " "1"" of type '" "csArray< csRef< iShader > > const *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
-  result = (bool)((csArray< csRef< csShaderVariable::iShader > > const *)arg1)->IsEmpty();
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
+  result = (bool)((csArray< csRef< iShader > > const *)arg1)->IsEmpty();
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -20432,7 +20280,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_SetMinimalCapacity(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -20442,11 +20290,11 @@ SWIGINTERN PyObject *_wrap_iShaderArray_SetMinimalCapacity(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_SetMinimalCapacity",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_SetMinimalCapacity" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_SetMinimalCapacity" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderArray_SetMinimalCapacity" "', argument " "2"" of type '" "size_t""'");
@@ -20462,7 +20310,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_DeleteIndex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -20473,11 +20321,11 @@ SWIGINTERN PyObject *_wrap_iShaderArray_DeleteIndex(PyObject *SWIGUNUSEDPARM(sel
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_DeleteIndex",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_DeleteIndex" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_DeleteIndex" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderArray_DeleteIndex" "', argument " "2"" of type '" "size_t""'");
@@ -20493,7 +20341,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_DeleteIndexFast(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -20504,11 +20352,11 @@ SWIGINTERN PyObject *_wrap_iShaderArray_DeleteIndexFast(PyObject *SWIGUNUSEDPARM
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_DeleteIndexFast",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_DeleteIndexFast" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_DeleteIndexFast" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderArray_DeleteIndexFast" "', argument " "2"" of type '" "size_t""'");
@@ -20524,7 +20372,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_DeleteRange(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   size_t arg2 ;
   size_t arg3 ;
   void *argp1 = 0 ;
@@ -20539,11 +20387,11 @@ SWIGINTERN PyObject *_wrap_iShaderArray_DeleteRange(PyObject *SWIGUNUSEDPARM(sel
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_DeleteRange",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_DeleteRange" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_DeleteRange" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderArray_DeleteRange" "', argument " "2"" of type '" "size_t""'");
@@ -20564,8 +20412,8 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray___eq__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
-  csArray< csRef< csShaderVariable::iShader > > *arg2 = 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -20575,20 +20423,20 @@ SWIGINTERN PyObject *_wrap_iShaderArray___eq__(PyObject *SWIGUNUSEDPARM(self), P
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray___eq__",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray___eq__" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray___eq__" "', argument " "1"" of type '" "csArray< csRef< iShader > > const *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csRefT_iShader_t_t,  0  | 0);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray___eq__" "', argument " "2"" of type '" "csArray< csRef< csShaderVariable::iShader > > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray___eq__" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray___eq__" "', argument " "2"" of type '" "csArray< csRef< csShaderVariable::iShader > > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray___eq__" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
   }
-  arg2 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp2);
-  result = (bool)((csArray< csRef< csShaderVariable::iShader > > const *)arg1)->operator ==((csArray< csRef< csShaderVariable::iShader > > const &)*arg2);
+  arg2 = reinterpret_cast< csArray< csRef< iShader > > * >(argp2);
+  result = (bool)((csArray< csRef< iShader > > const *)arg1)->operator ==((csArray< csRef< iShader > > const &)*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -20598,8 +20446,8 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray___ne__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
-  csArray< csRef< csShaderVariable::iShader > > *arg2 = 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -20609,20 +20457,20 @@ SWIGINTERN PyObject *_wrap_iShaderArray___ne__(PyObject *SWIGUNUSEDPARM(self), P
   bool result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray___ne__",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray___ne__" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray___ne__" "', argument " "1"" of type '" "csArray< csRef< iShader > > const *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csRefT_iShader_t_t,  0  | 0);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray___ne__" "', argument " "2"" of type '" "csArray< csRef< csShaderVariable::iShader > > const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray___ne__" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray___ne__" "', argument " "2"" of type '" "csArray< csRef< csShaderVariable::iShader > > const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray___ne__" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
   }
-  arg2 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp2);
-  result = (bool)((csArray< csRef< csShaderVariable::iShader > > const *)arg1)->operator !=((csArray< csRef< csShaderVariable::iShader > > const &)*arg2);
+  arg2 = reinterpret_cast< csArray< csRef< iShader > > * >(argp2);
+  result = (bool)((csArray< csRef< iShader > > const *)arg1)->operator !=((csArray< csRef< iShader > > const &)*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -20632,20 +20480,20 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iShaderArray_GetAllocator(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csArray< csRef< csShaderVariable::iShader > > *arg1 = (csArray< csRef< csShaderVariable::iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   CS::Memory::AllocatorMalloc *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_GetAllocator",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_GetAllocator" "', argument " "1"" of type '" "csArray< csRef< csShaderVariable::iShader > > const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_GetAllocator" "', argument " "1"" of type '" "csArray< csRef< iShader > > const *""'"); 
   }
-  arg1 = reinterpret_cast< csArray< csRef< csShaderVariable::iShader > > * >(argp1);
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
   {
-    CS::Memory::AllocatorMalloc const &_result_ref = ((csArray< csRef< csShaderVariable::iShader > > const *)arg1)->GetAllocator();
+    CS::Memory::AllocatorMalloc const &_result_ref = ((csArray< csRef< iShader > > const *)arg1)->GetAllocator();
     result = (CS::Memory::AllocatorMalloc *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Memory__AllocatorMalloc, 0 |  0 );
@@ -20658,7 +20506,7 @@ fail:
 SWIGINTERN PyObject *iShaderArray_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csArrayT_csRefT_iShader_t_t, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -23363,7 +23211,7 @@ SWIGINTERN PyObject *_wrap_iMaterial_GetShaders(PyObject *SWIGUNUSEDPARM(self), 
     csHash< csRef< iShader >,csStringID > const &_result_ref = ((iMaterial const *)arg1)->GetShaders();
     result = (csHash< csRef< iShader >,csStringID > *) &_result_ref;
   }
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -23395,11 +23243,9 @@ fail:
 SWIGINTERN PyObject *_wrap_iMaterial_GetTexture__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iMaterial *arg1 = (iMaterial *) 0 ;
-  CS::ShaderVarStringID arg2 ;
+  SwigValueWrapper< CS::StringID< CS::StringSetTag::ShaderVar > > arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   iTextureHandle *result = 0 ;
@@ -23411,17 +23257,7 @@ SWIGINTERN PyObject *_wrap_iMaterial_GetTexture__SWIG_1(PyObject *SWIGUNUSEDPARM
   }
   arg1 = reinterpret_cast< iMaterial * >(argp1);
   {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__ShaderVarStringID,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iMaterial_GetTexture" "', argument " "2"" of type '" "CS::ShaderVarStringID""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iMaterial_GetTexture" "', argument " "2"" of type '" "CS::ShaderVarStringID""'");
-    } else {
-      CS::ShaderVarStringID * temp = reinterpret_cast< CS::ShaderVarStringID * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
+    arg2 = (CS::ShaderVarStringID)PyLong_AsUnsignedLong(obj1);
   }
   result = (iTextureHandle *)(arg1)->GetTexture(arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iTextureHandle, 0 |  0 );
@@ -23456,8 +23292,9 @@ SWIGINTERN PyObject *_wrap_iMaterial_GetTexture(PyObject *self, PyObject *args) 
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iMaterial, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__ShaderVarStringID, 0);
-      _v = SWIG_CheckState(res);
+      {
+        _v = (PyLong_Check(argv[1]) || PyInt_Check(argv[1]));
+      }
       if (_v) {
         return _wrap_iMaterial_GetTexture__SWIG_1(self, args);
       }
@@ -23599,6 +23436,8 @@ fail:
 
 
 static PyMethodDef SwigMethods[] = {
+	 { (char *)"_SetSCFPointer", _wrap__SetSCFPointer, METH_VARARGS, NULL},
+	 { (char *)"_GetSCFPointer", _wrap__GetSCFPointer, METH_VARARGS, NULL},
 	 { (char *)"csPixelCoord_x_set", _wrap_csPixelCoord_x_set, METH_VARARGS, NULL},
 	 { (char *)"csPixelCoord_x_get", _wrap_csPixelCoord_x_get, METH_VARARGS, NULL},
 	 { (char *)"csPixelCoord_y_set", _wrap_csPixelCoord_y_set, METH_VARARGS, NULL},
@@ -23955,8 +23794,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iShaderManager_SetTagOptions", _wrap_iShaderManager_SetTagOptions, METH_VARARGS, NULL},
 	 { (char *)"iShaderManager_GetTagOptions", _wrap_iShaderManager_GetTagOptions, METH_VARARGS, NULL},
 	 { (char *)"iShaderManager_GetTags", _wrap_iShaderManager_GetTags, METH_VARARGS, NULL},
-	 { (char *)"iShaderManager_SetActiveLights", _wrap_iShaderManager_SetActiveLights, METH_VARARGS, NULL},
-	 { (char *)"iShaderManager_GetActiveLights", _wrap_iShaderManager_GetActiveLights, METH_VARARGS, NULL},
 	 { (char *)"iShaderManager_GetSVNameStringset", _wrap_iShaderManager_GetSVNameStringset, METH_VARARGS, NULL},
 	 { (char *)"iShaderManager_GetShaderCache", _wrap_iShaderManager_GetShaderCache, METH_VARARGS, NULL},
 	 { (char *)"iShaderManager_AddSubShaderCache", _wrap_iShaderManager_AddSubShaderCache, METH_VARARGS, NULL},
@@ -24091,23 +23928,8 @@ static PyMethodDef SwigMethods[] = {
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
-static void *_p_csShaderVariable__CS__Graphics__RenderMeshTo_p_csShaderVariable__CS__Graphics__RenderMeshModes(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((csShaderVariable::CS::Graphics::RenderMeshModes *)  ((csShaderVariable::CS::Graphics::RenderMesh *) x));
-}
-static void *_p_scfImplementation1T_csImageBase_iImage_tTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iImage *)  ((scfImplementation1< csImageBase,iImage > *) x));
-}
-static void *_p_csImageBaseTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *) ((csImageBase *) x));
-}
-static void *_p_csImageMemoryTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *)(csImageBase *)(scfImplementationExt0< csImageMemory,csShaderVariable::csImageBase > *) ((csImageMemory *) x));
-}
-static void *_p_scfImplementationExt0T_csImageMemory_csImageBase_tTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *)(csImageBase *) ((scfImplementationExt0< csImageMemory,csImageBase > *) x));
-}
-static void *_p_csShaderVariable__CS__Graphics__RenderMeshTo_p_csShaderVariable__CS__Graphics__CoreRenderMesh(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((csShaderVariable::CS::Graphics::CoreRenderMesh *)  ((csShaderVariable::CS::Graphics::RenderMesh *) x));
+static void *_p_CS__Graphics__RenderMeshTo_p_CS__Graphics__CoreRenderMesh(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Graphics::CoreRenderMesh *)  ((CS::Graphics::RenderMesh *) x));
 }
 static void *_p_scfImplementation1T_csObject_iObject_tTo_p_iObject(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iObject *)  ((scfImplementation1< csObject,iObject > *) x));
@@ -24126,6 +23948,33 @@ static void *_p_iShaderTo_p_iShaderVariableContext(void *x, int *SWIGUNUSEDPARM(
 }
 static void *_p_iMaterialTo_p_iShaderVariableContext(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iShaderVariableContext *)  ((iMaterial *) x));
+}
+static void *_p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csVector2 > *) x));
+}
+static void *_p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csVector3 > *) x));
+}
+static void *_p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< unsigned int > *) x));
+}
+static void *_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csImageIOFileFormatDescription const * > *) x));
+}
+static void *_p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csVector4 > *) x));
+}
+static void *_p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csPluginRequest > *) x));
+}
+static void *_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csRef< iShader > > *) x));
+}
+static void *_p_CS__Graphics__RenderMeshTo_p_CS__Graphics__RenderMeshModes(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Graphics::RenderMeshModes *)  ((CS::Graphics::RenderMesh *) x));
+}
+static void *_p_csImageBaseTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iBase *) (iImage *)(scfImplementation1< csImageBase,iImage > *) ((csImageBase *) x));
 }
 static void *_p_iDocumentNodeIteratorTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iDocumentNodeIterator *) x));
@@ -24175,11 +24024,11 @@ static void *_p_iShaderVarStringSetTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newme
 static void *_p_iStringSetTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *) (iStringSetBase< CS::StringSetTag::General > *) ((iStringSet *) x));
 }
-static void *_p_iFontServerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iBase *)  ((iFontServer *) x));
-}
 static void *_p_iFactoryTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iFactory *) x));
+}
+static void *_p_iFontServerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iBase *)  ((iFontServer *) x));
 }
 static void *_p_iEventTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iEvent *) x));
@@ -24268,11 +24117,11 @@ static void *_p_iStringTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
 static void *_p_iComponentTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iComponent *) x));
 }
-static void *_p_iShaderVariableContextTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iBase *)  ((iShaderVariableContext *) x));
-}
 static void *_p_iCommandLineParserTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iCommandLineParser *) x));
+}
+static void *_p_iShaderVariableContextTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iBase *)  ((iShaderVariableContext *) x));
 }
 static void *_p_iJoystickDriverTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iJoystickDriver *) x));
@@ -24294,6 +24143,9 @@ static void *_p_iMaterialTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
 }
 static void *_p_iEventHandlerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iEventHandler *) x));
+}
+static void *_p_csImageMemoryTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iBase *) (iImage *)(scfImplementation1< csImageBase,iImage > *)(csImageBase *)(scfImplementationExt0< csImageMemory,csImageBase > *) ((csImageMemory *) x));
 }
 static void *_p_iStringSetBaseT_CS__StringSetTag__ShaderVar_tTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iStringSetBase< CS::StringSetTag::ShaderVar > *) x));
@@ -24343,6 +24195,9 @@ static void *_p_iTextureManagerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory
 static void *_p_iAnimatedImageTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iAnimatedImage *) x));
 }
+static void *_p_scfImplementationExt0T_csImageMemory_csImageBase_tTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iBase *) (iImage *)(scfImplementation1< csImageBase,iImage > *)(csImageBase *) ((scfImplementationExt0< csImageMemory,csImageBase > *) x));
+}
 static void *_p_scfImplementation1T_csConfigFile_iConfigFile_tTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *) (iConfigFile *) ((scfImplementation1< csConfigFile,iConfigFile > *) x));
 }
@@ -24351,6 +24206,9 @@ static void *_p_iDataBufferTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
 }
 static void *_p_iShaderCompilerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iShaderCompiler *) x));
+}
+static void *_p_scfImplementation1T_csImageBase_iImage_tTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iBase *) (iImage *) ((scfImplementation1< csImageBase,iImage > *) x));
 }
 static void *_p_iKeyboardDriverTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iKeyboardDriver *) x));
@@ -24361,35 +24219,26 @@ static void *_p_iReporterListenerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemo
 static void *_p_iObjectNameChangeListenerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iObjectNameChangeListener *) x));
 }
-static void *_p_iHaloTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iBase *)  ((iHalo *) x));
-}
 static void *_p_iFileTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iFile *) x));
+}
+static void *_p_iHaloTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iBase *)  ((iHalo *) x));
 }
 static void *_p_iDocumentAttributeTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iDocumentAttribute *) x));
 }
-static void *_p_csArrayT_csVector2_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csVector2 > *) x));
+static void *_p_scfImplementation1T_csImageBase_iImage_tTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iImage *)  ((scfImplementation1< csImageBase,iImage > *) x));
 }
-static void *_p_csArrayT_csVector3_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csVector3 > *) x));
+static void *_p_csImageBaseTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *) ((csImageBase *) x));
 }
-static void *_p_csArrayT_unsigned_int_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< unsigned int > *) x));
+static void *_p_csImageMemoryTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *)(csImageBase *)(scfImplementationExt0< csImageMemory,csImageBase > *) ((csImageMemory *) x));
 }
-static void *_p_csArrayT_csImageIOFileFormatDescription_const_p_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csImageIOFileFormatDescription const * > *) x));
-}
-static void *_p_csArrayT_csVector4_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csVector4 > *) x));
-}
-static void *_p_csArrayT_csPluginRequest_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csPluginRequest > *) x));
-}
-static void *_p_csArrayT_csRefT_iShader_t_tTo_p_CS__Memory__CustomAllocated(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Memory::CustomAllocated *)  ((csArray< csRef< iShader > > *) x));
+static void *_p_scfImplementationExt0T_csImageMemory_csImageBase_tTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *)(csImageBase *) ((scfImplementationExt0< csImageMemory,csImageBase > *) x));
 }
 static swig_type_info _swigt__p_AllocatorType = {"_p_AllocatorType", "AllocatorType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Graphics__AlphaTestOptions = {"_p_CS__Graphics__AlphaTestOptions", "CS::Graphics::AlphaTestOptions *", 0, 0, (void*)0, 0};
@@ -24401,14 +24250,13 @@ static swig_type_info _swigt__p_CS__Graphics__TextureComparisonMode = {"_p_CS__G
 static swig_type_info _swigt__p_CS__Math__Matrix4 = {"_p_CS__Math__Matrix4", "CS::Math::Matrix4 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Memory__AllocatorMalloc = {"_p_CS__Memory__AllocatorMalloc", "CS::Container::ArrayAllocDefault *|CS::Memory::AllocatorMalloc *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Memory__CustomAllocated = {"_p_CS__Memory__CustomAllocated", "CS::Memory::CustomAllocated *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csArrayT_csVector4_t = {"_p_csArrayT_csVector4_t", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_csArrayT_csPluginRequest_t = {"_p_csArrayT_csPluginRequest_t", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_csArrayT_csVector2_t = {"_p_csArrayT_csVector2_t", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_csArrayT_unsigned_int_t = {"_p_csArrayT_unsigned_int_t", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_csArrayT_csVector3_t = {"_p_csArrayT_csVector3_t", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_CS__ShaderVarStringID = {"_p_CS__ShaderVarStringID", "CS::ShaderVarStringID *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_CS__StringIDT_CS__StringSetTag__General_t = {"_p_CS__StringIDT_CS__StringSetTag__General_t", "csStringID *|csEventID *|CS::StringID< CS::StringSetTag::General > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__StringIDValue = {"_p_CS__StringIDValue", "CS::StringIDValue *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t = {"_p_CS__StringIDT_CS__StringSetTag__ShaderVar_t", "CS::ShaderVarStringID *|CS::StringID< CS::StringSetTag::ShaderVar > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__StructuredTextureFormat = {"_p_CS__StructuredTextureFormat", "CS::StructuredTextureFormat *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Utility__StringSetT_CS__StringSetTag__General_t = {"_p_CS__Utility__StringSetT_CS__StringSetTag__General_t", "CS::Utility::StringSet< CS::StringSetTag::General > *|csStringSet *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CapacityHandlerType = {"_p_CapacityHandlerType", "CapacityHandlerType *", 0, 0, (void*)0, 0};
@@ -24433,17 +24281,15 @@ static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csAlphaMode = {"_p_csAlphaMode", "csAlphaMode *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayCapacityFixedGrowT_16_t = {"_p_csArrayCapacityFixedGrowT_16_t", "CS::Container::ArrayCapacityDefault *|csArrayCapacityFixedGrow< 16 > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayCapacityVariableGrow = {"_p_csArrayCapacityVariableGrow", "csArrayCapacityDefault *|csArrayCapacityVariableGrow *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_t = {"_p_csArrayT_csImageIOFileFormatDescription_const_p_t", "csImageIOFileFormatDescriptions *|csArray< csImageIOFileFormatDescription const * > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csArrayT_csRefT_iShader_t_t = {"_p_csArrayT_csRefT_iShader_t_t", "csArray< csRef< iShader > > *|csArray< csRef< csShaderVariable::iShader > > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csArrayT_iLight_p_t = {"_p_csArrayT_iLight_p_t", "csArray< iLight * > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csImageIOFileFormatDescriptions *|csArray< csImageIOFileFormatDescription const *,csArrayElementHandler< csImageIOFileFormatDescription const * >,CS::Memory::AllocatorMalloc,csArrayCapacityFixedGrow< 16 > > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csArray< csRef< iShader > > *|csArray< csRef< iShader >,csArrayElementHandler< csRef< iShader > >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csBitArray = {"_p_csBitArray", "csBitArray *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csBitmapMetrics = {"_p_csBitmapMetrics", "csBitmapMetrics *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csBox3 = {"_p_csBox3", "csBox3 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csFlags = {"_p_csFlags", "csFlags *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csGlyphMetrics = {"_p_csGlyphMetrics", "csGlyphMetrics *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csGraphics3DCaps = {"_p_csGraphics3DCaps", "csGraphics3DCaps *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t = {"_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t", "csHash< csRef< iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< iShader >,CS::StringID< CS::StringSetTag::General > > > > *|csHash< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< csShaderVariable::iShader >,CS::StringID< CS::StringSetTag::General > > > > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t = {"_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t", "csHash< csRef< iShader >,CS::StringID< CS::StringSetTag::General > > *|csHash< csRef< iShader >,csStringID > *|csHash< csRef< csShaderVariable::iShader >,csStringID > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t = {"_p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t", "csHash< csRef< iShader >,CS::StringID< CS::StringSetTag::General > > *|csHash< csRef< iShader >,CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler< CS::Container::HashElement< csRef< iShader >,CS::StringID< CS::StringSetTag::General > > > > *|csHash< csRef< iShader >,csStringID > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPixelCoord = {"_p_csPixelCoord", "csPixelCoord *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPlane3 = {"_p_csPlane3", "csPlane3 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPtrT_iShaderPriorityList_t = {"_p_csPtrT_iShaderPriorityList_t", "csPtr< iShaderPriorityList > *", 0, 0, (void*)0, 0};
@@ -24454,23 +24300,16 @@ static swig_type_info _swigt__p_csRefArrayT_iObject_t = {"_p_csRefArrayT_iObject
 static swig_type_info _swigt__p_csRefArrayT_iShader_t = {"_p_csRefArrayT_iShader_t", "csRefArray< iShader > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefT_csRenderBufferHolder_t = {"_p_csRefT_csRenderBufferHolder_t", "csRef< csRenderBufferHolder > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefT_iShaderVariableContext_t = {"_p_csRefT_iShaderVariableContext_t", "csRef< iShaderVariableContext > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csRefT_iShader_t = {"_p_csRefT_iShader_t", "csRef< iShader > *|csRef< csShaderVariable::iShader > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csRefT_iShader_t = {"_p_csRefT_iShader_t", "csRef< iShader > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRenderBufferHolder = {"_p_csRenderBufferHolder", "csRenderBufferHolder *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRenderBufferName = {"_p_csRenderBufferName", "csRenderBufferName *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRenderTargetAttachment = {"_p_csRenderTargetAttachment", "enum csRenderTargetAttachment *|csRenderTargetAttachment *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csReversibleTransform = {"_p_csReversibleTransform", "csReversibleTransform *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_t = {"_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_t", "csSet< csStringID > *|csSet< CS::StringID< CS::StringSetTag::General > > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t = {"_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t", "csSet< csStringID > *|csSet< CS::StringID< CS::StringSetTag::General >,CS::Memory::AllocatorMalloc > *|csSet< CS::StringID< CS::StringSetTag::General > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csShaderMetadata = {"_p_csShaderMetadata", "csShaderMetadata *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csShaderTagPresence = {"_p_csShaderTagPresence", "enum csShaderTagPresence *|csShaderTagPresence *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csShaderVariable = {"_p_csShaderVariable", "csShaderVariable *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csShaderVariableStack = {"_p_csShaderVariableStack", "csShaderVariableStack *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csShaderVariable__CS__Graphics__AlphaTestOptions = {"_p_csShaderVariable__CS__Graphics__AlphaTestOptions", "csShaderVariable::CS::Graphics::AlphaTestOptions *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csShaderVariable__CS__Graphics__CoreRenderMesh = {"_p_csShaderVariable__CS__Graphics__CoreRenderMesh", "csShaderVariable::CS::Graphics::CoreRenderMesh *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csShaderVariable__CS__Graphics__RenderMesh = {"_p_csShaderVariable__CS__Graphics__RenderMesh", "csShaderVariable::CS::Graphics::RenderMesh *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csShaderVariable__CS__Graphics__RenderMeshIndexRange = {"_p_csShaderVariable__CS__Graphics__RenderMeshIndexRange", "csShaderVariable::CS::Graphics::RenderMeshIndexRange *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csShaderVariable__CS__Graphics__RenderMeshModes = {"_p_csShaderVariable__CS__Graphics__RenderMeshModes", "csShaderVariable::CS::Graphics::RenderMeshModes *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csShaderVariable__CS__Graphics__RenderPriority = {"_p_csShaderVariable__CS__Graphics__RenderPriority", "csShaderVariable::CS::Graphics::RenderPriority *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csShaderVariable__CS__Graphics__TextureComparisonMode = {"_p_csShaderVariable__CS__Graphics__TextureComparisonMode", "csShaderVariable::CS::Graphics::TextureComparisonMode *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csSimpleRenderMesh = {"_p_csSimpleRenderMesh", "csSimpleRenderMesh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csVector2 = {"_p_csVector2", "csVector2 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csVector3 = {"_p_csVector3", "csVector3 *", 0, 0, (void*)0, 0};
@@ -24478,6 +24317,7 @@ static swig_type_info _swigt__p_csVector4 = {"_p_csVector4", "csVector4 *", 0, 0
 static swig_type_info _swigt__p_csVertexAttrib = {"_p_csVertexAttrib", "enum csVertexAttrib *|csVertexAttrib *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_float = {"_p_float", "float *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iBase = {"_p_iBase", "iBase *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csImageBase = {"_p_csImageBase", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iDocumentNodeIterator = {"_p_iDocumentNodeIterator", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iDocumentAttributeIterator = {"_p_iDocumentAttributeIterator", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iConfigIterator = {"_p_iConfigIterator", 0, 0, 0, 0, 0};
@@ -24487,7 +24327,6 @@ static swig_type_info _swigt__p_iObjectRegistryIterator = {"_p_iObjectRegistryIt
 static swig_type_info _swigt__p_iEventAttributeIterator = {"_p_iEventAttributeIterator", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iPluginIterator = {"_p_iPluginIterator", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iDocument = {"_p_iDocument", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_csImageBase = {"_p_csImageBase", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iImageIO = {"_p_iImageIO", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iObjectRegistry = {"_p_iObjectRegistry", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEventNameRegistry = {"_p_iEventNameRegistry", 0, 0, 0, 0, 0};
@@ -24512,7 +24351,6 @@ static swig_type_info _swigt__p_iPath = {"_p_iPath", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iReporter = {"_p_iReporter", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_scfImplementation1T_csImageBase_iImage_t = {"_p_scfImplementation1T_csImageBase_iImage_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csObject = {"_p_csObject", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_iSCF = {"_p_iSCF", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEventQueue = {"_p_iEventQueue", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEvent = {"_p_iEvent", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iString = {"_p_iString", 0, 0, 0, 0, 0};
@@ -24559,6 +24397,7 @@ static swig_type_info _swigt__p_iNativeWindow = {"_p_iNativeWindow", "iNativeWin
 static swig_type_info _swigt__p_iNativeWindowManager = {"_p_iNativeWindowManager", "iNativeWindowManager *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iObject = {"_p_iObject", "iObject *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iPortalContainer = {"_p_iPortalContainer", "iPortalContainer *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_iSCF = {"_p_iSCF", "iSCF *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iShader = {"_p_iShader", "iShader *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iShaderCompiler = {"_p_iShaderCompiler", "iShaderCompiler *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iShaderManager = {"_p_iShaderManager", "iShaderManager *", 0, 0, (void*)0, 0};
@@ -24568,7 +24407,7 @@ static swig_type_info _swigt__p_iShaderVariableAccessor = {"_p_iShaderVariableAc
 static swig_type_info _swigt__p_iShaderVariableContext = {"_p_iShaderVariableContext", "iShaderVariableContext *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iTextureHandle = {"_p_iTextureHandle", "iTextureHandle *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iTextureManager = {"_p_iTextureManager", "iTextureManager *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int = {"_p_int", "int *|int32 *|scfInterfaceVersion *|int32_t *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int = {"_p_int", "int *|int32 *|scfInterfaceVersion *|int32_t *|CS::Graphics::RenderPriority *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int16_t = {"_p_int16_t", "int16 *|int16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *|int64 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int8_t = {"_p_int8_t", "int8 *|int8_t *", 0, 0, (void*)0, 0};
@@ -24583,7 +24422,7 @@ static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *"
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8 *|uint8_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *|uint *|csTicks *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "CS::StringIDValue *|unsigned int *|uint *|csTicks *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "unsigned long *|scfInterfaceID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long_long = {"_p_unsigned_long_long", "ulonglong *|unsigned long long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_void = {"_p_void", "void *", 0, 0, (void*)0, 0};
@@ -24600,9 +24439,8 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_CS__Math__Matrix4,
   &_swigt__p_CS__Memory__AllocatorMalloc,
   &_swigt__p_CS__Memory__CustomAllocated,
-  &_swigt__p_CS__ShaderVarStringID,
   &_swigt__p_CS__StringIDT_CS__StringSetTag__General_t,
-  &_swigt__p_CS__StringIDValue,
+  &_swigt__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t,
   &_swigt__p_CS__StructuredTextureFormat,
   &_swigt__p_CS__Utility__StringSetT_CS__StringSetTag__General_t,
   &_swigt__p_CapacityHandlerType,
@@ -24627,14 +24465,13 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csAlphaMode,
   &_swigt__p_csArrayCapacityFixedGrowT_16_t,
   &_swigt__p_csArrayCapacityVariableGrow,
-  &_swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_t,
-  &_swigt__p_csArrayT_csPluginRequest_t,
-  &_swigt__p_csArrayT_csRefT_iShader_t_t,
-  &_swigt__p_csArrayT_csVector2_t,
-  &_swigt__p_csArrayT_csVector3_t,
-  &_swigt__p_csArrayT_csVector4_t,
-  &_swigt__p_csArrayT_iLight_p_t,
-  &_swigt__p_csArrayT_unsigned_int_t,
+  &_swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  &_swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  &_swigt__p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  &_swigt__p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  &_swigt__p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  &_swigt__p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  &_swigt__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   &_swigt__p_csBitArray,
   &_swigt__p_csBitmapMetrics,
   &_swigt__p_csBox3,
@@ -24643,7 +24480,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csGlyphMetrics,
   &_swigt__p_csGraphics3DCaps,
   &_swigt__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t,
-  &_swigt__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t,
   &_swigt__p_csImageBase,
   &_swigt__p_csImageMemory,
   &_swigt__p_csObject,
@@ -24662,18 +24498,11 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csRenderBufferName,
   &_swigt__p_csRenderTargetAttachment,
   &_swigt__p_csReversibleTransform,
-  &_swigt__p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_t,
+  &_swigt__p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,
   &_swigt__p_csShaderMetadata,
   &_swigt__p_csShaderTagPresence,
   &_swigt__p_csShaderVariable,
   &_swigt__p_csShaderVariableStack,
-  &_swigt__p_csShaderVariable__CS__Graphics__AlphaTestOptions,
-  &_swigt__p_csShaderVariable__CS__Graphics__CoreRenderMesh,
-  &_swigt__p_csShaderVariable__CS__Graphics__RenderMesh,
-  &_swigt__p_csShaderVariable__CS__Graphics__RenderMeshIndexRange,
-  &_swigt__p_csShaderVariable__CS__Graphics__RenderMeshModes,
-  &_swigt__p_csShaderVariable__CS__Graphics__RenderPriority,
-  &_swigt__p_csShaderVariable__CS__Graphics__TextureComparisonMode,
   &_swigt__p_csSimpleRenderMesh,
   &_swigt__p_csVector2,
   &_swigt__p_csVector3,
@@ -24791,22 +24620,21 @@ static swig_type_info *swig_type_initial[] = {
 
 static swig_cast_info _swigc__p_AllocatorType[] = {  {&_swigt__p_AllocatorType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Graphics__AlphaTestOptions[] = {  {&_swigt__p_CS__Graphics__AlphaTestOptions, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Graphics__CoreRenderMesh[] = {  {&_swigt__p_CS__Graphics__CoreRenderMesh, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Graphics__CoreRenderMesh[] = {  {&_swigt__p_CS__Graphics__CoreRenderMesh, 0, 0, 0},  {&_swigt__p_CS__Graphics__RenderMesh, _p_CS__Graphics__RenderMeshTo_p_CS__Graphics__CoreRenderMesh, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Graphics__RenderMesh[] = {  {&_swigt__p_CS__Graphics__RenderMesh, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Graphics__RenderMeshIndexRange[] = {  {&_swigt__p_CS__Graphics__RenderMeshIndexRange, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Graphics__RenderMeshModes[] = {  {&_swigt__p_CS__Graphics__RenderMeshModes, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Graphics__RenderMeshModes[] = {  {&_swigt__p_CS__Graphics__RenderMesh, _p_CS__Graphics__RenderMeshTo_p_CS__Graphics__RenderMeshModes, 0, 0},  {&_swigt__p_CS__Graphics__RenderMeshModes, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Graphics__TextureComparisonMode[] = {  {&_swigt__p_CS__Graphics__TextureComparisonMode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Math__Matrix4[] = {  {&_swigt__p_CS__Math__Matrix4, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Memory__AllocatorMalloc[] = {  {&_swigt__p_CS__Memory__AllocatorMalloc, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayT_csVector4_t[] = {{&_swigt__p_csArrayT_csVector4_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayT_csPluginRequest_t[] = {{&_swigt__p_csArrayT_csPluginRequest_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayT_csVector2_t[] = {{&_swigt__p_csArrayT_csVector2_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayT_unsigned_int_t[] = {{&_swigt__p_csArrayT_unsigned_int_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayT_csVector3_t[] = {{&_swigt__p_csArrayT_csVector3_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_t, _p_csArrayT_csImageIOFileFormatDescription_const_p_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector4_t, _p_csArrayT_csVector4_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csPluginRequest_t, _p_csArrayT_csPluginRequest_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csRefT_iShader_t_t, _p_csArrayT_csRefT_iShader_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector2_t, _p_csArrayT_csVector2_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_unsigned_int_t, _p_csArrayT_unsigned_int_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector3_t, _p_csArrayT_csVector3_tTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__ShaderVarStringID[] = {  {&_swigt__p_CS__ShaderVarStringID, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {{&_swigt__p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {{&_swigt__p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {{&_swigt__p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {{&_swigt__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {{&_swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__StringIDT_CS__StringSetTag__General_t[] = {  {&_swigt__p_CS__StringIDT_CS__StringSetTag__General_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__StringIDValue[] = {  {&_swigt__p_CS__StringIDValue, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t[] = {  {&_swigt__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__StructuredTextureFormat[] = {  {&_swigt__p_CS__StructuredTextureFormat, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Utility__StringSetT_CS__StringSetTag__General_t[] = {  {&_swigt__p_CS__Utility__StringSetT_CS__StringSetTag__General_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CapacityHandlerType[] = {  {&_swigt__p_CapacityHandlerType, 0, 0, 0},{0, 0, 0, 0}};
@@ -24831,9 +24659,8 @@ static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_csAlphaMode[] = {  {&_swigt__p_csAlphaMode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayCapacityFixedGrowT_16_t[] = {  {&_swigt__p_csArrayCapacityFixedGrowT_16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayCapacityVariableGrow[] = {  {&_swigt__p_csArrayCapacityVariableGrow, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayT_csImageIOFileFormatDescription_const_p_t[] = {  {&_swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayT_csRefT_iShader_t_t[] = {  {&_swigt__p_csArrayT_csRefT_iShader_t_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayT_iLight_p_t[] = {  {&_swigt__p_csArrayT_iLight_p_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBitArray[] = {  {&_swigt__p_csBitArray, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBitmapMetrics[] = {  {&_swigt__p_csBitmapMetrics, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBox3[] = {  {&_swigt__p_csBox3, 0, 0, 0},{0, 0, 0, 0}};
@@ -24841,7 +24668,6 @@ static swig_cast_info _swigc__p_csFlags[] = {  {&_swigt__p_csFlags, 0, 0, 0},{0,
 static swig_cast_info _swigc__p_csGlyphMetrics[] = {  {&_swigt__p_csGlyphMetrics, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csGraphics3DCaps[] = {  {&_swigt__p_csGraphics3DCaps, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t[] = {  {&_swigt__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t[] = {  {&_swigt__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPixelCoord[] = {  {&_swigt__p_csPixelCoord, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPlane3[] = {  {&_swigt__p_csPlane3, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPtrT_iShaderPriorityList_t[] = {  {&_swigt__p_csPtrT_iShaderPriorityList_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -24857,24 +24683,18 @@ static swig_cast_info _swigc__p_csRenderBufferHolder[] = {  {&_swigt__p_csRender
 static swig_cast_info _swigc__p_csRenderBufferName[] = {  {&_swigt__p_csRenderBufferName, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRenderTargetAttachment[] = {  {&_swigt__p_csRenderTargetAttachment, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csReversibleTransform[] = {  {&_swigt__p_csReversibleTransform, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_t[] = {  {&_swigt__p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t[] = {  {&_swigt__p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csShaderMetadata[] = {  {&_swigt__p_csShaderMetadata, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csShaderTagPresence[] = {  {&_swigt__p_csShaderTagPresence, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csShaderVariable[] = {  {&_swigt__p_csShaderVariable, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csShaderVariableStack[] = {  {&_swigt__p_csShaderVariableStack, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csShaderVariable__CS__Graphics__AlphaTestOptions[] = {  {&_swigt__p_csShaderVariable__CS__Graphics__AlphaTestOptions, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csShaderVariable__CS__Graphics__CoreRenderMesh[] = {  {&_swigt__p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0, 0, 0},  {&_swigt__p_csShaderVariable__CS__Graphics__RenderMesh, _p_csShaderVariable__CS__Graphics__RenderMeshTo_p_csShaderVariable__CS__Graphics__CoreRenderMesh, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csShaderVariable__CS__Graphics__RenderMesh[] = {  {&_swigt__p_csShaderVariable__CS__Graphics__RenderMesh, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csShaderVariable__CS__Graphics__RenderMeshIndexRange[] = {  {&_swigt__p_csShaderVariable__CS__Graphics__RenderMeshIndexRange, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csShaderVariable__CS__Graphics__RenderMeshModes[] = {  {&_swigt__p_csShaderVariable__CS__Graphics__RenderMesh, _p_csShaderVariable__CS__Graphics__RenderMeshTo_p_csShaderVariable__CS__Graphics__RenderMeshModes, 0, 0},  {&_swigt__p_csShaderVariable__CS__Graphics__RenderMeshModes, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csShaderVariable__CS__Graphics__RenderPriority[] = {  {&_swigt__p_csShaderVariable__CS__Graphics__RenderPriority, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csShaderVariable__CS__Graphics__TextureComparisonMode[] = {  {&_swigt__p_csShaderVariable__CS__Graphics__TextureComparisonMode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csSimpleRenderMesh[] = {  {&_swigt__p_csSimpleRenderMesh, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csVector2[] = {  {&_swigt__p_csVector2, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csVector3[] = {  {&_swigt__p_csVector3, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csVector4[] = {  {&_swigt__p_csVector4, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csVertexAttrib[] = {  {&_swigt__p_csVertexAttrib, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_float[] = {  {&_swigt__p_float, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csImageBase[] = {{&_swigt__p_csImageBase, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDocumentNodeIterator[] = {{&_swigt__p_iDocumentNodeIterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDocumentAttributeIterator[] = {{&_swigt__p_iDocumentAttributeIterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iConfigIterator[] = {{&_swigt__p_iConfigIterator, 0, 0, 0},{0, 0, 0, 0}};
@@ -24884,7 +24704,6 @@ static swig_cast_info _swigc__p_iObjectRegistryIterator[] = {{&_swigt__p_iObject
 static swig_cast_info _swigc__p_iEventAttributeIterator[] = {{&_swigt__p_iEventAttributeIterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iPluginIterator[] = {{&_swigt__p_iPluginIterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDocument[] = {{&_swigt__p_iDocument, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csImageBase[] = {{&_swigt__p_csImageBase, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iImageIO[] = {{&_swigt__p_iImageIO, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iObjectRegistry[] = {{&_swigt__p_iObjectRegistry, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEventNameRegistry[] = {{&_swigt__p_iEventNameRegistry, 0, 0, 0},{0, 0, 0, 0}};
@@ -24909,7 +24728,6 @@ static swig_cast_info _swigc__p_iPath[] = {{&_swigt__p_iPath, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_iReporter[] = {{&_swigt__p_iReporter, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_scfImplementation1T_csImageBase_iImage_t[] = {{&_swigt__p_scfImplementation1T_csImageBase_iImage_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csObject[] = {{&_swigt__p_csObject, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iSCF[] = {{&_swigt__p_iSCF, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEventQueue[] = {{&_swigt__p_iEventQueue, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEvent[] = {{&_swigt__p_iEvent, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iString[] = {{&_swigt__p_iString, 0, 0, 0},{0, 0, 0, 0}};
@@ -24938,7 +24756,7 @@ static swig_cast_info _swigc__p_iReporterListener[] = {{&_swigt__p_iReporterList
 static swig_cast_info _swigc__p_iObjectNameChangeListener[] = {{&_swigt__p_iObjectNameChangeListener, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iFile[] = {{&_swigt__p_iFile, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDocumentAttribute[] = {{&_swigt__p_iDocumentAttribute, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_csImageBase, 0, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVarStringSet, _p_iShaderVarStringSetTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t, _p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_iFontServer, _p_iFontServerTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeAllT_csShaderVariable_p_t, _p_iArrayChangeAllT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeElementsT_csShaderVariable_p_t, _p_iArrayChangeElementsT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayReadOnlyT_csShaderVariable_p_t, _p_iArrayReadOnlyT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseT_CS__StringSetTag__ShaderVar_t, _p_iStringSetBaseT_CS__StringSetTag__ShaderVar_tTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iGraphics2D, _p_iGraphics2DTo_p_iBase, 0, 0},  {&_swigt__p_iFontDeleteNotify, _p_iFontDeleteNotifyTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_iThreadReturn, _p_iThreadReturnTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csConfigFile_iConfigFile_t, _p_scfImplementation1T_csConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csImageBase_iImage_t, 0, 0, 0},  {&_swigt__p_iShaderPriorityList, _p_iShaderPriorityListTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iTextureHandle, _p_iTextureHandleTo_p_iBase, 0, 0},  {&_swigt__p_iShader, _p_iShaderTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iNativeWindow, _p_iNativeWindowTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVariableContext, _p_iShaderVariableContextTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iMaterial, _p_iMaterialTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_csImageMemory, 0, 0, 0},  {&_swigt__p_iProcTexture, _p_iProcTextureTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iGraphics3D, _p_iGraphics3DTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iFont, _p_iFontTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVariableAccessor, _p_iShaderVariableAccessorTo_p_iBase, 0, 0},  {&_swigt__p_iNativeWindowManager, _p_iNativeWindowManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iThreadManager, _p_iThreadManagerTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTextureManager, _p_iTextureManagerTo_p_iBase, 0, 0},  {&_swigt__p_iShaderManager, _p_iShaderManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iAnimatedImage, _p_iAnimatedImageTo_p_iBase, 0, 0},  {&_swigt__p_iShaderCompiler, _p_iShaderCompilerTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseT_CS__StringSetTag__General_t, _p_iStringSetBaseT_CS__StringSetTag__General_tTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csObject_iObject_t, _p_scfImplementation1T_csObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt0T_csImageMemory_csImageBase_t, 0, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iHalo, _p_iHaloTo_p_iBase, 0, 0},  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_csImageBase, _p_csImageBaseTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVarStringSet, _p_iShaderVarStringSetTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t, _p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_iFontServer, _p_iFontServerTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeAllT_csShaderVariable_p_t, _p_iArrayChangeAllT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeElementsT_csShaderVariable_p_t, _p_iArrayChangeElementsT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayReadOnlyT_csShaderVariable_p_t, _p_iArrayReadOnlyT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseT_CS__StringSetTag__ShaderVar_t, _p_iStringSetBaseT_CS__StringSetTag__ShaderVar_tTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iGraphics2D, _p_iGraphics2DTo_p_iBase, 0, 0},  {&_swigt__p_iFontDeleteNotify, _p_iFontDeleteNotifyTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_iThreadReturn, _p_iThreadReturnTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csConfigFile_iConfigFile_t, _p_scfImplementation1T_csConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csImageBase_iImage_t, _p_scfImplementation1T_csImageBase_iImage_tTo_p_iBase, 0, 0},  {&_swigt__p_iShaderPriorityList, _p_iShaderPriorityListTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iTextureHandle, _p_iTextureHandleTo_p_iBase, 0, 0},  {&_swigt__p_iShader, _p_iShaderTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iNativeWindow, _p_iNativeWindowTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVariableContext, _p_iShaderVariableContextTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iMaterial, _p_iMaterialTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_csImageMemory, _p_csImageMemoryTo_p_iBase, 0, 0},  {&_swigt__p_iProcTexture, _p_iProcTextureTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iGraphics3D, _p_iGraphics3DTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iFont, _p_iFontTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVariableAccessor, _p_iShaderVariableAccessorTo_p_iBase, 0, 0},  {&_swigt__p_iNativeWindowManager, _p_iNativeWindowManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iThreadManager, _p_iThreadManagerTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTextureManager, _p_iTextureManagerTo_p_iBase, 0, 0},  {&_swigt__p_iShaderManager, _p_iShaderManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iAnimatedImage, _p_iAnimatedImageTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_iShaderCompiler, _p_iShaderCompilerTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseT_CS__StringSetTag__General_t, _p_iStringSetBaseT_CS__StringSetTag__General_tTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csObject_iObject_t, _p_scfImplementation1T_csObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt0T_csImageMemory_csImageBase_t, _p_scfImplementationExt0T_csImageMemory_csImageBase_tTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_iHalo, _p_iHaloTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iClipper2D[] = {  {&_swigt__p_iClipper2D, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDocumentNode[] = {  {&_swigt__p_iDocumentNode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iFont[] = {  {&_swigt__p_iFont, 0, 0, 0},{0, 0, 0, 0}};
@@ -24957,6 +24775,7 @@ static swig_cast_info _swigc__p_iNativeWindow[] = {  {&_swigt__p_iNativeWindow, 
 static swig_cast_info _swigc__p_iNativeWindowManager[] = {  {&_swigt__p_iNativeWindowManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iObject[] = {  {&_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t, _p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_iObject, 0, 0},  {&_swigt__p_iObject, 0, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementation1T_csObject_iObject_t, _p_scfImplementation1T_csObject_iObject_tTo_p_iObject, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iPortalContainer[] = {  {&_swigt__p_iPortalContainer, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iSCF[] = {  {&_swigt__p_iSCF, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShader[] = {  {&_swigt__p_iShader, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShaderCompiler[] = {  {&_swigt__p_iShaderCompiler, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShaderManager[] = {  {&_swigt__p_iShaderManager, 0, 0, 0},{0, 0, 0, 0}};
@@ -24998,9 +24817,8 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_CS__Math__Matrix4,
   _swigc__p_CS__Memory__AllocatorMalloc,
   _swigc__p_CS__Memory__CustomAllocated,
-  _swigc__p_CS__ShaderVarStringID,
   _swigc__p_CS__StringIDT_CS__StringSetTag__General_t,
-  _swigc__p_CS__StringIDValue,
+  _swigc__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t,
   _swigc__p_CS__StructuredTextureFormat,
   _swigc__p_CS__Utility__StringSetT_CS__StringSetTag__General_t,
   _swigc__p_CapacityHandlerType,
@@ -25025,14 +24843,13 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csAlphaMode,
   _swigc__p_csArrayCapacityFixedGrowT_16_t,
   _swigc__p_csArrayCapacityVariableGrow,
-  _swigc__p_csArrayT_csImageIOFileFormatDescription_const_p_t,
-  _swigc__p_csArrayT_csPluginRequest_t,
-  _swigc__p_csArrayT_csRefT_iShader_t_t,
-  _swigc__p_csArrayT_csVector2_t,
-  _swigc__p_csArrayT_csVector3_t,
-  _swigc__p_csArrayT_csVector4_t,
-  _swigc__p_csArrayT_iLight_p_t,
-  _swigc__p_csArrayT_unsigned_int_t,
+  _swigc__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  _swigc__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  _swigc__p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  _swigc__p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  _swigc__p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  _swigc__p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  _swigc__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   _swigc__p_csBitArray,
   _swigc__p_csBitmapMetrics,
   _swigc__p_csBox3,
@@ -25041,7 +24858,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csGlyphMetrics,
   _swigc__p_csGraphics3DCaps,
   _swigc__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerT_CS__Container__HashElementT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t_t_t,
-  _swigc__p_csHashT_csRefT_iShader_t_CS__StringIDT_CS__StringSetTag__General_t_t,
   _swigc__p_csImageBase,
   _swigc__p_csImageMemory,
   _swigc__p_csObject,
@@ -25060,18 +24876,11 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csRenderBufferName,
   _swigc__p_csRenderTargetAttachment,
   _swigc__p_csReversibleTransform,
-  _swigc__p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_t,
+  _swigc__p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,
   _swigc__p_csShaderMetadata,
   _swigc__p_csShaderTagPresence,
   _swigc__p_csShaderVariable,
   _swigc__p_csShaderVariableStack,
-  _swigc__p_csShaderVariable__CS__Graphics__AlphaTestOptions,
-  _swigc__p_csShaderVariable__CS__Graphics__CoreRenderMesh,
-  _swigc__p_csShaderVariable__CS__Graphics__RenderMesh,
-  _swigc__p_csShaderVariable__CS__Graphics__RenderMeshIndexRange,
-  _swigc__p_csShaderVariable__CS__Graphics__RenderMeshModes,
-  _swigc__p_csShaderVariable__CS__Graphics__RenderPriority,
-  _swigc__p_csShaderVariable__CS__Graphics__TextureComparisonMode,
   _swigc__p_csSimpleRenderMesh,
   _swigc__p_csVector2,
   _swigc__p_csVector3,
@@ -25804,9 +25613,9 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_FX_FLAT",SWIG_From_int(static_cast< int >((0x04000000))));
   SWIG_Python_SetConstant(d, "CS_FX_MASK_ALPHA",SWIG_From_int(static_cast< int >((0x000000FF))));
   SWIG_Python_SetConstant(d, "CS_FX_MASK_MIXMODE",SWIG_From_int(static_cast< int >((0xf8ffff00))));
-  SWIG_Python_SetConstant(d, "csAlphaMode_alphaNone",SWIG_From_int(static_cast< int >(csShaderVariable::csAlphaMode::alphaNone)));
-  SWIG_Python_SetConstant(d, "csAlphaMode_alphaBinary",SWIG_From_int(static_cast< int >(csShaderVariable::csAlphaMode::alphaBinary)));
-  SWIG_Python_SetConstant(d, "csAlphaMode_alphaSmooth",SWIG_From_int(static_cast< int >(csShaderVariable::csAlphaMode::alphaSmooth)));
+  SWIG_Python_SetConstant(d, "csAlphaMode_alphaNone",SWIG_From_int(static_cast< int >(csAlphaMode::alphaNone)));
+  SWIG_Python_SetConstant(d, "csAlphaMode_alphaBinary",SWIG_From_int(static_cast< int >(csAlphaMode::alphaBinary)));
+  SWIG_Python_SetConstant(d, "csAlphaMode_alphaSmooth",SWIG_From_int(static_cast< int >(csAlphaMode::alphaSmooth)));
   SWIG_Python_SetConstant(d, "CS_LIGHTPARAM_POSITION",SWIG_From_int(static_cast< int >(0)));
   SWIG_Python_SetConstant(d, "CS_LIGHTPARAM_DIFFUSE",SWIG_From_int(static_cast< int >(1)));
   SWIG_Python_SetConstant(d, "CS_LIGHTPARAM_SPECULAR",SWIG_From_int(static_cast< int >(2)));
@@ -25847,10 +25656,10 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "rtaDepth",SWIG_From_int(static_cast< int >(rtaDepth)));
   SWIG_Python_SetConstant(d, "rtaColor0",SWIG_From_int(static_cast< int >(rtaColor0)));
   SWIG_Python_SetConstant(d, "rtaNumAttachments",SWIG_From_int(static_cast< int >(rtaNumAttachments)));
-  SWIG_Python_SetConstant(d, "TextureComparisonMode_compareNone",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::TextureComparisonMode::compareNone)));
-  SWIG_Python_SetConstant(d, "TextureComparisonMode_compareR",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::TextureComparisonMode::compareR)));
-  SWIG_Python_SetConstant(d, "TextureComparisonMode_funcLEqual",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::TextureComparisonMode::funcLEqual)));
-  SWIG_Python_SetConstant(d, "TextureComparisonMode_funcGEqual",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::TextureComparisonMode::funcGEqual)));
+  SWIG_Python_SetConstant(d, "TextureComparisonMode_compareNone",SWIG_From_int(static_cast< int >(CS::Graphics::TextureComparisonMode::compareNone)));
+  SWIG_Python_SetConstant(d, "TextureComparisonMode_compareR",SWIG_From_int(static_cast< int >(CS::Graphics::TextureComparisonMode::compareR)));
+  SWIG_Python_SetConstant(d, "TextureComparisonMode_funcLEqual",SWIG_From_int(static_cast< int >(CS::Graphics::TextureComparisonMode::funcLEqual)));
+  SWIG_Python_SetConstant(d, "TextureComparisonMode_funcGEqual",SWIG_From_int(static_cast< int >(CS::Graphics::TextureComparisonMode::funcGEqual)));
   SWIG_Python_SetConstant(d, "csmcNone",SWIG_From_int(static_cast< int >(csmcNone)));
   SWIG_Python_SetConstant(d, "csmcArrow",SWIG_From_int(static_cast< int >(csmcArrow)));
   SWIG_Python_SetConstant(d, "csmcLens",SWIG_From_int(static_cast< int >(csmcLens)));
@@ -25866,13 +25675,13 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_ALERT_ERROR",SWIG_From_int(static_cast< int >(1)));
   SWIG_Python_SetConstant(d, "CS_ALERT_WARNING",SWIG_From_int(static_cast< int >(2)));
   SWIG_Python_SetConstant(d, "CS_ALERT_NOTE",SWIG_From_int(static_cast< int >(3)));
-  SWIG_Python_SetConstant(d, "cullNormal",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::cullNormal)));
-  SWIG_Python_SetConstant(d, "cullFlipped",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::cullFlipped)));
-  SWIG_Python_SetConstant(d, "cullDisabled",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::cullDisabled)));
-  SWIG_Python_SetConstant(d, "atfGreaterEqual",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::atfGreaterEqual)));
-  SWIG_Python_SetConstant(d, "atfGreater",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::atfGreater)));
-  SWIG_Python_SetConstant(d, "atfLowerEqual",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::atfLowerEqual)));
-  SWIG_Python_SetConstant(d, "atfLower",SWIG_From_int(static_cast< int >(csShaderVariable::CS::Graphics::atfLower)));
+  SWIG_Python_SetConstant(d, "cullNormal",SWIG_From_int(static_cast< int >(CS::Graphics::cullNormal)));
+  SWIG_Python_SetConstant(d, "cullFlipped",SWIG_From_int(static_cast< int >(CS::Graphics::cullFlipped)));
+  SWIG_Python_SetConstant(d, "cullDisabled",SWIG_From_int(static_cast< int >(CS::Graphics::cullDisabled)));
+  SWIG_Python_SetConstant(d, "atfGreaterEqual",SWIG_From_int(static_cast< int >(CS::Graphics::atfGreaterEqual)));
+  SWIG_Python_SetConstant(d, "atfGreater",SWIG_From_int(static_cast< int >(CS::Graphics::atfGreater)));
+  SWIG_Python_SetConstant(d, "atfLowerEqual",SWIG_From_int(static_cast< int >(CS::Graphics::atfLowerEqual)));
+  SWIG_Python_SetConstant(d, "atfLower",SWIG_From_int(static_cast< int >(CS::Graphics::atfLower)));
   SWIG_Python_SetConstant(d, "CSFONT_LARGE",SWIG_FromCharPtr("*large"));
   SWIG_Python_SetConstant(d, "CSFONT_ITALIC",SWIG_FromCharPtr("*italic"));
   SWIG_Python_SetConstant(d, "CSFONT_COURIER",SWIG_FromCharPtr("*courier"));
@@ -25881,28 +25690,28 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "TagNeutral",SWIG_From_int(static_cast< int >(TagNeutral)));
   SWIG_Python_SetConstant(d, "TagForbidden",SWIG_From_int(static_cast< int >(TagForbidden)));
   SWIG_Python_SetConstant(d, "TagRequired",SWIG_From_int(static_cast< int >(TagRequired)));
-  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityLowest",SWIG_From_int(static_cast< int >(csShaderVariable::iShaderManager::cachePriorityLowest)));
-  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityGlobal",SWIG_From_int(static_cast< int >(csShaderVariable::iShaderManager::cachePriorityGlobal)));
-  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityApp",SWIG_From_int(static_cast< int >(csShaderVariable::iShaderManager::cachePriorityApp)));
-  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityUser",SWIG_From_int(static_cast< int >(csShaderVariable::iShaderManager::cachePriorityUser)));
-  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityHighest",SWIG_From_int(static_cast< int >(csShaderVariable::iShaderManager::cachePriorityHighest)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_POS_X",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::CS_TEXTURE_CUBE_POS_X)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_NEG_X",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::CS_TEXTURE_CUBE_NEG_X)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_POS_Y",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::CS_TEXTURE_CUBE_POS_Y)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_NEG_Y",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::CS_TEXTURE_CUBE_NEG_Y)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_POS_Z",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::CS_TEXTURE_CUBE_POS_Z)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_NEG_Z",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::CS_TEXTURE_CUBE_NEG_Z)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_RGBA8888",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::RGBA8888)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_BGRA8888",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::BGRA8888)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_texType1D",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::texType1D)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_texType2D",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::texType2D)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_texType3D",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::texType3D)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_texTypeCube",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::texTypeCube)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_texTypeRect",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::texTypeRect)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_blitbufReadable",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::blitbufReadable)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_blitbufRetainArea",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::blitbufRetainArea)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_natureIndirect",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::natureIndirect)));
-  SWIG_Python_SetConstant(d, "iTextureHandle_natureDirect",SWIG_From_int(static_cast< int >(csShaderVariable::iTextureHandle::natureDirect)));
+  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityLowest",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityLowest)));
+  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityGlobal",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityGlobal)));
+  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityApp",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityApp)));
+  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityUser",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityUser)));
+  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityHighest",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityHighest)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_POS_X",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_POS_X)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_NEG_X",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_NEG_X)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_POS_Y",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_POS_Y)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_NEG_Y",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_NEG_Y)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_POS_Z",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_POS_Z)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_NEG_Z",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_NEG_Z)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_RGBA8888",SWIG_From_int(static_cast< int >(iTextureHandle::RGBA8888)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_BGRA8888",SWIG_From_int(static_cast< int >(iTextureHandle::BGRA8888)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_texType1D",SWIG_From_int(static_cast< int >(iTextureHandle::texType1D)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_texType2D",SWIG_From_int(static_cast< int >(iTextureHandle::texType2D)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_texType3D",SWIG_From_int(static_cast< int >(iTextureHandle::texType3D)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_texTypeCube",SWIG_From_int(static_cast< int >(iTextureHandle::texTypeCube)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_texTypeRect",SWIG_From_int(static_cast< int >(iTextureHandle::texTypeRect)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_blitbufReadable",SWIG_From_int(static_cast< int >(iTextureHandle::blitbufReadable)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_blitbufRetainArea",SWIG_From_int(static_cast< int >(iTextureHandle::blitbufRetainArea)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_natureIndirect",SWIG_From_int(static_cast< int >(iTextureHandle::natureIndirect)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_natureDirect",SWIG_From_int(static_cast< int >(iTextureHandle::natureDirect)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_2D",SWIG_From_int(static_cast< int >(0x00000001)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_3D",SWIG_From_int(static_cast< int >(0x00000002)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_NOMIPMAPS",SWIG_From_int(static_cast< int >(0x00000008)));

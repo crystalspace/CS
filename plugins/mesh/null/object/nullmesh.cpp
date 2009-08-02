@@ -38,7 +38,7 @@
 csNullmeshMeshObject::csNullmeshMeshObject (csNullmeshMeshFactory* factory,
                                             iMeshObjectType* parent)
   : scfImplementationType(this), nullmesh_type (parent), logparent (0),
-  vis_cb (0), hitbeam_mesh(0)
+  hitbeam_mesh(0), vis_cb (0)
 {
   csNullmeshMeshObject::factory = factory;
   radius = factory->GetRadius ();

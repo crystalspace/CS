@@ -337,10 +337,11 @@
             <Property Name='UnifiedSize' Value='{{0.0,224.0},{0.0,330.0}}'/>
 	    <Property Name='UnifiedPosition' Value='{{0.01,0.0},{0.01,0.0}}'/>
             <Property Name="CloseButtonEnabled" Value="False" />
-            <Property Name='SizingEnabled' Value='False'/>
+            <Property Name='SizingEnabled' Value='True'/>
             <Property Name='Visible' Value='False'/>
+            
              <Window Type="ice/StaticImage" Name="StdDlg/Main" >
-             	<Property Name='UnifiedSize' Value='{{0.0,214.0},{0.0,298.0}}'/>
+             	<Property Name='UnifiedSize' Value='{{1.0,-10.0},{1.0,-32.0}}'/>
 	     	<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,30.0}}'/>
  
  
@@ -352,7 +353,7 @@
 				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,2.0}}'/>
                        </Window> 
 	     	        <Window Type="ice/Editbox" Name="StdDlg/Path" >
-			        <Property Name='UnifiedSize' Value='{{0.0,200.0},{0.0,28.0}}'/>
+			        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.0,28.0}}'/>
 				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,22.0}}'/>
                        </Window> 
 	     	        <Window Type="ice/StaticText" Name="StdDlg/FileLable" >
@@ -363,18 +364,18 @@
 				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,50.0}}'/>
                        </Window> 
 	     	        <Window Type="ice/Editbox" Name="StdDlg/File" >
-			        <Property Name='UnifiedSize' Value='{{0.0,200.0},{0.0,28.0}}'/>
+			        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.0,28.0}}'/>
 				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,70.0}}'/>
                        </Window>
  
  
 	     	        <Window Type="ice/Listbox" Name="StdDlg/DirSelect" >
-			        <Property Name='UnifiedSize' Value='{{0.0,100.0},{0.0,150.0}}'/>
+			        <Property Name='UnifiedSize' Value='{{0.5,-15.0},{1.0,-150.0}}'/>
 				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,107.0}}'/>
                        </Window>  
 	     	        <Window Type="ice/Listbox" Name="StdDlg/FileSelect" >
-			        <Property Name='UnifiedSize' Value='{{0.0,100.0},{0.0,150.0}}'/>
-				<Property Name='UnifiedPosition' Value='{{0.0,107.0},{0.0,107.0}}'/>
+			        <Property Name='UnifiedSize' Value='{{0.5,-15.0},{1.0,-150.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.5,5.0},{0.0,107.0}}'/>
                        </Window>                        
  
  
@@ -382,12 +383,12 @@
 	     	        <Window Type="ice/Button" Name="StdDlg/CancleButton" >
 				<Property Name="Text" Value="Cancel" />
 			        <Property Name='UnifiedSize' Value='{{0.0,80.0},{0.0,25.0}}'/>
-				<Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,265.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{1.0,-140.0},{1.0,-35.0}}'/>
                        </Window>
                        <Window Type="ice/Button" Name="StdDlg/OkButton" >
 		       		<Property Name="Text" Value="OK" />
 		       		<Property Name='UnifiedSize' Value='{{0.0,50.0},{0.0,25.0}}'/>
-		       		<Property Name='UnifiedPosition' Value='{{0.0,150.0},{0.0,265.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{1.0,-55.0},{1.0,-35.0}}'/>
                        </Window>                       
  
  

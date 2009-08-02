@@ -218,6 +218,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
         {
           // Handle submesh
           csRef<iRenderBuffer> indexBuffer;
+          
+          csRef<iMaterialWrapper> material;
 
           csRef<iDocumentNodeIterator> it = child->GetNodes ();
           while (it->HasNext ())
@@ -238,16 +240,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
                 }
               }
               break;
+            case XMLTOKEN_MATERIAL:
+              {
+                const char* matname = child2->GetContentsValue ();
+                material = ldr_context->FindMaterial (matname);
+                if (!material)
+                {
+                  synldr->ReportError (msgidFactory, child2, "Couldn't find material '%s'!", 
+                    matname);
+                  return 0;
+                }
+              }
+              break;
             default:
               synldr->ReportBadToken (child2);
               return 0;
             }
           }
 
-
           if (indexBuffer)
           {
-            amfact->CreateSubMesh (indexBuffer);
+            iAnimatedMeshFactorySubMesh* smf = amfact->CreateSubMesh (indexBuffer);
+            smf->SetMaterial(material);
           }
         }
         break;

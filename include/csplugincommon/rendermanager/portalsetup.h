@@ -430,6 +430,11 @@ namespace RenderManager
       int sb_minY = int (screenBox.MinY());
       int txt_w = int (ceil (screenBox.MaxX() - screenBox.MinX()));
       int txt_h = int (ceil (screenBox.MaxY() - screenBox.MinY()));
+
+      // Work around faulty texture cache behaviour.
+      txt_w = csFindNearestPowerOf2 (txt_w);
+      txt_h = csFindNearestPowerOf2 (txt_h);
+
       int real_w, real_h;
       csRef<iTextureHandle> tex = persistentData.texCache.QueryUnusedTexture (txt_w, txt_h,
 		  real_w, real_h);

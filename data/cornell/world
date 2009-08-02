@@ -20,10 +20,21 @@
     <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
     <plugin name="terrainfact">crystalspace.mesh.loader.factory.terrain</plugin>
   </plugins>
+  <textures>
+    <texture name="texWhite">
+      <color red="1" green="1" blue="1" />
+    </texture>
+    <texture name="texGreen">
+      <color red="0" green="1" blue="0" />
+    </texture>
+    <texture name="texRed">
+      <color red="1" green="0" blue="0" />
+    </texture>
+  </textures>
   <materials>
-    <material name="white"> <color red="1" green="1" blue="1" /> </material>
-    <material name="green"> <color red="0" green="1" blue="0" /> </material>
-    <material name="red"> <color red="1" green="0" blue="0" /> </material>
+    <material name="white"><texture>texWhite</texture></material>
+    <material name="green"><texture>texGreen</texture></material>
+    <material name="red"><texture>texRed</texture></material>
   </materials>
   <settings>
     <clearzbuf>yes</clearzbuf>
@@ -36,8 +47,8 @@
   <meshfact name="Cube.006">
     <plugin>genmeshfact</plugin>
     <params>
-      <material>no</material>
-      <numvt>20</numvt>
+      <material>white</material>
+      <numvt>24</numvt>
       <v x="-1.0873" y="-1.03523" z="1.79828" u="0" v="0"/>
       <v x="-1.5773" y="-1.03523" z="0.198284" u="0" v="1"/>
       <v x="0.00269604" y="-1.03523" z="-0.291716" u="1" v="1"/>
@@ -58,28 +69,33 @@
       <v x="-1.0873" y="2.26477" z="1.79828" u="0" v="0"/>
       <v x="-1.0873" y="-1.03523" z="1.79828" u="0" v="1"/>
       <v x="0.492695" y="-1.03523" z="1.29828" u="1" v="1"/>
+      <v x="0.492695" y="-1.03523" z="1.29828" u="1" v="0"/>
+      <v x="-1.5773" y="2.26477" z="0.198284" u="0" v="1"/>
+      <v x="-1.0873" y="-1.03523" z="1.79828" u="0" v="0"/>
+      <v x="0.492696" y="2.26477" z="1.29828" u="1" v="0"/>
       <numtri>12</numtri>
       <t v1="0" v2="1" v3="2"/>
       <t v1="2" v2="3" v3="0"/>
       <t v1="4" v2="5" v3="6"/>
       <t v1="6" v2="7" v3="4"/>
       <t v1="8" v2="9" v3="10"/>
-      <t v1="10" v2="3" v3="8"/>
-      <t v1="11" v2="5" v3="12"/>
+      <t v1="10" v2="20" v3="8"/>
+      <t v1="11" v2="21" v3="12"/>
       <t v1="12" v2="13" v3="11"/>
-      <t v1="0" v2="14" v3="15"/>
-      <t v1="15" v2="16" v3="0"/>
+      <t v1="22" v2="14" v3="15"/>
+      <t v1="15" v2="16" v3="22"/>
       <t v1="17" v2="18" v3="19"/>
-      <t v1="19" v2="7" v3="17"/>
+      <t v1="19" v2="23" v3="17"/>
       <autonormals/>
+      <normalnocompress />
       <localshadows/>
     </params>
   </meshfact>
   <meshfact name="Cube.005">
     <plugin>genmeshfact</plugin>
     <params>
-      <material>no</material>
-      <numvt>20</numvt>
+      <material>white</material>
+      <numvt>24</numvt>
       <v x="-1.04" y="-0.825" z="0.565" u="0" v="0"/>
       <v x="-0.56" y="-0.825" z="-1.035" u="0" v="1"/>
       <v x="1.04" y="-0.825" z="-0.545" u="1" v="1"/>
@@ -100,27 +116,32 @@
       <v x="-1.04" y="0.825" z="0.565" u="0" v="0"/>
       <v x="-1.04" y="-0.825" z="0.565" u="0" v="1"/>
       <v x="0.54" y="-0.825" z="1.035" u="1" v="1"/>
+      <v x="0.54" y="-0.825" z="1.035" u="1" v="0"/>
+      <v x="-0.56" y="0.825" z="-1.035" u="0" v="1"/>
+      <v x="-1.04" y="-0.825" z="0.565" u="0" v="0"/>
+      <v x="0.54" y="0.825" z="1.035" u="1" v="0"/>
       <numtri>12</numtri>
       <t v1="0" v2="1" v3="2"/>
       <t v1="2" v2="3" v3="0"/>
       <t v1="4" v2="5" v3="6"/>
       <t v1="6" v2="7" v3="4"/>
       <t v1="8" v2="9" v3="10"/>
-      <t v1="10" v2="3" v3="8"/>
-      <t v1="11" v2="5" v3="12"/>
+      <t v1="10" v2="20" v3="8"/>
+      <t v1="11" v2="21" v3="12"/>
       <t v1="12" v2="13" v3="11"/>
-      <t v1="0" v2="14" v3="15"/>
-      <t v1="15" v2="16" v3="0"/>
+      <t v1="22" v2="14" v3="15"/>
+      <t v1="15" v2="16" v3="22"/>
       <t v1="17" v2="18" v3="19"/>
-      <t v1="19" v2="7" v3="17"/>
+      <t v1="19" v2="23" v3="17"/>
       <autonormals/>
+      <normalnocompress />
       <localshadows/>
     </params>
   </meshfact>
   <meshfact name="Cube.004">
     <plugin>genmeshfact</plugin>
     <params>
-      <material>no</material>
+      <material>white</material>
       <numvt>4</numvt>
       <v x="2.764" y="0" z="-2.796" u="0" v="0"/>
       <v x="-2.764" y="0" z="-2.796" u="0" v="1"/>
@@ -136,7 +157,7 @@
   <meshfact name="Cube.003">
     <plugin>genmeshfact</plugin>
     <params>
-      <material>no</material>
+      <material>red</material>
       <numvt>4</numvt>
       <v x="4.76837e-007" y="-2.744" z="2.796" u="0" v="0"/>
       <v x="7.15256e-007" y="-2.744" z="-2.796" u="0" v="1"/>
@@ -152,7 +173,7 @@
   <meshfact name="Cube.002">
     <plugin>genmeshfact</plugin>
     <params>
-      <material>no</material>
+      <material>white</material>
       <numvt>4</numvt>
       <v x="2.748" y="-2.744" z="9.53674e-007" u="0" v="0"/>
       <v x="-2.748" y="-2.744" z="4.76837e-007" u="0" v="1"/>
@@ -168,7 +189,7 @@
   <meshfact name="Cube.001">
     <plugin>genmeshfact</plugin>
     <params>
-      <material>no</material>
+      <material>green</material>
       <numvt>4</numvt>
       <v x="0.0160007" y="-2.744" z="-2.796" u="0" v="0"/>
       <v x="-0.0160012" y="-2.744" z="2.796" u="0" v="1"/>
@@ -184,7 +205,7 @@
   <meshfact name="Cube">
     <plugin>genmeshfact</plugin>
     <params>
-      <material>no</material>
+      <material>white</material>
       <numvt>4</numvt>
       <v x="-2.764" y="0" z="2.796" u="0" v="0"/>
       <v x="-2.764" y="0" z="-2.796" u="0" v="1"/>

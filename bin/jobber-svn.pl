@@ -249,6 +249,8 @@
 #         Archives with 'tar' and compresses with 'gzip'. Extension: .tgz
 #     $ARCHIVER_ZIP
 #         Archives and compresses with 'zip'. Extension: .zip
+#     $ARCHIVER_LZMA
+#         Archives with 'tar' and compresses with 'lzma'. Extension: .tar.lzma
 #
 #     Default: ($ARCHIVER_BZIP2, $ARCHIVER_GZIP, $ARCHIVER_ZIP)
 #
@@ -282,7 +284,7 @@ use warnings;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber-svn.pl';
-my $PROG_VERSION = '38';
+my $PROG_VERSION = '39';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2005 by $AUTHOR_NAME <$AUTHOR_EMAIL>\nConverted for SVN support by Marten Svanfeldt";
@@ -299,6 +301,10 @@ my $ARCHIVER_ZIP = {
     'name'      => 'zip',
     'extension' => 'zip',
     'command'   => 'zip -q -r ~D ~S' };
+my $ARCHIVER_LZMA = {
+    'name'      => 'lzma',
+    'extension' => 'tar.lzma',
+    'command'   => 'tar --create --file=- ~S | lzma > ~D' };
 
 my $jobber_project_root = undef;
 my $jobber_svn_base_url = undef;
@@ -311,7 +317,7 @@ my $jobber_public_mode = undef;
 my $jobber_temp_dir = '/tmp';
 my @jobber_binary_override = ('(?i)\.(dsw|dsp)$');
 my @jobber_tasks = ();
-my @jobber_archivers = ($ARCHIVER_BZIP2, $ARCHIVER_GZIP, $ARCHIVER_ZIP);
+my @jobber_archivers = ($ARCHIVER_BZIP2, $ARCHIVER_GZIP, $ARCHIVER_ZIP, $ARCHIVER_LZMA);
 my %jobber_properties = ();
 
 # SVN binary name

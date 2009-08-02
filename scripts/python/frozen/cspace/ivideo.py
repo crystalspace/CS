@@ -59,6 +59,8 @@ def _swig_setattr_nondynamic_method(set):
 
 import core
 import csgfx
+_SetSCFPointer = _ivideo._SetSCFPointer
+_GetSCFPointer = _ivideo._GetSCFPointer
 if not "core" in dir():
     core = __import__("cspace").__dict__["core"]
 core.AddSCFLink(_SetSCFPointer)
@@ -713,8 +715,6 @@ class iShaderManager(iShaderVariableContext):
     def SetTagOptions(*args): return _ivideo.iShaderManager_SetTagOptions(*args)
     def GetTagOptions(*args): return _ivideo.iShaderManager_GetTagOptions(*args)
     def GetTags(*args): return _ivideo.iShaderManager_GetTags(*args)
-    def SetActiveLights(*args): return _ivideo.iShaderManager_SetActiveLights(*args)
-    def GetActiveLights(*args): return _ivideo.iShaderManager_GetActiveLights(*args)
     def GetSVNameStringset(*args): return _ivideo.iShaderManager_GetSVNameStringset(*args)
     def GetShaderCache(*args): return _ivideo.iShaderManager_GetShaderCache(*args)
     cachePriorityLowest = _ivideo.iShaderManager_cachePriorityLowest

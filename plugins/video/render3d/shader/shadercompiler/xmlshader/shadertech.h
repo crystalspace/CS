@@ -80,6 +80,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           csDirtyAccessArray<size_t, csArrayElementHandler<size_t>,
             CS::Memory::LocalBufferAllocator<size_t, 2,
             CS::Memory::AllocatorMalloc, true> > indices;
+            
+          SV() : id (CS::InvalidShaderVarStringID) {}
         };
         SV tex, fallback;
         int textureUnit;

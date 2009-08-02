@@ -66,10 +66,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   //-------------------------------------------------------------------------
 
   Synthesizer::Synthesizer (WeaverCompiler* compiler, 
+                            const char* shaderName,
                             const csArray<DocNodeArray>& prePassNodes,
                             const csPDelArray<Snippet>& outerSnippets,
                             const DocNodeArray& postPassesNodes)
-    : prePassNodes (prePassNodes), postPassesNodes (postPassesNodes), 
+    : shaderName (shaderName), 
+      prePassNodes (prePassNodes), postPassesNodes (postPassesNodes), 
       compiler (compiler), xmltokens (compiler->xmltokens)
   {
     graphs.SetSize (outerSnippets.GetSize());
@@ -688,7 +690,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       outputs.Push (generatedOutputColor);
       if (hasOutputDepth) outputs.Push (generatedOutputDepth);
       outputs.Push (outTechniquePos);
-      synthTree.Rebuild (graph, outputs);
+      if (!synthTree.Rebuild (graph, outputs)) return false;
     }
     
     // Writing
@@ -1368,51 +1370,80 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
 
-  void Synthesizer::SynthesizeNodeTree::Rebuild (const TechniqueGraph& graph,
+  bool Synthesizer::SynthesizeNodeTree::Rebuild (const TechniqueGraph& graph,
     const csArray<const Snippet::Technique*>& outputs)
   {
-    NodeArray newNodes;
-    csHash<size_t, csConstPtrKey<Snippet::Technique> > newTechToNode;
+    struct TraverseHelper
+    {
+      SynthesizeNodeTree& owner;
+      const TechniqueGraph& graph;
+      
+      TraverseHelper (SynthesizeNodeTree& owner,
+        const TechniqueGraph& graph) : owner (owner), graph (graph) {}
     
-    csFIFO<const Snippet::Technique*> techsToAdd;
+      csStringFast<2048> message;
+      NodeArray newNodes;
+      csHash<size_t, csConstPtrKey<Snippet::Technique> > newTechToNode;
+      
+      bool HandleTech (const Snippet::Technique* tech)
+      {
+        if (techsPath.Contains (tech))
+        {
+          message.Append ("Circular dependency detected. Snippet stack:\n");
+          return false;
+        }
+      
+        techsPath.AddNoTest (tech);
+	size_t oldIndex = newTechToNode.Get (tech, csArrayItemNotFound);
+	if (oldIndex == csArrayItemNotFound)
+	{
+	  Node* node = owner.nodeAlloc.Alloc();
+	  *node = owner.GetNodeForTech (tech);
+	  newTechToNode.Put (tech, newNodes.Push (node));
+	}
+	else
+	{
+	  /* A dependency was added earlier. However, dependencies of a node
+	    must come after the depending node in the array; so push the
+	    node back. */
+	  Node* node = owner.nodeAlloc.Alloc();
+	  *node = *newNodes[oldIndex];
+	  newNodes[oldIndex]->tech = 0;
+	  newNodes[oldIndex]->outputRenames.DeleteAll();
+	  newTechToNode.PutUnique (tech, newNodes.Push (node));
+	}
+	
+	csArray<const Snippet::Technique*> deps;
+	graph.GetDependencies (tech, deps, false);
+	for (size_t d = 0; d < deps.GetSize(); d++)
+	{
+	  if (!HandleTech (deps[d]))
+	  {
+            message.AppendFmt (" %s\n", deps[d]->owner->GetName());
+	    return false;
+	  }
+	}
+        techsPath.Delete (tech);
+	return true;
+      }
+    private:
+      csSet<csConstPtrKey<Snippet::Technique> > techsPath;
+    };
+
+    TraverseHelper trav (*this, graph);
     for (size_t o = 0; o < outputs.GetSize(); o++)
     {
-      techsToAdd.Push (outputs[o]);
-    }
-    
-    while (techsToAdd.GetSize() > 0)
-    {
-      const Snippet::Technique* tech = techsToAdd.PopTop();
-      
-      size_t oldIndex = newTechToNode.Get (tech, csArrayItemNotFound);
-      if (oldIndex == csArrayItemNotFound)
+      if (!trav.HandleTech (outputs[o]))
       {
-        Node* node = nodeAlloc.Alloc();
-        *node = GetNodeForTech (tech);
-        newTechToNode.Put (tech, newNodes.Push (node));
-      }
-      else
-      {
-        /* A dependency was added earlier. However, dependencies of a node
-           must come after the depending node in the array; so push the
-           node back. */
-        Node* node = nodeAlloc.Alloc();
-        *node = *newNodes[oldIndex];
-        newNodes[oldIndex]->tech = 0;
-        newNodes[oldIndex]->outputRenames.DeleteAll();
-        newTechToNode.PutUnique (tech, newNodes.Push (node));
-      }
-      
-      csArray<const Snippet::Technique*> deps;
-      graph.GetDependencies (tech, deps, false);
-      for (size_t d = 0; d < deps.GetSize(); d++)
-      {
-        techsToAdd.Push (deps[d]);
+	synthTech.compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "%s: %s", synthTech.synth->shaderName, trav.message.GetData());
+        return false;
       }
     }
     
-    nodes = newNodes;
-    techToNode = newTechToNode;
+    nodes = trav.newNodes;
+    techToNode = trav.newTechToNode;
+    return true;
   }
   
   void Synthesizer::SynthesizeNodeTree::Collapse (TechniqueGraph& graph)
@@ -1463,10 +1494,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                make sure the nodes that depend on it get fixed up. */
             csArray<const Snippet::Technique*> deps;
 	    csFIFO<Node*> nodesToCheck;
+	    csSet<csPtrKey<Node> > checkedNodes;
 	    nodesToCheck.Push (node);
 	    while (nodesToCheck.GetSize() > 0)
 	    {
 	      Node* checkNode = nodesToCheck.PopTop();
+	      checkedNodes.AddNoTest (checkNode);
 	      if (checkNode->tech == 0) continue;
 	      deps.Empty();
 	      graph.GetDependants (checkNode->tech, deps, false);
@@ -1494,7 +1527,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 		newConn.to = deps[d];
 		graph.AddConnection (newConn);
 		
-		nodesToCheck.Push (&dependentNode);
+		if (!checkedNodes.Contains (&dependentNode))
+		  nodesToCheck.Push (&dependentNode);
 	      }
 	    }
 	    graph.RemoveTechnique (node->tech);

@@ -29,7 +29,9 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "iutil/virtclk.h"
-#include "csver.h"
+/* Small hack: include the _template_ as only the major & minor version is
+   needed here */
+#include "csver.h.template"
 
 typedef void* OSXAssistantHandle;
 #define NSD_PROTO(RET,FUNC) extern "C" RET OSXAssistant_##FUNC
