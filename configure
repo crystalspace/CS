@@ -25318,10 +25318,12 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() since
-# CS_CHECK_HOST() may alter the build environment in a way which affects these
-# tests. For instance, these tests might be impacted on Mac OS X by a universal
-# binary build.
+# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() and
+# the CPU optimization flags detection since these may alter the build
+# environment in a way which affects the SIMD flags tests. For instance,
+# they might be impacted on Mac OS X by a universal binary build, or only the
+# "-march" parameter chosen by the optimization flags detection may enable
+# support for specific SIMD instructions.
 #------------------------------------------------------------------------------
 { $as_echo "$as_me:$LINENO: checking for -mmmx flag" >&5
 $as_echo_n "checking for -mmmx flag... " >&6; }
@@ -25665,7 +25667,7 @@ $as_echo "$cs_cv_prog_cc_msse_ok" >&6; }
   cs_build_prop_val="$cs_cv_prog_cc_msse"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.SSE += $cs_build_prop_val ;
 "
 fi
 
@@ -25839,7 +25841,7 @@ $as_echo "$cs_cv_prog_cc_msse2_ok" >&6; }
   cs_build_prop_val="$cs_cv_prog_cc_msse2"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.SSE2 += $cs_build_prop_val ;
 "
 fi
 
