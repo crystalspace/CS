@@ -719,12 +719,14 @@ AC_MSG_CHECKING([whether to use CPU-specific optimizations])
 AC_ARG_ENABLE([cpu-specific-optimizations],
     [AC_HELP_STRING([--enable-cpu-specific-optimizations=level],
 	[enable CPU-specific optimizations; recognized levels are `no',
-	`minimum' or `min', `maximum' or `max' (default MINIMUM); the `minimum'
-	option selects optimizations which are likely to be supported by
-	reasonably modern hardware, thus making the resulting executables
-	fairly portable; use the `maximum' option with caution since code for
-	one processor will not work with earlier processors (for example, Intel
-	686-specific code will not work with a 586)])],
+	`minimum' or `min', `maximum' or `max' (default MINIMUM), `native';
+	the `minimum' option selects optimizations which are likely to be 
+	supported by reasonably modern hardware, thus making the resulting 
+	executables fairly portable; use the `maximum' option with caution 
+	since code for one processor will not work with earlier processors
+	(for example, Intel 686-specific code will not work with a 586). The
+	`native' option select optimizations specific for the compiling machine
+	(thus giving a fairly unportable executable).])],
     [case $enable_cpu_specific_optimizations in
 	yes|min) enable_cpu_specific_optimizations=minimum ;;
 	max) enable_cpu_specific_optimizations=maximum ;;
@@ -733,14 +735,16 @@ AC_ARG_ENABLE([cpu-specific-optimizations],
 AC_MSG_RESULT([$enable_cpu_specific_optimizations])
 
 case $enable_cpu_specific_optimizations in
-    no|minimum|maximum) ;;
-    *) CS_MSG_ERROR([unrecognized option; use `no', `minimum', or `maximum'])
+    no|minimum|maximum|native) ;;
+    *) CS_MSG_ERROR([unrecognized option; use `no', `minimum', `maximum' or `native'])
        ;;
 esac
 
 AS_IF([test $enable_cpu_specific_optimizations != no],
     [AC_CACHE_CHECK([for code generation flags], [cs_cv_prog_cxx_code_gen],
 	[cs_cv_prog_cxx_code_gen=no
+	AS_IF([test $enable_cpu_specific_optimizations = native],
+	    [CS_CHECK_CODE_GEN_FLAG([*], [-march=native -mtune=native])])
 	AS_IF([test $enable_cpu_specific_optimizations = maximum],
 	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon -mtune=generic])
 	    CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
@@ -761,6 +765,7 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	     # -march=i686.
 	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=prescott])
 	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=i686])])
+	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=generic])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-march=k8])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=k8])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586 -mtune=generic])
