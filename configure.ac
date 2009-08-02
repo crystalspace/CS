@@ -766,11 +766,11 @@ CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
         [append])])
 CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
     [CS_CREATE_TUPLE([-msse])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SSE], [$cs_cv_prog_cc_msse],
         [append])])
 CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
     [CS_CREATE_TUPLE([-msse2])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse2],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SSE2], [$cs_cv_prog_cc_msse2],
         [append])])
 CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
     [CS_CREATE_TUPLE([-mfpmath=sse])], [],
