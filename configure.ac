@@ -252,40 +252,6 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
 
 
 #------------------------------------------------------------------------------
-# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() since
-# CS_CHECK_HOST() may alter the build environment in a way which affects these
-# tests. For instance, these tests might be impacted on Mac OS X by a universal
-# binary build.
-#------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
-    [CS_CREATE_TUPLE([-mmmx])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],
-        [append])])
-CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
-    [CS_CREATE_TUPLE([-msse])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse],
-        [append])])
-CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
-    [CS_CREATE_TUPLE([-msse2])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse2],
-        [append])])
-CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
-    [CS_CREATE_TUPLE([-mfpmath=sse])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_mfpmath_sse],
-        [append])])
-
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_CHECK_BUILD([for mmintrin.h],
-        [cs_cv_header_mmintrin_h],
-        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
-        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
-        [C++],
-        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
-        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
-
-
-
-#------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
 # required to embed Perl.  Also determine if the glue file can be created with
 # ExtUtils::Embed or if it must be created manually.
@@ -747,9 +713,9 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	    [CS_CHECK_CODE_GEN_FLAG([*], [-march=native -mtune=native])])
 	AS_IF([test $enable_cpu_specific_optimizations = maximum \
 		-o $enable_cpu_specific_optimizations = native],
-	    [CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=generic -fpmath=sse])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=pentium3 -fpmath=sse])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -fpmath=sse])])
+	    [CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=generic])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=pentium3])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3])])
 	AS_IF([test $host_vendor = apple],
 	    [# Work around issue on intel macs, where "-fpmath=sse" is on by
 	     # default, but this breaks compilation when combined with 
@@ -783,6 +749,40 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
     AS_IF([test "$cs_cv_prog_cxx_code_gen" != no],
 	[CS_EMIT_BUILD_PROPERTY(
 	    [COMPILER.CFLAGS], [$cs_cv_prog_cxx_code_gen], [+])])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() since
+# CS_CHECK_HOST() may alter the build environment in a way which affects these
+# tests. For instance, these tests might be impacted on Mac OS X by a universal
+# binary build.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
+    [CS_CREATE_TUPLE([-mmmx])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],
+        [append])])
+CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
+    [CS_CREATE_TUPLE([-msse])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse],
+        [append])])
+CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
+    [CS_CREATE_TUPLE([-msse2])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse2],
+        [append])])
+CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
+    [CS_CREATE_TUPLE([-mfpmath=sse])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_mfpmath_sse],
+        [append])])
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_CHECK_BUILD([for mmintrin.h],
+        [cs_cv_header_mmintrin_h],
+        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
+        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
+        [C++],
+        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
+        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
 
 
 
