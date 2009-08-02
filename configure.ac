@@ -747,16 +747,9 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	    [CS_CHECK_CODE_GEN_FLAG([*], [-march=native -mtune=native])])
 	AS_IF([test $enable_cpu_specific_optimizations = maximum \
 		-o $enable_cpu_specific_optimizations = native],
-	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon -mtune=generic])
-	    CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
-	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
-	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686 -mtune=generic])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro -march=i686])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro])])
+	    [CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=generic -fpmath=sse])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=pentium3 -fpmath=sse])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -fpmath=sse])])
 	AS_IF([test $host_vendor = apple],
 	    [# Work around issue on intel macs, where "-fpmath=sse" is on by
 	     # default, but this breaks compilation when combined with 
@@ -769,6 +762,12 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=generic])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-march=k8])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=k8])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686 -mtune=generic])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro -march=i686])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586 -mtune=generic])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium -march=i586])
