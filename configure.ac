@@ -753,10 +753,12 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 
 
 #------------------------------------------------------------------------------
-# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() since
-# CS_CHECK_HOST() may alter the build environment in a way which affects these
-# tests. For instance, these tests might be impacted on Mac OS X by a universal
-# binary build.
+# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() and
+# the CPU optimization flags detection since these may alter the build 
+# environment in a way which affects the SIMD flags tests. For instance,
+# they might be impacted on Mac OS X by a universal binary build, or only the
+# "-march" parameter chosen by the optimization flags detection may enable
+# support for specific SIMD instructions.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
     [CS_CREATE_TUPLE([-mmmx])], [],
