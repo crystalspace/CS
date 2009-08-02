@@ -832,9 +832,6 @@ rule MsvcProject
       
       Win32Resource $(rawname) : $(metarc) ;
       MsvcRmTemps $(resource) : $(metarc) ;
-      ResponseFile $(respfile) :
-	"file|$($(rawname)_METAFILE:R=$(SEARCH_SOURCE))" : notfile :
-	$(respdir) ;
     }
 
     if [ IsElem $(type) : appgui appcon ]
@@ -1200,30 +1197,97 @@ rule Application
   CompileGroups $(<) : all apps ;
 }
 
+rule UberPlugin
+{
+  if "$(ENABLE_UBERPLUGINS)" != "yes"
+  {
+    return ;
+  }
+
+  local plugins = $(2) ;
+
+  local p ;
+  for p in $(plugins)
+  {
+    $(p)_UBERPLUGIN = $(<) ;
+  }
+
+  RegisterWellKnownCompileGroup plugins ;
+
+  if ! $($(<)_PLUGIN_SETUP)
+  {
+    $(<)_TYPE = plugin ;
+    $(<)_TARGET = $(target) ;
+    
+    local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+    local outdircommon = [ Property msvcgen : outdircommon ] ;
+    if "$(outdircommon)" = ""
+    {
+      outdircommon = $(outdir) ;
+    }
+    local plugin_impl_file = plugin_impl.cpp ;
+    MakeLocate $(plugin_impl_file) : $(outdircommon) ;
+    WritePluginImplement $(plugin_impl_file) ;
+    Depends msvcgen : $(plugin_impl_file) ;
+    $(<)_EXTRASOURCES = $(plugin_impl_file:R=$(outdircommon))
+
+    local metafile ;
+    metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
+    MakeLocate $(metafile) : $(workdircommon) ;
+    Depends $(<) : $(metafile) ;
+    $(<)_METAFILE = $(metafile) ;
+    MsvcProject $(<) : plugin : $(<:S=$(MSVCGEN.PLUGIN_EXT.$(<):E=.dll)) ;
+    CompileGroups $(<) : all plugins ;
+
+    $(<)_PLUGIN_SETUP = 1 ;
+  }
+}
+
 rule Plugin
 {
   RegisterWellKnownCompileGroup plugins ;
 
-  $(<)_TYPE = plugin ;
-  
+  local uberplugin = $($(<)_UBERPLUGIN) ;
+
   local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
   local outdircommon = [ Property msvcgen : outdircommon ] ;
   if "$(outdircommon)" = ""
   {
     outdircommon = $(outdir) ;
   }
-  local plugin_impl_file = plugin_impl.cpp ;
-  MakeLocate $(plugin_impl_file) : $(outdircommon) ;
-  WritePluginImplement $(plugin_impl_file) ;
-  Depends msvcgen : $(plugin_impl_file) ;
-  $(<)_EXTRASOURCES = $(plugin_impl_file:R=$(outdircommon))
-  
   local metafile ;
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
   SEARCH on $(metafile) = $(SEARCH_SOURCE) ;
   $(<)_METAFILE = $(metafile) ;
-  MsvcProject $(<) : plugin : $(<:S=$(MSVCGEN.PLUGIN_EXT.$(<):E=.dll)) : $(>) ;
-  CompileGroups $(<) : all plugins ;
+  
+  if "$(uberplugin)" != ""
+  {
+    PluginMergeMetadata $($(uberplugin)_METAFILE) : $(metafile) ;
+    Depends $($(uberplugin)_METAFILE) : $(metafile) ;
+    
+    $(<).PROPAGATE_LINKWITH += $(uberplugin) ;
+    $(<).PROPAGATE_EXTERNALLIBS += $(uberplugin) ;
+    
+    for i in $(>)
+    {
+      ResponseFile $($(uberplugin)_PRJ_RESPFILE) : "file|$(i:R=$(SEARCH_SOURCE))" : notfile : $($(uberplugin)_PRJ_RESPDIR) ;
+    }
+    ResponseFile $($(uberplugin)_PRJ_RESPFILE) : "file|$(metafile:R=$(SEARCH_SOURCE))" : notfile : $($(uberplugin)_PRJ_RESPDIR) ;
+ }
+  else
+  {
+    $(<)_TYPE = plugin ;
+    
+    local plugin_impl_file = plugin_impl.cpp ;
+    MakeLocate $(plugin_impl_file) : $(outdircommon) ;
+    WritePluginImplement $(plugin_impl_file) ;
+    Depends msvcgen : $(plugin_impl_file) ;
+    $(<)_EXTRASOURCES = $(plugin_impl_file:R=$(outdircommon)) ;
+    $(<)_EXTRASOURCES += $(metafile:R=$(SEARCH_SOURCE)) ;
+    
+    MsvcProject $(<) : plugin : $(<:S=$(MSVCGEN.PLUGIN_EXT.$(<):E=.dll)) : $(>) ;
+    CompileGroups $(<) : all plugins ;
+  }
 
   STATICPLUGINS.SOURCES.$(<) += $(>:R=$(SEARCH_SOURCE)) ;
   STATICPLUGINS.SUBTARGETS += $(<) ;
@@ -1440,6 +1504,11 @@ rule LinkWith
     }
   }
   $(<).NEEDLIBS = $(libs) ;
+  
+  for i in $($(<).PROPAGATE_LINKWITH)
+  {
+    LinkWith $(i) : $(>) ;
+  }
 }
 
 rule LibDepends
@@ -1525,6 +1594,11 @@ rule MsvcExternalLibrary1
   local mode = $(3) ;
   mode ?= debug release ;
   $(1)_$(mode)_EXTERNALLIBS += $(2) ;
+  
+  for target in $($(<).PROPAGATE_EXTERNALLIBS)
+  {
+    MsvcExternalLibrary $(target) : $(>) : $(mode) ;
+  }
 }
 
 # MsvcDefine target [ : key [ : value [ : mode ]]]
@@ -1662,6 +1736,11 @@ rule ExternalLibs
     _ExternalLibsHelperMsvc $(<) : $(i) : _MsvcLibDirs : LIBDIRS ;
     
     $(<).EXTERNALLIBS += $(i) ;
+  }
+  
+  for target in $($(<).PROPAGATE_EXTERNALLIBS)
+  {
+    ExternalLibs $(target) : $(>) ;
   }
 }
 
