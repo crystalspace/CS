@@ -25403,7 +25403,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_code_gen $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -25577,7 +25577,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_code_gen $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -25751,7 +25751,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_code_gen $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -25925,7 +25925,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_code_gen $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
