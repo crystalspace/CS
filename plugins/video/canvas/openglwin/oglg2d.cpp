@@ -745,6 +745,11 @@ void csGraphics2DOpenGL::SetTitle (const char* title)
   }
 }
 
+void csGraphics2DOpenGL::SetIcon (iImage *image)
+{
+   //TODO: IMPLEMENT THIS FOR WINDOWS
+}
+
 void csGraphics2DOpenGL::AlertV (int type, const char* title, const char* okMsg,
 	const char* msg, va_list arg)
 {

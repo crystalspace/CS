@@ -53,6 +53,12 @@ public:
   // Set window title
   virtual void SetTitle(char *title);
 
+  /** Sets the icon of this window with the provided one.
+   *
+   *  @param image the iImage to set as the icon of this window.
+   */
+  virtual void SetIcon (iImage *image);
+
   // Flip video page (or dump to framebuffer)
   virtual void Print(csRect const* area = 0);
 

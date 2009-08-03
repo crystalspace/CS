@@ -38,6 +38,7 @@
 #include "ivaria/reporter.h"
 #include "csplugincommon/canvas/scancode.h"
 #include "igraphic/image.h"
+#include "csgfx/imagememory.h"
 #include "csplugincommon/canvas/cursorconvert.h"
 
 // Define this if you want keyboard-grabbing behavior enabled.  For now it is
@@ -443,6 +444,78 @@ void csXWindow::Close ()
     wm_win = 0;
   }
   XSync (dpy, true);
+}
+
+static void reversePixelBuffer(unsigned char *buffer, size_t bufferSize) 
+{
+	if(bufferSize%4 != 0) { return; } //determine if the buffer size is ok for this conversion
+	unsigned char *source, *endSource, *destination;
+	unsigned char red;
+	unsigned char green;
+	unsigned char blue;
+	unsigned char alpha;
+	
+    //prepare a temporary copy of the data
+	unsigned char *bufferCopy = (unsigned char *)malloc(bufferSize);
+	memcpy(bufferCopy, buffer, bufferSize);
+	
+	source = bufferCopy;
+	endSource = bufferCopy + bufferSize - 1;
+	destination = buffer;
+
+    //swaps the buffer
+	while(source < endSource) {
+		red = *source; source++;
+		green = *source; source++;
+		blue = *source; source++;
+		alpha = *source; source++;
+		*destination = blue; destination++;
+		*destination = green; destination++;
+		*destination = red; destination++;
+		*destination = alpha; destination++;
+	}
+
+	//cleanup
+	free(bufferCopy);
+}
+
+void csXWindow::SetIcon (iImage *image)
+{
+  //check and prepare the data we will work on
+  if (!image) { return; }
+  csImageMemory *imageBuffer = new csImageMemory(image, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+  if (!imageBuffer) { return; }
+  char *baseImage = (char*)imageBuffer->GetImagePtr();
+  if(!baseImage) { delete imageBuffer; return; }
+  
+  //used to get an alpha mask to be used for the xserver
+  uint8* mask;
+  uint8* source;
+  csCursorConverter::ConvertTo1bpp (image, source, mask, csRGBcolor(255,255,255),
+                                    csRGBcolor(0,0,0),0,true);
+  Pixmap maskIconPixmap = XCreatePixmapFromBitmapData (dpy, ctx_win, (char*)mask,
+                                                  image->GetWidth(), image->GetHeight(),1,0,image->GetDepth()); 
+  delete[] mask;
+  delete[] source;
+                                                  
+  //swaps the buffer to be suitable for x
+  reversePixelBuffer((unsigned char*)baseImage, ((image->GetWidth()* image->GetHeight()))*4);
+  //creates the pixmaps for the icon
+  XImage *IconImage = XCreateImage(dpy,xvis->visual, 24, ZPixmap, 0, baseImage, image->GetWidth(), image->GetHeight(),32,4*image->GetWidth());
+  Pixmap iconPixmap = XCreatePixmap(dpy,ctx_win,image->GetWidth(), image->GetHeight(),  24);
+  XPutImage (dpy, iconPixmap, gc, IconImage, 0, 0, 0, 0, image->GetWidth(), image->GetHeight());
+
+  //set the xwmhints accordly to our needs
+  if (dpy && wm_win)   
+  {
+    XWMHints *wm_hints =XGetWMHints (dpy, wm_win);
+    wm_hints->flags |= IconPixmapHint | IconMaskHint;
+    wm_hints->icon_pixmap = iconPixmap;
+    wm_hints->icon_mask = maskIconPixmap;
+    XSetWMHints (dpy, wm_win, wm_hints);
+  }
+
+  delete imageBuffer; //cleanup
 }
 
 void csXWindow::SetTitle (const char* title)

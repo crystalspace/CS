@@ -92,6 +92,13 @@ public:
 
   virtual void SetTitle (const char* title)
   { xwin->SetTitle (title); }
+  
+  /** Sets the icon of this window with the provided one.
+   *
+   *  @param image the iImage to set as the icon of this window.
+   */
+  virtual void SetIcon (iImage *image)
+  { xwin->SetIcon (image); }
 
   virtual void SetFullScreen (bool yesno);
 
