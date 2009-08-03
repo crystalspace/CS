@@ -829,7 +829,7 @@ void G2DTestSystemDriver::DrawCustomIconScreen ()
 
   SetFont (fontItalic);
   int tpos = -h / 2;
-  WriteCentered (0, tpos, white, -1, "CUSTOM WINDOW CURSORS");
+  WriteCentered (0, tpos, white, -1, "CUSTOM WINDOW ICON");
 
   SetFont (fontLarge);
   WriteCentered (0, tpos + 16*2, black,  -1, "If your current canvas supports custom window icons");
