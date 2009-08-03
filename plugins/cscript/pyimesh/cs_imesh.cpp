@@ -3857,7 +3857,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_GetTriangleDataIterator(PyObject *SWIGUN
   arg1 = reinterpret_cast< iObjectModel * >(argp1);
   result = (arg1)->GetTriangleDataIterator();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTriangleMeshIterator> ref((csPtr<iTriangleMeshIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4920,7 +4920,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_GetRenderBufferName(PyObject 
   arg2 = static_cast< int >(val2);
   result = ((iGeneralMeshCommonState const *)arg1)->GetRenderBufferName(arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iString> ref((csRef<iString>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15265,6 +15265,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_GetMaterial(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactorySubMesh *arg1 = (iAnimatedMeshFactorySubMesh *) 0 ;
+  iMaterialWrapper *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactorySubMesh_GetMaterial",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactorySubMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactorySubMesh_GetMaterial" "', argument " "1"" of type '" "iAnimatedMeshFactorySubMesh const *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactorySubMesh * >(argp1);
+  result = (iMaterialWrapper *)((iAnimatedMeshFactorySubMesh const *)arg1)->GetMaterial();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_SetMaterial(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactorySubMesh *arg1 = (iAnimatedMeshFactorySubMesh *) 0 ;
+  iMaterialWrapper *arg2 = (iMaterialWrapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactorySubMesh_SetMaterial",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactorySubMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactorySubMesh_SetMaterial" "', argument " "1"" of type '" "iAnimatedMeshFactorySubMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactorySubMesh * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iAnimatedMeshFactorySubMesh_SetMaterial" "', argument " "2"" of type '" "iMaterialWrapper *""'"); 
+  }
+  arg2 = reinterpret_cast< iMaterialWrapper * >(argp2);
+  (arg1)->SetMaterial(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -16593,7 +16645,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory2_CreateSkeleton(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< iSkeletonFactory2 * >(argp1);
   result = (arg1)->CreateSkeleton();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeleton2> ref((csPtr<iSkeleton2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17698,7 +17750,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreateInstance(PyObject *
   arg2 = reinterpret_cast< iSkeleton2 * >(argp2);
   result = (arg1)->CreateInstance(arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonAnimPacket2> ref((csPtr<iSkeletonAnimPacket2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17936,7 +17988,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreateAnimationNode(PyObj
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateAnimationNode((char const *)arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonAnimationNodeFactory2> ref((csPtr<iSkeletonAnimationNodeFactory2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17982,7 +18034,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreateBlendNode(PyObject 
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateBlendNode((char const *)arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonBlendNodeFactory2> ref((csPtr<iSkeletonBlendNodeFactory2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18028,7 +18080,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreatePriorityNode(PyObje
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreatePriorityNode((char const *)arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonPriorityNodeFactory2> ref((csPtr<iSkeletonPriorityNodeFactory2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18108,7 +18160,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreateFSMNode(PyObject *S
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateFSMNode((char const *)arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonFSMNodeFactory2> ref((csPtr<iSkeletonFSMNodeFactory2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18947,7 +18999,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimNodeFactory2_CreateInstance(PyObject *SW
   arg3 = reinterpret_cast< iSkeleton2 * >(argp3);
   result = (arg1)->CreateInstance(arg2,arg3);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonAnimNode2> ref((csPtr<iSkeletonAnimNode2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -31261,7 +31313,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetSkeleton(PyObject *SWIGUNUSEDPAR
   arg1 = reinterpret_cast< iSpriteCal3DState * >(argp1);
   result = (arg1)->GetSkeleton();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeleton> ref((csPtr<iSkeleton>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -31475,7 +31527,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_Clone(PyObject *SWIGUNUSEDPARM(self), PyO
   arg1 = reinterpret_cast< iMeshObject * >(argp1);
   result = (arg1)->Clone();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshObject> ref((csPtr<iMeshObject>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -32307,7 +32359,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_NewInstance(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< iMeshObjectFactory * >(argp1);
   result = (arg1)->NewInstance();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshObject> ref((csPtr<iMeshObject>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -32341,7 +32393,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_Clone(PyObject *SWIGUNUSEDPARM(sel
   arg1 = reinterpret_cast< iMeshObjectFactory * >(argp1);
   result = (arg1)->Clone();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshObjectFactory> ref((csPtr<iMeshObjectFactory>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -32673,7 +32725,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectType_NewFactory(PyObject *SWIGUNUSEDPARM(s
   arg1 = reinterpret_cast< iMeshObjectType * >(argp1);
   result = (arg1)->NewFactory();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshObjectFactory> ref((csPtr<iMeshObjectFactory>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -33456,7 +33508,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddPolygon(PyObject *SWIGUNUSEDPAR
   }
   arg1 = reinterpret_cast< iThingFactoryState * >(argp1);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,334,TYPEMAP_IN_ARRAY_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,334,TYPEMAP_IN_ARRAY_BODY@*/
     if (!PyList_Check(obj1))
     {
       PyErr_SetString(PyExc_TypeError, "not a list");
@@ -36001,7 +36053,7 @@ SWIGINTERN PyObject *_wrap_iThingState_GetPolygonLightmap(PyObject *SWIGUNUSEDPA
   arg2 = static_cast< int >(val2);
   result = (arg1)->GetPolygonLightmap(arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csPtr<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -39126,7 +39178,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellCollisionProperties_Clone(PyObject *SWIGU
   arg1 = reinterpret_cast< iTerrainCellCollisionProperties * >(argp1);
   result = (arg1)->Clone();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellCollisionProperties> ref((csPtr<iTerrainCellCollisionProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -39462,7 +39514,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellRenderProperties_Clone(PyObject *SWIGUNUS
   arg1 = reinterpret_cast< iTerrainCellRenderProperties * >(argp1);
   result = (arg1)->Clone();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellRenderProperties> ref((csPtr<iTerrainCellRenderProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -39899,7 +39951,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_Clone(PyObject *SWIGUNUS
   arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
   result = (arg1)->Clone();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellFeederProperties> ref((csPtr<iTerrainCellFeederProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -40353,7 +40405,7 @@ SWIGINTERN PyObject *_wrap_iTerrainDataFeeder_CreateProperties(PyObject *SWIGUNU
   arg1 = reinterpret_cast< iTerrainDataFeeder * >(argp1);
   result = (arg1)->CreateProperties();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellFeederProperties> ref((csPtr<iTerrainCellFeederProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -40843,7 +40895,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_CreateProperties(PyObject *SWIGUNUSE
   arg1 = reinterpret_cast< iTerrainCollider * >(argp1);
   result = (arg1)->CreateProperties();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellCollisionProperties> ref((csPtr<iTerrainCellCollisionProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -41295,7 +41347,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_CreateProperties(PyObject *SWIGUNUSE
   arg1 = reinterpret_cast< iTerrainRenderer * >(argp1);
   result = (arg1)->CreateProperties();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellRenderProperties> ref((csPtr<iTerrainCellRenderProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -47469,7 +47521,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_Clone(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iParticleEmitter * >(argp1);
   result = ((iParticleEmitter const *)arg1)->Clone();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleEmitter> ref((csPtr<iParticleEmitter>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -47805,7 +47857,7 @@ SWIGINTERN PyObject *_wrap_iParticleEffector_Clone(PyObject *SWIGUNUSEDPARM(self
   arg1 = reinterpret_cast< iParticleEffector * >(argp1);
   result = ((iParticleEffector const *)arg1)->Clone();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleEffector> ref((csPtr<iParticleEffector>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -49768,7 +49820,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateSphere(PyObject 
   arg1 = reinterpret_cast< iParticleBuiltinEmitterFactory * >(argp1);
   result = ((iParticleBuiltinEmitterFactory const *)arg1)->CreateSphere();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEmitterSphere> ref((csPtr<iParticleBuiltinEmitterSphere>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -49802,7 +49854,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateCone(PyObject *S
   arg1 = reinterpret_cast< iParticleBuiltinEmitterFactory * >(argp1);
   result = ((iParticleBuiltinEmitterFactory const *)arg1)->CreateCone();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEmitterCone> ref((csPtr<iParticleBuiltinEmitterCone>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -49836,7 +49888,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateBox(PyObject *SW
   arg1 = reinterpret_cast< iParticleBuiltinEmitterFactory * >(argp1);
   result = ((iParticleBuiltinEmitterFactory const *)arg1)->CreateBox();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEmitterBox> ref((csPtr<iParticleBuiltinEmitterBox>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -49870,7 +49922,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateCylinder(PyObjec
   arg1 = reinterpret_cast< iParticleBuiltinEmitterFactory * >(argp1);
   result = ((iParticleBuiltinEmitterFactory const *)arg1)->CreateCylinder();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEmitterCylinder> ref((csPtr<iParticleBuiltinEmitterCylinder>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -51216,7 +51268,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorFactory_CreateForce(PyObject 
   arg1 = reinterpret_cast< iParticleBuiltinEffectorFactory * >(argp1);
   result = ((iParticleBuiltinEffectorFactory const *)arg1)->CreateForce();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEffectorForce> ref((csPtr<iParticleBuiltinEffectorForce>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -51250,7 +51302,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorFactory_CreateLinColor(PyObje
   arg1 = reinterpret_cast< iParticleBuiltinEffectorFactory * >(argp1);
   result = ((iParticleBuiltinEffectorFactory const *)arg1)->CreateLinColor();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEffectorLinColor> ref((csPtr<iParticleBuiltinEffectorLinColor>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -51306,7 +51358,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorFactory_CreateLinear(PyObject
   arg1 = reinterpret_cast< iParticleBuiltinEffectorFactory * >(argp1);
   result = ((iParticleBuiltinEffectorFactory const *)arg1)->CreateLinear();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEffectorLinear> ref((csPtr<iParticleBuiltinEffectorLinear>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -51771,6 +51823,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iAnimatedMeshFactorySubMesh_GetIndices", _wrap_iAnimatedMeshFactorySubMesh_GetIndices, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_GetIndexSetCount", _wrap_iAnimatedMeshFactorySubMesh_GetIndexSetCount, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_GetBoneIndices", _wrap_iAnimatedMeshFactorySubMesh_GetBoneIndices, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactorySubMesh_GetMaterial", _wrap_iAnimatedMeshFactorySubMesh_GetMaterial, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactorySubMesh_SetMaterial", _wrap_iAnimatedMeshFactorySubMesh_SetMaterial, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_scfGetVersion", _wrap_iAnimatedMeshFactorySubMesh_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iAnimatedMeshFactorySubMesh", _wrap_delete_iAnimatedMeshFactorySubMesh, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_swigregister", iAnimatedMeshFactorySubMesh_swigregister, METH_VARARGS, NULL},

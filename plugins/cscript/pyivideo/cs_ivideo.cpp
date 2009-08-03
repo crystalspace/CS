@@ -6706,7 +6706,7 @@ SWIGINTERN PyObject *_wrap_iGraphics2D_ScreenShot(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iGraphics2D * >(argp1);
   result = (arg1)->ScreenShot();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csPtr<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -7543,7 +7543,7 @@ SWIGINTERN PyObject *_wrap_iGraphics2D_CreateOffscreenCanvas(PyObject *SWIGUNUSE
   arg6 = reinterpret_cast< iOffscreenCanvasCallback * >(argp6);
   result = (arg1)->CreateOffscreenCanvas(arg2,arg3,arg4,arg5,arg6);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iGraphics2D> ref((csPtr<iGraphics2D>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14813,7 +14813,7 @@ SWIGINTERN PyObject *_wrap_iFont_GetGlyphBitmap(PyObject *SWIGUNUSEDPARM(self), 
   arg3 = reinterpret_cast< csBitmapMetrics * >(argp3);
   result = (arg1)->GetGlyphBitmap(arg2,*arg3);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14868,7 +14868,7 @@ SWIGINTERN PyObject *_wrap_iFont_GetGlyphAlphaBitmap(PyObject *SWIGUNUSEDPARM(se
   arg3 = reinterpret_cast< csBitmapMetrics * >(argp3);
   result = (arg1)->GetGlyphAlphaBitmap(arg2,*arg3);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15210,7 +15210,7 @@ SWIGINTERN PyObject *_wrap_iFontServer_LoadFont__SWIG_0(PyObject *SWIGUNUSEDPARM
   arg3 = static_cast< float >(val3);
   result = (arg1)->LoadFont((char const *)arg2,arg3);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iFont> ref((csPtr<iFont>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15256,7 +15256,7 @@ SWIGINTERN PyObject *_wrap_iFontServer_LoadFont__SWIG_1(PyObject *SWIGUNUSEDPARM
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->LoadFont((char const *)arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iFont> ref((csPtr<iFont>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17645,7 +17645,7 @@ SWIGINTERN PyObject *_wrap_iShaderCompiler_CompileShader__SWIG_0(PyObject *SWIGU
   arg4 = static_cast< int >(val4);
   result = (arg1)->CompileShader(arg2,arg3,arg4);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iShader> ref((csPtr<iShader>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17697,7 +17697,7 @@ SWIGINTERN PyObject *_wrap_iShaderCompiler_CompileShader__SWIG_1(PyObject *SWIGU
   arg3 = reinterpret_cast< iDocumentNode * >(argp3);
   result = (arg1)->CompileShader(arg2,arg3);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iShader> ref((csPtr<iShader>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -19532,7 +19532,7 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Pop(PyObject *SWIGUNUSEDPARM(self), PyOb
   arg1 = reinterpret_cast< csArray<csRef<iShader > > * >(argp1);
   result = (arg1)->Pop();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iShader> ref((csRef<iShader>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -21771,7 +21771,7 @@ SWIGINTERN PyObject *_wrap_iSuperLightmap_Dump(PyObject *SWIGUNUSEDPARM(self), P
   arg1 = reinterpret_cast< iSuperLightmap * >(argp1);
   result = (arg1)->Dump();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csPtr<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -21879,7 +21879,7 @@ SWIGINTERN PyObject *_wrap_iTextureManager_RegisterTexture__SWIG_0(PyObject *SWI
   }
   result = (arg1)->RegisterTexture(arg2,arg3,arg4);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -21937,7 +21937,7 @@ SWIGINTERN PyObject *_wrap_iTextureManager_RegisterTexture__SWIG_1(PyObject *SWI
   arg3 = static_cast< int >(val3);
   result = (arg1)->RegisterTexture(arg2,arg3);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22084,7 +22084,7 @@ SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture__SWIG_0(PyObject *SWIGU
   }
   result = (arg1)->CreateTexture(arg2,arg3,arg4,(char const *)arg5,arg6,arg7);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22172,7 +22172,7 @@ SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture__SWIG_1(PyObject *SWIGU
   arg6 = static_cast< int >(val6);
   result = (arg1)->CreateTexture(arg2,arg3,arg4,(char const *)arg5,arg6);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())

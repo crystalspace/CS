@@ -3015,7 +3015,7 @@ SWIG_From_size_t  (size_t value)
 }
 
 SWIGINTERN PyObject *csShaderVariable_GetValue__SWIG_13(csShaderVariable *self){
-		/*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pyshadervar.i,20,SHADERVAR_RETURN@*/
+		/*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pyshadervar.i,20,SHADERVAR_RETURN@*/
 		PyObject *obj = Py_None;
 		if (self)
 		{
@@ -3027,7 +3027,7 @@ SWIGINTERN PyObject *csShaderVariable_GetValue__SWIG_13(csShaderVariable *self){
 				obj = PyFloat_FromDouble(fval);
 				break;
 			case csShaderVariable::VECTOR2:
-				/*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pyshadervar.i,6,SHADERVAR_GET@*/
+				/*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pyshadervar.i,6,SHADERVAR_GET@*/
 	{
 	    csVector2 *res = new csVector2 ();
 	    self->GetValue(* res);
@@ -3036,7 +3036,7 @@ SWIGINTERN PyObject *csShaderVariable_GetValue__SWIG_13(csShaderVariable *self){
 /*@SWIG@*/
 				break;
 			case csShaderVariable::VECTOR3:
-				/*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pyshadervar.i,6,SHADERVAR_GET@*/
+				/*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pyshadervar.i,6,SHADERVAR_GET@*/
 	{
 	    csVector3 *res = new csVector3 ();
 	    self->GetValue(* res);
@@ -3050,7 +3050,7 @@ SWIGINTERN PyObject *csShaderVariable_GetValue__SWIG_13(csShaderVariable *self){
 				obj = SWIG_From_long((long)ival);
 				break;
 			case csShaderVariable::VECTOR4:
-				/*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pyshadervar.i,6,SHADERVAR_GET@*/
+				/*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pyshadervar.i,6,SHADERVAR_GET@*/
 	{
 	    csVector4 *res = new csVector4 ();
 	    self->GetValue(* res);
@@ -3059,7 +3059,7 @@ SWIGINTERN PyObject *csShaderVariable_GetValue__SWIG_13(csShaderVariable *self){
 /*@SWIG@*/
 				break;
 			case csShaderVariable::MATRIX:
-				/*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pyshadervar.i,6,SHADERVAR_GET@*/
+				/*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pyshadervar.i,6,SHADERVAR_GET@*/
 	{
 	    csMatrix3 *res = new csMatrix3 ();
 	    self->GetValue(* res);
@@ -3068,7 +3068,7 @@ SWIGINTERN PyObject *csShaderVariable_GetValue__SWIG_13(csShaderVariable *self){
 /*@SWIG@*/
 				break;
 			case csShaderVariable::TRANSFORM:
-				/*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pyshadervar.i,6,SHADERVAR_GET@*/
+				/*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pyshadervar.i,6,SHADERVAR_GET@*/
 	{
 	    csReversibleTransform *res = new csReversibleTransform ();
 	    self->GetValue(* res);
@@ -3077,7 +3077,7 @@ SWIGINTERN PyObject *csShaderVariable_GetValue__SWIG_13(csShaderVariable *self){
 /*@SWIG@*/
 				break;
 			case csShaderVariable::TEXTURE:
-				/*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pyshadervar.i,13,SHADERVAR_GETREF@*/
+				/*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pyshadervar.i,13,SHADERVAR_GETREF@*/
 	{
 	    iTextureHandle *res;
 	    self->GetValue(res);
@@ -3086,7 +3086,7 @@ SWIGINTERN PyObject *csShaderVariable_GetValue__SWIG_13(csShaderVariable *self){
 /*@SWIG@*/
 				break;
 			case csShaderVariable::RENDERBUFFER:
-				/*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pyshadervar.i,13,SHADERVAR_GETREF@*/
+				/*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pyshadervar.i,13,SHADERVAR_GETREF@*/
 	{
 	    iRenderBuffer *res;
 	    self->GetValue(res);
@@ -8166,7 +8166,7 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetMipmap(PyObject *SWIGUNUSEDPARM(self),
   arg2 = static_cast< uint >(val2);
   result = (arg1)->GetMipmap(arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -8253,7 +8253,7 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetSubImage(PyObject *SWIGUNUSEDPARM(self
   arg2 = static_cast< uint >(val2);
   result = (arg1)->GetSubImage(arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -8309,7 +8309,7 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetCookedImageData(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< csImageBase * >(argp1);
   result = (arg1)->GetCookedImageData();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csRef<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -9508,7 +9508,7 @@ SWIGINTERN PyObject *_wrap_csImageMemory_GetRawData(PyObject *SWIGUNUSEDPARM(sel
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
   result = ((csImageMemory const *)arg1)->GetRawData();
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csRef<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -9938,7 +9938,7 @@ SWIGINTERN PyObject *_wrap_csImageMemory_GetMipmap(PyObject *SWIGUNUSEDPARM(self
   arg2 = static_cast< uint >(val2);
   result = (arg1)->GetMipmap(arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -10612,7 +10612,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Rescale__SWIG_0(PyObject *SWIGUNUSE
   arg4 = static_cast< int >(val4);
   result = csImageManipulate::Rescale(arg1,arg2,arg3,arg4);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -10664,7 +10664,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Rescale__SWIG_1(PyObject *SWIGUNUSE
   arg3 = static_cast< int >(val3);
   result = csImageManipulate::Rescale(arg1,arg2,arg3);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -10781,7 +10781,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Mipmap__SWIG_0(PyObject *SWIGUNUSED
   arg3 = reinterpret_cast< csRGBpixel * >(argp3);
   result = csImageManipulate::Mipmap(arg1,arg2,arg3);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -10824,7 +10824,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Mipmap__SWIG_1(PyObject *SWIGUNUSED
   arg2 = static_cast< int >(val2);
   result = csImageManipulate::Mipmap(arg1,arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -10919,7 +10919,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Blur__SWIG_0(PyObject *SWIGUNUSEDPA
   arg2 = reinterpret_cast< csRGBpixel * >(argp2);
   result = csImageManipulate::Blur(arg1,arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -10953,7 +10953,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Blur__SWIG_1(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< iImage * >(argp1);
   result = csImageManipulate::Blur(arg1);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -11063,7 +11063,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Crop(PyObject *SWIGUNUSEDPARM(self)
   arg5 = static_cast< int >(val5);
   result = csImageManipulate::Crop(arg1,arg2,arg3,arg4,arg5);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -11115,7 +11115,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Sharpen__SWIG_0(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< csRGBpixel * >(argp3);
   result = csImageManipulate::Sharpen(arg1,arg2,arg3);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -11158,7 +11158,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Sharpen__SWIG_1(PyObject *SWIGUNUSE
   arg2 = static_cast< int >(val2);
   result = csImageManipulate::Sharpen(arg1,arg2);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -11268,7 +11268,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_TransformColor(PyObject *SWIGUNUSED
   arg3 = reinterpret_cast< csColor4 * >(argp3);
   result = csImageManipulate::TransformColor(arg1,(csColor4 const &)*arg2,(csColor4 const &)*arg3);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -11302,7 +11302,7 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Gray(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iImage * >(argp1);
   result = csImageManipulate::Gray(arg1);
   {
-    /*@SWIG:/home/vince/Projects/CrystalSpace/1.4/CS/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp1/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())

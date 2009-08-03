@@ -723,6 +723,8 @@ class iAnimatedMeshFactorySubMesh(core.iBase):
     def GetIndices(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetIndices(*args)
     def GetIndexSetCount(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetIndexSetCount(*args)
     def GetBoneIndices(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetBoneIndices(*args)
+    def GetMaterial(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetMaterial(*args)
+    def SetMaterial(*args): return _imesh.iAnimatedMeshFactorySubMesh_SetMaterial(*args)
     scfGetVersion = staticmethod(_imesh.iAnimatedMeshFactorySubMesh_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iAnimatedMeshFactorySubMesh
     __del__ = lambda self : None;
