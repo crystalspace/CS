@@ -1572,8 +1572,8 @@ Optional Features:
                           Mac OS X with universal SDK installed, else NO)
   --enable-cpu-specific-optimizations=level
                           enable CPU-specific optimizations; recognized levels
-                          are `no', `minimum' or `min', `maximum' or `max'
-                          (default MINIMUM), `native'; the `minimum' option
+                          are `no', `minimum' or `min', `maximum' or `max',
+                          `native' (default MINIMUM); the `minimum' option
                           selects optimizations which are likely to be
                           supported by reasonably modern hardware, thus making
                           the resulting executables fairly portable; use the
@@ -21461,7 +21461,7 @@ fi
 fi
 
 	if test $enable_cpu_specific_optimizations = maximum \
-		-o $enable_cpu_specific_optimizations = native; then
+		|| test $enable_cpu_specific_optimizations = native; then
 
     if test "$cs_cv_prog_cxx_code_gen" = no; then
   case $host_cpu in
