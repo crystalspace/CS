@@ -685,7 +685,7 @@ AC_MSG_CHECKING([whether to use CPU-specific optimizations])
 AC_ARG_ENABLE([cpu-specific-optimizations],
     [AC_HELP_STRING([--enable-cpu-specific-optimizations=level],
 	[enable CPU-specific optimizations; recognized levels are `no',
-	`minimum' or `min', `maximum' or `max' (default MINIMUM), `native';
+	`minimum' or `min', `maximum' or `max', `native' (default MINIMUM);
 	the `minimum' option selects optimizations which are likely to be 
 	supported by reasonably modern hardware, thus making the resulting 
 	executables fairly portable; use the `maximum' option with caution 
@@ -712,7 +712,7 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	AS_IF([test $enable_cpu_specific_optimizations = native],
 	    [CS_CHECK_CODE_GEN_FLAG([*], [-march=native -mtune=native])])
 	AS_IF([test $enable_cpu_specific_optimizations = maximum \
-		-o $enable_cpu_specific_optimizations = native],
+		|| test $enable_cpu_specific_optimizations = native],
 	    [CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=generic])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=pentium3])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3])])
