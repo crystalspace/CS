@@ -9755,6 +9755,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *SetTitle = *cspacec::iNativeWindow_SetTitle;
+*SetIcon = *cspacec::iNativeWindow_SetIcon;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
