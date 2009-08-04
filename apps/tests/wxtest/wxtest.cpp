@@ -185,8 +185,9 @@ bool Simple::HandleEvent (iEvent& ev)
     if((ev.Name == KeyboardDown) &&
        (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
     {
-      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
-      if (q) q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
+      /* Close the main window, which will trigger an application exit.
+         CS-specific cleanup happens in OnClose(). */
+      Close();
       return true;
     }
   }
@@ -334,6 +335,12 @@ bool Simple::Initialize ()
   // not to need this.
   engine->SetLightingCacheMode (0);
 
+  /* Manually focus the GL canvas.
+     This is so it receives keyboard events (and conveniently translate these
+     into CS keyboard events/update the CS keyboard state).
+   */
+  wxwin->GetWindow()->SetFocus ();
+
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
@@ -406,6 +413,18 @@ void Simple::PushFrame ()
   if (vc)
     vc->Advance();
   q->Process();
+}
+
+void Simple::OnClose(wxCloseEvent& event)
+{
+  csPrintf("got close event\n");
+  
+  // Tell CS we're going down
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+  if (q) q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
+  
+  // WX will destroy the 'Simple' instance
+  simple = 0;
 }
 
 void Simple::OnIconize(wxIconizeEvent& event)
@@ -513,8 +532,6 @@ void MyApp::OnIdle() {
 
 int MyApp::OnExit()
 {
-  simple->Shutdown ();
-  simple = 0;
   csInitializer::DestroyApplication (object_reg);
   return 0;
 }
