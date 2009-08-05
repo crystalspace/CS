@@ -26,6 +26,7 @@
 #include "xwindow.h"
 #include "csgeom/csrect.h"
 #include "csgfx/imageautoconvert.h"
+#include "csgfx/imagemanipulate.h"
 #include "csutil/callstack.h"
 #include "csutil/cfgacc.h"
 #include "csutil/eventnames.h"
@@ -451,12 +452,38 @@ void csXWindow::SetIcon (iImage *image)
   if (!dpy || !wm_win) return;
   //check and prepare the data we will work on
   if (!image) { return; }
-  CS::ImageAutoConvert imageRGBA (image, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
-  int imgW = imageRGBA->GetWidth();
-  int imgH = imageRGBA->GetHeight();
-  /* @@@ NOTE: Apparently not all Window Managers like icons of all sizes
-     (eg Compiz doesn't display icons larger than 48x48 in some places)
-     - consider providing a "scaled down" version of the icon as well? */
+  
+  static const int tooLargeSize = 48;
+  
+  csRefArray<iImage> iconImages;
+  {
+    CS::ImageAutoConvert imageRGBA (image, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+    iconImages.Push (imageRGBA);
+    /* Apparently not all Window Managers like icons of all sizes
+       (eg Compiz doesn't display icons larger than 48x48 in some places)
+       - so also provide a scaled down version of the icon */
+    {
+      int imgW = imageRGBA->GetWidth();
+      int imgH = imageRGBA->GetHeight();
+      if ((imgW > tooLargeSize) || (imgH > tooLargeSize))
+      {
+	int newW, newH;
+	if (imgW > imgH)
+	{
+	  newW = tooLargeSize;
+	  newH = int ((float(imgH)/float(imgW)) * tooLargeSize);
+	}
+	else
+	{
+	  newW = int ((float(imgW)/float(imgH)) * tooLargeSize);
+	  newH = tooLargeSize;
+	}
+	iconImages.Insert (0,
+	  csImageManipulate::Rescale (imageRGBA, newW, newH));
+      }
+    }
+  }
+  
 
   /*
     Convert image data into format expected by _NET_WM_ICON.
@@ -466,12 +493,23 @@ void csXWindow::SetIcon (iImage *image)
     low byte being B. The first two cardinals are width, height. Data is in rows, 
     left to right and top to bottom. "
    */
-  unsigned long* iconData = (unsigned long*)cs_malloc ((2 + imgW * imgH) * sizeof (unsigned long));
-  iconData[0] = imgW;
-  iconData[1] = imgH;
+  size_t iconDataSize = 0;
+  for (size_t i = 0; i < iconImages.GetSize(); i++)
   {
-    const csRGBpixel* src = (csRGBpixel*)imageRGBA->GetImageData();
-    unsigned long* dst = iconData+2;
+    iconDataSize += 2 + iconImages[i]->GetWidth()*iconImages[i]->GetHeight();
+  }
+  unsigned long* iconData = (unsigned long*)cs_malloc (iconDataSize * sizeof (unsigned long));
+  unsigned long* iconDataPtr = iconData;
+  for (size_t i = 0; i < iconImages.GetSize(); i++)
+  {
+    iImage* img = iconImages[i];
+    int imgW = img->GetWidth();
+    int imgH = img->GetHeight();
+    
+    iconDataPtr[0] = imgW;
+    iconDataPtr[1] = imgH;
+    const csRGBpixel* src = (csRGBpixel*)img->GetImageData();
+    unsigned long* dst = iconDataPtr+2;
     for (size_t nPixels = imgW*imgH; nPixels-- > 0; )
     {
       *dst =
@@ -479,12 +517,13 @@ void csXWindow::SetIcon (iImage *image)
       src++;
       dst++;
     }
+    iconDataPtr = dst;
   }
   
   Atom iconAtom = XInternAtom (dpy, "_NET_WM_ICON", False);
   XChangeProperty (dpy, wm_win, iconAtom, XA_CARDINAL, 32,
     PropModeReplace, (unsigned char*)iconData,
-    2 + imgW * imgH);  
+    iconDataSize);  
   
   cs_free (iconData);
 }
