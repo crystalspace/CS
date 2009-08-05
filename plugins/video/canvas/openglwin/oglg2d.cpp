@@ -20,6 +20,7 @@
 #include "csutil/sysfunc.h"
 
 
+#include "csplugincommon/win32/icontools.h"
 #include "csutil/win32/wintools.h"
 #include "csutil/win32/win32.h"
 
@@ -165,7 +166,8 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
   scfImplementationType (this, iParent),
   m_nGraphicsReady (true),
   m_hWnd (0),
-  modeSwitched (true)
+  modeSwitched (true),
+  customIcon (0)
 {
 }
 
@@ -747,7 +749,10 @@ void csGraphics2DOpenGL::SetTitle (const char* title)
 
 void csGraphics2DOpenGL::SetIcon (iImage *image)
 {
-   //TODO: IMPLEMENT THIS FOR WINDOWS
+  HICON icon = CS::Platform::Win32::IconTools::IconFromImage (image);
+  SendMessage (m_hWnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
+  if (customIcon != 0) DestroyIcon (customIcon);
+  customIcon = icon;
 }
 
 void csGraphics2DOpenGL::AlertV (int type, const char* title, const char* okMsg,

@@ -134,6 +134,7 @@ protected:
   bool hardwareAccelerated;
 
   csWin32CustomCursors cursors;
+  HICON customIcon;
 };
 
 #endif // __CS_OGLG2D_H__

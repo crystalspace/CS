@@ -23,6 +23,8 @@
 #include "csgeom/math.h"
 #include "csgfx/imagememory.h"
 #include "csutil/win32/cachedll.h"
+#include "csutil/win32/wintools.h"
+#include "csplugincommon/canvas/cursorconvert.h"
 
 #include <windows.h>
 #include "csutil/win32/psdk-compat.h"
@@ -197,6 +199,252 @@ namespace CS
 	return csPtr<iImage> (img);
       }
 
-    } // namespace CS
+      static HBITMAP CreateCursorBitmapXP (HDC hDC, const BITMAPINFO* bitmapInfo,
+					    DWORD dibFlags, const void* data)
+      {
+	return CreateDIBitmap (hDC, &bitmapInfo->bmiHeader, dibFlags, data, 
+	  bitmapInfo, DIB_RGB_COLORS);
+      }
+
+      static HBITMAP CreateCursorBitmapOther (HDC hDC, const BITMAPINFO* bitmapInfo,
+					       DWORD /*dibFlags*/, const void* data)
+      {
+	HDC memDC = CreateCompatibleDC (hDC);
+	HBITMAP bm = CreateCompatibleBitmap (hDC, bitmapInfo->bmiHeader.biWidth,
+	  -bitmapInfo->bmiHeader.biHeight);
+        
+	SetDIBits (memDC, bm, 0, -bitmapInfo->bmiHeader.biHeight, data, bitmapInfo,
+	  DIB_RGB_COLORS);
+	DeleteDC (memDC);
+        
+	return bm;
+      }
+
+      typedef HBITMAP (*CreateCursorBitmapFN)(HDC hDC, const BITMAPINFO* bitmapInfo,
+	DWORD dibFlags, const void* data);
+
+      HICON IconTools::IconFromImage (iImage* image, const ICONINFO* iconTemplate)
+      {
+	cswinWindowsVersion ver;
+	cswinIsWinNT (&ver);
+	HDC DC = GetDC (0);
+	int colorDepth = GetDeviceCaps (DC, BITSPIXEL);
+	ReleaseDC (0, DC);
+	// Use alpha cursor when we can (Win2K+), the image actually possesses
+	// alpha data, and if we have more than 24bpp color depth
+	bool doAlpha = (ver >= cswinWin2K)
+	  && (image->GetFormat() & CS_IMGFMT_ALPHA)
+	  && (colorDepth >= 24);
+	// Only use a paletted cursor when we're on NT4.0 or the source image
+	// has a palette, but we won't use alpha for it.
+	bool doPaletted = (ver == cswinWinNT) 
+	  || (((image->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+	  && !doAlpha);
+	CreateCursorBitmapFN CreateCursorBitmap = 
+	  (ver >= cswinWinXP) ? &CreateCursorBitmapXP : &CreateCursorBitmapOther;
+
+	const int imgW = image->GetWidth();
+	const int imgH = image->GetHeight();
+        
+	uint8* pixels = 0;
+	csRGBpixel* palette = 0;
+	uint8* pixelsRGB = 0;
+	csRef<csImageMemory> imageRGB;
+	csRGBpixel transp;
+	if (doPaletted)
+	{
+	  if (!csCursorConverter::ConvertTo8bpp (image, pixels, palette, 0))
+	    return 0;
+	}
+	else
+	{
+      #include "csutil/custom_new_disable.h"
+	  imageRGB.AttachNew (new csImageMemory (image));
+      #include "csutil/custom_new_enable.h"
+	  if (!doAlpha)
+	  {
+	    imageRGB->SetFormat (CS_IMGFMT_TRUECOLOR 
+	      | (image->GetFormat () & ~CS_IMGFMT_MASK));
+
+	    int tr = 255, tg = 0, tb = 255;
+	    if (image->HasKeyColor ())
+	      image->GetKeyColor (tr, tg, tb);
+	    transp.Set (tr, tg, tb);
+	    if (image->GetFormat () & CS_IMGFMT_ALPHA)
+	      csCursorConverter::StripAlphaFromRGBA (imageRGB, transp);
+	  }
+	  else
+	    imageRGB->SetFormat (CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+
+	  int scanlineSize = doAlpha ? imgW * 4 : ((imgW * 3) + 3) & ~3;
+	  csRGBpixel* imageData = (csRGBpixel*)imageRGB->GetImageData();
+	  pixelsRGB = new uint8[scanlineSize * imgH];
+	  for (int y = 0; y < imgH; y++)
+	  {
+	    uint8* pixPtr = pixelsRGB + (y * scanlineSize);
+
+	    for (int x = 0; x < imgW; x++)
+	    {
+	      if (doAlpha)
+	      {
+		*pixPtr++ = imageData->blue;
+		*pixPtr++ = imageData->green;
+		*pixPtr++ = imageData->red;
+		*pixPtr++ = imageData->alpha;
+	      }
+	      else
+	      {
+		if (imageData->eq (transp))
+		{
+		  *pixPtr++ = 0;
+		  *pixPtr++ = 0;
+		  *pixPtr++ = 0;
+		}
+		else
+		{
+		  *pixPtr++ = imageData->blue;
+		  *pixPtr++ = imageData->green;
+		  *pixPtr++ = imageData->red;
+		}
+	      }
+	      imageData++;
+	    }
+	  }
+	}
+       
+	BITMAPINFO* bmpInfoMem;
+	bmpInfoMem = (BITMAPINFO *)calloc (sizeof (BITMAPINFOHEADER) + 
+	  (doPaletted ? sizeof (RGBQUAD) * 256 : 0), 1);
+
+	bmpInfoMem->bmiHeader.biSize           = sizeof (BITMAPINFOHEADER);
+	bmpInfoMem->bmiHeader.biWidth          = imgW;
+	bmpInfoMem->bmiHeader.biHeight         = -imgH;
+	bmpInfoMem->bmiHeader.biPlanes         = 1;
+	bmpInfoMem->bmiHeader.biBitCount       = doPaletted ? 8 : (doAlpha ? 32 : 24);
+	bmpInfoMem->bmiHeader.biCompression    = BI_RGB;
+
+	int i;
+	if (doPaletted)
+	{
+	  for(i = 0; i < 256; i++)
+	  {
+	    bmpInfoMem->bmiColors[i].rgbRed = palette[i].red;
+	    bmpInfoMem->bmiColors[i].rgbGreen = palette[i].green;
+	    bmpInfoMem->bmiColors[i].rgbBlue = palette[i].blue;
+	  }
+	  bmpInfoMem->bmiColors[0].rgbRed = 0;
+	  bmpInfoMem->bmiColors[0].rgbGreen = 0;
+	  bmpInfoMem->bmiColors[0].rgbBlue = 0;
+       
+	  if (imgW & 1)
+	  {
+	    // Pixel data needs WORD alignment
+	    size_t scanlineSize = imgW + 1;
+	    uint8* alignedPixels = new uint8[scanlineSize * imgH];
+	    for (int y = 0; y < imgH; y++)
+	    {
+	      memcpy (alignedPixels + (y * scanlineSize), pixels + (y * imgW), imgW);
+	    }
+	    delete[] pixels; pixels = alignedPixels;
+	  }
+	  delete[] palette;
+	}
+
+	HDC hClientDC	= GetDC (0);
+
+	HBITMAP XORbitmap = CreateCursorBitmap (hClientDC, bmpInfoMem, CBM_INIT, 
+	  doPaletted ? pixels : pixelsRGB);
+
+	HBITMAP ANDbitmap;
+	if (!doAlpha)
+	{
+	  // Create the monochrome AND mask
+	  int destScanlineSize = (((imgW + 7) / 8) + 1) & ~1;
+	  if (doPaletted)
+	  {
+	    int srcScanlineSize = (imgW + 1) & ~1;
+	    CS_ALLOC_STACK_ARRAY(uint8, destLine, destScanlineSize + 1);
+            
+	    for (int y = 0; y < imgH; y++)
+	    {
+	      uint8* dest = destLine;
+	      memset (dest, 0, destScanlineSize);
+	      uint8* src = pixels + y * srcScanlineSize;
+              
+	      for (int x = 0; x < imgW; x++)
+	      {
+		if (*src++ == 0)
+		  *dest |= 1;
+                
+		if (((x + 1) % 8) == 0)
+		  dest++;
+		else
+		  *dest <<= 1;
+	      }
+	      *dest <<= 7 - (imgW % 8);
+	      memcpy (pixels + y * destScanlineSize, destLine, destScanlineSize);
+	    }
+	    ANDbitmap = CreateBitmap (imgW, imgH, 1, 1, pixels);
+	  }
+	  else
+	  {
+	    csRGBpixel* imageData = (csRGBpixel*)imageRGB->GetImageData();
+	    uint8* pixels = new uint8[imgH * destScanlineSize];
+	    memset (pixels, 0, imgH * destScanlineSize);
+            
+	    for (int y = 0; y < imgH; y++)
+	    {
+	      uint8* dest = pixels + y * destScanlineSize;
+              
+	      for (int x = 0; x < imgW; x++)
+	      {
+		if ((imageData++)->eq (transp))
+		  *dest |= 1;
+                
+		if (((x + 1) % 8) == 0)
+		  dest++;
+		else
+		  *dest <<= 1;
+	      }
+	      if ((imgW % 8) != 0)
+		*dest <<= 7 - (imgW % 8);
+	    }
+	    ANDbitmap = CreateBitmap (imgW, imgH, 1, 1, pixels);
+	    delete[] pixels;
+	  }
+	}
+	else
+	{
+	  ANDbitmap = CreateBitmap (imgW, imgH, 1, 1, 0);
+	    /* Apparently, for alpha cursors, the AND mask 
+	       contents don't matter, but you need _some_
+	       bitmap */
+	}
+
+	ICONINFO iconInfo;
+	if (iconTemplate != 0)
+	  iconInfo = *iconTemplate;
+	else
+	{
+	  iconInfo.fIcon          = true;
+	  iconInfo.xHotspot	  = 0;
+	  iconInfo.yHotspot	  = 0;
+	}
+	iconInfo.hbmMask	  = ANDbitmap;
+	iconInfo.hbmColor	  = XORbitmap;
+
+	HICON icon = CreateIconIndirect (&iconInfo);
+
+	ReleaseDC (0, hClientDC);
+	if (ANDbitmap) DeleteObject (ANDbitmap);
+	if (XORbitmap) DeleteObject (XORbitmap);
+	free (bmpInfoMem);
+	delete[] pixels;
+	delete[] pixelsRGB;
+
+	return icon;
+      }
+
+    } // namespace Win32
   } // namespace Platform
-} // namespace Win32
+} // namespace CS
