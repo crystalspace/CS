@@ -1894,7 +1894,7 @@ bool csVFS::PopDir ()
     return false;
   char *olddir = (char *) dirstack.GetValue()->Pop ();
   bool retcode = ChDir (olddir);
-  cs_free (olddir);
+  delete[] olddir;
   return retcode;
 }
 

@@ -35,12 +35,12 @@ class csStringArrayElementHandler : public csArrayElementHandler<const char*>
 public:
   static void Construct (const char** address, const char* const& src)
   {
-    *address = CS::StrDup (src);
+    *address = csStrNew (src);
   }
 
   static void Destroy (const char** address)
   {
-    cs_free ((char*)*address);
+    delete[] (char*)*address;
   }
 
   static void InitRegion (const char** address, size_t count)
