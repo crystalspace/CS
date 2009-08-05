@@ -38,12 +38,12 @@ namespace lighter
   class PartialElementIgnoreCallback;  
   
   // Class to calculate direct lighting
-  class DirectLighting : public LightComponent
+  class RaytracerLighting : public LightComponent
   {
   public:
     // Setup
-    DirectLighting (const csVector3& tangentSpaceNorm, size_t subLightmapNum);
-    ~DirectLighting ();
+    RaytracerLighting (const csVector3& tangentSpaceNorm, size_t subLightmapNum);
+    ~RaytracerLighting ();
 
     virtual csColor ComputeElementLightingComponent(Sector* sector, 
       ElementProxy element, SamplerSequence<2>& lightSampler,
@@ -116,9 +116,9 @@ namespace lighter
   
     struct ShadeAllLightsNonPD
     {
-      DirectLighting& lighting;
+      RaytracerLighting& lighting;
       const LightRefArray& allLights;
-      ShadeAllLightsNonPD (DirectLighting& lighting, 
+      ShadeAllLightsNonPD (RaytracerLighting& lighting, 
         const LightRefArray& allLights) : lighting (lighting), 
         allLights (allLights) {}
       inline csColor ShadeLight (Object* obj, const csVector3& point, 
@@ -129,10 +129,10 @@ namespace lighter
 
     struct ShadeRndLightNonPD
     {
-      DirectLighting& lighting;
+      RaytracerLighting& lighting;
       const LightRefArray& allLights;
       SamplerSequence<3>& lightSampler;
-      ShadeRndLightNonPD (DirectLighting& lighting, 
+      ShadeRndLightNonPD (RaytracerLighting& lighting, 
         const LightRefArray& allLights, SamplerSequence<3>& lightSampler) : 
         lighting (lighting), allLights (allLights), 
         lightSampler (lightSampler) {}
@@ -144,9 +144,9 @@ namespace lighter
 
     struct ShadeOneLight
     {
-      DirectLighting& lighting;
+      RaytracerLighting& lighting;
       Light* light;
-      ShadeOneLight (DirectLighting& lighting, Light* light) : 
+      ShadeOneLight (RaytracerLighting& lighting, Light* light) : 
         lighting (lighting), light (light) {}
       inline csColor ShadeLight (Object* obj, const csVector3& point, 
         const csVector3& normal, SamplerSequence<2>& sampler, 
@@ -165,12 +165,12 @@ namespace lighter
     csVector3 ComputeElementNormal (ElementProxy element, const csVector3& pt) const;
     
     // Function Pointer -- Shade a point
-    typedef csColor (DirectLighting::*PVLPointShader)(Sector* sector, 
+    typedef csColor (RaytracerLighting::*PVLPointShader)(Sector* sector, 
       Object* obj, const csVector3& point, const csVector3& normal, 
       SamplerSequence<2>& lightSampler);
 
     // Function Pointer -- Shade a lightmap element
-    typedef csColor (DirectLighting::*LMElementShader)(Sector* sector, 
+    typedef csColor (RaytracerLighting::*LMElementShader)(Sector* sector, 
       ElementProxy element, SamplerSequence<2>& lightSampler,
       bool recordInfluence);
 

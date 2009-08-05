@@ -48,12 +48,12 @@ namespace lighter
     }
   };
 
-  class IndirectLight : public LightComponent
+  class PhotonmapperLighting : public LightComponent
   {
   public:
     // Setup
-    IndirectLight ();
-    ~IndirectLight ();
+    PhotonmapperLighting ();
+    ~PhotonmapperLighting ();
 
     virtual csColor ComputeElementLightingComponent(Sector* sector, 
       ElementProxy element, SamplerSequence<2>& lightSampler,
@@ -64,6 +64,15 @@ namespace lighter
       SamplerSequence<2>& lightSampler);
 
     /**
+     * SetPhotonStorage
+     * Set weather direct and indirect photons should be stored
+     * /param storeDirectPhotons - Directly emitted photons should be stored 
+     * /param storeIndirectPhotons - Scattered photons should be stored
+     */
+    void SetPhotonStorage(bool storeDirectPhotons,
+      bool storeIndirectPhotons);
+
+    /**
     * EmitPhotons
     * Emits photons in the given sector from the lights
     * /param sect - the sector to emit photons into 
@@ -71,20 +80,35 @@ namespace lighter
     */
     void EmitPhotons(Sector *sect, Statistics::Progress& progress);
 
+    /**
+    * BalancePhotons
+    * Balance the photon map KD-Tree for the indicated sector
+    * /param sect - the sector to balance 
+    * /param progress - the progress we are making in calculations
+    */
+    void BalancePhotons(Sector *sect, Statistics::Progress& progress);
+
   private:
    /**
     * Emit Photon
     * Emits a photon in this sector and traces it through till its
     * termination using a monte-carlo based technique to determine
     * the termination.
-    * /param pos - the position we are starting the trace from
-    * /param dir - the direction we are tracing
-    * /param color - the color of the photon
-    * /param power - the power of the current photon
-    * /param depth - how deep this call currently is
-    * /param depth - is this photon a reflected photon or an initial emmision (default)
+    * /param sect - the sector the photon is emitting into
+    * /param photon - the photon to emit
+    * /param maxDepth - the maximum number of recursive bounces allowed
+    * /param depth - the number of times this photon has scattered
+    * /param ignoreDirect - weather or not to store direct photons (depth=0)
     */
-    static void EmitPhoton(Sector* &sect, const PhotonRay &photon, const size_t &depth);
+    static void EmitPhoton(Sector* &sect, const PhotonRay &photon,
+      const size_t &maxDepth, const size_t &depth, const bool &ignoreDirect);
+
+    /**
+     * SpotlightDir
+     *    Compute a random direction within the cone of the spotlight with
+     * direction 'dir' and falloffOutter as 'cosTheta'.
+     **/
+    static csVector3 SpotlightDir(const csVector3 &dir, const float cosTheta);
 
     /**
      * DiffuseScatter
@@ -96,17 +120,45 @@ namespace lighter
      **/
     static csVector3 DiffuseScatter(const csVector3 &n);
 
+    /**
+     * StratifiedSample
+     *    This function divides the hemisphere around the vector n into a grid
+     * of M by N samples and returns a vector at the grid point (i, j) that is
+     * jittered off the grid slightly.  This is jittered, stratified sampling.
+     * /param n - The surface normal to generate vectors around
+     * /param i - The azimuth grid point to generate the vector from
+     * /param j - The altitude grid point to generate the vector from
+     * /param M - The number of altitude subdivisions
+     * /param N - the number of azimuth subdivisions
+     **/
+    static csVector3 StratifiedSample(const csVector3 &n, const size_t i,
+                        const size_t j, const size_t M, const size_t N);
+    /**
+     * RotateAroundN
+     *    This function will rotate the vector n away from itself theta radians
+     * then around the original n phi radians.  It is used for generating directions
+     * to emit photons from light sources and to scatter those photons when bouncing.
+     * /param n - The vector to rotate (usual a surface normal)
+     * /param theta - Angle away from n to rotate (in radians)
+     * /param phi - Angle around n to rotate (in radians)
+     **/
+    static csVector3 RotateAroundN(const csVector3 &n, const double theta, const double phi);
 
     csRandomVectorGen randVect;
     csRandomFloatGen randFloat;
 
-    // The global lighter2 settings do not change so we 
-    // cache their values locally to avoid multiple lookups
-    bool finalGather;
-    int numFinalGatherRays;
-    float searchRadius;
-    int numPhotonsPerSector;
-    int numSamplesPerPhoton;
+    // These values all come from the lighter2 global settings
+    int numPhotonsPerSector;  ///< Number of photons to emit in each sector of the world
+
+    bool directLightEnabled;   ///< Should direct photons be stored (first hit after emission)
+    bool indirectLightEnabled; ///< Should photons be scattered to estimate indirect lighting
+
+    float searchRadius;       ///< Maximum distance to search during density estimation
+    int numSamplesForDensity; ///< Maximum number of photons to sample during density est.
+
+    bool finalGather;               ///< Enable the final gather to eliminate noise
+    size_t numFinalGatherMSubdivs;  ///< Number of rays used in the final gather
+    size_t numFinalGatherNSubdivs;  ///< Number of rays used in the final gather
   };
 }
 

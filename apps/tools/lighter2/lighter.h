@@ -83,7 +83,8 @@ namespace lighter
     void CalculateLightmaps ();
 
     // Build the photon map
-    void BuildPhotonMap();
+    void BuildPhotonMaps();
+    void BalancePhotonMaps();
 
     // Initialize objects after LM construction
     void InitializeObjects ();
@@ -95,7 +96,7 @@ namespace lighter
     void BuildKDTrees ();
 
     // Compute all lighting components (Fill the lightmaps)
-    void ComputeLighting ();
+    void ComputeLighting (bool enableRaytracer, bool enablePhotonMapper);
 
     // Post-process all lightmaps
     void PostprocessLightmaps ();
@@ -104,7 +105,7 @@ namespace lighter
     void LoadConfiguration ();
 
     // Print command line help
-    void CommandLineHelp (bool expert) const;
+    void CommandLineHelp (bool expert, bool raytraceopts, bool pmopts) const;
 
     Scene *scene;
 
@@ -126,6 +127,7 @@ namespace lighter
     Statistics::Progress progBuildKDTree;
     Statistics::Progress progCalcLighting;
     Statistics::Progress progPhotonEmission;
+    Statistics::Progress progPhotonBalancing;
     Statistics::Progress progPostproc;
     Statistics::Progress progPostprocSector;
     Statistics::Progress progPostprocLM;

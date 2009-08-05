@@ -29,77 +29,171 @@
 #ifndef __PHOTONMAP_H__
 #define __PHOTONMAP_H__
 
+#include "statistics.h"
+
 namespace lighter
 {
   struct Photon;
   struct NearestPhotons;
 
+  enum FilterType
+  {
+    FILTER_NONE,
+    FILTER_CONE,
+    FILTER_GAUSS
+  };
+
   class PhotonMap
   {
   public:
-    PhotonMap( size_t max_phot );
+    PhotonMap( size_t maxPhot );
     ~PhotonMap();
 
-    void store(
-      const float power[3],         // photon power
-      const float pos[3],           // photon position
-      const float dir[3] );         // photon direction
+    /**
+     * Store
+     *    Add a photon to the photonMap structure.
+     * /param power - The radiant power of this photon
+     * /param pos - The world position of this photon
+     * /param dir - The INCOMING direction for this photon
+     **/
+    void Store(
+      const float power[3],
+      const float pos[3],
+      const float dir[3] );
 
-    void scale_photon_power(
-      const float scale );          // 1/(number of emitted photons)
+    size_t GetPhotonCount();
+    
+    /**
+     * ScalePhotonPower
+     *    Scale the power member of every photon in the map that
+     * was added since the last scale.  This is useful for scaling
+     * by the number of photons emitted for a single light.
+     * /param scale - Fraction to scale each photon's power by
+     **/
+    void ScalePhotonPower(
+      const float scale );
 
-    void balance(void);             // balance the kd-tree (before use!)
+    /**
+     * Balance
+     *    Restructure the photon map heap into a balanced kd-tree.
+     * You must call this function before using the map with the
+     * functions IrradianceEstimate, RadianceEstimate and LocatePhotons.
+     **/
+    void Balance(Statistics::ProgressState &prog);
 
-    void irradiance_estimate(
-      float irrad[3],                // returned irradiance
-      const float pos[3],            // surface position
-      const float normal[3],         // surface normal at pos
-      const float max_dist,          // max distance to look for photons
-      const size_t nphotons ) const; // number of photons to use
+    /**
+     * IrradianceEstimate
+     *    Estimate the irradiance landing on a specific point by computing
+     * the photon density in that area.  NOTE: This is NOT the visible light
+     * emitted from a point.
+     * /param irrad - Returned irradiance estimate
+     * /param pos - Position in scene to compute estimate (should be on surface)
+     * /param normal - The surface normal at 'pos'
+     * /param maxDist - The maximum distance to search for neighbors (world units)
+     * /param nphotons - The number of neighbor photons to use for estimate.
+     **/
+    void IrradianceEstimate(
+      float irrad[3],
+      const float pos[3],
+      const float normal[3],
+      const float maxDist,
+      const size_t nphotons,
+      const FilterType filter = FILTER_CONE) const;
 
-    void locate_photons(
-      NearestPhotons *const np,     // np is used to locate the photons
-      const size_t index ) const;      // call with index = 1
+    /**
+     * LocatePhotons
+     *     Search the kd-tree heap to find photons.  the NearestPhotons structure
+     * must be initialized with the number to search for, the maximum distance
+     * squared and the world position to search around.  Upon return, 'np' will
+     * contain a count of the number of photons found and pointers to the actual
+     * photon structures in a max heap.
+     * /param np - Structure to define the search and return the located photons.
+     * /param index - Index to start search (call with index = 1).
+     **/
+    void LocatePhotons(
+      NearestPhotons *const np,
+      const size_t index ) const;
 
-    void photon_dir(
-      float *dir,                    // direction of photon (returned)
-      const Photon *p ) const;       // the photon
+    /**
+     * PhotonDir
+     *    Convert the spherical coordinates stored in a photon into a
+     * world vector direction using the pre-compute lookup table.
+     * /param dir - returned vector direction (must be an array of 3 floats)
+     * /param p - photon structure to compute direction for
+     **/
+    void PhotonDir(
+      float *dir,
+      const Photon *p ) const;
+
+    /**
+     * SaveToFile
+     *    Write the contents of the photon map to a file for external use.
+     * The file will have the following format:
+     *
+     *    <size_t:photonCount>
+     *
+     *    <float:PositionXCoordinate>*photonCount
+     *    <float:PositionYCoordinate>*photonCount
+     *    <float:PositionZCoordinate>*photonCount
+     *
+     *    <float:PowerRedComponent>*photonCount
+     *    <float:PowerGreenComponent>*photonCount
+     *    <float:PowerBlueComponent>*photonCount
+     *
+     *    <unsigned char:DirectionThetaAngle>*photonCount
+     *    <unsigned char:DirectionPhiAngle>*photonCount
+     *
+     *    <short int:KDTreeSplittingPlane>*photonCount
+     *
+     * Note: whitespace and newlines above are not part of the file format.
+     * Endiness is the machine native format.
+     *
+     * /param filename - name of file to store photon map data
+     **/
+    void SaveToFile(
+      const char* filename);
 
   private:
 
-    bool expand();
+    static inline float ConeWeight(float dist, float r, float k);
+    static inline float GaussianWeight(float distSq, float rSq);
 
-    void balance_segment(
+    bool Expand();
+
+    void BalanceSegment(
       Photon **pbal,
       Photon **porg,
       const size_t index,
 
       const size_t start,
-      const size_t end );
+      const size_t end,
+      Statistics::ProgressState &prog);
 
-    void median_split(
+    void MedianSplit(
       Photon **p,
       const size_t start,
       const size_t end,
       const size_t median,
       const int axis );
 
-    Photon *photons;
+    Photon *photons;          ///< Internal array of photons (kd-tree heap after call to Balance())
 
-    size_t stored_photons;
-    size_t half_stored_photons;
-    size_t max_photons;
-    int prev_scale;
+    size_t initialSize;       ///< The initial requested array size (used for array expansion)
+    size_t storedPhotons;     ///< Number of photons stored in the internal array
+    size_t halfStoredPhotons; ///< Half the photons stored in the internal array
+    size_t maxPhotons;        ///< Allocated size of internal array
+    int prevScale;            ///< Index of the last photon scaled with ScalePhotonPower
+    float coneK;              ///< K factor used to control cone filter
 
-    float bbox_min[3];     // use bbox_min;
-    float bbox_max[3];     // use bbox_max;
+    float bboxMin[3];         ///< Minimum value in each dimension for bounding box computation
+    float bboxMax[3];         ///< Maximum value in each dimension for bounding box computation
 
-    // We save some memory by making these static
+    // Precomputed cosine and sine lookup tables for spherical coordinate conversion
     static bool directionTablesReady;
-    static float costheta[256];
-    static float sintheta[256];
-    static float cosphi[256];
-    static float sinphi[256];
+    static float cosTheta[256];
+    static float sinTheta[256];
+    static float cosPhi[256];
+    static float sinPhi[256];
   };
 };
 

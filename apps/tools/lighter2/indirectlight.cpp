@@ -19,29 +19,47 @@
 
 #include "common.h"
 #include "indirectlight.h"
-//#include "jensenphotonmap.h"
 
 #include "scene.h"
 
 namespace lighter
 {
-  IndirectLight::IndirectLight ()
+  PhotonmapperLighting::PhotonmapperLighting ()
   {
-    // Cache global settings
-    finalGather =           globalConfig.GetIndirectProperties() .finalGather;
-    numFinalGatherRays  =   globalConfig.GetIndirectProperties() .numFinalGatherRays;
-    searchRadius =          globalConfig.GetIndirectProperties() .sampleDistance;
-    numPhotonsPerSector =   globalConfig.GetIndirectProperties() .numPhotons;
-    numSamplesPerPhoton =   globalConfig.GetIndirectProperties() .numPerSample;
+    // Cache global photon map settings
+    searchRadius =         globalConfig.GetIndirectProperties() .sampleDistance;
+    numPhotonsPerSector =  globalConfig.GetIndirectProperties() .numPhotons;
+    numSamplesForDensity = globalConfig.GetIndirectProperties() .maxDensitySamples;
+
+    // Cache global final gather settings
+    finalGather =             globalConfig.GetIndirectProperties() .finalGather;
+    numFinalGatherMSubdivs  = globalConfig.GetIndirectProperties() .numFinalGatherRays;
+    numFinalGatherNSubdivs  = globalConfig.GetIndirectProperties() .numFinalGatherRays;
+
+    // Determine which bounces should be stored
+    directLightEnabled = 
+      (globalConfig.GetLighterProperties ().directLightEngine ==
+          LIGHT_ENGINE_PHOTONMAPPER);
+
+    indirectLightEnabled = 
+      (globalConfig.GetLighterProperties ().indirectLightEngine ==
+          LIGHT_ENGINE_PHOTONMAPPER);
 
     // Initialize random number generators
     randVect.Initialize();
     randFloat.Initialize();
   }
 
-  IndirectLight::~IndirectLight () {}
+  PhotonmapperLighting::~PhotonmapperLighting () {}
 
-  csColor IndirectLight::ComputeElementLightingComponent(Sector* sector,
+  void PhotonmapperLighting::SetPhotonStorage(bool storeDirectPhotons,
+          bool storeIndirectPhotons)
+  {
+    directLightEnabled = storeDirectPhotons;
+    indirectLightEnabled = storeIndirectPhotons;
+  }
+
+  csColor PhotonmapperLighting::ComputeElementLightingComponent(Sector* sector,
       ElementProxy element, SamplerSequence<2>& lightSampler,
       bool recordInfluence)
   {
@@ -54,58 +72,64 @@ namespace lighter
     return ComputePointLightingComponent(sector, obj, pos, normal, lightSampler);
   }
 
-  csColor IndirectLight::ComputePointLightingComponent(Sector* sector, 
+  csColor PhotonmapperLighting::ComputePointLightingComponent(Sector* sector, 
         Object* obj, const csVector3& point, const csVector3& normal, 
         SamplerSequence<2>& lightSampler)
   {
-    // color to return
-    csColor c;
+    // Color to return
+    csColor c(0.0f, 0.0f, 0.0f);
 
-    // check to see if we are supposed to do a final gather
+    // Are we doing a final gather ?
     if (finalGather)
     {
-      // average over the number of FG rays
-      csColor final(0,0,0);
-      for (size_t num = 0; num < (size_t)numFinalGatherRays; ++num)
+      // Accumulate the energy from the FG rays in 'final'
+      csColor final(0.0f, 0.0f, 0.0f);
+
+      // Loop through an M by N grid of sample rays
+      for (size_t j = 1; j <= numFinalGatherMSubdivs; j++)
       {
-        lighter::HitPoint hit;
-        hit.distance = FLT_MAX*0.9f;
-        lighter::Ray ray;
-        ray.type = RAY_TYPE_OTHER2;
-
-        // create a new directional vector that faces towards the
-        // direction of the normal
-        csVector3 newDir = randVect.Get();
-        if (newDir*normal < 0.0)
+        for (size_t i = 1; i <= numFinalGatherNSubdivs; i++)
         {
-          newDir = newDir*-1.0;
-        }
-        ray.direction = newDir;
-        ray.origin = point;
-        ray.minLength = 0.01f;
+          // Use stratified sampling to sample the hemisphere above our point
+          csVector3 sampleDir = StratifiedSample(normal, i, j,
+                numFinalGatherMSubdivs, numFinalGatherNSubdivs);
 
-        // raytrace another ray
-        if (lighter::Raytracer::TraceClosestHit(sector->kdTree, ray, hit))
-        {
-          if (hit.primitive)
+          // Build a hit and ray structure to use for Final Gather Rays
+          lighter::HitPoint hit;
+          hit.distance = FLT_MAX*0.9f;
+
+          lighter::Ray ray;
+          ray.type = RAY_TYPE_OTHER2;   // Special type for Final Gather rays
+          ray.direction = sampleDir;
+          ray.origin = point;
+          ray.minLength = 0.01f;
+
+          // Trace the final gather ray
+          if (lighter::Raytracer::TraceClosestHit(sector->kdTree, ray, hit)
+              && hit.primitive)
           {
-            csVector3 dirToSrc = csVector3(-ray.direction.x, 
-              -ray.direction.y, -ray.direction.z);
-            csVector3 hNorm = 
-              hit.primitive->ComputeNormal(hit.hitPoint);
+            // Compute the direction to the source point
+            csVector3 dirToSource = point - hit.hitPoint;
+            dirToSource.Normalize();
 
-//            final += 
-//              sector->photonMap->SampleColor(hit.hitPoint, 
-//                    searchRadius, hNorm, dirToSrc);
+            // Calculate the normal at the hit point
+            csVector3 hNorm = hit.primitive->ComputeNormal(hit.hitPoint);
+
+            // Make sure normal is facing towards source point
+            if(dirToSource*hNorm < 0.0) hNorm -= hNorm;
+
+            // Sample the photon map at the hit point and accumulate the energy
+            final += sector->SamplePhoton(hit.hitPoint, hNorm, searchRadius);
           }
-        }
-        else
-        {
-//          final += sector->photonMap->SampleColor(point, searchRadius, normal);
+          //else
+          //{
+          //  final += sector->SamplePhoton(point, normal, searchRadius);
+          //}
         }
       }
-      // average the color
-      c = final * (1.0 / numFinalGatherRays);
+
+      // Normalize the accumulated energy
+      c = final * (PI / (numFinalGatherMSubdivs*numFinalGatherNSubdivs));
     }
     else
     {
@@ -115,9 +139,38 @@ namespace lighter
     return c;
   }
 
-  void IndirectLight::EmitPhotons(Sector *sect, Statistics::Progress& progress)
+  void PhotonmapperLighting::BalancePhotons(Sector *sect, Statistics::Progress& progress)
+  {
+    // Balance the PhotonMap KD-Trees
+    progress.SetProgress(0.0f);
+    Statistics::ProgressState progressState(progress, (int)(0.5*sect->GetPhotonCount()));
+
+    sect->BalancePhotons(progressState);
+
+    progress.SetProgress(0.0f);
+
+    // Save the photon map if requested
+    if(globalConfig.GetIndirectProperties ().savePhotonMap)
+    {
+      static int secCount = 0;
+      char filename[30];
+      sprintf(filename, "photonmap%d.dat", secCount);
+      sect->SavePhotonMap(filename);
+      secCount++;
+    }
+  }
+
+  void PhotonmapperLighting::EmitPhotons(Sector *sect, Statistics::Progress& progress)
   {
     progress.SetProgress(0.0f);
+
+    // Determine maximum allowed photon recursion
+    size_t maxDepth = 0;
+    if(indirectLightEnabled)
+    {
+      maxDepth =
+        (size_t)globalConfig.GetIndirectProperties ().maxRecursionDepth;
+    }
 
     // Iterate through all the non 'Pseudo Dynamic' light sources
     const LightRefArray& allNonPDLights = sect->allNonPDLights;
@@ -152,23 +205,43 @@ namespace lighter
       size_t photonsForCurLight = floor(powerScale*numPhotonsPerSector + 0.5);
 
       // Loop to generate the requested number of photons for this light source
-      for (size_t num = 0; num < photonsForCurLight; ++num)
+      bool warning = false, stop = false;
+      for (size_t num = 0; num < photonsForCurLight && !stop; ++num)
       {
+        // Get direction to emit the photon
+        csVector3 dir;
+
         switch (curLightType) {
 
           // directional light
           case CS_LIGHT_DIRECTIONAL:
             {
-              globalLighter->Report (
-                  "Directional lights are ignored for indirect light calculation");
+              if(!warning)
+              {
+                globalLighter->Report (
+                    "Directional lights are ignored for indirect light calculation");
+                warning = true; stop = true; continue;
+              }
             }
             break;
 
           // spotlight
           case CS_LIGHT_SPOTLIGHT:
             {
-              globalLighter->Report (
-                  "Spotlights are ignored for indirect light calculation");
+              if(!warning)
+              {
+                globalLighter->Report (
+                  "Spotlight falloff is ignored for indirect light calculation");
+                warning = true;
+              }
+
+              // Get spotlight properties
+              float innerFalloff, outterFalloff;
+              csVector3 lightDir = ((SpotLight*)curLight)->GetDirection();
+              ((SpotLight*)curLight)->GetFalloff(innerFalloff, outterFalloff);
+
+              // Generate a random direction within the spotlight cone
+              dir = SpotlightDir(lightDir, outterFalloff);
             }
             break;
 
@@ -177,40 +250,29 @@ namespace lighter
           default:
             {
               // Genrate a random direction vector for uniform light source sampling
-              csVector3 dir = randVect.Get();
-
-              // Emit a single photon into the sector containing this light
-              const PhotonRay newPhoton = { pos, dir, color, powerScale*power, RAY_TYPE_OTHER1 };
-              EmitPhoton(sect, newPhoton, 0);
+              dir = randVect.Get();
             }
             break;
         }
 
+        // Emit a single photon into the sector containing this light
+        const PhotonRay newPhoton = { pos, dir, color, power, RAY_TYPE_OTHER1 };
+        EmitPhoton(sect, newPhoton, maxDepth, 0, !directLightEnabled);
         progressState.Advance();
       }
-    }
 
-    // Balance the PhotonMap KD-Tree
-    sect->BalancePhotons();
+      // Scale the photons for this light
+      sect->ScalePhotons(1.0/photonsForCurLight);
+    }
 
     progress.SetProgress(1.0f);
-
-    // Save the photon map if requested
-    if(globalConfig.GetIndirectProperties ().savePhotonMap)
-    {
-      static int secCount = 0;
-      char filename[30];
-      sprintf(filename, "photonmap%d.dat", secCount);
-      sect->SavePhotonMap(filename);
-      secCount++;
-    }
   }
 
-  void IndirectLight::EmitPhoton(Sector* &sect, const PhotonRay &photon, const size_t &depth)
+  void PhotonmapperLighting::EmitPhoton(Sector* &sect, const PhotonRay &photon,
+    const size_t &maxDepth, const size_t &depth, const bool &ignoreDirect)
   {    
     // Check recursion depth
-    if(globalConfig.GetIndirectProperties ().maxRecursionDepth > 0 &&
-        depth > (size_t)globalConfig.GetIndirectProperties ().maxRecursionDepth)
+    if(depth > maxDepth)
     {
       return;
     }
@@ -234,32 +296,55 @@ namespace lighter
       // Compute reflected color
       csColor reflColor = photon.color*photon.power;
 
-      // Record photon (initializing photon map object if needed)
-      sect->AddPhoton(reflColor, hit.hitPoint, dir);
-
-      // Russian roulette to cut off recursion depth early (but only if we are past first recursion level)
-      float pd = (reflColor.red + reflColor.green + reflColor.blue) / 3.0;
-      csRandomFloatGen randGen;
-      float rand = randGen.Get();
-
-      if(depth == 0 || rand <= pd)
+      // Record photon based on enabled options
+      if((depth == 0 && !ignoreDirect) || depth > 0)
       {
-        // Determine color and power of scattered light
-        // TODO: attenuate color and/or power by material properties
-        csColor newColor = photon.color;
-        csColor newPower = photon.power;
-        
-        // Generate a scattering direction in the hemisphere around the normal
-        csVector3 scatterDir = DiffuseScatter(normal);
+        sect->AddPhoton(reflColor, hit.hitPoint, dir);
+      }
 
-        // Emit a new Photon
-        const PhotonRay newPhoton = { hit.hitPoint, scatterDir, newColor, newPower, RAY_TYPE_REFLECT };
-        EmitPhoton(sect, newPhoton, depth+1);
+      // If indirect lighting is enabled, scatter the photon
+      if(maxDepth > 0)
+      {
+        // Russian roulette to cut off recursion depth early (but only if we are past first recursion level)
+        float pd = (reflColor.red + reflColor.green + reflColor.blue) / 3.0;
+        csRandomFloatGen randGen;
+        float rand = randGen.Get();
+
+        if(depth == 0 || rand <= pd)
+        {
+          // Determine color and power of scattered light
+          // TODO: attenuate color and/or power by material properties
+          csColor newColor = photon.color;
+          csColor newPower = photon.power;
+          
+          // Generate a scattering direction in the hemisphere around the normal
+          csVector3 scatterDir = DiffuseScatter(normal);
+
+          // Emit a new Photon
+          const PhotonRay newPhoton = { hit.hitPoint, scatterDir, newColor, newPower, RAY_TYPE_REFLECT };
+          EmitPhoton(sect, newPhoton, maxDepth, depth+1, ignoreDirect);
+        }
       }
     }
   }
 
-  csVector3 IndirectLight::DiffuseScatter(const csVector3 &n)
+  csVector3 PhotonmapperLighting::SpotlightDir(const csVector3 &dir, const float cosTheta)
+  {
+    // Local, static random number generator
+    static csRandomFloatGen randGen;
+
+    // Get two uniformly distributed random numbers between 0 and 1
+    double e1 = randGen.Get();
+    double e2 = randGen.Get();
+
+    // Compute the angles of rotation around the optical axis
+    double theta = acos(cosTheta)*e1;
+    double phi = 2.0*PI*e2;
+
+    return RotateAroundN(dir, theta, phi);
+  }
+
+  csVector3 PhotonmapperLighting::DiffuseScatter(const csVector3 &n)
   {
     // Local, static random number generator
     static csRandomFloatGen randGen;
@@ -273,6 +358,31 @@ namespace lighter
     double theta = acos(sqrt(e1));
     double phi = 2.0*PI*e2;
 
+    return RotateAroundN(n, theta, phi);
+  }
+
+  csVector3 PhotonmapperLighting::StratifiedSample(const csVector3 &n, const size_t i,
+                                      const size_t j, const size_t M, const size_t N)
+  {
+    // Local, static random number generator
+    static csRandomFloatGen randGen;
+
+    // Get two uniformly distributed random numbers between 0 and 1
+    double e1 = randGen.Get();
+    double e2 = randGen.Get();
+
+    // Generate rotation angles around n.  Here we are generating
+    // jittered samples in a grid across the hemisphere weighted
+    // by the cos function again (lambert's law).
+    double theta = acos(sqrt((j-e1)/M));
+    double phi = 2.0*PI*( (i-e2)/N );
+
+    return RotateAroundN(n, theta, phi);
+  }
+
+  csVector3 PhotonmapperLighting::RotateAroundN(const csVector3 &n,
+    const double theta, const double phi)
+  {
     // Find orthogonal axis (must avoid the dominant axis)
     csVector3 orthoN, rotAxis;
     switch(n.DominantAxis())

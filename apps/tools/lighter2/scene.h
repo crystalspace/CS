@@ -24,9 +24,6 @@
 #include "light.h"
 #include "material.h"
 
-#include <string>
-using namespace std;
-
 namespace lighter
 {
   class KDTree;
@@ -66,14 +63,18 @@ namespace lighter
     // Build kd tree for Sector
     void BuildKDTree (Statistics::Progress& progress);
 
-    void SavePhotonMap(string filename);
+    void SavePhotonMap(const char* filename);
 
     void InitPhotonMap();
 
     void AddPhoton(const csColor power, const csVector3 pos,
       const csVector3 dir );
 
-    void BalancePhotons();
+    void ScalePhotons(const float scale);
+
+    size_t GetPhotonCount();
+    
+    void BalancePhotons(Statistics::ProgressState& prog);
 
     csColor SamplePhoton(const csVector3 point, const csVector3 normal,
                           const float searchRad);

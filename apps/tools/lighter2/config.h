@@ -23,6 +23,12 @@
 
 namespace lighter
 {
+  enum LightingEngine
+  {
+    LIGHT_ENGINE_NONE,
+    LIGHT_ENGINE_RAYTRACER,
+    LIGHT_ENGINE_PHOTONMAPPER
+  };
 
   // Object holding global and part-local config
   class Configuration
@@ -37,13 +43,15 @@ namespace lighter
     struct LighterProperties
     {
       // Direct lighting from light sources
-      bool doDirectLight;
+      LightingEngine directLightEngine;
+
+      // Indirect lighting from scattered light
+      LightingEngine indirectLightEngine;
+
       // HL2-style directional LMs
       bool directionalLMs;
       // Whether to generate maps containing light directions for specular
       bool specularDirectionMaps;
-      // Indirect Illumination through photon mapping
-      bool indirectLMs;
       // Number of threads to use for multicore parts
       uint numThreads;
       // Save buffers as binary
@@ -112,12 +120,10 @@ namespace lighter
     {
       // Number of photons to emit
       int numPhotons;
-      // Number of photons per sample
-      int numPerSample;
       // Maximum photon recursion depth
       int maxRecursionDepth;
-      // Maximum number of neighbors to sample
-      int maxNumNeighbors;
+      // Maximum number of samples for density estimation
+      int maxDensitySamples;
       // The sample distance for sampling photons
       float sampleDistance;
       // Flag for Final Gather

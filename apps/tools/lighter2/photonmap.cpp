@@ -32,7 +32,7 @@
 namespace lighter
 {
   // How many new photons to allocate when expanding the array size
-  #define ARRAY_EXPAND_AMOUNT   1000
+  #define ARRAY_EXPAND_AMOUNT   100000
 
   /**
    * This is the photon
@@ -40,7 +40,6 @@ namespace lighter
    * size is 28 bytes
    */
   struct Photon {
-    float pos[3];                  // photon position
     short plane;                   // splitting plane for kd-tree
     unsigned char theta, phi;      // incoming direction
     float power[3];                // photon power (uncompressed)
@@ -48,39 +47,138 @@ namespace lighter
 
   /**
    * This structure is used only to locate the
-   * nearest photons
+   * nearest photons.  Initialize max, pos and
+   * distSq[0] (squared maximum search distance)
+   * before calling LocatePhotons.  LocatePhotons
+   * will fill found, gotHeap and index.  See
+   * IrradianceEstimate for more details.
    */
   struct NearestPhotons {
-    size_t max;
-    size_t found;
-    size_t got_heap;
-    float pos[3];
-    float *dist2;
-    const Photon **index;
+
+    // Initialize these members before using LocatePhotons()
+    size_t max;             ///< Number of photons to search for
+    float pos[3];           ///< Position to search around (for computing distances)
+
+    bool bias;              ///< Should search be biased along the surface containing pos?
+    float norm[3];          ///< Surface normal at pos (for biasing search along a surface)
+    float biasScale;        ///< A scale between 0 & 1 to apply to distances along the normal
+
+    // Initialize distSq[0] to the max search distance squared (distSq[1 to found] is filled by LocatePhotons())
+    float *distSq;          ///< Array (or max heap) of squared distances from 'pos' to the photons in 'index'
+
+    // These members are filled by the LocatePhotons() function
+    size_t found;           ///< Number found so far
+    bool gotHeap;           ///< Has the array been converted to a max heap yet?
+    const Photon **index;   ///< Array (or max heap) of pointers to the photons
+
+    // Functions to help with management of the max heap
+    static void AddToHeap(NearestPhotons *const NP, const float &distSq, const Photon* &p)
+    {
+      // If array is not yet full, treat as a flat array
+      if ( NP->found < NP->max )
+      {
+        NP->found++;
+        NP->distSq[NP->found] = distSq;
+        NP->index[NP->found] = p;
+      }
+
+      // Once array is full, must treat as a max heap
+      else
+      {
+        // Build heap if we haven't already
+        if (!NP->gotHeap) BuildMaxHeap(NP);
+
+        // Find spot in heap for this photon
+        size_t j = 2, parent = 1;
+        while ( j <= NP->found )
+        {
+          if ( j < NP->found && NP->distSq[j] < NP->distSq[j+1] )
+            j++;
+          if ( distSq > NP->distSq[j] )
+            break;
+        
+          NP->distSq[parent] = NP->distSq[j];
+          NP->index[parent] = NP->index[j];
+          parent = j;
+          j += j;
+        }
+
+        // Replace photon at this spot in the heap with new photon
+        if ( distSq < NP->distSq[parent] )
+        {
+          NP->index[parent] = p;
+          NP->distSq[parent] = distSq;
+        }
+
+        // Any photon that is further out than the most distant
+        // photon in the heap will be ignored so we update minimum
+        // distance in NP to the distance to this furtherst node in
+        // order to avoid extra work
+        NP->distSq[0] = NP->distSq[1];
+      }
+    }
+
+    static void BuildMaxHeap(NearestPhotons *const NP)
+    {
+      float dst2;
+      const Photon *phot;
+
+      size_t halfFound = NP->found>>1;
+      for ( size_t k=halfFound; k>=1; k--)
+      {
+        size_t parent=k ;
+        phot = NP->index[k];
+        dst2 = NP->distSq[k];
+        while ( parent <= halfFound )
+        {
+          size_t j = parent+parent;
+
+          if (j<NP->found && NP->distSq[j]<NP->distSq[j+1])
+            j++;
+
+          if (dst2>=NP->distSq[j])
+            break;
+
+          NP->distSq[parent] = NP->distSq[j];
+          NP->index[parent] = NP->index[j];
+
+          parent=j;
+        }
+
+        NP->distSq[parent] = dst2;
+        NP->index[parent] = phot;
+      }
+
+      // The max heap is now initialized
+      NP->gotHeap = true;
+    }
   };
 
   // Static member variables
   bool PhotonMap::directionTablesReady = false;
-  float PhotonMap::costheta[256];
-  float PhotonMap::sintheta[256];
-  float PhotonMap::cosphi[256];
-  float PhotonMap::sinphi[256];
+  float PhotonMap::cosTheta[256];
+  float PhotonMap::sinTheta[256];
+  float PhotonMap::cosPhi[256];
+  float PhotonMap::sinPhi[256];
 
   /**
    * This is the constructor for the photon map.
-   * To create the photon map it is necessary to specify the
-   * maximum number of photons that will be stored
+   * To create the photon map it is necessary to specify
+   * the maximum number of photons that will be stored
+   * It is okay to underestimate this as it will expand
+   * as needed.
    */
-  PhotonMap::PhotonMap( const size_t max_phot )
+  PhotonMap::PhotonMap( const size_t maxPhot )
   {
-    stored_photons = 0;
-    prev_scale = 1;
-    max_photons = max_phot;
+    coneK = 1.0;
+    storedPhotons = 0;
+    prevScale = 1;
+    initialSize = maxPhotons = maxPhot;
 
-    photons = (Photon*)malloc( sizeof( Photon ) * ( max_photons+1 ) );
+    photons = (Photon*)malloc( sizeof( Photon ) * ( maxPhotons+1 ) );
 
-    bbox_min[0] = bbox_min[1] = bbox_min[2] = FLT_MAX;
-    bbox_max[0] = bbox_max[1] = bbox_max[2] = -FLT_MAX;
+    bboxMin[0] = bboxMin[1] = bboxMin[2] = FLT_MAX;
+    bboxMax[0] = bboxMax[1] = bboxMax[2] = -FLT_MAX;
 
     //----------------------------------------
     // initialize direction conversion tables
@@ -89,10 +187,10 @@ namespace lighter
     {
       for (size_t i=0; i<256; i++) {
         double angle = double(i)*(1.0/256.0)*PI;
-        costheta[i] = cos( angle );
-        sintheta[i] = sin( angle );
-        cosphi[i]   = cos( 2.0*angle );
-        sinphi[i]   = sin( 2.0*angle );
+        cosTheta[i] = cos( angle );
+        sinTheta[i] = sin( angle );
+        cosPhi[i]   = cos( 2.0*angle );
+        sinPhi[i]   = sin( 2.0*angle );
       }
     }
   }
@@ -103,188 +201,242 @@ namespace lighter
   }
 
   /**
-   * photon_dir() - returns the direction of a photon
+   * PhotonDir() - returns the direction of a photon
    */
-  void PhotonMap :: photon_dir( float *dir, const Photon *p ) const
+  void PhotonMap :: PhotonDir( float *dir, const Photon *p ) const
   {
-    dir[0] = sintheta[p->theta]*cosphi[p->phi];
-    dir[1] = sintheta[p->theta]*sinphi[p->phi];
-    dir[2] = costheta[p->theta];
+    dir[0] = sinTheta[p->theta]*cosPhi[p->phi];
+    dir[1] = sinTheta[p->theta]*sinPhi[p->phi];
+    dir[2] = cosTheta[p->theta];
   }
 
+  size_t PhotonMap :: GetPhotonCount() { return storedPhotons; }
+
+  inline float PhotonMap :: ConeWeight(float dist, float r, float k)
+  {
+    return (1.0 - dist/(k*r));
+  }
+
+  inline float PhotonMap :: GaussianWeight(float distSq, float rSq)
+  {
+    #define G_ALPHA   1.818f
+    #define G_BETA    1.953f
+
+    return G_ALPHA*(1.0 - ( 1.0 - expf(-G_BETA*(distSq/(2*rSq))) )/
+                          ( 1.0 - expf(-G_BETA)) );
+  }
 
   /**
-   * irradiance_estimate() - computes an irradiance estimate
+   * IrradianceEstimate() - computes an irradiance estimate
    * at a given surface position
    */
-  void PhotonMap :: irradiance_estimate(
+  void PhotonMap :: IrradianceEstimate(
                                          float irrad[3],                // returned irradiance
                                          const float pos[3],            // surface position
-                                         const float normal[3],         // surface normal at pos
-                                         const float max_dist,          // max distance to look for photons
-                                         const size_t nphotons ) const     // number of photons to use
+                                         const float norm[3],         // surface normal at pos
+                                         const float maxDist,           // max distance to look for photons
+                                         const size_t nphotons,         // number of photons to use
+                                         const FilterType filter) const // Filter to apply to photon power
   {
+    // Zero irradiance for accumulation of photon power
     irrad[0] = irrad[1] = irrad[2] = 0.0;
 
+    // Initialize the NearestPhotons structure
     NearestPhotons np;
-    np.dist2 = (float*)alloca( sizeof(float)*(nphotons+1) );
+    np.distSq = (float*)alloca( sizeof(float)*(nphotons+1) );
     np.index = (const Photon**)alloca( sizeof(Photon*)*(nphotons+1) );
 
     np.pos[0] = pos[0]; np.pos[1] = pos[1]; np.pos[2] = pos[2];
+
+    float len = sqrtf(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2]);
+    np.norm[0] = norm[0]/len; np.norm[1] = norm[1]/len; np.norm[2] = norm[2]/len;
+
+    np.biasScale = 0.0001f;
     np.max = nphotons;
     np.found = 0;
-    np.got_heap = 0;
-    np.dist2[0] = max_dist*max_dist;
+    np.gotHeap = false;
+    np.bias = true;
+    np.distSq[0] = maxDist*maxDist;
 
     // locate the nearest photons
-    locate_photons( &np, 1 );
+    LocatePhotons( &np, 1 );
 
-    // if less than 8 photons return
-    if (np.found<8)
+    // if less than 8 photons assume black (Note: this may be dangerous)
+    if (np.found < 8)
       return;
 
-    float pdir[3];
+    // Choose weights and norm based on filter
+    float pdir[3], normF;
+    switch(filter)
+    {
+      case FILTER_NONE: default:
+      {
+        // sum irradiance from all photons
+        for (size_t i=1; i<=np.found; i++)
+        {
+          const Photon *p = np.index[i];
+          PhotonDir( pdir, p );
+          if ( (pdir[0]*norm[0]+pdir[1]*norm[1]+pdir[2]*norm[2]) < 0.0f )
+          {
+            irrad[0] += p->power[0];
+            irrad[1] += p->power[1];
+            irrad[2] += p->power[2];
+          }
+        }
 
-    // sum irradiance from all photons
-    for (size_t i=1; i<=np.found; i++) {
-      const Photon *p = np.index[i];
-      // the photon_dir call and following if can be omitted (for speed)
-      // if the scene does not have any thin surfaces
-      photon_dir( pdir, p );
-      if ( (pdir[0]*normal[0]+pdir[1]*normal[1]+pdir[2]*normal[2]) < 0.0f ) {
-        irrad[0] += p->power[0];
-        irrad[1] += p->power[1];
-        irrad[2] += p->power[2];
+        // Norm factor is area of a circle
+        normF = (PI*np.distSq[0]);
       }
-    }
-    const float tmp=(1.0f/PI)/(np.dist2[0]);    // estimate of density
+      break;
 
-    irrad[0] *= tmp;
-    irrad[1] *= tmp;
-    irrad[2] *= tmp;
+      case FILTER_CONE:
+      {
+        // sum irradiance from all photons
+        for (size_t i=1; i<=np.found; i++)
+        {
+          const Photon *p = np.index[i];
+          PhotonDir( pdir, p );
+          if ( (pdir[0]*norm[0]+pdir[1]*norm[1]+pdir[2]*norm[2]) < 0.0f )
+          {
+            float w = ConeWeight(sqrtf(np.distSq[i]), sqrtf(np.distSq[0]), coneK);
+            irrad[0] += p->power[0]*w;
+            irrad[1] += p->power[1]*w;
+            irrad[2] += p->power[2]*w;
+          }
+        }
+
+        // Norm factor is MODIFIED area of a circle
+        normF = (PI*np.distSq[0])*(1.0f-2.0f/(3.0f*coneK));
+      }
+      break;
+
+      case FILTER_GAUSS:
+      {
+        // sum irradiance from all photons
+        for (size_t i=1; i<=np.found; i++)
+        {
+          const Photon *p = np.index[i];
+          PhotonDir( pdir, p );
+          if ( (pdir[0]*norm[0]+pdir[1]*norm[1]+pdir[2]*norm[2]) < 0.0f )
+          {
+            float w = GaussianWeight(np.distSq[i], np.distSq[0]);
+            irrad[0] += p->power[0]*w;
+            irrad[1] += p->power[1]*w;
+            irrad[2] += p->power[2]*w;
+          }
+        }
+
+        // Gaussian filter is already normalized
+        normF = 1.0;
+      }
+      break;
+    }
+
+    // Normalize density
+    irrad[0] /= normF;
+    irrad[1] /= normF;
+    irrad[2] /= normF;
   }
 
-
-  /* locate_photons finds the nearest photons in the
-  * photon map given the parameters in np
-  */
-  void PhotonMap :: locate_photons(
+  /* LocatePhotons finds the nearest photons in the
+   * photon map given the parameters in np
+   */
+  void PhotonMap :: LocatePhotons(
                                     NearestPhotons *const np,
                                     const size_t index ) const
   {
+    // Get pointer to photon at this node
     const Photon *p = &(photons [index]);
-    float dist1;
 
-    if (index<half_stored_photons) {
-      dist1 = np->pos[ p->plane ] - p->pos[ p->plane ];
+    // If this is not a leaf then traverse it's children first
+    if (index<halfStoredPhotons)
+    {
+      // Compute distance in splitting dimension only
+      float splitDist = np->pos[ p->plane ] - p->pos[ p->plane ];
 
-      if (dist1>0.0) { // if dist1 is positive search right plane
-        locate_photons( np, 2*index+1 );
-        if ( dist1*dist1 < np->dist2[0] )
-          locate_photons( np, 2*index );
-      } else {         // dist1 is negative search left first
-        locate_photons( np, 2*index );
-        if ( dist1*dist1 < np->dist2[0] )
-          locate_photons( np, 2*index+1 );
+      // If splitDist is positive then there are likely to be more good
+      // photons in the right sub-tree so we traverse it first
+      if (splitDist > 0.0)
+      {
+        LocatePhotons( np, 2*index+1 );
+
+        // If squared dist in the splitting dimension is greater than
+        // or equal to the maximum squared dist then we can eliminate
+        // the other sub-tree completely.
+        if ( splitDist*splitDist < np->distSq[0] )
+        {
+          LocatePhotons( np, 2*index );
+        }
+      }
+      
+      // distSplit is negative so traverse the left sub-tree first
+      else
+      {
+        LocatePhotons( np, 2*index );
+        if ( splitDist*splitDist < np->distSq[0] )
+        {
+          LocatePhotons( np, 2*index+1 );
+        }
       }
     }
 
-    // compute squared distance between current photon and np->pos
+    // Compute squared distance between current photon and np->pos
+    float V[3], distSq, maxDist = np->distSq[0];
+    V[0] = np->pos[0] - p->pos[0]; distSq = V[0]*V[0];
+    V[1] = np->pos[1] - p->pos[1]; distSq += V[1]*V[1];
+    V[2] = np->pos[2] - p->pos[2]; distSq += V[2]*V[2];
 
-    dist1 = p->pos[0] - np->pos[0];
-    float dist2 = dist1*dist1;
-    dist1 = p->pos[1] - np->pos[1];
-    dist2 += dist1*dist1;
-    dist1 = p->pos[2] - np->pos[2];
-    dist2 += dist1*dist1;
+    // Bias against the normal direction (changes search area to a
+    // flattened disk instead of a sphere as Jensen suggests)
+    if(np->bias)
+    {
+      // Normalize V
+      float len = sqrt(distSq);
+      V[0] /= len; V[1] /= len; V[2] /= len;
 
-    if ( dist2 < np->dist2[0] ) {
-      // we found a photon :) Insert it in the candidate list
+      // Compute dot product with normal in absolute value
+      float dotP = fabsf(V[0]*np->norm[0] + V[1]*np->norm[1] + V[2]*np->norm[2]);
 
-      if ( np->found < np->max ) {
-        // heap is not full; use array
-        np->found++;
-        np->dist2[np->found] = dist2;
-        np->index[np->found] = p;
-      } else {
-        size_t j,parent;
+      // Interpolate to get scale for distance.  This will produce
+      // a scale of 1.0 (i.e. no scale) when perpendicular to the normal,
+      // np->biasScale when parallel and interpolate between them elsewhere.
+      float scale = 1.0*(1.0 - dotP) + np->biasScale*(dotP);
 
-        if (np->got_heap==0) { // Do we need to build the heap?
-          // Build heap
-          float dst2;
-          const Photon *phot;
-          size_t half_found = np->found>>1;
-          for ( size_t k=half_found; k>=1; k--) {
-            parent=k ;
-            phot = np->index[k];
-            dst2 = np->dist2[k];
-            while ( parent <= half_found ) {
-              j = parent+parent;
-              if (j<np->found && np->dist2[j]<np->dist2[j+1])
-                j++;
-              if (dst2>=np->dist2[j])
-                break;
-              np->dist2[parent] = np->dist2[j];
-              np->index[parent] = np->index[j];
-              parent=j;
-            }
-            np->dist2[parent] = dst2;
-            np->index[parent] = phot;
-          }
-          np->got_heap = 1;
+      // Scale maximum distance
+      maxDist *= scale;
+    }
 
-        }
-
-        // insert new photon into max heap
-        // delete largest element, insert new, and reorder the heap
-
-        parent=1;
-
-        j = 2;
-        while ( j <= np->found ) {
-          if ( j < np->found && np->dist2[j] < np->dist2[j+1] )
-            j++;
-          if ( dist2 > np->dist2[j] )
-            break;
-          np->dist2[parent] = np->dist2[j];
-          np->index[parent] = np->index[j];
-          parent = j;
-          j += j;
-        }
-        if ( dist2 < np->dist2[parent] ) {
-          np->index[parent] = p;
-          np->dist2[parent] = dist2;
-        }
-        np->dist2[0] = np->dist2[1];
-      }
+    // Is this photon close enough?  If so, add it to the candidate list.
+    if (distSq < maxDist )
+    {
+      NearestPhotons::AddToHeap(np, distSq, p);
     }
   }
-
 
   /* store puts a photon into the flat array that will form
    * the final kd-tree.
    *
    * Call this function to store a photon.
    */
-  void PhotonMap :: store(
+  void PhotonMap :: Store(
                            const float power[3],
                            const float pos[3],
                            const float dir[3] )
   {
     // Check for storage and attempt to expand if needed
-    if (stored_photons>=max_photons && !expand())
+    if (storedPhotons>=maxPhotons && !Expand())
       return;
 
-    stored_photons++;
-    Photon *const node = &(photons[stored_photons]);
+    storedPhotons++;
+    Photon *const node = &(photons[storedPhotons]);
 
     for (size_t i=0; i<3; i++) {
       node->pos[i] = pos[i];
 
-      if (node->pos[i] < bbox_min[i])
-        bbox_min[i] = node->pos[i];
-      if (node->pos[i] > bbox_max[i])
-        bbox_max[i] = node->pos[i];
+      if (node->pos[i] < bboxMin[i])
+        bboxMin[i] = node->pos[i];
+      if (node->pos[i] > bboxMax[i])
+        bboxMax[i] = node->pos[i];
 
       node->power[i] = power[i];
     }
@@ -310,27 +462,27 @@ namespace lighter
    * source, scale = l/(#emitted photons).
    * Call this function after each light source is processed.
    */
-  void PhotonMap :: scale_photon_power( const float scale )
+  void PhotonMap :: ScalePhotonPower( const float scale )
   {
-    for (size_t i=prev_scale; i<=stored_photons; i++) {
+    for (size_t i=prevScale; i<=storedPhotons; i++) {
       photons[i].power[0] *= scale;
       photons[i].power[1] *= scale;
       photons[i].power[2] *= scale;
     }
-    prev_scale = stored_photons+1;
+    prevScale = storedPhotons+1;
   }
 
-  bool PhotonMap :: expand()
+  bool PhotonMap :: Expand()
   {
-    // Increase size by indicated amount
-    size_t newMax = max_photons + ARRAY_EXPAND_AMOUNT;
+    // Increase size by initial amount
+    size_t newMax = maxPhotons + initialSize;
 
     // Allocate a new array
     Photon *newPhotons = (Photon*)malloc( sizeof( Photon ) * ( newMax+1 ) );
     if(newPhotons == NULL) return false;
 
     // Copy over old data
-    for(size_t i=0; i<max_photons; i++)
+    for(size_t i=0; i<maxPhotons; i++)
       newPhotons[i] = photons[i];
 
     // Free old array
@@ -338,7 +490,7 @@ namespace lighter
 
     // Replace old variables
     photons = newPhotons;
-    max_photons = newMax;
+    maxPhotons = newMax;
 
     // return success
     return true;
@@ -348,36 +500,36 @@ namespace lighter
    * This function should be called before the photon map
    * is used for rendering.
    */
-  void PhotonMap :: balance(void)
+  void PhotonMap :: Balance(Statistics::ProgressState &prog)
   {
-    if (stored_photons>1) {
+    if (storedPhotons>1) {
       // allocate two temporary arrays for the balancing procedure
-      Photon **pa1 = (Photon**)malloc(sizeof(Photon*)*(stored_photons+1));
-      Photon **pa2 = (Photon**)malloc(sizeof(Photon*)*(stored_photons+1));
+      Photon **pa1 = (Photon**)malloc(sizeof(Photon*)*(storedPhotons+1));
+      Photon **pa2 = (Photon**)malloc(sizeof(Photon*)*(storedPhotons+1));
 
-      for (size_t i=0; i<=stored_photons; i++)
+      for (size_t i=0; i<=storedPhotons; i++)
         pa2[i] = &(photons[i]);
 
-      balance_segment( pa1, pa2, 1, 1, stored_photons );
+      BalanceSegment( pa1, pa2, 1, 1, storedPhotons, prog );
       free(pa2);
 
       // reorganize balanced kd-tree (make a heap)
       size_t d, j=1, foo=1;
-      Photon foo_photon = photons[j];
+      Photon fooPhoton = photons[j];
 
-      for (size_t i=1; i<=stored_photons; i++) {
+      for (size_t i=1; i<=storedPhotons; i++) {
         d=pa1[j]-photons;
         pa1[j] = NULL;
         if (d != foo)
           photons[j] = photons [d];
         else {
-          photons[j] = foo_photon;
+          photons[j] = fooPhoton;
 
-          if (i<stored_photons) {
-            for (;foo<=stored_photons; foo++)
+          if (i<storedPhotons) {
+            for (;foo<=storedPhotons; foo++)
               if (pa1[foo] != NULL)
                 break;
-            foo_photon = photons [foo];
+            fooPhoton = photons [foo];
             j = foo;
           }
           continue;
@@ -387,19 +539,20 @@ namespace lighter
       free(pa1);
     }
 
-    half_stored_photons = stored_photons/2-1;
+    halfStoredPhotons = storedPhotons/2-1;
   }
 
 
   #define swap(ph,a,b) { Photon *ph2=ph[a]; ph[a]=ph[b]; ph[b]=ph2; }
 
-  // median_split splits the photon array into two separate
-  // pieces around the median, with all photons below
-  // the median in the lower half and all photons above
-  // the median in the upper half. The comparison
-  // criteria is the axis (indicated by the axis parameter)
-  // (inspired by routine in "Algorithms in C++" by Sedgewick)
-  void PhotonMap :: median_split(
+  /* median_split splits the photon array into two separate
+   * pieces around the median, with all photons below
+   * the median in the lower half and all photons above
+   * the median in the upper half. The comparison
+   * criteria is the axis (indicated by the axis parameter)
+   * (inspired by routine in "Algorithms in C++" by Sedgewick)
+   */
+  void PhotonMap :: MedianSplit(
                                   Photon **p,
                                   const size_t start,                // start of photon block in array
                                   const size_t end,                  // end of photon block in array
@@ -432,15 +585,19 @@ namespace lighter
   }
 
 
-  // See "Realistic Image Synthesis using Photon Mapping" Chapter 6
-  // for an explanation of this function
-  void PhotonMap :: balance_segment(
+  /* See "Realistic Image Synthesis using Photon Mapping" Chapter 6
+   * for an explanation of this function
+   */
+  void PhotonMap :: BalanceSegment(
                                      Photon **pbal,
                                      Photon **porg,
                                      const size_t index,
                                      const size_t start,
-                                     const size_t end )
+                                     const size_t end,
+                                     Statistics::ProgressState &prog)
   {
+    prog.Advance();
+
     //--------------------
     // compute new median
     //--------------------
@@ -461,18 +618,17 @@ namespace lighter
     //--------------------------
 
     int axis=2;
-    if ((bbox_max[0]-bbox_min[0])>(bbox_max[1]-bbox_min[1]) &&
-      (bbox_max[0]-bbox_min[0])>(bbox_max[2]-bbox_min[2]))
+    if ((bboxMax[0]-bboxMin[0])>(bboxMax[1]-bboxMin[1]) &&
+      (bboxMax[0]-bboxMin[0])>(bboxMax[2]-bboxMin[2]))
       axis=0;
-    else if ((bbox_max[1]-bbox_min[1])>(bbox_max[2]-bbox_min[2]))
+    else if ((bboxMax[1]-bboxMin[1])>(bboxMax[2]-bboxMin[2]))
       axis=1;
 
     //-------------------------------------------
-
     // partition photon block around the median
     // ------------------------------------------
 
-    median_split( porg, start, end, median, axis );
+    MedianSplit( porg, start, end, median, axis );
 
     pbal[ index ] = porg[ median ];
     pbal[ index ]->plane = axis;
@@ -484,10 +640,10 @@ namespace lighter
     if ( median > start ) {
       // balance left segment
       if ( start < median-1 ) {
-        const float tmp=bbox_max[axis];
-        bbox_max[axis] = pbal[index]->pos[axis];
-        balance_segment( pbal, porg, 2*index, start, median-1 );
-        bbox_max[axis] = tmp;
+        const float tmp=bboxMax[axis];
+        bboxMax[axis] = pbal[index]->pos[axis];
+        BalanceSegment( pbal, porg, 2*index, start, median-1, prog );
+        bboxMax[axis] = tmp;
       } else {
         pbal[ 2*index ] = porg[start];
       }
@@ -496,13 +652,65 @@ namespace lighter
     if ( median < end ) {
       // balance right segment
       if ( median+1 < end ) {
-        const float tmp = bbox_min[axis];
-        bbox_min[axis] = pbal[index]->pos[axis];
-        balance_segment( pbal, porg, 2*index+1, median+1, end );
-        bbox_min[axis] = tmp;
+        const float tmp = bboxMin[axis];
+        bboxMin[axis] = pbal[index]->pos[axis];
+        BalanceSegment( pbal, porg, 2*index+1, median+1, end, prog );
+        bboxMin[axis] = tmp;
       } else {
         pbal[ 2*index+1 ] = porg[end];
       }
+    }
+  }
+
+  void PhotonMap :: SaveToFile(const char* filename)
+  {
+    // Open file for writing in binary mode
+    FILE* fout = fopen(filename, "wb");
+    if(fout != NULL)
+    {
+      // Write the number of photons
+      fwrite(&storedPhotons, sizeof(size_t), 1, fout);
+
+      // Individual components are stored instead of
+      // full photon structures to aid in compression
+
+      // Write photon position
+      for(size_t j=0; j<3; j++)
+      {
+        for(size_t i=0; i<storedPhotons; i++)
+        {
+          fwrite(&(photons[i].pos[j]), sizeof(float), 1, fout);
+        }
+      }
+
+      // Write photon power
+      for(size_t j=0; j<3; j++)
+      {
+        for(size_t i=0; i<storedPhotons; i++)
+        {
+          fwrite(&(photons[i].power[j]), sizeof(float), 1, fout);
+        }
+      }
+
+      // Write photon direction
+      for(size_t i=0; i<storedPhotons; i++)
+      {
+        fwrite(&(photons[i].theta), sizeof(unsigned char), 1, fout);
+      }
+
+      for(size_t i=0; i<storedPhotons; i++)
+      {
+        fwrite(&(photons[i].phi), sizeof(unsigned char), 1, fout);
+      }
+
+      // Write kd-tree splitting plane
+      for(size_t i=0; i<storedPhotons; i++)
+      {
+        fwrite(&(photons[i].plane), sizeof(short), 1, fout);
+      }
+
+      // Close the file
+      fclose(fout);
     }
   }
 

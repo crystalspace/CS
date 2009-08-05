@@ -153,8 +153,8 @@ namespace lighter
     csPrintf ("|                                                                             |\n");
     csPrintf ("|-----------------------------------------------------------------------------|\n");
     csPrintf ("| Raytracer Stats    | Settings   | Scene Stats                               |\n");
-    csPrintf ("|                    | [ ] Direct |   Sectors:                                |\n");
-    csPrintf ("|   Direct:          | [ ] Indir. |   Meshes:                                 |\n");
+    csPrintf ("|                    | [ ] Raytrc |   Sectors:                                |\n");
+    csPrintf ("|   Direct:          | [ ] PtnMap |   Meshes:                                 |\n");
     csPrintf ("|   Indir.:          | [ ] LMs    |   Lights:                                 |\n");
     csPrintf ("|   Reflec:          | [ ] AO     |   LM:                                     |\n");
     csPrintf ("|   Refrac:          | PLM:       |                                           |\n");
@@ -229,8 +229,15 @@ namespace lighter
 
   void TUI::DrawSettings () const
   {
-    csPrintf (CS_ANSI_CURSOR(25,8) "%s", globalConfig.GetLighterProperties ().doDirectLight ? "X" : "");
-    csPrintf (CS_ANSI_CURSOR(25,9) "%s", globalConfig.GetLighterProperties ().indirectLMs ? "X" : "");
+    csPrintf (CS_ANSI_CURSOR(25,8) "%s",
+      globalConfig.GetLighterProperties ().directLightEngine == LIGHT_ENGINE_RAYTRACER
+      ? "X" : "");
+
+    csPrintf (CS_ANSI_CURSOR(25,9) "%s",
+      (globalConfig.GetLighterProperties ().directLightEngine == LIGHT_ENGINE_PHOTONMAPPER ||
+       globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_PHOTONMAPPER)
+      ? "X" : "");
+
     csPrintf (CS_ANSI_CURSOR(25,10) "%s", true ? "X" : "");
     csPrintf (CS_ANSI_CURSOR(25,11) "%s", false ? "X" : "");
   
