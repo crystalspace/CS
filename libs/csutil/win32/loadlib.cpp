@@ -162,7 +162,7 @@ void csPrintLibraryError (const char* /*iModule*/)
   {
     str = (char*)ErrorMessages.Pop();
     if (str != 0) csPrintfErr ("  %s\n", str);
-    delete[] str;
+    cs_free (str);
   }
 }
 
