@@ -61,8 +61,8 @@ namespace CS
   CS_CRYSTALSPACE_EXPORT wchar_t* StrDupW (const char *s);
 }
 
-///\internal Helper functions needed by the csStrNew variants below
-size_t cs_wcslen (wchar_t const* s);
+///\internal Helper function needed by the csStrNew variants below
+CS_CRYSTALSPACE_EXPORT size_t cs_wcslen (wchar_t const* s);
 
 /**
  * Allocate a new char [] and copy the string into the newly allocated 
