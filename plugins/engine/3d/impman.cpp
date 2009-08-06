@@ -104,28 +104,16 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   csVector3 mesh_pos = csMesh->GetWorldBoundingBox ().GetCenter ();
   const csVector3& cam_pos = newCamera->GetCamera()->GetTransform ().GetOrigin ();
   csVector3 camdir = mesh_pos-cam_pos;
-  camdir.Normalize();
   newCamera->GetCamera()->GetTransform ().LookAt (camdir, csVector3(0,1,0));
 
   // Set up a new projection matrix.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
-  csIMesh->texWidth = 256; //csFindNearestPowerOf2(rbox.sbox.MaxX() - rbox.sbox.MinX());
-  csIMesh->texHeight = 256; //csFindNearestPowerOf2(rbox.sbox.MaxY() - rbox.sbox.MinY());
-
-//   float irw = 1.0f/csIMesh->texWidth;
-//   float irh = 1.0f/csIMesh->texHeight;
-//   int screenW = g3d->GetDriver2D()->GetWidth();
-//   int screenH = g3d->GetDriver2D()->GetHeight();
-//
-//   CS::Math::Matrix4 projShift (
-//       screenW*irw, 0, 0, irw * (screenW-2*rbox.sbox.MinX()) - 1,
-//       0, screenH*irh, 0, irh * (screenH-2*rbox.sbox.MinY()) - 1,
-//       0, 0, 1, 0,
-//       0, 0, 0, 1);
+  csIMesh->texWidth = csFindNearestPowerOf2(rbox.sbox.MaxX() - rbox.sbox.MinX());
+  csIMesh->texHeight = csFindNearestPowerOf2(rbox.sbox.MaxY() - rbox.sbox.MinY());
 
   // Calculate required projection scaling.
-  float widthScale = csIMesh->texWidth / float(rbox.sbox.MaxX() - rbox.sbox.MinX());
-  float heightScale = csIMesh->texHeight / float(rbox.sbox.MaxY() - rbox.sbox.MinY());
+  float widthScale = g3d->GetWidth() / float(rbox.sbox.MaxX() - rbox.sbox.MinX());
+  float heightScale = g3d->GetHeight() / float(rbox.sbox.MaxY() - rbox.sbox.MinY());
 
   CS::Math::Matrix4 projShift (
       widthScale, 0, 0, 0,
@@ -138,7 +126,6 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   // Set up view.
   csRef<iView> newView = csPtr<iView>(new csView(engine, g3d));
   newView->SetCustomMatrixCamera(newCamera);
-  //newView->
   newView->GetMeshFilter().SetFilterMode(MESH_FILTER_INCLUDE);
   newView->GetMeshFilter().AddFilterMesh(csMesh);
 
