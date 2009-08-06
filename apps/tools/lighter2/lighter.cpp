@@ -30,8 +30,8 @@
 #include "statistics.h"
 #include "tui.h"
 #include "lightcalculator.h"
-#include "directlight.h"
-#include "indirectlight.h"
+#include "raytracerlighting.h"
+#include "photonmapperlighting.h"
 #include "sampler.h"
 #include <csutil/floatrand.h>
 

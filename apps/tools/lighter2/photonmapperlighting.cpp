@@ -18,7 +18,7 @@
 */
 
 #include "common.h"
-#include "indirectlight.h"
+#include "photonmapperlighting.h"
 
 #include "scene.h"
 

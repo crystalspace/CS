@@ -18,7 +18,8 @@
 
 #include "common.h"
 
-#include "directlight.h"
+#include "raytracerlighting.h"
+
 #include "lighter.h"
 #include "raytracer.h"
 #include "scene.h"
