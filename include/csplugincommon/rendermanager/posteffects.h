@@ -123,9 +123,16 @@ namespace RenderManager
       int downsample;
       /// Prevent texture reuse. Useful for readback or feedback effects.
       bool noTextureReuse;
+      /// If not empty render to this rectangle of the target texture
+      csRect targetRect;
+      /**
+       * If given renders onto the specified layer as well.
+       * This means all other options except targetRect are ignored.
+       */
+      Layer* renderOn;
       
       LayerOptions() : mipmap (false), maxMipmap (-1), downsample (0),
-        noTextureReuse (false) {}
+        noTextureReuse (false), renderOn (0) {}
       
       bool operator==(const LayerOptions& other) const
       { 
@@ -139,9 +146,11 @@ namespace RenderManager
     /// Custom input mapping for a layer
     struct LayerInputMap
     {
+      /**
+       * Shader variable for manually specifying an inout texture.
+       * Takes precedence over inputLayer and textureName if given.
+       */
       csRef<csShaderVariable> manualInput;
-      csRef<iRenderBuffer> manualTexcoords;
-      
       /// Input layer
       Layer* inputLayer;
       /// Name of the shader variable to provide the input layer texture in
@@ -151,6 +160,11 @@ namespace RenderManager
        * input layer texture in
        */
       csString texcoordName;
+      /**
+       * If not empty specifies the rectangle of the input texture, in pixels,
+       * the be used as input for the layer.
+       */
+      csRect sourceRect;
       
       LayerInputMap() : inputLayer (0), textureName ("tex diffuse"),
         texcoordName ("texture coordinate 0") {}
@@ -161,6 +175,7 @@ namespace RenderManager
     {
     private:
       friend class PostEffectManager;
+      
       csRef<iShader> effectShader;
       int outTextureNum;
       csArray<LayerInputMap> inputs;
@@ -174,7 +189,7 @@ namespace RenderManager
       bool IsInput (const Layer* layer) const;
     public:
       /// Get the shader variables for this layer.
-      iShaderVariableContext* GetSVContext() { return svContext; }
+      iShaderVariableContext* GetSVContext() const { return svContext; }
       /// Get inputs to this layer
       const csArray<LayerInputMap>& GetInputs() const { return inputs; }
       
@@ -293,8 +308,13 @@ namespace RenderManager
     PostEffectManager* chainedEffects;
     uint dbgIntermediateTextures;
 
-    csSimpleRenderMesh fullscreenQuad;
     void SetupScreenQuad ();
+    const Layer& GetRealOutputLayer (const Layer& layer) const
+    { 
+      return layer.options.renderOn 
+        ? GetRealOutputLayer (*(layer.options.renderOn))
+        : layer;
+    }
 
     struct Dimensions
     {
@@ -310,25 +330,43 @@ namespace RenderManager
        */
       struct TexturesBucket
       {
-	csRef<iRenderBuffer> vertBuf;
-	csRef<iRenderBuffer> texcoordBuf;
-	float textureCoordinateX, textureCoordinateY, textureOffsetX, textureOffsetY;
-	csRef<csShaderVariable> svPixelSize;
+        /// Textures in this bucket
 	csRefArray<iTextureHandle> textures;
+	/**
+	 * Maximum X/Y coords (normalized for 2D textures, unnormalized for
+	 * RECT textures)
+	 */
+	float texMaxX, texMaxY;
 	
-	TexturesBucket() : textureCoordinateX (1), textureCoordinateY (1), 
-	  textureOffsetX (0), textureOffsetY (0) { }
+	TexturesBucket() : texMaxX (1), texMaxY (1) { }
       };
       csArray<TexturesBucket> buckets;
-      csRefArray<iShaderVariableContext> layerSVs;
-      csRefArray<csRenderBufferHolder> buffers;
       
+      struct LayerRenderInfo
+      {
+        /// 'Pixel size' (values to add to X/Y to get next input pixel)
+	csRef<csShaderVariable> svPixelSize;
+	/// Input vertices for layer
+	csRef<iRenderBuffer> vertBuf;
+	/// Shader vars
+	csRef<iShaderVariableContext> layerSVs;
+	/// Render buffers
+	csRef<csRenderBufferHolder> buffers;
+	/// Render mesh for layer
+        csSimpleRenderMesh fullscreenQuad;
+      };
+      /// Render information for all layers
+      csArray<LayerRenderInfo> layerRenderInfos;
+
       void AllocatePingpongTextures (PostEffectManager& pfx);
       void UpdateSVContexts (PostEffectManager& pfx);
     
-      void SetupScreenQuad (PostEffectManager& pfx);
+      void SetupRenderInfo (PostEffectManager& pfx);
+    protected:
+      csPtr<iRenderBuffer> ComputeTexCoords (iTextureHandle* tex,
+        const csRect& rect, const csRect& targetRect);
     };
-
+    
     struct DimensionCacheSorting
     {
       typedef Dimensions KeyType;
