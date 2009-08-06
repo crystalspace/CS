@@ -28,7 +28,7 @@
 
 #include "common.h"
 #include "photonmap.h"
-
+  
 namespace lighter
 {
   // How many new photons to allocate when expanding the array size
@@ -40,6 +40,7 @@ namespace lighter
    * size is 28 bytes
    */
   struct Photon {
+    float pos[3];                  // The position of the photon in space
     short plane;                   // splitting plane for kd-tree
     unsigned char theta, phi;      // incoming direction
     float power[3];                // photon power (uncompressed)
