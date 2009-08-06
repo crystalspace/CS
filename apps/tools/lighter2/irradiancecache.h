@@ -24,7 +24,7 @@
 namespace lighter
 {
   struct IrradianceSample;
-  struct OctreeSampleNode;
+  class OctreeSampleNode;
 
   class IrradianceCache
   {
