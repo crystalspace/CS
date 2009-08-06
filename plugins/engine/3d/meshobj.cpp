@@ -1063,14 +1063,17 @@ csScreenBoxResult csMeshWrapper::GetScreenBoundingBox (iCamera *camera)
 {
   csScreenBoxResult rc;
 
+  // Calculate camera space bbox.
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable.IsFullTransformIdentity ())
     tr_o2c /= movable.GetFullTransform ();
   
   rc.cbox = GetTransformedBoundingBox (tr_o2c);
 
+  // Calculate screen space bbox.
   float minz, maxz;
-  if(!rc.cbox.ProjectBox(camera->GetTransform(), camera->GetProjectionMatrix(),
+  const csBox3& wbox = GetWorldBoundingBox();
+  if(!wbox.ProjectBox(camera->GetTransform(), camera->GetProjectionMatrix(),
       rc.sbox, minz, maxz, engine->G3D->GetDriver2D()->GetWidth(),
       engine->G3D->GetDriver2D()->GetHeight()))
   {
