@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2006 by Marten Svanfeldt
+  Portions Copyright (C) 2009 by Seth Berrier
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -21,6 +22,7 @@
 
 #include "csutil/noncopyable.h"
 
+#include "lightcomponent.h"
 #include "light.h"
 #include "lightmap.h"
 #include "primitive.h"
@@ -36,20 +38,33 @@ namespace lighter
   class PartialElementIgnoreCallback;  
   
   // Class to calculate direct lighting
-  class DirectLighting : private CS::NonCopyable
+  class RaytracerLighting : public LightComponent
   {
   public:
     // Setup
-    DirectLighting (const csVector3& tangentSpaceNorm, size_t subLightmapNum);
+    RaytracerLighting (const csVector3& tangentSpaceNorm, size_t subLightmapNum);
+    ~RaytracerLighting ();
 
-    // Shade by using all primitives within range
-    void ShadeDirectLighting (Sector* sector, 
-      Statistics::Progress& progress);
+    virtual csColor ComputeElementLightingComponent(Sector* sector, 
+      ElementProxy element, SamplerSequence<2>& lightSampler,
+      bool recordInfluence);
 
-    //-- Shade a point
-    typedef csColor (DirectLighting::*PVLPointShader)(Sector* sector, 
+    virtual csColor ComputePointLightingComponent(Sector* sector, 
       Object* obj, const csVector3& point, const csVector3& normal, 
       SamplerSequence<2>& lightSampler);
+
+    virtual csColor ComputeElementLightingComponent (Sector* sector,
+      ElementProxy element, SamplerSequence<2>& lightSampler,
+      bool recordInfluence, Light* light);
+
+    virtual csColor ComputePointLightingComponent(Sector* sector, 
+      Object* obj, const csVector3& point, const csVector3& normal, 
+      SamplerSequence<2>& lightSampler, Light* light);
+
+  private:
+    // Shade by using all primitives within range
+    //void ShadeDirectLighting (Sector* sector, 
+    //  Statistics::Progress& progress);
 
     // Shade a single point in space with direct lighting
     csColor UniformShadeAllLightsNonPD (Sector* sector, Object* obj, 
@@ -61,11 +76,6 @@ namespace lighter
       const csVector3& point, const csVector3& normal, 
       SamplerSequence<2>& lightSampler);
 
-    //-- Shade a lightmap element
-    typedef csColor (DirectLighting::*LMElementShader)(Sector* sector, 
-      ElementProxy element, SamplerSequence<2>& lightSampler,
-      bool recordInfluence);
-
     // Shade a primitive element with direct lighting
     csColor UniformShadeAllLightsNonPD (Sector* sector, ElementProxy element,
       SamplerSequence<2>& lightSampler, bool recordInfluence);
@@ -74,7 +84,6 @@ namespace lighter
     csColor UniformShadeRndLightNonPD (Sector* sector, ElementProxy element,
       SamplerSequence<2>& lightSampler, bool recordInfluence);
 
-    //-- Shade using one light
     // Shade a primitive element with direct lighting
     csColor UniformShadeOneLight (Sector* sector, Object* obj, 
       const csVector3& point, const csVector3& normal, Light* light, 
@@ -88,7 +97,6 @@ namespace lighter
     inline csColor UniformShadeElement (T& shade, ElementProxy element, 
       SamplerSequence<2>& lightSampler, bool recordInfluence);
 
-  private:
     struct InfluenceRecorder
     {
       Object* obj;
@@ -108,9 +116,9 @@ namespace lighter
   
     struct ShadeAllLightsNonPD
     {
-      DirectLighting& lighting;
+      RaytracerLighting& lighting;
       const LightRefArray& allLights;
-      ShadeAllLightsNonPD (DirectLighting& lighting, 
+      ShadeAllLightsNonPD (RaytracerLighting& lighting, 
         const LightRefArray& allLights) : lighting (lighting), 
         allLights (allLights) {}
       inline csColor ShadeLight (Object* obj, const csVector3& point, 
@@ -121,10 +129,10 @@ namespace lighter
 
     struct ShadeRndLightNonPD
     {
-      DirectLighting& lighting;
+      RaytracerLighting& lighting;
       const LightRefArray& allLights;
       SamplerSequence<3>& lightSampler;
-      ShadeRndLightNonPD (DirectLighting& lighting, 
+      ShadeRndLightNonPD (RaytracerLighting& lighting, 
         const LightRefArray& allLights, SamplerSequence<3>& lightSampler) : 
         lighting (lighting), allLights (allLights), 
         lightSampler (lightSampler) {}
@@ -133,11 +141,12 @@ namespace lighter
         const Primitive* shadowIgnorePrimitive = 0, 
         bool fullIgnore = false, InfluenceRecorder* influenceRec = 0);
     };
+
     struct ShadeOneLight
     {
-      DirectLighting& lighting;
+      RaytracerLighting& lighting;
       Light* light;
-      ShadeOneLight (DirectLighting& lighting, Light* light) : 
+      ShadeOneLight (RaytracerLighting& lighting, Light* light) : 
         lighting (lighting), light (light) {}
       inline csColor ShadeLight (Object* obj, const csVector3& point, 
         const csVector3& normal, SamplerSequence<2>& sampler, 
@@ -152,50 +161,26 @@ namespace lighter
       const Primitive* shadowIgnorePrimitive = 0, 
       bool fullIgnore = false, csVector3* incomingLightVec = 0);
 
-    class ProgressState
-    {
-      Statistics::Progress& progress;
-      size_t updateFreq;
-      size_t u;
-      float progressStep;
-
-    public:
-      ProgressState (Statistics::Progress& progress, size_t total) : 
-        progress (progress), 
-        updateFreq (progress.GetUpdateFrequency (total)), u (updateFreq),
-        progressStep (float (updateFreq) / total) {}
-
-      CS_FORCEINLINE void Advance ()
-      {
-        if (--u == 0)
-        {
-          progress.IncProgress (progressStep);
-          u = updateFreq;
-          globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
-        }
-      }
-    };
-
-    void ShadeLightmap (Sector* sector, Object* obj, 
-      SamplerSequence<2>& masterSampler, ProgressState& progress);
-
-    void ShadePerVertex (Sector* sector, Object* obj,
-      SamplerSequence<2>& masterSampler, ProgressState& progress);
-
     // Helpers
-    csVector3 ComputeElementNormal (ElementProxy element,
-      const csVector3& pt) const;
-    csVector3 ComputeVertexNormal (Object* obj, size_t index) const;
+    csVector3 ComputeElementNormal (ElementProxy element, const csVector3& pt) const;
     
-    void ComputeAffectingLights (Object* obj);
+    // Function Pointer -- Shade a point
+    typedef csColor (RaytracerLighting::*PVLPointShader)(Sector* sector, 
+      Object* obj, const csVector3& point, const csVector3& normal, 
+      SamplerSequence<2>& lightSampler);
 
-    // Data...
+    // Function Pointer -- Shade a lightmap element
+    typedef csColor (RaytracerLighting::*LMElementShader)(Sector* sector, 
+      ElementProxy element, SamplerSequence<2>& lightSampler,
+      bool recordInfluence);
+
+    // Normal Calculation data
     csVector3 tangentSpaceNorm;
     bool fancyTangentSpaceNorm;
-    size_t subLightmapNum;
+
+    // Pointers to the shading functions
     PVLPointShader pvlPointShader;
     LMElementShader lmElementShader;
-    csBitArray affectingLights;
   };
 }
 

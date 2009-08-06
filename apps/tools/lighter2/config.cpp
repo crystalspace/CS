@@ -23,7 +23,6 @@
 
 namespace lighter
 {
-
   Configuration globalConfig;
 
   // @@@ Depends on lightmap precision and scale
@@ -32,7 +31,8 @@ namespace lighter
   Configuration::Configuration ()
   {
     //Setup defaults
-    lighterProperties.doDirectLight = true;
+    lighterProperties.directLightEngine = LIGHT_ENGINE_RAYTRACER;
+    lighterProperties.indirectLightEngine = LIGHT_ENGINE_NONE;
     lighterProperties.directionalLMs = false;
     lighterProperties.specularDirectionMaps = false;
     lighterProperties.numThreads = CS::Platform::GetProcessorCount();
@@ -51,6 +51,16 @@ namespace lighter
 
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
+		
+    indtLightProperties.numPhotons = 500;
+    indtLightProperties.maxRecursionDepth = 10;
+    indtLightProperties.maxDensitySamples = 50;
+    indtLightProperties.sampleDistance = 1.0f;
+
+    indtLightProperties.finalGather = true;
+    indtLightProperties.numFinalGatherRays = 30;
+
+    indtLightProperties.savePhotonMap = false;
   }
 
   void Configuration::Initialize (iConfigFile* _cfgFile)
@@ -59,12 +69,43 @@ namespace lighter
     if (!cfgFile.IsValid())
       cfgFile = scfQueryInterface<iConfigFile> (globalLighter->configMgr);
     
-    lighterProperties.doDirectLight = cfgFile->GetBool ("lighter2.DirectLight", 
-      lighterProperties.doDirectLight);
+    const char* DLEngineStr = cfgFile->GetStr ("lighter2.DirectLight", 
+      "raytracer");
+
+    if(strcmp(DLEngineStr, "none") == 0)
+      lighterProperties.directLightEngine = LIGHT_ENGINE_NONE;
+    else if(strcmp(DLEngineStr, "raytracer") == 0)
+      lighterProperties.directLightEngine = LIGHT_ENGINE_RAYTRACER;
+    else if(strcmp(DLEngineStr, "photonmapper") == 0)
+      lighterProperties.directLightEngine = LIGHT_ENGINE_PHOTONMAPPER;
+    else
+    {
+      csPrintf("Error: Unknown direct light engine '%s'.\n"
+               "       Options are 'none', 'raytracer' or 'photonmapper'.\n",
+               DLEngineStr);
+      exit(1);
+    }
+
+    const char* ILEngineStr = cfgFile->GetStr ("lighter2.IndirectLight", 
+      "none");
+
+    if(strcmp(ILEngineStr, "none") == 0)
+      lighterProperties.indirectLightEngine = LIGHT_ENGINE_NONE;
+    else if(strcmp(ILEngineStr, "photonmapper") == 0)
+      lighterProperties.indirectLightEngine = LIGHT_ENGINE_PHOTONMAPPER;
+    else
+    {
+      csPrintf("Error: Unknown indirect light engine '%s'.\n"
+               "       Options are 'none' or 'photonmapper'.\n",
+               ILEngineStr);
+      exit(1);
+    }
+
     lighterProperties.directionalLMs = cfgFile->GetBool ("lighter2.BumpLMs", 
       lighterProperties.directionalLMs);
     lighterProperties.specularDirectionMaps = cfgFile->GetBool ("lighter2.SpecMaps", 
       true) && lighterProperties.directionalLMs;
+
     lighterProperties.numThreads = cfgFile->GetInt ("lighter2.NumThreads", 
       lighterProperties.numThreads);
     lighterProperties.checkDupes = cfgFile->GetBool ("lighter2.CheckDupes",
@@ -99,5 +140,22 @@ namespace lighter
 
     debugProperties.rayDebugRE =
       cfgFile->GetStr ("lighter2.debugOcclusionRays");
+		
+    indtLightProperties.numPhotons = cfgFile->GetInt("lighter2.numPhotons",
+      indtLightProperties.numPhotons);
+    indtLightProperties.maxRecursionDepth = cfgFile->GetInt("lighter2.maxRecursionDepth",
+      indtLightProperties.maxRecursionDepth);
+    indtLightProperties.maxDensitySamples = cfgFile->GetInt("lighter2.maxDensitySamples",
+      indtLightProperties.maxDensitySamples);
+    indtLightProperties.sampleDistance = cfgFile->GetFloat("lighter2.sampleDistance",
+      indtLightProperties.sampleDistance);
+
+    indtLightProperties.finalGather = cfgFile->GetBool("lighter2.finalGather",
+      indtLightProperties.finalGather);
+    indtLightProperties.numFinalGatherRays = cfgFile->GetInt("lighter2.numFGRays",
+      indtLightProperties.numFinalGatherRays);
+
+    indtLightProperties.savePhotonMap = cfgFile->GetBool("lighter2.savePhotonMap",
+      indtLightProperties.savePhotonMap);
   }
 }

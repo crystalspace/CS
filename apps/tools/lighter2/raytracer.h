@@ -30,6 +30,23 @@ namespace lighter
   class Primitive;
   class PrimitiveBase;
 
+  enum RayType {
+    RAY_TYPE_EYE,     /// Originating from the camera/eye
+    RAY_TYPE_REFLECT, //< Originating from a reflected ray
+    RAY_TYPE_REFRACT, //< Originating from a refracted ray
+    RAY_TYPE_SHADOW,  //< Used for occlusion testing in shadow calculation
+
+    /// User defined ray types
+    RAY_TYPE_OTHER1,
+    RAY_TYPE_OTHER2,
+    RAY_TYPE_OTHER3,
+    RAY_TYPE_OTHER4,
+    RAY_TYPE_OTHER5,
+
+    /// Do not count this ray
+    RAY_TYPE_IGNORE
+  };
+
   /**
    * A ray in space.
    * The ray is parameterized as O+t*D, t=[mindist, maxdist)
@@ -57,9 +74,11 @@ namespace lighter
     // Also ignore all primitives from this object
     const Object* ignoreObject;
 
+    RayType type;
+
     Ray () 
       : origin (0,0,0), direction (1,0,0), minLength (0), maxLength (FLT_MAX*0.9f),
-      rayID (0), ignoreFlags (0), ignorePrimitive (0), ignoreObject (0)
+      rayID (0), ignoreFlags (0), ignorePrimitive (0), ignoreObject (0), type(RAY_TYPE_EYE)
     {}
 
     // Clip to box. Returns if ray touch box at all
@@ -339,9 +358,25 @@ namespace lighter
   class RaytraceProfiler
   {
   public:
-    RaytraceProfiler (uint numRays)
+    RaytraceProfiler (uint numRays, RayType type = RAY_TYPE_EYE)
     {
+      if(type == RAY_TYPE_IGNORE) return;
+
       globalStats.raytracer.numRays += numRays;
+
+      switch(type)
+      {
+        case RAY_TYPE_REFLECT: globalStats.raytracer.numReflectionRays += numRays; break;
+        case RAY_TYPE_REFRACT: globalStats.raytracer.numRefractionRays += numRays; break;
+        case RAY_TYPE_SHADOW: globalStats.raytracer.numShadowRays += numRays; break;
+
+        // Types specific to photon mapping
+        case RAY_TYPE_OTHER1: globalStats.raytracer.numLightRays += numRays; break;
+        case RAY_TYPE_OTHER2: globalStats.raytracer.numFinalGatherRays += numRays; break;
+
+        default:
+        case RAY_TYPE_EYE: globalStats.raytracer.numEyeRays += numRays; break;
+      }
     }
   };
 }

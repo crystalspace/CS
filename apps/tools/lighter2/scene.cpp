@@ -25,12 +25,23 @@
 #include "object_genmesh.h"
 #include "object_terrain2.h"
 
+#include "photonmap.h"
+
 #include <functional>
 
 using namespace CS;
 
 namespace lighter
 {
+  Sector::~Sector()
+  {
+    delete kdTree;
+    if (photonMap != NULL)
+    {
+      delete photonMap;
+    }
+  }
+
 
   void Sector::Initialize (Statistics::Progress& progress)
   {
@@ -92,6 +103,70 @@ namespace lighter
     ObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
     KDTreeBuilder builder;
     kdTree = builder.BuildTree (objIt, progress);
+  }
+
+  void Sector::InitPhotonMap()
+  { 
+    if(photonMap == NULL)
+    {
+      photonMap = new PhotonMap(
+        2 * globalConfig.GetIndirectProperties ().numPhotons);
+    }
+  }
+
+  void Sector::AddPhoton(const csColor power, const csVector3 pos,
+      const csVector3 dir )
+  {
+    if(photonMap == NULL)
+    {
+      photonMap = new PhotonMap(
+        2 * globalConfig.GetIndirectProperties ().numPhotons);
+    }
+
+    const float fPower[3] = { power.red, power.green, power.blue };
+    const float fPos[3] = { pos.x, pos.y, pos.z };
+    const float fDir[3] = { dir.x, dir.y, dir.z };
+
+    photonMap->Store(fPower, fPos, fDir);
+  }
+
+  void Sector::ScalePhotons(const float scale)
+  {
+    if(photonMap != NULL) photonMap->ScalePhotonPower(scale);
+  }
+
+  size_t Sector::GetPhotonCount()
+  {
+    if(photonMap != NULL) return photonMap->GetPhotonCount();
+    return 0;
+  }
+
+  void Sector::BalancePhotons(Statistics::ProgressState& prog)
+  {
+    if(photonMap != NULL) photonMap->Balance(prog);
+  }
+
+  csColor Sector::SamplePhoton(const csVector3 point, const csVector3 normal,
+                    const float searchRad)
+  {
+    if(photonMap == NULL) return csColor();
+
+    // Local copy of the global option
+    const static size_t densitySamples =
+      globalConfig.GetIndirectProperties ().maxDensitySamples;
+
+    float result[3] = {0, 0, 0};
+    float fPos[3] = { point.x, point.y, point.z };
+    float fNorm[3] = { normal.x, normal.y, normal.z };
+
+    photonMap->IrradianceEstimate(result, fPos, fNorm, searchRad, densitySamples);
+
+    return csColor(result[0], result[1], result[2]);
+  }
+
+  void Sector::SavePhotonMap(const char* filename)
+  {
+    if(photonMap != NULL) photonMap->SaveToFile(filename);
   }
 
   //-------------------------------------------------------------------------
@@ -741,6 +816,8 @@ namespace lighter
     csRef<iDocumentNode> worldNode = 
       fileInfo->GetDocument()->GetRoot()->GetNode ("world");
 
+    globalStats.scene.numSectors = sectorList->GetCount ();
+
     if (worldNode.IsValid ())
     {
       csRef<iDocumentNodeIterator> sectorNodeIt = 
@@ -852,6 +929,7 @@ namespace lighter
 
     // Parse all meshes (should have selector later!)
     iMeshList *meshList = sector->GetMeshes ();
+    globalStats.scene.numObjects += meshList->GetCount ();
 
     u = updateFreq = progress.GetUpdateFrequency (meshList->GetCount ());
     progressStep = updateFreq * (1.0f / meshList->GetCount ());
@@ -880,6 +958,8 @@ namespace lighter
     csSet<csString> lightNames;
     // Parse all lights (should have selector later!)
     iLightList *lightList = sector->GetLights ();
+    globalStats.scene.numLights = lightList->GetCount ();
+
     for (int i = lightList->GetCount (); i-- > 0;)
     {
       iLight *light = lightList->Get (i);
@@ -2450,7 +2530,7 @@ namespace lighter
   
   void Scene::LightingPostProcessor::ApplyAmbient (Lightmap* lightmap)
   {
-    //if (!<indirect lighting enabled>)
+    if (!globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_NONE)
     {
       csColor amb;
       globalLighter->engine->GetAmbientLight (amb);
@@ -2460,7 +2540,7 @@ namespace lighter
 
   void Scene::LightingPostProcessor::ApplyAmbient (csColor* colors, size_t numColors)
   {
-    //if (!<indirect lighting enabled>)
+    if (!globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_NONE)
     {
       csColor amb;
       globalLighter->engine->GetAmbientLight (amb);

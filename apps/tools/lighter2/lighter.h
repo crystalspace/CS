@@ -24,6 +24,7 @@
 #include "raydebug.h"
 #include "statistics.h"
 
+
 namespace lighter
 {
   class ElementAreasAlloc;
@@ -34,6 +35,7 @@ namespace lighter
   class Scene;
   class Sector;
   class SwapManager;
+  
 
   class Lighter : public csRefCount
   {
@@ -80,6 +82,10 @@ namespace lighter
     // Calculate lightmapping
     void CalculateLightmaps ();
 
+    // Build the photon map
+    void BuildPhotonMaps();
+    void BalancePhotonMaps();
+
     // Initialize objects after LM construction
     void InitializeObjects ();
 
@@ -89,8 +95,8 @@ namespace lighter
     // Build per-sector KD-tree
     void BuildKDTrees ();
 
-    // Shoot direct lighting
-    void DoDirectLighting ();
+    // Compute all lighting components (Fill the lightmaps)
+    void ComputeLighting (bool enableRaytracer, bool enablePhotonMapper);
 
     // Post-process all lightmaps
     void PostprocessLightmaps ();
@@ -99,7 +105,7 @@ namespace lighter
     void LoadConfiguration ();
 
     // Print command line help
-    void CommandLineHelp (bool expert) const;
+    void CommandLineHelp (bool expert, bool raytraceopts, bool pmopts) const;
 
     Scene *scene;
 
@@ -119,7 +125,9 @@ namespace lighter
     Statistics::Progress progSaveMeshes;
     Statistics::Progress progSaveFinish;
     Statistics::Progress progBuildKDTree;
-    Statistics::Progress progDirectLighting;
+    Statistics::Progress progCalcLighting;
+    Statistics::Progress progPhotonEmission;
+    Statistics::Progress progPhotonBalancing;
     Statistics::Progress progPostproc;
     Statistics::Progress progPostprocSector;
     Statistics::Progress progPostprocLM;

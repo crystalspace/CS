@@ -29,6 +29,7 @@ namespace lighter
   class KDTree;
   class Scene;
   class Sector;
+  class PhotonMap;
 
   class Portal : public csRefCount
   {
@@ -49,13 +50,10 @@ namespace lighter
   {
   public:
     Sector (Scene* scene)
-      : kdTree (0), scene (scene)
+      : kdTree (0), scene (scene), photonMap(NULL)
     {}
 
-    ~Sector ()
-    {
-      delete kdTree;
-    }
+    ~Sector ();
 
     // Initialize any extra data in the sector
     void Initialize (Statistics::Progress& progress);
@@ -64,6 +62,22 @@ namespace lighter
 
     // Build kd tree for Sector
     void BuildKDTree (Statistics::Progress& progress);
+
+    void SavePhotonMap(const char* filename);
+
+    void InitPhotonMap();
+
+    void AddPhoton(const csColor power, const csVector3 pos,
+      const csVector3 dir );
+
+    void ScalePhotons(const float scale);
+
+    size_t GetPhotonCount();
+    
+    void BalancePhotons(Statistics::ProgressState& prog);
+
+    csColor SamplePhoton(const csVector3 point, const csVector3 normal,
+                          const float searchRad);
 
     // All objects in sector
     ObjectHash allObjects;
@@ -84,6 +98,10 @@ namespace lighter
     csString sectorName;
 
     Scene* scene;
+
+  protected:
+    // Photon map for indirect lighting
+    PhotonMap *photonMap;
   };
   typedef csHash<csRef<Sector>, csString> SectorHash;
 
