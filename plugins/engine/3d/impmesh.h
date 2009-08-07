@@ -80,19 +80,16 @@ private:
   // Convenience shortcut
   csEngine *engine;
 
-  // Flag that indicates that we have been updated.
-  bool dirty;
+  // Flags that indicate that we have been updated.
+  bool matDirty;
+  bool meshDirty;
 
   // Saved values for update checking.
-  csVector3 relativeDir;
   csVector3 meshLocalDir;
   csVector3 cameraLocalDir;
 
   // Current height and width of the billboard
   float height, width;
-
-  // Texture width and height.
-  size_t texHeight, texWidth;
 
   // Rendermesh holder for this mesh
   csRenderMeshHolder rmHolder;
@@ -105,6 +102,15 @@ private:
 
   // The camera this mesh is being viewed through.
   csWeakRef<iCamera> camera;
+
+  // The distance to the closest instance of this imposter.
+  size_t closestInstance;
+
+  // The closest instance of the mesh.
+  csWeakRef<iMeshWrapper> closestInstanceMesh;
+
+  // True if currently awaiting an update.
+  bool isUpdating;
 
   // Flags for iMeshObject.
   csFlags flags;

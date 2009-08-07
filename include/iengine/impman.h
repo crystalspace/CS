@@ -37,6 +37,8 @@ struct iImposterManager : public virtual iBase
 
   virtual void Register(iImposterMesh* mesh) = 0;
 
+  virtual void Update(iImposterMesh* mesh) = 0;
+
   virtual void Unregister(iImposterMesh* mesh) = 0;
 };
 

@@ -56,16 +56,25 @@ private:
   {
     csRef<iImposterMesh> mesh;
     bool init;
+    bool update;
     bool remove;
 
+    size_t lastDistance;
+    size_t texWidth;
+    size_t texHeight;
+
     ImposterMat(iImposterMesh* mesh)
-      : mesh(mesh), init(false), remove(false)
+      : mesh(mesh), init(false), update(false),
+      remove(false), lastDistance(size_t(-1))
     {
     }
   };
 
   /* Initialises an imposter. */
   void InitialiseImposter(ImposterMat* imposter);
+
+  /* Updated an imposter. */
+  void UpdateImposter(ImposterMat* imposter);
 
   csArray<ImposterMat*> imposterMats;
   csArray<ImposterMat*> updateQueue;
@@ -83,6 +92,8 @@ public:
 
   /////////////// iImposterManager ///////////////
   void Register(iImposterMesh* mesh);
+
+  void Update(iImposterMesh* mesh);
 
   void Unregister(iImposterMesh* mesh);
 };

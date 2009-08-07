@@ -72,6 +72,11 @@ bool csImposterManager::HandleEvent(iEvent &ev)
       InitialiseImposter(updateQueue[i]);
       updateQueue[i]->init = true;
     }
+    else if(updateQueue[i]->update)
+    {
+      UpdateImposter(updateQueue[i]);
+      updateQueue[i]->update = false;
+    }
 
     if(updateQueue[i]->remove)
     {
@@ -92,7 +97,7 @@ bool csImposterManager::HandleEvent(iEvent &ev)
 void csImposterManager::InitialiseImposter(ImposterMat* imposter)
 {
   csImposterMesh* csIMesh = static_cast<csImposterMesh*>(&*imposter->mesh);
-  csMeshWrapper* csMesh = static_cast<csMeshWrapper*>(&*csIMesh->instances[0]->mesh);
+  csMeshWrapper* csMesh = static_cast<csMeshWrapper*>(&*csIMesh->closestInstanceMesh);
 
   if(!csIMesh->camera.IsValid())
     return;
@@ -108,8 +113,8 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Set up a new projection matrix.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
-  csIMesh->texWidth = csFindNearestPowerOf2(rbox.sbox.MaxX() - rbox.sbox.MinX());
-  csIMesh->texHeight = csFindNearestPowerOf2(rbox.sbox.MaxY() - rbox.sbox.MinY());
+  imposter->texWidth = csFindNearestPowerOf2(rbox.sbox.MaxX() - rbox.sbox.MinX());
+  imposter->texHeight = csFindNearestPowerOf2(rbox.sbox.MaxY() - rbox.sbox.MinY());
 
   // Calculate required projection scaling.
   float widthScale = g3d->GetWidth() / float(rbox.sbox.MaxX() - rbox.sbox.MinX());
@@ -134,7 +139,7 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Allocate a texture image.
   csRef<iTextureManager> texman = g3d->GetTextureManager();
-  csRef<iTextureHandle> texh = texman->CreateTexture(csIMesh->texWidth, csIMesh->texHeight,
+  csRef<iTextureHandle> texh = texman->CreateTexture(imposter->texWidth, imposter->texHeight,
       csimg2D, "rgba8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
   texh->SetAlphaType (csAlphaMode::alphaBinary);
 
@@ -145,10 +150,46 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   csRef<iTextureWrapper> tex = engine->GetTextureList()->CreateTexture(texh);
   csIMesh->mat = engine->CreateMaterial("impostermat", tex);
 
+  csRef<iLoader> ldr = csQueryRegistry<iLoader>(engine->GetObjectRegistry());
+  ldr->LoadShader("/shader/lighting/lighting_imposter.xml");
+
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>(
+    engine->GetObjectRegistry(), "crystalspace.shared.stringset");
+  csStringID shadertype = strings->Request("base");
+  csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
+  iShader* shader = shman->GetShader("lighting_imposter");
+  csIMesh->mat->GetMaterial()->SetShader(shadertype, shader);
+
+  csIMesh->matDirty = true;
+
   // Move imposter mesh to correct sector.
   csIMesh->mesh->GetMovable()->SetPosition(csVector3(0.0f));
   csIMesh->mesh->GetMovable()->SetSector(csIMesh->sector);
   csIMesh->mesh->GetMovable()->UpdateMove();
+}
+
+void csImposterManager::UpdateImposter(ImposterMat* imposter)
+{
+  csImposterMesh* csIMesh = static_cast<csImposterMesh*>(&*imposter->mesh);
+  csMeshWrapper* csMesh = static_cast<csMeshWrapper*>(&*csIMesh->closestInstanceMesh);
+
+  if(csIMesh->closestInstance < imposter->lastDistance)
+  {
+    // Calculate new texture sizes.
+    csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(csIMesh->camera);
+    size_t texWidth = csFindNearestPowerOf2(rbox.sbox.MaxX() - rbox.sbox.MinX());
+    size_t texHeight = csFindNearestPowerOf2(rbox.sbox.MaxY() - rbox.sbox.MinY());
+
+    if(imposter->texHeight < texHeight || imposter->texWidth < texWidth)
+    {
+      InitialiseImposter(imposter);
+    }
+
+    imposter->lastDistance = csIMesh->closestInstance;
+  }
+
+  // Finished updating.
+  csIMesh->isUpdating = false;
 }
 
 void csImposterManager::Register(iImposterMesh* mesh)
@@ -156,6 +197,24 @@ void csImposterManager::Register(iImposterMesh* mesh)
   ImposterMat* imposterMat = new ImposterMat(mesh);
   imposterMats.Push(imposterMat);
   updateQueue.Push(imposterMat);
+}
+
+void csImposterManager::Update(iImposterMesh* mesh)
+{
+  for(size_t i=0; i<imposterMats.GetSize(); ++i)
+  {
+    if(imposterMats[i]->mesh == mesh)
+    {
+      if(imposterMats[i]->init &&
+        !imposterMats[i]->update &&
+        !imposterMats[i]->remove)
+      {
+        updateQueue.Push(imposterMats[i]);
+        imposterMats[i]->update = true;
+        break;
+      }
+    }
+  }
 }
 
 void csImposterManager::Unregister(iImposterMesh* mesh)
