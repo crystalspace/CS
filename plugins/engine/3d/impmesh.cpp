@@ -281,7 +281,7 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
 
   if (rmCreated)
   {
-    //Initialize mesh
+    // Initialize mesh
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
     mesh->do_mirror = rview->GetCamera ()->IsMirrored ();
     mesh->object2world = csReversibleTransform ();
@@ -289,6 +289,7 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     mesh->mixmode = CS_FX_ALPHA;
     mesh->alphaType = csAlphaMode::alphaBinary;
     mesh->z_buf_mode = CS_ZBUF_TEST;
+    mesh->material = 0;
 
     mesh_indices.Push (0);
     mesh_indices.Push (1);
@@ -336,18 +337,6 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
   {
     GetMeshVertices ()->Empty ();
     GetMeshTexels ()->Empty ();
-
-    float x = 1;
-    float y = 1;
-
-    // correct textels for impostor height/width ratio
-    // since r2t texture is square, but billboard might not
-    if (height > width)
-    {
-      x -= (1 - width/height)/2;
-    } else {
-      y -= (1 - height/width)/2;
-    }
 
     mesh_texels.Push (csVector2 (1,0));  //1 0
     mesh_texels.Push (csVector2 (1,1));  //1 1
