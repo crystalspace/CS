@@ -161,11 +161,16 @@ void PostEffectManager::DrawPostEffects (RenderTreeBase& renderTree)
 
   UpdateLayers();
 
+  size_t lastLayerToTarget = postLayers.GetSize () - 1;
+  while (postLayers[lastLayerToTarget]->options.renderOn != 0)
+  {
+    lastLayerToTarget--;
+  }
   for (size_t layer = 1; layer < postLayers.GetSize (); ++layer)
   {
     // Draw and ping-pong   
     iTextureHandle* targetTex;
-    if (layer < postLayers.GetSize () - 1)
+    if (layer < lastLayerToTarget)
     {
       const Layer& outputLayer = GetRealOutputLayer (*(postLayers[layer]));
       size_t bucket = GetBucketIndex (outputLayer.options);
