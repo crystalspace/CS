@@ -59,7 +59,7 @@ namespace CS
       uint8 key[sizeof(K)];
 
       RedBlackTreeNode() : parent(0) {}
-      ~RedBlackTreeNode() { ((K*)&key)->~K(); }
+      ~RedBlackTreeNode() { GetKey().~K(); }
       inline RedBlackTreeNode* GetParent() const
       { return (RedBlackTreeNode*)((uintptr_t)parent & (uintptr_t)~1); }
       void SetParent(RedBlackTreeNode* p)
@@ -80,8 +80,20 @@ namespace CS
       /// Accessor for node field.
       inline RedBlackTreeNode* GetLeft() const { return left; }
       inline RedBlackTreeNode* GetRight() const { return right; }
-      inline K& GetKey () { return *((K*)&key); }
-      inline const K& GetKey () const { return *((K*)&key); }
+      inline K& GetKey ()
+      {
+	/* Cast through 'void*' to avoid strict aliasing warning.
+	  'key' is not ever actually accessed through an uint8*, so the strict
+	  aliasing assumption practically still holds. */
+	void* p = &key;
+	return *(reinterpret_cast<K*> (p));
+      }
+      inline const K& GetKey () const
+      {
+	// See above
+	const void* p = &key;
+	return *(reinterpret_cast<const K*> (p));
+      }
       //@}
     };
   } // namespace Container
@@ -139,7 +151,7 @@ protected:
     }
     else
     {
-      int r = csComparator<K, K>::Compare (key, *((K*)&node->key));
+      int r = csComparator<K, K>::Compare (key, node->GetKey());
       if (r < 0)
 	return RecursiveInsert (node, node->left, key);
       else
@@ -288,7 +300,7 @@ protected:
     if (y != node)
     {
       // Copy key
-      *((K*)&node->key) = *((K*)&y->key);
+      node->GetKey() = y->GetKey();
     }
     if (y->GetColor() == Node::Black)
       DeleteFixup (x, nilParent);
@@ -374,7 +386,7 @@ protected:
   {
     if (node == 0) return 0;
 
-    int r = csComparator<K, K>::Compare (key, *((K*)&node->key));
+    int r = csComparator<K, K>::Compare (key, node->GetKey());
     if (r == 0)
       return node;
     else if (r < 0)
@@ -387,8 +399,8 @@ protected:
   {
     if (node == 0) return 0;
 
-    if (key == (K*)&node->key) return node;
-    int r = csComparator<K, K>::Compare (*key, *((K*)&node->key));
+    if (key == &(node->GetKey())) return node;
+    int r = csComparator<K, K>::Compare (*key, node->GetKey());
     if (r == 0)
     {
       // @@@ Should that be really necessary?
@@ -443,9 +455,9 @@ protected:
   const K* RecursiveFind (Node* node, const K2& other) const
   {
     if (node == 0) return 0;
-    int r = csComparator<K2, K>::Compare (other, *((K*)&node->key));
+    int r = csComparator<K2, K>::Compare (other, node->GetKey());
     if (r == 0)
-      return ((K*)&node->key);
+      return (&(node->GetKey()));
     else if (r < 0)
       return RecursiveFind<K2> (node->left, other);
     else
@@ -455,9 +467,9 @@ protected:
   K* RecursiveFind (Node* node, const K2& other)
   {
     if (node == 0) return 0;
-    int r = csComparator<K2, K>::Compare (other, *((K*)&node->key));
+    int r = csComparator<K2, K>::Compare (other, node->GetKey());
     if (r == 0)
-      return ((K*)&node->key);
+      return (&(node->GetKey()));
     else if (r < 0)
       return RecursiveFind<K2> (node->left, other);
     else
@@ -467,9 +479,9 @@ protected:
   const K& RecursiveFind (Node* node, const K2& other, const K& fallback) const
   {
     if (node == 0) return fallback;
-    int r = csComparator<K2, K>::Compare (other, *((K*)&node->key));
+    int r = csComparator<K2, K>::Compare (other, node->GetKey());
     if (r == 0)
-      return *((K*)&node->key);
+      return node->GetKey();
     else if (r < 0)
       return RecursiveFind<K2> (node->left, other, fallback);
     else
@@ -479,9 +491,9 @@ protected:
   K& RecursiveFind (Node* node, const K2& other, K& fallback)
   {
     if (node == 0) return fallback;
-    int r = csComparator<K2, K>::Compare (other, *((K*)&node->key));
+    int r = csComparator<K2, K>::Compare (other, node->GetKey());
     if (r == 0)
-      return *((K*)&node->key);
+      return node->GetKey();
     else if (r < 0)
       return RecursiveFind (node->left, other, fallback);
     else
@@ -495,16 +507,16 @@ protected:
   const K* RecursiveFindSGE (Node* node, const K2& other) const
   {
     if (node == 0) return 0;
-    int r = csComparator<K2, K>::Compare (other, *((K*)&node->key));
+    int r = csComparator<K2, K>::Compare (other, node->GetKey());
     if (r == 0)
-      return ((K*)&node->key);
+      return &(node->GetKey());
     if (r < 0)
     {
       const K* x = RecursiveFindSGE<K2> (node->left, other);
       /* This node is currently the smallest known greater or equal to
        * 'other', so return that if a search in the left subtree does
        * not give a result */
-      return x ? x : ((K*)&node->key);
+      return x ? x : &(node->GetKey());
     }
     else
       return RecursiveFindSGE<K2> (node->right, other);
@@ -513,16 +525,16 @@ protected:
   const K& RecursiveFindSGE (Node* node, const K2& other, const K& fallback) const
   {
     if (node == 0) return 0;
-    int r = csComparator<K2, K>::Compare (other, *((K*)&node->key));
+    int r = csComparator<K2, K>::Compare (other, node->GetKey());
     if (r == 0)
-      return *((K*)&node->key);
+      return node->GetKey();
     if (r < 0)
     {
       const K& x = RecursiveFindSGE<K2> (node->left, other);
       /* This node is currently the smallest known greater or equal to
        * 'other', so return that if a search in the left subtree does
        * not give a result */
-      return x ? x : *((K*)&node->key);
+      return x ? x : node->GetKey();
     }
     else
       return RecursiveFindSGE<K2> (node->right, other);
@@ -534,7 +546,7 @@ protected:
   void RecursiveTraverseInOrder (Node* node, CB& callback) const
   {
     if (node->left != 0) RecursiveTraverseInOrder (node->left, callback);
-    callback (*((K*)&node->key));
+    callback (node->GetKey());
     if (node->right != 0) RecursiveTraverseInOrder (node->right, callback);
   }
 
@@ -563,7 +575,7 @@ protected:
     to = AllocNode ();
     to->SetParent (parent);
     to->SetColor (from->GetColor());
-    new ((K*)&to->key) K (*((K*)&from->key));
+    new ((K*)&to->key) K (from->GetKey());
     RecursiveCopy (to->left, to, from->left);
     RecursiveCopy (to->right, to, from->right);
   }
@@ -600,7 +612,7 @@ public:
     Node* n = RecursiveInsert (0, root.p, key);
     if (n == 0) return 0;
     InsertFixup (n);
-    return (K*)&n->key;
+    return &(n->GetKey());
   }
   /**
    * Delete a key.
@@ -701,7 +713,7 @@ public:
     /// Get the next element's value.
     const K& Next ()
     {
-      const K& ret = *((const K*)&currentNode->key);
+      const K& ret = currentNode->GetKey();
       currentNode = Successor (currentNode);
       return ret;
     }
@@ -733,7 +745,7 @@ public:
     /// Get the next element's value.
     const K& Next ()
     {
-      const K& ret = *((const K*)&currentNode->key);
+      const K& ret = currentNode->GetKey();
       currentNode = Predecessor (currentNode);
       return ret;
     }
