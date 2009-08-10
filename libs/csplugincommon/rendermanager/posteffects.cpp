@@ -237,6 +237,36 @@ PostEffectManager::Layer* PostEffectManager::AddLayer (iShader* shader, const La
   return newLayer;
 }
 
+bool PostEffectManager::RemoveLayer (Layer* layer)
+{
+  size_t layerIndex = 0;
+  for (; layerIndex < postLayers.GetSize(); layerIndex++)
+  {
+    if (postLayers[layerIndex] == layer) break;
+  }
+  if (layerIndex >= postLayers.GetSize()) return false;
+  // If this layer was input to some other, replace these
+  const LayerInputMap& input = layer->inputs[0];
+  for (size_t l = layerIndex+1; l < postLayers.GetSize(); l++)
+  {
+    Layer* fixupLayer = postLayers[l];
+    for (size_t i = 0; i < fixupLayer->inputs.GetSize(); i++)
+    {
+      LayerInputMap& inputFixup = fixupLayer->inputs[i];
+      if (inputFixup.inputLayer == layer)
+        inputFixup.inputLayer = input.inputLayer;
+    }
+  }
+  
+  if (layer == lastLayer)
+    lastLayer = postLayers[layerIndex-1];
+  
+  postLayers.DeleteIndex (layerIndex);
+  textureDistributionDirty = true;
+  layersDirty = true;
+  return true;
+}
+    
 void PostEffectManager::ClearLayers()
 {
   postLayers.DeleteAll();

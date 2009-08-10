@@ -247,6 +247,8 @@ namespace RenderManager
     Layer* AddLayer (iShader* shader, const LayerOptions& opt, size_t numMaps,
       const LayerInputMap* maps);
     //@}
+    /// Remove a layer
+    bool RemoveLayer (Layer* layer);
     /// Remove all layers
     void ClearLayers();
     
