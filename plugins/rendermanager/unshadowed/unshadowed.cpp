@@ -283,6 +283,7 @@ bool RMUnshadowed::HandleTarget (RenderTreeType& renderTree,
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
   startContext->renderTargets[rtaColor0].texHandle = settings.target;
   startContext->renderTargets[rtaColor0].subtexture = settings.targetSubTexture;
+  startContext->drawFlags = settings.drawFlags;
 
   ContextSetupType contextSetup (this, renderLayer);
   ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
