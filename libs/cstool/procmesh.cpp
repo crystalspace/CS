@@ -31,6 +31,7 @@
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
 #include "iengine/camera.h"
+#include "iengine/rendermanager.h"
 
 csMeshOnTexture::csMeshOnTexture (iObjectRegistry* object_reg)
 {
@@ -38,6 +39,7 @@ csMeshOnTexture::csMeshOnTexture (iObjectRegistry* object_reg)
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   view.AttachNew (new csView (engine, g3d));
   view->SetAutoResize (false);
+  view->GetMeshFilter().SetFilterMode(CS::Utility::MESH_FILTER_INCLUDE);
   cur_w = cur_h = -1;
 }
 
@@ -102,8 +104,8 @@ void csMeshOnTexture::UpdateView (int w, int h)
     view->GetCamera ()->SetViewportSize (w, h);
     view->SetRectangle (0, 0, w, h);
     view->UpdateClipper ();
-    view->GetPerspectiveCamera ()->SetPerspectiveCenter (w/2, h/2);
-    view->GetPerspectiveCamera ()->SetFOV (h, w);
+    view->GetPerspectiveCamera ()->SetPerspectiveCenter (0.5f, 0.5f);
+    view->GetPerspectiveCamera ()->SetFOV (1, 1);
     cur_w = w;
     cur_h = h;
   }
@@ -112,24 +114,27 @@ void csMeshOnTexture::UpdateView (int w, int h)
 bool csMeshOnTexture::Render (iMeshWrapper* mesh, iTextureHandle* handle,
     bool persistent, int color)
 {
-  g3d->SetRenderTarget (handle, persistent);
-  iTextureHandle *oldContext = engine->GetContext ();
-  engine->SetContext (handle);
   int w, h;
   handle->GetRendererDimensions (w, h);
   UpdateView (w, h);
 
-  // Draw the engine view.
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER |
-    ((persistent || color != -1) ? 0 : CSDRAW_CLEARSCREEN));
-  if ((!persistent) && color != -1)
-    g3d->GetDriver2D()->Clear (color);
-  view->Draw (mesh);
+  view->GetMeshFilter().Clear();
+  view->GetMeshFilter().AddFilterMesh(mesh);
+  view->GetCamera()->SetSector(mesh->GetMovable()->GetSectors()->Get(0));
 
-  g3d->FinishDraw ();
+  csRef<iRenderManagerTargets> rmTargets = scfQueryInterface<iRenderManagerTargets>(engine->GetRenderManager());
+  rmTargets->RegisterRenderTarget(handle, 
+                                  view, 
+                                  0, 
+                                  iRenderManagerTargets::updateOnce 
+                                  | ((persistent || color != -1) ? 0 : iRenderManagerTargets::clearScreen));
 
-  // switch back to the old context
-  engine->SetContext (oldContext);
+  ///@TODO Color doesn't work at the moment.
+  /// The next line should probably move to SimpleTreeRenderer::RenderContextStack() somewhere.
+  //if ((!persistent) && color != -1) g3d->GetDriver2D()->Clear (color);
+
+  rmTargets->MarkAsUsed(handle);
+
   return true;
 }
 
