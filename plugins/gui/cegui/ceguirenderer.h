@@ -76,6 +76,8 @@ public:
    */
   virtual bool Initialize (iScript* script=0);
 
+  virtual bool IsInitialized () { return initialized; }
+
   /// Initialize with an iObjectRegistry pointer (called by plugin loader).
   virtual bool Initialize (iObjectRegistry *reg) 
   {
@@ -144,6 +146,7 @@ public:
   virtual void destroyAllTextures ();
 
 private:
+  bool initialized;
   iObjectRegistry* obj_reg;
   csCEGUIEventHandler* events;
   csCEGUIScriptModule* scriptModule;
@@ -183,6 +186,9 @@ private:
    */
   virtual CEGUI::Texture* createTexture (const CEGUI::String& filename, 
     const CEGUI::String& resourceGroup);
+
+  /// Create a texture from a CS texturehandle.
+  virtual CEGUI::Texture* createTexture (iTextureHandle* htxt);
 
   /// Create an empty texture, but specify its size (square, and power of 2).
   virtual CEGUI::Texture* createTexture (float size);

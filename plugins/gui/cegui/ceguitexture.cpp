@@ -95,7 +95,7 @@ void csCEGUITexture::loadFromMemory (const void *buffPtr,
     /* Hack: assume memory textures are for fonts only; disable filtering
      * to have them look a bit crisper */
     hTxt = txtmgr->RegisterTexture (image, CS_TEXTURE_2D | CS_TEXTURE_NOFILTER);
-    hTxt->SetTextureClass ("nocompress");
+    hTxt->SetTextureClass ("cegui");
   }
 }
 
@@ -107,4 +107,10 @@ CEGUI::Renderer* csCEGUITexture::getRenderer () const
 iTextureHandle* csCEGUITexture::GetTexHandle () const
 {
   return hTxt;
+}
+
+void csCEGUITexture::SetTexHandle(iTextureHandle* handle)
+{
+  hTxt = handle;
+  hTxt->SetTextureClass ("cegui");
 }
