@@ -21088,6 +21088,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *updateOnce = *cspacec::iRenderManagerTargets_updateOnce;
 *assumeAlwaysUsed = *cspacec::iRenderManagerTargets_assumeAlwaysUsed;
+*clearScreen = *cspacec::iRenderManagerTargets_clearScreen;
 *RegisterRenderTarget = *cspacec::iRenderManagerTargets_RegisterRenderTarget;
 *UnregisterRenderTarget = *cspacec::iRenderManagerTargets_UnregisterRenderTarget;
 *MarkAsUsed = *cspacec::iRenderManagerTargets_MarkAsUsed;

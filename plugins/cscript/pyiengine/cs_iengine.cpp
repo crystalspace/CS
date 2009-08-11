@@ -39579,5 +39579,6 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_DEFAULT_RENDERLOOP_NAME",SWIG_FromCharPtr("*default"));
   SWIG_Python_SetConstant(d, "iRenderManagerTargets_updateOnce",SWIG_From_int(static_cast< int >(iRenderManagerTargets::updateOnce)));
   SWIG_Python_SetConstant(d, "iRenderManagerTargets_assumeAlwaysUsed",SWIG_From_int(static_cast< int >(iRenderManagerTargets::assumeAlwaysUsed)));
+  SWIG_Python_SetConstant(d, "iRenderManagerTargets_clearScreen",SWIG_From_int(static_cast< int >(iRenderManagerTargets::clearScreen)));
 }
 

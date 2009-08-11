@@ -63,6 +63,7 @@ class iCEGUI(cspace.iBase):
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Initialize(*args): return _pycscegui.iCEGUI_Initialize(*args)
+    def IsInitialized(*args): return _pycscegui.iCEGUI_IsInitialized(*args)
     def Render(*args): return _pycscegui.iCEGUI_Render(*args)
     def GetSystemPtr(*args): return _pycscegui.iCEGUI_GetSystemPtr(*args)
     def GetFontManagerPtr(*args): return _pycscegui.iCEGUI_GetFontManagerPtr(*args)
@@ -77,6 +78,7 @@ class iCEGUI(cspace.iBase):
     def DisableMouseCapture(*args): return _pycscegui.iCEGUI_DisableMouseCapture(*args)
     def EnableKeyboardCapture(*args): return _pycscegui.iCEGUI_EnableKeyboardCapture(*args)
     def DisableKeyboardCapture(*args): return _pycscegui.iCEGUI_DisableKeyboardCapture(*args)
+    def CreateTexture(*args): return _pycscegui.iCEGUI_CreateTexture(*args)
     scfGetVersion = staticmethod(_pycscegui.iCEGUI_scfGetVersion)
     __swig_destroy__ = _pycscegui.delete_iCEGUI
     __del__ = lambda self : None;
