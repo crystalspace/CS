@@ -90,7 +90,7 @@ struct iCEGUI : public virtual iBase
   virtual void DisableKeyboardCapture () = 0;
 
   /// Create a texture from a CS texturehandle.
-  virtual CEGUI::Texture* createTexture (iTextureHandle* htxt)= 0;
+  virtual CEGUI::Texture* CreateTexture (iTextureHandle* htxt)= 0;
 };
 
 #endif

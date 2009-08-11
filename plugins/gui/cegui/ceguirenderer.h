@@ -188,7 +188,7 @@ private:
     const CEGUI::String& resourceGroup);
 
   /// Create a texture from a CS texturehandle.
-  virtual CEGUI::Texture* createTexture (iTextureHandle* htxt);
+  virtual CEGUI::Texture* CreateTexture (iTextureHandle* htxt);
 
   /// Create an empty texture, but specify its size (square, and power of 2).
   virtual CEGUI::Texture* createTexture (float size);

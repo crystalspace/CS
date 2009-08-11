@@ -243,7 +243,7 @@ CEGUI::Texture* csCEGUIRenderer::createTexture (
 }
 
 /// Create a texture from a CS texturehandle.
-CEGUI::Texture* csCEGUIRenderer::createTexture (iTextureHandle* htxt)
+CEGUI::Texture* csCEGUIRenderer::CreateTexture (iTextureHandle* htxt)
 {
   csCEGUITexture* tex = (csCEGUITexture*) createTexture();
   tex->SetTexHandle(htxt);

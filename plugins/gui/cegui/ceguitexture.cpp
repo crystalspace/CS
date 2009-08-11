@@ -112,5 +112,4 @@ iTextureHandle* csCEGUITexture::GetTexHandle () const
 void csCEGUITexture::SetTexHandle(iTextureHandle* handle)
 {
   hTxt = handle;
-  hTxt->SetTextureClass ("cegui");
 }
