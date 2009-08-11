@@ -115,6 +115,22 @@ public:
 #include "cstool/tokenlist.h"
 };
 
+class csShaderPriorityList : public scfImplementation1<csShaderPriorityList, 
+                                                       iShaderPriorityList>
+{
+public:
+  csArray<int> priorities;
+  csShaderPriorityList () : scfImplementationType (this)
+  {
+  }
+  virtual ~csShaderPriorityList ()
+  {
+  }
+
+  virtual size_t GetCount () const { return priorities.GetSize (); }
+  virtual int GetPriority (size_t idx) const { return priorities[idx]; }
+};
+
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)
 

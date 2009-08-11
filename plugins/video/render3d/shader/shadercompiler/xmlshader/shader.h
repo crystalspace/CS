@@ -21,6 +21,7 @@
 #define __CS_SHADER_H__
 
 #include "iutil/selfdestruct.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/shader/xmlshader.h"
 #include "imap/ldrctxt.h"
@@ -139,6 +140,8 @@ public:
   { CollectUsedConditions (rootNode, condWrite); }
 };
 
+class ForcedPriorityShader;
+
 class csXMLShader : public scfImplementationExt3<csXMLShader,
 						 csObject,
 						 iShader,
@@ -146,6 +149,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
 						 iXMLShader>
 {
   friend class csShaderConditionResolver;
+  friend class ForcedPriorityShader;
 
   csRef<iDocumentNode> originalShaderDoc;
   csRef<iDocumentNode> shaderRootStripped;
@@ -198,6 +202,9 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     
     csBitArray variantsPrepared;
     csArray<csXMLShaderTech*> variants;
+    
+    typedef csHash<csString, csString> MetadataHash;
+    MetadataHash metadata;
   
     Technique() : resolver (0) {}
     void Free ()
@@ -208,6 +215,10 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
       }
       delete resolver;
     }
+    
+    bool ReadFromCache (iFile* cacheFile);
+    bool WriteToCache (iFile* cacheFile);
+    void ScanMetadata (iDocumentNode* node);
   };
   csArray<Technique> techniques;
   size_t allTechVariantCount;
@@ -322,6 +333,12 @@ public:
   void SetFileName (const char* filename)
   { this->filename = CS::StrDup(filename); }
 
+  size_t GetTicketForTech (const csRenderMeshModes& modes, 
+    const csShaderVariableStack& stack, size_t techNum);
+  size_t GetTicketForTech (const csRenderMeshModes& modes, 
+    const csShaderVariableStack& stack, int lightCount, size_t techNum);
+  size_t GetTicketForTechVar (const csRenderMeshModes& modes, 
+    const csShaderVariableStack& stack, int lightCount, size_t tvi);
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
       const csShaderVariableStack& stack);
 
@@ -389,6 +406,12 @@ public:
     csXMLShaderTech* tech = TechForTicket (ticket);
     if (tech != 0) tech->GetUsedShaderVars (bits);
   }
+  
+  size_t GetPrioritiesTicket (const CS::Graphics::RenderMeshModes& modes,
+    const csShaderVariableStack& stack);
+  csPtr<iShaderPriorityList> GetAvailablePriorities (size_t prioTicket) const;
+  csPtr<iString> GetTechniqueMetadata (int priority, const char* dataKey) const;
+  csPtr<iShader> ForceTechnique (int priority);
 
   friend class csXMLShaderCompiler;
 
