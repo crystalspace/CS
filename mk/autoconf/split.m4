@@ -46,4 +46,5 @@ AC_DEFUN([CS_SPLIT],
 AC_DEFUN([_CS_SPLIT],
     [AS_IF([test $[@%:@] -eq 0], [$1=''],
 	[AS_IF([test "$[1]" = cs_split_filler], [$1=''], [$1=$[1]])
-	shift])])
+	shift])
+])

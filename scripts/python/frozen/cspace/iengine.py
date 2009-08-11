@@ -1363,6 +1363,7 @@ class iRenderManagerTargets(core.iBase):
     __repr__ = _swig_repr
     updateOnce = _iengine.iRenderManagerTargets_updateOnce
     assumeAlwaysUsed = _iengine.iRenderManagerTargets_assumeAlwaysUsed
+    clearScreen = _iengine.iRenderManagerTargets_clearScreen
     def RegisterRenderTarget(*args): return _iengine.iRenderManagerTargets_RegisterRenderTarget(*args)
     def UnregisterRenderTarget(*args): return _iengine.iRenderManagerTargets_UnregisterRenderTarget(*args)
     def MarkAsUsed(*args): return _iengine.iRenderManagerTargets_MarkAsUsed(*args)

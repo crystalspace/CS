@@ -9755,6 +9755,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *SetTitle = *cspacec::iNativeWindow_SetTitle;
+*SetIcon = *cspacec::iNativeWindow_SetIcon;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15094,6 +15095,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetIndices = *cspacec::iAnimatedMeshFactorySubMesh_GetIndices;
 *GetIndexSetCount = *cspacec::iAnimatedMeshFactorySubMesh_GetIndexSetCount;
 *GetBoneIndices = *cspacec::iAnimatedMeshFactorySubMesh_GetBoneIndices;
+*GetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_GetMaterial;
+*SetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_SetMaterial;
 *scfGetVersion = *cspacec::iAnimatedMeshFactorySubMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -21085,6 +21088,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *updateOnce = *cspacec::iRenderManagerTargets_updateOnce;
 *assumeAlwaysUsed = *cspacec::iRenderManagerTargets_assumeAlwaysUsed;
+*clearScreen = *cspacec::iRenderManagerTargets_clearScreen;
 *RegisterRenderTarget = *cspacec::iRenderManagerTargets_RegisterRenderTarget;
 *UnregisterRenderTarget = *cspacec::iRenderManagerTargets_UnregisterRenderTarget;
 *MarkAsUsed = *cspacec::iRenderManagerTargets_MarkAsUsed;

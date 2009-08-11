@@ -358,6 +358,11 @@ void csGraphics2D::SetTitle (const char* title)
   win_title = title;
 }
 
+void csGraphics2D::SetIcon (iImage *image)
+{
+    
+}
+
 bool csGraphics2D::Resize (int w, int h)
 {
   if (!is_open)
