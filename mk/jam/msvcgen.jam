@@ -1280,12 +1280,21 @@ rule StaticPluginLibrary
   for t in $(targets)
   {
     sources += $(STATICPLUGINS.SOURCES.$(t)) ;
+    extlibs += $($(t).EXTERNALLIBS) ;
   }
 
   $(name)_STATIC = "yes" ;
   # Set up library
   Library $(name) : $(sources) ;
   MsvcDefine $(name) : CS_STATIC_LINKED ;
+  # We need the CFLAGS of external dependencies, but not the LFLAGS.
+  local extlib ;
+  for extlib in [ RemoveDups $(extlibs) ]
+  {
+    _ExternalLibsHelperMsvc $(name) : $(extlib) : MsvcCFlags : CFLAGS ;
+    _ExternalLibsHelperMsvc $(name) : $(extlib) : _MsvcDefine  : DEFINES ;
+    _ExternalLibsHelperMsvc $(name) : $(extlib) : _MsvcIncDirs : INCDIRS ;
+  }
 
   # Write out needed CFLAGS, LFLAGS
   local outdir = [ Property msvcgen : outdircommon ] ;
