@@ -80,15 +80,17 @@ const char* PostEffectManager::GetIntermediateTargetFormat ()
   return textureFmt;
 }
 
-bool PostEffectManager::SetupView (iView* view)
+bool PostEffectManager::SetupView (iView* view, 
+				   CS::Math::Matrix4& perspectiveFixup)
 {
   unsigned int width = view->GetContext ()->GetWidth ();
   unsigned int height = view->GetContext ()->GetHeight ();
 
-  return SetupView (width, height);
+  return SetupView (width, height, perspectiveFixup);
 }
 
-bool PostEffectManager::SetupView (uint width, uint height)
+bool PostEffectManager::SetupView (uint width, uint height, 
+				   CS::Math::Matrix4& perspectiveFixup)
 {
   bool result = false;
   if (width != currentWidth || height != currentHeight)
@@ -125,8 +127,26 @@ bool PostEffectManager::SetupView (uint width, uint height)
   }
   if (chainedEffects)
   {
-    if (chainedEffects->SetupView (width, height))
+    if (chainedEffects->SetupView (width, height, perspectiveFixup))
       target = chainedEffects->GetScreenTarget();
+  }
+  else
+  {
+    iTextureHandle* screenTarget = GetScreenTarget ();
+    if (screenTarget)
+    {
+      int targetW, targetH;
+      screenTarget->GetRendererDimensions (targetW, targetH);
+      float scaleX = float(width)/float (targetW);
+      float scaleY = float(height)/float (targetH);
+      perspectiveFixup = CS::Math::Matrix4 (
+	scaleX, 0, 0, scaleX-1.0f,
+	0, scaleY, 0, scaleY-1.0f,
+	0, 0, 1, 0,
+	0, 0, 0, 1);
+    }
+    else
+      perspectiveFixup = CS::Math::Matrix4();
   }
   return result;
 }

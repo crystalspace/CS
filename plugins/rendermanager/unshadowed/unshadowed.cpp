@@ -216,13 +216,15 @@ bool RMUnshadowed::RenderView (iView* view)
   if (!startSector)
     return false;
 
-  postEffects.SetupView (view);
+  CS::Math::Matrix4 perspectiveFixup;
+  postEffects.SetupView (view, perspectiveFixup);
 
   // Pre-setup culling graph
   RenderTreeType renderTree (treePersistent);
 
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
   startContext->renderTargets[rtaColor0].texHandle = postEffects.GetScreenTarget ();
+  startContext->perspectiveFixup = perspectiveFixup;
 
   // Setup the main context
   {
