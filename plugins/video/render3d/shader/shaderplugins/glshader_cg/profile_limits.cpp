@@ -29,7 +29,9 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
-#define UNLIMITED  ~(1 << 31)
+/* At least Cg 2.1 seems to store the profile limits as 16-bit integers,
+   so use 0x7fff when something is 'unlimited'. */
+#define UNLIMITED  0x7fff
 
 // Tabularize what profiles use what limits
 #define PROFILES  \
