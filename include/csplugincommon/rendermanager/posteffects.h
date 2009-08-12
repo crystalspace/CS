@@ -24,6 +24,7 @@
  */
 
 #include "csgfx/shadervarcontext.h"
+#include "csplugincommon/rendermanager/rendertree.h"
 #include "csutil/array.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/genericresourcecache.h"
@@ -215,7 +216,7 @@ namespace RenderManager
      * Draw post processing effects after the scene was rendered to
      * the handle returned by GetScreenTarget().
      */
-    void DrawPostEffects ();
+    void DrawPostEffects (RenderTreeBase& renderTree);
     
     //@{
     /// Add an effect pass. Uses last added layer as the input
@@ -282,6 +283,7 @@ namespace RenderManager
     csRef<iRenderBuffer> indices;
     csRef<iTextureHandle> target;
     PostEffectManager* chainedEffects;
+    uint dbgIntermediateTextures;
 
     csSimpleRenderMesh fullscreenQuad;
     void SetupScreenQuad ();

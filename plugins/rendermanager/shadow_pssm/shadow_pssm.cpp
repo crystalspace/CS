@@ -385,7 +385,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
     ForEachContextReverse (renderTree, render);
   }
 
-  postEffects.DrawPostEffects ();
+  postEffects.DrawPostEffects (renderTree);
   
   
   if (doHDRExposure) hdrExposure.ApplyExposure ();

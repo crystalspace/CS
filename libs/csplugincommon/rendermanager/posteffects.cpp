@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 
+#include "csplugincommon/rendermanager/posteffects.h"
+
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/cfgacc.h"
@@ -36,14 +38,14 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 
-#include "csplugincommon/rendermanager/posteffects.h"
+#include "csplugincommon/rendermanager/rendertree.h"
 
 #include <stdarg.h>
 
 using namespace CS::RenderManager;
 
 PostEffectManager::PostEffectManager ()
-  : frameNum (0), chainedEffects (0),
+  : frameNum (0), chainedEffects (0), dbgIntermediateTextures (~0),
     dimCache (CS::Utility::ResourceCache::ReuseConditionFlagged (),
       CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (0)),
     currentDimData (0), currentWidth (0), currentHeight (0), 
@@ -137,13 +139,16 @@ iTextureHandle* PostEffectManager::GetScreenTarget ()
     return currentDimData->buckets[bucket].textures[postLayers[0]->outTextureNum];
   }
 
-  return 0;
+  return target;
 }
 
-void PostEffectManager::DrawPostEffects ()
+void PostEffectManager::DrawPostEffects (RenderTreeBase& renderTree)
 { 
   graphics3D->FinishDraw ();
   
+  if (dbgIntermediateTextures == (uint)~0)
+    dbgIntermediateTextures = renderTree.RegisterDebugFlag ("textures.postprocess");
+
   UpdateLayers();
 
   for (size_t layer = 1; layer < postLayers.GetSize (); ++layer)
@@ -162,8 +167,20 @@ void PostEffectManager::DrawPostEffects ()
     graphics3D->DrawSimpleMesh (fullscreenQuad, csSimpleMeshScreenspace);
     graphics3D->FinishDraw ();
   }
+  
+  if (renderTree.IsDebugFlagEnabled (dbgIntermediateTextures))
+  {
+    for (size_t layer = 0; layer < postLayers.GetSize ()-1; ++layer)
+    {
+      // Actual intermediate layers
+      size_t bucket = GetBucketIndex (postLayers[layer]->options);
+      renderTree.AddDebugTexture (
+	currentDimData->buckets[bucket].textures[postLayers[layer]->outTextureNum],
+	float (currentWidth)/float(currentHeight));
+    }
+  }
 
-  if (chainedEffects) chainedEffects->DrawPostEffects ();
+  if (chainedEffects) chainedEffects->DrawPostEffects (renderTree);
   
   dimCache.AdvanceTime (++frameNum);
   // Reset to avoid purging every frame

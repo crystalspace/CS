@@ -336,7 +336,7 @@ namespace RenderManager
       contextStack.Empty ();
       
       if (context->postEffects.IsValid())
-        context->postEffects->DrawPostEffects ();
+        context->postEffects->DrawPostEffects (context->owner);
     }
 
 
