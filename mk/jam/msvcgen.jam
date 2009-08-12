@@ -703,6 +703,28 @@ rule MsvcGenName1
   MSVC.NAME_OVERRIDE.$(<) = $(>) ;
 }
 
+## MsvcAddFileToRespFile respfile : files : respdir ;
+rule MsvcAddFileToProject
+{
+  local respfile = $(1) ;
+  local files = $(2) ;
+  local respdir = $(3) ;
+  
+  for f in $(files)
+  {
+    local file_base = $(f:G=:D=) ;
+    if [ IsElem $(file_base) : $($(respfile)_FILES) ]
+    {
+      ResponseFile $(respfile) : "file_obj_unique|$(f)" : notfile : $(respdir) ;
+    }
+    else
+    {
+      ResponseFile $(respfile) : "file|$(f)" : notfile : $(respdir) ;
+      $(respfile)_FILES += $(file_base) ;
+    }
+  }
+}
+
 ## MsvcProject target : type : target-with-ext : sources : options
 ##   Create a project file for 'target', which is the project's raw name.
 ##   'sources' is a list of files comprising the target.
@@ -793,8 +815,7 @@ rule MsvcProject
       {
 	fileinproj = $(i:R=$(SEARCH_SOURCE)) ;
       }
-      ResponseFile $(respfile) : "file|$(fileinproj)" : notfile :
-	$(respdir) ;
+      MsvcAddFileToProject $(respfile) : $(fileinproj) : $(respdir) ;
     }
   }
 
@@ -807,8 +828,7 @@ rule MsvcProject
     SEARCH on $(resource) = $(outdircommon) ;
     NAME on $(resource) = $(rawname) ;
     $(rawname)_RCNAME = $(resource) ;
-    ResponseFile $(respfile) : "file|$(resource:R=$(outdircommon))" : notfile :
-      $(respdir) ;
+    MsvcAddFileToProject $(respfile) : $(resource:R=$(outdircommon)) : $(respdir) ;
   
     local versionrc = $(resource:S=.vrctmp) ;
     MakeLocate $(versionrc) : $(workdircommon) ;
@@ -828,9 +848,8 @@ rule MsvcProject
       
       Win32Resource $(rawname) : $(metarc) ;
       MsvcRmTemps $(resource) : $(metarc) ;
-      ResponseFile $(respfile) :
-	"file|$($(rawname)_METAFILE:R=$(SEARCH_SOURCE))" : notfile :
-	$(respdir) ;
+      MsvcAddFileToProject $(respfile) :
+	$($(rawname)_METAFILE:R=$(SEARCH_SOURCE)) : $(respdir) ;
     }
 
     if [ IsElem $(type) : appgui appcon ]
@@ -854,8 +873,7 @@ rule MsvcProject
           # VC8: Manifest appears in project along other files, a special build
           # tool cares about the embedding into a resource. (The resource goop
           # still has to be generated since it is shared with other VCs.)
-	  ResponseFile $(respfile) : "file|$(manifest:R=$(outdircommon))" : notfile :
-	    $(respdir) ;
+	  MsvcAddFileToProject $(respfile) : $(manifest:R=$(outdircommon)) : $(respdir) ;
         }
       
         Win32Resource $(rawname) : $(manifestrc) ;
@@ -1103,12 +1121,10 @@ rule LinkStaticPlugins
     GeneratePluginLibraryGlueLib $(libglue) : $(plugin_lib_name) : $(tag) ;
     
     Library $(plugin_lib_name) : : noinstall notest independent nohelp shared ;
-    ResponseFile $($(plugin_lib_name)_PRJ_RESPFILE) : 
-      "file|$(libglue:R=$(outdir))" : notfile :
-      $($(target)_PRJ_RESPDIR) ;
-    ResponseFile $($(plugin_lib_name)_PRJ_RESPFILE) : 
-      "file|$(staticuse_out:R=$(outdir))" : notfile :
-      $($(target)_PRJ_RESPDIR) ;
+    MsvcAddFileToProject $($(plugin_lib_name)_PRJ_RESPFILE) : 
+      $(libglue:R=$(outdir)) : $($(target)_PRJ_RESPDIR) ;
+    MsvcAddFileToProject $($(plugin_lib_name)_PRJ_RESPFILE) : 
+      $(staticuse_out:R=$(outdir)) : $($(target)_PRJ_RESPDIR) ;
     LibDepends $(plugin_lib_name) : $(target_link_with) ;
     LFlags $(plugin_lib_name) : $(target_lflags) ;
     Depends msvcgen : $(libglue) ;
@@ -1151,9 +1167,8 @@ rule LinkStaticPlugins
     LinkWith $(target) : $(target_link_with) ;
     
     # Add usefile to project
-    ResponseFile $($(target)_PRJ_RESPFILE) : 
-      "file|$(appglue:R=$(outdir))" : notfile :
-      $($(target)_PRJ_RESPDIR) ;
+    MsvcAddFileToProject $($(target)_PRJ_RESPFILE) : 
+      $(appglue:R=$(outdir)) : $($(target)_PRJ_RESPDIR) ;
     Depends $(target) : $(appglue) ;
     Depends msvcgen : $(appglue) ;
     LinkWith $(target) : $(plugin_lib_name) ;
@@ -1171,9 +1186,8 @@ rule LinkStaticPlugins
     LinkWith $(target) : $(target_link_with) ;
     
     # Add usefile to project
-    ResponseFile $($(target)_PRJ_RESPFILE) : 
-      "file|$(staticuse_out:R=$(outdir))" : notfile :
-      $($(target)_PRJ_RESPDIR) ;
+    MsvcAddFileToProject $($(target)_PRJ_RESPFILE) : 
+      $(staticuse_out:R=$(outdir)) : $($(target)_PRJ_RESPDIR) ;
     Depends $(target) : $(staticuse_out) ;
   }
 }
@@ -1583,8 +1597,7 @@ rule MsvcExtraFile1
   local respfile = $($(rawname)_PRJ_RESPFILE) ;
   local respdir = $($(rawname)_PRJ_RESPDIR) ;
   
-  ResponseFile $(respfile) : "file|$(files)" : notfile :
-    $(respdir) ;
+  MsvcAddFileToProject $(respfile) : $(files) : $(respdir) ;
 }
 
 # _MsvcIncDirs target : incdirs [ : mode ]
