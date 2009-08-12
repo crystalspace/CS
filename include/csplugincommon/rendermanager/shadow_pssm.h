@@ -741,7 +741,12 @@ namespace RenderManager
 	      Probably the post effects manager should be changed to handle
 	      changing resolutions well */
 	    if (shadowMapCtx->postEffects.IsValid())
-	      shadowMapCtx->postEffects->SetupView (shadowMapSize, shadowMapSize);
+	    {
+  	      CS::Math::Matrix4 perspectiveFixup;
+	      shadowMapCtx->postEffects->SetupView (shadowMapSize, shadowMapSize,
+		perspectiveFixup);
+	      shadowMapCtx->perspectiveFixup = perspectiveFixup;
+	    }
     
 	    // Setup the new context
 	    ShadowmapContextSetup contextFunction (layerConfig,

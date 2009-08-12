@@ -403,6 +403,7 @@ namespace RenderManager
       // Copy the target from last portal
       for (int a = 0; a < rtaNumAttachments; a++)
         portalCtx->renderTargets[a] = context.renderTargets[a];
+      portalCtx->perspectiveFixup = context.perspectiveFixup;
 
       // Setup the new context
       contextFunction (*portalCtx, setupData);

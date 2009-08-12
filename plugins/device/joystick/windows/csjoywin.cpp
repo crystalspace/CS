@@ -130,12 +130,12 @@ bool csWindowsJoystick::HandleEvent (iEvent& ev)
 
 struct JoyAxesInfo
 {
-  LPDIRECTINPUTDEVICE2 device;
+  LPDIRECTINPUTDEVICE2A device;
   uint nAxes;
   csDirtyAccessArray<int32> axesMapping;
 };
 
-static BOOL CALLBACK axes_callback(LPCDIDEVICEOBJECTINSTANCE i, LPVOID p)
+static BOOL CALLBACK axes_callback(LPCDIDEVICEOBJECTINSTANCEA i, LPVOID p)
 {
   // Configure to return data in the range (-32767..32767)
   DIPROPRANGE diprg;
@@ -191,21 +191,21 @@ static BOOL CALLBACK axes_callback(LPCDIDEVICEOBJECTINSTANCE i, LPVOID p)
     // axis # and DIJoystate2 member/offset
     //TODO BLACK MAGIC HERE
   }
-  LPDIRECTINPUTDEVICE2 device = pJoyAxisInfo->device;
+  LPDIRECTINPUTDEVICE2A device = pJoyAxisInfo->device;
   device->SetProperty (DIPROP_RANGE, &diprg.diph);
 
   return DIENUM_CONTINUE;
 }
 
 
-bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCE*  pdidInstanc)
+bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCEA*  pdidInstanc)
 { 
-  LPDIRECTINPUTDEVICE device;
+  LPDIRECTINPUTDEVICEA device;
   lpdin->CreateDevice (pdidInstanc->guidInstance, &device, 0);
   bool const ok = (device != 0);
   if (ok) 
   {
-    LPDIRECTINPUTDEVICE2 device2 = (LPDIRECTINPUTDEVICE2)device;
+    LPDIRECTINPUTDEVICE2A device2 = (LPDIRECTINPUTDEVICE2A)device;
 
     DIDEVCAPS caps;
     JoyAxesInfo jaxes;
@@ -243,7 +243,7 @@ bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCE*  pdidInstanc)
   return ok;
 }
 
-static BOOL CALLBACK dev_callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
+static BOOL CALLBACK dev_callback(LPCDIDEVICEINSTANCEA lpddi, LPVOID pvRef)
 {
   csWindowsJoystick* po = (csWindowsJoystick*)pvRef;
   po->CreateDevice (lpddi);
@@ -253,7 +253,7 @@ static BOOL CALLBACK dev_callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 bool csWindowsJoystick::Init ()
 {
   csRef<iWin32Assistant> win32 = csQueryRegistry<iWin32Assistant> (object_reg);
-  HRESULT hr = DirectInputCreate (win32->GetInstance (), DIRECTINPUT_VERSION, 
+  HRESULT hr = DirectInputCreateA (win32->GetInstance (), DIRECTINPUT_VERSION, 
     &lpdin, 0);
   if (SUCCEEDED (hr))
   {

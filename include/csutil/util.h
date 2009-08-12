@@ -29,33 +29,6 @@
 
 /**\addtogroup util
  * @{ */
- 
-/**
- * Allocate a new char [] and copy the string into the newly allocated 
- * storage.
- * This is a handy method for copying strings, in fact it is the C++ analogue
- * of the strdup() function from string.h (strdup() is not present on some
- * platforms). To free the pointer the caller should call delete[].
- */
-CS_CRYSTALSPACE_EXPORT char *csStrNew (const char *s);
-/**
- * Allocate a new char [] and copy an UTF-8 version of the string into 
- * the newly allocated storage.
- * \sa csStrNew(const char*)
- */
-CS_CRYSTALSPACE_EXPORT char *csStrNew (const wchar_t *s);
-/**
- * Allocate a new widechar [] and copy the string into the newly allocated 
- * storage.
- * \sa csStrNew(const char*)
- */
-CS_CRYSTALSPACE_EXPORT wchar_t* csStrNewW (const wchar_t *s);
-/**
- * Allocate a new widechar [] and copy the string converted from UTF-8 into 
- * the newly allocated storage.
- * \sa csStrNew(const char*)
- */
-CS_CRYSTALSPACE_EXPORT wchar_t* csStrNewW (const char *s);
 
 namespace CS
 {
@@ -86,6 +59,72 @@ namespace CS
    * \sa StrDup(const char*)
    */
   CS_CRYSTALSPACE_EXPORT wchar_t* StrDupW (const char *s);
+}
+
+///\internal Helper function needed by the csStrNew variants below
+CS_CRYSTALSPACE_EXPORT size_t cs_wcslen (wchar_t const* s);
+
+/**
+ * Allocate a new char [] and copy the string into the newly allocated 
+ * storage.
+ * This is a handy method for copying strings, in fact it is the C++ analogue
+ * of the strdup() function from string.h (strdup() is not present on some
+ * platforms). To free the pointer the caller should call delete[].
+ * \sa CS::StrDup which is slightly more efficient
+ */
+inline char *csStrNew (const char *s)
+{
+  if (!s) return 0;
+  size_t sl = strlen (s) + 1;
+  char *r = new char [sl];
+  memcpy (r, s, sl);
+  return r;
+}
+/**
+ * Allocate a new char [] and copy an UTF-8 version of the string into 
+ * the newly allocated storage.
+ * \sa csStrNew(const char*)
+ * \sa CS::StrDup which is slightly more efficient
+ */
+inline char *csStrNew (const wchar_t *s)
+{
+  if (!s) return 0;
+  char* cs = CS::StrDup (s);
+  size_t sl = strlen (cs) + 1;
+  char *r = new char [sl];
+  memcpy (r, cs, sl);
+  cs_free (cs);
+  return r;
+}
+/**
+ * Allocate a new widechar [] and copy the string into the newly allocated 
+ * storage.
+ * \sa csStrNew(const char*)
+ * \sa CS::StrDupW which is slightly more efficient
+ */
+inline wchar_t* csStrNewW (const wchar_t *s)
+{
+  if (!s) return 0;
+  size_t sl = cs_wcslen (s) + 1;
+  wchar_t *r = new wchar_t [sl];
+  memcpy (r, s, sl * sizeof (wchar_t));
+  return r;
+}
+/**
+ * Allocate a new widechar [] and copy the string converted from UTF-8 into 
+ * the newly allocated storage.
+ * \sa csStrNew(const char*)
+ * \sa CS::StrDupW which is slightly more efficient
+ */
+inline wchar_t* csStrNewW (const char *s)
+{
+  if (!s) return 0;
+  wchar_t* ws = CS::StrDupW (s);
+  size_t sl = cs_wcslen (ws) + 1;
+  wchar_t *r = new wchar_t [sl];
+  memcpy (r, ws, sl * sizeof (wchar_t));
+  cs_free (ws);
+  return r;
 }
 
 /**
@@ -129,12 +168,12 @@ public:
    * Stores an UTF-8 converted version of \p ws internally.   
    */
   csWtoC (const wchar_t* ws)
-  { s = csStrNew (ws); }
+  { s = CS::StrDup (ws); }
   /**
    * Deletes the internally stored string.
    */
   ~csWtoC ()
-  { delete[] s; }
+  { cs_free (s); }
   /**
    * Retrieve the converted string.
    */
@@ -159,12 +198,12 @@ public:
    * Stores an UTF-16 converted version of \p s internally.   
    */
   csCtoW (const char* s)
-  { ws = csStrNewW (s); }
+  { ws = CS::StrDupW (s); }
   /**
    * Deletes the internally stored string.
    */
   ~csCtoW ()
-  { delete[] ws; }
+  { cs_free (ws); }
   /**
    * Retrieve the converted string.
    */

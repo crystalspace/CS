@@ -52,3 +52,8 @@ bool MeshFilter::IsMeshFiltered (iMeshWrapper* mesh) const
     return !filteredMeshes.Contains (mesh);
   }
 }
+
+void MeshFilter::Clear ()
+{
+  filteredMeshes.DeleteAll ();
+}

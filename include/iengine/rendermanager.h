@@ -55,7 +55,10 @@ struct iRenderManagerTargets : public virtual iBase
      *   this is a waste of cycles. Consider manual marking with MarkAsUsed()
      *   if the texture is only used some times.
      */
-    assumeAlwaysUsed = 2
+    assumeAlwaysUsed = 2,
+
+    /// Clear the frame buffer before rendering to it.
+    clearScreen = 4
   };
   /**
    * Register a texture and view that should be rendered to the texture.

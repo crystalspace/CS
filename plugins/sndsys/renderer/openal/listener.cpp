@@ -30,7 +30,7 @@ SndSysListenerOpenAL::SndSysListenerOpenAL () :
   m_Front (csVector3 (0, 0, -1)), m_Top (csVector3 (0, 1, 0)),
   m_Position (csVector3 (0, 0, 0)), m_Distance (1.0), m_RollOff (1.0),
   m_Volume (1.0), m_Velocity (csVector3 (0, 0, 0)), m_DopplerFactor (1.0),
-  m_SpeedOfSound(343.3), m_Update (true), m_ExternalUpdate (true)
+  m_SpeedOfSound(343.3f), m_Update (true), m_ExternalUpdate (true)
 {
   alListener3f( AL_VELOCITY, 0, 0, 0 );
   alDistanceModel( AL_EXPONENT_DISTANCE_CLAMPED );

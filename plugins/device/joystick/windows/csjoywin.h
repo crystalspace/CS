@@ -57,7 +57,7 @@ private:
   struct joydata
   {
     int number;			 // joystick number; CS numbers are 1-based
-    LPDIRECTINPUTDEVICE2 device; // DInput device
+    LPDIRECTINPUTDEVICE2A device; // DInput device
     int nButtons;		 // number of buttons
     uint nAxes;			 // number of axis
     joystate state[2];		 // joystick current & last state
@@ -81,7 +81,7 @@ private:
   csConfigAccess config;
   csRef<iEventQueue > eq;
   csRef<iEventOutlet> EventOutlet;
-  LPDIRECTINPUT lpdin;
+  LPDIRECTINPUTA lpdin;
 
   bool Init ();
   bool Close ();
@@ -94,7 +94,7 @@ private:
   virtual ~csWindowsJoystick ();
 
   virtual bool Initialize (iObjectRegistry *oreg);
-  virtual bool CreateDevice (const DIDEVICEINSTANCE* pdidInstance);
+  virtual bool CreateDevice (const DIDEVICEINSTANCEA* pdidInstance);
 
   /**\name iEventPlug implementation
    * @{ */

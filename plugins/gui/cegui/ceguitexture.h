@@ -73,6 +73,9 @@ public:
   /// Get a handle to the texture.
   iTextureHandle* GetTexHandle() const;
 
+  /// Set a handle to the texture.
+  void SetTexHandle( iTextureHandle*);
+
 private:
   /// Returns the renderer
   CEGUI::Renderer* getRenderer (void) const;

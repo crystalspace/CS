@@ -213,7 +213,9 @@ namespace RenderManager
    *
    * Usage: with reverse iteration over all contexts.
    * Usually used in the final step before post processing effects are
-   * applied. Example:
+   * applied. 
+   *
+   * Example:
    * \code
    * // ... contexts setup etc. ...
    *
@@ -297,7 +299,8 @@ namespace RenderManager
       }
       
       // Setup the camera etc.. @@should be delayed as well
-      g3d->SetProjectionMatrix (cam->GetProjectionMatrix ());
+      g3d->SetProjectionMatrix (
+	context->perspectiveFixup * cam->GetProjectionMatrix ());
       g3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
       BeginFinishDrawScope bd (g3d, drawFlags);
@@ -336,7 +339,7 @@ namespace RenderManager
       contextStack.Empty ();
       
       if (context->postEffects.IsValid())
-        context->postEffects->DrawPostEffects ();
+        context->postEffects->DrawPostEffects (context->owner);
     }
 
 

@@ -20,6 +20,7 @@
 #include "csutil/sysfunc.h"
 
 
+#include "csplugincommon/win32/icontools.h"
 #include "csutil/win32/wintools.h"
 #include "csutil/win32/win32.h"
 
@@ -165,7 +166,8 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
   scfImplementationType (this, iParent),
   m_nGraphicsReady (true),
   m_hWnd (0),
-  modeSwitched (true)
+  modeSwitched (true),
+  customIcon (0)
 {
 }
 
@@ -274,7 +276,7 @@ int csGraphics2DOpenGL::FindPixelFormatWGL (csGLPixelFormatPicker& picker)
 
   HINSTANCE ModuleHandle = GetModuleHandle(0);
 
-  WNDCLASS wc;
+  WNDCLASSA wc;
   wc.hCursor        = 0;
   wc.hIcon	    = 0;
   wc.lpszMenuName   = 0;
@@ -286,7 +288,7 @@ int csGraphics2DOpenGL::FindPixelFormatWGL (csGLPixelFormatPicker& picker)
   wc.cbClsExtra     = 0;
   wc.cbWndExtra     = 0;
 
-  if (!RegisterClass (&wc)) return false;
+  if (!RegisterClassA (&wc)) return false;
 
   DummyWndInfo dwi;
   dwi.pixelFormat = -1;
@@ -294,12 +296,12 @@ int csGraphics2DOpenGL::FindPixelFormatWGL (csGLPixelFormatPicker& picker)
   dwi.chosenFormat = &currentFormat;
   dwi.picker = &picker;
 
-  HWND wnd = CreateWindow (dummyClassName, 0, 0, CW_USEDEFAULT, 
+  HWND wnd = CreateWindowA (dummyClassName, 0, 0, CW_USEDEFAULT, 
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
     ModuleHandle, (LPVOID)&dwi);
   DestroyWindow (wnd);
 
-  UnregisterClass (dummyClassName, ModuleHandle);
+  UnregisterClassA (dummyClassName, ModuleHandle);
 
   ext.Reset();
 
@@ -743,6 +745,14 @@ void csGraphics2DOpenGL::SetTitle (const char* title)
     else
       SetWindowTextA (m_hWnd, cswinCtoA (title));
   }
+}
+
+void csGraphics2DOpenGL::SetIcon (iImage *image)
+{
+  HICON icon = CS::Platform::Win32::IconTools::IconFromImage (image);
+  SendMessage (m_hWnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
+  if (customIcon != 0) DestroyIcon (customIcon);
+  customIcon = icon;
 }
 
 void csGraphics2DOpenGL::AlertV (int type, const char* title, const char* okMsg,

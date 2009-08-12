@@ -346,13 +346,15 @@ bool RMShadowedPSSM::RenderView (iView* view)
   if (!startSector)
     return false;
 
-  postEffects.SetupView (view);
+  CS::Math::Matrix4 perspectiveFixup;
+  postEffects.SetupView (view, perspectiveFixup);
 
   // Pre-setup culling graph
   RenderTreeType renderTree (treePersistent);
 
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
   startContext->renderTargets[rtaColor0].texHandle = postEffects.GetScreenTarget ();
+  startContext->perspectiveFixup = perspectiveFixup;
 
   // Setup the main context
   {
@@ -385,7 +387,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
     ForEachContextReverse (renderTree, render);
   }
 
-  postEffects.DrawPostEffects ();
+  postEffects.DrawPostEffects (renderTree);
   
   
   if (doHDRExposure) hdrExposure.ApplyExposure ();
@@ -414,6 +416,7 @@ bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
   startContext->renderTargets[rtaColor0].texHandle = settings.target;
   startContext->renderTargets[rtaColor0].subtexture = settings.targetSubTexture;
+  startContext->drawFlags = settings.drawFlags;
 
   ContextSetupType contextSetup (this, lightPersistent, renderLayer);
   ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);

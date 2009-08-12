@@ -24,6 +24,7 @@
  */
 
 #include "csgfx/shadervarcontext.h"
+#include "csplugincommon/rendermanager/rendertree.h"
 #include "csutil/array.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/genericresourcecache.h"
@@ -203,9 +204,14 @@ namespace RenderManager
      * Set up post processing manager for a view.
      * \returns Whether the manager has changed. If \c true some values,
      *   such as the screen texture, must be reobtained from the manager.
+     *   \a perspectiveFixup returns a matrix that should be applied
+     *   after the normal perspective matrix (this is needed as the
+     *   screen texture may be larger than the desired viewport and thus
+     *   the projection must be corrected for that).
      */
-    bool SetupView (iView* view);
-    bool SetupView (uint width, uint height);
+    bool SetupView (iView* view, CS::Math::Matrix4& perspectiveFixup);
+    bool SetupView (uint width, uint height,
+      CS::Math::Matrix4& perspectiveFixup);
     //@}
 
     /// Get the texture to render a scene to for post processing.
@@ -215,7 +221,7 @@ namespace RenderManager
      * Draw post processing effects after the scene was rendered to
      * the handle returned by GetScreenTarget().
      */
-    void DrawPostEffects ();
+    void DrawPostEffects (RenderTreeBase& renderTree);
     
     //@{
     /// Add an effect pass. Uses last added layer as the input
@@ -282,6 +288,7 @@ namespace RenderManager
     csRef<iRenderBuffer> indices;
     csRef<iTextureHandle> target;
     PostEffectManager* chainedEffects;
+    uint dbgIntermediateTextures;
 
     csSimpleRenderMesh fullscreenQuad;
     void SetupScreenQuad ();

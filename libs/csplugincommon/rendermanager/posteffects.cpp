@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 
+#include "csplugincommon/rendermanager/posteffects.h"
+
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/cfgacc.h"
@@ -36,14 +38,14 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 
-#include "csplugincommon/rendermanager/posteffects.h"
+#include "csplugincommon/rendermanager/rendertree.h"
 
 #include <stdarg.h>
 
 using namespace CS::RenderManager;
 
 PostEffectManager::PostEffectManager ()
-  : frameNum (0), chainedEffects (0),
+  : frameNum (0), chainedEffects (0), dbgIntermediateTextures (~0),
     dimCache (CS::Utility::ResourceCache::ReuseConditionFlagged (),
       CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (0)),
     currentDimData (0), currentWidth (0), currentHeight (0), 
@@ -78,15 +80,17 @@ const char* PostEffectManager::GetIntermediateTargetFormat ()
   return textureFmt;
 }
 
-bool PostEffectManager::SetupView (iView* view)
+bool PostEffectManager::SetupView (iView* view, 
+				   CS::Math::Matrix4& perspectiveFixup)
 {
   unsigned int width = view->GetContext ()->GetWidth ();
   unsigned int height = view->GetContext ()->GetHeight ();
 
-  return SetupView (width, height);
+  return SetupView (width, height, perspectiveFixup);
 }
 
-bool PostEffectManager::SetupView (uint width, uint height)
+bool PostEffectManager::SetupView (uint width, uint height, 
+				   CS::Math::Matrix4& perspectiveFixup)
 {
   bool result = false;
   if (width != currentWidth || height != currentHeight)
@@ -123,8 +127,26 @@ bool PostEffectManager::SetupView (uint width, uint height)
   }
   if (chainedEffects)
   {
-    if (chainedEffects->SetupView (width, height))
+    if (chainedEffects->SetupView (width, height, perspectiveFixup))
       target = chainedEffects->GetScreenTarget();
+  }
+  else
+  {
+    iTextureHandle* screenTarget = GetScreenTarget ();
+    if (screenTarget)
+    {
+      int targetW, targetH;
+      screenTarget->GetRendererDimensions (targetW, targetH);
+      float scaleX = float(width)/float (targetW);
+      float scaleY = float(height)/float (targetH);
+      perspectiveFixup = CS::Math::Matrix4 (
+	scaleX, 0, 0, scaleX-1.0f,
+	0, scaleY, 0, scaleY-1.0f,
+	0, 0, 1, 0,
+	0, 0, 0, 1);
+    }
+    else
+      perspectiveFixup = CS::Math::Matrix4();
   }
   return result;
 }
@@ -137,13 +159,16 @@ iTextureHandle* PostEffectManager::GetScreenTarget ()
     return currentDimData->buckets[bucket].textures[postLayers[0]->outTextureNum];
   }
 
-  return 0;
+  return target;
 }
 
-void PostEffectManager::DrawPostEffects ()
+void PostEffectManager::DrawPostEffects (RenderTreeBase& renderTree)
 { 
   graphics3D->FinishDraw ();
   
+  if (dbgIntermediateTextures == (uint)~0)
+    dbgIntermediateTextures = renderTree.RegisterDebugFlag ("textures.postprocess");
+
   UpdateLayers();
 
   for (size_t layer = 1; layer < postLayers.GetSize (); ++layer)
@@ -162,8 +187,20 @@ void PostEffectManager::DrawPostEffects ()
     graphics3D->DrawSimpleMesh (fullscreenQuad, csSimpleMeshScreenspace);
     graphics3D->FinishDraw ();
   }
+  
+  if (renderTree.IsDebugFlagEnabled (dbgIntermediateTextures))
+  {
+    for (size_t layer = 0; layer < postLayers.GetSize ()-1; ++layer)
+    {
+      // Actual intermediate layers
+      size_t bucket = GetBucketIndex (postLayers[layer]->options);
+      renderTree.AddDebugTexture (
+	currentDimData->buckets[bucket].textures[postLayers[layer]->outTextureNum],
+	float (currentWidth)/float(currentHeight));
+    }
+  }
 
-  if (chainedEffects) chainedEffects->DrawPostEffects ();
+  if (chainedEffects) chainedEffects->DrawPostEffects (renderTree);
   
   dimCache.AdvanceTime (++frameNum);
   // Reset to avoid purging every frame
