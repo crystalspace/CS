@@ -27,6 +27,7 @@
 #include "csutil/ref.h"
 
 struct iImage;
+struct _ICONINFO;
 
 namespace CS
 {
@@ -71,6 +72,20 @@ namespace CS
 	 * desired.
 	 */
 	static csPtr<iImage> CS_CSPLUGINCOMMON_WIN_EXPORT IconToImage (HICON icon);
+	/**
+	 * Create a Windows icon from a CS image.
+	 * The color depth depends on the color depth of the screen.
+	 * The handling of the alpha channel of the image - if it has one -
+	 * depends on the Windows version and screen color depth: in particular,
+	 * icons with alpha are only supported on Windows XP and a screen color
+	 * depth of at least 24bpp. In other cases the alpha will be reduced to
+	 * binary alpha.
+	 * \param image Image to create icon from.
+	 * \param iconTemplate (Optional) Template for information used to create
+	 *   icon.
+	 */
+	static HICON CS_CSPLUGINCOMMON_WIN_EXPORT IconFromImage (iImage* image,
+	  const _ICONINFO* iconTemplate = 0);
       };
     } // namespace CS
   } // namespace Platform

@@ -71,6 +71,7 @@ class G2DTestSystemDriver
     stWindowFixed,
     stWindowResize,
     stCustomCursor,
+    stCustomIcon,
     stAlphaTest,
     stTestUnicode1,
     stTestUnicode2,
@@ -146,12 +147,14 @@ private:
 
   void SetCustomCursor ();
   void SetNormalCursor ();
+  void SetCustomIcon ();
 
   void DrawStartupScreen ();
   void DrawContextInfoScreen ();
   void DrawWindowScreen ();
   void DrawWindowResizeScreen ();
   void DrawCustomCursorScreen ();
+  void DrawCustomIconScreen ();
   void DrawAlphaTestScreen ();
   void DrawUnicodeTest1 ();
   void DrawUnicodeTest2 ();
@@ -287,6 +290,7 @@ void G2DTestSystemDriver::SetupFrame ()
     case stWindowFixed:
     case stWindowResize:
     case stCustomCursor:
+    case stCustomIcon:
     case stAlphaTest:
     case stTestUnicode1:
     case stTestUnicode2:
@@ -362,12 +366,18 @@ void G2DTestSystemDriver::SetupFrame ()
           DrawCustomCursorScreen ();
 	  SetCustomCursor ();
 	  if (lastkey9)
-            EnterState (stAlphaTest);
+            EnterState (stCustomIcon);
 	  else
             EnterState (stCustomCursor);
           break;
-	case stAlphaTest:
+	case stCustomIcon:
           SetNormalCursor ();
+	  SetCustomIcon ();
+          DrawCustomIconScreen ();
+	  EnterState (stAlphaTest);
+          EnterState (stWaitKey);
+          break;
+	case stAlphaTest:
           DrawAlphaTestScreen ();
           EnterState (stTestUnicode1);
           EnterState (stWaitKey);
@@ -771,6 +781,29 @@ void G2DTestSystemDriver::SetNormalCursor ()
   myG2D->SetMouseCursor (csmcArrow);
 }
 
+void G2DTestSystemDriver::SetCustomIcon ()
+{
+  csRef<iNativeWindow> natwin = scfQueryInterface<iNativeWindow> (myG2D);
+  
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iImageIO> iio = 
+    csQueryRegistry<iImageIO> (object_reg);
+  if (vfs.IsValid () && iio.IsValid ())
+  {
+    csRef<iFile> testFile = vfs->Open ("/lib/g2dtest/testicon.png", 
+      VFS_FILE_READ);
+    if (testFile.IsValid ())
+    {
+      csRef<iDataBuffer> fileData = testFile->GetAllData ();
+      csRef<iImage> newIcon = iio->Load (fileData, CS_IMGFMT_TRUECOLOR 
+	| CS_IMGFMT_ALPHA);
+      
+      csRef<iNativeWindow> natwin = scfQueryInterface<iNativeWindow> (myG2D);
+      natwin->SetIcon (newIcon);
+    }
+  }
+}
+
 void G2DTestSystemDriver::DrawCustomCursorScreen ()
 {
   int w = myG2D->GetWidth ();
@@ -785,6 +818,23 @@ void G2DTestSystemDriver::DrawCustomCursorScreen ()
   SetFont (fontLarge);
   WriteCentered (0, tpos + 16*2, black,  -1, "If your current canvas supports custom mouse cursors");
   WriteCentered (0, tpos + 16*3, black,  -1, "you shouldn't see your systems default cursor now.");
+}
+
+void G2DTestSystemDriver::DrawCustomIconScreen ()
+{
+  int w = myG2D->GetWidth ();
+  int h = myG2D->GetHeight ();
+  myG2D->SetClipRect(0,0,w,h);
+  myG2D->DrawBox(0,0,w,h, dsteel);
+
+  SetFont (fontItalic);
+  int tpos = -h / 2;
+  WriteCentered (0, tpos, white, -1, "CUSTOM WINDOW ICON");
+
+  SetFont (fontLarge);
+  WriteCentered (0, tpos + 16*2, black,  -1, "If your current canvas supports custom window icons");
+  WriteCentered (0, tpos + 16*3, black,  -1, "the window icon should have changed.");
+  WriteCentered (0, tpos + 16*4, black,  -1, "It should look like a \"shard\" of the Crystal Space logo.");
 }
 
 void G2DTestSystemDriver::DrawAlphaTestScreen ()

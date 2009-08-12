@@ -137,6 +137,10 @@ void GLOSXDriver2D::SetTitle(char *title)
   csGraphics2DGLCommon::SetTitle(title);
 }
 
+void csGraphics2DOpenGL::SetIcon (iImage *image)
+{
+   //TODO: IMPLEMENT THIS FOR MACOSX.
+}
 
 // Print
 // Swap OpenGL buffers

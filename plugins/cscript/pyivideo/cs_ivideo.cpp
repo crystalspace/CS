@@ -11724,6 +11724,36 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iNativeWindow_SetIcon(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iNativeWindow *arg1 = (iNativeWindow *) 0 ;
+  iImage *arg2 = (iImage *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iNativeWindow_SetIcon",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iNativeWindow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iNativeWindow_SetIcon" "', argument " "1"" of type '" "iNativeWindow *""'"); 
+  }
+  arg1 = reinterpret_cast< iNativeWindow * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iImage, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iNativeWindow_SetIcon" "', argument " "2"" of type '" "iImage *""'"); 
+  }
+  arg2 = reinterpret_cast< iImage * >(argp2);
+  (arg1)->SetIcon(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iNativeWindow(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iNativeWindow *arg1 = (iNativeWindow *) 0 ;
@@ -23619,6 +23649,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_iNativeWindowManager", _wrap_delete_iNativeWindowManager, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindowManager_swigregister", iNativeWindowManager_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_SetTitle", _wrap_iNativeWindow_SetTitle, METH_VARARGS, NULL},
+	 { (char *)"iNativeWindow_SetIcon", _wrap_iNativeWindow_SetIcon, METH_VARARGS, NULL},
 	 { (char *)"delete_iNativeWindow", _wrap_delete_iNativeWindow, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_swigregister", iNativeWindow_swigregister, METH_VARARGS, NULL},
 	 { (char *)"GetFlippedCullMode", _wrap_GetFlippedCullMode, METH_VARARGS, NULL},

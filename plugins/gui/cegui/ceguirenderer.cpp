@@ -35,6 +35,7 @@ SCF_IMPLEMENT_FACTORY (csCEGUIRenderer)
 // TODO add description
 csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
   scfImplementationType (this, parent),
+  initialized(false),
   obj_reg(0),
   events(0),
   scriptModule(0),
@@ -91,6 +92,8 @@ bool csCEGUIRenderer::Initialize (iScript* script)
   g2d->SetMouseCursor (csmcNone);
   events = new csCEGUIEventHandler (obj_reg, this);
   events->Initialize ();
+
+  initialized = true;
 
   return true;
 }
@@ -236,6 +239,14 @@ CEGUI::Texture* csCEGUIRenderer::createTexture (
   csCEGUITexture* tex = (csCEGUITexture*) createTexture();
   tex->loadFromFile (filename, resourceGroup);
 
+  return tex;
+}
+
+/// Create a texture from a CS texturehandle.
+CEGUI::Texture* csCEGUIRenderer::CreateTexture (iTextureHandle* htxt)
+{
+  csCEGUITexture* tex = (csCEGUITexture*) createTexture();
+  tex->SetTexHandle(htxt);
   return tex;
 }
 

@@ -55,6 +55,8 @@ namespace Utility
       return filterMode;
     }
 
+    void Clear ();
+
   private:
     MeshFilterMode filterMode;
     // FIXME: csRef<> prolly not a good idea

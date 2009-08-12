@@ -29,6 +29,8 @@
  
 #include "csutil/scf.h"
 
+struct iImage;
+
 /**\name Alert types
  * @{ */
 /// Display an error
@@ -86,7 +88,7 @@ struct iNativeWindowManager : public virtual iBase
  */
 struct iNativeWindow : public virtual iBase
 {
-  SCF_INTERFACE (iNativeWindow, 2, 0, 1);
+  SCF_INTERFACE (iNativeWindow, 2, 0, 2);
   
   /**
    * Set the title for this window.
@@ -97,6 +99,12 @@ struct iNativeWindow : public virtual iBase
    * Set the title for this window.
    */
   virtual void SetTitle (const wchar_t* title) = 0;
+  
+  /** Sets the icon of this window with the provided one.
+   *
+   *  @param image the iImage to set as the icon of this window.
+   */  
+  virtual void SetIcon (iImage *image) = 0;
 };
 
 /** @} */
