@@ -404,6 +404,11 @@ namespace RenderManager
       };
       /// All render targets to be used when rendering the context node
       TargetTexture renderTargets[rtaNumAttachments];
+      /**
+       * Matrix to be applied after projection from camera (usually used for
+       * post processing manager targets)
+       */
+      CS::Math::Matrix4 perspectiveFixup;
       /// Camera transformation
       csReversibleTransform cameraTransform;
       /// Flags for iGraphics3D::BeginDraw()

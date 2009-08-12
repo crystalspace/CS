@@ -276,7 +276,7 @@ int csGraphics2DOpenGL::FindPixelFormatWGL (csGLPixelFormatPicker& picker)
 
   HINSTANCE ModuleHandle = GetModuleHandle(0);
 
-  WNDCLASS wc;
+  WNDCLASSA wc;
   wc.hCursor        = 0;
   wc.hIcon	    = 0;
   wc.lpszMenuName   = 0;
@@ -288,7 +288,7 @@ int csGraphics2DOpenGL::FindPixelFormatWGL (csGLPixelFormatPicker& picker)
   wc.cbClsExtra     = 0;
   wc.cbWndExtra     = 0;
 
-  if (!RegisterClass (&wc)) return false;
+  if (!RegisterClassA (&wc)) return false;
 
   DummyWndInfo dwi;
   dwi.pixelFormat = -1;
@@ -296,12 +296,12 @@ int csGraphics2DOpenGL::FindPixelFormatWGL (csGLPixelFormatPicker& picker)
   dwi.chosenFormat = &currentFormat;
   dwi.picker = &picker;
 
-  HWND wnd = CreateWindow (dummyClassName, 0, 0, CW_USEDEFAULT, 
+  HWND wnd = CreateWindowA (dummyClassName, 0, 0, CW_USEDEFAULT, 
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
     ModuleHandle, (LPVOID)&dwi);
   DestroyWindow (wnd);
 
-  UnregisterClass (dummyClassName, ModuleHandle);
+  UnregisterClassA (dummyClassName, ModuleHandle);
 
   ext.Reset();
 

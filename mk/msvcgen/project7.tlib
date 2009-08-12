@@ -38,6 +38,7 @@
   FOREACH f IN my.doc.customize; PROCESS $f | null; END;
 
   files = striproots(filter(my.doc.file).split('\|')).split('\|').sort;
+  files_obj_unique = striproots(filter(my.doc.file_obj_unique).split('\|')).split('\|').sort;
 END -%]
 <?xml version="1.0" encoding = "Windows-1252"?>
 <VisualStudioProject
@@ -131,14 +132,19 @@ END -%]
 	<Files>
 		[%- FOREACH group IN groups %]
 		[%- items = files.grep(group.types) %]
-		[%- IF items.size > 0 %]
+		[%- items2 = files_obj_unique.grep(group.types) %]
+		[%- IF (items.size > 0) || (items2.size > 0) %]
 		<Filter
 			Name="[% group.name %]"
 			Filter="">
 			[%- FOREACH file IN items %]
 			<File
 				RelativePath="[% path([my.doc.sourceroot.0, file]) %]">
-				[%- IF my.doc.static %]
+			</File>
+			[%- END %]
+			[%- FOREACH file IN items2 %]
+			<File
+				RelativePath="[% path([my.doc.sourceroot.0, file]) %]">
 				[%- UNLESS file.match('\\.(h|hpp|rc)$') %]
 				[%- FOREACH build IN builds %]
                                   [% FOREACH mutator IN mutators -%]
@@ -150,7 +156,6 @@ END -%]
 							ObjectFile="[% workbuild([file.replace('/', '_'), '.obj']) %]"/>
 					</FileConfiguration>
 				  [%- END %]
-				[%- END %]
 				[%- END %]
 				[%- END %]
 				[%- END %]
