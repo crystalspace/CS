@@ -70,6 +70,23 @@ private:
     }
   };
 
+  struct TextureSpace : public CS::Utility::FastRefCount<TextureSpace>
+  {
+    csArray<csBox2> freeRegions;
+    csRef<iMaterialWrapper> material;
+    bool full;
+
+    TextureSpace() : full(false)
+    {
+    }
+  };
+
+  csRefArray<TextureSpace> textureSpace;
+
+  /* Allocates texture space for r2t. */
+  iMaterialWrapper* AllocateTexture(size_t& textureWidth, size_t& textureHeight,
+      csBox2& texCoords);
+
   /* Initialises an imposter. */
   void InitialiseImposter(ImposterMat* imposter);
 
@@ -85,6 +102,8 @@ private:
 
   size_t maxWidth;
   size_t maxHeight;
+
+  bool shaderLoaded;
 
 public:
   csImposterManager(csEngine* engine);

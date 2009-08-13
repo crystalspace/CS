@@ -37,7 +37,7 @@ using namespace CS::Math;
 using namespace CS::Utility;
 
 csImposterManager::csImposterManager(csEngine* engine)
-: scfImplementationType(this), engine(engine)
+: scfImplementationType(this), engine(engine), shaderLoaded(false)
 {
   g3d = csQueryRegistry<iGraphics3D>(engine->GetObjectRegistry());
   maxWidth = g3d->GetCaps()->maxTexWidth;
@@ -94,6 +94,96 @@ bool csImposterManager::HandleEvent(iEvent &ev)
   return false;
 }
 
+iMaterialWrapper* csImposterManager::AllocateTexture(size_t& textureWidth,
+                                                     size_t& textureHeight,
+                                                     csBox2& texCoords)
+{
+  // Need to recalc in case screen size changes.
+  size_t rTexWidth = csFindNearestPowerOf2(g3d->GetWidth());
+  size_t rTexHeight = csFindNearestPowerOf2(g3d->GetHeight());
+
+  // Get normalized size.
+  float realWidth = (float)textureWidth/rTexWidth;
+  float realHeight = (float)textureHeight/rTexHeight;
+
+  // Check for space in existing textures.
+  for(size_t i=0; i<textureSpace.GetSize(); ++i)
+  {
+    if(!textureSpace[i]->full && false /* Disable for now, not working right. */)
+    {
+      for(size_t j=0; j<textureSpace[i]->freeRegions.GetSize(); ++j)
+      {
+        // Check area, as we can 'rotate' textures to slot them in.
+        size_t tsWidth = textureSpace[i]->freeRegions[j].MaxX() - 
+          textureSpace[i]->freeRegions[j].MinX();
+        size_t tsHeight = textureSpace[i]->freeRegions[j].MaxY() - 
+          textureSpace[i]->freeRegions[j].MinY();
+
+        if(tsWidth*tsHeight >= textureWidth*textureHeight)
+        {
+          // Check if rotate needed.
+          if(textureHeight <= tsHeight)
+          {
+            // No.
+            float maxY = textureSpace[i]->freeRegions[j].MinY() + realHeight;
+            float maxX = textureSpace[i]->freeRegions[j].MinX() + realWidth;
+            textureSpace[i]->freeRegions.Push(csBox2(maxX, textureSpace[i]->freeRegions[j].MinY(), rTexWidth, rTexHeight));
+            textureSpace[i]->freeRegions.Push(csBox2(textureSpace[i]->freeRegions[j].MinX(), maxY, rTexWidth, rTexHeight));
+            texCoords.Set(textureSpace[i]->freeRegions[j].MinX(), textureSpace[i]->freeRegions[j].MinY(),
+              maxX, maxY);
+          }
+          else
+          {
+            // Yes.
+            continue;
+          }
+
+          textureSpace[i]->freeRegions.DeleteIndexFast(j);
+          return textureSpace[i]->material;
+        }
+      }
+    }
+  }
+
+  // Else allocate a new texture.
+  csRef<TextureSpace> newSpace;
+  newSpace.AttachNew(new TextureSpace());
+  textureSpace.Push(newSpace);
+
+  // Create texture handle. Size is the current screen size (to nearest pow2)
+  // as that's the maximum texture size we should have to handle.
+  csRef<iTextureManager> texman = g3d->GetTextureManager();
+  csRef<iTextureHandle> texh = texman->CreateTexture(rTexWidth, rTexHeight,
+    csimg2D, "rgba8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+  texh->SetAlphaType (csAlphaMode::alphaBinary);
+
+  // Create the material.
+  csRef<iTextureWrapper> tex = engine->GetTextureList()->CreateTexture(texh);
+  newSpace->material = engine->CreateMaterial("impostermat", tex);
+
+  // Set shaders.
+  if(!shaderLoaded)
+  {
+    csRef<iLoader> ldr = csQueryRegistry<iLoader>(engine->GetObjectRegistry());
+    ldr->LoadShader("/shader/lighting/lighting_imposter.xml");
+    shaderLoaded = true;
+  }
+
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>(
+    engine->GetObjectRegistry(), "crystalspace.shared.stringset");
+  csStringID shadertype = strings->Request("base");
+  csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
+  iShader* shader = shman->GetShader("lighting_imposter");
+  newSpace->material->GetMaterial()->SetShader(shadertype, shader);
+
+  // Now allocate part of this texture for use.
+  newSpace->freeRegions.Push(csBox2(realWidth, 0.0f, rTexWidth, rTexHeight));
+  newSpace->freeRegions.Push(csBox2(0.0f, realHeight, rTexWidth, rTexHeight));
+  texCoords.Set(0.0f, 0.0f, realWidth, realHeight);
+
+  return newSpace->material;
+}
+
 void csImposterManager::InitialiseImposter(ImposterMat* imposter)
 {
   csImposterMesh* csIMesh = static_cast<csImposterMesh*>(&*imposter->mesh);
@@ -111,18 +201,18 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   csVector3 camdir = mesh_pos-cam_pos;
   newCamera->GetCamera()->GetTransform ().LookAt (camdir, csVector3(0,1,0));
 
-  // Set up a new projection matrix.
+  // Get screen bounding box of the mesh.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
-  imposter->texWidth = csFindNearestPowerOf2(rbox.sbox.MaxX() - rbox.sbox.MinX());
-  imposter->texHeight = csFindNearestPowerOf2(rbox.sbox.MaxY() - rbox.sbox.MinY());
+  imposter->texWidth = rbox.sbox.MaxX() - rbox.sbox.MinX();
+  imposter->texHeight = rbox.sbox.MaxY() - rbox.sbox.MinY();
 
-  // Calculate required projection scaling.
-  float widthScale = g3d->GetWidth() / float(rbox.sbox.MaxX() - rbox.sbox.MinX());
-  float heightScale = g3d->GetHeight() / float(rbox.sbox.MaxY() - rbox.sbox.MinY());
+  // Allocate texture space.
+  csIMesh->mat = AllocateTexture(imposter->texWidth, imposter->texHeight, csIMesh->texCoords);
 
+  // Calculate required projection shift.
   CS::Math::Matrix4 projShift (
-      widthScale, 0, 0, 0,
-      0, heightScale, 0, 0,
+      1, 0, 0, csIMesh->texCoords.MinX() + (g3d->GetWidth()-2*rbox.sbox.MinX())/g3d->GetWidth() - 1,
+      0, 1, 0, csIMesh->texCoords.MinY() + (g3d->GetHeight()-2*rbox.sbox.MinY())/g3d->GetHeight() - 1,
       0, 0, 1, 0,
       0, 0, 0, 1);
 
@@ -137,28 +227,10 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   // Mark original mesh for r2t draw.
   csMesh->drawing_imposter = scfQueryInterface<iBase>(newCamera);
 
-  // Allocate a texture image.
-  csRef<iTextureManager> texman = g3d->GetTextureManager();
-  csRef<iTextureHandle> texh = texman->CreateTexture(imposter->texWidth, imposter->texHeight,
-      csimg2D, "rgba8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
-  texh->SetAlphaType (csAlphaMode::alphaBinary);
-
   // Add view and texture as a render target.
   csRef<iRenderManagerTargets> rmTargets = scfQueryInterface<iRenderManagerTargets>(engine->renderManager);
-  rmTargets->RegisterRenderTarget(texh, newView, 0, iRenderManagerTargets::updateOnce);
-
-  csRef<iTextureWrapper> tex = engine->GetTextureList()->CreateTexture(texh);
-  csIMesh->mat = engine->CreateMaterial("impostermat", tex);
-
-  csRef<iLoader> ldr = csQueryRegistry<iLoader>(engine->GetObjectRegistry());
-  ldr->LoadShader("/shader/lighting/lighting_imposter.xml");
-
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>(
-    engine->GetObjectRegistry(), "crystalspace.shared.stringset");
-  csStringID shadertype = strings->Request("base");
-  csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
-  iShader* shader = shman->GetShader("lighting_imposter");
-  csIMesh->mat->GetMaterial()->SetShader(shadertype, shader);
+  rmTargets->RegisterRenderTarget(csIMesh->mat->GetMaterial()->GetTexture(), newView,
+    0, iRenderManagerTargets::updateOnce);
 
   csIMesh->matDirty = true;
 

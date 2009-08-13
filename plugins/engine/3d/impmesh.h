@@ -100,6 +100,9 @@ private:
   // Imposter material.
   csRef<iMaterialWrapper> mat;
 
+  // Texture coordinates.
+  csBox2 texCoords;
+
   // The camera this mesh is being viewed through.
   csWeakRef<iCamera> camera;
 

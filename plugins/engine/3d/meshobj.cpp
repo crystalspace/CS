@@ -1074,8 +1074,8 @@ csScreenBoxResult csMeshWrapper::GetScreenBoundingBox (iCamera *camera)
   float minz, maxz;
   const csBox3& wbox = GetWorldBoundingBox();
   if(!wbox.ProjectBox(camera->GetTransform(), camera->GetProjectionMatrix(),
-      rc.sbox, minz, maxz, engine->G3D->GetDriver2D()->GetWidth(),
-      engine->G3D->GetDriver2D()->GetHeight()))
+      rc.sbox, minz, maxz, engine->G3D->GetWidth(),
+      engine->G3D->GetHeight()))
   {
       rc.distance = -1;
   }

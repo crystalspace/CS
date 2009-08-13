@@ -289,6 +289,7 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     mesh->mixmode = CS_FX_ALPHA;
     mesh->alphaType = csAlphaMode::alphaBinary;
     mesh->z_buf_mode = CS_ZBUF_TEST;
+    mesh->renderPrio = engine->GetRenderPriority("alpha");
     mesh->material = 0;
 
     mesh_indices.Push (0);
@@ -326,9 +327,22 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
   }
 
   // Material changed.
-  if (matDirty)
+  if (matDirty || meshDirty)
   {
     mesh->material = mat;
+
+    GetMeshTexels ()->Empty ();
+    mesh_texels.Push (csVector2 (texCoords.MaxX(),1-texCoords.MaxY()));
+    mesh_texels.Push (csVector2 (texCoords.MaxX(),1-texCoords.MinY()));
+    mesh_texels.Push (csVector2 (texCoords.MinX(),1-texCoords.MinY()));
+    mesh_texels.Push (csVector2 (texCoords.MinX(),1-texCoords.MaxY()));
+
+    csRef<csRenderBuffer> texBuffer = csRenderBuffer::CreateRenderBuffer(
+      4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+    texBuffer->CopyInto (mesh_texels.GetArray(), 4);
+
+    mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
+
     matDirty = false;
   }
 
@@ -336,20 +350,10 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
   if (meshDirty)
   {
     GetMeshVertices ()->Empty ();
-    GetMeshTexels ()->Empty ();
-
-    mesh_texels.Push (csVector2 (1,0));  //1 0
-    mesh_texels.Push (csVector2 (1,1));  //1 1
-    mesh_texels.Push (csVector2 (0,1));  //0 1
-    mesh_texels.Push (csVector2 (0,0));  //0 0
 
     csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
       4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     vertBuffer->CopyInto (cutout.GetVertices (), 4);
-
-    csRef<csRenderBuffer> texBuffer = csRenderBuffer::CreateRenderBuffer(
-      4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-    texBuffer->CopyInto (mesh_texels.GetArray(), 4);
 
     csDirtyAccessArray<csVector3> normals;
     normals.Push(csVector3(0, 0, -1));
@@ -362,7 +366,6 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     normalBuffer->CopyInto (normals.GetArray(), 4);
 
     mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertBuffer);
-    mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
     mesh->buffers->SetRenderBuffer (CS_BUFFER_NORMAL, normalBuffer);
 
     meshDirty = false;
