@@ -1,0 +1,93 @@
+<shader compiler="xmlshader" name="postproc_grayscale_average_max_1">
+  <?Template Technique PRIO XSIZE YSIZE ?>
+    <technique priority="$PRIO$">
+      <meta name="filterSizeX">$XSIZE$</meta>
+      <meta name="filterSizeY">$YSIZE$</meta>
+      <pass>
+	<buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	<!-- vp plugin="glfixed" / -->
+	<texture destination="Texture1" name="tex diffuse" />
+	<fp plugin="glcg">
+	  <cgfp>
+	    <variablemap variable="input pixel size" destination="pixelSize" />
+	    <variablemap variable="weight coeff" destination="weightCoeff" />
+	    <program>
+		<![CDATA[
+  
+		float4 main (in float2 TexCoord : TEXCOORD0,
+			  uniform sampler2D Texture1,
+			  uniform float2 pixelSize,
+			  uniform float weightCoeff) : COLOR
+		{
+		  /* The TexCoord is sampled at the center of the rendered fragment,
+		     thus it's in the middle of the block we're looking at */
+		  TexCoord -= float2 ($XSIZE$/2, $YSIZE$/2)*pixelSize;
+		  
+		  float weight = weightCoeff*(2.0/float(16*16));
+		  float3 rgb2gray = float3 (0.2126, 0.7152, 0.0722);
+		  float average1 = 0;
+		  float max1 = 0;
+		  float average2 = 0;
+		  float max2 = 0;
+		  for (int y = 0; y < $YSIZE$; y++)
+		  {
+		    int x;
+		    for (x = 0; x < ($XSIZE$/2); x++)
+		    {
+		      float2 sampleCoord = TexCoord+float2(x, y)*pixelSize;
+		      float3 color = tex2D (Texture1, sampleCoord).rgb;
+		      float gray = dot (color, rgb2gray);
+		      average1 += gray*weight;
+		      max1 = max (max1, gray);
+		    }
+		    for (; x < $XSIZE$; x++)
+		    {
+		      float2 sampleCoord = TexCoord+float2(x, y)*pixelSize;
+		      float3 color = tex2D (Texture1, sampleCoord).rgb;
+		      float gray = dot (color, rgb2gray);
+		      average2 += gray*weight;
+		      max2 = max (max2, gray);
+		    }
+		  }
+		  
+		  return float4 (max1, average1, max2, average2);
+		}
+  
+		]]>
+	    </program>
+	  </cgfp>
+	</fp>
+      </pass>
+    </technique>
+  <?Endtemplate?>
+  
+  <?Technique 25 16 16 ?>
+  <?Technique 24 16 8 ?>
+  <?Technique 23 16 4 ?>
+  <?Technique 22 16 2 ?>
+  <?Technique 21 16 1 ?>
+
+  <?Technique 20 8 16 ?>
+  <?Technique 19 8 8 ?>
+  <?Technique 18 8 4 ?>
+  <?Technique 17 8 2 ?>
+  <?Technique 16 8 1 ?>
+  
+  <?Technique 15 4 16 ?>
+  <?Technique 14 4 8 ?>
+  <?Technique 13 4 4 ?>
+  <?Technique 12 4 2 ?>
+  <?Technique 11 4 1 ?>
+  
+  <?Technique 10 2 16 ?>
+  <?Technique 9 2 8 ?>
+  <?Technique 8 2 4 ?>
+  <?Technique 7 2 2 ?>
+  <?Technique 6 2 1 ?>
+  
+  <?Technique 5 1 16 ?>
+  <?Technique 4 1 8 ?>
+  <?Technique 3 1 4 ?>
+  <?Technique 2 1 2 ?>
+  <?Technique 1 1 1 ?>
+</shader>

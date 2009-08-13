@@ -49,7 +49,26 @@ namespace CS
       CS::StructuredTextureFormat readbackFmt;
       PostEffectManager::Layer* measureLayer;
       HDRHelper* hdr;
+      csRef<iGraphics3D> graphics3D;
+      csRef<iShaderVarStringSet> svNameStringSet;
+      csRef<iShaderManager> shaderManager;
       
+      csRef<iShader> computeShader1;
+      csRef<iShader> computeShaderN;
+      struct ExposureComputeStage
+      {
+	csArray<PostEffectManager::Layer*> layers;
+	csRef<csShaderVariable> svInput;
+	csRef<csShaderVariable> svWeightCoeff;
+	csRef<iTextureHandle> target;
+	int targetW, targetH;
+	
+	ExposureComputeStage() {}
+      };
+      csArray<ExposureComputeStage> computeStages;
+      PostEffectManager computeFX;
+      
+      int lastTargetW, lastTargetH;
       csRef<iDataBuffer> lastData;
       int lastW, lastH;
       csTicks lastTime;
@@ -58,6 +77,14 @@ namespace CS
       float targetAvgLumTolerance;
       float minExposure, maxExposure;
       float exposureChangeRate;
+      
+      bool FindBlockSize (iShader* shader, size_t pticket,
+        int maxW, int maxH,
+        int& blockSizeX, int& blockSizeY, csRef<iShader>* usedShader);
+      bool SetupStage (ExposureComputeStage& stage,
+        int inputW, int inputH, int minSize, iTextureHandle* inputTex,
+        iShader* computeShader);
+      void SetupStages (int targetW, int targetH);
     public:
       HDRExposureLinear () : exposure (1.0f), 
         readbackFmt (CS::TextureFormatStrings::ConvertStructured ("argb8")),
@@ -71,7 +98,7 @@ namespace CS
         HDRHelper& hdr);
       
       /// Obtain rendered image and apply exposure correction
-      void ApplyExposure ();
+      void ApplyExposure (RenderTreeBase& renderTree, iView* view);
       
       /// Set target average luminance
       void SetTargetAverageLuminance (float f) { targetAvgLum = f; }

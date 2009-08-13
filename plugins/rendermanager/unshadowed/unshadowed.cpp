@@ -259,7 +259,7 @@ bool RMUnshadowed::RenderView (iView* view)
 
   postEffects.DrawPostEffects (renderTree);
   
-  if (doHDRExposure) hdrExposure.ApplyExposure ();
+  if (doHDRExposure) hdrExposure.ApplyExposure (renderTree, view);
   
   DebugFrameRender (rview, renderTree);
 
