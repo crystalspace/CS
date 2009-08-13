@@ -35,354 +35,59 @@ namespace CS
 {
   namespace RenderManager
   {
-    CS_DECLARE_PROFILER
-    CS_DECLARE_PROFILER_ZONE(HDRExposureLinear_Apply);
-    CS_DECLARE_PROFILER_ZONE(HDRExposureLinear_Apply_Readback);
-
-    void HDRExposureLinear::Initialize (iObjectRegistry* objReg,
-      HDRHelper& hdr)
+    namespace HDR
     {
-      this->hdr = &hdr;
-      measureLayer = hdr.GetMeasureLayer();
-      PostEffectManager::LayerOptions measureOpts = measureLayer->GetOptions();
-      measureOpts.mipmap = true;
-      measureOpts.maxMipmap = csMax (measureOpts.maxMipmap, 2);
-      measureOpts.noTextureReuse = true;
-      measureLayer->SetOptions (measureOpts);
-      
-      graphics3D = csQueryRegistry<iGraphics3D> (objReg);
+      namespace Exposure
+      {
+	void Linear::Initialize (iObjectRegistry* objReg, HDRHelper& hdr)
+	{
+	  luminance.Initialize (objReg, hdr);
+	  this->hdr = &hdr;
+	  
+	  csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
+	  CS_ASSERT(loader);
+	  csRef<iShaderVarStringSet> svNameStringSet = 
+	    csQueryRegistryTagInterface<iShaderVarStringSet> (objReg,
+	      "crystalspace.shader.variablenameset");
+	  CS_ASSERT (svNameStringSet);
+	  
+	  csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager> (objReg);
+	  CS_ASSERT (shaderManager);
+	      
+	  csRef<iShader> tonemap = loader->LoadShader ("/shader/postproc/hdr/identity-map.xml");
+	  hdr.SetMappingShader (tonemap);
+	
+	  svHDRScale = shaderManager->GetVariableAdd (svNameStringSet->Request (
+	    "hdr scale"));
+	  float exposure = luminance.GetColorScale();
+	  svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
+	}
+	
+	void Linear::ApplyExposure (RenderTreeBase& renderTree, iView* view)
+	{
+	  if (!hdr) return;
+	  
+	  csTicks currentTime = csGetTicks();
+	  float avgLum, maxLum;
+	  if (luminance.ComputeLuminance (renderTree, view,
+	      avgLum, maxLum) && (lastTime != 0))
+	  {
+	    uint deltaTime = csMin (currentTime-lastTime, (uint)33);
+	    const float exposureAdjust = exposureChangeRate*deltaTime/1000.0f;
+	    float exposure = luminance.GetColorScale ();
+	    if (avgLum >= targetAvgLum+targetAvgLumTolerance)
+	      exposure -= exposureAdjust;
+	    else if (avgLum <= targetAvgLum-targetAvgLumTolerance)
+	      exposure += exposureAdjust;
+	    luminance.SetColorScale (exposure);
+	      
+	    svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
+	  }
+	  
+	  lastTime = currentTime;
+	}
   
-      csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
-      CS_ASSERT(loader);
-      svNameStringSet = 
-	csQueryRegistryTagInterface<iShaderVarStringSet> (objReg,
-	  "crystalspace.shader.variablenameset");
-      CS_ASSERT (svNameStringSet);
-      
-      shaderManager = csQueryRegistry<iShaderManager> (objReg);
-      CS_ASSERT (shaderManager);
-	  
-      computeFX.Initialize (objReg);
-      //computeFX.SetIntermediateTargetFormat ("bgr16_f");
-      computeFX.SetIntermediateTargetFormat ("abgr8");
-      csRef<iShader> tonemap = loader->LoadShader ("/shader/postproc/hdr/identity-map.xml");
-      hdr.SetMappingShader (tonemap);
-    
-      computeShader1 =
-        loader->LoadShader ("/shader/postproc/hdr/grayscale_average_max_1.xml");
-      computeShaderN =
-        loader->LoadShader ("/shader/postproc/hdr/grayscale_average_max_n.xml");
-        
-      svHDRScale = shaderManager->GetVariableAdd (svNameStringSet->Request (
-	"hdr scale"));
-      svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
-    }
-    
-    bool HDRExposureLinear::FindBlockSize (iShader* shader, size_t pticket,
-                                           int maxW, int maxH,
-                                           int& blockSizeX, int& blockSizeY,
-                                           csRef<iShader>* usedShader)
-    {
-      // 2. Iterate over techniques, find block size
-      csRef<iShaderPriorityList> shaderPrios (
-	shader->GetAvailablePriorities (pticket));
-      for (size_t i = 0; i < shaderPrios->GetCount(); i++)
-      {
-	int prio = shaderPrios->GetPriority (i);
-	csRef<iString> filterSizeXStr (
-	  computeShader1->GetTechniqueMetadata (prio, "filterSizeX"));
-	if (!filterSizeXStr.IsValid()) continue;
-	csRef<iString> filterSizeYStr (
-	  computeShader1->GetTechniqueMetadata (prio, "filterSizeY"));
-	if (!filterSizeYStr.IsValid()) continue;
-    
-        int w, h;
-	char dummy;
-	if (sscanf (filterSizeXStr->GetData(), "%d%c", &w, 
-	    &dummy) != 1)
-	  continue;
-	if (sscanf (filterSizeYStr->GetData(), "%d%c", &h, 
-	    &dummy) != 1)
-	  continue;
-	  
-	if ((w <= maxW) && (h <= maxH))
-	{
-	 blockSizeX = w;
-	 blockSizeY = h;
-	 if (usedShader) *usedShader = shader->ForceTechnique (prio);
-	 return true;
-	}
-      }
-      return false;
-    }
-    
-    namespace
-    {
-      struct ProcessingPart
-      {
-        csRect sourceRect;
-        uint destOffsX, destOffsY;
-      };
-      struct ProcessingPartFinal
-      {
-        csRef<iShader> shader;
-        csRect sourceRect;
-        csRect destRect;
-      };
-    }
-      
-    bool HDRExposureLinear::SetupStage (ExposureComputeStage& stage,
-                                        int inputW, int inputH, int minSize,
-                                        iTextureHandle* inputTex,
-                                        iShader* computeShader)
-    {
-      stage.svInput.AttachNew (new csShaderVariable (
-        svNameStringSet->Request ("tex diffuse")));
-        
-      size_t pticket;
-
-      {
-        PostEffectManager::Layer* tempLayer;
-	PostEffectManager::LayerInputMap inputMap;
-	inputMap.manualInput = stage.svInput;
-	tempLayer = computeFX.AddLayer (computeShader, 1, &inputMap);
-	
-	// Determine 'priority ticket' for stage
-	csShaderVariableStack svstack;
-	svstack.Setup (shaderManager->GetSVNameStringset ()->GetSize ());
-	CS::Graphics::RenderMeshModes modes; // Just keep defaults
-	computeFX.GetLayerRenderSVs (tempLayer, svstack);
-	pticket = computeShader->GetPrioritiesTicket (modes, svstack);
-	computeFX.RemoveLayer (tempLayer);
-      }
-      
-      int maxBlockSizeX = 16;
-      int maxBlockSizeY = 16;
-      
-      csRef<iShader> shader;
-      FindBlockSize (computeShader, pticket,
-	inputW, inputH,
-	maxBlockSizeX, maxBlockSizeY, 0);
-	  
-      csArray<ProcessingPartFinal> finalParts;
-      csFIFO<ProcessingPart> remainingParts;
-      {
-        ProcessingPart firstPart;
-        firstPart.sourceRect.Set (0, 0, inputW, inputH);
-        firstPart.destOffsX = 0;
-        firstPart.destOffsY = 0;
-        remainingParts.Push (firstPart);
-      }
-      while (remainingParts.GetSize() > 0)
-      {
-        ProcessingPart part = remainingParts.PopTop();
-	int blockSizeX = 16;
-	int blockSizeY = 16;
-	
-	csRef<iShader> shader;
-	FindBlockSize (computeShader, pticket,
-	  part.sourceRect.Width(), part.sourceRect.Height(),
-	  blockSizeX, blockSizeY, &shader);
-	// @@@ Handle failure
-	
-	int destW = part.sourceRect.Width()/blockSizeX;
-	int destH = part.sourceRect.Height()/blockSizeY;
-	int coveredW = destW*blockSizeX;
-	int coveredH = destH*blockSizeY;
-	int remainderX = part.sourceRect.Width()-coveredW;
-	int remainderY = part.sourceRect.Height()-coveredH;
-	if (remainderX > 0)
-	{
-	  ProcessingPart newPart;
-	  newPart.sourceRect.Set (
-	    part.sourceRect.xmin+coveredW, 
-	    part.sourceRect.ymin,
-	    part.sourceRect.xmin+coveredW+remainderX,
-	    part.sourceRect.ymin+coveredH);
-	  newPart.destOffsX = part.destOffsX+destW;
-	  newPart.destOffsY = part.destOffsY;
-	  remainingParts.Push (newPart);
-	}
-	if (remainderY > 0)
-	{
-	  ProcessingPart newPart;
-	  newPart.sourceRect.Set (
-	    part.sourceRect.xmin, 
-	    part.sourceRect.ymin+coveredH,
-	    part.sourceRect.xmin+coveredW, 
-	    part.sourceRect.ymin+coveredH+remainderY);
-	  newPart.destOffsX = part.destOffsX;
-	  newPart.destOffsY = part.destOffsY+destH;
-	  remainingParts.Push (newPart);
-	}
-	if ((remainderX > 0) && (remainderY > 0))
-	{
-	  ProcessingPart newPart;
-	  newPart.sourceRect.Set (
-	    part.sourceRect.xmin+coveredW, 
-	    part.sourceRect.ymin+coveredH,
-	    part.sourceRect.xmin+coveredW+remainderX, 
-	    part.sourceRect.ymin+coveredH+remainderY);
-	  newPart.destOffsX = part.destOffsX+destW;
-	  newPart.destOffsY = part.destOffsY+destH;
-	  remainingParts.Push (newPart);
-	}
-	
-	ProcessingPartFinal finalPart;
-	finalPart.sourceRect.Set (
-	  part.sourceRect.xmin, part.sourceRect.ymin,
-	  part.sourceRect.xmin+coveredW,
-	  part.sourceRect.ymin+coveredH);
-	finalPart.destRect.Set (
-	  part.destOffsX, part.destOffsY,
-	  part.destOffsX+destW, part.destOffsY+destH);
-	finalPart.shader = shader;
-	
-	finalParts.Push (finalPart);
-      }
-      
-      stage.targetW = finalParts[0].destRect.xmax;
-      stage.targetH = finalParts[0].destRect.ymax;
-      for (size_t l = 1; l < finalParts.GetSize(); l++)
-      {
-	stage.targetW = csMax (stage.targetW, finalParts[l].destRect.xmax);
-	stage.targetH = csMax (stage.targetH, finalParts[l].destRect.ymax);
-      }
-      bool lastStage = (stage.targetW <= minSize) && (stage.targetH <= minSize);
-      uint texFlags =
-	CS_TEXTURE_3D | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP | CS_TEXTURE_NOMIPMAPS;
-      csString stageFormat;
-      if (lastStage)
-        stageFormat = readbackFmt.GetCanonical();
-      else
-        stageFormat = computeFX.GetIntermediateTargetFormat();
-      stage.target = graphics3D->GetTextureManager ()->CreateTexture (stage.targetW,
-	stage.targetH, csimg2D, stageFormat, texFlags);
-      
-      
-      int targetPixels = stage.targetW * maxBlockSizeX 
-        * stage.targetH * maxBlockSizeY;
-      int sourcePixels = inputW * inputH;
-      stage.svWeightCoeff.AttachNew (new csShaderVariable (
-	svNameStringSet->Request ("weight coeff")));
-      stage.svWeightCoeff->SetValue (float(targetPixels)/float(sourcePixels));
-      
-      // Set measureTex as input to first layer of computeFX
-      stage.svInput->SetValue (inputTex);
-      
-      PostEffectManager::Layer* outputLayer = 0;
-      for (size_t l = 0; l < finalParts.GetSize(); l++)
-      {
-        PostEffectManager::Layer* layer;
-	PostEffectManager::LayerInputMap inputMap;
-	inputMap.manualInput = stage.svInput;
-	inputMap.sourceRect = finalParts[l].sourceRect;
-	inputMap.inputPixelSizeName = "input pixel size";
-	PostEffectManager::LayerOptions options;
-	options.targetRect = finalParts[l].destRect;
-	if (outputLayer == 0)
-	  options.manualTarget = stage.target;
-	else
-	  options.renderOn = outputLayer;
-	//inputMap.manualTexcoords = computeTexcoordBuf;
-	layer = computeFX.AddLayer (finalParts[l].shader, options, 1, &inputMap);
-        
-        layer->GetSVContext()->AddVariable (stage.svInput);
-        layer->GetSVContext()->AddVariable (stage.svWeightCoeff);
-        stage.layers.Push (layer);
-        if (outputLayer == 0) outputLayer = layer;
-      }
-      return !lastStage;
-    }
-    
-    void HDRExposureLinear::SetupStages (int targetW, int targetH)
-    {
-      // Set up input layer (needed for 'priority ticket')
-      iTextureHandle* measureTex =
-	hdr->GetHDRPostEffects().GetLayerOutput (measureLayer);
-	
-      int currentW = targetW;
-      int currentH = targetH;
-      const int minSize = 16; // Arbitrary
-      iTextureHandle* currentTex = measureTex;
-      bool iterateStage;
-      do
-      {
-        ExposureComputeStage newStage;
-        iterateStage = SetupStage (newStage, currentW, currentH, minSize,
-          currentTex,
-          computeStages.GetSize() == 0 ? computeShader1 : computeShaderN);
-        computeStages.Push (newStage);
-        currentW = newStage.targetW;
-        currentH = newStage.targetH;
-        currentTex = newStage.target;
-      }
-      while (iterateStage);
-      
-      computeFX.SetEffectsOutputTarget (computeStages[0].target);
-      CS::Math::Matrix4 perspectiveFixup;
-      computeFX.SetupView (computeStages[0].targetW, computeStages[0].targetH,
-        perspectiveFixup);
-    }
-    
-    void HDRExposureLinear::ApplyExposure (RenderTreeBase& renderTree, iView* view)
-    {
-      if (!measureLayer || !hdr) return;
-      
-      CS_PROFILER_ZONE(HDRExposureLinear_Apply);
-      
-      // (Re-)create computeTarget if not created/view dimensions changed
-      if ((computeStages.GetSize() == 0)
-          || (view->GetContext ()->GetWidth () != lastTargetW)
-          || (view->GetContext ()->GetHeight () != lastTargetH))
-      {
-        lastTargetW = view->GetContext ()->GetWidth ();
-        lastTargetH = view->GetContext ()->GetHeight ();
-        SetupStages (lastTargetW, lastTargetH);
-      }
-      computeFX.DrawPostEffects (renderTree);
-      
-      iTextureHandle* measureTex =
-	computeStages[computeStages.GetSize()-1].target;
-      int newW, newH;
-      measureTex->GetRendererDimensions (newW, newH);
-      
-      csRef<iDataBuffer> newData;
-      {
-        CS_PROFILER_ZONE(HDRExposureLinear_Apply_Readback);
-	newData = measureTex->Readback (readbackFmt, 0);
-      }
-      
-      csTicks currentTime = csGetTicks();
-      if (lastData.IsValid() && (lastTime != 0))
-      {
-        const uint8* bgra = lastData->GetUint8();
-        int numPixels = lastW * lastH;
-        float totalLum = 0;
-        for (int i = 0; i < numPixels; i++)
-        {
-          /*int b = **/bgra++;
-          int g = *bgra++;
-          /*int r = **/bgra++;
-          int a = *bgra++;
-          totalLum += (g+a)/510.0f;
-        }
-        
-        uint deltaTime = csMin (currentTime-lastTime, (uint)33);
-        const float exposureAdjust = exposureChangeRate*deltaTime/1000.0f;
-        float avgLum = (totalLum / numPixels) * exposure;
-        if (avgLum >= targetAvgLum+targetAvgLumTolerance)
-          exposure -= exposureAdjust;
-        else if (avgLum <= targetAvgLum-targetAvgLumTolerance)
-          exposure += exposureAdjust;
-          
-        svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
-      }
-      
-      lastData = newData;
-      lastW = newW; lastH = newH;
-      lastTime = currentTime;
-    }
-  
+      } // namespace Exposure
+    } // namespace HDR
   } // namespace RenderManager
 } // namespace CS

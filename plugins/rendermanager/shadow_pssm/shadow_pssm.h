@@ -143,7 +143,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 
     CS::RenderManager::PostEffectManager       postEffects;
     CS::RenderManager::HDRHelper hdr;
-    CS::RenderManager::HDRExposureLinear hdrExposure;
+    CS::RenderManager::HDR::Exposure::Linear hdrExposure;
     bool doHDRExposure;
     int maxPortalRecurse;
 
