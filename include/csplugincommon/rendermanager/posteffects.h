@@ -105,6 +105,7 @@ namespace RenderManager
   class CS_CRYSTALSPACE_EXPORT PostEffectManager :
     public CS::Memory::CustomAllocatedDerived<csRefCount>
   {
+    class DimensionData;
   public:
     class Layer;
     /**
@@ -185,6 +186,7 @@ namespace RenderManager
     {
     private:
       friend class PostEffectManager;
+      friend class DimensionData;
       
       csRef<iShader> effectShader;
       int outTextureNum;
