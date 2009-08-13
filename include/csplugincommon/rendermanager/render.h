@@ -232,7 +232,7 @@ namespace RenderManager
   public:
     SimpleTreeRenderer (iGraphics3D* g3di, iShaderManager* shaderMgri)
       : targetSetup (g3di), meshRender (g3di, shaderMgri),
-      g3d (g3di), shaderMgr (shaderMgri)
+      g3d (g3di), shaderMgr (shaderMgri), lastRenderView (0)
     {
       memset (lastTarget, 0, sizeof (lastTarget));
       memset (lastSubtexture, 0, sizeof (lastSubtexture));
@@ -256,6 +256,7 @@ namespace RenderManager
           lastTarget[a] = context->renderTargets[a].texHandle;
           lastSubtexture[a] = context->renderTargets[a].subtexture;
         }
+	lastRenderView = context->renderView;
       }
 
       // Push the context
@@ -348,7 +349,7 @@ namespace RenderManager
 	    || (lastSubtexture[a] != context.renderTargets[a].subtexture))
           return true;
       }
-      return false;
+      return context.renderView != lastRenderView;
     }
 
     ContextTargetSetup<typename RenderTree::ContextNode> targetSetup;
@@ -359,6 +360,7 @@ namespace RenderManager
 
     iTextureHandle* lastTarget[rtaNumAttachments];
     int lastSubtexture[rtaNumAttachments];
+    RenderView* lastRenderView;
 
     csArray<typename RenderTree::ContextNode*> contextStack;
   };

@@ -94,60 +94,124 @@ bool csImposterManager::HandleEvent(iEvent &ev)
   return false;
 }
 
-iMaterialWrapper* csImposterManager::AllocateTexture(size_t& textureWidth,
-                                                     size_t& textureHeight,
+csImposterManager::TextureSpace::TextureSpace(size_t width, size_t height, TextureSpace* parent)
+: parent(parent), full(false)
+{
+  if(!parent)
+  {
+    minX = 0;
+    minY = 0;
+  }
+  else if(!parent->firstSpace)
+  {
+    if(width < height)
+    {
+      minX = parent->minX;
+      minY = parent->minY;
+    }
+    else
+    {
+      minX = parent->minX;
+      minY = parent->minY + height;
+    }
+  }
+  else
+  {
+    if(width < height)
+    {
+      minX = parent->minX + width;
+      minY = parent->minY;
+    }
+    else
+    {
+      minX = parent->minX;
+      minY = parent->minY;
+    }
+  }
+
+  if(width > 64 || height > 64)
+  {
+    if(width < height)
+    {
+      childWidth = width;
+      childHeight = height/2;
+    }
+    else
+    {
+      childWidth = width/2;
+      childHeight = height;
+    }
+
+    firstSpace.AttachNew(new TextureSpace(childWidth, childHeight, this));
+    secondSpace.AttachNew(new TextureSpace(childWidth, childHeight, this));
+  }
+}
+
+csImposterManager::TextureSpace* csImposterManager::TextureSpace::Allocate(size_t& width,
+                                                                           size_t& height,
+                                                                           csBox2& texCoords)
+{
+  if(childWidth < width || childHeight < height)
+  {
+    texCoords.Set(minX, minY, minX+width, minY+height);
+
+    full = true;
+    return this;
+  }
+  
+  if(!firstSpace->IsFull())
+  {
+    TextureSpace* space = firstSpace->Allocate(width, height, texCoords);
+    if(space)
+    {
+      return space;
+    }
+  }
+
+  TextureSpace* space = secondSpace->Allocate(width, height, texCoords);
+  if(space->IsFull())
+  {
+    full = true;
+  }
+
+  return space;
+}
+
+void csImposterManager::TextureSpace::Free()
+{
+  full = false;
+
+  if(parent)
+    parent->Free();
+}
+
+iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
                                                      csBox2& texCoords)
 {
-  // Need to recalc in case screen size changes.
-  size_t rTexWidth = csFindNearestPowerOf2(g3d->GetWidth());
-  size_t rTexHeight = csFindNearestPowerOf2(g3d->GetHeight());
-
-  // Get normalized size.
-  float realWidth = (float)textureWidth/rTexWidth;
-  float realHeight = (float)textureHeight/rTexHeight;
+  // Check whether to free existing space.
+  if(imposter->allocatedSpace)
+  {
+     imposter->allocatedSpace->Free();
+  }
 
   // Check for space in existing textures.
   for(size_t i=0; i<textureSpace.GetSize(); ++i)
   {
-    if(!textureSpace[i]->full && false /* Disable for now, not working right. */)
+    if(!textureSpace[i]->IsFull())
     {
-      for(size_t j=0; j<textureSpace[i]->freeRegions.GetSize(); ++j)
-      {
-        // Check area, as we can 'rotate' textures to slot them in.
-        size_t tsWidth = textureSpace[i]->freeRegions[j].MaxX() - 
-          textureSpace[i]->freeRegions[j].MinX();
-        size_t tsHeight = textureSpace[i]->freeRegions[j].MaxY() - 
-          textureSpace[i]->freeRegions[j].MinY();
-
-        if(tsWidth*tsHeight >= textureWidth*textureHeight)
-        {
-          // Check if rotate needed.
-          if(textureHeight <= tsHeight)
-          {
-            // No.
-            float maxY = textureSpace[i]->freeRegions[j].MinY() + realHeight;
-            float maxX = textureSpace[i]->freeRegions[j].MinX() + realWidth;
-            textureSpace[i]->freeRegions.Push(csBox2(maxX, textureSpace[i]->freeRegions[j].MinY(), rTexWidth, rTexHeight));
-            textureSpace[i]->freeRegions.Push(csBox2(textureSpace[i]->freeRegions[j].MinX(), maxY, rTexWidth, rTexHeight));
-            texCoords.Set(textureSpace[i]->freeRegions[j].MinX(), textureSpace[i]->freeRegions[j].MinY(),
-              maxX, maxY);
-          }
-          else
-          {
-            // Yes.
-            continue;
-          }
-
-          textureSpace[i]->freeRegions.DeleteIndexFast(j);
-          return textureSpace[i]->material;
-        }
-      }
+      imposter->allocatedSpace = textureSpace[i]->Allocate(imposter->texWidth,
+        imposter->texHeight, texCoords);
+      return textureSpace[i]->material;
     }
   }
 
+  // Need to recalc in case screen size changes.
+  size_t rTexWidth = csFindNearestPowerOf2(g3d->GetWidth());
+  size_t rTexHeight = csFindNearestPowerOf2(g3d->GetHeight());
+
   // Else allocate a new texture.
   csRef<TextureSpace> newSpace;
-  newSpace.AttachNew(new TextureSpace());
+  newSpace.AttachNew(new TextureSpace(rTexWidth, rTexHeight));
   textureSpace.Push(newSpace);
 
   // Create texture handle. Size is the current screen size (to nearest pow2)
@@ -177,10 +241,7 @@ iMaterialWrapper* csImposterManager::AllocateTexture(size_t& textureWidth,
   newSpace->material->GetMaterial()->SetShader(shadertype, shader);
 
   // Now allocate part of this texture for use.
-  newSpace->freeRegions.Push(csBox2(realWidth, 0.0f, rTexWidth, rTexHeight));
-  newSpace->freeRegions.Push(csBox2(0.0f, realHeight, rTexWidth, rTexHeight));
-  texCoords.Set(0.0f, 0.0f, realWidth, realHeight);
-
+  newSpace->Allocate(imposter->texWidth, imposter->texHeight, texCoords);
   return newSpace->material;
 }
 
@@ -207,12 +268,18 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   imposter->texHeight = rbox.sbox.MaxY() - rbox.sbox.MinY();
 
   // Allocate texture space.
-  csIMesh->mat = AllocateTexture(imposter->texWidth, imposter->texHeight, csIMesh->texCoords);
+  csIMesh->mat = AllocateTexture(imposter, csIMesh->texCoords);
+
+  // Normalise the texture coordinates.
+  csIMesh->texCoords.Set(csIMesh->texCoords.MinX()/g3d->GetWidth(),
+                         csIMesh->texCoords.MinY()/g3d->GetHeight(),
+                         csIMesh->texCoords.MaxX()/g3d->GetWidth(),
+                         csIMesh->texCoords.MaxY()/g3d->GetHeight());
 
   // Calculate required projection shift.
   CS::Math::Matrix4 projShift (
-      1, 0, 0, csIMesh->texCoords.MinX() + (g3d->GetWidth()-2*rbox.sbox.MinX())/g3d->GetWidth() - 1,
-      0, 1, 0, csIMesh->texCoords.MinY() + (g3d->GetHeight()-2*rbox.sbox.MinY())/g3d->GetHeight() - 1,
+      1, 0, 0, 2*csIMesh->texCoords.MinX() + (g3d->GetWidth()-2*rbox.sbox.MinX())/g3d->GetWidth() - 1,
+      0, 1, 0, 2*csIMesh->texCoords.MinY() + (g3d->GetHeight()-2*rbox.sbox.MinY())/g3d->GetHeight() - 1,
       0, 0, 1, 0,
       0, 0, 0, 1);
 

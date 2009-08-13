@@ -52,6 +52,35 @@ private:
     CS_EVENTHANDLER_NIL_CONSTRAINTS;
   };
 
+  class TextureSpace : public CS::Utility::FastRefCount<TextureSpace>
+  {
+  public:
+    csRef<iMaterialWrapper> material;
+
+    TextureSpace(size_t width, size_t height, TextureSpace* parent = 0);
+
+    TextureSpace* Allocate(size_t& width, size_t& height, csBox2& texCoords);
+
+    void Free();
+
+    inline bool IsFull() const { return full; }
+
+  private:
+    csRef<TextureSpace> firstSpace;
+    csRef<TextureSpace> secondSpace;
+    size_t childWidth;
+    size_t childHeight;
+
+    size_t minX;
+    size_t minY;
+
+    TextureSpace* parent;
+
+    bool full;
+  };
+
+  csRefArray<TextureSpace> textureSpace;
+
   struct ImposterMat
   {
     csRef<iImposterMesh> mesh;
@@ -63,28 +92,18 @@ private:
     size_t texWidth;
     size_t texHeight;
 
+    TextureSpace* allocatedSpace;
+
     ImposterMat(iImposterMesh* mesh)
       : mesh(mesh), init(false), update(false),
-      remove(false), lastDistance(size_t(-1))
+      remove(false), lastDistance(size_t(-1)),
+      allocatedSpace(0)
     {
     }
   };
-
-  struct TextureSpace : public CS::Utility::FastRefCount<TextureSpace>
-  {
-    csArray<csBox2> freeRegions;
-    csRef<iMaterialWrapper> material;
-    bool full;
-
-    TextureSpace() : full(false)
-    {
-    }
-  };
-
-  csRefArray<TextureSpace> textureSpace;
 
   /* Allocates texture space for r2t. */
-  iMaterialWrapper* AllocateTexture(size_t& textureWidth, size_t& textureHeight,
+  iMaterialWrapper* AllocateTexture(ImposterMat* imposter,
       csBox2& texCoords);
 
   /* Initialises an imposter. */
