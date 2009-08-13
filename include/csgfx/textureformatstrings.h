@@ -320,7 +320,7 @@ namespace CS
     static csString ConvertCanonical (const char* in);
 
     /**
-     * Convert a (canonical of not) texture format to a structured form.
+     * Convert a (canonical or not) texture format to a structured form.
      * \sa \ref TextureFormatStrings
      */
     static StructuredTextureFormat ConvertStructured (const char* in);
