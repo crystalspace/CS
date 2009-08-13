@@ -95,7 +95,7 @@ csString StructuredTextureFormat::GetCanonical ()
   if (p3 != 0) { out += char ((p3>>8)&255); out += p3 & 255; }
   if (p4 != 0) { out += char ((p4>>8)&255); out += p4 & 255; }
   out += '_';
-  out += format;
+  out += (char)format;
   return out;
 }
 
