@@ -190,15 +190,24 @@ void PostEffectManager::DrawPostEffects (RenderTreeBase& renderTree)
   {
     // Draw and ping-pong   
     iTextureHandle* targetTex;
-    if (layer < lastLayerToTarget)
+    const Layer& outputLayer = GetRealOutputLayer (*(postLayers[layer]));
+    if (outputLayer.options.manualTarget.IsValid())
     {
-      const Layer& outputLayer = GetRealOutputLayer (*(postLayers[layer]));
-      size_t bucket = GetBucketIndex (outputLayer.options);
-      targetTex =
-        currentDimData->buckets[bucket].textures[outputLayer.outTextureNum];
+      targetTex = outputLayer.options.manualTarget;
     }
     else
-      targetTex = target;
+    {
+      if (layer < lastLayerToTarget)
+      {
+	size_t bucket = GetBucketIndex (outputLayer.options);
+	targetTex =
+	  currentDimData->buckets[bucket].textures[outputLayer.outTextureNum];
+      }
+      else
+      {
+	targetTex = target;
+      }
+    }
     graphics3D->SetRenderTarget (targetTex);
 
     graphics3D->BeginDraw (CSDRAW_CLEARZBUFFER | CSDRAW_3DGRAPHICS);
@@ -443,9 +452,19 @@ void PostEffectManager::DimensionData::SetupRenderInfo (PostEffectManager& pfx)
     if (targetRect.IsEmpty())
     {
       const Layer& outputLayer (pfx.GetRealOutputLayer (layer));
-      targetRect.Set (0, 0,
-        dim.x >> outputLayer.options.downsample,
-        dim.y >> outputLayer.options.downsample);
+      if (outputLayer.options.manualTarget.IsValid())
+      {
+        int targetW, targetH;
+        outputLayer.options.manualTarget->GetRendererDimensions (targetW,
+          targetH);
+	targetRect.Set (0, 0, targetW, targetH);
+      }
+      else
+      {
+	targetRect.Set (0, 0,
+	  dim.x >> outputLayer.options.downsample,
+	  dim.y >> outputLayer.options.downsample);
+      }
     }
     
     // Setup the vertices & texcoords
@@ -457,7 +476,8 @@ void PostEffectManager::DimensionData::SetupRenderInfo (PostEffectManager& pfx)
 }
 
 csPtr<iRenderBuffer> PostEffectManager::DimensionData::ComputeTexCoords (
-  iTextureHandle* tex, const csRect& rect, const csRect& targetRect)
+  iTextureHandle* tex, const csRect& rect, const csRect& targetRect,
+  float& pixSizeX, float& pixSizeY)
 {
   csRect tcRect (rect);
   if (tcRect.IsEmpty()) tcRect = targetRect;
@@ -481,7 +501,7 @@ csPtr<iRenderBuffer> PostEffectManager::DimensionData::ComputeTexCoords (
     tcMulX = 1.0f/tw;
     tcMulY = 1.0f/th;
   }
-  tcOffsY = (th-tcRect.ymax)*tcMulY;
+  tcOffsY = (th-targetRect.ymax+0.5f)*tcMulY;
   
   csRef<iRenderBuffer> texcoordBuf =
     csRenderBuffer::CreateRenderBuffer (4, CS_BUF_STATIC,
@@ -490,10 +510,13 @@ csPtr<iRenderBuffer> PostEffectManager::DimensionData::ComputeTexCoords (
   csRenderBufferLock<csVector2> screenQuadTex (texcoordBuf);
 
   // Setup the texcoords
-  screenQuadTex[(size_t)0].Set (tcRect.xmin*tcMulX, tcOffsY+tcRect.ymin*tcMulY);
-  screenQuadTex[(size_t)1].Set (tcRect.xmax*tcMulX, tcOffsY+tcRect.ymin*tcMulY);
-  screenQuadTex[(size_t)2].Set (tcRect.xmax*tcMulX, tcOffsY+tcRect.ymax*tcMulY);
-  screenQuadTex[(size_t)3].Set (tcRect.xmin*tcMulX, tcOffsY+tcRect.ymax*tcMulY);
+  screenQuadTex[(size_t)0].Set ((tcRect.xmin+0.5f)*tcMulX, tcOffsY+tcRect.ymin*tcMulY);
+  screenQuadTex[(size_t)1].Set ((tcRect.xmax+0.5f)*tcMulX, tcOffsY+tcRect.ymin*tcMulY);
+  screenQuadTex[(size_t)2].Set ((tcRect.xmax+0.5f)*tcMulX, tcOffsY+tcRect.ymax*tcMulY);
+  screenQuadTex[(size_t)3].Set ((tcRect.xmin+0.5f)*tcMulX, tcOffsY+tcRect.ymax*tcMulY);
+  
+  pixSizeX = tcMulX;
+  pixSizeY = tcMulY;
   
   return csPtr<iRenderBuffer> (texcoordBuf);
 }
@@ -518,10 +541,6 @@ void PostEffectManager::DimensionData::UpdateSVContexts (
     const PostEffectManager::Layer& layer = *(pfx.postLayers[l]);
     LayerRenderInfo& renderInfo = layerRenderInfos[l];
     
-    int texW = dim.x >> layer.options.downsample;
-    int texH = dim.y >> layer.options.downsample;
-    csRect fullRect (0, 0, texW, texH);
-    
     csRef<iShaderVariableContext> newSVs;
     newSVs.AttachNew (new OverlaySVC (layer.GetSVContext ()));
     renderInfo.layerSVs = newSVs;
@@ -531,11 +550,14 @@ void PostEffectManager::DimensionData::UpdateSVContexts (
       
       csRef<csShaderVariable> sv;
       iTextureHandle* inputTex;
+      int texW, texH;
       if (input.manualInput.IsValid())
       {
         // User specified input texture
         newSVs->AddVariable (input.manualInput);
         input.manualInput->GetValue (inputTex);
+        
+        inputTex->GetRendererDimensions (texW, texH);
       }
       else
       {
@@ -547,12 +569,18 @@ void PostEffectManager::DimensionData::UpdateSVContexts (
 	  buckets[inBucket].textures[input.inputLayer->GetOutTextureNum ()];
 	sv->SetValue (inputTex);
 	newSVs->AddVariable (sv);
+	
+        texW = dim.x >> input.inputLayer->options.downsample;
+        texH = dim.y >> input.inputLayer->options.downsample;
       }
     
+      csRect fullRect (0, 0, texW, texH);
+    
+      float pixSizeX, pixSizeY;
       csRenderBufferName bufferName =
         csRenderBuffer::GetBufferNameFromDescr (input.texcoordName);
       csRef<iRenderBuffer> texcoordBuf = ComputeTexCoords (inputTex,
-        input.sourceRect, fullRect);
+        input.sourceRect, fullRect, pixSizeX, pixSizeY);
       if (bufferName != CS_BUFFER_NONE)
         renderInfo.buffers->SetRenderBuffer (bufferName, texcoordBuf);
       else
@@ -561,6 +589,15 @@ void PostEffectManager::DimensionData::UpdateSVContexts (
           input.texcoordName)));
         newSVs->AddVariable (sv);
       }
+      
+      if (!input.inputPixelSizeName.IsEmpty())
+      {
+        csRef<csShaderVariable> svInPixSize;
+	svInPixSize.AttachNew (new csShaderVariable (
+	  pfx.svStrings->Request (input.inputPixelSizeName)));
+	svInPixSize->SetValue (csVector2 (pixSizeX, pixSizeY));
+	newSVs->AddVariable (svInPixSize);
+      }
     }
     
     const PostEffectManager::Layer& outputLayer = pfx.GetRealOutputLayer (layer);
@@ -568,6 +605,8 @@ void PostEffectManager::DimensionData::UpdateSVContexts (
     
     renderInfo.svPixelSize.AttachNew (new csShaderVariable (
       pfx.svStrings->Request ("pixel size")));
+    int texW = dim.x >> layer.options.downsample;
+    int texH = dim.y >> layer.options.downsample;
     renderInfo.svPixelSize->SetValue (
       csVector2 (buckets[b].texMaxX/float (texW), 
         buckets[b].texMaxY/float (texH)));
@@ -583,6 +622,9 @@ void PostEffectManager::UpdateTextureDistribution()
     if (postLayers[l]->options.renderOn != 0)
       // If rendering onto another layer the bucket of that layer will be used.
       continue;
+    if (postLayers[l]->options.manualTarget.IsValid())
+      // If a manual target is given we don't allocate a texture here
+      continue;
     GetBucket (postLayers[l]->options);
   }
 
@@ -597,6 +639,9 @@ void PostEffectManager::UpdateTextureDistribution()
   {
     if (postLayers[l]->options.renderOn != 0)
       // If rendering onto another layer the bucket of that layer will be used.
+      continue;
+    if (postLayers[l]->options.manualTarget.IsValid())
+      // If a manual target is given we don't allocate a texture here
       continue;
     
     size_t bucket = GetBucketIndex (postLayers[l]->options);

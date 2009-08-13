@@ -123,6 +123,11 @@ namespace RenderManager
       int downsample;
       /// Prevent texture reuse. Useful for readback or feedback effects.
       bool noTextureReuse;
+      /**
+       * Manually provide a texture to render on.
+       * Means mipmap, maxMipmap, downsample and noTextureReuse are ignored.
+       */
+      csRef<iTextureHandle> manualTarget;
       /// If not empty render to this rectangle of the target texture
       csRect targetRect;
       /**
@@ -160,6 +165,11 @@ namespace RenderManager
        * input layer texture in
        */
       csString texcoordName;
+      /**
+       * If not empty the SV with that name receives the 'pixel size'
+       * (values to add to X/Y to get next input pixel) for this input.
+       */
+      csString inputPixelSizeName;
       /**
        * If not empty specifies the rectangle of the input texture, in pixels,
        * the be used as input for the layer.
@@ -371,7 +381,8 @@ namespace RenderManager
       void SetupRenderInfo (PostEffectManager& pfx);
     protected:
       csPtr<iRenderBuffer> ComputeTexCoords (iTextureHandle* tex,
-        const csRect& rect, const csRect& targetRect);
+        const csRect& rect, const csRect& targetRect,
+        float& pixSizeX, float& pixSizeY);
     };
     
     struct DimensionCacheSorting
