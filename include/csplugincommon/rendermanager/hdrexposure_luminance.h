@@ -93,7 +93,19 @@ namespace CS
         class CS_CRYSTALSPACE_EXPORT Average : public BaseHierarchical
         {
         public:
-          Average() : BaseHierarchical ("abgr8", "abgr8") {}
+          Average() : BaseHierarchical ("argb8", "argb8") {}
+        
+	  void Initialize (iObjectRegistry* objReg,
+	    HDRHelper& hdr);
+	    
+	  bool ComputeLuminance (RenderTreeBase& renderTree, iView* view,
+	    float& averageLuminance, float& maxLuminance);
+        };
+        
+        class CS_CRYSTALSPACE_EXPORT LogAverage : public BaseHierarchical
+        {
+        public:
+          LogAverage() : BaseHierarchical ("abgr32_f", "abgr32_f") {}
         
 	  void Initialize (iObjectRegistry* objReg,
 	    HDRHelper& hdr);

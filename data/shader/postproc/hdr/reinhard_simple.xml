@@ -1,0 +1,41 @@
+<shader compiler="xmlshader" name="postproc_hdr_reinhard_simple">
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <texture destination="Texture1" name="tex diffuse" />
+      <fp plugin="glcg">
+	<cgfp>
+	  <variablemap variable="hdr scale" destination="hdrScale" />
+	  <variablemap variable="mapping params" destination="mappingParams" />
+	  <program>
+	      <![CDATA[
+
+	      float4 main (in float2 TexCoord : TEXCOORD0,
+			   uniform sampler2D Texture1,
+			   uniform float4 hdrScale,
+			   uniform float3 mappingParams) : COLOR
+	      {
+	        float avgLum = mappingParams.x;
+		float imageKey = mappingParams.y;
+		float whiteLuminance = mappingParams.z;
+		float whiteLuminanceSq = whiteLuminance*whiteLuminance;
+	      
+		float4 inCol = tex2D (Texture1, TexCoord);
+		float3 rgb2lum = float3 (0.2126, 0.7152, 0.0722);
+		float lum_world = dot (inCol.rgb, rgb2lum);
+		lum_world = lum_world*hdrScale.x + hdrScale.z;
+		
+		float lum = (imageKey/avgLum)*lum_world;
+		
+		float colorScale = (lum*(1+lum/(whiteLuminanceSq)))/(1+lum);
+		
+		return float4 (inCol.rgb * colorScale, inCol.a);
+	      }
+
+	      ]]>
+	  </program>
+	</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

@@ -399,6 +399,51 @@ namespace CS
 	  return false;
 	}
 	
+	//-------------------------------------------------------------------
+	
+	void LogAverage::Initialize (iObjectRegistry* objReg,
+	  HDRHelper& hdr)
+	{
+	  BaseHierarchical::Initialize (objReg, hdr,
+	    "/shader/postproc/hdr/luminance/logaverage_1.xml",
+	    "/shader/postproc/hdr/luminance/logaverage_n.xml");
+	}
+	    
+	bool LogAverage::ComputeLuminance (RenderTreeBase& renderTree, iView* view,
+	                                   float& averageLuminance, float& maxLuminance)
+	{
+	  int W, H;
+	  csRef<iDataBuffer> computeData = GetResultData (renderTree, view, W, H);
+	  if (computeData.IsValid ())
+	  {
+	    const float* rgba = (float*)computeData->GetData();
+	    int numPixels = W * H;
+	    //float lumProd = 1;
+	    float lumSum = 0;
+	    float maxLum = 0;
+	    for (int i = 0; i < numPixels; i++)
+	    {
+	      float r = *rgba++;
+	      float g = *rgba++;
+	      float b = *rgba++;
+	      float a = *rgba++;
+	      //lumProd *= g*a;
+	      lumSum += g+a;
+	      if (b > r)
+	        maxLum = csMax (maxLum, b);
+	      else
+	        maxLum = csMax (maxLum, r);
+	    }
+	    
+	    int numOrgPixels = view->GetContext ()->GetWidth ()
+	      * view->GetContext ()->GetHeight ();
+	    //averageLuminance = expf (1.0f/numOrgPixels * logf (lumProd));
+	    averageLuminance = expf (1.0f/numOrgPixels * lumSum);
+	    maxLuminance = maxLum;
+	    return true;
+	  }
+	  return false;
+	}
       } // namespace Luminance
     } // namespace HDR
   } // namespace RenderManager

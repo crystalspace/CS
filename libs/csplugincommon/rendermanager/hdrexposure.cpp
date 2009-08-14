@@ -81,10 +81,74 @@ namespace CS
   
         //-------------------------------------------------------------------
         
+	void Reinhard_Simple::Initialize (iObjectRegistry* objReg, HDRHelper& hdr)
+	{
+	  luminance.Initialize (objReg, hdr);
+	  this->hdr = &hdr;
+	  
+	  csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
+	  CS_ASSERT(loader);
+	  csRef<iShaderVarStringSet> svNameStringSet = 
+	    csQueryRegistryTagInterface<iShaderVarStringSet> (objReg,
+	      "crystalspace.shader.variablenameset");
+	  CS_ASSERT (svNameStringSet);
+	  
+	  csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager> (objReg);
+	  CS_ASSERT (shaderManager);
+	      
+	  csRef<iShader> tonemap = loader->LoadShader ("/shader/postproc/hdr/reinhard_simple.xml");
+	  hdr.SetMappingShader (tonemap);
+	
+	  svHDRScale = shaderManager->GetVariableAdd (svNameStringSet->Request (
+	    "hdr scale"));
+	  float exposure = luminance.GetColorScale();
+	  svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
+	  
+	  svMappingParams = shaderManager->GetVariableAdd (svNameStringSet->Request (
+	    "mapping params"));
+	}
+	
+	void Reinhard_Simple::ApplyExposure (RenderTreeBase& renderTree, iView* view)
+	{
+	  if (!hdr) return;
+	  
+	  csTicks currentTime = csGetTicks();
+	  float avgLum, maxLum;
+	  if (luminance.ComputeLuminance (renderTree, view,
+	      avgLum, maxLum) && (lastTime != 0))
+	  {
+	    float exposure = luminance.GetColorScale ();
+	    // Some pixels saturate, so change the HDR scaling to accomodate that
+	    float maxLumExp = maxLum*exposure;
+	    if (maxLumExp > (254.0f/255.0f))
+	    {
+	      exposure = exposure * (253.0f/255.0f);
+	    }
+	    else if ((maxLum > 0) && (maxLumExp < (250.0f/255.0f)))
+	    {
+	      float d = (253.0f/255.0f)/maxLumExp;
+	      exposure = exposure * d;
+	      //exposure = exposure * (255.0f/250.0f);
+	    }
+	    luminance.SetColorScale (exposure);
+	      
+	    svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
+	    svMappingParams->SetValue (csVector3 (avgLum, 0.36f, csMax (maxLum, 1.0f)));
+	    
+	    csPrintf ("%f %f %f\n", avgLum, maxLum, exposure);
+	  }
+	  
+	  lastTime = currentTime;
+	}
+  
+        //-------------------------------------------------------------------
+        
 	Configurable::AbstractExposure* Configurable::CreateExposure (const char* name)
 	{
 	  if (strcmp (name, "linear") == 0)
 	    return new WrapperExposure<Linear>;
+	  if (strcmp (name, "reinhard_simple") == 0)
+	    return new WrapperExposure<Reinhard_Simple>;
 	  return 0;
 	}
         

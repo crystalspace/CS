@@ -97,6 +97,26 @@ namespace CS
 	  /// Get exposure change rate
 	  float GetExposureChangeRate () const { return exposureChangeRate; }
 	};
+	
+	class CS_CRYSTALSPACE_EXPORT Reinhard_Simple
+	{
+	  csRef<csShaderVariable> svHDRScale;
+	  csRef<csShaderVariable> svMappingParams;
+	  HDRHelper* hdr;
+	  
+	  csTicks lastTime;
+	  
+	  Luminance::LogAverage luminance;
+	public:
+	  Reinhard_Simple() : lastTime (0) {}
+	
+	  /// Set up HDR exposure control for a post effects manager
+	  void Initialize (iObjectRegistry* objReg,
+	    HDRHelper& hdr);
+	  
+	  /// Obtain rendered image and apply exposure correction
+	  void ApplyExposure (RenderTreeBase& renderTree, iView* view);
+	};
   
         /**
          * Exposure controller wrapping other exposure controllers, allowing
