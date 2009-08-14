@@ -55,15 +55,18 @@ private:
   class TextureSpace : public CS::Utility::FastRefCount<TextureSpace>
   {
   public:
-    csRef<iMaterialWrapper> material;
-
-    TextureSpace(size_t width, size_t height, TextureSpace* parent = 0);
+    TextureSpace(size_t width, size_t height, iMaterialWrapper* material,
+      TextureSpace* parent = 0);
 
     TextureSpace* Allocate(size_t& width, size_t& height, csBox2& texCoords);
+
+    bool Realloc(size_t& width, size_t& height, csBox2& texCoords);
 
     void Free();
 
     inline bool IsFull() const { return full; }
+
+    iMaterialWrapper* GetMaterial() const { return material; }
 
   private:
     csRef<TextureSpace> firstSpace;
@@ -74,8 +77,8 @@ private:
     size_t minX;
     size_t minY;
 
+    csRef<iMaterialWrapper> material;
     TextureSpace* parent;
-
     bool full;
   };
 
