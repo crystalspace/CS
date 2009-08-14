@@ -364,8 +364,8 @@ namespace CS
 	  HDRHelper& hdr)
 	{
 	  BaseHierarchical::Initialize (objReg, hdr,
-	    "/shader/postproc/hdr/grayscale_average_max_1.xml",
-	    "/shader/postproc/hdr/grayscale_average_max_n.xml");
+	    "/shader/postproc/hdr/luminance/average_1.xml",
+	    "/shader/postproc/hdr/luminance/average_n.xml");
 	}
 	    
 	bool Average::ComputeLuminance (RenderTreeBase& renderTree, iView* view,
