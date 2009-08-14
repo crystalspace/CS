@@ -103,6 +103,15 @@ private:
       allocatedSpace(0)
     {
     }
+
+    ~ImposterMat()
+    {
+      // Free allocated texture space.
+      if(allocatedSpace)
+      {
+        allocatedSpace->Free();
+      }
+    }
   };
 
   /* Allocates texture space for r2t. */
