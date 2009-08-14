@@ -137,6 +137,9 @@ namespace CS
       HDRHelper::Quality GetQuality();
       /// Get requested color range
       int GetColorRange();
+      
+      /// Get exposure method
+      const char* GetExposureMethod() const;
     };
   
   } // namespace RenderManager

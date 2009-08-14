@@ -20,16 +20,8 @@
 
 #include "csplugincommon/rendermanager/hdrexposure.h"
 
-#include "csgfx/imagememory.h"
-#include "csgfx/renderbuffer.h"
-#include "csplugincommon/rendermanager/posteffects.h"
-#include "csutil/fifo.h"
-#include "csutil/objreg.h"
-#include "csutil/sysfunc.h"
-#include "imap/loader.h"
-#include "iutil/databuff.h"
-#include "iutil/string.h"
-#include "ivaria/profile.h"
+#include "iutil/verbositymanager.h"
+#include "ivaria/reporter.h"
 
 namespace CS
 {
@@ -87,6 +79,53 @@ namespace CS
 	  lastTime = currentTime;
 	}
   
+        //-------------------------------------------------------------------
+        
+	Configurable::AbstractExposure* Configurable::CreateExposure (const char* name)
+	{
+	  if (strcmp (name, "linear") == 0)
+	    return new WrapperExposure<Linear>;
+	  return 0;
+	}
+        
+        Configurable::~Configurable()
+        {
+          delete exposure;
+        }
+  
+	void Configurable::Initialize (iObjectRegistry* objReg,
+                                       HDRHelper& hdr,
+                                       const HDRSettings& settings)
+	{
+          const char messageID[] = "crystalspace.rendermanager.hdr.exposure";
+  
+	  csRef<iVerbosityManager> verbosity = csQueryRegistry<iVerbosityManager> (
+	    objReg);
+	  bool doVerbose = verbosity && verbosity->Enabled ("rendermanager.hdr.exposure");
+	  
+	  const char* exposureStr = settings.GetExposureMethod();
+	  if (!exposureStr) exposureStr = "linear";
+	  if (doVerbose)
+	  {
+	    csReport (objReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
+	      "Configured exposure type: '%s'", exposureStr);
+	  }
+	  exposure = CreateExposure (exposureStr);
+	  if (!exposure)
+	  {
+	    csReport (objReg, CS_REPORTER_SEVERITY_WARNING, messageID,
+	      "Invalid exposure type '%s'", exposureStr);
+	  }
+	  else
+	  {
+	    exposure->Initialize (objReg, hdr);
+	  }
+	}
+	
+	void Configurable::ApplyExposure (RenderTreeBase& renderTree, iView* view)
+	{
+	  if (exposure) exposure->ApplyExposure (renderTree, view);
+	}
       } // namespace Exposure
     } // namespace HDR
   } // namespace RenderManager

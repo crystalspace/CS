@@ -397,8 +397,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
       hdrSettings.GetColorRange());
     postEffects.SetChainedOutput (hdr.GetHDRPostEffects());
   
-    // @@@ Make configurable, too
-    hdrExposure.Initialize (objectReg, hdr);
+    hdrExposure.Initialize (objectReg, hdr, hdrSettings);
   }
   
   portalPersistent.Initialize (shaderManager, g3d,

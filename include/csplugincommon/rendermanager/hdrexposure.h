@@ -42,11 +42,11 @@ namespace CS
       namespace Exposure
       {
 	/**
-	* A simple exposure controller, just scaling color values by a factor.
-	* For the rendered image the average luminance is computed. If it's higher
-	* than a given target average luminance (plus a tolerance) the image is
-	* dimmed; if it's darker, the image is brightened up.
-	*/
+	 * A simple exposure controller, just scaling color values by a factor.
+	 * For the rendered image the average luminance is computed. If it's higher
+	 * than a given target average luminance (plus a tolerance) the image is
+	 * dimmed; if it's darker, the image is brightened up.
+	 */
 	class CS_CRYSTALSPACE_EXPORT Linear
 	{
 	  csRef<csShaderVariable> svHDRScale;
@@ -97,6 +97,51 @@ namespace CS
 	  /// Get exposure change rate
 	  float GetExposureChangeRate () const { return exposureChangeRate; }
 	};
+  
+        /**
+         * Exposure controller wrapping other exposure controllers, allowing
+         * the choice of exposure through the configuration system.
+         */
+        class CS_CRYSTALSPACE_EXPORT Configurable
+        {
+        protected:
+          struct AbstractExposure : public CS::Memory::CustomAllocated
+          {
+            virtual ~AbstractExposure() {}
+            
+            virtual void Initialize (iObjectRegistry* objReg,
+	      HDRHelper& hdr) = 0;
+	    virtual void ApplyExposure (RenderTreeBase& renderTree, iView* view) = 0;
+          };
+          
+          template<typename T>
+          struct WrapperExposure : public AbstractExposure
+          {
+            T exposure;
+            
+            virtual void Initialize (iObjectRegistry* objReg,
+	      HDRHelper& hdr)
+	    {
+	      exposure.Initialize (objReg, hdr);
+	    }
+	    
+	    virtual void ApplyExposure (RenderTreeBase& renderTree, iView* view)
+	    {
+	      exposure.ApplyExposure (renderTree, view);
+	    }
+          };
+          
+          virtual AbstractExposure* CreateExposure (const char* name);
+          
+          AbstractExposure* exposure;
+        public:
+          Configurable() : exposure (0) {}
+          ~Configurable();
+        
+	  void Initialize (iObjectRegistry* objReg,
+	    HDRHelper& hdr, const HDRSettings& settings);
+	  void ApplyExposure (RenderTreeBase& renderTree, iView* view);
+        };
   
       } // namespace Exposure
     } // namespace HDR

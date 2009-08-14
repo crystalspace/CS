@@ -137,6 +137,12 @@ namespace CS
       return config->GetInt (csString ().Format ("%s.HDR.ColorRange",
         prefix.GetData()), 4);
     }
+    
+    const char* HDRSettings::GetExposureMethod() const
+    {
+      return config->GetStr (
+        csString ().Format ("%s.HDR.Exposure", prefix.GetData()), 0);
+    }
   } // namespace RenderManager
 } // namespace CS
 
