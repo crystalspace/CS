@@ -270,6 +270,14 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   // Allocate texture space.
   csIMesh->mat = AllocateTexture(imposter, csIMesh->texCoords);
 
+  // Set up view.
+  csRef<iView> newView = csPtr<iView>(new csView(engine, g3d));
+  newView->SetCustomMatrixCamera(newCamera);
+  newView->GetMeshFilter().SetFilterMode(MESH_FILTER_INCLUDE);
+  newView->GetMeshFilter().AddFilterMesh(csMesh);
+  newView->SetRectangle(csIMesh->texCoords.MinX(), csIMesh->texCoords.MinY(),
+    csIMesh->texCoords.MaxX(), csIMesh->texCoords.MaxY());
+
   // Normalise the texture coordinates.
   csIMesh->texCoords.Set(csIMesh->texCoords.MinX()/g3d->GetWidth(),
                          csIMesh->texCoords.MinY()/g3d->GetHeight(),
@@ -285,19 +293,13 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   newCamera->SetProjectionMatrix (projShift * newCamera->GetCamera()->GetProjectionMatrix());
 
-  // Set up view.
-  csRef<iView> newView = csPtr<iView>(new csView(engine, g3d));
-  newView->SetCustomMatrixCamera(newCamera);
-  newView->GetMeshFilter().SetFilterMode(MESH_FILTER_INCLUDE);
-  newView->GetMeshFilter().AddFilterMesh(csMesh);
-
   // Mark original mesh for r2t draw.
   csMesh->drawing_imposter = scfQueryInterface<iBase>(newCamera);
 
   // Add view and texture as a render target.
   csRef<iRenderManagerTargets> rmTargets = scfQueryInterface<iRenderManagerTargets>(engine->renderManager);
   rmTargets->RegisterRenderTarget(csIMesh->mat->GetMaterial()->GetTexture(), newView,
-    0, iRenderManagerTargets::updateOnce);
+    0, iRenderManagerTargets::updateOnce | iRenderManagerTargets::clearScreen);
 
   csIMesh->matDirty = true;
 
