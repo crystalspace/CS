@@ -169,7 +169,7 @@ csImposterManager::TextureSpace* csImposterManager::TextureSpace::Allocate(size_
   }
 
   TextureSpace* space = secondSpace->Allocate(width, height, texCoords);
-  if(space->IsFull())
+  if(secondSpace->IsFull())
   {
     full = true;
   }
