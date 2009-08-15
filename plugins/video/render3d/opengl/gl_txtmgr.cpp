@@ -375,6 +375,70 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h, int d,
     delete txt;
     return 0;
   }
+  
+  /*
+    At least on an NV GeForce 8800M, driver versions up to & including
+    190.18, Linux 64 bit, float textures have to be cleared before being
+    used as a render target, otherwise they will exhibit artifacts after
+    being rendered to. 
+   */
+  if ((G3D->ext->CS_GL_EXT_framebuffer_object)
+      && (texFormat.GetFormat() == CS::StructuredTextureFormat::Float))
+  {
+    GLuint framebuffer;
+    G3D->ext->glGenFramebuffersEXT (1, &framebuffer);
+    G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
+    
+    const GLenum texTarget = txt->GetGLTextureTarget();
+    const GLuint texHandle = txt->GetHandle();
+    switch (texTarget)
+    {
+      case GL_TEXTURE_1D:
+	G3D->ext->glFramebufferTexture1DEXT (GL_FRAMEBUFFER_EXT,
+	  GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_1D, texHandle, 0);
+	if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
+	    == GL_FRAMEBUFFER_COMPLETE_EXT)
+	  glClear (GL_COLOR_BUFFER_BIT);
+	break;
+      case GL_TEXTURE_2D:
+      case GL_TEXTURE_RECTANGLE_ARB:
+	G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
+	  GL_COLOR_ATTACHMENT0_EXT, texTarget, texHandle, 0);
+	if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
+	    == GL_FRAMEBUFFER_COMPLETE_EXT)
+	  glClear (GL_COLOR_BUFFER_BIT);
+	break;
+      case GL_TEXTURE_CUBE_MAP:
+        {
+	  for (int i = 0; i < 6; i++)
+	  {
+	    G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
+	      GL_COLOR_ATTACHMENT0_EXT, 
+	      GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 
+	      texHandle, 0);
+	    if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
+		== GL_FRAMEBUFFER_COMPLETE_EXT)
+	      glClear (GL_COLOR_BUFFER_BIT);
+	  }
+	}
+	break;
+      case GL_TEXTURE_3D:
+        {
+	  for (int i = 0; i < 6; i++)
+	  {
+	    G3D->ext->glFramebufferTexture3DEXT (GL_FRAMEBUFFER_EXT, 
+	      GL_COLOR_ATTACHMENT0_EXT, texTarget, texHandle, 0, d);
+	    if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
+		== GL_FRAMEBUFFER_COMPLETE_EXT)
+	      glClear (GL_COLOR_BUFFER_BIT);
+	  }
+	}
+	break;
+    }
+    
+    G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+    G3D->ext->glDeleteFramebuffersEXT (1, &framebuffer);
+  }
 
   MutexScopedLock lock(texturesLock);
   CompactTextures ();
