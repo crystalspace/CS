@@ -1173,7 +1173,7 @@ public:
 	    size_t lastVert = orgDest2D.GetVertexCount() - 1;
 	    for (size_t v = 0; v < orgDest2D.GetVertexCount(); v++)
 	    {
-	      if ((fabs(orgDest2D[lastVert].y - orgDest2D[v].y) > EPSILON) 
+	      if ((fabs(orgDest2D[lastVert].y - orgDest2D[v].y) > SMALL_EPSILON) 
 		&& ((y >= orgDest2D[lastVert].y && y <= orgDest2D[v].y)
 		|| (y <= orgDest2D[lastVert].y && y >= orgDest2D[v].y)))
 	      {
