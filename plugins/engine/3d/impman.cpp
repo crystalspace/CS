@@ -150,17 +150,18 @@ csImposterManager::TextureSpace::TextureSpace(size_t width,
   }
 }
 
-csImposterManager::TextureSpace* csImposterManager::TextureSpace::Allocate(size_t& width,
-                                                                           size_t& height,
+csImposterManager::TextureSpace* csImposterManager::TextureSpace::Allocate(size_t& rWidth,
+                                                                           size_t& rHeight,
                                                                            csBox2& texCoords)
 {
   // Check if it'll fit in a child.
-  if(childWidth < width || childHeight < height)
+  if(childWidth < rWidth || childHeight < rHeight)
   {
     // It can't. Check if we have room in this one.
-    if(!firstSpace->IsUsed() && !secondSpace->IsUsed())
+    if(rWidth <= width && rHeight <= height &&
+      !firstSpace->IsUsed() && !secondSpace->IsUsed())
     {
-      texCoords.Set(minX, minY, minX+width, minY+height);
+      texCoords.Set(minX, minY, minX+rWidth, minY+rHeight);
 
       full = true;
       return this;
@@ -169,17 +170,18 @@ csImposterManager::TextureSpace* csImposterManager::TextureSpace::Allocate(size_
     return 0;
   }
   
+  TextureSpace* space = 0;
   if(!firstSpace->IsFull())
   {
-    TextureSpace* space = firstSpace->Allocate(width, height, texCoords);
-    if(space)
-    {
-      return space;
-    }
+    space = firstSpace->Allocate(rWidth, rHeight, texCoords);
   }
 
-  TextureSpace* space = secondSpace->Allocate(width, height, texCoords);
-  if(secondSpace->IsFull())
+  if(!space && !secondSpace->IsFull())
+  {
+    space = secondSpace->Allocate(rWidth, rHeight, texCoords);
+  }
+
+  if(firstSpace->IsFull() && secondSpace->IsFull())
   {
     full = true;
   }
@@ -187,13 +189,14 @@ csImposterManager::TextureSpace* csImposterManager::TextureSpace::Allocate(size_
   return space;
 }
 
-bool csImposterManager::TextureSpace::Realloc(size_t& width,
-                                              size_t& height,
+bool csImposterManager::TextureSpace::Realloc(size_t& rWidth,
+                                              size_t& rHeight,
                                               csBox2& texCoords) const
 {
-  if(full && (childWidth < width || childHeight < height))
+  if(full && (childWidth < rWidth || childHeight < rHeight) &&
+     rWidth <= width && rHeight <= height)
   {
-    texCoords.Set(minX, minY, minX+width, minY+height);
+    texCoords.Set(minX, minY, minX+rWidth, minY+rHeight);
     return true;
   }
 
@@ -204,15 +207,15 @@ void csImposterManager::TextureSpace::Free()
 {
   full = false;
 
-  if(parent)
+  if(parent && parent->full)
     parent->Free();
 }
 
-void csImposterManager::TextureSpace::GetRenderTextureDimensions(size_t& rTexWidth,
-                                                                 size_t& rTexHeight) const
+void csImposterManager::TextureSpace::GetRenderTextureDimensions(size_t& rTWidth,
+                                                                 size_t& rTHeight) const
 {
-  rTexWidth = this->rTexWidth;
-  rTexHeight = this->rTexHeight;
+  rTWidth = rTexWidth;
+  rTHeight = rTexHeight;
 }
 
 bool csImposterManager::TextureSpace::IsUsed() const
@@ -235,8 +238,9 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
       return imposter->allocatedSpace->GetMaterial();
     }
 
-    // We can't. So free it and allocate new.
+    // We can't. So free it and we'll need to allocate new.
     imposter->allocatedSpace->Free();
+    imposter->allocatedSpace = 0;
   }
 
   // Check for space in existing textures.
@@ -254,8 +258,7 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
     }
   }
 
-  // Else allocate a new texture.
-  // Need to recalc in case screen size changes.
+  // Else create a new texture.
   rTexWidth = csFindNearestPowerOf2((int)imposter->texWidth > g3d->GetWidth() ?
     (int)imposter->texWidth : g3d->GetWidth());
   rTexHeight = csFindNearestPowerOf2((int)imposter->texHeight > g3d->GetHeight() ?
@@ -312,7 +315,8 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   csVector3 mesh_pos = csMesh->GetWorldBoundingBox ().GetCenter ();
   const csVector3& cam_pos = newCamera->GetCamera()->GetTransform ().GetOrigin ();
   csVector3 camdir = mesh_pos-cam_pos;
-  newCamera->GetCamera()->GetTransform ().LookAt (camdir, csVector3(0,1,0));
+  newCamera->GetCamera()->GetTransform ().LookAt (camdir,
+    newCamera->GetCamera()->GetTransform().GetT2O().Col2());
 
   // Get screen bounding box of the mesh.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
