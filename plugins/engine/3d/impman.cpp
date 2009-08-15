@@ -98,37 +98,37 @@ csImposterManager::TextureSpace::TextureSpace(size_t width,
                                               size_t height,
                                               iMaterialWrapper* material,
                                               TextureSpace* parent)
-: material(material), parent(parent), full(false)
+: width(width), height(height), material(material), parent(parent), full(false)
 {
   if(!parent)
   {
     minX = 0;
     minY = 0;
-  }
-  else if(!parent->firstSpace)
-  {
-    if(width < height)
-    {
-      minX = parent->minX;
-      minY = parent->minY;
-    }
-    else
-    {
-      minX = parent->minX;
-      minY = parent->minY + height;
-    }
+    rTexWidth = width;
+    rTexHeight = height;
   }
   else
   {
-    if(width < height)
+    rTexWidth = parent->rTexWidth;
+    rTexHeight = parent->rTexHeight;
+
+    if(!parent->firstSpace)
     {
-      minX = parent->minX + width;
+      minX = parent->minX;
       minY = parent->minY;
     }
     else
     {
-      minX = parent->minX;
-      minY = parent->minY;
+      if(width < height)
+      {
+        minX = parent->minX + width;
+        minY = parent->minY;
+      }
+      else
+      {
+        minX = parent->minX;
+        minY = parent->minY + height;
+      }
     }
   }
 
@@ -154,12 +154,19 @@ csImposterManager::TextureSpace* csImposterManager::TextureSpace::Allocate(size_
                                                                            size_t& height,
                                                                            csBox2& texCoords)
 {
+  // Check if it'll fit in a child.
   if(childWidth < width || childHeight < height)
   {
-    texCoords.Set(minX, minY, minX+width, minY+height);
+    // It can't. Check if we have room in this one.
+    if(!firstSpace->IsUsed() && !secondSpace->IsUsed())
+    {
+      texCoords.Set(minX, minY, minX+width, minY+height);
 
-    full = true;
-    return this;
+      full = true;
+      return this;
+    }
+
+    return 0;
   }
   
   if(!firstSpace->IsFull())
@@ -182,7 +189,7 @@ csImposterManager::TextureSpace* csImposterManager::TextureSpace::Allocate(size_
 
 bool csImposterManager::TextureSpace::Realloc(size_t& width,
                                               size_t& height,
-                                              csBox2& texCoords)
+                                              csBox2& texCoords) const
 {
   if(full && (childWidth < width || childHeight < height))
   {
@@ -201,8 +208,22 @@ void csImposterManager::TextureSpace::Free()
     parent->Free();
 }
 
+void csImposterManager::TextureSpace::GetRenderTextureDimensions(size_t& rTexWidth,
+                                                                 size_t& rTexHeight) const
+{
+  rTexWidth = this->rTexWidth;
+  rTexHeight = this->rTexHeight;
+}
+
+bool csImposterManager::TextureSpace::IsUsed() const
+{
+  return full || (firstSpace && firstSpace->IsUsed()) || (secondSpace && secondSpace->IsUsed());
+}
+
 iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
-                                                     csBox2& texCoords)
+                                                     csBox2& texCoords,
+                                                     size_t& rTexWidth,
+                                                     size_t& rTexHeight)
 {
   // Check whether if we can reuse existing space.
   if(imposter->allocatedSpace)
@@ -210,6 +231,7 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
     if(imposter->allocatedSpace->Realloc(imposter->texWidth,
       imposter->texHeight, texCoords))
     {
+      imposter->allocatedSpace->GetRenderTextureDimensions(rTexWidth, rTexHeight);
       return imposter->allocatedSpace->GetMaterial();
     }
 
@@ -224,14 +246,20 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
     {
       imposter->allocatedSpace = textureSpace[i]->Allocate(imposter->texWidth,
         imposter->texHeight, texCoords);
-      return textureSpace[i]->GetMaterial();
+      if(imposter->allocatedSpace)
+      {
+        imposter->allocatedSpace->GetRenderTextureDimensions(rTexWidth, rTexHeight);
+        return textureSpace[i]->GetMaterial();
+      }
     }
   }
 
   // Else allocate a new texture.
   // Need to recalc in case screen size changes.
-  size_t rTexWidth = csFindNearestPowerOf2(g3d->GetWidth());
-  size_t rTexHeight = csFindNearestPowerOf2(g3d->GetHeight());
+  rTexWidth = csFindNearestPowerOf2((int)imposter->texWidth > g3d->GetWidth() ?
+    (int)imposter->texWidth : g3d->GetWidth());
+  rTexHeight = csFindNearestPowerOf2((int)imposter->texHeight > g3d->GetHeight() ?
+    (int)imposter->texHeight : g3d->GetHeight());
 
   // Create texture handle. Size is the current screen size (to nearest pow2)
   // as that's the maximum texture size we should have to handle.
@@ -265,7 +293,7 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
   textureSpace.Push(newSpace);
 
   // Now allocate part of this texture for use.
-  newSpace->Allocate(imposter->texWidth, imposter->texHeight, texCoords);
+  imposter->allocatedSpace = newSpace->Allocate(imposter->texWidth, imposter->texHeight, texCoords);
   return material;
 }
 
@@ -292,7 +320,8 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   imposter->texHeight = rbox.sbox.MaxY() - rbox.sbox.MinY();
 
   // Allocate texture space.
-  csIMesh->mat = AllocateTexture(imposter, csIMesh->texCoords);
+  size_t rTexWidth, rTexHeight;
+  csIMesh->mat = AllocateTexture(imposter, csIMesh->texCoords, rTexWidth, rTexHeight);
 
   // Set up view.
   csRef<iView> newView = csPtr<iView>(new csView(engine, g3d));
@@ -300,19 +329,20 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
   newView->GetMeshFilter().SetFilterMode(MESH_FILTER_INCLUDE);
   newView->GetMeshFilter().AddFilterMesh(csMesh);
   newView->SetRectangle(csIMesh->texCoords.MinX(), csIMesh->texCoords.MinY(),
-    csIMesh->texCoords.MaxX(), csIMesh->texCoords.MaxY());
+    csIMesh->texCoords.MaxX()-csIMesh->texCoords.MinX(),
+    csIMesh->texCoords.MaxY()-csIMesh->texCoords.MinY());
   newView->UpdateClipper ();
 
   // Normalise the texture coordinates.
-  csIMesh->texCoords.Set(csIMesh->texCoords.MinX()/g3d->GetWidth(),
-                         csIMesh->texCoords.MinY()/g3d->GetHeight(),
-                         csIMesh->texCoords.MaxX()/g3d->GetWidth(),
-                         csIMesh->texCoords.MaxY()/g3d->GetHeight());
+  csIMesh->texCoords.Set(csIMesh->texCoords.MinX()/rTexWidth,
+                         csIMesh->texCoords.MinY()/rTexHeight,
+                         csIMesh->texCoords.MaxX()/rTexWidth,
+                         csIMesh->texCoords.MaxY()/rTexHeight);
 
   // Calculate required projection shift.
   CS::Math::Matrix4 projShift (
-      1, 0, 0, 2*csIMesh->texCoords.MinX() + (g3d->GetWidth()-2*rbox.sbox.MinX())/g3d->GetWidth() - 1,
-      0, 1, 0, 2*csIMesh->texCoords.MinY() + (g3d->GetHeight()-2*rbox.sbox.MinY())/g3d->GetHeight() - 1,
+      1, 0, 0, 2*csIMesh->texCoords.MinX() + (rTexWidth-2*rbox.sbox.MinX())/rTexWidth - 1,
+      0, 1, 0, 2*csIMesh->texCoords.MinY() + (rTexHeight-2*rbox.sbox.MinY())/rTexHeight - 1,
       0, 0, 1, 0,
       0, 0, 0, 1);
 

@@ -60,7 +60,7 @@ private:
 
     TextureSpace* Allocate(size_t& width, size_t& height, csBox2& texCoords);
 
-    bool Realloc(size_t& width, size_t& height, csBox2& texCoords);
+    bool Realloc(size_t& width, size_t& height, csBox2& texCoords) const;
 
     void Free();
 
@@ -68,9 +68,15 @@ private:
 
     iMaterialWrapper* GetMaterial() const { return material; }
 
+    void GetRenderTextureDimensions(size_t& width, size_t& height) const;
+
+    bool IsUsed() const;
+
   private:
     csRef<TextureSpace> firstSpace;
     csRef<TextureSpace> secondSpace;
+    size_t width;
+    size_t height;
     size_t childWidth;
     size_t childHeight;
 
@@ -80,6 +86,8 @@ private:
     csRef<iMaterialWrapper> material;
     TextureSpace* parent;
     bool full;
+    size_t rTexWidth;
+    size_t rTexHeight;
   };
 
   csRefArray<TextureSpace> textureSpace;
@@ -116,7 +124,7 @@ private:
 
   /* Allocates texture space for r2t. */
   iMaterialWrapper* AllocateTexture(ImposterMat* imposter,
-      csBox2& texCoords);
+      csBox2& texCoords, size_t& width, size_t& height);
 
   /* Initialises an imposter. */
   void InitialiseImposter(ImposterMat* imposter);
