@@ -88,9 +88,6 @@ private:
   csVector3 meshLocalDir;
   csVector3 cameraLocalDir;
 
-  // Current height and width of the billboard
-  float height, width;
-
   // Rendermesh holder for this mesh
   csRenderMeshHolder rmHolder;
 

@@ -215,22 +215,36 @@ void csImposterMesh::DestroyInstance(Instance* instance)
 
 void csImposterMesh::InitMesh(iCamera* camera)
 {
-  // Calculate object space billboard size.
-  const csBox3& bbox = instances[0]->mesh->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox();
-  float z = (bbox.MinZ() + bbox.MaxZ()) / 2;
-  cutout[0] = csVector3(bbox.MaxX(), bbox.MaxY(), z);
-  cutout[1] = csVector3(bbox.MaxX(), bbox.MinY(), z);
-  cutout[2] = csVector3(bbox.MinX(), bbox.MinY(), z);
-  cutout[3] = csVector3(bbox.MinX(), bbox.MaxY(), z);
+  // Save camera orientation
+  const csOrthoTransform oldt = camera->GetTransform();
 
-  width = (cutout[1] - cutout[0]).Norm();
-  height = (cutout[3] - cutout[0]).Norm();
+  // Look at mesh
+  csVector3 meshcenter = closestInstanceMesh->GetWorldBoundingBox().GetCenter();
+  csVector3 campos = camera->GetTransform().GetOrigin();
+  camera->GetTransform ().LookAt(meshcenter-campos, camera->GetTransform().GetT2O().Col2());
+
+  // Get camera and object space size.
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!closestInstanceMesh->GetMovable()->IsFullTransformIdentity())
+    tr_o2c /= closestInstanceMesh->GetMovable()->GetFullTransform();
+  const csBox3& cbbox = closestInstanceMesh->GetTransformedBoundingBox(tr_o2c);
+  const csBox3& obbox = closestInstanceMesh->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox();
+
+  // Calculate object space billboard size.
+  float z = (bbox.MinZ() + bbox.MaxZ()) / 2;
+  cutout[0] = csVector3(cbbox.MaxX(), obbox.MaxY(), z);
+  cutout[1] = csVector3(cbbox.MaxX(), obbox.MinY(), z);
+  cutout[2] = csVector3(cbbox.MinX(), obbox.MinY(), z);
+  cutout[3] = csVector3(cbbox.MinX(), obbox.MaxY(), z);
+
+  // Restore camera orientation.
+  camera->SetTransform (oldt);
 
   // Save current facing for angle checking
-  csReversibleTransform objt = instances[0]->mesh->GetMovable()->GetFullTransform();
+  csReversibleTransform objt = closestInstanceMesh->GetMovable()->GetFullTransform();
   csOrthoTransform& camt = camera->GetTransform();
 
-  csVector3 relativeDir = (instances[0]->mesh->GetWorldBoundingBox().GetCenter()
+  csVector3 relativeDir = (closestInstanceMesh->GetWorldBoundingBox().GetCenter()
       - camt.GetOrigin()).Unit();
 
   meshLocalDir = objt.Other2ThisRelative(relativeDir);
@@ -324,9 +338,22 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     buffer->SetRenderBuffer (CS_BUFFER_COLOR, colBuffer);
     mesh->buffers = buffer;
     mesh->variablecontext = new csShaderVariableContext();
+
+    // Set normals.
+    csDirtyAccessArray<csVector3> normals;
+    normals.Push(csVector3(0, 0, -1));
+    normals.Push(csVector3(0, 0, -1));
+    normals.Push(csVector3(0, 0, -1));
+    normals.Push(csVector3(0, 0, -1));
+
+    csRef<csRenderBuffer> normalBuffer = csRenderBuffer::CreateRenderBuffer(
+      4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+    normalBuffer->CopyInto (normals.GetArray(), 4);
+
+    mesh->buffers->SetRenderBuffer (CS_BUFFER_NORMAL, normalBuffer);
   }
 
-  // Material changed.
+  // Material or mesh changed.
   if (matDirty || meshDirty)
   {
     mesh->material = mat;
@@ -343,31 +370,15 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
 
     mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
 
-    matDirty = false;
-  }
-
-  // Mesh changed
-  if (meshDirty)
-  {
+    // Recalculate vertex positions.
+    InitMesh(rview->GetCamera());
     GetMeshVertices ()->Empty ();
-
     csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
       4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     vertBuffer->CopyInto (cutout.GetVertices (), 4);
-
-    csDirtyAccessArray<csVector3> normals;
-    normals.Push(csVector3(0, 0, -1));
-    normals.Push(csVector3(0, 0, -1));
-    normals.Push(csVector3(0, 0, -1));
-    normals.Push(csVector3(0, 0, -1));
-
-    csRef<csRenderBuffer> normalBuffer = csRenderBuffer::CreateRenderBuffer(
-      4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-    normalBuffer->CopyInto (normals.GetArray(), 4);
-
     mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertBuffer);
-    mesh->buffers->SetRenderBuffer (CS_BUFFER_NORMAL, normalBuffer);
 
+    matDirty = false;
     meshDirty = false;
   }
 
