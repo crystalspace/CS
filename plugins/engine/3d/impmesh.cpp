@@ -300,7 +300,7 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     mesh->do_mirror = rview->GetCamera ()->IsMirrored ();
     mesh->object2world = csReversibleTransform ();
     mesh->worldspace_origin = csVector3 (0,0,0);
-    mesh->mixmode = CS_FX_ALPHA;
+    mesh->mixmode = CS_FX_COPY;
     mesh->alphaType = csAlphaMode::alphaBinary;
     mesh->z_buf_mode = CS_ZBUF_TEST;
     mesh->renderPrio = engine->GetRenderPriority("alpha");
