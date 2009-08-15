@@ -105,7 +105,7 @@ namespace CS
       /// Get the shader used for tonemapping the final image.
       iShader* GetMappingShader ();
       /// Get the shader variable context for the tonemapping stage.
-      iShaderVariableContext* GetMapppingShaderVarContext();
+      iShaderVariableContext* GetMappingShaderVarContext();
       
       /**
        * Get the post processing effects layer that can be used for measuring

@@ -93,7 +93,7 @@ namespace CS
       return mappingLayer->GetShader();
     }
 
-    iShaderVariableContext* HDRHelper::GetMapppingShaderVarContext()
+    iShaderVariableContext* HDRHelper::GetMappingShaderVarContext()
     {
       return mappingLayer->GetSVContext();
     }
