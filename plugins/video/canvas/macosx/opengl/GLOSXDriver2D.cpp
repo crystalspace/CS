@@ -137,7 +137,7 @@ void GLOSXDriver2D::SetTitle(char *title)
   csGraphics2DGLCommon::SetTitle(title);
 }
 
-void csGraphics2DOpenGL::SetIcon (iImage *image)
+void GLOSXDriver2D::SetIcon (iImage *image)
 {
    //TODO: IMPLEMENT THIS FOR MACOSX.
 }
