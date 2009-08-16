@@ -417,12 +417,12 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
 
       for(size_t i=0; i<meshCount; ++i)
       {
-        mesh_indices.Push (0+4*meshCount);
-        mesh_indices.Push (1+4*meshCount);
-        mesh_indices.Push (2+4*meshCount);
-        mesh_indices.Push (2+4*meshCount);
-        mesh_indices.Push (3+4*meshCount);
-        mesh_indices.Push (0+4*meshCount);
+        mesh_indices.Push (0+4*i);
+        mesh_indices.Push (1+4*i);
+        mesh_indices.Push (2+4*i);
+        mesh_indices.Push (2+4*i);
+        mesh_indices.Push (3+4*i);
+        mesh_indices.Push (0+4*i);
       }
 
       mesh->indexstart = 0;
