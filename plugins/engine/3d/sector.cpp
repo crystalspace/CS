@@ -297,7 +297,7 @@ void csSector::PrecacheDraw ()
   /*g3d->BeginDraw (CSDRAW_3DGRAPHICS);
   view->Draw ();
   g3d->FinishDraw ();*/
-  engine->renderManager->RenderView (view);
+  engine->renderManager->PrecacheView (view);
 }
 
 //----------------------------------------------------------------------

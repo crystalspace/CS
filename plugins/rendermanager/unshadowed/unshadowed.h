@@ -48,6 +48,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
 
     //---- iRenderManager ----
     virtual bool RenderView (iView* view);
+    virtual bool PrecacheView (iView* view);
 
     virtual void RegisterRenderTarget (iTextureHandle* target, 
       iView* view, int subtexture = 0, uint flags = 0)

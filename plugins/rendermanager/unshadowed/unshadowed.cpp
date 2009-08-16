@@ -266,6 +266,19 @@ bool RMUnshadowed::RenderView (iView* view)
   return true;
 }
 
+bool RMUnshadowed::PrecacheView (iView* view)
+{
+  if (!RenderView (view)) return false;
+
+  postEffects.ClearIntermediates();
+  hdr.GetHDRPostEffects().ClearIntermediates();
+
+  /* @@@ Other ideas for precache drawing:
+    - No frame advancement?
+   */
+
+  return true;
+}
 
 bool RMUnshadowed::HandleTarget (RenderTreeType& renderTree,
                                  const TargetManagerType::TargetSettings& settings)

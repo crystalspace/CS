@@ -398,6 +398,20 @@ bool RMShadowedPSSM::RenderView (iView* view)
 }
 
 
+bool RMShadowedPSSM::PrecacheView (iView* view)
+{
+  if (!RenderView (view)) return false;
+
+  postEffects.ClearIntermediates();
+  hdr.GetHDRPostEffects().ClearIntermediates();
+
+  /* @@@ Other ideas for precache drawing:
+    - No frame advancement?
+   */
+
+  return true;
+}
+
 bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
                                  const TargetManagerType::TargetSettings& settings)
 {
