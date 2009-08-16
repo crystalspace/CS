@@ -183,6 +183,10 @@ private:
   float imposter_rotation_tolerance;
   float imposter_camera_rotation_tolerance;
 
+  csString imposter_shader;
+
+  bool imposter_instancing;
+
   // Factory to be instanced.
   iMeshFactoryWrapper* instanceFactory;
 
@@ -381,6 +385,22 @@ public:
    */
   virtual float GetCameraRotationTolerance()
   { return imposter_camera_rotation_tolerance; }
+
+ /**
+  * Sets the shader to be used by the imposters.
+  */
+  virtual void SetShader(const char* shader)
+  {
+    imposter_shader = shader;
+  }
+
+ /**
+  * Sets what method of impostering (instanced or not) to use.
+  */
+  virtual void SetInstancing(bool instancing)
+  {
+    imposter_instancing = instancing;
+  }
 
   //--------------------- iSelfDestruct implementation -------------------//
 

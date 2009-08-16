@@ -87,6 +87,16 @@ struct iImposterFactory : public virtual iBase
    * Gets the camera rotation tolerance.
    */
   virtual float GetCameraRotationTolerance() = 0;
+
+  /**
+   * Sets the shader to be used by the imposters.
+   */
+  virtual void SetShader(const char* shader) = 0;
+
+  /**
+   * Sets what method of impostering (instancing or not) to use.
+   */
+  virtual void SetInstancing(bool instancing) = 0;
 };
 
 struct iImposterMesh : public virtual iBase

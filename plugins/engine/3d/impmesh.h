@@ -80,6 +80,12 @@ private:
   // Convenience shortcut
   csEngine *engine;
 
+  // Whether or not we're instancing.
+  bool instance;
+
+  // Shader to use on the imposter material.
+  csString shader;
+
   // Flags that indicate that we have been updated.
   bool matDirty;
   bool meshDirty;
@@ -96,6 +102,12 @@ private:
 
   // Imposter material.
   csRef<iMaterialWrapper> mat;
+
+  // Imposter meshes (for batched rendering).
+  csRefArray<csImposterMesh> imposterMeshes;
+
+  // Number of meshes at last update.
+  size_t numImposterMeshes;
 
   // Texture coordinates.
   csBox2 texCoords;
@@ -132,11 +144,17 @@ private:
 
   bool WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh);
 
+  void SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCamera* camera);
+
+  void SetupRenderMeshesInstance(csRenderMesh*& mesh,  bool rmCreated, iCamera* camera);
+
   friend class csImposterManager;
 
 public:
+  csImposterMesh (csEngine* engine);
+
   csImposterMesh (csEngine* engine, iImposterFactory* fact,
-    iMeshWrapper* mesh, iRenderView* rview);
+    iMeshWrapper* mesh, iRenderView* rview, bool instance, const char* shader);
   virtual ~csImposterMesh () {}
 
   ///////////////////// iImposterMesh /////////////////////
@@ -144,7 +162,7 @@ public:
   /**
    * Whether this imposter is currently instancing any meshes.
    */
-  virtual bool IsInstancing() { return instances.GetSize() != 0; }
+  virtual bool IsInstancing() { return !instance || instances.GetSize() != 0; }
 
   /**
    * Add an instance of the passed mesh.

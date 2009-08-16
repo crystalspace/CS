@@ -37,7 +37,7 @@ using namespace CS::Math;
 using namespace CS::Utility;
 
 csImposterManager::csImposterManager(csEngine* engine)
-: scfImplementationType(this), engine(engine), shaderLoaded(false)
+: scfImplementationType(this), engine(engine)
 {
   g3d = csQueryRegistry<iGraphics3D>(engine->GetObjectRegistry());
   maxWidth = g3d->GetCaps()->maxTexWidth;
@@ -57,10 +57,6 @@ csImposterManager::csImposterManager(csEngine* engine)
 
 csImposterManager::~csImposterManager()
 {
-  for(size_t i=0; i<imposterMats.GetSize(); ++i)
-  {
-    delete imposterMats[i];
-  }
 }
 
 bool csImposterManager::HandleEvent(iEvent &ev)
@@ -84,8 +80,8 @@ bool csImposterManager::HandleEvent(iEvent &ev)
       cmesh->mesh->GetMovable()->SetSector(0);
       cmesh->mesh->GetMovable()->UpdateMove();
 
+      RemoveMeshFromImposter(updateQueue[i]->mesh);
       imposterMats.Delete(updateQueue[i]);
-      delete updateQueue[i];
     }
   }
 
@@ -276,18 +272,11 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
   csRef<iMaterialWrapper> material = engine->CreateMaterial("impostermat", tex);
 
   // Set shaders.
-  if(!shaderLoaded)
-  {
-    csRef<iLoader> ldr = csQueryRegistry<iLoader>(engine->GetObjectRegistry());
-    ldr->LoadShader("/shader/lighting/lighting_imposter.xml");
-    shaderLoaded = true;
-  }
-
   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>(
     engine->GetObjectRegistry(), "crystalspace.shared.stringset");
   csStringID shadertype = strings->Request("base");
   csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
-  iShader* shader = shman->GetShader("lighting_imposter");
+  iShader* shader = shman->GetShader(imposter->shader);
   material->GetMaterial()->SetShader(shadertype, shader);
 
   // Create new texture space.
@@ -307,6 +296,9 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   if(!csIMesh->camera.IsValid())
     return;
+
+  // Set material shader.
+  imposter->shader = csIMesh->shader;
 
   // Set up camera.
   csRef<iCustomMatrixCamera> newCamera = engine->CreateCustomMatrixCamera(csIMesh->camera);
@@ -362,10 +354,19 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   csIMesh->matDirty = true;
 
-  // Move imposter mesh to correct sector.
-  csIMesh->mesh->GetMovable()->SetPosition(csVector3(0.0f));
-  csIMesh->mesh->GetMovable()->SetSector(csIMesh->sector);
-  csIMesh->mesh->GetMovable()->UpdateMove();
+  // Check for instancing.
+  if(csIMesh->instance)
+  {
+    // Move imposter mesh to correct sector.
+    csIMesh->mesh->GetMovable()->SetPosition(csVector3(0.0f));
+    csIMesh->mesh->GetMovable()->SetSector(csIMesh->sector);
+    csIMesh->mesh->GetMovable()->UpdateMove();
+  }
+  else
+  {
+    // Add imposter mesh to our sector imposter.
+    AddMeshToImposter(imposter->mesh);
+  }
 }
 
 void csImposterManager::UpdateImposter(ImposterMat* imposter)
@@ -399,9 +400,49 @@ void csImposterManager::UpdateImposter(ImposterMat* imposter)
   csIMesh->isUpdating = false;
 }
 
+void csImposterManager::AddMeshToImposter(csImposterMesh* imposter)
+{
+  for(size_t i=0; i<sectorImposters.GetSize(); ++i)
+  {
+    if(imposter->sector == sectorImposters[i]->sector &&
+       sectorImposters[i]->sectorImposter->mat == imposter->mat)
+    {
+      sectorImposters[i]->sectorImposter->imposterMeshes.Push(imposter);
+      return;
+    }
+  }
+
+  csRef<SectorImposter> newSectorI;
+  newSectorI.AttachNew(new SectorImposter());
+
+  newSectorI->sector = imposter->sector;
+  newSectorI->sectorImposter->imposterMeshes.Push(imposter);
+  newSectorI->sectorImposter.AttachNew(new csImposterMesh(engine));
+  newSectorI->sectorImposter->mat = imposter->mat;
+
+  newSectorI->sectorImposter->mesh->GetMovable()->SetPosition(csVector3(0.0f));
+  newSectorI->sectorImposter->mesh->GetMovable()->SetSector(newSectorI->sector);
+  newSectorI->sectorImposter->mesh->GetMovable()->UpdateMove();
+
+  sectorImposters.Push(newSectorI);
+}
+
+void csImposterManager::RemoveMeshFromImposter(csImposterMesh* imposter)
+{
+  for(size_t i=0; i<sectorImposters.GetSize(); ++i)
+  {
+    if(imposter->sector == sectorImposters[i]->sector)
+    {
+      sectorImposters[i]->sectorImposter->imposterMeshes.Delete(imposter);
+      return;
+    }
+  }
+}
+
 void csImposterManager::Register(iImposterMesh* mesh)
 {
-  ImposterMat* imposterMat = new ImposterMat(mesh);
+  csRef<ImposterMat> imposterMat;
+  imposterMat.AttachNew(new ImposterMat(mesh));
   imposterMats.Push(imposterMat);
   updateQueue.Push(imposterMat);
 }
@@ -410,7 +451,7 @@ void csImposterManager::Update(iImposterMesh* mesh)
 {
   for(size_t i=0; i<imposterMats.GetSize(); ++i)
   {
-    if(imposterMats[i]->mesh == mesh)
+    if(&*(imposterMats[i]->mesh) == mesh)
     {
       if(imposterMats[i]->init &&
         !imposterMats[i]->update &&
@@ -428,7 +469,7 @@ void csImposterManager::Unregister(iImposterMesh* mesh)
 {
   for(size_t i=0; i<imposterMats.GetSize(); ++i)
   {
-    if(imposterMats[i]->mesh == mesh)
+    if(&*(imposterMats[i]->mesh) == mesh)
     {
       updateQueue.Push(imposterMats[i]);
       imposterMats[i]->remove = true;

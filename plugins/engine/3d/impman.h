@@ -92,9 +92,9 @@ private:
 
   csRefArray<TextureSpace> textureSpace;
 
-  struct ImposterMat
+  struct ImposterMat : CS::Utility::FastRefCount<ImposterMat>
   {
-    csRef<iImposterMesh> mesh;
+    csRef<csImposterMesh> mesh;
     bool init;
     bool update;
     bool remove;
@@ -105,11 +105,14 @@ private:
 
     TextureSpace* allocatedSpace;
 
-    ImposterMat(iImposterMesh* mesh)
-      : mesh(mesh), init(false), update(false),
+    csString shader;
+
+    ImposterMat(iImposterMesh* imesh)
+      : init(false), update(false),
       remove(false), lastDistance(size_t(-1)),
       allocatedSpace(0)
     {
+      mesh = static_cast<csImposterMesh*>(imesh);
     }
 
     ~ImposterMat()
@@ -132,8 +135,8 @@ private:
   /* Updated an imposter. */
   void UpdateImposter(ImposterMat* imposter);
 
-  csArray<ImposterMat*> imposterMats;
-  csArray<ImposterMat*> updateQueue;
+  csRefArray<ImposterMat> imposterMats;
+  csRefArray<ImposterMat> updateQueue;
 
   csEngine* engine;
 
@@ -141,8 +144,22 @@ private:
 
   size_t maxWidth;
   size_t maxHeight;
+  
+  /**
+   * For management of non-instanced meshes.
+   * One 'mesh' per sector, we need to keep it updated.
+   */
+  struct SectorImposter : CS::Utility::FastRefCount<SectorImposter>
+  {
+    csWeakRef<iSector> sector;
+    csRef<csImposterMesh> sectorImposter;
+  };
 
-  bool shaderLoaded;
+  csRefArray<SectorImposter> sectorImposters;
+
+  void AddMeshToImposter(csImposterMesh* imposter);
+
+  void RemoveMeshFromImposter(csImposterMesh* imposter);
 
 public:
   csImposterManager(csEngine* engine);
