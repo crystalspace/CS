@@ -405,7 +405,9 @@ bool csImposterManager::UpdateImposter(ImposterMat* imposter)
 
     if(imposter->texHeight < texHeight || imposter->texWidth < texWidth)
     {
+      RemoveMeshFromImposter(imposter->mesh);
       InitialiseImposter(imposter);
+      AddMeshToImposter(imposter->mesh);
       updated = true;
     }
 

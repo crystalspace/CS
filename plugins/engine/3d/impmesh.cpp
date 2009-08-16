@@ -152,6 +152,9 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
     if((!instance && closestInstanceMesh == mesh) ||
         (instance && instances[i]->mesh == mesh))
     {
+      // Update if the camera isn't valid.
+      bool update = !camera.IsValid();
+
       // Check that this imposter mesh is valid for this meshwrapper.
       if(!WithinTolerance(rview, mesh))
       {
@@ -163,11 +166,16 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
         } 
         else
         {
-          // Update mesh
-          camera = rview->GetCamera();
-          InitMesh();
-          materialUpdateNeeded = true;
+          update = true;
         }
+      }
+
+      if(update)
+      {
+        // Update mesh
+        camera = rview->GetCamera();
+        InitMesh();
+        materialUpdateNeeded = true;
       }
 
       // Update the distance.
@@ -396,8 +404,6 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
     mesh->variablecontext = new csShaderVariableContext();
   }
 
-  // Depth sort the billboards.
-
   // Material or mesh changed.
   if (matDirty || meshDirty || rmCreated)
   {
@@ -465,6 +471,8 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
       normalBuffer->CopyInto (normals.GetArray(), normals.GetSize());
       mesh->buffers->SetRenderBuffer (CS_BUFFER_NORMAL, normalBuffer);
     }
+
+    // Depth sort the billboards.
 
     // Create texels buffer.
     mesh_texels.Empty ();
