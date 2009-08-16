@@ -149,7 +149,7 @@ iObjectRegistry* csGLBasicTextureHandle::GetObjectRegistry() const
 
 bool csGLBasicTextureHandle::SynthesizeUploadData (
   const CS::StructuredTextureFormat& format,
-  iString* fail_reason)
+  iString* fail_reason, bool zeroTexture)
 {
   TextureStorageFormat glFormat;
   TextureSourceFormat srcFormat;
@@ -171,6 +171,21 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
     return false;
   }
 
+  const void* zeroData = 0;
+  csRef<iBase> zeroRef;
+  if (zeroTexture)
+  {
+    int texelBits = 0;
+    for (int i = 0; i < format.GetComponentCount(); i++)
+      texelBits += format.GetComponentSize (i);
+    size_t zeroSize = actual_width * actual_height * actual_d
+      * ((texelBits+7)/8);
+    CS::DataBuffer<>* zeroBuf = new CS::DataBuffer<> (zeroSize);
+    memset (zeroBuf->GetData(), 0, zeroSize);
+    zeroData = zeroBuf->GetData();
+    zeroRef.AttachNew (zeroBuf);
+  }
+
   const int imgNum = (texType == texTypeCube) ? 6 : 1;
 
   FreshUploadData ();
@@ -179,7 +194,8 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
     for (int i = 0; i < imgNum; i++)
     {
       csGLUploadData upload;
-      upload.image_data = 0;
+      upload.image_data = zeroData;
+      upload.dataRef = zeroRef;
       upload.w = actual_width;
       upload.h = actual_height;
       upload.d = actual_d;
@@ -203,7 +219,8 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
       do
       {
         csGLUploadData upload;
-        upload.image_data = 0;
+	upload.image_data = zeroData;
+	upload.dataRef = zeroRef;
         upload.w = w;
         upload.h = h;
         upload.d = d;

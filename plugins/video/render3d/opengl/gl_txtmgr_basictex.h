@@ -251,7 +251,7 @@ public:
    * Synthesize empty upload data structures for textures of the format
    * \a format. */
   bool SynthesizeUploadData (const CS::StructuredTextureFormat& format,
-    iString* fail_reason);
+    iString* fail_reason, bool zeroTexture);
 
   void Clear();
 

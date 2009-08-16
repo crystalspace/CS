@@ -108,6 +108,13 @@ struct iString;
  *   will decide whether a dimension is scaled up or down.
  */
 #define CS_TEXTURE_SCALE_DOWN		0x00000100
+/**
+ * Create cleared texture.
+ * When creating a texture with iTextureManager::CreateTexture() its contents
+ * are by default undefined. Setting this flag will clear the texture.
+ * It only has an effect when used with iTextureManager::CreateTexture().
+ */
+#define CS_TEXTURE_CREATE_CLEAR		0x00000200
 /** @} */
 
 /**

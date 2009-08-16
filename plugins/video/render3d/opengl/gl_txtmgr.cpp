@@ -370,7 +370,9 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h, int d,
   csGLBasicTextureHandle *txt = new csGLBasicTextureHandle (
       w, h, d, imagetype, flags, G3D);
 
-  if (!txt->SynthesizeUploadData (texFormat, fail_reason))
+  bool doClear = (flags & CS_TEXTURE_CREATE_CLEAR) != 0;
+  if (!txt->SynthesizeUploadData (texFormat, fail_reason,
+      doClear && !G3D->ext->CS_GL_EXT_framebuffer_object))
   {
     delete txt;
     return 0;
@@ -382,8 +384,9 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h, int d,
     used as a render target, otherwise they will exhibit artifacts after
     being rendered to. 
    */
-  if ((G3D->ext->CS_GL_EXT_framebuffer_object)
-      && (texFormat.GetFormat() == CS::StructuredTextureFormat::Float))
+  doClear |= (G3D->ext->CS_GL_EXT_framebuffer_object)
+    && (texFormat.GetFormat() == CS::StructuredTextureFormat::Float);
+  if (doClear && G3D->ext->CS_GL_EXT_framebuffer_object)
   {
     GLuint framebuffer;
     G3D->ext->glGenFramebuffersEXT (1, &framebuffer);
@@ -393,47 +396,47 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h, int d,
     const GLuint texHandle = txt->GetHandle();
     switch (texTarget)
     {
-      case GL_TEXTURE_1D:
-	G3D->ext->glFramebufferTexture1DEXT (GL_FRAMEBUFFER_EXT,
-	  GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_1D, texHandle, 0);
-	if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
-	    == GL_FRAMEBUFFER_COMPLETE_EXT)
-	  glClear (GL_COLOR_BUFFER_BIT);
-	break;
-      case GL_TEXTURE_2D:
-      case GL_TEXTURE_RECTANGLE_ARB:
-	G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
-	  GL_COLOR_ATTACHMENT0_EXT, texTarget, texHandle, 0);
-	if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
-	    == GL_FRAMEBUFFER_COMPLETE_EXT)
-	  glClear (GL_COLOR_BUFFER_BIT);
-	break;
-      case GL_TEXTURE_CUBE_MAP:
-        {
-	  for (int i = 0; i < 6; i++)
+	case GL_TEXTURE_1D:
+	  G3D->ext->glFramebufferTexture1DEXT (GL_FRAMEBUFFER_EXT,
+	    GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_1D, texHandle, 0);
+	  if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
+	      == GL_FRAMEBUFFER_COMPLETE_EXT)
+	    glClear (GL_COLOR_BUFFER_BIT);
+	  break;
+	case GL_TEXTURE_2D:
+	case GL_TEXTURE_RECTANGLE_ARB:
+	  G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
+	    GL_COLOR_ATTACHMENT0_EXT, texTarget, texHandle, 0);
+	  if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
+	      == GL_FRAMEBUFFER_COMPLETE_EXT)
+	    glClear (GL_COLOR_BUFFER_BIT);
+	  break;
+	case GL_TEXTURE_CUBE_MAP:
 	  {
-	    G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
-	      GL_COLOR_ATTACHMENT0_EXT, 
-	      GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 
-	      texHandle, 0);
-	    if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
-		== GL_FRAMEBUFFER_COMPLETE_EXT)
-	      glClear (GL_COLOR_BUFFER_BIT);
+	    for (int i = 0; i < 6; i++)
+	    {
+	      G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
+		GL_COLOR_ATTACHMENT0_EXT, 
+		GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 
+		texHandle, 0);
+	      if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
+		  == GL_FRAMEBUFFER_COMPLETE_EXT)
+		glClear (GL_COLOR_BUFFER_BIT);
+	    }
 	  }
-	}
-	break;
-      case GL_TEXTURE_3D:
-        {
-	  for (int i = 0; i < 6; i++)
+	  break;
+	case GL_TEXTURE_3D:
 	  {
-	    G3D->ext->glFramebufferTexture3DEXT (GL_FRAMEBUFFER_EXT, 
-	      GL_COLOR_ATTACHMENT0_EXT, texTarget, texHandle, 0, d);
-	    if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
-		== GL_FRAMEBUFFER_COMPLETE_EXT)
-	      glClear (GL_COLOR_BUFFER_BIT);
+	    for (int i = 0; i < 6; i++)
+	    {
+	      G3D->ext->glFramebufferTexture3DEXT (GL_FRAMEBUFFER_EXT, 
+		GL_COLOR_ATTACHMENT0_EXT, texTarget, texHandle, 0, d);
+	      if (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)
+		  == GL_FRAMEBUFFER_COMPLETE_EXT)
+		glClear (GL_COLOR_BUFFER_BIT);
+	    }
 	  }
-	}
-	break;
+	  break;
     }
     
     G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
