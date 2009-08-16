@@ -61,34 +61,40 @@ csImposterManager::~csImposterManager()
 
 bool csImposterManager::HandleEvent(iEvent &ev)
 {
-  if(!updateQueue.IsEmpty())
+  for(size_t i=0; i<updateQueue.GetSize(); ++i)
   {
-    if(!updateQueue[0]->init)
+    if(updateQueue[i]->remove)
     {
-      updateQueue[0]->init = InitialiseImposter(updateQueue[0]);
-    }
-    else if(updateQueue[0]->update)
-    {
-      UpdateImposter(updateQueue[0]);
-      updateQueue[0]->update = false;
-    }
-
-    if(updateQueue[0]->remove)
-    {
-      csImposterMesh* cmesh = static_cast<csImposterMesh*>(&*(updateQueue[0]->mesh));
+      csImposterMesh* cmesh = static_cast<csImposterMesh*>(&*(updateQueue[i]->mesh));
       if(cmesh->mesh)
       {
         cmesh->mesh->GetMovable()->SetSector(0);
         cmesh->mesh->GetMovable()->UpdateMove();
       }
 
-      RemoveMeshFromImposter(updateQueue[0]->mesh);
-      imposterMats.Delete(updateQueue[0]);
+      RemoveMeshFromImposter(updateQueue[i]->mesh);
+      imposterMats.Delete(updateQueue[i]);
+      updateQueue.DeleteIndex(i--);
     }
-
-    if(updateQueue[0]->init || updateQueue[0]->remove)
+    else if(!updateQueue[i]->init)
     {
-      updateQueue.DeleteIndexFast(0);
+       updateQueue[i]->init = InitialiseImposter(updateQueue[i]);
+      if(updateQueue[i]->init)
+      {
+        updateQueue.DeleteIndexFast(i);
+        break;
+      }
+    }
+    else if(updateQueue[i]->update)
+    {
+      updateQueue[i]->update = false;
+      if(UpdateImposter(updateQueue[i]))
+      {
+        updateQueue.DeleteIndexFast(i);
+        break;
+      }
+
+      updateQueue.DeleteIndex(i--);
     }
   }
 
@@ -99,7 +105,8 @@ csImposterManager::TextureSpace::TextureSpace(size_t width,
                                               size_t height,
                                               iMaterialWrapper* material,
                                               TextureSpace* parent)
-: width(width), height(height), material(material), parent(parent), full(false)
+: width(width), height(height), childWidth(0), childHeight(0),
+  material(material), parent(parent), full(false)
 {
   if(!parent)
   {
@@ -376,7 +383,7 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   return true;
 }
 
-void csImposterManager::UpdateImposter(ImposterMat* imposter)
+bool csImposterManager::UpdateImposter(ImposterMat* imposter)
 {
   csImposterMesh* csIMesh = static_cast<csImposterMesh*>(&*imposter->mesh);
   csMeshWrapper* csMesh = static_cast<csMeshWrapper*>(&*csIMesh->closestInstanceMesh);
@@ -385,9 +392,10 @@ void csImposterManager::UpdateImposter(ImposterMat* imposter)
   {
     // Finished updating.
     csIMesh->isUpdating = false;
-    return;
+    return false;
   }
 
+  bool updated = false;
   if(csIMesh->closestInstance < imposter->lastDistance || csIMesh->materialUpdateNeeded)
   {
     // Calculate new texture sizes.
@@ -398,6 +406,7 @@ void csImposterManager::UpdateImposter(ImposterMat* imposter)
     if(imposter->texHeight < texHeight || imposter->texWidth < texWidth)
     {
       InitialiseImposter(imposter);
+      updated = true;
     }
 
     imposter->lastDistance = csIMesh->closestInstance;
@@ -405,6 +414,8 @@ void csImposterManager::UpdateImposter(ImposterMat* imposter)
 
   // Finished updating.
   csIMesh->isUpdating = false;
+
+  return updated;
 }
 
 void csImposterManager::AddMeshToImposter(csImposterMesh* imposter)
@@ -412,7 +423,7 @@ void csImposterManager::AddMeshToImposter(csImposterMesh* imposter)
   for(size_t i=0; i<sectorImposters.GetSize(); ++i)
   {
     if(imposter->sector == sectorImposters[i]->sector &&
-       sectorImposters[i]->sectorImposter->mat == imposter->mat)
+       imposter->mat == sectorImposters[i]->sectorImposter->mat)
     {
       sectorImposters[i]->sectorImposter->meshDirty = true;
       sectorImposters[i]->sectorImposter->imposterMeshes.Push(imposter);
@@ -435,8 +446,10 @@ void csImposterManager::RemoveMeshFromImposter(csImposterMesh* imposter)
 {
   for(size_t i=0; i<sectorImposters.GetSize(); ++i)
   {
-    if(imposter->sector == sectorImposters[i]->sector)
+    if(imposter->sector == sectorImposters[i]->sector &&
+       imposter->mat == sectorImposters[i]->sectorImposter->mat)
     {
+      sectorImposters[i]->sectorImposter->meshDirty = true;
       sectorImposters[i]->sectorImposter->imposterMeshes.Delete(imposter);
       return;
     }

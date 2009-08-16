@@ -33,8 +33,8 @@
 #include "engine.h"
 
 csImposterMesh::csImposterMesh (csEngine* engine, iSector* sector) : scfImplementationType(this),
-engine(engine), sector(sector), materialUpdateNeeded(false), numImposterMeshes(0),
-instance(false), removeMe(false)
+engine(engine), sector(sector), materialUpdateNeeded(false), matDirty(true), meshDirty(true), 
+numImposterMeshes(0), instance(false), removeMe(false)
 {
   // Create meshwrapper.
   csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
@@ -435,7 +435,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
 
       // Create colour buffer.
       static csVector4 c (1, 1, 1, 1.0);
-      GetMeshColors ()->Empty ();
+      mesh_colors.Empty ();
 
       for(size_t i=0; i<meshCount; ++i)
       {
@@ -467,7 +467,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
     }
 
     // Create texels buffer.
-    GetMeshTexels ()->Empty ();
+    mesh_texels.Empty ();
     for(size_t i=0; i<meshCount; ++i)
     {
       mesh_texels.Push (csVector2 (imposterMeshes[i]->texCoords.MaxX(),1-imposterMeshes[i]->texCoords.MaxY()));
@@ -482,13 +482,9 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
     mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
 
     // Create vertex buffer.
-    GetMeshVertices ()->Empty ();
+    mesh_vertices.Empty ();
     for(size_t i=0; i<meshCount; ++i)
     {
-      printf("Mesh: %s, %s, %s, %s\n", imposterMeshes[i]->vertices.GetVertices()[0].Description().GetData(),
-        imposterMeshes[i]->vertices.GetVertices()[1].Description().GetData(),
-        imposterMeshes[i]->vertices.GetVertices()[2].Description().GetData(),
-        imposterMeshes[i]->vertices.GetVertices()[3].Description().GetData());
       mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[0]);
       mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[1]);
       mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[2]);

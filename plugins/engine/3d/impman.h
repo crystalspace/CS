@@ -133,7 +133,7 @@ private:
   bool InitialiseImposter(ImposterMat* imposter);
 
   /* Updated an imposter. */
-  void UpdateImposter(ImposterMat* imposter);
+  bool UpdateImposter(ImposterMat* imposter);
 
   csRefArray<ImposterMat> imposterMats;
   csRefArray<ImposterMat> updateQueue;
