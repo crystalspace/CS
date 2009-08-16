@@ -33,7 +33,8 @@
 #include "engine.h"
 
 csImposterMesh::csImposterMesh (csEngine* engine, iSector* sector) : scfImplementationType(this),
-engine(engine), sector(sector), materialUpdateNeeded(false), numImposterMeshes(0), instance(false)
+engine(engine), sector(sector), materialUpdateNeeded(false), numImposterMeshes(0),
+instance(false), removeMe(false)
 {
   // Create meshwrapper.
   csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
@@ -54,9 +55,9 @@ engine(engine), sector(sector), materialUpdateNeeded(false), numImposterMeshes(0
 csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
                                 iMeshWrapper* pmesh, iRenderView* rview,
                                 bool instance, const char* shader) :
-scfImplementationType(this), engine(engine), instance(instance), shader(shader),
-materialUpdateNeeded(false), matDirty(true), meshDirty(true), fact(fact),
-camera(rview->GetCamera()), isUpdating(false)
+scfImplementationType(this), engine(engine), instance(instance), removeMe(false),
+shader(shader), materialUpdateNeeded(false), matDirty(true), meshDirty(true),
+fact(fact), camera(rview->GetCamera()), isUpdating(false)
 {
   // Misc inits.
   vertices.SetVertexCount (4);
@@ -205,6 +206,13 @@ bool csImposterMesh::Remove(iMeshWrapper* mesh)
       instances.DeleteIndexFast(i);
       return true;
     }
+  }
+
+  // Mark for removal.
+  if(!instance && mesh == closestInstanceMesh)
+  {
+    removeMe = true;
+    return true;
   }
 
   return false;
@@ -420,9 +428,9 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
       mesh->indexstart = 0;
       mesh->indexend = 6*meshCount;
 
-      csRef<csRenderBuffer> indexBuffer = csRenderBuffer::CreateIndexRenderBuffer(6*meshCount,
-        CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, 3*meshCount);
-      indexBuffer->CopyInto (mesh_indices.GetArray(), 6*meshCount);
+      csRef<csRenderBuffer> indexBuffer = csRenderBuffer::CreateIndexRenderBuffer(
+        mesh_indices.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, 3*meshCount);
+      indexBuffer->CopyInto (mesh_indices.GetArray(), mesh_indices.GetSize());
       mesh->buffers->SetRenderBuffer (CS_BUFFER_INDEX, indexBuffer);
 
       // Create colour buffer.
@@ -438,8 +446,8 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
       }
 
       csRef<csRenderBuffer> colBuffer = csRenderBuffer::CreateRenderBuffer(
-        4*meshCount, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 4);
-      colBuffer->CopyInto (mesh_colors.GetArray(), 4*meshCount);
+        mesh_colors.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 4);
+      colBuffer->CopyInto (mesh_colors.GetArray(), mesh_colors.GetSize());
       mesh->buffers->SetRenderBuffer (CS_BUFFER_COLOR, colBuffer);
 
       // Create normals buffer.
@@ -453,8 +461,8 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
       }
 
       csRef<csRenderBuffer> normalBuffer = csRenderBuffer::CreateRenderBuffer(
-        4*meshCount, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-      normalBuffer->CopyInto (normals.GetArray(), 4*meshCount);
+        normals.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+      normalBuffer->CopyInto (normals.GetArray(), normals.GetSize());
       mesh->buffers->SetRenderBuffer (CS_BUFFER_NORMAL, normalBuffer);
     }
 
@@ -469,24 +477,27 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
     }
 
     csRef<csRenderBuffer> texBuffer = csRenderBuffer::CreateRenderBuffer(
-      4*meshCount, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-    texBuffer->CopyInto (mesh_texels.GetArray(), 4*meshCount);
+      mesh_texels.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+    texBuffer->CopyInto (mesh_texels.GetArray(), mesh_texels.GetSize());
     mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
 
     // Create vertex buffer.
     GetMeshVertices ()->Empty ();
-    csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
-      4*meshCount, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-
     for(size_t i=0; i<meshCount; ++i)
     {
+      printf("Mesh: %s, %s, %s, %s\n", imposterMeshes[i]->vertices.GetVertices()[0].Description().GetData(),
+        imposterMeshes[i]->vertices.GetVertices()[1].Description().GetData(),
+        imposterMeshes[i]->vertices.GetVertices()[2].Description().GetData(),
+        imposterMeshes[i]->vertices.GetVertices()[3].Description().GetData());
       mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[0]);
       mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[1]);
       mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[2]);
       mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[3]);
     }
 
-    vertBuffer->CopyInto (mesh_vertices.GetArray(), 4*meshCount);
+    csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
+      mesh_vertices.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+    vertBuffer->CopyInto (mesh_vertices.GetArray(), mesh_vertices.GetSize());
     mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertBuffer);
 
     matDirty = false;

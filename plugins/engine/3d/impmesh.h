@@ -83,6 +83,9 @@ private:
   // Whether or not we're instancing.
   bool instance;
 
+  // True if we're ready to be removed.
+  bool removeMe;
+
   // Shader to use on the imposter material.
   csString shader;
 
@@ -166,7 +169,8 @@ public:
   /**
    * Whether this imposter is currently instancing any meshes.
    */
-  virtual bool IsInstancing() { return !instance || instances.GetSize() != 0; }
+  virtual bool IsInstancing()
+  { return (!instance && !removeMe) || instances.GetSize() != 0; }
 
   /**
    * Add an instance of the passed mesh.

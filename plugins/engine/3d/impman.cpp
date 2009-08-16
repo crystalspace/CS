@@ -76,8 +76,11 @@ bool csImposterManager::HandleEvent(iEvent &ev)
     if(updateQueue[0]->remove)
     {
       csImposterMesh* cmesh = static_cast<csImposterMesh*>(&*(updateQueue[0]->mesh));
-      cmesh->mesh->GetMovable()->SetSector(0);
-      cmesh->mesh->GetMovable()->UpdateMove();
+      if(cmesh->mesh)
+      {
+        cmesh->mesh->GetMovable()->SetSector(0);
+        cmesh->mesh->GetMovable()->UpdateMove();
+      }
 
       RemoveMeshFromImposter(updateQueue[0]->mesh);
       imposterMats.Delete(updateQueue[0]);
