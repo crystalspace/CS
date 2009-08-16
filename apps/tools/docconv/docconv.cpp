@@ -101,7 +101,7 @@ void DocConv::ConvertFile(const char* val, csRef<iDocumentSystem> inputDS, csRef
   
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Parsing file %s", val);
   
-  if (strstr (val, ".zip"))
+  if (!strcmp(val + strlen(val) - 4, ".zip"))
   {
     vfs->Unmount("/tmp/docconv_data", NULL);
     vfs->Mount ("/tmp/docconv_data", val);
