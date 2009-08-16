@@ -87,6 +87,7 @@ private:
   csString shader;
 
   // Flags that indicate that we have been updated.
+  bool materialUpdateNeeded;
   bool matDirty;
   bool meshDirty;
 
@@ -97,8 +98,11 @@ private:
   // Rendermesh holder for this mesh
   csRenderMeshHolder rmHolder;
 
-  // Rect for cardboard cutout version
-  csPoly3D cutout;
+  // Rect for billboard
+  csPoly3D vertices;
+
+  // Normals.
+  csVector3 normals;
 
   // Imposter material.
   csRef<iMaterialWrapper> mat;
@@ -140,7 +144,7 @@ private:
 
   void DestroyInstance(Instance* instance);
 
-  void InitMesh(iCamera* camera);
+  void InitMesh();
 
   bool WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh);
 
@@ -151,7 +155,7 @@ private:
   friend class csImposterManager;
 
 public:
-  csImposterMesh (csEngine* engine);
+  csImposterMesh (csEngine* engine, iSector* sector);
 
   csImposterMesh (csEngine* engine, iImposterFactory* fact,
     iMeshWrapper* mesh, iRenderView* rview, bool instance, const char* shader);

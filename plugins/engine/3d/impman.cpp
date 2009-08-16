@@ -61,31 +61,33 @@ csImposterManager::~csImposterManager()
 
 bool csImposterManager::HandleEvent(iEvent &ev)
 {
-  for(size_t i=0; i<updateQueue.GetSize(); ++i)
+  if(!updateQueue.IsEmpty())
   {
-    if(!updateQueue[i]->init)
+    if(!updateQueue[0]->init)
     {
-      InitialiseImposter(updateQueue[i]);
-      updateQueue[i]->init = true;
+      updateQueue[0]->init = InitialiseImposter(updateQueue[0]);
     }
-    else if(updateQueue[i]->update)
+    else if(updateQueue[0]->update)
     {
-      UpdateImposter(updateQueue[i]);
-      updateQueue[i]->update = false;
+      UpdateImposter(updateQueue[0]);
+      updateQueue[0]->update = false;
     }
 
-    if(updateQueue[i]->remove)
+    if(updateQueue[0]->remove)
     {
-      csImposterMesh* cmesh = static_cast<csImposterMesh*>(&*(updateQueue[i]->mesh));
+      csImposterMesh* cmesh = static_cast<csImposterMesh*>(&*(updateQueue[0]->mesh));
       cmesh->mesh->GetMovable()->SetSector(0);
       cmesh->mesh->GetMovable()->UpdateMove();
 
-      RemoveMeshFromImposter(updateQueue[i]->mesh);
-      imposterMats.Delete(updateQueue[i]);
+      RemoveMeshFromImposter(updateQueue[0]->mesh);
+      imposterMats.Delete(updateQueue[0]);
+    }
+
+    if(updateQueue[0]->init || updateQueue[0]->remove)
+    {
+      updateQueue.DeleteIndexFast(0);
     }
   }
-
-  updateQueue.Empty();
 
   return false;
 }
@@ -289,13 +291,13 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
   return material;
 }
 
-void csImposterManager::InitialiseImposter(ImposterMat* imposter)
+bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
 {
   csImposterMesh* csIMesh = static_cast<csImposterMesh*>(&*imposter->mesh);
   csMeshWrapper* csMesh = static_cast<csMeshWrapper*>(&*csIMesh->closestInstanceMesh);
 
   if(!csIMesh->camera.IsValid())
-    return;
+    return false;
 
   // Set material shader.
   imposter->shader = csIMesh->shader;
@@ -362,11 +364,13 @@ void csImposterManager::InitialiseImposter(ImposterMat* imposter)
     csIMesh->mesh->GetMovable()->SetSector(csIMesh->sector);
     csIMesh->mesh->GetMovable()->UpdateMove();
   }
-  else
+  else if(!imposter->init)
   {
     // Add imposter mesh to our sector imposter.
     AddMeshToImposter(imposter->mesh);
   }
+
+  return true;
 }
 
 void csImposterManager::UpdateImposter(ImposterMat* imposter)
@@ -381,7 +385,7 @@ void csImposterManager::UpdateImposter(ImposterMat* imposter)
     return;
   }
 
-  if(csIMesh->closestInstance < imposter->lastDistance)
+  if(csIMesh->closestInstance < imposter->lastDistance || csIMesh->materialUpdateNeeded)
   {
     // Calculate new texture sizes.
     csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(csIMesh->camera);
@@ -407,6 +411,7 @@ void csImposterManager::AddMeshToImposter(csImposterMesh* imposter)
     if(imposter->sector == sectorImposters[i]->sector &&
        sectorImposters[i]->sectorImposter->mat == imposter->mat)
     {
+      sectorImposters[i]->sectorImposter->meshDirty = true;
       sectorImposters[i]->sectorImposter->imposterMeshes.Push(imposter);
       return;
     }
@@ -416,13 +421,9 @@ void csImposterManager::AddMeshToImposter(csImposterMesh* imposter)
   newSectorI.AttachNew(new SectorImposter());
 
   newSectorI->sector = imposter->sector;
+  newSectorI->sectorImposter.AttachNew(new csImposterMesh(engine, newSectorI->sector));
   newSectorI->sectorImposter->imposterMeshes.Push(imposter);
-  newSectorI->sectorImposter.AttachNew(new csImposterMesh(engine));
   newSectorI->sectorImposter->mat = imposter->mat;
-
-  newSectorI->sectorImposter->mesh->GetMovable()->SetPosition(csVector3(0.0f));
-  newSectorI->sectorImposter->mesh->GetMovable()->SetSector(newSectorI->sector);
-  newSectorI->sectorImposter->mesh->GetMovable()->UpdateMove();
 
   sectorImposters.Push(newSectorI);
 }

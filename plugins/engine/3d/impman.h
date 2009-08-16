@@ -130,7 +130,7 @@ private:
       csBox2& texCoords, size_t& width, size_t& height);
 
   /* Initialises an imposter. */
-  void InitialiseImposter(ImposterMat* imposter);
+  bool InitialiseImposter(ImposterMat* imposter);
 
   /* Updated an imposter. */
   void UpdateImposter(ImposterMat* imposter);

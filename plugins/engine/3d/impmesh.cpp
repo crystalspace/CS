@@ -32,8 +32,8 @@
 #include "light.h"
 #include "engine.h"
 
-csImposterMesh::csImposterMesh (csEngine* engine) : scfImplementationType(this),
-numImposterMeshes(0), instance(false)
+csImposterMesh::csImposterMesh (csEngine* engine, iSector* sector) : scfImplementationType(this),
+engine(engine), sector(sector), materialUpdateNeeded(false), numImposterMeshes(0), instance(false)
 {
   // Create meshwrapper.
   csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
@@ -45,35 +45,40 @@ numImposterMeshes(0), instance(false)
   mesh->GetMeshObject()->GetObjectModel()->SetObjectBoundingBox(
     csBox3(-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
     CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE));
+
+  mesh->GetMovable()->SetPosition(csVector3(0.0f));
+  mesh->GetMovable()->SetSector(sector);
+  mesh->GetMovable()->UpdateMove();
 }
 
 csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
                                 iMeshWrapper* pmesh, iRenderView* rview,
                                 bool instance, const char* shader) :
 scfImplementationType(this), engine(engine), instance(instance), shader(shader),
-matDirty(true), meshDirty(true), fact(fact), camera(rview->GetCamera()), isUpdating(false)
+materialUpdateNeeded(false), matDirty(true), meshDirty(true), fact(fact),
+camera(rview->GetCamera()), isUpdating(false)
 {
   // Misc inits.
-  cutout.SetVertexCount (4);
+  vertices.SetVertexCount (4);
   meshLocalDir.Set (0, 0, 0);
   cameraLocalDir.Set (0, 0, 0);
   sector = pmesh->GetMovable()->GetSectors()->Get(0);
   g3d = csQueryRegistry<iGraphics3D>(engine->GetObjectRegistry());
 
-  // Create meshwrapper.
-  csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
-  csString name(pmesh->QueryObject()->GetName());
-  cmesh->SetName(name + "_imposter");
-  cmesh->SetRenderPriority(engine->GetRenderPriority("alpha"));
-  mesh = csPtr<iMeshWrapper>(cmesh);
-
-  // Set bbox so that it's never culled.
-  mesh->GetMeshObject()->GetObjectModel()->SetObjectBoundingBox(
-    csBox3(-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
-    CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE));
-
   if(instance)
   {
+    // Create meshwrapper.
+    csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
+    csString name(pmesh->QueryObject()->GetName());
+    cmesh->SetName(name + "_imposter");
+    cmesh->SetRenderPriority(engine->GetRenderPriority("alpha"));
+    mesh = csPtr<iMeshWrapper>(cmesh);
+
+    // Set bbox so that it's never culled.
+    mesh->GetMeshObject()->GetObjectModel()->SetObjectBoundingBox(
+      csBox3(-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
+      CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE));
+
     // Init shadervar array.
     csRef<iShaderVarStringSet> SVstrings = csQueryRegistryTagInterface<iShaderVarStringSet>(
       engine->GetObjectRegistry(), "crystalspace.shader.variablenameset");
@@ -93,15 +98,15 @@ matDirty(true), meshDirty(true), fact(fact), camera(rview->GetCamera()), isUpdat
 
     // Create first instance of the imposter.
     CreateInstance(pmesh);
-
-    // Set the initial distance.
-    closestInstanceMesh = pmesh;
-    closestInstance = (rview->GetCamera()->GetTransform().GetOrigin()
-      - pmesh->GetMovable()->GetPosition()).Norm();
   }
 
+  // Set the initial distance.
+  closestInstanceMesh = pmesh;
+  closestInstance = (rview->GetCamera()->GetTransform().GetOrigin()
+    - pmesh->GetMovable()->GetPosition()).Norm();
+
   // Init the imposter mesh.
-  InitMesh(rview->GetCamera());
+  InitMesh();
 
   // Register this imposter with the manager.
   impman = csQueryRegistry<iImposterManager>(engine->GetObjectRegistry());
@@ -141,16 +146,27 @@ bool csImposterMesh::Add(iMeshWrapper* mesh, iRenderView* rview)
 
 bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
 {
-  for(size_t i=0; i<instances.GetSize(); ++i)
+  for(size_t i=0; i<instances.GetSize() || !instance; ++i)
   {
-    if(instances[i]->mesh == mesh)
+    if((!instance && closestInstanceMesh == mesh) ||
+        (instance && instances[i]->mesh == mesh))
     {
       // Check that this imposter mesh is valid for this meshwrapper.
       if(!WithinTolerance(rview, mesh))
       {
-        DestroyInstance(instances[i]);
-        instances.DeleteIndexFast(i);
-        return false;
+        if(instance)
+        {
+          DestroyInstance(instances[i]);
+          instances.DeleteIndexFast(i);
+          return false;
+        } 
+        else
+        {
+          // Update mesh
+          camera = rview->GetCamera();
+          InitMesh();
+          materialUpdateNeeded = true;
+        }
       }
 
       // Update the distance.
@@ -171,6 +187,9 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
 
       return true;
     }
+
+    if(!instance)
+      break;
   }
 
   return false;
@@ -232,7 +251,7 @@ void csImposterMesh::DestroyInstance(Instance* instance)
   delete instance;
 }
 
-void csImposterMesh::InitMesh(iCamera* camera)
+void csImposterMesh::InitMesh()
 {
   // Save camera orientation
   const csOrthoTransform oldt = camera->GetTransform();
@@ -242,19 +261,42 @@ void csImposterMesh::InitMesh(iCamera* camera)
   csVector3 campos = camera->GetTransform().GetOrigin();
   camera->GetTransform ().LookAt(meshcenter-campos, camera->GetTransform().GetT2O().Col2());
 
-  // Get camera and object space size.
-  csReversibleTransform tr_o2c = camera->GetTransform ();
-  if (!closestInstanceMesh->GetMovable()->IsFullTransformIdentity())
-    tr_o2c /= closestInstanceMesh->GetMovable()->GetFullTransform();
-  const csBox3& cbbox = closestInstanceMesh->GetTransformedBoundingBox(tr_o2c);
-  const csBox3& obbox = closestInstanceMesh->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox();
+  if (instance)
+  {
+    // Get camera and object space size.
+    csReversibleTransform tr_o2c = camera->GetTransform ();
+    if (!closestInstanceMesh->GetMovable()->IsFullTransformIdentity())
+      tr_o2c /= closestInstanceMesh->GetMovable()->GetFullTransform();
+    const csBox3& cbbox = closestInstanceMesh->GetTransformedBoundingBox(tr_o2c);
+    const csBox3& obbox = closestInstanceMesh->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox();
 
-  // Calculate object space billboard size.
-  float z = (bbox.MinZ() + bbox.MaxZ()) / 2;
-  cutout[0] = csVector3(cbbox.MaxX(), obbox.MaxY(), z);
-  cutout[1] = csVector3(cbbox.MaxX(), obbox.MinY(), z);
-  cutout[2] = csVector3(cbbox.MinX(), obbox.MinY(), z);
-  cutout[3] = csVector3(cbbox.MinX(), obbox.MaxY(), z);
+    // Calculate object space billboard size.
+    float z = (bbox.MinZ() + bbox.MaxZ()) / 2;
+    vertices[0] = csVector3(cbbox.MaxX(), obbox.MaxY(), z);
+    vertices[1] = csVector3(cbbox.MaxX(), obbox.MinY(), z);
+    vertices[2] = csVector3(cbbox.MinX(), obbox.MinY(), z);
+    vertices[3] = csVector3(cbbox.MinX(), obbox.MaxY(), z);
+  }
+  else
+  {
+    // Get screen bounding box
+    csScreenBoxResult screenbox = closestInstanceMesh->GetScreenBoundingBox(camera);
+
+    // Unproject screen bounding box into camera space.
+    csVector3 v1 = camera->InvPerspective(screenbox.sbox.GetCorner(3), screenbox.cbox.MinZ());
+    csVector3 v2 = camera->InvPerspective(screenbox.sbox.GetCorner(2), screenbox.cbox.MinZ());
+    csVector3 v3 = camera->InvPerspective(screenbox.sbox.GetCorner(0), screenbox.cbox.MinZ());
+    csVector3 v4 = camera->InvPerspective(screenbox.sbox.GetCorner(1), screenbox.cbox.MinZ());
+
+    // Get world space vertex coordinates.
+    vertices[0] = camera->GetTransform().This2Other(v1);
+    vertices[1] = camera->GetTransform().This2Other(v2);
+    vertices[2] = camera->GetTransform().This2Other(v3);
+    vertices[3] = camera->GetTransform().This2Other(v4);
+
+    // Get normals.
+    normals = camera->GetTransform().This2Other(csVector3(0, 0, -1));
+  }
 
   // Restore camera orientation.
   camera->SetTransform (oldt);
@@ -400,10 +442,10 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh,  bool rmCreated, iCa
       csDirtyAccessArray<csVector3> normals;
       for(size_t i=0; i<meshCount; ++i)
       {
-        normals.Push(csVector3(0, 0, -1));
-        normals.Push(csVector3(0, 0, -1));
-        normals.Push(csVector3(0, 0, -1));
-        normals.Push(csVector3(0, 0, -1));
+        normals.Push(imposterMeshes[i]->normals);
+        normals.Push(imposterMeshes[i]->normals);
+        normals.Push(imposterMeshes[i]->normals);
+        normals.Push(imposterMeshes[i]->normals);
       }
 
       csRef<csRenderBuffer> normalBuffer = csRenderBuffer::CreateRenderBuffer(
@@ -434,11 +476,10 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh,  bool rmCreated, iCa
 
     for(size_t i=0; i<meshCount; ++i)
     {
-      imposterMeshes[i]->InitMesh(camera);
-      mesh_vertices.Push(imposterMeshes[i]->cutout.GetVertices()[0]);
-      mesh_vertices.Push(imposterMeshes[i]->cutout.GetVertices()[1]);
-      mesh_vertices.Push(imposterMeshes[i]->cutout.GetVertices()[2]);
-      mesh_vertices.Push(imposterMeshes[i]->cutout.GetVertices()[3]);
+      mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[0]);
+      mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[1]);
+      mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[2]);
+      mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[3]);
     }
 
     vertBuffer->CopyInto (mesh_vertices.GetArray(), 4*meshCount);
@@ -534,11 +575,11 @@ void csImposterMesh::SetupRenderMeshesInstance(csRenderMesh*& mesh, bool rmCreat
     mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
 
     // Recalculate vertex positions.
-    InitMesh(camera);
+    InitMesh();
     GetMeshVertices ()->Empty ();
     csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
       4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-    vertBuffer->CopyInto (cutout.GetVertices (), 4);
+    vertBuffer->CopyInto (vertices.GetVertices (), 4);
     mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertBuffer);
 
     matDirty = false;
