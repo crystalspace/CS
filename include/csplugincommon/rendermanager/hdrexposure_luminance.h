@@ -62,12 +62,13 @@ namespace CS
 	  int lastTargetW, lastTargetH;
 	  csRef<iDataBuffer> lastData;
 	  int lastW, lastH;
+	  iTextureHandle* lastMeasureTex;
 	  
 	  BaseHierarchical (const char* intermediateTextureFormat,
 	    const char* outputTextureFormat) : colorScale (1.0f), 
 	    intermediateTextureFormat (intermediateTextureFormat),
 	    readbackFmt (CS::TextureFormatStrings::ConvertStructured (outputTextureFormat)),
-	    measureLayer (0), hdr (0) {}
+	    measureLayer (0), hdr (0), lastMeasureTex (0) {}
 	   
 	  /// Set up HDR exposure control for a post effects manager
 	  void Initialize (iObjectRegistry* objReg,
@@ -84,7 +85,8 @@ namespace CS
 	  bool SetupStage (LuminanceComputeStage& stage,
 	    int inputW, int inputH, int minSize, iTextureHandle* inputTex,
 	    iShader* computeShader);
-	  void SetupStages (int targetW, int targetH);
+	  void SetupStages (int targetW, int targetH,
+	    iTextureHandle* measureTex);
 	public:
 	  float GetColorScale () const { return colorScale; }
 	  void SetColorScale (float scale) { colorScale = scale; }

@@ -75,19 +75,23 @@ namespace CS
 	  
 	  CS_PROFILER_ZONE(HDRLuminance_GetResultData);
 	  
+	  iTextureHandle* measureTex =
+	    hdr->GetHDRPostEffects().GetLayerOutput (measureLayer);
+
 	  // (Re-)create computeTarget if not created/view dimensions changed
 	  if ((computeStages.GetSize() == 0)
 	      || (view->GetContext ()->GetWidth () != lastTargetW)
-	      || (view->GetContext ()->GetHeight () != lastTargetH))
+	      || (view->GetContext ()->GetHeight () != lastTargetH)
+	      || (lastMeasureTex != measureTex))
 	  {
 	    lastTargetW = view->GetContext ()->GetWidth ();
 	    lastTargetH = view->GetContext ()->GetHeight ();
-	    SetupStages (lastTargetW, lastTargetH);
+	    SetupStages (lastTargetW, lastTargetH, measureTex);
+	    lastMeasureTex = measureTex;
 	  }
 	  computeFX.DrawPostEffects (renderTree);
 	  
-	  iTextureHandle* measureTex =
-	    computeStages[computeStages.GetSize()-1].target;
+	  measureTex = computeStages[computeStages.GetSize()-1].target;
 	  int newW, newH;
 	  measureTex->GetRendererDimensions (newW, newH);
 	  
@@ -328,12 +332,12 @@ namespace CS
 	  return !lastStage;
 	}
 	
-	void BaseHierarchical::SetupStages (int targetW, int targetH)
+	void BaseHierarchical::SetupStages (int targetW, int targetH,
+					    iTextureHandle* measureTex)
 	{
-	  // Set up input layer (needed for 'priority ticket')
-	  iTextureHandle* measureTex =
-	    hdr->GetHDRPostEffects().GetLayerOutput (measureLayer);
-	    
+	  computeStages.Empty();
+	  computeFX.ClearLayers();
+
 	  int currentW = targetW;
 	  int currentH = targetH;
 	  const int minSize = 16; // Arbitrary
