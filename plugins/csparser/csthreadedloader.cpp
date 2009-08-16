@@ -1413,7 +1413,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             file = child->GetContentsValue();
           }
 
-          csRef<iDocumentNode> lib = libs.Get(libIDs.Find(file));
+          csRef<iDocumentNode> lib;
+          size_t idx = libIDs.Find(file);
+          if(idx != csArrayItemNotFound)
+          {
+            lib = libs.Get(idx);
+          }
+
           if(!lib.IsValid())
           {
             lib = child;
