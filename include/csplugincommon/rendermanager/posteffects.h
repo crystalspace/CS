@@ -105,7 +105,7 @@ namespace RenderManager
   class CS_CRYSTALSPACE_EXPORT PostEffectManager :
     public CS::Memory::CustomAllocatedDerived<csRefCount>
   {
-    class DimensionData;
+    struct DimensionData;
   public:
     class Layer;
     /**
@@ -186,7 +186,7 @@ namespace RenderManager
     {
     private:
       friend class PostEffectManager;
-      friend class DimensionData;
+      friend struct DimensionData;
       
       csRef<iShader> effectShader;
       int outTextureNum;
@@ -243,6 +243,11 @@ namespace RenderManager
     bool SetupView (uint width, uint height,
       CS::Math::Matrix4& perspectiveFixup);
     //@}
+
+    /**
+     * Discard (and thus cause recreation of) all intermediate textures.
+     */
+    void ClearIntermediates();
 
     /// Get the texture to render a scene to for post processing.
     iTextureHandle* GetScreenTarget ();

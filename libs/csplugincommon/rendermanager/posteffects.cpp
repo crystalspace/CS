@@ -161,6 +161,15 @@ bool PostEffectManager::SetupView (uint width, uint height,
   return result;
 }
 
+void PostEffectManager::ClearIntermediates()
+{
+  currentWidth = 0; currentHeight = 0;
+  currentDimData = 0;
+  dimCache.Clear (true);
+
+  //if (chainedEffects) chainedEffects->ClearIntermediates();
+}
+
 iTextureHandle* PostEffectManager::GetScreenTarget ()
 {
   if (postLayers.GetSize () > 1)
@@ -371,12 +380,16 @@ void PostEffectManager::SetChainedOutput (PostEffectManager* nextEffects)
 void PostEffectManager::DimensionData::AllocatePingpongTextures (
   PostEffectManager& pfx)
 {
+  size_t layer0bucket = pfx.GetBucketIndex (pfx.postLayers[0]->options);
   for (size_t b = 0; b < buckets.GetSize(); b++)
   {
     uint texFlags =
       CS_TEXTURE_3D | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP;
     if (!pfx.buckets[b].options.mipmap)
       texFlags |= CS_TEXTURE_NOMIPMAPS;
+    // Always clear the texture that is used as the screen target
+    if (layer0bucket == b)
+      texFlags |= CS_TEXTURE_CREATE_CLEAR;
     csRef<iTextureHandle> t;
     int texW = dim.x >> pfx.buckets[b].options.downsample;
     int texH = dim.y >> pfx.buckets[b].options.downsample;
@@ -649,7 +662,8 @@ void PostEffectManager::UpdateTextureDistribution()
     
     // Look for an unused texture
     size_t freeTexture;
-    if (keepAllIntermediates || buckets[bucket].options.noTextureReuse)
+    if (keepAllIntermediates || buckets[bucket].options.noTextureReuse
+	|| (l == 0))
       freeTexture = csArrayItemNotFound;
     else
       freeTexture = usedTextureBits[l].GetFirstBitUnset ();
