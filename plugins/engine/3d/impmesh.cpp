@@ -363,7 +363,7 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
   return &mesh;
 }
 
-void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh,  bool rmCreated, iCamera* camera)
+void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCamera* camera)
 {
   csDirtyAccessArray<uint>& mesh_indices = *GetMeshIndices ();
   csDirtyAccessArray<csVector3>& mesh_vertices = *GetMeshVertices ();
@@ -393,6 +393,10 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh,  bool rmCreated, iCa
   // Material or mesh changed.
   if (matDirty || meshDirty || rmCreated)
   {
+    // Update material pointer.
+    mesh->material = mat;
+
+    // Check for new imposter meshes.
     size_t meshCount = imposterMeshes.GetSize();
 
     if(numImposterMeshes != meshCount || rmCreated)
