@@ -337,10 +337,12 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   newView->SetCustomMatrixCamera(newCamera);
   newView->GetMeshFilter().SetFilterMode(MESH_FILTER_INCLUDE);
   newView->GetMeshFilter().AddFilterMesh(csMesh);
-  newView->SetRectangle(csIMesh->texCoords.MinX(), csIMesh->texCoords.MinY(),
+  newView->SetRectangle(csIMesh->texCoords.MinX(),
+    csIMesh->texCoords.MinY(),
     csIMesh->texCoords.MaxX()-csIMesh->texCoords.MinX(),
-    csIMesh->texCoords.MaxY()-csIMesh->texCoords.MinY());
+    csIMesh->texCoords.MaxY()-csIMesh->texCoords.MinY(), false);
   newView->UpdateClipper ();
+
 
   // Normalise the texture coordinates.
   csIMesh->texCoords.Set(csIMesh->texCoords.MinX()/rTexWidth,
