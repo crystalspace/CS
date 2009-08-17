@@ -127,7 +127,7 @@ csImposterManager::TextureSpace::TextureSpace(size_t width,
     }
     else
     {
-      if(width < height)
+      if(width < height || parent->height < parent->width)
       {
         minX = parent->minX + width;
         minY = parent->minY;
@@ -268,10 +268,8 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
   }
 
   // Else create a new texture.
-  rTexWidth = csFindNearestPowerOf2((int)imposter->texWidth > g3d->GetWidth() ?
-    (int)imposter->texWidth : g3d->GetWidth());
-  rTexHeight = csFindNearestPowerOf2((int)imposter->texHeight > g3d->GetHeight() ?
-    (int)imposter->texHeight : g3d->GetHeight());
+  rTexWidth = csFindNearestPowerOf2(g3d->GetWidth());
+  rTexHeight = csFindNearestPowerOf2(g3d->GetHeight());
 
   // Create texture handle. Size is the current screen size (to nearest pow2)
   // as that's the maximum texture size we should have to handle.
@@ -325,8 +323,10 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Get screen bounding box of the mesh.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
-  imposter->texWidth = rbox.sbox.MaxX() - rbox.sbox.MinX();
-  imposter->texHeight = rbox.sbox.MaxY() - rbox.sbox.MinY();
+  float widthRatio = csFindNearestPowerOf2(g3d->GetWidth())/(float)g3d->GetWidth();
+  float heightRatio = csFindNearestPowerOf2(g3d->GetHeight())/(float)g3d->GetHeight();
+  imposter->texWidth = widthRatio*(rbox.sbox.MaxX() - rbox.sbox.MinX());
+  imposter->texHeight = heightRatio*(rbox.sbox.MaxY() - rbox.sbox.MinY());
 
   // Allocate texture space.
   size_t rTexWidth, rTexHeight;
@@ -350,8 +350,10 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Calculate required projection shift.
   CS::Math::Matrix4 projShift (
-      1, 0, 0, 2*csIMesh->texCoords.MinX() + (rTexWidth-2*rbox.sbox.MinX())/rTexWidth - 1,
-      0, 1, 0, 2*csIMesh->texCoords.MinY() + (rTexHeight-2*rbox.sbox.MinY())/rTexHeight - 1,
+      1, 0, 0, 2*csIMesh->texCoords.MinX() +
+      (g3d->GetWidth()-2*rbox.sbox.MinX())/g3d->GetWidth() - 1,
+      0, 1, 0, 2*csIMesh->texCoords.MinY() +
+      (g3d->GetHeight()-2*rbox.sbox.MinY())/g3d->GetHeight() - 1,
       0, 0, 1, 0,
       0, 0, 0, 1);
 
