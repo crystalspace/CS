@@ -275,6 +275,9 @@ void ImposterTest::CreateRoom ()
 
   light = engine->CreateLight(0, csVector3(0, 3, -3), 10, csColor(0, 1, 0));
   ll->Add (light);
+
+  // Load shader required for this test app.
+  loader->LoadShader("/shader/lighting/lighting_imposter.xml");
 }
 
 void ImposterTest::CreateSprite (iMeshFactoryWrapper* imeshfact,
@@ -316,10 +319,13 @@ void ImposterTest::CreateSprites ()
   if (imeshfact == 0)
     ReportError("Error loading mesh object factory!");
 
+  // Set imposter settings.
   csRef<iImposterFactory> i = scfQueryInterface<iImposterFactory> (imeshfact);
   i->SetMinDistance(3.0f);
   i->SetRotationTolerance(0.40f);
   i->SetCameraRotationTolerance(3.0f);
+  i->SetShader("lighting_imposter");
+  i->SetInstancing(false);
 
   look_point = csVector3 (1, 1, 1);
 

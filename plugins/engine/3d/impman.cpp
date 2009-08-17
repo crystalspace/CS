@@ -167,7 +167,8 @@ csImposterManager::TextureSpace* csImposterManager::TextureSpace::Allocate(size_
   {
     // It can't. Check if we have room in this one.
     if(rWidth <= width && rHeight <= height &&
-      !firstSpace->IsUsed() && !secondSpace->IsUsed())
+      (!firstSpace || !firstSpace->IsUsed()) &&
+      (!secondSpace || !secondSpace->IsUsed()))
     {
       texCoords.Set(minX, minY, minX+rWidth, minY+rHeight);
 
