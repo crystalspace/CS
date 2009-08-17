@@ -396,7 +396,7 @@ bool csImposterManager::UpdateImposter(ImposterMat* imposter)
   }
 
   bool updated = false;
-  if(csIMesh->closestInstance < imposter->lastDistance || csIMesh->materialUpdateNeeded)
+  if(csIMesh->materialUpdateNeeded || csIMesh->closestInstance < imposter->lastDistance)
   {
     // Calculate new texture sizes.
     csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(csIMesh->camera);
@@ -411,6 +411,7 @@ bool csImposterManager::UpdateImposter(ImposterMat* imposter)
       updated = true;
     }
 
+    csIMesh->materialUpdateNeeded = false;
     imposter->lastDistance = csIMesh->closestInstance;
   }
 
@@ -466,7 +467,7 @@ void csImposterManager::Register(iImposterMesh* mesh)
   updateQueue.Push(imposterMat);
 }
 
-void csImposterManager::Update(iImposterMesh* mesh)
+bool csImposterManager::Update(iImposterMesh* mesh)
 {
   for(size_t i=0; i<imposterMats.GetSize(); ++i)
   {
@@ -478,10 +479,14 @@ void csImposterManager::Update(iImposterMesh* mesh)
       {
         updateQueue.Push(imposterMats[i]);
         imposterMats[i]->update = true;
-        break;
+        return true;
       }
+
+      break;
     }
   }
+
+  return false;
 }
 
 void csImposterManager::Unregister(iImposterMesh* mesh)
@@ -492,7 +497,7 @@ void csImposterManager::Unregister(iImposterMesh* mesh)
     {
       updateQueue.Push(imposterMats[i]);
       imposterMats[i]->remove = true;
-      break;
+      return;
     }
   }
 }

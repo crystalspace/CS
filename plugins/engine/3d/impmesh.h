@@ -155,6 +155,9 @@ private:
 
   void SetupRenderMeshesInstance(csRenderMesh*& mesh,  bool rmCreated, iCamera* camera);
 
+  // For batched imposter sorting.
+  static int ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s);
+
   friend class csImposterManager;
 
 public:

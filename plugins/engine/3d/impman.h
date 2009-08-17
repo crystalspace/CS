@@ -168,7 +168,7 @@ public:
   /////////////// iImposterManager ///////////////
   void Register(iImposterMesh* mesh);
 
-  void Update(iImposterMesh* mesh);
+  bool Update(iImposterMesh* mesh);
 
   void Unregister(iImposterMesh* mesh);
 };

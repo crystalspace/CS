@@ -190,8 +190,7 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
       // Update material!
       if(!isUpdating)
       {
-        impman->Update(this);
-        isUpdating = true;
+        isUpdating = impman->Update(this);
       }
 
       return true;
@@ -379,6 +378,17 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
   return &mesh;
 }
 
+int csImposterMesh::ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s)
+{
+  // Get distance from camera.
+  float distancef = (f->camera->GetTransform().GetOrigin() -
+    f->closestInstanceMesh->GetMovable()->GetPosition()).Norm();
+  float distances = (s->camera->GetTransform().GetOrigin() -
+    s->closestInstanceMesh->GetMovable()->GetPosition()).Norm();
+
+  return (distancef > distances) ? -1 : 1;
+}
+
 void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCamera* camera)
 {
   csDirtyAccessArray<uint>& mesh_indices = *GetMeshIndices ();
@@ -410,8 +420,15 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
     // Update material pointer.
     mesh->material = mat;
 
+    // Sort imposter meshes.
+    csArray<csImposterMesh*> sortedMeshes;
+    for(size_t i=0; i<imposterMeshes.GetSize(); ++i)
+    {
+      sortedMeshes.InsertSorted(imposterMeshes[i], &ImposterMeshSort);
+    }
+
     // Check for new imposter meshes.
-    size_t meshCount = imposterMeshes.GetSize();
+    size_t meshCount = sortedMeshes.GetSize();
 
     if(numImposterMeshes != meshCount || rmCreated)
     {
@@ -460,10 +477,10 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
       csDirtyAccessArray<csVector3> normals;
       for(size_t i=0; i<meshCount; ++i)
       {
-        normals.Push(imposterMeshes[i]->normals);
-        normals.Push(imposterMeshes[i]->normals);
-        normals.Push(imposterMeshes[i]->normals);
-        normals.Push(imposterMeshes[i]->normals);
+        normals.Push(sortedMeshes[i]->normals);
+        normals.Push(sortedMeshes[i]->normals);
+        normals.Push(sortedMeshes[i]->normals);
+        normals.Push(sortedMeshes[i]->normals);
       }
 
       csRef<csRenderBuffer> normalBuffer = csRenderBuffer::CreateRenderBuffer(
@@ -472,16 +489,14 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
       mesh->buffers->SetRenderBuffer (CS_BUFFER_NORMAL, normalBuffer);
     }
 
-    // Depth sort the billboards.
-
     // Create texels buffer.
     mesh_texels.Empty ();
     for(size_t i=0; i<meshCount; ++i)
     {
-      mesh_texels.Push (csVector2 (imposterMeshes[i]->texCoords.MaxX(),1-imposterMeshes[i]->texCoords.MaxY()));
-      mesh_texels.Push (csVector2 (imposterMeshes[i]->texCoords.MaxX(),1-imposterMeshes[i]->texCoords.MinY()));
-      mesh_texels.Push (csVector2 (imposterMeshes[i]->texCoords.MinX(),1-imposterMeshes[i]->texCoords.MinY()));
-      mesh_texels.Push (csVector2 (imposterMeshes[i]->texCoords.MinX(),1-imposterMeshes[i]->texCoords.MaxY()));
+      mesh_texels.Push (csVector2 (sortedMeshes[i]->texCoords.MaxX(),1-sortedMeshes[i]->texCoords.MaxY()));
+      mesh_texels.Push (csVector2 (sortedMeshes[i]->texCoords.MaxX(),1-sortedMeshes[i]->texCoords.MinY()));
+      mesh_texels.Push (csVector2 (sortedMeshes[i]->texCoords.MinX(),1-sortedMeshes[i]->texCoords.MinY()));
+      mesh_texels.Push (csVector2 (sortedMeshes[i]->texCoords.MinX(),1-sortedMeshes[i]->texCoords.MaxY()));
     }
 
     csRef<csRenderBuffer> texBuffer = csRenderBuffer::CreateRenderBuffer(
@@ -493,10 +508,10 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
     mesh_vertices.Empty ();
     for(size_t i=0; i<meshCount; ++i)
     {
-      mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[0]);
-      mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[1]);
-      mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[2]);
-      mesh_vertices.Push(imposterMeshes[i]->vertices.GetVertices()[3]);
+      mesh_vertices.Push(sortedMeshes[i]->vertices.GetVertices()[0]);
+      mesh_vertices.Push(sortedMeshes[i]->vertices.GetVertices()[1]);
+      mesh_vertices.Push(sortedMeshes[i]->vertices.GetVertices()[2]);
+      mesh_vertices.Push(sortedMeshes[i]->vertices.GetVertices()[3]);
     }
 
     csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
