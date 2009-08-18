@@ -53,6 +53,9 @@ csImposterManager::csImposterManager(csEngine* engine)
 
   csRef<iEventQueue> queue = csQueryRegistry<iEventQueue> (engine->GetObjectRegistry());
   queue->RegisterListener(event_handler, esub);
+
+  csRef<iConfigManager> cfman = csQueryRegistry<iConfigManager>(engine->GetObjectRegistry());
+  updatePerFrame = cfman->GetInt("Engine.Imposters.UpdatePerFrame", 10);
 }
 
 csImposterManager::~csImposterManager()
@@ -61,6 +64,7 @@ csImposterManager::~csImposterManager()
 
 bool csImposterManager::HandleEvent(iEvent &ev)
 {
+  int updated = 0;
   for(size_t i=0; i<updateQueue.GetSize(); ++i)
   {
     if(updateQueue[i]->remove)
@@ -78,14 +82,18 @@ bool csImposterManager::HandleEvent(iEvent &ev)
     else if(!updateQueue[i]->init)
     {
        updateQueue[i]->init = InitialiseImposter(updateQueue[i]);
+       ++updated;
     }
     else if(updateQueue[i]->update)
     {
       updateQueue[i]->update = false;
       if(UpdateImposter(updateQueue[i]))
       {
-        updateQueue.DeleteIndexFast(i);
-        break;
+        if(++updated == updatePerFrame)
+        {
+          updateQueue.DeleteIndexFast(i);
+          break;
+        }
       }
     }
 

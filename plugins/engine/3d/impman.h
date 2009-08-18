@@ -144,6 +144,9 @@ private:
 
   size_t maxWidth;
   size_t maxHeight;
+
+  // Max number of imposters to update per frame.
+  int updatePerFrame;
   
   /**
    * For management of non-instanced meshes.
