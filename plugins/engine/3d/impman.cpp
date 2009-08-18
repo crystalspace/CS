@@ -283,13 +283,16 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
   csRef<iTextureWrapper> tex = engine->GetTextureList()->CreateTexture(texh);
   csRef<iMaterialWrapper> material = engine->CreateMaterial("impostermat", tex);
 
-  // Set shaders.
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>(
-    engine->GetObjectRegistry(), "crystalspace.shared.stringset");
-  csStringID shadertype = strings->Request("base");
-  csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
-  iShader* shader = shman->GetShader(imposter->shader);
-  material->GetMaterial()->SetShader(shadertype, shader);
+  // If a shader was specified, use it.
+  if (!imposter->shader.IsEmpty())
+  {
+    csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>(
+      engine->GetObjectRegistry(), "crystalspace.shared.stringset");
+    csStringID shadertype = strings->Request("base");
+    csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
+    iShader* shader = shman->GetShader(imposter->shader);
+    material->GetMaterial()->SetShader(shadertype, shader);
+  }
 
   // Create new texture space.
   csRef<TextureSpace> newSpace;
