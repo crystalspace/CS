@@ -267,10 +267,6 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
     }
   }
 
-  // Else create a new texture.
-  rTexWidth = csFindNearestPowerOf2(g3d->GetWidth());
-  rTexHeight = csFindNearestPowerOf2(g3d->GetHeight());
-
   // Create texture handle. Size is the current screen size (to nearest pow2)
   // as that's the maximum texture size we should have to handle.
   csRef<iTextureManager> texman = g3d->GetTextureManager();
@@ -323,13 +319,18 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Get screen bounding box of the mesh.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
-  float widthRatio = csFindNearestPowerOf2(g3d->GetWidth())/(float)g3d->GetWidth();
-  float heightRatio = csFindNearestPowerOf2(g3d->GetHeight())/(float)g3d->GetHeight();
-  imposter->texWidth = widthRatio*(rbox.sbox.MaxX() - rbox.sbox.MinX());
-  imposter->texHeight = heightRatio*(rbox.sbox.MaxY() - rbox.sbox.MinY());
+  imposter->texWidth = rbox.sbox.MaxX() - rbox.sbox.MinX();
+  imposter->texHeight = rbox.sbox.MaxY() - rbox.sbox.MinY();
+
+  if(imposter->texWidth == 0 || imposter->texHeight == 0)
+  {
+    csIMesh->rendered = true;
+    return true;
+  }
 
   // Allocate texture space.
-  size_t rTexWidth, rTexHeight;
+  size_t rTexWidth = csFindNearestPowerOf2(g3d->GetWidth());
+  size_t rTexHeight = csFindNearestPowerOf2(g3d->GetHeight());
   csIMesh->mat = AllocateTexture(imposter, csIMesh->texCoords, rTexWidth, rTexHeight);
 
   // Set up view.
@@ -338,11 +339,9 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   newView->GetMeshFilter().SetFilterMode(MESH_FILTER_INCLUDE);
   newView->GetMeshFilter().AddFilterMesh(csMesh);
   newView->SetRectangle(csIMesh->texCoords.MinX(),
-    csIMesh->texCoords.MinY(),
-    csIMesh->texCoords.MaxX()-csIMesh->texCoords.MinX(),
-    csIMesh->texCoords.MaxY()-csIMesh->texCoords.MinY(), false);
+    csIMesh->texCoords.MinY(), imposter->texWidth,
+    imposter->texHeight, false);
   newView->UpdateClipper ();
-
 
   // Normalise the texture coordinates.
   csIMesh->texCoords.Set(csIMesh->texCoords.MinX()/rTexWidth,
@@ -350,12 +349,15 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
                          csIMesh->texCoords.MaxX()/rTexWidth,
                          csIMesh->texCoords.MaxY()/rTexHeight);
 
-  // Calculate required projection shift.
+  float widthRatio = g3d->GetWidth()/(float)rTexWidth;
+  float heightRatio = g3d->GetHeight()/(float)rTexHeight;
+  float newMinX = (rTexWidth/2-imposter->texWidth/2);
+  float newMinY = (rTexHeight/2-imposter->texHeight/2);
+
+  // Calculate required projection.
   CS::Math::Matrix4 projShift (
-      1, 0, 0, 2*csIMesh->texCoords.MinX() +
-      (g3d->GetWidth()-2*rbox.sbox.MinX())/g3d->GetWidth() - 1,
-      0, 1, 0, 2*csIMesh->texCoords.MinY() +
-      (g3d->GetHeight()-2*rbox.sbox.MinY())/g3d->GetHeight() - 1,
+      widthRatio, 0, 0, 2*(csIMesh->texCoords.MinX() - newMinX/rTexWidth),
+      0, heightRatio, 0, 2*(csIMesh->texCoords.MinY() - newMinY/rTexHeight),
       0, 0, 1, 0,
       0, 0, 0, 1);
 
