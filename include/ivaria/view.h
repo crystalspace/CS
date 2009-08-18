@@ -51,7 +51,7 @@ struct iPerspectiveCamera;
  */
 struct iView : public virtual iBase
 {
-  SCF_INTERFACE(iView, 2,1,0);
+  SCF_INTERFACE(iView, 3,0,0);
   /// Get engine handle.
   virtual iEngine* GetEngine () = 0;
   /// Set engine handle.
@@ -121,6 +121,18 @@ struct iView : public virtual iBase
   virtual iCustomMatrixCamera* GetCustomMatrixCamera () = 0;
   /// Set current perspective camera.
   virtual void SetCustomMatrixCamera (iCustomMatrixCamera* c) = 0;
+
+  // Get the view width.
+  virtual int GetWidth () const = 0;
+
+  // Get the view height.
+  virtual int GetHeight () const = 0;
+
+  // Set the view width.
+  virtual void SetWidth (int w) = 0;
+
+  // Set the view height.
+  virtual void SetHeight (int h) = 0;
 };
 
 #endif // __CS_IVARIA_VIEW_H__

@@ -208,6 +208,9 @@ bool ImposterTest::SetupModules()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
+  engine->SetClearZBuf(true);
+  engine->SetClearScreen(true);
+
   // Here we create our world.
   CreateRoom();
 

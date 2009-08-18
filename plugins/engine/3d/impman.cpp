@@ -344,6 +344,9 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   newView->SetCustomMatrixCamera(newCamera);
   newView->GetMeshFilter().SetFilterMode(MESH_FILTER_INCLUDE);
   newView->GetMeshFilter().AddFilterMesh(csMesh);
+  newView->SetAutoResize(false);
+  newView->SetWidth(rTexWidth);
+  newView->SetHeight(rTexHeight);
   newView->SetRectangle(csIMesh->texCoords.MinX(),
     csIMesh->texCoords.MinY(), imposter->texWidth,
     imposter->texHeight, false);
