@@ -89,7 +89,10 @@ bool csImposterManager::HandleEvent(iEvent &ev)
       }
     }
 
-    updateQueue.DeleteIndex(i--);
+    if(updateQueue[i]->init || updateQueue[i]->remove)
+    {
+      updateQueue.DeleteIndex(i--);
+    }
   }
 
   return false;
