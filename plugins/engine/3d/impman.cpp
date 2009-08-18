@@ -74,16 +74,10 @@ bool csImposterManager::HandleEvent(iEvent &ev)
 
       RemoveMeshFromImposter(updateQueue[i]->mesh);
       imposterMats.Delete(updateQueue[i]);
-      updateQueue.DeleteIndex(i--);
     }
     else if(!updateQueue[i]->init)
     {
        updateQueue[i]->init = InitialiseImposter(updateQueue[i]);
-      if(updateQueue[i]->init)
-      {
-        updateQueue.DeleteIndexFast(i);
-        break;
-      }
     }
     else if(updateQueue[i]->update)
     {
@@ -93,9 +87,9 @@ bool csImposterManager::HandleEvent(iEvent &ev)
         updateQueue.DeleteIndexFast(i);
         break;
       }
-
-      updateQueue.DeleteIndex(i--);
     }
+
+    updateQueue.DeleteIndex(i--);
   }
 
   return false;
@@ -322,6 +316,11 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   imposter->texWidth = rbox.sbox.MaxX() - rbox.sbox.MinX();
   imposter->texHeight = rbox.sbox.MaxY() - rbox.sbox.MinY();
 
+  if(maxWidth < imposter->texWidth)
+    imposter->texWidth = maxWidth;
+  if(maxHeight < imposter->texHeight)
+    imposter->texHeight = maxHeight;
+
   if(imposter->texWidth == 0 || imposter->texHeight == 0)
   {
     csIMesh->rendered = true;
@@ -331,6 +330,10 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   // Allocate texture space.
   size_t rTexWidth = csFindNearestPowerOf2(g3d->GetWidth());
   size_t rTexHeight = csFindNearestPowerOf2(g3d->GetHeight());
+  if(maxWidth < rTexWidth)
+    rTexWidth = maxWidth;
+  if(maxHeight < rTexHeight)
+    rTexHeight = maxHeight;
   csIMesh->mat = AllocateTexture(imposter, csIMesh->texCoords, rTexWidth, rTexHeight);
 
   // Set up view.
@@ -411,6 +414,11 @@ bool csImposterManager::UpdateImposter(ImposterMat* imposter)
     csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(csIMesh->camera);
     size_t texWidth = csFindNearestPowerOf2(rbox.sbox.MaxX() - rbox.sbox.MinX());
     size_t texHeight = csFindNearestPowerOf2(rbox.sbox.MaxY() - rbox.sbox.MinY());
+
+    if(maxWidth < texWidth)
+      texWidth = maxWidth;
+    if(maxHeight < texHeight)
+      texHeight = maxHeight;
 
     if(imposter->texHeight < texHeight || imposter->texWidth < texWidth)
     {
