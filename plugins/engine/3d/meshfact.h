@@ -320,7 +320,7 @@ public:
   /**
    * Given a mesh, activate and update its imposter.
    */
-  virtual void UpdateImposter (iMeshWrapper* mesh, iRenderView* rview);
+  virtual bool UpdateImposter (iMeshWrapper* mesh, iRenderView* rview);
 
   /**
    * Given a mesh, deactivate and remove its imposter.

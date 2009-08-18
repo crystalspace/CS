@@ -385,6 +385,8 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
     AddMeshToImposter(imposter->mesh);
   }
 
+  csIMesh->rendered = true;
+
   return true;
 }
 

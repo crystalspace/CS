@@ -34,7 +34,7 @@
 
 csImposterMesh::csImposterMesh (csEngine* engine, iSector* sector) : scfImplementationType(this),
 engine(engine), sector(sector), materialUpdateNeeded(false), matDirty(true), meshDirty(true), 
-numImposterMeshes(0), instance(false), removeMe(false)
+numImposterMeshes(0), instance(false), removeMe(false), rendered(false)
 {
   // Create meshwrapper.
   csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
@@ -57,7 +57,7 @@ csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
                                 bool instance, const char* shader) :
 scfImplementationType(this), engine(engine), instance(instance), removeMe(false),
 shader(shader), materialUpdateNeeded(false), matDirty(true), meshDirty(true),
-fact(fact), camera(rview->GetCamera()), isUpdating(false)
+fact(fact), camera(rview->GetCamera()), isUpdating(false), rendered(false)
 {
   // Misc inits.
   vertices.SetVertexCount (4);
@@ -381,10 +381,17 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
 int csImposterMesh::ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s)
 {
   // Get distance from camera.
-  float distancef = (f->camera->GetTransform().GetOrigin() -
-    f->closestInstanceMesh->GetMovable()->GetPosition()).Norm();
-  float distances = (s->camera->GetTransform().GetOrigin() -
-    s->closestInstanceMesh->GetMovable()->GetPosition()).Norm();
+  csReversibleTransform tr_o2c = f->camera->GetTransform ();
+  if (!f->closestInstanceMesh->GetMovable()->IsFullTransformIdentity())
+    tr_o2c /= f->closestInstanceMesh->GetMovable()->GetFullTransform();
+  const csBox3& cbboxf = f->closestInstanceMesh->GetTransformedBoundingBox(tr_o2c);
+  float distancef = cbboxf.MinZ();
+
+  tr_o2c = s->camera->GetTransform ();
+  if (!s->closestInstanceMesh->GetMovable()->IsFullTransformIdentity())
+    tr_o2c /= s->closestInstanceMesh->GetMovable()->GetFullTransform();
+  const csBox3& cbboxs = s->closestInstanceMesh->GetTransformedBoundingBox(tr_o2c);
+  float distances = cbboxs.MinZ();
 
   return (distancef > distances) ? -1 : 1;
 }
@@ -424,6 +431,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
     csArray<csImposterMesh*> sortedMeshes;
     for(size_t i=0; i<imposterMeshes.GetSize(); ++i)
     {
+      imposterMeshes[i]->camera = camera;
       sortedMeshes.InsertSorted(imposterMeshes[i], &ImposterMeshSort);
     }
 

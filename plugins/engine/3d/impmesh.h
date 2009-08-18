@@ -141,6 +141,9 @@ private:
 
   iSector* sector;
 
+  // True if r2t has been performed for this imposter.
+  bool rendered;
+
   void AddSVToMesh(iMeshWrapper* mesh, csShaderVariable* sv);
 
   void CreateInstance(iMeshWrapper* pmesh);
@@ -200,6 +203,14 @@ public:
    * Destroy this imposter.
    */
   virtual void Destroy();
+
+  /**
+   * Query whether the r2t has been performed for this imposter.
+   */
+  virtual bool Rendered() const
+  {
+    return rendered;
+  }
 
   ///////////////////// iObjectModel /////////////////////
   virtual const csBox3& GetObjectBoundingBox()

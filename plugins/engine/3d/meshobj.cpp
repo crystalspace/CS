@@ -412,10 +412,12 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     {
       if (UseImposter (rview))
       {
-        factwrap->UpdateImposter (this, rview);
-        using_imposter = true;
-        n = 0;
-        return 0;
+        if(factwrap->UpdateImposter (this, rview))
+        {
+          using_imposter = true;
+          n = 0;
+          return 0;
+        }
       }
       else if (using_imposter)
       {
