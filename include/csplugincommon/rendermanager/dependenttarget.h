@@ -97,12 +97,12 @@ namespace RenderManager
       if (targetInfo == 0)
       {
         RenderTargetInfo newInfo;
-        newInfo.views.PutUnique (subtexture, newView);
+        newInfo.views.Put (subtexture, newView);
         targets->PutUnique (target, newInfo);
       }
       else
       {
-        targetInfo->views.PutUnique (subtexture, newView);
+        targetInfo->views.Put (subtexture, newView);
       }
     }
 

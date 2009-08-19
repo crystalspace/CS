@@ -52,20 +52,77 @@ private:
     CS_EVENTHANDLER_NIL_CONSTRAINTS;
   };
 
+  class TextureSpace : public CS::Utility::FastRefCount<TextureSpace>
+  {
+  public:
+    TextureSpace(size_t width, size_t height, iMaterialWrapper* material,
+      TextureSpace* parent = 0);
+
+    TextureSpace* Allocate(size_t& width, size_t& height, csBox2& texCoords);
+
+    bool Realloc(size_t& width, size_t& height, csBox2& texCoords);
+
+    void Free();
+
+    inline bool IsFull() const { return full; }
+
+    iMaterialWrapper* GetMaterial() const { return material; }
+
+  private:
+    csRef<TextureSpace> firstSpace;
+    csRef<TextureSpace> secondSpace;
+    size_t childWidth;
+    size_t childHeight;
+
+    size_t minX;
+    size_t minY;
+
+    csRef<iMaterialWrapper> material;
+    TextureSpace* parent;
+    bool full;
+  };
+
+  csRefArray<TextureSpace> textureSpace;
+
   struct ImposterMat
   {
     csRef<iImposterMesh> mesh;
     bool init;
+    bool update;
     bool remove;
 
+    size_t lastDistance;
+    size_t texWidth;
+    size_t texHeight;
+
+    TextureSpace* allocatedSpace;
+
     ImposterMat(iImposterMesh* mesh)
-      : mesh(mesh), init(false), remove(false)
+      : mesh(mesh), init(false), update(false),
+      remove(false), lastDistance(size_t(-1)),
+      allocatedSpace(0)
     {
+    }
+
+    ~ImposterMat()
+    {
+      // Free allocated texture space.
+      if(allocatedSpace)
+      {
+        allocatedSpace->Free();
+      }
     }
   };
 
+  /* Allocates texture space for r2t. */
+  iMaterialWrapper* AllocateTexture(ImposterMat* imposter,
+      csBox2& texCoords);
+
   /* Initialises an imposter. */
   void InitialiseImposter(ImposterMat* imposter);
+
+  /* Updated an imposter. */
+  void UpdateImposter(ImposterMat* imposter);
 
   csArray<ImposterMat*> imposterMats;
   csArray<ImposterMat*> updateQueue;
@@ -77,12 +134,16 @@ private:
   size_t maxWidth;
   size_t maxHeight;
 
+  bool shaderLoaded;
+
 public:
   csImposterManager(csEngine* engine);
   virtual ~csImposterManager();
 
   /////////////// iImposterManager ///////////////
   void Register(iImposterMesh* mesh);
+
+  void Update(iImposterMesh* mesh);
 
   void Unregister(iImposterMesh* mesh);
 };

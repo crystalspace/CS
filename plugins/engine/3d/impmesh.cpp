@@ -34,7 +34,8 @@
 
 csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
                                 iMeshWrapper* pmesh, iRenderView* rview) :
-scfImplementationType(this), engine(engine), fact(fact), camera(rview->GetCamera())
+scfImplementationType(this), engine(engine), matDirty(true), meshDirty(true),
+fact(fact), camera(rview->GetCamera()), isUpdating(false)
 {
   // Misc inits.
   cutout.SetVertexCount (4);
@@ -75,6 +76,11 @@ scfImplementationType(this), engine(engine), fact(fact), camera(rview->GetCamera
   // Create first instance of the imposter.
   CreateInstance(pmesh);
 
+  // Set the initial distance.
+  closestInstanceMesh = pmesh;
+  closestInstance = (rview->GetCamera()->GetTransform().GetOrigin()
+    - pmesh->GetMovable()->GetPosition()).Norm();
+
   // Init the imposter mesh.
   InitMesh(rview->GetCamera());
 
@@ -98,6 +104,16 @@ bool csImposterMesh::Add(iMeshWrapper* mesh, iRenderView* rview)
   if(WithinTolerance(rview, mesh))
   {
     CreateInstance(mesh);
+
+    // Update the range.
+    size_t distance = (rview->GetCamera()->GetTransform().GetOrigin()
+      - mesh->GetMovable()->GetPosition()).Norm();
+    if(distance < closestInstance || closestInstanceMesh == mesh)
+    {
+      closestInstanceMesh = mesh;
+      closestInstance = distance;
+    }
+
     return true;
   }
 
@@ -110,11 +126,28 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
   {
     if(instances[i]->mesh == mesh)
     {
+      // Check that this imposter mesh is valid for this meshwrapper.
       if(!WithinTolerance(rview, mesh))
       {
         DestroyInstance(instances[i]);
         instances.DeleteIndexFast(i);
         return false;
+      }
+
+      // Update the distance.
+      size_t distance = (rview->GetCamera()->GetTransform().GetOrigin()
+        - mesh->GetMovable()->GetPosition()).Norm();
+      if(distance < closestInstance || closestInstanceMesh == mesh)
+      {
+        closestInstanceMesh = mesh;
+        closestInstance = distance;
+      }
+
+      // Update material!
+      if(!isUpdating)
+      {
+        impman->Update(this);
+        isUpdating = true;
       }
 
       return true;
@@ -190,33 +223,18 @@ void csImposterMesh::InitMesh(iCamera* camera)
   cutout[2] = csVector3(bbox.MinX(), bbox.MinY(), z);
   cutout[3] = csVector3(bbox.MinX(), bbox.MaxY(), z);
 
-  // Calculate texture resolution.
-  /*
-  float den = 2.0f*res.distance*tanf(camera->GetFOV()/2.0f);
-  int oTexHeight = g3d->GetHeight()*height/den;
-  int oTexWidth = g3d->GetWidth()*width/den;
-  texHeight = csFindNearestPowerOf2(oTexHeight);
-  texWidth = csFindNearestPowerOf2(oTexWidth);
-
-  if((oTexHeight - (texHeight >> 1)) < (texHeight - oTexHeight))
-    texHeight >>= 1;
-  if((oTexWidth - (texWidth >> 1)) < (texWidth - oTexWidth))
-    texWidth >>= 1;
-    */
-  texHeight = 256;
-  texWidth = 256;
+  width = (cutout[1] - cutout[0]).Norm();
+  height = (cutout[3] - cutout[0]).Norm();
 
   // Save current facing for angle checking
   csReversibleTransform objt = instances[0]->mesh->GetMovable()->GetFullTransform();
   csOrthoTransform& camt = camera->GetTransform();
 
   csVector3 relativeDir = (instances[0]->mesh->GetWorldBoundingBox().GetCenter()
-    - camt.GetOrigin()).Unit();
+      - camt.GetOrigin()).Unit();
 
   meshLocalDir = objt.Other2ThisRelative(relativeDir);
   cameraLocalDir = camt.Other2ThisRelative(relativeDir);
-
-  dirty = true;
 }
 
 bool csImposterMesh::WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh)
@@ -263,7 +281,7 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
 
   if (rmCreated)
   {
-    //Initialize mesh
+    // Initialize mesh
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
     mesh->do_mirror = rview->GetCamera ()->IsMirrored ();
     mesh->object2world = csReversibleTransform ();
@@ -271,18 +289,8 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     mesh->mixmode = CS_FX_ALPHA;
     mesh->alphaType = csAlphaMode::alphaBinary;
     mesh->z_buf_mode = CS_ZBUF_TEST;
-
-    csRef<iLoader> ldr = csQueryRegistry<iLoader>(engine->GetObjectRegistry());
-    ldr->LoadShader("/shader/lighting/lighting_imposter.xml");
-
-    csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>(
-    engine->GetObjectRegistry(), "crystalspace.shared.stringset");
-    csStringID shadertype = strings->Request("base");
-    csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
-    iShader* shader = shman->GetShader("lighting_imposter");
-    mat->GetMaterial()->SetShader(shadertype, shader);
-
-    mesh->material = mat;
+    mesh->renderPrio = engine->GetRenderPriority("alpha");
+    mesh->material = 0;
 
     mesh_indices.Push (0);
     mesh_indices.Push (1);
@@ -318,36 +326,34 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     mesh->variablecontext = new csShaderVariableContext();
   }
 
-  //mesh changed
-  if (dirty)
+  // Material changed.
+  if (matDirty || meshDirty)
   {
-    GetMeshVertices ()->Empty ();
+    mesh->material = mat;
+
     GetMeshTexels ()->Empty ();
-
-    float x = 1;
-    float y = 1;
-
-    // correct textels for imposter heigth/width ratio
-    // since r2t texture is square, but billboard might not
-    if (height > width)
-    {
-      x -= (1 - width/height)/2;
-    } else {
-      y -= (1 - height/width)/2;
-    }
-
-    mesh_texels.Push (csVector2 (1-x,y));  //0 1
-    mesh_texels.Push (csVector2 (1-x,1-y));  //0 0
-    mesh_texels.Push (csVector2 (x,1-y));  //1 0
-    mesh_texels.Push (csVector2 (x,y));    //1 1
-
-    csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
-      4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-    vertBuffer->CopyInto (cutout.GetVertices (), 4);
+    mesh_texels.Push (csVector2 (texCoords.MaxX(),1-texCoords.MaxY()));
+    mesh_texels.Push (csVector2 (texCoords.MaxX(),1-texCoords.MinY()));
+    mesh_texels.Push (csVector2 (texCoords.MinX(),1-texCoords.MinY()));
+    mesh_texels.Push (csVector2 (texCoords.MinX(),1-texCoords.MaxY()));
 
     csRef<csRenderBuffer> texBuffer = csRenderBuffer::CreateRenderBuffer(
       4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     texBuffer->CopyInto (mesh_texels.GetArray(), 4);
+
+    mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
+
+    matDirty = false;
+  }
+
+  // Mesh changed
+  if (meshDirty)
+  {
+    GetMeshVertices ()->Empty ();
+
+    csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
+      4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+    vertBuffer->CopyInto (cutout.GetVertices (), 4);
 
     csDirtyAccessArray<csVector3> normals;
     normals.Push(csVector3(0, 0, -1));
@@ -360,10 +366,9 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     normalBuffer->CopyInto (normals.GetArray(), 4);
 
     mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertBuffer);
-    mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
     mesh->buffers->SetRenderBuffer (CS_BUFFER_NORMAL, normalBuffer);
 
-    dirty = false;
+    meshDirty = false;
   }
 
   num = 1;
