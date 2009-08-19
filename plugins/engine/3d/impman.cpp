@@ -37,11 +37,9 @@ using namespace CS::Math;
 using namespace CS::Utility;
 
 csImposterManager::csImposterManager(csEngine* engine)
-: scfImplementationType(this), engine(engine)
+: scfImplementationType(this), engine(engine), maxWidth(0), maxHeight(0)
 {
   g3d = csQueryRegistry<iGraphics3D>(engine->GetObjectRegistry());
-  maxWidth = g3d->GetCaps()->maxTexWidth;
-  maxHeight = g3d->GetCaps()->maxTexHeight;
 
   // Register our event handler
   csRef<EventHandler> event_handler = csPtr<EventHandler> (new EventHandler (this));
@@ -329,6 +327,12 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
   imposter->texWidth = rbox.sbox.MaxX() - rbox.sbox.MinX();
   imposter->texHeight = rbox.sbox.MaxY() - rbox.sbox.MinY();
+
+  if(maxWidth == 0 || maxHeight == 0)
+  {
+    maxWidth = g3d->GetCaps()->maxTexWidth;
+    maxHeight = g3d->GetCaps()->maxTexHeight;
+  }
 
   if(maxWidth < imposter->texWidth)
     imposter->texWidth = maxWidth;
