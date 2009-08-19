@@ -23,26 +23,52 @@
 
 namespace lighter
 {
-  struct IrradianceSample;
   class OctreeSampleNode;
+
+  struct IrradianceSample
+  {
+    float pos[3];   // sample position
+    float norm[3];  // Normal at pos
+    float power[3]; // irradiance
+    float mean;     // Harmonic mean distance to visible surfaces
+  };
 
   class IrradianceCache
   {
   public:
-    IrradianceCache( size_t maxSamples );
+    IrradianceCache( const float bboxMin[3], const float bboxMax[3],
+      size_t maxSamples, double maxError = 0.1 );
     ~IrradianceCache();
 
     /**
      * Store
      *    Add a sample to the irradiance cache structure.
-     * /param power - The irradiance estimate at this position
      * /param pos - The world position of this sample
      * /param norm - The surface normal at this position
+     * /param power - The irradiance estimate at this position
+     * /param mean - The harmonic mean of ray lengths used to calc this sample
      **/
     void Store(
-      const float power[3],
       const float pos[3],
-      const float norm[3]);
+      const float norm[3],
+      const float power[3],
+      const float mean);
+
+    /**
+     * EstimateIrradiance
+     *    Try to estimate the irradiance from the cache.  This function
+     * will estimate the irradiance gradiant using the method proposed
+     * by Ward et al. and determine if it can be averged from values
+     * already in the cache.  If so, it will place the estimate in
+     * 'power' and return true.  If not, it will return false.
+     * /param pos - The world position at which to compute irradiance
+     * /param norm - The surface normal at pos
+     * /param power - On return, holds the irradiance at pos
+     **/
+    bool EstimateIrradiance(
+      const float pos[3],
+      const float norm[3],
+      float* &power);
 
     size_t GetSampleCount();
 
@@ -52,11 +78,11 @@ namespace lighter
 
     IrradianceSample *samples;  ///< Internal array of samples
     OctreeSampleNode *root;     ///< The root of the octree
+    double alpha;               ///< The maximum error allowed when estimating irradiance
 
-    size_t initialSize;       ///< The initial requested array size (used for array expansion)
-    size_t storedSamples;     ///< Number of photons stored in the internal array
-    size_t halfStoredSamples; ///< Half the photons stored in the internal array
-    size_t maxSamples;        ///< Allocated size of internal array
+    size_t initialSize;     ///< Initial allocated sample array size
+    size_t storedSamples;   ///< Number of samples stored in the internal array
+    size_t maxSamples;      ///< Actual allocated size of sample array
   };
 };
 
