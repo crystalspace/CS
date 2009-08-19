@@ -129,6 +129,7 @@ namespace RenderManager
         targetInfo->views.DeleteAll (subtexture);
         if (targetInfo->views.IsEmpty()) alwaysUsedTargets.DeleteAll (target);
       }
+      forciblyUsedTextures.Delete (target);
     }
     
     void MarkAsUsed (iTextureHandle* target)

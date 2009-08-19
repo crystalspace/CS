@@ -385,7 +385,8 @@ void csShaderManager::LoadDefaultVariables()
 
 void csShaderManager::Open ()
 {
-  Clear();
+  /* Note: this used to clear all SVs, but being able to add SVs before the
+     shader manager is rather convenient ... */
   AddDefaultVariables();
   LoadDefaultVariables();
 }

@@ -346,13 +346,15 @@ bool RMShadowedPSSM::RenderView (iView* view)
   if (!startSector)
     return false;
 
-  postEffects.SetupView (view);
+  CS::Math::Matrix4 perspectiveFixup;
+  postEffects.SetupView (view, perspectiveFixup);
 
   // Pre-setup culling graph
   RenderTreeType renderTree (treePersistent);
 
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
   startContext->renderTargets[rtaColor0].texHandle = postEffects.GetScreenTarget ();
+  startContext->perspectiveFixup = perspectiveFixup;
 
   // Setup the main context
   {
@@ -385,7 +387,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
     ForEachContextReverse (renderTree, render);
   }
 
-  postEffects.DrawPostEffects ();
+  postEffects.DrawPostEffects (renderTree);
   
   
   if (doHDRExposure) hdrExposure.ApplyExposure ();
@@ -490,8 +492,7 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
     if (!loader->LoadShader ("/shader/lighting/lighting_default.xml").IsValid())
     {
       csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
-	"crystalspace.rendermanager.test1",
-	"Could not load lighting_default shader");
+	messageID, "Could not load lighting_default shader");
     }
   
     if (doVerbose)

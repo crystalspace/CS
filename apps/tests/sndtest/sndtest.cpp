@@ -153,9 +153,9 @@ bool SndTest::LoadSound ()
   if (fname.IsEmpty ())
   {
     fname = "/lib/std/loopbzzt.wav";
-    printf("You can override sound file using -sndfile option (VFS path)\n");
+    csPrintf ("You can override sound file using -sndfile option (VFS path)\n");
   }
-  printf("Sound file  : %s\n", fname.GetData ());
+  csPrintf ("Sound file  : %s\n", fname.GetData ());
 
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry ());
 
@@ -168,13 +168,12 @@ bool SndTest::LoadSound ()
     return ReportError ("Can't load sound '%s'!", fname.GetData ());
 
   const csSndSysSoundFormat* format = snddata->GetFormat ();
-  printf("=== iSndSysData format informations ===\n");
-  printf("Format      : %d bits, %d channel(s), %d Hz\n",
+  csPrintf ("=== iSndSysData format informations ===\n");
+  csPrintf ("Format      : %d bits, %d channel(s), %d Hz\n",
         format->Bits, format->Channels, format->Freq);
-  printf("Sample Size : %zu bytes, %zu frames\n", snddata->GetDataSize (),
+  csPrintf ("Sample Size : %zu bytes, %zu frames\n", snddata->GetDataSize (),
         snddata->GetFrameCount ());
-  printf("Description : %s\n", snddata->GetDescription ());
-  fflush(stdout);
+  csPrintf ("Description : %s\n", snddata->GetDescription ());
 
   csRef<iSndSysStream> sndstream = sndrenderer->CreateStream (snddata,
         cmdline->GetBoolOption("no3d") ? CS_SND3D_DISABLE : CS_SND3D_ABSOLUTE);
@@ -182,12 +181,11 @@ bool SndTest::LoadSound ()
     return ReportError ("Can't create stream for '%s'!", fname.GetData ());
 
   const csSndSysSoundFormat* rformat = sndstream->GetRenderedFormat ();
-  printf("=== iSndSysStream \"rendered\" format informations ===\n");
-  printf("Format      : %d bits, %d channel(s), %d Hz\n",
+  csPrintf ("=== iSndSysStream \"rendered\" format informations ===\n");
+  csPrintf ("Format      : %d bits, %d channel(s), %d Hz\n",
         rformat->Bits, rformat->Channels, rformat->Freq);
-  printf("Stream Size : %zu frames\n", sndstream->GetFrameCount ());
-  printf("Description : %s\n", sndstream->GetDescription ());
-  fflush(stdout);
+  csPrintf ("Stream Size : %zu frames\n", sndstream->GetFrameCount ());
+  csPrintf ("Description : %s\n", sndstream->GetDescription ());
 
   sndsource = sndrenderer->CreateSource (sndstream);
   if (!sndsource)
