@@ -1,6 +1,7 @@
 /*
   Copyright (C) 2002 by Keith Fulton and Jorrit Tyberghein
-  Rewritten during Sommer of Code 2006 by Christoph "Fossi" Mewes
+  Rewritten during Summer of Code 2006 by Christoph "Fossi" Mewes
+  Rewritten during Summer of Code 2009 by Michael Gist
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
