@@ -44,7 +44,7 @@ struct iImposterFactory : public virtual iBase
    * Given a mesh, activate and update its imposter.
    * Return the render mesh for this imposter.
    */
-  virtual void UpdateImposter(iMeshWrapper* mesh, iRenderView* rview) = 0;
+  virtual bool UpdateImposter(iMeshWrapper* mesh, iRenderView* rview) = 0;
 
   /**
    * Given a mesh, deactivate and remove its imposter.
@@ -87,6 +87,16 @@ struct iImposterFactory : public virtual iBase
    * Gets the camera rotation tolerance.
    */
   virtual float GetCameraRotationTolerance() = 0;
+
+  /**
+   * Sets the shader to be used by the imposters.
+   */
+  virtual void SetShader(const char* shader) = 0;
+
+  /**
+   * Sets what method of impostering (instancing or not) to use.
+   */
+  virtual void SetInstancing(bool instancing) = 0;
 };
 
 struct iImposterMesh : public virtual iBase
@@ -123,6 +133,11 @@ struct iImposterMesh : public virtual iBase
    * Destroy this imposter.
    */
   virtual void Destroy() = 0;
+
+  /**
+   * Query whether the r2t has been performed for this imposter.
+   */
+  virtual bool Rendered() const = 0;
 };
 
 /** @} */

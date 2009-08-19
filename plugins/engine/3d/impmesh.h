@@ -80,7 +80,17 @@ private:
   // Convenience shortcut
   csEngine *engine;
 
+  // Whether or not we're instancing.
+  bool instance;
+
+  // True if we're ready to be removed.
+  bool removeMe;
+
+  // Shader to use on the imposter material.
+  csString shader;
+
   // Flags that indicate that we have been updated.
+  bool materialUpdateNeeded;
   bool matDirty;
   bool meshDirty;
 
@@ -88,17 +98,23 @@ private:
   csVector3 meshLocalDir;
   csVector3 cameraLocalDir;
 
-  // Current height and width of the billboard
-  float height, width;
-
   // Rendermesh holder for this mesh
   csRenderMeshHolder rmHolder;
 
-  // Rect for cardboard cutout version
-  csPoly3D cutout;
+  // Rect for billboard
+  csPoly3D vertices;
+
+  // Normals.
+  csVector3 normals;
 
   // Imposter material.
   csRef<iMaterialWrapper> mat;
+
+  // Imposter meshes (for batched rendering).
+  csRefArray<csImposterMesh> imposterMeshes;
+
+  // Number of meshes at last update.
+  size_t numImposterMeshes;
 
   // Texture coordinates.
   csBox2 texCoords;
@@ -125,21 +141,33 @@ private:
 
   iSector* sector;
 
+  // True if r2t has been performed for this imposter.
+  bool rendered;
+
   void AddSVToMesh(iMeshWrapper* mesh, csShaderVariable* sv);
 
   void CreateInstance(iMeshWrapper* pmesh);
 
   void DestroyInstance(Instance* instance);
 
-  void InitMesh(iCamera* camera);
+  void InitMesh();
 
   bool WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh);
+
+  void SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCamera* camera);
+
+  void SetupRenderMeshesInstance(csRenderMesh*& mesh,  bool rmCreated, iCamera* camera);
+
+  // For batched imposter sorting.
+  static int ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s);
 
   friend class csImposterManager;
 
 public:
+  csImposterMesh (csEngine* engine, iSector* sector);
+
   csImposterMesh (csEngine* engine, iImposterFactory* fact,
-    iMeshWrapper* mesh, iRenderView* rview);
+    iMeshWrapper* mesh, iRenderView* rview, bool instance, const char* shader);
   virtual ~csImposterMesh () {}
 
   ///////////////////// iImposterMesh /////////////////////
@@ -147,7 +175,8 @@ public:
   /**
    * Whether this imposter is currently instancing any meshes.
    */
-  virtual bool IsInstancing() { return instances.GetSize() != 0; }
+  virtual bool IsInstancing()
+  { return (!instance && !removeMe) || instances.GetSize() != 0; }
 
   /**
    * Add an instance of the passed mesh.
@@ -174,6 +203,14 @@ public:
    * Destroy this imposter.
    */
   virtual void Destroy();
+
+  /**
+   * Query whether the r2t has been performed for this imposter.
+   */
+  virtual bool Rendered() const
+  {
+    return rendered;
+  }
 
   ///////////////////// iObjectModel /////////////////////
   virtual const csBox3& GetObjectBoundingBox()

@@ -60,7 +60,7 @@ private:
 
     TextureSpace* Allocate(size_t& width, size_t& height, csBox2& texCoords);
 
-    bool Realloc(size_t& width, size_t& height, csBox2& texCoords);
+    bool Realloc(size_t& width, size_t& height, csBox2& texCoords) const;
 
     void Free();
 
@@ -68,9 +68,15 @@ private:
 
     iMaterialWrapper* GetMaterial() const { return material; }
 
+    void GetRenderTextureDimensions(size_t& width, size_t& height) const;
+
+    bool IsUsed() const;
+
   private:
     csRef<TextureSpace> firstSpace;
     csRef<TextureSpace> secondSpace;
+    size_t width;
+    size_t height;
     size_t childWidth;
     size_t childHeight;
 
@@ -80,13 +86,15 @@ private:
     csRef<iMaterialWrapper> material;
     TextureSpace* parent;
     bool full;
+    size_t rTexWidth;
+    size_t rTexHeight;
   };
 
   csRefArray<TextureSpace> textureSpace;
 
-  struct ImposterMat
+  struct ImposterMat : CS::Utility::FastRefCount<ImposterMat>
   {
-    csRef<iImposterMesh> mesh;
+    csRef<csImposterMesh> mesh;
     bool init;
     bool update;
     bool remove;
@@ -97,11 +105,14 @@ private:
 
     TextureSpace* allocatedSpace;
 
-    ImposterMat(iImposterMesh* mesh)
-      : mesh(mesh), init(false), update(false),
+    csString shader;
+
+    ImposterMat(iImposterMesh* imesh)
+      : init(false), update(false),
       remove(false), lastDistance(size_t(-1)),
       allocatedSpace(0)
     {
+      mesh = static_cast<csImposterMesh*>(imesh);
     }
 
     ~ImposterMat()
@@ -116,16 +127,16 @@ private:
 
   /* Allocates texture space for r2t. */
   iMaterialWrapper* AllocateTexture(ImposterMat* imposter,
-      csBox2& texCoords);
+      csBox2& texCoords, size_t& width, size_t& height);
 
   /* Initialises an imposter. */
-  void InitialiseImposter(ImposterMat* imposter);
+  bool InitialiseImposter(ImposterMat* imposter);
 
   /* Updated an imposter. */
-  void UpdateImposter(ImposterMat* imposter);
+  bool UpdateImposter(ImposterMat* imposter);
 
-  csArray<ImposterMat*> imposterMats;
-  csArray<ImposterMat*> updateQueue;
+  csRefArray<ImposterMat> imposterMats;
+  csRefArray<ImposterMat> updateQueue;
 
   csEngine* engine;
 
@@ -134,7 +145,24 @@ private:
   size_t maxWidth;
   size_t maxHeight;
 
-  bool shaderLoaded;
+  // Max number of imposters to update per frame.
+  int updatePerFrame;
+  
+  /**
+   * For management of non-instanced meshes.
+   * One 'mesh' per sector, we need to keep it updated.
+   */
+  struct SectorImposter : CS::Utility::FastRefCount<SectorImposter>
+  {
+    csWeakRef<iSector> sector;
+    csRef<csImposterMesh> sectorImposter;
+  };
+
+  csRefArray<SectorImposter> sectorImposters;
+
+  void AddMeshToImposter(csImposterMesh* imposter);
+
+  void RemoveMeshFromImposter(csImposterMesh* imposter);
 
 public:
   csImposterManager(csEngine* engine);
@@ -143,7 +171,7 @@ public:
   /////////////// iImposterManager ///////////////
   void Register(iImposterMesh* mesh);
 
-  void Update(iImposterMesh* mesh);
+  bool Update(iImposterMesh* mesh);
 
   void Unregister(iImposterMesh* mesh);
 };

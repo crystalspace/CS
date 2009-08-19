@@ -92,15 +92,9 @@ RenderView::RenderView (iView* v) :
   g2d = g3d->GetDriver2D ();
   original_camera = v->GetCamera ();
 
-  if (g3d)
-  {
-    viewWidth = g3d->GetWidth(); viewHeight = g3d->GetHeight();
-  }
-  else
-  {
-    viewWidth = 0; viewHeight = 0;
-  }
-  
+  viewWidth = v->GetWidth();
+  viewHeight = v->GetHeight();
+ 
   iClipper2D* clipper = v->GetClipper ();
 
   ctxt = new csRenderContext ();

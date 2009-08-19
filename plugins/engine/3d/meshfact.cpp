@@ -41,7 +41,8 @@ CS_LEAKGUARD_IMPLEMENT (csMeshFactoryWrapper);
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
                                             iMeshObjectFactory *meshFact)
   : scfImplementationType (this), meshFact (meshFact), parent (0),
-  zbufMode (CS_ZBUF_USE), engine (engine), min_imposter_distance(0)
+  zbufMode (CS_ZBUF_USE), engine (engine), min_imposter_distance(0),
+  imposter_instancing(false)
 {
   children.SetMeshFactory (this);
 
@@ -63,7 +64,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
   : scfImplementationType (this), parent (0), zbufMode (CS_ZBUF_USE), 
-  engine (engine), min_imposter_distance(0)
+  engine (engine), min_imposter_distance(0), imposter_instancing(false)
 {
   children.SetMeshFactory (this);
 
@@ -246,13 +247,13 @@ void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
   meshes_for_lod.Push (fact);
 }
 
-void csMeshFactoryWrapper::UpdateImposter(iMeshWrapper* mesh, iRenderView* rview)
+bool csMeshFactoryWrapper::UpdateImposter(iMeshWrapper* mesh, iRenderView* rview)
 {
   // Check existing imposter meshes to see if we need to update.
   for(size_t i=0; i<imposters.GetSize(); ++i)
   {
     if(imposters[i]->Update(mesh, rview))
-      return;
+      return imposters[i]->Rendered();
 
     if(!imposters[i]->IsInstancing())
     {
@@ -261,16 +262,22 @@ void csMeshFactoryWrapper::UpdateImposter(iMeshWrapper* mesh, iRenderView* rview
     }
   }
 
-  // Check if we can add the instance to an existing imposter mesh.
-  for(size_t i=0; i<imposters.GetSize(); ++i)
+  if(imposter_instancing)
   {
-    if(imposters[i]->Add(mesh, rview))
-      return;
+    // Check if we can add the instance to an existing imposter mesh.
+    for(size_t i=0; i<imposters.GetSize(); ++i)
+    {
+      if(imposters[i]->Add(mesh, rview))
+        return true;
+    }
   }
 
   // Create a new imposter mesh.
-  csRef<iImposterMesh> imposter = csPtr<iImposterMesh>(new csImposterMesh(engine, this, mesh, rview));
+  csRef<iImposterMesh> imposter = csPtr<iImposterMesh>(new csImposterMesh(engine,
+    this, mesh, rview, imposter_instancing, imposter_shader));
   imposters.Push(imposter);
+
+  return false;
 }
 
 void csMeshFactoryWrapper::RemoveImposter(iMeshWrapper* mesh)
