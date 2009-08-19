@@ -32,174 +32,215 @@
 #include "light.h"
 #include "engine.h"
 
-
-csImposterMesh* csImposterFactory::GetImposterMesh (csMeshWrapper* mesh,
-      csImposterMesh* old_imposter_mesh, iRenderView* rview)
+csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
+                                iMeshWrapper* pmesh, iRenderView* rview) :
+scfImplementationType(this), engine(engine), fact(fact), camera(rview->GetCamera())
 {
-  // Check for imposter existence. If not create it.
-  if (!old_imposter_mesh)
-  {
-    old_imposter_mesh = new csImposterMesh (meshfact->GetEngine (), mesh);
-  }
-
-  // Check for imposter already ready
-  if (!old_imposter_mesh->GetImposterReady (rview))
-  {
-    return old_imposter_mesh;
-  }
-
-  // Check for too much camera movement since last imposter render
-  if (!old_imposter_mesh->CheckUpdateNeeded (rview,
-	meshfact->imposter_rotation_tolerance
-		? meshfact->imposter_rotation_tolerance->Get ()
-		: 0.4f,
-	meshfact->imposter_camera_rotation_tolerance
-		? meshfact->imposter_camera_rotation_tolerance->Get ()
-		: 0.2f))
-  {
-  }
-  return old_imposter_mesh;
-}
-
-//===========================================================================
-
-csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
-{
-  csImposterMesh::engine = engine;
-  parent_mesh = parent;
-
-  tex = new csImposterProcTex (engine, this);
-  impostermat = engine->CreateMaterial ("Imposter", tex->GetTexture ());
-
+  // Misc inits.
   cutout.SetVertexCount (4);
+  meshLocalDir.Set (0, 0, 0);
+  cameraLocalDir.Set (0, 0, 0);
+  sector = pmesh->GetMovable()->GetSectors()->Get(0);
+  g3d = csQueryRegistry<iGraphics3D>(engine->GetObjectRegistry());
 
-  SetImposterReady (false, 0);
-  dirty = true;
-  meshLocalDir.Set (0, 0, 0); //@@@
-  cameraLocalDir.Set (0, 0, 0); //@@@
+  // Init shadervar array.
+  csRef<iShaderVarStringSet> SVstrings = csQueryRegistryTagInterface<iShaderVarStringSet>(
+    engine->GetObjectRegistry(), "crystalspace.shader.variablenameset");
+  CS::ShaderVarStringID varTransform = SVstrings->Request("instancing transforms");
+  transformVars.AttachNew (new csShaderVariable (varTransform));
+  transformVars->SetType (csShaderVariable::ARRAY);
+  transformVars->SetArraySize (0);
+
+  CS::ShaderVarStringID varFadeFactor = SVstrings->Request ("alpha factor");
+  fadeFactors.AttachNew (new csShaderVariable (varFadeFactor));
+  fadeFactors->SetType (csShaderVariable::ARRAY);
+  fadeFactors->SetArraySize (0);
+
+  // Create meshwrapper.
+  csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
+  csString name(pmesh->QueryObject()->GetName());
+  cmesh->SetName(name + "_imposter");
+  cmesh->SetRenderPriority(engine->GetRenderPriority("alpha"));
+  mesh = csPtr<iMeshWrapper>(cmesh);
+
+  // Add instancing shadervars.
+  AddSVToMesh(mesh, transformVars);
+  AddSVToMesh(mesh, fadeFactors);
+
+  // Set bbox so that it's never culled.
+  mesh->GetMeshObject()->GetObjectModel()->SetObjectBoundingBox(
+      csBox3(-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
+      CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE));
+
+  // Create first instance of the imposter.
+  CreateInstance(pmesh);
+
+  // Init the imposter mesh.
+  InitMesh(rview->GetCamera());
+
+  // Register this imposter with the manager.
+  impman = csQueryRegistry<iImposterManager>(engine->GetObjectRegistry());
+  impman->Register(this);
 }
 
-csImposterMesh::~csImposterMesh ()
+void csImposterMesh::Destroy()
 {
-  delete tex;
-}
-
-void csImposterMesh::GetLocalViewVectors (iCamera *cam)
-{
-  csReversibleTransform objt = 
-    (parent_mesh->GetCsMovable ()).csMovable::GetFullTransform ();
-  csOrthoTransform& camt = cam->GetTransform ();
-
-  csVector3 relativeDir = (
-    parent_mesh->GetWorldBoundingBox ().GetCenter ()
-    - camt.GetOrigin ()
-  ).Unit ();
-
-  meshLocalDir = objt.Other2ThisRelative (relativeDir);
-  cameraLocalDir = camt.Other2ThisRelative (relativeDir);
-}
-
-bool csImposterMesh::CheckUpdateNeeded (iRenderView *rview, float tolerance,
-    float camtolerance)
-{
-  csReversibleTransform objt = 
-    (parent_mesh->GetCsMovable ()).csMovable::GetFullTransform ();
-  csOrthoTransform& camt = rview->GetCamera ()->GetTransform ();
-
-  csVector3 relativeDir = (
-    parent_mesh->GetWorldBoundingBox ().GetCenter ()
-    - camt.GetOrigin ()
-  ).Unit ();
-
-  csVector3 meshDir = objt.This2OtherRelative (meshLocalDir);
-
-  // If not ok, mark for redraw of imposter
-  // @@@ todo: use a listener system on the tolerance variable
-  // so we can precalc the cos(tolerance).
-  bool updateneeded = false;
-  if (meshDir * relativeDir < cosf (tolerance))
+  for(size_t i=0; i<instances.GetSize(); ++i)
   {
-    updateneeded = true;
+    DestroyInstance(instances[i]);
+  }
+
+  impman->Unregister(this);
+}
+
+bool csImposterMesh::Add(iMeshWrapper* mesh, iRenderView* rview)
+{
+  if(WithinTolerance(rview, mesh))
+  {
+    CreateInstance(mesh);
+    return true;
+  }
+
+  return false;
+}
+
+bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
+{
+  for(size_t i=0; i<instances.GetSize(); ++i)
+  {
+    if(instances[i]->mesh == mesh)
+    {
+      if(!WithinTolerance(rview, mesh))
+      {
+        DestroyInstance(instances[i]);
+        instances.DeleteIndexFast(i);
+        return false;
+      }
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool csImposterMesh::Remove(iMeshWrapper* mesh)
+{
+  for(size_t i=0; i<instances.GetSize(); ++i)
+  {
+    if(instances[i]->mesh == mesh)
+    {
+      DestroyInstance(instances[i]);
+      instances.DeleteIndexFast(i);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void csImposterMesh::AddSVToMesh(iMeshWrapper* mesh,  
+                                 csShaderVariable* sv) 
+{ 
+  if (!mesh)
+    return;
+
+  mesh->GetSVContext()->AddVariable(sv);
+
+  csRef<iSceneNodeArray> children = mesh->QuerySceneNode()->GetChildrenArray(); 
+  for(size_t i=0; i<children->GetSize(); ++i)
+  {
+    AddSVToMesh (children->Get(i)->QueryMesh(), sv);
+  }
+}
+
+void csImposterMesh::CreateInstance(iMeshWrapper* pmesh)
+{
+  Instance* instance = new Instance(pmesh);
+  instance->transformVar.AttachNew(new csShaderVariable);
+  instance->fadeFactor.AttachNew(new csShaderVariable);
+
+  csMatrix3 rot;
+  csReversibleTransform tr(rot, pmesh->GetMovable()->GetPosition());
+  instance->transformVar->SetValue(tr);
+  instance->fadeFactor->SetValue(1.0f);
+
+  transformVars->AddVariableToArray(instance->transformVar);
+  fadeFactors->AddVariableToArray(instance->fadeFactor);
+  instances.Push(instance);
+}
+
+void csImposterMesh::DestroyInstance(Instance* instance)
+{
+  size_t idx = transformVars->FindArrayElement(instance->transformVar); 
+  CS_ASSERT(idx != csArrayItemNotFound);
+
+  transformVars->RemoveFromArray(idx);
+  fadeFactors->RemoveFromArray(idx);
+  delete instance;
+}
+
+void csImposterMesh::InitMesh(iCamera* camera)
+{
+  // Calculate object space billboard size.
+  const csBox3& bbox = instances[0]->mesh->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox();
+  float z = (bbox.MinZ() + bbox.MaxZ()) / 2;
+  cutout[0] = csVector3(bbox.MaxX(), bbox.MaxY(), z);
+  cutout[1] = csVector3(bbox.MaxX(), bbox.MinY(), z);
+  cutout[2] = csVector3(bbox.MinX(), bbox.MinY(), z);
+  cutout[3] = csVector3(bbox.MinX(), bbox.MaxY(), z);
+
+  // Calculate texture resolution.
+  /*
+  float den = 2.0f*res.distance*tanf(camera->GetFOV()/2.0f);
+  int oTexHeight = g3d->GetHeight()*height/den;
+  int oTexWidth = g3d->GetWidth()*width/den;
+  texHeight = csFindNearestPowerOf2(oTexHeight);
+  texWidth = csFindNearestPowerOf2(oTexWidth);
+
+  if((oTexHeight - (texHeight >> 1)) < (texHeight - oTexHeight))
+    texHeight >>= 1;
+  if((oTexWidth - (texWidth >> 1)) < (texWidth - oTexWidth))
+    texWidth >>= 1;
+    */
+  texHeight = 256;
+  texWidth = 256;
+
+  // Save current facing for angle checking
+  csReversibleTransform objt = instances[0]->mesh->GetMovable()->GetFullTransform();
+  csOrthoTransform& camt = camera->GetTransform();
+
+  csVector3 relativeDir = (instances[0]->mesh->GetWorldBoundingBox().GetCenter()
+    - camt.GetOrigin()).Unit();
+
+  meshLocalDir = objt.Other2ThisRelative(relativeDir);
+  cameraLocalDir = camt.Other2ThisRelative(relativeDir);
+
+  dirty = true;
+}
+
+bool csImposterMesh::WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh)
+{
+  csReversibleTransform objt = pmesh->GetMovable()->GetFullTransform();
+  csOrthoTransform& camt = rview->GetCamera()->GetTransform();
+
+  csVector3 relativeDir = (pmesh->GetWorldBoundingBox().GetCenter() - camt.GetOrigin()).Unit();
+  csVector3 meshDir = objt.This2OtherRelative(meshLocalDir);
+
+  if(meshDir * relativeDir < cosf(fact->GetRotationTolerance()))
+  {
+    return false;
   }
   else
   {
-    csVector3 cameraDir = camt.This2OtherRelative (cameraLocalDir);
-    if (cameraDir * relativeDir < cosf (camtolerance))
+    csVector3 cameraDir = camt.This2OtherRelative(cameraLocalDir);
+    if(cameraDir * relativeDir < cosf(fact->GetCameraRotationTolerance()))
     {
-      updateneeded = true;
+      return false;
     }
   }
-  if (updateneeded)
-  {
-    SetImposterReady (false, rview);
-    return false;
-  }
+
   return true;
-}
-
-void csImposterMesh::SetImposterReady (bool r, iRenderView* rview)
-{
-  ready = r;
-  if (!ready) tex->Update (rview);
-}
-
-bool csImposterMesh::GetImposterReady (iRenderView* rview)
-{
-  //if (!ready) tex->Update (rview);
-  return tex->GetImposterReady();
-}
-
-
-void csImposterMesh::FindImposterRectangle (iCamera* c)
-{
-  // Called from csImposterProcTex during Anim.
-  //  (Recalc of texture causes recalc of imposter poly also.)
-
-  // Save camera orientation
-  const csOrthoTransform oldt = c->GetTransform ();
-
-  // Look at mesh
-  csVector3 meshcenter = parent_mesh->GetWorldBoundingBox ().GetCenter ();
-  csVector3 campos = c->GetTransform ().GetOrigin ();
-
-  c->GetTransform ().LookAt (meshcenter - campos,
-     c->GetTransform ().GetT2O ().Col2 ());
-
-  // Get screen bounding box
-  res = parent_mesh->GetScreenBoundingBox (c);
-
-  //calculate height and width of the imposter on screen
-  height = (res.sbox.GetCorner (1) - res.sbox.GetCorner (0)).y;
-  width = (res.sbox.GetCorner (2) - res.sbox.GetCorner (0)).x;
-
-  // Project screen bounding box, at the returned depth to
-  //  the camera transform to rotate it around where we need it
-  float middle = (res.cbox.MinZ () + res.cbox.MaxZ ()) / 2;
-
-  csVector3 v1 = c->InvPerspective (res.sbox.GetCorner (0), middle);
-  csVector3 v2 = c->InvPerspective (res.sbox.GetCorner (1), middle);
-  csVector3 v3 = c->InvPerspective (res.sbox.GetCorner (3), middle);
-  csVector3 v4 = c->InvPerspective (res.sbox.GetCorner (2), middle);
-  
-  //@@@ put these into w2o and save transform
-  v1 = c->GetTransform ().This2Other (v1);
-  v2 = c->GetTransform ().This2Other (v2);
-  v3 = c->GetTransform ().This2Other (v3);
-  v4 = c->GetTransform ().This2Other (v4);
-
-  // Save as csPoly3d for later rendering
-  cutout[0] = v1;
-  cutout[1] = v2;
-  cutout[2] = v3;
-  cutout[3] = v4;
-
-  // Revert camera changes
-  c->SetTransform (oldt);
-
-  // save current facing for angle checking
-  GetLocalViewVectors (c);
-
-  dirty = true;
 }
 
 //static arrays that keep the imposterdata
@@ -208,9 +249,10 @@ CS_IMPLEMENT_STATIC_VAR (GetMeshVertices, csDirtyAccessArray<csVector3>, ());
 CS_IMPLEMENT_STATIC_VAR (GetMeshTexels, csDirtyAccessArray<csVector2>, ());
 CS_IMPLEMENT_STATIC_VAR (GetMeshColors, csDirtyAccessArray<csVector4>, ());
 
-csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
+csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview, 
+    iMovable* movable, uint32 frustum_mask)
 {
-  //Get an unused mesh
+  // Get an unused mesh
   bool rmCreated;
   csRenderMesh*& mesh = rmHolder.GetUnusedMesh (rmCreated,
     rview->GetCurrentFrameNumber ());
@@ -223,14 +265,24 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
   {
     //Initialize mesh
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
-//    mesh->flipCulling = false;
     mesh->do_mirror = rview->GetCamera ()->IsMirrored ();
     mesh->object2world = csReversibleTransform ();
     mesh->worldspace_origin = csVector3 (0,0,0);
     mesh->mixmode = CS_FX_ALPHA;
     mesh->alphaType = csAlphaMode::alphaBinary;
     mesh->z_buf_mode = CS_ZBUF_TEST;
-    mesh->material = impostermat;
+
+    csRef<iLoader> ldr = csQueryRegistry<iLoader>(engine->GetObjectRegistry());
+    ldr->LoadShader("/shader/lighting/lighting_imposter.xml");
+
+    csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>(
+    engine->GetObjectRegistry(), "crystalspace.shared.stringset");
+    csStringID shadertype = strings->Request("base");
+    csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
+    iShader* shader = shman->GetShader("lighting_imposter");
+    mat->GetMaterial()->SetShader(shadertype, shader);
+
+    mesh->material = mat;
 
     mesh_indices.Push (0);
     mesh_indices.Push (1);
@@ -297,11 +349,23 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
       4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     texBuffer->CopyInto (mesh_texels.GetArray(), 4);
 
+    csDirtyAccessArray<csVector3> normals;
+    normals.Push(csVector3(0, 0, -1));
+    normals.Push(csVector3(0, 0, -1));
+    normals.Push(csVector3(0, 0, -1));
+    normals.Push(csVector3(0, 0, -1));
+
+    csRef<csRenderBuffer> normalBuffer = csRenderBuffer::CreateRenderBuffer(
+      4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+    normalBuffer->CopyInto (normals.GetArray(), 4);
+
     mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertBuffer);
     mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
+    mesh->buffers->SetRenderBuffer (CS_BUFFER_NORMAL, normalBuffer);
 
     dirty = false;
   }
 
+  num = 1;
   return &mesh;
 }

@@ -140,6 +140,7 @@ class csMeshWrapper :
 {
   friend class csMovable;
   friend class csMovableSectorList;
+  friend class csImposterManager;
 
 protected:
   /**
@@ -226,7 +227,12 @@ private:
   /// Z-buf mode to use for drawing this object.
   csZBufMode zbufMode;
 
-  csImposterMesh *imposter_mesh;
+  /// Whether or not an imposter is currently being used for this mesh.
+  bool using_imposter;
+
+  /// Whether we're drawing to an imposter texture.
+  /// TODO: Work out a better way to detect this.
+  csWeakRef<iBase> drawing_imposter;
 
   // In case the mesh has CS_ENTITY_NOCLIP set then this will
   // contain the value of the last frame number and camera pointer.
@@ -459,13 +465,8 @@ public:
    */
   virtual void HardTransform (const csReversibleTransform& t);
 
-  /// This is the function to check distances.  Fn above may not be needed.
-  bool CheckImposterRelevant (iRenderView *rview);
-
-  /**
-   * Gets the imposters rendermesh
-   */
-  csRenderMesh** GetImposter (iRenderView *rview);
+  /// Check if we should use an imposter (distance based).
+  bool UseImposter (iRenderView *rview);
 
   void SetLODFade (float fade);
   void UnsetLODFade ();

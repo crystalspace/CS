@@ -2123,7 +2123,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_IMPOSTER:
         {
-          csRef<iImposter> imposter = scfQueryInterface<iImposter> (stemp);
+          csRef<iImposterFactory> imposter = scfQueryInterface<iImposterFactory> (stemp);
           if (!imposter)
           {
             SyntaxService->ReportError (
