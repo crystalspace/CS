@@ -35,10 +35,11 @@ namespace lighter
 
   LightCalculator::~LightCalculator() {}
 
-  void LightCalculator::addComponent(LightComponent* newComponent, float coefficient)
+  void LightCalculator::addComponent(LightComponent* newComponent, float coefficient, float offset)
   {
     component.push_back(newComponent);
     componentCoefficient.push_back(coefficient);
+    componentOffset.push_back(offset);
   }
 
   void LightCalculator::ComputeSectorStaticLighting (
@@ -222,9 +223,14 @@ namespace lighter
           csColor c(0, 0, 0);
           for(size_t i=0; i<component.size(); i++)
           {
-            c += componentCoefficient[i] *
+            csColor value = 
                   component[i]->ComputeElementLightingComponent(sector,
                                     ep, masterSampler, recordInfluence);
+            
+            if(!value.IsBlack())
+            {
+              c += componentCoefficient[i] * value + componentOffset[i];
+            }
           }
 
           // Update the normal lightmap
@@ -241,9 +247,16 @@ namespace lighter
             for(size_t i=0; i<component.size(); i++)
             {
               if(component[i]->SupportsPDLights())
-                c += componentCoefficient[i] *
-                      component[i]->ComputeElementLightingComponent(sector, ep,
+              {
+                csColor value =
+                  component[i]->ComputeElementLightingComponent(sector, ep,
                                         masterSampler, recordInfluence, pdl);
+
+                if(!value.IsBlack())
+                {
+                  c += componentCoefficient[i] * value + componentOffset[i];
+                }
+              }
             }
 
             // Update this light's light map
@@ -298,9 +311,14 @@ namespace lighter
       c.Set(0, 0, 0);
       for(size_t j=0; j<component.size(); j++)
       {
-        c += componentCoefficient[j] *
-              component[j]->ComputePointLightingComponent(sector, obj, pos,
+        csColor value =
+          component[j]->ComputePointLightingComponent(sector, obj, pos,
                               normal, masterSampler);
+
+        if(!value.IsBlack())
+        {
+          c += componentCoefficient[i] * value + componentOffset[i];
+        }
       }
 
       // Shade PD lights
@@ -311,9 +329,14 @@ namespace lighter
         csColor& c = pdlColors->Get (i);
         for(size_t j=0; j<component.size(); j++)
         {
-          c += componentCoefficient[j] *
-                component[j]->ComputePointLightingComponent(sector, obj, pos,
+          csColor value =
+            component[j]->ComputePointLightingComponent(sector, obj, pos,
                                 normal, masterSampler, pdl);
+
+          if(!value.IsBlack())
+          {
+            c += componentCoefficient[i] * value + componentOffset[i];
+          }
         }
       }
 #endif

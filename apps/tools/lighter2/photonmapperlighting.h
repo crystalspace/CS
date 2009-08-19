@@ -35,6 +35,9 @@ namespace lighter
     // Power from emitting light
     csColor color, power;
 
+    // Pointer to light that generated this photon
+    Light* source;
+
     RayType type;
 
     lighter::Ray getRay() const
@@ -111,11 +114,23 @@ namespace lighter
     static csVector3 SpotlightDir(const csVector3 &dir, const float cosTheta);
 
     /**
+     * EqualScatter
+     *    This funciton will compute a random direction in the hemisphere
+     * around the vector n (which should be the surface normal at the hit
+     * point).  The photon should be reflected in this direction to continue
+     * photon tracing.  There is no weighting and all directions around
+     * the hemisphere have an equal chance of occuring.
+     * /param n - The surface normal at the phontons hit point
+     **/
+    static csVector3 EqualScatter(const csVector3 &n);
+
+    /**
      * DiffuseScatter
      *    This funciton will compute a random direction in the hemisphere
      * around the vector n (which should be the surface normal at the hit
      * point).  The photon should be reflected in this direction to continue
-     * photon tracing.
+     * photon tracing.  The directions are weighted by the cos of the
+     * angle between the normal and the new direction (lambert's law).
      * /param n - The surface normal at the phontons hit point
      **/
     static csVector3 DiffuseScatter(const csVector3 &n);

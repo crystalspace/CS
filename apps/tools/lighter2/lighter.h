@@ -86,6 +86,9 @@ namespace lighter
     void BuildPhotonMaps();
     void BalancePhotonMaps();
 
+    // Adjust light attenuation
+    void ForceRealisticAttenuation();
+
     // Initialize objects after LM construction
     void InitializeObjects ();
 

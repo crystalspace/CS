@@ -42,7 +42,7 @@ namespace lighter
     LightCalculator (const csVector3& tangentSpaceNorm, size_t subLightmapNum);
     ~LightCalculator ();
 
-    void addComponent(LightComponent* newComponent, float scaler = 1.0);
+    void addComponent(LightComponent* newComponent, float scaler = 1.0, float offset = 0.0);
 
     // Loop through all objects in a sector and calculate the
     // static light using all attached LightComponents
@@ -62,8 +62,8 @@ namespace lighter
 
     csVector3 ComputeVertexNormal (Object* obj, size_t index) const;
 
-    // The list of lighting component objects and their coefficients
-    vector<float> componentCoefficient;
+    // The list of lighting component objects and their coefficients & offsets
+    vector<float> componentCoefficient, componentOffset;
     vector<LightComponent*> component;
 
     csVector3 tangentSpaceNorm;

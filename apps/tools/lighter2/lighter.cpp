@@ -521,6 +521,34 @@ namespace lighter
     progInitialize.SetProgress (1);
   }
 
+  void Lighter::ForceRealisticAttenuation()
+  {
+    // Iterate overl all scene sectors
+    SectorHash::GlobalIterator sectIt = 
+      scene->GetSectors ().GetIterator ();
+    while (sectIt.HasNext ())
+    {
+      // Get the next sector
+      csRef<Sector> sect = sectIt.Next ();
+
+      // Loop through non-pseudodynamic static lights
+      const LightRefArray& allNonPDLights = sect->allNonPDLights;
+      for (size_t i = 0; i < allNonPDLights.GetSize (); i++)
+      {
+        Light* npdl = allNonPDLights[i];
+        npdl->SetAttenuation( CS_ATTN_REALISTIC, csVector4(0, 0, 0, 0) );
+      }
+
+      // Loop through pseudodynamic static lights
+      const LightRefArray& allPDLights = sect->allPDLights;
+      for (size_t i = 0; i < allPDLights.GetSize (); i++)
+      {
+        Light* pdl = allPDLights[i];
+        pdl->SetAttenuation( CS_ATTN_REALISTIC, csVector4(0, 0, 0, 0) );
+      }
+    }
+  }
+
   void Lighter::PrepareLighting ()
   {
     uvLayout->PrepareLighting (progPrepareLightingUVL);
@@ -594,13 +622,13 @@ namespace lighter
       if(enableRaytracer)
       {
         raytracerComponent = new RaytracerLighting (bases[p], p);
-        lighting.addComponent(raytracerComponent, 1.0);
+        lighting.addComponent(raytracerComponent, 1.0f, 0.0f);
       }
 
       if(enablePhotonMapper)
       {
         photonmapperComponent = new PhotonmapperLighting();
-        lighting.addComponent(photonmapperComponent, 8.0);
+        lighting.addComponent(photonmapperComponent, 1.0f, 0.0f);
       }
 
       // Iterate overl all scene sectors
@@ -787,6 +815,11 @@ namespace lighter
                 "considered black.\n");
     csPrintf ("   Default: %f\n\n", globalConfig.GetLMProperties ().blackThreshold);
 
+    csPrintf (" --lightpowerscale\n");
+    csPrintf ("  Scale the power of all light sources evenly by the indicated value.\n");
+    csPrintf ("  Note that this effects both raytracing and photonmapping (useful with 'forceRealistic').\n");
+    csPrintf ("   Default: 1.0\n\n");
+
     csPrintf (" --normalstolerance=<angle>\n");
     csPrintf ("  Set the angle between two normals to be considered equal by the\n");
     csPrintf ("  lightmap layouter.\n");
@@ -824,6 +857,15 @@ namespace lighter
       csPrintf ("  Use random sampling for raytraced lights instead of sampling\n"
                 "  every light source.\n");
       csPrintf ("   Default: False\n\n");
+
+      csPrintf (" --[no]globalambient\n");
+      csPrintf ("  Add a constant ambient value to the direct lighting component \n");
+      csPrintf ("  (ignored if indirect light is enabled)\n");
+      csPrintf ("   Default: true\n\n");
+
+      csPrintf (" --[no]forcerealistic\n");
+      csPrintf ("  Override light attenuation to be 'realistic' (important if combining with photonmapping).\n");
+      csPrintf ("   Default: false\n\n");
     }
 
     if (pmopts)

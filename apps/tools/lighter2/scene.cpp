@@ -982,6 +982,19 @@ namespace lighter
 
       bool isPD = light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
 
+      // Force to realistic attenuation if requested
+      if(globalConfig.GetLighterProperties ().forceRealistic)
+      {
+        light->SetAttenuationMode( CS_ATTN_REALISTIC );
+      }
+
+      // Scale light power to help avoid dark scenes when forcing realistic att
+      if(globalConfig.GetLighterProperties ().lightPowerScale != 1.0)
+      {
+        light->SetColor( light->GetColor()*
+          globalConfig.GetLighterProperties ().lightPowerScale);
+      }
+
       // IneQuation was here
       csRef<Light> intLight;
 
@@ -1040,6 +1053,7 @@ namespace lighter
 
       intLight->SetAttenuation (light->GetAttenuationMode (),
         light->GetAttenuationConstants ());
+
       intLight->SetPDLight (isPD);
       intLight->SetLightID (light->GetLightID());
       intLight->SetName (lightName);
@@ -2530,7 +2544,8 @@ namespace lighter
   
   void Scene::LightingPostProcessor::ApplyAmbient (Lightmap* lightmap)
   {
-    if (!globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_NONE)
+    if (globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_NONE &&
+        globalConfig.GetLighterProperties ().globalAmbient)
     {
       csColor amb;
       globalLighter->engine->GetAmbientLight (amb);
@@ -2540,7 +2555,8 @@ namespace lighter
 
   void Scene::LightingPostProcessor::ApplyAmbient (csColor* colors, size_t numColors)
   {
-    if (!globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_NONE)
+    if (globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_NONE &&
+        globalConfig.GetLighterProperties ().globalAmbient)
     {
       csColor amb;
       globalLighter->engine->GetAmbientLight (amb);

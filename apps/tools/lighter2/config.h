@@ -48,6 +48,14 @@ namespace lighter
       // Indirect lighting from scattered light
       LightingEngine indirectLightEngine;
 
+      // Enable/Disable constant ambient light
+      bool globalAmbient;
+      // Override lighting attenuation to be realistic for all lights
+      bool forceRealistic;
+      // Scale the power of all light sources evenly by indicated value
+      float lightPowerScale;
+      // Scale the power of all light source for photonmapping only
+      float PMLightScale;
       // HL2-style directional LMs
       bool directionalLMs;
       // Whether to generate maps containing light directions for specular

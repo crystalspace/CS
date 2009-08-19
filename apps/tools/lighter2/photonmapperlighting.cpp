@@ -181,7 +181,8 @@ namespace lighter
     for(size_t lightIdx = 0; lightIdx < allNonPDLights.GetSize(); ++lightIdx)
     {
       Light* curLight = allNonPDLights[lightIdx];
-      csColor pow = curLight->GetColor()*curLight->GetPower();
+      csColor pow = curLight->GetColor()*curLight->GetPower()*
+        globalConfig.GetLighterProperties ().PMLightScale;
       sectorLumenPower += (pow.red + pow.green + pow.blue)/3.0;
     }
 
@@ -190,7 +191,8 @@ namespace lighter
       // Get the position, color and power for this light source
       Light* curLight = allNonPDLights[lightIdx];
       const csVector3& pos = curLight->GetPosition();
-      const csColor& color = curLight->GetColor();
+      const csColor& color = curLight->GetColor()*
+          globalConfig.GetLighterProperties ().PMLightScale;
       const csColor& power = curLight->GetPower();
 
       // Determine type of light source
@@ -198,9 +200,10 @@ namespace lighter
       if(dynamic_cast<SpotLight*>(curLight) != NULL) curLightType = CS_LIGHT_SPOTLIGHT;
       else if(dynamic_cast<DirectionalLight*>(curLight) != NULL) curLightType = CS_LIGHT_DIRECTIONAL;
 
+      csColor pow = color*power;
+
       // How many photons does this light get (proportional to the fraction
       // of power this light contributes to the sector)?
-      csColor pow = curLight->GetColor()*curLight->GetPower();
       double powerScale = ((pow.red + pow.green + pow.blue)/3.0)/sectorLumenPower;
       size_t photonsForCurLight = floor(powerScale*numPhotonsPerSector + 0.5);
 
@@ -256,7 +259,7 @@ namespace lighter
         }
 
         // Emit a single photon into the sector containing this light
-        const PhotonRay newPhoton = { pos, dir, color, power, RAY_TYPE_OTHER1 };
+        const PhotonRay newPhoton = { pos, dir, color, power, curLight, RAY_TYPE_OTHER1 };
         EmitPhoton(sect, newPhoton, maxDepth, 0, !directLightEnabled);
         progressState.Advance();
       }
@@ -286,42 +289,51 @@ namespace lighter
       // TODO: Why would a hit be returned and 'hit.primitive' be NULL?
       if (!hit.primitive) { return; }
 
-      // Compute reflection direction
-      csVector3 normal = hit.primitive->ComputeNormal(hit.hitPoint);
-      csVector3 dir = photon.direction;
-      float dot = normal*dir;
-      csVector3 reflDir = dir;
-      reflDir -= normal*2*dot;
+      // Get the surface normal and direction from light source
+      csVector3 N = hit.primitive->ComputeNormal(hit.hitPoint);
+      csVector3 L = photon.direction;
+      N.Normalize(); L.Normalize();
 
-      // Compute reflected color
-      csColor reflColor = photon.color*photon.power;
+      // Compute reflection direction (not used anymore)
+//      float dot = N*L;
+//      csVector3 reflDir = L;
+//      reflDir -= N*2*dot;
+
+      // Compute reflected color intensity (lambertian)
+      // TODO: Account for surface albedo (textures, color, etc).
+      //       Right now surface is perfect white.
+      float dot = MAX(0.0, (-L)*N);
+      csColor Pd = dot * csColor(1.0, 1.0, 1.0);
+      csColor reflColor = photon.color*photon.power*dot;
 
       // Record photon based on enabled options
       if((depth == 0 && !ignoreDirect) || depth > 0)
       {
-        sect->AddPhoton(reflColor, hit.hitPoint, dir);
+        sect->AddPhoton(reflColor, hit.hitPoint, L);
       }
 
       // If indirect lighting is enabled, scatter the photon
       if(maxDepth > 0)
       {
-        // Russian roulette to cut off recursion depth early (but only if we are past first recursion level)
-        float pd = (reflColor.red + reflColor.green + reflColor.blue) / 3.0;
+        // Russian roulette to cut off recursion depth early
+        float avgRefl = (Pd.red + Pd.green + Pd.blue)/3.0;
         csRandomFloatGen randGen;
         float rand = randGen.Get();
 
-        if(depth == 0 || rand <= pd)
+        if(avgRefl > rand)
         {
           // Determine color and power of scattered light
-          // TODO: attenuate color and/or power by material properties
+          // Due to russian roulette, no power is lost but color should
+          // change according to surface reflectivity.
+          // TODO: change color to account for surface reflectivity
           csColor newColor = photon.color;
           csColor newPower = photon.power;
           
           // Generate a scattering direction in the hemisphere around the normal
-          csVector3 scatterDir = DiffuseScatter(normal);
+          csVector3 scatterDir = EqualScatter(N);
 
           // Emit a new Photon
-          const PhotonRay newPhoton = { hit.hitPoint, scatterDir, newColor, newPower, RAY_TYPE_REFLECT };
+          const PhotonRay newPhoton = { hit.hitPoint, scatterDir, newColor, newPower, photon.source, RAY_TYPE_REFLECT };
           EmitPhoton(sect, newPhoton, maxDepth, depth+1, ignoreDirect);
         }
       }
@@ -342,6 +354,23 @@ namespace lighter
     double phi = 2.0*PI*e2;
 
     return RotateAroundN(dir, theta, phi);
+  }
+
+  csVector3 PhotonmapperLighting::EqualScatter(const csVector3 &n)
+  {
+    // Local, static random number generator
+    static csRandomFloatGen randGen;
+
+    // Get two uniformly distributed random numbers between 0 and 1
+    double e1 = randGen.Get();
+    double e2 = randGen.Get();
+
+    // Compute the angles of rotation around the normal
+    // Up to 180 and 360 respectively.
+    double theta = PI*e1;
+    double phi = 2.0*PI*e2;
+
+    return RotateAroundN(n, theta, phi);
   }
 
   csVector3 PhotonmapperLighting::DiffuseScatter(const csVector3 &n)

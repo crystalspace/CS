@@ -33,6 +33,10 @@ namespace lighter
     //Setup defaults
     lighterProperties.directLightEngine = LIGHT_ENGINE_RAYTRACER;
     lighterProperties.indirectLightEngine = LIGHT_ENGINE_NONE;
+    lighterProperties.globalAmbient = true;
+    lighterProperties.forceRealistic = false;
+    lighterProperties.lightPowerScale = 1.0;
+    lighterProperties.PMLightScale = 1.0;
     lighterProperties.directionalLMs = false;
     lighterProperties.specularDirectionMaps = false;
     lighterProperties.numThreads = CS::Platform::GetProcessorCount();
@@ -100,6 +104,18 @@ namespace lighter
                ILEngineStr);
       exit(1);
     }
+
+    lighterProperties.globalAmbient = cfgFile->GetBool ("lighter2.GlobalAmbient", 
+      true);
+
+    lighterProperties.forceRealistic = cfgFile->GetBool ("lighter2.forceRealistic", 
+      false);
+
+    lighterProperties.lightPowerScale = cfgFile->GetFloat ("lighter2.lightPowerScale", 
+      lighterProperties.lightPowerScale);
+
+    lighterProperties.PMLightScale = cfgFile->GetFloat ("lighter2.PMLightScale", 
+      lighterProperties.PMLightScale);
 
     lighterProperties.directionalLMs = cfgFile->GetBool ("lighter2.BumpLMs", 
       lighterProperties.directionalLMs);
