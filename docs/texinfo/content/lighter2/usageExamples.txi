@@ -1,0 +1,14 @@
+@c -*-texinfo-*-
+@node lighter2 Basic Usage Examples, lighter2 Configure Options Reference, lighter2 Developers's Manual, Using lighter2
+@subsection @code{lighter2} Basic Usage Examples
+@cindex Using @code{lighter2} Basic Usage Examples
+
+@heading Introduction
+
+This section shows several command line usage cases for @code{lighter2}.  These
+examples will use data from the standard development distribution of CrystalSpace
+and demonstrate all options from standard raytracing to advanced tuning of
+photon mapping for good indirect lighting.
+
+@heading Basic, Direct Lighting Examples
+

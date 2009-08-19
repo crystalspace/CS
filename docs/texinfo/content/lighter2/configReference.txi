@@ -1,0 +1,224 @@
+@c -*-texinfo-*-
+@node lighter2 Configure Options Reference, , lighter2 Basic Usage Examples, Using lighter2
+@subsection @code{lighter2} Configure Options Reference
+@cindex Using @code{lighter2} Configure Options Reference
+
+@heading Introduction
+
+This section lists and describes in detail all of the configuration options available
+for @code{lighter2}.  These options can be set from inside a Crystal Space @file{world}
+file or library for individual mesh factories or instances or globally in a config file
+or at the command line when @code{lighter2} is run.  Command line options override any
+configuration options inside config files while options set on individual meshes
+override any global options.
+
+@heading General Syntax
+
+@code{lighter2} options are always set as <key>=<value> pairs (with a shortcut
+available for global boolean options).
+
+General command line syntax:
+
+@example
+    lighter2 --@emph{option}=@emph{value} @dots{}
+@end example
+
+Boolean option command line syntax:
+
+@example
+    lighter2 --[no]@emph{BooleanOption} @dots{}
+@end example
+
+where omitting the `no' prefix sets the option to `true' and including it sets the option to `false'.
+Note that command line options are NOT case sensitive.
+
+World/Library file syntax:
+
+@example
+    @dots{}
+    <key name="lighter2" editoronly="yes" @emph{option}=@emph{value} @dots{} />
+    @dots{}
+@end example
+
+Such a @samp{key} node must be placed inside a @samp{meshobj} node for mesh
+object options respectively a @samp{meshfact} node for mesh factory options.
+
+Here, @samp{name="lighter2"} is used by @code{lighter2} to identify keys 
+containing options.  @samp{editoronly="yes"} instructs the engine to discard
+the key-value-pair during normal execution in order to conserve memory (since
+the @code{lighter2}-specific settings are simply not needed).  The actual
+options are specified by a number of @samp{@emph{option}=@emph{value}} pairs.
+
+@heading @code{lighter2} Configuration options
+
+@heading Available Options
+
+@subheading General Options
+
+@table @code
+@item [no]simpletui
+  Use simplified text ui for output. Recommended/needed
+  for platforms without ANSI console handling such as msys.
+  Values: @samp{yes}, @samp{true}, @samp{no}, @samp{false}
+  Default: false
+
+@item swapcachesize
+  Set the size of the in memory swappable data cache in number of megabytes
+  Values: size of cache in megabytes
+  Default: 200
+
+@item [no]directlight
+  Calculate direct lighting using specified engine.  Valid engines are:
+    @samp{none} or @samp{false} - Disable direct lighting (useful for debugging)
+    @samp{raytracer} or @samp{true} - DEFAULT, sharp shadows, no noise, faster
+    @samp{photonmapper} - Softer shadows, noisy, slower (not recommended)
+
+@item [no]indirectlight
+  Calculate indirect lighting using specified engine.  Valid engines are:
+    @samp{none} or @samp{false} - DEFAULT, Disable indirect lighting (much faster)
+    @samp{photonmapper} - Slower but more realistic (captures color blead)
+
+@item lmdensity
+  Set scaling between world space units and lightmap pixels.  Larger values will
+  produce higher resolution lightmaps which look better but take up more memory
+  and may cause aliasing artifacts.
+  Value: strictly positive real number
+  Default: 4.000000
+
+@item maxlightmapu
+  Set maximum lightmap size in u-mapping direction.
+  Value: strictly positive integer
+  Default: 1024
+
+@item maxlightmapv
+  Set maximum lightmap size in v-mapping direction.
+  Value: strictly positive integer
+  Default: 1024
+
+@item blackthreshold
+  Set the normalized threshold for lightmap pixels to be considered black.  This value
+  determines when a lightmap is completely blank (i.e. no static light is hitting it)
+  and can safely be thrown out.
+  Value: floating point value between 0.0 and 1.0 inclusive.
+  Default: 0.007843
+
+@item normalstolerance
+  Set the angle between two normals to be considered equal when placing lightmaps on
+  a surface.  Angles beyond this tollerance indicate a boundary where a new lightmap
+  should be started.
+  Value: angle in degrees
+  Default: 1
+
+@item [no]bumplms
+  Generate directional lightmaps needed for normalmapping static lit surfaces.
+  Values: @samp{yes}, @samp{true}, @samp{no}, @samp{false}
+  Default: false
+
+@item [no]specmaps
+  Generate maps for specular lighting on static lit surfaces.
+  Values: @samp{yes}, @samp{true}, @samp{no}, @samp{false}
+  Default: false
+
+@end table
+
+@subheading Terrain Options
+@table @code
+@item maxterrainlightmapu
+  Set maximum terrain lightmap size in u-mapping direction
+  Value: strictly positive integer
+  Default: same as @code{maxlightmapu}
+
+@item maxterrainlightmapv
+  Set maximum terrain lightmap size in v-mapping direction
+  Value: strictly positive integer
+  Default: same as @code{maxlightmapv}
+@end table
+
+@subheading Advanced Options
+@table @code
+@item debugocclusionrays
+  Write a visualization of rays and their occlusions to meshes matching this expression.
+  Value: a @samp{regular expression} to use for matching mesh names.
+  Default: empty
+
+@item [no]binary
+  Enable/Disable saving world buffers in binary format.  If this is enabled then all factories
+  and mesh data will be re-written in binary format regardless of the input format.
+  Values: @samp{yes}, @samp{true}, @samp{no}, @samp{false}
+  Default: true
+
+@end table
+
+@subheading Raytracer Options
+@table @code
+@item [no]randomlight
+  Use random sampling for raytraced lights instead of sampling every light source.
+  Values: @samp{yes}, @samp{true}, @samp{no}, @samp{false}
+  Default: false
+
+@item [no]globalambient
+  Add a constant ambient value to the direct lighting component (ignored if indirect light is enabled).
+  Values: @samp{yes}, @samp{true}, @samp{no}, @samp{false}
+  Default: true
+
+@item [no]forcerealistic
+  Override light attenuation mode on all static lights to be @samp{realistic} (important if combining with photonmapping).
+  Values: @samp{yes}, @samp{true}, @samp{no}, @samp{false}
+  Default: false
+
+@end table
+
+
+@subheading Photon Mapping Options
+@table @code
+@item numphotons
+  Sets the number of photons to emit in each sector.  The photons will be divided
+  between the light sources in the sector according to the fraction of total light
+  contributed to the sector by that source.  Larger number will better sample the
+  illumination and reduce noise in the final image but take longer to emit, balance
+  and sample.
+  Value: positive integer (prefferably in the millions).
+  Default: 500
+
+@item maxdensitysamples
+  Sets the maximum number of photons to sample when estimating
+  density using the photon map.  Larger values will reduce noise
+  in the final image but increase lighting calculation time.
+  Value: positive integer (prefferably in the thousands).
+  Default: 50
+
+@item maxrecursiondepth
+  Sets the maximum number of times a photon can scatter during photon emission
+  Note: set to -1 to use a purely random cutoff (not recommended).
+  Value: positive integer (must be greater than 0 for indirect illumination).
+  Default: 10
+
+@item sampledistance
+  Sets the max distance to search for photons when estimating density at point p.
+  A sphere will expand around p with a radius of at most @samp{sampledistance} to
+  estimate photon density at p.
+  Value: positive float point value.
+  Default: 1.000000
+
+@item [no]finalgather
+  Enable/disable the final gather calculation for photon map indirect illumination.
+  The final gather step will smooth noise in the photon map at the cost of DRAMATICALLY
+  increased calculation time.  If enabled, you should reduce @code{maxdensitysamples}.
+  Values: @samp{yes}, @samp{true}, @samp{no}, @samp{false}
+  Default: false
+
+@item numfgrays
+  Sets the number of Final Gather rays to cast for each surface point.  Again, more rays
+  will help eliminate noise but will greatly increase computation time.
+  Value: positive integer (preferrably in the hundreds)
+  Default: 30
+
+@item [no]savephotonmap
+  Save the contents of the photon maps in a binary file for external use.  For the format
+  of this file see the photon map source code.  One file will be written for each sector
+  and written to the current directory (usually the directory containg @code{lighter2}).
+  Note that these files can be quite large for photon counts in the millions.
+  Values: @samp{yes}, @samp{true}, @samp{no}, @samp{false}
+  Default: False
+
+@end table

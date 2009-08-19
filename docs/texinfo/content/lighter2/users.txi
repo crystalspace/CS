@@ -6,15 +6,17 @@
 @heading Introduction
 
 @code{lighter2} is a tool to compute @emph{static lighting} for a CrystalSpace
-world. 
+world.
 
 @emph{Static} means that the lighting effects on objects in the world
 are precomputed in a preprocessing step during and after modelling of the 
 world. The benefit is that it is very cheap to render; it makes no difference
 if a world uses one or one thousand lights, the runtime performance is the
-same. Shadows are supported as well. However, as the name ``static'' implies,
-the lighting can't be changed at runtime - that is, moving a light source
-won't have an effect on statically lit geometry.
+same. Also, more accurate lighting techniques that cannot run in realtime can
+be used  (such as raytracing and photon mapping) which acheve such effects as
+accurate shadows and global illumination. However, as the name ``static''
+implies, the lighting can't be changed at runtime - that is, moving a light
+source won't have an effect on statically lit geometry.
 
 @c Mention GI and alpha shadows once we have them
 

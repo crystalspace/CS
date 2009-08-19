@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node lighter2 Developer's Manual, , lighter2 User's Manual, Using lighter2
+@node lighter2 Developer's Manual, lighter2 Basic Usage Examples, lighter2 User's Manual, Using lighter2
 @subsection @code{lighter2} Developer's Manual
 @cindex Using @code{lighter2} Developer's Manual
 

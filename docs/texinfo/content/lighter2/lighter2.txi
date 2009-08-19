@@ -18,5 +18,15 @@ a certain user-configured option has to be specified.
 * lighter2 Developer's Manual:: @code{lighter2} Developer's Manual
 @end menu
 
+Those wanting to dive right in can refer to the ``Basic Usage Examples'' and 
+the ``Configure Options Reference'' linked below.
+
+@menu
+* lighter2 Basic Usage Examples:: @code{lighter2} Basic Usage Examples
+* lighter2 Configure Options Reference:: @code{lighter2} Configure Options Reference
+@end menu
+
 @importss{content,lighter2,users.txi}
 @importss{content,lighter2,developers.txi}
+@importss{content,lighter2,usageExamples.txi}
+@importss{content,lighter2,configReference.txi}
