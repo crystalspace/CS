@@ -6230,6 +6230,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMeshFilter = *cspacec::iView_GetMeshFilter;
 *GetCustomMatrixCamera = *cspacec::iView_GetCustomMatrixCamera;
 *SetCustomMatrixCamera = *cspacec::iView_SetCustomMatrixCamera;
+*GetWidth = *cspacec::iView_GetWidth;
+*GetHeight = *cspacec::iView_GetHeight;
+*SetWidth = *cspacec::iView_SetWidth;
+*SetHeight = *cspacec::iView_SetHeight;
 *scfGetVersion = *cspacec::iView_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -21584,6 +21588,10 @@ sub DESTROY {
 *GetClipper = *cspacec::csView_GetClipper;
 *Draw = *cspacec::csView_Draw;
 *GetMeshFilter = *cspacec::csView_GetMeshFilter;
+*GetWidth = *cspacec::csView_GetWidth;
+*GetHeight = *cspacec::csView_GetHeight;
+*SetWidth = *cspacec::csView_SetWidth;
+*SetHeight = *cspacec::csView_SetHeight;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

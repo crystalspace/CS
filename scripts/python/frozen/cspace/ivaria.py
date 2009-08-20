@@ -284,6 +284,10 @@ class iView(core.iBase):
     def GetMeshFilter(*args): return _ivaria.iView_GetMeshFilter(*args)
     def GetCustomMatrixCamera(*args): return _ivaria.iView_GetCustomMatrixCamera(*args)
     def SetCustomMatrixCamera(*args): return _ivaria.iView_SetCustomMatrixCamera(*args)
+    def GetWidth(*args): return _ivaria.iView_GetWidth(*args)
+    def GetHeight(*args): return _ivaria.iView_GetHeight(*args)
+    def SetWidth(*args): return _ivaria.iView_SetWidth(*args)
+    def SetHeight(*args): return _ivaria.iView_SetHeight(*args)
     scfGetVersion = staticmethod(_ivaria.iView_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iView
     __del__ = lambda self : None;
