@@ -51,6 +51,9 @@ numImposterMeshes(0), instance(false), removeMe(false), rendered(false)
   mesh->GetMovable()->SetPosition(csVector3(0.0f));
   mesh->GetMovable()->SetSector(sector);
   mesh->GetMovable()->UpdateMove();
+
+  mesh->GetFlags().Set(CS_ENTITY_NOLIGHTING | CS_ENTITY_NOSHADOWS | CS_ENTITY_NOSHADOWRECEIVE);
+  flags.Set(CS_ENTITY_NOLIGHTING | CS_ENTITY_NOSHADOWS | CS_ENTITY_NOSHADOWRECEIVE);
 }
 
 csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,

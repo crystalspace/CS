@@ -259,9 +259,10 @@ public:
     return static_cast<iObjectModel*>(this);
   }
 
+  virtual csFlags& GetFlags () { return flags; }
+
   /// All of these are unsupported.
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
-  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return csPtr<iMeshObject>(0); }
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb) {}
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return 0; }
