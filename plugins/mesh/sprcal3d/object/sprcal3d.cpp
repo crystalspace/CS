@@ -956,7 +956,7 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
     new_socket->SetMeshWrapper (0);
   }
 
-  skeleton = new csCal3dSkeleton (cal_skeleton, factory->skel_factory, this);
+  skeleton.AttachNew(new csCal3dSkeleton (cal_skeleton, factory->skel_factory, this));
 }
 
 
@@ -2392,8 +2392,10 @@ csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton,
   std::vector<CalBone*> cal_bones = skeleton->getVectorBone ();
   for (size_t i = 0; i < cal_bones.size (); i++)
   {
-    bones.Push (new csCal3dSkeletonBone (cal_bones[i],
-	  skel_factory->GetBone (i), this));
+    csRef<csCal3dSkeletonBone> bone;
+    bone.AttachNew(new csCal3dSkeletonBone (cal_bones[i],
+         skel_factory->GetBone (i), this));
+    bones.Push (bone);
   }
   for (size_t i = 0; i < cal_bones.size (); i++)
   {
