@@ -154,7 +154,7 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
   for(size_t i=0; i<instances.GetSize() || !instance; ++i)
   {
     if((!instance && closestInstanceMesh == mesh) ||
-        (instance && instances[i]->mesh == mesh))
+      (instance && instances[i]->mesh == mesh))
     {
       // Update if the camera isn't valid.
       bool update = !camera.IsValid();
@@ -185,19 +185,19 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
 
       // Update material!
       if(!isUpdating)
-			{
-				if(update)
-				{
-					// Update mesh
-					camera = rview->GetCamera();
-					InitMesh();
-					materialUpdateNeeded = true;
-				}
+      {
+        if(update)
+        {
+          // Update mesh
+          camera = rview->GetCamera();
+          InitMesh();
+          materialUpdateNeeded = true;
+        }
 
-				if(camera.IsValid())
-				{
-					isUpdating = impman->Update(this);
-				}
+        if(camera.IsValid())
+        {
+          isUpdating = impman->Update(this);
+        }
       }
 
       return true;
@@ -328,7 +328,7 @@ void csImposterMesh::InitMesh()
   csOrthoTransform& camt = camera->GetTransform();
 
   csVector3 relativeDir = (closestInstanceMesh->GetWorldBoundingBox().GetCenter()
-      - camt.GetOrigin()).Unit();
+    - camt.GetOrigin()).Unit();
 
   meshLocalDir = objt.Other2ThisRelative(relativeDir);
   cameraLocalDir = camt.Other2ThisRelative(relativeDir);
@@ -365,7 +365,7 @@ CS_IMPLEMENT_STATIC_VAR (GetMeshTexels, csDirtyAccessArray<csVector2>, ());
 CS_IMPLEMENT_STATIC_VAR (GetMeshColors, csDirtyAccessArray<csVector4>, ());
 
 csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview, 
-    iMovable* movable, uint32 frustum_mask)
+                                                iMovable* movable, uint32 frustum_mask)
 {
   // Get an unused mesh
   bool rmCreated;

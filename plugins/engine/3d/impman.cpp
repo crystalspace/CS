@@ -79,8 +79,8 @@ bool csImposterManager::HandleEvent(iEvent &ev)
     }
     else if(!updateQueue[i]->init)
     {
-       updateQueue[i]->init = InitialiseImposter(updateQueue[i]);
-       ++updated;
+      updateQueue[i]->init = InitialiseImposter(updateQueue[i]);
+      ++updated;
     }
     else if(updateQueue[i]->update)
     {
@@ -108,8 +108,8 @@ csImposterManager::TextureSpace::TextureSpace(size_t width,
                                               size_t height,
                                               iMaterialWrapper* material,
                                               TextureSpace* parent)
-: width(width), height(height), childWidth(0), childHeight(0),
-  material(material), parent(parent), full(false)
+                                              : width(width), height(height), childWidth(0), childHeight(0),
+                                              material(material), parent(parent), full(false)
 {
   if(!parent)
   {
@@ -181,7 +181,7 @@ csImposterManager::TextureSpace* csImposterManager::TextureSpace::Allocate(size_
 
     return 0;
   }
-  
+
   TextureSpace* space = 0;
   if(!firstSpace->IsFull())
   {
@@ -206,7 +206,7 @@ bool csImposterManager::TextureSpace::Realloc(size_t& rWidth,
                                               csBox2& texCoords) const
 {
   if(full && (childWidth < rWidth || childHeight < rHeight) &&
-     rWidth <= width && rHeight <= height)
+    rWidth <= width && rHeight <= height)
   {
     texCoords.Set(minX, minY, minX+rWidth, minY+rHeight);
     return true;
@@ -370,9 +370,9 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Normalise the texture coordinates.
   csIMesh->texCoords.Set(csIMesh->texCoords.MinX()/rTexWidth,
-                         csIMesh->texCoords.MinY()/rTexHeight,
-                         csIMesh->texCoords.MaxX()/rTexWidth,
-                         csIMesh->texCoords.MaxY()/rTexHeight);
+    csIMesh->texCoords.MinY()/rTexHeight,
+    csIMesh->texCoords.MaxX()/rTexWidth,
+    csIMesh->texCoords.MaxY()/rTexHeight);
 
   float widthRatio = g3d->GetWidth()/(float)rTexWidth;
   float heightRatio = g3d->GetHeight()/(float)rTexHeight;
@@ -381,10 +381,10 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Calculate required projection.
   CS::Math::Matrix4 projShift (
-      widthRatio, 0, 0, 2*(csIMesh->texCoords.MinX() - newMinX/rTexWidth),
-      0, heightRatio, 0, 2*(csIMesh->texCoords.MinY() - newMinY/rTexHeight),
-      0, 0, 1, 0,
-      0, 0, 0, 1);
+    widthRatio, 0, 0, 2*(csIMesh->texCoords.MinX() - newMinX/rTexWidth),
+    0, heightRatio, 0, 2*(csIMesh->texCoords.MinY() - newMinY/rTexHeight),
+    0, 0, 1, 0,
+    0, 0, 0, 1);
 
   newCamera->SetProjectionMatrix (projShift * newCamera->GetCamera()->GetProjectionMatrix());
 
@@ -458,7 +458,7 @@ void csImposterManager::AddMeshToImposter(csImposterMesh* imposter)
   for(size_t i=0; i<sectorImposters.GetSize(); ++i)
   {
     if(imposter->sector == sectorImposters[i]->sector &&
-       imposter->mat == sectorImposters[i]->sectorImposter->mat)
+      imposter->mat == sectorImposters[i]->sectorImposter->mat)
     {
       sectorImposters[i]->sectorImposter->meshDirty = true;
       sectorImposters[i]->sectorImposter->imposterMeshes.Push(imposter);
@@ -482,19 +482,19 @@ void csImposterManager::RemoveMeshFromImposter(csImposterMesh* imposter)
   for(size_t i=0; i<sectorImposters.GetSize(); ++i)
   {
     if(imposter->sector == sectorImposters[i]->sector &&
-       imposter->mat == sectorImposters[i]->sectorImposter->mat)
+      imposter->mat == sectorImposters[i]->sectorImposter->mat)
     {
-			csImposterMesh* imposterMesh = sectorImposters[i]->sectorImposter;
+      csImposterMesh* imposterMesh = sectorImposters[i]->sectorImposter;
       imposterMesh->meshDirty = true;
       imposterMesh->imposterMeshes.Delete(imposter);
 
-			if(imposterMesh->imposterMeshes.IsEmpty())
-			{
-				imposterMesh->mesh->GetMovable()->SetSector(0);
-				imposterMesh->mesh->GetMovable()->UpdateMove();
-				sectorImposters[i]->sectorImposter.Invalidate();
-				sectorImposters.DeleteIndexFast(i);
-			}
+      if(imposterMesh->imposterMeshes.IsEmpty())
+      {
+        imposterMesh->mesh->GetMovable()->SetSector(0);
+        imposterMesh->mesh->GetMovable()->UpdateMove();
+        sectorImposters[i]->sectorImposter.Invalidate();
+        sectorImposters.DeleteIndexFast(i);
+      }
 
       return;
     }
