@@ -174,14 +174,6 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
         }
       }
 
-      if(update)
-      {
-        // Update mesh
-        camera = rview->GetCamera();
-        InitMesh();
-        materialUpdateNeeded = true;
-      }
-
       // Update the distance.
       size_t distance = (rview->GetCamera()->GetTransform().GetOrigin()
         - mesh->GetMovable()->GetPosition()).Norm();
@@ -193,8 +185,19 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
 
       // Update material!
       if(!isUpdating)
-      {
-        isUpdating = impman->Update(this);
+			{
+				if(update)
+				{
+					// Update mesh
+					camera = rview->GetCamera();
+					InitMesh();
+					materialUpdateNeeded = true;
+				}
+
+				if(camera.IsValid())
+				{
+					isUpdating = impman->Update(this);
+				}
       }
 
       return true;

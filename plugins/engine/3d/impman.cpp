@@ -143,7 +143,7 @@ csImposterManager::TextureSpace::TextureSpace(size_t width,
     }
   }
 
-  if(width > 64 || height > 64)
+  if(width > 32 || height > 32)
   {
     if(width < height)
     {
@@ -347,8 +347,8 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   }
 
   // Allocate texture space.
-  size_t rTexWidth = csFindNearestPowerOf2(g3d->GetWidth());
-  size_t rTexHeight = csFindNearestPowerOf2(g3d->GetHeight());
+  size_t rTexWidth = 2*csFindNearestPowerOf2(g3d->GetWidth());
+  size_t rTexHeight = 2*csFindNearestPowerOf2(g3d->GetHeight());
   if(maxWidth < rTexWidth)
     rTexWidth = maxWidth;
   if(maxHeight < rTexHeight)
@@ -422,13 +422,6 @@ bool csImposterManager::UpdateImposter(ImposterMat* imposter)
   csImposterMesh* csIMesh = static_cast<csImposterMesh*>(&*imposter->mesh);
   csMeshWrapper* csMesh = static_cast<csMeshWrapper*>(&*csIMesh->closestInstanceMesh);
 
-  if(!csIMesh->camera.IsValid())
-  {
-    // Finished updating.
-    csIMesh->isUpdating = false;
-    return false;
-  }
-
   bool updated = false;
   if(csIMesh->materialUpdateNeeded || csIMesh->closestInstance < imposter->lastDistance)
   {
@@ -491,8 +484,18 @@ void csImposterManager::RemoveMeshFromImposter(csImposterMesh* imposter)
     if(imposter->sector == sectorImposters[i]->sector &&
        imposter->mat == sectorImposters[i]->sectorImposter->mat)
     {
-      sectorImposters[i]->sectorImposter->meshDirty = true;
-      sectorImposters[i]->sectorImposter->imposterMeshes.Delete(imposter);
+			csImposterMesh* imposterMesh = sectorImposters[i]->sectorImposter;
+      imposterMesh->meshDirty = true;
+      imposterMesh->imposterMeshes.Delete(imposter);
+
+			if(imposterMesh->imposterMeshes.IsEmpty())
+			{
+				imposterMesh->mesh->GetMovable()->SetSector(0);
+				imposterMesh->mesh->GetMovable()->UpdateMove();
+				sectorImposters[i]->sectorImposter.Invalidate();
+				sectorImposters.DeleteIndexFast(i);
+			}
+
       return;
     }
   }
