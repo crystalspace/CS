@@ -185,7 +185,11 @@ private:
 
   csString imposter_shader;
 
+  // Whether to use pseudo-instanced impostering.
   bool imposter_instancing;
+
+  // Whether to render the 'real' mesh while waiting for the imposter to init.
+  bool imposter_renderReal;
 
   // Factory to be instanced.
   iMeshFactoryWrapper* instanceFactory;
@@ -400,6 +404,14 @@ public:
   virtual void SetInstancing(bool instancing)
   {
     imposter_instancing = instancing;
+  }
+
+  /**
+   * Sets whether to render the real mesh while waiting for the imposter to init.
+   */
+  virtual void SetRenderReal(bool renderReal)
+  {
+    imposter_renderReal = renderReal;
   }
 
   //--------------------- iSelfDestruct implementation -------------------//

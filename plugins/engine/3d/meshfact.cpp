@@ -42,7 +42,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
                                             iMeshObjectFactory *meshFact)
   : scfImplementationType (this), meshFact (meshFact), parent (0),
   zbufMode (CS_ZBUF_USE), engine (engine), min_imposter_distance(0),
-  imposter_instancing(false)
+  imposter_instancing(false), imposter_renderReal(false)
 {
   children.SetMeshFactory (this);
 
@@ -64,7 +64,8 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
   : scfImplementationType (this), parent (0), zbufMode (CS_ZBUF_USE), 
-  engine (engine), min_imposter_distance(0), imposter_instancing(false)
+  engine (engine), min_imposter_distance(0), imposter_instancing(false),
+  imposter_renderReal(false)
 {
   children.SetMeshFactory (this);
 
@@ -253,7 +254,7 @@ bool csMeshFactoryWrapper::UpdateImposter(iMeshWrapper* mesh, iRenderView* rview
   for(size_t i=0; i<imposters.GetSize(); ++i)
   {
     if(imposters[i]->Update(mesh, rview))
-      return imposters[i]->Rendered();
+      return !imposter_renderReal || imposters[i]->Rendered();
 
     if(!imposters[i]->IsInstancing())
     {
@@ -277,7 +278,7 @@ bool csMeshFactoryWrapper::UpdateImposter(iMeshWrapper* mesh, iRenderView* rview
     this, mesh, rview, imposter_instancing, imposter_shader));
   imposters.Push(imposter);
 
-  return false;
+  return !imposter_renderReal;
 }
 
 void csMeshFactoryWrapper::RemoveImposter(iMeshWrapper* mesh)

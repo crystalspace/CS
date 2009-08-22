@@ -35,7 +35,7 @@
 
 csImposterMesh::csImposterMesh (csEngine* engine, iSector* sector) : scfImplementationType(this),
 engine(engine), sector(sector), materialUpdateNeeded(false), matDirty(true), meshDirty(true), 
-numImposterMeshes(0), instance(false), removeMe(false), rendered(false)
+numImposterMeshes(0), instance(false), removeMe(false), rendered(false), currentMesh(0)
 {
   // Create meshwrapper.
   csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
@@ -261,10 +261,16 @@ void csImposterMesh::CreateInstance(iMeshWrapper* pmesh)
   transformVars->AddVariableToArray(instance->transformVar);
   fadeFactors->AddVariableToArray(instance->fadeFactor);
   instances.Push(instance);
+
+  // Mark original mesh as invisible.
+  pmesh->GetFlags().Set(CS_ENTITY_INVISIBLEMESH);
 }
 
 void csImposterMesh::DestroyInstance(Instance* instance)
 {
+  // Mark original mesh as visible.
+  instance->mesh->GetFlags().Reset(CS_ENTITY_INVISIBLEMESH);
+
   size_t idx = transformVars->FindArrayElement(instance->transformVar); 
   CS_ASSERT(idx != csArrayItemNotFound);
 
@@ -378,7 +384,7 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
   }
   else
   {
-    SetupRenderMeshes(mesh, rmCreated, rview->GetCamera());
+    SetupRenderMeshes(mesh, rmCreated, rview);
   }
 
   num = 1;
@@ -403,7 +409,7 @@ int csImposterMesh::ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* c
   return (distancef > distances) ? -1 : 1;
 }
 
-void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCamera* camera)
+void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRenderView* rview)
 {
   csDirtyAccessArray<uint>& mesh_indices = *GetMeshIndices ();
   csDirtyAccessArray<csVector3>& mesh_vertices = *GetMeshVertices ();
@@ -414,7 +420,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
   {
     // Initialize mesh
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
-    mesh->do_mirror = camera->IsMirrored ();
+    mesh->do_mirror = rview->GetCamera()->IsMirrored ();
     mesh->object2world = csReversibleTransform ();
     mesh->worldspace_origin = csVector3 (0,0,0);
     mesh->mixmode = CS_FX_COPY;
@@ -438,7 +444,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
     csArray<csImposterMesh*> sortedMeshes;
     for(size_t i=0; i<imposterMeshes.GetSize(); ++i)
     {
-      imposterMeshes[i]->camera = camera;
+      imposterMeshes[i]->camera = rview->GetCamera();
       sortedMeshes.InsertSorted(imposterMeshes[i], &ImposterMeshSort);
     }
 
@@ -536,6 +542,22 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCam
 
     matDirty = false;
     meshDirty = false;
+  }
+  else
+  {
+    // No change.. so trigger an update check.
+    if(currentMesh >= imposterMeshes.GetSize())
+      currentMesh = 0;
+
+    uint i = currentMesh;
+    for(; i<currentMesh+updatePerFrame && i<imposterMeshes.GetSize(); ++i)
+    {
+      iMeshWrapper* imesh = imposterMeshes[i]->closestInstanceMesh;
+      imesh->GetFlags().Set(CS_ENTITY_INVISIBLEMESH);
+      imposterMeshes[i]->camera = rview->GetCamera();
+      imposterMeshes[i]->Update(imesh, rview);
+    }
+    currentMesh = i;
   }
 }
 

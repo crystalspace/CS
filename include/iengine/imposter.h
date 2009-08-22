@@ -38,7 +38,7 @@ struct iSharedVariable;
  */
 struct iImposterFactory : public virtual iBase
 {
-  SCF_INTERFACE(iImposterFactory, 1, 0, 0);
+  SCF_INTERFACE(iImposterFactory, 1, 1, 0);
 
   /**
    * Given a mesh, activate and update its imposter.
@@ -97,6 +97,11 @@ struct iImposterFactory : public virtual iBase
    * Sets what method of impostering (instancing or not) to use.
    */
   virtual void SetInstancing(bool instancing) = 0;
+
+  /**
+  * Sets whether to render the real mesh while waiting for the imposter to init.
+  */
+  virtual void SetRenderReal(bool renderReal) = 0;
 };
 
 struct iImposterMesh : public virtual iBase

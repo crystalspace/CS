@@ -329,6 +329,7 @@ void ImposterTest::CreateSprites ()
   i->SetCameraRotationTolerance(3.0f);
   i->SetShader("lighting_imposter");
   i->SetInstancing(false);
+  i->SetRenderReal(true);
 
   look_point = csVector3 (1, 1, 1);
 

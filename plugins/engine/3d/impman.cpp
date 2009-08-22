@@ -80,7 +80,11 @@ bool csImposterManager::HandleEvent(iEvent &ev)
     else if(!updateQueue[i]->init)
     {
       updateQueue[i]->init = InitialiseImposter(updateQueue[i]);
-      ++updated;
+      if(++updated == updatePerFrame)
+      {
+        updateQueue.DeleteIndexFast(i);
+        break;
+      }
     }
     else if(updateQueue[i]->update)
     {
@@ -412,6 +416,9 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
     AddMeshToImposter(imposter->mesh);
   }
 
+  // Make the mesh visible again for this r2t.
+  csMesh->GetFlags().Reset(CS_ENTITY_INVISIBLEMESH);
+
   csIMesh->rendered = true;
 
   return true;
@@ -475,6 +482,12 @@ void csImposterManager::AddMeshToImposter(csImposterMesh* imposter)
   newSectorI->sectorImposter->mat = imposter->mat;
 
   sectorImposters.Push(newSectorI);
+
+  for(size_t i=0; i<sectorImposters.GetSize(); ++i)
+  {
+    sectorImposters[i]->sectorImposter->updatePerFrame =
+      updatePerFrame/sectorImposters.GetSize();
+  }
 }
 
 void csImposterManager::RemoveMeshFromImposter(csImposterMesh* imposter)
@@ -494,6 +507,12 @@ void csImposterManager::RemoveMeshFromImposter(csImposterMesh* imposter)
         imposterMesh->mesh->GetMovable()->UpdateMove();
         sectorImposters[i]->sectorImposter.Invalidate();
         sectorImposters.DeleteIndexFast(i);
+
+        for(size_t i=0; i<sectorImposters.GetSize(); ++i)
+        {
+          sectorImposters[i]->sectorImposter->updatePerFrame =
+            updatePerFrame/sectorImposters.GetSize();
+        }
       }
 
       return;

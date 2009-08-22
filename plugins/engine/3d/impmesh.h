@@ -145,6 +145,12 @@ private:
   // True if r2t has been performed for this imposter.
   bool rendered;
 
+  // Current mesh being updated.
+  uint currentMesh;
+
+  // Number of meshes to update (for batching).
+  uint updatePerFrame;
+
   void AddSVToMesh(iMeshWrapper* mesh, csShaderVariable* sv);
 
   void CreateInstance(iMeshWrapper* pmesh);
@@ -155,7 +161,7 @@ private:
 
   bool WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh);
 
-  void SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iCamera* camera);
+  void SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRenderView* rview);
 
   void SetupRenderMeshesInstance(csRenderMesh*& mesh,  bool rmCreated, iCamera* camera);
 
