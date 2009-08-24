@@ -237,6 +237,9 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     allocHeight = MAX ((allocHeight+1) / 2, 1);
     coordCorrect = 1;
   }
+  // Width needs to be rounded up to a multiple of 4 for bug on Nvidia cards
+  // in Mac OSX
+  allocWidth = ((allocWidth - 1) / 4 + 1) * 4;
   /*if (glyphAlign != 1) // uncomment if glyphAlign gets != 1 someday
   {
     allocWidth = 
@@ -326,9 +329,10 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     // When using size-reduced glyphs, nudge the TCs slightly inward
     // to reduce leaking in of neighbouring glyphs.
     const float tccorrect = (float)((1 << coordCorrect) / 2) * (0.5f / tsf);
+    const int padX = MAX (texRect.Width() - bmetrics.width, 0);
     cacheData->tx1 = (float)texRect.xmin / tsf + tccorrect;
     cacheData->ty1 = (float)texRect.ymin / tsf + tccorrect;
-    cacheData->tx2 = (float)(texRect.xmax) / tsf - tccorrect;
+    cacheData->tx2 = (float)(texRect.xmax - padX) / tsf - tccorrect;
     cacheData->ty2 = (float)(texRect.ymax) / tsf - tccorrect;
     cacheData->hasGlyph = true;
 
@@ -416,7 +420,8 @@ void csGLFontCache::CopyGlyphData (iFont* /*font*/, utf32_char /*glyph*/, size_t
 	  const uint8 val = *src++;
 	  *dest++ = valXor ^ val;
 	}
-	dest += padX;
+        for(int i = 0; i < padX; i++)
+	  *dest++ = 0;
       }
     }
     else
@@ -451,7 +456,8 @@ void csGLFontCache::CopyGlyphData (iFont* /*font*/, utf32_char /*glyph*/, size_t
 	  if (((bmetrics.width & 7) != 0)  && 
               (y < bmetrics.height-1)) // Don't do last iteration
             byte = *src++;
-	  dest += padX;
+          for(int i = 0; i < padX; i++)
+	    *dest++ = 0;
 	}
       }
     }
