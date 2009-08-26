@@ -27,6 +27,7 @@
 #include "iengine/collection.h"
 #include "iengine/engine.h"
 #include "iengine/halo.h"
+#include "iengine/impman.h"
 #include "iengine/imposter.h"
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"

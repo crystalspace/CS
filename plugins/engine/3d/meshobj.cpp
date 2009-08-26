@@ -70,8 +70,7 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   }
   factory = 0;
   zbufMode = CS_ZBUF_USE;
-  //imposter_active = false;
-  imposter_mesh = 0;
+  using_imposter = false;
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
 
@@ -232,12 +231,17 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 
 csMeshWrapper::~csMeshWrapper ()
 {
+  if (using_imposter)
+  {
+    iImposterFactory* factwrap = dynamic_cast<iImposterFactory*> (factory);
+    factwrap->RemoveImposter (this);
+  }
+
   // Copy the array because we are going to unlink the children.
   csRefArray<iSceneNode> children = movable.GetChildren ();
   size_t i;
   for (i = 0 ; i < children.GetSize () ; i++)
     children[i]->SetParent (0);
-  delete imposter_mesh;
   ClearFromSectorPortalLists ();
 }
 
@@ -400,17 +404,25 @@ void csMeshWrapper::SetRenderPriority (CS::Graphics::RenderPriority rp)
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  if (factory)
+
+  if (factory && drawing_imposter != rview->GetCamera())
   {
-    csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
-  	factory);
-    if (factwrap->imposter_active && CheckImposterRelevant (rview))
+    csRef<iImposterFactory> factwrap = scfQueryInterfaceSafe<iImposterFactory> (factory);
+    if (factwrap)
     {
-      csRenderMesh** imposter = GetImposter (rview);
-      if (imposter)
+      if (UseImposter (rview))
       {
-        n = 1;
-        return imposter;
+        if(factwrap->UpdateImposter (this, rview))
+        {
+          using_imposter = true;
+          n = 0;
+          return 0;
+        }
+      }
+      else if (using_imposter)
+      {
+        factwrap->RemoveImposter (this);
+        using_imposter = false;
       }
     }
   }
@@ -753,31 +765,18 @@ void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
 
 //---------------------------------------------------------------------------
 
-bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
+bool csMeshWrapper::UseImposter (iRenderView *rview)
 {
-  if (!factory) return false;
-  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
-  	factory);
+  if (!factory)
+    return false;
+
+  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (factory);
+  if(!factwrap->GetMinDistance())
+    return false;
+
   float wor_sq_dist = GetSquaredDistance (rview);
-  float dist = factwrap->min_imposter_distance->Get ();
+  float dist = factwrap->GetMinDistance();
   return (wor_sq_dist > dist*dist);
-}
-
-csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
-{
-  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
-  	factory);
-  csImposterFactory* imposter_factory = factwrap->GetImposterFactory ();
-  if (!imposter_factory) return 0;
-
-  imposter_mesh = imposter_factory->GetImposterMesh (this,
-      imposter_mesh, rview);
-  if (!imposter_mesh) return 0;
-  if (!imposter_mesh->GetImposterReady (rview))
-    return 0;
-
-  // Get imposter rendermesh
-  return imposter_mesh->GetRenderMesh (rview);
 }
 
 void csMeshWrapper::SetLODFade (float fade)
@@ -1066,44 +1065,27 @@ csScreenBoxResult csMeshWrapper::GetScreenBoundingBox (iCamera *camera)
 {
   csScreenBoxResult rc;
 
-  csVector2 oneCorner;
+  // Calculate camera space bbox.
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable.IsFullTransformIdentity ())
     tr_o2c /= movable.GetFullTransform ();
   
   rc.cbox = GetTransformedBoundingBox (tr_o2c);
 
-  // if the entire bounding box is behind the camera, we're done
-  if ((rc.cbox.MinZ () < 0) && (rc.cbox.MaxZ () < 0))
+  // Calculate screen space bbox.
+  float minz, maxz;
+  const csBox3& wbox = GetWorldBoundingBox();
+  if(!wbox.ProjectBox(camera->GetTransform(), camera->GetProjectionMatrix(),
+      rc.sbox, minz, maxz, engine->G3D->GetWidth(),
+      engine->G3D->GetHeight()))
   {
-    rc.distance = -1;
-    return rc;
-  }
-
-  // Transform from camera to screen space.
-  if (rc.cbox.MinZ () <= 0)
-  {
-    // Mesh is very close to camera.
-    // Just return a maximum bounding box.
-    rc.sbox.Set (-10000, -10000, 10000, 10000);
+      rc.distance = -1;
   }
   else
   {
-    oneCorner = camera->Perspective (rc.cbox.Max ());
-    rc.sbox.StartBoundingBox (oneCorner);
-
-    csVector3 v (rc.cbox.MinX (), rc.cbox.MinY (), rc.cbox.MaxZ ());
-    oneCorner = camera->Perspective (v);
-    rc.sbox.AddBoundingVertexSmart (oneCorner);
-    oneCorner = camera->Perspective (rc.cbox.Min ());
-    rc.sbox.AddBoundingVertexSmart (oneCorner);
-    v.Set (rc.cbox.MaxX (), rc.cbox.MaxY (), rc.cbox.MinZ ());
-    oneCorner = camera->Perspective (v);
-    rc.sbox.AddBoundingVertexSmart (oneCorner);
+      rc.distance = rc.cbox.MaxZ ();
   }
 
-  rc.distance = rc.cbox.MaxZ ();
-  
   return rc;
 }
 

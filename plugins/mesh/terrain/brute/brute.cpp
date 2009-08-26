@@ -639,8 +639,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
                             csReversibleTransform &transform,
                             iMovable *movable)
 {
-  if(detach)
-	  return;
+  if (detach) return;
 
   int clip_portal, clip_plane, clip_z_plane;
   if (!CS::RenderViewClipper::CullBBox (rview->GetRenderContext (),

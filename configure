@@ -1595,7 +1595,7 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-perl             use Perl5 scripting interface (default NO)
   --without-python        do not use Python scripting interface
-  --with-java             use Java scripting interface (default YES)
+  --with-java             use Java (default YES)
   --with-x11=dir          specify additional location to search libx11 if not
                           detected automatically; directories searched include
                           dir/include, dir/lib, and dir
@@ -14428,15 +14428,20 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check if Java2 SDK is installed and which compiler and linker flags are
+# Check if Java SDK is installed and which compiler and linker flags are
 # needed.  Also check if Ant build tool, which is commonly used to build Java
 # projects, is available.
 #------------------------------------------------------------------------------
 
+    case $host_os in
+	mingw*|cygwin*) cs_java_platform=win32 ;;
+	*) cs_java_platform=`echo $host_os |
+	    sed 's/^\([^-]*\).*$/\1/'` ;;
+    esac
 
 JAVA_HOME=`echo "x$JAVA_HOME" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 
-if test -z "$JAVA" && test -n "$JAVACMD"; then
+    if test -z "$JAVA" && test -n "$JAVACMD"; then
   JAVA=`echo "x$JAVACMD" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
@@ -14492,12 +14497,13 @@ fi
   test -n "$JAVA" && break
 done
 
-cs_build_prop_val="$JAVA"
+    cs_build_prop_val="$JAVA"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}JAVA ?= $cs_build_prop_val ;
 "
 fi
+
 
 
 
@@ -14552,7 +14558,7 @@ fi
   test -n "$JAVAC" && break
 done
 
-cs_build_prop_val="$JAVAC"
+    cs_build_prop_val="$JAVAC"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}JAVAC ?= $cs_build_prop_val ;
@@ -14561,128 +14567,125 @@ fi
 
 
 
+
 # Check whether --with-java was given.
 if test "${with_java+set}" = set; then
   withval=$with_java;
 fi
 
-if test -z "$with_java"; then
+    if test -z "$with_java"; then
   with_java=yes
 fi
 
 
-if test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"; then
+    if test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"; then
+  { $as_echo "$as_me:$LINENO: checking for Java SDK" >&5
+$as_echo_n "checking for Java SDK... " >&6; }
+if test "${cs_cv_java_sdk+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$JAVA" && test -n "$JAVAC"; then
+  cat <<EOF > conftest.java
+public class conftest {
+    public static void main(String[] args) {
+        System.out.println(System.getProperty(args[0]));
+    }
+}
+EOF
+    $JAVAC conftest.java
+
 
 
     if test x$cs_host_macosx = xyes && # Not cross-building for Darwin.
 	test -r /System/Library/Frameworks/JavaVM.framework/Headers; then
-  cs_java_cflags="-I/System/Library/Frameworks/JavaVM.framework/Headers"
-	cs_java_libs="-framework JavaVM"
+  cs_cv_java_sdk_cflags="-I/System/Library/Frameworks/JavaVM.framework/Headers"
+	cs_cv_java_sdk_libs="-framework JavaVM"
 else
   if test -n "$JAVA_HOME"; then
-  cs_java_dir="$JAVA_HOME"
+
+    cs_cv_java_sdk_cflags="$cs_cv_java_sdk_cflags -I$JAVA_HOME/include"
+    if test -n "$cs_java_platform"; then
+  cs_cv_java_sdk_cflags="$cs_cv_java_sdk_cflags -I$JAVA_HOME/include/$cs_java_platform"
+fi
+
+	    cs_save_ifs=$IFS; IFS=$PATH_SEPARATOR
+    for cs_dir in $JAVA_HOME
+    do
+        IFS=$cs_save_ifs
+        test -z "$cs_dir" && cs_dir=.
+        cs_cv_java_sdk_lflags="$cs_cv_java_sdk_lflags -L$cs_dir"
+    done
+    IFS=$cs_save_ifs
+
+fi
+
+	cs_java_home=`{ ($as_echo "$as_me:$LINENO: \$JAVA conftest java.home") >&5
+  ($JAVA conftest java.home) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }`
+	if test -n "$cs_java_home"; then
+
+    cs_cv_java_sdk_cflags="$cs_cv_java_sdk_cflags -I$cs_java_home/include"
+    if test -n "$cs_java_platform"; then
+  cs_cv_java_sdk_cflags="$cs_cv_java_sdk_cflags -I$cs_java_home/include/$cs_java_platform"
+fi
+
+
+    cs_cv_java_sdk_cflags="$cs_cv_java_sdk_cflags -I$cs_java_home/../include"
+    if test -n "$cs_java_platform"; then
+  cs_cv_java_sdk_cflags="$cs_cv_java_sdk_cflags -I$cs_java_home/../include/$cs_java_platform"
+fi
+
+	    cs_save_ifs=$IFS; IFS=$PATH_SEPARATOR
+    for cs_dir in $cs_java_home$PATH_SEPARATOR$cs_java_home/..
+    do
+        IFS=$cs_save_ifs
+        test -z "$cs_dir" && cs_dir=.
+        cs_cv_java_sdk_lflags="$cs_cv_java_sdk_lflags -L$cs_dir"
+    done
+    IFS=$cs_save_ifs
+
+fi
+
+	cs_java_lib_path=`{ ($as_echo "$as_me:$LINENO: \$JAVA conftest java.library.path") >&5
+  ($JAVA conftest java.library.path) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }`
+	if test -n "$cs_java_lib_path"; then
+  cs_save_ifs=$IFS; IFS=$PATH_SEPARATOR
+    for cs_dir in $cs_java_lib_path
+    do
+        IFS=$cs_save_ifs
+        test -z "$cs_dir" && cs_dir=.
+        cs_cv_java_sdk_lflags="$cs_cv_java_sdk_lflags -L$cs_dir"
+    done
+    IFS=$cs_save_ifs
+
+fi
+
+	cs_cv_java_sdk_cflags=`echo "x$cs_cv_java_sdk_cflags" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_java_sdk_lflags=`echo "x$cs_cv_java_sdk_lflags" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_java_sdk_libs="-ljvm"
+fi
+
+	    rm -f conftest.java conftest.class
+
+	    cs_java_cflags="$cs_cv_java_sdk_cflags"
+	    cs_java_lflags="$cs_cv_java_sdk_lflags"
+	    cs_java_libs="$cs_cv_java_sdk_libs"
+	    cs_cv_java_sdk=yes
 else
-  if test -n "$JAVAC"; then
-  cs_java_dir=`$as_dirname -- $JAVAC ||
-$as_expr X$JAVAC : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X$JAVAC : 'X\(//\)[^/]' \| \
-	 X$JAVAC : 'X\(//\)$' \| \
-	 X$JAVAC : 'X\(/\)' \| . 2>/dev/null ||
-$as_echo X$JAVAC |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\/\)[^/].*/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\/\)$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\).*/{
-	    s//\1/
-	    q
-	  }
-	  s/.*/./; q'`
-		cs_java_dir=`$as_dirname -- $cs_java_dir ||
-$as_expr X$cs_java_dir : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X$cs_java_dir : 'X\(//\)[^/]' \| \
-	 X$cs_java_dir : 'X\(//\)$' \| \
-	 X$cs_java_dir : 'X\(/\)' \| . 2>/dev/null ||
-$as_echo X$cs_java_dir |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\/\)[^/].*/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\/\)$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\).*/{
-	    s//\1/
-	    q
-	  }
-	  s/.*/./; q'`
-else
-  cs_java_dir=''
+  cs_cv_java_sdk=no
 fi
 
 fi
-
-	if test -n "$cs_java_dir"; then
-  cs_java_cflags="-I$cs_java_dir/include"
-	    case $host_os in
-		mingw*|cygwin*) cs_java_platform=win32 ;;
-		*) cs_java_platform=`echo $host_os |
-		    sed 's/^\([^-]*\).*$/\1/'` ;;
-	    esac
-	    if test -n "$cs_java_platform"; then
-  cs_java_cflags="$cs_java_cflags
-		    $cs_java_cflags/$cs_java_platform"
-fi
-
-	    cs_java_cflags=`echo "x$cs_java_cflags" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    for i in `find "$cs_java_dir/" -name '*jvm.*' -print`; do
-	        echo `$as_dirname -- $i ||
-$as_expr X$i : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X$i : 'X\(//\)[^/]' \| \
-	 X$i : 'X\(//\)$' \| \
-	 X$i : 'X\(/\)' \| . 2>/dev/null ||
-$as_echo X$i |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\/\)[^/].*/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\/\)$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\).*/{
-	    s//\1/
-	    q
-	  }
-	  s/.*/./; q'`; done | sort | uniq > conftest.jlib
-	    cs_java_lflags=`sed 's/^\(.*\)$/-L\1/' < conftest.jlib`
-	    cs_java_lflags=`echo "x$cs_java_lflags" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    rm -f conftest.jlib
-	    cs_java_libs="-ljvm"
-fi
-
-fi
-
-    if test "" != yes; then
-  { $as_echo "$as_me:$LINENO: checking if Java2 SDK is usable" >&5
-$as_echo_n "checking if Java2 SDK is usable... " >&6; }
+{ $as_echo "$as_me:$LINENO: result: $cs_cv_java_sdk" >&5
+$as_echo "$cs_cv_java_sdk" >&6; }
+	if test "" != yes; then
+  { $as_echo "$as_me:$LINENO: checking if Java SDK is usable" >&5
+$as_echo_n "checking if Java SDK is usable... " >&6; }
 if test "${cs_cv_java+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
@@ -14699,7 +14702,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-        `echo @$cs_java_cflags@$cs_java_lflags@$cs_java_libs | sed 'y% %#%'`
+	    `echo @$cs_java_cflags@$cs_java_lflags@$cs_java_libs | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -14769,16 +14772,16 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #if defined(__GNUC__)
-	    typedef long long __int64; /* For GCC on Windows */
-	    #endif
-	    /* Fix for 'jlong' on x86_64. */
-	    #if defined(__x86_64)
-	    #ifdef _LP64 /* 64-bit Solaris */
-	    #undef _LP64
-	    #endif
-	    #endif
-	    #include <jni.h>
-	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);
+		typedef long long __int64; /* For GCC on Windows */
+		#endif
+		/* Fix for 'jlong' on x86_64. */
+		#if defined(__x86_64)
+		#ifdef _LP64 /* 64-bit Solaris */
+		#undef _LP64
+		#endif
+		#endif
+		#include <jni.h>
+		JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);
 int
 main ()
 {
@@ -14852,8 +14855,8 @@ fi
 { $as_echo "$as_me:$LINENO: result: $cs_cv_java" >&5
 $as_echo "$cs_cv_java" >&6; }
 else
-  { $as_echo "$as_me:$LINENO: checking if Java2 SDK is usable" >&5
-$as_echo_n "checking if Java2 SDK is usable... " >&6; }
+  { $as_echo "$as_me:$LINENO: checking if Java SDK is usable" >&5
+$as_echo_n "checking if Java SDK is usable... " >&6; }
 	    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -14867,7 +14870,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-        `echo @$cs_java_cflags@$cs_java_lflags@$cs_java_libs | sed 'y% %#%'`
+	    `echo @$cs_java_cflags@$cs_java_lflags@$cs_java_libs | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -14937,16 +14940,16 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #if defined(__GNUC__)
-	    typedef long long __int64; /* For GCC on Windows */
-	    #endif
-	    /* Fix for 'jlong' on x86_64. */
-	    #if defined(__x86_64)
-	    #ifdef _LP64 /* 64-bit Solaris */
-	    #undef _LP64
-	    #endif
-	    #endif
-	    #include <jni.h>
-	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);
+		typedef long long __int64; /* For GCC on Windows */
+		#endif
+		/* Fix for 'jlong' on x86_64. */
+		#if defined(__x86_64)
+		#ifdef _LP64 /* 64-bit Solaris */
+		#undef _LP64
+		#endif
+		#endif
+		#include <jni.h>
+		JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);
 int
 main ()
 {
@@ -15107,12 +15110,14 @@ fi
   test -n "$ANT" && break
 done
 
-cs_build_prop_val="$ANT"
+    cs_build_prop_val="$ANT"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}ANT ?= $cs_build_prop_val ;
 "
 fi
+
+
 
 
 
