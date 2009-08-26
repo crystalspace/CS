@@ -249,40 +249,6 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
 
 
 #------------------------------------------------------------------------------
-# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() since
-# CS_CHECK_HOST() may alter the build environment in a way which affects these
-# tests. For instance, these tests might be impacted on Mac OS X by a universal
-# binary build.
-#------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
-    [CS_CREATE_TUPLE([-mmmx])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],
-        [append])])
-CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
-    [CS_CREATE_TUPLE([-msse])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse],
-        [append])])
-CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
-    [CS_CREATE_TUPLE([-msse2])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse2],
-        [append])])
-CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
-    [CS_CREATE_TUPLE([-mfpmath=sse])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_mfpmath_sse],
-        [append])])
-
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_CHECK_BUILD([for mmintrin.h],
-        [cs_cv_header_mmintrin_h],
-        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
-        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
-        [C++],
-        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
-        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
-
-
-
-#------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
 # required to embed Perl.  Also determine if the glue file can be created with
 # ExtUtils::Embed or if it must be created manually.
@@ -648,12 +614,14 @@ AC_MSG_CHECKING([whether to use CPU-specific optimizations])
 AC_ARG_ENABLE([cpu-specific-optimizations],
     [AC_HELP_STRING([--enable-cpu-specific-optimizations=level],
 	[enable CPU-specific optimizations; recognized levels are `no',
-	`minimum' or `min', `maximum' or `max' (default MINIMUM); the `minimum'
-	option selects optimizations which are likely to be supported by
-	reasonably modern hardware, thus making the resulting executables
-	fairly portable; use the `maximum' option with caution since code for
-	one processor will not work with earlier processors (for example, Intel
-	686-specific code will not work with a 586)])],
+	`minimum' or `min', `maximum' or `max', `native' (default MINIMUM);
+	the `minimum' option selects optimizations which are likely to be 
+	supported by reasonably modern hardware, thus making the resulting 
+	executables fairly portable; use the `maximum' option with caution 
+	since code for one processor will not work with earlier processors
+	(for example, Intel 686-specific code will not work with a 586). The
+	`native' option select optimizations specific for the compiling machine
+	(thus giving a fairly unportable executable).])],
     [case $enable_cpu_specific_optimizations in
 	yes|min) enable_cpu_specific_optimizations=minimum ;;
 	max) enable_cpu_specific_optimizations=maximum ;;
@@ -662,25 +630,21 @@ AC_ARG_ENABLE([cpu-specific-optimizations],
 AC_MSG_RESULT([$enable_cpu_specific_optimizations])
 
 case $enable_cpu_specific_optimizations in
-    no|minimum|maximum) ;;
-    *) CS_MSG_ERROR([unrecognized option; use `no', `minimum', or `maximum'])
+    no|minimum|maximum|native) ;;
+    *) CS_MSG_ERROR([unrecognized option; use `no', `minimum', `maximum' or `native'])
        ;;
 esac
 
 AS_IF([test $enable_cpu_specific_optimizations != no],
     [AC_CACHE_CHECK([for code generation flags], [cs_cv_prog_cxx_code_gen],
 	[cs_cv_prog_cxx_code_gen=no
-	AS_IF([test $enable_cpu_specific_optimizations = maximum],
-	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon -mtune=generic])
-	    CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
-	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
-	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686 -mtune=generic])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro -march=i686])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro])])
+	AS_IF([test $enable_cpu_specific_optimizations = native],
+	    [CS_CHECK_CODE_GEN_FLAG([*], [-march=native -mtune=native])])
+	AS_IF([test $enable_cpu_specific_optimizations = maximum \
+		|| test $enable_cpu_specific_optimizations = native],
+	    [CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=generic])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=pentium3])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3])])
 	AS_IF([test $host_vendor = apple],
 	    [# Work around issue on intel macs, where "-fpmath=sse" is on by
 	     # default, but this breaks compilation when combined with 
@@ -690,8 +654,15 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	     # -march=i686.
 	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=prescott])
 	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=i686])])
+	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=generic])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-march=k8])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=k8])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686 -mtune=generic])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro -march=i686])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586 -mtune=generic])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium -march=i586])
@@ -707,6 +678,35 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
     AS_IF([test "$cs_cv_prog_cxx_code_gen" != no],
 	[CS_EMIT_BUILD_PROPERTY(
 	    [COMPILER.CFLAGS], [$cs_cv_prog_cxx_code_gen], [+])])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() and
+# the CPU optimization flags detection since these may alter the build 
+# environment in a way which affects the SIMD flags tests. For instance,
+# they might be impacted on Mac OS X by a universal binary build, or only the
+# "-march" parameter chosen by the optimization flags detection may enable
+# support for specific SIMD instructions.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
+    [CS_CREATE_TUPLE([-mmmx])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],
+        [append])], [],	[$cs_cv_prog_cxx_code_gen])
+CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
+    [CS_CREATE_TUPLE([-mfpmath=sse])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_mfpmath_sse],
+        [append])], [],
+	[$cs_cv_prog_cxx_code_gen $cs_cv_prog_cxx_enable_errors])
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_CHECK_BUILD([for mmintrin.h],
+        [cs_cv_header_mmintrin_h],
+        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
+        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
+        [C++],
+        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
+        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
 
 
 
