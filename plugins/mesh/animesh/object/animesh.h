@@ -107,6 +107,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       const csReversibleTransform& transform, const char* name);
     virtual size_t GetSocketCount () const;
     virtual iAnimatedMeshSocketFactory* GetSocket (size_t index) const;
+    virtual uint FindSocket (const char* name) const;
 
     //-- iMeshObjectFactory
     virtual csFlags& GetFlags ();

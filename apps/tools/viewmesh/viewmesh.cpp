@@ -75,8 +75,8 @@ struct vmAnimCallback : public CalAnimationCallback
 
 ViewMesh::ViewMesh () : 
   camMode(movenormal), roomsize(5), scale(1), move_sprite_speed(0),
-  selectedSocket(0),  selectedCal3dSocket(0), meshTx(0), meshTy(0), 
-  meshTz(0), callback(0)
+  selectedSocket(0),  selectedCal3dSocket(0), selectedAnimeshSocket(0),
+  meshTx(0), meshTy(0), meshTz(0), callback(0)
 {
   SetApplicationName ("CrystalSpace.ViewMesh");
 }
@@ -947,6 +947,7 @@ void ViewMesh::LoadSprite (const char* filename)
     cal3dstate = 0;
     selectedSocket = 0;
     selectedCal3dSocket = 0;
+    selectedAnimeshSocket = 0;
     selectedAnimation = 0;
     selectedMorphTarget = 0;
     meshTx = meshTy = meshTz = 0;
@@ -1217,6 +1218,22 @@ void ViewMesh::UpdateSocketList ()
       list->addItem(item);
     }
   }
+  else if (animeshsprite)
+  {
+    for (int i = 0; i < animeshsprite->GetSocketCount(); i++)
+    {
+      iAnimatedMeshSocketFactory* sock = animeshsprite->GetSocket(i);
+      if (!sock) continue;
+
+      if (i==0) SelectSocket(sock->GetName());
+
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(sock->GetName());
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
+    }
+  }
 }
 
 void ViewMesh::UpdateAnimationList ()
@@ -1371,6 +1388,12 @@ void ViewMesh::SelectSocket (const char* newsocket)
     if (selectedCal3dSocket == sock) return;
     selectedCal3dSocket = sock;
   }
+  else if (animeshstate && animeshsprite)
+  {
+    iAnimatedMeshSocket* sock = animeshstate->GetSocket(animeshsprite->FindSocket(newsocket));
+    if(selectedAnimeshSocket == sock) return;
+    selectedAnimeshSocket = sock;
+  }
   UpdateSocket();
 }
 
@@ -1409,6 +1432,12 @@ void ViewMesh::UpdateSocket ()
     csRef<iString> valueTriangle(new scfString());
     valueTriangle->Format("%d", selectedCal3dSocket->GetTriangleIndex());
     InputTriangle->setProperty("Text", valueTriangle->GetData());
+  }
+  else if (selectedAnimeshSocket)
+  {
+    CEGUI::Window* InputName = winMgr->getWindow("Tab3/RenameSocket/Input");
+    const char* name = selectedAnimeshSocket->GetName();
+    InputName->setProperty("Text", name);
   }
 }
 

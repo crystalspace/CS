@@ -413,6 +413,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return sockets[index];
   }
 
+  uint AnimeshObjectFactory::FindSocket (const char* name) const
+  {
+    for(size_t i=0; i<sockets.GetSize(); ++i)
+    {
+      if(!strcmp(name, sockets[i]->GetName()))
+      {
+        return i;
+      }
+    }
+
+    return (uint)~0;
+  }
+
   csFlags& AnimeshObjectFactory::GetFlags ()
   {
     return factoryFlags;

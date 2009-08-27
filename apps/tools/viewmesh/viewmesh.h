@@ -48,6 +48,7 @@
 
 struct iAnimatedMesh;
 struct iAnimatedMeshFactory;
+struct iAnimatedMeshSocket;
 struct iSkeletonAnimNode2;
 struct iSkeletonAnimNodeFactory2;
 
@@ -105,6 +106,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   csRef<iSpriteCal3DState> cal3dstate;
   iSpriteSocket* selectedSocket;
   iSpriteCal3DSocket* selectedCal3dSocket;
+  iAnimatedMeshSocket* selectedAnimeshSocket;
   const char* selectedAnimation;
   const char* selectedMorphTarget;
   float meshTx, meshTy, meshTz;
