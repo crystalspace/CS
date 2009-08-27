@@ -26,6 +26,7 @@
 #include "object_terrain2.h"
 
 #include "photonmap.h"
+#include "irradiancecache.h"
 
 #include <functional>
 
@@ -41,7 +42,6 @@ namespace lighter
       delete photonMap;
     }
   }
-
 
   void Sector::Initialize (Statistics::Progress& progress)
   {
@@ -143,25 +143,72 @@ namespace lighter
 
   void Sector::BalancePhotons(Statistics::ProgressState& prog)
   {
-    if(photonMap != NULL) photonMap->Balance(prog);
+    if(photonMap != NULL)
+    {
+      // First, initialize the irradiance cache
+      if(irradianceCache != NULL) delete irradianceCache;
+      irradianceCache = new IrradianceCache(
+        photonMap->GetBBoxMin(), photonMap->GetBBoxMax(), 1000);
+
+      // Balance the photons
+      photonMap->Balance(prog);
+    }
+  }
+
+  bool Sector::SampleIRCache(const csVector3 point, const csVector3 normal,
+                    csColor &irrad)
+  {
+    if(irradianceCache == NULL) return false;
+
+    // Check cache to see if we can reuse old results
+    float* result = new float[3];
+    float fPos[3] = { point.x, point.y, point.z };
+    float fNorm[3] = { normal.x, normal.y, normal.z };
+    
+    if(irradianceCache->EstimateIrradiance(fPos, fNorm, result))
+    {
+      irrad.Set(result[0], result[1], result[2]);
+      delete [] result;
+      return true;
+    }
+
+    return false;
   }
 
   csColor Sector::SamplePhoton(const csVector3 point, const csVector3 normal,
                     const float searchRad)
   {
-    if(photonMap == NULL) return csColor();
+    if(photonMap == NULL) return csColor(0, 0, 0);
 
-    // Local copy of the global option
+    // Local copy of the global options
     const static size_t densitySamples =
       globalConfig.GetIndirectProperties ().maxDensitySamples;
 
+    // Sample the photon map
     float result[3] = {0, 0, 0};
     float fPos[3] = { point.x, point.y, point.z };
     float fNorm[3] = { normal.x, normal.y, normal.z };
-
     photonMap->IrradianceEstimate(result, fPos, fNorm, searchRad, densitySamples);
 
+    // Return result as a csColor
     return csColor(result[0], result[1], result[2]);
+  }
+
+  void Sector::AddToIRCache(const csVector3 point, const csVector3 normal,
+                      const csColor irrad, const float mean)
+  {
+    float fPow[3] = { irrad.red, irrad.green, irrad.blue };
+    float fPos[3] = { point.x, point.y, point.z };
+    float fNorm[3] = { normal.x, normal.y, normal.z };
+
+    // Add sample to the irradiance cache for reuse
+    if(irradianceCache == NULL)
+    {
+      irradianceCache = new IrradianceCache(
+        photonMap->GetBBoxMin(), photonMap->GetBBoxMax(), 1000);
+    }
+
+    irradianceCache->Store(fPos, fNorm, fPow, mean);
   }
 
   void Sector::SavePhotonMap(const char* filename)

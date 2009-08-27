@@ -43,9 +43,10 @@ namespace lighter
       TUI_DRAW_PROGRESS = (1<<3),
       TUI_DRAW_MESSAGES = (1<<4),
       TUI_DRAW_RAYCORE = (1<<5),
-      TUI_DRAW_SETTINGS = (1<<6),
-      TUI_DRAW_STATS = (1<<7),
-      TUI_DRAW_SWAPCACHE = (1<<8),
+      TUI_DRAW_PMCORE = (1<<6),
+      TUI_DRAW_SETTINGS = (1<<7),
+      TUI_DRAW_STATS = (1<<8),
+      TUI_DRAW_SWAPCACHE = (1<<9),
       TUI_DRAW_ALL = 0xFFFFFFFF
     };
 
@@ -73,6 +74,9 @@ namespace lighter
 
     //Draw raytracer stats
     void DrawRayCore () const;
+
+    //Draw photonmapper stats
+    void DrawPMCore () const;
 
     //Draw settings
     void DrawSettings () const;

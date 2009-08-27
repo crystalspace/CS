@@ -133,7 +133,7 @@ namespace lighter
         {
           progress.IncProgress (progressStep);
           u = updateFreq;
-          globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
+          globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE | TUI::TUI_DRAW_PMCORE);
         }
       }
     };
@@ -167,6 +167,37 @@ namespace lighter
       /// Number of rays generated to gather photons for indirect lighting
       uint64 numFinalGatherRays;
     } raytracer;
+
+    struct Photonmapping
+    {
+      Photonmapping ()
+        : numStoredPhotons(0), numKDLookups(0),
+          KDTreeDepth(0), irCachePrimary(0),
+          irCacheSecondary(0), irCacheSplits(0),
+          irCacheLookups(0)
+      {}
+
+      /// Total number of photons stored (different from traced)
+      uint64 numStoredPhotons;
+
+      /// Number of KD tree lookups
+      uint64 numKDLookups;
+
+      /// Depth of the photon map KD tree (after balancing
+      uint64 KDTreeDepth;
+
+      /// Primary samples in the IR Cache
+      uint64 irCachePrimary;
+
+      /// Secondary evaluations from the IR cache
+      uint64 irCacheSecondary;
+
+      /// Number of nodes splits in the IR cache octree
+      uint64 irCacheSplits;
+
+      /// Number of lookups into the IR cache
+      uint64 irCacheLookups;
+    } photonmapping;
 
     struct Scene
     {

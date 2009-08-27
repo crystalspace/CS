@@ -213,6 +213,9 @@ namespace lighter
 
   size_t PhotonMap :: GetPhotonCount() { return storedPhotons; }
 
+  float* PhotonMap :: GetBBoxMin() { return bboxMin; }
+  float* PhotonMap :: GetBBoxMax() { return bboxMax; }
+
   inline float PhotonMap :: ConeWeight(float dist, float r, float k)
   {
     return (1.0 - dist/(k*r));
@@ -261,6 +264,7 @@ namespace lighter
 
     // locate the nearest photons
     LocatePhotons( &np, 1 );
+    globalStats.photonmapping.numKDLookups += np.found;
 
     // if less than 8 photons assume black (Note: this may be dangerous)
     if (np.found < 8)
@@ -429,6 +433,8 @@ namespace lighter
       return;
 
     storedPhotons++;
+    globalStats.photonmapping.numStoredPhotons++;
+    
     Photon *const node = &(photons[storedPhotons]);
 
     for (size_t i=0; i<3; i++) {
@@ -541,6 +547,8 @@ namespace lighter
     }
 
     halfStoredPhotons = storedPhotons/2-1;
+    globalStats.photonmapping.KDTreeDepth =
+      (int)floor(log10f(storedPhotons)/log10f(2.0));
   }
 
 

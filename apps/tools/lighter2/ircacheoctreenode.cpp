@@ -20,6 +20,8 @@
 #include "ircacheoctreenode.h"
 #include "irradiancecache.h"
 
+#include "statistics.h"
+
 namespace lighter
 {
   double OctreeSampleNode::alpha = 0.1;
@@ -108,6 +110,8 @@ namespace lighter
   void OctreeSampleNode::FindSamples(const IrradianceSample *samp,
                           NearestSamples* &nearest)
   {
+    globalStats.photonmapping.irCacheLookups++;
+
     // Check all samples at this node
     for(size_t i=0; i<samples.GetSize(); i++)
     {
@@ -228,6 +232,8 @@ namespace lighter
   {
     // Sanity check (can't split a non-leaf node)
     if(!isLeaf) return;
+
+    globalStats.photonmapping.irCacheSplits++;
 
     // Allocate children nodes
     for(size_t i=0; i<8; i++)

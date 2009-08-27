@@ -62,6 +62,8 @@ namespace lighter
       const float dir[3] );
 
     size_t GetPhotonCount();
+    float* GetBBoxMin();
+    float* GetBBoxMax();
     
     /**
      * ScalePhotonPower

@@ -82,60 +82,81 @@ namespace lighter
     // Are we doing a final gather ?
     if (finalGather)
     {
-      // Accumulate the energy from the FG rays in 'final'
-      csColor final(0.0f, 0.0f, 0.0f);
-
-      // Loop through an M by N grid of sample rays
-      for (size_t j = 1; j <= numFinalGatherMSubdivs; j++)
+      // Attempt secondary calculation (cache lookup)
+      if(sector->SampleIRCache(point, normal, c))
       {
-        for (size_t i = 1; i <= numFinalGatherNSubdivs; i++)
-        {
-          // Use stratified sampling to sample the hemisphere above our point
-          csVector3 sampleDir = StratifiedSample(normal, i, j,
-                numFinalGatherMSubdivs, numFinalGatherNSubdivs);
-
-          // Build a hit and ray structure to use for Final Gather Rays
-          lighter::HitPoint hit;
-          hit.distance = FLT_MAX*0.9f;
-
-          lighter::Ray ray;
-          ray.type = RAY_TYPE_OTHER2;   // Special type for Final Gather rays
-          ray.direction = sampleDir;
-          ray.origin = point;
-          ray.minLength = 0.01f;
-
-          // Trace the final gather ray
-          if (lighter::Raytracer::TraceClosestHit(sector->kdTree, ray, hit)
-              && hit.primitive)
-          {
-            // Compute the direction to the source point
-            csVector3 dirToSource = point - hit.hitPoint;
-            dirToSource.Normalize();
-
-            // Calculate the normal at the hit point
-            csVector3 hNorm = hit.primitive->ComputeNormal(hit.hitPoint);
-
-            // Make sure normal is facing towards source point
-            if(dirToSource*hNorm < 0.0) hNorm -= hNorm;
-
-            // Sample the photon map at the hit point and accumulate the energy
-            final += sector->SamplePhoton(hit.hitPoint, hNorm, searchRadius);
-          }
-          //else
-          //{
-          //  final += sector->SamplePhoton(point, normal, searchRadius);
-          //}
-        }
+        globalStats.photonmapping.irCacheSecondary++;
       }
 
-      // Normalize the accumulated energy
-      c = final * (PI / (numFinalGatherMSubdivs*numFinalGatherNSubdivs));
-    }
-    else
-    {
-      c = sector->SamplePhoton(point, normal, searchRadius);
+      // Secondary calculation failed, fall-back to primary
+      // calculation (single-bounce monte carlo raytracing)
+      else
+      {
+        // Accumulate the energy from the FG rays in 'final'
+        csColor final(0.0f, 0.0f, 0.0f);
+
+        // Accumulate the recipricol length of each ray
+        float meanDist = 0.0;
+
+        // Count the rays that hit something
+        size_t rayCount = 0;
+
+        // Loop through an M by N grid of sample rays
+        for (size_t j = 1; j <= numFinalGatherMSubdivs; j++)
+        {
+          for (size_t i = 1; i <= numFinalGatherNSubdivs; i++)
+          {
+            // Use stratified sampling to sample the hemisphere above our point
+            csVector3 sampleDir = StratifiedSample(normal, i, j,
+                  numFinalGatherMSubdivs, numFinalGatherNSubdivs);
+
+            // Build a hit and ray structure to use for Final Gather Rays
+            lighter::HitPoint hit;
+            hit.distance = FLT_MAX*0.9f;
+
+            lighter::Ray ray;
+            ray.type = RAY_TYPE_OTHER2;   // Special type for Final Gather rays
+            ray.direction = sampleDir;
+            ray.origin = point;
+            ray.minLength = 0.01f;
+
+            // Trace the final gather ray
+            if (lighter::Raytracer::TraceClosestHit(sector->kdTree, ray, hit)
+                && hit.primitive)
+            {
+              // Compute the direction to the source point
+              csVector3 dirToSource = point - hit.hitPoint;
+              meanDist += 1.0/dirToSource.Norm();
+              rayCount++;
+              dirToSource.Normalize();
+
+              // Calculate the normal at the hit point
+              csVector3 hNorm = hit.primitive->ComputeNormal(hit.hitPoint);
+
+              // Make sure normal is facing towards source point
+              if(dirToSource*hNorm < 0.0) hNorm -= hNorm;
+
+              // Sample the photon map at the hit point and accumulate the energy
+              final += sector->SamplePhoton(hit.hitPoint, hNorm, searchRadius);
+            }
+          }
+        }
+
+        // Normalize the accumulated energy
+        c = final * (PI / (numFinalGatherMSubdivs*numFinalGatherNSubdivs));
+
+        // Cache the results
+        sector->AddToIRCache(point, normal, c, rayCount/meanDist);
+        globalStats.photonmapping.irCachePrimary++;
+      }
     }
 
+    else
+    {
+      // Just lookup irradiance in the photon map (no raytracing)
+      c = sector->SamplePhoton(point, normal, searchRadius);
+    }
+    
     return c;
   }
 
@@ -366,8 +387,8 @@ namespace lighter
     double e2 = randGen.Get();
 
     // Compute the angles of rotation around the normal
-    // Up to 180 and 360 respectively.
-    double theta = PI*e1;
+    // Up to 90 and 360 respectively.
+    double theta = PI/2.0*e1;
     double phi = 2.0*PI*e2;
 
     return RotateAroundN(n, theta, phi);
