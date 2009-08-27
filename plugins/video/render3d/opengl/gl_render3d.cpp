@@ -1668,7 +1668,8 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   queueEntry.attrib = CS_VATTRIB_SECONDARY_COLOR;
   changeQueue.Push (queueEntry);
   
-  for (int i = 0; i < csMin (numTCUnits, 8); i++)
+  const int n = ( numTCUnits < 8 ) ? numTCUnits : 8 ;
+  for (int i = 0; i < n; i++)
   {
     queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
     queueEntry.attrib = (csVertexAttrib)(CS_VATTRIB_TEXCOORD0+i);
