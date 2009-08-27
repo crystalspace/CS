@@ -1502,14 +1502,6 @@ bool ViewMesh::HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, 
     {
       if(HandleSkel2Node(animName, node->FindNode(priNode->GetNode(i)->GetNodeName()), start))
       {
-        if(start)
-        {
-          node->Play();
-        }
-        else
-        {
-          node->Stop();
-        }
         return true;
       }
     }
