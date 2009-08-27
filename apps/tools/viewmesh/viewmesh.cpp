@@ -2084,8 +2084,6 @@ bool ViewMesh::SelMorph (const CEGUI::EventArgs& e)
 
 bool ViewMesh::BlendButton (const CEGUI::EventArgs& e)
 {
-  if (!cal3dstate) return false;
-
   float weight=1, delay=1;
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
@@ -2105,19 +2103,31 @@ bool ViewMesh::BlendButton (const CEGUI::EventArgs& e)
     if(csScanStr(Sdelay.c_str(), "%f", &delay) != 1) delay = 1;
   }
 
-  int target =
-    cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
+  if(cal3dsprite && cal3dstate)
+  {
+    int target =
+      cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
 
-  if (target == -1) return false;
+    if (target == -1) return false;
 
-  cal3dstate->BlendMorphTarget(target, weight, delay);
-  return true;
+    cal3dstate->BlendMorphTarget(target, weight, delay);
+
+    return true;
+  }
+  else if (animeshsprite && animeshstate)
+  {
+    int target = animeshsprite->FindMorphTarget(selectedMorphTarget);
+    if (target == -1) return false;
+
+    animeshstate->SetMorphTargetWeight(target, weight);
+    return true;
+  }
+
+  return false;
 }
 
 bool ViewMesh::ClearButton (const CEGUI::EventArgs& e)
 {
-  if (!cal3dstate) return false;
-
   float weight=1;
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
@@ -2130,13 +2140,26 @@ bool ViewMesh::ClearButton (const CEGUI::EventArgs& e)
     if(csScanStr(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
   }
 
-  int target =
-    cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
+  if(cal3dsprite && cal3dstate)
+  {
+    int target =
+      cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
 
-  if (target == -1) return false;
+    if (target == -1) return false;
 
-  cal3dstate->ClearMorphTarget(target, weight);
-  return true;
+    cal3dstate->ClearMorphTarget(target, weight);
+    return true;
+  }
+  else if (animeshsprite && animeshstate)
+  {
+    int target = animeshsprite->FindMorphTarget(selectedMorphTarget);
+    if (target == -1) return false;
+
+    animeshstate->SetMorphTargetWeight(target, 0.0f);
+    return true;
+  }
+
+  return false;
 }
 
 bool ViewMesh::ResetCameraButton (const CEGUI::EventArgs& e)
