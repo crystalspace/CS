@@ -26,7 +26,9 @@
 #include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
 #include "csutil/stringconv.h"
+#include "imesh/animesh.h"
 #include "imesh/object.h"
+#include "imesh/skeleton2anim.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"
 #include "iutil/stringarray.h"
@@ -938,8 +940,10 @@ void ViewMesh::LoadSprite (const char* filename)
     engine->RemoveObject(spritewrapper->GetFactory());
     spritewrapper = 0;
     sprite = 0;
+    animeshsprite = 0;
     cal3dsprite = 0;
     state = 0;
+    animeshstate = 0;
     cal3dstate = 0;
     selectedSocket = 0;
     selectedCal3dSocket = 0;
@@ -986,11 +990,13 @@ void ViewMesh::LoadSprite (const char* filename)
       csVector3 v(0, 0, 0);
       spritewrapper = engine->CreateMeshWrapper(wrap, "MySprite", room, v);
 
+      animeshsprite = scfQueryInterface<iAnimatedMeshFactory> (fact);
       cal3dsprite = scfQueryInterface<iSpriteCal3DFactoryState> (fact);
       sprite = scfQueryInterface<iSprite3DFactoryState> (fact);
-      if (cal3dsprite || sprite)
+      if (animeshsprite || cal3dsprite || sprite)
       {
         iMeshObject* mesh = spritewrapper->GetMeshObject();
+        animeshstate = scfQueryInterface<iAnimatedMesh> (mesh);
         cal3dstate = scfQueryInterface<iSpriteCal3DState> (mesh);
         state = scfQueryInterface<iSprite3DState> (mesh);
       }
@@ -1255,6 +1261,56 @@ void ViewMesh::UpdateAnimationList ()
       list->addItem(item);
     }
   }
+  else if (animeshsprite)
+  {
+    WalkSkel2Nodes(list, animeshsprite->GetSkeletonFactory()->GetAnimationPacket()->GetAnimationRoot());
+  }
+}
+
+void ViewMesh::WalkSkel2Nodes (CEGUI::Listbox* list, iSkeletonAnimNodeFactory2* node)
+{
+  csRef<iSkeletonPriorityNodeFactory2> priNode = scfQueryInterface<iSkeletonPriorityNodeFactory2> (node);
+  if (priNode.IsValid())
+  {
+    for (size_t i = 0; i < priNode->GetNodeCount(); ++i)
+    {
+      WalkSkel2Nodes(list, priNode->GetNode(i));
+    }
+  } 
+  else
+  {
+    csRef<iSkeletonAnimationNodeFactory2> animNode = scfQueryInterface<iSkeletonAnimationNodeFactory2> (node);
+    if (animNode.IsValid())
+    {
+      const char* animname = animNode->GetNodeName();
+      if (!animname) return;
+
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(animname);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
+    }
+    else
+    {
+      csRef<iSkeletonFSMNodeFactory2> fsmNode = scfQueryInterface<iSkeletonFSMNodeFactory2> (node);
+      if (fsmNode.IsValid())
+      {
+        for(size_t s = 0; s < fsmNode->GetStateCount(); ++s)
+        {
+          const char* animname = fsmNode->GetStateName(s);
+          if (!animname) continue;
+
+          CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(animname);
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          list->addItem(item);
+        }
+      }
+      // Else other nodes.
+    }
+  }
 }
 
 void ViewMesh::UpdateMorphList ()
@@ -1276,6 +1332,20 @@ void ViewMesh::UpdateMorphList ()
     for (int i = 0; i < cal3dsprite->GetMorphAnimationCount(); i++)
     {
       const char* morphname = cal3dsprite->GetMorphAnimationName(i);
+      if (!morphname) continue;
+
+      item = new CEGUI::ListboxTextItem(morphname);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
+    }
+  }
+  else if (animeshsprite)
+  {
+    for (size_t i = 0; i < animeshsprite->GetMorphTargetCount(); i++)
+    {
+      const char* morphname = animeshsprite->GetMorphTarget(i)->GetName();
       if (!morphname) continue;
 
       item = new CEGUI::ListboxTextItem(morphname);
@@ -1414,7 +1484,59 @@ bool ViewMesh::AddAnimation (const CEGUI::EventArgs& e)
     int anim = cal3dstate->FindAnim(selectedAnimation);
     cal3dstate->AddAnimCycle(anim,1,3);
   }
+  else if(animeshsprite)
+  {
+    if (!selectedAnimation) return false;
+    HandleSkel2Node(selectedAnimation, animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot());
+  }
   return true;
+}
+
+bool ViewMesh::HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node)
+{
+  csRef<iSkeletonPriorityNodeFactory2> priNode = scfQueryInterface<iSkeletonPriorityNodeFactory2> (node->GetFactory());
+  if (priNode.IsValid())
+  {
+    for (size_t i = 0; i < priNode->GetNodeCount(); ++i)
+    {
+      if(HandleSkel2Node(animName, node->FindNode(priNode->GetNode(i)->GetNodeName())))
+      {
+        node->Play();
+        return true;
+      }
+    }
+  } 
+  else
+  {
+    csRef<iSkeletonAnimationNode2> animNode = scfQueryInterface<iSkeletonAnimationNode2> (node);
+    if (animNode.IsValid())
+    {
+      if(!strcmp(animName, animNode->GetFactory()->GetNodeName()))
+      {
+        animNode->Play();
+        return true;
+      }
+    }
+    else
+    {
+      csRef<iSkeletonFSMNodeFactory2> fsmNode = scfQueryInterface<iSkeletonFSMNodeFactory2> (node->GetFactory());
+      if (fsmNode.IsValid())
+      {
+        for(size_t s = 0; s < fsmNode->GetStateCount(); ++s)
+        {
+          if(!strcmp(animName, fsmNode->GetStateName(s)))
+          {
+            csRef<iSkeletonFSMNode2> fsm = scfQueryInterface<iSkeletonFSMNode2> (node);
+            fsm->SwitchToState(s);
+            return true;
+          }
+        }
+      }
+      // Else other nodes.
+    }
+  }
+
+  return false;
 }
 
 bool ViewMesh::FasterAnimation (const CEGUI::EventArgs& e)
@@ -1455,6 +1577,7 @@ bool ViewMesh::ClearAnimation (const CEGUI::EventArgs& e)
     int anim = cal3dstate->FindAnim(selectedAnimation);
     cal3dstate->ClearAnimCycle(anim,3);
   }
+
   return true;
 }
 

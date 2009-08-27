@@ -46,6 +46,11 @@
 #include "imesh/spritecal3d.h"
 #include "ivaria/icegui.h"
 
+struct iAnimatedMesh;
+struct iAnimatedMeshFactory;
+struct iSkeletonAnimNode2;
+struct iSkeletonAnimNodeFactory2;
+
 struct vmAnimCallback;
 
 class ViewMesh : public csApplicationFramework, public csBaseEventHandler
@@ -93,8 +98,10 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
   csRef<iMeshWrapper> spritewrapper;
   csRef<iSprite3DFactoryState> sprite;
+  csRef<iAnimatedMeshFactory> animeshsprite;
   csRef<iSpriteCal3DFactoryState> cal3dsprite;
   csRef<iSprite3DState> state;
+  csRef<iAnimatedMesh> animeshstate;
   csRef<iSpriteCal3DState> cal3dstate;
   iSpriteSocket* selectedSocket;
   iSpriteCal3DSocket* selectedCal3dSocket;
@@ -132,6 +139,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   void UpdateSocketList ();
   void UpdateMorphList ();
   void UpdateAnimationList ();
+  void WalkSkel2Nodes (CEGUI::Listbox* list, iSkeletonAnimNodeFactory2* node);
   void UpdateSocket ();
 
   //SETTING
@@ -156,6 +164,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool RemoveAnimation (const CEGUI::EventArgs& e);
   bool ClearAnimation (const CEGUI::EventArgs& e);
   bool SelAnimation (const CEGUI::EventArgs& e);
+  bool HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node);
   //SOCKET
   bool SetMesh (const CEGUI::EventArgs& e);
   bool SetSubMesh (const CEGUI::EventArgs& e);
