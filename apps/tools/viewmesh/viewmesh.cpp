@@ -1487,21 +1487,29 @@ bool ViewMesh::AddAnimation (const CEGUI::EventArgs& e)
   else if(animeshsprite)
   {
     if (!selectedAnimation) return false;
-    HandleSkel2Node(selectedAnimation, animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot());
+    return HandleSkel2Node(selectedAnimation,
+      animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot(), true);
   }
   return true;
 }
 
-bool ViewMesh::HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node)
+bool ViewMesh::HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, bool start)
 {
   csRef<iSkeletonPriorityNodeFactory2> priNode = scfQueryInterface<iSkeletonPriorityNodeFactory2> (node->GetFactory());
   if (priNode.IsValid())
   {
     for (size_t i = 0; i < priNode->GetNodeCount(); ++i)
     {
-      if(HandleSkel2Node(animName, node->FindNode(priNode->GetNode(i)->GetNodeName())))
+      if(HandleSkel2Node(animName, node->FindNode(priNode->GetNode(i)->GetNodeName()), start))
       {
-        node->Play();
+        if(start)
+        {
+          node->Play();
+        }
+        else
+        {
+          node->Stop();
+        }
         return true;
       }
     }
@@ -1513,7 +1521,14 @@ bool ViewMesh::HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node)
     {
       if(!strcmp(animName, animNode->GetFactory()->GetNodeName()))
       {
-        animNode->Play();
+        if(start)
+        {
+          animNode->Play();
+        }
+        else
+        {
+          animNode->Stop();
+        }
         return true;
       }
     }
@@ -1527,7 +1542,15 @@ bool ViewMesh::HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node)
           if(!strcmp(animName, fsmNode->GetStateName(s)))
           {
             csRef<iSkeletonFSMNode2> fsm = scfQueryInterface<iSkeletonFSMNode2> (node);
-            fsm->SwitchToState(s);
+            if(start)
+            {
+              fsm->SwitchToState(s);
+              fsm->Play();
+            }
+            else
+            {
+              fsm->Stop();
+            }
             return true;
           }
         }
@@ -1576,6 +1599,12 @@ bool ViewMesh::ClearAnimation (const CEGUI::EventArgs& e)
     if (!selectedAnimation) return false;
     int anim = cal3dstate->FindAnim(selectedAnimation);
     cal3dstate->ClearAnimCycle(anim,3);
+  }
+  else if(animeshstate)
+  {
+    if (!selectedAnimation) return false;
+    return HandleSkel2Node(selectedAnimation,
+      animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot(), false);
   }
 
   return true;

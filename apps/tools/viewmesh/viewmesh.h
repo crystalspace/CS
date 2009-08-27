@@ -164,7 +164,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool RemoveAnimation (const CEGUI::EventArgs& e);
   bool ClearAnimation (const CEGUI::EventArgs& e);
   bool SelAnimation (const CEGUI::EventArgs& e);
-  bool HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node);
+  bool HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, bool start);
   //SOCKET
   bool SetMesh (const CEGUI::EventArgs& e);
   bool SetSubMesh (const CEGUI::EventArgs& e);
