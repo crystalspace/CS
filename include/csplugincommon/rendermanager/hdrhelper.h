@@ -113,7 +113,12 @@ namespace CS
        */
       PostEffectManager::Layer* GetMeasureLayer() const
       { return measureLayer; }
+      
+      bool IsRangeLimited() const
+      { return (quality == qualInt8) || (quality == qualInt10)
+          || (quality == qualInt16); }
     private:
+      Quality quality;
       PostEffectManager postEffects;
       PostEffectManager::Layer* measureLayer;
       PostEffectManager::Layer* mappingLayer;

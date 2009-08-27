@@ -69,7 +69,8 @@ namespace CS
 	  
 	csPtr<iDataBuffer> BaseHierarchical::GetResultData (RenderTreeBase& renderTree,
 	                                                    iView* view,
-	                                                    int& resultW, int& resultH)
+	                                                    int& resultW, int& resultH,
+	                                                    float& usedColorScale)
 	{
 	  if (!measureLayer || !hdr) return 0;
 	  
@@ -101,16 +102,22 @@ namespace CS
 	    newData = measureTex->Readback (readbackFmt, 0);
 	  }
 	  
+	  //lastData = newData;
+	  //lastW = newW; lastH = newH;
+	  //lastColorScale = colorScale;
+	  
 	  csRef<iDataBuffer> ret;
 	  if (lastData.IsValid())
 	  {
 	    resultW = lastW;
 	    resultH = lastH;
 	    ret = lastData;
+	    usedColorScale = lastColorScale;
 	  }
 	  
 	  lastData = newData;
 	  lastW = newW; lastH = newH;
+	  lastColorScale = colorScale;
 	  
 	  return csPtr<iDataBuffer> (ret);
 	}
@@ -373,10 +380,12 @@ namespace CS
 	}
 	    
 	bool Average::ComputeLuminance (RenderTreeBase& renderTree, iView* view,
-	                                float& averageLuminance, float& maxLuminance)
+	                                float& averageLuminance, float& maxLuminance,
+	                                float& usedColorScale)
 	{
 	  int W, H;
-	  csRef<iDataBuffer> computeData = GetResultData (renderTree, view, W, H);
+	  csRef<iDataBuffer> computeData = GetResultData (renderTree, view, W, H,
+	    usedColorScale);
 	  if (computeData.IsValid ())
 	  {
 	    const uint8* bgra = computeData->GetUint8();
@@ -414,36 +423,34 @@ namespace CS
 	}
 	    
 	bool LogAverage::ComputeLuminance (RenderTreeBase& renderTree, iView* view,
-	                                   float& averageLuminance, float& maxLuminance)
+	                                   float& averageLuminance, float& maxLuminance,
+	                                   float& maxComponent, float& usedColorScale)
 	{
 	  int W, H;
-	  csRef<iDataBuffer> computeData = GetResultData (renderTree, view, W, H);
+	  csRef<iDataBuffer> computeData = GetResultData (renderTree, view, W, H,
+	    usedColorScale);
 	  if (computeData.IsValid ())
 	  {
-	    const float* rgba = (float*)computeData->GetData();
+	    const float* rgb = (float*)computeData->GetData();
 	    int numPixels = W * H;
-	    //float lumProd = 1;
 	    float lumSum = 0;
 	    float maxLum = 0;
+	    float maxComp = 0;
 	    for (int i = 0; i < numPixels; i++)
 	    {
-	      float r = *rgba++;
-	      float g = *rgba++;
-	      float b = *rgba++;
-	      float a = *rgba++;
-	      //lumProd *= g*a;
-	      lumSum += g+a;
-	      if (b > r)
-	        maxLum = csMax (maxLum, b);
-	      else
-	        maxLum = csMax (maxLum, r);
+	      float r = *rgb++;
+	      float g = *rgb++;
+	      float b = *rgb++;
+	      lumSum += g;
+	      maxLum = csMax (maxLum, r);
+	      maxComp = csMax (maxComp, b);
 	    }
 	    
 	    int numOrgPixels = view->GetContext ()->GetWidth ()
 	      * view->GetContext ()->GetHeight ();
-	    //averageLuminance = expf (1.0f/numOrgPixels * logf (lumProd));
 	    averageLuminance = expf (1.0f/numOrgPixels * lumSum);
 	    maxLuminance = maxLum;
+	    maxComponent = maxComp;
 	    return true;
 	  }
 	  return false;

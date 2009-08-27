@@ -60,13 +60,12 @@ namespace CS
 	  if (!hdr) return;
 	  
 	  csTicks currentTime = csGetTicks();
-	  float avgLum, maxLum;
+	  float avgLum, maxLum, exposure;
 	  if (luminance.ComputeLuminance (renderTree, view,
-	      avgLum, maxLum) && (lastTime != 0))
+	      avgLum, maxLum, exposure) && (lastTime != 0))
 	  {
 	    uint deltaTime = csMin (currentTime-lastTime, (uint)33);
 	    const float exposureAdjust = exposureChangeRate*deltaTime/1000.0f;
-	    float exposure = luminance.GetColorScale ();
 	    if (avgLum >= targetAvgLum+targetAvgLumTolerance)
 	      exposure -= exposureAdjust;
 	    else if (avgLum <= targetAvgLum-targetAvgLumTolerance)
@@ -113,29 +112,34 @@ namespace CS
 	  if (!hdr) return;
 	  
 	  csTicks currentTime = csGetTicks();
-	  float avgLum, maxLum;
+	  float avgLum, maxLum, maxComp, exposure;
 	  if (luminance.ComputeLuminance (renderTree, view,
-	      avgLum, maxLum) && (lastTime != 0))
+	      avgLum, maxLum, maxComp, exposure) && (lastTime != 0))
 	  {
-	    float exposure = luminance.GetColorScale ();
-	    // Some pixels saturate, so change the HDR scaling to accomodate that
-	    float maxLumExp = maxLum*exposure;
-	    if (maxLumExp > (254.0f/255.0f))
+	    if (hdr->IsRangeLimited())
 	    {
-	      exposure = exposure * (253.0f/255.0f);
+	      // Some pixels saturate, so change the HDR scaling to accomodate that
+	      if (maxComp > (253.0f/255.0f))
+	      {
+		/* Agressively increase the range: if the range is too small
+		   the scene gets a very flat look (large saturated areas that
+		   turn out to be a dark gray). If the range is too large the
+		   next check will gradually decrease it. */
+		exposure = exposure * 0.77f;
+	      }
+	      else if ((maxComp > SMALL_EPSILON) && (maxComp < (250.0f/255.0f)))
+	      {
+		float d = (253.0f/255.0f)/maxComp;
+		exposure = exposure * d;
+	      }
+	      exposure = csMin (exposure, 16.0f);
+	      luminance.SetColorScale (exposure);
+	      svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
 	    }
-	    else if ((maxLum > 0) && (maxLumExp < (250.0f/255.0f)))
-	    {
-	      float d = (253.0f/255.0f)/maxLumExp;
-	      exposure = exposure * d;
-	      //exposure = exposure * (255.0f/250.0f);
-	    }
-	    luminance.SetColorScale (exposure);
 	      
-	    svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
-	    svMappingParams->SetValue (csVector3 (avgLum, 0.36f, csMax (maxLum, 1.0f)));
+	    svMappingParams->SetValue (csVector3 (avgLum, 0.18f,
+	      csMax (maxLum*(254.0f/255.0f), 1.0f)));
 	    
-	    csPrintf ("%f %f %f\n", avgLum, maxLum, exposure);
 	  }
 	  
 	  lastTime = currentTime;
@@ -168,7 +172,7 @@ namespace CS
 	  bool doVerbose = verbosity && verbosity->Enabled ("rendermanager.hdr.exposure");
 	  
 	  const char* exposureStr = settings.GetExposureMethod();
-	  if (!exposureStr) exposureStr = "linear";
+	  if (!exposureStr) exposureStr = "reinhard_simple";
 	  if (doVerbose)
 	  {
 	    csReport (objReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,

@@ -55,6 +55,7 @@ namespace CS
 	default: return false;
       }
       postEffects.SetIntermediateTargetFormat (textureFmt);
+      this->quality = quality;
       
       csRef<iShaderManager> shaderManager =
 	csQueryRegistry<iShaderManager> (objectReg);

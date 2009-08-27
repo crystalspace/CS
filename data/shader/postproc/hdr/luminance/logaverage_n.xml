@@ -21,23 +21,20 @@
 		  thus it's in the middle of the block we're looking at */
 		  TexCoord -= float2 ($XSIZE$/2, $YSIZE$/2)*pixelSize;
 		  
-		  //float2 products = float2(1);
-		  float2 sums = float2(0);
-		  float2 maxima = float2(0);
+		  float sum = 0;
+		  float2 maxima = float2 (0);
 		  for (int y = 0; y < $YSIZE$; y++)
 		  {
 		    for (int x = 0; x < $XSIZE$; x++)
 		    {
 		      float2 sampleCoord = TexCoord+float2(x, y)*pixelSize;
 		      float4 values = tex2D (Texture1, sampleCoord).rgba;
-		      //products *= values.yw;
-		      sums += values.yw;
+		      sum += values.y;
 		      maxima = max (maxima, values.xz);
 		    }
 		  }
 		  
-		  //return float4 (maxima.x, products.x, maxima.y, products.y);
-		  return float4 (maxima.x, sums.x, maxima.y, sums.y);
+		  return float4 (maxima.x, sum, maxima.y, 1);
 		}
   
 		]]>

@@ -63,6 +63,7 @@ namespace CS
 	  csRef<iDataBuffer> lastData;
 	  int lastW, lastH;
 	  iTextureHandle* lastMeasureTex;
+	  float lastColorScale;
 	  
 	  BaseHierarchical (const char* intermediateTextureFormat,
 	    const char* outputTextureFormat) : colorScale (1.0f), 
@@ -77,7 +78,7 @@ namespace CS
 	    
 	  /// Obtain rendered image
 	  csPtr<iDataBuffer> GetResultData (RenderTreeBase& renderTree, 
-	    iView* view, int& resultW, int& resultH);
+	    iView* view, int& resultW, int& resultH, float& usedColorScale);
 	private:
 	  bool FindBlockSize (iShader* shader, size_t pticket,
 	    int maxW, int maxH,
@@ -101,19 +102,21 @@ namespace CS
 	    HDRHelper& hdr);
 	    
 	  bool ComputeLuminance (RenderTreeBase& renderTree, iView* view,
-	    float& averageLuminance, float& maxLuminance);
+	    float& averageLuminance, float& maxLuminance,
+	    float& usedColorScale);
         };
         
         class CS_CRYSTALSPACE_EXPORT LogAverage : public BaseHierarchical
         {
         public:
-          LogAverage() : BaseHierarchical ("abgr32_f", "abgr32_f") {}
+          LogAverage() : BaseHierarchical ("bgr16_f", "bgr32_f") {}
         
 	  void Initialize (iObjectRegistry* objReg,
 	    HDRHelper& hdr);
 	    
 	  bool ComputeLuminance (RenderTreeBase& renderTree, iView* view,
-	    float& averageLuminance, float& maxLuminance);
+	    float& averageLuminance, float& maxLuminance, float& maxComp,
+	    float& usedColorScale);
         };
       } // namespace Luminance
     } // namespace HDR
