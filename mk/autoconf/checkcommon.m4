@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2009 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -67,7 +67,10 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_RELAYTOOL],
 	    [enable_relaytool=yes])
     AS_IF([test "$enable_relaytool" != "no"],
 	[CS_PATH_TOOL([RELAYTOOL], [relaytool], [], [$1])
-	CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL], [$RELAYTOOL], [], [], [$2])])])
+	CS_CHECK_PROGS([BASH], [bash])
+	AS_IF([test -n "$BASH"],
+	    [CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL],
+	        [$BASH $RELAYTOOL], [], [], [$2])])])])
 
 
 #------------------------------------------------------------------------------
