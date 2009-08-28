@@ -707,6 +707,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       // Copy the skeletal state into our buffers
       UpdateLocalBoneTransforms ();
+      UpdateSocketTransforms ();
     }
     lastTick = current_time;
     skinVertexLF = skinNormalLF = skinBinormalLF = skinTangentLF = false;
