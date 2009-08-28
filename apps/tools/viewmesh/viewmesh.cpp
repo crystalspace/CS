@@ -1190,8 +1190,8 @@ void ViewMesh::AttachMesh (const char* file)
   }
   else if (selectedAnimeshSocket)
   {
-    meshWrap->GetMovable()->SetSector(spritewrapper->GetMovable()->GetSectors()->Get(0));
     selectedAnimeshSocket->SetSceneNode(meshWrap->QuerySceneNode());
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper->QuerySceneNode ());
   }
 }
 
