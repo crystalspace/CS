@@ -699,6 +699,7 @@ class iAnimatedMeshFactory(core.iBase):
     def CreateSocket(*args): return _imesh.iAnimatedMeshFactory_CreateSocket(*args)
     def GetSocketCount(*args): return _imesh.iAnimatedMeshFactory_GetSocketCount(*args)
     def GetSocket(*args): return _imesh.iAnimatedMeshFactory_GetSocket(*args)
+    def FindSocket(*args): return _imesh.iAnimatedMeshFactory_FindSocket(*args)
     scfGetVersion = staticmethod(_imesh.iAnimatedMeshFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iAnimatedMeshFactory
     __del__ = lambda self : None;

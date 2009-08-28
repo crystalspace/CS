@@ -15077,6 +15077,40 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_FindSocket(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactory *arg1 = (iAnimatedMeshFactory *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  uint result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactory_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactory_FindSocket" "', argument " "1"" of type '" "iAnimatedMeshFactory const *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactory * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iAnimatedMeshFactory_FindSocket" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (uint)((iAnimatedMeshFactory const *)arg1)->FindSocket((char const *)arg2);
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -48382,6 +48416,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iAnimatedMeshFactory_CreateSocket", _wrap_iAnimatedMeshFactory_CreateSocket, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_GetSocketCount", _wrap_iAnimatedMeshFactory_GetSocketCount, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_GetSocket", _wrap_iAnimatedMeshFactory_GetSocket, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactory_FindSocket", _wrap_iAnimatedMeshFactory_FindSocket, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_scfGetVersion", _wrap_iAnimatedMeshFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iAnimatedMeshFactory", _wrap_delete_iAnimatedMeshFactory, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_swigregister", iAnimatedMeshFactory_swigregister, METH_VARARGS, NULL},

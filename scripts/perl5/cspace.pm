@@ -15064,6 +15064,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateSocket = *cspacec::iAnimatedMeshFactory_CreateSocket;
 *GetSocketCount = *cspacec::iAnimatedMeshFactory_GetSocketCount;
 *GetSocket = *cspacec::iAnimatedMeshFactory_GetSocket;
+*FindSocket = *cspacec::iAnimatedMeshFactory_FindSocket;
 *scfGetVersion = *cspacec::iAnimatedMeshFactory_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
