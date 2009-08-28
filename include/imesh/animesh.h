@@ -25,6 +25,7 @@
 
 struct iRenderBuffer;
 struct iMaterialWrapper;
+struct iShaderVariableContext;
 
 struct iAnimatedMeshFactory;
 struct iAnimatedMeshFactorySubMesh;
@@ -153,7 +154,7 @@ public:
  */
 struct iAnimatedMeshFactory : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshFactory, 2, 1, 0);
+  SCF_INTERFACE(iAnimatedMeshFactory, 2, 2, 0);
 
   /**\name SubMesh handling
    * @{ */
@@ -164,7 +165,8 @@ struct iAnimatedMeshFactory : public virtual iBase
    * The newly created submesh will use all bones.
    * \param indices Index buffer to use for the newly created submesh.
    */
-  virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices) = 0;
+  virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices,
+    const char* name) = 0;
 
   /**
    * Create a new submesh.
@@ -176,7 +178,8 @@ struct iAnimatedMeshFactory : public virtual iBase
    */
   virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
-    const csArray<csArray<unsigned int> >& boneIndices) = 0;
+    const csArray<csArray<unsigned int> >& boneIndices,
+    const char* name) = 0;
 
   /**
    * Get a submesh by index.
@@ -399,7 +402,7 @@ struct iAnimatedMeshFactory : public virtual iBase
  */
 struct iAnimatedMeshFactorySubMesh : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshFactorySubMesh, 1, 1, 0);
+  SCF_INTERFACE(iAnimatedMeshFactorySubMesh, 1, 2, 0);
 
   /**
    * Get the index buffer for this submesh. Defines a triangle list.
@@ -425,7 +428,11 @@ struct iAnimatedMeshFactorySubMesh : public virtual iBase
    * Set the material, or 0 to use default.
    */
   virtual void SetMaterial (iMaterialWrapper* material) = 0;
-  
+
+  /**
+   * Get the submesh name.
+   */
+  virtual const char* GetName () const = 0;
 };
 
 /**
@@ -488,7 +495,7 @@ struct iAnimatedMesh : public virtual iBase
  */
 struct iAnimatedMeshSubMesh : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshSubMesh, 1, 0, 0);
+  SCF_INTERFACE(iAnimatedMeshSubMesh, 1, 1, 0);
 
   /**
    * Get the factory submesh
@@ -503,7 +510,12 @@ struct iAnimatedMeshSubMesh : public virtual iBase
   /**
    * Get current rendering state for this submesh
    */
-  virtual bool IsRendering () const = 0;  
+  virtual bool IsRendering () const = 0;
+
+  /**
+   * Get a shader variable context for this submesh.
+   */
+  virtual iShaderVariableContext* GetShaderVariableContext(size_t buffer) const = 0;
 };
 
 /**

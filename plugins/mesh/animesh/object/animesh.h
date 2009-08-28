@@ -397,6 +397,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         return isRendering;
       }
 
+      virtual iShaderVariableContext* GetShaderVariableContext(size_t buffer) const
+      {
+        return svContexts[buffer];
+      }
+
       AnimeshObject* meshObject;
       FactorySubmesh* factorySubmesh;
       iMaterialWrapper* material;
