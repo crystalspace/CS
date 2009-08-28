@@ -99,12 +99,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices)
+  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices, const char* name)
   {
     csRef<FactorySubmesh> newSubmesh;
 
-    newSubmesh.AttachNew (new FactorySubmesh);
-    newSubmesh->indexBuffers.Push (indices);    
+    newSubmesh.AttachNew (new FactorySubmesh(name));
+    newSubmesh->indexBuffers.Push (indices);  
     submeshes.Push (newSubmesh);
 
     return newSubmesh;
@@ -112,11 +112,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
-    const csArray<csArray<unsigned int> >& boneIndices)
+    const csArray<csArray<unsigned int> >& boneIndices,
+    const char* name)
   {
     csRef<FactorySubmesh> newSubmesh;
 
-    newSubmesh.AttachNew (new FactorySubmesh);
+    newSubmesh.AttachNew (new FactorySubmesh(name));
     
     for (size_t i = 0; i < indices.GetSize (); ++i)
     {

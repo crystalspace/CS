@@ -66,10 +66,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     AnimeshObjectFactory (AnimeshObjectType* objType);
 
     //-- iAnimatedMeshFactory
-    virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices);
+    virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices,
+      const char* name);
     virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (
       const csArray<iRenderBuffer*>& indices, 
-      const csArray<csArray<unsigned int> >& boneIndices);
+      const csArray<csArray<unsigned int> >& boneIndices,
+      const char* name);
     virtual iAnimatedMeshFactorySubMesh* GetSubMesh (size_t index) const;
     virtual size_t GetSubMeshCount () const;
     virtual void DeleteSubMesh (iAnimatedMeshFactorySubMesh* mesh);
@@ -179,8 +181,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
                               iAnimatedMeshFactorySubMesh>
   {
   public:
-    FactorySubmesh ()
-      : scfImplementationType (this), material(0)
+    FactorySubmesh (const char* name)
+      : scfImplementationType (this), material(0), name(name)
     {}
 
     virtual iRenderBuffer* GetIndices (size_t set)
@@ -228,7 +230,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     /// Set the material, or 0 to use default.
     virtual void SetMaterial (iMaterialWrapper* m) { material = m; }
     
-    
+    const char* name;
+
+    /// Get the submesh name.
+    virtual const char* GetName () const { return name; }
   };
 
 

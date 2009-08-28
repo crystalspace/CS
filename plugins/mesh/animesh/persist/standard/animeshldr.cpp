@@ -262,7 +262,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
           if (indexBuffer)
           {
-            iAnimatedMeshFactorySubMesh* smf = amfact->CreateSubMesh (indexBuffer);
+            iAnimatedMeshFactorySubMesh* smf = amfact->CreateSubMesh (indexBuffer,
+              child->GetAttributeValue("name"));
             smf->SetMaterial(material);
           }
         }
