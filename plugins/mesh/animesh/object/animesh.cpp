@@ -143,6 +143,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return submeshes[index];
   }
 
+  size_t AnimeshObjectFactory::FindSubMesh (const char* name) const
+  {
+    for (size_t i=0; i < submeshes.GetSize (); ++i)
+    {
+      const char* meshName = submeshes[i]->GetName();
+      if (meshName)
+      {
+        if (!strcmp(meshName, name))
+        {
+          return i;
+        }
+      }
+    }
+
+    return (size_t)-1;
+  }
+
   size_t AnimeshObjectFactory::GetSubMeshCount () const
   {
     return submeshes.GetSize ();

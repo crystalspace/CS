@@ -73,6 +73,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       const csArray<csArray<unsigned int> >& boneIndices,
       const char* name);
     virtual iAnimatedMeshFactorySubMesh* GetSubMesh (size_t index) const;
+    virtual size_t FindSubMesh (const char* name) const;
     virtual size_t GetSubMeshCount () const;
     virtual void DeleteSubMesh (iAnimatedMeshFactorySubMesh* mesh);
 

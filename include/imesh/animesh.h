@@ -187,6 +187,11 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual iAnimatedMeshFactorySubMesh* GetSubMesh (size_t index) const = 0;
 
   /**
+   * Find a submesh index by name, returns (size_t)-1 if not found.
+   */
+  virtual size_t FindSubMesh (const char* name) const = 0;
+
+  /**
    * Get the total number of submeshes.
    */
   virtual size_t GetSubMeshCount () const = 0;
