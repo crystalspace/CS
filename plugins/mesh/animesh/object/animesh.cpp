@@ -99,12 +99,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices, const char* name)
+  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices,
+    const char* name, bool visible)
   {
     csRef<FactorySubmesh> newSubmesh;
 
     newSubmesh.AttachNew (new FactorySubmesh(name));
     newSubmesh->indexBuffers.Push (indices);  
+    newSubmesh->visible = visible;
     submeshes.Push (newSubmesh);
 
     return newSubmesh;
@@ -113,11 +115,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
     const csArray<csArray<unsigned int> >& boneIndices,
-    const char* name)
+    const char* name,
+    bool visible)
   {
     csRef<FactorySubmesh> newSubmesh;
 
     newSubmesh.AttachNew (new FactorySubmesh(name));
+    newSubmesh->visible = visible;
     
     for (size_t i = 0; i < indices.GetSize (); ++i)
     {
@@ -584,12 +588,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshSubMesh* AnimeshObject::GetSubMesh (size_t index) const
   {
-    return 0;
+    return submeshes[index];
   }
 
   size_t AnimeshObject::GetSubMeshCount () const
   {
-    return 0;
+    return submeshes.GetSize();
   }
 
   void AnimeshObject::SetMorphTargetWeight (uint target, float weight)

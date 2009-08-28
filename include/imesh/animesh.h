@@ -166,7 +166,7 @@ struct iAnimatedMeshFactory : public virtual iBase
    * \param indices Index buffer to use for the newly created submesh.
    */
   virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices,
-    const char* name) = 0;
+    const char* name, bool visible) = 0;
 
   /**
    * Create a new submesh.
@@ -179,7 +179,7 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
     const csArray<csArray<unsigned int> >& boneIndices,
-    const char* name) = 0;
+    const char* name, bool visible) = 0;
 
   /**
    * Get a submesh by index.

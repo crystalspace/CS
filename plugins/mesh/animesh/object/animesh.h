@@ -67,11 +67,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     //-- iAnimatedMeshFactory
     virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices,
-      const char* name);
+      const char* name, bool visible);
     virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (
       const csArray<iRenderBuffer*>& indices, 
       const csArray<csArray<unsigned int> >& boneIndices,
-      const char* name);
+      const char* name,
+      bool visible);
     virtual iAnimatedMeshFactorySubMesh* GetSubMesh (size_t index) const;
     virtual size_t FindSubMesh (const char* name) const;
     virtual size_t GetSubMeshCount () const;
@@ -235,6 +236,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     /// Get the submesh name.
     virtual const char* GetName () const { return name; }
+
+    /// Whether we're visible by default.
+    bool visible;
   };
 
 
@@ -380,7 +384,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     public:
       Submesh (AnimeshObject* meshObject, FactorySubmesh* factorySubmesh)
         : scfImplementationType (this), meshObject (meshObject),
-        factorySubmesh (factorySubmesh), material(0), isRendering (true)
+        factorySubmesh (factorySubmesh), material(0), isRendering (factorySubmesh->visible)
       {}
 
       virtual iAnimatedMeshFactorySubMesh* GetFactorySubMesh ()
