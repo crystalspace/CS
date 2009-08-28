@@ -26,7 +26,9 @@
 #include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
 #include "csutil/stringconv.h"
+#include "imesh/animesh.h"
 #include "imesh/object.h"
+#include "imesh/skeleton2anim.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"
 #include "iutil/stringarray.h"
@@ -72,8 +74,8 @@ struct vmAnimCallback : public CalAnimationCallback
 
 ViewMesh::ViewMesh () : 
   camMode(movenormal), roomsize(5), scale(1), move_sprite_speed(0),
-  selectedSocket(0),  selectedCal3dSocket(0), meshTx(0), meshTy(0), 
-  meshTz(0), callback(0)
+  selectedSocket(0),  selectedCal3dSocket(0), selectedAnimeshSocket(0),
+  meshTx(0), meshTy(0), meshTz(0), callback(0)
 {
   SetApplicationName ("CrystalSpace.ViewMesh");
 }
@@ -940,11 +942,14 @@ void ViewMesh::LoadSprite (const char* filename)
     engine->RemoveObject(spritewrapper->GetFactory());
     spritewrapper = 0;
     sprite = 0;
+    animeshsprite = 0;
     cal3dsprite = 0;
     state = 0;
+    animeshstate = 0;
     cal3dstate = 0;
     selectedSocket = 0;
     selectedCal3dSocket = 0;
+    selectedAnimeshSocket = 0;
     selectedAnimation = 0;
     selectedMorphTarget = 0;
     meshTx = meshTy = meshTz = 0;
@@ -988,11 +993,13 @@ void ViewMesh::LoadSprite (const char* filename)
       csVector3 v(0, 0, 0);
       spritewrapper = engine->CreateMeshWrapper(wrap, "MySprite", room, v);
 
+      animeshsprite = scfQueryInterface<iAnimatedMeshFactory> (fact);
       cal3dsprite = scfQueryInterface<iSpriteCal3DFactoryState> (fact);
       sprite = scfQueryInterface<iSprite3DFactoryState> (fact);
-      if (cal3dsprite || sprite)
+      if (animeshsprite || cal3dsprite || sprite)
       {
         iMeshObject* mesh = spritewrapper->GetMeshObject();
+        animeshstate = scfQueryInterface<iAnimatedMesh> (mesh);
         cal3dstate = scfQueryInterface<iSpriteCal3DState> (mesh);
         state = scfQueryInterface<iSprite3DState> (mesh);
       }
@@ -1213,6 +1220,22 @@ void ViewMesh::UpdateSocketList ()
       list->addItem(item);
     }
   }
+  else if (animeshsprite)
+  {
+    for (int i = 0; i < animeshsprite->GetSocketCount(); i++)
+    {
+      iAnimatedMeshSocketFactory* sock = animeshsprite->GetSocket(i);
+      if (!sock) continue;
+
+      if (i==0) SelectSocket(sock->GetName());
+
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(sock->GetName());
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
+    }
+  }
 }
 
 void ViewMesh::UpdateAnimationList ()
@@ -1257,6 +1280,56 @@ void ViewMesh::UpdateAnimationList ()
       list->addItem(item);
     }
   }
+  else if (animeshsprite)
+  {
+    WalkSkel2Nodes(list, animeshsprite->GetSkeletonFactory()->GetAnimationPacket()->GetAnimationRoot());
+  }
+}
+
+void ViewMesh::WalkSkel2Nodes (CEGUI::Listbox* list, iSkeletonAnimNodeFactory2* node)
+{
+  csRef<iSkeletonPriorityNodeFactory2> priNode = scfQueryInterface<iSkeletonPriorityNodeFactory2> (node);
+  if (priNode.IsValid())
+  {
+    for (size_t i = 0; i < priNode->GetNodeCount(); ++i)
+    {
+      WalkSkel2Nodes(list, priNode->GetNode(i));
+    }
+  } 
+  else
+  {
+    csRef<iSkeletonAnimationNodeFactory2> animNode = scfQueryInterface<iSkeletonAnimationNodeFactory2> (node);
+    if (animNode.IsValid())
+    {
+      const char* animname = animNode->GetNodeName();
+      if (!animname) return;
+
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(animname);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
+    }
+    else
+    {
+      csRef<iSkeletonFSMNodeFactory2> fsmNode = scfQueryInterface<iSkeletonFSMNodeFactory2> (node);
+      if (fsmNode.IsValid())
+      {
+        for(size_t s = 0; s < fsmNode->GetStateCount(); ++s)
+        {
+          const char* animname = fsmNode->GetStateName(s);
+          if (!animname) continue;
+
+          CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(animname);
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          list->addItem(item);
+        }
+      }
+      // Else other nodes.
+    }
+  }
 }
 
 void ViewMesh::UpdateMorphList ()
@@ -1287,6 +1360,20 @@ void ViewMesh::UpdateMorphList ()
       list->addItem(item);
     }
   }
+  else if (animeshsprite)
+  {
+    for (size_t i = 0; i < animeshsprite->GetMorphTargetCount(); i++)
+    {
+      const char* morphname = animeshsprite->GetMorphTarget(i)->GetName();
+      if (!morphname) continue;
+
+      item = new CEGUI::ListboxTextItem(morphname);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
+    }
+  }
 }
 
 void ViewMesh::SelectSocket (const char* newsocket)
@@ -1302,6 +1389,12 @@ void ViewMesh::SelectSocket (const char* newsocket)
     iSpriteCal3DSocket* sock = cal3dstate->FindSocket(newsocket);
     if (selectedCal3dSocket == sock) return;
     selectedCal3dSocket = sock;
+  }
+  else if (animeshstate && animeshsprite)
+  {
+    iAnimatedMeshSocket* sock = animeshstate->GetSocket(animeshsprite->FindSocket(newsocket));
+    if(selectedAnimeshSocket == sock) return;
+    selectedAnimeshSocket = sock;
   }
   UpdateSocket();
 }
@@ -1341,6 +1434,12 @@ void ViewMesh::UpdateSocket ()
     csRef<iString> valueTriangle(new scfString());
     valueTriangle->Format("%d", selectedCal3dSocket->GetTriangleIndex());
     InputTriangle->setProperty("Text", valueTriangle->GetData());
+  }
+  else if (selectedAnimeshSocket)
+  {
+    CEGUI::Window* InputName = winMgr->getWindow("Tab3/RenameSocket/Input");
+    const char* name = selectedAnimeshSocket->GetName();
+    InputName->setProperty("Text", name);
   }
 }
 
@@ -1416,7 +1515,74 @@ bool ViewMesh::AddAnimation (const CEGUI::EventArgs& e)
     int anim = cal3dstate->FindAnim(selectedAnimation);
     cal3dstate->AddAnimCycle(anim,1,3);
   }
+  else if(animeshsprite)
+  {
+    if (!selectedAnimation) return false;
+    return HandleSkel2Node(selectedAnimation,
+      animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot(), true);
+  }
   return true;
+}
+
+bool ViewMesh::HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, bool start)
+{
+  csRef<iSkeletonPriorityNodeFactory2> priNode = scfQueryInterface<iSkeletonPriorityNodeFactory2> (node->GetFactory());
+  if (priNode.IsValid())
+  {
+    for (size_t i = 0; i < priNode->GetNodeCount(); ++i)
+    {
+      if(HandleSkel2Node(animName, node->FindNode(priNode->GetNode(i)->GetNodeName()), start))
+      {
+        return true;
+      }
+    }
+  } 
+  else
+  {
+    csRef<iSkeletonAnimationNode2> animNode = scfQueryInterface<iSkeletonAnimationNode2> (node);
+    if (animNode.IsValid())
+    {
+      if(!strcmp(animName, animNode->GetFactory()->GetNodeName()))
+      {
+        if(start)
+        {
+          animNode->Play();
+        }
+        else
+        {
+          animNode->Stop();
+        }
+        return true;
+      }
+    }
+    else
+    {
+      csRef<iSkeletonFSMNodeFactory2> fsmNode = scfQueryInterface<iSkeletonFSMNodeFactory2> (node->GetFactory());
+      if (fsmNode.IsValid())
+      {
+        for(size_t s = 0; s < fsmNode->GetStateCount(); ++s)
+        {
+          if(!strcmp(animName, fsmNode->GetStateName(s)))
+          {
+            csRef<iSkeletonFSMNode2> fsm = scfQueryInterface<iSkeletonFSMNode2> (node);
+            if(start)
+            {
+              fsm->SwitchToState(s);
+              fsm->Play();
+            }
+            else
+            {
+              fsm->Stop();
+            }
+            return true;
+          }
+        }
+      }
+      // Else other nodes.
+    }
+  }
+
+  return false;
 }
 
 bool ViewMesh::FasterAnimation (const CEGUI::EventArgs& e)
@@ -1457,6 +1623,13 @@ bool ViewMesh::ClearAnimation (const CEGUI::EventArgs& e)
     int anim = cal3dstate->FindAnim(selectedAnimation);
     cal3dstate->ClearAnimCycle(anim,3);
   }
+  else if(animeshstate)
+  {
+    if (!selectedAnimation) return false;
+    return HandleSkel2Node(selectedAnimation,
+      animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot(), false);
+  }
+
   return true;
 }
 
@@ -1940,8 +2113,6 @@ bool ViewMesh::SelMorph (const CEGUI::EventArgs& e)
 
 bool ViewMesh::BlendButton (const CEGUI::EventArgs& e)
 {
-  if (!cal3dstate) return false;
-
   float weight=1, delay=1;
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
@@ -1961,19 +2132,31 @@ bool ViewMesh::BlendButton (const CEGUI::EventArgs& e)
     if(csScanStr(Sdelay.c_str(), "%f", &delay) != 1) delay = 1;
   }
 
-  int target =
-    cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
+  if(cal3dsprite && cal3dstate)
+  {
+    int target =
+      cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
 
-  if (target == -1) return false;
+    if (target == -1) return false;
 
-  cal3dstate->BlendMorphTarget(target, weight, delay);
-  return true;
+    cal3dstate->BlendMorphTarget(target, weight, delay);
+
+    return true;
+  }
+  else if (animeshsprite && animeshstate)
+  {
+    int target = animeshsprite->FindMorphTarget(selectedMorphTarget);
+    if (target == -1) return false;
+
+    animeshstate->SetMorphTargetWeight(target, weight);
+    return true;
+  }
+
+  return false;
 }
 
 bool ViewMesh::ClearButton (const CEGUI::EventArgs& e)
 {
-  if (!cal3dstate) return false;
-
   float weight=1;
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
@@ -1986,13 +2169,26 @@ bool ViewMesh::ClearButton (const CEGUI::EventArgs& e)
     if(csScanStr(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
   }
 
-  int target =
-    cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
+  if(cal3dsprite && cal3dstate)
+  {
+    int target =
+      cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
 
-  if (target == -1) return false;
+    if (target == -1) return false;
 
-  cal3dstate->ClearMorphTarget(target, weight);
-  return true;
+    cal3dstate->ClearMorphTarget(target, weight);
+    return true;
+  }
+  else if (animeshsprite && animeshstate)
+  {
+    int target = animeshsprite->FindMorphTarget(selectedMorphTarget);
+    if (target == -1) return false;
+
+    animeshstate->SetMorphTargetWeight(target, 0.0f);
+    return true;
+  }
+
+  return false;
 }
 
 bool ViewMesh::ResetCameraButton (const CEGUI::EventArgs& e)

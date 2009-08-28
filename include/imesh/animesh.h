@@ -153,7 +153,7 @@ public:
  */
 struct iAnimatedMeshFactory : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshFactory, 2, 0, 0);
+  SCF_INTERFACE(iAnimatedMeshFactory, 2, 1, 0);
 
   /**\name SubMesh handling
    * @{ */
@@ -385,6 +385,12 @@ struct iAnimatedMeshFactory : public virtual iBase
    * Get a specific socket instance
    */
   virtual iAnimatedMeshSocketFactory* GetSocket (size_t index) const = 0;
+
+ /**
+  * Find the index of the socket with the given name (or (uint)~0 if no
+  * socket with that name exists).
+  */
+  virtual uint FindSocket (const char* name) const = 0;
   /** @} */
 };
 
