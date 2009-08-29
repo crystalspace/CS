@@ -232,10 +232,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     /// Set the material, or 0 to use default.
     virtual void SetMaterial (iMaterialWrapper* m) { material = m; }
     
-    const char* name;
+    csString name;
 
     /// Get the submesh name.
-    virtual const char* GetName () const { return name; }
+    virtual const char* GetName () const { return name.GetData(); }
 
     /// Whether we're visible by default.
     bool visible;
