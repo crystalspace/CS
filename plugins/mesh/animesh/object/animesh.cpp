@@ -98,12 +98,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices)
+  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices,
+    const char* name, bool visible)
   {
     csRef<FactorySubmesh> newSubmesh;
 
-    newSubmesh.AttachNew (new FactorySubmesh);
-    newSubmesh->indexBuffers.Push (indices);    
+    newSubmesh.AttachNew (new FactorySubmesh(name));
+    newSubmesh->indexBuffers.Push (indices);  
+    newSubmesh->visible = visible;
     submeshes.Push (newSubmesh);
 
     return newSubmesh;
@@ -111,11 +113,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
-    const csArray<csArray<unsigned int> >& boneIndices)
+    const csArray<csArray<unsigned int> >& boneIndices,
+    const char* name,
+    bool visible)
   {
     csRef<FactorySubmesh> newSubmesh;
 
-    newSubmesh.AttachNew (new FactorySubmesh);
+    newSubmesh.AttachNew (new FactorySubmesh(name));
+    newSubmesh->visible = visible;
     
     for (size_t i = 0; i < indices.GetSize (); ++i)
     {
@@ -139,6 +144,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     CS_ASSERT (index < submeshes.GetSize ());
     return submeshes[index];
+  }
+
+  size_t AnimeshObjectFactory::FindSubMesh (const char* name) const
+  {
+    for (size_t i=0; i < submeshes.GetSize (); ++i)
+    {
+      const char* meshName = submeshes[i]->GetName();
+      if (meshName)
+      {
+        if (!strcmp(meshName, name))
+        {
+          return i;
+        }
+      }
+    }
+
+    return (size_t)-1;
   }
 
   size_t AnimeshObjectFactory::GetSubMeshCount () const
@@ -565,12 +587,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshSubMesh* AnimeshObject::GetSubMesh (size_t index) const
   {
-    return 0;
+    return submeshes[index];
   }
 
   size_t AnimeshObject::GetSubMeshCount () const
   {
-    return 0;
+    return submeshes.GetSize();
   }
 
   void AnimeshObject::SetMorphTargetWeight (uint target, float weight)
@@ -705,6 +727,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       // Copy the skeletal state into our buffers
       UpdateLocalBoneTransforms ();
+      UpdateSocketTransforms ();
     }
     lastTick = current_time;
     skinVertexLF = skinNormalLF = skinBinormalLF = skinTangentLF = false;

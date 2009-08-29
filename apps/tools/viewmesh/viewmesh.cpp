@@ -1132,6 +1132,18 @@ void ViewMesh::AttachMesh (const char* file)
       selectedCal3dSocket->SetMeshWrapper( 0 );    
     }
   }
+  else if (selectedAnimeshSocket)
+  {
+    if(selectedAnimeshSocket->GetSceneNode())
+    {
+      csRef<iMeshWrapper> meshWrapOld = selectedAnimeshSocket->GetSceneNode()->QueryMesh();
+      if ( meshWrapOld )
+      {
+        meshWrapOld->GetMovable()->SetSector(0);
+        selectedAnimeshSocket->SetSceneNode(0);  
+      }
+    }
+  }
 
   iRegion* region = engine->CreateRegion ("viewmesh_region");
   csLoadResult rc = loader->Load (file, region, false, true);
@@ -1142,10 +1154,10 @@ void ViewMesh::AttachMesh (const char* file)
   csRef<iMeshFactoryWrapper> factory;
   if (rc.result == 0)
   {
-    // Library file. Find the first factory in our region.
+    // Library file. Find the last factory in our region.
     iMeshFactoryList* factories = engine->GetMeshFactories ();
     int i;
-    for (i = 0 ; i < factories->GetCount () ; i++)
+    for (i = factories->GetCount ()-1 ; i >= 0 ; --i)
     {
       iMeshFactoryWrapper* f = factories->Get (i);
       if (region->IsInRegion (f->QueryObject ()))
@@ -1177,6 +1189,11 @@ void ViewMesh::AttachMesh (const char* file)
     meshWrap->QuerySceneNode ()->SetParent (spritewrapper->QuerySceneNode ());
     selectedCal3dSocket->SetMeshWrapper( meshWrap );
     spritewrapper->GetMovable()->UpdateMove();
+  }
+  else if (selectedAnimeshSocket)
+  {
+    selectedAnimeshSocket->SetSceneNode(meshWrap->QuerySceneNode());
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper->QuerySceneNode ());
   }
 }
 
@@ -1878,19 +1895,26 @@ bool ViewMesh::AttachButton (const CEGUI::EventArgs& e)
 bool ViewMesh::DetachButton (const CEGUI::EventArgs& e)
 {
   csRef<iMeshWrapper> meshWrapOld;
-  if (selectedCal3dSocket)
+  if (selectedAnimeshSocket && selectedAnimeshSocket->GetSceneNode())
+    meshWrapOld = selectedAnimeshSocket->GetSceneNode()->QueryMesh();
+  else if (selectedCal3dSocket)
     meshWrapOld = selectedCal3dSocket->GetMeshWrapper();
   else if (selectedSocket)
     meshWrapOld = selectedSocket->GetMeshWrapper();
   
   if (!meshWrapOld ) return false;
 
-  meshWrapOld->QuerySceneNode ()->SetParent (0);
+  if(selectedAnimeshSocket)
+    meshWrapOld->GetMovable()->SetSector(0);
+  else
+    meshWrapOld->QuerySceneNode ()->SetParent (0);
 
   engine->RemoveObject(meshWrapOld);
   engine->RemoveObject(meshWrapOld->GetFactory());
 
-  if (selectedCal3dSocket)
+  if (selectedAnimeshSocket)
+    selectedAnimeshSocket->SetSceneNode(0);
+  else if (selectedCal3dSocket)
     selectedCal3dSocket->SetMeshWrapper( 0 );    
   else if (selectedSocket)
     selectedSocket->SetMeshWrapper( 0 );    
