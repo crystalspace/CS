@@ -964,6 +964,7 @@ void ViewMesh::LoadSprite (const char* filename)
     selectedAnimeshSocket = 0;
     selectedAnimation = 0;
     selectedMorphTarget = 0;
+    selectedSubMesh = 0;
     meshTx = meshTy = meshTz = 0;
   }
 
@@ -1329,6 +1330,21 @@ void ViewMesh::UpdateSubMeshList ()
         for(size_t i=0; i<animeshsprite->GetSubMeshCount(); ++i)
         {
             const char* name = animeshsprite->GetSubMesh(i)->GetName();
+            if(name)
+            {
+                CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(name);
+                item->setTextColours(CEGUI::colour(0,0,0));
+                item->setSelectionBrushImage("ice", "TextSelectionBrush");
+                item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+                list->addItem(item);
+            }
+        }
+    }
+    else if(cal3dsprite)
+    {
+        for(size_t i=0; i<cal3dsprite->GetMeshCount(); ++i)
+        {
+            const char* name = cal3dsprite->GetMeshName(i);
             if(name)
             {
                 CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(name);
@@ -2289,6 +2305,9 @@ bool ViewMesh::SelSubmesh (const CEGUI::EventArgs& e)
 
 bool ViewMesh::AttachSMButton (const CEGUI::EventArgs& e)
 {
+    if(!selectedSubMesh)
+        return false;
+
     if(animeshsprite && animeshstate)
     {
         size_t idx = animeshsprite->FindSubMesh(selectedSubMesh);
@@ -2298,12 +2317,20 @@ bool ViewMesh::AttachSMButton (const CEGUI::EventArgs& e)
             return true;
         }
     }
+    else if(cal3dsprite && cal3dstate)
+    {
+        cal3dstate->AttachCoreMesh(selectedSubMesh);
+        return true;
+    }
 
     return false;
 }
 
 bool ViewMesh::DetachSMButton (const CEGUI::EventArgs& e)
 {
+    if(!selectedSubMesh)
+        return false;
+
     if(animeshsprite && animeshstate)
     {
         size_t idx = animeshsprite->FindSubMesh(selectedSubMesh);
@@ -2312,6 +2339,11 @@ bool ViewMesh::DetachSMButton (const CEGUI::EventArgs& e)
             animeshstate->GetSubMesh(idx)->SetRendering(false);
             return true;
         }
+    }
+    else if(cal3dsprite && cal3dstate)
+    {
+        cal3dstate->DetachCoreMesh(cal3dsprite->FindMeshName(selectedSubMesh));
+        return true;
     }
 
     return false;
