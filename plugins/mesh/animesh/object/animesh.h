@@ -29,6 +29,7 @@
 #include "csutil/scf_implementation.h"
 #include "iengine/movable.h"
 #include "iengine/scenenode.h"
+#include "iengine/material.h"
 #include "imesh/animesh.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
@@ -147,7 +148,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     // required but stupid stuff..
     AnimeshObjectType* objectType;
     iMeshFactoryWrapper* logParent;
-    iMaterialWrapper* material;
+    csRef<iMaterialWrapper> material;
     csFlags factoryFlags;
     uint mixMode;
     csBox3 factoryBB;
@@ -224,7 +225,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     };
     csArray<RemappedBones> boneMapping;
     
-    iMaterialWrapper* material;
+    csRef<iMaterialWrapper> material;
 
     /// Get the material
     virtual iMaterialWrapper* GetMaterial () const { return material; }
@@ -421,7 +422,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       AnimeshObject* meshObject;
       FactorySubmesh* factorySubmesh;
-      iMaterialWrapper* material;
+      csRef<iMaterialWrapper> material;
       bool isRendering;
 
       csRefArray<csShaderVariableContext> svContexts;
@@ -458,7 +459,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     AnimeshObjectFactory* factory;
     iMeshWrapper* logParent;
-    iMaterialWrapper* material;
+    csRef<iMaterialWrapper> material;
     uint mixMode;
     csFlags meshObjectFlags;
 
