@@ -414,10 +414,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       virtual void SetMaterial (iMaterialWrapper* mat)
       {
-          if(!mat)
-            material = factorySubmesh->material;
-          else
-            material = mat;
+          material = mat;
       }
 
       AnimeshObject* meshObject;
