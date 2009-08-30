@@ -407,6 +407,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         return svContexts[buffer];
       }
 
+      virtual iMaterialWrapper* GetMaterial () const
+      {
+          return material;
+      }
+
+      virtual void SetMaterial (iMaterialWrapper* mat)
+      {
+          if(!mat)
+            material = factorySubmesh->material;
+          else
+            material = mat;
+      }
+
       AnimeshObject* meshObject;
       FactorySubmesh* factorySubmesh;
       iMaterialWrapper* material;

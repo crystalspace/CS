@@ -500,7 +500,7 @@ struct iAnimatedMesh : public virtual iBase
  */
 struct iAnimatedMeshSubMesh : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshSubMesh, 1, 1, 0);
+  SCF_INTERFACE(iAnimatedMeshSubMesh, 1, 2, 0);
 
   /**
    * Get the factory submesh
@@ -521,6 +521,16 @@ struct iAnimatedMeshSubMesh : public virtual iBase
    * Get a shader variable context for this submesh.
    */
   virtual iShaderVariableContext* GetShaderVariableContext(size_t buffer) const = 0;
+
+ /**
+  * Get the material.
+  */
+  virtual iMaterialWrapper* GetMaterial () const = 0;
+
+ /**
+  * Set the material, or 0 to use factory material.
+  */
+  virtual void SetMaterial (iMaterialWrapper* material) = 0;
 };
 
 /**
