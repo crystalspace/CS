@@ -1052,16 +1052,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           return;
         }
 
-        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (buffer);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        if (!skinnedVertices ||
+          skinnedVertices->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedVertices = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
-          holder->SetRenderBuffer (CS_BUFFER_POSITION, skinnedVertices);          
           skinVertexVersion = skeletonVersion - 1;
         }
+
+        holder->SetRenderBuffer (CS_BUFFER_POSITION, skinnedVertices);
 
         if (skeletonVersion != skinVertexVersion)
         {
@@ -1079,16 +1079,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           return;
         }
 
-        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (buffer);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        if (!skinnedNormals ||
+          skinnedNormals->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedNormals = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-
-          holder->SetRenderBuffer (CS_BUFFER_NORMAL, skinnedNormals);          
+         
           skinNormalVersion = skeletonVersion - 1;
         }
+
+        holder->SetRenderBuffer (CS_BUFFER_NORMAL, skinnedNormals);
 
         if (skeletonVersion != skinNormalVersion)
         {
@@ -1108,27 +1108,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           return;
         }
 
-        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (CS_BUFFER_TANGENT);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        if (!skinnedTangents ||
+          skinnedTangents->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedTangents = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
-          holder->SetRenderBuffer (CS_BUFFER_TANGENT, skinnedTangents);          
           skinTangentVersion = skeletonVersion - 1;
         }
-
-        currBuffer = holder->GetRenderBufferNoAccessor (CS_BUFFER_BINORMAL);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+      
+        if (!skinnedBinormals ||
+          skinnedBinormals->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedBinormals = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-
-          holder->SetRenderBuffer (CS_BUFFER_BINORMAL, skinnedBinormals);          
+          
           skinBinormalVersion = skeletonVersion - 1;
         }
+
+        holder->SetRenderBuffer (CS_BUFFER_TANGENT, skinnedTangents);
+        holder->SetRenderBuffer (CS_BUFFER_BINORMAL, skinnedBinormals);
 
         if (skeletonVersion != skinTangentVersion ||
           skeletonVersion != skinBinormalVersion)
