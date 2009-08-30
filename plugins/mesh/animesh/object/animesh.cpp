@@ -20,6 +20,7 @@
 
 #include "csgeom/math3d.h"
 #include "csgfx/renderbuffer.h"
+#include "csgfx/vertexlight.h"
 #include "csgfx/vertexlistwalker.h"
 #include "cstool/rviewclipper.h"
 #include "csutil/objreg.h"
@@ -27,9 +28,12 @@
 #include "csutil/scfarray.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
+#include "iengine/engine.h"
+#include "iengine/lightmgr.h"
 #include "iengine/material.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
+#include "iengine/sector.h"
 #include "imesh/skeleton2.h"
 #include "imesh/skeleton2anim.h"
 #include "iutil/strset.h"
@@ -71,6 +75,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
       object_reg, "crystalspace.shared.stringset");
+    
+    lightmgr = csQueryRegistry<iLightManager> (object_reg);
+    engine = csQueryRegistry<iEngine> (object_reg);
 
     // Get the SV names
     svNameVertexUnskinned = strset->Request ("position unskinned");
@@ -639,6 +646,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     renderMeshList.DeleteAll ();
 
+    lighting_movable = movable;
+    
     // Boiler-plate stuff...
     iCamera* camera = rview->GetCamera ();
 
@@ -913,7 +922,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         // Setup the accessor to this mesh
         bufferHolder->SetAccessor (rba, 
           CS_BUFFER_POSITION_MASK | CS_BUFFER_NORMAL_MASK | 
-          CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);
+          CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK |
+	  CS_BUFFER_COLOR_MASK);
 
         sm->bufferHolders.Push (bufferHolder);
       }
@@ -1144,6 +1154,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         skinBinormalLF = true;
       }
       break;
+    case CS_BUFFER_COLOR:
+      {
+	// These are needed for lighting
+	PreGetBuffer (holder, CS_BUFFER_POSITION);
+	PreGetBuffer (holder, CS_BUFFER_NORMAL);
+	
+        if (!colorsLit ||
+          colorsLit->GetElementCount () < factory->GetVertexCountP ())
+        {
+          colorsLit = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
+            CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+        }
+
+        holder->SetRenderBuffer (CS_BUFFER_COLOR, colorsLit);
+
+	UpdateLighting();
+      }
+      break;
     default: //Empty..
       break;
     }    
@@ -1167,6 +1195,86 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       SkinVertices ();
       skinVertexVersion = skeletonVersion;
     }
+  }
+
+  void AnimeshObject::UpdateLighting ()
+  {
+    const csArray<iLightSectorInfluence*>& lights =
+      factory->objectType->lightmgr->GetRelevantLights (logParent, -1, false);
+    
+    csColor4 col;
+    factory->objectType->engine->GetAmbientLight (col);
+    iSector* sect = lighting_movable->GetSectors ()->Get (0);
+    if (sect)
+      col += sect->GetDynamicAmbientLight ();
+    
+    size_t elementCount = colorsLit->GetElementCount ();
+    {
+      csRenderBufferLock<csColor> tmpColor (colorsLit);
+      for (size_t i = 0; i < elementCount; i++)
+      {
+        tmpColor[i] = col;
+      }
+    }
+    
+    for (size_t i = 0; i < lights.GetSize(); i++)
+    {
+      iLight* light = lights[i]->GetLight();
+      UpdateLighting (light);
+    }
+    
+    {
+      csRenderBufferLock<csColor> tmpColor (colorsLit);
+      for (size_t i = 0; i < elementCount; i++)
+      {
+        tmpColor[i] *= 0.5f;
+      }
+    }
+    
+  }
+
+  void AnimeshObject::UpdateLighting (iLight* light)
+  {
+    // Choose attenuation.
+    switch (light->GetAttenuationMode())
+    {
+      default:
+      case CS_ATTN_NONE:
+	UpdateLighting<csNoAttenuation> (light);
+	break;
+      case CS_ATTN_LINEAR:
+	UpdateLighting<csLinearAttenuation> (light);
+	break;
+      case CS_ATTN_INVERSE:
+	UpdateLighting<csInverseAttenuation> (light);
+	break;
+      case CS_ATTN_REALISTIC:
+	UpdateLighting<csRealisticAttenuation> (light);
+	break;
+      case CS_ATTN_CLQ:
+	UpdateLighting<csCLQAttenuation> (light);
+	break;
+    }
+  }
+  
+  template<typename Attenuation>
+  void AnimeshObject::UpdateLighting (iLight* light)
+  {
+    /* Just assume point lights (SW lighting code in other meshes generally
+       does that) */
+    csVertexLightCalculator<csPointLightProc<Attenuation> > lightCalc;
+    csLightProperties lightProps;
+    
+    const csReversibleTransform o2wt = lighting_movable->GetFullTransform ();
+    lightProps.posObject = o2wt.Other2This (light->GetFullCenter());
+    lightProps.attenuationConsts = light->GetAttenuationConstants();
+    lightProps.color = light->GetColor();
+  
+    // Let csVertexLightCalculator do the lifting.
+    iRenderBuffer* vertices = skinnedVertices ? skinnedVertices : postMorphVertices;
+    iRenderBuffer* normals = skinnedNormals ? skinnedNormals : factory->normalBuffer;
+    lightCalc.CalculateLightingAdd (lightProps, csVector3(0), 0,
+      vertices->GetElementCount(), vertices, normals, colorsLit);
   }
 
   AnimeshObject::Socket::Socket (AnimeshObject* object, FactorySocket* factorySocket)

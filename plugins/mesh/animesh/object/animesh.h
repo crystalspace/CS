@@ -36,6 +36,9 @@
 
 #include "morphtarget.h"
 
+struct iEngine;
+struct iLightManager;
+
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
 
@@ -55,6 +58,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);
+  
+    csRef<iEngine> engine;
+    csRef<iLightManager> lightmgr;
   };
 
 
@@ -363,6 +369,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void MorphVertices ();
 
     void PreskinLF ();
+    void UpdateLighting ();
+    void UpdateLighting (iLight* light);
+    template<typename Attenuation> void UpdateLighting (iLight* light);
 
     class RenderBufferAccessor :
       public scfImplementation1<RenderBufferAccessor, 
@@ -491,6 +500,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     unsigned int skinVertexVersion, skinNormalVersion, skinTangentVersion, skinBinormalVersion;
     // Things we skinned in software last frame
     bool skinVertexLF, skinNormalLF, skinTangentLF, skinBinormalLF;
+    
+    // Used for SW lighting
+    iMovable*  lighting_movable;
+    csRef<iRenderBuffer> colorsLit;
   };
 
 }
