@@ -6,12 +6,12 @@
  
         <Window Type="ice/FrameWindow" Name="Form" >
             <Property Name="Text" Value="ViewMesh" />
-            <Property Name='UnifiedSize' Value='{{0.0,164.0},{0.0,350.0}}'/>
+            <Property Name='UnifiedSize' Value='{{0.0,190.0},{0.0,350.0}}'/>
 	    <Property Name='UnifiedPosition' Value='{{0.01,0.0},{0.01,0.0}}'/>
             <Property Name="CloseButtonEnabled" Value="False" />
             <Property Name='SizingEnabled' Value='True'/>
              <Window Type="ice/TabControl" Name="Root/Control/Tabs" >
-             	<Property Name='UnifiedSize' Value='{{0.000000,154.000000},{0.000000,318.000000}}'/>
+             	<Property Name='UnifiedSize' Value='{{0.000000,190.000000},{0.000000,318.000000}}'/>
 	     	<Property Name='UnifiedPosition' Value='{{0.000000,5.000000},{0.000000,30.000000}}'/>
 	     	<Property Name='TabHeight' Value='{0.05,0}'/>
 		<Property Name='TabTextPadding' Value='{0.02,0}'/>
@@ -321,6 +321,37 @@
 		       		<Property Name="Text" Value="Clear" />
 		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
 		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,195.0}}'/>
+                       </Window>  
+ 
+ 
+ 
+                     </Window>
+	         </Window>
+
+
+
+
+<Window Type="DefaultWindow" Name="Root/Control/Tabs/Tab5" > 
+	           <Property Name="Text" Value="SM" />
+	             <Window Type="ice/StaticImage" Name="Root/Control/Tabs/Tab5/main" >
+		   	<Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}'/>
+	     	        <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+ 
+	     	        <Window Type="ice/Listbox" Name="Tab5/List" >
+				<Property Name="Text" Value="Set" />
+				<Property Name='UnifiedSize' Value='{{0.0,144.0},{0.0,150.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+                       </Window>
+ 
+	     	        <Window Type="ice/Button" Name="Tab5/AttachSMButton" >
+				<Property Name="Text" Value="Attach" />
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,160.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="Tab5/DetachSMButton" >
+		       		<Property Name="Text" Value="Detach" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,160.0}}'/>
                        </Window>  
  
  

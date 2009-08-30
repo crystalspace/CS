@@ -110,6 +110,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   iAnimatedMeshSocket* selectedAnimeshSocket;
   const char* selectedAnimation;
   const char* selectedMorphTarget;
+  const char* selectedSubMesh;
   float meshTx, meshTy, meshTz;
 
   vmAnimCallback* callback;
@@ -142,6 +143,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   void UpdateSocketList ();
   void UpdateMorphList ();
   void UpdateAnimationList ();
+  void UpdateSubMeshList ();
   void WalkSkel2Nodes (CEGUI::Listbox* list, iSkeletonAnimNodeFactory2* node);
   void UpdateSocket ();
 
@@ -187,6 +189,10 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool ClearButton (const CEGUI::EventArgs& e);
   bool ResetCameraButton (const CEGUI::EventArgs& e);
   bool ReloadButton (const CEGUI::EventArgs& e);
+  //SUBMESH
+  bool SelSubmesh (const CEGUI::EventArgs& e);
+  bool AttachSMButton (const CEGUI::EventArgs& e);
+  bool DetachSMButton (const CEGUI::EventArgs& e);
 
  public:
 
