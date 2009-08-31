@@ -15180,6 +15180,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetRendering = *cspacec::iAnimatedMeshSubMesh_SetRendering;
 *IsRendering = *cspacec::iAnimatedMeshSubMesh_IsRendering;
 *GetShaderVariableContext = *cspacec::iAnimatedMeshSubMesh_GetShaderVariableContext;
+*GetMaterial = *cspacec::iAnimatedMeshSubMesh_GetMaterial;
+*SetMaterial = *cspacec::iAnimatedMeshSubMesh_SetMaterial;
 *scfGetVersion = *cspacec::iAnimatedMeshSubMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

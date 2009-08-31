@@ -752,6 +752,8 @@ class iAnimatedMeshSubMesh(core.iBase):
     def SetRendering(*args): return _imesh.iAnimatedMeshSubMesh_SetRendering(*args)
     def IsRendering(*args): return _imesh.iAnimatedMeshSubMesh_IsRendering(*args)
     def GetShaderVariableContext(*args): return _imesh.iAnimatedMeshSubMesh_GetShaderVariableContext(*args)
+    def GetMaterial(*args): return _imesh.iAnimatedMeshSubMesh_GetMaterial(*args)
+    def SetMaterial(*args): return _imesh.iAnimatedMeshSubMesh_SetMaterial(*args)
     scfGetVersion = staticmethod(_imesh.iAnimatedMeshSubMesh_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iAnimatedMeshSubMesh
     __del__ = lambda self : None;
