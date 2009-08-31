@@ -140,9 +140,9 @@ class csMeshFactoryWrapper :
   public scfImplementationExt4<csMeshFactoryWrapper,
                                csObject, 
                                iMeshFactoryWrapper,
-			       iImposter,
+                               iImposterFactory,
                                scfFakeInterface<iShaderVariableContext>,
-			       iSelfDestruct>,
+			                         iSelfDestruct>,
   public CS::ShaderVariableContextImpl
 {
 private:
@@ -173,8 +173,23 @@ private:
 
   csEngine* engine;
 
-  /// Class for keeping track of imposter information.
-  csImposterFactory* imposter_factory;
+  /// Hash of active imposters.
+  csRefArray<iImposterMesh> imposters;
+
+  /// Imposter Threshold Range.
+  float min_imposter_distance;
+
+  /// Imposter Redo Threshold angle change.
+  float imposter_rotation_tolerance;
+  float imposter_camera_rotation_tolerance;
+
+  csString imposter_shader;
+
+  // Whether to use pseudo-instanced impostering.
+  bool imposter_instancing;
+
+  // Whether to render the 'real' mesh while waiting for the imposter to init.
+  bool imposter_renderReal;
 
   // Factory to be instanced.
   iMeshFactoryWrapper* instanceFactory;
@@ -187,15 +202,6 @@ private:
 
 protected:
   virtual void InternalRemove() { SelfDestruct(); }
-
-public:
-  /// Flag indicating whether this factory should try to imposter or not.
-  bool imposter_active;
-  /// Imposter Threshold Range.
-  csRef<iSharedVariable> min_imposter_distance;
-  /// Imposter Redo Threshold angle change.
-  csRef<iSharedVariable> imposter_rotation_tolerance;
-  csRef<iSharedVariable> imposter_camera_rotation_tolerance;
 
 public:
   /// Constructor.
@@ -313,68 +319,100 @@ public:
     return transformVars;
   }
 
-  //---------- iImposter Functions -----------------//
+  //---------- iImposterFactory Functions -----------------//
 
   /**
-   * Set true if this meshes created from this
-   * factory should use Impostering. Note that this only
-   * affects meshes created from this factory after this
-   * has been called.
+   * Given a mesh, activate and update its imposter.
    */
-  virtual void SetImposterActive (bool flag);
+  virtual bool UpdateImposter (iMeshWrapper* mesh, iRenderView* rview);
 
   /**
-   * Determine if impostering is enabled for this factory
-   * (not if Imposter is being drawn, but simply considered).
+   * Given a mesh, deactivate and remove its imposter.
    */
-  virtual bool GetImposterActive () const { return imposter_active; }
+  virtual void RemoveImposter (iMeshWrapper* mesh);
 
   /**
-   * Minimum Imposter Distance is the distance from camera 
-   * beyond which imposter is used. Imposter gets a 
-   * ptr here because value is a shared variable 
+   * Sets the minimum imposter distance.
+   * This is the distance from camera beyond which an imposter is used.
+   * The imposter gets a ptr here because the value is a shared variable 
    * which can be changed at runtime for many objects.
    *
    * All meshes created from this factory after this function
    * is called will get this variable. Meshes created before
    * calling this function will get the previous value.
    */
-  virtual void SetMinDistance (iSharedVariable* dist)
+  virtual void SetMinDistance (float dist)
   { min_imposter_distance = dist; }
 
+  /**
+   * Gets the minimum imposter distance.
+   */
+  virtual float GetMinDistance()
+  {
+    return min_imposter_distance;
+  }
+
   /** 
-   * Rotation Tolerance is the maximum allowable 
-   * angle difference between when the imposter was 
-   * created and the current position of the camera.
-   * Angle greater than this triggers a re-render of
-   * the imposter.
+   * Sets the rotation tolerance.
+   * This is the maximum allowable angle difference between when the
+   * imposter was created and the current position of the camera.
+   * Angles greater than this trigger a re-render of the imposter.
    *
    * All meshes created from this factory after this function
    * is called will get this variable. Meshes created before
    * calling this function will get the previous value.
    */
-  virtual void SetRotationTolerance (iSharedVariable* angle)
+  virtual void SetRotationTolerance (float angle)
   { imposter_rotation_tolerance = angle; }
 
+  /**
+   * Gets the rotation tolerance.
+   */
+  virtual float GetRotationTolerance()
+  { return imposter_rotation_tolerance; }
+
   /** 
-   * Camera Rotation Tolerance is the tolerance angle
-   * between z->1 vector and object on screen. Exceeding this
-   * value triggers updating of the imposter whenever the
-   * object slides too much away from the center of screen.
+   * Sets the camera rotation tolerance.
+   * This is the tolerance angle between the z->1 vector and the object
+   * on screen. Exceeding this value triggers the updating of the imposter
+   * whenever the object slides too much away from the center of screen.
    *
    * All meshes created from this factory after this function
    * is called will get this variable. Meshes created before
    * calling this function will get the previous value.
    */
-  virtual void SetCameraRotationTolerance (iSharedVariable* angle)
+  virtual void SetCameraRotationTolerance (float angle)
   { imposter_camera_rotation_tolerance = angle; }
 
-  /// Determine if imposter or true rendering will be used.
-  virtual bool WouldUseImposter (csReversibleTransform& /*pov*/) const
-  { /* implement later */ return false; }
+  /**
+   * Gets the camera rotation tolerance.
+   */
+  virtual float GetCameraRotationTolerance()
+  { return imposter_camera_rotation_tolerance; }
 
-  /// Get the imposter factory.
-  csImposterFactory* GetImposterFactory () { return imposter_factory; }
+ /**
+  * Sets the shader to be used by the imposters.
+  */
+  virtual void SetShader(const char* shader)
+  {
+    imposter_shader = shader;
+  }
+
+ /**
+  * Sets what method of impostering (instanced or not) to use.
+  */
+  virtual void SetInstancing(bool instancing)
+  {
+    imposter_instancing = instancing;
+  }
+
+  /**
+   * Sets whether to render the real mesh while waiting for the imposter to init.
+   */
+  virtual void SetRenderReal(bool renderReal)
+  {
+    imposter_renderReal = renderReal;
+  }
 
   //--------------------- iSelfDestruct implementation -------------------//
 

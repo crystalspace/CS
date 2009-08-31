@@ -252,8 +252,11 @@ void ProctexPDLight::Animate_MMX ()
     {
       if (!lightBits.IsBitSet (i)) continue;
       MappedLight& light = lights[i];
-      __m64 lightColor = lightFactors[l++];
-      if (!light.map.tileNonNull.IsBitSet (t)) continue;
+      if (!light.map.tileNonNull.IsBitSet (t))
+      {
+	l++;
+	continue;
+      }
       const PDMap::Tile mapTile = light.map.tiles[t];
 
       const int mapW = mapTile.tilePartW;
@@ -265,6 +268,7 @@ void ProctexPDLight::Animate_MMX ()
         mapTile.tilePartX / 2;
       size_t scratchPitch = blitPitch / sizeof (__m64)  - mapW/2;
 
+      __m64 lightColor = lightFactors[l];
       csRGBcolor mapMax = mapTile.maxValue;
       int mapMax_red   = mapMax.red   * lightFactors_ui16[l*3+0];
       int mapMax_green = mapMax.green * lightFactors_ui16[l*3+1];
@@ -296,6 +300,7 @@ void ProctexPDLight::Animate_MMX ()
           MultiplyAddLumels<Map_Lumel, false> (scratchPtr, scratchPitch,
             mapPtr, mapPitch, mapW, lines, lightColor);
       }
+      l++;
     }
   }
   _m_empty();

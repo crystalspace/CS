@@ -41,13 +41,12 @@ CS_LEAKGUARD_IMPLEMENT (csMeshFactoryWrapper);
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
                                             iMeshObjectFactory *meshFact)
   : scfImplementationType (this), meshFact (meshFact), parent (0),
-  zbufMode (CS_ZBUF_USE), engine (engine)
+  zbufMode (CS_ZBUF_USE), engine (engine), min_imposter_distance(0),
+  imposter_instancing(false), imposter_renderReal(false)
 {
   children.SetMeshFactory (this);
 
   render_priority = engine->GetObjectRenderPriority ();
-  imposter_active = false;
-  imposter_factory = 0;
 
   instanceFactory = 0;
 
@@ -65,13 +64,12 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
   : scfImplementationType (this), parent (0), zbufMode (CS_ZBUF_USE), 
-  engine (engine)
+  engine (engine), min_imposter_distance(0), imposter_instancing(false),
+  imposter_renderReal(false)
 {
   children.SetMeshFactory (this);
 
   render_priority = engine->GetObjectRenderPriority ();
-  imposter_active = false;
-  imposter_factory = 0;
 
   instanceFactory = 0;
 
@@ -92,7 +90,6 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
   // This line MUST be here to ensure that the children are not
   // removed after the destructor has already finished.
   children.RemoveAll ();
-  delete imposter_factory;
 }
 
 void csMeshFactoryWrapper::SelfDestruct ()
@@ -251,17 +248,52 @@ void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
   meshes_for_lod.Push (fact);
 }
 
-void csMeshFactoryWrapper::SetImposterActive (bool flag)
+bool csMeshFactoryWrapper::UpdateImposter(iMeshWrapper* mesh, iRenderView* rview)
 {
-  imposter_active = flag;
-  if (imposter_active)
+  // Check existing imposter meshes to see if we need to update.
+  for(size_t i=0; i<imposters.GetSize(); ++i)
   {
-    if (!imposter_factory)
-      imposter_factory = new csImposterFactory (this);
+    if(imposters[i]->Update(mesh, rview))
+      return !imposter_renderReal || imposters[i]->Rendered();
+
+    if(!imposters[i]->IsInstancing())
+    {
+      imposters[i]->Destroy();
+      imposters.DeleteIndex(i);
+    }
   }
-  else if (!imposter_active)
+
+  if(imposter_instancing)
   {
-    delete imposter_factory;
+    // Check if we can add the instance to an existing imposter mesh.
+    for(size_t i=0; i<imposters.GetSize(); ++i)
+    {
+      if(imposters[i]->Add(mesh, rview))
+        return true;
+    }
+  }
+
+  // Create a new imposter mesh.
+  csRef<iImposterMesh> imposter = csPtr<iImposterMesh>(new csImposterMesh(engine,
+    this, mesh, rview, imposter_instancing, imposter_shader));
+  imposters.Push(imposter);
+
+  return !imposter_renderReal;
+}
+
+void csMeshFactoryWrapper::RemoveImposter(iMeshWrapper* mesh)
+{
+  for(size_t i=0; i<imposters.GetSize(); ++i)
+  {
+    if(imposters[i]->Remove(mesh))
+    {
+      if(!imposters[i]->IsInstancing())
+      {
+        imposters[i]->Destroy();
+        imposters.DeleteIndexFast(i);
+      }
+      return;
+    }
   }
 }
 

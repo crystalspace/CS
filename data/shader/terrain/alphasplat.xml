@@ -386,5 +386,7 @@
     </pass>
   </technique>
   <?endif?>
+
+  <fallbackshader name="terrain_alphasplat_pvl" file="/shader/terrain/alphasplat_pvl.xml" />
 </shader>
 

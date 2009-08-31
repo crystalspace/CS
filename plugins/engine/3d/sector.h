@@ -36,6 +36,7 @@
 #include "iutil/selfdestruct.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
+#include "iengine/rview.h"
 #include "iengine/viscull.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -52,7 +53,6 @@ class csMeshMeshList;
 class csMeshWrapper;
 class csMeshGenerator;
 struct iVisibilityCuller;
-struct iRenderView;
 struct iMeshWrapper;
 
 /// A list of meshes for a sector.

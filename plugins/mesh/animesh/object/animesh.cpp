@@ -99,12 +99,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices)
+  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices,
+    const char* name, bool visible)
   {
     csRef<FactorySubmesh> newSubmesh;
 
-    newSubmesh.AttachNew (new FactorySubmesh);
-    newSubmesh->indexBuffers.Push (indices);    
+    newSubmesh.AttachNew (new FactorySubmesh(name));
+    newSubmesh->indexBuffers.Push (indices);  
+    newSubmesh->visible = visible;
     submeshes.Push (newSubmesh);
 
     return newSubmesh;
@@ -112,11 +114,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
-    const csArray<csArray<unsigned int> >& boneIndices)
+    const csArray<csArray<unsigned int> >& boneIndices,
+    const char* name,
+    bool visible)
   {
     csRef<FactorySubmesh> newSubmesh;
 
-    newSubmesh.AttachNew (new FactorySubmesh);
+    newSubmesh.AttachNew (new FactorySubmesh(name));
+    newSubmesh->visible = visible;
     
     for (size_t i = 0; i < indices.GetSize (); ++i)
     {
@@ -140,6 +145,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     CS_ASSERT (index < submeshes.GetSize ());
     return submeshes[index];
+  }
+
+  size_t AnimeshObjectFactory::FindSubMesh (const char* name) const
+  {
+    for (size_t i=0; i < submeshes.GetSize (); ++i)
+    {
+      const char* meshName = submeshes[i]->GetName();
+      if (meshName)
+      {
+        if (!strcmp(meshName, name))
+        {
+          return i;
+        }
+      }
+    }
+
+    return (size_t)-1;
   }
 
   size_t AnimeshObjectFactory::GetSubMeshCount () const
@@ -413,6 +435,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return sockets[index];
   }
 
+  uint AnimeshObjectFactory::FindSocket (const char* name) const
+  {
+    for(size_t i=0; i<sockets.GetSize(); ++i)
+    {
+      if(!strcmp(name, sockets[i]->GetName()))
+      {
+        return i;
+      }
+    }
+
+    return (uint)~0;
+  }
+
   csFlags& AnimeshObjectFactory::GetFlags ()
   {
     return factoryFlags;
@@ -553,12 +588,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshSubMesh* AnimeshObject::GetSubMesh (size_t index) const
   {
-    return 0;
+    return submeshes[index];
   }
 
   size_t AnimeshObject::GetSubMeshCount () const
   {
-    return 0;
+    return submeshes.GetSize();
   }
 
   void AnimeshObject::SetMorphTargetWeight (uint target, float weight)
@@ -694,6 +729,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       // Copy the skeletal state into our buffers
       UpdateLocalBoneTransforms ();
+      UpdateSocketTransforms ();
     }
     lastTick = current_time;
     skinVertexLF = skinNormalLF = skinBinormalLF = skinTangentLF = false;
@@ -1016,16 +1052,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           return;
         }
 
-        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (buffer);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        if (!skinnedVertices ||
+          skinnedVertices->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedVertices = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
-          holder->SetRenderBuffer (CS_BUFFER_POSITION, skinnedVertices);          
           skinVertexVersion = skeletonVersion - 1;
         }
+
+        holder->SetRenderBuffer (CS_BUFFER_POSITION, skinnedVertices);
 
         if (skeletonVersion != skinVertexVersion)
         {
@@ -1043,16 +1079,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           return;
         }
 
-        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (buffer);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        if (!skinnedNormals ||
+          skinnedNormals->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedNormals = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-
-          holder->SetRenderBuffer (CS_BUFFER_NORMAL, skinnedNormals);          
+         
           skinNormalVersion = skeletonVersion - 1;
         }
+
+        holder->SetRenderBuffer (CS_BUFFER_NORMAL, skinnedNormals);
 
         if (skeletonVersion != skinNormalVersion)
         {
@@ -1072,27 +1108,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           return;
         }
 
-        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (CS_BUFFER_TANGENT);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        if (!skinnedTangents ||
+          skinnedTangents->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedTangents = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
-          holder->SetRenderBuffer (CS_BUFFER_TANGENT, skinnedTangents);          
           skinTangentVersion = skeletonVersion - 1;
         }
-
-        currBuffer = holder->GetRenderBufferNoAccessor (CS_BUFFER_BINORMAL);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+      
+        if (!skinnedBinormals ||
+          skinnedBinormals->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedBinormals = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-
-          holder->SetRenderBuffer (CS_BUFFER_BINORMAL, skinnedBinormals);          
+          
           skinBinormalVersion = skeletonVersion - 1;
         }
+
+        holder->SetRenderBuffer (CS_BUFFER_TANGENT, skinnedTangents);
+        holder->SetRenderBuffer (CS_BUFFER_BINORMAL, skinnedBinormals);
 
         if (skeletonVersion != skinTangentVersion ||
           skeletonVersion != skinBinormalVersion)

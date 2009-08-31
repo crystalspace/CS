@@ -187,54 +187,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  bool csThreadedLoader::ParseImposterSettings (iImposter* imposter,
+  bool csThreadedLoader::ParseImposterSettings (iImposterFactory* imposter,
     iDocumentNode *node)
   {
-    const char *s = node->GetAttributeValue ("active");
-    if (s && !strcmp (s, "no"))
-      imposter->SetImposterActive (false);
-    else
-      imposter->SetImposterActive (true);
+    float range = node->GetAttributeValueAsFloat("range");
+    imposter->SetMinDistance(range);
 
-    iSharedVariable *var = 0;
+    float tolerance = node->GetAttributeValueAsFloat("tolerance");
+    imposter->SetRotationTolerance(tolerance);
 
-    s = node->GetAttributeValue ("range");
-    if (s)
-      var = Engine->GetVariableList()->FindByName (s);
-    if (!s || !var)
-    {
-      SyntaxService->ReportError (
-        "crystalspace.maploader.parse.meshobject",
-        node, "Imposter range variable (%s) doesn't exist!", s);
-      return false;
-    }
-    imposter->SetMinDistance (var);
+    float camera_tolerance = node->GetAttributeValueAsFloat("camera_tolerance");
+    imposter->SetCameraRotationTolerance(camera_tolerance);
 
-    s = node->GetAttributeValue ("tolerance");
-    if (s)
-      var = Engine->GetVariableList ()->FindByName (s);
-    if (!s || !var)
-    {
-      SyntaxService->ReportError (
-        "crystalspace.maploader.parse.meshobject", node,
-        "Imposter rotation tolerance variable (%s) doesn't exist!",
-        s);
-      return false;
-    }
-    imposter->SetRotationTolerance (var);
+    imposter->SetShader(node->GetAttributeValue("shader"));
 
-    s = node->GetAttributeValue ("camera_tolerance");
-    if (s)
-      var = Engine->GetVariableList ()->FindByName (s);
-    if (!s || !var)
-    {
-      SyntaxService->ReportError (
-        "crystalspace.maploader.parse.meshobject", node,
-        "Imposter camera rotation tolerance variable (%s) doesn't exist!",
-        s);
-      return false;
-    }
-    imposter->SetCameraRotationTolerance (var);
+    imposter->SetInstancing(node->GetAttributeValueAsBool("instance"));
+
+    imposter->SetRenderReal(node->GetAttributeValueAsBool("render_real"));
+
     return true;
   }
 

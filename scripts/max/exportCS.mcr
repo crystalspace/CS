@@ -2785,7 +2785,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 				  )
 		      )
 
-			  format "      <size x=\"%\" y=\"%\" z=\"%\" />\n" terrx terry terrz to:outFile
+			  format "      <size x=\"%\" y=\"%\" z=\"%\" />\n" (terrx*2) terry (terrz*2) to:outFile
 			  format "      <basematerial>%</basematerial>\n" base_material to:outFile
 			  format "      <renderproperties><param name=\"block resolution\">16</param><param name=\"lod splitcoeff\">8</param></renderproperties>\n" to:outFile
 			  format "      <feederproperties><param name=\"heightmap source\">%</param> \n" terrimage  to:outFile
@@ -2804,7 +2804,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 			    )
 			  )
 
-			  format "  </feederproperties><position x=\"-640\" y=\"-640\" /></cell></cells>\n" to:outFile
+			  format "  </feederproperties><position x=\"-%\" y=\"-%\" /></cell></cells>\n" terrx terrz to:outFile
 
 			  --format "   <terraformer>%</terraformer><sampleregion>\n" roomName to:outFile
 			  --format "   <min x=\"-%\" y=\"-%\" /> <max x=\"%\" y=\"%\" /></sampleregion>\n" terrx terrz terrx terrz to:outFile

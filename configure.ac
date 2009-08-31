@@ -346,79 +346,11 @@ CS_CHECK_PYTHON([emit], [], [Python scripting interface])
 
 
 #------------------------------------------------------------------------------
-# Check if Java2 SDK is installed and which compiler and linker flags are
+# Check if Java SDK is installed and which compiler and linker flags are
 # needed.  Also check if Ant build tool, which is commonly used to build Java
 # projects, is available.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_JAVA_FLAGS],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
-    AC_REQUIRE([CS_CHECK_HOST])
-    AS_IF([test x$cs_host_macosx = xyes && # Not cross-building for Darwin.
-	test -r /System/Library/Frameworks/JavaVM.framework/Headers],
-	[$1_cflags="-I/System/Library/Frameworks/JavaVM.framework/Headers"
-	$1_libs="-framework JavaVM"],
-	[AS_IF([test -n "$JAVA_HOME"],
-	    [$1_dir="$JAVA_HOME"],
-	    [AS_IF([test -n "$2"],
-		[$1_dir=`AS_DIRNAME([$2])`
-		$1_dir=`AS_DIRNAME([$$1_dir])`],
-		[$1_dir=''])])
-	AS_IF([test -n "$$1_dir"],
-	    [$1_cflags="-I$$1_dir/include"
-	    case $host_os in
-		mingw*|cygwin*) cs_java_platform=win32 ;;
-		*) cs_java_platform=`echo $host_os |
-		    sed 's/^\([[^-]]*\).*$/\1/'` ;;
-	    esac
-	    AS_IF([test -n "$cs_java_platform"],
-		[$1_cflags="$$1_cflags
-		    $$1_cflags/$cs_java_platform"])
-	    $1_cflags=CS_PATH_NORMALIZE([$$1_cflags])
-	    for i in `find "$$1_dir/" -name '*jvm.*' -print`; do
-	        echo `AS_DIRNAME([$i])`; done | sort | uniq > conftest.jlib
-	    $1_lflags=`sed 's/^\(.*\)$/-L\1/' < conftest.jlib`
-	    $1_lflags=CS_PATH_NORMALIZE([$$1_lflags])
-	    rm -f conftest.jlib
-	    $1_libs="-ljvm"])])])
-
-JAVA_HOME=CS_PATH_NORMALIZE([$JAVA_HOME])
-
-AS_IF([test -z "$JAVA" && test -n "$JAVACMD"],
-    [JAVA=CS_PATH_NORMALIZE([$JAVACMD])])
-CS_PATH_PROGS([JAVA], [java], [],
-    [$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
-CS_EMIT_BUILD_PROPERTY([JAVA], [$JAVA])
-
-CS_PATH_PROGS([JAVAC], [javac], [],
-    [$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
-CS_EMIT_BUILD_PROPERTY([JAVAC], [$JAVAC])
-
-AC_ARG_WITH([java], [AC_HELP_STRING([--with-java],
-    [use Java scripting interface (default YES)])])
-AS_IF([test -z "$with_java"], [with_java=yes])
-
-AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
-    [CS_JAVA_FLAGS([cs_java], [$JAVAC])
-    CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
-	[AC_LANG_PROGRAM(
-	    [[#if defined(__GNUC__)
-	    typedef long long __int64; /* For GCC on Windows */
-	    #endif
-	    /* Fix for 'jlong' on x86_64. */
-	    #if defined(__x86_64)
-	    #ifdef _LP64 /* 64-bit Solaris */
-	    #undef _LP64
-	    #endif
-	    #endif
-	    #include <jni.h>
-	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);]],
-	    [JNI_GetCreatedJavaVMs(0,0,0);])],
-	[CS_CREATE_TUPLE() \
-        CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
-	[], [CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
-
-CS_PATH_PROGS([ANT], [ant], [], [$PATH$PATH_SEPARATOR$ANT_HOME/bin])
-CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
+CS_CHECK_JAVA([emit])
 
 
 
@@ -763,14 +695,6 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
     [CS_CREATE_TUPLE([-mmmx])], [],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],
-        [append])], [],	[$cs_cv_prog_cxx_code_gen])
-CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
-    [CS_CREATE_TUPLE([-msse])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SSE], [$cs_cv_prog_cc_msse],
-        [append])], [],	[$cs_cv_prog_cxx_code_gen])
-CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
-    [CS_CREATE_TUPLE([-msse2])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SSE2], [$cs_cv_prog_cc_msse2],
         [append])], [],	[$cs_cv_prog_cxx_code_gen])
 CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
     [CS_CREATE_TUPLE([-mfpmath=sse])], [],

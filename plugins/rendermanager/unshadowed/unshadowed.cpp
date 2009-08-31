@@ -362,8 +362,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
     if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
     {
       csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
-	"crystalspace.rendermanager.test1",
-	"Could not load lighting_default shader");
+	messageID, "Could not load lighting_default shader");
     }
   
     if (doVerbose)

@@ -1842,9 +1842,10 @@ void csVFS::CheckCurrentDir()
 
 bool csVFS::ChDir (const char *Path)
 {
+  csString copy (Path);
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   // First, transform Path to absolute
-  char *newwd = _ExpandPath (Path, true);
+  char *newwd = _ExpandPath (copy, true);
   if (!newwd)
     return false;
   CheckCurrentDir();
