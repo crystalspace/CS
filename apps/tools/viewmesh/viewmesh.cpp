@@ -26,7 +26,9 @@
 #include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
 #include "csutil/stringconv.h"
+#include "imesh/animesh.h"
 #include "imesh/object.h"
+#include "imesh/skeleton2anim.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"
 #include "iutil/stringarray.h"
@@ -73,8 +75,8 @@ struct vmAnimCallback : public CalAnimationCallback
 
 ViewMesh::ViewMesh () : 
   camMode(movenormal), roomsize(5), scale(1), move_sprite_speed(0),
-  selectedSocket(0),  selectedCal3dSocket(0), meshTx(0), meshTy(0), 
-  meshTz(0), callback(0)
+  selectedSocket(0),  selectedCal3dSocket(0), selectedAnimeshSocket(0),
+  meshTx(0), meshTy(0), meshTz(0), callback(0)
 {
   SetApplicationName ("CrystalSpace.ViewMesh");
 }
@@ -863,6 +865,20 @@ bool ViewMesh::CreateGui()
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&ViewMesh::ClearButton, this));
 
+  // ----[ Submesh ]----------------------------------------------------------
+
+  btn = winMgr->getWindow("Tab5/List");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+      CEGUI::Event::Subscriber(&ViewMesh::SelSubmesh, this));
+
+  btn = winMgr->getWindow("Tab5/AttachSMButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&ViewMesh::AttachSMButton, this));
+
+  btn = winMgr->getWindow("Tab5/DetachSMButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&ViewMesh::DetachSMButton, this));
+
 
   // ----[ STDDLG ]----------------------------------------------------------
 
@@ -938,13 +954,17 @@ void ViewMesh::LoadSprite (const char* filename)
     engine->RemoveObject(spritewrapper->GetFactory());
     spritewrapper = 0;
     sprite = 0;
+    animeshsprite = 0;
     cal3dsprite = 0;
     state = 0;
+    animeshstate = 0;
     cal3dstate = 0;
     selectedSocket = 0;
     selectedCal3dSocket = 0;
+    selectedAnimeshSocket = 0;
     selectedAnimation = 0;
     selectedMorphTarget = 0;
+    selectedSubMesh = 0;
     meshTx = meshTy = meshTz = 0;
   }
 
@@ -986,11 +1006,13 @@ void ViewMesh::LoadSprite (const char* filename)
       csVector3 v(0, 0, 0);
       spritewrapper = engine->CreateMeshWrapper(wrap, "MySprite", room, v);
 
+      animeshsprite = scfQueryInterface<iAnimatedMeshFactory> (fact);
       cal3dsprite = scfQueryInterface<iSpriteCal3DFactoryState> (fact);
       sprite = scfQueryInterface<iSprite3DFactoryState> (fact);
-      if (cal3dsprite || sprite)
+      if (animeshsprite || cal3dsprite || sprite)
       {
         iMeshObject* mesh = spritewrapper->GetMeshObject();
+        animeshstate = scfQueryInterface<iAnimatedMesh> (mesh);
         cal3dstate = scfQueryInterface<iSpriteCal3DState> (mesh);
         state = scfQueryInterface<iSprite3DState> (mesh);
       }
@@ -1019,6 +1041,7 @@ void ViewMesh::LoadSprite (const char* filename)
   UpdateSocketList();
   UpdateAnimationList();
   UpdateMorphList ();
+  UpdateSubMeshList ();
 }
 
 void ViewMesh::SaveSprite (const char* filename, bool binary)
@@ -1123,6 +1146,18 @@ void ViewMesh::AttachMesh (const char* file)
       selectedCal3dSocket->SetMeshWrapper( 0 );    
     }
   }
+  else if (selectedAnimeshSocket)
+  {
+    if(selectedAnimeshSocket->GetSceneNode())
+    {
+      csRef<iMeshWrapper> meshWrapOld = selectedAnimeshSocket->GetSceneNode()->QueryMesh();
+      if ( meshWrapOld )
+      {
+        meshWrapOld->GetMovable()->SetSector(0);
+        selectedAnimeshSocket->SetSceneNode(0);  
+      }
+    }
+  }
 
   iCollection* collection = engine->CreateCollection ("viewmesh_region");
   csLoadResult rc = loader->Load (file, collection, false, true);
@@ -1133,10 +1168,10 @@ void ViewMesh::AttachMesh (const char* file)
   csRef<iMeshFactoryWrapper> factory;
   if (rc.result == 0)
   {
-    // Library file. Find the first factory in our region.
+    // Library file. Find the last factory in our region.
     iMeshFactoryList* factories = engine->GetMeshFactories ();
     int i;
-    for (i = 0 ; i < factories->GetCount () ; i++)
+    for (i = factories->GetCount ()-1 ; i >= 0 ; --i)
     {
       iMeshFactoryWrapper* f = factories->Get (i);
       if (collection->IsParentOf (f->QueryObject ()))
@@ -1169,6 +1204,11 @@ void ViewMesh::AttachMesh (const char* file)
     selectedCal3dSocket->SetMeshWrapper( meshWrap );
     spritewrapper->GetMovable()->UpdateMove();
   }
+  else if (selectedAnimeshSocket)
+  {
+    selectedAnimeshSocket->SetSceneNode(meshWrap->QuerySceneNode());
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper->QuerySceneNode ());
+  }
 }
 
 void ViewMesh::UpdateSocketList ()
@@ -1200,6 +1240,22 @@ void ViewMesh::UpdateSocketList ()
     for (int i = 0; i < cal3dsprite->GetSocketCount(); i++)
     {
       iSpriteCal3DSocket* sock = cal3dsprite->GetSocket(i);
+      if (!sock) continue;
+
+      if (i==0) SelectSocket(sock->GetName());
+
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(sock->GetName());
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
+    }
+  }
+  else if (animeshsprite)
+  {
+    for (int i = 0; i < animeshsprite->GetSocketCount(); i++)
+    {
+      iAnimatedMeshSocketFactory* sock = animeshsprite->GetSocket(i);
       if (!sock) continue;
 
       if (i==0) SelectSocket(sock->GetName());
@@ -1255,6 +1311,96 @@ void ViewMesh::UpdateAnimationList ()
       list->addItem(item);
     }
   }
+  else if (animeshsprite)
+  {
+    WalkSkel2Nodes(list, animeshsprite->GetSkeletonFactory()->GetAnimationPacket()->GetAnimationRoot());
+  }
+}
+
+void ViewMesh::UpdateSubMeshList ()
+{
+    CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+    CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab5/List");
+
+    list->resetList();
+
+    if (animeshsprite)
+    {
+        for(size_t i=0; i<animeshsprite->GetSubMeshCount(); ++i)
+        {
+            const char* name = animeshsprite->GetSubMesh(i)->GetName();
+            if(name)
+            {
+                CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(name);
+                item->setTextColours(CEGUI::colour(0,0,0));
+                item->setSelectionBrushImage("ice", "TextSelectionBrush");
+                item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+                list->addItem(item);
+            }
+        }
+    }
+    else if(cal3dsprite)
+    {
+        for(size_t i=0; i<cal3dsprite->GetMeshCount(); ++i)
+        {
+            const char* name = cal3dsprite->GetMeshName(i);
+            if(name)
+            {
+                CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(name);
+                item->setTextColours(CEGUI::colour(0,0,0));
+                item->setSelectionBrushImage("ice", "TextSelectionBrush");
+                item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+                list->addItem(item);
+            }
+        }
+    }
+}
+
+void ViewMesh::WalkSkel2Nodes (CEGUI::Listbox* list, iSkeletonAnimNodeFactory2* node)
+{
+  csRef<iSkeletonPriorityNodeFactory2> priNode = scfQueryInterface<iSkeletonPriorityNodeFactory2> (node);
+  if (priNode.IsValid())
+  {
+    for (size_t i = 0; i < priNode->GetNodeCount(); ++i)
+    {
+      WalkSkel2Nodes(list, priNode->GetNode(i));
+    }
+  } 
+  else
+  {
+    csRef<iSkeletonAnimationNodeFactory2> animNode = scfQueryInterface<iSkeletonAnimationNodeFactory2> (node);
+    if (animNode.IsValid())
+    {
+      const char* animname = animNode->GetNodeName();
+      if (!animname) return;
+
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(animname);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
+    }
+    else
+    {
+      csRef<iSkeletonFSMNodeFactory2> fsmNode = scfQueryInterface<iSkeletonFSMNodeFactory2> (node);
+      if (fsmNode.IsValid())
+      {
+        for(size_t s = 0; s < fsmNode->GetStateCount(); ++s)
+        {
+          const char* animname = fsmNode->GetStateName(s);
+          if (!animname) continue;
+
+          CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(animname);
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          list->addItem(item);
+        }
+      }
+      // Else other nodes.
+    }
+  }
 }
 
 void ViewMesh::UpdateMorphList ()
@@ -1285,6 +1431,20 @@ void ViewMesh::UpdateMorphList ()
       list->addItem(item);
     }
   }
+  else if (animeshsprite)
+  {
+    for (size_t i = 0; i < animeshsprite->GetMorphTargetCount(); i++)
+    {
+      const char* morphname = animeshsprite->GetMorphTarget(i)->GetName();
+      if (!morphname) continue;
+
+      item = new CEGUI::ListboxTextItem(morphname);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
+    }
+  }
 }
 
 void ViewMesh::SelectSocket (const char* newsocket)
@@ -1300,6 +1460,12 @@ void ViewMesh::SelectSocket (const char* newsocket)
     iSpriteCal3DSocket* sock = cal3dstate->FindSocket(newsocket);
     if (selectedCal3dSocket == sock) return;
     selectedCal3dSocket = sock;
+  }
+  else if (animeshstate && animeshsprite)
+  {
+    iAnimatedMeshSocket* sock = animeshstate->GetSocket(animeshsprite->FindSocket(newsocket));
+    if(selectedAnimeshSocket == sock) return;
+    selectedAnimeshSocket = sock;
   }
   UpdateSocket();
 }
@@ -1339,6 +1505,12 @@ void ViewMesh::UpdateSocket ()
     csRef<iString> valueTriangle(new scfString());
     valueTriangle->Format("%d", selectedCal3dSocket->GetTriangleIndex());
     InputTriangle->setProperty("Text", valueTriangle->GetData());
+  }
+  else if (selectedAnimeshSocket)
+  {
+    CEGUI::Window* InputName = winMgr->getWindow("Tab3/RenameSocket/Input");
+    const char* name = selectedAnimeshSocket->GetName();
+    InputName->setProperty("Text", name);
   }
 }
 
@@ -1414,7 +1586,74 @@ bool ViewMesh::AddAnimation (const CEGUI::EventArgs& e)
     int anim = cal3dstate->FindAnim(selectedAnimation);
     cal3dstate->AddAnimCycle(anim,1,3);
   }
+  else if(animeshsprite)
+  {
+    if (!selectedAnimation) return false;
+    return HandleSkel2Node(selectedAnimation,
+      animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot(), true);
+  }
   return true;
+}
+
+bool ViewMesh::HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, bool start)
+{
+  csRef<iSkeletonPriorityNodeFactory2> priNode = scfQueryInterface<iSkeletonPriorityNodeFactory2> (node->GetFactory());
+  if (priNode.IsValid())
+  {
+    for (size_t i = 0; i < priNode->GetNodeCount(); ++i)
+    {
+      if(HandleSkel2Node(animName, node->FindNode(priNode->GetNode(i)->GetNodeName()), start))
+      {
+        return true;
+      }
+    }
+  } 
+  else
+  {
+    csRef<iSkeletonAnimationNode2> animNode = scfQueryInterface<iSkeletonAnimationNode2> (node);
+    if (animNode.IsValid())
+    {
+      if(!strcmp(animName, animNode->GetFactory()->GetNodeName()))
+      {
+        if(start)
+        {
+          animNode->Play();
+        }
+        else
+        {
+          animNode->Stop();
+        }
+        return true;
+      }
+    }
+    else
+    {
+      csRef<iSkeletonFSMNodeFactory2> fsmNode = scfQueryInterface<iSkeletonFSMNodeFactory2> (node->GetFactory());
+      if (fsmNode.IsValid())
+      {
+        for(size_t s = 0; s < fsmNode->GetStateCount(); ++s)
+        {
+          if(!strcmp(animName, fsmNode->GetStateName(s)))
+          {
+            csRef<iSkeletonFSMNode2> fsm = scfQueryInterface<iSkeletonFSMNode2> (node);
+            if(start)
+            {
+              fsm->SwitchToState(s);
+              fsm->Play();
+            }
+            else
+            {
+              fsm->Stop();
+            }
+            return true;
+          }
+        }
+      }
+      // Else other nodes.
+    }
+  }
+
+  return false;
 }
 
 bool ViewMesh::FasterAnimation (const CEGUI::EventArgs& e)
@@ -1455,6 +1694,13 @@ bool ViewMesh::ClearAnimation (const CEGUI::EventArgs& e)
     int anim = cal3dstate->FindAnim(selectedAnimation);
     cal3dstate->ClearAnimCycle(anim,3);
   }
+  else if(animeshstate)
+  {
+    if (!selectedAnimation) return false;
+    return HandleSkel2Node(selectedAnimation,
+      animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot(), false);
+  }
+
   return true;
 }
 
@@ -1705,19 +1951,26 @@ bool ViewMesh::AttachButton (const CEGUI::EventArgs& e)
 bool ViewMesh::DetachButton (const CEGUI::EventArgs& e)
 {
   csRef<iMeshWrapper> meshWrapOld;
-  if (selectedCal3dSocket)
+  if (selectedAnimeshSocket && selectedAnimeshSocket->GetSceneNode())
+    meshWrapOld = selectedAnimeshSocket->GetSceneNode()->QueryMesh();
+  else if (selectedCal3dSocket)
     meshWrapOld = selectedCal3dSocket->GetMeshWrapper();
   else if (selectedSocket)
     meshWrapOld = selectedSocket->GetMeshWrapper();
   
   if (!meshWrapOld ) return false;
 
-  meshWrapOld->QuerySceneNode ()->SetParent (0);
+  if(selectedAnimeshSocket)
+    meshWrapOld->GetMovable()->SetSector(0);
+  else
+    meshWrapOld->QuerySceneNode ()->SetParent (0);
 
   engine->RemoveObject(meshWrapOld);
   engine->RemoveObject(meshWrapOld->GetFactory());
 
-  if (selectedCal3dSocket)
+  if (selectedAnimeshSocket)
+    selectedAnimeshSocket->SetSceneNode(0);
+  else if (selectedCal3dSocket)
     selectedCal3dSocket->SetMeshWrapper( 0 );    
   else if (selectedSocket)
     selectedSocket->SetMeshWrapper( 0 );    
@@ -1940,8 +2193,6 @@ bool ViewMesh::SelMorph (const CEGUI::EventArgs& e)
 
 bool ViewMesh::BlendButton (const CEGUI::EventArgs& e)
 {
-  if (!cal3dstate) return false;
-
   float weight=1, delay=1;
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
@@ -1961,19 +2212,31 @@ bool ViewMesh::BlendButton (const CEGUI::EventArgs& e)
     if(csScanStr(Sdelay.c_str(), "%f", &delay) != 1) delay = 1;
   }
 
-  int target =
-    cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
+  if(cal3dsprite && cal3dstate)
+  {
+    int target =
+      cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
 
-  if (target == -1) return false;
+    if (target == -1) return false;
 
-  cal3dstate->BlendMorphTarget(target, weight, delay);
-  return true;
+    cal3dstate->BlendMorphTarget(target, weight, delay);
+
+    return true;
+  }
+  else if (animeshsprite && animeshstate)
+  {
+    int target = animeshsprite->FindMorphTarget(selectedMorphTarget);
+    if (target == -1) return false;
+
+    animeshstate->SetMorphTargetWeight(target, weight);
+    return true;
+  }
+
+  return false;
 }
 
 bool ViewMesh::ClearButton (const CEGUI::EventArgs& e)
 {
-  if (!cal3dstate) return false;
-
   float weight=1;
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
@@ -1986,13 +2249,26 @@ bool ViewMesh::ClearButton (const CEGUI::EventArgs& e)
     if(csScanStr(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
   }
 
-  int target =
-    cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
+  if(cal3dsprite && cal3dstate)
+  {
+    int target =
+      cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
 
-  if (target == -1) return false;
+    if (target == -1) return false;
 
-  cal3dstate->ClearMorphTarget(target, weight);
-  return true;
+    cal3dstate->ClearMorphTarget(target, weight);
+    return true;
+  }
+  else if (animeshsprite && animeshstate)
+  {
+    int target = animeshsprite->FindMorphTarget(selectedMorphTarget);
+    if (target == -1) return false;
+
+    animeshstate->SetMorphTargetWeight(target, 0.0f);
+    return true;
+  }
+
+  return false;
 }
 
 bool ViewMesh::ResetCameraButton (const CEGUI::EventArgs& e)
@@ -2010,6 +2286,67 @@ bool ViewMesh::ReloadButton (const CEGUI::EventArgs& e)
   LoadSprite(reloadFilename);
 
   return true;
+}
+
+//---------------------------------------------------------------------------
+bool ViewMesh::SelSubmesh (const CEGUI::EventArgs& e)
+{
+    CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+    CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab5/List");
+
+    CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+    const CEGUI::String& text = item->getText();
+    if (text.empty()) return false;
+
+    selectedSubMesh = text.c_str();
+    return true;
+}
+
+bool ViewMesh::AttachSMButton (const CEGUI::EventArgs& e)
+{
+    if(!selectedSubMesh)
+        return false;
+
+    if(animeshsprite && animeshstate)
+    {
+        size_t idx = animeshsprite->FindSubMesh(selectedSubMesh);
+        if(idx != (size_t)-1)
+        {
+            animeshstate->GetSubMesh(idx)->SetRendering(true);
+            return true;
+        }
+    }
+    else if(cal3dsprite && cal3dstate)
+    {
+        cal3dstate->AttachCoreMesh(selectedSubMesh);
+        return true;
+    }
+
+    return false;
+}
+
+bool ViewMesh::DetachSMButton (const CEGUI::EventArgs& e)
+{
+    if(!selectedSubMesh)
+        return false;
+
+    if(animeshsprite && animeshstate)
+    {
+        size_t idx = animeshsprite->FindSubMesh(selectedSubMesh);
+        if(idx != (size_t)-1)
+        {
+            animeshstate->GetSubMesh(idx)->SetRendering(false);
+            return true;
+        }
+    }
+    else if(cal3dsprite && cal3dstate)
+    {
+        cal3dstate->DetachCoreMesh(cal3dsprite->FindMeshName(selectedSubMesh));
+        return true;
+    }
+
+    return false;
 }
 
 //---------------------------------------------------------------------------

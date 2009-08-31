@@ -46,6 +46,12 @@
 #include "imesh/spritecal3d.h"
 #include "ivaria/icegui.h"
 
+struct iAnimatedMesh;
+struct iAnimatedMeshFactory;
+struct iAnimatedMeshSocket;
+struct iSkeletonAnimNode2;
+struct iSkeletonAnimNodeFactory2;
+
 struct vmAnimCallback;
 
 class ViewMesh : public csApplicationFramework, public csBaseEventHandler
@@ -93,13 +99,17 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
   csRef<iMeshWrapper> spritewrapper;
   csRef<iSprite3DFactoryState> sprite;
+  csRef<iAnimatedMeshFactory> animeshsprite;
   csRef<iSpriteCal3DFactoryState> cal3dsprite;
   csRef<iSprite3DState> state;
+  csRef<iAnimatedMesh> animeshstate;
   csRef<iSpriteCal3DState> cal3dstate;
   iSpriteSocket* selectedSocket;
   iSpriteCal3DSocket* selectedCal3dSocket;
+  iAnimatedMeshSocket* selectedAnimeshSocket;
   const char* selectedAnimation;
   const char* selectedMorphTarget;
+  const char* selectedSubMesh;
   float meshTx, meshTy, meshTz;
 
   vmAnimCallback* callback;
@@ -132,6 +142,8 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   void UpdateSocketList ();
   void UpdateMorphList ();
   void UpdateAnimationList ();
+  void UpdateSubMeshList ();
+  void WalkSkel2Nodes (CEGUI::Listbox* list, iSkeletonAnimNodeFactory2* node);
   void UpdateSocket ();
 
   //SETTING
@@ -156,6 +168,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool RemoveAnimation (const CEGUI::EventArgs& e);
   bool ClearAnimation (const CEGUI::EventArgs& e);
   bool SelAnimation (const CEGUI::EventArgs& e);
+  bool HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, bool start);
   //SOCKET
   bool SetMesh (const CEGUI::EventArgs& e);
   bool SetSubMesh (const CEGUI::EventArgs& e);
@@ -175,6 +188,10 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool ClearButton (const CEGUI::EventArgs& e);
   bool ResetCameraButton (const CEGUI::EventArgs& e);
   bool ReloadButton (const CEGUI::EventArgs& e);
+  //SUBMESH
+  bool SelSubmesh (const CEGUI::EventArgs& e);
+  bool AttachSMButton (const CEGUI::EventArgs& e);
+  bool DetachSMButton (const CEGUI::EventArgs& e);
 
  public:
 

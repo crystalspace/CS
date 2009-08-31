@@ -15035,6 +15035,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *CreateSubMesh = *cspacec::iAnimatedMeshFactory_CreateSubMesh;
 *GetSubMesh = *cspacec::iAnimatedMeshFactory_GetSubMesh;
+*FindSubMesh = *cspacec::iAnimatedMeshFactory_FindSubMesh;
 *GetSubMeshCount = *cspacec::iAnimatedMeshFactory_GetSubMeshCount;
 *DeleteSubMesh = *cspacec::iAnimatedMeshFactory_DeleteSubMesh;
 *GetVertexCount = *cspacec::iAnimatedMeshFactory_GetVertexCount;
@@ -15064,6 +15065,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateSocket = *cspacec::iAnimatedMeshFactory_CreateSocket;
 *GetSocketCount = *cspacec::iAnimatedMeshFactory_GetSocketCount;
 *GetSocket = *cspacec::iAnimatedMeshFactory_GetSocket;
+*FindSocket = *cspacec::iAnimatedMeshFactory_FindSocket;
 *scfGetVersion = *cspacec::iAnimatedMeshFactory_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -15101,6 +15103,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetBoneIndices = *cspacec::iAnimatedMeshFactorySubMesh_GetBoneIndices;
 *GetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_GetMaterial;
 *SetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_SetMaterial;
+*GetName = *cspacec::iAnimatedMeshFactorySubMesh_GetName;
 *scfGetVersion = *cspacec::iAnimatedMeshFactorySubMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -15176,6 +15179,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetFactorySubMesh = *cspacec::iAnimatedMeshSubMesh_GetFactorySubMesh;
 *SetRendering = *cspacec::iAnimatedMeshSubMesh_SetRendering;
 *IsRendering = *cspacec::iAnimatedMeshSubMesh_IsRendering;
+*GetShaderVariableContext = *cspacec::iAnimatedMeshSubMesh_GetShaderVariableContext;
+*GetMaterial = *cspacec::iAnimatedMeshSubMesh_GetMaterial;
+*SetMaterial = *cspacec::iAnimatedMeshSubMesh_SetMaterial;
 *scfGetVersion = *cspacec::iAnimatedMeshSubMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
