@@ -1350,6 +1350,7 @@ class iRenderManager(core.iBase):
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def RenderView(*args): return _iengine.iRenderManager_RenderView(*args)
+    def PrecacheView(*args): return _iengine.iRenderManager_PrecacheView(*args)
     scfGetVersion = staticmethod(_iengine.iRenderManager_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iRenderManager
     __del__ = lambda self : None;

@@ -35350,6 +35350,37 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iRenderManager_PrecacheView(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iRenderManager *arg1 = (iRenderManager *) 0 ;
+  iView *arg2 = (iView *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iRenderManager_PrecacheView",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iRenderManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iRenderManager_PrecacheView" "', argument " "1"" of type '" "iRenderManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iRenderManager * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iView, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iRenderManager_PrecacheView" "', argument " "2"" of type '" "iView *""'"); 
+  }
+  arg2 = reinterpret_cast< iView * >(argp2);
+  result = (bool)(arg1)->PrecacheView(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iRenderManager_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -37508,6 +37539,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_iRenderLoopManager", _wrap_delete_iRenderLoopManager, METH_VARARGS, NULL},
 	 { (char *)"iRenderLoopManager_swigregister", iRenderLoopManager_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iRenderManager_RenderView", _wrap_iRenderManager_RenderView, METH_VARARGS, NULL},
+	 { (char *)"iRenderManager_PrecacheView", _wrap_iRenderManager_PrecacheView, METH_VARARGS, NULL},
 	 { (char *)"iRenderManager_scfGetVersion", _wrap_iRenderManager_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iRenderManager", _wrap_delete_iRenderManager, METH_VARARGS, NULL},
 	 { (char *)"iRenderManager_swigregister", iRenderManager_swigregister, METH_VARARGS, NULL},

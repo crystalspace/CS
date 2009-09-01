@@ -748,6 +748,17 @@ class csShaderMetadata(object):
 csShaderMetadata_swigregister = _ivideo.csShaderMetadata_swigregister
 csShaderMetadata_swigregister(csShaderMetadata)
 
+class iShaderPriorityList(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetCount(*args): return _ivideo.iShaderPriorityList_GetCount(*args)
+    def GetPriority(*args): return _ivideo.iShaderPriorityList_GetPriority(*args)
+    __swig_destroy__ = _ivideo.delete_iShaderPriorityList
+    __del__ = lambda self : None;
+iShaderPriorityList_swigregister = _ivideo.iShaderPriorityList_swigregister
+iShaderPriorityList_swigregister(iShaderPriorityList)
+
 class iShader(iShaderVariableContext):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
@@ -764,23 +775,16 @@ class iShader(iShaderVariableContext):
     def GetUsedShaderVars(*args): return _ivideo.iShader_GetUsedShaderVars(*args)
     def GetMetadata(*args): return _ivideo.iShader_GetMetadata(*args)
     def PushShaderVariables(*args): return _ivideo.iShader_PushShaderVariables(*args)
+    def GetPrioritiesTicket(*args): return _ivideo.iShader_GetPrioritiesTicket(*args)
+    def GetAvailablePriorities(*args): return _ivideo.iShader_GetAvailablePriorities(*args)
+    def GetTechniqueMetadata(*args): return _ivideo.iShader_GetTechniqueMetadata(*args)
+    def ForceTechnique(*args): return _ivideo.iShader_ForceTechnique(*args)
     scfGetVersion = staticmethod(_ivideo.iShader_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShader
     __del__ = lambda self : None;
 iShader_swigregister = _ivideo.iShader_swigregister
 iShader_swigregister(iShader)
 iShader_scfGetVersion = _ivideo.iShader_scfGetVersion
-
-class iShaderPriorityList(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetCount(*args): return _ivideo.iShaderPriorityList_GetCount(*args)
-    def GetPriority(*args): return _ivideo.iShaderPriorityList_GetPriority(*args)
-    __swig_destroy__ = _ivideo.delete_iShaderPriorityList
-    __del__ = lambda self : None;
-iShaderPriorityList_swigregister = _ivideo.iShaderPriorityList_swigregister
-iShaderPriorityList_swigregister(iShaderPriorityList)
 
 class iShaderCompiler(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -916,6 +920,7 @@ CS_TEXTURE_NOFILTER = _ivideo.CS_TEXTURE_NOFILTER
 CS_TEXTURE_NPOTS = _ivideo.CS_TEXTURE_NPOTS
 CS_TEXTURE_SCALE_UP = _ivideo.CS_TEXTURE_SCALE_UP
 CS_TEXTURE_SCALE_DOWN = _ivideo.CS_TEXTURE_SCALE_DOWN
+CS_TEXTURE_CREATE_CLEAR = _ivideo.CS_TEXTURE_CREATE_CLEAR
 class iTextureManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
