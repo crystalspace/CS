@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "csver.h"
 
 #include "iutil/csinput.h" /* for JS max/mins */
 #include "iutil/verbositymanager.h"
