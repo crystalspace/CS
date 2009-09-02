@@ -134,11 +134,11 @@ namespace lighter
     rayDebug.SetFilterExpression (globalConfig.GetDebugProperties().rayDebugRE);
 
     // Setup the job manager
-    if (globalConfig.GetLighterProperties ().numThreads <= 1)
+/*    if (globalConfig.GetLighterProperties ().numThreads <= 1)
     {
       jobManager.AttachNew (new CS::Utility::SimpleJobQueue);
     }
-    else
+    else*/
     {
       jobManager.AttachNew (new CS::Threading::ThreadedJobQueue (
         globalConfig.GetLighterProperties ().numThreads));
