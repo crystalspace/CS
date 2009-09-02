@@ -97,7 +97,7 @@ public class conftest {
     }
 }
 EOF
-    $1 conftest.java
+    AC_RUN_LOG([$1 conftest.java])
     ])
 
 
@@ -107,7 +107,7 @@ AC_DEFUN([_CS_JAVA_PROPERTY_CLEAN],
 
 
 AC_DEFUN([_CS_JAVA_PROPERTY],
-    [AC_RUN_LOG([$2 conftest $1])])
+    [AC_RUN_LOG([CLASSPATH=. $2 conftest $1])])
 
 
 AC_DEFUN([_CS_JAVA_PLATFORM],
