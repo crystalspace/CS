@@ -41,6 +41,13 @@
   -->
 <gldriverdb>
   <configs>
+    <config name="slowzonly">
+      <RenderManager>
+	<ZOnly>
+	  <Enabled>false</Enabled>
+	</ZOnly>
+      </RenderManager>
+    </config>
     <config name="brokenstencil">
       <Video>
 	<OpenGL>
@@ -476,6 +483,21 @@
 	<usecfg>nolinearfog</usecfg>
 	<usecfg>enableIntensityBlendText</usecfg>
 	<usecfg>disableMipmapGeneration</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      On Intel Graphics hardware it seems that the initial z-only pass gives
+      no benefit, only performance degradation. I thus disabled this feature for
+      *all* Intel Graphics. Needs to be tested to see if there exists Intel Graphics
+      hardware where the z-only pass is beneficial.
+      -->
+    <rule description="Intel Graphics: general slow features">
+      <conditions>
+	<regexp string="vendor" pattern="^Intel" />
+      </conditions>
+      <applicable>
+	<usecfg>slowzonly</usecfg>
       </applicable>
     </rule>
 

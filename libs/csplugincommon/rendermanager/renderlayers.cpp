@@ -26,6 +26,7 @@
 #include "csgfx/shadervarcontext.h"
 #include "csutil/objreg.h"
 #include "csutil/xmltiny.h"
+#include "csutil/cfgacc.h"
 
 #include "csplugincommon/rendermanager/renderlayers.h"
 
@@ -213,9 +214,22 @@ namespace CS
 	    {
 	      case XMLTOKEN_LAYER:
 	        {
-	          SingleRenderLayer layer;
-	          if (!ParseLayer (child, layer)) return false;
-	          layers.AddLayers (layer);
+		  const char* config = child->GetAttributeValue ("config");
+		  bool yes = true;
+		  if (config != 0 && *config != 0)
+		  {
+		    // This layer is controlled by a configuration option.
+		    // We see if the configuration value is set. By default
+		    // we always assume 'yes'.
+		    csConfigAccess cfg (objectReg);
+		    yes = cfg->GetBool (config, true);
+		  }
+		  if (yes)
+		  {
+	            SingleRenderLayer layer;
+	            if (!ParseLayer (child, layer)) return false;
+	            layers.AddLayers (layer);
+		  }
 	        }
 	        break;
 	      case XMLTOKEN_STATICLIGHTS:

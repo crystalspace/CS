@@ -103,18 +103,7 @@ namespace Threading
   void ThreadedJobQueue::Dequeue (iJob* job)
   {
     // Check all the thread queues
-    for (size_t i = 0; i < numWorkerThreads; ++i)
-    {
-      ThreadState* ts = allThreadState[i];
-      MutexScopedLock l (ts->tsMutex);
-      
-      bool removed = ts->jobQueue.Delete (job);
-      
-      if (removed)
-      {
-        break;
-      }
-    }
+    PullFromQueues (job);
   }
 
 

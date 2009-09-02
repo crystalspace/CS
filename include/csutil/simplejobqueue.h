@@ -45,7 +45,6 @@ public:
   virtual bool IsFinished ();
   virtual int32 GetQueueCount();
   void Wait(iJob*);
-  void PopAndRun();
 };
 
 
