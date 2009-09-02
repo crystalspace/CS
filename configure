@@ -14583,7 +14583,11 @@ public class conftest {
     }
 }
 EOF
-    $JAVAC conftest.java
+    { ($as_echo "$as_me:$LINENO: \$JAVAC conftest.java") >&5
+  ($JAVAC conftest.java) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
 
 
 
@@ -14610,8 +14614,8 @@ fi
 
 fi
 
-	cs_java_home=`{ ($as_echo "$as_me:$LINENO: \$JAVA conftest java.home") >&5
-  ($JAVA conftest java.home) 2>&5
+	cs_java_home=`{ ($as_echo "$as_me:$LINENO: CLASSPATH=. \$JAVA conftest java.home") >&5
+  (CLASSPATH=. $JAVA conftest java.home) 2>&5
   ac_status=$?
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
@@ -14639,8 +14643,8 @@ fi
 
 fi
 
-	cs_java_lib_path=`{ ($as_echo "$as_me:$LINENO: \$JAVA conftest java.library.path") >&5
-  ($JAVA conftest java.library.path) 2>&5
+	cs_java_lib_path=`{ ($as_echo "$as_me:$LINENO: CLASSPATH=. \$JAVA conftest java.library.path") >&5
+  (CLASSPATH=. $JAVA conftest java.library.path) 2>&5
   ac_status=$?
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
