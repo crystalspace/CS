@@ -2376,7 +2376,8 @@ $as_echo "$cs_mno_cygwin" >&6; }
 
 
 
-    CFLAGS="$CFLAGS" # Filter undesired flags
+    # Magic to suppress automatic addition of undesirable flags by Autoconf.
+    CFLAGS="$CFLAGS"
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3315,6 +3316,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
     if test -n "$CC"; then
 
 	cs_build_prop_val="$CC"
@@ -3533,7 +3535,9 @@ fi
         # project-agnostic C compiler check, but it is needed by assembly code
         # implementing Sparc atomic threading operations, and it should not
         # hurt if the option is not recognized.
-	{ $as_echo "$as_me:$LINENO: checking if $CC handles Sparc v9" >&5
+	case $host_cpu in
+	    sparc*)
+		{ $as_echo "$as_me:$LINENO: checking if $CC handles Sparc v9" >&5
 $as_echo_n "checking if $CC handles Sparc v9... " >&6; }
 if test "${cs_cv_prog_cc_sparc_v9_ok+set}" = set; then
   $as_echo_n "(cached) " >&6
@@ -3708,12 +3712,15 @@ fi
 
 fi
 
+		;;
+	esac
 
 fi
 
 
 
-    CXXFLAGS="$CXXFLAGS" # Filter undesired flags
+    # Magic to suppress automatic addition of undesirable flags by Autoconf.
+    CXXFLAGS="$CXXFLAGS"
 
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
