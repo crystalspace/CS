@@ -64,6 +64,14 @@ namespace Threading
      * until it returns.
      */
     virtual void Run () = 0;
+
+    /**
+     * 
+     */
+    virtual const char* GetName () const
+    {
+      return "Unnamed thread";
+    }
   };
 
   /// OS specific thread identifier

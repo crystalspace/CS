@@ -28,6 +28,7 @@
 #include "csextern.h"
 #include "csutil/fifo.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/csstring.h"
 #include "iutil/job.h"
 
 #include "csutil/threading/condition.h"
@@ -49,9 +50,9 @@ public:
   virtual void Enqueue (iJob* job);
   virtual void Dequeue (iJob* job);
   virtual void PullAndRun (iJob* job, bool waitForCompletion = false);
-  virtual void WaitAll ();
   virtual bool IsFinished ();  
   virtual int32 GetQueueCount();
+  virtual void WaitAll ();
 
 private:
 
@@ -63,21 +64,23 @@ private:
   class QueueRunnable : public Runnable
   {
   public:
-    QueueRunnable (ThreadedJobQueue* queue, ThreadState* ts);
+    QueueRunnable (ThreadedJobQueue* queue, ThreadState* ts, unsigned int id);
 
     virtual void Run ();
+    virtual const char* GetName () const;
 
   private:
     ThreadedJobQueue* ownerQueue;
     ThreadState* threadState;
+    csString name;
   };
 
   // Per thread state
   struct ThreadState
   {
-    ThreadState (ThreadedJobQueue* queue)
+    ThreadState (ThreadedJobQueue* queue, unsigned int id)
     {
-      runnable.AttachNew (new QueueRunnable (queue, this));
+      runnable.AttachNew (new QueueRunnable (queue, this, id));
       threadObject.AttachNew (new Thread (runnable, false));
     }
 

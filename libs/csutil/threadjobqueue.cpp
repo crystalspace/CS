@@ -45,7 +45,7 @@ namespace Threading
     // Start up the threads
     for (size_t i = 0; i < numWorkerThreads; ++i)
     {
-      allThreadState[i] = new ThreadState (this);      
+      allThreadState[i] = new ThreadState (this, i); 
       allThreadState[i]->threadObject->SetPriority(priority);
 
       allThreads.Add (allThreadState[i]->threadObject);
@@ -187,9 +187,10 @@ namespace Threading
 
 
   ThreadedJobQueue::QueueRunnable::QueueRunnable (ThreadedJobQueue* queue, 
-    ThreadState* ts)
+    ThreadState* ts, unsigned int id)
     : ownerQueue (queue), threadState (ts)
   {
+    name.Format ("Queue [%p] Runner %d", queue, id);
   }
 
   void ThreadedJobQueue::QueueRunnable::Run ()
@@ -260,6 +261,13 @@ namespace Threading
       }
     }
   }
+
+  const char* ThreadedJobQueue::QueueRunnable::GetName () const
+  {
+    return name.GetDataSafe ();
+  }
+
+
 
 }
 }
