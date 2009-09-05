@@ -25,6 +25,7 @@
 
 #include <process.h>
 
+#ifdef CS_COMPILER_MSVC
 // Helper to set thread name in debugger
 #define MS_VC_EXCEPTION 0x406D1388
 
@@ -38,7 +39,7 @@ typedef struct tagTHREADNAME_INFO
 } THREADNAME_INFO;
 #pragma pack(pop)
 
-void SetThreadName (DWORD dwThreadID, const char* threadName)
+static void SetThreadName (DWORD dwThreadID, const char* threadName)
 {
   THREADNAME_INFO info;
   info.dwType = 0x1000;
@@ -54,7 +55,10 @@ void SetThreadName (DWORD dwThreadID, const char* threadName)
   {
   }
 }
-
+#else
+static void SetThreadName (DWORD dwThreadID, const char* threadName)
+{}
+#endif
 
 
 #if defined (__CYGWIN__) 
