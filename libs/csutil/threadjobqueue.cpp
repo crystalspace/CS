@@ -57,7 +57,7 @@ namespace Threading
   ThreadedJobQueue::~ThreadedJobQueue ()
   {
     // Kill all threads, friendly
-    CS::Threading::AtomicOperations::Set (&shutdownQueue, 0xff);
+    CS::Threading::AtomicOperations::Set (&shutdownQueue, 0xff);    
     for(size_t i = 0; i < numWorkerThreads; ++i)
     {
       allThreadState[i]->tsNewJob.NotifyAll ();
@@ -94,7 +94,9 @@ namespace Threading
         CS::Threading::AtomicOperations::Increment (&outstandingJobs);      
         ts->tsMutex.Unlock ();
 
-        ts->tsNewJob.NotifyAll ();        
+        ts->tsNewJob.NotifyAll ();
+
+        return;
       }
     }
     
@@ -146,8 +148,9 @@ namespace Threading
   void ThreadedJobQueue::WaitAll ()
   {   
     while(!IsFinished ())
-    {      
-      jobFinished.Wait (finishMutex);
+    {
+      MutexScopedLock l(finishMutex);
+      jobFinished.Wait (finishMutex, 500);
     }
   }
   
@@ -196,7 +199,7 @@ namespace Threading
       // Get a job
       csRef<iJob> currentJob;
 
-      // Try our own list first            
+      // Try our own list first
       // We need to hold this until currentJob is set, otherwise something might slip through in "wait"
       threadState->tsMutex.Lock ();
 
@@ -219,16 +222,19 @@ namespace Threading
           if (foreignTS == threadState)
             continue;
 
-
-          // Lock it
-          MutexScopedLock l (foreignTS->tsMutex);
-
-          // Get the job
-          if (foreignTS->jobQueue.GetSize() > 0)
+          // Try to lock it, but never wait for a lock
+          if (foreignTS->tsMutex.TryLock ())
           {
-            currentJob = foreignTS->jobQueue.PopTop ();
-            break;
-          }
+            // Get the job
+            if (foreignTS->jobQueue.GetSize() > 0)
+            {
+              currentJob = foreignTS->jobQueue.PopTop ();
+              foreignTS->tsMutex.Unlock ();
+              break;
+            }
+
+            foreignTS->tsMutex.Unlock ();
+          } 
         }
       }
 
