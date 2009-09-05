@@ -79,6 +79,11 @@ struct iJobQueue : public virtual iBase
    * Return the number of jobs in the queue.
    */
   virtual int32 GetQueueCount() = 0;
+
+  /**
+   * Wait for all jobs to finish running.
+   */
+  virtual void WaitAll () = 0;
 };
 
 #endif // __CS_IUTIL_JOB_H__
