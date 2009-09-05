@@ -13,7 +13,6 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "csver.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
 

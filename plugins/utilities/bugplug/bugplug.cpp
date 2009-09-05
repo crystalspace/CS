@@ -18,7 +18,6 @@
 #include "cssysdef.h"
 #include "csqint.h"
 #include "csqsqrt.h"
-#include "csver.h"
 
 #include <string.h>
 #include <ctype.h>

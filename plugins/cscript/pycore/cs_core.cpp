@@ -12571,6 +12571,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iThreadReturn_SetJob(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iThreadReturn *arg1 = (iThreadReturn *) 0 ;
+  iJob *arg2 = (iJob *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iThreadReturn_SetJob",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThreadReturn, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThreadReturn_SetJob" "', argument " "1"" of type '" "iThreadReturn *""'"); 
+  }
+  arg1 = reinterpret_cast< iThreadReturn * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iJob, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iThreadReturn_SetJob" "', argument " "2"" of type '" "iJob *""'"); 
+  }
+  arg2 = reinterpret_cast< iJob * >(argp2);
+  (arg1)->SetJob(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iThreadReturn_GetJob(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iThreadReturn *arg1 = (iThreadReturn *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  iJob *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iThreadReturn_GetJob",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThreadReturn, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThreadReturn_GetJob" "', argument " "1"" of type '" "iThreadReturn const *""'"); 
+  }
+  arg1 = reinterpret_cast< iThreadReturn * >(argp1);
+  result = (iJob *)((iThreadReturn const *)arg1)->GetJob();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iJob, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iThreadReturn(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iThreadReturn *arg1 = (iThreadReturn *) 0 ;
@@ -54901,6 +54953,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iThreadReturn_Copy", _wrap_iThreadReturn_Copy, METH_VARARGS, NULL},
 	 { (char *)"iThreadReturn_Wait", _wrap_iThreadReturn_Wait, METH_VARARGS, NULL},
 	 { (char *)"iThreadReturn_SetWaitPtrs", _wrap_iThreadReturn_SetWaitPtrs, METH_VARARGS, NULL},
+	 { (char *)"iThreadReturn_SetJob", _wrap_iThreadReturn_SetJob, METH_VARARGS, NULL},
+	 { (char *)"iThreadReturn_GetJob", _wrap_iThreadReturn_GetJob, METH_VARARGS, NULL},
 	 { (char *)"delete_iThreadReturn", _wrap_delete_iThreadReturn, METH_VARARGS, NULL},
 	 { (char *)"iThreadReturn_swigregister", iThreadReturn_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iThreadManager_Init", _wrap_iThreadManager_Init, METH_VARARGS, NULL},

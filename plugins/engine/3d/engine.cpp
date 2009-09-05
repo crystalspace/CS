@@ -24,6 +24,7 @@
 #include "csgeom/sphere.h"
 #include "csgfx/imagememory.h"
 #include "csqint.h"
+#include "cstool/vfsdirchange.h"
 #include "csutil/cfgacc.h"
 #include "csutil/databuf.h"
 #include "csutil/scf.h"
@@ -1286,8 +1287,9 @@ csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
     shaderFn.DeleteAt (0, slash + 1);
   }
 
-  VFS->PushDir();
-  VFS->ChDir (shaderDir);
+  csVfsDirectoryChanger dirchange(VFS);
+  dirchange.ChangeToFull(shaderDir);
+
   csRef<iFile> shaderFile = VFS->Open (shaderFn, VFS_FILE_READ);
   if (shaderFile.IsValid())
   {
@@ -1317,13 +1319,14 @@ csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
     if (!shcom.IsValid())
     {
       Warn ("%s: '%s' shader compiler not available", filename, compilerAttr);
+      return 0;
     }
-    
+
     csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
     shader = shcom->CompileShader (elctxt, shaderNode);
     if (shader.IsValid()) shaderManager->RegisterShader (shader);
   }
-  VFS->PopDir();
+
   return shader;
 }
 

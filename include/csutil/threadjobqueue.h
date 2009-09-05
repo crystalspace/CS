@@ -48,7 +48,6 @@ public:
 
   virtual void Enqueue (iJob* job, bool lowPriority = false);
   virtual void PullAndRun (iJob* job);
-  virtual void PopAndRun();
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
   virtual bool IsFinished ();
   virtual void Wait (iJob* job);
