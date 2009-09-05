@@ -41,9 +41,9 @@ namespace Threading
     for (size_t i = 0; i < numWorkerThreads; ++i)
     {
       if(i < numWorkers)
-        allThreadState[i] = new ThreadState (this);
+        allThreadState[i] = new ThreadState (this, i);
       else
-        allThreadState[i] = new ThreadState (this, false);
+        allThreadState[i] = new ThreadState (this, i, false);
       allThreadState[i]->threadObject->SetPriority(priority);
       allThreads.Add (allThreadState[i]->threadObject);
     }
@@ -228,9 +228,10 @@ namespace Threading
   }
 
   ThreadedJobQueue::QueueRunnable::QueueRunnable (ThreadedJobQueue* queue, 
-    ThreadState* ts, bool doLow)
+    ThreadState* ts, unsigned int id, bool doLow)
     : ownerQueue (queue), threadState (ts), doLow(doLow)
   {
+    name.Format ("Queue [%p] Runner %d", queue, id);
   }
 
   void ThreadedJobQueue::QueueRunnable::Run ()
@@ -276,9 +277,23 @@ namespace Threading
     }
   }
 
+  const char* ThreadedJobQueue::QueueRunnable::GetName () const
+  {
+    return name.GetDataSafe ();
+  }
+
   int32 ThreadedJobQueue::GetQueueCount()
   {
     return CS::Threading::AtomicOperations::Read(&outstandingJobs);
+  }
+
+  void ThreadedJobQueue::WaitAll ()
+  {
+    while (!IsFinished())
+    {
+      MutexScopedLock lock(jobFinishedMutex);
+      jobFinished.Wait (jobFinishedMutex, 500);
+    }
   }
 
 }
