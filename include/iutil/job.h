@@ -68,7 +68,7 @@ struct iJobQueue : public virtual iBase
    * If yes, remove it from the queue and run it immediately.
    * If a job is currently running, we can either wait for it or just let it be
    */
-  virtual void PullAndRun (iJob* job, bool waitForCompletion = false) = 0;
+  virtual void PullAndRun (iJob* job, bool waitForCompletion = true) = 0;
   
   /**
    * Wait for all jobs in queue to finish executing.
