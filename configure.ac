@@ -1038,15 +1038,13 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 	    #endif
 	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
-	    #include <ddraw.h>
 	    #include <dsound.h>
 	    #include <dinput.h>]],
-	    [DirectDrawCreate(0,0,0); 
-	     DirectSoundCreate$1(0,0,0); 
+	    [DirectSoundCreate$1(0,0,0); 
 	     DirectInputCreate(0,0,0,0)])],
-	[CS_CREATE_TUPLE([],[],[-lddraw -ldsound -ldinput]) \
+	[CS_CREATE_TUPLE([],[],[-ldsound -ldinput]) \
 	CS_CREATE_TUPLE([-I/usr/include/directx],[],
-	    [-lddraw -ldsound -ldinput])], 
+	    [-ldsound -ldinput])], 
 	[C++], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx$1], [DIRECTX$1])])])
 
 AS_IF([test $cs_host_family = windows],
