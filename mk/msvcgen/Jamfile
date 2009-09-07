@@ -25,8 +25,6 @@ SubDir TOP mk msvcgen ;
 InstallData [ Wildcard *.cslib *.jam *.tlib ] : build msvcgen ;
 
 MsvcGenSubDir TOP mk msvc : common ;
-MsvcGenSubDir TOP mk msvc7 : 7 ;
-MsvcGenSubDir TOP mk msvc71 : 71 ;
 MsvcGenSubDir TOP mk msvc8 : 8 ;
 MsvcGenSubDir TOP mk msvc9 : 9 ;
 MsvcGenTemplateDir TOP mk msvcgen ;

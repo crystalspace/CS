@@ -37590,8 +37590,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
-	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-ldsound -ldinput | sed 'y% %#%'` \
+	`echo @-I/usr/include/directx@@-ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -37665,14 +37665,12 @@ cat >>conftest.$ac_ext <<_ACEOF
 	    #endif
 	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
-	    #include <ddraw.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
 int
 main ()
 {
-DirectDrawCreate(0,0,0);
-	     DirectSoundCreate(0,0,0);
+DirectSoundCreate(0,0,0);
 	     DirectInputCreate(0,0,0,0)
   ;
   return 0;
@@ -37757,8 +37755,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
-	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-ldsound -ldinput | sed 'y% %#%'` \
+	`echo @-I/usr/include/directx@@-ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -37832,14 +37830,12 @@ cat >>conftest.$ac_ext <<_ACEOF
 	    #endif
 	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
-	    #include <ddraw.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
 int
 main ()
 {
-DirectDrawCreate(0,0,0);
-	     DirectSoundCreate(0,0,0);
+DirectSoundCreate(0,0,0);
 	     DirectInputCreate(0,0,0,0)
   ;
   return 0;
@@ -37960,8 +37956,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
-	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-ldsound -ldinput | sed 'y% %#%'` \
+	`echo @-I/usr/include/directx@@-ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -38035,14 +38031,12 @@ cat >>conftest.$ac_ext <<_ACEOF
 	    #endif
 	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
-	    #include <ddraw.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
 int
 main ()
 {
-DirectDrawCreate(0,0,0);
-	     DirectSoundCreate8(0,0,0);
+DirectSoundCreate8(0,0,0);
 	     DirectInputCreate(0,0,0,0)
   ;
   return 0;
@@ -38127,8 +38121,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
-	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-ldsound -ldinput | sed 'y% %#%'` \
+	`echo @-I/usr/include/directx@@-ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -38202,14 +38196,12 @@ cat >>conftest.$ac_ext <<_ACEOF
 	    #endif
 	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
-	    #include <ddraw.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
 int
 main ()
 {
-DirectDrawCreate(0,0,0);
-	     DirectSoundCreate8(0,0,0);
+DirectSoundCreate8(0,0,0);
 	     DirectInputCreate(0,0,0,0)
   ;
   return 0;
