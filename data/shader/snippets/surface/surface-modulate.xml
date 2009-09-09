@@ -28,9 +28,9 @@
           <attribute name="perfragment" type="bool" />
         </input>
 
-        <input name="color_modulation" type="rgba" default="complex">
+        <input name="color_modulation" type="rgb" default="complex">
           <block location="shadervars">
-             <shadervar name="color modulation" type="vector4">1,1,1,1</shadervar>
+             <shadervar name="color modulation" type="vector3">1,1,1</shadervar>
           </block>
 
           <block location="cg:variablemap">
@@ -38,11 +38,29 @@
           </block>
       
           <block location="cg:fragmentIn">
-	      <uniform type="rgba" name="color_modulation" />
+	      <uniform type="rgb" name="color_modulation" />
           </block>
       
           <block location="cg:fragmentMain">
 	      color_modulation = fragmentIn.color_modulation;
+          </block>
+        </input>
+
+        <input name="alpha_factor" type="float" default="complex">
+          <block location="shadervars">
+             <shadervar name="alpha factor" type="float">1</shadervar>
+          </block>
+
+          <block location="cg:variablemap">
+	      <variablemap variable="alpha factor" destination="fragmentIn.alpha_factor" />
+          </block>
+      
+          <block location="cg:fragmentIn">
+	      <uniform type="float" name="alpha_factor" />
+          </block>
+      
+          <block location="cg:fragmentMain">
+	      alpha_factor = fragmentIn.alpha_factor;
           </block>
         </input>
 
@@ -52,7 +70,7 @@
     
         <block location="cg:fragmentMain">
           surfaceColorOut.rgb = surfaceColorIn.rgb * color_modulation.rgb;
-          surfaceColorOut.a = surfaceColorIn.a * color_modulation.a;
+          surfaceColorOut.a = surfaceColorIn.a * alpha_factor;
           surfaceColorOut_attr_perfragment = surfaceColorIn_attr_perfragment;
         </block>
 
