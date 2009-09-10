@@ -52,5 +52,7 @@ namespace Utility
   }
 
   void SimpleJobQueue::Wait (iJob*) { }
+
+  void SimpleJobQueue::WaitAll () {}
 }
 }
