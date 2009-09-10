@@ -59,6 +59,8 @@ public:
 
   /// \brief The main running function of this thread
   virtual void Run();
+
+  virtual const char* GetName () const {return "Sndsys DS";}
 };
 
 struct iConfigFile;
