@@ -53,6 +53,6 @@ namespace Utility
 
   void SimpleJobQueue::Wait (iJob*) { }
 
-  void SimpleJobQueue::PopAndRun() { }
+  void SimpleJobQueue::WaitAll () {}
 }
 }

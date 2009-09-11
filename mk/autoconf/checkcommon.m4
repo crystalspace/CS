@@ -70,7 +70,7 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_RELAYTOOL],
 	CS_CHECK_PROGS([BASH], [bash])
 	AS_IF([test -n "$BASH"],
 	    [CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL],
-	        [$BASH $RELAYTOOL], [], [], [$2])])])])
+	        [$BASH $RELAYTOOL], [atomic], [], [$2])])])])
 
 
 #------------------------------------------------------------------------------

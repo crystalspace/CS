@@ -2359,7 +2359,8 @@ $as_echo "$cs_mno_cygwin" >&6; }
 
 
 
-    CFLAGS="$CFLAGS" # Filter undesired flags
+    # Magic to suppress automatic addition of undesirable flags by Autoconf.
+    CFLAGS="$CFLAGS"
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3298,6 +3299,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
     if test -n "$CC"; then
 
 	cs_build_prop_val="$CC"
@@ -3560,7 +3562,9 @@ fi
         # project-agnostic C compiler check, but it is needed by assembly code
         # implementing Sparc atomic threading operations, and it should not
         # hurt if the option is not recognized.
-	{ $as_echo "$as_me:$LINENO: checking if $CC handles Sparc v9" >&5
+	case $host_cpu in
+	    sparc*)
+		{ $as_echo "$as_me:$LINENO: checking if $CC handles Sparc v9" >&5
 $as_echo_n "checking if $CC handles Sparc v9... " >&6; }
 if test "${cs_cv_prog_cc_sparc_v9_ok+set}" = set; then
   $as_echo_n "(cached) " >&6
@@ -3735,12 +3739,15 @@ fi
 
 fi
 
+		;;
+	esac
 
 fi
 
 
 
-    CXXFLAGS="$CXXFLAGS" # Filter undesired flags
+    # Magic to suppress automatic addition of undesirable flags by Autoconf.
+    CXXFLAGS="$CXXFLAGS"
 
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -9241,7 +9248,7 @@ done
   cs_build_prop_val="$BASH $RELAYTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.RELAYTOOL ?= $cs_build_prop_val ;
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.RELAYTOOL ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -14645,7 +14652,11 @@ public class conftest {
     }
 }
 EOF
-    $JAVAC conftest.java
+    { ($as_echo "$as_me:$LINENO: \$JAVAC conftest.java") >&5
+  ($JAVAC conftest.java) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
 
 
 
@@ -14672,8 +14683,8 @@ fi
 
 fi
 
-	cs_java_home=`{ ($as_echo "$as_me:$LINENO: \$JAVA conftest java.home") >&5
-  ($JAVA conftest java.home) 2>&5
+	cs_java_home=`{ ($as_echo "$as_me:$LINENO: CLASSPATH=. \$JAVA conftest java.home") >&5
+  (CLASSPATH=. $JAVA conftest java.home) 2>&5
   ac_status=$?
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
@@ -14701,8 +14712,8 @@ fi
 
 fi
 
-	cs_java_lib_path=`{ ($as_echo "$as_me:$LINENO: \$JAVA conftest java.library.path") >&5
-  ($JAVA conftest java.library.path) 2>&5
+	cs_java_lib_path=`{ ($as_echo "$as_me:$LINENO: CLASSPATH=. \$JAVA conftest java.library.path") >&5
+  (CLASSPATH=. $JAVA conftest java.library.path) 2>&5
   ac_status=$?
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
@@ -37579,8 +37590,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
-	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-ldsound -ldinput | sed 'y% %#%'` \
+	`echo @-I/usr/include/directx@@-ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -37654,14 +37665,12 @@ cat >>conftest.$ac_ext <<_ACEOF
 	    #endif
 	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
-	    #include <ddraw.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
 int
 main ()
 {
-DirectDrawCreate(0,0,0);
-	     DirectSoundCreate(0,0,0);
+DirectSoundCreate(0,0,0);
 	     DirectInputCreate(0,0,0,0)
   ;
   return 0;
@@ -37746,8 +37755,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
-	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-ldsound -ldinput | sed 'y% %#%'` \
+	`echo @-I/usr/include/directx@@-ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -37821,14 +37830,12 @@ cat >>conftest.$ac_ext <<_ACEOF
 	    #endif
 	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
-	    #include <ddraw.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
 int
 main ()
 {
-DirectDrawCreate(0,0,0);
-	     DirectSoundCreate(0,0,0);
+DirectSoundCreate(0,0,0);
 	     DirectInputCreate(0,0,0,0)
   ;
   return 0;
@@ -37949,8 +37956,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
-	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-ldsound -ldinput | sed 'y% %#%'` \
+	`echo @-I/usr/include/directx@@-ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -38024,14 +38031,12 @@ cat >>conftest.$ac_ext <<_ACEOF
 	    #endif
 	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
-	    #include <ddraw.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
 int
 main ()
 {
-DirectDrawCreate(0,0,0);
-	     DirectSoundCreate8(0,0,0);
+DirectSoundCreate8(0,0,0);
 	     DirectInputCreate(0,0,0,0)
   ;
   return 0;
@@ -38116,8 +38121,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
-	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-ldsound -ldinput | sed 'y% %#%'` \
+	`echo @-I/usr/include/directx@@-ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -38191,14 +38196,12 @@ cat >>conftest.$ac_ext <<_ACEOF
 	    #endif
 	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
-	    #include <ddraw.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
 int
 main ()
 {
-DirectDrawCreate(0,0,0);
-	     DirectSoundCreate8(0,0,0);
+DirectSoundCreate8(0,0,0);
 	     DirectInputCreate(0,0,0,0)
   ;
   return 0;

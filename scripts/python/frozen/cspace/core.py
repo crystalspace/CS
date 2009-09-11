@@ -452,6 +452,8 @@ class iThreadReturn(iBase):
     def Copy(*args): return _core.iThreadReturn_Copy(*args)
     def Wait(*args): return _core.iThreadReturn_Wait(*args)
     def SetWaitPtrs(*args): return _core.iThreadReturn_SetWaitPtrs(*args)
+    def SetJob(*args): return _core.iThreadReturn_SetJob(*args)
+    def GetJob(*args): return _core.iThreadReturn_GetJob(*args)
     __swig_destroy__ = _core.delete_iThreadReturn
     __del__ = lambda self : None;
 iThreadReturn_swigregister = _core.iThreadReturn_swigregister

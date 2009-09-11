@@ -944,6 +944,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Copy = *cspacec::iThreadReturn_Copy;
 *Wait = *cspacec::iThreadReturn_Wait;
 *SetWaitPtrs = *cspacec::iThreadReturn_SetWaitPtrs;
+*SetJob = *cspacec::iThreadReturn_SetJob;
+*GetJob = *cspacec::iThreadReturn_GetJob;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -4443,6 +4445,8 @@ sub DESTROY {
 *Copy = *cspacec::csLoaderReturn_Copy;
 *Wait = *cspacec::csLoaderReturn_Wait;
 *SetWaitPtrs = *cspacec::csLoaderReturn_SetWaitPtrs;
+*SetJob = *cspacec::csLoaderReturn_SetJob;
+*GetJob = *cspacec::csLoaderReturn_GetJob;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
