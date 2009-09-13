@@ -680,6 +680,7 @@ class iAnimatedMeshFactory(core.iBase):
     __repr__ = _swig_repr
     def CreateSubMesh(*args): return _imesh.iAnimatedMeshFactory_CreateSubMesh(*args)
     def GetSubMesh(*args): return _imesh.iAnimatedMeshFactory_GetSubMesh(*args)
+    def FindSubMesh(*args): return _imesh.iAnimatedMeshFactory_FindSubMesh(*args)
     def GetSubMeshCount(*args): return _imesh.iAnimatedMeshFactory_GetSubMeshCount(*args)
     def DeleteSubMesh(*args): return _imesh.iAnimatedMeshFactory_DeleteSubMesh(*args)
     def GetVertexCount(*args): return _imesh.iAnimatedMeshFactory_GetVertexCount(*args)
@@ -709,6 +710,7 @@ class iAnimatedMeshFactory(core.iBase):
     def CreateSocket(*args): return _imesh.iAnimatedMeshFactory_CreateSocket(*args)
     def GetSocketCount(*args): return _imesh.iAnimatedMeshFactory_GetSocketCount(*args)
     def GetSocket(*args): return _imesh.iAnimatedMeshFactory_GetSocket(*args)
+    def FindSocket(*args): return _imesh.iAnimatedMeshFactory_FindSocket(*args)
     scfGetVersion = staticmethod(_imesh.iAnimatedMeshFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iAnimatedMeshFactory
     __del__ = lambda self : None;
@@ -725,6 +727,7 @@ class iAnimatedMeshFactorySubMesh(core.iBase):
     def GetBoneIndices(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetBoneIndices(*args)
     def GetMaterial(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetMaterial(*args)
     def SetMaterial(*args): return _imesh.iAnimatedMeshFactorySubMesh_SetMaterial(*args)
+    def GetName(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetName(*args)
     scfGetVersion = staticmethod(_imesh.iAnimatedMeshFactorySubMesh_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iAnimatedMeshFactorySubMesh
     __del__ = lambda self : None;
@@ -758,6 +761,9 @@ class iAnimatedMeshSubMesh(core.iBase):
     def GetFactorySubMesh(*args): return _imesh.iAnimatedMeshSubMesh_GetFactorySubMesh(*args)
     def SetRendering(*args): return _imesh.iAnimatedMeshSubMesh_SetRendering(*args)
     def IsRendering(*args): return _imesh.iAnimatedMeshSubMesh_IsRendering(*args)
+    def GetShaderVariableContext(*args): return _imesh.iAnimatedMeshSubMesh_GetShaderVariableContext(*args)
+    def GetMaterial(*args): return _imesh.iAnimatedMeshSubMesh_GetMaterial(*args)
+    def SetMaterial(*args): return _imesh.iAnimatedMeshSubMesh_SetMaterial(*args)
     scfGetVersion = staticmethod(_imesh.iAnimatedMeshSubMesh_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iAnimatedMeshSubMesh
     __del__ = lambda self : None;
