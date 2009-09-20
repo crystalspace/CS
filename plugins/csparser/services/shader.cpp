@@ -401,7 +401,7 @@ csRef<iShader> csTextSyntaxService::ParseShader (
 
   csRef<iShaderManager> shaderMgr = csQueryRegistry<iShaderManager> (object_reg);
   const char* name = node->GetAttributeValue ("name");
-  if (ldr_context && ldr_context->CheckDupes () && name)
+  if ((!ldr_context || ldr_context->CheckDupes ()) && name)
   {
     iShader* shader = shaderMgr->GetShader (name);
     if (shader)
