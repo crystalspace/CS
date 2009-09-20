@@ -240,6 +240,18 @@ void csLight::CalculateAttenuationVector ()
     attenuationConstants);
 }
 
+void csLight::SetParent (iSceneNode* parent)
+{
+    if(!parent && GetParent())
+    {
+      for (size_t i = 0; i < sectors.GetSize (); ++i)
+        sectors[i]->GetLights ()->Remove(this);     
+      sectors.Empty();
+    }
+
+    csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
+}
+
 void csLight::OnSetPosition ()
 {
   // Update the AABB
@@ -253,6 +265,12 @@ void csLight::OnSetPosition ()
       for (int i = 0; i < list->GetCount (); ++i)
       {
         csSector* sect = static_cast<csSector*> (list->Get (i));
+        if(GetParent() && sectors.Find(sect) == csArrayItemNotFound)
+        {
+            sectors.Push (sect);
+            sect->GetLights ()->Add (this);
+        }
+
         sect->UpdateLightBounds (this, oldBox);
       }      
     }    
