@@ -48,7 +48,7 @@ csLight::csLight (csEngine* engine,
     userSpecular (false), halo (0), dynamicType (dyntype), 
     cutoffDistance (d), directionalCutoffRadius (d), 
     userDirectionalCutoffRadius (false),
-    lightnr (0), engine (engine)
+    lightnr (0), removingLight (false), engine (engine)
 {
   //movable.scfParent = (iBase*)(csObject*)this; //@@MS: Look at this?
   movable.SetLight (this);
@@ -245,7 +245,7 @@ void csLight::SetParent (iSceneNode* parent)
     if(!parent && GetParent())
     {
       for (size_t i = 0; i < sectors.GetSize (); ++i)
-        sectors[i]->GetLights ()->Remove(this);     
+        sectors[i]->GetLights ()->Remove (this);     
       sectors.Empty();
     }
 
@@ -272,8 +272,22 @@ void csLight::OnSetPosition ()
         }
 
         sect->UpdateLightBounds (this, oldBox);
-      }      
-    }    
+      }
+
+      if(!removingLight && GetParent())
+      {
+        for(size_t i = 0; i < sectors.GetSize (); ++i)
+        {
+          if(list->Find(sectors[i]) == csArrayItemNotFound)
+          {
+            removingLight = true;
+            sectors[i]->GetLights ()->Remove (this);
+            sectors.DeleteIndex (i--);
+            removingLight = false;
+          }
+        }
+      }
+    }
   }
 
   csVector3 pos = GetFullCenter ();

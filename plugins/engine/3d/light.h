@@ -165,6 +165,9 @@ protected:
   /// List of all sectors that this light shines in.
   csRefArrayObject<iSector> sectors;
 
+  /// If we're currently removing a light from a sector.
+  bool removingLight;
+
   csBox3 lightBoundingBox, worldBoundingBox;
 
   csEngine* engine;
