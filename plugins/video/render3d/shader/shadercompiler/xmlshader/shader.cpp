@@ -763,9 +763,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         newTech.minLights = tk.node->GetAttributeValueAsInt ("minlights");
 
         size_t techIndex = techniques.GetSize();
-	techCache = shaderCache->GetRootedCache (
-	  csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
-	    techIndex));
+	if (shaderCache != 0)
+	  techCache = shaderCache->GetRootedCache (
+	    csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
+	      techIndex));
         LoadTechnique (newTech, tk.node, techIndex, techCache);
         techniques.Push (newTech);
       }
@@ -1138,7 +1139,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     const csShaderVariableStack& stack)
   {
     size_t ticket = csArrayItemNotFound;
-    //sharedEvaluator->ResetEvaluationCache();
     csConditionEvaluator::ScopedEvaluation scope (*sharedEvaluator);
     techsResolver->SetEvalParams (&modes, &stack);
 
@@ -1319,34 +1319,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     
     for (size_t tvi = 0; tvi < tvc; tvi++)
     {
-      // Make sure evaluation cache is cleared after each loop
-      csConditionEvaluator::ScopedEvaluation scope (*sharedEvaluator);
-      
-      techsResolver->SetVariant (tvi);
-      ShaderTechVariant& techVar = techVariants.GetExtend (tvi);
-      
-      techVar.activeTechniques.SetSize (techniques.GetSize ());
-    
-      csArray<TechniqueKeeper> techniquesTmp;
-      ScanForTechniques (shaderRoot, techniquesTmp, forcepriority);
-
-      csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
-      while (techIt.HasNext ())
+      /* Make sure (a) evaluation cache is cleared after each loop
+       * (b) forcing the variant does not 'taint' the eval cache for normal
+       * evaluation */
+      sharedEvaluator->PushEvaluationState();
       {
-        const TechniqueKeeper& tk = techIt.Next();
-        csWrappedDocumentNode* wrapperNode =
-          static_cast<csWrappedDocumentNode*> ((iDocumentNode*)tk.node);
+	csConditionEvaluator::ScopedEvaluation scope (*sharedEvaluator);
+      
+	techsResolver->SetVariant (tvi);
+	ShaderTechVariant& techVar = techVariants.GetExtend (tvi);
         
-        for (size_t t = 0; t < techniques.GetSize(); t++)
-        {
-          iDocumentNode* srcNode = techniques[t].techNode->GetWrappedNode();
-          if (srcNode->Equals (wrapperNode->GetWrappedNode()))
-          {
-            techVar.activeTechniques.SetBit (t);
-            break;
-          }
-        }
+	techVar.activeTechniques.SetSize (techniques.GetSize ());
+      
+	csArray<TechniqueKeeper> techniquesTmp;
+	ScanForTechniques (shaderRoot, techniquesTmp, forcepriority);
+
+	csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
+	while (techIt.HasNext ())
+	{
+	  const TechniqueKeeper& tk = techIt.Next();
+	  csWrappedDocumentNode* wrapperNode =
+	    static_cast<csWrappedDocumentNode*> ((iDocumentNode*)tk.node);
+          
+	  for (size_t t = 0; t < techniques.GetSize(); t++)
+	  {
+	    iDocumentNode* srcNode = techniques[t].techNode->GetWrappedNode();
+	    if (srcNode->Equals (wrapperNode->GetWrappedNode()))
+	    {
+	      techVar.activeTechniques.SetBit (t);
+	      break;
+	    }
+	  }
+	}
       }
+      sharedEvaluator->PopEvaluationState();
     }
   }
 
