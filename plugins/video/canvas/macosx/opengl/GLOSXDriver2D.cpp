@@ -19,6 +19,14 @@
 
 #include <ApplicationServices/ApplicationServices.h>
 
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+  #if __MAC_OS_X_VERSION_MIN_REQUIRED < 1030
+    #import <mach-o/dyld.h>
+  #else  
+    #import <dlfcn.h>
+  #endif
+#endif
+
 #define GLOSXDRIVER_REPORTER_ID "crystalspace.canvas.glosx"
 
 // Plugin stuff - create factory functions, etc
@@ -28,7 +36,7 @@ SCF_IMPLEMENT_FACTORY(GLOSXDriver2D)
 
 // Constructor
 GLOSXDriver2D::GLOSXDriver2D(iBase *p)
-    : scfImplementationType (this, p), OSXDriver2D(this)
+    : scfImplementationType(this, p), OSXDriver2D(this)
 {
   context = 0;
 }
@@ -56,8 +64,7 @@ bool GLOSXDriver2D::Initialize(iObjectRegistry *reg)
   // (including things like glString() - the OpenGL renderer was using this
   // before this driver had been Open()'d) When the driver is actually Open()'d
   // all we need to do is bind the context to our window
-  if ((context = OSXDelegate2D_createOpenGLContext(delegate, Depth, display))
-    == 0)
+  if ((context = OSXDelegate2D_createOpenGLContext(delegate, Depth, display)) == 0)
   {
     csFPrintf(stderr, "Failed to create OpenGL context\n");
     return false;
@@ -210,3 +217,32 @@ void GLOSXDriver2D::SetupDrawingFunctions()
     _GetPixelAt = GetPixelAt16;
   }
 }
+
+// Only compile on machines running Mac OS X (not iPhones)
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+  // Only compile if OS version earlier than 10.3.0
+  #if __MAC_OS_X_VERSION_MIN_REQUIRED < 1030
+    // Get the address of a procedure (for OGL use.)
+    void *GLOSXDriver2D::GetProcAddress(const char *name) 
+    {	
+      NSSymbol symbol;
+      csString symbolName;
+      // Prepend a '_' for the Unix C symbol mangling convention
+      symbolName << '_' << name;
+      if (NSIsSymbolNameDefined (symbolName))
+      {
+        symbol = NSLookupAndBindSymbol (symbolName);
+        return NSAddressOfSymbol (symbol);
+      }
+      else
+        return 0;
+    }
+  // Only compile if OS version 10.3.0 or later
+  #else
+    // Get the address of a procedure (for OGL use.)
+    void *GLOSXDriver2D::GetProcAddress(const char *name) 
+    {	
+      return dlsym(RTLD_DEFAULT, name);
+    }
+  #endif
+#endif

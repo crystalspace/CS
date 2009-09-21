@@ -24,7 +24,6 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 
-#import <mach-o/dyld.h>
 #import <stdlib.h>
 #import <string.h>
 
@@ -71,22 +70,9 @@ public:
   // Toggle between fullscreen/windowed mode
   virtual bool ToggleFullscreen();
 
-  virtual void *GetProcAddress (const char *name) 
-  {
-    // Get the address of a procedure (for OGL use.)
-    NSSymbol symbol;
-    csString symbolName;
-    // Prepend a '_' for the Unix C symbol mangling convention
-    symbolName << '_' << name;
-    if (NSIsSymbolNameDefined (symbolName))
-    {
-      symbol = NSLookupAndBindSymbol (symbolName);
-      return NSAddressOfSymbol (symbol);
-    }
-    else
-      return 0;
-  }
-
+  // Get the address of a procedure (for OGL use.)
+  virtual void *GetProcAddress (const char *name); 
+	
 protected:
   // Set up the function pointers for drawing based on the current Depth
   virtual void SetupDrawingFunctions();
