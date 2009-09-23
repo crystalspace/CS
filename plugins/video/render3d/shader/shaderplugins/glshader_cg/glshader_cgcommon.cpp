@@ -180,8 +180,9 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
       }
     }
     else if ((programProfile == CG_PROFILE_ARBVP1)
-      && (shaderPlug->vendor ==
-        CS::PluginCommon::ShaderProgramPluginGL::ATI))
+      && (programPositionInvariant
+	|| (shaderPlug->vendor ==
+	  CS::PluginCommon::ShaderProgramPluginGL::ATI)))
     {
       for (size_t c = 0; c < clips.GetSize(); c++)
       {
@@ -297,20 +298,24 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
       : csGLShader_CG::argsAll, args);
   for (i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
-  /* Work around Cg 2.0 bug: it emits "OPTION ARB_position_invariant;"
-     AND computes result.position in the VP - doing both is verboten.
-     Remedy: remove -posinv argument 
-     (cgc version 2.0.0010)
-   */
-  if (profile == CG_PROFILE_GPU_VP)
+  programPositionInvariant = false;
+  for (i = 0; i < args.GetSize(); ) 
   {
-    for (i = 0; i < args.GetSize(); ) 
+    if (strcmp (args[i], "-posinv") == 0)
     {
-      if (strcmp (args[i], "-posinv") == 0)
+      if (profile == CG_PROFILE_GPU_VP)
+      {
+	/* Work around Cg 2.0 bug: it emits "OPTION ARB_position_invariant;"
+	   AND computes result.position in the VP - doing both is verboten.
+	   Remedy: remove -posinv argument 
+	   (cgc version 2.0.0010)
+	 */
 	args.DeleteIndex (i);
-      else
-	i++;
+	continue;
+      }
+      programPositionInvariant = true;
     }
+    i++;
   }
   customLimits.ToCgOptions (args);
   args.Push (0);
