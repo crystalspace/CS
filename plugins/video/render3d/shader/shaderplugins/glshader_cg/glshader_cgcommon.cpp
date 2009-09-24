@@ -641,8 +641,7 @@ bool csShaderGLCGCommon::WriteToCacheWorker (iHierarchicalCache* cache,
     
     if (objectCodeCachePathArc.IsEmpty() || objectCodeCachePathItem.IsEmpty())
     {
-      csString preprocSource (GetAugmentedProgram (
-        cgGetProgramString (program, CG_PROGRAM_SOURCE)));
+      const char* preprocSource (cgGetProgramString (program, CG_PROGRAM_SOURCE));
       csString failReason2;
       if (!WriteToCompileCache (preprocSource, limits, cache, failReason2))
       {
