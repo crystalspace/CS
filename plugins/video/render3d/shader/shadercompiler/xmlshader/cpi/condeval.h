@@ -671,9 +671,18 @@ class csConditionEvaluator :
   ConditionIDMapper conditions;
 
   // Evaluation cache
-  MyBitArrayMalloc condChecked;
-  MyBitArrayMalloc condResult;
-  uint evalDepth;
+  struct EvalCacheState
+  {
+    MyBitArrayMalloc condChecked;
+    MyBitArrayMalloc condResult;
+
+    uint evalDepth;
+    EvalCacheState() : evalDepth (0) {}
+  };
+  enum { maxEvalStackDepth = 2 };
+  EvalCacheState evalCacheStack[maxEvalStackDepth];
+  uint evalStackDepth;
+  EvalCacheState* evalCache;
   
   csMemoryPool scratch;
 
@@ -801,6 +810,11 @@ public:
     ~ScopedEvaluation()
     { eval.LeaveEvaluation(); }
   };
+
+  /// Push the current evaluation state and set a clean evaluation state
+  void PushEvaluationState();
+  /// Pop an evaluation state pushed earlier
+  void PopEvaluationState();
 
   /// Get number of conditions allocated so far
   size_t GetNumConditions() { return conditions.GetNumConditions(); }

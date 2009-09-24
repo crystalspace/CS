@@ -246,7 +246,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  
 	  SynthesizeTechnique* synthTech = synthTechs[t].Get (p);
 	#ifdef THREADED_TECH_SYNTHESIS
-	  synthQueue.Wait (synthTech);
+	  synthQueue.PullAndRun (synthTech, true);
 	#else
 	  synthTech->Run();
 	#endif

@@ -76,6 +76,7 @@ protected:
 
   CGprogram program;
   CGprofile programProfile;
+  bool programPositionInvariant;
   csString entrypoint;
   csRefArray<iDocumentNode> cacheKeepNodes;
   csString objectCode;

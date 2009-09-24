@@ -162,6 +162,12 @@ protected:
   /// Compute attenuation vector from current attenuation mode.
   void CalculateAttenuationVector ();
 
+  /// List of all sectors that this light shines in.
+  csRefArrayObject<iSector> sectors;
+
+  /// If we're currently removing a light from a sector.
+  bool removingLight;
+
   csBox3 lightBoundingBox, worldBoundingBox;
 
   csEngine* engine;
@@ -449,10 +455,8 @@ public:
     return &movable;
   }
 
-  virtual void SetParent (iSceneNode* parent)
-  {
-    csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
-  }
+  virtual void SetParent (iSceneNode* parent);
+
   virtual iSceneNode* GetParent () const
   {
     if (movable.GetParent ())

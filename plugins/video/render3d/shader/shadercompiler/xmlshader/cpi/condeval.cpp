@@ -193,8 +193,9 @@ const CondOperation& ConditionIDMapper::GetCondition (csConditionID condition)
 //---------------------------------------------------------------------------
 
 csConditionEvaluator::csConditionEvaluator (iShaderVarStringSet* strings, 
-    const csConditionConstants& constants) :
-    strings(strings), evalDepth (0), constants(constants)
+  const csConditionConstants& constants) :
+  strings(strings), evalStackDepth (0), evalCache (evalCacheStack),
+  constants(constants)
 {
 }
   
@@ -941,7 +942,7 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
   /* Assert we don't evaluate without an EnterEvaluation()
      (otherwise, evaluation cache won't be cleared, causing problems down
      the road) */
-  CS_ASSERT(evalDepth > 0);
+  CS_ASSERT(evalCache->evalDepth > 0);
 
   if (condition == csCondAlwaysTrue)
     return true;
@@ -952,22 +953,22 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
    * are added (notably when a shader source is retrieved from an
    * external source). Make sure the cache is large enough.
    */
-  if (condChecked.GetSize() < GetNumConditions ())
+  if (evalCache->condChecked.GetSize() < GetNumConditions ())
   {
-    condChecked.SetSize (GetNumConditions ());
-    condResult.SetSize (GetNumConditions ());
+    evalCache->condChecked.SetSize (GetNumConditions ());
+    evalCache->condResult.SetSize (GetNumConditions ());
   }
 
-  if (condChecked.IsBitSet (condition))
+  if (evalCache->condChecked.IsBitSet (condition))
   {
-    return condResult.IsBitSet (condition);
+    return evalCache->condResult.IsBitSet (condition);
   }
 
   EvaluatorShadervar eval (*this, modes, stack);
   bool result = Evaluate (eval, condition);
 
-  condChecked.Set (condition, true);
-  condResult.Set (condition, result);
+  evalCache->condChecked.Set (condition, true);
+  evalCache->condResult.Set (condition, result);
 
   return result;
 }
@@ -979,18 +980,18 @@ void csConditionEvaluator::ForceConditionResults (
    * are added (notably when a shader source is retrieved from an
    * external source). Make sure the cache is large enough.
    */
-  if (condChecked.GetSize() < GetNumConditions ())
+  if (evalCache->condChecked.GetSize() < GetNumConditions ())
   {
-    condChecked.SetSize (GetNumConditions ());
-    condResult.SetSize (GetNumConditions ());
+    evalCache->condChecked.SetSize (GetNumConditions ());
+    evalCache->condResult.SetSize (GetNumConditions ());
   }
-  condChecked.Clear();
-  condResult.Clear();
+  evalCache->condChecked.Clear();
+  evalCache->condResult.Clear();
 
   for (size_t i = 0; i < condResults.GetSize(); i++)
   {
-    condChecked.Set (i, condSet[i]);
-    condResult.Set (i, condResults[i]);
+    evalCache->condChecked.Set (i, condSet[i]);
+    evalCache->condResult.Set (i, condResults[i]);
   }
 }
 
@@ -1311,18 +1312,33 @@ typename Evaluator::EvalResult csConditionEvaluator::Evaluate (
 
 void csConditionEvaluator::EnterEvaluation()
 {
-  if (evalDepth == 0)
+  if (evalCache->evalDepth == 0)
   {
-    condChecked.SetSize (GetNumConditions ());
-    condChecked.Clear();
-    condResult.SetSize (GetNumConditions ());
+    evalCache->condChecked.SetSize (GetNumConditions ());
+    evalCache->condChecked.Clear();
+    evalCache->condResult.SetSize (GetNumConditions ());
   }
-  evalDepth++;
+  evalCache->evalDepth++;
 }
 
 void csConditionEvaluator::LeaveEvaluation()
 {
-  evalDepth--;
+  evalCache->evalDepth--;
+}
+
+void csConditionEvaluator::PushEvaluationState()
+{
+  CS_ASSERT(evalStackDepth < maxEvalStackDepth);
+  evalStackDepth++;
+  evalCache = &(evalCacheStack[evalStackDepth]);
+}
+
+void csConditionEvaluator::PopEvaluationState()
+{
+  CS_ASSERT(evalStackDepth > 0);
+  CS_ASSERT(evalCache->evalDepth == 0);
+  evalStackDepth--;
+  evalCache = &(evalCacheStack[evalStackDepth]);
 }
 
 bool csConditionEvaluator::EvaluateConst (const CondOperation& op, bool& result)
