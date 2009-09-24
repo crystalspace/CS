@@ -86,7 +86,7 @@ struct csPixelCoord
  */
 struct iGraphics2D : public virtual iBase
 {
-  SCF_INTERFACE (iGraphics2D, 4, 0, 0);
+  SCF_INTERFACE (iGraphics2D, 4, 0, 1);
   
   /// Open the device.
   virtual bool Open () = 0;
