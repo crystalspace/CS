@@ -257,27 +257,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   CGGLenum type = (_type == progVP) ? CG_GL_VERTEX : CG_GL_FRAGMENT;
 
   size_t i;
-  csString augmentedProgramStr;
-  const csSet<csString>* unusedParams = &this->unusedParams;
-  if (cgResolve != 0)
-  {
-    unusedParams = &cgResolve->GetUnusedParameters ();
-  }
-  csSet<csString>::GlobalIterator unusedIt (unusedParams->GetIterator());
-  while (unusedIt.HasNext())
-  {
-    const csString& param = unusedIt.Next ();
-    augmentedProgramStr.AppendFmt ("#define %s\n",
-      param.GetData());
-  }
-  
-  if (flags & loadFlagUnusedV2FForInit)
-    augmentedProgramStr.Append ("#define _INITIALIZE_UNUSED_V2F\n");
-  
-  OutputClipPreamble (augmentedProgramStr);
-  WriteClipApplications (augmentedProgramStr);
-  
-  augmentedProgramStr.Append (programStr);
+  csString augmentedProgramStr = GetAugmentedProgram (programStr,
+    flags & loadFlagUnusedV2FForInit);
+    
   programStr = augmentedProgramStr;
   CGprofile profile = customLimits.profile;
   CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendor =
@@ -435,9 +417,14 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   return result;
 }
 
-csString csShaderGLCGCommon::GetPreprocessedProgram (const char* programStr)
+csString csShaderGLCGCommon::GetAugmentedProgram (const char* programStr,
+                                                  bool initializeUnusedV2F)
 {
   csString augmentedProgramStr;
+  
+  if (programPositionInvariant)
+    augmentedProgramStr.Append ("/* position invariant */\n");
+  
   const csSet<csString>* unusedParams = &this->unusedParams;
   if (cgResolve != 0)
   {
@@ -450,6 +437,9 @@ csString csShaderGLCGCommon::GetPreprocessedProgram (const char* programStr)
     augmentedProgramStr.AppendFmt ("#define %s\n",
       param.GetData());
   }
+  
+  if (initializeUnusedV2F)
+    augmentedProgramStr.Append ("#define _INITIALIZE_UNUSED_V2F\n");
   
   OutputClipPreamble (augmentedProgramStr);
   WriteClipApplications (augmentedProgramStr);
@@ -651,7 +641,7 @@ bool csShaderGLCGCommon::WriteToCacheWorker (iHierarchicalCache* cache,
     
     if (objectCodeCachePathArc.IsEmpty() || objectCodeCachePathItem.IsEmpty())
     {
-      csString preprocSource (GetPreprocessedProgram (
+      csString preprocSource (GetAugmentedProgram (
         cgGetProgramString (program, CG_PROGRAM_SOURCE)));
       csString failReason2;
       if (!WriteToCompileCache (preprocSource, limits, cache, failReason2))
@@ -974,8 +964,10 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
  */
 #define PROG_CACHE_STORE_SOURCE 0
 
-static const uint32 cacheFileMagicCC = 0x04435043
+static const uint32 cacheFileMagicCC = 0x05435043
                                        ^ (0x00202020 * PROG_CACHE_STORE_SOURCE);
+
+enum { objFlagPosInv = 1 << 0 };
 
 bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source, 
                                                   const ProfileLimits& limits,
@@ -1088,6 +1080,14 @@ bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source,
     }
   }
   
+  {
+    uint32 diskFlags;
+    if (foundFile->Read ((char*)&diskFlags, sizeof (diskFlags))
+	!= sizeof (diskFlags)) return false;
+    uint flags =  csLittleEndian::UInt32 (diskFlags);
+    programPositionInvariant = flags & objFlagPosInv;
+  }
+  
   objectCode =
     CS::PluginCommon::ShaderCacheHelper::ReadString (foundFile);
   if (objectCode.IsEmpty()) return false;
@@ -1177,6 +1177,14 @@ bool csShaderGLCGCommon::LoadObjectCodeFromCompileCache (
       objectCode.Empty();
       return true;
     }
+  }
+  
+  {
+    uint32 diskFlags;
+    if (cacheFile->Read ((char*)&diskFlags, sizeof (diskFlags))
+	!= sizeof (diskFlags)) return false;
+    uint flags =  csLittleEndian::UInt32 (diskFlags);
+    programPositionInvariant = flags & objFlagPosInv;
   }
   
   objectCode =
@@ -1330,6 +1338,18 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
 	  != sizeof (diskState))
       {
 	failReason = "write error (state-valid)";
+	return false;
+      }
+    }
+    
+    {
+      uint flags = 0;
+      if (programPositionInvariant) flags |= objFlagPosInv;
+      uint32 diskFlags = csLittleEndian::UInt32 (flags);
+      if (cacheFile.Write ((char*)&diskFlags, sizeof (diskFlags))
+	  != sizeof (diskFlags))
+      {
+	failReason = "write error (flags)";
 	return false;
       }
     }

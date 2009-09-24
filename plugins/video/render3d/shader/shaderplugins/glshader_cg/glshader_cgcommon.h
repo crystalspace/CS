@@ -146,7 +146,8 @@ protected:
     const char* programStr, ProgramType type,
     const ProfileLimitsPair& customLimits, 
     uint flags = loadLoadToGL | loadApplyVmap | loadFlagUnusedV2FForInit);
-  csString GetPreprocessedProgram (const char* programStr);
+  csString GetAugmentedProgram (const char* programStr,
+    bool initializeUnusedV2F = false);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   const char* GetProgramType()
@@ -182,10 +183,14 @@ protected:
   bool WriteToCache (iHierarchicalCache* cache, const ProfileLimits& limits,
     const ProfileLimitsPair& limitsPair, const char* tag);
   
+  /* Try to find compiled object code in program cache for the given Cg
+     source code */
   bool TryLoadFromCompileCache (const char* source, const ProfileLimits& limits,
     iHierarchicalCache* cache);
+  // Load object code from program cache using objectCodeCachePath{Arc,Item}
   bool LoadObjectCodeFromCompileCache (const ProfileLimits& limits,
     iHierarchicalCache* cache);
+  // Write the object code to the program cache
   bool WriteToCompileCache (const char* source, const ProfileLimits& limits,
     iHierarchicalCache* cache, csString& failReason);
     
