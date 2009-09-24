@@ -300,6 +300,13 @@ struct iGraphics2D : public virtual iBase
   
   /// Get the dimensions of the framebuffer.
   virtual void GetFramebufferDimensions (int& width, int& height) = 0;
+  
+  /// Get a string containing the hardware renderer.
+  virtual const char* GetHWRenderer () = 0;
+  /// Get a string containing the OpenGL version.
+  virtual const char* GetHWGLVersion () = 0;
+  /// Get a string containing the vendor info.
+  virtual const char* GetHWVendor () = 0;
 };
 
 /** @} */
