@@ -9400,6 +9400,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetViewport = *cspacec::iGraphics2D_SetViewport;
 *GetViewport = *cspacec::iGraphics2D_GetViewport;
 *GetFramebufferDimensions = *cspacec::iGraphics2D_GetFramebufferDimensions;
+*GetHWRenderer = *cspacec::iGraphics2D_GetHWRenderer;
+*GetHWGLVersion = *cspacec::iGraphics2D_GetHWGLVersion;
+*GetHWVendor = *cspacec::iGraphics2D_GetHWVendor;
 *scfGetVersion = *cspacec::iGraphics2D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
