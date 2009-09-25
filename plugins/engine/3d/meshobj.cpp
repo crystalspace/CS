@@ -44,7 +44,8 @@ using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 // ---------------------------------------------------------------------------
 
 csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj) 
-  : scfImplementationType (this), engine (engine)
+  : scfImplementationType (this), instancingTransformsDirty (false),
+    engine (engine)
 {
 //  movable.scfParent = this; //@TODO: CHECK THIS
   wor_bbox_movablenr = -1;
@@ -157,6 +158,8 @@ csShaderVariable* csMeshWrapper::AddInstance(csVector3& position, csMatrix3& rot
   csReversibleTransform tr(rotation.GetInverse(), position);
   transformVar->SetValue (tr);
   transformVars->AddVariableToArray(transformVar);
+  
+  instancingTransformsDirty = true;
 
   return transformVar;
 }
@@ -166,6 +169,77 @@ void csMeshWrapper::RemoveInstance(csShaderVariable* instance)
   size_t element = transformVars->FindArrayElement(instance);
   transformVars->RemoveFromArray(element);
   fadeFactors->RemoveFromArray(element);
+  instancingTransformsDirty = true;
+}
+
+// Stuff to fixup rendermesh bboxes in case of instancing
+
+csMeshWrapper::RenderMeshesSet::RenderMeshesSet () : n (0), meshArray (0),
+  meshes (0)
+{}
+
+csMeshWrapper::RenderMeshesSet::~RenderMeshesSet ()
+{
+  cs_free (meshArray);
+  cs_free (meshes);
+}
+
+void csMeshWrapper::RenderMeshesSet::CopyOriginalMeshes (int n,
+  csRenderMesh** origMeshes)
+{
+  if (n != this->n)
+  {
+    meshes = (csRenderMesh*)cs_realloc (meshes, n * sizeof (csRenderMesh));
+    meshArray = (csRenderMesh**)cs_realloc (meshArray, n * sizeof (csRenderMesh*));
+    for (int i = 0; i < n; i++)
+      meshArray[i] = meshes+i;
+    
+    this->n = n;
+  }
+  for (int i = 0; i < n; i++)
+    memcpy (meshes+i, origMeshes[i], sizeof (csRenderMesh));
+}
+  
+csBox3 csMeshWrapper::AdjustBboxForInstances (const csBox3& origBox) const
+{
+  CS_ASSERT (transformVars->GetType() == csShaderVariable::ARRAY);
+  size_t numInst = transformVars->GetArraySize ();
+  if (numInst == 0) return origBox;
+  csBox3 newBox;
+  for (size_t i = 0; i < numInst; i++)
+  {
+    csReversibleTransform tf;
+    transformVars->GetArrayElement (i)->GetValue (tf);
+    csBox3 box_tf = tf.This2Other (origBox);
+    newBox += box_tf;
+  }
+  return newBox;
+}
+
+csRenderMesh** csMeshWrapper::FixupRendermeshesForInstancing (int n,
+  csRenderMesh** meshes)
+{
+  instancingBoxes.SetSize (n);
+  for (int i = 0; i < n; i++)
+  {
+    const csBox3& origBox = meshes[i]->bbox;
+    if (origBox != instancingBoxes[i].oldBox)
+    {
+      instancingBoxes[i].oldBox = origBox;
+      instancingBoxes[i].newBox = AdjustBboxForInstances (origBox);
+    }
+  }
+  
+  bool created;
+  RenderMeshesSet& meshesSet = instancingRMs.GetUnusedData (created,
+    engine->csEngine::GetCurrentFrameNumber());
+  meshesSet.CopyOriginalMeshes (n, meshes);
+  for (int i = 0; i < n; i++)
+  {
+    meshesSet.meshes[i].bbox = instancingBoxes[i].newBox;
+  }
+  
+  return meshesSet.meshArray;
 }
 
 void csMeshWrapper::AddToSectorPortalLists ()
@@ -490,6 +564,10 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
 
   CS::Graphics::RenderMesh** rmeshes = meshobj->GetRenderMeshes (n, rview, &movable,
   	old_ctxt != 0 ? 0 : frustum_mask);
+  if (DoInstancing())
+  {
+    rmeshes = FixupRendermeshesForInstancing (n, rmeshes);
+  }
   if (old_ctxt)
   {
     CS::RenderManager::RenderView* csrview =

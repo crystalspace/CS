@@ -243,7 +243,28 @@ private:
   // Shadervars for instancing.
   csRef<csShaderVariable> fadeFactors;
   csRef<csShaderVariable> transformVars;
-
+  bool instancingTransformsDirty;
+  struct InstancingBbox
+  {
+    csBox3 oldBox;
+    csBox3 newBox;
+  };
+  csArray<InstancingBbox> instancingBoxes;
+  struct RenderMeshesSet : public CS::NonCopyable
+  {
+    int n;
+    csRenderMesh** meshArray;
+    csRenderMesh* meshes;
+    
+    RenderMeshesSet ();
+    ~RenderMeshesSet ();
+    void CopyOriginalMeshes (int n, csRenderMesh** meshes);
+  };
+  csFrameDataHolder<RenderMeshesSet> instancingRMs;
+  
+  bool DoInstancing() const { return transformVars.IsValid(); }
+  csBox3 AdjustBboxForInstances (const csBox3& origBox) const;
+  csRenderMesh** FixupRendermeshesForInstancing (int n, csRenderMesh** meshes);
 public:
   CS_LEAKGUARD_DECLARE (csMeshWrapper);
 
