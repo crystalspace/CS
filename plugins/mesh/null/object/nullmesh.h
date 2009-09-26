@@ -64,15 +64,17 @@ public:
   { return logparent_factory; }
   virtual iMeshObjectType* GetMeshObjectType () const
   { return nullmesh_type; }
-  virtual iObjectModel* GetObjectModel () { return 0; }
+  virtual iObjectModel* GetObjectModel () { return collision_data; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual void SetMixMode (uint) { }
   virtual uint GetMixMode () const { return 0; }
+  virtual void SetCollisionMeshData (iObjectModel* data) { collision_data = data; }
   
 private:
   iMeshFactoryWrapper* logparent_factory;
   iMeshObjectType* nullmesh_type;
+  iObjectModel* collision_data;
   float radius;
   csBox3 box;
   csFlags factory_flags;
