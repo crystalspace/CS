@@ -49,14 +49,18 @@
 class csEngine;
 class csProgressPulse;
 class csSector;
-class csMeshMeshList;
-class csMeshWrapper;
 class csMeshGenerator;
 struct iVisibilityCuller;
 struct iMeshWrapper;
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+  class csMeshWrapper;
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
+
 /// A list of meshes for a sector.
-class csSectorMeshList : public csMeshList
+class csSectorMeshList : public CS_PLUGIN_NAMESPACE_NAME(Engine)::csMeshList
 {
 public:
   /// constructor
@@ -172,8 +176,7 @@ class csSector : public scfImplementationExt3<csSector,
 {
   // Friends
   friend class csEngine;
-  friend class csMeshMeshList;
-  friend class csMeshWrapper;
+  friend class CS_PLUGIN_NAMESPACE_NAME(Engine)::csMeshWrapper;
   friend class csSectorMeshList;
 
 public:
@@ -541,8 +544,8 @@ private:
   void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, 
     iRenderView* rview, uint32 frustum_mask,
     bool doFade = false, float fade = 1.0f);
-  void ObjectVisible (csMeshWrapper* cmesh, iRenderView* rview, 
-    uint32 frustum_mask, bool doFade, float fade);
+  void ObjectVisible (CS_PLUGIN_NAMESPACE_NAME(Engine)::csMeshWrapper* cmesh,
+    iRenderView* rview, uint32 frustum_mask, bool doFade, float fade);
 
   /**
    * Visibilty number for last VisTest call

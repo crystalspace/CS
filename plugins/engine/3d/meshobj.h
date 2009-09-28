@@ -51,13 +51,14 @@ struct iMovable;
 struct iRenderView;
 struct iSharedVariable;
 class csEngine;
-class csMeshWrapper;
+class csImposterManager;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
   class csLight;
-}
-CS_PLUGIN_NAMESPACE_END(Engine)
+  class csMeshWrapper;
+  class csMovable;
+  class csMovableSectorList;
 
 /**
  * General list of meshes.
@@ -140,7 +141,7 @@ class csMeshWrapper :
 {
   friend class csMovable;
   friend class csMovableSectorList;
-  friend class csImposterManager;
+  friend class ::csImposterManager;
 
 protected:
   /**
@@ -610,5 +611,8 @@ public:
 };
 
 #include "csutil/deprecated_warn_on.h"
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 #endif // __CS_MESHOBJ_H__

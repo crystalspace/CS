@@ -31,11 +31,10 @@
 #include "ivideo/rendermesh.h"
 #include "plugins/engine/3d/portal.h"
 
-class csMeshWrapper;
-class csMovable;
-
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
+class csMeshWrapper;
+class csMovable;
 
 /**
  * A helper class for iTriangleMesh implementations used by csPortalContainer.

@@ -28,9 +28,9 @@ class csSceneNode
 {
 public:
   static void SetParent (iSceneNode* this_node, iSceneNode* parent,
-  	csMovable* this_movable)
+  	CS_PLUGIN_NAMESPACE_NAME(Engine)::csMovable* this_movable)
   {
-    csMovable* parent_mov = this_movable->GetParent ();
+    CS_PLUGIN_NAMESPACE_NAME(Engine)::csMovable* parent_mov = this_movable->GetParent ();
     if (!parent_mov && !parent) return;
     if (parent_mov && parent_mov->GetSceneNode () == parent) return;
 
@@ -43,13 +43,13 @@ public:
     }
 
     if (parent)
-      this_movable->SetParent ((csMovable*)(parent->GetMovable ()));
+      this_movable->SetParent ((CS_PLUGIN_NAMESPACE_NAME(Engine)::csMovable*)(parent->GetMovable ()));
     else
       this_movable->SetParent (0);
 
     if (parent)
     {
-      parent_mov = (csMovable*)(parent->GetMovable ());
+      parent_mov = (CS_PLUGIN_NAMESPACE_NAME(Engine)::csMovable*)(parent->GetMovable ());
       csRefArray<iSceneNode>& parent_children = parent_mov->GetChildren ();
 #ifdef CS_DEBUG
       size_t idx = parent_children.Find (parent);

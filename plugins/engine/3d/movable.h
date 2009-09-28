@@ -30,15 +30,13 @@
 
 class csVector3;
 class csMatrix3;
-class csMovable;
-class csMeshWrapper;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
   class csCameraBase;
   class csLight;
-}
-CS_PLUGIN_NAMESPACE_END(Engine)
+  class csMeshWrapper;
+  class csMovable;
 
 /// A list of sectors as the movable uses it
 class csMovableSectorList : public scfImplementation1<csMovableSectorList,
@@ -105,12 +103,12 @@ private:
   /**
    * Light on which this movable operates.
    */
-  CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* lightobject;
+  csLight* lightobject;
 
   /**
    * Camera on which this movable operates.
    */
-  CS_PLUGIN_NAMESPACE_NAME(Engine)::csCameraBase* cameraobject;
+  csCameraBase* cameraobject;
 
   /// Update number.
   long updatenr;
@@ -140,25 +138,25 @@ public:
   const csRefArray<iSceneNode>& GetChildren () const { return scene_children; }
 
   /// Set light on which this movable operates.
-  void SetLight (CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* obj)
+  void SetLight (csLight* obj)
   {
     lightobject = obj;
   }
 
   /// Get the light on which we operate.
-  CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* GetCsLight () const
+  csLight* GetCsLight () const
   {
     return lightobject;
   }
 
   /// Set camera on which this movable operates.
-  void SetCamera (CS_PLUGIN_NAMESPACE_NAME(Engine)::csCameraBase* obj)
+  void SetCamera (csCameraBase* obj)
   {
     cameraobject = obj;
   }
 
   /// Get the camera on which we operate.
-  CS_PLUGIN_NAMESPACE_NAME(Engine)::csCameraBase* GetCsCamera () const
+  csCameraBase* GetCsCamera () const
   {
     return cameraobject;
   }
@@ -325,5 +323,8 @@ public:
     obj.Identity ();
   }
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 #endif // __CS_MOVABLE_H__
