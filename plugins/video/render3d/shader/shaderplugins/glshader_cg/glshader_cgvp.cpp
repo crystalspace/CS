@@ -106,6 +106,7 @@ bool csShaderGLCGVP::Precache (const ProfileLimitsPair& limits,
   else
   {
     ret = true;
+    unusedParams = programObj.GetUnusedParams();
     WriteToCache (cache, limits.fp, limits, csString("CG") + tag,
       programObj);
   }

@@ -930,6 +930,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     }
     programProfile = limits.profile;
     programPositionInvariant = programObj.GetFlags() & ProgramObject::flagPositionInvariant;
+    unusedParams = programObj.GetUnusedParams();
     
     ClipsToVmap();
     GetParamsFromVmap();
