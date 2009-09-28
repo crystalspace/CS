@@ -165,15 +165,6 @@ protected:
    */
   CS::Graphics::RenderPriority render_priority;
 
-  /// For NR: Cached value from DrawTest
-  bool draw_test;
-  /// For NR: Cached light test
-  bool in_light;
-  /// For NR: Should we draw anything in drawshadow at all?
-  bool cast_hardware_shadow;
-  /// For NR: should we draw last
-  bool draw_after_fancy_stuff;
-
   // Used to store extra rendermeshes that something might attach to this
   // mesh (ie, for decals)
   csDirtyAccessArray<csRenderMesh*> extraRenderMeshes;
@@ -263,6 +254,8 @@ private:
   csFrameDataHolder<RenderMeshesSet> instancingRMs;
   
   bool DoInstancing() const { return transformVars.IsValid(); }
+  /* Given a box in object space return a box that contains all boxes
+     transformed by instance transforms. */
   csBox3 AdjustBboxForInstances (const csBox3& origBox) const;
   csRenderMesh** FixupRendermeshesForInstancing (int n, csRenderMesh** meshes);
 public:
@@ -408,8 +401,6 @@ public:
   {
     return draw_cb_vector.Get (idx);
   }
-
-  virtual void SetLightingUpdate (int flags, int num_lights){}
 
   /**
    * Draw this mesh object given a camera transformation.

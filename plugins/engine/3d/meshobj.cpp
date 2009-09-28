@@ -72,8 +72,6 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   factory = 0;
   zbufMode = CS_ZBUF_USE;
   using_imposter = false;
-  cast_hardware_shadow = true;
-  draw_after_fancy_stuff = false;
 
   do_minmax_range = false;
   min_render_dist = -1000000000.0f;
@@ -187,6 +185,12 @@ csMeshWrapper::RenderMeshesSet::~RenderMeshesSet ()
 void csMeshWrapper::RenderMeshesSet::CopyOriginalMeshes (int n,
   csRenderMesh** origMeshes)
 {
+  /* This _deliberately_ does not do proper C++ construction/destruction/
+     copying.
+     csRenderMesh contains a number of csRef<>s and such, but we're really
+     only interested in the bbox members, and neither care about nor want to
+     pay for the others. Also, the meshes only have to be valid for one
+     frame - and if the original meshes are the simple copies are, too. */
   if (n != this->n)
   {
     meshes = (csRenderMesh*)cs_realloc (meshes, n * sizeof (csRenderMesh));
@@ -219,6 +223,7 @@ csBox3 csMeshWrapper::AdjustBboxForInstances (const csBox3& origBox) const
 csRenderMesh** csMeshWrapper::FixupRendermeshesForInstancing (int n,
   csRenderMesh** meshes)
 {
+  // Check old bboxes and recompute if necessary
   instancingBoxes.SetSize (n);
   for (int i = 0; i < n; i++)
   {
@@ -230,10 +235,12 @@ csRenderMesh** csMeshWrapper::FixupRendermeshesForInstancing (int n,
     }
   }
   
+  // Get a new set of rendermeshes valid for this frame...
   bool created;
   RenderMeshesSet& meshesSet = instancingRMs.GetUnusedData (created,
     engine->csEngine::GetCurrentFrameNumber());
   meshesSet.CopyOriginalMeshes (n, meshes);
+  // ... and change the bounding boxes
   for (int i = 0; i < n; i++)
   {
     meshesSet.meshes[i].bbox = instancingBoxes[i].newBox;
