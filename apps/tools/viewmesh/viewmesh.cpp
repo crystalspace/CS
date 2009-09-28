@@ -871,6 +871,10 @@ bool ViewMesh::CreateGui()
   btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
       CEGUI::Event::Subscriber(&ViewMesh::SelSubmesh, this));
 
+  btn = winMgr->getWindow("Tab5/MatList");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::SelMaterial, this));
+
   btn = winMgr->getWindow("Tab5/AttachSMButton");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&ViewMesh::AttachSMButton, this));
@@ -878,6 +882,10 @@ bool ViewMesh::CreateGui()
   btn = winMgr->getWindow("Tab5/DetachSMButton");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&ViewMesh::DetachSMButton, this));
+
+  btn = winMgr->getWindow("Tab5/SelectMatButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::SelectMatButton, this));
 
 
   // ----[ STDDLG ]----------------------------------------------------------
@@ -965,6 +973,7 @@ void ViewMesh::LoadSprite (const char* filename)
     selectedAnimation = 0;
     selectedMorphTarget = 0;
     selectedSubMesh = 0;
+    selectedMaterial = 0;
     meshTx = meshTy = meshTz = 0;
   }
 
@@ -1354,6 +1363,23 @@ void ViewMesh::UpdateSubMeshList ()
                 list->addItem(item);
             }
         }
+    }
+
+    // Update materials available to apply to submeshes.
+    list = (CEGUI::Listbox*)winMgr->getWindow("Tab5/MatList");
+    list->resetList();
+
+    for(size_t i=0; i<engine->GetMaterialList()->GetCount(); ++i)
+    {
+      const char* name = engine->GetMaterialList()->Get(i)->QueryObject()->GetName();
+      if(name)
+      {
+        CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(name);
+        item->setTextColours(CEGUI::colour(0,0,0));
+        item->setSelectionBrushImage("ice", "TextSelectionBrush");
+        item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+        list->addItem(item);
+      }
     }
 }
 
@@ -2303,6 +2329,20 @@ bool ViewMesh::SelSubmesh (const CEGUI::EventArgs& e)
     return true;
 }
 
+bool ViewMesh::SelMaterial (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab5/MatList");
+
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  const CEGUI::String& text = item->getText();
+  if (text.empty()) return false;
+
+  selectedMaterial = text.c_str();
+  return true;
+}
+
 bool ViewMesh::AttachSMButton (const CEGUI::EventArgs& e)
 {
     if(!selectedSubMesh)
@@ -2347,6 +2387,33 @@ bool ViewMesh::DetachSMButton (const CEGUI::EventArgs& e)
     }
 
     return false;
+}
+
+bool ViewMesh::SelectMatButton (const CEGUI::EventArgs& e)
+{
+  if(selectedSubMesh && selectedMaterial)
+  {
+    iMaterialWrapper* mat = engine->GetMaterialList()->FindByName(selectedMaterial);
+    if(mat)
+    {
+      if(animeshsprite && animeshstate)
+      {
+        size_t idx = animeshsprite->FindSubMesh(selectedSubMesh);
+        if(idx != (size_t)-1)
+        {
+          animeshstate->GetSubMesh(idx)->SetMaterial(mat);
+          return true;
+        }
+      }
+      else if(cal3dsprite && cal3dstate)
+      {
+        cal3dstate->SetMaterial(selectedSubMesh, mat);
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 //---------------------------------------------------------------------------

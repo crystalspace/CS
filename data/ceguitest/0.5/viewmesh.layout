@@ -6,12 +6,12 @@
  
         <Window Type="ice/FrameWindow" Name="Form" >
             <Property Name="Text" Value="ViewMesh" />
-            <Property Name='UnifiedSize' Value='{{0.0,190.0},{0.0,350.0}}'/>
+            <Property Name='UnifiedSize' Value='{{0.0,190.0},{0.0,430.0}}'/>
 	    <Property Name='UnifiedPosition' Value='{{0.01,0.0},{0.01,0.0}}'/>
             <Property Name="CloseButtonEnabled" Value="False" />
             <Property Name='SizingEnabled' Value='True'/>
              <Window Type="ice/TabControl" Name="Root/Control/Tabs" >
-             	<Property Name='UnifiedSize' Value='{{0.000000,190.000000},{0.000000,318.000000}}'/>
+             	<Property Name='UnifiedSize' Value='{{0.000000,190.000000},{0.000000,418.000000}}'/>
 	     	<Property Name='UnifiedPosition' Value='{{0.000000,5.000000},{0.000000,30.000000}}'/>
 	     	<Property Name='TabHeight' Value='{0.05,0}'/>
 		<Property Name='TabTextPadding' Value='{0.02,0}'/>
@@ -352,7 +352,19 @@
 		       		<Property Name="Text" Value="Detach" />
 		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
 		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,160.0}}'/>
-                       </Window>  
+                       </Window>
+
+	     	        <Window Type="ice/Listbox" Name="Tab5/MatList" >
+				<Property Name="Text" Value="SetMaterial" />
+				<Property Name='UnifiedSize' Value='{{0.0,144.0},{0.0,150.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,190.0}}'/>
+                       </Window>
+ 
+	     	        <Window Type="ice/Button" Name="Tab5/SelectMatButton" >
+				<Property Name="Text" Value="Set Material" />
+			        <Property Name='UnifiedSize' Value='{{0.0,100.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,345.0}}'/>
+                       </Window>
  
  
  

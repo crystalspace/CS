@@ -110,6 +110,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   const char* selectedAnimation;
   const char* selectedMorphTarget;
   const char* selectedSubMesh;
+  const char* selectedMaterial;
   float meshTx, meshTy, meshTz;
 
   vmAnimCallback* callback;
@@ -190,8 +191,10 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool ReloadButton (const CEGUI::EventArgs& e);
   //SUBMESH
   bool SelSubmesh (const CEGUI::EventArgs& e);
+  bool SelMaterial (const CEGUI::EventArgs& e);
   bool AttachSMButton (const CEGUI::EventArgs& e);
   bool DetachSMButton (const CEGUI::EventArgs& e);
+  bool SelectMatButton (const CEGUI::EventArgs& e);
 
  public:
 
