@@ -21,6 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __GLSHADER_CGCOMMON_H__
 
 #include "cg_common.h"
+#include "progcache.h"
 
 #include "csplugincommon/opengl/shaderplugin.h"
 #include "csplugincommon/shader/shaderplugin.h"
@@ -79,8 +80,6 @@ protected:
   bool programPositionInvariant;
   csString entrypoint;
   csRefArray<iDocumentNode> cacheKeepNodes;
-  csString objectCode;
-  csString objectCodeCachePathArc, objectCodeCachePathItem;
 
   enum ProgramType
   {
@@ -179,21 +178,14 @@ protected:
   void ApplyVariableMapArrays (const csShaderVariableStack& stack);
   
   bool WriteToCacheWorker (iHierarchicalCache* cache, const ProfileLimits& limits,
-    const ProfileLimitsPair& limitsPair, const char* tag, csString& failReason);
+    const ProfileLimitsPair& limitsPair, const char* tag, 
+    const ProgramObject& program, csString& failReason);
+  bool WriteToCache (iHierarchicalCache* cache, const ProfileLimits& limits,
+    const ProfileLimitsPair& limitsPair, const char* tag,
+    const ProgramObject& program);
   bool WriteToCache (iHierarchicalCache* cache, const ProfileLimits& limits,
     const ProfileLimitsPair& limitsPair, const char* tag);
   
-  /* Try to find compiled object code in program cache for the given Cg
-     source code */
-  bool TryLoadFromCompileCache (const char* source, const ProfileLimits& limits,
-    iHierarchicalCache* cache);
-  // Load object code from program cache using objectCodeCachePath{Arc,Item}
-  bool LoadObjectCodeFromCompileCache (const ProfileLimits& limits,
-    iHierarchicalCache* cache);
-  // Write the object code to the program cache
-  bool WriteToCompileCache (const char* source, const ProfileLimits& limits,
-    iHierarchicalCache* cache, csString& failReason);
-    
   bool GetProgramNode (iDocumentNode* passProgNode);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
