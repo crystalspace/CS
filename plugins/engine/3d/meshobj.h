@@ -231,29 +231,40 @@ private:
   iCamera* last_camera;
   uint last_frame_number;
 
-  // Shadervars for instancing.
-  csRef<csShaderVariable> fadeFactors;
-  csRef<csShaderVariable> transformVars;
-  bool instancingTransformsDirty;
-  struct InstancingBbox
+  // Data used when instancing is used on this mesh
+  struct InstancingData
   {
-    csBox3 oldBox;
-    csBox3 newBox;
-  };
-  csArray<InstancingBbox> instancingBoxes;
-  struct RenderMeshesSet : public CS::NonCopyable
-  {
-    int n;
-    csRenderMesh** meshArray;
-    csRenderMesh* meshes;
+    // Shadervars for instancing.
+    csRef<csShaderVariable> fadeFactors;
+    csRef<csShaderVariable> transformVars;
+    bool instancingTransformsDirty;
+    struct InstancingBbox
+    {
+      csBox3 oldBox;
+      csBox3 newBox;
+    };
+    csArray<InstancingBbox> instancingBoxes;
+    struct RenderMeshesSet : public CS::NonCopyable
+    {
+      int n;
+      csRenderMesh** meshArray;
+      csRenderMesh* meshes;
+      
+      RenderMeshesSet ();
+      ~RenderMeshesSet ();
+      void CopyOriginalMeshes (int n, csRenderMesh** meshes);
+    };
+    csFrameDataHolder<RenderMeshesSet> instancingRMs;
     
-    RenderMeshesSet ();
-    ~RenderMeshesSet ();
-    void CopyOriginalMeshes (int n, csRenderMesh** meshes);
+    InstancingData() : instancingTransformsDirty (false) {}
   };
-  csFrameDataHolder<RenderMeshesSet> instancingRMs;
+  typedef csBlockAllocator<InstancingData> InstancingAlloc;
+  CS_DECLARE_STATIC_CLASSVAR_REF(instancingAlloc, GetInstancingAlloc,
+    InstancingAlloc)
+  InstancingData* instancing;
+  InstancingData* GetInstancingData();
   
-  bool DoInstancing() const { return transformVars.IsValid(); }
+  bool DoInstancing() const { return instancing != 0; }
   /* Given a box in object space return a box that contains all boxes
      transformed by instance transforms. */
   csBox3 AdjustBboxForInstances (const csBox3& origBox) const;
