@@ -6408,6 +6408,72 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iGraphics2D_GetHWRenderer(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics2D *arg1 = (iGraphics2D *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics2D_GetHWRenderer",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics2D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics2D_GetHWRenderer" "', argument " "1"" of type '" "iGraphics2D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics2D * >(argp1);
+  result = (char *)(arg1)->GetHWRenderer();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics2D_GetHWGLVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics2D *arg1 = (iGraphics2D *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics2D_GetHWGLVersion",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics2D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics2D_GetHWGLVersion" "', argument " "1"" of type '" "iGraphics2D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics2D * >(argp1);
+  result = (char *)(arg1)->GetHWGLVersion();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics2D_GetHWVendor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics2D *arg1 = (iGraphics2D *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics2D_GetHWVendor",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics2D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics2D_GetHWVendor" "', argument " "1"" of type '" "iGraphics2D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics2D * >(argp1);
+  result = (char *)(arg1)->GetHWVendor();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iGraphics2D_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -23685,6 +23751,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGraphics2D_SetViewport", _wrap_iGraphics2D_SetViewport, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D_GetViewport", _wrap_iGraphics2D_GetViewport, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D_GetFramebufferDimensions", _wrap_iGraphics2D_GetFramebufferDimensions, METH_VARARGS, NULL},
+	 { (char *)"iGraphics2D_GetHWRenderer", _wrap_iGraphics2D_GetHWRenderer, METH_VARARGS, NULL},
+	 { (char *)"iGraphics2D_GetHWGLVersion", _wrap_iGraphics2D_GetHWGLVersion, METH_VARARGS, NULL},
+	 { (char *)"iGraphics2D_GetHWVendor", _wrap_iGraphics2D_GetHWVendor, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D_scfGetVersion", _wrap_iGraphics2D_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iGraphics2D", _wrap_delete_iGraphics2D, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D__PerformExtension", _wrap_iGraphics2D__PerformExtension, METH_VARARGS, NULL},

@@ -35,12 +35,17 @@
 class csVector3;
 class csMatrix3;
 class csMovable;
-class csMeshWrapper;
 class csMeshFactoryWrapper;
 class csImposterMesh;
 class csEngine;
 struct iGraphics3D;
 struct iRenderView;
+
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+  class csMeshWrapper;
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 /**
  * Class representing the mesh/imposter relation.

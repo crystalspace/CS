@@ -150,26 +150,6 @@ class csReversibleTransform;
 
 /** @} */
 
-/** \name SetLightingUpdate flags
- * @{ */
-
-/**
- * This is a flag for iMeshWrapper->SetLightingUpdate(). If this
- * flag is set then only the 'N' most relevant lights will be returned
- * to the object. If not set then 'N' random lights will be returned.
- */
-#define CS_LIGHTINGUPDATE_SORTRELEVANCE 1
-
-/**
- * If this flag for iMeshWrapper->SetLightingUpdate() is set then
- * the set of relevant lights will be recalculated every time.
- * Otherwise the lights are only recalculated when the object moves or
- * when one of the affected lights changes (default).
- */
-#define CS_LIGHTINGUPDATE_ALWAYSUPDATE 2
-
-/** @} */
-
 /**
  * Set a callback which is called just before the object is drawn.
  * This is useful to do some expensive computations which only need
@@ -279,7 +259,7 @@ struct csScreenBoxResult
  */
 struct iMeshWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshWrapper, 2, 4, 0);
+  SCF_INTERFACE(iMeshWrapper, 3, 0, 0);
 
   /**
    * Get the iObject for this mesh object. This can be used to get the
@@ -302,21 +282,6 @@ struct iMeshWrapper : public virtual iBase
   virtual iMeshFactoryWrapper *GetFactory () const = 0;
   /// Set the parent factory (this only sets a pointer).
   virtual void SetFactory (iMeshFactoryWrapper* factory) = 0;
-
-  /**
-   * Control how lighting updates should take place.
-   * 'num_lights' is the number of lights that will be given to the
-   * mesh object at maximum (default is 8). 'flags' can be a combination
-   * of one of the following:
-   * - #CS_LIGHTINGUPDATE_SORTRELEVANCE (default on).
-   * - #CS_LIGHTINGUPDATE_ALWAYSUPDATE (default off).
-   *
-   * Note that this function has no effect on thing
-   * mesh objects as they use another lighting system (lightmaps).
-   * Also some genmesh objects can optionally also use the other lighting
-   * system in which nothing will happen either.
-   */
-  virtual void SetLightingUpdate (int flags, int num_lights) = 0;
 
   /**
    * Get the movable instance for this object.

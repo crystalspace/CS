@@ -743,6 +743,7 @@ bool csGLShader_CG::Initialize(iObjectRegistry* reg)
       csRef<iHierarchicalCache> progCache =
         shaderCache->GetRootedCache ("/CgProgCache");
       stringStore = new StringStore (progCache);
+      this->progCache.SetCache (progCache);
     }
   }
   

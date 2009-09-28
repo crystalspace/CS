@@ -70,13 +70,13 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
   class csLight;
+  class csMeshWrapper;
 }
 CS_PLUGIN_NAMESPACE_END(Engine)
 
 class csEngine;
 class csLightPatchPool;
 class csMaterialList;
-class csMeshWrapper;
 class csPolygon3D;
 class csSector;
 class csSectorList;
@@ -180,7 +180,7 @@ private:
 /**
  * A list of meshes for the engine.
  */
-class csEngineMeshList : public csMeshList
+class csEngineMeshList : public CS_PLUGIN_NAMESPACE_NAME(Engine)::csMeshList
 {
 public:
   csEngineMeshList () : csMeshList (256, 256) { }
