@@ -25,6 +25,9 @@
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/camera.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+
 //---------------------------------------------------------------------------
 csMovableSectorList::csMovableSectorList ()
   : scfImplementationType (this)
@@ -192,3 +195,5 @@ iSceneNode* csMovable::GetSceneNode ()
   return 0;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(Engine)

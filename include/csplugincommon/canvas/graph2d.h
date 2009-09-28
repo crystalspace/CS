@@ -280,6 +280,13 @@ public:
   
   void GetFramebufferDimensions (int& width, int& height)
   { width = fbWidth; height = fbHeight; }
+  
+  const char* GetHWRenderer ()
+  { return 0; }
+  const char* GetHWGLVersion ()
+  { return 0; }
+  const char* GetHWVendor ()
+  { return 0; }
 
   CS_EVENTHANDLER_NAMES("crystalspace.graphics2d.common")
   CS_EVENTHANDLER_NIL_CONSTRAINTS

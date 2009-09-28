@@ -48,7 +48,7 @@ csLight::csLight (csEngine* engine,
     userSpecular (false), halo (0), dynamicType (dyntype), 
     cutoffDistance (d), directionalCutoffRadius (d), 
     userDirectionalCutoffRadius (false),
-    lightnr (0), engine (engine)
+    lightnr (0), removingLight (false), engine (engine)
 {
   //movable.scfParent = (iBase*)(csObject*)this; //@@MS: Look at this?
   movable.SetLight (this);
@@ -240,6 +240,18 @@ void csLight::CalculateAttenuationVector ()
     attenuationConstants);
 }
 
+void csLight::SetParent (iSceneNode* parent)
+{
+    if(!parent && GetParent())
+    {
+      for (size_t i = 0; i < sectors.GetSize (); ++i)
+        sectors[i]->GetLights ()->Remove (this);     
+      sectors.Empty();
+    }
+
+    csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
+}
+
 void csLight::OnSetPosition ()
 {
   // Update the AABB
@@ -253,9 +265,29 @@ void csLight::OnSetPosition ()
       for (int i = 0; i < list->GetCount (); ++i)
       {
         csSector* sect = static_cast<csSector*> (list->Get (i));
+        if(GetParent() && sectors.Find(sect) == csArrayItemNotFound)
+        {
+            sectors.Push (sect);
+            sect->GetLights ()->Add (this);
+        }
+
         sect->UpdateLightBounds (this, oldBox);
-      }      
-    }    
+      }
+
+      if(!removingLight && GetParent())
+      {
+        for(size_t i = 0; i < sectors.GetSize (); ++i)
+        {
+          if(list->Find(sectors[i]) == csArrayItemNotFound)
+          {
+            removingLight = true;
+            sectors[i]->GetLights ()->Remove (this);
+            sectors.DeleteIndex (i--);
+            removingLight = false;
+          }
+        }
+      }
+    }
   }
 
   csVector3 pos = GetFullCenter ();

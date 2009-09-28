@@ -113,7 +113,7 @@ csCommonImageFile::~csCommonImageFile()
 {
 #ifdef THREADED_LOADING
   if (loadJob.IsValid())
-    jobQueue->Unqueue (loadJob);
+    jobQueue->Dequeue (loadJob);
 #endif
 }
 

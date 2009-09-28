@@ -300,7 +300,7 @@ namespace CS
 	buf.AttachNew (new csParasiticDataBuffer (allFileData,
 	  file->GetPos(), bufSize));
 	if (buf->GetSize() != bufSize) return 0;
-	size_t pad = 4 - (bufSize & 3);
+	uint32 pad = 4 - (bufSize & 3);
 	if (pad < 4) bufSize += pad;
 	file->SetPos (file->GetPos() + bufSize);
 	return csPtr<iDataBuffer> (buf);

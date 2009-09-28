@@ -90,6 +90,44 @@ public:
   }
 
   /**
+   * Return and remove the last element
+   */
+  T PopBottom ()
+  {
+    CS_ASSERT ((a1.GetSize () > 0) || (a2.GetSize () > 0));
+
+    if(a1.GetSize () > 0)
+    {
+      return a1.Pop ();
+    }
+    else
+    {
+      T tmp = a2[0];
+      a2.DeleteIndex (0);
+      return tmp;
+    }
+  }
+
+  /**
+   * Return the last element
+   */
+  T& Bottom ()
+  {
+
+    CS_ASSERT ((a1.GetSize () > 0) || (a2.GetSize () > 0));
+
+    if(a1.GetSize () > 0)
+    {
+      return a1.Top ();
+    }
+    else
+    {
+      T tmp = a2[0];
+      return tmp;
+    }
+  }
+
+  /**
    * Push an element onto the FIFO.
    */
   void Push (T const& what)

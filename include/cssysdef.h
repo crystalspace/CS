@@ -943,7 +943,21 @@ namespace CS
 
 // gcc can perform usefull checking for printf/scanf format strings, just add
 // this define at the end of the function declaration
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
+/* Newer GCCs know different 'archetypes' of format string styles.
+ * CS format strings are on the level of the GNU C library, so use that
+ * archetype. */
+#  define CS_GNUC_PRINTF(format_idx, arg_idx) \
+     __attribute__((format (gnu_printf, format_idx, arg_idx)))
+#  define CS_GNUC_SCANF(format_idx, arg_idx) \
+     __attribute__((format (gnu_scanf, format_idx, arg_idx)))
+// Unfortunately, gcc doesn't support format argument checking for wide strings
+#  define CS_GNUC_WPRINTF(format_idx, arg_idx) \
+     /*__attribute__((format (__wprintf__, format_idx, arg_idx)))*/
+#  define CS_GNUC_WSCANF(format_idx, arg_idx) \
+     /*__attribute__((format (__wscanf__, format_idx, arg_idx)))*/
+#elif __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+// Use default archetype for older versions.
 #  define CS_GNUC_PRINTF(format_idx, arg_idx) \
      __attribute__((format (__printf__, format_idx, arg_idx)))
 #  define CS_GNUC_SCANF(format_idx, arg_idx) \

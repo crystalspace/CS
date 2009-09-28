@@ -45,12 +45,12 @@ AC_DEFUN([CS_CHECK_JAVA],
 	[JAVA=CS_PATH_NORMALIZE([$JAVACMD])])
     CS_PATH_PROGS([JAVA], [java], [],
 	[$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
-    CS_EMIT_BUILD_PROPERTY([JAVA], [$JAVA])
+    CS_EMIT_BUILD_PROPERTY([JAVA], [$JAVA], [], [], CS_EMITTER_OPTIONAL([$1]))
     AC_SUBST([JAVA])
 
     CS_PATH_PROGS([JAVAC], [javac], [],
 	[$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
-    CS_EMIT_BUILD_PROPERTY([JAVAC], [$JAVAC])
+    CS_EMIT_BUILD_PROPERTY([JAVAC], [$JAVAC], [], [], CS_EMITTER_OPTIONAL([$1]))
     AC_SUBST([JAVAC])
 
     AC_ARG_WITH([java], [AC_HELP_STRING([--with-java],
@@ -78,10 +78,11 @@ AC_DEFUN([CS_CHECK_JAVA],
 	        [$cs_java_cflags],
 		[$cs_java_lflags],
 		[$cs_java_libs])],
-	    [], [CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
+	    [], [CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA],
+	        CS_EMITTER_OPTIONAL([$1]))])])
 
     CS_PATH_PROGS([ANT], [ant], [], [$PATH$PATH_SEPARATOR$ANT_HOME/bin])
-    CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
+    CS_EMIT_BUILD_PROPERTY([ANT], [$ANT], [], [], CS_EMITTER_OPTIONAL([$1]))
     AC_SUBST([ANT])
     ])
 

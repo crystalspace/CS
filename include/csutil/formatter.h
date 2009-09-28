@@ -960,14 +960,14 @@ class csPrintfFormatter
      * You need log10(256^sizeof(x)) characters, becoming
      * sizeof(x)*log10(256). 25/10 is an (over-)approximation of log10(256).
      * Add 1 for sign.) */
-    CS_ALLOC_STACK_ARRAY(char, precStr, 
-      (sizeof(currentFormat.precision) * 25) / 10 + 2);
+    size_t precStrLen = (sizeof(currentFormat.precision) * 25) / 10 + 2;
+    CS_ALLOC_STACK_ARRAY(char, precStr, precStrLen);
     if (currentFormat.precision >= 0)
       sprintf (precStr, ".%d", currentFormat.precision);
     else
       precStr[0] = 0;
-    CS_ALLOC_STACK_ARRAY(char, formatStr, 1 + strlen (flags)
-      + (sizeof(currentFormat.width) * 25) / 10 + 1 + strlen (precStr) + 2);
+    CS_ALLOC_STACK_ARRAY(char, formatStr, 1 + sizeof(flags)
+      + (sizeof(currentFormat.width) * 25) / 10 + 1 + precStrLen + 2);
     sprintf (formatStr, "%%%s%d%s%s", flags, currentFormat.width, precStr,
       type);
     // Make sure *any* number thrown at us fits

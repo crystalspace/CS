@@ -50,7 +50,7 @@ public:
     {
       {
         CS::Threading::MutexScopedLock lock(waitingThreadsLock);
-        threadQueue->Enqueue(job, queueType == THREADEDL);
+        threadQueue->Enqueue(job);
       }
 
       for(size_t i=0; i<waitingThreads.GetSize(); ++i)

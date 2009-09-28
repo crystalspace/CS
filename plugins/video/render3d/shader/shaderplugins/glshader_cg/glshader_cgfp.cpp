@@ -183,6 +183,7 @@ bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
 {
   PrecacheClear();
 
+  ProgramObject programObj;
   bool needBuild = true;
   csString sourcePreproc;
   {
@@ -193,23 +194,29 @@ bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
     programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
     
     // Get preprocessed result of pristine source
-    sourcePreproc = GetPreprocessedProgram (programStr);
+    sourcePreproc = GetAugmentedProgram (programStr);
     if (!sourcePreproc.IsEmpty ())
     {
       // Check preprocessed source against cache
-      if (TryLoadFromCompileCache (sourcePreproc, limits.fp, cache))
+      //if (TryLoadFromCompileCache (sourcePreproc, limits.fp, cache))
+      if (shaderPlug->progCache.SearchObject (sourcePreproc, limits.fp, programObj))
         needBuild = false;
     }
   }
   
   bool ret;
   if (needBuild)
+  {
     ret = TryCompile (loadApplyVmap, limits);
+    WriteToCache (cache, limits.fp, limits, csString("CG") + tag);
+  }
   else
+  {
     ret = true;
+    WriteToCache (cache, limits.fp, limits, csString("CG") + tag,
+      programObj);
+  }
 
-  WriteToCache (cache, limits.fp, limits, csString("CG") + tag);
-  
   return ret;
 }
 

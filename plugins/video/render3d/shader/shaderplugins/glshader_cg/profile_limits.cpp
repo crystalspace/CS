@@ -85,10 +85,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   }
   
   uint ProfileLimits::glGetProgramInteger (csGLExtensionManager* ext,
-								 GLenum target, GLenum what)
+					   GLenum target, GLenum what)
   {
-    GLint v;
+    GLint v = 0;
     ext->glGetProgramivARB (target, what, &v);
+    /* If we happen to get a 0, try the non-native variant of a limit
+     * (on some Intel HW native limits are all 0, but non-native ones are
+     * useable) */
+    if (v == 0)
+    {
+      switch (what)
+      {
+      case GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB:
+	ext->glGetProgramivARB (target, GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB, &v);
+	break;
+      case GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB:
+	ext->glGetProgramivARB (target, GL_MAX_PROGRAM_ATTRIBS_ARB, &v);
+	break;
+      case GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB:
+	ext->glGetProgramivARB (target, GL_MAX_PROGRAM_INSTRUCTIONS_ARB, &v);
+	break;
+      case GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB:
+	ext->glGetProgramivARB (target, GL_MAX_PROGRAM_PARAMETERS_ARB, &v);
+	break;
+      case GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB:
+	ext->glGetProgramivARB (target, GL_MAX_PROGRAM_TEMPORARIES_ARB, &v);
+	break;
+      }
+    }
     return v;
   }
   

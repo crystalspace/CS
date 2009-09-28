@@ -7,6 +7,7 @@ SubInclude TOP apps tests csbench ;
 SubInclude TOP apps tests eventtest ;
 SubInclude TOP apps tests g2dtest ;
 SubInclude TOP apps tests imptest ;
+SubInclude TOP apps tests jobtest ;
 SubInclude TOP apps tests joytest ;
 SubInclude TOP apps tests lghtngtest ;
 SubInclude TOP apps tests perl5tst ;
