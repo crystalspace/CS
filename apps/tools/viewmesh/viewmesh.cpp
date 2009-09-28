@@ -1371,7 +1371,11 @@ void ViewMesh::UpdateSubMeshList ()
 
     for(size_t i=0; i<engine->GetMaterialList()->GetCount(); ++i)
     {
-      const char* name = engine->GetMaterialList()->Get(i)->QueryObject()->GetName();
+      iMaterialWrapper* mat = engine->GetMaterialList()->Get(i);
+      if(!collection->IsParentOf(mat->QueryObject()))
+        continue;
+
+      const char* name = mat->QueryObject()->GetName();
       if(name)
       {
         CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(name);
