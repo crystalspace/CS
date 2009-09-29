@@ -25,11 +25,13 @@
 
 using namespace CS::Threading;
 
-ThreadID csThreadManager::tid = Thread::GetThreadID();
+ThreadID csThreadManager::tid;
 
 csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this), 
   waiting(0), alwaysRunNow(false), objectReg(objReg), exiting(false)
 {
+  tid = Thread::GetThreadID();
+
   threadCount = CS::Platform::GetProcessorCount();
 
   // If we can't detect, assume we have one.
