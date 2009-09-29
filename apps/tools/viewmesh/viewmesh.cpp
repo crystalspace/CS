@@ -418,9 +418,14 @@ void ViewMesh::HandleCommandLine()
     vfs->Mount ("/tmp/viewmesh", realPath);
     vfs->ChDir ("/tmp/viewmesh");
   }
+
   if (vfsDir)
   {
     vfs->ChDir (vfsDir);
+  }
+  else if(meshfilename)
+  {
+    vfs->ChDir(csString(meshfilename).Slice(0, csString(meshfilename).FindLast('/')));
   }
 
   if (texturefilename && texturename)
