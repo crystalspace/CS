@@ -939,6 +939,13 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
 				     const CS::Graphics::RenderMeshModes& modes,
 				     const csShaderVariableStack* stack)
 {
+  EvaluatorShadervar eval (*this, modes, stack);
+  return EvaluateCached (eval, condition);
+}
+
+bool csConditionEvaluator::EvaluateCached (EvaluatorShadervar& eval,
+					   csConditionID condition)
+{
   /* Assert we don't evaluate without an EnterEvaluation()
      (otherwise, evaluation cache won't be cleared, causing problems down
      the road) */
@@ -964,7 +971,6 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
     return evalCache->condResult.IsBitSet (condition);
   }
 
-  EvaluatorShadervar eval (*this, modes, stack);
   bool result = Evaluate (eval, condition);
 
   evalCache->condChecked.Set (condition, true);
@@ -1002,7 +1008,7 @@ csConditionEvaluator::EvaluatorShadervar::Boolean (
   switch (operand.type)
   {
     case operandOperation:
-      return evaluator.Evaluate<EvaluatorShadervar> (*this, operand.operation);
+      return evaluator.EvaluateCached (*this, operand.operation);
     case operandBoolean:
       return operand.boolVal;
     case operandSV:
