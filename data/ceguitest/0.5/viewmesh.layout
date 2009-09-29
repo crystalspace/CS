@@ -383,11 +383,21 @@
 				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
                        </Window>
 
-	     	        <Window Type="ice/Listbox" Name="Tab6/SVList" >
+	     	        <Window Type="ice/MultiColumnList" Name="Tab6/SVList" >
 				<Property Name="Text" Value="SetSV" />
 				<Property Name='UnifiedSize' Value='{{0.0,220.0},{0.0,150.0}}'/>
 				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,160.0}}'/>
                        </Window>
+
+	     	        <Window Type="ice/Editbox" Name="Tab6/SVInput" >
+			        <Property Name='UnifiedSize' Value='{{0.0,165.0},{0.0,32.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,315.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Button" Name="Tab6/SetSV" >
+	     	                <Property Name="Text" Value="Set" />
+			        <Property Name='UnifiedSize' Value='{{0.0,50.0},{0.0,32.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,175.0},{0.0,315.0}}'/>
+                       </Window>  
  
                      </Window>
 	         </Window>
