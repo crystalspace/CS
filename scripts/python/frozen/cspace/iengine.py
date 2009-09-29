@@ -878,8 +878,6 @@ CS_ENTITY_NODECAL = _iengine.CS_ENTITY_NODECAL
 CS_ENTITY_STATICLIT = _iengine.CS_ENTITY_STATICLIT
 CS_ENTITY_NOSHADOWRECEIVE = _iengine.CS_ENTITY_NOSHADOWRECEIVE
 CS_ENTITY_LIMITEDSHADOWCAST = _iengine.CS_ENTITY_LIMITEDSHADOWCAST
-CS_LIGHTINGUPDATE_SORTRELEVANCE = _iengine.CS_LIGHTINGUPDATE_SORTRELEVANCE
-CS_LIGHTINGUPDATE_ALWAYSUPDATE = _iengine.CS_LIGHTINGUPDATE_ALWAYSUPDATE
 class iMeshDrawCallback(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
@@ -934,7 +932,6 @@ class iMeshWrapper(core.iBase):
     def GetPortalContainer(*args): return _iengine.iMeshWrapper_GetPortalContainer(*args)
     def GetFactory(*args): return _iengine.iMeshWrapper_GetFactory(*args)
     def SetFactory(*args): return _iengine.iMeshWrapper_SetFactory(*args)
-    def SetLightingUpdate(*args): return _iengine.iMeshWrapper_SetLightingUpdate(*args)
     def GetMovable(*args): return _iengine.iMeshWrapper_GetMovable(*args)
     def QuerySceneNode(*args): return _iengine.iMeshWrapper_QuerySceneNode(*args)
     def FindChildByName(*args): return _iengine.iMeshWrapper_FindChildByName(*args)

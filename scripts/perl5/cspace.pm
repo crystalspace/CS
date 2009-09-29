@@ -20305,7 +20305,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetPortalContainer = *cspacec::iMeshWrapper_GetPortalContainer;
 *GetFactory = *cspacec::iMeshWrapper_GetFactory;
 *SetFactory = *cspacec::iMeshWrapper_SetFactory;
-*SetLightingUpdate = *cspacec::iMeshWrapper_SetLightingUpdate;
 *GetMovable = *cspacec::iMeshWrapper_GetMovable;
 *QuerySceneNode = *cspacec::iMeshWrapper_QuerySceneNode;
 *FindChildByName = *cspacec::iMeshWrapper_FindChildByName;
@@ -23195,8 +23194,6 @@ sub CS_ENTITY_NODECAL () { $cspacec::CS_ENTITY_NODECAL }
 sub CS_ENTITY_STATICLIT () { $cspacec::CS_ENTITY_STATICLIT }
 sub CS_ENTITY_NOSHADOWRECEIVE () { $cspacec::CS_ENTITY_NOSHADOWRECEIVE }
 sub CS_ENTITY_LIMITEDSHADOWCAST () { $cspacec::CS_ENTITY_LIMITEDSHADOWCAST }
-sub CS_LIGHTINGUPDATE_SORTRELEVANCE () { $cspacec::CS_LIGHTINGUPDATE_SORTRELEVANCE }
-sub CS_LIGHTINGUPDATE_ALWAYSUPDATE () { $cspacec::CS_LIGHTINGUPDATE_ALWAYSUPDATE }
 sub CS_CULLER_HINT_GOODOCCLUDER () { $cspacec::CS_CULLER_HINT_GOODOCCLUDER }
 sub CS_CULLER_HINT_BADOCCLUDER () { $cspacec::CS_CULLER_HINT_BADOCCLUDER }
 sub CS_PORTAL_CLIPDEST () { $cspacec::CS_PORTAL_CLIPDEST }
