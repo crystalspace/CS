@@ -26018,45 +26018,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iMeshWrapper_SetLightingUpdate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iMeshWrapper *arg1 = (iMeshWrapper *) 0 ;
-  int arg2 ;
-  int arg3 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iMeshWrapper_SetLightingUpdate",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshWrapper_SetLightingUpdate" "', argument " "1"" of type '" "iMeshWrapper *""'"); 
-  }
-  arg1 = reinterpret_cast< iMeshWrapper * >(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMeshWrapper_SetLightingUpdate" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = static_cast< int >(val2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iMeshWrapper_SetLightingUpdate" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  (arg1)->SetLightingUpdate(arg2,arg3);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iMeshWrapper_GetMovable(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iMeshWrapper *arg1 = (iMeshWrapper *) 0 ;
@@ -37285,7 +37246,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iMeshWrapper_GetPortalContainer", _wrap_iMeshWrapper_GetPortalContainer, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_GetFactory", _wrap_iMeshWrapper_GetFactory, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_SetFactory", _wrap_iMeshWrapper_SetFactory, METH_VARARGS, NULL},
-	 { (char *)"iMeshWrapper_SetLightingUpdate", _wrap_iMeshWrapper_SetLightingUpdate, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_GetMovable", _wrap_iMeshWrapper_GetMovable, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_QuerySceneNode", _wrap_iMeshWrapper_QuerySceneNode, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_FindChildByName", _wrap_iMeshWrapper_FindChildByName, METH_VARARGS, NULL},
@@ -39595,8 +39555,6 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_ENTITY_STATICLIT",SWIG_From_int(static_cast< int >(512)));
   SWIG_Python_SetConstant(d, "CS_ENTITY_NOSHADOWRECEIVE",SWIG_From_int(static_cast< int >(1024)));
   SWIG_Python_SetConstant(d, "CS_ENTITY_LIMITEDSHADOWCAST",SWIG_From_int(static_cast< int >(2048)));
-  SWIG_Python_SetConstant(d, "CS_LIGHTINGUPDATE_SORTRELEVANCE",SWIG_From_int(static_cast< int >(1)));
-  SWIG_Python_SetConstant(d, "CS_LIGHTINGUPDATE_ALWAYSUPDATE",SWIG_From_int(static_cast< int >(2)));
   SWIG_Python_SetConstant(d, "CS_CULLER_HINT_GOODOCCLUDER",SWIG_From_int(static_cast< int >(4)));
   SWIG_Python_SetConstant(d, "CS_CULLER_HINT_BADOCCLUDER",SWIG_From_int(static_cast< int >(8)));
   SWIG_Python_SetConstant(d, "CS_PORTAL_CLIPDEST",SWIG_From_int(static_cast< int >(0x00000001)));

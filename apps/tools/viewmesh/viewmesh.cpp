@@ -418,9 +418,14 @@ void ViewMesh::HandleCommandLine()
     vfs->Mount ("/tmp/viewmesh", realPath);
     vfs->ChDir ("/tmp/viewmesh");
   }
+
   if (vfsDir)
   {
     vfs->ChDir (vfsDir);
+  }
+  else if(meshfilename)
+  {
+    vfs->ChDir(csString(meshfilename).Slice(0, csString(meshfilename).FindLast('/')));
   }
 
   if (texturefilename && texturename)
@@ -871,6 +876,10 @@ bool ViewMesh::CreateGui()
   btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
       CEGUI::Event::Subscriber(&ViewMesh::SelSubmesh, this));
 
+  btn = winMgr->getWindow("Tab5/MatList");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::SelMaterial, this));
+
   btn = winMgr->getWindow("Tab5/AttachSMButton");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&ViewMesh::AttachSMButton, this));
@@ -879,6 +888,24 @@ bool ViewMesh::CreateGui()
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&ViewMesh::DetachSMButton, this));
 
+  btn = winMgr->getWindow("Tab5/SelectMatButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::SelectMatButton, this));
+
+  // ----[ Material ]----------------------------------------------------------
+
+  btn = winMgr->getWindow("Tab6/MatList");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::UpdateMaterialSVs, this));
+
+  btn = winMgr->getWindow("Tab6/SetSV");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::SetSV, this));
+
+  CEGUI::MultiColumnList* multiColumnList = static_cast<CEGUI::MultiColumnList*>(winMgr->getWindow("Tab6/SVList"));
+  multiColumnList->addColumn("Name", 0, CEGUI::UDim(0.6f, 0));
+  multiColumnList->addColumn("Value", 1, CEGUI::UDim(0.7f, 0));
+  multiColumnList->setSelectionMode(CEGUI::MultiColumnList::RowSingle);
 
   // ----[ STDDLG ]----------------------------------------------------------
 
@@ -965,6 +992,7 @@ void ViewMesh::LoadSprite (const char* filename)
     selectedAnimation = 0;
     selectedMorphTarget = 0;
     selectedSubMesh = 0;
+    selectedMaterial = 0;
     meshTx = meshTy = meshTz = 0;
   }
 
@@ -1253,7 +1281,7 @@ void ViewMesh::UpdateSocketList ()
   }
   else if (animeshsprite)
   {
-    for (int i = 0; i < animeshsprite->GetSocketCount(); i++)
+    for (size_t i = 0; i < animeshsprite->GetSocketCount(); i++)
     {
       iAnimatedMeshSocketFactory* sock = animeshsprite->GetSocket(i);
       if (!sock) continue;
@@ -1342,7 +1370,7 @@ void ViewMesh::UpdateSubMeshList ()
     }
     else if(cal3dsprite)
     {
-        for(size_t i=0; i<cal3dsprite->GetMeshCount(); ++i)
+        for(int i=0; i<cal3dsprite->GetMeshCount(); ++i)
         {
             const char* name = cal3dsprite->GetMeshName(i);
             if(name)
@@ -1354,6 +1382,35 @@ void ViewMesh::UpdateSubMeshList ()
                 list->addItem(item);
             }
         }
+    }
+
+    // Update materials available to apply to submeshes.
+    list = (CEGUI::Listbox*)winMgr->getWindow("Tab5/MatList");
+    CEGUI::Listbox* list2 = (CEGUI::Listbox*)winMgr->getWindow("Tab6/MatList");
+    list->resetList();
+    list2->resetList();
+
+    for(int i=0; i<engine->GetMaterialList()->GetCount(); ++i)
+    {
+      iMaterialWrapper* mat = engine->GetMaterialList()->Get(i);
+      if(!collection->IsParentOf(mat->QueryObject()))
+        continue;
+
+      const char* name = mat->QueryObject()->GetName();
+      if(name)
+      {
+        CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(name);
+        item->setTextColours(CEGUI::colour(0,0,0));
+        item->setSelectionBrushImage("ice", "TextSelectionBrush");
+        item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+        list->addItem(item);
+
+        item = new CEGUI::ListboxTextItem(name);
+        item->setTextColours(CEGUI::colour(0,0,0));
+        item->setSelectionBrushImage("ice", "TextSelectionBrush");
+        item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+        list2->addItem(item);
+      }
     }
 }
 
@@ -1545,9 +1602,9 @@ void ViewMesh::MoveLights (const csVector3 &a, const csVector3 &b,
   if (ll->GetCount () < 3)
     ReportError("MoveLights () has less lights than expected!");
 
-  ll->Get (0)->SetCenter (a);
-  ll->Get (1)->SetCenter (b);
-  ll->Get (2)->SetCenter (c);
+  ll->Get (0)->GetMovable()->SetPosition (a);
+  ll->Get (1)->GetMovable()->SetPosition (b);
+  ll->Get (2)->GetMovable()->SetPosition (c);
 }
 
 //---------------------------------------------------------------------------
@@ -2303,6 +2360,20 @@ bool ViewMesh::SelSubmesh (const CEGUI::EventArgs& e)
     return true;
 }
 
+bool ViewMesh::SelMaterial (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab5/MatList");
+
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  const CEGUI::String& text = item->getText();
+  if (text.empty()) return false;
+
+  selectedMaterial = text.c_str();
+  return true;
+}
+
 bool ViewMesh::AttachSMButton (const CEGUI::EventArgs& e)
 {
     if(!selectedSubMesh)
@@ -2347,6 +2418,332 @@ bool ViewMesh::DetachSMButton (const CEGUI::EventArgs& e)
     }
 
     return false;
+}
+
+bool ViewMesh::SelectMatButton (const CEGUI::EventArgs& e)
+{
+  if(selectedSubMesh && selectedMaterial)
+  {
+    iMaterialWrapper* mat = engine->GetMaterialList()->FindByName(selectedMaterial);
+    if(mat)
+    {
+      if(animeshsprite && animeshstate)
+      {
+        size_t idx = animeshsprite->FindSubMesh(selectedSubMesh);
+        if(idx != (size_t)-1)
+        {
+          animeshstate->GetSubMesh(idx)->SetMaterial(mat);
+          return true;
+        }
+      }
+      else if(cal3dsprite && cal3dstate)
+      {
+        cal3dstate->SetMaterial(selectedSubMesh, mat);
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+//---------------------------------------------------------------------------
+
+bool ViewMesh::UpdateMaterialSVs (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab6/MatList");
+
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  const CEGUI::String& text = item->getText();
+  if (text.empty()) return false;
+
+  const char* matName = text.c_str();
+  iMaterialWrapper* mat = engine->GetMaterialList()->FindByName(matName);
+  if(mat)
+  {
+    CEGUI::MultiColumnList* multiColumnList = static_cast<CEGUI::MultiColumnList*>(winMgr->getWindow("Tab6/SVList"));
+    multiColumnList->resetList();
+    csRef<iShaderVarStringSet> svstrings = csQueryRegistryTagInterface<iShaderVarStringSet>(object_reg,
+      "crystalspace.shader.variablenameset");
+    
+    for(size_t i=0; i<mat->GetMaterial()->GetShaderVariables().GetSize(); ++i)
+    {
+      csShaderVariable* sv = mat->GetMaterial()->GetShaderVariables().Get(i);
+      switch(sv->GetType())
+      {
+      case csShaderVariable::TEXTURE:
+        {
+          multiColumnList->addRow();
+
+          CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(svstrings->Request(sv->GetName()), 100 + i);
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 0, i); // ColumnID, RowID
+
+          iTextureWrapper* tex;
+          sv->GetValue(tex);
+          item = new CEGUI::ListboxTextItem(tex->QueryObject()->GetName(), 101 + i);
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 1, i);
+          break;
+        }
+      case csShaderVariable::INT:
+        {
+          multiColumnList->addRow();
+
+          CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(svstrings->Request(sv->GetName()), 100 + i);
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 0, i); // ColumnID, RowID
+
+          int var;
+          sv->GetValue(var);
+          char* str = new char[11];
+          sprintf(str, "%d", var);
+          item = new CEGUI::ListboxTextItem(str, 101 + i);
+          delete[] str;
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 1, i);
+          break;
+        }
+      case csShaderVariable::FLOAT:
+        {
+          multiColumnList->addRow();
+
+          CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(svstrings->Request(sv->GetName()), 100 + i);
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 0, i); // ColumnID, RowID
+
+          float var;
+          sv->GetValue(var);
+          char* str = new char[5];
+          sprintf(str, "%.2f", var);
+          item = new CEGUI::ListboxTextItem(str, 101 + i);
+          delete[] str;
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 1, i);
+          break;
+        }
+      case csShaderVariable::VECTOR2:
+        {
+          multiColumnList->addRow();
+
+          CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(svstrings->Request(sv->GetName()), 100 + i);
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 0, i); // ColumnID, RowID
+
+          csVector2 vec;
+          sv->GetValue(vec);
+          char* str = new char[11];
+          sprintf(str, "%.2f, %.2f", vec.x, vec.y);
+          item = new CEGUI::ListboxTextItem(str, 101 + i);
+          delete[] str;
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 1, i);
+          break;
+          break;
+        }
+      case csShaderVariable::VECTOR3:
+        {
+          multiColumnList->addRow();
+
+          CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(svstrings->Request(sv->GetName()), 100 + i);
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 0, i); // ColumnID, RowID
+
+          csVector3 vec;
+          sv->GetValue(vec);
+          char* str = new char[17];
+          sprintf(str, "%.2f, %.2f, %.2f", vec.x, vec.y, vec.z);
+          item = new CEGUI::ListboxTextItem(str, 101 + i);
+          delete[] str;
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 1, i);
+          break;
+        }
+      case csShaderVariable::VECTOR4:
+        {
+          multiColumnList->addRow();
+
+          CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(svstrings->Request(sv->GetName()), 100 + i);
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 0, i); // ColumnID, RowID
+
+          csVector4 vec;
+          sv->GetValue(vec);
+          char* str = new char[23];
+          sprintf(str, "%.2f, %.2f, %.2f, %.2f", vec.x, vec.y, vec.z, vec.w);
+          item = new CEGUI::ListboxTextItem(str, 101 + i);
+          delete[] str;
+          item->setTextColours(CEGUI::colour(0,0,0));
+          item->setSelectionBrushImage("ice", "TextSelectionBrush");
+          item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+          multiColumnList->setItem(item, 1, i);
+          break;
+        }
+      default:
+        {
+          continue;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+bool ViewMesh::SetSV (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab6/MatList");
+
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if(!item) return false;
+  const CEGUI::String& text = item->getText();
+  if (text.empty()) return false;
+
+  const char* matName = text.c_str();
+  iMaterialWrapper* mat = engine->GetMaterialList()->FindByName(matName);
+  if(mat)
+  {
+    csRef<iShaderVarStringSet> svstrings = csQueryRegistryTagInterface<iShaderVarStringSet>(object_reg,
+      "crystalspace.shader.variablenameset");
+    CEGUI::MultiColumnList* svlist = (CEGUI::MultiColumnList*)winMgr->getWindow("Tab6/SVList");
+    item = svlist->getFirstSelectedItem();
+    if(!item) return false;
+    const CEGUI::String& svs = item->getText();
+    if (svs.empty()) return false;
+
+    const char* svname = svs.c_str();
+    for(size_t i=0; i<mat->GetMaterial()->GetShaderVariables().GetSize(); ++i)
+    {
+      csShaderVariable* sv = mat->GetMaterial()->GetShaderVariables().Get(i);
+      if(!strcmp(svname, svstrings->Request(sv->GetName())))
+      {
+        switch(sv->GetType())
+        {
+        case csShaderVariable::TEXTURE:
+          {
+            CEGUI::Window* svinput = winMgr->getWindow("Tab6/SVInput");
+            CEGUI::String name = svinput->getProperty("Text");
+            iTextureWrapper* tex = collection->FindTexture(name.c_str());
+            if(!tex)
+              return false;
+
+            sv->SetValue(tex);
+
+            svlist->getNextSelected(item)->setText(name.c_str());
+            svlist->setItemSelectState(item, false); // Force update.
+            svlist->setItemSelectState(item, true);
+            break;
+          }
+        case csShaderVariable::INT:
+          {
+            CEGUI::Window* svinput = winMgr->getWindow("Tab6/SVInput");
+            CEGUI::String name = svinput->getProperty("Text");
+
+            int var;
+            sscanf(name.c_str(), "%d", &var);
+            sv->SetValue(var);
+
+            svlist->getNextSelected(item)->setText(name.c_str());
+            svlist->setItemSelectState(item, false); // Force update.
+            svlist->setItemSelectState(item, true);
+            break;
+          }
+        case csShaderVariable::FLOAT:
+          {
+            CEGUI::Window* svinput = winMgr->getWindow("Tab6/SVInput");
+            CEGUI::String name = svinput->getProperty("Text");
+
+            float var;
+            sscanf(name.c_str(), "%f", &var);
+            sv->SetValue(var);
+
+            svlist->getNextSelected(item)->setText(name.c_str());
+            svlist->setItemSelectState(item, false); // Force update.
+            svlist->setItemSelectState(item, true);
+            break;
+          }
+        case csShaderVariable::VECTOR2:
+          {
+            CEGUI::Window* svinput = winMgr->getWindow("Tab6/SVInput");
+            CEGUI::String name = svinput->getProperty("Text");
+
+            csVector2 vec;
+            sscanf(name.c_str(), "%f, %f", &vec.x, &vec.y);
+            sv->SetValue(vec);
+
+            svlist->getNextSelected(item)->setText(name.c_str());
+            svlist->setItemSelectState(item, false); // Force update.
+            svlist->setItemSelectState(item, true);
+            break;
+          }
+        case csShaderVariable::VECTOR3:
+          {
+            CEGUI::Window* svinput = winMgr->getWindow("Tab6/SVInput");
+            CEGUI::String name = svinput->getProperty("Text");
+
+            csVector3 vec;
+            sscanf(name.c_str(), "%f, %f, %f", &vec.x, &vec.y, &vec.z);
+            sv->SetValue(vec);
+
+            svlist->getNextSelected(item)->setText(name.c_str());
+            svlist->setItemSelectState(item, false); // Force update.
+            svlist->setItemSelectState(item, true);
+            break;
+          }
+        case csShaderVariable::VECTOR4:
+          {
+            CEGUI::Window* svinput = winMgr->getWindow("Tab6/SVInput");
+            CEGUI::String name = svinput->getProperty("Text");
+
+            csVector4 vec;
+            sscanf(name.c_str(), "%f, %f, %f, %f", &vec.x, &vec.y, &vec.z, &vec.w);
+            sv->SetValue(vec);
+
+            svlist->getNextSelected(item)->setText(name.c_str());
+            svlist->setItemSelectState(item, false); // Force update.
+            svlist->setItemSelectState(item, true);
+            break;
+          }
+        default:
+          {
+            continue;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  return false;
 }
 
 //---------------------------------------------------------------------------
