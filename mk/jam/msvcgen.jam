@@ -183,6 +183,13 @@ rule MsvcIncDirs1 { }
 rule MsvcCFlags { MsvcCFlags1 $(1) : $(2) : $(3) ; }
 rule MsvcCFlags1 { }
 
+## MsvcLibDirs target : libdirs [ : mode ]
+##   Invoke this rule to define an MSVC-specific additional library directories.
+##   'mode' should be "release" or "debug". If 'mode' is omitted, then 
+##   'directories' is used for release and debug.
+rule MsvcLibDirs { _MsvcLibDirs $(1) : $(2) : $(3) ; }
+rule _MsvcLibDirs { }
+
 ## MsvcLFlags target [ : lflags [ : mode ]]
 ##   Invoke this rule to set additional MSVC-specific linker flags for
 ##   'target'.  'mode' should be "release" or "debug". If 'mode' is omitted,
