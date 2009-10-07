@@ -18,12 +18,10 @@
 
 #include <ApplicationServices/ApplicationServices.h>
 
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-  #if __MAC_OS_X_VERSION_MIN_REQUIRED < 1030
-    #import <mach-o/dyld.h>
-  #else  
-    #import <dlfcn.h>
-  #endif
+#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED < 1030
+#import <mach-o/dyld.h>
+#else  
+#import <dlfcn.h>
 #endif
 
 #define GLOSXDRIVER_REPORTER_ID "crystalspace.canvas.glosx"
@@ -201,31 +199,31 @@ bool GLOSXDriver2D::ToggleFullscreen()
   return success;
 }
 
-// Only compile on machines running Mac OS X (not iPhones)
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-  // Only compile if OS version earlier than 10.3.0
-  #if __MAC_OS_X_VERSION_MIN_REQUIRED < 1030
-    // Get the address of a procedure (for OGL use.)
-    void *GLOSXDriver2D::GetProcAddress(const char *name) 
-    {	
-      NSSymbol symbol;
-      csString symbolName;
-      // Prepend a '_' for the Unix C symbol mangling convention
-      symbolName << '_' << name;
-      if (NSIsSymbolNameDefined (symbolName))
-      {
-        symbol = NSLookupAndBindSymbol (symbolName);
-        return NSAddressOfSymbol (symbol);
-      }
-      else
-        return 0;
+
+#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED < 1030
+
+// Get the address of a procedure (for OGL use.)
+void *GLOSXDriver2D::GetProcAddress(const char *name) 
+{	
+  NSSymbol symbol;
+  csString symbolName;
+  // Prepend a '_' for the Unix C symbol mangling convention
+  symbolName << '_' << name;
+  if (NSIsSymbolNameDefined (symbolName))
+    {
+      symbol = NSLookupAndBindSymbol (symbolName);
+      return NSAddressOfSymbol (symbol);
     }
-  // Only compile if OS version 10.3.0 or later
-  #else
-    // Get the address of a procedure (for OGL use.)
-    void *GLOSXDriver2D::GetProcAddress(const char *name) 
-    {	
-      return dlsym(RTLD_DEFAULT, name);
-    }
-  #endif
+  else
+    return 0;
+}
+
+#else
+
+// Get the address of a procedure (for OGL use.)
+void *GLOSXDriver2D::GetProcAddress(const char *name) 
+{	
+  return dlsym(RTLD_DEFAULT, name);
+}
+
 #endif
