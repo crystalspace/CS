@@ -677,6 +677,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         return res;
       }
 
+      // Trimesh
+      csRef<iDocumentNode> trimeshnode;
+      if(attempt == 1)
+      {
+          trimeshnode = node->GetNode ("trimesh");
+      }
+      if(attempt == 2)
+      {
+          if(csString("trimesh") == csString(node->GetValue()))
+              trimeshnode = node;
+      }
+      if (trimeshnode)
+      {
+          const char* name = trimeshnode->GetAttributeValue ("name");
+          csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
+              "crystalspace.mesh.object.null", name, 0, csVector3(0), false);
+
+          bool res = LoadTriMeshInSector (ldr_context, mesh, trimeshnode, ssource);
+          ret->SetResult(scfQueryInterfaceSafe<iBase>(mesh));
+          if(sync && res)
+          {
+              Engine->SyncEngineListsWait(this);
+          }
+          return res;
+      }
+
+
       // World node.
       csRef<iDocumentNode> worldnode;
       if(attempt == 1)
