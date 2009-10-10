@@ -859,7 +859,9 @@ int csColliderActor::CollisionDetect (
       if (reallycollided)
       {
         hits++;
-        //printf("Collided with %s\n", meshWrapper->QueryObject ()->GetName());
+#ifdef COLLDEBUG
+        printf("Collided with %s\n", meshWrapper->QueryObject ()->GetName());
+#endif
         if (do_hit_meshes)
           hit_meshes.Add (meshWrapper);
         if (cdsys->GetOneHitOnly ()) return 1;
@@ -981,7 +983,9 @@ bool csColliderActor::AdjustForCollisions (
     cdsys->ResetCollisionPairs ();
 
     // Perform collision testing to minimise hits
-    // printf("Enter at %g %g %g\n", newpos.x, newpos.y, newpos.z);
+#ifdef COLLDEBUG
+    printf("Enter at %g %g %g\n", newpos.x, newpos.y, newpos.z);
+#endif
     if (cd)
     {
       hits = CollisionDetect (topCollider, current_sector,
@@ -999,7 +1003,7 @@ bool csColliderActor::AdjustForCollisions (
     // Flag to indicate if a reaction force was applied.
     bool bounced = false;
     // The smallest reaction force found (also the largest angle).
-    csVector3 bestBounce;
+    csVector3 bestBounce(0);
 
     // The maximum Y position we are allowed to jump to.
     float jumpY = newpos.y + bottomSize.y;
@@ -1009,17 +1013,19 @@ bool csColliderActor::AdjustForCollisions (
     if(counter == 1)
       jumpY = newpos.y;
 
-    // printf("JumpY: %g\n", jumpY);
-    // printf("localvel %g %g %g\n", localvel.x, localvel.y, localvel.z);
-
+#ifdef COLLDEBUG
+    printf("JumpY: %g\n", jumpY);
+    printf("localvel %g %g %g\n", localvel.x, localvel.y, localvel.z);
+#endif
     // Extra test values for numerical inaccuracies when testing whether a
     // triangle is inward facing.
     csVector3 testVel(localvel);
     csVector3 testVel2(localvel);
     if(testVel.y == 0)
+    {
       testVel.y = -0.1;
-    if(testVel2.y == 0)
       testVel2.y = 0.1;
+    }
     for (i = 0; i < our_cd_contact.GetSize () ; i++ )
     {
       csCollisionPair& cd = our_cd_contact[i];
@@ -1035,7 +1041,9 @@ bool csColliderActor::AdjustForCollisions (
       if(!FindIntersection (cd,line))  continue;
       line[0] += shift;
       line[1] += shift;
-      // printf("Hit tri at %g %g with norm %g %g %g dotprod %g\n", line[0].y, line[1].y, unit.x, unit.y, unit.z, normal * localvel);
+#ifdef COLLDEBUG
+      printf("Hit tri at %g %g with norm %g %g %g dotprod %g\n", line[0].y, line[1].y, unit.x, unit.y, unit.z, normal * localvel);
+#endif
 
       // Check, have we collided against an 'inner' face
       if (normal * testVel > 0 && normal * testVel2 > 0)
@@ -1048,7 +1056,6 @@ bool csColliderActor::AdjustForCollisions (
         onground = true;
         // This is a ground triangle so we can move on top of it
         max_y = MIN(MAX(MAX(line[0].y, line[1].y),max_y), jumpY);
-        continue;
       }
 
       // No sliding forces from ground-like surfaces if we are testing against legs
@@ -1059,10 +1066,12 @@ bool csColliderActor::AdjustForCollisions (
       if(line[0].y > newpos.y + bottomSize.y + topSize.y && line[1].y > newpos.y + bottomSize.y + topSize.y)
         continue;
 
-      // printf("Angle between wall and velocity: %g ", acos((unit * localvel) / localvel.Norm())*180/M_PI);
+#ifdef COLLDEBUG
+      printf("Angle between wall and velocity: %g ", acos((unit * localvel) / localvel.Norm())*180/M_PI);
+#endif
 
       // If walking normally, increase reaction (bounce) effect from obstacles.
-      if (localvel.y == 0) {
+      if (vel.y == 0) {
         unit.y = 0;
         if (unit.Norm() == 0)
           continue;
@@ -1092,7 +1101,9 @@ bool csColliderActor::AdjustForCollisions (
     if(counter == 0 && onground)
     {
       localvel.y = max_y - oldpos.y;
-      // printf("Jumped!");
+#ifdef COLLDEBUG
+      printf("Jumped!");
+#endif
     }
     else
       // If no jump then skip second pass.
@@ -1101,8 +1112,10 @@ bool csColliderActor::AdjustForCollisions (
 
     // Apply the reaction force here.
     if(counter == 1 && bounced && bestBounce.Norm() < localvel.Norm()){
-      // printf("best bounce: %g %g %g, %g\n", bestBounce.x, bestBounce.y, bestBounce.z, acos((bestBounce * localvel)/(bestBounce.Norm()*localvel.Norm()))*180/M_PI);
-      // printf("new angle: %g, angle against bounce: %g\n", acos((localvel - bestBounce)*localvel/(localvel.Norm()*(localvel - bestBounce).Norm()))*180/M_PI, acos((localvel - bestBounce)*bestBounce/(bestBounce.Norm()*(localvel - bestBounce).Norm()))*180/M_PI);
+#ifdef COLLDEBUG
+      printf("best bounce: %g %g %g, %g\n", bestBounce.x, bestBounce.y, bestBounce.z, acos((bestBounce * localvel)/(bestBounce.Norm()*localvel.Norm()))*180/M_PI);
+      printf("new angle: %g, angle against bounce: %g\n", acos((localvel - bestBounce)*localvel/(localvel.Norm()*(localvel - bestBounce).Norm()))*180/M_PI, acos((localvel - bestBounce)*bestBounce/(bestBounce.Norm()*(localvel - bestBounce).Norm()))*180/M_PI);
+#endif
       // 1.1 multiplier for numerical errors.
       localvel = localvel - 1.1 * bestBounce;
     }
@@ -1145,8 +1158,12 @@ bool csColliderActor::AdjustForCollisions (
 
   hits = 0;
   csVector3 testVel(newpos - oldpos);
+  csVector3 testVel2(testVel);
   if(testVel.y == 0)
+  {
+    testVel2.y = 0.1;
     testVel.y = -0.1;
+  }
   for (i = 0; i < our_cd_contact.GetSize () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
@@ -1154,7 +1171,7 @@ bool csColliderActor::AdjustForCollisions (
     csVector3 normal = obstacle.Normal ();
     float norm = normal.Norm ();
     if (fabs (norm) < SMALL_EPSILON) continue;
-    if (normal * testVel > 0) continue;
+    if (normal * testVel > 0 && normal * testVel2 > 0) continue;
     csVector3 line[2];
     if(!FindIntersection (cd,line))  continue;
     line[0].y += shift.y;
@@ -1173,13 +1190,17 @@ bool csColliderActor::AdjustForCollisions (
   // Check if hits were still detected after move so try failsafe (no jumping) move.
   if(hits > 0 && onground && fabs(newpos.y - newpos_nojump.y) > 0.001f)
   {
-    // printf("Nojump to %g %g %g\n", newpos_nojump.x, newpos_nojump.y, newpos_nojump.z);
+#ifdef COLLDEBUG
+    printf("Nojump to %g %g %g\n", newpos_nojump.x, newpos_nojump.y, newpos_nojump.z);
+#endif
     newpos = newpos_nojump;
     our_cd_contact.Empty ();
     cdsys->ResetCollisionPairs ();
 
     transform_newpos = csOrthoTransform (csMatrix3(), newpos);
-    // printf("Exit testing %g %g %g\n", newpos.x, newpos.y, newpos.z);
+#ifdef COLLDEBUG
+    printf("Exit testing %g %g %g\n", newpos.x, newpos.y, newpos.z);
+#endif
 
     if (cd)
       hits = CollisionDetect (topCollider, current_sector,
@@ -1188,9 +1209,13 @@ bool csColliderActor::AdjustForCollisions (
       cd = 0;
 
     hits = 0;
-    csVector3 testVel(newpos - oldpos);
+    testVel = newpos - oldpos;
+    testVel2 = testVel;
     if(testVel.y == 0)
+    {
+      testVel2.y = -0.1;
       testVel.y = -0.1;
+    }
     for (i = 0; i < our_cd_contact.GetSize () ; i++ )
     {
       csCollisionPair& cd = our_cd_contact[i];
@@ -1210,21 +1235,27 @@ bool csColliderActor::AdjustForCollisions (
 
       csVector3 unit = normal / norm;
 
-      // printf("final check hit y %g %g %g", unit.y, line[0].y, line[1].y);
+#ifdef COLLDEBUG
+      printf("final check hit y %g %g %g", unit.y, line[0].y, line[1].y);
+#endif
       hits++;
       break;
     }
   }
-  // if (onground)
-    // printf("onground\n");
-  // else
-    // printf("offground\n");
+#ifdef COLLDEBUG
+  if (onground)
+    printf("onground\n");
+  else
+    printf("offground\n");
+#endif
 
   if (hits > 0 || (newpos - oldpos).IsZero())
   {
     // No move possible without a collision with the torso
-    // if (hits > 0) printf("Hits >1 at end reverting.\n");
-    // if ((newpos-oldpos).IsZero()) printf("zero movement\n");
+#ifdef COLLDEBUG
+    if (hits > 0) printf("Hits >1 at end reverting.\n");
+    if ((newpos-oldpos).IsZero()) printf("zero movement\n");
+#endif
     newpos = oldpos;
 
     return false;
@@ -1297,7 +1328,9 @@ bool csColliderActor::MoveV (float delta,
       && onground)
     return false;  // didn't move anywhere
 
-  // printf("Start Y %g\n", velWorld.y);
+#ifdef COLLDEBUG
+  printf("Start Y %g\n", velWorld.y);
+#endif
   csMatrix3 mat;
 
   // To test collision detection we use absolute position and transformation
