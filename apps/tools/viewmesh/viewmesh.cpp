@@ -938,12 +938,17 @@ bool ViewMesh::CreateGui()
   return true;
 }
 
-void ViewMesh::LoadSprite (const char* filename)
+void ViewMesh::LoadSprite (const char* filename, const char* path)
 {
   reloadFilename = filename;
+  if (path)
+    vfs->ChDir(path);
+  else
+    reloadFilePath = vfs->GetCwd();
 
   if (spritewrapper)
   {
+    ClearLists();
     if (sprite)
     {
       for (int i = 0; i < sprite->GetSocketCount(); i++)
@@ -1181,7 +1186,7 @@ void ViewMesh::AttachMesh (const char* file)
       csRef<iMeshWrapper> meshWrapOld = selectedAnimeshSocket->GetSceneNode()->QueryMesh();
       if ( meshWrapOld )
       {
-        meshWrapOld->GetMovable()->SetSector(0);
+        meshWrapOld->QuerySceneNode()->SetParent(0);
         selectedAnimeshSocket->SetSceneNode(0);  
       }
     }
@@ -1237,6 +1242,32 @@ void ViewMesh::AttachMesh (const char* file)
     selectedAnimeshSocket->SetSceneNode(meshWrap->QuerySceneNode());
     meshWrap->QuerySceneNode ()->SetParent (spritewrapper->QuerySceneNode ());
   }
+}
+
+void ViewMesh::ClearLists ()
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  // Sockets
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab3/List");
+  if (list) list->resetList();
+  CEGUI::Window* w = winMgr->getWindow("Tab3/RenameSocket/Input");
+  w->setText("");
+  // Morphs
+  /*CEGUI::Listbox**/ list = (CEGUI::Listbox*)winMgr->getWindow("Tab4/List");
+  if (list) list->resetList();
+  // Animations
+  /*CEGUI::Listbox**/ list = (CEGUI::Listbox*)winMgr->getWindow("Tab2/List");
+  if (list) list->resetList();
+  // SubMeshes
+  /*CEGUI::Listbox**/ list = (CEGUI::Listbox*)winMgr->getWindow("Tab5/List");
+  if (list) list->resetList();
+  // Materials
+  /*CEGUI::Listbox**/ list = (CEGUI::Listbox*)winMgr->getWindow("Tab5/MatList");
+  if (list) list->resetList();
+  /*CEGUI::Listbox**/ list = (CEGUI::Listbox*)winMgr->getWindow("Tab6/MatList");
+  if (list) list->resetList();
+
 }
 
 void ViewMesh::UpdateSocketList ()
@@ -2340,7 +2371,7 @@ bool ViewMesh::ReloadButton (const CEGUI::EventArgs& e)
       return true;
 
   collection->ReleaseAllObjects();
-  LoadSprite(reloadFilename);
+  LoadSprite(reloadFilename, reloadFilePath);
 
   return true;
 }

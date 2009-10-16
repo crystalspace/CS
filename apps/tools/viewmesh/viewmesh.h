@@ -70,6 +70,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool      camModeZoom;
 
   csString reloadFilename;
+  csString reloadFilePath;
 
   int       lastMouseX, lastMouseY;
 
@@ -134,12 +135,13 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool CreateGui ();
   void LoadLibrary(const char* file);
   void LoadTexture(const char* file, const char* name);
-  void LoadSprite (const char* file);
+  void LoadSprite (const char* file, const char* path = 0);
   void SaveSprite (const char* file, bool binary);
   void AttachMesh (const char* file);
   void SelectSocket (const char* newsocket);
   void ScaleSprite (float newScale);
   void MoveLights (const csVector3 &a, const csVector3 &b, const csVector3 &c);
+  void ClearLists ();
   void UpdateSocketList ();
   void UpdateMorphList ();
   void UpdateAnimationList ();
@@ -156,6 +158,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool LightUnlit (const CEGUI::EventArgs& e);
   bool LoadButton (const CEGUI::EventArgs& e);
   bool LoadLibButton (const CEGUI::EventArgs& e);
+  bool ReloadButton (const CEGUI::EventArgs& e);
   bool SaveButton (const CEGUI::EventArgs& e);
   bool SaveBinaryButton (const CEGUI::EventArgs& e);
   bool SetScaleSprite (const CEGUI::EventArgs& e);
@@ -188,7 +191,6 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool BlendButton (const CEGUI::EventArgs& e);
   bool ClearButton (const CEGUI::EventArgs& e);
   bool ResetCameraButton (const CEGUI::EventArgs& e);
-  bool ReloadButton (const CEGUI::EventArgs& e);
   //SUBMESH
   bool SelSubmesh (const CEGUI::EventArgs& e);
   bool SelMaterial (const CEGUI::EventArgs& e);
