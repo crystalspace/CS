@@ -77,6 +77,9 @@ public:
   */
   virtual void AdvancePosition(size_t frame_delta);
 
+  /// Whether this stream always needs to be treated as a stream regardless of size.
+  virtual bool AlwaysStream() const { return true; }
+
 private:
   /// Holds our reference to the underlying data element
   csRef<SndSysSpeexSoundData> m_pSoundData;
