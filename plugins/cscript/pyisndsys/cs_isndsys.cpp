@@ -7411,6 +7411,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSndSysStream_AlwaysStream(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSndSysStream *arg1 = (iSndSysStream *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_AlwaysStream",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_AlwaysStream" "', argument " "1"" of type '" "iSndSysStream const *""'"); 
+  }
+  arg1 = reinterpret_cast< iSndSysStream * >(argp1);
+  result = (bool)((iSndSysStream const *)arg1)->AlwaysStream();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSndSysStream_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -8548,6 +8570,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSndSysStream_RegisterCallback", _wrap_iSndSysStream_RegisterCallback, METH_VARARGS, NULL},
 	 { (char *)"iSndSysStream_UnregisterCallback", _wrap_iSndSysStream_UnregisterCallback, METH_VARARGS, NULL},
 	 { (char *)"iSndSysStream_RegisterFrameNotification", _wrap_iSndSysStream_RegisterFrameNotification, METH_VARARGS, NULL},
+	 { (char *)"iSndSysStream_AlwaysStream", _wrap_iSndSysStream_AlwaysStream, METH_VARARGS, NULL},
 	 { (char *)"iSndSysStream_scfGetVersion", _wrap_iSndSysStream_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSndSysStream", _wrap_delete_iSndSysStream, METH_VARARGS, NULL},
 	 { (char *)"iSndSysStream_swigregister", iSndSysStream_swigregister, METH_VARARGS, NULL},
