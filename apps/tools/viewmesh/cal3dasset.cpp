@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "Cal3DAsset.h"
+#include "cal3dasset.h"
 
 #include "iengine/engine.h"
 #include "iutil/objreg.h"

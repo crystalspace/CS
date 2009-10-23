@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "Sprite3DAsset.h"
+#include "sprite3dasset.h"
 
 #include "iengine/engine.h"
 #include "iutil/objreg.h"
