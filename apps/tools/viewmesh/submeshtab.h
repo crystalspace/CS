@@ -84,7 +84,7 @@ bool SubMeshTab::SelSubmesh (const CEGUI::EventArgs& e)
 
 bool SubMeshTab::AttachSMButton (const CEGUI::EventArgs& e)
 {
-  if (asset->GetSelectedSubMesh() == "")
+  if (strcmp (asset->GetSelectedSubMesh(), "") == 0)
     return true;
 
   asset->SetSubMeshRendering(asset->GetSelectedSubMesh(), true);
@@ -94,7 +94,7 @@ bool SubMeshTab::AttachSMButton (const CEGUI::EventArgs& e)
 
 bool SubMeshTab::DetachSMButton (const CEGUI::EventArgs& e)
 {
-  if (asset->GetSelectedSubMesh() == "")
+  if (strcmp (asset->GetSelectedSubMesh(), "") == 0)
     return true;
 
   asset->SetSubMeshRendering(asset->GetSelectedSubMesh(), false);
@@ -105,7 +105,8 @@ bool SubMeshTab::DetachSMButton (const CEGUI::EventArgs& e)
 bool SubMeshTab::SelectMatButton (const CEGUI::EventArgs& e)
 {
   csString selectedMaterial;
-  if (asset->GetSelectedSubMesh()!="" && GetSelectedItemText("SubMeshes/MatList", selectedMaterial))
+  if ((strcmp (asset->GetSelectedSubMesh(), "") != 0)
+    && GetSelectedItemText("SubMeshes/MatList", selectedMaterial))
   {
     csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
     iMaterialWrapper* mat = engine->GetMaterialList()->FindByName(selectedMaterial);
