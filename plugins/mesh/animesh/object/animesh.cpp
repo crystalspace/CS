@@ -524,6 +524,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return name.GetData ();
   }
 
+  void FactorySocket::SetName (const char* value)
+  {
+    name = value;
+  }
+
   const csReversibleTransform& FactorySocket::GetTransform () const
   {
     return transform;
@@ -670,6 +675,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       if (!submat)
       {
         csPrintf ("INTERNAL ERROR: mesh used without material!\n");
+        num = 0;
         return 0;
       }
 
@@ -725,7 +731,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     if (skeleton)
     {
-      skeleton->UpdateSkeleton ((current_time - lastTick) / 1000.0f);
+      skeleton->UpdateSkeleton ((current_time - lastTick) / 1000.0f, currentFrame);
 
       // Copy the skeletal state into our buffers
       UpdateLocalBoneTransforms ();

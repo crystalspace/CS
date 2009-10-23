@@ -32,7 +32,7 @@ enum
   WORK_UNIT_STEPS = 8
 };
 
-int64 BenchResult[MAX_WORKER_THREADS][WORK_UNIT_STEPS] = {0};
+int64 BenchResult[MAX_WORKER_THREADS][WORK_UNIT_STEPS] = {{0}};
 
 template<bool UseMemory>
 void PerformSomeWork (void* membuff, size_t iterations = (1<<16))
@@ -74,15 +74,16 @@ void PerformSomeWork (void* membuff, size_t iterations = (1<<16))
 template<bool useMemory>
 class WorkerJob : public scfImplementation1<WorkerJob<useMemory>, iJob>
 {
+  typedef scfImplementation1<WorkerJob<useMemory>, iJob> Superclass;
 public:
   WorkerJob(size_t it)
-    : scfImplementationType (this), iterations(it)
+    : Superclass (this), iterations(it)
   { 
   }
   
   virtual void Run ()
   {
-    for(int i = 0; i < iterations; ++i)
+    for(size_t i = 0; i < iterations; ++i)
       PerformSomeWork<useMemory> (0, 1<<8);
   }
 

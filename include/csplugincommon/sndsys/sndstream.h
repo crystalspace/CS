@@ -281,6 +281,9 @@ namespace CS
     /// notification when it's crossed.
     virtual bool RegisterFrameNotification(size_t frame_number);
 
+    /// Whether this stream always needs to be treated as a stream regardless of size.
+    virtual bool AlwaysStream() const { return false; }
+
     ////
     // Internal functions
     ////

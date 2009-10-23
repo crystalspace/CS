@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Materials" >
+    <Property Name="Text" Value="Mats" />
+    <Window Type="ice/StaticImage" Name="Materials/main" >
+      <Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+
+      <Window Type="ice/Listbox" Name="Materials/MatList" >
+        <Property Name="Text" Value="SetMat" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.5,-30.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+      </Window>
+
+      <Window Type="ice/MultiColumnList" Name="Materials/SVList" >
+        <Property Name="Text" Value="SetSV" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.5,-20.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.5,-20.0}}'/>
+      </Window>
+
+      <Window Type="ice/Editbox" Name="Materials/SVInput" >
+        <Property Name='UnifiedSize' Value='{{1.0,-60.0},{0.0,32.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{1.0,-37.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Materials/SetSV" >
+        <Property Name="Text" Value="Set" />
+        <Property Name='UnifiedSize' Value='{{0.0,50.0},{0.0,32.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{1.0,-55.0},{1.0,-37.0}}'/>
+      </Window>
+
+    </Window>
+  </Window>
+</GUILayout>
+

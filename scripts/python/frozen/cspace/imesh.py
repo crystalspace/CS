@@ -637,9 +637,11 @@ class iAnimatedMeshSocketFactory(core.iBase):
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _imesh.iAnimatedMeshSocketFactory_GetName(*args)
+    def SetName(*args): return _imesh.iAnimatedMeshSocketFactory_SetName(*args)
     def GetTransform(*args): return _imesh.iAnimatedMeshSocketFactory_GetTransform(*args)
     def SetTransform(*args): return _imesh.iAnimatedMeshSocketFactory_SetTransform(*args)
     def GetBone(*args): return _imesh.iAnimatedMeshSocketFactory_GetBone(*args)
+    def SetBone(*args): return _imesh.iAnimatedMeshSocketFactory_SetBone(*args)
     def GetFactory(*args): return _imesh.iAnimatedMeshSocketFactory_GetFactory(*args)
     __swig_destroy__ = _imesh.delete_iAnimatedMeshSocketFactory
     __del__ = lambda self : None;
