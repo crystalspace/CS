@@ -46,13 +46,19 @@
 #include "imesh/spritecal3d.h"
 #include "ivaria/icegui.h"
 
+#include "csutil/parray.h"
+
 struct iAnimatedMesh;
 struct iAnimatedMeshFactory;
 struct iAnimatedMeshSocket;
 struct iSkeletonAnimNode2;
 struct iSkeletonAnimNodeFactory2;
 
-struct vmAnimCallback;
+#include "assetbase.h"
+#include "tabbase.h"
+
+class GeneralTab;
+class MaterialTab;
 
 class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 {
@@ -90,31 +96,13 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
   CEGUI::Window* form;
   CEGUI::Window* stddlg;
-  enum { load, loadlib, save, savebinary, attach } stddlgPurpose;
 
   enum { movenormal, moveorigin, rotateorigin } camMode;
 
-  float rotX, rotY;
   float roomsize, scale;
   float move_sprite_speed;
 
-  csRef<iMeshWrapper> spritewrapper;
-  csRef<iSprite3DFactoryState> sprite;
-  csRef<iAnimatedMeshFactory> animeshsprite;
-  csRef<iSpriteCal3DFactoryState> cal3dsprite;
-  csRef<iSprite3DState> state;
-  csRef<iAnimatedMesh> animeshstate;
-  csRef<iSpriteCal3DState> cal3dstate;
-  iSpriteSocket* selectedSocket;
-  iSpriteCal3DSocket* selectedCal3dSocket;
-  iAnimatedMeshSocket* selectedAnimeshSocket;
-  const char* selectedAnimation;
-  const char* selectedMorphTarget;
-  const char* selectedSubMesh;
-  const char* selectedMaterial;
-  float meshTx, meshTy, meshTz;
-
-  vmAnimCallback* callback;
+  csRef<AssetBase> asset;
 
   void ResetCamera();
   void UpdateCamera();
@@ -138,68 +126,26 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   void LoadSprite (const char* file, const char* path = 0);
   void SaveSprite (const char* file, bool binary);
   void AttachMesh (const char* file);
-  void SelectSocket (const char* newsocket);
   void ScaleSprite (float newScale);
   void MoveLights (const csVector3 &a, const csVector3 &b, const csVector3 &c);
-  void ClearLists ();
-  void UpdateSocketList ();
-  void UpdateMorphList ();
-  void UpdateAnimationList ();
-  void UpdateSubMeshList ();
-  void WalkSkel2Nodes (CEGUI::Listbox* list, iSkeletonAnimNodeFactory2* node);
-  void UpdateSocket ();
 
-  //SETTING
-  bool CameraModeRotate (const CEGUI::EventArgs& e);
-  bool CameraModeMoveOrigin (const CEGUI::EventArgs& e);
-  bool CameraModeMoveNormal (const CEGUI::EventArgs& e);
-  bool LightThreePoint (const CEGUI::EventArgs& e);
-  bool LightFrontBackTop (const CEGUI::EventArgs& e);
-  bool LightUnlit (const CEGUI::EventArgs& e);
-  bool LoadButton (const CEGUI::EventArgs& e);
-  bool LoadLibButton (const CEGUI::EventArgs& e);
-  bool ReloadButton (const CEGUI::EventArgs& e);
-  bool SaveButton (const CEGUI::EventArgs& e);
-  bool SaveBinaryButton (const CEGUI::EventArgs& e);
-  bool SetScaleSprite (const CEGUI::EventArgs& e);
-  //ANIMATION
-  bool ReversAnimation (const CEGUI::EventArgs& e);
-  bool StopAnimation (const CEGUI::EventArgs& e);
-  bool SlowerAnimation (const CEGUI::EventArgs& e);
-  bool AddAnimation (const CEGUI::EventArgs& e);
-  bool FasterAnimation (const CEGUI::EventArgs& e);
-  bool SetAnimation (const CEGUI::EventArgs& e);
-  bool RemoveAnimation (const CEGUI::EventArgs& e);
-  bool ClearAnimation (const CEGUI::EventArgs& e);
-  bool SelAnimation (const CEGUI::EventArgs& e);
-  bool HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, bool start);
-  //SOCKET
-  bool SetMesh (const CEGUI::EventArgs& e);
-  bool SetSubMesh (const CEGUI::EventArgs& e);
-  bool SetTriangle (const CEGUI::EventArgs& e);
-  bool SetRotX (const CEGUI::EventArgs& e);
-  bool SetRotY (const CEGUI::EventArgs& e);
-  bool SetRotZ (const CEGUI::EventArgs& e);
-  bool AttachButton (const CEGUI::EventArgs& e);
-  bool DetachButton (const CEGUI::EventArgs& e);
-  bool AddSocket (const CEGUI::EventArgs& e);
-  bool DelSocket (const CEGUI::EventArgs& e);
-  bool SelSocket (const CEGUI::EventArgs& e);
-  bool RenameSocket (const CEGUI::EventArgs& e);
-  //MORPH
-  bool SelMorph (const CEGUI::EventArgs& e);
-  bool BlendButton (const CEGUI::EventArgs& e);
-  bool ClearButton (const CEGUI::EventArgs& e);
-  bool ResetCameraButton (const CEGUI::EventArgs& e);
-  //SUBMESH
-  bool SelSubmesh (const CEGUI::EventArgs& e);
-  bool SelMaterial (const CEGUI::EventArgs& e);
-  bool AttachSMButton (const CEGUI::EventArgs& e);
-  bool DetachSMButton (const CEGUI::EventArgs& e);
-  bool SelectMatButton (const CEGUI::EventArgs& e);
-  //MATERIAL
-  bool UpdateMaterialSVs (const CEGUI::EventArgs& e);
-  bool SetSV (const CEGUI::EventArgs& e);
+  // Tabs
+  csRef<GeneralTab> generalTab;
+  friend class GeneralTab;
+  csRef<MaterialTab> materialTab;
+
+  csRefArray<TabBase> tabs;
+
+  template<class T>
+  void RegisterTab ()
+  {
+    csRef<TabBase> t;
+    t.AttachNew(new T(GetObjectRegistry(), asset));
+    tabs.Push(t);
+  }
+
+  void UnRegisterTabs ();
+  
 
  public:
 
