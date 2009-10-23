@@ -80,7 +80,7 @@ bool TabBase::LoadLayout(const char* layoutFile)
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
 
   vfs->PushDir();
-  vfs->ChDir ("/ceguitest/0.5/");
+  vfs->ChDir ("/viewmesh/");
   
   window = winMgr->loadWindowLayout(layoutFile);
 

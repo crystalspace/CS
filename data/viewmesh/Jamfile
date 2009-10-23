@@ -1,0 +1,4 @@
+SubDir TOP data viewmesh ;
+
+InstallData [ Wildcard *.layout ] : data viewmesh ;
+FileListEntriesData [ Wildcard *.layout ] : viewmesh : data-tool ;
