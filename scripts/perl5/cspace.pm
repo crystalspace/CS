@@ -14966,9 +14966,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetName = *cspacec::iAnimatedMeshSocketFactory_GetName;
+*SetName = *cspacec::iAnimatedMeshSocketFactory_SetName;
 *GetTransform = *cspacec::iAnimatedMeshSocketFactory_GetTransform;
 *SetTransform = *cspacec::iAnimatedMeshSocketFactory_SetTransform;
 *GetBone = *cspacec::iAnimatedMeshSocketFactory_GetBone;
+*SetBone = *cspacec::iAnimatedMeshSocketFactory_SetBone;
 *GetFactory = *cspacec::iAnimatedMeshSocketFactory_GetFactory;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

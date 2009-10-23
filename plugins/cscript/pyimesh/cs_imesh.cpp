@@ -13752,6 +13752,39 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iAnimatedMeshSocketFactory_SetName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshSocketFactory *arg1 = (iAnimatedMeshSocketFactory *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshSocketFactory_SetName",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshSocketFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshSocketFactory_SetName" "', argument " "1"" of type '" "iAnimatedMeshSocketFactory *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshSocketFactory * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iAnimatedMeshSocketFactory_SetName" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  (arg1)->SetName((char const *)arg2);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iAnimatedMeshSocketFactory_GetTransform(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iAnimatedMeshSocketFactory *arg1 = (iAnimatedMeshSocketFactory *) 0 ;
@@ -13826,6 +13859,36 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshSocketFactory_GetBone(PyObject *SWIGUNUS
   arg1 = reinterpret_cast< iAnimatedMeshSocketFactory * >(argp1);
   result = (BoneID)((iAnimatedMeshSocketFactory const *)arg1)->GetBone();
   resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMeshSocketFactory_SetBone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshSocketFactory *arg1 = (iAnimatedMeshSocketFactory *) 0 ;
+  BoneID arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshSocketFactory_SetBone",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshSocketFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshSocketFactory_SetBone" "', argument " "1"" of type '" "iAnimatedMeshSocketFactory *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshSocketFactory * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshSocketFactory_SetBone" "', argument " "2"" of type '" "BoneID""'");
+  } 
+  arg2 = static_cast< BoneID >(val2);
+  (arg1)->SetBone(arg2);
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -48569,9 +48632,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_csAnimatedMeshBoneInfluence", _wrap_delete_csAnimatedMeshBoneInfluence, METH_VARARGS, NULL},
 	 { (char *)"csAnimatedMeshBoneInfluence_swigregister", csAnimatedMeshBoneInfluence_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_GetName", _wrap_iAnimatedMeshSocketFactory_GetName, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshSocketFactory_SetName", _wrap_iAnimatedMeshSocketFactory_SetName, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_GetTransform", _wrap_iAnimatedMeshSocketFactory_GetTransform, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_SetTransform", _wrap_iAnimatedMeshSocketFactory_SetTransform, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_GetBone", _wrap_iAnimatedMeshSocketFactory_GetBone, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshSocketFactory_SetBone", _wrap_iAnimatedMeshSocketFactory_SetBone, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_GetFactory", _wrap_iAnimatedMeshSocketFactory_GetFactory, METH_VARARGS, NULL},
 	 { (char *)"delete_iAnimatedMeshSocketFactory", _wrap_delete_iAnimatedMeshSocketFactory, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_swigregister", iAnimatedMeshSocketFactory_swigregister, METH_VARARGS, NULL},
