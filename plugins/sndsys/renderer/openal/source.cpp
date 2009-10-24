@@ -44,7 +44,7 @@ SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, csSndSy
     * m_Stream->GetRenderedFormat()->Channels;
   streamSize = m_Stream->GetFrameCount () * m_BytesPerSample;
 
-  if (streamSize < ADVANCE_LENGTH)
+  if (streamSize < ADVANCE_LENGTH && !m_Stream->AlwaysStream())
   {
     // This is a short sample, don't use streaming
     useStaticBuffer = true;

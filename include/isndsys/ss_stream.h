@@ -61,7 +61,7 @@ enum
 struct iSndSysStream : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysStream,0,2,1);
+  SCF_INTERFACE(iSndSysStream,1,0,0);
 
   /// Retrieve a description of this stream.  
   //  This is not guaranteed to be useful for any particular purpose, different,
@@ -262,6 +262,9 @@ struct iSndSysStream : public virtual iBase
   /// Register a particular frame number which will trigger a callback notification when
   //   it's crossed.
   virtual bool RegisterFrameNotification(size_t frame_number) = 0;
+
+  /// Whether this stream always needs to be treated as a stream regardless of size.
+  virtual bool AlwaysStream() const = 0;
 };
 
 /// Sound System stream interface for callback notification
