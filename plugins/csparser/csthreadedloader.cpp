@@ -889,6 +889,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         return true;
       }
+
+      csRef<iDocumentNode> sequencenode;
+      if(attempt == 1)
+      {
+          sequencenode = node->GetNode ("sequence");
+      }
+      if(attempt == 2)
+      {
+          if(csString("sequence") == csString(node->GetValue()))
+              sequencenode = node;
+      }
+      if (sequencenode)
+      {
+          CreateSequence(sequencenode);
+          LoadSequence(ldr_context, sequencenode);
+          return true;
+      }
+
+      csRef<iDocumentNode> triggernode;
+      if(attempt == 1)
+      {
+          triggernode = node->GetNode ("trigger");
+      }
+      if(attempt == 2)
+      {
+          if(csString("trigger") == csString(node->GetValue()))
+              triggernode = node;
+      }
+      if (triggernode)
+      {
+          LoadTrigger(ldr_context, triggernode);
+          if(sync)
+          {
+              Engine->SyncEngineListsWait(this);
+          }
+          return true;
+      }
     }
 
     ReportError("crystalspace.maploader.parse",
