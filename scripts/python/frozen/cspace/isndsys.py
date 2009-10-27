@@ -380,6 +380,7 @@ class iSndSysStream(core.iBase):
     def RegisterCallback(*args): return _isndsys.iSndSysStream_RegisterCallback(*args)
     def UnregisterCallback(*args): return _isndsys.iSndSysStream_UnregisterCallback(*args)
     def RegisterFrameNotification(*args): return _isndsys.iSndSysStream_RegisterFrameNotification(*args)
+    def AlwaysStream(*args): return _isndsys.iSndSysStream_AlwaysStream(*args)
     scfGetVersion = staticmethod(_isndsys.iSndSysStream_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysStream
     __del__ = lambda self : None;

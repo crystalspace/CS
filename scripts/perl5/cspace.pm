@@ -5615,6 +5615,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RegisterCallback = *cspacec::iSndSysStream_RegisterCallback;
 *UnregisterCallback = *cspacec::iSndSysStream_UnregisterCallback;
 *RegisterFrameNotification = *cspacec::iSndSysStream_RegisterFrameNotification;
+*AlwaysStream = *cspacec::iSndSysStream_AlwaysStream;
 *scfGetVersion = *cspacec::iSndSysStream_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
