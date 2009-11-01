@@ -51,10 +51,10 @@ bool PositionMap::GetRandomPosition(float& xpos, float& zpos, float& radius, flo
       continue;
     }
 
-    float xAvail = (freeArea.x + radius) * 0.5f;
-    float yAvail = (freeArea.y + radius) * 0.5f;
-    float zAvail = (freeArea.z - radius) * 0.5f;
-    float wAvail = (freeArea.w - radius) * 0.5f;
+    float xAvail = freeArea.x + radius * 0.5f;
+    float yAvail = freeArea.y + radius * 0.5f;
+    float zAvail = freeArea.z - radius * 0.5f;
+    float wAvail = freeArea.w - radius * 0.5f;
 
     xpos = freeArea.x + radius + (zAvail - xAvail) * posGen.Get();
     zpos = freeArea.y + radius + (wAvail - yAvail) * posGen.Get();
