@@ -902,8 +902,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if (sequencenode)
       {
-          CreateSequence(sequencenode);
+          iSequenceWrapper* sw = CreateSequence(sequencenode);
           LoadSequence(ldr_context, sequencenode);
+          ret->SetResult(csRef<iBase>(sw));
+          if(sync)
+          {
+              Engine->SyncEngineListsWait(this);
+          }
           return true;
       }
 
@@ -919,7 +924,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if (triggernode)
       {
-          LoadTrigger(ldr_context, triggernode);
+          iSequenceTrigger* st = LoadTrigger(ldr_context, triggernode);
+          ret->SetResult(csRef<iBase>(st));
           if(sync)
           {
               Engine->SyncEngineListsWait(this);
