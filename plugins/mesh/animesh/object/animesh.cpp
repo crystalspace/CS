@@ -731,7 +731,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     if (skeleton)
     {
-      skeleton->UpdateSkeleton ((current_time - lastTick) / 1000.0f, currentFrame);
+      skeleton->UpdateSkeleton ((current_time - lastTick) / 1000.0f);
 
       // Copy the skeletal state into our buffers
       UpdateLocalBoneTransforms ();

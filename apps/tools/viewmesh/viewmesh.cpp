@@ -639,6 +639,7 @@ bool ViewMesh::CreateGui()
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
+  vfs->ChDir ("/viewmesh/");
   // Load layout and set as root
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("viewmesh.layout"));
 

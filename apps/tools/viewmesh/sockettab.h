@@ -246,7 +246,7 @@ bool SocketTab::SelSocket (const CEGUI::EventArgs& e)
 
 bool SocketTab::SaveSocket (const CEGUI::EventArgs& e)
 {
-  if (asset->GetSelectedSocket() == "") return true;
+  if (strcmp (asset->GetSelectedSocket(), "") == 0) return true;
   asset->SetSocketTransform(asset->GetSelectedSocket(), GetSocketInfo());
 
   csRef<iStringArray> arr = asset->GetSockets();

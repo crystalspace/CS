@@ -57,3 +57,4 @@ SubInclude TOP data renderlayers ;
 SubInclude TOP data shader ;
 SubInclude TOP data shader-old ;
 SubInclude TOP data varia ;
+SubInclude TOP data viewmesh ;
