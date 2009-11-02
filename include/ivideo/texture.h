@@ -266,8 +266,17 @@ struct iTextureHandle : public virtual iBase
   
   /**
    * Read back the data of the texture in the given format.
-   * \remarks To facilitate asynchronous transfers it's better to access
-   *   the actual data in a delayed fashion.
+   * \remarks To obtain the fastest possible readbacks:
+   * - If you read back the data frequently (e.g. from a render target used to
+   *   render the scene) use the CSDRAW_READBACK draw flag when drawing the
+   *   scene.
+   * - Access the actual data in a delayed fashion (e.g. the next frame)
+   *   to facilitate asynchronous transfers.
+   * - Read back in the format the texture was created with.
+   * - Certain formats are faster than others. (This is hardware-dependent,
+   *   but usually choosing one of <tt>argb8</tt>, <tt>abgr16_f</tt> or
+   *   <tt>abgr32_f</tt> gives good results. Again, texture and readback
+   *   format should match.)
    */
   virtual csPtr<iDataBuffer> Readback (
     const CS::StructuredTextureFormat& format, int mip = 0) = 0;

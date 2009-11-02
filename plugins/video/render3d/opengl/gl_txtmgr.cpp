@@ -57,7 +57,6 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
     G3D->ext->InitGL_ARB_half_float_pixel();*/
 
   G3D->ext->InitGL_ARB_pixel_buffer_object();
-  hasPBO = G3D->ext->CS_GL_ARB_pixel_buffer_object;
   
   G3D->ext->InitGL_SGIS_texture_lod();
   G3D->ext->InitGL_ARB_shadow ();
@@ -107,6 +106,21 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 csGLTextureManager::~csGLTextureManager()
 {
   Clear ();
+}
+  
+void csGLTextureManager::NextFrame (uint frameNum)
+{
+  pboCache.AdvanceTime (frameNum);
+}
+  
+csRef<PBOWrapper> csGLTextureManager::GetPBOWrapper (size_t pboSize)
+{
+  csRef<PBOWrapper>* wrapper = pboCache.Query (pboSize, true);
+  if (wrapper != 0) return *wrapper;
+  csRef<PBOWrapper> newWrapper;
+  newWrapper.AttachNew (new PBOWrapper (pboSize));
+  pboCache.AddActive (newWrapper);
+  return newWrapper;
 }
 
 void csGLTextureManager::read_config (iConfigFile *config)

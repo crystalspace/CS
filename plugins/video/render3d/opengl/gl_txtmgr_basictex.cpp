@@ -22,6 +22,7 @@
 
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagememory.h"
+#include "csutil/measuretime.h"
 
 #include "gl_render3d.h"
 #include "gl_txtmgr_basictex.h"
@@ -170,6 +171,12 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
     if (fail_reason) fail_reason->Replace ("compressed formats not supported");
     return false;
   }
+  
+  desiredReadbackFormat = srcFormat;
+  desiredReadbackBPP = 0;
+  for (int i = 0; i < format.GetComponentCount(); i++)
+    desiredReadbackBPP += format.GetComponentSize (i);
+  desiredReadbackBPP = ((desiredReadbackBPP+7)/8);
 
   const void* zeroData = 0;
   csRef<iBase> zeroRef;
@@ -966,8 +973,74 @@ void csGLBasicTextureHandle::GetMipmapLimits (int& maxMip, int& minMip)
     minMip = 0;
   }
 }
+
+void csGLBasicTextureHandle::SetDesiredReadbackFormat (const CS::StructuredTextureFormat& format)
+{
+  TextureStorageFormat glFormat;
+  TextureSourceFormat sourceFormat;
+  if (!txtmgr->DetermineGLFormat (format, glFormat, sourceFormat))
+  {
+    desiredReadbackFormat = TextureSourceFormat();
+    desiredReadbackBPP = 0;
+    return;
+  }
+    
+  desiredReadbackFormat = sourceFormat;
+
+  int s = 0;
+  for (int i = 0; i < format.GetComponentCount(); i++)
+    s += format.GetComponentSize (i);
+  s = ((s+7)/8);
+  desiredReadbackBPP = s;
+}
+
+template<typename Action>
+csPtr<iDataBuffer> csGLBasicTextureHandle::ReadbackPerform (
+  size_t readbackSize, Action& readbackAction)
+{
+  if (G3D->ext->CS_GL_ARB_pixel_buffer_object)
+  {
+    csRef<PBOWrapper> pbo = txtmgr->GetPBOWrapper (readbackSize);
+    GLuint _pbo = pbo->GetPBO (GL_PIXEL_PACK_BUFFER_ARB);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, _pbo, true);
+    readbackAction (0);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, 0, true);
+    
+    csRef<iDataBuffer> db;
+    db.AttachNew (new (txtmgr->pboTextureReadbacks) TextureReadbackPBO (
+      pbo, readbackSize));
+    return csPtr<iDataBuffer> (db);
+  }
+  else
+  {
+    void* data = cs_malloc (readbackSize);
+  
+    readbackAction (data);
+    
+    csRef<iDataBuffer> db;
+    db.AttachNew (new (txtmgr->simpleTextureReadbacks) TextureReadbackSimple (
+      data, readbackSize));
+    return csPtr<iDataBuffer> (db);
+  }
+}
   
 #include "csutil/custom_new_disable.h"
+
+struct ReadbackActionGetTexImage
+{
+  GLenum target;
+  GLint level;
+  GLenum format;
+  GLenum type;
+
+  ReadbackActionGetTexImage (GLenum target, GLint level, GLenum format, GLenum type)
+   : target (target), level (level), format (format), type (type) {}
+
+  void operator() (GLvoid *pixels) const
+  {
+    glGetTexImage (target, level, format, type, pixels);
+  }
+};
 
 csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (GLenum textarget,
     const CS::StructuredTextureFormat& format, int mip)
@@ -981,23 +1054,49 @@ csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (GLenum textarget,
   TextureSourceFormat sourceFormat;
   if (!txtmgr->DetermineGLFormat (format, glFormat, sourceFormat))
     return 0;
-
-  int s = 0;
-  for (int i = 0; i < format.GetComponentCount(); i++)
-    s += format.GetComponentSize (i);
+    
+  if (lastReadbackFormat == sourceFormat)
+  {
+    return csPtr<iDataBuffer> (lastReadback);
+  }
+  SetDesiredReadbackFormat (format);
   
   int w = csMax (actual_width >> mip, 1);
   int h = csMax (actual_height >> mip, 1);
   int d = csMax (actual_d >> mip, 1);
-  size_t byteSize = w * h * d * ((s+7)/8);
-  void* data = cs_malloc (byteSize);
-
-  glGetTexImage (textarget, mip, sourceFormat.format, sourceFormat.type, data);
+  size_t byteSize = w * h * d * desiredReadbackBPP;
   
-  csRef<iDataBuffer> db;
-  db.AttachNew (new (txtmgr->simpleTextureReadbacks) TextureReadbackSimple (
-    data, byteSize));
-  return csPtr<iDataBuffer> (db);
+  ReadbackActionGetTexImage action (textarget, mip, sourceFormat.format, sourceFormat.type);
+  return ReadbackPerform (byteSize, action);
+}
+  
+struct ReadbackActionReadPixels
+{
+  GLint x;
+  GLint y;
+  GLsizei width;
+  GLsizei height;
+  GLenum format;
+  GLenum type;
+
+  ReadbackActionReadPixels (GLint x, GLint y, GLsizei width, GLsizei height,
+    GLenum format, GLenum type)
+   : x (x), y (y), width (width), height (height), format (format), type (type) {}
+
+  void operator() (GLvoid *pixels) const
+  {
+    glReadPixels (x, y, width, height, format, type, pixels);
+  }
+};
+
+void csGLBasicTextureHandle::ReadbackFramebuffer ()
+{
+  size_t byteSize = actual_width * actual_height * desiredReadbackBPP;
+  
+  ReadbackActionReadPixels action (0, 0, actual_width, actual_height,
+    desiredReadbackFormat.format, desiredReadbackFormat.type);
+  lastReadback = ReadbackPerform (byteSize, action);
+  lastReadbackFormat = desiredReadbackFormat;
 }
 
 #include "csutil/custom_new_enable.h"

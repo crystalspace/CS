@@ -82,7 +82,7 @@ public:
   virtual void BeginDraw (int drawflags);
   virtual CS::Math::Matrix4 FixupProjection (
     const CS::Math::Matrix4& projectionMatrix);
-  virtual void FinishDraw ();
+  virtual void FinishDraw (bool readbackTargets);
   virtual void SetClipRect (const csRect& clipRect);
   virtual void SetupClipPortalDrawing ();
   virtual bool HasStencil();

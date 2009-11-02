@@ -22,6 +22,7 @@
 #define __CS_GL_NEWTXTMGR_H__
 
 #include "csgfx/textureformatstrings.h"
+#include "csutil/genericresourcecache.h"
 #include "csutil/threadmanager.h"
 #include "csutil/weakrefarr.h"
 
@@ -29,6 +30,7 @@
 #include "ivideo/txtmgr.h"
 
 #include "gl_txtmgr_basictex.h"
+#include "pbo.h"
 
 struct iImageIO;
 
@@ -158,15 +160,22 @@ public:
     bool generateMipMapsExcessOne;
   } tweaks;
     
-  bool hasPBO;
-  
   TextureReadbackSimple::Pool simpleTextureReadbacks;
+  TextureReadbackPBO::Pool pboTextureReadbacks;
+  
+  typedef CS::Utility::GenericResourceCache<csRef<PBOWrapper>,
+    uint, CacheSorting::PBO, 
+    CS::Utility::ResourceCache::ReuseIfOnlyOneRef> PBOCache;
+  PBOCache pboCache;
+  csRef<PBOWrapper> GetPBOWrapper (size_t pboSize);
 
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *G3D);
 
   virtual ~csGLTextureManager ();
+
+  void NextFrame (uint frameNum);
 
   /// Read configuration values from config file.
   void read_config (iConfigFile *config);

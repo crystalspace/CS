@@ -78,6 +78,12 @@ class csShaderVariableStack;
 #define CSDRAW_CLEARSCREEN  0x00000020
 /// Ignore clipping rectangle when clearing?
 #define CSDRAW_NOCLIPCLEAR  0x00000040
+/**
+ * Trigger a read back of the render target once drawing is finished.
+ * The read back data must be retrieved with iTextureHandle::Readback().
+ * Has no effect if no render target is set.
+ */
+#define CSDRAW_READBACK     0x00000080
 /** @} */
 
 /**\name Type of clipper (for iGraphics3D::SetClipper())

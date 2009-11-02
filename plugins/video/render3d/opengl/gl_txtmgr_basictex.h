@@ -73,6 +73,11 @@ struct TextureSourceFormat
   /// Init for uncompressed texture
   TextureSourceFormat (GLenum format, GLenum type) :
     format (format), type (type) {}
+    
+  bool operator== (const TextureSourceFormat& other) const
+  {
+    return (format == other.format) && (type == other.type);
+  }
 };
 
 struct csGLUploadData
@@ -214,6 +219,16 @@ protected:
   THREADED_CALLABLE_DECL(csGLBasicTextureHandle, Unload, csThreadReturn, HIGH, true, false);
   
   CS::Graphics::TextureComparisonMode texCompare;
+  
+  // Readback data
+  TextureSourceFormat lastReadbackFormat;
+  csRef<iDataBuffer> lastReadback;
+  TextureSourceFormat desiredReadbackFormat;
+  int desiredReadbackBPP;
+  
+  void SetDesiredReadbackFormat (const CS::StructuredTextureFormat&);
+  template<typename Action>
+  csPtr<iDataBuffer> ReadbackPerform (size_t readbackSize, Action& readbackAction);
 public:
   /// The dimensions which were requested upon texture creation
   int orig_width, orig_height, orig_d;
@@ -238,7 +253,9 @@ public:
   
   bool IsInFBO() const { return texFlags.Check (flagInFBO); }
   void SetInFBO (bool b) { texFlags.SetBool (flagInFBO, b); }
-
+  
+  void ReadbackFramebuffer ();
+  
   /// Create a texture with given dimensions
   csGLBasicTextureHandle (int width, int height, int depth,
     csImageType imagetype, int flags, csGLGraphics3D *iG3D);
