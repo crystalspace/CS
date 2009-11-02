@@ -1,0 +1,77 @@
+<shader compiler="xmlshader" name="postproc_hdr_luminance_logaverage_n">
+  <?Template Technique PRIO XSIZE YSIZE ?>
+    <technique priority="$PRIO$">
+      <meta name="filterSizeX">$XSIZE$</meta>
+      <meta name="filterSizeY">$YSIZE$</meta>
+      <pass>
+	<buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	<!-- vp plugin="glfixed" / -->
+	<texture destination="Texture1" name="tex diffuse" />
+	<fp plugin="glcg">
+	  <cgfp>
+	    <variablemap variable="input pixel size" destination="pixelSize" />
+	    <program>
+		<![CDATA[
+  
+		float4 main (in float2 TexCoord : TEXCOORD0,
+			  uniform sampler2D Texture1,
+			  uniform float2 pixelSize) : COLOR
+		{
+		  /* The TexCoord is sampled at the center of the rendered fragment,
+		  thus it's in the middle of the block we're looking at */
+		  TexCoord -= float2 ($XSIZE$/2, $YSIZE$/2)*pixelSize;
+		  
+		  float sum = 0;
+		  float2 maxima = float2 (0);
+		  for (int y = 0; y < $YSIZE$; y++)
+		  {
+		    for (int x = 0; x < $XSIZE$; x++)
+		    {
+		      float2 sampleCoord = TexCoord+float2(x, y)*pixelSize;
+		      float4 values = tex2D (Texture1, sampleCoord).rgba;
+		      sum += values.y;
+		      maxima = max (maxima, values.xz);
+		    }
+		  }
+		  
+		  return float4 (maxima.x, sum, maxima.y, 1);
+		}
+  
+		]]>
+	    </program>
+	  </cgfp>
+	</fp>
+      </pass>
+    </technique>
+  <?Endtemplate?>
+  
+  <?Technique 25 16 16 ?>
+  <?Technique 24 16 8 ?>
+  <?Technique 23 16 4 ?>
+  <?Technique 22 16 2 ?>
+  <?Technique 21 16 1 ?>
+
+  <?Technique 20 8 16 ?>
+  <?Technique 19 8 8 ?>
+  <?Technique 18 8 4 ?>
+  <?Technique 17 8 2 ?>
+  <?Technique 16 8 1 ?>
+  
+  <?Technique 15 4 16 ?>
+  <?Technique 14 4 8 ?>
+  <?Technique 13 4 4 ?>
+  <?Technique 12 4 2 ?>
+  <?Technique 11 4 1 ?>
+  
+  <?Technique 10 2 16 ?>
+  <?Technique 9 2 8 ?>
+  <?Technique 8 2 4 ?>
+  <?Technique 7 2 2 ?>
+  <?Technique 6 2 1 ?>
+  
+  <?Technique 5 1 16 ?>
+  <?Technique 4 1 8 ?>
+  <?Technique 3 1 4 ?>
+  <?Technique 2 1 2 ?>
+  <?Technique 1 1 1 ?>
+</shader>

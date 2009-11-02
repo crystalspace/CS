@@ -152,8 +152,27 @@ public:
   {
     realShader->PushShaderVariables (s, t);
   }
-
-  friend class csXMLShaderCompiler;
+  
+  size_t GetPrioritiesTicket (const CS::Graphics::RenderMeshModes& modes,
+    const csShaderVariableStack& stack)
+  {
+    return realShader->GetPrioritiesTicket (modes, stack);
+  }
+  
+  csPtr<iShaderPriorityList> GetAvailablePriorities (size_t ticket) const
+  {
+    return realShader->GetAvailablePriorities (ticket);
+  }
+  
+  csPtr<iString> GetTechniqueMetadata (int priority, const char* dataKey) const
+  {
+    return realShader->GetTechniqueMetadata (priority, dataKey);
+  }
+  
+  csPtr<iShader> ForceTechnique (int priority)
+  {
+    return realShader->ForceTechnique (priority);
+  }
 
   /**\name iSelfDestruct implementation
    * @{ */

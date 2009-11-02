@@ -44,6 +44,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RM_RLCompat)
     bool Initialize (iObjectRegistry* objReg);
   
     bool RenderView (iView* view);
+    bool PrecacheView (iView* view);
   
     void RegisterRenderTarget (iTextureHandle* target, 
       iView* view, int subtexture = 0, uint flags = 0) {}

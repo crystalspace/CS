@@ -17530,6 +17530,87 @@ SWIGINTERN PyObject *csShaderMetadata_swigregister(PyObject *SWIGUNUSEDPARM(self
   return SWIG_Py_Void();
 }
 
+SWIGINTERN PyObject *_wrap_iShaderPriorityList_GetCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  size_t result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderPriorityList_GetCount",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderPriorityList_GetCount" "', argument " "1"" of type '" "iShaderPriorityList const *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
+  result = ((iShaderPriorityList const *)arg1)->GetCount();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderPriorityList_GetPriority(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderPriorityList_GetPriority",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderPriorityList_GetPriority" "', argument " "1"" of type '" "iShaderPriorityList const *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderPriorityList_GetPriority" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = (int)((iShaderPriorityList const *)arg1)->GetPriority(arg2);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_iShaderPriorityList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iShaderPriorityList",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iShaderPriorityList" "', argument " "1"" of type '" "iShaderPriorityList *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *iShaderPriorityList_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_iShaderPriorityList, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
 SWIGINTERN PyObject *_wrap_iShader_QueryObject(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShader *arg1 = (iShader *) 0 ;
@@ -17959,6 +18040,177 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iShader_GetPrioritiesTicket(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShader *arg1 = (iShader *) 0 ;
+  CS::Graphics::RenderMeshModes *arg2 = 0 ;
+  csShaderVariableStack *arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  size_t result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShader_GetPrioritiesTicket",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_GetPrioritiesTicket" "', argument " "1"" of type '" "iShader *""'"); 
+  }
+  arg1 = reinterpret_cast< iShader * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__Graphics__RenderMeshModes,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShader_GetPrioritiesTicket" "', argument " "2"" of type '" "CS::Graphics::RenderMeshModes const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShader_GetPrioritiesTicket" "', argument " "2"" of type '" "CS::Graphics::RenderMeshModes const &""'"); 
+  }
+  arg2 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csShaderVariableStack,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShader_GetPrioritiesTicket" "', argument " "3"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShader_GetPrioritiesTicket" "', argument " "3"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  arg3 = reinterpret_cast< csShaderVariableStack * >(argp3);
+  result = (arg1)->GetPrioritiesTicket((CS::Graphics::RenderMeshModes const &)*arg2,(csShaderVariableStack const &)*arg3);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShader_GetAvailablePriorities(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShader *arg1 = (iShader *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  SwigValueWrapper< csPtr< iShaderPriorityList > > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShader_GetAvailablePriorities",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_GetAvailablePriorities" "', argument " "1"" of type '" "iShader const *""'"); 
+  }
+  arg1 = reinterpret_cast< iShader * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShader_GetAvailablePriorities" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = ((iShader const *)arg1)->GetAvailablePriorities(arg2);
+  resultobj = SWIG_NewPointerObj((new csPtr< iShaderPriorityList >(static_cast< const csPtr< iShaderPriorityList >& >(result))), SWIGTYPE_p_csPtrT_iShaderPriorityList_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShader_GetTechniqueMetadata(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShader *arg1 = (iShader *) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  SwigValueWrapper< csPtr< iString > > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShader_GetTechniqueMetadata",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_GetTechniqueMetadata" "', argument " "1"" of type '" "iShader const *""'"); 
+  }
+  arg1 = reinterpret_cast< iShader * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShader_GetTechniqueMetadata" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShader_GetTechniqueMetadata" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  result = ((iShader const *)arg1)->GetTechniqueMetadata(arg2,(char const *)arg3);
+  {
+    csRef<iString> ref((csPtr<iString>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iString *)ref, SWIGTYPE_p_iString, 1);
+  }
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShader_ForceTechnique(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShader *arg1 = (iShader *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  SwigValueWrapper< csPtr< iShader > > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShader_ForceTechnique",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_ForceTechnique" "', argument " "1"" of type '" "iShader *""'"); 
+  }
+  arg1 = reinterpret_cast< iShader * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShader_ForceTechnique" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (arg1)->ForceTechnique(arg2);
+  {
+    csRef<iShader> ref((csPtr<iShader>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iShader *)ref, SWIGTYPE_p_iShader, 1);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iShader_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -17997,87 +18249,6 @@ SWIGINTERN PyObject *iShader_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObje
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iShader, SWIG_NewClientData(obj));
-  return SWIG_Py_Void();
-}
-
-SWIGINTERN PyObject *_wrap_iShaderPriorityList_GetCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  size_t result;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iShaderPriorityList_GetCount",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderPriorityList_GetCount" "', argument " "1"" of type '" "iShaderPriorityList const *""'"); 
-  }
-  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
-  result = ((iShaderPriorityList const *)arg1)->GetCount();
-  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iShaderPriorityList_GetPriority(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
-  size_t arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  size_t val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  int result;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iShaderPriorityList_GetPriority",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderPriorityList_GetPriority" "', argument " "1"" of type '" "iShaderPriorityList const *""'"); 
-  }
-  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
-  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderPriorityList_GetPriority" "', argument " "2"" of type '" "size_t""'");
-  } 
-  arg2 = static_cast< size_t >(val2);
-  result = (int)((iShaderPriorityList const *)arg1)->GetPriority(arg2);
-  resultobj = SWIG_From_int(static_cast< int >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_delete_iShaderPriorityList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"delete_iShaderPriorityList",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iShaderPriorityList" "', argument " "1"" of type '" "iShaderPriorityList *""'"); 
-  }
-  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
-  delete arg1;
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *iShaderPriorityList_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *obj;
-  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_iShaderPriorityList, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -23910,6 +24081,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_csShaderMetadata", _wrap_new_csShaderMetadata, METH_VARARGS, NULL},
 	 { (char *)"delete_csShaderMetadata", _wrap_delete_csShaderMetadata, METH_VARARGS, NULL},
 	 { (char *)"csShaderMetadata_swigregister", csShaderMetadata_swigregister, METH_VARARGS, NULL},
+	 { (char *)"iShaderPriorityList_GetCount", _wrap_iShaderPriorityList_GetCount, METH_VARARGS, NULL},
+	 { (char *)"iShaderPriorityList_GetPriority", _wrap_iShaderPriorityList_GetPriority, METH_VARARGS, NULL},
+	 { (char *)"delete_iShaderPriorityList", _wrap_delete_iShaderPriorityList, METH_VARARGS, NULL},
+	 { (char *)"iShaderPriorityList_swigregister", iShaderPriorityList_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iShader_QueryObject", _wrap_iShader_QueryObject, METH_VARARGS, NULL},
 	 { (char *)"iShader_GetFileName", _wrap_iShader_GetFileName, METH_VARARGS, NULL},
 	 { (char *)"iShader_SetFileName", _wrap_iShader_SetFileName, METH_VARARGS, NULL},
@@ -23922,13 +24097,13 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iShader_GetUsedShaderVars", _wrap_iShader_GetUsedShaderVars, METH_VARARGS, NULL},
 	 { (char *)"iShader_GetMetadata", _wrap_iShader_GetMetadata, METH_VARARGS, NULL},
 	 { (char *)"iShader_PushShaderVariables", _wrap_iShader_PushShaderVariables, METH_VARARGS, NULL},
+	 { (char *)"iShader_GetPrioritiesTicket", _wrap_iShader_GetPrioritiesTicket, METH_VARARGS, NULL},
+	 { (char *)"iShader_GetAvailablePriorities", _wrap_iShader_GetAvailablePriorities, METH_VARARGS, NULL},
+	 { (char *)"iShader_GetTechniqueMetadata", _wrap_iShader_GetTechniqueMetadata, METH_VARARGS, NULL},
+	 { (char *)"iShader_ForceTechnique", _wrap_iShader_ForceTechnique, METH_VARARGS, NULL},
 	 { (char *)"iShader_scfGetVersion", _wrap_iShader_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iShader", _wrap_delete_iShader, METH_VARARGS, NULL},
 	 { (char *)"iShader_swigregister", iShader_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iShaderPriorityList_GetCount", _wrap_iShaderPriorityList_GetCount, METH_VARARGS, NULL},
-	 { (char *)"iShaderPriorityList_GetPriority", _wrap_iShaderPriorityList_GetPriority, METH_VARARGS, NULL},
-	 { (char *)"delete_iShaderPriorityList", _wrap_delete_iShaderPriorityList, METH_VARARGS, NULL},
-	 { (char *)"iShaderPriorityList_swigregister", iShaderPriorityList_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_GetName", _wrap_iShaderCompiler_GetName, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_CompileShader", _wrap_iShaderCompiler_CompileShader, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_ValidateTemplate", _wrap_iShaderCompiler_ValidateTemplate, METH_VARARGS, NULL},
@@ -25820,6 +25995,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_TEXTURE_NPOTS",SWIG_From_int(static_cast< int >(0x00000040)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_SCALE_UP",SWIG_From_int(static_cast< int >(0x00000080)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_SCALE_DOWN",SWIG_From_int(static_cast< int >(0x00000100)));
+  SWIG_Python_SetConstant(d, "CS_TEXTURE_CREATE_CLEAR",SWIG_From_int(static_cast< int >(0x00000200)));
   SWIG_Python_SetConstant(d, "CS_MATERIAL_VARNAME_FLATCOLOR",SWIG_FromCharPtr("mat flatcolor"));
   SWIG_Python_SetConstant(d, "CS_MATERIAL_TEXTURE_DIFFUSE",SWIG_FromCharPtr("tex diffuse"));
 }

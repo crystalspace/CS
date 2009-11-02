@@ -369,6 +369,9 @@ bool csGLTextureHandle::MakeUploadData (bool allowCompressed,
         uploadData.image_data = imageRaw->GetUint8();
         if (glFormat.isCompressed)
 	  uploadData.compressedSize = imageRaw->GetSize();
+	  
+	if (desiredReadbackFormat.format == 0)
+	 SetDesiredReadbackFormat (texFormat);
       }
     }
   }
@@ -395,6 +398,9 @@ bool csGLTextureHandle::MakeUploadData (bool allowCompressed,
     //uploadData->size = n * 4;
     uploadData.sourceFormat.format = GL_RGBA;
     uploadData.sourceFormat.type = GL_UNSIGNED_BYTE;
+    
+    if (desiredReadbackFormat.format == 0)
+      SetDesiredReadbackFormat (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
   }
   uploadData.storageFormat.targetFormat = targetFormat;
   uploadData.w = Image->GetWidth();

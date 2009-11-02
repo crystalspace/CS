@@ -372,7 +372,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 	return currentAttachments != data.initialAttachments;
       }
     };
-  } // namespace CacheReuse
+  } // namespace CachePurge
 
 class csGLRender2TextureEXTfbo : public csGLRender2TextureBackend
 {
@@ -391,7 +391,6 @@ class csGLRender2TextureEXTfbo : public csGLRender2TextureBackend
     CS::Utility::ResourceCache::ReuseConditionAfterTime<>,
     CachePurge::FrameBuffer> fboCache;
 
-  uint frameNum;
   R2TAttachmentGroup<csRef<iTextureHandle> > currentAttachments;
 
   csString fboMsg;
@@ -415,13 +414,13 @@ public:
   void BeginDraw (int drawflags);
   CS::Math::Matrix4 FixupProjection (
     const CS::Math::Matrix4& projectionMatrix);
-  void FinishDraw ();
+  void FinishDraw (bool readbackTargets);
   void SetClipRect (const csRect& clipRect);
   void SetupClipPortalDrawing ();
 
   virtual bool HasStencil() { return stencilStorage != 0; }
 
-  void NextFrame();
+  void NextFrame (uint frameNum);
   void CleanupFBOs();
 
   void GetDepthStencilRBs (const Dimensions& fbSize, 

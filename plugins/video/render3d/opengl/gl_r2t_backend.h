@@ -96,12 +96,12 @@ public:
   virtual void BeginDraw (int drawflags) = 0;
   virtual CS::Math::Matrix4 FixupProjection (
     const CS::Math::Matrix4& projectionMatrix) = 0;
-  virtual void FinishDraw () = 0;
+  virtual void FinishDraw (bool readbackTargets) = 0;
   virtual void SetClipRect (const csRect& clipRect) = 0;
   virtual void SetupClipPortalDrawing () = 0;
   virtual bool HasStencil() = 0;
 
-  virtual void NextFrame() {}
+  virtual void NextFrame (uint frameNum) {}
   virtual void CleanupFBOs() {}
 };
 

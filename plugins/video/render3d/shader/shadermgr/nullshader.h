@@ -58,11 +58,15 @@ public:
 
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes&, 
     const csShaderVariableStack&) { return 0; }
-  virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
-    csShaderVariable** stacks)
-  {
-    return 0;
-  }
+  virtual size_t GetPrioritiesTicket (const CS::Graphics::RenderMeshModes& modes,
+    const csShaderVariableStack& stack)
+  { return csArrayItemNotFound; }
+  virtual csPtr<iShaderPriorityList> GetAvailablePriorities (size_t prioTicket) const
+  { return 0; }
+  virtual csPtr<iString> GetTechniqueMetadata (int priority, const char* dataKey) const
+  { return 0; }
+  virtual csPtr<iShader> ForceTechnique (int priority)
+  { return 0; }
 
   virtual size_t GetNumberOfPasses (size_t) { return 0; }
   virtual bool ActivatePass (size_t, size_t) { return false; }

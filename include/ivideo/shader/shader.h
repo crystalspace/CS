@@ -42,6 +42,7 @@ struct iHierarchicalCache;
 struct iLight;
 struct iObject;
 struct iLoaderContext;
+struct iString;
 
 namespace CS
 {
@@ -469,12 +470,24 @@ struct csShaderMetadata
 };
 
 /**
+ * A list of priorities as returned by iShaderCompiler->GetPriorities()
+ */
+struct iShaderPriorityList : public virtual iBase
+{
+  SCF_INTERFACE (iShaderPriorityList, 1,0,0);
+  /// Get number of priorities.
+  virtual size_t GetCount () const = 0;
+  /// Get priority.
+  virtual int GetPriority (size_t idx) const = 0;
+};
+
+/**
  * Specific shader. Can/will be either render-specific or general
  * The shader in this form is "compiled" and cannot be modified.
  */
 struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 4, 0, 0);
+  SCF_INTERFACE(iShader, 4, 0, 1);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -540,21 +553,36 @@ struct iShader : public virtual iShaderVariableContext
    * supplied in the "stack" argument
    */
   virtual void PushShaderVariables (csShaderVariableStack& stack,
-    size_t ticket) const = 0;  
+    size_t ticket) const = 0;
+  
+  /**\name Shader technique selection and metadata
+   * @{ */
+  /**
+   * Query a "priorities ticket".
+   * This is a shader-internal token representing the techniques available
+   * with the given mesh modes and shader variables.
+   * \sa GetTicket
+   */
+  virtual size_t GetPrioritiesTicket (const CS::Graphics::RenderMeshModes& modes,
+    const csShaderVariableStack& stack) = 0;
+  /**
+   * Get a list of all available techniques (resp. their priorities) for a
+   * priority ticket.
+   */
+  virtual csPtr<iShaderPriorityList> GetAvailablePriorities (size_t prioTicket) const = 0;
+  /**
+   * Query metadata from a technique.
+   * Returns 0 if no metadata with the given key is available.
+   */
+  virtual csPtr<iString> GetTechniqueMetadata (int priority, const char* dataKey) const = 0;
+  /**
+   * Return a shader that wraps a certain technique of this shader.
+   * Returns 0 if no technique with that priority is actually present.
+   */
+  virtual csPtr<iShader> ForceTechnique (int priority) = 0;
+  /** @} */
 };
 
-
-/**
- * A list of priorities as returned by iShaderCompiler->GetPriorities()
- */
-struct iShaderPriorityList : public virtual iBase
-{
-  SCF_INTERFACE (iShaderPriorityList, 1,0,0);
-  /// Get number of priorities.
-  virtual size_t GetCount () const = 0;
-  /// Get priority.
-  virtual int GetPriority (size_t idx) const = 0;
-};
 
 /**
  * Compiler of shaders. Compile from a description of the shader to a 

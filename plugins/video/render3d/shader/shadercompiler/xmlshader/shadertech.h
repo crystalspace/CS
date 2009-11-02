@@ -21,6 +21,7 @@
 #define __CS_SHADERTECH_H__
 
 #include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
 
 #include "csgfx/shadervarcontext.h"
 #include "csplugincommon/shader/shaderplugin.h"

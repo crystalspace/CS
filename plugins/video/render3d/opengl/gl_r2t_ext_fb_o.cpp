@@ -173,7 +173,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
   csGLRender2TextureEXTfbo::csGLRender2TextureEXTfbo (csGLGraphics3D* G3D) :
     csGLRender2TextureBackend (G3D), enableFBO (true), currentFBO (0), 
-    viewportSet (false), frameNum (0)
+    viewportSet (false)
   {
     GLenum fbStatus = GL_FRAMEBUFFER_UNSUPPORTED_EXT;
 
@@ -387,9 +387,24 @@ CS::Math::Matrix4 csGLRender2TextureEXTfbo::FixupProjection (
   return actual;
 }
 
-void csGLRender2TextureEXTfbo::FinishDraw ()
+void csGLRender2TextureEXTfbo::FinishDraw (bool readbackTargets)
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  
+  if (readbackTargets)
+  {
+    for (int a = 0; a < rtaNumAttachments; a++)
+    {
+      const WRTAG::RTA& attachment =
+	currentAttachments.GetAttachment (csRenderTargetAttachment(a));
+      if (attachment.IsValid())
+      {
+	csGLBasicTextureHandle* tex_mm = 
+	  static_cast<csGLBasicTextureHandle*> ((iTextureHandle*)attachment.texture);
+	tex_mm->ReadbackFramebuffer();
+      }
+    }
+  }
 
   currentFBO->Unbind();
   G3D->statecache->SetCullFace (GL_FRONT);
@@ -411,10 +426,8 @@ void csGLRender2TextureEXTfbo::SetupClipPortalDrawing ()
   glScalef (1, -1, 1);
 }
 
-void csGLRender2TextureEXTfbo::NextFrame()
+void csGLRender2TextureEXTfbo::NextFrame (uint frameNum)
 {
-  frameNum++;
-
   fboCache.AdvanceTime (frameNum);
   depthRBCache.AdvanceTime (frameNum);
   stencilRBCache.AdvanceTime (frameNum);
