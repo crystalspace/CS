@@ -109,7 +109,9 @@ namespace CS
         class CS_CRYSTALSPACE_EXPORT LogAverage : public BaseHierarchical
         {
         public:
-          LogAverage() : BaseHierarchical ("bgr16_f", "bgr32_f") {}
+          LogAverage() : BaseHierarchical ("bgr16_f",
+            "abgr32_f") // This format allows fast readback (at least on NV)
+          {}
         
 	  void Initialize (iObjectRegistry* objReg,
 	    HDRHelper& hdr);

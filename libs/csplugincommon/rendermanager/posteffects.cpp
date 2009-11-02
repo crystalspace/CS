@@ -219,7 +219,12 @@ void PostEffectManager::DrawPostEffects (RenderTreeBase& renderTree)
     }
     graphics3D->SetRenderTarget (targetTex);
 
-    graphics3D->BeginDraw (CSDRAW_CLEARZBUFFER | CSDRAW_3DGRAPHICS);
+    int drawflags = CSDRAW_CLEARZBUFFER | CSDRAW_3DGRAPHICS;
+    if (outputLayer.options.readback
+        && ((layer == postLayers.GetSize ()-1)
+          || (&GetRealOutputLayer (*(postLayers[layer+1])) != &outputLayer)))
+      drawflags |= CSDRAW_READBACK;
+    graphics3D->BeginDraw (drawflags);
     graphics3D->DrawSimpleMesh (
       currentDimData->layerRenderInfos[layer].fullscreenQuad,
       csSimpleMeshScreenspace);
@@ -613,16 +618,22 @@ void PostEffectManager::DimensionData::UpdateSVContexts (
       }
     }
     
-    const PostEffectManager::Layer& outputLayer = pfx.GetRealOutputLayer (layer);
-    size_t b = pfx.GetBucketIndex (outputLayer.GetOptions ());
-    
     renderInfo.svPixelSize.AttachNew (new csShaderVariable (
       pfx.svStrings->Request ("pixel size")));
-    int texW = dim.x >> layer.options.downsample;
-    int texH = dim.y >> layer.options.downsample;
-    renderInfo.svPixelSize->SetValue (
-      csVector2 (buckets[b].texMaxX/float (texW), 
-        buckets[b].texMaxY/float (texH)));
+    const PostEffectManager::Layer& outputLayer = pfx.GetRealOutputLayer (layer);
+    if (!outputLayer.options.manualTarget.IsValid())
+    {
+      size_t b = pfx.GetBucketIndex (outputLayer.GetOptions ());
+      
+      int texW = dim.x >> layer.options.downsample;
+      int texH = dim.y >> layer.options.downsample;
+      renderInfo.svPixelSize->SetValue (
+	csVector2 (buckets[b].texMaxX/float (texW), 
+	  buckets[b].texMaxY/float (texH)));
+    }
+    else
+      // Don't really know pixel size...
+      renderInfo.svPixelSize->SetValue (csVector2 (0, 0));
         
     renderInfo.fullscreenQuad.dynDomain = renderInfo.layerSVs;
   }

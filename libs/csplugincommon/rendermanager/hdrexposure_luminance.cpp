@@ -35,6 +35,7 @@ namespace CS
 	CS_DECLARE_PROFILER
 	CS_DECLARE_PROFILER_ZONE(HDRLuminance_GetResultData);
 	CS_DECLARE_PROFILER_ZONE(HDRLuminance_GetResultData_Readback);
+	CS_DECLARE_PROFILER_ZONE(HDRLuminance_GetResultData_DrawFX);
 
 	void BaseHierarchical::Initialize (iObjectRegistry* objReg,
 	  HDRHelper& hdr,
@@ -90,9 +91,13 @@ namespace CS
 	    SetupStages (lastTargetW, lastTargetH, measureTex);
 	    lastMeasureTex = measureTex;
 	  }
-	  computeFX.DrawPostEffects (renderTree);
 	  
 	  measureTex = computeStages[computeStages.GetSize()-1].target;
+	  {
+	    CS_PROFILER_ZONE(HDRLuminance_GetResultData_DrawFX);
+	    computeFX.DrawPostEffects (renderTree);
+	  }
+	  
 	  int newW, newH;
 	  measureTex->GetRendererDimensions (newW, newH);
 	  
@@ -325,7 +330,10 @@ namespace CS
 	    PostEffectManager::LayerOptions options;
 	    options.targetRect = finalParts[l].destRect;
 	    if (outputLayer == 0)
+	    {
 	      options.manualTarget = stage.target;
+	      options.readback = lastStage;
+	    }
 	    else
 	      options.renderOn = outputLayer;
 	    //inputMap.manualTexcoords = computeTexcoordBuf;
@@ -347,7 +355,12 @@ namespace CS
 
 	  int currentW = targetW;
 	  int currentH = targetH;
-	  const int minSize = 16; // Arbitrary
+	  const int minSize = 256; /* Arbitrary
+	                              @@@ In fact I [res] don't know the cut
+	                              off point after which the multi-stage
+	                              approach is faster than a readback of
+	                              the first stage, or if that exists at
+	                              all... */
 	  iTextureHandle* currentTex = measureTex;
 	  bool iterateStage;
 	  do
@@ -431,16 +444,17 @@ namespace CS
 	    usedColorScale);
 	  if (computeData.IsValid ())
 	  {
-	    const float* rgb = (float*)computeData->GetData();
+	    const float* rgba = (float*)computeData->GetData();
 	    int numPixels = W * H;
 	    float lumSum = 0;
 	    float maxLum = 0;
 	    float maxComp = 0;
 	    for (int i = 0; i < numPixels; i++)
 	    {
-	      float r = *rgb++;
-	      float g = *rgb++;
-	      float b = *rgb++;
+	      float r = *rgba++;
+	      float g = *rgba++;
+	      float b = *rgba++;
+	      rgba++;
 	      lumSum += g;
 	      maxLum = csMax (maxLum, r);
 	      maxComp = csMax (maxComp, b);

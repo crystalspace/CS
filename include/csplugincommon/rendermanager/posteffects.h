@@ -136,16 +136,25 @@ namespace RenderManager
        * This means all other options except targetRect are ignored.
        */
       Layer* renderOn;
+      /**
+       * This layer will later be read back. Sets the #CSDRAW_READBACK draw
+       * flag.
+       */
+      bool readback;
       
       LayerOptions() : mipmap (false), maxMipmap (-1), downsample (0),
-        noTextureReuse (false), renderOn (0) {}
+        noTextureReuse (false), renderOn (0), readback (false) {}
       
       bool operator==(const LayerOptions& other) const
       { 
         return (mipmap == other.mipmap)
           && (maxMipmap == other.maxMipmap)
           && (downsample == other.downsample)
-          && (noTextureReuse == other.noTextureReuse);
+          && (noTextureReuse == other.noTextureReuse)
+          && (manualTarget == other.manualTarget)
+          && (targetRect == other.targetRect)
+          && (renderOn == other.renderOn)
+          && (readback == other.readback);
       }
     };
 
