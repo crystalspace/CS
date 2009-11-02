@@ -25805,6 +25805,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CSDRAW_CLEARZBUFFER",SWIG_From_int(static_cast< int >(0x00000010)));
   SWIG_Python_SetConstant(d, "CSDRAW_CLEARSCREEN",SWIG_From_int(static_cast< int >(0x00000020)));
   SWIG_Python_SetConstant(d, "CSDRAW_NOCLIPCLEAR",SWIG_From_int(static_cast< int >(0x00000040)));
+  SWIG_Python_SetConstant(d, "CSDRAW_READBACK",SWIG_From_int(static_cast< int >(0x00000080)));
   SWIG_Python_SetConstant(d, "CS_CLIPPER_NONE",SWIG_From_int(static_cast< int >(-1)));
   SWIG_Python_SetConstant(d, "CS_CLIPPER_OPTIONAL",SWIG_From_int(static_cast< int >(0)));
   SWIG_Python_SetConstant(d, "CS_CLIPPER_TOPLEVEL",SWIG_From_int(static_cast< int >(1)));
