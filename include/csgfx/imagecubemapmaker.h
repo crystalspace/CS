@@ -63,7 +63,7 @@ public:
   CS_LEAKGUARD_DECLARE (csImageCubeMapMaker);
 
   /// Create a new map without faces set.
-  csImageCubeMapMaker();
+  csImageCubeMapMaker ();
   /// Create a new map and copy the faces from \a source.
   csImageCubeMapMaker (iImage* source);
   /**
@@ -73,7 +73,7 @@ public:
   csImageCubeMapMaker (iImage* posX, iImage* negX, iImage* posY, 
     iImage* negY, iImage* posZ, iImage* negZ);
 
-  virtual ~csImageCubeMapMaker();
+  virtual ~csImageCubeMapMaker ();
 
   virtual const void *GetImageData ();
   virtual int GetWidth () const;
@@ -99,10 +99,10 @@ public:
   virtual uint HasMipmaps () const;
   virtual csRef<iImage> GetMipmap (uint num);
 
-  virtual const char* GetRawFormat() const;
-  virtual csRef<iDataBuffer> GetRawData() const;
-  virtual csImageType GetImageType() const { return csimgCube; }
-  virtual uint HasSubImages() const { return (uint)(NUM_FACES - 1); }
+  virtual const char* GetRawFormat () const;
+  virtual csRef<iDataBuffer> GetRawData () const;
+  virtual csImageType GetImageType () const { return csimgCube; }
+  virtual uint HasSubImages () const { return (uint)(NUM_FACES - 1); }
   virtual csRef<iImage> GetSubImage (uint num);
   
   /// Set a specific face.
@@ -114,7 +114,7 @@ public:
    * the internal face reference is 0 or not.
    */
   bool SubImageSet (uint num) 
-  { return ((num < (uint)NUM_FACES) && (cubeImages[num].IsValid())); }
+  { return ((num < (uint)NUM_FACES) && (cubeImages[num].IsValid ())); }
 };
 
 /** @} */

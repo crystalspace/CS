@@ -48,10 +48,10 @@ protected:
   char* fName;
   /// Create new instance.
   csImageBase() :
-    scfImplementationType(this, 0), fName(0)
+    scfImplementationType (this, 0), fName(0)
   { }
 public:
-  virtual ~csImageBase() { cs_free (fName); }
+  virtual ~csImageBase () { cs_free (fName); }
 
   /* Commented out: should be implemented by all descendants.
   virtual const void *GetImageData () { return 0; }
@@ -85,13 +85,13 @@ public:
   virtual const char* GetRawFormat() const { return 0; }
   virtual csRef<iDataBuffer> GetRawData() const { return 0; }
   */
-  virtual csImageType GetImageType() const { return csimg2D; }
-  virtual uint HasSubImages() const { return 0; }
+  virtual csImageType GetImageType () const { return csimg2D; }
+  virtual uint HasSubImages () const { return 0; }
   virtual csRef<iImage> GetSubImage (uint num) 
   { return (num == 0) ? this : 0; }
 
-  const char* GetCookedImageFormat () { return GetRawFormat(); }
-  csRef<iDataBuffer> GetCookedImageData () { return GetCookedImageData(); }
+  const char* GetCookedImageFormat () { return GetRawFormat (); }
+  csRef<iDataBuffer> GetCookedImageData () { return GetCookedImageData (); }
 };
 
 /** @} */
