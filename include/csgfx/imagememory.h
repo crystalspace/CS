@@ -42,14 +42,14 @@ class CS_CRYSTALSPACE_EXPORT csImageMemory :
 {
 private:
   /// Common code shared by constructors.
-  void ConstructCommon ();
+  void ConstructCommon();
   /// Used by ctors setting a width/height/format.
   void ConstructWHDF (int width, int height, int depth, int format);
   /// Used by the "copy from iImage" ctor.
   void ConstructSource (iImage* source);
   /// Used by the "init from buffers" ctors.
   void ConstructBuffers (int width, int height, void* buffer, 
-    bool destroy, int format, csRGBpixel* palette);
+    bool destroy, int format, csRGBpixel *palette);
 protected:
   /// Width of image.
   int Width;
@@ -65,9 +65,9 @@ protected:
    */
   csRef<iDataBuffer> databuf;
   /// The image palette or 0
-  csRGBpixel* Palette;
+  csRGBpixel *Palette;
   /// The alpha map
-  uint8* Alpha;
+  uint8 *Alpha;
   /// Image format (see CS_IMGFMT_XXX above)
   int Format;
   /// if it has a keycolour.
@@ -102,9 +102,9 @@ protected:
   void SetDimensions (int newWidth, int newHeight, int newDepth);
 
   /// Allocate the pixel data buffers.
-  void AllocImage ();
+  void AllocImage();
   /// Allocate the pixel data buffers if they aren't already.
-  void EnsureImage ();
+  void EnsureImage();
   /**
    * Free all image data: pixels and palette. Takes care of image data format.
    */
@@ -146,7 +146,7 @@ public:
    * \param palette Palette for indexed images.
    */
   csImageMemory (int width, int height, void* buffer, bool destroy,
-    int format = CS_IMGFMT_TRUECOLOR, csRGBpixel* palette = 0);
+    int format = CS_IMGFMT_TRUECOLOR, csRGBpixel *palette = 0);
   /**
    * Create an instance from a pixel buffer with these dimensions. 
    * A copy of the pixel data is made.
@@ -158,7 +158,7 @@ public:
    * \param palette Palette for indexed images.
    */
   csImageMemory (int width, int height, const void* buffer, 
-    int format = CS_IMGFMT_TRUECOLOR, const csRGBpixel* palette = 0);
+    int format = CS_IMGFMT_TRUECOLOR, const csRGBpixel *palette = 0);
   /**
    * Create an instance that copies the pixel data from another iImage
    * object.
@@ -179,27 +179,26 @@ public:
   /// Get a pointer to the alpha data that can be changed.
   uint8* GetAlphaPtr ();
 
-  virtual const void *GetImageData () { return GetImagePtr (); }
+  virtual const void *GetImageData () { return GetImagePtr(); }
   virtual int GetWidth () const { return Width; }
   virtual int GetHeight () const { return Height; }
   virtual int GetDepth () const { return Depth; }
 
-  virtual const char* GetRawFormat () const 
+  virtual const char* GetRawFormat() const 
   { 
     return "a8b8g8r8"; 
   }
-  virtual csRef<iDataBuffer> GetRawData () const 
+  virtual csRef<iDataBuffer> GetRawData() const 
   { 
     // Should this also call EnsureImage()?
     if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
-      return databuf;
-
-    CS_ASSERT_MSG ("Not implemented yet: get RGB data from palette", false);
+      return databuf; 
+    CS_ASSERT_MSG("Not implemented yet: get RGB data from palette", false);
     return 0;
   }
   virtual int GetFormat () const { return Format; }
-  virtual const csRGBpixel* GetPalette () { return GetPalettePtr (); }
-  virtual const uint8* GetAlpha () { return GetAlphaPtr (); }
+  virtual const csRGBpixel* GetPalette () { return GetPalettePtr(); }
+  virtual const uint8* GetAlpha () { return GetAlphaPtr(); }
 
   virtual bool HasKeyColor () const { return has_keycolour; }
 
@@ -233,7 +232,7 @@ public:
    */
   virtual void ApplyKeyColor ();
 
-  virtual csImageType GetImageType () const { return imageType; }
+  virtual csImageType GetImageType() const { return imageType; }
   void SetImageType (csImageType type) { imageType = type; }
 
   virtual uint HasMipmaps () const 

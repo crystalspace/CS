@@ -52,10 +52,10 @@ namespace CS
     {
       if (image)
       {
-        if (image->GetFormat () == desiredFormat)
-          theImage = image;
-        else
-          theImage.AttachNew (new csImageMemory (image, desiredFormat));
+	if (image->GetFormat() == desiredFormat)
+	  theImage = image;
+	else
+	  theImage.AttachNew (new csImageMemory (image, desiredFormat));
       }
     }
     /// Provide access to the image.
