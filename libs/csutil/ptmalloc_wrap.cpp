@@ -25,6 +25,9 @@
 #include "csutil/threading/atomicops.h"
 #include "csutil/threading/mutex.h"
 
+#define DLMALLOC_DEFINES_ONLY
+#include "dlmalloc-settings.h" // for MALLOC_ALIGNMENT
+
 // ptmalloc functions
 namespace CS
 {
@@ -81,6 +84,12 @@ namespace
   static const size_t maxRequest = (~(size_t)0) - cookieOverhead;
   
   static const uint32 indicator = 0x58585858;
+
+  static inline size_t PadToAlignment (size_t x)
+  {
+    return (MALLOC_ALIGNMENT - (x & (MALLOC_ALIGNMENT-1)))
+      & (MALLOC_ALIGNMENT-1);
+  }
 
   class AllocatorMallocPlatform
   {
@@ -215,16 +224,19 @@ namespace
     bool ret = true;
     
     // Compute original allocated address
-    uint8* p = (uint8*)block.address;
-    p -= sizeof(CookieType);
-    const CookieType startCookie = GetCookie (p
-      - (sizeof(size_t) + sizeof (indicator)));
+    const size_t extraDataStart = sizeof (size_t) + sizeof (CookieType)
+      + sizeof(indicator);
+    uint8* p_org = (uint8*)(((uintptr_t)block.address) - extraDataStart
+      - PadToAlignment (extraDataStart));
+    uint8* p_cookie = (uint8*)block.address;
+    p_cookie -= sizeof (CookieType);
+    const CookieType startCookie = GetCookie (p_org);
     const CookieType endCookie = CookieSwap (startCookie);
     
-    CookieType theCookie = *(CookieType*)p;
-    p -= sizeof(size_t);
-    size_t n = *((size_t*)p);
-    p -= sizeof(indicator);
+    CookieType theCookie = *(CookieType*)p_cookie;
+    p_cookie -= sizeof(size_t);
+    size_t n = *((size_t*)p_cookie);
+    p_cookie -= sizeof(indicator);
     
     // Verify cookies
     ret &= mem_check (true, block.address,
@@ -291,11 +303,15 @@ namespace
       errno = ENOMEM;
       return 0;
     }
-    size_t extraData = sizeof (size_t) + 2*sizeof (CookieType);
-    if (keepLocation) extraData += sizeof (indicator);
-    uint8* p = (uint8*)ptmalloc_::ptmalloc (n + extraData);
+    size_t extraDataStart = sizeof (size_t) + sizeof (CookieType);
+    size_t extraDataEnd = sizeof (CookieType);
+    if (keepLocation) extraDataStart += sizeof (indicator);
+    size_t startPad = PadToAlignment (extraDataStart);
+    uint8* p = (uint8*)ptmalloc_::ptmalloc (
+      startPad + extraDataStart + n + extraDataEnd);
     const CookieType startCookie = GetCookie (p);
     const CookieType endCookie = CookieSwap (startCookie);
+    p += startPad;
     // Write location
     if (keepLocation)
     {
@@ -335,22 +351,25 @@ namespace
     if (keepLocation) block = FindAllocatedBlock (P);
     
     // Compute original allocated address
-    uint8* p = (uint8*)P;
-    p -= sizeof(CookieType);
-    const CookieType startCookie = GetCookie (p
-      - (sizeof(size_t) + locationSize));
+    const size_t extraDataStart = sizeof (size_t) + sizeof (CookieType)
+      + locationSize;
+    uint8* p_org = (uint8*)(((uintptr_t)P) - extraDataStart
+      - PadToAlignment (extraDataStart));
+    uint8* p_cookie = (uint8*)P;
+    p_cookie -= sizeof (CookieType);
+    const CookieType startCookie = GetCookie (p_org);
     const CookieType endCookie = CookieSwap (startCookie);
     // Verify cookies
     mem_check (keepLocation, P,
       "Memory block has wrong cookie "
       "(was probably allocated in another module)",
-      *(CookieType*)p == startCookie, block ? block->stack : 0,
+      *(CookieType*)p_cookie == startCookie, block ? block->stack : 0,
       __FILE__, __LINE__);
-    p -= sizeof(size_t);
-    size_t n = *((size_t*)p);
+    p_cookie -= sizeof(size_t);
+    size_t n = *((size_t*)p_cookie);
     if (keepLocation)
     {
-      p -= sizeof (indicator);
+      p_cookie -= sizeof (indicator);
     }
     mem_check (keepLocation, P,
       "Memory block has wrong cookie "
@@ -359,8 +378,8 @@ namespace
       block ? block->stack : 0, __FILE__, __LINE__);
     // Salt.
     size_t extraData = sizeof (size_t) + 2*sizeof (CookieType);
-    memset (p + locationSize, 0xcf, n + extraData);
-    ptmalloc_::ptfree (p);
+    memset (p_cookie + locationSize, 0xcf, n + extraData);
+    ptmalloc_::ptfree (p_org);
     if (keepLocation)
     {
       CS::Threading::ScopedLock<CS::Threading::RecursiveMutex> lock (
@@ -413,22 +432,25 @@ namespace
     if (keepLocation) oldBlock = FindAllocatedBlock (P);
     
     // Compute original allocated address
-    uint8* p = (uint8*)P;
-    p -= sizeof(CookieType);
+    const size_t extraDataStart = sizeof (size_t) + sizeof (CookieType)
+      + locationSize;
+    uint8* p_org = (uint8*)(((uintptr_t)P) - extraDataStart
+      - PadToAlignment (extraDataStart));
+    uint8* p_cookie = (uint8*)P;
+    p_cookie -= sizeof (CookieType);
     // Verify cookies
-    const CookieType startCookie = GetCookie (p
-      - (sizeof(size_t) + locationSize));
+    const CookieType startCookie = GetCookie (p_org);
     const CookieType endCookie = CookieSwap (startCookie);
     mem_check (keepLocation, P,
       "Memory block has wrong cookie "
       "(was probably allocated in another module)",
-      *(CookieType*)p == startCookie, 
+      *(CookieType*)p_cookie == startCookie, 
       oldBlock ? oldBlock->stack : 0, __FILE__, __LINE__);
-    p -= sizeof(size_t);
-    size_t nOld = *((size_t*)p);
+    p_cookie -= sizeof(size_t);
+    size_t nOld = *((size_t*)p_cookie);
     if (keepLocation)
     {
-      p -= sizeof (indicator);
+      p_cookie -= sizeof (indicator);
     }
     mem_check (keepLocation, P,
       "Memory block has wrong cookie "
@@ -436,13 +458,15 @@ namespace
       *(CookieType*)((uint8*)P + nOld) == endCookie, 
       oldBlock ? oldBlock->stack : 0, __FILE__, __LINE__);
   
-    size_t extraData = sizeof (size_t) + 2*sizeof (CookieType) + locationSize;
-    uint8* np = (uint8*)ptmalloc_::ptrealloc (p, 
-      n + extraData); 
+    size_t extraDataEnd = sizeof (CookieType);
+    size_t startPad = PadToAlignment (extraDataStart);
+    uint8* np = (uint8*)ptmalloc_::ptrealloc (p_org, 
+      startPad + extraDataStart + n + extraDataEnd); 
     // Cookie may have changed since the memory address may have changed,
     // update
     const CookieType newStartCookie = GetCookie (np);
     const CookieType newEndCookie = CookieSwap (newStartCookie);
+    np += startPad;
     if (keepLocation)
     {
       np += sizeof (indicator);
