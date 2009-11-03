@@ -105,89 +105,89 @@ private:
   arg_array accstack;
 
   /// Parse an XML X-expression
-  bool parse_xml(cons*, iDocumentNode*);
+  bool parse_xml (cons*, iDocumentNode*);
   /// Parse a single X-expression data atom
-  bool parse_xml_atom(oper_arg&, csStringID, const char*, const char*);
+  bool parse_xml_atom (oper_arg&, csStringID, const char*, const char*);
   /// Parse a Lisplike S-expression
-  bool parse_sexp(cons*, iDocumentNode*);
+  bool parse_sexp (cons*, iDocumentNode*);
   /** Parse an S-expression form
       Used to recurse down the S-expression's nested lists. */
-  bool parse_sexp_form(const char*& text, cons*);
+  bool parse_sexp_form (const char*& text, cons*);
   /// Parse an S-expression atom 
-  bool parse_sexp_atom(const char*& text, cons*);
+  bool parse_sexp_atom (const char*& text, cons*);
   /// Parse a numerical atom for either XEXP or SEXP
-  bool parse_num_atom(const char*& text, oper_arg&);
+  bool parse_num_atom (const char*& text, oper_arg&);
 
   /// Compile a cons list into the oper_array.
-  bool compile_cons(const cons*, int& acc_top);
+  bool compile_cons (const cons*, int& acc_top);
   /// Compile a MAKE-VECTOR pseudo-op
-  bool compile_make_vector(const cons*, int& acc_top, int acc);
+  bool compile_make_vector (const cons*, int& acc_top, int acc);
   /// Compile an IF pseudo-op
-  bool compile_if(const cons*, int& acc_top, int acc);
+  bool compile_if (const cons*, int& acc_top, int acc);
 
   /// Evaluate away constant values 
-  bool eval_const(cons*&);
+  bool eval_const (cons*&);
 
   /// Evaluate an operator and 2 arguments
-  bool eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_arg& output);
+  bool eval_oper (int oper, oper_arg arg1, oper_arg arg2, oper_arg& output);
   /// Evaluate an operator with a single argument
-  bool eval_oper(int oper, oper_arg arg1, oper_arg& output);
+  bool eval_oper (int oper, oper_arg arg1, oper_arg& output);
   /// Evaluate an operator without any arguments
-  bool eval_oper(int oper, oper_arg& output);
+  bool eval_oper (int oper, oper_arg& output);
 
   /// Add operator
-  bool eval_add(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_add (const oper_arg& arg1, const oper_arg& arg2,
   	oper_arg& output) const;
   /// Subtraction operator
-  bool eval_sub(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_sub (const oper_arg& arg1, const oper_arg& arg2,
   	oper_arg& output) const;
   /// Multiplication operator
-  bool eval_mul(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_mul (const oper_arg& arg1, const oper_arg& arg2,
   	oper_arg& output) const;
   /// Division operator
-  bool eval_div(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_div (const oper_arg& arg1, const oper_arg& arg2,
   	oper_arg& output) const;
   
   /// Element1 operator
-  bool eval_elt1(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_elt1 (const oper_arg& arg1, oper_arg& output) const;
   /// Element2 operator
-  bool eval_elt2(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_elt2 (const oper_arg& arg1, oper_arg& output) const;
   /// Element3 operator
-  bool eval_elt3(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_elt3 (const oper_arg& arg1, oper_arg& output) const;
   /// Element4 operator
-  bool eval_elt4(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_elt4 (const oper_arg& arg1, oper_arg& output) const;
 
   /// Sine operator
-  bool eval_sin(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_sin (const oper_arg& arg1, oper_arg& output) const;
   /// Cosine operator
-  bool eval_cos(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_cos (const oper_arg& arg1, oper_arg& output) const;
   /// Tangent operator
-  bool eval_tan(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_tan (const oper_arg& arg1, oper_arg& output) const;
 
-  bool eval_arcsin(const oper_arg& arg1, oper_arg& output) const;
-  bool eval_arccos(const oper_arg& arg1, oper_arg& output) const;
-  bool eval_arctan(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_arcsin (const oper_arg& arg1, oper_arg& output) const;
+  bool eval_arccos (const oper_arg& arg1, oper_arg& output) const;
+  bool eval_arctan (const oper_arg& arg1, oper_arg& output) const;
 
-  bool eval_dot(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_dot (const oper_arg& arg1, const oper_arg& arg2,
   	oper_arg& output) const;
-  bool eval_cross(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_cross (const oper_arg& arg1, const oper_arg& arg2,
   	oper_arg& output) const;
-  bool eval_vec_len(const oper_arg& arg1, oper_arg& output) const;
-  bool eval_normal(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_vec_len (const oper_arg& arg1, oper_arg& output) const;
+  bool eval_normal (const oper_arg& arg1, oper_arg& output) const;
   /// Floor operator
-  bool eval_floor(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_floor (const oper_arg& arg1, oper_arg& output) const;
 
-  bool eval_pow(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_pow (const oper_arg& arg1, const oper_arg& arg2,
   	oper_arg& output) const;
-  bool eval_min(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_min (const oper_arg& arg1, const oper_arg& arg2,
   	oper_arg& output) const;
-  bool eval_max(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_max (const oper_arg& arg1, const oper_arg& arg2,
   	oper_arg& output) const;
 
   /// Time function
-  bool eval_time(oper_arg& output) const;
+  bool eval_time (oper_arg& output) const;
   /// Frame function
-  bool eval_frame(oper_arg& output) const;
+  bool eval_frame (oper_arg& output) const;
 
   template<typename Comparator>
   bool eval_compare (const Comparator& cmp, const oper_arg& arg1,
@@ -202,30 +202,30 @@ private:
   bool eval_matrix_inv (const oper_arg& arg1, oper_arg& output) const;
   	
   /// Internal set vector element 1 and 2
-  bool eval_selt12(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_selt12 (const oper_arg& arg1, const oper_arg& arg2,
   	oper_arg & output) const;
   /// Internal set vector element 3 and 4
-  bool eval_selt34(const oper_arg & arg1, const oper_arg & arg2,
+  bool eval_selt34 (const oper_arg & arg1, const oper_arg & arg2,
   	oper_arg& output) const;
   /// Internal load operator
-  bool eval_load(const oper_arg& arg1, oper_arg& output) const;
+  bool eval_load (const oper_arg& arg1, oper_arg& output) const;
   /// Internal select operator
-  bool eval_select(const oper_arg& arg1, const oper_arg& arg2,
+  bool eval_select (const oper_arg& arg1, const oper_arg& arg2,
     oper_arg& output) const;
 
   /// Evaluate a variable into an oper_arg
-  bool eval_variable(csShaderVariable*, oper_arg& out);
+  bool eval_variable (csShaderVariable*, oper_arg& out);
   /// Evaluate an oper_arg into a variable
-  bool eval_argument(const oper_arg&, csShaderVariable*);
+  bool eval_argument (const oper_arg&, csShaderVariable*);
 
   /// Free all the memory used by a cons list
-  void destruct_cons(cons*) const;
+  void destruct_cons (cons*) const;
   /// Dump the contents of a cons list
-  void print_cons(const cons*) const;
+  void print_cons (const cons*) const;
   /// Dump the opcode list
-  void print_ops(const oper_array&) const;
+  void print_ops (const oper_array&) const;
   /// Dump the result of an operation
-  void print_result(const oper_arg&) const;
+  void print_result (const oper_arg&) const;
 
   /*inline*/static const char* GetTypeName (unsigned int id)/* const*/;
   /*{
@@ -245,21 +245,21 @@ private:
   void ParseError (const char* message, ...) const;
   void EvalError (const char* message, ...) const;
 public:
-  csShaderExpression(iObjectRegistry*);
-  ~csShaderExpression();
+  csShaderExpression (iObjectRegistry*);
+  ~csShaderExpression ();
 
   /// Parse in the XML in the context of a symbol table.
-  bool Parse(iDocumentNode*);
+  bool Parse (iDocumentNode*);
   //@{
   /**
    * Evaluate this expression into a variable.
    * It will use the symbol table it was initialized with.
    */
-  bool Evaluate(csShaderVariable*, csShaderVariableStack& stacks);
+  bool Evaluate (csShaderVariable*, csShaderVariableStack& stacks);
   //@}
 
   /// Retrieve the error message if the evaluation or parsing failed.
-  const char* GetError() const { return errorMsg; }
+  const char* GetError () const { return errorMsg; }
 };
 
 #endif
