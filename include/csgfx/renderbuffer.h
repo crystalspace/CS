@@ -77,9 +77,9 @@ public:
    * @{ */
   virtual void* Lock (csRenderBufferLockType lockType);
 
-  virtual void Release();
+  virtual void Release ();
 
-  virtual void CopyInto (const void *data, size_t elementCount,
+  virtual void CopyInto (const void* data, size_t elementCount,
     size_t elemOffset = 0);
 
   virtual int GetComponentCount () const
@@ -92,28 +92,28 @@ public:
     return props.comptype;
   }
 
-  virtual csRenderBufferType GetBufferType() const
+  virtual csRenderBufferType GetBufferType () const
   {
     return props.bufferType;
   }
 
-  virtual size_t GetSize() const
+  virtual size_t GetSize () const
   {
     return bufferSize;
   }
 
-  virtual size_t GetStride() const 
+  virtual size_t GetStride () const 
   {
     return props.stride;
   }
 
-  virtual size_t GetElementDistance() const
+  virtual size_t GetElementDistance () const
   {
     return props.stride ? props.stride :
       props.compCount * csRenderBufferComponentSizes[props.comptype];
   }
 
-  virtual size_t GetOffset() const
+  virtual size_t GetOffset () const
   { return props.offset; }
 
   /// Get version
@@ -124,7 +124,7 @@ public:
 
   bool IsMasterBuffer ()
   {
-    return !masterBuffer.IsValid();
+    return !masterBuffer.IsValid ();
   }
 
   virtual iRenderBuffer* GetMasterBuffer () const
@@ -132,15 +132,15 @@ public:
     return masterBuffer;
   }
 
-  virtual bool IsIndexBuffer() const
+  virtual bool IsIndexBuffer () const
   { return props.isIndex; }
 
-  virtual size_t GetRangeStart() const
+  virtual size_t GetRangeStart () const
   { return rangeStart; }
-  virtual size_t GetRangeEnd() const
+  virtual size_t GetRangeEnd () const
   { return rangeEnd; }
 
-  virtual size_t GetElementCount() const;
+  virtual size_t GetElementCount () const;
 
   virtual void SetCallback (iRenderBufferCallback *cb)
   {
@@ -303,7 +303,7 @@ protected:
       offset (0), doCopy (copy), doDelete (false), isLocked (false), 
       isIndex (false), lastLock (0)
     {
-      CS_ASSERT(componentCount <= 255); // Just to be sure...
+      CS_ASSERT (componentCount <= 255); // Just to be sure...
     }
   } props;
 
@@ -316,7 +316,7 @@ protected:
   unsigned int version; 
 
   /// buffer holding the data
-  unsigned char *buffer; 
+  unsigned char* buffer; 
   
   csRef<iRenderBuffer> masterBuffer;
 
@@ -338,8 +338,7 @@ namespace CS
   /// Render buffer wrapper with additional persistence information.
   class RenderBufferPersistent : 
     public scfImplementation2<RenderBufferPersistent,
-                              iRenderBuffer,
-                              iRenderBufferPersistence>
+      iRenderBuffer, iRenderBufferPersistence>
   {
     csRef<iRenderBuffer> wrappedBuffer;
     csString filename;
@@ -354,35 +353,35 @@ namespace CS
      * @{ */
     void* Lock (csRenderBufferLockType lockType)
     { return wrappedBuffer->Lock (lockType); }
-    void Release() { wrappedBuffer->Release (); }
-    void CopyInto (const void *data, size_t elementCount,
+    void Release () { wrappedBuffer->Release (); }
+    void CopyInto (const void* data, size_t elementCount,
       size_t elemOffset = 0) 
     { wrappedBuffer->CopyInto (data, elementCount, elemOffset); }
     int GetComponentCount () const
-    { return wrappedBuffer->GetComponentCount(); }
+    { return wrappedBuffer->GetComponentCount (); }
     csRenderBufferComponentType GetComponentType () const 
-    { return wrappedBuffer->GetComponentType(); }
-    csRenderBufferType GetBufferType() const
-    { return wrappedBuffer->GetBufferType(); }
-    size_t GetSize() const
-    { return wrappedBuffer->GetSize(); }
-    size_t GetStride() const 
-    { return wrappedBuffer->GetStride(); }
-    size_t GetElementDistance() const
-    { return wrappedBuffer->GetElementDistance(); }
-    size_t GetOffset() const
-    { return wrappedBuffer->GetOffset(); }
+    { return wrappedBuffer->GetComponentType (); }
+    csRenderBufferType GetBufferType () const
+    { return wrappedBuffer->GetBufferType (); }
+    size_t GetSize () const
+    { return wrappedBuffer->GetSize (); }
+    size_t GetStride () const 
+    { return wrappedBuffer->GetStride (); }
+    size_t GetElementDistance () const
+    { return wrappedBuffer->GetElementDistance (); }
+    size_t GetOffset () const
+    { return wrappedBuffer->GetOffset (); }
     uint GetVersion ()
     { return wrappedBuffer->GetVersion (); }
     iRenderBuffer* GetMasterBuffer () const
     { return wrappedBuffer->GetMasterBuffer (); }
-    bool IsIndexBuffer() const
+    bool IsIndexBuffer () const
     { return wrappedBuffer->IsIndexBuffer (); }
-    size_t GetRangeStart() const
+    size_t GetRangeStart () const
     { return wrappedBuffer->GetRangeStart (); }
     size_t GetRangeEnd() const
     { return wrappedBuffer->GetRangeEnd (); }
-    size_t GetElementCount() const
+    size_t GetElementCount () const
     { return wrappedBuffer->GetElementCount (); }
     void SetCallback (iRenderBufferCallback *cb)
     { wrappedBuffer->SetCallback (cb); }
