@@ -129,7 +129,7 @@ public:
    * Construct an instance.
    * \remarks The instance is only useable after a call to SetStrings().
    */
-  csLightShaderVarCache () { ClearDefVars(); }
+  csLightShaderVarCache () { ClearDefVars (); }
   
   /**
    * Set the string set to query the name identifiers from.
