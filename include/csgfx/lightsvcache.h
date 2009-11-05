@@ -44,23 +44,8 @@ public:
     lightDiffuse = 0,
     /// Specular color
     lightSpecular,
-    /**
-     * Position (object space)
-     * \deprecated Deprecated in 1.3.
-     */
-    lightPosition,
-    /**
-     * Position (camera space)
-     * \deprecated Deprecated in 1.3.
-     */
-    lightPositionCamera,
     /// Position (world space)
     lightPositionWorld,
-    /**
-     * Transform (camera space)
-     * \deprecated Deprecated in 1.3.
-     */
-    lightTransformCamera,
     /// Transform (from light to world space)
     lightTransformWorld,
     /// Inverse transform (from world to light space)
@@ -72,16 +57,6 @@ public:
      * \deprecated Deprecated in 1.3.
      */
     lightAttenuationTex,
-    /**
-     * Direction (object space)
-     * \deprecated Deprecated in 1.3.
-     */
-    lightDirection,
-    /**
-     * Direction (camera space)
-     * \deprecated Deprecated in 1.3.
-     */
-    lightDirectionCamera,
     /// Direction (world space)
     lightDirectionWorld,
     /// Spot inner falloff
@@ -113,11 +88,6 @@ public:
     _varCount
   };
 private:
-  struct LightSvIdCacheEntry
-  {
-    CS::ShaderVarStringID ids[_lightCount];
-  };
-  csArray<LightSvIdCacheEntry> lightSVIdCache;
   csRef<iShaderVarStringSet> strings;
   CS::ShaderVarStringID defaultVars[_varCount];
   
@@ -137,19 +107,6 @@ public:
    */
   void SetStrings (iShaderVarStringSet* strings);
   
-  /**
-   * Obtain the name for for a lighting-relevant shader variable whose name
-   * also depends on the number of a light.
-   * A caching scheme is used to avoid having to re-request a name from the
-   * given string set every time one is needed.
-   * \param num Number of the light that appears in the name
-   * \param prop Light property for which a variable name is to be retrieved.
-   * \return Name of the relevant variable, csInvalidStringID in case of an
-   *   error.
-   * \deprecated Deprecated in 1.3. Use shader var arrays instead.
-   */
-  CS::ShaderVarStringID GetLightSVId (size_t num, LightProperty prop);
-    
   /**
    * Obtain the name for for a lighting-relevant shader variable.
    * A caching scheme is used to avoid having to re-request a name from the
