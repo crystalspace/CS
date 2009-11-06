@@ -1023,8 +1023,8 @@ bool csColliderActor::AdjustForCollisions (
     csVector3 testVel2(localvel);
     if(testVel.y == 0)
     {
-      testVel.y = -0.1;
-      testVel2.y = 0.1;
+      testVel.y = -0.1f;
+      testVel2.y = 0.1f;
     }
     for (i = 0; i < our_cd_contact.GetSize () ; i++ )
     {
@@ -1161,8 +1161,8 @@ bool csColliderActor::AdjustForCollisions (
   csVector3 testVel2(testVel);
   if(testVel.y == 0)
   {
-    testVel2.y = 0.1;
-    testVel.y = -0.1;
+    testVel2.y = 0.1f;
+    testVel.y = -0.1f;
   }
   for (i = 0; i < our_cd_contact.GetSize () ; i++ )
   {
@@ -1213,8 +1213,8 @@ bool csColliderActor::AdjustForCollisions (
     testVel2 = testVel;
     if(testVel.y == 0)
     {
-      testVel2.y = -0.1;
-      testVel.y = -0.1;
+      testVel2.y = -0.1f;
+      testVel.y = -0.1f;
     }
     for (i = 0; i < our_cd_contact.GetSize () ; i++ )
     {
