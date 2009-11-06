@@ -648,7 +648,8 @@ public:
     } v;
 
     const csBitArrayStorageType* p = GetStore();
-    size_t ofs = 0, result;
+    size_t ofs = 0;
+    unsigned long result;
     for (size_t i = 0; i < mLength; i++)
     {
       v.s = p[i];

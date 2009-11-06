@@ -35,10 +35,10 @@ namespace CS
      * \param value Input value
      * \param index Index of first bit set
      */
-    CS_FORCEINLINE bool ScanBitForward (uint32 value, size_t& index)
+    CS_FORCEINLINE bool ScanBitForward (uint32 value, unsigned long& index)
     {
 #ifdef CS_HAVE_BITSCAN_INTRINSICS
-      return _BitScanForward ((unsigned long*)&index, value) != 0;
+      return _BitScanForward (&index, value) != 0;
 #else
       // Generic c++ version
       index = 0;
@@ -63,10 +63,10 @@ namespace CS
      * \param value Input value
      * \param index Index of first bit set
      */
-    CS_FORCEINLINE bool ScanBitReverse (uint32 value, size_t& index)
+    CS_FORCEINLINE bool ScanBitReverse (uint32 value, unsigned long& index)
     {
 #ifdef CS_HAVE_BITSCAN_INTRINSICS
-      return _BitScanReverse ((unsigned long*)&index, value) != 0;
+      return _BitScanReverse (&index, value) != 0;
 #else
       index = 0;
 
