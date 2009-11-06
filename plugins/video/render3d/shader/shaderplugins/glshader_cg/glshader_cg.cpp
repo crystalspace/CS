@@ -42,7 +42,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "profile_limits.h"
 #include "stringstore.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {

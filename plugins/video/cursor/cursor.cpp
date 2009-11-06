@@ -38,7 +38,7 @@
 #include "ivideo/texture.h"
 #include "cursor.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csCursor)
 

@@ -825,6 +825,10 @@ rule MsvcProject
       MsvcAddFileToProject $(respfile) : $(fileinproj) : $(respdir) ;
     }
   }
+  for i in $($(rawname)_EXTRASOURCES)
+  {
+    ResponseFile $(respfile) : "file|$(i)" : notfile : $(respdir) ;
+  }
 
   # Add resource file.
   if [ IsElem $(type) : dll plugin appgui appcon library_shared ]
@@ -1222,6 +1226,18 @@ rule Plugin
   RegisterWellKnownCompileGroup plugins ;
 
   $(<)_TYPE = plugin ;
+  
+  local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+  local outdircommon = [ Property msvcgen : outdircommon ] ;
+  if "$(outdircommon)" = ""
+  {
+    outdircommon = $(outdir) ;
+  }
+  local plugin_impl_file = plugin_impl.cpp ;
+  MakeLocate $(plugin_impl_file) : $(outdircommon) ;
+  WritePluginImplement $(plugin_impl_file) ;
+  Depends msvcgen : $(plugin_impl_file) ;
+  $(<)_EXTRASOURCES = $(plugin_impl_file:R=$(outdircommon))
   
   local metafile ;
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;

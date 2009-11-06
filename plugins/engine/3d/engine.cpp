@@ -82,7 +82,7 @@
 
 using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
-CS_IMPLEMENT_PLUGIN
+
 
 bool csEngine::doVerbose = false;
 

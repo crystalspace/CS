@@ -29,7 +29,7 @@
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csConsoleInput)
 

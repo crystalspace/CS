@@ -55,7 +55,7 @@
 
 #include "stencil.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 csStencilShadowCacheEntry::csStencilShadowCacheEntry (
   csStencilShadowStep* parent, iMeshWrapper* mesh) :

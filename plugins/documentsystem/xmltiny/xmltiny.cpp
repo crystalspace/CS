@@ -152,6 +152,4 @@ bool csTinyXMLPlugin::Initialize (iObjectRegistry* /*objreg*/)
   return true;
 }
 
-CS_IMPLEMENT_PLUGIN
-
 SCF_IMPLEMENT_FACTORY (csTinyXMLPlugin)

@@ -36,7 +36,7 @@
 #include "ivaria/reporter.h"
 #include "csutil/scfarray.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 //----------------------------------------------------------------------
 

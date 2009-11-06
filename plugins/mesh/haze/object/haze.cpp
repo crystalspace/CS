@@ -43,7 +43,7 @@
 #include "haze.h"
 
 
-CS_IMPLEMENT_PLUGIN
+
 
 csHazeHull::csHazeHull() : scfImplementationType(this)
 {

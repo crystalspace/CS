@@ -45,7 +45,7 @@
 
 #include "spr2d.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
 {

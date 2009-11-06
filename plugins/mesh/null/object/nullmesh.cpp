@@ -33,7 +33,7 @@
 #include "iutil/objreg.h"
 #include "csqsqrt.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 csNullmeshMeshObject::csNullmeshMeshObject (csNullmeshMeshFactory* factory,
                                             iMeshObjectType* parent)

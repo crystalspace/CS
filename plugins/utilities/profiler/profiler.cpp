@@ -28,7 +28,7 @@
 #include "ivaria/profile.h"
 #include "cstool/vfsdirchange.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 template<>
 class csComparator<const char*, csString> :

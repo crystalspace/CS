@@ -68,8 +68,6 @@
 
 #define ONE_OVER_255 (1.0/255.0)
 
-CS_IMPLEMENT_PLUGIN
-
 SCF_IMPLEMENT_FACTORY(csSaver)
 
 csSaver::csSaver(iBase *p) : scfImplementationType(this, p)

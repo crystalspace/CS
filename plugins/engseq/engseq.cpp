@@ -51,7 +51,7 @@
 #include "imesh/object.h"
 #include "engseq.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 //---------------------------------------------------------------------------
 

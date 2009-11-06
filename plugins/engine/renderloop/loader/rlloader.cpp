@@ -37,7 +37,7 @@ CS_LEAKGUARD_IMPLEMENT (csRenderLoopLoader);
 
 // Plugin stuff
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY(csRenderLoopLoader)
 

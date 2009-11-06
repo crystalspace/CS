@@ -32,8 +32,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ps1_emu_ati.h"
 #include "ps1_emu_nv.h"
 
-CS_IMPLEMENT_PLUGIN
-
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
 {
 

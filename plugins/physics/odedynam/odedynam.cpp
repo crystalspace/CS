@@ -63,7 +63,6 @@ static void ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat)
 }
 
 
-CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(odedynam)
 {

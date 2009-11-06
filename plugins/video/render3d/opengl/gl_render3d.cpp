@@ -60,7 +60,7 @@ const int CS_CLIPPER_EMPTY = 0xf008412;
 // uses CS_CLIPPER_EMPTY
 #include "gl_stringlists.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {

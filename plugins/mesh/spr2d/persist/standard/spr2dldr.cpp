@@ -42,7 +42,7 @@
 #include "iutil/stringarray.h"
 #include "imap/ldrctxt.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 enum
 {

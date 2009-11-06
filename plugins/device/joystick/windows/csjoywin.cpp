@@ -38,7 +38,7 @@
 // #define CS_WINDOWS_JOYSTICK_CFG "/config/joystick.cfg"
 // #define CS_WINDOWS_JOYSTICK_KEY "Device.Joystick." CS_PLATFORM_NAME "."
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(JoystickWin)
 {

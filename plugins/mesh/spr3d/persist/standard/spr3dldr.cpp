@@ -51,8 +51,6 @@
 
 #include "spr3dldr.h"
 
-CS_IMPLEMENT_PLUGIN
-
 using namespace CS::Plugins::Spr3dLoader;
 
 enum

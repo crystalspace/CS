@@ -228,12 +228,13 @@ int MyPlugin::GetSomething () const
 
 @end example
 
-The first macro is @code{CS_IMPLEMENT_PLUGIN()}. This indicates to the
+The first macro is @code{CS_IMPLEMENT_PLUGIN}. This indicates to the
 Crystal Space framework that this module will end up as a plugin
 (as opposed to an application or library). On some platforms this
 actually makes a difference; on others it does not.  For best portability,
 you should use this macro in exactly one C++ file within each plugin
-module.
+module. (@emph{Note:} If your project uses the Jam-based CS build system
+please also @pxref{plugins-in-cs-build-system}.)
 
 The @code{SCF_IMPLEMENT_FACTORY()} says that C++ class @samp{MyPlugin}
 represents an @sc{scf} factory which allows @sc{scf} to instantiate objects of
@@ -396,3 +397,34 @@ printf ("%d\n", myapi->GetSomething ());
 @end example
 
 This should print out 9.
+
+@subsubheading Plugins in the Crystal Space Build System
+@anchor{plugins-in-cs-build-system}
+
+When writing plugins for a project that uses Crystal Space's Jam-based build
+system invoking the @code{CS_IMPLEMENT_PLUGIN} macro is @emph{not} needed.
+A source file with an invocation will automatically be provided by the build
+system.
+
+Neglecting to invoke @code{CS_IMPLEMENT_PLUGIN} if needed or wrongly invoking
+it when the build system already does will cause build errors; see the next
+paragraphs.
+
+@subsubheading Troubleshooting
+
+@itemize @bullet
+@item
+@emph{Issue:} The symbol @samp{csStaticVarCleanup_local} and/or @samp{main}
+are reported missing upon linking.
+
+@emph{Solution:} You need to manually invoke @code{CS_IMPLEMENT_PLUGIN} but
+did not do so. Add an invocation to one source file of the plugin.
+
+@item
+@emph{Issue:} The symbol @samp{csStaticVarCleanup_local} and/or @samp{main}
+are reported to be defined multiple times upon linking.
+
+@emph{Solution:} You manually invoked @code{CS_IMPLEMENT_PLUGIN} although this
+was not necessary. Remove all invocations from the source code.
+
+@end itemize

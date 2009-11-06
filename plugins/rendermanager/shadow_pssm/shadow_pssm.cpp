@@ -35,7 +35,7 @@
 
 #include "shadow_pssm.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 using namespace CS::RenderManager;
 

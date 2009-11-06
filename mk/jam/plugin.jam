@@ -46,7 +46,7 @@ rule Plugin
 
   local target = [ ConstructPluginTarget $(<) : $(3) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
-  local objects = [ CompileObjects $(sources) ] ;
+  local objects = [ CompileObjects $(sources) ] [ PluginImplementObject ] ;
 
   $(<)_TYPE = plugin ;
   $(<)_OBJECTS = $(objects) ;
@@ -152,6 +152,14 @@ rule Plugin
   }
 }
 
+## WritePluginImplement file
+##   Write the plugin implementation code snippet to the specified file.
+actions together WritePluginImplement 
+{
+  echo "#include <cssysdef.h>" > $(<)
+  echo "CS_IMPLEMENT_PLUGIN" >> $(<)
+}
+
 #----------------------------------------------------------------------------
 # private rules
 
@@ -177,6 +185,24 @@ rule PluginMetaData
   {
     Depends install_plugin : [ DoInstall $(target) : $(plugindir) ] ;
   }
+}
+
+rule PluginImplementObject
+{
+  local implement_source ;
+  if "$(SUBVARIANT)" = ""
+  {
+    implement_source = plugin_impl.cpp ;
+  }
+  else
+  {
+    implement_source = plugin_impl_$(SUBVARIANT:J=_).cpp ;
+  }
+  MakeLocate $(implement_source) : $(LOCATE.OBJECTS) ;
+  WritePluginImplement $(implement_source) ;
+  NoUpdate $(implement_source) ;
+  local implement_obj = [ CompileObjects $(implement_source) ] ;
+  return $(implement_obj) ;
 }
 
 # Construct pseudo target plugins

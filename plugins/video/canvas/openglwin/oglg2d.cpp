@@ -42,7 +42,7 @@
 #error OpenGL version 1.1 required! Stopping compilation.
 #endif
 
-CS_IMPLEMENT_PLUGIN
+
 
 /*
     In fs mode, the window is topmost, means above every other

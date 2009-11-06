@@ -38,7 +38,7 @@
 #include "csutil/eventhandlers.h"
 #include "decalmanager.h"
 
-CS_IMPLEMENT_PLUGIN
+
 SCF_IMPLEMENT_FACTORY (csDecalManager)
 
 csDecalManager::csDecalManager (iBase * parent)

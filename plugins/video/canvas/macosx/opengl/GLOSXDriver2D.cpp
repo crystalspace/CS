@@ -27,7 +27,7 @@
 #define GLOSXDRIVER_REPORTER_ID "crystalspace.canvas.glosx"
 
 // Plugin stuff - create factory functions, etc
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY(GLOSXDriver2D)
 

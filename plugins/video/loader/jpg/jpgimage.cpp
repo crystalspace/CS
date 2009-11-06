@@ -30,7 +30,7 @@
 #include "csutil/databuf.h"
 #include "ivaria/reporter.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(JPGImageIO)
 {

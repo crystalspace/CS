@@ -34,7 +34,7 @@
 #include "ivaria/ode.h"
 #include "physldr.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 enum
 {

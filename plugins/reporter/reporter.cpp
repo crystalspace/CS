@@ -24,7 +24,7 @@
 #include "csutil/refarr.h"
 #include "reporter.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csReporter)
 

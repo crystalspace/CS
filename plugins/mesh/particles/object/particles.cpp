@@ -41,7 +41,7 @@
 #include "particles.h"
 #include "vertexsetup.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 {

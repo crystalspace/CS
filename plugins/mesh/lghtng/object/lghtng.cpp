@@ -36,7 +36,7 @@
 
 #include "lghtng.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 //------------ csLightningMeshObject -------------------------------
 

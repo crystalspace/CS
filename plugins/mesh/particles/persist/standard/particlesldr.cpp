@@ -32,7 +32,7 @@
 #include "iutil/object.h"
 #include "iutil/stringarray.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 template<>
 class csHashComputer<iParticleEmitter*> : public csHashComputerIntegral<iParticleEmitter*> {};

@@ -23,7 +23,7 @@
 #include "oggstream2.h"
 #include "oggdata2.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 
 // As of 2004/10/05 the specs to which these functions (should) adhere is located at

@@ -49,7 +49,7 @@
 // or keyboard-related interface).
 #undef CS_XWIN_GRAB_KEYBOARD
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csXWindow)
 
