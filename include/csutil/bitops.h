@@ -37,7 +37,10 @@ namespace CS
      */
     CS_FORCEINLINE bool ScanBitForward (uint32 value, unsigned long& index)
     {
-#ifdef CS_HAVE_BITSCAN_INTRINSICS
+#if defined(CS_HAVE___BUILTIN_CTZ)
+      index = __builtin_ctz (value);
+      return value != 0;
+#elif defined(CS_HAVE_BITSCAN_INTRINSICS)
       return _BitScanForward (&index, value) != 0;
 #else
       // Generic c++ version
@@ -65,7 +68,10 @@ namespace CS
      */
     CS_FORCEINLINE bool ScanBitReverse (uint32 value, unsigned long& index)
     {
-#ifdef CS_HAVE_BITSCAN_INTRINSICS
+#if defined(CS_HAVE___BUILTIN_CLZ)
+      index = __builtin_clz (value);
+      return value != 0;
+#elif defined(CS_HAVE_BITSCAN_INTRINSICS)
       return _BitScanReverse (&index, value) != 0;
 #else
       index = 0;
@@ -89,9 +95,13 @@ namespace CS
      */
     CS_FORCEINLINE uint32 ComputeBitsSet (uint32 v)
     {
+#if defined(CS_HAVE___BUILTIN_POPCOUNT)
+      return __builtin_popcount (v);
+#else
       v = v - ((v >> 1) & 0x55555555);
       v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
       return (((v + (v >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 24;
+#endif
     }
 
     }

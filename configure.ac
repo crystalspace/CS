@@ -2266,6 +2266,22 @@ CS_CHECK_BUILD([for strtof], [cs_cv_strtof],
 
 
 #------------------------------------------------------------------------------
+# Check for bit operation builtins.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_BUILTIN],
+    [CS_CHECK_BUILD([for $1], [cs_cv_func_$1],
+	[AC_LANG_PROGRAM(
+	    [],
+	    [$1(0)])],
+	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))],
+	[], [], [$cs_cv_prog_cxx_enable_pedantic])])
+CS_CHECK_BUILTIN(__builtin_clz)
+CS_CHECK_BUILTIN(__builtin_ctz)
+CS_CHECK_BUILTIN(__builtin_popcount)
+
+
+
+#------------------------------------------------------------------------------
 # Determine if plugin meta-information should be embedded directly into plugin
 # modules or if it should exist in stand-alone .csplugin files.
 #------------------------------------------------------------------------------
