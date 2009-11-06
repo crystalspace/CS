@@ -1260,7 +1260,10 @@ rule Library
   }
   $(<)_TYPE = $(type) ;
   MsvcProject $(<) : $(type) : $(<:S=.lib) : $(>) ;
-  CompileGroups $(<) : all libs ;
+  if ! [ IsElem independent : $(options) ]
+  {
+    CompileGroups $(<) : all libs ;
+  }
 }
 
 rule DLL
