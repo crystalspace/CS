@@ -1041,10 +1041,10 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 	    #include <dsound.h>
 	    #include <dinput.h>]],
 	    [DirectSoundCreate$1(0,0,0); 
-	     DirectInputCreate(0,0,0,0)])],
-	[CS_CREATE_TUPLE([],[],[-ldsound -ldinput]) \
+	     DirectInputCreate8(0,0,0,0,0)])],
+	[CS_CREATE_TUPLE([],[],[-ldsound -ldinput8]) \
 	CS_CREATE_TUPLE([-I/usr/include/directx],[],
-	    [-ldsound -ldinput])], 
+	    [-ldsound -ldinput8])], 
 	[C++], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx$1], [DIRECTX$1])])])
 
 AS_IF([test $cs_host_family = windows],
