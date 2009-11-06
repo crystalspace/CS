@@ -26,13 +26,9 @@
 #include "csgfx/normalmaptools.h"
 
 void csNormalMappingTools::CalculateTangents (size_t numTriangles, 
-					      const csTriangle* triangles, 
-					      size_t numVertices, 
-					      const csVector3* vertices,
-					      const csVector3* normals,
-					      const csVector2* texcoords, 
-					      csVector3* outTangents, 
-					      csVector3* outBitangents)
+  const csTriangle* triangles, size_t numVertices, const csVector3* vertices,
+  const csVector3* normals, const csVector2* texcoords, csVector3* outTangents, 
+  csVector3* outBitangents)
 {
   /*
     Calculate tangents & bitangents for a triangle mesh.
@@ -74,17 +70,17 @@ void csNormalMappingTools::CalculateTangents (size_t numTriangles,
     
     const float div = s1 * t2 - s2 * t1;
     float r = 1.0f;
-    if(fabs(div) > SMALL_EPSILON)
+    if(fabs (div) > SMALL_EPSILON)
       r = 1.0f / div;
     csVector3 sdir ((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, 
       (t2 * z1 - t1 * z2) * r);
-    if (sdir.IsZero())
+    if (sdir.IsZero ())
     {
       sdir = v2 - v1;
     }
-    csVector3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, 
+    csVector3 tdir ((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, 
       (s1 * z2 - s2 * z1) * r);
-    if (tdir.IsZero())
+    if (tdir.IsZero ())
     {
       tdir = v3 - v1;
     }
@@ -109,8 +105,8 @@ void csNormalMappingTools::CalculateTangents (size_t numTriangles,
 
     outTangents[v] = (outTangents[v] - normals[v] * (normals[v] * outTangents[v]));
 
-    outTangents[v].Normalize();
-    outBitangents[v].Normalize();
+    outTangents[v].Normalize ();
+    outBitangents[v].Normalize ();
 
     //float a = (outTangents[v] % outBitangents[v]) * normals[v];
     //csPrintf ("%g\n", a);

@@ -282,7 +282,7 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetFreeVBOSlot (
     // Scan 32 bits at a time
     for (size_t bunchIdx = 0; bunchIdx < numSlotBitmap; bunchIdx++, bitmap++)
     {
-      size_t localIndex;
+      unsigned long localIndex;
       bool foundSlot = CS::Utility::BitOps::ScanBitForward (*bitmap, localIndex);
       if (foundSlot)
       {

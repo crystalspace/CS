@@ -789,6 +789,7 @@ public:
   /// Evaluate a condition and return the result.
   bool Evaluate (csConditionID condition, const CS::Graphics::RenderMeshModes& modes,
     const csShaderVariableStack* stack);
+  bool EvaluateCached (EvaluatorShadervar& eval, csConditionID condition);
     
   void ForceConditionResults (const csBitArray& condSet,
     const csBitArray& condResults);

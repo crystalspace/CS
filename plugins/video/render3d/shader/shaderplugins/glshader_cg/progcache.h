@@ -58,6 +58,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     const char* GetObjectCode() const { return objectCode; }
     const ProgramObjectID& GetID() const { return id; }
     uint GetFlags() const { return flags; }
+    const csSet<csString>& GetUnusedParams() const { return unusedParams; }
     
     void SetID (const ProgramObjectID& id) { this->id = id; }
   };

@@ -54,7 +54,7 @@
  */
 struct csPackRGB
 {
-  static bool IsRGBcolorSane() { return (sizeof(csRGBcolor) == 3); }
+  static bool IsRGBcolorSane () { return (sizeof(csRGBcolor) == 3); }
   /**
    * Pack an array of csRGBcolor into a RGB byte array. 
    * \param buf Buffer to pack the data into.
@@ -71,10 +71,10 @@ struct csPackRGB
       uint8* bufptr = buf;
       while (numPixels--)
       {
-	*bufptr++ = pixels->red;
-	*bufptr++ = pixels->green;
-	*bufptr++ = pixels->blue;
-	pixels++; 
+        *bufptr++ = pixels->red;
+        *bufptr++ = pixels->green;
+        *bufptr++ = pixels->blue;
+        pixels++; 
       }
     }
   }
@@ -90,7 +90,7 @@ struct csPackRGB
   static const uint8* PackRGBcolorToRGB (const csRGBcolor* pixels, 
     size_t numPixels)
   {
-    if (IsRGBcolorSane())
+    if (IsRGBcolorSane ())
       return (uint8*)pixels;
     else
     {
@@ -105,7 +105,7 @@ struct csPackRGB
    */
   static void DiscardPackedRGB (const uint8* rgb) 
   {
-    if (!IsRGBcolorSane())
+    if (!IsRGBcolorSane ())
       delete[] (uint8*)rgb;
   }
   /**
@@ -117,17 +117,17 @@ struct csPackRGB
   static void UnpackRGBtoRGBcolor (csRGBcolor* buf, const uint8* rgb, 
     size_t numPixels)
   {
-    if (IsRGBcolorSane())
+    if (IsRGBcolorSane ())
       memcpy (buf, rgb, numPixels * 3);
     else
     {
       csRGBcolor* bufptr = buf;
       while (numPixels--)
       {
-	bufptr->red = *rgb++;
-	bufptr->green = *rgb++;
-	bufptr->blue = *rgb++;
-	bufptr++; 
+        bufptr->red = *rgb++;
+        bufptr->green = *rgb++;
+        bufptr->blue = *rgb++;
+        bufptr++; 
       }
     }
   }
@@ -143,7 +143,7 @@ struct csPackRGB
   static const csRGBcolor* UnpackRGBtoRGBcolor (const uint8* rgb, 
     size_t numPixels)
   {
-    if (IsRGBcolorSane())
+    if (IsRGBcolorSane ())
       return (const csRGBcolor*)rgb;
     else
     {
@@ -159,7 +159,7 @@ struct csPackRGB
    */
   static void DiscardUnpackedRGBcolor (const csRGBcolor* pixels) 
   {
-    if (!IsRGBcolorSane())
+    if (!IsRGBcolorSane ())
       delete[] (csRGBcolor*)pixels;
   }
   /**
@@ -219,7 +219,7 @@ struct csPackRGB
  */
 struct csPackRGBA
 {
-  static bool IsRGBpixelSane() { return (sizeof(csRGBpixel) == 4); }
+  static bool IsRGBpixelSane () { return (sizeof(csRGBpixel) == 4); }
   /**
    * Pack an array of csRGBpixel into a RGBA byte array. 
    * \param buf Buffer to pack the data into.
@@ -229,18 +229,18 @@ struct csPackRGBA
   static void PackRGBpixelToRGBA (uint8* buf, const csRGBpixel* pixels, 
     size_t numPixels)
   {
-    if (IsRGBpixelSane())
+    if (IsRGBpixelSane ())
       memcpy (buf, pixels, numPixels * 4);
     else
     {
       uint8* bufptr = buf;
       while (numPixels--)
       {
-	*bufptr++ = pixels->red;
-	*bufptr++ = pixels->green;
-	*bufptr++ = pixels->blue;
-	*bufptr++ = pixels->alpha;
-	pixels++; 
+        *bufptr++ = pixels->red;
+        *bufptr++ = pixels->green;
+        *bufptr++ = pixels->blue;
+        *bufptr++ = pixels->alpha;
+        pixels++; 
       }
     }
   }
@@ -256,7 +256,7 @@ struct csPackRGBA
   static const uint8* PackRGBpixelToRGBA (const csRGBpixel* pixels, 
     size_t numPixels)
   {
-    if (IsRGBpixelSane())
+    if (IsRGBpixelSane ())
       return (uint8*)pixels;
     else
     {
@@ -271,7 +271,7 @@ struct csPackRGBA
    */
   static void DiscardPackedRGBA (const uint8* rgba) 
   {
-    if (!IsRGBpixelSane())
+    if (!IsRGBpixelSane ())
     {
       delete[] (uint8*)rgba;
     }
@@ -285,18 +285,18 @@ struct csPackRGBA
   static void UnpackRGBAtoRGBpixel (csRGBpixel* buf, const uint8* rgba, 
     size_t numPixels)
   {
-    if (IsRGBpixelSane())
+    if (IsRGBpixelSane ())
       memcpy (buf, rgba, numPixels * 4);
     else
     {
       csRGBpixel* bufptr = buf;
       while (numPixels--)
       {
-	bufptr->red = *rgba++;
-	bufptr->green = *rgba++;
-	bufptr->blue = *rgba++;
-	bufptr->alpha = *rgba++;
-	bufptr++; 
+        bufptr->red = *rgba++;
+        bufptr->green = *rgba++;
+        bufptr->blue = *rgba++;
+        bufptr->alpha = *rgba++;
+        bufptr++; 
       }
     }
   }
@@ -312,7 +312,7 @@ struct csPackRGBA
   static const csRGBpixel* UnpackRGBAtoRGBpixel (const uint8* rgba, 
     size_t numPixels)
   {
-    if (IsRGBpixelSane())
+    if (IsRGBpixelSane ())
       return (csRGBpixel*)rgba;
     else
     {
@@ -333,7 +333,7 @@ struct csPackRGBA
   static csRGBpixel* CopyUnpackRGBAtoRGBpixel (const uint8* rgba, 
     size_t numPixels)
   {
-    if (IsRGBpixelSane())
+    if (IsRGBpixelSane ())
     {
       csRGBpixel* buf = new csRGBpixel[numPixels];
       memcpy (buf, rgba, numPixels * sizeof(csRGBpixel));
@@ -349,7 +349,7 @@ struct csPackRGBA
    */
   static void csDiscardUnpackedRGBpixel (const csRGBpixel* pixels) 
   {
-    if (!IsRGBpixelSane())
+    if (!IsRGBpixelSane ())
       delete[] (csRGBpixel*)pixels;
   }
   /**

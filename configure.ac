@@ -1041,10 +1041,10 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 	    #include <dsound.h>
 	    #include <dinput.h>]],
 	    [DirectSoundCreate$1(0,0,0); 
-	     DirectInputCreate(0,0,0,0)])],
-	[CS_CREATE_TUPLE([],[],[-ldsound -ldinput]) \
+	     DirectInputCreate8(0,0,0,0,0)])],
+	[CS_CREATE_TUPLE([],[],[-ldsound -ldinput8]) \
 	CS_CREATE_TUPLE([-I/usr/include/directx],[],
-	    [-ldsound -ldinput])], 
+	    [-ldsound -ldinput8])], 
 	[C++], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx$1], [DIRECTX$1])])])
 
 AS_IF([test $cs_host_family = windows],
@@ -2262,6 +2262,22 @@ CS_CHECK_BUILD([for strtof], [cs_cv_strtof],
 	[strtof (0, 0)])],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE_STRTOF])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for bit operation builtins.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_BUILTIN],
+    [CS_CHECK_BUILD([for $1], [cs_cv_func_$1],
+	[AC_LANG_PROGRAM(
+	    [],
+	    [$1(0)])],
+	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))],
+	[], [], [$cs_cv_prog_cxx_enable_pedantic])])
+CS_CHECK_BUILTIN(__builtin_clz)
+CS_CHECK_BUILTIN(__builtin_ctz)
+CS_CHECK_BUILTIN(__builtin_popcount)
 
 
 

@@ -259,13 +259,26 @@ bool RMUnshadowed::RenderView (iView* view)
 
   postEffects.DrawPostEffects (renderTree);
   
-  if (doHDRExposure) hdrExposure.ApplyExposure ();
+  if (doHDRExposure) hdrExposure.ApplyExposure (renderTree, view);
   
   DebugFrameRender (rview, renderTree);
 
   return true;
 }
 
+bool RMUnshadowed::PrecacheView (iView* view)
+{
+  if (!RenderView (view)) return false;
+
+  postEffects.ClearIntermediates();
+  hdr.GetHDRPostEffects().ClearIntermediates();
+
+  /* @@@ Other ideas for precache drawing:
+    - No frame advancement?
+   */
+
+  return true;
+}
 
 bool RMUnshadowed::HandleTarget (RenderTreeType& renderTree,
                                  const TargetManagerType::TargetSettings& settings)
@@ -396,8 +409,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
       hdrSettings.GetColorRange());
     postEffects.SetChainedOutput (hdr.GetHDRPostEffects());
   
-    // @@@ Make configurable, too
-    hdrExposure.Initialize (objectReg, hdr);
+    hdrExposure.Initialize (objectReg, hdr, hdrSettings);
   }
   
   portalPersistent.Initialize (shaderManager, g3d,

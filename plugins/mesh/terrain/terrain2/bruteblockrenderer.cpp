@@ -55,7 +55,7 @@ class TerrainBBCellRenderProperties :
 public:
   TerrainBBCellRenderProperties ()
     : scfImplementationType (this), visible (true), blockResolution (16), 
-    minSteps (1), splitDistanceCoeff (16), splatDistance (200)
+    minSteps (1), splitDistanceCoeff (128), splatDistance (200)
   {
   }
 

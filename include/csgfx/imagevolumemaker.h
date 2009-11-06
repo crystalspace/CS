@@ -84,27 +84,27 @@ public:
   csImageVolumeMaker (iImage* source);
   virtual ~csImageVolumeMaker();
 
-  virtual const void *GetImageData ();
+  virtual const void* GetImageData ();
   virtual int GetWidth () const { return Width > 0 ? Width : 0; }
-  virtual int GetHeight () const { return Height > 0 ? Height : 0; ; }
+  virtual int GetHeight () const { return Height > 0 ? Height : 0; }
   virtual int GetDepth () const { return Depth + (int)pendingImages.GetSize (); }
   /// Set the name of the image.
-  virtual void SetName (const char *iName);
+  virtual void SetName (const char* iName);
   /**
    * Get the name of the image.
    * \remarks Unless the name was manually overridden with SetName(), the
    *  default name will contain the names of the wrapped slices, separated
    *  by ':', in the form <tt>slice1.png:slice2.png:...</tt>.
    */
-  virtual const char *GetName () const { return fName; }
+  virtual const char* GetName () const { return fName; }
 
   virtual int GetFormat () const;
   virtual const csRGBpixel* GetPalette ();
   virtual const uint8* GetAlpha ();
 
-  virtual const char* GetRawFormat() const { return 0; }
-  virtual csRef<iDataBuffer> GetRawData() const { return 0; }
-  virtual csImageType GetImageType() const { return csimg3D; }
+  virtual const char* GetRawFormat () const { return 0; }
+  virtual csRef<iDataBuffer> GetRawData () const { return 0; }
+  virtual csImageType GetImageType () const { return csimg3D; }
   
   void AddImage (iImage* source);
 };

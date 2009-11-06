@@ -130,12 +130,12 @@ bool csWindowsJoystick::HandleEvent (iEvent& ev)
 
 struct JoyAxesInfo
 {
-  LPDIRECTINPUTDEVICE2A device;
+  LPDIRECTINPUTDEVICE8W device;
   uint nAxes;
   csDirtyAccessArray<int32> axesMapping;
 };
 
-static BOOL CALLBACK axes_callback(LPCDIDEVICEOBJECTINSTANCEA i, LPVOID p)
+static BOOL CALLBACK axes_callback(LPCDIDEVICEOBJECTINSTANCEW i, LPVOID p)
 {
   // Configure to return data in the range (-32767..32767)
   DIPROPRANGE diprg;
@@ -191,28 +191,26 @@ static BOOL CALLBACK axes_callback(LPCDIDEVICEOBJECTINSTANCEA i, LPVOID p)
     // axis # and DIJoystate2 member/offset
     //TODO BLACK MAGIC HERE
   }
-  LPDIRECTINPUTDEVICE2A device = pJoyAxisInfo->device;
+  LPDIRECTINPUTDEVICE8W device = pJoyAxisInfo->device;
   device->SetProperty (DIPROP_RANGE, &diprg.diph);
 
   return DIENUM_CONTINUE;
 }
 
 
-bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCEA*  pdidInstanc)
+bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCEW*  pdidInstanc)
 { 
-  LPDIRECTINPUTDEVICEA device;
+  LPDIRECTINPUTDEVICE8W device;
   lpdin->CreateDevice (pdidInstanc->guidInstance, &device, 0);
   bool const ok = (device != 0);
   if (ok) 
   {
-    LPDIRECTINPUTDEVICE2A device2 = (LPDIRECTINPUTDEVICE2A)device;
-
     DIDEVCAPS caps;
     JoyAxesInfo jaxes;
 
     caps.dwSize = sizeof (caps);
-    device2->GetCapabilities (&caps);
-    device2->SetDataFormat (&c_dfDIJoystick2);
+    device->GetCapabilities (&caps);
+    device->SetDataFormat (&c_dfDIJoystick2);
 
     jaxes.nAxes = 0;
     jaxes.axesMapping.SetSize(caps.dwAxes);
@@ -223,15 +221,15 @@ bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCEA*  pdidInstanc)
 	jaxes.axesMapping[i] = 0; // default X Axis
       }
     }
-    jaxes.device = device2;
-    if (SUCCEEDED(device2->EnumObjects(axes_callback, (LPVOID)&jaxes,
+    jaxes.device = device;
+    if (SUCCEEDED(device->EnumObjects(axes_callback, (LPVOID)&jaxes,
       DIDFT_AXIS)))
     {
       joydata data;
 
       data.axesMapping = jaxes.axesMapping;
       data.number = (int)joystick.GetSize () + 0; // CS joystick numbers 1-based
-      data.device = device2;
+      data.device = device;
       data.nButtons = caps.dwButtons;    
       data.nAxes = (uint)caps.dwAxes;
      
@@ -243,7 +241,7 @@ bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCEA*  pdidInstanc)
   return ok;
 }
 
-static BOOL CALLBACK dev_callback(LPCDIDEVICEINSTANCEA lpddi, LPVOID pvRef)
+static BOOL CALLBACK dev_callback(LPCDIDEVICEINSTANCEW lpddi, LPVOID pvRef)
 {
   csWindowsJoystick* po = (csWindowsJoystick*)pvRef;
   po->CreateDevice (lpddi);
@@ -253,8 +251,8 @@ static BOOL CALLBACK dev_callback(LPCDIDEVICEINSTANCEA lpddi, LPVOID pvRef)
 bool csWindowsJoystick::Init ()
 {
   csRef<iWin32Assistant> win32 = csQueryRegistry<iWin32Assistant> (object_reg);
-  HRESULT hr = DirectInputCreateA (win32->GetInstance (), DIRECTINPUT_VERSION, 
-    &lpdin, 0);
+  HRESULT hr = DirectInput8Create (win32->GetInstance (), DIRECTINPUT_VERSION, 
+    IID_IDirectInput8W, (void**)&lpdin, 0);
   if (SUCCEEDED (hr))
   {
     csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
@@ -274,14 +272,14 @@ bool csWindowsJoystick::Init ()
 
     HWND window = canvas->GetWindowHandle();
     // Only enum attached Joysticks, get Details of Devices
-    lpdin->EnumDevices (DIDEVTYPE_JOYSTICK, &dev_callback,
+    lpdin->EnumDevices (DI8DEVCLASS_GAMECTRL, &dev_callback,
       (LPVOID)this, DIEDFL_ATTACHEDONLY);
     size_t i;
     size_t const njoys = joystick.GetSize ();
     for (i = 0; i < njoys; i++) 
     {
       joydata& jd = joystick[i];
-      DIDEVICEINSTANCEA devInfo;
+      DIDEVICEINSTANCEW devInfo;
       memset (&devInfo, 0, sizeof (devInfo));
       devInfo.dwSize = sizeof (devInfo);
       hr = jd.device->GetDeviceInfo (&devInfo);
@@ -292,10 +290,8 @@ bool csWindowsJoystick::Init ()
       }
       else
       {
-        wchar_t* devProduct = cswinAnsiToWide (devInfo.tszProductName);
         Report (CS_REPORTER_SEVERITY_NOTIFY,
-          "Found input device %d: %ls", jd.number, devProduct);
-        delete[] devProduct;
+          "Found input device %d: %ls", jd.number, devInfo.tszProductName);
       }
     
 #ifdef CS_DEBUG

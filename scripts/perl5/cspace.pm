@@ -5586,6 +5586,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RegisterCallback = *cspacec::iSndSysStream_RegisterCallback;
 *UnregisterCallback = *cspacec::iSndSysStream_UnregisterCallback;
 *RegisterFrameNotification = *cspacec::iSndSysStream_RegisterFrameNotification;
+*AlwaysStream = *cspacec::iSndSysStream_AlwaysStream;
 *scfGetVersion = *cspacec::iSndSysStream_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -10463,6 +10464,39 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iShaderPriorityList ##############
+
+package cspace::iShaderPriorityList;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetCount = *cspacec::iShaderPriorityList_GetCount;
+*GetPriority = *cspacec::iShaderPriorityList_GetPriority;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iShaderPriorityList($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iShader ##############
 
 package cspace::iShader;
@@ -10482,6 +10516,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetUsedShaderVars = *cspacec::iShader_GetUsedShaderVars;
 *GetMetadata = *cspacec::iShader_GetMetadata;
 *PushShaderVariables = *cspacec::iShader_PushShaderVariables;
+*GetPrioritiesTicket = *cspacec::iShader_GetPrioritiesTicket;
+*GetAvailablePriorities = *cspacec::iShader_GetAvailablePriorities;
+*GetTechniqueMetadata = *cspacec::iShader_GetTechniqueMetadata;
+*ForceTechnique = *cspacec::iShader_ForceTechnique;
 *scfGetVersion = *cspacec::iShader_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -10490,39 +10528,6 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iShader($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iShaderPriorityList ##############
-
-package cspace::iShaderPriorityList;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-%ITERATORS = ();
-*GetCount = *cspacec::iShaderPriorityList_GetCount;
-*GetPriority = *cspacec::iShaderPriorityList_GetPriority;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iShaderPriorityList($self);
         delete $OWNER{$self};
     }
 }
@@ -14965,9 +14970,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetName = *cspacec::iAnimatedMeshSocketFactory_GetName;
+*SetName = *cspacec::iAnimatedMeshSocketFactory_SetName;
 *GetTransform = *cspacec::iAnimatedMeshSocketFactory_GetTransform;
 *SetTransform = *cspacec::iAnimatedMeshSocketFactory_SetTransform;
 *GetBone = *cspacec::iAnimatedMeshSocketFactory_GetBone;
+*SetBone = *cspacec::iAnimatedMeshSocketFactory_SetBone;
 *GetFactory = *cspacec::iAnimatedMeshSocketFactory_GetFactory;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -20305,7 +20312,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetPortalContainer = *cspacec::iMeshWrapper_GetPortalContainer;
 *GetFactory = *cspacec::iMeshWrapper_GetFactory;
 *SetFactory = *cspacec::iMeshWrapper_SetFactory;
-*SetLightingUpdate = *cspacec::iMeshWrapper_SetLightingUpdate;
 *GetMovable = *cspacec::iMeshWrapper_GetMovable;
 *QuerySceneNode = *cspacec::iMeshWrapper_QuerySceneNode;
 *FindChildByName = *cspacec::iMeshWrapper_FindChildByName;
@@ -21071,6 +21077,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *RenderView = *cspacec::iRenderManager_RenderView;
+*PrecacheView = *cspacec::iRenderManager_PrecacheView;
 *scfGetVersion = *cspacec::iRenderManager_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -22879,6 +22886,7 @@ sub CSDRAW_3DGRAPHICS () { $cspacec::CSDRAW_3DGRAPHICS }
 sub CSDRAW_CLEARZBUFFER () { $cspacec::CSDRAW_CLEARZBUFFER }
 sub CSDRAW_CLEARSCREEN () { $cspacec::CSDRAW_CLEARSCREEN }
 sub CSDRAW_NOCLIPCLEAR () { $cspacec::CSDRAW_NOCLIPCLEAR }
+sub CSDRAW_READBACK () { $cspacec::CSDRAW_READBACK }
 sub CS_CLIPPER_NONE () { $cspacec::CS_CLIPPER_NONE }
 sub CS_CLIPPER_OPTIONAL () { $cspacec::CS_CLIPPER_OPTIONAL }
 sub CS_CLIPPER_TOPLEVEL () { $cspacec::CS_CLIPPER_TOPLEVEL }
@@ -23040,6 +23048,7 @@ sub CS_TEXTURE_NOFILTER () { $cspacec::CS_TEXTURE_NOFILTER }
 sub CS_TEXTURE_NPOTS () { $cspacec::CS_TEXTURE_NPOTS }
 sub CS_TEXTURE_SCALE_UP () { $cspacec::CS_TEXTURE_SCALE_UP }
 sub CS_TEXTURE_SCALE_DOWN () { $cspacec::CS_TEXTURE_SCALE_DOWN }
+sub CS_TEXTURE_CREATE_CLEAR () { $cspacec::CS_TEXTURE_CREATE_CLEAR }
 sub CS_MATERIAL_VARNAME_FLATCOLOR () { $cspacec::CS_MATERIAL_VARNAME_FLATCOLOR }
 sub CS_MATERIAL_TEXTURE_DIFFUSE () { $cspacec::CS_MATERIAL_TEXTURE_DIFFUSE }
 sub CS_AXIS_NONE () { $cspacec::CS_AXIS_NONE }
@@ -23195,8 +23204,6 @@ sub CS_ENTITY_NODECAL () { $cspacec::CS_ENTITY_NODECAL }
 sub CS_ENTITY_STATICLIT () { $cspacec::CS_ENTITY_STATICLIT }
 sub CS_ENTITY_NOSHADOWRECEIVE () { $cspacec::CS_ENTITY_NOSHADOWRECEIVE }
 sub CS_ENTITY_LIMITEDSHADOWCAST () { $cspacec::CS_ENTITY_LIMITEDSHADOWCAST }
-sub CS_LIGHTINGUPDATE_SORTRELEVANCE () { $cspacec::CS_LIGHTINGUPDATE_SORTRELEVANCE }
-sub CS_LIGHTINGUPDATE_ALWAYSUPDATE () { $cspacec::CS_LIGHTINGUPDATE_ALWAYSUPDATE }
 sub CS_CULLER_HINT_GOODOCCLUDER () { $cspacec::CS_CULLER_HINT_GOODOCCLUDER }
 sub CS_CULLER_HINT_BADOCCLUDER () { $cspacec::CS_CULLER_HINT_BADOCCLUDER }
 sub CS_PORTAL_CLIPDEST () { $cspacec::CS_PORTAL_CLIPDEST }

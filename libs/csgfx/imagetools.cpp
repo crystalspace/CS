@@ -28,21 +28,20 @@ static inline unsigned sqr (int x)
 }
 
 int csImageTools::ClosestPaletteIndex (const csRGBpixel* Palette, 
-				       const csRGBpixel& iColor, 
-				       int palEntries)
+  const csRGBpixel& iColor, int palEntries)
 {
   if (!Palette)
     return -1;
 
   int closest_idx = -1;
-  unsigned closest_dst = (unsigned)-1;
+  unsigned closest_dst = (unsigned) - 1;
 
   int idx;
   for (idx = 0; idx < palEntries; idx++)
   {
     unsigned dst = sqr (iColor.red   - Palette [idx].red)   * R_COEF_SQ +
-                   sqr (iColor.green - Palette [idx].green) * G_COEF_SQ +
-                   sqr (iColor.blue  - Palette [idx].blue)  * B_COEF_SQ;
+      sqr (iColor.green - Palette [idx].green) * G_COEF_SQ +
+      sqr (iColor.blue  - Palette [idx].blue)  * B_COEF_SQ;
     if (dst == 0)
       return idx;
     if (dst < closest_dst)

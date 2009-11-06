@@ -55,6 +55,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 
     //---- iRenderManager ----
     virtual bool RenderView (iView* view);
+    virtual bool PrecacheView (iView* view);
 
     //---- iRenderManagerTargets ----
     virtual void RegisterRenderTarget (iTextureHandle* target, 
@@ -143,7 +144,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 
     CS::RenderManager::PostEffectManager       postEffects;
     CS::RenderManager::HDRHelper hdr;
-    CS::RenderManager::HDRExposureLinear hdrExposure;
+    CS::RenderManager::HDR::Exposure::Configurable hdrExposure;
     bool doHDRExposure;
     int maxPortalRecurse;
 

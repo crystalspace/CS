@@ -141,6 +141,20 @@ namespace CS
      */
     namespace AutoFX
     {}
+    
+    /**
+     * Helpers for HDR effects
+     */
+    namespace HDR
+    {
+      /// Rendered scene luminance computation
+      namespace Luminance
+      {}
+      
+      /// Exposure computation
+      namespace Exposure
+      {}
+    }
   }
 
   /**

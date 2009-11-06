@@ -52,6 +52,7 @@ struct WrapperStackEntry;
 
 struct csConditionNode;
 class csWrappedDocumentNodeFactory;
+class ConditionDumper;
 
 /**
  * Callback to parse and evaluate conditions, used by
@@ -225,6 +226,7 @@ protected:
       TempHeap::Free (this);
     }
     
+    ConditionDumper* condDumper;
     csHash<Template, TempString<>, TempHeapAlloc> templates;
     csArray<int, csArrayElementHandler<int>, TempHeapAlloc> ascendStack;
     csSet<TempString<>, TempHeapAlloc> defines;
@@ -454,11 +456,6 @@ class csWrappedDocumentNodeFactory
     PITOKEN_STATIC_ENDIF
   };
 
-  csString* currentOut;
-  csConditionEvaluator* currentEval;
-  MyBitArrayTemp seenConds;
-  void DumpCondition (size_t id, const char* condStr, size_t condLen);
-
   void DebugProcessing (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
 public:
   csWrappedDocumentNodeFactory (csXMLShaderCompiler* plugin);
@@ -483,6 +480,18 @@ public:
   csWrappedDocumentNode* CreateWrapperFromCache (iFile* cacheFile,
     iConditionResolver* resolver, csConditionEvaluator& evaluator,
     const ConditionsReader& condReader);
+};
+
+/// Helper to dump condition expressions and IDs to a string
+class ConditionDumper
+{
+  csString* currentOut;
+  csConditionEvaluator* currentEval;
+  MyBitArrayTemp seenConds;
+public:
+  ConditionDumper (csString* dumpOut, csConditionEvaluator* evaluator)
+    : currentOut (dumpOut), currentEval (evaluator) {}
+  void Dump (size_t id, const char* condStr, size_t condLen);
 };
 
 }

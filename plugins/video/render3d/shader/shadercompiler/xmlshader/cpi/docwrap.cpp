@@ -746,7 +746,7 @@ void csWrappedDocumentNode::ParseCondition (WrapperStackEntry& newWrapper,
       result);
     newWrapper.child->condition = csCondAlwaysFalse;
   }
-  shared->DumpCondition (newWrapper.child->condition,
+  globalState->condDumper->Dump (newWrapper.child->condition,
     cond, condLen);
 }
 
@@ -2225,8 +2225,7 @@ csRef<iDocumentNode> csWrappedDocumentNodeIterator::Next ()
 //---------------------------------------------------------------------------
 
 csWrappedDocumentNodeFactory::csWrappedDocumentNodeFactory (
-  csXMLShaderCompiler* plugin) : plugin (plugin), objreg (plugin->objectreg),
-  currentEval (0)
+  csXMLShaderCompiler* plugin) : plugin (plugin), objreg (plugin->objectreg)
 {
   InitTokenTable (pitokens);
   pitokens.Register ("Template", PITOKEN_TEMPLATE_NEW);
@@ -2243,48 +2242,6 @@ csWrappedDocumentNodeFactory::csWrappedDocumentNodeFactory (
   pitokens.Register ("SElsIfNDef", PITOKEN_STATIC_ELSIFNDEF);
   pitokens.Register ("SElse", PITOKEN_STATIC_ELSE);
   pitokens.Register ("SEndIf", PITOKEN_STATIC_ENDIF);
-}
-
-void csWrappedDocumentNodeFactory::DumpCondition (size_t id, 
-						  const char* condStr, 
-						  size_t condLen)
-{
-  if (currentOut)
-  {
-    if ((seenConds.GetSize() > id) && (seenConds[id])) return;
-    
-    switch (id)
-    {
-      case csCondAlwaysTrue:
-	currentOut->AppendFmt ("condition \"always true\" = '");
-	break;
-      case csCondAlwaysFalse:
-	currentOut->AppendFmt ("condition \"always false\" = '");
-	break;
-      default:
-	{
-	  if (seenConds.GetSize() <= id) seenConds.SetSize (id+1);
-	  seenConds.SetBit (id);
-	  
-	  const CondOperation& condOp = currentEval->GetCondition (id);
-	  if (condOp.left.type == operandOperation)
-	  {
-	    csString condStr;
-	    condStr = currentEval->GetConditionString (condOp.left.operation);
-	    DumpCondition (condOp.left.operation, condStr, condStr.Length ());
-	  }
-	  if (condOp.right.type == operandOperation)
-	  {
-	    csString condStr;
-	    condStr = currentEval->GetConditionString (condOp.right.operation);
-	    DumpCondition (condOp.right.operation, condStr, condStr.Length ());
-	  }
-	}
-        currentOut->AppendFmt ("condition %zu = '", id);
-    }
-    currentOut->Append (condStr, condLen);
-    currentOut->Append ("'\n");
-  }
 }
 
 void csWrappedDocumentNodeFactory::DebugProcessing (const char* format, ...)
@@ -2316,8 +2273,7 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
   const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut,
   uint parseOpts)
 {
-  currentOut = dumpOut;
-  currentEval = &evaluator;
+  ConditionDumper condDump (dumpOut, &evaluator);
 
   csWrappedDocumentNode* node;
   {
@@ -2330,6 +2286,7 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
 	globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
 	globalState->vfs = csQueryRegistry<iVFS> (objreg);
 	CS_ASSERT (globalState->vfs);
+	globalState->condDumper = &condDump;
 	/* "extra nodes" here just contribute to the conditions in the condition
 	* tree, so they're parsed, but not retained. */
 	delete new csWrappedDocumentNode (eval, 0, extraNodes[i], resolver, 
@@ -2340,6 +2297,7 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
     globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
     globalState->vfs = csQueryRegistry<iVFS> (objreg);
     CS_ASSERT (globalState->vfs);
+    globalState->condDumper = &condDump;
     node = new csWrappedDocumentNode (eval, 0, wrappedNode, resolver, this,
       globalState, parseOpts);
     eval.condTree.ToResolver (resolver);
@@ -2352,8 +2310,6 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
   }
   evaluator.CompactMemory();
   TempHeap::Trim();
-  currentEval = 0;
-  seenConds.SetSize (0);
   return node;
 }
 
@@ -2389,7 +2345,7 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
   iDocumentNode* wrappedNode, iConditionResolver* resolver, csString* dumpOut,
   uint parseOptions)
 {
-  currentOut = dumpOut;
+  ConditionDumper condDump (dumpOut, 0);
 
   csWrappedDocumentNode* node;
   {
@@ -2397,6 +2353,7 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
     globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
     globalState->vfs = csQueryRegistry<iVFS> (objreg);
     CS_ASSERT (globalState->vfs);
+    globalState->condDumper = &condDump;
     EvalStatic eval (resolver);
     node = new csWrappedDocumentNode (eval, 0, wrappedNode, resolver, this, 
       globalState, parseOptions);
@@ -2417,6 +2374,48 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperFromCache (
     return 0;
   }
   return node;
+}
+
+//---------------------------------------------------------------------------
+
+void ConditionDumper::Dump (size_t id, const char* condStr, size_t condLen)
+{
+  if (currentOut)
+  {
+    if ((seenConds.GetSize() > id) && (seenConds[id])) return;
+    
+    switch (id)
+    {
+      case csCondAlwaysTrue:
+	currentOut->AppendFmt ("condition \"always true\" = '");
+	break;
+      case csCondAlwaysFalse:
+	currentOut->AppendFmt ("condition \"always false\" = '");
+	break;
+      default:
+	{
+	  if (seenConds.GetSize() <= id) seenConds.SetSize (id+1);
+	  seenConds.SetBit (id);
+	  
+	  const CondOperation& condOp = currentEval->GetCondition (id);
+	  if (condOp.left.type == operandOperation)
+	  {
+	    csString condStr;
+	    condStr = currentEval->GetConditionString (condOp.left.operation);
+	    Dump (condOp.left.operation, condStr, condStr.Length ());
+	  }
+	  if (condOp.right.type == operandOperation)
+	  {
+	    csString condStr;
+	    condStr = currentEval->GetConditionString (condOp.right.operation);
+	    Dump (condOp.right.operation, condStr, condStr.Length ());
+	  }
+	}
+        currentOut->AppendFmt ("condition %zu = '", id);
+    }
+    currentOut->Append (condStr, condLen);
+    currentOut->Append ("'\n");
+  }
 }
 
 }

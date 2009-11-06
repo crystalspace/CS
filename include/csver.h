@@ -49,16 +49,15 @@
  * However, in case csver.h.template is edited for a reason other than a
  * version bump, CS_RCSREV_OFFSET is provided to allow adjustment
  * of the relative SVN revision to avoid having it go backwards.
- * Increment the offset by the value reported by `rcsrev print` (BEFORE
- * committing).
+ * Set the offset to the value reported by `rcsrev print` (BEFORE committing).
  *
  * CS_RCSREV_OFFSET should be set to 0 again when bumping the version.
  *
  * The relative SVN revision is computed by the script `rcsrev`.
  */
-//CS_RCSREV_OFFSET 10
+//CS_RCSREV_OFFSET 513
 #ifndef CS_VERSION_RCSREV
-#define CS_VERSION_RCSREV	225
+#define CS_VERSION_RCSREV	528
 #endif
 
 /**\name Version number definitions (numeric)
@@ -149,6 +148,8 @@
 
 /// A complete version string, including platform, processor and compiler
 #define CS_VERSION CS_VERSION_NUMBER \
-  " [" CS_PLATFORM_NAME "-" CS_PROCESSOR_NAME "-" CS_COMPILER_NAME "]"
+  " [" CS_PLATFORM_NAME "-" \
+  CS_PROCESSOR_NAME "(" CS_VER_QUOTE(CS_PROCESSOR_SIZE) ")-" \
+  CS_COMPILER_NAME "]"
 
 #endif // __CS_CSVER_H__

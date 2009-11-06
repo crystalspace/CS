@@ -105,7 +105,7 @@ namespace CS
       /// Get the shader used for tonemapping the final image.
       iShader* GetMappingShader ();
       /// Get the shader variable context for the tonemapping stage.
-      iShaderVariableContext* GetMapppingShaderVarContext();
+      iShaderVariableContext* GetMappingShaderVarContext();
       
       /**
        * Get the post processing effects layer that can be used for measuring
@@ -113,7 +113,12 @@ namespace CS
        */
       PostEffectManager::Layer* GetMeasureLayer() const
       { return measureLayer; }
+      
+      bool IsRangeLimited() const
+      { return (quality == qualInt8) || (quality == qualInt10)
+          || (quality == qualInt16); }
     private:
+      Quality quality;
       PostEffectManager postEffects;
       PostEffectManager::Layer* measureLayer;
       PostEffectManager::Layer* mappingLayer;
@@ -137,6 +142,9 @@ namespace CS
       HDRHelper::Quality GetQuality();
       /// Get requested color range
       int GetColorRange();
+      
+      /// Get exposure method
+      const char* GetExposureMethod() const;
     };
   
   } // namespace RenderManager

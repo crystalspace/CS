@@ -63,24 +63,35 @@ a choice between multiple versions for a library, pick the recommended one.
 but newer versions are very likely to work as well and can be chosen.
 @end itemize
 
-@subheading The ``cs-win32libs'' Package
+@subheading The ``cs-winlibs'' Package
 @cindex Windows, Building
 @anchor{cs-win32libs}
 
 Rather than having to install these components manually, Microsoft Visual C++ 
-7/7.1/8/9, MinGW/MSYS, and Cygwin users can download a single package which
+8/9, MinGW/MSYS, and Cygwin users can download a single package which
 contains all common headers, pre-built library files, and dynamic link 
 libraries in pre-compiled form, all in versions known to work with this
 particular release of Crystal Space. You can obtain it from the following
 location:
 
+@subsubheading 32-bit version
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.4_002.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.9_002.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-1.4_002.exe}
+@code{cs-win32libs-1.9_002.exe}
+@end iftex
+
+@subsubheading 64-bit version
+@noindent
+@ifnottex
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-winlibs-x64-1.9_002.exe}
+@end ifnottex
+@iftex
+@code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
+@code{cs-winlibs-x64-1.9_002.exe}
 @end iftex
 
 @subheading zlib

@@ -61,6 +61,8 @@ VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 
 ; CEgui test
 VFS.Mount.ceguitest  = $(CS_DATADIR)$/ceguitest$/
+; Viewmesh
+VFS.Mount.viewmesh   = $@data$/viewmesh$/
 
 ; Mount for unittest
 VFS.Mount.lev/unittest = $(CS_DATADIR)$/unittest$/

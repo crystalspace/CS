@@ -29,10 +29,18 @@ struct iTextureHandle;
  */
 struct iRenderManager : public virtual iBase
 {
-  SCF_INTERFACE(iRenderManager,2,0,0);
+  SCF_INTERFACE(iRenderManager,2,0,1);
 
   /// Render the given view into the framebuffer.
   virtual bool RenderView (iView* view) = 0;
+
+  /**
+   * Render the given view into the framebuffer (special precache variant).
+   * This method is used by the engine for a precache draw. Usually it's
+   * behaviour differs from RenderView() and is thus unsuitable for normal
+   * drawing.
+   */
+  virtual bool PrecacheView (iView* view) = 0;
 };
 
 /**

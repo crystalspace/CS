@@ -55,6 +55,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RM_RLCompat)
     engine->Draw (view->GetCamera(), view->GetClipper());
     return true;
   }
+
+  bool RMCompat::PrecacheView (iView* view)
+  {
+    return RenderView (view);
+  }
   
   bool RMCompat::DebugCommand (const char* _cmd)
   {

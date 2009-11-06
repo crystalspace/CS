@@ -200,6 +200,7 @@ private:
   csRef<iShaderManager> shadermgr;
   csRef<csGLVBOBufferManager> vboManager;
   bool isOpen;
+  uint frameNum;
 
   csEventID SystemOpen;
   csEventID SystemClose;

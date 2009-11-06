@@ -258,7 +258,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
 
   size_t i;
   csString augmentedProgramStr = GetAugmentedProgram (programStr,
-    flags & loadFlagUnusedV2FForInit);
+    (flags & loadFlagUnusedV2FForInit) != 0);
     
   programStr = augmentedProgramStr;
   CGprofile profile = customLimits.profile;
@@ -930,6 +930,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     }
     programProfile = limits.profile;
     programPositionInvariant = programObj.GetFlags() & ProgramObject::flagPositionInvariant;
+    unusedParams = programObj.GetUnusedParams();
     
     ClipsToVmap();
     GetParamsFromVmap();

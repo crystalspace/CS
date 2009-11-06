@@ -24,25 +24,24 @@
 
 CS_LEAKGUARD_IMPLEMENT (csImageCubeMapMaker);
 
-csImageCubeMapMaker::csImageCubeMapMaker() :
-  scfImplementationType(this), manualName (false)
+csImageCubeMapMaker::csImageCubeMapMaker () :
+  scfImplementationType (this), manualName (false)
 { }
 
 csImageCubeMapMaker::csImageCubeMapMaker (iImage* source) :
-  scfImplementationType(this), manualName (false)
+  scfImplementationType (this), manualName (false)
 {
   if (source != 0)
   {
-    for (uint i = 0; i < source->HasSubImages() + 1; i++)
+    for (uint i = 0; i < source->HasSubImages () + 1; i++)
       cubeImages[i] = source->GetSubImage (i);
   }
-  UpdateName();
+  UpdateName ();
 }
 
 csImageCubeMapMaker::csImageCubeMapMaker (iImage* posX, iImage* negX, 
-					  iImage* posY, iImage* negY, 
-					  iImage* posZ, iImage* negZ) :
-  scfImplementationType(this), manualName (false)
+  iImage* posY, iImage* negY, iImage* posZ, iImage* negZ) :
+  scfImplementationType (this), manualName (false)
 {
   cubeImages[0] = posX;
   cubeImages[1] = negX;
@@ -50,7 +49,7 @@ csImageCubeMapMaker::csImageCubeMapMaker (iImage* posX, iImage* negX,
   cubeImages[3] = negY;
   cubeImages[4] = posZ;
   cubeImages[5] = negZ;
-  UpdateName();
+  UpdateName ();
 }
 
 csImageCubeMapMaker::~csImageCubeMapMaker ()
@@ -79,20 +78,20 @@ void csImageCubeMapMaker::UpdateName ()
 const void* csImageCubeMapMaker::GetImageData ()
 {
   CheckImage (0);
-  return cubeImages[0]->GetImageData();
+  return cubeImages[0]->GetImageData ();
 }
 
 int csImageCubeMapMaker::GetWidth () const
 {
-  return cubeImages[0].IsValid() ? cubeImages[0]->GetWidth() : 128;
+  return cubeImages[0].IsValid () ? cubeImages[0]->GetWidth () : 128;
 }
 
 int csImageCubeMapMaker::GetHeight () const
 {
-  return cubeImages[0].IsValid() ? cubeImages[0]->GetHeight() : 128;
+  return cubeImages[0].IsValid () ? cubeImages[0]->GetHeight () : 128;
 }
 
-void csImageCubeMapMaker::SetName (const char *iName)
+void csImageCubeMapMaker::SetName (const char* iName)
 {
   cs_free (fName);
   fName = CS::StrDup (iName);
@@ -101,25 +100,25 @@ void csImageCubeMapMaker::SetName (const char *iName)
 
 int csImageCubeMapMaker::GetFormat () const
 {
-  return cubeImages[0].IsValid() ? 
-    cubeImages[0]->GetFormat() : CS_IMGFMT_TRUECOLOR;
+  return cubeImages[0].IsValid () ? 
+    cubeImages[0]->GetFormat () : CS_IMGFMT_TRUECOLOR;
 }
 
 const csRGBpixel* csImageCubeMapMaker::GetPalette ()
 {
   CheckImage (0);
-  return cubeImages[0]->GetPalette();
+  return cubeImages[0]->GetPalette ();
 }
 
 const uint8* csImageCubeMapMaker::GetAlpha ()
 {
   CheckImage (0);
-  return cubeImages[0]->GetAlpha();
+  return cubeImages[0]->GetAlpha ();
 }
 
 uint csImageCubeMapMaker::HasMipmaps () const
 {
-  return cubeImages[0].IsValid() ? cubeImages[0]->HasMipmaps() : 0;
+  return cubeImages[0].IsValid () ? cubeImages[0]->HasMipmaps() : 0;
 }
 
 csRef<iImage> csImageCubeMapMaker::GetMipmap (uint num)
@@ -128,17 +127,17 @@ csRef<iImage> csImageCubeMapMaker::GetMipmap (uint num)
   return cubeImages[0]->GetMipmap (num);
 }
 
-const char* csImageCubeMapMaker::GetRawFormat() const
+const char* csImageCubeMapMaker::GetRawFormat () const
 {
-  return cubeImages[0].IsValid() ? 
-    cubeImages[0]->GetRawFormat() : 0;
+  return cubeImages[0].IsValid () ? 
+    cubeImages[0]->GetRawFormat () : 0;
 }
 
-csRef<iDataBuffer> csImageCubeMapMaker::GetRawData() const
+csRef<iDataBuffer> csImageCubeMapMaker::GetRawData () const
 {
   csRef<iDataBuffer> d;
-  if (cubeImages[0].IsValid())
-    d = cubeImages[0]->GetRawData();
+  if (cubeImages[0].IsValid ())
+    d = cubeImages[0]->GetRawData ();
   return d;
 }
 
@@ -160,6 +159,6 @@ void csImageCubeMapMaker::SetSubImage (uint num, iImage* image)
   if (num < NUM_FACES)
   {
     cubeImages[num] = image;
-    if (!manualName) UpdateName();
+    if (!manualName) UpdateName ();
   }
 }

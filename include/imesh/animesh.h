@@ -60,12 +60,17 @@ struct csAnimatedMeshBoneInfluence
 struct iAnimatedMeshSocketFactory : public virtual iBase
 {
 public:
-  SCF_INTERFACE(iAnimatedMeshSocketFactory, 1, 0, 0);
+  SCF_INTERFACE(iAnimatedMeshSocketFactory, 2, 0, 0);
 
   /**
    * Get the name of the socket
    */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Set the name of the socket
+   */
+  virtual void SetName (const char* ) = 0;
   
   /**
    * Get the bone to socket transform of the socket
@@ -81,6 +86,11 @@ public:
    * Get the bone ID associated with the socket
    */
   virtual BoneID GetBone () const = 0;
+
+  /**
+   * Set the bone ID associated with the socket
+   */
+  virtual void SetBone (BoneID) = 0;
 
   /**
    * Get the associated mesh factory

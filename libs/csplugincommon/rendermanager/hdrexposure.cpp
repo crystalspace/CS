@@ -20,95 +20,181 @@
 
 #include "csplugincommon/rendermanager/hdrexposure.h"
 
-#include "csplugincommon/rendermanager/posteffects.h"
-#include "csutil/objreg.h"
-#include "csutil/sysfunc.h"
-#include "imap/loader.h"
-#include "iutil/databuff.h"
+#include "iutil/verbositymanager.h"
+#include "ivaria/reporter.h"
 
 namespace CS
 {
   namespace RenderManager
   {
-    void HDRExposureLinear::Initialize (iObjectRegistry* objReg,
-      HDRHelper& hdr)
+    namespace HDR
     {
-      this->hdr = &hdr;
-      measureLayer = hdr.GetMeasureLayer();
-      PostEffectManager::LayerOptions measureOpts = measureLayer->GetOptions();
-      measureOpts.mipmap = true;
-      measureOpts.maxMipmap = csMax (measureOpts.maxMipmap, 2);
-      measureOpts.noTextureReuse = true;
-      measureLayer->SetOptions (measureOpts);
-      
-      csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
-      CS_ASSERT(loader);
-      csRef<iShader> tonemap = loader->LoadShader ("/shader/postproc/hdr/identity-map.xml");
-      hdr.SetMappingShader (tonemap);
-    
-      csRef<iShaderManager> shaderManager =
-	csQueryRegistry<iShaderManager> (objReg);
-      CS_ASSERT (shaderManager);
-      csRef<iShaderVarStringSet> svNameStringSet = 
-	csQueryRegistryTagInterface<iShaderVarStringSet> (objReg,
-	  "crystalspace.shader.variablenameset");
-      CS_ASSERT (svNameStringSet);
+      namespace Exposure
+      {
+	void Linear::Initialize (iObjectRegistry* objReg, HDRHelper& hdr)
+	{
+	  luminance.Initialize (objReg, hdr);
+	  this->hdr = &hdr;
 	  
-      svHDRScale = shaderManager->GetVariableAdd (svNameStringSet->Request (
-	"hdr scale"));
-      svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
-    }
-    
-    void HDRExposureLinear::ApplyExposure ()
-    {
-      if (!measureLayer || !hdr) return;
-      iTextureHandle* measureTex =
-	hdr->GetHDRPostEffects().GetLayerOutput (measureLayer);
-      int newW, newH;
-      measureTex->GetRendererDimensions (newW, newH);
-      csRef<iDataBuffer> newData = measureTex->Readback (readbackFmt, 2);
-      if (!newData.IsValid())
-      {
-	// If we can't get the mipmapped version, try to get full version
-        newData = measureTex->Readback (readbackFmt, 0);
-        if (!newData.IsValid()) return;
-      }
-      else
-      {
-        lastW >>= 2; lastH >>= 2;
-      }
-      
-      csTicks currentTime = csGetTicks();
-      if (lastData.IsValid() && (lastTime != 0))
-      {
-        const uint8* bgra = lastData->GetUint8();
-        int numPixels = lastW * lastH;
-        float totalLum = 0;
-        for (int i = 0; i < numPixels; i++)
-        {
-          int b = *bgra++;
-          int g = *bgra++;
-          int r = *bgra++;
-          bgra++;
-          float lum = r*(0.2126f/255) + g*(0.7152f/255) + b*(0.722f/255);
-          totalLum += lum;
-        }
-        
-        uint deltaTime = csMin (currentTime-lastTime, (uint)33);
-        const float exposureAdjust = exposureChangeRate*deltaTime/1000.0f;
-        float avgLum = (totalLum / numPixels) * exposure;
-        if (avgLum >= targetAvgLum+targetAvgLumTolerance)
-          exposure -= exposureAdjust;
-        else if (avgLum <= targetAvgLum-targetAvgLumTolerance)
-          exposure += exposureAdjust;
-          
-        svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
-      }
-      
-      lastData = newData;
-      lastW = newW; lastH = newH;
-      lastTime = currentTime;
-    }
+	  csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
+	  CS_ASSERT(loader);
+	  csRef<iShaderVarStringSet> svNameStringSet = 
+	    csQueryRegistryTagInterface<iShaderVarStringSet> (objReg,
+	      "crystalspace.shader.variablenameset");
+	  CS_ASSERT (svNameStringSet);
+	  
+	  csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager> (objReg);
+	  CS_ASSERT (shaderManager);
+	      
+	  csRef<iShader> tonemap = loader->LoadShader ("/shader/postproc/hdr/identity-map.xml");
+	  hdr.SetMappingShader (tonemap);
+	
+	  svHDRScale = shaderManager->GetVariableAdd (svNameStringSet->Request (
+	    "hdr scale"));
+	  float exposure = luminance.GetColorScale();
+	  svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
+	}
+	
+	void Linear::ApplyExposure (RenderTreeBase& renderTree, iView* view)
+	{
+	  if (!hdr) return;
+	  
+	  csTicks currentTime = csGetTicks();
+	  float avgLum, maxLum, exposure;
+	  if (luminance.ComputeLuminance (renderTree, view,
+	      avgLum, maxLum, exposure) && (lastTime != 0))
+	  {
+	    uint deltaTime = csMin (currentTime-lastTime, (uint)33);
+	    const float exposureAdjust = exposureChangeRate*deltaTime/1000.0f;
+	    if (avgLum >= targetAvgLum+targetAvgLumTolerance)
+	      exposure -= exposureAdjust;
+	    else if (avgLum <= targetAvgLum-targetAvgLumTolerance)
+	      exposure += exposureAdjust;
+	    luminance.SetColorScale (exposure);
+	      
+	    svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
+	  }
+	  
+	  lastTime = currentTime;
+	}
   
+        //-------------------------------------------------------------------
+        
+	void Reinhard_Simple::Initialize (iObjectRegistry* objReg, HDRHelper& hdr)
+	{
+	  luminance.Initialize (objReg, hdr);
+	  this->hdr = &hdr;
+	  
+	  csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
+	  CS_ASSERT(loader);
+	  csRef<iShaderVarStringSet> svNameStringSet = 
+	    csQueryRegistryTagInterface<iShaderVarStringSet> (objReg,
+	      "crystalspace.shader.variablenameset");
+	  CS_ASSERT (svNameStringSet);
+	  
+	  csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager> (objReg);
+	  CS_ASSERT (shaderManager);
+	      
+	  csRef<iShader> tonemap = loader->LoadShader ("/shader/postproc/hdr/reinhard_simple.xml");
+	  hdr.SetMappingShader (tonemap);
+	
+	  svHDRScale = shaderManager->GetVariableAdd (svNameStringSet->Request (
+	    "hdr scale"));
+	  float exposure = luminance.GetColorScale();
+	  svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
+	  
+	  svMappingParams = shaderManager->GetVariableAdd (svNameStringSet->Request (
+	    "mapping params"));
+	}
+	
+	void Reinhard_Simple::ApplyExposure (RenderTreeBase& renderTree, iView* view)
+	{
+	  if (!hdr) return;
+	  
+	  csTicks currentTime = csGetTicks();
+	  float avgLum, maxLum, maxComp, exposure;
+	  if (luminance.ComputeLuminance (renderTree, view,
+	      avgLum, maxLum, maxComp, exposure) && (lastTime != 0))
+	  {
+	    if (hdr->IsRangeLimited())
+	    {
+	      // Some pixels saturate, so change the HDR scaling to accomodate that
+	      if (maxComp > (253.0f/255.0f))
+	      {
+		/* Agressively increase the range: if the range is too small
+		   the scene gets a very flat look (large saturated areas that
+		   turn out to be a dark gray). If the range is too large the
+		   next check will gradually decrease it. */
+		exposure = exposure * 0.77f;
+	      }
+	      else if ((maxComp > SMALL_EPSILON) && (maxComp < (250.0f/255.0f)))
+	      {
+		float d = (253.0f/255.0f)/maxComp;
+		exposure = exposure * d;
+	      }
+	      exposure = csMin (exposure, 16.0f);
+	      luminance.SetColorScale (exposure);
+	      svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
+	    }
+	      
+	    svMappingParams->SetValue (csVector3 (avgLum, 0.18f,
+	      csMax (maxLum*(254.0f/255.0f), 1.0f)));
+	    
+	  }
+	  
+	  lastTime = currentTime;
+	}
+  
+        //-------------------------------------------------------------------
+        
+	Configurable::AbstractExposure* Configurable::CreateExposure (const char* name)
+	{
+	  if (strcmp (name, "linear") == 0)
+	    return new WrapperExposure<Linear>;
+	  if (strcmp (name, "reinhard_simple") == 0)
+	    return new WrapperExposure<Reinhard_Simple>;
+	  return 0;
+	}
+        
+        Configurable::~Configurable()
+        {
+          delete exposure;
+        }
+  
+	void Configurable::Initialize (iObjectRegistry* objReg,
+                                       HDRHelper& hdr,
+                                       const HDRSettings& settings)
+	{
+          const char messageID[] = "crystalspace.rendermanager.hdr.exposure";
+  
+	  csRef<iVerbosityManager> verbosity = csQueryRegistry<iVerbosityManager> (
+	    objReg);
+	  bool doVerbose = verbosity && verbosity->Enabled ("rendermanager.hdr.exposure");
+	  
+	  const char* exposureStr = settings.GetExposureMethod();
+	  if (!exposureStr) exposureStr = "reinhard_simple";
+	  if (doVerbose)
+	  {
+	    csReport (objReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
+	      "Configured exposure type: '%s'", exposureStr);
+	  }
+	  exposure = CreateExposure (exposureStr);
+	  if (!exposure)
+	  {
+	    csReport (objReg, CS_REPORTER_SEVERITY_WARNING, messageID,
+	      "Invalid exposure type '%s'", exposureStr);
+	  }
+	  else
+	  {
+	    exposure->Initialize (objReg, hdr);
+	  }
+	}
+	
+	void Configurable::ApplyExposure (RenderTreeBase& renderTree, iView* view)
+	{
+	  if (exposure) exposure->ApplyExposure (renderTree, view);
+	}
+      } // namespace Exposure
+    } // namespace HDR
   } // namespace RenderManager
 } // namespace CS

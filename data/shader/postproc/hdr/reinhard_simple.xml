@@ -1,0 +1,78 @@
+<shader compiler="xmlshader" name="postproc_hdr_reinhard_simple">
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <texture destination="Texture1" name="tex diffuse" />
+      <fp plugin="glcg">
+	<cgfp>
+	  <variablemap variable="hdr scale" destination="hdrScale" />
+	  <variablemap variable="mapping params" destination="mappingParams" />
+	  <program>
+	      <![CDATA[
+		       
+	      float3 RGBtoxyY (float3 c)
+	      {
+	        float3x3 rgb2xyz = float3x3 (0.4124, 0.3575, 0.1804,
+	                                     0.2126, 0.7151, 0.0721,
+	                                     0.0193, 0.1191, 0.9502);
+		float3 XYZ = mul (rgb2xyz, c);
+		float XYZ_sum = dot (XYZ, float3(1));
+		float2 xy;
+		if (XYZ_sum > 0)
+		{
+		  xy = XYZ.xy/XYZ_sum;
+		}
+		else
+		{
+		  xy = float2 (0);
+		}
+		return float3 (xy, XYZ.y);
+	      }
+
+	      float3 xyYtoRGB (float3 c)
+	      {
+	        float2 XZ;
+		if (c.y > 0)
+		  XZ = float2 (c.x, 1-dot (c.xy, float2 (1)))*float2(c.z/c.y);
+		else
+		  XZ = float2 (0);
+	        float3 XYZ = float3 (XZ.x, c.z, XZ.y);
+		float3x3 xyz2rgb = float3x3 ( 3.2404, -1.5371, -0.4985,
+					     -0.9692,  1.8759,  0.0415,
+					      0.0556, -0.2040,  1.0573);
+		return mul (xyz2rgb, XYZ);
+	      }
+	      
+	      float4 main (in float2 TexCoord : TEXCOORD0,
+			   uniform sampler2D Texture1,
+			   uniform float4 hdrScale,
+			   uniform float3 mappingParams) : COLOR
+	      {
+	        float avgLum = mappingParams.x;
+		float imageKey = mappingParams.y;
+		float whiteLuminance = mappingParams.z;
+		whiteLuminance = (imageKey/avgLum)*whiteLuminance;
+		float whiteLuminanceSq = whiteLuminance*whiteLuminance;
+	      
+					     
+		float4 inCol = tex2D (Texture1, TexCoord);
+		inCol.rgb = inCol.rgb*hdrScale.x + hdrScale.z;
+		float3 inCol_xyY = RGBtoxyY (inCol.rgb);
+		float lum_world = inCol_xyY.z;
+		
+		float lum = (imageKey/avgLum)*lum_world;
+		
+		float newLum = (lum*(1+lum/(whiteLuminanceSq)))/(1+lum);
+		inCol_xyY.z = newLum;
+		inCol.rgb = xyYtoRGB (inCol_xyY);
+		
+		return float4 (inCol.rgb, inCol.a);
+	      }
+
+	      ]]>
+	  </program>
+	</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

@@ -48,6 +48,7 @@
 #include "csutil/bitarray.h"
 #include "csutil/eventnames.h"
 #include "csutil/scfarray.h"
+#include "csutil/measuretime.h"
 
 #include "gl_r2t_ext_fb_o.h"
 #include "gl_r2t_framebuf.h"
@@ -130,7 +131,7 @@ CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(MakeAString, reader, GetReader,
 SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
-  scfImplementationType (this, parent), isOpen (false), 
+  scfImplementationType (this, parent), isOpen (false), frameNum (0), 
   explicitProjection (false), needMatrixUpdate (true), imageUnits (0),
   activeVertexAttribs (0), wantToSwap (false), delayClearFlags (0),
   currentAttachments (0)
@@ -1567,10 +1568,10 @@ void csGLGraphics3D::FinishDraw ()
     G2D->FinishDraw ();
 
   DeactivateBuffers (0, 0);
-
+  
   if (currentAttachments != 0)
   {
-    r2tbackend->FinishDraw();
+    r2tbackend->FinishDraw (current_drawflags & CSDRAW_READBACK);
     UnsetRenderTargets();
     currentAttachments = 0;
   }
@@ -1580,6 +1581,26 @@ void csGLGraphics3D::FinishDraw ()
 
 void csGLGraphics3D::Print (csRect const* area)
 {
+#if 0
+  static void* blah;
+  //if (blah == 0) blah = cs_malloc (scrwidth*scrheight*32);
+  static GLuint pbo;
+  if (pbo == 0)
+  {
+    csGLGraphics3D::ext->glGenBuffersARB (1, &pbo);
+    GLuint oldBuffer = csGLGraphics3D::statecache->GetBufferARB (GL_PIXEL_PACK_BUFFER_ARB);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, pbo, true);
+    csGLGraphics3D::ext->glBufferDataARB (GL_PIXEL_PACK_BUFFER_ARB, scrwidth*scrheight*4, 0, GL_STREAM_READ_ARB);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, oldBuffer);
+  }
+  {
+  CS::MeasureTime measure ("%s", CS_FUNCTION_NAME);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, pbo, true);
+  glReadPixels (0, 0, scrwidth, scrheight, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, 0, true);
+  }
+#endif
+
   //glFinish ();
   if (bugplug)
     bugplug->ResetCounter ("Triangle Count");
@@ -1600,7 +1621,10 @@ void csGLGraphics3D::Print (csRect const* area)
   }
   G2D->Print (area);
   
-  r2tbackend->NextFrame();
+  //csPrintf ("frame\n");
+  frameNum++;
+  r2tbackend->NextFrame (frameNum);
+  txtmgr->NextFrame (frameNum);
 }
 
 void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,

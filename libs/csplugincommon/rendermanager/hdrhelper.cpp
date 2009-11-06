@@ -55,6 +55,7 @@ namespace CS
 	default: return false;
       }
       postEffects.SetIntermediateTargetFormat (textureFmt);
+      this->quality = quality;
       
       csRef<iShaderManager> shaderManager =
 	csQueryRegistry<iShaderManager> (objectReg);
@@ -93,7 +94,7 @@ namespace CS
       return mappingLayer->GetShader();
     }
 
-    iShaderVariableContext* HDRHelper::GetMapppingShaderVarContext()
+    iShaderVariableContext* HDRHelper::GetMappingShaderVarContext()
     {
       return mappingLayer->GetSVContext();
     }
@@ -136,6 +137,12 @@ namespace CS
     {
       return config->GetInt (csString ().Format ("%s.HDR.ColorRange",
         prefix.GetData()), 4);
+    }
+    
+    const char* HDRSettings::GetExposureMethod() const
+    {
+      return config->GetStr (
+        csString ().Format ("%s.HDR.Exposure", prefix.GetData()), 0);
     }
   } // namespace RenderManager
 } // namespace CS

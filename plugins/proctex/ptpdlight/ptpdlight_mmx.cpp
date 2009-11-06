@@ -35,6 +35,10 @@ CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_MMX_Blit)
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {
 
+/* This file is always compiled on MSVC, but it does not support MMX on all
+   platforms */
+#ifdef CS_SUPPORTS_MMX
+
 struct Map_uint8
 {
   typedef uint8 type;
@@ -305,6 +309,8 @@ void ProctexPDLight::Animate_MMX ()
   }
   _m_empty();
 }
+
+#endif // CS_SUPPORTS_MMX
 
 }
 CS_PLUGIN_NAMESPACE_END(PTPDLight)

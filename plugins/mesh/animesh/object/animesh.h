@@ -253,6 +253,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     //-- iAnimatedMeshSocketFactory
     virtual const char* GetName () const;
+    virtual void SetName (const char*);
     virtual const csReversibleTransform& GetTransform () const;
     virtual void SetTransform (csReversibleTransform& tf);
     virtual BoneID GetBone () const;
