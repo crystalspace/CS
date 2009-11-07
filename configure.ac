@@ -443,26 +443,6 @@ CS_EMIT_BUILD_FLAGS([how to enforce C++ standards conformance],
 
 
 #------------------------------------------------------------------------------
-# On MinGW, with some versions of the MinGW runtime (3.15 and above), using
-# the STL together with -ansi is broken: the C runtime function swprintf()
-# and vswprintf() are not declared, but an STL header (<cwchar>)
-# unconditionally references it.
-# Detect if this is the case.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_FUNCTION_WITH_ANSI],
-    [CS_CHECK_BUILD([if $1 is available when enforcing C++ standards],
-        [cs_cv_have_$1_with_ansi],
-        [AC_LANG_PROGRAM(
-	    [[#include <stdio.h>]],
-	    [using ::$1;])],
-        [], [C++], [], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_ANSI_BREAKS_$1]))], [],
-        [$cs_cv_prog_cxx_enable_pedantic])])
-CS_CHECK_FUNCTION_WITH_ANSI([swprintf])
-CS_CHECK_FUNCTION_WITH_ANSI([vswprintf])
-
-
-
-#------------------------------------------------------------------------------
 # Check if the linker recognizes "-force_cpusubtype_ALL".  This is required on
 # MacOS/X since the Crystal Space's PowerPC implementation of csQsqrt() uses
 # the `frsqrte' instruction which is only valid when the -force_cpusubtype_ALL
@@ -2056,6 +2036,29 @@ CS_CHECK_BUILD([for MAXPATHLEN], [cs_cv_c_macro_maxpathlen],
 	[char s[[[MAXPATHLEN]]]; (void)s;])],
     [], [], [CS_HEADER_PROPERTY([CS_MAXPATHLEN], [MAXPATHLEN])], [], [],
     [$cs_cv_prog_cxx_enable_pedantic])
+
+
+
+#------------------------------------------------------------------------------
+# On MinGW, with some versions of the MinGW runtime (3.15 and above), using
+# the STL together with -ansi is broken: the C runtime function swprintf()
+# and vswprintf() are not declared, but an STL header (<cwchar>)
+# unconditionally references it.
+# Detect if this is the case.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_FUNCTION_WITH_ANSI],
+    [CS_CHECK_BUILD([if $1 is available when enforcing C++ standards],
+        [cs_cv_have_$1_with_ansi],
+        [AC_LANG_PROGRAM(
+	    [[#include <stdio.h>
+	    #if HAVE_WCHAR_H
+	    #include <wchar.h>
+	    #endif]],
+	    [using ::$1;])],
+        [], [C++], [], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_ANSI_BREAKS_$1]))], [],
+        [$cs_cv_prog_cxx_enable_pedantic])])
+CS_CHECK_FUNCTION_WITH_ANSI([swprintf])
+CS_CHECK_FUNCTION_WITH_ANSI([vswprintf])
 
 
 
