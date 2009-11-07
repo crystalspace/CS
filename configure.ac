@@ -402,7 +402,7 @@ CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
 # optimization levels). This is needed for some code we don't have
 # control over (e.g. SWIG-generated code) that breaks strict-aliasing rules.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for flag to disable string-aliasing],
+CS_CHECK_BUILD_FLAGS([for flag to disable strict-aliasing],
     [cs_cv_prog_cxx_no_strict_aliasing],
     [CS_CREATE_TUPLE([-fno-strict-aliasing])], [C++],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.STRICTALIASING.DISABLE],
