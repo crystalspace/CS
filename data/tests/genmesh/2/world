@@ -1,0 +1,100 @@
+<world>
+
+  <plugins>
+    <plugin name="genmesh">
+      <id>crystalspace.mesh.loader.genmesh</id>
+      <defaults>
+        <staticshape/>
+        <staticpos/>
+      </defaults>
+    </plugin>
+    <plugin name="genmeshfact">
+      <id>crystalspace.mesh.loader.factory.genmesh</id>
+      <defaults>
+        <staticshape/>
+      </defaults>
+    </plugin>
+  </plugins>
+
+	<textures>
+    <texture name="texWhite">
+      <color red="1" green="1" blue="1" />
+    </texture>
+    <texture name="texGreen">
+      <color red="0" green="1" blue="0" />
+    </texture>
+    <texture name="texRed">
+      <color red="1" green="0" blue="0" />
+    </texture>
+  </textures>
+
+	<materials>
+    <material name="white"><texture>texWhite</texture></material>
+    <material name="green"><texture>texGreen</texture></material>
+    <material name="red"><texture>texRed</texture></material>
+  </materials>
+
+	<meshfact name="Cube">
+    <plugin>genmeshfact</plugin>
+    <params>
+      <material>green</material>
+      <numvt>24</numvt>
+      <v x="-1.0873" y="-1.03523" z="1.79828" u="0" v="0"/>
+      <v x="-1.5773" y="-1.03523" z="0.198284" u="0" v="1"/>
+      <v x="0.00269604" y="-1.03523" z="-0.291716" u="1" v="1"/>
+      <v x="0.492695" y="-1.03523" z="1.29828" u="1" v="0"/>
+      <v x="0.00269538" y="2.26477" z="-0.291716" u="0" v="0"/>
+      <v x="-1.5773" y="2.26477" z="0.198284" u="0" v="1"/>
+      <v x="-1.0873" y="2.26477" z="1.79828" u="1" v="1"/>
+      <v x="0.492696" y="2.26477" z="1.29828" u="1" v="0"/>
+      <v x="0.00269604" y="-1.03523" z="-0.291716" u="0" v="0"/>
+      <v x="0.00269538" y="2.26477" z="-0.291716" u="0" v="1"/>
+      <v x="0.492696" y="2.26477" z="1.29828" u="1" v="1"/>
+      <v x="-1.5773" y="-1.03523" z="0.198284" u="0" v="0"/>
+      <v x="0.00269538" y="2.26477" z="-0.291716" u="1" v="1"/>
+      <v x="0.00269604" y="-1.03523" z="-0.291716" u="1" v="0"/>
+      <v x="-1.0873" y="2.26477" z="1.79828" u="0" v="1"/>
+      <v x="-1.5773" y="2.26477" z="0.198284" u="1" v="1"/>
+      <v x="-1.5773" y="-1.03523" z="0.198284" u="1" v="0"/>
+      <v x="-1.0873" y="2.26477" z="1.79828" u="0" v="0"/>
+      <v x="-1.0873" y="-1.03523" z="1.79828" u="0" v="1"/>
+      <v x="0.492695" y="-1.03523" z="1.29828" u="1" v="1"/>
+      <v x="0.492695" y="-1.03523" z="1.29828" u="1" v="0"/>
+      <v x="-1.5773" y="2.26477" z="0.198284" u="0" v="1"/>
+      <v x="-1.0873" y="-1.03523" z="1.79828" u="0" v="0"/>
+      <v x="0.492696" y="2.26477" z="1.29828" u="1" v="0"/>
+      <numtri>12</numtri>
+      <t v1="0" v2="1" v3="2"/>
+      <t v1="2" v2="3" v3="0"/>
+      <t v1="4" v2="5" v3="6"/>
+      <t v1="6" v2="7" v3="4"/>
+      <t v1="8" v2="9" v3="10"/>
+      <t v1="10" v2="20" v3="8"/>
+      <t v1="11" v2="21" v3="12"/>
+      <t v1="12" v2="13" v3="11"/>
+      <t v1="22" v2="14" v3="15"/>
+      <t v1="15" v2="16" v3="22"/>
+      <t v1="17" v2="18" v3="19"/>
+      <t v1="19" v2="23" v3="17"/>
+      <autonormals/>
+      <normalnocompress />
+      <localshadows/>
+    </params>
+  </meshfact>
+  
+	<sector name="room">
+	
+		<meshobj name="Cube">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>Cube</factory>
+        <material>green</material>
+      </params>
+      <zuse/>
+      <move>
+        <v x="0" y="5" z="0"/>
+      </move>
+    </meshobj>
+    
+	</sector>
+</world>
