@@ -16,8 +16,8 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef __REGRESSIONTEST_H__
-#define __REGRESSIONTEST_H__
+#ifndef __SMOKETEST_H__
+#define __SMOKETEST_H__
 
 #include "crystalspace.h"
 
@@ -33,7 +33,7 @@
 
 struct iSector;
 
-class RegressionTest : public csApplicationFramework, public csBaseEventHandler
+class SmokeTest : public csApplicationFramework, public csBaseEventHandler
 {
 private:
   iSector *room;
@@ -79,8 +79,8 @@ private:
   bool onMouseLeaves (const CEGUI::EventArgs& e);
 
 public:
-  RegressionTest();
-  ~RegressionTest();
+  SmokeTest();
+  ~SmokeTest();
 
   void OnExit();
   bool OnInitialize(int argc, char* argv[]);

@@ -16,7 +16,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#include "regressiontest.h"
+#include "smoketest.h"
 
 #include "csutil/custom_new_disable.h"
 #include <CEGUI.h>
@@ -27,17 +27,17 @@
 
 CS_IMPLEMENT_APPLICATION
 
-RegressionTest::RegressionTest() 
+SmokeTest::SmokeTest() 
   : current(-1)
 {
-  SetApplicationName ("RegressionTest");
+  SetApplicationName ("SmokeTest");
 }
 
-RegressionTest::~RegressionTest()
+SmokeTest::~SmokeTest()
 {
 }
 
-void RegressionTest::Frame()
+void SmokeTest::Frame()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -114,7 +114,7 @@ void RegressionTest::Frame()
   }
 }
 
-bool RegressionTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
+bool SmokeTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
     CS_REQUEST_VFS,
@@ -137,12 +137,12 @@ bool RegressionTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
   return true;
 }
 
-void RegressionTest::OnExit()
+void SmokeTest::OnExit()
 {
   printer.Invalidate ();
 }
 
-bool RegressionTest::Application()
+bool SmokeTest::Application()
 {
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
@@ -192,8 +192,8 @@ bool RegressionTest::Application()
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
   // Load layout and set as root
-  vfs->ChDir ("/data/regressiontest/");
-  cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("regressiontest.layout"));
+  vfs->ChDir ("/data/smoketest/");
+  cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("smoketest.layout"));
   vfs->ChDir ("/ceguitest/0.5/");
 
   // These are used store the current orientation of the camera.
@@ -213,28 +213,28 @@ bool RegressionTest::Application()
   CEGUI::Window* btn;
   btn = winMgr->getWindow("Browse/GO");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&RegressionTest::OnGoto, this));
+    CEGUI::Event::Subscriber(&SmokeTest::OnGoto, this));
 
   btn = winMgr->getWindow("Browse/Previous");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&RegressionTest::OnPrevious, this));
+    CEGUI::Event::Subscriber(&SmokeTest::OnPrevious, this));
 
   btn = winMgr->getWindow("Browse/Next");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&RegressionTest::OnNext, this));
+    CEGUI::Event::Subscriber(&SmokeTest::OnNext, this));
 
 
   btn = winMgr->getWindow("Preview");
   btn->subscribeEvent(CEGUI::Window::EventMouseEnters,
-    CEGUI::Event::Subscriber(&RegressionTest::onMouseEnters, this));
+    CEGUI::Event::Subscriber(&SmokeTest::onMouseEnters, this));
 
   btn = winMgr->getWindow("Preview");
   btn->subscribeEvent(CEGUI::Window::EventMouseLeaves,
-    CEGUI::Event::Subscriber(&RegressionTest::onMouseLeaves, this));
+    CEGUI::Event::Subscriber(&SmokeTest::onMouseLeaves, this));
 
   if (cmdline->GetBoolOption ("help"))
   {
-    csPrintf ("regressiontest <options>\n");
+    csPrintf ("smoketest <options>\n");
     csPrintf ("  --help:\n");       
     csPrintf ("     Print this help.\n");
     csPrintf ("  -path=<path>:\n");       
@@ -262,7 +262,7 @@ bool RegressionTest::Application()
   return true;
 }
 
-void RegressionTest::ScreenShot(const std::string& fileName)
+void SmokeTest::ScreenShot(const std::string& fileName)
 {
   csRef<iImageIO> iio = csQueryRegistry<iImageIO> (object_reg);
 
@@ -280,7 +280,7 @@ void RegressionTest::ScreenShot(const std::string& fileName)
     printf("Written '%s'...\n", fileName.c_str());
 }
 
-void RegressionTest::ScanDirectory(const std::string& path)
+void SmokeTest::ScanDirectory(const std::string& path)
 {
   csRef<iStringArray> arrs = vfs->FindFiles(path.c_str());
   for (size_t i = 0; i < arrs->GetSize(); i++)
@@ -299,7 +299,7 @@ void RegressionTest::ScanDirectory(const std::string& path)
   }
 }
 
-void RegressionTest::LoadPath(size_t index, bool render)
+void SmokeTest::LoadPath(size_t index, bool render)
 {
   if (index >= paths.size()) return;
 
@@ -362,7 +362,7 @@ void RegressionTest::LoadPath(size_t index, bool render)
   }
 }
 
-bool RegressionTest::OnGoto (const CEGUI::EventArgs& e)
+bool SmokeTest::OnGoto (const CEGUI::EventArgs& e)
 {
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
   CEGUI::Window* btn = winMgr->getWindow("Browse/GO/Input");
@@ -372,19 +372,19 @@ bool RegressionTest::OnGoto (const CEGUI::EventArgs& e)
   return true;
 }
 
-bool RegressionTest::OnPrevious (const CEGUI::EventArgs& e)
+bool SmokeTest::OnPrevious (const CEGUI::EventArgs& e)
 {
   LoadPath(current-1);
   return true;
 }
 
-bool RegressionTest::OnNext (const CEGUI::EventArgs& e)
+bool SmokeTest::OnNext (const CEGUI::EventArgs& e)
 {
   LoadPath(current+1);
   return true;
 }
 
-bool RegressionTest::onMouseEnters (const CEGUI::EventArgs& e)
+bool SmokeTest::onMouseEnters (const CEGUI::EventArgs& e)
 {
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
   CEGUI::Window* btn = winMgr->getWindow("Preview");
@@ -395,7 +395,7 @@ bool RegressionTest::onMouseEnters (const CEGUI::EventArgs& e)
   return true;
 }
 
-bool RegressionTest::onMouseLeaves (const CEGUI::EventArgs& e)
+bool SmokeTest::onMouseLeaves (const CEGUI::EventArgs& e)
 {
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
   CEGUI::Window* btn = winMgr->getWindow("Preview");
@@ -405,7 +405,7 @@ bool RegressionTest::onMouseLeaves (const CEGUI::EventArgs& e)
   return true;
 }
 
-bool RegressionTest::OnKeyboard(iEvent& ev)
+bool SmokeTest::OnKeyboard(iEvent& ev)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
@@ -421,7 +421,7 @@ bool RegressionTest::OnKeyboard(iEvent& ev)
   return false;
 }
 
-void RegressionTest::CreateRoom ()
+void SmokeTest::CreateRoom ()
 {
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
@@ -474,5 +474,5 @@ void RegressionTest::CreateRoom ()
  *---------------*/
 int main (int argc, char* argv[])
 {
-  return csApplicationRunner<RegressionTest>::Run (argc, argv);
+  return csApplicationRunner<SmokeTest>::Run (argc, argv);
 }
