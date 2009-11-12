@@ -479,7 +479,6 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
             TransversalQueue.IsEmpty()))
     {
       TransversalData& tdata = QueryQueue.Front();
-      QueryQueue.PopFront();
       
       unsigned int visible = 0;
       if(g3d->IsVisible(tdata.query, visible))
@@ -516,12 +515,13 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
           tdata = *(tdata.parent);
         }
       }
+
+      QueryQueue.PopFront();
     }
 
     if (!TransversalQueue.IsEmpty())
     {
       TransversalData& tdata = TransversalQueue.Front();
-      TransversalQueue.PopFront();
 
       // Do frustum culling check.
       NodeVisibility visibilty;
@@ -570,6 +570,8 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
         }
         history->wasVisible = (visibilty != INVISIBLE);
       }
+
+      TransversalQueue.PopFront();
     }
   }
 
