@@ -763,6 +763,8 @@ enum csRenderTargetAttachment
   rtaNumAttachments
 };
 
+typedef unsigned int GLuint;
+
 namespace CS
 {
   namespace Graphics
@@ -803,7 +805,7 @@ namespace CS
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 4, 0, 2);
+  SCF_INTERFACE(iGraphics3D, 4, 1, 0);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -1193,6 +1195,22 @@ struct iGraphics3D : public virtual iBase
    */
   virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
     size_t numMeshes, uint flags = 0) = 0;
+
+  /**
+   * Initialise a set of occlusion queries.
+   */
+  virtual void InitQueries(GLuint*& queries, size_t& old_num_queries,
+    size_t& num_queries) = 0;
+
+  /**
+   * Returns whether an occlusion query has finished.
+   */
+  virtual bool QueryFinished(GLuint& occlusion_query) = 0;
+
+  /**
+   * Check via occlusion query whether a mesh is visible.
+   */
+  virtual bool IsVisible(GLuint& occlusion_query, GLuint& sampleLimit) = 0;
 };
 
 /** @} */

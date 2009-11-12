@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- occluvis.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.culling.occluvis</name>
+        <implementation>csOccluVis</implementation>
+        <description>Occlusion Query Visibility System</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

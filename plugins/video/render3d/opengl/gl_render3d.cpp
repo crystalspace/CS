@@ -895,6 +895,7 @@ bool csGLGraphics3D::Open ()
   //ext->InitGL_ATI_separate_stencil ();
   ext->InitGL_EXT_secondary_color ();
   ext->InitGL_EXT_blend_func_separate ();
+  ext->InitGL_ARB_occlusion_query ();
   ext->InitGL_GREMEDY_string_marker ();
   
   // Some 'assumed state' is for extensions, so set again
@@ -3671,6 +3672,31 @@ bool csGLGraphics3D::PerformExtension (char const* command, ...)
   bool rc = PerformExtensionV(command, args);
   va_end (args);
   return rc;
+}
+
+void csGLGraphics3D::InitQueries(GLuint*& queries, size_t& old_num_queries, size_t& num_queries)
+{
+  if (queries != 0 && old_num_queries != 0)
+  {
+    ext->glDeleteQueriesARB(old_num_queries, queries);
+    delete[] queries;
+  }
+  queries = new GLuint[num_queries];
+  ext->glGenQueriesARB(num_queries, queries);
+}
+
+bool csGLGraphics3D::QueryFinished(GLuint& occlusion_query)
+{
+  GLint available;
+  ext->glGetQueryObjectivARB(occlusion_query, GL_QUERY_RESULT_AVAILABLE_ARB, &available);
+  return (available != 0);
+}
+
+bool csGLGraphics3D::IsVisible(GLuint& occlusion_query, GLuint& sampleLimit)
+{
+  GLuint sampleCount;
+  ext->glGetQueryObjectuivARB(occlusion_query, GL_QUERY_RESULT_ARB, &sampleCount);
+  return (sampleCount > sampleLimit);
 }
 
 csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,

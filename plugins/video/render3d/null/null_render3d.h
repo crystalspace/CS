@@ -178,6 +178,10 @@ public:
   bool PerformExtensionV (char const* /*command*/, va_list /*args*/)
   { return false; }
 
+  void InitQueries(GLuint*& queries, size_t& old_num_queries, size_t& num_queries) { }
+  bool QueryFinished(GLuint& occlusion_query) { return true; }
+  bool IsVisible(GLuint& occlusion_query, GLuint& sampleLimit) { return true; }
+
 private:
   iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;

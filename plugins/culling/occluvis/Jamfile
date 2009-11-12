@@ -1,0 +1,8 @@
+SubDir TOP plugins culling occluvis ;
+
+Description occluvis : "Occlusion Query Visibility System" ;
+
+Plugin occluvis
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith occluvis : crystalspace ;
