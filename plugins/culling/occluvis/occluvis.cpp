@@ -459,7 +459,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
   while (!DelayedQueryQueue.IsEmpty())
   {
     TransversalData& tdata = DelayedQueryQueue.Front();
-    GLuint visible = 0;
+    unsigned int visible = 0;
     csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
     visobj_wrap->wasVisible = g3d->IsVisible(tdata.query, visible);
     DelayedQueryQueue.PopFront();
@@ -481,7 +481,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
       TransversalData& tdata = QueryQueue.Front();
       QueryQueue.PopFront();
       
-      GLuint visible = 0;
+      unsigned int visible = 0;
       if(g3d->IsVisible(tdata.query, visible))
       {
         if (tdata.treeleaf != 0)
@@ -520,8 +520,8 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
 
     if (!TransversalQueue.IsEmpty())
     {
-      TransversalData& tdata = QueryQueue.Front();
-      QueryQueue.PopFront();
+      TransversalData& tdata = TransversalQueue.Front();
+      TransversalQueue.PopFront();
 
       // Do frustum culling check.
       NodeVisibility visibilty;
@@ -536,7 +536,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
       }
 
       // If frustum doesn't cull, proceed to occlusion query.
-      if (visibilty == VISIBLE)
+      if (visibilty != INVISIBLE)
       {
         if (tdata.treeleaf != 0)
         {
@@ -558,7 +558,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
       if(tdata.treeleaf != 0)
       {
         csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
-        visobj_wrap->wasVisible = (visibilty == VISIBLE);
+        visobj_wrap->wasVisible = (visibilty != INVISIBLE);
       }
       else
       {
@@ -568,7 +568,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
           history = new csVisibilityObjectHistory();
           tdata.treenode->SetUserObject(history);
         }
-        history->wasVisible = (visibilty == VISIBLE);
+        history->wasVisible = (visibilty != INVISIBLE);
       }
     }
   }
@@ -579,7 +579,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
     TransversalData& tdata = DelayedQueryQueue.Front();
     if (g3d->QueryFinished(tdata.query))
     {
-      GLuint visible = 0;
+      unsigned int visible = 0;
       csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
       visobj_wrap->wasVisible = g3d->IsVisible(tdata.query, visible);
       if(visobj_wrap->wasVisible)

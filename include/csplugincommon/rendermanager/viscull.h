@@ -110,10 +110,12 @@ namespace RenderManager
         }
       }
 
-      virtual bool RenderZMeshQuery (GLuint& query, iMeshWrapper *imesh, uint32 frustum_mask)
+      virtual bool RenderZMeshQuery (unsigned int& query, iMeshWrapper *imesh, uint32 frustum_mask)
       {
         if (filter && filter->IsMeshFiltered (imesh))
           return false;
+
+        csRef<iGraphics3D> g3d = currentRenderView->GetGraphics3D();
 
           // Get the meshes
           int numMeshes;
@@ -123,7 +125,9 @@ namespace RenderManager
           csShaderVariableStack svStack;
           CS::Graphics::RenderMeshModes rmModes;
 
-          g3d->InitQueries(&query, 0, 1);
+          int old_num_queries = 0;
+          int num_queries = 1;
+          g3d->InitQueries(&query, old_num_queries, num_queries);
           g3d->BeginOcclusionQuery(query);
 
           for (int m = 0; m < numMeshes; ++m)

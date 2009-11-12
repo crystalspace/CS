@@ -783,10 +783,10 @@ public:
   virtual bool PerformExtension (char const* command, ...);
   virtual bool PerformExtensionV (char const* command, va_list args);
 
-  virtual void InitQueries(GLuint*& queries, GLsizei& old_num_queries, GLsizei& num_queries);
-  virtual bool QueryFinished(GLuint& occlusion_query);
-  virtual bool IsVisible(GLuint& occlusion_query, GLuint& sampleLimit);
-  virtual void BeginOcclusionQuery (GLuint& occlusion_query);
+  virtual void InitQueries(unsigned int* queries, int& old_num_queries, int& num_queries);
+  virtual bool QueryFinished(unsigned int& occlusion_query);
+  virtual bool IsVisible(unsigned int& occlusion_query, unsigned int& sampleLimit);
+  virtual void BeginOcclusionQuery (unsigned int& occlusion_query);
   virtual void EndOcclusionQuery ();
 
   //=========================================================================

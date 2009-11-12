@@ -152,7 +152,7 @@ private:
     csKDTree* treenode;
     csKDTreeChild* treeleaf;
     bool isVisible;
-    GLuint query;
+    unsigned int query;
   };
 
   csList<TransversalData> TransversalQueue;

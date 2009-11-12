@@ -178,10 +178,10 @@ public:
   bool PerformExtensionV (char const* /*command*/, va_list /*args*/)
   { return false; }
 
-  void InitQueries(GLuint*& queries, GLsizei& old_num_queries, GLsizei& num_queries) { }
-  bool QueryFinished(GLuint& occlusion_query) { return true; }
-  bool IsVisible(GLuint& occlusion_query, GLuint& sampleLimit) { return true; }
-  void BeginOcclusionQuery (GLuint& occlusion_query) { }
+  void InitQueries(unsigned int* queries, int& old_num_queries, int& num_queries) { }
+  bool QueryFinished(unsigned int& occlusion_query) { return true; }
+  bool IsVisible(unsigned int& occlusion_query, unsigned int& sampleLimit) { return true; }
+  void BeginOcclusionQuery (unsigned int& occlusion_query) { }
   void EndOcclusionQuery () { }
 
 private:

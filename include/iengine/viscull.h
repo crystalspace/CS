@@ -82,7 +82,7 @@ struct iVisibilityCullerListener : public virtual iBase
   /**
    * This function is called to do a z-only render of a mesh with an occlusion query.
    */
-  virtual bool RenderZMeshQuery (GLuint& query, iMeshWrapper *imesh, uint32 frustum_mask) = 0;
+  virtual bool RenderZMeshQuery (unsigned int& query, iMeshWrapper *imesh, uint32 frustum_mask) = 0;
 };
 
 /**

@@ -112,6 +112,12 @@ public:
 
   virtual void ObjectVisible (iVisibilityObject *visobject, 
     iMeshWrapper *mesh, uint32 frustum_mask);
+
+  virtual bool RenderZMeshQuery (unsigned int& query, iMeshWrapper *imesh,
+    uint32 frustum_mask)
+  {
+    return false;
+  }
 };
 
 class csShadowmapRSLoader :

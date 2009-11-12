@@ -481,6 +481,12 @@ public:
     }
   }
 
+  virtual bool RenderZMeshQuery (unsigned int& query, iMeshWrapper *imesh,
+    uint32 frustum_mask)
+  {
+    return false;
+  }
+
 private:
   csRenderMeshList *privMeshlist;
   iRenderView *rview;
