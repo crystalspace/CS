@@ -161,7 +161,7 @@ private:
   csList<TransversalData> DelayedQueryQueue;
 
   bool WasVisible(TransversalData& data);
-  void TransverseNode(TransversalData& data, uint32 cur_timestamp, bool delayQuery);
+  void TransverseNode(TransversalData& tdata, uint32 cur_timestamp);
 
 public:
   csOccluVis (iBase *iParent);

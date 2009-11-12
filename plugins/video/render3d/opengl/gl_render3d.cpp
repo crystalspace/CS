@@ -1572,7 +1572,7 @@ void csGLGraphics3D::FinishDraw ()
   
   if (currentAttachments != 0)
   {
-    r2tbackend->FinishDraw (current_drawflags & CSDRAW_READBACK);
+    r2tbackend->FinishDraw ((current_drawflags & CSDRAW_READBACK) != 0);
     UnsetRenderTargets();
     currentAttachments = 0;
   }
@@ -3674,7 +3674,7 @@ bool csGLGraphics3D::PerformExtension (char const* command, ...)
   return rc;
 }
 
-void csGLGraphics3D::InitQueries(GLuint*& queries, size_t& old_num_queries, size_t& num_queries)
+void csGLGraphics3D::InitQueries(GLuint*& queries, GLsizei& old_num_queries, GLsizei& num_queries)
 {
   if (queries != 0 && old_num_queries != 0)
   {
@@ -3697,6 +3697,16 @@ bool csGLGraphics3D::IsVisible(GLuint& occlusion_query, GLuint& sampleLimit)
   GLuint sampleCount;
   ext->glGetQueryObjectuivARB(occlusion_query, GL_QUERY_RESULT_ARB, &sampleCount);
   return (sampleCount > sampleLimit);
+}
+
+void csGLGraphics3D::BeginOcclusionQuery (GLuint& occlusion_query)
+{
+  ext->glBeginQueryARB(GL_SAMPLES_PASSED_ARB, occlusion_query);
+}
+
+void csGLGraphics3D::EndOcclusionQuery ()
+{
+  ext->glEndQueryARB(GL_SAMPLES_PASSED_ARB);
 }
 
 csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,

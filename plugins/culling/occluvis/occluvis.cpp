@@ -468,6 +468,8 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
   TransversalData root;
   root.treenode = kdtree;
   root.treeleaf = 0;
+  root.parent = 0;
+  root.isVisible = false;
   TransversalQueue.PushBack(root);
 
   while (!TransversalQueue.IsEmpty() ||!QueryQueue.IsEmpty())
@@ -482,7 +484,21 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
       GLuint visible = 0;
       if(g3d->IsVisible(tdata.query, visible))
       {
-        TransverseNode(tdata, cur_timestamp, WasVisible(tdata));
+        if (tdata.treeleaf != 0)
+        {
+          csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
+          if(data.viscallback->RenderZMeshQuery(tdata.query, visobj_wrap->mesh, frustum_mask))
+          {
+            if (WasVisible(tdata))
+              DelayedQueryQueue.PushBack(tdata);
+            else
+              QueryQueue.PushBack(tdata);
+          }
+        }
+        else
+        {
+          TransverseNode(tdata, cur_timestamp);
+        }
 
         while (!tdata.isVisible)
         {
@@ -522,7 +538,21 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
       // If frustum doesn't cull, proceed to occlusion query.
       if (visibilty == VISIBLE)
       {
-        TransverseNode(tdata, cur_timestamp, WasVisible(tdata));
+        if (tdata.treeleaf != 0)
+        {
+          csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
+          if (data.viscallback->RenderZMeshQuery(tdata.query, visobj_wrap->mesh, frustum_mask))
+          {
+            if (WasVisible(tdata))
+              DelayedQueryQueue.PushBack(tdata);
+            else
+              QueryQueue.PushBack(tdata);
+          }
+        }
+        else
+        {
+          TransverseNode(tdata, cur_timestamp);
+        }
       }
 
       if(tdata.treeleaf != 0)
@@ -584,63 +614,50 @@ bool csOccluVis::WasVisible(TransversalData& data)
   }
 }
 
-void csOccluVis::TransverseNode(TransversalData& data, uint32 cur_timestamp, bool delayQuery)
+void csOccluVis::TransverseNode(TransversalData& tdata, uint32 cur_timestamp)
 {
-  if (data.treeleaf != 0)
-  {
-    csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)data.treeleaf->GetObject();
-    //data.query = SomeCallToDrawTheMeshAndQuery();
+  tdata.treenode->Distribute ();
 
-    if (delayQuery)
-      DelayedQueryQueue.PushBack(data);
-    else
-      QueryQueue.PushBack(data);
+  int num_objects;
+  csKDTreeChild** objects;
+  num_objects = tdata.treenode->GetObjectCount ();
+  objects = tdata.treenode->GetObjects ();
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+
+      TransversalData child;
+      child.parent = &tdata;
+      child.treenode = 0;
+      child.treeleaf = objects[i];
+      child.isVisible = false;
+      TransversalQueue.PushBack(child);
+    }
   }
-  else
+
+  csKDTree* child1 = tdata.treenode->GetChild1 ();
+  if (child1)
   {
-    data.treenode->Distribute ();
+    TransversalData child;
+    child.parent = &tdata;
+    child.treenode = child1;
+    child.treeleaf = 0;
+    child.isVisible = false;
+    TransversalQueue.PushBack(child);
+  }
 
-    int num_objects;
-    csKDTreeChild** objects;
-    num_objects = data.treenode->GetObjectCount ();
-    objects = data.treenode->GetObjects ();
-    int i;
-    for (i = 0 ; i < num_objects ; i++)
-    {
-      if (objects[i]->timestamp != cur_timestamp)
-      {
-        objects[i]->timestamp = cur_timestamp;
-
-        TransversalData child;
-        child.parent = &data;
-        child.treenode = 0;
-        child.treeleaf = objects[i];
-        child.isVisible = false;
-        TransversalQueue.PushBack(child);
-      }
-    }
-
-    csKDTree* child1 = data.treenode->GetChild1 ();
-    if (child1)
-    {
-      TransversalData child;
-      child.parent = &data;
-      child.treenode = child1;
-      child.treeleaf = 0;
-      child.isVisible = false;
-      TransversalQueue.PushBack(child);
-    }
-
-    csKDTree* child2 = data.treenode->GetChild2 ();
-    if (child2)
-    {
-      TransversalData child;
-      child.parent = &data;
-      child.treenode = child2;
-      child.treeleaf = 0;
-      child.isVisible = false;
-      TransversalQueue.PushBack(child);
-    }
+  csKDTree* child2 = tdata.treenode->GetChild2 ();
+  if (child2)
+  {
+    TransversalData child;
+    child.parent = &tdata;
+    child.treenode = child2;
+    child.treeleaf = 0;
+    child.isVisible = false;
+    TransversalQueue.PushBack(child);
   }
 }
 

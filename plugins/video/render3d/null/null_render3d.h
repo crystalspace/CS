@@ -178,9 +178,11 @@ public:
   bool PerformExtensionV (char const* /*command*/, va_list /*args*/)
   { return false; }
 
-  void InitQueries(GLuint*& queries, size_t& old_num_queries, size_t& num_queries) { }
+  void InitQueries(GLuint*& queries, GLsizei& old_num_queries, GLsizei& num_queries) { }
   bool QueryFinished(GLuint& occlusion_query) { return true; }
   bool IsVisible(GLuint& occlusion_query, GLuint& sampleLimit) { return true; }
+  void BeginOcclusionQuery (GLuint& occlusion_query) { }
+  void EndOcclusionQuery () { }
 
 private:
   iObjectRegistry* object_reg;

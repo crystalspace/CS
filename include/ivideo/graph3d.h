@@ -764,6 +764,7 @@ enum csRenderTargetAttachment
 };
 
 typedef unsigned int GLuint;
+typedef int GLsizei;
 
 namespace CS
 {
@@ -1199,18 +1200,21 @@ struct iGraphics3D : public virtual iBase
   /**
    * Initialise a set of occlusion queries.
    */
-  virtual void InitQueries(GLuint*& queries, size_t& old_num_queries,
-    size_t& num_queries) = 0;
+  virtual void InitQueries (GLuint*& queries, GLsizei& old_num_queries,
+    GLsizei& num_queries) = 0;
 
   /**
    * Returns whether an occlusion query has finished.
    */
-  virtual bool QueryFinished(GLuint& occlusion_query) = 0;
+  virtual bool QueryFinished (GLuint& occlusion_query) = 0;
 
   /**
    * Check via occlusion query whether a mesh is visible.
    */
-  virtual bool IsVisible(GLuint& occlusion_query, GLuint& sampleLimit) = 0;
+  virtual bool IsVisible (GLuint& occlusion_query, GLuint& sampleLimit) = 0;
+
+  virtual void BeginOcclusionQuery (GLuint& occlusion_query) = 0;
+  virtual void EndOcclusionQuery () = 0;
 };
 
 /** @} */
