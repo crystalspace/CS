@@ -399,7 +399,7 @@ CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
 # optimization levels). This is needed for some code we don't have
 # control over (e.g. SWIG-generated code) that breaks strict-aliasing rules.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for flag to disable string-aliasing],
+CS_CHECK_BUILD_FLAGS([for flag to disable strict-aliasing],
     [cs_cv_prog_cxx_no_strict_aliasing],
     [CS_CREATE_TUPLE([-fno-strict-aliasing])], [C++],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.STRICTALIASING.DISABLE],
@@ -504,13 +504,23 @@ CS_CHECK_VTABLE_THUNKS
 
 
 #------------------------------------------------------------------------------
+# Check how to ask the linker to promote warnings to errors.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD_FLAGS([how to treat linker warnings as errors],
+    [cs_cv_prog_link_enable_errors], [CS_CREATE_TUPLE([-Wl,--fatal-warnings])],
+    [C++])
+
+
+
+#------------------------------------------------------------------------------
 # Check how to ask the linker to export all dynamic symbols in debug mode to
 # allow the backtrace() callstack creation code to obtain symbols in all cases.
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
+CS_CHECK_BUILD_FLAGS([how to export all dynamic symbols],
     [cs_cv_prog_link_export_dynamic], [CS_CREATE_TUPLE([-Wl,-E])],
-    [C++], [COMPILER.LFLAGS.debug], [+])
-
+    [C++], [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.debug],
+        [$cs_cv_prog_link_export_dynamic], [+])],
+    [], [], [$cs_cv_prog_link_enable_errors])
 
 
 #------------------------------------------------------------------------------
@@ -2075,6 +2085,29 @@ CS_CHECK_BUILD([for MAXPATHLEN], [cs_cv_c_macro_maxpathlen],
 	[char s[[[MAXPATHLEN]]]; (void)s;])],
     [], [], [CS_HEADER_PROPERTY([CS_MAXPATHLEN], [MAXPATHLEN])], [], [],
     [$cs_cv_prog_cxx_enable_pedantic])
+
+
+
+#------------------------------------------------------------------------------
+# On MinGW, with some versions of the MinGW runtime (3.15 and above), using
+# the STL together with -ansi is broken: the C runtime function swprintf()
+# and vswprintf() are not declared, but an STL header (<cwchar>)
+# unconditionally references it.
+# Detect if this is the case.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_FUNCTION_WITH_ANSI],
+    [CS_CHECK_BUILD([if $1 is available when enforcing C++ standards],
+        [cs_cv_have_$1_with_ansi],
+        [AC_LANG_PROGRAM(
+	    [[#include <stdio.h>
+	    #if HAVE_WCHAR_H
+	    #include <wchar.h>
+	    #endif]],
+	    [using ::$1;])],
+        [], [C++], [], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_ANSI_BREAKS_$1]))], [],
+        [$cs_cv_prog_cxx_enable_pedantic])])
+CS_CHECK_FUNCTION_WITH_ANSI([swprintf])
+CS_CHECK_FUNCTION_WITH_ANSI([vswprintf])
 
 
 
