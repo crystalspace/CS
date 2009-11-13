@@ -122,9 +122,6 @@ namespace RenderManager
           csSectorVisibleRenderMeshes* meshList = sector->GetVisibleRenderMeshes (
             numMeshes, imesh, currentRenderView, frustum_mask);
 
-          csShaderVariableStack svStack;
-          CS::Graphics::RenderMeshModes rmModes;
-
           int old_num_queries = 0;
           int num_queries = 1;
           g3d->InitQueries(&query, old_num_queries, num_queries);
@@ -135,7 +132,8 @@ namespace RenderManager
             for (int i = 0; i < meshList[m].num; ++i)
             {
               csRenderMesh* rm = meshList[m].rmeshes[i];
-              g3d->DrawMesh(rm, rmModes, svStack);
+              CS::Graphics::RenderMeshModes rmModes(*rm);
+              g3d->DrawMesh(rm, rmModes);
             }
           }
 

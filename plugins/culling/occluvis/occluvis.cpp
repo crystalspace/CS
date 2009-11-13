@@ -472,13 +472,13 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
   root.isVisible = false;
   TransversalQueue.PushBack(root);
 
-  while (!TransversalQueue.IsEmpty() ||!QueryQueue.IsEmpty())
+  while (!TransversalQueue.IsEmpty() || !QueryQueue.IsEmpty())
   {
-    while (!QueryQueue.IsEmpty() &&
-           (g3d->QueryFinished(QueryQueue.Front().query) ||
-            TransversalQueue.IsEmpty()))
+    while (!QueryQueue.IsEmpty())
     {
       TransversalData& tdata = QueryQueue.Front();
+      if(!g3d->QueryFinished(tdata.query) && !TransversalQueue.IsEmpty())
+        break;
       
       unsigned int visible = 0;
       if(g3d->IsVisible(tdata.query, visible))
@@ -499,20 +499,21 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
           TransverseNode(tdata, cur_timestamp);
         }
 
-        while (!tdata.isVisible)
+        TransversalData* pullup = &tdata;
+        while (!pullup->isVisible)
         {
-          if(tdata.treeleaf != 0)
+          if(pullup->treeleaf != 0)
           {
-            csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
+            csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)pullup->treeleaf->GetObject();
             data.viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
             visobj_wrap->wasVisible = true;
           }
 
-          tdata.isVisible = true;
-          if(tdata.parent == 0)
+          pullup->isVisible = true;
+          if(pullup->parent == 0)
             break;
 
-          tdata = *(tdata.parent);
+          pullup = pullup->parent;
         }
       }
 

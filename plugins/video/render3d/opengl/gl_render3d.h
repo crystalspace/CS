@@ -775,6 +775,9 @@ public:
   virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
     size_t numMeshes, uint flags = 0);
 
+  virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* rmesh,
+    const CS::Graphics::RenderMeshModes& modes);
+
   virtual iHalo* CreateHalo (float, float, float,
     unsigned char *, int, int);
   void RemoveHalo (csOpenGLHalo* halo);

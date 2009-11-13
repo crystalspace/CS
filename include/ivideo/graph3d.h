@@ -952,6 +952,11 @@ struct iGraphics3D : public virtual iBase
   virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
                          const CS::Graphics::RenderMeshModes& modes,
                          const csShaderVariableStack& stack) = 0;
+
+  /// Drawroutine. Only way to draw stuff
+  virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* rmesh,
+                         const CS::Graphics::RenderMeshModes& modes) = 0;
+
   /**
   * Draw a csSimpleRenderMesh on the screen.
   * Simple render meshes are intended for cases where setting up

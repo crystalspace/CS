@@ -3655,6 +3655,20 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
   }
 }
 
+void csGLGraphics3D::DrawMesh (const CS::Graphics::CoreRenderMesh* rmesh,
+                               const CS::Graphics::RenderMeshModes& modes)
+{
+
+  if(modes.buffers)
+  {
+    csShaderVariableStack stack;
+    stack.Setup (strings->GetSize ());
+    shadermgr->PushVariables (stack);
+    ActivateBuffers (modes.buffers, defaultBufferMapping);
+    DrawMesh (rmesh, modes, stack);
+  }
+}
+
 bool csGLGraphics3D::PerformExtensionV (char const* command, va_list /*args*/)
 {
   if (!strcasecmp (command, "applybufferchanges"))
@@ -3676,12 +3690,16 @@ bool csGLGraphics3D::PerformExtension (char const* command, ...)
 
 void csGLGraphics3D::InitQueries(unsigned int* queries, int& old_num_queries, int& num_queries)
 {
-  if (queries != 0 && old_num_queries != 0)
+  if (1 < num_queries)
   {
-    ext->glDeleteQueriesARB(old_num_queries, (GLuint*)queries);
-    delete[] queries;
+    if (queries != 0)
+    {
+      ext->glDeleteQueriesARB(old_num_queries, (GLuint*)queries);
+      delete[] queries;
+    }
+    queries = new GLuint[num_queries];
   }
-  queries = new GLuint[num_queries];
+
   ext->glGenQueriesARB((GLsizei)num_queries, (GLuint*)queries);
 }
 
