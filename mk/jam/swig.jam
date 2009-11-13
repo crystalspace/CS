@@ -93,8 +93,11 @@ if $(CMD.SWIG)
   ##     [ : swigfiledir [ : frozendirs [ : tag [ : outdir ]]]]]]
   ##   Given a Swig input file `swigfile', generate `targets' for scripting
   ##   language `language'.  The first element of `targets' should name the
-  ##   generated C or C++ file, and the remaining optional elements should name
-  ##   any other language-specific scripting files which Swig will generate.
+  ##   generated C or C++ file. The second, optional element should name
+  ##   the generated C or C++ header accompanying the source file if Swig
+  ##	  generates one. It will be places in the same directory. The remaining
+  ##   optional elements should name any other language-specific scripting
+  ##   files which Swig will generate.
   ##   For instance, the files widgets.cpp and widgets.py might be emitted by
   ##   Swig for the input file widgets.i.  The generated files are placed in
   ##   $(LOCATE_TARGET).  `swigflags' specifies additional flags to pass to
@@ -122,6 +125,12 @@ if $(CMD.SWIG)
   {
     local target = $(1[1]) ;
     local othertargets = $(1[2-]) ;
+    local headertarget ;
+    if $(othertargets[1]:S) = ".h"
+    {
+      headertarget = $(othertargets[1]) ;
+      othertargets = $(othertargets[2-]) ;
+    }
     local swigfile = $(2) ;
     local language = $(3) ;
     local swigflags = $(4) ;
@@ -157,6 +166,17 @@ if $(CMD.SWIG)
     SWIG.FLAGS on $(target) +=
       $(SWIG.FLAGS) -$(language) $(swigflags) -I$(swigincdirs)
       -outdir [ ConcatDirs $(outdir) ] -o $(target:G=:D=$(LOCATE_TARGET)) ;
+      
+    if $(headertarget)
+    {
+      MakeLocate $(headertarget) : $(LOCATE_TARGET) ;
+      # If any target, such as an install target, depends upon the other files,
+      # we force them to be built with a dependency upon the target.
+      Depends $(headertarget) : $(target) ;
+      
+      SWIG.FLAGS on $(target) +=
+	-oh $(headertarget:G=:D=$(LOCATE_TARGET)) ;
+    }
 
     # Allow Swig input file to reside at location other than $(SEARCH_SOURCE).
     if $(swigfiledir)
@@ -200,6 +220,15 @@ if $(CMD.SWIG)
         Depends $(frozen_other) : $(othertargets) ;
         Copy $(frozen_other) : $(othertargets) ;
         Depends $(tag)freeze : $(frozen_other) ;
+      }
+
+      if $(headertarget)
+      {
+        local frozen_header = $(headertarget:G=$(tag)freeze) ;
+        MakeLocate $(frozen_header) : $(frozentargetdir) ;
+        Depends $(frozen_header) : $(headertarget) ;
+        Copy $(frozen_header) : $(headertarget) ;
+        Depends $(tag)freeze : $(frozen_header) ;
       }
 
       NotFile $(tag)freeze ;
