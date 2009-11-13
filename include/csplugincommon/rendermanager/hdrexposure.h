@@ -156,7 +156,7 @@ namespace CS
           AbstractExposure* exposure;
         public:
           Configurable() : exposure (0) {}
-          ~Configurable();
+          virtual ~Configurable();
         
 	  void Initialize (iObjectRegistry* objReg,
 	    HDRHelper& hdr, const HDRSettings& settings);
