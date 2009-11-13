@@ -507,13 +507,23 @@ CS_CHECK_VTABLE_THUNKS
 
 
 #------------------------------------------------------------------------------
+# Check how to ask the linker to promote warnings to errors.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD_FLAGS([how to treat linker warnings as errors],
+    [cs_cv_prog_link_enable_errors], [CS_CREATE_TUPLE([-Wl,--fatal-warnings])],
+    [C++])
+
+
+
+#------------------------------------------------------------------------------
 # Check how to ask the linker to export all dynamic symbols in debug mode to
 # allow the backtrace() callstack creation code to obtain symbols in all cases.
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
+CS_CHECK_BUILD_FLAGS([how to export all dynamic symbols],
     [cs_cv_prog_link_export_dynamic], [CS_CREATE_TUPLE([-Wl,-E])],
-    [C++], [COMPILER.LFLAGS.debug], [+])
-
+    [C++], [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.debug],
+        [$cs_cv_prog_link_export_dynamic], [+])],
+    [], [], [$cs_cv_prog_link_enable_errors])
 
 
 #------------------------------------------------------------------------------
