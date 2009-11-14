@@ -66,8 +66,7 @@
       <?if vars."tex detail".texture ?>
       {
 	surfaceColor.a = surfaceColorIn.a;
-	surfaceColor.rgb *= (tex2D (texDetail,
-	  texCoord*texDetailScale)-0.5)*2;
+	surfaceColor.rgb *= (tex2D (texDetail, texCoord*texDetailScale).rgb)*2;
 	surfaceColor_attr_perfragment = true;
       }
       <?else?>
