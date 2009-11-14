@@ -24,7 +24,7 @@ VFS.Mount.scripts = $(CS_SHAREDIR)$/bindings$/
 VFS.Mount.shader = $(CS_DATADIR)$/shader$/,$(CS_DATADIR)$/shader-old$/
 VFS.Mount.shader-snippets = $(CS_DATADIR)$/shader-snippets$/
 ; @@@ This is to not break existing shaders
-VFS.Mount.shader/snippets = $@data$/shader-snippets$/
+VFS.Mount.shader/snippets = $(CS_DATADIR)$/shader-snippets$/,$(CS_DATADIR)$/shader-old$/snippets$/
 ; Global shader cache
 VFS.Mount.shadercache/global = $(CS_DATADIR)$/shadercache.zip
 ; Per-user shader cache
