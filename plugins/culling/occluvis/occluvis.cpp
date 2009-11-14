@@ -18,6 +18,13 @@
 
 #include "cssysdef.h"
 #include <string.h>
+#include "csplugincommon/rendermanager/operations.h"
+#include "csplugincommon/rendermanager/posteffects.h"
+#include "csplugincommon/rendermanager/render.h"
+#include "csplugincommon/rendermanager/renderlayers.h"
+#include "csplugincommon/rendermanager/shadersetup.h"
+#include "csplugincommon/rendermanager/standardsorter.h"
+#include "csplugincommon/rendermanager/svsetup.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
@@ -44,12 +51,54 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
+#include "iengine/portal.h"
+#include "iengine/sector.h"
 #include "imesh/object.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
 #include "occluvis.h"
 
+using namespace CS::RenderManager;
 
+class StandardContextSetup
+{
+public:
+
+  void operator() (RenderTreeType::ContextNode& context, iShaderManager* shaderManager)
+  {
+    CS::RenderManager::RenderView* rview = context.renderView;
+
+    // Sort the mesh lists  
+    {
+      StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine ());
+      mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
+      ForEachMeshNode (context, mySorter);
+    }
+
+    // After sorting, assign in-context per-mesh indices
+    {
+      SingleMeshContextNumbering<RenderTreeType> numbering;
+      ForEachMeshNode (context, numbering);
+    }
+
+    // Setup the SV arrays
+    // Push the default stuff
+    SingleRenderLayer renderLayer(shaderManager->GetShader("z_only"));
+    SetupStandardSVs (context, renderLayer, shaderManager, rview->GetThisSector ());
+
+    // Setup the material&mesh SVs
+    {
+      StandardSVSetup<RenderTreeType, SingleRenderLayer> svSetup (
+        context.svArrays, renderLayer);
+
+      ForEachMeshNode (context, svSetup);
+    }
+
+    // Setup shaders and tickets
+    SetupStandardShader (context, shaderManager, renderLayer);
+    SetupStandardTicket (context, shaderManager, renderLayer);
+  }
+};
 
 SCF_IMPLEMENT_FACTORY (csOccluVis)
 
@@ -378,8 +427,6 @@ struct FrustTest_Front2BackData
   csVector3 pos;
   iRenderView* rview;
   csPlane3* frustum;
-  // this is the callback to call when we discover a visible node
-  iVisibilityCullerListener* viscallback;
 };
 
 csOccluVis::NodeVisibility csOccluVis::TestNodeVisibility (csKDTree* treenode,
@@ -417,6 +464,57 @@ bool csOccluVis::TestObjectVisibility (csOccluVisObjectWrapper* obj,
   return csIntersect3::BoxFrustum (obj_bbox, data->frustum, frustum_mask, new_mask);
 }
 
+void csOccluVis::RenderZMeshQuery (unsigned int& query, iMeshWrapper *imesh, 
+                               uint32 frustum_mask, iRenderView* rview)
+{
+  csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager>(object_reg);
+
+  // Get the meshes
+  int numMeshes;
+  csSectorVisibleRenderMeshes* meshList = rview->GetThisSector()->GetVisibleRenderMeshes (
+    numMeshes, imesh, rview, frustum_mask);
+
+  // Set up OQ context.
+  RenderTreeType renderTree (treePersistent);
+  RenderView* renderView = (RenderView*)rview;
+  RenderTreeType::ContextNode* OQContext = renderTree.CreateContext(renderView);
+
+  for (int m = 0; m < numMeshes; ++m)
+  {
+    csZBufMode zmode = meshList[m].imesh->GetZBufMode ();
+    CS::Graphics::RenderPriority renderPrio = meshList[m].imesh->GetRenderPriority ();
+
+    RenderTreeType::MeshNode::SingleMesh sm;
+    sm.meshWrapper = meshList[m].imesh;
+    sm.meshObjSVs = meshList[m].imesh->GetSVContext();
+    sm.zmode = zmode;
+    sm.meshFlags = meshList[m].imesh->GetFlags();
+
+    // Add it to the appropriate meshnode
+    for (int i = 0; i < meshList[m].num; ++i)
+    {
+      csRenderMesh* rm = meshList[m].rmeshes[i];
+      OQContext->AddRenderMesh (rm, renderPrio, sm);
+    }
+  }
+
+  // Setup the context for rendering.
+  StandardContextSetup contextSetup;
+  contextSetup (*OQContext, shaderManager);
+
+  // Begin OQ.
+  int old_num_queries = 0, num_queries = 1;
+  g3d->InitQueries(&query, old_num_queries, num_queries);
+  g3d->BeginOcclusionQuery(query);
+  {
+    SimpleTreeRenderer<RenderTreeType> render (rview->GetGraphics3D (), shaderManager);
+    ForEachContextReverse (renderTree, render);
+  }
+  g3d->EndOcclusionQuery();
+
+  renderTree.DestroyContext(OQContext);
+}
+
 //======== VisTest =========================================================
 bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscallback, int, int)
 {
@@ -440,7 +538,6 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
   // Traverse from front to back.
   data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   data.rview = rview;
-  data.viscallback = viscallback;
   uint32 cur_timestamp = kdtree->NewTraversal ();
 
   // Get any results from last run.
@@ -475,7 +572,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
         if(tdata.treeleaf != 0)
         {
           csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
-          data.viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, tdata.frustum_mask);
+          viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, tdata.frustum_mask);
           visobj_wrap->wasVisible = true;
         }
 
@@ -534,13 +631,12 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
         if (tdata.treeleaf != 0)
         {
            csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
-           if (data.viscallback->RenderZMeshQuery(tdata.query, visobj_wrap->mesh, tdata.frustum_mask))
-           {
-             if (WasVisible(tdata))
-               DelayedQueryQueue.PushBack(tdata);
-             else
-               QueryQueue.PushBack(tdata);
-           }
+           RenderZMeshQuery(tdata.query, visobj_wrap->mesh, tdata.frustum_mask, rview);
+
+           if (WasVisible(tdata))
+             DelayedQueryQueue.PushBack(tdata);
+           else
+             QueryQueue.PushBack(tdata);
         }
         else
         {
@@ -570,7 +666,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
       csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
       visobj_wrap->wasVisible = g3d->IsVisible(tdata.query, visible);
       if(visobj_wrap->wasVisible)
-        data.viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, tdata.frustum_mask);
+        viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, tdata.frustum_mask);
       DelayedQueryQueue.PopFront();
     }
   }
@@ -581,7 +677,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
   {
     TransversalData& tdata = itr.Next();
     csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
-    data.viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, tdata.frustum_mask);
+    viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, tdata.frustum_mask);
   }
 
   return true;

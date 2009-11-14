@@ -22,6 +22,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
+#include "csplugincommon/rendermanager/rendertree.h"
 #include "csutil/array.h"
 #include "csutil/list.h"
 #include "csutil/parray.h"
@@ -72,6 +73,9 @@ public:
   /// The movable is about to be destroyed.
   virtual void MovableDestroyed (iMovable*) { }
 };
+
+typedef CS::RenderManager::RenderTree<
+CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
 
 /**
  * A occlusion query based visibility culler.
@@ -163,6 +167,9 @@ private:
 
   bool WasVisible(TransversalData& data);
   void TransverseNode(TransversalData& tdata, uint32 cur_timestamp, bool parentTotallyVisible);
+
+  RenderTreeType::PersistentData treePersistent;
+  void RenderZMeshQuery (unsigned int& query, iMeshWrapper *imesh, uint32 frustum_mask, iRenderView* rview);
 
 public:
   csOccluVis (iBase *iParent);

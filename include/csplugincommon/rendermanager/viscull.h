@@ -110,38 +110,6 @@ namespace RenderManager
         }
       }
 
-      virtual bool RenderZMeshQuery (unsigned int& query, iMeshWrapper *imesh, uint32 frustum_mask)
-      {
-        if (filter && filter->IsMeshFiltered (imesh))
-          return false;
-
-        csRef<iGraphics3D> g3d = currentRenderView->GetGraphics3D();
-
-          // Get the meshes
-          int numMeshes;
-          csSectorVisibleRenderMeshes* meshList = sector->GetVisibleRenderMeshes (
-            numMeshes, imesh, currentRenderView, frustum_mask);
-
-          int old_num_queries = 0;
-          int num_queries = 1;
-          g3d->InitQueries(&query, old_num_queries, num_queries);
-          g3d->BeginOcclusionQuery(query);
-
-          for (int m = 0; m < numMeshes; ++m)
-          {
-            for (int i = 0; i < meshList[m].num; ++i)
-            {
-              csRenderMesh* rm = meshList[m].rmeshes[i];
-              CS::Graphics::RenderMeshModes rmModes(*rm);
-              g3d->DrawMesh(rm, rmModes);
-            }
-          }
-
-          g3d->EndOcclusionQuery();
-
-        return true;
-      }
-
     private:      
       ContextNodeType& context;
       RenderView* currentRenderView;

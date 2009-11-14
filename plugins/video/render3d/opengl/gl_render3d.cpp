@@ -3655,20 +3655,6 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
   }
 }
 
-void csGLGraphics3D::DrawMesh (const CS::Graphics::CoreRenderMesh* rmesh,
-                               const CS::Graphics::RenderMeshModes& modes)
-{
-
-  if(modes.buffers)
-  {
-    csShaderVariableStack stack;
-    stack.Setup (strings->GetSize ());
-    shadermgr->PushVariables (stack);
-    ActivateBuffers (modes.buffers, defaultBufferMapping);
-    DrawMesh (rmesh, modes, stack);
-  }
-}
-
 bool csGLGraphics3D::PerformExtensionV (char const* command, va_list /*args*/)
 {
   if (!strcasecmp (command, "applybufferchanges"))
