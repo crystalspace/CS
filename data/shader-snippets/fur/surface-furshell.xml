@@ -1,0 +1,97 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input file="/shader-snippets/texCoord.inp"	/>
+    
+    <input name="texDiffuse" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex diffuse" destination="fragmentIn.texDiffuse" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texDiffuse" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texDiffuse = fragmentIn.texDiffuse;
+      </block>
+    </input>
+    
+    <input name="texFurShell" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex fur shell" destination="fragmentIn.texFurShell" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texFurShell" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texFurShell = fragmentIn.texFurShell;
+      </block>
+    </input>
+    
+    <input name="furShadow" type="float" default="complex">
+      <block location="shadervars">
+	<shadervar name="fur self shadow" type="float">0.7</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="fur self shadow" destination="fragmentIn.furShadow" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float" name="furShadow" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	furShadow = fragmentIn.furShadow;
+      </block>
+    </input>
+      
+    <input name="passNumber" type="int" default="value" defval="0" />
+    <input name="totalPasses" type="int" default="value" defval="1" />
+    
+    <block location="cg:vertexMain">
+      surfaceColor = float4 (0,0,0,1);
+      surfaceColor_attr_perfragment = false;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      surfaceColor = tex2D (texDiffuse, texCoord);
+      float fur = tex2D (texFurShell, texCoord).r;
+      float furFactor = (totalPasses > 1) ? (float (passNumber)/float (totalPasses-1)) : 0;
+      fur = lerp (1, fur, furFactor);
+      
+      float shadow = lerp (1, furShadow + furFactor*(1-furShadow), fur);
+      surfaceColor *= shadow;
+      
+      surfaceColor.a *= fur;
+      surfaceColor.rgb *= surfaceColor.a;
+      surfaceColor_attr_perfragment = true;
+    </block>
+    
+    <output name="surfaceColor" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+</snippet>

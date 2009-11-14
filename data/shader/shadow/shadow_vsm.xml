@@ -22,9 +22,9 @@
     <pass>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
-      <snippet id="position" file="/shader/snippets/position.xml" />
-      <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
-      <snippet id="shadowfrag" file="/shader/snippets/shadow/fragment-vsm.xml" />
+      <snippet id="position" file="/shader-snippets/position.xml" />
+      <snippet id="surface" file="/shader-snippets/surface/surface-classic.xml" />
+      <snippet id="shadowfrag" file="/shader-snippets/shadow/fragment-vsm.xml" />
       
       <connection from="position" to="shadowfrag" />
       <connection from="surface" to="shadowfrag" />

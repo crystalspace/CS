@@ -1,0 +1,275 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <technique priority="100">
+    <snippet id="ets" file="/shader-snippets/eye-direction-tangent.xml"/>
+    
+    <snippet id="forward_normal">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<!-- Surface normal -->
+	<input name="i_normal" type="normal_tangent" default="value" defval="0,0,1"/>
+	<output name="o_normal" type="normal_tangent" />
+	
+	<block location="cg:vertexMain">
+	  o_normal = i_normal;
+	</block>
+	<block location="cg:fragmentMain">
+	  o_normal = i_normal;
+	</block>
+      </technique>
+    </snippet>
+    
+    <snippet id="specular_static">
+      <technique priority="150"
+		 condition='(vars."pass number".int == 0) &amp;&amp; (vars."pass do_ambient") &amp;&amp; (vars."tex lightmap dir 1".texture || vars."static color dir 1".buffer) &amp;&amp; vars."tex spec directions 1".texture'>
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input name="color_dir1" type="rgb" default="complex" private="yes">
+	  <block location="pass">
+	    <buffer source="static color dir 1" destination="vertexIn.color_dir1" />
+	  </block>
+	  
+	  <block location="cg:vertexIn">
+	    <varying type="rgb" name="color_dir1" />
+	  </block>
+	  
+	  <block location="cg:vertexToFragment">
+	    <varying type="rgb" name="color_dir1" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    color_dir1 = vertexIn.color_dir1;
+	  </block>
+	</input>
+	<input name="color_dir2" type="rgb" default="complex" private="yes">
+	  <block location="pass">
+	    <buffer source="static color dir 2" destination="vertexIn.color_dir2" />
+	  </block>
+	  
+	  <block location="cg:vertexIn">
+	    <varying type="rgb" name="color_dir2" />
+	  </block>
+	  
+	  <block location="cg:vertexToFragment">
+	    <varying type="rgb" name="color_dir2" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    color_dir2 = vertexIn.color_dir2;
+	  </block>
+	</input>
+	<input name="color_dir3" type="rgb" default="complex" private="yes">
+	  <block location="pass">
+	    <buffer source="static color dir 3" destination="vertexIn.color_dir3" />
+	  </block>
+	  
+	  <block location="cg:vertexIn">
+	    <varying type="rgb" name="color_dir3" />
+	  </block>
+	  
+	  <block location="cg:vertexToFragment">
+	    <varying type="rgb" name="color_dir3" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    color_dir3 = vertexIn.color_dir3;
+	  </block>
+	</input>
+	
+	<input name="texCoordLM" type="texcoord2" default="complex" private="yes">
+	  <block location="pass">
+	    <buffer source="texture coordinate lightmap" 
+		    destination="vertexIn.texcoordLM" />
+	  </block>
+	  
+	  <block location="cg:vertexToFragment">
+	    <varying type="texcoord2" name="texCoordLM" />
+	  </block>
+	  
+	  <block location="cg:vertexIn">
+	    <varying type="texcoord2" name="texcoordLM" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    texCoordLM = vertexIn.texcoordLM;
+	  </block>
+	</input>
+	
+	<input name="eyeToSurf" type="normal_tangent" default="value" defval="0,0,1" />
+	<!-- Surface normal -->
+	<input name="normal" type="normal_tangent" default="value" defval="0,0,1">
+	  <attribute name="perfragment" type="bool" defval="false" />
+	</input>
+	
+	<input name="lightmap_dir1" type="tex2d" default="complex" private="yes">
+	  <block location="pass">
+	    <texture name="tex lightmap dir 1" destination="fragmentIn.lightmap_dir1" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="lightmap_dir1" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    lightmap_dir1 = fragmentIn.lightmap_dir1;
+	  </block>
+	</input>
+	<input name="lightmap_dir2" type="tex2d" default="complex" private="yes">
+	  <block location="pass">
+	    <texture name="tex lightmap dir 2" destination="fragmentIn.lightmap_dir2" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="lightmap_dir2" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    lightmap_dir2 = fragmentIn.lightmap_dir2;
+	  </block>
+	</input>
+	<input name="lightmap_dir3" type="tex2d" default="complex" private="yes">
+	  <block location="pass">
+	    <texture name="tex lightmap dir 3" destination="fragmentIn.lightmap_dir3" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="lightmap_dir3" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    lightmap_dir3 = fragmentIn.lightmap_dir3;
+	  </block>
+	</input>
+	<input name="directions1" type="tex2d" default="complex" private="yes">
+	  <block location="pass">
+	    <texture name="tex spec directions 1" destination="fragmentIn.directions1" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="directions1" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    directions1 = fragmentIn.directions1;
+	  </block>
+	</input>
+	<input name="directions2" type="tex2d" default="complex" private="yes">
+	  <block location="pass">
+	    <texture name="tex spec directions 2" destination="fragmentIn.directions2" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="directions2" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    directions2 = fragmentIn.directions2;
+	  </block>
+	</input>
+	<input name="directions3" type="tex2d" default="complex" private="yes">
+	  <block location="pass">
+	    <texture name="tex spec directions 3" destination="fragmentIn.directions3" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="directions3" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    directions3 = fragmentIn.directions3;
+	  </block>
+	</input>
+	
+	<block location="cg:definitions">
+	  <?Include /shader-snippets/lighting/directional_lms.cginc ?>
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  <![CDATA[
+	  float3 spec = float3(0);
+	  float3 baseLit[3];
+	  ]]>
+	  <?if vars."tex lightmap dir 1".texture ?>
+	  <![CDATA[
+	  baseLit[0] = tex2D (lightmap_dir1, texCoordLM).rgb;
+	  baseLit[1] = tex2D (lightmap_dir2, texCoordLM).rgb;
+	  baseLit[2] = tex2D (lightmap_dir3, texCoordLM).rgb;
+	  ]]>
+	  <?else?>
+	  <![CDATA[
+	  baseLit[0] = color_dir1;
+	  baseLit[1] = color_dir2;
+	  baseLit[2] = color_dir3;
+	  ]]>
+	  <?endif?>
+	  <![CDATA[
+
+          float2 rawdir1 = tex2D (directions1, texCoordLM).ga * 2 -float2(1);
+	  float2 rawdir2 = tex2D (directions2, texCoordLM).ga * 2 -float2(1);
+	  float2 rawdir3 = tex2D (directions3, texCoordLM).ga * 2 -float2(1);
+	  
+	  float3 lightDir;
+	  lightDir.xy = rawdir1;
+	  lightDir.z = rawdir3.x;
+	  
+	  float3 speccol = 2 * ComputeDLMColor (lightDir, baseLit);
+	  
+	  float3 H = normalize (-eyeToSurf + lightDir);
+	  spec += (pow (saturate (dot (normal, H)), 32) * speccol);
+	 
+	  lightDir.xy = rawdir2;
+	  lightDir.z = rawdir3.y;
+	  
+	  speccol = 2 * ComputeDLMColor (lightDir, baseLit);
+	  
+	  H = normalize (-eyeToSurf + lightDir);
+	  spec += (pow (saturate (dot (normal, H)), 32) * speccol);
+	  
+	  specular = spec;
+	  specular_attr_perfragment = true;
+	  ]]>
+	</block>
+	
+	<output name="specular" type="rgb">
+  	  <attribute name="perfragment" type="bool" />
+        </output>
+      </technique>
+    
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<block location="cg:fragmentMain">
+	  specular = float3(0);
+	  specular_attr_perfragment = false;
+	</block>
+	
+	<output name="specular" type="rgb">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+      </technique>
+    </snippet>
+    <connection from="forward_normal" to="specular_static">
+      <explicit from="o_normal" to="normal" />
+    </connection>
+    <connection from="ets" to="specular_static">
+      <explicit from="eyeDirectionTangent" to="eyeToSurf" />
+    </connection>
+  </technique>
+</snippet>

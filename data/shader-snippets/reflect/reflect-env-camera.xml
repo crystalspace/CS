@@ -1,0 +1,47 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <technique priority="100">
+    <snippet id="eyeVecCam" file="/shader-snippets/eye-direction-camera.xml" />
+    
+    <snippet id="doReflect">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<!-- Surface normal -->
+	<input name="normal" type="normal_camera" />
+	<!-- Vector from eye to position -->
+	<!-- @@@ FIXME: When this is normal_camera, too, weaver picks the
+	     same variable as for 'normal' ... -->
+	<input name="eyeVec" type="direction_camera" />
+	
+	<block location="cg:vertexMain">
+	  reflected = reflect (eyeVec, normal);
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  reflected = reflect (normalize (eyeVec), normal);
+	</block>
+	
+	<output name="reflected" type="direction_camera" />
+      </technique>
+    </snippet>
+    <connection from="eyeVecCam" to="doReflect" />
+  </technique>
+</snippet>

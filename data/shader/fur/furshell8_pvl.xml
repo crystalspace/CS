@@ -47,15 +47,15 @@
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
       <!-- Snippets - the building blocks of this shader. -->
-      <snippet id="position" file="/shader/snippets/fur/position-furshell.xml" />
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="surface" file="/shader/snippets/fur/surface-furshell.xml" />
-      <snippet id="lighting" file="/shader/snippets/lighting/lighting-pvl.xml" />
-      <snippet id="ambient" file="/shader/snippets/lighting/ambient-simple.xml" />
-      <snippet id="mod_diffuse" file="/shader/snippets/modulate_rgb.xml" />
-      <snippet id="specular" file="/shader/snippets/surface/specular-weirdold.xml" />
-      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
-      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
+      <snippet id="position" file="/shader-snippets/fur/position-furshell.xml" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="surface" file="/shader-snippets/fur/surface-furshell.xml" />
+      <snippet id="lighting" file="/shader-snippets/lighting/lighting-pvl.xml" />
+      <snippet id="ambient" file="/shader-snippets/lighting/ambient-simple.xml" />
+      <snippet id="mod_diffuse" file="/shader-snippets/modulate_rgb.xml" />
+      <snippet id="specular" file="/shader-snippets/surface/specular-weirdold.xml" />
+      <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
+      <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other
 	   snippets (ie the "data flow" is modeled). The exact resolution of
 	   what output is linked to what input is done automatically. -->

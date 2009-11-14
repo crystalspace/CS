@@ -1,0 +1,72 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input file="/shader-snippets/texCoord.inp"	/>
+    
+    <input name="texDiffuse" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex diffuse" destination="fragmentIn.texDiffuse" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texDiffuse" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texDiffuse = fragmentIn.texDiffuse;
+      </block>
+    </input>
+
+    <input name="texture_scale" type="float2" default="complex">
+      <block location="shadervars">
+	  <shadervar name="texture scale" type="vector2">1,1</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	  <variablemap variable="texture scale" destination="fragmentIn.texture_scale" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	  <uniform type="float2" name="texture_scale" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	  texture_scale = fragmentIn.texture_scale;
+      </block>
+    </input>
+    
+    <block location="cg:vertexMain">
+      surfaceColor = float4(0);
+      surfaceColor_attr_perfragment = true;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      surfaceColor = tex2D (texDiffuse, texCoord*texture_scale);
+      surfaceColor_attr_perfragment = true;
+    </block>
+    
+    <output name="surfaceColor" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+</snippet>
+

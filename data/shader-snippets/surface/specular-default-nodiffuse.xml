@@ -1,0 +1,89 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<!-- This is the same as specular-default, except the diffuse texture isn't
+     used for fallback -->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input file="/shader-snippets/texCoord.inp"	/>
+    
+    <input name="texSpecular" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex specular" destination="fragmentIn.texSpecular"
+		 fallback="standardtex white" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texSpecular" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texSpecular = fragmentIn.texSpecular;
+      </block>
+    </input>
+    
+    <!-- Surface color - the RGB part is ignored, but alpha is used to modulate the
+	 specular color for correct appearance on transparent surfaces. -->
+    <input name="surfaceColorWithAlpha" type="rgba" default="value" defval="0,0,0,1">
+      <attribute name="perfragment" type="bool" defval="true" />
+    </input>
+    
+    <input name="specular" type="rgb" default="complex" private="yes">
+      <block location="shadervars">
+	<shadervar name="specular" type="vector3">1,1,1</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="specular" destination="fragmentIn.specular" />
+	<variablemap variable="specular" destination="vertexIn.specular" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="rgb" name="specular" />
+      </block>
+      
+      <block location="cg:vertexIn">
+	<uniform type="rgb" name="specular" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	specular = fragmentIn.specular;
+      </block>
+
+      <block location="cg:vertexMain">
+	specular = vertexIn.specular;
+      </block>
+    </input>
+      
+    <block location="cg:vertexMain">
+      specularColor = specular*surfaceColorWithAlpha.a;
+      specularColor_attr_perfragment = true;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      specularColor = tex2D (texSpecular, texCoord).rgb * specular;
+      specularColor_attr_perfragment = true;
+      specularColor *= surfaceColorWithAlpha.a;
+    </block>
+    
+    <output name="specularColor" type="rgb">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+</snippet>
