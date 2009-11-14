@@ -25,8 +25,6 @@
     </input>
     
     <input name="texDetail" type="tex2d" default="complex">
-      <attribute name="available" type="bool" />
-      
       <block location="pass">
 	<texture name="tex detail" destination="fragmentIn.texDetail" />
       </block>
@@ -37,15 +35,10 @@
       
       <block location="cg:fragmentMain">
 	texDetail = fragmentIn.texDetail;
-	<?if vars."tex detail".texture ?>
-	texDetail_attr_available = true;
-	<?else?>
-	texDetail_attr_available = false;
-	<?endif?>
       </block>
     </input>
     
-    <input name="scale" type="float2" default="complex">
+    <input name="texDetailScale" type="float2" default="complex">
       <block location="shadervars">
 	<shadervar name="tex detail scale" type="vector2">10,10</shadervar>
       </block>
@@ -70,18 +63,19 @@
     </block>
     
     <block location="cg:fragmentMain">
-      if (texDetail_attr_available)
+      <?if vars."tex detail".texture ?>
       {
 	surfaceColor.a = surfaceColorIn.a;
 	surfaceColor.rgb *= (tex2D (texDetail,
 	  texCoord*texDetailScale)-0.5)*2;
 	surfaceColor_attr_perfragment = true;
       }
-      else
+      <?else?>
       {
 	surfaceColor = surfaceColorIn;
 	surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
       }
+      <?endif?>
     </block>
     
     <output name="surfaceColor" type="rgba">
