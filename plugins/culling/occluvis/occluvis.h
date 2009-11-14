@@ -148,11 +148,12 @@ private:
 
   struct TransversalData
   {
-    TransversalData* parent;
+    csKDTree* parent;
     csKDTree* treenode;
     csKDTreeChild* treeleaf;
-    bool isVisible;
     unsigned int query;
+    bool parentTotallyVisible;
+    uint32 frustum_mask;
   };
 
   csList<TransversalData> TransversalQueue;
@@ -161,7 +162,7 @@ private:
   csList<TransversalData> DelayedQueryQueue;
 
   bool WasVisible(TransversalData& data);
-  void TransverseNode(TransversalData& tdata, uint32 cur_timestamp);
+  void TransverseNode(TransversalData& tdata, uint32 cur_timestamp, bool parentTotallyVisible);
 
 public:
   csOccluVis (iBase *iParent);

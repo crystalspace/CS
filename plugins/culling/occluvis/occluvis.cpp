@@ -411,21 +411,10 @@ bool csOccluVis::TestObjectVisibility (csOccluVisObjectWrapper* obj,
 
   const csBox3& obj_bbox = obj->child->GetBBox ();
   if (obj_bbox.Contains (data->pos))
-  {
-    data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
     return true;
-  }
   
   uint32 new_mask;
-  if (!csIntersect3::BoxFrustum (obj_bbox, data->frustum,
-		frustum_mask, new_mask))
-  {
-    return false;
-  }
-
-  data->viscallback->ObjectVisible (obj->visobj, obj->mesh, new_mask);
-
-  return true;
+  return csIntersect3::BoxFrustum (obj_bbox, data->frustum, frustum_mask, new_mask);
 }
 
 //======== VisTest =========================================================
@@ -447,7 +436,6 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
   // First get the current view frustum from the rview.
   csRenderContext* ctxt = rview->GetRenderContext ();
   data.frustum = ctxt->clip_planes;
-  uint32 frustum_mask = ctxt->clip_planes_mask;
 
   // Traverse from front to back.
   data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
@@ -469,7 +457,8 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
   root.treenode = kdtree;
   root.treeleaf = 0;
   root.parent = 0;
-  root.isVisible = false;
+  root.parentTotallyVisible = false;
+  root.frustum_mask = ctxt->clip_planes_mask;
   TransversalQueue.PushBack(root);
 
   while (!TransversalQueue.IsEmpty() || !QueryQueue.IsEmpty())
@@ -483,37 +472,37 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
       unsigned int visible = 0;
       if(g3d->IsVisible(tdata.query, visible))
       {
-        if (tdata.treeleaf != 0)
+        if(tdata.treeleaf != 0)
         {
           csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
-          if(data.viscallback->RenderZMeshQuery(tdata.query, visobj_wrap->mesh, frustum_mask))
-          {
-            if (WasVisible(tdata))
-              DelayedQueryQueue.PushBack(tdata);
-            else
-              QueryQueue.PushBack(tdata);
-          }
-        }
-        else
-        {
-          TransverseNode(tdata, cur_timestamp);
+          data.viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, tdata.frustum_mask);
+          visobj_wrap->wasVisible = true;
         }
 
-        TransversalData* pullup = &tdata;
-        while (!pullup->isVisible)
+        csKDTree* pullup = tdata.parent;
+        csVisibilityObjectHistory* history = 0;
+        while (!history || !history->wasVisible)
         {
-          if(pullup->treeleaf != 0)
+          history = (csVisibilityObjectHistory*)pullup->GetUserObject();
+          if (history == 0)
           {
-            csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)pullup->treeleaf->GetObject();
-            data.viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
-            visobj_wrap->wasVisible = true;
+            history = new csVisibilityObjectHistory();
+            pullup->SetUserObject(history);
           }
+          history->wasVisible = true;
 
-          pullup->isVisible = true;
-          if(pullup->parent == 0)
+          if(pullup->GetParent() == 0)
             break;
 
-          pullup = pullup->parent;
+          pullup = pullup->GetParent();
+        }
+      }
+      else
+      {
+        if(tdata.treeleaf != 0)
+        {
+          csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
+          visobj_wrap->wasVisible = false;
         }
       }
 
@@ -525,15 +514,18 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
       TransversalData& tdata = TransversalQueue.Front();
 
       // Do frustum culling check.
-      NodeVisibility visibilty;
-      if(tdata.treenode)
+      NodeVisibility visibilty = VISIBLE;
+      if(!tdata.parentTotallyVisible)
       {
-         visibilty = TestNodeVisibility (tdata.treenode, &data, frustum_mask);
-      }
-      else
-      {
-        csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject ();
-        visibilty = TestObjectVisibility(visobj_wrap, &data, frustum_mask) ? VISIBLE : INVISIBLE;
+        if(tdata.treenode)
+        {
+          visibilty = TestNodeVisibility (tdata.treenode, &data, tdata.frustum_mask);
+        }
+        else
+        {
+          csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject ();
+          visibilty = TestObjectVisibility(visobj_wrap, &data, tdata.frustum_mask) ? VISIBLE : INVISIBLE;
+        }
       }
 
       // If frustum doesn't cull, proceed to occlusion query.
@@ -541,35 +533,27 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
       {
         if (tdata.treeleaf != 0)
         {
-          csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
-          if (data.viscallback->RenderZMeshQuery(tdata.query, visobj_wrap->mesh, frustum_mask))
-          {
-            if (WasVisible(tdata))
-              DelayedQueryQueue.PushBack(tdata);
-            else
-              QueryQueue.PushBack(tdata);
-          }
+           csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
+           if (data.viscallback->RenderZMeshQuery(tdata.query, visobj_wrap->mesh, tdata.frustum_mask))
+           {
+             if (WasVisible(tdata))
+               DelayedQueryQueue.PushBack(tdata);
+             else
+               QueryQueue.PushBack(tdata);
+           }
         }
         else
         {
-          TransverseNode(tdata, cur_timestamp);
+          TransverseNode(tdata, cur_timestamp, visibilty == VISIBLE && tdata.frustum_mask == 0);
         }
-      }
-
-      if(tdata.treeleaf != 0)
-      {
-        csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
-        visobj_wrap->wasVisible = (visibilty != INVISIBLE);
       }
       else
       {
-        csVisibilityObjectHistory* history = (csVisibilityObjectHistory*)tdata.treenode->GetUserObject();
-        if (history == 0)
+        if(tdata.treeleaf != 0)
         {
-          history = new csVisibilityObjectHistory();
-          tdata.treenode->SetUserObject(history);
+          csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
+          visobj_wrap->wasVisible = false;
         }
-        history->wasVisible = (visibilty != INVISIBLE);
       }
 
       TransversalQueue.PopFront();
@@ -586,7 +570,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
       csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
       visobj_wrap->wasVisible = g3d->IsVisible(tdata.query, visible);
       if(visobj_wrap->wasVisible)
-        data.viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
+        data.viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, tdata.frustum_mask);
       DelayedQueryQueue.PopFront();
     }
   }
@@ -597,7 +581,7 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
   {
     TransversalData& tdata = itr.Next();
     csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
-    data.viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
+    data.viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, tdata.frustum_mask);
   }
 
   return true;
@@ -617,7 +601,7 @@ bool csOccluVis::WasVisible(TransversalData& data)
   }
 }
 
-void csOccluVis::TransverseNode(TransversalData& tdata, uint32 cur_timestamp)
+void csOccluVis::TransverseNode(TransversalData& tdata, uint32 cur_timestamp, bool parentTotallyVisible)
 {
   tdata.treenode->Distribute ();
 
@@ -633,10 +617,11 @@ void csOccluVis::TransverseNode(TransversalData& tdata, uint32 cur_timestamp)
       objects[i]->timestamp = cur_timestamp;
 
       TransversalData child;
-      child.parent = &tdata;
+      child.parent = tdata.treenode;
       child.treenode = 0;
       child.treeleaf = objects[i];
-      child.isVisible = false;
+      child.parentTotallyVisible = parentTotallyVisible;
+      child.frustum_mask = tdata.frustum_mask;
       TransversalQueue.PushBack(child);
     }
   }
@@ -645,10 +630,11 @@ void csOccluVis::TransverseNode(TransversalData& tdata, uint32 cur_timestamp)
   if (child1)
   {
     TransversalData child;
-    child.parent = &tdata;
+    child.parent = tdata.treenode;
     child.treenode = child1;
     child.treeleaf = 0;
-    child.isVisible = false;
+    child.parentTotallyVisible = parentTotallyVisible;
+    child.frustum_mask = tdata.frustum_mask;
     TransversalQueue.PushBack(child);
   }
 
@@ -656,10 +642,11 @@ void csOccluVis::TransverseNode(TransversalData& tdata, uint32 cur_timestamp)
   if (child2)
   {
     TransversalData child;
-    child.parent = &tdata;
+    child.parent = tdata.treenode;
     child.treenode = child2;
     child.treeleaf = 0;
-    child.isVisible = false;
+    child.parentTotallyVisible = parentTotallyVisible;
+    child.frustum_mask = tdata.frustum_mask;
     TransversalQueue.PushBack(child);
   }
 }
