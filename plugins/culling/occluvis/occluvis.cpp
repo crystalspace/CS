@@ -83,7 +83,9 @@ public:
 
     // Setup the SV arrays
     // Push the default stuff
-    SingleRenderLayer renderLayer(shaderManager->GetShader("z_only"));
+    csStringID shaderType = shaderManager->GetStringSet()->Request("depthwrite");
+    SingleRenderLayer renderLayer(shaderType, shaderManager->GetShader("z_only"), 0, 0);
+    renderLayer.SetAmbient(true);
     SetupStandardSVs (context, renderLayer, shaderManager, rview->GetThisSector ());
 
     // Setup the material&mesh SVs
@@ -631,6 +633,16 @@ bool csOccluVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscall
         if (tdata.treeleaf != 0)
         {
            csOccluVisObjectWrapper* visobj_wrap = (csOccluVisObjectWrapper*)tdata.treeleaf->GetObject();
+           // HACK
+           {
+             if (visobj_wrap->mesh->GetPortalContainer() != 0)
+             {
+               viscallback->ObjectVisible(visobj_wrap->visobj, visobj_wrap->mesh, tdata.frustum_mask);
+               TransversalQueue.PopFront();
+               continue;
+             }
+           }
+           //
            RenderZMeshQuery(tdata.query, visobj_wrap->mesh, tdata.frustum_mask, rview);
 
            if (WasVisible(tdata))
