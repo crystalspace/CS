@@ -1628,8 +1628,7 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
     idle_override_interval -= delta;
     if ((idle_override_interval <= 0) && (default_idle_anim != -1))
     {
-      csRandomGen rng;
-      SetIdleOverrides(&rng,default_idle_anim);
+      SetIdleOverrides(&randomGen,default_idle_anim);
       SetAnimAction(factory->anims[idle_action]->name,.25,.25);
     }
   }
@@ -1855,11 +1854,7 @@ void csSpriteCal3DMeshObject::SetDefaultIdleAnim(const char *name)
 {
     default_idle_anim = FindAnim(name);
     if( default_idle_anim != -1 )
-    {
-      float max_interval(factory->anims[default_idle_anim]->max_interval);
-      if(idle_override_interval > max_interval)
-        idle_override_interval = max_interval;
-    }
+      SetIdleOverrides(&randomGen,default_idle_anim);
 }
 
 bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
