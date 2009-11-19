@@ -516,5 +516,21 @@ void ProctexPDLight::OnColorChange (iLight* light, const csColor& newcolor)
     state.Set (stateDirty); 
 }
 
+void ProctexPDLight::OnDestroy (iLight* light)
+{
+  for (size_t i = 0; i < lights.GetSize(); i++)
+  {
+    if (lights[i].light == light)
+    {
+      lights.DeleteIndexFast (i);
+      lightColorStates.DeleteAll (light);
+      state.Set (stateDirty);
+      dirtyLights.Add (light);
+      lightBits.SetSize (lights.GetSize ());
+      return;
+    }
+  }
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(PTPDLight)

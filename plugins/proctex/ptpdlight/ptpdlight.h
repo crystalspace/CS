@@ -318,7 +318,7 @@ public:
   virtual void OnPositionChange (iLight* light, const csVector3& newpos) { };
   virtual void OnSectorChange (iLight* light, iSector* newsector) { };
   virtual void OnRadiusChange (iLight* light, float newradius) { };
-  virtual void OnDestroy (iLight* light) { };
+  virtual void OnDestroy (iLight* light);
   virtual void OnAttenuationChange (iLight* light, int newatt) { };
   /** @} */
 
