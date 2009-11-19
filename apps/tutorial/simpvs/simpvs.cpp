@@ -217,7 +217,7 @@ void Simple::CreateGui()
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
 
-  vfs->ChDir ("/ceguitest/0.5/");
+  vfs->ChDir ("/cegui/");
 
   // Load the ice skin (which uses Falagard skinning system)
   cegui->GetSchemeManagerPtr ()->create("ice.scheme");
@@ -229,6 +229,7 @@ void Simple::CreateGui()
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
   // Load layout and set as root
+  vfs->ChDir ("/simpvs/");
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("simpvs.layout"));
 
   CEGUI::Window* btn = 0;

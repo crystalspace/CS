@@ -161,7 +161,8 @@ bool CEGUITest::Application()
   
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
-  vfs->ChDir ("/ceguitest/0.5/");
+
+  vfs->ChDir ("/cegui/");
 
   // Load the ice skin (which uses Falagard skinning system)
   cegui->GetSchemeManagerPtr ()->create("ice.scheme");
@@ -173,6 +174,7 @@ bool CEGUITest::Application()
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
   // Load layout and set as root
+  vfs->ChDir ("/ceguitest/");
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("ice.layout"));
 
   // Subscribe to the clicked event for the exit button

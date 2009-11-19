@@ -177,7 +177,7 @@ bool SmokeTest::Application()
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
 
-  vfs->ChDir ("/ceguitest/0.5/");
+  vfs->ChDir ("/cegui/");
 
   // Load the ice skin (which uses Falagard skinning system)
   cegui->GetSchemeManagerPtr ()->create("ice.scheme");
@@ -191,7 +191,7 @@ bool SmokeTest::Application()
   // Load layout and set as root
   vfs->ChDir ("/data/smoketest/");
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("smoketest.layout"));
-  vfs->ChDir ("/ceguitest/0.5/");
+  vfs->ChDir ("/cegui/");
 
   // These are used store the current orientation of the camera.
   rotY = rotX = 0;

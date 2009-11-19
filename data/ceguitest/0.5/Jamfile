@@ -1,7 +1,0 @@
-SubDir TOP data ceguitest 0.5 ;
-
-InstallData [ Wildcard *.xsd ice.* *.layout ] : data ceguitest 0.5 ;
-# The .layout files are used only by demo apps ...
-FileListEntriesData [ Wildcard *.layout ] : ceguitest 0.5 : data-demo ;
-# ... the other files, however, also by some tools (notably viewmesh)
-FileListEntriesData [ Wildcard *.xsd ice.* ] : ceguitest 0.5 : data-tool ;
