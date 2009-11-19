@@ -37,7 +37,7 @@ struct iTextureHandle;
  */
 struct iCEGUI : public virtual iBase
 {
-  SCF_INTERFACE (iCEGUI, 2, 0, 0);
+  SCF_INTERFACE (iCEGUI, 3, 0, 0);
 
   /**
    * Initialize the plugin.
@@ -90,7 +90,7 @@ struct iCEGUI : public virtual iBase
   virtual void DisableKeyboardCapture () = 0;
 
   /// Create a texture from a CS texturehandle.
-  virtual CEGUI::Texture* CreateTexture (iTextureHandle* htxt)= 0;
+  virtual CEGUI::Texture& CreateTexture (iTextureHandle* htxt)= 0;
 };
 
 #endif

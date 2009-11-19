@@ -158,26 +158,17 @@ bool CEGUITest::Application()
 
   // Initialize CEGUI wrapper
   cegui->Initialize ();
-
+  
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
-
-//#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
-  // Use the 0.5 version of the skin
   vfs->ChDir ("/ceguitest/0.5/");
-//#else
-  // Other versions here, if supported
-//#endif
 
   // Load the ice skin (which uses Falagard skinning system)
-  cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");
+  cegui->GetSchemeManagerPtr ()->create("ice.scheme");
 
   cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
 
-  CEGUI::Font* font = cegui->GetFontManagerPtr ()->createFont("FreeType",
-    "Vera", "/fonts/ttf/Vera.ttf");
-  font->setProperty("PointSize", "10");
-  font->load();
+  CEGUI::Font& font = cegui->GetFontManagerPtr ()->createFreeTypeFont("Vera", 10, true, "/fonts/ttf/Vera.ttf");
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 

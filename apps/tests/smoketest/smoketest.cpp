@@ -180,14 +180,11 @@ bool SmokeTest::Application()
   vfs->ChDir ("/ceguitest/0.5/");
 
   // Load the ice skin (which uses Falagard skinning system)
-  cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");
+  cegui->GetSchemeManagerPtr ()->create("ice.scheme");
 
   cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
 
-  CEGUI::Font* font = cegui->GetFontManagerPtr ()->createFont("FreeType",
-    "Vera", "/fonts/ttf/Vera.ttf");
-  font->setProperty("PointSize", "10");
-  font->load();
+  CEGUI::Font& font = cegui->GetFontManagerPtr ()->createFreeTypeFont("Vera", 10, true, "/fonts/ttf/Vera.ttf");
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
@@ -346,13 +343,13 @@ void SmokeTest::LoadPath(size_t index, bool render)
 
   { // If available set the preview.
     CEGUI::ImagesetManager* imsetmgr = cegui->GetImagesetManagerPtr();
-    imsetmgr->destroyImageset("Preview");
+    imsetmgr->destroy("Preview");
     btn = winMgr->getWindow("Preview");
 
     std::string fileName = paths[index]+"world.png";
     if ( vfs->Exists(fileName.c_str()) )
     {
-      imsetmgr->createImagesetFromImageFile("Preview", fileName.c_str());
+      imsetmgr->createFromImageFile("Preview", fileName.c_str());
       btn->setProperty("Image", "set:Preview image:full_image");
     }
     else
