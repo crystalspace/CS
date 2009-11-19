@@ -1,4 +1,1 @@
 SubDir TOP data smoketest ;
-
-InstallData [ Wildcard *.layout ] : data smoketest ;
-FileListEntriesData [ Wildcard *.layout ] : smoketest : data-tool ;
