@@ -120,13 +120,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     if (d_activeTexture)
       t = d_activeTexture->GetTexHandle();
 
-    SubMeshes::iterator meshPtr = std::find(submeshes.begin(), submeshes.end(), t);
-    if (meshPtr == submeshes.end()) // No submesh with this texture.
+    if (renderMeshes.IsEmpty() || renderMeshes.Top().texture != t)
     {
-      // Create a new submesh.
-      SubMesh submesh(renderMeshes);
       csSimpleRenderMesh simple;
-
       simple.renderBuffers = bufHolder;
       simple.meshtype = CS_MESHTYPE_TRIANGLES;
       simple.texture = t;
@@ -138,18 +134,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 
       simple.object2world = d_matrix.GetTransform();
 
-      meshPtr = submeshes.insert(submeshes.end(), submesh);
+      simple.indexStart = indexBuf.GetSize();
+      simple.indexEnd = simple.indexStart;
 
-      meshPtr->index = renderMeshes.Push(simple);
+      renderMeshes.Push(simple);
     }
 
+    // Update index range
+    renderMeshes.Top().indexEnd += vertex_count;
+
     // buffer these vertices
-    size_t currentIndex = meshPtr->indices.GetSize();
+    size_t currentIndex = indexBuf.GetSize();
     for (uint i = 0; i < vertex_count; ++i)
     {
       const CEGUI::Vertex& vs = vbuff[i];
       // convert from CEGUI::Vertex to something directly usable by CS.
-      meshPtr->indices.Push(vertBuf.GetSize());
+      indexBuf.Push(vertBuf.GetSize());
       csVector3 v(vs.position.d_x + d_texelOffset.d_x, 
                   vs.position.d_y + d_texelOffset.d_y, 
                   vs.position.d_z);
@@ -161,7 +161,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 
       // Reverse winding order.
       if ((currentIndex+i)%3 == 2) 
-        std::swap(meshPtr->indices[currentIndex+i], meshPtr->indices[currentIndex+i-1]);
+        std::swap(indexBuf[currentIndex+i], indexBuf[currentIndex+i-1]);
     }
 
     d_sync = false;
@@ -176,15 +176,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   //----------------------------------------------------------------------------//
   void GeometryBuffer::reset()
   {
-    submeshes.clear();
+    renderMeshes.Empty();
     tcBuf.Empty();
     colBuf.Empty();
     vertBuf.Empty();
     indexBuf.Empty();
     d_activeTexture = 0;
     d_sync = false;
-
-    renderMeshes.Empty();
   }
 
   //----------------------------------------------------------------------------//
@@ -202,7 +200,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   //----------------------------------------------------------------------------//
   uint GeometryBuffer::getBatchCount() const
   {
-    return submeshes.size();
+    return renderMeshes.GetSize();
   }
 
   //----------------------------------------------------------------------------//
@@ -244,9 +242,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     d_matrix = trans * rot * inv_pivot_trans;
 
     // Update mesh transforms
-    SubMeshes::iterator it = submeshes.begin();
-    for (; it != submeshes.end(); it++)
-      it->UpdateTransform(d_matrix.GetTransform());
+    for (size_t i = 0; i != renderMeshes.GetSize(); i++)
+      renderMeshes.Get(i).object2world = d_matrix.GetTransform();
 
     d_matrixValid = true;
   }
@@ -270,21 +267,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     rbuf->SetData (tcBuf.GetArray());
     bufHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, rbuf);
-
-    // Create the indexbuffer from all submeshes' indices.
-    size_t totalSize = 0;
-    SubMeshes::iterator it = submeshes.begin();
-    for (; it != submeshes.end(); it++) { totalSize+= it->indices.GetSize(); }
-    indexBuf.SetSize(totalSize);
-    
-    /// Copy indices to buffer.
-    for (it = submeshes.begin(),totalSize = 0; it != submeshes.end(); it++)
-    {
-      // Update indices range for submesh.
-      it->UpdateIndexRange(totalSize);
-      memcpy(indexBuf.GetArray()+totalSize, it->indices.GetArray(), sizeof(uint)*it->indices.GetSize());
-      totalSize += it->indices.GetSize();
-    }
 
     rbuf = csRenderBuffer::CreateIndexRenderBuffer (indexBuf.GetSize(),
       CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, indexBuf.GetSize()-1);

@@ -76,38 +76,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     iObjectRegistry* obj_reg;
     csRef<iGraphics3D> g3d;
     csRef<iGraphics2D> g2d;
-
-    /// A submesh defining indexranges with a different texture.
-    struct SubMesh
-    {
-      csDirtyAccessArray<csSimpleRenderMesh>& ms;
-      size_t index;
-
-      SubMesh(csDirtyAccessArray<csSimpleRenderMesh>& mss) : ms(mss) {}
-
-      typedef std::vector<uint> Indices;
-      csSimpleRenderMesh simple;
-      csDirtyAccessArray<uint> indices;
-
-      void UpdateIndexRange(size_t c)
-      {
-        ms[index].indexStart = c;
-        ms[index].indexEnd = c+indices.GetSize();
-      }
-
-      void UpdateTransform(const csTransform& c)
-      { ms[index].object2world = c; }
-
-      bool operator==(iTextureHandle* t) 
-      { return ms[index].texture==t; }
-    };
-    typedef std::list<SubMesh> SubMeshes;
     
 
     /* Cached data */
 
-    /// List of submeshes (different texture) for this buffer
-    mutable SubMeshes submeshes;
     /// Cached list of rendermeshes.
     mutable csDirtyAccessArray<csSimpleRenderMesh> renderMeshes;
 
