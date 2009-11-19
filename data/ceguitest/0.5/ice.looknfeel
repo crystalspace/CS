@@ -408,7 +408,7 @@
         <PropertyDefinition name="SelectedTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
         <PropertyDefinition name="ActiveSelectionColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
         <PropertyDefinition name="InactiveSelectionColour" initialValue="FF999999" redrawOnWrite="true" />
-        <Property name="MouseCursorImage" value="set:ice image:MouseTextBar" />
+        <Property name="MouseCursorImage" value="set:ice image:MouseTextBar" /> 
         <NamedArea name="TextArea">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
@@ -694,6 +694,7 @@
                 <Dim type="Height" ><FontDim type="LineSpacing" padding="8" /></Dim>
             </Area>
             <Property name="AlwaysOnTop" value="False" />
+            <Property name="NonClient" value="True" />
         </Child>
         <Child type="ice/SystemButton" nameSuffix="__auto_closebutton__">
             <Area>
@@ -726,6 +727,7 @@
             <Property name="NormalImage" value="set:ice image:NewCloseButtonNormal" />
             <Property name="HoverImage" value="set:ice image:NewCloseButtonHover" />
             <Property name="PushedImage" value="set:ice image:NewCloseButtonPressed" />
+            <Property name="NonClient" value="True" />
         </Child>
         <ImagerySection name="withtitle_frame">
             <FrameComponent>
