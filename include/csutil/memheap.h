@@ -29,8 +29,6 @@
 #include <typeinfo>
 #endif
 
-#include "csutil/spinlock.h"
-
 /**\addtogroup util_memory
  * @{ */
 
@@ -47,7 +45,6 @@ namespace CS
     {
       /// The 'mspace' used by this heap.
       void* mspace;
-      SpinLock lock;
       
       Heap (Heap const&);   		// Illegal; unimplemented.
       void operator= (Heap const&); 	// Illegal; unimplemented.

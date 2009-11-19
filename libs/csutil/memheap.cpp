@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 
 #include "csutil/memheap.h"
-#include "csutil/scopedlock.h"
 #include "csutil/sysfunc.h"
 
 namespace CS
@@ -50,17 +49,14 @@ namespace CS
     
     void* Heap::Alloc (const size_t n)
     {
-      csScopedLock<SpinLock> foo (lock);
       return mspace_malloc (mspace, n);
     }
     void Heap::Free (void* p)
     {
-      csScopedLock<SpinLock> foo (lock);
       return mspace_free (mspace, p);
     }
     void* Heap::Realloc (void* p, size_t newSize)
     {
-      csScopedLock<SpinLock> foo (lock);
       return mspace_realloc (mspace, p, newSize);
     }
     void Heap::Trim (size_t pad)
