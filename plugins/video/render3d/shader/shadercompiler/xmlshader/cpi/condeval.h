@@ -888,6 +888,7 @@ public:
 
 class ConditionsReader
 {
+  bool status;
   csConditionEvaluator& evaluator;
   
   csHash<csConditionID, uint32> diskIDToCond;
@@ -904,6 +905,7 @@ public:
     iDataBuffer* src);
   ~ConditionsReader ();
   
+  bool GetStatus() const { return status; }
   csConditionID GetConditionID (uint32 diskID) const;
 };
 

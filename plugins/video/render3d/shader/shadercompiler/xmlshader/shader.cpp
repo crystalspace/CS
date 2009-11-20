@@ -573,20 +573,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         }
         while (false);
       }
-      if (!readFromCache)
-      {
-        // Getting from cache failed, so prep for writing to cache
-        cacheFile.AttachNew (new csMemFile ());
-        // Write magic header
-        uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
-        cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
-        CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, cacheTag);
-        // Write hash stream
-        csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
-        if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
-          cacheFile, hashStream))
-          cacheFile.Invalidate();
-      }
     }
 
     if (cacheTag.IsEmpty())
@@ -615,9 +601,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         readFromCache = false;
         csRef<iDataBuffer> conditionsBuf =
           CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
-        if (!conditionsBuf.IsValid()) break;;
+        if (!conditionsBuf.IsValid()) break;
         condReader = new ConditionsReader (*sharedEvaluator, conditionsBuf);
-        readFromCache = true;
+	readFromCache = condReader->GetStatus();
       }
       while (false);
 
@@ -728,6 +714,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     if (!readFromCache)
     {
+      // Getting from cache failed, so prep for writing to cache
+      cacheFile.AttachNew (new csMemFile ());
+      // Write magic header
+      uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
+      cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
+      CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, cacheTag);
+      // Write hash stream
+      csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
+      if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+        cacheFile, hashStream))
+        cacheFile.Invalidate();
+
       // Scan techniques on node w/ expanded templates
       {
 	csRef<csWrappedDocumentNode> wrappedNode;
