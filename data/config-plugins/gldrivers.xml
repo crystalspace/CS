@@ -265,12 +265,14 @@
 	    <GL_ARB_fragment_program>no</GL_ARB_fragment_program>
 	  </UseExtension>
 	  <!-- Our GL ext disabling obviously doesn't apply to CgGL, so set
-	       the maximum FP profile to the highest below AFP. -->
+	       the FP profile to the highest below AFP. -->
 	  <Shader>
 	    <Cg>
-	      <MaxProfile>
-		<Fragment>ps_1_3</Fragment>
-	      </MaxProfile>
+	      <Fake>
+		<Fragment>
+		  <Profile>ps_1_3</Profile>
+		</Fragment>
+	      </Fake>
 	    </Cg>
 	  </Shader>
 	</OpenGL>
@@ -605,10 +607,14 @@
 		      When setting a max LOD level for a texture and generating
 		      mipmaps with GL_GENERATE_MIPMAPS_SGIS, the last LOD
 		      level stays black.
+	* 2008-09-10: GeForce 8800M GTX/PCI/SSE2, Linux 64-bit, 
+		      OpenGL 2.1.2 NVIDIA 173.14.09
+		      No issues with post processing, presumably fixed
 	-->
     <rule description="NVidia: GENERATE_MIPMAPS does not generate last level">
-      <conditions>
+      <conditions fulfill="all">
 	<regexp	string="vendor" pattern="NVIDIA" />
+	<comparever version="glvendor" relation="lt 173.14.09" />
       </conditions>
       <applicable>
 	<usecfg>generateexcessmipmap</usecfg>
