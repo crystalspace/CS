@@ -307,9 +307,11 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
     cgDestroyProgram (program);
   }
   shaderPlug->SetCompiledSource (programStr);
+  shaderPlug->SetIgnoreErrors (true);
   program = cgCreateProgram (shaderPlug->context, 
     CG_SOURCE, programStr, 
     profile, !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
+  shaderPlug->SetIgnoreErrors (false);
   
   if (!(flags & loadIgnoreErrors)) shaderPlug->PrintAnyListing();
 
