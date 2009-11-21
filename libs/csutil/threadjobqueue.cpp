@@ -43,7 +43,7 @@ namespace Threading
     allThreadState = new ThreadState*[numWorkerThreads];
 
     // Start up the threads
-    for (size_t i = 0; i < numWorkerThreads; ++i)
+    for (unsigned int i = 0; i < numWorkerThreads; ++i)
     {
       allThreadState[i] = new ThreadState (this, i); 
       allThreadState[i]->threadObject->SetPriority(priority);
@@ -82,7 +82,7 @@ namespace Threading
     while (true)
     {
       // Find a thread (on random) to add it to
-      size_t targetThread = rgen.Get (numWorkerThreads);
+      size_t targetThread = rgen.Get ((uint32)numWorkerThreads);
 
       // Lock, add and notify
       ThreadState* ts = allThreadState[targetThread];
@@ -214,7 +214,7 @@ namespace Threading
       
         // If we couldn't get any job, try to steal. At most try to steal once
         // from each of the other threads
-        for (size_t i = 0, index = rgen.Get (ownerQueue->numWorkerThreads); 
+        for (size_t i = 0, index = rgen.Get ((uint32)ownerQueue->numWorkerThreads); 
              i < ownerQueue->numWorkerThreads; 
              ++i, index = (index + 1) % ownerQueue->numWorkerThreads
              )
@@ -251,6 +251,7 @@ namespace Threading
         threadState->currentJob = 0;
         currentJob = 0;
 
+        MutexScopedLock l (ownerQueue->finishMutex);
         ownerQueue->jobFinished.NotifyAll ();
       }
       else
