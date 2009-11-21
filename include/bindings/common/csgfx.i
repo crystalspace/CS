@@ -1,3 +1,11 @@
+%include "igraphic/image.h"
+%immutable csImageIOFileFormatDescription::mime;
+%immutable csImageIOFileFormatDescription::subtype;
+%template (csImageIOFileFormatDescriptions) csArray<csImageIOFileFormatDescription const*>;
+%include "igraphic/imageio.h"
+%include "igraphic/animimg.h"
+%include "itexture/iproctex.h"
+
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
 %ignore ShaderVarName;
