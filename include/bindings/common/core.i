@@ -1003,6 +1003,8 @@ csEventID _csevJoystickEvent (iObjectRegistry *);
   csColor operator - (const csColor & c) const { return *self - c; }
 }
 
+%include "cstool/primitives.h"
+
 // functions for returning wrapped iBase objects.
 %include "bindings/common/scfsugar.i"
 
