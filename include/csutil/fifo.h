@@ -113,7 +113,6 @@ public:
    */
   T& Bottom ()
   {
-
     CS_ASSERT ((a1.GetSize () > 0) || (a2.GetSize () > 0));
 
     if(a1.GetSize () > 0)
