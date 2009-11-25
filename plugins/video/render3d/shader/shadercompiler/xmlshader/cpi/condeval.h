@@ -654,7 +654,7 @@ public:
 
   csConditionID GetConditionID (const CondOperation& operation,
     bool get_new = true);
-  const CondOperation& GetCondition (csConditionID condition);
+  CondOperation GetCondition (csConditionID condition);
 };
 
 struct EvaluatorShadervarValues;
@@ -875,7 +875,7 @@ public:
    */
   csConditionID FindOptimizedCondition (const CondOperation& operation);
   
-  const CondOperation& GetCondition (csConditionID condition)
+  CondOperation GetCondition (csConditionID condition)
   { 
     LockType lock (mutex);
     return conditions.GetCondition (condition);

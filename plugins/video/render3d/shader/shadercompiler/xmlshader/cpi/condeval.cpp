@@ -183,7 +183,7 @@ csConditionID ConditionIDMapper::GetConditionID (const CondOperation& operation,
   return id;
 }
 
-const CondOperation& ConditionIDMapper::GetCondition (csConditionID condition)
+CondOperation ConditionIDMapper::GetCondition (csConditionID condition)
 {
   const CondOperation* op = conditions.GetKeyPointer (condition);
   CS_ASSERT(op != 0);
@@ -946,17 +946,15 @@ bool csConditionEvaluator::IsConditionPartOfInternal (csConditionID condition,
 {
   if (condition == containerCondition) return true;
 
-  const CondOperation* op = //conditions.GetKeyPointer (containerCondition);
-    &conditions.GetCondition (containerCondition);
-  CS_ASSERT (op != 0);
+  CondOperation op = conditions.GetCondition (containerCondition);
 
-  if (op->left.type == operandOperation)
+  if (op.left.type == operandOperation)
   {
-    if (IsConditionPartOfInternal (condition, op->left.operation)) return true;
+    if (IsConditionPartOfInternal (condition, op.left.operation)) return true;
   }
-  if (op->right.type == operandOperation)
+  if (op.right.type == operandOperation)
   {
-    if (IsConditionPartOfInternal (condition, op->right.operation)) return true;
+    if (IsConditionPartOfInternal (condition, op.right.operation)) return true;
   }
   return false;
 }
@@ -1211,136 +1209,134 @@ typename Evaluator::EvalResult csConditionEvaluator::EvaluateInternal (
   typedef typename Evaluator::IntType EvInt;
   EvResult result (eval.GetDefaultResult());
 
-  const CondOperation* op = //conditions.GetKeyPointer (condition);
-    &conditions.GetCondition (condition);
-  CS_ASSERT (op != 0);
+  CondOperation op = conditions.GetCondition (condition);
 
-  switch (op->operation)
+  switch (op.operation)
   {
     case opAnd:
-      result = eval.LogicAnd (op->left, op->right);
+      result = eval.LogicAnd (op.left, op.right);
       break;
     case opOr:
-      result = eval.LogicOr (op->left, op->right);
+      result = eval.LogicOr (op.left, op.right);
       break;
     case opEqual:
       {
-	if ((op->left.type == operandFloat) 
-	  || (op->left.type == operandSVValueFloat)
-	  || (op->left.type == operandSVValueX)
-	  || (op->left.type == operandSVValueY)
-	  || (op->left.type == operandSVValueZ)
-	  || (op->left.type == operandSVValueW)
-	  || (op->right.type == operandFloat) 
-	  || (op->right.type == operandSVValueX) 
-	  || (op->right.type == operandSVValueY) 
-	  || (op->right.type == operandSVValueZ) 
-	  || (op->right.type == operandSVValueW) 
-	  || (op->right.type == operandSVValueFloat))
+	if ((op.left.type == operandFloat) 
+	  || (op.left.type == operandSVValueFloat)
+	  || (op.left.type == operandSVValueX)
+	  || (op.left.type == operandSVValueY)
+	  || (op.left.type == operandSVValueZ)
+	  || (op.left.type == operandSVValueW)
+	  || (op.right.type == operandFloat) 
+	  || (op.right.type == operandSVValueX) 
+	  || (op.right.type == operandSVValueY) 
+	  || (op.right.type == operandSVValueZ) 
+	  || (op.right.type == operandSVValueW) 
+	  || (op.right.type == operandSVValueFloat))
 	{
-	  EvFloat f1 (eval.Float (op->left));
-	  EvFloat f2 (eval.Float (op->right));
+	  EvFloat f1 (eval.Float (op.left));
+	  EvFloat f2 (eval.Float (op.right));
           result = f1 == f2;
 	}
-	else if (OpTypesCompatible (op->left.type, operandBoolean) 
-	  && OpTypesCompatible (op->right.type, operandBoolean))
+	else if (OpTypesCompatible (op.left.type, operandBoolean) 
+	  && OpTypesCompatible (op.right.type, operandBoolean))
 	{
-	  EvBool b1 (eval.Boolean (op->left));
-	  EvBool b2 (eval.Boolean (op->right));
+	  EvBool b1 (eval.Boolean (op.left));
+	  EvBool b2 (eval.Boolean (op.right));
 	  result = b1 == b2;
 	}
 	else
 	{
-	  EvInt i1 (eval.Int (op->left));
-	  EvInt i2 (eval.Int (op->right));
+	  EvInt i1 (eval.Int (op.left));
+	  EvInt i2 (eval.Int (op.right));
 	  result = i1 == i2;
 	}
 	break;
       }
     case opNEqual:
       {
-	if ((op->left.type == operandFloat) 
-	  || (op->left.type == operandSVValueFloat)
-	  || (op->left.type == operandSVValueX)
-	  || (op->left.type == operandSVValueY)
-	  || (op->left.type == operandSVValueZ)
-	  || (op->left.type == operandSVValueW)
-	  || (op->right.type == operandFloat) 
-	  || (op->right.type == operandSVValueX) 
-	  || (op->right.type == operandSVValueY) 
-	  || (op->right.type == operandSVValueZ) 
-	  || (op->right.type == operandSVValueW) 
-	  || (op->right.type == operandSVValueFloat))
+	if ((op.left.type == operandFloat) 
+	  || (op.left.type == operandSVValueFloat)
+	  || (op.left.type == operandSVValueX)
+	  || (op.left.type == operandSVValueY)
+	  || (op.left.type == operandSVValueZ)
+	  || (op.left.type == operandSVValueW)
+	  || (op.right.type == operandFloat) 
+	  || (op.right.type == operandSVValueX) 
+	  || (op.right.type == operandSVValueY) 
+	  || (op.right.type == operandSVValueZ) 
+	  || (op.right.type == operandSVValueW) 
+	  || (op.right.type == operandSVValueFloat))
 	{
-	  EvFloat f1 (eval.Float (op->left));
-	  EvFloat f2 (eval.Float (op->right));
+	  EvFloat f1 (eval.Float (op.left));
+	  EvFloat f2 (eval.Float (op.right));
           result = f1 != f2;
 	}
-	else if (OpTypesCompatible (op->left.type, operandBoolean) 
-	  && OpTypesCompatible (op->right.type, operandBoolean))
+	else if (OpTypesCompatible (op.left.type, operandBoolean) 
+	  && OpTypesCompatible (op.right.type, operandBoolean))
 	{
-	  EvBool b1 (eval.Boolean (op->left));
-	  EvBool b2 (eval.Boolean (op->right));
+	  EvBool b1 (eval.Boolean (op.left));
+	  EvBool b2 (eval.Boolean (op.right));
 	  result = b1 != b2;
 	}
 	else
 	{
-	  EvInt i1 (eval.Int (op->left));
-	  EvInt i2 (eval.Int (op->right));
+	  EvInt i1 (eval.Int (op.left));
+	  EvInt i2 (eval.Int (op.right));
 	  result = i1 != i2;
 	}
 	break;
       }
     case opLesser:
       {
-	if ((op->left.type == operandFloat) 
-	  || (op->left.type == operandSVValueFloat)
-	  || (op->left.type == operandSVValueX)
-	  || (op->left.type == operandSVValueY)
-	  || (op->left.type == operandSVValueZ)
-	  || (op->left.type == operandSVValueW)
-	  || (op->right.type == operandFloat) 
-	  || (op->right.type == operandSVValueX) 
-	  || (op->right.type == operandSVValueY) 
-	  || (op->right.type == operandSVValueZ) 
-	  || (op->right.type == operandSVValueW) 
-	  || (op->right.type == operandSVValueFloat))
+	if ((op.left.type == operandFloat) 
+	  || (op.left.type == operandSVValueFloat)
+	  || (op.left.type == operandSVValueX)
+	  || (op.left.type == operandSVValueY)
+	  || (op.left.type == operandSVValueZ)
+	  || (op.left.type == operandSVValueW)
+	  || (op.right.type == operandFloat) 
+	  || (op.right.type == operandSVValueX) 
+	  || (op.right.type == operandSVValueY) 
+	  || (op.right.type == operandSVValueZ) 
+	  || (op.right.type == operandSVValueW) 
+	  || (op.right.type == operandSVValueFloat))
 	{
-	  EvFloat f1 (eval.Float (op->left));
-	  EvFloat f2 (eval.Float (op->right));
+	  EvFloat f1 (eval.Float (op.left));
+	  EvFloat f2 (eval.Float (op.right));
 	  result = (f1 < f2);
 	}
 	else
 	{
-	  EvInt i1 (eval.Int (op->left));
-	  EvInt i2 (eval.Int (op->right));
+	  EvInt i1 (eval.Int (op.left));
+	  EvInt i2 (eval.Int (op.right));
 	  result = i1 < i2;
 	}
 	break;
       }
     case opLesserEq:
       {
-	if ((op->left.type == operandFloat) 
-	  || (op->left.type == operandSVValueFloat)
-	  || (op->left.type == operandSVValueX)
-	  || (op->left.type == operandSVValueY)
-	  || (op->left.type == operandSVValueZ)
-	  || (op->left.type == operandSVValueW)
-	  || (op->right.type == operandFloat) 
-	  || (op->right.type == operandSVValueX) 
-	  || (op->right.type == operandSVValueY) 
-	  || (op->right.type == operandSVValueZ) 
-	  || (op->right.type == operandSVValueW) 
-	  || (op->right.type == operandSVValueFloat))
+	if ((op.left.type == operandFloat) 
+	  || (op.left.type == operandSVValueFloat)
+	  || (op.left.type == operandSVValueX)
+	  || (op.left.type == operandSVValueY)
+	  || (op.left.type == operandSVValueZ)
+	  || (op.left.type == operandSVValueW)
+	  || (op.right.type == operandFloat) 
+	  || (op.right.type == operandSVValueX) 
+	  || (op.right.type == operandSVValueY) 
+	  || (op.right.type == operandSVValueZ) 
+	  || (op.right.type == operandSVValueW) 
+	  || (op.right.type == operandSVValueFloat))
 	{
-	  EvFloat f1 (eval.Float (op->left));
-	  EvFloat f2 (eval.Float (op->right));
+	  EvFloat f1 (eval.Float (op.left));
+	  EvFloat f2 (eval.Float (op.right));
 	  result = (f1 <= f2);
 	}
 	else
 	{
-	  EvInt i1 (eval.Int (op->left));
-	  EvInt i2 (eval.Int (op->right));
+	  EvInt i1 (eval.Int (op.left));
+	  EvInt i2 (eval.Int (op.right));
 	  result = i1 <= i2;
 	}
 	break;
@@ -1494,10 +1490,8 @@ bool csConditionEvaluator::EvaluateOperandBConst (const CondOperand& operand,
 	  result = false;
 	else
 	{
-	  const CondOperation* op = //conditions.GetKeyPointer (operand.operation);
-	    &conditions.GetCondition (operand.operation);
-	  CS_ASSERT (op != 0);
-	  if (!EvaluateConst (*op, result)) return false;
+	  CondOperation op = conditions.GetCondition (operand.operation);
+	  if (!EvaluateConst (op, result)) return false;
 	}
       }
       break;
@@ -1549,28 +1543,26 @@ bool csConditionEvaluator::EvaluateOperandFConst (const CondOperand& operand,
 void csConditionEvaluator::GetUsedSVs2 (csConditionID condition, 
                                         MyBitArrayTemp& affectedSVs)
 {
-  const CondOperation* op = //conditions.GetKeyPointer (condition);
-    &conditions.GetCondition (condition);
-  CS_ASSERT (op != 0);
+  CondOperation op = conditions.GetCondition (condition);
 
-  if (op->left.type == operandOperation)
-    GetUsedSVs2 (op->left.operation, affectedSVs);
-  else if ((op->left.type >= operandSV) 
-    && (op->left.type <= operandSVValueBuffer))
+  if (op.left.type == operandOperation)
+    GetUsedSVs2 (op.left.operation, affectedSVs);
+  else if ((op.left.type >= operandSV) 
+    && (op.left.type <= operandSVValueBuffer))
   {
-    if (affectedSVs.GetSize() <= op->left.svLocation.svName)
-      affectedSVs.SetSize (op->left.svLocation.svName+1);
-    affectedSVs.SetBit (op->left.svLocation.svName);
+    if (affectedSVs.GetSize() <= op.left.svLocation.svName)
+      affectedSVs.SetSize (op.left.svLocation.svName+1);
+    affectedSVs.SetBit (op.left.svLocation.svName);
   }
 
-  if (op->right.type == operandOperation)
-    GetUsedSVs2 (op->right.operation, affectedSVs);
-  else if ((op->right.type >= operandSV) 
-    && (op->right.type <= operandSVValueBuffer))
+  if (op.right.type == operandOperation)
+    GetUsedSVs2 (op.right.operation, affectedSVs);
+  else if ((op.right.type >= operandSV) 
+    && (op.right.type <= operandSVValueBuffer))
   {
-    if (affectedSVs.GetSize() <= op->right.svLocation.svName)
-      affectedSVs.SetSize (op->right.svLocation.svName+1);
-    affectedSVs.SetBit (op->right.svLocation.svName);
+    if (affectedSVs.GetSize() <= op.right.svLocation.svName)
+      affectedSVs.SetSize (op.right.svLocation.svName+1);
+    affectedSVs.SetBit (op.right.svLocation.svName);
   }
 }
 
