@@ -797,9 +797,9 @@ class csConditionEvaluator :
     const Variables& vars);
   const char* ProcessExpressionInternal (csExpression* expression, 
     CondOperation& operation);
-  csConditionID csConditionEvaluator::FindOptimizedConditionInternal (
+  csConditionID FindOptimizedConditionInternal (
     const CondOperation& operation);
-  bool csConditionEvaluator::IsConditionPartOfInternal (csConditionID condition,
+  bool IsConditionPartOfInternal (csConditionID condition,
     csConditionID containerCondition);
   csString GetConditionStringInternal (csConditionID id);
 public:
