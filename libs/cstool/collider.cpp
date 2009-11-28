@@ -1035,7 +1035,7 @@ bool csColliderActor::AdjustForCollisions (
     float max_y = -1e9;
     // On the second pass account for map irregularities by allowing a slightly higher jump that ignores the normal vector.
     if(counter == 1)
-      jumpY = newpos.y + bottomSize.y * 0.57;
+      jumpY = newpos.y + bottomSize.y * 0.1;
     if(counter == 2) // Disable jumping
       jumpY = newpos.y;
 
