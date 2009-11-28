@@ -991,6 +991,9 @@ csEventID _csevMouseMove (iObjectRegistry *,uint x);
 #undef csevJoystickEvent
 csEventID _csevJoystickEvent (iObjectRegistry *);
 
+%include "csutil/eventhandlers.h"
+%include "csutil/common_handlers.h"
+
 // csutil/cscolor.h
 %extend csColor
 {
