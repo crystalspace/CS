@@ -187,7 +187,8 @@ namespace RenderManager
       NewTargetFn newTarget (*this, renderTree);
       typedef TraverseUsedSVs<RenderTree, NewTargetFn> MeshTraverseType;
       MeshTraverseType svTraverser
-        (newTarget, shaderManager->GetSVNameStringset ()->GetSize ());
+        (newTarget, shaderManager->GetSVNameStringset ()->GetSize (),
+	 iShader::svuTextures);
 
       // Just traverse each context once
       Implementation::OnceOperationBlockRef<typename RenderTree::ContextNode*> 
