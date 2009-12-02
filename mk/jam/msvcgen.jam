@@ -1003,6 +1003,7 @@ rule LinkStaticPlugins
   local target_link_with target_ext_libs target_ext_libs.release target_ext_libs.debug ;
   local target_lflags.release target_lflags.debug ;
   local target_cflags.release target_cflags.debug ;
+  local target_relaydeps target_relaylibs ;
   
   if $(package)
   {
@@ -1045,6 +1046,13 @@ rule LinkStaticPlugins
 	  target_lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode)) ;
 	}
       }
+      
+      local relaydeps = $(STATICPLUGIN.$(p).RELAYDEPS) ;
+      for relaydep in $(relaydeps)
+      {
+	target_relaydeps += $(relaydep) ;
+	target_relaylibs += "$(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep))" ;
+      }
     }
   }
   else
@@ -1071,6 +1079,13 @@ rule LinkStaticPlugins
       for mode in debug release
       {
         target_ext_libs.$(mode) += $($(p)_$(mode)_EXTERNALLIBS) ;
+      }
+      
+      local relaydeps = $($(p).RELAYDEPS) ;
+      for relaydep in $(relaydeps)
+      {
+	target_relaydeps += $(relaydep) ;
+	target_relaylibs += "$($(p).RELAYLIBS.$(relaydep))" ;
       }
     }
   }
@@ -1163,6 +1178,12 @@ rule LinkStaticPlugins
       MsvcCFlags $(plugin_lib_name) : $(target_cflags.$(mode)) ;
       MsvcExternalLibrary $(plugin_lib_name) : $(target_ext_libs.$(mode)) : $(mode) ;
     }
+    for relaydep in $(target_relaydeps)
+    {
+      local relaylibs = $(target_relaylibs[1]) ;
+      target_relaylibs = $(target_relaylibs[2-]) ;
+      RelayLibs $(plugin_lib_name) : $(relaydep) : $(relaylibs) ;
+    }
     LinkWith $(plugin_lib_name) : $(target_link_with) ;
     
     # Nevertheless link plugin deps to actual target to make static lib builds
@@ -1193,6 +1214,12 @@ rule LinkStaticPlugins
 	[ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) ;
       MsvcCFlags $(target) : $(target_cflags.$(mode)) ;
       MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode)) : $(mode) ;
+    }
+    for relaydep in $(target_relaydeps)
+    {
+      local relaylibs = $(target_relaylibs[1]) ;
+      target_relaylibs = $(target_relaylibs[2-]) ;
+      RelayLibs $(target) : $(relaydep) : $(relaylibs) ;
     }
     LinkWith $(target) : $(target_link_with) ;
     
@@ -1397,6 +1424,15 @@ rule WriteDependencies
     $(depfile).FIRSTTIME = "yes" ;
   }
   WriteDepFlags $(depfile_gristed) : $(plugin) ;
+  
+  local relaydeps = $($(plugin).RELAYDEPS) ;
+  for relaydep in $(relaydeps)
+  {
+    RELAYDEP on $(depfile_gristed) = "$(relaydep)" ;
+    RELAYLIBS on $(depfile_gristed) = "$($(plugin).RELAYLIBS.$(relaydep))" ;
+    WriteDepRelayLibs $(depfile_gristed) : $(plugin) ;
+  }
+  
   Depends $(depfile) : $(depfile_gristed) ;
   Always $(depfile_gristed) ;
 }
@@ -1420,6 +1456,14 @@ STATICPLUGIN.$(>).CFLAGS.debug.$(MSVC_VERSION) = $(CFLAGS.DEBUG) ;
 STATICPLUGIN.$(>).CFLAGS.release.$(MSVC_VERSION) = $(CFLAGS.RELEASE) ;
 STATICPLUGIN.$(>).LFLAGS.debug.$(MSVC_VERSION) = $(LFLAGS.DEBUG) ;
 STATICPLUGIN.$(>).LFLAGS.release.$(MSVC_VERSION) = $(LFLAGS.RELEASE) ;
+EOT
+}
+
+actions WriteDepRelayLibs
+{
+  cat << EOT >> $(<)
+STATICPLUGIN.$(>).RELAYDEPS += $(RELAYDEP) ;
+STATICPLUGIN.$(>).RELAYLIBS.$(RELAYDEP) = $(RELAYLIBS) ;
 EOT
 }
 
@@ -1512,6 +1556,9 @@ rule RelayLibs
     Depends msvcgen : $(relayfile) ;
 
     MsvcExtraFile1 $(<) : $(relayfile:R=$(outdircommon)) ;
+    
+    $(<).RELAYDEPS += $(extlib) ;
+    $(<).RELAYLIBS.$(extlib) = $(3) ;
   }
 
   ExternalLibs $(<) : $(>) ;
