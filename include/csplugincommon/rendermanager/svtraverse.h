@@ -126,6 +126,9 @@ namespace RenderManager
                        const typename RenderTree::MeshNode::SingleMesh& mesh,
                        const csBitArray& names)
       {
+	// No names to check anyway, so leave right away ...
+	if (names.AllBitsFalse()) return;
+	
 	typename RenderTree::ContextNode& context = node->owner;
 
 	csShaderVariableStack varStack;
