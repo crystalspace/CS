@@ -44,8 +44,8 @@ namespace RenderManager
   class TraverseUsedSVSets
   {
   public:
-    TraverseUsedSVSets (Fn& fn, size_t maxNumSVs)
-      : fn (fn)
+    TraverseUsedSVSets (Fn& fn, size_t maxNumSVs, uint svUsers = iShader::svuAll)
+      : fn (fn), svUsers (svUsers)
     {
       names.SetSize (maxNumSVs);
     }
@@ -76,7 +76,7 @@ namespace RenderManager
               ticket != lastTicket)
           {
             names.Clear();
-            shader->GetUsedShaderVars (ticket, names);
+            shader->GetUsedShaderVars (ticket, names, svUsers);
             lastShader = shader;
           }
           
@@ -88,6 +88,7 @@ namespace RenderManager
   private:
     Fn& fn;
     csBitArray names;
+    uint svUsers;
   };
 
   /**
@@ -103,8 +104,8 @@ namespace RenderManager
   class TraverseUsedSVs
   {
   public:
-    TraverseUsedSVs (Fn& fn, size_t maxNumSVs)
-      : proxy (fn), traverseSets (proxy, maxNumSVs)
+    TraverseUsedSVs (Fn& fn, size_t maxNumSVs, uint svUsers = iShader::svuAll)
+      : proxy (fn), traverseSets (proxy, maxNumSVs, svUsers)
     {
     }
 
