@@ -64,4 +64,12 @@ extern int cs_atexit(void(*func)(void));
 
 #endif // DLMALLOC_DEFINES_ONLY
 
+#include "csconfig.h"
+#ifdef CS_HAVE_VALGRIND_VALGRIND_H
+#define HAVE_VALGRIND_VALGRIND_H
+#endif
+#ifdef CS_HAVE_VALGRIND_MEMCHECK_H
+#define HAVE_VALGRIND_MEMCHECK_H
+#endif
+
 #endif // __CS_CSUTIL_DLMALLOC_SETTINGS_H__

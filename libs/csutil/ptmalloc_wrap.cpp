@@ -25,6 +25,16 @@
 #include "csutil/threading/atomicops.h"
 #include "csutil/threading/mutex.h"
 
+#ifdef CS_HAVE_VALGRIND_MEMCHECK_H
+#include <valgrind/memcheck.h>
+#endif
+#ifndef VALGRIND_MAKE_MEM_DEFINED
+#define VALGRIND_MAKE_MEM_DEFINED(mem, bytes)			(void)0
+#endif
+#ifndef VALGRIND_MAKE_MEM_UNDEFINED
+#define VALGRIND_MAKE_MEM_UNDEFINED(mem, bytes)			(void)0
+#endif
+
 #define DLMALLOC_DEFINES_ONLY
 #include "dlmalloc-settings.h" // for MALLOC_ALIGNMENT
 
@@ -326,6 +336,7 @@ namespace
     *((CookieType*)(p + n)) = endCookie;
     // Pepper.
     memset (p, 0xca, n);
+    VALGRIND_MAKE_MEM_UNDEFINED(p, n);
     if (keepLocation)
     {
       AllocatedBlock newBlock;
@@ -478,7 +489,10 @@ namespace
     *((CookieType*)(np + n)) = newEndCookie;
     // Spice the enlarged area
     if (n > nOld)
+    {
       memset (np + nOld, 0xca, n-nOld);
+      VALGRIND_MAKE_MEM_UNDEFINED(np + nOld, n-nOld);
+    }
     if (keepLocation)
     {
       CS::Threading::ScopedLock<CS::Threading::RecursiveMutex> lock (

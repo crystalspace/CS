@@ -478,6 +478,10 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
   rarely trigger versus holding on to unused memory. To effectively
   disable, set to MAX_SIZE_T. This may lead to a very slight speed
   improvement at the expense of carrying around more memory.
+  
+HAVE_VALGRIND_VALGRIND_H, HAVE_VALGRIND_MEMCHECK_H  default: undefined
+  If defined, Valgrind headers are included and Valgrind client requests
+  performed to tell it more about memory allocated by dlmalloc.
 */
 
 /***** CS SPECIFIC SETTINGS BEGIN HERE *****/
@@ -674,6 +678,36 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
 #define M_GRANULARITY        (-2)
 #define M_MMAP_THRESHOLD     (-3)
 
+/* Include valgrind headers, if present */
+#ifdef HAVE_VALGRIND_VALGRIND_H
+#include <valgrind/valgrind.h>
+#endif
+#ifdef HAVE_VALGRIND_MEMCHECK_H
+#include <valgrind/memcheck.h>
+#endif
+/* Valgrind macros. Define macros not present to do nothing. */
+#ifndef RUNNING_ON_VALGRIND
+#define RUNNING_ON_VALGRIND					(0)
+#endif
+#ifndef VALGRIND_MAKE_MEM_NOACCESS
+#define VALGRIND_MAKE_MEM_NOACCESS(mem, bytes)			(void)0
+#endif
+#ifndef VALGRIND_MAKE_MEM_DEFINED
+#define VALGRIND_MAKE_MEM_DEFINED(mem, bytes)			(void)0
+#endif
+#ifndef VALGRIND_MAKE_MEM_UNDEFINED
+#define VALGRIND_MAKE_MEM_UNDEFINED(mem, bytes)			(void)0
+#endif
+#ifndef VALGRIND_MALLOCLIKE_BLOCK
+#define VALGRIND_MALLOCLIKE_BLOCK(p, size, redzone, is_null)	(void)0
+#endif
+#ifndef VALGRIND_FREELIKE_BLOCK
+#define VALGRIND_FREELIKE_BLOCK(p, redzone)			(void)0
+#endif
+
+#define VALGRIND_MAKE_MEM_UNDEFINED_RANGE(Start, End)			\
+  VALGRIND_MAKE_MEM_UNDEFINED((Start), (char*)(End)-(char*)(Start))
+  
 /* ------------------------ Mallinfo declarations ------------------------ */
 
 #if !NO_MALLINFO
@@ -1342,6 +1376,10 @@ int mspace_mallopt(int, int);
 extern void*     sbrk(ptrdiff_t);
 #endif /* FreeBSD etc */
 #endif /* LACKS_UNISTD_H */
+
+#if !(defined(__GNUC__) && __GNUC__ >= 3)
+#define __builtin_expect(e,v)  (e)
+#endif
 
 /* Declarations for locking */
 #if USE_LOCKS
@@ -3639,15 +3677,18 @@ static void internal_malloc_stats(mstate m) {
 
 /* Relays to internal calls to malloc/free from realloc, memalign etc */
 
+static void* mspace_malloc_real(mspace m, size_t b);
+static void mspace_free_real(mspace m, void* mem);
+
 #if ONLY_MSPACES
-#define internal_malloc(m, b) mspace_malloc(m, b)
-#define internal_free(m, mem) mspace_free(m,mem);
+#define internal_malloc(m, b) mspace_malloc_real(m, b)
+#define internal_free(m, mem) mspace_free_real(m,mem);
 #else /* ONLY_MSPACES */
 #if MSPACES
 #define internal_malloc(m, b)\
-   (m == gm)? dlmalloc(b) : mspace_malloc(m, b)
+   (m == gm)? dlmalloc(b) : mspace_malloc_real(m, b)
 #define internal_free(m, mem)\
-   if (m == gm) dlfree(mem); else mspace_free(m,mem);
+   if (m == gm) dlfree(mem); else mspace_free_real(m,mem);
 #else /* MSPACES */
 #define internal_malloc(m, b) dlmalloc(b)
 #define internal_free(m, mem) dlfree(mem)
@@ -3673,6 +3714,9 @@ static void* mmap_alloc(mstate m, size_t nb) {
       size_t offset = align_offset(chunk2mem(mm));
       size_t psize = mmsize - offset - MMAP_FOOT_PAD;
       mchunkptr p = (mchunkptr)(mm + offset);
+      VALGRIND_MAKE_MEM_NOACCESS(mm, mmsize);
+      VALGRIND_MAKE_MEM_UNDEFINED(p, psize+3*SIZE_T_SIZE);
+      /* One size_t for prev_foot, one for the fencepost, one for the final 0 */
       p->prev_foot = offset;
       p->head = psize;
       mark_inuse_foot(m, p, psize);
@@ -3709,6 +3753,10 @@ static mchunkptr mmap_resize(mstate m, mchunkptr oldp, size_t nb) {
     if (cp != CMFAIL) {
       mchunkptr newp = (mchunkptr)(cp + offset);
       size_t psize = newmmsize - offset - MMAP_FOOT_PAD;
+      VALGRIND_MAKE_MEM_NOACCESS(cp+oldmmsize, newmmsize-oldmmsize);
+      VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(newp, oldsize+SIZE_T_SIZE),
+	psize-oldsize+TWO_SIZE_T_SIZES);
+      /* one size_t for the fencepost, one for the final 0 */
       newp->head = psize;
       mark_inuse_foot(m, newp, psize);
       chunk_plus_offset(newp, psize)->head = FENCEPOST_HEAD;
@@ -3736,8 +3784,10 @@ static void init_top(mstate m, mchunkptr p, size_t psize) {
 
   m->top = p;
   m->topsize = psize;
+  VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, SIZE_T_SIZE), SIZE_T_SIZE);
   p->head = psize | PINUSE_BIT;
   /* set size of fake trailing chunk holding overhead space only once */
+  VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, psize+SIZE_T_SIZE), SIZE_T_SIZE);
   chunk_plus_offset(p, psize)->head = TOP_FOOT_SIZE;
   m->trim_check = mparams.trim_threshold; /* reset on each update */
 }
@@ -3779,12 +3829,23 @@ static void* prepend_alloc(mstate m, char* newbase, char* oldbase,
   size_t psize = (char*)oldfirst - (char*)p;
   mchunkptr q = chunk_plus_offset(p, nb);
   size_t qsize = psize - nb;
+  VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, SIZE_T_SIZE), nb);
   set_size_and_pinuse_of_inuse_chunk(m, p, nb);
 
   assert((char*)oldfirst > (char*)q);
   assert(pinuse(oldfirst));
   assert(qsize >= MIN_CHUNK_SIZE);
 
+  if (qsize >= sizeof(tchunk))
+  {
+    VALGRIND_MAKE_MEM_UNDEFINED(q, sizeof(tchunk));
+  }
+  else
+  {
+    VALGRIND_MAKE_MEM_UNDEFINED(q, MCHUNK_SIZE);
+  }
+  VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(q, qsize), SIZE_T_SIZE);
+    
   /* consolidate remainder with first chunk of old base */
   if (oldfirst == m->top) {
     size_t tsize = m->topsize += qsize;
@@ -3836,6 +3897,7 @@ static void add_segment(mstate m, char* tbase, size_t tsize, flag_t mmapped) {
   /* Set up segment record */
   assert(is_aligned(ss));
   set_size_and_pinuse_of_inuse_chunk(m, sp, ssize);
+  VALGRIND_MAKE_MEM_UNDEFINED(ss, sizeof(struct malloc_segment));
   *ss = m->seg; /* Push current record */
   m->seg.base = tbase;
   m->seg.size = tsize;
@@ -3845,6 +3907,7 @@ static void add_segment(mstate m, char* tbase, size_t tsize, flag_t mmapped) {
   /* Insert trailing fenceposts */
   for (;;) {
     mchunkptr nextp = chunk_plus_offset(p, SIZE_T_SIZE);
+    VALGRIND_MAKE_MEM_UNDEFINED(nextp, SIZE_T_SIZE);
     p->head = FENCEPOST_HEAD;
     ++nfences;
     if ((char*)(&(nextp->head)) < old_end)
@@ -3859,6 +3922,18 @@ static void add_segment(mstate m, char* tbase, size_t tsize, flag_t mmapped) {
     mchunkptr q = (mchunkptr)old_top;
     size_t psize = csp - old_top;
     mchunkptr tn = chunk_plus_offset(q, psize);
+    if (psize > sizeof(tchunk)-SIZE_T_SIZE)
+    {
+      VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(q, SIZE_T_SIZE),
+	sizeof(tchunk)-SIZE_T_SIZE);
+      VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(q, psize),
+	SIZE_T_SIZE);
+    }
+    else
+    {
+      VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(q, SIZE_T_SIZE),
+	psize);
+    }
     set_free_with_pinuse(q, psize, tn);
     insert_chunk(m, q, psize);
   }
@@ -3996,6 +4071,7 @@ static void* sys_alloc(mstate m, size_t nb) {
   }
 
   if (tbase != CMFAIL) {
+    VALGRIND_MAKE_MEM_NOACCESS(tbase, tsize);
 
     if ((m->footprint += tsize) > m->max_footprint)
       m->max_footprint = m->footprint;
@@ -4057,6 +4133,7 @@ static void* sys_alloc(mstate m, size_t nb) {
       size_t rsize = m->topsize -= nb;
       mchunkptr p = m->top;
       mchunkptr r = m->top = chunk_plus_offset(p, nb);
+      VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, SIZE_T_SIZE), nb+SIZE_T_SIZE);
       r->head = rsize | PINUSE_BIT;
       set_size_and_pinuse_of_inuse_chunk(m, p, nb);
       check_top_chunk(m, m->top);
@@ -4102,6 +4179,7 @@ static size_t release_unused_segments(mstate m) {
           /* unlink obsoleted record */
           sp = pred;
           sp->next = next;
+	  VALGRIND_MAKE_MEM_NOACCESS(base, size);
         }
         else { /* back out if cannot unmap */
           insert_large_chunk(m, tp, psize);
@@ -4142,6 +4220,7 @@ static int sys_trim(mstate m, size_t pad) {
             if ((CALL_MREMAP(sp->base, sp->size, newsize, 0) != MFAIL) ||
                 (CALL_MUNMAP(sp->base + newsize, extra) == 0)) {
               released = extra;
+	      VALGRIND_MAKE_MEM_NOACCESS(sp->base+newsize, extra);
             }
           }
         }
@@ -4156,7 +4235,10 @@ static int sys_trim(mstate m, size_t pad) {
               char* rel_br = (char*)(CALL_MORECORE(-extra));
               char* new_br = (char*)(CALL_MORECORE(0));
               if (rel_br != CMFAIL && new_br < old_br)
+	      {
                 released = old_br - new_br;
+		VALGRIND_MAKE_MEM_NOACCESS(new_br, released);
+	      }
             }
           }
           RELEASE_MALLOC_GLOBAL_LOCK();
@@ -4239,12 +4321,26 @@ static void* tmalloc_large(mstate m, size_t nb) {
   if (v != 0 && rsize < (size_t)(m->dvsize - nb)) {
     if (RTCHECK(ok_address(m, v))) { /* split */
       mchunkptr r = chunk_plus_offset(v, nb);
+      char* undef_start;
+      char* undef_end;
       assert(chunksize(v) == rsize + nb);
       if (RTCHECK(ok_next(v, r))) {
         unlink_large_chunk(m, v);
+	undef_start = (char*)chunk_plus_offset(v, SIZE_T_SIZE);
+	undef_end = undef_start + nb;
         if (rsize < MIN_CHUNK_SIZE)
+	{
+	  undef_end = (char*)chunk_plus_offset(v, rsize + nb);
+	  VALGRIND_MAKE_MEM_UNDEFINED_RANGE(undef_start, undef_end);
           set_inuse_and_pinuse(m, v, (rsize + nb));
+	}
         else {
+	  undef_end += MCHUNK_SIZE-SIZE_T_SIZE;
+	  if (rsize >= sizeof(tchunk))
+	  {
+	    undef_end += sizeof(tchunk)-MCHUNK_SIZE;
+	  }
+	  VALGRIND_MAKE_MEM_UNDEFINED_RANGE(undef_start, undef_end);
           set_size_and_pinuse_of_inuse_chunk(m, v, nb);
           set_size_and_pinuse_of_free_chunk(r, rsize);
           insert_chunk(m, r, rsize);
@@ -4279,10 +4375,24 @@ static void* tmalloc_small(mstate m, size_t nb) {
     mchunkptr r = chunk_plus_offset(v, nb);
     assert(chunksize(v) == rsize + nb);
     if (RTCHECK(ok_next(v, r))) {
+      char* undef_start;
+      char* undef_end;
       unlink_large_chunk(m, v);
+      undef_start = (char*)chunk_plus_offset(v, SIZE_T_SIZE);
+      undef_end = undef_start + nb+SIZE_T_SIZE; /* extra SIZE_T_SIZE is for r */
       if (rsize < MIN_CHUNK_SIZE)
+      {
+	undef_end = (char*)chunk_plus_offset(v, rsize + nb);
+	VALGRIND_MAKE_MEM_UNDEFINED_RANGE(undef_start, undef_end);
         set_inuse_and_pinuse(m, v, (rsize + nb));
+      }
       else {
+	undef_end += MCHUNK_SIZE-SIZE_T_SIZE;
+	if (rsize >= sizeof(tchunk))
+	{
+	  undef_end += sizeof(tchunk)-MCHUNK_SIZE;
+	}
+	VALGRIND_MAKE_MEM_UNDEFINED_RANGE(undef_start, undef_end);
         set_size_and_pinuse_of_inuse_chunk(m, v, nb);
         set_size_and_pinuse_of_free_chunk(r, rsize);
         replace_dv(m, r, rsize);
@@ -4331,8 +4441,10 @@ static void* internal_realloc(mstate m, void* oldmem, size_t bytes) {
         size_t newsize = oldsize + m->topsize;
         size_t newtopsize = newsize - nb;
         mchunkptr newtop = chunk_plus_offset(oldp, nb);
-        set_inuse(m, oldp, nb);
+	VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(oldp, oldsize+SIZE_T_SIZE),
+	  nb-oldsize+SIZE_T_SIZE);
         newtop->head = newtopsize |PINUSE_BIT;
+        set_inuse(m, oldp, nb);
         m->top = newtop;
         m->topsize = newtopsize;
         newp = oldp;
@@ -5048,7 +5160,7 @@ size_t destroy_mspace(mspace msp) {
 */
 
 
-void* mspace_malloc(mspace msp, size_t bytes) {
+static void* mspace_malloc_real(mspace msp, size_t bytes) {
   mstate ms = (mstate)msp;
   if (!ok_magic(ms)) {
     USAGE_ERROR_ACTION(ms,ms);
@@ -5071,6 +5183,7 @@ void* mspace_malloc(mspace msp, size_t bytes) {
         p = b->fd;
         assert(chunksize(p) == small_index2size(idx));
         unlink_first_small_chunk(ms, b, p, idx);
+	VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, SIZE_T_SIZE), small_index2size(idx));
         set_inuse_and_pinuse(ms, p, small_index2size(idx));
         mem = chunk2mem(p);
         check_malloced_chunk(ms, mem, nb);
@@ -5092,8 +5205,22 @@ void* mspace_malloc(mspace msp, size_t bytes) {
           rsize = small_index2size(i) - nb;
           /* Fit here cannot be remainderless if 4byte sizes */
           if (SIZE_T_SIZE != 4 && rsize < MIN_CHUNK_SIZE)
+	  {
+	    VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, SIZE_T_SIZE), small_index2size(i));
             set_inuse_and_pinuse(ms, p, small_index2size(i));
+	  }
           else {
+	    char* undef_start = (char*)chunk_plus_offset(p, SIZE_T_SIZE);
+	    char* undef_end = undef_start + nb+SIZE_T_SIZE; /* extra SIZE_T_SIZE is for r */
+	    if (rsize >= sizeof(tchunk))
+	    {
+	      undef_end += sizeof(tchunk)-SIZE_T_SIZE;
+	    }
+	    else
+	    {
+	      undef_end += MCHUNK_SIZE-SIZE_T_SIZE;
+	    }
+	    VALGRIND_MAKE_MEM_UNDEFINED_RANGE(undef_start, undef_end);
             set_size_and_pinuse_of_inuse_chunk(ms, p, nb);
             r = chunk_plus_offset(p, nb);
             set_size_and_pinuse_of_free_chunk(r, rsize);
@@ -5123,14 +5250,20 @@ void* mspace_malloc(mspace msp, size_t bytes) {
     if (nb <= ms->dvsize) {
       size_t rsize = ms->dvsize - nb;
       mchunkptr p = ms->dv;
+      char* undef_start = (char*)chunk_plus_offset(p, SIZE_T_SIZE);
+      char* undef_end = undef_start + nb;
       if (rsize >= MIN_CHUNK_SIZE) { /* split dv */
         mchunkptr r = ms->dv = chunk_plus_offset(p, nb);
+	undef_end += MCHUNK_SIZE;
+	VALGRIND_MAKE_MEM_UNDEFINED_RANGE(undef_start, undef_end);
         ms->dvsize = rsize;
         set_size_and_pinuse_of_free_chunk(r, rsize);
         set_size_and_pinuse_of_inuse_chunk(ms, p, nb);
       }
       else { /* exhaust dv */
         size_t dvs = ms->dvsize;
+	undef_end += rsize;
+	VALGRIND_MAKE_MEM_UNDEFINED_RANGE(undef_start, undef_end);
         ms->dvsize = 0;
         ms->dv = 0;
         set_inuse_and_pinuse(ms, p, dvs);
@@ -5144,6 +5277,8 @@ void* mspace_malloc(mspace msp, size_t bytes) {
       size_t rsize = ms->topsize -= nb;
       mchunkptr p = ms->top;
       mchunkptr r = ms->top = chunk_plus_offset(p, nb);
+      VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, SIZE_T_SIZE),
+	nb+SIZE_T_SIZE); /* extra SIZE_T_SIZE is for r->head */
       r->head = rsize | PINUSE_BIT;
       set_size_and_pinuse_of_inuse_chunk(ms, p, nb);
       mem = chunk2mem(p);
@@ -5162,7 +5297,16 @@ void* mspace_malloc(mspace msp, size_t bytes) {
   return 0;
 }
 
-void mspace_free(mspace msp, void* mem) {
+void* mspace_malloc(mspace msp, size_t bytes) {
+  void* p = mspace_malloc_real(msp, bytes);
+  if (p != 0)
+  {
+    VALGRIND_MALLOCLIKE_BLOCK(p, bytes, 0, 0);
+  }
+  return p;
+}
+
+static void mspace_free_real(mspace msp, void* mem) {
   if (mem != 0) {
     mchunkptr p  = mem2chunk(mem);
 #if FOOTERS
@@ -5180,6 +5324,11 @@ void mspace_free(mspace msp, void* mem) {
       if (RTCHECK(ok_address(fm, p) && ok_inuse(p))) {
         size_t psize = chunksize(p);
         mchunkptr next = chunk_plus_offset(p, psize);
+	/* Mark undefined (in case VALGRIND_MEMPOOL_FREE was used) */
+	VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, TWO_SIZE_T_SIZES),
+				     MCHUNK_SIZE-TWO_SIZE_T_SIZES);
+	VALGRIND_MAKE_MEM_NOACCESS(chunk_plus_offset(p, MCHUNK_SIZE),
+				   psize - MCHUNK_SIZE);
         if (!pinuse(p)) {
           size_t prevsize = p->prev_foot;
           if (is_mmapped(p)) {
@@ -5198,6 +5347,8 @@ void mspace_free(mspace msp, void* mem) {
               }
               else if ((next->head & INUSE_BITS) == INUSE_BITS) {
                 fm->dvsize = psize;
+		/* Mark undefined (in case VALGRIND_MEMPOOL_FREE was used) */
+		VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, psize), SIZE_T_SIZE);
                 set_free_with_pinuse(p, psize, next);
                 goto postaction;
               }
@@ -5223,6 +5374,8 @@ void mspace_free(mspace msp, void* mem) {
             }
             else if (next == fm->dv) {
               size_t dsize = fm->dvsize += psize;
+	      VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, MCHUNK_SIZE),
+					  sizeof(tchunk)-MCHUNK_SIZE);
               fm->dv = p;
               set_size_and_pinuse_of_free_chunk(p, dsize);
               goto postaction;
@@ -5239,7 +5392,11 @@ void mspace_free(mspace msp, void* mem) {
             }
           }
           else
+	  {
+	    /* Mark undefined (in case VALGRIND_MEMPOOL_FREE was used) */
+	    VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, psize), SIZE_T_SIZE);
             set_free_with_pinuse(p, psize, next);
+	  }
 
           if (is_small(psize)) {
             insert_small_chunk(fm, p, psize);
@@ -5247,6 +5404,9 @@ void mspace_free(mspace msp, void* mem) {
           }
           else {
             tchunkptr tp = (tchunkptr)p;
+	    /* Mark undefined (in case VALGRIND_MEMPOOL_FREE was used) */
+	    VALGRIND_MAKE_MEM_UNDEFINED(chunk_plus_offset(p, MCHUNK_SIZE),
+					sizeof(tchunk)-MCHUNK_SIZE);
             insert_large_chunk(fm, tp, psize);
             check_free_chunk(fm, p);
             if (--fm->release_checks == 0)
@@ -5261,6 +5421,14 @@ void mspace_free(mspace msp, void* mem) {
       POSTACTION(fm);
     }
   }
+}
+
+void mspace_free(mspace msp, void* mem) {
+  if (mem != 0)
+    /* VALGRIND_MEMPOOL_FREE marks memory as NOACCESS, so do this before
+       actual freeing */
+    VALGRIND_FREELIKE_BLOCK(mem, 0);
+  mspace_free_real(msp, mem);
 }
 
 void* mspace_calloc(mspace msp, size_t n_elements, size_t elem_size) {
@@ -5280,6 +5448,8 @@ void* mspace_calloc(mspace msp, size_t n_elements, size_t elem_size) {
   mem = internal_malloc(ms, req);
   if (mem != 0 && calloc_must_clear(mem2chunk(mem)))
     memset(mem, 0, req);
+  if (mem != 0)
+    VALGRIND_MALLOCLIKE_BLOCK(mem, req, 0, 1);
   return mem;
 }
 
@@ -5299,42 +5469,100 @@ void* mspace_realloc(mspace msp, void* oldmem, size_t bytes) {
 #else /* FOOTERS */
     mstate ms = (mstate)msp;
 #endif /* FOOTERS */
+    void* newmem;
     if (!ok_magic(ms)) {
       USAGE_ERROR_ACTION(ms,ms);
       return 0;
     }
-    return internal_realloc(ms, oldmem, bytes);
+    if (__builtin_expect(RUNNING_ON_VALGRIND, 0))
+    {
+      /* Valgrind does not have a "REALLOCLIKE_BLOCK" macro, the docs say
+         realloc() should be simulated using malloc()+free()-like functions */
+      mchunkptr oldp = mem2chunk(oldmem);
+      size_t oldsize = chunksize(oldp) - CHUNK_OVERHEAD;
+      if (oldsize < bytes)
+      {
+	newmem = mspace_malloc (ms, bytes);
+	memcpy (newmem, oldmem, oldsize);
+	mspace_free (ms, oldmem);
+      }
+      else
+      {
+	newmem = oldmem;
+      }
+    }
+    else
+    {
+      newmem = internal_realloc(ms, oldmem, bytes);
+    }
+    return newmem;
   }
 }
 
 void* mspace_memalign(mspace msp, size_t alignment, size_t bytes) {
   mstate ms = (mstate)msp;
+  void* mem;
   if (!ok_magic(ms)) {
     USAGE_ERROR_ACTION(ms,ms);
     return 0;
   }
-  return internal_memalign(ms, alignment, bytes);
+  mem = internal_memalign(ms, alignment, bytes);
+  if (mem != 0)
+  {
+    VALGRIND_MALLOCLIKE_BLOCK(mem, bytes, 0, 0);
+  }
+  return mem;
 }
 
 void** mspace_independent_calloc(mspace msp, size_t n_elements,
                                  size_t elem_size, void* chunks[]) {
   size_t sz = elem_size; /* serves as 1-element array */
   mstate ms = (mstate)msp;
+  void** newchunks;
   if (!ok_magic(ms)) {
     USAGE_ERROR_ACTION(ms,ms);
     return 0;
   }
-  return ialloc(ms, n_elements, &sz, 3, chunks);
+  newchunks = ialloc(ms, n_elements, &sz, 3, chunks);
+  if (newchunks != 0)
+  {
+    size_t i;
+    if (newchunks != chunks)
+    {
+      VALGRIND_MALLOCLIKE_BLOCK(newchunks, n_elements * sizeof(chunks), 0, 0);
+      VALGRIND_MAKE_MEM_DEFINED(newchunks, n_elements * sizeof(chunks));
+    }
+    for (i = 0; i < n_elements; i++)
+    {
+      VALGRIND_MALLOCLIKE_BLOCK(newchunks[i], elem_size, 0, 0);
+    }
+  }
+  return newchunks;
 }
 
 void** mspace_independent_comalloc(mspace msp, size_t n_elements,
                                    size_t sizes[], void* chunks[]) {
   mstate ms = (mstate)msp;
+  void** newchunks;
   if (!ok_magic(ms)) {
     USAGE_ERROR_ACTION(ms,ms);
     return 0;
   }
-  return ialloc(ms, n_elements, sizes, 0, chunks);
+  newchunks = ialloc(ms, n_elements, sizes, 0, chunks);
+  if (newchunks != 0)
+  {
+    size_t i;
+    if (newchunks != chunks)
+    {
+      VALGRIND_MALLOCLIKE_BLOCK(newchunks, n_elements * sizeof(chunks), 0, 0);
+      VALGRIND_MAKE_MEM_DEFINED(newchunks, n_elements * sizeof(chunks));
+    }
+    for (i = 0; i < n_elements; i++)
+    {
+      VALGRIND_MALLOCLIKE_BLOCK(newchunks[i], sizes[i], 0, 0);
+    }
+  }
+  return newchunks;
 }
 
 int mspace_trim(mspace msp, size_t pad) {
