@@ -2469,12 +2469,13 @@ AC_ARG_ENABLE([valgrind], [AC_HELP_STRING([--enable-valgrind],
     NO otherwise)])],
     [], [enable_valgrind=$enable_valgrind_default])
 AC_MSG_RESULT([$enable_valgrind])
-AS_IF([test $enable_valgrind = yes],
-    [AC_CHECK_HEADERS([valgrind/valgrind.h],
-        [CS_HEADER_PROPERTY([CS_HAVE_VALGRIND_VALGRIND_H])])
-    AC_CHECK_HEADERS([valgrind/memcheck.h],
-        [CS_HEADER_PROPERTY([CS_HAVE_VALGRIND_MEMCHECK_H])])])
-
+AS_IF([test $enable_valgrind = no],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [-DNVALGRIND], [+])
+    CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [-DNVALGRIND], [+])])
+AC_CHECK_HEADERS([valgrind/valgrind.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_VALGRIND_VALGRIND_H])])
+AC_CHECK_HEADERS([valgrind/memcheck.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_VALGRIND_MEMCHECK_H])])
 
 
 #------------------------------------------------------------------------------
