@@ -61,7 +61,8 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
                                                 int flags, 
                                                 csGLGraphics3D *iG3D) : 
   scfImplementationType (this), txtmgr (iG3D->txtmgr), 
-  textureClass (txtmgr->GetTextureClassID ("default")), Handle (0), pbo (0),
+  textureClass (txtmgr->GetTextureClassID ("default")),
+  alphaType (csAlphaMode::alphaNone), Handle (0), pbo (0),
   orig_width (width), orig_height (height), orig_d (depth),
   uploadData(0), G3D (iG3D), texFormat((TextureBlitDataFormat)-1)
 {
