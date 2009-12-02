@@ -183,6 +183,10 @@ namespace RenderManager
       const LayerConfigType& layerConfig,
       csSet<typename RenderTree::ContextNode*>& contextsTested)
     {
+      if ((targets.GetSize() + oneTimeTargets.GetSize()) == 0)
+	// Nothing to do (forced textures were already dealt with)
+	return;
+      
       // Setup callbacks for SVs and mesh nodes
       NewTargetFn newTarget (*this, renderTree);
       typedef TraverseUsedSVs<RenderTree, NewTargetFn> MeshTraverseType;
