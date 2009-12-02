@@ -26,6 +26,17 @@
 #include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 
+#ifdef NVALGRIND
+// Force Valgrind client requests enabled
+#undef NVALGRIND
+#endif
+#ifdef CS_HAVE_VALGRIND_VALGRIND_H
+#include <valgrind/valgrind.h>
+#endif
+#ifndef RUNNING_ON_VALGRIND
+#define RUNNING_ON_VALGRIND	0
+#endif
+
 #ifndef CS_PLUGIN_META_EXT
 #  define CS_PLUGIN_META_EXT ".csplugin"
 #endif
@@ -91,5 +102,13 @@ void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)
 
 bool csUnloadLibrary (csLibraryHandle Handle)
 {
+  if (RUNNING_ON_VALGRIND)
+  {
+    return true;
+    /* Don't dlclose() on Valgrind. Otherwise debug symbols get lost (and
+       reported call stacks less useful).
+       This is the workaround stated in the Valgrind FAQ.
+     */
+  }
   return (dlclose (Handle) == 0);
 }
