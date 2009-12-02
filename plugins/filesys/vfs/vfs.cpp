@@ -2372,10 +2372,21 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
   }
   
   bool rc = Mount (tryvfspath, npath);
+  if (rc)
+  {
+    csString oldcwd (GetCwd());
+    if (ChDir (tryvfspath))
+    {
+      rc = (filename == 0) || Exists (filename);
+    }
+    if (!rc)
+    {
+      ChDir (oldcwd);
+      Unmount (tryvfspath, npath);
+    }
+  }
   cs_free (npath);
-  if (!rc)
-    return false;
-  return ChDir (tryvfspath);
+  return rc;
 }
 
 bool csVFS::GetFileTime (const char *FileName, csFileTime &oTime)
