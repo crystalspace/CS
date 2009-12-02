@@ -372,7 +372,7 @@ ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, int w, int h) :
   scfImplementationType (this), loader (loader),
   tiles (w, h), tilesDirty (tiles.ComputeTileCount()),
   baseColor (0, 0, 0), baseMap (tilesDirty.GetSize()), 
-  state (stateDirty)
+  state (0)
 {
   mat_w = w;
   mat_h = h;
@@ -472,6 +472,10 @@ bool ProctexPDLight::PrepareAnim ()
   }
   lightBits.SetSize (lights.GetSize ());
   state.Set (statePrepared);
+  
+  // Initially fill texture (starts out with garbage)
+  Animate();
+  
   return true;
 }
 
@@ -481,23 +485,28 @@ void ProctexPDLight::Animate (csTicks current_time)
   {
     if (!loader->UpdatePT (this, current_time)) return;
 
-    csTicks startTime = csGetTicks();
-
-    CS_PROFILER_ZONE(ProctexPDLight_Animate)
-#ifdef CS_SUPPORTS_MMX
-    if (state.Check ((uint32)stateDoMMX))
-      Animate_MMX ();
-    else
-#endif
-      Animate_Generic ();
-
-    state.Reset (stateDirty);
-    dirtyLights.DeleteAll ();
-    tilesDirty.Clear ();
-
-    csTicks endTime = csGetTicks();
-    loader->RecordUpdateTime (endTime-startTime);
+    Animate();
   }
+}
+
+void ProctexPDLight::Animate ()
+{
+  csTicks startTime = csGetTicks();
+
+  CS_PROFILER_ZONE(ProctexPDLight_Animate)
+#ifdef CS_SUPPORTS_MMX
+  if (state.Check ((uint32)stateDoMMX))
+    Animate_MMX ();
+  else
+#endif
+    Animate_Generic ();
+
+  state.Reset (stateDirty);
+  dirtyLights.DeleteAll ();
+  tilesDirty.Clear ();
+
+  csTicks endTime = csGetTicks();
+  loader->RecordUpdateTime (endTime-startTime);
 }
 
 void ProctexPDLight::OnColorChange (iLight* light, const csColor& newcolor)

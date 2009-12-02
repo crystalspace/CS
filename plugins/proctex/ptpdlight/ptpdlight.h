@@ -310,7 +310,8 @@ public:
 
   virtual bool PrepareAnim ();
 
-  virtual void Animate (csTicks /*current_time*/);
+  virtual void Animate (csTicks current_time);
+  void Animate ();
 
   /**\name iLightCallback implementation
    * @{ */
