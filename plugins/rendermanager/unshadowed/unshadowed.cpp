@@ -154,7 +154,8 @@ public:
       typedef TraverseUsedSVSets<RenderTreeType,
         FXFunctor> SVTraverseType;
       SVTraverseType svTraverser
-        (fxf, shaderManager->GetSVNameStringset ()->GetSize ());
+        (fxf, shaderManager->GetSVNameStringset ()->GetSize (),
+	 fxRR.svUserFlags | fxFB.svUserFlags);
       // And do the iteration
       ForEachMeshNode (context, svTraverser);
     }
