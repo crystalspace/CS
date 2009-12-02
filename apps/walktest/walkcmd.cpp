@@ -1143,8 +1143,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg)
     {
       char level[300];
+      csString levelFile;
       csScanStr (arg, "%s", level);
-      if (!Sys->SetMapDir (level))
+      if (!Sys->SetMapDir (level, levelFile))
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	  "Couldn't open level '%s'!", level);
@@ -1159,7 +1160,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       Sys->Engine->DeleteAll ();
       Sys->Engine->SetVFSCacheManager ();
-      if (!Sys->LevelLoader->LoadMapFile ("world"))
+      if (!Sys->LevelLoader->LoadMapFile (levelFile))
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
           "Couldn't load level '%s'!", level);
