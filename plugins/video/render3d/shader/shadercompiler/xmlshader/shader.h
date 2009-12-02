@@ -392,19 +392,20 @@ public:
     return allShaderMeta;
   }
 
-  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits,
+				  uint userFlags) const
   {
     if (ticket == csArrayItemNotFound) return;
     
     if (IsFallbackTicket (ticket))
     {
       fallbackShader->GetUsedShaderVars (GetFallbackTicket (ticket),
-        bits);
+        bits, userFlags);
       return;
     }
 
     csXMLShaderTech* tech = TechForTicket (ticket);
-    if (tech != 0) tech->GetUsedShaderVars (bits);
+    if (tech != 0) tech->GetUsedShaderVars (bits, userFlags);
   }
   
   size_t GetPrioritiesTicket (const CS::Graphics::RenderMeshModes& modes,

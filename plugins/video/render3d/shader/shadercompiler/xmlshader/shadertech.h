@@ -228,7 +228,7 @@ public:
     const csShaderVariableStack& stack);
   bool TeardownPass();
   bool DeactivatePass();
-  void GetUsedShaderVars (csBitArray& bits) const;
+  void GetUsedShaderVars (csBitArray& bits, uint userFlags) const;
 
   bool Load (iLoaderContext* ldr_context, iDocumentNode* node,
       iDocumentNode* parentSV, size_t variant, iHierarchicalCache* cacheTo);
