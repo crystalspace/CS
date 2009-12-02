@@ -92394,7 +92394,23 @@ fi
 
 { $as_echo "$as_me:$LINENO: result: $enable_valgrind" >&5
 $as_echo "$enable_valgrind" >&6; }
-if test $enable_valgrind = yes; then
+if test $enable_valgrind = no; then
+  cs_build_prop_val="-DNVALGRIND"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+"
+fi
+
+    cs_build_prop_val="-DNVALGRIND"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
+
 
 for ac_header in valgrind/valgrind.h
 do
@@ -92698,9 +92714,6 @@ _ACEOF
 fi
 
 done
-
-fi
-
 
 
 
