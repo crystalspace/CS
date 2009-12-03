@@ -17932,7 +17932,58 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShader *arg1 = (iShader *) 0 ;
+  size_t arg2 ;
+  csBitArray *arg3 = 0 ;
+  uint arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  unsigned long val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShader_GetUsedShaderVars",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_GetUsedShaderVars" "', argument " "1"" of type '" "iShader const *""'"); 
+  }
+  arg1 = reinterpret_cast< iShader * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShader_GetUsedShaderVars" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csBitArray,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShader_GetUsedShaderVars" "', argument " "3"" of type '" "csBitArray &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShader_GetUsedShaderVars" "', argument " "3"" of type '" "csBitArray &""'"); 
+  }
+  arg3 = reinterpret_cast< csBitArray * >(argp3);
+  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iShader_GetUsedShaderVars" "', argument " "4"" of type '" "uint""'");
+  } 
+  arg4 = static_cast< uint >(val4);
+  ((iShader const *)arg1)->GetUsedShaderVars(arg2,*arg3,arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShader *arg1 = (iShader *) 0 ;
   size_t arg2 ;
@@ -17970,6 +18021,72 @@ SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars(PyObject *SWIGUNUSEDPARM(se
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShader, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csBitArray, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iShader_GetUsedShaderVars__SWIG_1(self, args);
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShader, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csBitArray, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_unsigned_SS_long(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_iShader_GetUsedShaderVars__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iShader_GetUsedShaderVars'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GetUsedShaderVars(iShader const *,size_t,csBitArray &,uint)\n"
+    "    GetUsedShaderVars(iShader const *,size_t,csBitArray &)\n");
   return NULL;
 }
 
@@ -25979,6 +26096,12 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityApp",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityApp)));
   SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityUser",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityUser)));
   SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityHighest",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityHighest)));
+  SWIG_Python_SetConstant(d, "iShader_svuTextures",SWIG_From_int(static_cast< int >(iShader::svuTextures)));
+  SWIG_Python_SetConstant(d, "iShader_svuBuffers",SWIG_From_int(static_cast< int >(iShader::svuBuffers)));
+  SWIG_Python_SetConstant(d, "iShader_svuVProc",SWIG_From_int(static_cast< int >(iShader::svuVProc)));
+  SWIG_Python_SetConstant(d, "iShader_svuVP",SWIG_From_int(static_cast< int >(iShader::svuVP)));
+  SWIG_Python_SetConstant(d, "iShader_svuFP",SWIG_From_int(static_cast< int >(iShader::svuFP)));
+  SWIG_Python_SetConstant(d, "iShader_svuAll",SWIG_From_int(static_cast< int >(iShader::svuAll)));
   SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_POS_X",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_POS_X)));
   SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_NEG_X",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_NEG_X)));
   SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_POS_Y",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_POS_Y)));
