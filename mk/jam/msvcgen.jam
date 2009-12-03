@@ -1050,8 +1050,19 @@ rule LinkStaticPlugins
       local relaydeps = $(STATICPLUGIN.$(p).RELAYDEPS) ;
       for relaydep in $(relaydeps)
       {
-	target_relaydeps += $(relaydep) ;
-	target_relaylibs += "$(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep))" ;
+	local has_dep = no ;
+	for trd in $(target_relaydeps)
+	{
+	  if $(trd) = $(relaydep)
+	  {
+	    has_dep = yes ;
+	  }
+	}
+	if $(has_dep) = no
+	{
+	  target_relaydeps += $(relaydep) ;
+	  target_relaylibs += "$($(p).RELAYLIBS.$(relaydep))" ;
+	}
       }
     }
   }
@@ -1084,8 +1095,19 @@ rule LinkStaticPlugins
       local relaydeps = $($(p).RELAYDEPS) ;
       for relaydep in $(relaydeps)
       {
-	target_relaydeps += $(relaydep) ;
-	target_relaylibs += "$($(p).RELAYLIBS.$(relaydep))" ;
+	local has_dep = no ;
+	for trd in $(target_relaydeps)
+	{
+	  if $(trd) = $(relaydep)
+	  {
+	    has_dep = yes ;
+	  }
+	}
+	if $(has_dep) = no
+	{
+	  target_relaydeps += $(relaydep) ;
+	  target_relaylibs += "$($(p).RELAYLIBS.$(relaydep))" ;
+	}
       }
     }
   }
@@ -1461,7 +1483,7 @@ EOT
 
 actions WriteDepRelayLibs
 {
-  cat << EOT >> $(<)
+  cat << EOT > $(<)
 STATICPLUGIN.$(>).RELAYDEPS += $(RELAYDEP) ;
 STATICPLUGIN.$(>).RELAYLIBS.$(RELAYDEP) = $(RELAYLIBS) ;
 EOT
