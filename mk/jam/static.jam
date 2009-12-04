@@ -344,7 +344,7 @@ rule LinkStaticPlugins
   {
     LinkWith $(target) : $(target_link_with) ;
     LFlags $(target) : $(target_lflags) ;
-    ExtraObjects $(target) : $(staticobject) : inheritcflags ;
+    ExtraObjects $(target) : $(staticobject) $(relayobjs) : inheritcflags ;
   }
 }
 
