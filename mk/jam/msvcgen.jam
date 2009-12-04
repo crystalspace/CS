@@ -1483,7 +1483,7 @@ EOT
 
 actions WriteDepRelayLibs
 {
-  cat << EOT > $(<)
+  cat << EOT >> $(<)
 STATICPLUGIN.$(>).RELAYDEPS += $(RELAYDEP) ;
 STATICPLUGIN.$(>).RELAYLIBS.$(RELAYDEP) = $(RELAYLIBS) ;
 EOT
