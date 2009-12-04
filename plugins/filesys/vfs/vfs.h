@@ -25,7 +25,7 @@
 #include "csutil/memheap.h"
 #include "csutil/refcount.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/threading/mutex.h"
+#include "csutil/threading/rwmutex.h"
 #include "csutil/threading/tls.h"
 #include "csutil/stringarray.h"
 #include "iutil/vfs.h"
@@ -129,7 +129,7 @@ private:
   friend class VfsNode;
 
   /// Mutex to make VFS thread-safe.
-  mutable CS::Threading::RecursiveMutex mutex;
+  mutable CS::Threading::ReadWriteMutex mutex;
 
   // A vector of VFS nodes
   class VfsVector : public csPDelArray<VfsNode>
@@ -284,7 +284,7 @@ private:
 
   /// Find the VFS node corresponding to given virtual path
   VfsNode *GetNode (const char *Path, char *NodePrefix,
-    size_t NodePrefixSize) const;
+    size_t NodePrefixSize);
 
   /// Common routine for many functions
   bool PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
