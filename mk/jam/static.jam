@@ -66,6 +66,7 @@ rule BuildStaticRegFile
 
   MakeLocate $(sources) : $(LOCATE_TARGET) ;
   MakeLocate $(object) : $(LOCATE_TARGET) ;
+  C++FLAGS on $(object) += $($($(<).EXTERNALLIBS).CFLAGS) ;
 
   local metalist metafile i ;
   for i in $(<)
@@ -374,6 +375,8 @@ rule StaticPluginLibrary
   for t in $(targets)
   {
     objects += $(STATICPLUGINS.OBJECTS.$(t)) ;
+    local staticreginfoobject = [ BuildStaticRegFile $(t) : $(name) ] ;
+    objects += $(staticreginfoobject) ;
   }
   
   # Set up library
