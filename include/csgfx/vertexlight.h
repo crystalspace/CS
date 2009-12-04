@@ -319,6 +319,7 @@ public:
       }
       else
       {
+	direction = csVector3 (0);
 	invDistance = 0.0f;
 	a = 0.0f;
       }
