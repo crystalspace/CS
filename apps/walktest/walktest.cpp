@@ -731,7 +731,7 @@ bool WalkTest::SetMapDir (const char* map_dir, csString& map_file)
 	map_dir);
     return false;
   }
-  myVFS->SetSyncDir(myVFS->GetCwd());
+
   map_file = fileNameToOpen;
   return true;
 }

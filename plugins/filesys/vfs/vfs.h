@@ -141,14 +141,6 @@ private:
   // Current working directory (in fact, the automatically-added prefix path)
   // NOTE: cwd ALWAYS ends in '/'!
   CS::Threading::ThreadLocal<char*> cwd;
-  // True for each thread has init its current dir.
-  csArray<bool> threadInit;
-  // Which element in the init array we are.
-  CS::Threading::ThreadLocal<size_t> initElem;
-  // True if SetSyncDir has been called.
-  bool syncDir;
-  // Dir to sync to.
-  char* mainDir;
   // The installation directory (the value of $@)
   char *basedir;
   // Full path of application's resource directory (the value of $*)
@@ -188,13 +180,6 @@ public:
   bool IsVerbose(unsigned int mask) const { return (verbosity & mask) != 0; }
   /// Get verbosity flags.
   unsigned int GetVerbosity() const { return verbosity; }
-
-  /**
-   * Set thread current dir sync.
-   * It is important to use this carefully. This will reset the current dir
-   * for all threads so that they are in the same place.
-   */
-  virtual void SetSyncDir(const char *Path);
 
   /// Set current working directory
   virtual bool ChDir (const char *Path);

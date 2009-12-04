@@ -342,7 +342,7 @@ public:
   // Does file exists?
   bool Exists (const char *Suffix);
   // Query date/time
-  bool GetFileTime (const char *Suffix, csFileTime &oTime) const;
+  bool GetFileTime (const char *Suffix, csFileTime &oTime);
   // Set date/time
   bool SetFileTime (const char *Suffix, const csFileTime &iTime);
   // Get file size
@@ -353,7 +353,9 @@ private:
   // Copy a string from src to dst and expand all variables
   csString Expand (csVFS *Parent, char const *src);
   // Find a file either on disk or in archive - in this node only
-  bool FindFile (const char *Suffix, PathString& RealPath, csArchive *&) const;
+  bool FindFile (const char *Suffix, PathString& RealPath, csArchive *&);
+  // Mutex on this node.
+  CS::Threading::ReadWriteMutex mutex;
 };
 
 // The global archive cache
@@ -1025,7 +1027,10 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
 
       char rpath [CS_MAXPATHLEN + 1];
       csExpandPlatformFilename (src, rpath);
-      RPathV.Push (rpath);
+      {
+        CS::Threading::ScopedWriteLock lock(mutex);
+        RPathV.Push (rpath);
+      }
       src = cur + 1;
     } /* endif */
   } /* for */
@@ -1038,19 +1043,27 @@ bool VfsNode::RemoveRPath (const char *RealPath, csVFS* Parent)
 {
   if (!RealPath)
   {
+    CS::Threading::ScopedWriteLock lock(mutex);
     RPathV.DeleteAll ();
     UPathV.DeleteAll ();
     return true;
-  } /* endif */
+  }
+
   csString const expanded_path = Expand(Parent, RealPath);
-  size_t i;
-  for (i = 0; i < UPathV.GetSize (); i++)
-    if (strcmp ((char *)UPathV.Get (i), expanded_path) == 0)
+  {
+    CS::Threading::ScopedUpgradeableLock lock(mutex);
+    for (size_t i = 0; i < UPathV.GetSize (); i++)
     {
-      RPathV.DeleteIndex (i);
-      UPathV.DeleteIndex (i);
-      return true;
-    } /* endif */
+      if (strcmp ((char *)UPathV.Get (i), expanded_path) == 0)
+      {
+        mutex.UpgradeUnlockAndWriteLock();
+        RPathV.DeleteIndex (i);
+        UPathV.DeleteIndex (i);
+        mutex.WriteUnlock();
+        return true;
+      }
+    }
+  }
 
   return false;
 }
@@ -1183,6 +1196,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
   // Look through all RPathV's for file or directory
   size_t i;
   csString vpath;
+  CS::Threading::ScopedReadLock lock(mutex);
   for (i = 0; i < RPathV.GetSize (); i++)
   {
     char *rpath = (char *)RPathV [i];
@@ -1291,8 +1305,8 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
   csFile *f = 0;
 
   // Look through all RPathV's for file or directory
-  size_t i;
-  for (i = 0; i < RPathV.GetSize (); i++)
+  CS::Threading::ScopedReadLock lock(mutex);
+  for (size_t i = 0; i < RPathV.GetSize (); i++)
   {
     char *rpath = (char *)RPathV [i];
     if (rpath [strlen (rpath) - 1] == CS_PATH_SEPARATOR)
@@ -1304,7 +1318,7 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
       else
       {
         delete f;
-	f = 0;
+        f = 0;
       }
     }
     else
@@ -1315,24 +1329,24 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
       if (idx == csArrayItemNotFound)
       {
         if ((Mode & VFS_FILE_MODE) != VFS_FILE_WRITE)
-	{
+        {
           // does file rpath exist?
-	  if (access (rpath, F_OK) != 0)
+          if (access (rpath, F_OK) != 0)
             continue;
-	}
+        }
 
         idx = ArchiveCache->Length ();
         ArchiveCache->Push (new VfsArchive (rpath, verbosity));
       }
 
       f = new ArchiveFile (Mode, this, i, FileName, ArchiveCache->Get(idx),
-			   verbosity);
+        verbosity);
       if (f->GetStatus () == VFS_STATUS_OK)
         break;
       else
       {
         delete f;
-	f = 0;
+        f = 0;
       }
     }
   }
@@ -1340,11 +1354,11 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
 }
 
 bool VfsNode::FindFile (const char *Suffix, PathString& RealPath,
-  csArchive *&Archive) const
+  csArchive *&Archive)
 {
   // Look through all RPathV's for file or directory
-  size_t i;
-  for (i = 0; i < RPathV.GetSize (); i++)
+  CS::Threading::ScopedReadLock lock(mutex);
+  for (size_t i = 0; i < RPathV.GetSize (); i++)
   {
     char *rpath = (char *)RPathV [i];
     if (rpath [strlen (rpath) - 1] == CS_PATH_SEPARATOR)
@@ -1423,7 +1437,7 @@ bool VfsNode::Exists (const char *Suffix)
   return FindFile (Suffix, fname, a);
 }
 
-bool VfsNode::GetFileTime (const char *Suffix, csFileTime &oTime) const
+bool VfsNode::GetFileTime (const char *Suffix, csFileTime &oTime)
 {
   PathString fname;
   csArchive *a;
@@ -1509,7 +1523,6 @@ SCF_IMPLEMENT_FACTORY (csVFS)
 
 csVFS::csVFS (iBase *iParent) :
   scfImplementationType(this, iParent),
-  syncDir(false),
   basedir(0),
   resdir(0),
   appdir(0),
@@ -1519,18 +1532,15 @@ csVFS::csVFS (iBase *iParent) :
 {
   dirstack = new csStringArray(8,8);
   heap.AttachNew (new HeapRefCounted);
-  mainDir = (char*)cs_malloc (2);
   cwd.SetValue((char*)cs_malloc (2));
   cwd [0] = VFS_PATH_SEPARATOR;
   cwd [1] = 0;
-  initElem = size_t(-1);
   ArchiveCache = new VfsArchiveCache ();
 }
 
 csVFS::~csVFS ()
 {
   cs_free (cwd);
-  cs_free (mainDir);
   cs_free (basedir);
   cs_free (resdir);
   cs_free (appdir);
@@ -1809,33 +1819,15 @@ bool csVFS::CheckIfMounted(char const* virtual_path)
 
 void csVFS::CheckCurrentDir()
 {
-  if(size_t(initElem.GetValue()) != size_t(-1) &&
-    (initElem.GetValue() == 0 || !threadInit[size_t(initElem.GetValue()-1)]))
+  if (cwd == 0)
   {
-    if(initElem.GetValue() == 0)
-    {
-      CS::Threading::RecursiveMutexScopedLock lock (mutex);
-      initElem = threadInit.Push(true)+1;
-    }
-    else
-    {
-      threadInit[size_t(initElem.GetValue()-1)] = true;
-    }
+    cwd.SetValue((char*)cs_malloc (2));
+    cwd [0] = VFS_PATH_SEPARATOR;
+    cwd [1] = 0;
+  }
 
-    cs_free(cwd);
-    if(syncDir)
-    {
-      char* dir = (char*)cs_malloc(strlen(mainDir)+1);
-      cwd.SetValue(dir);
-      memcpy(dir, mainDir, strlen(mainDir)+1);
-    }
-    else
-    {
-      cwd.SetValue((char*)cs_malloc (2));
-      cwd [0] = VFS_PATH_SEPARATOR;
-      cwd [1] = 0;
-    }
-
+  if (dirstack == 0)
+  {
     dirstack = new csStringArray(8,8);
   }
 }
@@ -1843,7 +1835,6 @@ void csVFS::CheckCurrentDir()
 bool csVFS::ChDir (const char *Path)
 {
   csString copy (Path);
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   // First, transform Path to absolute
   char *newwd = _ExpandPath (copy, true);
   if (!newwd)
@@ -1863,33 +1854,17 @@ const char* csVFS::GetCwd ()
   return cwd;
 }
 
-void csVFS::SetSyncDir(const char* Path)
-{
-  cs_free(mainDir);
-  mainDir = (char*)cs_malloc(strlen(Path)+1);
-  memcpy(mainDir, Path, strlen(Path)+1);
-  syncDir = true;
-
-  for(uint i=0; i<threadInit.GetSize(); i++)
-  {
-    threadInit[i] = false;
-  }
-}
-
 void csVFS::PushDir (char const* Path)
 {
   CheckCurrentDir();
-  { // Scope.
-    CS::Threading::RecursiveMutexScopedLock lock (mutex);
-    dirstack.GetValue()->Push (cwd);
-  }
+  dirstack.GetValue()->Push (cwd);
+
   if (Path != 0)
     ChDir(Path);
 }
 
 bool csVFS::PopDir ()
 {
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   CheckCurrentDir();
   if (!dirstack.GetValue()->GetSize ())
     return false;
@@ -2033,9 +2008,11 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
     return 0;
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  if (!PreparePath (FileName, false, node, suffix, sizeof (suffix)))
-    return 0;
+  {
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    if (!PreparePath (FileName, false, node, suffix, sizeof (suffix)))
+      return 0;
+  }
 
   iFile *f = node->Open (Mode, suffix);
 
