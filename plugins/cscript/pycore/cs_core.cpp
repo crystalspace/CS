@@ -23556,39 +23556,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iVFS_SetSyncDir(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iVFS *arg1 = (iVFS *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iVFS_SetSyncDir",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iVFS, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iVFS_SetSyncDir" "', argument " "1"" of type '" "iVFS *""'"); 
-  }
-  arg1 = reinterpret_cast< iVFS * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iVFS_SetSyncDir" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  (arg1)->SetSyncDir((char const *)arg2);
-  resultobj = SWIG_Py_Void();
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iVFS_PushDir__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iVFS *arg1 = (iVFS *) 0 ;
@@ -58926,7 +58893,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iFile_swigregister", iFile_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iVFS_ChDir", _wrap_iVFS_ChDir, METH_VARARGS, NULL},
 	 { (char *)"iVFS_GetCwd", _wrap_iVFS_GetCwd, METH_VARARGS, NULL},
-	 { (char *)"iVFS_SetSyncDir", _wrap_iVFS_SetSyncDir, METH_VARARGS, NULL},
 	 { (char *)"iVFS_PushDir", _wrap_iVFS_PushDir, METH_VARARGS, NULL},
 	 { (char *)"iVFS_PopDir", _wrap_iVFS_PopDir, METH_VARARGS, NULL},
 	 { (char *)"iVFS_ExpandPath", _wrap_iVFS_ExpandPath, METH_VARARGS, NULL},

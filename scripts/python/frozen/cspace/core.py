@@ -973,7 +973,6 @@ class iVFS(iBase):
     __repr__ = _swig_repr
     def ChDir(*args): return _core.iVFS_ChDir(*args)
     def GetCwd(*args): return _core.iVFS_GetCwd(*args)
-    def SetSyncDir(*args): return _core.iVFS_SetSyncDir(*args)
     def PushDir(*args): return _core.iVFS_PushDir(*args)
     def PopDir(*args): return _core.iVFS_PopDir(*args)
     def ExpandPath(*args): return _core.iVFS_ExpandPath(*args)

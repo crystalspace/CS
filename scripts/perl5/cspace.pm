@@ -2085,7 +2085,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *ChDir = *cspacec::iVFS_ChDir;
 *GetCwd = *cspacec::iVFS_GetCwd;
-*SetSyncDir = *cspacec::iVFS_SetSyncDir;
 *PushDir = *cspacec::iVFS_PushDir;
 *PopDir = *cspacec::iVFS_PopDir;
 *ExpandPath = *cspacec::iVFS_ExpandPath;
