@@ -528,6 +528,19 @@ bool csShaderGLCGCommon::GetPostCompileParamProps (ShaderParameter* sparam)
     return cgIsParameterReferenced (param) != 0;
 }
 
+static csString GetParamUnusedMacroName (const char* cgName)
+{
+  csString param (cgName);
+  for (size_t j = 0; j < param.Length(); j++)
+  {
+    if ((param[j] == '.') || (param[j] == '[') || (param[j] == ']'))
+      param[j] = '_';
+  }
+  csString s;
+  s.Format ("PARAM_%s_UNUSED", param.GetData());
+  return s;
+}
+
 void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)
 {
   csSet<uint> sharedResources;
@@ -549,15 +562,26 @@ void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)
     if (!cgIsParameterUsed (cgParam, program)
       && (!sharedResources.Contains (paramRes)))
     {
-      csString param (cgGetParameterName (cgParam));
-      for (size_t j = 0; j < param.Length(); j++)
-      {
-        if ((param[j] == '.') || (param[j] == '[') || (param[j] == ']'))
-          param[j] = '_';
-      }
-      csString s;
-      s.Format ("PARAM_%s_UNUSED", param.GetData());
-      unusedParams.Add (s);
+      unusedParams.Add (GetParamUnusedMacroName (cgGetParameterName (cgParam)));
+    }
+    else if (paramRes != CG_UNDEFINED)
+      sharedResources.Add (paramRes);
+
+    cgParam = cgGetNextLeafParameter (cgParam);
+  }
+  
+  // Now scan global parameters for unused values
+  cgParam = cgGetFirstLeafParameter (program, CG_GLOBAL);
+  while (cgParam)
+  {
+    CGresource paramRes = cgGetParameterResource (cgParam);
+    if (!cgIsParameterUsed (cgParam, program)
+      && (!sharedResources.Contains (paramRes)))
+    {
+      const char* paramName = cgGetParameterName (cgParam); 
+      if (strchr (paramName, '$') == 0)
+	// Cg seems to emit internal-ish globals with $ in the name, ignore these
+	unusedParams.Add (GetParamUnusedMacroName (paramName));
     }
     else if (paramRes != CG_UNDEFINED)
       sharedResources.Add (paramRes);

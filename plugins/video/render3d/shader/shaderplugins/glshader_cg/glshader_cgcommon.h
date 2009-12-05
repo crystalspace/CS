@@ -148,6 +148,7 @@ protected:
   csString GetAugmentedProgram (const char* programStr,
     bool initializeUnusedV2F = false);
   void DoDebugDump ();
+  void DebugDumpParam (csString& output, CGparameter param);
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   const char* GetProgramType()
   {

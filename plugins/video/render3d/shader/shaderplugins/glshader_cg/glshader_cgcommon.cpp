@@ -488,40 +488,20 @@ void csShaderGLCGCommon::DoDebugDump ()
   }
   output << "\n";
 
+  output << "Program leaf parameters:\n";
   CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
   while (param)
   {
-    output << "Parameter: " << cgGetParameterName (param) << "\n";
-    output << " Type: " << 
-      cgGetTypeString (cgGetParameterNamedType (param)) << "\n";
-    output << " Direction: " <<
-      cgGetEnumString (cgGetParameterDirection (param)) << "\n";
-    output << " Semantic: " << cgGetParameterSemantic (param) << "\n";
-    const CGenum var = cgGetParameterVariability (param);
-    output << " Variability: " << cgGetEnumString (var) << "\n";
-    output << " Resource: " <<
-      cgGetResourceString (cgGetParameterResource (param)) << "\n";
-    output << " Resource index: " <<
-      cgGetParameterResourceIndex (param) << "\n";
-    // Cg 2.0 seems to not like CG_DEFAULT for uniforms
-    if (/*(var == CG_UNIFORM) || */(var == CG_CONSTANT))
-    {
-      int nValues;
-      const double* values = cgGetParameterValues (param, 
-	(var == CG_UNIFORM) ? CG_DEFAULT : CG_CONSTANT, &nValues);
-      if (nValues != 0)
-      {
-	output << " Values:";
-	for (int v = 0; v < nValues; v++)
-	{
-	  output << ' ' << values[v];
-	}
-	output << "\n";
-      }
-    }
-    if (!cgIsParameterUsed (param, program)) output << "  not used\n";
-    if (!cgIsParameterReferenced (param)) output << "  not referenced\n";
+    DebugDumpParam (output, param);
+    param = cgGetNextLeafParameter (param);
+  }
+  output << "\n";
 
+  output << "Program global parameters:\n";
+  param = cgGetFirstLeafParameter (program, CG_GLOBAL);
+  while (param)
+  {
+    DebugDumpParam (output, param);
     param = cgGetNextLeafParameter (param);
   }
   output << "\n";
@@ -551,6 +531,40 @@ void csShaderGLCGCommon::DoDebugDump ()
       "crystalspace.graphics3d.shader.glcg",
       "Dumped Cg program info to '%s'", debugFN.GetData());
   }
+}
+
+void csShaderGLCGCommon::DebugDumpParam (csString& output, CGparameter param)
+{
+  output << "Parameter: " << cgGetParameterName (param) << "\n";
+  output << " Type: " << 
+    cgGetTypeString (cgGetParameterNamedType (param)) << "\n";
+  output << " Direction: " <<
+    cgGetEnumString (cgGetParameterDirection (param)) << "\n";
+  output << " Semantic: " << cgGetParameterSemantic (param) << "\n";
+  const CGenum var = cgGetParameterVariability (param);
+  output << " Variability: " << cgGetEnumString (var) << "\n";
+  output << " Resource: " <<
+    cgGetResourceString (cgGetParameterResource (param)) << "\n";
+  output << " Resource index: " <<
+    cgGetParameterResourceIndex (param) << "\n";
+  // Cg 2.0 seems to not like CG_DEFAULT for uniforms
+  if (/*(var == CG_UNIFORM) || */(var == CG_CONSTANT))
+  {
+    int nValues;
+    const double* values = cgGetParameterValues (param, 
+      (var == CG_UNIFORM) ? CG_DEFAULT : CG_CONSTANT, &nValues);
+    if (nValues != 0)
+    {
+      output << " Values:";
+      for (int v = 0; v < nValues; v++)
+      {
+	output << ' ' << values[v];
+      }
+      output << "\n";
+    }
+  }
+  if (!cgIsParameterUsed (param, program)) output << "  not used\n";
+  if (!cgIsParameterReferenced (param)) output << "  not referenced\n";
 }
 
 void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description, 
