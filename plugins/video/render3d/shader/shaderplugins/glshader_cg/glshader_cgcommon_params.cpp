@@ -543,6 +543,7 @@ static csString GetParamUnusedMacroName (const char* cgName)
 
 void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)
 {
+  csArray<CGparameter> unusedCgParams;
   csSet<uint> sharedResources;
   CGparameter cgParam = cgGetFirstLeafParameter (program, CG_PROGRAM);
   while (cgParam)
@@ -559,10 +560,11 @@ void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)
        resource was found used earlier, we also assume that parameter to be
        used.
      */
-    if (!cgIsParameterUsed (cgParam, program)
-      && (!sharedResources.Contains (paramRes)))
+    if (!cgIsParameterUsed (cgParam, program))
     {
-      unusedParams.Add (GetParamUnusedMacroName (cgGetParameterName (cgParam)));
+      /* The 'main' shared resource user may only appear later, so postpone
+         parameter checking */
+      unusedCgParams.Push (cgParam);
     }
     else if (paramRes != CG_UNDEFINED)
       sharedResources.Add (paramRes);
@@ -575,18 +577,29 @@ void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)
   while (cgParam)
   {
     CGresource paramRes = cgGetParameterResource (cgParam);
-    if (!cgIsParameterUsed (cgParam, program)
-      && (!sharedResources.Contains (paramRes)))
+    if (!cgIsParameterUsed (cgParam, program))
+    {
+      /* The 'main' shared resource user may only appear later, so postpone
+         parameter checking */
+      unusedCgParams.Push (cgParam);
+    }
+    else if (paramRes != CG_UNDEFINED)
+      sharedResources.Add (paramRes);
+
+    cgParam = cgGetNextLeafParameter (cgParam);
+  }
+  
+  for (size_t p = 0; p < unusedCgParams.GetSize(); p++)
+  {
+    cgParam = unusedCgParams[p];
+    CGresource paramRes = cgGetParameterResource (cgParam);
+    if (!sharedResources.Contains (paramRes))
     {
       const char* paramName = cgGetParameterName (cgParam); 
       if (strchr (paramName, '$') == 0)
 	// Cg seems to emit internal-ish globals with $ in the name, ignore these
 	unusedParams.Add (GetParamUnusedMacroName (paramName));
     }
-    else if (paramRes != CG_UNDEFINED)
-      sharedResources.Add (paramRes);
-
-    cgParam = cgGetNextLeafParameter (cgParam);
   }
 }
 
