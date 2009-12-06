@@ -1061,7 +1061,7 @@ rule LinkStaticPlugins
 	if $(has_dep) = no
 	{
 	  target_relaydeps += $(relaydep) ;
-	  target_relaylibs += "$($(p).RELAYLIBS.$(relaydep))" ;
+	  target_relaylibs += "$(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep))" ;
 	}
       }
     }
