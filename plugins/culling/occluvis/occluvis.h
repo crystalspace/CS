@@ -96,6 +96,7 @@ public:
 private:
   iObjectRegistry *object_reg;
   csRef<iGraphics3D> g3d;
+  csRef<iShaderManager> shaderManager;
   csEventID CanvasResize;
   csRef<iEventHandler> weakEventHandler;
   csKDTree* kdtree;

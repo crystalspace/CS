@@ -53,6 +53,7 @@
 #include "iengine/mesh.h"
 #include "iengine/portal.h"
 #include "iengine/sector.h"
+#include "imap/loader.h"
 #include "imesh/object.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
@@ -68,12 +69,12 @@ public:
   {
     CS::RenderManager::RenderView* rview = context.renderView;
 
-    // Sort the mesh lists  
+    /* Sort the mesh lists  
     {
       StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine ());
       mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
       ForEachMeshNode (context, mySorter);
-    }
+    }*/
 
     // After sorting, assign in-context per-mesh indices
     {
@@ -88,13 +89,13 @@ public:
     renderLayer.SetAmbient(true);
     SetupStandardSVs (context, renderLayer, shaderManager, rview->GetThisSector ());
 
-    // Setup the material&mesh SVs
+    /* Setup the material&mesh SVs
     {
-      StandardSVSetup<RenderTreeType, SingleRenderLayer> svSetup (
-        context.svArrays, renderLayer);
+       StandardSVSetup<RenderTreeType, SingleRenderLayer> svSetup (
+         context.svArrays, renderLayer);
 
       ForEachMeshNode (context, svSetup);
-    }
+    }*/
 
     // Setup shaders and tickets
     SetupStandardShader (context, shaderManager, renderLayer);
@@ -273,6 +274,12 @@ bool csOccluVis::Initialize (iObjectRegistry *object_reg)
     if (q)
       CS::RegisterWeakListener (q, this, CanvasResize, weakEventHandler);
   }
+
+  shaderManager = csQueryRegistry<iShaderManager>(object_reg);
+  treePersistent.Initialize(shaderManager);
+
+  csRef<iLoader> loader = csQueryRegistry<iLoader>(object_reg);
+  loader->LoadShader("/shader/early_z/z_only.xml");
 
   return true;
 }
@@ -469,8 +476,6 @@ bool csOccluVis::TestObjectVisibility (csOccluVisObjectWrapper* obj,
 void csOccluVis::RenderZMeshQuery (unsigned int& query, iMeshWrapper *imesh, 
                                uint32 frustum_mask, iRenderView* rview)
 {
-  csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager>(object_reg);
-
   // Get the meshes
   int numMeshes;
   csSectorVisibleRenderMeshes* meshList = rview->GetThisSector()->GetVisibleRenderMeshes (
@@ -506,6 +511,7 @@ void csOccluVis::RenderZMeshQuery (unsigned int& query, iMeshWrapper *imesh,
 
   // Begin OQ.
   int old_num_queries = 0, num_queries = 1;
+  g3d->SetZMode (CS_ZBUF_MESH);
   g3d->InitQueries(&query, old_num_queries, num_queries);
   g3d->BeginOcclusionQuery(query);
   {
@@ -1300,4 +1306,3 @@ csPtr<iVisibilityObjectIterator> csOccluVis::IntersectSegmentSloppy (
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (data.vector, 0);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
-
