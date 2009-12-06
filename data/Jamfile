@@ -56,5 +56,6 @@ SubInclude TOP data posteffects ;
 SubInclude TOP data renderlayers ;
 SubInclude TOP data shader ;
 SubInclude TOP data shader-old ;
+SubInclude TOP data shader-snippets ;
 SubInclude TOP data varia ;
 SubInclude TOP data viewmesh ;

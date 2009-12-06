@@ -20,7 +20,7 @@
   <technique priority="150">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader/snippets/primaryColor.inp" />
+    <input file="/shader-snippets/primaryColor.inp" />
     <input name="color_dir1" type="rgb" default="complex" private="yes">
       <block location="pass">
 	<buffer source="lit color dir 1" destination="vertexIn.color_dir1" />
@@ -229,7 +229,7 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader/snippets/primaryColor.inp" />
+    <input file="/shader-snippets/primaryColor.inp" />
     
     <input name="ambient" type="rgb" default="complex">
       <block location="cg:variablemap">

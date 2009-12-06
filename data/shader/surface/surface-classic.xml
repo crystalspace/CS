@@ -20,7 +20,7 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader/snippets/texCoord.inp"	
+    <input file="/shader-snippets/texCoord.inp"	
       condition='vars."tex diffuse".texture' />
     
     <input name="texDiffuse" type="tex2d" default="complex"

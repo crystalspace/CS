@@ -971,20 +971,30 @@ bool csColliderActor::AdjustForCollisions (
   // Only set to true when we have hit something.
   onground = false;
 
+    // Extra test values for numerical inaccuracies when testing whether a
+    // triangle is inward facing.
+  csVector3 testVel(localvel);
+  csVector3 testVel2(localvel);
+  if(testVel.y == 0.0f)
+  {
+    testVel.y = -0.1f;
+    testVel2.y = 0.1f;
+  }
 
   // Counter == 0, try to jump to highest flat surface, if not then slide on legs and body
-  // Counter == 1, jump succeeded so now do the sliding
+  // Counter == 1, slightly move up to account for map bugs
+  // Counter == 2, jump succeeded so now do the sliding
   do
   {
-
     // Travel all relevant sectors and do collision detection.
     our_cd_contact.Empty ();
     cdsys->SetOneHitOnly (false);
     cdsys->ResetCollisionPairs ();
+    onground = false;
 
     // Perform collision testing to minimise hits
 #ifdef COLLDEBUG
-    printf("Enter at %g %g %g\n", newpos.x, newpos.y, newpos.z);
+    printf("\nEnter at %g %g %g localvel %g %g %g\n", newpos.x, newpos.y, newpos.z, localvel.x, localvel.y, localvel.z);
 #endif
     if (cd)
     {
@@ -1009,23 +1019,16 @@ bool csColliderActor::AdjustForCollisions (
     float jumpY = newpos.y + bottomSize.y;
     // The maximum Y position that we have found so far.
     float max_y = -1e9;
-    // On the second pass disable jumping since we have already jumped.
+    // On the second pass account for map irregularities by allowing a slightly higher jump that ignores the normal vector.
     if(counter == 1)
+      jumpY = newpos.y + bottomSize.y * 0.57;
+    if(counter == 2) // Disable jumping
       jumpY = newpos.y;
 
 #ifdef COLLDEBUG
-    printf("JumpY: %g\n", jumpY);
+    printf("Pass %d JumpY: %g\n", counter, jumpY);
     printf("localvel %g %g %g\n", localvel.x, localvel.y, localvel.z);
 #endif
-    // Extra test values for numerical inaccuracies when testing whether a
-    // triangle is inward facing.
-    csVector3 testVel(localvel);
-    csVector3 testVel2(localvel);
-    if(testVel.y == 0)
-    {
-      testVel.y = -0.1f;
-      testVel2.y = 0.1f;
-    }
     for (i = 0; i < our_cd_contact.GetSize () ; i++ )
     {
       csCollisionPair& cd = our_cd_contact[i];
@@ -1048,15 +1051,22 @@ bool csColliderActor::AdjustForCollisions (
       // Check, have we collided against an 'inner' face
       if (normal * testVel > 0 && normal * testVel2 > 0)
         continue;
-
-      // Walkable surfaces should have normal Y > 0.55 (fairly arbitrary value)
-      // TODO: Needs to be settable
-      if(fabs(unit.y) >= 0.55 && (line[0].y <= jumpY || line[1].y <= jumpY))
+      // If jumping up or down ignore feet collisions.
+      if(counter == 0 && (testVel.y > 0 || testVel2.y < 0) && line[0].y <= newpos.y + 0.01f && line[1].y <= newpos.y + 0.01f)
       {
-        onground = true;
+	continue;
+      }
+
+      // Walkable surfaces should have normal Y > 0.7 (fairly arbitrary value)
+      // TODO: Needs to be settable
+      if((fabs(unit.y) >= 0.7f && (line[0].y <= jumpY || line[1].y <= jumpY)) || (counter == 1 && line[0].y <= jumpY && line[1].y <= jumpY))
+      {
+	if(fabs(unit.y) >= 0.7f)
+          onground = true;
         // This is a ground triangle so we can move on top of it
         max_y = MIN(MAX(MAX(line[0].y, line[1].y),max_y), jumpY);
       }
+      
 
       // No sliding forces from ground-like surfaces if we are testing against legs
 
@@ -1094,11 +1104,11 @@ bool csColliderActor::AdjustForCollisions (
     if(bounced && counter == 0)
     {
       // printf("Initial best bounce: %g %g %g\n", bestBounce.x, bestBounce.y, bestBounce.z);
-      newpos_nojump = oldpos + localvel - 1.1 * bestBounce;
+      newpos_nojump = oldpos + localvel - 1.1f * bestBounce;
     }
     // Always consider the possibility of a step up or jump if possible, the failsafe
     // position will take care of the other possibility.
-    if(counter == 0 && onground)
+    if(counter < 2 && onground)
     {
       localvel.y = max_y - oldpos.y;
 #ifdef COLLDEBUG
@@ -1107,17 +1117,17 @@ bool csColliderActor::AdjustForCollisions (
     }
     else
       // If no jump then skip second pass.
-      counter = 1;
+      counter = 2;
 
 
     // Apply the reaction force here.
-    if(counter == 1 && bounced && bestBounce.Norm() < localvel.Norm()){
+    if(counter == 2 && bounced && bestBounce.Norm() < localvel.Norm()){
 #ifdef COLLDEBUG
       printf("best bounce: %g %g %g, %g\n", bestBounce.x, bestBounce.y, bestBounce.z, acos((bestBounce * localvel)/(bestBounce.Norm()*localvel.Norm()))*180/M_PI);
       printf("new angle: %g, angle against bounce: %g\n", acos((localvel - bestBounce)*localvel/(localvel.Norm()*(localvel - bestBounce).Norm()))*180/M_PI, acos((localvel - bestBounce)*bestBounce/(bestBounce.Norm()*(localvel - bestBounce).Norm()))*180/M_PI);
 #endif
       // 1.1 multiplier for numerical errors.
-      localvel = localvel - 1.1 * bestBounce;
+      localvel = localvel - 1.1f * bestBounce;
     }
 
     newpos = oldpos + localvel;
@@ -1125,10 +1135,13 @@ bool csColliderActor::AdjustForCollisions (
 
     counter++;
 
-  } while (counter < 2);
+  } while (counter < 3);
 
   //newpos = maxmove + localvel;
   newpos = oldpos + localvel;
+#ifdef COLLDEBUG
+  printf("Final Y: %g\n", newpos.y);
+#endif
 
   our_cd_contact.Empty ();
 
@@ -1157,8 +1170,8 @@ bool csColliderActor::AdjustForCollisions (
     cd = 0;
 
   hits = 0;
-  csVector3 testVel(newpos - oldpos);
-  csVector3 testVel2(testVel);
+  //testVel = newpos - oldpos;
+  //testVel2 = testVel;
   if(testVel.y == 0)
   {
     testVel2.y = 0.1f;
@@ -1213,7 +1226,7 @@ bool csColliderActor::AdjustForCollisions (
     testVel2 = testVel;
     if(testVel.y == 0)
     {
-      testVel2.y = -0.1f;
+      testVel2.y = 0.1f;
       testVel.y = -0.1f;
     }
     for (i = 0; i < our_cd_contact.GetSize () ; i++ )
@@ -1223,7 +1236,7 @@ bool csColliderActor::AdjustForCollisions (
       csVector3 normal = obstacle.Normal ();
       float norm = normal.Norm ();
       if (fabs (norm) < SMALL_EPSILON) continue;
-      if (normal * testVel > 0) continue;
+      //if (normal * testVel > 0) continue;
       csVector3 line[2];
       if(!FindIntersection (cd,line))  continue;
       line[0].y += shift.y;
@@ -1354,6 +1367,9 @@ bool csColliderActor::MoveV (float delta,
   csVector3 oldpos (fulltransf.GetOrigin ());
   csVector3 newpos (worldVel*delta + oldpos);
 
+#ifdef COLLDEBUG
+  printf("WorldVel: %g\n", worldVel.y);
+#endif
   // Check for collisions and adjust position
   if (!AdjustForCollisions (oldpos, newpos, worldVel, delta))
   {
@@ -1439,6 +1455,9 @@ bool csColliderActor::MoveV (float delta,
   if (!onground)
   {
     // gravity! move down!
+#ifdef COLLDEBUG
+    printf("Applying gravity: velY: %g.\n", velWorld.y);
+#endif
     velWorld.y  -= gravity * delta;
     /*
      * Terminal velocity

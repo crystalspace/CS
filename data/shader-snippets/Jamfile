@@ -1,0 +1,15 @@
+SubDir TOP data shader-snippets ;
+
+rule InstallShaderSnippet
+{
+  InstallData $(1) : data shader-snippets $(2) ;
+}
+rule FilelistEntryShaderSnippet
+{
+  local file_gristed = $(1:G=$(2:J=!)) ;
+  FileListEntriesData $(file_gristed) : shader-snippets $(2) : data-runtime ;
+}
+
+SHADER_DATA_MASK = .afp .avp .fvp .xml .cgfp .cgvp .inp .cginc .inc .block ;
+Recurse InstallShaderSnippet : $(SHADER_DATA_MASK) ;
+Recurse FilelistEntryShaderSnippet : $(SHADER_DATA_MASK) ;

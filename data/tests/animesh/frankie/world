@@ -1,0 +1,19 @@
+<world>
+
+	<library>/lib/frankie/frankie.xml</library>
+  
+	<sector name="room">
+	
+		<meshobj name="Frankie">
+      <plugin>crystalspace.mesh.loader.animesh</plugin> <!--TODO: why can't you use 'animesh' here? As it is defined in the library. -->
+      <params>
+        <factory>franky_frankie</factory>
+      </params>
+      <zuse/>
+      <move>
+        <v x="0" y="0" z="0"/>
+      </move>
+    </meshobj>
+    
+	</sector>
+</world>

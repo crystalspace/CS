@@ -1,0 +1,1 @@
+Simple cube with white material.

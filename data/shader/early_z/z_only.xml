@@ -27,8 +27,8 @@
       </mixmode>
       <writemask r="false" g="false" b="false" a="false" />
 
-      <snippet id="position" file="/shader/snippets/position.xml" />
-      <snippet id="rgbaout" file="/shader/snippets/shadow/fragment-depth.xml" />
+      <snippet id="position" file="/shader-snippets/position.xml" />
+      <snippet id="rgbaout" file="/shader-snippets/shadow/fragment-depth.xml" />
     </pass>
   </technique>
 </shader>

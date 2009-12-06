@@ -23,14 +23,14 @@
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
       <!-- Snippets - the building blocks of this shader. -->
-      <snippet id="position" file="/shader/snippets/position.xml" />
-      <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="surface" file="/shader/snippets/surface/surface-modulate.xml" />
-      <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
+      <snippet id="position" file="/shader-snippets/position.xml" />
+      <snippet id="parallax" file="/shader-snippets/surface/parallax.xml" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="surface" file="/shader-snippets/surface/surface-modulate.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
-      <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
-      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
+      <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other
            snippets (ie the "data flow" is modeled). The exact resolution of
 	   what output is linked to what input is done automatically. -->

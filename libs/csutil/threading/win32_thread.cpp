@@ -137,7 +137,7 @@ namespace Implementation
       startupBarrier->Wait ();
       
       // Set the name, for debugging
-      SetThreadName (-1, runnable->GetName ());
+      SetThreadName ((DWORD)-1, runnable->GetName ());
 
       // Run      
       runnable->Run ();
