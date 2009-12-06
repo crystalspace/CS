@@ -263,7 +263,7 @@ bool csShaderGLCGFP::TryCompile (uint loadFlags,
 	unusedParams.Add (testForUnused[i]);
       bool compileSucceeded = DefaultLoadProgram (0, programStr, progFP, 
 	limits, 
-	/*loadIgnoreErrors | */(loadFlags & loadIgnoreConfigProgramOpts));
+	loadIgnoreErrors | (loadFlags & loadIgnoreConfigProgramOpts));
 	
       if (compileSucceeded)
       {

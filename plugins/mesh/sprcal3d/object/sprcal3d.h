@@ -419,6 +419,7 @@ private:
   float idle_override_interval;
   int   idle_action;
   float cyclic_blend_factor;
+  csRandomGen randomGen;
 
   csRef<csCal3dSkeleton> skeleton;
 

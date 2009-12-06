@@ -3495,7 +3495,10 @@ SWIGINTERN PyObject *_wrap_iCEGUI_CreateTexture(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iCEGUI_CreateTexture" "', argument " "2"" of type '" "iTextureHandle *""'"); 
   }
   arg2 = reinterpret_cast< iTextureHandle * >(argp2);
-  result = (CEGUI::Texture *)(arg1)->CreateTexture(arg2);
+  {
+    CEGUI::Texture &_result_ref = (arg1)->CreateTexture(arg2);
+    result = (CEGUI::Texture *) &_result_ref;
+  }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CEGUI__Texture, 0 |  0 );
   return resultobj;
 fail:

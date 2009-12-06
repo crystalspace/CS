@@ -61,10 +61,14 @@ VFS.Mount.lib/kwartz   = $(CS_DATADIR)$/kwartz.zip
 VFS.Mount.lib/frankie  = $(CS_DATADIR)$/frankie$/
 VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 
+; General CEGUI data
+VFS.Mount.cegui  			= $@(CS_DATADIR)$/cegui$/
 ; CEgui test
-VFS.Mount.ceguitest  = $(CS_DATADIR)$/ceguitest$/
+VFS.Mount.ceguitest  	= $@(CS_DATADIR)$/ceguitest$/
 ; Viewmesh
-VFS.Mount.viewmesh   = $@data$/viewmesh$/
+VFS.Mount.viewmesh   	= $@(CS_DATADIR)$/viewmesh$/
+; Simpvs
+VFS.Mount.simpvs   		= $@(CS_DATADIR)$/simpvs$/
 
 ; Mount for unittest
 VFS.Mount.lev/unittest = $(CS_DATADIR)$/unittest$/

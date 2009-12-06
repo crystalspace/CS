@@ -172,7 +172,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	progress->SetProgressDescription (
 	  "crystalspace.graphics3d.shadercompiler.weaver.synth",
 	  "Generating %zu techniques", synthTechs.GetSize());
-	progress->SetTotal (synthTechs.GetSize());
+	progress->SetTotal (int (synthTechs.GetSize()));
       }
       for (size_t t = 0; t < synthTechs.GetSize(); t++)
       {

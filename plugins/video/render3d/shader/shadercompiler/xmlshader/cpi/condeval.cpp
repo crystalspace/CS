@@ -1747,14 +1747,14 @@ bool ConditionsWriter::WriteCondOperand (iFile* cacheFile,
         if (operand.svLocation.indices != 0)
         {
           size_t numInd = *operand.svLocation.indices;
-          uint32 numIndLE = csLittleEndian::UInt32 (numInd);
+          uint32 numIndLE = csLittleEndian::UInt32 (uint32 (numInd));
 	  if (cacheFile->Write ((char*)&numIndLE, sizeof (numIndLE))
 	      != sizeof (numIndLE))
 	    return false;
 	  for (size_t i = 0; i < numInd; i++)
 	  {
 	   size_t ind = operand.svLocation.indices[i+1];
-	    uint32 indLE = csLittleEndian::UInt32 (ind);
+	    uint32 indLE = csLittleEndian::UInt32 (uint32 (ind));
 	    if (cacheFile->Write ((char*)&indLE, sizeof (indLE))
 		!= sizeof (indLE))
 	      return false;
@@ -1805,7 +1805,7 @@ csPtr<iDataBuffer> ConditionsWriter::GetPersistentData ()
 
 ConditionsReader::ConditionsReader (csConditionEvaluator& evaluator,
                                     iDataBuffer* src)
- : evaluator (evaluator)
+ : status (false), evaluator (evaluator)
 {
   diskIDToCond.Put ((uint32)csCondAlwaysFalse, csCondAlwaysFalse);
   diskIDToCond.Put ((uint32)csCondAlwaysTrue, csCondAlwaysTrue);
@@ -1832,6 +1832,8 @@ ConditionsReader::ConditionsReader (csConditionEvaluator& evaluator,
   }
   
   stringStore.EndUse();
+
+  status = true;
 }
 
 ConditionsReader::~ConditionsReader ()
@@ -1947,7 +1949,9 @@ bool ConditionsReader::ReadCondOperand (iFile* cacheFile,
       }
       break;
     default:
-      CS_ASSERT(false);
+      /* This should _not_ occur ... but does in case of corrupted 
+         files - source of corruption unclear :/ */
+      return false;
   }
   return false;
 }

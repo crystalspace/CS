@@ -43,6 +43,7 @@ struct iMeshGenerator;
 struct iMeshList;
 struct iLightList;
 struct iLight;
+struct iPortal;
 struct iVisibilityCuller;
 
 struct iObject;
@@ -206,7 +207,7 @@ struct csSectorVisibleRenderMeshes
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,4,0,0);
+  SCF_INTERFACE(iSector,4,1,0);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -439,7 +440,9 @@ struct iSector : public virtual iBase
    * collision detection system to test with walls.
    */
   virtual iSector* FollowSegment (csReversibleTransform& t,
-    csVector3& new_position, bool& mirror, bool only_portals = false) = 0;
+      csVector3& new_position, bool& mirror, bool only_portals = false,
+      iPortal** transversed_portals = 0, iMeshWrapper** portal_meshes = 0,
+      int firstIndex = 0, int* lastIndex = 0) = 0;
   /** @} */
 
   /**\name Sector callbacks

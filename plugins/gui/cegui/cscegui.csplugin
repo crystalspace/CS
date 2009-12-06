@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.cegui.wrapper</name>
-        <implementation>csCEGUIRenderer</implementation>
+        <implementation>Renderer</implementation>
         <description>Crystal Space CEGUI Wrapper</description>
         <requires>
           <class>crystalspace.graphics3d.</class>

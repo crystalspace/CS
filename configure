@@ -62930,7 +62930,7 @@ int
 main ()
 {
 CEGUI::WidgetLookManager::getSingleton();
-	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
+	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 7)
 	    who took the ram from the ramalamadingdong?
 	    #endif
 
@@ -63091,7 +63091,7 @@ int
 main ()
 {
 CEGUI::WidgetLookManager::getSingleton();
-	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
+	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 7)
 	    who took the ram from the ramalamadingdong?
 	    #endif
 

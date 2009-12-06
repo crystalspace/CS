@@ -443,6 +443,7 @@ bool ProctexPDLight::PrepareAnim ()
     if (light.light)
     {
       success = true;
+      light.light->SetLightCallback(this);
       dirtyLights.Add ((iLight*)light.light);
 
       LightColorState colorState;
@@ -496,6 +497,38 @@ void ProctexPDLight::Animate (csTicks current_time)
 
     csTicks endTime = csGetTicks();
     loader->RecordUpdateTime (endTime-startTime);
+  }
+}
+
+void ProctexPDLight::OnColorChange (iLight* light, const csColor& newcolor)
+{
+  dirtyLights.Add (light);
+  const LightColorState& colorState = *lightColorStates.GetElementPointer (light);
+  /* When the light color difference to the value last used at updating
+     is below the amount needed for a visible difference an update of the
+     texture because of this light isn't needed. */
+  if ((fabsf (colorState.lastColor.red - newcolor.red) 
+      >= colorState.minChangeThresh.red)
+    || (fabsf (colorState.lastColor.green - newcolor.green) 
+      >= colorState.minChangeThresh.green)
+    || (fabsf (colorState.lastColor.blue - newcolor.blue) 
+      >= colorState.minChangeThresh.blue))
+    state.Set (stateDirty); 
+}
+
+void ProctexPDLight::OnDestroy (iLight* light)
+{
+  for (size_t i = 0; i < lights.GetSize(); i++)
+  {
+    if (lights[i].light == light)
+    {
+      lights.DeleteIndexFast (i);
+      lightColorStates.DeleteAll (light);
+      state.Set (stateDirty);
+      dirtyLights.Add (light);
+      lightBits.SetSize (lights.GetSize ());
+      return;
+    }
   }
 }
 

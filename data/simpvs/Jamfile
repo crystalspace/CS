@@ -1,0 +1,4 @@
+SubDir TOP data simpvs ;
+
+InstallData [ Wildcard *.layout ] : data simpvs ;
+FileListEntriesData [ Wildcard *.layout ] : simpvs : data-tool ;
