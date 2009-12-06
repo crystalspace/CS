@@ -293,6 +293,15 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="noArbColorBufferFloat">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_color_buffer_float>no</GL_ARB_color_buffer_float>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
     <config name="nofbo">
       <Video>
 	<OpenGL>
@@ -870,6 +879,21 @@
       </conditions>
       <applicable>
 	<usecfg>novp40</usecfg>
+      </applicable>
+    </rule>
+    <!--
+     * 2009-11-20: Mac OS X does not support ARB_color_buffer_float.
+                   Even though this is advertised by the driver, if the
+		   extension is enabled, the app will crash in the OpenGL profiler.
+		   Additional info from http://lists.apple.com/archives/mac-opengl//2008/Jul/msg00060.html
+                   Driver version 2.1 NVIDIA-1.6.6. Tested on 10.6.2.
+     -->
+    <rule description="OSX: Broken ARB_color_buffer_float implementation">
+      <conditions fulfill="all">
+	<regexp string="platform" pattern="MacOS/X" />
+      </conditions>
+      <applicable>
+	<usecfg>noArbColorBufferFloat</usecfg>
       </applicable>
     </rule>
   </rules>

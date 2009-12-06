@@ -514,8 +514,8 @@ csEngine::csEngine (iBase *iParent) :
   sectors (this), textures (new csTextureList (this)), 
   materials (new csMaterialList), sharedVariables (new csSharedVariableList),
   renderLoopManager (0), topLevelClipper (0), resize (false),
-  worldSaveable (false), maxAspectRatio (0), nextframePending (0),
-  currentFrameNumber (0), 
+  worldSaveable (false), defaultKeepImage (false), maxAspectRatio (0),
+  nextframePending (0), currentFrameNumber (0), 
   clearZBuf (false), defaultClearZBuf (false), 
   clearScreen (false),  defaultClearScreen (false), 
   currentRenderContext (0), weakEventHandler(0)

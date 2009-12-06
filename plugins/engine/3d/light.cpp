@@ -46,8 +46,8 @@ csLight::csLight (csEngine* engine,
   csLightDynamicType dyntype) :
     scfImplementationType (this), light_id (0),
     userSpecular (false), halo (0), dynamicType (dyntype), 
-    cutoffDistance (d), directionalCutoffRadius (d), 
-    userDirectionalCutoffRadius (false),
+    type (CS_LIGHT_POINTLIGHT), cutoffDistance (d),
+    directionalCutoffRadius (d), userDirectionalCutoffRadius (false),
     lightnr (0), removingLight (false), engine (engine)
 {
   //movable.scfParent = (iBase*)(csObject*)this; //@@MS: Look at this?
@@ -56,7 +56,6 @@ csLight::csLight (csEngine* engine,
   // Call setters explicitly since they also set SVs
   csLight::SetCenter (csVector3 (x,y,z));
   csLight::SetColor (csColor (red, green, blue));
-  csLight::SetType (CS_LIGHT_POINTLIGHT);
   csLight::SetAttenuationMode (CS_ATTN_LINEAR);
   csLight::SetSpotLightFalloff (1, 0);
 

@@ -124,7 +124,7 @@ struct csKeyMap
 struct csMapToLoad
 {
   /// The startup directory on VFS with needed map file
-  char* map_dir;
+  csString map_name;
   csMapToLoad* next_map;
 };
 
@@ -359,7 +359,7 @@ public:
   /**
    * Set the current VFS dir to the given map directory.
    */
-  bool SetMapDir (const char* map_dir);
+  bool SetMapDir (const char* map_dir, csString& map_file);
 
   /// Draw the frame.
   void SetupFrame ();

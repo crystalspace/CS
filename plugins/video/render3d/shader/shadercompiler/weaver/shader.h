@@ -143,9 +143,10 @@ public:
     return realShader->GetMetadata ();
   }
 
-  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits, 
+				  uint userFlags) const
   {
-    realShader->GetUsedShaderVars (ticket, bits);
+    realShader->GetUsedShaderVars (ticket, bits, userFlags);
   }
   
   void PushShaderVariables (csShaderVariableStack& s, size_t t) const

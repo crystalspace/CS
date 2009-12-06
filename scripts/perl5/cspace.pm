@@ -2085,7 +2085,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *ChDir = *cspacec::iVFS_ChDir;
 *GetCwd = *cspacec::iVFS_GetCwd;
-*SetSyncDir = *cspacec::iVFS_SetSyncDir;
 *PushDir = *cspacec::iVFS_PushDir;
 *PopDir = *cspacec::iVFS_PopDir;
 *ExpandPath = *cspacec::iVFS_ExpandPath;
@@ -4318,6 +4317,366 @@ sub DESTROY {
     }
 }
 
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csEventHandlerRegistry ##############
+
+package cspace::csEventHandlerRegistry;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csEventHandlerRegistry(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csEventHandlerRegistry($self);
+        delete $OWNER{$self};
+    }
+}
+
+*GetGenericID = *cspacec::csEventHandlerRegistry_GetGenericID;
+*GetGenericPreBoundID = *cspacec::csEventHandlerRegistry_GetGenericPreBoundID;
+*GetGenericPostBoundID = *cspacec::csEventHandlerRegistry_GetGenericPostBoundID;
+*RegisterID = *cspacec::csEventHandlerRegistry_RegisterID;
+*GetID = *cspacec::csEventHandlerRegistry_GetID;
+*ReleaseID = *cspacec::csEventHandlerRegistry_ReleaseID;
+*GetHandler = *cspacec::csEventHandlerRegistry_GetHandler;
+*IsInstanceOf = *cspacec::csEventHandlerRegistry_IsInstanceOf;
+*IsInstance = *cspacec::csEventHandlerRegistry_IsInstance;
+*GetGeneric = *cspacec::csEventHandlerRegistry_GetGeneric;
+*GetString = *cspacec::csEventHandlerRegistry_GetString;
+*GetRegistry = *cspacec::csEventHandlerRegistry_GetRegistry;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iFrameEventSignpost ##############
+
+package cspace::iFrameEventSignpost;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iEventHandler cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iFrameEventSignpost($self);
+        delete $OWNER{$self};
+    }
+}
+
+*InstancePrec = *cspacec::iFrameEventSignpost_InstancePrec;
+*InstanceSucc = *cspacec::iFrameEventSignpost_InstanceSucc;
+*HandleEvent = *cspacec::iFrameEventSignpost_HandleEvent;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::FrameSignpost_Logic3D ##############
+
+package cspace::FrameSignpost_Logic3D;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*StaticHandlerName = *cspacec::FrameSignpost_Logic3D_StaticHandlerName;
+*StaticID = *cspacec::FrameSignpost_Logic3D_StaticID;
+*GenericName = *cspacec::FrameSignpost_Logic3D_GenericName;
+*GenericID = *cspacec::FrameSignpost_Logic3D_GenericID;
+*GenericPrec = *cspacec::FrameSignpost_Logic3D_GenericPrec;
+*GenericSucc = *cspacec::FrameSignpost_Logic3D_GenericSucc;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_FrameSignpost_Logic3D($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::FrameSignpost_3D2D ##############
+
+package cspace::FrameSignpost_3D2D;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*StaticHandlerName = *cspacec::FrameSignpost_3D2D_StaticHandlerName;
+*StaticID = *cspacec::FrameSignpost_3D2D_StaticID;
+*GenericName = *cspacec::FrameSignpost_3D2D_GenericName;
+*GenericID = *cspacec::FrameSignpost_3D2D_GenericID;
+*GenericPrec = *cspacec::FrameSignpost_3D2D_GenericPrec;
+*GenericSucc = *cspacec::FrameSignpost_3D2D_GenericSucc;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_FrameSignpost_3D2D($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::FrameSignpost_2DConsole ##############
+
+package cspace::FrameSignpost_2DConsole;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*StaticHandlerName = *cspacec::FrameSignpost_2DConsole_StaticHandlerName;
+*StaticID = *cspacec::FrameSignpost_2DConsole_StaticID;
+*GenericName = *cspacec::FrameSignpost_2DConsole_GenericName;
+*GenericID = *cspacec::FrameSignpost_2DConsole_GenericID;
+*GenericPrec = *cspacec::FrameSignpost_2DConsole_GenericPrec;
+*GenericSucc = *cspacec::FrameSignpost_2DConsole_GenericSucc;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_FrameSignpost_2DConsole($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::FrameSignpost_ConsoleDebug ##############
+
+package cspace::FrameSignpost_ConsoleDebug;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*StaticHandlerName = *cspacec::FrameSignpost_ConsoleDebug_StaticHandlerName;
+*StaticID = *cspacec::FrameSignpost_ConsoleDebug_StaticID;
+*GenericName = *cspacec::FrameSignpost_ConsoleDebug_GenericName;
+*GenericID = *cspacec::FrameSignpost_ConsoleDebug_GenericID;
+*GenericPrec = *cspacec::FrameSignpost_ConsoleDebug_GenericPrec;
+*GenericSucc = *cspacec::FrameSignpost_ConsoleDebug_GenericSucc;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_FrameSignpost_ConsoleDebug($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::FrameSignpost_DebugFrame ##############
+
+package cspace::FrameSignpost_DebugFrame;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*StaticHandlerName = *cspacec::FrameSignpost_DebugFrame_StaticHandlerName;
+*StaticID = *cspacec::FrameSignpost_DebugFrame_StaticID;
+*GenericName = *cspacec::FrameSignpost_DebugFrame_GenericName;
+*GenericID = *cspacec::FrameSignpost_DebugFrame_GenericID;
+*GenericPrec = *cspacec::FrameSignpost_DebugFrame_GenericPrec;
+*GenericSucc = *cspacec::FrameSignpost_DebugFrame_GenericSucc;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_FrameSignpost_DebugFrame($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::FrameBegin3DDraw ##############
+
+package cspace::FrameBegin3DDraw;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_FrameBegin3DDraw(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_FrameBegin3DDraw($self);
+        delete $OWNER{$self};
+    }
+}
+
+*HandleEvent = *cspacec::FrameBegin3DDraw_HandleEvent;
+*StaticHandlerName = *cspacec::FrameBegin3DDraw_StaticHandlerName;
+*StaticID = *cspacec::FrameBegin3DDraw_StaticID;
+*GenericName = *cspacec::FrameBegin3DDraw_GenericName;
+*GenericID = *cspacec::FrameBegin3DDraw_GenericID;
+*InstancePrec = *cspacec::FrameBegin3DDraw_InstancePrec;
+*InstanceSucc = *cspacec::FrameBegin3DDraw_InstanceSucc;
+*GenericPrec = *cspacec::FrameBegin3DDraw_GenericPrec;
+*GenericSucc = *cspacec::FrameBegin3DDraw_GenericSucc;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::FramePrinter ##############
+
+package cspace::FramePrinter;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_FramePrinter(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_FramePrinter($self);
+        delete $OWNER{$self};
+    }
+}
+
+*HandleEvent = *cspacec::FramePrinter_HandleEvent;
+*StaticHandlerName = *cspacec::FramePrinter_StaticHandlerName;
+*StaticID = *cspacec::FramePrinter_StaticID;
+*GenericName = *cspacec::FramePrinter_GenericName;
+*GenericID = *cspacec::FramePrinter_GenericID;
+*InstancePrec = *cspacec::FramePrinter_InstancePrec;
+*InstanceSucc = *cspacec::FramePrinter_InstanceSucc;
+*GenericPrec = *cspacec::FramePrinter_GenericPrec;
+*GenericSucc = *cspacec::FramePrinter_GenericSucc;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -10513,6 +10872,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetupPass = *cspacec::iShader_SetupPass;
 *TeardownPass = *cspacec::iShader_TeardownPass;
 *DeactivatePass = *cspacec::iShader_DeactivatePass;
+*svuTextures = *cspacec::iShader_svuTextures;
+*svuBuffers = *cspacec::iShader_svuBuffers;
+*svuVProc = *cspacec::iShader_svuVProc;
+*svuVP = *cspacec::iShader_svuVP;
+*svuFP = *cspacec::iShader_svuFP;
+*svuAll = *cspacec::iShader_svuAll;
 *GetUsedShaderVars = *cspacec::iShader_GetUsedShaderVars;
 *GetMetadata = *cspacec::iShader_GetMetadata;
 *PushShaderVariables = *cspacec::iShader_PushShaderVariables;

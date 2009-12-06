@@ -44,6 +44,9 @@ namespace CS
       class FramebufferTex_Base
       {
       public:
+	/// Flags to pass for GetUsedShaderVars() for this effect
+	enum { svUserFlags = iShader::svuTextures };
+	
 	/**
 	* Data used by the helper that needs to persist over multiple frames.
 	* Render managers must store an instance of this class and provide
@@ -117,7 +120,7 @@ namespace CS
       * typedef TraverseUsedSVSets<RenderTreeType,
       *   RenderManagerType::AutoFramebufferTexType> SVTraverseType;
       * SVTraverseType svTraverser
-      *   (fxFB, shaderManager->GetSVNameStringset ()->GetSize ());
+      *   (fxFB, shaderManager->GetSVNameStringset ()->GetSize (), fxFB.svUserFlags);
       * // Do the actual traversal.
       * ForEachMeshNode (context, svTraverser);
       * \endcode

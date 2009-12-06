@@ -27,6 +27,7 @@
 
 namespace
 {
+  static CS::Threading::Mutex rgenLock;
   static csRandomGen rgen;
 }
 
@@ -91,7 +92,7 @@ namespace Threading
       if (ts->tsMutex.TryLock ())
       {
         ts->jobQueue.Push (job);
-        CS::Threading::AtomicOperations::Increment (&outstandingJobs);      
+        CS::Threading::AtomicOperations::Increment (&outstandingJobs); 
         ts->tsMutex.Unlock ();
 
         ts->tsNewJob.NotifyAll ();
@@ -119,28 +120,35 @@ namespace Threading
     }
     else if (waitForCompletion)
     {
-      // Check if it is running, then wait
+      // Check if it is running, then wait      
+      ThreadState *ownerTs = 0;
 
-      size_t i;
-      for (i = 0; i < numWorkerThreads; ++i)
+      for (size_t i = 0; i < numWorkerThreads; ++i)
       {
         ThreadState* ts = allThreadState[i];
-        MutexScopedLock l (ts->tsMutex);
+        
+        ts->tsMutex.Lock ();
 
         if (ts->currentJob == job)
         {
+          ownerTs = ts;
           break;
         }
+        ts->tsMutex.Unlock (); // Unlock if not right
       }
 
-      if (i < numWorkerThreads)
+      if (ownerTs)
       {
-        while (allThreadState[i]->currentJob == job)
-        {
-          MutexScopedLock l (finishMutex);
-          jobFinished.Wait (finishMutex);
+        // Always enter here with ownerTs->tsMutex locked!
+        while (ownerTs->currentJob == job)
+        {          
+          ownerTs->tsJobFinished.Wait (ownerTs->tsMutex);
         }
+
+        ownerTs->tsMutex.Unlock (); // Unlock if right
       }
+
+      // All mutex that have been locked are unlocked!
     }
     // Nothing
   }
@@ -149,8 +157,17 @@ namespace Threading
   {   
     while(!IsFinished ())
     {
-      MutexScopedLock l(finishMutex);
-      jobFinished.Wait (finishMutex, 500);
+      for (size_t i = 0; i < numWorkerThreads; ++i)
+      {
+        ThreadState* ts = allThreadState[i];
+
+        MutexScopedLock l (ts->tsMutex);
+        if(ts->currentJob || ts->jobQueue.GetSize() > 0)
+        {
+          // Have a job, wait for it
+          ts->tsJobFinished.Wait (ts->tsMutex);
+        }
+      }
     }
   }
   
@@ -210,11 +227,16 @@ namespace Threading
       }
       
       if (!currentJob)
-      {
-      
+      {        
         // If we couldn't get any job, try to steal. At most try to steal once
         // from each of the other threads
-        for (size_t i = 0, index = rgen.Get ((uint32)ownerQueue->numWorkerThreads); 
+        size_t start;
+        {
+          MutexScopedLock l (rgenLock);
+          start = rgen.Get ((uint32)ownerQueue->numWorkerThreads);
+        }
+
+        for (size_t i = 0, index = start; 
              i < ownerQueue->numWorkerThreads; 
              ++i, index = (index + 1) % ownerQueue->numWorkerThreads
              )
@@ -224,17 +246,17 @@ namespace Threading
             continue;
 
           // Try to lock it, but never wait for a lock
-          if (foreignTS->tsMutex.TryLock ())
+          if (foreignTS->tsMutex.TryLock ()) // Lock foreign object A
           {
             // Get the job
             if (foreignTS->jobQueue.GetSize() > 0)
             {
-              currentJob = foreignTS->jobQueue.PopTop ();
-              foreignTS->tsMutex.Unlock ();
+              currentJob = foreignTS->jobQueue.PopBottom ();
+              foreignTS->tsMutex.Unlock (); // Unlock foreign object A if success
               break;
             }
 
-            foreignTS->tsMutex.Unlock ();
+            foreignTS->tsMutex.Unlock (); // Unlock foreign object A if unsuccessful
           } 
         }
       }
@@ -245,14 +267,17 @@ namespace Threading
 
         // Got one, execute
         threadState->currentJob = currentJob;        
-        threadState->tsMutex.Unlock ();
+        threadState->tsMutex.Unlock (); // Unlock our own TS after getting a job
 
         currentJob->Run ();
-        threadState->currentJob = 0;
-        currentJob = 0;
 
-        MutexScopedLock l (ownerQueue->finishMutex);
-        ownerQueue->jobFinished.NotifyAll ();
+        {
+          MutexScopedLock l (threadState->tsMutex);
+          threadState->currentJob = 0;
+          currentJob = 0;
+        }
+       
+        threadState->tsJobFinished.NotifyAll ();
       }
       else
       {

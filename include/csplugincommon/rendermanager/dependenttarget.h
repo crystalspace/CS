@@ -183,11 +183,16 @@ namespace RenderManager
       const LayerConfigType& layerConfig,
       csSet<typename RenderTree::ContextNode*>& contextsTested)
     {
+      if ((targets.GetSize() + oneTimeTargets.GetSize()) == 0)
+	// Nothing to do (forced textures were already dealt with)
+	return;
+      
       // Setup callbacks for SVs and mesh nodes
       NewTargetFn newTarget (*this, renderTree);
       typedef TraverseUsedSVs<RenderTree, NewTargetFn> MeshTraverseType;
       MeshTraverseType svTraverser
-        (newTarget, shaderManager->GetSVNameStringset ()->GetSize ());
+        (newTarget, shaderManager->GetSVNameStringset ()->GetSize (),
+	 iShader::svuTextures);
 
       // Just traverse each context once
       Implementation::OnceOperationBlockRef<typename RenderTree::ContextNode*> 

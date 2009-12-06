@@ -118,6 +118,8 @@ class ConditionTree
     Node* owner;
     int branch;
     Node* newNode;
+    csConditionID oldCondition;
+    MyBitArrayTemp oldConditionAffectedSVs;
   };
   typedef csArray<CommitNode> CommitArray;
   csArray<CommitArray> commitArrays;
@@ -239,7 +241,11 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	  int containingBranch;
 	  bool hasContainer = HasContainingCondition (node, condition,
 	    containerCondition, containingBranch);
+
+	  CommitNode commitNode;
   
+	  commitNode.oldCondition = node->condition;
+	  commitNode.oldConditionAffectedSVs = node->conditionAffectedSVs;
 	  node->condition = condition;
 	  node->conditionAffectedSVs = affectedSVs;
 	  if (node->parent)
@@ -293,8 +299,6 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	    {
 	      nn->values = (b == bTrue) ? trueVals : falseVals;
 	    }
-	    //node->branches[b] = nn;
-	    CommitNode commitNode;
 	    commitNode.owner = node;
 	    commitNode.branch = b;
 	    commitNode.newNode = nn;
@@ -400,6 +404,12 @@ void ConditionTree::Ascend (int num)
     if (commitArrays.GetSize() > 0)
     {
       CommitArray ca (commitArrays.Pop ());
+      for (size_t n = ca.GetSize(); n-- > 0; )
+      {
+	Node* node = ca[n].owner;
+	node->condition = ca[n].oldCondition;
+	node->conditionAffectedSVs = ca[n].oldConditionAffectedSVs;
+      }
       ClearCommitArray (ca);
     }
   }

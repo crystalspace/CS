@@ -654,8 +654,11 @@ public:
 
   csConditionID GetConditionID (const CondOperation& operation,
     bool get_new = true);
-  const CondOperation& GetCondition (csConditionID condition);
+  CondOperation GetCondition (csConditionID condition);
 };
+
+struct EvaluatorShadervarValues;
+struct EvaluatorShadervarValuesSimple;
 
 /**
  * Processes an expression tree and converts it into an internal 
@@ -665,6 +668,13 @@ class csConditionEvaluator :
   public csRefCount,
   public CS::Memory::CustomAllocated
 {
+  friend struct EvaluatorShadervarValues;
+  friend struct EvaluatorShadervarValuesSimple;
+
+  typedef CS::Threading::Mutex MutexType;
+  typedef CS::Threading::ScopedLock<MutexType> LockType;
+  mutable MutexType mutex;
+
   /// Used to resolve SV names.
   csRef<iShaderVarStringSet> strings;
   
@@ -771,6 +781,27 @@ class csConditionEvaluator :
 
   csString OperandToString (const CondOperand& operand);
   csString OperationToString (const CondOperation& operation);
+
+  /* "Internal" methods - do the same as their non-internal namesakes
+     except they don't lock. Used for internal/recursive calls. */
+  template<typename Evaluator>
+  typename Evaluator::EvalResult EvaluateInternal (Evaluator& eval,
+    csConditionID condition);
+  const char* ProcessExpressionInternal (csExpression* expression, 
+    csConditionID& cond);
+  bool EvaluateCachedInternal (EvaluatorShadervar& eval,
+    csConditionID condition);
+  Logic3 CheckConditionResultsInternal (csConditionID condition,
+    const Variables& vars, Variables& trueVars, Variables& falseVars);
+  Logic3 CheckConditionResultsInternal (csConditionID condition,
+    const Variables& vars);
+  const char* ProcessExpressionInternal (csExpression* expression, 
+    CondOperation& operation);
+  csConditionID FindOptimizedConditionInternal (
+    const CondOperation& operation);
+  bool IsConditionPartOfInternal (csConditionID condition,
+    csConditionID containerCondition);
+  csString GetConditionStringInternal (csConditionID id);
 public:
   template<typename Evaluator>
   typename Evaluator::EvalResult Evaluate (Evaluator& eval, csConditionID condition);
@@ -818,7 +849,11 @@ public:
   void PopEvaluationState();
 
   /// Get number of conditions allocated so far
-  size_t GetNumConditions() { return conditions.GetNumConditions(); }
+  size_t GetNumConditions()
+  { 
+    LockType lock (mutex);
+    return conditions.GetNumConditions(); 
+  }
 
   /*
    * Check whether a condition, given a set of possible values for
@@ -840,8 +875,11 @@ public:
    */
   csConditionID FindOptimizedCondition (const CondOperation& operation);
   
-  const CondOperation& GetCondition (csConditionID condition)
-  { return conditions.GetCondition (condition); }
+  CondOperation GetCondition (csConditionID condition)
+  { 
+    LockType lock (mutex);
+    return conditions.GetCondition (condition);
+  }
 
   /**
    * Test if \c condition is a sub-condition of \c containerCondition 

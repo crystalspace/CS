@@ -57,7 +57,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     bool TeardownPass (size_t ticket);
     bool DeactivatePass (size_t ticket);
   
-    void GetUsedShaderVars (size_t ticket, csBitArray& bits) const;
+    void GetUsedShaderVars (size_t ticket, csBitArray& bits, uint userFlags) const;
     
     const csShaderMetadata& GetMetadata () const;
     void PushShaderVariables (csShaderVariableStack& stack,

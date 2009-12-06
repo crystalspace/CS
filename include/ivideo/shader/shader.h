@@ -492,7 +492,7 @@ struct iShaderPriorityList : public virtual iBase
  */
 struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 4, 0, 1);
+  SCF_INTERFACE(iShader, 5, 0, 0);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -535,6 +535,24 @@ struct iShader : public virtual iShaderVariableContext
 
   /// Completly deactivate a pass
   virtual bool DeactivatePass (size_t ticket) = 0;
+  
+  /// Flags for SV users to be considered by GetUsedShaderVars
+  enum SVUserFlags
+  {
+    /// Used by texture mappings
+    svuTextures = (1 << 0),
+    /// Used by buffer bindings
+    svuBuffers = (1 << 1),
+    /// Used by VProc program
+    svuVProc = (1 << 2),
+    /// Used by vertex program
+    svuVP = (1 << 3),
+    /// Used by fragment program
+    svuFP = (1 << 4),
+    
+    /// All users
+    svuAll = 0xffff
+  };
 
   /**
    * Request all shader variables used by a certain shader ticket.
@@ -547,8 +565,11 @@ struct iShader : public virtual iShaderVariableContext
    *   shader variable string set. Second, bits corresponding to unused
    *   shader variables will not be reset. It is the responsibility of the 
    *   caller to do so.
+   * \param userFlags What users to consider when collecting used SVs.
+   *   Combination of SVUserFlags values.
    */
-  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const = 0;
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits,
+				  uint userFlags = svuAll) const = 0;
   
   /// Get shader metadata
   virtual const csShaderMetadata& GetMetadata () const = 0;
