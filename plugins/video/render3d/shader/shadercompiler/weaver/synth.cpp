@@ -65,6 +65,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
   //-------------------------------------------------------------------------
 
+  void TagNodesHelper::AddNode (iDocumentNode* node)
+  {
+    if (node->GetType() == CS_NODE_ELEMENT)
+    {
+      const char* nodeName = node->GetValue();
+      if (strcmp (nodeName, "tag") != 0) return;
+      const char* tag = node->GetContentsValue ();
+      if (tag && *tag)
+	tags.Add (tag);
+    }
+  }
+
+  void TagNodesHelper::Merge (const TagNodesHelper& other)
+  {
+    csSet<csString>::GlobalIterator it (other.tags.GetIterator());
+    while (it.HasNext())
+    {
+      const csString& tag (it.Next());
+      tags.Add (tag);
+    }
+  }
+
+  void TagNodesHelper::AddToNode (iDocumentNode* node, iDocumentNode* before)
+  {
+    csSet<csString>::GlobalIterator it (tags.GetIterator());
+    while (it.HasNext())
+    {
+      const csString& tag (it.Next());
+      csRef<iDocumentNode> newNode = node->CreateNodeBefore (CS_NODE_ELEMENT,
+	before);
+      newNode->SetValue ("tag");
+      csRef<iDocumentNode> newNodeContent =
+	newNode->CreateNodeBefore (CS_NODE_TEXT);
+      newNodeContent->SetValue (tag);
+    }
+  }
+    
+  //-------------------------------------------------------------------------
+
   Synthesizer::Synthesizer (WeaverCompiler* compiler, 
                             const char* shaderName,
                             const csArray<DocNodeArray>& prePassNodes,
@@ -214,7 +253,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         }
       
         csSet<csString> techConditions;
+	TagNodesHelper techTags;
 	bool aPassSucceeded = false;
+	csRef<iDocumentNode> firstTechNode;
 	for (size_t p = 0; p < synthTechs[t].GetSize(); p++)
 	{
 	  size_t g = graphIndices[t].Get (p);
@@ -225,6 +266,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    csRef<iDocumentNode> newNode =
 	      techniqueNode->CreateNodeBefore (copyFrom->GetType());
 	    CS::DocSystem::CloneNode (copyFrom, newNode);
+	    if (!firstTechNode.IsValid()) firstTechNode = newNode;
 	  }
 	  
 	  Snippet* snippet = outerSnippets[g];
@@ -233,6 +275,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	  passNode->SetValue ("pass");
 	  CS::DocSystem::CloneAttributes (snippet->GetSourceNode(), passNode);
+	  if (!firstTechNode.IsValid()) firstTechNode = passNode;
 	  
 	  csRefArray<iDocumentNode> passForwardedNodes =
 	    snippet->GetPassForwardedNodes();
@@ -260,6 +303,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    const char* techCond = synthTech->GetTechniqueConditions();
 	    if (techCond && *techCond)
 	     techConditions.Add (techCond);
+	    techTags.Merge (synthTech->GetTags());
 	  }
 	}
 	if (!aPassSucceeded)
@@ -298,6 +342,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      shaderNode->CreateNodeBefore (CS_NODE_UNKNOWN));
 	    condNode->SetValue ("?endif?");
 	  }
+	  techTags.AddToNode (techniqueNode, firstTechNode);
 	}
 	
 	if (progress) progress->Step (1);
@@ -309,7 +354,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* errorNode,
     const Snippet* snippet, const TechniqueGraph& techGraph)
   {
-    defaultCombiner.AttachNew (new CombinerDefault (compiler, shaderVarNodes));
+    defaultCombiner.AttachNew (new CombinerDefault (compiler, shaderVarNodes, tags));
 
     TechniqueGraph graph (techGraph);
     /*

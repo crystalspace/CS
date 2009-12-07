@@ -31,9 +31,11 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
   CombinerDefault::CombinerDefault (const WeaverCompiler* compiler,
-                                    ShaderVarNodesHelper& shaderVarNodes) : 
+                                    ShaderVarNodesHelper& shaderVarNodes,
+				    TagNodesHelper& tagNodes) : 
     scfImplementationType (this), compiler (compiler),
-    xmltokens (compiler->xmltokens), shaderVarNodes (shaderVarNodes)
+    xmltokens (compiler->xmltokens), shaderVarNodes (shaderVarNodes),
+    tagNodes (tagNodes)
   {
   }
   
@@ -69,6 +71,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         csRef<iDocumentNode> child = nodes->Next();
         shaderVarNodes.AddNode (child);
+      }
+    }
+    else if (strcmp (location, "tags") == 0)
+    {
+      csRef<iDocumentNodeIterator> nodes = blockNode->GetNodes();
+      while (nodes->HasNext())
+      {
+        csRef<iDocumentNode> child = nodes->Next();
+        tagNodes.AddNode (child);
       }
     }
   }

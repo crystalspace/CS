@@ -47,6 +47,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void AddNode (iDocumentNode* node);
   };
   
+  class TagNodesHelper
+  {
+    csSet<csString> tags;
+  public:
+    void AddNode (iDocumentNode* node);
+    void Merge (const TagNodesHelper& other);
+    void AddToNode (iDocumentNode* node, iDocumentNode* before);
+  };
+  
   class Synthesizer
   {
   public:
@@ -88,6 +97,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       ShaderVarNodesHelper& shaderVarNodes;
       iDocumentNode* errorNode;
       const Snippet* snippet;
+      TagNodesHelper tags;
       const TechniqueGraph& graph;
     
       csString annotateString;
@@ -165,6 +175,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         combiner->WriteToPass (passNode);
       }
       const char* GetTechniqueConditions() const { return techniqueConditions; }
+      const TagNodesHelper& GetTags() const { return tags; }
     };
     
     typedef csHash<csString, csString> StringStringHash;
