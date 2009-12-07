@@ -472,6 +472,7 @@ bool ProctexPDLight::PrepareAnim ()
   }
   lightBits.SetSize (lights.GetSize ());
   state.Set (statePrepared);
+  tilesDirty.FlipAllBits();
   
   // Initially fill texture (starts out with garbage)
   Animate();
@@ -536,6 +537,8 @@ void ProctexPDLight::OnDestroy (iLight* light)
       state.Set (stateDirty);
       dirtyLights.Add (light);
       lightBits.SetSize (lights.GetSize ());
+      tilesDirty.Clear();
+      tilesDirty.FlipAllBits();
       return;
     }
   }
