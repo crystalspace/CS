@@ -197,6 +197,10 @@
 	  </block>
 	</input>
 	
+	<block location="tags">
+	  <tag>static_specular</tag>
+	</block>
+	
 	<block location="cg:definitions">
 	  <?Include /shader-snippets/lighting/directional_lms.cginc ?>
 	</block>

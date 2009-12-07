@@ -77,6 +77,10 @@
 	  </block>
 	</input>
 	  
+	<block location="tags">
+	  <tag>specular</tag>
+	</block>
+    
 	<block location="cg:vertexMain">
 	  specularColor = specular;
 	  specularColor_attr_perfragment = true;
@@ -95,9 +99,27 @@
 	  <attribute name="perfragment" type="bool" />
 	</output>
       </technique>
+      
+      <technique priority="50">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+	<block location="cg:vertexMain">
+	  specularColor = float3(0);
+	  specularColor_attr_perfragment = false;
+	</block>
+            
+	<block location="cg:fragmentMain">
+	  specularColor = float3(0);
+	  specularColor_attr_perfragment = false;
+	</block>
+    
+	<output name="specularColor" type="rgb">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+      </technique>
     </snippet>
     <connection from="normalMapAlpha" to="specular">
       <explicit from="normalmap_alpha" to="normalMapAlpha" />
     </connection>
   </technique>
-</snippet>
+  </snippet>

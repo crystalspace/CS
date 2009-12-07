@@ -66,6 +66,10 @@
 	  </block>
 	</input>
 	
+	<block location="tags">
+	  <tag>parallax</tag>
+	</block>
+	
 	<block location="cg:vertexMain">
 	  // In case the coords are used on the VP side...
 	  texCoordOffset = texCoord;

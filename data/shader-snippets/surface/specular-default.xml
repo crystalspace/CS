@@ -69,6 +69,10 @@
       </block>
     </input>
       
+    <block location="tags">
+      <tag>specular</tag>
+    </block>
+    
     <block location="cg:vertexMain">
       specularColor = specular*surfaceColorWithAlpha.a;
       specularColor_attr_perfragment = true;
@@ -78,6 +82,24 @@
       specularColor = tex2D (texSpecular, texCoord).rgb * specular;
       specularColor_attr_perfragment = true;
       specularColor *= surfaceColorWithAlpha.a;
+    </block>
+    
+    <output name="specularColor" type="rgb">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+  
+  <technique priority="50">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <block location="cg:vertexMain">
+      specularColor = float3(0);
+      specularColor_attr_perfragment = false;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      specularColor = float3(0);
+      specularColor_attr_perfragment = false;
     </block>
     
     <output name="specularColor" type="rgb">
