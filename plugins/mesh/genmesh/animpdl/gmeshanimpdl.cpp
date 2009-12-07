@@ -92,10 +92,12 @@ void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
     }
     if (newLight.light)
     {
+      newLight.light->SetLightCallback (this);
       buffer.lights.Push (newLight);
     }
   }
   buffer.lights.ShrinkBestFit();
+  buffer.lightsDirty = true;
 }
 
 void GenmeshAnimationPDL::Prepare ()
@@ -189,6 +191,8 @@ GenmeshAnimationPDL::~GenmeshAnimationPDL ()
 void GenmeshAnimationPDL::Update(csTicks current, int num_verts, 
                                  uint32 version_id)
 {
+  if (!prepared) Prepare();
+
   if (buffers.GetSize() == 0) return;
 
   // @@@ FIXME: Bit of a waste here to always update custom buffers...
@@ -238,6 +242,32 @@ const csColor4* GenmeshAnimationPDL::UpdateColors (csTicks current,
   if (colorsBuffer.name == 0) return colors;
   UpdateBuffer (colorsBuffer, current, colors, num_colors, version_id);
   return colorsBuffer.combinedColors.GetArray();
+}
+
+void GenmeshAnimationPDL::OnColorChange (iLight* light, const csColor& newcolor)
+{
+  colorsBuffer.lightsDirty = true; 
+  for (size_t i = 0; i < buffers.GetSize(); i++) 
+  { 
+    buffers[i].lightsDirty = true; 
+  } 
+}
+
+void GenmeshAnimationPDL::OnDestroy (iLight* light)
+{
+  for (size_t b = 0; b < buffers.GetSize(); b++) 
+  { 
+    csSafeCopyArray<ColorBuffer::MappedLight>& lights = buffers[b].lights; 
+    for (size_t i = 0; i < lights.GetSize(); i++) 
+    { 
+      if (lights[i].light == light) 
+      { 
+	lights.DeleteIndexFast (i); 
+	buffers[b].lightsDirty = true; 
+	break;
+      }
+    }
+  }
 }
 
 //-------------------------------------------------------------------------

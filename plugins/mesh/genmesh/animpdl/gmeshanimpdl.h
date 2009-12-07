@@ -124,8 +124,9 @@ public:
  * Genmesh animation control.
  */
 class GenmeshAnimationPDL :
-  public scfImplementation1<GenmeshAnimationPDL,
-    iGenMeshAnimationControl>
+  public scfImplementation2<GenmeshAnimationPDL,
+    iGenMeshAnimationControl,
+    iLightCallback>
 {
 private:
   csRef<GenmeshAnimationPDLFactory> factory;
@@ -184,6 +185,16 @@ public:
   	const csVector3* normals, int num_normals, uint32 version_id);
   virtual const csColor4* UpdateColors (csTicks current,
   	const csColor4* colors, int num_colors, uint32 version_id);
+  /** @} */
+
+  /**\name iLightCallback implementation
+   * @{ */
+  virtual void OnColorChange (iLight* light, const csColor& newcolor);
+  virtual void OnPositionChange (iLight* light, const csVector3& newpos) { }
+  virtual void OnSectorChange (iLight* light, iSector* newsector) { }
+  virtual void OnRadiusChange (iLight* light, float newradius) { }
+  virtual void OnDestroy (iLight* light);
+  virtual void OnAttenuationChange (iLight* light, int newatt) { }
   /** @} */
 };
 
