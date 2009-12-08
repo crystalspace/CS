@@ -236,6 +236,27 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
+   * Attaches a static collider capsule to world (oriented along it's Z axis).
+   * A capsule is a cylinder with an halph-sphere at each end. It is less costly
+   * to compute collisions with a capsule than with a cylinder.
+   * \param length the capsule length along the axis (i.e. the distance between the 
+   * two halph-sphere's centers)
+   * \param radius the capsule radius
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
+  virtual bool AttachColliderCapsule (float length, float radius,
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f) = 0;
+
+  /**
    * Attaches a static collider box to world
    * \param size the box size along each axis
    * \param trans a hard transform to apply to the mesh
@@ -322,9 +343,21 @@ struct iDynamicsMoveCallback : public virtual iBase
 {
   SCF_INTERFACE (iDynamicsMoveCallback, 0, 0, 1);
 
+  /// Update the position of the mesh with the specified transform.
   virtual void Execute (iMeshWrapper* mesh, csOrthoTransform& t) = 0;
+
+  /// Update the position of the light with the specified transform.
   virtual void Execute (iLight* light, csOrthoTransform& t) = 0;
+
+  /// Update the position of the camera with the specified transform.
   virtual void Execute (iCamera* camera, csOrthoTransform& t) = 0;
+
+  /**
+   * Update the position of the rigid body with the specified transform. If 
+   * you want to attach to the rigid body an object different than a mesh, a 
+   * camera or a light, then you should reimplement this method and update 
+   * here the position of your object.
+   */
   virtual void Execute (csOrthoTransform& t) = 0;
 };
 
@@ -420,7 +453,7 @@ struct iRigidBody : public virtual iBase
   /// Re-enables a body after calling Disable, or by being auto disabled
   virtual bool Enable (void) = 0;
   /// Returns true if a body is enabled.
-  virtual bool IsEnabled (void) = 0;  
+  virtual bool IsEnabled (void) = 0; 
 
   /// Returns which group a body belongs to
   virtual csRef<iBodyGroup> GetGroup (void) = 0;
@@ -481,6 +514,27 @@ struct iRigidBody : public virtual iBase
    * are more "mushy"
    */
   virtual bool AttachColliderCylinder (float length, float radius,
+    const csOrthoTransform& trans, float friction, float density,
+    float elasticity, float softness = 0.01f) = 0;
+
+  /**
+   * Attaches a collider capsule to the body (oriented along it's Z axis).
+   * A capsule is a cylinder with an halph-sphere at each end. It is less costly
+   * to compute collisions with a capsule than with a cylinder.
+   * \param length the capsule length along the axis (i.e. the distance between the 
+   * two halph-sphere's centers)
+   * \param radius the capsule radius
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
+  virtual bool AttachColliderCapsule (float length, float radius,
     const csOrthoTransform& trans, float friction, float density,
     float elasticity, float softness = 0.01f) = 0;
 
@@ -580,14 +634,17 @@ struct iRigidBody : public virtual iBase
   /// Get the physic properties. 0 parameters are ignored
   virtual void GetProperties (float* mass, csVector3* center,
     csMatrix3* inertia) = 0;
-  /// Get mass
+  /// Get the total mass of this body
   virtual float GetMass () = 0;
-  /// Get center
+  /// Get the center of mass of this body
   virtual csVector3 GetCenter () = 0;
-  /// Get inertia
+  /// Get the matrix of inertia of this body
   virtual csMatrix3 GetInertia () = 0;
 
-  /// Set total mass to targetmass, and adjust properties
+  /**
+   * Set the total mass to targetmass, and adjust the properties 
+   * (center of mass and matrix of inertia)
+   */
   virtual void AdjustTotalMass (float targetmass) = 0;
 
   /// Add a force (world space) (active for one timestep)
@@ -616,7 +673,7 @@ struct iRigidBody : public virtual iBase
   virtual void AddRelForceAtPos (const csVector3& force,
     const csVector3& pos) = 0;
   /**
-   * Add a force (local space) at a specific position (loacl space)
+   * Add a force (local space) at a specific position (local space)
    * (active for one timestep)
    */
   virtual void AddRelForceAtRelPos (const csVector3& force,
@@ -658,7 +715,7 @@ struct iRigidBody : public virtual iBase
    */
   virtual void SetMoveCallback (iDynamicsMoveCallback* cb) = 0;
   /**
-   * Set a callback to be executed when this body collides with another
+   * Set a callback to be executed when this body collides with another.
    * If 0, no callback is executed.
    */
   virtual void SetCollisionCallback (iDynamicsCollisionCallback* cb) = 0;
@@ -689,6 +746,7 @@ enum csColliderGeometryType
   BOX_COLLIDER_GEOMETRY,
   PLANE_COLLIDER_GEOMETRY,
   TRIMESH_COLLIDER_GEOMETRY,
+  CONVEXMESH_COLLIDER_GEOMETRY,
   CYLINDER_COLLIDER_GEOMETRY,
   CAPSULE_COLLIDER_GEOMETRY,
   SPHERE_COLLIDER_GEOMETRY
@@ -769,79 +827,85 @@ struct iDynamicsSystemCollider : public virtual iBase
   virtual void SetCollisionCallback (
   	iDynamicsColliderCollisionCallback* cb) = 0;
 
-  /// Set friction of collider surface
+  /// Set the friction of the collider surface.
   virtual void SetFriction (float friction) = 0;
 
-  /// Set softness of collider surface
+  /// Set the softness of the collider surface.
   virtual void SetSoftness (float softness) = 0;
 
   /**
-   * Set body density. This could look strange that collider needs to know
-   * this parameter, but it is used for reseting mass of conected body  
+   * Set the density of the body. This could look strange that collider needs
+   * to know this parameter, but it is used for reseting mass of connected body  
    * (it should depend on collider geometry)
    */
   virtual void SetDensity (float density) = 0;
 
-  /// Set softness of collider elasticity
+  /// Set the elasticity of the collider surface.
   virtual void SetElasticity (float elasticity) = 0;
   
-  /// Get collider surface friction
+  /// Get the friction of the collider surface.
   virtual float GetFriction () = 0;
 
-  /// Get collider surface friction
+  /// Get the softness of the collider surface.
   virtual float GetSoftness () = 0;
 
-  /// Get bodys density
+  /// Get the density of the body.
   virtual float GetDensity () = 0;
 
-  /// Get collider surface elasticity
+  /// Get the elasticity of the collider surface.
   virtual float GetElasticity () = 0;
 
-  /// Fills given General Mesh factory with collider geometry 
+  /// Fill given General Mesh factory with collider geometry 
   virtual void FillWithColliderGeometry (
   	csRef<iGeneralFactoryState> genmesh_fact) = 0;
 
-  /// Get geometry type
+  /// Get the type of the geometry.
   virtual csColliderGeometryType GetGeometryType () = 0;
 
-  /// Get collider transform (it will be alwas in world cooridnates)
+  /// Get collider transform (it will always be in world coordinates)
   virtual csOrthoTransform GetTransform () = 0;
 
   /**
-   * Get collider transform (when collider is attached to body transform 
-   * will be in body space)
+   * Get collider transform. If the collider is attached to a body, then the
+   *  transform will be in body space, otherwise it will be in world coordinates.
    */
   virtual csOrthoTransform GetLocalTransform () = 0;
 
   /**
-   * Set Collider transform. If this is "static" collider then given transform
+   * Set Collider transform. If this is a "static" collider then the given transform
    * will be in world space, otherwise it will be in attached rigid body space.
    */ 
   virtual void SetTransform (const csOrthoTransform& trans) = 0;
 
   /**
-   * If collider has box geometry method will return true and size of
-   * box, otherwise it will return false.
+   * If this collider has a box geometry then the method will return true and the 
+   * size of the box, otherwise it will return false.
    */
-  virtual bool GetBoxGeometry (csVector3& size) = 0; 
+  virtual bool GetBoxGeometry (csVector3& size) = 0;
 
   /**
-   * If collider has sphere geometry method will return true and sphere, 
-   * otherwise it will return false.
+   * If this collider has a sphere geometry then the method will return true and
+   * the sphere, otherwise it will return false.
    */
   virtual bool GetSphereGeometry (csSphere& sphere) = 0;
 
   /**
-   * If collider has plane geometry method will return true and plane, 
-   * otherwise it will return false.
+   * If this collider has a plane geometry then the method will return true and 
+   * the plane, otherwise it will return false.
    */
-  virtual bool GetPlaneGeometry (csPlane3& plane) = 0; 
+  virtual bool GetPlaneGeometry (csPlane3& plane) = 0;
 
   /**
-   * If collider has plane geometry method will return true and cylinder's
-   * length and radius, otherwise it will return false.
+   * If this collider has a cylinder geometry then the method will return true and
+   * the cylinder's length and radius, otherwise it will return false.
    */
-  virtual bool GetCylinderGeometry (float& length, float& radius) = 0; 
+  virtual bool GetCylinderGeometry (float& length, float& radius) = 0;
+
+  /**
+   * If this collider has a capsule geometry then the method will return true and
+   * the capsule's length and radius, otherwise it will return false.
+   */
+  virtual bool GetCapsuleGeometry (float& length, float& radius) = 0;
 
   /**
    * Make collider static. Static collider acts on dynamic colliders and bodies,
@@ -882,7 +946,7 @@ struct iJoint : public virtual iBase
    * you want to apply changes right away.
    */
   virtual void Attach (iRigidBody* body1, iRigidBody* body2, bool force_update = true) = 0;
-  /// Get an attached body (valid values for body are 0 and 1)
+  /// Get an attached body (valid values for body are 0 and 1).
   virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
   /**
    * Set the local transformation of the joint.  This transform
@@ -891,74 +955,76 @@ struct iJoint : public virtual iBase
    * you want to apply changes right away.
    */
   virtual void SetTransform (const csOrthoTransform &trans, bool force_update = true) = 0;
-  /// Get the local transformation of the joint
+  /// Get the local transformation of the joint.
   virtual csOrthoTransform GetTransform () = 0;
   /**
-   * Sets the translation constraints on the 3 axes.  If true is
-   * passed for an axis the Joint will constrain all motion along
+   * Set the translation constraints on the 3 axes.  If true is
+   * passed for an axis then the Joint will constrain all motion along
    * that axis.  If false is passed in then all motion along that
-   * axis free, but bounded by the minimum and maximum distance
+   * axis is free, but bounded by the minimum and maximum distance
    * if set. Set force_update to true if you want to apply changes 
    * right away.
    */
   virtual void SetTransConstraints (bool X, bool Y, bool Z, bool force_update = true) = 0;
-  /// True if this axis' translation is constrained
+  /// True if this axis' translation is constrained.
   virtual bool IsXTransConstrained () = 0;
-  /// True if this axis' translation is constrained
+  /// True if this axis' translation is constrained.
   virtual bool IsYTransConstrained () = 0;
-  /// True if this axis' translation is constrained
+  /// True if this axis' translation is constrained.
   virtual bool IsZTransConstrained () = 0;
   /**
-   * Sets the minimum constrained distance between bodies. Set force_update to true if 
+   * Set the minimum constrained distance between bodies. Set force_update to true if 
    * you want to apply changes right away.
    */
   virtual void SetMinimumDistance (const csVector3 &min, bool force_update = true) = 0;
-  /// Gets the minimum constrained distance between bodies
+  /// Get the minimum constrained distance between bodies.
   virtual csVector3 GetMinimumDistance () = 0;
   /**
-   * Sets the maximum constrained distance between bodies. Set force_update to true if 
+   * Set the maximum constrained distance between bodies. Set force_update to true if 
    * you want to apply changes right away.
    */
   virtual void SetMaximumDistance (const csVector3 &max, bool force_update = true) = 0;
-  /// Gets the maximum constrained distance between bodies
+  /// Get the maximum constrained distance between bodies.
   virtual csVector3 GetMaximumDistance () = 0;
   /**
-   * Sets the rotational constraints on the 3 axes.  Works like
-   * the above translational constraints, but for rotation about
-   * the respective axes. Set force_update to true if you want to apply
-   * changes right away.
+   * Set the rotational constraints on the 3 axes.  If true is
+   * passed for an axis then the Joint will constrain all rotation around
+   * that axis.  If false is passed in then all rotation around that
+   * axis is free, but bounded by the minimum and maximum distance
+   * if set. Set force_update to true if you want to apply changes 
+   * right away.
    */
   virtual void SetRotConstraints (bool X, bool Y, bool Z, bool force_update = true) = 0;
-  /// True if this axis' rotation is constrained
+  /// True if this axis' rotation is constrained.
   virtual bool IsXRotConstrained () = 0;
-  /// True if this axis' rotation is constrained
+  /// True if this axis' rotation is constrained.
   virtual bool IsYRotConstrained () = 0;
   /// True if this axis' rotation is constrained
   virtual bool IsZRotConstrained () = 0;
   /**
-   * Sets the minimum constrained angle between bodies. Set force_update to true if 
+   * Set the minimum constrained angle between bodies (in radian). Set force_update to true if 
    * you want to apply changes right away.
    */
   virtual void SetMinimumAngle (const csVector3 &min, bool force_update = true) = 0;
-  /// Gets the minimum constrained angle between bodies
+  /// Get the minimum constrained angle between bodies (in radian).
   virtual csVector3 GetMinimumAngle () = 0;
   /**
-   * Sets the maximum constrained angle between bodies. Set force_update to true if 
+   * Set the maximum constrained angle between bodies (in radian). Set force_update to true if 
    * you want to apply changes right away.
    */
   virtual void SetMaximumAngle (const csVector3 &max, bool force_update = true) = 0;
-  /// Gets the maximum constrained angle between bodies
+  /// Get the maximum constrained angle between bodies (in radian).
   virtual csVector3 GetMaximumAngle () = 0;
 
   //Motor parameters
 
   /** 
-   * Sets the restitution of the joint's stop point (this is the 
+   * Set the restitution of the joint's stop point (this is the 
    * elasticity of the joint when say throwing open a door how 
-   * much it will bounce the door back closed when it hits)
+   * much it will bounce the door back closed when it hits).
    */
   virtual void SetBounce (const csVector3 & bounce, bool force_update = true) = 0;
-  /// Get the joint restitution
+  /// Get the joint restitution.
   virtual csVector3 GetBounce () = 0;
   /**
    * Apply a motor velocity to joint (for instance on wheels). Set force_update to true if 
@@ -967,7 +1033,7 @@ struct iJoint : public virtual iBase
   virtual void SetDesiredVelocity (const csVector3 &velocity, bool force_update = true) = 0;
   virtual csVector3 GetDesiredVelocity () = 0;
   /**
-   * Sets the force at which the desired velocity will be achieved. Set force_update to true if 
+   * Set the force at which the desired velocity will be achieved. Set force_update to true if 
    * you want to apply changes right away.
    */
   virtual void SetMaxForce (const csVector3 & maxForce, bool force_update = true) = 0;

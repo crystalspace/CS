@@ -387,6 +387,9 @@ public:
   virtual bool AttachColliderCylinder (float length, float radius,
         const csOrthoTransform& trans, float friction, float elasticity,
 	float softness);
+  virtual bool AttachColliderCapsule (float length, float radius,
+        const csOrthoTransform& trans, float friction, float elasticity,
+	float softness);
   virtual bool AttachColliderBox (const csVector3 &size,
         const csOrthoTransform& trans, float friction, float elasticity,
 	float softness);
@@ -469,6 +472,7 @@ public:
   bool GetSphereGeometry (csSphere& sphere);
   bool GetPlaneGeometry (csPlane3& box); 
   bool GetCylinderGeometry (float& length, float& radius); 
+  bool GetCapsuleGeometry (float& length, float& radius);
 
   void SetCollisionCallback (iDynamicsColliderCollisionCallback* cb);
   void Collision (csODECollider* other, const csVector3& pos,
@@ -580,6 +584,9 @@ public:
         const csOrthoTransform& trans, float friction, float density,
         float elasticity, float softness);
   bool AttachColliderCylinder (float length, float radius,
+        const csOrthoTransform& trans, float friction, float density,
+        float elasticity, float softness);
+  bool AttachColliderCapsule (float length, float radius,
         const csOrthoTransform& trans, float friction, float density,
         float elasticity, float softness);
   bool AttachColliderBox (const csVector3 &size,

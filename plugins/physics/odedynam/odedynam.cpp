@@ -62,8 +62,6 @@ static void ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat)
   csmat.m31 = odemat[2]; csmat.m32 = odemat[6]; csmat.m33 = odemat[10];
 }
 
-
-
 CS_PLUGIN_NAMESPACE_BEGIN(odedynam)
 {
 
@@ -871,6 +869,24 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
   return true;
 }
 
+bool csODEDynamicSystem::AttachColliderCapsule (float length, float radius,
+                                                 const csOrthoTransform& trans,
+						 float friction,
+						 float elasticity,
+						 float softness)
+{
+  csODECollider *odec = new csODECollider (this, this);
+  odec->SetElasticity (elasticity);
+  odec->SetFriction (friction);
+  odec->SetSoftness (softness);
+  odec->CreateCapsuleGeometry (length, radius);
+  odec->SetTransform (trans);
+  odec->AddToSpace (spaceID);
+  colliders.Push (odec);
+
+  return true;
+}
+
 bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
                                             const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
@@ -1120,7 +1136,7 @@ void csODECollider::AddMassToBody (bool doSet)
       {
         dReal radius, length;
         dGeomCCylinderGetParams (geomID, &radius, &length);
-        dMassSetCappedCylinder (&m, density, 3, radius, length);
+        dMassSetCapsule (&m, density, 3, radius, length);
       }
       break;
     case TRIMESH_COLLIDER_GEOMETRY:
@@ -1479,7 +1495,20 @@ bool csODECollider::GetPlaneGeometry (csPlane3& plane)
 }
 bool csODECollider::GetCylinderGeometry (float& length, float& radius)
 {
-  if (geom_type == CYLINDER_COLLIDER_GEOMETRY)
+  //if (geom_type == CYLINDER_COLLIDER_GEOMETRY)
+  if (geom_type == CAPSULE_COLLIDER_GEOMETRY)
+  {
+    dReal odeR, odeL;
+    dGeomCCylinderGetParams (geomID, &odeR, &odeL);
+    radius = odeR;
+    length = odeL;
+    return true;
+  }
+  return false;
+}
+bool csODECollider::GetCapsuleGeometry (float& length, float& radius)
+{
+  if (geom_type == CAPSULE_COLLIDER_GEOMETRY)
   {
     dReal odeR, odeL;
     dGeomCCylinderGetParams (geomID, &odeR, &odeL);
@@ -1684,6 +1713,26 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   odec->SetSoftness (softness);
   odec->SetDensity (density);
   odec->CreateCylinderGeometry (length, radius);
+  odec->SetTransform (trans);
+  odec->AttachBody (bodyID);
+  odec->AddTransformToSpace (groupID);
+  odec->MakeDynamic ();
+  colliders.Push (odec);
+
+  return true;
+}
+
+bool csODERigidBody::AttachColliderCapsule (float length, float radius,
+                                             const csOrthoTransform& trans,
+					     float friction, float density,
+                                             float elasticity, float softness)
+{
+  csODECollider *odec = new csODECollider (dynsys, this);
+  odec->SetElasticity (elasticity);
+  odec->SetFriction (friction);
+  odec->SetSoftness (softness);
+  odec->SetDensity (density);
+  odec->CreateCapsuleGeometry (length, radius);
   odec->SetTransform (trans);
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);
