@@ -127,7 +127,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   void Synthesizer::Synthesize (iDocumentNode* shaderNode,
                                 ShaderVarNodesHelper& shaderVarNodesHelper,
                                 csRefArray<iDocumentNode>& techNodes,
-                                iDocumentNode* sourceTechNode, 
+                                iDocumentNode* sourceTechNode,
+				CombinerLoaderSet& combiners,
                                 iProgressMeter* progress)
   {
     if (graphs.GetSize() > 0)
@@ -193,7 +194,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	   
 	    csRef<SynthesizeTechnique> synthTech;
 	    synthTech.AttachNew (new SynthesizeTechnique (compiler, this,
-	      shaderVarNodesHelper, shaderNode, snippet, graph));
+	      shaderVarNodesHelper, shaderNode, snippet, graph, combiners));
 	    techPasses.Push (synthTech);
 	  #ifdef THREADED_TECH_SYNTHESIS
 	    synthQueue.Enqueue (synthTech);
@@ -403,6 +404,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  "Could not get combiner from '%s'", comb->classId.GetData());
 	return false;
       }
+      combiners.Add (loader);
     }
     
     // Two outputs are needed: color (usually from the fragment part)...

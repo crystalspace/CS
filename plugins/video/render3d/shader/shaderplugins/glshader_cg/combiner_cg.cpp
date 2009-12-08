@@ -26,8 +26,12 @@
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 
+#include "csplugincommon/shader/shadercachehelper.h"
 #include "csplugincommon/shader/weavertypes.h"
+#include "csutil/base64.h"
 #include "csutil/cfgacc.h"
+#include "csutil/checksum.h"
+#include "csutil/csendian.h"
 #include "csutil/documenthelper.h"
 #include "csutil/fifo.h"
 #include "csutil/scfstr.h"
@@ -454,6 +458,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	  }
       }
     }
+
+    /* Compute a checksum over the coercion library, to be able to detect
+       changes (and allow weaver to invalidate cached shaders) */
+    uint32 libCheckSum;
+    {
+      csRef<iDataBuffer> libData = libfile->GetAllData();
+      libCheckSum = CS::Utility::Checksum::Adler32 (libData);
+      CS::PluginCommon::ShaderCacheHelper::ShaderDocHasher hasher (object_reg,
+	startNode);
+      csRef<iDataBuffer> hashStream = hasher.GetHashStream();
+      libCheckSum = CS::Utility::Checksum::Adler32 (libCheckSum, hashStream);
+    }
+    uint32 checkSumLE = csLittleEndian::UInt32 (libCheckSum);
+    codeString = CS::Utility::EncodeBase64 (&checkSumLE, sizeof (checkSumLE));
+
     return SynthesizeDefaultCoercions (templates);
   }
   

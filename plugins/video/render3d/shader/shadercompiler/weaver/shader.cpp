@@ -22,6 +22,7 @@
 #include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/hiercache.h"
+#include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 
@@ -42,13 +43,14 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
+  namespace WeaverCommon = CS::PluginCommon::ShaderWeaver;
 
   CS_LEAKGUARD_IMPLEMENT (WeaverShader);
 
   /* Magic value for cache file.
   * The most significant byte serves as a "version", increase when the
   * cache file format changes. */
-  static const uint32 cacheFileMagic = 0x01727677;
+  static const uint32 cacheFileMagic = 0x02727677;
 
   WeaverShader::WeaverShader (WeaverCompiler* compiler) : 
     scfImplementationType (this), compiler (compiler), 
@@ -182,6 +184,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       CS::DocSystem::CloneNode (svNode, newNode);
     }
 
+    CombinerLoaderSet combiners;
     csRefArray<iDocumentNode> techniqueNodes;
     //for (size_t t = 0; t < techniques.GetSize(); t++)
     for (size_t t = 0; t < 1; t++)
@@ -227,7 +230,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csTextProgressMeter pmeter (0);
       csPrintf ("shader %s: ", shaderName);
       synth.Synthesize (shaderNode, shaderVarNodesHelper, techniqueNodes,
-        techSource, &pmeter);
+        techSource, combiners, &pmeter);
     }
     if (techniques.GetSize() > 1)
     {
@@ -272,6 +275,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       // Write magic header
       uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
       cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
+
+      uint32 diskCombinerNum = csLittleEndian::UInt32 (combiners.UnlockedGetSize());
+      cacheFile->Write ((char*)&diskCombinerNum, sizeof (diskCombinerNum));
+      {
+	CombinerLoaderSet::GlobalIterator it (combiners.UnlockedGetIterator());
+	while (it.HasNext())
+	{
+	  WeaverCommon::iCombinerLoader* combinerLoader = it.Next();
+	  csRef<iFactory> scfFactory = scfQueryInterface<iFactory> (combinerLoader);
+	  CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, scfFactory->QueryClassID());
+	  CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, combinerLoader->GetCodeString());
+	}
+      }
       
       iDocumentSystem* cacheDocSys = compiler->binDocSys.IsValid()
 	? compiler->binDocSys : compiler->xmlDocSys;
@@ -283,8 +299,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       CS::DocSystem::CloneNode (shaderNode, cacheShaderNode);
       
       csMemFile cachedDocFile;
-      if (cacheDoc->Write (&cachedDocFile) != 0)
-	cachingError.AttachNew (new scfString ("failed to write cache doc"));
+      const char* writeErr = cacheDoc->Write (&cachedDocFile);
+      if (writeErr != 0)
+	cachingError.AttachNew (new scfString (
+	  csString ("failed to write cache doc: ") + writeErr));
       else
       {
 	csRef<iDataBuffer> cachedDocBuf = cachedDocFile.GetAllData ();
@@ -317,6 +335,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       cacheFailReason = "Out of date (magic)";
       return 0;
+    }
+
+    uint32 diskCombinerNum;
+    read = cacheFile->Read ((char*)&diskCombinerNum, sizeof (diskCombinerNum));
+    if (read != sizeof (diskCombinerNum))
+    {
+      cacheFailReason = "Read error";
+      return 0;
+    }
+    for (uint i = 0; i < csLittleEndian::UInt32 (diskCombinerNum); i++)
+    {
+      csString combinerID =
+	CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+      csString combinerCode =
+	CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+
+      csRef<WeaverCommon::iCombinerLoader> loader = 
+	csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
+	  combinerID);
+      if (!loader.IsValid())
+      {
+	cacheFailReason = "Failed to load combiner";
+	return 0;
+      }
+      if (combinerCode != loader->GetCodeString())
+      {
+	cacheFailReason = "Out of date (combiner code)";
+	return 0;
+      }
     }
     
     csRef<iDataBuffer> cachedDocData = 

@@ -138,7 +138,7 @@ namespace CS
       
       struct iCombinerLoader : public virtual iBase
       {
-        SCF_INTERFACE (iCombinerLoader, 0, 0, 3);
+        SCF_INTERFACE (iCombinerLoader, 0, 0, 4);
         
         virtual csPtr<iCombiner> GetCombiner (iDocumentNode* params) = 0;
 
@@ -153,6 +153,15 @@ namespace CS
           const char* locationPrefix, const char* bufName, 
           const char* outputType, const char* outputName, 
           const char* uniqueTag) = 0;
+
+	/**
+	 * A short string identifying the revision or some such of the combiner.
+	 * It is used to trigger regeneration of shaders if changed. Thus, a fix
+	 * or such that affects existing, cached shaders should result in a change
+	 * of this code in order to trigger the regeneration of the previously
+	 * cached shaders.
+	 */
+	virtual const char* GetCodeString() = 0;
       };
     } // namespace ShaderWeaver
   } // namespace PluginCommon

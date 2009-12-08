@@ -55,6 +55,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void Merge (const TagNodesHelper& other);
     void AddToNode (iDocumentNode* node, iDocumentNode* before);
   };
+
+  class CombinerLoaderSet
+  {
+  public:
+    typedef CS::PluginCommon::ShaderWeaver::iCombinerLoader iCombinerLoader;
+    typedef csSet<csRef<iCombinerLoader> > SetType;
+    typedef SetType::GlobalIterator GlobalIterator;
+  private:
+    CS::Threading::Mutex lock;
+    typedef CS::Threading::ScopedLock<CS::Threading::Mutex> LockType;
+    SetType set;
+  public:
+    void Add (iCombinerLoader* loader)
+    {
+      LockType l (lock);
+      set.Add (loader);
+    }
+
+    size_t UnlockedGetSize() { return set.GetSize(); }
+    GlobalIterator UnlockedGetIterator() { return set.GetIterator(); }
+  };
   
   class Synthesizer
   {
@@ -77,7 +98,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void Synthesize (iDocumentNode* shaderNode,
       ShaderVarNodesHelper& shaderVarNodesHelper,
       csRefArray<iDocumentNode>& techNodes,
-      iDocumentNode* sourceTechNode, 
+      iDocumentNode* sourceTechNode, CombinerLoaderSet& combiners,
       iProgressMeter* progress);
   private:
     class SynthesizeNodeTree;
@@ -99,6 +120,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const Snippet* snippet;
       TagNodesHelper tags;
       const TechniqueGraph& graph;
+      CombinerLoaderSet& combiners;
     
       csString annotateString;
       const char* GetAnnotation (const char* fmt, ...) CS_GNUC_PRINTF (2, 3)
@@ -157,11 +179,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         const Synthesizer* synth,
         ShaderVarNodesHelper& shaderVarNodes, 
         iDocumentNode* errorNode, const Snippet* snippet,
-        const TechniqueGraph& graph)
+        const TechniqueGraph& graph, CombinerLoaderSet& combiners)
        : scfImplementationType (this),
          status (false), compiler (compiler), synth (synth),
          shaderVarNodes (shaderVarNodes), errorNode (errorNode),
-         snippet (snippet), graph (graph)
+         snippet (snippet), graph (graph), combiners (combiners)
       {}
     
       bool GetStatus() const { return status; }
