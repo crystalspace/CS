@@ -34,4 +34,9 @@
     Tangent = vertexIn.Tangent;
   </block>
   
+  <block location="fragmentMain">
+    // Renormalize, as interpolation will have denormalized it
+    Tangent = normalize (Tangent);
+  </block>
+  
 </input>

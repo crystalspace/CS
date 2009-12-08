@@ -34,4 +34,9 @@
     Bitangent = vertexIn.Bitangent;
   </block>
    
+  <block location="fragmentMain">
+    // Renormalize, as interpolation will have denormalized it
+    Bitangent = normalize (Bitangent);
+  </block>
+  
 </input>
