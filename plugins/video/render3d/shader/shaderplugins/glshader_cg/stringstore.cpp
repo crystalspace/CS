@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 
 #include "csplugincommon/shader/shadercachehelper.h"
+#include "csutil/checksum.h"
 #include "csutil/csendian.h"
 #include "csutil/parasiticdatabuffer.h"
 
@@ -234,7 +235,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
     takenIDs.SetBit (newId);
     BinEntry newEntry;
-    newEntry.crc = CRC32 ((uint8*)str.s, str.len);
+    newEntry.crc = CS::Utility::Checksum::CRC32 ((uint8*)str.s, str.len);
     newEntry.lastUsedTime = timestamp;
     newEntry.dataOffset = stringDataFile->GetSize();
     stringDataFile->Write (str.s, str.len);
@@ -335,7 +336,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         BinEntry& entry = entriesIt.Next (id);
         const char* entryStr = stringDataFile->GetData() + entry.dataOffset;
 	size_t len = strlen (entryStr);
-	entry.crc = CRC32 ((uint8*)entryStr, len);
+	entry.crc = CS::Utility::Checksum::CRC32 ((uint8*)entryStr, len);
         uint hash = csHashCompute (entryStr, len);
         hashedIDs.Put (hash, id);
       }
@@ -361,7 +362,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       BinEntry newEntry (entriesIt.Next (id));
       const char* entryStr = stringDataFile->GetData() + newEntry.dataOffset;
       size_t len = strlen (entryStr);
-      if (CRC32 ((uint8*)entryStr, len) != newEntry.crc)
+      if (CS::Utility::Checksum::CRC32 ((uint8*)entryStr, len) != newEntry.crc)
         continue;
       newEntry.dataOffset = newStringsFile->GetPos();
       if (newStringsFile->Write (entryStr, len+1) != len+1)
