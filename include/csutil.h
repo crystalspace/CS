@@ -38,6 +38,7 @@
 #include "csutil/cfgdoc.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
+#include "csutil/checksum.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/cmdline.h"
 #include "csutil/common_handlers.h"
