@@ -525,6 +525,7 @@ class iDynamicSystem(core.iBase):
     def AttachColliderConvexMesh(*args): return _ivaria.iDynamicSystem_AttachColliderConvexMesh(*args)
     def AttachColliderMesh(*args): return _ivaria.iDynamicSystem_AttachColliderMesh(*args)
     def AttachColliderCylinder(*args): return _ivaria.iDynamicSystem_AttachColliderCylinder(*args)
+    def AttachColliderCapsule(*args): return _ivaria.iDynamicSystem_AttachColliderCapsule(*args)
     def AttachColliderBox(*args): return _ivaria.iDynamicSystem_AttachColliderBox(*args)
     def AttachColliderSphere(*args): return _ivaria.iDynamicSystem_AttachColliderSphere(*args)
     def AttachColliderPlane(*args): return _ivaria.iDynamicSystem_AttachColliderPlane(*args)
@@ -590,6 +591,7 @@ class iRigidBody(core.iBase):
     def AttachColliderConvexMesh(*args): return _ivaria.iRigidBody_AttachColliderConvexMesh(*args)
     def AttachColliderMesh(*args): return _ivaria.iRigidBody_AttachColliderMesh(*args)
     def AttachColliderCylinder(*args): return _ivaria.iRigidBody_AttachColliderCylinder(*args)
+    def AttachColliderCapsule(*args): return _ivaria.iRigidBody_AttachColliderCapsule(*args)
     def AttachColliderBox(*args): return _ivaria.iRigidBody_AttachColliderBox(*args)
     def AttachColliderSphere(*args): return _ivaria.iRigidBody_AttachColliderSphere(*args)
     def AttachColliderPlane(*args): return _ivaria.iRigidBody_AttachColliderPlane(*args)
@@ -643,6 +645,7 @@ NO_GEOMETRY = _ivaria.NO_GEOMETRY
 BOX_COLLIDER_GEOMETRY = _ivaria.BOX_COLLIDER_GEOMETRY
 PLANE_COLLIDER_GEOMETRY = _ivaria.PLANE_COLLIDER_GEOMETRY
 TRIMESH_COLLIDER_GEOMETRY = _ivaria.TRIMESH_COLLIDER_GEOMETRY
+CONVEXMESH_COLLIDER_GEOMETRY = _ivaria.CONVEXMESH_COLLIDER_GEOMETRY
 CYLINDER_COLLIDER_GEOMETRY = _ivaria.CYLINDER_COLLIDER_GEOMETRY
 CAPSULE_COLLIDER_GEOMETRY = _ivaria.CAPSULE_COLLIDER_GEOMETRY
 SPHERE_COLLIDER_GEOMETRY = _ivaria.SPHERE_COLLIDER_GEOMETRY
@@ -685,6 +688,7 @@ class iDynamicsSystemCollider(core.iBase):
     def GetSphereGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetSphereGeometry(*args)
     def GetPlaneGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetPlaneGeometry(*args)
     def GetCylinderGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetCylinderGeometry(*args)
+    def GetCapsuleGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetCapsuleGeometry(*args)
     def MakeStatic(*args): return _ivaria.iDynamicsSystemCollider_MakeStatic(*args)
     def MakeDynamic(*args): return _ivaria.iDynamicsSystemCollider_MakeDynamic(*args)
     def IsStatic(*args): return _ivaria.iDynamicsSystemCollider_IsStatic(*args)

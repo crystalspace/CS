@@ -14596,6 +14596,255 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iDynamicSystem_AttachColliderCapsule__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicSystem *arg1 = (iDynamicSystem *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  csOrthoTransform *arg4 = 0 ;
+  float arg5 ;
+  float arg6 ;
+  float arg7 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  float val5 ;
+  int ecode5 = 0 ;
+  float val6 ;
+  int ecode6 = 0 ;
+  float val7 ;
+  int ecode7 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicSystem_AttachColliderCapsule",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "1"" of type '" "iDynamicSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicSystem * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csOrthoTransform,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "4"" of type '" "csOrthoTransform const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "4"" of type '" "csOrthoTransform const &""'"); 
+  }
+  arg4 = reinterpret_cast< csOrthoTransform * >(argp4);
+  ecode5 = SWIG_AsVal_float(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "5"" of type '" "float""'");
+  } 
+  arg5 = static_cast< float >(val5);
+  ecode6 = SWIG_AsVal_float(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "6"" of type '" "float""'");
+  } 
+  arg6 = static_cast< float >(val6);
+  ecode7 = SWIG_AsVal_float(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "7"" of type '" "float""'");
+  } 
+  arg7 = static_cast< float >(val7);
+  result = (bool)(arg1)->AttachColliderCapsule(arg2,arg3,(csOrthoTransform const &)*arg4,arg5,arg6,arg7);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDynamicSystem_AttachColliderCapsule__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicSystem *arg1 = (iDynamicSystem *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  csOrthoTransform *arg4 = 0 ;
+  float arg5 ;
+  float arg6 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  float val5 ;
+  int ecode5 = 0 ;
+  float val6 ;
+  int ecode6 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicSystem_AttachColliderCapsule",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "1"" of type '" "iDynamicSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicSystem * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csOrthoTransform,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "4"" of type '" "csOrthoTransform const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "4"" of type '" "csOrthoTransform const &""'"); 
+  }
+  arg4 = reinterpret_cast< csOrthoTransform * >(argp4);
+  ecode5 = SWIG_AsVal_float(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "5"" of type '" "float""'");
+  } 
+  arg5 = static_cast< float >(val5);
+  ecode6 = SWIG_AsVal_float(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iDynamicSystem_AttachColliderCapsule" "', argument " "6"" of type '" "float""'");
+  } 
+  arg6 = static_cast< float >(val6);
+  result = (bool)(arg1)->AttachColliderCapsule(arg2,arg3,(csOrthoTransform const &)*arg4,arg5,arg6);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDynamicSystem_AttachColliderCapsule(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[8];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 7); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 6) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDynamicSystem, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_float(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_float(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csOrthoTransform, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_float(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_float(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                return _wrap_iDynamicSystem_AttachColliderCapsule__SWIG_1(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 7) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDynamicSystem, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_float(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_float(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csOrthoTransform, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_float(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_float(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  return _wrap_iDynamicSystem_AttachColliderCapsule__SWIG_0(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iDynamicSystem_AttachColliderCapsule'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    AttachColliderCapsule(iDynamicSystem *,float,float,csOrthoTransform const &,float,float,float)\n"
+    "    AttachColliderCapsule(iDynamicSystem *,float,float,csOrthoTransform const &,float,float)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iDynamicSystem_AttachColliderBox__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iDynamicSystem *arg1 = (iDynamicSystem *) 0 ;
@@ -16889,6 +17138,285 @@ fail:
     "  Possible C/C++ prototypes are:\n"
     "    AttachColliderCylinder(iRigidBody *,float,float,csOrthoTransform const &,float,float,float,float)\n"
     "    AttachColliderCylinder(iRigidBody *,float,float,csOrthoTransform const &,float,float,float)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iRigidBody_AttachColliderCapsule__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iRigidBody *arg1 = (iRigidBody *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  csOrthoTransform *arg4 = 0 ;
+  float arg5 ;
+  float arg6 ;
+  float arg7 ;
+  float arg8 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  float val5 ;
+  int ecode5 = 0 ;
+  float val6 ;
+  int ecode6 = 0 ;
+  float val7 ;
+  int ecode7 = 0 ;
+  float val8 ;
+  int ecode8 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iRigidBody_AttachColliderCapsule",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iRigidBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "1"" of type '" "iRigidBody *""'"); 
+  }
+  arg1 = reinterpret_cast< iRigidBody * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csOrthoTransform,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "4"" of type '" "csOrthoTransform const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "4"" of type '" "csOrthoTransform const &""'"); 
+  }
+  arg4 = reinterpret_cast< csOrthoTransform * >(argp4);
+  ecode5 = SWIG_AsVal_float(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "5"" of type '" "float""'");
+  } 
+  arg5 = static_cast< float >(val5);
+  ecode6 = SWIG_AsVal_float(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "6"" of type '" "float""'");
+  } 
+  arg6 = static_cast< float >(val6);
+  ecode7 = SWIG_AsVal_float(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "7"" of type '" "float""'");
+  } 
+  arg7 = static_cast< float >(val7);
+  ecode8 = SWIG_AsVal_float(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "8"" of type '" "float""'");
+  } 
+  arg8 = static_cast< float >(val8);
+  result = (bool)(arg1)->AttachColliderCapsule(arg2,arg3,(csOrthoTransform const &)*arg4,arg5,arg6,arg7,arg8);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iRigidBody_AttachColliderCapsule__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iRigidBody *arg1 = (iRigidBody *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  csOrthoTransform *arg4 = 0 ;
+  float arg5 ;
+  float arg6 ;
+  float arg7 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  float val5 ;
+  int ecode5 = 0 ;
+  float val6 ;
+  int ecode6 = 0 ;
+  float val7 ;
+  int ecode7 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iRigidBody_AttachColliderCapsule",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iRigidBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "1"" of type '" "iRigidBody *""'"); 
+  }
+  arg1 = reinterpret_cast< iRigidBody * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csOrthoTransform,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "4"" of type '" "csOrthoTransform const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "4"" of type '" "csOrthoTransform const &""'"); 
+  }
+  arg4 = reinterpret_cast< csOrthoTransform * >(argp4);
+  ecode5 = SWIG_AsVal_float(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "5"" of type '" "float""'");
+  } 
+  arg5 = static_cast< float >(val5);
+  ecode6 = SWIG_AsVal_float(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "6"" of type '" "float""'");
+  } 
+  arg6 = static_cast< float >(val6);
+  ecode7 = SWIG_AsVal_float(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iRigidBody_AttachColliderCapsule" "', argument " "7"" of type '" "float""'");
+  } 
+  arg7 = static_cast< float >(val7);
+  result = (bool)(arg1)->AttachColliderCapsule(arg2,arg3,(csOrthoTransform const &)*arg4,arg5,arg6,arg7);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iRigidBody_AttachColliderCapsule(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[9];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 8); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 7) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iRigidBody, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_float(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_float(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csOrthoTransform, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_float(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_float(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  return _wrap_iRigidBody_AttachColliderCapsule__SWIG_1(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 8) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iRigidBody, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_float(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_float(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csOrthoTransform, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_float(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_float(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_float(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    return _wrap_iRigidBody_AttachColliderCapsule__SWIG_0(self, args);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iRigidBody_AttachColliderCapsule'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    AttachColliderCapsule(iRigidBody *,float,float,csOrthoTransform const &,float,float,float,float)\n"
+    "    AttachColliderCapsule(iRigidBody *,float,float,csOrthoTransform const &,float,float,float)\n");
   return NULL;
 }
 
@@ -19827,6 +20355,52 @@ SWIGINTERN PyObject *_wrap_iDynamicsSystemCollider_GetCylinderGeometry(PyObject 
   }
   arg3 = reinterpret_cast< float * >(argp3);
   result = (bool)(arg1)->GetCylinderGeometry(*arg2,*arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDynamicsSystemCollider_GetCapsuleGeometry(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicsSystemCollider *arg1 = (iDynamicsSystemCollider *) 0 ;
+  float *arg2 = 0 ;
+  float *arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicsSystemCollider_GetCapsuleGeometry",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicsSystemCollider, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicsSystemCollider_GetCapsuleGeometry" "', argument " "1"" of type '" "iDynamicsSystemCollider *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicsSystemCollider * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_float,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDynamicsSystemCollider_GetCapsuleGeometry" "', argument " "2"" of type '" "float &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicsSystemCollider_GetCapsuleGeometry" "', argument " "2"" of type '" "float &""'"); 
+  }
+  arg2 = reinterpret_cast< float * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_float,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iDynamicsSystemCollider_GetCapsuleGeometry" "', argument " "3"" of type '" "float &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicsSystemCollider_GetCapsuleGeometry" "', argument " "3"" of type '" "float &""'"); 
+  }
+  arg3 = reinterpret_cast< float * >(argp3);
+  result = (bool)(arg1)->GetCapsuleGeometry(*arg2,*arg3);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -39298,6 +39872,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iDynamicSystem_AttachColliderConvexMesh", _wrap_iDynamicSystem_AttachColliderConvexMesh, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AttachColliderMesh", _wrap_iDynamicSystem_AttachColliderMesh, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AttachColliderCylinder", _wrap_iDynamicSystem_AttachColliderCylinder, METH_VARARGS, NULL},
+	 { (char *)"iDynamicSystem_AttachColliderCapsule", _wrap_iDynamicSystem_AttachColliderCapsule, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AttachColliderBox", _wrap_iDynamicSystem_AttachColliderBox, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AttachColliderSphere", _wrap_iDynamicSystem_AttachColliderSphere, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AttachColliderPlane", _wrap_iDynamicSystem_AttachColliderPlane, METH_VARARGS, NULL},
@@ -39333,6 +39908,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iRigidBody_AttachColliderConvexMesh", _wrap_iRigidBody_AttachColliderConvexMesh, METH_VARARGS, NULL},
 	 { (char *)"iRigidBody_AttachColliderMesh", _wrap_iRigidBody_AttachColliderMesh, METH_VARARGS, NULL},
 	 { (char *)"iRigidBody_AttachColliderCylinder", _wrap_iRigidBody_AttachColliderCylinder, METH_VARARGS, NULL},
+	 { (char *)"iRigidBody_AttachColliderCapsule", _wrap_iRigidBody_AttachColliderCapsule, METH_VARARGS, NULL},
 	 { (char *)"iRigidBody_AttachColliderBox", _wrap_iRigidBody_AttachColliderBox, METH_VARARGS, NULL},
 	 { (char *)"iRigidBody_AttachColliderSphere", _wrap_iRigidBody_AttachColliderSphere, METH_VARARGS, NULL},
 	 { (char *)"iRigidBody_AttachColliderPlane", _wrap_iRigidBody_AttachColliderPlane, METH_VARARGS, NULL},
@@ -39407,6 +39983,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iDynamicsSystemCollider_GetSphereGeometry", _wrap_iDynamicsSystemCollider_GetSphereGeometry, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_GetPlaneGeometry", _wrap_iDynamicsSystemCollider_GetPlaneGeometry, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_GetCylinderGeometry", _wrap_iDynamicsSystemCollider_GetCylinderGeometry, METH_VARARGS, NULL},
+	 { (char *)"iDynamicsSystemCollider_GetCapsuleGeometry", _wrap_iDynamicsSystemCollider_GetCapsuleGeometry, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_MakeStatic", _wrap_iDynamicsSystemCollider_MakeStatic, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_MakeDynamic", _wrap_iDynamicsSystemCollider_MakeDynamic, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_IsStatic", _wrap_iDynamicsSystemCollider_IsStatic, METH_VARARGS, NULL},
@@ -41595,6 +42172,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "BOX_COLLIDER_GEOMETRY",SWIG_From_int(static_cast< int >(BOX_COLLIDER_GEOMETRY)));
   SWIG_Python_SetConstant(d, "PLANE_COLLIDER_GEOMETRY",SWIG_From_int(static_cast< int >(PLANE_COLLIDER_GEOMETRY)));
   SWIG_Python_SetConstant(d, "TRIMESH_COLLIDER_GEOMETRY",SWIG_From_int(static_cast< int >(TRIMESH_COLLIDER_GEOMETRY)));
+  SWIG_Python_SetConstant(d, "CONVEXMESH_COLLIDER_GEOMETRY",SWIG_From_int(static_cast< int >(CONVEXMESH_COLLIDER_GEOMETRY)));
   SWIG_Python_SetConstant(d, "CYLINDER_COLLIDER_GEOMETRY",SWIG_From_int(static_cast< int >(CYLINDER_COLLIDER_GEOMETRY)));
   SWIG_Python_SetConstant(d, "CAPSULE_COLLIDER_GEOMETRY",SWIG_From_int(static_cast< int >(CAPSULE_COLLIDER_GEOMETRY)));
   SWIG_Python_SetConstant(d, "SPHERE_COLLIDER_GEOMETRY",SWIG_From_int(static_cast< int >(SPHERE_COLLIDER_GEOMETRY)));

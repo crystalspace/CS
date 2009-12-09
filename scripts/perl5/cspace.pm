@@ -7103,6 +7103,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AttachColliderConvexMesh = *cspacec::iDynamicSystem_AttachColliderConvexMesh;
 *AttachColliderMesh = *cspacec::iDynamicSystem_AttachColliderMesh;
 *AttachColliderCylinder = *cspacec::iDynamicSystem_AttachColliderCylinder;
+*AttachColliderCapsule = *cspacec::iDynamicSystem_AttachColliderCapsule;
 *AttachColliderBox = *cspacec::iDynamicSystem_AttachColliderBox;
 *AttachColliderSphere = *cspacec::iDynamicSystem_AttachColliderSphere;
 *AttachColliderPlane = *cspacec::iDynamicSystem_AttachColliderPlane;
@@ -7254,6 +7255,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AttachColliderConvexMesh = *cspacec::iRigidBody_AttachColliderConvexMesh;
 *AttachColliderMesh = *cspacec::iRigidBody_AttachColliderMesh;
 *AttachColliderCylinder = *cspacec::iRigidBody_AttachColliderCylinder;
+*AttachColliderCapsule = *cspacec::iRigidBody_AttachColliderCapsule;
 *AttachColliderBox = *cspacec::iRigidBody_AttachColliderBox;
 *AttachColliderSphere = *cspacec::iRigidBody_AttachColliderSphere;
 *AttachColliderPlane = *cspacec::iRigidBody_AttachColliderPlane;
@@ -7386,6 +7388,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSphereGeometry = *cspacec::iDynamicsSystemCollider_GetSphereGeometry;
 *GetPlaneGeometry = *cspacec::iDynamicsSystemCollider_GetPlaneGeometry;
 *GetCylinderGeometry = *cspacec::iDynamicsSystemCollider_GetCylinderGeometry;
+*GetCapsuleGeometry = *cspacec::iDynamicsSystemCollider_GetCapsuleGeometry;
 *MakeStatic = *cspacec::iDynamicsSystemCollider_MakeStatic;
 *MakeDynamic = *cspacec::iDynamicsSystemCollider_MakeDynamic;
 *IsStatic = *cspacec::iDynamicsSystemCollider_IsStatic;
@@ -23207,6 +23210,7 @@ sub NO_GEOMETRY () { $cspacec::NO_GEOMETRY }
 sub BOX_COLLIDER_GEOMETRY () { $cspacec::BOX_COLLIDER_GEOMETRY }
 sub PLANE_COLLIDER_GEOMETRY () { $cspacec::PLANE_COLLIDER_GEOMETRY }
 sub TRIMESH_COLLIDER_GEOMETRY () { $cspacec::TRIMESH_COLLIDER_GEOMETRY }
+sub CONVEXMESH_COLLIDER_GEOMETRY () { $cspacec::CONVEXMESH_COLLIDER_GEOMETRY }
 sub CYLINDER_COLLIDER_GEOMETRY () { $cspacec::CYLINDER_COLLIDER_GEOMETRY }
 sub CAPSULE_COLLIDER_GEOMETRY () { $cspacec::CAPSULE_COLLIDER_GEOMETRY }
 sub SPHERE_COLLIDER_GEOMETRY () { $cspacec::SPHERE_COLLIDER_GEOMETRY }
