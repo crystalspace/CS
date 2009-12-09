@@ -141,14 +141,20 @@ private:
 
     struct MappedLight
     {
-      csWeakRef<iLight> light;
       csRef<iRenderBuffer> colors;
+      csColor lastUpdateColor;
+      
+      MappedLight() : lastUpdateColor (-1, -1, -1) {}
     };
-    csSafeCopyArray<MappedLight> lights;
+    typedef csHash<MappedLight, csPtrKey<iLight> > LightsHash;
+    LightsHash lights;
     csRef<iRenderBuffer> staticColors;
     csDirtyAccessArray<csColor4> combinedColors;
 
     ColorBuffer() : name (0), lightsDirty (true), lastMeshVersion (~0) {}
+      
+    void UpdateLight (iLight* l, const csColor& col, float thresh);
+    void RemoveLight (iLight* l);
   };
 
   bool prepared;
