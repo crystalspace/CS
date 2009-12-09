@@ -110,6 +110,22 @@ namespace RenderManager
         }
       }
 
+      virtual void ObjectVisible (csRenderMesh* rm,
+        CS::Graphics::RenderPriority& rp,
+        iMeshWrapper* mw,
+        iShaderVariableContext* meshObjSVs,
+        csZBufMode& zBufMode,
+        csFlags& flags)
+      {
+        typename RenderTreeType::MeshNode::SingleMesh sm;
+        sm.meshWrapper = mw;
+        sm.meshObjSVs = meshObjSVs;
+        sm.zmode = zBufMode;
+        sm.meshFlags = flags;
+
+         context.AddRenderMesh (rm, rp, sm);
+      }
+
     private:      
       ContextNodeType& context;
       RenderView* currentRenderView;

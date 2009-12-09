@@ -107,7 +107,7 @@ namespace RenderManager
    * Render mesh nodes within one context.
    * Does not handle setting render targets or camera transform.
    */
-  template<typename RenderTree>
+  template<typename RenderTree, bool occlusionQueries = false>
   class SimpleContextRender
   {
   public:
@@ -187,7 +187,17 @@ namespace RenderManager
           if (!shader->SetupPass (ticket, mesh.renderMesh, modes, svStack)) continue;
           modes.z_buf_mode = mesh.zmode;
 
+          if (occlusionQueries)
+          {
+            g3d->BeginOcclusionQuery(*mesh.occlusionQuery);
+          }
+
           g3d->DrawMesh (mesh.renderMesh, modes, svStack);
+
+          if (occlusionQueries)
+          {
+            g3d->EndOcclusionQuery();
+          }
 
           shader->TeardownPass (ticket);
         }
@@ -228,7 +238,7 @@ namespace RenderManager
    * // ... apply post processing ...
    * \endcode
    */
-  template<typename RenderTree>
+  template<typename RenderTree, bool occlusionQueries = false>
   class SimpleTreeRenderer
   {
   public:
@@ -246,7 +256,7 @@ namespace RenderManager
       RenderContextStack ();
     }
 
-    void operator() (size_t i, typename RenderTree::ContextNode* context)
+    void operator() (typename RenderTree::ContextNode* context)
     {
       // Make sure right target is set
       if (IsNew (*context))
@@ -258,11 +268,16 @@ namespace RenderManager
           lastTarget[a] = context->renderTargets[a].texHandle;
           lastSubtexture[a] = context->renderTargets[a].subtexture;
         }
-	lastRenderView = context->renderView;
+        lastRenderView = context->renderView;
       }
 
       // Push the context
       contextStack.Push (context);      
+    }
+
+    void operator() (size_t i, typename RenderTree::ContextNode* context)
+    {
+      (*this)(context);
     }
    
   private:
@@ -356,7 +371,7 @@ namespace RenderManager
     }
 
     ContextTargetSetup<typename RenderTree::ContextNode> targetSetup;
-    SimpleContextRender<RenderTree> meshRender;
+    SimpleContextRender<RenderTree, occlusionQueries> meshRender;
 
     iGraphics3D* g3d;
     iShaderManager* shaderMgr;

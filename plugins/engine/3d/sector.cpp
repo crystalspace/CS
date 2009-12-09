@@ -481,6 +481,13 @@ public:
     }
   }
 
+  virtual void ObjectVisible (csRenderMesh* rm,
+    CS::Graphics::RenderPriority& rp,
+    iMeshWrapper* mw,
+    iShaderVariableContext* meshObjSVs,
+    csZBufMode& zBufMode,
+    csFlags& flags) {}
+
 private:
   csRenderMeshList *privMeshlist;
   iRenderView *rview;

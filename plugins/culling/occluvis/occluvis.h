@@ -151,18 +151,38 @@ private:
     INSIDE
   };
 
+  struct OcclusionQueries
+  {
+    // Query data.
+    size_t numQueries;
+    unsigned int* query;
+    csRenderMesh** rm;
+    CS::Graphics::RenderPriority* rp;
+    RenderTreeType::MeshNode::SingleMesh* sm;
+
+    // State data.
+    size_t currentQuery;
+
+    OcclusionQueries () : numQueries (0),
+      query (0), rm (0), rp (0), sm (0),
+      currentQuery (0)
+    {
+    }
+  };
+
   struct TransversalData
   {
     csKDTree* parent;
     csKDTree* treenode;
     csKDTreeChild* treeleaf;
-    unsigned int query;
+    OcclusionQueries queries;
     bool parentTotallyVisible;
     uint32 frustum_mask;
   };
 
   csList<TransversalData> TransversalQueue;
 
+  csList<TransversalData> PushedQueue;
   csList<TransversalData> QueryQueue;
   csList<TransversalData> DelayedQueryQueue;
 
@@ -170,7 +190,17 @@ private:
   void TransverseNode(TransversalData& tdata, uint32 cur_timestamp, bool parentTotallyVisible);
 
   RenderTreeType::PersistentData treePersistent;
-  void RenderZMeshQuery (unsigned int& query, iMeshWrapper *imesh, uint32 frustum_mask, iRenderView* rview);
+  void RenderZMeshQuery(iRenderView* rview);
+  void PushVisibleRenderMeshes(OcclusionQueries& query, iMeshWrapper *imesh,
+    uint32 frustum_mask, iRenderView* rview);
+
+  // Render context.
+  RenderTreeType::ContextNode* OQContext;
+
+  // Render tree.
+  RenderTreeType* renderTree;
+
+  size_t OQContextRMeshes;
 
 public:
   csOccluVis (iBase *iParent);

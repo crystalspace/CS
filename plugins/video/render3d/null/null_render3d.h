@@ -178,7 +178,7 @@ public:
   bool PerformExtensionV (char const* /*command*/, va_list /*args*/)
   { return false; }
 
-  void InitQueries(unsigned int* queries, int& old_num_queries, int& num_queries) { }
+  void InitQueries(unsigned int*& queries, int& old_num_queries, int& num_queries) { }
   bool QueryFinished(unsigned int& occlusion_query) { return true; }
   bool IsVisible(unsigned int& occlusion_query, unsigned int& sampleLimit) { return true; }
   void BeginOcclusionQuery (unsigned int& occlusion_query) { }

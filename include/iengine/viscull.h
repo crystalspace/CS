@@ -28,6 +28,7 @@
  * @{ */
  
 #include "csutil/scf_interface.h"
+#include "ivideo/rendermesh.h"
 
 struct iDocumentNode;
 struct iMeshWrapper;
@@ -68,7 +69,7 @@ struct iVisibilityObjectIterator : public virtual iBase
  */
 struct iVisibilityCullerListener : public virtual iBase
 {
-  SCF_INTERFACE(iVisibilityCullerListener, 2,0,0);
+  SCF_INTERFACE(iVisibilityCullerListener, 3,0,0);
   /**
    * This function is called whenever the visibilty culler discovers a new
    * visible mesh.  The frustum_mask is a mask that is compatible with
@@ -78,6 +79,13 @@ struct iVisibilityCullerListener : public virtual iBase
    */
   virtual void ObjectVisible (iVisibilityObject *visobject, 
     iMeshWrapper *mesh, uint32 frustum_mask) = 0;
+
+  virtual void ObjectVisible (csRenderMesh* rm,
+    CS::Graphics::RenderPriority& rp,
+    iMeshWrapper* mw,
+    iShaderVariableContext* meshObjSVs,
+    csZBufMode& zBufMode,
+    csFlags& flags) = 0;
 };
 
 /**

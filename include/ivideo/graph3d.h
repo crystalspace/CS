@@ -1198,7 +1198,7 @@ struct iGraphics3D : public virtual iBase
   /**
    * Initialise a set of occlusion queries.
    */
-  virtual void InitQueries (unsigned int* queries, int& old_num_queries,
+  virtual void InitQueries (unsigned int*& queries, int& old_num_queries,
     int& num_queries) = 0;
 
   /**

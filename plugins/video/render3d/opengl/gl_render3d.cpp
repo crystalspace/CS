@@ -3674,11 +3674,11 @@ bool csGLGraphics3D::PerformExtension (char const* command, ...)
   return rc;
 }
 
-void csGLGraphics3D::InitQueries(unsigned int* queries, int& old_num_queries, int& num_queries)
+void csGLGraphics3D::InitQueries(unsigned int*& queries, int& old_num_queries, int& num_queries)
 {
-  if (1 < num_queries)
+  if (num_queries != 0)
   {
-    if (queries != 0)
+    if (queries != 0 && old_num_queries != 0)
     {
       ext->glDeleteQueriesARB(old_num_queries, (GLuint*)queries);
       delete[] queries;

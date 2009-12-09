@@ -783,7 +783,7 @@ public:
   virtual bool PerformExtension (char const* command, ...);
   virtual bool PerformExtensionV (char const* command, va_list args);
 
-  virtual void InitQueries(unsigned int* queries, int& old_num_queries, int& num_queries);
+  virtual void InitQueries(unsigned int*& queries, int& old_num_queries, int& num_queries);
   virtual bool QueryFinished(unsigned int& occlusion_query);
   virtual bool IsVisible(unsigned int& occlusion_query, unsigned int& sampleLimit);
   virtual void BeginOcclusionQuery (unsigned int& occlusion_query);

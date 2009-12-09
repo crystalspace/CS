@@ -170,6 +170,13 @@ public:
 
   virtual void ObjectVisible (iVisibilityObject *visobject, 
     iMeshWrapper *mesh, uint32 frustum_mask);
+
+  virtual void ObjectVisible (csRenderMesh* rm,
+    CS::Graphics::RenderPriority& rp,
+    iMeshWrapper* mw,
+    iShaderVariableContext* meshObjSVs,
+    csZBufMode& zBufMode,
+    csFlags& flags) {}
 };
 
 class csStencilShadowFactory :
