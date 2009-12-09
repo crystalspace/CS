@@ -37,7 +37,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
-// TODO: is this needed?
 #include "csutil/custom_new_disable.h"
 
 // Bullet includes.
@@ -120,8 +119,7 @@ static csRef<iTriangleMesh> FindColdetTriangleMesh(iMeshWrapper* mesh,
   return trimesh;
 }
 
-// TODO: is this needed?
-//#include "csutil/custom_new_disable.h"
+#include "csutil/custom_new_disable.h"
 
 static btTriangleIndexVertexArray* GenerateTriMeshData (iMeshWrapper* mesh,
 	int*& indices, btVector3*& vertices,
@@ -161,7 +159,7 @@ static btTriangleIndexVertexArray* GenerateTriMeshData (iMeshWrapper* mesh,
   return indexVertexArrays;
 }
 
-//#include "csutil/custom_new_enable.h"
+#include "csutil/custom_new_enable.h"
 
 //------------------------ csBulletMotionState ----------------------
 
@@ -214,8 +212,8 @@ public:
 //---------------------------------------------------------------------------
 
 csBulletDynamics::csBulletDynamics (iBase *iParent)
-  : scfImplementationType (this, iParent), dispatcher (NULL),
-    configuration (NULL), solver (NULL), broadphase (NULL)
+  : scfImplementationType (this, iParent), dispatcher (0),
+    configuration (0), solver (0), broadphase (0)
 {
 }
 
@@ -358,7 +356,7 @@ public:
 
 csBulletDynamicsSystem::csBulletDynamicsSystem (btDynamicsWorld* world,
     iObjectRegistry* object_reg)
-  : scfImplementationType (this), bulletWorld (world), debugDraw (NULL)
+  : scfImplementationType (this), bulletWorld (world), debugDraw (0)
 {
   moveCb.AttachNew (new csBulletDefaultMoveCallback ());
   SetGravity (csVector3 (0, -9.81, 0));
@@ -733,7 +731,7 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
 //-------------------- csBulletRigidBody -----------------------------------
 
 csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic)
-  : scfImplementationType (this), dynSys (dynSys), body (NULL),
+  : scfImplementationType (this), dynSys (dynSys), body (0),
     isStatic (isStatic), mass (1.0f)
 {
   btTransform identity;
@@ -774,7 +772,7 @@ void csBulletRigidBody::RebuildBody ()
 
   // create body infos
   btVector3 localInertia (0, 0, 0);
-  void* userPointer (NULL);
+  void* userPointer (0);
   float bodyMass (0);
 
   // update the compound shape if changed
@@ -1650,9 +1648,9 @@ void csBulletDefaultMoveCallback::Execute (csOrthoTransform&)
 csBulletCollider::csBulletCollider (csBulletDynamicsSystem* dynSys,
 				    csBulletRigidBody* body, bool isStaticBody)
   :  scfImplementationType (this), dynSys (dynSys), body (body),
-     isStaticBody (isStaticBody), geomType (NO_GEOMETRY), shape (NULL),
+     isStaticBody (isStaticBody), geomType (NO_GEOMETRY), shape (0),
      density (0.1f), friction (0.5f), softness (0.0f), elasticity (0.2f),
-     vertices (NULL), indices (NULL)
+     vertices (0), indices (0)
 {
 }
 
@@ -1667,9 +1665,9 @@ bool csBulletCollider::CreateSphereGeometry (const csSphere& sphere)
 {
   // TODO: the body won't be set if one create a body, then AttachCollider, then CreateGeometry on the collider
 
-  delete shape; shape = NULL;
-  delete[] vertices; vertices = NULL;
-  delete[] indices; indices = NULL;
+  delete shape; shape = 0;
+  delete[] vertices; vertices = 0;
+  delete[] indices; indices = 0;
 
   shape = new btSphereShape (sphere.GetRadius ());
   geomType = SPHERE_COLLIDER_GEOMETRY;
@@ -1692,9 +1690,9 @@ bool csBulletCollider::CreatePlaneGeometry (const csPlane3& plane)
 {
   // TODO
   /*
-  delete shape; shape = NULL;
-  delete[] vertices; vertices = NULL;
-  delete[] indices; indices = NULL;
+  delete shape; shape = 0;
+  delete[] vertices; vertices = 0;
+  delete[] indices; indices = 0;
 
   csVector3 normal = plane.GetNormal ();
   shape = new btPlaneShape (btVector3 (normal.GetX (), normal.GetY (), normal.GetZ ()), plane.D ());
@@ -1713,9 +1711,9 @@ bool csBulletCollider::CreatePlaneGeometry (const csPlane3& plane)
 
 bool csBulletCollider::CreateConvexMeshGeometry (iMeshWrapper* mesh)
 {
-  delete shape; shape = NULL;
-  delete[] vertices; vertices = NULL;
-  delete[] indices; indices = NULL;
+  delete shape; shape = 0;
+  delete[] vertices; vertices = 0;
+  delete[] indices; indices = 0;
 
   btTriangleIndexVertexArray* indexVertexArrays =
     GenerateTriMeshData (mesh, indices, vertices,
@@ -1753,9 +1751,9 @@ bool csBulletCollider::CreateConvexMeshGeometry (iMeshWrapper* mesh)
 
 bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
 {
-  delete shape; shape = NULL;
-  delete[] vertices; vertices = NULL;
-  delete[] indices; indices = NULL;
+  delete shape; shape = 0;
+  delete[] vertices; vertices = 0;
+  delete[] indices; indices = 0;
 
   btTriangleIndexVertexArray* indexVertexArrays =
     GenerateTriMeshData (mesh, indices, vertices,
@@ -1787,9 +1785,9 @@ bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
 
 bool csBulletCollider::CreateBoxGeometry (const csVector3& size)
 {
-  delete shape; shape = NULL;
-  delete[] vertices; vertices = NULL;
-  delete[] indices; indices = NULL;
+  delete shape; shape = 0;
+  delete[] vertices; vertices = 0;
+  delete[] indices; indices = 0;
 
   shape = new btBoxShape (btVector3 (
 	size.x / 2.0f, size.y / 2.0f, size.z / 2.0f));
@@ -1807,9 +1805,9 @@ bool csBulletCollider::CreateBoxGeometry (const csVector3& size)
 bool csBulletCollider::CreateCylinderGeometry (float length,
   float radius)
 {
-  delete shape; shape = NULL;
-  delete[] vertices; vertices = NULL;
-  delete[] indices; indices = NULL;
+  delete shape; shape = 0;
+  delete[] vertices; vertices = 0;
+  delete[] indices; indices = 0;
 
   shape = new btCylinderShapeZ (btVector3 (radius, radius, length / 2.0f));
   geomType = CYLINDER_COLLIDER_GEOMETRY;
@@ -1826,9 +1824,9 @@ bool csBulletCollider::CreateCylinderGeometry (float length,
 bool csBulletCollider::CreateCapsuleGeometry (float length,
   float radius)
 {
-  delete shape; shape = NULL;
-  delete[] vertices; vertices = NULL;
-  delete[] indices; indices = NULL;
+  delete shape; shape = 0;
+  delete[] vertices; vertices = 0;
+  delete[] indices; indices = 0;
 
   shape = new btCapsuleShapeZ (radius, length);
   geomType = CAPSULE_COLLIDER_GEOMETRY;
@@ -2028,7 +2026,7 @@ bool csBulletCollider::IsStatic ()
 
 csBulletJoint::csBulletJoint (csBulletDynamicsSystem* dynsys)
   : scfImplementationType (this), dynSys (dynsys), jointType (BULLET_JOINT_NONE),
-    constraint (NULL), trans_constraint_x (false), trans_constraint_y (false),
+    constraint (0), trans_constraint_x (false), trans_constraint_y (false),
     trans_constraint_z (false), min_dist (1000.0f), max_dist (-1000.0f),
     rot_constraint_x (false), rot_constraint_y (false), rot_constraint_z (false),
     min_angle (PI / 2.0), max_angle (- PI / 2.0), bounce (0),
@@ -2077,7 +2075,7 @@ bool csBulletJoint::RebuildJoint ()
   {
     dynSys->bulletWorld->removeConstraint (constraint);
     delete constraint;
-    constraint = NULL;
+    constraint = 0;
   }
 
   if (!bodies[0] || !bodies[1]) return false;

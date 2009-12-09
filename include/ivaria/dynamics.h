@@ -113,7 +113,7 @@ struct iDynamicsSystemCollider;
  */
 struct iDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE (iDynamicSystem, 0, 0, 2);
+  SCF_INTERFACE (iDynamicSystem, 0, 0, 3);
 
   /// returns the underlying object
   virtual iObject *QueryObject (void) = 0;
@@ -236,27 +236,6 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attaches a static collider capsule to world (oriented along it's Z axis).
-   * A capsule is a cylinder with an halph-sphere at each end. It is less costly
-   * to compute collisions with a capsule than with a cylinder.
-   * \param length the capsule length along the axis (i.e. the distance between the 
-   * two halph-sphere's centers)
-   * \param radius the capsule radius
-   * \param trans a hard transform to apply to the mesh
-   * \param friction how much friction this body has,
-   * ranges from 0 (no friction) to infinity (perfect friction)
-   * \param elasticity the "bouncyness" of this object, from 0
-   * (no bounce) to 1 (maximum bouncyness)
-   * \param softness how "squishy" this object is, in the range
-   * 0...1; small values (range of 0.00001 to 0.01) give
-   * reasonably stiff collision contacts, larger values
-   * are more "mushy"
-   */
-  virtual bool AttachColliderCapsule (float length, float radius,
-    const csOrthoTransform& trans, float friction,
-    float elasticity, float softness = 0.01f) = 0;
-
-  /**
    * Attaches a static collider box to world
    * \param size the box size along each axis
    * \param trans a hard transform to apply to the mesh
@@ -326,6 +305,27 @@ struct iDynamicSystem : public virtual iBase
 
   /// Get static colliders count.
   virtual int GetColliderCount () = 0;
+
+  /**
+   * Attaches a static collider capsule to world (oriented along it's Z axis).
+   * A capsule is a cylinder with an halph-sphere at each end. It is less costly
+   * to compute collisions with a capsule than with a cylinder.
+   * \param length the capsule length along the axis (i.e. the distance between the 
+   * two halph-sphere's centers)
+   * \param radius the capsule radius
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
+  virtual bool AttachColliderCapsule (float length, float radius,
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f) = 0;
 };
 
 /**
@@ -432,7 +432,7 @@ struct iBodyGroup : public virtual iBase
  */
 struct iRigidBody : public virtual iBase
 {
-  SCF_INTERFACE (iRigidBody, 0, 0, 2);
+  SCF_INTERFACE (iRigidBody, 0, 0, 3);
 
   /// returns the underlying object
   virtual iObject *QueryObject (void) = 0;
@@ -514,27 +514,6 @@ struct iRigidBody : public virtual iBase
    * are more "mushy"
    */
   virtual bool AttachColliderCylinder (float length, float radius,
-    const csOrthoTransform& trans, float friction, float density,
-    float elasticity, float softness = 0.01f) = 0;
-
-  /**
-   * Attaches a collider capsule to the body (oriented along it's Z axis).
-   * A capsule is a cylinder with an halph-sphere at each end. It is less costly
-   * to compute collisions with a capsule than with a cylinder.
-   * \param length the capsule length along the axis (i.e. the distance between the 
-   * two halph-sphere's centers)
-   * \param radius the capsule radius
-   * \param trans a hard transform to apply to the mesh
-   * \param friction how much friction this body has,
-   * ranges from 0 (no friction) to infinity (perfect friction)
-   * \param elasticity the "bouncyness" of this object, from 0
-   * (no bounce) to 1 (maximum bouncyness)
-   * \param softness how "squishy" this object is, in the range
-   * 0...1; small values (range of 0.00001 to 0.01) give
-   * reasonably stiff collision contacts, larger values
-   * are more "mushy"
-   */
-  virtual bool AttachColliderCapsule (float length, float radius,
     const csOrthoTransform& trans, float friction, float density,
     float elasticity, float softness = 0.01f) = 0;
 
@@ -738,6 +717,27 @@ struct iRigidBody : public virtual iBase
 
   /// Get body colliders count 
   virtual int GetColliderCount () = 0;
+
+  /**
+   * Attaches a collider capsule to the body (oriented along it's Z axis).
+   * A capsule is a cylinder with an halph-sphere at each end. It is less costly
+   * to compute collisions with a capsule than with a cylinder.
+   * \param length the capsule length along the axis (i.e. the distance between the 
+   * two halph-sphere's centers)
+   * \param radius the capsule radius
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
+  virtual bool AttachColliderCapsule (float length, float radius,
+    const csOrthoTransform& trans, float friction, float density,
+    float elasticity, float softness = 0.01f) = 0;
 };
 
 enum csColliderGeometryType
@@ -799,7 +799,7 @@ class csReversibleTransform;
  */
 struct iDynamicsSystemCollider : public virtual iBase
 {
-  SCF_INTERFACE (iDynamicsSystemCollider, 0, 0, 2);
+  SCF_INTERFACE (iDynamicsSystemCollider, 0, 0, 3);
 
   /// Create Collider Geometry with given sphere.
   virtual bool CreateSphereGeometry (const csSphere& sphere) = 0;
@@ -902,12 +902,6 @@ struct iDynamicsSystemCollider : public virtual iBase
   virtual bool GetCylinderGeometry (float& length, float& radius) = 0;
 
   /**
-   * If this collider has a capsule geometry then the method will return true and
-   * the capsule's length and radius, otherwise it will return false.
-   */
-  virtual bool GetCapsuleGeometry (float& length, float& radius) = 0;
-
-  /**
    * Make collider static. Static collider acts on dynamic colliders and bodies,
    * but ignores other static colliders (it won't do precise collision detection 
    * in that case).
@@ -922,6 +916,12 @@ struct iDynamicsSystemCollider : public virtual iBase
 
   /// Check if collider is static. 
   virtual bool IsStatic () = 0;
+
+  /**
+   * If this collider has a capsule geometry then the method will return true and
+   * the capsule's length and radius, otherwise it will return false.
+   */
+  virtual bool GetCapsuleGeometry (float& length, float& radius) = 0;
 };
 
 /**

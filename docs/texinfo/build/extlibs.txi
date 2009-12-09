@@ -225,7 +225,7 @@ in order to use the library with Crystal Space.
 @cindex Libraries, Bullet
 @cindex Physics library
 
-@emph{Version:} 2.69 minimum
+@emph{Version:} 2.75 recommended
 
 Crystal Space can also provide physics through Bullet. You can get
 the required version at:
