@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include <crystalspace.h>
 #include <ivaria/ode.h>
+#include "dynsysdebug.h"
 
 class Simple
 {
@@ -37,7 +38,6 @@ private:
   csRef<iCollideSystem> cdsys;
   csRef<FramePrinter> printer;
   iSector* room;
-  int objcnt;
   int solver;
   bool disable;
 
@@ -58,15 +58,31 @@ private:
   void WriteShadow (int x,int y,int fg,const char *str,...);
   void Write(int x,int y,int fg,int bg,const char *str,...);
   
+  void UpdateCameraMode ();
+
   bool CreateStarCollider ();
   iRigidBody* CreateBox ();
   iRigidBody* CreateSphere ();
+  iRigidBody* CreateCylinder ();
+  iRigidBody* CreateCapsule ();
   iRigidBody* CreateMesh ();
   iJoint* CreateJointed ();
+  void CreateChain ();
   void CreateWalls (const csVector3& radius);
+
   csRef<iMeshWrapper> walls;
+
+  int cameraMode;
   csRef<iMeshWrapper> avatar;
   csRef<iRigidBody> avatarbody;
+  // Current orientation of the camera.
+  float rotX, rotY;
+
+  csDynamicSystemDebugger dynSysDebugger;
+  bool debugMode;
+  bool allStatic;
+  bool pauseDynamic;
+  float dynamicSpeed;
 
   CS_DECLARE_EVENT_SHORTCUTS;
 

@@ -514,6 +514,7 @@ public:
   { autonormals = false; }
   void Compress ();
   void GenerateBox (const csBox3& box);
+  void GenerateCylinder (float l, float r, uint sides);
   void GenerateCapsule (float l, float r, uint sides);
   void GenerateSphere (const csEllipsoid& ellips, int rim_vertices,
       	bool cyl_mapping = false, bool toponly = false,

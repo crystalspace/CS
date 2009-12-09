@@ -1297,14 +1297,28 @@ void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
   legacyBuffers.mesh_normals_dirty_flag = true;
 }
 
+void csGenmeshMeshObjectFactory::GenerateCylinder (float l, float r, uint sides)
+{
+  CreateLegacyBuffers();
+  subMeshes.GetDefaultSubmesh()->CreateLegacyBuffer();
+  CS::Geometry::DensityTextureMapper mapper (10);
+  CS::Geometry::Primitives::GenerateCylinder (
+      l, r, sides, legacyBuffers.mesh_vertices, legacyBuffers.mesh_texels,
+      legacyBuffers.mesh_normals, 
+      subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles, &mapper);
+  legacyBuffers.mesh_colors.DeleteAll ();
+  Invalidate ();
+}
+
 void csGenmeshMeshObjectFactory::GenerateCapsule (float l, float r, uint sides)
 {
   CreateLegacyBuffers();
   subMeshes.GetDefaultSubmesh()->CreateLegacyBuffer();
+  CS::Geometry::DensityTextureMapper mapper (10);
   CS::Geometry::Primitives::GenerateCapsule (
       l, r, sides, legacyBuffers.mesh_vertices, legacyBuffers.mesh_texels,
       legacyBuffers.mesh_normals, 
-      subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles);
+      subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles, &mapper);
   legacyBuffers.mesh_colors.DeleteAll ();
   Invalidate ();
 }

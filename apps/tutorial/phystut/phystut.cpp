@@ -23,19 +23,26 @@ CS_IMPLEMENT_APPLICATION
 #define ODE_ID 1
 #define BULLET_ID 2
 
+#define CAMERA_BODY 1
+#define CAMERA_FREE 2
+
 //-----------------------------------------------------------------------------
 
 // The global pointer to simple
 Simple *simple;
 
 Simple::Simple (iObjectRegistry* object_reg)
+  : dynSysDebugger (object_reg)
 {
   Simple::object_reg = object_reg;
-  objcnt = 0;
   solver = 0;
   disable = false;
   do_bullet_debug = false;
-}
+  cameraMode = CAMERA_BODY;
+  debugMode = false;
+  allStatic = false;
+  pauseDynamic = false;
+  dynamicSpeed = 1.0;}
 
 Simple::~Simple ()
 {
@@ -50,30 +57,90 @@ void Simple::SetupFrame ()
   // Now rotate the camera according to keyboard state
   const float speed = elapsed_time / 1000.0;
 
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_RIGHT, speed);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_UP, speed);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
+  // Camera is controlled by a rigid body
+  if (cameraMode == CAMERA_BODY)
   {
-    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform()
-	.GetT2O () * csVector3 (0, 0, 5));
-  }
-  if (kbd->GetKeyState (CSKEY_DOWN))
-  {
-    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform()
-	.GetT2O () * csVector3 (0, 0, -5));
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_RIGHT, speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_LEFT, speed);
+    if (kbd->GetKeyState (CSKEY_PGUP))
+      view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_UP, speed);
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_DOWN, speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+    {
+      avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform()
+				     .GetT2O () * csVector3 (0, 0, 5));
+    }
+    if (kbd->GetKeyState (CSKEY_DOWN))
+    {
+      avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform()
+				     .GetT2O () * csVector3 (0, 0, -5));
+    }
   }
 
-  dyn->Step (speed);
+  // Camera is free
+  else
+  {
+    iCamera* c = view->GetCamera();
 
-  view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()
-    ->GetTransform().GetOrigin());
-  //avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
+    if (kbd->GetKeyState (CSKEY_SHIFT))
+    {
+      // If the user is holding down shift, the arrow keys will cause
+      // the camera to strafe up, down, left or right from it's
+      // current position.
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+	c->Move (CS_VEC_RIGHT * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_LEFT))
+	c->Move (CS_VEC_LEFT * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_UP))
+	c->Move (CS_VEC_UP * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_DOWN))
+	c->Move (CS_VEC_DOWN * 4 * speed);
+    }
+    else
+    {
+      // left and right cause the camera to rotate on the global Y
+      // axis; page up and page down cause the camera to rotate on the
+      // _camera's_ X axis (more on this in a second) and up and down
+      // arrows cause the camera to go forwards and backwards.
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+	rotY += speed;
+      if (kbd->GetKeyState (CSKEY_LEFT))
+	rotY -= speed;
+      if (kbd->GetKeyState (CSKEY_PGUP))
+	rotX += speed;
+      if (kbd->GetKeyState (CSKEY_PGDN))
+	rotX -= speed;
+      if (kbd->GetKeyState (CSKEY_UP))
+	c->Move (CS_VEC_FORWARD * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_DOWN))
+	c->Move (CS_VEC_BACKWARD * 4 * speed);
+    }
+
+    // We now assign a new rotation transformation to the camera.  You
+    // can think of the rotation this way: starting from the zero
+    // position, you first rotate "rotY" radians on your Y axis to get
+    // the first rotation.  From there you rotate "rotX" radians on the
+    // your X axis to get the final rotation.  We multiply the
+    // individual rotations on each axis together to get a single
+    // rotation matrix.  The rotations are applied in right to left
+    // order .
+    csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+    csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+    c->SetTransform (ot);
+  }
+
+  if (!pauseDynamic)
+    dyn->Step (speed / dynamicSpeed);
+
+  if (cameraMode == CAMERA_BODY)
+  {
+    view->GetCamera()->GetTransform().SetOrigin(
+				    avatarbody->GetTransform().GetOrigin());
+    //avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
+  }
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -95,7 +162,8 @@ void Simple::SetupFrame ()
   if( speed != 0.0f)
     WriteShadow( 10, 400, g2d->FindRGB (255, 150, 100),"FPS: %.2f",
 	1.0f/speed);
-  WriteShadow( 10, 410, g2d->FindRGB (255, 150, 100),"%d Objects",objcnt);
+  WriteShadow( 10, 410, g2d->FindRGB (255, 150, 100),"%d Objects",
+	       dynSys->GetBodysCount ());
 
   if (phys_engine_id == ODE_ID)
   {
@@ -137,6 +205,18 @@ bool Simple::HandleEvent (iEvent& ev)
 	CreateSphere ();
 	return true;
       }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'c'
+	       && phys_engine_id == BULLET_ID)
+      {
+	CreateCylinder ();
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'a'
+	       && phys_engine_id == BULLET_ID)
+      {
+	CreateCapsule ();
+	return true;
+      }
       else if (csKeyEventHelper::GetCookedCode (&ev) == 'm')
       {
 	CreateMesh ();
@@ -152,8 +232,90 @@ bool Simple::HandleEvent (iEvent& ev)
 	CreateJointed ();
 	return true;
       }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'h'
+	       && phys_engine_id == BULLET_ID)
+      {
+	CreateChain ();
+	return true;
+      }
+
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'f')
+      {
+	// Toggle camera mode
+	if (cameraMode == CAMERA_BODY)
+	{
+	  cameraMode = CAMERA_FREE;
+	  printf ("Toggling camera to free mode\n");
+	}
+	else
+	{
+	  cameraMode = CAMERA_BODY;
+	  printf ("Toggling camera to rigid body mode\n");
+	}
+	UpdateCameraMode ();
+	return true;
+      }
+
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 't')
+      {
+	// Toggle all bodies between dynamic and static
+	allStatic = !allStatic;
+
+	if (allStatic)
+	  printf ("Toggling all bodies to static mode\n");
+	else
+	  printf ("Toggling all bodies to dynamic mode\n");
+
+	for (int i = 0; i < dynSys->GetBodysCount (); i++)
+	{
+	  iRigidBody* body = dynSys->GetBody (i);
+	  if (allStatic)
+	    body->MakeStatic ();
+	  else {
+	    body->MakeDynamic ();
+	    body->Enable ();
+	  }
+	}
+	return true;
+      }
+
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'p')
+      {
+	// Toggle pause mode for dynamic simulation
+	pauseDynamic = !pauseDynamic;
+	if (pauseDynamic)
+	  printf ("Dynamic simulation paused\n");
+	else
+	  printf ("Dynamic simulation resumed\n");
+	return true;
+      }
+
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'o')
+      {
+	// Toggle speed of dynamic simulation
+	if (dynamicSpeed - 1.0 < 0.00001)
+	{
+	  dynamicSpeed = 45.0;
+	  printf ("Dynamic simulation slowed\n");
+	}
+	else
+	{
+	  dynamicSpeed = 1.0;
+	  printf ("Dynamic simulation at normal speed\n");
+	}
+      }
+
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
+      {
+	// Toggle dynamic system visual debug mode
+	debugMode = !debugMode;
+	dynSysDebugger.SetDebugDisplayMode (debugMode);
+	return true;
+      }
+
       else if (csKeyEventHelper::GetCookedCode (&ev) == '?')
       {
+	// Toggle collision debug mode
         if (phys_engine_id != BULLET_ID)
           csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
             "crystalspace.application.phystut",
@@ -161,6 +323,7 @@ bool Simple::HandleEvent (iEvent& ev)
 	else
 	  do_bullet_debug = !do_bullet_debug;
       }
+
       else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
       { // Toggle gravity.
 	dynSys->SetGravity (dynSys->GetGravity () == 0 ?
@@ -378,6 +541,7 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
+  dynSysDebugger.SetDebugSector (room);
 
   // First we make a primitive for our geometry.
   using namespace CS::Geometry;
@@ -392,9 +556,37 @@ bool Simple::Initialize ()
       engine, room, "walls", "walls_factory", &box);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
+  // Creating the background (usefull when the camera is free and is moved 
+  // outside of the room)
+
+  // First we make a primitive for our geometry.
+  CS::Geometry::DensityTextureMapper bgMapper (0.3f);
+  CS::Geometry::TesselatedBox bgBox (csVector3 (-50000), csVector3 (50000));
+  bgBox.SetMapper(&bgMapper);
+  bgBox.SetFlags(CS::Geometry::Primitives::CS_PRIMBOX_INSIDE);
+  
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> background =
+    CS::Geometry::GeneralMeshBuilder::CreateFactoryAndMesh(engine, room,
+				   "background", "background_factory", &bgBox);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<iGeneralMeshState>
+    (background->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+
+  csRef<iMaterialWrapper> bgMaterial = ColoredTexture::CreateColoredMaterial
+    ("background", csColor (0.898), object_reg);
+  background->GetMeshObject()->SetMaterialWrapper(bgMaterial);
+
+  // Creating lights
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
+  // This light is for the background
+  light = engine->CreateLight(0, csVector3(10), 100000, csColor (1));
+  ll->Add (light);
+
+  // Other lights
   light = engine->CreateLight (0, csVector3 (3, 0, 0), 8,
     csColor (1, 0, 0));
   ll->Add (light);
@@ -470,6 +662,8 @@ bool Simple::Initialize ()
 
   dynSys->SetRollingDampener(.995f);
 
+  dynSysDebugger.SetDynamicSystem (dynSys);
+
   if (phys_engine_id == ODE_ID)
   {
     csRef<iODEDynamicSystemState> osys= 
@@ -483,25 +677,8 @@ bool Simple::Initialize ()
   }
   CreateWalls (csVector3 (5));
 
-  // Use the camera transform.
-  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
-
-  // Create the avatar.
-  avatar = engine->CreateMeshWrapper (boxFact, "box", room);
-
-  // Create a body and attach the mesh.
-  avatarbody = dynSys->CreateBody ();
-  avatarbody->SetProperties (1, csVector3 (0), csMatrix3 ());
-  avatarbody->SetPosition (tc.GetOrigin ());
-  avatarbody->AttachMesh (avatar);
-
-  // Create and attach a box collider.
-  // const csMatrix3 tmm;
-  // const csVector3 tvv (0);
-  // csOrthoTransform tt (tmm, tvv);
-  // csVector3 size (0.4f, 0.8f, 0.4f); // This should be same size as mesh.
-  // avatarbody->AttachColliderBox (size, tt, 10, 1, 0.8f);
-  avatarbody->AttachColliderSphere (0.8f, csVector3 (0), 10, 1, 0.8f);
+  // Init the camera
+  UpdateCameraMode ();
 
   return true;
 }
@@ -511,9 +688,43 @@ void Simple::Shutdown ()
   printer.Invalidate ();
 }
 
+void Simple::UpdateCameraMode ()
+{
+  if (cameraMode == CAMERA_BODY)
+  {
+    // Use the camera transform.
+    const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+    // Create the avatar.
+    avatar = engine->CreateMeshWrapper (boxFact, "box", room);
+
+    // Create a body and attach the mesh.
+    avatarbody = dynSys->CreateBody ();
+    avatarbody->SetProperties (1, csVector3 (0), csMatrix3 ());
+    avatarbody->SetPosition (tc.GetOrigin ());
+    avatarbody->AttachMesh (avatar);
+
+    // Create and attach a box collider.
+    // const csMatrix3 tmm;
+    // const csVector3 tvv (0);
+    // csOrthoTransform tt (tmm, tvv);
+    // csVector3 size (0.4f, 0.8f, 0.4f); // This should be same size as mesh.
+    // avatarbody->AttachColliderBox (size, tt, 10, 1, 0.8f);
+    avatarbody->AttachColliderSphere (0.8f, csVector3 (0), 10, 1, 0.8f);
+  }
+
+  else
+  {
+    dynSys->RemoveBody (avatarbody);
+    engine->WantToDie (avatar);
+    avatar = 0;
+
+    // TODO: update RotX, rotY
+  }
+}
+
 iRigidBody* Simple::CreateBox ()
 {
-  objcnt++;
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
@@ -551,7 +762,7 @@ bool Simple::CreateStarCollider ()
     if (!starFact)
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
+        "crystalspace.application.avatartest",
         "Error loading 'star.xml'!");
       return false;
     }
@@ -567,16 +778,40 @@ bool Simple::CreateStarCollider ()
   star->GetMovable ()->SetTransform (tc);
   star->GetMovable ()->UpdateMove ();
 
-  csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
-  collider->CreateMeshGeometry (star);
-  collider->SetTransform (tc);
+  bool staticCollider = true;
+  if (staticCollider)
+  {
+    csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
+    // TODO: star is not convex
+    collider->CreateConvexMeshGeometry (star);
+    //collider->CreateMeshGeometry (star);
+    collider->SetTransform (tc);
+  }
+
+  else
+  {
+    csRef<iRigidBody> rb = dynSys->CreateBody ();
+    rb->SetProperties (1, csVector3 (0), csMatrix3 ());
+    rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 2));
+
+    const csMatrix3 tm;
+    const csVector3 tv (0);
+    csOrthoTransform t (tm, tv);
+    //rb->AttachColliderMesh (star, t, 10, 1, 0.8f);
+    rb->AttachColliderConvexMesh (star, t, 10, 1, 0.8f);
+
+    rb->AttachMesh (star);
+
+    // Fling the body.
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  }
 
   return true;
 }
 
 iRigidBody* Simple::CreateMesh ()
 {
-  objcnt++;
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
@@ -596,7 +831,7 @@ iRigidBody* Simple::CreateMesh ()
 
   if (!rb->AttachColliderMesh (mesh, t, 10, 1, 0.8f))
   {
-    // If dynamic collider meshes are not supported (like in bullet)
+    // If dynamic collider meshes are not supported
     // we use a cylinder instead.
     t.RotateThis (csVector3 (1, 0, 0), PI / 2.0f);
     rb->AttachColliderCylinder (0.2f, 1, t, 10, 1, 0.8f);
@@ -611,7 +846,6 @@ iRigidBody* Simple::CreateMesh ()
 
 iRigidBody* Simple::CreateSphere ()
 {
-  objcnt++;
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
@@ -636,7 +870,8 @@ iRigidBody* Simple::CreateSphere ()
   // We do a hardtransform here to make sure our sphere has an artificial
   // offset. That way we can test if the physics engine supports that.
   csMatrix3 m;
-  csReversibleTransform t = csReversibleTransform (m, csVector3 (0, .5, 0));
+  csVector3 artificialOffset (0, .5, 0);
+  csReversibleTransform t = csReversibleTransform (m, artificialOffset);
   ballFact->HardTransform (t);
 
   // Create the mesh.
@@ -648,11 +883,117 @@ iRigidBody* Simple::CreateSphere ()
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
   rb->SetProperties (r, csVector3 (0), csMatrix3 ());
-  rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
+  rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1)
+		   - artificialOffset);
   rb->AttachMesh (mesh);
 
   // Create and attach a sphere collider.
-  rb->AttachColliderSphere (r, csVector3 (0, .5, 0), 10, 1, 0.8f);
+  rb->AttachColliderSphere (r, artificialOffset, 10, 1, 0.8f);
+
+  // Fling the body.
+  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
+  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+
+  return rb;
+}
+
+iRigidBody* Simple::CreateCylinder ()
+{
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create the cylinder mesh factory.
+  csRef<iMeshFactoryWrapper> cylinderFact = engine->CreateMeshFactory(
+  	"crystalspace.mesh.object.genmesh", "cylinderFact");
+  if (cylinderFact == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.phystut",
+      "Error creating mesh object factory!");
+    return 0;
+  }
+
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<
+    iGeneralFactoryState> (cylinderFact->GetMeshObjectFactory ());
+  const float radius (rand() % 10 / 50. + .2);
+  const float length (rand() % 3 / 50. + .7);
+  gmstate->GenerateCylinder (length, radius, 10);
+
+  // We do a hardtransform here to make sure our cylinder has an artificial
+  // offset. That way we can test if the physics engine supports that.
+  csVector3 artificialOffset (3, 3, 3);
+  csReversibleTransform hardTransform (csYRotMatrix3 (PI/2.0), artificialOffset);
+  cylinderFact->HardTransform (hardTransform);
+
+  // Create the mesh.
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+					   cylinderFact, "cylinder", room));
+
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Create a body and attach the mesh.
+  csRef<iRigidBody> rb = dynSys->CreateBody ();
+  rb->SetProperties (radius, csVector3 (0), csMatrix3 ());
+  rb->AttachMesh (mesh);
+
+  // Create and attach a cylinder collider.
+  csMatrix3 m;
+  csReversibleTransform t = csReversibleTransform (m, artificialOffset);
+  rb->AttachColliderCylinder (length, radius, t, 10, 1, 0.8f);
+  rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1)
+		   - artificialOffset);
+  rb->SetOrientation (csXRotMatrix3 (PI / 5.0));
+  //csOrthoTransform bodyTransform (csMatrix3 (), tc.GetOrigin ()
+  //         + tc.GetT2O () * csVector3 (0, 0, 1) - artificialOffset);
+  //rb->SetTransform (bodyTransform);
+
+  // Fling the body.
+  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
+  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+
+  return rb;
+}
+
+iRigidBody* Simple::CreateCapsule ()
+{
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create the ball mesh factory.
+  csRef<iMeshFactoryWrapper> capsuleFact = engine->CreateMeshFactory(
+  	"crystalspace.mesh.object.genmesh", "capsuleFact");
+  if (capsuleFact == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.phystut",
+      "Error creating mesh object factory!");
+    return 0;
+  }
+
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<
+    iGeneralFactoryState> (capsuleFact->GetMeshObjectFactory ());
+  const float radius (rand() % 10 / 50. + .2);
+  const float length (rand() % 3 / 50. + .7);
+  gmstate->GenerateCapsule (length, radius, 10);
+  capsuleFact->HardTransform (
+        csReversibleTransform (csYRotMatrix3 (PI/2), csVector3 (0)));
+
+  // Create the mesh.
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+				            capsuleFact, "capsule", room));
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Create a body and attach the mesh.
+  csRef<iRigidBody> rb = dynSys->CreateBody ();
+  rb->SetProperties (radius, csVector3 (0), csMatrix3 ());
+  rb->AttachMesh (mesh);
+
+  // Create and attach a sphere collider.
+  csOrthoTransform t;
+  rb->AttachColliderCapsule (length, radius, t, 10, 1, 0.8f);
+  rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
@@ -663,7 +1004,6 @@ iRigidBody* Simple::CreateSphere ()
 
 iJoint* Simple::CreateJointed ()
 {
-  objcnt++;
   // Create and position objects.
   iRigidBody* rb1 = CreateBox();
   rb1->SetPosition (rb1->GetPosition () +
@@ -677,16 +1017,84 @@ iJoint* Simple::CreateJointed ()
   joint->Attach (rb1, rb2);
 
   // Constrain translation.
-  joint->SetMinimumDistance (csVector3 (1, 1, 1));
-  joint->SetMaximumDistance (csVector3 (1, 1, 1));
-  joint->SetTransConstraints (true, true, true);
+  joint->SetMinimumDistance (csVector3 (-1, -1, -1), false);
+  joint->SetMaximumDistance (csVector3 (1, 1, 1), false);
+  joint->SetTransConstraints (true, true, true, false);
 
   // Constrain rotation.
-  joint->SetMinimumAngle (csVector3 (0, 0, 0));
-  joint->SetMaximumAngle (csVector3 (0, 0, 0));
-  joint->SetRotConstraints (true, true, true);
+  joint->SetMinimumAngle (csVector3 (-PI/4.0, -PI/6.0, -PI/6.0), false);
+  joint->SetMaximumAngle (csVector3 (PI/4.0, PI/6.0, PI/6.0), false);
+  joint->SetRotConstraints (false, false, false, false);
+
+  joint->RebuildJoint ();
 
   return joint;
+}
+
+void ConstraintJoint (iJoint* joint)
+{
+  // Constrain translation.
+  joint->SetMinimumDistance (csVector3 (-1, -1, -1), false);
+  joint->SetMaximumDistance (csVector3 (1, 1, 1), false);
+  joint->SetTransConstraints (true, true, true, false);
+
+  // Constrain rotation.
+  joint->SetMinimumAngle (csVector3 (-PI/4.0, -PI/6.0, -PI/6.0), false);
+  joint->SetMaximumAngle (csVector3 (PI/4.0, PI/6.0, PI/6.0), false);
+  joint->SetRotConstraints (false, false, false, false);
+}
+
+void Simple::CreateChain ()
+{
+  iRigidBody* rb1 = CreateBox();
+  csVector3 initPos = rb1->GetPosition () + csVector3 (0, 5, 0);
+  rb1->MakeStatic ();
+  rb1->SetPosition (initPos);
+
+  csVector3 offset (0, 1.3, 0);
+
+  iRigidBody* rb2 = CreateCapsule();
+  rb2->SetLinearVelocity (csVector3 (0));
+  rb2->SetAngularVelocity (csVector3 (0));
+  rb2->SetPosition (initPos - offset);
+  rb2->SetOrientation (csXRotMatrix3 (PI / 2.0));
+
+  iRigidBody* rb3 = CreateBox();
+  rb3->SetLinearVelocity (csVector3 (0));
+  rb3->SetAngularVelocity (csVector3 (0));
+  rb3->SetPosition (initPos - 2 * offset);
+
+  iRigidBody* rb4 = CreateCapsule();
+  rb4->SetLinearVelocity (csVector3 (0));
+  rb4->SetAngularVelocity (csVector3 (0));
+  rb4->SetPosition (initPos - 3 * offset);
+  rb4->SetOrientation (csXRotMatrix3 (PI / 2.0));
+
+  iRigidBody* rb5 = CreateBox();
+  rb5->SetLinearVelocity (csVector3 (0));
+  rb5->SetAngularVelocity (csVector3 (0));
+  rb5->SetPosition (initPos - 4 * offset);
+
+  // Create joints and attach bodies.
+  csRef<iJoint> joint = dynSys->CreateJoint ();
+  joint->Attach (rb1, rb2, false);
+  ConstraintJoint (joint);
+  joint->RebuildJoint ();
+
+  joint = dynSys->CreateJoint ();
+  joint->Attach (rb2, rb3, false);
+  ConstraintJoint (joint);
+  joint->RebuildJoint ();
+
+  joint = dynSys->CreateJoint ();
+  joint->Attach (rb3, rb4, false);
+  ConstraintJoint (joint);
+  joint->RebuildJoint ();
+
+  joint = dynSys->CreateJoint ();
+  joint->Attach (rb4, rb5, false);
+  ConstraintJoint (joint);
+  joint->RebuildJoint ();
 }
 
 void Simple::CreateWalls (const csVector3& /*radius*/)

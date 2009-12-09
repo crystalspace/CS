@@ -1243,8 +1243,7 @@ void csSprite3DMeshObject::InitSprite ()
 {
   if (!factory)
   {
-    factory->Report (CS_REPORTER_SEVERITY_ERROR,
-    	"There is no defined template for this sprite!");
+    csPrintf ("There is no defined template for this sprite!");
     return;
   }
 
