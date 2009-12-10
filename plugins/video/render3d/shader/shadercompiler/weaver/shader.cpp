@@ -50,7 +50,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   /* Magic value for cache file.
   * The most significant byte serves as a "version", increase when the
   * cache file format changes. */
-  static const uint32 cacheFileMagic = 0x02727677;
+  static const uint32 cacheFileMagic = 0x03727677;
 
   WeaverShader::WeaverShader (WeaverCompiler* compiler) : 
     scfImplementationType (this), compiler (compiler), 
@@ -151,7 +151,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 						   const FileAliases& aliases,
 						   iDocumentNode* docSource,
 						   const char* cacheID, 
-						   const char* cacheTag,
+						   const char* _cacheTag,
 						   iFile* cacheFile,
 						   csRef<iString>& cachingError)
   {
@@ -167,7 +167,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     CS::DocSystem::CloneAttributes (docSource, shaderNode);
     shaderNode->SetAttribute ("compiler", "xmlshader");
     if (cacheID != 0) shaderNode->SetAttribute ("_cacheid", cacheID);
-    if (cacheTag != 0) shaderNode->SetAttribute ("_cachetag", cacheTag);
+    csString cacheTag (_cacheTag);
 
     csRef<iDocumentNode> shadervarsNode =
       shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -270,6 +270,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       techniqueNodes[t]->SetAttributeAsInt ("priority",
         int (techniqueNodes.GetSize()-t));
     
+    /* Include combiner code into cache tag to trigger updating the
+       generated shader */
+    {
+      csStringArray cacheTagExtra;
+      CombinerLoaderSet::GlobalIterator it (combiners.UnlockedGetIterator());
+      while (it.HasNext())
+      {
+        WeaverCommon::iCombinerLoader* combinerLoader = it.Next();
+        cacheTagExtra.Push (combinerLoader->GetCodeString());
+      }
+      cacheTagExtra.Sort ();
+      for (size_t i = 0; i < cacheTagExtra.GetSize(); i++)
+      {
+	cacheTag.Append (";");
+	cacheTag.Append (cacheTagExtra[i]);
+      }
+    }
+    shaderNode->SetAttribute ("_cachetag", cacheTag);
+
     if (cacheFile)
     {
       // Write magic header
