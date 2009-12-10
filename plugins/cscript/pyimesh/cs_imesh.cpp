@@ -6826,6 +6826,54 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GenerateCylinder(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGeneralFactoryState *arg1 = (iGeneralFactoryState *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  uint arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  unsigned long val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GenerateCylinder",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GenerateCylinder" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iGeneralFactoryState * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGeneralFactoryState_GenerateCylinder" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGeneralFactoryState_GenerateCylinder" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iGeneralFactoryState_GenerateCylinder" "', argument " "4"" of type '" "uint""'");
+  } 
+  arg4 = static_cast< uint >(val4);
+  (arg1)->GenerateCylinder(arg2,arg3,arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetVertexByIndex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iGeneralFactoryState *arg1 = (iGeneralFactoryState *) 0 ;
@@ -48379,6 +48427,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGeneralFactoryState_GetSubMeshCount", _wrap_iGeneralFactoryState_GetSubMeshCount, METH_VARARGS, NULL},
 	 { (char *)"iGeneralFactoryState_GetSubMesh", _wrap_iGeneralFactoryState_GetSubMesh, METH_VARARGS, NULL},
 	 { (char *)"iGeneralFactoryState_DisableAutoNormals", _wrap_iGeneralFactoryState_DisableAutoNormals, METH_VARARGS, NULL},
+	 { (char *)"iGeneralFactoryState_GenerateCylinder", _wrap_iGeneralFactoryState_GenerateCylinder, METH_VARARGS, NULL},
 	 { (char *)"iGeneralFactoryState_GetVertexByIndex", _wrap_iGeneralFactoryState_GetVertexByIndex, METH_VARARGS, NULL},
 	 { (char *)"iGeneralFactoryState_GetTexelByIndex", _wrap_iGeneralFactoryState_GetTexelByIndex, METH_VARARGS, NULL},
 	 { (char *)"iGeneralFactoryState_GetNormalByIndex", _wrap_iGeneralFactoryState_GetNormalByIndex, METH_VARARGS, NULL},

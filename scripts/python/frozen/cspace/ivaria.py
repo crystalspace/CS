@@ -525,7 +525,6 @@ class iDynamicSystem(core.iBase):
     def AttachColliderConvexMesh(*args): return _ivaria.iDynamicSystem_AttachColliderConvexMesh(*args)
     def AttachColliderMesh(*args): return _ivaria.iDynamicSystem_AttachColliderMesh(*args)
     def AttachColliderCylinder(*args): return _ivaria.iDynamicSystem_AttachColliderCylinder(*args)
-    def AttachColliderCapsule(*args): return _ivaria.iDynamicSystem_AttachColliderCapsule(*args)
     def AttachColliderBox(*args): return _ivaria.iDynamicSystem_AttachColliderBox(*args)
     def AttachColliderSphere(*args): return _ivaria.iDynamicSystem_AttachColliderSphere(*args)
     def AttachColliderPlane(*args): return _ivaria.iDynamicSystem_AttachColliderPlane(*args)
@@ -535,6 +534,7 @@ class iDynamicSystem(core.iBase):
     def CreateCollider(*args): return _ivaria.iDynamicSystem_CreateCollider(*args)
     def GetCollider(*args): return _ivaria.iDynamicSystem_GetCollider(*args)
     def GetColliderCount(*args): return _ivaria.iDynamicSystem_GetColliderCount(*args)
+    def AttachColliderCapsule(*args): return _ivaria.iDynamicSystem_AttachColliderCapsule(*args)
     scfGetVersion = staticmethod(_ivaria.iDynamicSystem_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iDynamicSystem
     __del__ = lambda self : None;
@@ -591,7 +591,6 @@ class iRigidBody(core.iBase):
     def AttachColliderConvexMesh(*args): return _ivaria.iRigidBody_AttachColliderConvexMesh(*args)
     def AttachColliderMesh(*args): return _ivaria.iRigidBody_AttachColliderMesh(*args)
     def AttachColliderCylinder(*args): return _ivaria.iRigidBody_AttachColliderCylinder(*args)
-    def AttachColliderCapsule(*args): return _ivaria.iRigidBody_AttachColliderCapsule(*args)
     def AttachColliderBox(*args): return _ivaria.iRigidBody_AttachColliderBox(*args)
     def AttachColliderSphere(*args): return _ivaria.iRigidBody_AttachColliderSphere(*args)
     def AttachColliderPlane(*args): return _ivaria.iRigidBody_AttachColliderPlane(*args)
@@ -636,6 +635,7 @@ class iRigidBody(core.iBase):
     def Update(*args): return _ivaria.iRigidBody_Update(*args)
     def GetCollider(*args): return _ivaria.iRigidBody_GetCollider(*args)
     def GetColliderCount(*args): return _ivaria.iRigidBody_GetColliderCount(*args)
+    def AttachColliderCapsule(*args): return _ivaria.iRigidBody_AttachColliderCapsule(*args)
     __swig_destroy__ = _ivaria.delete_iRigidBody
     __del__ = lambda self : None;
 iRigidBody_swigregister = _ivaria.iRigidBody_swigregister
@@ -688,10 +688,10 @@ class iDynamicsSystemCollider(core.iBase):
     def GetSphereGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetSphereGeometry(*args)
     def GetPlaneGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetPlaneGeometry(*args)
     def GetCylinderGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetCylinderGeometry(*args)
-    def GetCapsuleGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetCapsuleGeometry(*args)
     def MakeStatic(*args): return _ivaria.iDynamicsSystemCollider_MakeStatic(*args)
     def MakeDynamic(*args): return _ivaria.iDynamicsSystemCollider_MakeDynamic(*args)
     def IsStatic(*args): return _ivaria.iDynamicsSystemCollider_IsStatic(*args)
+    def GetCapsuleGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetCapsuleGeometry(*args)
     __swig_destroy__ = _ivaria.delete_iDynamicsSystemCollider
     __del__ = lambda self : None;
 iDynamicsSystemCollider_swigregister = _ivaria.iDynamicsSystemCollider_swigregister

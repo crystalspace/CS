@@ -226,6 +226,7 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def GetSubMeshCount(*args): return _imesh.iGeneralFactoryState_GetSubMeshCount(*args)
     def GetSubMesh(*args): return _imesh.iGeneralFactoryState_GetSubMesh(*args)
     def DisableAutoNormals(*args): return _imesh.iGeneralFactoryState_DisableAutoNormals(*args)
+    def GenerateCylinder(*args): return _imesh.iGeneralFactoryState_GenerateCylinder(*args)
     def GetVertexByIndex(*args): return _imesh.iGeneralFactoryState_GetVertexByIndex(*args)
     def GetTexelByIndex(*args): return _imesh.iGeneralFactoryState_GetTexelByIndex(*args)
     def GetNormalByIndex(*args): return _imesh.iGeneralFactoryState_GetNormalByIndex(*args)

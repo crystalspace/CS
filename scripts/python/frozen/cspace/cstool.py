@@ -369,6 +369,7 @@ class Primitives(object):
     GenerateBox = staticmethod(_cstool.Primitives_GenerateBox)
     GenerateQuad = staticmethod(_cstool.Primitives_GenerateQuad)
     GenerateTesselatedQuad = staticmethod(_cstool.Primitives_GenerateTesselatedQuad)
+    GenerateCylinder = staticmethod(_cstool.Primitives_GenerateCylinder)
     GenerateCapsule = staticmethod(_cstool.Primitives_GenerateCapsule)
     GenerateSphere = staticmethod(_cstool.Primitives_GenerateSphere)
     def __init__(self, *args): 
@@ -382,6 +383,7 @@ Primitives_swigregister(Primitives)
 Primitives_GenerateBox = _cstool.Primitives_GenerateBox
 Primitives_GenerateQuad = _cstool.Primitives_GenerateQuad
 Primitives_GenerateTesselatedQuad = _cstool.Primitives_GenerateTesselatedQuad
+Primitives_GenerateCylinder = _cstool.Primitives_GenerateCylinder
 Primitives_GenerateCapsule = _cstool.Primitives_GenerateCapsule
 Primitives_GenerateSphere = _cstool.Primitives_GenerateSphere
 
