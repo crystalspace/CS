@@ -1326,7 +1326,7 @@ const csVector3 csBulletRigidBody::GetAngularVelocity () const
 void csBulletRigidBody::SetProperties (float mass, const csVector3& center,
                                        const csMatrix3& inertia)
 {
-  CS_ASSERT (mass >= 0.0)
+  CS_ASSERT (mass >= 0.0);
 
   this->mass = mass;
 
@@ -1377,8 +1377,7 @@ csMatrix3 csBulletRigidBody::GetInertia ()
 
 void csBulletRigidBody::AdjustTotalMass (float targetmass)
 {
-  CS_ASSERT (targetmass >= 0.0)
-    return;
+  CS_ASSERT (targetmass >= 0.0);
 
   this->mass = targetmass;
 
