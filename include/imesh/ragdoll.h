@@ -126,7 +126,7 @@ struct iRagdollAnimNode : public iSkeletonAnimNode2
   /**
    * Get the joint of the specified bone.
    */
-  virtual iJoint* GetBoneJoint (BoneID bone) = 0;
+  virtual iJoint* GetBoneJoint (const BoneID bone) = 0;
 
   /**
    * Get the count of bones in the specified physical state.

@@ -217,7 +217,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     if (state != RAGDOLL_STATE_DYNAMIC)
       return 0;
 
-    return bones.GetSize ();
+    return (uint)bones.GetSize ();
   }
 
   BoneID RagdollAnimNode::GetBone (csChainStateType state, uint index) const

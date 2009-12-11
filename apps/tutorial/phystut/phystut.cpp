@@ -606,12 +606,8 @@ bool Simple::Initialize ()
     CS::Geometry::GeneralMeshBuilder::CreateFactoryAndMesh(engine, room,
 				   "background", "background_factory", &bgBox);
 
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<iGeneralMeshState>
-    (background->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
-
   csRef<iMaterialWrapper> bgMaterial = ColoredTexture::CreateColoredMaterial
-    ("background", csColor (0.898), object_reg);
+    ("background", csColor (0.898f), object_reg);
   background->GetMeshObject()->SetMaterialWrapper(bgMaterial);
 
   // Creating lights
@@ -1087,33 +1083,33 @@ void ConstraintJoint (iJoint* joint)
 void Simple::CreateChain ()
 {
   iRigidBody* rb1 = CreateBox();
-  csVector3 initPos = rb1->GetPosition () + csVector3 (0, 5, 0);
+  csVector3 initPos = rb1->GetPosition () + csVector3 (0.0f, 5.0f, 0.0f);
   rb1->MakeStatic ();
   rb1->SetPosition (initPos);
 
-  csVector3 offset (0, 1.3, 0);
+  csVector3 offset (0.0f, 1.3f, 0.0f);
 
   iRigidBody* rb2 = CreateCapsule();
-  rb2->SetLinearVelocity (csVector3 (0));
-  rb2->SetAngularVelocity (csVector3 (0));
+  rb2->SetLinearVelocity (csVector3 (0.0f));
+  rb2->SetAngularVelocity (csVector3 (0.0f));
   rb2->SetPosition (initPos - offset);
-  rb2->SetOrientation (csXRotMatrix3 (PI / 2.0));
+  rb2->SetOrientation (csXRotMatrix3 (PI / 2.0f));
 
   iRigidBody* rb3 = CreateBox();
-  rb3->SetLinearVelocity (csVector3 (0));
-  rb3->SetAngularVelocity (csVector3 (0));
-  rb3->SetPosition (initPos - 2 * offset);
+  rb3->SetLinearVelocity (csVector3 (0.0f));
+  rb3->SetAngularVelocity (csVector3 (0.0f));
+  rb3->SetPosition (initPos - 2.0f * offset);
 
   iRigidBody* rb4 = CreateCapsule();
-  rb4->SetLinearVelocity (csVector3 (0));
-  rb4->SetAngularVelocity (csVector3 (0));
-  rb4->SetPosition (initPos - 3 * offset);
-  rb4->SetOrientation (csXRotMatrix3 (PI / 2.0));
+  rb4->SetLinearVelocity (csVector3 (0.0f));
+  rb4->SetAngularVelocity (csVector3 (0.0f));
+  rb4->SetPosition (initPos - 3.0f * offset);
+  rb4->SetOrientation (csXRotMatrix3 (PI / 2.0f));
 
   iRigidBody* rb5 = CreateBox();
-  rb5->SetLinearVelocity (csVector3 (0));
-  rb5->SetAngularVelocity (csVector3 (0));
-  rb5->SetPosition (initPos - 4 * offset);
+  rb5->SetLinearVelocity (csVector3 (0.0f));
+  rb5->SetAngularVelocity (csVector3 (0.0f));
+  rb5->SetPosition (initPos - 4.0f * offset);
 
   // Create joints and attach bodies.
   csRef<iJoint> joint = dynSys->CreateJoint ();
@@ -1199,105 +1195,105 @@ void Simple::LoadRagdoll ()
   // Define bone's properties
   iBodyBoneCollider* collider;
   iBodyBoneJoint* joint;
-  csVector3 boxSize (0.03);
-  float density = 1.0;
+  csVector3 boxSize (0.03f);
+  float density = 1.0f;
 
   collider = bone_Main->CreateBoneCollider ();
-  collider->CreateSphereGeometry (csSphere (csVector3 (0, 0.05, 0), 0.05));
-  collider->SetFriction (10.0);
+  collider->CreateSphereGeometry (csSphere (csVector3 (0.0f, 0.05f, 0.0f), 0.05f));
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   // No joint for root bone
 
   collider = bone_Spin->CreateBoneCollider ();
-  collider->CreateCylinderGeometry (0.02, 0.1);
-  csOrthoTransform spinTransform (csXRotMatrix3 (PI / 7.0),
-				  csVector3 (0, 0.065, 0));
+  collider->CreateCylinderGeometry (0.02f, 0.1f);
+  csOrthoTransform spinTransform (csXRotMatrix3 (PI / 7.0f),
+				  csVector3 (0, 0.065f, 0));
   collider->SetTransform (spinTransform);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone_Spin->CreateBoneJoint ();
-  bone_Spin->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone_Spin->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone_Spin->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone_Spin->GetBoneJoint ()->SetRotConstraints (false, false, false);
-  bone_Spin->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175));
-  bone_Spin->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175));
+  bone_Spin->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175f));
+  bone_Spin->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175f));
 
   collider = bone_SpinM->CreateBoneCollider ();
-  collider->CreateCylinderGeometry (0.07, 0.1);
-  csOrthoTransform spinMTransform (csMatrix3 (), csVector3 (0, 0.095, 0));
+  collider->CreateCylinderGeometry (0.07f, 0.1f);
+  csOrthoTransform spinMTransform (csMatrix3 (), csVector3 (0.0f, 0.095f, 0.0f));
   collider->SetTransform (spinMTransform);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone_SpinM->CreateBoneJoint ();
-  bone_SpinM->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone_SpinM->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone_SpinM->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone_SpinM->GetBoneJoint ()->SetRotConstraints (false, false, false);
-  bone_SpinM->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175));
-  bone_SpinM->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175));
+  bone_SpinM->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175f));
+  bone_SpinM->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175f));
 
   collider = bone_RibCage->CreateBoneCollider ();
-  collider->CreateCylinderGeometry (0.07, 0.1);
-  csOrthoTransform ribCageTransform (csMatrix3 (), csVector3 (0, 0.105, 0));
+  collider->CreateCylinderGeometry (0.07f, 0.1f);
+  csOrthoTransform ribCageTransform (csMatrix3 (), csVector3 (0.0f, 0.105f, 0.0f));
   collider->SetTransform (ribCageTransform);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone_RibCage->CreateBoneJoint ();
-  bone_RibCage->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone_RibCage->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone_RibCage->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone_RibCage->GetBoneJoint ()->SetRotConstraints (false, false, false);
-  bone_RibCage->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175));
-  bone_RibCage->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175));
+  bone_RibCage->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175f));
+  bone_RibCage->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175f));
 
   collider = bone_Head->CreateBoneCollider ();
-  collider->CreateSphereGeometry (csSphere (csVector3 (0, 0, 0.08), 0.12));
-  collider->SetFriction (10.0);
+  collider->CreateSphereGeometry (csSphere (csVector3 (0.0f, 0.0f, 0.08f), 0.12f));
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone_Head->CreateBoneJoint ();
-  bone_Head->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone_Head->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone_Head->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone_Head->GetBoneJoint ()->SetRotConstraints (false, false, false);
-  bone_Head->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175));
-  bone_Head->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175));
+  bone_Head->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175f));
+  bone_Head->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175f));
 
   collider = bone_Pelvis->CreateBoneCollider ();
-  collider->CreateBoxGeometry (csVector3 (0.05));
-  collider->CreateSphereGeometry (csSphere (csVector3 (0, 0.07, 0.05), 0.05));
-  collider->SetFriction (10.0);
+  collider->CreateBoxGeometry (csVector3 (0.05f));
+  collider->CreateSphereGeometry (csSphere (csVector3 (0.0f, 0.07f, 0.05f), 0.05f));
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone_Pelvis->CreateBoneJoint ();
-  bone_Pelvis->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone_Pelvis->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone_Pelvis->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone_Pelvis->GetBoneJoint ()->SetRotConstraints (true, true, true);
-  bone_Pelvis->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175));
-  bone_Pelvis->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175));
+  bone_Pelvis->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175f));
+  bone_Pelvis->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175f));
 
-  float capsuleLength = 0.01;
-  float capsuleRadius = 0.02;
+  float capsuleLength = 0.01f;
+  float capsuleRadius = 0.02f;
   csOrthoTransform boneOffset;
-  boneOffset.Translate (csVector3 (capsuleLength / 2.0, 0, 0));
-  csVector3 minimumAngle (-0.275);
-  csVector3 maximumAngle (0.275);
+  boneOffset.Translate (csVector3 (capsuleLength / 2.0f, 0.0f, 0.0f));
+  csVector3 minimumAngle (-0.275f);
+  csVector3 maximumAngle (0.275f);
 
   collider = bone1->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone1->CreateBoneJoint ();
-  bone1->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone1->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone1->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone1->GetBoneJoint ()->SetRotConstraints (false, false, false);
   bone1->GetBoneJoint ()->SetMinimumAngle (minimumAngle);
@@ -1305,12 +1301,12 @@ void Simple::LoadRagdoll ()
 
   collider = bone2->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone2->CreateBoneJoint ();
-  bone2->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone2->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone2->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone2->GetBoneJoint ()->SetRotConstraints (false, false, false);
   bone2->GetBoneJoint ()->SetMinimumAngle (minimumAngle);
@@ -1318,12 +1314,12 @@ void Simple::LoadRagdoll ()
 
   collider = bone3->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone3->CreateBoneJoint ();
-  bone3->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone3->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone3->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone3->GetBoneJoint ()->SetRotConstraints (false, false, false);
   bone3->GetBoneJoint ()->SetMinimumAngle (minimumAngle);
@@ -1331,12 +1327,12 @@ void Simple::LoadRagdoll ()
 
   collider = bone4->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone4->CreateBoneJoint ();
-  bone4->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone4->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone4->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone4->GetBoneJoint ()->SetRotConstraints (false, false, false);
   bone4->GetBoneJoint ()->SetMinimumAngle (minimumAngle);
@@ -1344,12 +1340,12 @@ void Simple::LoadRagdoll ()
 
   collider = bone5->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone5->CreateBoneJoint ();
-  bone5->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone5->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone5->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone5->GetBoneJoint ()->SetRotConstraints (false, false, false);
   bone5->GetBoneJoint ()->SetMinimumAngle (minimumAngle);
@@ -1357,12 +1353,12 @@ void Simple::LoadRagdoll ()
 
   collider = bone6->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone6->CreateBoneJoint ();
-  bone6->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone6->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone6->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone6->GetBoneJoint ()->SetRotConstraints (false, false, false);
   bone6->GetBoneJoint ()->SetMinimumAngle (minimumAngle);
@@ -1370,12 +1366,12 @@ void Simple::LoadRagdoll ()
 
   collider = bone7->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone7->CreateBoneJoint ();
-  bone7->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone7->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone7->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone7->GetBoneJoint ()->SetRotConstraints (false, false, false);
   bone7->GetBoneJoint ()->SetMinimumAngle (minimumAngle);
@@ -1384,12 +1380,12 @@ void Simple::LoadRagdoll ()
   collider = bone8->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
   collider->SetTransform (boneOffset);
-  collider->SetFriction (10.0);
+  collider->SetFriction (10.0f);
   collider->SetDensity (density);
   collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01);
+  collider->SetSoftness (0.01f);
   joint = bone8->CreateBoneJoint ();
-  bone8->GetBoneJoint ()->SetBounce (csVector3 (0.2, 0.2, 0.2));
+  bone8->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone8->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone8->GetBoneJoint ()->SetRotConstraints (false, false, false);
   bone8->GetBoneJoint ()->SetMinimumAngle (minimumAngle);
