@@ -1,0 +1,3 @@
+SubDir TOP plugins mesh animesh controllers ;
+
+SubInclude TOP plugins mesh animesh controllers ragdoll ;

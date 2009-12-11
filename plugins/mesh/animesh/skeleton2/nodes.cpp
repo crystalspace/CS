@@ -188,7 +188,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   csPtr<iSkeletonAnimNode2> AnimationNodeFactory::CreateInstance (
     iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
   {
-    return new AnimationNode (this);
+    csRef<iSkeletonAnimNode2> ref;
+    ref.AttachNew (new AnimationNode (this));
+    return csPtr<iSkeletonAnimNode2> (ref);
   }
 
   const char* AnimationNodeFactory::GetNodeName () const

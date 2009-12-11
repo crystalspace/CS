@@ -219,6 +219,7 @@ csBulletDynamics::csBulletDynamics (iBase *iParent)
 
 csBulletDynamics::~csBulletDynamics ()
 {
+  systems.DeleteAll ();
   delete dispatcher;
   delete configuration;
   delete solver;

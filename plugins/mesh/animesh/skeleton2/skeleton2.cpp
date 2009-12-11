@@ -262,7 +262,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   csPtr<iSkeleton2> SkeletonFactory::CreateSkeleton ()
   {
-    return new Skeleton (this);
+    csRef<iSkeleton2> ref;
+    ref.AttachNew (new Skeleton (this));
+    return csPtr<iSkeleton2> (ref);
   }
 
   iSkeletonAnimPacketFactory2* SkeletonFactory::GetAnimationPacket () const

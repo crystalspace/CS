@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- ragdoll.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.animesh.controllers.ragdoll</name>
+        <implementation>RagdollManager</implementation>
+        <description>Crystal Space Ragdoll Controller of an Animated Mesh</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

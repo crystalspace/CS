@@ -73,7 +73,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
   {
     csRef<PriorityNode> newp;
-    newp = new PriorityNode (this);
+    newp.AttachNew (new PriorityNode (this));
 
     BaseFactoryChildren::SetupInstance (newp, packet, skeleton);
 
@@ -368,7 +368,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
   {
     csRef<RandomNode> newp;
-    newp = new RandomNode (this);
+    newp.AttachNew (new RandomNode (this));
 
     BaseFactoryChildren::SetupInstance (newp, packet, skeleton);
 

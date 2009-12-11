@@ -801,25 +801,25 @@ struct iDynamicsSystemCollider : public virtual iBase
 {
   SCF_INTERFACE (iDynamicsSystemCollider, 0, 0, 3);
 
-  /// Create Collider Geometry with given sphere.
+  /// Create collider geometry with given sphere.
   virtual bool CreateSphereGeometry (const csSphere& sphere) = 0;
 
-  /// Create Collider Geometry with given plane.
+  /// Create collider geometry with given plane.
   virtual bool CreatePlaneGeometry (const csPlane3& plane) = 0;
 
-  /// Create Collider Geometry with given convex mesh geometry.
+  /// Create collider geometry with given convex mesh geometry.
   virtual bool CreateConvexMeshGeometry (iMeshWrapper *mesh) = 0;
 
-  /// Create Collider Geometry with given mesh geometry.
+  /// Create collider geometry with given mesh geometry.
   virtual bool CreateMeshGeometry (iMeshWrapper *mesh) = 0;
 
-  /// Create Collider Geometry with given box (given by its size).
+  /// Create collider geometry with given box (given by its size).
   virtual bool CreateBoxGeometry (const csVector3& box_size) = 0;
 
-  /// Create Capsule Collider Geometry.
+  /// Create capsule collider geometry.
   virtual bool CreateCapsuleGeometry (float length, float radius) = 0;
 
-  /// Create Cylinder Geometry.
+  /// Create cylinder Geometry.
   virtual bool CreateCylinderGeometry (float length, float radius) = 0;
 
   //FIXME: This should be implememented, but it is not so obvious - it

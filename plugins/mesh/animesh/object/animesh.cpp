@@ -64,7 +64,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   csPtr<iMeshObjectFactory> AnimeshObjectType::NewFactory ()
   {
-    return new AnimeshObjectFactory (this);
+    csRef<iMeshObjectFactory> ref;
+    ref.AttachNew (new AnimeshObjectFactory (this));
+    return csPtr<iMeshObjectFactory> (ref);
   }
 
   bool AnimeshObjectType::Initialize (iObjectRegistry* object_reg)
@@ -455,7 +457,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   csPtr<iMeshObject> AnimeshObjectFactory::NewInstance ()
   {
-    return new AnimeshObject (this);
+    csRef<iMeshObject> ref;
+    ref.AttachNew (new AnimeshObject (this));
+    return csPtr<iMeshObject> (ref);
   }
 
   csPtr<iMeshObjectFactory> AnimeshObjectFactory::Clone ()
@@ -932,7 +936,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     for (size_t i = 0; i < factory->sockets.GetSize (); ++i)
     {
       csRef<Socket> newSocket;
-      newSocket.AttachNew(new Socket(this, factory->sockets[i]));
+      newSocket.AttachNew (new Socket(this, factory->sockets[i]));
       sockets.Push (newSocket);
     }
   }

@@ -39,7 +39,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     BaseNodeSingle (iSkeletonAnimNode2* owner)
       : owner (owner)
     {}
-    
+
     void FireAnimationFinishedCb ()
     {
       for (size_t i = 0; i < callbacks.GetSize (); ++i)
@@ -97,9 +97,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
     BaseNodeChildren (iSkeletonAnimNode2* owner)
       : BaseNodeSingle (owner), manualCbInstall (false)
-    {}
-
-    virtual ~BaseNodeChildren ()
     {}
 
     void AddAnimationCallback (iSkeletonAnimCallback2* callback);

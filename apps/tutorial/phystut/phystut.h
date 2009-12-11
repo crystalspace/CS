@@ -68,6 +68,10 @@ private:
   iRigidBody* CreateMesh ();
   iJoint* CreateJointed ();
   void CreateChain ();
+
+  void LoadRagdoll ();
+  void CreateRagdoll ();
+
   void CreateWalls (const csVector3& radius);
 
   csRef<iMeshWrapper> walls;
@@ -83,6 +87,12 @@ private:
   bool allStatic;
   bool pauseDynamic;
   float dynamicSpeed;
+
+  // ragdoll related
+  csRef<iBodyManager> bodyManager;
+  csRef<iRagdollManager> ragdollManager;
+  CS::Animation::StateID ragdollState;
+  csRef<iMeshWrapper> ragdollMesh;
 
   CS_DECLARE_EVENT_SHORTCUTS;
 

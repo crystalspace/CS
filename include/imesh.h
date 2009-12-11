@@ -23,6 +23,7 @@
  */
 #include "cssysdef.h"
 #include "imesh/animesh.h"
+#include "imesh/bodymesh.h"
 #include "imesh/emit.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
@@ -36,6 +37,7 @@
 #include "imesh/particles.h"
 #include "imesh/partsys.h"
 #include "imesh/protomesh.h"
+#include "imesh/ragdoll.h"
 #include "imesh/skeleton.h"
 #include "imesh/skeleton2.h"
 #include "imesh/skeleton2anim.h"

@@ -145,7 +145,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
     Skeleton (SkeletonFactory* factory);
 
-
     //-- iSkeleton2
     virtual iSceneNode* GetSceneNode ();
 
