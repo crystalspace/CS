@@ -656,8 +656,6 @@ CONFIG_WX
 CONFIG_CAL3D
 CONFIG_FREETYPE
 CONFIG_FREETYPE2
-CONFIG_BULLETDYNAMICS
-CONFIG_BULLET
 CONFIG_ODE
 CONFIG_LIB3DS_120
 CONFIG_LIB3DS
@@ -1658,9 +1656,9 @@ Optional Packages:
   --with-ode=dir          specify additional location to search libode if not
                           detected automatically; directories searched include
                           dir/include, dir/lib, and dir
-  --with-bullet=dir       specify additional location to search libbullet if
-                          not detected automatically; directories searched
-                          include dir/include, dir/lib, and dir
+  --with-bullet=dir       specify additional location to search Bullet if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
   --with-freetype2=dir    specify additional location to search libfreetype2
                           if not detected automatically; directories searched
                           include dir/include, dir/lib, and dir
@@ -55355,8 +55353,13 @@ fi
 # Check for bullet physics library.
 #------------------------------------------------------------------------------
 # Note: The pkg-config package name for Bullet 2.x is 'bullet', but the actual
-# libraries are bulletdynamics, bulletcollision and bulletmath. So note that
-# there is actually no 'bullet' library.
+# libraries are bulletdynamics, bulletcollision and bulletmath... sometimes.
+# On some setups/distros the names BulletDynamics, BulletCollision and
+# LinearMath are used (note case and name differences).
+# So note that there is actually no single 'bullet' library. (Having to deal
+# with that and the different library name styles is the reason for most of the
+# complexity of this check.)
+
 
 # Check whether --with-bullet was given.
 if test "${with_bullet+set}" = set; then
@@ -55364,41 +55367,40 @@ if test "${with_bullet+set}" = set; then
 fi
 
 
-    # Backward compatibility: Recognize --with-libbullet as alias for --with-bullet.
-    if test -n "$with_libbullet" &&
-           test -z "$with_bullet"; then
-  with_bullet="$with_libbullet"
-fi
+# Modified versions of _CS_CHECK_LIB_CREATE_FLAG and _CS_CHECK_LIB_CREATE_FLAG
+# to allow checking for multiple libs at once
 
 
-    if test -z "$with_bullet"; then
+
+if test -z "$with_bullet"; then
   with_bullet=yes
 fi
 
-    if test "$with_bullet" != no; then
+if test "$with_bullet" != no; then
 
-	# If --with-bullet value is same as cached value, then assume other
-	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_bullet" != "$cs_cv_with_bullet"; then
+    # If --with-bullet value is same as cached value, then assume other
+    # cached values are also valid; otherwise, ignore all cached values.
+    if test "$with_bullet" != "$cs_cv_with_bullet"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
 fi
 
 
-	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
-	PATH_SAVE="$PATH"
-	if test $with_bullet != yes; then
+    # Put relevant subdirs of the library directory into PATH and PKGCONFIG
+    PATH_SAVE="$PATH"
+    if test $with_bullet != yes; then
   PATH="$with_bullet/bin$PATH_SEPARATOR$PATH"
-	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+        PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
     PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     PKG_CONFIG_PATH="$with_bullet$PATH_SEPARATOR$with_bullet/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 fi
 
 
-	cs_check_lib_flags=''
-	if test "$cs_prog_pkg_config_checked" != yes; then
+    cs_check_lib_flags=''
+    # Check for 'bullet' pkg-config package
+    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -55559,442 +55561,8 @@ fi
 
 fi
 
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
-	export PATH
-fi
-
-    if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}bullet-config", so it can be a program name with args.
-set dummy ${ac_tool_prefix}bullet-config; ac_word=$2
-{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_path_CONFIG_BULLET+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  case $CONFIG_BULLET in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_CONFIG_BULLET="$CONFIG_BULLET" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_CONFIG_BULLET="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-CONFIG_BULLET=$ac_cv_path_CONFIG_BULLET
-if test -n "$CONFIG_BULLET"; then
-  { $as_echo "$as_me:$LINENO: result: $CONFIG_BULLET" >&5
-$as_echo "$CONFIG_BULLET" >&6; }
-else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-fi
-if test -z "$ac_cv_path_CONFIG_BULLET"; then
-  ac_pt_CONFIG_BULLET=$CONFIG_BULLET
-  # Extract the first word of "bullet-config", so it can be a program name with args.
-set dummy bullet-config; ac_word=$2
-{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_path_ac_pt_CONFIG_BULLET+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  case $ac_pt_CONFIG_BULLET in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_ac_pt_CONFIG_BULLET="$ac_pt_CONFIG_BULLET" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_ac_pt_CONFIG_BULLET="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-ac_pt_CONFIG_BULLET=$ac_cv_path_ac_pt_CONFIG_BULLET
-if test -n "$ac_pt_CONFIG_BULLET"; then
-  { $as_echo "$as_me:$LINENO: result: $ac_pt_CONFIG_BULLET" >&5
-$as_echo "$ac_pt_CONFIG_BULLET" >&6; }
-else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-  if test "x$ac_pt_CONFIG_BULLET" = x; then
-    CONFIG_BULLET=""
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ $as_echo "$as_me:$LINENO: WARNING: using cross tools not prefixed with host triplet" >&5
-$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    CONFIG_BULLET=$ac_pt_CONFIG_BULLET
-  fi
-else
-  CONFIG_BULLET="$ac_cv_path_CONFIG_BULLET"
-fi
-
-    if test -n "$CONFIG_BULLET"; then
-  if test -z "$cs_cv_prog_config_bullet_ok"; then
-  if $CONFIG_BULLET --cflags --libs >/dev/null 2>&1; then
-  cs_cv_prog_config_bullet_ok=yes
-else
-  cs_cv_prog_config_bullet_ok=no
-fi
-
-fi
-
-	if test $cs_cv_prog_config_bullet_ok = yes; then
-  if test -z "$cs_cv_prog_config_bullet_flags"; then
-  cs_check_lib_cflag=`{ ($as_echo "$as_me:$LINENO: \$CONFIG_BULLET --cflags ") >&5
-  ($CONFIG_BULLET --cflags ) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
-	cs_check_lib_lflag=''
-	cs_check_lib_libs=`{ ($as_echo "$as_me:$LINENO: \$CONFIG_BULLET --libs ") >&5
-  ($CONFIG_BULLET --libs ) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_config_bullet_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_config_bullet_flags"
-fi
-
-fi
-
-	    if test "$cs_prog_pkg_config_checked" != yes; then
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
-	export PATH
-fi
-
-    if test -n "$ac_tool_prefix"; then
-  for ac_prog in pkg-config
-  do
-    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
-set dummy $ac_tool_prefix$ac_prog; ac_word=$2
-{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_prog_PKG_CONFIG+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$PKG_CONFIG"; then
-  ac_cv_prog_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_prog_PKG_CONFIG="$ac_tool_prefix$ac_prog"
-    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-fi
-fi
-PKG_CONFIG=$ac_cv_prog_PKG_CONFIG
-if test -n "$PKG_CONFIG"; then
-  { $as_echo "$as_me:$LINENO: result: $PKG_CONFIG" >&5
-$as_echo "$PKG_CONFIG" >&6; }
-else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-    test -n "$PKG_CONFIG" && break
-  done
-fi
-if test -z "$PKG_CONFIG"; then
-  ac_ct_PKG_CONFIG=$PKG_CONFIG
-  for ac_prog in pkg-config
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_prog_ac_ct_PKG_CONFIG+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$ac_ct_PKG_CONFIG"; then
-  ac_cv_prog_ac_ct_PKG_CONFIG="$ac_ct_PKG_CONFIG" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_prog_ac_ct_PKG_CONFIG="$ac_prog"
-    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-fi
-fi
-ac_ct_PKG_CONFIG=$ac_cv_prog_ac_ct_PKG_CONFIG
-if test -n "$ac_ct_PKG_CONFIG"; then
-  { $as_echo "$as_me:$LINENO: result: $ac_ct_PKG_CONFIG" >&5
-$as_echo "$ac_ct_PKG_CONFIG" >&6; }
-else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  test -n "$ac_ct_PKG_CONFIG" && break
-done
-
-  if test "x$ac_ct_PKG_CONFIG" = x; then
-    PKG_CONFIG=""
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ $as_echo "$as_me:$LINENO: WARNING: using cross tools not prefixed with host triplet" >&5
-$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    PKG_CONFIG=$ac_ct_PKG_CONFIG
-  fi
-fi
-
-	cs_prog_pkg_config_checked=yes
-fi
-
-    if test -z "$cs_cv_prog_pkg_config_ok"; then
-  if test -n "$PKG_CONFIG"; then
-  if $PKG_CONFIG --atleast-pkgconfig-version=0.9.0; then
-  cs_cv_prog_pkg_config_ok=yes
-else
-  cs_cv_prog_pkg_config_ok=no
-fi
-
-else
-  cs_cv_prog_pkg_config_ok=no
-fi
-
-fi
-
-    if test $cs_cv_prog_pkg_config_ok = yes; then
-  { $as_echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes bulletdynamics" >&5
-$as_echo_n "checking if $PKG_CONFIG recognizes bulletdynamics... " >&6; }
-if test "${cs_cv_prog_pkg_config_bulletdynamics+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  if $PKG_CONFIG --exists bulletdynamics; then
-  cs_cv_prog_pkg_config_bulletdynamics=yes
-else
-  cs_cv_prog_pkg_config_bulletdynamics=no
-fi
-
-fi
-{ $as_echo "$as_me:$LINENO: result: $cs_cv_prog_pkg_config_bulletdynamics" >&5
-$as_echo "$cs_cv_prog_pkg_config_bulletdynamics" >&6; }
-	if test $cs_cv_prog_pkg_config_bulletdynamics = yes; then
-  if test -z "$cs_cv_prog_pkg_config_bulletdynamics_flags"; then
-  cs_check_lib_cflag=`{ ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --cflags bulletdynamics") >&5
-  ($PKG_CONFIG --cflags bulletdynamics) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
-	cs_check_lib_lflag=''
-	cs_check_lib_libs=`{ ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --libs bulletdynamics") >&5
-  ($PKG_CONFIG --libs bulletdynamics) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_pkg_config_bulletdynamics_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_pkg_config_bulletdynamics_flags"
-fi
-
-fi
-
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
-	export PATH
-fi
-
-    if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}bulletdynamics-config", so it can be a program name with args.
-set dummy ${ac_tool_prefix}bulletdynamics-config; ac_word=$2
-{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_path_CONFIG_BULLETDYNAMICS+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  case $CONFIG_BULLETDYNAMICS in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_CONFIG_BULLETDYNAMICS="$CONFIG_BULLETDYNAMICS" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_CONFIG_BULLETDYNAMICS="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-CONFIG_BULLETDYNAMICS=$ac_cv_path_CONFIG_BULLETDYNAMICS
-if test -n "$CONFIG_BULLETDYNAMICS"; then
-  { $as_echo "$as_me:$LINENO: result: $CONFIG_BULLETDYNAMICS" >&5
-$as_echo "$CONFIG_BULLETDYNAMICS" >&6; }
-else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-fi
-if test -z "$ac_cv_path_CONFIG_BULLETDYNAMICS"; then
-  ac_pt_CONFIG_BULLETDYNAMICS=$CONFIG_BULLETDYNAMICS
-  # Extract the first word of "bulletdynamics-config", so it can be a program name with args.
-set dummy bulletdynamics-config; ac_word=$2
-{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_path_ac_pt_CONFIG_BULLETDYNAMICS+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  case $ac_pt_CONFIG_BULLETDYNAMICS in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_ac_pt_CONFIG_BULLETDYNAMICS="$ac_pt_CONFIG_BULLETDYNAMICS" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_ac_pt_CONFIG_BULLETDYNAMICS="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-ac_pt_CONFIG_BULLETDYNAMICS=$ac_cv_path_ac_pt_CONFIG_BULLETDYNAMICS
-if test -n "$ac_pt_CONFIG_BULLETDYNAMICS"; then
-  { $as_echo "$as_me:$LINENO: result: $ac_pt_CONFIG_BULLETDYNAMICS" >&5
-$as_echo "$ac_pt_CONFIG_BULLETDYNAMICS" >&6; }
-else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-  if test "x$ac_pt_CONFIG_BULLETDYNAMICS" = x; then
-    CONFIG_BULLETDYNAMICS=""
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ $as_echo "$as_me:$LINENO: WARNING: using cross tools not prefixed with host triplet" >&5
-$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    CONFIG_BULLETDYNAMICS=$ac_pt_CONFIG_BULLETDYNAMICS
-  fi
-else
-  CONFIG_BULLETDYNAMICS="$ac_cv_path_CONFIG_BULLETDYNAMICS"
-fi
-
-    if test -n "$CONFIG_BULLETDYNAMICS"; then
-  if test -z "$cs_cv_prog_config_bulletdynamics_ok"; then
-  if $CONFIG_BULLETDYNAMICS --cflags --libs >/dev/null 2>&1; then
-  cs_cv_prog_config_bulletdynamics_ok=yes
-else
-  cs_cv_prog_config_bulletdynamics_ok=no
-fi
-
-fi
-
-	if test $cs_cv_prog_config_bulletdynamics_ok = yes; then
-  if test -z "$cs_cv_prog_config_bulletdynamics_flags"; then
-  cs_check_lib_cflag=`{ ($as_echo "$as_me:$LINENO: \$CONFIG_BULLETDYNAMICS --cflags ") >&5
-  ($CONFIG_BULLETDYNAMICS --cflags ) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
-	cs_check_lib_lflag=''
-	cs_check_lib_libs=`{ ($as_echo "$as_me:$LINENO: \$CONFIG_BULLETDYNAMICS --libs ") >&5
-  ($CONFIG_BULLETDYNAMICS --libs ) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_config_bulletdynamics_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_config_bulletdynamics_flags"
-fi
-
-fi
-
-
-
-	if test $with_bullet != yes; then
+    # Generate flag tuples for plain old libs
+    if test $with_bullet != yes; then
   cs_check_lib_paths=$with_bullet
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
@@ -56003,7 +55571,7 @@ else
     /opt/include|/opt/lib "
 fi
 
-	for cs_lib_item in $cs_check_lib_paths
+    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -56048,16 +55616,13 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "bullet"; then
-  cs_check_lib_libs="-lbullet"
-	cs_check_lib_framework="-framework bullet"
+    if test -n "-lBulletDynamics -lBulletCollision -lLinearMath"; then
+  cs_check_lib_libs="-lBulletDynamics -lBulletCollision -lLinearMath"
 else
   cs_check_lib_libs=''
-	cs_check_lib_framework=''
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then
@@ -56072,16 +55637,13 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "bullet"; then
-  cs_check_lib_libs="-lbullet"
-	cs_check_lib_framework="-framework bullet"
+    if test -n "-lBulletDynamics -lBulletCollision -lLinearMath"; then
+  cs_check_lib_libs="-lBulletDynamics -lBulletCollision -lLinearMath"
 else
   cs_check_lib_libs=''
-	cs_check_lib_framework=''
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -56095,21 +55657,18 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "bullet"; then
-  cs_check_lib_libs="-lbullet"
-	cs_check_lib_framework="-framework bullet"
+    if test -n "-lBulletDynamics -lBulletCollision -lLinearMath"; then
+  cs_check_lib_libs="-lBulletDynamics -lBulletCollision -lLinearMath"
 else
   cs_check_lib_libs=''
-	cs_check_lib_framework=''
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
     done
-	    for cs_lib_item in $cs_check_lib_paths
+    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -56154,16 +55713,13 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "bulletdynamics"; then
-  cs_check_lib_libs="-lbulletdynamics"
-	cs_check_lib_framework="-framework bulletdynamics"
+    if test -n "-lbulletdynamics -lbulletcollision -lbulletmath"; then
+  cs_check_lib_libs="-lbulletdynamics -lbulletcollision -lbulletmath"
 else
   cs_check_lib_libs=''
-	cs_check_lib_framework=''
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then
@@ -56178,16 +55734,13 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "bulletdynamics"; then
-  cs_check_lib_libs="-lbulletdynamics"
-	cs_check_lib_framework="-framework bulletdynamics"
+    if test -n "-lbulletdynamics -lbulletcollision -lbulletmath"; then
+  cs_check_lib_libs="-lbulletdynamics -lbulletcollision -lbulletmath"
 else
   cs_check_lib_libs=''
-	cs_check_lib_framework=''
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -56201,25 +55754,21 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "bulletdynamics"; then
-  cs_check_lib_libs="-lbulletdynamics"
-	cs_check_lib_framework="-framework bulletdynamics"
+    if test -n "-lbulletdynamics -lbulletcollision -lbulletmath"; then
+  cs_check_lib_libs="-lbulletdynamics -lbulletcollision -lbulletmath"
 else
   cs_check_lib_libs=''
-	cs_check_lib_framework=''
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
     done
 
-
-	if test "$cs_ignore_cache" != yes; then
-  { $as_echo "$as_me:$LINENO: checking for libbullet" >&5
-$as_echo_n "checking for libbullet... " >&6; }
+    if test "$cs_ignore_cache" != yes; then
+  { $as_echo "$as_me:$LINENO: checking for Bullet" >&5
+$as_echo_n "checking for Bullet... " >&6; }
 if test "${cs_cv_libbullet+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
@@ -56297,7 +55846,7 @@ fi
 
 	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test -lbulletdynamics -lbulletcollision -lbulletmath $cs_libs_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -56305,15 +55854,15 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include "btBulletDynamicsCommon.h"
-      #include "btBulletCollisionCommon.h"
+      	    #include "btBulletCollisionCommon.h"
 int
 main ()
 {
 btCollisionDispatcher* d;
-      btBroadphaseInterface* b;
-      btSequentialImpulseConstraintSolver* s;
-      btDefaultCollisionConfiguration* c;
-      btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)
+      	    btBroadphaseInterface* b;
+      	    btSequentialImpulseConstraintSolver* s;
+      	    btDefaultCollisionConfiguration* c;
+      	    btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)
   ;
   return 0;
 }
@@ -56370,7 +55919,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test $cs_build_ok = yes; then
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test -lbulletdynamics -lbulletcollision -lbulletmath | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libbullet=yes
 		cs_cv_libbullet_cflags=$cs_build_cflags
 		cs_cv_libbullet_lflags=$cs_build_lflags
@@ -56383,8 +55932,8 @@ fi
 { $as_echo "$as_me:$LINENO: result: $cs_cv_libbullet" >&5
 $as_echo "$cs_cv_libbullet" >&6; }
 else
-  { $as_echo "$as_me:$LINENO: checking for libbullet" >&5
-$as_echo_n "checking for libbullet... " >&6; }
+  { $as_echo "$as_me:$LINENO: checking for Bullet" >&5
+$as_echo_n "checking for Bullet... " >&6; }
 	    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -56459,7 +56008,7 @@ fi
 
 	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test -lbulletdynamics -lbulletcollision -lbulletmath $cs_libs_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -56467,15 +56016,15 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include "btBulletDynamicsCommon.h"
-      #include "btBulletCollisionCommon.h"
+      	    #include "btBulletCollisionCommon.h"
 int
 main ()
 {
 btCollisionDispatcher* d;
-      btBroadphaseInterface* b;
-      btSequentialImpulseConstraintSolver* s;
-      btDefaultCollisionConfiguration* c;
-      btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)
+      	    btBroadphaseInterface* b;
+      	    btSequentialImpulseConstraintSolver* s;
+      	    btDefaultCollisionConfiguration* c;
+      	    btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)
   ;
   return 0;
 }
@@ -56532,7 +56081,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test $cs_build_ok = yes; then
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test -lbulletdynamics -lbulletcollision -lbulletmath | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libbullet=yes
 		cs_cv_libbullet_cflags=$cs_build_cflags
 		cs_cv_libbullet_lflags=$cs_build_lflags
@@ -56555,8 +56104,8 @@ else
 fi
 
 
-	PATH="$PATH_SAVE"
-	if test $with_bullet != yes; then
+    PATH="$PATH_SAVE"
+    if test $with_bullet != yes; then
   PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
     export PKG_CONFIG_PATH
 fi
@@ -56567,8 +56116,7 @@ else
 fi
 
 
-    cs_cv_with_bullet="$with_bullet"
-
+cs_cv_with_bullet="$with_bullet"
 
 if test $cs_cv_libbullet = yes; then
   if test "" != yes; then
