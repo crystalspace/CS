@@ -1307,20 +1307,91 @@ AS_IF([test $cs_cv_libode_opcode = yes],
 # Check for bullet physics library.
 #------------------------------------------------------------------------------
 # Note: The pkg-config package name for Bullet 2.x is 'bullet', but the actual
-# libraries are bulletdynamics, bulletcollision and bulletmath. So note that
-# there is actually no 'bullet' library.
-CS_CHECK_LIB_WITH([bullet],
-    [AC_LANG_PROGRAM(
-      [[#include "btBulletDynamicsCommon.h"
-      #include "btBulletCollisionCommon.h"]],
-      [btCollisionDispatcher* d;
-      btBroadphaseInterface* b;
-      btSequentialImpulseConstraintSolver* s;
-      btDefaultCollisionConfiguration* c;
-      btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
-    [], [C++], [], [],
-    [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
-    [bulletdynamics])
+# libraries are bulletdynamics, bulletcollision and bulletmath... sometimes.
+# On some setups/distros the names BulletDynamics, BulletCollision and
+# LinearMath are used (note case and name differences).
+# So note that there is actually no single 'bullet' library. (Having to deal
+# with that and the different library name styles is the reason for most of the
+# complexity of this check.)
+
+AC_ARG_WITH([bullet], [AC_HELP_STRING([--with-bullet=dir],
+    [specify additional location to search Bullet if not detected automatically; 
+    directories searched include dir/include, dir/lib, and dir])])
+
+# Modified versions of _CS_CHECK_LIB_CREATE_FLAG and _CS_CHECK_LIB_CREATE_FLAG
+# to allow checking for multiple libs at once
+AC_DEFUN([_CS_CHECK_BULLET_CREATE_FLAGS],
+    [for cs_lib_item in $3
+    do
+	case $cs_lib_item in
+	    *\|*) CS_SPLIT(
+		    [$cs_lib_item], [cs_check_incdir,cs_check_libdir], [|])
+		_CS_CHECK_BULLET_CREATE_FLAG([$1],
+		    [$cs_check_incdir], [$cs_check_libdir], [$2])
+		;;
+	    *)  _CS_CHECK_BULLET_CREATE_FLAG([$1],
+		    [$cs_lib_item/include], [$cs_lib_item/lib], [$2])
+		_CS_CHECK_BULLET_CREATE_FLAG(
+		    [$1], [$cs_lib_item], [$cs_lib_item], [$2])
+		;;
+	esac
+    done])
+AC_DEFUN([_CS_CHECK_BULLET_CREATE_FLAG],
+   [AS_IF([test -n "$2"], [cs_check_lib_cflag="-I$2"], [cs_check_lib_cflag=''])
+    AS_IF([test -n "$3"], [cs_check_lib_lflag="-L$3"], [cs_check_lib_lflag=''])
+    AS_IF([test -n "$4"], [cs_check_lib_libs="$4"], [cs_check_lib_libs=''])
+    $1="$$1
+	CS_CREATE_TUPLE(
+	    [$cs_check_lib_cflag],
+	    [$cs_check_lib_lflag],
+	    [$cs_check_lib_libs])"])
+
+AS_IF([test -z "$with_bullet"], [with_bullet=yes])
+AS_IF([test "$with_bullet" != no],
+[
+    # If --with-bullet value is same as cached value, then assume other
+    # cached values are also valid; otherwise, ignore all cached values.
+    AS_IF([test "$with_bullet" != "$cs_cv_with_bullet"],
+        [cs_ignore_cache=yes], [cs_ignore_cache=no])
+
+    # Put relevant subdirs of the library directory into PATH and PKGCONFIG
+    PATH_SAVE="$PATH"
+    AS_IF([test $with_bullet != yes],
+        [PATH="$with_bullet/bin$PATH_SEPARATOR$PATH"
+        _CS_CHECK_PKG_CONFIG_PREPARE_PATH([$with_bullet,
+	    $with_bullet/lib/pkgconfig])])
+    
+    cs_check_lib_flags=''
+    # Check for 'bullet' pkg-config package
+    _CS_CHECK_LIB_PKG_CONFIG_FLAGS([cs_check_lib_flags], [bullet])
+    # Generate flag tuples for plain old libs
+    AS_IF([test $with_bullet != yes],
+        [cs_check_lib_paths=$with_bullet],
+        [cs_check_lib_paths="| cs_lib_paths_default "])
+    _CS_CHECK_BULLET_CREATE_FLAGS([cs_check_lib_flags],
+            [-lBulletDynamics -lBulletCollision -lLinearMath], [$cs_check_lib_paths])
+    _CS_CHECK_BULLET_CREATE_FLAGS([cs_check_lib_flags],
+            [-lbulletdynamics -lbulletcollision -lbulletmath], [$cs_check_lib_paths])
+            
+    CS_CHECK_BUILD([for Bullet], [cs_cv_libbullet],
+    	[AC_LANG_PROGRAM(
+      	    [[#include "btBulletDynamicsCommon.h"
+      	    #include "btBulletCollisionCommon.h"]],
+	    [btCollisionDispatcher* d;
+      	    btBroadphaseInterface* b;
+      	    btSequentialImpulseConstraintSolver* s;
+      	    btDefaultCollisionConfiguration* c;
+      	    btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
+        [$cs_check_lib_flags], [C++], [], [], [$cs_ignore_cache],
+        [], [], [])
+    
+    PATH="$PATH_SAVE"
+    AS_IF([test $with_bullet != yes],
+        [_CS_CHECK_PKG_CONFIG_UNPREPARE_PATH])
+],
+[cs_cv_libbullet=no])
+
+cs_cv_with_bullet="$with_bullet"
 
 AS_IF([test $cs_cv_libbullet = yes],
     [CS_CHECK_BUILD([if bullet is sufficiently recent (>=2.68)], [cs_cv_bullet_recent],
