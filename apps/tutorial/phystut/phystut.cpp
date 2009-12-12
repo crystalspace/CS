@@ -1266,7 +1266,6 @@ void Simple::LoadRagdoll ()
   bone_Head->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175f));
 
   collider = bone_Pelvis->CreateBoneCollider ();
-  collider->CreateBoxGeometry (csVector3 (0.05f));
   collider->CreateSphereGeometry (csSphere (csVector3 (0.0f, 0.07f, 0.05f), 0.05f));
   collider->SetFriction (10.0f);
   collider->SetDensity (density);
