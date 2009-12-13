@@ -217,7 +217,10 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
       if(flags & lpiReturnLoadedInstance)
       {
         // Check if this plugin is already loaded and return it if so.
-        csRef<iComponent> comp = csQueryPluginClass<iComponent> (this, classID);
+	csRef<iComponent> comp;
+	csPlugin* pl = FindPluginByClassID (classID);
+	if (pl)
+	  comp = pl->Plugin;
         if(comp)
           return csPtr<iComponent>(comp);
       }
@@ -436,10 +439,21 @@ csPluginManager::csPlugin* csPluginManager::FindPluginByClassID (
   return 0;
 }
 
+void csPluginManager::WaitForPluginLoad (const char* classID)
+{
+  MutexScopedLock lock (loadingLock);
+  // Check if this plugin is already loading.
+  csRef<PluginLoadCondition> loading = alreadyLoading.Get(classID, csRef<PluginLoadCondition>());
+  if (loading.IsValid())
+  {
+    loading->Wait(loadingLock);
+  }
+}
 
 csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID)
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  WaitForPluginLoad (classID);
   csPlugin* pl = FindPluginByClassID (classID);
   if (pl) return csPtr<iComponent> (pl->Plugin);
   return 0;
@@ -449,6 +463,22 @@ csPtr<iComponent> csPluginManager::QueryPluginInstance (const char *iInterface, 
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  {
+    // Make sure all pending plugins are loaded completely
+    CS::Threading::MutexScopedLock lock2 (loadingLock);
+    while (alreadyLoading.GetSize() > 0)
+    {
+      AlreadyLoadingHash::GlobalIterator it (alreadyLoading.GetIterator());
+      if (it.HasNext())
+      {
+	csRef<PluginLoadCondition> loading (it.Next ());
+	loading->Wait (loadingLock);
+      }
+      loadingLock.Unlock();
+      CS::Threading::Thread::Yield();
+      loadingLock.Lock();
+    }
+  }
   for (size_t i = 0; i < Plugins.GetSize (); i++)
   {
     iComponent* ret = Plugins[i].Plugin;
@@ -466,6 +496,7 @@ csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID,
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  WaitForPluginLoad (classID);
   csPlugin* lastPlugin = 0;
   do
   {
