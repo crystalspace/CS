@@ -217,6 +217,7 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
       if(flags & lpiReturnLoadedInstance)
       {
         // Check if this plugin is already loaded and return it if so.
+	CS::Threading::RecursiveMutexScopedLock lock (mutex);
 	csRef<iComponent> comp;
 	csPlugin* pl = FindPluginByClassID (classID);
 	if (pl)
