@@ -77,21 +77,21 @@ location:
 @subsubheading 32-bit version
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.9_002.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.9_003.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-1.9_002.exe}
+@code{cs-win32libs-1.9_003.exe}
 @end iftex
 
 @subsubheading 64-bit version
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-winlibs-x64-1.9_002.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-winlibs-x64-1.9_003.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-winlibs-x64-1.9_002.exe}
+@code{cs-winlibs-x64-1.9_003.exe}
 @end iftex
 
 @subheading zlib
