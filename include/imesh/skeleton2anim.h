@@ -766,7 +766,8 @@ struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
 
 
 /**
- * 
+ * An animation node that uses a finite state machine to determine the 
+ * animation to be played.
  */
 struct iSkeletonFSMNode2 : public iSkeletonAnimNode2
 {

@@ -99,7 +99,8 @@ public:
 };
 
 /**
- * 
+ * Sockets attached to animated meshes. Sockets are designed to 
+ * attach external objects to animated meshes.
  */
 struct iAnimatedMeshSocket : public virtual iBase
 {

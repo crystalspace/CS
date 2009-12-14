@@ -124,7 +124,7 @@ struct iSkeletonFactory2 : public virtual iBase
    */
   virtual BoneID CreateBone (BoneID parent = InvalidBoneID) = 0;
 
-  /*
+  /**
    * Find a bone id from its name
    * \param name bone name
    */
@@ -346,7 +346,8 @@ struct iSkeleton2 : public virtual iBase
 };
 
 /**
- * 
+ * Holds the state of an animesh skeleton for a frame, ie the position
+ * and rotation of each bone of the skeleton.
  */
 class csSkeletalState2 : public csRefCount
 {
@@ -357,7 +358,7 @@ public:
     : boneVecs (0), boneQuats (0), numberOfBones (0)
   {}
 
-  //
+  ///
   virtual inline ~csSkeletalState2 ()
   {
     delete[] boneVecs;
@@ -365,7 +366,8 @@ public:
   }
 
   /**
-   * 
+   * Return the position vector of the specified bone.
+   * \param i the BoneID of the bone.
    */
   inline const csVector3& GetVector (size_t i) const
   {
@@ -373,7 +375,8 @@ public:
   }
 
   /**
-   * 
+   * Return the position vector of the specified bone.
+   * \param i the BoneID of the bone.
    */
   inline csVector3& GetVector (size_t i) 
   {
@@ -382,7 +385,8 @@ public:
 
 
   /**
-   * 
+   * Return the rotation quaternion of the specified bone.
+   * \param i the BoneID of the bone.
    */
   inline const csQuaternion& GetQuaternion (size_t i) const
   {
@@ -390,7 +394,8 @@ public:
   }
 
   /**
-   * 
+   * Return the rotation quaternion of the specified bone.
+   * \param i the BoneID of the bone.
    */
   inline csQuaternion& GetQuaternion (size_t i) 
   {
@@ -398,7 +403,9 @@ public:
   }
 
   /**
-   * 
+   * Return true if the position and rotation values have been set for
+   * the specified bone, false otherwise (default values will therefore
+   * be used).
    */
   inline bool IsBoneUsed (BoneID bone) const
   {
@@ -406,7 +413,8 @@ public:
   }
 
   /**
-   * 
+   * Mark that the position and rotation values have been set for
+   * the specified bone. Both position and rotation must therefore be set.
    */
   inline void SetBoneUsed (BoneID bone)
   {
@@ -414,7 +422,7 @@ public:
   }
 
   /**
-   * 
+   * Return the count of bones of the animesh skeleton.
    */
   inline size_t GetBoneCount () const
   {
@@ -422,7 +430,8 @@ public:
   }
 
   /**
-   * 
+   * Initialize the skeleton state.
+   * \param numBones The count of bones of the animesh skeleton.
    */
   inline void Setup (size_t numBones)
   {
