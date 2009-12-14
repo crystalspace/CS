@@ -1275,8 +1275,6 @@ void Simple::LoadRagdoll ()
   bone_Pelvis->GetBoneJoint ()->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
   bone_Pelvis->GetBoneJoint ()->SetTransConstraints (true, true, true);
   bone_Pelvis->GetBoneJoint ()->SetRotConstraints (true, true, true);
-  bone_Pelvis->GetBoneJoint ()->SetMinimumAngle (csVector3 (-0.175f));
-  bone_Pelvis->GetBoneJoint ()->SetMaximumAngle (csVector3 (0.175f));
 
   float capsuleLength = 0.01f;
   float capsuleRadius = 0.02f;
