@@ -1060,7 +1060,6 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 
 AS_IF([test $cs_host_family = windows],
     [AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
-    CS_CHECK_DIRECTX([])
     CS_CHECK_DIRECTX([8])])
 
 
