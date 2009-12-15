@@ -64,6 +64,7 @@ WalkTest::WalkTest () :
   extern bool CommandHandler (const char *cmd, const char *arg);
   csCommandProcessor::ExtraHandler = CommandHandler;
   auto_script = 0;
+  world_file = "world";
   views = 0;
   wMissile_boom = 0;
   wMissile_whoosh = 0;
@@ -210,6 +211,11 @@ void WalkTest::SetDefaults ()
     auto_script = csStrNew (val);
   }
 
+  if ((val = cmdline->GetOption ("world")))
+  {
+    world_file = val;
+  }
+
   if (cmdline->GetOption ("logo"))
   {
     do_logo = true;
@@ -247,6 +253,7 @@ void WalkTest::Help ()
   csPrintf ("  -noprecache        after loading don't precache to speed up rendering\n");
   csPrintf ("  -bots              allow random generation of bots\n");
   csPrintf ("  -[no]saveable      enable/disable engine 'saveable' flag\n");
+  csPrintf ("  -world=<file>      use given world file instead of 'world'\n");
   csPrintf ("  <path>             load map from VFS <path> (default '%s')\n",
         cfg->GetStr ("Walktest.Settings.WorldFile", "world"));
 }
@@ -725,7 +732,7 @@ static bool WalkEventHandler (iEvent& ev)
 bool WalkTest::SetMapDir (const char* map_dir, csString& map_file)
 {
   const char* fileNameToOpen;
-  if (!CS::Utility::SmartChDir (myVFS, map_dir, "world", &fileNameToOpen))
+  if (!CS::Utility::SmartChDir (myVFS, map_dir, world_file, &fileNameToOpen))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error setting directory '%s'!",
 	map_dir);

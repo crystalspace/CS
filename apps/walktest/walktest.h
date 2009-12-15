@@ -155,6 +155,7 @@ public:
   csMapToLoad* cache_map;	// If 0 no cache: entry was given.
   /// A script to execute at startup.
   char* auto_script;
+  csString world_file;
 
   /// Player position, orientation, and velocity
   csVector3 pos;
