@@ -32,9 +32,14 @@ namespace CS
      * "Smartly" try to locate a file given a path that could be: a plain file
      * name, directory, name of a level in /lev/, or .zip file.
      *
-     * Try to open a file given a path that could be any of a VFS path, a 
-     * plain file name or directory in the real file system, name of a level 
-     * in /lev/, or .zip file.
+     * \a path is tried to be interpreted in a number of different ways:
+     * - A VFS directory. Succeeds if a file named \a defaultFilename exists
+     *   in the directory.
+     * - A level name in VFS <tt>/lev/</tt>. Succeeds if a file named 
+     *   \a defaultFilename exists below that directory.
+     * - A <tt>.zip</tt> file name. Succeeds if a file named \a defaultFilename
+     *   exists in the archive.
+     * - A plain file name. Succeeds if the file exists.
      *
      * This is for example useful for tool applications which want to let the
      * user specify paths and file locations in a variety of ways.
@@ -55,9 +60,14 @@ namespace CS
      * "Smartly" change to the directory with some file given a path that could
      * be: a plain file name, directory, name of a level in /lev/, or .zip file.
      *
-     * Try to change to a directory containing a file given a path that could
-     * be any of a VFS path, a plain file name or directory in the real file
-     * system, name of a level in /lev/, or .zip file.
+     * \a path is tried to be interpreted in a number of different ways:
+     * - A VFS directory. Succeeds if a file named \a defaultFilename exists
+     *   in the directory.
+     * - A level name in VFS <tt>/lev/</tt>. Succeeds if a file named 
+     *   \a defaultFilename exists below that directory.
+     * - A <tt>.zip</tt> file name. Succeeds if a file named \a defaultFilename
+     *   exists in the archive.
+     * - A plain file name. Succeeds if the file exists.
      *
      * This is for example useful for tool applications which want to let the
      * user specify paths and file locations in a variety of ways.
