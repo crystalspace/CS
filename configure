@@ -37835,7 +37835,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
-	    #define DIRECTINPUT_VERSION 0x0500
+	    #define DIRECTINPUT_VERSION 0x0800
 	    #include <windows.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
@@ -37843,7 +37843,8 @@ int
 main ()
 {
 DirectSoundCreate(0,0,0);
-	     DirectInputCreate8(0,0,0,0,0)
+	     IID* iid;
+	     DirectInput8Create(0,0,*iid,0,0)
   ;
   return 0;
 }
@@ -38000,7 +38001,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
-	    #define DIRECTINPUT_VERSION 0x0500
+	    #define DIRECTINPUT_VERSION 0x0800
 	    #include <windows.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
@@ -38008,7 +38009,8 @@ int
 main ()
 {
 DirectSoundCreate(0,0,0);
-	     DirectInputCreate8(0,0,0,0,0)
+	     IID* iid;
+	     DirectInput8Create(0,0,*iid,0,0)
   ;
   return 0;
 }
@@ -38201,7 +38203,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
-	    #define DIRECTINPUT_VERSION 0x0500
+	    #define DIRECTINPUT_VERSION 0x0800
 	    #include <windows.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
@@ -38209,7 +38211,8 @@ int
 main ()
 {
 DirectSoundCreate8(0,0,0);
-	     DirectInputCreate8(0,0,0,0,0)
+	     IID* iid;
+	     DirectInput8Create(0,0,*iid,0,0)
   ;
   return 0;
 }
@@ -38366,7 +38369,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
-	    #define DIRECTINPUT_VERSION 0x0500
+	    #define DIRECTINPUT_VERSION 0x0800
 	    #include <windows.h>
 	    #include <dsound.h>
 	    #include <dinput.h>
@@ -38374,7 +38377,8 @@ int
 main ()
 {
 DirectSoundCreate8(0,0,0);
-	     DirectInputCreate8(0,0,0,0,0)
+	     IID* iid;
+	     DirectInput8Create(0,0,*iid,0,0)
   ;
   return 0;
 }
