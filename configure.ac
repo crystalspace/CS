@@ -1046,12 +1046,13 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 	    [[#if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
-	    #define DIRECTINPUT_VERSION 0x0500
+	    #define DIRECTINPUT_VERSION 0x0800
 	    #include <windows.h>
 	    #include <dsound.h>
 	    #include <dinput.h>]],
 	    [DirectSoundCreate$1(0,0,0); 
-	     DirectInputCreate8(0,0,0,0,0)])],
+	     IID* iid;
+	     DirectInput8Create(0,0,*iid,0,0)])],
 	[CS_CREATE_TUPLE([],[],[-ldsound -ldinput8]) \
 	CS_CREATE_TUPLE([-I/usr/include/directx],[],
 	    [-ldsound -ldinput8])], 
