@@ -442,26 +442,24 @@ csPluginManager::csPlugin* csPluginManager::FindPluginByClassID (
 
 void csPluginManager::WaitForPluginLoad (const char* classID)
 {
-  MutexScopedLock lock (loadingLock);
   // Check if this plugin is already loading.
   csRef<PluginLoadCondition> loading = alreadyLoading.Get(classID, csRef<PluginLoadCondition>());
   if (loading.IsValid())
   {
-    /* Unlock the main plugin manager mutex to make sure the loading commences
-       (it can happen that we start to wait for the load complete just after
-       the alreadyLoading hash was changed, but before actual loading starts.
-       In that case, having the lock will result in a deadlock. Unlocking the
-       main mutex avoids that */
-    mutex.Unlock();
     loading->Wait(loadingLock);
-    mutex.Lock();
   }
 }
 
 csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID)
 {
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  loadingLock.Lock();
+  /* Acquire main lock _before_ unlocking the loading lock in order to make
+     sure the alreadyLoading hash isn't modified between waiting for the
+     plugin load and getting the lock - that would mean a missed loading-
+     in-progress */
   WaitForPluginLoad (classID);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  loadingLock.Unlock();
   csPlugin* pl = FindPluginByClassID (classID);
   if (pl) return csPtr<iComponent> (pl->Plugin);
   return 0;
@@ -470,10 +468,9 @@ csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID)
 csPtr<iComponent> csPluginManager::QueryPluginInstance (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  loadingLock.Lock();
   {
     // Make sure all pending plugins are loaded completely
-    CS::Threading::MutexScopedLock lock2 (loadingLock);
     while (alreadyLoading.GetSize() > 0)
     {
       AlreadyLoadingHash::GlobalIterator it (alreadyLoading.GetIterator());
@@ -481,15 +478,15 @@ csPtr<iComponent> csPluginManager::QueryPluginInstance (const char *iInterface, 
       {
 	csRef<PluginLoadCondition> loading (it.Next ());
 	// Avoid deadlock if loading didn't commence yet
-	mutex.Unlock();
 	loading->Wait (loadingLock);
-	mutex.Lock();
       }
       loadingLock.Unlock();
       CS::Threading::Thread::Yield();
       loadingLock.Lock();
     }
   }
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  loadingLock.Unlock();
   for (size_t i = 0; i < Plugins.GetSize (); i++)
   {
     iComponent* ret = Plugins[i].Plugin;
@@ -505,13 +502,15 @@ csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID,
                                                         int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  
-  /* Acquire main lock _before_ waiting for load to finish in order to make
+
+  loadingLock.Lock();
+  WaitForPluginLoad (classID);
+  /* Acquire main lock _before_ unlocking the loading lock in order to make
      sure the alreadyLoading hash isn't modified between waiting for the
      plugin load and getting the lock - that would mean a missed loading-
      in-progress */
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  WaitForPluginLoad (classID);
+  loadingLock.Unlock();
   csPlugin* lastPlugin = 0;
   do
   {
