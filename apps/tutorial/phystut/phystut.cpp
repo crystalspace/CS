@@ -165,6 +165,9 @@ void Simple::SetupFrame ()
   WriteShadow( 10, 410, g2d->FindRGB (255, 150, 100),"%d Objects",
 	       dynSys->GetBodysCount ());
 
+  // Write available keys
+  DisplayKeys ();
+
   if (phys_engine_id == ODE_ID)
   {
     if(solver==0)
@@ -329,14 +332,10 @@ bool Simple::HandleEvent (iEvent& ev)
 	return true;
       }
 
-      else if (csKeyEventHelper::GetCookedCode (&ev) == '?')
+      else if (csKeyEventHelper::GetCookedCode (&ev) == '?'
+	       && phys_engine_id != BULLET_ID)
       {
 	// Toggle collision debug mode
-        if (phys_engine_id != BULLET_ID)
-          csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-            "crystalspace.application.phystut",
-            "Debugging colliders only works for bullet!");
-	else
 	  do_bullet_debug = !do_bullet_debug;
       }
 
@@ -346,14 +345,15 @@ bool Simple::HandleEvent (iEvent& ev)
 	  csVector3 (0,-7,0) : csVector3 (0));
 	return true;
       }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'i')
       { // Toggle autodisable.
 	dynSys->EnableAutoDisable (!dynSys->AutoDisableEnabled ());
 	//dynSys->SetAutoDisableParams(1.5f,2.5f,6,0.0f);
 	disable=dynSys->AutoDisableEnabled ();
 	return true;
       }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == '1')
+      else if (csKeyEventHelper::GetCookedCode (&ev) == '1'
+	       && phys_engine_id == ODE_ID)
       { // Toggle stepfast.
         csRef<iODEDynamicSystemState> osys = 
           scfQueryInterface<iODEDynamicSystemState> (dynSys);
@@ -361,7 +361,8 @@ bool Simple::HandleEvent (iEvent& ev)
 	solver=0;
 	return true;
       }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == '2')
+      else if (csKeyEventHelper::GetCookedCode (&ev) == '2'
+	       && phys_engine_id == ODE_ID)
       { // Toggle stepfast.
         csRef<iODEDynamicSystemState> osys = 
           scfQueryInterface<iODEDynamicSystemState> (dynSys);
@@ -369,7 +370,8 @@ bool Simple::HandleEvent (iEvent& ev)
 	solver=1;
 	return true;
       }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == '3')
+      else if (csKeyEventHelper::GetCookedCode (&ev) == '3'
+	       && phys_engine_id == ODE_ID)
       { // Toggle quickstep.
         csRef<iODEDynamicSystemState> osys = 
           scfQueryInterface<iODEDynamicSystemState> (dynSys);
@@ -450,7 +452,6 @@ bool Simple::Initialize ()
   phys_engine_name = clp->GetOption ("phys_engine");
   if (phys_engine_name == "ode")
   {
-    phys_engine_name = "ode";
     phys_engine_id = ODE_ID;
     csRef<iPluginManager> plugmgr = 
       csQueryRegistry<iPluginManager> (object_reg);
@@ -458,6 +459,7 @@ bool Simple::Initialize ()
   }
   else 
   {
+    phys_engine_name = "bullet";
     phys_engine_id = BULLET_ID;
     csRef<iPluginManager> plugmgr = 
       csQueryRegistry<iPluginManager> (object_reg);
@@ -1565,6 +1567,89 @@ void Simple::Write(int x,int y,int fg,int bg,const char *str,...)
   va_end (arg);
 
   g2d->Write (courierFont, x, y, fg, bg, buf);
+}
+
+void Simple::DisplayKeys ()
+{
+  int x = 20;
+  int y = 20;
+  int fg = g2d->FindRGB (255, 150, 100);
+  int lineSize = 15;
+
+  WriteShadow (x - 5, y, fg, "Keys available:");
+  y += lineSize;
+
+  WriteShadow (x, y, fg, "b: spawn a box");
+  y += lineSize;
+
+  WriteShadow (x, y, fg, "s: spawn a sphere");
+  y += lineSize;
+
+  if (phys_engine_id == BULLET_ID)
+  {
+    WriteShadow (x, y, fg, "c: spawn a cylinder");
+    y += lineSize;
+
+    WriteShadow (x, y, fg, "a: spawn a capsule");
+    y += lineSize;
+  }
+
+  WriteShadow (x, y, fg, "m: spawn a concave mesh");
+  y += lineSize;
+
+  WriteShadow (x, y, fg, "*: spawn a static concave mesh");
+  y += lineSize;
+
+  WriteShadow (x, y, fg, "j: spawn two jointed bodies");
+  y += lineSize;
+
+  if (phys_engine_id == BULLET_ID)
+  {
+    WriteShadow (x, y, fg, "h: spawn a chain");
+    y += lineSize;
+
+    WriteShadow (x, y, fg, "r: spawn a frankie's ragdoll");
+    y += lineSize;
+  }
+
+  WriteShadow (x, y, fg, "f: toggle physical/free camera");
+  y += lineSize;
+
+  WriteShadow (x, y, fg, "t: toggle all bodies to dynamic/static");
+  y += lineSize;
+
+  WriteShadow (x, y, fg, "p: pause the simulation");
+  y += lineSize;
+
+  WriteShadow (x, y, fg, "o: toggle speed of simulation");
+  y += lineSize;
+
+  WriteShadow (x, y, fg, "d: toggle colliders displayed/hidden");
+  y += lineSize;
+
+  if (phys_engine_id == BULLET_ID)
+  {
+    WriteShadow (x, y, fg, "?: toggle display of collisions");
+    y += lineSize;
+  }
+
+  WriteShadow (x, y, fg, "g: toggle gravity");
+  y += lineSize;
+
+  WriteShadow (x, y, fg, "i: toggle autodisable enabled or not");
+  y += lineSize;
+
+  if (phys_engine_id == ODE_ID)
+  {
+    WriteShadow (x, y, fg, "1: enable StepFast solver");
+    y += lineSize;
+
+    WriteShadow (x, y, fg, "2: disable StepFast solver");
+    y += lineSize;
+
+    WriteShadow (x, y, fg, "3: enable QuickStep solver");
+    y += lineSize;
+  }
 }
 
 /*---------------------------------------------------------------------*

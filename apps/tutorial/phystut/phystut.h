@@ -74,6 +74,8 @@ private:
 
   void CreateWalls (const csVector3& radius);
 
+  void DisplayKeys ();
+
   csRef<iMeshWrapper> walls;
 
   int cameraMode;
