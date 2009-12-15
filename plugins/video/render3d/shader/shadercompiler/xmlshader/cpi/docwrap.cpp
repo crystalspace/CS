@@ -2407,18 +2407,21 @@ void ConditionDumper::Dump (size_t id, const char* condStr, size_t condLen)
 	  if (seenConds.GetSize() <= id) seenConds.SetSize (id+1);
 	  seenConds.SetBit (id);
 	  
-	  const CondOperation& condOp = currentEval->GetCondition (id);
-	  if (condOp.left.type == operandOperation)
+	  if (currentEval)
 	  {
-	    csString condStr;
-	    condStr = currentEval->GetConditionString (condOp.left.operation);
-	    Dump (condOp.left.operation, condStr, condStr.Length ());
-	  }
-	  if (condOp.right.type == operandOperation)
-	  {
-	    csString condStr;
-	    condStr = currentEval->GetConditionString (condOp.right.operation);
-	    Dump (condOp.right.operation, condStr, condStr.Length ());
+	    const CondOperation& condOp = currentEval->GetCondition (id);
+	    if (condOp.left.type == operandOperation)
+	    {
+	      csString condStr;
+	      condStr = currentEval->GetConditionString (condOp.left.operation);
+	      Dump (condOp.left.operation, condStr, condStr.Length ());
+	    }
+	    if (condOp.right.type == operandOperation)
+	    {
+	      csString condStr;
+	      condStr = currentEval->GetConditionString (condOp.right.operation);
+	      Dump (condOp.right.operation, condStr, condStr.Length ());
+	    }
 	  }
 	}
         currentOut->AppendFmt ("condition %zu = '", id);
