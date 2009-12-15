@@ -240,7 +240,13 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
 
       // If we wish to return any loaded instance of this plugin then do so.
       if(flags & lpiReturnLoadedInstance)
-        return csQueryPluginClass<iComponent> (this, classID);
+      {
+        // The plugin should have been loaded now.
+	CS::Threading::RecursiveMutexScopedLock lock (mutex);
+	csPlugin* pl = FindPluginByClassID (classID);
+	csRef<iComponent> comp (pl->Plugin);
+        return csPtr<iComponent> (comp);
+      }
     }
   }
 
