@@ -448,20 +448,20 @@ bool Simple::Initialize ()
   // Checking for choosen engine
   csRef<iCommandLineParser> clp = csQueryRegistry<iCommandLineParser> (object_reg);
   phys_engine_name = clp->GetOption ("phys_engine");
-  if (phys_engine_name == "bullet")
-  {
-    phys_engine_id = BULLET_ID;
-    csRef<iPluginManager> plugmgr = 
-      csQueryRegistry<iPluginManager> (object_reg);
-    dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
-  }
-  else 
+  if (phys_engine_name == "ode")
   {
     phys_engine_name = "ode";
     phys_engine_id = ODE_ID;
     csRef<iPluginManager> plugmgr = 
       csQueryRegistry<iPluginManager> (object_reg);
     dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.ode");
+  }
+  else 
+  {
+    phys_engine_id = BULLET_ID;
+    csRef<iPluginManager> plugmgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
+    dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
   }
   if (!dyn)
   {
