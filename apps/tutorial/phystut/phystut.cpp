@@ -909,6 +909,8 @@ iRigidBody* Simple::CreateSphere ()
   // offset. That way we can test if the physics engine supports that.
   csMatrix3 m;
   csVector3 artificialOffset (0, .5, 0);
+  if (phys_engine_id == ODE_ID)
+    artificialOffset.Set (0, 0, 0);
   csReversibleTransform t = csReversibleTransform (m, artificialOffset);
   ballFact->HardTransform (t);
 
