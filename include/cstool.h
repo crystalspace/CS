@@ -35,6 +35,7 @@
 #include "cstool/fogmath.h"
 #include "cstool/framedataholder.h"
 #include "cstool/genmeshbuilder.h"
+#include "cstool/materialbuilder.h"
 #include "cstool/identstrings.h"
 #include "cstool/importkit.h"
 #include "cstool/initapp.h"
