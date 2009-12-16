@@ -27,6 +27,7 @@
 
 struct iMaterialWrapper;
 struct iTextureHandle;
+struct iObjectRegistry;
 class csVector4;
 
 namespace CS
