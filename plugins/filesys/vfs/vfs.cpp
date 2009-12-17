@@ -120,7 +120,7 @@ private:
   friend class VfsNode;
 
   // parent archive
-  VfsArchive *Archive;
+  csRef<VfsArchive> Archive;
   // The file handle
   void *fh;
   // buffer, where read mode data is contained
@@ -159,9 +159,9 @@ public:
   CS::Threading::RecursiveMutex archive_mutex;
 
   // Last time this archive was used
-  long LastUseTime;
+  int32 LastUseTime;
   // Number of references (open files) to this archive
-  int RefCount;
+  int32 RefCount;
   // number of open for writing files in this archive
   int Writing;
   // Verbosity flags.
@@ -173,27 +173,27 @@ public:
   }
   void UpdateTime ()
   {
-    LastUseTime = csGetTicks ();
+    CS::Threading::AtomicOperations::Set (&LastUseTime, csGetTicks ());
   }
   void IncRef ()
   {
-    RefCount++;
+    CS::Threading::AtomicOperations::Increment (&RefCount);
     UpdateTime ();
   }
   void DecRef ()
   {
-    if (RefCount)
-      RefCount--;
+    CS::Threading::AtomicOperations::Decrement (&RefCount);
     UpdateTime ();
+    CS_ASSERT(RefCount >= 0);
   }
   bool CheckUp ()
   {
     return (RefCount == 0) &&
       (csGetTicks () - LastUseTime > VFS_KEEP_UNUSED_ARCHIVE_TIME);
   }
-  VfsArchive (const char *filename, unsigned int verbosity) : csArchive (filename)
+  VfsArchive (const char *filename, unsigned int verbosity) : csArchive (filename),
+    RefCount (1)
   {
-    RefCount = 0;
     Writing = 0;
     VfsArchive::verbosity = verbosity;
     UpdateTime ();
@@ -221,6 +221,15 @@ private:
 
   CS::Threading::ReadWriteMutex m;
 
+  /// Find a given archive file.
+  size_t FindKey (const char* Key)
+  {
+    size_t i;
+    for (i = 0; i < array.GetSize (); i++)
+      if (strcmp (array[i]->GetName (), Key) == 0)
+        return i;
+    return (size_t)-1;
+  }
 public:
   VfsArchiveCache () : array (8)
   {
@@ -233,33 +242,46 @@ public:
     }
   }
 
-  /// Find a given archive file.
-  size_t FindKey (const char* Key)
+  /// Find a given archive file, or, if ir doesn't exist, create it.
+  csPtr<VfsArchive> GetArchive (const char* rpath, 
+    bool mustExist, uint createVerbosity)
   {
-    CS::Threading::ScopedReadLock lock(m);
-    size_t i;
-    for (i = 0; i < array.GetSize (); i++)
-      if (strcmp (array[i]->GetName (), Key) == 0)
-        return i;
-    return (size_t)-1;
-  }
+    CS::Threading::ScopedUpgradeableLock lock(m);
+    size_t idx = FindKey (rpath);
+    csRef<VfsArchive> arch;
+    // archive not in cache?
+    if (idx == (size_t)-1)
+    {
+      // does file rpath exist?
+      if (mustExist && (access (rpath, F_OK) != 0))
+        return 0;
 
-  VfsArchive *Get (size_t iIndex)
-  {
-    CS::Threading::ScopedReadLock lock(m);
-    return array.Get (iIndex);
+      m.UpgradeUnlockAndWriteLock();
+      /* Look for the archive again to deal with multiple threads simultaneously
+         requesting the same archive. In that case the archive should only be
+	 added once to the cache. The first thread will not find the archive on
+	 the following FindKey() and create a new one. However, the second and later
+	 threads will find the archive and return the already cached version.
+       */
+      idx = FindKey (rpath);
+      if (idx == (size_t)-1)
+      {
+	arch.AttachNew (new VfsArchive (rpath, createVerbosity));
+	array.Push (arch);
+      }
+      else
+	arch = array[idx];
+      m.WriteUnlockAndUpgradeLock();
+    }
+    else
+      arch = array[idx];
+    return csPtr<VfsArchive> (arch);
   }
 
   size_t Length ()
   {
     CS::Threading::ScopedReadLock lock(m);
     return array.GetSize ();
-  }
-
-  void Push (VfsArchive* ar)
-  {
-    CS::Threading::ScopedWriteLock lock(m);
-    array.Push (ar);
   }
 
   void DeleteAll ()
@@ -352,7 +374,7 @@ private:
   // Copy a string from src to dst and expand all variables
   csString Expand (csVFS *Parent, char const *src);
   // Find a file either on disk or in archive - in this node only
-  bool FindFile (const char *Suffix, PathString& RealPath, csArchive *&);
+  bool FindFile (const char *Suffix, PathString& RealPath, csRef<VfsArchive>&);
   // Mutex on this node.
   CS::Threading::ReadWriteMutex mutex;
 };
@@ -879,7 +901,6 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
       Archive->Writing++;
     }
   }
-  Archive->IncRef ();
 }
 
 ArchiveFile::~ArchiveFile ()
@@ -891,7 +912,6 @@ ArchiveFile::~ArchiveFile ()
   CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
   if (fh)
     Archive->Writing--;
-  Archive->DecRef ();
 }
 
 size_t ArchiveFile::Read (char *Data, size_t DataSize)
@@ -1245,19 +1265,9 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
     else
     {
       // rpath is an archive
-      size_t idx = ArchiveCache->FindKey (rpath);
-      // archive not in cache?
-      if (idx == (size_t)-1)
-      {
-        // does file rpath exist?
-        if (access (rpath, F_OK) != 0)
-          continue;
-
-        idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, verbosity));
-      }
-
-      VfsArchive *a = ArchiveCache->Get (idx);
+      csRef<VfsArchive> a (ArchiveCache->GetArchive (rpath, true, verbosity));
+      if (!a.IsValid())
+	continue;
       // Flush all pending operations
       a->UpdateTime ();
       if (a->Writing == 0)
@@ -1323,23 +1333,11 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
     else
     {
       // rpath is an archive
-      size_t idx = ArchiveCache->FindKey (rpath);
-      // archive not in cache?
-      if (idx == csArrayItemNotFound)
-      {
-        if ((Mode & VFS_FILE_MODE) != VFS_FILE_WRITE)
-        {
-          // does file rpath exist?
-          if (access (rpath, F_OK) != 0)
-            continue;
-        }
+      csRef<VfsArchive> a (ArchiveCache->GetArchive (rpath,
+	(Mode & VFS_FILE_MODE) != VFS_FILE_WRITE, verbosity));
+      if (!a.IsValid()) continue;
 
-        idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, verbosity));
-      }
-
-      f = new ArchiveFile (Mode, this, i, FileName, ArchiveCache->Get(idx),
-        verbosity);
+      f = new ArchiveFile (Mode, this, i, FileName, a, verbosity);
       if (f->GetStatus () == VFS_STATUS_OK)
         break;
       else
@@ -1353,7 +1351,7 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
 }
 
 bool VfsNode::FindFile (const char *Suffix, PathString& RealPath,
-  csArchive *&Archive)
+  csRef<VfsArchive>& Archive)
 {
   // Look through all RPathV's for file or directory
   CS::Threading::ScopedReadLock lock(mutex);
@@ -1373,19 +1371,9 @@ bool VfsNode::FindFile (const char *Suffix, PathString& RealPath,
     else
     {
       // rpath is an archive
-      size_t idx = ArchiveCache->FindKey (rpath);
-      // archive not in cache?
-      if (idx == csArrayItemNotFound)
-      {
-        // does file rpath exist?
-        if (access (rpath, F_OK) != 0)
-          continue;
-
-        idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, verbosity));
-      }
-
-      VfsArchive *a = ArchiveCache->Get (idx);
+      csRef<VfsArchive> a (ArchiveCache->GetArchive (rpath, true, verbosity));
+      if (!a.IsValid())
+	continue;
       a->UpdateTime ();
       if (a->FileExists (Suffix, 0))
       {
@@ -1405,7 +1393,7 @@ bool VfsNode::FindFile (const char *Suffix, PathString& RealPath,
 bool VfsNode::Delete (const char *Suffix)
 {
   PathString fname;
-  csArchive *a;
+  csRef<VfsArchive> a;
   if (!FindFile (Suffix, fname, a))
     return false;
 
@@ -1432,14 +1420,14 @@ bool VfsNode::Delete (const char *Suffix)
 bool VfsNode::Exists (const char *Suffix)
 {
   PathString fname;
-  csArchive *a;
+  csRef<VfsArchive> a;
   return FindFile (Suffix, fname, a);
 }
 
 bool VfsNode::GetFileTime (const char *Suffix, csFileTime &oTime)
 {
   PathString fname;
-  csArchive *a;
+  csRef<VfsArchive> a;
   if (!FindFile (Suffix, fname, a))
     return false;
 
@@ -1465,7 +1453,7 @@ bool VfsNode::GetFileTime (const char *Suffix, csFileTime &oTime)
 bool VfsNode::SetFileTime (const char *Suffix, const csFileTime &iTime)
 {
   PathString fname;
-  csArchive *a;
+  csRef<VfsArchive> a;
   if (!FindFile (Suffix, fname, a))
     return false;
 
@@ -1487,7 +1475,7 @@ bool VfsNode::SetFileTime (const char *Suffix, const csFileTime &iTime)
 bool VfsNode::GetFileSize (const char *Suffix, size_t &oSize)
 {
   PathString fname;
-  csArchive *a;
+  csRef<VfsArchive> a;
   if (!FindFile (Suffix, fname, a))
     return false;
 
