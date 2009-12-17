@@ -195,7 +195,18 @@ bool Simple::HandleEvent (iEvent& ev)
     {
       if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_SPACE)
       {
-	if (rand()%2) CreateBox (); else CreateSphere ();
+	int primitiveCount = phys_engine_id == BULLET_ID ? 7 : 4;
+	switch (rand() % primitiveCount)
+	{
+	case 0: CreateBox (); break;
+	case 1: CreateSphere (); break;
+	case 2: CreateMesh (); break;
+	case 3: CreateJointed (); break;
+	case 4: CreateCylinder (); break;
+	case 5: CreateCapsule (); break;
+	case 6: CreateRagdoll (); break;
+	default: break;
+	}
 	return true;
       }
       else if (csKeyEventHelper::GetCookedCode (&ev) == 'b')
@@ -1613,6 +1624,9 @@ void Simple::DisplayKeys ()
     WriteShadow (x, y, fg, "r: spawn a frankie's ragdoll");
     y += lineSize;
   }
+
+  WriteShadow (x, y, fg, "SPACE: spawn random object");
+  y += lineSize;
 
   WriteShadow (x, y, fg, "f: toggle physical/free camera");
   y += lineSize;
