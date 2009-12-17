@@ -32,6 +32,7 @@
 
 #include "cpi/condition.h"
 #include "cpi/docwrap.h"
+#include "iinternal.h"
 #include "shadertech.h"
 #include "cpi/mybitarray.h"
 
@@ -87,8 +88,9 @@ class csShaderConditionResolver : public iConditionResolver
   csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
   csHash<MyBitArrayTemp, size_t, TempHeapAlloc> variantConditions;
 
-  const CS::Graphics::RenderMeshModes* modes;
-  const csShaderVariableStack* stack;
+  //const CS::Graphics::RenderMeshModes* modes;
+  //const csShaderVariableStack* stack;
+  csRef<csConditionEvaluator::TicketEvaluator> currentEval;
 
   csString lastError;
   const char* SetLastError (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
@@ -125,13 +127,21 @@ public:
     const MyBitArrayTemp& conditionResultsFalse);
   virtual void FinishAdding ();
 
-  void SetEvalParams (const CS::Graphics::RenderMeshModes* modes,
-    const csShaderVariableStack* stack);
+  //void SetEvalParams (const CS::Graphics::RenderMeshModes* modes,
+    //const csShaderVariableStack* stack);
+  //void EndEvaluation ();
   size_t GetVariant ();
   size_t GetVariantCount () const
   { return nextVariant; }
-  void SetVariant (size_t variant);
+  //void SetVariant (size_t variant);
+  void SetVariantEval (size_t variant);
+  //csPtr<csConditionEvaluator::TicketEvaluator> GetVariantEvaluator (size_t variant);
   void DumpConditionTree (csString& out);
+
+  csConditionEvaluator::TicketEvaluator* GetCurrentEval ()
+  { return currentEval; }
+  void SetCurrentEval (csConditionEvaluator::TicketEvaluator* eval)
+  { currentEval = eval; }
   
   bool ReadFromCache (iFile* cacheFile, ConditionsReader& condReader);
   bool WriteToCache (iFile* cacheFile, ConditionsWriter& condWriter);
@@ -142,11 +152,12 @@ public:
 
 class ForcedPriorityShader;
 
-class csXMLShader : public scfImplementationExt3<csXMLShader,
+class csXMLShader : public scfImplementationExt4<csXMLShader,
 						 csObject,
 						 iShader,
 						 iSelfDestruct,
-						 iXMLShader>
+						 iXMLShader,
+						 iXMLShaderInternal>
 {
   friend class csShaderConditionResolver;
   friend class ForcedPriorityShader;
@@ -230,8 +241,9 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
 
   /// Shader we fall back to if none of the techs validate
   csRef<iShader> fallbackShader;
+  csRef<iXMLShaderInternal> fallbackShaderXML;
   bool fallbackTried;
-  iShader* GetFallbackShader();
+  void GetFallbackShader (iShader*& shader, iXMLShaderInternal*& xmlshader);
   
   /// Identify whether a ticker refers to the fallback shader
   bool IsFallbackTicket (size_t ticket) const
@@ -336,9 +348,14 @@ public:
   size_t GetTicketForTech (const csRenderMeshModes& modes, 
     const csShaderVariableStack& stack, size_t techNum);
   size_t GetTicketForTech (const csRenderMeshModes& modes, 
-    const csShaderVariableStack& stack, int lightCount, size_t techNum);
+    const csShaderVariableStack& stack, csConditionEvaluator::TicketEvaluator* eval,
+    int lightCount, size_t techNum);
   size_t GetTicketForTechVar (const csRenderMeshModes& modes, 
-    const csShaderVariableStack& stack, int lightCount, size_t tvi);
+    const csShaderVariableStack& stack, csConditionEvaluator::TicketEvaluator* eval,
+    int lightCount, size_t tvi);
+  size_t GetTicketNoSetupInternal (const csRenderMeshModes& modes, 
+    const csShaderVariableStack& stack,
+    csConditionEvaluator::TicketEvaluator* eval);
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
       const csShaderVariableStack& stack);
 
@@ -347,7 +364,12 @@ public:
   {
     if (ticket == csArrayItemNotFound) return 0;
     if (IsFallbackTicket (ticket))
-      return GetFallbackShader()->GetNumberOfPasses (GetFallbackTicket (ticket));
+    {
+      iShader* fallback;
+      iXMLShaderInternal* fallbackXML;
+      GetFallbackShader (fallback, fallbackXML);
+      return fallback->GetNumberOfPasses (GetFallbackTicket (ticket));
+    }
     csXMLShaderTech* tech = TechForTicket (ticket);
     return tech ? tech->GetNumberOfPasses () : 0;
   }
@@ -361,8 +383,13 @@ public:
     const csShaderVariableStack& stack)
   { 
     if (IsFallbackTicket (ticket))
-      return GetFallbackShader()->SetupPass (GetFallbackTicket (ticket),
+    {
+      iShader* fallback;
+      iXMLShaderInternal* fallbackXML;
+      GetFallbackShader (fallback, fallbackXML);
+      return fallback->SetupPass (GetFallbackTicket (ticket),
 	mesh, modes, stack);
+    }
 
     CS_ASSERT_MSG ("A pass must be activated prior calling SetupPass()",
       activeTech);
@@ -376,7 +403,12 @@ public:
   virtual bool TeardownPass (size_t ticket)
   { 
     if (IsFallbackTicket (ticket))
-      return GetFallbackShader()->TeardownPass (GetFallbackTicket (ticket));
+    {
+      iShader* fallback;
+      iXMLShaderInternal* fallbackXML;
+      GetFallbackShader (fallback, fallbackXML);
+      return fallback->TeardownPass (GetFallbackTicket (ticket));
+    }
 
     CS_ASSERT_MSG ("A pass must be activated prior calling TeardownPass()",
       activeTech);
@@ -516,6 +548,12 @@ public:
   /**\name iXMLShader implementation
    * @{ */
   virtual iDocumentNode* GetShaderSource () { return originalShaderDoc; }
+  /** @} */
+  
+  /**\name iXMLShaderInternal implementation
+   * @{ */
+  virtual size_t GetTicketNoSetup (const csRenderMeshModes& modes,
+    const csShaderVariableStack& stack, void* eval);
   /** @} */
 
   /// Set object description

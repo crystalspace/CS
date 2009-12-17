@@ -628,6 +628,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     realShader = compiler->xmlshader->CompileShader (ldr_context,
       shaderNode);
+    realShaderXML = scfQueryInterfaceSafe<iXMLShaderInternal> (realShader);
       
     return realShader.IsValid();
   }

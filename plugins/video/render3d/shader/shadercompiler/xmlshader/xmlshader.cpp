@@ -152,6 +152,14 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (
 
   if (!ValidateTemplate (templ))
     return 0;
+
+  /* We might only be loaded as a dependency of the engine, so query it
+     here instead of Initialize() */
+  if (!engine.IsValid())
+  {
+    engine = csQueryRegistry<iEngine> (objectreg);
+    sharedEvaluator->SetEngine (engine);
+  }
   
   csTicks startTime = 0, endTime = 0;
   // Create a shader. The actual loading happens later.

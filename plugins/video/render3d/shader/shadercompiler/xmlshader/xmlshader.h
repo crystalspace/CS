@@ -98,6 +98,7 @@ public:
   csWeakRef<iGraphics3D> g3d;
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;
+  csWeakRef<iEngine> engine; // only needed for frame number ...
   csWrappedDocumentNodeFactory* wrapperFact;
   /// Condition constants
   csConditionConstants condConstants;

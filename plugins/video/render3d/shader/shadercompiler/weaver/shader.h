@@ -32,16 +32,19 @@
 #include "snippet.h"
 #include "synth.h"
 
+#include "../xmlshader/iinternal.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
 
 class WeaverCompiler;
 
-class WeaverShader : public scfImplementationExt3<WeaverShader,
+class WeaverShader : public scfImplementationExt4<WeaverShader,
 						  csObject,
 						  iShader,
 						  iSelfDestruct,
-						  iXMLShader>
+						  iXMLShader,
+						  iXMLShaderInternal>
 {
   csRef<WeaverCompiler> compiler;
   csRef<iShaderManager> shadermgr;
@@ -67,6 +70,7 @@ class WeaverShader : public scfImplementationExt3<WeaverShader,
 
   /// Shader we actually use
   csRef<iShader> realShader;
+  csRef<iXMLShaderInternal> realShaderXML;
   csString filename;
 
 protected:
@@ -237,6 +241,16 @@ public:
   }
   /** @} */
 
+  /**\name iXMLShaderInternal implementation
+   * @{ */
+  virtual size_t GetTicketNoSetup (const csRenderMeshModes& modes, 
+    const csShaderVariableStack& stack, void* eval)
+  {
+    return realShaderXML.IsValid()
+      ? realShaderXML->GetTicketNoSetup (modes, stack, eval)
+      : (size_t)~0;
+  }
+  /** @} */
 public:
   csStringHash& xmltokens;
 };
