@@ -184,8 +184,7 @@ private:
     uint lastEvalFrame;
     csArray<const csShaderVariable*> lastShaderVars;
 
-    uint evalDepth;
-    EvalCacheState() : evalDepth (0) { Clear(); }
+    EvalCacheState() { Clear(); }
     void Clear() { lastEvalFrame = ~0; EvalState::Clear(); }
   };
   EvalCacheState evalCache;
@@ -201,8 +200,19 @@ private:
   const csConditionConstants& constants;
   
   // For each shadervar, marks which conditions are affected
-  typedef csHash<MyBitArrayMalloc, CS::ShaderVarStringID> AffectedConditionsHash;
-  AffectedConditionsHash svAffectedConditions;
+  struct SVAffection
+  {
+    CS::ShaderVarStringID svName;
+    MyBitArrayMalloc affectedConditions;
+      
+    SVAffection (CS::ShaderVarStringID svName) : svName (svName) {}
+    bool operator< (const SVAffection& other) const { return svName < other.svName; }
+    bool operator< (const CS::ShaderVarStringID& other) const { return svName < other; }
+    friend bool operator< (const CS::ShaderVarStringID& a,
+      const SVAffection& b)
+    { return a < b.svName; }
+  };
+  csSafeCopyArray<SVAffection> svAffectedConditions;
   MyBitArrayMalloc bufferAffectConditions;
 
   csString lastError;

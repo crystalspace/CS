@@ -28,8 +28,6 @@
 #include "condeval_eval_svvalues.h"
 #include "tokenhelper.h"
 
-//#define CACHE_BETWEEN_SHADERS
-
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
@@ -82,8 +80,7 @@ static void SetSizeFill1 (T& array, size_t newSize)
 
 csConditionEvaluator::csConditionEvaluator (iShaderVarStringSet* strings,
   const csConditionConstants& constants) :
-  strings(strings), /*evalStackDepth (0),*/
-  /*evalCache (evalCacheStack), */ticketEvalPool (0),
+  strings(strings), ticketEvalPool (0),
   evalStatePool (0), constants(constants)
 {
 }
@@ -887,25 +884,24 @@ static const csShaderVariable definitelyUniqueSV;
 
 void csConditionEvaluator::SetupEvalCacheInternal (const csShaderVariableStack* stack)
 {
-#ifdef CACHE_BETWEEN_SHADERS
   if (stack != 0)
   {
-    if (evalCache.lastShaderVars.GetSize() < stack->GetSize())
-      evalCache.lastShaderVars.SetSize (stack->GetSize(),
-	&definitelyUniqueSV);
-    AffectedConditionsHash::GlobalIterator it (
-      svAffectedConditions.GetIterator());
-    //for (size_t i = 0; i < stack->GetSize(); i++)
-    while (it.HasNext())
+    if (evalCache.lastShaderVars.GetSize() != svAffectedConditions.GetSize())
     {
-      CS::ShaderVarStringID i;
-      MyBitArrayMalloc& bitarray = it.Next (i);
-      csShaderVariable* sv = (*stack)[i];
+      evalCache.lastShaderVars.DeleteAll();
+      evalCache.lastShaderVars.SetSize (svAffectedConditions.GetSize(),
+	&definitelyUniqueSV);
+    }
+	
+    for (size_t i = 0; i < svAffectedConditions.GetSize(); i++)
+    {
+      SVAffection& affection = svAffectedConditions[i];
+      csShaderVariable* sv = (*stack)[affection.svName];
       if (evalCache.lastShaderVars[i] != sv)
       {
-	if (bitarray.GetSize() != evalCache.condChecked.GetSize())
-	  SetSizeFill1 (bitarray, evalCache.condChecked.GetSize());
-	evalCache.condChecked &= bitarray;
+	if (affection.affectedConditions.GetSize() != evalCache.condChecked.GetSize())
+	  SetSizeFill1 (affection.affectedConditions, evalCache.condChecked.GetSize());
+	evalCache.condChecked &= affection.affectedConditions;
 	evalCache.lastShaderVars[i] = sv;
       }
     }
@@ -916,7 +912,6 @@ void csConditionEvaluator::SetupEvalCacheInternal (const csShaderVariableStack* 
       SetSizeFill1 (bitarray, evalCache.condChecked.GetSize());
     evalCache.condChecked &= bitarray;
   }
-#endif
 }
 
 
@@ -943,9 +938,8 @@ csPtr<csConditionEvaluator::TicketEvaluator> csConditionEvaluator::BeginTicketEv
   {
     uint currentFrame = ~0;
     if (engine.IsValid()) currentFrame = engine->GetCurrentFrameNumber();
-    #ifdef CACHE_BETWEEN_SHADERS
-    if (evalCache.lastEvalFrame != currentFrame)
-    #endif
+    if ((evalCache.lastEvalFrame != currentFrame)
+      || (currentFrame == (uint)~0)) // be conservative in case we don't have an engine
     {
       evalCache.condChecked.SetSize (conditions.GetNumConditions ());
       evalCache.condChecked.Clear();
@@ -1427,9 +1421,12 @@ void csConditionEvaluator::MarkAffectionBySVs (csConditionID condition,
 	  bits = &bufferAffectConditions;
 	else
 	{
-	  csPrintf ("condition %lu: affected by SV \"%s\"\n",
-		    (unsigned long)condition, strings->Request(operand.svLocation.svName));
-	  bits = &svAffectedConditions.GetOrCreate (operand.svLocation.svName);
+	  size_t idx = svAffectedConditions.FindSortedKey (
+	    csArrayCmp<SVAffection, CS::ShaderVarStringID> (operand.svLocation.svName));
+	  if (idx == csArrayItemNotFound)
+	    idx = svAffectedConditions.InsertSorted (SVAffection (operand.svLocation.svName));
+	  SVAffection& affectedConds = svAffectedConditions[idx];
+	  bits = &affectedConds.affectedConditions;
 	}
 	if (bits->GetSize() <= condition)
 	  SetSizeFill1 (*bits, condition+1);
