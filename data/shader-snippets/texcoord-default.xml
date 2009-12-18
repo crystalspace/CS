@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2008 by Frank Richter
+  Copyright (C) 2009 by Frank Richter
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -16,24 +16,20 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <snippet>
+  <!-- Simply returns default texture coordinate -->
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-
-     <!-- Dummy input so this snippet can be used as a drop-in, even if lightmap TCs are explicitly specified -->
-    <input name="texCoordLM" type="texcoord2" default="value" private="yes" defval="0,0" />
     
-    <block location="cg:vertexMain">
-      ambient = float3(0);
-      ambient_attr_perfragment = false;
-    </block>
-      
+    <input file="/shader-snippets/texCoord.inp"	/>
+    
     <block location="cg:fragmentMain">
-      ambient = float3(0);
-      ambient_attr_perfragment = false;
+      result = texCoord;
+    </block>
+
+    <block location="cg:vertexMain">
+      result = texCoord;
     </block>
     
-    <output name="ambient" type="rgb">
-      <attribute name="perfragment" type="bool" />
-    </output>
+    <output name="result" type="texcoord2" />
   </technique>
 </snippet>

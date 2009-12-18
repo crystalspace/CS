@@ -37,6 +37,7 @@
     <alias name="specular" weak="yes" file="/shader-snippets/surface/specular-weirdold.xml" />
     <alias name="staticspecular" weak="yes" file="/shader-snippets/lighting/staticspec-default.xml" />
     <alias name="glow" weak="yes" file="/shader/lighting/glow.xml" />
+    <alias name="lightmaptc" weak="yes" file="/shader-snippets/texcoord-lightmap.xml" />
 
     <!--
 	Snippets - the building blocks of this shader.
@@ -49,6 +50,7 @@
     -->
     <snippet id="position" filealias="position" />
     <snippet id="normalmap" filealias="normalmap" />
+    <snippet id="ambient_lightmaptc" filealias="lightmaptc" />
     <snippet id="ambient" filealias="ambient" />
     <snippet id="staticspecular" filealias="staticspecular" />
     <snippet id="parallax" filealias="parallax" />
@@ -69,6 +71,9 @@
     <connection from="position" to="lighting" />
     <connection from="parallax" to="surface" />
     <connection from="parallax" to="normalmap" />
+    <connection from="ambient_lightmaptc" to="ambient">
+      <explicit from="result" to="texCoordLM" />
+    </connection>
     <connection from="normalmap" to="ambient" />
     <connection from="normalmap" to="lighting" />
     <connection from="normalmap" to="staticspecular" />

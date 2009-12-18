@@ -126,7 +126,7 @@
 	  </block>
 	</input>
 	
-	<input name="texCoordLM" type="texcoord2" default="complex" private="yes">
+	<input name="texCoordLM" type="texcoord2" default="complex">
 	  <block location="pass">
 	    <buffer source="texture coordinate lightmap" 
 		    destination="vertexIn.texcoordLM" />
@@ -300,7 +300,7 @@
 	  <attribute name="perfragment" type="bool" defval="false" />
 	</input>
 	
-	<input name="texCoordLM" type="texcoord2" default="complex" private="yes">
+	<input name="texCoordLM" type="texcoord2" default="complex">
 	  <block location="pass">
 	    <buffer source="texture coordinate lightmap" 
 		    destination="vertexIn.texcoordLM" />
