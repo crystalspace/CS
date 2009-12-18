@@ -122,7 +122,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
   
-  //#define THREADED_TECH_SYNTHESIS
+  #define THREADED_TECH_SYNTHESIS
   
   void Synthesizer::Synthesize (iDocumentNode* shaderNode,
                                 ShaderVarNodesHelper& shaderVarNodesHelper,
