@@ -205,7 +205,7 @@ private:
     CS::ShaderVarStringID svName;
     MyBitArrayMalloc affectedConditions;
       
-    SVAffection (CS::ShaderVarStringID svName) : svName (svName) {}
+    explicit SVAffection (CS::ShaderVarStringID svName) : svName (svName) {}
     bool operator< (const SVAffection& other) const { return svName < other.svName; }
     bool operator< (const CS::ShaderVarStringID& other) const { return svName < other; }
     friend bool operator< (const CS::ShaderVarStringID& a,
