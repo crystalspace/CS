@@ -58,11 +58,10 @@ Description openglrenderer : "OpenGL renderer and related plugins" ;
 Description rendermanagers : "Render manager plugins" ;
 RegisterCompileGroups sndsys imageloaders fontservers
 		      canvases renderers meshes walkall openglcanvas 
-		      softcanvas proctexes renderall shaders softrenderer 
+		      proctexes renderall shaders
 		      openglrenderer rendermanagers ;
 
 # Useful dependencies
-Depends softrenderer : softcanvas ;
 Depends openglrenderer : openglcanvas ;
 
 # Historic group aliases.
