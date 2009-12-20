@@ -43,7 +43,9 @@ Simple::Simple (iObjectRegistry* object_reg)
   debugMode = false;
   allStatic = false;
   pauseDynamic = false;
-  dynamicSpeed = 1.0;}
+  dynamicSpeed = 1.0f;
+  rotX = rotY = 0.0f;
+}
 
 Simple::~Simple ()
 {
