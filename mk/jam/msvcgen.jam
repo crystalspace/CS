@@ -1003,6 +1003,7 @@ rule MsvcProject
   local inckeys = "include" includedebug ;
   local incdirs = $(MSVC.INCDIRS_LITERAL) $(MSVC.INCDIRS_LITERAL.$(rawname)) ;
   ResponseFile $(respfile) : "$(inckeys)|$(incdirs)" : notfile : $(respdir) ;
+  ResponseFile $(respfile) : "$(inckeys)-x64|$(incdirs)" : notfile : $(respdir) ;
 
   local incdir ;
   for incdir in $(MSVC.INCDIRS) $(MSVC.INCDIRS.$(rawname))

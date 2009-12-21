@@ -29,14 +29,6 @@ MsvcGenSubDir TOP mk msvc8 : 8 ;
 MsvcGenSubDir TOP mk msvc9 : 9 ;
 MsvcGenTemplateDir TOP mk msvcgen ;
 
-if [ Property build : projgen ] = msvc
-{
-  # New, cs-win32libs >= 1.3_002 include dir
-  IncludeDir win32libs "include" ;
-  # "Old" include dir
-  IncludeDir "include" csutil win32 ;
-}
-
 # We need to customize the list of build configurations.
 MsvcGenVariable customize : custom.cslib custom2.cslib ;
 
@@ -44,14 +36,26 @@ MsvcGenVariable customize : custom.cslib custom2.cslib ;
 include [ ConcatDirs $(SUBDIR) workspaces.jam ] ;
 
 # Crystal Space-specific interpolation values.
-MsvcGenVariable libdir : 
-  # New, cs-win32libs >= 1.3_002 libraries dir
-  "../../win32libs/lib"
-  # "Old" libraries dir
-  "../../libs/csutil/win32/libs" ;
-MsvcGenVariable libdirdebug : 
-  "../../win32libs/lib"
-  "../../libs/csutil/win32/libs" ;
+# cs-win32libs >= 1.9_004 include dir
+MsvcGenVariable "include" : "../../winlibs/x86/include" ;
+MsvcGenVariable includedebug : "../../winlibs/x86/include" ;
+MsvcGenVariable include-x64 : "../../winlibs/x64/include" ;
+MsvcGenVariable includedebug-x64 : "../../winlibs/x64/include" ;
+# include dir for previous versions
+MsvcGenVariable "include" : "../../win32libs/include" ;
+MsvcGenVariable includedebug : "../../win32libs/include" ;
+MsvcGenVariable include-x64 : "../../win32libs/include" ;
+MsvcGenVariable includedebug-x64 : "../../win32libs/include" ;
+# cs-win32libs >= 1.9_004 lib dir
+MsvcGenVariable libdir : "../../winlibs/x86/lib" ;
+MsvcGenVariable libdirdebug : "../../winlibs/x86/lib" ;
+MsvcGenVariable libdir-x64 : "../../winlibs/x64/lib" ;
+MsvcGenVariable libdirdebug-x64 : "../../winlibs/x64/lib" ;
+# lib dir for previous versions
+MsvcGenVariable libdir : "../../win32libs/lib" ;
+MsvcGenVariable libdirdebug : "../../win32libs/lib" ;
+MsvcGenVariable libdir-x64 : "../../win32libs/lib" ;
+MsvcGenVariable libdirdebug-x64 : "../../win32libs/lib" ;
 
 #------------------------------------------------------------------------------
 # The msvcgen process needs to be presented with configuration information
