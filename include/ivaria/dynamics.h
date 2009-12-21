@@ -80,14 +80,14 @@ struct iDynamics : public virtual iBase
   /// Remove all dynamic systems from the simulation
   virtual void RemoveSystems () = 0;
 
-  /// Finds a system by name
+  /// Find a system by name
   virtual iDynamicSystem* FindSystem (const char *name) = 0;
 
   /// Step the simulation forward by stepsize.
   virtual void Step (float stepsize) = 0;
 
   /**
-   * Add a callback to be executed dynamics is being stepped.
+   * Add a callback to be executed when the dynamic simulation is being stepped.
    */
   virtual void AddStepCallback (iDynamicsStepCallback *callback) = 0;
 
@@ -115,7 +115,7 @@ struct iDynamicSystem : public virtual iBase
 {
   SCF_INTERFACE (iDynamicSystem, 0, 0, 3);
 
-  /// returns the underlying object
+  /// Return the underlying object
   virtual iObject *QueryObject (void) = 0;
   /// Set the global gravity.
   virtual void SetGravity (const csVector3& v) = 0;
@@ -155,22 +155,22 @@ struct iDynamicSystem : public virtual iBase
   /// Create a rigid body and add it to the simulation
   virtual csPtr<iRigidBody> CreateBody () = 0;
 
-  /// Create a rigid body and add it to the simulation
+  /// Remove a rigid body from the simulation
   virtual void RemoveBody (iRigidBody* body) = 0;
 
-  /// Finds a body within a system
+  /// Find a body within a system
   virtual iRigidBody *FindBody (const char *name) = 0;
 
   /// Get Rigid Body by its index
   virtual iRigidBody *GetBody (unsigned int index) = 0;
 
-  /// Get rigid bodys count
+  /// Get the count of rigid bodies
   virtual int GetBodysCount () = 0;
 
-  /// Create a body group.  Bodies in a group don't collide with each other
+  /// Create a body group. Bodies in a same group don't collide with each other.
   virtual csPtr<iBodyGroup> CreateGroup () = 0;
 
-  /// Remove a group from a simulation.  Those bodies now collide
+  /// Remove a group from a simulation. Those bodies now collide.
   virtual void RemoveGroup (iBodyGroup* group) = 0;
 
   /// Create a joint and add it to the simulation
@@ -183,7 +183,7 @@ struct iDynamicSystem : public virtual iBase
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () = 0;
 
   /**
-   * Attaches a convex static collider mesh to world
+   * Attach a convex static collider mesh to world
    * \param mesh the mesh to use for collision detection. This
    * mesh must be convex.
    * \param trans a hard transform to apply to the mesh
@@ -201,7 +201,7 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attaches a static collider mesh to world
+   * Attach a static collider mesh to world
    * \param mesh the mesh to use for collision detection
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -218,7 +218,7 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attaches a static collider cylinder to world (oriented along it's Z axis)
+   * Attach a static collider cylinder to world (oriented along it's Z axis)
    * \param length the cylinder length along the axis
    * \param radius the cylinder radius
    * \param trans a hard transform to apply to the mesh
@@ -236,7 +236,7 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attaches a static collider box to world
+   * Attach a static collider box to world
    * \param size the box size along each axis
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -253,7 +253,7 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attaches a static collider sphere to world
+   * Attach a static collider sphere to world
    * \param radius the radius of the sphere
    * \param offset a translation of the sphere's center
    * from the default (0,0,0)
@@ -270,7 +270,7 @@ struct iDynamicSystem : public virtual iBase
     float friction, float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attaches a static collider plane to world
+   * Attach a static collider plane to world
    * \param plane describes the plane to added
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
@@ -303,11 +303,11 @@ struct iDynamicSystem : public virtual iBase
   /// Get static collider.
   virtual csRef<iDynamicsSystemCollider> GetCollider (unsigned int index) = 0;
 
-  /// Get static colliders count.
+  /// Get the count of static colliders.
   virtual int GetColliderCount () = 0;
 
   /**
-   * Attaches a static collider capsule to world (oriented along it's Z axis).
+   * Attach a static collider capsule to world (oriented along it's Z axis).
    * A capsule is a cylinder with an halph-sphere at each end. It is less costly
    * to compute collisions with a capsule than with a cylinder.
    * \param length the capsule length along the axis (i.e. the distance between the 
@@ -389,9 +389,9 @@ struct iDynamicsCollisionCallback : public virtual iBase
 
 /**
  * Body Group is a collection of bodies which don't collide with
- * each other.  This can speed up processing by manually avoiding
- * certain collisions.  For instance if you have a car built of
- * many different bodies.  The bodies can be collected into a group
+ * each other. This can speed up processing by manually avoiding
+ * certain collisions. For instance if you have a car built of
+ * many different bodies. The bodies can be collected into a group
  * and the car will be treated as a single object.
  *
  * Main creators of instances implementing this interface:
@@ -407,11 +407,11 @@ struct iBodyGroup : public virtual iBase
 {
   SCF_INTERFACE (iBodyGroup, 0, 1, 0);
 
-  /// Adds a body to this group
+  /// Add a body to this group
   virtual void AddBody (iRigidBody *body) = 0;
-  /// Removes a body from this group
+  /// Remove a body from this group
   virtual void RemoveBody (iRigidBody *body) = 0;
-  /// Tells whether the body is in this group or not
+  /// Tell whether the body is in this group or not
   virtual bool BodyInGroup (iRigidBody *body) = 0;
 };
 
@@ -434,28 +434,28 @@ struct iRigidBody : public virtual iBase
 {
   SCF_INTERFACE (iRigidBody, 0, 0, 3);
 
-  /// returns the underlying object
+  /// Return the underlying object
   virtual iObject *QueryObject (void) = 0;
   /**
-   * Makes a body stop reacting dynamically.  This is especially useful
-   * for environmental objects.  It will also increase speed in some cases
+   * Make a body stop reacting dynamically. This is especially useful
+   * for environmental objects. It will also increase speed in some cases
    * by ignoring all physics for that body
    */
   virtual bool MakeStatic (void) = 0;
-  /// Returns a static body to a dynamic state
+  /// Return a static body to a dynamic state
   virtual bool MakeDynamic (void) = 0;
-  /// Tells whether a body has been made static or not
+  /// Tell whether a body has been made static or not
   virtual bool IsStatic (void) = 0;
   /**
-    * Temporarily ignores the body until something collides with it.
+    * Temporarily ignore the body until something collides with it.
   */
   virtual bool Disable (void) = 0;
-  /// Re-enables a body after calling Disable, or by being auto disabled
+  /// Re-enable a body after calling Disable(), or after being auto disabled
   virtual bool Enable (void) = 0;
-  /// Returns true if a body is enabled.
+  /// Return true if a body is enabled.
   virtual bool IsEnabled (void) = 0; 
 
-  /// Returns which group a body belongs to
+  /// Return which group a body belongs to
   virtual csRef<iBodyGroup> GetGroup (void) = 0;
 
   /**
@@ -677,15 +677,15 @@ struct iRigidBody : public virtual iBase
 
   /// Attach an iMeshWrapper to this body
   virtual void AttachMesh (iMeshWrapper* mesh) = 0;
-  /// Returns the attached MeshWrapper
+  /// Return the attached MeshWrapper
   virtual iMeshWrapper* GetAttachedMesh () = 0;
   /// Attach an iLight to this body
   virtual void AttachLight (iLight* light) = 0;
-  /// Returns the attached light
+  /// Return the attached light
   virtual iLight* GetAttachedLight () = 0;
   /// Attach an iCamera to this body
   virtual void AttachCamera (iCamera* camera) = 0;
-  /// Returns the attached camera
+  /// Return the attached camera
   virtual iCamera* GetAttachedCamera () = 0;
 
   /**
@@ -715,11 +715,11 @@ struct iRigidBody : public virtual iBase
   /// Get body collider by its index
   virtual csRef<iDynamicsSystemCollider> GetCollider (unsigned int index) = 0;
 
-  /// Get body colliders count 
+  /// Get the count of colliders of this body
   virtual int GetColliderCount () = 0;
 
   /**
-   * Attaches a collider capsule to the body (oriented along it's Z axis).
+   * Attach a collider capsule to the body (oriented along it's Z axis).
    * A capsule is a cylinder with an halph-sphere at each end. It is less costly
    * to compute collisions with a capsule than with a cylinder.
    * \param length the capsule length along the axis (i.e. the distance between the 
@@ -867,7 +867,7 @@ struct iDynamicsSystemCollider : public virtual iBase
 
   /**
    * Get collider transform. If the collider is attached to a body, then the
-   *  transform will be in body space, otherwise it will be in world coordinates.
+   * transform will be in body space, otherwise it will be in world coordinates.
    */
   virtual csOrthoTransform GetLocalTransform () = 0;
 
@@ -925,8 +925,8 @@ struct iDynamicsSystemCollider : public virtual iBase
 };
 
 /**
- * This is the interface for a joint.  It works by constraining
- * the relative motion between the two bodies it attaches.  For
+ * This is the interface for a joint. It works by constraining
+ * the relative motion between the two bodies attached. For
  * instance if all motion in along the local X axis is constrained
  * then the bodies will stay motionless relative to each other
  * along an x axis rotated and positioned by the Joint's transform.
@@ -949,7 +949,7 @@ struct iJoint : public virtual iBase
   /// Get an attached body (valid values for body are 0 and 1).
   virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
   /**
-   * Set the local transformation of the joint.  This transform
+   * Set the local transformation of the joint. This transform
    * sets the position of the constraining axes in the world
    * not relative to the attached bodies. Set force_update to true if 
    * you want to apply changes right away.
@@ -958,9 +958,9 @@ struct iJoint : public virtual iBase
   /// Get the local transformation of the joint.
   virtual csOrthoTransform GetTransform () = 0;
   /**
-   * Set the translation constraints on the 3 axes.  If true is
+   * Set the translation constraints on the 3 axes. If true is
    * passed for an axis then the Joint will constrain all motion along
-   * that axis.  If false is passed in then all motion along that
+   * that axis. If false is passed in then all motion along that
    * axis is free, but bounded by the minimum and maximum distance
    * if set. Set force_update to true if you want to apply changes 
    * right away.
@@ -987,9 +987,9 @@ struct iJoint : public virtual iBase
   /// Get the maximum constrained distance between bodies.
   virtual csVector3 GetMaximumDistance () = 0;
   /**
-   * Set the rotational constraints on the 3 axes.  If true is
+   * Set the rotational constraints on the 3 axes. If true is
    * passed for an axis then the Joint will constrain all rotation around
-   * that axis.  If false is passed in then all rotation around that
+   * that axis. If false is passed in then all rotation around that
    * axis is free, but bounded by the minimum and maximum distance
    * if set. Set force_update to true if you want to apply changes 
    * right away.
@@ -1046,7 +1046,7 @@ struct iJoint : public virtual iBase
   /// Get custom angular constraint axis.
   virtual csVector3 GetAngularConstraintAxis (int body) = 0;
   /**
-   * Rebuild joint using current setup. Returns true if rebuilding operation is sucesfull
+   * Rebuild joint using current setup. Return true if rebuilding operation is successful
    * (otherwise joint won't be active).
    */
   virtual bool RebuildJoint () = 0;
