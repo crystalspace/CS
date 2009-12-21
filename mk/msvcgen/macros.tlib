@@ -198,22 +198,23 @@ END;
 # optionally modified by `prefix' and `suffix' as described in the glue()
 # macro.  The actual list of arrays consulted is:
 #
-#    build.tag
-#    projtypes.projtype.tag
-#    my.doc.tagkey
+#    build.<tag>
+#    projtypes.projtype.<tag>
+#    my.doc.<tagkey><suffix>
 #
 # The above list assumes that a hash named `build' is in scope.  Typically,
 # this is a reference to an element of the global builds[] array
 # (control.tlib).  Furthermore, `projtype' is shorthand for my.doc.projtype.0,
 # which is assumed to exist globally, and is specific to the project being
-# generated.  Finally, `tagkey' is actually the value of the "${tag}key" key
-# within the `build' hash.  As a practical example, if generating a project
-# file for a "plugin" and emitting the "debug" configuration, given a `tag' of
-# "cflags", then the following arrays may be consulted:
+# generated.  `tagkey' is actually the value of the "${tag}key" key within the
+# `build' hash. Finally, `suffix' is the value of `platform.suffix'.
+# As a practical example, if generating a project file for a "plugin" and
+# emitting the "debug" configuration, given a `tag' of "cflags", generating for
+# x64, then the following arrays may be consulted:
 #
 #    build.cflags
 #    projtypes.plugin.cflags
-#    my.doc.cflagsdebug
+#    my.doc.cflagsdebug-x64
 #
 # In this example, the name "cflagsdebug" comes from the
 # builds['debug'].cflagskey property (control.tlib).
@@ -223,10 +224,11 @@ MACRO compose(tag, seed, delim, prefix, suffix) BLOCK;
     ? mutator.${my.doc.projtype.0} 
     : my.doc.projtype.0;
   
+  buildtag = ${"build.${tag}key"};
   p = [];
   p = p.merge(build.$tag).
     merge(projtypes.$projtype.$tag).
-    merge(my.doc.${${"build.${tag}key"}}).
+    merge(my.doc.${"${buildtag}${platform.suffix}"}).
     merge(seed);
   GET glue(p, delim, prefix, suffix);
 END;
