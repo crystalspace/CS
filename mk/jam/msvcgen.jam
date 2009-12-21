@@ -190,11 +190,12 @@ rule MsvcCFlags1 { }
 rule MsvcLibDirs { _MsvcLibDirs $(1) : $(2) : $(3) ; }
 rule _MsvcLibDirs { }
 
-## MsvcLFlags target [ : lflags [ : mode ]]
+## MsvcLFlags target [ : lflags [ : mode [ : arch ]]]
 ##   Invoke this rule to set additional MSVC-specific linker flags for
 ##   'target'.  'mode' should be "release" or "debug". If 'mode' is omitted,
-##   then 'lflags' is used for release and debug.
-rule MsvcLFlags { MsvcLFlags1 $(1) : $(2) : $(3) ; }
+##   then 'lflags' is used for release and debug. 'arch' should be "x86" or
+##   "x64". If 'arch' is omitted, then 'lflags' is used for x86 and x64.
+rule MsvcLFlags { MsvcLFlags1 $(1) : $(2) : $(3) : $(4) ; }
 rule MsvcLFlags1 { }
 
 ## MsvcExtraFile target : files
@@ -1697,7 +1698,19 @@ rule MsvcClassifyMode
   return $(c) ;
 }
 
-# _MsvcRespEmit target : items : tag [ : mode [ : options ]]
+rule MsvcClassifyArch
+{
+  local c ;
+  switch $(<)
+  {
+    case x86 : c = "" ;
+    case x64 : c = "-x64" ;
+    case * : c = "" "-x64" ;
+  }
+  return $(c) ;
+}
+
+# _MsvcRespEmit target : items : tag [ : mode [ : arch [ : options ]]]
 #   Emit `items' to the response file for `target' using the response file tag
 #   `tag'. `mode' is either "release", "debug", or empty, in which case it
 #   applies to release and debug modes. If options contains "ignoremode", then
@@ -1708,13 +1721,16 @@ rule _MsvcRespEmit
   local items = $(2) ;
   local tag = $(3) ;
   local mode = $(4) ;
-  local options = $(5) ;
+  local arch = $(5) ;
+  local options = $(6) ;
   local modes = "" ;
+  local archs = "" ;
 
-  CheckOptions ignoremode : $(options) : $(target) ;
+  CheckOptions ignoremode ignorearch : $(options) : $(target) ;
   if ! [ IsElem ignoremode ] { modes = [ MsvcClassifyMode $(mode) ] ; }
+  if ! [ IsElem ignorearch ] { archs = [ MsvcClassifyArch $(arch) ] ; }
 
-  ResponseFile $($(target)_PRJ_RESPFILE) : "$(tag)$(modes)|$(items)" :
+  ResponseFile $($(target)_PRJ_RESPFILE) : "$(tag)$(modes)$(archs)|$(items)" :
     notfile : $($(target)_PRJ_RESPDIR) ;
 }
 
@@ -1781,16 +1797,16 @@ rule MsvcCFlags1
   _MsvcRespEmit $(1) : $(2) : cflags : $(3) ;
 }
 
-# MsvcLFlags target [ : lflags [ : mode ]]
+# MsvcLFlags target [ : lflags [ : mode [ : arch ]]]
 #   (See documentation above.)
 rule MsvcLFlags1
 {
   local modes = [ MsvcClassifyMode $(3) ] ;
   $(target).LFLAGS.$(modes) += $(2) ;
-  _MsvcRespEmit $(1) : $(2) : lflags : $(3) ;
+  _MsvcRespEmit $(1) : $(2) : lflags : $(3) : $(4) ;
 }
 
-# MsvcLFlags target : files
+# MsvcExtraFile target : files
 #   (See documentation above.)
 rule MsvcExtraFile1 
 {
