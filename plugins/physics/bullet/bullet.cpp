@@ -43,6 +43,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
 #include "BulletCollision/Gimpact/btGImpactShape.h"
+#include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
 
 #include "csutil/custom_new_enable.h"
 
@@ -171,8 +172,11 @@ public:
   btTransform inversePrincipalAxis;
 
 public:
-  csBulletMotionState (csBulletRigidBody* body, const btTransform& initialTransform, const btTransform& principalAxis)
-    : btDefaultMotionState (initialTransform), body (body), inversePrincipalAxis (principalAxis.inverse ())
+  csBulletMotionState (csBulletRigidBody* body,
+		       const btTransform& initialTransform,
+		       const btTransform& principalAxis)
+    : btDefaultMotionState (initialTransform), body (body),
+      inversePrincipalAxis (principalAxis.inverse ())
   {
     if (body->body)
       body->body->setInterpolationWorldTransform (initialTransform);
@@ -357,10 +361,11 @@ public:
 
 csBulletDynamicsSystem::csBulletDynamicsSystem (btDynamicsWorld* world,
     iObjectRegistry* object_reg)
-  : scfImplementationType (this), bulletWorld (world), debugDraw (0)
+  : scfImplementationType (this), bulletWorld (world), gimpactRegistered (false),
+    debugDraw (0)
 {
   moveCb.AttachNew (new csBulletDefaultMoveCallback ());
-  SetGravity (csVector3 (0, -9.81, 0));
+  SetGravity (csVector3 (0, -9.81f, 0));
 
   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
       object_reg, "crystalspace.shared.stringset");
@@ -716,6 +721,17 @@ int csBulletDynamicsSystem::GetColliderCount ()
   return (int) colliderBodies.GetSize ();
 }
 
+void csBulletDynamicsSystem::RegisterGimpact ()
+{
+  if (!gimpactRegistered)
+  {
+    btCollisionDispatcher* dispatcher =
+      static_cast<btCollisionDispatcher*> (bulletWorld->getDispatcher ());
+    btGImpactCollisionAlgorithm::registerAlgorithm (dispatcher);
+    gimpactRegistered = true;
+  }
+}
+
 void csBulletDynamicsSystem::DebugDraw (iView* view)
 {
   if (!debugDraw)
@@ -883,11 +899,24 @@ bool csBulletRigidBody::MakeStatic (void)
 {
   if (body && !isStatic)
   {
+    // rebuild body if a child collider was a concave mesh
+    for (unsigned int i = 0; i < colliders.GetSize (); i++)
+      if (colliders[i]->shape
+	  && colliders[i]->geomType == TRIMESH_COLLIDER_GEOMETRY)
+      {
+	isStatic = true;
+	colliders[i]->RebuildMeshGeometry ();
+	RebuildBody ();
+	return true;
+      }
+
+    // set body static
     dynSys->bulletWorld->removeRigidBody (body);
 
     SetAngularVelocity(csVector3(0));
     SetLinearVelocity(csVector3(0));
-    body->setCollisionFlags (body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+    body->setCollisionFlags (body->getCollisionFlags()
+			     | btCollisionObject::CF_STATIC_OBJECT);
     body->setMassProps(0.0, btVector3(0.0, 0.0, 0.0));
 
     dynSys->bulletWorld->addRigidBody (body);
@@ -902,9 +931,22 @@ bool csBulletRigidBody::MakeDynamic (void)
 {
   if (body && isStatic)
   {
+    // rebuild body if a child collider was a concave mesh
+    for (unsigned int i = 0; i < colliders.GetSize (); i++)
+      if (colliders[i]->shape
+	  && colliders[i]->geomType == TRIMESH_COLLIDER_GEOMETRY)
+      {
+	isStatic = false;
+	colliders[i]->RebuildMeshGeometry ();
+	RebuildBody ();
+	return true;
+      }
+
+    // set body dynamic
     dynSys->bulletWorld->removeRigidBody (body);
 
-    body->setCollisionFlags (body->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
+    body->setCollisionFlags (body->getCollisionFlags()
+			     & ~btCollisionObject::CF_STATIC_OBJECT);
     btVector3 localInertia (0, 0, 0);
     body->getCollisionShape()->calculateLocalInertia (mass, localInertia);
     body->setMassProps(mass, localInertia);
@@ -1663,7 +1705,8 @@ csBulletCollider::~csBulletCollider ()
 
 bool csBulletCollider::CreateSphereGeometry (const csSphere& sphere)
 {
-  // TODO: the body won't be set if one create a body, then AttachCollider, then CreateGeometry on the collider
+  // TODO: the body won't be set if one create a body, then AttachCollider,
+  //       then CreateGeometry on the collider
 
   delete shape; shape = 0;
   delete[] vertices; vertices = 0;
@@ -1695,7 +1738,8 @@ bool csBulletCollider::CreatePlaneGeometry (const csPlane3& plane)
   delete[] indices; indices = 0;
 
   csVector3 normal = plane.GetNormal ();
-  shape = new btPlaneShape (btVector3 (normal.GetX (), normal.GetY (), normal.GetZ ()), plane.D ());
+  shape = new btPlaneShape (btVector3 (normal.GetX (), normal.GetY (),
+                                       normal.GetZ ()), plane.D ());
   geomType = PLANE_COLLIDER_GEOMETRY;
 
   if (isStaticBody)
@@ -1762,13 +1806,21 @@ bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
     return false;
 
   // this shape is optimized for static concave meshes
-  if (isStaticBody)
-    shape = new btBvhTriangleMeshShape (indexVertexArrays, true);
+  if (isStaticBody || body->isStatic)
+  {
+    btBvhTriangleMeshShape* concaveShape =
+      new btBvhTriangleMeshShape (indexVertexArrays, true);
+    // it seems to work without that line, to be tested if problems occur
+    //concaveShape->refitTree (btVector3 (-1000, -1000, -1000),
+    //                         btVector3 (1000, 1000, 1000));
+    shape = concaveShape;
+  }
 
   // this one is for dynamic meshes
   else
   {
-    btGImpactMeshShape* concaveShape = new btGImpactMeshShape(indexVertexArrays);
+    dynSys->RegisterGimpact ();
+    btGImpactMeshShape* concaveShape = new btGImpactMeshShape (indexVertexArrays);
     concaveShape->updateBound();
     shape = concaveShape;
   }
@@ -1781,6 +1833,36 @@ bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
   }
 
   return true;
+}
+
+void csBulletCollider::RebuildMeshGeometry ()
+{
+  if (geomType != TRIMESH_COLLIDER_GEOMETRY
+      || !sizeof (indices) || !sizeof (vertices))
+    return;
+
+  btTriangleIndexVertexArray* indexVertexArrays =
+    new btTriangleIndexVertexArray (sizeof (indices) / 3, indices, 3 * sizeof (int),
+	      sizeof (vertices), (btScalar*) &vertices[0].x (), sizeof (btVector3));
+
+  if (isStaticBody || body->isStatic)
+  {
+    btBvhTriangleMeshShape* concaveShape =
+      new btBvhTriangleMeshShape (indexVertexArrays, true);
+    // it seems to work without that line, to be tested if problems occur
+    //concaveShape->refitTree (btVector3 (-1000, -1000, -1000),
+    //                         btVector3 (1000, 1000, 1000));
+    shape = concaveShape;
+  }
+
+  // this one is for dynamic meshes
+  else
+  {
+    dynSys->RegisterGimpact ();
+    btGImpactMeshShape* concaveShape = new btGImpactMeshShape (indexVertexArrays);
+    concaveShape->updateBound();
+    shape = concaveShape;
+  }
 }
 
 bool csBulletCollider::CreateBoxGeometry (const csVector3& size)

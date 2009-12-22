@@ -86,7 +86,7 @@ public:
   { stepCallbacks.Delete (callback); }
 
   //  iComponent
-  virtual bool Initialize (iObjectRegistry* object_reg);
+  virtual bool Initialize (iObjectRegistry* object_reg);  
 };
 
 class csBulletDynamicsSystem : public scfImplementationExt2<
@@ -103,6 +103,7 @@ private:
   csRefArrayObject<iRigidBody> colliderBodies;
   csRefArray<iJoint> joints;
   csRef<csBulletDefaultMoveCallback> moveCb;
+  bool gimpactRegistered;
 
   // For getting collision mesh data.
   csStringID baseId;
@@ -110,7 +111,8 @@ private:
 
   csBulletDebugDraw* debugDraw;
   void CheckCollisions();
-  void CheckCollision(csBulletRigidBody& cs_obA,btCollisionObject *obB,btPersistentManifold &contactManifold);
+  void CheckCollision(csBulletRigidBody& cs_obA,btCollisionObject *obB,
+		      btPersistentManifold &contactManifold);
 
 public:
   csBulletDynamicsSystem (btDynamicsWorld* world,
@@ -168,6 +170,8 @@ public:
   virtual csRef<iDynamicsSystemCollider> CreateCollider ();
   virtual csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
   virtual int GetColliderCount ();
+
+  void RegisterGimpact ();
 
   virtual void DebugDraw (iView* view);
 };
@@ -324,13 +328,15 @@ class csBulletCollider : public scfImplementation1<csBulletCollider,
   int* indices;
 
 public:
-  csBulletCollider (csBulletDynamicsSystem* dynSys, csBulletRigidBody* body = NULL, bool isStaticBody = false);
+  csBulletCollider (csBulletDynamicsSystem* dynSys,
+		    csBulletRigidBody* body = NULL, bool isStaticBody = false);
   virtual ~csBulletCollider ();
 
   virtual bool CreateSphereGeometry (const csSphere& sphere);
   virtual bool CreatePlaneGeometry (const csPlane3& plane);
   virtual bool CreateConvexMeshGeometry (iMeshWrapper *mesh);
   virtual bool CreateMeshGeometry (iMeshWrapper *mesh);
+  void RebuildMeshGeometry ();
   virtual bool CreateBoxGeometry (const csVector3& box_size);
   virtual bool CreateCapsuleGeometry (float length, float radius);
   virtual bool CreateCylinderGeometry (float length, float radius);
@@ -414,26 +420,32 @@ public:
  
   virtual bool RebuildJoint ();
 
-  virtual void Attach (iRigidBody* body1, iRigidBody* body2, bool force_update = true);
+  virtual void Attach (iRigidBody* body1, iRigidBody* body2,
+		       bool force_update = true);
   virtual csRef<iRigidBody> GetAttachedBody (int body)
   {
     CS_ASSERT (body >= 0 && body <= 1);
     return bodies[body];
   }
 
-  virtual void SetTransform (const csOrthoTransform& trans, bool force_update = true);
+  virtual void SetTransform (const csOrthoTransform& trans,
+			     bool force_update = true);
   virtual csOrthoTransform GetTransform () { return transform; }
 
-  virtual void SetTransConstraints (bool x, bool y, bool z, bool force_update = true);
+  virtual void SetTransConstraints (bool x, bool y, bool z,
+				    bool force_update = true);
   virtual bool IsXTransConstrained () { return trans_constraint_x; }
   virtual bool IsYTransConstrained () { return trans_constraint_y; }
   virtual bool IsZTransConstrained () { return trans_constraint_z; }
-  virtual void SetMinimumDistance (const csVector3& min, bool force_update = true) ;
+  virtual void SetMinimumDistance (const csVector3& min,
+				   bool force_update = true);
   virtual csVector3 GetMinimumDistance () { return min_dist; }
-  virtual void SetMaximumDistance (const csVector3& max, bool force_update = true);
+  virtual void SetMaximumDistance (const csVector3& max,
+				   bool force_update = true);
   virtual csVector3 GetMaximumDistance () { return max_dist; }
 
-  virtual void SetRotConstraints (bool x, bool y, bool z, bool force_update = true);
+  virtual void SetRotConstraints (bool x, bool y, bool z,
+				  bool force_update = true);
   virtual bool IsXRotConstrained () { return rot_constraint_x; }
   virtual bool IsYRotConstrained () { return rot_constraint_y; }
   virtual bool IsZRotConstrained () { return rot_constraint_z; }
@@ -446,13 +458,15 @@ public:
   virtual void SetBounce (const csVector3& bounce, bool force_update = true);
   virtual csVector3 GetBounce () { return bounce; }
 
-  virtual void SetDesiredVelocity (const csVector3& velocity, bool force_update = true);
+  virtual void SetDesiredVelocity (const csVector3& velocity,
+				   bool force_update = true);
   virtual csVector3 GetDesiredVelocity () { return desired_velocity; }
 
   virtual void SetMaxForce (const csVector3& maxForce, bool force_update = true);
   virtual csVector3 GetMaxForce () { return maxforce; }
 
-  virtual void SetAngularConstraintAxis (const csVector3& axis, int body, bool force_update = true);
+  virtual void SetAngularConstraintAxis (const csVector3& axis, int body,
+					 bool force_update = true);
   virtual csVector3 GetAngularConstraintAxis (int body);
 };
 
