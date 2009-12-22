@@ -46,12 +46,17 @@ struct iDynamicSystem;
 
 
 /**
- * This is the interface for a dynamics step callback.
+ * This is the interface for a dynamics step callback, eg when
+ * a step is performed in the simulation.
  */
 struct iDynamicsStepCallback : public virtual iBase
 {
   SCF_INTERFACE (iDynamicsStepCallback, 0, 0, 1);
 
+  /**
+   * A step has been performed in the dynamic simulation.
+   * \param stepsize the time length (in seconds) of the simulation step
+   */
   virtual void Step (float stepsize) = 0;
 };
 
@@ -71,10 +76,10 @@ struct iDynamicsStepCallback : public virtual iBase
 struct iDynamics : public virtual iBase
 {
   SCF_INTERFACE(iDynamics,0,0,2);
-  /// Create a rigid body and add it to the simulation
+  /// Create a dynamic system and start its simulation
   virtual csPtr<iDynamicSystem> CreateSystem () = 0;
 
-  /// Remove dynamic system from the simulation
+  /// Remove the dynamic system from the simulation
   virtual void RemoveSystem (iDynamicSystem* system) = 0;
 
   /// Remove all dynamic systems from the simulation
@@ -136,6 +141,7 @@ struct iDynamicSystem : public virtual iBase
    * to save processing time. By default this is enabled.
    */
   virtual void EnableAutoDisable (bool enable) = 0;
+  /// Return whether the AutoDisable is on or off.
   virtual bool AutoDisableEnabled () =0;
   /**
    * Set the parameters for AutoDisable.
@@ -183,7 +189,7 @@ struct iDynamicSystem : public virtual iBase
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () = 0;
 
   /**
-   * Attach a convex static collider mesh to world
+   * Attach a static convex collider to the dynamic system.
    * \param mesh the mesh to use for collision detection. This
    * mesh must be convex.
    * \param trans a hard transform to apply to the mesh
@@ -201,7 +207,7 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attach a static collider mesh to world
+   * Attach a static concave collider to the dynamic system.
    * \param mesh the mesh to use for collision detection
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -218,7 +224,7 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attach a static collider cylinder to world (oriented along it's Z axis)
+   * Attach a static cylinder collider to the dynamic system (oriented along it's Z axis)
    * \param length the cylinder length along the axis
    * \param radius the cylinder radius
    * \param trans a hard transform to apply to the mesh
@@ -236,7 +242,7 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attach a static collider box to world
+   * Attach a static box collider to the dynamic system
    * \param size the box size along each axis
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -253,7 +259,7 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attach a static collider sphere to world
+   * Attach a static sphere collider to the dynamic system
    * \param radius the radius of the sphere
    * \param offset a translation of the sphere's center
    * from the default (0,0,0)
@@ -270,7 +276,7 @@ struct iDynamicSystem : public virtual iBase
     float friction, float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attach a static collider plane to world
+   * Attach a static plane collider to the dynamic system
    * \param plane describes the plane to added
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
@@ -296,7 +302,7 @@ struct iDynamicSystem : public virtual iBase
   /**
    * Create static collider and put it into simulation. After collision it
    * will remain in the same place, but it will affect collided dynamic
-   * colliders (to make it dynamic, just attach it to the rigid body).
+   * colliders (to make it dynamic, just attach it to a rigid body).
    */
   virtual csRef<iDynamicsSystemCollider> CreateCollider () = 0;
 
@@ -307,7 +313,7 @@ struct iDynamicSystem : public virtual iBase
   virtual int GetColliderCount () = 0;
 
   /**
-   * Attach a static collider capsule to world (oriented along it's Z axis).
+   * Attach a static capsule collider to the dynamic system (oriented along it's Z axis).
    * A capsule is a cylinder with an halph-sphere at each end. It is less costly
    * to compute collisions with a capsule than with a cylinder.
    * \param length the capsule length along the axis (i.e. the distance between the 
@@ -459,7 +465,7 @@ struct iRigidBody : public virtual iBase
   virtual csRef<iBodyGroup> GetGroup (void) = 0;
 
   /**
-   * Add a collider with a associated friction coefficient
+   * Add a convex collider to this body
    * \param mesh the mesh object which will act as collider. This
    * must be a convex mesh.
    * \param trans a hard transform to apply to the mesh
@@ -479,7 +485,7 @@ struct iRigidBody : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Add a collider with a associated friction coefficient
+   * Add a concave collider to this body
    * \param mesh the mesh object which will act as collider
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -498,7 +504,7 @@ struct iRigidBody : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Cylinder orientated along its local z axis
+   * Add a cylinder collider to this body (orientated along its local z axis)
    * \param length length of the cylinder
    * \param radius radius of the cylinder
    * \param trans a hard transform to apply to the mesh
@@ -518,7 +524,7 @@ struct iRigidBody : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Add a collider box with given properties
+   * Add a box collider to this body
    * \param size the box's dimensions
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -537,7 +543,7 @@ struct iRigidBody : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Add a collider sphere with given properties
+   * Add a sphere collider to this body
    * \param radius radius of sphere
    * \param offset position of sphere
    * \param friction how much friction this body has,
@@ -556,7 +562,7 @@ struct iRigidBody : public virtual iBase
     float softness = 0.01f) = 0;
 
   /**
-   * Add a collider plane with given properties
+   * Add a plane collider to this body
    * \param plane the plane which will act as collider
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
@@ -573,10 +579,10 @@ struct iRigidBody : public virtual iBase
     float density, float elasticity, float softness = 0.01f) = 0;
 
   /** 
-   * Attach collider to rigid body. If you have set colliders transform before
-   * then it will be considered as relative to attached body (but still if you 
+   * Add a collider to this rigid body. If you have set the collider transform before
+   * then it will be considered as relative to the attached body (but still if you 
    * will use colliders "GetTransform ()" it will be in the world coordinates.
-   * Colider become dynamic (which means that it will follow rigid body).
+   * The collider becomes dynamic (which means that it will follow the rigid body).
    */
   virtual void AttachCollider (iDynamicsSystemCollider* collider) = 0;
 
@@ -719,7 +725,7 @@ struct iRigidBody : public virtual iBase
   virtual int GetColliderCount () = 0;
 
   /**
-   * Attach a collider capsule to the body (oriented along it's Z axis).
+   * Add a capsule collider to this body (oriented along it's Z axis).
    * A capsule is a cylinder with an halph-sphere at each end. It is less costly
    * to compute collisions with a capsule than with a cylinder.
    * \param length the capsule length along the axis (i.e. the distance between the 
@@ -742,19 +748,19 @@ struct iRigidBody : public virtual iBase
 
 enum csColliderGeometryType
 {
-  NO_GEOMETRY,
-  BOX_COLLIDER_GEOMETRY,
-  PLANE_COLLIDER_GEOMETRY,
-  TRIMESH_COLLIDER_GEOMETRY,
-  CONVEXMESH_COLLIDER_GEOMETRY,
-  CYLINDER_COLLIDER_GEOMETRY,
-  CAPSULE_COLLIDER_GEOMETRY,
-  SPHERE_COLLIDER_GEOMETRY
+  NO_GEOMETRY,                  /*!< No geometry has been defined */
+  BOX_COLLIDER_GEOMETRY,        /*!< Box geometry */
+  PLANE_COLLIDER_GEOMETRY,      /*!< Plane geometry */
+  TRIMESH_COLLIDER_GEOMETRY,    /*!< Concave mesh geometry */
+  CONVEXMESH_COLLIDER_GEOMETRY, /*!< Convex mesh geometry */
+  CYLINDER_COLLIDER_GEOMETRY,   /*!< Cylinder geometry */
+  CAPSULE_COLLIDER_GEOMETRY,    /*!< Capsule geometry */
+  SPHERE_COLLIDER_GEOMETRY      /*!< Sphere geometry */
 };
 
 
 /**
- * This is the interface for attaching a collider callback to the body
+ * This is the interface for attaching a collision callback to a collider
  *
  * Main ways to get pointers to this interface:
  * - application specific
@@ -766,8 +772,15 @@ struct iDynamicsColliderCollisionCallback : public virtual iBase
 {
   SCF_INTERFACE (iDynamicsColliderCollisionCallback, 0, 0, 1);
 
+  /**
+   * A collision has occured between this collider and another
+   */
   virtual void Execute (iDynamicsSystemCollider *thiscollider, 
     iDynamicsSystemCollider *othercollider) = 0;
+
+  /**
+   * A collision has occured between this collider and a rigid body
+   */
   virtual void Execute (iDynamicsSystemCollider *thiscollider, 
     iRigidBody *otherbody) = 0;
 };
