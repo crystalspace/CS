@@ -1017,6 +1017,7 @@ rule MsvcProject
       incdir = [ ConcatDirs $(relpath) $(incdir) ] ;
     }
     ResponseFile $(respfile) : "$(inckeys)|$(incdir)" : notfile : $(respdir) ;
+    ResponseFile $(respfile) : "$(inckeys)-x64|$(incdir)" : notfile : $(respdir) ;
   }
 
   if ! [ Property msvcgen : templatedir ]
