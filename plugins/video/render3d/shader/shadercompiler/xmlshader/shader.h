@@ -88,8 +88,6 @@ class csShaderConditionResolver : public iConditionResolver
   csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
   csHash<MyBitArrayTemp, size_t, TempHeapAlloc> variantConditions;
 
-  //const CS::Graphics::RenderMeshModes* modes;
-  //const csShaderVariableStack* stack;
   csRef<csConditionEvaluator::TicketEvaluator> currentEval;
 
   csString lastError;
@@ -127,15 +125,10 @@ public:
     const MyBitArrayTemp& conditionResultsFalse);
   virtual void FinishAdding ();
 
-  //void SetEvalParams (const CS::Graphics::RenderMeshModes* modes,
-    //const csShaderVariableStack* stack);
-  //void EndEvaluation ();
   size_t GetVariant ();
   size_t GetVariantCount () const
   { return nextVariant; }
-  //void SetVariant (size_t variant);
   void SetVariantEval (size_t variant);
-  //csPtr<csConditionEvaluator::TicketEvaluator> GetVariantEvaluator (size_t variant);
   void DumpConditionTree (csString& out);
 
   csConditionEvaluator::TicketEvaluator* GetCurrentEval ()
