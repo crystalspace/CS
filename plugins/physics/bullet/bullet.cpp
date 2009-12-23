@@ -123,23 +123,23 @@ static csRef<iTriangleMesh> FindColdetTriangleMesh(iMeshWrapper* mesh,
 #include "csutil/custom_new_disable.h"
 
 static btTriangleIndexVertexArray* GenerateTriMeshData (iMeshWrapper* mesh,
-	int*& indices, btVector3*& vertices,
+	int*& indices, size_t& triangleCount, btVector3*& vertices, size_t& vertexCount,
 	csStringID base_id, csStringID colldet_id)
 {
   csRef<iTriangleMesh> trimesh = FindColdetTriangleMesh(mesh, base_id, colldet_id);
   if (!trimesh)
     return 0;
   csTriangle *c_triangle = trimesh->GetTriangles();
-  size_t tr_num = trimesh->GetTriangleCount();
-  size_t vt_num = trimesh->GetVertexCount ();
+  triangleCount = trimesh->GetTriangleCount();
+  vertexCount = trimesh->GetVertexCount ();
 
   delete[] indices;
-  indices = new int[tr_num*3];
+  indices = new int[triangleCount * 3];
   int indexStride = 3 * sizeof (int);
 
   size_t i;
   int* id = indices;
-  for (i = 0 ; i < tr_num ; i++)
+  for (i = 0 ; i < triangleCount ; i++)
   {
     *id++ = c_triangle[i].a;
     *id++ = c_triangle[i].b;
@@ -147,16 +147,16 @@ static btTriangleIndexVertexArray* GenerateTriMeshData (iMeshWrapper* mesh,
   }
 
   delete[] vertices;
-  vertices = new btVector3[vt_num];
+  vertices = new btVector3[vertexCount];
   csVector3 *c_vertex = trimesh->GetVertices();
   int vertexStride = sizeof (btVector3);
 
-  for (i = 0 ; i < vt_num ; i++)
+  for (i = 0 ; i < vertexCount ; i++)
     vertices[i].setValue (c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
 
   btTriangleIndexVertexArray* indexVertexArrays =
-    new btTriangleIndexVertexArray (tr_num, indices, indexStride,
-	vt_num, (btScalar*) &vertices[0].x (), vertexStride);
+    new btTriangleIndexVertexArray (triangleCount, indices, indexStride,
+	vertexCount, (btScalar*) &vertices[0].x (), vertexStride);
   return indexVertexArrays;
 }
 
@@ -1760,26 +1760,15 @@ bool csBulletCollider::CreateConvexMeshGeometry (iMeshWrapper* mesh)
   delete[] indices; indices = 0;
 
   btTriangleIndexVertexArray* indexVertexArrays =
-    GenerateTriMeshData (mesh, indices, vertices,
+    GenerateTriMeshData (mesh, indices, triangleCount, vertices, vertexCount,
       dynSys->baseId, dynSys->colldetId);
   if (!indexVertexArrays)
     return false;
 
   //shape = new btConvexTriangleMeshShape (indexVertexArrays);
-  csRef<iTriangleMesh> trimesh = FindColdetTriangleMesh (mesh,
-				       dynSys->baseId, dynSys->colldetId);
-  if (!trimesh)
-    return false;
-
-  size_t vt_num = trimesh->GetVertexCount ();
-  csVector3* c_vertex = trimesh->GetVertices();
-
   btConvexHullShape* convexShape = new btConvexHullShape ();
-  for (size_t i = 0; i < vt_num; i++)
-  {
-    csVector3* curr = c_vertex + i;
-    convexShape->addPoint(btVector3(curr->x, curr->y, curr->z));
-  }
+  for (size_t i = 0; i < vertexCount; i++)
+    convexShape->addPoint(*(vertices + i));
   shape = convexShape;
 
   geomType = CONVEXMESH_COLLIDER_GEOMETRY;
@@ -1800,7 +1789,7 @@ bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
   delete[] indices; indices = 0;
 
   btTriangleIndexVertexArray* indexVertexArrays =
-    GenerateTriMeshData (mesh, indices, vertices,
+    GenerateTriMeshData (mesh, indices, triangleCount, vertices, vertexCount,
 			 dynSys->baseId, dynSys->colldetId);
   if (!indexVertexArrays)
     return false;
@@ -1838,12 +1827,12 @@ bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
 void csBulletCollider::RebuildMeshGeometry ()
 {
   if (geomType != TRIMESH_COLLIDER_GEOMETRY
-      || !sizeof (indices) || !sizeof (vertices))
+      || !triangleCount)
     return;
 
   btTriangleIndexVertexArray* indexVertexArrays =
-    new btTriangleIndexVertexArray (sizeof (indices) / 3, indices, 3 * sizeof (int),
-	      sizeof (vertices), (btScalar*) &vertices[0].x (), sizeof (btVector3));
+    new btTriangleIndexVertexArray (triangleCount, indices, 3 * sizeof (int),
+	      vertexCount, (btScalar*) &vertices[0].x (), sizeof (btVector3));
 
   if (isStaticBody || body->isStatic)
   {

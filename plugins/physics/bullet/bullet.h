@@ -324,6 +324,7 @@ class csBulletCollider : public scfImplementation1<csBulletCollider,
 
   // Data we need to keep for the body so we can clean it up
   // later.
+  size_t triangleCount, vertexCount;
   btVector3* vertices;
   int* indices;
 
