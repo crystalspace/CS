@@ -324,11 +324,11 @@ protected:
   void CollectUsedConditions (const csRefArray<WrappedChild>& children,
     ConditionsWriter& condWrite);
   bool ReadFromCache (iFile* cacheFile, ForeignNodeReader& foreignNodes,
-    const ConditionsReader& condReader);
+    const ConditionsReader& condReader, ConditionDumper& condDump);
   bool ReadWrappedChildren (iFile* file, 
     ForeignNodeReader& foreignNodes,
     csRefArray<WrappedChild>& children,
-    const ConditionsReader& condReader);
+    const ConditionsReader& condReader, ConditionDumper& condDump);
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
 
@@ -355,7 +355,8 @@ public:
   virtual bool GetAttributeValueAsBool (const char* name, 
     bool defaultvalue = false);
     
-  bool ReadFromCache (iFile* cacheFile, const ConditionsReader& condReader);
+  bool ReadFromCache (iFile* cacheFile, const ConditionsReader& condReader,
+    ConditionDumper& condDump);
   bool StoreToCache (iFile* cacheFile, const ConditionsWriter& condWriter);
   void CollectUsedConditions (ConditionsWriter& condWrite);
   
@@ -479,7 +480,7 @@ public:
     
   csWrappedDocumentNode* CreateWrapperFromCache (iFile* cacheFile,
     iConditionResolver* resolver, csConditionEvaluator& evaluator,
-    const ConditionsReader& condReader);
+    const ConditionsReader& condReader, csString* dumpOut);
 };
 
 /// Helper to dump condition expressions and IDs to a string
@@ -491,6 +492,9 @@ class ConditionDumper
 public:
   ConditionDumper (csString* dumpOut, csConditionEvaluator* evaluator)
     : currentOut (dumpOut), currentEval (evaluator) {}
+  bool DoesDumping() const { return currentOut; }
+  csString GetConditionString (size_t id) const
+  { return currentEval ? currentEval->GetConditionString (id) : csString(); }
   void Dump (size_t id, const char* condStr, size_t condLen);
 };
 

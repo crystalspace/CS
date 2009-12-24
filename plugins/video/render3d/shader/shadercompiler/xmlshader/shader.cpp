@@ -651,7 +651,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	techCache = shaderCache->GetRootedCache (
 	  csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
 	    t));
-        readFromCache = LoadTechniqueFromCache (newTech, techCache);
+        readFromCache = LoadTechniqueFromCache (newTech, techCache,
+	  techniques.GetSize());
         // Discard variations data from cache as well
         if (!readFromCache) techCache->ClearCache ("/");
         techniques.Push (newTech);
@@ -725,8 +726,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       csArray<TechniqueKeeper> techniquesTmp;
       ScanForTechniques (shaderRoot, techniquesTmp, forcepriority);
 
-      csRef<iHierarchicalCache> techCache;
-	
       /* Find a suitable technique
        * (Note that a wrapper is created for each technique node individually,
        * not the whole shader) */
@@ -739,12 +738,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         newTech.minLights = tk.node->GetAttributeValueAsInt ("minlights");
         newTech.ScanMetadata (tk.node);
 
-        size_t techIndex = techniques.GetSize();
-	if (shaderCache != 0)
-	  techCache = shaderCache->GetRootedCache (
-	    csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
-	      techIndex));
-        LoadTechnique (newTech, tk.node, techIndex, techCache);
         techniques.Push (newTech);
       }
     
@@ -771,7 +764,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           | wdnfpoExpandTemplates));
       shaderRoot = wrappedNode;
       
-      PrepareTechVars (shaderRoot, forcepriority);
+      PrepareTechVars (shaderRoot, techniquesTmp, forcepriority);
+      
+      for (size_t i = 0; i < techniques.GetSize(); i++)
+      {
+	csRef<iHierarchicalCache> techCache;
+	if (shaderCache != 0)
+	  techCache = shaderCache->GetRootedCache (
+	    csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
+	      i));
+        LoadTechnique (techniques[i], techniquesTmp[i].node, techCache);
+      }
       
       if (cacheValid)
       {
@@ -1442,7 +1445,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       reinterpret_cast<csConditionEvaluator::TicketEvaluator*> (eval));
   }
 
-  void csXMLShader::PrepareTechVars (iDocumentNode* shaderRoot, int forcepriority)
+  void csXMLShader::PrepareTechVars (iDocumentNode* shaderRoot,
+				     const csArray<TechniqueKeeper> allTechniques,
+				     int forcepriority)
   {
     size_t tvc = techsResolver->GetVariantCount();
     if (tvc == 0) tvc = 1;
@@ -1471,8 +1476,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           
 	  for (size_t t = 0; t < techniques.GetSize(); t++)
 	  {
-	    iDocumentNode* srcNode = techniques[t].techNode->GetWrappedNode();
-	    if (srcNode->Equals (wrapperNode->GetWrappedNode()))
+	    csWrappedDocumentNode* srcWrapperNode =
+	      static_cast<csWrappedDocumentNode*> ((iDocumentNode*)allTechniques[t].node);
+	    if (srcWrapperNode->Equals (wrapperNode->GetWrappedNode()))
 	    {
 	      techVar.activeTechniques.SetBit (t);
 	      break;
@@ -1485,7 +1491,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   }
 
   bool csXMLShader::LoadTechniqueFromCache (Technique& tech,
-    iHierarchicalCache* cache)
+    iHierarchicalCache* cache, size_t techIndex)
   {
     csRef<iFile> cacheFile;
     csRef<iDataBuffer> cacheData (cache->ReadCache ("/doc"));
@@ -1516,8 +1522,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     }
 
     csRef<csWrappedDocumentNode> wrappedNode;
-    wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (cacheFile,
-      tech.resolver, *sharedEvaluator, condReader));
+    if (compiler->doDumpConds)
+    {
+      csString tree;
+      tree.SetGrowsBy (0);
+
+      wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (cacheFile,
+	tech.resolver, *sharedEvaluator, condReader, &tree));
+
+      tech.resolver->DumpConditionTree (tree);
+      csString filename;
+      filename.Format ("/tmp/shader/cond_%s_%zu.txt",
+        originalShaderDoc->GetAttributeValue ("name"),
+        techIndex);
+      compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
+    }
+    else
+      wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (cacheFile,
+	tech.resolver, *sharedEvaluator, condReader, 0));
     if (!wrappedNode.IsValid()) return false;
     tech.techNode = wrappedNode;
 
@@ -1525,8 +1547,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   }
 
   void csXMLShader::LoadTechnique (Technique& tech, iDocumentNode* srcNode,
-    size_t techIndex, iHierarchicalCache* cacheTo, bool forPrecache)
+    iHierarchicalCache* cacheTo, bool forPrecache)
   {
+    size_t techIndex = techniques.GetIndex (&tech);
     tech.resolver = new csShaderConditionResolver (*sharedEvaluator);
 
     csRefArray<iDocumentNode> extraNodes;

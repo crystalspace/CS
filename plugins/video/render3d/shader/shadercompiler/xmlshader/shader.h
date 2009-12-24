@@ -202,6 +202,7 @@ class csXMLShader : public scfImplementationExt4<csXMLShader,
     int minLights;
 
     csShaderConditionResolver* resolver;
+    csRef<iDocumentNode> srcNode;
     csRef<csWrappedDocumentNode> techNode;
     
     csBitArray variantsPrepared;
@@ -310,12 +311,13 @@ protected:
   csPtr<iDocumentNode> StripShaderRoot (iDocumentNode* shaderRoot);
   void Load (iDocumentNode* source, bool forPrecache);
     
-  void PrepareTechVars (iDocumentNode* shaderRoot, int forcepriority);
+  void PrepareTechVars (iDocumentNode* shaderRoot,
+    const csArray<TechniqueKeeper> allTechniques, int forcepriority);
   
   bool LoadTechniqueFromCache (Technique& tech,
-    iHierarchicalCache* cache);
+    iHierarchicalCache* cache, size_t techIndex);
   void LoadTechnique (Technique& tech, iDocumentNode* srcNode,
-    size_t techIndex, iHierarchicalCache* cacheTo, bool forPrecache = true);
+    iHierarchicalCache* cacheTo, bool forPrecache = true);
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 

@@ -900,7 +900,16 @@ void csConditionEvaluator::SetupEvalCacheInternal (const csShaderVariableStack* 
       if (evalCache.lastShaderVars[i] != sv)
       {
 	if (affection.affectedConditions.GetSize() != evalCache.condChecked.GetSize())
-	  SetSizeFill1 (affection.affectedConditions, evalCache.condChecked.GetSize());
+	{
+	  /* Sometimes the affected conditions mask is bigger,
+	   * sometimes the condition checked mask - the former can happen
+	   * when a fallback shader or new tech is loaded that uses hitherto
+	   * unknown conditions */
+	  size_t newCondSize = csMax (affection.affectedConditions.GetSize(),
+	    evalCache.condChecked.GetSize());
+	  SetSizeFill1 (affection.affectedConditions, newCondSize);
+	  evalCache.condChecked.SetSize (newCondSize);
+	}
 	evalCache.condChecked &= affection.affectedConditions;
 	evalCache.lastShaderVars[i] = sv;
       }
@@ -948,7 +957,6 @@ csPtr<csConditionEvaluator::TicketEvaluator> csConditionEvaluator::BeginTicketEv
       evalCache.lastEvalFrame = currentFrame;
     }
   }
-
   SetupEvalCacheInternal (stack);
   
   return csPtr<TicketEvaluator> (newEval);

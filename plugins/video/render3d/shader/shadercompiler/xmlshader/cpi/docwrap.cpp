@@ -1947,18 +1947,19 @@ bool csWrappedDocumentNode::StoreToCache (iFile* cacheFile,
 }
 
 bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
-  const ConditionsReader& condReader)
+  const ConditionsReader& condReader, ConditionDumper& condDump)
 {
   ForeignNodeReader foreignNodes (shared->plugin);
   if (!foreignNodes.StartUse (cacheFile)) return false;
-  if (!ReadFromCache (cacheFile, foreignNodes, condReader)) return false;
+  if (!ReadFromCache (cacheFile, foreignNodes, condReader, condDump)) return false;
   if (!foreignNodes.EndUse ()) return false;
   return true;
 }
 
 bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
                                            ForeignNodeReader& foreignNodes,
-                                           const ConditionsReader& condReader)
+                                           const ConditionsReader& condReader,
+					   ConditionDumper& condDump)
 {
   int32 wrappedNodeLE;
   if (cacheFile->Read ((char*)&wrappedNodeLE, sizeof (wrappedNodeLE))
@@ -1966,7 +1967,7 @@ bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
   wrappedNode = foreignNodes.GetNode (csLittleEndian::Int32 (wrappedNodeLE));
   
   return ReadWrappedChildren (cacheFile, foreignNodes, wrappedChildren,
-    condReader);
+    condReader, condDump);
 }
 
 enum
@@ -2046,7 +2047,7 @@ void csWrappedDocumentNode::CollectUsedConditions (
 
 bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
   ForeignNodeReader& foreignNodes, csRefArray<WrappedChild>& children,
-  const ConditionsReader& condReader)
+  const ConditionsReader& condReader, ConditionDumper& condDump)
 {
   uint32 numChildrenLE;
   if (file->Read ((char*)&numChildrenLE, sizeof (numChildrenLE))
@@ -2070,16 +2071,23 @@ bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
 	!= sizeof (condLE)) return false;
     child->condition =
       condReader.GetConditionID (csLittleEndian::UInt32 (condLE));
+    if (condDump.DoesDumping()
+      && (child->condition != csCondAlwaysTrue)
+      && (child->condition != csCondAlwaysFalse))
+    {
+      csString condStr (condDump.GetConditionString (child->condition));
+      condDump.Dump (child->condition, condStr, condStr.Length());
+    }
     if ((flags & childIsNull) == 0)
     {
       csWrappedDocumentNode* childWrapper = new csWrappedDocumentNode (
         this, resolver, shared);
-      if (!childWrapper->ReadFromCache (file, foreignNodes, condReader))
+      if (!childWrapper->ReadFromCache (file, foreignNodes, condReader, condDump))
         return false;
       child->childNode.AttachNew (childWrapper);
     }
     if (!ReadWrappedChildren (file, foreignNodes, child->childrenWrappers,
-        condReader))
+        condReader, condDump))
       return false;
     children.Put (i, child);
   }
@@ -2374,11 +2382,12 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
 
 csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperFromCache (
   iFile* cacheFile, iConditionResolver* resolver, csConditionEvaluator& evaluator,
-  const ConditionsReader& condReader)
+  const ConditionsReader& condReader, csString* dumpOut)
 {
+  ConditionDumper condDump (dumpOut, &evaluator);
   csWrappedDocumentNode* node;
   node = new csWrappedDocumentNode (0, resolver, this);
-  if (!node->ReadFromCache (cacheFile, condReader))
+  if (!node->ReadFromCache (cacheFile, condReader, condDump))
   {
     delete node;
     return 0;
