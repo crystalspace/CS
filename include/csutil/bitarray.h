@@ -211,6 +211,54 @@ protected:
       GetStore()[mLength - 1] &= ~((~(csBitArrayStorageType)0) << extra_bits);
   }
 
+  /**
+   * Set the number of stored bits.
+   * \remarks Does not clear newly added bits.
+   */
+  void SetSizeInternal (size_t newSize)
+  {
+    size_t newLength;
+    if (newSize == 0)
+      newLength = 0;
+    else
+      newLength = 1 + GetIndex (newSize - 1);
+
+    if (newLength != mLength)
+    {
+      // Avoid allocation if length is 1 (common case)
+      csBitArrayStorageType* newStore;
+      if (newLength <= cellCount)
+        newStore = storage.inlineStore;
+      else
+	newStore = (csBitArrayStorageType*)storage.Alloc (
+          newLength * sizeof (csBitArrayStorageType));
+
+      if (newLength > 0)
+      {
+	if (mLength > 0)
+	{
+	  csBitArrayStorageType* oldStore = GetStore();
+	  if (newStore != oldStore)
+	  {
+	    memcpy (newStore, oldStore, 
+	      (MIN (mLength, newLength)) * sizeof (csBitArrayStorageType));
+	    if (newLength > mLength)
+	      memset(newStore + mLength, 0,
+		     (newLength - mLength) * sizeof (csBitArrayStorageType));
+            if (!UseInlineStore ())
+              storage.Free (oldStore);
+	  }
+	}
+	else
+	  memset (newStore, 0, newLength * sizeof (csBitArrayStorageType));
+      }
+      mLength = newLength;
+      if (!UseInlineStore()) storage.heapStore = newStore;
+    }
+
+    mNumBits = newSize;
+  }
+
 public:
   /**
    * \internal Bit proxy (for csBitArray::operator[])
@@ -321,46 +369,7 @@ public:
    */
   void SetSize (size_t newSize)
   {
-    size_t newLength;
-    if (newSize == 0)
-      newLength = 0;
-    else
-      newLength = 1 + GetIndex (newSize - 1);
-
-    if (newLength != mLength)
-    {
-      // Avoid allocation if length is 1 (common case)
-      csBitArrayStorageType* newStore;
-      if (newLength <= cellCount)
-        newStore = storage.inlineStore;
-      else
-	newStore = (csBitArrayStorageType*)storage.Alloc (
-          newLength * sizeof (csBitArrayStorageType));
-
-      if (newLength > 0)
-      {
-	if (mLength > 0)
-	{
-	  csBitArrayStorageType* oldStore = GetStore();
-	  if (newStore != oldStore)
-	  {
-	    memcpy (newStore, oldStore, 
-	      (MIN (mLength, newLength)) * sizeof (csBitArrayStorageType));
-	    if (newLength > mLength)
-	      memset(newStore + mLength, 0,
-		     (newLength - mLength) * sizeof (csBitArrayStorageType));
-            if (!UseInlineStore ())
-              storage.Free (oldStore);
-	  }
-	}
-	else
-	  memset (newStore, 0, newLength * sizeof (csBitArrayStorageType));
-      }
-      mLength = newLength;
-      if (!UseInlineStore()) storage.heapStore = newStore;
-    }
-
-    mNumBits = newSize;
+    SetSizeInternal (newSize);
     Trim();
   }
 
@@ -373,7 +382,7 @@ public:
   {
     if (this != &that)
     {
-      SetSize (that.mNumBits);
+      SetSizeInternal (that.mNumBits);
       memcpy (GetStore(), that.GetStore(), 
         mLength * sizeof (csBitArrayStorageType));
     }
