@@ -82,6 +82,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
      NumTemps (0),
      NumTexInstructionSlots (0)
   {
+    FixupVendor();
   }
   
   uint ProfileLimits::glGetProgramInteger (csGLExtensionManager* ext,
@@ -187,6 +188,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     csString prefix (_prefix);
     vendor = CS::PluginCommon::ShaderProgramPluginGL::VendorFromString (
       cfg->GetStr (prefix + ".Vendor", "other"));
+    FixupVendor();
     // Set defaults
     SetDefaults ();
 #define READ(Limit) \
@@ -250,6 +252,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (i >= components.GetSize()) return false;
     vendor = CS::PluginCommon::ShaderProgramPluginGL::VendorFromString (
       components[i++]);
+    FixupVendor();
     if (vendor == CS::PluginCommon::ShaderProgramPluginGL::Invalid)
       return false;
     
@@ -435,6 +438,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         return false;
       vendor = (CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor)
         csLittleEndian::Int32 (diskVal);
+      FixupVendor ();
     }
 #define READ(Limit) \
     { \
