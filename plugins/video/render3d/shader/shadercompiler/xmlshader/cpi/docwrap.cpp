@@ -64,6 +64,7 @@ class ConditionTree
     Variables values;
     MyBitArrayTemp conditionAffectedSVs;
     MyBitArrayTemp conditionResults[2];
+    MyBitArrayTemp conditionResultsSet;
 
     Node (Node* p, int parentBranch) : parent (p), condition (csCondUnknown)
     {
@@ -88,6 +89,9 @@ class ConditionTree
 	
 	if (branches[b]) branches[b]->SetConditionResult (0x3, cond, val);
       }
+      if (conditionResultsSet.GetSize() <= cond)
+	conditionResultsSet.SetSize (cond+1);
+      conditionResultsSet.SetBit (cond);
     }
   };
 
@@ -153,6 +157,8 @@ public:
   {
     RecursiveFree (root);
   }
+  
+  void PresetConditions (const MyBitArrayTemp& presetCondResults);
 
   Logic3 Descend (csConditionID condition);
   // Switch the current branch from "true" to "false"
@@ -337,6 +343,25 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
   }
 }
 
+void ConditionTree::PresetConditions (const MyBitArrayTemp& presetCondResults)
+{
+  CS_ASSERT(root->condition == csCondUnknown);
+  
+  size_t numCond = presetCondResults.GetSize()/2;
+  for (size_t c = 0; c < numCond; c++)
+  {
+    int condBits = (presetCondResults[2*c] ? 2 : 0) | (presetCondResults[2*c+1] ? 1 : 0);
+    if ((condBits == 2) || (condBits == 1))
+    {
+      Variables trueVals;
+      Variables falseVals;
+      
+      evaluator.CheckConditionResults (c, root->values, trueVals, falseVals);
+      root->values = (condBits == 2) ? trueVals : falseVals;
+    }
+  }
+}
+
 Logic3 ConditionTree::Descend (csConditionID condition)
 {
   bool conditionReserved = (condition == csCondAlwaysTrue)
@@ -440,7 +465,8 @@ void ConditionTree::ToResolver (iConditionResolver* resolver,
   csConditionNode* falseNode;
 
   resolver->AddNode (parent, node->condition, trueNode, falseNode,
-    node->conditionResults[bTrue], node->conditionResults[bFalse]);
+    node->conditionResults[bTrue], node->conditionResults[bFalse],
+    node->conditionResultsSet);
   if (node->branches[bTrue] != 0)
     ToResolver (resolver, node->branches[bTrue], trueNode);
   if (node->branches[bFalse] != 0)
@@ -2289,13 +2315,15 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
   iDocumentNode* wrappedNode, iConditionResolver* resolver, 
   csConditionEvaluator& evaluator, 
   const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut,
-  uint parseOpts)
+  uint parseOpts, const MyBitArrayTemp* presetCondResults)
 {
   ConditionDumper condDump (dumpOut, &evaluator);
 
   csWrappedDocumentNode* node;
   {
     EvalCondTree eval (evaluator);
+    if (presetCondResults)
+      eval.condTree.PresetConditions (*presetCondResults);
     if (parseOpts & wdnfpoHandleConditions)
     {
       for (size_t i = 0; i < extraNodes.GetSize(); i++)

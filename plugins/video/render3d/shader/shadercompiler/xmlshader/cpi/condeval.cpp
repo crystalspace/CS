@@ -909,6 +909,7 @@ void csConditionEvaluator::SetupEvalCacheInternal (const csShaderVariableStack* 
 	    evalCache.condChecked.GetSize());
 	  SetSizeFill1 (affection.affectedConditions, newCondSize);
 	  evalCache.condChecked.SetSize (newCondSize);
+	  evalCache.condResult.SetSize (newCondSize);
 	}
 	evalCache.condChecked &= affection.affectedConditions;
 	evalCache.lastShaderVars[i] = sv;
@@ -918,7 +919,13 @@ void csConditionEvaluator::SetupEvalCacheInternal (const csShaderVariableStack* 
        conditions depending on buffer values */
     MyBitArrayMalloc& bitarray = bufferAffectConditions;
     if (bitarray.GetSize() != evalCache.condChecked.GetSize())
-      SetSizeFill1 (bitarray, evalCache.condChecked.GetSize());
+    {
+      size_t newCondSize = csMax (bitarray.GetSize(),
+	evalCache.condChecked.GetSize());
+      SetSizeFill1 (bitarray, newCondSize);
+      evalCache.condChecked.SetSize (newCondSize);
+      evalCache.condResult.SetSize (newCondSize);
+    }
     evalCache.condChecked &= bitarray;
   }
 }

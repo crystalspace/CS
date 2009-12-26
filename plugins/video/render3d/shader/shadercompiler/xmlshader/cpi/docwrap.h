@@ -80,7 +80,8 @@ struct iConditionResolver
     csConditionID condition, csConditionNode*& trueNode, 
     csConditionNode*& falseNode,
     const MyBitArrayTemp& conditionResultsTrue,
-    const MyBitArrayTemp& conditionResultsFalse) = 0;
+    const MyBitArrayTemp& conditionResultsFalse,
+    const MyBitArrayTemp& conditionResultsSet) = 0;
   /// Finish adding of nodes. Frees up some tempoarily used resources.
   virtual void FinishAdding () = 0;
 
@@ -469,11 +470,15 @@ public:
    * \param extraNodes Extra document nodes whose conditions are added to the
    *  tree.
    * \param dumpOut Optional destination for condition tree dump.
+   * \param parseOptions Parse options, see wdnfpoExpandTemplates etc.
+   * \param presetCondResults Preset condition results, with two bits per
+   *   condition - the same format csXMLShader::ComputeTechniquesConditionsResults
+   *   returns.
    */
   csWrappedDocumentNode* CreateWrapper (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csConditionEvaluator& evaluator, 
     const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut,
-    uint parseOptions);
+    uint parseOptions, const MyBitArrayTemp* presetCondResults = 0);
   csWrappedDocumentNode* CreateWrapperStatic (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csString* dumpOut,
     uint parseOptions = wdnfpoExpandTemplates | wdnfpoHandleConditions);
