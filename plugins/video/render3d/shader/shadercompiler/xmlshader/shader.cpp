@@ -124,7 +124,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
   size_t csShaderConditionResolver::GetVariant (csConditionNode* node)
   {
-    MyBitArrayTemp bits (evaluator.GetNumConditions ());
+    MyBitArrayMalloc bits (evaluator.GetNumConditions ());
     node->FillConditionArray (bits);
     size_t* var = variantIDs.GetElementPointer (bits);
     if (var)
@@ -141,7 +141,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     csConditionNode*& trueNode,
     csConditionNode*& falseNode,
     const MyBitArrayTemp& conditionResultsTrue,
-    const MyBitArrayTemp& conditionResultsFalse)
+    const MyBitArrayTemp& conditionResultsFalse,
+    const MyBitArrayTemp& conditionResultsSet)
   {
     if (rootNode == 0)
     {
@@ -153,11 +154,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
       parent->trueNode = trueNode = NewNode (parent);
       trueNode->variant = GetVariant (trueNode);
-      variantConditions.PutUnique (trueNode->variant, conditionResultsTrue);
+      variantConditions.PutUnique (trueNode->variant,
+	VariantConditionsBits (conditionResultsTrue, conditionResultsSet));
 
       parent->falseNode = falseNode = NewNode (parent);
       falseNode->variant = GetVariant (falseNode);
-      variantConditions.PutUnique (falseNode->variant, conditionResultsFalse);
+      variantConditions.PutUnique (falseNode->variant,
+	VariantConditionsBits (conditionResultsFalse, conditionResultsSet));
     }
     else
     {
@@ -168,16 +171,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       parent->falseNode = falseNode = NewNode (parent);
 
       CS_ASSERT(parent->variant != csArrayItemNotFound);
-      MyBitArrayTemp bits (evaluator.GetNumConditions ());
+      MyBitArrayMalloc bits (evaluator.GetNumConditions ());
       parent->condition = condition;
 
       trueNode->variant = GetVariant (trueNode);
-      variantConditions.PutUnique (trueNode->variant, conditionResultsTrue);
+      variantConditions.PutUnique (trueNode->variant,
+	VariantConditionsBits (conditionResultsTrue, conditionResultsSet));
 
       falseNode->variant = parent->variant;
       falseNode->FillConditionArray (bits);
       variantIDs.PutUnique (bits, falseNode->variant);
-      variantConditions.PutUnique (falseNode->variant, conditionResultsFalse);
+      variantConditions.PutUnique (falseNode->variant,
+	VariantConditionsBits (conditionResultsFalse, conditionResultsSet));
 
       parent->variant = csArrayItemNotFound;
     }
@@ -224,15 +229,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     csBitArray conditionResults (evaluator.GetNumConditions());
     csBitArray conditionSet (evaluator.GetNumConditions());
-    MyBitArrayTemp* conditionResultsPtr = variantConditions.GetElementPointer (
+    VariantConditionsBits* conditionsPtr = variantConditions.GetElementPointer (
       variant);
-    CS_ASSERT(conditionResultsPtr);
+    CS_ASSERT(conditionsPtr);
 
     size_t i = 0;
-    for (; i < conditionResultsPtr->GetSize(); i++)
+    for (; i < conditionsPtr->conditionResults.GetSize(); i++)
     {
-      conditionResults.Set (i, (*conditionResultsPtr)[i]);
-      conditionSet.SetBit (i);
+      conditionResults.Set (i, conditionsPtr->conditionResults[i]);
+      conditionSet.Set (i, conditionsPtr->conditionsSet[i]);
     }
     currentEval = evaluator.BeginTicketEvaluation (conditionSet, conditionResults);
   }
@@ -279,6 +284,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         DumpConditionNode (out, node->falseNode, level + 1);
       }
     }
+  }
+
+  void csShaderConditionResolver::GetVariantConditions (size_t variant,
+    const MyBitArrayMalloc*& conditionResults,
+    const MyBitArrayMalloc*& conditionSet)
+  {
+    VariantConditionsBits* conditionsPtr = variantConditions.GetElementPointer (
+      variant);
+    CS_ASSERT(conditionsPtr);
+    
+    conditionResults = &conditionsPtr->conditionResults;
+    conditionSet = &conditionsPtr->conditionsSet;
   }
 
   void csShaderConditionResolver::CollectUsedConditions (csConditionNode* node,
@@ -1446,7 +1463,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   }
 
   void csXMLShader::PrepareTechVars (iDocumentNode* shaderRoot,
-				     const csArray<TechniqueKeeper> allTechniques,
+				     const csArray<TechniqueKeeper>& allTechniques,
 				     int forcepriority)
   {
     size_t tvc = techsResolver->GetVariantCount();
@@ -1487,6 +1504,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	}
       }
       techsResolver->SetCurrentEval (oldeval);
+    }
+  }
+  
+  void csXMLShader::ComputeTechniquesConditionsResults (size_t techIndex,
+    MyBitArrayTemp& condResults)
+  {
+    size_t tvc = techsResolver->GetVariantCount();
+    if (tvc == 0) return;
+    
+    condResults.SetSize (sharedEvaluator->GetNumConditions ()*2);
+    
+    for (size_t tvi = 0; tvi < tvc; tvi++)
+    {
+      const ShaderTechVariant& techVar = techVariants[tvi];
+      if (techVar.activeTechniques.IsBitSet (techIndex))
+      {
+	const MyBitArrayMalloc* conditionResults;
+	const MyBitArrayMalloc* conditionSet;
+	techsResolver->GetVariantConditions (tvi, conditionResults,
+	  conditionSet);
+	for (size_t c = 0; c < conditionSet->GetSize(); c++)
+	{
+	  if ((*conditionSet)[c])
+	    condResults.SetBit (2*c + ((*conditionResults)[c] ? 0 : 1));
+	}
+      }
     }
   }
 
@@ -1579,9 +1622,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     csVfsDirectoryChanger dirChange (compiler->vfs);
     dirChange.ChangeTo (vfsStartDir);
 
-    /* @@@ TODO: Some SV values are fixed from the tech determination;
-    * treat them as constant in the technique */
     csRef<csWrappedDocumentNode> wrappedNode;
+    
+    /* Some condition results are fixed from the tech determination;
+     * pass these to the technique node wrapping */
+    MyBitArrayTemp condResults;
+    ComputeTechniquesConditionsResults (techIndex, condResults);
 
     if (compiler->doDumpConds)
     {
@@ -1590,7 +1636,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (srcNode, 
         tech.resolver, tech.resolver->evaluator, extraNodes, &tree,
-        wdnfpoHandleConditions));
+        wdnfpoHandleConditions, &condResults));
 
       tech.resolver->DumpConditionTree (tree);
       csString filename;
@@ -1602,7 +1648,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     else
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (srcNode, 
         tech.resolver, tech.resolver->evaluator, extraNodes, 0,
-        wdnfpoHandleConditions));
+        wdnfpoHandleConditions, &condResults));
 
     tech.techNode = wrappedNode;
 

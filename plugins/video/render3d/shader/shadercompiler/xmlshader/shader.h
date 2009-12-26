@@ -65,7 +65,7 @@ struct csConditionNode
     delete trueNode;
     delete falseNode;
   }
-  void FillConditionArray (MyBitArrayTemp& array)
+  void FillConditionArray (MyBitArrayMalloc& array)
   {
     if (!parent) return;
     const csConditionID cond = parent->condition;
@@ -78,15 +78,24 @@ struct csConditionNode
 /**
  * An implementation of the callback used by csWrappedDocumentNode.
  */
-class csShaderConditionResolver : public iConditionResolver
+class csShaderConditionResolver :
+  public CS::Memory::CustomAllocatedDerived<iConditionResolver>
 {
   csExpressionTokenizer tokenizer;
   csExpressionParser parser;
   
   csConditionNode* rootNode;
   size_t nextVariant;
-  csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
-  csHash<MyBitArrayTemp, size_t, TempHeapAlloc> variantConditions;
+  csHash<size_t, MyBitArrayMalloc> variantIDs;
+  struct VariantConditionsBits
+  {
+    MyBitArrayMalloc conditionResults;
+    MyBitArrayMalloc conditionsSet;
+    
+    VariantConditionsBits (const MyBitArrayMalloc& r, const MyBitArrayMalloc& s)
+     : conditionResults (r), conditionsSet (s) {}
+  };
+  csHash<VariantConditionsBits, size_t> variantConditions;
 
   csRef<csConditionEvaluator::TicketEvaluator> currentEval;
 
@@ -122,7 +131,8 @@ public:
     csConditionID condition, csConditionNode*& trueNode, 
     csConditionNode*& falseNode,
     const MyBitArrayTemp& conditionResultsTrue,
-    const MyBitArrayTemp& conditionResultsFalse);
+    const MyBitArrayTemp& conditionResultsFalse,
+    const MyBitArrayTemp& conditionResultsSet);
   virtual void FinishAdding ();
 
   size_t GetVariant ();
@@ -130,6 +140,10 @@ public:
   { return nextVariant; }
   void SetVariantEval (size_t variant);
   void DumpConditionTree (csString& out);
+  
+  void GetVariantConditions (size_t variant,
+    const MyBitArrayMalloc*& conditionResults,
+    const MyBitArrayMalloc*& conditionSet);
 
   csConditionEvaluator::TicketEvaluator* GetCurrentEval ()
   { return currentEval; }
@@ -312,7 +326,15 @@ protected:
   void Load (iDocumentNode* source, bool forPrecache);
     
   void PrepareTechVars (iDocumentNode* shaderRoot,
-    const csArray<TechniqueKeeper> allTechniques, int forcepriority);
+    const csArray<TechniqueKeeper>& allTechniques, int forcepriority);
+  /**
+   * Computes the values of conditions for a given technique.
+   * Each condition takes up _two_ bits in the result array. 10 means the
+   * condition is true, 01 means it's false. Otherwise the value of the
+   * condition is indefinite.
+   */
+  void ComputeTechniquesConditionsResults (size_t techIndex,
+    MyBitArrayTemp& condResults);
   
   bool LoadTechniqueFromCache (Technique& tech,
     iHierarchicalCache* cache, size_t techIndex);
