@@ -368,6 +368,8 @@
 	   -->
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <!-- Using a specialized no-lighting snippet cuts down variations -->
+      <alias name="lighting" file="/shader-snippets/lighting/lighting-none.xml" />
       <!-- The meat of the shader is actually in a snippet. to be shared more
 	   easily across all techniques -->
       <snippet id="shared" file="/shader-snippets/lighting/lighting_default-shared.xml" />
