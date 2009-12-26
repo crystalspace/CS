@@ -268,7 +268,7 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
       args.Push (profileMacroArg);
     }
     
-    int profileLevel = GetProfileLevel (profile);
+    int profileLevel = GetProfileLevel (limitsPair.fp.profile);
     if (profileLevel != 0)
     {
       profileMacroArg.Format ("-DFRAGMENT_PROGRAM_LEVEL=0x%x", profileLevel);
@@ -538,16 +538,19 @@ bool csGLShader_CG::Open()
       else
       {
         CGprofile profile2;
+	// Check if hardware supports requested profile, directly or by routing
         if (cgGLIsProfileSupported (profile2 = profile)
-            || cgGLIsProfileSupported (profile2 = NextBestFakeProfile (profile)))
+            || IsRoutedProfileSupported (profile2))
         {
 	  ProfileLimits limits (vendor, profile2);
 	  limits.ReadFromConfig (config, "Video.OpenGL.Shader.Cg.Fake.Fragment");
 	  currentLimits.fp = limits;
           strictMatchFP = true;
 	}
-	else if (IsRoutedProfileSupported (profile2 = profile)
-            || IsRoutedProfileSupported (profile2 = NextBestFakeProfile (profile)))
+	// Check if hardware supports a profile "close enough" to the requested one,
+	// directly or by routing
+	else if (cgGLIsProfileSupported (profile2 = NextBestFakeProfile (profile))
+            || IsRoutedProfileSupported (profile2))
 	{
 	  ProfileLimits limits (
 	    CS::PluginCommon::ShaderProgramPluginGL::Other,

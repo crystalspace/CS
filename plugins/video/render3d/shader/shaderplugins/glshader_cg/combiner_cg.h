@@ -240,6 +240,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     void AppendProgramInput_V2FFP (const Snippet& snippet, 
       DocNodeCgAppender& appender);
     void AppendProgramInput (iDocumentNode* node, DocNodeCgAppender& appender);
+    csString CgType (const WeaverCommon::TypeInfo* typeInfo);
     csString CgType (const char* weaverType);
     csString GetAttrIdentifier (const char* var, const char* attr);
 

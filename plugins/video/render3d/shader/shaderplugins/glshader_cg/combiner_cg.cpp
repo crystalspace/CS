@@ -1760,6 +1760,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
           {
 	    const char* name = node->GetAttributeValue ("name");
 	    const char* type = node->GetAttributeValue ("type");
+	    const ShaderWeaver::TypeInfo* typeInfo = 
+	      ShaderWeaver::QueryTypeInfo (type);
 	    const char* binding = node->GetAttributeValue ("binding");
 	    if (name && *name && type && *type)
 	    {
@@ -1769,7 +1771,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
               str.Format ("%s %s %s%s;\n", 
 	        (id == ShaderCombinerLoaderCg::XMLTOKEN_UNIFORM) ? "uniform" :
 	        "varying",
-	        CgType (type).GetData(), name, bindingStr.GetDataSafe());
+	        typeInfo ? CgType (typeInfo).GetData() : type,
+		name, bindingStr.GetDataSafe());
+	      if (typeInfo && (typeInfo->baseType == ShaderWeaver::TypeInfo::Sampler))
+	      {
+		/* This is a workaround for a weird Cg bug:
+		   In FP2.0/PS1.x programs a constant will not be used
+		   correctly if it directly follows a sampler.
+		   Workaround: add an unused constant right after the sampler ... */
+		str.AppendFmt ("uniform float4 %s_Cg_WTF;", name);
+	      }
     	      appender.Append (str);
             }
           }
@@ -1786,32 +1797,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   {
     const ShaderWeaver::TypeInfo* typeInfo = 
       ShaderWeaver::QueryTypeInfo (weaverType);
-    
     if (typeInfo)
     {
-      switch (typeInfo->baseType)
-      {
-	case ShaderWeaver::TypeInfo::Vector:
-	case ShaderWeaver::TypeInfo::VectorB:
-	case ShaderWeaver::TypeInfo::VectorI:
-          {
-            static const char* const baseTypeStrs[] = 
-            { "float", "bool", "int" };
-            const char* baseTypeStr = baseTypeStrs[typeInfo->baseType -
-              ShaderWeaver::TypeInfo::Vector];
-	    if (typeInfo->dimensions == 1)
-	      return baseTypeStr;
-	    else
-	      return csString().Format ("%s%d", baseTypeStr, typeInfo->dimensions);
-          }
-	case ShaderWeaver::TypeInfo::Sampler:
-	  if (typeInfo->samplerIsCube)
-	    return "samplerCUBE";
-	  else
-	    return csString().Format ("sampler%dD", typeInfo->dimensions);
-      }
+      return CgType (typeInfo);
     }
     return weaverType; // @@@ Hmmm... what fallback, if any?
+  }
+  
+  csString ShaderCombinerCg::CgType (const ShaderWeaver::TypeInfo* typeInfo)
+  {
+    switch (typeInfo->baseType)
+    {
+      case ShaderWeaver::TypeInfo::Vector:
+      case ShaderWeaver::TypeInfo::VectorB:
+      case ShaderWeaver::TypeInfo::VectorI:
+	{
+	  static const char* const baseTypeStrs[] = 
+	  { "float", "bool", "int" };
+	  const char* baseTypeStr = baseTypeStrs[typeInfo->baseType -
+	    ShaderWeaver::TypeInfo::Vector];
+	  if (typeInfo->dimensions == 1)
+	    return baseTypeStr;
+	  else
+	    return csString().Format ("%s%d", baseTypeStr, typeInfo->dimensions);
+	}
+      case ShaderWeaver::TypeInfo::Sampler:
+	if (typeInfo->samplerIsCube)
+	  return "samplerCUBE";
+	else
+	  return csString().Format ("sampler%dD", typeInfo->dimensions);
+    }
   }
 
   csString ShaderCombinerCg::GetAttrIdentifier (const char* var, 

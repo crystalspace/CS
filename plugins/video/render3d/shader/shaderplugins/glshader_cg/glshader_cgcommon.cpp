@@ -736,7 +736,7 @@ struct CachedShaderWrapper
 
 iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   iHierarchicalCache* cache, iBase* previous, iDocumentNode* node,
-  csRef<iString>* failReason, csRef<iString>* tag)
+  uint flags, csRef<iString>* failReason, csRef<iString>* tag)
 {
   if (!cache) return iShaderProgram::loadFail;
 
@@ -952,7 +952,15 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     GetParamsFromVmap();
     
     cgGetError(); // Clear error
-    cgGLLoadProgram (program);
+    if (flags & loadLoadToGL)
+    {
+      cgGLLoadProgram (program);
+    }
+    else
+    {
+      cgCompileProgram (program);
+    }
+    
     shaderPlug->PrintAnyListing();
     err = cgGetError();
     if ((err != CG_NO_ERROR)
@@ -993,5 +1001,12 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   return oneReadCorrectly ? iShaderProgram::loadSuccessShaderInvalid : iShaderProgram::loadFail;
 }
 
+iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
+  iHierarchicalCache* cache, iBase* previous, iDocumentNode* node,
+  csRef<iString>* failReason, csRef<iString>* tag)
+{
+  return LoadFromCache (cache, previous, node, loadLoadToGL, failReason, tag);
+}
+  
 }
 CS_PLUGIN_NAMESPACE_END(GLShaderCg)
