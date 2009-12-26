@@ -35,8 +35,10 @@
   </block>
   
   <block location="fragmentMain">
+  #if FRAGMENT_PROGRAM_LEVEL >= 0x200
     // Renormalize, as interpolation will have denormalized it
     Tangent = normalize (Tangent);
+  #endif
   </block>
   
 </input>

@@ -33,7 +33,12 @@
       </block>
       
       <block location="cg:fragmentIn">
-	<uniform type="float" name="mixModeAlpha" />
+	<!-- Workaround for apparent Cg bug: in FP20/PS1.x, it uses the alpha
+	     component of a constant register for mixmode alpha, but the
+	     library sets that to 0 (the value goes only to the first component).
+	     Setting the type to float4 replicates the value over all components,
+	     including alpha -->
+	<uniform type="float4" name="mixModeAlpha" />
       </block>
       
       <block location="cg:vertexMain">
@@ -41,7 +46,7 @@
       </block>
       
       <block location="cg:fragmentMain">
-	mixModeAlpha = fragmentIn.mixModeAlpha;
+	mixModeAlpha = fragmentIn.mixModeAlpha.a;
       </block>
     </input>
     

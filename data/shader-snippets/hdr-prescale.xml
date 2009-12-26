@@ -43,11 +43,21 @@
     </input>
       
     <block location="cg:fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
       result = float4 (a.rgb*hdrScale.x+hdrScale.z, a.a);
+    #else
+      // HDR not supported sensibly on old HW
+      result = a;
+    #endif
     </block>
 
     <block location="cg:vertexMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
       result = float4 (a.rgb*hdrScale.x+hdrScale.z, a.a);
+    #else
+      // HDR not supported sensibly on old HW
+      result = a;
+    #endif
     </block>
     
     <output name="result" type="rgba" />

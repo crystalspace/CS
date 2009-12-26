@@ -116,11 +116,16 @@
     </block>
     
     <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
       float3x3 obj2tang;
       obj2tang[0] = Tangent;
       obj2tang[1] = Bitangent;
       obj2tang[2] = Normal;
       output =  mul (obj2tang, input);
+    #else
+      // PS1.x can't do matrix mul ...
+      output = float3 (0, 0, 1);
+    #endif
     </block>
   </coercion>
   
