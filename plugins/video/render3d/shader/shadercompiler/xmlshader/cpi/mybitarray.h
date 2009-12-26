@@ -103,15 +103,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       BitsAlloc4().Compact();
     }
   };
+  
+  class MyBitArrayMalloc;
+  class MyBitArrayTemp;
 
   //@{
   /**
    * Specialized bit array that uses block allocation for smaller
    * sizes.
    */
-  typedef csBitArrayTweakable<64, MyBitArrayAllocatorMalloc> MyBitArrayMalloc;
-  typedef csBitArrayTweakable<64, MyBitArrayAllocatorTemp> MyBitArrayTemp;
+  class MyBitArrayMalloc : public csBitArrayTweakable<64, MyBitArrayAllocatorMalloc>
+  {
+    typedef csBitArrayTweakable<64, MyBitArrayAllocatorMalloc> Superclass;
+  public:
+    MyBitArrayMalloc () : Superclass () {}
+    MyBitArrayMalloc (size_t size) : Superclass (size) {}
+    MyBitArrayMalloc (const MyBitArrayTemp& other);
+  };
+  
+  class MyBitArrayTemp : public csBitArrayTweakable<64, MyBitArrayAllocatorTemp>
+  {
+    typedef csBitArrayTweakable<64, MyBitArrayAllocatorTemp> Superclass;
+    
+    friend class MyBitArrayMalloc;
+  public:
+    MyBitArrayTemp () : Superclass () {}
+    MyBitArrayTemp (size_t size) : Superclass (size) {}
+  };
   //@}
+  
+  inline MyBitArrayMalloc::MyBitArrayMalloc (const MyBitArrayTemp& other)
+   : Superclass (other.GetSize())
+  {
+    memcpy (GetStore(), other.GetStore(),
+      mLength * sizeof (csBitArrayStorageType));
+  }
+  
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)
 
