@@ -72,6 +72,7 @@ class ConditionTree
       {
 	conditionResults[bTrue] = conditionResults[bFalse] =
 	  p->conditionResults[parentBranch];
+	conditionResultsSet = p->conditionResultsSet;
       }
       branches[bTrue] = 0;
       branches[bFalse] = 0;
