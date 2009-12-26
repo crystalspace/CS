@@ -108,7 +108,7 @@ bool csShaderGLPS1_Common::Compile (iHierarchicalCache*, csRef<iString>* tag)
 
   variablemap.DeleteAll();
 
-  tag->AttachNew (new scfString ("default"));
+  if (tag) tag->AttachNew (new scfString ("default"));
   
   return LoadProgramStringToGL();
 }
