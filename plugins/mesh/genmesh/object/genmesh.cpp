@@ -943,12 +943,31 @@ void csGenmeshMeshObjectFactory::UpdateTangentsBitangents ()
     }
     triNum = triangleScratch.GetSize ();
     tris = triangleScratch.GetArray ();
+    
+    // Workaround for meshes that don't have normals set
+    csVector3* normals = GetNormals();
+    csDirtyAccessArray<csVector3> normalsScratch;
+    if (normals == 0)
+    {
+      normalsScratch.SetSize (vertCount, csVector3 (0, 0, 1));
+      normals = normalsScratch.GetArray();
+    }
+    
+    // Workaround for meshes that don't have texcoords set
+    csVector2* texels = GetTexels();
+    csDirtyAccessArray<csVector2> texcoordScratch;
+    if (texels == 0)
+    {
+      texcoordScratch.SetSize (vertCount, csVector2 (0));
+      texels = texcoordScratch.GetArray();
+    }
+    
     csVector3* tangentData = (csVector3*)cs_malloc (
       sizeof (csVector3) * vertCount * 2);
     csVector3* bitangentData = tangentData + vertCount;
     csNormalMappingTools::CalculateTangents (triNum, tris, 
       vertCount, GetVertices(), 
-      GetNormals(), GetTexels(), 
+      normals, texels, 
       tangentData, bitangentData);
   
     knownBuffers.tangent->CopyInto (tangentData, vertCount);
