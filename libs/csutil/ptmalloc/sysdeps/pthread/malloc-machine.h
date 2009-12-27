@@ -123,50 +123,54 @@ typedef pthread_key_t tsd_key_t;
 #endif
 
 #include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+
+static inline void get_sharemem_env_name (char* buf, size_t bufsize)
+{
+  snprintf (buf, bufsize, "__CS_PTMALLOC_%d_%d", getppid(), getpid());
+}
 
 static inline void* sharemem_init (size_t bytes, int* created)
 {
-  char buf[64];
-  int fd;
+  char envName[64];
   void* p;
+  char* envStr;
+  char envBuf[32];
   
-  sprintf (buf, "/tmp/ptmalloc-%d-%d", getppid(), getpid());
-  fd = open (buf, O_RDWR, S_IRUSR | S_IWUSR);
-  if (fd < 0)
+  get_sharemem_env_name (envName, sizeof (envName));
+  envStr = getenv (envName);
+  if ((envStr == 0) || (sscanf (envStr, "%p", &p) != 1))
+    p = 0;
+  if (p == 0)
   {
-    fd = open (buf, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    p = malloc (bytes);
     *created = 1;
+    snprintf (envBuf, sizeof (envBuf), "%p", p);
+    setenv (envName, envBuf, 0);
   }
   else
     *created = 0;
-  if (fd < 0) return NULL;
-  if (ftruncate (fd, bytes) < 0)
-  {
-    unlink (buf);
-    return NULL;
-  }
-  p = mmap (NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-  if (p == MAP_FAILED)
-  {
-    unlink (buf);
-    return NULL;
-  }
   return p;
 }
 
 static inline void sharemem_close (void* p, size_t bytes)
 {
-  munmap (p, bytes);
 }
 
 static inline void sharemem_destroy (void)
 {
-  char buf[64];
+  char envName[64];
+  void* p;
+  char* envStr;
   
-  sprintf (buf, "/tmp/ptmalloc-%d-%d", getppid(), getpid());
-  unlink (buf);
+  get_sharemem_env_name (envName, sizeof (envName));
+  envStr = getenv (envName);
+  if ((envStr == 0) || (sscanf (envStr, "%p", &p) != 1))
+    p = 0;
+  if (p != 0)
+  {
+    free (p);
+  }
+  unsetenv (envName);
 }
 
 /* at fork */
