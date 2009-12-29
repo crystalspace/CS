@@ -36,6 +36,11 @@ SndSysBasicStream::SndSysBasicStream(csSndSysSoundFormat *pRenderFormat, int Mod
   // Set stream to m_bPaused, at the beginning, and not m_bLooping
   m_bPaused=true;
   m_bLooping=false;
+  
+  //set the starting loop position to zero
+  m_startLoopFrame=0;
+  //set the rewind loop position to zero (rewind to end of stream)
+  m_endLoopFrame = 0;
 
   // A prepared data buffer will be allocated when we know the size needed
   m_pPreparedDataBuffer=0;
@@ -161,6 +166,26 @@ int SndSysBasicStream::GetLoopState()
   if (m_bLooping)
     return CS_SNDSYS_STREAM_LOOP;
   return CS_SNDSYS_STREAM_DONTLOOP;
+}
+
+size_t SndSysBasicStream::GetLoopStart()
+{
+    return m_startLoopFrame;
+}
+
+size_t SndSysBasicStream::GetLoopEnd()
+{
+    return m_endLoopFrame;
+}
+
+bool SndSysBasicStream::SetLoopBoundaries(size_t startPosition, size_t endPosition)
+{
+    //don't allow to set a loop start higher than loop end or we could have
+    //some interesting effects
+    if(endPosition != 0 && startPosition >= endPosition) return false;
+    m_startLoopFrame = startPosition;
+    m_endLoopFrame = endPosition;
+    return true;
 }
 
 void SndSysBasicStream::SetPlayRatePercent(int percent)

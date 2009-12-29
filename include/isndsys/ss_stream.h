@@ -61,7 +61,7 @@ enum
 struct iSndSysStream : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysStream,1,0,0);
+  SCF_INTERFACE(iSndSysStream,1,1,0);
 
   /// Retrieve a description of this stream.  
   //  This is not guaranteed to be useful for any particular purpose, different,
@@ -265,6 +265,34 @@ struct iSndSysStream : public virtual iBase
 
   /// Whether this stream always needs to be treated as a stream regardless of size.
   virtual bool AlwaysStream() const = 0;
+    
+  /**
+   * Gets where the audio should rewind to loop.
+   * 
+   * \return The position where to restart playing when looping in frames.
+   */
+  virtual size_t GetLoopStart() = 0;
+
+  /**
+   * Gets when the audio should rewind to loop.
+   * 
+   * \return The position where to rewind to loop start when looping in frames.
+   */
+  virtual size_t GetLoopEnd() = 0;
+    
+  /**
+   * Sets the loop start and end bounduaries. The start position defines the position in frames
+   * where the loop will restart when the stream reaches the end of the stream, in case
+   * endPosition is 0 or the frame defined in endPosition.
+   * 
+   * \note The endPosition is exclusive while the start position is inclusive, so for example to get
+   *       a loop from frame 0 to frame 0 you should do startPosition 0 and endPosition 1
+   * \param startPosition The position in frames where to restart playing when looping.
+   * \param endPosition The position in frames where to rewind to loop start when looping.
+   * \return false if the parameters are out of bound or the audio format plugin doesn't support this.
+   */
+  virtual bool SetLoopBoundaries(size_t startPosition, size_t endPosition) = 0;
+
 };
 
 /// Sound System stream interface for callback notification

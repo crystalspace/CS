@@ -88,6 +88,24 @@ void SndSysWavSoundStream::AdvancePosition(size_t frame_delta)
 {
   size_t needed_bytes=0;
 
+  //if loop is enabled, end loop frame is different than zero and we are at the loop ending return to the
+  //start of the loop
+  if(m_bLooping && m_endLoopFrame != 0 && m_MostAdvancedReadPointer+frame_delta >= m_endLoopFrame)
+  {
+      //first advance the decoding of the exact length we need to reach the endloopframe
+      AdvancePosition(m_endLoopFrame-m_MostAdvancedReadPointer-1);
+      //remove from frame_delta what we decoded already
+      frame_delta -= m_endLoopFrame-m_MostAdvancedReadPointer-1;
+      // Flush the prepared samples
+      m_PreparedDataBufferUsage=0;
+      m_PreparedDataBufferStart=0;
+
+      //Move the wav read position to the requested position 
+      //to the start loop position position for the rest of the advancement
+      m_pWavCurrentPointer=m_pWavDataBase+m_startLoopFrame;
+      m_WavBytesLeft=m_WavDataLength-m_startLoopFrame;
+  }
+
   // If a new position has been requested via the SetPosition function,
   //  handle that first.
   if (m_NewPosition != positionInvalid)
@@ -236,8 +254,8 @@ void SndSysWavSoundStream::AdvancePosition(size_t frame_delta)
       }
 
       // Loop by resetting the position to the beginning and continuing
-      m_pWavCurrentPointer=m_pWavDataBase;
-      m_WavBytesLeft=m_WavDataLength;
+      m_pWavCurrentPointer=m_pWavDataBase+m_startLoopFrame;
+      m_WavBytesLeft=m_WavDataLength-m_startLoopFrame;
     }
   }
       
