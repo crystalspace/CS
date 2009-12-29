@@ -43,6 +43,7 @@ protected:
 
   enum
   {
+    /// Number of available constant registers
     MAX_CONST_REGS = 8
   };
   ProgramParam constantRegs[MAX_CONST_REGS];

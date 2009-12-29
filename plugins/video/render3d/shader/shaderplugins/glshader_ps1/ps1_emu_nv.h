@@ -35,6 +35,12 @@ private:
   GLuint program_num;
   GLuint tex_program_num;
 
+  enum
+  {
+    /// Maximum number of combiner stages supported here
+    maxCombinerStages = 8
+  };
+
   struct nv_input
   {
     nv_input (GLenum p, GLenum v, GLenum i, GLenum m, GLenum c)
@@ -68,11 +74,11 @@ private:
   };
   struct nv_constant_pair
   {
-    short stage;
-    short first;
-    short second;
+    short constant[2];
+
+    nv_constant_pair() { constant[0] = constant[1] = -1; }
   };
-  csArray<nv_constant_pair> constant_pairs;
+  nv_constant_pair constant_pairs[maxCombinerStages];
   struct nv_texture_shader_stage
   {
     short instruction;

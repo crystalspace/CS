@@ -68,39 +68,43 @@ void csShaderGLPS1_NV::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 {
   csGLExtensionManager *ext = shaderPlug->ext;
 
+  csVector4 vectorVal[MAX_CONST_REGS];
+  bool valFetched[MAX_CONST_REGS];
+
+  memset (valFetched, 0, sizeof (valFetched));
+
   // set variables
-  for (int i = 0; i < MAX_CONST_REGS; i++)
+  for (int i = 0; i < maxCombinerStages; i++)
   {
-    csRef<csShaderVariable> var;
+    const nv_constant_pair &pair = constant_pairs[i];
 
-    var = csGetShaderVariableFromStack (stack, constantRegs[i].name);
-    if (!var.IsValid ())
-      var = constantRegs[i].var;
-
-    // If var is null now we have no const nor any passed value, ignore it
-    if (!var.IsValid ())
-      continue;
-
-    csVector4 vectorVal;
-    var->GetValue (vectorVal);
-
-    const float* vptr = &vectorVal.x;
-    for(size_t j = 0; j < constant_pairs.GetSize (); j++)
+    for (int c = 0; c < 2; c++)
     {
-      nv_constant_pair &pair = constant_pairs.Get (j);
-      if (pair.first == i)
+      int constNr = pair.constant[c];
+      if (constNr >= 0)
       {
-        ext->glCombinerStageParameterfvNV (
-          GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR0_NV,
-          vptr);
+	if (!valFetched[constNr])
+	{
+	  csRef<csShaderVariable> var;
+
+	  var = csGetShaderVariableFromStack (stack, constantRegs[constNr].name);
+	  if (!var.IsValid ())
+	    var = constantRegs[constNr].var;
+
+	  // If var is null now we have no const nor any passed value, ignore it
+	  if (!var.IsValid ())
+	    continue;
+
+          var->GetValue (vectorVal[constNr]);
+
+	  valFetched[constNr] = true;
+	}
+
+	const float* vptr = &(vectorVal[constNr]).x;
+	ext->glCombinerStageParameterfvNV (
+	  GL_COMBINER0_NV + i, GL_CONSTANT_COLOR0_NV + c,
+	  vptr);
       }
-      else if (pair.second == i)
-      {
-        ext->glCombinerStageParameterfvNV (
-          GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR1_NV,
-          vptr);
-      }
-  
     }
   }
 
@@ -726,17 +730,16 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
 
   if(stages.GetSize () < 1) return false;
 
-  int prev_combiner = 0;
+  num_combiners = 0;
+  int prev_combiner = -1;
   for(i = 0; i < stages.GetSize (); i++)
   {
     const nv_combiner_stage &stage = stages.Get (i);
     if(prev_combiner != num_combiners)
     {
-      nv_constant_pair constant_pair;
-      constant_pair.first = stage.con_first;
-      constant_pair.second = stage.con_second;
-      constant_pair.stage = num_combiners - 1;
-      constant_pairs.Push(constant_pair);
+      nv_constant_pair& constant_pair = constant_pairs[num_combiners];
+      constant_pair.constant[0] = stage.con_first;
+      constant_pair.constant[1] = stage.con_second;
       prev_combiner = num_combiners;
     }
     if(i+1 < stages.GetSize ())
