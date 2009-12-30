@@ -1,6 +1,7 @@
 SubDir TOP apps tests ;
 
 SubInclude TOP apps tests asndtest ;
+SubInclude TOP apps tests avatartest ;
 SubInclude TOP apps tests ceguitest ;
 SubInclude TOP apps tests consoletest ;
 SubInclude TOP apps tests csbench ;
