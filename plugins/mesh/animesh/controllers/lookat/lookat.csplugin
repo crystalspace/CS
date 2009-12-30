@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- lookat.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.animesh.controllers.lookat</name>
+        <implementation>LookAtManager</implementation>
+        <description>Crystal Space LookAt Controller of an Animated Mesh</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
