@@ -960,6 +960,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	else if (csGetTicks() - startTime > 1000)
 	{
 	  progress = new csTextProgressMeter (0, totalTechs);
+	  progress->SetGranularity (progress->GetTickScale());
 	  progress->Step (techsHandled);
 	}
 	tech.resolver->SetCurrentEval (0);

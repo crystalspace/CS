@@ -228,6 +228,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       Synthesizer synth (compiler, shaderName, prePassNodes, passSnippets, nonPassNodes);
     
       csTextProgressMeter pmeter (0);
+      pmeter.SetGranularity (pmeter.GetTickScale());
       csPrintf ("shader %s: ", shaderName);
       synth.Synthesize (shaderNode, shaderVarNodesHelper, techniqueNodes,
         techSource, combiners, &pmeter);
