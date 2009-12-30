@@ -362,6 +362,9 @@ class iSndSysStream(core.iBase):
     def UnregisterCallback(*args): return _isndsys.iSndSysStream_UnregisterCallback(*args)
     def RegisterFrameNotification(*args): return _isndsys.iSndSysStream_RegisterFrameNotification(*args)
     def AlwaysStream(*args): return _isndsys.iSndSysStream_AlwaysStream(*args)
+    def GetLoopStart(*args): return _isndsys.iSndSysStream_GetLoopStart(*args)
+    def GetLoopEnd(*args): return _isndsys.iSndSysStream_GetLoopEnd(*args)
+    def SetLoopBoundaries(*args): return _isndsys.iSndSysStream_SetLoopBoundaries(*args)
     scfGetVersion = staticmethod(_isndsys.iSndSysStream_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysStream
     __del__ = lambda self : None;

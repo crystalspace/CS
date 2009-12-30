@@ -7434,6 +7434,90 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSndSysStream_GetLoopStart(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSndSysStream *arg1 = (iSndSysStream *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  size_t result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetLoopStart",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetLoopStart" "', argument " "1"" of type '" "iSndSysStream *""'"); 
+  }
+  arg1 = reinterpret_cast< iSndSysStream * >(argp1);
+  result = (arg1)->GetLoopStart();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSndSysStream_GetLoopEnd(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSndSysStream *arg1 = (iSndSysStream *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  size_t result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetLoopEnd",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetLoopEnd" "', argument " "1"" of type '" "iSndSysStream *""'"); 
+  }
+  arg1 = reinterpret_cast< iSndSysStream * >(argp1);
+  result = (arg1)->GetLoopEnd();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSndSysStream_SetLoopBoundaries(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSndSysStream *arg1 = (iSndSysStream *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  size_t val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_SetLoopBoundaries",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_SetLoopBoundaries" "', argument " "1"" of type '" "iSndSysStream *""'"); 
+  }
+  arg1 = reinterpret_cast< iSndSysStream * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSndSysStream_SetLoopBoundaries" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  ecode3 = SWIG_AsVal_size_t(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iSndSysStream_SetLoopBoundaries" "', argument " "3"" of type '" "size_t""'");
+  } 
+  arg3 = static_cast< size_t >(val3);
+  result = (bool)(arg1)->SetLoopBoundaries(arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSndSysStream_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -8572,6 +8656,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSndSysStream_UnregisterCallback", _wrap_iSndSysStream_UnregisterCallback, METH_VARARGS, NULL},
 	 { (char *)"iSndSysStream_RegisterFrameNotification", _wrap_iSndSysStream_RegisterFrameNotification, METH_VARARGS, NULL},
 	 { (char *)"iSndSysStream_AlwaysStream", _wrap_iSndSysStream_AlwaysStream, METH_VARARGS, NULL},
+	 { (char *)"iSndSysStream_GetLoopStart", _wrap_iSndSysStream_GetLoopStart, METH_VARARGS, NULL},
+	 { (char *)"iSndSysStream_GetLoopEnd", _wrap_iSndSysStream_GetLoopEnd, METH_VARARGS, NULL},
+	 { (char *)"iSndSysStream_SetLoopBoundaries", _wrap_iSndSysStream_SetLoopBoundaries, METH_VARARGS, NULL},
 	 { (char *)"iSndSysStream_scfGetVersion", _wrap_iSndSysStream_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSndSysStream", _wrap_delete_iSndSysStream, METH_VARARGS, NULL},
 	 { (char *)"iSndSysStream_swigregister", iSndSysStream_swigregister, METH_VARARGS, NULL},
