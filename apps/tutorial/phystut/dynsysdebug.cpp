@@ -225,8 +225,8 @@ void ColoredTexture::Animate (csTicks current_time)
 {
   g3d->SetRenderTarget (GetTextureWrapper ()->GetTextureHandle ());
   if (!g3d->BeginDraw(CSDRAW_2DGRAPHICS)) return;
-  g3d->GetDriver2D()->DrawPixel (0, 0, g3d->GetDriver2D()->FindRGB (
-            color.red * 255.0, color.green * 255.0, color.blue * 255.0));
+  g3d->GetDriver2D()->DrawPixel (0, 0, g3d->GetDriver2D()->FindRGB
+         ((int) (color.red * 255.0), (int) (color.green * 255.0), (int) (color.blue * 255.0)));
   g3d->FinishDraw ();
 }
 
