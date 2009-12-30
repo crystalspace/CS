@@ -216,6 +216,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
   void AnimationNode::Play ()
   {
+    CS_ASSERT (factory->animation);
+
     if (!isPlaying && factory->automaticReset)
       playbackPosition = 0;
 
