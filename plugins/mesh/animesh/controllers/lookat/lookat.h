@@ -29,7 +29,7 @@
 #include "csutil/csstring.h"
 #include "imesh/lookat.h"
 
-class iBodyBoneJoint;
+struct iBodyBoneJoint;
 
 CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 {

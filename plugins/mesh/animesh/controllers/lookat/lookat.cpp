@@ -328,7 +328,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   void LookAtAnimNode::Play ()
   {
-    CS_ASSERT (boneID != InvalidBoneID)
+    CS_ASSERT (boneID != InvalidBoneID);
 
     // init tracking
     isPlaying = true;
