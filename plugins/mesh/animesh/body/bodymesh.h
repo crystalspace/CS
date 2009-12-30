@@ -195,6 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
     virtual iBodyBone* CreateBodyBone (BoneID boneID);
     virtual iBodyBone* FindBodyBone (const char *name) const;
+    virtual iBodyBone* FindBodyBone (BoneID bone) const;
     virtual void ClearBodyBones ();
 
     virtual iBodyChain* CreateBodyChain (

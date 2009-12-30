@@ -29,6 +29,9 @@
 
 #include "imesh/bodymesh.h"
 
+/**\addtogroup meshplugins
+ * @{ */
+
 struct iAnimatedMesh;
 struct iRagdollAnimNodeFactory;
 
@@ -138,5 +141,7 @@ struct iRagdollAnimNode : public iSkeletonAnimNode2
    */
   virtual BoneID GetBone (csChainStateType state, uint index) const = 0;
 };
+
+/** @} */
 
 #endif //__CS_BODYMESH_RAGDOLL_H__

@@ -83,7 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
     if (rep)
       rep->ReportV (severity,
-		    "crystalspace.mesh.object.animesh.controllers.ragdoll",
+		    "crystalspace.mesh.animesh.controllers.ragdoll",
 		    msg, arg);
     else
       {

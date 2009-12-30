@@ -30,6 +30,9 @@
 #include "imesh/skeleton2anim.h"
 #include "ivaria/dynamics.h"
 
+/**\addtogroup meshplugins
+ * @{ */
+
 struct iAnimatedMeshFactory;
 struct iAnimatedMesh;
 struct iBodySkeleton;
@@ -72,7 +75,7 @@ struct iBodyManager : public virtual iBase
  */
 struct iBodySkeleton : public virtual iBase
 {
-  SCF_INTERFACE(iBodySkeleton, 1, 0, 0);
+  SCF_INTERFACE(iBodySkeleton, 1, 0, 1);
 
   /**
    * Return the name of the body skeleton.
@@ -129,6 +132,11 @@ struct iBodySkeleton : public virtual iBase
    * Delete all body chains.
    */
   virtual void ClearBodyChains () = 0;
+
+  /**
+   * Find a body bone from the ID of the associated animesh bone.
+   */
+  virtual iBodyBone* FindBodyBone (BoneID bone) const = 0;
 };
 
 /**
@@ -511,5 +519,7 @@ struct iBodyBoneCollider : public virtual iBase
    */
   virtual float GetDensity () const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_BODYMESH_H__

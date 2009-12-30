@@ -74,7 +74,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     va_start (arg, msg);
     csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
     if (rep)
-      rep->ReportV (severity, "crystalspace.mesh.object.animesh.body",
+      rep->ReportV (severity, "crystalspace.mesh.animesh.body",
 		    msg, arg);
     else
       {
@@ -157,6 +157,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   {
     BoneID boneID = animeshFactory->GetSkeletonFactory ()->FindBone (name);
     return boneHash.Get (boneID, 0);
+  }
+
+  iBodyBone* BodySkeleton::FindBodyBone (BoneID bone) const
+  {
+    return boneHash.Get (bone, 0);
   }
 
   void BodySkeleton::ClearBodyBones ()
