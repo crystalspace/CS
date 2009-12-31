@@ -781,19 +781,19 @@ public:
    * 
    * \param origin The array to push at the end of this array.
    */
-  void PushAll(csArray& origin)
+  void MergeAll(const csArray& origin)
   {
     for(size_t i = 0; i < origin.GetSize(); i++)
       Push(origin.Get(i));
   }
   
   /**
-   * Push the elements of an array onto the tail end of the array if it's elements aren't already present.
+   * Push the elements of an array onto the tail end of the array if its elements aren't already present.
    * If an element is found duplicate it's skipped.
    * 
    * \param origin The array to push at the end of this array.
    */
-  void PushSmartAll(csArray& porigin)
+  void MergeSmart(const csArray& origin)
   {
     for(size_t i = 0; i < origin.GetSize(); i++)
       PushSmart(origin.Get(i));
