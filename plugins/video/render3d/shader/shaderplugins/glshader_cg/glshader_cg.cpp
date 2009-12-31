@@ -454,6 +454,9 @@ bool csGLShader_CG::Open()
   enableVP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Vertex", true);
   enableFP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Fragment", true);
 
+  bool forceBestProfile =
+    config->GetBool ("Video.OpenGL.Shader.Cg.ForceBestProfile", false);
+
   strictMatchVP = false;
   if (enableVP)
   {
@@ -507,6 +510,7 @@ bool csGLShader_CG::Open()
       ProfileLimits limits (vendor, profile);
       limits.GetCurrentLimits (ext);
       currentLimits.vp = limits;
+      strictMatchVP = forceBestProfile;
     }
     enableVP = currentLimits.vp.profile != CG_PROFILE_UNKNOWN;
     if (doVerbose)
@@ -572,6 +576,7 @@ bool csGLShader_CG::Open()
 	cgGLGetLatestProfile (CG_GL_FRAGMENT));
       limits.GetCurrentLimits (ext);
       currentLimits.fp = limits;
+      strictMatchFP = forceBestProfile;
     }
   }
   else
