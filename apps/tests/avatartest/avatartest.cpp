@@ -36,7 +36,7 @@ AvatarTest *avatarTest;
 
 AvatarTest::AvatarTest (iObjectRegistry* object_reg)
   : scfImplementationType (this), object_reg (object_reg), targetMode (LOOKAT_CAMERA),
-    alwaysRotate (false), rotationSpeed (ROTATION_NORMAL)
+    alwaysRotate (false), rotationSpeed (ROTATION_NORMAL), targetReached (false)
 {
 }
 
@@ -98,6 +98,22 @@ void AvatarTest::SetupFrame ()
   // We now assign a new rotation transformation to the camera.
   c->GetTransform().LookAt (avatarPosition - c->GetTransform().GetOrigin (),
 			    csVector3(0,1,0) );
+
+  // Update the morph state (frankie smiles sadistically if no target in view)
+  float morphDuration = 250.0f;
+  if (targetReached)
+    smileWeight -= (float) elapsed_time / (float) morphDuration;
+  else 
+    smileWeight += (float) elapsed_time / (float) morphDuration;
+
+  if (smileWeight > 1.0f)
+    smileWeight = 1.0f;
+  else if (smileWeight < 0.0f)
+    smileWeight = 0.0f;
+
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"), -2.0f * smileWeight);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"), smileWeight);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), smileWeight);
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -443,7 +459,7 @@ void AvatarTest::CreateAvatar ()
   if (!meshfact)
     return;
 
-  csRef<iAnimatedMeshFactory> animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
   if (!animeshFactory)
   {
@@ -497,20 +513,28 @@ void AvatarTest::CreateAvatar ()
   lookAtNode->SetAlwaysRotate (alwaysRotate);
   lookAtNode->SetMaximumSpeed (5.0f);
   lookAtNode->SetListenerDelay (0.6f);
-  lookAtNode->SetTarget (view->GetCamera(), csVector3 (0, 0, 0));
+  lookAtNode->SetTarget (view->GetCamera(), csVector3 (0.0f));
 
   // Start animation
   root->Play ();
+
+  // Init morph animation
+  smileWeight = 1.0f;
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"), -2.0f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"), 1.0f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), 1.0f);
 }
 
 void AvatarTest::TargetReached ()
 {
   printf ("target reached\n");
+  targetReached = true;
 }
 
 void AvatarTest::TargetLost ()
 {
   printf ("target lost\n");
+  targetReached = false;
 }
 
 void AvatarTest::WriteShadow (int x,int y,int fg,const char *str,...)

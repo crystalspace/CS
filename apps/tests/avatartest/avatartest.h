@@ -41,6 +41,7 @@ private:
   csRef<iFont> courierFont;
   iSector* room;
 
+  csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
   csRef<iBodyManager> bodyManager;
   csRef<iLookAtManager> lookAtManager;
@@ -48,6 +49,9 @@ private:
   char targetMode;
   bool alwaysRotate;
   char rotationSpeed;
+
+  bool targetReached;
+  float smileWeight;
 
   static bool AvatarTestEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
