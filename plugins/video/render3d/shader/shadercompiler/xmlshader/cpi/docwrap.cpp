@@ -94,6 +94,20 @@ class ConditionTree
 	conditionResultsSet.SetSize (cond+1);
       conditionResultsSet.SetBit (cond);
     }
+
+    void MergeConditionResults (const Node* other, int otherBranch)
+    {
+      for (size_t c = 0; c < other->conditionResultsSet.GetSize(); c++)
+      {
+	if (!other->conditionResultsSet[c]) continue;
+	if ((c >= conditionResultsSet.GetSize())
+	    || !conditionResultsSet.IsBitSet (c))
+	{
+	  SetConditionResult (0x3, c,
+	    other->conditionResults[otherBranch].IsBitSet (c));
+	}
+      }
+    }
   };
 
   csFixedSizeAllocator<sizeof (Node), TempHeapAlloc> nodeAlloc;
@@ -452,6 +466,7 @@ void ConditionTree::Commit ()
       node->branches[ca[n].branch] = ca[n].newNode;
       node->SetConditionResult (1 << ca[n].branch, node->condition,
 	ca[n].branch == bTrue);
+      ca[n].newNode->MergeConditionResults (node, ca[n].branch);
     }
   }
   commitArrays.Empty();
