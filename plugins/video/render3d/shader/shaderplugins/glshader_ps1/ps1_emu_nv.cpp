@@ -114,18 +114,30 @@ void csShaderGLPS1_NV::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
   {
     if (tex_program_num != (GLuint)~0)
     {
+      // Set state the display list expects
+      shaderPlug->stateCache->SetCurrentTCUnit (0);
+      shaderPlug->stateCache->ActivateTCUnit (csGLStateCache::activateTexEnv);
       glCallList(tex_program_num);
     }
     else
     {
       tex_program_num = program_num + 1;
+      // Put GL state cache into a known state ...
+      shaderPlug->stateCache->SetCurrentTCUnit (0);
+      shaderPlug->stateCache->ActivateTCUnit (csGLStateCache::activateTexEnv);
       glNewList (tex_program_num, GL_COMPILE);
       ActivateTextureShaders ();
+      /* ...and manually reset the state, bypassing the state manager.
+         (This is necessary as it obviously can't see the action when executing
+	 the list later.) */
+      ext->glClientActiveTextureARB (GL_TEXTURE0);
       glEndList();
     }
   }
   else
+  {
     ActivateTextureShaders ();
+  }
 }
 
 void csShaderGLPS1_NV::ResetState ()
@@ -135,21 +147,13 @@ void csShaderGLPS1_NV::ResetState ()
 void csShaderGLPS1_NV::ActivateTextureShaders ()
 {
   size_t i;
-  for(i = 0; i < 4; i++)
-  {
-    shaderPlug->stateCache->SetCurrentTCUnit ((int)i);
-    shaderPlug->stateCache->ActivateTCUnit (csGLStateCache::activateTexEnv);
-    glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-      GL_NONE);
-  }
-
 
   for(i = 0; i < texture_shader_stages.GetSize (); i++)
   {
     const nv_texture_shader_stage &shader = texture_shader_stages.Get(i);
 
     shaderPlug->stateCache->SetCurrentTCUnit (shader.stage);
-    shaderPlug->stateCache->ActivateTCUnit (csGLStateCache::activateTexCoord);
+    shaderPlug->stateCache->ActivateTCUnit (csGLStateCache::activateTexEnv);
 
     switch(shader.instruction)
     {
@@ -260,6 +264,14 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
           GL_TEXTURE0_ARB + shader.previous);
         break;
     }
+  }
+  // Disable remaining TUs
+  for(; i < 4; i++)
+  {
+    shaderPlug->stateCache->SetCurrentTCUnit ((int)i);
+    shaderPlug->stateCache->ActivateTCUnit (csGLStateCache::activateTexEnv);
+    glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+      GL_NONE);
   }
 }
 
