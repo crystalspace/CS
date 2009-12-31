@@ -128,9 +128,9 @@ void AvatarTest::SetupFrame ()
   if (targetMode == LOOKAT_CAMERA)
     WriteShadow( 10, 480, g2d->FindRGB (255, 150, 100), "Watch out, Frankie is looking at you!");
   else if (targetMode == LOOKAT_POSITION)
-    WriteShadow( 10, 480, g2d->FindRGB (255, 150, 100), "Frankie is looking something");
+    WriteShadow( 10, 480, g2d->FindRGB (255, 150, 100), "Frankie is looking at something");
   else if (targetMode == LOOKAT_NOTHING)
-    WriteShadow( 10, 480, g2d->FindRGB (255, 150, 100), "Frankie doesn't care about nothing");
+    WriteShadow( 10, 480, g2d->FindRGB (255, 150, 100), "Frankie doesn't care about anything");
 
   if (alwaysRotate)
     WriteShadow( 10, 500, g2d->FindRGB (255, 150, 100), "Always rotate: ON");
