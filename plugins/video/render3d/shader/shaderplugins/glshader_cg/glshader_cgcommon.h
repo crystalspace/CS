@@ -234,9 +234,14 @@ public:
   const csSet<csString>& GetUnusedParameters ()
   { return unusedParams; }
   
+  iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* tag = 0,
+    ProfileLimitsPair* cacheLimits = 0);
   virtual iShaderProgram::CacheLoadResult LoadFromCache (
     iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
-    csRef<iString>* failReason = 0, csRef<iString>* = 0);
+    csRef<iString>* failReason = 0, csRef<iString>* tag = 0)
+  { return LoadFromCache (cache, previous, programNode, failReason, tag, 0); }
 };
 
 }

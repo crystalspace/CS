@@ -82,9 +82,13 @@ public:
     csShaderGLCGCommon::GetUsedShaderVars (bits);
   }
   
-  /*iShaderProgram::CacheLoadResult LoadFromCache (
+  iShaderProgram::CacheLoadResult LoadFromCache (
     iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
-    csRef<iString>* failReason = 0, csRef<iString>* = 0);*/
+    csRef<iString>* failReason = 0, csRef<iString>* tag = 0)
+  {
+    return csShaderGLCGCommon::LoadFromCache (cache, previous, programNode,
+      failReason, tag, &cacheLimits);
+  }
 };
 
 }
