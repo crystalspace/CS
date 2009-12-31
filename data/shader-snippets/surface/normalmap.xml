@@ -17,7 +17,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <snippet>
-  <technique priority="100">
+  <technique priority="100"
+	     condition="vars.&quot;tex normal compressed&quot;.texture || vars.&quot;tex normal&quot;.texture">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
     <input file="/shader-snippets/texCoord.inp" />
@@ -50,27 +51,47 @@
       </block>
     </input>
     
+    <block location="tags">
+      <tag>normalmap</tag>
+    </block>
+	
     <block location="cg:fragmentMain">
     <?if vars."tex normal compressed".texture ?>
       normal = half3 (h4tex2D (texNormalCompressed, texCoord).wy*2-1, 0);
       normal.z = sqrt (1 - dot (normal.xy, normal.xy));
       normal_attr_perfragment = true;
-    <?elsif vars."tex normal".texture ?>
+    <?else?>
       normal = normalize (h4tex2D (texNormal, texCoord).xyz*2-1);
       normal_attr_perfragment = true;
-    <?else?>
-      normal = half3 (0, 0, 1);
-      normal_attr_perfragment = false;
     <?endif?>
     </block>
     
     <block location="cg:vertexMain">
       normal = half3 (0, 0, 1);
-    <?if vars."tex normal".texture || vars."tex normal compressed".texture?>
       normal_attr_perfragment = true;
-    <?else?>
+    </block>
+    
+    <output name="normal" type="normal_tangent">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+  
+  <technique priority="50">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <!-- Inputs aren't used but here to let this tech have the same 'interface' as the one above -->
+    <input file="/shader-snippets/texCoord.inp" />
+    <input name="texNormal" type="tex2d" default="undefined" />
+    <input name="texNormalCompressed" type="tex2d" default="undefined" />
+    
+    <block location="cg:fragmentMain">
+      normal = half3 (0, 0, 1);
       normal_attr_perfragment = false;
-    <?endif?>
+    </block>
+    
+    <block location="cg:vertexMain">
+      normal = half3 (0, 0, 1);
+      normal_attr_perfragment = false;
     </block>
     
     <output name="normal" type="normal_tangent">
