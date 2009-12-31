@@ -964,7 +964,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     shaderPlug->PrintAnyListing();
     err = cgGetError();
     if ((err != CG_NO_ERROR)
-      || !cgGLIsProgramLoaded (program)) 
+      || ((flags & loadLoadToGL) && !cgGLIsProgramLoaded (program)))
     {
       //if (shaderPlug->debugDump)
 	//DoDebugDump();
