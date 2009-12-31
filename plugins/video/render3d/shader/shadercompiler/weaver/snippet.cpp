@@ -455,6 +455,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           return false;
         }
       }
+      else if (strcmp (def, "undefined") == 0)
+      {
+        newInput.defaultType = Technique::Input::Undefined;
+      }
       else
       {
         compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,

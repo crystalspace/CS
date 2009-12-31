@@ -598,6 +598,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                   return false;
                 }
 	        break;
+	      case Snippet::Technique::Input::Undefined:
+		break;
 	      case Snippet::Technique::Input::Value:
                 {
                   node.inputDefaults.Put (inp.name, inp.defaultValue);
@@ -787,7 +789,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      combiner->AddInput (inp.name, inp.type);
               inpRenamed = node.inputLinks.Get (inp.name, (const char*)0);
             }
-            combiner->InputRename (inpRenamed, inp.name);
+	    if (inpRenamed)
+	      combiner->InputRename (inpRenamed, inp.name);
 
             for (size_t a = 0; a < inp.attributes.GetSize(); a++)
             {

@@ -74,6 +74,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         enum
         {
           None,
+	  Undefined,
           Value,
           Complex
         } defaultType : 3;
