@@ -565,7 +565,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
           csString cacheFileTag =
             CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-          if (cacheFileTag != cacheTag) break;
+	  /* Note: empty cache tag means none was provided with the source;
+	     ignoring a mismatch here is okay: if the input data changed the
+	     hash stream will mismatch as well. The cache tag itself is then
+	     only used to verify technique data. */
+	  if (!cacheTag.IsEmpty() && (cacheFileTag != cacheTag)) break;
+	  if (cacheTag.IsEmpty()) cacheTag = cacheFileTag;
 
           // Extract hash stream
           csRef<iDataBuffer> hashStream = 
