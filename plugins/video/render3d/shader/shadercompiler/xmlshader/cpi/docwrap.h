@@ -497,7 +497,7 @@ class ConditionDumper
 public:
   ConditionDumper (csString* dumpOut, csConditionEvaluator* evaluator)
     : currentOut (dumpOut), currentEval (evaluator) {}
-  bool DoesDumping() const { return currentOut; }
+  bool DoesDumping() const { return currentOut != 0 ? true : false; }
   csString GetConditionString (size_t id) const
   { return currentEval ? currentEval->GetConditionString (id) : csString(); }
   void Dump (size_t id, const char* condStr, size_t condLen);
