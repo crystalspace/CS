@@ -89,7 +89,7 @@
   <coercion from="position4_world" to="position4_camera" cost="4">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/ModelView.inp" private="yes" />
     
     <block location="vertexMain">
       output = mul (ModelView, input);
@@ -103,9 +103,9 @@
   <!------------------------------------------------------------------------->
   
   <coercion from="direction_object" to="direction_tangent" cost="3">
-    <input file="/shader/combiner-cg/Normal.inp" private="yes" />
-    <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
-    <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Bitangent.inp" private="yes" />
     
     <block location="vertexMain">
       float3x3 obj2tang;
@@ -142,7 +142,7 @@
   <coercion from="direction_world" to="direction_camera" cost="3">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/ModelView.inp" private="yes" />
     
     <block location="vertexMain">
       output = mul (ModelView, float4 (input, 0)).xyz;
@@ -174,9 +174,9 @@
   </coercion>
   
   <coercion from="direction_tangent" to="direction_object" cost="3">
-    <input file="/shader/combiner-cg/Normal.inp" private="yes" />
-    <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
-    <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Bitangent.inp" private="yes" />
     
     <block location="vertexMain">
       float3x3 obj2tang;
@@ -202,7 +202,7 @@
   <coercion from="direction_object" to="direction_camera" cost="3">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/ModelView.inp" private="yes" />
     
     <block location="vertexMain">
       output = mul (ModelView, float4 (input, 0)).xyz;
@@ -216,9 +216,9 @@
   <!------------------------------------------------------------------------->
   
   <coercion from="normal_object" to="normal_tangent" cost="3">
-    <input file="/shader/combiner-cg/Normal.inp" private="yes" />
-    <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
-    <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Bitangent.inp" private="yes" />
     
     <block location="vertexMain">
       float3x3 obj2tang;
@@ -238,9 +238,9 @@
   </coercion>
   
   <coercion from="normal_tangent" to="normal_object" cost="3">
-    <input file="/shader/combiner-cg/Normal.inp" private="yes" />
-    <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
-    <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Bitangent.inp" private="yes" />
     
     <block location="vertexMain">
       float3x3 obj2tang;
@@ -314,7 +314,7 @@
   <coercion from="normal_object" to="normal_camera" cost="3">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/ModelView.inp" private="yes" />
     
     <block location="vertexMain">
       output = mul (ModelView, float4 (input, 0)).xyz;
