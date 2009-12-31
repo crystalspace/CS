@@ -1779,7 +1779,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 		   In FP2.0/PS1.x programs a constant will not be used
 		   correctly if it directly follows a sampler.
 		   Workaround: add an unused constant right after the sampler ... */
-		str.AppendFmt ("uniform float4 %s_Cg_WTF;", name);
+		str.AppendFmt ("uniform float4 %s_Cg_WTF;\n", name);
 	      }
     	      appender.Append (str);
             }
