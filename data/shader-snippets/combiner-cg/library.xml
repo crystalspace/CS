@@ -123,8 +123,8 @@
       obj2tang[2] = Normal;
       output =  mul (obj2tang, input);
     #else
-      // PS1.x can't do matrix mul ...
-      output = float3 (0, 0, 1);
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
     #endif
     </block>
   </coercion>
