@@ -93,6 +93,11 @@ bool csShaderGLCGFP::LoadProgramWithPS1 ()
   if (!pswrap)
     return false;
 
+  const char* objectCode = cgGetProgramString (program, CG_COMPILED_PROGRAM);
+  if (!objectCode || !*objectCode)
+    // Program did not actually compile
+    return false;
+
   csArray<csShaderVarMapping> mappings;
   
   for (size_t i = 0; i < variablemap.GetSize (); i++)
@@ -111,8 +116,7 @@ bool csShaderGLCGFP::LoadProgramWithPS1 ()
     }
   }
 
-  if (pswrap->Load (0, cgGetProgramString (program, CG_COMPILED_PROGRAM), 
-    mappings))
+  if (pswrap->Load (0, objectCode, mappings))
   {
     bool ret = pswrap->Compile (0);
     if (shaderPlug->debugDump)
@@ -158,8 +162,6 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
     tag->AttachNew (new scfString (tagStr));
     return ret;
   }
-
-  return true;
 }
 
 bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
