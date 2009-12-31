@@ -260,17 +260,8 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand (const csPixelShaderParser& parser,
 #undef CHECKED_CALL
 }
 
-bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
+bool csShaderGLPS1_ATI::LoadProgramStringToGL (const csPixelShaderParser& parser)
 {
-  if (!programBuffer.IsValid())
-    programBuffer = GetProgramData();
-  if(!programBuffer.IsValid())
-    return false;
-
-  csPixelShaderParser parser (shaderPlug->object_reg);
-
-  if(!parser.ParseProgram (programBuffer)) return false;
-
   const csArray<csPSConstant> &constants = parser.GetConstants ();
 
   size_t i;

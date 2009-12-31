@@ -25,6 +25,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
 
+#include "ps1_instr.h"
+
 struct csGLExtensionManager;
 class csGLStateCache;
 
@@ -47,9 +49,12 @@ public:
   bool useLists;
   bool doVerbose;
   bool dumpTo14ConverterOutput;
+  csPixelShaderVersion supportedPSVersion;
 
   csGLShader_PS1 (iBase *parent);
   virtual ~csGLShader_PS1 ();
+
+  const char* PSVersionStr (csPixelShaderVersion ver) const;
 
   
   /**\name iShaderProgramPlugin implementation

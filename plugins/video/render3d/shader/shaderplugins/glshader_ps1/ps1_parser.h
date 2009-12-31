@@ -87,9 +87,9 @@ public:
   ~csPixelShaderParser ();
 
   bool ParseProgram (iDataBuffer* program);
-  const csArray<csPSProgramInstruction> &GetParsedInstructionList ()
+  const csArray<csPSProgramInstruction> &GetParsedInstructionList () const
   { return program_instructions; }
-  const csArray<csPSConstant> &GetConstants ()
+  const csArray<csPSConstant> &GetConstants () const
   { return program_constants; }
 
   void GetInstructionString (const csPSProgramInstruction& instr,
@@ -97,7 +97,7 @@ public:
   void GetInstructionLine (const csPSProgramInstruction& instr,
     csString& str) const;
   void WriteProgram (const csArray<csPSProgramInstruction>& instr, 
-    csString& str);
+    csString& str) const;
 
   csPixelShaderVersion GetVersion () const { return version; };
 };

@@ -96,7 +96,7 @@ private:
 
   bool GetTextureShaderInstructions (
     const csArray<csPSProgramInstruction> &instrs);
-  bool GetNVInstructions (csPixelShaderParser& parser,
+  bool GetNVInstructions (const csPixelShaderParser& parser,
     const csArray<csPSProgramInstruction> &instrs);
   GLenum GetTexTarget();
 
@@ -111,7 +111,7 @@ public:
     glDeleteLists(program_num, 2);
   }
 
-  bool LoadProgramStringToGL ();
+  bool LoadProgramStringToGL (const csPixelShaderParser& parser);
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram

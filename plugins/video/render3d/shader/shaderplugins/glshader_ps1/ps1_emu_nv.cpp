@@ -394,7 +394,7 @@ bool csShaderGLPS1_NV::GetTextureShaderInstructions (
   return true;
 }
 
-bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
+bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
 					  const csArray<csPSProgramInstruction> &instrs)
 {
   for(size_t i = 0; i < instrs.GetSize (); i++)
@@ -702,17 +702,8 @@ bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
   return true;
 }
 
-bool csShaderGLPS1_NV::LoadProgramStringToGL ()
+bool csShaderGLPS1_NV::LoadProgramStringToGL (const csPixelShaderParser& parser)
 {
-  if (!programBuffer.IsValid())
-    programBuffer = GetProgramData();
-  if(!programBuffer.IsValid())
-    return false;
-
-  csPixelShaderParser parser (shaderPlug->object_reg);
-
-  if(!parser.ParseProgram (programBuffer)) return false;
-
   const csArray<csPSConstant> &constants = parser.GetConstants ();
 
   size_t i;
