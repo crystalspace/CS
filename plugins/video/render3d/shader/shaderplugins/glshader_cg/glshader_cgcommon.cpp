@@ -736,7 +736,7 @@ struct CachedShaderWrapper
 
 iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   iHierarchicalCache* cache, iBase* previous, iDocumentNode* node,
-  uint flags, csRef<iString>* failReason, csRef<iString>* tag)
+  csRef<iString>* failReason, csRef<iString>* tag)
 {
   if (!cache) return iShaderProgram::loadFail;
 
@@ -950,9 +950,11 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     
     ClipsToVmap();
     GetParamsFromVmap();
-    
+
+    bool doLoadToGL = !shaderPlug->ProfileNeedsRouting (programProfile);
+
     cgGetError(); // Clear error
-    if (flags & loadLoadToGL)
+    if (doLoadToGL)
     {
       cgGLLoadProgram (program);
     }
@@ -964,7 +966,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     shaderPlug->PrintAnyListing();
     err = cgGetError();
     if ((err != CG_NO_ERROR)
-      || ((flags & loadLoadToGL) && !cgGLIsProgramLoaded (program)))
+      || (doLoadToGL && !cgGLIsProgramLoaded (program)))
     {
       //if (shaderPlug->debugDump)
 	//DoDebugDump();
@@ -993,7 +995,16 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       
     tag->AttachNew (new scfString (wrapper.name));
     
-    return iShaderProgram::loadSuccessShaderValid;
+    if (shaderPlug->ProfileNeedsRouting (programProfile))
+    {
+      return LoadProgramWithPS1 ()
+        ? iShaderProgram::loadSuccessShaderValid
+        : iShaderProgram::loadSuccessShaderInvalid;
+    }
+    else
+    {
+      return iShaderProgram::loadSuccessShaderValid;
+    }
   }
   
   if (failReason) failReason->AttachNew (
@@ -1001,12 +1012,48 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   return oneReadCorrectly ? iShaderProgram::loadSuccessShaderInvalid : iShaderProgram::loadFail;
 }
 
-iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
-  iHierarchicalCache* cache, iBase* previous, iDocumentNode* node,
-  csRef<iString>* failReason, csRef<iString>* tag)
+bool csShaderGLCGCommon::LoadProgramWithPS1 ()
 {
-  return LoadFromCache (cache, previous, node, loadLoadToGL, failReason, tag);
-}
+  pswrap = shaderPlug->psplg->CreateProgram ("fp");
+
+  if (!pswrap)
+    return false;
+
+  const char* objectCode = cgGetProgramString (program, CG_COMPILED_PROGRAM);
+  if (!objectCode || !*objectCode)
+    // Program did not actually compile
+    return false;
+
+  csArray<csShaderVarMapping> mappings;
   
+  for (size_t i = 0; i < variablemap.GetSize (); i++)
+  {
+    // Get the Cg parameter
+    ShaderParameter* sparam =
+      reinterpret_cast<ShaderParameter*> (variablemap[i].userVal);
+    // Make sure it's a C-register
+    CGresource resource = cgGetParameterResource (sparam->param);
+    if (resource == CG_C)
+    {
+      // Get the register number, and create a mapping
+      csString regnum;
+      regnum.Format ("c%lu", cgGetParameterResourceIndex (sparam->param));
+      mappings.Push (csShaderVarMapping (variablemap[i].name, regnum));
+    }
+  }
+
+  if (pswrap->Load (0, objectCode, mappings))
+  {
+    bool ret = pswrap->Compile (0);
+    if (shaderPlug->debugDump)
+      DoDebugDump();
+    return ret;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(GLShaderCg)

@@ -584,37 +584,25 @@ bool csGLShader_CG::Open()
   cgGLSetDebugMode (config->GetBool ("Video.OpenGL.Shader.Cg.CgDebugMode",
     false));
  
-  // Check if the requested profile needs routing.
-  bool doRoute = ProfileNeedsRouting (currentLimits.fp.profile);
-
   if (enableFP)
   {
-    if (currentLimits.fp.profile != CG_PROFILE_UNKNOWN)
+    // Load PS1 plugin, might be needed later
+    psplg = csLoadPluginCheck<iShaderProgramPlugin> (object_reg,
+      "crystalspace.graphics3d.shader.glps1", false);
+    if(!psplg)
     {
-      // Load PS1 plugin, if requested and/or needed
       if (doVerbose)
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-          "Routing Cg fragment programs to Pixel Shader plugin %s", 
-          doRoute ? "ON" : "OFF");
-      if (doRoute)
+        Report (CS_REPORTER_SEVERITY_WARNING,
+            "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
+            "routing unavailable.");
+      if (ProfileNeedsRouting (currentLimits.fp.profile))
       {
-        psplg = csLoadPluginCheck<iShaderProgramPlugin> (object_reg,
-          "crystalspace.graphics3d.shader.glps1", false);
-        if(!psplg)
-        {
-          if (doVerbose)
-            Report (CS_REPORTER_SEVERITY_WARNING,
-                "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
-                "routing unavailable.");
 	  ProfileLimits limits (vendor,
 	    cgGLGetLatestProfile (CG_GL_FRAGMENT));
 	  limits.GetCurrentLimits (ext);
 	  currentLimits.fp = limits;
-        }
       }
     }
-    else
-      enableFP = false;
     if (doVerbose)
       Report (CS_REPORTER_SEVERITY_NOTIFY,
 	"Using fragment program limits: %s",

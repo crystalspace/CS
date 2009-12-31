@@ -86,56 +86,13 @@ void csShaderGLCGFP::ResetState()
   csShaderGLCGCommon::ResetState();
 }
 
-bool csShaderGLCGFP::LoadProgramWithPS1 ()
-{
-  pswrap = shaderPlug->psplg->CreateProgram ("fp");
-
-  if (!pswrap)
-    return false;
-
-  const char* objectCode = cgGetProgramString (program, CG_COMPILED_PROGRAM);
-  if (!objectCode || !*objectCode)
-    // Program did not actually compile
-    return false;
-
-  csArray<csShaderVarMapping> mappings;
-  
-  for (size_t i = 0; i < variablemap.GetSize (); i++)
-  {
-    // Get the Cg parameter
-    ShaderParameter* sparam =
-      reinterpret_cast<ShaderParameter*> (variablemap[i].userVal);
-    // Make sure it's a C-register
-    CGresource resource = cgGetParameterResource (sparam->param);
-    if (resource == CG_C)
-    {
-      // Get the register number, and create a mapping
-      csString regnum;
-      regnum.Format ("c%lu", cgGetParameterResourceIndex (sparam->param));
-      mappings.Push (csShaderVarMapping (variablemap[i].name, regnum));
-    }
-  }
-
-  if (pswrap->Load (0, objectCode, mappings))
-  {
-    bool ret = pswrap->Compile (0);
-    if (shaderPlug->debugDump)
-      DoDebugDump();
-    return ret;
-  }
-  else
-  {
-    return false;
-  }
-}
-
 bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
 {
   if (!shaderPlug->enableFP) return false;
 
   // See if we want to wrap through the PS plugin
-  // (psplg will be 0 if wrapping isn't wanted)
-  if (shaderPlug->psplg)
+  if (shaderPlug->ProfileNeedsRouting (shaderPlug->currentLimits.fp.profile)
+      && shaderPlug->psplg)
   {
     bool ret = TryCompile (loadApplyVmap,
       shaderPlug->currentLimits);
@@ -303,28 +260,6 @@ bool csShaderGLCGFP::TryCompile (uint loadFlags,
     limits, loadFlags | loadFlagUnusedV2FForInit);
     
   return ret;
-}
-
-iShaderProgram::CacheLoadResult csShaderGLCGFP::LoadFromCache (
-  iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
-  csRef<iString>* failReason, csRef<iString>* tag)
-{
-  if (shaderPlug->psplg)
-  {
-    iShaderProgram::CacheLoadResult res =
-      csShaderGLCGCommon::LoadFromCache (cache, previous, programNode, 0,
-					 failReason, tag);
-    if (res == iShaderProgram::loadSuccessShaderValid)
-    {
-      return LoadProgramWithPS1 ()
-	? iShaderProgram::loadSuccessShaderValid
-	: iShaderProgram::loadSuccessShaderInvalid;
-    }
-    return res;
-  }
-  
-  return csShaderGLCGCommon::LoadFromCache (cache, previous, programNode,
-					    failReason, tag);
 }
 
 int csShaderGLCGFP::ResolveTU (const char* binding)

@@ -81,6 +81,9 @@ protected:
   csString entrypoint;
   csRefArray<iDocumentNode> cacheKeepNodes;
 
+  // Wrapped PS1.x shader program
+  csRef<iShaderProgram> pswrap;
+  
   enum ProgramType
   {
     progVP, progFP
@@ -188,6 +191,8 @@ protected:
     const ProfileLimitsPair& limitsPair, const char* tag);
   
   bool GetProgramNode (iDocumentNode* passProgNode);
+
+  bool LoadProgramWithPS1 ();
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 
@@ -229,9 +234,6 @@ public:
   const csSet<csString>& GetUnusedParameters ()
   { return unusedParams; }
   
-  iShaderProgram::CacheLoadResult LoadFromCache (
-    iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
-    uint flags, csRef<iString>* failReason = 0, csRef<iString>* = 0);
   virtual iShaderProgram::CacheLoadResult LoadFromCache (
     iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
     csRef<iString>* failReason = 0, csRef<iString>* = 0);

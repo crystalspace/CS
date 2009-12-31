@@ -39,9 +39,6 @@ class csShaderGLCGFP : public csShaderGLCGCommon
 private:
   csGLStateCache* statecache;
 
-  csRef<iShaderProgram> pswrap;
-  
-  bool LoadProgramWithPS1 ();
   bool TryCompile (uint loadFlags, const ProfileLimitsPair& limits);
 public:
   ProfileLimitsPair cacheLimits;
@@ -85,9 +82,9 @@ public:
     csShaderGLCGCommon::GetUsedShaderVars (bits);
   }
   
-  iShaderProgram::CacheLoadResult LoadFromCache (
+  /*iShaderProgram::CacheLoadResult LoadFromCache (
     iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
-    csRef<iString>* failReason = 0, csRef<iString>* = 0);
+    csRef<iString>* failReason = 0, csRef<iString>* = 0);*/
 };
 
 }
