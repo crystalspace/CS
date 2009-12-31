@@ -1797,11 +1797,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   {
     const ShaderWeaver::TypeInfo* typeInfo = 
       ShaderWeaver::QueryTypeInfo (weaverType);
+    csString result;
     if (typeInfo)
     {
-      return CgType (typeInfo);
+      result = CgType (typeInfo);
     }
-    return weaverType; // @@@ Hmmm... what fallback, if any?
+    // @@@ Hmmm... what fallback, if any?
+    return result.IsEmpty() ? csString (weaverType) : result;
   }
   
   csString ShaderCombinerCg::CgType (const ShaderWeaver::TypeInfo* typeInfo)
@@ -1827,6 +1829,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	else
 	  return csString().Format ("sampler%dD", typeInfo->dimensions);
     }
+    return csString();
   }
 
   csString ShaderCombinerCg::GetAttrIdentifier (const char* var, 
