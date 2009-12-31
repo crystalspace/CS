@@ -781,7 +781,7 @@ public:
    * 
    * \param origin The array to push at the end of this array.
    */
-  void MergeAll(const csArray& origin)
+  void Merge(const csArray& origin)
   {
     for(size_t i = 0; i < origin.GetSize(); i++)
       Push(origin.Get(i));
