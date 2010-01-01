@@ -521,6 +521,11 @@ csPtr<iRigidBody> csBulletDynamicsSystem::CreateBody ()
 
 void csBulletDynamicsSystem::RemoveBody (iRigidBody* body)
 {
+  csBulletRigidBody* csBody = dynamic_cast<csBulletRigidBody*> (body);
+  CS_ASSERT (csBody);
+  if (csBody->body)
+    bulletWorld->removeRigidBody (csBody->body);
+
   dynamicBodies.Delete (body);
 }
 
