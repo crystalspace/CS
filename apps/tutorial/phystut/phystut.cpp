@@ -44,7 +44,6 @@ Simple::Simple (iObjectRegistry* object_reg)
   allStatic = false;
   pauseDynamic = false;
   dynamicSpeed = 1.0f;
-  rotX = rotY = 0.0f;
 }
 
 Simple::~Simple ()
@@ -72,12 +71,12 @@ void Simple::SetupFrame ()
       view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_DOWN, speed);
     if (kbd->GetKeyState (CSKEY_UP))
     {
-      avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform()
+      cameraBody->SetLinearVelocity (view->GetCamera()->GetTransform()
 				     .GetT2O () * csVector3 (0, 0, 5));
     }
     if (kbd->GetKeyState (CSKEY_DOWN))
     {
-      avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform()
+      cameraBody->SetLinearVelocity (view->GetCamera()->GetTransform()
 				     .GetT2O () * csVector3 (0, 0, -5));
     }
   }
@@ -112,36 +111,31 @@ void Simple::SetupFrame ()
       if (kbd->GetKeyState (CSKEY_LEFT))
 	rotY -= speed;
       if (kbd->GetKeyState (CSKEY_PGUP))
-	rotX += speed;
+	rotX -=speed;
       if (kbd->GetKeyState (CSKEY_PGDN))
-	rotX -= speed;
+	rotX += speed;
       if (kbd->GetKeyState (CSKEY_UP))
 	c->Move (CS_VEC_FORWARD * 4 * speed);
       if (kbd->GetKeyState (CSKEY_DOWN))
 	c->Move (CS_VEC_BACKWARD * 4 * speed);
     }
 
-    // We now assign a new rotation transformation to the camera.  You
-    // can think of the rotation this way: starting from the zero
-    // position, you first rotate "rotY" radians on your Y axis to get
-    // the first rotation.  From there you rotate "rotX" radians on the
-    // your X axis to get the final rotation.  We multiply the
-    // individual rotations on each axis together to get a single
-    // rotation matrix.  The rotations are applied in right to left
-    // order .
-    csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-    csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+    // We now assign a new rotation transformation to the camera.
+    csQuaternion quaternion;
+    quaternion.SetEulerAngles (csVector3 (rotX, rotY, rotZ));
+    csOrthoTransform ot (quaternion.GetConjugate ().GetMatrix (), c->GetTransform().GetOrigin ());
     c->SetTransform (ot);
   }
 
+  // Step the dynamic simulation
   if (!pauseDynamic)
     dyn->Step (speed / dynamicSpeed);
 
+  // Update camera position if it is controlled by a rigid body
   if (cameraMode == CAMERA_BODY)
   {
-    view->GetCamera()->GetTransform().SetOrigin(
-				    avatarbody->GetTransform().GetOrigin());
-    //avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
+    view->GetCamera()->GetTransform().SetOrigin
+      (cameraBody->GetTransform().GetOrigin());
   }
 
   // Tell 3D driver we're going to display 3D things.
@@ -399,13 +393,6 @@ bool Simple::HandleEvent (iEvent& ev)
 	return true;
       }
     }
-    else if ((ev.Name == KeyboardUp)
-	     && ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) 
-	      || (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
-    {
-      avatarbody->SetLinearVelocity(csVector3 (0, 0, 0));
-      avatarbody->SetAngularVelocity (csVector3 (0, 0, 0));
-    }
   }
 
   return false;
@@ -455,7 +442,7 @@ bool Simple::Initialize ()
     csPrintf ("Usage: phystut [OPTIONS]\n");
     csPrintf ("Physics tutorial for crystalspace\n\n");
     csPrintf ("Options for phystut:\n");
-    csPrintf ("  -phys_engine:      specify which physics plugin to use\n");
+    csPrintf ("  -phys_engine:      specify which physics plugin to use (ode, bullet)\n");
     csCommandLineHelper::Help (object_reg);
     return false;
   }
@@ -741,36 +728,32 @@ void Simple::Shutdown ()
 
 void Simple::UpdateCameraMode ()
 {
+  // The camera is controlled by a rigid body
   if (cameraMode == CAMERA_BODY)
   {
     // Use the camera transform.
     const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
-    // Create the avatar.
-    avatar = engine->CreateMeshWrapper (boxFact, "box", room);
-
-    // Create a body and attach the mesh.
-    avatarbody = dynSys->CreateBody ();
-    avatarbody->SetProperties (1, csVector3 (0), csMatrix3 ());
-    avatarbody->SetPosition (tc.GetOrigin ());
-    avatarbody->AttachMesh (avatar);
-
-    // Create and attach a box collider.
-    // const csMatrix3 tmm;
-    // const csVector3 tvv (0);
-    // csOrthoTransform tt (tmm, tvv);
-    // csVector3 size (0.4f, 0.8f, 0.4f); // This should be same size as mesh.
-    // avatarbody->AttachColliderBox (size, tt, 10, 1, 0.8f);
-    avatarbody->AttachColliderSphere (0.8f, csVector3 (0), 10, 1, 0.8f);
+    // Create a body
+    cameraBody = dynSys->CreateBody ();
+    cameraBody->SetProperties (1, csVector3 (0), csMatrix3 ());
+    cameraBody->SetTransform (tc);
+    cameraBody->AttachColliderSphere (0.8f, csVector3 (0), 10, 1, 0.8f);
   }
 
+  // The camera is free
   else
   {
-    dynSys->RemoveBody (avatarbody);
-    engine->WantToDie (avatar);
-    avatar = 0;
+    dynSys->RemoveBody (cameraBody);
+    cameraBody = 0;
 
-    // TODO: update RotX, rotY
+    // Update rotX, rotY, rotZ
+    csQuaternion quaternion;
+    quaternion.SetMatrix (((csReversibleTransform) view->GetCamera ()->GetTransform ()).GetT2O ());
+    csVector3 eulerAngles = quaternion.GetEulerAngles ();
+    rotX = eulerAngles.x;
+    rotY = eulerAngles.y;
+    rotZ = eulerAngles.z;
   }
 }
 
@@ -1452,9 +1435,15 @@ void Simple::CreateRagdoll ()
   // Create animesh
   ragdollMesh = engine->CreateMeshWrapper (meshfact, "Frankie",
 					   room, csVector3 (0, -4, 0));
-
   csRef<iAnimatedMesh> animesh =
     scfQueryInterface<iAnimatedMesh> (ragdollMesh->GetMeshObject ());
+
+  // Close the eyes of Frankie as he is dead
+  csRef<iAnimatedMeshFactory> animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+    (meshfact->GetMeshObjectFactory ());
+
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"), -1.0f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 1.0f);
 
   // Position the body
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();

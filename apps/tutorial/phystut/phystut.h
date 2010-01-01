@@ -78,11 +78,10 @@ private:
 
   csRef<iMeshWrapper> walls;
 
+  // Camera related
   int cameraMode;
-  csRef<iMeshWrapper> avatar;
-  csRef<iRigidBody> avatarbody;
-  // Current orientation of the camera.
-  float rotX, rotY;
+  csRef<iRigidBody> cameraBody;
+  float rotX, rotY, rotZ;
 
   csDynamicSystemDebugger dynSysDebugger;
   bool debugMode;
