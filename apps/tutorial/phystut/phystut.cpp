@@ -393,6 +393,16 @@ bool Simple::HandleEvent (iEvent& ev)
 	return true;
       }
     }
+
+    // Slow down the camera's body
+    else if (cameraMode == CAMERA_BODY
+	     && (ev.Name == KeyboardUp)
+	     && ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) 
+	      || (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
+    {
+      cameraBody->SetLinearVelocity(csVector3 (0, 0, 0));
+      cameraBody->SetAngularVelocity (csVector3 (0, 0, 0));
+    }
   }
 
   return false;
