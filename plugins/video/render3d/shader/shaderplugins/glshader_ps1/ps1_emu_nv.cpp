@@ -108,7 +108,7 @@ void csShaderGLPS1_NV::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
     }
   }
 
-  if (texture_shader_stages.GetSize () > 0)
+  if (numTextureStages > 0)
   {
     // Has to go here at least the first time so that we can find
     // the correct texture targets
@@ -149,11 +149,9 @@ void csShaderGLPS1_NV::ResetState ()
 
 void csShaderGLPS1_NV::ActivateTextureShaders ()
 {
-  size_t i;
-
-  for(i = 0; i < texture_shader_stages.GetSize (); i++)
+  for(int i = 0; i < numTextureStages; i++)
   {
-    const nv_texture_shader_stage &shader = texture_shader_stages.Get(i);
+    const nv_texture_shader_stage &shader = texture_shader_stages[i];
 
     shaderPlug->stateCache->SetCurrentTCUnit (shader.stage);
     shaderPlug->stateCache->ActivateTCUnit (csGLStateCache::activateTexEnv);
@@ -274,24 +272,25 @@ bool csShaderGLPS1_NV::ActivateRegisterCombiners ()
 {
   csGLExtensionManager *ext = shaderPlug->ext;
 
+  glGetError(); // Clear any pending error
+
   ext->glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV,
-    num_combiners);
+    num_stages);
 
-  GLenum glstage = GL_COMBINER0_NV;
-
-  for(size_t i = 0; i < stages.GetSize (); i++)
+  for (int i = 0; i < num_combiners; i++)
   {
-    const nv_combiner_stage &stage = stages.Get (i);
-    for(size_t j = 0; j < stage.inputs.GetSize (); j++)
+    const nv_combiner_stage &stage = stages[i];
+    GLenum glstage = GL_COMBINER0_NV + stage.stageNum;
+    for (int j = 0; j < stage.numInputs; j++)
     {
-      const nv_input &input = stage.inputs.Get (j);
+      const nv_input &input = stage.inputs[j];
       ext->glCombinerInputNV (glstage, input.portion, input.variable,
         input.input, input.mapping, input.component);
       if(glGetError() == GL_INVALID_OPERATION)
       {
         if (shaderPlug->doVerbose)
           Report (CS_REPORTER_SEVERITY_WARNING,
-            "glCombinerInputNV #%zu returned GL_INVALID_OPERATION on stage %zu!",
+            "glCombinerInputNV #%d returned GL_INVALID_OPERATION on stage %d!",
             j, i);
         return false;
       }
@@ -304,23 +303,9 @@ bool csShaderGLPS1_NV::ActivateRegisterCombiners ()
     {
       if (shaderPlug->doVerbose)
         Report (CS_REPORTER_SEVERITY_WARNING,
-          "glCombinerOutputNV returned GL_INVALID_OPERATION on stage %zu!",
+          "glCombinerOutputNV returned GL_INVALID_OPERATION on stage %d!",
           i);
       return false;
-    }
-    if(i+1 < stages.GetSize ())
-    {
-      nv_combiner_stage &next = stages.Get (i+1);
-      /* If there is any difference in outputs, or it's not
-       * using the alpha channel, increment the register
-       * combiner stage */
-      if(!(next.output.abOutput == stage.output.abOutput
-        && next.output.cdOutput == stage.output.cdOutput
-        && next.output.sumOutput == stage.output.sumOutput
-        && next.output.portion == GL_ALPHA))
-      {
-        glstage ++;
-      }
     }
   }
 
@@ -388,15 +373,26 @@ bool csShaderGLPS1_NV::GetTextureShaderInstructions (
     texshader.stage = stage;
     texshader.previous = previous;
     texshader.param = param;
-    texture_shader_stages.Push (texshader);
+    if (numTextureStages >= maxTextureStages) return false;
+    texture_shader_stages[numTextureStages++] = texshader;
   }
 
   return true;
 }
 
+enum CombinerPipe
+{
+  pipeInvalid,
+  pipeRGB,
+  pipeA
+};
+
 bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
 					  const csArray<csPSProgramInstruction> &instrs)
 {
+  CombinerPipe lastPipe = pipeInvalid;
+  int currentStage = 0;
+  int stageConsts = 0;
   for(size_t i = 0; i < instrs.GetSize (); i++)
   {
     const csPSProgramInstruction &inst = instrs.Get(i);
@@ -405,7 +401,7 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
      * shader portion */
     if(inst.instruction >= CS_PS_INS_TEX) continue;
 
-    GLenum portion = GL_RGB;
+    CombinerPipe nextPipe = pipeRGB;
     bool both_pipelines = true;
 
     if(inst.instruction == CS_PS_INS_DP3)
@@ -414,7 +410,7 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
     if(inst.dest_reg_mods == CS_PS_WMASK_ALPHA)
     {
       // Write to alpha (scalar) pipeline only
-      portion = GL_ALPHA;
+      nextPipe = pipeA;
       both_pipelines = false;
     }
     else if(inst.dest_reg_mods == (CS_PS_WMASK_RED | CS_PS_WMASK_BLUE
@@ -423,6 +419,16 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
       // Write to color (vector) pipeline only
       both_pipelines = false;
     }
+
+    int instConsts = inst.NumDistinctConstantsUsed();
+    // Check if we need to advance a combiner stage
+    if ((nextPipe <= lastPipe) // A must come after RGB
+        || (stageConsts + instConsts > maxConstsPerStage)) // Too many constants for one stage
+    {
+      currentStage++;
+      stageConsts = 0;
+    }
+    if (currentStage >= maxCombinerStages) return false;
 
     // NV_r_c based register targets
     GLenum dest = GL_DISCARD_NV, src[3] = {GL_ZERO, GL_ZERO, GL_ZERO};
@@ -448,7 +454,7 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
       return false;
     }
 
-    int con_first = -1, con_second = -1;
+    nv_constant_pair& const_pair = constant_pairs[currentStage];
 
     // Convert the PS1.x registers to NV_r_c equivalents
     for(int j=0;j<4;j++)
@@ -478,24 +484,26 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
           *out = GL_TEXTURE0_ARB + in_num;
           break;
         case CS_PS_REG_CONSTANT:
-          if(con_first < 0)
+          if (const_pair.constant[0] == in_num)
           {
             *out = GL_CONSTANT_COLOR0_NV;
-            con_first = in_num;
+          }
+          else if (const_pair.constant[1] == in_num)
+          {
+            *out = GL_CONSTANT_COLOR1_NV;
           }
           else
           {
-            *out = GL_CONSTANT_COLOR1_NV;
-            con_second = in_num;
+            int c = stageConsts++;
+            *out = GL_CONSTANT_COLOR0_NV+c;
+            const_pair.constant[c] = in_num;
           }
           break;
         case CS_PS_REG_TEMP:
-          if(in_num == 0) *out = GL_SPARE0_NV;
-          else *out = GL_SPARE1_NV;
+          *out = GL_SPARE0_NV + in_num;
           break;
         case CS_PS_REG_COLOR:
-          if(in_num == 0) *out = GL_PRIMARY_COLOR_NV;
-          else *out = GL_SECONDARY_COLOR_NV;
+          *out = GL_PRIMARY_COLOR_NV + in_num;
           break;
         default:
 	  break;
@@ -570,7 +578,8 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
 
     for(int i=0;i<(both_pipelines ? 2 : 1);i++)
     {
-      if(i==1) // alpha half
+      GLenum portion;
+      if ((nextPipe == pipeA) || (i==1)) // alpha half
       {
         portion = GL_ALPHA;
         for(int j=0;j<3;j++)
@@ -578,11 +587,12 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
           component[j] = GL_ALPHA;
         }
       }
+      else
+        portion = GL_RGB;
       // NV register combiner stage
       nv_combiner_stage combiner;
 
-      combiner.con_first = con_first;
-      combiner.con_second = con_second;
+      combiner.stageNum = currentStage;
       combiner.output.portion = portion;
       combiner.output.abOutput = GL_DISCARD_NV;
       combiner.output.cdOutput = GL_DISCARD_NV;
@@ -596,14 +606,15 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
       switch(inst.instruction)
       {
         case CS_PS_INS_ADD:
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-            src[0], mapping[0], component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-            src[1], mapping[1], component[1]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]));
+          combiner.numInputs = 4;
+          combiner.inputs[0] = nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]);
+          combiner.inputs[1] = nv_input(portion, GL_VARIABLE_B_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]);
+          combiner.inputs[2] = nv_input(portion, GL_VARIABLE_C_NV,
+            src[1], mapping[1], component[1]);
+          combiner.inputs[3] = nv_input(portion, GL_VARIABLE_D_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]);
           combiner.output.sumOutput = dest;
           break;
         case CS_PS_INS_BEM:
@@ -617,22 +628,24 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
               "NV_register_combiners does not support the 'cmp' instruction");
 	  return false;
         case CS_PS_INS_CND:
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-            src[0], mapping[0], component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-            src[1], mapping[1], component[1]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]));
+          combiner.numInputs = 4;
+          combiner.inputs[0] = nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]);
+          combiner.inputs[1] = nv_input(portion, GL_VARIABLE_B_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]);
+          combiner.inputs[2] = nv_input(portion, GL_VARIABLE_C_NV,
+            src[1], mapping[1], component[1]);
+          combiner.inputs[3] = nv_input(portion, GL_VARIABLE_D_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]);
           combiner.output.sumOutput = dest;
           combiner.output.muxSum = GL_TRUE;
           break;
         case CS_PS_INS_DP3:
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-            src[0], mapping[0], component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-            src[1], mapping[1], component[1]));
+          combiner.numInputs = 2;
+          combiner.inputs[0] = nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]);
+          combiner.inputs[1] = nv_input(portion, GL_VARIABLE_B_NV,
+            src[1], mapping[1], component[1]);
           combiner.output.abOutput = dest;
           combiner.output.abDotProduct = GL_TRUE;
           break;
@@ -643,62 +656,73 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
               products.");
           return false;
         case CS_PS_INS_LRP:
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-            src[0], GL_UNSIGNED_IDENTITY_NV, component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-            src[1], mapping[1], component[1]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-            src[0], GL_UNSIGNED_INVERT_NV, component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-            src[2], mapping[2], component[2]));
+          combiner.numInputs = 4;
+          combiner.inputs[0] = nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], GL_UNSIGNED_IDENTITY_NV, component[0]);
+          combiner.inputs[1] = nv_input(portion, GL_VARIABLE_B_NV,
+            src[1], mapping[1], component[1]);
+          combiner.inputs[2] = nv_input(portion, GL_VARIABLE_C_NV,
+            src[0], GL_UNSIGNED_INVERT_NV, component[0]);
+          combiner.inputs[3] = nv_input(portion, GL_VARIABLE_D_NV,
+            src[2], mapping[2], component[2]);
           combiner.output.sumOutput = dest;
           break;
         case CS_PS_INS_MAD:
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-            src[0], mapping[0], component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-            src[1], mapping[1], component[1]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-            src[2], mapping[2], component[2]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[2]));
+          combiner.numInputs = 4;
+          combiner.inputs[0] = nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]);
+          combiner.inputs[1] = nv_input(portion, GL_VARIABLE_B_NV,
+            src[1], mapping[1], component[1]);
+          combiner.inputs[2] = nv_input(portion, GL_VARIABLE_C_NV,
+            src[2], mapping[2], component[2]);
+          combiner.inputs[3] = nv_input(portion, GL_VARIABLE_D_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[2]);
           combiner.output.sumOutput = dest;
           break;
         case CS_PS_INS_MOV:
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-            src[0], mapping[0], component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-            GL_ZERO, GL_UNSIGNED_IDENTITY_NV, component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-            GL_ZERO, GL_UNSIGNED_IDENTITY_NV, component[0]));
+          combiner.numInputs = 4;
+          combiner.inputs[0] = nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]);
+          combiner.inputs[1] = nv_input(portion, GL_VARIABLE_B_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]);
+          combiner.inputs[2] = nv_input(portion, GL_VARIABLE_C_NV,
+            GL_ZERO, GL_UNSIGNED_IDENTITY_NV, component[0]);
+          combiner.inputs[3] = nv_input(portion, GL_VARIABLE_D_NV,
+            GL_ZERO, GL_UNSIGNED_IDENTITY_NV, component[0]);
           combiner.output.sumOutput = dest;
           break;
         case CS_PS_INS_MUL:
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-            src[0], mapping[0], component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-            src[1], mapping[1], component[1]));
+          combiner.numInputs = 2;
+          combiner.inputs[0] = nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]);
+          combiner.inputs[1] = nv_input(portion, GL_VARIABLE_B_NV,
+            src[1], mapping[1], component[1]);
           combiner.output.abOutput = dest;
           break;
         case CS_PS_INS_SUB:
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-            src[0], mapping[0], component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-            src[1], GL_SIGNED_NEGATE_NV, component[1]));
-          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]));
+          combiner.numInputs = 4;
+          combiner.inputs[0] = nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]);
+          combiner.inputs[1] = nv_input(portion, GL_VARIABLE_B_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]);
+          combiner.inputs[2] = nv_input(portion, GL_VARIABLE_C_NV,
+            src[1], GL_SIGNED_NEGATE_NV, component[1]);
+          combiner.inputs[3] = nv_input(portion, GL_VARIABLE_D_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]);
           combiner.output.sumOutput = dest;
           break;
         default:
           break;
       }
-      stages.Push (combiner);
+      stages[num_combiners++] = combiner;
     }
+    // Force new combiner for next instruction
+    if (both_pipelines)
+      lastPipe = pipeA;
+    else
+      lastPipe = nextPipe;
   }
+  num_stages = currentStage+1;
   return true;
 }
 
@@ -706,9 +730,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL (const csPixelShaderParser& parser)
 {
   const csArray<csPSConstant> &constants = parser.GetConstants ();
 
-  size_t i;
-
-  for(i = 0; i < constants.GetSize (); i++)
+  for(size_t i = 0; i < constants.GetSize (); i++)
   {
     const csPSConstant& constant = constants.Get (i);
 
@@ -726,35 +748,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL (const csPixelShaderParser& parser)
   // Then translate PS instructions into NV_register_combiners info
   if(!GetNVInstructions (parser, instrs)) return false;
 
-  if(stages.GetSize () < 1) return false;
-
-  num_combiners = 0;
-  int prev_combiner = -1;
-  for(i = 0; i < stages.GetSize (); i++)
-  {
-    const nv_combiner_stage &stage = stages.Get (i);
-    if(prev_combiner != num_combiners)
-    {
-      nv_constant_pair& constant_pair = constant_pairs[num_combiners];
-      constant_pair.constant[0] = stage.con_first;
-      constant_pair.constant[1] = stage.con_second;
-      prev_combiner = num_combiners;
-    }
-    if(i+1 < stages.GetSize ())
-    {
-      nv_combiner_stage &next = stages.Get (i+1);
-      /* If there is any difference in outputs, or it's not
-       * using the alpha channel, increment the register
-       * combiner stage */
-      if(!(next.output.abOutput == stage.output.abOutput
-        && next.output.cdOutput == stage.output.cdOutput
-        && next.output.sumOutput == stage.output.sumOutput
-        && next.output.portion == GL_ALPHA))
-      {
-        num_combiners ++;
-      }
-    }
-  }
+  if(num_combiners < 1) return false;
 
   bool ret = true;
   if (shaderPlug->useLists)
