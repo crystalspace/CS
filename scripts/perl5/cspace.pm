@@ -362,6 +362,8 @@ sub new {
 *Get = *cspacec::Vector2Array_Get;
 *Put = *cspacec::Vector2Array_Put;
 *Push = *cspacec::Vector2Array_Push;
+*Merge = *cspacec::Vector2Array_Merge;
+*MergeSmart = *cspacec::Vector2Array_MergeSmart;
 *Pop = *cspacec::Vector2Array_Pop;
 *Top = *cspacec::Vector2Array_Top;
 *Insert = *cspacec::Vector2Array_Insert;
@@ -462,6 +464,8 @@ sub new {
 *Get = *cspacec::Vector3Array_Get;
 *Put = *cspacec::Vector3Array_Put;
 *Push = *cspacec::Vector3Array_Push;
+*Merge = *cspacec::Vector3Array_Merge;
+*MergeSmart = *cspacec::Vector3Array_MergeSmart;
 *Pop = *cspacec::Vector3Array_Pop;
 *Top = *cspacec::Vector3Array_Top;
 *Insert = *cspacec::Vector3Array_Insert;
@@ -562,6 +566,8 @@ sub new {
 *Get = *cspacec::Vector4Array_Get;
 *Put = *cspacec::Vector4Array_Put;
 *Push = *cspacec::Vector4Array_Push;
+*Merge = *cspacec::Vector4Array_Merge;
+*MergeSmart = *cspacec::Vector4Array_MergeSmart;
 *Pop = *cspacec::Vector4Array_Pop;
 *Top = *cspacec::Vector4Array_Top;
 *Insert = *cspacec::Vector4Array_Insert;
@@ -662,6 +668,8 @@ sub new {
 *Get = *cspacec::UIntArray_Get;
 *Put = *cspacec::UIntArray_Put;
 *Push = *cspacec::UIntArray_Push;
+*Merge = *cspacec::UIntArray_Merge;
+*MergeSmart = *cspacec::UIntArray_MergeSmart;
 *Pop = *cspacec::UIntArray_Pop;
 *Top = *cspacec::UIntArray_Top;
 *Insert = *cspacec::UIntArray_Insert;
@@ -1731,6 +1739,8 @@ sub new {
 *GetSize = *cspacec::csPluginRequestArray_GetSize;
 *Get = *cspacec::csPluginRequestArray_Get;
 *Push = *cspacec::csPluginRequestArray_Push;
+*Merge = *cspacec::csPluginRequestArray_Merge;
+*MergeSmart = *cspacec::csPluginRequestArray_MergeSmart;
 *Pop = *cspacec::csPluginRequestArray_Pop;
 *Top = *cspacec::csPluginRequestArray_Top;
 *Insert = *cspacec::csPluginRequestArray_Insert;
@@ -8933,6 +8943,8 @@ sub new {
 *Get = *cspacec::csImageIOFileFormatDescriptions_Get;
 *Put = *cspacec::csImageIOFileFormatDescriptions_Put;
 *Push = *cspacec::csImageIOFileFormatDescriptions_Push;
+*Merge = *cspacec::csImageIOFileFormatDescriptions_Merge;
+*MergeSmart = *cspacec::csImageIOFileFormatDescriptions_MergeSmart;
 *Pop = *cspacec::csImageIOFileFormatDescriptions_Pop;
 *Top = *cspacec::csImageIOFileFormatDescriptions_Top;
 *Insert = *cspacec::csImageIOFileFormatDescriptions_Insert;
@@ -11036,6 +11048,8 @@ sub new {
 *Get = *cspacec::iShaderArray_Get;
 *Put = *cspacec::iShaderArray_Put;
 *Push = *cspacec::iShaderArray_Push;
+*Merge = *cspacec::iShaderArray_Merge;
+*MergeSmart = *cspacec::iShaderArray_MergeSmart;
 *Pop = *cspacec::iShaderArray_Pop;
 *Top = *cspacec::iShaderArray_Top;
 *Insert = *cspacec::iShaderArray_Insert;
@@ -14013,6 +14027,8 @@ sub new {
 *Get = *cspacec::csIntArray_Get;
 *Put = *cspacec::csIntArray_Put;
 *Push = *cspacec::csIntArray_Push;
+*Merge = *cspacec::csIntArray_Merge;
+*MergeSmart = *cspacec::csIntArray_MergeSmart;
 *Pop = *cspacec::csIntArray_Pop;
 *Top = *cspacec::csIntArray_Top;
 *Insert = *cspacec::csIntArray_Insert;
@@ -14074,6 +14090,8 @@ sub new {
 *Get = *cspacec::csIntArrayArray_Get;
 *Put = *cspacec::csIntArrayArray_Put;
 *Push = *cspacec::csIntArrayArray_Push;
+*Merge = *cspacec::csIntArrayArray_Merge;
+*MergeSmart = *cspacec::csIntArrayArray_MergeSmart;
 *Pop = *cspacec::csIntArrayArray_Pop;
 *Top = *cspacec::csIntArrayArray_Top;
 *Insert = *cspacec::csIntArrayArray_Insert;
@@ -17448,6 +17466,8 @@ sub new {
 *Get = *cspacec::csCharArrayArray_Get;
 *Put = *cspacec::csCharArrayArray_Put;
 *Push = *cspacec::csCharArrayArray_Push;
+*Merge = *cspacec::csCharArrayArray_Merge;
+*MergeSmart = *cspacec::csCharArrayArray_MergeSmart;
 *Pop = *cspacec::csCharArrayArray_Pop;
 *Top = *cspacec::csCharArrayArray_Top;
 *Insert = *cspacec::csCharArrayArray_Insert;

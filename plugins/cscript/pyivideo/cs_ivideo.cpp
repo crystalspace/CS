@@ -20372,6 +20372,72 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iShaderArray_Merge(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Merge",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Merge" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray_Merge" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_Merge" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csArray< csRef< iShader > > * >(argp2);
+  (arg1)->Merge((csArray< csRef< iShader > > const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderArray_MergeSmart(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_MergeSmart",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_MergeSmart" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray_MergeSmart" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_MergeSmart" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csArray< csRef< iShader > > * >(argp2);
+  (arg1)->MergeSmart((csArray< csRef< iShader > > const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iShaderArray_Pop(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
@@ -24258,6 +24324,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iShaderArray_Get", _wrap_iShaderArray_Get, METH_VARARGS, NULL},
 	 { (char *)"iShaderArray_Put", _wrap_iShaderArray_Put, METH_VARARGS, NULL},
 	 { (char *)"iShaderArray_Push", _wrap_iShaderArray_Push, METH_VARARGS, NULL},
+	 { (char *)"iShaderArray_Merge", _wrap_iShaderArray_Merge, METH_VARARGS, NULL},
+	 { (char *)"iShaderArray_MergeSmart", _wrap_iShaderArray_MergeSmart, METH_VARARGS, NULL},
 	 { (char *)"iShaderArray_Pop", _wrap_iShaderArray_Pop, METH_VARARGS, NULL},
 	 { (char *)"iShaderArray_Top", _wrap_iShaderArray_Top, METH_VARARGS, NULL},
 	 { (char *)"iShaderArray_Insert", _wrap_iShaderArray_Insert, METH_VARARGS, NULL},

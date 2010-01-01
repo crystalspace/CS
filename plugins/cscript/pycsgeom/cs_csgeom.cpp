@@ -45659,6 +45659,72 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csIntArray_Merge(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray< int > *arg1 = (csArray< int > *) 0 ;
+  csArray< int > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csIntArray_Merge",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csIntArray_Merge" "', argument " "1"" of type '" "csArray< int > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray< int > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csIntArray_Merge" "', argument " "2"" of type '" "csArray< int > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csIntArray_Merge" "', argument " "2"" of type '" "csArray< int > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csArray< int > * >(argp2);
+  (arg1)->Merge((csArray< int > const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csIntArray_MergeSmart(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray< int > *arg1 = (csArray< int > *) 0 ;
+  csArray< int > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csIntArray_MergeSmart",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csIntArray_MergeSmart" "', argument " "1"" of type '" "csArray< int > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray< int > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csIntArray_MergeSmart" "', argument " "2"" of type '" "csArray< int > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csIntArray_MergeSmart" "', argument " "2"" of type '" "csArray< int > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csArray< int > * >(argp2);
+  (arg1)->MergeSmart((csArray< int > const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csIntArray_Pop(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csArray< int > *arg1 = (csArray< int > *) 0 ;
@@ -46762,6 +46828,72 @@ SWIGINTERN PyObject *_wrap_csIntArrayArray_Push(PyObject *SWIGUNUSEDPARM(self), 
   arg2 = reinterpret_cast< csArray< int,csArrayElementHandler< int >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > * >(argp2);
   result = (arg1)->Push((csArray< int,csArrayElementHandler< int >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > const &)*arg2);
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csIntArrayArray_Merge(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray< csArray< int > > *arg1 = (csArray< csArray< int > > *) 0 ;
+  csArray< csArray< int > > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csIntArrayArray_Merge",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csIntArrayArray_Merge" "', argument " "1"" of type '" "csArray< csArray< int > > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray< csArray< int > > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csIntArrayArray_Merge" "', argument " "2"" of type '" "csArray< csArray< int > > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csIntArrayArray_Merge" "', argument " "2"" of type '" "csArray< csArray< int > > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csArray< csArray< int > > * >(argp2);
+  (arg1)->Merge((csArray< csArray< int > > const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csIntArrayArray_MergeSmart(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray< csArray< int > > *arg1 = (csArray< csArray< int > > *) 0 ;
+  csArray< csArray< int > > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csIntArrayArray_MergeSmart",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csIntArrayArray_MergeSmart" "', argument " "1"" of type '" "csArray< csArray< int > > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray< csArray< int > > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csIntArrayArray_MergeSmart" "', argument " "2"" of type '" "csArray< csArray< int > > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csIntArrayArray_MergeSmart" "', argument " "2"" of type '" "csArray< csArray< int > > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csArray< csArray< int > > * >(argp2);
+  (arg1)->MergeSmart((csArray< csArray< int > > const &)*arg2);
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -49367,6 +49499,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csIntArray_Get", _wrap_csIntArray_Get, METH_VARARGS, NULL},
 	 { (char *)"csIntArray_Put", _wrap_csIntArray_Put, METH_VARARGS, NULL},
 	 { (char *)"csIntArray_Push", _wrap_csIntArray_Push, METH_VARARGS, NULL},
+	 { (char *)"csIntArray_Merge", _wrap_csIntArray_Merge, METH_VARARGS, NULL},
+	 { (char *)"csIntArray_MergeSmart", _wrap_csIntArray_MergeSmart, METH_VARARGS, NULL},
 	 { (char *)"csIntArray_Pop", _wrap_csIntArray_Pop, METH_VARARGS, NULL},
 	 { (char *)"csIntArray_Top", _wrap_csIntArray_Top, METH_VARARGS, NULL},
 	 { (char *)"csIntArray_Insert", _wrap_csIntArray_Insert, METH_VARARGS, NULL},
@@ -49394,6 +49528,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csIntArrayArray_Get", _wrap_csIntArrayArray_Get, METH_VARARGS, NULL},
 	 { (char *)"csIntArrayArray_Put", _wrap_csIntArrayArray_Put, METH_VARARGS, NULL},
 	 { (char *)"csIntArrayArray_Push", _wrap_csIntArrayArray_Push, METH_VARARGS, NULL},
+	 { (char *)"csIntArrayArray_Merge", _wrap_csIntArrayArray_Merge, METH_VARARGS, NULL},
+	 { (char *)"csIntArrayArray_MergeSmart", _wrap_csIntArrayArray_MergeSmart, METH_VARARGS, NULL},
 	 { (char *)"csIntArrayArray_Pop", _wrap_csIntArrayArray_Pop, METH_VARARGS, NULL},
 	 { (char *)"csIntArrayArray_Top", _wrap_csIntArrayArray_Top, METH_VARARGS, NULL},
 	 { (char *)"csIntArrayArray_Insert", _wrap_csIntArrayArray_Insert, METH_VARARGS, NULL},

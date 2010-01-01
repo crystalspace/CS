@@ -4778,6 +4778,72 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csImageIOFileFormatDescriptions_Merge(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray< csImageIOFileFormatDescription const * > *arg1 = (csArray< csImageIOFileFormatDescription const * > *) 0 ;
+  csArray< csImageIOFileFormatDescription const * > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csImageIOFileFormatDescriptions_Merge",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageIOFileFormatDescriptions_Merge" "', argument " "1"" of type '" "csArray< csImageIOFileFormatDescription const * > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray< csImageIOFileFormatDescription const * > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csImageIOFileFormatDescriptions_Merge" "', argument " "2"" of type '" "csArray< csImageIOFileFormatDescription const * > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csImageIOFileFormatDescriptions_Merge" "', argument " "2"" of type '" "csArray< csImageIOFileFormatDescription const * > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csArray< csImageIOFileFormatDescription const * > * >(argp2);
+  (arg1)->Merge((csArray< csImageIOFileFormatDescription const * > const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csImageIOFileFormatDescriptions_MergeSmart(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray< csImageIOFileFormatDescription const * > *arg1 = (csArray< csImageIOFileFormatDescription const * > *) 0 ;
+  csArray< csImageIOFileFormatDescription const * > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csImageIOFileFormatDescriptions_MergeSmart",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageIOFileFormatDescriptions_MergeSmart" "', argument " "1"" of type '" "csArray< csImageIOFileFormatDescription const * > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray< csImageIOFileFormatDescription const * > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csImageIOFileFormatDescriptions_MergeSmart" "', argument " "2"" of type '" "csArray< csImageIOFileFormatDescription const * > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csImageIOFileFormatDescriptions_MergeSmart" "', argument " "2"" of type '" "csArray< csImageIOFileFormatDescription const * > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csArray< csImageIOFileFormatDescription const * > * >(argp2);
+  (arg1)->MergeSmart((csArray< csImageIOFileFormatDescription const * > const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csImageIOFileFormatDescriptions_Pop(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csArray< csImageIOFileFormatDescription const * > *arg1 = (csArray< csImageIOFileFormatDescription const * > *) 0 ;
@@ -14774,6 +14840,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csImageIOFileFormatDescriptions_Get", _wrap_csImageIOFileFormatDescriptions_Get, METH_VARARGS, NULL},
 	 { (char *)"csImageIOFileFormatDescriptions_Put", _wrap_csImageIOFileFormatDescriptions_Put, METH_VARARGS, NULL},
 	 { (char *)"csImageIOFileFormatDescriptions_Push", _wrap_csImageIOFileFormatDescriptions_Push, METH_VARARGS, NULL},
+	 { (char *)"csImageIOFileFormatDescriptions_Merge", _wrap_csImageIOFileFormatDescriptions_Merge, METH_VARARGS, NULL},
+	 { (char *)"csImageIOFileFormatDescriptions_MergeSmart", _wrap_csImageIOFileFormatDescriptions_MergeSmart, METH_VARARGS, NULL},
 	 { (char *)"csImageIOFileFormatDescriptions_Pop", _wrap_csImageIOFileFormatDescriptions_Pop, METH_VARARGS, NULL},
 	 { (char *)"csImageIOFileFormatDescriptions_Top", _wrap_csImageIOFileFormatDescriptions_Top, METH_VARARGS, NULL},
 	 { (char *)"csImageIOFileFormatDescriptions_Insert", _wrap_csImageIOFileFormatDescriptions_Insert, METH_VARARGS, NULL},

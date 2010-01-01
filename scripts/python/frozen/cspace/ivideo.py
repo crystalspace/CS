@@ -855,6 +855,8 @@ class iShaderArray(core.CustomAllocated):
     def Get(*args): return _ivideo.iShaderArray_Get(*args)
     def Put(*args): return _ivideo.iShaderArray_Put(*args)
     def Push(*args): return _ivideo.iShaderArray_Push(*args)
+    def Merge(*args): return _ivideo.iShaderArray_Merge(*args)
+    def MergeSmart(*args): return _ivideo.iShaderArray_MergeSmart(*args)
     def Pop(*args): return _ivideo.iShaderArray_Pop(*args)
     def Top(*args): return _ivideo.iShaderArray_Top(*args)
     def Insert(*args): return _ivideo.iShaderArray_Insert(*args)
