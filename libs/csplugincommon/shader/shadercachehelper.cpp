@@ -257,11 +257,11 @@ namespace CS
           bytesRemaining -= sizeof(csMD5::Digest);
         
           DocStackEntry scanEntry = scanStack.PopTop();
+	  PushReferencedFiles (scanEntry);
           csMD5::Digest entryDigest (scanEntry.ComputeHash ());
           actualHashes.Write ((char*)&entryDigest, sizeof(csMD5::Digest));
           if (memcmp (&diskDigest, &entryDigest, sizeof(csMD5::Digest)) != 0)
             return false;
-	  PushReferencedFiles (scanEntry);
         }
         
         if (bytesRemaining > 0) return false;
