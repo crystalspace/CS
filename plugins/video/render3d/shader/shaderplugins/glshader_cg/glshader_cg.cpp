@@ -528,6 +528,16 @@ bool csGLShader_CG::Open()
   strictMatchFP = false;
   if (enableFP)
   {
+    psplg = csLoadPluginCheck<iShaderProgramPlugin> (object_reg,
+      "crystalspace.graphics3d.shader.glps1", false);
+    if(!psplg)
+    {
+      if (doVerbose)
+        Report (CS_REPORTER_SEVERITY_WARNING,
+            "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
+            "routing unavailable.");
+    }
+
     if (config->KeyExists ("Video.OpenGL.Shader.Cg.Fake.Fragment.Profile"))
     {
       const char* profileStr = 
@@ -572,12 +582,31 @@ bool csGLShader_CG::Open()
     }
     if (currentLimits.fp.profile == CG_PROFILE_UNKNOWN)
     {
-      ProfileLimits limits (vendor,
-	cgGLGetLatestProfile (CG_GL_FRAGMENT));
+      CGprofile latestProfile = cgGLGetLatestProfile (CG_GL_FRAGMENT);
+      if ((latestProfile == CG_PROFILE_FP20) && psplg.IsValid())
+      {
+        /* Use CG_PROFILE_PS_1_1 or CG_PROFILE_PS_1_3 instead of FP20.
+           NVidia's FP20 backend apparently doesn't handle constants that are
+           needed in two different combiner stages very well - it seems to
+           only set one of the constants. However, the PS1.x code generated
+           by Cg is semantically correct; our PS1.x 'emulation' plugin correctly
+           handles the required constant mapping, so prefer indirection through
+           PS1.x even if the hardware could support FP20 natively. */
+        if (IsRoutedProfileSupported (CG_PROFILE_PS_1_3))
+          latestProfile = CG_PROFILE_PS_1_3;
+        else if (IsRoutedProfileSupported (CG_PROFILE_PS_1_1))
+          latestProfile = CG_PROFILE_PS_1_1;
+      }
+      ProfileLimits limits (vendor, latestProfile);
       limits.GetCurrentLimits (ext);
       currentLimits.fp = limits;
       strictMatchFP = forceBestProfile;
     }
+
+    if (doVerbose)
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	"Using fragment program limits: %s",
+	currentLimits.fp.ToStringForPunyHumans().GetData());
   }
   else
   {
@@ -589,31 +618,6 @@ bool csGLShader_CG::Open()
   cgGLSetDebugMode (config->GetBool ("Video.OpenGL.Shader.Cg.CgDebugMode",
     false));
  
-  if (enableFP)
-  {
-    // Load PS1 plugin, might be needed later
-    psplg = csLoadPluginCheck<iShaderProgramPlugin> (object_reg,
-      "crystalspace.graphics3d.shader.glps1", false);
-    if(!psplg)
-    {
-      if (doVerbose)
-        Report (CS_REPORTER_SEVERITY_WARNING,
-            "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
-            "routing unavailable.");
-      if (ProfileNeedsRouting (currentLimits.fp.profile))
-      {
-	  ProfileLimits limits (vendor,
-	    cgGLGetLatestProfile (CG_GL_FRAGMENT));
-	  limits.GetCurrentLimits (ext);
-	  currentLimits.fp = limits;
-      }
-    }
-    if (doVerbose)
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Using fragment program limits: %s",
-	currentLimits.fp.ToStringForPunyHumans().GetData());
-  }
-
   return true;
 }
 
