@@ -242,13 +242,53 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     currentEval = evaluator.BeginTicketEvaluation (conditionSet, conditionResults);
   }
 
-  void csShaderConditionResolver::DumpConditionTree (csString& out)
+  void csShaderConditionResolver::DumpConditionTree (csString& out, bool includeConditions)
   {
     if (rootNode == 0)
       return;
 
+    if (includeConditions)
+    {
+      SeenConditionsSet seenConds;
+      DumpUsedConditions (out, rootNode, seenConds);
+    }
     out += "\n";
     DumpConditionNode (out, rootNode, 0);
+  }
+
+  void csShaderConditionResolver::DumpUsedConditions (csString& out, csConditionNode* node,
+    SeenConditionsSet& seenConds)
+  {
+    if (node == 0) return;
+
+    if ((node->condition != csCondAlwaysFalse)
+       && (node->condition != csCondAlwaysTrue))
+     DumpUsedCondition (out, node->condition, seenConds);
+
+    DumpUsedConditions (out, node->trueNode, seenConds);
+    DumpUsedConditions (out, node->falseNode, seenConds);
+  }
+
+  void csShaderConditionResolver::DumpUsedCondition (csString& out, csConditionID id,
+    SeenConditionsSet& seenConds)
+  {
+    if ((seenConds.GetSize() > id) && (seenConds[id])) return;
+    
+    if (seenConds.GetSize() <= id) seenConds.SetSize (id+1);
+    seenConds.SetBit (id);
+	  
+    const CondOperation& condOp = evaluator.GetCondition (id);
+    if (condOp.left.type == operandOperation)
+    {
+      DumpUsedCondition (out, condOp.left.operation, seenConds);
+    }
+    if (condOp.right.type == operandOperation)
+    {
+      DumpUsedCondition (out, condOp.right.operation, seenConds);
+    }
+    out.AppendFmt ("condition %zu = '", id);
+    out.Append (evaluator.GetConditionString (id));
+    out.Append ("'\n");
   }
 
   static void Indent (csString& out, int n)
@@ -623,7 +663,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         {
           csString tree;
           tree.SetGrowsBy (0);
-          techsResolver->DumpConditionTree (tree);
+          techsResolver->DumpConditionTree (tree, true);
           csString filename;
           filename.Format ("/tmp/shader/cond_%s_techs.txt", source->GetAttributeValue ("name"));
           compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());

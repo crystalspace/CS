@@ -104,6 +104,11 @@ class csShaderConditionResolver :
   csConditionNode* NewNode (csConditionNode* parent);
   csConditionNode* GetRoot ();
   
+  typedef csBitArray SeenConditionsSet;
+  void DumpUsedConditions (csString& out, csConditionNode* node,
+    SeenConditionsSet& seenConds);
+  void DumpUsedCondition (csString& out, csConditionID id,
+    SeenConditionsSet& seenConds);
   void DumpConditionNode (csString& out, csConditionNode* node, int level);
   size_t GetVariant (csConditionNode* node);
   
@@ -139,7 +144,7 @@ public:
   size_t GetVariantCount () const
   { return nextVariant; }
   void SetVariantEval (size_t variant);
-  void DumpConditionTree (csString& out);
+  void DumpConditionTree (csString& out, bool includeConditions = false);
   
   void GetVariantConditions (size_t variant,
     const MyBitArrayMalloc*& conditionResults,
