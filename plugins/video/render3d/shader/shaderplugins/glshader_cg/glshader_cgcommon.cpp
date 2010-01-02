@@ -1009,40 +1009,24 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     if (cacheLimits != 0)
       *cacheLimits = wrapper.limits;
     
-    if (shaderPlug->ProfileNeedsRouting (programProfile))
-    {
-      return LoadProgramWithPS1 ()
-        ? iShaderProgram::loadSuccessShaderValid
-        : iShaderProgram::loadSuccessShaderInvalid;
-    }
-    else
-    {
-      return iShaderProgram::loadSuccessShaderValid;
-    }
-  }
-  
-  iShaderProgram::CacheLoadResult ret;
-  if (failReason) failReason->AttachNew (
-    new scfString (allReasons));
-  if (oneReadCorrectly)
-  {
-    if (bestLimits < currentLimits)
+    bool loaded = !shaderPlug->ProfileNeedsRouting (programProfile)
+      || LoadProgramWithPS1 ();
+    if (loaded && (bestLimits < currentLimits))
     {
       /* The best found program is worse than the current limits, so pretend
          that the shader program failed (instead just being 'invalid') -
          that will make xmlshader try to load the program from scratch,
          ie with current limits, which may just work. */
-      allReasons += "Provoking clean load with current limits";
-      ret = iShaderProgram::loadFail;
+      if (failReason)
+        failReason->AttachNew (new scfString ("Provoking clean load with current limits"));
+      return iShaderProgram::loadFail;
     }
-    else
-      ret = iShaderProgram::loadSuccessShaderInvalid;
+    return loaded ? iShaderProgram::loadSuccessShaderValid
+        : iShaderProgram::loadSuccessShaderInvalid;
   }
-  else
-    ret = iShaderProgram::loadFail;
-  if (failReason)
-    failReason->AttachNew (new scfString (allReasons));
-  return ret;
+  
+  return oneReadCorrectly ? iShaderProgram::loadSuccessShaderInvalid
+                          : iShaderProgram::loadFail;
 }
 
 bool csShaderGLCGCommon::LoadProgramWithPS1 ()
