@@ -209,7 +209,7 @@ void Shagnetron::PrintHelp ()
   csPrintf ("The name is a portmanteau of 'shader' and 'magnetron'.\n");
   csPrintf ("\n");
   csPrintf ("Available options:\n");
-  csPrintf (" -cachedir         Specify additional cache directories.\n");
+  csPrintf (" -cachedir=<dir>   Specify additional cache VFS directories.\n");
   csPrintf ("                   The later a directory is specified the lower its priority.\n");
   csPrintf ("                   The first directory is written to.\n");
   csPrintf (" -nodefaultcaches  Do not use default caches set in config\n");
