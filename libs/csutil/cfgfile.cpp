@@ -823,12 +823,15 @@ void csConfigFile::LoadFromBuffer(const char *Filedata, bool overwrite)
   int SkipCount = 0;
   bool LastLine = false;
   int  Line;
-  for (Line = 1; !LastLine && Filedata != 0; Line++, Filedata = s + SkipCount)
+  for (Line = 1; !LastLine; Line++, Filedata = s + SkipCount)
   {
     s = Filedata + strcspn (Filedata, "\n\r");
     LastLine = (*s == 0);
     // Advance past LF, CR, or CRLF.
     SkipCount = (!LastLine && *s == '\r' && *(s+1) == '\n' ? 2 : 1);
+    // If the next advance will get to the end of file this is the 
+    // last line we are parsing
+    if(*(s+SkipCount) == 0) LastLine = true;
 
     currentLineBuf.Replace (Filedata, s - Filedata);
     currentLineBuf.Trim ();
