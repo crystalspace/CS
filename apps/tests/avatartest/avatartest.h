@@ -82,26 +82,5 @@ private:
   void TargetLost ();
 };
 
-//------------------------ ColoredTexture ----------------------
-
-// TODO: move this in plugins/proctex/standard?
-/**
- * A procedural texture to create a material from a color.
- */
-class ColoredTexture : public csProcTexture
-{
-public:
-  ColoredTexture (csColor color);
-  virtual ~ColoredTexture () { }
-  virtual bool PrepareAnim ();
-  virtual void Animate (csTicks current_time);
-
-  static iMaterialWrapper* CreateColoredMaterial(const char* materialName,
-				 csColor color, iObjectRegistry* object_reg);
-
- private:
-  csColor color;
-};
-
 #endif // __AVATARTEST_H__
 

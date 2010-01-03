@@ -25,9 +25,6 @@
 #include <iengine/sector.h>
 #include "csutil/ref.h"
 
-#include <cstool/proctex.h>
-#include <csutil/cscolor.h>
-
 struct iObjectRegistry;
 struct iMaterialWrapper;
 struct iDynamicSystem;
@@ -62,27 +59,6 @@ class csDynamicSystemDebugger
   csRef<iMaterialWrapper> material;
   bool debugMode;
   csHash<MeshData, csPtrKey<iRigidBody> > storedMeshes;
-};
-
-//------------------------ ColoredTexture ----------------------
-
-// TODO: move this in plugins/proctex/standard?
-/**
- * A procedural texture to create a material from a color.
- */
-class ColoredTexture : public csProcTexture
-{
-public:
-  ColoredTexture (csColor color);
-  virtual ~ColoredTexture () { }
-  virtual bool PrepareAnim ();
-  virtual void Animate (csTicks current_time);
-
-  static iMaterialWrapper* CreateColoredMaterial(const char* materialName,
-				 csColor color, iObjectRegistry* object_reg);
-
- private:
-  csColor color;
 };
 
 //------------------------ DebugShape ----------------------

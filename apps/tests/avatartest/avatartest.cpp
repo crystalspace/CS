@@ -411,8 +411,9 @@ void AvatarTest::CreateRoom ()
     CS::Geometry::GeneralMeshBuilder::CreateFactoryAndMesh(engine, room,
 				   "background", "background_factory", &bgBox);
 
-  csRef<iMaterialWrapper> bgMaterial = ColoredTexture::CreateColoredMaterial
-    ("background", csColor (0.898f), object_reg);
+  csRef<iMaterialWrapper> bgMaterial =
+    CS::Material::MaterialBuilder::CreateColorMaterial
+    (object_reg, "background", csColor (0.898f));
   background->GetMeshObject()->SetMaterialWrapper(bgMaterial);
 
   // Creating lights
@@ -586,67 +587,6 @@ void AvatarTest::DisplayKeys ()
 
   WriteShadow (x, y, fg, "s: toggle rotation speed");
   y += lineSize;
-}
-
-//------------------------ ColoredTexture ----------------------
-
-ColoredTexture::ColoredTexture (csColor color)
-  : csProcTexture (), color (color)
-{
-  mat_w = mat_h = 1;
-  DisableAutoUpdate ();
-}
-
-bool ColoredTexture::PrepareAnim ()
-{
-  if (anim_prepared) return true;
-  if (!csProcTexture::PrepareAnim ()) return false;
-
-  // Draw the texture
-  Animate (0);
-
-  return true;
-}
-
-void ColoredTexture::Animate (csTicks current_time)
-{
-  g3d->SetRenderTarget (GetTextureWrapper ()->GetTextureHandle ());
-  if (!g3d->BeginDraw(CSDRAW_2DGRAPHICS)) return;
-  g3d->GetDriver2D()->DrawPixel (0, 0, g3d->GetDriver2D()->FindRGB
-	 ((int) (color.red * 255.0), (int) (color.green * 255.0), (int) (color.blue * 255.0)));
-  g3d->FinishDraw ();
-}
-
-iMaterialWrapper* ColoredTexture::CreateColoredMaterial(const char* materialName,
-					csColor color, iObjectRegistry* object_reg)
-{
-  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
-  if (!engine)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	      "crystalspace.coloredtexture",
-	      "No engine found while initializing colored texture");
-    return 0;
-  }
-
-  // Create texture & register material
-  ColoredTexture texture (color);
-  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  iMaterialWrapper* material = texture.Initialize (object_reg, engine,
-					g3d->GetTextureManager (), materialName);
-  if (!material)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	      "crystalspace.coloredtexture",
-	      "Problem initializing colored material %s with colors %f-%f-%f\n",
-	      materialName, color.red, color.green, color.blue);
-    return 0;
-  }
-
-  // Draw the texture
-  texture.PrepareAnim ();
-  
-  return material;
 }
 
 /*---------------------------------------------------------------------*

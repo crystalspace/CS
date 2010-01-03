@@ -18,6 +18,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "phystut.h"
 #include "imesh/ragdoll.h"
+#include "cstool/materialbuilder.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -618,8 +619,9 @@ bool Simple::Initialize ()
     CS::Geometry::GeneralMeshBuilder::CreateFactoryAndMesh(engine, room,
 				   "background", "background_factory", &bgBox);
 
-  csRef<iMaterialWrapper> bgMaterial = ColoredTexture::CreateColoredMaterial
-    ("background", csColor (0.898f), object_reg);
+  csRef<iMaterialWrapper> bgMaterial =
+    CS::Material::MaterialBuilder::CreateColorMaterial
+    (object_reg, "background", csColor (0.898f));
   background->GetMeshObject()->SetMaterialWrapper(bgMaterial);
 
   // Creating lights

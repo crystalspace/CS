@@ -29,6 +29,7 @@ struct iMaterialWrapper;
 struct iTextureHandle;
 struct iObjectRegistry;
 class csVector4;
+class csColor;
 
 namespace CS
 {
@@ -60,6 +61,15 @@ public:
   static iMaterialWrapper* CreateParallaxMaterial (iObjectRegistry* object_reg,
       const char* matname, const char* matfile, const char* normalfile,
       const char* heightfile, const csVector4& specular);
+
+  /**
+   * Create a material from a color. The material will be composed of a single
+   * texture with size 1x1 pixel of the given color.
+   * If there is already a material in the engine with the given 'matname'
+   * then the material will not be loaded again.
+   */
+  static iMaterialWrapper* CreateColorMaterial(iObjectRegistry* object_reg,
+      const char* matname, csColor color);
 
 };
 } // namespace Material

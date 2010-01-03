@@ -30,6 +30,7 @@
 #include "iengine/movable.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
+#include "cstool/materialbuilder.h"
 
 //------------------------ csDynamicSystemDebugger ----------------------
 
@@ -62,8 +63,8 @@ void csDynamicSystemDebugger::SetDebugDisplayMode (bool debugMode)
 
   // check debug material available
   if (!material)
-    material = ColoredTexture::CreateColoredMaterial ("debug",
-					  csColor (1, 0, 0), object_reg);
+    material = CS::Material::MaterialBuilder::CreateColorMaterial
+      (object_reg, "debug", csColor (1, 0, 0));
 
   if (!material)
   {
@@ -199,67 +200,6 @@ void csDynamicSystemDebugger::SetDebugDisplayMode (bool debugMode)
   }
 
   // TODO: do the same with the static colliders of the dynamic system
-}
-
-//------------------------ ColoredTexture ----------------------
-
-ColoredTexture::ColoredTexture (csColor color)
-  : csProcTexture (), color (color)
-{
-  mat_w = mat_h = 1;
-  DisableAutoUpdate ();
-}
-
-bool ColoredTexture::PrepareAnim ()
-{
-  if (anim_prepared) return true;
-  if (!csProcTexture::PrepareAnim ()) return false;
-
-  // draw the texture
-  Animate (0);
-
-  return true;
-}
-
-void ColoredTexture::Animate (csTicks current_time)
-{
-  g3d->SetRenderTarget (GetTextureWrapper ()->GetTextureHandle ());
-  if (!g3d->BeginDraw(CSDRAW_2DGRAPHICS)) return;
-  g3d->GetDriver2D()->DrawPixel (0, 0, g3d->GetDriver2D()->FindRGB
-         ((int) (color.red * 255.0), (int) (color.green * 255.0), (int) (color.blue * 255.0)));
-  g3d->FinishDraw ();
-}
-
-iMaterialWrapper* ColoredTexture::CreateColoredMaterial(const char* materialName,
-					csColor color, iObjectRegistry* object_reg)
-{
-  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
-  if (!engine)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	      "crystalspace.coloredtexture",
-	      "No engine found while initializing colored texture");
-    return 0;
-  }
-
-  // create texture & register material
-  ColoredTexture texture (color);
-  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  iMaterialWrapper* material = texture.Initialize (object_reg, engine,
-					g3d->GetTextureManager (), materialName);
-  if (!material)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	      "crystalspace.coloredtexture",
-	      "Problem initializing colored material %s with colors %f-%f-%f\n",
-	      materialName, color.red, color.green, color.blue);
-    return 0;
-  }
-
-  // draw the texture
-  texture.PrepareAnim ();
-  
-  return material;
 }
 
 //------------------------ DebugShape ----------------------

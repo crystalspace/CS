@@ -25,11 +25,15 @@
 #include "imap/loader.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
+#include "csutil/cscolor.h"
+#include "cstool/proctex.h"
 
 namespace CS
 {
 namespace Material
 {
+
+//------------------------ ParallaxMaterial ----------------------
 
 void MaterialBuilder::SetupParallaxMaterial (
     iObjectRegistry* object_reg,
@@ -96,6 +100,69 @@ iMaterialWrapper* MaterialBuilder::CreateParallaxMaterial (iObjectRegistry* obje
   if (!heightmap) return 0;
 
   SetupParallaxMaterial (object_reg, material, normalmap, heightmap, specular);
+  return material;
+}
+
+//------------------------ ColorMaterial ----------------------
+
+class ColorTexture : public csProcTexture
+{
+ private:
+  csColor color;
+
+public:
+  ColorTexture (csColor color)
+    : csProcTexture (), color (color)
+  {
+    mat_w = mat_h = 1;
+    DisableAutoUpdate ();
+  }
+
+  virtual ~ColorTexture () { }
+
+  virtual bool PrepareAnim ()
+  {
+    if (anim_prepared) return true;
+    if (!csProcTexture::PrepareAnim ()) return false;
+
+    // Draw the texture
+    Animate (0);
+
+    return true;
+  }
+
+  virtual void Animate (csTicks current_time)
+  {
+    g3d->SetRenderTarget (GetTextureWrapper ()->GetTextureHandle ());
+    if (!g3d->BeginDraw(CSDRAW_2DGRAPHICS)) return;
+    g3d->GetDriver2D()->DrawPixel (0, 0, g3d->GetDriver2D()->FindRGB
+				   ((int) (color.red * 255.0),
+				    (int) (color.green * 255.0),
+				    (int) (color.blue * 255.0)));
+    g3d->FinishDraw ();
+  }
+};
+
+iMaterialWrapper* MaterialBuilder::CreateColorMaterial(iObjectRegistry* object_reg,
+      const char* matname, csColor color)
+{
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+  if (!engine) return 0;
+
+  // Test for existing material with given name
+  iMaterialWrapper* material = engine->GetMaterialList ()->FindByName (matname);
+  if (material) return material;
+
+  // Create texture & register material
+  ColorTexture texture (color);
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  material = texture.Initialize (object_reg, engine,
+					g3d->GetTextureManager (), matname);
+  if (!material) return 0;
+
+  // Draw the texture
+  texture.PrepareAnim ();
+  
   return material;
 }
 
