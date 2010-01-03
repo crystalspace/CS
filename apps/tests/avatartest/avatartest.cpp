@@ -95,23 +95,22 @@ void AvatarTest::SetupFrame ()
       c->Move (CS_VEC_DOWN * 4 * speed);
   }
 
-  // We now assign a new rotation transformation to the camera.
+  // Make the camera look at the animesh
   c->GetTransform().LookAt (avatarPosition - c->GetTransform().GetOrigin (),
-			    csVector3(0,1,0) );
+  			    csVector3(0,1,0) );
 
   // Update the morph state (frankie smiles sadistically if no target in view)
-  float morphDuration = 250.0f;
   if (targetReached)
-    smileWeight -= (float) elapsed_time / (float) morphDuration;
+    smileWeight -= (float) elapsed_time / 250.0f;
   else 
-    smileWeight += (float) elapsed_time / (float) morphDuration;
+    smileWeight += (float) elapsed_time / 1500.0f;
 
   if (smileWeight > 1.0f)
     smileWeight = 1.0f;
   else if (smileWeight < 0.0f)
     smileWeight = 0.0f;
 
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"), -2.0f * smileWeight);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"), -2.0f * smileWeight - 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"), smileWeight);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), smileWeight);
 
@@ -520,9 +519,10 @@ void AvatarTest::CreateAvatar ()
 
   // Init morph animation
   smileWeight = 1.0f;
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"), -2.0f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"), -3.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), 1.0f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("wings_in"), 1.0f);
 }
 
 void AvatarTest::TargetReached ()
@@ -595,8 +595,6 @@ ColoredTexture::ColoredTexture (csColor color)
 {
   mat_w = mat_h = 1;
   DisableAutoUpdate ();
-  // TODO: there is probably a problem here since the texture doesn't always appear 
-  // with the same color
 }
 
 bool ColoredTexture::PrepareAnim ()
