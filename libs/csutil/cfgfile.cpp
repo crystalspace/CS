@@ -823,7 +823,7 @@ void csConfigFile::LoadFromBuffer(const char *Filedata, bool overwrite)
   int SkipCount = 0;
   bool LastLine = false;
   int  Line;
-  for (Line = 1; !LastLine; Line++, Filedata = s + SkipCount)
+  for (Line = 1; !LastLine && FileData != 0; Line++, Filedata = s + SkipCount)
   {
     s = Filedata + strcspn (Filedata, "\n\r");
     LastLine = (*s == 0);
