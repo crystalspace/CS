@@ -288,6 +288,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         BaseNodeSingle::FireAnimationFinishedCb ();
       }
     }
+
+    else if (playbackPosition < 0.0f)
+    {
+      if (factory->cyclic)
+      {
+        while (playbackPosition < 0.0f)
+        {
+          playbackPosition += duration;
+          BaseNodeSingle::FireAnimationCycleCb ();
+        }
+      }
+      else
+      {
+        playbackPosition = 0.0f;
+        if (factory->automaticStop)
+          isPlaying = false;
+
+        BaseNodeSingle::FireAnimationFinishedCb ();
+      }
+    }
   }
 
   bool AnimationNode::IsActive () const
