@@ -374,7 +374,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObjectFactory::SetBoneInfluencesPerVertex (uint num)
   {
-
+    // TODO
   }
 
   uint AnimeshObjectFactory::GetBoneInfluencesPerVertex () const
@@ -399,6 +399,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshMorphTarget* AnimeshObjectFactory::GetMorphTarget (uint target)
   {
+    CS_ASSERT (target < morphTargets.GetSize ());
     return morphTargets[target];
   }
 
@@ -434,6 +435,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshSocketFactory* AnimeshObjectFactory::GetSocket (size_t index) const
   {
+    CS_ASSERT (index < sockets.GetSize ());
     return sockets[index];
   }
 
@@ -597,6 +599,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshSubMesh* AnimeshObject::GetSubMesh (size_t index) const
   {
+    CS_ASSERT (index < submeshes.GetSize ());
     return submeshes[index];
   }
 
@@ -607,6 +610,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::SetMorphTargetWeight (uint target, float weight)
   {
+    // allocating array now saves some flops at each frame when morph targets are not used
     morphTargetWeights.SetSize (factory->morphTargets.GetSize(), 0.0f);
     morphTargetWeights[target] = weight;
   }
@@ -626,6 +630,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshSocket* AnimeshObject::GetSocket (size_t index) const
   {
+    CS_ASSERT (index < sockets.GetSize ());
     return sockets[index];
   }
 
@@ -816,11 +821,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::PositionChild (iMeshObject* child,csTicks current_time)
   {
+    // TODO
   }
 
   void AnimeshObject::BuildDecal(const csVector3* pos, float decalRadius,
     iDecalBuilder* decalBuilder)
   {
+    // TODO
   }
 
   const csBox3& AnimeshObject::GetObjectBoundingBox ()
