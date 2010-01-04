@@ -100,7 +100,7 @@ struct iLookAtAnimNodeFactory : public iSkeletonAnimNodeFactory2
  * at a target.
  * There are three types of constraints that will modify the 'LookAt' control:
  * - Whether or not a iBodyBoneJoint for the bone controlled has been defined while
- * creating the 'LookAt' factory (see LookAtManager::CreateAnimNodeFactory()).
+ * creating the 'LookAt' factory (see iLookAtManager::CreateAnimNodeFactory()).
  * - Whether or not SetAlwaysRotate() has been set.
  * - The maximum rotation speed allowed through SetMaximumSpeed().
  *
