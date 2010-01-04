@@ -60,7 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     MorphTargetOffsetsWalker* morphWalkers =
       (MorphTargetOffsetsWalker*) morphWalkersRaw;
 
-    float weights[activeMorphCount];
+    CS_ALLOC_STACK_ARRAY(float, weights, activeMorphCount);
     for (size_t m = 0, index = 0; m < morphTargetCount; m++)
     {
       if (morphTargetWeights[m] != 0.0f)
