@@ -268,7 +268,7 @@ void Primitives::GenerateCylinder (float l, float r, uint sides,
 
   mesh_normals.Push (csVector3 (1, 0, 0));
   mesh_vertices.Push (csVector3 (l, 0, 0));
-  mesh_normals.Push (csVector3 (1, 0, 0));
+  mesh_normals.Push (csVector3 (-1, 0, 0));
   mesh_vertices.Push (csVector3 (-l, 0, 0));
 
   // cylinder body
@@ -284,32 +284,22 @@ void Primitives::GenerateCylinder (float l, float r, uint sides,
     nz = sa*ny + ca*nz;
     ny = tmp;
     
+    mesh_triangles.Push (csTriangle (v1, 0, v1 - 2));
+    mesh_triangles.Push (csTriangle (v2 - 2, 1, v2));
+
     if (i > 0)
     {
       mesh_triangles.Push (csTriangle (v2, v1, v1 - 2));
-      mesh_triangles.Push (csTriangle (v1 - 1, v2, v1));
-      mesh_triangles.Push (csTriangle (v1 - 2, v1 -1, v2));
-      mesh_triangles.Push (csTriangle (v1, v1 - 2, v1 - 1));
+      mesh_triangles.Push (csTriangle (v1 - 2, v2 - 2, v2));
+
       if (i == n - 1)
       {
-        mesh_triangles.Push (csTriangle (3, 2, v1));
-        mesh_triangles.Push (csTriangle (v2, 3, 2));
-        mesh_triangles.Push (csTriangle (v1, v2, 3));
-        mesh_triangles.Push (csTriangle (3, v1, v2));
-
-	// cylinder's top
-	mesh_triangles.Push (csTriangle (2, 0, v1));
-
-	// cylinder's bottom
+        mesh_triangles.Push (csTriangle (2, 0, v1));
 	mesh_triangles.Push (csTriangle (v2, 1, 3));
+        mesh_triangles.Push (csTriangle (3, 2, v1));
+        mesh_triangles.Push (csTriangle (v1, v2, 3));
       }
     }
-
-    // cylinder's top
-    mesh_triangles.Push (csTriangle (v1, 0, v1 - 2));
-
-    // cylinder's bottom
-    mesh_triangles.Push (csTriangle (v2 - 2, 1, v2));
   }
 
   if (mapper)
@@ -338,7 +328,7 @@ void Primitives::GenerateCapsule (float l, float r, uint sides,
   mesh_triangles.DeleteAll ();
   mesh_vertices.DeleteAll ();
 
-  // cylinder body
+  // capsule body (ie cylinder part)
   float ny = 1, nz = 0;
   for (uint i = 0; i < n; i++)
   {
@@ -354,15 +344,12 @@ void Primitives::GenerateCapsule (float l, float r, uint sides,
     if (i > 0)
     {
       mesh_triangles.Push (csTriangle (v2, v1, v1 - 2));
-      mesh_triangles.Push (csTriangle (v1 - 1, v2, v1));
-      mesh_triangles.Push (csTriangle (v1 - 2, v1 -1, v2));
-      mesh_triangles.Push (csTriangle (v1, v1 - 2, v1 - 1));
+      mesh_triangles.Push (csTriangle (v1 - 2, v2 - 2, v2));
+
       if (i == n - 1)
       {
-        mesh_triangles.Push (csTriangle (1, 0, v1));
-        mesh_triangles.Push (csTriangle (v2, 1, 0));
+	mesh_triangles.Push (csTriangle (1, 0, v1));
         mesh_triangles.Push (csTriangle (v1, v2, 1));
-        mesh_triangles.Push (csTriangle (0, v1, v2));
       }
     }
   }
@@ -393,9 +380,7 @@ void Primitives::GenerateCapsule (float l, float r, uint sides,
       if (i > 0)
       {
         mesh_triangles.Push (csTriangle (v2, v1, v1 - 2));
-        mesh_triangles.Push (csTriangle (v1 - 1, v2, v1));
-        mesh_triangles.Push (csTriangle (v1 - 2, v1 -1, v2));
-        mesh_triangles.Push (csTriangle (v1, v1 - 2, v1 - 1));
+        mesh_triangles.Push (csTriangle (v1 - 2, v2 - 2, v2));
       }
     }
     start_nx = start_nx2;
@@ -428,9 +413,7 @@ void Primitives::GenerateCapsule (float l, float r, uint sides,
       if (i > 0)
       {
         mesh_triangles.Push (csTriangle (v2, v1, v1 - 2));
-        mesh_triangles.Push (csTriangle (v1 - 1, v2, v1));
-        mesh_triangles.Push (csTriangle (v1 - 2, v1 -1, v2));
-        mesh_triangles.Push (csTriangle (v1, v1 - 2, v1 - 1));
+        mesh_triangles.Push (csTriangle (v1 - 2, v2 - 2, v2));
       }
     }
     start_nx = start_nx2;
