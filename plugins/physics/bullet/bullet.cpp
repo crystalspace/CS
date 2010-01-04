@@ -754,7 +754,7 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
 
 csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic)
   : scfImplementationType (this), dynSys (dynSys), body (0),
-    isStatic (isStatic), mass (1.0f)
+    isStatic (isStatic), customMass (false), mass (1.0f)
 {
   btTransform identity;
   identity.setIdentity ();
@@ -811,22 +811,39 @@ void csBulletRigidBody::RebuildBody ()
 
     delete compoundShape;
     compoundShape = newCompoundShape;
+    int shapeCount = compoundShape->getNumChildShapes ();
 
     // compute new principal axis
     if (!isStatic)
     {
       // compute the masses of the shapes
-      //float distributedMass = mass / compoundShape->getNumChildShapes ();
-      btScalar* masses = new btScalar[compoundShape->getNumChildShapes ()];
-      float totalMass (0);
-      for (int j = 0; j < compoundShape->getNumChildShapes(); j++)
+      btScalar* masses = new btScalar[shapeCount];
+      float totalMass = 0.0f;
+
+      // check if a custom mass has been defined
+      if (customMass)
       {
-	//masses[j] = distributedMass;
-	// TODO: use real volumes of shapes
-	btVector3 center;
-	btScalar radius;
-	compoundShape->getChildShape (j)->getBoundingSphere (center, radius);
-	masses[j] = colliders[j]->density * 1.3333 * PI * radius * radius * radius;
+	float volumes[shapeCount];
+	float totalVolume = 0.0f;
+
+	// compute the volume of each shape
+	for (int j = 0; j < shapeCount; j++)
+	{
+	  volumes[j] = colliders[j]->GetVolume ();
+	  totalVolume += volumes[j];
+	}
+
+	// assign masses
+	for (int j = 0; j < shapeCount; j++)
+	  masses[j] = mass * volumes[j] / totalVolume;
+
+	totalMass = mass;
+      }
+
+      // if no custom mass defined then use colliders density
+      else for (int j = 0; j < shapeCount; j++)
+      {
+	masses[j] = colliders[j]->density * colliders[j]->GetVolume ();
 	totalMass += masses[j];
       }
 
@@ -846,7 +863,7 @@ void csBulletRigidBody::RebuildBody ()
       // apply principal axis
       // creation is faster using a new compound to store the shifted children
       newCompoundShape = new btCompoundShape();
-      for (int i = 0; i < compoundShape->getNumChildShapes (); i++)
+      for (int i = 0; i < shapeCount; i++)
       {
 	btTransform newChildTransform =
 	  principal.inverse() * compoundShape->getChildTransform (i);
@@ -1382,6 +1399,8 @@ void csBulletRigidBody::SetProperties (float mass, const csVector3& center,
     MakeStatic ();
     return;
   }
+  else
+    customMass = true;
 
   if (body)
   {
@@ -1433,6 +1452,8 @@ void csBulletRigidBody::AdjustTotalMass (float targetmass)
     MakeStatic ();
     return;
   }
+  else
+    customMass = true;
 
   if (body)
   {
@@ -2096,6 +2117,81 @@ void csBulletCollider::MakeDynamic ()
 bool csBulletCollider::IsStatic ()
 {
   return isStaticBody;
+}
+
+float csBulletCollider::GetVolume ()
+{
+  switch (geomType)
+  {
+    case BOX_COLLIDER_GEOMETRY:
+      {
+	csVector3 size;
+	GetBoxGeometry (size);
+	return size[0] * size[1] * size[2];
+      }
+
+    case SPHERE_COLLIDER_GEOMETRY:
+      {
+	csSphere sphere;
+	GetSphereGeometry (sphere);
+	return 1.333333f * PI * sphere.GetRadius () * sphere.GetRadius ()
+	  * sphere.GetRadius ();
+      }
+
+    case CYLINDER_COLLIDER_GEOMETRY:
+      {
+	float length;
+	float radius;
+	GetCylinderGeometry (length, radius);
+	return PI * radius * radius * length;
+      }
+
+    case CAPSULE_COLLIDER_GEOMETRY:
+      {
+	float length;
+	float radius;
+	GetCapsuleGeometry (length, radius);
+	return PI * radius * radius * length
+	  + 1.333333f * PI * radius * radius * radius;
+      }
+
+    case CONVEXMESH_COLLIDER_GEOMETRY:
+      {
+	if (vertexCount == 0)
+	  return 0.0f;
+
+	float volume = 0.0f;
+	int faceCount = vertexCount / 3;
+	btVector3 origin = vertices[indices[0]];
+	for (int i = 1; i < faceCount; i++)
+	{
+	  int index = i * 3;
+	  volume += fabsl (btDot
+			   (vertices[indices[index]] - origin,
+			    btCross (vertices[indices[index + 1]] - origin,
+				     vertices[indices[index + 2]] - origin)));
+	}
+
+	return volume / 6.0f;
+      }
+
+    case TRIMESH_COLLIDER_GEOMETRY:
+      {
+	if (vertexCount == 0)
+	  return 0.0f;
+
+	// TODO: this is a really rough estimation
+	btVector3 center;
+	btScalar radius;
+	shape->getBoundingSphere (center, radius);
+	return 1.333333f * PI * radius * radius * radius;
+      }
+
+  default:
+    return 0.0f;
+  }
+
+  return 0.0f;
 }
 
 //------------------------ csBulletJoint ------------------------------------

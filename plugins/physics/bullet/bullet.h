@@ -192,6 +192,7 @@ class csBulletRigidBody : public scfImplementationExt1<csBulletRigidBody,
   csRefArray<csBulletCollider> colliders;
   btCompoundShape* compoundShape;
   bool isStatic;
+  bool customMass;
   float mass;
   bool compoundChanged;
   csRef<iMeshWrapper> mesh;
@@ -369,6 +370,8 @@ public:
   virtual void MakeStatic ();
   virtual void MakeDynamic ();
   virtual bool IsStatic ();
+
+  float GetVolume ();
 };
 
 #define BULLET_JOINT_NONE 0
