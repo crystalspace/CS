@@ -233,6 +233,11 @@ bool Simple::HandleEvent (iEvent& ev)
 	CreateMesh ();
 	return true;
       }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'v')
+      {
+	CreateConvexMesh ();
+	return true;
+      }
       else if (csKeyEventHelper::GetCookedCode (&ev) == '*')
       {
 	CreateStarCollider ();
@@ -1008,7 +1013,7 @@ iRigidBody* Simple::CreateCapsule ()
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
-  // Create the ball mesh factory.
+  // Create the capsule mesh factory.
   csRef<iMeshFactoryWrapper> capsuleFact = engine->CreateMeshFactory(
   	"crystalspace.mesh.object.genmesh", "capsuleFact");
   if (capsuleFact == 0)
@@ -1038,7 +1043,7 @@ iRigidBody* Simple::CreateCapsule ()
   rb->SetProperties (radius, csVector3 (0), csMatrix3 ());
   rb->AttachMesh (mesh);
 
-  // Create and attach a sphere collider.
+  // Create and attach a capsule collider.
   csOrthoTransform t;
   rb->AttachColliderCapsule (length, radius, t, 10, 1, 0.8f);
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
@@ -1046,6 +1051,55 @@ iRigidBody* Simple::CreateCapsule ()
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+
+  return rb;
+}
+
+iRigidBody* Simple::CreateConvexMesh ()
+{
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create the mesh factory (a capsule in this example)
+  csRef<iMeshFactoryWrapper> capsuleFact = engine->CreateMeshFactory(
+  	"crystalspace.mesh.object.genmesh", "capsuleFact");
+  if (capsuleFact == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.phystut",
+      "Error creating mesh object factory!");
+    return 0;
+  }
+
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<
+    iGeneralFactoryState> (capsuleFact->GetMeshObjectFactory ());
+  const float radius (rand() % 10 / 50. + .2);
+  const float length (rand() % 3 / 50. + .7);
+  gmstate->GenerateCapsule (length, radius, 10);
+  capsuleFact->HardTransform (
+        csReversibleTransform (csYRotMatrix3 (PI/2), csVector3 (0)));
+
+  // Create the mesh.
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+  			            capsuleFact, "capsule", room));
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Create a body and attach the mesh.
+  csRef<iRigidBody> rb = dynSys->CreateBody ();
+  rb->SetProperties (radius, csVector3 (0), csMatrix3 ());
+  rb->AttachMesh (mesh);
+
+  // Create and attach a mesh collider.
+  csOrthoTransform t;
+  rb->AttachColliderConvexMesh (mesh, t, 10, 1, 0.8f);
+  rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
+
+  // Fling the body.
+  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
+  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+
+  rb->MakeDynamic ();
 
   return rb;
 }
@@ -1610,6 +1664,9 @@ void Simple::DisplayKeys ()
     y += lineSize;
   }
 
+  WriteShadow (x, y, fg, "v: spawn a convex mesh");
+  y += lineSize;
+
   WriteShadow (x, y, fg, "m: spawn a concave mesh");
   y += lineSize;
 
@@ -1634,7 +1691,7 @@ void Simple::DisplayKeys ()
   WriteShadow (x, y, fg, "f: toggle physical/free camera");
   y += lineSize;
 
-  WriteShadow (x, y, fg, "t: toggle all bodies to dynamic/static");
+  WriteShadow (x, y, fg, "t: toggle all bodies dynamic/static");
   y += lineSize;
 
   WriteShadow (x, y, fg, "p: pause the simulation");
@@ -1643,7 +1700,7 @@ void Simple::DisplayKeys ()
   WriteShadow (x, y, fg, "o: toggle speed of simulation");
   y += lineSize;
 
-  WriteShadow (x, y, fg, "d: toggle colliders displayed/hidden");
+  WriteShadow (x, y, fg, "d: toggle display of colliders");
   y += lineSize;
 
   if (phys_engine_id == BULLET_ID)
@@ -1655,7 +1712,7 @@ void Simple::DisplayKeys ()
   WriteShadow (x, y, fg, "g: toggle gravity");
   y += lineSize;
 
-  WriteShadow (x, y, fg, "i: toggle autodisable enabled or not");
+  WriteShadow (x, y, fg, "i: toggle autodisable");
   y += lineSize;
 
   if (phys_engine_id == ODE_ID)

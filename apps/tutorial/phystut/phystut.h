@@ -66,6 +66,7 @@ private:
   iRigidBody* CreateCylinder ();
   iRigidBody* CreateCapsule ();
   iRigidBody* CreateMesh ();
+  iRigidBody* CreateConvexMesh ();
   iJoint* CreateJointed ();
   void CreateChain ();
 
