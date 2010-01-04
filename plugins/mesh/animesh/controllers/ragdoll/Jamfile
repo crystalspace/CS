@@ -2,7 +2,7 @@ SubDir TOP plugins mesh animesh controllers ragdoll ;
 
 if $(BULLET.AVAILABLE) = "yes"
 {
-Description ragdoll : "Ragdoll plugin for an animated mesh object" ;
+Description ragdoll : "Ragdoll animation node plugin for an animated mesh object" ;
 Plugin ragdoll : [ Wildcard *.cpp *.h ] ;
 LinkWith ragdoll : crystalspace ;
 CompileGroups ragdoll : meshes ;

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh animesh controllers lookat ;
 
-Description lookat : "LookAt plugin for an animated mesh object" ;
+Description lookat : "LookAt animation node plugin for an animated mesh object" ;
 Plugin lookat : [ Wildcard *.cpp *.h ] ;
 LinkWith lookat : crystalspace ;
 CompileGroups lookat : meshes ;

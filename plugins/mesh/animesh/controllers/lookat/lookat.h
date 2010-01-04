@@ -95,6 +95,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     scfFakeInterface<iSkeletonAnimNode2>, iLookAtAnimNode>
   {
   public:
+    CS_LEAKGUARD_DECLARE(LookAtAnimNode);
+
     LookAtAnimNode (LookAtAnimNodeFactory* factory, iSkeleton2* skeleton,
 		    iSkeletonAnimNode2* childNode);
 

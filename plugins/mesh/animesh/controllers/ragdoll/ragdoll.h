@@ -101,6 +101,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     scfFakeInterface<iSkeletonAnimNode2>, iRagdollAnimNode>
   {
   public:
+    CS_LEAKGUARD_DECLARE(RagdollAnimNode);
+
     RagdollAnimNode (RagdollAnimNodeFactory* factory, iSkeleton2* skeleton);
 
     //-- iRagdollAnimNode
