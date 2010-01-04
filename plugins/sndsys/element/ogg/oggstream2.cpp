@@ -108,7 +108,7 @@ void SndSysOggSoundStream::AdvancePosition(size_t frame_delta)
       m_PreparedDataBufferStart=0;
 
       // Seek the ogg stream to the start loop position position for the rest of the advancement
-      ov_raw_seek(&m_VorbisFile,m_startLoopFrame);
+      ov_pcm_seek(&m_VorbisFile,m_startLoopFrame);
   }
 
   if (m_NewPosition != InvalidPosition)
@@ -121,7 +121,7 @@ void SndSysOggSoundStream::AdvancePosition(size_t frame_delta)
     m_PreparedDataBufferStart=0;
 
     // Seek the ogg stream to the requested position
-    ov_raw_seek(&m_VorbisFile,m_NewPosition);
+    ov_pcm_seek(&m_VorbisFile,m_NewPosition);
 
     m_NewPosition = InvalidPosition;
     m_bPlaybackReadComplete=false;
@@ -180,7 +180,7 @@ void SndSysOggSoundStream::AdvancePosition(size_t frame_delta)
         }
 
         // Loop by resetting the position to the start loop position and continuing
-        ov_raw_seek(&m_VorbisFile,m_startLoopFrame);
+        ov_pcm_seek(&m_VorbisFile,m_startLoopFrame);
       }
     }
 
