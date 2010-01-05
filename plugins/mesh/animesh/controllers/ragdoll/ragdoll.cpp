@@ -560,7 +560,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     }
 
     // TODO: remove bodies if problem
-    // TODO: call iRigidBody::SetProperties if they are defined
+
+    // set body properties if they are defined
+    iBodyBoneProperties* properties = bodyBone->GetBoneProperties ();
+    if (properties)
+      rigidBody->SetProperties (properties->GetMass (),
+				properties->GetCenter (),
+				properties->GetInertia ());
 
     // create dynamic joint
     if (parentBody)
