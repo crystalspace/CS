@@ -115,6 +115,11 @@ bool SndSysBasicStream::ResetPosition()
   return true;
 }
 
+bool SndSysBasicStream::PendingSeek () 
+{
+  return (m_NewPosition != InvalidPosition);
+}
+
 bool SndSysBasicStream::SetPosition (size_t newposition)
 {
   m_NewPosition=newposition;

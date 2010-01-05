@@ -61,7 +61,7 @@ enum
 struct iSndSysStream : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysStream,1,1,0);
+  SCF_INTERFACE(iSndSysStream,1,1,1);
 
   /// Retrieve a description of this stream.  
   //  This is not guaranteed to be useful for any particular purpose, different,
@@ -292,6 +292,14 @@ struct iSndSysStream : public virtual iBase
    * \return false if the parameters are out of bound or the audio format plugin doesn't support this.
    */
   virtual bool SetLoopBoundaries(size_t startPosition, size_t endPosition) = 0;
+  
+  /**
+   * Check if the stream is pending position replacement.
+   * Usually in this case it might be a good idea to flush buffers and
+   * rebuffer.
+   * \return TRUE if the position is being changed
+   */
+  virtual bool PendingSeek () = 0;
 
 };
 

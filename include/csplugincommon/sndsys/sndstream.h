@@ -127,6 +127,14 @@ namespace CS
     */
     virtual bool SetPosition (size_t newposition);
 
+   /**
+    * Check if the stream is pending position replacement.
+    * Usually in this case it might be a good idea to flush buffers and
+    * rebuffer.
+    * \return TRUE if the position is being changed
+    */
+    virtual bool PendingSeek ();
+
     /**
     * Pauses the stream at the current position.  
     * Data will not be provided through the GetData() call beyond the point of
