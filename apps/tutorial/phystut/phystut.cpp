@@ -1348,7 +1348,9 @@ void Simple::LoadRagdoll ()
   boneOffset.Translate (csVector3 (capsuleLength / 2.0f, 0.0f, 0.0f));
   csVector3 minimumAngle (-0.275f);
   csVector3 maximumAngle (0.275f);
+  float mass = 0.0005f;
 
+  bone1->CreateBoneProperties ()->SetMass (mass);
   collider = bone1->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
   collider->SetFriction (10.0f);
@@ -1362,6 +1364,7 @@ void Simple::LoadRagdoll ()
   joint->SetMinimumAngle (minimumAngle);
   joint->SetMaximumAngle (maximumAngle);
 
+  bone2->CreateBoneProperties ()->SetMass (mass);
   collider = bone2->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
   collider->SetFriction (10.0f);
@@ -1375,6 +1378,7 @@ void Simple::LoadRagdoll ()
   joint->SetMinimumAngle (minimumAngle);
   joint->SetMaximumAngle (maximumAngle);
 
+  bone3->CreateBoneProperties ()->SetMass (mass);
   collider = bone3->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
   collider->SetFriction (10.0f);
@@ -1388,6 +1392,7 @@ void Simple::LoadRagdoll ()
   joint->SetMinimumAngle (minimumAngle);
   joint->SetMaximumAngle (maximumAngle);
 
+  bone4->CreateBoneProperties ()->SetMass (mass);
   collider = bone4->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
   collider->SetFriction (10.0f);
@@ -1401,6 +1406,7 @@ void Simple::LoadRagdoll ()
   joint->SetMinimumAngle (minimumAngle);
   joint->SetMaximumAngle (maximumAngle);
 
+  bone5->CreateBoneProperties ()->SetMass (mass);
   collider = bone5->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
   collider->SetFriction (10.0f);
@@ -1414,6 +1420,7 @@ void Simple::LoadRagdoll ()
   joint->SetMinimumAngle (minimumAngle);
   joint->SetMaximumAngle (maximumAngle);
 
+  bone6->CreateBoneProperties ()->SetMass (mass);
   collider = bone6->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
   collider->SetFriction (10.0f);
@@ -1427,6 +1434,7 @@ void Simple::LoadRagdoll ()
   joint->SetMinimumAngle (minimumAngle);
   joint->SetMaximumAngle (maximumAngle);
 
+  bone7->CreateBoneProperties ()->SetMass (mass);
   collider = bone7->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
   collider->SetFriction (10.0f);
@@ -1440,6 +1448,7 @@ void Simple::LoadRagdoll ()
   joint->SetMinimumAngle (minimumAngle);
   joint->SetMaximumAngle (maximumAngle);
 
+  bone8->CreateBoneProperties ()->SetMass (mass);
   collider = bone8->CreateBoneCollider ();
   collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
   collider->SetTransform (boneOffset);
