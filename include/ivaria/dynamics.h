@@ -613,7 +613,16 @@ struct iRigidBody : public virtual iBase
   /// Get the angular velocity (rotation)
   virtual const csVector3 GetAngularVelocity () const = 0;
 
-  /// Set the physic properties
+  /**
+   * Set the physic properties of this body. The given mass will be used
+   * in place of the density of the colliders.
+   *
+   * It is safer to use AdjustTotalMass() to set only the mass and let the
+   * dynamic system compute the center of mass and matrix of inertia.
+   * \param mass The total mass of this body
+   * \param center The center of mass of this body
+   * \param inertia The matrix of inertia of this body
+   */
   virtual void SetProperties (float mass, const csVector3& center,
     const csMatrix3& inertia) = 0;
   /// Get the physic properties. 0 parameters are ignored
@@ -628,7 +637,8 @@ struct iRigidBody : public virtual iBase
 
   /**
    * Set the total mass to targetmass, and adjust the properties 
-   * (center of mass and matrix of inertia)
+   * (center of mass and matrix of inertia). The given mass will be used
+   * in place of the density of the colliders.
    */
   virtual void AdjustTotalMass (float targetmass) = 0;
 
@@ -847,9 +857,14 @@ struct iDynamicsSystemCollider : public virtual iBase
   virtual void SetSoftness (float softness) = 0;
 
   /**
-   * Set the density of the body. This could look strange that collider needs
-   * to know this parameter, but it is used for reseting mass of connected body  
-   * (it should depend on collider geometry)
+   * Set the density of this collider. If the mass of the body was not defined
+   * through iRigidBody::SetProperties() or iRigidBody::AdjustTotalMass(),
+   * then it will be computed from this.
+   * 
+   * You should be really careful when using densities because most of the
+   * game physics libraries do not work well when objects with large mass
+   * differences interact. It is safer to artificially keep the mass of moving
+   * objects in a safe range (from 1 to 100 kilogram for example).
    */
   virtual void SetDensity (float density) = 0;
 
