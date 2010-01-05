@@ -823,7 +823,7 @@ void csBulletRigidBody::RebuildBody ()
       // check if a custom mass has been defined
       if (customMass)
       {
-	float volumes[shapeCount];
+	float* volumes = new float[shapeCount];
 	float totalVolume = 0.0f;
 
 	// compute the volume of each shape
@@ -838,6 +838,7 @@ void csBulletRigidBody::RebuildBody ()
 	  masses[j] = mass * volumes[j] / totalVolume;
 
 	totalMass = mass;
+	delete[] volumes;
       }
 
       // if no custom mass defined then use colliders density
@@ -851,7 +852,7 @@ void csBulletRigidBody::RebuildBody ()
       btTransform principal;
       btVector3 principalInertia;
       compoundShape->calculatePrincipalAxisTransform (masses, principal, principalInertia);
-      delete masses;
+      delete[] masses;
 
       // create new motion state
       btTransform trans;
