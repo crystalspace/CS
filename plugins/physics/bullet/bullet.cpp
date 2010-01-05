@@ -823,22 +823,28 @@ void csBulletRigidBody::RebuildBody ()
       // check if a custom mass has been defined
       if (customMass)
       {
-	float* volumes = new float[shapeCount];
-	float totalVolume = 0.0f;
+	if (shapeCount == 1)
+	  masses[0] = mass;
 
-	// compute the volume of each shape
-	for (int j = 0; j < shapeCount; j++)
+	else
 	{
-	  volumes[j] = colliders[j]->GetVolume ();
-	  totalVolume += volumes[j];
+	  float* volumes = new float[shapeCount];
+	  float totalVolume = 0.0f;
+
+	  // compute the volume of each shape
+	  for (int j = 0; j < shapeCount; j++)
+	  {
+	    volumes[j] = colliders[j]->GetVolume ();
+	    totalVolume += volumes[j];
+	  }
+
+	  // assign masses
+	  for (int j = 0; j < shapeCount; j++)
+	    masses[j] = mass * volumes[j] / totalVolume;
+
+	  totalMass = mass;
+	  delete[] volumes;
 	}
-
-	// assign masses
-	for (int j = 0; j < shapeCount; j++)
-	  masses[j] = mass * volumes[j] / totalVolume;
-
-	totalMass = mass;
-	delete[] volumes;
       }
 
       // if no custom mass defined then use colliders density
@@ -1395,7 +1401,7 @@ void csBulletRigidBody::SetProperties (float mass, const csVector3& center,
 
   this->mass = mass;
 
-  if (mass < EPSILON)
+  if (mass < SMALL_EPSILON)
   {
     MakeStatic ();
     return;
@@ -1448,7 +1454,7 @@ void csBulletRigidBody::AdjustTotalMass (float targetmass)
 
   this->mass = targetmass;
 
-  if (mass < EPSILON)
+  if (mass < SMALL_EPSILON)
   {
     MakeStatic ();
     return;
