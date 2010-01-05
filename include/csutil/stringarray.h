@@ -278,6 +278,9 @@ public:
 } // namespace Utility
 } // namespace CS
 
+/**
+ * An array of strings.
+ */
 class csStringArray : 
   public CS::Utility::StringArray<CS::Memory::AllocatorMalloc,
                                   csArrayCapacityDefault>
