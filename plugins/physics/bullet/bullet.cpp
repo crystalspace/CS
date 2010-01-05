@@ -842,9 +842,10 @@ void csBulletRigidBody::RebuildBody ()
 	  for (int j = 0; j < shapeCount; j++)
 	    masses[j] = mass * volumes[j] / totalVolume;
 
-	  totalMass = mass;
 	  delete[] volumes;
 	}
+
+	totalMass = mass;
       }
 
       // if no custom mass defined then use colliders density
