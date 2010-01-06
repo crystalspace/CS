@@ -365,6 +365,7 @@ class iSndSysStream(core.iBase):
     def GetLoopStart(*args): return _isndsys.iSndSysStream_GetLoopStart(*args)
     def GetLoopEnd(*args): return _isndsys.iSndSysStream_GetLoopEnd(*args)
     def SetLoopBoundaries(*args): return _isndsys.iSndSysStream_SetLoopBoundaries(*args)
+    def PendingSeek(*args): return _isndsys.iSndSysStream_PendingSeek(*args)
     scfGetVersion = staticmethod(_isndsys.iSndSysStream_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysStream
     __del__ = lambda self : None;

@@ -5959,6 +5959,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetLoopStart = *cspacec::iSndSysStream_GetLoopStart;
 *GetLoopEnd = *cspacec::iSndSysStream_GetLoopEnd;
 *SetLoopBoundaries = *cspacec::iSndSysStream_SetLoopBoundaries;
+*PendingSeek = *cspacec::iSndSysStream_PendingSeek;
 *scfGetVersion = *cspacec::iSndSysStream_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
