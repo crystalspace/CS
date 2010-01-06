@@ -208,6 +208,10 @@ struct iDynamicSystem : public virtual iBase
 
   /**
    * Attach a static concave collider to the dynamic system.
+   * 
+   * Concave colliders should be avoided because it is most costly to 
+   * compute the collisions with them, and the simulation of their movement
+   * is less stable. It is safer to use a combination of convex colliders.
    * \param mesh the mesh to use for collision detection
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -224,7 +228,8 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Attach a static cylinder collider to the dynamic system (oriented along it's Z axis)
+   * Attach a static cylinder collider to the dynamic system (oriented
+   * along it's Z axis)
    * \param length the cylinder length along the axis
    * \param radius the cylinder radius
    * \param trans a hard transform to apply to the mesh
@@ -486,6 +491,10 @@ struct iRigidBody : public virtual iBase
 
   /**
    * Add a concave collider to this body
+   * 
+   * Concave colliders should be avoided because it is most costly to 
+   * compute the collisions with them, and the simulation of their movement
+   * is less stable. It is safer to use a combination of convex colliders.
    * \param mesh the mesh object which will act as collider
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -617,8 +626,9 @@ struct iRigidBody : public virtual iBase
    * Set the physic properties of this body. The given mass will be used
    * in place of the density of the colliders.
    *
-   * It is safer to use AdjustTotalMass() to set only the mass and let the
-   * dynamic system compute the center of mass and matrix of inertia.
+   * If you are using the 'bullet' plugin, it is safer to use
+   * AdjustTotalMass() to set only the mass and let the dynamic system 
+   * compute the center of mass and matrix of inertia.
    * \param mass The total mass of this body
    * \param center The center of mass of this body
    * \param inertia The matrix of inertia of this body
@@ -830,10 +840,16 @@ struct iDynamicsSystemCollider : public virtual iBase
   /// Create collider geometry with given plane.
   virtual bool CreatePlaneGeometry (const csPlane3& plane) = 0;
 
-  /// Create collider geometry with given convex mesh geometry.
+  /// Create collider geometry with given convex mesh.
   virtual bool CreateConvexMeshGeometry (iMeshWrapper *mesh) = 0;
 
-  /// Create collider geometry with given mesh geometry.
+  /**
+   * Create collider geometry with given concave mesh.
+   * 
+   * Concave colliders should be avoided because it is most costly to 
+   * compute the collisions with them, and the simulation of their movement
+   * is less stable. It is safer to use a combination of convex colliders.
+   */
   virtual bool CreateMeshGeometry (iMeshWrapper *mesh) = 0;
 
   /// Create collider geometry with given box (given by its size).
