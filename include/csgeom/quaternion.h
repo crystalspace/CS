@@ -289,12 +289,12 @@ public:
   csQuaternion SLerp (const csQuaternion& q2, float t) const;
 
   /**
-   * Get quaternion log
+   * Get the logarithm of this quaternion
    */
   csQuaternion Log () const;
 
   /**
-   * Get quaternion exp
+   * Get the exponential of this quaternion
    */
   csQuaternion Exp () const;
 

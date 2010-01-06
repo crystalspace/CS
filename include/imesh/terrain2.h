@@ -302,7 +302,9 @@ struct iTerrainDataFeeder : public virtual iBase
 };
 
 /**
- * Return structure for the iTerrainCollider->CollideSegment() routines.
+ * Return structure for the
+ * iTerrainCollider::CollideSegment(iTerrainCell*, const csVector3&, const csVector3&)
+ * routine.
  */
 struct csTerrainColliderCollideSegmentResult
 {
