@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2009-10 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -11,7 +11,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
   Library General Public License for more details.
 
   You should have received a copy of the GNU Library General Public
@@ -21,6 +21,7 @@
 
 #include "avatartest.h"
 #include "imesh/lookat.h"
+#include "imesh/basicskelanim.h"
 
 #define LOOKAT_CAMERA 1
 #define LOOKAT_POSITION 2
@@ -36,7 +37,8 @@ AvatarTest *avatarTest;
 
 AvatarTest::AvatarTest (iObjectRegistry* object_reg)
   : scfImplementationType (this), object_reg (object_reg), targetMode (LOOKAT_CAMERA),
-    alwaysRotate (false), rotationSpeed (ROTATION_NORMAL), targetReached (false)
+    alwaysRotate (false), rotationSpeed (ROTATION_NORMAL), targetReached (false),
+    currentSpeed (0)
 {
 }
 
@@ -110,9 +112,12 @@ void AvatarTest::SetupFrame ()
   else if (smileWeight < 0.0f)
     smileWeight = 0.0f;
 
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"), -2.0f * smileWeight - 1.0f);
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"), smileWeight);
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), smileWeight);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"),
+				 -2.0f * smileWeight - 1.0f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"),
+				 smileWeight);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"),
+				 smileWeight);
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -125,26 +130,29 @@ void AvatarTest::SetupFrame ()
   if(!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
   if (targetMode == LOOKAT_CAMERA)
-    WriteShadow( 10, 480, g2d->FindRGB (255, 150, 100), "Watch out, Frankie is looking at you!");
+    WriteShadow(10, 480, g2d->FindRGB (255, 150, 100), "Watch out, Frankie is looking at you!");
   else if (targetMode == LOOKAT_POSITION)
-    WriteShadow( 10, 480, g2d->FindRGB (255, 150, 100), "Frankie is looking at something");
+    WriteShadow(10, 480, g2d->FindRGB (255, 150, 100), "Frankie is looking at something");
   else if (targetMode == LOOKAT_NOTHING)
-    WriteShadow( 10, 480, g2d->FindRGB (255, 150, 100), "Frankie doesn't care about anything");
+    WriteShadow(10, 480, g2d->FindRGB (255, 150, 100), "Frankie doesn't care about anything");
 
   if (alwaysRotate)
-    WriteShadow( 10, 500, g2d->FindRGB (255, 150, 100), "Always rotate: ON");
+    WriteShadow(10, 500, g2d->FindRGB (255, 150, 100), "Always rotate: ON");
   else
-    WriteShadow( 10, 500, g2d->FindRGB (255, 150, 100), "Always rotate: OFF");
+    WriteShadow(10, 500, g2d->FindRGB (255, 150, 100), "Always rotate: OFF");
 
   if (rotationSpeed == ROTATION_SLOW)
-    WriteShadow( 10, 520, g2d->FindRGB (255, 150, 100), "Rotation speed: really slow");
+    WriteShadow(10, 520, g2d->FindRGB (255, 150, 100), "Rotation speed: really slow");
   if (rotationSpeed == ROTATION_NORMAL)
-    WriteShadow( 10, 520, g2d->FindRGB (255, 150, 100), "Rotation speed: normal");
+    WriteShadow(10, 520, g2d->FindRGB (255, 150, 100), "Rotation speed: normal");
   if (rotationSpeed == ROTATION_IMMEDIATE)
-    WriteShadow( 10, 520, g2d->FindRGB (255, 150, 100), "Rotation speed: infinite");
+    WriteShadow(10, 520, g2d->FindRGB (255, 150, 100), "Rotation speed: infinite");
 
-  if( speed != 0.0f)
-    WriteShadow( 10, 540, g2d->FindRGB (255, 150, 100), "FPS: %.2f",
+  WriteShadow(10, 540, g2d->FindRGB (255, 150, 100), "Walk speed: %.1f",
+	      ((float) currentSpeed) / 10.0f);
+
+  if (speed != 0.0f)
+    WriteShadow(10, 560, g2d->FindRGB (255, 150, 100), "FPS: %.2f",
 		 1.0f / speed);
 
   // Write available keys
@@ -162,7 +170,7 @@ bool AvatarTest::HandleEvent (iEvent& ev)
   {
     if (ev.Name == KeyboardDown)
     {
-      // Toggle target mode
+      // Toggle the target mode of the 'LookAt' controller
       if (csKeyEventHelper::GetCookedCode (&ev) == 't')
       {
 	if (targetMode == LOOKAT_CAMERA)
@@ -187,14 +195,15 @@ bool AvatarTest::HandleEvent (iEvent& ev)
       }
     }
 
-    // Toggle always rotate
+    // Toggle 'always rotate' option of the 'LookAt' controller
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
     {
       alwaysRotate = !alwaysRotate;
       lookAtNode->SetAlwaysRotate (alwaysRotate);
+      return true;
     }
 
-    // Toggle rotation speed
+    // Toggle rotation speed of the 'LookAt' controller
     else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
     {
       if (rotationSpeed == ROTATION_SLOW)
@@ -214,8 +223,32 @@ bool AvatarTest::HandleEvent (iEvent& ev)
 	rotationSpeed = ROTATION_SLOW;
 	lookAtNode->SetMaximumSpeed (0.5f);
       }
+
+      return true;
     }
 
+    // Update walk speed
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '+')
+    {
+      if (currentSpeed < 23)
+      {
+	currentSpeed += 1;
+	speedNode->SetSpeed (((float) currentSpeed) / 10.0f);
+      }
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '-')
+    {
+      if (currentSpeed > 0)
+      {
+	currentSpeed -= 1;
+	speedNode->SetSpeed (((float) currentSpeed) / 10.0f);
+      }
+      return true;
+    }
+
+    // Check for ESC key
     else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
     {
       csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
@@ -243,8 +276,10 @@ bool AvatarTest::Initialize ()
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat", iLookAtManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.body", iBodyManager),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat", iLookAtManager),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
+		       iSkeletonBasicNodesManager2),
     CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -284,7 +319,7 @@ bool AvatarTest::Initialize ()
     return false;
   }
 
-  // Find the pointer to engine plugin
+  // Find the pointer to engine and other plugins
   engine = csQueryRegistry<iEngine> (object_reg);
   if (engine == 0)
   {
@@ -345,6 +380,15 @@ bool AvatarTest::Initialize ()
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
       "crystalspace.application.avatartest",
       "No iLookAtManager plugin!");
+    return false;
+  }
+
+  basicNodesManager = csQueryRegistry<iSkeletonBasicNodesManager2> (object_reg);
+  if (basicNodesManager == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.avatartest",
+      "No iSkeletonBasicNodesManager2 plugin!");
     return false;
   }
 
@@ -473,7 +517,7 @@ void AvatarTest::CreateAvatar ()
   iBodySkeleton* bodySkeleton = bodyManager->CreateBodySkeleton ("franky_body",
 								    animeshFactory);
 
-  // Create joint properties of 'head' bone
+  // Create joint properties of 'head' bone, it will be used by the 'LookAt' controller.
   iBodyBone* bone_Head = bodySkeleton->CreateBodyBone
     (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
   iBodyBoneJoint* joint = bone_Head->CreateBoneJoint ();
@@ -481,32 +525,79 @@ void AvatarTest::CreateAvatar ()
   joint->SetMinimumAngle (csVector3 (-1.0f, -1.4f, 0.0f));
   joint->SetMaximumAngle (csVector3 (0.8f, 1.4f, 0.0f));
 
-  // Create new animation tree
+  // Create a new animation tree. The structure of the tree is:
+  //   + 'LookAt' controller node (root node)
+  //     + 'speed' controller node
+  //       + animation nodes for all speeds
   csRef<iSkeletonAnimPacketFactory2> animFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create 'LookAt' controller
-  csRef<iLookAtAnimNodeFactory> lookAtFactory =
+  csRef<iLookAtAnimNodeFactory> lookAtNodeFactory =
     lookAtManager->CreateAnimNodeFactory ("lookat", bodySkeleton);
-  animFactory->SetAnimationRoot (lookAtFactory);
+  animFactory->SetAnimationRoot (lookAtNodeFactory);
 
   // Create 'idle' animation node
   csRef<iSkeletonAnimationNodeFactory2> idleNodeFactory =
     animFactory->CreateAnimationNode ("idle");
   idleNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_Idle1"));
-  idleNodeFactory->SetCyclic (true);
-  lookAtFactory->SetChildNode (idleNodeFactory);
+
+  // Create 'walk_slow' animation node
+  csRef<iSkeletonAnimationNodeFactory2> walkSlowNodeFactory =
+    animFactory->CreateAnimationNode ("walk_slow");
+  walkSlowNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_WalkSlow"));
+
+  // Create 'walk' animation node
+  csRef<iSkeletonAnimationNodeFactory2> walkNodeFactory =
+    animFactory->CreateAnimationNode ("walk");
+  walkNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_Walk"));
+
+  // Create 'walk_fast' animation node
+  csRef<iSkeletonAnimationNodeFactory2> walkFastNodeFactory =
+    animFactory->CreateAnimationNode ("walk_fast");
+  walkFastNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_WalkFast"));
+
+  // Create 'run_slow' animation node
+  csRef<iSkeletonAnimationNodeFactory2> runSlowNodeFactory =
+    animFactory->CreateAnimationNode ("run_slow");
+  runSlowNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_RunSlow"));
+
+  // Create 'run' animation node
+  csRef<iSkeletonAnimationNodeFactory2> runNodeFactory =
+    animFactory->CreateAnimationNode ("run");
+  runNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_Run"));
+
+  // Create 'run_fast' animation node
+  csRef<iSkeletonAnimationNodeFactory2> runFastNodeFactory =
+    animFactory->CreateAnimationNode ("run_fast");
+  runFastNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_RunFaster"));
+
+  // Create 'speed' controller
+  // Unfortunately, the Frankie animations from 'walk fast' to 'run slow' and 'run slow' to 'run'
+  // do not blend well together, but this is just an example...
+  csRef<iSkeletonSpeedNodeFactory2> speedNodeFactory =
+    basicNodesManager->CreateSpeedNodeFactory ("speed");
+  speedNodeFactory->AddNode (idleNodeFactory, 0.0f);
+  speedNodeFactory->AddNode (walkSlowNodeFactory, 0.1f);
+  speedNodeFactory->AddNode (walkNodeFactory, 0.4f);
+  speedNodeFactory->AddNode (walkFastNodeFactory, 0.9f);
+  speedNodeFactory->AddNode (runSlowNodeFactory, 1.1f);
+  speedNodeFactory->AddNode (runNodeFactory, 1.5f);
+  speedNodeFactory->AddNode (runFastNodeFactory, 2.3f);
+
+  lookAtNodeFactory->SetChildNode (speedNodeFactory);
 
   // Create animesh
   csRef<iMeshWrapper> avatarMesh = engine->CreateMeshWrapper (meshfact, "Frankie",
 					   room, csVector3 (0.0f));
   animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
-  // Setup of the LookAt controller
-  iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
-    GetAnimationRoot ();
+  // Now the animation nodes are created, we can set them up
 
-  lookAtNode = scfQueryInterfaceSafe<iLookAtAnimNode> (root->FindNode ("lookat"));
+  // Setup of the LookAt controller
+  iSkeletonAnimNode2* rootNode = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+
+  lookAtNode = scfQueryInterfaceSafe<iLookAtAnimNode> (rootNode->FindNode ("lookat"));
   lookAtNode->AddListener (this);
   lookAtNode->SetAnimatedMesh (animesh);
   lookAtNode->SetBone (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
@@ -515,8 +606,10 @@ void AvatarTest::CreateAvatar ()
   lookAtNode->SetListenerDelay (0.6f);
   lookAtNode->SetTarget (view->GetCamera(), csVector3 (0.0f));
 
-  // Start animation
-  root->Play ();
+  // Setup of the speed controller
+  speedNode = scfQueryInterfaceSafe<iSkeletonSpeedNode2> (rootNode->FindNode ("speed"));
+  currentSpeed = 0;
+  speedNode->SetSpeed (((float) currentSpeed) / 10.0f);
 
   // Init morph animation
   smileWeight = 1.0f;
@@ -524,17 +617,20 @@ void AvatarTest::CreateAvatar ()
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("wings_in"), 1.0f);
+
+  // Start animation
+  rootNode->Play ();
 }
 
 void AvatarTest::TargetReached ()
 {
-  printf ("target reached\n");
+  printf ("'LookAt' target reached\n");
   targetReached = true;
 }
 
 void AvatarTest::TargetLost ()
 {
-  printf ("target lost\n");
+  printf ("'LookAt' target lost\n");
   targetReached = false;
 }
 
@@ -582,10 +678,13 @@ void AvatarTest::DisplayKeys ()
   WriteShadow (x, y, fg, "t: toggle 'LookAt' target mode");
   y += lineSize;
 
-  WriteShadow (x, y, fg, "r: toggle 'always rotate' mode");
+  WriteShadow (x, y, fg, "r: toggle 'LookAt: always rotate' mode");
   y += lineSize;
 
-  WriteShadow (x, y, fg, "s: toggle rotation speed");
+  WriteShadow (x, y, fg, "s: toggle 'LookAt: rotation speed'");
+  y += lineSize;
+
+  WriteShadow (x, y, fg, "+/-: walk faster/slower");
   y += lineSize;
 }
 

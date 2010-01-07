@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2009-10 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -11,7 +11,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
   Library General Public License for more details.
 
   You should have received a copy of the GNU Library General Public
@@ -24,6 +24,10 @@
 #include <stdarg.h>
 #include <crystalspace.h>
 #include "csutil/scf_implementation.h"
+
+// TODO: to be removed
+class iSkeletonBasicNodesManager2;
+class iSkeletonSpeedNode2;
 
 class AvatarTest : public scfImplementation1<AvatarTest, iLookAtListener>
 {
@@ -45,12 +49,18 @@ private:
   csRef<iAnimatedMesh> animesh;
   csRef<iBodyManager> bodyManager;
   csRef<iLookAtManager> lookAtManager;
+  csRef<iSkeletonBasicNodesManager2> basicNodesManager;
+
   csRef<iLookAtAnimNode> lookAtNode;
   char targetMode;
   bool alwaysRotate;
   char rotationSpeed;
-
   bool targetReached;
+
+  csRef<iSkeletonSpeedNode2> speedNode;
+  // We use a 'int' instead of a 'float' to avoid round errors
+  int currentSpeed;
+
   float smileWeight;
 
   static bool AvatarTestEventHandler (iEvent& ev);
