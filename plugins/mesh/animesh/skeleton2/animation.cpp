@@ -286,24 +286,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
       // Find keyframes before/after time
       size_t before, after;
-      size_t ki = channel->keyFrames.FindSortedKey (cmp, &before);
 
-      // First keyframe
-      if (ki != csArrayItemNotFound)
+      if (channel->keyFrames.GetSize () == 0)
+	continue;
+
+      if (channel->keyFrames.GetSize () == 1)
+	before = after = 0;
+
+      else
       {
-        before = ki;
+	size_t ki = channel->keyFrames.FindSortedKey (cmp, &before);
+
+	// First keyframe
+	if (ki != csArrayItemNotFound)
+	{
+	  before = ki;
+	}
+
+	if (channel->keyFrames[before].time > playbackTime && before > 0)
+	  before--;
+
+	// Second
+	after = before + 1;
+	if (after == channel->keyFrames.GetSize ())
+	{
+	  // Handle end-of-frame
+	  after = isPlayingCyclic ? 0 : before;
+	}
       }
-
-      if (channel->keyFrames[before].time > playbackTime && before > 0)
-        before--;
-
-      // Second
-      after = before + 1;
-      if (after == channel->keyFrames.GetSize ())
-      {
-        // Handle end-of-frame
-        after = isPlayingCyclic ? 0 : before;
-      }      
 
       const KeyFrame& k1 = channel->keyFrames[before];
       const KeyFrame& k2 = channel->keyFrames[after];

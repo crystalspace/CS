@@ -40,7 +40,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       : owner (owner)
     {}
 
-    void FireAnimationFinishedCb ()
+    inline void FireAnimationFinishedCb ()
     {
       for (size_t i = 0; i < callbacks.GetSize (); ++i)
       {
@@ -48,7 +48,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    void FireAnimationCycleCb ()
+    inline void FireAnimationCycleCb ()
     {
       for (size_t i = 0; i < callbacks.GetSize (); ++i)
       {
@@ -56,7 +56,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    void FireStateChangeCb (bool playing)
+    inline void FireStateChangeCb (bool playing)
     {
       for (size_t i = 0; i < callbacks.GetSize (); ++i)
       {
@@ -64,7 +64,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    void FireDurationChangeCb ()
+    inline void FireDurationChangeCb ()
     {
       for (size_t i = 0; i < callbacks.GetSize (); ++i)
       {
@@ -72,12 +72,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    void AddAnimationCallback (iSkeletonAnimCallback2* callback)
+    inline void AddAnimationCallback (iSkeletonAnimCallback2* callback)
     {
       callbacks.PushSmart (callback);
     }
 
-    void RemoveAnimationCallback (iSkeletonAnimCallback2* callback)
+    inline void RemoveAnimationCallback (iSkeletonAnimCallback2* callback)
     {
       callbacks.Delete (callback);
     }    
@@ -98,6 +98,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     BaseNodeChildren (iSkeletonAnimNode2* owner)
       : BaseNodeSingle (owner), manualCbInstall (false)
     {}
+    virtual ~BaseNodeChildren () {}
 
     void AddAnimationCallback (iSkeletonAnimCallback2* callback);
     void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
