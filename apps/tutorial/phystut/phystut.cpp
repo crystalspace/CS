@@ -346,10 +346,11 @@ bool Simple::HandleEvent (iEvent& ev)
       }
 
       else if (csKeyEventHelper::GetCookedCode (&ev) == '?'
-	       && phys_engine_id != BULLET_ID)
+	       && phys_engine_id == BULLET_ID)
       {
 	// Toggle collision debug mode
-	  do_bullet_debug = !do_bullet_debug;
+	// (this only works with the static 'Star' mesh spawned with key '*')
+	do_bullet_debug = !do_bullet_debug;
       }
 
       else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
@@ -753,9 +754,9 @@ void Simple::UpdateCameraMode ()
 
     // Create a body
     cameraBody = dynSys->CreateBody ();
-    cameraBody->SetProperties (1, csVector3 (0), csMatrix3 ());
+    cameraBody->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
     cameraBody->SetTransform (tc);
-    cameraBody->AttachColliderSphere (0.8f, csVector3 (0), 10, 1, 0.8f);
+    cameraBody->AttachColliderSphere (0.8f, csVector3 (0.0f), 10.0f, 1.0f, 0.8f);
   }
 
   // The camera is free
@@ -784,7 +785,7 @@ iRigidBody* Simple::CreateBox ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (1, csVector3 (0), csMatrix3 ());
+  rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
   rb->AttachMesh (mesh);
 
@@ -833,23 +834,20 @@ bool Simple::CreateStarCollider ()
   if (staticCollider)
   {
     csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
-    // TODO: star is not convex
-    collider->CreateConvexMeshGeometry (star);
-    //collider->CreateMeshGeometry (star);
+    collider->CreateMeshGeometry (star);
     collider->SetTransform (tc);
   }
 
   else
   {
     csRef<iRigidBody> rb = dynSys->CreateBody ();
-    rb->SetProperties (1, csVector3 (0), csMatrix3 ());
+    rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
     rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 2));
 
     const csMatrix3 tm;
     const csVector3 tv (0);
     csOrthoTransform t (tm, tv);
-    //rb->AttachColliderMesh (star, t, 10, 1, 0.8f);
-    rb->AttachColliderConvexMesh (star, t, 10, 1, 0.8f);
+    rb->AttachColliderMesh (star, t, 10, 1, 0.8f);
 
     rb->AttachMesh (star);
 
@@ -871,7 +869,7 @@ iRigidBody* Simple::CreateMesh ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (1, csVector3 (0), csMatrix3 ());
+  rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 2));
   rb->AttachMesh (mesh);
 
@@ -935,7 +933,7 @@ iRigidBody* Simple::CreateSphere ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (r, csVector3 (0), csMatrix3 ());
+  rb->SetProperties (r, csVector3 (0.0f), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1)
 		   - artificialOffset);
   rb->AttachMesh (mesh);
@@ -987,7 +985,7 @@ iRigidBody* Simple::CreateCylinder ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (radius, csVector3 (0), csMatrix3 ());
+  rb->SetProperties (radius, csVector3 (0.0f), csMatrix3 ());
   rb->AttachMesh (mesh);
 
   // Create and attach a cylinder collider.
@@ -1040,7 +1038,7 @@ iRigidBody* Simple::CreateCapsule ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (radius, csVector3 (0), csMatrix3 ());
+  rb->SetProperties (radius, csVector3 (0.0f), csMatrix3 ());
   rb->AttachMesh (mesh);
 
   // Create and attach a capsule collider.
@@ -1087,7 +1085,7 @@ iRigidBody* Simple::CreateConvexMesh ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (radius, csVector3 (0), csMatrix3 ());
+  rb->SetProperties (radius, csVector3 (0.0f), csMatrix3 ());
   rb->AttachMesh (mesh);
 
   // Create and attach a mesh collider.
