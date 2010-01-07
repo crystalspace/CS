@@ -817,7 +817,7 @@ void csBulletRigidBody::RebuildBody ()
     if (!isStatic)
     {
       // compute the masses of the shapes
-      btScalar* masses = new btScalar[shapeCount];
+      CS_ALLOC_STACK_ARRAY(btScalar, masses, shapeCount); 
       float totalMass = 0.0f;
 
       // check if a custom mass has been defined
@@ -828,7 +828,7 @@ void csBulletRigidBody::RebuildBody ()
 
 	else
 	{
-	  float* volumes = new float[shapeCount];
+	  CS_ALLOC_STACK_ARRAY(float, volumes, shapeCount); 
 	  float totalVolume = 0.0f;
 
 	  // compute the volume of each shape
@@ -841,8 +841,6 @@ void csBulletRigidBody::RebuildBody ()
 	  // assign masses
 	  for (int j = 0; j < shapeCount; j++)
 	    masses[j] = mass * volumes[j] / totalVolume;
-
-	  delete[] volumes;
 	}
 
 	totalMass = mass;
@@ -859,7 +857,6 @@ void csBulletRigidBody::RebuildBody ()
       btTransform principal;
       btVector3 principalInertia;
       compoundShape->calculatePrincipalAxisTransform (masses, principal, principalInertia);
-      delete[] masses;
 
       // create new motion state
       btTransform trans;
