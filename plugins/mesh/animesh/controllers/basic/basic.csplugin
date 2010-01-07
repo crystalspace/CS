@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- basic.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.animesh.controllers.basic</name>
+        <implementation>BasicNodesManager</implementation>
+        <description>Crystal Space basic animation nodes of an animated mesh</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
