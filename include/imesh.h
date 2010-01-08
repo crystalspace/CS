@@ -23,6 +23,7 @@
  */
 #include "cssysdef.h"
 #include "imesh/animesh.h"
+#include "imesh/basicskelanim.h"
 #include "imesh/bodymesh.h"
 #include "imesh/emit.h"
 #include "imesh/genmesh.h"
