@@ -1025,8 +1025,21 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
         : iShaderProgram::loadSuccessShaderInvalid;
   }
   
-  return oneReadCorrectly ? iShaderProgram::loadSuccessShaderInvalid
-                          : iShaderProgram::loadFail;
+  if (oneReadCorrectly)
+  {
+    if (bestLimits < currentLimits)
+    {
+      /* The 'invalid' programs may compile with the current limits -
+         so again, provoke clean load */
+      if (failReason)
+        failReason->AttachNew (new scfString ("Provoking clean load with current limits"));
+      return iShaderProgram::loadFail;
+    }
+    else
+      return iShaderProgram::loadSuccessShaderInvalid;
+  }
+  else
+    return iShaderProgram::loadFail;
 }
 
 bool csShaderGLCGCommon::LoadProgramWithPS1 ()
