@@ -34,8 +34,8 @@
 #include "engine.h"
 
 csImposterMesh::csImposterMesh (csEngine* engine, iSector* sector) : scfImplementationType(this),
-engine(engine), sector(sector), materialUpdateNeeded(false), matDirty(true), meshDirty(true), 
-numImposterMeshes(0), instance(false), removeMe(false), rendered(false), currentMesh(0)
+engine(engine), sector(sector), materialUpdateNeeded(false), instance(false), removeMe(false), 
+matDirty(true), meshDirty(true), numImposterMeshes(0), rendered(false), currentMesh(0)
 {
   // Create meshwrapper.
   csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
@@ -59,9 +59,9 @@ numImposterMeshes(0), instance(false), removeMe(false), rendered(false), current
 csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
                                 iMeshWrapper* pmesh, iRenderView* rview,
                                 bool instance, const char* shader) :
-scfImplementationType(this), engine(engine), instance(instance), removeMe(false),
+scfImplementationType(this), fact(fact), engine(engine), instance(instance), removeMe(false),
 shader(shader), materialUpdateNeeded(false), matDirty(true), meshDirty(true),
-fact(fact), camera(rview->GetCamera()), isUpdating(false), rendered(false)
+camera(rview->GetCamera()), isUpdating(false), rendered(false)
 {
   // Misc inits.
   vertices.SetVertexCount (4);
@@ -135,7 +135,7 @@ bool csImposterMesh::Add(iMeshWrapper* mesh, iRenderView* rview)
     CreateInstance(mesh);
 
     // Update the range.
-    size_t distance = (rview->GetCamera()->GetTransform().GetOrigin()
+    float distance = (rview->GetCamera()->GetTransform().GetOrigin()
       - mesh->GetMovable()->GetPosition()).Norm();
     if(distance < closestInstance || closestInstanceMesh == mesh)
     {
@@ -175,7 +175,7 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
       }
 
       // Update the distance.
-      size_t distance = (rview->GetCamera()->GetTransform().GetOrigin()
+      float distance = (rview->GetCamera()->GetTransform().GetOrigin()
         - mesh->GetMovable()->GetPosition()).Norm();
       if(distance < closestInstance || closestInstanceMesh == mesh)
       {

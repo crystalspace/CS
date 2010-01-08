@@ -86,6 +86,8 @@ private:
   // Convenience shortcut
   csEngine *engine;
 
+  iSector* sector;
+
   // Whether or not we're instancing.
   bool instance;
 
@@ -129,7 +131,7 @@ private:
   csWeakRef<iCamera> camera;
 
   // The distance to the closest instance of this imposter.
-  size_t closestInstance;
+  float closestInstance;
 
   // The closest instance of the mesh.
   csWeakRef<iMeshWrapper> closestInstanceMesh;
@@ -144,8 +146,6 @@ private:
   csBox3 bbox;
 
   csRef<iGraphics3D> g3d;
-
-  iSector* sector;
 
   // True if r2t has been performed for this imposter.
   bool rendered;
