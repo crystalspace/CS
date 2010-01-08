@@ -71,7 +71,7 @@ bool Shagnetron::FileBlacklisted (const char* file)
   return false;
 }
 
-bool Shagnetron::PrecacheShaderFile (const char* file)
+bool Shagnetron::PrecacheShaderFile (const char* file, bool doQuick)
 {
   if (doVerbose)
     csPrintf ("%s ... ", file);
@@ -123,7 +123,7 @@ bool Shagnetron::PrecacheShaderFile (const char* file)
     dirChanger.ChangeTo (file);
     
     result = shcom->PrecacheShader (shaderNode,
-      shaderMgr->GetShaderCache());
+      shaderMgr->GetShaderCache(), doQuick);
   }
 
   csPrintf ("%s\n", result ? "ok" : "failed");
@@ -173,26 +173,37 @@ bool Shagnetron::Run ()
       iShaderManager::cachePriorityHighest);
   }
   if (cmdline->GetBoolOption ("cacheclear", false))
+  {
+    csPrintf ("Clearing cache ..."); fflush (stdout);
     shaderCache->ClearCache ("/");
+    csPrintf (" ok\n");
+  }
+
+  bool doQuick = cmdline->GetBoolOption ("quick", false);
   
+  csSet<csString> seenDirectories;
   while (toScan.GetSize() > 0)
   {
     csString obj (toScan.PopTop());
     
     if (obj[obj.Length()-1] == '/')
     {
-      csRef<iStringArray> vfsFiles (vfs->FindFiles (obj));
-      for (size_t i = 0; i < vfsFiles->GetSize(); i++)
+      if (!seenDirectories.Contains (obj))
       {
-	const char* file = vfsFiles->Get (i);
-	
-	if (FileBlacklisted (file)) continue;
-	
-	toScan.Push (file);
+        csRef<iStringArray> vfsFiles (vfs->FindFiles (obj));
+        for (size_t i = 0; i < vfsFiles->GetSize(); i++)
+        {
+	  const char* file = vfsFiles->Get (i);
+  	
+	  if (FileBlacklisted (file)) continue;
+  	
+	  toScan.Push (file);
+        }
+        seenDirectories.AddNoTest (obj);
       }
     }
     else
-      PrecacheShaderFile (obj);
+      PrecacheShaderFile (obj, doQuick);
   }
 
   return true;
@@ -214,6 +225,9 @@ void Shagnetron::PrintHelp ()
   csPrintf ("                   The first directory is written to.\n");
   csPrintf (" -nodefaultcaches  Do not use default caches set in config\n");
   csPrintf (" -cacheclear       Clear used caches\n");
+  csPrintf (" -quick            Do a 'quick' precache.\n");
+  csPrintf ("                   Precaching will take less time, but some shader processing\n");
+  csPrintf ("                   will still happen at run time.\n");
   csPrintf ("\n");
 }
 
