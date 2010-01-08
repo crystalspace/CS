@@ -918,97 +918,101 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     delete condReader;
   }
 
-  bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
+  bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo,
+                              bool quick)
   {
     shaderCache = cacheTo;
     Load (source, true);
     if (!shaderCache.IsValid()) return false;
 
     bool result = true;
-    size_t tvc = techsResolver->GetVariantCount();
-    if (tvc == 0) tvc = 1;
-
-    size_t totalTechs = 0;
-
-    for (size_t t = 0; t < techniques.GetSize(); t++)
-    {
-      Technique& tech = techniques[t];
-
-      size_t vc = tech.resolver->GetVariantCount();
-      if (vc == 0) vc = 1;
-      
-      if (compiler->do_verbose)
-	compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Shader '%s': priority %d: %zu variations",
-	GetName(), tech.priority, vc);
-
-      totalTechs += vc;
-    }
-
-    size_t techsHandled = 0;
-    csTicks startTime = csGetTicks();
     csTextProgressMeter* progress = 0;
-    for (size_t t = 0; t < techniques.GetSize(); t++)
+    if (!quick)
     {
-      Technique& tech = techniques[t];
+      size_t tvc = techsResolver->GetVariantCount();
+      if (tvc == 0) tvc = 1;
 
-      csRef<iHierarchicalCache> techCache;
-      techCache = shaderCache->GetRootedCache (
-	csString().Format ("/%s/%zu", cacheScope_tech.GetData(), t));
+      size_t totalTechs = 0;
 
-      size_t vc = tech.resolver->GetVariantCount();
-      if (vc == 0) vc = 1;
-      for (size_t vi = 0; vi < vc; vi++)
+      for (size_t t = 0; t < techniques.GetSize(); t++)
       {
-	tech.resolver->SetVariantEval (vi);
+        Technique& tech = techniques[t];
 
-	//size_t ticket = vi * (techniques.GetSize()+1) + (t+1);
-	//((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
-	size_t ticket = ComputeTicket (t, vi);
+        size_t vc = tech.resolver->GetVariantCount();
+        if (vc == 0) vc = 1;
+        
+        if (compiler->do_verbose)
+	  compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Shader '%s': priority %d: %zu variations",
+	  GetName(), tech.priority, vc);
 
-	if (compiler->doDumpXML)
-	{
-	  csRef<iDocumentSystem> docsys;
-	  docsys.AttachNew (new csTinyDocumentSystem);
-	  csRef<iDocument> newdoc = docsys->CreateDocument();
-	  CS::DocSystem::CloneNode (tech.techNode, newdoc->CreateRoot());
-	  newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s_%zu_%zu.xml",
-	    GetName(), t, vi));
-	}
+        totalTechs += vc;
+      }
 
-	csRef<iHierarchicalCache> varCache;
-	varCache.AttachNew (
-	  new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
-	  techCache, csString().Format ("/%zu", vi)));
+      size_t techsHandled = 0;
+      csTicks startTime = csGetTicks();
+      for (size_t t = 0; t < techniques.GetSize(); t++)
+      {
+        Technique& tech = techniques[t];
 
-	// So external files are found correctly
-	csVfsDirectoryChanger dirChange (compiler->vfs);
-	dirChange.ChangeTo (vfsStartDir);
+        csRef<iHierarchicalCache> techCache;
+        techCache = shaderCache->GetRootedCache (
+	  csString().Format ("/%s/%zu", cacheScope_tech.GetData(), t));
 
-	csXMLShaderTech* xmltech = new csXMLShaderTech (this);
-	bool result = xmltech->Precache (tech.techNode, ticket, varCache);
-	if (!result)
-	{
-	  if (compiler->do_verbose)
+        size_t vc = tech.resolver->GetVariantCount();
+        if (vc == 0) vc = 1;
+        for (size_t vi = 0; vi < vc; vi++)
+        {
+	  tech.resolver->SetVariantEval (vi);
+
+	  //size_t ticket = vi * (techniques.GetSize()+1) + (t+1);
+	  //((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
+	  size_t ticket = ComputeTicket (t, vi);
+
+	  if (compiler->doDumpXML)
 	  {
-	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "Shader '%s'<%zu/%zu>: Technique with priority %d fails. Reason: %s.",
-	      GetName(), vi, tech.priority,
-	      xmltech->GetFailReason());
+	    csRef<iDocumentSystem> docsys;
+	    docsys.AttachNew (new csTinyDocumentSystem);
+	    csRef<iDocument> newdoc = docsys->CreateDocument();
+	    CS::DocSystem::CloneNode (tech.techNode, newdoc->CreateRoot());
+	    newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s_%zu_%zu.xml",
+	      GetName(), t, vi));
 	  }
-	  result = false;
-	}
-	delete xmltech;
-	techsHandled++;
-	if (progress)
-	  progress->Step (1);
-	else if (csGetTicks() - startTime > 1000)
-	{
-	  progress = new csTextProgressMeter (0, totalTechs);
-	  progress->SetGranularity (progress->GetTickScale());
-	  progress->Step (techsHandled);
-	}
-	tech.resolver->SetCurrentEval (0);
+
+	  csRef<iHierarchicalCache> varCache;
+	  varCache.AttachNew (
+	    new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
+	    techCache, csString().Format ("/%zu", vi)));
+
+	  // So external files are found correctly
+	  csVfsDirectoryChanger dirChange (compiler->vfs);
+	  dirChange.ChangeTo (vfsStartDir);
+
+	  csXMLShaderTech* xmltech = new csXMLShaderTech (this);
+	  bool result = xmltech->Precache (tech.techNode, ticket, varCache);
+	  if (!result)
+	  {
+	    if (compiler->do_verbose)
+	    {
+	      compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	        "Shader '%s'<%zu/%zu>: Technique with priority %d fails. Reason: %s.",
+	        GetName(), vi, tech.priority,
+	        xmltech->GetFailReason());
+	    }
+	    result = false;
+	  }
+	  delete xmltech;
+	  techsHandled++;
+	  if (progress)
+	    progress->Step (1);
+	  else if (csGetTicks() - startTime > 1000)
+	  {
+	    progress = new csTextProgressMeter (0, totalTechs);
+	    progress->SetGranularity (progress->GetTickScale());
+	    progress->Step (techsHandled);
+	  }
+	  tech.resolver->SetCurrentEval (0);
+        }
       }
     }
 
@@ -1034,7 +1038,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           csRef<iShaderCompiler> shcom = shadermgr->GetCompiler (type);
           if (shcom.IsValid()) 
           {
-            result &= shcom->PrecacheShader (fallbackNode, cacheTo);
+            result &= shcom->PrecacheShader (fallbackNode, cacheTo, quick);
           }
         }
       }

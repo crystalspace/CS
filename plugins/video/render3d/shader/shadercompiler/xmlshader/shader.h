@@ -354,7 +354,8 @@ public:
   csXMLShader (csXMLShaderCompiler* compiler);
   virtual ~csXMLShader();
   
-  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo);
+  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo,
+    bool quick);
 
   virtual iObject* QueryObject () 
   { return (iObject*)(csObject*)this; }

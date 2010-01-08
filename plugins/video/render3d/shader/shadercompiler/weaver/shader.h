@@ -101,7 +101,8 @@ public:
   
   bool Load (iLoaderContext* ldr_context, iDocumentNode* source,
     int forcepriority);
-  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo);
+  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo,
+    bool quick);
 
   virtual iObject* QueryObject () 
   { return static_cast<iObject*> (static_cast<csObject*> (this)); }

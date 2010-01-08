@@ -612,7 +612,7 @@ struct iShader : public virtual iShaderVariableContext
  */
 struct iShaderCompiler : public virtual iBase
 {
-  SCF_INTERFACE (iShaderCompiler, 0,0,2);
+  SCF_INTERFACE (iShaderCompiler, 1,0,0);
   /// Get a name identifying this compiler
   virtual const char* GetName() = 0;
 
@@ -642,8 +642,24 @@ struct iShaderCompiler : public virtual iBase
   virtual csPtr<iShaderPriorityList> GetPriorities (
 		  iDocumentNode* templ) = 0;
 		  
+  /**
+   * 'Precache' a shader.
+   * Compiles a shader but stores results of that in the cache \a cacheTo
+   * for faster loading at runtime.
+   * \param node Root node of the shader to cache.
+   * \param cacheTo Cache object to store data in. Usually an instance of
+   *   VfsHierarchicalCache pointing to a VFS dir that is used as a cache
+   *   directory for the shader manager at runtime.
+   * \param quick Do a "quick" precache. That means thoroughness is traded
+   *   for time: the precache will take less time than a full one, but will
+   *   be incomplete, meaning that some more compilation will take place
+   *   at load time.
+   * \note In practice, 'quick' precaching means that the XMLShader plugin
+   *  does not compile shader programs; this is deferred to the application
+   *  run time.
+   */
   virtual bool PrecacheShader (iDocumentNode* node,
-    iHierarchicalCache* cacheTo) = 0;
+    iHierarchicalCache* cacheTo, bool quick = false) = 0;
 };
 
 #endif // __CS_IVIDEO_SHADER_H__

@@ -635,14 +635,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   bool WeaverShader::Precache (iDocumentNode* source,
-                               iHierarchicalCache* cacheTo)
+                               iHierarchicalCache* cacheTo,
+                               bool quick)
   {
     csRef<iDocument> synthShader (DoSynthesis (source, cacheTo, -1));
     
     csRef<iDocumentNode> shaderNode =
       synthShader->GetRoot()->GetNode ("shader");
     
-    return compiler->xmlshader->PrecacheShader (shaderNode, cacheTo);
+    return compiler->xmlshader->PrecacheShader (shaderNode, cacheTo, quick);
   }
   
   void WeaverShader::SelfDestruct ()
