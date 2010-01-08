@@ -251,6 +251,8 @@ private:
   template<typename Evaluator>
   typename Evaluator::EvalResult EvaluateInternal (Evaluator& eval,
     csConditionID condition);
+  size_t* AllocSVIndicesInternal (const CS::Graphics::ShaderVarNameParser& parser);
+  size_t* AllocSVIndicesInternal (size_t num);
   const char* ProcessExpressionInternal (csExpression* expression, 
     csConditionID& cond);
   void SetupEvalCacheInternal (const csShaderVariableStack* stack);
@@ -277,7 +279,6 @@ public:
   void SetEngine (iEngine* engine) { this->engine = engine; }
     
   iShaderVarStringSet* GetStrings() const { return strings; }
-  size_t* AllocSVIndices (const CS::Graphics::ShaderVarNameParser& parser);
   size_t* AllocSVIndices (size_t num);
 
   /// Convert expression into internal representation.

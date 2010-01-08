@@ -101,17 +101,23 @@ csConditionEvaluator::~csConditionEvaluator ()
   }
 }
 
-size_t* csConditionEvaluator::AllocSVIndices (
+size_t* csConditionEvaluator::AllocSVIndices (size_t num)
+{
+  if (num == 0) return 0;
+  
+  LockType lock (mutex);
+  size_t* mem = (size_t*)scratch.Alloc ((num+1) * sizeof (size_t));
+  return mem;
+}
+
+size_t* csConditionEvaluator::AllocSVIndicesInternal (
   const CS::Graphics::ShaderVarNameParser& parser)
 {
   const size_t num = parser.GetIndexNum();
   if (num == 0) return 0;
 
   size_t* mem;
-  {
-    LockType lock (mutex);
-    mem = (size_t*)scratch.Alloc ((num+1) * sizeof (size_t));
-  }
+  mem = (size_t*)scratch.Alloc ((num+1) * sizeof (size_t));
   size_t* p = mem;
   
   *p++ = num;
@@ -120,11 +126,10 @@ size_t* csConditionEvaluator::AllocSVIndices (
   return mem;
 }
 
-size_t* csConditionEvaluator::AllocSVIndices (size_t num)
+size_t* csConditionEvaluator::AllocSVIndicesInternal (size_t num)
 {
   if (num == 0) return 0;
   
-  LockType lock (mutex);
   size_t* mem = (size_t*)scratch.Alloc ((num+1) * sizeof (size_t));
   return mem;
 }
@@ -464,7 +469,7 @@ const char* csConditionEvaluator::ResolveSVIdentifier (
     
     operand.type = operandSV;
     operand.svLocation.svName = strings->Request (svParser.GetShaderVarName());
-    operand.svLocation.indices = AllocSVIndices (svParser);
+    operand.svLocation.indices = AllocSVIndicesInternal (svParser);
     return 0;
   }
   else
@@ -495,7 +500,7 @@ const char* csConditionEvaluator::ResolveSVIdentifier (
       
       operand.type = operandSV;
       operand.svLocation.svName = strings->Request (svParser.GetShaderVarName());
-      operand.svLocation.indices = AllocSVIndices (svParser);
+      operand.svLocation.indices = AllocSVIndicesInternal (svParser);
       operand.svLocation.bufferName = csRenderBuffer::GetBufferNameFromDescr (
         svParser.GetShaderVarName());
     }
