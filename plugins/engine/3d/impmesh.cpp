@@ -34,8 +34,7 @@
 #include "engine.h"
 
 csImposterMesh::csImposterMesh (csEngine* engine, iSector* sector) : scfImplementationType(this),
-engine(engine), sector(sector), materialUpdateNeeded(false), instance(false), removeMe(false), 
-matDirty(true), meshDirty(true), numImposterMeshes(0), rendered(false), currentMesh(0)
+engine(engine), sector(sector), instance(false), removeMe(false), materialUpdateNeeded(false), matDirty(true), meshDirty(true), numImposterMeshes(0), rendered(false), currentMesh(0)
 {
   // Create meshwrapper.
   csMeshWrapper* cmesh = new csMeshWrapper(engine, this);

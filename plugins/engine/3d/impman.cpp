@@ -330,8 +330,8 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Get screen bounding box of the mesh.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
-  imposter->texWidth = rbox.sbox.MaxX() - rbox.sbox.MinX();
-  imposter->texHeight = rbox.sbox.MaxY() - rbox.sbox.MinY();
+  imposter->texWidth = (size_t)(rbox.sbox.MaxX() - rbox.sbox.MinX());
+  imposter->texHeight = (size_t)(rbox.sbox.MaxY() - rbox.sbox.MinY());
 
   if(maxWidth == 0 || maxHeight == 0)
   {
@@ -367,8 +367,8 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   newView->SetAutoResize(false);
   newView->SetWidth(rTexWidth);
   newView->SetHeight(rTexHeight);
-  newView->SetRectangle(csIMesh->texCoords.MinX(),
-    csIMesh->texCoords.MinY(), imposter->texWidth,
+  newView->SetRectangle((int)csIMesh->texCoords.MinX(),
+    (int)csIMesh->texCoords.MinY(), imposter->texWidth,
     imposter->texHeight, false);
   newView->UpdateClipper ();
 
@@ -434,8 +434,8 @@ bool csImposterManager::UpdateImposter(ImposterMat* imposter)
   {
     // Calculate new texture sizes.
     csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(csIMesh->camera);
-    size_t texWidth = csFindNearestPowerOf2(rbox.sbox.MaxX() - rbox.sbox.MinX());
-    size_t texHeight = csFindNearestPowerOf2(rbox.sbox.MaxY() - rbox.sbox.MinY());
+    size_t texWidth = csFindNearestPowerOf2((int)(rbox.sbox.MaxX() - rbox.sbox.MinX()));
+    size_t texHeight = csFindNearestPowerOf2((int)(rbox.sbox.MaxY() - rbox.sbox.MinY()));
 
     if(maxWidth < texWidth)
       texWidth = maxWidth;
