@@ -35,9 +35,11 @@
     <input name="ambient" type="rgb" default="value" defval="0">
       <attribute name="perfragment" type="bool" defval="false" />
     </input>
+    <input file="/shader-snippets/lightScale.inp" private="yes" />
       
     <block location="cg:fragmentMain">
       result = float4 (ambient + lightDiffuse, 1)*surfaceDiffuse + float4 (surfaceSpecular*lightSpecular, 0);
+      result.rgb *= lightScale.y;
       result_attr_perfragment = ambient_attr_perfragment
         || surfaceDiffuse_attr_perfragment
 	|| lightDiffuse_attr_perfragment
@@ -47,6 +49,7 @@
 
     <block location="cg:vertexMain">
       result = float4 (ambient + lightDiffuse, 1)*surfaceDiffuse + float4 (surfaceSpecular*lightSpecular, 0);
+      result.rgb *= lightScale.y;
       result_attr_perfragment = ambient_attr_perfragment
 	|| surfaceDiffuse_attr_perfragment
 	|| lightDiffuse_attr_perfragment

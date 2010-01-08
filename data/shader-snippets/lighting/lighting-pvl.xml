@@ -32,6 +32,7 @@
 	<input name="lightOffset" type="int" default="value" defval="0"/>
 	<input name="maxLights" type="int" default="value" defval="8"/>
 	<input name="minLights" type="int" default="value" defval="0"/>
+	<input file="/shader-snippets/lightScale.inp" private="yes" />
 	
 	<block location="pass">
 	  <?Include /shader-snippets/lighting/lighting-tools.inc ?>
@@ -78,6 +79,8 @@
 	    diffuseColor += d;
 	    specularColor += s;
 	  }
+	  diffuseColor *= lightScale.x;
+	  specularColor *= lightScale.y;
 	  diffuseColor_attr_perfragment = false;
 	  specularColor_attr_perfragment = false;
 	</block>

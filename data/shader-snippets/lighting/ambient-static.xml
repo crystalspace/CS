@@ -17,11 +17,9 @@
 -->
 <snippet type="compound">
   <technique priority="100">
-    <snippet id="ambientOcclusion" file="/shader-snippets/lighting/ambient-ao.xml"
-	     condition='(vars."pass number".int == 0) &amp;&amp; (vars."pass do_ambient")'/>
-    
     <snippet id="ambient_static">
-      <technique priority="150">
+      <technique priority="150"
+                 condition='(vars."pass number".int == 0) &amp;&amp; (vars."pass do_ambient") &amp;&amp; (vars."tex lightmap dir 1".texture || vars."static color dir 1".buffer)'>
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
 	<input name="combinedAmbient" type="rgb" default="complex" private="yes">
@@ -203,12 +201,13 @@
 	  </block>
 	</input>
 	
+	<input file="/shader-snippets/lightScale.inp" private="yes" />
+	
 	<block location="cg:definitions">
 	  <?Include /shader-snippets/lighting/directional_lms.cginc ?>
 	</block>
 	
 	<block location="cg:fragmentMain">
-	  <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	  float3 ambient_dynamic = dynamicAmbient * occlusionFactor;
 	  float3 ambient_static;
 	  <?if vars."tex lightmap dir 1".texture || vars."static color dir 1".buffer ?>
@@ -243,20 +242,12 @@
 	  <?if vars."tex lightmap".texture ?>
 	    ambient_static = 2 * tex2D (lightmap, texCoordLM).rgb;
 	    ambient_attr_perfragment = true;
-	  <?elsif vars."static color".buffer ?>
+	  <?else ?>
 	    ambient_static = 2 * litColor;
-	    ambient_attr_perfragment = occlusionFactor_attr_perfragment;
-	  <?else?>
-	    ambient_dynamic = float3 (0);
-	    ambient_static = combinedAmbient * occlusionFactor;
 	    ambient_attr_perfragment = occlusionFactor_attr_perfragment;
 	  <?endif?>
 	  }
-	  ambient = ambient_dynamic + ambient_static;
-	  <?else?>
-	  ambient = float3(0);
-	  ambient_attr_perfragment = false;
-	  <?endif?>
+	  ambient = (ambient_dynamic + ambient_static)*lightScale.x;
 	</block>
 	
 	<output name="ambient" type="rgb">
@@ -264,7 +255,8 @@
 	</output>
       </technique>
     
-      <technique priority="100">
+      <technique priority="100"
+                 condition='(vars."pass number".int == 0) &amp;&amp; (vars."pass do_ambient")'>
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
 	<input name="combinedAmbient" type="rgb" default="complex" private="yes">
@@ -282,18 +274,30 @@
 	  </block>
 	</input>
 	
-	<input name="dynamicAmbient" type="rgb" default="complex" private="yes">
+	<input name="dynamicAmbientScaled" type="rgb" default="complex" private="yes">
 	  <block location="cg:variablemap">
-	    <variablemap variable="dynamic ambient"
-			destination="fragmentIn.dynamicAmbient" />
+	    <variablemap destination="fragmentIn.dynamicAmbientScaled" type="expr">
+	      <sexp>(* "dynamic ambient" 0.5)</sexp>
+	    </variablemap>
+	    <variablemap destination="vertexIn.dynamicAmbientScaled" type="expr">
+	      <sexp>(* "dynamic ambient" 0.5)</sexp>
+	    </variablemap>
 	  </block>
 	  
 	  <block location="cg:fragmentIn">
-	    <uniform type="rgb" name="dynamicAmbient" />
+	    <uniform type="rgb" name="dynamicAmbientScaled" />
 	  </block>
 	  
 	  <block location="cg:fragmentMain">
-	    dynamicAmbient = fragmentIn.dynamicAmbient;
+	    dynamicAmbientScaled = fragmentIn.dynamicAmbientScaled;
+	  </block>
+	  
+	  <block location="cg:vertexIn">
+	    <uniform type="rgb" name="dynamicAmbientScaled" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    dynamicAmbientScaled = vertexIn.dynamicAmbientScaled;
 	  </block>
 	</input>
 	<input name="occlusionFactor" type="float" default="value" defval="1">
@@ -354,27 +358,55 @@
 	    lightmap = fragmentIn.lightmap;
 	  </block>
 	</input>
-	
-	<block location="cg:fragmentMain">
-	  <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	    float3 ambient_dynamic = dynamicAmbient * occlusionFactor;
-	    float3 ambient_static;
+	<input file="/shader-snippets/lightScale.inp" private="yes" />
+		
+	<block location="cg:vertexToFragment">
+	  <varying type="rgb" name="ambientPerVertex" />
+	</block>
+	  
+	<block location="cg:vertexMain">
 	    <?if vars."tex lightmap".texture ?>
-	      ambient_static = 2 * tex2D (lightmap, texCoordLM).rgb;
 	      ambient_attr_perfragment = true;
 	    <?elsif vars."static color".buffer?>
-	      ambient_static = 2 * litColor;
+	      if (!occlusionFactor_attr_perfragment)
+	      {
+	        float3 ambient_dynamic = dynamicAmbientScaled * occlusionFactor;
+	        float3 ambient_static;
+	        ambient_static = (2*lightScale.x) * litColor;
+	        ambientPerVertex = (ambient_dynamic*(2*lightScale.x) + ambient_static);
+	        ambient_attr_perfragment = false;
+	      }
+	      else
+	        ambient_attr_perfragment = true;
+	    <?else?>
 	      ambient_attr_perfragment = occlusionFactor_attr_perfragment;
+	    <?endif?>
+	</block>
+	
+	<block location="cg:fragmentMain">
+	    float3 ambient_dynamic = dynamicAmbientScaled * occlusionFactor;
+	    float3 ambient_static;
+	    <?if vars."tex lightmap".texture ?>
+	      ambient_static = (2*lightScale.x) * tex2D (lightmap, texCoordLM).rgb;
+	      ambient_attr_perfragment = true;
+	    <?elsif vars."static color".buffer?>
+	      if (occlusionFactor_attr_perfragment)
+	      {
+	        ambient_static = (2*lightScale.x) * litColor;
+	        ambient_attr_perfragment = occlusionFactor_attr_perfragment;
+	      }
+	      else
+	      {
+	        ambient_dynamic = float3 (0);
+	        ambient_static = ambientPerVertex;
+		ambient_attr_perfragment = false;
+	      }
 	    <?else?>
 	      ambient_dynamic = float3 (0);
 	      ambient_static = combinedAmbient * occlusionFactor;
 	      ambient_attr_perfragment = occlusionFactor_attr_perfragment;
 	    <?endif?>
-	    ambient = ambient_dynamic + ambient_static;
-	  <?else?>
-	  ambient = float3(0);
-	  ambient_attr_perfragment = false;
-	  <?endif?>
+	    ambient = (ambient_dynamic*(2*lightScale.x) + ambient_static);
 	</block>
 	
 	<output name="ambient" type="rgb">
@@ -382,6 +414,10 @@
 	</output>
       </technique>
     </snippet>
+    
+    <snippet id="ambientOcclusion" file="/shader-snippets/lighting/ambient-ao.xml"
+	     condition='(vars."pass number".int == 0) &amp;&amp; (vars."pass do_ambient")'/>
+	     
     <connection from="ambientOcclusion" to="ambient_static" />
   </technique>
 </snippet>
