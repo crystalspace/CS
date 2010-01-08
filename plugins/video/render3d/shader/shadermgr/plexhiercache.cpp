@@ -42,7 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
     size_t insertBefore = 0;
     for (; insertBefore < caches.GetSize(); insertBefore++)
     {
-      if (caches[insertBefore].priority > priority) break;
+      if (caches[insertBefore].priority < priority) break;
     }
     SubCache subCache;
     subCache.cache = cache;
