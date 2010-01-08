@@ -749,10 +749,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
 
-#if defined(CS_PLATFORM_WIN32)
-  cswinMinidumpWriter::SetCrashMinidumpObjectReg (Sys->object_reg);
-#endif
-
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize config!\n"
@@ -762,22 +758,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
-#if defined(CS_PLATFORM_WIN32)
-  const bool mdumpDefault =
-#if defined(CS_COMPILER_MSVC)
-    true;
-#else
-    false;
-#endif
-  if (!cfg->GetBool ("Walktest.Win32.Minidumps", mdumpDefault))
-  {
-    cswinMinidumpWriter::DisableCrashMinidumps ();
-  }
-  else
-  {
-    cswinMinidumpWriter::EnableCrashMinidumps ();
-  }
-#endif
 
   SetDefaults ();
 
@@ -1202,9 +1182,6 @@ static void CreateSystem(void)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-#if defined(CS_PLATFORM_WIN32) && defined(CS_COMPILER_MSVC)
-  cswinMinidumpWriter::EnableCrashMinidumps ();
-#endif
   // Initialize the random number generator
   srand (time (0));
 
