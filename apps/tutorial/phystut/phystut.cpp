@@ -432,7 +432,7 @@ bool Simple::Initialize ()
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.body", iBodyManager),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll", iRagdollManager),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll", iSkeletonRagdollManager2),
     CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -555,7 +555,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  ragdollManager = csQueryRegistry<iRagdollManager> (object_reg);
+  ragdollManager = csQueryRegistry<iSkeletonRagdollManager2> (object_reg);
   if (ragdollManager == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -1467,7 +1467,7 @@ void Simple::LoadRagdoll ()
      bone8->GetAnimeshBone (), 0);
 
   // Create ragdoll factory
-  csRef<iRagdollAnimNodeFactory> ragdollFactory =
+  csRef<iSkeletonRagdollNodeFactory2> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("franky_ragdoll",
 					   bodySkeleton, dynSys);
   ragdollFactory->AddBodyChain (chain6, RAGDOLL_STATE_DYNAMIC);
@@ -1537,8 +1537,8 @@ void Simple::CreateRagdoll ()
     {
       // Find the ragdoll anim node and set it up
       csRef<iSkeletonAnimNode2> animNode = fsm->FindNode ("franky_ragdoll");
-      csRef<iRagdollAnimNode> ragdoll =
-	scfQueryInterfaceSafe<iRagdollAnimNode> (animNode);
+      csRef<iSkeletonRagdollNode2> ragdoll =
+	scfQueryInterfaceSafe<iSkeletonRagdollNode2> (animNode);
       CS_ASSERT (ragdoll);
       ragdoll->SetAnimatedMesh (animesh);
 

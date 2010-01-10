@@ -32,20 +32,20 @@
 /**\addtogroup meshplugins
  * @{ */
 
-struct iLookAtAnimNodeFactory;
+struct iSkeletonLookAtNodeFactory2;
 struct iBodySkeleton;
 struct iAnimatedMesh;
 struct iMovable;
 struct iCamera;
-struct iLookAtListener;
+struct iSkeletonLookAtListener2;
 
 /**
  * A class to manage the creation and deletion of 'LookAt' animation 
  * node factories.
  */
-struct iLookAtManager : public virtual iBase
+struct iSkeletonLookAtManager2 : public virtual iBase
 {
-  SCF_INTERFACE(iLookAtManager, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonLookAtManager2, 1, 0, 0);
 
   /**
    * Create a new 'LookAt' animation node factory.
@@ -55,13 +55,13 @@ struct iLookAtManager : public virtual iBase
    * controller. If skeleton is 0 or if there is no iBodyBoneJoint defined, then the
    * animation won't have any geometrical constraints.
    */
-  virtual iLookAtAnimNodeFactory* CreateAnimNodeFactory (const char *name,
+  virtual iSkeletonLookAtNodeFactory2* CreateAnimNodeFactory (const char *name,
 							 iBodySkeleton* skeleton) = 0;
 
   /**
    * Find the specified 'LookAt' animation node factory.
    */
-  virtual iLookAtAnimNodeFactory* FindAnimNodeFactory (const char* name) const = 0;
+  virtual iSkeletonLookAtNodeFactory2* FindAnimNodeFactory (const char* name) const = 0;
 
   /**
    * Delete all 'LookAt' animation node factories.
@@ -72,9 +72,9 @@ struct iLookAtManager : public virtual iBase
 /**
  * Factory for the 'LookAt' animation node.
  */
-struct iLookAtAnimNodeFactory : public iSkeletonAnimNodeFactory2
+struct iSkeletonLookAtNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
-  SCF_INTERFACE(iLookAtAnimNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonLookAtNodeFactory2, 1, 0, 0);
 
   /**
    * Set the child animation node of this node. The 'Lookat' controller will
@@ -107,9 +107,9 @@ struct iLookAtAnimNodeFactory : public iSkeletonAnimNodeFactory2
  * This controller uses only the pitch and yaw (ie rotations around X and Y axis)
  * in order to achieve the look at the target, the roll is not used.
  */
-struct iLookAtAnimNode : public iSkeletonAnimNode2
+struct iSkeletonLookAtNode2 : public iSkeletonAnimNode2
 {
-  SCF_INTERFACE(iLookAtAnimNode, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonLookAtNode2, 1, 0, 0);
 
   // TODO: remove this function and implement iSkeleton2::GetSceneNode ()
   /**
@@ -182,21 +182,21 @@ struct iLookAtAnimNode : public iSkeletonAnimNode2
   /**
    * Add a listener to be notified when the target has been reached or lost.
    */
-  virtual void AddListener (iLookAtListener* listener) = 0;
+  virtual void AddListener (iSkeletonLookAtListener2* listener) = 0;
 
   /**
    * Remove the specified listener.
    */
-  virtual void RemoveListener (iLookAtListener* listener) = 0;
+  virtual void RemoveListener (iSkeletonLookAtListener2* listener) = 0;
 };
 
 /**
  * A listener to be implemented if you want to be notified when the target has been
  * reached or lost.
  */
-struct iLookAtListener : public virtual iBase
+struct iSkeletonLookAtListener2 : public virtual iBase
 {
-  SCF_INTERFACE (iLookAtListener, 1, 0, 0);
+  SCF_INTERFACE (iSkeletonLookAtListener2, 1, 0, 0);
 
   /**
    * The target is now looked at.

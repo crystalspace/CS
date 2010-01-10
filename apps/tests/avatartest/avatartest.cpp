@@ -277,7 +277,7 @@ bool AvatarTest::Initialize ()
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.body", iBodyManager),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat", iLookAtManager),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat", iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
 		       iSkeletonBasicNodesManager2),
     CS_REQUEST_END))
@@ -374,7 +374,7 @@ bool AvatarTest::Initialize ()
     return false;
   }
 
-  lookAtManager = csQueryRegistry<iLookAtManager> (object_reg);
+  lookAtManager = csQueryRegistry<iSkeletonLookAtManager2> (object_reg);
   if (lookAtManager == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -533,7 +533,7 @@ void AvatarTest::CreateAvatar ()
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create 'LookAt' controller
-  csRef<iLookAtAnimNodeFactory> lookAtNodeFactory =
+  csRef<iSkeletonLookAtNodeFactory2> lookAtNodeFactory =
     lookAtManager->CreateAnimNodeFactory ("lookat", bodySkeleton);
   animFactory->SetAnimationRoot (lookAtNodeFactory);
 
@@ -597,7 +597,7 @@ void AvatarTest::CreateAvatar ()
   // Setup of the LookAt controller
   iSkeletonAnimNode2* rootNode = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
-  lookAtNode = scfQueryInterfaceSafe<iLookAtAnimNode> (rootNode->FindNode ("lookat"));
+  lookAtNode = scfQueryInterfaceSafe<iSkeletonLookAtNode2> (rootNode->FindNode ("lookat"));
   lookAtNode->AddListener (this);
   lookAtNode->SetAnimatedMesh (animesh);
   lookAtNode->SetBone (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));

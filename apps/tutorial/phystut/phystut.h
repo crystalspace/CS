@@ -24,6 +24,9 @@
 #include <ivaria/ode.h>
 #include "dynsysdebug.h"
 
+// TODO: remove that
+#include "imesh/ragdoll.h"
+
 class Simple
 {
 private:
@@ -92,7 +95,7 @@ private:
 
   // ragdoll related
   csRef<iBodyManager> bodyManager;
-  csRef<iRagdollManager> ragdollManager;
+  csRef<iSkeletonRagdollManager2> ragdollManager;
   CS::Animation::StateID ragdollState;
   csRef<iMeshWrapper> ragdollMesh;
 

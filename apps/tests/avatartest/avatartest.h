@@ -25,11 +25,14 @@
 #include <crystalspace.h>
 #include "csutil/scf_implementation.h"
 
+// TODO: remove that
+#include "imesh/lookat.h"
+
 // TODO: to be removed
 class iSkeletonBasicNodesManager2;
 class iSkeletonSpeedNode2;
 
-class AvatarTest : public scfImplementation1<AvatarTest, iLookAtListener>
+class AvatarTest : public scfImplementation1<AvatarTest, iSkeletonLookAtListener2>
 {
 private:
   iObjectRegistry* object_reg;
@@ -48,10 +51,10 @@ private:
   csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
   csRef<iBodyManager> bodyManager;
-  csRef<iLookAtManager> lookAtManager;
+  csRef<iSkeletonLookAtManager2> lookAtManager;
   csRef<iSkeletonBasicNodesManager2> basicNodesManager;
 
-  csRef<iLookAtAnimNode> lookAtNode;
+  csRef<iSkeletonLookAtNode2> lookAtNode;
   char targetMode;
   bool alwaysRotate;
   char rotationSpeed;
@@ -87,7 +90,7 @@ private:
   void Start ();
   void Shutdown ();
 
-  //-- iLookAtListener
+  //-- iSkeletonLookAtListener2
   void TargetReached ();
   void TargetLost ();
 };

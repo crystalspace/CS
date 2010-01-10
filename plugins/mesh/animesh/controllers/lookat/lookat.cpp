@@ -60,16 +60,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   {
   }
 
-  iLookAtAnimNodeFactory* LookAtManager::CreateAnimNodeFactory
+  iSkeletonLookAtNodeFactory2* LookAtManager::CreateAnimNodeFactory
     (const char *name, iBodySkeleton* skeleton)
   {
-    csRef<iLookAtAnimNodeFactory> newFact;
+    csRef<iSkeletonLookAtNodeFactory2> newFact;
     newFact.AttachNew (new LookAtAnimNodeFactory (this, name, skeleton));
 
     return factoryHash.PutUnique (name, newFact);
   }
 
-  iLookAtAnimNodeFactory* LookAtManager::FindAnimNodeFactory
+  iSkeletonLookAtNodeFactory2* LookAtManager::FindAnimNodeFactory
     (const char* name) const
   {
     return factoryHash.Get (name, 0);
@@ -302,12 +302,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     listenerMinimumDelay = delay;
   }
 
-  void LookAtAnimNode::AddListener (iLookAtListener* listener)
+  void LookAtAnimNode::AddListener (iSkeletonLookAtListener2* listener)
   {
     listeners.PushSmart (listener);
   }
 
-  void LookAtAnimNode::RemoveListener (iLookAtListener* listener)
+  void LookAtAnimNode::RemoveListener (iSkeletonLookAtListener2* listener)
   {
     listeners.Delete (listener);
   }

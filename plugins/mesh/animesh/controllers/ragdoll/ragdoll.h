@@ -32,18 +32,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 {
 
   class RagdollManager : public scfImplementation2<RagdollManager,
-    iRagdollManager, iComponent>
+    iSkeletonRagdollManager2, iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(RagdollManager);
 
     RagdollManager (iBase* parent);
 
-    //-- iRagdollManager
-    virtual iRagdollAnimNodeFactory* CreateAnimNodeFactory (const char *name, 
+    //-- iSkeletonRagdollManager2
+    virtual iSkeletonRagdollNodeFactory2* CreateAnimNodeFactory (const char *name, 
                iBodySkeleton* skeleton, iDynamicSystem* dynSys);
 
-    virtual iRagdollAnimNodeFactory* FindAnimNodeFactory (const char* name) const;
+    virtual iSkeletonRagdollNodeFactory2* FindAnimNodeFactory (const char* name) const;
     virtual void ClearAnimNodeFactories ();
 
     //-- iComponent
@@ -54,17 +54,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   private:
     iObjectRegistry* object_reg;
-    csHash<csRef<iRagdollAnimNodeFactory>, csString> factoryHash;
+    csHash<csRef<iSkeletonRagdollNodeFactory2>, csString> factoryHash;
   };
 
   struct ChainData
   {
     csRef<iBodyChain> chain;
-    csChainStateType state;
+    csSkeletonRagdollState state;
   };
 
   class RagdollAnimNodeFactory : public scfImplementation2<RagdollAnimNodeFactory, 
-    scfFakeInterface<iSkeletonAnimNodeFactory2>, iRagdollAnimNodeFactory>
+    scfFakeInterface<iSkeletonAnimNodeFactory2>, iSkeletonRagdollNodeFactory2>
   {
     friend class RagdollAnimNode;
 
@@ -82,9 +82,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
     virtual iSkeletonAnimNodeFactory2* FindNode (const char* name);
 
-    //-- iRagdollAnimNodeFactory
+    //-- iSkeletonRagdollNodeFactory2
     virtual void AddBodyChain (iBodyChain* chain,
-			       csChainStateType state = RAGDOLL_STATE_INACTIVE);
+			       csSkeletonRagdollState state = RAGDOLL_STATE_INACTIVE);
     virtual void RemoveBodyChain (iBodyChain* chain);
 
   protected:
@@ -98,24 +98,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
 
   class RagdollAnimNode : public scfImplementation2<RagdollAnimNode, 
-    scfFakeInterface<iSkeletonAnimNode2>, iRagdollAnimNode>
+    scfFakeInterface<iSkeletonAnimNode2>, iSkeletonRagdollNode2>
   {
   public:
     CS_LEAKGUARD_DECLARE(RagdollAnimNode);
 
     RagdollAnimNode (RagdollAnimNodeFactory* factory, iSkeleton2* skeleton);
 
-    //-- iRagdollAnimNode
+    //-- iSkeletonRagdollNode2
     virtual void SetAnimatedMesh (iAnimatedMesh* mesh);
 
-    virtual void SetBodyChainState (iBodyChain* chain, csChainStateType state);
-    virtual csChainStateType GetBodyChainState (iBodyChain* chain);
+    virtual void SetBodyChainState (iBodyChain* chain, csSkeletonRagdollState state);
+    virtual csSkeletonRagdollState GetBodyChainState (iBodyChain* chain);
 
     virtual iRigidBody* GetBoneRigidBody (BoneID bone);
     virtual iJoint* GetBoneJoint (const BoneID bone);
 
-    virtual uint GetBoneCount (csChainStateType state) const;
-    virtual BoneID GetBone (csChainStateType state, uint index) const;
+    virtual uint GetBoneCount (csSkeletonRagdollState state) const;
+    virtual BoneID GetBone (csSkeletonRagdollState state, uint index) const;
 
     //-- iSkeletonAnimPacket2
     virtual void Play ();

@@ -50,16 +50,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   {
   }
 
-  iRagdollAnimNodeFactory* RagdollManager::CreateAnimNodeFactory
+  iSkeletonRagdollNodeFactory2* RagdollManager::CreateAnimNodeFactory
     (const char *name, iBodySkeleton* skeleton, iDynamicSystem* dynSys)
   {
-    csRef<iRagdollAnimNodeFactory> newFact;
+    csRef<iSkeletonRagdollNodeFactory2> newFact;
     newFact.AttachNew (new RagdollAnimNodeFactory (this, name, skeleton, dynSys));
 
     return factoryHash.PutUnique (name, newFact);
   }
 
-  iRagdollAnimNodeFactory* RagdollManager::FindAnimNodeFactory
+  iSkeletonRagdollNodeFactory2* RagdollManager::FindAnimNodeFactory
     (const char* name) const
   {
     return factoryHash.Get (name, 0);
@@ -131,7 +131,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   }
 
   void RagdollAnimNodeFactory::AddBodyChain (iBodyChain* chain,
-					     csChainStateType state)
+					     csSkeletonRagdollState state)
   {
     if (chains.GetSize ())
     {
@@ -179,7 +179,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   }
 
   void RagdollAnimNode::SetBodyChainState (iBodyChain* chain,
-					   csChainStateType state)
+					   csSkeletonRagdollState state)
   {
     if (!chains.Contains (chain->GetName ()))
       return;
@@ -188,7 +188,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     chains[chain->GetName ()]->state = state;
   }
 
-  csChainStateType RagdollAnimNode::GetBodyChainState (iBodyChain* chain)
+  csSkeletonRagdollState RagdollAnimNode::GetBodyChainState (iBodyChain* chain)
   {
     if (!chains.Contains (chain->GetName ()))
       return RAGDOLL_STATE_INACTIVE;
@@ -212,7 +212,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     return bones[bone]->joint;
   }
 
-  uint RagdollAnimNode::GetBoneCount (csChainStateType state) const
+  uint RagdollAnimNode::GetBoneCount (csSkeletonRagdollState state) const
   {
     if (state != RAGDOLL_STATE_DYNAMIC)
       return 0;
@@ -220,7 +220,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     return (uint)bones.GetSize ();
   }
 
-  BoneID RagdollAnimNode::GetBone (csChainStateType state, uint index) const
+  BoneID RagdollAnimNode::GetBone (csSkeletonRagdollState state, uint index) const
   {
     if (state != RAGDOLL_STATE_DYNAMIC)
       return InvalidBoneID;

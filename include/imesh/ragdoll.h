@@ -33,26 +33,26 @@
  * @{ */
 
 struct iAnimatedMesh;
-struct iRagdollAnimNodeFactory;
+struct iSkeletonRagdollNodeFactory2;
 
 /**
  * A class to manage the creation and deletion of ragdoll animation 
  * node factories.
  */
-struct iRagdollManager : public virtual iBase
+struct iSkeletonRagdollManager2 : public virtual iBase
 {
-  SCF_INTERFACE(iRagdollManager, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonRagdollManager2, 1, 0, 0);
 
   /**
    * Create a new ragdoll animation node factory.
    */
-  virtual iRagdollAnimNodeFactory* CreateAnimNodeFactory (const char *name,
+  virtual iSkeletonRagdollNodeFactory2* CreateAnimNodeFactory (const char *name,
 		  iBodySkeleton* skeleton, iDynamicSystem* dynSys) = 0;
 
   /**
    * Find the specified ragdoll animation node factory.
    */
-  virtual iRagdollAnimNodeFactory* FindAnimNodeFactory
+  virtual iSkeletonRagdollNodeFactory2* FindAnimNodeFactory
     (const char* name) const = 0;
 
   /**
@@ -64,7 +64,7 @@ struct iRagdollManager : public virtual iBase
 /**
  * The physical state of a body chain.
  */
-enum csChainStateType
+enum csSkeletonRagdollState
 {
   RAGDOLL_STATE_INACTIVE = 0,   /*!< The chain is physically inactive. */
   RAGDOLL_STATE_DYNAMIC,        /*!< The chain is dynamic, ie the motion of 
@@ -77,9 +77,9 @@ enum csChainStateType
 /**
  * Factory for the ragdoll animation node.
  */
-struct iRagdollAnimNodeFactory : public iSkeletonAnimNodeFactory2
+struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
-  SCF_INTERFACE(iRagdollAnimNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonRagdollNodeFactory2, 1, 0, 0);
 
   /**
    * Add a new body chain to the ragdoll animation node. Adding more than 
@@ -87,7 +87,7 @@ struct iRagdollAnimNodeFactory : public iSkeletonAnimNodeFactory2
    * \param state The initial state of the body chain.
    */
   virtual void AddBodyChain (iBodyChain* chain,
-                  csChainStateType state = RAGDOLL_STATE_INACTIVE) = 0;
+                  csSkeletonRagdollState state = RAGDOLL_STATE_INACTIVE) = 0;
 
   /**
    * Remove the chain from the ragdoll animation node.
@@ -100,9 +100,9 @@ struct iRagdollAnimNodeFactory : public iSkeletonAnimNodeFactory2
  * control the animation of the animated mesh, and/or in order to make the mesh
  * collide with the rigid bodies of the simulation.
  */
-struct iRagdollAnimNode : public iSkeletonAnimNode2
+struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
 {
-  SCF_INTERFACE(iRagdollAnimNode, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonRagdollNode2, 1, 0, 0);
 
   // TODO: remove this function and implement iSkeleton2::GetSceneNode ()
   /**
@@ -114,12 +114,12 @@ struct iRagdollAnimNode : public iSkeletonAnimNode2
    * Set the body chain in the specified physical state. The kinematic state 
    * is not yet supported.
    */
-  virtual void SetBodyChainState (iBodyChain* chain, csChainStateType state) = 0;
+  virtual void SetBodyChainState (iBodyChain* chain, csSkeletonRagdollState state) = 0;
 
   /**
    * Get the physical state of the body chain specified.
    */
-  virtual csChainStateType GetBodyChainState (iBodyChain* chain) = 0;
+  virtual csSkeletonRagdollState GetBodyChainState (iBodyChain* chain) = 0;
 
   /**
    * Get the rigid body of the specified bone.
@@ -134,12 +134,12 @@ struct iRagdollAnimNode : public iSkeletonAnimNode2
   /**
    * Get the count of bones in the specified physical state.
    */
-  virtual uint GetBoneCount (csChainStateType state) const = 0;
+  virtual uint GetBoneCount (csSkeletonRagdollState state) const = 0;
 
   /**
    * Get a bone from its index.
    */
-  virtual BoneID GetBone (csChainStateType state, uint index) const = 0;
+  virtual BoneID GetBone (csSkeletonRagdollState state, uint index) const = 0;
 };
 
 /** @} */
