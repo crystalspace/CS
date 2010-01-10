@@ -137,8 +137,11 @@ class ConditionTree
     Node* owner;
     int branch;
     Node* newNode;
+
     csConditionID oldCondition;
     MyBitArrayTemp oldConditionAffectedSVs;
+    MyBitArrayTemp oldConditionResults[2];
+    MyBitArrayTemp oldConditionResultsSet;
   };
   typedef csArray<CommitNode> CommitArray;
   csArray<CommitArray> commitArrays;
@@ -267,6 +270,9 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
   
 	  commitNode.oldCondition = node->condition;
 	  commitNode.oldConditionAffectedSVs = node->conditionAffectedSVs;
+	  commitNode.oldConditionResults[0] = node->conditionResults[0];
+	  commitNode.oldConditionResults[1] = node->conditionResults[1];
+	  commitNode.oldConditionResultsSet = node->conditionResultsSet;
 	  node->condition = condition;
 	  node->conditionAffectedSVs = affectedSVs;
 	  if (node->parent)
@@ -449,6 +455,9 @@ void ConditionTree::Ascend (int num)
 	Node* node = ca[n].owner;
 	node->condition = ca[n].oldCondition;
 	node->conditionAffectedSVs = ca[n].oldConditionAffectedSVs;
+	node->conditionResults[0] = ca[n].oldConditionResults[0];
+	node->conditionResults[1] = ca[n].oldConditionResults[1];
+	node->conditionResultsSet = ca[n].oldConditionResultsSet;
       }
       ClearCommitArray (ca);
     }
