@@ -37,10 +37,29 @@ bool AnimeshAsset::Support(iMeshWrapper* mesh)
 }
 
 AnimeshAsset::AnimeshAsset(iObjectRegistry* obj_reg, iMeshWrapper* mesh)
-  : AssetBase(obj_reg, mesh)
+  : AssetBase(obj_reg, mesh), reverseAction (false)
 {
   animeshstate = scfQueryInterface<iAnimatedMesh> (mesh->GetMeshObject());
   animeshsprite = scfQueryInterface<iAnimatedMeshFactory> (mesh->GetFactory()->GetMeshObjectFactory());
+
+  // create a new animation tree
+  iSkeletonAnimPacketFactory2* packetFactory = animeshsprite->GetSkeletonFactory()->GetAnimationPacket();
+  csRef<iSkeletonFSMNodeFactory2> fsmNodeFactory = packetFactory->CreateFSMNode ("fsm");
+  packetFactory->SetAnimationRoot (fsmNodeFactory);
+
+  // create animation nodes
+  for (size_t i = 0; i < packetFactory->GetAnimationCount (); i++)
+  {
+    csString name = packetFactory->GetAnimation (i)->GetName ();
+    csRef<iSkeletonAnimationNodeFactory2> animationNode = packetFactory->CreateAnimationNode (name);
+    animationNode->SetAnimation (packetFactory->GetAnimation (i));
+    animationNode->SetCyclic (true);
+    fsmNodeFactory->AddState (name, animationNode);
+  }
+
+  // set new anim tree
+  csRef<iSkeletonAnimPacket2> packet = packetFactory->CreateInstance (animeshstate->GetSkeleton ());
+  animeshstate->GetSkeleton ()->SetAnimationPacket (packet);
 }
 
 AnimeshAsset::~AnimeshAsset()
@@ -54,108 +73,6 @@ AnimeshAsset::~AnimeshAsset()
   animeshsprite.Invalidate();
 }
 
-bool AnimeshAsset::HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, bool start)
-{
-  csRef<iSkeletonPriorityNodeFactory2> priNode = scfQueryInterface<iSkeletonPriorityNodeFactory2> (node->GetFactory());
-  if (priNode.IsValid())
-  {
-    for (size_t i = 0; i < priNode->GetNodeCount(); ++i)
-    {
-      if (HandleSkel2Node(animName, node->FindNode(priNode->GetNode(i)->GetNodeName()), start))
-      {
-        return true;
-      }
-    }
-  } 
-  else
-  {
-    csRef<iSkeletonAnimationNode2> animNode = scfQueryInterface<iSkeletonAnimationNode2> (node);
-    if (animNode.IsValid())
-    {
-      if (!strcmp(animName, animNode->GetFactory()->GetNodeName()))
-      {
-        if (start)
-        {
-          animNode->Play();
-        }
-        else
-        {
-          animNode->Stop();
-        }
-        return true;
-      }
-    }
-    else
-    {
-      csRef<iSkeletonFSMNodeFactory2> fsmNode = scfQueryInterface<iSkeletonFSMNodeFactory2> (node->GetFactory());
-      if (fsmNode.IsValid())
-      {
-        for(size_t s = 0; s < fsmNode->GetStateCount(); ++s)
-        {
-          if (!strcmp(animName, fsmNode->GetStateName(s)))
-          {
-            csRef<iSkeletonFSMNode2> fsm = scfQueryInterface<iSkeletonFSMNode2> (node);
-            if (start)
-            {
-              fsm->SwitchToState(s);
-              fsm->Play();
-            }
-            else
-            {
-              fsm->Stop();
-            }
-            return true;
-          }
-        }
-      }
-      // Else other nodes.
-    }
-  }
-
-  return false;
-}
-
-void WalkSkel2Nodes (iStringArray* arr, iSkeletonAnimNodeFactory2* node)
-{
-  csRef<iSkeletonPriorityNodeFactory2> priNode = scfQueryInterface<iSkeletonPriorityNodeFactory2> (node);
-  if (priNode.IsValid())
-  {
-    for (size_t i = 0; i < priNode->GetNodeCount(); ++i)
-    {
-      WalkSkel2Nodes(arr, priNode->GetNode(i));
-    }
-  } 
-  else
-  {
-    csRef<iSkeletonAnimationNodeFactory2> animNode = scfQueryInterface<iSkeletonAnimationNodeFactory2> (node);
-    if (animNode.IsValid())
-    {
-      const char* animname = animNode->GetNodeName();
-      if (!animname) return;
-
-      csString str = animname;
-      arr->Push (str);
-    }
-    else
-    {
-      csRef<iSkeletonFSMNodeFactory2> fsmNode = scfQueryInterface<iSkeletonFSMNodeFactory2> (node);
-      if (fsmNode.IsValid())
-      {
-        for(size_t s = 0; s < fsmNode->GetStateCount(); ++s)
-        {
-          const char* animname = fsmNode->GetStateName(s);
-          if (!animname) continue;
-
-          csString str = animname;
-          arr->Push (str);
-        }
-      }
-      // Else other nodes.
-    }
-  }
-}
-
-
 // Animations
 
 bool AnimeshAsset::SupportsAnimations() 
@@ -167,30 +84,60 @@ csPtr<iStringArray> AnimeshAsset::GetAnimations()
 {
   scfStringArray* arr = new scfStringArray;
 
-  WalkSkel2Nodes(arr, animeshsprite->GetSkeletonFactory()->GetAnimationPacket()->GetAnimationRoot());
+  iSkeletonAnimPacketFactory2* packetFactory = animeshsprite->GetSkeletonFactory()->GetAnimationPacket();
+  for (size_t i = 0; i < packetFactory->GetAnimationCount (); i++)
+  {
+    csString name = packetFactory->GetAnimation (i)->GetName ();
+    arr->Push (name);
+  }
 
   return csPtr<iStringArray>(arr);
 }
 
 bool AnimeshAsset::PlayAnimation(const char* animationName, bool cycle)
 {
-  return HandleSkel2Node(selectedAnimation.GetData(),
-      animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot(), true);
+  csRef<iSkeletonFSMNode2> node = scfQueryInterfaceSafe<iSkeletonFSMNode2>
+    (animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot()->FindNode ("fsm"));
+  csRef<iSkeletonFSMNodeFactory2> factory = scfQueryInterfaceSafe<iSkeletonFSMNodeFactory2>
+    (node->GetFactory ());
+  
+  CS::Animation::StateID id = factory->FindState (animationName);
+  if (id == CS::Animation::InvalidKeyframeID)
+    return false;
+
+  if (node->IsActive ())
+    node->Stop ();
+  node->SwitchToState (id);
+  csRef<iSkeletonAnimationNodeFactory2> animfactory = scfQueryInterfaceSafe<iSkeletonAnimationNodeFactory2>
+    (node->GetStateNode (id)->GetFactory ());
+  animfactory->SetCyclic (cycle);
+  node->GetStateNode (id)->SetPlaybackSpeed (reverseAction ? -1.00f : 1.00f);
+  node->Play ();
+
+  return true;
 }
 
 bool AnimeshAsset::StopAnimation(const char* animationName)
 {
-  return HandleSkel2Node(selectedAnimation.GetData(),
-      animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot(), false);
+  csRef<iSkeletonFSMNode2> node = scfQueryInterfaceSafe<iSkeletonFSMNode2>
+    (animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot()->FindNode ("fsm"));
+  if (node->IsActive ())
+    node->Stop ();
+
+  return true;
 }
 
 bool AnimeshAsset::GetReverseAction()
 {
-  return false;
+  return reverseAction;
 }
 
 void AnimeshAsset::SetReverseAction(bool value)
 {
+  reverseAction = value;
+  csRef<iSkeletonFSMNode2> node = scfQueryInterfaceSafe<iSkeletonFSMNode2>
+    (animeshstate->GetSkeleton()->GetAnimationPacket()->GetAnimationRoot()->FindNode ("fsm"));
+  node->GetStateNode (node->GetCurrentState ())->SetPlaybackSpeed (reverseAction ? -1.00f : 1.00f);
 }
 
 
