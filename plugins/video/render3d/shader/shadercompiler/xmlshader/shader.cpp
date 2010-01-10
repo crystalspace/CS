@@ -1577,7 +1577,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	for (size_t c = 0; c < conditionSet->GetSize(); c++)
 	{
 	  if ((*conditionSet)[c])
+          {
 	    condResults.SetBit (2*c + ((*conditionResults)[c] ? 0 : 1));
+          }
+          else
+          {
+            /* The condition isn't set in the given tech variant. Means it's
+               result has to be assumed "undefined", so set the result bits
+               accordingly. */
+	    condResults.SetBit (2*c);
+	    condResults.SetBit (2*c+1);
+          }
 	}
       }
     }
