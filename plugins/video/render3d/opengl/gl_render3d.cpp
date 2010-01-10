@@ -2882,8 +2882,11 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  if (ext->glDisableVertexAttribArrayARB)
 	  {
 	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
-	    ext->glDisableVertexAttribArrayARB (index);
-	    activeVertexAttribs &= ~(1 << index);
+	    if (activeVertexAttribs & (1 << index))
+	    {
+	      ext->glDisableVertexAttribArrayARB (index);
+	      activeVertexAttribs &= ~(1 << index);
+	    }
 	  }
         }
         else
