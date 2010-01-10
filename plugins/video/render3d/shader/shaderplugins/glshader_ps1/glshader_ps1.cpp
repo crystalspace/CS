@@ -144,6 +144,7 @@ const char* csGLShader_PS1::PSVersionStr (csPixelShaderVersion ver) const
   case CS_PS_1_2: return "1.2"; break;
   case CS_PS_1_3: return "1.3"; break;
   case CS_PS_1_4: return "1.4"; break;
+  case CS_PS_INVALID: break;
   }
   return 0;
 }
