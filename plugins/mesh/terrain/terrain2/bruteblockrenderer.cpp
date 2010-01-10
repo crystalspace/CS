@@ -224,7 +224,8 @@ public:
 
 
 private:
-  csRef<TerrainBBCellRenderProperties> properties;
+  // Note: properties (indirectly) holds refs to all accessors
+  TerrainBBCellRenderProperties* properties;
 };
 
 
