@@ -65,8 +65,8 @@ namespace Implementation
       runnable->Run ();
 
       // Set as non-running
+      AtomicOperations::Set (isRunningPtr, 0);
       
-      pthread_exit (0);
       return 0;
     }
 
