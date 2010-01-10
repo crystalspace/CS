@@ -684,7 +684,7 @@ struct iSkeletonRandomNode2 : public iSkeletonAnimNode2
  */
 struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
-  SCF_INTERFACE(iSkeletonFSMNodeFactory2, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonFSMNodeFactory2, 1, 0, 1);
 
   /**
    * Add a new state to the FSM and return the state identifier
@@ -762,6 +762,12 @@ struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
    */
   virtual void SetTransitionCrossfade (CS::Animation::StateID fromState, 
     CS::Animation::StateID toState, float time1, float time2) = 0;
+
+  /**
+   * Add a new state to the FSM and return the state identifier
+   */
+  virtual CS::Animation::StateID AddState (const char* name,
+    iSkeletonAnimNodeFactory2 *nodeFact) = 0; 
 };
 
 
@@ -771,7 +777,7 @@ struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
  */
 struct iSkeletonFSMNode2 : public iSkeletonAnimNode2
 {
-  SCF_INTERFACE(iSkeletonFSMNode2, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonFSMNode2, 1, 0, 1);
 
   /**
    * Switch to a new state.
@@ -782,6 +788,11 @@ struct iSkeletonFSMNode2 : public iSkeletonAnimNode2
    * Get the currently playing state id.
    */
   virtual CS::Animation::StateID GetCurrentState () const = 0;
+
+  /**
+   * Get the animation node of the given state.
+   */
+  virtual iSkeletonAnimNode2* GetStateNode (CS::Animation::StateID state) const = 0;
 };
 
 /** @} */
