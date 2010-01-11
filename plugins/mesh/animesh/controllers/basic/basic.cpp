@@ -97,8 +97,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
   void SpeedNodeFactory::AddNode (iSkeletonAnimNodeFactory2* factory, float speed)
   {
     // user help: set it cyclic if it is an animnode, otherwise it has to be made by the user
-    iSkeletonAnimationNodeFactory2* fact =
-      dynamic_cast<iSkeletonAnimationNodeFactory2*> (factory);
+    csRef<iSkeletonAnimationNodeFactory2> fact =
+      scfQueryInterface<iSkeletonAnimationNodeFactory2> (factory);
     if (fact)
       fact->SetCyclic (true);
 
