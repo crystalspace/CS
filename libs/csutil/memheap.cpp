@@ -65,10 +65,12 @@ namespace CS
     }
     void Heap::Trim (size_t pad)
     {
+      csScopedLock<SpinLock> foo (lock);
       mspace_trim (mspace, pad);
     }
     size_t Heap::Footprint ()
     {
+      csScopedLock<SpinLock> foo (lock);
       return mspace_footprint (mspace);
     }
   } // namespace Memory
