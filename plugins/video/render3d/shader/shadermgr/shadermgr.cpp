@@ -229,7 +229,9 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   
   if (config->GetBool ("Video.ShaderManager.EnableShaderCache", false))
   {
-    shaderCache.AttachNew (new PlexHierarchicalCache ());
+    bool redundantRemove =
+      config->GetBool ("Video.ShaderManager.ShaderCache.RedundantRemove", true);
+    shaderCache.AttachNew (new PlexHierarchicalCache (redundantRemove));
     
     csRef<CS::Utility::VfsHierarchicalCache> cache;
     const char* cachePath;

@@ -25,6 +25,7 @@
 #include "csutil/csstring.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/set.h"
 
 struct iObjectRegistry;
 struct iVFS;
@@ -39,14 +40,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
     {
       csRef<iHierarchicalCache> cache;
       int priority;
+      /// Directories to check for being empty and, if so, to be removed
+      csSet<csString> delayedClearDirs;
     };
     static int CacheSort (const SubCache& item,
       iHierarchicalCache* const& key)
     { return item.cache - key; }
     csArray<SubCache> caches;
+    bool redundantRemove;
+    
+    csString GetParentDir (const char* path);
+    void DelayClearDirs (SubCache& cache);
   public:
-    PlexHierarchicalCache ();
-    virtual ~PlexHierarchicalCache () {}
+    PlexHierarchicalCache (bool redundantRemove);
+    virtual ~PlexHierarchicalCache ();
   
     void AddSubShaderCache (iHierarchicalCache* cache,
       int priority);
@@ -63,6 +70,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
     virtual csPtr<iHierarchicalCache> GetRootedCache (const char* base);
     virtual csPtr<iStringArray> GetSubItems (const char* path);
     virtual iHierarchicalCache* GetTopCache();
+    virtual bool IsCacheWriteable() const;
     /** @} */
   };
 }

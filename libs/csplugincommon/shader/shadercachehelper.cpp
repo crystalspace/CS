@@ -593,6 +593,7 @@ namespace CS
       bool MicroArchiveCache::CacheData (const void* data, size_t size,
 	const char* path)
       {
+	if (!parentCache->IsCacheWriteable()) return false;
         csRef<CS::DataBuffer<> > dbuf;
         dbuf.AttachNew (new CS::DataBuffer<> (size));
         memcpy (dbuf->GetData(), data, size);

@@ -74,6 +74,8 @@ namespace Utility
     { return wrappedCache->GetSubItems (AdjustPath (path)); }
     virtual iHierarchicalCache* GetTopCache()
     { return wrappedCache->GetTopCache(); }
+    virtual bool IsCacheWriteable() const
+    { return wrappedCache->IsCacheWriteable(); }
     /** @} */
   };
 } // namespace Utility

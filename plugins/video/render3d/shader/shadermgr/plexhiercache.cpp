@@ -31,9 +31,54 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
-  PlexHierarchicalCache::PlexHierarchicalCache ()
-   : scfImplementationType (this)
+  PlexHierarchicalCache::PlexHierarchicalCache (bool redundantRemove)
+   : scfImplementationType (this), redundantRemove (redundantRemove)
   {
+  }
+
+  PlexHierarchicalCache::~PlexHierarchicalCache ()
+  {
+    // Delayed tidying of possibly empty cache dirs
+    for (size_t i = 0; i < caches.GetSize(); i++)
+    {
+      DelayClearDirs (caches[i]);
+    }
+  }
+  
+  csString PlexHierarchicalCache::GetParentDir (const char* path)
+  {
+    csString ret;
+    const char* rslash = strrchr (path, '/');
+    if (rslash != 0)
+    {
+      ret.Replace (path, rslash-path);
+    }
+    return ret;
+  }
+  
+  void PlexHierarchicalCache::DelayClearDirs (SubCache& cache)
+  {
+    while (cache.delayedClearDirs.GetSize() > 0)
+    {
+      csSet<csString> newClearDirs;
+      csSet<csString>::GlobalIterator it (cache.delayedClearDirs.GetIterator());
+      while (it.HasNext())
+      {
+	csString dir (it.Next());
+	csRef<iStringArray> subitems = cache.cache->GetSubItems (dir);
+	if (subitems->GetSize() == 0)
+	{
+	  cache.cache->ClearCache (dir);
+	
+	  // Now the parent may be empty ... check on next cycle
+	  csString parentPath (GetParentDir (dir));
+	  if (!parentPath.IsEmpty())
+	    newClearDirs.Add (parentPath);
+	}
+      }
+      
+      cache.delayedClearDirs = newClearDirs;
+    }
   }
 
   void PlexHierarchicalCache::AddSubShaderCache (iHierarchicalCache* cache,
@@ -66,13 +111,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
   bool PlexHierarchicalCache::CacheData (const void* data, size_t size,
 				  	 const char* path)
   {
+    size_t writeCacheIndex = (size_t)~0;
     for (size_t i = 0; i < caches.GetSize(); i++)
     {
-      if (caches[i].cache->CacheData (data, size, path))
-        return true;
+      if (caches[i].cache->IsCacheWriteable())
+      {
+	writeCacheIndex = i;
+	break;
+      }
+    }
+    if (writeCacheIndex == (size_t)~0) return false;
+
+    bool doWrite = true;
+    
+    if (redundantRemove)
+    {
+      csRef<iDataBuffer> nextData;
+      for (size_t i = writeCacheIndex+1; i < caches.GetSize(); i++)
+      {
+	nextData = caches[i].cache->ReadCache (path);
+	if (nextData.IsValid()) break;
+      }
+      if (nextData.IsValid()
+	&& (nextData->GetSize() == size)
+	&& (memcmp (data, nextData->GetData(), size) == 0))
+      {
+	/* The item to cache matches what's cached in some lower cache,
+	 * so we don't have to cache it in the higher cache. Instead,
+	 * remove it */
+	doWrite = false;
+	caches[writeCacheIndex].cache->ClearCache (path);
+	
+	// The containing directory may be empty, so try to tidy up later
+	csString parentPath (GetParentDir (path));
+	if (!parentPath.IsEmpty())
+	  caches[writeCacheIndex].delayedClearDirs.Add (parentPath);
+      }
     }
     
-    return false;
+    if (doWrite)
+      return caches[writeCacheIndex].cache->CacheData (data, size, path);
+    else
+      return true;
   }
   
   csPtr<iDataBuffer> PlexHierarchicalCache::ReadCache (const char* path)
@@ -136,6 +216,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
   iHierarchicalCache* PlexHierarchicalCache::GetTopCache()
   {
     return this;
+  }
+  
+  bool PlexHierarchicalCache::IsCacheWriteable() const
+  {
+    for (size_t i = 0; i < caches.GetSize(); i++)
+    {
+      if (caches[i].cache->IsCacheWriteable ())
+	return true;
+    }
+    return false;
   }
 }
 CS_PLUGIN_NAMESPACE_END(ShaderManager)
