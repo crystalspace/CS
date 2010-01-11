@@ -21147,7 +21147,7 @@ SWIGINTERN PyObject *iSkeletonRandomNode2_swigregister(PyObject *SWIGUNUSEDPARM(
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_iSkeletonFSMNodeFactory2_AddState(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iSkeletonFSMNodeFactory2_AddState__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSkeletonFSMNodeFactory2 *arg1 = (iSkeletonFSMNodeFactory2 *) 0 ;
   void *argp1 = 0 ;
@@ -21546,6 +21546,96 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonFSMNodeFactory2_AddState__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSkeletonFSMNodeFactory2 *arg1 = (iSkeletonFSMNodeFactory2 *) 0 ;
+  char *arg2 = (char *) 0 ;
+  iSkeletonAnimNodeFactory2 *arg3 = (iSkeletonAnimNodeFactory2 *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  CS::Animation::StateID result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFSMNodeFactory2_AddState",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFSMNodeFactory2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFSMNodeFactory2_AddState" "', argument " "1"" of type '" "iSkeletonFSMNodeFactory2 *""'"); 
+  }
+  arg1 = reinterpret_cast< iSkeletonFSMNodeFactory2 * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonFSMNodeFactory2_AddState" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iSkeletonAnimNodeFactory2, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeletonFSMNodeFactory2_AddState" "', argument " "3"" of type '" "iSkeletonAnimNodeFactory2 *""'"); 
+  }
+  arg3 = reinterpret_cast< iSkeletonAnimNodeFactory2 * >(argp3);
+  result = (CS::Animation::StateID)(arg1)->AddState((char const *)arg2,arg3);
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonFSMNodeFactory2_AddState(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[4];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSkeletonFSMNodeFactory2, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_iSkeletonFSMNodeFactory2_AddState__SWIG_0(self, args);
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSkeletonFSMNodeFactory2, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iSkeletonAnimNodeFactory2, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iSkeletonFSMNodeFactory2_AddState__SWIG_1(self, args);
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iSkeletonFSMNodeFactory2_AddState'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    AddState(iSkeletonFSMNodeFactory2 *)\n"
+    "    AddState(iSkeletonFSMNodeFactory2 *,char const *,iSkeletonAnimNodeFactory2 *)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSkeletonFSMNodeFactory2_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -21633,6 +21723,37 @@ SWIGINTERN PyObject *_wrap_iSkeletonFSMNode2_GetCurrentState(PyObject *SWIGUNUSE
   arg1 = reinterpret_cast< iSkeletonFSMNode2 * >(argp1);
   result = (CS::Animation::StateID)((iSkeletonFSMNode2 const *)arg1)->GetCurrentState();
   resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonFSMNode2_GetStateNode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSkeletonFSMNode2 *arg1 = (iSkeletonFSMNode2 *) 0 ;
+  CS::Animation::StateID arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  iSkeletonAnimNode2 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFSMNode2_GetStateNode",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFSMNode2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFSMNode2_GetStateNode" "', argument " "1"" of type '" "iSkeletonFSMNode2 const *""'"); 
+  }
+  arg1 = reinterpret_cast< iSkeletonFSMNode2 * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFSMNode2_GetStateNode" "', argument " "2"" of type '" "CS::Animation::StateID""'");
+  } 
+  arg2 = static_cast< CS::Animation::StateID >(val2);
+  result = (iSkeletonAnimNode2 *)((iSkeletonFSMNode2 const *)arg1)->GetStateNode(arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iSkeletonAnimNode2, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -49013,7 +49134,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonRandomNode2_GetCurrentNode", _wrap_iSkeletonRandomNode2_GetCurrentNode, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonRandomNode2", _wrap_delete_iSkeletonRandomNode2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRandomNode2_swigregister", iSkeletonRandomNode2_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonFSMNodeFactory2_AddState", _wrap_iSkeletonFSMNodeFactory2_AddState, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNodeFactory2_SetStateNode", _wrap_iSkeletonFSMNodeFactory2_SetStateNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNodeFactory2_GetStateNode", _wrap_iSkeletonFSMNodeFactory2_GetStateNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNodeFactory2_SetStateName", _wrap_iSkeletonFSMNodeFactory2_SetStateName, METH_VARARGS, NULL},
@@ -49025,11 +49145,13 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonFSMNodeFactory2_ClearStates", _wrap_iSkeletonFSMNodeFactory2_ClearStates, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNodeFactory2_SetStateTransition", _wrap_iSkeletonFSMNodeFactory2_SetStateTransition, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNodeFactory2_SetTransitionCrossfade", _wrap_iSkeletonFSMNodeFactory2_SetTransitionCrossfade, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonFSMNodeFactory2_AddState", _wrap_iSkeletonFSMNodeFactory2_AddState, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNodeFactory2_scfGetVersion", _wrap_iSkeletonFSMNodeFactory2_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonFSMNodeFactory2", _wrap_delete_iSkeletonFSMNodeFactory2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNodeFactory2_swigregister", iSkeletonFSMNodeFactory2_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNode2_SwitchToState", _wrap_iSkeletonFSMNode2_SwitchToState, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNode2_GetCurrentState", _wrap_iSkeletonFSMNode2_GetCurrentState, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonFSMNode2_GetStateNode", _wrap_iSkeletonFSMNode2_GetStateNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNode2_scfGetVersion", _wrap_iSkeletonFSMNode2_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonFSMNode2", _wrap_delete_iSkeletonFSMNode2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNode2_swigregister", iSkeletonFSMNode2_swigregister, METH_VARARGS, NULL},

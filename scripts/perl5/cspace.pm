@@ -16356,7 +16356,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
 %OWNER = ();
 %ITERATORS = ();
-*AddState = *cspacec::iSkeletonFSMNodeFactory2_AddState;
 *SetStateNode = *cspacec::iSkeletonFSMNodeFactory2_SetStateNode;
 *GetStateNode = *cspacec::iSkeletonFSMNodeFactory2_GetStateNode;
 *SetStateName = *cspacec::iSkeletonFSMNodeFactory2_SetStateName;
@@ -16368,6 +16367,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ClearStates = *cspacec::iSkeletonFSMNodeFactory2_ClearStates;
 *SetStateTransition = *cspacec::iSkeletonFSMNodeFactory2_SetStateTransition;
 *SetTransitionCrossfade = *cspacec::iSkeletonFSMNodeFactory2_SetTransitionCrossfade;
+*AddState = *cspacec::iSkeletonFSMNodeFactory2_AddState;
 *scfGetVersion = *cspacec::iSkeletonFSMNodeFactory2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -16402,6 +16402,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *SwitchToState = *cspacec::iSkeletonFSMNode2_SwitchToState;
 *GetCurrentState = *cspacec::iSkeletonFSMNode2_GetCurrentState;
+*GetStateNode = *cspacec::iSkeletonFSMNode2_GetStateNode;
 *scfGetVersion = *cspacec::iSkeletonFSMNode2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

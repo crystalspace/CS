@@ -1106,7 +1106,6 @@ class iSkeletonFSMNodeFactory2(iSkeletonAnimNodeFactory2):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def AddState(*args): return _imesh.iSkeletonFSMNodeFactory2_AddState(*args)
     def SetStateNode(*args): return _imesh.iSkeletonFSMNodeFactory2_SetStateNode(*args)
     def GetStateNode(*args): return _imesh.iSkeletonFSMNodeFactory2_GetStateNode(*args)
     def SetStateName(*args): return _imesh.iSkeletonFSMNodeFactory2_SetStateName(*args)
@@ -1118,6 +1117,7 @@ class iSkeletonFSMNodeFactory2(iSkeletonAnimNodeFactory2):
     def ClearStates(*args): return _imesh.iSkeletonFSMNodeFactory2_ClearStates(*args)
     def SetStateTransition(*args): return _imesh.iSkeletonFSMNodeFactory2_SetStateTransition(*args)
     def SetTransitionCrossfade(*args): return _imesh.iSkeletonFSMNodeFactory2_SetTransitionCrossfade(*args)
+    def AddState(*args): return _imesh.iSkeletonFSMNodeFactory2_AddState(*args)
     scfGetVersion = staticmethod(_imesh.iSkeletonFSMNodeFactory2_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonFSMNodeFactory2
     __del__ = lambda self : None;
@@ -1131,6 +1131,7 @@ class iSkeletonFSMNode2(iSkeletonAnimNode2):
     __repr__ = _swig_repr
     def SwitchToState(*args): return _imesh.iSkeletonFSMNode2_SwitchToState(*args)
     def GetCurrentState(*args): return _imesh.iSkeletonFSMNode2_GetCurrentState(*args)
+    def GetStateNode(*args): return _imesh.iSkeletonFSMNode2_GetStateNode(*args)
     scfGetVersion = staticmethod(_imesh.iSkeletonFSMNode2_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonFSMNode2
     __del__ = lambda self : None;
