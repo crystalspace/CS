@@ -37,25 +37,15 @@ include [ ConcatDirs $(SUBDIR) workspaces.jam ] ;
 
 # Crystal Space-specific interpolation values.
 # cs-win32libs >= 1.9_004 include dir
-MsvcGenVariable "include" : "../../winlibs/x86/include" ;
-MsvcGenVariable includedebug : "../../winlibs/x86/include" ;
-MsvcGenVariable include-x64 : "../../winlibs/x64/include" ;
-MsvcGenVariable includedebug-x64 : "../../winlibs/x64/include" ;
+MsvcIncDirs : [ ConcatDirs .. .. winlibs x86 "include" ] : : x86 ;
+MsvcIncDirs : [ ConcatDirs .. .. winlibs x64 "include" ] : : x64 ;
 # include dir for previous versions
-MsvcGenVariable "include" : "../../win32libs/include" ;
-MsvcGenVariable includedebug : "../../win32libs/include" ;
-MsvcGenVariable include-x64 : "../../win32libs/include" ;
-MsvcGenVariable includedebug-x64 : "../../win32libs/include" ;
+MsvcIncDirs : [ ConcatDirs .. .. win32libs "include" ] ;
 # cs-win32libs >= 1.9_004 lib dir
-MsvcGenVariable libdir : "../../winlibs/x86/lib" ;
-MsvcGenVariable libdirdebug : "../../winlibs/x86/lib" ;
-MsvcGenVariable libdir-x64 : "../../winlibs/x64/lib" ;
-MsvcGenVariable libdirdebug-x64 : "../../winlibs/x64/lib" ;
+MsvcLibDirs : [ ConcatDirs .. .. winlibs x86 lib ] : : x86 ;
+MsvcLibDirs : [ ConcatDirs .. .. winlibs x64 lib ] : : x64 ;
 # lib dir for previous versions
-MsvcGenVariable libdir : "../../win32libs/lib" ;
-MsvcGenVariable libdirdebug : "../../win32libs/lib" ;
-MsvcGenVariable libdir-x64 : "../../win32libs/lib" ;
-MsvcGenVariable libdirdebug-x64 : "../../win32libs/lib" ;
+MsvcLibDirs : [ ConcatDirs .. .. win32libs lib ] ;
 
 #------------------------------------------------------------------------------
 # The msvcgen process needs to be presented with configuration information
