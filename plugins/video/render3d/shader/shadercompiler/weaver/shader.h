@@ -92,6 +92,10 @@ protected:
   csRef<iDocument> DoSynthesis (iDocumentNode* source,
     iHierarchicalCache* cacheTo, int forcepriority);
 
+  /// Set up the fallback shader consisting of all techniques after the first
+  void MakeFallbackShader (iDocumentNode* targetNode,
+    iDocumentNode* docSource,
+    const csArray<TechniqueKeeper>& techniques);
   csRef<iDocumentNode> GetNodeOrFromFile (iDocumentNode* node);
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);
@@ -245,10 +249,10 @@ public:
   /**\name iXMLShaderInternal implementation
    * @{ */
   virtual size_t GetTicketNoSetup (const csRenderMeshModes& modes, 
-    const csShaderVariableStack& stack, void* eval)
+    const csShaderVariableStack& stack, void* eval, int lightCount)
   {
     return realShaderXML.IsValid()
-      ? realShaderXML->GetTicketNoSetup (modes, stack, eval)
+      ? realShaderXML->GetTicketNoSetup (modes, stack, eval, lightCount)
       : (size_t)~0;
   }
   /** @} */

@@ -238,24 +238,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csRef<iDocumentNode> newFallback = shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
       newFallback->SetValue ("fallbackshader");
       CS::DocSystem::CloneAttributes (docSource, newFallback);
-      
-      csString shaderNameDecorated (docSource->GetAttributeValue ("name"));
-      size_t atat = shaderNameDecorated.FindFirst ("@@");
-      if (atat != (size_t)-1)
-        shaderNameDecorated.DeleteAt (atat, shaderNameDecorated.Length()-atat);
-      shaderNameDecorated.AppendFmt ("@@%d", techniques[1].priority);
-      newFallback->SetAttribute ("name", shaderNameDecorated);
-      
-      csRef<iDocumentNodeIterator> docNodes = docSource->GetNodes ();
-      while (docNodes->HasNext())
-      {
-        csRef<iDocumentNode> orgNode = docNodes->Next();
-        if (orgNode->Equals (techniques[0].node)) continue;
-        
-        csRef<iDocumentNode> newNode = newFallback->CreateNodeBefore (
-          orgNode->GetType());
-        CS::DocSystem::CloneNode (orgNode, newNode);
-      }
+
+      MakeFallbackShader (newFallback, docSource, techniques);
     }
     else
     {
@@ -593,6 +577,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
 
     return synthShader;
+  }
+
+  void WeaverShader::MakeFallbackShader (iDocumentNode* targetNode,
+    iDocumentNode* docSource,
+    const csArray<TechniqueKeeper>& techniques)
+  {
+    csString shaderNameDecorated (docSource->GetAttributeValue ("name"));
+    size_t atat = shaderNameDecorated.FindFirst ("@@");
+    if (atat != (size_t)-1)
+      shaderNameDecorated.DeleteAt (atat, shaderNameDecorated.Length()-atat);
+    shaderNameDecorated.AppendFmt ("@@%d", techniques[1].priority);
+    targetNode->SetAttribute ("name", shaderNameDecorated);
+    
+    csRef<iDocumentNodeIterator> docNodes = docSource->GetNodes ();
+    while (docNodes->HasNext())
+    {
+      csRef<iDocumentNode> orgNode = docNodes->Next();
+      if (orgNode->Equals (techniques[0].node)) continue;
+      
+      csRef<iDocumentNode> newNode = targetNode->CreateNodeBefore (
+        orgNode->GetType());
+      CS::DocSystem::CloneNode (orgNode, newNode);
+    }
   }
     
   csRef<iDocumentNode> WeaverShader::GetNodeOrFromFile (iDocumentNode* node)

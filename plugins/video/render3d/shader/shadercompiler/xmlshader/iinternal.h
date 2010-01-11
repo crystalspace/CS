@@ -25,10 +25,11 @@ class csShaderVariableStack;
 
 struct iXMLShaderInternal : public virtual iBase
 {
-  SCF_INTERFACE(iXMLShaderInternal, 0, 0, 1);
+  SCF_INTERFACE(iXMLShaderInternal, 1, 0, 0);
 
   virtual size_t GetTicketNoSetup (const csRenderMeshModes& modes, 
-    const csShaderVariableStack& stack, void* eval) = 0;
+    const csShaderVariableStack& stack, void* eval,
+    int lightCount) = 0;
 };
 
 #endif // __CS_XMLSHADER_IINTERNAL_H__

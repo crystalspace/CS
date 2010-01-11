@@ -378,7 +378,7 @@ public:
     int lightCount, size_t tvi);
   size_t GetTicketNoSetupInternal (const csRenderMeshModes& modes, 
     const csShaderVariableStack& stack,
-    csConditionEvaluator::TicketEvaluator* eval);
+    csConditionEvaluator::TicketEvaluator* eval, int lightCount);
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
       const csShaderVariableStack& stack);
 
@@ -576,7 +576,7 @@ public:
   /**\name iXMLShaderInternal implementation
    * @{ */
   virtual size_t GetTicketNoSetup (const csRenderMeshModes& modes,
-    const csShaderVariableStack& stack, void* eval);
+    const csShaderVariableStack& stack, void* eval, int lightCount);
   /** @} */
 
   /// Set object description

@@ -1446,7 +1446,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	}
 	size_t fbticket = (size_t)~0;
 	if (useShortcut && (fallbackXML != 0))
-	  fbticket = fallbackXML->GetTicketNoSetup (modes, stack, eval);
+	  fbticket = fallbackXML->GetTicketNoSetup (modes, stack, eval,
+            lightCount);
 	if (fbticket == (size_t)~0)
 	{
 	  eval->EndEvaluation();
@@ -1469,18 +1470,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
   size_t csXMLShader::GetTicketNoSetupInternal (const csRenderMeshModes& modes, 
     const csShaderVariableStack& stack,
-    csConditionEvaluator::TicketEvaluator* eval)
+    csConditionEvaluator::TicketEvaluator* eval, int lightCount)
   {
     size_t ticket = csArrayItemNotFound;
     techsResolver->SetCurrentEval (eval);
-
-    int lightCount = 0;
-    if (stack.GetSize() > compiler->stringLightCount)
-    {
-      csShaderVariable* svLightCount = stack[compiler->stringLightCount];
-      if (svLightCount != 0)
-        svLightCount->GetValue (lightCount);
-    }
 
     size_t tvc = techsResolver->GetVariantCount();
     if (tvc == 0) tvc = 1;
@@ -1502,14 +1495,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     csRef<csConditionEvaluator::TicketEvaluator> eval (
       sharedEvaluator->BeginTicketEvaluationCaching (modes, &stack));
 
-    return GetTicketNoSetupInternal (modes, stack, eval);
+    int lightCount = 0;
+    if (stack.GetSize() > compiler->stringLightCount)
+    {
+      csShaderVariable* svLightCount = stack[compiler->stringLightCount];
+      if (svLightCount != 0)
+        svLightCount->GetValue (lightCount);
+    }
+
+    return GetTicketNoSetupInternal (modes, stack, eval, lightCount);
   }
 
   size_t csXMLShader::GetTicketNoSetup (const csRenderMeshModes& modes, 
-    const csShaderVariableStack& stack, void* eval)
+    const csShaderVariableStack& stack, void* eval, int lightCount)
   {
     return GetTicketNoSetupInternal (modes, stack,
-      reinterpret_cast<csConditionEvaluator::TicketEvaluator*> (eval));
+      reinterpret_cast<csConditionEvaluator::TicketEvaluator*> (eval),
+      lightCount);
   }
 
   void csXMLShader::PrepareTechVars (iDocumentNode* shaderRoot,
