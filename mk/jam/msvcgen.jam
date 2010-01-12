@@ -154,19 +154,22 @@ rule MsvcGenSubDir1 { }
 rule MsvcGenTemplateDir { MsvcGenTemplateDir1 $(1) ; }
 rule MsvcGenTemplateDir1 { }
 
-## MsvcExternalLibrary target [ : libs [ : mode ]]
+## MsvcExternalLibrary target [ : libs [ : mode [ : arch ]]]
 ##   Invoke this rule to link 'target' with one or more MSVC-specific external
 ##   libraries.  For example, 'libs' might be "wsock32.lib".  'mode' should be
 ##   "release" or "debug". If 'mode' is omitted, then 'libs' is used for
-##   release and debug.
-rule MsvcExternalLibrary { MsvcExternalLibrary1 $(1) : $(2) : $(3) ; }
+##   release and debug. 'arch' should be "x86" or "x64". If 'arch' is omitted,
+##   then 'directories' is used for x86 and x64.
+rule MsvcExternalLibrary { MsvcExternalLibrary1 $(1) : $(2) : $(3) : $(4) ; }
 rule MsvcExternalLibrary1 { }
 
-## MsvcDefine target [ : key [ : value [ : mode ]]]
+## MsvcDefine target [ : key [ : value [ : mode [ : arch ]]]]
 ##   Invoke this rule to define an MSVC-specific preprocessor macro 'key'
 ##   having 'value' for 'target'.  'mode' should be "release" or "debug". If
 ##   'mode' is omitted, then 'key/value' is used for release and debug.
-rule MsvcDefine { MsvcDefine1 $(1) : $(2) : $(3) : $(4) ; }
+##   'arch' should be "x86" or "x64". If 'arch' is omitted, then 'directories'
+##   is used for x86 and x64.
+rule MsvcDefine { MsvcDefine1 $(1) : $(2) : $(3) : $(4) : $(5) ; }
 rule MsvcDefine1 { }
 
 ## MsvcIncDirs target : directories [ : mode [ : arch ]]
@@ -180,11 +183,12 @@ rule MsvcDefine1 { }
 rule MsvcIncDirs { MsvcIncDirs1 $(1) : $(2) : $(3) : $(4) ; }
 rule MsvcIncDirs1 { }
 
-## MsvcCFlags target [ : cflags [ : mode ]]
+## MsvcCFlags target [ : cflags [ : mode [ : arch ]]]
 ##   Invoke this rule to set additional MSVC-specific compiler flags for
 ##   'target'.  'mode' should be "release" or "debug". If 'mode' is omitted,
-##   then 'cflags' is used for release and debug.
-rule MsvcCFlags { MsvcCFlags1 $(1) : $(2) : $(3) ; }
+##   then 'cflags' is used for release and debug. 'arch' should be "x86" or
+##   "x64". If 'arch' is omitted, then 'cflags' is used for x86 and x64.
+rule MsvcCFlags { MsvcCFlags1 $(1) : $(2) : $(3) : $(4) ; }
 rule MsvcCFlags1 { }
 
 ## MsvcLibDirs target : libdirs [ : mode [ : arch ]]
@@ -1102,10 +1106,13 @@ rule LinkStaticPlugins
   optplugins = $(3) ;
   package = $(4) ;
   
-  local target_link_with target_ext_libs target_ext_libs.release target_ext_libs.debug ;
+  local target_link_with target_ext_libs ;
+  local target_ext_libs.release.x86 target_ext_libs.debug.x86 ;
+  local target_ext_libs.release.x64 target_ext_libs.debug.x64 ;
   local target_lflags.release target_lflags.debug ;
   local target_cflags.release target_cflags.debug ;
   local target_relaydeps target_relaylibs ;
+  local mode a ;
   
   if $(package)
   {
@@ -1191,7 +1198,10 @@ rule LinkStaticPlugins
       target_ext_libs += $($(p).EXTERNALLIBS) ;
       for mode in debug release
       {
-        target_ext_libs.$(mode) += $($(p)_$(mode)_EXTERNALLIBS) ;
+	for a in x86 x64
+	{
+          target_ext_libs.$(mode).$(a) += $($(p)_$(mode)_$(a)_EXTERNALLIBS) ;
+	}
       }
       
       local relaydeps = $($(p).RELAYDEPS) ;
@@ -1297,10 +1307,13 @@ rule LinkStaticPlugins
     ExternalLibs $(plugin_lib_name) : $(target_ext_libs) ;
     for mode in debug release
     {
-      MsvcLFlags $(plugin_lib_name) : 
-	[ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) ;
-      MsvcCFlags $(plugin_lib_name) : $(target_cflags.$(mode)) ;
-      MsvcExternalLibrary $(plugin_lib_name) : $(target_ext_libs.$(mode)) : $(mode) ;
+      for a in x86 x64
+      {
+	MsvcLFlags $(plugin_lib_name) : 
+	  [ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) : $(a) ;
+	MsvcCFlags $(plugin_lib_name) : $(target_cflags.$(mode)) : $(a) ;
+	MsvcExternalLibrary $(plugin_lib_name) : $(target_ext_libs.$(mode).$(a)) : $(mode) : $(a) ;
+      }
     }
     for relaydep in $(target_relaydeps)
     {
@@ -1315,10 +1328,13 @@ rule LinkStaticPlugins
     ExternalLibs $(target) : $(target_ext_libs) ;
     for mode in debug release
     {
-      MsvcLFlags $(target) : 
-	[ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) ;
-      MsvcCFlags $(target) : $(target_cflags.$(mode)) ;
-      MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode)) : $(mode) ;
+      for a in x86 x64
+      {
+	MsvcLFlags $(target) : 
+	  [ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) : $(a) ;
+	MsvcCFlags $(target) : $(target_cflags.$(mode)) : $(a) ;
+	MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode).$(a)) : $(mode) : $(a) ;
+      }
     }
     LinkWith $(target) : $(target_link_with) ;
     
@@ -1334,10 +1350,13 @@ rule LinkStaticPlugins
     ExternalLibs $(target) : $(target_ext_libs) ;
     for mode in debug release
     {
-      MsvcLFlags $(target) : 
-	[ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) ;
-      MsvcCFlags $(target) : $(target_cflags.$(mode)) ;
-      MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode)) : $(mode) ;
+      for a in x86 x64
+      {
+	MsvcLFlags $(target) : 
+	  [ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) : $(a) ;
+	MsvcCFlags $(target) : $(target_cflags.$(mode)) : $(a) ;
+	MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode).$(a)) : $(mode) : $(a) ;
+      }
     }
     for relaydep in $(target_relaydeps)
     {
@@ -1752,17 +1771,19 @@ rule _MsvcRespEmit
   }
 }
 
-# MsvcExternalLibrary target [ : libs [ : mode ]]
+# MsvcExternalLibrary target [ : libs [ : mode [ : arch ]]]
 #   (See documentation above.)
 rule MsvcExternalLibrary1
 {
-  _MsvcRespEmit $(1) : $(2) : library : $(3) ;
+  _MsvcRespEmit $(1) : $(2) : library : $(3) : $(4) ;
   local mode = $(3) ;
   mode ?= debug release ;
-  $(1)_$(mode)_EXTERNALLIBS += $(2) ;
+  local arch = $(4) ;
+  arch ?= x86 x64 ;
+  $(1)_$(mode)_$(arch)_EXTERNALLIBS += $(2) ;
 }
 
-# MsvcDefine target [ : key [ : value [ : mode ]]]
+# MsvcDefine target [ : key [ : value [ : mode [ : arch ]]]]
 #   (See documentation above.)
 rule MsvcDefine1
 {
@@ -1770,6 +1791,8 @@ rule MsvcDefine1
   local key = $(2) ;
   local value = $(3) ;
   local mode = $(4) ;
+  local arch = $(5) ;
+  arch ?= x86 x64 ;
   if $(key)
   {
     local def ;
@@ -1781,8 +1804,11 @@ rule MsvcDefine1
     {
       def = $(key) ;
     }
-    _MsvcRespEmit $(target) : $(def) : define : $(mode) ;
-    STATICPLUGINS.$(target).MSVC_DEFINES += $(def) ;
+    for a in $(arch)
+    {
+      _MsvcRespEmit $(target) : $(def) : define : $(mode) : $(a) ;
+      STATICPLUGINS.$(target).MSVC_DEFINES.$(a) += $(def) ;
+    }
   }
 }
 
@@ -1800,19 +1826,19 @@ rule MsvcUsePCH1
   _MsvcRespEmit $(1) : $(2) : pch ; 
 }
 
-# _MsvcDefine target : tuples [ : mode ]
+# _MsvcDefine target : tuples [ : mode [ : arch ]]
 #   Similar to MsvcDefine, but works with a list of `key=value' tuples. Also
 #   understands `key' with no value.
 rule _MsvcDefine
 {
-  _MsvcRespEmit $(1) : $(2) : define : $(3) ;
+  _MsvcRespEmit $(1) : $(2) : define : $(3) : $(4) ;
 }
 
-# MsvcCFLags target [ : cflags [ : mode ]]
+# MsvcCFlags target [ : cflags [ : mode [ : arch ]]]
 #   (See documentation above.)
 rule MsvcCFlags1
 {
-  _MsvcRespEmit $(1) : $(2) : cflags : $(3) ;
+  _MsvcRespEmit $(1) : $(2) : cflags : $(3) : $(4) ;
 }
 
 # MsvcLFlags target [ : lflags [ : mode [ : arch ]]]
@@ -1860,26 +1886,52 @@ rule _ExternalLibsHelperMsvc
   local lib = $(2) ;
   local rulename = $(3) ;
   local attrib = $(4) ;
-
-  if $($(lib).$(attrib).DEBUG.$(MSVC_VERSION))
+  local arch_X86 = x86 ;
+  local arch_X64 = x64 ;
+  
+  for a in X86 X64
   {
-    $(rulename) $(target) : $($(lib).$(attrib).DEBUG.$(MSVC_VERSION)) : debug ;
-  }
-  else if $($(lib).$(attrib).DEBUG)
-  {
-    $(rulename) $(target) : $($(lib).$(attrib).DEBUG) : debug ;
-  }
-  else
-  {
-    $(rulename) $(target) : $($(lib).$(attrib)) : debug ;
-  }
-  if $($(lib).$(attrib).$(MSVC_VERSION))
-  {
-    $(rulename) $(target) : $($(lib).$(attrib).$(MSVC_VERSION)) : release ;
-  }
-  else
-  {
-    $(rulename) $(target) : $($(lib).$(attrib)) : release ;
+    if $($(lib).$(attrib).DEBUG.$(a).$(MSVC_VERSION))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).DEBUG.$(a).$(MSVC_VERSION)) : debug : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).DEBUG.$(MSVC_VERSION))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).DEBUG.$(MSVC_VERSION)) : debug : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).DEBUG.$(a))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).DEBUG.$(a)) : debug : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).DEBUG)
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).DEBUG) : debug : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).$(a))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).$(a)) : debug : $(arch_$(a)) ;
+    }
+    else
+    {
+      $(rulename) $(target) : $($(lib).$(attrib)) : debug : $(arch_$(a)) ;
+    }
+    
+    if $($(lib).$(attrib).$(a).$(MSVC_VERSION))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).$(a).$(MSVC_VERSION)) : release : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).$(MSVC_VERSION))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).$(MSVC_VERSION)) : release : $(arch_$(a)) ;
+    }
+    if $($(lib).$(attrib).$(a))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).$(a)) : release : $(arch_$(a)) ;
+    }
+    else
+    {
+      $(rulename) $(target) : $($(lib).$(attrib)) : release : $(arch_$(a)) ;
+    }
   }
 }
 
