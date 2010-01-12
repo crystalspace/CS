@@ -1404,10 +1404,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 
               csConditionID condition = newWrapper.child->condition;
               // If the parent condition is always false, so is this
-              if ((((currentWrapper.child->condition == csCondAlwaysFalse)
-                && (currentWrapper.child->GetConditionValue() == true))
-                  || ((currentWrapper.child->condition == csCondAlwaysTrue)
-                && (currentWrapper.child->GetConditionValue() == false))))
+              if (currentWrapper.child->IsUnreachable())
               {
                 condition = csCondAlwaysFalse;
               }
@@ -1418,7 +1415,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 newWrapper.child->condition = csCondAlwaysFalse;
               globalState->ascendStack.Push (1);
 
-	      currentWrapper.child->childrenWrappers.Push (newWrapper.child);
+	      if (!newWrapper.child->IsUnreachable())
+		currentWrapper.child->childrenWrappers.Push (newWrapper.child);
 	      wrapperStack.Push (currentWrapper);
 	      currentWrapper = newWrapper;
 	      handled = true;
@@ -1486,7 +1484,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		WrapperStackEntry newWrapper;
 		CreateElseWrapper (state, newWrapper);
 
-		currentWrapper.child->childrenWrappers.Push (newWrapper.child);
+		if (!newWrapper.child->IsUnreachable())
+		  currentWrapper.child->childrenWrappers.Push (newWrapper.child);
 		wrapperStack.Push (currentWrapper);
 		currentWrapper = newWrapper;
 
@@ -1516,7 +1515,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		WrapperStackEntry elseWrapper;
 		CreateElseWrapper (state, elseWrapper);
 
-		currentWrapper.child->childrenWrappers.Push (elseWrapper.child);
+		if (!elseWrapper.child->IsUnreachable())
+		  currentWrapper.child->childrenWrappers.Push (elseWrapper.child);
 		wrapperStack.Push (currentWrapper);
 		currentWrapper = elseWrapper;
 
@@ -1527,10 +1527,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 eval.SwitchBranch ();
                 csConditionID condition = newWrapper.child->condition;
                 // If the parent condition is always false, so is this
-                if ((((currentWrapper.child->condition == csCondAlwaysFalse)
-                  && (currentWrapper.child->GetConditionValue() == true))
-                    || ((currentWrapper.child->condition == csCondAlwaysTrue)
-                  && (currentWrapper.child->GetConditionValue() == false))))
+                if (currentWrapper.child->IsUnreachable())
                 {
                   condition = csCondAlwaysFalse;
                 }
@@ -1541,7 +1538,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                   newWrapper.child->condition = csCondAlwaysFalse;
                 globalState->ascendStack[globalState->ascendStack.GetSize()-1]++;
 
-		elseWrapper.child->childrenWrappers.Push (newWrapper.child);
+		if (!newWrapper.child->IsUnreachable())
+		  elseWrapper.child->childrenWrappers.Push (newWrapper.child);
 		wrapperStack.Push (currentWrapper);
 		currentWrapper = newWrapper;
 	      }
@@ -1762,11 +1760,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
       }
     }
   }
-  if (!handled
-    && !(((currentWrapper.child->condition == csCondAlwaysFalse)
-        && (currentWrapper.child->GetConditionValue() == true))
-      || ((currentWrapper.child->condition == csCondAlwaysTrue)
-        && (currentWrapper.child->GetConditionValue() == false))))
+  if (!handled && !currentWrapper.child->IsUnreachable())
   {
     eval.Commit();
     csRef<WrappedChild> newWrapper;
@@ -2070,8 +2064,16 @@ bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file,
     
     if (children[i]->condition == csCondAlwaysTrue)
       flags |= conditionIsTrue;
-    // Should've been filtered out earlier ...
-    CS_ASSERT (children[i]->condition != csCondAlwaysFalse);
+    else if (children[i]->condition == csCondAlwaysFalse)
+    {
+      /* AlwaysFalse and 'true' condition value should've been filtered out
+         earlier ... */
+      CS_ASSERT (!children[i]->GetConditionValue());
+      /* AlwaysFalse and 'false' condition value is equivalent to
+         AlwaysTrue and 'true', so convert into that */
+      flags |= conditionIsTrue;
+      flags &= ~childValue;
+    }
 
     uint32 flagsAndCond = flags;
     if (children[i]->condition != csCondAlwaysTrue)

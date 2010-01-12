@@ -151,6 +151,12 @@ public:
     }
     bool GetConditionValue () const
     { return (conditionValueAndRefCount & conditionValueMask) != 0; }
+    
+    bool IsUnreachable() const
+    {
+      return ((condition == csCondAlwaysTrue) && !GetConditionValue())
+	|| ((condition == csCondAlwaysFalse) && GetConditionValue());
+    }
 
     //typedef csFixedSizeAllocator<sizeof(WrappedChild)> WrappedChildAlloc;
     //CS_DECLARE_STATIC_CLASSVAR_REF (childAlloc, ChildAlloc, WrappedChildAlloc);
