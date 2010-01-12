@@ -25,13 +25,6 @@
 #include <crystalspace.h>
 #include "csutil/scf_implementation.h"
 
-// TODO: remove that
-#include "imesh/lookat.h"
-
-// TODO: to be removed
-class iSkeletonBasicNodesManager2;
-class iSkeletonSpeedNode2;
-
 class AvatarTest : public scfImplementation1<AvatarTest, iSkeletonLookAtListener2>
 {
 private:

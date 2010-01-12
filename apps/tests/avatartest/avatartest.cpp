@@ -112,8 +112,6 @@ void AvatarTest::SetupFrame ()
   else if (smileWeight < 0.0f)
     smileWeight = 0.0f;
 
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"),
-				 -2.0f * smileWeight - 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"),
 				 smileWeight);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"),
@@ -230,7 +228,7 @@ bool AvatarTest::HandleEvent (iEvent& ev)
     // Update walk speed
     else if (csKeyEventHelper::GetCookedCode (&ev) == '+')
     {
-      if (currentSpeed < 23)
+      if (currentSpeed < 29)
       {
 	currentSpeed += 1;
 	speedNode->SetSpeed (((float) currentSpeed) / 10.0f);
@@ -288,6 +286,7 @@ bool AvatarTest::Initialize ()
     return false;
   }
 
+  // Events
   if (!csInitializer::SetupEventHandler (object_reg, AvatarTestEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -446,7 +445,7 @@ void AvatarTest::CreateRoom ()
   // Creating the background
   // First we make a primitive for our geometry.
   CS::Geometry::DensityTextureMapper bgMapper (0.3f);
-  CS::Geometry::TesselatedBox bgBox (csVector3 (-40000), csVector3 (40000));
+  CS::Geometry::TesselatedBox bgBox (csVector3 (-4000), csVector3 (4000));
   bgBox.SetMapper(&bgMapper);
   bgBox.SetFlags(CS::Geometry::Primitives::CS_PRIMBOX_INSIDE);
   
@@ -457,7 +456,7 @@ void AvatarTest::CreateRoom ()
 
   csRef<iMaterialWrapper> bgMaterial =
     CS::Material::MaterialBuilder::CreateColorMaterial
-    (object_reg, "background", csColor (0.898f));
+    (object_reg, "background", csColor (0.398f));
   background->GetMeshObject()->SetMaterialWrapper(bgMaterial);
 
   // Creating lights
@@ -465,24 +464,28 @@ void AvatarTest::CreateRoom ()
   iLightList* ll = room->GetLights ();
 
   // This light is for the background
-  light = engine->CreateLight(0, csVector3(10), 100000, csColor (1));
+  // TODO: putting instead the following line creates a black background, otherwise it is grey
+  // the behavior doesn't persist if the other lights are removed
+  //light = engine->CreateLight(0, csVector3(1, 1, -1), 9000, csColor (1));
+  light = engine->CreateLight(0, csVector3(1, 1, 0), 9000, csColor (1));
+  light->SetAttenuationMode (CS_ATTN_NONE);
   ll->Add (light);
 
   // Other lights
-  light = engine->CreateLight (0, csVector3 (3, 0, 0), 8,
-			       csColor (1, 1, 1));
+  light = engine->CreateLight (0, csVector3 (3, 0, 0), 8, csColor (1));
+  light->SetAttenuationMode (CS_ATTN_REALISTIC);
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8,
-			       csColor (1, 1, 1));
+  light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8, csColor (1));
+  light->SetAttenuationMode (CS_ATTN_REALISTIC);
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (0, 0, -3), 8,
-			       csColor (1, 1, 1));
+  light = engine->CreateLight (0, csVector3 (0, 0, -3), 8, csColor (1));
+  light->SetAttenuationMode (CS_ATTN_REALISTIC);
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (0, -3, 0), 8,
-			       csColor (1, 1, 1));
+  light = engine->CreateLight (0, csVector3 (0, -3, 0), 8, csColor (1));
+  light->SetAttenuationMode (CS_ATTN_REALISTIC);
   ll->Add (light);
 
   engine->Prepare ();
@@ -557,6 +560,11 @@ void AvatarTest::CreateAvatar ()
     animFactory->CreateAnimationNode ("walk_fast");
   walkFastNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_WalkFast"));
 
+  // Create 'footing' animation node
+  csRef<iSkeletonAnimationNodeFactory2> footingNodeFactory =
+    animFactory->CreateAnimationNode ("footing");
+  footingNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_Runs"));
+
   // Create 'run_slow' animation node
   csRef<iSkeletonAnimationNodeFactory2> runSlowNodeFactory =
     animFactory->CreateAnimationNode ("run_slow");
@@ -572,18 +580,25 @@ void AvatarTest::CreateAvatar ()
     animFactory->CreateAnimationNode ("run_fast");
   runFastNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_RunFaster"));
 
+  // Create 'run_jump' animation node
+  csRef<iSkeletonAnimationNodeFactory2> runJumpNodeFactory =
+    animFactory->CreateAnimationNode ("run_jump");
+  runJumpNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_RunFast2Jump"));
+
   // Create 'speed' controller
-  // Unfortunately, the Frankie animations from 'walk fast' to 'run slow' and 'run slow' to 'run'
+  // Unfortunately, the Frankie animations from 'walk fast' to 'footing'
   // do not blend well together, but this is just an example...
   csRef<iSkeletonSpeedNodeFactory2> speedNodeFactory =
     basicNodesManager->CreateSpeedNodeFactory ("speed");
   speedNodeFactory->AddNode (idleNodeFactory, 0.0f);
   speedNodeFactory->AddNode (walkSlowNodeFactory, 0.1f);
-  speedNodeFactory->AddNode (walkNodeFactory, 0.4f);
-  speedNodeFactory->AddNode (walkFastNodeFactory, 0.9f);
-  speedNodeFactory->AddNode (runSlowNodeFactory, 1.1f);
-  speedNodeFactory->AddNode (runNodeFactory, 1.5f);
-  speedNodeFactory->AddNode (runFastNodeFactory, 2.3f);
+  speedNodeFactory->AddNode (walkNodeFactory, 0.3f);
+  speedNodeFactory->AddNode (walkFastNodeFactory, 0.6f);
+  speedNodeFactory->AddNode (footingNodeFactory, 0.8f);
+  speedNodeFactory->AddNode (runSlowNodeFactory, 1.3f);
+  speedNodeFactory->AddNode (runNodeFactory, 1.7f);
+  speedNodeFactory->AddNode (runFastNodeFactory, 2.5f);
+  speedNodeFactory->AddNode (runJumpNodeFactory, 2.9f);
 
   lookAtNodeFactory->SetChildNode (speedNodeFactory);
 
@@ -613,7 +628,6 @@ void AvatarTest::CreateAvatar ()
 
   // Init morph animation
   smileWeight = 1.0f;
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"), -3.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("wings_in"), 1.0f);
@@ -675,6 +689,9 @@ void AvatarTest::DisplayKeys ()
   WriteShadow (x, y, fg, "SHIFT-up/down keys: move camera closer/farther");
   y += lineSize;
 
+  WriteShadow (x, y, fg, "+/-: walk faster/slower");
+  y += lineSize;
+
   WriteShadow (x, y, fg, "t: toggle 'LookAt' target mode");
   y += lineSize;
 
@@ -682,9 +699,6 @@ void AvatarTest::DisplayKeys ()
   y += lineSize;
 
   WriteShadow (x, y, fg, "s: toggle 'LookAt: rotation speed'");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "+/-: walk faster/slower");
   y += lineSize;
 }
 

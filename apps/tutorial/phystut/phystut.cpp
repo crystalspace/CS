@@ -616,7 +616,7 @@ bool Simple::Initialize ()
 
   // First we make a primitive for our geometry.
   CS::Geometry::DensityTextureMapper bgMapper (0.3f);
-  CS::Geometry::TesselatedBox bgBox (csVector3 (-50000), csVector3 (50000));
+  CS::Geometry::TesselatedBox bgBox (csVector3 (-4000), csVector3 (4000));
   bgBox.SetMapper(&bgMapper);
   bgBox.SetFlags(CS::Geometry::Primitives::CS_PRIMBOX_INSIDE);
   
@@ -635,24 +635,25 @@ bool Simple::Initialize ()
   iLightList* ll = room->GetLights ();
 
   // This light is for the background
-  light = engine->CreateLight(0, csVector3(10), 100000, csColor (1));
+  light = engine->CreateLight(0, csVector3(10), 9000, csColor (1));
+  light->SetAttenuationMode (CS_ATTN_NONE);
   ll->Add (light);
 
   // Other lights
-  light = engine->CreateLight (0, csVector3 (3, 0, 0), 8,
-    csColor (1, 0, 0));
+  light = engine->CreateLight (0, csVector3 (3, 0, 0), 8, csColor (1, 0, 0));
+  light->SetAttenuationMode (CS_ATTN_INVERSE);
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8,
-    csColor (0, 0, 1));
+  light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8, csColor (0, 0, 1));
+  light->SetAttenuationMode (CS_ATTN_INVERSE);
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (0, 0, 3), 8,
-    csColor (0, 1, 0));
+  light = engine->CreateLight (0, csVector3 (0, 0, 3), 8, csColor (0, 1, 0));
+  light->SetAttenuationMode (CS_ATTN_INVERSE);
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (0, -3, 0), 8,
-    csColor (1, 1, 0));
+  light = engine->CreateLight (0, csVector3 (0, -3, 0), 8, csColor (1, 1, 0));
+  light->SetAttenuationMode (CS_ATTN_INVERSE);
   ll->Add (light);
 
   engine->Prepare ();
@@ -1515,8 +1516,7 @@ void Simple::CreateRagdoll ()
   csRef<iAnimatedMeshFactory> animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
 
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("Basis"), -1.0f);
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 1.0f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
 
   // Position the body
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
