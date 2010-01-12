@@ -69,28 +69,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
    */
   class TempHeap
   {
-    static int refcount;
+    struct RefCount
+    {
+      CS::Threading::Mutex mutex;
+      int val;
+      
+      RefCount() : val (0) {}
+    };
+    DECLARE_STATIC_CLASSVAR_DIRECT(HeapRefCount,RefCount,RefCountKill,);
     DECLARE_STATIC_CLASSVAR_DIRECT(TheHeap,CS::Memory::Heap,HeapKill,);
     
+    static void RefCountKill()
+    {
+      HeapRefCount().~RefCount();
+    }
     static void HeapKill()
     {
-      if (--refcount == 0)
-        TheHeap().~Heap();
+      CS::Threading::MutexScopedLock lock (HeapRefCount().mutex);
+      CS_ASSERT (HeapRefCount().val == 0);
     }
   public:
     static void Init()
     {
-      TheHeapInit();
+      HeapRefCountInit();
     }
   
     TempHeap()
     {
-      refcount++;
+      CS::Threading::MutexScopedLock lock (HeapRefCount().mutex);
+      if (++HeapRefCount().val == 1)
+	TheHeapInit();
     }
     ~TempHeap()
     {
-      if (--refcount == 0)
-        TheHeap().~Heap();
+      CS::Threading::MutexScopedLock lock (HeapRefCount().mutex);
+      if (--HeapRefCount().val == 0)
+	TheHeap().~Heap();
     }
   
     static void* Alloc (const size_t n)
