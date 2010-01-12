@@ -810,8 +810,9 @@ inline void const* TEventMemPool::Store<const char*>(const char** p)
   char* ptr = 0;
   if(*p)
   {
-    ptr = (char*)Alloc(strlen(*p) + 1);
-    strcpy(ptr, *p);
+    size_t length = strlen(*p) + 1;
+    ptr = (char*)Alloc(length);
+    memcpy(ptr, *p, length);
   }
 
   char** ptrPtr = new (this) char*;
