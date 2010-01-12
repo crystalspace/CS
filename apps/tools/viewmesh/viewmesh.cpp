@@ -347,6 +347,10 @@ void ViewMesh::Help ()
   csPrintf ("  -R=<realpath>      Real path from where to load the model\n");
   csPrintf ("  -C=<vfsdir>        Current VFS directory\n");
   csPrintf ("  <file>             Load the specified mesh object from the VFS path (meshfact or library)\n");
+  csPrintf ("\n");
+  csPrintf ("Example:\n");
+  csPrintf ("  viewmesh -C=data/frankie/ frankie.xml\n");
+  csPrintf ("\n");
 }
 
 void ViewMesh::HandleCommandLine()
