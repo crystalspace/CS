@@ -213,12 +213,17 @@ static int GetProfileLevel (CGprofile profile)
       return 0x102;
     case CG_PROFILE_PS_1_3:
       return 0x103;
+    case CG_PROFILE_GLSLF:
+    case CG_PROFILE_GLSLC:
+      // Actually GLSL can be anything from 0x200 upwards...
     case CG_PROFILE_ARBFP1:
       return 0x200;
     case CG_PROFILE_FP30:
       return 0x20a;
     case CG_PROFILE_FP40:
       return 0x300;
+    case CG_PROFILE_GP4FP:
+      return 0x400;
     default:
       return 0;
   }
