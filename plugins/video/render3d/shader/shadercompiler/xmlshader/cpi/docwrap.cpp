@@ -2081,7 +2081,7 @@ bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file,
       flagsAndCond |= condWriter.GetDiskID (children[i]->condition);
     }
     
-    uint32 flagsAndCondLE = csLittleEndian::UInt32 (flags);
+    uint32 flagsAndCondLE = csLittleEndian::UInt32 (flagsAndCond);
     if (file->Write ((char*)&flagsAndCondLE, sizeof (flagsAndCondLE))
 	!= sizeof (flagsAndCondLE)) return false;
 
@@ -2146,8 +2146,8 @@ bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
       child->condition = csCondAlwaysTrue;
     else
     {
-      child->condition =
-        csLittleEndian::UInt32 (flagsAndCondLE) & ~flagsExtract;;
+      child->condition = condReader.GetConditionID (
+        csLittleEndian::UInt32 (flagsAndCondLE) & ~flagsExtract);
       if (condDump.DoesDumping())
       {
         csString condStr (condDump.GetConditionString (child->condition));
