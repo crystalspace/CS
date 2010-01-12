@@ -1965,9 +1965,16 @@ bool csWrappedDocumentNode::GetAttributeValueAsBool (const char* name,
   return wrappedNode->GetAttributeValueAsBool (name, defaultvalue);
 }
 
+// Magic value to validate it's a wrapped doc and that the format is right
+static const uint32 cachedWrappedDocMagic = 0x01214948;
+
 bool csWrappedDocumentNode::StoreToCache (iFile* cacheFile,
   const ConditionsWriter& condWriter)
 {
+  uint32 magicLE = csLittleEndian::UInt32 (cachedWrappedDocMagic);
+  if (cacheFile->Write ((char*)&magicLE, sizeof (magicLE)) != sizeof (magicLE))
+    return false;
+
   ForeignNodeStorage foreignNodes (shared->plugin);
   if (!foreignNodes.StartUse (cacheFile)) return false;
   if (!StoreToCache (cacheFile, foreignNodes, condWriter)) return false;
@@ -2000,6 +2007,12 @@ bool csWrappedDocumentNode::StoreToCache (iFile* cacheFile,
 bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
   const ConditionsReader& condReader, ConditionDumper& condDump)
 {
+  uint32 magic;
+  if (cacheFile->Read ((char*)&magic, sizeof (magic)) != sizeof (magic))
+    return false;
+  if (csLittleEndian::UInt32 (magic) != cachedWrappedDocMagic)
+    return false;
+
   ForeignNodeReader foreignNodes (shared->plugin);
   if (!foreignNodes.StartUse (cacheFile)) return false;
   if (!ReadFromCache (cacheFile, foreignNodes, condReader, condDump)) return false;
@@ -2023,8 +2036,11 @@ bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
 
 enum
 {
-  childValue = 1,
-  childIsNull = 2
+  childValue = 0x80000000,
+  childIsNull = 0x40000000,
+  conditionIsTrue = 0x20000000,
+
+  flagsExtract = 0xe0000000
 };
 
 bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file, 
@@ -2052,14 +2068,21 @@ bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file,
       CS_ASSERT(wrapper);
     }
     
-    uint32 flagsLE = csLittleEndian::UInt32 (flags);
-    if (file->Write ((char*)&flagsLE, sizeof (flagsLE))
-	!= sizeof (flagsLE)) return false;
-    uint32 condLE = csLittleEndian::UInt32 (
-      condWriter.GetDiskID (children[i]->condition));
-    if (file->Write ((char*)&condLE, sizeof (condLE))
-	!= sizeof (condLE)) return false;
+    if (children[i]->condition == csCondAlwaysTrue)
+      flags |= conditionIsTrue;
+    // Should've been filtered out earlier ...
+    CS_ASSERT (children[i]->condition != csCondAlwaysFalse);
+
+    uint32 flagsAndCond = flags;
+    if (children[i]->condition != csCondAlwaysTrue)
+    {
+      flagsAndCond |= condWriter.GetDiskID (children[i]->condition);
+    }
     
+    uint32 flagsAndCondLE = csLittleEndian::UInt32 (flags);
+    if (file->Write ((char*)&flagsAndCondLE, sizeof (flagsAndCondLE))
+	!= sizeof (flagsAndCondLE)) return false;
+
     if (wrapper.IsValid())
     {
       csWrappedDocumentNode* child = static_cast<csWrappedDocumentNode*> (
@@ -2108,26 +2131,26 @@ bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
   children.SetSize (numChildren);
   for (size_t i = 0; i < numChildren; i++)
   {
-    uint32 flagsLE;
-    if (file->Read ((char*)&flagsLE, sizeof (flagsLE))
-	!= sizeof (flagsLE)) return false;
-    uint32 flags = csLittleEndian::UInt32 (flagsLE);
+    uint32 flagsAndCondLE;
+    if (file->Read ((char*)&flagsAndCondLE, sizeof (flagsAndCondLE))
+	!= sizeof (flagsAndCondLE)) return false;
+    uint32 flags = csLittleEndian::UInt32 (flagsAndCondLE) & flagsExtract;
     
     csRef<WrappedChild> child;
     child.AttachNew (new WrappedChild);
     child->SetConditionValue ((flags & childValue) != 0);
     
-    uint32 condLE;
-    if (file->Read ((char*)&condLE, sizeof (condLE))
-	!= sizeof (condLE)) return false;
-    child->condition =
-      condReader.GetConditionID (csLittleEndian::UInt32 (condLE));
-    if (condDump.DoesDumping()
-      && (child->condition != csCondAlwaysTrue)
-      && (child->condition != csCondAlwaysFalse))
+    if ((flags & conditionIsTrue) != 0)
+      child->condition = csCondAlwaysTrue;
+    else
     {
-      csString condStr (condDump.GetConditionString (child->condition));
-      condDump.Dump (child->condition, condStr, condStr.Length());
+      child->condition =
+        csLittleEndian::UInt32 (flagsAndCondLE) & ~flagsExtract;;
+      if (condDump.DoesDumping())
+      {
+        csString condStr (condDump.GetConditionString (child->condition));
+        condDump.Dump (child->condition, condStr, condStr.Length());
+      }
     }
     if ((flags & childIsNull) == 0)
     {
