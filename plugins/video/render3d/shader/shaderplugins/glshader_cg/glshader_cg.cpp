@@ -225,7 +225,8 @@ static int GetProfileLevel (CGprofile profile)
     case CG_PROFILE_GP4FP:
       return 0x400;
     default:
-      return 0;
+      // Some "future proofing"
+      return (profile > CG_PROFILE_GP4FP) ? 0x500 : 0;
   }
 }
 
