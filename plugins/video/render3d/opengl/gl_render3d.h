@@ -144,6 +144,11 @@ public:
     csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, 		    \
       CS_STRING_TO_WIDE(__FILE__), __LINE__, "")
 
+#define GLRENDER3D_CHECKED_COMMAND(g3d, Command)			\
+  glGetError();								\
+  Command;								\
+  (g3d)->CheckGLError (CS_STRING_TO_WIDE(__FILE__), __LINE__, #Command);
+
 class csGLGraphics3D;
 class csOpenGLHalo : public scfImplementation1<csOpenGLHalo, iHalo>
 {
@@ -536,6 +541,8 @@ public:
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, MakeAString& message);
   void Report (int severity, const char* msg, ...);
+  void CheckGLError (const wchar_t* sourceFile, int sourceLine,
+		     const char* call);
   
   csGLRender2TextureBackend* GetR2TBackend()
   { return r2tbackend; }

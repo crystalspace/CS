@@ -59,6 +59,7 @@ const int CS_CLIPPER_EMPTY = 0xf008412;
 
 // uses CS_CLIPPER_EMPTY
 #include "gl_stringlists.h"
+#include <csplugincommon/opengl/glenum_identstrs.h>
 
 
 
@@ -222,6 +223,19 @@ void csGLGraphics3D::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   csReportV (object_reg, severity, "crystalspace.graphics3d.opengl", msg, arg);
   va_end (arg);
+}
+
+void csGLGraphics3D::CheckGLError (const wchar_t* sourceFile, int sourceLine,
+				   const char* call)
+{
+  GLenum glerror = glGetError();
+  if (glerror != GL_NO_ERROR)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+	    "GL error %s in \"%s\" [%ls:%d]",
+	    CS::PluginCommon::OpenGLErrors.StringForIdent (glerror),
+	    call, sourceFile, sourceLine);
+  }
 }
 
 void csGLGraphics3D::SetCorrectStencilState ()

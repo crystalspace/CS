@@ -460,14 +460,14 @@ void csGLBasicTextureHandle::RegenerateMipmaps()
 
 void csGLBasicTextureHandle::Load ()
 {
-  if (Handle != 0) return;
+  if (IsUploaded() || IsForeignHandle()) return;
   
   static const GLint textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
     GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
   static const GLint textureMagFilters[3] = {GL_NEAREST, GL_LINEAR, 
     GL_LINEAR};
 
-  glGenTextures (1, &Handle);
+  GLRENDER3D_CHECKED_COMMAND(G3D, glGenTextures (1, &Handle));
   
   /* @@@ FIXME: That seems to happen with PS occasionally.
      Reason unknown. */
@@ -659,11 +659,12 @@ void csGLBasicTextureHandle::Load ()
   }
 
   delete uploadData; uploadData = 0;
+  SetUploaded (true);
 }
 
 THREADED_CALLABLE_IMPL(csGLBasicTextureHandle, Unload)
 {
-  if ((Handle == 0) || IsForeignHandle()) return false;
+  if (!IsUploaded() || IsForeignHandle()) return false;
   if (texType == texType1D)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_1D, Handle);
   else if (texType == texType2D)
@@ -676,6 +677,7 @@ THREADED_CALLABLE_IMPL(csGLBasicTextureHandle, Unload)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_RECTANGLE_ARB, Handle);
   glDeleteTextures (1, &Handle);
   Handle = 0;
+  SetUploaded (false);
   return true;
 }
 
