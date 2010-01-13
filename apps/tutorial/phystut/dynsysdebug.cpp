@@ -34,8 +34,12 @@
 
 //------------------------ csDynamicSystemDebugger ----------------------
 
-csDynamicSystemDebugger::csDynamicSystemDebugger (iObjectRegistry* object_reg)
+csDynamicSystemDebugger::csDynamicSystemDebugger ()
   : debugMode (false)
+{
+}
+
+void csDynamicSystemDebugger::SetObjectRegistry (iObjectRegistry* object_reg)
 {
   this->object_reg = object_reg;
 }
@@ -64,7 +68,7 @@ void csDynamicSystemDebugger::SetDebugDisplayMode (bool debugMode)
   // check debug material available
   if (!material)
     material = CS::Material::MaterialBuilder::CreateColorMaterial
-      (object_reg, "debug", csColor (1, 0, 0));
+      (object_reg, "dynsysdebug", csColor (1, 0, 0));
 
   if (!material)
   {
@@ -194,6 +198,7 @@ void csDynamicSystemDebugger::SetDebugDisplayMode (bool debugMode)
 	break;
 
       default:
+	// TODO: convex/concave meshes
 	break;
       }
     }

@@ -24,13 +24,10 @@
 #include <ivaria/ode.h>
 #include "dynsysdebug.h"
 
-// TODO: remove that
-#include "imesh/ragdoll.h"
-
-class Simple
+class Simple : public csApplicationFramework, public csBaseEventHandler
 {
 private:
-  iObjectRegistry* object_reg;
+  // Engine related
   csRef<iEngine> engine;
   csRef<iLoader> loader;
   csRef<iGraphics3D> g3d;
@@ -40,27 +37,45 @@ private:
   csRef<iView> view;
   csRef<iCollideSystem> cdsys;
   csRef<FramePrinter> printer;
-  iSector* room;
-  int solver;
-  bool disable;
+  csRef<iFont> courierFont;
 
-  csString phys_engine_name;
-  int  phys_engine_id;
-
+  // Pointers to main data
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;
   csRef<iBulletDynamicSystem> bullet_dynSys;
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
-  csRef<iFont> courierFont;
+  csRef<iMeshWrapper> walls;
+  iSector* room;
+
+  // Configuration related
+  int solver;
+  bool autodisable;
+  csString phys_engine_name;
+  int phys_engine_id;
   bool do_bullet_debug;
 
-  static bool SimpleEventHandler (iEvent& ev);
-  bool HandleEvent (iEvent& ev);
-  void SetupFrame ();
-  void WriteShadow (int x,int y,int fg,const char *str,...);
-  void Write(int x,int y,int fg,int bg,const char *str,...);
-  
+  // Dynamic simulation related
+  csDynamicSystemDebugger dynSysDebugger;
+  bool debugMode;
+  bool allStatic;
+  bool pauseDynamic;
+  float dynamicSpeed;
+
+  // Camera related
+  int cameraMode;
+  csRef<iRigidBody> cameraBody;
+  float rotX, rotY, rotZ;
+
+  // Ragdoll related
+  csRef<iBodyManager> bodyManager;
+  csRef<iSkeletonRagdollManager2> ragdollManager;
+  CS::Animation::StateID ragdollState;
+  csRef<iMeshWrapper> ragdollMesh;
+
+  void Frame ();
+  bool OnKeyboard (iEvent &event);
+
   void UpdateCameraMode ();
 
   bool CreateStarCollider ();
@@ -72,45 +87,21 @@ private:
   iRigidBody* CreateConvexMesh ();
   iJoint* CreateJointed ();
   void CreateChain ();
-
   void LoadRagdoll ();
   void CreateRagdoll ();
-
   void CreateWalls (const csVector3& radius);
 
   void DisplayKeys ();
-
-  csRef<iMeshWrapper> walls;
-
-  // Camera related
-  int cameraMode;
-  csRef<iRigidBody> cameraBody;
-  float rotX, rotY, rotZ;
-
-  csDynamicSystemDebugger dynSysDebugger;
-  bool debugMode;
-  bool allStatic;
-  bool pauseDynamic;
-  float dynamicSpeed;
-
-  // ragdoll related
-  csRef<iBodyManager> bodyManager;
-  csRef<iSkeletonRagdollManager2> ragdollManager;
-  CS::Animation::StateID ragdollState;
-  csRef<iMeshWrapper> ragdollMesh;
-
-  CS_DECLARE_EVENT_SHORTCUTS;
-
-  csEventID KeyboardDown;
-  csEventID KeyboardUp;
+  void WriteShadow (int x,int y,int fg,const char *str,...);
+  void Write(int x,int y,int fg,int bg,const char *str,...);
 
 public:
-  Simple (iObjectRegistry *obj);
+  Simple ();
   ~Simple ();
 
-  bool Initialize ();
-  void Start ();
-  void Shutdown ();
+  void OnExit ();
+  bool OnInitialize (int argc, char* argv[]);
+  bool Application ();
 };
 
 #endif // __PHYSTUT_H__

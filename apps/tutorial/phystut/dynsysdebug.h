@@ -32,15 +32,16 @@ struct iRigidBody;
 
 //------------------------ csDynamicSystemDebugger ----------------------
 
-// TODO: move this in a cstool file?
+// TODO: move this in a plugin
 /**
  * This class let visualize the colliders of a dynamic simulation.
  */
 class csDynamicSystemDebugger
 {
  public:
-  csDynamicSystemDebugger (iObjectRegistry* object_reg);
+  csDynamicSystemDebugger ();
 
+  void SetObjectRegistry (iObjectRegistry* object_reg);
   void SetDynamicSystem (iDynamicSystem* system);
   void SetDebugSector (iSector* sector);
   void SetDebugDisplayMode (bool debugMode);

@@ -30,28 +30,18 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-// The global pointer to simple
-Simple *simple;
-
-Simple::Simple (iObjectRegistry* object_reg)
-  : dynSysDebugger (object_reg)
+Simple::Simple ()
+  : solver (0), autodisable (false), do_bullet_debug (false), debugMode (false),
+    allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f), cameraMode (CAMERA_BODY)
 {
-  Simple::object_reg = object_reg;
-  solver = 0;
-  disable = false;
-  do_bullet_debug = false;
-  cameraMode = CAMERA_BODY;
-  debugMode = false;
-  allStatic = false;
-  pauseDynamic = false;
-  dynamicSpeed = 1.0f;
+  SetApplicationName ("CrystalSpace.PhysTut");
 }
 
 Simple::~Simple ()
 {
 }
 
-void Simple::SetupFrame ()
+void Simple::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -175,254 +165,263 @@ void Simple::SetupFrame ()
       WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
   }
 
-  if (disable)
+  if (autodisable)
     WriteShadow( 10, 430, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
 }
 
-bool Simple::HandleEvent (iEvent& ev)
+bool Simple::OnKeyboard (iEvent &ev)
 {
-  if (ev.Name == Frame)
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
   {
-    simple->SetupFrame ();
-    return true;
-  }
-  else if (CS_IS_KEYBOARD_EVENT(object_reg, ev)) 
-  {
-    if (ev.Name == KeyboardDown)
-    {
-      if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_SPACE)
+    if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_SPACE)
       {
 	int primitiveCount = phys_engine_id == BULLET_ID ? 7 : 4;
 	switch (rand() % primitiveCount)
-	{
-	case 0: CreateBox (); break;
-	case 1: CreateSphere (); break;
-	case 2: CreateMesh (); break;
-	case 3: CreateJointed (); break;
-	case 4: CreateCylinder (); break;
-	case 5: CreateCapsule (); break;
-	case 6: CreateRagdoll (); break;
-	default: break;
-	}
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'b')
-      {
-	CreateBox ();
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
-      {
-	CreateSphere ();
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'c'
-	       && phys_engine_id == BULLET_ID)
-      {
-	CreateCylinder ();
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'a'
-	       && phys_engine_id == BULLET_ID)
-      {
-	CreateCapsule ();
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'm')
-      {
-	CreateMesh ();
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'v')
-      {
-	CreateConvexMesh ();
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == '*')
-      {
-	CreateStarCollider ();
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'j')
-      {
-	CreateJointed ();
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'h'
-	       && phys_engine_id == BULLET_ID)
-      {
-	CreateChain ();
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'r'
-	       && phys_engine_id == BULLET_ID)
-      {
-	CreateRagdoll ();
-	return true;
-      }
-
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'f')
-      {
-	// Toggle camera mode
-	if (cameraMode == CAMERA_BODY)
-	{
-	  cameraMode = CAMERA_FREE;
-	  printf ("Toggling camera to free mode\n");
-	}
-	else
-	{
-	  cameraMode = CAMERA_BODY;
-	  printf ("Toggling camera to rigid body mode\n");
-	}
-	UpdateCameraMode ();
-	return true;
-      }
-
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 't')
-      {
-	// Toggle all bodies between dynamic and static
-	allStatic = !allStatic;
-
-	if (allStatic)
-	  printf ("Toggling all bodies to static mode\n");
-	else
-	  printf ("Toggling all bodies to dynamic mode\n");
-
-	for (int i = 0; i < dynSys->GetBodysCount (); i++)
-	{
-	  iRigidBody* body = dynSys->GetBody (i);
-	  if (allStatic)
-	    body->MakeStatic ();
-	  else {
-	    body->MakeDynamic ();
-	    body->Enable ();
+	  {
+	  case 0: CreateBox (); break;
+	  case 1: CreateSphere (); break;
+	  case 2: CreateMesh (); break;
+	  case 3: CreateJointed (); break;
+	  case 4: CreateCylinder (); break;
+	  case 5: CreateCapsule (); break;
+	  case 6: CreateRagdoll (); break;
+	  default: break;
 	  }
-	}
 	return true;
       }
 
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'p')
-      {
-	// Toggle pause mode for dynamic simulation
-	pauseDynamic = !pauseDynamic;
-	if (pauseDynamic)
-	  printf ("Dynamic simulation paused\n");
-	else
-	  printf ("Dynamic simulation resumed\n");
-	return true;
-      }
-
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'o')
-      {
-	// Toggle speed of dynamic simulation
-	if (dynamicSpeed - 1.0 < 0.00001)
-	{
-	  dynamicSpeed = 45.0;
-	  printf ("Dynamic simulation slowed\n");
-	}
-	else
-	{
-	  dynamicSpeed = 1.0;
-	  printf ("Dynamic simulation at normal speed\n");
-	}
-      }
-
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
-      {
-	// Toggle dynamic system visual debug mode
-	debugMode = !debugMode;
-	dynSysDebugger.SetDebugDisplayMode (debugMode);
-
-	// Hide the last ragdoll mesh if any
-	if (ragdollMesh)
-	{
-	  if (debugMode)
-	    ragdollMesh->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH);
-	  else
-	    ragdollMesh->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
-	}
-
-	return true;
-      }
-
-      else if (csKeyEventHelper::GetCookedCode (&ev) == '?'
-	       && phys_engine_id == BULLET_ID)
-      {
-	// Toggle collision debug mode
-	// (this only works with the static 'Star' mesh spawned with key '*')
-	do_bullet_debug = !do_bullet_debug;
-      }
-
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
-      { // Toggle gravity.
-	dynSys->SetGravity (dynSys->GetGravity () == 0 ?
-	  csVector3 (0,-7,0) : csVector3 (0));
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == 'i')
-      { // Toggle autodisable.
-	dynSys->EnableAutoDisable (!dynSys->AutoDisableEnabled ());
-	//dynSys->SetAutoDisableParams(1.5f,2.5f,6,0.0f);
-	disable=dynSys->AutoDisableEnabled ();
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == '1'
-	       && phys_engine_id == ODE_ID)
-      { // Toggle stepfast.
-        csRef<iODEDynamicSystemState> osys = 
-          scfQueryInterface<iODEDynamicSystemState> (dynSys);
-	osys->EnableStepFast (0);
-	solver=0;
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == '2'
-	       && phys_engine_id == ODE_ID)
-      { // Toggle stepfast.
-        csRef<iODEDynamicSystemState> osys = 
-          scfQueryInterface<iODEDynamicSystemState> (dynSys);
-	osys->EnableStepFast (1);
-	solver=1;
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == '3'
-	       && phys_engine_id == ODE_ID)
-      { // Toggle quickstep.
-        csRef<iODEDynamicSystemState> osys = 
-          scfQueryInterface<iODEDynamicSystemState> (dynSys);
-	osys->EnableQuickStep (1);
-	solver=2;
-	return true;
-      }
-      else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
-      {
-	csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
-	if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
-	return true;
-      }
-    }
-
-    // Slow down the camera's body
-    else if (cameraMode == CAMERA_BODY
-	     && (ev.Name == KeyboardUp)
-	     && ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) 
-	      || (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'b')
     {
-      cameraBody->SetLinearVelocity(csVector3 (0, 0, 0));
-      cameraBody->SetAngularVelocity (csVector3 (0, 0, 0));
+      CreateBox ();
+      return true;
     }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
+    {
+      CreateSphere ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'c'
+	     && phys_engine_id == BULLET_ID)
+    {
+      CreateCylinder ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'a'
+	     && phys_engine_id == BULLET_ID)
+    {
+      CreateCapsule ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'm')
+    {
+      CreateMesh ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'v')
+    {
+      CreateConvexMesh ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '*')
+    {
+      CreateStarCollider ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'j')
+    {
+      CreateJointed ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'h'
+	     && phys_engine_id == BULLET_ID)
+    {
+      CreateChain ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'r'
+	     && phys_engine_id == BULLET_ID)
+    {
+      CreateRagdoll ();
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'f')
+    {
+      // Toggle camera mode
+      if (cameraMode == CAMERA_BODY)
+      {
+	cameraMode = CAMERA_FREE;
+	printf ("Toggling camera to free mode\n");
+      }
+      else
+      {
+	cameraMode = CAMERA_BODY;
+	printf ("Toggling camera to rigid body mode\n");
+      }
+      UpdateCameraMode ();
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 't')
+    {
+      // Toggle all bodies between dynamic and static
+      allStatic = !allStatic;
+
+      if (allStatic)
+	printf ("Toggling all bodies to static mode\n");
+      else
+	printf ("Toggling all bodies to dynamic mode\n");
+
+      for (int i = 0; i < dynSys->GetBodysCount (); i++)
+      {
+	iRigidBody* body = dynSys->GetBody (i);
+	if (allStatic)
+	  body->MakeStatic ();
+	else
+	{
+	  body->MakeDynamic ();
+	  body->Enable ();
+	}
+      }
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'p')
+    {
+      // Toggle pause mode for dynamic simulation
+      pauseDynamic = !pauseDynamic;
+      if (pauseDynamic)
+	printf ("Dynamic simulation paused\n");
+      else
+	printf ("Dynamic simulation resumed\n");
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'o')
+    {
+      // Toggle speed of dynamic simulation
+      if (dynamicSpeed - 1.0 < 0.00001)
+      {
+	dynamicSpeed = 45.0;
+	printf ("Dynamic simulation slowed\n");
+      }
+      else
+      {
+	dynamicSpeed = 1.0;
+	printf ("Dynamic simulation at normal speed\n");
+      }
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
+    {
+      // Toggle dynamic system visual debug mode
+      debugMode = !debugMode;
+      dynSysDebugger.SetDebugDisplayMode (debugMode);
+
+      // Hide the last ragdoll mesh if any
+      if (ragdollMesh)
+      {
+	if (debugMode)
+	  ragdollMesh->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH);
+	else
+	  ragdollMesh->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
+      }
+
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '?'
+	     && phys_engine_id == BULLET_ID)
+    {
+      // Toggle collision debug mode
+      // (this only works with the static 'Star' mesh spawned with key '*')
+      do_bullet_debug = !do_bullet_debug;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
+    {
+      // Toggle gravity.
+      dynSys->SetGravity (dynSys->GetGravity () == 0 ?
+			  csVector3 (0,-7,0) : csVector3 (0));
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'i')
+    {
+      // Toggle autodisable.
+      dynSys->EnableAutoDisable (!dynSys->AutoDisableEnabled ());
+      //dynSys->SetAutoDisableParams(1.5f,2.5f,6,0.0f);
+      autodisable = dynSys->AutoDisableEnabled ();
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '1'
+	     && phys_engine_id == ODE_ID)
+    {
+      // Toggle stepfast.
+      csRef<iODEDynamicSystemState> osys = 
+	scfQueryInterface<iODEDynamicSystemState> (dynSys);
+      osys->EnableStepFast (0);
+      solver=0;
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '2'
+	     && phys_engine_id == ODE_ID)
+    {
+      // Toggle stepfast.
+      csRef<iODEDynamicSystemState> osys = 
+	scfQueryInterface<iODEDynamicSystemState> (dynSys);
+      osys->EnableStepFast (1);
+      solver=1;
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '3'
+	     && phys_engine_id == ODE_ID)
+    {
+      // Toggle quickstep.
+      csRef<iODEDynamicSystemState> osys = 
+	scfQueryInterface<iODEDynamicSystemState> (dynSys);
+      osys->EnableQuickStep (1);
+      solver=2;
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
+    {
+      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (GetObjectRegistry ()));
+      if (q) q->GetEventOutlet()->Broadcast (csevQuit (GetObjectRegistry ()));
+      return true;
+    }
+  }
+
+  // Slow down the camera's body
+  else if (cameraMode == CAMERA_BODY
+	   && (eventtype == csKeyEventTypeUp)
+	   && ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) 
+	       || (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
+  {
+    cameraBody->SetLinearVelocity(csVector3 (0, 0, 0));
+    cameraBody->SetAngularVelocity (csVector3 (0, 0, 0));
   }
 
   return false;
 }
 
-bool Simple::SimpleEventHandler (iEvent& ev)
+bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
 {
-  return simple ? simple->HandleEvent (ev) : false;
-}
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (GetObjectRegistry ()))
+  {
+    csPrintf ("Usage: phystut [OPTIONS]\n");
+    csPrintf ("Physics tutorial for crystalspace\n\n");
+    csPrintf ("Options for phystut:\n");
+    csPrintf ("  -phys_engine:      specify which physics plugin to use (ode, bullet)\n");
+    csCommandLineHelper::Help (GetObjectRegistry ());
+    return false;
+  }
 
-bool Simple::Initialize ()
-{
-  if (!csInitializer::RequestPlugins (object_reg,
+  // Request plugins
+  if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_VFS,
     CS_REQUEST_OPENGL3D,
     CS_REQUEST_ENGINE,
@@ -434,44 +433,20 @@ bool Simple::Initialize ()
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.body", iBodyManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll", iSkeletonRagdollManager2),
     CS_REQUEST_END))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Can't initialize plugins!");
-    return false;
-  }
+    return ReportError ("Failed to initialize plugins!");
 
-  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Can't initialize event handler!");
-    return false;
-  }
-  CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
+  csBaseEventHandler::Initialize(GetObjectRegistry ());
+  if (!RegisterQueue(GetObjectRegistry (), csevAllEvents (GetObjectRegistry ())))
+    return ReportError ("Failed to set up event handler!");
 
-  KeyboardDown = csevKeyboardDown (object_reg);
-  KeyboardUp = csevKeyboardUp (object_reg);
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    csPrintf ("Usage: phystut [OPTIONS]\n");
-    csPrintf ("Physics tutorial for crystalspace\n\n");
-    csPrintf ("Options for phystut:\n");
-    csPrintf ("  -phys_engine:      specify which physics plugin to use (ode, bullet)\n");
-    csCommandLineHelper::Help (object_reg);
-    return false;
-  }
-
-  // Checking for choosen engine
-  csRef<iCommandLineParser> clp = csQueryRegistry<iCommandLineParser> (object_reg);
+  // Checking for choosen dynamic system
+  csRef<iCommandLineParser> clp = csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
   phys_engine_name = clp->GetOption ("phys_engine");
   if (phys_engine_name == "ode")
   {
     phys_engine_id = ODE_ID;
     csRef<iPluginManager> plugmgr = 
-      csQueryRegistry<iPluginManager> (object_reg);
+      csQueryRegistry<iPluginManager> (GetObjectRegistry ());
     dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.ode");
   }
   else 
@@ -479,124 +454,84 @@ bool Simple::Initialize ()
     phys_engine_name = "bullet";
     phys_engine_id = BULLET_ID;
     csRef<iPluginManager> plugmgr = 
-      csQueryRegistry<iPluginManager> (object_reg);
+      csQueryRegistry<iPluginManager> (GetObjectRegistry ());
     dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
   }
   if (!dyn)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "No iDynamics plugin!");
-    return false;
-  }
+    return ReportError ("No iDynamics plugin!");
 
-  // The virtual clock.
-  vc = csQueryRegistry<iVirtualClock> (object_reg);
-  if (vc == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Can't find the virtual clock!");
-    return false;
-  }
+  return true;
+}
 
-  // Find the pointer to engine plugin
-  engine = csQueryRegistry<iEngine> (object_reg);
-  if (engine == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "No iEngine plugin!");
-    return false;
-  }
+void Simple::OnExit ()
+{
+  printer.Invalidate ();
+}
 
-  loader = csQueryRegistry<iLoader> (object_reg);
-  if (loader == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "No iLoader plugin!");
-    return false;
-  }
+bool Simple::Application ()
+{
+  if (!OpenApplication (GetObjectRegistry ()))
+    return ReportError ("Error opening system!");
 
-  g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  if (g3d == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "No iGraphics3D plugin!");
-    return false;
-  }
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry ());
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-  g2d = csQueryRegistry<iGraphics2D> (object_reg);
-  if (g2d == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "No iGraphics2D plugin!");
-    return false;
-  }
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry ());
+  if (!engine) return ReportError("Failed to locate 3D engine!");
 
-  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
-  if (kbd == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "No iKeyboardDriver plugin!");
-    return false;
-  }
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry ());
+  if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
-  bodyManager = csQueryRegistry<iBodyManager> (object_reg);
-  if (bodyManager == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "No iBodyManager plugin!");
-    return false;
-  }
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry ());
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  ragdollManager = csQueryRegistry<iSkeletonRagdollManager2> (object_reg);
-  if (ragdollManager == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "No iBodyRagdollManager plugin!");
-    return false;
-  }
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry ());
+  if (!loader) return ReportError("Failed to locate Loader!");
 
-  // Open the main system. This will open all the previously loaded plug-ins.
-  if (!csInitializer::OpenApplication (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error opening system!");
-    return false;
-  }
+  g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
+  if (!g2d) return ReportError("Failed to locate 2D renderer!");
 
-  printer.AttachNew (new FramePrinter (object_reg));
+  bodyManager = csQueryRegistry<iBodyManager> (GetObjectRegistry ());
+  if (!bodyManager) return ReportError("Failed to locate body mesh manager!");
+
+  ragdollManager = csQueryRegistry<iSkeletonRagdollManager2> (GetObjectRegistry ());
+  if (!ragdollManager) return ReportError("Failed to locate ragdoll manager!");
 
   csRef<iFontServer> fs = g3d->GetDriver2D()->GetFontServer ();
-  if (fs)
-    courierFont = fs->LoadFont (CSFONT_COURIER);
+  if (!fs) return ReportError("Failed to locate font server!");
+  courierFont = fs->LoadFont (CSFONT_COURIER);
+
+  // Create the dynamic system
+  dynSys = dyn->CreateSystem ();
+  if (!dynSys) return ReportError ("Error creating dynamic system!");
+
+  dynSys->SetGravity (csVector3 (0,-7,0));
+  dynSys->SetRollingDampener(.995f);
+
+  dynSysDebugger.SetObjectRegistry (GetObjectRegistry ());
+  dynSysDebugger.SetDynamicSystem (dynSys);
+
+  if (phys_engine_id == ODE_ID)
+  {
+    csRef<iODEDynamicSystemState> osys= 
+      scfQueryInterface<iODEDynamicSystemState> (dynSys);
+    osys->SetContactMaxCorrectingVel (.1f);
+    osys->SetContactSurfaceLayer (.0001f);
+  }
   else
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error getting FontServer!");
-    return false;
-  };
-
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error loading 'stone4' texture!");
-    return false;
+    bullet_dynSys = scfQueryInterface<iBulletDynamicSystem> (dynSys);
   }
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
+  // Creating the scene's room
   room = engine->CreateSector ("room");
   dynSysDebugger.SetDebugSector (room);
+
+  view = csPtr<iView> (new csView (engine, g3d));
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   // First we make a primitive for our geometry.
   using namespace CS::Geometry;
@@ -609,25 +544,26 @@ bool Simple::Initialize ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
+
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+    return false;
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Creating the background (usefull when the camera is free and is moved 
   // outside of the room)
-
-  // First we make a primitive for our geometry.
   CS::Geometry::DensityTextureMapper bgMapper (0.3f);
   CS::Geometry::TesselatedBox bgBox (csVector3 (-4000), csVector3 (4000));
   bgBox.SetMapper(&bgMapper);
   bgBox.SetFlags(CS::Geometry::Primitives::CS_PRIMBOX_INSIDE);
   
-  // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> background =
     CS::Geometry::GeneralMeshBuilder::CreateFactoryAndMesh(engine, room,
 				   "background", "background_factory", &bgBox);
 
   csRef<iMaterialWrapper> bgMaterial =
     CS::Material::MaterialBuilder::CreateColorMaterial
-    (object_reg, "background", csColor (0.898f));
+    (GetObjectRegistry (), "background", csColor (0.898f));
   background->GetMeshObject()->SetMaterialWrapper(bgMaterial);
 
   // Creating lights
@@ -661,31 +597,15 @@ bool Simple::Initialize ()
   using namespace CS::Lighting;
   SimpleStaticLighter::ShineLights (room, engine, 4);
 
-  view = csPtr<iView> (new csView (engine, g3d));
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
+  // Preload some meshes and materials
   iTextureWrapper* txt = loader->LoadTexture ("spark",
     "/lib/std/spark.png");
-  if (txt == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error loading texture!");
-    return false;
-  }
+  if (!txt) return ReportError ("Error loading texture!");
 
   // Load the box mesh factory.
   boxFact = loader->LoadMeshObjectFactory ("/lib/std/sprite1");
-  if (boxFact == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error loading mesh object factory!");
-    return false;
-  }
+  if (!boxFact) return ReportError ("Error loading mesh object factory!");
+
   // Double the size.
   csMatrix3 m; m *= .5;
   csReversibleTransform t = csReversibleTransform (m, csVector3 (0));
@@ -693,41 +613,9 @@ bool Simple::Initialize ()
 
   // Load the mesh factory.
   meshFact = loader->LoadMeshObjectFactory ("/varia/physmesh");
-  if (meshFact == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error loading mesh object factory!");
-    return false;
-  }
+  if (!meshFact) return ReportError ("Error loading mesh object factory!");
 
-  // Create the dynamic system.
-  dynSys = dyn->CreateSystem ();
-  if (dynSys == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error creating dynamic system!");
-    return false;
-  }
-
-  dynSys->SetGravity (csVector3 (0,-7,0));
-
-  dynSys->SetRollingDampener(.995f);
-
-  dynSysDebugger.SetDynamicSystem (dynSys);
-
-  if (phys_engine_id == ODE_ID)
-  {
-    csRef<iODEDynamicSystemState> osys= 
-      scfQueryInterface<iODEDynamicSystemState> (dynSys);
-    osys->SetContactMaxCorrectingVel (.1f);
-    osys->SetContactSurfaceLayer (.0001f);
-  }
-  else
-  {
-    bullet_dynSys = scfQueryInterface<iBulletDynamicSystem> (dynSys);
-  }
+  // Create the physical walls
   CreateWalls (csVector3 (5));
 
   // Init the camera
@@ -737,12 +625,11 @@ bool Simple::Initialize ()
   if (phys_engine_id == BULLET_ID)
     LoadRagdoll ();
 
-  return true;
-}
+  printer.AttachNew (new FramePrinter (GetObjectRegistry ()));
 
-void Simple::Shutdown ()
-{
-  printer.Invalidate ();
+  Run();
+
+  return true;
 }
 
 void Simple::UpdateCameraMode ()
@@ -814,9 +701,7 @@ bool Simple::CreateStarCollider ()
     starFact = engine->FindMeshFactory ("genstar");
     if (!starFact)
     {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "Error loading 'star.xml'!");
+      return ReportError ("Error loading 'star.xml'!");
       return false;
     }
   }
@@ -902,11 +787,9 @@ iRigidBody* Simple::CreateSphere ()
   // Create the ball mesh factory.
   csRef<iMeshFactoryWrapper> ballFact = engine->CreateMeshFactory(
   	"crystalspace.mesh.object.genmesh", "ballFact");
-  if (ballFact == 0)
+  if (!ballFact)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error creating mesh object factory!");
+    ReportError ("Error creating mesh object factory!");
     return 0;
   }
 
@@ -957,11 +840,9 @@ iRigidBody* Simple::CreateCylinder ()
   // Create the cylinder mesh factory.
   csRef<iMeshFactoryWrapper> cylinderFact = engine->CreateMeshFactory(
   	"crystalspace.mesh.object.genmesh", "cylinderFact");
-  if (cylinderFact == 0)
+  if (!cylinderFact)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error creating mesh object factory!");
+    ReportError ("Error creating mesh object factory!");
     return 0;
   }
 
@@ -1015,11 +896,9 @@ iRigidBody* Simple::CreateCapsule ()
   // Create the capsule mesh factory.
   csRef<iMeshFactoryWrapper> capsuleFact = engine->CreateMeshFactory(
   	"crystalspace.mesh.object.genmesh", "capsuleFact");
-  if (capsuleFact == 0)
+  if (!capsuleFact)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error creating mesh object factory!");
+    ReportError ("Error creating mesh object factory!");
     return 0;
   }
 
@@ -1062,11 +941,9 @@ iRigidBody* Simple::CreateConvexMesh ()
   // Create the mesh factory (a capsule in this example)
   csRef<iMeshFactoryWrapper> capsuleFact = engine->CreateMeshFactory(
   	"crystalspace.mesh.object.genmesh", "capsuleFact");
-  if (capsuleFact == 0)
+  if (!capsuleFact)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error creating mesh object factory!");
+    ReportError ("Error creating mesh object factory!");
     return 0;
   }
 
@@ -1200,15 +1077,15 @@ void Simple::CreateChain ()
 
 void Simple::LoadRagdoll ()
 {
-
   // Load animesh factory
   csLoadResult rc = loader->Load ("/lib/frankie/frankie.xml");
   if (!rc.success)
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	      "crystalspace.application.phystut",
-	      "Can't load frankie!");
-    csRef<iMeshFactoryWrapper> meshfact = engine->FindMeshFactory ("franky_frankie");
-
+  {
+    ReportError ("Can't load frankie!");
+    return;
+  }
+ 
+  csRef<iMeshFactoryWrapper> meshfact = engine->FindMeshFactory ("franky_frankie");
   if (!meshfact)
     return;
 
@@ -1217,9 +1094,7 @@ void Simple::LoadRagdoll ()
 
   if (!animeshFactory)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	      "crystalspace.application.phystut",
-	      "Can't find frankie's animesh factory!");
+    ReportError ("Can't find frankie's animesh factory!");
     return;
   }
 
@@ -1479,9 +1354,7 @@ void Simple::LoadRagdoll ()
     GetAnimationRoot ()->FindNode("standard");
   if (!animFactory)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	      "crystalspace.application.phystut",
-	      "Can't find 'standard' animation node factory!");
+    ReportError ("Can't find 'standard' animation node factory!");
     return;
   }
 
@@ -1579,6 +1452,7 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
   //  * Play with softness, cfm, etc.
   dynSys->AttachColliderMesh (walls, t, 10, 1);
 #endif
+
 #if 0
   // mesh <-> plane doesn't work yet, so we will use boxes for each
   // wall for now
@@ -1614,11 +1488,6 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
   dynSys->AttachColliderBox (size, t, 10, 0);
   t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
   dynSys->AttachColliderBox (size, t, 10, 0);
-}
-
-void Simple::Start ()
-{
-  csDefaultRunLoop (object_reg);
 }
 
 void Simple::WriteShadow (int x,int y,int fg,const char *str,...)
@@ -1735,20 +1604,9 @@ void Simple::DisplayKeys ()
   }
 }
 
-/*---------------------------------------------------------------------*
-* Main function
-*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------------
+
 int main (int argc, char* argv[])
 {
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
-
-  simple = new Simple (object_reg);
-  if (simple->Initialize ())
-    simple->Start ();
-  simple->Shutdown ();
-  delete simple; simple = 0;
-
-  csInitializer::DestroyApplication (object_reg);
-  return 0;
+  return Simple ().Main(argc, argv);
 }
-
