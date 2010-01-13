@@ -222,11 +222,11 @@ static int GetProfileLevel (CGprofile profile)
       return 0x20a;
     case CG_PROFILE_FP40:
       return 0x300;
-    case CG_PROFILE_GP4FP:
+    case CG_PROFILE_GPU_FP:
       return 0x400;
     default:
       // Some "future proofing"
-      return (profile > CG_PROFILE_GP4FP) ? 0x500 : 0;
+      return (profile > CG_PROFILE_GPU_FP) ? 0x500 : 0;
   }
 }
 
