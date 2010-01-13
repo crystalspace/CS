@@ -20,6 +20,8 @@
 
 #include "cssysdef.h"
 
+#include "ivaria/reporter.h"
+
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagememory.h"
 #include "csutil/measuretime.h"
@@ -459,13 +461,23 @@ void csGLBasicTextureHandle::RegenerateMipmaps()
 void csGLBasicTextureHandle::Load ()
 {
   if (Handle != 0) return;
-
+  
   static const GLint textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
     GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
   static const GLint textureMagFilters[3] = {GL_NEAREST, GL_LINEAR, 
     GL_LINEAR};
 
   glGenTextures (1, &Handle);
+  
+  /* @@@ FIXME: That seems to happen with PS occasionally.
+     Reason unknown. */
+  CS_ASSERT(uploadData);
+  if (!uploadData)
+  {
+    G3D->Report (CS_REPORTER_SEVERITY_WARNING, "WEIRD: no uploadData in %s!",
+		 CS_FUNCTION_NAME);
+    return;
+  }
 
   const int texFilter = texFlags.Check (CS_TEXTURE_NOFILTER) ? 0 : 
     txtmgr->rstate_bilinearmap;
