@@ -21,7 +21,6 @@
 
 #include <stdarg.h>
 #include <crystalspace.h>
-#include <ivaria/ode.h>
 #include "dynsysdebug.h"
 
 class Simple : public csApplicationFramework, public csBaseEventHandler
@@ -73,6 +72,7 @@ private:
   CS::Animation::StateID ragdollState;
   csRef<iMeshWrapper> ragdollMesh;
 
+  //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
 
@@ -99,6 +99,7 @@ public:
   Simple ();
   ~Simple ();
 
+  //-- csApplicationFramework
   void OnExit ();
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();

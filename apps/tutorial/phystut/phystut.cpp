@@ -17,7 +17,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "phystut.h"
-#include "imesh/ragdoll.h"
 #include "cstool/materialbuilder.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -25,14 +24,16 @@ CS_IMPLEMENT_APPLICATION
 #define ODE_ID 1
 #define BULLET_ID 2
 
-#define CAMERA_BODY 1
-#define CAMERA_FREE 2
+#define CAMERA_DYNAMIC 1
+#define CAMERA_KINEMATIC 2
+#define CAMERA_FREE 3
 
 //-----------------------------------------------------------------------------
 
 Simple::Simple ()
   : solver (0), autodisable (false), do_bullet_debug (false), debugMode (false),
-    allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f), cameraMode (CAMERA_BODY)
+    allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
+    cameraMode (CAMERA_DYNAMIC)
 {
   SetApplicationName ("CrystalSpace.PhysTut");
 }
@@ -50,7 +51,7 @@ void Simple::Frame ()
   const float speed = elapsed_time / 1000.0;
 
   // Camera is controlled by a rigid body
-  if (cameraMode == CAMERA_BODY)
+  if (cameraMode == CAMERA_DYNAMIC)
   {
     if (kbd->GetKeyState (CSKEY_RIGHT))
       view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_RIGHT, speed);
@@ -122,8 +123,11 @@ void Simple::Frame ()
   if (!pauseDynamic)
     dyn->Step (speed / dynamicSpeed);
 
-  // Update camera position if it is controlled by a rigid body
-  if (cameraMode == CAMERA_BODY)
+  // Update camera position if it is controlled by a rigid body.
+  // (in this mode we want to control the orientation of the camera,
+  // so we update the camera position by ourselves instead of using
+  // 'cameraBody->AttachCamera (camera)')
+  if (cameraMode == CAMERA_DYNAMIC)
   {
     view->GetCamera()->GetTransform().SetOrigin
       (cameraBody->GetTransform().GetOrigin());
@@ -136,37 +140,65 @@ void Simple::Frame ()
   // Tell the camera to render into the frame buffer.
   view->Draw ();
 
-  // Write FPS and other info..
+  // Display collisions 
   if(!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-
   if (do_bullet_debug)
   {
     bullet_dynSys->DebugDraw (view);
   }
 
-  WriteShadow( 10, 390, g2d->FindRGB (255, 150, 100),"Physics engine: %s", 
+  // Write FPS and other info..
+  int y = 390;
+  int lineSize = 15;
+  WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Physics engine: %s", 
     phys_engine_name.GetData ());
-  if( speed != 0.0f)
-    WriteShadow( 10, 400, g2d->FindRGB (255, 150, 100),"FPS: %.2f",
-	1.0f/speed);
-  WriteShadow( 10, 410, g2d->FindRGB (255, 150, 100),"%d Objects",
-	       dynSys->GetBodysCount ());
+  y += lineSize;
 
-  // Write available keys
-  DisplayKeys ();
+  switch (cameraMode)
+    {
+    case CAMERA_DYNAMIC:
+      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Camera mode: dynamic");
+      break;
+
+    case CAMERA_FREE:
+      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Camera mode: free");
+      break;
+
+    case CAMERA_KINEMATIC:
+      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Camera mode: kinematic");
+      break;
+
+    default:
+      break;
+    }
+  y += lineSize;
+
+  if( speed != 0.0f)
+    WriteShadow ( 10, y, g2d->FindRGB (255, 150, 100),"FPS: %.2f",
+	1.0f/speed);
+  y += lineSize;
+
+  WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"%d Objects",
+	       dynSys->GetBodysCount ());
+  y += lineSize;
 
   if (phys_engine_id == ODE_ID)
   {
-    if(solver==0)
-      WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: WorldStep");
-    else if(solver==1)
-      WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: StepFast");
-    else if(solver==2)
-      WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
+    if (solver==0)
+      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Solver: WorldStep");
+    else if (solver==1)
+      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Solver: StepFast");
+    else if (solver==2)
+      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
+    y += lineSize;
   }
 
   if (autodisable)
-    WriteShadow( 10, 430, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
+    WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
+  y += lineSize;
+
+  // Write available keys
+  DisplayKeys ();
 }
 
 bool Simple::OnKeyboard (iEvent &ev)
@@ -249,16 +281,24 @@ bool Simple::OnKeyboard (iEvent &ev)
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'f')
     {
       // Toggle camera mode
-      if (cameraMode == CAMERA_BODY)
-      {
-	cameraMode = CAMERA_FREE;
-	printf ("Toggling camera to free mode\n");
-      }
-      else
-      {
-	cameraMode = CAMERA_BODY;
-	printf ("Toggling camera to rigid body mode\n");
-      }
+      switch (cameraMode)
+	{
+	case CAMERA_DYNAMIC:
+	  cameraMode = CAMERA_FREE;
+	  break;
+
+	case CAMERA_FREE:
+	  if (phys_engine_id == BULLET_ID)
+	    cameraMode = CAMERA_KINEMATIC;
+	  else
+	    cameraMode = CAMERA_DYNAMIC;
+	  break;
+
+	case CAMERA_KINEMATIC:
+	  cameraMode = CAMERA_DYNAMIC;
+	  break;
+	}
+
       UpdateCameraMode ();
       return true;
     }
@@ -395,7 +435,7 @@ bool Simple::OnKeyboard (iEvent &ev)
   }
 
   // Slow down the camera's body
-  else if (cameraMode == CAMERA_BODY
+  else if (cameraMode == CAMERA_DYNAMIC
 	   && (eventtype == csKeyEventTypeUp)
 	   && ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) 
 	       || (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
@@ -572,24 +612,19 @@ bool Simple::Application ()
 
   // This light is for the background
   light = engine->CreateLight(0, csVector3(10), 9000, csColor (1));
-  light->SetAttenuationMode (CS_ATTN_NONE);
   ll->Add (light);
 
   // Other lights
   light = engine->CreateLight (0, csVector3 (3, 0, 0), 8, csColor (1, 0, 0));
-  light->SetAttenuationMode (CS_ATTN_INVERSE);
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8, csColor (0, 0, 1));
-  light->SetAttenuationMode (CS_ATTN_INVERSE);
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 0, 3), 8, csColor (0, 1, 0));
-  light->SetAttenuationMode (CS_ATTN_INVERSE);
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, -3, 0), 8, csColor (1, 1, 0));
-  light->SetAttenuationMode (CS_ATTN_INVERSE);
   ll->Add (light);
 
   engine->Prepare ();
@@ -634,33 +669,78 @@ bool Simple::Application ()
 
 void Simple::UpdateCameraMode ()
 {
-  // The camera is controlled by a rigid body
-  if (cameraMode == CAMERA_BODY)
-  {
-    // Use the camera transform.
-    const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+  switch (cameraMode)
+    {
+    // The camera is controlled by a rigid body
+    case CAMERA_DYNAMIC:
+      {
+	// Check if there is already a rigid body created for the 'kinematic' mode
+	if (cameraBody)
+	{
+	  cameraBody->MakeDynamic ();
 
-    // Create a body
-    cameraBody = dynSys->CreateBody ();
-    cameraBody->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
-    cameraBody->SetTransform (tc);
-    cameraBody->AttachColliderSphere (0.8f, csVector3 (0.0f), 10.0f, 1.0f, 0.8f);
-  }
+	  // Remove the attached camera (in this mode we want to control
+	  // the orientation of the camera, so we update the camera
+	  // position by ourselves)
+	  cameraBody->AttachCamera (0);
+	}
 
-  // The camera is free
-  else
-  {
-    dynSys->RemoveBody (cameraBody);
-    cameraBody = 0;
+	// Create a new rigid body
+	else
+	{
+	  cameraBody = dynSys->CreateBody ();
+	  cameraBody->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
+	  cameraBody->SetTransform (view->GetCamera ()->GetTransform ());
+	  cameraBody->AttachColliderSphere
+	    (0.8f, csVector3 (0.0f), 10.0f, 1.0f, 0.8f);
+	}
 
-    // Update rotX, rotY, rotZ
-    csQuaternion quaternion;
-    quaternion.SetMatrix (((csReversibleTransform) view->GetCamera ()->GetTransform ()).GetT2O ());
-    csVector3 eulerAngles = quaternion.GetEulerAngles ();
-    rotX = eulerAngles.x;
-    rotY = eulerAngles.y;
-    rotZ = eulerAngles.z;
-  }
+	break;
+      }
+
+    // The camera is free
+    case CAMERA_FREE:
+      {
+	dynSys->RemoveBody (cameraBody);
+	cameraBody = 0;
+
+	// Update rotX, rotY, rotZ
+	csQuaternion quaternion;
+	quaternion.SetMatrix
+	  (((csReversibleTransform) view->GetCamera ()->GetTransform ()).GetT2O ());
+	csVector3 eulerAngles = quaternion.GetEulerAngles ();
+	rotX = eulerAngles.x;
+	rotY = eulerAngles.y;
+	rotZ = eulerAngles.z;
+
+	break;
+      }
+
+    // The camera is kinematic
+    case CAMERA_KINEMATIC:
+      {
+	// Create a body
+	cameraBody = dynSys->CreateBody ();
+	cameraBody->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
+	cameraBody->SetTransform (view->GetCamera ()->GetTransform ());
+	cameraBody->AttachColliderSphere
+	  (0.8f, csVector3 (0.0f), 10.0f, 1.0f, 0.8f);
+
+	// Make it kinematic
+	csRef<iBulletRigidBody> bulletBody =
+	  scfQueryInterface<iBulletRigidBody> (cameraBody);
+	bulletBody->MakeKinematic ();
+
+	// Attach the camera to the body so as to benefit of the default
+	// kinematic callback
+	cameraBody->AttachCamera (view->GetCamera ());
+
+	break;
+      }
+
+    default:
+      break;
+    }
 }
 
 iRigidBody* Simple::CreateBox ()
@@ -974,8 +1054,6 @@ iRigidBody* Simple::CreateConvexMesh ()
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
-
-  rb->MakeDynamic ();
 
   return rb;
 }
@@ -1564,7 +1642,7 @@ void Simple::DisplayKeys ()
   WriteShadow (x, y, fg, "SPACE: spawn random object");
   y += lineSize;
 
-  WriteShadow (x, y, fg, "f: toggle physical/free camera");
+  WriteShadow (x, y, fg, "f: toggle camera modes");
   y += lineSize;
 
   WriteShadow (x, y, fg, "t: toggle all bodies dynamic/static");
