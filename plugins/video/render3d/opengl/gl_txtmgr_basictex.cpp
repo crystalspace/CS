@@ -1022,8 +1022,10 @@ csPtr<iDataBuffer> csGLBasicTextureHandle::ReadbackPerform (
     csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, 0, true);
     
     csRef<iDataBuffer> db;
+#include "csutil/custom_new_disable.h"
     db.AttachNew (new (txtmgr->pboTextureReadbacks) TextureReadbackPBO (
       pbo, readbackSize));
+#include "csutil/custom_new_enable.h"
     return csPtr<iDataBuffer> (db);
   }
   else
@@ -1033,8 +1035,10 @@ csPtr<iDataBuffer> csGLBasicTextureHandle::ReadbackPerform (
     readbackAction (data);
     
     csRef<iDataBuffer> db;
+#include "csutil/custom_new_disable.h"
     db.AttachNew (new (txtmgr->simpleTextureReadbacks) TextureReadbackSimple (
       data, readbackSize));
+#include "csutil/custom_new_enable.h"
     return csPtr<iDataBuffer> (db);
   }
 }
