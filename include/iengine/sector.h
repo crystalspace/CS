@@ -149,11 +149,12 @@ struct iLightVisibleCallback : public virtual iBase
 };
 
 /**
- * Return structure for the iSector->HitBeam() routines.
+ * Return structure for the iSector::HitBeam() and iSector::HitBeamPortals() routines.
+ * \sa csBulletHitBeamResult
  */
 struct csSectorHitBeamResult
 {
-  /// The resulting mesh that we hit.
+  /// The resulting mesh that was hit, or 0 if no mesh was hit.
   iMeshWrapper* mesh;
 
   /// Intersection point in world space.
@@ -164,7 +165,7 @@ struct csSectorHitBeamResult
 
   /**
    * The final sector for the end point.
-   * Only for iSector->HitBeamPortals().
+   * Only for iSector::HitBeamPortals().
    */
   iSector* final_sector;
 };
@@ -405,7 +406,7 @@ struct iSector : public virtual iBase
    * containing the 'start' point. 'isect' will be the intersection point
    * if a polygon is returned. This function returns -1 if no polygon
    * was hit or the polygon index otherwise.
-   * \sa csSectorHitBeamResult
+   * \sa csSectorHitBeamResult HitBeam() iBulletDynamicSystem::HitBeam()
    */
   virtual csSectorHitBeamResult HitBeamPortals (const csVector3& start,
   	const csVector3& end) = 0;
@@ -416,7 +417,7 @@ struct iSector : public virtual iBase
    * filled with the indices of the polygon that was hit.
    * If polygon_idx is null then the polygon will not be filled in.
    * This function doesn't support portals.
-   * \sa csSectorHitBeamResult
+   * \sa csSectorHitBeamResult HitBeamPortals() iBulletDynamicSystem::HitBeam()
    */
   virtual csSectorHitBeamResult HitBeam (const csVector3& start,
   	const csVector3& end, bool accurate = false) = 0;

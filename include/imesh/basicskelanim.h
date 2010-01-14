@@ -86,7 +86,7 @@ struct iSkeletonSpeedNodeFactory2 : public iSkeletonAnimNodeFactory2
 };
 
 /**
- * An animation node that takes some animations of the mesh moving at different speed
+ * An animation node that takes some animations of an Animated Mesh moving at different speed
  * (eg idle, walking, running) and blend them to achieve any custom speed.
  */
 struct iSkeletonSpeedNode2 : public iSkeletonAnimNode2

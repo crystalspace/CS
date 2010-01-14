@@ -72,6 +72,7 @@ struct iDynamicsStepCallback : public virtual iBase
  * 
  * Main users of this interface:
  * - Dynamics loader plugin (crystalspace.dynamics.loader)
+ * \sa iODEDynamicState
  */
 struct iDynamics : public virtual iBase
 {
@@ -115,6 +116,7 @@ struct iDynamicsSystemCollider;
  * 
  * Main ways to get pointers to this interface:
  * - iDynamics::FindSystem()
+ * \sa iBulletDynamicSystem iODEDynamicSystemState
  */
 struct iDynamicSystem : public virtual iBase
 {

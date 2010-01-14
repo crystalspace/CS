@@ -40,7 +40,8 @@ struct iODEFrameUpdateCallback : public virtual iBase
 
 /**
  * This class exposes parameters specific to odedynam as an implementation
- * of iDynamics
+ * of iDynamics.
+ * \sa iDynamics
  */
 struct iODEDynamicState : public virtual iBase
 {
@@ -126,8 +127,9 @@ struct iODESliderJoint;
 
 /**
  * This class exposes parameters specific to odedynam as an implementation
- * of iDynamics.  In most cases SystemState should not be modified directly
+ * of iDynamicsSystem. In most cases SystemState should not be modified directly
  * unless you want the behavior of a specific system different from others.
+ * \sa iDynamicsSystem iBulletDynamicSystem
  */
 struct iODEDynamicSystemState : public virtual iBase
 {
