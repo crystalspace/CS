@@ -133,6 +133,7 @@ public:
       iObjectRegistry* object_reg);
   virtual ~csBulletDynamicsSystem ();
 
+  //-- iDynamicsSystem
   virtual iObject *QueryObject () { return (iObject*) this; }
   virtual void SetGravity (const csVector3& v);
   virtual const csVector3 GetGravity () const;
@@ -187,7 +188,9 @@ public:
 
   void RegisterGimpact ();
 
+  //-- iBulletDynamicSystem
   virtual void DebugDraw (iView* view);
+  virtual csBulletHitBeamResult HitBeam (const csVector3 &start, const csVector3 &end);
 };
 
 class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,

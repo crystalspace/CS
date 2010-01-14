@@ -776,6 +776,29 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
   }
 }
 
+csBulletHitBeamResult csBulletDynamicsSystem::HitBeam (const csVector3 &start, const csVector3 &end)
+{
+  btVector3 rayFrom (start[0], start[1], start[2]);
+  btVector3 rayTo (end[0], end[1], end[2]);
+  btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
+  bulletWorld->rayTest(rayFrom, rayTo, rayCallback);
+
+  csBulletHitBeamResult result;
+  if (rayCallback.hasHit())
+  {
+    btRigidBody* body = btRigidBody::upcast (rayCallback.m_collisionObject);
+    if (body)
+    {
+      result.body = (csBulletRigidBody*) body->getUserPointer ();
+      result.isect = csVector3 (rayCallback.m_hitPointWorld.getX (),
+				rayCallback.m_hitPointWorld.getY (),
+				rayCallback.m_hitPointWorld.getZ ());
+    }
+  }
+
+  return result;
+}
+
 //-------------------- csBulletRigidBody -----------------------------------
 
 csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic)
@@ -1646,16 +1669,21 @@ void csBulletRigidBody::AdjustTotalMass (float targetmass)
 
 void csBulletRigidBody::AddForce (const csVector3& force)
 {
-  // TODO: all these addforce/torque methods are untested
   if (body)
-    body->applyForce (btVector3 (force.x, force.y, force.z),
-      btVector3 (0.0f, 0.0f, 0.0f));
+  {
+    body->applyImpulse (btVector3 (force.x, force.y, force.z),
+			btVector3 (0.0f, 0.0f, 0.0f));
+    body->setActivationState(ACTIVE_TAG);
+  }
 }
 
 void csBulletRigidBody::AddTorque (const csVector3& force)
 {
   if (body)
+  {
     body->applyTorque (btVector3 (force.x, force.y, force.z));
+    body->setActivationState(ACTIVE_TAG);
+  }
 }
 
 void csBulletRigidBody::AddRelForce (const csVector3& force)
@@ -1664,8 +1692,9 @@ void csBulletRigidBody::AddRelForce (const csVector3& force)
     return;
 
   csOrthoTransform trans = GetTransform ();
-  csVector3 relForce = trans.This2Other (force);
-  body->applyForce (btVector3 (relForce.x, relForce.y, relForce.z), btVector3 (0.0f, 0.0f, 0.0f));
+  csVector3 absForce = trans.This2Other (force);
+  body->applyImpulse (btVector3 (absForce.x, absForce.y, absForce.z), btVector3 (0.0f, 0.0f, 0.0f));
+  body->setActivationState(ACTIVE_TAG);
 }
 
 void csBulletRigidBody::AddRelTorque (const csVector3& torque) 
@@ -1674,30 +1703,34 @@ void csBulletRigidBody::AddRelTorque (const csVector3& torque)
     return;
 
   csOrthoTransform trans = GetTransform ();
-  csVector3 relTorque = trans.This2Other (torque);
-  body->applyTorque (btVector3 (relTorque.x, relTorque.y, relTorque.z));
+  csVector3 absTorque = trans.This2Other (torque);
+  body->applyTorque (btVector3 (absTorque.x, absTorque.y, absTorque.z));
+  body->setActivationState(ACTIVE_TAG);
 }
 
 void csBulletRigidBody::AddForceAtPos (const csVector3& force,
     const csVector3& pos)
 {
-  if (body)
-    body->applyForce (btVector3 (force.x, force.y, force.z),
-		      btVector3 (pos.x,pos.y,pos.z));
+  if (!body)
+    return;
+
+  btVector3 btForce (force.x, force.y, force.z);
+  csOrthoTransform trans = GetTransform ();
+  csVector3 relPos = trans.Other2This (pos);
+
+  body->applyImpulse (btForce, btVector3 (relPos.x, relPos.y, relPos.z));
+  body->setActivationState(ACTIVE_TAG);
 }
 
 void csBulletRigidBody::AddForceAtRelPos (const csVector3& force,
                                           const csVector3& pos)
 {
-  if (!body)
-    return;
-
-  btVector3 btForce (force.x, force.y, force.z);
-
-  csOrthoTransform trans = GetTransform ();
-  csVector3 relPos = trans.This2Other (pos);
-
-  body->applyForce (btForce, btVector3 (relPos.x, relPos.y, relPos.z));
+  if (body)
+  {
+    body->applyImpulse (btVector3 (force.x, force.y, force.z),
+			btVector3 (pos.x, pos.y, pos.z));
+    body->setActivationState(ACTIVE_TAG);
+  }
 }
 
 void csBulletRigidBody::AddRelForceAtPos (const csVector3& force,
@@ -1707,9 +1740,11 @@ void csBulletRigidBody::AddRelForceAtPos (const csVector3& force,
     return;
 
   csOrthoTransform trans = GetTransform ();
-  csVector3 relForce = trans.This2Other (force);
-  btVector3 btPos (force.x, force.y, force.z);
-  body->applyForce (btVector3 (relForce.x, relForce.y, relForce.z), btPos);
+  csVector3 absForce = trans.This2Other (force);
+  csVector3 relPos = trans.Other2This (pos);
+  body->applyImpulse (btVector3 (absForce.x, absForce.y, absForce.z),
+		      btVector3 (relPos.x, relPos.y, relPos.z));
+  body->setActivationState(ACTIVE_TAG);
 }
 
 void csBulletRigidBody::AddRelForceAtRelPos (const csVector3& force,
@@ -1719,10 +1754,10 @@ void csBulletRigidBody::AddRelForceAtRelPos (const csVector3& force,
     return;
 
   csOrthoTransform trans = GetTransform ();
-  csVector3 relForce = trans.This2Other (force);
-  csVector3 relPos = trans.This2Other (pos);
-  body->applyForce (btVector3 (relForce.x, relForce.y, relForce.z),
-		    btVector3 (relPos.x, relPos.y, relPos.z));
+  csVector3 absForce = trans.This2Other (force);
+  body->applyImpulse (btVector3 (absForce.x, absForce.y, absForce.z),
+		      btVector3 (pos.x, pos.y, pos.z));
+  body->setActivationState(ACTIVE_TAG);
 }
 
 const csVector3 csBulletRigidBody::GetForce () const

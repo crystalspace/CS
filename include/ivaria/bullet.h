@@ -30,17 +30,42 @@ struct iRigidBody;
 struct iBulletKinematicCallback;
 
 /**
+ * Return structure for the iBulletDynamicSystem::HitBeam() routine.
+ * \sa csSectorHitBeamResult
+ */
+struct csBulletHitBeamResult
+{
+  /**
+   * The resulting rigid or kinematic body that was hit, or 0 if no body was hit.
+   */
+  iRigidBody* body;
+
+  /**
+   * Intersection point in world space.
+   */
+  csVector3 isect;
+};
+
+/**
  * The Bullet implementation of iDynamicSystem also implements this
  * interface.
+ * \sa iDynamicSystem iODEDynamicSystemState
  */
 struct iBulletDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 0);
+  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 1);
 
   /**
    * Draw debug information for all colliders managed by bullet.
    */
   virtual void DebugDraw (iView* rview) = 0;
+
+  /**
+   * Follow a beam from start to end and return the first dynamic or kinematic rigid body
+   * that is hit. Static objects doesn't count.
+   * \sa csBulletHitBeamResult iSector::HitBeam() iSector::HitBeamPortals()
+   */
+  virtual csBulletHitBeamResult HitBeam (const csVector3 &start, const csVector3 &end) = 0;
 };
 
 /**
@@ -60,6 +85,7 @@ enum csBulletState
 /**
  * The Bullet implementation of iRigidBody also implements this
  * interface.
+ * \sa iRigidBody
  */
 struct iBulletRigidBody : public virtual iBase
 {
