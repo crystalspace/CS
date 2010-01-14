@@ -1029,8 +1029,12 @@ bool csGLGraphics3D::Open ()
       stencilClearWithZ ? "enabled" : "disabled");
 
   shadermgr = csQueryRegistryOrLoad<iShaderManager> (object_reg,
-    "crystalspace.graphics3d.shadermanager");
-  if (!shadermgr) return false;
+    "crystalspace.graphics3d.shadermanager", false);
+  if (!shadermgr && verbose)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Could not load shader manager. Any attempt at 3D rendering will fail.");
+  }
 
   txtmgr.AttachNew (new csGLTextureManager (
     object_reg, GetDriver2D (), config, this));
@@ -1172,6 +1176,9 @@ bool csGLGraphics3D::Open ()
 
 void csGLGraphics3D::SetupShaderVariables()
 {
+  // Allow start up w/o shader manager
+  if (!shadermgr) return;
+
   /* The shadermanager clears all SVs in Open(), but renderer Open() is called
      before the shadermanager's, thus the renderer needs to catch the open
      event twice, the second time setting up SVs */
