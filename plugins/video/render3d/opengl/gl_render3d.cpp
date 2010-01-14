@@ -1592,7 +1592,7 @@ void csGLGraphics3D::FinishDraw ()
   
   if (currentAttachments != 0)
   {
-    r2tbackend->FinishDraw (current_drawflags & CSDRAW_READBACK);
+    r2tbackend->FinishDraw ((current_drawflags & CSDRAW_READBACK) != 0);
     UnsetRenderTargets();
     currentAttachments = 0;
   }
