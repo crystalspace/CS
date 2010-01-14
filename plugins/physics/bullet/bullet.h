@@ -55,6 +55,20 @@ public:
 };
 
 /**
+* This is the implementation for a default dynamics move callback.
+* It can update mesh, light or camera's positions.
+*/
+class csBulletDefaultKinematicCallback : public scfImplementation1<
+  csBulletDefaultKinematicCallback, iBulletKinematicCallback>
+{
+public:
+  csBulletDefaultKinematicCallback ();
+  virtual ~csBulletDefaultKinematicCallback ();
+
+  virtual void GetBodyTransform (iRigidBody* body, csOrthoTransform& transform) const;
+};
+
+/**
 * This is the implementation for the actual plugin.
 * It is responsible for creating iDynamicSystem.
 */
@@ -176,10 +190,11 @@ public:
   virtual void DebugDraw (iView* view);
 };
 
-class csBulletRigidBody : public scfImplementationExt1<csBulletRigidBody,
-  csObject, iRigidBody>
+class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
+  csObject, iRigidBody, iBulletRigidBody>
 {
   friend class csBulletMotionState;
+  friend class csBulletKinematicMotionState;
   friend class csBulletDynamicsSystem;
   friend class csBulletCollider;
   friend class csBulletJoint;
@@ -188,10 +203,11 @@ class csBulletRigidBody : public scfImplementationExt1<csBulletRigidBody,
   btRigidBody* body;
   csRef<iDynamicsMoveCallback> moveCb;
   csRef<iDynamicsCollisionCallback> collCb;
+  csRef<iBulletKinematicCallback> kinematicCb;
   csBulletMotionState* motionState;
   csRefArray<csBulletCollider> colliders;
   btCompoundShape* compoundShape;
-  bool isStatic;
+  csBulletState dynamicState;
   bool customMass;
   float mass;
   bool compoundChanged;
@@ -208,6 +224,7 @@ public:
   csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic = false);
   virtual ~csBulletRigidBody ();
 
+  //-- iRigidBody
   virtual iObject* QueryObject (void) { return (iObject*) this; }
 
   virtual bool MakeStatic (void);
@@ -303,6 +320,12 @@ public:
       const csVector3& normal, float depth);
   virtual csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
   virtual int GetColliderCount ();
+
+  //-- iBulletRigidBody
+  virtual void MakeKinematic ();
+  virtual csBulletState GetDynamicState () const;
+  virtual void SetDynamicState (csBulletState state);
+  virtual void SetKinematicCallback (iBulletKinematicCallback* callback);
 };
 
 class csBulletCollider : public scfImplementation1<csBulletCollider,

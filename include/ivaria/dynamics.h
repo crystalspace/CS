@@ -448,18 +448,31 @@ struct iRigidBody : public virtual iBase
   /// Return the underlying object
   virtual iObject *QueryObject (void) = 0;
   /**
-   * Make a body stop reacting dynamically. This is especially useful
-   * for environmental objects. It will also increase speed in some cases
-   * by ignoring all physics for that body
+   * Make the body static, ie this body won't move anymore but dynamic
+   * objects will still collide with it. This is especially useful
+   * for environmental objects.
+   * \sa MakeDynamic() iBulletRigidBody::MakeKinematic()
    */
   virtual bool MakeStatic (void) = 0;
-  /// Return a static body to a dynamic state
+  /**
+   * Make the body dynamic, ie the motion of the body is controlled by
+   * the dynamic simulation. It will collide and react to any other
+   * bodies, whatever they are static or dynamic (or kinematic if you
+   * are using the bullet plugin).
+   * \sa MakeStatic() iBulletRigidBody::MakeKinematic()
+   */
   virtual bool MakeDynamic (void) = 0;
-  /// Tell whether a body has been made static or not
+  /**
+   * Tell whether a body has been made static or not.
+   * \warning If you are using the Bullet plugin, a 'false' value
+   * returned by this method doesn't mean it is dynamic, it can also
+   * have been made kinematic through iBulletRigidBody::MakeKinematic()
+   * \sa iBulletRigidBody::GetDynamicState()
+   */
   virtual bool IsStatic (void) = 0;
   /**
-    * Temporarily ignore the body until something collides with it.
-  */
+   * Temporarily ignore the body until something collides with it.
+   */
   virtual bool Disable (void) = 0;
   /// Re-enable a body after calling Disable(), or after being auto disabled
   virtual bool Enable (void) = 0;

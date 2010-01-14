@@ -26,6 +26,8 @@
 #include "csutil/scf_interface.h"
 
 struct iView;
+struct iRigidBody;
+struct iBulletKinematicCallback;
 
 /**
  * The Bullet implementation of iDynamicSystem also implements this
@@ -39,6 +41,75 @@ struct iBulletDynamicSystem : public virtual iBase
    * Draw debug information for all colliders managed by bullet.
    */
   virtual void DebugDraw (iView* rview) = 0;
+};
+
+/**
+ * The physical state of a rigid body.
+ */
+enum csBulletState
+{
+  BULLET_STATE_STATIC = 0,     /*!< The body is static, ie this body won't move
+				 anymore but dynamic objects will still collide with it. */
+  BULLET_STATE_DYNAMIC,        /*!< The body is dynamic, ie the motion of 
+				  the body is controlled by the dynamic simulation. */
+  BULLET_STATE_KINEMATIC       /*!< The body is kinematic, ie the motion 
+				  of the body is controlled by the animation system,
+				  but it interacts with the dynamic simulation. */
+};
+
+/**
+ * The Bullet implementation of iRigidBody also implements this
+ * interface.
+ */
+struct iBulletRigidBody : public virtual iBase
+{
+  SCF_INTERFACE(iBulletRigidBody, 1, 0, 0);
+
+  /**
+   * Set a body in the kinematic state, ie the motion of the body is
+   * controlled by you, but it interacts with the dynamic simulation.
+   * 
+   * You may need to set a callback with SetKinematicCallback() to let
+   * the dynamic system know how to update the transform of the body.
+   * \sa SetDynamicState() iRigidBody::MakeStatic() iRigidBody::MakeDynamic()
+   */
+  virtual void MakeKinematic () = 0;
+
+  /**
+   * Return the current state of the body.
+   */
+  virtual csBulletState GetDynamicState () const = 0;
+
+  /**
+   * Set the current state of the body.
+   * \sa iRigidBody::MakeStatic() iRigidBody::MakeDynamic() MakeKinematic()
+   */
+  virtual void SetDynamicState (csBulletState state) = 0;
+
+  /**
+   * Set the callback to be used to update the transform of the kinematic body.
+   * If no callback are provided then the dynamic system will use a default one.
+   */
+  virtual void SetKinematicCallback (iBulletKinematicCallback* callback) = 0;
+};
+
+/**
+ * A callback to be implemented when you are using kinematic bodies. If no
+ * callback are provided then the dynamic system will use a default one which
+ * will update the transform of the body from the position of the attached
+ * mesh, body or camera (see iRigidBody::AttachMesh(),
+ * iRigidBody::AttachLight(), iRigidBody::AttachCamera()).
+ * \sa iBulletRigidBody::SetKinematicCallback()
+ */
+struct iBulletKinematicCallback : public virtual iBase
+{
+  SCF_INTERFACE (iBulletKinematicCallback, 1, 0, 0);
+
+  /**
+   * Update the new transform of the rigid body.
+   */
+  virtual void GetBodyTransform (iRigidBody* body,
+				 csOrthoTransform& transform) const = 0;
 };
 
 #endif // __CS_IVARIA_BULLET_H__
