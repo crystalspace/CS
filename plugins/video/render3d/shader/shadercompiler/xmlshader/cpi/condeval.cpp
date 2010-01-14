@@ -901,7 +901,8 @@ void csConditionEvaluator::SetupEvalCacheInternal (const csShaderVariableStack* 
     for (size_t i = 0; i < svAffectedConditions.GetSize(); i++)
     {
       SVAffection& affection = svAffectedConditions[i];
-      csShaderVariable* sv = (*stack)[affection.svName];
+      csShaderVariable* sv = (affection.svName < stack->GetSize()) ?
+	(*stack)[affection.svName] : 0;
       if (evalCache.lastShaderVars[i] != sv)
       {
 	if (affection.affectedConditions.GetSize() != evalCache.condChecked.GetSize())
@@ -955,7 +956,9 @@ csPtr<csConditionEvaluator::TicketEvaluator> csConditionEvaluator::BeginTicketEv
   {
     newp = cs_malloc (sizeof (TicketEvaluator));
   }
+#include "csutil/custom_new_disable.h"
   TicketEvaluator* newEval = new (newp) TicketEvaluator (this, true, evalState, eval);
+#include "csutil/custom_new_enable.h"
   {
     uint currentFrame = ~0;
     if (engine.IsValid()) currentFrame = engine->GetCurrentFrameNumber();
@@ -986,7 +989,9 @@ csPtr<csConditionEvaluator::TicketEvaluator> csConditionEvaluator::BeginTicketEv
   }
   else
   {
+#include "csutil/custom_new_disable.h"
     evalState = new (cs_malloc (sizeof (EvalState))) EvalState;
+#include "csutil/custom_new_enable.h"
   }
 
   /* Hack: it can happen that while evaluating a shader, new conditions 
@@ -1019,7 +1024,9 @@ csPtr<csConditionEvaluator::TicketEvaluator> csConditionEvaluator::BeginTicketEv
   {
     newp = cs_malloc (sizeof (TicketEvaluator));
   }
+#include "csutil/custom_new_disable.h"
   TicketEvaluator* newEval = new (newp) TicketEvaluator (this, false, evalState, eval);
+#include "csutil/custom_new_enable.h"
 
   return csPtr<TicketEvaluator> (newEval);
 }
