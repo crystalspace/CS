@@ -75,6 +75,7 @@ private:
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
+  bool OnMouseDown (iEvent &event);
 
   void UpdateCameraMode ();
 

@@ -447,6 +447,45 @@ bool Simple::OnKeyboard (iEvent &ev)
   return false;
 }
 
+bool Simple::OnMouseDown (iEvent& ev)
+{
+  if (csMouseEventHelper::GetButton (&ev) == 0
+      && phys_engine_id == BULLET_ID)
+  {
+    // Shoot!
+    // Find the rigid body that was clicked on
+    int mouseX = csMouseEventHelper::GetX (&ev);
+    int mouseY = csMouseEventHelper::GetY (&ev);
+
+    // Compute the beam points
+    csRef<iCamera> camera = view->GetCamera ();
+    csVector2 v2d (mouseX, camera->GetShiftY () * 2 - mouseY);
+    csVector3 v3d = camera->InvPerspective (v2d, 10000);
+    csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+    csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+    // Trace the physical beam
+    csRef<iBulletDynamicSystem> bulletSystem = scfQueryInterface<iBulletDynamicSystem> (dynSys);
+    csBulletHitBeamResult result = bulletSystem->HitBeam (startBeam, endBeam);
+
+    // Add a force at the point clicked
+    if (result.body)
+    {
+      csVector3 force = endBeam - startBeam;
+      force.Normalize ();
+      force *= 2.0f;
+      result.body->AddForceAtPos (force, result.isect);
+
+      // This would work too
+      //csOrthoTransform transform (result.body->GetTransform ());
+      //csVector3 relativePosition = transform.Other2This (result.isect);
+      //result.body->AddForceAtRelPos (force, relativePosition);
+    }
+    return true;
+  }
+  return false;
+}
+
 bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
 {
   // Check for commandline help.
@@ -897,7 +936,7 @@ iRigidBody* Simple::CreateSphere ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (r, csVector3 (0.0f), csMatrix3 ());
+  rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1)
 		   - artificialOffset);
   rb->AttachMesh (mesh);
@@ -947,7 +986,7 @@ iRigidBody* Simple::CreateCylinder ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (radius, csVector3 (0.0f), csMatrix3 ());
+  rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->AttachMesh (mesh);
 
   // Create and attach a cylinder collider.
@@ -998,7 +1037,7 @@ iRigidBody* Simple::CreateCapsule ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (radius, csVector3 (0.0f), csMatrix3 ());
+  rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->AttachMesh (mesh);
 
   // Create and attach a capsule collider.
@@ -1043,7 +1082,7 @@ iRigidBody* Simple::CreateConvexMesh ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (radius, csVector3 (0.0f), csMatrix3 ());
+  rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->AttachMesh (mesh);
 
   // Create and attach a mesh collider.
@@ -1641,6 +1680,12 @@ void Simple::DisplayKeys ()
 
   WriteShadow (x, y, fg, "SPACE: spawn random object");
   y += lineSize;
+
+  if (phys_engine_id == BULLET_ID)
+  {
+    WriteShadow (x, y, fg, "left mouse: fire!");
+    y += lineSize;
+  }
 
   WriteShadow (x, y, fg, "f: toggle camera modes");
   y += lineSize;
