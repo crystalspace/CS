@@ -316,7 +316,12 @@ void csShaderManager::LoadDefaultVariables()
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectreg);
   CS_ASSERT(vfs);
   csRef<iSyntaxService> synldr = csQueryRegistry<iSyntaxService> (objectreg);
-  CS_ASSERT(synldr);
+  if (!synldr.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Can not load default shader vars, no iSyntaxService available");
+    return;
+  }
   
   csRef<iLoader> loader = csQueryRegistryOrLoad<iLoader> (objectreg,
     "crystalspace.level.loader", true);
