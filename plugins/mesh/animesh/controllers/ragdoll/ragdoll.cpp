@@ -465,6 +465,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     csOrthoTransform bodyTransform = boneTransform * animeshTransform;
     rigidBody->SetTransform (bodyTransform);
 
+    // set body properties if they are defined
+    // (with the Bullet plugin, it is more efficient to define it before the colliders)
+    iBodyBoneProperties* properties = bodyBone->GetBoneProperties ();
+    if (properties)
+      rigidBody->SetProperties (properties->GetMass (),
+				properties->GetCenter (),
+				properties->GetInertia ());
+
     // attach bone colliders
     for (uint index = 0; index < bodyBone->GetBoneColliderCount (); index++)
     {
@@ -560,13 +568,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     }
 
     // TODO: remove bodies if problem
-
-    // set body properties if they are defined
-    iBodyBoneProperties* properties = bodyBone->GetBoneProperties ();
-    if (properties)
-      rigidBody->SetProperties (properties->GetMass (),
-				properties->GetCenter (),
-				properties->GetInertia ());
 
     // create dynamic joint
     if (parentBody)
