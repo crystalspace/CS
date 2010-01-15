@@ -162,7 +162,7 @@ iMaterialWrapper* MaterialBuilder::CreateColorMaterial(iObjectRegistry* object_r
 
   // Draw the texture
   texture.PrepareAnim ();
-  
+
   return material;
 }
 

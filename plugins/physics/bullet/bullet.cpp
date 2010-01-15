@@ -790,9 +790,9 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam (const csVector3 &start, c
     if (body)
     {
       result.body = (csBulletRigidBody*) body->getUserPointer ();
-      result.isect = csVector3 (rayCallback.m_hitPointWorld.getX (),
-				rayCallback.m_hitPointWorld.getY (),
-				rayCallback.m_hitPointWorld.getZ ());
+      result.intersection = csVector3 (rayCallback.m_hitPointWorld.getX (),
+				       rayCallback.m_hitPointWorld.getY (),
+				       rayCallback.m_hitPointWorld.getZ ());
     }
   }
 

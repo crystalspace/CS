@@ -474,11 +474,11 @@ bool Simple::OnMouseDown (iEvent& ev)
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
       force *= 2.0f;
-      result.body->AddForceAtPos (force, result.isect);
+      result.body->AddForceAtPos (force, result.intersection);
 
       // This would work too
       //csOrthoTransform transform (result.body->GetTransform ());
-      //csVector3 relativePosition = transform.Other2This (result.isect);
+      //csVector3 relativePosition = transform.Other2This (result.intersection);
       //result.body->AddForceAtRelPos (force, relativePosition);
     }
     return true;

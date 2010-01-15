@@ -72,6 +72,7 @@ struct iDynamicsStepCallback : public virtual iBase
  * 
  * Main users of this interface:
  * - Dynamics loader plugin (crystalspace.dynamics.loader)
+ *
  * \sa iODEDynamicState
  */
 struct iDynamics : public virtual iBase
@@ -116,6 +117,7 @@ struct iDynamicsSystemCollider;
  * 
  * Main ways to get pointers to this interface:
  * - iDynamics::FindSystem()
+ *
  * \sa iBulletDynamicSystem iODEDynamicSystemState
  */
 struct iDynamicSystem : public virtual iBase
@@ -442,6 +444,8 @@ struct iBodyGroup : public virtual iBase
  * 
  * Main users of this interface:
  * - iDynamicSystem
+ *
+ * \sa iBulletRigidBody
  */
 struct iRigidBody : public virtual iBase
 {
@@ -467,8 +471,8 @@ struct iRigidBody : public virtual iBase
   /**
    * Tell whether a body has been made static or not.
    * \warning If you are using the Bullet plugin, a 'false' value
-   * returned by this method doesn't mean it is dynamic, it can also
-   * have been made kinematic through iBulletRigidBody::MakeKinematic()
+   * returned by this method doesn't mean that the body is dynamic, it can
+   * also have been made kinematic through iBulletRigidBody::MakeKinematic()
    * \sa iBulletRigidBody::GetDynamicState()
    */
   virtual bool IsStatic (void) = 0;
