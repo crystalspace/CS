@@ -509,7 +509,6 @@ bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.body", iBodyManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll", iSkeletonRagdollManager2),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
@@ -569,9 +568,6 @@ bool Simple::Application ()
 
   g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
   if (!g2d) return ReportError("Failed to locate 2D renderer!");
-
-  bodyManager = csQueryRegistry<iBodyManager> (GetObjectRegistry ());
-  if (!bodyManager) return ReportError("Failed to locate body mesh manager!");
 
   ragdollManager = csQueryRegistry<iSkeletonRagdollManager2> (GetObjectRegistry ());
   if (!ragdollManager) return ReportError("Failed to locate ragdoll manager!");
@@ -1198,7 +1194,7 @@ void Simple::LoadRagdoll ()
   csLoadResult rc = loader->Load ("/lib/frankie/frankie.xml");
   if (!rc.success)
   {
-    ReportError ("Can't load frankie!");
+    ReportError ("Can't load Frankie!");
     return;
   }
  
@@ -1208,278 +1204,43 @@ void Simple::LoadRagdoll ()
 
   csRef<iAnimatedMeshFactory> animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
-
   if (!animeshFactory)
   {
-    ReportError ("Can't find frankie's animesh factory!");
+    ReportError ("Can't find Frankie's animesh factory!");
     return;
   }
 
-  // Define animesh's physical properties
+  // Load bodymesh (animesh's physical properties)
+  rc = loader->Load ("/lib/frankie/skelfrankie_body");
+  if (!rc.success)
+  {
+    ReportError ("Can't load Frankie's body description!");
+    return;
+  }
 
-  // Create bones (this should be made through a loader)
-  iBodySkeleton* bodySkeleton = bodyManager->CreateBodySkeleton ("franky_body",
-								    animeshFactory);
-  iBodyBone* bone_Main = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"));
-  iBodyBone* bone_Spin = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Spin"));
-  iBodyBone* bone_SpinM = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Spin.M"));
-  iBodyBone* bone_RibCage = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_RibCage"));
-  iBodyBone* bone_Head = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
-  iBodyBone* bone_Pelvis = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Pelvis"));
-  iBodyBone* bone1 = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_1"));
-  iBodyBone* bone2 = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_2"));
-  iBodyBone* bone3 = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_3"));
-  iBodyBone* bone4 = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_4"));
-  iBodyBone* bone5 = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_5"));
-  iBodyBone* bone6 = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_6"));
-  iBodyBone* bone7 = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_7"));
-  iBodyBone* bone8 = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"));
-
-  // Define bone's properties
-  iBodyBoneCollider* collider;
-  iBodyBoneJoint* joint;
-  csVector3 boxSize (0.03f);
-  float density = 1.0f;
-
-  collider = bone_Main->CreateBoneCollider ();
-  collider->CreateSphereGeometry (csSphere (csVector3 (0.0f, 0.05f, 0.0f), 0.05f));
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  // No joint for root bone
-
-  collider = bone_Spin->CreateBoneCollider ();
-  collider->CreateCylinderGeometry (0.02f, 0.1f);
-  csOrthoTransform spinTransform (csXRotMatrix3 (PI / 7.0f),
-				  csVector3 (0, 0.065f, 0));
-  collider->SetTransform (spinTransform);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone_Spin->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (csVector3 (-0.175f));
-  joint->SetMaximumAngle (csVector3 (0.175f));
-
-  collider = bone_SpinM->CreateBoneCollider ();
-  collider->CreateCylinderGeometry (0.07f, 0.1f);
-  csOrthoTransform spinMTransform (csMatrix3 (), csVector3 (0.0f, 0.095f, 0.0f));
-  collider->SetTransform (spinMTransform);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone_SpinM->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (csVector3 (-0.175f));
-  joint->SetMaximumAngle (csVector3 (0.175f));
-
-  collider = bone_RibCage->CreateBoneCollider ();
-  collider->CreateCylinderGeometry (0.07f, 0.1f);
-  csOrthoTransform ribCageTransform (csMatrix3 (), csVector3 (0.0f, 0.105f, 0.0f));
-  collider->SetTransform (ribCageTransform);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone_RibCage->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (csVector3 (-0.175f));
-  joint->SetMaximumAngle (csVector3 (0.175f));
-
-  collider = bone_Head->CreateBoneCollider ();
-  collider->CreateSphereGeometry (csSphere (csVector3 (0.0f, 0.0f, 0.08f), 0.12f));
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone_Head->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (csVector3 (-0.175f));
-  joint->SetMaximumAngle (csVector3 (0.175f));
-
-  collider = bone_Pelvis->CreateBoneCollider ();
-  collider->CreateSphereGeometry (csSphere (csVector3 (0.0f, 0.07f, 0.05f), 0.05f));
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone_Pelvis->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (true, true, true);
-
-  float capsuleLength = 0.01f;
-  float capsuleRadius = 0.02f;
-  csOrthoTransform boneOffset;
-  boneOffset.Translate (csVector3 (capsuleLength / 2.0f, 0.0f, 0.0f));
-  csVector3 minimumAngle (-0.275f);
-  csVector3 maximumAngle (0.275f);
-  float mass = 0.0005f;
-
-  bone1->CreateBoneProperties ()->SetMass (mass);
-  collider = bone1->CreateBoneCollider ();
-  collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone1->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (minimumAngle);
-  joint->SetMaximumAngle (maximumAngle);
-
-  bone2->CreateBoneProperties ()->SetMass (mass);
-  collider = bone2->CreateBoneCollider ();
-  collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone2->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (minimumAngle);
-  joint->SetMaximumAngle (maximumAngle);
-
-  bone3->CreateBoneProperties ()->SetMass (mass);
-  collider = bone3->CreateBoneCollider ();
-  collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone3->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (minimumAngle);
-  joint->SetMaximumAngle (maximumAngle);
-
-  bone4->CreateBoneProperties ()->SetMass (mass);
-  collider = bone4->CreateBoneCollider ();
-  collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone4->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (minimumAngle);
-  joint->SetMaximumAngle (maximumAngle);
-
-  bone5->CreateBoneProperties ()->SetMass (mass);
-  collider = bone5->CreateBoneCollider ();
-  collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone5->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (minimumAngle);
-  joint->SetMaximumAngle (maximumAngle);
-
-  bone6->CreateBoneProperties ()->SetMass (mass);
-  collider = bone6->CreateBoneCollider ();
-  collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone6->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (minimumAngle);
-  joint->SetMaximumAngle (maximumAngle);
-
-  bone7->CreateBoneProperties ()->SetMass (mass);
-  collider = bone7->CreateBoneCollider ();
-  collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone7->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (minimumAngle);
-  joint->SetMaximumAngle (maximumAngle);
-
-  bone8->CreateBoneProperties ()->SetMass (mass);
-  collider = bone8->CreateBoneCollider ();
-  collider->CreateCapsuleGeometry (capsuleLength, capsuleRadius);
-  collider->SetTransform (boneOffset);
-  collider->SetFriction (10.0f);
-  collider->SetDensity (density);
-  collider->SetElasticity (0.8f);
-  collider->SetSoftness (0.01f);
-  joint = bone8->CreateBoneJoint ();
-  joint->SetBounce (csVector3 (0.2f, 0.2f, 0.2f));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (minimumAngle);
-  joint->SetMaximumAngle (maximumAngle);
+  csRef<iBodyManager> bodyManager = csQueryRegistry<iBodyManager> (GetObjectRegistry ());
+  iBodySkeleton* bodySkeleton = bodyManager->FindBodySkeleton ("frankie_body");
+  if (!bodySkeleton)
+  {
+    ReportError ("Can't find Frankie's body description!");
+    return;
+  }
 
   // Create bone chain
-  iBodyChain* chain6 = bodySkeleton->CreateBodyChain
-    ("chain6", bone_Main->GetAnimeshBone (), bone_Head->GetAnimeshBone (),
-     bone8->GetAnimeshBone (), 0);
+  iBodyChain* chain = bodySkeleton->CreateBodyChain
+    ("chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"),
+     animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"),
+     animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"), 0);
 
-  // Create ragdoll factory
+  // Create ragdoll animation node factory
   csRef<iSkeletonRagdollNodeFactory2> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("franky_ragdoll",
 					   bodySkeleton, dynSys);
-  ragdollFactory->AddBodyChain (chain6, RAGDOLL_STATE_DYNAMIC);
+  ragdollFactory->AddBodyChain (chain, RAGDOLL_STATE_DYNAMIC);
 
-  // Add ragdoll factory to the frankie's fsm animation node
-  csRef<iSkeletonAnimNodeFactory2> animFactory =
-    animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ()->
-    GetAnimationRoot ()->FindNode("standard");
-  if (!animFactory)
-  {
-    ReportError ("Can't find 'standard' animation node factory!");
-    return;
-  }
-
-  csRef<iSkeletonFSMNodeFactory2> fsmfact =
-    scfQueryInterface<iSkeletonFSMNodeFactory2>(animFactory);
-  ragdollState = fsmfact->AddState ();
-  fsmfact->SetStateName (ragdollState, "franky_ragdoll");
-  fsmfact->SetStateNode (ragdollState, ragdollFactory);
+  // Set the ragdoll anim node as the only node of the animation tree
+  animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ()
+    ->SetAnimationRoot (ragdollFactory);
 }
 
 void Simple::CreateRagdoll ()
@@ -1508,45 +1269,27 @@ void Simple::CreateRagdoll ()
 
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
 
-  // Position the body
+  // Set initial position of the body
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
   ragdollMesh->QuerySceneNode ()->GetMovable ()->SetPosition (
                   tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
 
-  // Start the ragdoll controller
+  // Start the ragdoll anim node
   iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
     GetAnimationRoot ();
-  csRef<iSkeletonAnimNode2> anim;
-  if (root)
+
+  csRef<iSkeletonRagdollNode2> ragdoll =
+    scfQueryInterfaceSafe<iSkeletonRagdollNode2> (root);
+  ragdoll->SetAnimatedMesh (animesh);
+  ragdoll->Play ();
+
+  // Fling the body.
+  for (uint i = 0; i < ragdoll->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
   {
-    anim = root->FindNode ("standard");
-
-    csRef<iSkeletonFSMNode2> fsm =
-      scfQueryInterfaceSafe<iSkeletonFSMNode2> (anim);
-    if (fsm)
-    {
-      // Find the ragdoll anim node and set it up
-      csRef<iSkeletonAnimNode2> animNode = fsm->FindNode ("franky_ragdoll");
-      csRef<iSkeletonRagdollNode2> ragdoll =
-	scfQueryInterfaceSafe<iSkeletonRagdollNode2> (animNode);
-      CS_ASSERT (ragdoll);
-      ragdoll->SetAnimatedMesh (animesh);
-
-      // Play the animation node
-      fsm->SwitchToState(ragdollState);
-      root->Play ();
-      anim->Play ();
-      ragdoll->Play ();
-
-      // Fling the body.
-      for (uint i = 0; i < ragdoll->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
-      {
-	BoneID boneID = ragdoll->GetBone (RAGDOLL_STATE_DYNAMIC, i);
-	iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
-	rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
-	rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));
-      }
-    }
+    BoneID boneID = ragdoll->GetBone (RAGDOLL_STATE_DYNAMIC, i);
+    iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));
   }
 }
 
