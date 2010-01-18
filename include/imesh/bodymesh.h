@@ -33,7 +33,7 @@
 /**\addtogroup meshplugins
  * @{ */
 
-struct iAnimatedMeshFactory;
+struct iSkeletonFactory2;
 struct iAnimatedMesh;
 struct iBodySkeleton;
 struct iBodyBone;
@@ -48,13 +48,13 @@ struct iBodyBoneCollider;
  */
 struct iBodyManager : public virtual iBase
 {
-  SCF_INTERFACE(iBodyManager, 1, 0, 0);
+  SCF_INTERFACE(iBodyManager, 2, 0, 0);
 
   /**
    * Create a new body skeleton with the specified name.
    */
   virtual iBodySkeleton* CreateBodySkeleton (const char *name,
-			      iAnimatedMeshFactory* animeshFactory) = 0;
+			      iSkeletonFactory2* skeletonFactory) = 0;
 
   /**
    * Find a body skeleton from its name.
@@ -75,7 +75,7 @@ struct iBodyManager : public virtual iBase
  */
 struct iBodySkeleton : public virtual iBase
 {
-  SCF_INTERFACE(iBodySkeleton, 1, 0, 1);
+  SCF_INTERFACE(iBodySkeleton, 2, 0, 1);
 
   /**
    * Return the name of the body skeleton.
@@ -83,9 +83,9 @@ struct iBodySkeleton : public virtual iBase
   virtual const char* GetName () const = 0;
 
   /**
-   * Get the factory of the animated mesh associated with this body skeleton.
+   * Get the skeleton factory associated with this body skeleton.
    */
-  virtual iAnimatedMeshFactory* GetAnimatedMeshFactory () const = 0;
+  virtual iSkeletonFactory2* GetSkeletonFactory () const = 0;
 
   /**
    * Delete all body bones and all body chains.

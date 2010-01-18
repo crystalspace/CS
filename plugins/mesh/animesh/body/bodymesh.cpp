@@ -43,11 +43,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   }
 
   iBodySkeleton* BodyManager::CreateBodySkeleton (const char *name,
-			            iAnimatedMeshFactory* animeshFactory)
+			            iSkeletonFactory2* skeletonFactory)
   {
     // Check name uniqueness
     csRef<iBodySkeleton> newFact;
-    newFact.AttachNew (new BodySkeleton (name, this, animeshFactory));
+    newFact.AttachNew (new BodySkeleton (name, this, skeletonFactory));
 
     return factoryHash.PutUnique (name, newFact);
   }
@@ -92,9 +92,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   CS_LEAKGUARD_IMPLEMENT(BodySkeleton);
 
   BodySkeleton::BodySkeleton (const char* name, BodyManager* manager,
-			      iAnimatedMeshFactory* animeshFactory)
+			      iSkeletonFactory2* skeletonFactory)
     : scfImplementationType (this), name (name), manager (manager),
-    animeshFactory (animeshFactory)
+    skeletonFactory (skeletonFactory)
   {
   }
 
@@ -103,9 +103,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return name;
   }
 
-  iAnimatedMeshFactory* BodySkeleton::GetAnimatedMeshFactory () const
+  iSkeletonFactory2* BodySkeleton::GetSkeletonFactory () const
   {
-    return animeshFactory;
+    return skeletonFactory;
   }
 
   void BodySkeleton::ClearAll ()
@@ -124,24 +124,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     }
 
     // check boneid exists in skeleton
-    if (!animeshFactory)
+    if (!skeletonFactory)
     {
       manager->Report (CS_REPORTER_SEVERITY_ERROR,
-	       "No animesh factory defined while creating body bone");
+	       "No skeleton factory defined while creating body bone");
       return 0;
     }    
 
-    if (!animeshFactory->GetSkeletonFactory ())
+    if (!skeletonFactory->HasBone (boneID))
     {
       manager->Report (CS_REPORTER_SEVERITY_ERROR,
-       "No skeleton factory defined in animesh while creating body bone");
-      return 0;
-    }    
-
-    if (!animeshFactory->GetSkeletonFactory ()->HasBone (boneID))
-    {
-      manager->Report (CS_REPORTER_SEVERITY_ERROR,
-       "Bone %i doesn't exist in animesh factory while creating body bone",
+       "Bone %i doesn't exist in skeleton factory while creating body bone",
 		       boneID);
       return 0;
     }    
@@ -155,7 +148,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   iBodyBone* BodySkeleton::FindBodyBone (const char *name) const
   {
-    BoneID boneID = animeshFactory->GetSkeletonFactory ()->FindBone (name);
+    BoneID boneID = skeletonFactory->FindBone (name);
     return boneHash.Get (boneID, 0);
   }
 
@@ -183,8 +176,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 		       "Chain %s has already been defined.", name);
       return 0;
     }
-
-    iSkeletonFactory2* skeletonFactory = animeshFactory->GetSkeletonFactory ();
 
     // check validity of root bone
     if (rootBone == InvalidBoneID)
