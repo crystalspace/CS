@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- bodymeshldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.animesh.body</name>
+        <implementation>BodyMeshLoader</implementation>
+        <description>Crystal Space loader of the physical description of an animated mesh</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
