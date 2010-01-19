@@ -1253,7 +1253,7 @@ void Simple::LoadRagdoll ()
 
   // Create ragdoll animation node factory
   csRef<iSkeletonRagdollNodeFactory2> ragdollFactory =
-    ragdollManager->CreateAnimNodeFactory ("franky_ragdoll",
+    ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll",
 					   bodySkeleton, dynSys);
   ragdollFactory->AddBodyChain (chain, RAGDOLL_STATE_DYNAMIC);
 
@@ -1300,9 +1300,10 @@ void Simple::CreateRagdoll ()
   csRef<iSkeletonRagdollNode2> ragdoll =
     scfQueryInterfaceSafe<iSkeletonRagdollNode2> (root);
   ragdoll->SetAnimatedMesh (animesh);
-  ragdoll->Play ();
 
   // Fling the body.
+  // (start the ragdoll node before so that the rigid bodies are created)
+  ragdoll->Play ();
   for (uint i = 0; i < ragdoll->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
   {
     BoneID boneID = ragdoll->GetBone (RAGDOLL_STATE_DYNAMIC, i);
@@ -1315,9 +1316,6 @@ void Simple::CreateRagdoll ()
 void Simple::CreateWalls (const csVector3& /*radius*/)
 {
   csOrthoTransform t;
-
-  //csRef<iThingFactoryState> walls_state = 
-    //scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
 
 #if 0
   // Enabling this will work, however, mesh<->mesh collision
@@ -1333,11 +1331,11 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
 #endif
 
 #if 0
-  // mesh <-> plane doesn't work yet, so we will use boxes for each
+  // With ODE, mesh <-> plane doesn't work yet, so we will use boxes for each
   // wall for now
-  for(int i = 0; i < walls_state->GetPolygonCount(); i++)
+  for (int i = 0; i < walls_state->GetPolygonCount (); i++)
   {
-    rb->AttachColliderPlane(walls_state->GetPolygonObjectPlane(i), 10, 0, 0);
+    rb->AttachColliderPlane (walls_state->GetPolygonObjectPlane (i), 10, 0, 0);
   }
 #endif
 
@@ -1351,22 +1349,31 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
   collider->CreateBoxGeometry (size);
   collider->SetTransform (t);
 
-  t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
+  t.SetOrigin(csVector3(-10.0f, 0.0f, 0.0f));
   collider = dynSys->CreateCollider ();
   collider->CreateBoxGeometry (size);
   collider->SetTransform (t);
 
-  t.SetOrigin(csVector3(0.0f,10.0f,0.0f));
+  t.SetOrigin(csVector3(0.0f, 10.0f, 0.0f));
   collider = dynSys->CreateCollider ();
   collider->CreateBoxGeometry (size);
   collider->SetTransform (t);
 
-  t.SetOrigin(csVector3(0.0f,-10.0f,0.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(0.0f,0.0f,10.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
+  // If we use the Bullet plugin, then use a plane collider for the floor
+  if (phys_engine_id == ODE_ID)
+  {
+    t.SetOrigin(csVector3(0.0f, -10.0f, 0.0f));
+    dynSys->AttachColliderBox (size, t, 10.0f, 0.0f);
+  }
+  else
+    dynSys->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), -5.0f), 10.0f, 0.0f);
+
+  t.SetOrigin(csVector3(0.0f, 0.0f, 10.0f));
+  dynSys->AttachColliderBox (size, t, 10.0f, 0.0f);
+  t.SetOrigin(csVector3(0.0f, 0.0f, -10.0f));
+  dynSys->AttachColliderBox (size, t, 10.0f, 0.0f);
+
+  
 }
 
 void Simple::WriteShadow (int x,int y,int fg,const char *str,...)

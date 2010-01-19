@@ -2007,15 +2007,16 @@ bool csBulletCollider::CreateSphereGeometry (const csSphere& sphere)
 
 bool csBulletCollider::CreatePlaneGeometry (const csPlane3& plane)
 {
-  // TODO
-  /*
   delete shape; shape = 0;
   delete[] vertices; vertices = 0;
   delete[] indices; indices = 0;
 
+  // Bullet doesn't support dynamic plane shapes
+  if (!isStaticBody && body->dynamicState != BULLET_STATE_STATIC)
+    return false;
+  
   csVector3 normal = plane.GetNormal ();
-  shape = new btPlaneShape (btVector3 (normal.GetX (), normal.GetY (),
-                                       normal.GetZ ()), plane.D ());
+  shape = new btStaticPlaneShape (btVector3 (normal.x, normal.y, normal.z), plane.D ());                                       
   geomType = PLANE_COLLIDER_GEOMETRY;
 
   if (isStaticBody)
@@ -2025,8 +2026,6 @@ bool csBulletCollider::CreatePlaneGeometry (const csPlane3& plane)
   }
 
   return true;
-  */
-  return false;
 }
 
 bool csBulletCollider::CreateConvexMeshGeometry (iMeshWrapper* mesh)
