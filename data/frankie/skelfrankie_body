@@ -1,7 +1,4 @@
 <library>
-  <plugins>
-    <plugin name="bodymeshmanager">crystalspace.mesh.loader.factory.skeleton</plugin>
-  </plugins>
  <addon plugin="crystalspace.mesh.loader.animesh.body">
  <skeleton name="frankie_body" skeletonfact="frankie_rig">
   <bone id="1">
@@ -85,8 +82,8 @@
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.175" y="-0.175" z="-0.175" />
-      <max x="0.175" y="0.175" z="0.175" />
+      <min x="-1.0" y="-1.4" z="0.0" />
+      <max x="0.8" y="1.4" z="0.0" />
      </angle>
     </constraints>
    </joint>
