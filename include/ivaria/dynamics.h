@@ -90,7 +90,13 @@ struct iDynamics : public virtual iBase
   /// Find a system by name
   virtual iDynamicSystem* FindSystem (const char *name) = 0;
 
-  /// Step the simulation forward by stepsize.
+  /**
+   * Step the simulation forward by stepsize milliseconds.
+   * If the physics engine is ODE, then you must take care of calling the
+   * update of the dynamic simulation with a constant step time, otherwise
+   * the stability of the simulation might suffer. The Bullet plugin doesn't
+   * have the same problem because it uses a constant step time on its own.
+   */
   virtual void Step (float stepsize) = 0;
 
   /**

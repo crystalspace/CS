@@ -20,6 +20,10 @@
 #ifndef __CS_IMESH_TERRAIN2_H__
 #define __CS_IMESH_TERRAIN2_H__
 
+/**\file
+ * Terrain2 interfaces
+ */
+
 #include "csutil/scf_interface.h"
 #include "iutil/array.h"
 #include "ivideo/shader/shader.h"

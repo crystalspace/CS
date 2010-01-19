@@ -84,8 +84,8 @@ public:
 };
 
 /**
- * A structure used by TestRectangle() and initialized by
- * PrepareTestRectangle().
+ * A structure used by csTiledCoverageBuffer::TestRectangle() and initialized by
+ * csTiledCoverageBuffer::PrepareTestRectangle().
  */
 struct csTestRectData
 {
