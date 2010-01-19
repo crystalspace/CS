@@ -518,7 +518,7 @@ void AvatarTest::CreateAvatar ()
 
   // Create bodymesh (this should be made through a loader)
   iBodySkeleton* bodySkeleton = bodyManager->CreateBodySkeleton ("franky_body",
-								    animeshFactory);
+								 animeshFactory->GetSkeletonFactory ());
 
   // Create joint properties of 'head' bone, it will be used by the 'LookAt' controller.
   iBodyBone* bone_Head = bodySkeleton->CreateBodyBone
