@@ -101,6 +101,11 @@ void AvatarTest::SetupFrame ()
   c->GetTransform().LookAt (avatarPosition - c->GetTransform().GetOrigin (),
   			    csVector3(0,1,0) );
 
+  // Step the dynamic simulation (we slow down artificially the simulation in
+  // order to achieve a 'slow motion' effect)
+  if (physicsEnabled)
+    dynamics->Step (speed / 4.0f);
+
   // Update the morph state (frankie smiles sadistically if no target in view)
   if (targetReached)
     smileWeight -= (float) elapsed_time / 250.0f;
@@ -194,7 +199,7 @@ bool AvatarTest::HandleEvent (iEvent& ev)
     }
 
     // Toggle 'always rotate' option of the 'LookAt' controller
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
       alwaysRotate = !alwaysRotate;
       lookAtNode->SetAlwaysRotate (alwaysRotate);
@@ -225,7 +230,7 @@ bool AvatarTest::HandleEvent (iEvent& ev)
       return true;
     }
 
-    // Update walk speed
+    // Update walk speed of the 'speed' controller
     else if (csKeyEventHelper::GetCookedCode (&ev) == '+')
     {
       if (currentSpeed < 29)
@@ -243,6 +248,20 @@ bool AvatarTest::HandleEvent (iEvent& ev)
 	currentSpeed -= 1;
 	speedNode->SetSpeed (((float) currentSpeed) / 10.0f);
       }
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'k'
+	     && physicsEnabled)
+    {
+      KillFrankie ();
+      return true;
+    }
+
+    // Reset of the scene
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
+    {
+      ResetScene ();
       return true;
     }
 
@@ -274,8 +293,8 @@ bool AvatarTest::Initialize ()
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.body", iBodyManager),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat", iSkeletonLookAtManager2),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
+		       iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
 		       iSkeletonBasicNodesManager2),
     CS_REQUEST_END))
@@ -284,6 +303,53 @@ bool AvatarTest::Initialize ()
       "crystalspace.application.avatartest",
       "Can't initialize plugins!");
     return false;
+  }
+
+  // Check if physics effects are enabled
+  csRef<iCommandLineParser> clp = csQueryRegistry<iCommandLineParser> (object_reg);
+  physicsEnabled = !clp->GetBoolOption ("no_physics", false);
+
+  if (physicsEnabled)
+  {
+    csRef<iPluginManager> plugmgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
+
+    // Load the Bullet plugin
+    dynamics = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
+    if (!dynamics)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+		"crystalspace.application.avatartest",
+		"Can't load Bullet plugin, continuing with reduced functionalities");
+      physicsEnabled = false;
+    }
+
+    else
+    {
+      // Create the dynamic system
+      dynamicSystem = dynamics->CreateSystem ();
+      if (!dynamicSystem) 
+      {
+	csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+		  "crystalspace.application.avatartest",
+		  "Can't create dynamic system, continuing with reduced functionalities");
+	physicsEnabled = false;
+      }
+
+      else
+      {
+	// Load the ragdoll plugin
+	ragdollManager = csLoadPlugin<iSkeletonRagdollManager2>
+	  (plugmgr, "crystalspace.mesh.animesh.controllers.ragdoll");
+	if (!ragdollManager)
+	{
+	  csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+		    "crystalspace.application.avatartest",
+		    "Can't create dynamic system, continuing with reduced functionalities");
+	  physicsEnabled = false;
+	}
+      }
+    }
   }
 
   // Events
@@ -304,6 +370,8 @@ bool AvatarTest::Initialize ()
   {
     csPrintf ("Usage: avatartest\n");
     csPrintf ("Tests on animesh animation\n\n");
+    csPrintf ("Options for avatartest:\n");
+    csPrintf ("  -no_physics:       disable physical animations\n");
     csCommandLineHelper::Help (object_reg);
     return false;
   }
@@ -361,15 +429,6 @@ bool AvatarTest::Initialize ()
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
       "crystalspace.application.avatartest",
       "No iKeyboardDriver plugin!");
-    return false;
-  }
-
-  bodyManager = csQueryRegistry<iBodyManager> (object_reg);
-  if (bodyManager == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "No iBodyManager plugin!");
     return false;
   }
 
@@ -459,6 +518,11 @@ void AvatarTest::CreateRoom ()
     (object_reg, "background", csColor (0.398f));
   background->GetMeshObject()->SetMaterialWrapper(bgMaterial);
 
+  // Set up of the physical collider for the roof
+  if (physicsEnabled)
+    dynamicSystem->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), 0.0f),
+					10.0f, 0.0f);
+
   // Creating lights
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
@@ -516,76 +580,93 @@ void AvatarTest::CreateAvatar ()
     return;
   }
 
-  // Create bodymesh (this should be made through a loader)
-  iBodySkeleton* bodySkeleton = bodyManager->CreateBodySkeleton ("franky_body",
-								 animeshFactory->GetSkeletonFactory ());
+  // Load bodymesh (animesh's physical properties)
+  rc = loader->Load ("/lib/frankie/skelfrankie_body");
+  if (!rc.success)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	      "crystalspace.application.avatartest",
+	      "Can't find frankie's body mesh file!");
+    return;    
+  }
 
-  // Create joint properties of 'head' bone, it will be used by the 'LookAt' controller.
-  iBodyBone* bone_Head = bodySkeleton->CreateBodyBone
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
-  iBodyBoneJoint* joint = bone_Head->CreateBoneJoint ();
-  joint->SetRotConstraints (false, false, false);
-  joint->SetMinimumAngle (csVector3 (-1.0f, -1.4f, 0.0f));
-  joint->SetMaximumAngle (csVector3 (0.8f, 1.4f, 0.0f));
+  csRef<iBodyManager> bodyManager = csQueryRegistry<iBodyManager> (object_reg);
+  csRef<iBodySkeleton> bodySkeleton = bodyManager->FindBodySkeleton ("frankie_body");
+  if (!bodySkeleton)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	      "crystalspace.application.avatartest",
+	      "Can't find Frankie's body mesh description!");
+    return;
+  }
 
   // Create a new animation tree. The structure of the tree is:
-  //   + 'LookAt' controller node (root node)
-  //     + 'speed' controller node
-  //       + animation nodes for all speeds
-  csRef<iSkeletonAnimPacketFactory2> animFactory =
+  //   + Finite State Machine node (root node)
+  //     + 'LookAt' controller node
+  //       + 'speed' controller node
+  //         + animation nodes for all speeds
+  //     + ragdoll controller node
+  csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
-  // Create 'LookAt' controller
+  // Create the Finite State Machine node
+  csRef<iSkeletonFSMNodeFactory2> FSMNodeFactory =
+    animPacketFactory->CreateFSMNode ("fsm");
+  animPacketFactory->SetAnimationRoot (FSMNodeFactory);
+
+  // Create the 'LookAt' controller
   csRef<iSkeletonLookAtNodeFactory2> lookAtNodeFactory =
     lookAtManager->CreateAnimNodeFactory ("lookat", bodySkeleton);
-  animFactory->SetAnimationRoot (lookAtNodeFactory);
+  mainFSMState = FSMNodeFactory->AddState
+    ("main_state", lookAtNodeFactory);
+  FSMNodeFactory->SetStartState (mainFSMState);
 
-  // Create 'idle' animation node
+  // Create the 'idle' animation node
   csRef<iSkeletonAnimationNodeFactory2> idleNodeFactory =
-    animFactory->CreateAnimationNode ("idle");
-  idleNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_Idle1"));
+    animPacketFactory->CreateAnimationNode ("idle");
+  idleNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_Idle1"));
 
-  // Create 'walk_slow' animation node
+  // Create the 'walk_slow' animation node
   csRef<iSkeletonAnimationNodeFactory2> walkSlowNodeFactory =
-    animFactory->CreateAnimationNode ("walk_slow");
-  walkSlowNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_WalkSlow"));
+    animPacketFactory->CreateAnimationNode ("walk_slow");
+  walkSlowNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_WalkSlow"));
 
-  // Create 'walk' animation node
+  // Create the 'walk' animation node
   csRef<iSkeletonAnimationNodeFactory2> walkNodeFactory =
-    animFactory->CreateAnimationNode ("walk");
-  walkNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_Walk"));
+    animPacketFactory->CreateAnimationNode ("walk");
+  walkNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_Walk"));
 
-  // Create 'walk_fast' animation node
+  // Create the 'walk_fast' animation node
   csRef<iSkeletonAnimationNodeFactory2> walkFastNodeFactory =
-    animFactory->CreateAnimationNode ("walk_fast");
-  walkFastNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_WalkFast"));
+    animPacketFactory->CreateAnimationNode ("walk_fast");
+  walkFastNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_WalkFast"));
 
-  // Create 'footing' animation node
+  // Create the 'footing' animation node
   csRef<iSkeletonAnimationNodeFactory2> footingNodeFactory =
-    animFactory->CreateAnimationNode ("footing");
-  footingNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_Runs"));
+    animPacketFactory->CreateAnimationNode ("footing");
+  footingNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_Runs"));
 
-  // Create 'run_slow' animation node
+  // Create the 'run_slow' animation node
   csRef<iSkeletonAnimationNodeFactory2> runSlowNodeFactory =
-    animFactory->CreateAnimationNode ("run_slow");
-  runSlowNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_RunSlow"));
+    animPacketFactory->CreateAnimationNode ("run_slow");
+  runSlowNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_RunSlow"));
 
-  // Create 'run' animation node
+  // Create the 'run' animation node
   csRef<iSkeletonAnimationNodeFactory2> runNodeFactory =
-    animFactory->CreateAnimationNode ("run");
-  runNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_Run"));
+    animPacketFactory->CreateAnimationNode ("run");
+  runNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_Run"));
 
-  // Create 'run_fast' animation node
+  // Create the 'run_fast' animation node
   csRef<iSkeletonAnimationNodeFactory2> runFastNodeFactory =
-    animFactory->CreateAnimationNode ("run_fast");
-  runFastNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_RunFaster"));
+    animPacketFactory->CreateAnimationNode ("run_fast");
+  runFastNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_RunFaster"));
 
-  // Create 'run_jump' animation node
+  // Create the 'run_jump' animation node
   csRef<iSkeletonAnimationNodeFactory2> runJumpNodeFactory =
-    animFactory->CreateAnimationNode ("run_jump");
-  runJumpNodeFactory->SetAnimation (animFactory->FindAnimation ("Frankie_RunFast2Jump"));
+    animPacketFactory->CreateAnimationNode ("run_jump");
+  runJumpNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_RunFast2Jump"));
 
-  // Create 'speed' controller
+  // Create the 'speed' controller (and add all animations of Frankie moving at different speeds)
   // Unfortunately, the Frankie animations from 'walk fast' to 'footing'
   // do not blend well together, but this is just an example...
   csRef<iSkeletonSpeedNodeFactory2> speedNodeFactory =
@@ -602,35 +683,55 @@ void AvatarTest::CreateAvatar ()
 
   lookAtNodeFactory->SetChildNode (speedNodeFactory);
 
-  // Create animesh
+  if (physicsEnabled)
+  {
+    // Create the ragdoll controller
+    csRef<iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
+      ragdollManager->CreateAnimNodeFactory ("ragdoll",
+					     bodySkeleton, dynamicSystem);
+    ragdollFSMState = FSMNodeFactory->AddState
+      ("ragdoll_state", ragdollNodeFactory);
+
+    // Create bone chain
+    iBodyChain* chain = bodySkeleton->CreateBodyChain
+      ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"), 0);
+    ragdollNodeFactory->AddBodyChain (chain, RAGDOLL_STATE_DYNAMIC);
+  }
+
+  // Create the animated mesh
   csRef<iMeshWrapper> avatarMesh = engine->CreateMeshWrapper (meshfact, "Frankie",
 					   room, csVector3 (0.0f));
   animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
-  // Now the animation nodes are created, we can set them up
+  // When the animated mesh is created, the animation nodes are created too.
+  // We can therefore set them up
+  iSkeletonAnimNode2* rootNode =
+    animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+
+  // Setup of the FSM node
+  FSMNode = scfQueryInterface<iSkeletonFSMNode2> (rootNode->FindNode ("fsm"));
 
   // Setup of the LookAt controller
-  iSkeletonAnimNode2* rootNode = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
-
-  lookAtNode = scfQueryInterfaceSafe<iSkeletonLookAtNode2> (rootNode->FindNode ("lookat"));
+  lookAtNode = scfQueryInterface<iSkeletonLookAtNode2> (rootNode->FindNode ("lookat"));
   lookAtNode->AddListener (this);
   lookAtNode->SetAnimatedMesh (animesh);
   lookAtNode->SetBone (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
-  lookAtNode->SetAlwaysRotate (alwaysRotate);
-  lookAtNode->SetMaximumSpeed (5.0f);
   lookAtNode->SetListenerDelay (0.6f);
-  lookAtNode->SetTarget (view->GetCamera(), csVector3 (0.0f));
 
   // Setup of the speed controller
-  speedNode = scfQueryInterfaceSafe<iSkeletonSpeedNode2> (rootNode->FindNode ("speed"));
-  currentSpeed = 0;
-  speedNode->SetSpeed (((float) currentSpeed) / 10.0f);
+  speedNode = scfQueryInterface<iSkeletonSpeedNode2> (rootNode->FindNode ("speed"));
 
-  // Init morph animation
-  smileWeight = 1.0f;
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"), 1.0f);
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), 1.0f);
-  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("wings_in"), 1.0f);
+  // Setup of the ragdoll controller
+  if (physicsEnabled)
+  {
+    ragdollNode = scfQueryInterface<iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
+    ragdollNode->SetAnimatedMesh (animesh);
+  }
+
+  // Reset the scene so as to put the parameters of the animation nodes in a default state
+  ResetScene ();
 
   // Start animation
   rootNode->Play ();
@@ -648,7 +749,55 @@ void AvatarTest::TargetLost ()
   targetReached = false;
 }
 
-void AvatarTest::WriteShadow (int x,int y,int fg,const char *str,...)
+void AvatarTest::KillFrankie ()
+{
+  // Set the ragdoll animation node as the active state of the Finite State Machine
+  FSMNode->SwitchToState (ragdollFSMState);
+
+  // Fling the body.
+  // (start the ragdoll node before so that the rigid bodies are created)
+  FSMNode->GetStateNode (ragdollFSMState)->Play ();
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+  for (uint i = 0; i < ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
+  {
+    BoneID boneID = ragdollNode->GetBone (RAGDOLL_STATE_DYNAMIC, i);
+    iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));
+  }
+}
+
+void AvatarTest::ResetScene ()
+{
+  // Reset animesh position
+  csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
+  animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->SetTransform
+    (csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
+
+  // Reset initial Finite State Machine state
+  FSMNode->SwitchToState (mainFSMState);
+
+  // The FSM doesn't stop the child nodes
+  ragdollNode->Stop ();
+
+  // Reset 'LookAt' controller
+  alwaysRotate = false;
+  lookAtNode->SetAlwaysRotate (alwaysRotate);
+  lookAtNode->SetTarget (view->GetCamera(), csVector3 (0.0f));
+  lookAtNode->SetMaximumSpeed (5.0f);
+
+  // Reset 'speed' controller
+  currentSpeed = 0;
+  speedNode->SetSpeed (((float) currentSpeed) / 10.0f);
+
+  // Reset morphing
+  smileWeight = 1.0f;
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"), 1.0f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), 1.0f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("wings_in"), 1.0f);
+}
+
+void AvatarTest::WriteShadow (int x, int y, int fg, const char *str,...)
 {
   csString buf;
 
@@ -661,7 +810,7 @@ void AvatarTest::WriteShadow (int x,int y,int fg,const char *str,...)
   Write (x, y, fg, -1, "%s", buf.GetData());
 }
 
-void AvatarTest::Write(int x,int y,int fg,int bg,const char *str,...)
+void AvatarTest::Write(int x, int y, int fg, int bg, const char *str,...)
 {
   va_list arg;
   csString buf;
@@ -678,7 +827,7 @@ void AvatarTest::DisplayKeys ()
   int x = 20;
   int y = 20;
   int fg = g2d->FindRGB (255, 150, 100);
-  int lineSize = 15;
+  int lineSize = 18;
 
   WriteShadow (x - 5, y, fg, "Keys available:");
   y += lineSize;
@@ -686,7 +835,7 @@ void AvatarTest::DisplayKeys ()
   WriteShadow (x, y, fg, "arrow keys: move camera");
   y += lineSize;
 
-  WriteShadow (x, y, fg, "SHIFT-up/down keys: move camera closer/farther");
+  WriteShadow (x, y, fg, "SHIFT-up/down keys: camera closer/farther");
   y += lineSize;
 
   WriteShadow (x, y, fg, "+/-: walk faster/slower");
@@ -695,10 +844,19 @@ void AvatarTest::DisplayKeys ()
   WriteShadow (x, y, fg, "t: toggle 'LookAt' target mode");
   y += lineSize;
 
-  WriteShadow (x, y, fg, "r: toggle 'LookAt: always rotate' mode");
+  WriteShadow (x, y, fg, "a: toggle 'LookAt: always rotate' mode");
   y += lineSize;
 
   WriteShadow (x, y, fg, "s: toggle 'LookAt: rotation speed'");
+  y += lineSize;
+
+  if (physicsEnabled)
+  {
+    WriteShadow (x, y, fg, "k: kill Frankie");
+    y += lineSize;
+  }
+
+  WriteShadow (x, y, fg, "r: reset scene");
   y += lineSize;
 }
 

@@ -41,22 +41,41 @@ private:
   csRef<iFont> courierFont;
   iSector* room;
 
+  // Physics related
+  bool physicsEnabled;
+  csRef<iDynamics> dynamics;
+  csRef<iDynamicSystem> dynamicSystem;
+
   csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
-  csRef<iBodyManager> bodyManager;
   csRef<iSkeletonLookAtManager2> lookAtManager;
   csRef<iSkeletonBasicNodesManager2> basicNodesManager;
 
+  // Body mesh related
+  //csRef<iBodySkeleton> bodySkeleton;
+
+  // FSM node related
+  csRef<iSkeletonFSMNode2> FSMNode;
+
+  // LookAt node related
   csRef<iSkeletonLookAtNode2> lookAtNode;
   char targetMode;
   bool alwaysRotate;
   char rotationSpeed;
   bool targetReached;
 
+  // Speed node related
   csRef<iSkeletonSpeedNode2> speedNode;
   // We use a 'int' instead of a 'float' to avoid round errors
   int currentSpeed;
 
+  // Ragdoll node related
+  csRef<iSkeletonRagdollManager2> ragdollManager;
+  csRef<iSkeletonRagdollNode2> ragdollNode;
+  CS::Animation::StateID mainFSMState;
+  CS::Animation::StateID ragdollFSMState;
+
+  // Morphing related
   float smileWeight;
 
   static bool AvatarTestEventHandler (iEvent& ev);
@@ -66,8 +85,11 @@ private:
   void CreateRoom ();
   void CreateAvatar ();
 
-  void WriteShadow (int x,int y,int fg,const char *str,...);
-  void Write(int x,int y,int fg,int bg,const char *str,...);
+  void KillFrankie ();
+  void ResetScene ();
+
+  void WriteShadow (int x, int y, int fg, const char *str,...);
+  void Write(int x, int y, int fg, int bg, const char *str,...);
   void DisplayKeys ();
 
   CS_DECLARE_EVENT_SHORTCUTS;
