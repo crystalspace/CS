@@ -186,6 +186,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
     // TODO: make sure there are no bones shared between the various states
     chains[chain->GetName ()]->state = state;
+
+    // check if need to recreate the rigid body tree
+    if (isActive && !rigidBodyCreated
+	&& (state == RAGDOLL_STATE_DYNAMIC
+	    || state == RAGDOLL_STATE_KINEMATIC))
+      CreateRigidBodyTree ();
+
+    // TODO: chek for deaction of body tree
   }
 
   csSkeletonRagdollState RagdollAnimNode::GetBodyChainState (iBodyChain* chain)
@@ -241,12 +249,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   void RagdollAnimNode::Play ()
   {
+    printf ("RagdollAnimNode::Play\n");
+    isActive = true;
+
     if (!rigidBodyCreated)
       CreateRigidBodyTree ();
   }
 
   void RagdollAnimNode::Stop ()
   {
+    printf ("RagdollAnimNode::Stop\n");
+    isActive = false;
+
     // remove all joints
     for (csHash<Bone, BoneID>::GlobalIterator it = bones.GetIterator (); it.HasNext (); )
     {
@@ -294,6 +308,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   void RagdollAnimNode::BlendState (csSkeletalState2* state, float baseWeight)
   {
+    if (!isActive)
+      return;
+
+    //printf ("RagdollAnimNode::BlendState\n");
+
+    // TODO: use baseWeight
     for (csHash<Bone, BoneID>::GlobalIterator it = bones.GetIterator ();
 	 it.HasNext(); )
     {
@@ -303,7 +323,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       // TODO: test for deactivation of rigid body
       BoneID parentBoneID = skeleton->GetFactory ()->GetBoneParent (bone.boneID);
 
-      /// if this bone is the root of the skeleton
+      // if this bone is the root of the skeleton
+      // TODO: valid also for root of dynamic node?
       if (parentBoneID == InvalidBoneID)
       {
 	csQuaternion boneRotation;
@@ -355,7 +376,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   bool RagdollAnimNode::IsActive () const
   {
-    return rigidBodyCreated;
+    return isActive;
   }
 
   iSkeletonAnimNodeFactory2* RagdollAnimNode::GetFactory () const
@@ -417,7 +438,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     // create the rigid body chain
     iBodyChainNode* rootNode = chainData.chain->GetRootNode ();
     if (!CreateRigidBodyNode (rootNode, 0))
+    {
+      factory->manager->Report (CS_REPORTER_SEVERITY_ERROR,
+	"Can not create ragdoll tree.\n");
       return false;
+    }
 
     rigidBodyCreated = true;
 
@@ -580,7 +605,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     // create child nodes
     for (uint i = 0; i < node->GetChildCount (); i++)
       if (!CreateRigidBodyNode (node->GetChild (i), rigidBody))
+      {
+	factory->manager->Report (CS_REPORTER_SEVERITY_ERROR,
+				  "Problem creating ragdoll body for bone %i\n",
+				  bodyBone->GetAnimeshBone ());
 	return false;
+      }
 
     return true;
   }

@@ -168,6 +168,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     csHash<ChainData, csString> chains;
     csHash<Bone, BoneID> bones;
     bool rigidBodyCreated;
+    bool isActive;
   };
 
 }
