@@ -31,9 +31,9 @@ CS_IMPLEMENT_APPLICATION
 //-----------------------------------------------------------------------------
 
 Simple::Simple ()
-  : solver (0), autodisable (false), do_bullet_debug (false), debugMode (false),
-    allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
-    cameraMode (CAMERA_DYNAMIC)
+  : solver (0), autodisable (false), do_bullet_debug (false),
+    remainingStepDuration (0.0f), debugMode (false), allStatic (false),
+    pauseDynamic (false), dynamicSpeed (1.0f), cameraMode (CAMERA_DYNAMIC)    
 {
   SetApplicationName ("CrystalSpace.PhysTut");
 }
@@ -121,7 +121,26 @@ void Simple::Frame ()
 
   // Step the dynamic simulation
   if (!pauseDynamic)
-    dyn->Step (speed / dynamicSpeed);
+  {
+    // If the physics engine is ODE, then we have to take care of calling
+    // the update of the dynamic simulation with a constant step time.
+    if (phys_engine_id == ODE_ID)
+    {
+      float odeStepDuration = 0.01f;
+      float totalDuration = remainingStepDuration + speed / dynamicSpeed;
+      int iterationCount = (int) (totalDuration / odeStepDuration);
+      for (int i = 0; i < iterationCount; i++)
+	dyn->Step (odeStepDuration);
+
+      // Store the remaining step duration
+      remainingStepDuration = totalDuration -
+	((float) iterationCount) * odeStepDuration;
+    }
+
+    // The bullet plugin uses a constant step time on its own
+    else
+      dyn->Step (speed / dynamicSpeed);
+  }
 
   // Update camera position if it is controlled by a rigid body.
   // (in this mode we want to control the orientation of the camera,

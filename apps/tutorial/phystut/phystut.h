@@ -53,6 +53,7 @@ private:
   csString phys_engine_name;
   int phys_engine_id;
   bool do_bullet_debug;
+  float remainingStepDuration;
 
   // Dynamic simulation related
   csDynamicSystemDebugger dynSysDebugger;
