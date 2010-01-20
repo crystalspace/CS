@@ -249,7 +249,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   void RagdollAnimNode::Play ()
   {
-    printf ("RagdollAnimNode::Play\n");
     isActive = true;
 
     if (!rigidBodyCreated)
@@ -258,7 +257,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   void RagdollAnimNode::Stop ()
   {
-    printf ("RagdollAnimNode::Stop\n");
     isActive = false;
 
     // remove all joints

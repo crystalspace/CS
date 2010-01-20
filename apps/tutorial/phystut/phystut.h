@@ -77,8 +77,10 @@ private:
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
 
+  // Camera
   void UpdateCameraMode ();
 
+  // Spawning meshes
   bool CreateStarCollider ();
   iRigidBody* CreateBox ();
   iRigidBody* CreateSphere ();
@@ -92,6 +94,7 @@ private:
   void CreateRagdoll ();
   void CreateWalls (const csVector3& radius);
 
+  // Display of comments 
   void DisplayKeys ();
   void WriteShadow (int x,int y,int fg,const char *str,...);
   void Write(int x,int y,int fg,int bg,const char *str,...);

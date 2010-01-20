@@ -166,7 +166,7 @@ void Simple::Frame ()
     bullet_dynSys->DebugDraw (view);
   }
 
-  // Write FPS and other info..
+  // Write FPS and other info
   int y = 390;
   int lineSize = 15;
   WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Physics engine: %s", 
@@ -493,15 +493,17 @@ bool Simple::OnMouseDown (iEvent& ev)
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
       force *= 2.0f;
-      result.body->AddForceAtPos (force, result.intersection);
+      result.body->AddForceAtPos (force, result.isect);
 
       // This would work too
       //csOrthoTransform transform (result.body->GetTransform ());
-      //csVector3 relativePosition = transform.Other2This (result.intersection);
+      //csVector3 relativePosition = transform.Other2This (result.isect);
       //result.body->AddForceAtRelPos (force, relativePosition);
     }
+
     return true;
   }
+
   return false;
 }
 
@@ -528,12 +530,13 @@ bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll", iSkeletonRagdollManager2),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll",
+		       iSkeletonRagdollManager2),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
-  csBaseEventHandler::Initialize(GetObjectRegistry ());
-  if (!RegisterQueue(GetObjectRegistry (), csevAllEvents (GetObjectRegistry ())))
+  csBaseEventHandler::Initialize (GetObjectRegistry ());
+  if (!RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ())))
     return ReportError ("Failed to set up event handler!");
 
   // Checking for choosen dynamic system

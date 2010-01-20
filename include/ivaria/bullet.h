@@ -35,6 +35,8 @@ struct iBulletKinematicCallback;
  */
 struct csBulletHitBeamResult
 {
+  csBulletHitBeamResult () : body (0), isect (0.0f) {}
+
   /**
    * The resulting dynamic or kinematic body that was hit, or 0 if no body was hit.
    */
@@ -43,7 +45,7 @@ struct csBulletHitBeamResult
   /**
    * Intersection point in world space.
    */
-  csVector3 intersection;
+  csVector3 isect;
 };
 
 /**
