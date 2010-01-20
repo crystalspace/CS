@@ -23,12 +23,11 @@
 
 #include <stdarg.h>
 #include <crystalspace.h>
-#include "csutil/scf_implementation.h"
 
-class AvatarTest : public scfImplementation1<AvatarTest, iSkeletonLookAtListener2>
+class AvatarTest : public csApplicationFramework, public csBaseEventHandler
 {
 private:
-  iObjectRegistry* object_reg;
+  // Engine related
   csRef<iEngine> engine;
   csRef<iLoader> loader;
   csRef<iGraphics3D> g3d;
@@ -46,15 +45,11 @@ private:
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
 
+  // Animesh & animation nodes
   csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
   csRef<iSkeletonLookAtManager2> lookAtManager;
   csRef<iSkeletonBasicNodesManager2> basicNodesManager;
-
-  // Body mesh related
-  //csRef<iBodySkeleton> bodySkeleton;
-
-  // FSM node related
   csRef<iSkeletonFSMNode2> FSMNode;
 
   // LookAt node related
@@ -66,10 +61,10 @@ private:
 
   // Speed node related
   csRef<iSkeletonSpeedNode2> speedNode;
-  // We use a 'int' instead of a 'float' to avoid round errors
-  int currentSpeed;
+  int currentSpeed; // We use a 'int' instead of a 'float' to avoid round errors
 
   // Ragdoll node related
+  bool frankieDead;
   csRef<iSkeletonRagdollManager2> ragdollManager;
   csRef<iSkeletonRagdollNode2> ragdollNode;
   CS::Animation::StateID mainFSMState;
@@ -78,36 +73,46 @@ private:
   // Morphing related
   float smileWeight;
 
-  static bool AvatarTestEventHandler (iEvent& ev);
-  bool HandleEvent (iEvent& ev);
-  void SetupFrame ();
+  //-- csBaseEventHandler
+  void Frame ();
+  bool OnKeyboard (iEvent &event);
+  bool OnMouseDown (iEvent &event);
 
+  // Creation of objects
   void CreateRoom ();
-  void CreateAvatar ();
+  bool CreateAvatar ();
 
-  void KillFrankie ();
+  // User interaction with the scene
   void ResetScene ();
 
+  // Display of comments 
   void WriteShadow (int x, int y, int fg, const char *str,...);
   void Write(int x, int y, int fg, int bg, const char *str,...);
   void DisplayKeys ();
 
-  CS_DECLARE_EVENT_SHORTCUTS;
+  // LookAt listener
+  class LookAtListener : public scfImplementation1<LookAtListener,
+    iSkeletonLookAtListener2>
+  {
+    AvatarTest* avatarTest;
 
-  csEventID KeyboardDown;
-  csEventID KeyboardUp;
+  public:
+    LookAtListener (AvatarTest* avatarTest)
+      : scfImplementationType (this), avatarTest (avatarTest) {}
+
+    //-- iSkeletonLookAtListener2
+    void TargetReached ();
+    void TargetLost ();
+  } lookAtListener;
 
  public:
-  AvatarTest (iObjectRegistry *obj);
+  AvatarTest ();
   ~AvatarTest ();
 
-  bool Initialize ();
-  void Start ();
-  void Shutdown ();
-
-  //-- iSkeletonLookAtListener2
-  void TargetReached ();
-  void TargetLost ();
+  //-- csApplicationFramework
+  void OnExit ();
+  bool OnInitialize (int argc, char* argv[]);
+  bool Application ();
 };
 
 #endif // __AVATARTEST_H__

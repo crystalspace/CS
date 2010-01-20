@@ -20,8 +20,6 @@
 */
 
 #include "avatartest.h"
-#include "imesh/lookat.h"
-#include "imesh/basicskelanim.h"
 
 #define LOOKAT_CAMERA 1
 #define LOOKAT_POSITION 2
@@ -33,21 +31,20 @@
 
 CS_IMPLEMENT_APPLICATION
 
-AvatarTest *avatarTest;
-
-AvatarTest::AvatarTest (iObjectRegistry* object_reg)
-  : scfImplementationType (this), object_reg (object_reg), targetMode (LOOKAT_CAMERA),
-    alwaysRotate (false), rotationSpeed (ROTATION_NORMAL), targetReached (false),
-    currentSpeed (0)
+AvatarTest::AvatarTest ()
+  : targetMode (LOOKAT_CAMERA), alwaysRotate (false),
+    rotationSpeed (ROTATION_NORMAL), targetReached (false), currentSpeed (0),
+    lookAtListener (this)
 {
+  SetApplicationName ("CrystalSpace.AvatarTest");
 }
 
 AvatarTest::~AvatarTest ()
 {
-  lookAtNode->RemoveListener (this);
+  lookAtNode->RemoveListener (&lookAtListener);
 }
 
-void AvatarTest::SetupFrame ()
+void AvatarTest::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -62,6 +59,7 @@ void AvatarTest::SetupFrame ()
   csVector3 avatarPosition = animeshObject->GetMeshWrapper ()->QuerySceneNode ()
     ->GetMovable ()->GetTransform ().GetOrigin () + csVector3 (0.0f, 0.35f, 0.0f);
 
+  // Move camera
   if (kbd->GetKeyState (CSKEY_SHIFT))
   {
     // If the user is holding down shift, the Up/Down arrow keys will cause
@@ -129,73 +127,76 @@ void AvatarTest::SetupFrame ()
   // Tell the camera to render into the frame buffer.
   view->Draw ();
 
-  // Write FPS and other info..
+  // Write FPS and other info
   if(!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
+  int y = 480;
+  int lineSize = 18;
+
   if (targetMode == LOOKAT_CAMERA)
-    WriteShadow(10, 480, g2d->FindRGB (255, 150, 100), "Watch out, Frankie is looking at you!");
+    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Watch out, Frankie is looking at you!");
   else if (targetMode == LOOKAT_POSITION)
-    WriteShadow(10, 480, g2d->FindRGB (255, 150, 100), "Frankie is looking at something");
+    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Frankie is looking at something");
   else if (targetMode == LOOKAT_NOTHING)
-    WriteShadow(10, 480, g2d->FindRGB (255, 150, 100), "Frankie doesn't care about anything");
+    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Frankie doesn't care about anything");
+  y += lineSize;
 
   if (alwaysRotate)
-    WriteShadow(10, 500, g2d->FindRGB (255, 150, 100), "Always rotate: ON");
+    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Always rotate: ON");
   else
-    WriteShadow(10, 500, g2d->FindRGB (255, 150, 100), "Always rotate: OFF");
+    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Always rotate: OFF");
+  y += lineSize;
 
   if (rotationSpeed == ROTATION_SLOW)
-    WriteShadow(10, 520, g2d->FindRGB (255, 150, 100), "Rotation speed: really slow");
-  if (rotationSpeed == ROTATION_NORMAL)
-    WriteShadow(10, 520, g2d->FindRGB (255, 150, 100), "Rotation speed: normal");
-  if (rotationSpeed == ROTATION_IMMEDIATE)
-    WriteShadow(10, 520, g2d->FindRGB (255, 150, 100), "Rotation speed: infinite");
+    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Rotation speed: really slow");
+  else if (rotationSpeed == ROTATION_NORMAL)
+    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Rotation speed: normal");
+  else if (rotationSpeed == ROTATION_IMMEDIATE)
+    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Rotation speed: infinite");
+  y += lineSize;
 
-  WriteShadow(10, 540, g2d->FindRGB (255, 150, 100), "Walk speed: %.1f",
+  WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Walk speed: %.1f",
 	      ((float) currentSpeed) / 10.0f);
+  y += lineSize;
 
   if (speed != 0.0f)
-    WriteShadow(10, 560, g2d->FindRGB (255, 150, 100), "FPS: %.2f",
+  {
+    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "FPS: %.2f",
 		 1.0f / speed);
+    y += lineSize;
+  }
 
   // Write available keys
   DisplayKeys ();
 }
 
-bool AvatarTest::HandleEvent (iEvent& ev)
+bool AvatarTest::OnKeyboard (iEvent &ev)
 {
-  if (ev.Name == Frame)
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
   {
-    avatarTest->SetupFrame ();
-    return true;
-  }
-  else if (CS_IS_KEYBOARD_EVENT(object_reg, ev)) 
-  {
-    if (ev.Name == KeyboardDown)
+    // Toggle the target mode of the 'LookAt' controller
+    if (csKeyEventHelper::GetCookedCode (&ev) == 't')
     {
-      // Toggle the target mode of the 'LookAt' controller
-      if (csKeyEventHelper::GetCookedCode (&ev) == 't')
+      if (targetMode == LOOKAT_CAMERA)
       {
-	if (targetMode == LOOKAT_CAMERA)
-	{
-	  lookAtNode->SetTarget (view->GetCamera ()->GetTransform ().GetOrigin ());
-	  targetMode = LOOKAT_POSITION;
-	}
-
-	else if (targetMode == LOOKAT_POSITION)
-	{
-	  lookAtNode->RemoveTarget ();
-	  targetMode = LOOKAT_NOTHING;
-	}
-
-	else
-	{
-	  lookAtNode->SetTarget (view->GetCamera (), csVector3 (0.0f));
-	  targetMode = LOOKAT_CAMERA;
-	}
-
-	return true;
+	lookAtNode->SetTarget (view->GetCamera ()->GetTransform ().GetOrigin ());
+	targetMode = LOOKAT_POSITION;
       }
+
+      else if (targetMode == LOOKAT_POSITION)
+      {
+	lookAtNode->RemoveTarget ();
+	targetMode = LOOKAT_NOTHING;
+      }
+
+      else
+      {
+	lookAtNode->SetTarget (view->GetCamera (), csVector3 (0.0f));
+	targetMode = LOOKAT_CAMERA;
+      }
+
+      return true;
     }
 
     // Toggle 'always rotate' option of the 'LookAt' controller
@@ -233,7 +234,7 @@ bool AvatarTest::HandleEvent (iEvent& ev)
     // Update walk speed of the 'speed' controller
     else if (csKeyEventHelper::GetCookedCode (&ev) == '+')
     {
-      if (currentSpeed < 29)
+      if (currentSpeed < 58)
       {
 	currentSpeed += 1;
 	speedNode->SetSpeed (((float) currentSpeed) / 10.0f);
@@ -251,13 +252,6 @@ bool AvatarTest::HandleEvent (iEvent& ev)
       return true;
     }
 
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'k'
-	     && physicsEnabled)
-    {
-      KillFrankie ();
-      return true;
-    }
-
     // Reset of the scene
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
     {
@@ -268,8 +262,8 @@ bool AvatarTest::HandleEvent (iEvent& ev)
     // Check for ESC key
     else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
     {
-      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
-      if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
+      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (GetObjectRegistry ()));
+      if (q) q->GetEventOutlet()->Broadcast (csevQuit (GetObjectRegistry ()));
       return true;
     }
   }
@@ -277,14 +271,108 @@ bool AvatarTest::HandleEvent (iEvent& ev)
   return false;
 }
 
-bool AvatarTest::AvatarTestEventHandler (iEvent& ev)
+bool AvatarTest::OnMouseDown (iEvent& ev)
 {
-  return avatarTest ? avatarTest->HandleEvent (ev) : false;
+  if (csMouseEventHelper::GetButton (&ev) == 0
+      && physicsEnabled)
+  {
+    // Trying to kill Frankie
+
+    // Compute the beam points to check what was hit
+    int mouseX = csMouseEventHelper::GetX (&ev);
+    int mouseY = csMouseEventHelper::GetY (&ev);
+
+    csRef<iCamera> camera = view->GetCamera ();
+    csVector2 v2d (mouseX, camera->GetShiftY () * 2 - mouseY);
+    csVector3 v3d = camera->InvPerspective (v2d, 10000);
+    csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+    csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+    // If Frankie is already dead, simply check for adding a force on him
+    if (frankieDead)
+    {
+      // Trace a physical beam to find if a rigid body was hit
+      csRef<iBulletDynamicSystem> bulletSystem =
+	scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
+      csBulletHitBeamResult physicsResult = bulletSystem->HitBeam (startBeam, endBeam);
+
+      // Apply a big force at the point clicked by the mouse
+      if (physicsResult.body)
+      {
+	csVector3 force = endBeam - startBeam;
+	force.Normalize ();
+	physicsResult.body->AddForceAtPos (physicsResult.isect, force * 10.0f);
+      }
+
+      return true;
+    }
+
+    // At first, test with a sector HitBeam if we clicked on an animated mesh
+    csSectorHitBeamResult sectorResult = camera->GetSector ()->HitBeam
+      (startBeam, endBeam, true);
+    if (!sectorResult.mesh)
+      return false;
+
+    csRef<iAnimatedMesh> animesh =
+      scfQueryInterface<iAnimatedMesh> (sectorResult.mesh->GetMeshObject ());
+    if (!animesh)
+      return false;
+
+    // OK, it's an animesh, it must be Frankie, start the ragdoll
+    frankieDead = true;
+
+    // Close the eyes of Frankie as he is dead
+    animesh->SetMorphTargetWeight
+      (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
+
+    // Set the ragdoll animation node as the active state of the Finite State Machine
+    // (start the ragdoll node so that the rigid bodies are created)
+    FSMNode->SwitchToState (ragdollFSMState);
+    FSMNode->GetStateNode (ragdollFSMState)->Play ();
+
+    // Fling the body a bit
+    const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+    for (uint i = 0; i < ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
+    {
+      BoneID boneID = ragdollNode->GetBone (RAGDOLL_STATE_DYNAMIC, i);
+      iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
+      rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 1));
+      rb->SetAngularVelocity (tc.GetT2O () * csVector3 (1, 1, 0));
+    }
+
+    // Trace a physical beam to find which rigid body was hit
+    csRef<iBulletDynamicSystem> bulletSystem =
+      scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
+    csBulletHitBeamResult physicsResult = bulletSystem->HitBeam (startBeam, endBeam);
+
+    // Apply a big force at the point clicked by the mouse
+    if (physicsResult.body)
+    {
+      csVector3 force = endBeam - startBeam;
+      force.Normalize ();
+      physicsResult.body->AddForceAtPos (physicsResult.isect, force * 10.0f);
+    }
+
+    return true;
+  }
+
+  return false;
 }
 
-bool AvatarTest::Initialize ()
+bool AvatarTest::OnInitialize (int /*argc*/, char* /*argv*/ [])
 {
-  if (!csInitializer::RequestPlugins (object_reg,
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (GetObjectRegistry ()))
+  {
+    csPrintf ("Usage: avatartest\n");
+    csPrintf ("Tests on animesh animation\n\n");
+    csPrintf ("Options for avatartest:\n");
+    csPrintf ("  -no_physics:       disable physical animations\n");
+    csCommandLineHelper::Help (GetObjectRegistry ());
+    return false;
+  }
+
+  if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_VFS,
     CS_REQUEST_OPENGL3D,
     CS_REQUEST_ENGINE,
@@ -298,179 +386,104 @@ bool AvatarTest::Initialize ()
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
 		       iSkeletonBasicNodesManager2),
     CS_REQUEST_END))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "Can't initialize plugins!");
-    return false;
-  }
+    return ReportError ("Failed to initialize plugins!");
+
+  csBaseEventHandler::Initialize (GetObjectRegistry ());
+  if (!RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ())))
+    return ReportError ("Failed to set up event handler!");
 
   // Check if physics effects are enabled
-  csRef<iCommandLineParser> clp = csQueryRegistry<iCommandLineParser> (object_reg);
+  csRef<iCommandLineParser> clp =
+    csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
   physicsEnabled = !clp->GetBoolOption ("no_physics", false);
 
   if (physicsEnabled)
   {
-    csRef<iPluginManager> plugmgr = 
-      csQueryRegistry<iPluginManager> (object_reg);
-
     // Load the Bullet plugin
+    csRef<iPluginManager> plugmgr = 
+      csQueryRegistry<iPluginManager> (GetObjectRegistry ());
     dynamics = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
+
     if (!dynamics)
     {
-      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-		"crystalspace.application.avatartest",
-		"Can't load Bullet plugin, continuing with reduced functionalities");
+      ReportWarning
+	("Can't load Bullet plugin, continuing with reduced functionalities");
+      physicsEnabled = false;
+    }
+  }
+
+  return true;
+}
+
+void AvatarTest::OnExit ()
+{
+  printer.Invalidate ();
+}
+
+bool AvatarTest::Application ()
+{
+  if (!OpenApplication (GetObjectRegistry ()))
+    return ReportError ("Error opening system!");
+
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry ());
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry ());
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry ());
+  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry ());
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry ());
+  if (!loader) return ReportError("Failed to locate Loader!");
+
+  g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
+  if (!g2d) return ReportError("Failed to locate 2D renderer!");
+
+  lookAtManager = csQueryRegistry<iSkeletonLookAtManager2> (GetObjectRegistry ());
+  if (!lookAtManager) return ReportError("Failed to locate iLookAtManager plugin!");
+
+  basicNodesManager =
+    csQueryRegistry<iSkeletonBasicNodesManager2> (GetObjectRegistry ());
+  if (!basicNodesManager)
+    return ReportError("Failed to locate iSkeletonBasicNodesManager2 plugin!");
+
+  printer.AttachNew (new FramePrinter (GetObjectRegistry ()));
+
+  csRef<iFontServer> fs = g3d->GetDriver2D()->GetFontServer ();
+  if (fs)
+    courierFont = fs->LoadFont (CSFONT_COURIER);
+  else return ReportError ("Failed to locate font server!");
+
+  // Create the dynamic system
+  if (physicsEnabled)
+  {
+    dynamicSystem = dynamics->CreateSystem ();
+    if (!dynamicSystem) 
+    {
+      ReportWarning
+	("Can't create dynamic system, continuing with reduced functionalities");
       physicsEnabled = false;
     }
 
     else
     {
-      // Create the dynamic system
-      dynamicSystem = dynamics->CreateSystem ();
-      if (!dynamicSystem) 
+      // Load the ragdoll plugin
+      csRef<iPluginManager> plugmgr = 
+	csQueryRegistry<iPluginManager> (GetObjectRegistry ());
+      ragdollManager = csLoadPlugin<iSkeletonRagdollManager2>
+	(plugmgr, "crystalspace.mesh.animesh.controllers.ragdoll");
+      if (!ragdollManager)
       {
-	csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-		  "crystalspace.application.avatartest",
-		  "Can't create dynamic system, continuing with reduced functionalities");
+	ReportWarning
+	  ("Can't load ragdoll plugin, continuing with reduced functionalities");
 	physicsEnabled = false;
-      }
-
-      else
-      {
-	// Load the ragdoll plugin
-	ragdollManager = csLoadPlugin<iSkeletonRagdollManager2>
-	  (plugmgr, "crystalspace.mesh.animesh.controllers.ragdoll");
-	if (!ragdollManager)
-	{
-	  csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-		    "crystalspace.application.avatartest",
-		    "Can't create dynamic system, continuing with reduced functionalities");
-	  physicsEnabled = false;
-	}
       }
     }
   }
-
-  // Events
-  if (!csInitializer::SetupEventHandler (object_reg, AvatarTestEventHandler))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "Can't initialize event handler!");
-    return false;
-  }
-  CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
-
-  KeyboardDown = csevKeyboardDown (object_reg);
-  KeyboardUp = csevKeyboardUp (object_reg);
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    csPrintf ("Usage: avatartest\n");
-    csPrintf ("Tests on animesh animation\n\n");
-    csPrintf ("Options for avatartest:\n");
-    csPrintf ("  -no_physics:       disable physical animations\n");
-    csCommandLineHelper::Help (object_reg);
-    return false;
-  }
-
-  // The virtual clock.
-  vc = csQueryRegistry<iVirtualClock> (object_reg);
-  if (vc == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "Can't find the virtual clock!");
-    return false;
-  }
-
-  // Find the pointer to engine and other plugins
-  engine = csQueryRegistry<iEngine> (object_reg);
-  if (engine == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "No iEngine plugin!");
-    return false;
-  }
-
-  loader = csQueryRegistry<iLoader> (object_reg);
-  if (loader == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "No iLoader plugin!");
-    return false;
-  }
-
-  g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  if (g3d == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "No iGraphics3D plugin!");
-    return false;
-  }
-
-  g2d = csQueryRegistry<iGraphics2D> (object_reg);
-  if (g2d == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "No iGraphics2D plugin!");
-    return false;
-  }
-
-  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
-  if (kbd == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "No iKeyboardDriver plugin!");
-    return false;
-  }
-
-  lookAtManager = csQueryRegistry<iSkeletonLookAtManager2> (object_reg);
-  if (lookAtManager == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "No iLookAtManager plugin!");
-    return false;
-  }
-
-  basicNodesManager = csQueryRegistry<iSkeletonBasicNodesManager2> (object_reg);
-  if (basicNodesManager == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "No iSkeletonBasicNodesManager2 plugin!");
-    return false;
-  }
-
-  // Open the main system. This will open all the previously loaded plug-ins.
-  if (!csInitializer::OpenApplication (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "Error opening system!");
-    return false;
-  }
-
-  printer.AttachNew (new FramePrinter (object_reg));
-
-  csRef<iFontServer> fs = g3d->GetDriver2D()->GetFontServer ();
-  if (fs)
-    courierFont = fs->LoadFont (CSFONT_COURIER);
-  else
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.avatartest",
-      "Error getting FontServer!");
-    return false;
-  };
 
   // Create sector
   room = engine->CreateSector ("room");
@@ -484,19 +497,13 @@ bool AvatarTest::Initialize ()
 
   // Create scene
   CreateRoom ();
-  CreateAvatar ();
+  if (!CreateAvatar ())
+    return false;
+
+  // Run the application
+  Run();
 
   return true;
-}
-
-void AvatarTest::Shutdown ()
-{
-  printer.Invalidate ();
-}
-
-void AvatarTest::Start ()
-{
-  csDefaultRunLoop (object_reg);
 }
 
 void AvatarTest::CreateRoom ()
@@ -515,7 +522,7 @@ void AvatarTest::CreateRoom ()
 
   csRef<iMaterialWrapper> bgMaterial =
     CS::Material::MaterialBuilder::CreateColorMaterial
-    (object_reg, "background", csColor (0.398f));
+    (GetObjectRegistry (), "background", csColor (0.398f));
   background->GetMeshObject()->SetMaterialWrapper(bgMaterial);
 
   // Set up of the physical collider for the roof
@@ -557,48 +564,31 @@ void AvatarTest::CreateRoom ()
   CS::Lighting::SimpleStaticLighter::ShineLights (room, engine, 4);
 }
 
-void AvatarTest::CreateAvatar ()
+bool AvatarTest::CreateAvatar ()
 {
   // Load animesh factory
   csLoadResult rc = loader->Load ("/lib/frankie/frankie.xml");
   if (!rc.success)
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	      "crystalspace.application.avatartest",
-	      "Can't load frankie!");
+    return ReportError ("Can't load Frankie library file!");
 
   csRef<iMeshFactoryWrapper> meshfact = engine->FindMeshFactory ("franky_frankie");
   if (!meshfact)
-    return;
+    return ReportError ("Can't find Frankie's mesh factory!");
 
   animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
   if (!animeshFactory)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	      "crystalspace.application.avatartest",
-	      "Can't find frankie's animesh factory!");
-    return;
-  }
+    return ReportError ("Can't find Frankie's animesh factory!");
 
   // Load bodymesh (animesh's physical properties)
   rc = loader->Load ("/lib/frankie/skelfrankie_body");
   if (!rc.success)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	      "crystalspace.application.avatartest",
-	      "Can't find frankie's body mesh file!");
-    return;    
-  }
+    return ReportError ("Can't load frankie's body mesh file!");
 
-  csRef<iBodyManager> bodyManager = csQueryRegistry<iBodyManager> (object_reg);
+  csRef<iBodyManager> bodyManager = csQueryRegistry<iBodyManager> (GetObjectRegistry ());
   csRef<iBodySkeleton> bodySkeleton = bodyManager->FindBodySkeleton ("frankie_body");
   if (!bodySkeleton)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	      "crystalspace.application.avatartest",
-	      "Can't find Frankie's body mesh description!");
-    return;
-  }
+    return ReportError ("Can't find Frankie's body mesh description!");
 
   // Create a new animation tree. The structure of the tree is:
   //   + Finite State Machine node (root node)
@@ -672,14 +662,14 @@ void AvatarTest::CreateAvatar ()
   csRef<iSkeletonSpeedNodeFactory2> speedNodeFactory =
     basicNodesManager->CreateSpeedNodeFactory ("speed");
   speedNodeFactory->AddNode (idleNodeFactory, 0.0f);
-  speedNodeFactory->AddNode (walkSlowNodeFactory, 0.1f);
-  speedNodeFactory->AddNode (walkNodeFactory, 0.3f);
-  speedNodeFactory->AddNode (walkFastNodeFactory, 0.6f);
-  speedNodeFactory->AddNode (footingNodeFactory, 0.8f);
-  speedNodeFactory->AddNode (runSlowNodeFactory, 1.3f);
-  speedNodeFactory->AddNode (runNodeFactory, 1.7f);
-  speedNodeFactory->AddNode (runFastNodeFactory, 2.5f);
-  speedNodeFactory->AddNode (runJumpNodeFactory, 2.9f);
+  speedNodeFactory->AddNode (walkSlowNodeFactory, 0.2f);
+  speedNodeFactory->AddNode (walkNodeFactory, 0.6f);
+  speedNodeFactory->AddNode (walkFastNodeFactory, 1.2f);
+  speedNodeFactory->AddNode (footingNodeFactory, 1.6f);
+  speedNodeFactory->AddNode (runSlowNodeFactory, 2.6f);
+  speedNodeFactory->AddNode (runNodeFactory, 3.4f);
+  speedNodeFactory->AddNode (runFastNodeFactory, 5.0f);
+  speedNodeFactory->AddNode (runJumpNodeFactory, 5.8f);
 
   lookAtNodeFactory->SetChildNode (speedNodeFactory);
 
@@ -715,7 +705,7 @@ void AvatarTest::CreateAvatar ()
 
   // Setup of the LookAt controller
   lookAtNode = scfQueryInterface<iSkeletonLookAtNode2> (rootNode->FindNode ("lookat"));
-  lookAtNode->AddListener (this);
+  lookAtNode->AddListener (&lookAtListener);
   lookAtNode->SetAnimatedMesh (animesh);
   lookAtNode->SetBone (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
   lookAtNode->SetListenerDelay (0.6f);
@@ -726,7 +716,8 @@ void AvatarTest::CreateAvatar ()
   // Setup of the ragdoll controller
   if (physicsEnabled)
   {
-    ragdollNode = scfQueryInterface<iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
+    ragdollNode =
+      scfQueryInterface<iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
     ragdollNode->SetAnimatedMesh (animesh);
   }
 
@@ -735,36 +726,20 @@ void AvatarTest::CreateAvatar ()
 
   // Start animation
   rootNode->Play ();
+
+  return true;
 }
 
-void AvatarTest::TargetReached ()
+void AvatarTest::LookAtListener::TargetReached ()
 {
   printf ("'LookAt' target reached\n");
-  targetReached = true;
+  avatarTest->targetReached = true;
 }
 
-void AvatarTest::TargetLost ()
+void AvatarTest::LookAtListener::TargetLost ()
 {
   printf ("'LookAt' target lost\n");
-  targetReached = false;
-}
-
-void AvatarTest::KillFrankie ()
-{
-  // Set the ragdoll animation node as the active state of the Finite State Machine
-  FSMNode->SwitchToState (ragdollFSMState);
-
-  // Fling the body.
-  // (start the ragdoll node before so that the rigid bodies are created)
-  FSMNode->GetStateNode (ragdollFSMState)->Play ();
-  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
-  for (uint i = 0; i < ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
-  {
-    BoneID boneID = ragdollNode->GetBone (RAGDOLL_STATE_DYNAMIC, i);
-    iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
-    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
-    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));
-  }
+  avatarTest->targetReached = false;
 }
 
 void AvatarTest::ResetScene ()
@@ -778,7 +753,8 @@ void AvatarTest::ResetScene ()
   FSMNode->SwitchToState (mainFSMState);
 
   // The FSM doesn't stop the child nodes
-  ragdollNode->Stop ();
+  if (physicsEnabled)
+    ragdollNode->Stop ();
 
   // Reset 'LookAt' controller
   alwaysRotate = false;
@@ -795,6 +771,9 @@ void AvatarTest::ResetScene ()
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("smile.B"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("wings_in"), 1.0f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.0f);
+
+  frankieDead = false;
 }
 
 void AvatarTest::WriteShadow (int x, int y, int fg, const char *str,...)
@@ -852,7 +831,7 @@ void AvatarTest::DisplayKeys ()
 
   if (physicsEnabled)
   {
-    WriteShadow (x, y, fg, "k: kill Frankie");
+    WriteShadow (x, y, fg, "left mouse: kill Frankie");
     y += lineSize;
   }
 
@@ -860,19 +839,9 @@ void AvatarTest::DisplayKeys ()
   y += lineSize;
 }
 
-/*---------------------------------------------------------------------*
-* Main function
-*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------------
+
 int main (int argc, char* argv[])
 {
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
-
-  avatarTest = new AvatarTest (object_reg);
-  if (avatarTest->Initialize ())
-    avatarTest->Start ();
-  avatarTest->Shutdown ();
-  delete avatarTest; avatarTest = 0;
-
-  csInitializer::DestroyApplication (object_reg);
-  return 0;
+  return AvatarTest ().Main (argc, argv);
 }
