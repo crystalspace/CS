@@ -134,34 +134,34 @@ void AvatarTest::Frame ()
   int lineSize = 18;
 
   if (targetMode == LOOKAT_CAMERA)
-    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Watch out, Frankie is looking at you!");
+    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Watch out, Frankie is looking at you!");
   else if (targetMode == LOOKAT_POSITION)
-    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Frankie is looking at something");
+    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Frankie is looking at something");
   else if (targetMode == LOOKAT_NOTHING)
-    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Frankie doesn't care about anything");
+    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Frankie doesn't care about anything");
   y += lineSize;
 
   if (alwaysRotate)
-    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Always rotate: ON");
+    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Always rotate: ON");
   else
-    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Always rotate: OFF");
+    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Always rotate: OFF");
   y += lineSize;
 
   if (rotationSpeed == ROTATION_SLOW)
-    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Rotation speed: really slow");
+    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Rotation speed: really slow");
   else if (rotationSpeed == ROTATION_NORMAL)
-    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Rotation speed: normal");
+    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Rotation speed: normal");
   else if (rotationSpeed == ROTATION_IMMEDIATE)
-    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Rotation speed: infinite");
+    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Rotation speed: infinite");
   y += lineSize;
 
-  WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "Walk speed: %.1f",
+  WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Walk speed: %.1f",
 	      ((float) currentSpeed) / 10.0f);
   y += lineSize;
 
   if (speed != 0.0f)
   {
-    WriteShadow(10, y, g2d->FindRGB (255, 150, 100), "FPS: %.2f",
+    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "FPS: %.2f",
 		 1.0f / speed);
     y += lineSize;
   }
@@ -336,8 +336,8 @@ bool AvatarTest::OnMouseDown (iEvent& ev)
     {
       BoneID boneID = ragdollNode->GetBone (RAGDOLL_STATE_DYNAMIC, i);
       iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
-      rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 1));
-      rb->SetAngularVelocity (tc.GetT2O () * csVector3 (1, 1, 0));
+      rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 1.0f));
+      rb->SetAngularVelocity (tc.GetT2O () * csVector3 (1.0f, 1.0f, 0.0f));
     }
 
     // Trace a physical beam to find which rigid body was hit
@@ -350,7 +350,7 @@ bool AvatarTest::OnMouseDown (iEvent& ev)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
-      physicsResult.body->AddForceAtPos (physicsResult.isect, force * 10.0f);
+      physicsResult.body->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 7.5f));
     }
 
     return true;
