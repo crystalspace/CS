@@ -470,7 +470,7 @@ struct csShaderMetadata
 };
 
 /**
- * A list of priorities as returned by iShaderCompiler->GetPriorities()
+ * A list of priorities as returned by iShaderCompiler::GetPriorities()
  */
 struct iShaderPriorityList : public virtual iBase
 {

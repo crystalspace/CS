@@ -63,11 +63,11 @@ enum
  * to get the required object (mesh, light, material, ...).
  * The engine sequence manager itself currently provides two ready-made
  * implementations of this resolver:
- * - iEngineSequenceParameters->CreateParameterESM() which will create
+ * - iEngineSequenceParameters::CreateParameterESM() which will create
  *   a resolver that gets the requested parameter from the given
  *   iEngineSequenceParameters instance. This is useful for sequences
  *   where you don't know in advance on what objects you will use it.
- * - iEngineSequenceManager->CreateParameterESM() which will give
+ * - iEngineSequenceManager::CreateParameterESM() which will give
  *   a resolver that returns a constant value. This is useful for
  *   operations where the object to operate on is known in advance.
  * 
@@ -105,11 +105,11 @@ struct iParameterESM : public virtual iBase
 /**
  * An interface for passing on parameters to the engine sequence
  * manager. You can create a ready-made instance of this interface
- * by calling iSequenceWrapper->CreateBaseParameterBlock(). This will
+ * by calling iSequenceWrapper::CreateBaseParameterBlock(). This will
  * create an empty parameter block that specifies the supported parameters
  * (and optional default values) that are relevant for that sequence.
  * When running a sequence later you can call
- * iSequenceWrapper->CreateParameterBlock() to make a clone of the
+ * iSequenceWrapper::CreateParameterBlock() to make a clone of the
  * base parameter block and then fill in the values.<br>
  * To use a value from this parameter block you can call CreateParameterESM()
  * which will return a parameter that you can give to an operation.
@@ -217,7 +217,7 @@ struct iSequenceWrapper : public virtual iBase
    * conditions, operations, and general sequence management. The
    * AddOperationBla() functions provided in this wrapper do nothing
    * more than add custom operations through the regular
-   * iSequence->AddOperation().
+   * iSequence::AddOperation().
    */
   virtual iSequence* GetSequence () = 0;
 
@@ -787,7 +787,7 @@ struct iEngineSequenceManager : public virtual iBase
    * \param params Operation parameters.
    * \param sequence_id This identifier can be used to get track of
    *   a given sequence. You can use this id to remove all operations that
-   *   have this id. Use iSequenceManager->GetUniqueID() to fetch a suitable
+   *   have this id. Use iSequenceManager::GetUniqueID() to fetch a suitable
    *   id here or else use the same id as the sequence has.
    * \remarks  The params block is increffed for as long as is needed so you
    *   can release your reference.

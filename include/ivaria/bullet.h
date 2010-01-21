@@ -31,7 +31,7 @@ struct iBulletKinematicCallback;
 
 /**
  * Return structure for the iBulletDynamicSystem::HitBeam() routine.
- * \sa csSectorHitBeamResult
+ * \sa csHitBeamResult csSectorHitBeamResult
  */
 struct csBulletHitBeamResult
 {
@@ -65,7 +65,8 @@ struct iBulletDynamicSystem : public virtual iBase
   /**
    * Follow a beam from start to end and return the first dynamic or kinematic rigid body
    * that is hit. Static objects doesn't count.
-   * \sa csBulletHitBeamResult iSector::HitBeam() iSector::HitBeamPortals()
+   * \sa csBulletHitBeamResult iMeshWrapper::HitBeam() iSector::HitBeam()
+   * iSector::HitBeamPortals()
    */
   virtual csBulletHitBeamResult HitBeam (const csVector3 &start, const csVector3 &end) = 0;
 };

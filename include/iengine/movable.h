@@ -63,7 +63,7 @@ struct iMovableListener : public virtual iBase
  * relative to its parent (this is the transformation between local object
  * space of the model and world space (i.e. where it is in the world)).
  * Movables are attached to objects (like meshes). For example, use
- * iMeshWrapper->GetMovable()) to get the movable belonging to some mesh.
+ * iMeshWrapper::GetMovable()) to get the movable belonging to some mesh.
  * 
  * The parent of an object can be null in which case it is positioned
  * relative to world space coordinates. The parent of an object can also
@@ -120,7 +120,7 @@ struct iMovable : public virtual iBase
    * crosses a portal then you should in theory add every touched sector
    * to this list of sectors. If objects are small then you can get away
    * by not doing this. But it is possible that you will get render/clipping
-   * errors. There is a convenience function (iMeshWrapper->PlaceMesh())
+   * errors. There is a convenience function (iMeshWrapper::PlaceMesh())
    * which will attempt to find all sectors a mesh is in and update the
    * movable.
    * <p>
@@ -182,7 +182,7 @@ struct iMovable : public virtual iBase
    * <b>WARNING:</b> Do not scale objects using the transform in the movable!
    * Several subsystems in Crystal Space (like collision detection and
    * visibility culling) don't work properly if you do that. Instead use
-   * iMeshWrapper or iMeshFactoryWrapper->HardTransform() to scale.
+   * iMeshWrapper or iMeshFactoryWrapper::HardTransform() to scale.
    * <p>
    * This function ignores the hierarchical transformation this movable
    * may be part off. If part of a hierarchical transformation this function
@@ -197,7 +197,7 @@ struct iMovable : public virtual iBase
    * <b>WARNING:</b> Do not scale objects using the transform in the movable!
    * Several subsystems in Crystal Space (like collision detection and
    * visibility culling) don't work properly if you do that. Instead use
-   * iMeshWrapper or iMeshFactoryWrapper->HardTransform() to scale.
+   * iMeshWrapper or iMeshFactoryWrapper::HardTransform() to scale.
    * <p>
    * This function ignores the hierarchical transformation this movable
    * may be part off. If part of a hierarchical transformation this function
