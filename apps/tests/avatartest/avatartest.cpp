@@ -32,9 +32,7 @@
 CS_IMPLEMENT_APPLICATION
 
 AvatarTest::AvatarTest ()
-  : targetMode (LOOKAT_CAMERA), alwaysRotate (false),
-    rotationSpeed (ROTATION_NORMAL), targetReached (false), currentSpeed (0),
-    lookAtListener (this)
+  : targetReached (false), lookAtListener (this)
 {
   SetApplicationName ("CrystalSpace.AvatarTest");
 }
@@ -58,6 +56,7 @@ void AvatarTest::Frame ()
   csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
   csVector3 avatarPosition = animeshObject->GetMeshWrapper ()->QuerySceneNode ()
     ->GetMovable ()->GetTransform ().GetOrigin () + csVector3 (0.0f, 0.35f, 0.0f);
+  avatarPosition.y = 0.5f;
 
   // Move camera
   if (kbd->GetKeyState (CSKEY_SHIFT))
@@ -96,8 +95,8 @@ void AvatarTest::Frame ()
   }
 
   // Make the camera look at the animesh
-  c->GetTransform().LookAt (avatarPosition - c->GetTransform().GetOrigin (),
-  			    csVector3(0,1,0) );
+  c->GetTransform ().LookAt (avatarPosition - c->GetTransform ().GetOrigin (),
+			     csVector3 (0,1,0) );
 
   // Step the dynamic simulation (we slow down artificially the simulation in
   // order to achieve a 'slow motion' effect)
@@ -134,34 +133,37 @@ void AvatarTest::Frame ()
   int lineSize = 18;
 
   if (targetMode == LOOKAT_CAMERA)
-    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Watch out, Frankie is looking at you!");
+    WriteShadow (20, y, g2d->FindRGB (255, 150, 100),
+		 "Watch out, Frankie is looking at you!");
   else if (targetMode == LOOKAT_POSITION)
-    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Frankie is looking at something");
+    WriteShadow (20, y, g2d->FindRGB (255, 150, 100),
+		 "Frankie is looking at something");
   else if (targetMode == LOOKAT_NOTHING)
-    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Frankie doesn't care about anything");
+    WriteShadow (20, y, g2d->FindRGB (255, 150, 100),
+		 "Frankie doesn't care about anything");
   y += lineSize;
 
   if (alwaysRotate)
-    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Always rotate: ON");
+    WriteShadow (20, y, g2d->FindRGB (255, 150, 100), "Always rotate: ON");
   else
-    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Always rotate: OFF");
+    WriteShadow (20, y, g2d->FindRGB (255, 150, 100), "Always rotate: OFF");
   y += lineSize;
 
   if (rotationSpeed == ROTATION_SLOW)
-    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Rotation speed: really slow");
+    WriteShadow (20, y, g2d->FindRGB (255, 150, 100), "Rotation speed: really slow");
   else if (rotationSpeed == ROTATION_NORMAL)
-    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Rotation speed: normal");
+    WriteShadow (20, y, g2d->FindRGB (255, 150, 100), "Rotation speed: normal");
   else if (rotationSpeed == ROTATION_IMMEDIATE)
-    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Rotation speed: infinite");
+    WriteShadow (20, y, g2d->FindRGB (255, 150, 100), "Rotation speed: infinite");
   y += lineSize;
 
-  WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "Walk speed: %.1f",
+  WriteShadow (20, y, g2d->FindRGB (255, 150, 100), "Walk speed: %.1f",
 	      ((float) currentSpeed) / 10.0f);
   y += lineSize;
 
   if (speed != 0.0f)
   {
-    WriteShadow(20, y, g2d->FindRGB (255, 150, 100), "FPS: %.2f",
+    WriteShadow (20, y, g2d->FindRGB (255, 150, 100), "FPS: %.2f",
 		 1.0f / speed);
     y += lineSize;
   }
@@ -336,8 +338,7 @@ bool AvatarTest::OnMouseDown (iEvent& ev)
     {
       BoneID boneID = ragdollNode->GetBone (RAGDOLL_STATE_DYNAMIC, i);
       iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
-      rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 1.0f));
-      rb->SetAngularVelocity (tc.GetT2O () * csVector3 (1.0f, 1.0f, 0.0f));
+      rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 0.1f));
     }
 
     // Trace a physical beam to find which rigid body was hit
@@ -350,7 +351,8 @@ bool AvatarTest::OnMouseDown (iEvent& ev)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
-      physicsResult.body->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 7.5f));
+      physicsResult.body->AddForceAtPos (physicsResult.isect, force * 1.0f);
+      physicsResult.body->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 1.0f));
     }
 
     return true;
@@ -512,24 +514,23 @@ void AvatarTest::CreateRoom ()
   // First we make a primitive for our geometry.
   CS::Geometry::DensityTextureMapper bgMapper (0.3f);
   CS::Geometry::TesselatedBox bgBox (csVector3 (-4000), csVector3 (4000));
-  bgBox.SetMapper(&bgMapper);
-  bgBox.SetFlags(CS::Geometry::Primitives::CS_PRIMBOX_INSIDE);
+  bgBox.SetMapper (&bgMapper);
+  bgBox.SetFlags (CS::Geometry::Primitives::CS_PRIMBOX_INSIDE);
   
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> background =
-    CS::Geometry::GeneralMeshBuilder::CreateFactoryAndMesh(engine, room,
+    CS::Geometry::GeneralMeshBuilder::CreateFactoryAndMesh (engine, room,
 				   "background", "background_factory", &bgBox);
 
   csRef<iMaterialWrapper> bgMaterial =
     CS::Material::MaterialBuilder::CreateColorMaterial
     (GetObjectRegistry (), "background", csColor (0.398f));
-  background->GetMeshObject()->SetMaterialWrapper(bgMaterial);
+  background->GetMeshObject()->SetMaterialWrapper (bgMaterial);
 
   // Set up of the physical collider for the roof
   if (physicsEnabled)
     dynamicSystem->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), 0.0f),
 					10.0f, 0.0f);
-
   // Creating lights
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
@@ -614,47 +615,56 @@ bool AvatarTest::CreateAvatar ()
   // Create the 'idle' animation node
   csRef<iSkeletonAnimationNodeFactory2> idleNodeFactory =
     animPacketFactory->CreateAnimationNode ("idle");
-  idleNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_Idle1"));
+  idleNodeFactory->SetAnimation
+    (animPacketFactory->FindAnimation ("Frankie_Idle1"));
 
   // Create the 'walk_slow' animation node
   csRef<iSkeletonAnimationNodeFactory2> walkSlowNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk_slow");
-  walkSlowNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_WalkSlow"));
+  walkSlowNodeFactory->SetAnimation
+    (animPacketFactory->FindAnimation ("Frankie_WalkSlow"));
 
   // Create the 'walk' animation node
   csRef<iSkeletonAnimationNodeFactory2> walkNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk");
-  walkNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_Walk"));
+  walkNodeFactory->SetAnimation
+    (animPacketFactory->FindAnimation ("Frankie_Walk"));
 
   // Create the 'walk_fast' animation node
   csRef<iSkeletonAnimationNodeFactory2> walkFastNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk_fast");
-  walkFastNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_WalkFast"));
+  walkFastNodeFactory->SetAnimation
+    (animPacketFactory->FindAnimation ("Frankie_WalkFast"));
 
   // Create the 'footing' animation node
   csRef<iSkeletonAnimationNodeFactory2> footingNodeFactory =
     animPacketFactory->CreateAnimationNode ("footing");
-  footingNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_Runs"));
+  footingNodeFactory->SetAnimation
+    (animPacketFactory->FindAnimation ("Frankie_Runs"));
 
   // Create the 'run_slow' animation node
   csRef<iSkeletonAnimationNodeFactory2> runSlowNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_slow");
-  runSlowNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_RunSlow"));
+  runSlowNodeFactory->SetAnimation
+    (animPacketFactory->FindAnimation ("Frankie_RunSlow"));
 
   // Create the 'run' animation node
   csRef<iSkeletonAnimationNodeFactory2> runNodeFactory =
     animPacketFactory->CreateAnimationNode ("run");
-  runNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_Run"));
+  runNodeFactory->SetAnimation
+    (animPacketFactory->FindAnimation ("Frankie_Run"));
 
   // Create the 'run_fast' animation node
   csRef<iSkeletonAnimationNodeFactory2> runFastNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_fast");
-  runFastNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_RunFaster"));
+  runFastNodeFactory->SetAnimation
+    (animPacketFactory->FindAnimation ("Frankie_RunFaster"));
 
   // Create the 'run_jump' animation node
   csRef<iSkeletonAnimationNodeFactory2> runJumpNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_jump");
-  runJumpNodeFactory->SetAnimation (animPacketFactory->FindAnimation ("Frankie_RunFast2Jump"));
+  runJumpNodeFactory->SetAnimation
+    (animPacketFactory->FindAnimation ("Frankie_RunFast2Jump"));
 
   // Create the 'speed' controller (and add all animations of Frankie moving at different speeds)
   // Unfortunately, the Frankie animations from 'walk fast' to 'footing'
@@ -662,7 +672,7 @@ bool AvatarTest::CreateAvatar ()
   csRef<iSkeletonSpeedNodeFactory2> speedNodeFactory =
     basicNodesManager->CreateSpeedNodeFactory ("speed");
   speedNodeFactory->AddNode (idleNodeFactory, 0.0f);
-  speedNodeFactory->AddNode (walkSlowNodeFactory, 0.2f);
+  speedNodeFactory->AddNode (walkSlowNodeFactory, 0.4f);
   speedNodeFactory->AddNode (walkNodeFactory, 0.6f);
   speedNodeFactory->AddNode (walkFastNodeFactory, 1.2f);
   speedNodeFactory->AddNode (footingNodeFactory, 1.6f);
@@ -759,7 +769,9 @@ void AvatarTest::ResetScene ()
   // Reset 'LookAt' controller
   alwaysRotate = false;
   lookAtNode->SetAlwaysRotate (alwaysRotate);
+  targetMode = LOOKAT_CAMERA;
   lookAtNode->SetTarget (view->GetCamera(), csVector3 (0.0f));
+  rotationSpeed = ROTATION_NORMAL;
   lookAtNode->SetMaximumSpeed (5.0f);
 
   // Reset 'speed' controller
