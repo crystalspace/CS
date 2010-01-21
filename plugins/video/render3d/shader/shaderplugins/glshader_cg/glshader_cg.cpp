@@ -520,9 +520,15 @@ bool csGLShader_CG::Open()
     }
     enableVP = currentLimits.vp.profile != CG_PROFILE_UNKNOWN;
     if (doVerbose)
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Using vertex program limits: %s",
-	currentLimits.vp.ToStringForPunyHumans().GetData());
+    {
+      if (enableVP)
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Using vertex program limits: %s",
+	  currentLimits.vp.ToStringForPunyHumans().GetData());
+      else
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Vertex programs not supported");
+    }
   }
   else
   {
@@ -608,11 +614,17 @@ bool csGLShader_CG::Open()
       currentLimits.fp = limits;
       strictMatchFP = forceBestProfile;
     }
-
+    enableFP = currentLimits.vp.profile != CG_PROFILE_UNKNOWN;
     if (doVerbose)
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Using fragment program limits: %s",
-	currentLimits.fp.ToStringForPunyHumans().GetData());
+    {
+      if (enableFP)
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Using fragment program limits: %s",
+	  currentLimits.fp.ToStringForPunyHumans().GetData());
+      else
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Fragment programs not supported");
+    }
   }
   else
   {
