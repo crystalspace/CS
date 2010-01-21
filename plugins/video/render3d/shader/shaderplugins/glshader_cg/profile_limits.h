@@ -79,6 +79,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	vendor = CS::PluginCommon::ShaderProgramPluginGL::Other;
     }
     void SetDefaults ();
+    /// Like cgGetProfileString(), but also handles CG_PROFILE_UNKNOWN
+    static const char* GetProfileString (CGprofile);
     static uint glGetProgramInteger (csGLExtensionManager* ext,
       GLenum target, GLenum what);
   };

@@ -139,6 +139,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_END
 #undef LIMIT
   }
+
+  const char* ProfileLimits::GetProfileString (CGprofile p)
+  {
+    switch (p)
+    {
+      case CG_PROFILE_UNKNOWN: return "(unknown)";
+      default: return cgGetProfileString (p);
+    }
+  }
   
   static GLenum GetProgramIntegerTarget (CGprofile profile)
   {
@@ -323,7 +332,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_END
 #undef LIMIT
 
-    csString ret (cgGetProfileString (profile));
+    csString ret (GetProfileString (profile));
     ret.AppendFmt (".%s",
       CS::PluginCommon::ShaderProgramPluginGL::VendorToString (vendor));
 #define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) ret.AppendFmt (".%u", Limit);
@@ -363,7 +372,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_END
 #undef LIMIT
 
-    csString ret (cgGetProfileString (profile));
+    csString ret (GetProfileString (profile));
     ret.AppendFmt (" %s",
       CS::PluginCommon::ShaderProgramPluginGL::VendorToString (vendor));
 #define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) \
