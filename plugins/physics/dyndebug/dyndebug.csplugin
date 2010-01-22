@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- dyndebug.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.dynamics.debug</name>
+        <implementation>DebuggerManager</implementation>
+        <description>Debugging of physical simulations</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
