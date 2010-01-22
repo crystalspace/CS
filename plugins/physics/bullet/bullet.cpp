@@ -241,44 +241,25 @@ public:
 //---------------------------------------------------------------------------
 
 csBulletDynamics::csBulletDynamics (iBase *iParent)
-  : scfImplementationType (this, iParent), dispatcher (0),
-    configuration (0), solver (0), broadphase (0)
+  : scfImplementationType (this, iParent)
 {
 }
 
 csBulletDynamics::~csBulletDynamics ()
 {
   systems.DeleteAll ();
-  delete dispatcher;
-  delete configuration;
-  delete solver;
-  delete broadphase;
 }
 
 bool csBulletDynamics::Initialize (iObjectRegistry* object_reg)
 {
   csBulletDynamics::object_reg = object_reg;
-
-  configuration = new btDefaultCollisionConfiguration ();
-  dispatcher = new btCollisionDispatcher (configuration);
-  solver = new btSequentialImpulseConstraintSolver;
-
-  const int maxProxies = 32766;
-  // TODO: these AABB values will not fit to every worlds
-  btVector3 worldAabbMin (-1000.0f, -1000.0f, -1000.0f);
-  btVector3 worldAabbMax (1000.0f, 1000.0f, 1000.0f);
-  broadphase = new btAxisSweep3 (worldAabbMin, worldAabbMax, maxProxies);
-
   return true;
 }
 
 csPtr<iDynamicSystem> csBulletDynamics::CreateSystem ()
 {
-  btDynamicsWorld* world = new btDiscreteDynamicsWorld (dispatcher,
-      broadphase, solver, configuration);
-
   csRef<csBulletDynamicsSystem> system;
-  system.AttachNew (new csBulletDynamicsSystem (world, object_reg));
+  system.AttachNew (new csBulletDynamicsSystem (object_reg));
   systems.Push (system);
 
   return csPtr<iDynamicSystem> (system);
@@ -384,14 +365,30 @@ public:
 
 //----------------------- csBulletDynamicsSystem ----------------------------
 
-csBulletDynamicsSystem::csBulletDynamicsSystem (btDynamicsWorld* world,
-    iObjectRegistry* object_reg)
-  : scfImplementationType (this), bulletWorld (world), gimpactRegistered (false),
-    debugDraw (0)
+csBulletDynamicsSystem::csBulletDynamicsSystem
+  (iObjectRegistry* object_reg)
+  : scfImplementationType (this), gimpactRegistered (false), debugDraw (0)
 {
-  moveCb.AttachNew (new csBulletDefaultMoveCallback ());
+  // create base Bullet objects
+  configuration = new btDefaultCollisionConfiguration ();
+  dispatcher = new btCollisionDispatcher (configuration);
+  solver = new btSequentialImpulseConstraintSolver;
+
+  const int maxProxies = 32766;
+  // TODO: these AABB values will not fit to every worlds
+  btVector3 worldAabbMin (-1000.0f, -1000.0f, -1000.0f);
+  btVector3 worldAabbMax (1000.0f, 1000.0f, 1000.0f);
+  broadphase = new btAxisSweep3 (worldAabbMin, worldAabbMax, maxProxies);
+
+  // create dynamics world
+  bulletWorld = new btDiscreteDynamicsWorld (dispatcher,
+      broadphase, solver, configuration);
   SetGravity (csVector3 (0.0f, -9.81f, 0.0f));
 
+  // register default callback
+  moveCb.AttachNew (new csBulletDefaultMoveCallback ());
+
+  // init string IDs
   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
       object_reg, "crystalspace.shared.stringset");
   baseId = strings->Request ("base");
@@ -403,8 +400,13 @@ csBulletDynamicsSystem::~csBulletDynamicsSystem ()
   joints.DeleteAll ();
   dynamicBodies.DeleteAll ();
   colliderBodies.DeleteAll ();
+
   delete bulletWorld;
   delete debugDraw;
+  delete dispatcher;
+  delete configuration;
+  delete solver;
+  delete broadphase;
 }
 
 void csBulletDynamicsSystem::SetGravity (const csVector3& v)
@@ -1084,6 +1086,7 @@ bool csBulletRigidBody::MakeDynamic (void)
     body->setActivationState(ACTIVE_TAG);
     body->setLinearVelocity (btVector3 (0.0f, 0.0f, 0.0f));
     body->setAngularVelocity (btVector3 (0.0f, 0.0f, 0.0f));
+    // TODO: no need for updateInertiaTensor();? or instead use inertia = btVector3(0,0,0)?
 
     // put body back in world
     dynSys->bulletWorld->addRigidBody (body);

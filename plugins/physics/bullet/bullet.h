@@ -80,11 +80,6 @@ private:
   csRefArrayObject<iDynamicSystem> systems;
   csRefArray<iDynamicsStepCallback> stepCallbacks;
 
-  btCollisionDispatcher* dispatcher;
-  btDefaultCollisionConfiguration* configuration;
-  btSequentialImpulseConstraintSolver* solver;
-  btBroadphaseInterface* broadphase;
-
 public:
   csBulletDynamics (iBase *iParent);
   virtual ~csBulletDynamics ();
@@ -113,6 +108,11 @@ class csBulletDynamicsSystem : public scfImplementationExt2<
 
 private:
   btDynamicsWorld* bulletWorld;
+  btCollisionDispatcher* dispatcher;
+  btDefaultCollisionConfiguration* configuration;
+  btSequentialImpulseConstraintSolver* solver;
+  btBroadphaseInterface* broadphase;
+
   csRefArrayObject<iRigidBody> dynamicBodies;
   csRefArrayObject<iRigidBody> colliderBodies;
   csRefArray<iJoint> joints;
@@ -125,12 +125,11 @@ private:
 
   csBulletDebugDraw* debugDraw;
   void CheckCollisions();
-  void CheckCollision(csBulletRigidBody& cs_obA,btCollisionObject *obB,
+  void CheckCollision(csBulletRigidBody& cs_obA, btCollisionObject *obB,
 		      btPersistentManifold &contactManifold);
 
 public:
-  csBulletDynamicsSystem (btDynamicsWorld* world,
-      iObjectRegistry* object_reg);
+  csBulletDynamicsSystem (iObjectRegistry* object_reg);
   virtual ~csBulletDynamicsSystem ();
 
   //-- iDynamicsSystem
