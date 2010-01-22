@@ -2354,8 +2354,12 @@ class iParticleBuiltinEffectorLinColor(iParticleEffector):
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def AddColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_AddColor(*args)
+    def RemoveColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_RemoveColor(*args)
+    def Clear(*args): return _imesh.iParticleBuiltinEffectorLinColor_Clear(*args)
     def SetColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_SetColor(*args)
+    def SetEndTTL(*args): return _imesh.iParticleBuiltinEffectorLinColor_SetEndTTL(*args)
     def GetColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_GetColor(*args)
+    def GetEndTTL(*args): return _imesh.iParticleBuiltinEffectorLinColor_GetEndTTL(*args)
     def GetColorCount(*args): return _imesh.iParticleBuiltinEffectorLinColor_GetColorCount(*args)
     scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorLinColor_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorLinColor
@@ -2414,8 +2418,12 @@ class iParticleBuiltinEffectorLinear(iParticleEffector):
     def SetMask(*args): return _imesh.iParticleBuiltinEffectorLinear_SetMask(*args)
     def GetMask(*args): return _imesh.iParticleBuiltinEffectorLinear_GetMask(*args)
     def AddParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_AddParameterSet(*args)
+    def RemoveParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_RemoveParameterSet(*args)
+    def Clear(*args): return _imesh.iParticleBuiltinEffectorLinear_Clear(*args)
     def SetParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_SetParameterSet(*args)
+    def SetEndTTL(*args): return _imesh.iParticleBuiltinEffectorLinear_SetEndTTL(*args)
     def GetParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_GetParameterSet(*args)
+    def GetEndTTL(*args): return _imesh.iParticleBuiltinEffectorLinear_GetEndTTL(*args)
     def GetParameterSetCount(*args): return _imesh.iParticleBuiltinEffectorLinear_GetParameterSetCount(*args)
     scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorLinear_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorLinear

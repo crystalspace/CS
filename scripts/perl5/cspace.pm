@@ -18920,8 +18920,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *AddColor = *cspacec::iParticleBuiltinEffectorLinColor_AddColor;
+*RemoveColor = *cspacec::iParticleBuiltinEffectorLinColor_RemoveColor;
+*Clear = *cspacec::iParticleBuiltinEffectorLinColor_Clear;
 *SetColor = *cspacec::iParticleBuiltinEffectorLinColor_SetColor;
+*SetEndTTL = *cspacec::iParticleBuiltinEffectorLinColor_SetEndTTL;
 *GetColor = *cspacec::iParticleBuiltinEffectorLinColor_GetColor;
+*GetEndTTL = *cspacec::iParticleBuiltinEffectorLinColor_GetEndTTL;
 *GetColorCount = *cspacec::iParticleBuiltinEffectorLinColor_GetColorCount;
 *scfGetVersion = *cspacec::iParticleBuiltinEffectorLinColor_scfGetVersion;
 sub DESTROY {
@@ -19045,8 +19049,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetMask = *cspacec::iParticleBuiltinEffectorLinear_SetMask;
 *GetMask = *cspacec::iParticleBuiltinEffectorLinear_GetMask;
 *AddParameterSet = *cspacec::iParticleBuiltinEffectorLinear_AddParameterSet;
+*RemoveParameterSet = *cspacec::iParticleBuiltinEffectorLinear_RemoveParameterSet;
+*Clear = *cspacec::iParticleBuiltinEffectorLinear_Clear;
 *SetParameterSet = *cspacec::iParticleBuiltinEffectorLinear_SetParameterSet;
+*SetEndTTL = *cspacec::iParticleBuiltinEffectorLinear_SetEndTTL;
 *GetParameterSet = *cspacec::iParticleBuiltinEffectorLinear_GetParameterSet;
+*GetEndTTL = *cspacec::iParticleBuiltinEffectorLinear_GetEndTTL;
 *GetParameterSetCount = *cspacec::iParticleBuiltinEffectorLinear_GetParameterSetCount;
 *scfGetVersion = *cspacec::iParticleBuiltinEffectorLinear_scfGetVersion;
 sub DESTROY {

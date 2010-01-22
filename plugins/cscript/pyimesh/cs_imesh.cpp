@@ -47359,6 +47359,57 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_RemoveColor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorLinColor *arg1 = (iParticleBuiltinEffectorLinColor *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinColor_RemoveColor",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinColor_RemoveColor" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinColor *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorLinColor * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorLinColor_RemoveColor" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  (arg1)->RemoveColor(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_Clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorLinColor *arg1 = (iParticleBuiltinEffectorLinColor *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinColor_Clear",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinColor_Clear" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinColor *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorLinColor * >(argp1);
+  (arg1)->Clear();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_SetColor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iParticleBuiltinEffectorLinColor *arg1 = (iParticleBuiltinEffectorLinColor *) 0 ;
@@ -47401,7 +47452,46 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_GetColor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_SetEndTTL(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorLinColor *arg1 = (iParticleBuiltinEffectorLinColor *) 0 ;
+  size_t arg2 ;
+  float arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinColor_SetEndTTL",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinColor_SetEndTTL" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinColor *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorLinColor * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorLinColor_SetEndTTL" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iParticleBuiltinEffectorLinColor_SetEndTTL" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  (arg1)->SetEndTTL(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_GetColor__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iParticleBuiltinEffectorLinColor *arg1 = (iParticleBuiltinEffectorLinColor *) 0 ;
   size_t arg2 ;
@@ -47449,6 +47539,131 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_GetColor(PyObject *S
   arg4 = reinterpret_cast< float * >(argp4);
   ((iParticleBuiltinEffectorLinColor const *)arg1)->GetColor(arg2,*arg3,*arg4);
   resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_GetColor__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorLinColor *arg1 = (iParticleBuiltinEffectorLinColor *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  csColor4 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinColor_GetColor",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinColor_GetColor" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinColor const *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorLinColor * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorLinColor_GetColor" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  {
+    csColor4 const &_result_ref = ((iParticleBuiltinEffectorLinColor const *)arg1)->GetColor(arg2);
+    result = (csColor4 *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csColor4, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_GetColor(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_iParticleBuiltinEffectorLinColor_GetColor__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csColor4, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_float, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            return _wrap_iParticleBuiltinEffectorLinColor_GetColor__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iParticleBuiltinEffectorLinColor_GetColor'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GetColor(iParticleBuiltinEffectorLinColor const *,size_t,csColor4 &,float &)\n"
+    "    GetColor(iParticleBuiltinEffectorLinColor const *,size_t)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_GetEndTTL(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorLinColor *arg1 = (iParticleBuiltinEffectorLinColor *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  float result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinColor_GetEndTTL",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinColor_GetEndTTL" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinColor const *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorLinColor * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorLinColor_GetEndTTL" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = (float)((iParticleBuiltinEffectorLinColor const *)arg1)->GetEndTTL(arg2);
+  resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
   return NULL;
@@ -48202,6 +48417,57 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinear_RemoveParameterSet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorLinear *arg1 = (iParticleBuiltinEffectorLinear *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinear_RemoveParameterSet",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinear, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinear_RemoveParameterSet" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinear *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorLinear * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorLinear_RemoveParameterSet" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  (arg1)->RemoveParameterSet(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinear_Clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorLinear *arg1 = (iParticleBuiltinEffectorLinear *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinear_Clear",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinear, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinear_Clear" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinear *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorLinear * >(argp1);
+  (arg1)->Clear();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinear_SetParameterSet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iParticleBuiltinEffectorLinear *arg1 = (iParticleBuiltinEffectorLinear *) 0 ;
@@ -48244,7 +48510,46 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinear_GetParameterSet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinear_SetEndTTL(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorLinear *arg1 = (iParticleBuiltinEffectorLinear *) 0 ;
+  size_t arg2 ;
+  float arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinear_SetEndTTL",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinear, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinear_SetEndTTL" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinear *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorLinear * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorLinear_SetEndTTL" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iParticleBuiltinEffectorLinear_SetEndTTL" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  (arg1)->SetEndTTL(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinear_GetParameterSet__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iParticleBuiltinEffectorLinear *arg1 = (iParticleBuiltinEffectorLinear *) 0 ;
   size_t arg2 ;
@@ -48292,6 +48597,131 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinear_GetParameterSet(PyObje
   arg4 = reinterpret_cast< float * >(argp4);
   ((iParticleBuiltinEffectorLinear const *)arg1)->GetParameterSet(arg2,*arg3,*arg4);
   resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinear_GetParameterSet__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorLinear *arg1 = (iParticleBuiltinEffectorLinear *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  csParticleParameterSet *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinear_GetParameterSet",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinear, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinear_GetParameterSet" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinear const *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorLinear * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorLinear_GetParameterSet" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  {
+    csParticleParameterSet const &_result_ref = ((iParticleBuiltinEffectorLinear const *)arg1)->GetParameterSet(arg2);
+    result = (csParticleParameterSet *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csParticleParameterSet, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinear_GetParameterSet(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iParticleBuiltinEffectorLinear, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_iParticleBuiltinEffectorLinear_GetParameterSet__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iParticleBuiltinEffectorLinear, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csParticleParameterSet, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_float, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            return _wrap_iParticleBuiltinEffectorLinear_GetParameterSet__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iParticleBuiltinEffectorLinear_GetParameterSet'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GetParameterSet(iParticleBuiltinEffectorLinear const *,size_t,csParticleParameterSet &,float &)\n"
+    "    GetParameterSet(iParticleBuiltinEffectorLinear const *,size_t)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinear_GetEndTTL(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorLinear *arg1 = (iParticleBuiltinEffectorLinear *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  float result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinear_GetEndTTL",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinear, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinear_GetEndTTL" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinear const *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorLinear * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorLinear_GetEndTTL" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = (float)((iParticleBuiltinEffectorLinear const *)arg1)->GetEndTTL(arg2);
+  resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
   return NULL;
@@ -49895,8 +50325,12 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_iParticleBuiltinEffectorForce", _wrap_delete_iParticleBuiltinEffectorForce, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorForce_swigregister", iParticleBuiltinEffectorForce_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinColor_AddColor", _wrap_iParticleBuiltinEffectorLinColor_AddColor, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorLinColor_RemoveColor", _wrap_iParticleBuiltinEffectorLinColor_RemoveColor, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorLinColor_Clear", _wrap_iParticleBuiltinEffectorLinColor_Clear, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinColor_SetColor", _wrap_iParticleBuiltinEffectorLinColor_SetColor, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorLinColor_SetEndTTL", _wrap_iParticleBuiltinEffectorLinColor_SetEndTTL, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinColor_GetColor", _wrap_iParticleBuiltinEffectorLinColor_GetColor, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorLinColor_GetEndTTL", _wrap_iParticleBuiltinEffectorLinColor_GetEndTTL, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinColor_GetColorCount", _wrap_iParticleBuiltinEffectorLinColor_GetColorCount, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinColor_scfGetVersion", _wrap_iParticleBuiltinEffectorLinColor_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iParticleBuiltinEffectorLinColor", _wrap_delete_iParticleBuiltinEffectorLinColor, METH_VARARGS, NULL},
@@ -49928,8 +50362,12 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iParticleBuiltinEffectorLinear_SetMask", _wrap_iParticleBuiltinEffectorLinear_SetMask, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinear_GetMask", _wrap_iParticleBuiltinEffectorLinear_GetMask, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinear_AddParameterSet", _wrap_iParticleBuiltinEffectorLinear_AddParameterSet, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorLinear_RemoveParameterSet", _wrap_iParticleBuiltinEffectorLinear_RemoveParameterSet, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorLinear_Clear", _wrap_iParticleBuiltinEffectorLinear_Clear, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinear_SetParameterSet", _wrap_iParticleBuiltinEffectorLinear_SetParameterSet, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorLinear_SetEndTTL", _wrap_iParticleBuiltinEffectorLinear_SetEndTTL, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinear_GetParameterSet", _wrap_iParticleBuiltinEffectorLinear_GetParameterSet, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorLinear_GetEndTTL", _wrap_iParticleBuiltinEffectorLinear_GetEndTTL, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinear_GetParameterSetCount", _wrap_iParticleBuiltinEffectorLinear_GetParameterSetCount, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorLinear_scfGetVersion", _wrap_iParticleBuiltinEffectorLinear_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iParticleBuiltinEffectorLinear", _wrap_delete_iParticleBuiltinEffectorLinear, METH_VARARGS, NULL},
