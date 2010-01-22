@@ -42,6 +42,7 @@ typedef csTuple2<float, float> csDualNumber;
  * Dual quaternion is a combination
  * q = q0 + e*qe where e is the dual identity element (e^2 = 0)
  * For the background, read "Preliminary Sketch of Biquaternions" [W Clifford, 1873]
+ * \sa csQuaternion
  */
 class csDualQuaternion
 {
