@@ -376,7 +376,7 @@ bool Simple::OnKeyboard (iEvent &ev)
     {
       // Toggle dynamic system visual debug mode
       debugMode = !debugMode;
-      dynSysDebugger.SetDebugDisplayMode (debugMode);
+      dynamicsDebugger->SetDebugDisplayMode (debugMode);
 
       // Hide the last ragdoll mesh if any
       if (ragdollMesh)
@@ -530,6 +530,8 @@ bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug",
+		       iDynamicsDebuggerManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll",
 		       iSkeletonRagdollManager2),
     CS_REQUEST_END))
@@ -574,28 +576,35 @@ bool Simple::Application ()
     return ReportError ("Error opening system!");
 
   g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry ());
-  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+  if (!g3d) return ReportError ("Failed to locate 3D renderer!");
 
   engine = csQueryRegistry<iEngine> (GetObjectRegistry ());
-  if (!engine) return ReportError("Failed to locate 3D engine!");
+  if (!engine) return ReportError ("Failed to locate 3D engine!");
 
   vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry ());
-  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+  if (!vc) return ReportError ("Failed to locate Virtual Clock!");
 
   kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry ());
-  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+  if (!kbd) return ReportError ("Failed to locate Keyboard Driver!");
 
   loader = csQueryRegistry<iLoader> (GetObjectRegistry ());
-  if (!loader) return ReportError("Failed to locate Loader!");
+  if (!loader) return ReportError ("Failed to locate Loader!");
 
   g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
-  if (!g2d) return ReportError("Failed to locate 2D renderer!");
+  if (!g2d) return ReportError ("Failed to locate 2D renderer!");
 
-  ragdollManager = csQueryRegistry<iSkeletonRagdollManager2> (GetObjectRegistry ());
-  if (!ragdollManager) return ReportError("Failed to locate ragdoll manager!");
+  debuggerManager =
+    csQueryRegistry<iDynamicsDebuggerManager> (GetObjectRegistry ());
+  if (!debuggerManager)
+    return ReportError ("Failed to locate dynamic's debug manager!");
+
+  ragdollManager =
+    csQueryRegistry<iSkeletonRagdollManager2> (GetObjectRegistry ());
+  if (!ragdollManager)
+    return ReportError ("Failed to locate ragdoll manager!");
 
   csRef<iFontServer> fs = g3d->GetDriver2D()->GetFontServer ();
-  if (!fs) return ReportError("Failed to locate font server!");
+  if (!fs) return ReportError ("Failed to locate font server!");
   courierFont = fs->LoadFont (CSFONT_COURIER);
 
   // Create the dynamic system
@@ -605,8 +614,9 @@ bool Simple::Application ()
   dynSys->SetGravity (csVector3 (0,-7,0));
   dynSys->SetRollingDampener(.995f);
 
-  dynSysDebugger.SetObjectRegistry (GetObjectRegistry ());
-  dynSysDebugger.SetDynamicSystem (dynSys);
+  // Create the dynamic's debugger
+  dynamicsDebugger = debuggerManager->CreateDebugger ();
+  dynamicsDebugger->SetDynamicSystem (dynSys);
 
   if (phys_engine_id == ODE_ID)
   {
@@ -622,7 +632,7 @@ bool Simple::Application ()
 
   // Creating the scene's room
   room = engine->CreateSector ("room");
-  dynSysDebugger.SetDebugSector (room);
+  dynamicsDebugger->SetDebugSector (room);
 
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);

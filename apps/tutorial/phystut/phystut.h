@@ -21,7 +21,7 @@
 
 #include <stdarg.h>
 #include <crystalspace.h>
-#include "dynsysdebug.h"
+#include "ivaria/dynamicsdebug.h"
 
 class Simple : public csApplicationFramework, public csBaseEventHandler
 {
@@ -38,10 +38,14 @@ private:
   csRef<FramePrinter> printer;
   csRef<iFont> courierFont;
 
-  // Pointers to main data
+  // Physics related
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;
   csRef<iBulletDynamicSystem> bullet_dynSys;
+  csRef<iDynamicsDebuggerManager> debuggerManager;
+  csRef<iDynamicSystemDebugger> dynamicsDebugger;
+
+  // Meshes
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
   csRef<iMeshWrapper> walls;
@@ -56,7 +60,6 @@ private:
   float remainingStepDuration;
 
   // Dynamic simulation related
-  csDynamicSystemDebugger dynSysDebugger;
   bool debugMode;
   bool allStatic;
   bool pauseDynamic;
