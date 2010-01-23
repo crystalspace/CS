@@ -614,7 +614,7 @@ bool csGLShader_CG::Open()
       currentLimits.fp = limits;
       strictMatchFP = forceBestProfile;
     }
-    enableFP = currentLimits.vp.profile != CG_PROFILE_UNKNOWN;
+    enableFP = currentLimits.fp.profile != CG_PROFILE_UNKNOWN;
     if (doVerbose)
     {
       if (enableFP)
