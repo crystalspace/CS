@@ -32,13 +32,13 @@ struct iDynamicSystem;
 struct iSector;
 struct iMeshWrapper;
 struct iMaterialWrapper;
-struct csOrthoTransform;
-struct csBox3;
-struct csSphere;
-class DynamicsDebugger;
+class csOrthoTransform;
+class csBox3;
+class csSphere;
 
 CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 {
+  class DynamicsDebugger;
 
   class DebuggerManager : public scfImplementation2<DebuggerManager,
     iDynamicsDebuggerManager, iComponent>
