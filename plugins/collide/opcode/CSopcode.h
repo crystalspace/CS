@@ -66,8 +66,14 @@ class csOPCODECollideSystem :
 public:
   Opcode::AABBTreeCollider TreeCollider;
   Opcode::RayCollider RayCol;
+  Opcode::LSSCollider LSSCol;
+  Opcode::OBBCollider OBBCol;
   Opcode::BVTCache ColCache;
+  Opcode::LSSCache LSSCache;
+  Opcode::OBBCache OBBCache;
 
+  IceMaths::Matrix4x4 identity_matrix;
+  
   csDirtyAccessArray<csCollisionPair> pairs;
   csArray<int> collision_faces;
   csArray<csIntersectingTriangle> intersecting_triangles;
@@ -128,6 +134,41 @@ public:
   {
     return CollideRaySegment (collider, trans, start, end, false);
   }
+  
+  virtual bool CollideLSS (
+  	iCollider* collider, const csReversibleTransform* trans1,
+	const csVector3& start, const csVector3& end, float radius,
+  	const csReversibleTransform* trans2);
+  bool CollideLSS (
+  	csOPCODECollider* collider, const csReversibleTransform* trans1,
+	const csVector3& start, const csVector3& end, float radius,
+  	const csReversibleTransform* trans2);
+  bool CollideLSS (
+  	iTerrainSystem* terrain, const csReversibleTransform* trans1,
+	const csVector3& start, const csVector3& end, float radius,
+  	const csReversibleTransform* trans2);
+  bool CollideLSS (
+  	csTerraFormerCollider* terraformer, const csReversibleTransform* trans1,
+	const csVector3& start, const csVector3& end, float radius,
+  	const csReversibleTransform* trans2);
+  
+  virtual bool CollideOBB (
+  	iCollider* collider, const csReversibleTransform* trans1,
+  	const csVector3& min, const csVector3& max,
+  	const csReversibleTransform* trans2);
+  bool CollideOBB (
+  	csOPCODECollider* collider, const csReversibleTransform* trans1,
+  	const csVector3& min, const csVector3& max,
+  	const csReversibleTransform* trans2);
+  bool CollideOBB (
+  	iTerrainSystem* terrain, const csReversibleTransform* trans1,
+  	const csVector3& min, const csVector3& max,
+  	const csReversibleTransform* trans2);
+  bool CollideOBB (
+  	csTerraFormerCollider* terraformer, const csReversibleTransform* trans1,
+  	const csVector3& min, const csVector3& max,
+  	const csReversibleTransform* trans2);
+  
   virtual const csArray<csIntersectingTriangle>& GetIntersectingTriangles ()
   	const
   {

@@ -87,6 +87,8 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent) :
   TreeCollider.SetTemporalCoherence (true);
 
   RayCol.SetCulling (false);
+  
+  identity_matrix.Identity();
 }
 
 csOPCODECollideSystem::~csOPCODECollideSystem ()
@@ -671,6 +673,298 @@ bool csOPCODECollideSystem::CollideRaySegment (
   {
     return CollideRaySegment ((csTerraFormerCollider*) collider,
 	trans, start, end, use_ray);
+  }
+  return false;
+}
+
+bool csOPCODECollideSystem::CollideLSS (
+  	csOPCODECollider* col, const csReversibleTransform* trans1,
+  	const csVector3& start, const csVector3& end, float radius,
+  	const csReversibleTransform* trans2)
+{
+  csMatrix3 m1;
+  if (trans1) m1 = trans1->GetT2O ();
+  csMatrix3 m2;
+  if (trans2) m2 = trans2->GetT2O ();
+  csVector3 u;
+
+  IceMaths::Matrix4x4 transform1;
+  transform1.m[0][3] = 0;
+  transform1.m[1][3] = 0;
+  transform1.m[2][3] = 0;
+  transform1.m[3][3] = 1;
+  IceMaths::Matrix4x4 transform2;
+  transform2.m[0][3] = 0;
+  transform2.m[1][3] = 0;
+  transform2.m[2][3] = 0;
+  transform2.m[3][3] = 1;
+
+  u = m1.Row1 ();
+  transform1.m[0][0] = u.x;
+  transform1.m[1][0] = u.y;
+  transform1.m[2][0] = u.z;
+  u = m2.Row1 ();
+  transform2.m[0][0] = u.x;
+  transform2.m[1][0] = u.y;
+  transform2.m[2][0] = u.z;
+  u = m1.Row2 ();
+  transform1.m[0][1] = u.x;
+  transform1.m[1][1] = u.y;
+  transform1.m[2][1] = u.z;
+  u = m2.Row2 ();
+  transform2.m[0][1] = u.x;
+  transform2.m[1][1] = u.y;
+  transform2.m[2][1] = u.z;
+  u = m1.Row3 ();
+  transform1.m[0][2] = u.x;
+  transform1.m[1][2] = u.y;
+  transform1.m[2][2] = u.z;
+  u = m2.Row3();
+  transform2.m[0][2] = u.x;
+  transform2.m[1][2] = u.y;
+  transform2.m[2][2] = u.z;
+
+  if (trans1) u = trans1->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
+  transform1.m[3][0] = u.x;
+  transform1.m[3][1] = u.y;
+  transform1.m[3][2] = u.z;
+
+  if (trans2) u = trans2->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
+  transform2.m[3][0] = u.x;
+  transform2.m[3][1] = u.y;
+  transform2.m[3][2] = u.z;
+  
+  LSS capsule(Segment(Point (start.x, start.y, start.z),
+  	   Point (end.x, end.y, end.z)), radius);
+
+  intersecting_triangles.SetSize (0);
+  collision_faces.SetSize (0);
+  bool isOk = LSSCol.Collide (LSSCache, capsule, *col->m_pCollisionModel, &transform2, &transform1);
+  if (isOk)
+  {
+    bool status = (LSSCol.GetContactStatus () != FALSE);
+    if (status)
+    {
+      udword ntouched_primitives = LSSCol.GetNbTouchedPrimitives();
+      const	udword* touched_primitives = LSSCol.GetTouchedPrimitives();
+      
+      // Now calculate the real intersection points for all hit faces.
+      Point* vertholder = col->vertholder;
+      if (!vertholder) return true;
+      udword* indexholder = col->indexholder;
+      if (!indexholder) return true;
+      if (ntouched_primitives == 0) return false;
+      Point* c;
+      
+      udword i;
+      for (i = 0 ; i < ntouched_primitives ; i++)
+      {
+        int idx = touched_primitives[i] * 3;
+        int it_idx = (int)intersecting_triangles.Push (csIntersectingTriangle ());
+        c = &vertholder[indexholder[idx+0]];
+        intersecting_triangles[it_idx].a.Set (c->x, c->y, c->z);
+        c = &vertholder[indexholder[idx+1]];
+        intersecting_triangles[it_idx].b.Set (c->x, c->y, c->z);
+        c = &vertholder[indexholder[idx+2]];
+        intersecting_triangles[it_idx].c.Set (c->x, c->y, c->z);
+      }
+    }
+    return status;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool csOPCODECollideSystem::CollideLSS (
+	iTerrainSystem* terrain, const csReversibleTransform* trans1,
+	const csVector3& start, const csVector3& end, float radius,
+	const csReversibleTransform* trans2)
+{
+	// TODO: To be implemented!
+	return false;
+}
+bool csOPCODECollideSystem::CollideLSS (
+	csTerraFormerCollider* terraformer, const csReversibleTransform* trans1,
+	const csVector3& start, const csVector3& end, float radius,
+	const csReversibleTransform* trans2)
+{
+	// TODO: To be implemented!
+	return false;
+}
+
+
+bool csOPCODECollideSystem::CollideLSS (
+  	iCollider* collider, const csReversibleTransform* trans1,
+	const csVector3& start, const csVector3& end, float radius,
+  	const csReversibleTransform* trans2)
+{
+  if (!collider) return false;
+  if (collider->GetColliderType () == CS_MESH_COLLIDER)
+  {
+    return CollideLSS ((csOPCODECollider*) collider,
+	trans1, start, end, radius, trans2);
+  }
+  else if (collider->GetColliderType () == CS_TERRAIN_COLLIDER)
+  {
+    csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (
+	  collider);
+    return CollideLSS (terrain, trans1, start, end, radius, trans2);
+  }
+  else if (collider->GetColliderType () == CS_TERRAFORMER_COLLIDER)
+  {
+    return CollideLSS ((csTerraFormerCollider*) collider,
+	trans1, start, end, radius, trans2);
+  }
+  return false;
+}
+
+bool csOPCODECollideSystem::CollideOBB (
+  	csOPCODECollider* col, const csReversibleTransform* trans1,
+  	const csVector3& min, const csVector3& max,
+  	const csReversibleTransform* trans2)
+{
+  csMatrix3 m1;
+  if (trans1) m1 = trans1->GetT2O ();
+  csMatrix3 m2;
+  if (trans2) m2 = trans2->GetT2O ();
+  csVector3 u;
+
+  IceMaths::Matrix4x4 transform1;
+  transform1.m[0][3] = 0;
+  transform1.m[1][3] = 0;
+  transform1.m[2][3] = 0;
+  transform1.m[3][3] = 1;
+  IceMaths::Matrix4x4 transform2;
+  transform2.m[0][3] = 0;
+  transform2.m[1][3] = 0;
+  transform2.m[2][3] = 0;
+  transform2.m[3][3] = 1;
+
+  u = m1.Row1 ();
+  transform1.m[0][0] = u.x;
+  transform1.m[1][0] = u.y;
+  transform1.m[2][0] = u.z;
+  u = m2.Row1 ();
+  transform2.m[0][0] = u.x;
+  transform2.m[1][0] = u.y;
+  transform2.m[2][0] = u.z;
+  u = m1.Row2 ();
+  transform1.m[0][1] = u.x;
+  transform1.m[1][1] = u.y;
+  transform1.m[2][1] = u.z;
+  u = m2.Row2 ();
+  transform2.m[0][1] = u.x;
+  transform2.m[1][1] = u.y;
+  transform2.m[2][1] = u.z;
+  u = m1.Row3 ();
+  transform1.m[0][2] = u.x;
+  transform1.m[1][2] = u.y;
+  transform1.m[2][2] = u.z;
+  u = m2.Row3();
+  transform2.m[0][2] = u.x;
+  transform2.m[1][2] = u.y;
+  transform2.m[2][2] = u.z;
+
+  if (trans1) u = trans1->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
+  transform1.m[3][0] = u.x;
+  transform1.m[3][1] = u.y;
+  transform1.m[3][2] = u.z;
+
+  if (trans2) u = trans2->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
+  transform2.m[3][0] = u.x;
+  transform2.m[3][1] = u.y;
+  transform2.m[3][2] = u.z;
+  
+  AABB box;
+  box.SetMinMax(Point (min.x, min.y, min.z),
+		  Point (max.x, max.y, max.z));
+  OBB obb_box;
+  obb_box.Create(box, identity_matrix);
+
+  intersecting_triangles.SetSize (0);
+  collision_faces.SetSize (0);
+  bool isOk = OBBCol.Collide (OBBCache, obb_box, *col->m_pCollisionModel, &transform2, &transform1);
+  if (isOk)
+  {
+    bool status = (OBBCol.GetContactStatus () != FALSE);
+    if (status)
+    {
+      udword ntouched_primitives = OBBCol.GetNbTouchedPrimitives();
+      const	udword* touched_primitives = OBBCol.GetTouchedPrimitives();
+      
+      // Now calculate the real intersection points for all hit faces.
+      Point* vertholder = col->vertholder;
+      if (!vertholder) return true;
+      udword* indexholder = col->indexholder;
+      if (!indexholder) return true;
+      if (ntouched_primitives == 0) return false;
+      Point* c;
+      
+      udword i;
+      for (i = 0 ; i < ntouched_primitives ; i++)
+      {
+        int idx = touched_primitives[i] * 3;
+        int it_idx = (int)intersecting_triangles.Push (csIntersectingTriangle ());
+        c = &vertholder[indexholder[idx+0]];
+        intersecting_triangles[it_idx].a.Set (c->x, c->y, c->z);
+        c = &vertholder[indexholder[idx+1]];
+        intersecting_triangles[it_idx].b.Set (c->x, c->y, c->z);
+        c = &vertholder[indexholder[idx+2]];
+        intersecting_triangles[it_idx].c.Set (c->x, c->y, c->z);
+      }
+    }
+    return status;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool csOPCODECollideSystem::CollideOBB (
+	iTerrainSystem* terrain, const csReversibleTransform* trans1,
+	const csVector3& min, const csVector3& max,
+	const csReversibleTransform* trans2)
+{
+	// TODO: To be implemented!
+	return false;
+}
+bool csOPCODECollideSystem::CollideOBB (
+	csTerraFormerCollider* terraformer, const csReversibleTransform* trans1,
+	const csVector3& min, const csVector3& max,
+	const csReversibleTransform* trans2)
+{
+	// TODO: To be implemented!
+	return false;
+}
+
+bool csOPCODECollideSystem::CollideOBB (
+  	iCollider* collider, const csReversibleTransform* trans1,
+  	const csVector3& min, const csVector3& max,
+  	const csReversibleTransform* trans2)
+{
+  if (!collider) return false;
+  if (collider->GetColliderType () == CS_MESH_COLLIDER)
+  {
+    return CollideOBB ((csOPCODECollider*) collider,
+	trans1, min, max, trans2);
+  }
+  else if (collider->GetColliderType () == CS_TERRAIN_COLLIDER)
+  {
+    csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (
+	  collider);
+    return CollideOBB (terrain, trans1, min, max, trans2);
+  }
+  else if (collider->GetColliderType () == CS_TERRAFORMER_COLLIDER)
+  {
+    return CollideOBB ((csTerraFormerCollider*) collider,
+	trans1, min, max, trans2);
   }
   return false;
 }
