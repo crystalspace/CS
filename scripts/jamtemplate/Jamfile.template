@@ -86,12 +86,12 @@ if $(CEL.DESIRED) = yes
     [ ConcatDirs "$(hash)(CEL)" include ]
     [ ConcatDirs "$(hash)(CEL)" include cel ] ;
   MsvcGenConfig CEL.LIBDIRS :
-    [ ConcatDirs .. .. .. cel out release libs ]
-    [ ConcatDirs "$(hash)(CEL)" out release libs ]
+    [ ConcatDirs .. .. .. cel out release$(MSVC_VERSION) libs ]
+    [ ConcatDirs "$(hash)(CEL)" out release$(MSVC_VERSION) libs ]
     [ ConcatDirs "$(hash)(CEL)" libs ] ;
   MsvcGenConfig CEL.LIBDIRS.DEBUG :
-    [ ConcatDirs .. .. .. cel out debug libs ]
-    [ ConcatDirs "$(hash)(CEL)" out debug libs ]
+    [ ConcatDirs .. .. .. cel out debug$(MSVC_VERSION) libs ]
+    [ ConcatDirs "$(hash)(CEL)" out debug$(MSVC_VERSION) libs ]
     [ ConcatDirs "$(hash)(CEL)" libs ] ;
 }
 
