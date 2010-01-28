@@ -339,7 +339,7 @@ void csConsoleInput::Refresh ()
   Console->PutText ("\r");
   Console->PutText ("%s", Prompt);
   Console->PutText ("%s", line.GetData ());
-  Console->SetCursorPos ((int)(PromptLen + vCursorPos));
+  Console->SetCursorPos ((int)(PromptLen + strCursorPos));
   if (InsertMode)
     Console->SetCursorStyle (csConInsertCursor);
   else
