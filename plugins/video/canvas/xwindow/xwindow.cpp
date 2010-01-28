@@ -29,6 +29,7 @@
 #include "csgfx/imagemanipulate.h"
 #include "csutil/callstack.h"
 #include "csutil/cfgacc.h"
+#include "csutil/csuctransform.h"
 #include "csutil/eventnames.h"
 #include "csutil/scf.h"
 #include "iutil/plugin.h"
@@ -56,7 +57,8 @@ SCF_IMPLEMENT_FACTORY (csXWindow)
 #define CS_XEXT_XF86VM_SCF_ID "crystalspace.window.x.extf86vm"
 #define CS_XEXT_XF86VM "XFree86-VidModeExtension"
 
-csXWindow::csXWindow (iBase* parent) : scfImplementationType (this, parent)
+csXWindow::csXWindow (iBase* parent) : scfImplementationType (this, parent),
+  keyboardIM (0), keyboardIC (0)
 {
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
@@ -286,13 +288,33 @@ bool csXWindow::Open ()
     cw_ctx_mask,
     &swa);
 
+  // Set up keyboard input method/context
+  keyboardIM = XOpenIM (dpy, 0, 0, 0);
+  if (keyboardIM == 0)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "XOpenIM() failed");
+    return false;
+  }
+  keyboardIC = XCreateIC (keyboardIM, 
+			  XNClientWindow, ctx_win,
+			  XNFocusWindow, ctx_win,
+			  XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
+			  (void*)0);
+  if (keyboardIC == 0)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "XCreateIC() failed");
+    return false;
+  }
+
   XGCValues values;
   gc = XCreateGC (dpy, ctx_win, 0, &values);
   XSetForeground (dpy, gc, BlackPixel (dpy, screen_num));
   XSetLineAttributes (dpy, gc, 0, LineSolid, CapButt, JoinMiter);
   XSetGraphicsExposures (dpy, gc, False);
 
-  XSelectInput (dpy, ctx_win, si_ctx_mask);
+  unsigned long filterEvents = 0;
+  XGetICValues (keyboardIC, XNFilterEvents, &filterEvents, (void*)0);
+  XSelectInput (dpy, ctx_win, si_ctx_mask | filterEvents);
   if (cmap)
     XSetWindowColormap (dpy, ctx_win, cmap);
 
@@ -357,7 +379,7 @@ bool csXWindow::Open ()
   // Note that if we do this before expose event, with some window managers
   // (e.g. Window Maker) it will be unable to resize the window at all.
   Canvas->AllowResize (false);
-
+  
   // Tell event queue to call us on every frame
   if (!scfiEventHandler)
     scfiEventHandler.AttachNew (new EventHandler (this));
@@ -416,6 +438,9 @@ void csXWindow::Close ()
 {
   if (xf86vm)
     xf86vm->Close ();
+  
+  if (keyboardIC) XDestroyIC (keyboardIC);
+  if (keyboardIM) XCloseIM (keyboardIM);
 
   if (EmptyMouseCursor)
   {
@@ -598,13 +623,32 @@ static int TranslateXMouseButton (int xbutton)
     return xbutton-1; // Since mouse buttons are 0-based
 }
 
+static utf32_char KeyEventCharacter (XIC ic, XKeyEvent* keyEvent)
+{
+  utf32_char ch[2] = {0, 0};
+  
+#if defined(X_HAVE_UTF8_STRING)
+  char charcode [CS_UC_MAX_UTF8_ENCODED];
+  int charcount;
+  charcount = Xutf8LookupString (ic, keyEvent, charcode, sizeof (charcode), 0, 0);
+  if (charcount > 0)
+    csUnicodeTransform::UTF8to32 (ch, sizeof (ch)/sizeof (utf32_char),
+				  (utf8_char*)charcode, charcount);
+#else
+  wchar_t charcode [4];
+  int charcount;
+  charcount = XwcLookupString (ic, keyEvent, charcode, sizeof (charcode), 0, 0);
+  if (charcount == 1)
+    ch[0] = charcode[0];
+#endif
+  return ch[0];
+}
+
 bool csXWindow::HandleEvent (iEvent &Event)
 {
   XEvent event;
   KeySym xKey;
   utf32_char csKeyRaw = 0, csKeyCooked = 0;
-  int charcount;
-  char charcode [8];
   bool prevdown, down;
   bool resize = false;
 
@@ -663,12 +707,17 @@ bool csXWindow::HandleEvent (iEvent &Event)
         XCheckIfEvent (event.xkey.display, &event, CheckKeyPress,
           (XPointer)&event);
         down = (event.type == KeyPress);
-        charcount = XLookupString ((XKeyEvent *)&event, charcode,
-				  sizeof (charcode), &xKey, 0);
-#define MAP_KEY(xKey, rawCode, cookedCode) \
-      case xKey:		                       \
-        csKeyRaw = rawCode;			           \
-        csKeyCooked = cookedCode;          \
+	/* Use XLookupString() instead of XLookupKeysym() as the former does
+	   some extra handling of NumLock keys */
+	XLookupString ((XKeyEvent *)&event, 0, 0, &xKey, 0);
+#define HANDLE_MAP_KEY(rawCode, cookedCode) 		\
+        csKeyRaw = rawCode;			       	\
+	csKeyCooked = (cookedCode != 0) 		\
+	  ? cookedCode 					\
+	  : KeyEventCharacter (keyboardIC, (XKeyEvent *)&event);
+#define MAP_KEY(xKey, rawCode, cookedCode) 		\
+      case xKey:		                       	\
+        HANDLE_MAP_KEY(rawCode, cookedCode);          	\
         break
     
         switch (xKey)
@@ -686,46 +735,45 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	        MAP_KEY (XK_Shift_R, CSKEY_SHIFT_RIGHT, CSKEY_SHIFT);
 	  
 	        MAP_KEY (XK_KP_Up, CSKEY_PAD8, CSKEY_UP);
-	        MAP_KEY (XK_KP_8, CSKEY_PAD8, '8');
+	        MAP_KEY (XK_KP_8, CSKEY_PAD8, 0);
 	        MAP_KEY (XK_Up, CSKEY_UP, CSKEY_UP);
 	  
 	        MAP_KEY (XK_KP_Down, CSKEY_PAD2, CSKEY_DOWN);
-	        MAP_KEY (XK_KP_2, CSKEY_PAD2, '2');
+	        MAP_KEY (XK_KP_2, CSKEY_PAD2, 0);
 	        MAP_KEY (XK_Down, CSKEY_DOWN, CSKEY_DOWN);
 	  
 	        MAP_KEY (XK_KP_Left, CSKEY_PAD4, CSKEY_LEFT);
-	        MAP_KEY (XK_KP_4, CSKEY_PAD4, '4');
+	        MAP_KEY (XK_KP_4, CSKEY_PAD4, 0);
 	        MAP_KEY (XK_Left, CSKEY_LEFT, CSKEY_LEFT);
 	  
 	        MAP_KEY (XK_KP_Right, CSKEY_PAD6, CSKEY_RIGHT);
-	        MAP_KEY (XK_KP_6, CSKEY_PAD6, '6');
+	        MAP_KEY (XK_KP_6, CSKEY_PAD6, 0);
 	        MAP_KEY (XK_Right, CSKEY_RIGHT, CSKEY_RIGHT);
 	  
 	        MAP_KEY (XK_BackSpace, CSKEY_BACKSPACE, CSKEY_BACKSPACE);
 	  
 	        MAP_KEY (XK_KP_Insert, CSKEY_PAD0, CSKEY_INS);
-	        MAP_KEY (XK_KP_0, CSKEY_PAD0, '0');
+	        MAP_KEY (XK_KP_0, CSKEY_PAD0, 0);
 	        MAP_KEY (XK_Insert, CSKEY_INS, CSKEY_INS);
 	  
 	        MAP_KEY (XK_KP_Delete, CSKEY_PADDECIMAL, CSKEY_DEL);
-	        MAP_KEY (XK_KP_Decimal, CSKEY_PADDECIMAL, '.'); 
-	        // @@@ Not necessary '.' on non-English keyboards
+	        MAP_KEY (XK_KP_Decimal, CSKEY_PADDECIMAL, 0); 
 	        MAP_KEY (XK_Delete, CSKEY_DEL, CSKEY_DEL);
 	  
 	        MAP_KEY (XK_KP_Page_Up, CSKEY_PAD9, CSKEY_PGUP);
-	        MAP_KEY (XK_KP_9, CSKEY_PAD9, '9');
+	        MAP_KEY (XK_KP_9, CSKEY_PAD9, 0);
 	        MAP_KEY (XK_Page_Up, CSKEY_PGUP, CSKEY_PGUP);
 	  
 	        MAP_KEY (XK_KP_Page_Down, CSKEY_PAD3, CSKEY_PGDN);
-	        MAP_KEY (XK_KP_3, CSKEY_PAD3, '3');
+	        MAP_KEY (XK_KP_3, CSKEY_PAD3, 0);
 	        MAP_KEY (XK_Page_Down, CSKEY_PGDN, CSKEY_PGDN);
 	  
 	        MAP_KEY (XK_KP_Home, CSKEY_PAD7, CSKEY_HOME);
-	        MAP_KEY (XK_KP_7, CSKEY_PAD7, '7');
+	        MAP_KEY (XK_KP_7, CSKEY_PAD7, 0);
 	        MAP_KEY (XK_Home, CSKEY_HOME, CSKEY_HOME);
 	  
 	        MAP_KEY (XK_KP_End, CSKEY_PAD1, CSKEY_END);
-	        MAP_KEY (XK_KP_1, CSKEY_PAD1, '1');
+	        MAP_KEY (XK_KP_1, CSKEY_PAD1, 0);
 	        MAP_KEY (XK_End, CSKEY_END, CSKEY_END);
 
 	        MAP_KEY (XK_Escape, CSKEY_ESC, CSKEY_ESC);
@@ -755,8 +803,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
         SetVideoMode (true, true, false);
 	      else
 	      {
-          csKeyRaw = CSKEY_PADPLUS;
-          csKeyCooked = '+';
+		HANDLE_MAP_KEY (CSKEY_PADPLUS, 0);
 	      }
 	      break;
 	    }
@@ -767,8 +814,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
         SetVideoMode (true, false, true);
 	      else
 	      {
-          csKeyRaw = CSKEY_PADMINUS;
-          csKeyCooked = '-';
+		HANDLE_MAP_KEY (CSKEY_PADMINUS, 0);
 	      }
 	      break;
 	    }
@@ -780,14 +826,13 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	      else
 #endif
 	      {
-          csKeyRaw = CSKEY_PADMULT;
-          csKeyCooked = '*';
+		HANDLE_MAP_KEY (CSKEY_PADMULT, 0);
 	      }
 	      break;
 	    }
-      MAP_KEY (XK_KP_Divide, CSKEY_PADDIV, '/');
-      MAP_KEY (XK_KP_Begin, CSKEY_PAD5, '5');
-      MAP_KEY (XK_KP_5, CSKEY_PAD5, '5');
+      MAP_KEY (XK_KP_Divide, CSKEY_PADDIV, 0);
+      MAP_KEY (XK_KP_Begin, CSKEY_PAD5, 0);
+      MAP_KEY (XK_KP_5, CSKEY_PAD5, 0);
       case XK_KP_Enter:
       case XK_Return:
 	    {
@@ -804,14 +849,13 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	    }
       default:            
 	    {
-	      if (xKey < sizeof(ScanCodeToChar)/sizeof(ScanCodeToChar[0]))
-	      {
-          csKeyRaw = ScanCodeToChar [xKey]; 
-          // @@@ Remove scancodes, if possible
-          csKeyCooked = charcount == 1 ? charcode[0] : 0;
-	      }
+	      csKeyCooked = KeyEventCharacter (keyboardIC, (XKeyEvent *)&event);
+	      XKeyEvent rawEvent (*((XKeyEvent *)&event));
+	      rawEvent.state = 0;
+	      csKeyRaw = KeyEventCharacter (keyboardIC, &rawEvent);
 	    }
 #undef MAP_KEY
+#undef HANDLE_MAP_KEY
         }
         if (csKeyRaw || csKeyCooked)
           EventOutlet->Key(csKeyRaw, csKeyCooked, down, prevdown != down);

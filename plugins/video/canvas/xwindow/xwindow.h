@@ -83,6 +83,10 @@ class csXWindow : public scfImplementation3<csXWindow, iXWindow,
   bool allow_resize;
   /// Determines grab status of keyboard (only in release build)
   int keyboard_grabbed;
+  /// Keyboard input method
+  XIM keyboardIM;
+  /// Keyboard input context
+  XIC keyboardIC;
 
   //-------------------------------------------------------------
   // Hardware mouse cursor or software emulation?
