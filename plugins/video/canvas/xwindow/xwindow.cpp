@@ -39,7 +39,6 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "csplugincommon/canvas/scancode.h"
 #include "igraphic/image.h"
 #include "csplugincommon/canvas/cursorconvert.h"
 
