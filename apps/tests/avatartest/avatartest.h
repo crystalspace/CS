@@ -24,9 +24,38 @@
 #include <stdarg.h>
 #include <crystalspace.h>
 
+class AvatarScene
+{
+ public:
+  virtual ~AvatarScene () {}
+
+  // Camera related
+  virtual csVector3 GetCameraStart () = 0;
+  virtual csVector3 GetCameraTarget () = 0;
+
+  // From csBaseEventHandler
+  virtual void Frame () = 0;
+  virtual bool OnKeyboard (iEvent &event) = 0;
+  virtual bool OnMouseDown (iEvent &event) = 0;
+
+  // Creation of objects
+  virtual bool CreateAvatar () = 0;
+
+  // User interaction with the scene
+  virtual void ResetScene () = 0;
+
+  // Display of comments 
+  virtual void DisplayKeys () = 0;
+};
+
 class AvatarTest : public csApplicationFramework, public csBaseEventHandler
 {
+  friend class FrankieScene;
+  friend class CrystalinScene;
+
 private:
+  AvatarScene* avatarScene;
+
   // Engine related
   csRef<iEngine> engine;
   csRef<iLoader> loader;
@@ -45,33 +74,10 @@ private:
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
 
-  // Animesh & animation nodes
-  csRef<iAnimatedMeshFactory> animeshFactory;
-  csRef<iAnimatedMesh> animesh;
+  // Animation node plugin managers
   csRef<iSkeletonLookAtManager2> lookAtManager;
   csRef<iSkeletonBasicNodesManager2> basicNodesManager;
-  csRef<iSkeletonFSMNode2> FSMNode;
-
-  // LookAt node related
-  csRef<iSkeletonLookAtNode2> lookAtNode;
-  char targetMode;
-  bool alwaysRotate;
-  char rotationSpeed;
-  bool targetReached;
-
-  // Speed node related
-  csRef<iSkeletonSpeedNode2> speedNode;
-  int currentSpeed; // We use a 'int' instead of a 'float' to avoid round errors
-
-  // Ragdoll node related
-  bool frankieDead;
   csRef<iSkeletonRagdollManager2> ragdollManager;
-  csRef<iSkeletonRagdollNode2> ragdollNode;
-  CS::Animation::StateID mainFSMState;
-  CS::Animation::StateID ragdollFSMState;
-
-  // Morphing related
-  float smileWeight;
 
   //-- csBaseEventHandler
   void Frame ();
@@ -80,30 +86,11 @@ private:
 
   // Creation of objects
   void CreateRoom ();
-  bool CreateAvatar ();
-
-  // User interaction with the scene
-  void ResetScene ();
+  int avatarModel;
 
   // Display of comments 
   void WriteShadow (int x, int y, int fg, const char *str,...);
   void Write(int x, int y, int fg, int bg, const char *str,...);
-  void DisplayKeys ();
-
-  // LookAt listener
-  class LookAtListener : public scfImplementation1<LookAtListener,
-    iSkeletonLookAtListener2>
-  {
-    AvatarTest* avatarTest;
-
-  public:
-    LookAtListener (AvatarTest* avatarTest)
-      : scfImplementationType (this), avatarTest (avatarTest) {}
-
-    //-- iSkeletonLookAtListener2
-    void TargetReached ();
-    void TargetLost ();
-  } lookAtListener;
 
  public:
   AvatarTest ();
