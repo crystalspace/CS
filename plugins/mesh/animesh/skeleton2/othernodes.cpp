@@ -372,6 +372,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     BaseFactoryChildren::SetupInstance (newp, packet, skeleton);
 
+    // Need CB for possible automatic switch
+    newp->InstallInnerCb (true);
+    newp->Switch ();
+
     return csPtr<iSkeletonAnimNode2> (newp);
   }
 
@@ -425,9 +429,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     : scfImplementationType (this), BaseNodeChildren (this), currentNode (0), 
     active (false), playbackSpeed (1.0f), factory (factory)
   {
-    // Need CB for possible automatic switch
-    InstallInnerCb (true);
-    Switch ();
   }
 
   void RandomNode::Switch ()
@@ -574,7 +575,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void RandomNode::PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying)
   {
-    if (node == subNodes[currentNode] && !isPlaying)
+    if (node == subNodes[currentNode] && !isPlaying && !factory->autoSwitch)
     {
       active = false;
       FireStateChangeCb (false);

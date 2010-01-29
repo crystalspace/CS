@@ -182,6 +182,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     float playbackSpeed;
 
     csRef<RandomNodeFactory> factory;
+
+    friend class RandomNodeFactory;
   };
 
 }
