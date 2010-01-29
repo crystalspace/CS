@@ -710,10 +710,18 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	   some extra handling of NumLock keys */
 	XLookupString ((XKeyEvent *)&event, 0, 0, &xKey, 0);
 #define HANDLE_MAP_KEY(rawCode, cookedCode) 		\
-        csKeyRaw = rawCode;			       	\
-	csKeyCooked = (cookedCode != 0) 		\
-	  ? cookedCode 					\
-	  : KeyEventCharacter (keyboardIC, (XKeyEvent *)&event);
+	{						\
+          csKeyRaw = rawCode;			       	\
+	  if (cookedCode != 0) 				\
+	    csKeyCooked = cookedCode;			\
+	  else						\
+	  {						\
+	    XKeyEvent myEvent (*((XKeyEvent *)&event));	\
+	    myEvent.type = KeyPress;			\
+	    csKeyCooked = 				\
+	      KeyEventCharacter (keyboardIC, &myEvent);	\
+	  }						\
+	}
 #define MAP_KEY(xKey, rawCode, cookedCode) 		\
       case xKey:		                       	\
         HANDLE_MAP_KEY(rawCode, cookedCode);          	\
@@ -848,8 +856,10 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	    }
       default:            
 	    {
-	      csKeyCooked = KeyEventCharacter (keyboardIC, (XKeyEvent *)&event);
-	      XKeyEvent rawEvent (*((XKeyEvent *)&event));
+	      XKeyEvent myEvent (*((XKeyEvent *)&event));
+	      myEvent.type = KeyPress;
+	      csKeyCooked = KeyEventCharacter (keyboardIC, &myEvent);
+	      XKeyEvent rawEvent (myEvent);
 	      rawEvent.state = 0;
 	      csKeyRaw = KeyEventCharacter (keyboardIC, &rawEvent);
 	    }
