@@ -49,6 +49,7 @@ SubInclude TOP data castle-staticlit ;
 SubInclude TOP data ceguitest ;
 SubInclude TOP data config-app ;
 SubInclude TOP data config-plugins ;
+SubInclude TOP data crystalin ;
 SubInclude TOP data cube ;
 SubInclude TOP data flarge ;
 SubInclude TOP data frankie ;
