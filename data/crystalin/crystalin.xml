@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <plugins>
+    <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
+    <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
+  </plugins>
+  <shaders/>
+  <textures>
+    <texture name='crystalin_body_h'>
+      <file>/lib/crystalin/crystalin_body_h.png</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name='crystalin_material'>
+      <texture>crystalin_body_h</texture>
+    </material>
+  </materials>
+  <sounds/>
+  <library>/lib/crystalin/skelcrystalin_rig</library>
+  <library>/lib/crystalin/crystalin</library>
+</library>
