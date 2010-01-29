@@ -5,7 +5,6 @@ RUNTIME_DATA =
   fancycon.zip
   standard.zip
   ttf-dejavu.zip
-  ttf-vera.zip
   unifont.zip ;
 DEMO_DATA =
   startme.zip
