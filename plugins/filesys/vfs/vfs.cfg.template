@@ -91,8 +91,8 @@ VFS.Unix.. = .
 VFS.Unix... = ..
 VFS.Unix.CS_CDROM = /mnt/cdrom
 VFS.Unix.CS_TMP = /tmp
-; This is true at least for systems using XFree86
-VFS.Unix.TTF_PATH = /usr/X11R6/lib/X11/fonts/Truetype/, /usr/X11R6/lib/X11/fonts/TTF/
+; This is true at least for systems using XFree86, Linux and Mac OS X
+VFS.Unix.TTF_PATH = /usr/share/fonts/, /usr/local/share/fonts/, /System/Library/Fonts/, /Library/Fonts/, /usr/X11R6/lib/X11/fonts/Truetype/, /usr/X11R6/lib/X11/fonts/TTF/
 VFS.Unix.CS_LOCALAPPDATA = $(HOME)$/.crystalspace
 
 VFS.CP/M.. = .
