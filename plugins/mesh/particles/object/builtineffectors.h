@@ -307,6 +307,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return fparams.GetSize ();
     }
 
+    virtual void AddFParameter(float value)
+    {
+      fparams.Push(value);
+    }
+
+    virtual void RemoveFParameter(size_t index)
+    {
+      fparams.DeleteIndex(index);
+    }
+
     virtual void SetVParameter (size_t parameterNumber, const csVector3& value)
     {
       vparams.Put (parameterNumber, value);
@@ -323,6 +333,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual size_t GetVParameterCount () const
     {
       return vparams.GetSize ();
+    }
+
+    virtual void AddVParameter(const csVector3& value)
+    {
+      vparams.Push(value);
+    }
+
+    virtual void RemoveVParameter(size_t index)
+    {
+      vparams.DeleteIndex(index);
     }
 
   private:

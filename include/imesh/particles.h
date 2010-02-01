@@ -781,7 +781,7 @@ enum csParticleBuiltinEffectorVFType
  */
 struct iParticleBuiltinEffectorVelocityField : public iParticleEffector
 {
-  SCF_INTERFACE(iParticleBuiltinEffectorVelocityField,1,0,0);
+  SCF_INTERFACE(iParticleBuiltinEffectorVelocityField,2,0,0);
 
   /**
    * Set force field type
@@ -809,6 +809,16 @@ struct iParticleBuiltinEffectorVelocityField : public iParticleEffector
   virtual size_t GetFParameterCount () const = 0;
 
   /**
+   * Add an F parameter.
+   */
+  virtual void AddFParameter(float value) = 0;
+
+  /**
+   * Remove an F parameter.
+   */
+  virtual void RemoveFParameter(size_t index) = 0;
+
+  /**
    * Set vector parameter
    */
   virtual void SetVParameter (size_t parameterNumber, const csVector3& value) = 0;
@@ -822,6 +832,17 @@ struct iParticleBuiltinEffectorVelocityField : public iParticleEffector
    * Get the number of set vector parameters
    */
   virtual size_t GetVParameterCount () const = 0;
+
+  /**
+   * Add a V parameter.
+   */
+  virtual void AddVParameter(const csVector3& value) = 0;
+
+  /**
+   * Remove a V parameter.
+   */
+  virtual void RemoveVParameter(size_t index) = 0;
+
 };
 
 /**
