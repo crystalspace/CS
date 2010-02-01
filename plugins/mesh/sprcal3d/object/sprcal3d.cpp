@@ -168,11 +168,11 @@ void csSpriteCal3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 
 csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
   csSpriteCal3DMeshObjectType* pParent, iObjectRegistry* object_reg) : 
-  scfImplementationType (this, (iBase*)pParent), sprcal3d_type (pParent), 
+  scfImplementationType (this, (iBase*)pParent), sprcal3d_type (pParent),
   calCoreModel("no name")
 {
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
-
+  currentScalingFactor = 1;
   skel_factory.AttachNew (new csCal3dSkeletonFactory ());
 }
 
@@ -214,6 +214,12 @@ void csSpriteCal3DMeshObjectFactory::RescaleFactory(float factor)
 {
   calCoreModel.scale(factor);
   calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
+  currentScalingFactor *= factor;
+}
+
+void csSpriteCal3DMeshObjectFactory::AbsoluteRescaleFactory(float factor)
+{
+    RescaleFactory(factor/currentScalingFactor);
 }
 
 bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
