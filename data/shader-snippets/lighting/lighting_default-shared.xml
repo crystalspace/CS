@@ -49,6 +49,7 @@
 	important than a parallax effect.
     -->
     <snippet id="position" filealias="position" />
+    <snippet id="specular" filealias="specular" />
     <snippet id="normalmap" filealias="normalmap" />
     <snippet id="ambient_lightmaptc" filealias="lightmaptc" />
     <snippet id="ambient" filealias="ambient" />
@@ -58,7 +59,6 @@
     <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
     <snippet id="apply_alpha" filealias="apply_alpha" />
     <snippet id="lighting" filealias="lighting" />
-    <snippet id="specular" filealias="specular" />
     <snippet id="add_specular" file="/shader-snippets/add.xml" />
     <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
     <snippet id="glow" filealias="glow" />
