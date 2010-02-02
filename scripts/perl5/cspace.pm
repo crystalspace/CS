@@ -17104,6 +17104,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetCal3DCoreModel = *cspacec::iSpriteCal3DFactoryState_GetCal3DCoreModel;
 *RegisterAnimCallback = *cspacec::iSpriteCal3DFactoryState_RegisterAnimCallback;
 *RemoveAnimCallback = *cspacec::iSpriteCal3DFactoryState_RemoveAnimCallback;
+*AbsoluteRescaleFactory = *cspacec::iSpriteCal3DFactoryState_AbsoluteRescaleFactory;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -18964,9 +18965,13 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetFParameter = *cspacec::iParticleBuiltinEffectorVelocityField_SetFParameter;
 *GetFParameter = *cspacec::iParticleBuiltinEffectorVelocityField_GetFParameter;
 *GetFParameterCount = *cspacec::iParticleBuiltinEffectorVelocityField_GetFParameterCount;
+*AddFParameter = *cspacec::iParticleBuiltinEffectorVelocityField_AddFParameter;
+*RemoveFParameter = *cspacec::iParticleBuiltinEffectorVelocityField_RemoveFParameter;
 *SetVParameter = *cspacec::iParticleBuiltinEffectorVelocityField_SetVParameter;
 *GetVParameter = *cspacec::iParticleBuiltinEffectorVelocityField_GetVParameter;
 *GetVParameterCount = *cspacec::iParticleBuiltinEffectorVelocityField_GetVParameterCount;
+*AddVParameter = *cspacec::iParticleBuiltinEffectorVelocityField_AddVParameter;
+*RemoveVParameter = *cspacec::iParticleBuiltinEffectorVelocityField_RemoveVParameter;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

@@ -1482,6 +1482,7 @@ class iSpriteCal3DFactoryState(core.iBase):
     def GetCal3DCoreModel(*args): return _imesh.iSpriteCal3DFactoryState_GetCal3DCoreModel(*args)
     def RegisterAnimCallback(*args): return _imesh.iSpriteCal3DFactoryState_RegisterAnimCallback(*args)
     def RemoveAnimCallback(*args): return _imesh.iSpriteCal3DFactoryState_RemoveAnimCallback(*args)
+    def AbsoluteRescaleFactory(*args): return _imesh.iSpriteCal3DFactoryState_AbsoluteRescaleFactory(*args)
     __swig_destroy__ = _imesh.delete_iSpriteCal3DFactoryState
     __del__ = lambda self : None;
 iSpriteCal3DFactoryState_swigregister = _imesh.iSpriteCal3DFactoryState_swigregister
@@ -2379,9 +2380,13 @@ class iParticleBuiltinEffectorVelocityField(iParticleEffector):
     def SetFParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_SetFParameter(*args)
     def GetFParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_GetFParameter(*args)
     def GetFParameterCount(*args): return _imesh.iParticleBuiltinEffectorVelocityField_GetFParameterCount(*args)
+    def AddFParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_AddFParameter(*args)
+    def RemoveFParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_RemoveFParameter(*args)
     def SetVParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_SetVParameter(*args)
     def GetVParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_GetVParameter(*args)
     def GetVParameterCount(*args): return _imesh.iParticleBuiltinEffectorVelocityField_GetVParameterCount(*args)
+    def AddVParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_AddVParameter(*args)
+    def RemoveVParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_RemoveVParameter(*args)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorVelocityField
     __del__ = lambda self : None;
 iParticleBuiltinEffectorVelocityField_swigregister = _imesh.iParticleBuiltinEffectorVelocityField_swigregister

@@ -29833,6 +29833,36 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_AbsoluteRescaleFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
+  float arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_AbsoluteRescaleFactory",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_AbsoluteRescaleFactory" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iSpriteCal3DFactoryState * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSpriteCal3DFactoryState_AbsoluteRescaleFactory" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  (arg1)->AbsoluteRescaleFactory(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iSpriteCal3DFactoryState(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
@@ -47877,6 +47907,66 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_AddFParameter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorVelocityField *arg1 = (iParticleBuiltinEffectorVelocityField *) 0 ;
+  float arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_AddFParameter",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_AddFParameter" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorVelocityField * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorVelocityField_AddFParameter" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  (arg1)->AddFParameter(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_RemoveFParameter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorVelocityField *arg1 = (iParticleBuiltinEffectorVelocityField *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_RemoveFParameter",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_RemoveFParameter" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorVelocityField * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorVelocityField_RemoveFParameter" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  (arg1)->RemoveFParameter(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_SetVParameter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iParticleBuiltinEffectorVelocityField *arg1 = (iParticleBuiltinEffectorVelocityField *) 0 ;
@@ -47966,6 +48056,69 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_GetVParameterCo
   arg1 = reinterpret_cast< iParticleBuiltinEffectorVelocityField * >(argp1);
   result = ((iParticleBuiltinEffectorVelocityField const *)arg1)->GetVParameterCount();
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_AddVParameter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorVelocityField *arg1 = (iParticleBuiltinEffectorVelocityField *) 0 ;
+  csVector3 *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_AddVParameter",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_AddVParameter" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorVelocityField * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iParticleBuiltinEffectorVelocityField_AddVParameter" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iParticleBuiltinEffectorVelocityField_AddVParameter" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  (arg1)->AddVParameter((csVector3 const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_RemoveVParameter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iParticleBuiltinEffectorVelocityField *arg1 = (iParticleBuiltinEffectorVelocityField *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_RemoveVParameter",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_RemoveVParameter" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField *""'"); 
+  }
+  arg1 = reinterpret_cast< iParticleBuiltinEffectorVelocityField * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iParticleBuiltinEffectorVelocityField_RemoveVParameter" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  (arg1)->RemoveVParameter(arg2);
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -49810,6 +49963,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSpriteCal3DFactoryState_GetCal3DCoreModel", _wrap_iSpriteCal3DFactoryState_GetCal3DCoreModel, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DFactoryState_RegisterAnimCallback", _wrap_iSpriteCal3DFactoryState_RegisterAnimCallback, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DFactoryState_RemoveAnimCallback", _wrap_iSpriteCal3DFactoryState_RemoveAnimCallback, METH_VARARGS, NULL},
+	 { (char *)"iSpriteCal3DFactoryState_AbsoluteRescaleFactory", _wrap_iSpriteCal3DFactoryState_AbsoluteRescaleFactory, METH_VARARGS, NULL},
 	 { (char *)"delete_iSpriteCal3DFactoryState", _wrap_delete_iSpriteCal3DFactoryState, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DFactoryState_swigregister", iSpriteCal3DFactoryState_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimTimeUpdateHandler_UpdatePosition", _wrap_iAnimTimeUpdateHandler_UpdatePosition, METH_VARARGS, NULL},
@@ -50340,9 +50494,13 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iParticleBuiltinEffectorVelocityField_SetFParameter", _wrap_iParticleBuiltinEffectorVelocityField_SetFParameter, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorVelocityField_GetFParameter", _wrap_iParticleBuiltinEffectorVelocityField_GetFParameter, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorVelocityField_GetFParameterCount", _wrap_iParticleBuiltinEffectorVelocityField_GetFParameterCount, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorVelocityField_AddFParameter", _wrap_iParticleBuiltinEffectorVelocityField_AddFParameter, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorVelocityField_RemoveFParameter", _wrap_iParticleBuiltinEffectorVelocityField_RemoveFParameter, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorVelocityField_SetVParameter", _wrap_iParticleBuiltinEffectorVelocityField_SetVParameter, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorVelocityField_GetVParameter", _wrap_iParticleBuiltinEffectorVelocityField_GetVParameter, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorVelocityField_GetVParameterCount", _wrap_iParticleBuiltinEffectorVelocityField_GetVParameterCount, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorVelocityField_AddVParameter", _wrap_iParticleBuiltinEffectorVelocityField_AddVParameter, METH_VARARGS, NULL},
+	 { (char *)"iParticleBuiltinEffectorVelocityField_RemoveVParameter", _wrap_iParticleBuiltinEffectorVelocityField_RemoveVParameter, METH_VARARGS, NULL},
 	 { (char *)"delete_iParticleBuiltinEffectorVelocityField", _wrap_delete_iParticleBuiltinEffectorVelocityField, METH_VARARGS, NULL},
 	 { (char *)"iParticleBuiltinEffectorVelocityField_swigregister", iParticleBuiltinEffectorVelocityField_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csParticleParameterSet_mass_set", _wrap_csParticleParameterSet_mass_set, METH_VARARGS, NULL},
