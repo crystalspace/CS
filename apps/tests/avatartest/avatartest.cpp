@@ -21,10 +21,10 @@
 
 #include "avatartest.h"
 #include "frankie.h"
-#include "crystalin.h"
+#include "krystal.h"
 
 #define MODEL_FRANKIE 1
-#define MODEL_CRYSTALIN 2
+#define MODEL_KRYSTAL 2
 
 CS_IMPLEMENT_APPLICATION
 
@@ -130,9 +130,9 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
     {
       if (avatarModel == MODEL_FRANKIE)
       {
-	avatarModel = MODEL_CRYSTALIN;
+	avatarModel = MODEL_KRYSTAL;
 	delete avatarScene;
-	avatarScene = new CrystalinScene (this);
+	avatarScene = new KrystalScene (this);
       }
 
       else
@@ -170,7 +170,7 @@ bool AvatarTest::OnInitialize (int /*argc*/, char* /*argv*/ [])
     csPrintf ("Usage: avatartest\n");
     csPrintf ("Tests on animesh animation\n\n");
     csPrintf ("Options for avatartest:\n");
-    csPrintf ("  -model=<name>:     set the starting model (frankie, crystalin)\n");
+    csPrintf ("  -model=<name>:     set the starting model (frankie, krystal)\n");
     csPrintf ("  -no_physics:       disable physical animations\n");
     csCommandLineHelper::Help (GetObjectRegistry ());
     return false;
@@ -218,10 +218,10 @@ bool AvatarTest::OnInitialize (int /*argc*/, char* /*argv*/ [])
 
   // Read which model to display at first
   csString modelName = clp->GetOption ("model");
-  if (modelName != "crystalin")
+  if (modelName != "krystal")
     avatarModel = MODEL_FRANKIE;
   else
-    avatarModel = MODEL_CRYSTALIN;
+    avatarModel = MODEL_KRYSTAL;
 
   return true;
 }
@@ -309,8 +309,8 @@ bool AvatarTest::Application ()
   CreateRoom ();
 
   // Create avatar
-  if (avatarModel == MODEL_CRYSTALIN)
-    avatarScene = new CrystalinScene (this);
+  if (avatarModel == MODEL_KRYSTAL)
+    avatarScene = new KrystalScene (this);
   else
     avatarScene = new FrankieScene (this);
   if (!avatarScene->CreateAvatar ())

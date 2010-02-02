@@ -1,0 +1,7 @@
+SubDir TOP data crystalin ;
+
+{
+local files = crystalin skelcrystalin_rig [ Wildcard *.png *.xml ] ;
+InstallData $(files) : data crystalin ;
+FileListEntriesData $(files) : crystalin : data-demo ;
+}

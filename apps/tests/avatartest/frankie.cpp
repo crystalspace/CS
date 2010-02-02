@@ -526,7 +526,7 @@ void FrankieScene::DisplayKeys ()
   avatarTest->WriteShadow (x, y, fg, "r: reset scene");
   y += lineSize;
 
-  avatarTest->WriteShadow (x, y, fg, "m: switch to crystalin");
+  avatarTest->WriteShadow (x, y, fg, "m: switch to Krystal");
   y += lineSize;
 
   // Write FPS and other info
