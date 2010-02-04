@@ -184,7 +184,7 @@ bool SmokeTest::Application()
 
   cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
 
-  CEGUI::Font& font = cegui->GetFontManagerPtr ()->createFreeTypeFont("Vera", 10, true, "/fonts/ttf/Vera.ttf");
+  cegui->GetFontManagerPtr ()->createFreeTypeFont("DejaVuSans", 10, true, "/fonts/ttf/DejaVuSans.ttf");
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
