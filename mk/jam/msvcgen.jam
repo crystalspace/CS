@@ -1924,7 +1924,7 @@ rule _ExternalLibsHelperMsvc
     {
       $(rulename) $(target) : $($(lib).$(attrib).$(MSVC_VERSION)) : release : $(arch_$(a)) ;
     }
-    if $($(lib).$(attrib).$(a))
+    else if $($(lib).$(attrib).$(a))
     {
       $(rulename) $(target) : $($(lib).$(attrib).$(a)) : release : $(arch_$(a)) ;
     }
