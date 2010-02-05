@@ -1602,26 +1602,6 @@ void csGLGraphics3D::FinishDraw ()
 
 void csGLGraphics3D::Print (csRect const* area)
 {
-#if 0
-  static void* blah;
-  //if (blah == 0) blah = cs_malloc (scrwidth*scrheight*32);
-  static GLuint pbo;
-  if (pbo == 0)
-  {
-    csGLGraphics3D::ext->glGenBuffersARB (1, &pbo);
-    GLuint oldBuffer = csGLGraphics3D::statecache->GetBufferARB (GL_PIXEL_PACK_BUFFER_ARB);
-    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, pbo, true);
-    csGLGraphics3D::ext->glBufferDataARB (GL_PIXEL_PACK_BUFFER_ARB, scrwidth*scrheight*4, 0, GL_STREAM_READ_ARB);
-    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, oldBuffer);
-  }
-  {
-  CS::MeasureTime measure ("%s", CS_FUNCTION_NAME);
-    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, pbo, true);
-  glReadPixels (0, 0, scrwidth, scrheight, GL_BGRA, GL_UNSIGNED_BYTE, 0);
-    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, 0, true);
-  }
-#endif
-
   //glFinish ();
   if (bugplug)
     bugplug->ResetCounter ("Triangle Count");
