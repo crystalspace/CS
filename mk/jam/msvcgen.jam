@@ -1338,6 +1338,10 @@ rule LinkStaticPlugins
     }
     LinkWith $(target) : $(target_link_with) ;
     
+    # We need to get the external libs for the plugin lib; but they have to be 
+    # specified after LinkStaticPlugins
+    $(target).PROPAGATE_EXTERNALLIBS += $(plugin_lib_name) ;
+    
     # Add usefile to project
     MsvcAddFileToProject $($(target)_PRJ_RESPFILE) : 
       $(appglue:R=$(outdir)) : $($(target)_PRJ_RESPDIR) ;
@@ -1948,6 +1952,11 @@ rule ExternalLibs
     _ExternalLibsHelperMsvc $(<) : $(i) : _MsvcLibDirs : LIBDIRS ;
     
     $(<).EXTERNALLIBS += $(i) ;
+  }
+  
+  for target in $($(<).PROPAGATE_EXTERNALLIBS)
+  {
+    ExternalLibs $(target) : $(>) ;
   }
 }
 
