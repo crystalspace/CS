@@ -9,10 +9,16 @@
     <texture name='krystal_body_h'>
       <file>/lib/krystal/krystal_body_h.png</file>
     </texture>
+    <texture name='krystal_hairs.png'>
+      <file>/lib/krystal/krystal_hairs.png</file>
+    </texture>
   </textures>
   <materials>
     <material name='krystal_material'>
       <texture>krystal_body_h</texture>
+    </material>
+    <material name='hairs_material'>
+      <texture>krystal_hairs.png</texture>
     </material>
   </materials>
   <sounds/>
