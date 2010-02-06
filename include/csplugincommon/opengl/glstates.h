@@ -923,6 +923,7 @@ public:
   void SetClampColor (GLenum target, GLenum clamp)
   {
     int index = csGLStateCacheContext::GLClampTargetToCacheIndex (target);
+    CS_ASSERT (index >= 0);
     if (clamp != currentContext->clampState[index])
     {
       extmgr->glClampColorARB (target, clamp);

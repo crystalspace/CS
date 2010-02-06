@@ -75,7 +75,7 @@ namespace Threading
   };
 
   /// OS specific thread identifier
-  typedef unsigned long ThreadID;
+  typedef unsigned int ThreadID;
 
 }
 }
