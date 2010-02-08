@@ -1,7 +1,7 @@
 <library>
  <addon plugin="crystalspace.mesh.loader.animesh.body">
  <skeleton name="frankie_body" skeletonfact="frankie_rig">
-  <bone id="1">
+  <bone name="Frankie_Main">
    <properties>
     <mass value="0.3" />
    </properties>
@@ -9,7 +9,7 @@
     <collidersphere x="0.0" y="0.05" z="0.0" radius="0.05" density="1.0" friction="10.0" elasticity="0.8" softness="0.01" />
    </colliders>
   </bone>
-  <bone id="2">
+  <bone name="CTRL_Spin">
    <properties>
     <mass value="0.35" />
    </properties>
@@ -30,7 +30,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="3">
+  <bone name="CTRL_Spin.M">
    <properties>
     <mass value="0.5" />
    </properties>
@@ -50,7 +50,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="4">
+  <bone name="CTRL_RibCage">
    <properties>
     <mass value="0.5" />
    </properties>
@@ -70,7 +70,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="5">
+  <bone name="CTRL_Head">
    <properties>
     <mass value="1.0" />
    </properties>
@@ -88,7 +88,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="35">
+  <bone name="CTRL_Pelvis">
    <properties>
     <mass value="0.1" />
    </properties>
@@ -103,7 +103,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="44">
+  <bone name="Tail_1">
    <properties>
     <mass value="0.05" />
    </properties>
@@ -121,7 +121,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="45">
+  <bone name="Tail_2">
    <properties>
     <mass value="0.05" />
    </properties>
@@ -139,7 +139,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="46">
+  <bone name="Tail_3">
    <properties>
     <mass value="0.05" />
    </properties>
@@ -157,7 +157,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="47">
+  <bone name="Tail_4">
    <properties>
     <mass value="0.05" />
    </properties>
@@ -175,7 +175,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="48">
+  <bone name="Tail_5">
    <properties>
     <mass value="0.05" />
    </properties>
@@ -193,7 +193,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="49">
+  <bone name="Tail_6">
    <properties>
     <mass value="0.05" />
    </properties>
@@ -211,7 +211,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="50">
+  <bone name="Tail_7">
    <properties>
     <mass value="0.05" />
    </properties>
@@ -229,7 +229,7 @@
     </constraints>
    </joint>
   </bone>
-  <bone id="51">
+  <bone name="Tail_8">
    <properties>
     <mass value="0.05" />
    </properties>

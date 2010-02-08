@@ -159,12 +159,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
   bool BodyMeshLoader::ParseBone (iDocumentNode* node, iLoaderContext* ldr_context,
 				  iBodySkeleton* skeleton)
   {
-    // parse bone id
-    int id = node->GetAttributeValueAsInt ("id");
-    if (!skeleton->GetSkeletonFactory ()->HasBone (id))
+    // parse bone name
+    const char* name = node->GetAttributeValue ("name");
+    if (!name)
     {
-      synldr->ReportError (msgid, node, "No bone with id %i in skeleton factory",
-			   id);
+      synldr->ReportError (msgid, node, "No name set for bone");
+      return false;
+    }
+
+    BoneID id = skeleton->GetSkeletonFactory ()->FindBone (name);
+    if (id == InvalidBoneID)
+    {
+      synldr->ReportError (msgid, node, "No bone with name %s in skeleton factory",
+			   name);
       return false;
     }
 
