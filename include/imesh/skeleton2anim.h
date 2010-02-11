@@ -627,9 +627,10 @@ struct iSkeletonBlendNodeFactory2 : public iSkeletonAnimNodeFactory2
 
 /**
  * An animation node that blends together the sub-nodes based on their
- * weights. The weights does not have to add up to 1, upon update the active
+ * weights. It is defined by a iSkeletonBlendNodeFactory2.
+ *
+ * The weights does not have to add up to 1, upon update the active
  * animations will be combined so that the sum is 1.
- * It is defined by a iSkeletonBlendNodeFactory2.
  *
  * Main creators of instances implementing this interface:
  * - iSkeletonBlendNodeFactory2::CreateInstance()
@@ -657,7 +658,7 @@ struct iSkeletonBlendNode2 : public iSkeletonAnimNode2
 
 
 /**
- * Factory for priority blend nodes, ie nodes nodes blending sub-nodes on
+ * Factory for priority blend nodes, ie nodes blending sub-nodes on
  * the base of their current priority.
  * It defines instances of iSkeletonPriorityNode2.
  *
@@ -706,12 +707,12 @@ struct iSkeletonPriorityNodeFactory2 : public iSkeletonAnimNodeFactory2
 
 /**
  * An animation node that blends together the sub-nodes based on their priority.
+ * It is defined by a iSkeletonPriorityNodeFactory2.
+ *
  * A sub-node with a higher priority will always replace a lower priority one, for
  * the bones it animates.
  * This is useful for example when you have a base walk animation and want to 
  * add a secondary motion on top of it
- *
- * It is defined by a iSkeletonPriorityNodeFactory2.
  *
  * Main creators of instances implementing this interface:
  * - iSkeletonPriorityNodeFactory2::CreateInstance()
