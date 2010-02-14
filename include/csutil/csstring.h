@@ -977,7 +977,11 @@ protected:
     {
       NewSize++; // Plus one for implicit null byte.
       if (NewSize <= LEN)
+      {
+	// minibuff may still be wholly uninitialized, so ensure a null terminator
+	if (miniused == 0) minibuff[0] = 0;
 	miniused = NewSize;
+      }
       else
       {
 	CS_ASSERT(MaxSize == 0);
