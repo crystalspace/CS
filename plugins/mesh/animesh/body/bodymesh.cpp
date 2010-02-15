@@ -614,14 +614,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   {
   }
   
-  bool BodyBoneCollider::CreateBoxGeometry (const csVector3 &box_size)
+  bool BodyBoneCollider::SetBoxGeometry (const csVector3 &box_size)
   {
     geometryType = BOX_COLLIDER_GEOMETRY;
     this->box_size = box_size;
     return true;
   }
 
-  bool BodyBoneCollider::CreateCapsuleGeometry (float length, float radius)
+  bool BodyBoneCollider::SetCapsuleGeometry (float length, float radius)
   {
     geometryType = CAPSULE_COLLIDER_GEOMETRY;
     this->length = length;
@@ -629,14 +629,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return true;
   }
 
-  bool BodyBoneCollider::CreateConvexMeshGeometry (iMeshWrapper *mesh)
+  bool BodyBoneCollider::SetConvexMeshGeometry (iMeshWrapper *mesh)
   {
     geometryType = CONVEXMESH_COLLIDER_GEOMETRY;
     this->mesh = mesh;
     return false;
   }
 
-  bool BodyBoneCollider::CreateCylinderGeometry (float length, float radius)
+  bool BodyBoneCollider::SetCylinderGeometry (float length, float radius)
   {
     geometryType = CYLINDER_COLLIDER_GEOMETRY;
     this->length = length;
@@ -644,21 +644,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return true;
   }
 
-  bool BodyBoneCollider::CreateMeshGeometry (iMeshWrapper *mesh)
+  bool BodyBoneCollider::SetMeshGeometry (iMeshWrapper *mesh)
   {
     geometryType = TRIMESH_COLLIDER_GEOMETRY;
     this->mesh = mesh;
     return true;
   }
 
-  bool BodyBoneCollider::CreatePlaneGeometry (const csPlane3 &plane)
+  bool BodyBoneCollider::SetPlaneGeometry (const csPlane3 &plane)
   {
     geometryType = PLANE_COLLIDER_GEOMETRY;
     this->plane = plane;
     return true;
   }
 
-  bool BodyBoneCollider::CreateSphereGeometry (const csSphere &sphere)
+  bool BodyBoneCollider::SetSphereGeometry (const csSphere &sphere)
   {
     geometryType = SPHERE_COLLIDER_GEOMETRY;
     this->sphere = sphere;

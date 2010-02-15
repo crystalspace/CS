@@ -385,45 +385,45 @@ struct iBodyBoneJoint : public virtual iBase
  */
 struct iBodyBoneCollider : public virtual iBase
 {
-  SCF_INTERFACE(iBodyBoneCollider, 1, 0, 0);
+  SCF_INTERFACE(iBodyBoneCollider, 2, 0, 0);
 
   /**
-   * Create collider geometry with given box (given by its size).
+   * Set the collider as a box (defined by the given size).
    */
-  virtual bool CreateBoxGeometry (const csVector3 &box_size) = 0;
+  virtual bool SetBoxGeometry (const csVector3 &box_size) = 0;
 
   /**
-   * Create capsule collider geometry.
+   * Set the collider as a capsule.
    */
-  virtual bool CreateCapsuleGeometry (float length, float radius) = 0;
+  virtual bool SetCapsuleGeometry (float length, float radius) = 0;
 
   /**
-   * Create collider geometry with given convex mesh geometry.
+   * Set the collider as the geometry of the given convex mesh factory.
    */
-  virtual bool CreateConvexMeshGeometry (iMeshWrapper *mesh) = 0;
+  virtual bool SetConvexMeshGeometry (iMeshWrapper *mesh) = 0;
 
   /**
-   * Create cylinder Geometry.
+   * Set the collider as a cylinder.
    */
-  virtual bool CreateCylinderGeometry (float length, float radius) = 0;
+  virtual bool SetCylinderGeometry (float length, float radius) = 0;
 
   /**
-   * Create collider geometry with given mesh geometry. 
+   * Set the collider as the geometry of the given concave mesh factory.
    */
-  virtual bool CreateMeshGeometry (iMeshWrapper *mesh) = 0;
+  virtual bool SetMeshGeometry (iMeshWrapper *mesh) = 0;
 
   /**
-   * Create collider geometry with given plane. 
+   * Set the collider as a plane. 
    */
-  virtual bool CreatePlaneGeometry (const csPlane3 &plane) = 0;
+  virtual bool SetPlaneGeometry (const csPlane3 &plane) = 0;
 
   /**
-   * Create collider geometry with given sphere. 
+   * Set the collider as a sphere. 
    */
-  virtual bool CreateSphereGeometry (const csSphere &sphere) = 0;
+  virtual bool SetSphereGeometry (const csSphere &sphere) = 0;
  
   /**
-   * Get the type of the geometry.
+   * Get the type of the collider geometry.
    */
   virtual csColliderGeometryType GetGeometryType () = 0;
 

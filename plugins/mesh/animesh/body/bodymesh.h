@@ -106,13 +106,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
     BodyBoneCollider ();
 
-    virtual bool CreateBoxGeometry (const csVector3 &box_size);
-    virtual bool CreateCapsuleGeometry (float length, float radius);
-    virtual bool CreateConvexMeshGeometry (iMeshWrapper *mesh);
-    virtual bool CreateCylinderGeometry (float length, float radius);
-    virtual bool CreateMeshGeometry (iMeshWrapper *mesh);
-    virtual bool CreatePlaneGeometry (const csPlane3 &plane);
-    virtual bool CreateSphereGeometry (const csSphere &sphere);
+    virtual bool SetBoxGeometry (const csVector3 &box_size);
+    virtual bool SetCapsuleGeometry (float length, float radius);
+    virtual bool SetConvexMeshGeometry (iMeshWrapper *mesh);
+    virtual bool SetCylinderGeometry (float length, float radius);
+    virtual bool SetMeshGeometry (iMeshWrapper *mesh);
+    virtual bool SetPlaneGeometry (const csPlane3 &plane);
+    virtual bool SetSphereGeometry (const csSphere &sphere);
  
     virtual csColliderGeometryType GetGeometryType ();
 

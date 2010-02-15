@@ -288,23 +288,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	      return false;
 	    }
 
-	    // find the mesh
-	    csRef<iMeshWrapper> m = ldr_context->FindMeshObject
+	    // try to find a mesh factory
+	    csRef<iMeshWrapper> mesh;
+	    csRef<iMeshFactoryWrapper> meshFactory = ldr_context->FindMeshFactory
 	      (child->GetAttributeValue ("mesh"));
-	    if (!m)
+	    if (meshFactory)
+	      mesh = meshFactory->CreateMeshWrapper ();
+
+	    // try to find a mesh
+	    else
 	    {
-	      synldr->ReportError (msgid, child,
-				   "Unable to find mesh %s while loading collider",
-				   child->GetAttributeValue ("mesh"));
-	      return false;
+	      mesh = ldr_context->FindMeshObject (child->GetAttributeValue ("mesh"));
+	      if (!mesh)
+		{
+		  synldr->ReportError (msgid, child,
+				       "Unable to find mesh or factory '%s' while loading collider",
+				       child->GetAttributeValue ("mesh"));
+		  return false;
+		}
 	    }
 
 	    // create collider
 	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
 	    if (id == XMLTOKEN_COLLIDERMESH)
-	      collider->CreateMeshGeometry (m);
+	      collider->SetMeshGeometry (mesh);
 	    else
-	      collider->CreateConvexMeshGeometry (m);
+	      collider->SetConvexMeshGeometry (mesh);
 
 	    // parse params
 	    ParseColliderParams (child, collider);
@@ -322,7 +331,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	    }
 
 	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
-	    collider->CreateBoxGeometry (v);
+	    collider->SetBoxGeometry (v);
 	    ParseColliderParams (child, collider);
 
 	    break;
@@ -339,7 +348,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	    }
 
 	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
-	    collider->CreateSphereGeometry (csSphere (v, r));
+	    collider->SetSphereGeometry (csSphere (v, r));
 	    ParseColliderParams (child, collider);
 
 	    break;
@@ -351,7 +360,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	    float r = child->GetAttributeValueAsFloat ("radius");
 
 	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
-	    collider->CreateCylinderGeometry (l, r);
+	    collider->SetCylinderGeometry (l, r);
 	    ParseColliderParams (child, collider);
 
 	    break;
@@ -363,7 +372,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	    float r = child->GetAttributeValueAsFloat ("radius");
 
 	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
-	    collider->CreateCapsuleGeometry (l, r);
+	    collider->SetCapsuleGeometry (l, r);
 	    ParseColliderParams (child, collider);
 
 	    break;
@@ -375,7 +384,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	    synldr->ParsePlane (node, plane);
 
 	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
-	    collider->CreatePlaneGeometry (plane);
+	    collider->SetPlaneGeometry (plane);
 	    ParseColliderParams (child, collider);
 
 	    break;
