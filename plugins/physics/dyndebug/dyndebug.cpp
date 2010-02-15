@@ -25,6 +25,7 @@
 #include "ivaria/dynamics.h"
 #include "csgeom/vector3.h"
 #include "csgeom/sphere.h"
+#include "csgeom/tri.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
@@ -133,6 +134,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
       return;
     }
 
+    // TODO: remove all previous debug meshes
+
     // Iterate through each rigid body
     for (unsigned int bodyIndex = 0;
 	 bodyIndex < (unsigned int) system->GetBodysCount ();
@@ -151,28 +154,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 	{
 	  engine->RemoveObject (mesh);
 	  meshData.mesh = mesh;
-	  storedMeshes.PutUnique (body, meshData);
 	}
+
+	storedMeshes.PutUnique (body, meshData);
       }
 
-      // Else, put back the original attached mesh
+      // Else, go back to normal mode
       else
       {
 	if (storedMeshes.Contains (body))
 	{
-	  // TODO: the debug mesh is not removed when this is an animesh 
+	  // Remove the debug mesh
+	  engine->RemoveObject (body->GetAttachedMesh ());
+
+	  // Put back the original attached mesh
 	  MeshData nullData;
 	  meshData = storedMeshes.Get (body, nullData);
-	  engine->RemoveObject (body->GetAttachedMesh ());
-	  meshData.mesh->GetMovable ()->SetSector (sector);
-	  body->AttachMesh (meshData.mesh);
+
+	  if (meshData.mesh)
+	  {
+	    meshData.mesh->GetMovable ()->SetSector (sector);
+	    body->AttachMesh (meshData.mesh);
+	  }
+
+	  else
+	    body->AttachMesh (0);
+
+	  // Erase body reference
+	  storedMeshes.DeleteAll (body);
 	}
 
 	continue;
       }
 
       // TODO: display the joints too
-      // TODO: use iDynamicsSystemCollider::FillWithColliderGeometry instead
+      // TODO: use iDynamicsSystemCollider::FillWithColliderGeometry instead?
       // TODO: use specific colors for objects static/dynamic/active/inactive
       // TODO: display collisions
 
@@ -244,8 +260,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 	    }
 	    break;
 
+	  case TRIMESH_COLLIDER_GEOMETRY:
+	    {
+	      // Get mesh geometry
+	      csVector3* vertices = 0;
+	      int* indices = 0;
+	      size_t vertexCount, triangleCount;
+	      collider->GetMeshGeometry (vertices, vertexCount, indices, triangleCount);
+
+	      // Create mesh
+	      csRef<iMeshWrapper> mesh =
+		CreateCustomMesh (vertices, vertexCount, indices, triangleCount, material,
+				collider->GetLocalTransform (), sector);
+	      body->AttachMesh (mesh);
+	    }
+	    break;
+
+	  case CONVEXMESH_COLLIDER_GEOMETRY:
+	    {
+	      // Get mesh geometry
+	      csVector3* vertices = 0;
+	      int* indices = 0;
+	      size_t vertexCount, triangleCount;
+	      collider->GetConvexMeshGeometry (vertices, vertexCount, indices, triangleCount);
+
+	      // Create mesh
+	      csRef<iMeshWrapper> mesh =
+		CreateCustomMesh (vertices, vertexCount, indices, triangleCount, material,
+				collider->GetLocalTransform (), sector);
+	      body->AttachMesh (mesh);
+	    }
+	    break;
+
 	  default:
-	    // TODO: convex/concave meshes
+	    // TODO: plan meshes
 	    break;
 	  }
       }
@@ -403,6 +451,58 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 
     // Create the mesh.
     csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (capsuleFact, "capsule",
+						       sector));
+    mesh->GetMeshObject ()->SetMaterialWrapper (material);
+
+    return mesh;
+  }
+
+  csRef<iMeshWrapper> DynamicsDebugger::CreateCustomMesh
+    (csVector3*& vertices, size_t& vertexCount, int*& indices, size_t& triangleCount,
+     iMaterialWrapper* material, csOrthoTransform transform, iSector* sector)
+  {
+    // Find the pointer to the engine plugin
+    csRef<iEngine> engine = csQueryRegistry<iEngine> (manager->object_reg);
+    if (!engine)
+    {
+      manager->Report (CS_REPORTER_SEVERITY_ERROR,
+		       "No iEngine plugin!");
+      return 0;
+    }
+
+    // Create the mesh factory.
+    csRef<iMeshFactoryWrapper> meshFact =
+      engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh",
+				 "meshFact");
+    if (meshFact == 0)
+    {
+      manager->Report (CS_REPORTER_SEVERITY_ERROR,
+		       "Error creating custom mesh factory!");
+      return 0;
+    }
+ 
+    // Generate the mesh topology
+    csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
+      (meshFact->GetMeshObjectFactory ());
+
+    gmstate->SetVertexCount (vertexCount);
+    gmstate->SetTriangleCount (triangleCount);
+
+    for (unsigned int i = 0; i < vertexCount; i++)
+      gmstate->GetVertices ()[i] = vertices[i];
+
+    for (unsigned int i = 0; i < triangleCount; i++)
+    {
+      gmstate->GetTriangles ()[i].a = indices[i * 3];
+      gmstate->GetTriangles ()[i].b = indices[i * 3 + 1];
+      gmstate->GetTriangles ()[i].c = indices[i * 3 + 2];
+    }
+    gmstate->CalculateNormals ();
+
+    meshFact->HardTransform (transform);
+
+    // Create the mesh.
+    csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (meshFact, "mesh",
 						       sector));
     mesh->GetMeshObject ()->SetMaterialWrapper (material);
 

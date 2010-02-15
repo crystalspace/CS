@@ -97,6 +97,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 					   csOrthoTransform transform,
 					   iSector* sector);
 
+    csRef<iMeshWrapper> CreateCustomMesh (csVector3*& vertices, size_t& vertexCount,
+					  int*& indices, size_t& triangleCount,
+					  iMaterialWrapper* material,
+					  csOrthoTransform transform,
+					  iSector* sector);
+
   private:
 
     struct MeshData
