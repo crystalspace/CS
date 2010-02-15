@@ -1217,7 +1217,7 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   if (!trimesh || trimesh->GetVertexCount () == 0
       || trimesh->GetTriangleCount () == 0)
   {
-    csFPrintf(stderr, "csODECollider: No collision polygons, triangles or vertices on %s\n",
+    csFPrintf(stderr, "csODECollider: No collision polygons, triangles or vertices on mesh factory '%s'\n",
       mesh->QueryObject()->GetName());
     return false;
   }
@@ -1516,6 +1516,35 @@ bool csODECollider::GetCapsuleGeometry (float& length, float& radius)
     length = odeL;
     return true;
   }
+  return false;
+}
+bool csODECollider::GetMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+				     int*& indices, size_t& triangleCount)
+{
+  triangleCount = dGeomTriMeshGetTriangleCount (geomID);
+  vertexCount = triangleCount * 3;
+
+  delete[] indices;
+  indices = new int[triangleCount * 3];
+  for (unsigned int i = 0; i < triangleCount * 3; i++)
+    indices[i] = i;
+
+  delete[] vertices;
+  vertices = new csVector3[vertexCount];
+  for (unsigned int i = 0; i < triangleCount; i++)
+  {
+    dVector3 v0, v1, v2;
+    dGeomTriMeshGetTriangle (geomID, i, &v0, &v1, &v2);
+    vertices[i*3] = csVector3 (v0[0], v0[1], v0[2]);
+    vertices[i*3+1] = csVector3 (v1[0], v1[1], v1[2]);
+    vertices[i*3+2] = csVector3 (v2[0], v2[1], v2[2]);
+  }
+
+  return false;
+}
+bool csODECollider::GetConvexMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+					   int*& indices, size_t& triangleCount)
+{
   return false;
 }
 void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact)
@@ -3167,6 +3196,7 @@ ODEJointType csODEJoint::GetType()
   case dJointTypeHinge2: return CS_ODE_JOINT_TYPE_HINGE2;
   case dJointTypeFixed: return CS_ODE_JOINT_TYPE_FIXED;
   case dJointTypeAMotor: return CS_ODE_JOINT_TYPE_AMOTOR;
+  default: return CS_ODE_JOINT_TYPE_UNKNOWN;
   }
   return CS_ODE_JOINT_TYPE_UNKNOWN;
 }

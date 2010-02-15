@@ -392,6 +392,10 @@ public:
   virtual bool GetPlaneGeometry (csPlane3& plane); 
   virtual bool GetCylinderGeometry (float& length, float& radius);
   virtual bool GetCapsuleGeometry (float& length, float& radius);
+  virtual bool GetMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+				int*& indices, size_t& triangleCount);
+  virtual bool GetConvexMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+				      int*& indices, size_t& triangleCount);
   virtual void MakeStatic ();
   virtual void MakeDynamic ();
   virtual bool IsStatic ();

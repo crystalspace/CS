@@ -857,7 +857,7 @@ class csReversibleTransform;
  */
 struct iDynamicsSystemCollider : public virtual iBase
 {
-  SCF_INTERFACE (iDynamicsSystemCollider, 0, 0, 3);
+  SCF_INTERFACE (iDynamicsSystemCollider, 0, 0, 4);
 
   /// Create collider geometry with given sphere.
   virtual bool CreateSphereGeometry (const csSphere& sphere) = 0;
@@ -991,6 +991,42 @@ struct iDynamicsSystemCollider : public virtual iBase
    * the capsule's length and radius, otherwise it will return false.
    */
   virtual bool GetCapsuleGeometry (float& length, float& radius) = 0;
+
+  /**
+   * If this collider has a concave mesh geometry then the method will return
+   * true and the vertices and triangles of the mesh, otherwise it will
+   * return false.
+   * \param vertices Array of the vertices of the geometry. The array will be
+   * deleted and reallocated by this call, you should therefore call 'delete[]'
+   * on your array after having used it.
+   * \param vertexCount The number of vertices that have been put in the array.
+   * \param indices Array of the indices of the triangles of the geometry. There
+   * are 3 indices per triangle. The indices are put consecutively, so the array
+   * is one-dimensional. The array will be deleted and reallocated by this call,
+   * you should therefore call 'delete[]' on your array after having used it.
+   * \param triangleCount The number of triangles that have been put in the array
+   * of indices.
+   */
+  virtual bool GetMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+				int*& indices, size_t& triangleCount) = 0;
+
+  /**
+   * If this collider has a convex mesh geometry then the method will return
+   * true and the vertices and triangles of the mesh, otherwise it will
+   * return false.
+   * \param vertices Array of the vertices of the geometry. The array will be
+   * deleted and reallocated by this call, you should therefore call 'delete[]'
+   * on your array after having used it.
+   * \param vertexCount The number of vertices that have been put in the array.
+   * \param indices Array of the indices of the triangles of the geometry. There
+   * are 3 indices per triangle. The indices are put consecutively, so the array
+   * is one-dimensional. The array will be deleted and reallocated by this call,
+   * you should therefore call 'delete[]' on your array after having used it.
+   * \param triangleCount The number of triangles that have been put in the array
+   * of indices.
+   */
+  virtual bool GetConvexMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+				      int*& indices, size_t& triangleCount) = 0;
 };
 
 /**

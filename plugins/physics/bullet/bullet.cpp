@@ -112,7 +112,7 @@ static csRef<iTriangleMesh> FindColdetTriangleMesh(iMeshWrapper* mesh,
   if (!trimesh || trimesh->GetVertexCount () == 0
       || trimesh->GetTriangleCount () == 0)
   {
-    csFPrintf (stderr, "csBulletRigidBody: No collision polygons, triangles or vertices on %s\n",
+    csFPrintf (stderr, "csBulletRigidBody: No collision polygons, triangles or vertices on mesh factory '%s'\n",
       mesh->QueryObject()->GetName());
 
     return 0;
@@ -2353,6 +2353,52 @@ bool csBulletCollider::GetCapsuleGeometry (float& length,
   btCapsuleShapeZ* geometry = static_cast<btCapsuleShapeZ*> (shape);
   radius = geometry->getRadius ();
   length = geometry->getHalfHeight () * 2.0f;
+
+  return true;
+}
+
+bool csBulletCollider::GetMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+					int*& indices, size_t& triangleCount)
+{
+  if (geomType != TRIMESH_COLLIDER_GEOMETRY)
+    return false;
+
+  triangleCount = this->triangleCount;
+  delete[] indices;
+  indices = new int[this->triangleCount * 3];
+  for (unsigned int i = 0; i < triangleCount * 3; i++)
+    indices[i] = this->indices[i];
+
+  vertexCount = this->vertexCount;
+  delete[] vertices;
+  vertices = new csVector3[this->vertexCount];
+  for (unsigned int i = 0; i < vertexCount; i++)
+    vertices[i].Set (this->vertices[i].getX (),
+		     this->vertices[i].getY (),
+		     this->vertices[i].getZ ());
+
+  return true;
+}
+
+bool csBulletCollider::GetConvexMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+					      int*& indices, size_t& triangleCount)
+{
+  if (geomType != CONVEXMESH_COLLIDER_GEOMETRY)
+    return false;
+
+  triangleCount = this->triangleCount;
+  delete[] indices;
+  indices = new int[this->triangleCount * 3];
+  for (unsigned int i = 0; i < triangleCount * 3; i++)
+    indices[i] = this->indices[i];
+
+  vertexCount = this->vertexCount;
+  delete[] vertices;
+  vertices = new csVector3[this->vertexCount];
+  for (unsigned int i = 0; i < vertexCount; i++)
+    vertices[i].Set (this->vertices[i].getX (),
+		     this->vertices[i].getY (),
+		     this->vertices[i].getZ ());
 
   return true;
 }
