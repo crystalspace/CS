@@ -610,14 +610,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::SetMorphTargetWeight (uint target, float weight)
   {
-    // allocating array now saves some flops at each frame when morph targets are not used
+    CS_ASSERT (target < factory->morphTargets.GetSize ());
+
+    // allocating array now saves some flops at each frame until morph targets are used
     morphTargetWeights.SetSize (factory->morphTargets.GetSize(), 0.0f);
     morphTargetWeights[target] = weight;
   }
 
   float AnimeshObject::GetMorphTargetWeight (uint target) const
   {
-    if (morphTargetWeights.GetSize()>target)
+    if (morphTargetWeights.GetSize() > target)
       return morphTargetWeights[target];
     else
       return 0.0;
