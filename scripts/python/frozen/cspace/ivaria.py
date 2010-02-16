@@ -692,6 +692,8 @@ class iDynamicsSystemCollider(core.iBase):
     def MakeDynamic(*args): return _ivaria.iDynamicsSystemCollider_MakeDynamic(*args)
     def IsStatic(*args): return _ivaria.iDynamicsSystemCollider_IsStatic(*args)
     def GetCapsuleGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetCapsuleGeometry(*args)
+    def GetMeshGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetMeshGeometry(*args)
+    def GetConvexMeshGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetConvexMeshGeometry(*args)
     __swig_destroy__ = _ivaria.delete_iDynamicsSystemCollider
     __del__ = lambda self : None;
 iDynamicsSystemCollider_swigregister = _ivaria.iDynamicsSystemCollider_swigregister

@@ -7406,6 +7406,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *MakeDynamic = *cspacec::iDynamicsSystemCollider_MakeDynamic;
 *IsStatic = *cspacec::iDynamicsSystemCollider_IsStatic;
 *GetCapsuleGeometry = *cspacec::iDynamicsSystemCollider_GetCapsuleGeometry;
+*GetMeshGeometry = *cspacec::iDynamicsSystemCollider_GetMeshGeometry;
+*GetConvexMeshGeometry = *cspacec::iDynamicsSystemCollider_GetConvexMeshGeometry;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

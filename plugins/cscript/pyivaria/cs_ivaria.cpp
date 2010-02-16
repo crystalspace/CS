@@ -2710,19 +2710,22 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_int64_t swig_types[187]
 #define SWIGTYPE_p_int8_t swig_types[188]
 #define SWIGTYPE_p_long_long swig_types[189]
-#define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[190]
-#define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[191]
-#define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[192]
-#define SWIGTYPE_p_uint16_t swig_types[193]
-#define SWIGTYPE_p_uint32_t swig_types[194]
-#define SWIGTYPE_p_uint64_t swig_types[195]
-#define SWIGTYPE_p_uint8_t swig_types[196]
-#define SWIGTYPE_p_unsigned_int swig_types[197]
-#define SWIGTYPE_p_unsigned_long swig_types[198]
-#define SWIGTYPE_p_unsigned_long_long swig_types[199]
-#define SWIGTYPE_p_void swig_types[200]
-static swig_type_info *swig_types[202];
-static swig_module_info swig_module = {swig_types, 201, 0, 0, 0, 0};
+#define SWIGTYPE_p_p_csVector3 swig_types[190]
+#define SWIGTYPE_p_p_int swig_types[191]
+#define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[192]
+#define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[193]
+#define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[194]
+#define SWIGTYPE_p_size_t swig_types[195]
+#define SWIGTYPE_p_uint16_t swig_types[196]
+#define SWIGTYPE_p_uint32_t swig_types[197]
+#define SWIGTYPE_p_uint64_t swig_types[198]
+#define SWIGTYPE_p_uint8_t swig_types[199]
+#define SWIGTYPE_p_unsigned_int swig_types[200]
+#define SWIGTYPE_p_unsigned_long swig_types[201]
+#define SWIGTYPE_p_unsigned_long_long swig_types[202]
+#define SWIGTYPE_p_void swig_types[203]
+static swig_type_info *swig_types[205];
+static swig_module_info swig_module = {swig_types, 204, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -20465,6 +20468,146 @@ SWIGINTERN PyObject *_wrap_iDynamicsSystemCollider_GetCapsuleGeometry(PyObject *
   }
   arg3 = reinterpret_cast< float * >(argp3);
   result = (bool)(arg1)->GetCapsuleGeometry(*arg2,*arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDynamicsSystemCollider_GetMeshGeometry(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicsSystemCollider *arg1 = (iDynamicsSystemCollider *) 0 ;
+  csVector3 **arg2 = 0 ;
+  size_t *arg3 = 0 ;
+  int **arg4 = 0 ;
+  size_t *arg5 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicsSystemCollider_GetMeshGeometry",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicsSystemCollider, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicsSystemCollider_GetMeshGeometry" "', argument " "1"" of type '" "iDynamicsSystemCollider *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicsSystemCollider * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_p_csVector3,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDynamicsSystemCollider_GetMeshGeometry" "', argument " "2"" of type '" "csVector3 *&""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicsSystemCollider_GetMeshGeometry" "', argument " "2"" of type '" "csVector3 *&""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 ** >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_size_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iDynamicsSystemCollider_GetMeshGeometry" "', argument " "3"" of type '" "size_t &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicsSystemCollider_GetMeshGeometry" "', argument " "3"" of type '" "size_t &""'"); 
+  }
+  arg3 = reinterpret_cast< size_t * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_p_int,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iDynamicsSystemCollider_GetMeshGeometry" "', argument " "4"" of type '" "int *&""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicsSystemCollider_GetMeshGeometry" "', argument " "4"" of type '" "int *&""'"); 
+  }
+  arg4 = reinterpret_cast< int ** >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_size_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iDynamicsSystemCollider_GetMeshGeometry" "', argument " "5"" of type '" "size_t &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicsSystemCollider_GetMeshGeometry" "', argument " "5"" of type '" "size_t &""'"); 
+  }
+  arg5 = reinterpret_cast< size_t * >(argp5);
+  result = (bool)(arg1)->GetMeshGeometry(*arg2,*arg3,*arg4,*arg5);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDynamicsSystemCollider_GetConvexMeshGeometry(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicsSystemCollider *arg1 = (iDynamicsSystemCollider *) 0 ;
+  csVector3 **arg2 = 0 ;
+  size_t *arg3 = 0 ;
+  int **arg4 = 0 ;
+  size_t *arg5 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicsSystemCollider_GetConvexMeshGeometry",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicsSystemCollider, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicsSystemCollider_GetConvexMeshGeometry" "', argument " "1"" of type '" "iDynamicsSystemCollider *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicsSystemCollider * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_p_csVector3,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDynamicsSystemCollider_GetConvexMeshGeometry" "', argument " "2"" of type '" "csVector3 *&""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicsSystemCollider_GetConvexMeshGeometry" "', argument " "2"" of type '" "csVector3 *&""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 ** >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_size_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iDynamicsSystemCollider_GetConvexMeshGeometry" "', argument " "3"" of type '" "size_t &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicsSystemCollider_GetConvexMeshGeometry" "', argument " "3"" of type '" "size_t &""'"); 
+  }
+  arg3 = reinterpret_cast< size_t * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_p_int,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iDynamicsSystemCollider_GetConvexMeshGeometry" "', argument " "4"" of type '" "int *&""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicsSystemCollider_GetConvexMeshGeometry" "', argument " "4"" of type '" "int *&""'"); 
+  }
+  arg4 = reinterpret_cast< int ** >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_size_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iDynamicsSystemCollider_GetConvexMeshGeometry" "', argument " "5"" of type '" "size_t &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicsSystemCollider_GetConvexMeshGeometry" "', argument " "5"" of type '" "size_t &""'"); 
+  }
+  arg5 = reinterpret_cast< size_t * >(argp5);
+  result = (bool)(arg1)->GetConvexMeshGeometry(*arg2,*arg3,*arg4,*arg5);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -39987,6 +40130,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iDynamicsSystemCollider_MakeDynamic", _wrap_iDynamicsSystemCollider_MakeDynamic, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_IsStatic", _wrap_iDynamicsSystemCollider_IsStatic, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_GetCapsuleGeometry", _wrap_iDynamicsSystemCollider_GetCapsuleGeometry, METH_VARARGS, NULL},
+	 { (char *)"iDynamicsSystemCollider_GetMeshGeometry", _wrap_iDynamicsSystemCollider_GetMeshGeometry, METH_VARARGS, NULL},
+	 { (char *)"iDynamicsSystemCollider_GetConvexMeshGeometry", _wrap_iDynamicsSystemCollider_GetConvexMeshGeometry, METH_VARARGS, NULL},
 	 { (char *)"delete_iDynamicsSystemCollider", _wrap_delete_iDynamicsSystemCollider, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_swigregister", iDynamicsSystemCollider_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iJoint_Attach", _wrap_iJoint_Attach, METH_VARARGS, NULL},
@@ -41012,6 +41157,9 @@ static swig_type_info _swigt__p_int16_t = {"_p_int16_t", "int16 *|int16_t *", 0,
 static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *|int64 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int8_t = {"_p_int8_t", "int8 *|int8_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "longlong *|long long *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_p_csVector3 = {"_p_p_csVector3", "csVector3 **", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_p_int = {"_p_p_int", "int **", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
@@ -41212,9 +41360,12 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_int64_t,
   &_swigt__p_int8_t,
   &_swigt__p_long_long,
+  &_swigt__p_p_csVector3,
+  &_swigt__p_p_int,
   &_swigt__p_scfImplementation1T_csConfigFile_iConfigFile_t,
   &_swigt__p_scfImplementation1T_csObject_iObject_t,
   &_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t,
+  &_swigt__p_size_t,
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
@@ -41418,6 +41569,9 @@ static swig_cast_info _swigc__p_int16_t[] = {  {&_swigt__p_int16_t, 0, 0, 0},{0,
 static swig_cast_info _swigc__p_int64_t[] = {  {&_swigt__p_int64_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int8_t[] = {  {&_swigt__p_int8_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_long_long[] = {  {&_swigt__p_long_long, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_p_csVector3[] = {  {&_swigt__p_p_csVector3, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_p_int[] = {  {&_swigt__p_p_int, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -41618,9 +41772,12 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_int64_t,
   _swigc__p_int8_t,
   _swigc__p_long_long,
+  _swigc__p_p_csVector3,
+  _swigc__p_p_int,
   _swigc__p_scfImplementation1T_csConfigFile_iConfigFile_t,
   _swigc__p_scfImplementation1T_csObject_iObject_t,
   _swigc__p_scfImplementationExt1T_csPath_csObject_iPath_t,
+  _swigc__p_size_t,
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
