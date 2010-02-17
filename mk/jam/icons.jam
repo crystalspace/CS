@@ -173,7 +173,7 @@ if $(CMD.ICOTOOL) != ""
       $(CP) $ICONSSRC/\${ICONBASE}_8.png $(<)
     else
       # Makes transparency binary and reduces colors to 256
-      $(CMD.CONVERT) $(>) \( +clone -fx a +matte -monochrome \) -compose CopyOpacity -composite -colors 256 -dither $(<)
+      $(CMD.CONVERT) $(>) \( +clone -fx a +matte -monochrome \) -compose CopyOpacity -composite -colors 256 +dither $(<)
     fi
   }
   
