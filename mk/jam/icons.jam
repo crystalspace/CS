@@ -91,10 +91,18 @@ if $(CMD.RSVG) != ""
     ICONBASE=`basename $(>) .svg`
     if [ -e $SIZEDICONSSRC/$ICONBASE.png ] ; then
       $(CP) $SIZEDICONSSRC/$ICONBASE.png $(<)
-    elif [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
-      $(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $SIZEDICONSSRC/$ICONBASE.svg $(<)
     else
-      $(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $(>) $(<)
+      if [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
+	$(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $SIZEDICONSSRC/$ICONBASE.svg $(<).tmp
+      else
+	$(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $(>) $(<).tmp
+      fi
+      if [ -n "$(CMD.PNGCRUSH:E=)" ] ; then
+	$(CMD.PNGCRUSH) $(<).tmp $(<)
+	rm $(<).tmp
+      else
+	mv $(<).tmp $(<)
+      fi
     fi
   }
   
@@ -105,10 +113,18 @@ if $(CMD.RSVG) != ""
     GENSIZEDICONSSRC=`dirname $(<)`/../22
     if [ -e $SIZEDICONSSRC/$ICONBASE.png ] ; then
       $(CP) $SIZEDICONSSRC/$ICONBASE.png $(<)
-    elif [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
-      $(CMD.RSVG) -f png -w 24 -h 24  $SIZEDICONSSRC/$ICONBASE.svg $(<)
     else
-      $(CMD.CONVERT) -bordercolor Transparent -border 1x1 $GENSIZEDICONSSRC/$ICONBASE.png $(<)
+      if [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
+	$(CMD.RSVG) -f png -w 24 -h 24  $SIZEDICONSSRC/$ICONBASE.svg $(<).tmp
+      else
+	$(CMD.CONVERT) -bordercolor Transparent -border 1x1 $GENSIZEDICONSSRC/$ICONBASE.png $(<).tmp
+      fi
+      if [ -n "$(CMD.PNGCRUSH:E=)" ] ; then
+	$(CMD.PNGCRUSH) $(<).tmp $(<)
+	rm $(<).tmp
+      else
+	mv $(<).tmp $(<)
+      fi
     fi
   }
 }
