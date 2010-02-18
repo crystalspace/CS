@@ -119,12 +119,12 @@ else
 
 if $(CMD.ICOTOOL) != ""
 {
-  ## IconsMakeWin32ICO filename : iconname
+  ## IconsMakeWin32ICO filename : iconname [: sizes]
   ##   Generate a Win32 ICO file from multiple PNG images, such as those
   ##   produced by IconsFromSVG.
   ##   The source images are expected to have the names
-  ##   icons/<size>/<iconname>.png for multiple common icon sizes as
-  ##   'size' (currently 16, 32 and 48).
+  ##   icons/<size>/<iconname>.png for the sizes specified in `sizes'.
+  ##   By default, a set of common sizes is used, currently 16, 32, 48 and 256.
   ##   The ICO will also include 256 color images that are generated from
   ##   the (presumably RGBA) source PNGs and stored as 
   ##   icons/<size>/<iconname>_8.png. 
@@ -137,9 +137,12 @@ if $(CMD.ICOTOOL) != ""
   { 
     local icofile = $(1) ;
     local icon = $(2) ;
+    local sizes = $(3) ;
+    
+    if "$(sizes)" = "" { sizes = 16 32 48 256 ; }
     
     local size icons ;
-    for size in 16 32 48 256
+    for size in $(sizes)
     {
       local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
       local pngtempdir = [ ConcatDirs $(BUILDTOP) out iconstmp $(SUBDIR) $(size) ] ;
