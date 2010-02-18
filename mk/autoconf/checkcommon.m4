@@ -145,6 +145,16 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_ICONS],
     # icotool: for creating Win32 ICO files
     CS_CHECK_PROGS([ICOTOOL], [icotool])
     CS_EMIT_BUILD_PROPERTY([CMD.ICOTOOL], [$ICOTOOL], [], [], [$1])
+    AS_IF([test -n "$ICOTOOL"],
+	[AC_CACHE_CHECK([whether icotool supports --raw], [cs_cv_icotool_supports_raw],
+	    [cs_cv_icotool_supports_raw=no
+	    AS_IF([AC_TRY_COMMAND(
+		    [$ICOTOOL 2>/dev/null | grep -e "--raw" >/dev/null 2>&1])],
+		    [cs_cv_icotool_supports_raw=yes])
+	    ])
+	CS_EMIT_BUILD_PROPERTY([ICOTOOL.SUPPORTS_RAW],
+	    [$cs_cv_icotool_supports_raw], [], [], [$1])
+	])
 
     # convert: for various image manipulations from both the svg conversion and
     #  ICO creation.

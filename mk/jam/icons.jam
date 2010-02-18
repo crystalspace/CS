@@ -139,7 +139,7 @@ if $(CMD.ICOTOOL) != ""
     local icon = $(2) ;
     
     local size icons ;
-    for size in 16 32 48
+    for size in 16 32 48 256
     {
       local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
       local pngtempdir = [ ConcatDirs $(BUILDTOP) out iconstmp $(SUBDIR) $(size) ] ;
@@ -147,15 +147,26 @@ if $(CMD.ICOTOOL) != ""
       local pngfile = $(icon:G=$(pngdir)).png ;
       local lowfile = $(icon:G=$(pngtempdir))_8.png ;
       NoCare $(pngfile) ;
-      icons += "$(pngfile)" ;
-      if $(CMD.CONVERT) != ""
+      if $(size) != 256
       {
-	MakeLocate $(lowfile) : $(pngtempdir) ;
-        SIZE on $(lowfile) = $(size) ;
-	
-	ReduceColorDepth $(lowfile) : $(pngfile) ;
-	Always $(lowfile) ;
-        icons += "$(lowfile)" ;
+	icons += "$(pngfile)" ;
+	if $(CMD.CONVERT) != ""
+	{
+	  MakeLocate $(lowfile) : $(pngtempdir) ;
+	  SIZE on $(lowfile) = $(size) ;
+	  
+	  ReduceColorDepth $(lowfile) : $(pngfile) ;
+	  Always $(lowfile) ;
+	  icons += "$(lowfile)" ;
+	}
+      }
+      else
+      {
+	if "$(ICOTOOL.SUPPORTS_RAW)" = "yes"
+	{
+	  # Special case, embed icon as PNG
+	  RAW_ICONS on $(icofile) += "$(pngfile)" ;
+	}
       }
     }
     
@@ -177,7 +188,7 @@ if $(CMD.ICOTOOL) != ""
     fi
   }
   
-  actions IcoTool
+  actions IcoTool bind RAW_ICONS
   {
     SOURCES=
     for i in $(>) ; do
@@ -185,7 +196,7 @@ if $(CMD.ICOTOOL) != ""
         SOURCES="$SOURCES $i"
       fi
     done
-    $(CMD.ICOTOOL) -c -o $(<) $SOURCES
+    $(CMD.ICOTOOL) -c -o $(<) $SOURCES "--raw=$(RAW_ICONS)"
   }
 }
 else
