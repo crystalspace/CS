@@ -595,15 +595,20 @@ bool csGLShader_CG::Open()
     if (currentLimits.fp.profile == CG_PROFILE_UNKNOWN)
     {
       CGprofile latestProfile = cgGLGetLatestProfile (CG_GL_FRAGMENT);
-      if ((latestProfile == CG_PROFILE_FP20) && psplg.IsValid())
+      if (((latestProfile == CG_PROFILE_FP20) /* (1) below */
+	  || (latestProfile == CG_PROFILE_UNKNOWN)) /* (2) below */
+	&& psplg.IsValid())
       {
-        /* Use CG_PROFILE_PS_1_1 or CG_PROFILE_PS_1_3 instead of FP20.
+        /* (1) Use CG_PROFILE_PS_1_1 or CG_PROFILE_PS_1_3 instead of FP20.
            NVidia's FP20 backend apparently doesn't handle constants that are
            needed in two different combiner stages very well - it seems to
            only set one of the constants. However, the PS1.x code generated
            by Cg is semantically correct; our PS1.x 'emulation' plugin correctly
            handles the required constant mapping, so prefer indirection through
-           PS1.x even if the hardware could support FP20 natively. */
+           PS1.x even if the hardware could support FP20 natively. 
+	   (2) If there is no Cg-supported profile we might still support a
+	   routed PS1.x profile.
+	   */
         if (IsRoutedProfileSupported (CG_PROFILE_PS_1_3))
           latestProfile = CG_PROFILE_PS_1_3;
         else if (IsRoutedProfileSupported (CG_PROFILE_PS_1_1))
