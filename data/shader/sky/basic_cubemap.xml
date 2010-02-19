@@ -17,7 +17,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 
-<shader compiler="shaderweaver" name="sky_basic">
+<shader compiler="shaderweaver" name="sky_basic_cubemap">
   <technique priority="100">
     <pass>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />

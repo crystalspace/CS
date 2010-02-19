@@ -53,7 +53,7 @@
     </textures>
     <shaders>
         <shader>
-            <file>/shader/sky/basic.xml</file>
+            <file>/shader/sky/basic_cubemap.xml</file>
         </shader>
         <shader>
             <file>/shader/terrain/splat.xml</file>
@@ -103,8 +103,8 @@
             <shader type="base">lighting_fullbright</shader>
         </material>
         <material name="sky">
-            <shader type="base">sky_basic</shader>
-            <shader type="diffuse">sky_basic</shader>
+            <shader type="base">sky_basic_cubemap</shader>
+            <shader type="diffuse">sky_basic_cubemap</shader>
             <shadervar type="texture" name="tex sky">sky</shadervar>
         </material>
     </materials>
