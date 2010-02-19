@@ -581,6 +581,7 @@ bool csGLShader_CG::Open()
 	  ProfileLimits limits (
 	    CS::PluginCommon::ShaderProgramPluginGL::Other,
 	    profile2);
+	  limits.GetCurrentLimits (ext);
 	  currentLimits.fp = limits;
           strictMatchFP = true;
 	}
