@@ -1097,22 +1097,12 @@ rule RegisterWellKnownCompileGroup
   MSVCGEN.DELAYED_COMPILE_GROUPS = ;
 }
 
-rule LinkStaticPlugins
+rule _ApplyStaticPluginFlags
 {
-  local package target plugins optplugins ;
-  # Fetch the parameters
-  target = $(1) ;
+  local target ;
   plugins = $(2) ;
   optplugins = $(3) ;
   package = $(4) ;
-  
-  local target_link_with target_ext_libs ;
-  local target_ext_libs.release.x86 target_ext_libs.debug.x86 ;
-  local target_ext_libs.release.x64 target_ext_libs.debug.x64 ;
-  local target_lflags.release target_lflags.debug ;
-  local target_cflags.release target_cflags.debug ;
-  local target_relaydeps target_relaylibs ;
-  local mode a ;
   
   if $(package)
   {
@@ -1133,18 +1123,21 @@ rule LinkStaticPlugins
       }
     }
     # Grab flags
+    local target_lflags.release target_lflags.debug ;
+    local target_relaydeps ;
     for p in $(plugins)
     {
       NotFile $(p) ;
       for mode in debug release
       {
+        local cflags ;
         if $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION))
         {
-	  target_cflags.$(mode) += $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION)) ;
+	  cflags = $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION)) ;
 	}
 	else
 	{
-	  target_cflags.$(mode) += $(STATICPLUGIN.$(p).CFLAGS.$(mode)) ;
+	  cflags = $(STATICPLUGIN.$(p).CFLAGS.$(mode)) ;
 	}
 	if $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION))
 	{
@@ -1154,6 +1147,10 @@ rule LinkStaticPlugins
 	{
 	  target_lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode)) ;
 	}
+        for target in $(1)
+        {
+          MsvcCFlags $(target) : $(cflags) ;
+        }
       }
       
       local relaydeps = $(STATICPLUGIN.$(p).RELAYDEPS) ;
@@ -1169,16 +1166,30 @@ rule LinkStaticPlugins
 	}
 	if $(has_dep) = no
 	{
-	  target_relaydeps += $(relaydep) ;
-	  target_relaylibs += "$(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep))" ;
+          target_relaydeps += $(relaydep) ;
+          for target in $(1)
+          {
+            RelayLibs $(target) : $(relaydep) : $(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep)) ;
+          }
 	}
+      }
+    }
+    for mode in debug release
+    {
+      local lflags = [ RemoveDupFlags $(target_lflags.$(mode)) ] ;
+      for target in $(1)
+      {
+        MsvcLFlags $(target) : $(lflags) : $(mode) ;
       }
     }
   }
   else
   {
     # link with static plugins
-    target_link_with += $(STATICPLUGINS.LIBRARY) ;
+    for target in $(1)
+    {
+      LinkWith $(target) : $(STATICPLUGINS.LIBRARY) ;
+    }
     
     # Local static plugins
     local libs p ;
@@ -1191,16 +1202,23 @@ rule LinkStaticPlugins
       }
     }
     # Grab flags
+    local target_relaydeps ;
     for p in $(plugins)
     {
-      target_link_with += $($(p).NEEDLIBS) ;
+      for target in $(1)
+      {
+        LinkWith $(target) : $($(p).NEEDLIBS) ;
+        ExternalLibs $(target) : $($(p).EXTERNALLIBS) ;
+      }
 
-      target_ext_libs += $($(p).EXTERNALLIBS) ;
       for mode in debug release
       {
 	for a in x86 x64
 	{
-          target_ext_libs.$(mode).$(a) += $($(p)_$(mode)_$(a)_EXTERNALLIBS) ;
+          for target in $(1)
+          {
+            MsvcExternalLibrary $(target) : $($(p)_$(mode)_$(a)_EXTERNALLIBS) : $(mode) : $(a) ;
+          }
 	}
       }
       
@@ -1217,13 +1235,27 @@ rule LinkStaticPlugins
 	}
 	if $(has_dep) = no
 	{
-	  target_relaydeps += $(relaydep) ;
-	  target_relaylibs += "$($(p).RELAYLIBS.$(relaydep))" ;
+          target_relaydeps += $(relaydep) ;
+          for target in $(1)
+          {
+            RelayLibs $(target) : $(relaydep) : $(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep)) ;
+          }
 	}
       }
     }
   }
+  
+}
 
+rule LinkStaticPlugins
+{
+  local package target plugins optplugins ;
+  # Fetch the parameters
+  target = $(1) ;
+  plugins = $(2) ;
+  optplugins = $(3) ;
+  package = $(4) ;
+  
   # Generate static plugin instantiation
   local outdir = [ Property msvcgen : outdircommon ] ;
   if "$(outdir)" = ""
@@ -1304,40 +1336,6 @@ rule LinkStaticPlugins
     
     GeneratePluginLibraryGlueApp $(appglue) : $(plugin_lib_name) ;
     
-    ExternalLibs $(plugin_lib_name) : $(target_ext_libs) ;
-    for mode in debug release
-    {
-      for a in x86 x64
-      {
-	MsvcLFlags $(plugin_lib_name) : 
-	  [ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) : $(a) ;
-	MsvcCFlags $(plugin_lib_name) : $(target_cflags.$(mode)) : $(a) ;
-	MsvcExternalLibrary $(plugin_lib_name) : $(target_ext_libs.$(mode).$(a)) : $(mode) : $(a) ;
-      }
-    }
-    for relaydep in $(target_relaydeps)
-    {
-      local relaylibs = $(target_relaylibs[1]) ;
-      target_relaylibs = $(target_relaylibs[2-]) ;
-      RelayLibs $(plugin_lib_name) : $(relaydep) : $(relaylibs) ;
-    }
-    LinkWith $(plugin_lib_name) : $(target_link_with) ;
-    
-    # Nevertheless link plugin deps to actual target to make static lib builds
-    # work
-    ExternalLibs $(target) : $(target_ext_libs) ;
-    for mode in debug release
-    {
-      for a in x86 x64
-      {
-	MsvcLFlags $(target) : 
-	  [ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) : $(a) ;
-	MsvcCFlags $(target) : $(target_cflags.$(mode)) : $(a) ;
-	MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode).$(a)) : $(mode) : $(a) ;
-      }
-    }
-    LinkWith $(target) : $(target_link_with) ;
-    
     # We need to get the external libs for the plugin lib; but they have to be 
     # specified after LinkStaticPlugins
     $(target).PROPAGATE_EXTERNALLIBS += $(plugin_lib_name) ;
@@ -1348,27 +1346,14 @@ rule LinkStaticPlugins
     Depends $(target) : $(appglue) ;
     Depends msvcgen : $(appglue) ;
     LinkWith $(target) : $(plugin_lib_name) ;
+    
+    # @@@ Something is overflowing Jam's little mind or so ...
+    # $(target) changes it's value, somewhere!
+    _ApplyStaticPluginFlags $(<) $(plugin_lib_name) : $(plugins) : $(optplugins) : $(package) ;
   }
   else
   {
-    ExternalLibs $(target) : $(target_ext_libs) ;
-    for mode in debug release
-    {
-      for a in x86 x64
-      {
-	MsvcLFlags $(target) : 
-	  [ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) : $(a) ;
-	MsvcCFlags $(target) : $(target_cflags.$(mode)) : $(a) ;
-	MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode).$(a)) : $(mode) : $(a) ;
-      }
-    }
-    for relaydep in $(target_relaydeps)
-    {
-      local relaylibs = $(target_relaylibs[1]) ;
-      target_relaylibs = $(target_relaylibs[2-]) ;
-      RelayLibs $(target) : $(relaydep) : $(relaylibs) ;
-    }
-    LinkWith $(target) : $(target_link_with) ;
+    _ApplyStaticPluginFlags $(target) : $(plugins) : $(optplugins) : $(package) ;
     
     # Add usefile to project
     MsvcAddFileToProject $($(target)_PRJ_RESPFILE) : 
