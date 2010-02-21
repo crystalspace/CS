@@ -1,5 +1,5 @@
 #============================================================================
-# Copyright (C)2006-2009 by Frank Richter
+# Copyright (C)2006-2010 by Frank Richter
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -23,7 +23,8 @@ if $(CMD.RSVG) != ""
   ##   The source SVG file is expected to have the name 
   ##   icons-src/scalable/<iconname>.svg. The result files are named
   ##   the icons/<size>/<iconname>.png for multiple common icon sizes as
-  ##   'size'.
+  ##   'size'. These "common sizes" include suitable sizes for icons on Linux
+  ##   desktops, Windows and MacOS/X.
   ##   Images for certain sizes can be specified as 
   ##   icons-src/<size>/<iconname>.png files; these are preferred over the
   ##   automatically generated ones.
@@ -43,17 +44,18 @@ if $(CMD.RSVG) != ""
     # Icon sizes to generate/use:
     # 16 - Windows small icon (Window menu, start menu)
     # 22 - Small icon for KDE and GNOME menus
-    # 24 - Small icon for GNOME file lists(*)
+    # 24 - Small icon for GNOME file lists(1)
     # 32 - Normal icon for Windows
     # 48 - Large icon for Windows XP
-    # 128 - MacOS/X, some Windows Explorer alternatives use that(**)
-    # 256 - Windows Vista icon(**)
+    # 256 - Windows Vista icon(2)
+    # 512 - MacOS/X(3)
     #
-    # * - Can be generated from 22x22 pics by adding a border.
-    # ** - Cause icon files to be really large. Vista supports PNG compression
-    #      in icons and uses it for the 256x256 versions. Problem: resource
-    #      compilers don't support that yet.
-    for size in 16 22 32 48 128 256
+    # (1) - Can be generated from 22x22 pics by adding a border.
+    # (2) - Cause icon files to be really large. Vista supports PNG compression
+    #       in icons and uses it for the 256x256 versions.
+    # (3) - OS/X 10.5 and newer. Older versions used 128x128, but seem to
+    #       handle the larger icons just fine (tested on 10.4 by Eric).
+    for size in 16 22 32 48 256 512
     {
       local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
       local pngfile = $(icon:G=$(pngdir)).png ;
@@ -135,6 +137,20 @@ else
 
 if $(CMD.ICOTOOL) != ""
 {
+  # Pad the given argument with zeroes on the left side to a length of 3 chars.
+  rule _ZeroPad
+  {
+    if [ Match ^([0-9][0-9])$ : $(<) ]
+    {
+      return 0$(<) ;
+    }
+    if [ Match ^([0-9])$ : $(<) ]
+    {
+      return 00$(<) ;
+    }
+    return $(<) ;
+  }
+
   ## IconsMakeWin32ICO filename : iconname [: sizes]
   ##   Generate a Win32 ICO file from multiple PNG images, such as those
   ##   produced by IconsFromSVG.
@@ -166,7 +182,8 @@ if $(CMD.ICOTOOL) != ""
       local pngfile = $(icon:G=$(pngdir)).png ;
       local lowfile = $(icon:G=$(pngtempdir))_8.png ;
       NoCare $(pngfile) ;
-      if $(size) != 256
+      # <= is a string comparison in Jam, hence the 0 padding
+      if [ _ZeroPad $(size) ] <= 128
       {
 	icons += "$(pngfile)" ;
 	if $(CMD.CONVERT) != ""
