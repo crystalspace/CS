@@ -12,10 +12,10 @@ FileListEntryApplications walktest : app-demo ;
 # language standard. As a compromise, we enable these restrictions on an
 # individual module basis so as to ensure that the CS headers are tested
 # against these options on a regular basis.
-if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
-{
-  CFlags walktest : $(COMPILER.C++FLAGS.PEDANTIC.ENABLE) ;
-}
+#if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
+#{
+  #CFlags walktest : $(COMPILER.C++FLAGS.PEDANTIC.ENABLE) ;
+#}
 
 # List of plugins which should be go into walkall.
 WALKALL.PLUGINLIST =

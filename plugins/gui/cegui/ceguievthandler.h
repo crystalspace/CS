@@ -32,64 +32,68 @@
 struct iObjectRegistry;
 struct iVirtualClock;
 
-class csCEGUIRenderer;
-
-/// Handles resize events and injects mouse and keyboard into CEGUI.
-class csCEGUIEventHandler : public csBaseEventHandler
+CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {
-public:
-  /// Constructor.
-  csCEGUIEventHandler (iObjectRegistry*, csCEGUIRenderer*);
+  class Renderer;
 
-  /// Destructor.
-  ~csCEGUIEventHandler ();
+  /// Handles resize events and injects mouse and keyboard into CEGUI.
+  class CEGUIEventHandler : public csBaseEventHandler
+  {
+  public:
+    /// Constructor.
+    CEGUIEventHandler (iObjectRegistry*, Renderer*);
 
-  /// Initialize the event handler. This sets up the event queue.
-  bool Initialize ();
+    /// Destructor.
+    ~CEGUIEventHandler ();
 
-  /// Handle unhandled events (like broadcast messages).
-  bool OnUnhandledEvent (iEvent &event);
+    /// Initialize the event handler. This sets up the event queue.
+    bool Initialize ();
 
-  /// Handle frame events.
-  void Frame ();
+    /// Handle unhandled events (like broadcast messages).
+    bool OnUnhandledEvent (iEvent &event);
 
-  /// Handle mouse down events.
-  bool OnMouseDown (iEvent &event);
+    /// Handle frame events.
+    void Frame ();
 
-  /// Handle mouse move events.
-  bool OnMouseMove (iEvent &event);
+    /// Handle mouse down events.
+    bool OnMouseDown (iEvent &event);
 
-  /// Handle mouse up events.
-  bool OnMouseUp (iEvent &event);
+    /// Handle mouse move events.
+    bool OnMouseMove (iEvent &event);
 
-  /// Handle keyboard events.
-  bool OnKeyboard (iEvent &event);
+    /// Handle mouse up events.
+    bool OnMouseUp (iEvent &event);
 
-  /// Capture mouse events.
-  void EnableMouseCapture ();
+    /// Handle keyboard events.
+    bool OnKeyboard (iEvent &event);
 
-  /// Don't capture mouse events.
-  void DisableMouseCapture ();
+    /// Capture mouse events.
+    void EnableMouseCapture ();
 
-  /// Capture keyboard events.
-  void EnableKeyboardCapture ();
+    /// Don't capture mouse events.
+    void DisableMouseCapture ();
 
-  /// Don't capture keyboard events.
-  void DisableKeyboardCapture ();
+    /// Capture keyboard events.
+    void EnableKeyboardCapture ();
 
-  CS_EVENTHANDLER_NAMES("crystalspace.cegui")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
-private:
-  iObjectRegistry *obj_reg;
-  csCEGUIRenderer* renderer;
-  csRef<iVirtualClock> vc;
-  csRef<iKeyComposer> compose;
-  csSet<utf32_char> caughtCharKeys;
-  csEventID CanvasResize;
+    /// Don't capture keyboard events.
+    void DisableKeyboardCapture ();
 
-  bool mouseCapture;
-  bool keyboardCapture;
+    CS_EVENTHANDLER_NAMES("crystalspace.cegui")
+      CS_EVENTHANDLER_NIL_CONSTRAINTS
+  private:
+    iObjectRegistry *obj_reg;
+    Renderer* renderer;
+    csRef<iVirtualClock> vc;
+    csRef<iKeyComposer> compose;
+    csSet<utf32_char> caughtCharKeys;
+    csEventID CanvasResize;
 
-  static CEGUI::MouseButton CSMBtoCEMB (uint button);
-};
+    bool mouseCapture;
+    bool keyboardCapture;
+
+    static CEGUI::MouseButton CSMBtoCEMB (uint button);
+  };
+} CS_PLUGIN_NAMESPACE_END(cegui)
+
 #endif // _CS_CEGUI_EVENTHANDLER_H_

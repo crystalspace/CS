@@ -71,6 +71,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       const char* locationPrefix, const char* bufName, 
       const char* outputType, const char* outputName, 
       const char* uniqueTag);
+
+    const char* GetCodeString() { return codeString; }
     /** @} */
   
     /**\name iComponent implementation
@@ -88,6 +90,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       const char* fromType, const char* toType);
     uint CoerceCost (const char* fromType, const char* toType);
   private:
+    csString codeString;
+
     csStringHash typesSet;
     const char* StoredTypeName (const char* type)
     { return typesSet.Register (type); }
@@ -236,6 +240,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     void AppendProgramInput_V2FFP (const Snippet& snippet, 
       DocNodeCgAppender& appender);
     void AppendProgramInput (iDocumentNode* node, DocNodeCgAppender& appender);
+    csString CgType (const WeaverCommon::TypeInfo* typeInfo);
     csString CgType (const char* weaverType);
     csString GetAttrIdentifier (const char* var, const char* attr);
 

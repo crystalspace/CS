@@ -80,7 +80,8 @@ struct iConditionResolver
     csConditionID condition, csConditionNode*& trueNode, 
     csConditionNode*& falseNode,
     const MyBitArrayTemp& conditionResultsTrue,
-    const MyBitArrayTemp& conditionResultsFalse) = 0;
+    const MyBitArrayTemp& conditionResultsFalse,
+    const MyBitArrayTemp& conditionResultsSet) = 0;
   /// Finish adding of nodes. Frees up some tempoarily used resources.
   virtual void FinishAdding () = 0;
 
@@ -150,6 +151,12 @@ public:
     }
     bool GetConditionValue () const
     { return (conditionValueAndRefCount & conditionValueMask) != 0; }
+    
+    bool IsUnreachable() const
+    {
+      return ((condition == csCondAlwaysTrue) && !GetConditionValue())
+	|| ((condition == csCondAlwaysFalse) && GetConditionValue());
+    }
 
     //typedef csFixedSizeAllocator<sizeof(WrappedChild)> WrappedChildAlloc;
     //CS_DECLARE_STATIC_CLASSVAR_REF (childAlloc, ChildAlloc, WrappedChildAlloc);
@@ -324,11 +331,11 @@ protected:
   void CollectUsedConditions (const csRefArray<WrappedChild>& children,
     ConditionsWriter& condWrite);
   bool ReadFromCache (iFile* cacheFile, ForeignNodeReader& foreignNodes,
-    const ConditionsReader& condReader);
+    const ConditionsReader& condReader, ConditionDumper& condDump);
   bool ReadWrappedChildren (iFile* file, 
     ForeignNodeReader& foreignNodes,
     csRefArray<WrappedChild>& children,
-    const ConditionsReader& condReader);
+    const ConditionsReader& condReader, ConditionDumper& condDump);
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
 
@@ -355,7 +362,8 @@ public:
   virtual bool GetAttributeValueAsBool (const char* name, 
     bool defaultvalue = false);
     
-  bool ReadFromCache (iFile* cacheFile, const ConditionsReader& condReader);
+  bool ReadFromCache (iFile* cacheFile, const ConditionsReader& condReader,
+    ConditionDumper& condDump);
   bool StoreToCache (iFile* cacheFile, const ConditionsWriter& condWriter);
   void CollectUsedConditions (ConditionsWriter& condWrite);
   
@@ -468,18 +476,22 @@ public:
    * \param extraNodes Extra document nodes whose conditions are added to the
    *  tree.
    * \param dumpOut Optional destination for condition tree dump.
+   * \param parseOptions Parse options, see wdnfpoExpandTemplates etc.
+   * \param presetCondResults Preset condition results, with two bits per
+   *   condition - the same format csXMLShader::ComputeTechniquesConditionsResults
+   *   returns.
    */
   csWrappedDocumentNode* CreateWrapper (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csConditionEvaluator& evaluator, 
     const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut,
-    uint parseOptions);
+    uint parseOptions, const MyBitArrayTemp* presetCondResults = 0);
   csWrappedDocumentNode* CreateWrapperStatic (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csString* dumpOut,
     uint parseOptions = wdnfpoExpandTemplates | wdnfpoHandleConditions);
     
   csWrappedDocumentNode* CreateWrapperFromCache (iFile* cacheFile,
     iConditionResolver* resolver, csConditionEvaluator& evaluator,
-    const ConditionsReader& condReader);
+    const ConditionsReader& condReader, csString* dumpOut);
 };
 
 /// Helper to dump condition expressions and IDs to a string
@@ -491,6 +503,9 @@ class ConditionDumper
 public:
   ConditionDumper (csString* dumpOut, csConditionEvaluator* evaluator)
     : currentOut (dumpOut), currentEval (evaluator) {}
+  bool DoesDumping() const { return currentOut != 0 ? true : false; }
+  csString GetConditionString (size_t id) const
+  { return currentEval ? currentEval->GetConditionString (id) : csString(); }
   void Dump (size_t id, const char* condStr, size_t condLen);
 };
 

@@ -418,7 +418,7 @@ namespace RenderManager
      */
     template<typename _ShadowHandler>
     size_t HandleLights (_ShadowHandler& shadows,
-      LightingSorter& sortedLights,
+      size_t overallPass, LightingSorter& sortedLights,
       size_t layer, LayerHelper<RenderTree, LayerConfigType,
         PostLightingLayers>& layers, const LayerConfigType& layerConfig,
       typename RenderTree::MeshNode::SingleMesh& mesh,
@@ -706,6 +706,7 @@ namespace RenderManager
 	    }
 	    firstLight += thisNum;
 	    num -= thisNum;
+            remainingLights -= thisNum;
 	  }
   
 	  totalLayers = neededLayers;
@@ -834,6 +835,7 @@ namespace RenderManager
         }
 
         size_t lightOffset = 0;
+        size_t overallPass = 0;
         for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
         {
           size_t layerLights = (numLights == 0) ? 0 :
@@ -851,12 +853,13 @@ namespace RenderManager
           sortedLights.SetLightsLimit (layerLights);
           size_t handledLights;
           if (mesh.meshFlags.CheckAll (CS_ENTITY_NOSHADOWCAST
-            | CS_ENTITY_NOSHADOWRECEIVE))
-            handledLights = HandleLights (noShadows, sortedLights,
-            layer, layerHelper, layerConfig, mesh, node);
+              | CS_ENTITY_NOSHADOWRECEIVE))
+            handledLights = HandleLights (noShadows, overallPass, sortedLights,
+              layer, layerHelper, layerConfig, mesh, node);
           else
-            handledLights = HandleLights (shadows, sortedLights,
-            layer, layerHelper, layerConfig, mesh, node);
+            handledLights = HandleLights (shadows, overallPass, sortedLights,
+              layer, layerHelper, layerConfig, mesh, node);
+          overallPass++;
           if ((handledLights == 0)
             && (!layerConfig.IsAmbientLayer (layer)))
           {

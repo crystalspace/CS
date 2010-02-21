@@ -32,16 +32,19 @@
 #include "snippet.h"
 #include "synth.h"
 
+#include "../xmlshader/iinternal.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
 
 class WeaverCompiler;
 
-class WeaverShader : public scfImplementationExt3<WeaverShader,
+class WeaverShader : public scfImplementationExt4<WeaverShader,
 						  csObject,
 						  iShader,
 						  iSelfDestruct,
-						  iXMLShader>
+						  iXMLShader,
+						  iXMLShaderInternal>
 {
   csRef<WeaverCompiler> compiler;
   csRef<iShaderManager> shadermgr;
@@ -67,6 +70,7 @@ class WeaverShader : public scfImplementationExt3<WeaverShader,
 
   /// Shader we actually use
   csRef<iShader> realShader;
+  csRef<iXMLShaderInternal> realShaderXML;
   csString filename;
 
 protected:
@@ -88,6 +92,10 @@ protected:
   csRef<iDocument> DoSynthesis (iDocumentNode* source,
     iHierarchicalCache* cacheTo, int forcepriority);
 
+  /// Set up the fallback shader consisting of all techniques after the first
+  void MakeFallbackShader (iDocumentNode* targetNode,
+    iDocumentNode* docSource,
+    const csArray<TechniqueKeeper>& techniques);
   csRef<iDocumentNode> GetNodeOrFromFile (iDocumentNode* node);
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);
@@ -97,7 +105,8 @@ public:
   
   bool Load (iLoaderContext* ldr_context, iDocumentNode* source,
     int forcepriority);
-  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo);
+  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo,
+    bool quick);
 
   virtual iObject* QueryObject () 
   { return static_cast<iObject*> (static_cast<csObject*> (this)); }
@@ -143,9 +152,10 @@ public:
     return realShader->GetMetadata ();
   }
 
-  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits, 
+				  uint userFlags) const
   {
-    realShader->GetUsedShaderVars (ticket, bits);
+    realShader->GetUsedShaderVars (ticket, bits, userFlags);
   }
   
   void PushShaderVariables (csShaderVariableStack& s, size_t t) const
@@ -236,6 +246,16 @@ public:
   }
   /** @} */
 
+  /**\name iXMLShaderInternal implementation
+   * @{ */
+  virtual size_t GetTicketNoSetup (const csRenderMeshModes& modes, 
+    const csShaderVariableStack& stack, void* eval, int lightCount)
+  {
+    return realShaderXML.IsValid()
+      ? realShaderXML->GetTicketNoSetup (modes, stack, eval, lightCount)
+      : (size_t)~0;
+  }
+  /** @} */
 public:
   csStringHash& xmltokens;
 };

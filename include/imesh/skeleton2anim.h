@@ -101,9 +101,20 @@ namespace Animation
 }
 
 /**
- * Defines a factory for a skeletal animation packet.
+ * Defines a factory for a skeletal animation packet (iSkeletonAnimPacket2).
  * A packet consists of a number of animations and a hierarchical
  * structure of nodes that defines how those animations are mixed.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonManager2::CreateAnimPacketFactory()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonManager2::FindAnimPacketFactory()
+ * - iSkeletonFactory2::GetAnimationPacket()
+ * - iSkeletonAnimPacket2::GetFactory()
+ *
+ * Main users of this interface:
+ * - iSkeletonFactory2
  */
 struct iSkeletonAnimPacketFactory2 : public virtual iBase
 {
@@ -176,7 +187,16 @@ struct iSkeletonAnimPacketFactory2 : public virtual iBase
 };
 
 /**
- * A animation packet instance
+ * A animation packet instance. It is defined by a iSkeletonAnimPacketFactory2.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonAnimPacketFactory2::CreateInstance()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeleton2::GetAnimationPacket()
+ *
+ * Main users of this interface:
+ * - iSkeleton2
  */
 struct iSkeletonAnimPacket2 : public virtual iBase
 {
@@ -194,10 +214,20 @@ struct iSkeletonAnimPacket2 : public virtual iBase
 };
 
 /**
- * Factory for skeletal animations. Defines the key frames but not the current
- * playing state.
+ * Data structure for raw skeletal animations. It defines the key frames of the
+ * animation but not the current playing state.
  * Each animation is made up of one or more channels, where a channel is a set
  * of key frames associated with a specific bone.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonAnimPacketFactory2::CreateAnimation()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonAnimPacketFactory2::FindAnimation()
+ * - iSkeletonAnimPacketFactory2::GetAnimation()
+ *
+ * Main users of this interface:
+ * - iSkeleton2
  */
 struct iSkeletonAnimation2 : public virtual iBase
 {
@@ -280,8 +310,11 @@ struct iSkeletonAnimation2 : public virtual iBase
 
 
 /**
- * A callback that is called when an animation or animation tree have finished 
- * playing
+ * A callback to be implemented if you want to be notified when the state of an
+ * animation or animation tree is changed.
+ *
+ * Main users of this interface:
+ * - iSkeletonAnimNode2::AddAnimationCallback()
  */
 struct iSkeletonAnimCallback2 : public virtual iBase
 {
@@ -309,7 +342,16 @@ struct iSkeletonAnimCallback2 : public virtual iBase
 
 
 /**
- * Base type for nodes in the hierarchical blending tree factory
+ * Base type for nodes in the hierarchical blending tree factory of the
+ * skeletal animation system. It is implemented by all types of node
+ * factories. It creates instances of iSkeletonAnimNode2.
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonAnimNode2::GetFactory()
+ * - iSkeletonAnimNodeFactory2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeletonFactory2
  */
 struct iSkeletonAnimNodeFactory2 : public virtual iBase
 {
@@ -333,8 +375,18 @@ struct iSkeletonAnimNodeFactory2 : public virtual iBase
 };
 
 /**
- * Base type for nodes in the hierarchical blending tree for 
- * skeletal animation system. 
+ * Base type for nodes in the hierarchical blending tree of the
+ * skeletal animation system. It is implemented by all types of nodes.
+ * It is defined by a iSkeletonAnimNodeFactory2.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonAnimNodeFactory2::CreateInstance()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonAnimNode2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeleton2
  */
 struct iSkeletonAnimNode2 : public virtual iBase
 {
@@ -420,7 +472,17 @@ struct iSkeletonAnimNode2 : public virtual iBase
 };
 
 /**
- * Factory for animation node
+ * Factory for raw animation nodes. It defines instances of iSkeletonAnimationNode2.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonAnimPacketFactory2::CreateAnimationNode()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonAnimationNode2::GetFactory()
+ * - iSkeletonAnimNodeFactory2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeletonFactory2
  */
 struct iSkeletonAnimationNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
@@ -477,12 +539,21 @@ struct iSkeletonAnimationNodeFactory2 : public iSkeletonAnimNodeFactory2
    * Get if animation should automatically stop when finishing.
    */
   virtual bool GetAutomaticStop () const = 0;
-
 };
 
 /**
- * Animation node. Takes data from a raw animation and controls the playback
- * of it and feeds it into the blending tree.
+ * Raw animation node. Takes data from a raw animation, controls the playback
+ * of it, and feeds it into the animation blending tree. It is defined by a
+ * iSkeletonAnimationNodeFactory2.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonAnimationNodeFactory2::CreateInstance()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonAnimNode2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeleton2
  */
 struct iSkeletonAnimationNode2 : public iSkeletonAnimNode2
 {
@@ -490,7 +561,18 @@ struct iSkeletonAnimationNode2 : public iSkeletonAnimNode2
 };
 
 /**
- * Factory for blend node
+ * Factory for blend nodes, ie nodes which blend together any number of sub-nodes.
+ * It defines instances of iSkeletonBlendNode2.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonAnimPacketFactory2::CreateBlendNode()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonBlendNode2::GetFactory()
+ * - iSkeletonAnimNodeFactory2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeletonFactory2
  */
 struct iSkeletonBlendNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
@@ -498,34 +580,36 @@ struct iSkeletonBlendNodeFactory2 : public iSkeletonAnimNodeFactory2
 
   /**
    * Add a new sub-node to be blended into the result
-   * \param node the node to add
+   * \param node the sub-node to add
    * \param weight the blend weight to use for this node
    */
   virtual void AddNode (iSkeletonAnimNodeFactory2* node, float weight) = 0;
 
   /**
-   * Set the blend weight for a specific node
+   * Set the blend weight for a specific sub-node. The weight can be of any
+   * arbitrary scale, this is the proportion between all sub-nodes that matters.
    */
   virtual void SetNodeWeight (uint node, float weight) = 0;
 
   /**
-   * Normalize the node weights so that the sum is 1
+   * Normalize the sub-node weights so that the sum is 1. Calling this is not
+   * mandatory.
    */
   virtual void NormalizeWeights () = 0;
 
   /**
-   * Get specific node
+   * Get the sub-node at the given index
    * \param node node index
    */
   virtual iSkeletonAnimNodeFactory2* GetNode (uint node) = 0;
 
   /**
-   * Get number of nodes
+   * Get number of sub-nodes
    */
   virtual uint GetNodeCount () const = 0;
 
   /**
-   * Remove all nodes
+   * Remove all sub-nodes
    */
   virtual void ClearNodes () = 0;
 
@@ -543,8 +627,19 @@ struct iSkeletonBlendNodeFactory2 : public iSkeletonAnimNodeFactory2
 
 /**
  * An animation node that blends together the sub-nodes based on their
- * weights. The weights does not have to add up to 1, upon update the active
- * animations will be combined so the sum is 1.
+ * weights. It is defined by a iSkeletonBlendNodeFactory2.
+ *
+ * The weights does not have to add up to 1, upon update the active
+ * animations will be combined so that the sum is 1.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonBlendNodeFactory2::CreateInstance()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonAnimNode2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeleton2
  */
 struct iSkeletonBlendNode2 : public iSkeletonAnimNode2
 {
@@ -563,7 +658,19 @@ struct iSkeletonBlendNode2 : public iSkeletonAnimNode2
 
 
 /**
- * Factory for priority blend node
+ * Factory for priority blend nodes, ie nodes blending sub-nodes on
+ * the base of their current priority.
+ * It defines instances of iSkeletonPriorityNode2.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonAnimPacketFactory2::CreatePriorityNode()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonPriorityNode2::GetFactory()
+ * - iSkeletonAnimNodeFactory2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeletonFactory2
  */
 struct iSkeletonPriorityNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
@@ -577,114 +684,166 @@ struct iSkeletonPriorityNodeFactory2 : public iSkeletonAnimNodeFactory2
   virtual void AddNode (iSkeletonAnimNodeFactory2* node, unsigned int priority) = 0;
 
   /**
-   * Set the priority for a specific node
+   * Set the initial priority of a specific sub-node
    */
   virtual void SetNodePriority (uint node, unsigned int priority) = 0;  
 
   /**
-   * Get specific node
+   * Get the sub-node at the given index
    * \param node node index
    */
   virtual iSkeletonAnimNodeFactory2* GetNode (uint node) = 0;
 
   /**
-   * Get number of nodes
+   * Get number of sub-nodes
    */
   virtual uint GetNodeCount () const = 0;
 
   /**
-   * Remove all noodes
+   * Remove all sub-nodes
    */
   virtual void ClearNodes () = 0;
 };
 
 /**
  * An animation node that blends together the sub-nodes based on their priority.
+ * It is defined by a iSkeletonPriorityNodeFactory2.
+ *
  * A sub-node with a higher priority will always replace a lower priority one, for
  * the bones it animates.
  * This is useful for example when you have a base walk animation and want to 
  * add a secondary motion on top of it
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonPriorityNodeFactory2::CreateInstance()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonAnimNode2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeleton2
  */
 struct iSkeletonPriorityNode2 : public iSkeletonAnimNode2
 {
   SCF_INTERFACE(iSkeletonPriorityNode2, 1, 0, 0);
 
   /**
-   * Set the priority for a specific node
+   * Set the priority for a specific sub-node
    */
   virtual void SetNodePriority (uint node, unsigned int priority) = 0;  
 };
 
 /**
- * Factory for randomized sub-node blending node
+ * Factory for blending nodes playing randomly their sub-nodes.
+ * It defines instances of iSkeletonRandomNode2.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonAnimPacketFactory2::CreateRandomNode()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonRandomNode2::GetFactory()
+ * - iSkeletonAnimNodeFactory2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeletonFactory2
  */
 struct iSkeletonRandomNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
   SCF_INTERFACE(iSkeletonRandomNodeFactory2, 1, 0, 0);
 
   /**
-   * Add a new sub-node to be blended into the result
+   * Add a new sub-node to be played randomly.
    * \param node the node to add
    * \param probability probability that the node will be selected to be played
-   * next when switching.
+   * next when switching. The probability can be of any arbitrary scale, this is
+   * the proportion between the probabilities of all nodes that matters.
+   *
+   * \warning If you use sub-nodes of type iSkeletonAnimationNodeFactory2, you must ensure
+   * to set iSkeletonAnimationNodeFactory2::SetAutomaticReset() and
+   * SetAutomaticReset::SetAutomaticStop(), otherwise the sub-nodes won't restart playing
+   * once they are selected again. Take also care to not use
+   * iSkeletonAnimationNodeFactory2::SetCyclic() otherwise this node will get in a deadlock.
    */
   virtual void AddNode (iSkeletonAnimNodeFactory2* node, float probability) = 0;
 
   /**
-   * Set the selection probability for a specific node
+   * Set the selection probability for a specific node. The probability can be of
+   * any arbitrary scale, this is the proportion between the probabilities of all
+   * nodes that matters.
    */
   virtual void SetNodeProbability (uint node, float weight) = 0;
 
   /**
    * Set that the node should automatically switch to next one upon completion
-   * of the current one.
+   * of the current one, otherwise it will stop after the first sub-node has
+   * been played. Default value is 'true'.
    */
   virtual void SetAutomaticSwitch (bool automatic) = 0;
 
   /**
-   * Get specific node
+   * Get the sub-node at the given index.
    * \param node node index
    */
   virtual iSkeletonAnimNodeFactory2* GetNode (uint node) = 0;
 
   /**
-   * Get number of nodes
+   * Get the number of sub-nodes
    */
   virtual uint GetNodeCount () const = 0;
 
   /**
-   * Remove all nodes
+   * Remove all sub-nodes
    */
   virtual void ClearNodes () = 0;
 };
 
 
 /**
- * An animation node that selects random sub-nodes 
+ * An animation node that selects randomly the sub-nodes to be played.
+ * It is defined by a iSkeletonRandomNodeFactory2.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonRandomNodeFactory2::CreateInstance()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonAnimNode2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeleton2
  */
 struct iSkeletonRandomNode2 : public iSkeletonAnimNode2
 {
   SCF_INTERFACE(iSkeletonRandomNode2, 1, 0, 0);
 
   /**
-   * Switch to next sub-node and, and optionally start it playing    
+   * Switch to next sub-node. This next node may not be played if
+   * iSkeletonRandomNodeFactory2::SetAutomaticSwitch() is not set.
    */
   virtual void Switch () = 0;
 
   /**
-   * Get the currently selected sub-node
+   * Get the sub-node which is currently selected.
    */
   virtual iSkeletonAnimNode2* GetCurrentNode () const = 0;
 };
 
-
-
 /**
- * Factory for FSM animation node
+ * Factory for Finite State Machine (FSM) animation nodes.
+ * It defines instances of iSkeletonFSMNode2.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonAnimPacketFactory2::CreateFSMNode()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonFSMNode2::GetFactory()
+ * - iSkeletonAnimNodeFactory2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeletonFactory2
  */
 struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
-  SCF_INTERFACE(iSkeletonFSMNodeFactory2, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonFSMNodeFactory2, 1, 0, 1);
 
   /**
    * Add a new state to the FSM and return the state identifier
@@ -693,7 +852,7 @@ struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
 
   /**
    * Set the node (sub-tree) associated with a given state.
-   * The sub node will be played once the state is switched to.
+   * The sub-node will be played once the state is switched to.
    */
   virtual void SetStateNode (CS::Animation::StateID id, iSkeletonAnimNodeFactory2* nodeFact) = 0;
 
@@ -704,17 +863,17 @@ struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
   virtual iSkeletonAnimNodeFactory2* GetStateNode (CS::Animation::StateID id) const = 0;
 
   /**
-   * Set a name for a state (for later access)
+   * Set a name for a state (for easier later access)
    */
   virtual void SetStateName (CS::Animation::StateID id, const char* name) = 0;
 
   /**
-   * Get the name for a state (for later access)
+   * Get the name for a state (for easier later access)
    */
   virtual const char* GetStateName (CS::Animation::StateID id) const = 0;
 
   /**
-   * Find the state with a given name
+   * Find the state of the given name
    */
   virtual CS::Animation::StateID FindState (const char* name) const = 0;
 
@@ -725,7 +884,7 @@ struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
   virtual void SetStartState (CS::Animation::StateID id) = 0;
 
   /**
-   * Set the ID of the state to use as first state before switching to any
+   * Get the ID of the state to use as first state before switching to any
    * other states.
    */
   virtual CS::Animation::StateID GetStartState () const = 0;
@@ -762,15 +921,32 @@ struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
    */
   virtual void SetTransitionCrossfade (CS::Animation::StateID fromState, 
     CS::Animation::StateID toState, float time1, float time2) = 0;
+
+  /**
+   * Add a new state to the FSM and return the state identifier
+   */
+  virtual CS::Animation::StateID AddState (const char* name,
+    iSkeletonAnimNodeFactory2 *nodeFact) = 0; 
 };
 
 
 /**
- * 
+ * An animation node that uses a Finite State Machine (FSM) to determine the 
+ * animation to be played.
+ * It is defined by a iSkeletonFSMNodeFactory2.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSkeletonFSMNodeFactory2::CreateInstance()
+ *
+ * Main ways to get pointers to this interface:
+ * - iSkeletonAnimNode2::FindNode()
+ *
+ * Main users of this interface:
+ * - iSkeleton2
  */
 struct iSkeletonFSMNode2 : public iSkeletonAnimNode2
 {
-  SCF_INTERFACE(iSkeletonFSMNode2, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonFSMNode2, 1, 0, 1);
 
   /**
    * Switch to a new state.
@@ -778,9 +954,14 @@ struct iSkeletonFSMNode2 : public iSkeletonAnimNode2
   virtual void SwitchToState (CS::Animation::StateID newState) = 0;
 
   /**
-   * Get the currently playing state id.
+   * Get the ID of the state currently playing.
    */
   virtual CS::Animation::StateID GetCurrentState () const = 0;
+
+  /**
+   * Get the animation node of the given state.
+   */
+  virtual iSkeletonAnimNode2* GetStateNode (CS::Animation::StateID state) const = 0;
 };
 
 /** @} */

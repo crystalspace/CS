@@ -81,6 +81,9 @@ protected:
   csString entrypoint;
   csRefArray<iDocumentNode> cacheKeepNodes;
 
+  // Wrapped PS1.x shader program
+  csRef<iShaderProgram> pswrap;
+  
   enum ProgramType
   {
     progVP, progFP
@@ -148,6 +151,7 @@ protected:
   csString GetAugmentedProgram (const char* programStr,
     bool initializeUnusedV2F = false);
   void DoDebugDump ();
+  void DebugDumpParam (csString& output, CGparameter param);
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   const char* GetProgramType()
   {
@@ -187,6 +191,8 @@ protected:
     const ProfileLimitsPair& limitsPair, const char* tag);
   
   bool GetProgramNode (iDocumentNode* passProgNode);
+
+  bool LoadProgramWithPS1 ();
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 
@@ -228,9 +234,14 @@ public:
   const csSet<csString>& GetUnusedParameters ()
   { return unusedParams; }
   
+  iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* tag = 0,
+    ProfileLimitsPair* cacheLimits = 0);
   virtual iShaderProgram::CacheLoadResult LoadFromCache (
     iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
-    csRef<iString>* failReason = 0, csRef<iString>* = 0);
+    csRef<iString>* failReason = 0, csRef<iString>* tag = 0)
+  { return LoadFromCache (cache, previous, programNode, failReason, tag, 0); }
 };
 
 }

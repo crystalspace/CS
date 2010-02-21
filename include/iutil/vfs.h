@@ -204,20 +204,13 @@ struct iFile : public virtual iBase
  */
 struct iVFS : public virtual iBase
 {
-  SCF_INTERFACE(iVFS, 3, 0, 0);
+  SCF_INTERFACE(iVFS, 3, 1, 0);
 
   /// Set current working directory
   virtual bool ChDir (const char *Path) = 0;
 
   /// Get current working directory
   virtual const char *GetCwd () = 0;
-
-  /**
-   * Set thread current dir sync.
-   * It is important to use this carefully. This will reset the current dir
-   * for all threads so that they are in the same place.
-   */
-  virtual void SetSyncDir(const char *Path) = 0;
 
   /**
    * Push current directory and optionally change to a different directory.

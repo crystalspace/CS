@@ -33,27 +33,27 @@
 	   -->
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-clear.xml" />
-      <alias name="apply_alpha" weak="yes" file="/shader/snippets/surface/alpha-premult.xml" />
-      <alias name="lighting" weak="yes" file="/shader/snippets/lighting/lighting-ppl.xml" />
+      <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-clear.xml" />
+      <alias name="apply_alpha" weak="yes" file="/shader-snippets/surface/alpha-premult.xml" />
+      <alias name="lighting" weak="yes" file="/shader-snippets/lighting/lighting-ppl.xml" />
       
       <!-- Snippets - the building blocks of this shader. -->
-      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="position" file="/shader-snippets/position.xml" />
       <snippet id="surface" filealias="surface" />
-      <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
+      <snippet id="parallax" file="/shader-snippets/surface/parallax.xml" />
       <snippet id="lighting" filealias="lighting" />
-      <snippet id="fake_light_diffuse" file="/shader/snippets/rgba-black.xml" />
-      <snippet id="ambient" file="/shader/snippets/lighting/ambient-one.xml" />
-      <snippet id="specular" file="/shader/snippets/surface/specular-default.xml" />
-      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
+      <snippet id="fake_light_diffuse" file="/shader-snippets/rgba-black.xml" />
+      <snippet id="ambient" file="/shader-snippets/lighting/ambient-one.xml" />
+      <snippet id="specular" file="/shader-snippets/surface/specular-default.xml" />
+      <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
       
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="reflection" file="/shader/snippets/reflect/reflect-env-world.xml" />
-      <snippet id="reflection_cubemap" file="/shader/snippets/surface/envmap-cube.xml" />
-      <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
-      <snippet id="lerp" file="/shader/snippets/lerp.xml" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="reflection" file="/shader-snippets/reflect/reflect-env-world.xml" />
+      <snippet id="reflection_cubemap" file="/shader-snippets/surface/envmap-cube.xml" />
+      <snippet id="fresnel" file="/shader-snippets/reflect/fresnel.xml" />
+      <snippet id="lerp" file="/shader-snippets/lerp.xml" />
       
-      <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
       
       <!-- "connections" describe what snippets take input from what other
 	   snippets (ie the "data flow" is modeled). The exact resolution of
@@ -119,27 +119,27 @@
 	   -->
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-clear.xml" />
-      <alias name="apply_alpha" weak="yes" file="/shader/snippets/surface/alpha-premult.xml" />
-      <alias name="lighting" weak="yes" file="/shader/snippets/lighting/lighting-pvl.xml" />
+      <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-clear.xml" />
+      <alias name="apply_alpha" weak="yes" file="/shader-snippets/surface/alpha-premult.xml" />
+      <alias name="lighting" weak="yes" file="/shader-snippets/lighting/lighting-pvl.xml" />
       
       <!-- Snippets - the building blocks of this shader. -->
-      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="position" file="/shader-snippets/position.xml" />
       <snippet id="surface" filealias="surface" />
-      <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
+      <snippet id="parallax" file="/shader-snippets/surface/parallax.xml" />
       <snippet id="lighting" filealias="lighting" />
-      <snippet id="fake_light_diffuse" file="/shader/snippets/rgba-black.xml" />
-      <snippet id="ambient" file="/shader/snippets/lighting/ambient-one.xml" />
-      <snippet id="specular" file="/shader/snippets/surface/specular-default.xml" />
-      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
+      <snippet id="fake_light_diffuse" file="/shader-snippets/rgba-black.xml" />
+      <snippet id="ambient" file="/shader-snippets/lighting/ambient-one.xml" />
+      <snippet id="specular" file="/shader-snippets/surface/specular-default.xml" />
+      <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
       
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="reflection" file="/shader/snippets/reflect/reflect-env-world.xml" />
-      <snippet id="reflection_cubemap" file="/shader/snippets/surface/envmap-cube.xml" />
-      <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
-      <snippet id="lerp" file="/shader/snippets/lerp.xml" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="reflection" file="/shader-snippets/reflect/reflect-env-world.xml" />
+      <snippet id="reflection_cubemap" file="/shader-snippets/surface/envmap-cube.xml" />
+      <snippet id="fresnel" file="/shader-snippets/reflect/fresnel.xml" />
+      <snippet id="lerp" file="/shader-snippets/lerp.xml" />
       
-      <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
       
       <!-- "connections" describe what snippets take input from what other
 	   snippets (ie the "data flow" is modeled). The exact resolution of

@@ -130,7 +130,7 @@ struct iMissingLoaderData : public virtual iBase
 };
 
 /**
- * Return structure for the iLoader->Load() routines.
+ * Return structure for the iLoader::Load() routines.
  */
 struct csLoadResult
 {
@@ -455,7 +455,7 @@ struct iThreadedLoader : public virtual iBase
   *   specified).
   * \param reg if true then the texture and material will be registered
   * to the texture manager. Set 'register' to false if you plan on calling
-  * 'engine->Prepare()' later as that function will take care of registering
+  * 'iEngine::Prepare()' later as that function will take care of registering
   * too.
   * \param create_material if true then this function also creates a
   * material for the texture.
@@ -483,7 +483,7 @@ struct iThreadedLoader : public virtual iBase
   *   specified).
   * \param reg If true then the texture and material will be registered
   *   to the texture manager. Set 'register' to false if you plan on calling
-  *   'engine->Prepare()' later as that function will take care of registering
+  *   'iEngine::Prepare()' later as that function will take care of registering
   *   too.
   * \param create_material If true then this function also creates a
   *   material for the texture.
@@ -938,7 +938,7 @@ struct iLoader : public virtual iBase
   *   specified).
   * \param reg if true then the texture and material will be registered
   * to the texture manager. Set 'register' to false if you plan on calling
-  * 'engine->Prepare()' later as that function will take care of registering
+  * 'iEngine::Prepare()' later as that function will take care of registering
   * too.
   * \param create_material if true then this function also creates a
   * material for the texture.
@@ -989,7 +989,7 @@ struct iLoader : public virtual iBase
   *   specified).
   * \param reg If true then the texture and material will be registered
   *   to the texture manager. Set 'register' to false if you plan on calling
-  *   'engine->Prepare()' later as that function will take care of registering
+  *   'iEngine::Prepare()' later as that function will take care of registering
   *   too.
   * \param create_material If true then this function also creates a
   *   material for the texture.

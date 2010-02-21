@@ -205,6 +205,7 @@ void csGenmeshMeshObject::UpdateSubMeshProxies () const
 
 bool csGenmeshMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 {
+  UpdateSubMeshProxies ();
   subMeshes.SetMaterialWrapper (mat);
   return true;
 }
@@ -943,12 +944,31 @@ void csGenmeshMeshObjectFactory::UpdateTangentsBitangents ()
     }
     triNum = triangleScratch.GetSize ();
     tris = triangleScratch.GetArray ();
+    
+    // Workaround for meshes that don't have normals set
+    csVector3* normals = GetNormals();
+    csDirtyAccessArray<csVector3> normalsScratch;
+    if (normals == 0)
+    {
+      normalsScratch.SetSize (vertCount, csVector3 (0, 0, 1));
+      normals = normalsScratch.GetArray();
+    }
+    
+    // Workaround for meshes that don't have texcoords set
+    csVector2* texels = GetTexels();
+    csDirtyAccessArray<csVector2> texcoordScratch;
+    if (texels == 0)
+    {
+      texcoordScratch.SetSize (vertCount, csVector2 (0));
+      texels = texcoordScratch.GetArray();
+    }
+    
     csVector3* tangentData = (csVector3*)cs_malloc (
       sizeof (csVector3) * vertCount * 2);
     csVector3* bitangentData = tangentData + vertCount;
     csNormalMappingTools::CalculateTangents (triNum, tris, 
       vertCount, GetVertices(), 
-      GetNormals(), GetTexels(), 
+      normals, texels, 
       tangentData, bitangentData);
   
     knownBuffers.tangent->CopyInto (tangentData, vertCount);
@@ -1297,14 +1317,28 @@ void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
   legacyBuffers.mesh_normals_dirty_flag = true;
 }
 
+void csGenmeshMeshObjectFactory::GenerateCylinder (float l, float r, uint sides)
+{
+  CreateLegacyBuffers();
+  subMeshes.GetDefaultSubmesh()->CreateLegacyBuffer();
+  CS::Geometry::DensityTextureMapper mapper (10);
+  CS::Geometry::Primitives::GenerateCylinder (
+      l, r, sides, legacyBuffers.mesh_vertices, legacyBuffers.mesh_texels,
+      legacyBuffers.mesh_normals, 
+      subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles, &mapper);
+  legacyBuffers.mesh_colors.DeleteAll ();
+  Invalidate ();
+}
+
 void csGenmeshMeshObjectFactory::GenerateCapsule (float l, float r, uint sides)
 {
   CreateLegacyBuffers();
   subMeshes.GetDefaultSubmesh()->CreateLegacyBuffer();
+  CS::Geometry::DensityTextureMapper mapper (10);
   CS::Geometry::Primitives::GenerateCapsule (
       l, r, sides, legacyBuffers.mesh_vertices, legacyBuffers.mesh_texels,
       legacyBuffers.mesh_normals, 
-      subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles);
+      subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles, &mapper);
   legacyBuffers.mesh_colors.DeleteAll ();
   Invalidate ();
 }

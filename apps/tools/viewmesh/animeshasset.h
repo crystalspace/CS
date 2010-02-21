@@ -34,6 +34,7 @@ class AnimeshAsset : public AssetBase
 private:
   csRef<iAnimatedMesh> animeshstate;
   csRef<iAnimatedMeshFactory> animeshsprite;
+  bool reverseAction;
 
 private:
   bool HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, bool start);

@@ -143,8 +143,8 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
   ALint processedBuffers = 0;
   alGetSourcei (m_Source, AL_BUFFERS_PROCESSED, &processedBuffers);
 
-  // Did OpenAL finish processing some buffers?
-  if (processedBuffers > 0)
+  // Did OpenAL finish processing some buffers? Are we going to seek in another position of the stream?
+  if (!m_Stream->PendingSeek() && processedBuffers > 0)
   {
     if (useStaticBuffer)
     {
@@ -163,6 +163,15 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
       m_CurrentBuffer = (m_CurrentBuffer + processedBuffers) % s_NumberOfBuffers;
 
     }
+  }
+  //we are going to seek in another position, so we have to prepare by flushing our buffers.
+  else if(m_Stream->PendingSeek())
+  {
+    alSourceStop(m_Source); //Openal needs to stop the source before flushing it's buffers
+    alSourcei(m_Source, AL_BUFFER, 0); //flush openal source from it's buffers
+    //reset positions for buffering again
+    m_CurrentBuffer = s_NumberOfBuffers-1;
+    m_EmptyBuffer = 0;
   }
 
   // Are there any empty buffers?

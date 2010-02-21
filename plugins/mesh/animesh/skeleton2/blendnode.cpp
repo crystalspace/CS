@@ -80,7 +80,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
   {
     csRef<BlendNode> newB;
-    newB = new BlendNode (this);
+    newB.AttachNew (new BlendNode (this));
 
     BaseFactoryChildren::SetupInstance (newB, packet, skeleton);
 

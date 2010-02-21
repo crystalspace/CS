@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- bodymesh.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.animesh.body</name>
+        <implementation>BodyManager</implementation>
+        <description>Crystal Space Physical Description of an Animated Mesh</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

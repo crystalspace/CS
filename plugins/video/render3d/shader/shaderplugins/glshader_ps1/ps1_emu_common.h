@@ -33,6 +33,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
 {
 
+class csPixelShaderParser;
+
 class csShaderGLPS1_Common : public csShaderProgram
 {
 protected:
@@ -43,13 +45,14 @@ protected:
 
   enum
   {
+    /// Number of available constant registers
     MAX_CONST_REGS = 8
   };
   ProgramParam constantRegs[MAX_CONST_REGS];
 
   void Report (int severity, const char* msg, ...);
 
-  virtual bool LoadProgramStringToGL () = 0;
+  virtual bool LoadProgramStringToGL (const csPixelShaderParser& parser) = 0;
 public:
   csShaderGLPS1_Common (csGLShader_PS1* shaderplug) : 
     csShaderProgram (shaderplug->object_reg)

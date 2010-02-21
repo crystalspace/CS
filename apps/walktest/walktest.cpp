@@ -64,6 +64,7 @@ WalkTest::WalkTest () :
   extern bool CommandHandler (const char *cmd, const char *arg);
   csCommandProcessor::ExtraHandler = CommandHandler;
   auto_script = 0;
+  world_file = "world";
   views = 0;
   wMissile_boom = 0;
   wMissile_whoosh = 0;
@@ -129,7 +130,6 @@ WalkTest::~WalkTest ()
   while (first_map)
   {
     csMapToLoad* map = first_map->next_map;
-    delete[] first_map->map_dir;
     delete first_map;
     first_map = map;
   }
@@ -181,7 +181,7 @@ void WalkTest::SetDefaults ()
       val += 6;
     }
 
-    map->map_dir = csStrNew (val);
+    map->map_name = val;
     map->next_map = 0;
     if (last_map)
       last_map->next_map = map;
@@ -209,6 +209,11 @@ void WalkTest::SetDefaults ()
   {
     delete [] auto_script;
     auto_script = csStrNew (val);
+  }
+
+  if ((val = cmdline->GetOption ("world")))
+  {
+    world_file = val;
   }
 
   if (cmdline->GetOption ("logo"))
@@ -248,6 +253,7 @@ void WalkTest::Help ()
   csPrintf ("  -noprecache        after loading don't precache to speed up rendering\n");
   csPrintf ("  -bots              allow random generation of bots\n");
   csPrintf ("  -[no]saveable      enable/disable engine 'saveable' flag\n");
+  csPrintf ("  -world=<file>      use given world file instead of 'world'\n");
   csPrintf ("  <path>             load map from VFS <path> (default '%s')\n",
         cfg->GetStr ("Walktest.Settings.WorldFile", "world"));
 }
@@ -723,17 +729,17 @@ static bool WalkEventHandler (iEvent& ev)
   }
 }
 
-bool WalkTest::SetMapDir (const char* map_dir)
+bool WalkTest::SetMapDir (const char* map_dir, csString& map_file)
 {
-  csStringArray paths;
-  paths.Push ("/lev/");
-  if (!myVFS->ChDirAuto (map_dir, &paths, 0, "world"))
+  const char* fileNameToOpen;
+  if (!CS::Utility::SmartChDir (myVFS, map_dir, world_file, &fileNameToOpen))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error setting directory '%s'!",
-    	map_dir);
+	map_dir);
     return false;
   }
-  myVFS->SetSyncDir(myVFS->GetCwd());
+
+  map_file = fileNameToOpen;
   return true;
 }
 
@@ -742,10 +748,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 {
   object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
-
-#if defined(CS_PLATFORM_WIN32)
-  cswinMinidumpWriter::SetCrashMinidumpObjectReg (Sys->object_reg);
-#endif
 
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
@@ -756,22 +758,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
-#if defined(CS_PLATFORM_WIN32)
-  const bool mdumpDefault =
-#if defined(CS_COMPILER_MSVC)
-    true;
-#else
-    false;
-#endif
-  if (!cfg->GetBool ("Walktest.Win32.Minidumps", mdumpDefault))
-  {
-    cswinMinidumpWriter::DisableCrashMinidumps ();
-  }
-  else
-  {
-    cswinMinidumpWriter::EnableCrashMinidumps ();
-  }
-#endif
 
   SetDefaults ();
 
@@ -981,19 +967,19 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Load from a map file.
   if (num_maps == 1)
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
-      first_map->map_dir);
+      first_map->map_name.GetData());
   else if (num_maps == 2 && cache_map != 0)
   {
     if (cache_map != first_map)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
-	      first_map->map_dir);
+	      first_map->map_name.GetData());
     else
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
-	      first_map->next_map->map_dir);
+	      first_map->next_map->map_name.GetData());
   }
   else if (num_maps > 1)
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps '%s', ...",
-      first_map->map_dir);
+      first_map->map_name.GetData());
 
   // Check if we have to load every separate map in a separate collection.
   csRef<iCommandLineParser> cmdline = 
@@ -1002,8 +988,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     
   if ((!do_collections) && cache_map != 0)
   {
+    csString cacheMapFN;
     // Then we set the current directory right.
-    if (!SetMapDir (cache_map->map_dir))
+    if (!SetMapDir (cache_map->map_name, cacheMapFN))
       return false;
     // Set the cache manager based on current VFS dir.
     Engine->SetVFSCacheManager ();
@@ -1020,20 +1007,21 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       continue;
     }
-    if (!SetMapDir (map->map_dir))
+    csString map_name;
+    if (!SetMapDir (map->map_name, map_name))
       return false;
 
     // Load the map from the file.
     if (num_maps > 1)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map '%s'",
-	      map->map_dir);
+	      map->map_name.GetData());
     iCollection* collection = 0;
     if (do_collections)
     {
-      collection = Engine->CreateCollection (map->map_dir);
+      collection = Engine->CreateCollection (map->map_name.GetData());
     }
 
-    csRef<iThreadReturn> ret = TLevelLoader->LoadMapFileWait (myVFS->GetCwd(), "world", false, collection,
+    csRef<iThreadReturn> ret = TLevelLoader->LoadMapFileWait (myVFS->GetCwd(), map_name, false, collection,
       0, 0, KEEP_ALL, cmdline->GetBoolOption("verbose", false));
 
     if(!ret->WasSuccessful())
@@ -1194,9 +1182,6 @@ static void CreateSystem(void)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-#if defined(CS_PLATFORM_WIN32) && defined(CS_COMPILER_MSVC)
-  cswinMinidumpWriter::EnableCrashMinidumps ();
-#endif
   // Initialize the random number generator
   srand (time (0));
 

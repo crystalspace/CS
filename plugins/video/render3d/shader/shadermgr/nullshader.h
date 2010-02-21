@@ -80,7 +80,8 @@ public:
   { return allShaderMeta; }
   virtual const csShaderMetadata& GetMetadata () const
   { return allShaderMeta; }
-  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits,
+				  uint userFlags) const
   { }
   void PushShaderVariables (csShaderVariableStack&, size_t) const { }
 

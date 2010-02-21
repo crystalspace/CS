@@ -1,0 +1,151 @@
+<!--
+  Copyright (C) 2009 by Mike Gist
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+
+<snippet type="compound">
+  <technique priority="100">
+    <snippet id="eyeVecT" file="/shader-snippets/eye-direction-tangent.xml" />
+    <snippet id="eyeVecW" file="/shader-snippets/eye-direction-world.xml" />
+    
+    <snippet id="parallax-occlusion">
+      <technique priority="100">
+      <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+      <input file="/shader-snippets/texCoord.inp" />
+
+      <input file="/shader-snippets/normal.inp" />
+	
+      <!-- vector pointing to eye, in tangent space -->
+      <input name="eyeVec" type="direction_tangent" />
+
+      <!-- vector pointing to eye, in world space -->
+      <input name="eyeVecW" type="direction_world" />
+
+      <block location="cg:definitions">
+        <?Include /shader-snippets/cg-global_objectToWorld.cginc?>
+      </block>
+	
+      <input name="texHeight" type="tex2d" default="complex">
+        <block location="pass">
+          <texture name="tex height" destination="fragmentIn.texHeight" />
+        </block>
+	  
+        <block location="cg:fragmentIn">
+          <uniform type="tex2d" name="texHeight" />
+        </block>
+	  
+        <block location="cg:fragmentMain">
+          texHeight = fragmentIn.texHeight;
+        </block>
+      </input>
+
+      <input name="heightMapScale" type="float" default="complex">
+        <block location="shadervars">
+           <shadervar name="tex height scale" type="float">0.01</shadervar>
+        </block>
+
+        <block location="cg:variablemap">
+          <variablemap variable="tex height scale" destination="fragmentIn.heightMapScale" />
+        </block>
+      
+        <block location="cg:fragmentIn">
+         <uniform type="float" name="heightMapScale" />
+        </block>
+      
+        <block location="cg:fragmentMain">
+          heightMapScale = fragmentIn.heightMapScale;
+        </block>
+      </input>
+
+      <input name="sampleLimits" type="float2" default="complex">
+        <block location="shadervars">
+           <shadervar name="sample limits" type="vector2">2,6</shadervar>
+        </block>
+
+        <block location="cg:variablemap">
+	    <variablemap variable="sample limits" destination="fragmentIn.sampleLimits" />
+        </block>
+      
+        <block location="cg:fragmentIn">
+	    <uniform type="float2" name="sampleLimits" />
+        </block>
+      
+        <block location="cg:fragmentMain">
+	    sampleLimits = fragmentIn.sampleLimits;
+        </block>
+      </input>
+	
+	<block location="tags">
+	  <tag>parallax_occlusion</tag>
+	  <tag>parallax</tag>
+	</block>
+	
+	<block location="cg:vertexMain">
+	  // In case the coords are used on the VP side...
+	  texCoordOffset = texCoord;
+	</block>
+	
+	<block location="cg:fragmentMain">
+        float2 offset = float2(0, 0);
+
+	  <?if vars."tex height".texture ?>
+          float2 dx = ddx(texCoord);
+          float2 dy = ddy(texCoord);
+
+          float rayheight = 1.0;
+          float lheight = 1.0;
+
+          float2 loffset = float2(0, 0);
+          float2 offsetValue = -normalize(eyeVec.xy) * heightMapScale * length(eyeVec.xy) / eyeVec.z;
+
+          float3 NormalW = normalize(mul((float3x3)objectToWorld, Normal));
+          int sampleSize = (int)lerp(sampleLimits.y, sampleLimits.x, dot(normalize(eyeVecW), NormalW));
+          float stepSize = 1.0/sampleSize;
+
+          float2 stepOffset = stepSize * offsetValue;
+
+          for(int sample = 0; sample&lt;sampleSize; sample++)
+          {
+            float height = tex2D(texHeight, texCoord + offset, dx, dy).x;
+
+            if(height &gt; rayheight)
+            {
+              float f = (height - rayheight)/((height + stepSize) - lheight);
+              offset = lerp(offset, loffset, f);
+              break;
+            }
+
+            rayheight -= stepSize;
+            loffset = offset;
+            offset += stepOffset;
+            lheight = height;
+          }
+	  <?endif?>
+        texCoordOffset = texCoord + offset;
+	</block>
+	
+	<output name="texCoordOffset" type="texcoord2" />
+      </technique>
+    </snippet>
+    <connection from="eyeVecT" to="parallax-occlusion" />
+  </technique>
+
+  <!-- Fall back to "old" parallax snippet -->
+  <technique priority="50">
+    <snippet id="parallax" file="/shader-snippets/surface/parallax.xml" />
+  </technique>
+</snippet>

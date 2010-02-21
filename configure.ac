@@ -402,7 +402,7 @@ CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
 # optimization levels). This is needed for some code we don't have
 # control over (e.g. SWIG-generated code) that breaks strict-aliasing rules.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for flag to disable string-aliasing],
+CS_CHECK_BUILD_FLAGS([for flag to disable strict-aliasing],
     [cs_cv_prog_cxx_no_strict_aliasing],
     [CS_CREATE_TUPLE([-fno-strict-aliasing])], [C++],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.STRICTALIASING.DISABLE],
@@ -507,13 +507,23 @@ CS_CHECK_VTABLE_THUNKS
 
 
 #------------------------------------------------------------------------------
+# Check how to ask the linker to promote warnings to errors.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD_FLAGS([how to treat linker warnings as errors],
+    [cs_cv_prog_link_enable_errors], [CS_CREATE_TUPLE([-Wl,--fatal-warnings])],
+    [C++])
+
+
+
+#------------------------------------------------------------------------------
 # Check how to ask the linker to export all dynamic symbols in debug mode to
 # allow the backtrace() callstack creation code to obtain symbols in all cases.
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
+CS_CHECK_BUILD_FLAGS([how to export all dynamic symbols],
     [cs_cv_prog_link_export_dynamic], [CS_CREATE_TUPLE([-Wl,-E])],
-    [C++], [COMPILER.LFLAGS.debug], [+])
-
+    [C++], [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.debug],
+        [$cs_cv_prog_link_export_dynamic], [+])],
+    [], [], [$cs_cv_prog_link_enable_errors])
 
 
 #------------------------------------------------------------------------------
@@ -1036,12 +1046,13 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 	    [[#if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
-	    #define DIRECTINPUT_VERSION 0x0500
+	    #define DIRECTINPUT_VERSION 0x0800
 	    #include <windows.h>
 	    #include <dsound.h>
 	    #include <dinput.h>]],
 	    [DirectSoundCreate$1(0,0,0); 
-	     DirectInputCreate8(0,0,0,0,0)])],
+	     IID* iid;
+	     DirectInput8Create(0,0,*iid,0,0)])],
 	[CS_CREATE_TUPLE([],[],[-ldsound -ldinput8]) \
 	CS_CREATE_TUPLE([-I/usr/include/directx],[],
 	    [-ldsound -ldinput8])], 
@@ -1049,7 +1060,6 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 
 AS_IF([test $cs_host_family = windows],
     [AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
-    CS_CHECK_DIRECTX([])
     CS_CHECK_DIRECTX([8])])
 
 
@@ -1297,20 +1307,91 @@ AS_IF([test $cs_cv_libode_opcode = yes],
 # Check for bullet physics library.
 #------------------------------------------------------------------------------
 # Note: The pkg-config package name for Bullet 2.x is 'bullet', but the actual
-# libraries are bulletdynamics, bulletcollision and bulletmath. So note that
-# there is actually no 'bullet' library.
-CS_CHECK_LIB_WITH([bullet],
-    [AC_LANG_PROGRAM(
-      [[#include "btBulletDynamicsCommon.h"
-      #include "btBulletCollisionCommon.h"]],
-      [btCollisionDispatcher* d;
-      btBroadphaseInterface* b;
-      btSequentialImpulseConstraintSolver* s;
-      btDefaultCollisionConfiguration* c;
-      btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
-    [], [C++], [], [],
-    [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
-    [bulletdynamics])
+# libraries are bulletdynamics, bulletcollision and bulletmath... sometimes.
+# On some setups/distros the names BulletDynamics, BulletCollision and
+# LinearMath are used (note case and name differences).
+# So note that there is actually no single 'bullet' library. (Having to deal
+# with that and the different library name styles is the reason for most of the
+# complexity of this check.)
+
+AC_ARG_WITH([bullet], [AC_HELP_STRING([--with-bullet=dir],
+    [specify additional location to search Bullet if not detected automatically; 
+    directories searched include dir/include, dir/lib, and dir])])
+
+# Modified versions of _CS_CHECK_LIB_CREATE_FLAG and _CS_CHECK_LIB_CREATE_FLAG
+# to allow checking for multiple libs at once
+AC_DEFUN([_CS_CHECK_BULLET_CREATE_FLAGS],
+    [for cs_lib_item in $3
+    do
+	case $cs_lib_item in
+	    *\|*) CS_SPLIT(
+		    [$cs_lib_item], [cs_check_incdir,cs_check_libdir], [|])
+		_CS_CHECK_BULLET_CREATE_FLAG([$1],
+		    [$cs_check_incdir], [$cs_check_libdir], [$2])
+		;;
+	    *)  _CS_CHECK_BULLET_CREATE_FLAG([$1],
+		    [$cs_lib_item/include], [$cs_lib_item/lib], [$2])
+		_CS_CHECK_BULLET_CREATE_FLAG(
+		    [$1], [$cs_lib_item], [$cs_lib_item], [$2])
+		;;
+	esac
+    done])
+AC_DEFUN([_CS_CHECK_BULLET_CREATE_FLAG],
+   [AS_IF([test -n "$2"], [cs_check_lib_cflag="-I$2"], [cs_check_lib_cflag=''])
+    AS_IF([test -n "$3"], [cs_check_lib_lflag="-L$3"], [cs_check_lib_lflag=''])
+    AS_IF([test -n "$4"], [cs_check_lib_libs="$4"], [cs_check_lib_libs=''])
+    $1="$$1
+	CS_CREATE_TUPLE(
+	    [$cs_check_lib_cflag],
+	    [$cs_check_lib_lflag],
+	    [$cs_check_lib_libs])"])
+
+AS_IF([test -z "$with_bullet"], [with_bullet=yes])
+AS_IF([test "$with_bullet" != no],
+[
+    # If --with-bullet value is same as cached value, then assume other
+    # cached values are also valid; otherwise, ignore all cached values.
+    AS_IF([test "$with_bullet" != "$cs_cv_with_bullet"],
+        [cs_ignore_cache=yes], [cs_ignore_cache=no])
+
+    # Put relevant subdirs of the library directory into PATH and PKGCONFIG
+    PATH_SAVE="$PATH"
+    AS_IF([test $with_bullet != yes],
+        [PATH="$with_bullet/bin$PATH_SEPARATOR$PATH"
+        _CS_CHECK_PKG_CONFIG_PREPARE_PATH([$with_bullet,
+	    $with_bullet/lib/pkgconfig])])
+    
+    cs_check_lib_flags=''
+    # Check for 'bullet' pkg-config package
+    _CS_CHECK_LIB_PKG_CONFIG_FLAGS([cs_check_lib_flags], [bullet])
+    # Generate flag tuples for plain old libs
+    AS_IF([test $with_bullet != yes],
+        [cs_check_lib_paths=$with_bullet],
+        [cs_check_lib_paths="| cs_lib_paths_default "])
+    _CS_CHECK_BULLET_CREATE_FLAGS([cs_check_lib_flags],
+            [-lBulletDynamics -lBulletCollision -lLinearMath], [$cs_check_lib_paths])
+    _CS_CHECK_BULLET_CREATE_FLAGS([cs_check_lib_flags],
+            [-lbulletdynamics -lbulletcollision -lbulletmath], [$cs_check_lib_paths])
+            
+    CS_CHECK_BUILD([for Bullet], [cs_cv_libbullet],
+    	[AC_LANG_PROGRAM(
+      	    [[#include "btBulletDynamicsCommon.h"
+      	    #include "btBulletCollisionCommon.h"]],
+	    [btCollisionDispatcher* d;
+      	    btBroadphaseInterface* b;
+      	    btSequentialImpulseConstraintSolver* s;
+      	    btDefaultCollisionConfiguration* c;
+      	    btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
+        [$cs_check_lib_flags], [C++], [], [], [$cs_ignore_cache],
+        [], [], [])
+    
+    PATH="$PATH_SAVE"
+    AS_IF([test $with_bullet != yes],
+        [_CS_CHECK_PKG_CONFIG_UNPREPARE_PATH])
+],
+[cs_cv_libbullet=no])
+
+cs_cv_with_bullet="$with_bullet"
 
 AS_IF([test $cs_cv_libbullet = yes],
     [CS_CHECK_BUILD([if bullet is sufficiently recent (>=2.68)], [cs_cv_bullet_recent],
@@ -1550,7 +1631,7 @@ AS_IF([test $cs_cv_libCEGUI = yes],
 	[AC_LANG_PROGRAM(
 	    [[#include <falagard/CEGUIFalWidgetLookManager.h>]],
 	    [CEGUI::WidgetLookManager::getSingleton();
-	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
+	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 7)
 	    who took the ram from the ramalamadingdong?
 	    #endif
 	    ])],
@@ -2040,6 +2121,29 @@ CS_CHECK_BUILD([for MAXPATHLEN], [cs_cv_c_macro_maxpathlen],
 
 
 #------------------------------------------------------------------------------
+# On MinGW, with some versions of the MinGW runtime (3.15 and above), using
+# the STL together with -ansi is broken: the C runtime function swprintf()
+# and vswprintf() are not declared, but an STL header (<cwchar>)
+# unconditionally references it.
+# Detect if this is the case.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_FUNCTION_WITH_ANSI],
+    [CS_CHECK_BUILD([if $1 is available when enforcing C++ standards],
+        [cs_cv_have_$1_with_ansi],
+        [AC_LANG_PROGRAM(
+	    [[#include <stdio.h>
+	    #if HAVE_WCHAR_H
+	    #include <wchar.h>
+	    #endif]],
+	    [using ::$1;])],
+        [], [C++], [], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_ANSI_BREAKS_$1]))], [],
+        [$cs_cv_prog_cxx_enable_pedantic])])
+CS_CHECK_FUNCTION_WITH_ANSI([swprintf])
+CS_CHECK_FUNCTION_WITH_ANSI([vswprintf])
+
+
+
+#------------------------------------------------------------------------------
 # Check for BSD-style socket support.  Also test for presence of type
 # socklen_t.  Note that we must not include both <winsock.h> and the Unix
 # socket-related headers at the same time on Cygwin even though they both exist
@@ -2422,6 +2526,27 @@ AC_MSG_RESULT([$enable_leak_guard])
 AS_IF([test $enable_leak_guard = yes],
     [CS_HEADER_PROPERTY([CS_USE_LEAK_GUARD])])
 
+
+
+#------------------------------------------------------------------------------
+# Check for valgrind headers
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to build with Valgrind support])
+AS_IF([test $cs_build_mode = debug],
+    [enable_valgrind_default=yes], [enable_valgrind_default=no])
+AC_ARG_ENABLE([valgrind], [AC_HELP_STRING([--enable-valgrind],
+    [enable building with special support for Valgrind, proving additional
+    information on memory blocks and states (default YES in 'debug' build mode, 
+    NO otherwise)])],
+    [], [enable_valgrind=$enable_valgrind_default])
+AC_MSG_RESULT([$enable_valgrind])
+AS_IF([test $enable_valgrind = no],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [-DNVALGRIND], [+])
+    CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [-DNVALGRIND], [+])])
+AC_CHECK_HEADERS([valgrind/valgrind.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_VALGRIND_VALGRIND_H])])
+AC_CHECK_HEADERS([valgrind/memcheck.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_VALGRIND_MEMCHECK_H])])
 
 
 #------------------------------------------------------------------------------

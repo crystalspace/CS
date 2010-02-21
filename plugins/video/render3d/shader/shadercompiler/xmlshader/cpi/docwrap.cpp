@@ -64,6 +64,7 @@ class ConditionTree
     Variables values;
     MyBitArrayTemp conditionAffectedSVs;
     MyBitArrayTemp conditionResults[2];
+    MyBitArrayTemp conditionResultsSet;
 
     Node (Node* p, int parentBranch) : parent (p), condition (csCondUnknown)
     {
@@ -71,6 +72,7 @@ class ConditionTree
       {
 	conditionResults[bTrue] = conditionResults[bFalse] =
 	  p->conditionResults[parentBranch];
+	conditionResultsSet = p->conditionResultsSet;
       }
       branches[bTrue] = 0;
       branches[bFalse] = 0;
@@ -87,6 +89,23 @@ class ConditionTree
 	  conditionResults[b].SetBit (cond);
 	
 	if (branches[b]) branches[b]->SetConditionResult (0x3, cond, val);
+      }
+      if (conditionResultsSet.GetSize() <= cond)
+	conditionResultsSet.SetSize (cond+1);
+      conditionResultsSet.SetBit (cond);
+    }
+
+    void MergeConditionResults (const Node* other, int otherBranch)
+    {
+      for (size_t c = 0; c < other->conditionResultsSet.GetSize(); c++)
+      {
+	if (!other->conditionResultsSet[c]) continue;
+	if ((c >= conditionResultsSet.GetSize())
+	    || !conditionResultsSet.IsBitSet (c))
+	{
+	  SetConditionResult (0x3, c,
+	    other->conditionResults[otherBranch].IsBitSet (c));
+	}
       }
     }
   };
@@ -118,6 +137,11 @@ class ConditionTree
     Node* owner;
     int branch;
     Node* newNode;
+
+    csConditionID oldCondition;
+    MyBitArrayTemp oldConditionAffectedSVs;
+    MyBitArrayTemp oldConditionResults[2];
+    MyBitArrayTemp oldConditionResultsSet;
   };
   typedef csArray<CommitNode> CommitArray;
   csArray<CommitArray> commitArrays;
@@ -151,6 +175,8 @@ public:
   {
     RecursiveFree (root);
   }
+  
+  void PresetConditions (const MyBitArrayTemp& presetCondResults);
 
   Logic3 Descend (csConditionID condition);
   // Switch the current branch from "true" to "false"
@@ -239,7 +265,14 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	  int containingBranch;
 	  bool hasContainer = HasContainingCondition (node, condition,
 	    containerCondition, containingBranch);
+
+	  CommitNode commitNode;
   
+	  commitNode.oldCondition = node->condition;
+	  commitNode.oldConditionAffectedSVs = node->conditionAffectedSVs;
+	  commitNode.oldConditionResults[0] = node->conditionResults[0];
+	  commitNode.oldConditionResults[1] = node->conditionResults[1];
+	  commitNode.oldConditionResultsSet = node->conditionResultsSet;
 	  node->condition = condition;
 	  node->conditionAffectedSVs = affectedSVs;
 	  if (node->parent)
@@ -293,8 +326,6 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	    {
 	      nn->values = (b == bTrue) ? trueVals : falseVals;
 	    }
-	    //node->branches[b] = nn;
-	    CommitNode commitNode;
 	    commitNode.owner = node;
 	    commitNode.branch = b;
 	    commitNode.newNode = nn;
@@ -329,6 +360,25 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	RecursiveAdd (condition, node->branches[1], newCurrent, affectedSVs,
 	  commitNodes);
 	break;
+    }
+  }
+}
+
+void ConditionTree::PresetConditions (const MyBitArrayTemp& presetCondResults)
+{
+  CS_ASSERT(root->condition == csCondUnknown);
+  
+  size_t numCond = presetCondResults.GetSize()/2;
+  for (size_t c = 0; c < numCond; c++)
+  {
+    int condBits = (presetCondResults[2*c] ? 2 : 0) | (presetCondResults[2*c+1] ? 1 : 0);
+    if ((condBits == 2) || (condBits == 1))
+    {
+      Variables trueVals;
+      Variables falseVals;
+      
+      evaluator.CheckConditionResults (c, root->values, trueVals, falseVals);
+      root->values = (condBits == 2) ? trueVals : falseVals;
     }
   }
 }
@@ -400,6 +450,15 @@ void ConditionTree::Ascend (int num)
     if (commitArrays.GetSize() > 0)
     {
       CommitArray ca (commitArrays.Pop ());
+      for (size_t n = ca.GetSize(); n-- > 0; )
+      {
+	Node* node = ca[n].owner;
+	node->condition = ca[n].oldCondition;
+	node->conditionAffectedSVs = ca[n].oldConditionAffectedSVs;
+	node->conditionResults[0] = ca[n].oldConditionResults[0];
+	node->conditionResults[1] = ca[n].oldConditionResults[1];
+	node->conditionResultsSet = ca[n].oldConditionResultsSet;
+      }
       ClearCommitArray (ca);
     }
   }
@@ -416,6 +475,7 @@ void ConditionTree::Commit ()
       node->branches[ca[n].branch] = ca[n].newNode;
       node->SetConditionResult (1 << ca[n].branch, node->condition,
 	ca[n].branch == bTrue);
+      ca[n].newNode->MergeConditionResults (node, ca[n].branch);
     }
   }
   commitArrays.Empty();
@@ -430,7 +490,8 @@ void ConditionTree::ToResolver (iConditionResolver* resolver,
   csConditionNode* falseNode;
 
   resolver->AddNode (parent, node->condition, trueNode, falseNode,
-    node->conditionResults[bTrue], node->conditionResults[bFalse]);
+    node->conditionResults[bTrue], node->conditionResults[bFalse],
+    node->conditionResultsSet);
   if (node->branches[bTrue] != 0)
     ToResolver (resolver, node->branches[bTrue], trueNode);
   if (node->branches[bFalse] != 0)
@@ -1343,10 +1404,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 
               csConditionID condition = newWrapper.child->condition;
               // If the parent condition is always false, so is this
-              if ((((currentWrapper.child->condition == csCondAlwaysFalse)
-                && (currentWrapper.child->GetConditionValue() == true))
-                  || ((currentWrapper.child->condition == csCondAlwaysTrue)
-                && (currentWrapper.child->GetConditionValue() == false))))
+              if (currentWrapper.child->IsUnreachable())
               {
                 condition = csCondAlwaysFalse;
               }
@@ -1357,7 +1415,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 newWrapper.child->condition = csCondAlwaysFalse;
               globalState->ascendStack.Push (1);
 
-	      currentWrapper.child->childrenWrappers.Push (newWrapper.child);
+	      if (!newWrapper.child->IsUnreachable())
+		currentWrapper.child->childrenWrappers.Push (newWrapper.child);
 	      wrapperStack.Push (currentWrapper);
 	      currentWrapper = newWrapper;
 	      handled = true;
@@ -1425,7 +1484,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		WrapperStackEntry newWrapper;
 		CreateElseWrapper (state, newWrapper);
 
-		currentWrapper.child->childrenWrappers.Push (newWrapper.child);
+		if (!newWrapper.child->IsUnreachable())
+		  currentWrapper.child->childrenWrappers.Push (newWrapper.child);
 		wrapperStack.Push (currentWrapper);
 		currentWrapper = newWrapper;
 
@@ -1455,7 +1515,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		WrapperStackEntry elseWrapper;
 		CreateElseWrapper (state, elseWrapper);
 
-		currentWrapper.child->childrenWrappers.Push (elseWrapper.child);
+		if (!elseWrapper.child->IsUnreachable())
+		  currentWrapper.child->childrenWrappers.Push (elseWrapper.child);
 		wrapperStack.Push (currentWrapper);
 		currentWrapper = elseWrapper;
 
@@ -1466,10 +1527,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 eval.SwitchBranch ();
                 csConditionID condition = newWrapper.child->condition;
                 // If the parent condition is always false, so is this
-                if ((((currentWrapper.child->condition == csCondAlwaysFalse)
-                  && (currentWrapper.child->GetConditionValue() == true))
-                    || ((currentWrapper.child->condition == csCondAlwaysTrue)
-                  && (currentWrapper.child->GetConditionValue() == false))))
+                if (currentWrapper.child->IsUnreachable())
                 {
                   condition = csCondAlwaysFalse;
                 }
@@ -1480,7 +1538,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                   newWrapper.child->condition = csCondAlwaysFalse;
                 globalState->ascendStack[globalState->ascendStack.GetSize()-1]++;
 
-		elseWrapper.child->childrenWrappers.Push (newWrapper.child);
+		if (!newWrapper.child->IsUnreachable())
+		  elseWrapper.child->childrenWrappers.Push (newWrapper.child);
 		wrapperStack.Push (currentWrapper);
 		currentWrapper = newWrapper;
 	      }
@@ -1701,11 +1760,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
       }
     }
   }
-  if (!handled
-    && !(((currentWrapper.child->condition == csCondAlwaysFalse)
-        && (currentWrapper.child->GetConditionValue() == true))
-      || ((currentWrapper.child->condition == csCondAlwaysTrue)
-        && (currentWrapper.child->GetConditionValue() == false))))
+  if (!handled && !currentWrapper.child->IsUnreachable())
   {
     eval.Commit();
     csRef<WrappedChild> newWrapper;
@@ -1904,9 +1959,16 @@ bool csWrappedDocumentNode::GetAttributeValueAsBool (const char* name,
   return wrappedNode->GetAttributeValueAsBool (name, defaultvalue);
 }
 
+// Magic value to validate it's a wrapped doc and that the format is right
+static const uint32 cachedWrappedDocMagic = 0x01214948;
+
 bool csWrappedDocumentNode::StoreToCache (iFile* cacheFile,
   const ConditionsWriter& condWriter)
 {
+  uint32 magicLE = csLittleEndian::UInt32 (cachedWrappedDocMagic);
+  if (cacheFile->Write ((char*)&magicLE, sizeof (magicLE)) != sizeof (magicLE))
+    return false;
+
   ForeignNodeStorage foreignNodes (shared->plugin);
   if (!foreignNodes.StartUse (cacheFile)) return false;
   if (!StoreToCache (cacheFile, foreignNodes, condWriter)) return false;
@@ -1937,18 +1999,25 @@ bool csWrappedDocumentNode::StoreToCache (iFile* cacheFile,
 }
 
 bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
-  const ConditionsReader& condReader)
+  const ConditionsReader& condReader, ConditionDumper& condDump)
 {
+  uint32 magic;
+  if (cacheFile->Read ((char*)&magic, sizeof (magic)) != sizeof (magic))
+    return false;
+  if (csLittleEndian::UInt32 (magic) != cachedWrappedDocMagic)
+    return false;
+
   ForeignNodeReader foreignNodes (shared->plugin);
   if (!foreignNodes.StartUse (cacheFile)) return false;
-  if (!ReadFromCache (cacheFile, foreignNodes, condReader)) return false;
+  if (!ReadFromCache (cacheFile, foreignNodes, condReader, condDump)) return false;
   if (!foreignNodes.EndUse ()) return false;
   return true;
 }
 
 bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
                                            ForeignNodeReader& foreignNodes,
-                                           const ConditionsReader& condReader)
+                                           const ConditionsReader& condReader,
+					   ConditionDumper& condDump)
 {
   int32 wrappedNodeLE;
   if (cacheFile->Read ((char*)&wrappedNodeLE, sizeof (wrappedNodeLE))
@@ -1956,13 +2025,16 @@ bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
   wrappedNode = foreignNodes.GetNode (csLittleEndian::Int32 (wrappedNodeLE));
   
   return ReadWrappedChildren (cacheFile, foreignNodes, wrappedChildren,
-    condReader);
+    condReader, condDump);
 }
 
 enum
 {
-  childValue = 1,
-  childIsNull = 2
+  childValue = 0x80000000,
+  childIsNull = 0x40000000,
+  conditionIsTrue = 0x20000000,
+
+  flagsExtract = 0xe0000000
 };
 
 bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file, 
@@ -1990,14 +2062,29 @@ bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file,
       CS_ASSERT(wrapper);
     }
     
-    uint32 flagsLE = csLittleEndian::UInt32 (flags);
-    if (file->Write ((char*)&flagsLE, sizeof (flagsLE))
-	!= sizeof (flagsLE)) return false;
-    uint32 condLE = csLittleEndian::UInt32 (
-      condWriter.GetDiskID (children[i]->condition));
-    if (file->Write ((char*)&condLE, sizeof (condLE))
-	!= sizeof (condLE)) return false;
+    if (children[i]->condition == csCondAlwaysTrue)
+      flags |= conditionIsTrue;
+    else if (children[i]->condition == csCondAlwaysFalse)
+    {
+      /* AlwaysFalse and 'true' condition value should've been filtered out
+         earlier ... */
+      CS_ASSERT (!children[i]->GetConditionValue());
+      /* AlwaysFalse and 'false' condition value is equivalent to
+         AlwaysTrue and 'true', so convert into that */
+      flags |= conditionIsTrue;
+      flags &= ~childValue;
+    }
+
+    uint32 flagsAndCond = flags;
+    if (children[i]->condition != csCondAlwaysTrue)
+    {
+      flagsAndCond |= condWriter.GetDiskID (children[i]->condition);
+    }
     
+    uint32 flagsAndCondLE = csLittleEndian::UInt32 (flagsAndCond);
+    if (file->Write ((char*)&flagsAndCondLE, sizeof (flagsAndCondLE))
+	!= sizeof (flagsAndCondLE)) return false;
+
     if (wrapper.IsValid())
     {
       csWrappedDocumentNode* child = static_cast<csWrappedDocumentNode*> (
@@ -2036,7 +2123,7 @@ void csWrappedDocumentNode::CollectUsedConditions (
 
 bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
   ForeignNodeReader& foreignNodes, csRefArray<WrappedChild>& children,
-  const ConditionsReader& condReader)
+  const ConditionsReader& condReader, ConditionDumper& condDump)
 {
   uint32 numChildrenLE;
   if (file->Read ((char*)&numChildrenLE, sizeof (numChildrenLE))
@@ -2046,30 +2133,37 @@ bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
   children.SetSize (numChildren);
   for (size_t i = 0; i < numChildren; i++)
   {
-    uint32 flagsLE;
-    if (file->Read ((char*)&flagsLE, sizeof (flagsLE))
-	!= sizeof (flagsLE)) return false;
-    uint32 flags = csLittleEndian::UInt32 (flagsLE);
+    uint32 flagsAndCondLE;
+    if (file->Read ((char*)&flagsAndCondLE, sizeof (flagsAndCondLE))
+	!= sizeof (flagsAndCondLE)) return false;
+    uint32 flags = csLittleEndian::UInt32 (flagsAndCondLE) & flagsExtract;
     
     csRef<WrappedChild> child;
     child.AttachNew (new WrappedChild);
     child->SetConditionValue ((flags & childValue) != 0);
     
-    uint32 condLE;
-    if (file->Read ((char*)&condLE, sizeof (condLE))
-	!= sizeof (condLE)) return false;
-    child->condition =
-      condReader.GetConditionID (csLittleEndian::UInt32 (condLE));
+    if ((flags & conditionIsTrue) != 0)
+      child->condition = csCondAlwaysTrue;
+    else
+    {
+      child->condition = condReader.GetConditionID (
+        csLittleEndian::UInt32 (flagsAndCondLE) & ~flagsExtract);
+      if (condDump.DoesDumping())
+      {
+        csString condStr (condDump.GetConditionString (child->condition));
+        condDump.Dump (child->condition, condStr, condStr.Length());
+      }
+    }
     if ((flags & childIsNull) == 0)
     {
       csWrappedDocumentNode* childWrapper = new csWrappedDocumentNode (
         this, resolver, shared);
-      if (!childWrapper->ReadFromCache (file, foreignNodes, condReader))
+      if (!childWrapper->ReadFromCache (file, foreignNodes, condReader, condDump))
         return false;
       child->childNode.AttachNew (childWrapper);
     }
     if (!ReadWrappedChildren (file, foreignNodes, child->childrenWrappers,
-        condReader))
+        condReader, condDump))
       return false;
     children.Put (i, child);
   }
@@ -2271,13 +2365,15 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
   iDocumentNode* wrappedNode, iConditionResolver* resolver, 
   csConditionEvaluator& evaluator, 
   const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut,
-  uint parseOpts)
+  uint parseOpts, const MyBitArrayTemp* presetCondResults)
 {
   ConditionDumper condDump (dumpOut, &evaluator);
 
   csWrappedDocumentNode* node;
   {
     EvalCondTree eval (evaluator);
+    if (presetCondResults)
+      eval.condTree.PresetConditions (*presetCondResults);
     if (parseOpts & wdnfpoHandleConditions)
     {
       for (size_t i = 0; i < extraNodes.GetSize(); i++)
@@ -2364,11 +2460,12 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
 
 csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperFromCache (
   iFile* cacheFile, iConditionResolver* resolver, csConditionEvaluator& evaluator,
-  const ConditionsReader& condReader)
+  const ConditionsReader& condReader, csString* dumpOut)
 {
+  ConditionDumper condDump (dumpOut, &evaluator);
   csWrappedDocumentNode* node;
   node = new csWrappedDocumentNode (0, resolver, this);
-  if (!node->ReadFromCache (cacheFile, condReader))
+  if (!node->ReadFromCache (cacheFile, condReader, condDump))
   {
     delete node;
     return 0;
@@ -2397,18 +2494,21 @@ void ConditionDumper::Dump (size_t id, const char* condStr, size_t condLen)
 	  if (seenConds.GetSize() <= id) seenConds.SetSize (id+1);
 	  seenConds.SetBit (id);
 	  
-	  const CondOperation& condOp = currentEval->GetCondition (id);
-	  if (condOp.left.type == operandOperation)
+	  if (currentEval)
 	  {
-	    csString condStr;
-	    condStr = currentEval->GetConditionString (condOp.left.operation);
-	    Dump (condOp.left.operation, condStr, condStr.Length ());
-	  }
-	  if (condOp.right.type == operandOperation)
-	  {
-	    csString condStr;
-	    condStr = currentEval->GetConditionString (condOp.right.operation);
-	    Dump (condOp.right.operation, condStr, condStr.Length ());
+	    const CondOperation& condOp = currentEval->GetCondition (id);
+	    if (condOp.left.type == operandOperation)
+	    {
+	      csString condStr;
+	      condStr = currentEval->GetConditionString (condOp.left.operation);
+	      Dump (condOp.left.operation, condStr, condStr.Length ());
+	    }
+	    if (condOp.right.type == operandOperation)
+	    {
+	      csString condStr;
+	      condStr = currentEval->GetConditionString (condOp.right.operation);
+	      Dump (condOp.right.operation, condStr, condStr.Length ());
+	    }
 	  }
 	}
         currentOut->AppendFmt ("condition %zu = '", id);

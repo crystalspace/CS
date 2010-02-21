@@ -1,0 +1,103 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <technique priority="100">
+    <snippet id="eyeVecWorld" file="/shader-snippets/eye-direction-world.xml" />
+    
+    <snippet id="lighting">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<!-- Vector from eye to position -->
+	<input name="eyeToSurf" type="direction_world" />
+	<input name="position" type="position4_world" />
+	<!-- Surface normal -->
+	<input name="normal" type="normal_world" />
+	
+	<input name="lightOffset" type="int" default="value" defval="0"/>
+	<input name="maxLights" type="int" default="value" defval="8"/>
+	<input name="minLights" type="int" default="value" defval="0"/>
+	<input file="/shader-snippets/lightScale.inp" private="yes" />
+	
+	<block location="pass">
+	  <?Include /shader-snippets/lighting/lighting-tools.inc ?>
+	</block>
+	
+	<block location="cg:variablemap">
+	  <?Lighting_Variablemaps vertex?>
+	</block>
+	
+	<block location="cg:definitions">
+	  <?Include /shader-snippets/lighting/lightfuncs.cginc ?>
+	</block>
+	
+	<!-- Shader might be used together with shadowmap shader... -->
+	<block location="cg:clips"
+	       file="/shader-snippets/lighting/shadowclip.block" />
+	
+	<block location="cg:vertexToFragment">
+	  <varying type="rgb" name="diffuseColor" />
+	  <varying type="rgb" name="specularColor" />
+	</block>
+	
+	<block location="cg:vertexMain">
+	  diffuseColor = float3(0);
+	  specularColor = float3(0);
+	  eyeToSurf = normalize (eyeToSurf);
+	  <![CDATA[
+	  for (int l = 0; l < maxLights; l++)
+	  {
+	    int i = lightOffset + l;
+	    if ((i >= minLights) && (i >= lightProps.count)) break;
+          ]]>
+		     
+	    LightSpaceWorld lightSpace;
+	    lightSpace.Init (i, position);
+		      
+	    Light light = GetCurrentLight (lightSpace, i, normal);
+	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
+	    float3 d, s;
+	    ComputeLight (lightSpace, light, eyeToSurf, normal, 32,
+	      lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
+	      lightAttenuationVec, 1.0, d, s);
+		      
+	    diffuseColor += d;
+	    specularColor += s;
+	  }
+	  diffuseColor *= lightScale.x;
+	  specularColor *= lightScale.y;
+	  diffuseColor_attr_perfragment = false;
+	  specularColor_attr_perfragment = false;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  diffuseColor_attr_perfragment = false;
+	  specularColor_attr_perfragment = false;
+	</block>
+		   
+	<output name="diffuseColor" type="rgb">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+	<output name="specularColor" type="rgb">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+      </technique>
+    </snippet>
+    <connection from="eyeVecWorld" to="lighting" />
+  </technique>
+</snippet>

@@ -534,6 +534,7 @@ class iDynamicSystem(core.iBase):
     def CreateCollider(*args): return _ivaria.iDynamicSystem_CreateCollider(*args)
     def GetCollider(*args): return _ivaria.iDynamicSystem_GetCollider(*args)
     def GetColliderCount(*args): return _ivaria.iDynamicSystem_GetColliderCount(*args)
+    def AttachColliderCapsule(*args): return _ivaria.iDynamicSystem_AttachColliderCapsule(*args)
     scfGetVersion = staticmethod(_ivaria.iDynamicSystem_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iDynamicSystem
     __del__ = lambda self : None;
@@ -634,6 +635,7 @@ class iRigidBody(core.iBase):
     def Update(*args): return _ivaria.iRigidBody_Update(*args)
     def GetCollider(*args): return _ivaria.iRigidBody_GetCollider(*args)
     def GetColliderCount(*args): return _ivaria.iRigidBody_GetColliderCount(*args)
+    def AttachColliderCapsule(*args): return _ivaria.iRigidBody_AttachColliderCapsule(*args)
     __swig_destroy__ = _ivaria.delete_iRigidBody
     __del__ = lambda self : None;
 iRigidBody_swigregister = _ivaria.iRigidBody_swigregister
@@ -643,6 +645,7 @@ NO_GEOMETRY = _ivaria.NO_GEOMETRY
 BOX_COLLIDER_GEOMETRY = _ivaria.BOX_COLLIDER_GEOMETRY
 PLANE_COLLIDER_GEOMETRY = _ivaria.PLANE_COLLIDER_GEOMETRY
 TRIMESH_COLLIDER_GEOMETRY = _ivaria.TRIMESH_COLLIDER_GEOMETRY
+CONVEXMESH_COLLIDER_GEOMETRY = _ivaria.CONVEXMESH_COLLIDER_GEOMETRY
 CYLINDER_COLLIDER_GEOMETRY = _ivaria.CYLINDER_COLLIDER_GEOMETRY
 CAPSULE_COLLIDER_GEOMETRY = _ivaria.CAPSULE_COLLIDER_GEOMETRY
 SPHERE_COLLIDER_GEOMETRY = _ivaria.SPHERE_COLLIDER_GEOMETRY
@@ -688,6 +691,9 @@ class iDynamicsSystemCollider(core.iBase):
     def MakeStatic(*args): return _ivaria.iDynamicsSystemCollider_MakeStatic(*args)
     def MakeDynamic(*args): return _ivaria.iDynamicsSystemCollider_MakeDynamic(*args)
     def IsStatic(*args): return _ivaria.iDynamicsSystemCollider_IsStatic(*args)
+    def GetCapsuleGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetCapsuleGeometry(*args)
+    def GetMeshGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetMeshGeometry(*args)
+    def GetConvexMeshGeometry(*args): return _ivaria.iDynamicsSystemCollider_GetConvexMeshGeometry(*args)
     __swig_destroy__ = _ivaria.delete_iDynamicsSystemCollider
     __del__ = lambda self : None;
 iDynamicsSystemCollider_swigregister = _ivaria.iDynamicsSystemCollider_swigregister

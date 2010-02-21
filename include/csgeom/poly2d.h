@@ -121,12 +121,12 @@ public:
   { if (num_vertices<=0) return 0;  else return &vertices[num_vertices-1]; }
 
   /**
-   * Test if this vector is inside the polygon.
+   * Test if this vector is inside the polygon. This assumes a convex polygon.
    */
   bool In (const csVector2& v);
 
   /**
-   * Test if a vector is inside the given polygon.
+   * Test if a vector is inside the given polygon. This assumes a convex polygon.
    */
   static bool In (csVector2* poly, size_t num_poly, const csVector2& v);
 

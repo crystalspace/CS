@@ -124,7 +124,7 @@ struct csKeyMap
 struct csMapToLoad
 {
   /// The startup directory on VFS with needed map file
-  char* map_dir;
+  csString map_name;
   csMapToLoad* next_map;
 };
 
@@ -155,6 +155,7 @@ public:
   csMapToLoad* cache_map;	// If 0 no cache: entry was given.
   /// A script to execute at startup.
   char* auto_script;
+  csString world_file;
 
   /// Player position, orientation, and velocity
   csVector3 pos;
@@ -359,7 +360,7 @@ public:
   /**
    * Set the current VFS dir to the given map directory.
    */
-  bool SetMapDir (const char* map_dir);
+  bool SetMapDir (const char* map_dir, csString& map_file);
 
   /// Draw the frame.
   void SetupFrame ();

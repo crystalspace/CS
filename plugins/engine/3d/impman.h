@@ -99,7 +99,7 @@ private:
     bool update;
     bool remove;
 
-    size_t lastDistance;
+    float lastDistance;
     size_t texWidth;
     size_t texHeight;
 
@@ -109,7 +109,7 @@ private:
 
     ImposterMat(iImposterMesh* imesh)
       : init(false), update(false),
-      remove(false), lastDistance(size_t(-1)),
+      remove(false), lastDistance(FLT_MAX),
       allocatedSpace(0)
     {
       mesh = static_cast<csImposterMesh*>(imesh);

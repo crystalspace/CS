@@ -333,6 +333,16 @@ struct iCamera : public virtual iBase
   virtual const CS::Math::Matrix4& GetInvProjectionMatrix () = 0;
 };
 
+/**
+ * An implementation of iCamera that renders a world with a classical 
+ * perspective.
+ * 
+ * Main creators of instances implementing this interface:
+ * - iEngine::CreatePerspectiveCamera()
+ * 
+ * Main ways to get pointers to this interface:
+ * - iView::GetPerspectiveCamera()
+ */
 struct iPerspectiveCamera : public virtual iBase
 {
   SCF_INTERFACE(iPerspectiveCamera, 1, 0, 0);
@@ -375,6 +385,16 @@ struct iPerspectiveCamera : public virtual iBase
   virtual void SetPerspectiveCenter (float x, float y) = 0;
 };
 
+/**
+ * An implementation of iCamera that renders a world with a custom
+ * projection matrix.
+ * 
+ * Main creators of instances implementing this interface:
+ * - iEngine::CreateCustomMatrixCamera()
+ * 
+ * Main ways to get pointers to this interface:
+ * - iView::GetCustomMatrixCamera()
+ */
 struct iCustomMatrixCamera : public virtual iBase
 {
   SCF_INTERFACE(iCustomMatrixCamera, 1, 0, 0);

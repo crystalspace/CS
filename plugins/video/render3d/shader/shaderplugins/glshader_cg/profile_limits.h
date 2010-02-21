@@ -66,7 +66,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     bool operator>= (const ProfileLimits& other) const
     { return !operator< (other); }
   private:
+    void FixupVendor ()
+    {
+      /* We only really distinguish the vendor here for purposes of clipping -
+         ATI can do a bit 'more' than what the ARBVP spec says. In that respect,
+	 NV acts like 'other'. NV-specific clipping requires the NV VP support
+	 which isn't available elsewhere anyway.
+	 And since the vendor really only matters for ARBVP, and NVIDIA or
+	 Other doesn't make a difference, reduce NVIDIA to Other.
+       */
+      if (vendor == CS::PluginCommon::ShaderProgramPluginGL::NVIDIA)
+	vendor = CS::PluginCommon::ShaderProgramPluginGL::Other;
+    }
     void SetDefaults ();
+    /// Like cgGetProfileString(), but also handles CG_PROFILE_UNKNOWN
+    static const char* GetProfileString (CGprofile);
     static uint glGetProgramInteger (csGLExtensionManager* ext,
       GLenum target, GLenum what);
   };

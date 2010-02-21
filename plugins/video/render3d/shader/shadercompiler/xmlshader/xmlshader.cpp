@@ -152,6 +152,14 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (
 
   if (!ValidateTemplate (templ))
     return 0;
+
+  /* We might only be loaded as a dependency of the engine, so query it
+     here instead of Initialize() */
+  if (!engine.IsValid())
+  {
+    engine = csQueryRegistry<iEngine> (objectreg);
+    sharedEvaluator->SetEngine (engine);
+  }
   
   csTicks startTime = 0, endTime = 0;
   // Create a shader. The actual loading happens later.
@@ -184,7 +192,8 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (
 }
   
 bool csXMLShaderCompiler::PrecacheShader(iDocumentNode* templ,
-                                         iHierarchicalCache* cache)
+                                         iHierarchicalCache* cache,
+                                         bool quick)
 {
   if (!templ) return 0;
 
@@ -197,7 +206,7 @@ bool csXMLShaderCompiler::PrecacheShader(iDocumentNode* templ,
   if (do_verbose) startTime = csGetTicks();
   shader.AttachNew (new csXMLShader (this));
   shader->SetName (templ->GetAttributeValue ("name"));
-  bool result = shader->Precache (templ, cache);
+  bool result = shader->Precache (templ, cache, quick);
   if (do_verbose) endTime = csGetTicks();
   if (do_verbose)
   {

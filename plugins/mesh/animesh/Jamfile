@@ -1,9 +1,11 @@
 SubDir TOP plugins mesh animesh ;
 
 Description animesh_mesh : "Animated mesh object plugin" ;
-UberPlugin animesh_mesh : animesh animeshldr skeleton2ldr skeleton2 ;
+UberPlugin animesh_mesh : animesh animeshldr skeleton2ldr skeleton2 bodymesh basic lookat ragdoll ;
 CompileGroups animesh_mesh : meshes ;
 
+SubInclude TOP plugins mesh animesh body ;
+SubInclude TOP plugins mesh animesh controllers ;
 SubInclude TOP plugins mesh animesh object ;
 SubInclude TOP plugins mesh animesh persist ;
 SubInclude TOP plugins mesh animesh skeleton2 ;

@@ -34,8 +34,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
   /// Wrapper for an OpenGL PBO
-  class PBOWrapper : public CS::Utility::FastRefCount<PBOWrapper>,
-		    public CS::Memory::CustomAllocated
+  class PBOWrapper : public CS::Memory::CustomAllocatedDerived<
+			      CS::Utility::FastRefCount<PBOWrapper> >
   {
     GLuint pbo;
     size_t size;

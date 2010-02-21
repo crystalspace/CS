@@ -188,8 +188,13 @@ struct iConsoleOutput : public virtual iBase
    */
   virtual void AutoUpdate (bool autoUpdate) = 0;
 
-  /// Set cursor horizontal position (-1 == follow output)
-  virtual void SetCursorPos (int charNo) = 0;
+  /**
+   * Set cursor horizontal position (-1 == follow output).
+   * \remark This is expressed as a <em>byte offset</em>. This is relevant when
+   * non-ASCII output occurs as a character offset may not be equivalent
+   * to it's byte offset.
+   */
+  virtual void SetCursorPos (int byteNo) = 0;
 
   /// Query maximal line width in characters
   virtual int GetMaxLineWidth () = 0;

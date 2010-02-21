@@ -3,16 +3,17 @@
   <Window Type="DefaultWindow" Name="root">
     <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
     <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+    <Property Name="MousePassThroughEnabled" Value="True" />
 
     <Window Type="ice/FrameWindow" Name="Form" >
       <Property Name="Text" Value="ViewMesh" />
-      <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,430.0}}'/>
+      <Property Name='UnifiedSize' Value='{{0.0,255.0},{0.0,430.0}}'/>
       <Property Name='UnifiedPosition' Value='{{0.01,0.0},{0.01,0.0}}'/>
       <Property Name="CloseButtonEnabled" Value="False" />
       <Property Name='SizingEnabled' Value='True'/>
       <Window Type="ice/TabControl" Name="Root/Control/Tabs" >
-        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{1.0,-35.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.000000,5.000000},{0.000000,30.000000}}'/>
+        <Property Name='UnifiedSize' Value='{{1.0,-2.0},{1.0,-3.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.000000,1.000000},{0.000000,2.000000}}'/>
         <Property Name='TabHeight' Value='{0.05,0}'/>
         <Property Name='TabTextPadding' Value='{0.02,0}'/>
         
@@ -31,8 +32,8 @@
       <Property Name='Visible' Value='False'/>
 
       <Window Type="ice/StaticImage" Name="StdDlg/Main" >
-        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{1.0,-32.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,30.0}}'/>
+        <Property Name='UnifiedSize' Value='{{1.0,-2.0},{1.0,-3.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.000000,1.000000},{0.000000,2.000000}}'/>
 
 
         <Window Type="ice/StaticText" Name="StdDlg/PathLable" >

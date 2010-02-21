@@ -91,6 +91,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     //-- iSkeletonFSMNodeFactory2
     virtual CS::Animation::StateID AddState (); 
+    virtual CS::Animation::StateID AddState (const char* name, iSkeletonAnimNodeFactory2 *nodeFact);
     virtual void SetStateNode (CS::Animation::StateID id, 
       iSkeletonAnimNodeFactory2* nodeFact);
     virtual iSkeletonAnimNodeFactory2* GetStateNode (CS::Animation::StateID id) const;
@@ -166,6 +167,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     //-- iSkeletonFSMNode2
     virtual void SwitchToState (CS::Animation::StateID newState);
     virtual CS::Animation::StateID GetCurrentState () const;
+    virtual iSkeletonAnimNode2* GetStateNode (CS::Animation::StateID state) const;
 
     //-- iSkeletonAnimationNode2
     virtual void Play ();

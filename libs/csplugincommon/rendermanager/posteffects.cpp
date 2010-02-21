@@ -347,7 +347,7 @@ void PostEffectManager::GetLayerRenderSVs (const Layer* layer,
     }
     else
     {
-      size_t svName = svStrings->Request (input.textureName);
+      CS::StringIDValue svName = svStrings->Request (input.textureName);
       if (svName < svStack.GetSize())
       {
         sv.AttachNew (new csShaderVariable (svName));
@@ -360,7 +360,7 @@ void PostEffectManager::GetLayerRenderSVs (const Layer* layer,
       csRenderBuffer::GetBufferNameFromDescr (input.texcoordName);
     if (bufferName == CS_BUFFER_NONE)
     {
-      size_t svName = svStrings->Request (input.texcoordName);
+      CS::StringIDValue svName = svStrings->Request (input.texcoordName);
       if (svName < svStack.GetSize())
       {
         sv.AttachNew (new csShaderVariable (svName));
@@ -686,7 +686,7 @@ void PostEffectManager::UpdateTextureDistribution()
         usedTextureBits[b].SetSize (freeTexture+1);
     }
     
-    postLayers[l]->outTextureNum = freeTexture;
+    postLayers[l]->outTextureNum = (int)freeTexture;
     
     size_t lastLayer = l;
     // Look for last layer which has current layer as an input

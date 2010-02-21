@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+<Window Type="DefaultWindow" Name="root">
+  <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+  <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+  <Property Name="MousePassThroughEnabled" Value="True" />
+
+    <Window Type="ice/StaticImage" Name="Preview" >
+      <Property Name='UnifiedSize' Value='{{0.2,0.0},{0.2,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,1.0}}'/>
+    </Window>
+    
+    <Window Type="ice/FrameWindow" Name="Browse" >
+      <Property Name="Text" Value="Browse" />
+      <Property Name='UnifiedSize' Value='{{0.0,400.0},{0.0,90.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.5,-200.0},{0.0,1.0}}'/>
+      <Property Name="CloseButtonEnabled" Value="False" />
+      <Property Name='SizingEnabled' Value='True'/>
+      
+      <Window Type="ice/StaticText" Name="Browse/File" >
+      	<Property Name='UnifiedSize' Value='{{1.0,-20.0},{0.0,25.0}}'/>
+      	<Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,5.0}}'/>
+      	<Property Name="Text" Value="" />
+				<Property Name="FrameEnabled" Value="False" />
+				<Property Name="BackgroundEnabled" Value="False" />      
+    	</Window>
+      
+      <Window Type="ice/Button" Name="Browse/Previous" >
+        <Property Name="Text"><![CDATA[<<]]></Property>
+        <Property Name='UnifiedSize' Value='{{0.0,25.0},{0.0,25.0}}'/>
+      	<Property Name='UnifiedPosition' Value='{{0.0,10.0},{1.0,-30.0}}'/>
+      </Window>
+      
+      <Window Type="ice/Editbox" Name="Browse/GO/Input" >
+        <Property Name="Text" Value="" />
+        <Property Name='UnifiedSize' Value='{{0.0,45.0},{0.0,25.0}}'/>
+      	<Property Name='UnifiedPosition' Value='{{0.5,-45.0},{1.0,-30.0}}'/>
+      </Window>
+      
+      <Window Type="ice/Button" Name="Browse/GO" >
+        <Property Name="Text" Value="GO" />
+        <Property Name='UnifiedSize' Value='{{0.0,25.0},{0.0,25.0}}'/>
+      	<Property Name='UnifiedPosition' Value='{{0.5,0.0},{1.0,-30.0}}'/>
+      </Window>
+      
+      <Window Type="ice/Button" Name="Browse/Next" >
+        <Property Name="Text"><![CDATA[>>]]></Property>
+        <Property Name='UnifiedSize' Value='{{0.0,25.0},{0.0,25.0}}'/>
+      	<Property Name='UnifiedPosition' Value='{{1.0,-35.0},{1.0,-30.0}}'/>
+      </Window>
+      
+    </Window>
+    
+    <Window Type="ice/MultiLineEditbox" Name="Description" >
+      <Property Name='UnifiedSize' Value='{{0.2,0.0},{0.2,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.8,-10.0},{0.0,1.0}}'/>
+      <Property Name="ReadOnly" Value="True" />      
+    </Window>
+    
+</Window>
+</GUILayout>
+

@@ -1258,7 +1258,8 @@ rule UberPlugin
     MakeLocate $(metafile) : $(workdircommon) ;
     Depends $(<) : $(metafile) ;
     $(<)_METAFILE = $(metafile) ;
-    MsvcProject $(<) : plugin : $(<:S=$(MSVCGEN.PLUGIN_EXT.$(<):E=.dll)) ;
+    MsvcSetTargetProp $(<) : outputfile : $(<:S=$(MSVCGEN.PLUGIN_EXT.$(<):E=.dll)) : weak ;
+    MsvcProject $(<) : plugin : $(>) ;
     CompileGroups $(<) : all plugins ;
 
     $(<)_PLUGIN_SETUP = 1 ;
@@ -1307,7 +1308,8 @@ rule Plugin
     $(<)_EXTRASOURCES = $(plugin_impl_file:R=$(outdircommon)) ;
     $(<)_EXTRASOURCES += $(metafile:R=$(SEARCH_SOURCE)) ;
     
-    MsvcProject $(<) : plugin : $(<:S=$(MSVCGEN.PLUGIN_EXT.$(<):E=.dll)) : $(>) ;
+    MsvcSetTargetProp $(<) : outputfile : $(<:S=$(MSVCGEN.PLUGIN_EXT.$(<):E=.dll)) : weak ;
+    MsvcProject $(<) : plugin : $(>) ;
     CompileGroups $(<) : all plugins ;
   }
 

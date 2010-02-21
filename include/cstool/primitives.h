@@ -169,6 +169,22 @@ public:
       TextureMapper* mapper = 0);
 
   /**
+   * Generate a cylinder of given length and radius.
+   * \param l Cylinder length.
+   * \param r Cylinder radius.
+   * \param sides Number of sides.
+   * \param mapper is an optional texture mapper. If not given the
+   * default cylinder texture mapping will be used (currently not
+   * implemented, you have to specify a mapper).
+   */
+  static void GenerateCylinder (float l, float r, uint sides,
+      csDirtyAccessArray<csVector3>& mesh_vertices,
+      csDirtyAccessArray<csVector2>& mesh_texels,
+      csDirtyAccessArray<csVector3>& mesh_normals,
+      csDirtyAccessArray<csTriangle>& mesh_triangles,
+      TextureMapper* mapper = 0);
+
+  /**
    * Generate a capsule of given length and radius.
    * \param l Capsule length.
    * \param r Capsule radius.

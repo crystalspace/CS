@@ -28,20 +28,20 @@
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
       <!-- Snippets - the building blocks of this shader. -->
-      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="position" file="/shader-snippets/position.xml" />
       <snippet id="parallax" file="/shader/surface/parallax.xml" />
       <snippet id="surface" file="/shader/surface/surface-classic.xml" />
       <snippet id="lighting" file="/shader/lighting/light-classic.xml" />
-      <snippet id="mod_light_surf" file="/shader/snippets/modulate.xml" />
+      <snippet id="mod_light_surf" file="/shader-snippets/modulate.xml" />
       
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="reflection" file="/shader/snippets/reflect/reflect-env-camera.xml" />
-      <snippet id="spheremap" file="/shader/snippets/surface/envmap-sphere.xml" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="reflection" file="/shader-snippets/reflect/reflect-env-camera.xml" />
+      <snippet id="spheremap" file="/shader-snippets/surface/envmap-sphere.xml" />
       <parameter id="lerp_factor" type="shadervar" 
 	weavertype="float">reflection opacity</parameter>
-      <snippet id="lerp" file="/shader/snippets/lerp.xml" />
+      <snippet id="lerp" file="/shader-snippets/lerp.xml" />
       
-      <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
       <snippet id="sectorfog" file="/shader/fog/fog-sector.xml" />
       
       <!-- "connections" describe what snippets take input from what other

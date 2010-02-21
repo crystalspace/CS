@@ -64,6 +64,9 @@ public:
   /// Parse an anonymous cylinder collider in the system
   virtual bool ParseSystemColliderCylinder (iDocumentNode *node,
   	iDynamicSystem* system);
+  /// Parse an anonymous capsule collider in the system
+  virtual bool ParseSystemColliderCapsule (iDocumentNode *node,
+  	iDynamicSystem* system);
   /// Parse an anonymous box collider in the system
   virtual bool ParseSystemColliderBox (iDocumentNode *node,
   	iDynamicSystem* system);

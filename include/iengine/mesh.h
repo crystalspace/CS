@@ -73,7 +73,7 @@ class csReversibleTransform;
  * is useful for skyboxes or skydomes. Important note! When you
  * use an object with this flag you should also add this object to
  * a render priority that also has the camera flag set (see
- * iEngine->SetRenderPriorityCamera()).
+ * iEngine::SetRenderPriorityCamera()).
  */
 #define CS_ENTITY_CAMERA 4
 
@@ -173,7 +173,8 @@ struct iMeshDrawCallback : public virtual iBase
 };
 
 /**
- * Return structure for the iMeshWrapper->HitBeam() routines.
+ * Return structure for the iMeshWrapper::HitBeam() routines.
+ * \sa csSectorHitBeamResult csBulletHitBeamResult
  */
 struct csHitBeamResult
 {
@@ -212,7 +213,7 @@ struct csHitBeamResult
 };
 
 /**
- * Return structure for iMeshWrapper->GetScreenBoundingBox().
+ * Return structure for iMeshWrapper::GetScreenBoundingBox().
  */
 struct csScreenBoxResult
 {
@@ -285,7 +286,7 @@ struct iMeshWrapper : public virtual iBase
 
   /**
    * Get the movable instance for this object.
-   * It is very important to call GetMovable()->UpdateMove()
+   * It is very important to call GetMovable()::UpdateMove()
    * after doing any kind of modification to this movable
    * to make sure that internal data structures are
    * correctly updated.
@@ -362,7 +363,8 @@ struct iMeshWrapper : public virtual iBase
    * This version can also return the material that was hit (this will
    * only happen if 'do_material' is true). This is not
    * supported by all meshes so this can return 0 even if there was a hit.
-   * \sa csHitBeamResult
+   * \sa csHitBeamResult iSector::HitBeam() iSector::HitBeamPortals()
+   * iBulletDynamicSystem::HitBeam()
    */
   virtual csHitBeamResult HitBeam (const csVector3& start,
   	const csVector3& end, bool do_material = false) = 0;
@@ -483,7 +485,7 @@ struct iMeshWrapper : public virtual iBase
    * only the position.
    * <p>
    * Note also that some mesh objects don't support HardTransform. You
-   * can find out by calling iMeshObject->SupportsHardTransform().
+   * can find out by calling iMeshObject::SupportsHardTransform().
    * In that case you can sometimes still call HardTransform() on the
    * factory.
    */

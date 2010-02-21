@@ -853,7 +853,10 @@ iSector *csSector::FollowSegment (
   csReversibleTransform &t,
   csVector3 &new_position,
   bool &mirror,
-  bool only_portals)
+  bool only_portals,
+  iPortal** transversed_portals,
+  iMeshWrapper** portal_meshes,
+  int firstIndex, int* lastIndex)
 {
   csVector3 isect;
   iMeshWrapper* mesh;
@@ -888,8 +891,16 @@ iSector *csSector::FollowSegment (
           new_position = po->Warp (warp_wor, new_position);
         }
 
+        if(transversed_portals && portal_meshes && lastIndex && firstIndex <= *lastIndex)
+        {
+            transversed_portals[firstIndex] = po;
+            portal_meshes[firstIndex] = mesh;
+            ++firstIndex;
+        }
+
         iSector *dest_sect = po->GetSector ();
-        return dest_sect->FollowSegment (t, new_position, mirror);
+        return dest_sect->FollowSegment (t, new_position, mirror, only_portals,
+            transversed_portals, portal_meshes, firstIndex, lastIndex);
       }
       else
       {
@@ -901,6 +912,10 @@ iSector *csSector::FollowSegment (
       new_position = isect;
     }
   }
+
+  if(lastIndex)
+    *lastIndex = --firstIndex;
+
   return (iSector*)this;
 }
 

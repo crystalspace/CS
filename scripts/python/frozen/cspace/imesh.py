@@ -226,6 +226,7 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def GetSubMeshCount(*args): return _imesh.iGeneralFactoryState_GetSubMeshCount(*args)
     def GetSubMesh(*args): return _imesh.iGeneralFactoryState_GetSubMesh(*args)
     def DisableAutoNormals(*args): return _imesh.iGeneralFactoryState_DisableAutoNormals(*args)
+    def GenerateCylinder(*args): return _imesh.iGeneralFactoryState_GenerateCylinder(*args)
     def GetVertexByIndex(*args): return _imesh.iGeneralFactoryState_GetVertexByIndex(*args)
     def GetTexelByIndex(*args): return _imesh.iGeneralFactoryState_GetTexelByIndex(*args)
     def GetNormalByIndex(*args): return _imesh.iGeneralFactoryState_GetNormalByIndex(*args)
@@ -1105,7 +1106,6 @@ class iSkeletonFSMNodeFactory2(iSkeletonAnimNodeFactory2):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def AddState(*args): return _imesh.iSkeletonFSMNodeFactory2_AddState(*args)
     def SetStateNode(*args): return _imesh.iSkeletonFSMNodeFactory2_SetStateNode(*args)
     def GetStateNode(*args): return _imesh.iSkeletonFSMNodeFactory2_GetStateNode(*args)
     def SetStateName(*args): return _imesh.iSkeletonFSMNodeFactory2_SetStateName(*args)
@@ -1117,6 +1117,7 @@ class iSkeletonFSMNodeFactory2(iSkeletonAnimNodeFactory2):
     def ClearStates(*args): return _imesh.iSkeletonFSMNodeFactory2_ClearStates(*args)
     def SetStateTransition(*args): return _imesh.iSkeletonFSMNodeFactory2_SetStateTransition(*args)
     def SetTransitionCrossfade(*args): return _imesh.iSkeletonFSMNodeFactory2_SetTransitionCrossfade(*args)
+    def AddState(*args): return _imesh.iSkeletonFSMNodeFactory2_AddState(*args)
     scfGetVersion = staticmethod(_imesh.iSkeletonFSMNodeFactory2_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonFSMNodeFactory2
     __del__ = lambda self : None;
@@ -1130,6 +1131,7 @@ class iSkeletonFSMNode2(iSkeletonAnimNode2):
     __repr__ = _swig_repr
     def SwitchToState(*args): return _imesh.iSkeletonFSMNode2_SwitchToState(*args)
     def GetCurrentState(*args): return _imesh.iSkeletonFSMNode2_GetCurrentState(*args)
+    def GetStateNode(*args): return _imesh.iSkeletonFSMNode2_GetStateNode(*args)
     scfGetVersion = staticmethod(_imesh.iSkeletonFSMNode2_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonFSMNode2
     __del__ = lambda self : None;
@@ -1480,6 +1482,7 @@ class iSpriteCal3DFactoryState(core.iBase):
     def GetCal3DCoreModel(*args): return _imesh.iSpriteCal3DFactoryState_GetCal3DCoreModel(*args)
     def RegisterAnimCallback(*args): return _imesh.iSpriteCal3DFactoryState_RegisterAnimCallback(*args)
     def RemoveAnimCallback(*args): return _imesh.iSpriteCal3DFactoryState_RemoveAnimCallback(*args)
+    def AbsoluteRescaleFactory(*args): return _imesh.iSpriteCal3DFactoryState_AbsoluteRescaleFactory(*args)
     __swig_destroy__ = _imesh.delete_iSpriteCal3DFactoryState
     __del__ = lambda self : None;
 iSpriteCal3DFactoryState_swigregister = _imesh.iSpriteCal3DFactoryState_swigregister
@@ -1653,6 +1656,8 @@ class csCharArrayArray(core.CustomAllocated):
     def Get(*args): return _imesh.csCharArrayArray_Get(*args)
     def Put(*args): return _imesh.csCharArrayArray_Put(*args)
     def Push(*args): return _imesh.csCharArrayArray_Push(*args)
+    def Merge(*args): return _imesh.csCharArrayArray_Merge(*args)
+    def MergeSmart(*args): return _imesh.csCharArrayArray_MergeSmart(*args)
     def Pop(*args): return _imesh.csCharArrayArray_Pop(*args)
     def Top(*args): return _imesh.csCharArrayArray_Top(*args)
     def Insert(*args): return _imesh.csCharArrayArray_Insert(*args)
@@ -2350,8 +2355,12 @@ class iParticleBuiltinEffectorLinColor(iParticleEffector):
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def AddColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_AddColor(*args)
+    def RemoveColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_RemoveColor(*args)
+    def Clear(*args): return _imesh.iParticleBuiltinEffectorLinColor_Clear(*args)
     def SetColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_SetColor(*args)
+    def SetEndTTL(*args): return _imesh.iParticleBuiltinEffectorLinColor_SetEndTTL(*args)
     def GetColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_GetColor(*args)
+    def GetEndTTL(*args): return _imesh.iParticleBuiltinEffectorLinColor_GetEndTTL(*args)
     def GetColorCount(*args): return _imesh.iParticleBuiltinEffectorLinColor_GetColorCount(*args)
     scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorLinColor_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorLinColor
@@ -2371,9 +2380,13 @@ class iParticleBuiltinEffectorVelocityField(iParticleEffector):
     def SetFParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_SetFParameter(*args)
     def GetFParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_GetFParameter(*args)
     def GetFParameterCount(*args): return _imesh.iParticleBuiltinEffectorVelocityField_GetFParameterCount(*args)
+    def AddFParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_AddFParameter(*args)
+    def RemoveFParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_RemoveFParameter(*args)
     def SetVParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_SetVParameter(*args)
     def GetVParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_GetVParameter(*args)
     def GetVParameterCount(*args): return _imesh.iParticleBuiltinEffectorVelocityField_GetVParameterCount(*args)
+    def AddVParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_AddVParameter(*args)
+    def RemoveVParameter(*args): return _imesh.iParticleBuiltinEffectorVelocityField_RemoveVParameter(*args)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorVelocityField
     __del__ = lambda self : None;
 iParticleBuiltinEffectorVelocityField_swigregister = _imesh.iParticleBuiltinEffectorVelocityField_swigregister
@@ -2410,8 +2423,12 @@ class iParticleBuiltinEffectorLinear(iParticleEffector):
     def SetMask(*args): return _imesh.iParticleBuiltinEffectorLinear_SetMask(*args)
     def GetMask(*args): return _imesh.iParticleBuiltinEffectorLinear_GetMask(*args)
     def AddParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_AddParameterSet(*args)
+    def RemoveParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_RemoveParameterSet(*args)
+    def Clear(*args): return _imesh.iParticleBuiltinEffectorLinear_Clear(*args)
     def SetParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_SetParameterSet(*args)
+    def SetEndTTL(*args): return _imesh.iParticleBuiltinEffectorLinear_SetEndTTL(*args)
     def GetParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_GetParameterSet(*args)
+    def GetEndTTL(*args): return _imesh.iParticleBuiltinEffectorLinear_GetEndTTL(*args)
     def GetParameterSetCount(*args): return _imesh.iParticleBuiltinEffectorLinear_GetParameterSetCount(*args)
     scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorLinear_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorLinear

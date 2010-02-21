@@ -155,6 +155,9 @@ protected:
     
     /// Special flag to mark this texture is used in an FBO
     flagInFBO = 1 << 24,
+    
+    /// Texture has been uploaded
+    flagUploaded = 1 << 23,
 
     flagLast,
     /// Mask to get only the "public" flags
@@ -172,6 +175,8 @@ protected:
   }
   bool IsPrepared() const { return texFlags.Check (flagPrepared); }
   void SetPrepared (bool b) { texFlags.SetBool (flagPrepared, b); }
+  bool IsUploaded() const { return texFlags.Check (flagUploaded); }
+  void SetUploaded (bool b) { texFlags.SetBool (flagUploaded, b); }
   bool IsTransp() const { return texFlags.Check (flagTransp); }
   void SetTransp (bool b) { texFlags.SetBool (flagTransp, b); }
   bool IsForeignHandle() const { return texFlags.Check (flagForeignHandle); }

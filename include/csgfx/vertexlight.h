@@ -319,6 +319,7 @@ public:
       }
       else
       {
+	direction = csVector3 (0);
 	invDistance = 0.0f;
 	a = 0.0f;
       }
@@ -484,12 +485,19 @@ class csVertexLightCalculator : public iVertexLightCalculator
   template<typename T, bool B>
   class ConditionalAlloc
   {
-    uint32 _data[(sizeof(T) + sizeof(uint32) - 1) / sizeof(uint32)];
+    char _data[(sizeof(T) + sizeof(void*) - 1) / sizeof(char)];
+    CS_FORCEINLINE_TEMPLATEMETHOD char* Data()
+    {
+      uintptr_t p = reinterpret_cast<uintptr_t> (_data);
+      const int align = sizeof(void*);
+      p = (p + align - 1) & ~(align - 1);
+      return reinterpret_cast<char*> (p);
+    }
   public:
     template<typename P1>
     ConditionalAlloc (const P1& a)
     {
-      if (B) new (&_data) T (a);
+      if (B) new (Data()) T (a);
     }
     ~ConditionalAlloc()
     {
@@ -499,7 +507,7 @@ class csVertexLightCalculator : public iVertexLightCalculator
     T& GetObject()
     {
       CS_ASSERT(B);
-      return *(reinterpret_cast<T*> (&_data));
+      return *(reinterpret_cast<T*> (Data()));
     }
   };
   

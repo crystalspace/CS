@@ -47,7 +47,7 @@ public:
   {
   }
 
-  bool LoadProgramStringToGL ();
+  bool LoadProgramStringToGL (const csPixelShaderParser& parser);
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram

@@ -776,6 +776,12 @@ class iShader(iShaderVariableContext):
     def SetupPass(*args): return _ivideo.iShader_SetupPass(*args)
     def TeardownPass(*args): return _ivideo.iShader_TeardownPass(*args)
     def DeactivatePass(*args): return _ivideo.iShader_DeactivatePass(*args)
+    svuTextures = _ivideo.iShader_svuTextures
+    svuBuffers = _ivideo.iShader_svuBuffers
+    svuVProc = _ivideo.iShader_svuVProc
+    svuVP = _ivideo.iShader_svuVP
+    svuFP = _ivideo.iShader_svuFP
+    svuAll = _ivideo.iShader_svuAll
     def GetUsedShaderVars(*args): return _ivideo.iShader_GetUsedShaderVars(*args)
     def GetMetadata(*args): return _ivideo.iShader_GetMetadata(*args)
     def PushShaderVariables(*args): return _ivideo.iShader_PushShaderVariables(*args)
@@ -849,6 +855,8 @@ class iShaderArray(core.CustomAllocated):
     def Get(*args): return _ivideo.iShaderArray_Get(*args)
     def Put(*args): return _ivideo.iShaderArray_Put(*args)
     def Push(*args): return _ivideo.iShaderArray_Push(*args)
+    def Merge(*args): return _ivideo.iShaderArray_Merge(*args)
+    def MergeSmart(*args): return _ivideo.iShaderArray_MergeSmart(*args)
     def Pop(*args): return _ivideo.iShaderArray_Pop(*args)
     def Top(*args): return _ivideo.iShaderArray_Top(*args)
     def Insert(*args): return _ivideo.iShaderArray_Insert(*args)

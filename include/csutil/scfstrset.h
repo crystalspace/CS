@@ -40,13 +40,15 @@ namespace CS
  * present.  This is useful when you need to work with strings but want the
  * performance characteristics of simple numeric comparisons.  Rather than
  * performing string comparisons, you instead compare the numeric string ID's.
+ *
+ * Instances of the set are locked are for concurrent accesses.
  */
 
 template<typename IF>
 class ScfStringSet : public scfImplementation1<ScfStringSet<IF>, IF>
 {
 private:
-  Utility::StringSet<typename IF::TagType> set;
+  Utility::StringSet<typename IF::TagType, true> set;
   typedef StringID<typename IF::TagType> StringIDType;
 
   typedef scfImplementation1<ScfStringSet<IF>, IF> scfImplementationType_;

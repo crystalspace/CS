@@ -64,6 +64,23 @@
 
 #include "csextern.h"
 
+/* On MinGW, with some versions of the MinGW runtime (3.15 and above), using
+   the STL together with -ansi is broken: the C runtime functions swprintf()
+   and vswprintf() are not declared, but an STL header (<cwchar>)
+   unconditionally references it via 'using'.
+   To work around the problem provide our own dummy declarations of these
+   functions. */
+#if defined(__STRICT_ANSI__) && \
+    (defined(CS_ANSI_BREAKS_SWPRINTF) || defined(CS_ANSI_BREAKS_VSWPRINTF))
+#if defined(CS_ANSI_BREAKS_SWPRINTF)
+int swprintf ();
+#endif
+#if defined(CS_ANSI_BREAKS_VSWPRINTF)
+int vswprintf ();
+#endif
+#include <cwchar>
+#endif
+
 /*
  * Default definitions for requested functionality.  Platform-specific
  * configuration files may override these.

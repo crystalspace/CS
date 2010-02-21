@@ -378,7 +378,7 @@ bool ImagePngFile::PngLoader::InitOk ()
   const png_bytep iBuffer = dataSource->GetUint8();
   const size_t iSize = dataSource->GetSize();
 
-  if (!png_check_sig (iBuffer, (int)iSize))
+  if (png_sig_cmp (iBuffer, 0, (int)iSize) != 0)
     return false;
   png = png_create_read_struct (PNG_LIBPNG_VER_STRING, 0, 0, 0);
   if (!png)

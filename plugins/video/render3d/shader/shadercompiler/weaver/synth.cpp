@@ -65,6 +65,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
   //-------------------------------------------------------------------------
 
+  void TagNodesHelper::AddNode (iDocumentNode* node)
+  {
+    if (node->GetType() == CS_NODE_ELEMENT)
+    {
+      const char* nodeName = node->GetValue();
+      if (strcmp (nodeName, "tag") != 0) return;
+      const char* tag = node->GetContentsValue ();
+      if (tag && *tag)
+	tags.Add (tag);
+    }
+  }
+
+  void TagNodesHelper::Merge (const TagNodesHelper& other)
+  {
+    csSet<csString>::GlobalIterator it (other.tags.GetIterator());
+    while (it.HasNext())
+    {
+      const csString& tag (it.Next());
+      tags.Add (tag);
+    }
+  }
+
+  void TagNodesHelper::AddToNode (iDocumentNode* node, iDocumentNode* before)
+  {
+    csSet<csString>::GlobalIterator it (tags.GetIterator());
+    while (it.HasNext())
+    {
+      const csString& tag (it.Next());
+      csRef<iDocumentNode> newNode = node->CreateNodeBefore (CS_NODE_ELEMENT,
+	before);
+      newNode->SetValue ("tag");
+      csRef<iDocumentNode> newNodeContent =
+	newNode->CreateNodeBefore (CS_NODE_TEXT);
+      newNodeContent->SetValue (tag);
+    }
+  }
+    
+  //-------------------------------------------------------------------------
+
   Synthesizer::Synthesizer (WeaverCompiler* compiler, 
                             const char* shaderName,
                             const csArray<DocNodeArray>& prePassNodes,
@@ -88,7 +127,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   void Synthesizer::Synthesize (iDocumentNode* shaderNode,
                                 ShaderVarNodesHelper& shaderVarNodesHelper,
                                 csRefArray<iDocumentNode>& techNodes,
-                                iDocumentNode* sourceTechNode, 
+                                iDocumentNode* sourceTechNode,
+				CombinerLoaderSet& combiners,
                                 iProgressMeter* progress)
   {
     if (graphs.GetSize() > 0)
@@ -154,7 +194,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	   
 	    csRef<SynthesizeTechnique> synthTech;
 	    synthTech.AttachNew (new SynthesizeTechnique (compiler, this,
-	      shaderVarNodesHelper, shaderNode, snippet, graph));
+	      shaderVarNodesHelper, shaderNode, snippet, graph, combiners));
 	    techPasses.Push (synthTech);
 	  #ifdef THREADED_TECH_SYNTHESIS
 	    synthQueue.Enqueue (synthTech);
@@ -172,7 +212,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	progress->SetProgressDescription (
 	  "crystalspace.graphics3d.shadercompiler.weaver.synth",
 	  "Generating %zu techniques", synthTechs.GetSize());
-	progress->SetTotal (synthTechs.GetSize());
+	progress->SetTotal (int (synthTechs.GetSize()));
       }
       for (size_t t = 0; t < synthTechs.GetSize(); t++)
       {
@@ -214,7 +254,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         }
       
         csSet<csString> techConditions;
+	TagNodesHelper techTags;
 	bool aPassSucceeded = false;
+	csRef<iDocumentNode> firstTechNode;
 	for (size_t p = 0; p < synthTechs[t].GetSize(); p++)
 	{
 	  size_t g = graphIndices[t].Get (p);
@@ -225,6 +267,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    csRef<iDocumentNode> newNode =
 	      techniqueNode->CreateNodeBefore (copyFrom->GetType());
 	    CS::DocSystem::CloneNode (copyFrom, newNode);
+	    if (!firstTechNode.IsValid()) firstTechNode = newNode;
 	  }
 	  
 	  Snippet* snippet = outerSnippets[g];
@@ -233,6 +276,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	  passNode->SetValue ("pass");
 	  CS::DocSystem::CloneAttributes (snippet->GetSourceNode(), passNode);
+	  if (!firstTechNode.IsValid()) firstTechNode = passNode;
 	  
 	  csRefArray<iDocumentNode> passForwardedNodes =
 	    snippet->GetPassForwardedNodes();
@@ -260,6 +304,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    const char* techCond = synthTech->GetTechniqueConditions();
 	    if (techCond && *techCond)
 	     techConditions.Add (techCond);
+	    techTags.Merge (synthTech->GetTags());
 	  }
 	}
 	if (!aPassSucceeded)
@@ -298,6 +343,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      shaderNode->CreateNodeBefore (CS_NODE_UNKNOWN));
 	    condNode->SetValue ("?endif?");
 	  }
+	  techTags.AddToNode (techniqueNode, firstTechNode);
 	}
 	
 	if (progress) progress->Step (1);
@@ -309,7 +355,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* errorNode,
     const Snippet* snippet, const TechniqueGraph& techGraph)
   {
-    defaultCombiner.AttachNew (new CombinerDefault (compiler, shaderVarNodes));
+    defaultCombiner.AttachNew (new CombinerDefault (compiler, shaderVarNodes, tags));
 
     TechniqueGraph graph (techGraph);
     /*
@@ -358,6 +404,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  "Could not get combiner from '%s'", comb->classId.GetData());
 	return false;
       }
+      combiners.Add (loader);
     }
     
     // Two outputs are needed: color (usually from the fragment part)...
@@ -551,6 +598,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                   return false;
                 }
 	        break;
+	      case Snippet::Technique::Input::Undefined:
+		break;
 	      case Snippet::Technique::Input::Value:
                 {
                   node.inputDefaults.Put (inp.name, inp.defaultValue);
@@ -740,7 +789,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      combiner->AddInput (inp.name, inp.type);
               inpRenamed = node.inputLinks.Get (inp.name, (const char*)0);
             }
-            combiner->InputRename (inpRenamed, inp.name);
+	    if (inpRenamed)
+	      combiner->InputRename (inpRenamed, inp.name);
 
             for (size_t a = 0; a < inp.attributes.GetSize(); a++)
             {

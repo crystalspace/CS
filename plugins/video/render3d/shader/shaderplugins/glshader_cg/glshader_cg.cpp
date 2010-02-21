@@ -213,14 +213,20 @@ static int GetProfileLevel (CGprofile profile)
       return 0x102;
     case CG_PROFILE_PS_1_3:
       return 0x103;
+    case CG_PROFILE_GLSLF:
+    case CG_PROFILE_GLSLC:
+      // Actually GLSL can be anything from 0x200 upwards...
     case CG_PROFILE_ARBFP1:
       return 0x200;
     case CG_PROFILE_FP30:
       return 0x20a;
     case CG_PROFILE_FP40:
       return 0x300;
+    case CG_PROFILE_GPU_FP:
+      return 0x400;
     default:
-      return 0;
+      // Some "future proofing"
+      return (profile > CG_PROFILE_GPU_FP) ? 0x500 : 0;
   }
 }
 
@@ -268,7 +274,7 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
       args.Push (profileMacroArg);
     }
     
-    int profileLevel = GetProfileLevel (profile);
+    int profileLevel = GetProfileLevel (limitsPair.fp.profile);
     if (profileLevel != 0)
     {
       profileMacroArg.Format ("-DFRAGMENT_PROGRAM_LEVEL=0x%x", profileLevel);
@@ -454,6 +460,9 @@ bool csGLShader_CG::Open()
   enableVP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Vertex", true);
   enableFP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Fragment", true);
 
+  bool forceBestProfile =
+    config->GetBool ("Video.OpenGL.Shader.Cg.ForceBestProfile", false);
+
   strictMatchVP = false;
   if (enableVP)
   {
@@ -507,12 +516,19 @@ bool csGLShader_CG::Open()
       ProfileLimits limits (vendor, profile);
       limits.GetCurrentLimits (ext);
       currentLimits.vp = limits;
+      strictMatchVP = forceBestProfile;
     }
     enableVP = currentLimits.vp.profile != CG_PROFILE_UNKNOWN;
     if (doVerbose)
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Using vertex program limits: %s",
-	currentLimits.vp.ToStringForPunyHumans().GetData());
+    {
+      if (enableVP)
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Using vertex program limits: %s",
+	  currentLimits.vp.ToStringForPunyHumans().GetData());
+      else
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Vertex programs not supported");
+    }
   }
   else
   {
@@ -524,6 +540,16 @@ bool csGLShader_CG::Open()
   strictMatchFP = false;
   if (enableFP)
   {
+    psplg = csLoadPluginCheck<iShaderProgramPlugin> (object_reg,
+      "crystalspace.graphics3d.shader.glps1", false);
+    if(!psplg)
+    {
+      if (doVerbose)
+        Report (CS_REPORTER_SEVERITY_WARNING,
+            "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
+            "routing unavailable.");
+    }
+
     if (config->KeyExists ("Video.OpenGL.Shader.Cg.Fake.Fragment.Profile"))
     {
       const char* profileStr = 
@@ -538,20 +564,24 @@ bool csGLShader_CG::Open()
       else
       {
         CGprofile profile2;
+	// Check if hardware supports requested profile, directly or by routing
         if (cgGLIsProfileSupported (profile2 = profile)
-            || cgGLIsProfileSupported (profile2 = NextBestFakeProfile (profile)))
+            || IsRoutedProfileSupported (profile2))
         {
 	  ProfileLimits limits (vendor, profile2);
 	  limits.ReadFromConfig (config, "Video.OpenGL.Shader.Cg.Fake.Fragment");
 	  currentLimits.fp = limits;
           strictMatchFP = true;
 	}
-	else if (IsRoutedProfileSupported (profile2 = profile)
-            || IsRoutedProfileSupported (profile2 = NextBestFakeProfile (profile)))
+	// Check if hardware supports a profile "close enough" to the requested one,
+	// directly or by routing
+	else if (cgGLIsProfileSupported (profile2 = NextBestFakeProfile (profile))
+            || IsRoutedProfileSupported (profile2))
 	{
 	  ProfileLimits limits (
 	    CS::PluginCommon::ShaderProgramPluginGL::Other,
 	    profile2);
+	  limits.GetCurrentLimits (ext);
 	  currentLimits.fp = limits;
           strictMatchFP = true;
 	}
@@ -565,10 +595,41 @@ bool csGLShader_CG::Open()
     }
     if (currentLimits.fp.profile == CG_PROFILE_UNKNOWN)
     {
-      ProfileLimits limits (vendor,
-	cgGLGetLatestProfile (CG_GL_FRAGMENT));
+      CGprofile latestProfile = cgGLGetLatestProfile (CG_GL_FRAGMENT);
+      if (((latestProfile == CG_PROFILE_FP20) /* (1) below */
+	  || (latestProfile == CG_PROFILE_UNKNOWN)) /* (2) below */
+	&& psplg.IsValid())
+      {
+        /* (1) Use CG_PROFILE_PS_1_1 or CG_PROFILE_PS_1_3 instead of FP20.
+           NVidia's FP20 backend apparently doesn't handle constants that are
+           needed in two different combiner stages very well - it seems to
+           only set one of the constants. However, the PS1.x code generated
+           by Cg is semantically correct; our PS1.x 'emulation' plugin correctly
+           handles the required constant mapping, so prefer indirection through
+           PS1.x even if the hardware could support FP20 natively. 
+	   (2) If there is no Cg-supported profile we might still support a
+	   routed PS1.x profile.
+	   */
+        if (IsRoutedProfileSupported (CG_PROFILE_PS_1_3))
+          latestProfile = CG_PROFILE_PS_1_3;
+        else if (IsRoutedProfileSupported (CG_PROFILE_PS_1_1))
+          latestProfile = CG_PROFILE_PS_1_1;
+      }
+      ProfileLimits limits (vendor, latestProfile);
       limits.GetCurrentLimits (ext);
       currentLimits.fp = limits;
+      strictMatchFP = forceBestProfile;
+    }
+    enableFP = currentLimits.fp.profile != CG_PROFILE_UNKNOWN;
+    if (doVerbose)
+    {
+      if (enableFP)
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Using fragment program limits: %s",
+	  currentLimits.fp.ToStringForPunyHumans().GetData());
+      else
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Fragment programs not supported");
     }
   }
   else
@@ -581,43 +642,6 @@ bool csGLShader_CG::Open()
   cgGLSetDebugMode (config->GetBool ("Video.OpenGL.Shader.Cg.CgDebugMode",
     false));
  
-  // Check if the requested profile needs routing.
-  bool doRoute = ProfileNeedsRouting (currentLimits.fp.profile);
-
-  if (enableFP)
-  {
-    if (currentLimits.fp.profile != CG_PROFILE_UNKNOWN)
-    {
-      // Load PS1 plugin, if requested and/or needed
-      if (doVerbose)
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-          "Routing Cg fragment programs to Pixel Shader plugin %s", 
-          doRoute ? "ON" : "OFF");
-      if (doRoute)
-      {
-        psplg = csLoadPluginCheck<iShaderProgramPlugin> (object_reg,
-          "crystalspace.graphics3d.shader.glps1", false);
-        if(!psplg)
-        {
-          if (doVerbose)
-            Report (CS_REPORTER_SEVERITY_WARNING,
-                "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
-                "routing unavailable.");
-	  ProfileLimits limits (vendor,
-	    cgGLGetLatestProfile (CG_GL_FRAGMENT));
-	  limits.GetCurrentLimits (ext);
-	  currentLimits.fp = limits;
-        }
-      }
-    }
-    else
-      enableFP = false;
-    if (doVerbose)
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Using fragment program limits: %s",
-	currentLimits.fp.ToStringForPunyHumans().GetData());
-  }
-
   return true;
 }
 

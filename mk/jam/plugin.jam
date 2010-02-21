@@ -157,7 +157,6 @@ rule Plugin
   if ! $(NO_STATIC_LINKING)
   {
     SubVariant static ;
-    local staticreginfoobject = [ BuildStaticRegFile $(<) : $(statictarget) ] ;
 
     # Add objects to the list of candidates for potential inclusion in a
     # monolithic static library containing objects for all plugins (useful for
@@ -180,7 +179,6 @@ rule Plugin
     }
 
     MakeLocate $(staticobjects) : $(LOCATE_TARGET) ;
-    STATICPLUGINS.OBJECTS.$(<) += $(staticreginfoobject) ;
     STATICPLUGINS.OBJECTS.$(<)  += $(staticobjects) ;
     STATICPLUGINS.SUBTARGETS += $(<) ;
     

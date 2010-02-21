@@ -51,10 +51,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
   csShaderConditionResolver::csShaderConditionResolver (
     csConditionEvaluator& evaluator)
-    : rootNode (0), nextVariant (0),
-    evaluator (evaluator)
+    : rootNode (0), nextVariant (0), evaluator (evaluator)
   {
-    SetEvalParams (0, 0);
   }
 
   csShaderConditionResolver::~csShaderConditionResolver ()
@@ -108,11 +106,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
   bool csShaderConditionResolver::Evaluate (csConditionID condition)
   {
-    const csRenderMeshModes* modes = csShaderConditionResolver::modes;
-    const csShaderVariableStack* stack = csShaderConditionResolver::stack;
-
-    return evaluator.Evaluate (condition, modes ? *modes : csRenderMeshModes(),
-      stack);
+    return currentEval->Evaluate (condition);
   }
 
   csConditionNode* csShaderConditionResolver::NewNode (csConditionNode* parent)
@@ -130,7 +124,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
   size_t csShaderConditionResolver::GetVariant (csConditionNode* node)
   {
-    MyBitArrayTemp bits (evaluator.GetNumConditions ());
+    MyBitArrayMalloc bits (evaluator.GetNumConditions ());
     node->FillConditionArray (bits);
     size_t* var = variantIDs.GetElementPointer (bits);
     if (var)
@@ -147,7 +141,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     csConditionNode*& trueNode,
     csConditionNode*& falseNode,
     const MyBitArrayTemp& conditionResultsTrue,
-    const MyBitArrayTemp& conditionResultsFalse)
+    const MyBitArrayTemp& conditionResultsFalse,
+    const MyBitArrayTemp& conditionResultsSet)
   {
     if (rootNode == 0)
     {
@@ -159,11 +154,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
       parent->trueNode = trueNode = NewNode (parent);
       trueNode->variant = GetVariant (trueNode);
-      variantConditions.PutUnique (trueNode->variant, conditionResultsTrue);
+      variantConditions.PutUnique (trueNode->variant,
+	VariantConditionsBits (conditionResultsTrue, conditionResultsSet));
 
       parent->falseNode = falseNode = NewNode (parent);
       falseNode->variant = GetVariant (falseNode);
-      variantConditions.PutUnique (falseNode->variant, conditionResultsFalse);
+      variantConditions.PutUnique (falseNode->variant,
+	VariantConditionsBits (conditionResultsFalse, conditionResultsSet));
     }
     else
     {
@@ -174,16 +171,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       parent->falseNode = falseNode = NewNode (parent);
 
       CS_ASSERT(parent->variant != csArrayItemNotFound);
-      MyBitArrayTemp bits (evaluator.GetNumConditions ());
+      MyBitArrayMalloc bits (evaluator.GetNumConditions ());
       parent->condition = condition;
 
       trueNode->variant = GetVariant (trueNode);
-      variantConditions.PutUnique (trueNode->variant, conditionResultsTrue);
+      variantConditions.PutUnique (trueNode->variant,
+	VariantConditionsBits (conditionResultsTrue, conditionResultsSet));
 
       falseNode->variant = parent->variant;
       falseNode->FillConditionArray (bits);
       variantIDs.PutUnique (bits, falseNode->variant);
-      variantConditions.PutUnique (falseNode->variant, conditionResultsFalse);
+      variantConditions.PutUnique (falseNode->variant,
+	VariantConditionsBits (conditionResultsFalse, conditionResultsSet));
 
       parent->variant = csArrayItemNotFound;
     }
@@ -194,17 +193,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     variantIDs.Empty();
   }
 
-  void csShaderConditionResolver::SetEvalParams (const csRenderMeshModes* modes,
-    const csShaderVariableStack* stack)
-  {
-    csShaderConditionResolver::modes = modes;
-    csShaderConditionResolver::stack = stack;
-  }
-
   size_t csShaderConditionResolver::GetVariant ()
   {
-    const csRenderMeshModes& modes = *csShaderConditionResolver::modes;
-    const csShaderVariableStack* stack = csShaderConditionResolver::stack;
+    CS_ASSERT(currentEval != 0);
 
     if (rootNode == 0)
     {
@@ -218,7 +209,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       while (nextRoot != 0)
       {
         currentRoot = nextRoot;
-        if (evaluator.Evaluate (currentRoot->condition, modes, stack))
+        if (currentEval->Evaluate (currentRoot->condition))
         {
           nextRoot = currentRoot->trueNode;
         }
@@ -232,32 +223,72 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     }
   }
 
-  void csShaderConditionResolver::SetVariant (size_t variant)
+  void csShaderConditionResolver::SetVariantEval (size_t variant)
   {
     if (rootNode == 0) return;
 
     csBitArray conditionResults (evaluator.GetNumConditions());
     csBitArray conditionSet (evaluator.GetNumConditions());
-    MyBitArrayTemp* conditionResultsPtr = variantConditions.GetElementPointer (
+    VariantConditionsBits* conditionsPtr = variantConditions.GetElementPointer (
       variant);
-    CS_ASSERT(conditionResultsPtr);
+    CS_ASSERT(conditionsPtr);
 
     size_t i = 0;
-    for (; i < conditionResultsPtr->GetSize(); i++)
+    for (; i < conditionsPtr->conditionResults.GetSize(); i++)
     {
-      conditionResults.Set (i, (*conditionResultsPtr)[i]);
-      conditionSet.SetBit (i);
+      conditionResults.Set (i, conditionsPtr->conditionResults[i]);
+      conditionSet.Set (i, conditionsPtr->conditionsSet[i]);
     }
-    evaluator.ForceConditionResults (conditionSet, conditionResults);
+    currentEval = evaluator.BeginTicketEvaluation (conditionSet, conditionResults);
   }
 
-  void csShaderConditionResolver::DumpConditionTree (csString& out)
+  void csShaderConditionResolver::DumpConditionTree (csString& out, bool includeConditions)
   {
     if (rootNode == 0)
       return;
 
+    if (includeConditions)
+    {
+      SeenConditionsSet seenConds;
+      DumpUsedConditions (out, rootNode, seenConds);
+    }
     out += "\n";
     DumpConditionNode (out, rootNode, 0);
+  }
+
+  void csShaderConditionResolver::DumpUsedConditions (csString& out, csConditionNode* node,
+    SeenConditionsSet& seenConds)
+  {
+    if (node == 0) return;
+
+    if ((node->condition != csCondAlwaysFalse)
+       && (node->condition != csCondAlwaysTrue))
+     DumpUsedCondition (out, node->condition, seenConds);
+
+    DumpUsedConditions (out, node->trueNode, seenConds);
+    DumpUsedConditions (out, node->falseNode, seenConds);
+  }
+
+  void csShaderConditionResolver::DumpUsedCondition (csString& out, csConditionID id,
+    SeenConditionsSet& seenConds)
+  {
+    if ((seenConds.GetSize() > id) && (seenConds[id])) return;
+    
+    if (seenConds.GetSize() <= id) seenConds.SetSize (id+1);
+    seenConds.SetBit (id);
+	  
+    const CondOperation& condOp = evaluator.GetCondition (id);
+    if (condOp.left.type == operandOperation)
+    {
+      DumpUsedCondition (out, condOp.left.operation, seenConds);
+    }
+    if (condOp.right.type == operandOperation)
+    {
+      DumpUsedCondition (out, condOp.right.operation, seenConds);
+    }
+    out.AppendFmt ("condition %zu = '", id);
+    out.Append (evaluator.GetConditionString (id));
+    out.Append ("'\n");
   }
 
   static void Indent (csString& out, int n)
@@ -293,6 +324,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         DumpConditionNode (out, node->falseNode, level + 1);
       }
     }
+  }
+
+  void csShaderConditionResolver::GetVariantConditions (size_t variant,
+    const MyBitArrayMalloc*& conditionResults,
+    const MyBitArrayMalloc*& conditionSet)
+  {
+    VariantConditionsBits* conditionsPtr = variantConditions.GetElementPointer (
+      variant);
+    CS_ASSERT(conditionsPtr);
+    
+    conditionResults = &conditionsPtr->conditionResults;
+    conditionSet = &conditionsPtr->conditionsSet;
   }
 
   void csShaderConditionResolver::CollectUsedConditions (csConditionNode* node,
@@ -562,7 +605,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
           csString cacheFileTag =
             CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-          if (cacheFileTag != cacheTag) break;
+	  /* Note: empty cache tag means none was provided with the source;
+	     ignoring a mismatch here is okay: if the input data changed the
+	     hash stream will mismatch as well. The cache tag itself is then
+	     only used to verify technique data. */
+	  if (!cacheTag.IsEmpty() && (cacheFileTag != cacheTag)) break;
+	  if (cacheTag.IsEmpty()) cacheTag = cacheFileTag;
 
           // Extract hash stream
           csRef<iDataBuffer> hashStream = 
@@ -572,20 +620,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           readFromCache = hasher.ValidateHashStream (hashStream);
         }
         while (false);
-      }
-      if (!readFromCache)
-      {
-        // Getting from cache failed, so prep for writing to cache
-        cacheFile.AttachNew (new csMemFile ());
-        // Write magic header
-        uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
-        cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
-        CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, cacheTag);
-        // Write hash stream
-        csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
-        if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
-          cacheFile, hashStream))
-          cacheFile.Invalidate();
       }
     }
 
@@ -615,9 +649,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         readFromCache = false;
         csRef<iDataBuffer> conditionsBuf =
           CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
-        if (!conditionsBuf.IsValid()) break;;
+        if (!conditionsBuf.IsValid()) break;
         condReader = new ConditionsReader (*sharedEvaluator, conditionsBuf);
-        readFromCache = true;
+	readFromCache = condReader->GetStatus();
       }
       while (false);
 
@@ -629,7 +663,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         {
           csString tree;
           tree.SetGrowsBy (0);
-          techsResolver->DumpConditionTree (tree);
+          techsResolver->DumpConditionTree (tree, true);
           csString filename;
           filename.Format ("/tmp/shader/cond_%s_techs.txt", source->GetAttributeValue ("name"));
           compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
@@ -679,7 +713,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	techCache = shaderCache->GetRootedCache (
 	  csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
 	    t));
-        readFromCache = LoadTechniqueFromCache (newTech, techCache);
+        readFromCache = LoadTechniqueFromCache (newTech, techCache,
+	  techniques.GetSize());
         // Discard variations data from cache as well
         if (!readFromCache) techCache->ClearCache ("/");
         techniques.Push (newTech);
@@ -728,6 +763,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     if (!readFromCache)
     {
+      // Getting from cache failed, so prep for writing to cache
+      cacheFile.AttachNew (new csMemFile ());
+      // Write magic header
+      uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
+      cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
+      CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, cacheTag);
+      // Write hash stream
+      csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
+      if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+        cacheFile, hashStream))
+        cacheFile.Invalidate();
+
       // Scan techniques on node w/ expanded templates
       {
 	csRef<csWrappedDocumentNode> wrappedNode;
@@ -741,8 +788,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       csArray<TechniqueKeeper> techniquesTmp;
       ScanForTechniques (shaderRoot, techniquesTmp, forcepriority);
 
-      csRef<iHierarchicalCache> techCache;
-	
       /* Find a suitable technique
        * (Note that a wrapper is created for each technique node individually,
        * not the whole shader) */
@@ -755,12 +800,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         newTech.minLights = tk.node->GetAttributeValueAsInt ("minlights");
         newTech.ScanMetadata (tk.node);
 
-        size_t techIndex = techniques.GetSize();
-	if (shaderCache != 0)
-	  techCache = shaderCache->GetRootedCache (
-	    csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
-	      techIndex));
-        LoadTechnique (newTech, tk.node, techIndex, techCache);
         techniques.Push (newTech);
       }
     
@@ -787,7 +826,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           | wdnfpoExpandTemplates));
       shaderRoot = wrappedNode;
       
-      PrepareTechVars (shaderRoot, forcepriority);
+      PrepareTechVars (shaderRoot, techniquesTmp, forcepriority);
+      
+      for (size_t i = 0; i < techniques.GetSize(); i++)
+      {
+	csRef<iHierarchicalCache> techCache;
+	if (shaderCache != 0)
+	  techCache = shaderCache->GetRootedCache (
+	    csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
+	      i));
+        LoadTechnique (techniques[i], techniquesTmp[i].node, techCache);
+      }
       
       if (cacheValid)
       {
@@ -869,97 +918,101 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     delete condReader;
   }
 
-  bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
+  bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo,
+                              bool quick)
   {
     shaderCache = cacheTo;
     Load (source, true);
     if (!shaderCache.IsValid()) return false;
 
     bool result = true;
-    size_t tvc = techsResolver->GetVariantCount();
-    if (tvc == 0) tvc = 1;
-
-    size_t totalTechs = 0;
-
-    for (size_t t = 0; t < techniques.GetSize(); t++)
-    {
-      Technique& tech = techniques[t];
-
-      size_t vc = tech.resolver->GetVariantCount();
-      if (vc == 0) vc = 1;
-      
-      if (compiler->do_verbose)
-	compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Shader '%s': priority %d: %zu variations",
-	GetName(), tech.priority, vc);
-
-      totalTechs += vc;
-    }
-
-    size_t techsHandled = 0;
-    csTicks startTime = csGetTicks();
     csTextProgressMeter* progress = 0;
-    for (size_t t = 0; t < techniques.GetSize(); t++)
+    if (!quick)
     {
-      Technique& tech = techniques[t];
+      size_t tvc = techsResolver->GetVariantCount();
+      if (tvc == 0) tvc = 1;
 
-      csRef<iHierarchicalCache> techCache;
-      techCache = shaderCache->GetRootedCache (
-	csString().Format ("/%s/%zu", cacheScope_tech.GetData(), t));
+      size_t totalTechs = 0;
 
-      size_t vc = tech.resolver->GetVariantCount();
-      if (vc == 0) vc = 1;
-      for (size_t vi = 0; vi < vc; vi++)
+      for (size_t t = 0; t < techniques.GetSize(); t++)
       {
-	tech.resolver->SetVariant (vi);
+        Technique& tech = techniques[t];
 
-	//size_t ticket = vi * (techniques.GetSize()+1) + (t+1);
-	//((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
-	size_t ticket = ComputeTicket (t, vi);
+        size_t vc = tech.resolver->GetVariantCount();
+        if (vc == 0) vc = 1;
+        
+        if (compiler->do_verbose)
+	  compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Shader '%s': priority %d: %zu variations",
+	  GetName(), tech.priority, vc);
 
-	if (compiler->doDumpXML)
-	{
-	  csRef<iDocumentSystem> docsys;
-	  docsys.AttachNew (new csTinyDocumentSystem);
-	  csRef<iDocument> newdoc = docsys->CreateDocument();
-	  CS::DocSystem::CloneNode (tech.techNode, newdoc->CreateRoot());
-	  newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s_%zu_%zu.xml",
-	    GetName(), t, vi));
-	}
+        totalTechs += vc;
+      }
 
-	csRef<iHierarchicalCache> varCache;
-	varCache.AttachNew (
-	  new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
-	  techCache, csString().Format ("/%zu", vi)));
+      size_t techsHandled = 0;
+      csTicks startTime = csGetTicks();
+      for (size_t t = 0; t < techniques.GetSize(); t++)
+      {
+        Technique& tech = techniques[t];
 
-	// So external files are found correctly
-	csVfsDirectoryChanger dirChange (compiler->vfs);
-	dirChange.ChangeTo (vfsStartDir);
+        csRef<iHierarchicalCache> techCache;
+        techCache = shaderCache->GetRootedCache (
+	  csString().Format ("/%s/%zu", cacheScope_tech.GetData(), t));
 
-        sharedEvaluator->EnterEvaluation();
-	csXMLShaderTech* xmltech = new csXMLShaderTech (this);
-	bool result = xmltech->Precache (tech.techNode, ticket, varCache);
-        sharedEvaluator->LeaveEvaluation();
-	if (!result)
-	{
-	  if (compiler->do_verbose)
+        size_t vc = tech.resolver->GetVariantCount();
+        if (vc == 0) vc = 1;
+        for (size_t vi = 0; vi < vc; vi++)
+        {
+	  tech.resolver->SetVariantEval (vi);
+
+	  //size_t ticket = vi * (techniques.GetSize()+1) + (t+1);
+	  //((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
+	  size_t ticket = ComputeTicket (t, vi);
+
+	  if (compiler->doDumpXML)
 	  {
-	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "Shader '%s'<%zu/%zu>: Technique with priority %d fails. Reason: %s.",
-	      GetName(), vi, tech.priority,
-	      xmltech->GetFailReason());
+	    csRef<iDocumentSystem> docsys;
+	    docsys.AttachNew (new csTinyDocumentSystem);
+	    csRef<iDocument> newdoc = docsys->CreateDocument();
+	    CS::DocSystem::CloneNode (tech.techNode, newdoc->CreateRoot());
+	    newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s_%zu_%zu.xml",
+	      GetName(), t, vi));
 	  }
-	  result = false;
-	}
-	delete xmltech;
-	techsHandled++;
-	if (progress)
-	  progress->Step (1);
-	else if (csGetTicks() - startTime > 1000)
-	{
-	  progress = new csTextProgressMeter (0, totalTechs);
-	  progress->Step (techsHandled);
-	}
+
+	  csRef<iHierarchicalCache> varCache;
+	  varCache.AttachNew (
+	    new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
+	    techCache, csString().Format ("/%zu", vi)));
+
+	  // So external files are found correctly
+	  csVfsDirectoryChanger dirChange (compiler->vfs);
+	  dirChange.ChangeTo (vfsStartDir);
+
+	  csXMLShaderTech* xmltech = new csXMLShaderTech (this);
+	  bool result = xmltech->Precache (tech.techNode, ticket, varCache);
+	  if (!result)
+	  {
+	    if (compiler->do_verbose)
+	    {
+	      compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	        "Shader '%s'<%zu/%zu>: Technique with priority %d fails. Reason: %s.",
+	        GetName(), vi, tech.priority,
+	        xmltech->GetFailReason());
+	    }
+	    result = false;
+	  }
+	  delete xmltech;
+	  techsHandled++;
+	  if (progress)
+	    progress->Step (1);
+	  else if (csGetTicks() - startTime > 1000)
+	  {
+	    progress = new csTextProgressMeter (0, totalTechs);
+	    progress->SetGranularity (progress->GetTickScale());
+	    progress->Step (techsHandled);
+	  }
+	  tech.resolver->SetCurrentEval (0);
+        }
       }
     }
 
@@ -985,7 +1038,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           csRef<iShaderCompiler> shcom = shadermgr->GetCompiler (type);
           if (shcom.IsValid()) 
           {
-            result &= shcom->PrecacheShader (fallbackNode, cacheTo);
+            result &= shcom->PrecacheShader (fallbackNode, cacheTo, quick);
           }
         }
       }
@@ -997,8 +1050,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   size_t csXMLShader::GetPrioritiesTicket (const CS::Graphics::RenderMeshModes& modes,
     const csShaderVariableStack& stack)
   {
-    csConditionEvaluator::ScopedEvaluation scope (*sharedEvaluator);
-    techsResolver->SetEvalParams (&modes, &stack);
+    csRef<csConditionEvaluator::TicketEvaluator> eval (
+      sharedEvaluator->BeginTicketEvaluationCaching (modes, &stack));
+    techsResolver->SetCurrentEval (eval);
     
     int lightCount = 0;
     if (stack.GetSize() > compiler->stringLightCount)
@@ -1012,7 +1066,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     if (tvc == 0) tvc = 1;
     size_t tvi = techsResolver->GetVariant ();
 
-    techsResolver->SetEvalParams (0, 0);
+    techsResolver->SetCurrentEval (0);
     if (tvi != csArrayItemNotFound)
       return tvi+tvc*lightCount;
     else
@@ -1126,7 +1180,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     techniquesTmp.Sort (&CompareTechniqueKeeper);
   }
 
-  iShader* csXMLShader::GetFallbackShader()
+  void csXMLShader::GetFallbackShader (iShader*& shader, iXMLShaderInternal*& xmlshader)
   {
     if (!fallbackTried)
     {
@@ -1144,10 +1198,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           fallbackShader = compiler->synldr->ParseShader (ldr_context,
           fallbackNode);
       }
+      fallbackShaderXML = scfQueryInterfaceSafe<iXMLShaderInternal> (fallbackShader);
 
       fallbackTried = true;
     }
-    return fallbackShader;
+    shader = fallbackShader;
+    xmlshader = fallbackShaderXML;
   }
 
   /**
@@ -1194,17 +1250,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     iDocumentNode* node)
   {
     SVCWrapper wrapper (globalSVContext, shadermgr->GetSVNameStringset ()->GetSize ());
-    sharedEvaluator->EnterEvaluation();
-    techsResolver->SetEvalParams (0, &wrapper.svStack);
+    csRenderMeshModes modes;
+    csRef<csConditionEvaluator::TicketEvaluator> eval (
+      sharedEvaluator->BeginTicketEvaluationCaching (modes, &wrapper.svStack));
+    techsResolver->SetCurrentEval (eval);
     compiler->LoadSVBlock (ldr_context, node, &wrapper);
-    techsResolver->SetEvalParams (0, 0);
-    sharedEvaluator->LeaveEvaluation();
+    techsResolver->SetCurrentEval (0);
   }
 
   size_t csXMLShader::GetTicketForTech (const csRenderMeshModes& modes, 
     const csShaderVariableStack& stack, size_t techNum)
   {
-    csConditionEvaluator::ScopedEvaluation scope (*sharedEvaluator);
+    csRef<csConditionEvaluator::TicketEvaluator> eval (
+      sharedEvaluator->BeginTicketEvaluationCaching (modes, &stack));
     
     int lightCount = 0;
     if (stack.GetSize() > compiler->stringLightCount)
@@ -1214,17 +1272,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         svLightCount->GetValue (lightCount);
     }
 
-    return GetTicketForTech (modes, stack, lightCount, techNum);
+    return GetTicketForTech (modes, stack, eval, lightCount, techNum);
   }
     
   size_t csXMLShader::GetTicketForTech (const csRenderMeshModes& modes, 
-    const csShaderVariableStack& stack, int lightCount, size_t techNum)
+    const csShaderVariableStack& stack, 
+    csConditionEvaluator::TicketEvaluator* eval,
+    int lightCount, size_t techNum)
   {
     Technique& tech = techniques[techNum];
     if (lightCount < tech.minLights) return csArrayItemNotFound;
 
     csRef<iHierarchicalCache> techCache;
-    tech.resolver->SetEvalParams (&modes, &stack);
+    tech.resolver->SetCurrentEval (eval);
 
     size_t vi = tech.resolver->GetVariant ();
     if (vi != csArrayItemNotFound)
@@ -1308,8 +1368,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	  dirChange.ChangeTo (vfsStartDir);
 
 	  var = new csXMLShaderTech (this);
-	  if (var->Load (ldr_context, tech.techNode, shaderRootStripped, ticket,
-	    varCache))
+	  bool loadResult = var->Load (ldr_context, tech.techNode, shaderRootStripped, ticket,
+	    varCache);
+	  if (loadResult)
 	  {
 	    if (compiler->do_verbose)
 	      compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -1332,17 +1393,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
       if (var != 0)
       {
-	tech.resolver->SetEvalParams (0, 0);
+	tech.resolver->SetCurrentEval (0);
 	return ticket;
       }
     }
-    tech.resolver->SetEvalParams (0, 0);
+    tech.resolver->SetCurrentEval (0);
     
     return csArrayItemNotFound;
   }
   
   size_t csXMLShader::GetTicketForTechVar (const csRenderMeshModes& modes, 
-    const csShaderVariableStack& stack, int lightCount, size_t tvi)
+    const csShaderVariableStack& stack, csConditionEvaluator::TicketEvaluator* eval,
+    int lightCount, size_t tvi)
   {
     size_t ticket = csArrayItemNotFound;
 
@@ -1353,7 +1415,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     for (size_t t = 0; t < techniques.GetSize(); t++)
     {
       if (!techVar.activeTechniques.IsBitSet (t)) continue;
-      ticket = GetTicketForTech (modes, stack, lightCount, t);
+      ticket = GetTicketForTech (modes, stack, eval, lightCount, t);
       if (ticket != csArrayItemNotFound)
       {
         usedTech = TechForTicket (ticket);
@@ -1363,7 +1425,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     if (usedTech == 0)
     {
-      if (GetFallbackShader ())
+      iShader* fallback;
+      iXMLShaderInternal* fallbackXML;
+      bool useShortcut = true;
+      if (!fallbackTried)
+      {
+	/* If we're going to load a shader release the lock as loading the new
+	   shader may need it. */
+	eval->EndEvaluation();
+	useShortcut = false;
+      }
+      GetFallbackShader (fallback, fallbackXML);
+      if (fallback)
       {
 	if (compiler->do_verbose && !techVar.shownError)
 	{
@@ -1371,8 +1444,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	    "No technique validated for shader '%s' TV %zu: using fallback", 
 	    GetName(), tvi);
 	}
-	ticket = ComputeTicketForFallback (
-	  GetFallbackShader()->GetTicket (modes, stack));
+	size_t fbticket = (size_t)~0;
+	if (useShortcut && (fallbackXML != 0))
+	  fbticket = fallbackXML->GetTicketNoSetup (modes, stack, eval,
+            lightCount);
+	if (fbticket == (size_t)~0)
+	{
+	  eval->EndEvaluation();
+	  fbticket = fallback->GetTicket (modes, stack);
+	}
+	ticket = ComputeTicketForFallback (fbticket);
       }
       else
       {
@@ -1387,13 +1468,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     return ticket;
   }
 
+  size_t csXMLShader::GetTicketNoSetupInternal (const csRenderMeshModes& modes, 
+    const csShaderVariableStack& stack,
+    csConditionEvaluator::TicketEvaluator* eval, int lightCount)
+  {
+    size_t ticket = csArrayItemNotFound;
+    techsResolver->SetCurrentEval (eval);
+
+    size_t tvc = techsResolver->GetVariantCount();
+    if (tvc == 0) tvc = 1;
+
+    size_t tvi = techsResolver->GetVariant ();
+    if (tvi != csArrayItemNotFound)
+    {
+      ticket = GetTicketForTechVar (modes, stack, eval, lightCount, tvi);
+    }
+
+    techsResolver->SetCurrentEval (0);
+
+    return ticket;
+  }
+
   size_t csXMLShader::GetTicket (const csRenderMeshModes& modes, 
     const csShaderVariableStack& stack)
   {
-    size_t ticket = csArrayItemNotFound;
-    //sharedEvaluator->ResetEvaluationCache();
-    csConditionEvaluator::ScopedEvaluation scope (*sharedEvaluator);
-    techsResolver->SetEvalParams (&modes, &stack);
+    csRef<csConditionEvaluator::TicketEvaluator> eval (
+      sharedEvaluator->BeginTicketEvaluationCaching (modes, &stack));
 
     int lightCount = 0;
     if (stack.GetSize() > compiler->stringLightCount)
@@ -1403,35 +1503,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         svLightCount->GetValue (lightCount);
     }
 
-    size_t tvc = techsResolver->GetVariantCount();
-    if (tvc == 0) tvc = 1;
-
-    size_t tvi = techsResolver->GetVariant ();
-    if (tvi != csArrayItemNotFound)
-    {
-      ticket = GetTicketForTechVar (modes, stack, lightCount, tvi);
-    }
-
-    techsResolver->SetEvalParams (0, 0);
-
-    return ticket;
+    return GetTicketNoSetupInternal (modes, stack, eval, lightCount);
   }
 
-  void csXMLShader::PrepareTechVars (iDocumentNode* shaderRoot, int forcepriority)
+  size_t csXMLShader::GetTicketNoSetup (const csRenderMeshModes& modes, 
+    const csShaderVariableStack& stack, void* eval, int lightCount)
+  {
+    return GetTicketNoSetupInternal (modes, stack,
+      reinterpret_cast<csConditionEvaluator::TicketEvaluator*> (eval),
+      lightCount);
+  }
+
+  void csXMLShader::PrepareTechVars (iDocumentNode* shaderRoot,
+				     const csArray<TechniqueKeeper>& allTechniques,
+				     int forcepriority)
   {
     size_t tvc = techsResolver->GetVariantCount();
     if (tvc == 0) tvc = 1;
     
     for (size_t tvi = 0; tvi < tvc; tvi++)
     {
-      /* Make sure (a) evaluation cache is cleared after each loop
-       * (b) forcing the variant does not 'taint' the eval cache for normal
-       * evaluation */
-      sharedEvaluator->PushEvaluationState();
+      /* Back up the evaluation state so forcing the variant does not 'taint'
+       * the eval cache for normal evaluation */
+      csRef<csConditionEvaluator::TicketEvaluator> oldeval (
+	techsResolver->GetCurrentEval());
       {
-	csConditionEvaluator::ScopedEvaluation scope (*sharedEvaluator);
-      
-	techsResolver->SetVariant (tvi);
+	techsResolver->SetVariantEval (tvi);
 	ShaderTechVariant& techVar = techVariants.GetExtend (tvi);
         
 	techVar.activeTechniques.SetSize (techniques.GetSize ());
@@ -1448,8 +1545,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           
 	  for (size_t t = 0; t < techniques.GetSize(); t++)
 	  {
-	    iDocumentNode* srcNode = techniques[t].techNode->GetWrappedNode();
-	    if (srcNode->Equals (wrapperNode->GetWrappedNode()))
+	    csWrappedDocumentNode* srcWrapperNode =
+	      static_cast<csWrappedDocumentNode*> ((iDocumentNode*)allTechniques[t].node);
+	    if (srcWrapperNode->Equals (wrapperNode->GetWrappedNode()))
 	    {
 	      techVar.activeTechniques.SetBit (t);
 	      break;
@@ -1457,12 +1555,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	  }
 	}
       }
-      sharedEvaluator->PopEvaluationState();
+      techsResolver->SetCurrentEval (oldeval);
+    }
+  }
+  
+  void csXMLShader::ComputeTechniquesConditionsResults (size_t techIndex,
+    MyBitArrayTemp& condResults)
+  {
+    size_t tvc = techsResolver->GetVariantCount();
+    if (tvc == 0) return;
+    
+    condResults.SetSize (sharedEvaluator->GetNumConditions ()*2);
+    
+    for (size_t tvi = 0; tvi < tvc; tvi++)
+    {
+      const ShaderTechVariant& techVar = techVariants[tvi];
+      if (techVar.activeTechniques.IsBitSet (techIndex))
+      {
+	const MyBitArrayMalloc* conditionResults;
+	const MyBitArrayMalloc* conditionSet;
+	techsResolver->GetVariantConditions (tvi, conditionResults,
+	  conditionSet);
+	for (size_t c = 0; c < conditionSet->GetSize(); c++)
+	{
+	  if ((*conditionSet)[c])
+          {
+	    condResults.SetBit (2*c + ((*conditionResults)[c] ? 0 : 1));
+          }
+          else
+          {
+            /* The condition isn't set in the given tech variant. Means it's
+               result has to be assumed "undefined", so set the result bits
+               accordingly. */
+	    condResults.SetBit (2*c);
+	    condResults.SetBit (2*c+1);
+          }
+	}
+      }
     }
   }
 
   bool csXMLShader::LoadTechniqueFromCache (Technique& tech,
-    iHierarchicalCache* cache)
+    iHierarchicalCache* cache, size_t techIndex)
   {
     csRef<iFile> cacheFile;
     csRef<iDataBuffer> cacheData (cache->ReadCache ("/doc"));
@@ -1493,8 +1627,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     }
 
     csRef<csWrappedDocumentNode> wrappedNode;
-    wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (cacheFile,
-      tech.resolver, *sharedEvaluator, condReader));
+    if (compiler->doDumpConds)
+    {
+      csString tree;
+      tree.SetGrowsBy (0);
+
+      wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (cacheFile,
+	tech.resolver, *sharedEvaluator, condReader, &tree));
+
+      tech.resolver->DumpConditionTree (tree);
+      csString filename;
+      filename.Format ("/tmp/shader/cond_%s_%zu.txt",
+        originalShaderDoc->GetAttributeValue ("name"),
+        techIndex);
+      compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
+    }
+    else
+      wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (cacheFile,
+	tech.resolver, *sharedEvaluator, condReader, 0));
     if (!wrappedNode.IsValid()) return false;
     tech.techNode = wrappedNode;
 
@@ -1502,8 +1652,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   }
 
   void csXMLShader::LoadTechnique (Technique& tech, iDocumentNode* srcNode,
-    size_t techIndex, iHierarchicalCache* cacheTo, bool forPrecache)
+    iHierarchicalCache* cacheTo, bool forPrecache)
   {
+    size_t techIndex = techniques.GetIndex (&tech);
     tech.resolver = new csShaderConditionResolver (*sharedEvaluator);
 
     csRefArray<iDocumentNode> extraNodes;
@@ -1533,9 +1684,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     csVfsDirectoryChanger dirChange (compiler->vfs);
     dirChange.ChangeTo (vfsStartDir);
 
-    /* @@@ TODO: Some SV values are fixed from the tech determination;
-    * treat them as constant in the technique */
     csRef<csWrappedDocumentNode> wrappedNode;
+    
+    /* Some condition results are fixed from the tech determination;
+     * pass these to the technique node wrapping */
+    MyBitArrayTemp condResults;
+    ComputeTechniquesConditionsResults (techIndex, condResults);
 
     if (compiler->doDumpConds)
     {
@@ -1544,7 +1698,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (srcNode, 
         tech.resolver, tech.resolver->evaluator, extraNodes, &tree,
-        wdnfpoHandleConditions));
+        wdnfpoHandleConditions, &condResults));
 
       tech.resolver->DumpConditionTree (tree);
       csString filename;
@@ -1556,7 +1710,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     else
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (srcNode, 
         tech.resolver, tech.resolver->evaluator, extraNodes, 0,
-        wdnfpoHandleConditions));
+        wdnfpoHandleConditions, &condResults));
 
     tech.techNode = wrappedNode;
 
@@ -1607,7 +1761,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     if (IsFallbackTicket (ticket))
     {
       useFallbackContext = true;
-      return GetFallbackShader()->ActivatePass (GetFallbackTicket (ticket), number);
+      iShader* fallback;
+      iXMLShaderInternal* fallbackXML;
+      GetFallbackShader (fallback, fallbackXML);
+      return fallback->ActivatePass (GetFallbackTicket (ticket), number);
     }
 
     CS_ASSERT_MSG ("ActivatePass() has already been called.",
@@ -1621,7 +1778,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     if (IsFallbackTicket (ticket))
     {
       useFallbackContext = false;
-      return GetFallbackShader()->DeactivatePass (GetFallbackTicket (ticket));
+      iShader* fallback;
+      iXMLShaderInternal* fallbackXML;
+      GetFallbackShader (fallback, fallbackXML);
+      return fallback->DeactivatePass (GetFallbackTicket (ticket));
     }
 
     bool ret = activeTech ? activeTech->DeactivatePass() : false; 

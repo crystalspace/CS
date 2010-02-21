@@ -22,7 +22,9 @@ VFS.Mount.scripts = $(CS_SHAREDIR)$/bindings$/
 
 ; Shaders
 VFS.Mount.shader = $(CS_DATADIR)$/shader$/,$(CS_DATADIR)$/shader-old$/
-; Per-user shader cache
+VFS.Mount.shader-snippets = $(CS_DATADIR)$/shader-snippets$/
+; @@@ This is to not break existing shaders
+VFS.Mount.shader/snippets = $(CS_DATADIR)$/shader-snippets$/,$(CS_DATADIR)$/shader-old$/snippets$/
 ; Global shader cache
 VFS.Mount.shadercache/global = $(CS_DATADIR)$/shadercache.zip
 ; Per-user shader cache
@@ -31,7 +33,7 @@ VFS.Mount.shadercache/user = $(CS_LOCALAPPDATA)$/shadercache$/
 ; The Unifont
 VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
 ; The TTF font library
-VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/), $(CS_DATADIR)$/ttf-dejavu.zip, $(CS_DATADIR)$/ttf-vera.zip
+VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/), $(CS_DATADIR)$/ttf-dejavu.zip
 
 VFS.Mount.lev/flarge   = $(CS_MAPDIR)$/flarge$/
 VFS.Mount.lev/r3dtest  = $(CS_MAPDIR)$/r3dtest$/
@@ -57,12 +59,17 @@ VFS.Mount.lib/cubemap  = $(CS_DATADIR)$/cube$/
 VFS.Mount.lib/teapot   = $(CS_DATADIR)$/teapot.zip
 VFS.Mount.lib/kwartz   = $(CS_DATADIR)$/kwartz.zip
 VFS.Mount.lib/frankie  = $(CS_DATADIR)$/frankie$/
+VFS.Mount.lib/krystal = $(CS_DATADIR)$/krystal$/
 VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 
+; General CEGUI data
+VFS.Mount.cegui  			= $@(CS_DATADIR)$/cegui$/
 ; CEgui test
-VFS.Mount.ceguitest  = $(CS_DATADIR)$/ceguitest$/
+VFS.Mount.ceguitest  	= $@(CS_DATADIR)$/ceguitest$/
 ; Viewmesh
-VFS.Mount.viewmesh   = $@data$/viewmesh$/
+VFS.Mount.viewmesh   	= $@(CS_DATADIR)$/viewmesh$/
+; Simpvs
+VFS.Mount.simpvs   		= $@(CS_DATADIR)$/simpvs$/
 
 ; Mount for unittest
 VFS.Mount.lev/unittest = $(CS_DATADIR)$/unittest$/
@@ -85,8 +92,8 @@ VFS.Unix.. = .
 VFS.Unix... = ..
 VFS.Unix.CS_CDROM = /mnt/cdrom
 VFS.Unix.CS_TMP = /tmp
-; This is true at least for systems using XFree86
-VFS.Unix.TTF_PATH = /usr/X11R6/lib/X11/fonts/Truetype/, /usr/X11R6/lib/X11/fonts/TTF/
+; This is true at least for systems using XFree86, Linux and Mac OS X
+VFS.Unix.TTF_PATH = /usr/share/fonts/, /usr/local/share/fonts/, /System/Library/Fonts/, /Library/Fonts/, /usr/X11R6/lib/X11/fonts/Truetype/, /usr/X11R6/lib/X11/fonts/TTF/
 VFS.Unix.CS_LOCALAPPDATA = $(HOME)$/.crystalspace
 
 VFS.CP/M.. = .

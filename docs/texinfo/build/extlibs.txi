@@ -77,21 +77,21 @@ location:
 @subsubheading 32-bit version
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.9_002.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-winlibs/cs-win32libs-1.9_004.exe}
 @end ifnottex
 @iftex
-@code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-1.9_002.exe}
+@code{http://www.crystalspace3d.org/downloads/cs-winlibs/}@*
+@code{cs-win32libs-1.9_004.exe}
 @end iftex
 
 @subsubheading 64-bit version
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-winlibs-x64-1.9_002.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-winlibs/cs-winlibs-x64-1.9_004.exe}
 @end ifnottex
 @iftex
-@code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-winlibs-x64-1.9_002.exe}
+@code{http://www.crystalspace3d.org/downloads/cs-winlibs/}@*
+@code{cs-winlibs-x64-1.9_004.exe}
 @end iftex
 
 @subheading zlib
@@ -225,7 +225,7 @@ in order to use the library with Crystal Space.
 @cindex Libraries, Bullet
 @cindex Physics library
 
-@emph{Version:} 2.69 minimum
+@emph{Version:} 2.75 recommended
 
 Crystal Space can also provide physics through Bullet. You can get
 the required version at:

@@ -22,5 +22,8 @@
 #include "csutil/win32/DbgHelpAPI.h"
 
 #define CS_API_DLL		"dbghelp.dll"
+/* The winlibs-x64 package contains a renamed dbghelp.dll to prevent a conflict
+   with the x86 libs */
+#define CS_API_DLL64	"dbghelp-x64.dll"
 
 #include "APIdefine.inc"

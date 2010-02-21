@@ -162,7 +162,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     {
       const char* classname = classlist->Get(i);
       csRef<iShaderCompiler> plugin = 
-	csLoadPlugin<iShaderCompiler> (plugin_mgr, classname);
+	csLoadPluginCheck<iShaderCompiler> (plugin_mgr, classname);
       if (plugin)
       {
 	if (do_verbose)
@@ -229,7 +229,9 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   
   if (config->GetBool ("Video.ShaderManager.EnableShaderCache", false))
   {
-    shaderCache.AttachNew (new PlexHierarchicalCache ());
+    bool redundantRemove =
+      config->GetBool ("Video.ShaderManager.ShaderCache.RedundantRemove", true);
+    shaderCache.AttachNew (new PlexHierarchicalCache (redundantRemove));
     
     csRef<CS::Utility::VfsHierarchicalCache> cache;
     const char* cachePath;
@@ -314,7 +316,12 @@ void csShaderManager::LoadDefaultVariables()
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectreg);
   CS_ASSERT(vfs);
   csRef<iSyntaxService> synldr = csQueryRegistry<iSyntaxService> (objectreg);
-  CS_ASSERT(synldr);
+  if (!synldr.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Can not load default shader vars, no iSyntaxService available");
+    return;
+  }
   
   csRef<iLoader> loader = csQueryRegistryOrLoad<iLoader> (objectreg,
     "crystalspace.level.loader", true);

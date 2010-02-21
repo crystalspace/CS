@@ -104,6 +104,12 @@ namespace RenderManager
       struct csBoxClipperCachedStore
       {
         uint bytes[(sizeof(csBoxClipperCached) + sizeof (uint) - 1)/sizeof(uint)];
+	
+	csBoxClipperCachedStore()
+	{ 
+	  // Avoid gcc complaining about uninitialised use
+	  memset (bytes, 0, sizeof (bytes));
+	}
       };
       CS::Utility::GenericResourceCache<csBoxClipperCachedStore, csTicks,
         CS::Utility::ResourceCache::SortingNone,

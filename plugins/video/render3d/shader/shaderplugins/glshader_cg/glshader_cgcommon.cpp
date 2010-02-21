@@ -307,9 +307,11 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
     cgDestroyProgram (program);
   }
   shaderPlug->SetCompiledSource (programStr);
+  shaderPlug->SetIgnoreErrors (true);
   program = cgCreateProgram (shaderPlug->context, 
     CG_SOURCE, programStr, 
     profile, !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
+  shaderPlug->SetIgnoreErrors (false);
   
   if (!(flags & loadIgnoreErrors)) shaderPlug->PrintAnyListing();
 
@@ -486,40 +488,20 @@ void csShaderGLCGCommon::DoDebugDump ()
   }
   output << "\n";
 
+  output << "Program leaf parameters:\n";
   CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
   while (param)
   {
-    output << "Parameter: " << cgGetParameterName (param) << "\n";
-    output << " Type: " << 
-      cgGetTypeString (cgGetParameterNamedType (param)) << "\n";
-    output << " Direction: " <<
-      cgGetEnumString (cgGetParameterDirection (param)) << "\n";
-    output << " Semantic: " << cgGetParameterSemantic (param) << "\n";
-    const CGenum var = cgGetParameterVariability (param);
-    output << " Variability: " << cgGetEnumString (var) << "\n";
-    output << " Resource: " <<
-      cgGetResourceString (cgGetParameterResource (param)) << "\n";
-    output << " Resource index: " <<
-      cgGetParameterResourceIndex (param) << "\n";
-    // Cg 2.0 seems to not like CG_DEFAULT for uniforms
-    if (/*(var == CG_UNIFORM) || */(var == CG_CONSTANT))
-    {
-      int nValues;
-      const double* values = cgGetParameterValues (param, 
-	(var == CG_UNIFORM) ? CG_DEFAULT : CG_CONSTANT, &nValues);
-      if (nValues != 0)
-      {
-	output << " Values:";
-	for (int v = 0; v < nValues; v++)
-	{
-	  output << ' ' << values[v];
-	}
-	output << "\n";
-      }
-    }
-    if (!cgIsParameterUsed (param, program)) output << "  not used\n";
-    if (!cgIsParameterReferenced (param)) output << "  not referenced\n";
+    DebugDumpParam (output, param);
+    param = cgGetNextLeafParameter (param);
+  }
+  output << "\n";
 
+  output << "Program global parameters:\n";
+  param = cgGetFirstLeafParameter (program, CG_GLOBAL);
+  while (param)
+  {
+    DebugDumpParam (output, param);
     param = cgGetNextLeafParameter (param);
   }
   output << "\n";
@@ -549,6 +531,40 @@ void csShaderGLCGCommon::DoDebugDump ()
       "crystalspace.graphics3d.shader.glcg",
       "Dumped Cg program info to '%s'", debugFN.GetData());
   }
+}
+
+void csShaderGLCGCommon::DebugDumpParam (csString& output, CGparameter param)
+{
+  output << "Parameter: " << cgGetParameterName (param) << "\n";
+  output << " Type: " << 
+    cgGetTypeString (cgGetParameterNamedType (param)) << "\n";
+  output << " Direction: " <<
+    cgGetEnumString (cgGetParameterDirection (param)) << "\n";
+  output << " Semantic: " << cgGetParameterSemantic (param) << "\n";
+  const CGenum var = cgGetParameterVariability (param);
+  output << " Variability: " << cgGetEnumString (var) << "\n";
+  output << " Resource: " <<
+    cgGetResourceString (cgGetParameterResource (param)) << "\n";
+  output << " Resource index: " <<
+    cgGetParameterResourceIndex (param) << "\n";
+  // Cg 2.0 seems to not like CG_DEFAULT for uniforms
+  if (/*(var == CG_UNIFORM) || */(var == CG_CONSTANT))
+  {
+    int nValues;
+    const double* values = cgGetParameterValues (param, 
+      (var == CG_UNIFORM) ? CG_DEFAULT : CG_CONSTANT, &nValues);
+    if (nValues != 0)
+    {
+      output << " Values:";
+      for (int v = 0; v < nValues; v++)
+      {
+	output << ' ' << values[v];
+      }
+      output << "\n";
+    }
+  }
+  if (!cgIsParameterUsed (param, program)) output << "  not used\n";
+  if (!cgIsParameterReferenced (param)) output << "  not referenced\n";
 }
 
 void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description, 
@@ -720,7 +736,8 @@ struct CachedShaderWrapper
 
 iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   iHierarchicalCache* cache, iBase* previous, iDocumentNode* node,
-  csRef<iString>* failReason, csRef<iString>* tag)
+  csRef<iString>* failReason, csRef<iString>* tag,
+  ProfileLimitsPair* cacheLimits)
 {
   if (!cache) return iShaderProgram::loadFail;
 
@@ -810,11 +827,21 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   
   csString allReasons;
   bool oneReadCorrectly = false;
+  ProfileLimits bestLimits (
+    CS::PluginCommon::ShaderProgramPluginGL::Other,
+    CG_PROFILE_UNKNOWN);
+  bool bestLimitsSet = false;
   for (size_t i = cachedProgWrappers.GetSize(); i-- > 0;)
   {
     const CachedShaderWrapper& wrapper = cachedProgWrappers[i];
     const ProfileLimits& limits =
       (programType == progVP) ? wrapper.limits.vp : wrapper.limits.fp;
+
+    if (!bestLimitsSet)
+    {
+      bestLimits = limits;
+      bestLimitsSet = true;
+    }
       
     if (strictMatch && (limits != currentLimits))
     {
@@ -934,13 +961,23 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     
     ClipsToVmap();
     GetParamsFromVmap();
-    
+
+    bool doLoadToGL = !shaderPlug->ProfileNeedsRouting (programProfile);
+
     cgGetError(); // Clear error
-    cgGLLoadProgram (program);
+    if (doLoadToGL)
+    {
+      cgGLLoadProgram (program);
+    }
+    else
+    {
+      cgCompileProgram (program);
+    }
+    
     shaderPlug->PrintAnyListing();
     err = cgGetError();
     if ((err != CG_NO_ERROR)
-      || !cgGLIsProgramLoaded (program)) 
+      || (doLoadToGL && !cgGLIsProgramLoaded (program)))
     {
       //if (shaderPlug->debugDump)
 	//DoDebugDump();
@@ -968,13 +1005,84 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       DoDebugDump();
       
     tag->AttachNew (new scfString (wrapper.name));
+
+    if (cacheLimits != 0)
+      *cacheLimits = wrapper.limits;
     
-    return iShaderProgram::loadSuccessShaderValid;
+    bool loaded = !shaderPlug->ProfileNeedsRouting (programProfile)
+      || LoadProgramWithPS1 ();
+    if (loaded && (bestLimits < currentLimits))
+    {
+      /* The best found program is worse than the current limits, so pretend
+         that the shader program failed (instead just being 'invalid') -
+         that will make xmlshader try to load the program from scratch,
+         ie with current limits, which may just work. */
+      if (failReason)
+        failReason->AttachNew (new scfString ("Provoking clean load with current limits"));
+      return iShaderProgram::loadFail;
+    }
+    return loaded ? iShaderProgram::loadSuccessShaderValid
+        : iShaderProgram::loadSuccessShaderInvalid;
   }
   
-  if (failReason) failReason->AttachNew (
-    new scfString (allReasons));
-  return oneReadCorrectly ? iShaderProgram::loadSuccessShaderInvalid : iShaderProgram::loadFail;
+  if (oneReadCorrectly)
+  {
+    if (bestLimits < currentLimits)
+    {
+      /* The 'invalid' programs may compile with the current limits -
+         so again, provoke clean load */
+      if (failReason)
+        failReason->AttachNew (new scfString ("Provoking clean load with current limits"));
+      return iShaderProgram::loadFail;
+    }
+    else
+      return iShaderProgram::loadSuccessShaderInvalid;
+  }
+  else
+    return iShaderProgram::loadFail;
+}
+
+bool csShaderGLCGCommon::LoadProgramWithPS1 ()
+{
+  pswrap = shaderPlug->psplg->CreateProgram ("fp");
+
+  if (!pswrap)
+    return false;
+
+  const char* objectCode = cgGetProgramString (program, CG_COMPILED_PROGRAM);
+  if (!objectCode || !*objectCode)
+    // Program did not actually compile
+    return false;
+
+  csArray<csShaderVarMapping> mappings;
+  
+  for (size_t i = 0; i < variablemap.GetSize (); i++)
+  {
+    // Get the Cg parameter
+    ShaderParameter* sparam =
+      reinterpret_cast<ShaderParameter*> (variablemap[i].userVal);
+    // Make sure it's a C-register
+    CGresource resource = cgGetParameterResource (sparam->param);
+    if (resource == CG_C)
+    {
+      // Get the register number, and create a mapping
+      csString regnum;
+      regnum.Format ("c%lu", cgGetParameterResourceIndex (sparam->param));
+      mappings.Push (csShaderVarMapping (variablemap[i].name, regnum));
+    }
+  }
+
+  if (pswrap->Load (0, objectCode, mappings))
+  {
+    bool ret = pswrap->Compile (0);
+    if (shaderPlug->debugDump)
+      DoDebugDump();
+    return ret;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 }

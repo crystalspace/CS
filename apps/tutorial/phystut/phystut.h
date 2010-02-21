@@ -21,12 +21,12 @@
 
 #include <stdarg.h>
 #include <crystalspace.h>
-#include <ivaria/ode.h>
+#include "ivaria/dynamicsdebug.h"
 
-class Simple
+class Simple : public csApplicationFramework, public csBaseEventHandler
 {
 private:
-  iObjectRegistry* object_reg;
+  // Engine related
   csRef<iEngine> engine;
   csRef<iLoader> loader;
   csRef<iGraphics3D> g3d;
@@ -36,50 +36,80 @@ private:
   csRef<iView> view;
   csRef<iCollideSystem> cdsys;
   csRef<FramePrinter> printer;
-  iSector* room;
-  int objcnt;
-  int solver;
-  bool disable;
+  csRef<iFont> courierFont;
 
-  csString phys_engine_name;
-  int  phys_engine_id;
-
+  // Physics related
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;
   csRef<iBulletDynamicSystem> bullet_dynSys;
+  csRef<iDynamicsDebuggerManager> debuggerManager;
+  csRef<iDynamicSystemDebugger> dynamicsDebugger;
+
+  // Meshes
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
-  csRef<iFont> courierFont;
-  bool do_bullet_debug;
+  csRef<iMeshWrapper> walls;
+  iSector* room;
 
-  static bool SimpleEventHandler (iEvent& ev);
-  bool HandleEvent (iEvent& ev);
-  void SetupFrame ();
-  void WriteShadow (int x,int y,int fg,const char *str,...);
-  void Write(int x,int y,int fg,int bg,const char *str,...);
-  
+  // Configuration related
+  int solver;
+  bool autodisable;
+  csString phys_engine_name;
+  int phys_engine_id;
+  bool do_bullet_debug;
+  float remainingStepDuration;
+
+  // Dynamic simulation related
+  bool debugMode;
+  bool allStatic;
+  bool pauseDynamic;
+  float dynamicSpeed;
+
+  // Camera related
+  int cameraMode;
+  csRef<iRigidBody> cameraBody;
+  float rotX, rotY, rotZ;
+
+  // Ragdoll related
+  csRef<iSkeletonRagdollManager2> ragdollManager;
+  CS::Animation::StateID ragdollState;
+  csRef<iMeshWrapper> ragdollMesh;
+
+  //-- csBaseEventHandler
+  void Frame ();
+  bool OnKeyboard (iEvent &event);
+  bool OnMouseDown (iEvent &event);
+
+  // Camera
+  void UpdateCameraMode ();
+
+  // Spawning meshes
   bool CreateStarCollider ();
   iRigidBody* CreateBox ();
   iRigidBody* CreateSphere ();
+  iRigidBody* CreateCylinder ();
+  iRigidBody* CreateCapsule ();
   iRigidBody* CreateMesh ();
+  iRigidBody* CreateConvexMesh ();
   iJoint* CreateJointed ();
+  void CreateChain ();
+  void LoadRagdoll ();
+  void CreateRagdoll ();
   void CreateWalls (const csVector3& radius);
-  csRef<iMeshWrapper> walls;
-  csRef<iMeshWrapper> avatar;
-  csRef<iRigidBody> avatarbody;
 
-  CS_DECLARE_EVENT_SHORTCUTS;
-
-  csEventID KeyboardDown;
-  csEventID KeyboardUp;
+  // Display of comments 
+  void DisplayKeys ();
+  void WriteShadow (int x,int y,int fg,const char *str,...);
+  void Write(int x,int y,int fg,int bg,const char *str,...);
 
 public:
-  Simple (iObjectRegistry *obj);
+  Simple ();
   ~Simple ();
 
-  bool Initialize ();
-  void Start ();
-  void Shutdown ();
+  //-- csApplicationFramework
+  void OnExit ();
+  bool OnInitialize (int argc, char* argv[]);
+  bool Application ();
 };
 
 #endif // __PHYSTUT_H__

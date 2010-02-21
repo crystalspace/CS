@@ -786,6 +786,8 @@ private:
   void const** args;
 };
 
+#include "custom_new_disable.h"
+
 class TEventMemPool : public csMemoryPool
 {
 public:
@@ -810,13 +812,16 @@ inline void const* TEventMemPool::Store<const char*>(const char** p)
   char* ptr = 0;
   if(*p)
   {
-    ptr = (char*)Alloc(strlen(*p) + 1);
-    strcpy(ptr, *p);
+    size_t length = strlen(*p) + 1;
+    ptr = (char*)Alloc(length);
+    memcpy(ptr, *p, length);
   }
 
   char** ptrPtr = new (this) char*;
   *ptrPtr = ptr;
   return (void const*)ptrPtr;
 }
+
+#include "custom_new_enable.h"
 
 #endif // __CS_CSUTIL_THREADEVENT_H__

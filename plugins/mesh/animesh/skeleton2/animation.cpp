@@ -100,33 +100,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   csPtr<iSkeletonAnimationNodeFactory2> AnimationPacketFactory::CreateAnimationNode (
     const char* name)
   {
-    return new AnimationNodeFactory (name);
+    csRef<iSkeletonAnimationNodeFactory2> ref;
+    ref.AttachNew (new AnimationNodeFactory (name));
+    return csPtr<iSkeletonAnimationNodeFactory2> (ref);
   }
   
   csPtr<iSkeletonBlendNodeFactory2> AnimationPacketFactory::CreateBlendNode (
     const char* name)
   {
-    return new BlendNodeFactory (name);
+    csRef<iSkeletonBlendNodeFactory2> ref;
+    ref.AttachNew (new BlendNodeFactory (name));
+    return csPtr<iSkeletonBlendNodeFactory2> (ref);
   }
 
   csPtr<iSkeletonPriorityNodeFactory2> AnimationPacketFactory::CreatePriorityNode (
     const char* name)
   {
-    return new PriorityNodeFactory (name);
+    csRef<iSkeletonPriorityNodeFactory2> ref;
+    ref.AttachNew (new PriorityNodeFactory (name));
+    return csPtr<iSkeletonPriorityNodeFactory2> (ref);
   }
 
   csPtr<iSkeletonRandomNodeFactory2> AnimationPacketFactory::CreateRandomNode (
     const char* name)
   {
-    return new RandomNodeFactory (name);
+    csRef<iSkeletonRandomNodeFactory2> ref;
+    ref.AttachNew (new RandomNodeFactory (name));
+    return csPtr<iSkeletonRandomNodeFactory2> (ref);
   }
 
   csPtr<iSkeletonFSMNodeFactory2> AnimationPacketFactory::CreateFSMNode (
     const char* name)
   {
-    return new FSMNodeFactory (name);
+    csRef<iSkeletonFSMNodeFactory2> ref;
+    ref.AttachNew (new FSMNodeFactory (name));
+    return csPtr<iSkeletonFSMNodeFactory2> (ref);
   }
-
 
 
   CS_LEAKGUARD_IMPLEMENT(AnimationPacket);
@@ -277,24 +286,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
       // Find keyframes before/after time
       size_t before, after;
-      size_t ki = channel->keyFrames.FindSortedKey (cmp, &before);
 
-      // First keyframe
-      if (ki != csArrayItemNotFound)
+      if (channel->keyFrames.GetSize () == 0)
+	continue;
+
+      if (channel->keyFrames.GetSize () == 1)
+	before = after = 0;
+
+      else
       {
-        before = ki;
+	size_t ki = channel->keyFrames.FindSortedKey (cmp, &before);
+
+	// First keyframe
+	if (ki != csArrayItemNotFound)
+	{
+	  before = ki;
+	}
+
+	if (channel->keyFrames[before].time > playbackTime && before > 0)
+	  before--;
+
+	// Second
+	after = before + 1;
+	if (after == channel->keyFrames.GetSize ())
+	{
+	  // Handle end-of-frame
+	  after = isPlayingCyclic ? 0 : before;
+	}
       }
-
-      if (channel->keyFrames[before].time > playbackTime && before > 0)
-        before--;
-
-      // Second
-      after = before + 1;
-      if (after == channel->keyFrames.GetSize ())
-      {
-        // Handle end-of-frame
-        after = isPlayingCyclic ? 0 : before;
-      }      
 
       const KeyFrame& k1 = channel->keyFrames[before];
       const KeyFrame& k2 = channel->keyFrames[after];

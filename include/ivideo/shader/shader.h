@@ -470,7 +470,7 @@ struct csShaderMetadata
 };
 
 /**
- * A list of priorities as returned by iShaderCompiler->GetPriorities()
+ * A list of priorities as returned by iShaderCompiler::GetPriorities()
  */
 struct iShaderPriorityList : public virtual iBase
 {
@@ -487,7 +487,7 @@ struct iShaderPriorityList : public virtual iBase
  */
 struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 4, 0, 1);
+  SCF_INTERFACE(iShader, 5, 0, 0);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -530,6 +530,24 @@ struct iShader : public virtual iShaderVariableContext
 
   /// Completly deactivate a pass
   virtual bool DeactivatePass (size_t ticket) = 0;
+  
+  /// Flags for SV users to be considered by GetUsedShaderVars
+  enum SVUserFlags
+  {
+    /// Used by texture mappings
+    svuTextures = (1 << 0),
+    /// Used by buffer bindings
+    svuBuffers = (1 << 1),
+    /// Used by VProc program
+    svuVProc = (1 << 2),
+    /// Used by vertex program
+    svuVP = (1 << 3),
+    /// Used by fragment program
+    svuFP = (1 << 4),
+    
+    /// All users
+    svuAll = 0xffff
+  };
 
   /**
    * Request all shader variables used by a certain shader ticket.
@@ -542,8 +560,11 @@ struct iShader : public virtual iShaderVariableContext
    *   shader variable string set. Second, bits corresponding to unused
    *   shader variables will not be reset. It is the responsibility of the 
    *   caller to do so.
+   * \param userFlags What users to consider when collecting used SVs.
+   *   Combination of SVUserFlags values.
    */
-  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const = 0;
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits,
+				  uint userFlags = svuAll) const = 0;
   
   /// Get shader metadata
   virtual const csShaderMetadata& GetMetadata () const = 0;
@@ -591,7 +612,7 @@ struct iShader : public virtual iShaderVariableContext
  */
 struct iShaderCompiler : public virtual iBase
 {
-  SCF_INTERFACE (iShaderCompiler, 0,0,2);
+  SCF_INTERFACE (iShaderCompiler, 1,0,0);
   /// Get a name identifying this compiler
   virtual const char* GetName() = 0;
 
@@ -621,8 +642,24 @@ struct iShaderCompiler : public virtual iBase
   virtual csPtr<iShaderPriorityList> GetPriorities (
 		  iDocumentNode* templ) = 0;
 		  
+  /**
+   * 'Precache' a shader.
+   * Compiles a shader but stores results of that in the cache \a cacheTo
+   * for faster loading at runtime.
+   * \param node Root node of the shader to cache.
+   * \param cacheTo Cache object to store data in. Usually an instance of
+   *   VfsHierarchicalCache pointing to a VFS dir that is used as a cache
+   *   directory for the shader manager at runtime.
+   * \param quick Do a "quick" precache. That means thoroughness is traded
+   *   for time: the precache will take less time than a full one, but will
+   *   be incomplete, meaning that some more compilation will take place
+   *   at load time.
+   * \note In practice, 'quick' precaching means that the XMLShader plugin
+   *  does not compile shader programs; this is deferred to the application
+   *  run time.
+   */
   virtual bool PrecacheShader (iDocumentNode* node,
-    iHierarchicalCache* cacheTo) = 0;
+    iHierarchicalCache* cacheTo, bool quick = false) = 0;
 };
 
 #endif // __CS_IVIDEO_SHADER_H__

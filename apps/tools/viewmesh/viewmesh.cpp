@@ -347,6 +347,10 @@ void ViewMesh::Help ()
   csPrintf ("  -R=<realpath>      Real path from where to load the model\n");
   csPrintf ("  -C=<vfsdir>        Current VFS directory\n");
   csPrintf ("  <file>             Load the specified mesh object from the VFS path (meshfact or library)\n");
+  csPrintf ("\n");
+  csPrintf ("Example:\n");
+  csPrintf ("  viewmesh -C=data/frankie/ frankie.xml\n");
+  csPrintf ("\n");
 }
 
 void ViewMesh::HandleCommandLine()
@@ -625,17 +629,14 @@ bool ViewMesh::CreateGui()
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
 
-  vfs->ChDir ("/ceguitest/0.5/");
+  vfs->ChDir ("/cegui/");
 
   // Load the ice skin (which uses Falagard skinning system)
-  cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");
+  cegui->GetSchemeManagerPtr ()->create("ice.scheme");
 
   cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
 
-  CEGUI::Font* font = cegui->GetFontManagerPtr ()->createFont("FreeType",
-    "Vera", "/fonts/ttf/Vera.ttf");
-  font->setProperty("PointSize", "10");
-  font->load();
+  cegui->GetFontManagerPtr ()->createFreeTypeFont("DejaVuSans", 10, true, "/fonts/ttf/DejaVuSans.ttf");
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 

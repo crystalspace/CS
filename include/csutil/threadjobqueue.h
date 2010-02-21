@@ -91,6 +91,7 @@ private:
     // 
     Mutex tsMutex;
     Condition tsNewJob;
+    Condition tsJobFinished;
 
     csFIFO<csRef<iJob> > jobQueue;
   };
@@ -99,7 +100,6 @@ private:
   ThreadGroup allThreads;
 
   Mutex finishMutex;
-  Condition jobFinished;
 
   size_t numWorkerThreads;
   int32 shutdownQueue;

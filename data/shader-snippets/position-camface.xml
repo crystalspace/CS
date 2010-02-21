@@ -1,0 +1,136 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="Hposition" type="position4_object" default="complex">
+      <block location="cg:vertexIn">
+	<varying type="position4" name="Hposition" binding="POSITION" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	Hposition = vertexIn.Hposition;
+      </block>
+    </input>
+    
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelViewProj" type="float4x4" default="complex">
+      <block location="cg:vertexIn">
+	<uniform type="float4x4" name="ModelViewProj" binding="state.matrix.mvp" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	ModelViewProj = vertexIn.ModelViewProj;
+      </block>
+    </input>
+
+    <input name="Proj" type="float4x4" default="complex">
+      <block location="cg:vertexIn">
+	<uniform type="float4x4" name="Proj" binding="state.matrix.projection" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	Proj = vertexIn.Proj;
+      </block>
+    </input>
+
+    <input file="/shader-snippets/ModelView.inp" private="yes" />
+
+    <input name="objectToWorld" type="float4x4" default="complex" private="yes">
+      <block location="cg:vertexIn">
+	<uniform type="float4x4" name="objectToWorld" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float4x4" name="objectToWorld" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	objectToWorld = vertexIn.objectToWorld;
+      </block>
+
+      <block location="cg:fragmentMain">
+	objectToWorld = fragmentIn.objectToWorld;
+      </block>
+
+      <block location="cg:variablemap">
+	<variablemap variable="object2world transform" 
+	  destination="vertexIn.objectToWorld" />
+	<variablemap variable="object2world transform" 
+	  destination="fragmentIn.objectToWorld" />
+      </block>
+    </input>
+
+    <block location="cg:vertexToFragment">
+      <varying type="position4" name="position" binding="POSITION" />
+      <!-- This is needed since POSITION semantics can't be used for input in an FP -->
+      <varying type="position4" name="position_screen" />
+      <varying type="position4" name="position_object"/>
+      <varying type="position4" name="position_world"/>
+      <varying type="position4" name="position_camera"/>
+    </block>
+    
+    <block location="cg:clips">
+      <!-- Clip for reflection/refraction rendering -->
+      <clip space="object">
+	<plane type="shadervar">clip plane reflection</plane>
+      </clip>
+    </block>
+    
+    <block location="cg:vertexCompilerArgs">
+      -posinv
+    </block>
+    
+    <block location="cg:definitions">
+      <?Include /shader-snippets/cg-global_objectToWorld.cginc?>
+    </block>
+	
+    <block location="cg:vertexMain">
+      float4 offset = mul (objectToWorld, float4(0, 0, 0, 1));
+      position_camera = position_object = Hposition;
+      position_world = mul (objectToWorld, position_object);
+      position_camera.xyz += mul (ModelView, offset).xyz;
+      position_screen = position = mul (Proj, position_camera);
+      
+      APPLY_CLIPPING_VP_POSINV(position_camera, position_world, position_object);
+
+      /* The objectToWorld transform is needed in other places, so there is a 
+	 global variable for it. Set that */
+      SetGlobalObjectToWorld (objectToWorld);
+    </block>
+    
+    <block location="cg:fragmentMain">
+      APPLY_CLIPPING_FP_POSINV;
+      
+      /* The objectToWorld transform is needed in other places, so there is a 
+	 global variable for it. Set that */
+      SetGlobalObjectToWorld (objectToWorld);
+      position = position_screen;
+    </block>
+    
+    <output name="position" type="position4_screen" />
+    <!-- @@@ FIXME: Other blocks may need the world space input as well... 
+         Pass through. But is there a better (ie automatic) way? -->
+    <output name="position_world" type="position4_world" />
+    <output name="position_object" type="position4_object" />
+    <output name="position_camera" type="position4_camera" />
+  </technique>
+</snippet>

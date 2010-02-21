@@ -20,6 +20,8 @@
 
 #include "cssysdef.h"
 
+#include "ivaria/reporter.h"
+
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagememory.h"
 #include "csutil/measuretime.h"
@@ -61,7 +63,8 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
                                                 int flags, 
                                                 csGLGraphics3D *iG3D) : 
   scfImplementationType (this), txtmgr (iG3D->txtmgr), 
-  textureClass (txtmgr->GetTextureClassID ("default")), Handle (0), pbo (0),
+  textureClass (txtmgr->GetTextureClassID ("default")),
+  alphaType (csAlphaMode::alphaNone), Handle (0), pbo (0),
   orig_width (width), orig_height (height), orig_d (depth),
   uploadData(0), G3D (iG3D), texFormat((TextureBlitDataFormat)-1)
 {
@@ -457,14 +460,24 @@ void csGLBasicTextureHandle::RegenerateMipmaps()
 
 void csGLBasicTextureHandle::Load ()
 {
-  if (Handle != 0) return;
-
+  if (IsUploaded() || IsForeignHandle()) return;
+  
   static const GLint textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
     GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
   static const GLint textureMagFilters[3] = {GL_NEAREST, GL_LINEAR, 
     GL_LINEAR};
 
-  glGenTextures (1, &Handle);
+  GLRENDER3D_CHECKED_COMMAND(G3D, glGenTextures (1, &Handle));
+  
+  /* @@@ FIXME: That seems to happen with PS occasionally.
+     Reason unknown. */
+  CS_ASSERT(uploadData);
+  if (!uploadData)
+  {
+    G3D->Report (CS_REPORTER_SEVERITY_WARNING, "WEIRD: no uploadData in %s!",
+		 CS_FUNCTION_NAME);
+    return;
+  }
 
   const int texFilter = texFlags.Check (CS_TEXTURE_NOFILTER) ? 0 : 
     txtmgr->rstate_bilinearmap;
@@ -646,11 +659,12 @@ void csGLBasicTextureHandle::Load ()
   }
 
   delete uploadData; uploadData = 0;
+  SetUploaded (true);
 }
 
 THREADED_CALLABLE_IMPL(csGLBasicTextureHandle, Unload)
 {
-  if ((Handle == 0) || IsForeignHandle()) return false;
+  if (!IsUploaded() || IsForeignHandle()) return false;
   if (texType == texType1D)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_1D, Handle);
   else if (texType == texType2D)
@@ -663,6 +677,7 @@ THREADED_CALLABLE_IMPL(csGLBasicTextureHandle, Unload)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_RECTANGLE_ARB, Handle);
   glDeleteTextures (1, &Handle);
   Handle = 0;
+  SetUploaded (false);
   return true;
 }
 
@@ -1007,8 +1022,10 @@ csPtr<iDataBuffer> csGLBasicTextureHandle::ReadbackPerform (
     csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, 0, true);
     
     csRef<iDataBuffer> db;
+#include "csutil/custom_new_disable.h"
     db.AttachNew (new (txtmgr->pboTextureReadbacks) TextureReadbackPBO (
       pbo, readbackSize));
+#include "csutil/custom_new_enable.h"
     return csPtr<iDataBuffer> (db);
   }
   else
@@ -1018,8 +1035,10 @@ csPtr<iDataBuffer> csGLBasicTextureHandle::ReadbackPerform (
     readbackAction (data);
     
     csRef<iDataBuffer> db;
+#include "csutil/custom_new_disable.h"
     db.AttachNew (new (txtmgr->simpleTextureReadbacks) TextureReadbackSimple (
       data, readbackSize));
+#include "csutil/custom_new_enable.h"
     return csPtr<iDataBuffer> (db);
   }
 }

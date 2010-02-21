@@ -32,7 +32,7 @@ private:
   csRef<iShaderManager> shaderMgr;
   
   bool FileBlacklisted (const char* file);
-  bool PrecacheShaderFile (const char* file);
+  bool PrecacheShaderFile (const char* file, bool doQuick);
 public:
   Shagnetron (iObjectRegistry* object_reg);
 

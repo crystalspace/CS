@@ -20,7 +20,7 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader/snippets/texCoord.inp"	
+    <input file="/shader-snippets/texCoord.inp"	
       condition='vars."tex glow".texture' />
     
     <input name="texGlow" type="tex2d" default="complex"
@@ -53,7 +53,7 @@
   <technique priority="50">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader/snippets/texCoord.inp"	
+    <input file="/shader-snippets/texCoord.inp"	
       condition='vars."tex glow".texture' />
     
     <input name="texGlow" type="tex2d" default="complex"

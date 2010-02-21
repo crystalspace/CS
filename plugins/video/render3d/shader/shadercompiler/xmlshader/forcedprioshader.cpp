@@ -110,9 +110,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     return parentShader->DeactivatePass (ticket);
   }
 
-  void ForcedPriorityShader::GetUsedShaderVars (size_t ticket, csBitArray& bits) const
+  void ForcedPriorityShader::GetUsedShaderVars (size_t ticket, csBitArray& bits, 
+						uint userFlags) const
   {
-    parentShader->GetUsedShaderVars (ticket, bits);
+    parentShader->GetUsedShaderVars (ticket, bits, userFlags);
   }
   
   const csShaderMetadata& ForcedPriorityShader::GetMetadata () const

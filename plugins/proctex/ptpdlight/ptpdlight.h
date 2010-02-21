@@ -57,8 +57,9 @@ public:
 class ProctexPDLightLoader;
 
 class ProctexPDLight : 
-  public scfImplementationExt0<ProctexPDLight, 
-                               csProcTexture>
+  public scfImplementationExt1<ProctexPDLight, 
+                               csProcTexture,
+                               iLightCallback>
 {
 public:
   struct Lumel
@@ -309,15 +310,17 @@ public:
 
   virtual bool PrepareAnim ();
 
-  virtual void Animate (csTicks /*current_time*/);
+  virtual void Animate (csTicks current_time);
+  void Animate ();
 
-  /**\name iLightingInfo implementation
+  /**\name iLightCallback implementation
    * @{ */
-  //void DisconnectAllLights ();
-  //void InitializeDefault (bool /*clear*/) {}
-  //void LightChanged (iLight* light);
-  //void LightDisconnect (iLight* light);
-  //void PrepareLighting () {}
+  virtual void OnColorChange (iLight* light, const csColor& newcolor);
+  virtual void OnPositionChange (iLight* light, const csVector3& newpos) { };
+  virtual void OnSectorChange (iLight* light, iSector* newsector) { };
+  virtual void OnRadiusChange (iLight* light, float newradius) { };
+  virtual void OnDestroy (iLight* light);
+  virtual void OnAttenuationChange (iLight* light, int newatt) { };
   /** @} */
 
   using csProcTexture::UseTexture;

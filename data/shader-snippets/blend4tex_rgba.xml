@@ -1,0 +1,46 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input file="/shader-snippets/texCoord.inp"	/>
+    
+    <input name="texMask" type="tex2d" />
+    <input name="v1" type="rgba" />
+    <input name="v2" type="rgba" />
+    <input name="v3" type="rgba" />
+    <input name="v4" type="rgba" />
+      
+    <block location="cg:fragmentMain">
+      float4 weights = tex2D (texMask, texCoord);
+      result = v1*weights.r + v2*weights.g + v3*weights.b + v4*weights.a;
+      result_attr_perfragment = true;
+    </block>
+
+    <block location="cg:vertexMain">
+      result = float4 (0);
+      result_attr_perfragment = true;
+    </block>
+    
+    <output name="result" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </output>
+      
+  </technique>
+</snippet>

@@ -266,7 +266,7 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
  */
 struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralFactoryState, 2, 0, 0);
+  SCF_INTERFACE (iGeneralFactoryState, 2, 0, 1);
   
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
@@ -368,14 +368,14 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
   virtual void Compress () = 0;
 
   /**
-   * Automatically generate a box. This will set the number of vertices
+   * Generate procedurally a box. This will set the number of vertices
    * to eight and generate vertices, texels, normals, and triangles. The
    * vertex colors are set to black.
    */
   virtual void GenerateBox (const csBox3& box) = 0;
 
   /**
-   * Automatically generate a capsule of given length and radius.
+   * Generate procedurally a capsule of given length and radius.
    * \param l Capsule length.
    * \param r Capsule radius.
    * \param sides Number of sides.
@@ -383,7 +383,7 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
   virtual void GenerateCapsule (float l, float r, uint sides) = 0;
 
   /**
-   * Automatically generate a sphere. This will set the apropriate number 
+   * Generate procedurally a sphere. This will set the apropriate number 
    * of vertices and generate vertices, texels, normals, and triangles.
    * The vertex colors are set to black.
    * \param ellips Properties of the ellipsoid to generate.
@@ -481,6 +481,14 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    * factories, as all vertex normals will be written out explicitly.
    */
   virtual void DisableAutoNormals () = 0;
+
+  /**
+   * Generate procedurally a cylinder of given length and radius.
+   * \param l Cylinder length.
+   * \param r Cylinder radius.
+   * \param sides Number of sides.
+   */
+  virtual void GenerateCylinder (float l, float r, uint sides) = 0;
 };
 
 /**

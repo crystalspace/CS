@@ -30,8 +30,9 @@ struct iTextureManager;
 /**\file
  * Some full screen special effects.
  * Most need to be called, either during 2d drawing phase - between
- * the g2d->BeginDraw and FinishDraw calls, or they need to be called
- * in the 3d drawing phase, between the g3d->BeginDraw and FinishDraw calls.
+ * the iGraphics2D::BeginDraw() and iGraphics2D::FinishDraw() calls, or they need
+ * to be called in the 3d drawing phase, between the iGraphics3D::BeginDraw()
+ * and iGraphics3D::FinishDraw() calls.
  */
 
 /**
@@ -51,14 +52,16 @@ CS_CRYSTALSPACE_EXPORT void csfxInterference (iGraphics2D *g2d,
  * Fade the screen to black. The fadevalue determines how much fading is
  * done. fadevalue 0: no fading. fadevalue 1: all black.
  * Hardware acceleration is used, if available.
- * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
+ * This routine must only be used between iGraphics3D::BeginDraw() and
+ * iGraphics3D::FinishDraw() calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxFadeOut (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Fade to given pixmap (which must be prepared for 3D usage),
  * fadevalue 0: no fading, fadevalue 1: only given texture is visible.
- * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
+ * This routine must only be used between iGraphics3D::BeginDraw() and
+ * iGraphics3D::FinishDraw() calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxFadeTo (iGraphics3D *g3d, iTextureHandle *tex, 
   float fadevalue);
@@ -66,7 +69,8 @@ CS_CRYSTALSPACE_EXPORT void csfxFadeTo (iGraphics3D *g3d, iTextureHandle *tex,
 /**
  * Fade the screen to a specific color, passed as parameter.
  * fadevalue 0: no fading, fadevalue 1: screen filled with the given color.
- * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
+ * This routine must only be used between iGraphics3D::BeginDraw() and
+ * iGraphics3D::FinishDraw() calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxFadeToColor (iGraphics3D *g3d, float fadevalue, 
   const csColor& color);
@@ -74,28 +78,32 @@ CS_CRYSTALSPACE_EXPORT void csfxFadeToColor (iGraphics3D *g3d, float fadevalue,
 /**
  * Make the screen look like an old fashioned green-only monitor.
  * fadevalue 0: no fading, fadevalue 1: only green tints are visible.
- * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
+ * This routine must only be used between iGraphics3D::BeginDraw() and
+ * iGraphics3D::FinishDraw() calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxGreenScreen (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Similar to csfxGreenScreen, but makes the screen show only red.
  * fadevalue 0: no fading, fadevalue 1: only red tints are visible.
- * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
+ * This routine must only be used between iGraphics3D::BeginDraw() and
+ * iGraphics3D::FinishDraw() calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxRedScreen (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Similar to csfxGreenScreen, but makes the screen show only blue
  * fadevalue 0: no fading, fadevalue 1: only blue tints are visible.
- * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
+ * This routine must only be used between iGraphics3D::BeginDraw() and
+ * iGraphics3D::FinishDraw() calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxBlueScreen (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Increase the brightness of the image.
  * fadevalue 0: no fading, fadevalue 1: full white.
- * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
+ * This routine must only be used between iGraphics3D::BeginDraw() and
+ * iGraphics3D::FinishDraw() calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxWhiteOut (iGraphics3D *g3d, float fadevalue);
 
@@ -103,7 +111,8 @@ CS_CRYSTALSPACE_EXPORT void csfxWhiteOut (iGraphics3D *g3d, float fadevalue);
  * Create a vertical shading from topcolor to bottomcolor.
  * default this is copied to the screen, overwriting the old contents,
  * also other mixmodes can be used.
- * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
+ * This routine must only be used between iGraphics3D::BeginDraw() and
+ * iGraphics3D::FinishDraw() calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxShadeVert (iGraphics3D *g3d, 
   const csColor& topcolor, const csColor& bottomcolor, 
@@ -113,7 +122,8 @@ CS_CRYSTALSPACE_EXPORT void csfxShadeVert (iGraphics3D *g3d,
 /**
  * Do a fullscreen drawpolygonFX draw, used by some other routines.
  * With tex NULL it draws solid colour. pass colours between 0 and 1.
- * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
+ * This routine must only be used between iGraphics3D::BeginDraw() and
+ * iGraphics3D::FinishDraw() calls.
  * fa at 1 is solid colour.
  */
 CS_CRYSTALSPACE_EXPORT void csfxScreenDPFX (iGraphics3D *g3d, 

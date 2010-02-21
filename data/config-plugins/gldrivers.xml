@@ -265,14 +265,40 @@
 	    <GL_ARB_fragment_program>no</GL_ARB_fragment_program>
 	  </UseExtension>
 	  <!-- Our GL ext disabling obviously doesn't apply to CgGL, so set
-	       the maximum FP profile to the highest below AFP. -->
+	       the FP profile to the highest below AFP. -->
 	  <Shader>
 	    <Cg>
-	      <MaxProfile>
-		<Fragment>ps_1_3</Fragment>
-	      </MaxProfile>
+	      <Fake>
+		<Fragment>
+		  <Profile>ps_1_3</Profile>
+		</Fragment>
+	      </Fake>
 	    </Cg>
 	  </Shader>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="novp40">
+      <Video>
+	<OpenGL>
+	  <Shader>
+	    <Cg>
+              <Fake>
+	        <Vertex>
+		  <Profile>arbvp1</Profile>
+		</Vertex>
+	      </Fake>
+	    </Cg>
+	  </Shader>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="noArbColorBufferFloat">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_color_buffer_float>no</GL_ARB_color_buffer_float>
+	  </UseExtension>
 	</OpenGL>
       </Video>
     </config>
@@ -840,6 +866,35 @@
       </applicable>
     </rule>
     -->
-
+    <!--
+      * 2009-11-20: Support for result.clip[0] variable in vp40
+                    causes compiler errors on Mac OS X Nvidia drivers.
+                    Occurred on 10.5 and 10.6.2. Bug #726.
+                    Driver version 2.1 NVIDIA-1.6.6
+      -->
+    <rule description="NVIDIA on OSX: Broken vp40 implementation">
+      <conditions fulfill="all">
+	<regexp string="platform" pattern="MacOS/X" />
+	<regexp	string="vendor" pattern="NVIDIA" />
+      </conditions>
+      <applicable>
+	<usecfg>novp40</usecfg>
+      </applicable>
+    </rule>
+    <!--
+     * 2009-11-20: Mac OS X does not support ARB_color_buffer_float.
+                   Even though this is advertised by the driver, if the
+		   extension is enabled, the app will crash in the OpenGL profiler.
+		   Additional info from http://lists.apple.com/archives/mac-opengl//2008/Jul/msg00060.html
+                   Driver version 2.1 NVIDIA-1.6.6. Tested on 10.6.2.
+     -->
+    <rule description="OSX: Broken ARB_color_buffer_float implementation">
+      <conditions fulfill="all">
+	<regexp string="platform" pattern="MacOS/X" />
+      </conditions>
+      <applicable>
+	<usecfg>noArbColorBufferFloat</usecfg>
+      </applicable>
+    </rule>
   </rules>
 </gldriverdb>
