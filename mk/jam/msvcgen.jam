@@ -1099,29 +1099,14 @@ rule RegisterWellKnownCompileGroup
 
 rule _ApplyStaticPluginFlags
 {
-  local target ;
+  local package target plugins ;
   plugins = $(2) ;
-  optplugins = $(3) ;
-  package = $(4) ;
+  package = $(3) ;
   
   if $(package)
   {
     # External static plugins.
-    # First include static plugin info
-    if ! $(HAVE_STATICDEPS.$(package))
-    {
-      include $($(package).STATICDEPS) ;
-      HAVE_STATICDEPS.$(package) = yes ;
-    }
     local lflags.debug lflags.release p mode ;
-    # Collect optional plugins
-    for p in $(optplugins)
-    {
-      if [ IsElem $(p) : $(STATICPLUGINS.AVAILABLE) ]
-      {
-	plugins += $(p) ;
-      }
-    }
     # Grab flags
     local target_lflags.release target_lflags.debug ;
     local target_relaydeps ;
@@ -1193,14 +1178,6 @@ rule _ApplyStaticPluginFlags
     
     # Local static plugins
     local libs p ;
-    # Collect optional plugins
-    for p in $(optplugins)
-    {
-      if $($(p)_TYPE)
-      {
-	plugins += $(p) ;
-      }
-    }
     # Grab flags
     local target_relaydeps ;
     for p in $(plugins)
@@ -1255,6 +1232,39 @@ rule LinkStaticPlugins
   plugins = $(2) ;
   optplugins = $(3) ;
   package = $(4) ;
+  
+  if $(package)
+  {
+    # External static plugins.
+    # First include static plugin info
+    if ! $(HAVE_STATICDEPS.$(package))
+    {
+      include $($(package).STATICDEPS) ;
+      HAVE_STATICDEPS.$(package) = yes ;
+    }
+    local lflags.debug lflags.release p mode ;
+    # Collect optional plugins
+    for p in $(optplugins)
+    {
+      if [ IsElem $(p) : $(STATICPLUGINS.AVAILABLE) ]
+      {
+	plugins += $(p) ;
+      }
+    }
+  }
+  else
+  {
+    # Local static plugins
+    local p ;
+    # Collect optional plugins
+    for p in $(optplugins)
+    {
+      if $($(p)_TYPE)
+      {
+	plugins += $(p) ;
+      }
+    }
+  }
   
   # Generate static plugin instantiation
   local outdir = [ Property msvcgen : outdircommon ] ;
@@ -1349,11 +1359,11 @@ rule LinkStaticPlugins
     
     # @@@ Something is overflowing Jam's little mind or so ...
     # $(target) changes it's value, somewhere!
-    _ApplyStaticPluginFlags $(<) $(plugin_lib_name) : $(plugins) : $(optplugins) : $(package) ;
+    _ApplyStaticPluginFlags $(<) $(plugin_lib_name) : $(plugins) : $(package) ;
   }
   else
   {
-    _ApplyStaticPluginFlags $(target) : $(plugins) : $(optplugins) : $(package) ;
+    _ApplyStaticPluginFlags $(target) : $(plugins) : $(package) ;
     
     # Add usefile to project
     MsvcAddFileToProject $($(target)_PRJ_RESPFILE) : 
