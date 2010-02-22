@@ -309,8 +309,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     if (!isActive)
       return;
 
-    //printf ("RagdollAnimNode::BlendState\n");
-
     // TODO: use baseWeight
     for (csHash<Bone, BoneID>::GlobalIterator it = bones.GetIterator ();
 	 it.HasNext(); )
@@ -325,16 +323,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       // TODO: valid also for root of dynamic node?
       if (parentBoneID == InvalidBoneID)
       {
+	// compute the new bone transform
 	csQuaternion boneRotation;
 	csVector3 boneOffset;
 	skeleton->GetFactory ()->GetTransformBoneSpace (bone.boneID, boneRotation,
 							boneOffset);
-	csOrthoTransform boneTransform (csMatrix3 (boneRotation), boneOffset);
+	csOrthoTransform boneTransform (csMatrix3 (boneRotation.GetConjugate ()), boneOffset);
 	csOrthoTransform newTransform = boneTransform.GetInverse () * bodyTransform;
 
+	// apply the new transform to the iMovable of the animesh
 	iMovable* movable = sceneNode->GetMovable ();
 	movable->SetTransform (newTransform);
 	movable->UpdateMove ();
+
+	// reset the bone offset & rotation
+	state->SetBoneUsed (bone.boneID);
+	state->GetVector (bone.boneID) = boneOffset;
+	state->GetQuaternion (bone.boneID) = boneRotation;
 
 	continue;
       }
@@ -342,12 +347,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       // if this bone is inside the ragdoll chain
       if (bones.Contains (parentBoneID))
       {
+	// compute the new bone transform
 	Bone nullBone;
-	csOrthoTransform parentTransform = bones.Get (parentBoneID, nullBone)
-	  .rigidBody->GetTransform ();
+	csOrthoTransform parentTransform =
+	  bones.Get (parentBoneID, nullBone).rigidBody->GetTransform ();
 	csReversibleTransform relativeTransform =
 	  bodyTransform * parentTransform.GetInverse ();
 
+	// apply the new transform to the csSkeletalState2
 	state->SetBoneUsed (bone.boneID);
 	state->GetVector (bone.boneID) = relativeTransform.GetOrigin ();
 	csQuaternion quaternion;
@@ -583,10 +590,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 	  }
 
 	default:
-	  factory->manager->Report (CS_REPORTER_SEVERITY_ERROR,
-	    "No geometry for collider in bone %i while creating ragdoll chain.\n",
+	  factory->manager->Report (CS_REPORTER_SEVERITY_WARNING,
+	    "No supported geometry for collider in bone %i while creating ragdoll chain.\n",
 				    bodyBone->GetAnimeshBone ());
-	  return false;
 	}
     }
 
