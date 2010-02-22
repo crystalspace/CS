@@ -240,11 +240,20 @@ else
 
 if $(CMD.MAKEICNS) != ""
 {
-  ## IconsMakeWinMacICNS filename : iconname
+  ## IconsMakeWinMacICNS filename : iconname [: sizes]
   ##   Generate a MacOS/X ICNS file from a PNG image such as produced by
   ##   IconsFromSVG.
-  ##   Currently the source image is expected to have a resolution of 512x512
-  ##   pixels and to be located at icons/512/<iconname>.png.
+  ##   `sizes' specify the available source image resolutions. Allowed sizes
+  ##   are 128, 256 and 512. Note that a missing size is generated
+  ##   automatically if a higher size is available. Thus, only specifying a
+  ##   512x512 is sufficient as the lower resolutions will be generated from
+  ##   that. However, upscaling will not take place: e.g. only specifying a
+  ##   size of 256 will result in an icon without a 512x512 image (forcing the
+  ##   OS to upscale the lower resolution image).
+  ##   The source images are expected to have the names
+  ##   icons-src/<size>/<iconname>.png or icons/<size>/<iconname>.png for the
+  ##   sizes specified in `sizes'. Files in the `icons-src/' directory are
+  ##   preferred over files in the `icons/' directory.
   ##   For the conversion to happen a 3rd party tool, `makeicns' is required.
   ##   It can be obtained from http://www.amnoid.de/icns/makeicns.html .
   ##   The actual conversion is done when the "generateicons" target is
@@ -253,26 +262,67 @@ if $(CMD.MAKEICNS) != ""
   { 
     local icnsfile = $(1) ;
     local icon = $(2) ;
+    local in_sizes = $(3) ;
     
-    # Hardcoded size for Leopard and above.
-    # Note that `makeicns' takes care of downsizing to the smaller sizes needed
-    # for older versions.
-    local size = 512 ; 
-    
-    local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
-    local pngfile = $(icon:G=$(pngdir)).png ;
-    
-    SEARCH on $(pngfile) = $(pngdir) ;
-    NoCare $(pngfile) ;
-    MakeLocate $(icnsfile) : $(SUBDIR) ;
-    Depends $(icnsfile) : $(pngfile) ;
-    MakeIcns $(icnsfile) : $(pngfile) ;
-    Depends generateicons : $(icnsfile) ;
+    # Default to the size used by Leopard and aboce.
+    if "$(in_sizes)" = "" { in_sizes = 512 ; }
+    # Filter out unsupported sizes (only certain sizes are allowed in ICNS
+    # icons, and we don't provide/care about images sized below 128x128)
+    local sizes ;
+    for i in $(in_sizes)
+    {
+      if [ IsElem $(i) : 128 256 512 ]
+      {
+	sizes += $(i) ;
+      }
+    }
+    if "$(sizes)" = ""
+    {
+      echo "IconsMakeMacICNS $(icnsfile): no valid size given, sizes must contain at least one of 128, 256 or 512" ;
+    }
+    else
+    {
+      local in_512 = "" ;
+      local in_256 = "" ;
+      local in_128 = "" ;
+      for size in $(sizes)
+      {
+	local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
+	local pngsrcdir = [ ConcatDirs $(SUBDIR) icons-src $(size) ] ;
+	local pngfile = $(icon:G=$(pngdir)).png ;
+      
+	SEARCH on $(pngfile) = $(pngsrcdir) $(pngdir) ;
+	NoCare $(pngfile) ;
+	Depends $(icnsfile) : $(pngfile) ;
+	in_$(size) = $(pngfile) ;
+      }
+      # If an image of a size is not available, default to the next larger size.
+      # Note that `makeicns' takes care of downsizing to the smaller size in
+      # that case.
+      if ! $(in_256) { in_256 = $(in_512) ; }
+      if ! $(in_128) { in_128 = $(in_256) ; }
+      INPUT_512 on $(icnsfile) = $(in_512) ;
+      INPUT_256 on $(icnsfile) = $(in_256) ;
+      INPUT_128 on $(icnsfile) = $(in_128) ;
+      MakeLocate $(icnsfile) : $(SUBDIR) ;
+      MakeIcns $(icnsfile) ;
+      Depends generateicons : $(icnsfile) ;
+    }
   }
   
-  actions MakeIcns
+  actions MakeIcns bind INPUT_128 INPUT_256 INPUT_512
   {
-    $(CMD.MAKEICNS) -512 $(>) -256 $(>) -128 $(>) -out $(<)
+    args=
+    if [ -n "$(INPUT_512)" ]; then
+      args="$args -512 $(INPUT_512)"
+    fi
+    if [ -n "$(INPUT_256)" ]; then
+      args="$args -256 $(INPUT_256)"
+    fi
+    if [ -n "$(INPUT_128)" ]; then
+      args="$args -128 $(INPUT_128)"
+    fi
+    $(CMD.MAKEICNS) $args -out $(<)
   }
 }
 else
