@@ -407,6 +407,7 @@ public:
 #define BULLET_JOINT_HINGE 1
 #define BULLET_JOINT_POINT2POINT 2
 #define BULLET_JOINT_6DOF 3
+#define BULLET_JOINT_CONETWIST 4
 
 class csBulletJoint : public scfImplementation1<csBulletJoint, iJoint>
 {

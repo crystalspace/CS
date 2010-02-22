@@ -2039,7 +2039,7 @@ bool csBulletCollider::CreateConvexMeshGeometry (iMeshWrapper* mesh)
 
   btTriangleIndexVertexArray* indexVertexArrays =
     GenerateTriMeshData (mesh, indices, triangleCount, vertices, vertexCount,
-      dynSys->baseId, dynSys->colldetId);
+			 dynSys->baseId, dynSys->colldetId);
   if (!indexVertexArrays)
     return false;
 
@@ -2526,14 +2526,15 @@ int csBulletJoint::ComputeBestBulletJointType ()
       // All rotations are constrainted.
       return BULLET_JOINT_6DOF;
     }
-    //else return BULLET_JOINT_POINT2POINT;
+
+    // It seems that the 6DOF joint type is always a better choice, because
+    // it is more stable and more powerful.
+    else return BULLET_JOINT_6DOF;//BULLET_JOINT_CONETWIST;
+
     // TODO: other joint types when more appropriate
-    // (eg, when there are no min/max values)
+    // (eg, BULLET_JOINT_POINT2POINT when there are no min/max values)
   }
-  else
-  {
-  }
-  //return BULLET_JOINT_NONE;
+
   return BULLET_JOINT_6DOF;
 }
 
@@ -2557,6 +2558,7 @@ bool csBulletJoint::RebuildJoint ()
   {
     case BULLET_JOINT_6DOF:
       {
+	// compute local transforms of the joint
 	btTransform frA;
 	btTransform frB;
 
@@ -2567,9 +2569,9 @@ bool csBulletJoint::RebuildJoint ()
 	bodies[1]->motionState->getWorldTransform (frB);
         frB = frB.inverse () * jointTransform;
 
-	btGeneric6DofConstraint* dof6;
-	dof6 = new btGeneric6DofConstraint (*bodies[0]->body, *bodies[1]->body,
-					    frA, frB, true);
+	// create joint
+	btGeneric6DofConstraint* dof6 = new btGeneric6DofConstraint (*bodies[0]->body, *bodies[1]->body,
+								     frA, frB, true);
 
 	// compute min/max values
 	btVector3 minLinear(0.0f, 0.0f, 0.0f);
@@ -2615,14 +2617,43 @@ bool csBulletJoint::RebuildJoint ()
 	dof6->setLinearUpperLimit (maxLinear);
 	dof6->setAngularLowerLimit (minAngular);
 	dof6->setAngularUpperLimit (maxAngular);
+
 	constraint = dof6;
+      }
+      break;
+
+    case BULLET_JOINT_CONETWIST:
+      {
+	// compute local transforms of the joint
+	btTransform frA;
+	btTransform frB;
+
+	btTransform jointTransform = CSToBullet (bodies[1]->GetTransform ());
+
+	bodies[0]->motionState->getWorldTransform (frA);
+        frA = frA.inverse () * jointTransform;
+	bodies[1]->motionState->getWorldTransform (frB);
+        frB = frB.inverse () * jointTransform;
+
+	// create joint
+	btConeTwistConstraint* coneTwist = new btConeTwistConstraint (*bodies[0]->body, *bodies[1]->body,
+								      frA, frB);
+
+	// apply min/max values
+	if (min_angle[0] < max_angle[0])
+	  coneTwist->setLimit (0, (max_angle[0] - min_angle[0]) * 5.0f);
+	if (min_angle[1] < max_angle[1])
+	  coneTwist->setLimit (1, (max_angle[1] - min_angle[1]) * 5.0f);
+	if (min_angle[2] < max_angle[2])
+	  coneTwist->setLimit (2, (max_angle[2] - min_angle[2]) * 5.0f);
+
+	constraint = coneTwist;
       }
       break;
 
     case BULLET_JOINT_POINT2POINT:
       {
-	// TODO: problem: the point2point cannot handle min/max angles
-	// TODO: use btConeTwistConstraint?
+	// TODO
       }
       break;
 
