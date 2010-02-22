@@ -154,14 +154,15 @@ if $(CMD.ICOTOOL) != ""
   ##   Generate a Win32 ICO file from multiple PNG images, such as those
   ##   produced by IconsFromSVG.
   ##   The source images are expected to have the names
-  ##   icons/<size>/<iconname>.png for the sizes specified in `sizes'.
+  ##   icons-src/<size>/<iconname>.png or icons/<size>/<iconname>.png for the
+  ##   sizes specified in `sizes'. Files in the `icons-src/' directory are
+  ##   preferred over files in the `icons/' directory.
   ##   By default, a set of common sizes is used, currently 16, 32, 48 and 256.
   ##   The ICO will also include 256 color images that are generated from
-  ##   the (presumably RGBA) source PNGs and stored as 
-  ##   icons/<size>/<iconname>_8.png. 
-  ##   Color-reduced images for certain sizes can be specified as 
-  ##   icons-src/<size>/<iconname>_8.png files; these are preferred over the
-  ##   automatically reduced ones.
+  ##   the (presumably RGBA) source PNGs; however, such color-reduced images 
+  ##   can also be specified manually for certain sizes by saving them named
+  ##   icons-src/<size>/<iconname>_8.png. These user-provided reduced versions
+  ##   are preferred over the automatically reduced ones.
   ##   The actual conversion is done when the "generateicons" target is
   ##   invoked.
   rule IconsMakeWin32ICO
@@ -181,6 +182,9 @@ if $(CMD.ICOTOOL) != ""
       local pngfile = $(icon:G=$(pngdir)).png ;
       local lowfile = $(icon:G=$(pngtempdir))_8.png ;
       NoCare $(pngfile) ;
+      # Prefer icons from `icons-src/' (presumably user-provided) over icons
+      # from `icons/' (presumably auto-generated).
+      SEARCH on $(pngfile) = $(pngsrcdir) $(pngdir) ;
       # <= is a string comparison in Jam, hence the 0 padding
       if [ _ZeroPad $(size) ] <= 128
       {
@@ -191,8 +195,9 @@ if $(CMD.ICOTOOL) != ""
 	  SIZE on $(lowfile) = $(size) ;
 	  
 	  ReduceColorDepth $(lowfile) : $(pngfile) ;
-	  Always $(lowfile) ;
+	  Depends $(lowfile) : $(pngfile) ;
 	  icons += "$(lowfile)" ;
+	  RmTemps generateicons : $(lowfile) ;
 	}
       }
       else
@@ -215,8 +220,8 @@ if $(CMD.ICOTOOL) != ""
   {
     ICONSSRC=`dirname $(>)`/../../icons-src/$(SIZE)
     ICONBASE=`basename $(>) .png`
-    if [ -e $ICONSSRC/\${ICONBASE}_8.png ] ; then
-      $(CP) $ICONSSRC/\${ICONBASE}_8.png $(<)
+    if [ -e $ICONSSRC/${ICONBASE}_8.png ] ; then
+      $(CP) $ICONSSRC/${ICONBASE}_8.png $(<)
     else
       # Makes transparency binary and reduces colors to 256
       $(CMD.CONVERT) $(>) \( +clone -fx a +matte -monochrome \) -compose CopyOpacity -composite -colors 256 +dither $(<)
@@ -225,13 +230,7 @@ if $(CMD.ICOTOOL) != ""
   
   actions IcoTool bind RAW_ICONS
   {
-    SOURCES=
-    for i in $(>) ; do
-      if [ -a $i ] ; then
-        SOURCES="$SOURCES $i"
-      fi
-    done
-    $(CMD.ICOTOOL) -c -o $(<) $SOURCES "--raw=$(RAW_ICONS)"
+    $(CMD.ICOTOOL) -c -o $(<) $(>) $(RAW_ICONS)
   }
 }
 else
