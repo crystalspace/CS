@@ -165,7 +165,12 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_ICONS],
     #  (This is not so much about the size as about stripping "creation" and
     #  "modification" time comments convert seems to put into PNGs.)
     CS_CHECK_PROGS([PNGCRUSH], [pngcrush])
-    CS_EMIT_BUILD_PROPERTY([CMD.PNGCRUSH], [$PNGCRUSH], [], [], [$1])])
+    CS_EMIT_BUILD_PROPERTY([CMD.PNGCRUSH], [$PNGCRUSH], [], [], [$1])
+    
+    # Tools needed to generate OS/X icons.
+    CS_CHECK_PROGS([MAKEICNS], [makeicns])
+    CS_EMIT_BUILD_PROPERTY([CMD.MAKEICNS], [$MAKEICNS], [], [], [$1])
+    ])
 
 #------------------------------------------------------------------------------
 # CS_CHECK_COMMON_LIBS([EMITTER])
