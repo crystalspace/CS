@@ -108,7 +108,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    // Toggle 'always rotate' option of the 'LookAt' controller
+    // Toggle the 'always rotate' option of the 'LookAt' controller
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
       alwaysRotate = !alwaysRotate;
@@ -116,7 +116,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    // Toggle rotation speed of the 'LookAt' controller
+    // Toggle the rotation speed of the 'LookAt' controller
     else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
     {
       if (rotationSpeed == ROTATION_SLOW)
@@ -140,7 +140,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    // Update walk speed of the 'speed' controller
+    // Update the walking speed of the 'speed' controller
     else if (csKeyEventHelper::GetCookedCode (&ev) == '+')
     {
       if (currentSpeed < 58)
@@ -282,7 +282,7 @@ bool FrankieScene::CreateAvatar ()
   // Load bodymesh (animesh's physical properties)
   rc = avatarTest->loader->Load ("/lib/frankie/skelfrankie_body");
   if (!rc.success)
-    return avatarTest->ReportError ("Can't load frankie's body mesh file!");
+    return avatarTest->ReportError ("Can't load Frankie's body mesh file!");
 
   csRef<iBodyManager> bodyManager =
     csQueryRegistry<iBodyManager> (avatarTest->GetObjectRegistry ());
@@ -406,7 +406,7 @@ bool FrankieScene::CreateAvatar ()
   animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
   // When the animated mesh is created, the animation nodes are created too.
-  // We can therefore set them up
+  // We can therefore set them up now.
   iSkeletonAnimNode2* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
@@ -454,12 +454,13 @@ void FrankieScene::LookAtListener::TargetLost ()
 
 void FrankieScene::ResetScene ()
 {
-  // Reset animesh position
+  // Reset the position of the animesh
   csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
   animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->SetTransform
     (csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
+  animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->UpdateMove ();
 
-  // Reset initial Finite State Machine state
+  // Reset initial state of the Finite State Machine
   FSMNode->SwitchToState (mainFSMState);
 
   // The FSM doesn't stop the child nodes
@@ -520,6 +521,9 @@ void FrankieScene::DisplayKeys ()
   if (avatarTest->physicsEnabled)
   {
     avatarTest->WriteShadow (x, y, fg, "left mouse: kill Frankie");
+    y += lineSize;
+
+    avatarTest->WriteShadow (x, y, fg, "d: display active colliders");
     y += lineSize;
   }
 

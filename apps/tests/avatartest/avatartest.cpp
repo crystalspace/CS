@@ -26,10 +26,14 @@
 #define MODEL_FRANKIE 1
 #define MODEL_KRYSTAL 2
 
+#define DYNDEBUG_NONE 1
+#define DYNDEBUG_COLLIDER 2
+#define DYNDEBUG_MIXED 3
+
 CS_IMPLEMENT_APPLICATION
 
 AvatarTest::AvatarTest ()
-  : avatarScene (0)
+  : avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
 {
   SetApplicationName ("CrystalSpace.AvatarTest");
 }
@@ -152,6 +156,37 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
 
       return true;
     }
+
+    // Toggle the debug mode of the dynamic system
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'd'
+	     && physicsEnabled)
+    {
+      csRef<iMeshObject> animeshObject =
+	scfQueryInterface<iMeshObject> (avatarScene->animesh);
+
+      if (dynamicsDebugMode == DYNDEBUG_NONE)
+      {
+	dynamicsDebugMode = DYNDEBUG_COLLIDER;
+	dynamicsDebugger->SetDebugDisplayMode (true);
+	animeshObject->GetMeshWrapper ()->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH);
+      }
+
+      else if (dynamicsDebugMode == DYNDEBUG_COLLIDER)
+      {
+	dynamicsDebugMode = DYNDEBUG_MIXED;
+	dynamicsDebugger->SetDebugDisplayMode (true);
+	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
+      }
+
+      else if (dynamicsDebugMode == DYNDEBUG_MIXED)
+      {
+	dynamicsDebugMode = DYNDEBUG_NONE;
+	dynamicsDebugger->SetDebugDisplayMode (false);
+	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
+      }
+
+      return true;
+    }
   }
 
   return avatarScene->OnKeyboard (ev);
@@ -201,7 +236,7 @@ bool AvatarTest::OnInitialize (int /*argc*/, char* /*argv*/ [])
     csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
   physicsEnabled = !clp->GetBoolOption ("no_physics", false);
 
-  if (physicsEnabled)
+  while (physicsEnabled)
   {
     // Load the Bullet plugin
     csRef<iPluginManager> plugmgr = 
@@ -213,13 +248,46 @@ bool AvatarTest::OnInitialize (int /*argc*/, char* /*argv*/ [])
       ReportWarning
 	("Can't load Bullet plugin, continuing with reduced functionalities");
       physicsEnabled = false;
+      break;
     }
+
+    // Load the dynamics debugger
+    debuggerManager = csLoadPlugin<iDynamicsDebuggerManager>
+      (plugmgr, "crystalspace.dynamics.debug");
+
+    if (!debuggerManager)
+    {
+      ReportWarning
+	("Can't load Dynamics Debugger plugin, continuing with reduced functionalities");
+      physicsEnabled = false;
+      break;
+    }
+
+    // Load the ragdoll plugin
+    ragdollManager = csLoadPlugin<iSkeletonRagdollManager2>
+      (plugmgr, "crystalspace.mesh.animesh.controllers.ragdoll");
+
+    if (!ragdollManager)
+    {
+      ReportWarning
+	("Can't load ragdoll plugin, continuing with reduced functionalities");
+      physicsEnabled = false;
+      break;
+    }
+
+    break;
   }
 
   // Read which model to display at first
   csString modelName = clp->GetOption ("model");
   if (modelName != "krystal")
+  {
+    if (!modelName.IsEmpty () && modelName != "frankie")
+      printf ("Given model ('%s') is not one of {'frankie', 'krystal'}. Using Frankie\n",
+	      modelName.GetData ());
+
     avatarModel = MODEL_FRANKIE;
+  }
   else
     avatarModel = MODEL_KRYSTAL;
 
@@ -269,6 +337,9 @@ bool AvatarTest::Application ()
     courierFont = fs->LoadFont (CSFONT_COURIER);
   else return ReportError ("Failed to locate font server!");
 
+  // Create the main sector
+  room = engine->CreateSector ("room");
+
   // Create the dynamic system
   if (physicsEnabled)
   {
@@ -280,24 +351,14 @@ bool AvatarTest::Application ()
       physicsEnabled = false;
     }
 
+    // Create the dynamic's debugger
     else
     {
-      // Load the ragdoll plugin
-      csRef<iPluginManager> plugmgr = 
-	csQueryRegistry<iPluginManager> (GetObjectRegistry ());
-      ragdollManager = csLoadPlugin<iSkeletonRagdollManager2>
-	(plugmgr, "crystalspace.mesh.animesh.controllers.ragdoll");
-      if (!ragdollManager)
-      {
-	ReportWarning
-	  ("Can't load ragdoll plugin, continuing with reduced functionalities");
-	physicsEnabled = false;
-      }
+      dynamicsDebugger = debuggerManager->CreateDebugger ();
+      dynamicsDebugger->SetDynamicSystem (dynamicSystem);
+      dynamicsDebugger->SetDebugSector (room);
     }
   }
-
-  // Create sector
-  room = engine->CreateSector ("room");
 
   // Initialize camera
   view = csPtr<iView> (new csView (engine, g3d));

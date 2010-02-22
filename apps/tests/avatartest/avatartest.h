@@ -24,6 +24,7 @@
 #include <stdarg.h>
 #include <crystalspace.h>
 
+// Base class to be implemented for all different models
 class AvatarScene
 {
  public:
@@ -46,6 +47,10 @@ class AvatarScene
 
   // Display of comments 
   virtual void DisplayKeys () = 0;
+
+  // Animesh
+  csRef<iAnimatedMeshFactory> animeshFactory;
+  csRef<iAnimatedMesh> animesh;
 };
 
 class AvatarTest : public csApplicationFramework, public csBaseEventHandler
@@ -73,6 +78,9 @@ private:
   bool physicsEnabled;
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
+  csRef<iDynamicsDebuggerManager> debuggerManager;
+  csRef<iDynamicSystemDebugger> dynamicsDebugger;
+  int dynamicsDebugMode;
 
   // Animation node plugin managers
   csRef<iSkeletonLookAtManager2> lookAtManager;

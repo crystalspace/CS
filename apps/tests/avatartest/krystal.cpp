@@ -52,11 +52,101 @@ void KrystalScene::Frame ()
 
 bool KrystalScene::OnKeyboard (iEvent &ev)
 {
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
+  {
+    // Reset of the scene
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
+    {
+      ResetScene ();
+      return true;
+    }
+  }
+
   return false;
 }
 
 bool KrystalScene::OnMouseDown (iEvent &ev)
 {
+  if (csMouseEventHelper::GetButton (&ev) == 0
+      && avatarTest->physicsEnabled)
+  {
+    // Trying to kill Krystal
+
+    // Compute the beam points to check what was hit
+    int mouseX = csMouseEventHelper::GetX (&ev);
+    int mouseY = csMouseEventHelper::GetY (&ev);
+
+    csRef<iCamera> camera = avatarTest->view->GetCamera ();
+    csVector2 v2d (mouseX, camera->GetShiftY () * 2 - mouseY);
+    csVector3 v3d = camera->InvPerspective (v2d, 10000);
+    csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+    csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+    // If Krystal is already dead, simply check for adding a force on him
+    if (krystalDead)
+    {
+      // Trace a physical beam to find if a rigid body was hit
+      csRef<iBulletDynamicSystem> bulletSystem =
+	scfQueryInterface<iBulletDynamicSystem> (avatarTest->dynamicSystem);
+      csBulletHitBeamResult physicsResult = bulletSystem->HitBeam (startBeam, endBeam);
+
+      // Apply a big force at the point clicked by the mouse
+      if (physicsResult.body)
+      {
+	csVector3 force = endBeam - startBeam;
+	force.Normalize ();
+	physicsResult.body->AddForceAtPos (physicsResult.isect, force * 10.0f);
+      }
+
+      return true;
+    }
+
+    // At first, test with a sector HitBeam if we clicked on an animated mesh
+    csSectorHitBeamResult sectorResult = camera->GetSector ()->HitBeam
+      (startBeam, endBeam, true);
+    if (!sectorResult.mesh)
+      return false;
+
+    csRef<iAnimatedMesh> animesh =
+      scfQueryInterface<iAnimatedMesh> (sectorResult.mesh->GetMeshObject ());
+    if (!animesh)
+      return false;
+
+    // OK, it's an animesh, it must be Krystal, start the ragdoll
+    krystalDead = true;
+
+    // Set the ragdoll animation node as the active state of the Finite State Machine
+    // (start the ragdoll node so that the rigid bodies are created)
+    FSMNode->SwitchToState (ragdollFSMState);
+    FSMNode->GetStateNode (ragdollFSMState)->Play ();
+
+    // Fling the body a bit
+    const csOrthoTransform& tc = avatarTest->view->GetCamera ()->GetTransform ();
+    for (uint i = 0; i < ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
+    {
+      BoneID boneID = ragdollNode->GetBone (RAGDOLL_STATE_DYNAMIC, i);
+      iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
+      rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 0.1f));
+    }
+
+    // Trace a physical beam to find which rigid body was hit
+    csRef<iBulletDynamicSystem> bulletSystem =
+      scfQueryInterface<iBulletDynamicSystem> (avatarTest->dynamicSystem);
+    csBulletHitBeamResult physicsResult = bulletSystem->HitBeam (startBeam, endBeam);
+
+    // Apply a big force at the point clicked by the mouse
+    if (physicsResult.body)
+    {
+      csVector3 force = endBeam - startBeam;
+      force.Normalize ();
+      physicsResult.body->AddForceAtPos (physicsResult.isect, force * 1.0f);
+      physicsResult.body->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 1.0f));
+    }
+
+    return true;
+  }
+
   return false;
 }
 
@@ -79,17 +169,37 @@ bool KrystalScene::CreateAvatar ()
   if (!animeshFactory)
     return avatarTest->ReportError ("Can't find Krystal's animesh factory!");
 
+  // Load bodymesh (animesh's physical properties)
+  rc = avatarTest->loader->Load ("/lib/krystal/skelkrystal_body");
+  if (!rc.success)
+    return avatarTest->ReportError ("Can't load Krystal's body mesh file!");
+
+  csRef<iBodyManager> bodyManager =
+    csQueryRegistry<iBodyManager> (avatarTest->GetObjectRegistry ());
+  csRef<iBodySkeleton> bodySkeleton = bodyManager->FindBodySkeleton ("krystal_body");
+  if (!bodySkeleton)
+    return avatarTest->ReportError ("Can't find Krystal's body mesh description!");
+
   // Create a new animation tree. The structure of the tree is:
-  //   + Random node (root node)
-  //     + idle animation nodes
+  //   + Finite State Machine node (root node)
+  //     + Random node
+  //       + idle animation nodes
+  //     + ragdoll controller node
   csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
+
+  // Create the Finite State Machine node
+  csRef<iSkeletonFSMNodeFactory2> FSMNodeFactory =
+    animPacketFactory->CreateFSMNode ("fsm");
+  animPacketFactory->SetAnimationRoot (FSMNodeFactory);
 
   // Create the 'random' node
   csRef<iSkeletonRandomNodeFactory2> randomNodeFactory =
     animPacketFactory->CreateRandomNode ("random");
   randomNodeFactory->SetAutomaticSwitch (true);
-  animPacketFactory->SetAnimationRoot (randomNodeFactory);
+  mainFSMState = FSMNodeFactory->AddState
+    ("main_state", randomNodeFactory);
+  FSMNodeFactory->SetStartState (mainFSMState);
 
   // Create the 'idle01' animation node
   csRef<iSkeletonAnimationNodeFactory2> idle01NodeFactory =
@@ -157,18 +267,52 @@ bool KrystalScene::CreateAvatar ()
   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
   randomNodeFactory->AddNode (standNodeFactory, 10.0f);
 
+  if (avatarTest->physicsEnabled)
+  {
+    // Create the ragdoll controller
+    csRef<iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
+      avatarTest->ragdollManager->CreateAnimNodeFactory ("ragdoll",
+					     bodySkeleton, avatarTest->dynamicSystem);
+    ragdollFSMState = FSMNodeFactory->AddState
+      ("ragdoll_state", ragdollNodeFactory);
+
+    // Create bone chain
+    iBodyChain* chain = bodySkeleton->CreateBodyChain
+      ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("Head"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
+    ragdollNodeFactory->AddBodyChain (chain, RAGDOLL_STATE_DYNAMIC);
+  }
+
   // Create the animated mesh
   csRef<iMeshWrapper> avatarMesh =
     avatarTest->engine->CreateMeshWrapper (meshfact, "krystal",
 					   avatarTest->room, csVector3 (0.0f));
   animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
+  // When the animated mesh is created, the animation nodes are created too.
+  // We can therefore set them up now.
+  iSkeletonAnimNode2* rootNode =
+    animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+
+  // Setup of the FSM node
+  FSMNode = scfQueryInterface<iSkeletonFSMNode2> (rootNode->FindNode ("fsm"));
+
+  // Setup of the ragdoll controller
+  if (avatarTest->physicsEnabled)
+  {
+    ragdollNode =
+      scfQueryInterface<iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
+    ragdollNode->SetAnimatedMesh (animesh);
+  }
+
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
 
   // Start animation
-  iSkeletonAnimNode2* rootNode =
-    animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
   rootNode->Play ();
 
   return true;
@@ -176,6 +320,22 @@ bool KrystalScene::CreateAvatar ()
 
 void KrystalScene::ResetScene ()
 {
+  // Reset the position of the animesh
+  csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
+  animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->SetTransform
+    (csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
+  animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->UpdateMove ();
+
+  // Reset initial state of the Finite State Machine
+  FSMNode->SwitchToState (mainFSMState);
+  //FSMNode->SwitchToState (ragdollFSMState);
+  //FSMNodeFactory->SetStartState (ragdollFSMState);
+
+  // The FSM doesn't stop the child nodes
+  if (avatarTest->physicsEnabled)
+    ragdollNode->Stop ();
+
+  krystalDead = false;
 }
 
 void KrystalScene::DisplayKeys ()
@@ -187,6 +347,18 @@ void KrystalScene::DisplayKeys ()
 
   // Write available keys
   avatarTest->WriteShadow (x - 5, y, fg, "Keys available:");
+  y += lineSize;
+
+  if (avatarTest->physicsEnabled)
+  {
+    avatarTest->WriteShadow (x, y, fg, "left mouse: kill Krystal");
+    y += lineSize;
+
+    avatarTest->WriteShadow (x, y, fg, "d: display active colliders");
+    y += lineSize;
+  }
+
+  avatarTest->WriteShadow (x, y, fg, "r: reset scene");
   y += lineSize;
 
   avatarTest->WriteShadow (x, y, fg, "m: switch to Frankie");
