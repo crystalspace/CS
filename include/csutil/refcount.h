@@ -192,6 +192,63 @@ namespace CS
       /// Get the reference count (only for debugging).
       int GetInternalRefCount () const { return internal_ref_count; }
     };
+
+    /**
+     * This is a class which provides basic atomic reference-counting semantics.
+     * It behaves like csRefCount, with the difference that the reference count
+     * is increased/decreased atomically, making this class suitable for using
+     * reference-counted objects across threads.
+     */
+    class AtomicRefCount
+    {
+    protected:
+      int32 ref_count;
+
+      // To avoid a problem with MSVC and multiple DLLs (with separate memory
+      // space) we have to use a virtual destructor.
+      // @@@ Another alternative is to force this function to be non-inline, as
+      // doing so will most likely achieve the same result.
+      virtual void Delete ()
+      {
+        delete this;
+      }
+
+      virtual ~AtomicRefCount () 
+      {
+        csRefTrackerAccess::TrackDestruction (this, ref_count);
+      }
+
+    public:
+      //@{
+      /// Initialize object and set reference to 1.
+      AtomicRefCount () : ref_count (1) 
+      {
+        csRefTrackerAccess::TrackConstruction (this);
+      }
+      AtomicRefCount (const AtomicRefCount& other) : ref_count (1) 
+      {
+        csRefTrackerAccess::TrackConstruction (this);
+      }
+      //@}
+
+      /// Increase the number of references to this object.
+      void IncRef () 
+      { 
+        csRefTrackerAccess::TrackIncRef (this, ref_count); 
+        CS::Threading::AtomicOperations::Increment (&ref_count);
+      }
+      /// Decrease the number of references to this object.
+      void DecRef ()
+      {
+        csRefTrackerAccess::TrackDecRef (this, ref_count);
+        if (CS::Threading::AtomicOperations::Decrement (&ref_count) == 0)
+          Delete ();
+      }
+      /// Get the reference count (only for debugging).
+      int GetRefCount () const
+      { return CS::Threading::AtomicOperations::Read (&ref_count); }
+    };
+
   } // namespace Utility
 } // namespace CS
 
