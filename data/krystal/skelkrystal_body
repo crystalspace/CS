@@ -71,7 +71,8 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_Neck" friction="0.9" elasticity="0.5" softness="0.5" />
+    <collidersphere x="0.0" y="0.0" z="0.0" radius="0.035" friction="0.9" elasticity="0.5" softness="0.5" />
+    <!--colliderconvexmesh mesh="coll_Neck" friction="0.9" elasticity="0.5" softness="0.5" /-->
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
@@ -215,7 +216,8 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_RightShoulder" friction="0.9" elasticity="0.5" softness="0.5" />
+    <!--colliderconvexmesh mesh="coll_RightShoulder" friction="0.9" elasticity="0.5" softness="0.5" /-->
+    <collidersphere x="0.0" y="0.0" z="0.0" radius="0.035" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
@@ -287,7 +289,8 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_LeftShoulder" friction="0.9" elasticity="0.5" softness="0.5" />
+    <!--colliderconvexmesh mesh="coll_LeftShoulder" friction="0.9" elasticity="0.5" softness="0.5" /-->
+    <collidersphere x="0.0" y="0.0" z="0.0" radius="0.035" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
