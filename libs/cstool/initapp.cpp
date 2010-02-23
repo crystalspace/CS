@@ -532,6 +532,15 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
       q->RemoveAllListeners ();
   }
 
+  /* Process all pending thread events: these events may refer to objects that
+     are to destroyed in the following cleanups, so process them as long as
+     they may be possibly valid. */
+  {
+    csRef<iThreadManager> threadMgr (csQueryRegistry<iThreadManager> (r));
+    if (threadMgr)
+      threadMgr->Process ((uint)~0);
+  }
+
   // Explicitly unload all plugins from the plugin manager because
   // some plugins hold references to the plugin manager so the plugin
   // manager will never get destructed if there are still plugins in memory.
