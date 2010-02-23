@@ -30,12 +30,28 @@ stated are not required.  However, if you choose not to install them, at
 compile time you must follow the documented instructions of how to unload these
 projects from the Crystal Space build process.
 
-@subsubheading Platform @sc{sdk} - required for Microsoft Visual C++ 2005 Express Edition
+@subsubheading Windows @sc{sdk} - required for Microsoft Visual C++ 2005 Express Edition, Microsoft Visual Studio 2005
 
-All supported versions of Microsoft Visual C++ ship with a version of the
-Platform @sc{sdk} that suffices to compile Crystal Space, except the 
-Microsoft Visual C++ 2005 Express Edition, which requires a seperate setup of 
-the Platform SDK. Follow these instructions exactly to set up the @sc{psdk}:
+Microsoft Visual C++ 2005 Express Edition does not ship with a version of the
+Windows @sc{sdk}. Microsoft Visual Studio 2005 (non-Express) ships with version 5.0
+of the Windows @sc{sdk} which fails when building some applications (in particular,
+the resource compiler does not support the "Vista" version of the @sc{ico} file format).
+
+The Windows @sc{sdk} can be found at the following URL:
+@noindent
+@ifnottex
+@uref{http://msdn.microsoft.com/en-us/windows/bb980924.aspx}
+@end ifnottex
+@iftex
+@code{http://msdn.microsoft.com/en-us/windows/bb980924.aspx}
+@end iftex
+
+@itemize @bullet
+@item
+@emph{Microsoft Visual C++ 2005 Express Edition}:
+With the exception of using the Windows @sc{sdk} linked above instead of the
+Platform @sc{sdk} linked in the following document, exactly follow these
+instructions to set up the @sc{sdk}:
 
 @noindent
 @ifnottex
@@ -44,6 +60,16 @@ the Platform SDK. Follow these instructions exactly to set up the @sc{psdk}:
 @iftex
 @code{http://msdn2.microsoft.com/en-us/vstudio/aa700755.aspx}
 @end iftex
+
+@item
+@emph{Microsoft Visual Studio 2005}:
+After installing the Windows @sc{sdk}, configure Visual Studio to use the
+utilities from the newly installed @sc{sdk}: Select ``Options'', 
+``Projects and Solutions'', ``VC++ Directories''. Select ``Executable files''
+from ``Show directories for''. Add the @file{bin} subdirectory of the Windows
+@sc{sdk} installation directory at the top of the list. Repeat for ``x64''
+platform if desired.
+@end itemize
 
 @subsubheading cs-win32libs - Required
 
