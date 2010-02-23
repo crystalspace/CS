@@ -8,11 +8,7 @@
    </properties>
    <colliders>
     <!--colliderconvexmesh mesh="coll_Hips" /-->
-    <!--colliderconvexmesh mesh="coll_ToSpine" /-->
-    <!--collidersphere x="0.0" y="0.05" z="0.0" radius="0.05" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" /-->
-    <!--colliderbox x="0.08" y="0.08" z="0.08" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" /-->
-    <!--colliderbox x="0.07" y="0.07" z="0.07" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" /-->
-    <collidersphere x="0.0" y="0.0" z="0.0" radius="0.035" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <collidersphere x="0.0" y="0.0" z="0.0" radius="0.035" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
   </bone>
   <bone name="ToSpine">
@@ -20,14 +16,14 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_ToSpine" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_ToSpine" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
+      <min x="-0.05" y="-0.2" z="-0.2" />
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
@@ -38,19 +34,15 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <!--colliderconvexmesh mesh="coll_Spine" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" /-->
-    <!--TODO: remove density-->
-    <!--colliderbox x="0.07" y="0.07" z="0.07" density="100.0" friction="0.9" elasticity="0.5" softness="0.5">
-     <move x="0.0" y="0.0" z="0.055" />
-    </colliderbox-->
-    <collidersphere x="0.0" y="0.0" z="0.055" radius="0.035" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <!--colliderconvexmesh mesh="coll_Spine" friction="0.9" elasticity="0.5" softness="0.5" /-->
+    <collidersphere x="0.0" y="0.0" z="0.055" radius="0.035" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
+      <min x="-0.05" y="-0.2" z="-0.2" />
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
@@ -61,14 +53,14 @@
     <mass value="5.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_Spine1" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_Spine1" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
+      <min x="-0.05" y="-0.2" z="-0.2" />
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
@@ -79,14 +71,14 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_Neck" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_Neck" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
+      <min x="-0.05" y="-0.2" z="-0.2" />
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
@@ -97,7 +89,7 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_Head" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_Head" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
@@ -115,14 +107,14 @@
     <mass value="3.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_RightUpLeg" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_RightUpLeg" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
+      <min x="-0.0" y="-0.2" z="-0.2" />
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
@@ -133,15 +125,15 @@
     <mass value="2.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_RightLeg" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_RightLeg" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
-     <angle x="false" y="false" z="false">
+     <angle x="false" y="true" z="true">
       <min x="-0.83" y="-0.83" z="-0.83" />
-      <max x="0.83" y="0.83" z="0.83" />
+      <max x="0.0" y="0.83" z="0.83" />
      </angle>
     </constraints>
    </joint>
@@ -151,7 +143,7 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_RightFoot" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_RightFoot" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
@@ -169,14 +161,14 @@
     <mass value="3.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_LeftUpLeg" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_LeftUpLeg" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
+      <min x="-0.0" y="-0.2" z="-0.2" />
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
@@ -187,15 +179,15 @@
     <mass value="2.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_LeftLeg" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_LeftLeg" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
-     <angle x="false" y="false" z="false">
+     <angle x="false" y="true" z="true">
       <min x="-0.83" y="-0.83" z="-0.83" />
-      <max x="0.83" y="0.83" z="0.83" />
+      <max x="0.0" y="0.83" z="0.83" />
      </angle>
     </constraints>
    </joint>
@@ -205,7 +197,7 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_LeftFoot" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_LeftFoot" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
@@ -223,15 +215,15 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_RightShoulder" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_RightShoulder" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
-      <max x="0.83" y="0.83" z="0.83" />
+      <min x="-0.01" y="-0.2" z="-0.1" />
+      <max x="0.01" y="0.2" z="0.1" />
      </angle>
     </constraints>
    </joint>
@@ -241,14 +233,14 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_RightArm" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_RightArm" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
+      <min x="-0.83" y="-0.2" z="-0.83" />
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
@@ -259,15 +251,15 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_RightForeArm" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_RightForeArm" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
-     <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
-      <max x="0.83" y="0.83" z="0.83" />
+     <angle x="false" y="false" z="true">
+      <min x="-0.1" y="-0.0" z="-0.83" />
+      <max x="0.1" y="0.83" z="0.83" />
      </angle>
     </constraints>
    </joint>
@@ -277,15 +269,15 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_RightHand" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_RightHand" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
-      <max x="0.83" y="0.83" z="0.83" />
+      <min x="-0.0" y="-0.2" z="-0.7" />
+      <max x="0.0" y="0.2" z="0.83" />
      </angle>
     </constraints>
    </joint>
@@ -295,15 +287,15 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_LeftShoulder" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_LeftShoulder" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
-      <max x="0.83" y="0.83" z="0.83" />
+      <min x="-0.01" y="-0.2" z="-0.1" />
+      <max x="0.01" y="0.2" z="0.1" />
      </angle>
     </constraints>
    </joint>
@@ -313,14 +305,14 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_LeftArm" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_LeftArm" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
+      <min x="-0.83" y="-0.2" z="-0.83" />
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
@@ -331,7 +323,7 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_LeftForeArm" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_LeftForeArm" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
@@ -349,15 +341,15 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <colliderconvexmesh mesh="coll_LeftHand" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <colliderconvexmesh mesh="coll_LeftHand" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
-      <min x="-0.83" y="-0.83" z="-0.83" />
-      <max x="0.83" y="0.83" z="0.83" />
+      <min x="-0.0" y="-0.2" z="-0.7" />
+      <max x="0.0" y="0.2" z="0.83" />
      </angle>
     </constraints>
    </joint>
@@ -367,7 +359,7 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.05" radius="0.03" density="100.0" friction="0.9" elasticity="0.5" softness="0.5">
+    <collidercapsule length="0.05" radius="0.03" friction="0.9" elasticity="0.5" softness="0.5">
      <move x="0.0" y="0.04" z="0.0" />
     </collidercapsule>
    </colliders>
@@ -385,7 +377,7 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.07" radius="0.03" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <collidercapsule length="0.07" radius="0.03" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
@@ -401,7 +393,7 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.09" radius="0.03" density="100.0" friction="0.9" elasticity="0.5" softness="0.5" />
+    <collidercapsule length="0.09" radius="0.03" friction="0.9" elasticity="0.5" softness="0.5" />
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
