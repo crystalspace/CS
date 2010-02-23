@@ -356,6 +356,11 @@ namespace DocSystem
    * hashing.
    */
   CS_CRYSTALSPACE_EXPORT csString FlattenNode (iDocumentNode* node);
+  /**
+   * "Flatten" a document node structure into a string ignoring child nodes,
+   * \sa FlattenNode
+   */
+  CS_CRYSTALSPACE_EXPORT csString FlattenNodeShallow (iDocumentNode* node);
 } // namespace DocSystem
 
 

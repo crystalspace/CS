@@ -26,10 +26,13 @@ namespace CS
 {
 namespace DocSystem
 {
-  csString FlattenNode (iDocumentNode* node)
+  static csString FlattenNodeCommon (iDocumentNode* node, 
+    csRef<iDocumentNodeIterator> children)
   {
     csString str;
     str.SetGrowsBy (0);
+    str << int (node->GetType());
+    str << ' ';
     str << node->GetValue ();
     csRef<iDocumentAttributeIterator> attrIter = node->GetAttributes ();
     if (attrIter)
@@ -49,16 +52,29 @@ namespace DocSystem
       str << ']';
     }
     str << '(';
-    csRef<iDocumentNodeIterator> it = node->GetNodes ();
-    while (it->HasNext ())
+    if (children)
     {
-	csRef<iDocumentNode> child = it->Next ();
-	str << FlattenNode (child);
-	str << ',';
+      while (children->HasNext ())
+      {
+	  csRef<iDocumentNode> child = children->Next ();
+	  str << FlattenNode (child);
+	  str << ',';
+      }
     }
     str << ')';
     
     return str;
+  }
+
+  csString FlattenNode (iDocumentNode* node)
+  {
+    return FlattenNodeCommon (node, node->GetNodes ());
+  }
+
+  csString FlattenNodeShallow (iDocumentNode* node)
+  {
+    // Ignore children, that's what the 'shallow' part is about ...
+    return FlattenNodeCommon (node, 0);
   }
 } // namespace DocSystem
 } // namespace CS
