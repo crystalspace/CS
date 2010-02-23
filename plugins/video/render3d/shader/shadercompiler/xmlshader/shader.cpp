@@ -39,6 +39,7 @@
 #include "cstool/vfsdirchange.h"
 
 #include "forcedprioshader.h"
+#include "foreignnodes.h"
 #include "shader.h"
 #include "xmlshader.h"
 
@@ -485,7 +486,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     vfsStartDir = CS::StrDup (compiler->vfs->GetCwd ());
     shaderCache = shadermgr->GetShaderCache();
-    Load (source, false);
   }
 
   csXMLShader::csXMLShader (csXMLShaderCompiler* compiler)
@@ -550,9 +550,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   /* Magic value for cache file.
   * The most significant byte serves as a "version", increase when the
   * cache file format changes. */
-  static const uint32 cacheFileMagic = 0x08737863;
+  static const uint32 cacheFileMagic = 0x09737863;
 
-  void csXMLShader::Load (iDocumentNode* source, bool forPrecache)
+  bool csXMLShader::Load (iDocumentNode* source, bool forPrecache)
   {
     originalShaderDoc = source;
     csRef<iDocumentNode> shaderRoot;
@@ -563,6 +563,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     csString cacheType = source->GetAttributeValue ("name");
     cacheTag = source->GetAttributeValue ("_cachetag");
+    bool haveProvidedCacheTag = !cacheTag.IsEmpty();
+    bool forceCacheLoad = source->GetAttributeValueAsBool ("_forceCacheLoad");
     csString cacheID_header;
     {
       csString cacheID_base (source->GetAttributeValue ("_cacheid"));
@@ -597,6 +599,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       {
         do
         {
+          readFromCache = false;
+
           // Read magic header
           uint32 diskMagic;
           size_t read = cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic));
@@ -605,19 +609,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
           csString cacheFileTag =
             CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-	  /* Note: empty cache tag means none was provided with the source;
-	     ignoring a mismatch here is okay: if the input data changed the
-	     hash stream will mismatch as well. The cache tag itself is then
-	     only used to verify technique data. */
-	  if (!cacheTag.IsEmpty() && (cacheFileTag != cacheTag)) break;
-	  if (cacheTag.IsEmpty()) cacheTag = cacheFileTag;
-
           // Extract hash stream
           csRef<iDataBuffer> hashStream = 
             CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
           if (!hashStream.IsValid()) break;
 
-          readFromCache = hasher.ValidateHashStream (hashStream);
+	  /* Note: empty cache tag means none was provided with the source;
+	     ignoring a mismatch here is okay: if the input data changed the
+	     hash stream will mismatch as well. The cache tag itself is then
+	     only used to verify technique data. */
+          if (haveProvidedCacheTag)
+          {
+	    if (cacheFileTag != cacheTag) break;
+            readFromCache = true;
+          }
+          else
+          {
+	    cacheTag = cacheFileTag;
+
+            readFromCache = hasher.ValidateHashStream (hashStream);
+          }
         }
         while (false);
       }
@@ -644,16 +655,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     ConditionsReader* condReader = 0;
     if (readFromCache)
     {
-      do
+      ForeignNodeReader techniqueNodes (compiler);
+      readFromCache = techniqueNodes.StartUse (cacheFile)
+        && techniqueNodes.EndUse ();
+
+      if (readFromCache)
       {
         readFromCache = false;
         csRef<iDataBuffer> conditionsBuf =
           CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
-        if (!conditionsBuf.IsValid()) break;
-        condReader = new ConditionsReader (*sharedEvaluator, conditionsBuf);
-	readFromCache = condReader->GetStatus();
+        if (conditionsBuf.IsValid())
+        {
+          condReader = new ConditionsReader (*sharedEvaluator, conditionsBuf);
+	  readFromCache = condReader->GetStatus();
+        }
       }
-      while (false);
 
       if (readFromCache)
       {
@@ -691,7 +707,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	  techVariants.Push (newVar);
 	}
       }
-      
+
       size_t numTechniques = 0;
       if (readFromCache)
       {
@@ -710,14 +726,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         readFromCache = newTech.ReadFromCache (cacheFile);
 	if (!readFromCache) break;
         
-	techCache = shaderCache->GetRootedCache (
-	  csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
-	    t));
-        readFromCache = LoadTechniqueFromCache (newTech, techCache,
-	  techniques.GetSize());
+        csRef<iDataBuffer> techData =
+	  CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
+        if (!techData.IsValid())
+        {
+          readFromCache = false;
+          break;
+        }
+        readFromCache = LoadTechniqueFromCache (newTech, techniqueNodes,
+          techData, techniques.GetSize());
         // Discard variations data from cache as well
-        if (!readFromCache) techCache->ClearCache ("/");
-        techniques.Push (newTech);
+        if (!readFromCache)
+        {
+	  techCache = shaderCache->GetRootedCache (
+	    csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
+	      t));
+          techCache->ClearCache ("/");
+        }
+        else
+          techniques.Push (newTech);
       }
 
       if (readFromCache)
@@ -763,17 +790,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     if (!readFromCache)
     {
+      // shaderweaver wants us to fail loading so it can re-weave
+      if (forceCacheLoad) return false;
+
       // Getting from cache failed, so prep for writing to cache
       cacheFile.AttachNew (new csMemFile ());
       // Write magic header
       uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
       cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
       CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, cacheTag);
-      // Write hash stream
-      csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
-      if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
-        cacheFile, hashStream))
-        cacheFile.Invalidate();
+      if (haveProvidedCacheTag)
+      {
+        // Write empty hash stream
+        if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+            cacheFile, 0))
+          cacheFile.Invalidate();
+      }
+      else
+      {
+        // Write hash stream
+        csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
+        if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+            cacheFile, hashStream))
+          cacheFile.Invalidate();
+      }
 
       // Scan techniques on node w/ expanded templates
       {
@@ -828,17 +868,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       
       PrepareTechVars (shaderRoot, techniquesTmp, forcepriority);
       
+      ForeignNodeStorage techniqueNodes (compiler);
+      if (cacheFile.IsValid() && !techniqueNodes.StartUse (cacheFile))
+        cacheFile.Invalidate();
+
+      csRefArray<iDataBuffer> techCacheData;
       for (size_t i = 0; i < techniques.GetSize(); i++)
       {
-	csRef<iHierarchicalCache> techCache;
-	if (shaderCache != 0)
-	  techCache = shaderCache->GetRootedCache (
-	    csString().Format ("/%s/%zu", cacheScope_tech.GetData(),
-	      i));
-        LoadTechnique (techniques[i], techniquesTmp[i].node, techCache);
+        csRef<iDataBuffer> cacheData;
+        LoadTechnique (techniques[i], techniquesTmp[i].node,
+          techniqueNodes, cacheData);
+        techCacheData.Push (cacheData);
       }
+
+      if (cacheFile.IsValid() && !techniqueNodes.EndUse())
+        cacheFile.Invalidate();
       
-      if (cacheValid)
+      if (cacheValid && cacheFile.IsValid())
       {
         bool cacheState;
         ConditionsWriter condWriter (*sharedEvaluator);
@@ -869,7 +915,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	  for (size_t t = 0; (t < techniques.GetSize()) && cacheState; t++)
 	  {
 	    Technique& tech = techniques[t];
-	    cacheState = tech.WriteToCache (cacheFile);
+	    cacheState = tech.WriteToCache (cacheFile) &&
+              CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (cacheFile,
+                techCacheData[t]);
 	  }
         }
         if (cacheState)
@@ -916,6 +964,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       ParseGlobalSVs (ldr_context, varNode);
 
     delete condReader;
+
+    return true;
   }
 
   bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo,
@@ -1596,13 +1646,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   }
 
   bool csXMLShader::LoadTechniqueFromCache (Technique& tech,
-    iHierarchicalCache* cache, size_t techIndex)
+    ForeignNodeReader& foreignNodes, iDataBuffer* cacheData,
+    size_t techIndex)
   {
     csRef<iFile> cacheFile;
-    csRef<iDataBuffer> cacheData (cache->ReadCache ("/doc"));
-    if (cacheData.IsValid())
-      cacheFile.AttachNew (new csMemFile (cacheData, true));
-    if (!cacheFile.IsValid()) return false;
+    cacheFile.AttachNew (new csMemFile (cacheData, true));
 
     uint32 diskMagic;
     size_t read = cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic));
@@ -1633,7 +1681,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       tree.SetGrowsBy (0);
 
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (cacheFile,
-	tech.resolver, *sharedEvaluator, condReader, &tree));
+	tech.resolver, *sharedEvaluator, foreignNodes, condReader, &tree));
 
       tech.resolver->DumpConditionTree (tree);
       csString filename;
@@ -1644,7 +1692,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     }
     else
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (cacheFile,
-	tech.resolver, *sharedEvaluator, condReader, 0));
+	tech.resolver, *sharedEvaluator, foreignNodes, condReader, 0));
     if (!wrappedNode.IsValid()) return false;
     tech.techNode = wrappedNode;
 
@@ -1652,7 +1700,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   }
 
   void csXMLShader::LoadTechnique (Technique& tech, iDocumentNode* srcNode,
-    iHierarchicalCache* cacheTo, bool forPrecache)
+    ForeignNodeStorage& foreignNodes, csRef<iDataBuffer>& cacheData,
+    bool forPrecache)
   {
     size_t techIndex = techniques.GetIndex (&tech);
     tech.resolver = new csShaderConditionResolver (*sharedEvaluator);
@@ -1714,7 +1763,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     tech.techNode = wrappedNode;
 
-    if (cacheTo)
+    //if (cacheTo)
     {
       csRef<csMemFile> cacheFile;
       cacheFile.AttachNew (new csMemFile);
@@ -1744,13 +1793,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           condWriter))
           cacheFile.Invalidate();
         if (cacheFile.IsValid() && !wrappedNode->StoreToCache (cacheFile,
-          condWriter))
+            foreignNodes, condWriter))
           cacheFile.Invalidate();
         if (cacheFile.IsValid())
         {
-          csRef<iDataBuffer> cacheData (cacheFile->GetAllData());
-          cacheTo->CacheData (cacheData->GetData(), cacheData->GetSize(),
-            "/doc");
+          //csRef<iDataBuffer> cacheData (cacheFile->GetAllData());
+          //cacheTo->CacheData (cacheData->GetData(), cacheData->GetSize(),
+            //"/doc");
+          cacheData = cacheFile->GetAllData();
         }
       }
     }

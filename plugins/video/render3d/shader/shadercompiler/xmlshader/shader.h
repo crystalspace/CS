@@ -328,7 +328,7 @@ protected:
   void InternalRemove() { SelfDestruct(); }
 
   csPtr<iDocumentNode> StripShaderRoot (iDocumentNode* shaderRoot);
-  void Load (iDocumentNode* source, bool forPrecache);
+  bool Load (iDocumentNode* source, bool forPrecache);
     
   void PrepareTechVars (iDocumentNode* shaderRoot,
     const csArray<TechniqueKeeper>& allTechniques, int forcepriority);
@@ -342,9 +342,10 @@ protected:
     MyBitArrayTemp& condResults);
   
   bool LoadTechniqueFromCache (Technique& tech,
-    iHierarchicalCache* cache, size_t techIndex);
+    ForeignNodeReader& foreignNodes, iDataBuffer* cacheData, size_t techIndex);
   void LoadTechnique (Technique& tech, iDocumentNode* srcNode,
-    iHierarchicalCache* cacheTo, bool forPrecache = true);
+    ForeignNodeStorage& foreignNodes, csRef<iDataBuffer>& cacheData,
+    bool forPrecache = true);
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 
@@ -354,6 +355,7 @@ public:
   csXMLShader (csXMLShaderCompiler* compiler);
   virtual ~csXMLShader();
   
+  bool Load (iDocumentNode* source) { return Load (source, false); }
   bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo,
     bool quick);
 

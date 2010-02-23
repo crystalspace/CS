@@ -82,15 +82,29 @@ protected:
     csArray<Synthesizer::DocNodeArray>& prePassNodes,
     csPDelArray<Snippet>& passSnippets);
 
-  csRef<iDocument> LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
-    const FileAliases& aliases, iDocumentNode* docSource,
-    const char* cacheID, const char* cacheTag, iFile* cacheFile,
-    csRef<iString>& cachingError);
-  csRef<iDocument> LoadTechsFromCache (iFile* cacheFile,
-    const char*& cacheFailReason);
-  
-  csRef<iDocument> DoSynthesis (iDocumentNode* source,
+  /// Common information, used by all methods writing to/reading from shader cache
+  struct CacheInfo;
+  /// Try to load a shader document to pass to xmlshader from cache
+  csRef<iDocument> TryLoadShader (CacheInfo& ci, iDocumentNode* source,
+    iHierarchicalCache* cacheTo);
+  /// Helper to validate combiner codes, stored in cacheFile at current position
+  bool ValidateCombinerCodes (iFile* cacheFile, csString& cacheFailReason);
+  /// Synthersize a shader and store result in cacheTo
+  csRef<iDocument> SynthesizeShaderAndCache (CacheInfo& ci, iDocumentNode* source,
     iHierarchicalCache* cacheTo, int forcepriority);
+  /// Synthesize a shader
+  csRef<iDocument> SynthesizeShader (const csArray<TechniqueKeeper>& techniques,
+				     const FileAliases& aliases,
+				     iDocumentNode* docSource,
+				     const char* cacheID, 
+				     const char* _cacheTag,
+                                     csString& cacheTag,
+                                     CombinerLoaderSet& combiners);
+  /// Helper to store combiner codes in cacheFile at current position
+  bool WriteCombinerCodes (iFile* cacheFile, const CombinerLoaderSet& combiners);
+
+  /// Helper to dump weaving result
+  void DumpWeaved (CacheInfo& ci, iDocument* synthShader);
 
   /// Set up the fallback shader consisting of all techniques after the first
   void MakeFallbackShader (iDocumentNode* targetNode,

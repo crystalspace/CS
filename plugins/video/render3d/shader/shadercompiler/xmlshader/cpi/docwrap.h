@@ -322,7 +322,7 @@ protected:
     iConditionResolver* resolver,
     csWrappedDocumentNodeFactory* shared);
   
-  bool StoreToCache (iFile* cacheFile, ForeignNodeStorage& foreignNodes,
+  bool StoreToCacheReal (iFile* cacheFile, ForeignNodeStorage& foreignNodes,
     const ConditionsWriter& condWriter);
   bool StoreWrappedChildren (iFile* file, 
     ForeignNodeStorage& foreignNodes,
@@ -330,7 +330,7 @@ protected:
     const ConditionsWriter& condWriter);
   void CollectUsedConditions (const csRefArray<WrappedChild>& children,
     ConditionsWriter& condWrite);
-  bool ReadFromCache (iFile* cacheFile, ForeignNodeReader& foreignNodes,
+  bool ReadFromCacheReal (iFile* cacheFile, ForeignNodeReader& foreignNodes,
     const ConditionsReader& condReader, ConditionDumper& condDump);
   bool ReadWrappedChildren (iFile* file, 
     ForeignNodeReader& foreignNodes,
@@ -362,9 +362,10 @@ public:
   virtual bool GetAttributeValueAsBool (const char* name, 
     bool defaultvalue = false);
     
-  bool ReadFromCache (iFile* cacheFile, const ConditionsReader& condReader,
-    ConditionDumper& condDump);
-  bool StoreToCache (iFile* cacheFile, const ConditionsWriter& condWriter);
+  bool ReadFromCache (iFile* cacheFile, ForeignNodeReader& foreignNodes,
+    const ConditionsReader& condReader, ConditionDumper& condDump);
+  bool StoreToCache (iFile* cacheFile, ForeignNodeStorage& foreignNodes,
+    const ConditionsWriter& condWriter);
   void CollectUsedConditions (ConditionsWriter& condWrite);
   
   inline iDocumentNode* GetWrappedNode() const { return wrappedNode; }
@@ -491,6 +492,7 @@ public:
     
   csWrappedDocumentNode* CreateWrapperFromCache (iFile* cacheFile,
     iConditionResolver* resolver, csConditionEvaluator& evaluator,
+    ForeignNodeReader& foreignNodes,
     const ConditionsReader& condReader, csString* dumpOut);
 };
 

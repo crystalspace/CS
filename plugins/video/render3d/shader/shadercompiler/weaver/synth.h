@@ -73,8 +73,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       set.Add (loader);
     }
 
-    size_t UnlockedGetSize() { return set.GetSize(); }
-    GlobalIterator UnlockedGetIterator() { return set.GetIterator(); }
+    size_t UnlockedGetSize() const { return set.GetSize(); }
+    GlobalIterator UnlockedGetIterator() const { return set.GetIterator(); }
   };
   
   class Synthesizer
