@@ -94,7 +94,7 @@ protected:
 
 struct HeapRefCounted :
   public CS::Memory::CustomAllocatedDerived<CS::Memory::Heap>,
-  public CS::Utility::FastRefCount<HeapRefCounted>
+  public CS::Utility::AtomicRefCount
 {
 };
 
