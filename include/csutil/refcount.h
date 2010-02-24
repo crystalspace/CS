@@ -25,6 +25,7 @@
  */
 
 #include "csextern.h"
+#include "csutil/threading/atomicops.h"
 #include "csutil/reftrackeraccess.h"
 
 /**
