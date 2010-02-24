@@ -35,6 +35,10 @@ CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_MMX_Blit)
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {
 
+/* This file is always compiled on MSVC, but it does not support MMX on all
+   platforms */
+#ifdef CS_SUPPORTS_MMX
+
 struct Map_uint8
 {
   typedef uint8 type;
@@ -252,8 +256,11 @@ void ProctexPDLight::Animate_MMX ()
     {
       if (!lightBits.IsBitSet (i)) continue;
       MappedLight& light = lights[i];
-      __m64 lightColor = lightFactors[l++];
-      if (!light.map.tileNonNull.IsBitSet (t)) continue;
+      if (!light.map.tileNonNull.IsBitSet (t))
+      {
+	l++;
+	continue;
+      }
       const PDMap::Tile mapTile = light.map.tiles[t];
 
       const int mapW = mapTile.tilePartW;
@@ -265,6 +272,7 @@ void ProctexPDLight::Animate_MMX ()
         mapTile.tilePartX / 2;
       size_t scratchPitch = blitPitch / sizeof (__m64)  - mapW/2;
 
+      __m64 lightColor = lightFactors[l];
       csRGBcolor mapMax = mapTile.maxValue;
       int mapMax_red   = mapMax.red   * lightFactors_ui16[l*3+0];
       int mapMax_green = mapMax.green * lightFactors_ui16[l*3+1];
@@ -296,10 +304,13 @@ void ProctexPDLight::Animate_MMX ()
           MultiplyAddLumels<Map_Lumel, false> (scratchPtr, scratchPitch,
             mapPtr, mapPitch, mapW, lines, lightColor);
       }
+      l++;
     }
   }
   _m_empty();
 }
+
+#endif // CS_SUPPORTS_MMX
 
 }
 CS_PLUGIN_NAMESPACE_END(PTPDLight)

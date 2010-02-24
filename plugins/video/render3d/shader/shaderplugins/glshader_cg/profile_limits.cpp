@@ -29,7 +29,9 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
-#define UNLIMITED  ~(1 << 31)
+/* At least Cg 2.1 seems to store the profile limits as 16-bit integers,
+   so use 0x7fff when something is 'unlimited'. */
+#define UNLIMITED  0x7fff
 
 // Tabularize what profiles use what limits
 #define PROFILES  \
@@ -80,13 +82,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
      NumTemps (0),
      NumTexInstructionSlots (0)
   {
+    FixupVendor();
   }
   
   uint ProfileLimits::glGetProgramInteger (csGLExtensionManager* ext,
-								 GLenum target, GLenum what)
+					   GLenum target, GLenum what)
   {
-    GLint v;
+    GLint v = 0;
     ext->glGetProgramivARB (target, what, &v);
+    /* If we happen to get a 0, try the non-native variant of a limit
+     * (on some Intel HW native limits are all 0, but non-native ones are
+     * useable) */
+    if (v == 0)
+    {
+      switch (what)
+      {
+      case GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB:
+	ext->glGetProgramivARB (target, GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB, &v);
+	break;
+      case GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB:
+	ext->glGetProgramivARB (target, GL_MAX_PROGRAM_ATTRIBS_ARB, &v);
+	break;
+      case GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB:
+	ext->glGetProgramivARB (target, GL_MAX_PROGRAM_INSTRUCTIONS_ARB, &v);
+	break;
+      case GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB:
+	ext->glGetProgramivARB (target, GL_MAX_PROGRAM_PARAMETERS_ARB, &v);
+	break;
+      case GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB:
+	ext->glGetProgramivARB (target, GL_MAX_PROGRAM_TEMPORARIES_ARB, &v);
+	break;
+      }
+    }
     return v;
   }
   
@@ -111,6 +138,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_BEGIN
 #undef PROFILE_END
 #undef LIMIT
+  }
+
+  const char* ProfileLimits::GetProfileString (CGprofile p)
+  {
+    switch (p)
+    {
+      case CG_PROFILE_UNKNOWN: return "(unknown)";
+      default: return cgGetProfileString (p);
+    }
   }
   
   static GLenum GetProgramIntegerTarget (CGprofile profile)
@@ -161,6 +197,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     csString prefix (_prefix);
     vendor = CS::PluginCommon::ShaderProgramPluginGL::VendorFromString (
       cfg->GetStr (prefix + ".Vendor", "other"));
+    FixupVendor();
     // Set defaults
     SetDefaults ();
 #define READ(Limit) \
@@ -224,6 +261,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (i >= components.GetSize()) return false;
     vendor = CS::PluginCommon::ShaderProgramPluginGL::VendorFromString (
       components[i++]);
+    FixupVendor();
     if (vendor == CS::PluginCommon::ShaderProgramPluginGL::Invalid)
       return false;
     
@@ -294,7 +332,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_END
 #undef LIMIT
 
-    csString ret (cgGetProfileString (profile));
+    csString ret (GetProfileString (profile));
     ret.AppendFmt (".%s",
       CS::PluginCommon::ShaderProgramPluginGL::VendorToString (vendor));
 #define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) ret.AppendFmt (".%u", Limit);
@@ -334,7 +372,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_END
 #undef LIMIT
 
-    csString ret (cgGetProfileString (profile));
+    csString ret (GetProfileString (profile));
     ret.AppendFmt (" %s",
       CS::PluginCommon::ShaderProgramPluginGL::VendorToString (vendor));
 #define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) \
@@ -409,6 +447,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         return false;
       vendor = (CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor)
         csLittleEndian::Int32 (diskVal);
+      FixupVendor ();
     }
 #define READ(Limit) \
     { \

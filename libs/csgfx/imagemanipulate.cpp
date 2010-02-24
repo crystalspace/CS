@@ -29,10 +29,10 @@
 
 
 csRef<iImage> csImageManipulate::Rescale2D (iImage* source, int newwidth, 
-    int newheight)
+  int newheight)
 {
-  const int Width = source->GetWidth();
-  const int Height = source->GetHeight();
+  const int Width = source->GetWidth ();
+  const int Height = source->GetHeight ();
 
   if (newwidth == Width && newheight == Height)
     return source;
@@ -64,20 +64,20 @@ csRef<iImage> csImageManipulate::Rescale2D (iImage* source, int newwidth,
   }
 
   csImageMemory* newImg = new csImageMemory (newwidth, newheight,
-    source->GetFormat());
-  newImg->SetImageType (source->GetImageType());
+    source->GetFormat ());
+  newImg->SetImageType (source->GetImageType ());
 
-  switch (source->GetFormat() & CS_IMGFMT_MASK)
+  switch (source->GetFormat () & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_TRUECOLOR:
-      RESIZE (csRGBpixel, source->GetImageData(), newImg->GetImagePtr())
-      break;
+      RESIZE (csRGBpixel, source->GetImageData (), newImg->GetImagePtr ())
+    break;
     case CS_IMGFMT_PALETTED8:
-      RESIZE (uint8, source->GetImageData(), newImg->GetImagePtr())
-      break;
+      RESIZE (uint8, source->GetImageData (), newImg->GetImagePtr ())
+    break;
   }
-  if (source->GetAlpha())
-    RESIZE (uint8, source->GetAlpha(), newImg->GetAlphaPtr())
+  if (source->GetAlpha ())
+    RESIZE (uint8, source->GetAlpha (), newImg->GetAlphaPtr ())
 
   csRef<iImage> imageRef;
   imageRef.AttachNew (newImg);
@@ -85,54 +85,58 @@ csRef<iImage> csImageManipulate::Rescale2D (iImage* source, int newwidth,
 }
 
 csRef<iImage> csImageManipulate::Rescale (iImage* source, int newwidth, 
-    int newheight, int newdepth)
+  int newheight, int newdepth)
 {
-  if (source->GetImageType() != csimg3D) 
+  if (source->GetImageType () != csimg3D) 
     return Rescale2D (source, newwidth, newheight);
 
-  const int Width = source->GetWidth();
-  const int Height = source->GetHeight();
-  const int Depth = source->GetDepth();
+  const int Width = source->GetWidth ();
+  const int Height = source->GetHeight ();
+  const int Depth = source->GetDepth ();
 
   if (newwidth == Width && newheight == Height && newdepth == Depth)
     return source;
 
   csRef<csImageMemory> newImage;
   newImage.AttachNew (new csImageMemory (newwidth, newheight, newdepth, 
-    source->GetFormat()));
+    source->GetFormat ()));
   if (source->GetPalette() != 0)
-    memcpy (newImage->GetPalettePtr(), source->GetPalette(), 
+  {
+    memcpy (newImage->GetPalettePtr (), source->GetPalette (), 
       sizeof (csRGBpixel) * 256);
+  }
   uint dz = csQfixed16 (float (Depth) / float (newdepth));
   if (newdepth < Depth)
   {
     csRef<csImageMemory> resizeScrap;
     resizeScrap.AttachNew (new csImageMemory (Width, Height, 
-      source->GetFormat()));
+      source->GetFormat ()));
     const size_t srcSliceSize = csImageTools::ComputeDataSize (source) / Depth;
     const size_t srcSlicePix = Width * Height;
-    const uint8* srcData = (uint8*)source->GetImageData();
-    const uint8* srcAlpha = source->GetAlpha();
+    const uint8* srcData = (uint8*)source->GetImageData ();
+    const uint8* srcAlpha = source->GetAlpha ();
     const size_t dstSliceSize = csImageTools::ComputeDataSize (newImage) / newdepth;
     const size_t dstSlicePix = newwidth * newheight;
-    uint8* dstData = (uint8*)newImage->GetImagePtr();
-    uint8* dstAlpha = newImage->GetAlphaPtr();
+    uint8* dstData = (uint8*)newImage->GetImagePtr ();
+    uint8* dstAlpha = newImage->GetAlphaPtr ();
 
     for (int d = 0; d < newdepth; d++)
     {
       uint srcSlice = (dz * d) >> 16;
-      memcpy (resizeScrap->GetImagePtr(), srcData + (srcSlice * srcSliceSize), 
-	srcSliceSize);
+      memcpy (resizeScrap->GetImagePtr (), srcData + (srcSlice * srcSliceSize), 
+        srcSliceSize);
       if (srcAlpha != 0)
-	memcpy (resizeScrap->GetAlphaPtr(), srcAlpha + (srcSlice * srcSlicePix), 
-	  srcSlicePix);
+      {
+        memcpy (resizeScrap->GetAlphaPtr (),
+          srcAlpha + (srcSlice * srcSlicePix), srcSlicePix);
+      }
       csRef<iImage> resizedSlice = Rescale2D (resizeScrap, 
-	newwidth, newheight);
-      memcpy (dstData + (d * dstSliceSize), resizedSlice->GetImageData(), 
-	dstSliceSize);
+        newwidth, newheight);
+      memcpy (dstData + (d * dstSliceSize), resizedSlice->GetImageData (), 
+        dstSliceSize);
       if (dstAlpha != 0)
-	memcpy (dstAlpha + (d * dstSlicePix), resizedSlice->GetAlpha(), 
-	  dstSlicePix);
+        memcpy (dstAlpha + (d * dstSlicePix), resizedSlice->GetAlpha (), 
+          dstSlicePix);
     }
   }
   else
@@ -142,43 +146,49 @@ csRef<iImage> csImageManipulate::Rescale (iImage* source, int newwidth,
     {
       csRef<csImageMemory> resizeScrap;
       resizeScrap.AttachNew (new csImageMemory (Width, Height, 
-	source->GetFormat()));
+        source->GetFormat ()));
       const size_t srcSliceSize = csImageTools::ComputeDataSize (source) / Depth;
       const size_t srcSlicePix = Width * Height;
-      const uint8* srcData = (uint8*)source->GetImageData();
-      const uint8* srcAlpha = source->GetAlpha();
+      const uint8* srcData = (uint8*)source->GetImageData ();
+      const uint8* srcAlpha = source->GetAlpha ();
 
       for (d = 0; d < Depth; d++)
       {
-	memcpy (resizeScrap->GetImagePtr(), srcData + (d * srcSliceSize), 
-	  srcSliceSize);
-	if (srcAlpha != 0)
-	  memcpy (resizeScrap->GetAlphaPtr(), srcAlpha + (d * srcSlicePix), 
-	    srcSlicePix);
-	if ((newwidth != Width) || (newheight != Height))
-	  resizedSlices.Push (Rescale2D (resizeScrap, newwidth, newheight));
-	else
-	{
-	  csRef<csImageMemory> newImage;
-	  newImage.AttachNew (new csImageMemory (resizeScrap));
-	  resizedSlices.Push (newImage);
-	}
+        memcpy (resizeScrap->GetImagePtr (), srcData + (d * srcSliceSize), 
+          srcSliceSize);
+        if (srcAlpha != 0)
+        {
+          memcpy (resizeScrap->GetAlphaPtr (), srcAlpha + (d * srcSlicePix), 
+            srcSlicePix);
+        }
+        if ((newwidth != Width) || (newheight != Height))
+        {
+          resizedSlices.Push (Rescale2D (resizeScrap, newwidth, newheight));
+        }
+        else
+        {
+          csRef<csImageMemory> newImage;
+          newImage.AttachNew (new csImageMemory (resizeScrap));
+          resizedSlices.Push (newImage);
+        }
       }
     }
 
     const size_t dstSliceSize = csImageTools::ComputeDataSize (newImage) / newdepth;
     const size_t dstSlicePix = newwidth * newheight;
-    uint8* dstData = (uint8*)newImage->GetImagePtr();
-    uint8* dstAlpha = newImage->GetAlphaPtr();
+    uint8* dstData = (uint8*)newImage->GetImagePtr ();
+    uint8* dstAlpha = newImage->GetAlphaPtr ();
 
     for (d = 0; d < newdepth; d++)
     {
       uint srcSlice = (dz * d) >> 16;
-      memcpy (dstData + (d * dstSliceSize), resizedSlices[srcSlice]->GetImageData(), 
-	dstSliceSize);
+      memcpy (dstData + (d * dstSliceSize),
+        resizedSlices[srcSlice]->GetImageData (), dstSliceSize);
       if (dstAlpha != 0)
-	memcpy (dstAlpha + (d * dstSlicePix), resizedSlices[srcSlice]->GetAlpha(), 
-	  dstSlicePix);
+      {
+        memcpy (dstAlpha + (d * dstSlicePix),
+          resizedSlices[srcSlice]->GetAlpha (), dstSlicePix);
+      }
     }
   }
   return newImage;
@@ -239,10 +249,10 @@ csRef<iImage> csImageManipulate::Rescale (iImage* source, int newwidth,
 //-----------------------------------------------------------------------------
 
 csRef<iImage> csImageManipulate::Mipmap2D (iImage* source, int steps, 
-    csRGBpixel* transp)
+  csRGBpixel* transp)
 {
-  const int Width = source->GetWidth();
-  const int Height = source->GetHeight();
+  const int Width = source->GetWidth ();
+  const int Height = source->GetHeight ();
 
   if ((Width == 1) && (Height == 1)) return source;
 
@@ -254,80 +264,83 @@ csRef<iImage> csImageManipulate::Mipmap2D (iImage* source, int steps,
 
   while (steps && !((cur_w == 1) && (cur_h == 1)) )
   {
-    const int newW = MAX(1, cur_w >> 1);
-    const int newH = MAX(1, cur_h >> 1);
+    const int newW = MAX (1, cur_w >> 1);
+    const int newH = MAX (1, cur_h >> 1);
     
-    nimg.AttachNew (new csImageMemory (newW, newH, simg->GetFormat()));
+    nimg.AttachNew (new csImageMemory (newW, newH, simg->GetFormat ()));
 
     csRGBpixel *mipmap = new csRGBpixel [newW * newH];
-    uint8* Alpha = nimg->GetAlphaPtr();
+    uint8* Alpha = nimg->GetAlphaPtr ();
 
     int transpidx = -1;
     if (transp && simg->GetPalette ())
-      transpidx = csImageTools::ClosestPaletteIndex (simg->GetPalette(), 
-      *transp);
+    {
+      transpidx = csImageTools::ClosestPaletteIndex (simg->GetPalette (),
+        *transp);
+    }
 
-    switch (simg->GetFormat() & CS_IMGFMT_MASK)
+    switch (simg->GetFormat () & CS_IMGFMT_MASK)
     {
       case CS_IMGFMT_NONE:
       case CS_IMGFMT_PALETTED8:
-    if (simg->GetImageData())
-    {
-      if (transpidx < 0)
-        mipmap_1_p (cur_w, cur_h, 
-          (uint8 *)simg->GetImageData(), mipmap, simg->GetPalette());
-      else
-        mipmap_1_pt (cur_w, cur_h, (uint8*)simg->GetImageData(), mipmap,
-          simg->GetPalette(), transpidx);
-    }
-    nimg->ConvertFromRGBA (mipmap);
-    if (simg->GetAlpha ())
-    {
-      mipmap_1_a (cur_w, cur_h, (uint8 *)simg->GetAlpha (), Alpha);
-    }
-    break;
+        if (simg->GetImageData ())
+        {
+          if (transpidx < 0)
+            mipmap_1_p (cur_w, cur_h, (uint8*)simg->GetImageData (),
+              mipmap, simg->GetPalette ());
+          else
+            mipmap_1_pt (cur_w, cur_h, (uint8*)simg->GetImageData (), mipmap,
+              simg->GetPalette (), transpidx);
+        }
+        nimg->ConvertFromRGBA (mipmap);
+        if (simg->GetAlpha ())
+        {
+          mipmap_1_a (cur_w, cur_h, (uint8*)simg->GetAlpha (), Alpha);
+        }
+      break;
       case CS_IMGFMT_TRUECOLOR:
-    if (!transp)
-      mipmap_1 (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap);
-    else
-      mipmap_1_t (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap, *transp);
-    nimg->ConvertFromRGBA (mipmap);
-    break;
+        if (!transp)
+          mipmap_1 (cur_w, cur_h, (csRGBpixel*)simg->GetImageData (), mipmap);
+        else
+          mipmap_1_t (cur_w, cur_h, (csRGBpixel*)simg->GetImageData (),
+            mipmap, *transp);
+        nimg->ConvertFromRGBA (mipmap);
+      break;
     }
 
     simg = nimg;
     steps--;
-    cur_w = nimg->GetWidth();
-    cur_h = nimg->GetHeight();
+    cur_w = nimg->GetWidth ();
+    cur_h = nimg->GetHeight ();
   }
 
   return nimg;
 }
 
 csRef<iImage> csImageManipulate::Mipmap3D (iImage* source, int step, 
-    csRGBpixel* /*transp*/)
+  csRGBpixel* /*transp*/)
 {
-  const int nw = source->GetWidth() >> step;
-  const int nh = source->GetHeight() >> step;
-  const int nd = source->GetDepth() >> step;
+  const int nw = source->GetWidth () >> step;
+  const int nh = source->GetHeight () >> step;
+  const int nd = source->GetDepth () >> step;
   // @@@ Will look ugly...
   return Rescale (source, MAX (nw, 1), MAX (nh, 1), MAX (nd, 1));
 }
 
 csRef<iImage> csImageManipulate::Mipmap (iImage* source, int steps, 
-    csRGBpixel* transp)
+  csRGBpixel* transp)
 {
   if (steps == 0)
     return source;
 
-  if (source->GetImageType() == csimg3D)
+  if (source->GetImageType () == csimg3D)
     return Mipmap3D (source, steps, transp);
   else
     return Mipmap2D (source, steps, transp);
 }
 
 static csRGBpixel TransformOneColor (const csRGBpixel& s, const csColor4& mult,
-    const csColor4& add)
+  const csColor4& add)
 {
   float r = float (s.red) * mult.red + add.red;
   if (r < 0) r = 0; else if (r > 255) r = 255;
@@ -346,10 +359,10 @@ static csRGBpixel TransformOneColor (const csRGBpixel& s, const csColor4& mult,
 }
 
 csRef<iImage> csImageManipulate::TransformColor (iImage* source,
-    const csColor4& mult, const csColor4& add)
+  const csColor4& mult, const csColor4& add)
 {
-  const int Width = source->GetWidth();
-  const int Height = source->GetHeight();
+  const int Width = source->GetWidth ();
+  const int Height = source->GetHeight ();
 
   csRef<csImageMemory> nimg;
 
@@ -358,30 +371,30 @@ csRef<iImage> csImageManipulate::TransformColor (iImage* source,
 
   size_t i;
 
-  switch (source->GetFormat() & CS_IMGFMT_MASK)
+  switch (source->GetFormat () & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_NONE:
       return 0; // Not supported.
     case CS_IMGFMT_PALETTED8:
-      {
-        nimg.AttachNew (new csImageMemory (source));
-        src = source->GetPalette ();
-        dst = nimg->GetPalettePtr ();
-        for (i = 0 ; i < 256 ; i++)
-	  *dst++ = TransformOneColor (*src++, mult, add);
-      }
-      break;
+    {
+      nimg.AttachNew (new csImageMemory (source));
+      src = source->GetPalette ();
+      dst = nimg->GetPalettePtr ();
+      for (i = 0; i < 256; i++)
+        *dst++ = TransformOneColor (*src++, mult, add);
+    }
+    break;
     case CS_IMGFMT_TRUECOLOR:
-      {
-        nimg.AttachNew (new csImageMemory (Width, Height, source->GetFormat()));
-	csRGBpixel* mipmap = new csRGBpixel [Width * Height];
-        src = (const csRGBpixel*)source->GetImageData ();
-        dst = mipmap;
-        for (i = 0 ; i < size_t (Width * Height) ; i++)
-	  *dst++ = TransformOneColor (*src++, mult, add);
-        nimg->ConvertFromRGBA (mipmap);
-      }
-      break;
+    {
+      nimg.AttachNew (new csImageMemory (Width, Height, source->GetFormat ()));
+      csRGBpixel* mipmap = new csRGBpixel [Width * Height];
+      src = (const csRGBpixel*)source->GetImageData ();
+      dst = mipmap;
+      for (i = 0; i < size_t (Width * Height); i++)
+        *dst++ = TransformOneColor (*src++, mult, add);
+      nimg->ConvertFromRGBA (mipmap);
+    }
+    break;
   }
 
   return nimg;
@@ -397,8 +410,8 @@ static csRGBpixel GrayColor (const csRGBpixel& s)
 
 csRef<iImage> csImageManipulate::Gray (iImage* source)
 {
-  const int Width = source->GetWidth();
-  const int Height = source->GetHeight();
+  const int Width = source->GetWidth ();
+  const int Height = source->GetHeight ();
 
   csRef<csImageMemory> nimg;
 
@@ -406,30 +419,30 @@ csRef<iImage> csImageManipulate::Gray (iImage* source)
   csRGBpixel* dst;
   size_t i;
 
-  switch (source->GetFormat() & CS_IMGFMT_MASK)
+  switch (source->GetFormat () & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_NONE:
       return 0; // Not supported.
     case CS_IMGFMT_PALETTED8:
-      {
-        nimg.AttachNew (new csImageMemory (source));
-        src = source->GetPalette ();
-        dst = nimg->GetPalettePtr ();
-        for (i = 0 ; i < 256 ; i++)
-	  *dst++ = GrayColor (*src++);
-      }
-      break;
+    {
+      nimg.AttachNew (new csImageMemory (source));
+      src = source->GetPalette ();
+      dst = nimg->GetPalettePtr ();
+      for (i = 0; i < 256; i++)
+        *dst++ = GrayColor (*src++);
+    }
+    break;
     case CS_IMGFMT_TRUECOLOR:
-      {
-        nimg.AttachNew (new csImageMemory (Width, Height, source->GetFormat()));
-	csRGBpixel* mipmap = new csRGBpixel [Width * Height];
-        src = (const csRGBpixel*)source->GetImageData ();
-        dst = mipmap;
-        for (i = 0 ; i < size_t (Width * Height) ; i++)
-	  *dst++ = GrayColor (*src++);
-        nimg->ConvertFromRGBA (mipmap);
-      }
-      break;
+    {
+      nimg.AttachNew (new csImageMemory (Width, Height, source->GetFormat ()));
+      csRGBpixel* mipmap = new csRGBpixel [Width * Height];
+      src = (const csRGBpixel*)source->GetImageData ();
+      dst = mipmap;
+      for (i = 0; i < size_t (Width * Height); i++)
+        *dst++ = GrayColor (*src++);
+      nimg->ConvertFromRGBA (mipmap);
+    }
+    break;
   }
 
   return nimg;
@@ -437,97 +450,111 @@ csRef<iImage> csImageManipulate::Gray (iImage* source)
 
 csRef<iImage> csImageManipulate::Blur (iImage* source, csRGBpixel* transp)
 {
-  const int Width = source->GetWidth();
-  const int Height = source->GetHeight();
+  const int Width = source->GetWidth ();
+  const int Height = source->GetHeight ();
 
   csRef<csImageMemory> nimg;
-  nimg.AttachNew (new csImageMemory (source->GetWidth(), 
-    source->GetHeight(), source->GetFormat()));
+  nimg.AttachNew (new csImageMemory (source->GetWidth (), 
+    source->GetHeight (), source->GetFormat ()));
 
   csRGBpixel *mipmap = new csRGBpixel [Width * Height];
-  uint8* Alpha = nimg->GetAlphaPtr();
+  uint8* Alpha = nimg->GetAlphaPtr ();
 
   int transpidx = -1;
   if (transp && source->GetPalette ())
-      transpidx = csImageTools::ClosestPaletteIndex (source->GetPalette(), 
+  {
+    transpidx = csImageTools::ClosestPaletteIndex (source->GetPalette (), 
       *transp);
+  }
 
-  switch (source->GetFormat() & CS_IMGFMT_MASK)
+  switch (source->GetFormat () & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_NONE:
     case CS_IMGFMT_PALETTED8:
-      if (source->GetImageData())
+    {
+      if (source->GetImageData ())
       {
         if (transpidx < 0)
-          mipmap_0_p (source->GetWidth(), source->GetHeight(), 
-            (uint8 *)source->GetImageData(), mipmap, source->GetPalette());
+        {
+          mipmap_0_p (source->GetWidth (), source->GetHeight (), 
+            (uint8 *)source->GetImageData (), mipmap, source->GetPalette ());
+        }
         else
-          mipmap_0_pt(source->GetWidth(), source->GetHeight(), 
-            (uint8*)source->GetImageData(), mipmap, source->GetPalette(),
+        {
+          mipmap_0_pt (source->GetWidth (), source->GetHeight (), 
+            (uint8*)source->GetImageData (), mipmap, source->GetPalette (),
             transpidx);
+        }
       }
       nimg->ConvertFromRGBA (mipmap);
-      if (source->GetAlpha())
+      if (source->GetAlpha ())
       {
-        mipmap_0_a (source->GetWidth(), source->GetHeight(), 
-          (uint8 *)source->GetAlpha(), Alpha);
+        mipmap_0_a (source->GetWidth (), source->GetHeight (), 
+          (uint8 *)source->GetAlpha (), Alpha);
       }
-      break;
+    }
+    break;
     case CS_IMGFMT_TRUECOLOR:
+    {
       if (!transp)
-        mipmap_0 (source->GetWidth(), source->GetHeight(), 
-          (csRGBpixel *)source->GetImageData(), mipmap);
+        mipmap_0 (source->GetWidth (), source->GetHeight (), 
+          (csRGBpixel*)source->GetImageData (), mipmap);
       else
-        mipmap_0_t (source->GetWidth(), source->GetHeight(), 
-          (csRGBpixel *)source->GetImageData(), mipmap, *transp);
+        mipmap_0_t (source->GetWidth (), source->GetHeight (), 
+          (csRGBpixel*)source->GetImageData (), mipmap, *transp);
       nimg->ConvertFromRGBA (mipmap);
-      break;
+    }
+    break;
   }
 
   return nimg;
 }
 
 csRef<iImage> csImageManipulate::Crop (iImage* source, int x, int y, 
-    int width, int height)
+  int width, int height)
 {
-  const int Width = source->GetWidth();
-  const int Height = source->GetHeight();
+  const int Width = source->GetWidth ();
+  const int Height = source->GetHeight ();
 
   if (x+width > Width || y+height > Height) return 0;
   csRef<csImageMemory> nimg;
-  nimg.AttachNew (new csImageMemory (width, height, source->GetFormat()));
+  nimg.AttachNew (new csImageMemory (width, height, source->GetFormat ()));
 
   int i;
-  if (source->GetAlpha())
+  if (source->GetAlpha ())
   {
-    for ( i=0; i<height; i++ )
-      memcpy (nimg->GetAlphaPtr() + i*width, 
-	source->GetAlpha() + (i+y)*Width + x, width);
+    for (i = 0; i < height; i++)
+      memcpy (nimg->GetAlphaPtr () + i * width, 
+    source->GetAlpha () + (i + y) * Width + x, width);
   }
 
-  if (source->GetPalette())
+  if (source->GetPalette ())
   {
-    memcpy (nimg->GetPalettePtr(), source->GetPalette(), 
+    memcpy (nimg->GetPalettePtr (), source->GetPalette (), 
       256 * sizeof (csRGBpixel));
   }
 
-  if (source->GetImageData())
+  if (source->GetImageData ())
   {      
-    switch (source->GetFormat() & CS_IMGFMT_MASK)
+    switch (source->GetFormat () & CS_IMGFMT_MASK)
     {
       case CS_IMGFMT_NONE:
-        break;
+      break;
       case CS_IMGFMT_PALETTED8:
-        for ( i=0; i<height; i++ )
-          memcpy ( (uint8*)nimg->GetImagePtr() + i*width, 
-	    (uint8*)source->GetImageData() + (i+y)*Width + x, width);
-        break;
+        for (i = 0; i < height; i++)
+        {
+          memcpy ((uint8*)nimg->GetImagePtr () + i*width, 
+            (uint8*)source->GetImageData () + (i + y) * Width + x, width);
+        }
+      break;
       case CS_IMGFMT_TRUECOLOR:
-        for ( i=0; i<height; i++ )
-          memcpy ((csRGBpixel*)nimg->GetImagePtr() + i*width, 
-	    (csRGBpixel*)source->GetImageData() + (i+y)*Width + x, 
-	    width * sizeof (csRGBpixel));
-        break;
+        for (i = 0; i < height; i++)
+        {
+          memcpy ((csRGBpixel*)nimg->GetImagePtr () + i * width, 
+            (csRGBpixel*)source->GetImageData () + (i + y) * Width + x, 
+            width * sizeof (csRGBpixel));
+        }
+      break;
     }
   }
 
@@ -535,7 +562,7 @@ csRef<iImage> csImageManipulate::Crop (iImage* source, int x, int y,
 }
 
 csRef<iImage> csImageManipulate::Sharpen (iImage* source, int strength, 
-    csRGBpixel* transp)
+  csRGBpixel* transp)
 {
 /*
 
@@ -556,38 +583,40 @@ csRef<iImage> csImageManipulate::Sharpen (iImage* source, int strength,
   if (strength <= 0) 
     return source;
 
-  const int Width = source->GetWidth();
-  const int Height = source->GetHeight();
+  const int Width = source->GetWidth ();
+  const int Height = source->GetHeight ();
 
   // we need an RGB version of ourselves
   csRef<iImage> original; 
-  if ((source->GetFormat() & CS_IMGFMT_MASK) != CS_IMGFMT_TRUECOLOR)
+  if ((source->GetFormat () & CS_IMGFMT_MASK) != CS_IMGFMT_TRUECOLOR)
   {
     csImageMemory* nimg = new csImageMemory (source, CS_IMGFMT_TRUECOLOR);
-    nimg->SetFormat (CS_IMGFMT_TRUECOLOR | 
-      (source->GetAlpha() ? CS_IMGFMT_ALPHA : 0));
+    nimg->SetFormat (CS_IMGFMT_TRUECOLOR |
+      (source->GetAlpha () ? CS_IMGFMT_ALPHA : 0));
     original.AttachNew (nimg);
   }
   else
+  {
     original = source;
+  }
   csRef<iImage> blurry = Blur (original, transp);
   
-  csRGBpixel *result = new csRGBpixel [Width * Height];
-  csRGBpixel *src_o = (csRGBpixel*)original->GetImageData ();
-  csRGBpixel *src_b = (csRGBpixel*)blurry->GetImageData ();
-  csRGBpixel *dest = result;
+  csRGBpixel* result = new csRGBpixel [Width * Height];
+  csRGBpixel* src_o = (csRGBpixel*)original->GetImageData ();
+  csRGBpixel* src_b = (csRGBpixel*)blurry->GetImageData ();
+  csRGBpixel* dest = result;
  
   for (int n = Width * Height; n > 0; n--)
   {
     int v;
     #define DO(comp)  \
       v = src_o->comp + ((strength * (src_o->comp - src_b->comp)) >> 8);  \
-      dest->comp = (v>255)?255:((v<0)?0:v)
+      dest->comp = (v > 255) ? 255 : ((v < 0) ? 0 : v)
 
-    DO(red);
-    DO(green);
-    DO(blue);
-    DO(alpha);
+    DO (red);
+    DO (green);
+    DO (blue);
+    DO (alpha);
 
     #undef DO
 
@@ -597,40 +626,40 @@ csRef<iImage> csImageManipulate::Sharpen (iImage* source, int strength,
   }
 
   csRef<csImageMemory> resimg;
-  resimg.AttachNew (new csImageMemory (source->GetWidth(), source->GetHeight(),
-    result, true));
+  resimg.AttachNew (new csImageMemory (source->GetWidth (),
+    source->GetHeight (), result, true));
 
   return resimg;
 }
 
 csRef<iImage> csImageManipulate::RenormalizeNormals (iImage* source)
 {
-  const int Width = source->GetWidth();
-  const int Height = source->GetHeight();
-  const int Depth = source->GetDepth();
+  const int Width = source->GetWidth ();
+  const int Height = source->GetHeight ();
+  const int Depth = source->GetDepth ();
 
   CS::ImageAutoConvert imageRGB (source,
-    (source->GetFormat() & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR);
+    (source->GetFormat () & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR);
   
   csRef<csImageMemory> resimg;
   resimg.AttachNew (new csImageMemory (Width, Height, Depth,
-    imageRGB->GetFormat()));
-  csRGBpixel *src = (csRGBpixel*)imageRGB->GetImageData ();
-  csRGBpixel *dest = (csRGBpixel*)resimg->GetImageData ();
+    imageRGB->GetFormat ()));
+  csRGBpixel* src = (csRGBpixel*)imageRGB->GetImageData ();
+  csRGBpixel* dest = (csRGBpixel*)resimg->GetImageData ();
  
   for (int n = Width * Height * Depth; n > 0; n--)
   {
     csRGBpixel n_biased (*src);
     csVector3 nCurrent (
-      n_biased.red*(2.0f/255.0f)-1.0f,
-      n_biased.green*(2.0f/255.0f)-1.0f,
-      n_biased.blue*(2.0f/255.0f)-1.0f);
-    nCurrent.Normalize();
+      n_biased.red * (2.0f / 255.0f) - 1.0f,
+      n_biased.green * (2.0f / 255.0f) - 1.0f,
+      n_biased.blue * (2.0f / 255.0f) - 1.0f);
+    nCurrent.Normalize ();
     
     csRGBpixel n_new (
-      csClamp (int(nCurrent.x*127.5f+127.5f), 255, 0),
-      csClamp (int(nCurrent.y*127.5f+127.5f), 255, 0),
-      csClamp (int(nCurrent.z*127.5f+127.5f), 255, 0),
+      csClamp (int(nCurrent.x * 127.5f + 127.5f), 255, 0),
+      csClamp (int(nCurrent.y * 127.5f + 127.5f), 255, 0),
+      csClamp (int(nCurrent.z * 127.5f + 127.5f), 255, 0),
       n_biased.alpha);
     *dest = n_new;
 

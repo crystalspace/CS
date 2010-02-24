@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 Dan Hardfeldt and Seth Yastrov
+    Copyright (C) 2005 Dan Hardfeldt, Seth Yastrov and Jelle Hellemans
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,86 +25,158 @@
 
 #include "ceguitexture.h"
 
-csCEGUITexture::csCEGUITexture (CEGUI::Renderer* owner, iObjectRegistry *reg) 
-  : CEGUI::Texture (owner)
+CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {
-  renderer = owner;
-  obj_reg = reg;
-  hTxt = 0;
-}
-csCEGUITexture::~csCEGUITexture ()
-{
-}
-
-CEGUI::ushort csCEGUITexture::getWidth () const
-{
-  int w = 0, h = 0;
-  if (!hTxt) 
+  //----------------------------------------------------------------------------//
+  Texture::Texture (CEGUI::Renderer* owner, iObjectRegistry *reg) 
   {
-    return 0;
+    renderer = owner;
+    obj_reg = reg;
+    hTxt = 0;
   }
 
-  hTxt->GetRendererDimensions(w,h);
-  return w;
-}
-
-CEGUI::ushort csCEGUITexture::getHeight () const
-{
-  int w = 0, h = 0;
-  if (!hTxt) 
+  //----------------------------------------------------------------------------//
+  Texture::~Texture ()
   {
-    return 0;
   }
 
-  hTxt->GetRendererDimensions(w,h);
-  return h;
-}
-
-void csCEGUITexture::loadFromFile (const CEGUI::String &filename, 
-                                   const CEGUI::String& /*resourceGroup*/)
-{
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (obj_reg);
-  if (!loader)
-    return;
-
-  iTextureWrapper* txt = loader->LoadTexture(filename.c_str(), filename.c_str());
-  if(!txt)
-    return;
-
-  hTxt = txt->GetTextureHandle();
-  hTxt->SetTextureClass ("cegui");
-}
-
-void csCEGUITexture::loadFromMemory (const void *buffPtr, 
-  CEGUI::uint buffWidth, CEGUI::uint buffHeight, CEGUI::Texture::PixelFormat pixFmt)
-{
-  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (obj_reg);
-  if (!g3d)
-    return;
-
-  csRef<csImageMemory> image;
-  // this should never happen as CEGUI itself will only ask for RGBA
-  if (pixFmt != CEGUI::Texture::PF_RGBA)
-    return;
-  image.AttachNew(new csImageMemory (buffWidth, buffHeight, buffPtr, 
-    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-
-  iTextureManager* txtmgr = g3d->GetTextureManager();
-  if (txtmgr)
+  //----------------------------------------------------------------------------//
+  const CEGUI::Size& Texture::getSize() const
   {
-    /* Hack: assume memory textures are for fonts only; disable filtering
-     * to have them look a bit crisper */
-    hTxt = txtmgr->RegisterTexture (image, CS_TEXTURE_2D | CS_TEXTURE_NOFILTER);
-    hTxt->SetTextureClass ("nocompress");
+    return size;
   }
-}
 
-CEGUI::Renderer* csCEGUITexture::getRenderer () const
-{
-  return renderer;
-}
+  //----------------------------------------------------------------------------//
+  const CEGUI::Size& Texture::getOriginalDataSize() const
+  {
+    return dataSize;
+  }
 
-iTextureHandle* csCEGUITexture::GetTexHandle () const
-{
-  return hTxt;
-}
+  //----------------------------------------------------------------------------//
+  const CEGUI::Vector2& Texture::getTexelScaling() const
+  {
+    return texelScaling;
+  }
+
+  //----------------------------------------------------------------------------//
+  void Texture::loadFromFile (const CEGUI::String &filename, 
+                                const CEGUI::String& /*resourceGroup*/)
+  {
+    csRef<iLoader> loader = csQueryRegistry<iLoader> (obj_reg);
+    if (!loader)
+      return;
+
+    iTextureWrapper* txt = loader->LoadTexture(filename.c_str(), filename.c_str());
+    if(!txt)
+      return;
+
+    hTxt = txt->GetTextureHandle();
+    hTxt->SetTextureClass ("cegui");
+
+    updateCachedSizeValues();
+    updateCachedScaleValues();
+  }
+
+  //----------------------------------------------------------------------------//
+  void Texture::loadFromMemory (const void *buffPtr, 
+                                  const CEGUI::Size& buffer_size, 
+                                  CEGUI::Texture::PixelFormat pixFmt)
+  {
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (obj_reg);
+    if (!g3d)
+      return;
+
+    csRef<csImageMemory> image;
+    // this should never happen as CEGUI itself will only ask for RGBA
+    if (pixFmt != CEGUI::Texture::PF_RGBA)
+      return;
+    image.AttachNew(new csImageMemory (buffer_size.d_width, buffer_size.d_height, buffPtr, 
+      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+
+    iTextureManager* txtmgr = g3d->GetTextureManager();
+    if (txtmgr)
+    {
+      /* Hack: assume memory textures are for fonts only; disable filtering
+      * to have them look a bit crisper */
+      hTxt = txtmgr->RegisterTexture (image, CS_TEXTURE_2D | CS_TEXTURE_NOFILTER);
+      hTxt->SetTextureClass ("cegui");
+    }
+
+    size.d_width = image->GetWidth();
+    size.d_height = image->GetHeight();
+    dataSize = buffer_size;
+    updateCachedScaleValues();
+  }
+
+  //----------------------------------------------------------------------------//
+  void Texture::saveToMemory(void* buffer)
+  {
+    // @@@: Not implemented yet
+  }
+
+  //----------------------------------------------------------------------------//
+  CEGUI::Renderer* Texture::getRenderer () const
+  {
+    return renderer;
+  }
+
+  //----------------------------------------------------------------------------//
+  void Texture::updateCachedSizeValues()
+  {
+    int w, h;
+    hTxt->GetRendererDimensions(w, h);
+    size.d_width = w;
+    size.d_height = h;
+    dataSize = size;
+  }
+
+  //----------------------------------------------------------------------------//
+  void Texture::updateCachedScaleValues()
+  {
+    //
+    // calculate what to use for x scale
+    //
+    const float orgW = dataSize.d_width;
+    const float texW = size.d_width;
+
+    // if texture and original data width are the same, scale is based
+    // on the original size.
+    // if texture is wider (and source data was not stretched), scale
+    // is based on the size of the resulting texture.
+    texelScaling.d_x = 1.0f / ((orgW == texW) ? orgW : texW);
+
+    //
+    // calculate what to use for y scale
+    //
+    const float orgH = dataSize.d_height;
+    const float texH = size.d_height;
+
+    // if texture and original data height are the same, scale is based
+    // on the original size.
+    // if texture is taller (and source data was not stretched), scale
+    // is based on the size of the resulting texture.
+    texelScaling.d_y = 1.0f / ((orgH == texH) ? orgH : texH);
+  }
+
+  //----------------------------------------------------------------------------//
+  iTextureHandle* Texture::GetTexHandle () const
+  {
+    return hTxt;
+  }
+
+  //----------------------------------------------------------------------------//
+  void Texture::SetTexHandle(iTextureHandle* handle)
+  {
+    hTxt = handle;
+
+    if (hTxt)
+      updateCachedSizeValues();
+    else
+      size = dataSize = CEGUI::Size(0, 0);
+
+    updateCachedScaleValues();
+  }
+
+  //----------------------------------------------------------------------------//
+
+} CS_PLUGIN_NAMESPACE_END(cegui)

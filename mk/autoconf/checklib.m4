@@ -243,7 +243,7 @@ AC_DEFUN([_CS_CLPCF_CVAR], [AS_TR_SH([cs_cv_prog_pkg_config_$1])])
 #	list of tuples stored in the shell variable VARIABLE.
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_CHECK_LIB_CONFIG_FLAGS],
-    [CS_CHECK_TOOLS(_CS_CLCF_SHVAR([$2]), [$2-config])
+    [CS_PATH_TOOL(_CS_CLCF_SHVAR([$2]), [$2-config])
     AS_IF([test -n "$_CS_CLCF_SHVAR([$2])"],
 	[AS_IF([test -z "$_CS_CLCF_CVAR([$2])"],
 	    [AS_IF([$_CS_CLCF_SHVAR([$2]) --cflags --libs >/dev/null 2>&1],

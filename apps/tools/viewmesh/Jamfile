@@ -2,8 +2,14 @@ SubDir TOP apps tools viewmesh ;
 
 if $(CEGUI.AVAILABLE) = "yes"
 {
+  VIEWMESH.SOURCES = [ Filter [ Wildcard *.cpp *.h ] : cal3dasset.cpp ] ;
+  if $(CAL3D.AVAILABLE) = yes
+  {
+    VIEWMESH.SOURCES += cal3dasset.cpp ;
+  }
+  
   Description viewmesh : "mesh viewing utility" ;
-  Application viewmesh : [ Wildcard *.cpp *.h ] ;
+  Application viewmesh : $(VIEWMESH.SOURCES) ;
   LinkWith viewmesh : crystalspace ;
   CFlags viewmesh : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
   MsvcCFlags viewmesh : "/D CS_HAVE_CAL3D" ;
@@ -18,7 +24,7 @@ if $(CEGUI.AVAILABLE) = "yes"
 
   SubVariant static ;
   Description viewmesh_static : "mesh viewing utility (static build)" ;
-  Application viewmesh_static : [ Wildcard *.cpp *.h ] : nohelp independent noinstall ;
+  Application viewmesh_static : $(VIEWMESH.SOURCES) : nohelp independent noinstall ;
   CFlags viewmesh_static : [ FDefines CS_STATIC_LINKED ] $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
   MsvcCFlags viewmesh_static : "/D CS_HAVE_CAL3D" ;
   LinkWith viewmesh_static : crystalspace ;

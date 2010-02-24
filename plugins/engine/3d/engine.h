@@ -70,13 +70,13 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
   class csLight;
+  class csMeshWrapper;
 }
 CS_PLUGIN_NAMESPACE_END(Engine)
 
 class csEngine;
 class csLightPatchPool;
 class csMaterialList;
-class csMeshWrapper;
 class csPolygon3D;
 class csSector;
 class csSectorList;
@@ -180,7 +180,7 @@ private:
 /**
  * A list of meshes for the engine.
  */
-class csEngineMeshList : public csMeshList
+class csEngineMeshList : public CS_PLUGIN_NAMESPACE_NAME(Engine)::csMeshList
 {
 public:
   csEngineMeshList () : csMeshList (256, 256) { }
@@ -190,12 +190,6 @@ public:
 
 
 #include "csutil/deprecated_warn_off.h"
-
-struct csImposterUpdateQueue
-{
-  csRef<iRenderView> rview;
-  csWeakRefArray<csImposterProcTex> queue;
-};
 
 using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
@@ -243,7 +237,7 @@ public:
   /// Get the iObject for the engine.
   virtual iObject *QueryObject();
 
-  iObjectRegistry* GetObjectRegistry() const
+  inline iObjectRegistry* GetObjectRegistry() const
   {
     return objectRegistry;
   }
@@ -642,17 +636,6 @@ public:
     return renderLoopManager;
   }
 
-  /**
-   * Add an imposter to the update queue.
-   */
-  void AddImposterToUpdateQueue (csImposterProcTex* imptex,
-      iRenderView* rview);
-
-  /**
-   * Handle imposters.
-   */
-  void HandleImposters ();
-
   iMaterialWrapper* GetDefaultPortalMaterial () const
   { return defaultPortalMaterial; }
 
@@ -1014,12 +997,6 @@ private:
   
   /// Default portal material
   csRef<iMaterialWrapper> defaultPortalMaterial;
-
-  /**
-   * List of imposters that need to be rendered to texture.
-   * There is a different list for every distinct camera instance.
-   */
-  csHash<csImposterUpdateQueue,long> imposterUpdateQueue;
   
   csRef<csShaderVariable> lightAttenuationTexture;
 

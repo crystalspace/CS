@@ -19,6 +19,9 @@
 #include "cssysdef.h"
 #include "cstool/meshfilter.h"
 
+#include "iengine/scenenode.h"
+#include "iutil/object.h"
+
 using namespace CS::Utility;
 
 MeshFilter::MeshFilter ()
@@ -31,13 +34,26 @@ MeshFilter::~MeshFilter ()
 {
 }
 
-void MeshFilter::AddFilterMesh (iMeshWrapper* mesh)
+void MeshFilter::AddFilterMesh (iMeshWrapper* mesh, bool addChildren)
 {
   filteredMeshes.Add (mesh);
+
+  if (addChildren)
+  {
+    const csRef<iSceneNodeArray> itr = mesh->QuerySceneNode()->GetChildrenArray();
+    for (size_t i = 0 ; i < itr->GetSize () ; i++)
+      if (itr->Get(i)->QueryMesh())
+        filteredMeshes.Add (itr->Get(i)->QueryMesh());
+  }
 }
 
 void MeshFilter::RemoveFilterMesh (iMeshWrapper* mesh)
 {
+  const csRef<iSceneNodeArray> itr = mesh->QuerySceneNode()->GetChildrenArray();
+  for (size_t i = 0 ; i < itr->GetSize () ; i++)
+    if (itr->Get(i)->QueryMesh())
+      filteredMeshes.Delete (itr->Get(i)->QueryMesh());
+
   filteredMeshes.Delete (mesh);
 }
 
@@ -51,4 +67,9 @@ bool MeshFilter::IsMeshFiltered (iMeshWrapper* mesh) const
   {
     return !filteredMeshes.Contains (mesh);
   }
+}
+
+void MeshFilter::Clear ()
+{
+  filteredMeshes.DeleteAll ();
 }

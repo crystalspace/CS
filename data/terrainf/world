@@ -39,26 +39,22 @@
         <texture name="clouds">
             <file>clouddome.jpg</file>
         </texture>
-        <texture name="sky_up">
-            <file>skybox_u.jpg</file>
-        </texture>
-        <texture name="sky_down">
-            <file>skybox_d.jpg</file>
-        </texture>
-        <texture name="sky_left">
-            <file>skybox_l.jpg</file>
-        </texture>
-        <texture name="sky_right">
-            <file>skybox_r.jpg</file>
-        </texture>
-        <texture name="sky_front">
-            <file>skybox_f.jpg</file>
-        </texture>
-        <texture name="sky_back">
-            <file>skybox_b.jpg</file>
+        <texture name="sky">
+            <type>crystalspace.texture.loader.cubemap</type>
+            <params>
+                <north>skybox_f.jpg</north>
+                <south>skybox_b.jpg</south>
+                <east>skybox_r.jpg</east>
+                <west>skybox_l.jpg</west>
+                <top>skybox_u.jpg</top>
+                <bottom>skybox_d.jpg</bottom>
+            </params>
         </texture>
     </textures>
     <shaders>
+        <shader>
+            <file>/shader/sky/basic_cubemap.xml</file>
+        </shader>
         <shader>
             <file>/shader/terrain/splat.xml</file>
         </shader>
@@ -106,29 +102,10 @@
             <texture>clouds</texture>
             <shader type="base">lighting_fullbright</shader>
         </material>
-        <material name="sky_up">
-            <texture>sky_up</texture>
-            <shader type="base">lighting_fullbright</shader>
-        </material>
-        <material name="sky_down">
-            <texture>sky_down</texture>
-            <shader type="base">lighting_fullbright</shader>
-        </material>
-        <material name="sky_left">
-            <texture>sky_left</texture>
-            <shader type="base">lighting_fullbright</shader>
-        </material>
-        <material name="sky_right">
-            <texture>sky_right</texture>
-            <shader type="base">lighting_fullbright</shader>
-        </material>
-        <material name="sky_front">
-            <texture>sky_front</texture>
-            <shader type="base">lighting_fullbright</shader>
-        </material>
-        <material name="sky_back">
-            <texture>sky_back</texture>
-            <shader type="base">lighting_fullbright</shader>
+        <material name="sky">
+            <shader type="base">sky_basic_cubemap</shader>
+            <shader type="diffuse">sky_basic_cubemap</shader>
+            <shadervar type="texture" name="tex sky">sky</shadervar>
         </material>
     </materials>
     <library>grass.lib</library>
@@ -146,7 +123,16 @@
         <forward x="0" y="0" z="1" />
         <up x="0" y="1" z="0" />
     </start>
-    <meshfact name="skydome">
+    <meshfact name="clouds">
+        <plugin>genmeshFactory</plugin>
+        <nolighting />
+        <params>
+            <sphere rimvertices="6" reversed="true">
+                <radius x="1000" y="1000" z="1000" />
+            </sphere>
+        </params>
+    </meshfact>
+    <meshfact name="sky">
         <plugin>genmeshFactory</plugin>
         <nolighting />
         <params>
@@ -178,130 +164,6 @@
                     </feederproperties>
                 </cell>
             </cells>
-        </params>
-    </meshfact>
-    <meshfact name="factory_room_sky">
-        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
-        <nolighting />
-        <params>
-            <numvt>24</numvt>
-            <v x="-1000" y="1000" z="-1000" u="0.005" v="0.005" />
-            <v x="-1000" y="1000" z="1000" u="0.995" v="0.005" />
-            <v x="-1000" y="-1000" z="1000" u="0.995" v="0.995" />
-            <v x="-1000" y="-1000" z="-1000" u="0.00500003" v="0.995" />
-            <v x="-1000" y="1000" z="1000" u="0.005" v="0.005" />
-            <v x="1000" y="1000" z="1000" u="0.995" v="0.005" />
-            <v x="1000" y="-1000" z="1000" u="0.995" v="0.995" />
-            <v x="-1000" y="-1000" z="1000" u="0.00500003" v="0.995" />
-            <v x="-1000" y="1000" z="-1000" u="0.005" v="0.005" />
-            <v x="1000" y="1000" z="-1000" u="0.995" v="0.005" />
-            <v x="1000" y="1000" z="1000" u="0.995" v="0.995" />
-            <v x="-1000" y="1000" z="1000" u="0.00500003" v="0.995" />
-            <v x="1000" y="-1000" z="-1000" u="0.005" v="0.005" />
-            <v x="-1000" y="-1000" z="-1000" u="0.995" v="0.005" />
-            <v x="-1000" y="-1000" z="1000" u="0.995" v="0.995" />
-            <v x="1000" y="-1000" z="1000" u="0.00500003" v="0.995" />
-            <v x="1000" y="1000" z="1000" u="0.005" v="0.005" />
-            <v x="1000" y="1000" z="-1000" u="0.995" v="0.005" />
-            <v x="1000" y="-1000" z="-1000" u="0.995" v="0.995" />
-            <v x="1000" y="-1000" z="1000" u="0.00500003" v="0.995" />
-            <v x="1000" y="1000" z="-1000" u="0.005" v="0.005" />
-            <v x="-1000" y="1000" z="-1000" u="0.995" v="0.005" />
-            <v x="-1000" y="-1000" z="-1000" u="0.995" v="0.995" />
-            <v x="1000" y="-1000" z="-1000" u="0.00500003" v="0.995" />
-            <mixmode>
-                <copy />
-            </mixmode>
-            <n x="1" y="0" z="0" />
-            <n x="1" y="0" z="0" />
-            <n x="1" y="0" z="0" />
-            <n x="1" y="0" z="0" />
-            <n x="0" y="0" z="-1" />
-            <n x="0" y="0" z="-1" />
-            <n x="0" y="0" z="-1" />
-            <n x="0" y="0" z="-1" />
-            <n x="0" y="-1" z="0" />
-            <n x="0" y="-1" z="0" />
-            <n x="0" y="-1" z="0" />
-            <n x="0" y="-1" z="0" />
-            <n x="0" y="1" z="0" />
-            <n x="0" y="1" z="0" />
-            <n x="0" y="1" z="0" />
-            <n x="0" y="1" z="0" />
-            <n x="-1" y="0" z="0" />
-            <n x="-1" y="0" z="0" />
-            <n x="-1" y="0" z="0" />
-            <n x="-1" y="0" z="0" />
-            <n x="0" y="0" z="1" />
-            <n x="0" y="0" z="1" />
-            <n x="0" y="0" z="1" />
-            <n x="0" y="0" z="1" />
-            <submesh name="0">
-                <material>sky_left</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="0" />
-                    <e c0="1" />
-                    <e c0="2" />
-                    <e c0="0" />
-                    <e c0="2" />
-                    <e c0="3" />
-                </indexbuffer>
-            </submesh>
-            <submesh name="0">
-                <material>sky_front</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="4" />
-                    <e c0="5" />
-                    <e c0="6" />
-                    <e c0="4" />
-                    <e c0="6" />
-                    <e c0="7" />
-                </indexbuffer>
-            </submesh>
-            <submesh name="0">
-                <material>sky_down</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="12" />
-                    <e c0="13" />
-                    <e c0="14" />
-                    <e c0="12" />
-                    <e c0="14" />
-                    <e c0="15" />
-                </indexbuffer>
-            </submesh>
-            <submesh name="0">
-                <material>sky_back</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="20" />
-                    <e c0="21" />
-                    <e c0="22" />
-                    <e c0="20" />
-                    <e c0="22" />
-                    <e c0="23" />
-                </indexbuffer>
-            </submesh>
-            <submesh name="0">
-                <material>sky_right</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="16" />
-                    <e c0="17" />
-                    <e c0="18" />
-                    <e c0="16" />
-                    <e c0="18" />
-                    <e c0="19" />
-                </indexbuffer>
-            </submesh>
-            <submesh name="0">
-                <material>sky_up</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="8" />
-                    <e c0="9" />
-                    <e c0="10" />
-                    <e c0="8" />
-                    <e c0="10" />
-                    <e c0="11" />
-                </indexbuffer>
-            </submesh>
         </params>
     </meshfact>
     <sector name="room">
@@ -341,7 +203,7 @@
         <meshobj name="clouds">
             <plugin>genmesh</plugin>
             <params>
-                <factory>skydome</factory>
+                <factory>clouds</factory>
                 <mixmode>
                     <add />
                 </mixmode>
@@ -358,12 +220,14 @@
             <noshadows />
             <plugin>crystalspace.mesh.loader.genmesh</plugin>
             <params>
-                <factory>factory_room_sky</factory>
+                <factory>sky</factory>
                 <color red="1" green="1" blue="1" />
                 <manualcolors />
                 <mixmode>
                     <copy />
                 </mixmode>
+                <material>sky</material>
+                <lighting>no</lighting>
             </params>
             <camera />
             <zfill />

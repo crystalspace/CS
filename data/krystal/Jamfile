@@ -1,0 +1,7 @@
+SubDir TOP data krystal ;
+
+{
+local files = krystal skelkrystal_rig [ Wildcard *.png *.xml ] ;
+InstallData $(files) : data krystal ;
+FileListEntriesData $(files) : krystal : data-demo ;
+}

@@ -30,6 +30,7 @@
 #include "ivaria/conout.h"
 #include "ivaria/decal.h"
 #include "ivaria/dynamics.h"
+#include "ivaria/dynamicsdebug.h"
 #include "ivaria/engseq.h"
 #include "ivaria/gradient.h"
 #include "ivaria/keyval.h"

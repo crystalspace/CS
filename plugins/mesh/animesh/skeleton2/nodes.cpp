@@ -188,7 +188,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   csPtr<iSkeletonAnimNode2> AnimationNodeFactory::CreateInstance (
     iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
   {
-    return new AnimationNode (this);
+    csRef<iSkeletonAnimNode2> ref;
+    ref.AttachNew (new AnimationNode (this));
+    return csPtr<iSkeletonAnimNode2> (ref);
   }
 
   const char* AnimationNodeFactory::GetNodeName () const
@@ -214,6 +216,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
   void AnimationNode::Play ()
   {
+    CS_ASSERT (factory->animation);
+
     if (!isPlaying && factory->automaticReset)
       playbackPosition = 0;
 
@@ -278,6 +282,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       else
       {
         playbackPosition = duration;
+        if (factory->automaticStop)
+          isPlaying = false;
+
+        BaseNodeSingle::FireAnimationFinishedCb ();
+      }
+    }
+
+    else if (playbackPosition < 0.0f)
+    {
+      if (factory->cyclic)
+      {
+        while (playbackPosition < 0.0f)
+        {
+          playbackPosition += duration;
+          BaseNodeSingle::FireAnimationCycleCb ();
+        }
+      }
+      else
+      {
+        playbackPosition = 0.0f;
         if (factory->automaticStop)
           isPlaying = false;
 

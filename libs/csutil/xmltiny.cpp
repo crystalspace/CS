@@ -608,7 +608,20 @@ const char* csTinyXmlDocument::Parse (iFile* file, bool collapse)
 
 const char* csTinyXmlDocument::Parse (iDataBuffer* buf, bool collapse)
 {
-  return Parse ((const char*)buf->GetData (), collapse);
+  size_t size = buf->GetSize();
+  char *data = (char*)cs_malloc (size + 1);
+  memcpy(data, buf->GetData(), size);
+  data[size] = '\0';
+#ifdef CS_DEBUG
+  if (strlen (data) != size)
+  {
+    cs_free (data);
+    return "File contains one or more null characters";
+  }
+#endif
+  const char *error = Parse (data, collapse);
+  cs_free (data);
+  return error;
 }
 
 const char* csTinyXmlDocument::Parse (iString* str, bool collapse)

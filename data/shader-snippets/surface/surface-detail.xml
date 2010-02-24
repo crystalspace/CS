@@ -1,0 +1,108 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input file="/shader/snippets/texCoord.inp" />
+    <input name="surfaceColorIn" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </input>
+    
+    <input name="texDetail" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex detail" destination="fragmentIn.texDetail" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texDetail" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texDetail = fragmentIn.texDetail;
+      </block>
+    </input>
+    
+    <input name="texDetailScale" type="float2" default="complex">
+      <block location="shadervars">
+	<shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="tex detail scale" 
+		     destination="fragmentIn.texDetailScale" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<varying type="float2" name="texDetailScale" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texDetailScale = fragmentIn.texDetailScale;
+      </block>
+    </input>
+    
+    <block location="cg:vertexMain">
+      surfaceColor = surfaceColorIn;
+      surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      <?if vars."tex detail".texture ?>
+      {
+	surfaceColor.a = surfaceColorIn.a;
+	surfaceColor.rgb *= (tex2D (texDetail, texCoord*texDetailScale).rgb)*2;
+	surfaceColor_attr_perfragment = true;
+      }
+      <?else?>
+      {
+	surfaceColor = surfaceColorIn;
+	surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+      }
+      <?endif?>
+    </block>
+    
+    <output name="surfaceColor" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+  
+  <technique priority="50">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input file="/shader/snippets/texCoord.inp" />
+    <input name="surfaceColorIn" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </input>
+    
+    
+    <block location="cg:vertexMain">
+      surfaceColor = surfaceColorIn;
+      surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      surfaceColor = surfaceColorIn;
+      surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+    </block>
+    
+    <output name="surfaceColor" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+</snippet>

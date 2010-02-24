@@ -64,6 +64,23 @@
 
 #include "csextern.h"
 
+/* On MinGW, with some versions of the MinGW runtime (3.15 and above), using
+   the STL together with -ansi is broken: the C runtime functions swprintf()
+   and vswprintf() are not declared, but an STL header (<cwchar>)
+   unconditionally references it via 'using'.
+   To work around the problem provide our own dummy declarations of these
+   functions. */
+#if defined(__STRICT_ANSI__) && \
+    (defined(CS_ANSI_BREAKS_SWPRINTF) || defined(CS_ANSI_BREAKS_VSWPRINTF))
+#if defined(CS_ANSI_BREAKS_SWPRINTF)
+int swprintf ();
+#endif
+#if defined(CS_ANSI_BREAKS_VSWPRINTF)
+int vswprintf ();
+#endif
+#include <cwchar>
+#endif
+
 /*
  * Default definitions for requested functionality.  Platform-specific
  * configuration files may override these.
@@ -943,7 +960,21 @@ namespace CS
 
 // gcc can perform usefull checking for printf/scanf format strings, just add
 // this define at the end of the function declaration
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
+/* Newer GCCs know different 'archetypes' of format string styles.
+ * CS format strings are on the level of the GNU C library, so use that
+ * archetype. */
+#  define CS_GNUC_PRINTF(format_idx, arg_idx) \
+     __attribute__((format (gnu_printf, format_idx, arg_idx)))
+#  define CS_GNUC_SCANF(format_idx, arg_idx) \
+     __attribute__((format (gnu_scanf, format_idx, arg_idx)))
+// Unfortunately, gcc doesn't support format argument checking for wide strings
+#  define CS_GNUC_WPRINTF(format_idx, arg_idx) \
+     /*__attribute__((format (__wprintf__, format_idx, arg_idx)))*/
+#  define CS_GNUC_WSCANF(format_idx, arg_idx) \
+     /*__attribute__((format (__wscanf__, format_idx, arg_idx)))*/
+#elif __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+// Use default archetype for older versions.
 #  define CS_GNUC_PRINTF(format_idx, arg_idx) \
      __attribute__((format (__printf__, format_idx, arg_idx)))
 #  define CS_GNUC_SCANF(format_idx, arg_idx) \

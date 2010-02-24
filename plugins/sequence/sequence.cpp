@@ -30,7 +30,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 csSequence::csSequence (iSequenceManager* seqmgr) :
   scfImplementationType(this), first (0), last (0)

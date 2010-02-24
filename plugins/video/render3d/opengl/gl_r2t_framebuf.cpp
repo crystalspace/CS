@@ -582,7 +582,7 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment<>& target,
   }
 }
 
-void csGLRender2TextureFramebuf::FinishDraw ()
+void csGLRender2TextureFramebuf::FinishDraw (bool readbackTargets)
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
 
@@ -593,6 +593,22 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     if (colorTarget.IsValid()) GrabFramebuffer (colorTarget, ifColor);
     if (depthTarget.IsValid()) GrabFramebuffer (depthTarget, ifDepth);
     rt_onscreen = false;
+    
+    if (readbackTargets)
+    {
+      if (colorTarget.IsValid())
+      {
+	csGLBasicTextureHandle* tex_mm = 
+	  static_cast<csGLBasicTextureHandle*> ((iTextureHandle*)colorTarget.texture);
+	tex_mm->ReadbackFramebuffer();
+      }
+      if (depthTarget.IsValid())
+      {
+	csGLBasicTextureHandle* tex_mm = 
+	  static_cast<csGLBasicTextureHandle*> ((iTextureHandle*)depthTarget.texture);
+	tex_mm->ReadbackFramebuffer();
+      }
+    }
   }
 }
 

@@ -31,14 +31,13 @@
 CS_LEAKGUARD_IMPLEMENT (csRenderBuffer);
 
 csRenderBuffer::csRenderBuffer (size_t size, csRenderBufferType type, 
-				csRenderBufferComponentType componentType, 
-				uint componentCount, size_t rangeStart, 
-				size_t rangeEnd, bool copy) :
-  scfImplementationType(this, 0), bufferSize (size), props (type, 
+  csRenderBufferComponentType componentType, uint componentCount,
+  size_t rangeStart, size_t rangeEnd, bool copy) :
+    scfImplementationType (this, 0), bufferSize (size), props (type, 
     componentType, componentCount, copy), rangeStart (rangeStart), 
     rangeEnd (rangeEnd), version (0),  buffer (0)
 {
-#if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
+#if defined (CS_DEBUG) && defined (DEBUG_LOCKING)
   lockStack = 0;
 #endif
 }
@@ -48,8 +47,8 @@ csRenderBuffer::~csRenderBuffer ()
 #if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
   if (lockStack != 0)
   {
-    lockStack->Print();
-    lockStack->Free();
+    lockStack->Print ();
+    lockStack->Free ();
   }
 #endif
   //Notify callback
@@ -67,7 +66,7 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
       || (props.lastLock > CS_BUF_LOCK_READ)
       || ((uint)lockType != props.lastLock))
     {
-#if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
+#if defined (CS_DEBUG) && defined (DEBUG_LOCKING)
       if (lockStack)
       {
         csPrintf ("Renderbuffer %p Lock() while locked:\n", this);
@@ -81,7 +80,7 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
   props.lastLock = lockType;
   props.isLocked = true;
 
-  void *rb = 0;
+  void* rb = 0;
 
   if (masterBuffer.IsValid ())
   {
@@ -99,9 +98,9 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
     rb = buffer;
   }
 
-  CS_ASSERT(rb != 0);
+  CS_ASSERT (rb != 0);
 
-#if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
+#if defined (CS_DEBUG) && defined (DEBUG_LOCKING)
   if (lockStack == 0) 
     lockStack = csCallStackHelper::CreateCallStack (0, true);
 #endif
@@ -119,19 +118,19 @@ void csRenderBuffer::Release ()
     version++;
   }
   props.isLocked = false;
-#if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
+#if defined (CS_DEBUG) && defined (DEBUG_LOCKING)
   if (lockStack != 0)
   {
-    lockStack->Free();
+    lockStack->Free ();
     lockStack = 0;
   }
 #endif
 }
 
-void csRenderBuffer::CopyInto (const void *data, size_t elementCount, 
-			       size_t elemOffset)
+void csRenderBuffer::CopyInto (const void* data, size_t elementCount, 
+  size_t elemOffset)
 {
-  if (masterBuffer.IsValid()) return;
+  if (masterBuffer.IsValid ()) return;
   const size_t elemSize = 
     csRenderBufferComponentSizes[props.comptype] * props.compCount;
   const size_t byteOffs = elemSize * elemOffset;
@@ -161,7 +160,7 @@ void csRenderBuffer::CopyInto (const void *data, size_t elementCount,
   }
 }
 
-size_t csRenderBuffer::GetElementCount() const
+size_t csRenderBuffer::GetElementCount () const
 {
   if (masterBuffer.IsValid ())
     return masterBuffer->GetElementCount ();
@@ -172,7 +171,7 @@ size_t csRenderBuffer::GetElementCount() const
 
 void csRenderBuffer::SetData (const void *data)
 {
-  if (masterBuffer.IsValid()) return;
+  if (masterBuffer.IsValid ()) return;
   version++;
   if (props.doDelete)
   {
@@ -209,8 +208,8 @@ csRef<csRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount,
 }
 
 csRef<csRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCount, 
-    csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd)
+  csRenderBufferType type, csRenderBufferComponentType componentType,
+  size_t rangeStart, size_t rangeEnd)
 {
   size_t size = elementCount * csRenderBufferComponentSizes[componentType];
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
@@ -220,8 +219,8 @@ csRef<csRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCou
 }
 
 csRef<csRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCount, 
-    csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd, bool copy)
+  csRenderBufferType type, csRenderBufferComponentType componentType,
+  size_t rangeStart, size_t rangeEnd, bool copy)
 {
   size_t size = elementCount * csRenderBufferComponentSizes[componentType];
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
@@ -314,7 +313,7 @@ csRenderBufferName csRenderBuffer::GetBufferNameFromDescr (const char* name)
   size_t l = 0, r = sizeof (strMap) / sizeof (StrToName);
   while (l < r)
   {
-    size_t m = (l+r) / 2;
+    size_t m = (l + r) / 2;
     int i = strcmp (strMap[m].descr, name);
     if (i == 0) return strMap[m].name;
     if (i < 0)
@@ -326,18 +325,16 @@ csRenderBufferName csRenderBuffer::GetBufferNameFromDescr (const char* name)
 }
 
 void csRenderBuffer::SetRenderBufferProperties (size_t elementCount, 
-						csRenderBufferType type, 
-						csRenderBufferComponentType componentType,
-						uint componentCount, 
-						bool copy)
+  csRenderBufferType type, csRenderBufferComponentType componentType,
+  uint componentCount, bool copy)
 {
-  CS_ASSERT(!props.isIndex);
+  CS_ASSERT (!props.isIndex);
   if (componentCount > 255) return;
 
 #ifdef CS_DEBUG
   size_t newSize = elementCount * componentCount * 
     csRenderBufferComponentSizes[componentType];
-  CS_ASSERT(newSize <= bufferSize);
+  CS_ASSERT (newSize <= bufferSize);
 #else
   (void)elementCount; // unused except for above so silence the warning
 #endif
@@ -348,17 +345,14 @@ void csRenderBuffer::SetRenderBufferProperties (size_t elementCount,
 }
 
 void csRenderBuffer::SetIndexBufferProperties (size_t elementCount, 
-					       csRenderBufferType type, 
-					       csRenderBufferComponentType componentType,
-					       size_t rangeStart, 
-					       size_t rangeEnd, 
-					       bool copy)
+  csRenderBufferType type, csRenderBufferComponentType componentType,
+  size_t rangeStart, size_t rangeEnd, bool copy)
 {
-  CS_ASSERT(props.isIndex);
+  CS_ASSERT (props.isIndex);
 
 #ifdef CS_DEBUG
   size_t newSize = elementCount * csRenderBufferComponentSizes[componentType];
-  CS_ASSERT(newSize <= bufferSize);
+  CS_ASSERT (newSize <= bufferSize);
 #else
   (void)elementCount; // unused except for above assert so silence the warning
 #endif

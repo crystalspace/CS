@@ -1,4 +1,0 @@
-SubDir TOP data ceguitest 0.5 ;
-
-InstallData [ Wildcard *.xsd ice.* *.layout ] : data ceguitest 0.5 ;
-FileListEntriesData [ Wildcard *.xsd ice.* *.layout ] : ceguitest 0.5 : data-demo ;

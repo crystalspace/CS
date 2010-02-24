@@ -104,6 +104,12 @@ namespace RenderManager
       struct csBoxClipperCachedStore
       {
         uint bytes[(sizeof(csBoxClipperCached) + sizeof (uint) - 1)/sizeof(uint)];
+	
+	csBoxClipperCachedStore()
+	{ 
+	  // Avoid gcc complaining about uninitialised use
+	  memset (bytes, 0, sizeof (bytes));
+	}
       };
       CS::Utility::GenericResourceCache<csBoxClipperCachedStore, csTicks,
         CS::Utility::ResourceCache::SortingNone,
@@ -403,6 +409,7 @@ namespace RenderManager
       // Copy the target from last portal
       for (int a = 0; a < rtaNumAttachments; a++)
         portalCtx->renderTargets[a] = context.renderTargets[a];
+      portalCtx->perspectiveFixup = context.perspectiveFixup;
 
       // Setup the new context
       contextFunction (*portalCtx, setupData);
@@ -430,6 +437,11 @@ namespace RenderManager
       int sb_minY = int (screenBox.MinY());
       int txt_w = int (ceil (screenBox.MaxX() - screenBox.MinX()));
       int txt_h = int (ceil (screenBox.MaxY() - screenBox.MinY()));
+
+      // Work around faulty texture cache behaviour.
+      txt_w = csFindNearestPowerOf2 (txt_w);
+      txt_h = csFindNearestPowerOf2 (txt_h);
+
       int real_w, real_h;
       csRef<iTextureHandle> tex = persistentData.texCache.QueryUnusedTexture (txt_w, txt_h,
 		  real_w, real_h);

@@ -18,16 +18,22 @@
 
 #include <ApplicationServices/ApplicationServices.h>
 
+#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED < 1030
+#import <mach-o/dyld.h>
+#else  
+#import <dlfcn.h>
+#endif
+
 #define GLOSXDRIVER_REPORTER_ID "crystalspace.canvas.glosx"
 
 // Plugin stuff - create factory functions, etc
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY(GLOSXDriver2D)
 
 // Constructor
 GLOSXDriver2D::GLOSXDriver2D(iBase *p)
-    : scfImplementationType (this, p), OSXDriver2D(this)
+    : scfImplementationType(this, p), OSXDriver2D(this)
 {
   context = 0;
 }
@@ -55,8 +61,7 @@ bool GLOSXDriver2D::Initialize(iObjectRegistry *reg)
   // (including things like glString() - the OpenGL renderer was using this
   // before this driver had been Open()'d) When the driver is actually Open()'d
   // all we need to do is bind the context to our window
-  if ((context = OSXDelegate2D_createOpenGLContext(delegate, Depth, display))
-    == 0)
+  if ((context = OSXDelegate2D_createOpenGLContext(delegate, Depth, display)) == 0)
   {
     csFPrintf(stderr, "Failed to create OpenGL context\n");
     return false;
@@ -137,6 +142,10 @@ void GLOSXDriver2D::SetTitle(char *title)
   csGraphics2DGLCommon::SetTitle(title);
 }
 
+void GLOSXDriver2D::SetIcon (iImage *image)
+{
+   //TODO: IMPLEMENT THIS FOR MACOSX.
+}
 
 // Print
 // Swap OpenGL buffers
@@ -189,3 +198,32 @@ bool GLOSXDriver2D::ToggleFullscreen()
     OSXDelegate2D_updateOpenGLContext(delegate);
   return success;
 }
+
+
+#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED < 1030
+
+// Get the address of a procedure (for OGL use.)
+void *GLOSXDriver2D::GetProcAddress(const char *name) 
+{	
+  NSSymbol symbol;
+  csString symbolName;
+  // Prepend a '_' for the Unix C symbol mangling convention
+  symbolName << '_' << name;
+  if (NSIsSymbolNameDefined (symbolName))
+    {
+      symbol = NSLookupAndBindSymbol (symbolName);
+      return NSAddressOfSymbol (symbol);
+    }
+  else
+    return 0;
+}
+
+#else
+
+// Get the address of a procedure (for OGL use.)
+void *GLOSXDriver2D::GetProcAddress(const char *name) 
+{	
+  return dlsym(RTLD_DEFAULT, name);
+}
+
+#endif

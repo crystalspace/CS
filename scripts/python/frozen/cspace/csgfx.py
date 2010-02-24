@@ -135,6 +135,8 @@ class csImageIOFileFormatDescriptions(core.CustomAllocated):
     def Get(*args): return _csgfx.csImageIOFileFormatDescriptions_Get(*args)
     def Put(*args): return _csgfx.csImageIOFileFormatDescriptions_Put(*args)
     def Push(*args): return _csgfx.csImageIOFileFormatDescriptions_Push(*args)
+    def Merge(*args): return _csgfx.csImageIOFileFormatDescriptions_Merge(*args)
+    def MergeSmart(*args): return _csgfx.csImageIOFileFormatDescriptions_MergeSmart(*args)
     def Pop(*args): return _csgfx.csImageIOFileFormatDescriptions_Pop(*args)
     def Top(*args): return _csgfx.csImageIOFileFormatDescriptions_Top(*args)
     def Insert(*args): return _csgfx.csImageIOFileFormatDescriptions_Insert(*args)

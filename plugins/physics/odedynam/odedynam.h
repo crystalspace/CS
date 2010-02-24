@@ -387,6 +387,9 @@ public:
   virtual bool AttachColliderCylinder (float length, float radius,
         const csOrthoTransform& trans, float friction, float elasticity,
 	float softness);
+  virtual bool AttachColliderCapsule (float length, float radius,
+        const csOrthoTransform& trans, float friction, float elasticity,
+	float softness);
   virtual bool AttachColliderBox (const csVector3 &size,
         const csOrthoTransform& trans, float friction, float elasticity,
 	float softness);
@@ -457,10 +460,8 @@ public:
   
   bool CreateSphereGeometry (const csSphere& sphere);
   bool CreatePlaneGeometry (const csPlane3& plane);
-  bool CreateConvexMeshGeometry (iMeshWrapper *mesh)
-  {
-    return CreateMeshGeometry (mesh);
-  }
+  inline bool CreateConvexMeshGeometry (iMeshWrapper *mesh)
+  { return CreateMeshGeometry (mesh); }
   bool CreateMeshGeometry (iMeshWrapper *mesh);
   bool CreateBoxGeometry (const csVector3& box_size);
   bool CreateCapsuleGeometry (float length, float radius); 
@@ -469,6 +470,11 @@ public:
   bool GetSphereGeometry (csSphere& sphere);
   bool GetPlaneGeometry (csPlane3& box); 
   bool GetCylinderGeometry (float& length, float& radius); 
+  bool GetCapsuleGeometry (float& length, float& radius);
+  bool GetMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+			int*& indices, size_t& triangleCount);
+  bool GetConvexMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+			      int*& indices, size_t& triangleCount);
 
   void SetCollisionCallback (iDynamicsColliderCollisionCallback* cb);
   void Collision (csODECollider* other, const csVector3& pos,
@@ -580,6 +586,9 @@ public:
         const csOrthoTransform& trans, float friction, float density,
         float elasticity, float softness);
   bool AttachColliderCylinder (float length, float radius,
+        const csOrthoTransform& trans, float friction, float density,
+        float elasticity, float softness);
+  bool AttachColliderCapsule (float length, float radius,
         const csOrthoTransform& trans, float friction, float density,
         float elasticity, float softness);
   bool AttachColliderBox (const csVector3 &size,

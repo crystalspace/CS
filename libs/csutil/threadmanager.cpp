@@ -25,11 +25,13 @@
 
 using namespace CS::Threading;
 
-ThreadID csThreadManager::tid = Thread::GetThreadID();
+ThreadID csThreadManager::tid;
 
 csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this), 
   waiting(0), alwaysRunNow(false), objectReg(objReg), exiting(false)
 {
+  tid = Thread::GetThreadID();
+
   threadCount = CS::Platform::GetProcessorCount();
 
   // If we can't detect, assume we have one.
@@ -40,9 +42,7 @@ csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationTyp
   }
 
   // Have 'processor count' extra processing threads.
-  size_t threadCountHalf = size_t (ceil (threadCount/2.0f));
-  threadQueue.AttachNew(new ThreadedJobQueue(threadCountHalf, THREAD_PRIO_LOW,
-    threadCount == 1 ? 0 : threadCountHalf));
+  threadQueue.AttachNew(new ThreadedJobQueue(threadCount, THREAD_PRIO_LOW));
   listQueue.AttachNew(new ListAccessQueue());
 
   // Event handler.
@@ -81,17 +81,20 @@ void csThreadManager::Process(uint num)
 
 bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool process)
 {
+  Condition* c;
+  Mutex* m;
   bool success = true;
+  csRef<iThreadReturn> threadReturn;
 
   if(!IsMainThread())
   {
     AtomicOperations::Increment(&waiting);
   }
 
-  while(threadReturns.GetSize() != 0)
+  while(!threadReturns.IsEmpty())
   {
-    Condition* c;
-    Mutex* m;
+    threadReturn = threadReturns.Pop();
+
     if(IsMainThread())
     {
       c = &waitingMain;
@@ -103,10 +106,10 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool proces
       m = new Mutex();
     }
 
-    threadReturns[0]->SetWaitPtrs(c, m);
+    threadReturn->SetWaitPtrs(c, m);
 
     m->Lock();
-    while(!threadReturns[0]->IsFinished())
+    while(!threadReturn->IsFinished())
     {
       if(IsMainThread())
       {
@@ -124,11 +127,11 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool proces
       else
       {
         MutexScopedLock lock(waitingThreadsLock);
-        if(process && threadQueue->GetQueueCount() > 0)
+        if(process)
         {
           waitingThreadsLock.Unlock();
           m->Unlock();
-          threadQueue->PopAndRun();
+          threadQueue->PullAndRun(threadReturn->GetJob());
           m->Lock();
           waitingThreadsLock.Lock();
         }
@@ -148,7 +151,7 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool proces
     }
     m->Unlock();
 
-    threadReturns[0]->SetWaitPtrs(0, 0);
+    threadReturn->SetWaitPtrs(0, 0);
 
     if(!IsMainThread())
     {
@@ -156,8 +159,7 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool proces
       delete m;
     }
 
-    success &= threadReturns[0]->WasSuccessful();
-    threadReturns.DeleteIndexFast(0);
+    success &= threadReturn->WasSuccessful();
   }
 
   if(!IsMainThread())

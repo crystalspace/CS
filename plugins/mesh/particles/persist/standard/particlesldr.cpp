@@ -32,7 +32,7 @@
 #include "iutil/object.h"
 #include "iutil/stringarray.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 template<>
 class csHashComputer<iParticleEmitter*> : public csHashComputerIntegral<iParticleEmitter*> {};
@@ -1533,6 +1533,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         CS_NODE_ELEMENT, 0);
       sizeNode->SetValue ("particlesize");
       synldr->WriteVector (sizeNode, partFact->GetParticleSize ());
+
+      csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      mixmodeNode->SetValue ("mixmode");
+      synldr->WriteMixmode (mixmodeNode, meshFact->GetMixMode (),
+	  true);
 
       // Write emitters
       for (size_t i = 0; i < partFact->GetEmitterCount (); i++)

@@ -90,76 +90,22 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
 {
   if (!shaderPlug->enableFP) return false;
 
-  size_t i;
-
   // See if we want to wrap through the PS plugin
-  // (psplg will be 0 if wrapping isn't wanted)
-  if (shaderPlug->psplg)
+  if (shaderPlug->ProfileNeedsRouting (shaderPlug->currentLimits.fp.profile)
+      && shaderPlug->psplg)
   {
-    csRef<iDataBuffer> programBuffer = GetProgramData();
-    if (!programBuffer.IsValid())
-      return false;
-    csString programStr;
-    programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
+    bool ret = TryCompile (loadApplyVmap,
+      shaderPlug->currentLimits);
   
-    ArgumentArray args;
-    shaderPlug->GetProfileCompilerArgs ("fragment",
-      shaderPlug->currentLimits.fp.profile, 
-      shaderPlug->currentLimits,
-      CS::PluginCommon::ShaderProgramPluginGL::Other,
-      csGLShader_CG::argsAll, args);
-    for (i = 0; i < compilerArgs.GetSize(); i++) 
-      args.Push (compilerArgs[i]);
-    args.Push (0);
-    program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
-      programStr, shaderPlug->currentLimits.fp.profile, 
-      !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
-
-    if (!program)
-      return false;
-
-    pswrap = shaderPlug->psplg->CreateProgram ("fp");
-
-    if (!pswrap)
-      return false;
-
-    csArray<csShaderVarMapping> mappings;
+    csString tagStr (csString("CG") + shaderPlug->currentLimits.ToString());
+    WriteToCache (cache, shaderPlug->currentLimits.fp, 
+      shaderPlug->currentLimits, tagStr);
+    cacheKeepNodes.DeleteAll ();
+    tag->AttachNew (new scfString (tagStr));
     
-    for (i = 0; i < variablemap.GetSize (); i++)
-    {
-      // Get the Cg parameter
-      CGparameter parameter = cgGetNamedParameter (
-	program, variablemap[i].destination);
-      // Check if it's found, and just skip it if not.
-      if (!parameter)
-        continue;
-      if (!cgIsParameterReferenced (parameter))
-	continue;
-      // Make sure it's a C-register
-      CGresource resource = cgGetParameterResource (parameter);
-      if (resource == CG_C)
-      {
-        // Get the register number, and create a mapping
-        csString regnum;
-        regnum.Format ("c%lu", cgGetParameterResourceIndex (parameter));
-        mappings.Push (csShaderVarMapping (variablemap[i].name, regnum));
-      }
-    }
+    if (!ret) return false;
 
-    csRef<iHierarchicalCache> ps1cache;
-    if (pswrap->Load (0, cgGetProgramString (program, CG_COMPILED_PROGRAM), 
-      mappings))
-    {
-      if (cache != 0) ps1cache = cache->GetRootedCache ("/ps1/");
-      bool ret = pswrap->Compile (ps1cache);
-      if (shaderPlug->debugDump)
-        DoDebugDump();
-      return ret;
-    }
-    else
-    {
-      return false;
-    }
+    return LoadProgramWithPS1 ();
   }
   else
   {
@@ -173,8 +119,6 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
     tag->AttachNew (new scfString (tagStr));
     return ret;
   }
-
-  return true;
 }
 
 bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
@@ -183,6 +127,7 @@ bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
 {
   PrecacheClear();
 
+  ProgramObject programObj;
   bool needBuild = true;
   csString sourcePreproc;
   {
@@ -193,23 +138,30 @@ bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
     programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
     
     // Get preprocessed result of pristine source
-    sourcePreproc = GetPreprocessedProgram (programStr);
+    sourcePreproc = GetAugmentedProgram (programStr);
     if (!sourcePreproc.IsEmpty ())
     {
       // Check preprocessed source against cache
-      if (TryLoadFromCompileCache (sourcePreproc, limits.fp, cache))
+      //if (TryLoadFromCompileCache (sourcePreproc, limits.fp, cache))
+      if (shaderPlug->progCache.SearchObject (sourcePreproc, limits.fp, programObj))
         needBuild = false;
     }
   }
   
   bool ret;
   if (needBuild)
+  {
     ret = TryCompile (loadApplyVmap, limits);
+    WriteToCache (cache, limits.fp, limits, csString("CG") + tag);
+  }
   else
+  {
     ret = true;
+    unusedParams = programObj.GetUnusedParams();
+    WriteToCache (cache, limits.fp, limits, csString("CG") + tag,
+      programObj);
+  }
 
-  WriteToCache (cache, limits.fp, limits, csString("CG") + tag);
-  
   return ret;
 }
 
@@ -255,7 +207,7 @@ bool csShaderGLCGFP::TryCompile (uint loadFlags,
 	unusedParams.Add (testForUnused[i]);
       bool compileSucceeded = DefaultLoadProgram (0, programStr, progFP, 
 	limits, 
-	/*loadIgnoreErrors | */(loadFlags & loadIgnoreConfigProgramOpts));
+	loadIgnoreErrors | (loadFlags & loadIgnoreConfigProgramOpts));
 	
       if (compileSucceeded)
       {

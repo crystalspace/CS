@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include <string.h>
-#include "csver.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
@@ -50,7 +49,7 @@
 #include "ivaria/reporter.h"
 #include "frustvis.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csFrustumVis)
 

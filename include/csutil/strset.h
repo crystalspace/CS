@@ -37,24 +37,39 @@ namespace Utility
  * present.  This is useful when you need to work with strings but want the
  * performance characteristics of simple numeric comparisons.  Rather than
  * performing string comparisons, you instead compare the numeric string ID's.
+ *
+ * If \a Locked is true operations on an instance of the set are locked are
+ * for concurrent accesses.
+ *
  * \sa csStringHash
  * \sa iStringSet
  */
-template<typename Tag>
+template<typename Tag, bool Locked = false>
 class StringSet
 {
  private:
+  typedef CS::Threading::OptionalMutex<Locked> MutexType;
   StringHash<Tag> registry;
   csHash<const char*, CS::StringID<Tag> > reverse; // ID to string mapping.
-  unsigned int next_id;
+  /* Inherit from OptionalMutex<> to avoid spending extra memory if locking
+     is disabled */
+  struct LockAndId : public MutexType
+  {
+    unsigned int next_id;
+
+    LockAndId() : next_id (0) {}
+  };
+  mutable LockAndId lockAndId;
 
   void Copy(StringSet const& s)
   {
     if (&s != this)
     {
+      CS::Threading::ScopedLock<MutexType> l1 (lockAndId);
+      CS::Threading::ScopedLock<MutexType> l2 (s.lockAndId);
       registry = s.registry;
       reverse  = s.reverse;
-      next_id  = s.next_id;
+      lockAndId.next_id  = s.lockAndId.next_id;
     }
   }
 
@@ -63,7 +78,7 @@ public:
 
 public:
   /// Constructor.
-  StringSet (size_t size = 23) : registry(size), reverse(size), next_id(0) {}
+  StringSet (size_t size = 23) : registry(size), reverse(size) {}
   /// Copy constructor.
   StringSet (StringSet const& s) { Copy(s); }
   /// Destructor.
@@ -79,11 +94,12 @@ public:
    */
   CS::StringID<Tag> Request (const char* s)
   {
+    CS::Threading::ScopedLock<MutexType> lock (lockAndId);
     CS::StringID<Tag> id = registry.Request(s);
     if (id == CS::InvalidStringID<Tag> ())
     {
-      const char* t = registry.Register(s, next_id);
-      id = next_id++;
+      const char* t = registry.Register(s, lockAndId.next_id);
+      id = lockAndId.next_id++;
       reverse.Put (id, t);
     }
     return id;
@@ -96,6 +112,7 @@ public:
    */
   char const* Request (CS::StringID<Tag> id) const
   {
+    CS::Threading::ScopedLock<MutexType> lock (lockAndId);
     return reverse.Get(id, 0);
   }
 
@@ -104,6 +121,7 @@ public:
    */
   bool Contains(char const* s) const
   {
+    CS::Threading::ScopedLock<MutexType> lock (lockAndId);
     return registry.Request(s) != CS::InvalidStringID<Tag> ();
   }
 
@@ -113,7 +131,10 @@ public:
    *   <tt>return Request(id) != NULL</tt>, but more idomatic.
    */
   bool Contains(CS::StringID<Tag> id) const
-  { return Request(id) != 0; }
+  { 
+    CS::Threading::ScopedLock<MutexType> lock (lockAndId);
+    return Request(id) != 0; 
+  }
 
   /**
    * Remove specified string.
@@ -121,6 +142,7 @@ public:
    */
   bool Delete(char const* s)
   {
+    CS::Threading::ScopedLock<MutexType> lock (lockAndId);
     CS::StringID<Tag> const id = registry.Request(s);
     bool const ok = (id != csInvalidStringID);
     if (ok)
@@ -137,6 +159,7 @@ public:
    */
   bool Delete(CS::StringID<Tag> id)
   {
+    CS::Threading::ScopedLock<MutexType> lock (lockAndId);
     char const* s = reverse.Get(id,0);
     bool const ok = (s != 0);
     if (ok)
@@ -153,6 +176,7 @@ public:
    */
   void Empty ()
   {
+    CS::Threading::ScopedLock<MutexType> lock (lockAndId);
     registry.Empty();
     reverse.Empty();
   }
@@ -167,7 +191,10 @@ public:
 
   /// Get the number of elements in the hash.
   size_t GetSize () const
-  { return registry.GetSize (); }
+  { 
+    CS::Threading::ScopedLock<MutexType> lock (lockAndId);
+    return registry.GetSize (); 
+  }
 
   /**
    * Return true if the hash is empty.
@@ -175,12 +202,16 @@ public:
    *   idiomatic.
    */
   bool IsEmpty() const
-  { return GetSize() == 0; }
+  { 
+    CS::Threading::ScopedLock<MutexType> lock (lockAndId);
+    return GetSize() == 0; 
+  }
 
   /**
    * Return an iterator for the set which iterates over all strings.
    * \warning Modifying the set while you have open iterators will result
    *   undefined behaviour.
+   * \warning The iterator will <b>not</b> respect locking of the string set!
    */
   GlobalIterator GetIterator () const
   { return registry.GetIterator(); }

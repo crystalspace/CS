@@ -34,6 +34,7 @@
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 #include "imap/streamsource.h"
+#include "iutil/job.h"
 #include "iutil/threadmanager.h"
 
 #include "csutil/deprecated_warn_off.h"
@@ -129,7 +130,7 @@ struct iMissingLoaderData : public virtual iBase
 };
 
 /**
- * Return structure for the iLoader->Load() routines.
+ * Return structure for the iLoader::Load() routines.
  */
 struct csLoadResult
 {
@@ -236,6 +237,16 @@ public:
     waitLock = m;
   }
 
+  void SetJob(iJob* j)
+  {
+      job = j;
+  }
+
+  iJob* GetJob() const
+  {
+      return job;
+  }
+
 private:
   /// True if the loading has finished (should be true at some point).
   bool finished;
@@ -265,6 +276,9 @@ private:
 
   // Reference to the thread manager.
   csRef<iThreadManager> tm;
+
+  // Pointer to the thread job.
+  csRef<iJob> job;
 };
 
 struct iSectorLoaderIterator : public virtual iBase
@@ -441,7 +455,7 @@ struct iThreadedLoader : public virtual iBase
   *   specified).
   * \param reg if true then the texture and material will be registered
   * to the texture manager. Set 'register' to false if you plan on calling
-  * 'engine->Prepare()' later as that function will take care of registering
+  * 'iEngine::Prepare()' later as that function will take care of registering
   * too.
   * \param create_material if true then this function also creates a
   * material for the texture.
@@ -469,7 +483,7 @@ struct iThreadedLoader : public virtual iBase
   *   specified).
   * \param reg If true then the texture and material will be registered
   *   to the texture manager. Set 'register' to false if you plan on calling
-  *   'engine->Prepare()' later as that function will take care of registering
+  *   'iEngine::Prepare()' later as that function will take care of registering
   *   too.
   * \param create_material If true then this function also creates a
   *   material for the texture.
@@ -924,7 +938,7 @@ struct iLoader : public virtual iBase
   *   specified).
   * \param reg if true then the texture and material will be registered
   * to the texture manager. Set 'register' to false if you plan on calling
-  * 'engine->Prepare()' later as that function will take care of registering
+  * 'iEngine::Prepare()' later as that function will take care of registering
   * too.
   * \param create_material if true then this function also creates a
   * material for the texture.
@@ -975,7 +989,7 @@ struct iLoader : public virtual iBase
   *   specified).
   * \param reg If true then the texture and material will be registered
   *   to the texture manager. Set 'register' to false if you plan on calling
-  *   'engine->Prepare()' later as that function will take care of registering
+  *   'iEngine::Prepare()' later as that function will take care of registering
   *   too.
   * \param create_material If true then this function also creates a
   *   material for the texture.

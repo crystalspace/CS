@@ -35,8 +35,8 @@ csView::csView (iEngine *e, iGraphics3D* ig3d)
   csRef<iPerspectiveCamera> pcam = e->CreatePerspectiveCamera ();
   SetPerspectiveCamera(pcam);
 
-  OldWidth = G3D->GetWidth ();
-  OldHeight = G3D->GetHeight ();
+  viewWidth = OldWidth = G3D->GetWidth ();
+  viewHeight = OldHeight = G3D->GetHeight ();
 }
 
 csView::~csView ()
@@ -100,17 +100,21 @@ void csView::SetContext (iGraphics3D *ig3d)
   G3D = ig3d;
 }
 
-void csView::SetRectangle (int x, int y, int w, int h)
+void csView::SetRectangle (int x, int y, int w, int h, bool restrict)
 {
   OldWidth = G3D->GetWidth ();
   OldHeight = G3D->GetHeight ();
   delete PolyView; PolyView = 0;
   Clipper = 0;
-  // Do not allow the rectangle to go out of the screen
-  if (x < 0) { w += x; x = 0; }
-  if (y < 0) { h += y; y = 0; }
-  if (x + w > OldWidth) { w = OldWidth - x; }
-  if (y + h > OldHeight) { h = OldHeight - y; }
+
+  if(restrict)
+  {
+    // Do not allow the rectangle to go out of the screen
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
+    if (x + w > OldWidth) { w = OldWidth - x; }
+    if (y + h > OldHeight) { h = OldHeight - y; }
+  }
 
   if (RectView)
     RectView->Set (x, y, x + w, y + h);
@@ -152,8 +156,8 @@ void csView::UpdateView ()
 
   GetPerspectiveCamera()->SetFOVAngle (GetPerspectiveCamera()->GetFOVAngle(), G3D->GetWidth());
 
-  OldWidth = G3D->GetWidth ();
-  OldHeight = G3D->GetHeight ();
+  viewWidth = OldWidth = G3D->GetWidth ();
+  viewHeight = OldHeight = G3D->GetHeight ();
   
   if (PolyView)
   {

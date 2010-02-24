@@ -51,20 +51,17 @@ Description renderers	   : "3D renderers" ;
 Description meshes	   : "mesh plugins and loaders" ;
 Description walkall  	   : "Walktest application and all required plugins" ;
 Description openglcanvas   : "canvas for the OpenGL renderer" ;
-Description softcanvas     : "canvas for the software renderer" ;
 Description proctexes      : "procedural texture plugins" ;
 Description renderall      : "modules related to rendering" ;
 Description shaders        : "shaders and related modules" ;
-Description softrenderer   : "software renderer and related plugins" ;
 Description openglrenderer : "OpenGL renderer and related plugins" ;
 Description rendermanagers : "Render manager plugins" ;
 RegisterCompileGroups sndsys imageloaders fontservers
 		      canvases renderers meshes walkall openglcanvas 
-		      softcanvas proctexes renderall shaders softrenderer 
+		      proctexes renderall shaders
 		      openglrenderer rendermanagers ;
 
 # Useful dependencies
-Depends softrenderer : softcanvas ;
 Depends openglrenderer : openglcanvas ;
 
 # Historic group aliases.

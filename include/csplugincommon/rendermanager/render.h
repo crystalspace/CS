@@ -213,7 +213,9 @@ namespace RenderManager
    *
    * Usage: with reverse iteration over all contexts.
    * Usually used in the final step before post processing effects are
-   * applied. Example:
+   * applied. 
+   *
+   * Example:
    * \code
    * // ... contexts setup etc. ...
    *
@@ -232,7 +234,7 @@ namespace RenderManager
   public:
     SimpleTreeRenderer (iGraphics3D* g3di, iShaderManager* shaderMgri)
       : targetSetup (g3di), meshRender (g3di, shaderMgri),
-      g3d (g3di), shaderMgr (shaderMgri)
+      g3d (g3di), shaderMgr (shaderMgri), lastRenderView (0)
     {
       memset (lastTarget, 0, sizeof (lastTarget));
       memset (lastSubtexture, 0, sizeof (lastSubtexture));
@@ -256,6 +258,7 @@ namespace RenderManager
           lastTarget[a] = context->renderTargets[a].texHandle;
           lastSubtexture[a] = context->renderTargets[a].subtexture;
         }
+	lastRenderView = context->renderView;
       }
 
       // Push the context
@@ -297,7 +300,8 @@ namespace RenderManager
       }
       
       // Setup the camera etc.. @@should be delayed as well
-      g3d->SetProjectionMatrix (cam->GetProjectionMatrix ());
+      g3d->SetProjectionMatrix (
+	context->perspectiveFixup * cam->GetProjectionMatrix ());
       g3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
       BeginFinishDrawScope bd (g3d, drawFlags);
@@ -336,7 +340,7 @@ namespace RenderManager
       contextStack.Empty ();
       
       if (context->postEffects.IsValid())
-        context->postEffects->DrawPostEffects ();
+        context->postEffects->DrawPostEffects (context->owner);
     }
 
 
@@ -348,7 +352,7 @@ namespace RenderManager
 	    || (lastSubtexture[a] != context.renderTargets[a].subtexture))
           return true;
       }
-      return false;
+      return context.renderView != lastRenderView;
     }
 
     ContextTargetSetup<typename RenderTree::ContextNode> targetSetup;
@@ -359,6 +363,7 @@ namespace RenderManager
 
     iTextureHandle* lastTarget[rtaNumAttachments];
     int lastSubtexture[rtaNumAttachments];
+    RenderView* lastRenderView;
 
     csArray<typename RenderTree::ContextNode*> contextStack;
   };

@@ -1,21 +1,19 @@
 @c -*-texinfo-*-
 @node MSVC7, MinGW, Unix, Platform Instructions
-@subsection Microsoft Visual C++ 7, 7.1 or 8
+@subsection Microsoft Visual C++ 8 or 9
 @cindex Windows, Building
 @cindex MSVC, Building
 
 @noindent
 Originally written by Philip Wyett @email{philwyett@@gmx.com}.
 @noindent
-@emph{Last updated 18 May 2005.}
+@emph{Last updated September 2009.}
 
 In order to successfully compile the Crystal Space 3D Software Development Kit
-(@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio @sc{.net}}
-or the stand alone version of @emph{Microsoft Visual C++ 7 (@sc{.net 2002})}, 
-@emph{Microsoft Visual C++ 7.1 (@sc{.net 2003})} or 
-@emph{Microsoft Visual C++ 8 (@sc{.net 2005})}. The @emph{Express Edition} of
-@sc{msvc} 8 is perfectly suitable to compile Crystal Space, once the Platform
-@sc{sdk} was installed (more below).
+(@sc{sdk}), you will need a copy of @emph{Microsoft Visual C++ 8 (@sc{.net 2005})}
+or @emph{Microsoft Visual C++ 9 (@sc{.net 2008})}. The @emph{Express Editions} 
+are perfectly suitable to compile Crystal Space (although some extra steps are required
+for the Express Edition of @sc{msvc} 8 is, more below).
 
 @subsubheading Getting Extra Help
 
@@ -61,37 +59,6 @@ follow the setup instructions.  You may want to select ``VC typical'' in the
 components depending on your actual set up (e.g. install MinGW-related 
 components if you plan to also use CrystalSpace with MinGW/MSYS).
 
-@subsubheading DirectX - Optional
-
-In order to compile Crystal Space at its minimum
-you must have at least some form of the DirectX Software Development Kit 
-(@sc{sdk}) on your system. 
-
-Visual C++ 7 and later come with the minimum required DirectX @sc{sdk} 8.1 
-files in order to build Crystal Space. 
-
-The ``cs-win32libs'' package also come with minimum headers and libraries that 
-suffice to compile the parts of Crystal Space that utilize DirectX. However, 
-the version included in cs-win32libs is DirectX 7, so you may want to stick to 
-the DirectX 8.1 shipped with VC++ 7.
-
-You can optionally download the latest DirectX Software Development Kit 
-(@sc{sdk}), which can be obtained from:
-
-@uref{http://www.msdn.microsoft.com/directx}
-
-Thanks, to the miracle which is Microsoft.  If you download and install the
-latest DirectX  Software Development Kit (@sc{sdk}) and already have Visual
-C++ installed, it will ask you if you wish to add the paths to the @sc{sdk} to
-Visual C++ so it can use it.  We recommend you accept when offered this option.
-If it is not the latest @sc{sdk} you install you will have to manually point
-Visual C++ to where you installed the @sc{sdk} in-order for it to be used.
-This can be done from the Visual C++ file menu and selecting
-@emph{Tools->Options->Directories}.  You must add the paths for both the
-include files and libraries and being that we wish Visual C++ to see and use
-this new @sc{sdk} before all possible others on your system, you must click on
-and drag both paths you have entered to the top of the list.
-
 @subsubheading Python - Optional
 
 Crystal Space contains support for Python scripting and thus has projects
@@ -102,15 +69,10 @@ must install Python 2.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
 
-@sc{note}: To have parity with one of the latest versions of msvc_libs and take
-full advantage of the debug elements - you should have Python 2.2.3 or 2.3.0
-installed on your system. Whichever version you decide to use, make sure you
-download the comparable msvc_libs.
-
 @subsubheading Compiling Crystal Space
 
 To compile Crystal Space, you'll have to perform the following steps.  If
-anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC7 FAQ}.
+anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC8 FAQ}.
 
 @enumerate
 @item
@@ -211,7 +173,7 @@ for your own program which utilizes Crystal Space.
 @xref{HOWTO Creating External MSVC Application}.
 
 @subsubheading Frequently Asked Questions (@sc{faq})
-@anchor{MSVC7 FAQ}
+@anchor{MSVC8 FAQ}
 
 This is the list of frequently asked questions for the Win32 port of Crystal
 Space.  Please consult this list if you are having difficulty building or using

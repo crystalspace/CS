@@ -36,8 +36,6 @@
 #include "weaver.h"
 #include "shader.h"
 
-CS_IMPLEMENT_PLUGIN
-
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
 
@@ -270,7 +268,8 @@ bool WeaverCompiler::IsTemplateToCompiler(iDocumentNode *templ)
 }
 
 bool WeaverCompiler::PrecacheShader (iDocumentNode* templ,
-                                     iHierarchicalCache* cache)
+                                     iHierarchicalCache* cache,
+                                     bool quick)
 {
   const char* shaderName = templ->GetAttributeValue ("name");
   csRef<WeaverShader> shader;
@@ -279,7 +278,7 @@ bool WeaverCompiler::PrecacheShader (iDocumentNode* templ,
   // Create a shader. The actual loading happens later.
   if (do_verbose) startTime = csGetTicks();
   shader.AttachNew (new WeaverShader (this));
-  bool loadRet = shader->Precache (templ, cache);
+  bool loadRet = shader->Precache (templ, cache, quick);
   autoDocRoot.Invalidate ();
   if (!loadRet)
     return false;

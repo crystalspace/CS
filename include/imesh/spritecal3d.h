@@ -96,7 +96,7 @@ struct CalAnimationCallback;
  */
 struct iSpriteCal3DFactoryState : public virtual iBase
 {
-  SCF_INTERFACE (iSpriteCal3DFactoryState, 1, 0, 0);
+  SCF_INTERFACE (iSpriteCal3DFactoryState, 1, 0, 1);
 
   /// Initialize internal Cal3d data structures.
   virtual bool Create(const char *name) = 0;
@@ -324,6 +324,13 @@ struct iSpriteCal3DFactoryState : public virtual iBase
    */
   virtual bool RemoveAnimCallback(const char *anim,
   	CalAnimationCallback *callback) = 0;
+    
+  /**
+   * This function resizes absolutely all instances of this factory permanently.
+   * In other words if factor = 1 the size will be restored to the original one,
+   * differently than the previous one which multiplies size by the passed factor.
+   */
+  virtual void AbsoluteRescaleFactory(float factor) = 0;
 
 };
 

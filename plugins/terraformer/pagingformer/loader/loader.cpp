@@ -41,7 +41,7 @@
 
 #include "loader.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 namespace cspluginPagingFormerLoader
 {

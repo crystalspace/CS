@@ -74,6 +74,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         enum
         {
           None,
+	  Undefined,
           Value,
           Complex
         } defaultType : 3;
@@ -165,6 +166,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       
       typedef csHash<Snippet*, csString> IdSnippetHash;
       IdSnippetHash snippets;
+      // Snippets in the order they were added
+      csArray<Snippet*> snippetsOrdered;
       csArray<Connection> connections;
       /// "Input" snippets - those having no connections in
       csArray<Snippet*> inSnippets;

@@ -73,6 +73,11 @@ struct TextureSourceFormat
   /// Init for uncompressed texture
   TextureSourceFormat (GLenum format, GLenum type) :
     format (format), type (type) {}
+    
+  bool operator== (const TextureSourceFormat& other) const
+  {
+    return (format == other.format) && (type == other.type);
+  }
 };
 
 struct csGLUploadData
@@ -150,6 +155,9 @@ protected:
     
     /// Special flag to mark this texture is used in an FBO
     flagInFBO = 1 << 24,
+    
+    /// Texture has been uploaded
+    flagUploaded = 1 << 23,
 
     flagLast,
     /// Mask to get only the "public" flags
@@ -167,6 +175,8 @@ protected:
   }
   bool IsPrepared() const { return texFlags.Check (flagPrepared); }
   void SetPrepared (bool b) { texFlags.SetBool (flagPrepared, b); }
+  bool IsUploaded() const { return texFlags.Check (flagUploaded); }
+  void SetUploaded (bool b) { texFlags.SetBool (flagUploaded, b); }
   bool IsTransp() const { return texFlags.Check (flagTransp); }
   void SetTransp (bool b) { texFlags.SetBool (flagTransp, b); }
   bool IsForeignHandle() const { return texFlags.Check (flagForeignHandle); }
@@ -214,6 +224,16 @@ protected:
   THREADED_CALLABLE_DECL(csGLBasicTextureHandle, Unload, csThreadReturn, HIGH, true, false);
   
   CS::Graphics::TextureComparisonMode texCompare;
+  
+  // Readback data
+  TextureSourceFormat lastReadbackFormat;
+  csRef<iDataBuffer> lastReadback;
+  TextureSourceFormat desiredReadbackFormat;
+  int desiredReadbackBPP;
+  
+  void SetDesiredReadbackFormat (const CS::StructuredTextureFormat&);
+  template<typename Action>
+  csPtr<iDataBuffer> ReadbackPerform (size_t readbackSize, Action& readbackAction);
 public:
   /// The dimensions which were requested upon texture creation
   int orig_width, orig_height, orig_d;
@@ -238,7 +258,9 @@ public:
   
   bool IsInFBO() const { return texFlags.Check (flagInFBO); }
   void SetInFBO (bool b) { texFlags.SetBool (flagInFBO, b); }
-
+  
+  void ReadbackFramebuffer ();
+  
   /// Create a texture with given dimensions
   csGLBasicTextureHandle (int width, int height, int depth,
     csImageType imagetype, int flags, csGLGraphics3D *iG3D);
@@ -251,7 +273,7 @@ public:
    * Synthesize empty upload data structures for textures of the format
    * \a format. */
   bool SynthesizeUploadData (const CS::StructuredTextureFormat& format,
-    iString* fail_reason);
+    iString* fail_reason, bool zeroTexture);
 
   void Clear();
 

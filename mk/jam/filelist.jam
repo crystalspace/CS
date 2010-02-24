@@ -22,7 +22,7 @@
 ##    Returns the output file name for a certain file list.
 rule ListFile
 {
-    listfile = $(1:S=.txt) ;
+    listfile = $(1).txt ;
     local dir = [ ConcatDirs $(BUILDTOP) out lists ] ;
     MakeLocate $(listfile) : $(dir) ;
     SEARCH on $(listfile) = $(dir) ;

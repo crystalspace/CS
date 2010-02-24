@@ -29,6 +29,7 @@
 #include "cstool/rviewclipper.h"
 #include "csutil/scfarray.h"
 
+#include "ivaria/reporter.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
@@ -44,7 +45,7 @@
 
 #include "spr2d.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
 {
@@ -181,6 +182,14 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
 						      csVector3 offset)
 {
   SetupObject ();
+
+  if (!material)
+  {
+    csReport (factory->object_reg, CS_REPORTER_SEVERITY_ERROR,
+	"crystalspace.mesh.sprite2d",
+    	"Error! Trying to draw a sprite with no material!");
+    return 0;
+  }
 
   iCamera* camera = rview->GetCamera ();
 

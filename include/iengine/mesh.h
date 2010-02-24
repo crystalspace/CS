@@ -73,7 +73,7 @@ class csReversibleTransform;
  * is useful for skyboxes or skydomes. Important note! When you
  * use an object with this flag you should also add this object to
  * a render priority that also has the camera flag set (see
- * iEngine->SetRenderPriorityCamera()).
+ * iEngine::SetRenderPriorityCamera()).
  */
 #define CS_ENTITY_CAMERA 4
 
@@ -150,26 +150,6 @@ class csReversibleTransform;
 
 /** @} */
 
-/** \name SetLightingUpdate flags
- * @{ */
-
-/**
- * This is a flag for iMeshWrapper->SetLightingUpdate(). If this
- * flag is set then only the 'N' most relevant lights will be returned
- * to the object. If not set then 'N' random lights will be returned.
- */
-#define CS_LIGHTINGUPDATE_SORTRELEVANCE 1
-
-/**
- * If this flag for iMeshWrapper->SetLightingUpdate() is set then
- * the set of relevant lights will be recalculated every time.
- * Otherwise the lights are only recalculated when the object moves or
- * when one of the affected lights changes (default).
- */
-#define CS_LIGHTINGUPDATE_ALWAYSUPDATE 2
-
-/** @} */
-
 /**
  * Set a callback which is called just before the object is drawn.
  * This is useful to do some expensive computations which only need
@@ -193,7 +173,8 @@ struct iMeshDrawCallback : public virtual iBase
 };
 
 /**
- * Return structure for the iMeshWrapper->HitBeam() routines.
+ * Return structure for the iMeshWrapper::HitBeam() routines.
+ * \sa csSectorHitBeamResult csBulletHitBeamResult
  */
 struct csHitBeamResult
 {
@@ -232,7 +213,7 @@ struct csHitBeamResult
 };
 
 /**
- * Return structure for iMeshWrapper->GetScreenBoundingBox().
+ * Return structure for iMeshWrapper::GetScreenBoundingBox().
  */
 struct csScreenBoxResult
 {
@@ -279,7 +260,7 @@ struct csScreenBoxResult
  */
 struct iMeshWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshWrapper, 2, 4, 0);
+  SCF_INTERFACE(iMeshWrapper, 3, 0, 0);
 
   /**
    * Get the iObject for this mesh object. This can be used to get the
@@ -304,23 +285,8 @@ struct iMeshWrapper : public virtual iBase
   virtual void SetFactory (iMeshFactoryWrapper* factory) = 0;
 
   /**
-   * Control how lighting updates should take place.
-   * 'num_lights' is the number of lights that will be given to the
-   * mesh object at maximum (default is 8). 'flags' can be a combination
-   * of one of the following:
-   * - #CS_LIGHTINGUPDATE_SORTRELEVANCE (default on).
-   * - #CS_LIGHTINGUPDATE_ALWAYSUPDATE (default off).
-   *
-   * Note that this function has no effect on thing
-   * mesh objects as they use another lighting system (lightmaps).
-   * Also some genmesh objects can optionally also use the other lighting
-   * system in which nothing will happen either.
-   */
-  virtual void SetLightingUpdate (int flags, int num_lights) = 0;
-
-  /**
    * Get the movable instance for this object.
-   * It is very important to call GetMovable()->UpdateMove()
+   * It is very important to call GetMovable()::UpdateMove()
    * after doing any kind of modification to this movable
    * to make sure that internal data structures are
    * correctly updated.
@@ -397,7 +363,8 @@ struct iMeshWrapper : public virtual iBase
    * This version can also return the material that was hit (this will
    * only happen if 'do_material' is true). This is not
    * supported by all meshes so this can return 0 even if there was a hit.
-   * \sa csHitBeamResult
+   * \sa csHitBeamResult iSector::HitBeam() iSector::HitBeamPortals()
+   * iBulletDynamicSystem::HitBeam()
    */
   virtual csHitBeamResult HitBeam (const csVector3& start,
   	const csVector3& end, bool do_material = false) = 0;
@@ -518,7 +485,7 @@ struct iMeshWrapper : public virtual iBase
    * only the position.
    * <p>
    * Note also that some mesh objects don't support HardTransform. You
-   * can find out by calling iMeshObject->SupportsHardTransform().
+   * can find out by calling iMeshObject::SupportsHardTransform().
    * In that case you can sometimes still call HardTransform() on the
    * factory.
    */

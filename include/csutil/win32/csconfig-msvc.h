@@ -112,6 +112,15 @@
 #  endif
 #endif
 
+#if defined(CS_COMPILER_MSVC) && (CS_PROCESSOR_SIZE >= 64)
+  /* x64 MSVC doesn't support MMX intrinsics - they compile fine but fail to
+     link
+     See e.g. http://msdn.microsoft.com/en-us/library/08x3t697.aspx */
+  #ifdef CS_SUPPORTS_MMX
+  #undef CS_SUPPORTS_MMX
+  #endif
+#endif
+
 // Check for support of native aligned allocation
 #if defined(CS_COMPILER_MSVC) && defined(_MSC_VER) && (_MSC_VER >= 1300)
   #define CS_HAVE__ALIGNED_MALLOC

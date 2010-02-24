@@ -9,7 +9,5 @@
 # refer to the files inside CS or a copy in your project's sources; either
 # way, the include statements below would obviously have to adjusted 
 # appropriately.
-include $(TOP)/mk/msvc/crystalspace_staticplugins_msvc7.jam ;
-include $(TOP)/mk/msvc/crystalspace_staticplugins_msvc71.jam ;
 include $(TOP)/mk/msvc/crystalspace_staticplugins_msvc8.jam ;
 include $(TOP)/mk/msvc/crystalspace_staticplugins_msvc9.jam ;

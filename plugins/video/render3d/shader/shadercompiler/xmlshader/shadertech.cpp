@@ -2068,47 +2068,51 @@ void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes,
   modes.doInstancing = true;
 }
 
-void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits) const
+void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits, uint userFlags) const
 {
-  csDirtyAccessArray<csStringID> allNames;
-
   for (size_t pass = 0; pass < passesCount; pass++)
   {
     ShaderPass* thispass = &passes[pass];
 
-    if(thispass->vproc)
+    if (((userFlags & iShader::svuVProc) != 0) && thispass->vproc)
     {
       thispass->vproc->GetUsedShaderVars (bits);
     }
 
-    for (size_t i = 0; i < thispass->custommapping_attrib.GetSize (); i++)
+    if ((userFlags & iShader::svuBuffers) != 0)
     {
-      CS::ShaderVarStringID id = thispass->custommapping_id[i];
-      if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
+      for (size_t i = 0; i < thispass->custommapping_attrib.GetSize (); i++)
       {
-        bits.SetBit (id);
+	CS::ShaderVarStringID id = thispass->custommapping_id[i];
+	if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
+	{
+	  bits.SetBit (id);
+	}
       }
     }
-    for (size_t j = 0; j < thispass->textures.GetSize(); j++)
+    if ((userFlags & iShader::svuTextures) != 0)
     {
-      CS::ShaderVarStringID id = thispass->textures[j].tex.id;
-      if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
+      for (size_t j = 0; j < thispass->textures.GetSize(); j++)
       {
-        bits.SetBit (id);
-      }
-      id = thispass->textures[j].fallback.id;
-      if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
-      {
-        bits.SetBit (id);
+	CS::ShaderVarStringID id = thispass->textures[j].tex.id;
+	if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
+	{
+	  bits.SetBit (id);
+	}
+	id = thispass->textures[j].fallback.id;
+	if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
+	{
+	  bits.SetBit (id);
+	}
       }
     }
 
-    if(thispass->vp)
+    if (((userFlags & iShader::svuVP) != 0) && thispass->vp)
     {
       thispass->vp->GetUsedShaderVars (bits);
     }
 
-    if(thispass->fp)
+    if (((userFlags & iShader::svuFP) != 0) && thispass->fp)
     {
       thispass->fp->GetUsedShaderVars (bits);
     }

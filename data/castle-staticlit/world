@@ -81,10 +81,6 @@
         <texture name="castle-detail3_d.jpg">
             <file>/lib/std/castle/castle-detail3_d.jpg</file>
         </texture>
-        <texture name="BUMPcastle-detail3_h.jpg">
-            <file>/lib/std/castle/castle-detail3_h.jpg</file>
-            <class>heightmap</class>
-        </texture>
         <texture name="BUMPcastle-detail3_n.jpg">
             <file>/lib/std/castle/castle-detail3_n.jpg</file>
             <class>normalmap</class>
@@ -267,7 +263,6 @@
         <material name="parallaxAtt_detail3-parallaxcastle-detail3_d.jpg">
             <texture>castle-detail3_d.jpg</texture>
             <shadervar type="texture" name="tex normal">BUMPcastle-detail3_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPcastle-detail3_h.jpg</shadervar>
             <shadervar type="vector4" name="specular">0.2,0.2,0.2,0.2</shadervar>
         </material>
         <material name="parallaxAtt_wood_parallaxwood.png">

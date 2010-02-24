@@ -1,5 +1,5 @@
 #============================================================================
-# Copyright (C)2006-2009 by Frank Richter
+# Copyright (C)2006-2010 by Frank Richter
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -23,7 +23,8 @@ if $(CMD.RSVG) != ""
   ##   The source SVG file is expected to have the name 
   ##   icons-src/scalable/<iconname>.svg. The result files are named
   ##   the icons/<size>/<iconname>.png for multiple common icon sizes as
-  ##   'size'.
+  ##   'size'. These "common sizes" include suitable sizes for icons on Linux
+  ##   desktops, Windows and MacOS/X.
   ##   Images for certain sizes can be specified as 
   ##   icons-src/<size>/<iconname>.png files; these are preferred over the
   ##   automatically generated ones.
@@ -43,17 +44,17 @@ if $(CMD.RSVG) != ""
     # Icon sizes to generate/use:
     # 16 - Windows small icon (Window menu, start menu)
     # 22 - Small icon for KDE and GNOME menus
-    # 24 - Small icon for GNOME file lists(*)
+    # 24 - Small icon for GNOME file lists(1)
     # 32 - Normal icon for Windows
     # 48 - Large icon for Windows XP
-    # 128 - MacOS/X, some Windows Explorer alternatives use that(**)
-    # 256 - Windows Vista icon(**)
+    # 256 - Windows Vista icon(2)
+    # 512 - MacOS/X(3)
     #
-    # * - Can be generated from 22x22 pics by adding a border.
-    # ** - Cause icon files to be really large. Vista supports PNG compression
-    #      in icons and uses it for the 256x256 versions. Problem: resource
-    #      compilers don't support that yet.
-    for size in 16 22 32 48 128 256
+    # (1) - Can be generated from 22x22 pics by adding a border.
+    # (2) - Cause icon files to be really large. Vista supports PNG compression
+    #       in icons and uses it for the 256x256 versions.
+    # (3) - OS/X 10.5 and newer. Older versions used 128x128.
+    for size in 16 22 32 48 256 512
     {
       local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
       local pngfile = $(icon:G=$(pngdir)).png ;
@@ -91,10 +92,18 @@ if $(CMD.RSVG) != ""
     ICONBASE=`basename $(>) .svg`
     if [ -e $SIZEDICONSSRC/$ICONBASE.png ] ; then
       $(CP) $SIZEDICONSSRC/$ICONBASE.png $(<)
-    elif [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
-      $(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $SIZEDICONSSRC/$ICONBASE.svg $(<)
     else
-      $(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $(>) $(<)
+      if [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
+	$(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $SIZEDICONSSRC/$ICONBASE.svg $(<).tmp
+      else
+	$(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $(>) $(<).tmp
+      fi
+      if [ -n "$(CMD.PNGCRUSH:E=)" ] ; then
+	$(CMD.PNGCRUSH) -rem text $(<).tmp $(<)
+	rm $(<).tmp
+      else
+	mv $(<).tmp $(<)
+      fi
     fi
   }
   
@@ -105,10 +114,18 @@ if $(CMD.RSVG) != ""
     GENSIZEDICONSSRC=`dirname $(<)`/../22
     if [ -e $SIZEDICONSSRC/$ICONBASE.png ] ; then
       $(CP) $SIZEDICONSSRC/$ICONBASE.png $(<)
-    elif [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
-      $(CMD.RSVG) -f png -w 24 -h 24  $SIZEDICONSSRC/$ICONBASE.svg $(<)
     else
-      $(CMD.CONVERT) -bordercolor Transparent -border 1x1 $GENSIZEDICONSSRC/$ICONBASE.png $(<)
+      if [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
+	$(CMD.RSVG) -f png -w 24 -h 24  $SIZEDICONSSRC/$ICONBASE.svg $(<).tmp
+      else
+	$(CMD.CONVERT) -bordercolor Transparent -border 1x1 $GENSIZEDICONSSRC/$ICONBASE.png $(<).tmp
+      fi
+      if [ -n "$(CMD.PNGCRUSH:E=)" ] ; then
+	$(CMD.PNGCRUSH) -rem text $(<).tmp $(<)
+	rm $(<).tmp
+      else
+	mv $(<).tmp $(<)
+      fi
     fi
   }
 }
@@ -119,12 +136,26 @@ else
 
 if $(CMD.ICOTOOL) != ""
 {
-  ## IconsMakeWin32ICO filename : iconname
+  # Pad the given argument with zeroes on the left side to a length of 3 chars.
+  rule _ZeroPad
+  {
+    if [ Match ^([0-9][0-9])$ : $(<) ]
+    {
+      return 0$(<) ;
+    }
+    if [ Match ^([0-9])$ : $(<) ]
+    {
+      return 00$(<) ;
+    }
+    return $(<) ;
+  }
+
+  ## IconsMakeWin32ICO filename : iconname [: sizes]
   ##   Generate a Win32 ICO file from multiple PNG images, such as those
   ##   produced by IconsFromSVG.
   ##   The source images are expected to have the names
-  ##   icons/<size>/<iconname>.png for multiple common icon sizes as
-  ##   'size' (currently 16, 32 and 48).
+  ##   icons/<size>/<iconname>.png for the sizes specified in `sizes'.
+  ##   By default, a set of common sizes is used, currently 16, 32, 48 and 256.
   ##   The ICO will also include 256 color images that are generated from
   ##   the (presumably RGBA) source PNGs and stored as 
   ##   icons/<size>/<iconname>_8.png. 
@@ -137,9 +168,12 @@ if $(CMD.ICOTOOL) != ""
   { 
     local icofile = $(1) ;
     local icon = $(2) ;
+    local sizes = $(3) ;
+    
+    if "$(sizes)" = "" { sizes = 16 32 48 256 ; }
     
     local size icons ;
-    for size in 16 32 48
+    for size in $(sizes)
     {
       local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
       local pngtempdir = [ ConcatDirs $(BUILDTOP) out iconstmp $(SUBDIR) $(size) ] ;
@@ -147,15 +181,27 @@ if $(CMD.ICOTOOL) != ""
       local pngfile = $(icon:G=$(pngdir)).png ;
       local lowfile = $(icon:G=$(pngtempdir))_8.png ;
       NoCare $(pngfile) ;
-      icons += "$(pngfile)" ;
-      if $(CMD.CONVERT) != ""
+      # <= is a string comparison in Jam, hence the 0 padding
+      if [ _ZeroPad $(size) ] <= 128
       {
-	MakeLocate $(lowfile) : $(pngtempdir) ;
-        SIZE on $(lowfile) = $(size) ;
-	
-	ReduceColorDepth $(lowfile) : $(pngfile) ;
-	Always $(lowfile) ;
-        icons += "$(lowfile)" ;
+	icons += "$(pngfile)" ;
+	if $(CMD.CONVERT) != ""
+	{
+	  MakeLocate $(lowfile) : $(pngtempdir) ;
+	  SIZE on $(lowfile) = $(size) ;
+	  
+	  ReduceColorDepth $(lowfile) : $(pngfile) ;
+	  Always $(lowfile) ;
+	  icons += "$(lowfile)" ;
+	}
+      }
+      else
+      {
+	if "$(ICOTOOL.SUPPORTS_RAW)" = "yes"
+	{
+	  # Special case, embed icon as PNG
+	  RAW_ICONS on $(icofile) += "$(pngfile)" ;
+	}
       }
     }
     
@@ -173,11 +219,11 @@ if $(CMD.ICOTOOL) != ""
       $(CP) $ICONSSRC/\${ICONBASE}_8.png $(<)
     else
       # Makes transparency binary and reduces colors to 256
-      $(CMD.CONVERT) $(>) \( +clone -fx a +matte -monochrome \) -compose CopyOpacity -composite -colors 256 -dither $(<)
+      $(CMD.CONVERT) $(>) \( +clone -fx a +matte -monochrome \) -compose CopyOpacity -composite -colors 256 +dither $(<)
     fi
   }
   
-  actions IcoTool
+  actions IcoTool bind RAW_ICONS
   {
     SOURCES=
     for i in $(>) ; do
@@ -185,10 +231,52 @@ if $(CMD.ICOTOOL) != ""
         SOURCES="$SOURCES $i"
       fi
     done
-    $(CMD.ICOTOOL) -c -o $(<) $SOURCES
+    $(CMD.ICOTOOL) -c -o $(<) $SOURCES "--raw=$(RAW_ICONS)"
   }
 }
 else
 {
   rule IconsMakeWin32ICO { }
+}
+
+if $(CMD.MAKEICNS) != ""
+{
+  ## IconsMakeWinMacICNS filename : iconname
+  ##   Generate a MacOS/X ICNS file from a PNG image such as produced by
+  ##   IconsFromSVG.
+  ##   Currently the source image is expected to have a resolution of 512x512
+  ##   pixels and to be located at icons/512/<iconname>.png.
+  ##   For the conversion to happen a 3rd party tool, `makeicns' is required.
+  ##   It can be obtained from http://www.amnoid.de/icns/makeicns.html .
+  ##   The actual conversion is done when the "generateicons" target is
+  ##   invoked.
+  rule IconsMakeMacICNS
+  { 
+    local icnsfile = $(1) ;
+    local icon = $(2) ;
+    
+    # Hardcoded size for Leopard and above.
+    # Note that `makeicns' takes care of downsizing to the smaller sizes needed
+    # for older versions.
+    local size = 512 ; 
+    
+    local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
+    local pngfile = $(icon:G=$(pngdir)).png ;
+    
+    SEARCH on $(pngfile) = $(pngdir) ;
+    NoCare $(pngfile) ;
+    MakeLocate $(icnsfile) : $(SUBDIR) ;
+    Depends $(icnsfile) : $(pngfile) ;
+    MakeIcns $(icnsfile) : $(pngfile) ;
+    Depends generateicons : $(icnsfile) ;
+  }
+  
+  actions MakeIcns
+  {
+    $(CMD.MAKEICNS) -512 $(>) -256 $(>) -128 $(>) -out $(<)
+  }
+}
+else
+{
+  rule IconsMakeMacICNS { }
 }

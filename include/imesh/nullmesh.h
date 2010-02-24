@@ -31,6 +31,7 @@
 class csVector3;
 class csBox3;
 struct iMeshObject;
+struct iObjectModel;
 
 /**
  * This interface describes the API for the null mesh object.
@@ -70,7 +71,14 @@ struct iNullMeshState : public virtual iBase
  */
 struct iNullFactoryState : public virtual iNullMeshState
 {
-  SCF_INTERFACE (iNullFactoryState, 0, 0, 1);
+  SCF_INTERFACE (iNullFactoryState, 1, 0, 0);
+
+  /**
+   * Sets the object model required by csColliderHelper for retrieving
+   * collision data. Useful when you want to have collision on a null mesh,
+   * e.g. Using a nullmesh to represent the position of an instanced mesh.
+   */
+  virtual void SetCollisionMeshData (iObjectModel* data) = 0;
 };
 
 /** @} */

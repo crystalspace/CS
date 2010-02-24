@@ -25,7 +25,6 @@
 #include "csplugincommon/canvas/cursorconvert.h"
 #include "csplugincommon/canvas/fontcache.h"
 #include "csplugincommon/canvas/graph2d.h"
-#include "csplugincommon/canvas/scancode.h"
 #include "csplugincommon/imageloader/commonimagefile.h"
 #include "csplugincommon/imageloader/optionsparser.h"
 #include "csplugincommon/iopengl/driverdb.h"

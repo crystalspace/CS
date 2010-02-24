@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Keith Fulton
+    Copyright (C) 2009 by Keith Fulton and Mike Gist
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,47 +30,119 @@
 #include "csutil/scf.h"
 
 struct iSharedVariable;
-class csReversibleTransform;
 
 /**
- * iImposter defines the interface a mesh (or other) class must
- * implement to be used as imposter mesh by the engine.
+ * iImposterFactory defines the interface a mesh factory must
+ * implement for its meshes to be used as imposters by
+ * the engine.
  */
-struct iImposter : public virtual iBase
+struct iImposterFactory : public virtual iBase
 {
-  SCF_INTERFACE(iImposter, 4, 0, 0);
-
-  /// Self explanatory
-  virtual void SetImposterActive (bool flag)=0;
-  virtual bool GetImposterActive () const =0;
+  SCF_INTERFACE(iImposterFactory, 1, 1, 0);
 
   /**
-   * Minimum Imposter Distance is the distance from camera 
-   * beyond which imposter is used. Imposter gets a 
-   * ptr here because value is a shared variable 
-   * which can be changed at runtime for many objects.
+   * Given a mesh, activate and update its imposter.
+   * Return the render mesh for this imposter.
    */
-  virtual void SetMinDistance (iSharedVariable* dist) = 0;
+  virtual bool UpdateImposter(iMeshWrapper* mesh, iRenderView* rview) = 0;
 
   /**
-   * Rotation Tolerance is the maximum allowable 
-   * angle difference between when the imposter was 
-   * created and the current position of the camera.
-   * Angle greater than this triggers a re-render of
-   * the imposter.
+   * Given a mesh, deactivate and remove its imposter.
    */
-  virtual void SetRotationTolerance (iSharedVariable* angle) = 0;
+  virtual void RemoveImposter(iMeshWrapper* mesh) = 0;
 
   /**
-   * Camera Rotation Tolerance is the tolerance angle
-   * between z->1 vector and object on screen. Exceeding this
-   * value triggers updating of the imposter whenever the
-   * object slides too much away from the center of screen.
+   * Sets the minimum imposter distance.
+   * This is the distance from camera beyond which an imposter is used.
    */
-  virtual void SetCameraRotationTolerance (iSharedVariable* angle) = 0;
+  virtual void SetMinDistance(float dist) = 0;
 
-  /// Determine if imposter or true rendering will be used
-  virtual bool WouldUseImposter (csReversibleTransform& pov) const = 0;
+  /**
+   * Gets the minimum imposter distance.
+   */
+  virtual float GetMinDistance() = 0;
+
+  /**
+   * Sets the rotation tolerance.
+   * This is the maximum allowable angle difference between when the
+   * imposter was created and the current position of the camera.
+   * Angles greater than this trigger a re-render of the imposter.
+   */
+  virtual void SetRotationTolerance(float angle) = 0;
+
+  /**
+   * Gets the rotation tolerance.
+   */
+  virtual float GetRotationTolerance() = 0;
+
+  /**
+   * Sets the camera rotation tolerance.
+   * This is the tolerance angle between the z->1 vector and the object
+   * on screen. Exceeding this value triggers the updating of the imposter
+   * whenever the object slides too much away from the center of screen.
+   */
+  virtual void SetCameraRotationTolerance(float angle) = 0;
+
+  /**
+   * Gets the camera rotation tolerance.
+   */
+  virtual float GetCameraRotationTolerance() = 0;
+
+  /**
+   * Sets the shader to be used by the imposters.
+   */
+  virtual void SetShader(const char* shader) = 0;
+
+  /**
+   * Sets what method of impostering (instancing or not) to use.
+   */
+  virtual void SetInstancing(bool instancing) = 0;
+
+  /**
+  * Sets whether to render the real mesh while waiting for the imposter to init.
+  */
+  virtual void SetRenderReal(bool renderReal) = 0;
+};
+
+struct iImposterMesh : public virtual iBase
+{
+  SCF_INTERFACE(iImposterMesh, 1, 0, 0);
+
+  /**
+   * Whether this imposter is currently instancing any meshes.
+   */
+  virtual bool IsInstancing() = 0;
+
+  /**
+   * Add an instance of the passed mesh.
+   * Returns true if able to add an instance for this mesh.
+   * Returns false otherwise.
+   */
+  virtual bool Add(iMeshWrapper* mesh, iRenderView* rview) = 0;
+
+  /**
+   * Update the instance of the passed mesh.
+   * Returns true if able to update an instance for this mesh.
+   * Returns false otherwise.
+   */
+  virtual bool Update(iMeshWrapper* mesh, iRenderView* rview) = 0;
+
+  /**
+   * Remove the instance of the passed mesh.
+   * Returns false if not currently instancing this mesh.
+   * Returns true otherwise.
+   */
+  virtual bool Remove(iMeshWrapper* mesh) = 0;
+
+  /**
+   * Destroy this imposter.
+   */
+  virtual void Destroy() = 0;
+
+  /**
+   * Query whether the r2t has been performed for this imposter.
+   */
+  virtual bool Rendered() const = 0;
 };
 
 /** @} */

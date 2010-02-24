@@ -44,7 +44,8 @@ using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 // ---------------------------------------------------------------------------
 
 csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj) 
-  : scfImplementationType (this), engine (engine)
+  : scfImplementationType (this), instancing (0),
+    engine (engine)
 {
 //  movable.scfParent = this; //@TODO: CHECK THIS
   wor_bbox_movablenr = -1;
@@ -70,10 +71,7 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   }
   factory = 0;
   zbufMode = CS_ZBUF_USE;
-  //imposter_active = false;
-  imposter_mesh = 0;
-  cast_hardware_shadow = true;
-  draw_after_fancy_stuff = false;
+  using_imposter = false;
 
   do_minmax_range = false;
   min_render_dist = -1000000000.0f;
@@ -94,9 +92,13 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
 void csMeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
 {
   // Check if we're instancing, if so then set the shadervar and instance factory.
-  transformVars = factory->GetInstances();
-  if(transformVars)
+  csRef<csShaderVariable> factoryTransformVars = factory->GetInstances();
+  if(factoryTransformVars)
   {
+    csRef<csShaderVariable>& fadeFactors = GetInstancingData()->fadeFactors;
+    csRef<csShaderVariable>& transformVars = GetInstancingData()->transformVars;
+  
+    transformVars = factoryTransformVars;
     GetSVContext()->AddVariable(transformVars);
     factory = factory->GetInstanceFactory();
 
@@ -128,8 +130,21 @@ void csMeshWrapper::SelfDestruct ()
   engine->GetMeshes ()->Remove (static_cast<iMeshWrapper*> (this));
 }
 
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(csMeshWrapper, instancingAlloc, GetInstancingAlloc,
+  csMeshWrapper::InstancingAlloc, ())
+  
+csMeshWrapper::InstancingData* csMeshWrapper::GetInstancingData()
+{
+  if (instancing == 0)
+    instancing = GetInstancingAlloc().Alloc();
+  return instancing;
+}
+
 csShaderVariable* csMeshWrapper::AddInstance(csVector3& position, csMatrix3& rotation)
 {
+  csRef<csShaderVariable>& fadeFactors = GetInstancingData()->fadeFactors;
+  csRef<csShaderVariable>& transformVars = GetInstancingData()->transformVars;
+  
   if(!transformVars.IsValid())
   {
     csRef<iShaderVarStringSet> SVstrings = csQueryRegistryTagInterface<iShaderVarStringSet>(
@@ -158,15 +173,107 @@ csShaderVariable* csMeshWrapper::AddInstance(csVector3& position, csMatrix3& rot
   csReversibleTransform tr(rotation.GetInverse(), position);
   transformVar->SetValue (tr);
   transformVars->AddVariableToArray(transformVar);
+  
+  instancing->instancingTransformsDirty = true;
 
   return transformVar;
 }
 
 void csMeshWrapper::RemoveInstance(csShaderVariable* instance)
 {
+  CS_ASSERT (instancing != 0);
+  csRef<csShaderVariable>& fadeFactors = GetInstancingData()->fadeFactors;
+  csRef<csShaderVariable>& transformVars = instancing->transformVars;
   size_t element = transformVars->FindArrayElement(instance);
   transformVars->RemoveFromArray(element);
   fadeFactors->RemoveFromArray(element);
+  instancing->instancingTransformsDirty = true;
+}
+
+// Stuff to fixup rendermesh bboxes in case of instancing
+
+csMeshWrapper::InstancingData::RenderMeshesSet::RenderMeshesSet () : n (0), meshArray (0),
+  meshes (0)
+{}
+
+csMeshWrapper::InstancingData::RenderMeshesSet::~RenderMeshesSet ()
+{
+  cs_free (meshArray);
+  cs_free (meshes);
+}
+
+void csMeshWrapper::InstancingData::RenderMeshesSet::CopyOriginalMeshes (int n,
+  csRenderMesh** origMeshes)
+{
+  /* This _deliberately_ does not do proper C++ construction/destruction/
+     copying.
+     csRenderMesh contains a number of csRef<>s and such, but we're really
+     only interested in the bbox members, and neither care about nor want to
+     pay for the others. Also, the meshes only have to be valid for one
+     frame - and if the original meshes are the simple copies are, too. */
+  if (n != this->n)
+  {
+    meshes = (csRenderMesh*)cs_realloc (meshes, n * sizeof (csRenderMesh));
+    meshArray = (csRenderMesh**)cs_realloc (meshArray, n * sizeof (csRenderMesh*));
+    for (int i = 0; i < n; i++)
+      meshArray[i] = meshes+i;
+    
+    this->n = n;
+  }
+  for (int i = 0; i < n; i++)
+    memcpy (meshes+i, origMeshes[i], sizeof (csRenderMesh));
+}
+  
+csBox3 csMeshWrapper::AdjustBboxForInstances (const csBox3& origBox) const
+{
+  CS_ASSERT (instancing != 0);
+  csRef<csShaderVariable>& transformVars = instancing->transformVars;
+  CS_ASSERT (transformVars->GetType() == csShaderVariable::ARRAY);
+  size_t numInst = transformVars->GetArraySize ();
+  if (numInst == 0) return origBox;
+  csBox3 newBox;
+  for (size_t i = 0; i < numInst; i++)
+  {
+    csReversibleTransform tf;
+    transformVars->GetArrayElement (i)->GetValue (tf);
+    csBox3 box_tf = tf.This2Other (origBox);
+    newBox += box_tf;
+  }
+  return newBox;
+}
+
+csRenderMesh** csMeshWrapper::FixupRendermeshesForInstancing (int n,
+  csRenderMesh** meshes)
+{
+  CS_ASSERT (instancing != 0);
+  csArray<InstancingData::InstancingBbox>& instancingBoxes = instancing->instancingBoxes;
+  
+  // Check old bboxes and recompute if necessary
+  instancingBoxes.SetSize (n);
+  for (int i = 0; i < n; i++)
+  {
+    const csBox3& origBox = meshes[i]->bbox;
+    if (origBox != instancingBoxes[i].oldBox)
+    {
+      instancingBoxes[i].oldBox = origBox;
+      instancingBoxes[i].newBox = AdjustBboxForInstances (origBox);
+    }
+  }
+  
+  // Get a new set of rendermeshes valid for this frame...
+  csFrameDataHolder<InstancingData::RenderMeshesSet>& instancingRMs =
+    instancing->instancingRMs;
+  bool created;
+  InstancingData::RenderMeshesSet& meshesSet = instancingRMs.GetUnusedData (created,
+    engine->csEngine::GetCurrentFrameNumber());
+  meshesSet.CopyOriginalMeshes (n, meshes);
+  // ... and change the bounding boxes
+  for (int i = 0; i < n; i++)
+  {
+    meshesSet.meshes[i].bbox = instancingBoxes[i].newBox;
+  }
+  
+  return meshesSet.meshArray;
 }
 
 void csMeshWrapper::AddToSectorPortalLists ()
@@ -232,13 +339,20 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 
 csMeshWrapper::~csMeshWrapper ()
 {
+  if (using_imposter)
+  {
+    iImposterFactory* factwrap = dynamic_cast<iImposterFactory*> (factory);
+    factwrap->RemoveImposter (this);
+  }
+
   // Copy the array because we are going to unlink the children.
   csRefArray<iSceneNode> children = movable.GetChildren ();
   size_t i;
   for (i = 0 ; i < children.GetSize () ; i++)
     children[i]->SetParent (0);
-  delete imposter_mesh;
   ClearFromSectorPortalLists ();
+  
+  if (instancing != 0) GetInstancingAlloc().Free (instancing);
 }
 
 void csMeshWrapper::UpdateMove ()
@@ -400,17 +514,25 @@ void csMeshWrapper::SetRenderPriority (CS::Graphics::RenderPriority rp)
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  if (factory)
+
+  if (factory && drawing_imposter != rview->GetCamera())
   {
-    csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
-  	factory);
-    if (factwrap->imposter_active && CheckImposterRelevant (rview))
+    csRef<iImposterFactory> factwrap = scfQueryInterfaceSafe<iImposterFactory> (factory);
+    if (factwrap)
     {
-      csRenderMesh** imposter = GetImposter (rview);
-      if (imposter)
+      if (UseImposter (rview))
       {
-        n = 1;
-        return imposter;
+        if(factwrap->UpdateImposter (this, rview))
+        {
+          using_imposter = true;
+          n = 0;
+          return 0;
+        }
+      }
+      else if (using_imposter)
+      {
+        factwrap->RemoveImposter (this);
+        using_imposter = false;
       }
     }
   }
@@ -478,6 +600,10 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
 
   CS::Graphics::RenderMesh** rmeshes = meshobj->GetRenderMeshes (n, rview, &movable,
   	old_ctxt != 0 ? 0 : frustum_mask);
+  if (DoInstancing())
+  {
+    rmeshes = FixupRendermeshesForInstancing (n, rmeshes);
+  }
   if (old_ctxt)
   {
     CS::RenderManager::RenderView* csrview =
@@ -753,31 +879,18 @@ void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
 
 //---------------------------------------------------------------------------
 
-bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
+bool csMeshWrapper::UseImposter (iRenderView *rview)
 {
-  if (!factory) return false;
-  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
-  	factory);
+  if (!factory)
+    return false;
+
+  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (factory);
+  if(!factwrap->GetMinDistance())
+    return false;
+
   float wor_sq_dist = GetSquaredDistance (rview);
-  float dist = factwrap->min_imposter_distance->Get ();
+  float dist = factwrap->GetMinDistance();
   return (wor_sq_dist > dist*dist);
-}
-
-csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
-{
-  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
-  	factory);
-  csImposterFactory* imposter_factory = factwrap->GetImposterFactory ();
-  if (!imposter_factory) return 0;
-
-  imposter_mesh = imposter_factory->GetImposterMesh (this,
-      imposter_mesh, rview);
-  if (!imposter_mesh) return 0;
-  if (!imposter_mesh->GetImposterReady (rview))
-    return 0;
-
-  // Get imposter rendermesh
-  return imposter_mesh->GetRenderMesh (rview);
 }
 
 void csMeshWrapper::SetLODFade (float fade)
@@ -1066,44 +1179,27 @@ csScreenBoxResult csMeshWrapper::GetScreenBoundingBox (iCamera *camera)
 {
   csScreenBoxResult rc;
 
-  csVector2 oneCorner;
+  // Calculate camera space bbox.
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable.IsFullTransformIdentity ())
     tr_o2c /= movable.GetFullTransform ();
   
   rc.cbox = GetTransformedBoundingBox (tr_o2c);
 
-  // if the entire bounding box is behind the camera, we're done
-  if ((rc.cbox.MinZ () < 0) && (rc.cbox.MaxZ () < 0))
+  // Calculate screen space bbox.
+  float minz, maxz;
+  const csBox3& wbox = GetWorldBoundingBox();
+  if(!wbox.ProjectBox(camera->GetTransform(), camera->GetProjectionMatrix(),
+      rc.sbox, minz, maxz, engine->G3D->GetWidth(),
+      engine->G3D->GetHeight()))
   {
-    rc.distance = -1;
-    return rc;
-  }
-
-  // Transform from camera to screen space.
-  if (rc.cbox.MinZ () <= 0)
-  {
-    // Mesh is very close to camera.
-    // Just return a maximum bounding box.
-    rc.sbox.Set (-10000, -10000, 10000, 10000);
+      rc.distance = -1;
   }
   else
   {
-    oneCorner = camera->Perspective (rc.cbox.Max ());
-    rc.sbox.StartBoundingBox (oneCorner);
-
-    csVector3 v (rc.cbox.MinX (), rc.cbox.MinY (), rc.cbox.MaxZ ());
-    oneCorner = camera->Perspective (v);
-    rc.sbox.AddBoundingVertexSmart (oneCorner);
-    oneCorner = camera->Perspective (rc.cbox.Min ());
-    rc.sbox.AddBoundingVertexSmart (oneCorner);
-    v.Set (rc.cbox.MaxX (), rc.cbox.MaxY (), rc.cbox.MinZ ());
-    oneCorner = camera->Perspective (v);
-    rc.sbox.AddBoundingVertexSmart (oneCorner);
+      rc.distance = rc.cbox.MaxZ ();
   }
 
-  rc.distance = rc.cbox.MaxZ ();
-  
   return rc;
 }
 

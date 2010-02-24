@@ -64,6 +64,8 @@ namespace RenderManager
       iTextureHandle* target;
       /// The subtexture to be rendered to.
       int targetSubTexture;
+      /// Flags for iGraphics3D::BeginDraw()
+      int drawFlags;
     };
 
     /// Construct
@@ -95,12 +97,12 @@ namespace RenderManager
       if (targetInfo == 0)
       {
         RenderTargetInfo newInfo;
-        newInfo.views.PutUnique (subtexture, newView);
+        newInfo.views.Put (subtexture, newView);
         targets->PutUnique (target, newInfo);
       }
       else
       {
-        targetInfo->views.PutUnique (subtexture, newView);
+        targetInfo->views.Put (subtexture, newView);
       }
     }
 
@@ -127,6 +129,7 @@ namespace RenderManager
         targetInfo->views.DeleteAll (subtexture);
         if (targetInfo->views.IsEmpty()) alwaysUsedTargets.DeleteAll (target);
       }
+      forciblyUsedTextures.Delete (target);
     }
     
     void MarkAsUsed (iTextureHandle* target)
@@ -180,11 +183,16 @@ namespace RenderManager
       const LayerConfigType& layerConfig,
       csSet<typename RenderTree::ContextNode*>& contextsTested)
     {
+      if ((targets.GetSize() + oneTimeTargets.GetSize()) == 0)
+	// Nothing to do (forced textures were already dealt with)
+	return;
+      
       // Setup callbacks for SVs and mesh nodes
       NewTargetFn newTarget (*this, renderTree);
       typedef TraverseUsedSVs<RenderTree, NewTargetFn> MeshTraverseType;
       MeshTraverseType svTraverser
-        (newTarget, shaderManager->GetSVNameStringset ()->GetSize ());
+        (newTarget, shaderManager->GetSVNameStringset ()->GetSize (),
+	 iShader::svuTextures);
 
       // Just traverse each context once
       Implementation::OnceOperationBlockRef<typename RenderTree::ContextNode*> 
@@ -338,17 +346,19 @@ namespace RenderManager
 	  int subtexture;
 	  const typename RenderTargetInfo::ViewInfo& viewInfo (
 	    viewsIt.Next (subtexture));
-	  HandleView (viewInfo.view, textureHandle, subtexture);
+    int drawFlags = 0;
+    if (viewInfo.flags & iRenderManagerTargets::clearScreen) drawFlags |= CSDRAW_CLEARSCREEN;
+	  HandleView (viewInfo.view, textureHandle, subtexture, drawFlags);
 	}
       }
       else
       {
-	HandleView (localView, textureHandle, 0);
+	HandleView (localView, textureHandle, 0, 0);
       }
     }
 
     void HandleView (iView* targetView,
-      iTextureHandle* texh, int subtexture)
+      iTextureHandle* texh, int subtexture, int drawFlags)
     {
       if (!targetView) return;
 
@@ -359,6 +369,7 @@ namespace RenderManager
       settings.target = texh;
       settings.targetSubTexture = subtexture;
       settings.view = targetView;
+      settings.drawFlags = drawFlags;
 
       targetQueue.Push (settings);
     }

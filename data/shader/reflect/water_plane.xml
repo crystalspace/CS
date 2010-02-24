@@ -44,40 +44,40 @@
 	   - Fresnel for specular?
 	-->
       
-      <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-clear.xml" />
-      <alias name="apply_alpha" weak="yes" file="/shader/snippets/surface/alpha-premult.xml" />
-      <alias name="lighting" weak="yes" file="/shader/snippets/lighting/lighting-ppl.xml" />
-      <alias name="staticspecular" weak="yes" file="/shader/snippets/lighting/staticspec-default.xml" />
+      <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-clear.xml" />
+      <alias name="apply_alpha" weak="yes" file="/shader-snippets/surface/alpha-premult.xml" />
+      <alias name="lighting" weak="yes" file="/shader-snippets/lighting/lighting-ppl.xml" />
+      <alias name="staticspecular" weak="yes" file="/shader-snippets/lighting/staticspec-default.xml" />
 
       <!-- Snippets - the building blocks of this shader. -->
-      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="position" file="/shader-snippets/position.xml" />
       <snippet id="surface" filealias="surface" />
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap-tiled.xml" />
-      <snippet id="reflection" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
-      <snippet id="refraction" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
-      <snippet id="hdrscalerefl" file="/shader/snippets/hdr-prescale.xml" />
-      <snippet id="hdrscalerefr" file="/shader/snippets/hdr-prescale.xml" />
-      <snippet id="perturb_norm_refl" file="/shader/snippets/tcoffset2-perturb-normal-cam.xml" />
-      <snippet id="perturb_norm_refr" file="/shader/snippets/tcoffset2-perturb-normal-cam.xml" />
-      <snippet id="fog_refraction" file="/shader/snippets/fog/fog-distance-exp.xml" />
-      <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
-      <snippet id="fresnel_limit" file="/shader/snippets/modulate-float.xml" />
-      <snippet id="fresnel_inv" file="/shader/snippets/inverse-float.xml" />
-      <snippet id="blend_surface_refract" file="/shader/snippets/alpha-premult-blend.xml" />
-      <snippet id="lerp_reflect_refract" file="/shader/snippets/lerp.xml" />
-      <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap-tiled.xml" />
+      <snippet id="reflection" file="/shader-snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="refraction" file="/shader-snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="hdrscalerefl" file="/shader-snippets/hdr-prescale.xml" />
+      <snippet id="hdrscalerefr" file="/shader-snippets/hdr-prescale.xml" />
+      <snippet id="perturb_norm_refl" file="/shader-snippets/tcoffset2-perturb-normal-cam.xml" />
+      <snippet id="perturb_norm_refr" file="/shader-snippets/tcoffset2-perturb-normal-cam.xml" />
+      <snippet id="fog_refraction" file="/shader-snippets/fog/fog-distance-exp.xml" />
+      <snippet id="fresnel" file="/shader-snippets/reflect/fresnel.xml" />
+      <snippet id="fresnel_limit" file="/shader-snippets/modulate-float.xml" />
+      <snippet id="fresnel_inv" file="/shader-snippets/inverse-float.xml" />
+      <snippet id="blend_surface_refract" file="/shader-snippets/alpha-premult-blend.xml" />
+      <snippet id="lerp_reflect_refract" file="/shader-snippets/lerp.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
       <snippet id="apply_alpha" filealias="apply_alpha" />
       <snippet id="lighting" filealias="lighting" />
-      <snippet id="fake_light_diffuse" file="/shader/snippets/rgba-black.xml" />
-      <snippet id="specular_limit" file="/shader/snippets/modulate_rgb.xml" />
-      <snippet id="ambient" file="/shader/snippets/lighting/ambient-one.xml" />
-      <snippet id="specular" file="/shader/snippets/surface/specular-default-nodiffuse.xml" />
+      <snippet id="fake_light_diffuse" file="/shader-snippets/rgba-black.xml" />
+      <snippet id="specular_limit" file="/shader-snippets/modulate_rgb.xml" />
+      <snippet id="ambient" file="/shader-snippets/lighting/ambient-one.xml" />
+      <snippet id="specular" file="/shader-snippets/surface/specular-default-nodiffuse.xml" />
       <snippet id="staticspecular" filealias="staticspecular" />
-      <snippet id="add_specular" file="/shader/snippets/add.xml" />
-      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
+      <snippet id="add_specular" file="/shader-snippets/add.xml" />
+      <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
-      <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
-      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
+      <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other
            snippets (ie the "data flow" is modeled). The exact resolution of
 	   what output is linked to what input is done automatically. -->
@@ -216,30 +216,30 @@
 	   - Modulate specular by depth (similar to reflection)?
 	-->
       
-      <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-clear.xml" />
-      <alias name="apply_alpha" weak="yes" file="/shader/snippets/surface/alpha-premult.xml" />
+      <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-clear.xml" />
+      <alias name="apply_alpha" weak="yes" file="/shader-snippets/surface/alpha-premult.xml" />
 
       <!-- Snippets - the building blocks of this shader. -->
-      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="position" file="/shader-snippets/position.xml" />
       <snippet id="surface" filealias="surface" />
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="reflection" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
-      <snippet id="refraction" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
-      <snippet id="hdrscalerefl" file="/shader/snippets/hdr-prescale.xml" />
-      <snippet id="hdrscalerefr" file="/shader/snippets/hdr-prescale.xml" />
-      <snippet id="perturb_norm_refl" file="/shader/snippets/tcoffset2-perturb-normal-cam.xml" />
-      <snippet id="perturb_norm_refr" file="/shader/snippets/tcoffset2-perturb-normal-cam.xml" />
-      <snippet id="fog_refraction" file="/shader/snippets/fog/fog-distance-exp.xml" />
-      <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
-      <snippet id="fresnel_limit" file="/shader/snippets/modulate-float.xml" />
-      <snippet id="fresnel_inv" file="/shader/snippets/inverse-float.xml" />
-      <snippet id="blend_surface_refract" file="/shader/snippets/alpha-premult-blend.xml" />
-      <snippet id="lerp_reflect_refract" file="/shader/snippets/lerp.xml" />
-      <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="reflection" file="/shader-snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="refraction" file="/shader-snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="hdrscalerefl" file="/shader-snippets/hdr-prescale.xml" />
+      <snippet id="hdrscalerefr" file="/shader-snippets/hdr-prescale.xml" />
+      <snippet id="perturb_norm_refl" file="/shader-snippets/tcoffset2-perturb-normal-cam.xml" />
+      <snippet id="perturb_norm_refr" file="/shader-snippets/tcoffset2-perturb-normal-cam.xml" />
+      <snippet id="fog_refraction" file="/shader-snippets/fog/fog-distance-exp.xml" />
+      <snippet id="fresnel" file="/shader-snippets/reflect/fresnel.xml" />
+      <snippet id="fresnel_limit" file="/shader-snippets/modulate-float.xml" />
+      <snippet id="fresnel_inv" file="/shader-snippets/inverse-float.xml" />
+      <snippet id="blend_surface_refract" file="/shader-snippets/alpha-premult-blend.xml" />
+      <snippet id="lerp_reflect_refract" file="/shader-snippets/lerp.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
       <snippet id="apply_alpha" filealias="apply_alpha" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
-      <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
-      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
+      <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other
            snippets (ie the "data flow" is modeled). The exact resolution of
 	   what output is linked to what input is done automatically. -->
@@ -327,24 +327,24 @@
 	   - Modulate specular by depth (similar to reflection)?
 	-->
       
-      <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-clear.xml" />
-      <alias name="apply_alpha" weak="yes" file="/shader/snippets/surface/alpha-premult.xml" />
-      <alias name="lighting" weak="yes" file="/shader/snippets/lighting/lighting-ppl.xml" />
+      <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-clear.xml" />
+      <alias name="apply_alpha" weak="yes" file="/shader-snippets/surface/alpha-premult.xml" />
+      <alias name="lighting" weak="yes" file="/shader-snippets/lighting/lighting-ppl.xml" />
 
       <!-- Snippets - the building blocks of this shader. -->
-      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="position" file="/shader-snippets/position.xml" />
       <snippet id="surface" filealias="surface" />
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
       <snippet id="apply_alpha" filealias="apply_alpha" />
       <snippet id="lighting" filealias="lighting" />
-      <snippet id="fake_light_diffuse" file="/shader/snippets/rgba-black.xml" />
-      <snippet id="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
-      <snippet id="specular" file="/shader/snippets/surface/specular-default.xml" />
-      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
+      <snippet id="fake_light_diffuse" file="/shader-snippets/rgba-black.xml" />
+      <snippet id="ambient" file="/shader-snippets/lighting/ambient-null.xml" />
+      <snippet id="specular" file="/shader-snippets/surface/specular-default.xml" />
+      <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
-      <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
-      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
+      <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other
            snippets (ie the "data flow" is modeled). The exact resolution of
 	   what output is linked to what input is done automatically. -->

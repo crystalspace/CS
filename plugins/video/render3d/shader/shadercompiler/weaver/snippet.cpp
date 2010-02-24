@@ -455,6 +455,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           return false;
         }
       }
+      else if (strcmp (def, "undefined") == 0)
+      {
+        newInput.defaultType = Technique::Input::Undefined;
+      }
       else
       {
         compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
@@ -1152,6 +1156,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                                                Snippet* snippet)
   {
     snippets.Put (id, snippet);
+    snippetsOrdered.Push (snippet);
     inSnippets.Push (snippet);
     outSnippets.Push (snippet);
   }
@@ -1373,11 +1378,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         const Snippet::CompoundTechnique* compTech =
           static_cast<const Snippet::CompoundTechnique*> (tech);
 	// Each sub-snippet ...
-	Snippet::CompoundTechnique::IdSnippetHash::ConstGlobalIterator
-	  snippetIter = compTech->snippets.GetIterator();
-	while (snippetIter.HasNext())
+	for (size_t s = compTech->snippetsOrdered.GetSize(); s-- > 0; )
 	{
-	  Snippet* snippet = snippetIter.Next ();
+	  Snippet* snippet = //snippetIter.Next ();
+	    compTech->snippetsOrdered[s];
 	  if (techGraphs.GetSize() == 0)
 	  {
 	    BuildSubGraphs (snippet, techGraphs);

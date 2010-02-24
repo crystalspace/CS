@@ -372,7 +372,7 @@ ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, int w, int h) :
   scfImplementationType (this), loader (loader),
   tiles (w, h), tilesDirty (tiles.ComputeTileCount()),
   baseColor (0, 0, 0), baseMap (tilesDirty.GetSize()), 
-  state (stateDirty)
+  state (0)
 {
   mat_w = w;
   mat_h = h;
@@ -443,6 +443,7 @@ bool ProctexPDLight::PrepareAnim ()
     if (light.light)
     {
       success = true;
+      light.light->SetLightCallback(this);
       dirtyLights.Add ((iLight*)light.light);
 
       LightColorState colorState;
@@ -471,6 +472,11 @@ bool ProctexPDLight::PrepareAnim ()
   }
   lightBits.SetSize (lights.GetSize ());
   state.Set (statePrepared);
+  tilesDirty.FlipAllBits();
+  
+  // Initially fill texture (starts out with garbage)
+  Animate();
+  
   return true;
 }
 
@@ -480,22 +486,61 @@ void ProctexPDLight::Animate (csTicks current_time)
   {
     if (!loader->UpdatePT (this, current_time)) return;
 
-    csTicks startTime = csGetTicks();
+    Animate();
+  }
+}
 
-    CS_PROFILER_ZONE(ProctexPDLight_Animate)
+void ProctexPDLight::Animate ()
+{
+  csTicks startTime = csGetTicks();
+
+  CS_PROFILER_ZONE(ProctexPDLight_Animate)
 #ifdef CS_SUPPORTS_MMX
-    if (state.Check ((uint32)stateDoMMX))
-      Animate_MMX ();
-    else
+  if (state.Check ((uint32)stateDoMMX))
+    Animate_MMX ();
+  else
 #endif
-      Animate_Generic ();
+    Animate_Generic ();
 
-    state.Reset (stateDirty);
-    dirtyLights.DeleteAll ();
-    tilesDirty.Clear ();
+  state.Reset (stateDirty);
+  dirtyLights.DeleteAll ();
+  tilesDirty.Clear ();
 
-    csTicks endTime = csGetTicks();
-    loader->RecordUpdateTime (endTime-startTime);
+  csTicks endTime = csGetTicks();
+  loader->RecordUpdateTime (endTime-startTime);
+}
+
+void ProctexPDLight::OnColorChange (iLight* light, const csColor& newcolor)
+{
+  dirtyLights.Add (light);
+  const LightColorState& colorState = *lightColorStates.GetElementPointer (light);
+  /* When the light color difference to the value last used at updating
+     is below the amount needed for a visible difference an update of the
+     texture because of this light isn't needed. */
+  if ((fabsf (colorState.lastColor.red - newcolor.red) 
+      >= colorState.minChangeThresh.red)
+    || (fabsf (colorState.lastColor.green - newcolor.green) 
+      >= colorState.minChangeThresh.green)
+    || (fabsf (colorState.lastColor.blue - newcolor.blue) 
+      >= colorState.minChangeThresh.blue))
+    state.Set (stateDirty); 
+}
+
+void ProctexPDLight::OnDestroy (iLight* light)
+{
+  for (size_t i = 0; i < lights.GetSize(); i++)
+  {
+    if (lights[i].light == light)
+    {
+      lights.DeleteIndexFast (i);
+      lightColorStates.DeleteAll (light);
+      state.Set (stateDirty);
+      dirtyLights.Add (light);
+      lightBits.SetSize (lights.GetSize ());
+      tilesDirty.Clear();
+      tilesDirty.FlipAllBits();
+      return;
+    }
   }
 }
 

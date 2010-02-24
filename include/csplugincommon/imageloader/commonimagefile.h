@@ -152,7 +152,7 @@ protected:
   public:
     /// The actual image loader.
     csRef<iImageFileLoader> currentLoader;
-    /// Result of the iImageFileLoader->LoadData() call.
+    /// Result of the iImageFileLoader::LoadData() call.
     bool loadResult;
     /// Create new instance with a given image loader.
     LoaderJob (iImageFileLoader* loader);

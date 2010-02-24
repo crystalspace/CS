@@ -30,9 +30,14 @@
 #       COMPILER.C.TYPE, and (as an historic anomaly) COMPILER.TYPE variables
 #       in Jamconfig.  The shell variable cs_compiler_name_c is also exported.
 #-----------------------------------------------------------------------------
+AC_DEFUN([_CS_PROG_CC_CFLAGS_FILTER],[
+    # Magic to suppress automatic addition of undesirable flags by Autoconf.
+    CFLAGS="$CFLAGS"
+])
 AC_DEFUN([CS_PROG_CC],[
-    CFLAGS="$CFLAGS" # Filter undesired flags
-    AC_PROG_CC
+    AC_REQUIRE([_CS_PROG_CC_CFLAGS_FILTER])
+    AC_REQUIRE([AC_PROG_CC])
+    AC_REQUIRE([AC_CANONICAL_HOST])
     AS_IF([test -n "$CC"],[
 	CS_EMIT_BUILD_PROPERTY([CMD.CC], [$CC])
 	CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$CPPFLAGS $CFLAGS], [+])
@@ -51,9 +56,14 @@ AC_DEFUN([CS_PROG_CC],[
         # project-agnostic C compiler check, but it is needed by assembly code
         # implementing Sparc atomic threading operations, and it should not
         # hurt if the option is not recognized.
-	CS_EMIT_BUILD_FLAGS([if $CC handles Sparc v9],
-            [cs_cv_prog_cc_sparc_v9],
-            [CS_CREATE_TUPLE([-mcpu=v9])], [C], [COMPILER.CFLAGS], [append])
+	case $host_cpu in
+	    sparc*)
+		CS_EMIT_BUILD_FLAGS([if $CC handles Sparc v9],
+            	    [cs_cv_prog_cc_sparc_v9],
+            	    [CS_CREATE_TUPLE([-mcpu=v9])], [C], [COMPILER.CFLAGS],
+		        [append])
+		;;
+	esac
     ])
 ])
 
@@ -66,9 +76,13 @@ AC_DEFUN([CS_PROG_CC],[
 #       COMPILER.C++.TYPE, and (as an historic anomaly) COMPILER.TYPE variables
 #       in Jamconfig. The shell variable cs_compiler_name_cxx is also exported.
 #-----------------------------------------------------------------------------
+AC_DEFUN([_CS_PROG_CXX_CFLAGS_FILTER],[
+    # Magic to suppress automatic addition of undesirable flags by Autoconf.
+    CXXFLAGS="$CXXFLAGS" 
+])
 AC_DEFUN([CS_PROG_CXX],[
-    CXXFLAGS="$CXXFLAGS" # Filter undesired flags
-    AC_PROG_CXX
+    AC_REQUIRE([_CS_PROG_CXX_CFLAGS_FILTER])
+    AC_REQUIRE([AC_PROG_CXX])
     AS_IF([test -n "$CXX"],[
 	CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])
 	CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])

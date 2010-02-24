@@ -1,0 +1,11 @@
+SubDir TOP apps tests smoketest ;
+
+if $(CEGUI.AVAILABLE) = "yes"
+{
+Description smoketest : "Smoke Test Application" ;
+Application smoketest :
+  [ Wildcard *.h *.cpp ] ;
+CFlags smoketest : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+LinkWith smoketest : crystalspace ;
+ExternalLibs smoketest : CEGUI ;
+}

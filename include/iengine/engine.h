@@ -796,17 +796,35 @@ struct iEngine : public virtual iBase
   /**\name Collection handling
    * @{ */
 
-  virtual iCollection* CreateCollection(const char* name) = 0;
+  /**
+   * Create a new collection with the given name.
+   */
+  virtual iCollection* CreateCollection (const char* name) = 0;
 
-  virtual iCollection* GetCollection(const char* name) const = 0;
+  /**
+   * Get the collection of the given name.
+   */
+  virtual iCollection* GetCollection (const char* name) const = 0;
 
-  virtual csPtr<iCollectionArray> GetCollections() = 0;
+  /**
+   * Return all collections created.
+   */
+  virtual csPtr<iCollectionArray> GetCollections () = 0;
 
-  virtual void RemoveCollection(iCollection* collect) = 0;
+  /**
+   * Remove the given collection from the list of collections.
+   */
+  virtual void RemoveCollection (iCollection* collect) = 0;
 
-  virtual void RemoveCollection(const char* name) = 0;
+  /**
+   * Remove the collection of the given name.
+   */
+  virtual void RemoveCollection (const char* name) = 0;
 
-  virtual void RemoveAllCollections() = 0;
+  /**
+   * Remove all the collections.
+   */
+  virtual void RemoveAllCollections () = 0;
 
   /** @} */
   

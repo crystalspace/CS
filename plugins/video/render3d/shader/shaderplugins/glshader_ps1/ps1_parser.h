@@ -47,6 +47,26 @@ struct csPSProgramInstruction
     memset (this, 0, sizeof (*this)); 
     dest_reg = src_reg[0] = src_reg[1] = src_reg[2] = CS_PS_REG_NONE;
   }
+
+  /// Returns the number of distinct constants this instruction uses
+  int NumDistinctConstantsUsed () const
+  {
+    int n = 0;
+    uint seenConsts = 0;
+    for (int r = 0; r < 3; r++)
+    {
+      if (src_reg[r] == CS_PS_REG_CONSTANT)
+      {
+        uint m = (1 << src_reg_num[r]);
+        if ((seenConsts & m) == 0)
+        {
+          n++;
+          seenConsts |= m;
+        }
+      }
+    }
+    return n;
+  }
 };
 
 struct csPSConstant
@@ -87,9 +107,9 @@ public:
   ~csPixelShaderParser ();
 
   bool ParseProgram (iDataBuffer* program);
-  const csArray<csPSProgramInstruction> &GetParsedInstructionList ()
+  const csArray<csPSProgramInstruction> &GetParsedInstructionList () const
   { return program_instructions; }
-  const csArray<csPSConstant> &GetConstants ()
+  const csArray<csPSConstant> &GetConstants () const
   { return program_constants; }
 
   void GetInstructionString (const csPSProgramInstruction& instr,
@@ -97,7 +117,7 @@ public:
   void GetInstructionLine (const csPSProgramInstruction& instr,
     csString& str) const;
   void WriteProgram (const csArray<csPSProgramInstruction>& instr, 
-    csString& str);
+    csString& str) const;
 
   csPixelShaderVersion GetVersion () const { return version; };
 };

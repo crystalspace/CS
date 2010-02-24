@@ -40,7 +40,7 @@ namespace Utility
     MeshFilter();
     ~MeshFilter();
     
-    void AddFilterMesh (iMeshWrapper* mesh);
+    void AddFilterMesh (iMeshWrapper* mesh, bool addChildren=false);
     void RemoveFilterMesh (iMeshWrapper* mesh);
 
     bool IsMeshFiltered (iMeshWrapper* mesh) const;
@@ -54,6 +54,8 @@ namespace Utility
     {
       return filterMode;
     }
+
+    void Clear ();
 
   private:
     MeshFilterMode filterMode;

@@ -24,6 +24,8 @@
 #include "imesh/skeleton2.h"
 
 struct iRenderBuffer;
+struct iMaterialWrapper;
+struct iShaderVariableContext;
 
 struct iAnimatedMeshFactory;
 struct iAnimatedMeshFactorySubMesh;
@@ -58,12 +60,17 @@ struct csAnimatedMeshBoneInfluence
 struct iAnimatedMeshSocketFactory : public virtual iBase
 {
 public:
-  SCF_INTERFACE(iAnimatedMeshSocketFactory, 1, 0, 0);
+  SCF_INTERFACE(iAnimatedMeshSocketFactory, 2, 0, 0);
 
   /**
    * Get the name of the socket
    */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Set the name of the socket
+   */
+  virtual void SetName (const char* ) = 0;
   
   /**
    * Get the bone to socket transform of the socket
@@ -81,13 +88,19 @@ public:
   virtual BoneID GetBone () const = 0;
 
   /**
+   * Set the bone ID associated with the socket
+   */
+  virtual void SetBone (BoneID) = 0;
+
+  /**
    * Get the associated mesh factory
    */
   virtual iAnimatedMeshFactory* GetFactory () = 0;
 };
 
 /**
- * 
+ * Sockets attached to animated meshes. Sockets are designed to 
+ * attach external objects to animated meshes.
  */
 struct iAnimatedMeshSocket : public virtual iBase
 {
@@ -152,7 +165,7 @@ public:
  */
 struct iAnimatedMeshFactory : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshFactory, 2, 0, 0);
+  SCF_INTERFACE(iAnimatedMeshFactory, 2, 2, 0);
 
   /**\name SubMesh handling
    * @{ */
@@ -163,7 +176,8 @@ struct iAnimatedMeshFactory : public virtual iBase
    * The newly created submesh will use all bones.
    * \param indices Index buffer to use for the newly created submesh.
    */
-  virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices) = 0;
+  virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices,
+    const char* name, bool visible) = 0;
 
   /**
    * Create a new submesh.
@@ -175,12 +189,18 @@ struct iAnimatedMeshFactory : public virtual iBase
    */
   virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
-    const csArray<csArray<unsigned int> >& boneIndices) = 0;
+    const csArray<csArray<unsigned int> >& boneIndices,
+    const char* name, bool visible) = 0;
 
   /**
    * Get a submesh by index.
    */
   virtual iAnimatedMeshFactorySubMesh* GetSubMesh (size_t index) const = 0;
+
+  /**
+   * Find a submesh index by name, returns (size_t)-1 if not found.
+   */
+  virtual size_t FindSubMesh (const char* name) const = 0;
 
   /**
    * Get the total number of submeshes.
@@ -384,6 +404,12 @@ struct iAnimatedMeshFactory : public virtual iBase
    * Get a specific socket instance
    */
   virtual iAnimatedMeshSocketFactory* GetSocket (size_t index) const = 0;
+
+ /**
+  * Find the index of the socket with the given name (or (uint)~0 if no
+  * socket with that name exists).
+  */
+  virtual uint FindSocket (const char* name) const = 0;
   /** @} */
 };
 
@@ -392,7 +418,7 @@ struct iAnimatedMeshFactory : public virtual iBase
  */
 struct iAnimatedMeshFactorySubMesh : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshFactorySubMesh, 1, 0, 0);
+  SCF_INTERFACE(iAnimatedMeshFactorySubMesh, 1, 2, 0);
 
   /**
    * Get the index buffer for this submesh. Defines a triangle list.
@@ -408,7 +434,21 @@ struct iAnimatedMeshFactorySubMesh : public virtual iBase
    * Get the bone indices used by a given index set
    */
   virtual const csArray<unsigned int>& GetBoneIndices (size_t set) = 0;
-  
+
+  /**
+   * Get the material
+   */
+  virtual iMaterialWrapper* GetMaterial () const = 0;
+
+  /**
+   * Set the material, or 0 to use default.
+   */
+  virtual void SetMaterial (iMaterialWrapper* material) = 0;
+
+  /**
+   * Get the submesh name.
+   */
+  virtual const char* GetName () const = 0;
 };
 
 /**
@@ -471,7 +511,7 @@ struct iAnimatedMesh : public virtual iBase
  */
 struct iAnimatedMeshSubMesh : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshSubMesh, 1, 0, 0);
+  SCF_INTERFACE(iAnimatedMeshSubMesh, 1, 2, 0);
 
   /**
    * Get the factory submesh
@@ -486,7 +526,22 @@ struct iAnimatedMeshSubMesh : public virtual iBase
   /**
    * Get current rendering state for this submesh
    */
-  virtual bool IsRendering () const = 0;  
+  virtual bool IsRendering () const = 0;
+
+  /**
+   * Get a shader variable context for this submesh.
+   */
+  virtual iShaderVariableContext* GetShaderVariableContext(size_t buffer) const = 0;
+
+ /**
+  * Get the material.
+  */
+  virtual iMaterialWrapper* GetMaterial () const = 0;
+
+ /**
+  * Set the material, or 0 to use factory material.
+  */
+  virtual void SetMaterial (iMaterialWrapper* material) = 0;
 };
 
 /**

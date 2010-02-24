@@ -153,6 +153,8 @@ class Vector2Array(CustomAllocated):
     def Get(*args): return _core.Vector2Array_Get(*args)
     def Put(*args): return _core.Vector2Array_Put(*args)
     def Push(*args): return _core.Vector2Array_Push(*args)
+    def Merge(*args): return _core.Vector2Array_Merge(*args)
+    def MergeSmart(*args): return _core.Vector2Array_MergeSmart(*args)
     def Pop(*args): return _core.Vector2Array_Pop(*args)
     def Top(*args): return _core.Vector2Array_Top(*args)
     def Insert(*args): return _core.Vector2Array_Insert(*args)
@@ -200,6 +202,8 @@ class Vector3Array(CustomAllocated):
     def Get(*args): return _core.Vector3Array_Get(*args)
     def Put(*args): return _core.Vector3Array_Put(*args)
     def Push(*args): return _core.Vector3Array_Push(*args)
+    def Merge(*args): return _core.Vector3Array_Merge(*args)
+    def MergeSmart(*args): return _core.Vector3Array_MergeSmart(*args)
     def Pop(*args): return _core.Vector3Array_Pop(*args)
     def Top(*args): return _core.Vector3Array_Top(*args)
     def Insert(*args): return _core.Vector3Array_Insert(*args)
@@ -245,6 +249,8 @@ class Vector4Array(CustomAllocated):
     def Get(*args): return _core.Vector4Array_Get(*args)
     def Put(*args): return _core.Vector4Array_Put(*args)
     def Push(*args): return _core.Vector4Array_Push(*args)
+    def Merge(*args): return _core.Vector4Array_Merge(*args)
+    def MergeSmart(*args): return _core.Vector4Array_MergeSmart(*args)
     def Pop(*args): return _core.Vector4Array_Pop(*args)
     def Top(*args): return _core.Vector4Array_Top(*args)
     def Insert(*args): return _core.Vector4Array_Insert(*args)
@@ -290,6 +296,8 @@ class UIntArray(CustomAllocated):
     def Get(*args): return _core.UIntArray_Get(*args)
     def Put(*args): return _core.UIntArray_Put(*args)
     def Push(*args): return _core.UIntArray_Push(*args)
+    def Merge(*args): return _core.UIntArray_Merge(*args)
+    def MergeSmart(*args): return _core.UIntArray_MergeSmart(*args)
     def Pop(*args): return _core.UIntArray_Pop(*args)
     def Top(*args): return _core.UIntArray_Top(*args)
     def Insert(*args): return _core.UIntArray_Insert(*args)
@@ -452,6 +460,8 @@ class iThreadReturn(iBase):
     def Copy(*args): return _core.iThreadReturn_Copy(*args)
     def Wait(*args): return _core.iThreadReturn_Wait(*args)
     def SetWaitPtrs(*args): return _core.iThreadReturn_SetWaitPtrs(*args)
+    def SetJob(*args): return _core.iThreadReturn_SetJob(*args)
+    def GetJob(*args): return _core.iThreadReturn_GetJob(*args)
     __swig_destroy__ = _core.delete_iThreadReturn
     __del__ = lambda self : None;
 iThreadReturn_swigregister = _core.iThreadReturn_swigregister
@@ -792,6 +802,8 @@ class csPluginRequestArray(CustomAllocated):
     def GetSize(*args): return _core.csPluginRequestArray_GetSize(*args)
     def Get(*args): return _core.csPluginRequestArray_Get(*args)
     def Push(*args): return _core.csPluginRequestArray_Push(*args)
+    def Merge(*args): return _core.csPluginRequestArray_Merge(*args)
+    def MergeSmart(*args): return _core.csPluginRequestArray_MergeSmart(*args)
     def Pop(*args): return _core.csPluginRequestArray_Pop(*args)
     def Top(*args): return _core.csPluginRequestArray_Top(*args)
     def Insert(*args): return _core.csPluginRequestArray_Insert(*args)
@@ -971,7 +983,6 @@ class iVFS(iBase):
     __repr__ = _swig_repr
     def ChDir(*args): return _core.iVFS_ChDir(*args)
     def GetCwd(*args): return _core.iVFS_GetCwd(*args)
-    def SetSyncDir(*args): return _core.iVFS_SetSyncDir(*args)
     def PushDir(*args): return _core.iVFS_PushDir(*args)
     def PopDir(*args): return _core.iVFS_PopDir(*args)
     def ExpandPath(*args): return _core.iVFS_ExpandPath(*args)
@@ -2254,6 +2265,185 @@ csevMouseClick = _core.csevMouseClick
 csevMouseDoubleClick = _core.csevMouseDoubleClick
 csevMouseMove = _core.csevMouseMove
 csevJoystickEvent = _core.csevJoystickEvent
+class csEventHandlerRegistry(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_csEventHandlerRegistry(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _core.delete_csEventHandlerRegistry
+    __del__ = lambda self : None;
+    GetGenericID = staticmethod(_core.csEventHandlerRegistry_GetGenericID)
+    GetGenericPreBoundID = staticmethod(_core.csEventHandlerRegistry_GetGenericPreBoundID)
+    GetGenericPostBoundID = staticmethod(_core.csEventHandlerRegistry_GetGenericPostBoundID)
+    RegisterID = staticmethod(_core.csEventHandlerRegistry_RegisterID)
+    GetID = staticmethod(_core.csEventHandlerRegistry_GetID)
+    ReleaseID = staticmethod(_core.csEventHandlerRegistry_ReleaseID)
+    GetHandler = staticmethod(_core.csEventHandlerRegistry_GetHandler)
+    IsInstanceOf = staticmethod(_core.csEventHandlerRegistry_IsInstanceOf)
+    IsInstance = staticmethod(_core.csEventHandlerRegistry_IsInstance)
+    GetGeneric = staticmethod(_core.csEventHandlerRegistry_GetGeneric)
+    GetString = staticmethod(_core.csEventHandlerRegistry_GetString)
+    GetRegistry = staticmethod(_core.csEventHandlerRegistry_GetRegistry)
+csEventHandlerRegistry_swigregister = _core.csEventHandlerRegistry_swigregister
+csEventHandlerRegistry_swigregister(csEventHandlerRegistry)
+csEventHandlerRegistry_GetGenericID = _core.csEventHandlerRegistry_GetGenericID
+csEventHandlerRegistry_GetGenericPreBoundID = _core.csEventHandlerRegistry_GetGenericPreBoundID
+csEventHandlerRegistry_GetGenericPostBoundID = _core.csEventHandlerRegistry_GetGenericPostBoundID
+csEventHandlerRegistry_RegisterID = _core.csEventHandlerRegistry_RegisterID
+csEventHandlerRegistry_GetID = _core.csEventHandlerRegistry_GetID
+csEventHandlerRegistry_ReleaseID = _core.csEventHandlerRegistry_ReleaseID
+csEventHandlerRegistry_GetHandler = _core.csEventHandlerRegistry_GetHandler
+csEventHandlerRegistry_IsInstanceOf = _core.csEventHandlerRegistry_IsInstanceOf
+csEventHandlerRegistry_IsInstance = _core.csEventHandlerRegistry_IsInstance
+csEventHandlerRegistry_GetGeneric = _core.csEventHandlerRegistry_GetGeneric
+csEventHandlerRegistry_GetString = _core.csEventHandlerRegistry_GetString
+csEventHandlerRegistry_GetRegistry = _core.csEventHandlerRegistry_GetRegistry
+
+class iFrameEventSignpost(iEventHandler):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    __swig_destroy__ = _core.delete_iFrameEventSignpost
+    __del__ = lambda self : None;
+    def InstancePrec(*args): return _core.iFrameEventSignpost_InstancePrec(*args)
+    def InstanceSucc(*args): return _core.iFrameEventSignpost_InstanceSucc(*args)
+    def HandleEvent(*args): return _core.iFrameEventSignpost_HandleEvent(*args)
+iFrameEventSignpost_swigregister = _core.iFrameEventSignpost_swigregister
+iFrameEventSignpost_swigregister(iFrameEventSignpost)
+
+class FrameSignpost_Logic3D(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    StaticHandlerName = staticmethod(_core.FrameSignpost_Logic3D_StaticHandlerName)
+    StaticID = staticmethod(_core.FrameSignpost_Logic3D_StaticID)
+    def GenericName(*args): return _core.FrameSignpost_Logic3D_GenericName(*args)
+    def GenericID(*args): return _core.FrameSignpost_Logic3D_GenericID(*args)
+    def GenericPrec(*args): return _core.FrameSignpost_Logic3D_GenericPrec(*args)
+    def GenericSucc(*args): return _core.FrameSignpost_Logic3D_GenericSucc(*args)
+    __swig_destroy__ = _core.delete_FrameSignpost_Logic3D
+    __del__ = lambda self : None;
+FrameSignpost_Logic3D_swigregister = _core.FrameSignpost_Logic3D_swigregister
+FrameSignpost_Logic3D_swigregister(FrameSignpost_Logic3D)
+FrameSignpost_Logic3D_StaticHandlerName = _core.FrameSignpost_Logic3D_StaticHandlerName
+FrameSignpost_Logic3D_StaticID = _core.FrameSignpost_Logic3D_StaticID
+
+class FrameSignpost_3D2D(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    StaticHandlerName = staticmethod(_core.FrameSignpost_3D2D_StaticHandlerName)
+    StaticID = staticmethod(_core.FrameSignpost_3D2D_StaticID)
+    def GenericName(*args): return _core.FrameSignpost_3D2D_GenericName(*args)
+    def GenericID(*args): return _core.FrameSignpost_3D2D_GenericID(*args)
+    def GenericPrec(*args): return _core.FrameSignpost_3D2D_GenericPrec(*args)
+    def GenericSucc(*args): return _core.FrameSignpost_3D2D_GenericSucc(*args)
+    __swig_destroy__ = _core.delete_FrameSignpost_3D2D
+    __del__ = lambda self : None;
+FrameSignpost_3D2D_swigregister = _core.FrameSignpost_3D2D_swigregister
+FrameSignpost_3D2D_swigregister(FrameSignpost_3D2D)
+FrameSignpost_3D2D_StaticHandlerName = _core.FrameSignpost_3D2D_StaticHandlerName
+FrameSignpost_3D2D_StaticID = _core.FrameSignpost_3D2D_StaticID
+
+class FrameSignpost_2DConsole(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    StaticHandlerName = staticmethod(_core.FrameSignpost_2DConsole_StaticHandlerName)
+    StaticID = staticmethod(_core.FrameSignpost_2DConsole_StaticID)
+    def GenericName(*args): return _core.FrameSignpost_2DConsole_GenericName(*args)
+    def GenericID(*args): return _core.FrameSignpost_2DConsole_GenericID(*args)
+    def GenericPrec(*args): return _core.FrameSignpost_2DConsole_GenericPrec(*args)
+    def GenericSucc(*args): return _core.FrameSignpost_2DConsole_GenericSucc(*args)
+    __swig_destroy__ = _core.delete_FrameSignpost_2DConsole
+    __del__ = lambda self : None;
+FrameSignpost_2DConsole_swigregister = _core.FrameSignpost_2DConsole_swigregister
+FrameSignpost_2DConsole_swigregister(FrameSignpost_2DConsole)
+FrameSignpost_2DConsole_StaticHandlerName = _core.FrameSignpost_2DConsole_StaticHandlerName
+FrameSignpost_2DConsole_StaticID = _core.FrameSignpost_2DConsole_StaticID
+
+class FrameSignpost_ConsoleDebug(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    StaticHandlerName = staticmethod(_core.FrameSignpost_ConsoleDebug_StaticHandlerName)
+    StaticID = staticmethod(_core.FrameSignpost_ConsoleDebug_StaticID)
+    def GenericName(*args): return _core.FrameSignpost_ConsoleDebug_GenericName(*args)
+    def GenericID(*args): return _core.FrameSignpost_ConsoleDebug_GenericID(*args)
+    def GenericPrec(*args): return _core.FrameSignpost_ConsoleDebug_GenericPrec(*args)
+    def GenericSucc(*args): return _core.FrameSignpost_ConsoleDebug_GenericSucc(*args)
+    __swig_destroy__ = _core.delete_FrameSignpost_ConsoleDebug
+    __del__ = lambda self : None;
+FrameSignpost_ConsoleDebug_swigregister = _core.FrameSignpost_ConsoleDebug_swigregister
+FrameSignpost_ConsoleDebug_swigregister(FrameSignpost_ConsoleDebug)
+FrameSignpost_ConsoleDebug_StaticHandlerName = _core.FrameSignpost_ConsoleDebug_StaticHandlerName
+FrameSignpost_ConsoleDebug_StaticID = _core.FrameSignpost_ConsoleDebug_StaticID
+
+class FrameSignpost_DebugFrame(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    StaticHandlerName = staticmethod(_core.FrameSignpost_DebugFrame_StaticHandlerName)
+    StaticID = staticmethod(_core.FrameSignpost_DebugFrame_StaticID)
+    def GenericName(*args): return _core.FrameSignpost_DebugFrame_GenericName(*args)
+    def GenericID(*args): return _core.FrameSignpost_DebugFrame_GenericID(*args)
+    def GenericPrec(*args): return _core.FrameSignpost_DebugFrame_GenericPrec(*args)
+    def GenericSucc(*args): return _core.FrameSignpost_DebugFrame_GenericSucc(*args)
+    __swig_destroy__ = _core.delete_FrameSignpost_DebugFrame
+    __del__ = lambda self : None;
+FrameSignpost_DebugFrame_swigregister = _core.FrameSignpost_DebugFrame_swigregister
+FrameSignpost_DebugFrame_swigregister(FrameSignpost_DebugFrame)
+FrameSignpost_DebugFrame_StaticHandlerName = _core.FrameSignpost_DebugFrame_StaticHandlerName
+FrameSignpost_DebugFrame_StaticID = _core.FrameSignpost_DebugFrame_StaticID
+
+class FrameBegin3DDraw(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_FrameBegin3DDraw(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _core.delete_FrameBegin3DDraw
+    __del__ = lambda self : None;
+    def HandleEvent(*args): return _core.FrameBegin3DDraw_HandleEvent(*args)
+    StaticHandlerName = staticmethod(_core.FrameBegin3DDraw_StaticHandlerName)
+    StaticID = staticmethod(_core.FrameBegin3DDraw_StaticID)
+    def GenericName(*args): return _core.FrameBegin3DDraw_GenericName(*args)
+    def GenericID(*args): return _core.FrameBegin3DDraw_GenericID(*args)
+    def InstancePrec(*args): return _core.FrameBegin3DDraw_InstancePrec(*args)
+    def InstanceSucc(*args): return _core.FrameBegin3DDraw_InstanceSucc(*args)
+    def GenericPrec(*args): return _core.FrameBegin3DDraw_GenericPrec(*args)
+    def GenericSucc(*args): return _core.FrameBegin3DDraw_GenericSucc(*args)
+FrameBegin3DDraw_swigregister = _core.FrameBegin3DDraw_swigregister
+FrameBegin3DDraw_swigregister(FrameBegin3DDraw)
+FrameBegin3DDraw_StaticHandlerName = _core.FrameBegin3DDraw_StaticHandlerName
+FrameBegin3DDraw_StaticID = _core.FrameBegin3DDraw_StaticID
+
+class FramePrinter(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_FramePrinter(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _core.delete_FramePrinter
+    __del__ = lambda self : None;
+    def HandleEvent(*args): return _core.FramePrinter_HandleEvent(*args)
+    StaticHandlerName = staticmethod(_core.FramePrinter_StaticHandlerName)
+    StaticID = staticmethod(_core.FramePrinter_StaticID)
+    def GenericName(*args): return _core.FramePrinter_GenericName(*args)
+    def GenericID(*args): return _core.FramePrinter_GenericID(*args)
+    def InstancePrec(*args): return _core.FramePrinter_InstancePrec(*args)
+    def InstanceSucc(*args): return _core.FramePrinter_InstanceSucc(*args)
+    def GenericPrec(*args): return _core.FramePrinter_GenericPrec(*args)
+    def GenericSucc(*args): return _core.FramePrinter_GenericSucc(*args)
+FramePrinter_swigregister = _core.FramePrinter_swigregister
+FramePrinter_swigregister(FramePrinter)
+FramePrinter_StaticHandlerName = _core.FramePrinter_StaticHandlerName
+FramePrinter_StaticID = _core.FramePrinter_StaticID
+
 CS_LOAD_PLUGIN_ALWAYS = _core.CS_LOAD_PLUGIN_ALWAYS
 CS_QUERY_REGISTRY = _core.CS_QUERY_REGISTRY
 CS_QUERY_REGISTRY_TAG_INTERFACE = _core.CS_QUERY_REGISTRY_TAG_INTERFACE

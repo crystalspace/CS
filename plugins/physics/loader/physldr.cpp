@@ -34,7 +34,7 @@
 #include "ivaria/ode.h"
 #include "physldr.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 enum
 {
@@ -58,6 +58,7 @@ enum
   XMLTOKEN_COLLIDERSPHERE,
   XMLTOKEN_RADIUS,
   XMLTOKEN_COLLIDERCYLINDER,
+  XMLTOKEN_COLLIDERCAPSULE,
   XMLTOKEN_LENGTH,
   XMLTOKEN_COLLIDERBOX,
   XMLTOKEN_COLLIDERPLANE,
@@ -115,6 +116,7 @@ bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("colliderconvexmesh", XMLTOKEN_COLLIDERCONVEXMESH);
   xmltokens.Register ("collidersphere", XMLTOKEN_COLLIDERSPHERE);
   xmltokens.Register ("collidercylinder", XMLTOKEN_COLLIDERCYLINDER);
+  xmltokens.Register ("collidercapsule", XMLTOKEN_COLLIDERCAPSULE);
   xmltokens.Register ("colliderbox", XMLTOKEN_COLLIDERBOX);
   xmltokens.Register ("colliderplane", XMLTOKEN_COLLIDERPLANE);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
@@ -282,6 +284,11 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system,
 	if (!ParseSystemColliderCylinder (child, system)) return false;
 	break;
       }
+      case XMLTOKEN_COLLIDERCAPSULE:
+      {
+	if (!ParseSystemColliderCapsule (child, system)) return false;
+	break;
+      }
       case XMLTOKEN_COLLIDERBOX:
       {
 	if (!ParseSystemColliderBox (child, system)) return false;
@@ -381,11 +388,8 @@ bool csPhysicsLoader::ParseBody (iDocumentNode* node, iRigidBody* body, iLoaderC
       case XMLTOKEN_MESH:
         if (child->GetContentsValue ())
         {
-          csRef<iMeshWrapper> m;
-          while(!m.IsValid())
-          {
-            m = ldr_context->FindMeshObject (child->GetContentsValue ());
-          }
+          csRef<iMeshWrapper> m = ldr_context->FindMeshObject
+	    (child->GetContentsValue ());
           if (m)
           {
             body->SetTransform (m->GetMovable()->GetTransform());
@@ -447,12 +451,10 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body,
               child, "No mesh specified for collidermesh");
             return false;
           }
-          // Wait for load - assume it will exist eventually.
-          csRef<iMeshWrapper> m;
-          while(!m.IsValid())
-          {
-            m = ldr_context->FindMeshObject (child->GetAttributeValue ("mesh"));
-          }
+
+          csRef<iMeshWrapper> m = ldr_context->FindMeshObject
+	    (child->GetAttributeValue ("mesh"));
+
           csOrthoTransform t;
           ParseTransform (child, t);
           if (m)
@@ -498,6 +500,15 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body,
         body->AttachColliderCylinder (l, r, t, f, d, e, s);
         break;
       }
+      case XMLTOKEN_COLLIDERCAPSULE:
+      {
+        float l = child->GetAttributeValueAsFloat ("length");
+        float r = child->GetAttributeValueAsFloat ("radius");
+        csOrthoTransform t;
+        ParseTransform (child, t);
+        body->AttachColliderCapsule (l, r, t, f, d, e, s);
+        break;
+      }
       case XMLTOKEN_COLLIDERPLANE:
       {
         csPlane3 plane;
@@ -536,11 +547,9 @@ bool csPhysicsLoader::ParseSystemColliderMesh (
   if (!node->GetContentsValue ()) { return false; }
 
   // Wait for load - assume it will exist eventually.
-  csRef<iMeshWrapper> m;
-  while(!m.IsValid())
-  {
-    m = ldr_context->FindMeshObject (node->GetContentsValue ());
-  }
+  csRef<iMeshWrapper> m = ldr_context->FindMeshObject
+    (node->GetContentsValue ());
+
   if (m)
   {
     if (convex)
@@ -611,6 +620,20 @@ bool csPhysicsLoader::ParseSystemColliderCylinder (iDocumentNode* node,
   csOrthoTransform t;
   ParseTransform (node, t);
   system->AttachColliderCylinder (l, r, t, f, e, s);
+  return true;
+}
+
+bool csPhysicsLoader::ParseSystemColliderCapsule (iDocumentNode* node,
+		iDynamicSystem* system)
+{
+  float f = GetFloat (node, "friction", 1.0f);
+  float e = GetFloat (node, "elasticity", 0.0f);
+  float s = GetFloat (node, "softness", 0.0f);
+  float l = node->GetAttributeValueAsFloat ("length");
+  float r = node->GetAttributeValueAsFloat ("radius");
+  csOrthoTransform t;
+  ParseTransform (node, t);
+  system->AttachColliderCapsule (l, r, t, f, e, s);
   return true;
 }
 

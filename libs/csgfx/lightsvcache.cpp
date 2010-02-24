@@ -33,8 +33,7 @@ void csLightShaderVarCache::ClearDefVars ()
 
 void csLightShaderVarCache::SetStrings (iShaderVarStringSet* strings)
 {
-  lightSVIdCache.DeleteAll ();
-  ClearDefVars();
+  ClearDefVars ();
   this->strings = strings;
 }
   
@@ -44,16 +43,11 @@ namespace
   {
     "diffuse",
     "specular",
-    "position object",
-    "position",
     "position world",
-    "transform",
     "transform world",
     "transform world inverse",
     "attenuation",
     "attenuationtex",
-    "direction object",
-    "direction",
     "direction world",
     "inner falloff",
     "outer falloff",
@@ -64,35 +58,16 @@ namespace
   };
 }
 
-CS::ShaderVarStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
-{
-  if (!strings.IsValid()) return CS::InvalidShaderVarStringID;
-  
-  if (num >= lightSVIdCache.GetSize())
-  {
-    csString str;
-    for (size_t n = lightSVIdCache.GetSize(); n <= num; n++)
-    {
-      for (int p = 0; p < _lightCount; p++)
-      {
-	CS_ASSERT_MSG (
-	  "You added stuff to csLightShaderVarCache::LightProperty "
-	  "but didn't update " __FILE__,
-	  svSuffixes[p] != 0);
-	str.Format ("light %zu %s", n, svSuffixes[p]);
-	lightSVIdCache.GetExtend (num).ids[p] = strings->Request (str);
-      }
-    }
-  }
-  return lightSVIdCache[num].ids[prop];
-}
-
 CS::ShaderVarStringID csLightShaderVarCache::GetLightSVId (LightProperty prop)
 {
-  if (!strings.IsValid()) return CS::InvalidShaderVarStringID;
+  if (!strings.IsValid ()) return CS::InvalidShaderVarStringID;
 
   if (lightSVIdCache_unnumbered[prop] == csInvalidStringID)
   {
+    CS_ASSERT_MSG (
+      "You added stuff to csLightShaderVarCache::LightProperty "
+      "but didn't update " __FILE__,
+      svSuffixes[prop] != 0);
     csString str;
     str.Format ("light %s", svSuffixes[prop]);
     lightSVIdCache_unnumbered[prop] = strings->Request (str);
@@ -103,19 +78,19 @@ CS::ShaderVarStringID csLightShaderVarCache::GetLightSVId (LightProperty prop)
 
 CS::ShaderVarStringID csLightShaderVarCache::GetDefaultSVId (DefaultSV var)
 {
-  static const char* const svNames[_varCount] = {
+  static const char* const svNames[_varCount] =
+  {
     "light ambient",
     "light count"
   };
   
-  if (!strings.IsValid()) return CS::InvalidShaderVarStringID;
+  if (!strings.IsValid ()) return CS::InvalidShaderVarStringID;
 
   if (defaultVars[var] == csInvalidStringID)
   {
     CS_ASSERT_MSG (
       "You added stuff to csLightShaderVarCache::DefaultSV "
-      "but didn't update " __FILE__,
-      defaultVars[var] != 0);
+      "but didn't update " __FILE__, svNames[var] != 0);
     defaultVars[var] = strings->Request (svNames[var]);
   }
   return defaultVars[var];

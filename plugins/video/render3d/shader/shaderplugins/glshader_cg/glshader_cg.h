@@ -32,6 +32,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "glshader_cgcommon.h"
 #include "profile_limits.h"
+#include "progcache.h"
 
 struct csGLExtensionManager;
 
@@ -81,6 +82,7 @@ public:
   csRef<iDocumentSystem> binDocSys;
   csRef<iDocumentSystem> xmlDocSys;
 
+  ProgramCache progCache;
   StringStore* stringStore;
 
   csGLShader_CG (iBase *parent);

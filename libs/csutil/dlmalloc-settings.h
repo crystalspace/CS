@@ -30,7 +30,15 @@
  *      dynamic lib.
  * Con: Overhead.
  */
+#if defined(_MSC_VER) && defined(_M_X64)
+// MSVC on x64 needs 16-byte alignment of malloc
+#define MALLOC_ALIGNMENT	16
+#else
+// Default dlmalloc alignment
+#define MALLOC_ALIGNMENT	8
+#endif
 
+#ifndef DLMALLOC_DEFINES_ONLY
 #ifdef _MSC_VER
 /* silence "conversion from 'size_t' to 'bindex_t', possible loss of data" */
 #pragma warning(disable:4267)
@@ -53,5 +61,15 @@
 extern int cs_atexit(void(*func)(void));
 
 #define atexit cs_atexit
+
+#endif // DLMALLOC_DEFINES_ONLY
+
+#include "csplatform.h"
+#ifdef CS_HAVE_VALGRIND_VALGRIND_H
+#define HAVE_VALGRIND_VALGRIND_H
+#endif
+#ifdef CS_HAVE_VALGRIND_MEMCHECK_H
+#define HAVE_VALGRIND_MEMCHECK_H
+#endif
 
 #endif // __CS_CSUTIL_DLMALLOC_SETTINGS_H__

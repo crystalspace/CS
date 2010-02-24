@@ -133,8 +133,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     //-- iParticleBuiltinEffectorLinColor
     virtual size_t AddColor (const csColor4& color, float maxTTL);
+    virtual void RemoveColor (size_t index);
+    virtual void Clear ();
 
     virtual void SetColor (size_t index, const csColor4& color);
+    virtual void SetEndTTL (size_t index, float ttl);
 
     virtual void GetColor (size_t index, csColor4& color, float& maxTTL) const
     {
@@ -143,6 +146,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
       color = colorList[index].color;
       maxTTL = colorList[index].maxTTL;
+    }
+    virtual const csColor4& GetColor (size_t index) const
+    {
+      return colorList[index].color;
+    }
+    virtual float GetEndTTL (size_t index) const
+    {
+      return colorList[index].maxTTL;
     }
 
     virtual size_t GetColorCount () const
@@ -199,7 +210,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     }
 
     virtual size_t AddParameterSet (const csParticleParameterSet& param, float endTTL);
+    virtual void RemoveParameterSet (size_t index);
+    virtual void Clear ();
     virtual void SetParameterSet (size_t index, const csParticleParameterSet& param);
+    virtual void SetEndTTL (size_t index, float ttl);
     virtual void GetParameterSet (size_t index, csParticleParameterSet& param, float& maxTTL) const
     {
       if (index >= paramList.GetSize ())
@@ -207,6 +221,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
       param = paramList[index].param;
       maxTTL = paramList[index].maxTTL;
+    }
+    virtual const csParticleParameterSet& GetParameterSet (size_t index) const
+    {
+      return paramList[index].param;
+    }
+    virtual float GetEndTTL (size_t index) const
+    {
+      return paramList[index].maxTTL;
     }
 
     virtual size_t GetParameterSetCount () const
@@ -285,6 +307,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return fparams.GetSize ();
     }
 
+    virtual void AddFParameter(float value)
+    {
+      fparams.Push(value);
+    }
+
+    virtual void RemoveFParameter(size_t index)
+    {
+      fparams.DeleteIndex(index);
+    }
+
     virtual void SetVParameter (size_t parameterNumber, const csVector3& value)
     {
       vparams.Put (parameterNumber, value);
@@ -301,6 +333,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual size_t GetVParameterCount () const
     {
       return vparams.GetSize ();
+    }
+
+    virtual void AddVParameter(const csVector3& value)
+    {
+      vparams.Push(value);
+    }
+
+    virtual void RemoveVParameter(size_t index)
+    {
+      vparams.DeleteIndex(index);
     }
 
   private:

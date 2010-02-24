@@ -167,6 +167,10 @@ protected:
 public:
   virtual const char* GetRendererString (const char* str);
   virtual const char* GetVersionString (const char* ver);
+  
+  virtual const char* GetHWRenderer();
+  virtual const char* GetHWGLVersion();
+  virtual const char* GetHWVendor();
 
   /// The event plug object
   csRef<iEventOutlet> EventOutlet;

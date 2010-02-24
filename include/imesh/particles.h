@@ -695,7 +695,7 @@ struct iParticleBuiltinEffectorForce : public iParticleEffector
  */
 struct iParticleBuiltinEffectorLinColor : public iParticleEffector
 {
-  SCF_INTERFACE(iParticleBuiltinEffectorLinColor,1,0,0);
+  SCF_INTERFACE(iParticleBuiltinEffectorLinColor,1,1,0);
 
   /** 
    * Add color to list of colors to interpolate between.
@@ -704,14 +704,38 @@ struct iParticleBuiltinEffectorLinColor : public iParticleEffector
   virtual size_t AddColor (const csColor4& color, float endTTL) = 0;
 
   /**
+   * Remove a specific entry.
+   */
+  virtual void RemoveColor (size_t index) = 0;
+
+  /**
+   * Remove all entries.
+   */
+  virtual void Clear () = 0;
+
+  /**
    * Set the color of an already existing entry
    */
   virtual void SetColor (size_t index, const csColor4& color) = 0;
 
   /**
+   * Set the TTL for an already existing entry.
+   */
+  virtual void SetEndTTL (size_t index, float ttl) = 0;
+
+  /**
    * Get color and time
    */
   virtual void GetColor (size_t index, csColor4& color, float& endTTL) const = 0;
+
+  /**
+   * Get color.
+   */
+  virtual const csColor4& GetColor (size_t index) const = 0;
+  /**
+   * Get TTL.
+   */
+  virtual float GetEndTTL (size_t index) const = 0;
 
   /**
    * Get number of color entries
@@ -757,7 +781,7 @@ enum csParticleBuiltinEffectorVFType
  */
 struct iParticleBuiltinEffectorVelocityField : public iParticleEffector
 {
-  SCF_INTERFACE(iParticleBuiltinEffectorVelocityField,1,0,0);
+  SCF_INTERFACE(iParticleBuiltinEffectorVelocityField,2,0,0);
 
   /**
    * Set force field type
@@ -785,6 +809,16 @@ struct iParticleBuiltinEffectorVelocityField : public iParticleEffector
   virtual size_t GetFParameterCount () const = 0;
 
   /**
+   * Add an F parameter.
+   */
+  virtual void AddFParameter(float value) = 0;
+
+  /**
+   * Remove an F parameter.
+   */
+  virtual void RemoveFParameter(size_t index) = 0;
+
+  /**
    * Set vector parameter
    */
   virtual void SetVParameter (size_t parameterNumber, const csVector3& value) = 0;
@@ -798,6 +832,17 @@ struct iParticleBuiltinEffectorVelocityField : public iParticleEffector
    * Get the number of set vector parameters
    */
   virtual size_t GetVParameterCount () const = 0;
+
+  /**
+   * Add a V parameter.
+   */
+  virtual void AddVParameter(const csVector3& value) = 0;
+
+  /**
+   * Remove a V parameter.
+   */
+  virtual void RemoveVParameter(size_t index) = 0;
+
 };
 
 /**
@@ -865,7 +910,7 @@ struct csParticleParameterSet
  */
 struct iParticleBuiltinEffectorLinear : public iParticleEffector
 {
-  SCF_INTERFACE(iParticleBuiltinEffectorLinear,1,0,0);
+  SCF_INTERFACE(iParticleBuiltinEffectorLinear,1,1,0);
 
   /**
    * Set the mask to influence which parameters we will interpolate. By default
@@ -885,14 +930,39 @@ struct iParticleBuiltinEffectorLinear : public iParticleEffector
   virtual size_t AddParameterSet (const csParticleParameterSet& param, float endTTL) = 0;
 
   /**
+   * Remove a specific entry.
+   */
+  virtual void RemoveParameterSet (size_t index) = 0;
+
+  /**
+   * Remove all entries.
+   */
+  virtual void Clear () = 0;
+
+  /**
    * Overwrite the parameter set of an already existing entry
    */
   virtual void SetParameterSet (size_t index, const csParticleParameterSet& param) = 0;
 
   /**
+   * Set the TTL for an index.
+   */
+  virtual void SetEndTTL (size_t index, float ttl) = 0;
+
+  /**
    * Get parameter set and time
    */
   virtual void GetParameterSet (size_t index, csParticleParameterSet& param, float& endTTL) const = 0;
+
+  /**
+   * Get parameter set and time
+   */
+  virtual const csParticleParameterSet& GetParameterSet (size_t index) const = 0;
+
+  /**
+   * Get TTL.
+   */
+  virtual float GetEndTTL (size_t index) const = 0;
 
   /**
    * Get number of parameter set entries

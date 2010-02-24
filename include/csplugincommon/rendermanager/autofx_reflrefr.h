@@ -44,6 +44,9 @@ namespace CS
       class ReflectRefract_Base
       {
       public:
+	/// Flags to pass for GetUsedShaderVars() for this effect
+	enum { svUserFlags = iShader::svuTextures };
+	
 	/**
 	* Data used by the helper that needs to persist over multiple frames.
 	* Render managers must store an instance of this class and provide
@@ -165,7 +168,7 @@ namespace CS
       * typedef TraverseUsedSVSets<RenderTreeType,
       *   RenderManagerType::AutoReflectRefractType> SVTraverseType;
       * SVTraverseType svTraverser
-      *   (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+      *   (fxRR, shaderManager->GetSVNameStringset ()->GetSize (), fxRR.svUserFlags);
       * // Do the actual traversal.
       * ForEachMeshNode (context, svTraverser);
       * \endcode

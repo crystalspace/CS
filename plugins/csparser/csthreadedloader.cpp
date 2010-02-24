@@ -80,8 +80,6 @@
 #include "csthreadedloader.h"
 #include "loadtex.h"
 
-CS_IMPLEMENT_PLUGIN
-
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
   SCF_IMPLEMENT_FACTORY(csThreadedLoader)
@@ -272,7 +270,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       const char* name = meshobjnode->GetAttributeValue ("name");
       mesh = Engine->CreateMeshWrapper (name, false);
       csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-      if(LoadMeshObjectTC (itr, false, ldr_context, mesh, 0, meshobjnode, ssource, 0, name, vfs->GetCwd()))
+      csString cwd = vfs->GetCwd ();
+      if(LoadMeshObjectTC (itr, false, ldr_context, mesh, 0, meshobjnode, ssource, 0, name, cwd))
       {
         ret->Copy(itr);
 
@@ -605,7 +604,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (texturenode)
       {
         csSafeCopyArray<ProxyTexture> proxyTextures;
-        bool res = ParseTextureTC(ret, false, ldr_context, texturenode, &proxyTextures, vfs->GetCwd());
+	csString cwd = vfs->GetCwd ();
+        bool res = ParseTextureTC(ret, false, ldr_context, texturenode, &proxyTextures, cwd);
         if(sync && res)
         {
           Engine->SyncEngineListsWait(this);
@@ -666,7 +666,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         const char* name = meshobjnode->GetAttributeValue ("name");
         csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (name, false);
         ret->SetResult(scfQueryInterfaceSafe<iBase>(mesh));
-        bool res = LoadMeshObjectTC(ret, false, ldr_context, mesh, 0, meshobjnode, ssource, sector, name, vfs->GetCwd());
+	csString cwd = vfs->GetCwd ();
+        bool res = LoadMeshObjectTC(ret, false, ldr_context, mesh, 0, meshobjnode, ssource, sector, name, cwd);
+        if(sync && res)
+        {
+          Engine->SyncEngineListsWait(this);
+        }
+        return res;
+      }
+
+      // Trimesh
+      csRef<iDocumentNode> trimeshnode;
+      if(attempt == 1)
+      {
+        if(csString("trimesh") == csString(node->GetValue()))
+          trimeshnode = node;
+      }
+      if(attempt == 2)
+      {
+        trimeshnode = node->GetNode ("trimesh");
+      }
+      if (trimeshnode)
+      {
+        const char* name = trimeshnode->GetAttributeValue ("name");
+        csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
+          "crystalspace.mesh.object.null", name, 0, csVector3(0), false);
+
+        bool res = LoadTriMeshInSector (ldr_context, mesh, trimeshnode, ssource);
+        ret->SetResult(scfQueryInterfaceSafe<iBase>(mesh));
         if(sync && res)
         {
           Engine->SyncEngineListsWait(this);
@@ -860,6 +887,49 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         return true;
       }
+
+      csRef<iDocumentNode> sequencenode;
+      if(attempt == 1)
+      {
+          sequencenode = node->GetNode ("sequence");
+      }
+      if(attempt == 2)
+      {
+          if(csString("sequence") == csString(node->GetValue()))
+              sequencenode = node;
+      }
+      if (sequencenode)
+      {
+          iSequenceWrapper* sw = CreateSequence(sequencenode);
+          LoadSequence(ldr_context, sequencenode);
+          ret->SetResult(csRef<iBase>(sw));
+          if(sync)
+          {
+              Engine->SyncEngineListsWait(this);
+          }
+          return true;
+      }
+
+      csRef<iDocumentNode> triggernode;
+      if(attempt == 1)
+      {
+          triggernode = node->GetNode ("trigger");
+      }
+      if(attempt == 2)
+      {
+          if(csString("trigger") == csString(node->GetValue()))
+              triggernode = node;
+      }
+      if (triggernode)
+      {
+          iSequenceTrigger* st = LoadTrigger(ldr_context, triggernode);
+          ret->SetResult(csRef<iBase>(st));
+          if(sync)
+          {
+              Engine->SyncEngineListsWait(this);
+          }
+          return true;
+      }
     }
 
     ReportError("crystalspace.maploader.parse",
@@ -962,7 +1032,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNodeIterator> it = doc->GetNodes("library");
     while(it->HasNext())
     {
-      threadReturns.Push(LoadLibraryFromNode (ldr_context, it->Next(), &libs, &libIDs, vfs->GetCwd()));
+      csString cwd = vfs->GetCwd ();
+      threadReturns.Push(LoadLibraryFromNode (ldr_context, it->Next(), &libs, &libIDs, cwd));
     }
 
     csRef<iDocumentNodeIterator> itr = doc->GetNodes("plugins");
@@ -1413,7 +1484,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             file = child->GetContentsValue();
           }
 
-          csRef<iDocumentNode> lib = libs.Get(libIDs.Find(file));
+          csRef<iDocumentNode> lib;
+          size_t idx = libIDs.Find(file);
+          if(idx != csArrayItemNotFound)
+          {
+            lib = libs.Get(idx);
+          }
+
           if(!lib.IsValid())
           {
             lib = child;
@@ -1478,7 +1555,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           const char* name = child->GetAttributeValue ("name");
           csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (name, false);
-          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, 0, name, vfs->GetCwd());
+	  csString cwd = vfs->GetCwd ();
+          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, 0, name, cwd);
           AddLoadingMeshObject(name, itr);
           threadReturns.Push(itr);
         }
@@ -1889,7 +1967,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           csReversibleTransform child_transf;
           csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-          if(!FindOrLoadMeshFactoryTC(ret, false, 0, ldr_context, child, stemp, &child_transf, ssource, vfs->GetCwd()))
+	  csString cwd = vfs->GetCwd ();
+          if(!FindOrLoadMeshFactoryTC(ret, false, 0, ldr_context, child, stemp, &child_transf, ssource, cwd))
           {
             return false;
           }
@@ -1904,7 +1983,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
         csReversibleTransform child_transf;
         csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-        if(!FindOrLoadMeshFactoryTC(ret, false, 0, ldr_context, instancedFact, stemp, &child_transf, ssource, vfs->GetCwd()))
+	csString cwd = vfs->GetCwd ();
+        if(!FindOrLoadMeshFactoryTC(ret, false, 0, ldr_context, instancedFact, stemp, &child_transf, ssource, cwd))
         {
           return false;
         }
@@ -2117,7 +2197,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_IMPOSTER:
         {
-          csRef<iImposter> imposter = scfQueryInterface<iImposter> (stemp);
+          csRef<iImposterFactory> imposter = scfQueryInterface<iImposterFactory> (stemp);
           if (!imposter)
           {
             SyntaxService->ReportError (
@@ -2237,7 +2317,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           csString childName = csString(name).AppendFmt(":%s", child->GetAttributeValue("name"));
           csRef<iMeshWrapper> sp = Engine->CreateMeshWrapper(childName, false);
-          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, sp, mesh, child, ssource, 0, childName, vfs->GetCwd());
+	  csString cwd = vfs->GetCwd ();
+          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, sp, mesh, child, ssource, 0, childName, cwd);
           AddLoadingMeshObject(childName, itr);
         }
         break;
@@ -2385,8 +2466,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if (meshobjnode)
           {
             csString childName = csString(name).AppendFmt(":%s", child->GetAttributeValue("name"));
+	    csString cwd = vfs->GetCwd ();
             csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, parent, meshobjnode, ssource,
-              0, childName, vfs->GetCwd());
+              0, childName, cwd);
             AddLoadingMeshObject(childName, itr);
             break;
           }
@@ -2726,7 +2808,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if(plug->IsThreadSafe())
       {
         csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-        if(!ParseAddOnTC(itr, false, plug, node, ssource, ldr_context, context, vfs->GetCwd()))
+	csString cwd = vfs->GetCwd ();
+        if(!ParseAddOnTC(itr, false, plug, node, ssource, ldr_context, context, cwd))
         {
           return false;
         }
@@ -2734,7 +2817,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       else
       {
-        csRef<iThreadReturn> itr = ParseAddOnWait(plug, node, ssource, ldr_context, context, vfs->GetCwd());
+	csString cwd = vfs->GetCwd ();
+        csRef<iThreadReturn> itr = ParseAddOnWait(plug, node, ssource, ldr_context, context, cwd);
         if(!itr->WasSuccessful())
         {
           return false;
@@ -2779,7 +2863,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             if(plug->IsThreadSafe())
             {
               csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-              if(!ParseAddOnTC(itr, false, plug, child, ssource, ldr_context, context, vfs->GetCwd()))
+	      csString cwd = vfs->GetCwd ();
+              if(!ParseAddOnTC(itr, false, plug, child, ssource, ldr_context, context, cwd))
               {
                 return false;
               }
@@ -2787,7 +2872,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             }
             else
             {
-              csRef<iThreadReturn> itr = ParseAddOnWait(plug, child, ssource, ldr_context, context, vfs->GetCwd());
+	      csString cwd = vfs->GetCwd ();
+              csRef<iThreadReturn> itr = ParseAddOnWait(plug, child, ssource, ldr_context, context, cwd);
               if(!itr->WasSuccessful())
               {
                 return false;
@@ -2952,7 +3038,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if(plug->IsThreadSafe())
           {
             csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-            if(!ParseAddOnTC(itr, false, plug, paramsnode, ssource, ldr_context, context, vfs->GetCwd()))
+	    csString cwd = vfs->GetCwd ();
+            if(!ParseAddOnTC(itr, false, plug, paramsnode, ssource, ldr_context, context, cwd))
             {
               return false;
             }
@@ -2960,7 +3047,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           else
           {
-            csRef<iThreadReturn> itr = ParseAddOnWait(plug, paramsnode, ssource, ldr_context, context, vfs->GetCwd());
+	    csString cwd = vfs->GetCwd ();
+            csRef<iThreadReturn> itr = ParseAddOnWait(plug, paramsnode, ssource, ldr_context, context, cwd);
             if(!itr->WasSuccessful())
             {
               return false;
@@ -3896,7 +3984,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if (!snd)
           {
             csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csThreadReturn(threadman));
-            LoadSoundWrapperTC (ret, false, vfs->GetCwd(), name, filename, false);
+	    csString cwd = vfs->GetCwd ();
+            LoadSoundWrapperTC (ret, false, cwd, name, filename, false);
             snd = scfQueryInterface<iSndSysWrapper>(ret->GetResultRefPtr());
           }
           if (snd)
@@ -4394,7 +4483,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         csRef<iDocumentNode> node = doc->GetRoot ();
         csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-        return LoadNodeTC(itr, false, vfs->GetCwd(), node, collection, 0, ssource, missingdata, keepFlags, do_verbose);
+	csString cwd = vfs->GetCwd ();
+        return LoadNodeTC(itr, false, cwd, node, collection, 0, ssource, missingdata, keepFlags, do_verbose);
       }
       else
       {

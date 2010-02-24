@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
 	      (C) 2005 by Frank Richter
+              (C) 2009 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -40,50 +41,57 @@ struct iJob : public virtual iBase
 };
 
 /**
- * Interface to simple job management. Jobs are enqueued and run one after
- * another, e.g. in another thread.
+ * Interface to simple job management system. 
+ * 
+ * The queue will execute the jobs according to the policy of the implementation,
+ * such as in parallel using multiple threads.
+ *
+ * \remark Implementations makes no gurantees as to the order or latency for job
+ * execution.
  * \sa csThreadJobQueue
  */
 struct iJobQueue : public virtual iBase
 {
-  SCF_INTERFACE(iJobQueue, 3,1,0);
+  SCF_INTERFACE(iJobQueue,4,0,0);
   
   /// Add a job to the queue.
-  virtual void Enqueue (iJob* job, bool lowPriority = false) = 0;
-  
-  /**
-   * Check if a job is still in the queue. If yes, remove it from the queue
-   * and run it immediately.
-   */
-  virtual void PullAndRun (iJob* job) = 0;
+  virtual void Enqueue (iJob* job) = 0;
 
   /**
-   * Pop a job off the top of the queue and run it.
+   * Remove a job from the queue.
+   * If the job is currently running,this will be a no-operation.
    */
-  virtual void PopAndRun() = 0;
+  virtual void Dequeue (iJob* job) = 0;
   
   /**
-   * Remove a job from the queue.
-   * If the job is currently running and \a waitIfCurrent is true, wait until
-   * the job has finished. This guarantees that the queue won't hold any 
-   * reference to the job object.
+   * Check if a job is still in the queue. 
+   * If yes, remove it from the queue and run it immediately.
+   * If a job is currently running, we can either wait for it or just let it be
    */
-  virtual void Unqueue (iJob* job, bool waitIfCurrent = true) = 0;
+  virtual void PullAndRun (iJob* job, bool waitForCompletion = true) = 0;
+  
+  /**
+   * Wait for all jobs in queue to finish executing.
+   *
+   * \remark Might return prematurely if jobs are enqueued or dequeued from
+   * other threads during this call.
+   */
+  virtual void WaitAll () = 0;
 
   /**
    * Return true if all enqueued jobs are finished.
+   *
+   * \remark Might return wrong result if jobs are enqueued or dequeued from
+   * other threads during this call.
    */
   virtual bool IsFinished () = 0;
-  
-  /**
-   * Wait until a particular job finished running.
-   */
-  virtual void Wait (iJob* job) = 0;
 
   /**
    * Return the number of jobs in the queue.
    */
   virtual int32 GetQueueCount() = 0;
+
+
 };
 
 #endif // __CS_IUTIL_JOB_H__

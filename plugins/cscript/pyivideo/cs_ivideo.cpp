@@ -2533,7 +2533,7 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t swig_types[10]
 #define SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__ShaderVar_t swig_types[11]
 #define SWIGTYPE_p_CS__StructuredTextureFormat swig_types[12]
-#define SWIGTYPE_p_CS__Utility__StringSetT_CS__StringSetTag__General_t swig_types[13]
+#define SWIGTYPE_p_CS__Utility__StringSetT_CS__StringSetTag__General_false_t swig_types[13]
 #define SWIGTYPE_p_CapacityHandlerType swig_types[14]
 #define SWIGTYPE_p_ContainedType swig_types[15]
 #define SWIGTYPE_p_ElementHandlerType swig_types[16]
@@ -2633,82 +2633,83 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_iFont swig_types[110]
 #define SWIGTYPE_p_iFontDeleteNotify swig_types[111]
 #define SWIGTYPE_p_iFontServer swig_types[112]
-#define SWIGTYPE_p_iGeneralFactoryState swig_types[113]
-#define SWIGTYPE_p_iGraphics2D swig_types[114]
-#define SWIGTYPE_p_iGraphics3D swig_types[115]
-#define SWIGTYPE_p_iHalo swig_types[116]
-#define SWIGTYPE_p_iHierarchicalCache swig_types[117]
-#define SWIGTYPE_p_iImage swig_types[118]
-#define SWIGTYPE_p_iImageIO swig_types[119]
-#define SWIGTYPE_p_iJoystickDriver swig_types[120]
-#define SWIGTYPE_p_iKeyComposer swig_types[121]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[122]
-#define SWIGTYPE_p_iLoaderContext swig_types[123]
-#define SWIGTYPE_p_iMaterial swig_types[124]
-#define SWIGTYPE_p_iMaterialWrapper swig_types[125]
-#define SWIGTYPE_p_iMouseDriver swig_types[126]
-#define SWIGTYPE_p_iNativeWindow swig_types[127]
-#define SWIGTYPE_p_iNativeWindowManager swig_types[128]
-#define SWIGTYPE_p_iObject swig_types[129]
-#define SWIGTYPE_p_iObjectIterator swig_types[130]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[131]
-#define SWIGTYPE_p_iObjectRegistry swig_types[132]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[133]
-#define SWIGTYPE_p_iPath swig_types[134]
-#define SWIGTYPE_p_iPluginIterator swig_types[135]
-#define SWIGTYPE_p_iPluginManager swig_types[136]
-#define SWIGTYPE_p_iPortalContainer swig_types[137]
-#define SWIGTYPE_p_iProcTexture swig_types[138]
-#define SWIGTYPE_p_iReporter swig_types[139]
-#define SWIGTYPE_p_iReporterIterator swig_types[140]
-#define SWIGTYPE_p_iReporterListener swig_types[141]
-#define SWIGTYPE_p_iSCF swig_types[142]
-#define SWIGTYPE_p_iShader swig_types[143]
-#define SWIGTYPE_p_iShaderCompiler swig_types[144]
-#define SWIGTYPE_p_iShaderManager swig_types[145]
-#define SWIGTYPE_p_iShaderPriorityList swig_types[146]
-#define SWIGTYPE_p_iShaderVarStringSet swig_types[147]
-#define SWIGTYPE_p_iShaderVariableAccessor swig_types[148]
-#define SWIGTYPE_p_iShaderVariableContext swig_types[149]
-#define SWIGTYPE_p_iString swig_types[150]
-#define SWIGTYPE_p_iStringArray swig_types[151]
-#define SWIGTYPE_p_iStringSet swig_types[152]
-#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__General_t swig_types[153]
-#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__ShaderVar_t swig_types[154]
-#define SWIGTYPE_p_iTextureHandle swig_types[155]
-#define SWIGTYPE_p_iTextureManager swig_types[156]
-#define SWIGTYPE_p_iThreadManager swig_types[157]
-#define SWIGTYPE_p_iThreadReturn swig_types[158]
-#define SWIGTYPE_p_iTriangleMesh swig_types[159]
-#define SWIGTYPE_p_iVFS swig_types[160]
-#define SWIGTYPE_p_iVirtualClock swig_types[161]
-#define SWIGTYPE_p_int swig_types[162]
-#define SWIGTYPE_p_int16_t swig_types[163]
-#define SWIGTYPE_p_int64_t swig_types[164]
-#define SWIGTYPE_p_int8_t swig_types[165]
-#define SWIGTYPE_p_long_long swig_types[166]
-#define SWIGTYPE_p_p_csShaderVariable swig_types[167]
-#define SWIGTYPE_p_p_iRenderBuffer swig_types[168]
-#define SWIGTYPE_p_p_iTextureHandle swig_types[169]
-#define SWIGTYPE_p_p_p_csShaderVariable swig_types[170]
-#define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[171]
-#define SWIGTYPE_p_scfImplementation1T_csImageBase_iImage_t swig_types[172]
-#define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[173]
-#define SWIGTYPE_p_scfImplementationExt0T_csImageMemory_csImageBase_t swig_types[174]
-#define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[175]
-#define SWIGTYPE_p_size_t swig_types[176]
-#define SWIGTYPE_p_uint16_t swig_types[177]
-#define SWIGTYPE_p_uint32_t swig_types[178]
-#define SWIGTYPE_p_uint64_t swig_types[179]
-#define SWIGTYPE_p_uint8_t swig_types[180]
-#define SWIGTYPE_p_unsigned_char swig_types[181]
-#define SWIGTYPE_p_unsigned_int swig_types[182]
-#define SWIGTYPE_p_unsigned_long swig_types[183]
-#define SWIGTYPE_p_unsigned_long_long swig_types[184]
-#define SWIGTYPE_p_void swig_types[185]
-#define SWIGTYPE_p_wchar_t swig_types[186]
-static swig_type_info *swig_types[188];
-static swig_module_info swig_module = {swig_types, 187, 0, 0, 0, 0};
+#define SWIGTYPE_p_iFrameEventSignpost swig_types[113]
+#define SWIGTYPE_p_iGeneralFactoryState swig_types[114]
+#define SWIGTYPE_p_iGraphics2D swig_types[115]
+#define SWIGTYPE_p_iGraphics3D swig_types[116]
+#define SWIGTYPE_p_iHalo swig_types[117]
+#define SWIGTYPE_p_iHierarchicalCache swig_types[118]
+#define SWIGTYPE_p_iImage swig_types[119]
+#define SWIGTYPE_p_iImageIO swig_types[120]
+#define SWIGTYPE_p_iJoystickDriver swig_types[121]
+#define SWIGTYPE_p_iKeyComposer swig_types[122]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[123]
+#define SWIGTYPE_p_iLoaderContext swig_types[124]
+#define SWIGTYPE_p_iMaterial swig_types[125]
+#define SWIGTYPE_p_iMaterialWrapper swig_types[126]
+#define SWIGTYPE_p_iMouseDriver swig_types[127]
+#define SWIGTYPE_p_iNativeWindow swig_types[128]
+#define SWIGTYPE_p_iNativeWindowManager swig_types[129]
+#define SWIGTYPE_p_iObject swig_types[130]
+#define SWIGTYPE_p_iObjectIterator swig_types[131]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[132]
+#define SWIGTYPE_p_iObjectRegistry swig_types[133]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[134]
+#define SWIGTYPE_p_iPath swig_types[135]
+#define SWIGTYPE_p_iPluginIterator swig_types[136]
+#define SWIGTYPE_p_iPluginManager swig_types[137]
+#define SWIGTYPE_p_iPortalContainer swig_types[138]
+#define SWIGTYPE_p_iProcTexture swig_types[139]
+#define SWIGTYPE_p_iReporter swig_types[140]
+#define SWIGTYPE_p_iReporterIterator swig_types[141]
+#define SWIGTYPE_p_iReporterListener swig_types[142]
+#define SWIGTYPE_p_iSCF swig_types[143]
+#define SWIGTYPE_p_iShader swig_types[144]
+#define SWIGTYPE_p_iShaderCompiler swig_types[145]
+#define SWIGTYPE_p_iShaderManager swig_types[146]
+#define SWIGTYPE_p_iShaderPriorityList swig_types[147]
+#define SWIGTYPE_p_iShaderVarStringSet swig_types[148]
+#define SWIGTYPE_p_iShaderVariableAccessor swig_types[149]
+#define SWIGTYPE_p_iShaderVariableContext swig_types[150]
+#define SWIGTYPE_p_iString swig_types[151]
+#define SWIGTYPE_p_iStringArray swig_types[152]
+#define SWIGTYPE_p_iStringSet swig_types[153]
+#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__General_t swig_types[154]
+#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__ShaderVar_t swig_types[155]
+#define SWIGTYPE_p_iTextureHandle swig_types[156]
+#define SWIGTYPE_p_iTextureManager swig_types[157]
+#define SWIGTYPE_p_iThreadManager swig_types[158]
+#define SWIGTYPE_p_iThreadReturn swig_types[159]
+#define SWIGTYPE_p_iTriangleMesh swig_types[160]
+#define SWIGTYPE_p_iVFS swig_types[161]
+#define SWIGTYPE_p_iVirtualClock swig_types[162]
+#define SWIGTYPE_p_int swig_types[163]
+#define SWIGTYPE_p_int16_t swig_types[164]
+#define SWIGTYPE_p_int64_t swig_types[165]
+#define SWIGTYPE_p_int8_t swig_types[166]
+#define SWIGTYPE_p_long_long swig_types[167]
+#define SWIGTYPE_p_p_csShaderVariable swig_types[168]
+#define SWIGTYPE_p_p_iRenderBuffer swig_types[169]
+#define SWIGTYPE_p_p_iTextureHandle swig_types[170]
+#define SWIGTYPE_p_p_p_csShaderVariable swig_types[171]
+#define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[172]
+#define SWIGTYPE_p_scfImplementation1T_csImageBase_iImage_t swig_types[173]
+#define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[174]
+#define SWIGTYPE_p_scfImplementationExt0T_csImageMemory_csImageBase_t swig_types[175]
+#define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[176]
+#define SWIGTYPE_p_size_t swig_types[177]
+#define SWIGTYPE_p_uint16_t swig_types[178]
+#define SWIGTYPE_p_uint32_t swig_types[179]
+#define SWIGTYPE_p_uint64_t swig_types[180]
+#define SWIGTYPE_p_uint8_t swig_types[181]
+#define SWIGTYPE_p_unsigned_char swig_types[182]
+#define SWIGTYPE_p_unsigned_int swig_types[183]
+#define SWIGTYPE_p_unsigned_long swig_types[184]
+#define SWIGTYPE_p_unsigned_long_long swig_types[185]
+#define SWIGTYPE_p_void swig_types[186]
+#define SWIGTYPE_p_wchar_t swig_types[187]
+static swig_type_info *swig_types[189];
+static swig_module_info swig_module = {swig_types, 188, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -6402,6 +6403,72 @@ SWIGINTERN PyObject *_wrap_iGraphics2D_GetFramebufferDimensions(PyObject *SWIGUN
     int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_int, new_flags));
   }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics2D_GetHWRenderer(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics2D *arg1 = (iGraphics2D *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics2D_GetHWRenderer",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics2D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics2D_GetHWRenderer" "', argument " "1"" of type '" "iGraphics2D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics2D * >(argp1);
+  result = (char *)(arg1)->GetHWRenderer();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics2D_GetHWGLVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics2D *arg1 = (iGraphics2D *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics2D_GetHWGLVersion",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics2D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics2D_GetHWGLVersion" "', argument " "1"" of type '" "iGraphics2D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics2D * >(argp1);
+  result = (char *)(arg1)->GetHWGLVersion();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics2D_GetHWVendor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics2D *arg1 = (iGraphics2D *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics2D_GetHWVendor",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics2D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics2D_GetHWVendor" "', argument " "1"" of type '" "iGraphics2D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics2D * >(argp1);
+  result = (char *)(arg1)->GetHWVendor();
+  resultobj = SWIG_FromCharPtr((const char *)result);
   return resultobj;
 fail:
   return NULL;
@@ -11720,6 +11787,36 @@ fail:
     "  Possible C/C++ prototypes are:\n"
     "    SetTitle(iNativeWindow *,char const *)\n"
     "    SetTitle(iNativeWindow *,wchar_t const *)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iNativeWindow_SetIcon(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iNativeWindow *arg1 = (iNativeWindow *) 0 ;
+  iImage *arg2 = (iImage *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iNativeWindow_SetIcon",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iNativeWindow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iNativeWindow_SetIcon" "', argument " "1"" of type '" "iNativeWindow *""'"); 
+  }
+  arg1 = reinterpret_cast< iNativeWindow * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iImage, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iNativeWindow_SetIcon" "', argument " "2"" of type '" "iImage *""'"); 
+  }
+  arg2 = reinterpret_cast< iImage * >(argp2);
+  (arg1)->SetIcon(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -17434,6 +17531,87 @@ SWIGINTERN PyObject *csShaderMetadata_swigregister(PyObject *SWIGUNUSEDPARM(self
   return SWIG_Py_Void();
 }
 
+SWIGINTERN PyObject *_wrap_iShaderPriorityList_GetCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  size_t result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderPriorityList_GetCount",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderPriorityList_GetCount" "', argument " "1"" of type '" "iShaderPriorityList const *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
+  result = ((iShaderPriorityList const *)arg1)->GetCount();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderPriorityList_GetPriority(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderPriorityList_GetPriority",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderPriorityList_GetPriority" "', argument " "1"" of type '" "iShaderPriorityList const *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderPriorityList_GetPriority" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = (int)((iShaderPriorityList const *)arg1)->GetPriority(arg2);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_iShaderPriorityList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iShaderPriorityList",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iShaderPriorityList" "', argument " "1"" of type '" "iShaderPriorityList *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *iShaderPriorityList_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_iShaderPriorityList, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
 SWIGINTERN PyObject *_wrap_iShader_QueryObject(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShader *arg1 = (iShader *) 0 ;
@@ -17754,7 +17932,58 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShader *arg1 = (iShader *) 0 ;
+  size_t arg2 ;
+  csBitArray *arg3 = 0 ;
+  uint arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  unsigned long val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShader_GetUsedShaderVars",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_GetUsedShaderVars" "', argument " "1"" of type '" "iShader const *""'"); 
+  }
+  arg1 = reinterpret_cast< iShader * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShader_GetUsedShaderVars" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csBitArray,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShader_GetUsedShaderVars" "', argument " "3"" of type '" "csBitArray &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShader_GetUsedShaderVars" "', argument " "3"" of type '" "csBitArray &""'"); 
+  }
+  arg3 = reinterpret_cast< csBitArray * >(argp3);
+  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iShader_GetUsedShaderVars" "', argument " "4"" of type '" "uint""'");
+  } 
+  arg4 = static_cast< uint >(val4);
+  ((iShader const *)arg1)->GetUsedShaderVars(arg2,*arg3,arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShader *arg1 = (iShader *) 0 ;
   size_t arg2 ;
@@ -17792,6 +18021,72 @@ SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars(PyObject *SWIGUNUSEDPARM(se
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShader, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csBitArray, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iShader_GetUsedShaderVars__SWIG_1(self, args);
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShader, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csBitArray, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_unsigned_SS_long(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_iShader_GetUsedShaderVars__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iShader_GetUsedShaderVars'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GetUsedShaderVars(iShader const *,size_t,csBitArray &,uint)\n"
+    "    GetUsedShaderVars(iShader const *,size_t,csBitArray &)\n");
   return NULL;
 }
 
@@ -17863,6 +18158,177 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iShader_GetPrioritiesTicket(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShader *arg1 = (iShader *) 0 ;
+  CS::Graphics::RenderMeshModes *arg2 = 0 ;
+  csShaderVariableStack *arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  size_t result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShader_GetPrioritiesTicket",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_GetPrioritiesTicket" "', argument " "1"" of type '" "iShader *""'"); 
+  }
+  arg1 = reinterpret_cast< iShader * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__Graphics__RenderMeshModes,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShader_GetPrioritiesTicket" "', argument " "2"" of type '" "CS::Graphics::RenderMeshModes const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShader_GetPrioritiesTicket" "', argument " "2"" of type '" "CS::Graphics::RenderMeshModes const &""'"); 
+  }
+  arg2 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csShaderVariableStack,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShader_GetPrioritiesTicket" "', argument " "3"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShader_GetPrioritiesTicket" "', argument " "3"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  arg3 = reinterpret_cast< csShaderVariableStack * >(argp3);
+  result = (arg1)->GetPrioritiesTicket((CS::Graphics::RenderMeshModes const &)*arg2,(csShaderVariableStack const &)*arg3);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShader_GetAvailablePriorities(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShader *arg1 = (iShader *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  SwigValueWrapper< csPtr< iShaderPriorityList > > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShader_GetAvailablePriorities",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_GetAvailablePriorities" "', argument " "1"" of type '" "iShader const *""'"); 
+  }
+  arg1 = reinterpret_cast< iShader * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShader_GetAvailablePriorities" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = ((iShader const *)arg1)->GetAvailablePriorities(arg2);
+  resultobj = SWIG_NewPointerObj((new csPtr< iShaderPriorityList >(static_cast< const csPtr< iShaderPriorityList >& >(result))), SWIGTYPE_p_csPtrT_iShaderPriorityList_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShader_GetTechniqueMetadata(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShader *arg1 = (iShader *) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  SwigValueWrapper< csPtr< iString > > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShader_GetTechniqueMetadata",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_GetTechniqueMetadata" "', argument " "1"" of type '" "iShader const *""'"); 
+  }
+  arg1 = reinterpret_cast< iShader * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShader_GetTechniqueMetadata" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShader_GetTechniqueMetadata" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  result = ((iShader const *)arg1)->GetTechniqueMetadata(arg2,(char const *)arg3);
+  {
+    csRef<iString> ref((csPtr<iString>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iString *)ref, SWIGTYPE_p_iString, 1);
+  }
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShader_ForceTechnique(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShader *arg1 = (iShader *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  SwigValueWrapper< csPtr< iShader > > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShader_ForceTechnique",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_ForceTechnique" "', argument " "1"" of type '" "iShader *""'"); 
+  }
+  arg1 = reinterpret_cast< iShader * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShader_ForceTechnique" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (arg1)->ForceTechnique(arg2);
+  {
+    csRef<iShader> ref((csPtr<iShader>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iShader *)ref, SWIGTYPE_p_iShader, 1);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iShader_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -17901,87 +18367,6 @@ SWIGINTERN PyObject *iShader_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObje
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iShader, SWIG_NewClientData(obj));
-  return SWIG_Py_Void();
-}
-
-SWIGINTERN PyObject *_wrap_iShaderPriorityList_GetCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  size_t result;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iShaderPriorityList_GetCount",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderPriorityList_GetCount" "', argument " "1"" of type '" "iShaderPriorityList const *""'"); 
-  }
-  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
-  result = ((iShaderPriorityList const *)arg1)->GetCount();
-  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iShaderPriorityList_GetPriority(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
-  size_t arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  size_t val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  int result;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iShaderPriorityList_GetPriority",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderPriorityList_GetPriority" "', argument " "1"" of type '" "iShaderPriorityList const *""'"); 
-  }
-  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
-  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShaderPriorityList_GetPriority" "', argument " "2"" of type '" "size_t""'");
-  } 
-  arg2 = static_cast< size_t >(val2);
-  result = (int)((iShaderPriorityList const *)arg1)->GetPriority(arg2);
-  resultobj = SWIG_From_int(static_cast< int >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_delete_iShaderPriorityList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iShaderPriorityList *arg1 = (iShaderPriorityList *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"delete_iShaderPriorityList",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderPriorityList, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iShaderPriorityList" "', argument " "1"" of type '" "iShaderPriorityList *""'"); 
-  }
-  arg1 = reinterpret_cast< iShaderPriorityList * >(argp1);
-  delete arg1;
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *iShaderPriorityList_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *obj;
-  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_iShaderPriorityList, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -18273,7 +18658,56 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iShaderCompiler_PrecacheShader(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iShaderCompiler_PrecacheShader__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderCompiler *arg1 = (iShaderCompiler *) 0 ;
+  iDocumentNode *arg2 = (iDocumentNode *) 0 ;
+  iHierarchicalCache *arg3 = (iHierarchicalCache *) 0 ;
+  bool arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  bool val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderCompiler_PrecacheShader",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderCompiler, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderCompiler_PrecacheShader" "', argument " "1"" of type '" "iShaderCompiler *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderCompiler * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDocumentNode, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderCompiler_PrecacheShader" "', argument " "2"" of type '" "iDocumentNode *""'"); 
+  }
+  arg2 = reinterpret_cast< iDocumentNode * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iHierarchicalCache, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShaderCompiler_PrecacheShader" "', argument " "3"" of type '" "iHierarchicalCache *""'"); 
+  }
+  arg3 = reinterpret_cast< iHierarchicalCache * >(argp3);
+  ecode4 = SWIG_AsVal_bool(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iShaderCompiler_PrecacheShader" "', argument " "4"" of type '" "bool""'");
+  } 
+  arg4 = static_cast< bool >(val4);
+  result = (bool)(arg1)->PrecacheShader(arg2,arg3,arg4);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderCompiler_PrecacheShader__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShaderCompiler *arg1 = (iShaderCompiler *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -18309,6 +18743,70 @@ SWIGINTERN PyObject *_wrap_iShaderCompiler_PrecacheShader(PyObject *SWIGUNUSEDPA
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderCompiler_PrecacheShader(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShaderCompiler, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDocumentNode, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iHierarchicalCache, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iShaderCompiler_PrecacheShader__SWIG_1(self, args);
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShaderCompiler, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDocumentNode, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iHierarchicalCache, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_bool(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_iShaderCompiler_PrecacheShader__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iShaderCompiler_PrecacheShader'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    PrecacheShader(iShaderCompiler *,iDocumentNode *,iHierarchicalCache *,bool)\n"
+    "    PrecacheShader(iShaderCompiler *,iDocumentNode *,iHierarchicalCache *)\n");
   return NULL;
 }
 
@@ -19981,6 +20479,72 @@ SWIGINTERN PyObject *_wrap_iShaderArray_Push(PyObject *SWIGUNUSEDPARM(self), PyO
   arg2 = reinterpret_cast< csRef< iShader > * >(argp2);
   result = (arg1)->Push((csRef< iShader > const &)*arg2);
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderArray_Merge(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_Merge",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_Merge" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray_Merge" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_Merge" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csArray< csRef< iShader > > * >(argp2);
+  (arg1)->Merge((csArray< csRef< iShader > > const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderArray_MergeSmart(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray< csRef< iShader > > *arg1 = (csArray< csRef< iShader > > *) 0 ;
+  csArray< csRef< iShader > > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderArray_MergeSmart",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderArray_MergeSmart" "', argument " "1"" of type '" "csArray< csRef< iShader > > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray< csRef< iShader > > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderArray_MergeSmart" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderArray_MergeSmart" "', argument " "2"" of type '" "csArray< csRef< iShader > > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csArray< csRef< iShader > > * >(argp2);
+  (arg1)->MergeSmart((csArray< csRef< iShader > > const &)*arg2);
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -23484,6 +24048,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGraphics2D_SetViewport", _wrap_iGraphics2D_SetViewport, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D_GetViewport", _wrap_iGraphics2D_GetViewport, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D_GetFramebufferDimensions", _wrap_iGraphics2D_GetFramebufferDimensions, METH_VARARGS, NULL},
+	 { (char *)"iGraphics2D_GetHWRenderer", _wrap_iGraphics2D_GetHWRenderer, METH_VARARGS, NULL},
+	 { (char *)"iGraphics2D_GetHWGLVersion", _wrap_iGraphics2D_GetHWGLVersion, METH_VARARGS, NULL},
+	 { (char *)"iGraphics2D_GetHWVendor", _wrap_iGraphics2D_GetHWVendor, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D_scfGetVersion", _wrap_iGraphics2D_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iGraphics2D", _wrap_delete_iGraphics2D, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D__PerformExtension", _wrap_iGraphics2D__PerformExtension, METH_VARARGS, NULL},
@@ -23619,6 +24186,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_iNativeWindowManager", _wrap_delete_iNativeWindowManager, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindowManager_swigregister", iNativeWindowManager_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_SetTitle", _wrap_iNativeWindow_SetTitle, METH_VARARGS, NULL},
+	 { (char *)"iNativeWindow_SetIcon", _wrap_iNativeWindow_SetIcon, METH_VARARGS, NULL},
 	 { (char *)"delete_iNativeWindow", _wrap_delete_iNativeWindow, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_swigregister", iNativeWindow_swigregister, METH_VARARGS, NULL},
 	 { (char *)"GetFlippedCullMode", _wrap_GetFlippedCullMode, METH_VARARGS, NULL},
@@ -23810,6 +24378,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_csShaderMetadata", _wrap_new_csShaderMetadata, METH_VARARGS, NULL},
 	 { (char *)"delete_csShaderMetadata", _wrap_delete_csShaderMetadata, METH_VARARGS, NULL},
 	 { (char *)"csShaderMetadata_swigregister", csShaderMetadata_swigregister, METH_VARARGS, NULL},
+	 { (char *)"iShaderPriorityList_GetCount", _wrap_iShaderPriorityList_GetCount, METH_VARARGS, NULL},
+	 { (char *)"iShaderPriorityList_GetPriority", _wrap_iShaderPriorityList_GetPriority, METH_VARARGS, NULL},
+	 { (char *)"delete_iShaderPriorityList", _wrap_delete_iShaderPriorityList, METH_VARARGS, NULL},
+	 { (char *)"iShaderPriorityList_swigregister", iShaderPriorityList_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iShader_QueryObject", _wrap_iShader_QueryObject, METH_VARARGS, NULL},
 	 { (char *)"iShader_GetFileName", _wrap_iShader_GetFileName, METH_VARARGS, NULL},
 	 { (char *)"iShader_SetFileName", _wrap_iShader_SetFileName, METH_VARARGS, NULL},
@@ -23822,13 +24394,13 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iShader_GetUsedShaderVars", _wrap_iShader_GetUsedShaderVars, METH_VARARGS, NULL},
 	 { (char *)"iShader_GetMetadata", _wrap_iShader_GetMetadata, METH_VARARGS, NULL},
 	 { (char *)"iShader_PushShaderVariables", _wrap_iShader_PushShaderVariables, METH_VARARGS, NULL},
+	 { (char *)"iShader_GetPrioritiesTicket", _wrap_iShader_GetPrioritiesTicket, METH_VARARGS, NULL},
+	 { (char *)"iShader_GetAvailablePriorities", _wrap_iShader_GetAvailablePriorities, METH_VARARGS, NULL},
+	 { (char *)"iShader_GetTechniqueMetadata", _wrap_iShader_GetTechniqueMetadata, METH_VARARGS, NULL},
+	 { (char *)"iShader_ForceTechnique", _wrap_iShader_ForceTechnique, METH_VARARGS, NULL},
 	 { (char *)"iShader_scfGetVersion", _wrap_iShader_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iShader", _wrap_delete_iShader, METH_VARARGS, NULL},
 	 { (char *)"iShader_swigregister", iShader_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iShaderPriorityList_GetCount", _wrap_iShaderPriorityList_GetCount, METH_VARARGS, NULL},
-	 { (char *)"iShaderPriorityList_GetPriority", _wrap_iShaderPriorityList_GetPriority, METH_VARARGS, NULL},
-	 { (char *)"delete_iShaderPriorityList", _wrap_delete_iShaderPriorityList, METH_VARARGS, NULL},
-	 { (char *)"iShaderPriorityList_swigregister", iShaderPriorityList_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_GetName", _wrap_iShaderCompiler_GetName, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_CompileShader", _wrap_iShaderCompiler_CompileShader, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_ValidateTemplate", _wrap_iShaderCompiler_ValidateTemplate, METH_VARARGS, NULL},
@@ -23865,6 +24437,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iShaderArray_Get", _wrap_iShaderArray_Get, METH_VARARGS, NULL},
 	 { (char *)"iShaderArray_Put", _wrap_iShaderArray_Put, METH_VARARGS, NULL},
 	 { (char *)"iShaderArray_Push", _wrap_iShaderArray_Push, METH_VARARGS, NULL},
+	 { (char *)"iShaderArray_Merge", _wrap_iShaderArray_Merge, METH_VARARGS, NULL},
+	 { (char *)"iShaderArray_MergeSmart", _wrap_iShaderArray_MergeSmart, METH_VARARGS, NULL},
 	 { (char *)"iShaderArray_Pop", _wrap_iShaderArray_Pop, METH_VARARGS, NULL},
 	 { (char *)"iShaderArray_Top", _wrap_iShaderArray_Top, METH_VARARGS, NULL},
 	 { (char *)"iShaderArray_Insert", _wrap_iShaderArray_Insert, METH_VARARGS, NULL},
@@ -24195,6 +24769,9 @@ static void *_p_iTextureManagerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory
 static void *_p_iAnimatedImageTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iAnimatedImage *) x));
 }
+static void *_p_iFrameEventSignpostTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iBase *) (iEventHandler *) ((iFrameEventSignpost *) x));
+}
 static void *_p_scfImplementationExt0T_csImageMemory_csImageBase_tTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *) (iImage *)(scfImplementation1< csImageBase,iImage > *)(csImageBase *) ((scfImplementationExt0< csImageMemory,csImageBase > *) x));
 }
@@ -24258,7 +24835,7 @@ static swig_type_info _swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_
 static swig_type_info _swigt__p_CS__StringIDT_CS__StringSetTag__General_t = {"_p_CS__StringIDT_CS__StringSetTag__General_t", "csStringID *|csEventID *|CS::StringID< CS::StringSetTag::General > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t = {"_p_CS__StringIDT_CS__StringSetTag__ShaderVar_t", "CS::ShaderVarStringID *|CS::StringID< CS::StringSetTag::ShaderVar > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__StructuredTextureFormat = {"_p_CS__StructuredTextureFormat", "CS::StructuredTextureFormat *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Utility__StringSetT_CS__StringSetTag__General_t = {"_p_CS__Utility__StringSetT_CS__StringSetTag__General_t", "CS::Utility::StringSet< CS::StringSetTag::General > *|csStringSet *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Utility__StringSetT_CS__StringSetTag__General_false_t = {"_p_CS__Utility__StringSetT_CS__StringSetTag__General_false_t", "csStringSet *|CS::Utility::StringSet< CS::StringSetTag::General,false > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CapacityHandlerType = {"_p_CapacityHandlerType", "CapacityHandlerType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ContainedType = {"_p_ContainedType", "ContainedType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ElementHandlerType = {"_p_ElementHandlerType", "ElementHandlerType *", 0, 0, (void*)0, 0};
@@ -24370,6 +24947,7 @@ static swig_type_info _swigt__p_iThreadManager = {"_p_iThreadManager", 0, 0, 0, 
 static swig_type_info _swigt__p_iPluginManager = {"_p_iPluginManager", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iTriangleMesh = {"_p_iTriangleMesh", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iAnimatedImage = {"_p_iAnimatedImage", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_iFrameEventSignpost = {"_p_iFrameEventSignpost", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iDataBuffer = {"_p_iDataBuffer", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iStringSetBaseT_CS__StringSetTag__General_t = {"_p_iStringSetBaseT_CS__StringSetTag__General_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iKeyboardDriver = {"_p_iKeyboardDriver", 0, 0, 0, 0, 0};
@@ -24442,7 +25020,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_CS__StringIDT_CS__StringSetTag__General_t,
   &_swigt__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t,
   &_swigt__p_CS__StructuredTextureFormat,
-  &_swigt__p_CS__Utility__StringSetT_CS__StringSetTag__General_t,
+  &_swigt__p_CS__Utility__StringSetT_CS__StringSetTag__General_false_t,
   &_swigt__p_CapacityHandlerType,
   &_swigt__p_ContainedType,
   &_swigt__p_ElementHandlerType,
@@ -24542,6 +25120,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_iFont,
   &_swigt__p_iFontDeleteNotify,
   &_swigt__p_iFontServer,
+  &_swigt__p_iFrameEventSignpost,
   &_swigt__p_iGeneralFactoryState,
   &_swigt__p_iGraphics2D,
   &_swigt__p_iGraphics3D,
@@ -24636,7 +25215,7 @@ static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_C
 static swig_cast_info _swigc__p_CS__StringIDT_CS__StringSetTag__General_t[] = {  {&_swigt__p_CS__StringIDT_CS__StringSetTag__General_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t[] = {  {&_swigt__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__StructuredTextureFormat[] = {  {&_swigt__p_CS__StructuredTextureFormat, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Utility__StringSetT_CS__StringSetTag__General_t[] = {  {&_swigt__p_CS__Utility__StringSetT_CS__StringSetTag__General_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Utility__StringSetT_CS__StringSetTag__General_false_t[] = {  {&_swigt__p_CS__Utility__StringSetT_CS__StringSetTag__General_false_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CapacityHandlerType[] = {  {&_swigt__p_CapacityHandlerType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ContainedType[] = {  {&_swigt__p_ContainedType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ElementHandlerType[] = {  {&_swigt__p_ElementHandlerType, 0, 0, 0},{0, 0, 0, 0}};
@@ -24747,6 +25326,7 @@ static swig_cast_info _swigc__p_iThreadManager[] = {{&_swigt__p_iThreadManager, 
 static swig_cast_info _swigc__p_iPluginManager[] = {{&_swigt__p_iPluginManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iTriangleMesh[] = {{&_swigt__p_iTriangleMesh, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iAnimatedImage[] = {{&_swigt__p_iAnimatedImage, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iFrameEventSignpost[] = {{&_swigt__p_iFrameEventSignpost, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDataBuffer[] = {{&_swigt__p_iDataBuffer, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iStringSetBaseT_CS__StringSetTag__General_t[] = {{&_swigt__p_iStringSetBaseT_CS__StringSetTag__General_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iKeyboardDriver[] = {{&_swigt__p_iKeyboardDriver, 0, 0, 0},{0, 0, 0, 0}};
@@ -24756,7 +25336,7 @@ static swig_cast_info _swigc__p_iReporterListener[] = {{&_swigt__p_iReporterList
 static swig_cast_info _swigc__p_iObjectNameChangeListener[] = {{&_swigt__p_iObjectNameChangeListener, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iFile[] = {{&_swigt__p_iFile, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDocumentAttribute[] = {{&_swigt__p_iDocumentAttribute, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_csImageBase, _p_csImageBaseTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVarStringSet, _p_iShaderVarStringSetTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t, _p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_iFontServer, _p_iFontServerTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeAllT_csShaderVariable_p_t, _p_iArrayChangeAllT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeElementsT_csShaderVariable_p_t, _p_iArrayChangeElementsT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayReadOnlyT_csShaderVariable_p_t, _p_iArrayReadOnlyT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseT_CS__StringSetTag__ShaderVar_t, _p_iStringSetBaseT_CS__StringSetTag__ShaderVar_tTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iGraphics2D, _p_iGraphics2DTo_p_iBase, 0, 0},  {&_swigt__p_iFontDeleteNotify, _p_iFontDeleteNotifyTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_iThreadReturn, _p_iThreadReturnTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csConfigFile_iConfigFile_t, _p_scfImplementation1T_csConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csImageBase_iImage_t, _p_scfImplementation1T_csImageBase_iImage_tTo_p_iBase, 0, 0},  {&_swigt__p_iShaderPriorityList, _p_iShaderPriorityListTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iTextureHandle, _p_iTextureHandleTo_p_iBase, 0, 0},  {&_swigt__p_iShader, _p_iShaderTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iNativeWindow, _p_iNativeWindowTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVariableContext, _p_iShaderVariableContextTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iMaterial, _p_iMaterialTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_csImageMemory, _p_csImageMemoryTo_p_iBase, 0, 0},  {&_swigt__p_iProcTexture, _p_iProcTextureTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iGraphics3D, _p_iGraphics3DTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iFont, _p_iFontTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVariableAccessor, _p_iShaderVariableAccessorTo_p_iBase, 0, 0},  {&_swigt__p_iNativeWindowManager, _p_iNativeWindowManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iThreadManager, _p_iThreadManagerTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTextureManager, _p_iTextureManagerTo_p_iBase, 0, 0},  {&_swigt__p_iShaderManager, _p_iShaderManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iAnimatedImage, _p_iAnimatedImageTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_iShaderCompiler, _p_iShaderCompilerTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseT_CS__StringSetTag__General_t, _p_iStringSetBaseT_CS__StringSetTag__General_tTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csObject_iObject_t, _p_scfImplementation1T_csObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt0T_csImageMemory_csImageBase_t, _p_scfImplementationExt0T_csImageMemory_csImageBase_tTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_iHalo, _p_iHaloTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_csImageBase, _p_csImageBaseTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVarStringSet, _p_iShaderVarStringSetTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t, _p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_iFontServer, _p_iFontServerTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeAllT_csShaderVariable_p_t, _p_iArrayChangeAllT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeElementsT_csShaderVariable_p_t, _p_iArrayChangeElementsT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayReadOnlyT_csShaderVariable_p_t, _p_iArrayReadOnlyT_csShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseT_CS__StringSetTag__ShaderVar_t, _p_iStringSetBaseT_CS__StringSetTag__ShaderVar_tTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iGraphics2D, _p_iGraphics2DTo_p_iBase, 0, 0},  {&_swigt__p_iFontDeleteNotify, _p_iFontDeleteNotifyTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_iThreadReturn, _p_iThreadReturnTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csConfigFile_iConfigFile_t, _p_scfImplementation1T_csConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csImageBase_iImage_t, _p_scfImplementation1T_csImageBase_iImage_tTo_p_iBase, 0, 0},  {&_swigt__p_iShaderPriorityList, _p_iShaderPriorityListTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iTextureHandle, _p_iTextureHandleTo_p_iBase, 0, 0},  {&_swigt__p_iShader, _p_iShaderTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iNativeWindow, _p_iNativeWindowTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVariableContext, _p_iShaderVariableContextTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iMaterial, _p_iMaterialTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_csImageMemory, _p_csImageMemoryTo_p_iBase, 0, 0},  {&_swigt__p_iProcTexture, _p_iProcTextureTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iGraphics3D, _p_iGraphics3DTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iFont, _p_iFontTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVariableAccessor, _p_iShaderVariableAccessorTo_p_iBase, 0, 0},  {&_swigt__p_iNativeWindowManager, _p_iNativeWindowManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iThreadManager, _p_iThreadManagerTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTextureManager, _p_iTextureManagerTo_p_iBase, 0, 0},  {&_swigt__p_iShaderManager, _p_iShaderManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iAnimatedImage, _p_iAnimatedImageTo_p_iBase, 0, 0},  {&_swigt__p_iFrameEventSignpost, _p_iFrameEventSignpostTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_iShaderCompiler, _p_iShaderCompilerTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseT_CS__StringSetTag__General_t, _p_iStringSetBaseT_CS__StringSetTag__General_tTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csObject_iObject_t, _p_scfImplementation1T_csObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt0T_csImageMemory_csImageBase_t, _p_scfImplementationExt0T_csImageMemory_csImageBase_tTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_iHalo, _p_iHaloTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iClipper2D[] = {  {&_swigt__p_iClipper2D, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDocumentNode[] = {  {&_swigt__p_iDocumentNode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iFont[] = {  {&_swigt__p_iFont, 0, 0, 0},{0, 0, 0, 0}};
@@ -24820,7 +25400,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_CS__StringIDT_CS__StringSetTag__General_t,
   _swigc__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t,
   _swigc__p_CS__StructuredTextureFormat,
-  _swigc__p_CS__Utility__StringSetT_CS__StringSetTag__General_t,
+  _swigc__p_CS__Utility__StringSetT_CS__StringSetTag__General_false_t,
   _swigc__p_CapacityHandlerType,
   _swigc__p_ContainedType,
   _swigc__p_ElementHandlerType,
@@ -24920,6 +25500,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_iFont,
   _swigc__p_iFontDeleteNotify,
   _swigc__p_iFontServer,
+  _swigc__p_iFrameEventSignpost,
   _swigc__p_iGeneralFactoryState,
   _swigc__p_iGraphics2D,
   _swigc__p_iGraphics3D,
@@ -25530,6 +26111,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CSDRAW_CLEARZBUFFER",SWIG_From_int(static_cast< int >(0x00000010)));
   SWIG_Python_SetConstant(d, "CSDRAW_CLEARSCREEN",SWIG_From_int(static_cast< int >(0x00000020)));
   SWIG_Python_SetConstant(d, "CSDRAW_NOCLIPCLEAR",SWIG_From_int(static_cast< int >(0x00000040)));
+  SWIG_Python_SetConstant(d, "CSDRAW_READBACK",SWIG_From_int(static_cast< int >(0x00000080)));
   SWIG_Python_SetConstant(d, "CS_CLIPPER_NONE",SWIG_From_int(static_cast< int >(-1)));
   SWIG_Python_SetConstant(d, "CS_CLIPPER_OPTIONAL",SWIG_From_int(static_cast< int >(0)));
   SWIG_Python_SetConstant(d, "CS_CLIPPER_TOPLEVEL",SWIG_From_int(static_cast< int >(1)));
@@ -25695,6 +26277,12 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityApp",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityApp)));
   SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityUser",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityUser)));
   SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityHighest",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityHighest)));
+  SWIG_Python_SetConstant(d, "iShader_svuTextures",SWIG_From_int(static_cast< int >(iShader::svuTextures)));
+  SWIG_Python_SetConstant(d, "iShader_svuBuffers",SWIG_From_int(static_cast< int >(iShader::svuBuffers)));
+  SWIG_Python_SetConstant(d, "iShader_svuVProc",SWIG_From_int(static_cast< int >(iShader::svuVProc)));
+  SWIG_Python_SetConstant(d, "iShader_svuVP",SWIG_From_int(static_cast< int >(iShader::svuVP)));
+  SWIG_Python_SetConstant(d, "iShader_svuFP",SWIG_From_int(static_cast< int >(iShader::svuFP)));
+  SWIG_Python_SetConstant(d, "iShader_svuAll",SWIG_From_int(static_cast< int >(iShader::svuAll)));
   SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_POS_X",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_POS_X)));
   SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_NEG_X",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_NEG_X)));
   SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEXTURE_CUBE_POS_Y",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEXTURE_CUBE_POS_Y)));
@@ -25720,6 +26308,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_TEXTURE_NPOTS",SWIG_From_int(static_cast< int >(0x00000040)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_SCALE_UP",SWIG_From_int(static_cast< int >(0x00000080)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_SCALE_DOWN",SWIG_From_int(static_cast< int >(0x00000100)));
+  SWIG_Python_SetConstant(d, "CS_TEXTURE_CREATE_CLEAR",SWIG_From_int(static_cast< int >(0x00000200)));
   SWIG_Python_SetConstant(d, "CS_MATERIAL_VARNAME_FLATCOLOR",SWIG_FromCharPtr("mat flatcolor"));
   SWIG_Python_SetConstant(d, "CS_MATERIAL_TEXTURE_DIFFUSE",SWIG_FromCharPtr("tex diffuse"));
 }

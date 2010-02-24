@@ -38,7 +38,7 @@ struct iImage;
 /// Document me! @@@
 struct iXWindow : public virtual iBase
 {
-  SCF_INTERFACE (iXWindow, 1, 0, 0);
+  SCF_INTERFACE (iXWindow, 2, 0, 0);
 
   // These should be inherited from csNativeWindow
   virtual bool Open () = 0;
@@ -50,6 +50,12 @@ struct iXWindow : public virtual iBase
   virtual void SetFullScreen (bool yesno) = 0;
 
   virtual void SetTitle (const char* title) = 0;
+
+  /** Sets the icon of this window with the provided one.
+   *
+   *  @param image the iImage to set as the icon of this window.
+   */
+  virtual void SetIcon (iImage *image) = 0;
   virtual void SetCanvas (iGraphics2D *canvas) = 0;
 
   // These are X specific

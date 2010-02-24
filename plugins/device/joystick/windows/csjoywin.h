@@ -27,8 +27,8 @@
 #include "csutil/cfgacc.h"
 #include "csutil/dirtyaccessarray.h"
 
-#define DIRECTINPUT_VERSION 0x0500
-// @@@ Should be able build on older SDKs as well
+// Require DirectInput 8
+#define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #include "dinputdefs.h"
 
@@ -57,7 +57,7 @@ private:
   struct joydata
   {
     int number;			 // joystick number; CS numbers are 1-based
-    LPDIRECTINPUTDEVICE2 device; // DInput device
+    LPDIRECTINPUTDEVICE8W device; // DInput device
     int nButtons;		 // number of buttons
     uint nAxes;			 // number of axis
     joystate state[2];		 // joystick current & last state
@@ -81,7 +81,7 @@ private:
   csConfigAccess config;
   csRef<iEventQueue > eq;
   csRef<iEventOutlet> EventOutlet;
-  LPDIRECTINPUT lpdin;
+  LPDIRECTINPUT8W lpdin;
 
   bool Init ();
   bool Close ();
@@ -94,7 +94,7 @@ private:
   virtual ~csWindowsJoystick ();
 
   virtual bool Initialize (iObjectRegistry *oreg);
-  virtual bool CreateDevice (const DIDEVICEINSTANCE* pdidInstance);
+  virtual bool CreateDevice (const DIDEVICEINSTANCEW* pdidInstance);
 
   /**\name iEventPlug implementation
    * @{ */

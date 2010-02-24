@@ -1,0 +1,5 @@
+SubDir TOP apps tests jobtest ;
+
+Description jobtest : "JobQueue Test and benchmark" ;
+Application jobtest : [ Wildcard *.cpp *.h ] : noinstall console ;
+LinkWith jobtest : crystalspace ;

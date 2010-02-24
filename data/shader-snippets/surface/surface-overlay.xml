@@ -1,0 +1,96 @@
+<!--
+  Copyright (C) 2009 by Mike Gist
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+
+<snippet type="compound">
+  <technique priority="100">
+    <snippet id="surface_modulate" file="/shader-snippets/surface/surface-modulate.xml" />
+    
+    <snippet id="surface_overlay">
+      <technique priority="100">
+        <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+        <input file="/shader-snippets/texCoord.inp" />
+
+        <input name="surfaceColorIn" type="rgba">
+          <attribute name="perfragment" type="bool" />
+        </input>
+    
+        <input name="texOverlay" type="tex2d" default="complex">    
+          <block location="pass">
+	      <texture name="tex overlay" destination="fragmentIn.texOverlay" />
+          </block>
+      
+          <block location="cg:fragmentIn">
+	      <uniform type="tex2d" name="texOverlay" />
+          </block>
+      
+          <block location="cg:fragmentMain">
+	      texOverlay = fragmentIn.texOverlay;
+          </block>
+        </input>
+       
+        <block location="cg:vertexMain">
+          surfaceColor = surfaceColorIn;
+          surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+        </block>
+    
+        <block location="cg:fragmentMain">
+          <?if vars."tex overlay".texture ?>
+            surfaceColor = surfaceColorIn;
+            float4 overlayTex = tex2D(texOverlay, texCoord);
+            surfaceColor.rgb = lerp(overlayTex.rgb, surfaceColor.rgb, overlayTex.a);
+            surfaceColor_attr_perfragment = true;
+          <?else?>
+            surfaceColor = surfaceColorIn;
+            surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+          <?endif?>
+        </block>
+    
+        <output name="surfaceColor" type="rgba">
+          <attribute name="perfragment" type="bool" />
+        </output>
+      </technique>
+  
+      <technique priority="50">
+        <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+        <input file="/shader-snippets/texCoord.inp" />
+
+        <input name="surfaceColorIn" type="rgba">
+          <attribute name="perfragment" type="bool" />
+        </input>
+    
+        <block location="cg:vertexMain">
+          surfaceColor = surfaceColorIn;
+          surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+        </block>
+    
+        <block location="cg:fragmentMain">
+          surfaceColor = surfaceColorIn;
+          surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+        </block>
+    
+        <output name="surfaceColor" type="rgba">
+          <attribute name="perfragment" type="bool" />
+        </output>
+      </technique>
+    </snippet>
+
+    <connection from="surface_modulate" to="surface_overlay" />
+  </technique>
+</snippet>

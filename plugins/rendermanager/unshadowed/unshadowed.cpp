@@ -35,7 +35,7 @@
 
 #include "unshadowed.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 using namespace CS::RenderManager;
 
@@ -154,7 +154,8 @@ public:
       typedef TraverseUsedSVSets<RenderTreeType,
         FXFunctor> SVTraverseType;
       SVTraverseType svTraverser
-        (fxf, shaderManager->GetSVNameStringset ()->GetSize ());
+        (fxf, shaderManager->GetSVNameStringset ()->GetSize (),
+	 fxRR.svUserFlags | fxFB.svUserFlags);
       // And do the iteration
       ForEachMeshNode (context, svTraverser);
     }
@@ -216,13 +217,15 @@ bool RMUnshadowed::RenderView (iView* view)
   if (!startSector)
     return false;
 
-  postEffects.SetupView (view);
+  CS::Math::Matrix4 perspectiveFixup;
+  postEffects.SetupView (view, perspectiveFixup);
 
   // Pre-setup culling graph
   RenderTreeType renderTree (treePersistent);
 
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
   startContext->renderTargets[rtaColor0].texHandle = postEffects.GetScreenTarget ();
+  startContext->perspectiveFixup = perspectiveFixup;
 
   // Setup the main context
   {
@@ -255,15 +258,28 @@ bool RMUnshadowed::RenderView (iView* view)
     ForEachContextReverse (renderTree, render);
   }
 
-  postEffects.DrawPostEffects ();
+  postEffects.DrawPostEffects (renderTree);
   
-  if (doHDRExposure) hdrExposure.ApplyExposure ();
+  if (doHDRExposure) hdrExposure.ApplyExposure (renderTree, view);
   
   DebugFrameRender (rview, renderTree);
 
   return true;
 }
 
+bool RMUnshadowed::PrecacheView (iView* view)
+{
+  if (!RenderView (view)) return false;
+
+  postEffects.ClearIntermediates();
+  hdr.GetHDRPostEffects().ClearIntermediates();
+
+  /* @@@ Other ideas for precache drawing:
+    - No frame advancement?
+   */
+
+  return true;
+}
 
 bool RMUnshadowed::HandleTarget (RenderTreeType& renderTree,
                                  const TargetManagerType::TargetSettings& settings)
@@ -283,6 +299,7 @@ bool RMUnshadowed::HandleTarget (RenderTreeType& renderTree,
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
   startContext->renderTargets[rtaColor0].texHandle = settings.target;
   startContext->renderTargets[rtaColor0].subtexture = settings.targetSubTexture;
+  startContext->drawFlags = settings.drawFlags;
 
   ContextSetupType contextSetup (this, renderLayer);
   ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
@@ -359,8 +376,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
     if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
     {
       csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
-	"crystalspace.rendermanager.test1",
-	"Could not load lighting_default shader");
+	messageID, "Could not load lighting_default shader");
     }
   
     if (doVerbose)
@@ -394,8 +410,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
       hdrSettings.GetColorRange());
     postEffects.SetChainedOutput (hdr.GetHDRPostEffects());
   
-    // @@@ Make configurable, too
-    hdrExposure.Initialize (objectReg, hdr);
+    hdrExposure.Initialize (objectReg, hdr, hdrSettings);
   }
   
   portalPersistent.Initialize (shaderManager, g3d,

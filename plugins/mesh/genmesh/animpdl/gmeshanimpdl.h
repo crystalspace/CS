@@ -124,8 +124,9 @@ public:
  * Genmesh animation control.
  */
 class GenmeshAnimationPDL :
-  public scfImplementation1<GenmeshAnimationPDL,
-    iGenMeshAnimationControl>
+  public scfImplementation2<GenmeshAnimationPDL,
+    iGenMeshAnimationControl,
+    iLightCallback>
 {
 private:
   csRef<GenmeshAnimationPDLFactory> factory;
@@ -140,14 +141,20 @@ private:
 
     struct MappedLight
     {
-      csWeakRef<iLight> light;
       csRef<iRenderBuffer> colors;
+      csColor lastUpdateColor;
+      
+      MappedLight() : lastUpdateColor (-1, -1, -1) {}
     };
-    csSafeCopyArray<MappedLight> lights;
+    typedef csHash<MappedLight, csPtrKey<iLight> > LightsHash;
+    LightsHash lights;
     csRef<iRenderBuffer> staticColors;
     csDirtyAccessArray<csColor4> combinedColors;
 
     ColorBuffer() : name (0), lightsDirty (true), lastMeshVersion (~0) {}
+      
+    void UpdateLight (iLight* l, const csColor& col, float thresh);
+    void RemoveLight (iLight* l);
   };
 
   bool prepared;
@@ -184,6 +191,16 @@ public:
   	const csVector3* normals, int num_normals, uint32 version_id);
   virtual const csColor4* UpdateColors (csTicks current,
   	const csColor4* colors, int num_colors, uint32 version_id);
+  /** @} */
+
+  /**\name iLightCallback implementation
+   * @{ */
+  virtual void OnColorChange (iLight* light, const csColor& newcolor);
+  virtual void OnPositionChange (iLight* light, const csVector3& newpos) { }
+  virtual void OnSectorChange (iLight* light, iSector* newsector) { }
+  virtual void OnRadiusChange (iLight* light, float newradius) { }
+  virtual void OnDestroy (iLight* light);
+  virtual void OnAttenuationChange (iLight* light, int newatt) { }
   /** @} */
 };
 

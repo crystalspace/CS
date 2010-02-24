@@ -78,8 +78,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       typedef csHash<BinID, uint> HashedIDsType;
       HashedIDsType hashedIDs;
       csRef<csMemFile> stringDataFile;
-    
-      uint32 CRC32 (const uint8* data, size_t size);
     public:
       const char* GetStringForID (uint32 timestamp,
         BinID id, uint32 crc);

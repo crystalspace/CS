@@ -18,7 +18,6 @@
 #include "cssysdef.h"
 #include "csqint.h"
 #include "csqsqrt.h"
-#include "csver.h"
 
 #include <string.h>
 #include <ctype.h>
@@ -26,7 +25,7 @@
 #include "sndmanager.h"
 
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csSndSysManager)
 

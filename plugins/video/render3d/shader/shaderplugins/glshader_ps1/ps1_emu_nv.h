@@ -35,11 +35,22 @@ private:
   GLuint program_num;
   GLuint tex_program_num;
 
+  enum
+  {
+    /// Maximum number of combiner stages supported here
+    maxCombinerStages = 8,
+    /// Maximum number of texture stages
+    maxTextureStages = 4,
+    /// Maximum number of constants per combiner stage
+    maxConstsPerStage = 2
+  };
+
   struct nv_input
   {
+    nv_input () {}
     nv_input (GLenum p, GLenum v, GLenum i, GLenum m, GLenum c)
-    {
-      portion = p; variable = v; input = i; mapping = m; component = c;
+      : portion (p), variable (v), input (i), mapping (m), component (c)
+    {      
     }
     GLenum portion;
     GLenum variable;
@@ -61,18 +72,22 @@ private:
   };
   struct nv_combiner_stage
   {
-    short con_first;
-    short con_second;
-    csArray<nv_input> inputs;
+    short stageNum;
+    short numInputs;
+    nv_input inputs[4];
     nv_output output;
   };
   struct nv_constant_pair
   {
-    short stage;
-    short first;
-    short second;
+    /**
+     * Indices of the first and second combiner constant into the "linear"
+     * PS1.x register bank
+     */
+    short constant[2];
+
+    nv_constant_pair() { constant[0] = constant[1] = -1; }
   };
-  csArray<nv_constant_pair> constant_pairs;
+  nv_constant_pair constant_pairs[maxCombinerStages];
   struct nv_texture_shader_stage
   {
     short instruction;
@@ -81,8 +96,10 @@ private:
     short param;
     bool signed_scale;
   };
-  csArray<nv_texture_shader_stage> texture_shader_stages;
-  csArray<nv_combiner_stage> stages;
+  nv_texture_shader_stage texture_shader_stages[maxTextureStages];
+  int numTextureStages;
+  nv_combiner_stage stages[maxCombinerStages*2];
+  int num_stages;
   int num_combiners;
 
   void ActivateTextureShaders ();
@@ -90,22 +107,24 @@ private:
 
   bool GetTextureShaderInstructions (
     const csArray<csPSProgramInstruction> &instrs);
-  bool GetNVInstructions (csPixelShaderParser& parser,
+  bool GetNVInstructions (const csPixelShaderParser& parser,
     const csArray<csPSProgramInstruction> &instrs);
   GLenum GetTexTarget();
 
 public:
   csShaderGLPS1_NV (csGLShader_PS1* shaderPlug)
-    : csShaderGLPS1_Common(shaderPlug) 
+    : csShaderGLPS1_Common(shaderPlug), program_num ((GLuint)~0),
+      tex_program_num ((GLuint)~0), numTextureStages (0), 
+      num_stages (0), num_combiners (0)
   {
-    tex_program_num = (GLuint)~0;
   }
   virtual ~csShaderGLPS1_NV ()
   {
-    glDeleteLists(program_num, 2);
+    if (program_num != (GLuint)~0)
+      glDeleteLists(program_num, 2);
   }
 
-  bool LoadProgramStringToGL ();
+  bool LoadProgramStringToGL (const csPixelShaderParser& parser);
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram

@@ -24,7 +24,6 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 
-#import <mach-o/dyld.h>
 #import <stdlib.h>
 #import <string.h>
 
@@ -53,6 +52,12 @@ public:
   // Set window title
   virtual void SetTitle(char *title);
 
+  /** Sets the icon of this window with the provided one.
+   *
+   *  @param image the iImage to set as the icon of this window.
+   */
+  virtual void SetIcon (iImage *image);
+
   // Flip video page (or dump to framebuffer)
   virtual void Print(csRect const* area = 0);
 
@@ -71,22 +76,9 @@ public:
   // Toggle between fullscreen/windowed mode
   virtual bool ToggleFullscreen();
 
-  virtual void *GetProcAddress (const char *name) 
-  {
-    // Get the address of a procedure (for OGL use.)
-    NSSymbol symbol;
-    csString symbolName;
-    // Prepend a '_' for the Unix C symbol mangling convention
-    symbolName << '_' << name;
-    if (NSIsSymbolNameDefined (symbolName))
-    {
-      symbol = NSLookupAndBindSymbol (symbolName);
-      return NSAddressOfSymbol (symbol);
-    }
-    else
-      return 0;
-  }
-
+  // Get the address of a procedure (for OGL use.)
+  virtual void *GetProcAddress (const char *name); 
+	
 protected:
   // OpenGL context for drawing
   CGLContextObj context;

@@ -2,9 +2,11 @@ SubDir TOP apps tools startme ;
 
 Description startme : "Crystal Space demo launcher" ;
 ApplicationIcon win32 : startme : startme.ico ;
+ApplicationIcon macosx : startme : startme.icns ;
 Application startme : [ Wildcard *.cpp *.h ] ;
 LinkWith startme : crystalspace ;
 FileListEntryApplications startme : app-demo ;
 
 IconsFromSVG startme ;
 IconsMakeWin32ICO startme.ico : startme ;
+IconsMakeMacICNS startme.icns : startme ;

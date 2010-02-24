@@ -280,6 +280,13 @@ public:
   
   void GetFramebufferDimensions (int& width, int& height)
   { width = fbWidth; height = fbHeight; }
+  
+  const char* GetHWRenderer ()
+  { return 0; }
+  const char* GetHWGLVersion ()
+  { return 0; }
+  const char* GetHWVendor ()
+  { return 0; }
 
   CS_EVENTHANDLER_NAMES("crystalspace.graphics2d.common")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
@@ -306,6 +313,13 @@ protected:
   virtual void SetTitle (const char* title);
   virtual void SetTitle (const wchar_t* title)
   { SetTitle (csString (title)); }
+
+  /** Sets the icon of this window with the provided one.
+   *  
+   *  @note Virtual SetIcon function so it can be overridden by subclasses of csGraphics2D.
+   *  @param image the iImage to set as the icon of this window.
+   */  
+  virtual void SetIcon (iImage *image);
   /** @} */
 
   /**\name iPluginConfig implementation

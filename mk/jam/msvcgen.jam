@@ -154,40 +154,59 @@ rule MsvcGenSubDir1 { }
 rule MsvcGenTemplateDir { MsvcGenTemplateDir1 $(1) ; }
 rule MsvcGenTemplateDir1 { }
 
-## MsvcExternalLibrary target [ : libs [ : mode ]]
+## MsvcExternalLibrary target [ : libs [ : mode [ : arch ]]]
 ##   Invoke this rule to link 'target' with one or more MSVC-specific external
 ##   libraries.  For example, 'libs' might be "wsock32.lib".  'mode' should be
 ##   "release" or "debug". If 'mode' is omitted, then 'libs' is used for
-##   release and debug.
-rule MsvcExternalLibrary { MsvcExternalLibrary1 $(1) : $(2) : $(3) ; }
+##   release and debug. 'arch' should be "x86" or "x64". If 'arch' is omitted,
+##   then 'directories' is used for x86 and x64.
+rule MsvcExternalLibrary { MsvcExternalLibrary1 $(1) : $(2) : $(3) : $(4) ; }
 rule MsvcExternalLibrary1 { }
 
-## MsvcDefine target [ : key [ : value [ : mode ]]]
+## MsvcDefine target [ : key [ : value [ : mode [ : arch ]]]]
 ##   Invoke this rule to define an MSVC-specific preprocessor macro 'key'
 ##   having 'value' for 'target'.  'mode' should be "release" or "debug". If
 ##   'mode' is omitted, then 'key/value' is used for release and debug.
-rule MsvcDefine { MsvcDefine1 $(1) : $(2) : $(3) : $(4) ; }
+##   'arch' should be "x86" or "x64". If 'arch' is omitted, then 'directories'
+##   is used for x86 and x64.
+rule MsvcDefine { MsvcDefine1 $(1) : $(2) : $(3) : $(4) : $(5) ; }
 rule MsvcDefine1 { }
 
-## MsvcIncDirs target : directories [ : mode ]
-##   Invoke this rule to define an MSVC-specific additional include directories.
+## MsvcIncDirs target : directories [ : mode [ : arch ]]
+##   Invoke this rule to define MSVC-specific additional include directories.
+##   'target' can be omitted in which case the include directories are added
+##   to all MSVC projects.
 ##   'mode' should be "release" or "debug". If 'mode' is omitted, then 
-##   'directories' is used for release and debug.
-rule MsvcIncDirs { MsvcIncDirs1 $(1) : $(2) : $(3) ; }
+##   'directories' is used for release and debug. 'arch' should be "x86"
+##   or "x64". If 'arch' is omitted, then 'directories' is used for x86 and
+##   x64.
+rule MsvcIncDirs { MsvcIncDirs1 $(1) : $(2) : $(3) : $(4) ; }
 rule MsvcIncDirs1 { }
 
-## MsvcCFlags target [ : cflags [ : mode ]]
+## MsvcCFlags target [ : cflags [ : mode [ : arch ]]]
 ##   Invoke this rule to set additional MSVC-specific compiler flags for
 ##   'target'.  'mode' should be "release" or "debug". If 'mode' is omitted,
-##   then 'cflags' is used for release and debug.
-rule MsvcCFlags { MsvcCFlags1 $(1) : $(2) : $(3) ; }
+##   then 'cflags' is used for release and debug. 'arch' should be "x86" or
+##   "x64". If 'arch' is omitted, then 'cflags' is used for x86 and x64.
+rule MsvcCFlags { MsvcCFlags1 $(1) : $(2) : $(3) : $(4) ; }
 rule MsvcCFlags1 { }
 
-## MsvcLFlags target [ : lflags [ : mode ]]
+## MsvcLibDirs target : libdirs [ : mode [ : arch ]]
+##   Invoke this rule to define MSVC-specific additional library directories.
+##   'target' can be omitted in which case the library directories are added
+##   to all MSVC projects.
+##   'mode' should be "release" or "debug". If 'mode' is omitted, then 
+##   'libdirs' is used for release and debug. 'arch' should be "x86"
+##   or "x64". If 'arch' is omitted, then 'libdirs' is used for x86 and x64.
+rule MsvcLibDirs { _MsvcLibDirs $(1) : $(2) : $(3) : $(4) ; }
+rule _MsvcLibDirs { }
+
+## MsvcLFlags target [ : lflags [ : mode [ : arch ]]]
 ##   Invoke this rule to set additional MSVC-specific linker flags for
 ##   'target'.  'mode' should be "release" or "debug". If 'mode' is omitted,
-##   then 'lflags' is used for release and debug.
-rule MsvcLFlags { MsvcLFlags1 $(1) : $(2) : $(3) ; }
+##   then 'lflags' is used for release and debug. 'arch' should be "x86" or
+##   "x64". If 'arch' is omitted, then 'lflags' is used for x86 and x64.
+rule MsvcLFlags { MsvcLFlags1 $(1) : $(2) : $(3) : $(4) ; }
 rule MsvcLFlags1 { }
 
 ## MsvcExtraFile target : files
@@ -216,6 +235,41 @@ rule MsvcGenName1 { }
 ##   'file'.
 rule MsvcUsePCH { MsvcUsePCH1 $(1) : $(2) ; }
 rule MsvcUsePCH1 { }
+
+## "Properties" system
+## Properties are values attached to msvcgen project types or targets. Some
+## properties have a special meaning to the msvcgen process, but otherwise
+## properties can be arbitrarily specified. 
+## One notable facility is that "properties" can be mapped to variables passed
+## down to the templates when instanciated into actual projects, thus allowing
+## for a wide-reaching customizations of the generated project.
+
+## MsvcGetTypeProp type : property
+##   Get a property of a project type
+rule MsvcGetTypeProp { return [ MsvcGetTypeProp1 $(1) : $(2) ] ; }
+rule MsvcGetTypeProp1 { }
+## MsvcSetTypeProp type : property
+##   Set a property of a project type
+rule MsvcSetTypeProp { MsvcSetTypeProp1 $(1) : $(2) : $(3) : $(4) ; }
+rule MsvcSetTypeProp1 { }
+## MsvcGetTypeProp type : property
+##   Get a property of a target. Queries the property from the project's type
+##   if not present in the target.
+rule MsvcGetTargetProp { return [ MsvcGetTargetProp1 $(1) : $(2) ] ; }
+rule MsvcGetTargetProp1 { }
+## MsvcGetTypeProp type : property
+##   Set a property of a target
+rule MsvcSetTargetProp { MsvcSetTargetProp1 $(1) : $(2) : $(3) : $(4) ; }
+rule MsvcSetTargetProp1 { }
+
+## MsvcRegisterVariableProp variable : property
+##   Map the property 'property' of targets to the template variable
+##   'variable'.
+rule MsvcRegisterVariableProp { MsvcRegisterVariableProp1  $(1) : $(2) ; }
+rule MsvcRegisterVariableProp1 { }
+
+# Path from build work dir (e.g. out/debug8/libfoo/) to source root
+rule MsvcWorkbuildToRoot { return [ ConcatDirs $(DOTDOT) $(DOTDOT) ] ; }
 
 #------------------------------------------------------------------------------
 # Private utility rules. Common to all phases.
@@ -504,77 +558,107 @@ MSVC.CFLAGS ?= ;
 MSVC.CFLAGS_DEBUG ?= ;
 MSVC.DEFINES ?= ;
 MSVC.DEFINES_DEBUG ?= ;
-MSVC.DEPEND.appgui ?= ;
-MSVC.DEPEND_DEBUG.appgui ?= ;
-MSVC.LIBRARY.appgui ?= ;
-MSVC.LIBRARY_DEBUG.appgui ?= ;
-MSVC.LFLAGS.appgui ?= ;
-MSVC.LFLAGS_DEBUG.appgui ?= ;
-MSVC.CFLAGS.appgui ?= ;
-MSVC.CFLAGS_DEBUG.appgui ?= ;
-MSVC.DEFINES.appgui ?= ;
-MSVC.DEFINES_DEBUG.appgui ?= ;
-MSVC.DEPEND.appcon ?= ;
-MSVC.DEPEND_DEBUG.appcon ?= ;
-MSVC.LIBRARY.appcon ?= ;
-MSVC.LIBRARY_DEBUG.appcon ?= ;
-MSVC.LFLAGS.appcon ?= ;
-MSVC.LFLAGS_DEBUG.appcon ?= ;
-MSVC.CFLAGS.appcon ?= ;
-MSVC.CFLAGS_DEBUG.appcon ?= ;
-MSVC.DEFINES.appcon ?= ;
-MSVC.DEFINES_DEBUG.appcon ?= ;
-MSVC.DEPEND.plugin ?= ;
-MSVC.DEPEND_DEBUG.plugin ?= ;
-MSVC.LIBRARY.plugin ?= ;
-MSVC.LIBRARY_DEBUG.plugin ?= ;
-MSVC.LIBRARY_DELAY.plugin ?= ;
-MSVC.LFLAGS.plugin ?= ;
-MSVC.LFLAGS_DEBUG.plugin ?= ;
-MSVC.CFLAGS.plugin ?= ;
-MSVC.CFLAGS_DEBUG.plugin ?= ;
-MSVC.DEFINES.plugin ?= ;
-MSVC.DEFINES_DEBUG.plugin ?= ;
-MSVC.DEPEND.library_static ?= ;
-MSVC.DEPEND_DEBUG.library_static ?= ;
-MSVC.LIBRARY.library_static ?= ;
-MSVC.LIBRARY_DEBUG.library_static ?= ;
-MSVC.LFLAGS.library_static ?= ;
-MSVC.LFLAGS_DEBUG.library_static ?= ;
-MSVC.CFLAGS.library_static ?= ;
-MSVC.CFLAGS_DEBUG.library_static ?= ;
-MSVC.DEFINES.library_static ?= ;
-MSVC.DEFINES_DEBUG.library_static ?= ;
-MSVC.DEPEND.library_shared ?= ;
-MSVC.DEPEND_DEBUG.library_shared ?= ;
-MSVC.LIBRARY.library_shared ?= ;
-MSVC.LIBRARY_DEBUG.library_shared ?= ;
-MSVC.LFLAGS.library_shared ?= ;
-MSVC.LFLAGS_DEBUG.library_shared ?= ;
-MSVC.CFLAGS.library_shared ?= ;
-MSVC.CFLAGS_DEBUG.library_shared ?= ;
-MSVC.DEFINES.library_shared ?= ;
-MSVC.DEFINES_DEBUG.library_shared ?= ;
-MSVC.DEPEND.dll ?= ;
-MSVC.DEPEND_DEBUG.dll ?= ;
-MSVC.LIBRARY.dll ?= ;
-MSVC.LIBRARY_DEBUG.dll ?= ;
-MSVC.LIBRARY_DELAY.dll ?= ;
-MSVC.LFLAGS.dll ?= ;
-MSVC.LFLAGS_DEBUG.dll ?= ;
-MSVC.CFLAGS.dll ?= ;
-MSVC.CFLAGS_DEBUG.dll ?= ;
-MSVC.DEFINES.dll ?= ;
-MSVC.DEFINES_DEBUG.dll ?= ;
 
-MSVC.PREFIX.appgui         ?= app ;
-MSVC.PREFIX.appcon         ?= app ;
-MSVC.PREFIX.plugin         ?= plg ;
-MSVC.PREFIX.library_static ?= lib ;
-MSVC.PREFIX.library_shared ?= lib ;
-MSVC.PREFIX.group          ?= grp ;
-MSVC.PREFIX.workspace      ?= wks ;
-MSVC.PREFIX.dll       ?= dll ;
+# Set up default project types
+rule MsvcRegisterType
+{
+  local type = $(1) ;
+  local prefix = $(2) ;
+  
+  MSVC.DEPEND.$(type) ?= ;
+  MSVC.DEPEND_DEBUG.$(type) ?= ;
+  MSVC.LIBRARY.$(type) ?= ;
+  MSVC.LIBRARY_DEBUG.$(type) ?= ;
+  MSVC.LFLAGS.$(type) ?= ;
+  MSVC.LFLAGS_DEBUG.$(type) ?= ;
+  MSVC.CFLAGS.$(type) ?= ;
+  MSVC.CFLAGS_DEBUG.$(type) ?= ;
+  MSVC.DEFINES.$(type) ?= ;
+  MSVC.DEFINES_DEBUG.$(type) ?= ;
+  
+  MSVC.PREFIX.$(type) = $(prefix) ;
+}
+
+MsvcRegisterType appgui : app ;
+MsvcRegisterType appcon : app ;
+MsvcRegisterType plugin : plg ;
+MsvcRegisterType library_static : lib ;
+MsvcRegisterType library_shared : lib ;
+MsvcRegisterType dll : dll ;
+MsvcRegisterType group : grp ;
+MsvcRegisterType workspace : wks ;
+
+# Set/get per-type properties.
+rule MsvcGetTypeProp1
+{
+  local type = $(1) ;
+  local prop = $(2) ;
+  return $(MSVC.PROP.TYPE.$(type).$(prop)) ;
+}
+
+rule MsvcSetTypeProp1
+{
+  local type = $(1) ;
+  local prop = $(2) ;
+  local value = $(3) ;
+  local options = $(4) ;
+  if ! [ IsElem $(options) : weak ] || ! $(MSVC.PROP.TYPE.$(type).$(prop))
+  {
+    MSVC.PROP.TYPE.$(type).$(prop) = $(value) ;
+  }
+}
+
+# Set/get per-target props. Also inherits props from the type.
+rule MsvcGetTargetProp1
+{
+  local target = $(1) ;
+  local prop = $(2) ;
+  local value ;
+  if $(MSVC.PROP.TARGET.$(target).$(prop).SET)
+  {
+    value = $(MSVC.PROP.TARGET.$(target).$(prop)) ;
+  }
+  else
+  {
+    value = [ MsvcGetTypeProp $($(target)_TYPE) : $(prop) ] ;
+  }
+  return $(value) ;
+}
+
+rule MsvcSetTargetProp1
+{
+  local target = $(1) ;
+  local prop = $(2) ;
+  local value = $(3) ;
+  local options = $(4) ;
+  if ! [ IsElem $(options) : weak ] || ! $(MSVC.PROP.TARGET.$(target).$(prop))
+  {
+    MSVC.PROP.TARGET.$(target).$(prop) = $(value) ;
+    MSVC.PROP.TARGET.$(target).$(prop).SET = true ;
+  }
+}
+
+# Set up default use/generation of resources, manifests and version info.
+MsvcSetTypeProp appgui : resources : yes ;
+MsvcSetTypeProp appcon : resources : yes ;
+MsvcSetTypeProp plugin : resources : yes ;
+MsvcSetTypeProp library_shared : resources : yes ;
+MsvcSetTypeProp dll : resources : yes ;
+MsvcSetTypeProp appgui : rsrcManifest : yes ;
+MsvcSetTypeProp appcon : rsrcManifest : yes ;
+MsvcSetTypeProp plugin : rsrcMetadata : yes ;
+MsvcSetTypeProp appgui : rsrcVersion : yes ;
+MsvcSetTypeProp appcon : rsrcVersion : yes ;
+MsvcSetTypeProp plugin : rsrcVersion : yes ;
+MsvcSetTypeProp library_shared : rsrcVersion : yes ;
+MsvcSetTypeProp dll : rsrcVersion : yes ;
+
+rule MsvcRegisterVariableProp1
+{
+  local variable = $(1) ;
+  local prop = $(2) ;
+  MSVCGEN_VARIABLES_FROM_PROPS += $(variable) $(prop) ;
+}
 
 SetProperty build : projgen : msvc ;
 SetProperty build : projgen_version : $(MSVC_VERSION) ;
@@ -703,16 +787,40 @@ rule MsvcGenName1
   MSVC.NAME_OVERRIDE.$(<) = $(>) ;
 }
 
-## MsvcProject target : type : target-with-ext : sources : options
+## MsvcAddFileToRespFile respfile : files : respdir ;
+rule MsvcAddFileToProject
+{
+  local respfile = $(1) ;
+  local files = $(2) ;
+  local respdir = $(3) ;
+  
+  for f in $(files)
+  {
+    local file_base = $(f:G=:D=) ;
+    if [ IsElem $(file_base) : $($(respfile)_FILES) ]
+    {
+      ResponseFile $(respfile) : "file_obj_unique|$(f)" : notfile : $(respdir) ;
+    }
+    else
+    {
+      ResponseFile $(respfile) : "file|$(f)" : notfile : $(respdir) ;
+      $(respfile)_FILES += $(file_base) ;
+    }
+  }
+}
+
+## MsvcProject target : type : sources : options
 ##   Create a project file for 'target', which is the project's raw name.
 ##   'sources' is a list of files comprising the target.
+##   The output file of the project (library, executable etc) is controlled by
+##   the 'outputfile' property.
 rule MsvcProject
 {
   local rawname = $(1) ;
   local type = $(2) ;
-  local decorated = $(3) ;
-  local sources = $(4) ;
-  local options = $(5) ;
+  local decorated = [ MsvcGetTargetProp $(rawname) : outputfile ] ;
+  local sources = $(3) ;
+  local options = $(4) ;
   local relpath = [ Property msvcgen : relpath$(MSVC_VERSION) ] ;
   local relpathcommon = [ Property msvcgen : relpathcommon ] ;
   if "$(relpathcommon)" = ""
@@ -738,7 +846,22 @@ rule MsvcProject
   Always $(respfile) ;
   $(rawname)_PRJ_RESPFILE = $(respfile) ;
   $(rawname)_PRJ_RESPDIR = $(respdir) ;
-
+  
+  local extravars = [ MsvcGetTargetProp $(rawname) : linkerextra ] ;
+  {
+    local vars_from_props = $(MSVCGEN_VARIABLES_FROM_PROPS) ;
+    while $(vars_from_props)
+    {
+      local var = $(vars_from_props[1]) ;
+      local prop = $(vars_from_props[2]) ;
+      local value = [ MsvcGetTargetProp $(rawname) : $(prop) ] ;
+      
+      extravars += "$(var)|$(value)" ;
+      
+      vars_from_props = $(vars_from_props[3-]) ;
+    }
+  }
+  
   # Boilerplate.
   ResponseFile $(respfile) :
     "key|value"
@@ -773,6 +896,7 @@ rule MsvcProject
     "msvcversion|$(MSVC_VERSION)"
     "static|$($(rawname)_STATIC)"
     $(MSVCGEN_VARIABLES)
+    $(extravars)
     : notfile : $(respdir) ;
   MsvcRmTemps msvcgen : $(respfile) ;
   
@@ -793,13 +917,16 @@ rule MsvcProject
       {
 	fileinproj = $(i:R=$(SEARCH_SOURCE)) ;
       }
-      ResponseFile $(respfile) : "file|$(fileinproj)" : notfile :
-	$(respdir) ;
+      MsvcAddFileToProject $(respfile) : $(fileinproj) : $(respdir) ;
     }
+  }
+  for i in $($(rawname)_EXTRASOURCES)
+  {
+    ResponseFile $(respfile) : "file|$(i)" : notfile : $(respdir) ;
   }
 
   # Add resource file.
-  if [ IsElem $(type) : dll plugin appgui appcon library_shared ]
+  if [ MsvcGetTargetProp $(rawname) : resources ] = "yes"
   {
     local resource = $(msvcname:S=.rc) ;
     Depends msvcgen : $(resource) ;
@@ -807,18 +934,20 @@ rule MsvcProject
     SEARCH on $(resource) = $(outdircommon) ;
     NAME on $(resource) = $(rawname) ;
     $(rawname)_RCNAME = $(resource) ;
-    ResponseFile $(respfile) : "file|$(resource:R=$(outdircommon))" : notfile :
-      $(respdir) ;
+    MsvcAddFileToProject $(respfile) : $(resource:R=$(outdircommon)) : $(respdir) ;
   
-    local versionrc = $(resource:S=.vrctmp) ;
-    MakeLocate $(versionrc) : $(workdircommon) ;
-    MakeVersionRc $(versionrc) : $(rawname) ;
-    Depends $(versionrc) : $(TOP)/Jamconfig ;
-    Depends $(versionrc) : $(SUBDIR)/Jamfile ;
-    Win32Resource $(rawname) : $(versionrc) ;
-    MsvcRmTemps $(resource) : $(versionrc) ;
+    if [ MsvcGetTargetProp $(rawname) : rsrcVersion ] = "yes"
+    {
+      local versionrc = $(resource:S=.vrctmp) ;
+      MakeLocate $(versionrc) : $(workdircommon) ;
+      MakeVersionRc $(versionrc) : $(rawname) ;
+      Depends $(versionrc) : $(TOP)/Jamconfig ;
+      Depends $(versionrc) : $(SUBDIR)/Jamfile ;
+      Win32Resource $(rawname) : $(versionrc) ;
+      MsvcRmTemps $(resource) : $(versionrc) ;
+    }
     
-    if $(type) = "plugin" 
+    if [ MsvcGetTargetProp $(rawname) : rsrcMetadata ] = "yes"
     {
       local metarc = $(resource:S=.mrctmp) ;
       MakeLocate $(metarc) : $(workdircommon) ;
@@ -828,12 +957,11 @@ rule MsvcProject
       
       Win32Resource $(rawname) : $(metarc) ;
       MsvcRmTemps $(resource) : $(metarc) ;
-      ResponseFile $(respfile) :
-	"file|$($(rawname)_METAFILE:R=$(SEARCH_SOURCE))" : notfile :
-	$(respdir) ;
+      MsvcAddFileToProject $(respfile) :
+	$($(rawname)_METAFILE:R=$(SEARCH_SOURCE)) : $(respdir) ;
     }
 
-    if [ IsElem $(type) : appgui appcon ]
+    if [ MsvcGetTargetProp $(rawname) : rsrcManifest ] = "yes"
     {
       if ! [ IsElem nomanifest : $(options) ]
       {
@@ -854,8 +982,7 @@ rule MsvcProject
           # VC8: Manifest appears in project along other files, a special build
           # tool cares about the embedding into a resource. (The resource goop
           # still has to be generated since it is shared with other VCs.)
-	  ResponseFile $(respfile) : "file|$(manifest:R=$(outdircommon))" : notfile :
-	    $(respdir) ;
+	  MsvcAddFileToProject $(respfile) : $(manifest:R=$(outdircommon)) : $(respdir) ;
         }
       
         Win32Resource $(rawname) : $(manifestrc) ;
@@ -883,10 +1010,13 @@ rule MsvcProject
       }
     }
   }
+
+  ResponseFile $(respfile) : $(MSVC.RESPEMIT.GLOBAL) : notfile : $(respdir) ;
   
   local inckeys = "include" includedebug ;
   local incdirs = $(MSVC.INCDIRS_LITERAL) $(MSVC.INCDIRS_LITERAL.$(rawname)) ;
   ResponseFile $(respfile) : "$(inckeys)|$(incdirs)" : notfile : $(respdir) ;
+  ResponseFile $(respfile) : "$(inckeys)-x64|$(incdirs)" : notfile : $(respdir) ;
 
   local incdir ;
   for incdir in $(MSVC.INCDIRS) $(MSVC.INCDIRS.$(rawname))
@@ -900,8 +1030,9 @@ rule MsvcProject
       incdir = [ ConcatDirs $(relpath) $(incdir) ] ;
     }
     ResponseFile $(respfile) : "$(inckeys)|$(incdir)" : notfile : $(respdir) ;
+    ResponseFile $(respfile) : "$(inckeys)-x64|$(incdir)" : notfile : $(respdir) ;
   }
-
+  
   if ! [ Property msvcgen : templatedir ]
   {
     exit "Error: You must invoke MsvcGenTemplateDir for project generation." ;
@@ -944,7 +1075,11 @@ rule MsvcProject
 rule RegisterWellKnownCompileGroup1
 {
   local group = $(1) ;
-  RegisterCompileGroups $(group) ;
+  if $(MSVCGEN.WELL_KNOWN_GROUP_REGISTERED.$(group)) != yes
+  {
+    MSVCGEN.WELL_KNOWN_GROUP_REGISTERED.$(group) = yes ;
+    RegisterCompileGroups $(group) ;
+  }
 }
 
 rule RegisterWellKnownCompileGroup
@@ -962,6 +1097,133 @@ rule RegisterWellKnownCompileGroup
   MSVCGEN.DELAYED_COMPILE_GROUPS = ;
 }
 
+rule _ApplyStaticPluginFlags
+{
+  local package target plugins ;
+  plugins = $(2) ;
+  package = $(3) ;
+  
+  if $(package)
+  {
+    # External static plugins.
+    local lflags.debug lflags.release p mode ;
+    # Grab flags
+    local target_lflags.release target_lflags.debug ;
+    local target_relaydeps ;
+    for p in $(plugins)
+    {
+      NotFile $(p) ;
+      for mode in debug release
+      {
+        local cflags ;
+        if $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION))
+        {
+	  cflags = $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION)) ;
+	}
+	else
+	{
+	  cflags = $(STATICPLUGIN.$(p).CFLAGS.$(mode)) ;
+	}
+	if $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION))
+	{
+	  target_lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION)) ;
+	}
+	else
+	{
+	  target_lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode)) ;
+	}
+        for target in $(1)
+        {
+          MsvcCFlags $(target) : $(cflags) ;
+        }
+      }
+      
+      local relaydeps = $(STATICPLUGIN.$(p).RELAYDEPS) ;
+      for relaydep in $(relaydeps)
+      {
+	local has_dep = no ;
+	for trd in $(target_relaydeps)
+	{
+	  if $(trd) = $(relaydep)
+	  {
+	    has_dep = yes ;
+	  }
+	}
+	if $(has_dep) = no
+	{
+          target_relaydeps += $(relaydep) ;
+          for target in $(1)
+          {
+            RelayLibs $(target) : $(relaydep) : $(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep)) ;
+          }
+	}
+      }
+    }
+    for mode in debug release
+    {
+      local lflags = [ RemoveDupFlags $(target_lflags.$(mode)) ] ;
+      for target in $(1)
+      {
+        MsvcLFlags $(target) : $(lflags) : $(mode) ;
+      }
+    }
+  }
+  else
+  {
+    # link with static plugins
+    for target in $(1)
+    {
+      LinkWith $(target) : $(STATICPLUGINS.LIBRARY) ;
+    }
+    
+    # Local static plugins
+    local libs p ;
+    # Grab flags
+    local target_relaydeps ;
+    for p in $(plugins)
+    {
+      for target in $(1)
+      {
+        LinkWith $(target) : $($(p).NEEDLIBS) ;
+        ExternalLibs $(target) : $($(p).EXTERNALLIBS) ;
+      }
+
+      for mode in debug release
+      {
+	for a in x86 x64
+	{
+          for target in $(1)
+          {
+            MsvcExternalLibrary $(target) : $($(p)_$(mode)_$(a)_EXTERNALLIBS) : $(mode) : $(a) ;
+          }
+	}
+      }
+      
+      local relaydeps = $($(p).RELAYDEPS) ;
+      for relaydep in $(relaydeps)
+      {
+	local has_dep = no ;
+	for trd in $(target_relaydeps)
+	{
+	  if $(trd) = $(relaydep)
+	  {
+	    has_dep = yes ;
+	  }
+	}
+	if $(has_dep) = no
+	{
+          target_relaydeps += $(relaydep) ;
+          for target in $(1)
+          {
+            RelayLibs $(target) : $(relaydep) : $(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep)) ;
+          }
+	}
+      }
+    }
+  }
+  
+}
+
 rule LinkStaticPlugins
 {
   local package target plugins optplugins ;
@@ -970,10 +1232,6 @@ rule LinkStaticPlugins
   plugins = $(2) ;
   optplugins = $(3) ;
   package = $(4) ;
-  
-  local target_link_with target_ext_libs target_ext_libs.release target_ext_libs.debug ;
-  local target_lflags.release target_lflags.debug ;
-  local target_cflags.release target_cflags.debug ;
   
   if $(package)
   {
@@ -993,38 +1251,11 @@ rule LinkStaticPlugins
 	plugins += $(p) ;
       }
     }
-    # Grab flags
-    for p in $(plugins)
-    {
-      NotFile $(p) ;
-      for mode in debug release
-      {
-        if $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION))
-        {
-	  target_cflags.$(mode) += $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION)) ;
-	}
-	else
-	{
-	  target_cflags.$(mode) += $(STATICPLUGIN.$(p).CFLAGS.$(mode)) ;
-	}
-	if $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION))
-	{
-	  target_lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION)) ;
-	}
-	else
-	{
-	  target_lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode)) ;
-	}
-      }
-    }
   }
   else
   {
-    # link with static plugins
-    target_link_with += $(STATICPLUGINS.LIBRARY) ;
-    
     # Local static plugins
-    local libs p ;
+    local p ;
     # Collect optional plugins
     for p in $(optplugins)
     {
@@ -1033,19 +1264,8 @@ rule LinkStaticPlugins
 	plugins += $(p) ;
       }
     }
-    # Grab flags
-    for p in $(plugins)
-    {
-      target_link_with += $($(p).NEEDLIBS) ;
-
-      target_ext_libs += $($(p).EXTERNALLIBS) ;
-      for mode in debug release
-      {
-        target_ext_libs.$(mode) += $($(p)_$(mode)_EXTERNALLIBS) ;
-      }
-    }
   }
-
+  
   # Generate static plugin instantiation
   local outdir = [ Property msvcgen : outdircommon ] ;
   if "$(outdir)" = ""
@@ -1103,12 +1323,10 @@ rule LinkStaticPlugins
     GeneratePluginLibraryGlueLib $(libglue) : $(plugin_lib_name) : $(tag) ;
     
     Library $(plugin_lib_name) : : noinstall notest independent nohelp shared ;
-    ResponseFile $($(plugin_lib_name)_PRJ_RESPFILE) : 
-      "file|$(libglue:R=$(outdir))" : notfile :
-      $($(target)_PRJ_RESPDIR) ;
-    ResponseFile $($(plugin_lib_name)_PRJ_RESPFILE) : 
-      "file|$(staticuse_out:R=$(outdir))" : notfile :
-      $($(target)_PRJ_RESPDIR) ;
+    MsvcAddFileToProject $($(plugin_lib_name)_PRJ_RESPFILE) : 
+      $(libglue:R=$(outdir)) : $($(target)_PRJ_RESPDIR) ;
+    MsvcAddFileToProject $($(plugin_lib_name)_PRJ_RESPFILE) : 
+      $(staticuse_out:R=$(outdir)) : $($(target)_PRJ_RESPDIR) ;
     LibDepends $(plugin_lib_name) : $(target_link_with) ;
     LFlags $(plugin_lib_name) : $(target_lflags) ;
     Depends msvcgen : $(libglue) ;
@@ -1128,52 +1346,28 @@ rule LinkStaticPlugins
     
     GeneratePluginLibraryGlueApp $(appglue) : $(plugin_lib_name) ;
     
-    ExternalLibs $(plugin_lib_name) : $(target_ext_libs) ;
-    for mode in debug release
-    {
-      MsvcLFlags $(plugin_lib_name) : 
-	[ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) ;
-      MsvcCFlags $(plugin_lib_name) : $(target_cflags.$(mode)) ;
-      MsvcExternalLibrary $(plugin_lib_name) : $(target_ext_libs.$(mode)) : $(mode) ;
-    }
-    LinkWith $(plugin_lib_name) : $(target_link_with) ;
-    
-    # Nevertheless link plugin deps to actual target to make static lib builds
-    # work
-    ExternalLibs $(target) : $(target_ext_libs) ;
-    for mode in debug release
-    {
-      MsvcLFlags $(target) : 
-	[ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) ;
-      MsvcCFlags $(target) : $(target_cflags.$(mode)) ;
-      MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode)) : $(mode) ;
-    }
-    LinkWith $(target) : $(target_link_with) ;
+    # We need to get the external libs for the plugin lib; but they have to be 
+    # specified after LinkStaticPlugins
+    $(target).PROPAGATE_EXTERNALLIBS += $(plugin_lib_name) ;
     
     # Add usefile to project
-    ResponseFile $($(target)_PRJ_RESPFILE) : 
-      "file|$(appglue:R=$(outdir))" : notfile :
-      $($(target)_PRJ_RESPDIR) ;
+    MsvcAddFileToProject $($(target)_PRJ_RESPFILE) : 
+      $(appglue:R=$(outdir)) : $($(target)_PRJ_RESPDIR) ;
     Depends $(target) : $(appglue) ;
     Depends msvcgen : $(appglue) ;
     LinkWith $(target) : $(plugin_lib_name) ;
+    
+    # @@@ Something is overflowing Jam's little mind or so ...
+    # $(target) changes it's value, somewhere!
+    _ApplyStaticPluginFlags $(<) $(plugin_lib_name) : $(plugins) : $(package) ;
   }
   else
   {
-    ExternalLibs $(target) : $(target_ext_libs) ;
-    for mode in debug release
-    {
-      MsvcLFlags $(target) : 
-	[ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) ;
-      MsvcCFlags $(target) : $(target_cflags.$(mode)) ;
-      MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode)) : $(mode) ;
-    }
-    LinkWith $(target) : $(target_link_with) ;
+    _ApplyStaticPluginFlags $(target) : $(plugins) : $(package) ;
     
     # Add usefile to project
-    ResponseFile $($(target)_PRJ_RESPFILE) : 
-      "file|$(staticuse_out:R=$(outdir))" : notfile :
-      $($(target)_PRJ_RESPDIR) ;
+    MsvcAddFileToProject $($(target)_PRJ_RESPFILE) : 
+      $(staticuse_out:R=$(outdir)) : $($(target)_PRJ_RESPDIR) ;
     Depends $(target) : $(staticuse_out) ;
   }
 }
@@ -1191,7 +1385,9 @@ rule Application
   {
     projtype = appgui ;
   }
-  MsvcProject $(<) : $(projtype) : $(<:S=.exe) : $(>) : $(3) ;
+  $(<)_TYPE = $(projtype) ;
+  MsvcSetTargetProp $(<) : outputfile : $(<:S=.exe) : weak ;
+  MsvcProject $(<) : $(projtype) : $(>) : $(3) ;
   
   CompileGroups $(<) : all apps ;
 }
@@ -1202,11 +1398,24 @@ rule Plugin
 
   $(<)_TYPE = plugin ;
   
+  local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+  local outdircommon = [ Property msvcgen : outdircommon ] ;
+  if "$(outdircommon)" = ""
+  {
+    outdircommon = $(outdir) ;
+  }
+  local plugin_impl_file = plugin_impl.cpp ;
+  MakeLocate $(plugin_impl_file) : $(outdircommon) ;
+  WritePluginImplement $(plugin_impl_file) ;
+  Depends msvcgen : $(plugin_impl_file) ;
+  $(<)_EXTRASOURCES = $(plugin_impl_file:R=$(outdircommon))
+  
   local metafile ;
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
   SEARCH on $(metafile) = $(SEARCH_SOURCE) ;
   $(<)_METAFILE = $(metafile) ;
-  MsvcProject $(<) : plugin : $(<:S=$(MSVCGEN.PLUGIN_EXT.$(<):E=.dll)) : $(>) ;
+  MsvcSetTargetProp $(<) : outputfile : $(<:S=$(MSVCGEN.PLUGIN_EXT.$(<):E=.dll)) : weak ;
+  MsvcProject $(<) : plugin : $(>) ;
   CompileGroups $(<) : all plugins ;
 
   STATICPLUGINS.SOURCES.$(<) += $(>:R=$(SEARCH_SOURCE)) ;
@@ -1228,18 +1437,26 @@ rule Library
   local options = $(3) ;
 
   RegisterWellKnownCompileGroup libs ;
-  local type ;
-  if ( ! [ IsElem shared : $(options) ] )
+  local type decorated ;
+  
+  if [ IsElem shared : $(3) ]
   {
-    type = library_static ;
+    type = library_shared ;
+    decorated = $(<:S=.dll) ;
+    MsvcSetTargetProp $(<) : importlib : $(<:S=.lib) : weak ;
   }
   else
   {
-    type = library_shared ;
+    type = library_static ;
+    decorated = $(<:S=.lib) ;
   }
   $(<)_TYPE = $(type) ;
-  MsvcProject $(<) : $(type) : $(<:S=.lib) : $(>) ;
-  CompileGroups $(<) : all libs ;
+  MsvcSetTargetProp $(<) : outputfile : $(decorated) : weak ;
+  MsvcProject $(<) : $(type) : $(>) ;
+  if ! [ IsElem independent : $(options) ]
+  {
+    CompileGroups $(<) : all libs ;
+  }
 }
 
 rule DLL
@@ -1247,7 +1464,8 @@ rule DLL
   RegisterWellKnownCompileGroup ;
   
   $(<)_TYPE = dll ;
-  MsvcProject $(<) : dll : $(3:E=$(<:S=.dll)) : $(>) ;
+  MsvcSetTargetProp $(<) : outputfile : $(3:E=$(<:S=.dll)) : weak ;
+  MsvcProject $(<) : dll : $(>) ;
   CompileGroups $(<) : all ;
 }
 
@@ -1266,12 +1484,21 @@ rule StaticPluginLibrary
   for t in $(targets)
   {
     sources += $(STATICPLUGINS.SOURCES.$(t)) ;
+    extlibs += $($(t).EXTERNALLIBS) ;
   }
 
   $(name)_STATIC = "yes" ;
   # Set up library
   Library $(name) : $(sources) ;
   MsvcDefine $(name) : CS_STATIC_LINKED ;
+  # We need the CFLAGS of external dependencies, but not the LFLAGS.
+  local extlib ;
+  for extlib in [ RemoveDups $(extlibs) ]
+  {
+    _ExternalLibsHelperMsvc $(name) : $(extlib) : MsvcCFlags : CFLAGS ;
+    _ExternalLibsHelperMsvc $(name) : $(extlib) : _MsvcDefine  : DEFINES ;
+    _ExternalLibsHelperMsvc $(name) : $(extlib) : _MsvcIncDirs : INCDIRS ;
+  }
 
   # Write out needed CFLAGS, LFLAGS
   local outdir = [ Property msvcgen : outdircommon ] ;
@@ -1348,6 +1575,15 @@ rule WriteDependencies
     $(depfile).FIRSTTIME = "yes" ;
   }
   WriteDepFlags $(depfile_gristed) : $(plugin) ;
+  
+  local relaydeps = $($(plugin).RELAYDEPS) ;
+  for relaydep in $(relaydeps)
+  {
+    RELAYDEP on $(depfile_gristed) = "$(relaydep)" ;
+    RELAYLIBS on $(depfile_gristed) = "$($(plugin).RELAYLIBS.$(relaydep))" ;
+    WriteDepRelayLibs $(depfile_gristed) : $(plugin) ;
+  }
+  
   Depends $(depfile) : $(depfile_gristed) ;
   Always $(depfile_gristed) ;
 }
@@ -1371,6 +1607,14 @@ STATICPLUGIN.$(>).CFLAGS.debug.$(MSVC_VERSION) = $(CFLAGS.DEBUG) ;
 STATICPLUGIN.$(>).CFLAGS.release.$(MSVC_VERSION) = $(CFLAGS.RELEASE) ;
 STATICPLUGIN.$(>).LFLAGS.debug.$(MSVC_VERSION) = $(LFLAGS.DEBUG) ;
 STATICPLUGIN.$(>).LFLAGS.release.$(MSVC_VERSION) = $(LFLAGS.RELEASE) ;
+EOT
+}
+
+actions WriteDepRelayLibs
+{
+  cat << EOT >> $(<)
+STATICPLUGIN.$(>).RELAYDEPS += $(RELAYDEP) ;
+STATICPLUGIN.$(>).RELAYLIBS.$(RELAYDEP) = $(RELAYLIBS) ;
 EOT
 }
 
@@ -1463,6 +1707,9 @@ rule RelayLibs
     Depends msvcgen : $(relayfile) ;
 
     MsvcExtraFile1 $(<) : $(relayfile:R=$(outdircommon)) ;
+    
+    $(<).RELAYDEPS += $(extlib) ;
+    $(<).RELAYLIBS.$(extlib) = $(3) ;
   }
 
   ExternalLibs $(<) : $(>) ;
@@ -1480,7 +1727,19 @@ rule MsvcClassifyMode
   return $(c) ;
 }
 
-# _MsvcRespEmit target : items : tag [ : mode [ : options ]]
+rule MsvcClassifyArch
+{
+  local c ;
+  switch $(<)
+  {
+    case x86 : c = "" ;
+    case x64 : c = "-x64" ;
+    case * : c = "" "-x64" ;
+  }
+  return $(c) ;
+}
+
+# _MsvcRespEmit target : items : tag [ : mode [ : arch [ : options ]]]
 #   Emit `items' to the response file for `target' using the response file tag
 #   `tag'. `mode' is either "release", "debug", or empty, in which case it
 #   applies to release and debug modes. If options contains "ignoremode", then
@@ -1491,27 +1750,39 @@ rule _MsvcRespEmit
   local items = $(2) ;
   local tag = $(3) ;
   local mode = $(4) ;
-  local options = $(5) ;
+  local arch = $(5) ;
+  local options = $(6) ;
   local modes = "" ;
+  local archs = "" ;
 
-  CheckOptions ignoremode : $(options) : $(target) ;
+  CheckOptions ignoremode ignorearch : $(options) : $(target) ;
   if ! [ IsElem ignoremode ] { modes = [ MsvcClassifyMode $(mode) ] ; }
+  if ! [ IsElem ignorearch ] { archs = [ MsvcClassifyArch $(arch) ] ; }
 
-  ResponseFile $($(target)_PRJ_RESPFILE) : "$(tag)$(modes)|$(items)" :
-    notfile : $($(target)_PRJ_RESPDIR) ;
+  if "$(target)" = ""
+  {
+    MSVC.RESPEMIT.GLOBAL += "$(tag)$(modes)$(archs)|$(items)" ;
+  }
+  else
+  {
+    ResponseFile $($(target)_PRJ_RESPFILE) : "$(tag)$(modes)$(archs)|$(items)" :
+      notfile : $($(target)_PRJ_RESPDIR) ;
+  }
 }
 
-# MsvcExternalLibrary target [ : libs [ : mode ]]
+# MsvcExternalLibrary target [ : libs [ : mode [ : arch ]]]
 #   (See documentation above.)
 rule MsvcExternalLibrary1
 {
-  _MsvcRespEmit $(1) : $(2) : library : $(3) ;
+  _MsvcRespEmit $(1) : $(2) : library : $(3) : $(4) ;
   local mode = $(3) ;
   mode ?= debug release ;
-  $(1)_$(mode)_EXTERNALLIBS += $(2) ;
+  local arch = $(4) ;
+  arch ?= x86 x64 ;
+  $(1)_$(mode)_$(arch)_EXTERNALLIBS += $(2) ;
 }
 
-# MsvcDefine target [ : key [ : value [ : mode ]]]
+# MsvcDefine target [ : key [ : value [ : mode [ : arch ]]]]
 #   (See documentation above.)
 rule MsvcDefine1
 {
@@ -1519,6 +1790,8 @@ rule MsvcDefine1
   local key = $(2) ;
   local value = $(3) ;
   local mode = $(4) ;
+  local arch = $(5) ;
+  arch ?= x86 x64 ;
   if $(key)
   {
     local def ;
@@ -1530,16 +1803,19 @@ rule MsvcDefine1
     {
       def = $(key) ;
     }
-    _MsvcRespEmit $(target) : $(def) : define : $(mode) ;
-    STATICPLUGINS.$(target).MSVC_DEFINES += $(def) ;
+    for a in $(arch)
+    {
+      _MsvcRespEmit $(target) : $(def) : define : $(mode) : $(a) ;
+      STATICPLUGINS.$(target).MSVC_DEFINES.$(a) += $(def) ;
+    }
   }
 }
 
-# MsvcIncDirs target : directory [ : mode ]
+# MsvcIncDirs target : directory [ : mode [ : arch]]
 #   (See documentation above.)
 rule MsvcIncDirs1 
 { 
-  _MsvcIncDirs $(1) : $(2) : $(3) ;
+  _MsvcIncDirs $(1) : $(2) : $(3) : $(4) ;
 }
 
 ## MsvcUsePCH target : file
@@ -1549,31 +1825,31 @@ rule MsvcUsePCH1
   _MsvcRespEmit $(1) : $(2) : pch ; 
 }
 
-# _MsvcDefine target : tuples [ : mode ]
+# _MsvcDefine target : tuples [ : mode [ : arch ]]
 #   Similar to MsvcDefine, but works with a list of `key=value' tuples. Also
 #   understands `key' with no value.
 rule _MsvcDefine
 {
-  _MsvcRespEmit $(1) : $(2) : define : $(3) ;
+  _MsvcRespEmit $(1) : $(2) : define : $(3) : $(4) ;
 }
 
-# MsvcCFLags target [ : cflags [ : mode ]]
+# MsvcCFlags target [ : cflags [ : mode [ : arch ]]]
 #   (See documentation above.)
 rule MsvcCFlags1
 {
-  _MsvcRespEmit $(1) : $(2) : cflags : $(3) ;
+  _MsvcRespEmit $(1) : $(2) : cflags : $(3) : $(4) ;
 }
 
-# MsvcLFlags target [ : lflags [ : mode ]]
+# MsvcLFlags target [ : lflags [ : mode [ : arch ]]]
 #   (See documentation above.)
 rule MsvcLFlags1
 {
   local modes = [ MsvcClassifyMode $(3) ] ;
   $(target).LFLAGS.$(modes) += $(2) ;
-  _MsvcRespEmit $(1) : $(2) : lflags : $(3) ;
+  _MsvcRespEmit $(1) : $(2) : lflags : $(3) : $(4) ;
 }
 
-# MsvcLFlags target : files
+# MsvcExtraFile target : files
 #   (See documentation above.)
 rule MsvcExtraFile1 
 {
@@ -1583,24 +1859,23 @@ rule MsvcExtraFile1
   local respfile = $($(rawname)_PRJ_RESPFILE) ;
   local respdir = $($(rawname)_PRJ_RESPDIR) ;
   
-  ResponseFile $(respfile) : "file|$(files)" : notfile :
-    $(respdir) ;
+  MsvcAddFileToProject $(respfile) : $(files) : $(respdir) ;
 }
 
-# _MsvcIncDirs target : incdirs [ : mode ]
+# _MsvcIncDirs target : incdirs [ : mode [ : arch ]]
 #   Helper for ExternalLibs which processes the contents of TAG.INCDIRS for
 #   an external library.
 rule _MsvcIncDirs
 {
-  _MsvcRespEmit $(1) : $(2) : include : $(3) ;
+  _MsvcRespEmit $(1) : $(2) : include : $(3) : $(4) ;
 }
 
-# _MsvcLibDirs target : libdirs [ : mode ]
+# _MsvcLibDirs target : libdirs [ : mode [ : arch ]]
 #   Helper for ExternalLibs which processes the contents of TAG.LIBDIRS for
 #   an external library.
 rule _MsvcLibDirs
 {
-  _MsvcRespEmit $(1) : $(2) : libdir : $(3) ;
+  _MsvcRespEmit $(1) : $(2) : libdir : $(3) : $(4) ;
 }
 
 # _ExternalLibsHelperMsvc target : libtag : subrule : attribute
@@ -1610,26 +1885,52 @@ rule _ExternalLibsHelperMsvc
   local lib = $(2) ;
   local rulename = $(3) ;
   local attrib = $(4) ;
-
-  if $($(lib).$(attrib).DEBUG.$(MSVC_VERSION))
+  local arch_X86 = x86 ;
+  local arch_X64 = x64 ;
+  
+  for a in X86 X64
   {
-    $(rulename) $(target) : $($(lib).$(attrib).DEBUG.$(MSVC_VERSION)) : debug ;
-  }
-  else if $($(lib).$(attrib).DEBUG)
-  {
-    $(rulename) $(target) : $($(lib).$(attrib).DEBUG) : debug ;
-  }
-  else
-  {
-    $(rulename) $(target) : $($(lib).$(attrib)) : debug ;
-  }
-  if $($(lib).$(attrib).$(MSVC_VERSION))
-  {
-    $(rulename) $(target) : $($(lib).$(attrib).$(MSVC_VERSION)) : release ;
-  }
-  else
-  {
-    $(rulename) $(target) : $($(lib).$(attrib)) : release ;
+    if $($(lib).$(attrib).DEBUG.$(a).$(MSVC_VERSION))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).DEBUG.$(a).$(MSVC_VERSION)) : debug : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).DEBUG.$(MSVC_VERSION))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).DEBUG.$(MSVC_VERSION)) : debug : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).DEBUG.$(a))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).DEBUG.$(a)) : debug : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).DEBUG)
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).DEBUG) : debug : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).$(a))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).$(a)) : debug : $(arch_$(a)) ;
+    }
+    else
+    {
+      $(rulename) $(target) : $($(lib).$(attrib)) : debug : $(arch_$(a)) ;
+    }
+    
+    if $($(lib).$(attrib).$(a).$(MSVC_VERSION))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).$(a).$(MSVC_VERSION)) : release : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).$(MSVC_VERSION))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).$(MSVC_VERSION)) : release : $(arch_$(a)) ;
+    }
+    else if $($(lib).$(attrib).$(a))
+    {
+      $(rulename) $(target) : $($(lib).$(attrib).$(a)) : release : $(arch_$(a)) ;
+    }
+    else
+    {
+      $(rulename) $(target) : $($(lib).$(attrib)) : release : $(arch_$(a)) ;
+    }
   }
 }
 
@@ -1646,6 +1947,11 @@ rule ExternalLibs
     _ExternalLibsHelperMsvc $(<) : $(i) : _MsvcLibDirs : LIBDIRS ;
     
     $(<).EXTERNALLIBS += $(i) ;
+  }
+  
+  for target in $($(<).PROPAGATE_EXTERNALLIBS)
+  {
+    ExternalLibs $(target) : $(>) ;
   }
 }
 

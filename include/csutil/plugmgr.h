@@ -60,7 +60,8 @@ private:
   };
 
   /// Hash of loading plugins and their conditions.
-  csHash<csRef<PluginLoadCondition>, csString> alreadyLoading;
+  typedef csHash<csRef<PluginLoadCondition>, csString> AlreadyLoadingHash;
+  AlreadyLoadingHash alreadyLoading;
 
   /**
    * This is a private structure used to keep the list of plugins.
@@ -140,6 +141,7 @@ private:
   
   csPlugin* FindPluginByClassID (const char* classID,
     csPlugin* startAfter = 0);
+  void WaitForPluginLoad (const char* classID);
   csStringArray GetClassIDTagsLocal (const char* classID);
 
   /// List of all options for all plug-in modules.

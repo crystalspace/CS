@@ -69,8 +69,12 @@ public:
   {
     if (!vfs) return;
 
+    // We must make a copy of the filename because it can be a direct
+    // pointer to vfs->GetCwd() and vfs->PushDir() corrupts that pointer.
+    csString copy (filename);
+
     vfs->PushDir ();
-    vfs->ChDir (filename);
+    vfs->ChDir (copy);
     popCount++;
   }
 

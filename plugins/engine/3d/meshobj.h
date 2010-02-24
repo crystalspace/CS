@@ -51,13 +51,14 @@ struct iMovable;
 struct iRenderView;
 struct iSharedVariable;
 class csEngine;
-class csMeshWrapper;
+class csImposterManager;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
   class csLight;
-}
-CS_PLUGIN_NAMESPACE_END(Engine)
+  class csMeshWrapper;
+  class csMovable;
+  class csMovableSectorList;
 
 /**
  * General list of meshes.
@@ -140,6 +141,7 @@ class csMeshWrapper :
 {
   friend class csMovable;
   friend class csMovableSectorList;
+  friend class ::csImposterManager;
 
 protected:
   /**
@@ -163,15 +165,6 @@ protected:
    * free to use or not.
    */
   CS::Graphics::RenderPriority render_priority;
-
-  /// For NR: Cached value from DrawTest
-  bool draw_test;
-  /// For NR: Cached light test
-  bool in_light;
-  /// For NR: Should we draw anything in drawshadow at all?
-  bool cast_hardware_shadow;
-  /// For NR: should we draw last
-  bool draw_after_fancy_stuff;
 
   // Used to store extra rendermeshes that something might attach to this
   // mesh (ie, for decals)
@@ -226,7 +219,12 @@ private:
   /// Z-buf mode to use for drawing this object.
   csZBufMode zbufMode;
 
-  csImposterMesh *imposter_mesh;
+  /// Whether or not an imposter is currently being used for this mesh.
+  bool using_imposter;
+
+  /// Whether we're drawing to an imposter texture.
+  /// TODO: Work out a better way to detect this.
+  csWeakRef<iBase> drawing_imposter;
 
   // In case the mesh has CS_ENTITY_NOCLIP set then this will
   // contain the value of the last frame number and camera pointer.
@@ -234,10 +232,44 @@ private:
   iCamera* last_camera;
   uint last_frame_number;
 
-  // Shadervars for instancing.
-  csRef<csShaderVariable> fadeFactors;
-  csRef<csShaderVariable> transformVars;
-
+  // Data used when instancing is used on this mesh
+  struct InstancingData
+  {
+    // Shadervars for instancing.
+    csRef<csShaderVariable> fadeFactors;
+    csRef<csShaderVariable> transformVars;
+    bool instancingTransformsDirty;
+    struct InstancingBbox
+    {
+      csBox3 oldBox;
+      csBox3 newBox;
+    };
+    csArray<InstancingBbox> instancingBoxes;
+    struct RenderMeshesSet : public CS::NonCopyable
+    {
+      int n;
+      csRenderMesh** meshArray;
+      csRenderMesh* meshes;
+      
+      RenderMeshesSet ();
+      ~RenderMeshesSet ();
+      void CopyOriginalMeshes (int n, csRenderMesh** meshes);
+    };
+    csFrameDataHolder<RenderMeshesSet> instancingRMs;
+    
+    InstancingData() : instancingTransformsDirty (false) {}
+  };
+  typedef csBlockAllocator<InstancingData> InstancingAlloc;
+  CS_DECLARE_STATIC_CLASSVAR_REF(instancingAlloc, GetInstancingAlloc,
+    InstancingAlloc)
+  InstancingData* instancing;
+  InstancingData* GetInstancingData();
+  
+  bool DoInstancing() const { return instancing != 0; }
+  /* Given a box in object space return a box that contains all boxes
+     transformed by instance transforms. */
+  csBox3 AdjustBboxForInstances (const csBox3& origBox) const;
+  csRenderMesh** FixupRendermeshesForInstancing (int n, csRenderMesh** meshes);
 public:
   CS_LEAKGUARD_DECLARE (csMeshWrapper);
 
@@ -382,8 +414,6 @@ public:
     return draw_cb_vector.Get (idx);
   }
 
-  virtual void SetLightingUpdate (int flags, int num_lights){}
-
   /**
    * Draw this mesh object given a camera transformation.
    * If needed the skeleton state will first be updated.
@@ -459,13 +489,8 @@ public:
    */
   virtual void HardTransform (const csReversibleTransform& t);
 
-  /// This is the function to check distances.  Fn above may not be needed.
-  bool CheckImposterRelevant (iRenderView *rview);
-
-  /**
-   * Gets the imposters rendermesh
-   */
-  csRenderMesh** GetImposter (iRenderView *rview);
+  /// Check if we should use an imposter (distance based).
+  bool UseImposter (iRenderView *rview);
 
   void SetLODFade (float fade);
   void UnsetLODFade ();
@@ -586,5 +611,8 @@ public:
 };
 
 #include "csutil/deprecated_warn_on.h"
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 #endif // __CS_MESHOBJ_H__

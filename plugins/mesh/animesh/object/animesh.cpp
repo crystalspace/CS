@@ -37,7 +37,7 @@
 
 #include "animesh.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
@@ -64,7 +64,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   csPtr<iMeshObjectFactory> AnimeshObjectType::NewFactory ()
   {
-    return new AnimeshObjectFactory (this);
+    csRef<iMeshObjectFactory> ref;
+    ref.AttachNew (new AnimeshObjectFactory (this));
+    return csPtr<iMeshObjectFactory> (ref);
   }
 
   bool AnimeshObjectType::Initialize (iObjectRegistry* object_reg)
@@ -99,12 +101,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices)
+  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices,
+    const char* name, bool visible)
   {
     csRef<FactorySubmesh> newSubmesh;
 
-    newSubmesh.AttachNew (new FactorySubmesh);
-    newSubmesh->indexBuffers.Push (indices);    
+    newSubmesh.AttachNew (new FactorySubmesh(name));
+    newSubmesh->indexBuffers.Push (indices);  
+    newSubmesh->visible = visible;
     submeshes.Push (newSubmesh);
 
     return newSubmesh;
@@ -112,11 +116,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
-    const csArray<csArray<unsigned int> >& boneIndices)
+    const csArray<csArray<unsigned int> >& boneIndices,
+    const char* name,
+    bool visible)
   {
     csRef<FactorySubmesh> newSubmesh;
 
-    newSubmesh.AttachNew (new FactorySubmesh);
+    newSubmesh.AttachNew (new FactorySubmesh(name));
+    newSubmesh->visible = visible;
     
     for (size_t i = 0; i < indices.GetSize (); ++i)
     {
@@ -140,6 +147,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     CS_ASSERT (index < submeshes.GetSize ());
     return submeshes[index];
+  }
+
+  size_t AnimeshObjectFactory::FindSubMesh (const char* name) const
+  {
+    for (size_t i=0; i < submeshes.GetSize (); ++i)
+    {
+      const char* meshName = submeshes[i]->GetName();
+      if (meshName)
+      {
+        if (!strcmp(meshName, name))
+        {
+          return i;
+        }
+      }
+    }
+
+    return (size_t)-1;
   }
 
   size_t AnimeshObjectFactory::GetSubMeshCount () const
@@ -350,7 +374,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObjectFactory::SetBoneInfluencesPerVertex (uint num)
   {
-
+    // TODO
   }
 
   uint AnimeshObjectFactory::GetBoneInfluencesPerVertex () const
@@ -375,6 +399,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshMorphTarget* AnimeshObjectFactory::GetMorphTarget (uint target)
   {
+    CS_ASSERT (target < morphTargets.GetSize ());
     return morphTargets[target];
   }
 
@@ -410,7 +435,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshSocketFactory* AnimeshObjectFactory::GetSocket (size_t index) const
   {
+    CS_ASSERT (index < sockets.GetSize ());
     return sockets[index];
+  }
+
+  uint AnimeshObjectFactory::FindSocket (const char* name) const
+  {
+    for(size_t i=0; i<sockets.GetSize(); ++i)
+    {
+      if(!strcmp(name, sockets[i]->GetName()))
+      {
+        return i;
+      }
+    }
+
+    return (uint)~0;
   }
 
   csFlags& AnimeshObjectFactory::GetFlags ()
@@ -420,7 +459,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   csPtr<iMeshObject> AnimeshObjectFactory::NewInstance ()
   {
-    return new AnimeshObject (this);
+    csRef<iMeshObject> ref;
+    ref.AttachNew (new AnimeshObject (this));
+    return csPtr<iMeshObject> (ref);
   }
 
   csPtr<iMeshObjectFactory> AnimeshObjectFactory::Clone ()
@@ -489,6 +530,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return name.GetData ();
   }
 
+  void FactorySocket::SetName (const char* value)
+  {
+    name = value;
+  }
+
   const csReversibleTransform& FactorySocket::GetTransform () const
   {
     return transform;
@@ -553,23 +599,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshSubMesh* AnimeshObject::GetSubMesh (size_t index) const
   {
-    return 0;
+    CS_ASSERT (index < submeshes.GetSize ());
+    return submeshes[index];
   }
 
   size_t AnimeshObject::GetSubMeshCount () const
   {
-    return 0;
+    return submeshes.GetSize();
   }
 
   void AnimeshObject::SetMorphTargetWeight (uint target, float weight)
   {
+    CS_ASSERT (target < factory->morphTargets.GetSize ());
+
+    // allocating array now saves some flops at each frame until morph targets are used
     morphTargetWeights.SetSize (factory->morphTargets.GetSize(), 0.0f);
     morphTargetWeights[target] = weight;
   }
 
   float AnimeshObject::GetMorphTargetWeight (uint target) const
   {
-    if (morphTargetWeights.GetSize()>target)
+    if (morphTargetWeights.GetSize() > target)
       return morphTargetWeights[target];
     else
       return 0.0;
@@ -582,6 +632,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iAnimatedMeshSocket* AnimeshObject::GetSocket (size_t index) const
   {
+    CS_ASSERT (index < sockets.GetSize ());
     return sockets[index];
   }
 
@@ -614,21 +665,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     const csReversibleTransform o2wt = movable->GetFullTransform ();
     //const csVector3& wo = o2wt.GetOrigin ();
-    
-    
-    // Fetch the material
-    iMaterialWrapper* mat = material;
-    if (!mat)
-      mat = factory->material;
-
-    if (!mat)
-    {
-      csPrintf ("INTERNAL ERROR: mesh used without material!\n");
-      return 0;
-    }
-
-    if (mat->IsVisitRequired ()) 
-      mat->Visit ();
 
     uint frameNum = rview->GetCurrentFrameNumber ();
 
@@ -640,6 +676,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       
       Submesh* sm = submeshes[i];
       FactorySubmesh* fsm = factory->submeshes[i];
+      
+      // Fetch the material
+      iMaterialWrapper* submat = sm->material;
+      if (!submat) submat = fsm->material;
+      if (!submat) submat = material;
+      if (!submat) submat = factory->material;
+
+      if (!submat)
+      {
+        csPrintf ("INTERNAL ERROR: mesh used without material!\n");
+        num = 0;
+        return 0;
+      }
+
+      if (submat->IsVisitRequired ()) 
+        submat->Visit ();
 
       for (size_t j = 0; j < fsm->indexBuffers.GetSize (); ++j)
       {
@@ -655,7 +707,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
         meshPtr->indexstart = 0;
         meshPtr->indexend = (unsigned int)fsm->indexBuffers[j]->GetElementCount ();
-        meshPtr->material = mat;
+        meshPtr->material = submat;
 
         meshPtr->mixmode = mixMode;
         meshPtr->buffers = sm->bufferHolders[j];
@@ -694,6 +746,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       // Copy the skeletal state into our buffers
       UpdateLocalBoneTransforms ();
+      UpdateSocketTransforms ();
     }
     lastTick = current_time;
     skinVertexLF = skinNormalLF = skinBinormalLF = skinTangentLF = false;
@@ -770,11 +823,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::PositionChild (iMeshObject* child,csTicks current_time)
   {
+    // TODO
   }
 
   void AnimeshObject::BuildDecal(const csVector3* pos, float decalRadius,
     iDecalBuilder* decalBuilder)
   {
+    // TODO
   }
 
   const csBox3& AnimeshObject::GetObjectBoundingBox ()
@@ -870,7 +925,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       for (size_t j = 0; j < fsm->bufferHolders.GetSize (); ++j)
       {
         csRef<csRenderBufferHolder> bufferHolder;
-        bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[i]));
+        bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[j]));
 
         // Setup the accessor to this mesh
         bufferHolder->SetAccessor (rba, 
@@ -890,7 +945,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     for (size_t i = 0; i < factory->sockets.GetSize (); ++i)
     {
       csRef<Socket> newSocket;
-      newSocket.AttachNew(new Socket(this, factory->sockets[i]));
+      newSocket.AttachNew (new Socket(this, factory->sockets[i]));
       sockets.Push (newSocket);
     }
   }
@@ -1016,16 +1071,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           return;
         }
 
-        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (buffer);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        if (!skinnedVertices ||
+          skinnedVertices->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedVertices = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
-          holder->SetRenderBuffer (CS_BUFFER_POSITION, skinnedVertices);          
           skinVertexVersion = skeletonVersion - 1;
         }
+
+        holder->SetRenderBuffer (CS_BUFFER_POSITION, skinnedVertices);
 
         if (skeletonVersion != skinVertexVersion)
         {
@@ -1043,16 +1098,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           return;
         }
 
-        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (buffer);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        if (!skinnedNormals ||
+          skinnedNormals->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedNormals = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-
-          holder->SetRenderBuffer (CS_BUFFER_NORMAL, skinnedNormals);          
+         
           skinNormalVersion = skeletonVersion - 1;
         }
+
+        holder->SetRenderBuffer (CS_BUFFER_NORMAL, skinnedNormals);
 
         if (skeletonVersion != skinNormalVersion)
         {
@@ -1072,27 +1127,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           return;
         }
 
-        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (CS_BUFFER_TANGENT);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        if (!skinnedTangents ||
+          skinnedTangents->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedTangents = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
-          holder->SetRenderBuffer (CS_BUFFER_TANGENT, skinnedTangents);          
           skinTangentVersion = skeletonVersion - 1;
         }
-
-        currBuffer = holder->GetRenderBufferNoAccessor (CS_BUFFER_BINORMAL);
-        if (!currBuffer ||
-          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+      
+        if (!skinnedBinormals ||
+          skinnedBinormals->GetElementCount () < factory->GetVertexCountP ())
         {
           skinnedBinormals = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-
-          holder->SetRenderBuffer (CS_BUFFER_BINORMAL, skinnedBinormals);          
+          
           skinBinormalVersion = skeletonVersion - 1;
         }
+
+        holder->SetRenderBuffer (CS_BUFFER_TANGENT, skinnedTangents);
+        holder->SetRenderBuffer (CS_BUFFER_BINORMAL, skinnedBinormals);
 
         if (skeletonVersion != skinTangentVersion ||
           skeletonVersion != skinBinormalVersion)

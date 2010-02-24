@@ -77,6 +77,7 @@ namespace CS
       virtual csPtr<iHierarchicalCache> GetRootedCache (const char* base);
       virtual csPtr<iStringArray> GetSubItems (const char* path);
       virtual iHierarchicalCache* GetTopCache();
+      virtual bool IsCacheWriteable() const { return !readonly; }
       /** @} */
     };
   } // namespace Utility

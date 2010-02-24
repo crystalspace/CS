@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
 	      (C) 2005 by Frank Richter
+              (C) 2009 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,6 +28,7 @@
 #include "csextern.h"
 #include "csutil/fifo.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/csstring.h"
 #include "iutil/job.h"
 
 #include "csutil/threading/condition.h"
@@ -42,67 +44,65 @@ class CS_CRYSTALSPACE_EXPORT ThreadedJobQueue :
   public scfImplementation1<ThreadedJobQueue, iJobQueue>
 {
 public:
-  ThreadedJobQueue (size_t numWorkers = 1, ThreadPriority priority = THREAD_PRIO_NORMAL,
-    size_t numNonLowWorkers = 0);
+  ThreadedJobQueue (size_t numWorkers = 1, ThreadPriority priority = THREAD_PRIO_NORMAL);
   virtual ~ThreadedJobQueue ();
 
-  virtual void Enqueue (iJob* job, bool lowPriority = false);
-  virtual void PullAndRun (iJob* job);
-  virtual void PopAndRun();
-  virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
-  virtual bool IsFinished ();
-  virtual void Wait (iJob* job);
+  virtual void Enqueue (iJob* job);
+  virtual void Dequeue (iJob* job);
+  virtual void PullAndRun (iJob* job, bool waitForCompletion = false);
+  virtual bool IsFinished ();  
   virtual int32 GetQueueCount();
+  virtual void WaitAll ();
 
 private:
+
+  bool PullFromQueues (iJob* job);
   
   // Runnable
-  struct ThreadState;
+  struct ThreadState;  
 
   class QueueRunnable : public Runnable
   {
   public:
-    QueueRunnable (ThreadedJobQueue* queue, ThreadState* ts, bool doLow = true);
+    QueueRunnable (ThreadedJobQueue* queue, ThreadState* ts, unsigned int id);
 
     virtual void Run ();
+    virtual const char* GetName () const;
 
   private:
     ThreadedJobQueue* ownerQueue;
     ThreadState* threadState;
-    bool doLow;
+    csString name;
   };
 
   // Per thread state
   struct ThreadState
   {
-    ThreadState (ThreadedJobQueue* queue, bool doLow = true)
+    ThreadState (ThreadedJobQueue* queue, unsigned int id)
     {
-      runnable.AttachNew (new QueueRunnable (queue, this, doLow));
+      runnable.AttachNew (new QueueRunnable (queue, this, id));
       threadObject.AttachNew (new Thread (runnable, false));
     }
 
     csRef<QueueRunnable> runnable;
     csRef<Thread> threadObject;
     csRef<iJob> currentJob;
-    Condition jobFinished;
-  };
+    
+    // 
+    Mutex tsMutex;
+    Condition tsNewJob;
+    Condition tsJobFinished;
 
-  // Shared queue state
-  typedef csFIFO<csRef<iJob> > JobFifo;
-  JobFifo jobQueue;
-  JobFifo jobQueueL;
-  Mutex jobMutex;
-  Condition newJob;
+    csFIFO<csRef<iJob> > jobQueue;
+  };
 
   ThreadState** allThreadState;
   ThreadGroup allThreads;
-  Mutex threadStateMutex;
-  // Condition to detect a finished job in any of the running threads
-  Mutex jobFinishedMutex;
-  Condition jobFinished;
+
+  Mutex finishMutex;
 
   size_t numWorkerThreads;
-  bool shutdownQueue;
+  int32 shutdownQueue;
   int32 outstandingJobs;
 };
 

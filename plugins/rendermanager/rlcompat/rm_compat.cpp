@@ -24,7 +24,7 @@
 
 #include "rm_compat.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(RM_RLCompat)
 {
@@ -54,6 +54,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RM_RLCompat)
       engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS);
     engine->Draw (view->GetCamera(), view->GetClipper());
     return true;
+  }
+
+  bool RMCompat::PrecacheView (iView* view)
+  {
+    return RenderView (view);
   }
   
   bool RMCompat::DebugCommand (const char* _cmd)

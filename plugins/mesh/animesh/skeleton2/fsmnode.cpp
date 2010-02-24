@@ -171,7 +171,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     State newState;
 
-    return (CS::Animation::StateID)stateList.Push (newState);    
+    return (CS::Animation::StateID)stateList.Push (newState);
+  }
+
+  CS::Animation::StateID FSMNodeFactory::AddState (const char* name,
+						   iSkeletonAnimNodeFactory2 *nodeFact)
+  {
+    State newState;
+    CS::Animation::StateID id = stateList.Push (newState);
+    stateList[id].name = name;
+    stateList[id].nodeFactory = nodeFact;
+    return id;
   }
 
   void FSMNodeFactory::SetStateNode (CS::Animation::StateID id, 
@@ -369,6 +379,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS::Animation::StateID FSMNode::GetCurrentState () const
   {
     return currentState;
+  }
+
+  iSkeletonAnimNode2* FSMNode::GetStateNode (CS::Animation::StateID state) const
+  {
+    CS_ASSERT(state < stateList.GetSize ());
+    return stateList[state].stateNode;
   }
 
   void FSMNode::Play ()

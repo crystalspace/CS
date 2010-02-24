@@ -32,8 +32,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ps1_emu_ati.h"
 #include "ps1_emu_nv.h"
 
-CS_IMPLEMENT_PLUGIN
-
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
 {
 
@@ -99,19 +97,10 @@ void csGLShader_PS1::Open()
   ext->InitGL_NV_texture_shader ();
   ext->InitGL_NV_texture_shader2 ();
   ext->InitGL_NV_texture_shader3 ();
-  if(ext->CS_GL_NV_texture_shader)
-  {
-    if (doVerbose)
-      Report(CS_REPORTER_SEVERITY_NOTIFY,
-    	  "nVidia Texture Shader Extension Supported");
-  }
   if(ext->CS_GL_NV_register_combiners)
   {
     if (doVerbose)
     {
-      Report(CS_REPORTER_SEVERITY_NOTIFY,
-    	  "nVidia Register Combiners Extension Supported");
-
       GLint num_combiners;
       glGetIntegerv(GL_MAX_GENERAL_COMBINERS_NV, &num_combiners);
       Report(CS_REPORTER_SEVERITY_NOTIFY,
@@ -120,12 +109,6 @@ void csGLShader_PS1::Open()
   }
 
   ext->InitGL_ATI_fragment_shader ();
-  if(ext->CS_GL_ATI_fragment_shader)
-  {
-    if (doVerbose)
-      Report(CS_REPORTER_SEVERITY_NOTIFY,
-    	  "ATI Fragment Shader Extension Supported");
-  }
 
   useLists = config->GetBool ("Video.OpenGL.Shader.PS1.UseDisplayLists", true);
   if (doVerbose)
@@ -134,7 +117,36 @@ void csGLShader_PS1::Open()
   dumpTo14ConverterOutput = config->GetBool (
     "Video.OpenGL.Shader.PS1.Dump14ConverterOutput", false);
 
+  if(ext->CS_GL_ATI_fragment_shader)
+    supportedPSVersion = CS_PS_1_4;
+  else if (ext->CS_GL_NV_register_combiners2
+    && ext->CS_GL_NV_texture_shader)
+  {
+    if (ext->CS_GL_NV_texture_shader3)
+      supportedPSVersion = CS_PS_1_3;
+    else
+      supportedPSVersion = CS_PS_1_1;
+  }
+  if (doVerbose)
+  {
+    Report(CS_REPORTER_SEVERITY_NOTIFY,
+      "Highest supported PS version: %s", PSVersionStr (supportedPSVersion));
+  }
+
   isOpen = true;
+}
+
+const char* csGLShader_PS1::PSVersionStr (csPixelShaderVersion ver) const
+{
+  switch (ver)
+  {
+  case CS_PS_1_1: return "1.1"; break;
+  case CS_PS_1_2: return "1.2"; break;
+  case CS_PS_1_3: return "1.3"; break;
+  case CS_PS_1_4: return "1.4"; break;
+  case CS_PS_INVALID: break;
+  }
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////

@@ -1,0 +1,51 @@
+<!--
+  Copyright (C) 2009 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet id="lighting">
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="lightOffset" type="int" default="value" defval="0"/>
+    <input name="maxLights" type="int" default="value" defval="8"/>
+    <input name="minLights" type="int" default="value" defval="0"/>
+    
+    <!-- Shader might be used together with shadowmap shader... -->
+    <block location="cg:clips"
+	    file="/shader-snippets/lighting/shadowclip.block" />
+    
+    <block location="cg:vertexMain">
+      diffuseColor = float3(0);
+      specularColor = float3(0);
+      diffuseColor_attr_perfragment = false;
+      specularColor_attr_perfragment = false;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      diffuseColor = float3(0);
+      specularColor = float3(0);
+      diffuseColor_attr_perfragment = false;
+      specularColor_attr_perfragment = false;
+    </block>
+		
+    <output name="diffuseColor" type="rgb">
+      <attribute name="perfragment" type="bool" />
+    </output>
+    <output name="specularColor" type="rgb">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+</snippet>

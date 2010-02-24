@@ -27,7 +27,7 @@
 #include "wavstream2.h"
 #include "wavdata2.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(SndSysWav)
 {

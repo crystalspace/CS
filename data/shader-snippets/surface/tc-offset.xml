@@ -1,0 +1,110 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input file="/shader-snippets/texCoord.inp"	/>
+    
+    <input name="texOffset" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex offset" destination="fragmentIn.texOffset" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texOffset" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texOffset = fragmentIn.texOffset;
+      </block>
+    </input>
+    
+    <input name="scale" type="float2" default="complex">
+      <block location="shadervars">
+	<shadervar name="tex offset scale distance" type="vector4">1,1,1,1</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="tex offset scale distance" 
+		     destination="fragmentIn.texOffsetScaleDist" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<varying type="float4" name="texOffsetScaleDist" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	scale = texOffsetScaleDist.xy;
+      </block>
+    </input>
+    
+    <input name="distance" type="float2" default="complex">
+      <block location="shadervars">
+	<shadervar name="tex offset scale distance" type="vector4">1,1,1,1</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="tex offset scale distance" 
+		     destination="fragmentIn.texOffsetScaleDist" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<varying type="float4" name="texOffsetScaleDist" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	distance = texOffsetScaleDist.zw;
+      </block>
+    </input>
+      
+    <block location="cg:vertexMain">
+      // In case the coords are used on the VP side...
+      texCoordOffset = texCoord;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      float2 offset = float2 (0, 0);
+      <?if vars."tex offset".texture ?>
+	float2 usedTC;
+	usedTC = texCoord*scale;
+	offset = tex2D (texOffset, usedTC) * distance;
+      <?endif?>
+      texCoordOffset = texCoord + offset;
+    </block>
+    
+    <output name="texCoordOffset" type="texcoord2" />
+  </technique>
+  
+  <technique priority="50">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input file="/shader-snippets/texCoord.inp"	/>
+    
+    <block location="cg:vertexMain">
+      // In case the coords are used on the VP side...
+      texCoordOffset = texCoord;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      texCoordOffset = texCoord;
+    </block>
+    
+    <output name="texCoordOffset" type="texcoord2" />
+  </technique>
+</snippet>

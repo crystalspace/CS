@@ -43,6 +43,7 @@ struct iMeshGenerator;
 struct iMeshList;
 struct iLightList;
 struct iLight;
+struct iPortal;
 struct iVisibilityCuller;
 
 struct iObject;
@@ -148,11 +149,12 @@ struct iLightVisibleCallback : public virtual iBase
 };
 
 /**
- * Return structure for the iSector->HitBeam() routines.
+ * Return structure for the iSector::HitBeam() and iSector::HitBeamPortals() routines.
+ * \sa csHitBeamResult csBulletHitBeamResult
  */
 struct csSectorHitBeamResult
 {
-  /// The resulting mesh that we hit.
+  /// The resulting mesh that was hit, or 0 if no mesh was hit.
   iMeshWrapper* mesh;
 
   /// Intersection point in world space.
@@ -163,7 +165,7 @@ struct csSectorHitBeamResult
 
   /**
    * The final sector for the end point.
-   * Only for iSector->HitBeamPortals().
+   * Only for iSector::HitBeamPortals().
    */
   iSector* final_sector;
 };
@@ -206,7 +208,7 @@ struct csSectorVisibleRenderMeshes
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,4,0,0);
+  SCF_INTERFACE(iSector,4,1,0);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -404,7 +406,8 @@ struct iSector : public virtual iBase
    * containing the 'start' point. 'isect' will be the intersection point
    * if a polygon is returned. This function returns -1 if no polygon
    * was hit or the polygon index otherwise.
-   * \sa csSectorHitBeamResult
+   * \sa csSectorHitBeamResult HitBeam() iMeshWrapper::HitBeam()
+   * iBulletDynamicSystem::HitBeam()
    */
   virtual csSectorHitBeamResult HitBeamPortals (const csVector3& start,
   	const csVector3& end) = 0;
@@ -415,7 +418,8 @@ struct iSector : public virtual iBase
    * filled with the indices of the polygon that was hit.
    * If polygon_idx is null then the polygon will not be filled in.
    * This function doesn't support portals.
-   * \sa csSectorHitBeamResult
+   * \sa csSectorHitBeamResult HitBeamPortals() iMeshWrapper::HitBeam()
+   * iBulletDynamicSystem::HitBeam()
    */
   virtual csSectorHitBeamResult HitBeam (const csVector3& start,
   	const csVector3& end, bool accurate = false) = 0;
@@ -439,7 +443,9 @@ struct iSector : public virtual iBase
    * collision detection system to test with walls.
    */
   virtual iSector* FollowSegment (csReversibleTransform& t,
-    csVector3& new_position, bool& mirror, bool only_portals = false) = 0;
+      csVector3& new_position, bool& mirror, bool only_portals = false,
+      iPortal** transversed_portals = 0, iMeshWrapper** portal_meshes = 0,
+      int firstIndex = 0, int* lastIndex = 0) = 0;
   /** @} */
 
   /**\name Sector callbacks

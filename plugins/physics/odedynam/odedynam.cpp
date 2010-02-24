@@ -62,9 +62,6 @@ static void ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat)
   csmat.m31 = odemat[2]; csmat.m32 = odemat[6]; csmat.m33 = odemat[10];
 }
 
-
-CS_IMPLEMENT_PLUGIN
-
 CS_PLUGIN_NAMESPACE_BEGIN(odedynam)
 {
 
@@ -872,6 +869,24 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
   return true;
 }
 
+bool csODEDynamicSystem::AttachColliderCapsule (float length, float radius,
+                                                 const csOrthoTransform& trans,
+						 float friction,
+						 float elasticity,
+						 float softness)
+{
+  csODECollider *odec = new csODECollider (this, this);
+  odec->SetElasticity (elasticity);
+  odec->SetFriction (friction);
+  odec->SetSoftness (softness);
+  odec->CreateCapsuleGeometry (length, radius);
+  odec->SetTransform (trans);
+  odec->AddToSpace (spaceID);
+  colliders.Push (odec);
+
+  return true;
+}
+
 bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
                                             const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
@@ -1121,7 +1136,7 @@ void csODECollider::AddMassToBody (bool doSet)
       {
         dReal radius, length;
         dGeomCCylinderGetParams (geomID, &radius, &length);
-        dMassSetCappedCylinder (&m, density, 3, radius, length);
+        dMassSetCapsule (&m, density, 3, radius, length);
       }
       break;
     case TRIMESH_COLLIDER_GEOMETRY:
@@ -1202,7 +1217,7 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   if (!trimesh || trimesh->GetVertexCount () == 0
       || trimesh->GetTriangleCount () == 0)
   {
-    csFPrintf(stderr, "csODECollider: No collision polygons, triangles or vertices on %s\n",
+    csFPrintf(stderr, "csODECollider: No collision polygons, triangles or vertices on mesh factory '%s'\n",
       mesh->QueryObject()->GetName());
     return false;
   }
@@ -1480,7 +1495,8 @@ bool csODECollider::GetPlaneGeometry (csPlane3& plane)
 }
 bool csODECollider::GetCylinderGeometry (float& length, float& radius)
 {
-  if (geom_type == CYLINDER_COLLIDER_GEOMETRY)
+  //if (geom_type == CYLINDER_COLLIDER_GEOMETRY)
+  if (geom_type == CAPSULE_COLLIDER_GEOMETRY)
   {
     dReal odeR, odeL;
     dGeomCCylinderGetParams (geomID, &odeR, &odeL);
@@ -1488,6 +1504,47 @@ bool csODECollider::GetCylinderGeometry (float& length, float& radius)
     length = odeL;
     return true;
   }
+  return false;
+}
+bool csODECollider::GetCapsuleGeometry (float& length, float& radius)
+{
+  if (geom_type == CAPSULE_COLLIDER_GEOMETRY)
+  {
+    dReal odeR, odeL;
+    dGeomCCylinderGetParams (geomID, &odeR, &odeL);
+    radius = odeR;
+    length = odeL;
+    return true;
+  }
+  return false;
+}
+bool csODECollider::GetMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+				     int*& indices, size_t& triangleCount)
+{
+  triangleCount = dGeomTriMeshGetTriangleCount (geomID);
+  vertexCount = triangleCount * 3;
+
+  delete[] indices;
+  indices = new int[triangleCount * 3];
+  for (unsigned int i = 0; i < triangleCount * 3; i++)
+    indices[i] = i;
+
+  delete[] vertices;
+  vertices = new csVector3[vertexCount];
+  for (unsigned int i = 0; i < triangleCount; i++)
+  {
+    dVector3 v0, v1, v2;
+    dGeomTriMeshGetTriangle (geomID, i, &v0, &v1, &v2);
+    vertices[i*3] = csVector3 (v0[0], v0[1], v0[2]);
+    vertices[i*3+1] = csVector3 (v1[0], v1[1], v1[2]);
+    vertices[i*3+2] = csVector3 (v2[0], v2[1], v2[2]);
+  }
+
+  return false;
+}
+bool csODECollider::GetConvexMeshGeometry (csVector3*& vertices, size_t& vertexCount,
+					   int*& indices, size_t& triangleCount)
+{
   return false;
 }
 void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact)
@@ -1685,6 +1742,26 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   odec->SetSoftness (softness);
   odec->SetDensity (density);
   odec->CreateCylinderGeometry (length, radius);
+  odec->SetTransform (trans);
+  odec->AttachBody (bodyID);
+  odec->AddTransformToSpace (groupID);
+  odec->MakeDynamic ();
+  colliders.Push (odec);
+
+  return true;
+}
+
+bool csODERigidBody::AttachColliderCapsule (float length, float radius,
+                                             const csOrthoTransform& trans,
+					     float friction, float density,
+                                             float elasticity, float softness)
+{
+  csODECollider *odec = new csODECollider (dynsys, this);
+  odec->SetElasticity (elasticity);
+  odec->SetFriction (friction);
+  odec->SetSoftness (softness);
+  odec->SetDensity (density);
+  odec->CreateCapsuleGeometry (length, radius);
   odec->SetTransform (trans);
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);
@@ -3119,6 +3196,7 @@ ODEJointType csODEJoint::GetType()
   case dJointTypeHinge2: return CS_ODE_JOINT_TYPE_HINGE2;
   case dJointTypeFixed: return CS_ODE_JOINT_TYPE_FIXED;
   case dJointTypeAMotor: return CS_ODE_JOINT_TYPE_AMOTOR;
+  default: return CS_ODE_JOINT_TYPE_UNKNOWN;
   }
   return CS_ODE_JOINT_TYPE_UNKNOWN;
 }

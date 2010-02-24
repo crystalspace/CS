@@ -23,46 +23,67 @@
 
 #include "ceguiresourceprovider.h"
 
+#include "csutil/custom_new_disable.h"
 #include "CEGUIExceptions.h"
+#include "csutil/custom_new_enable.h"
 
-csCEGUIResourceProvider::csCEGUIResourceProvider (iObjectRegistry *reg) :
-  CEGUI::ResourceProvider ()
-{
-  obj_reg = reg;
-  vfs = csQueryRegistry<iVFS> (obj_reg);
-}
-csCEGUIResourceProvider::~csCEGUIResourceProvider ()
-{
-}
 
-void csCEGUIResourceProvider::loadRawDataContainer (const CEGUI::String& filename,
-    CEGUI::RawDataContainer& output, const CEGUI::String& resourceGroup)
+CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {
-  csRef<iDataBuffer> buffer = vfs->ReadFile (filename.c_str());
-
-  // Reading failed
-  if (!buffer.IsValid ())
+  //----------------------------------------------------------------------------//
+  ResourceProvider::ResourceProvider (iObjectRegistry *reg) :
+    CEGUI::ResourceProvider ()
   {
-    CEGUI::String msg= (uint8*)"csCEGUIResourceProvider::loadRawDataContainer - "
-      "Filename supplied for loading must be valid";
-    msg += (uint8*)" ["+filename+(uint8*)"]";
-    throw CEGUI::InvalidRequestException(msg);
+    obj_reg = reg;
+    vfs = csQueryRegistry<iVFS> (obj_reg);
   }
-  else
-  {
-    uint8* data = new uint8[buffer->GetSize ()];
-    memcpy (data, buffer->GetUint8 (), sizeof(uint8) * buffer->GetSize ());
-    output.setData(data);
-    output.setSize(buffer->GetSize ());
-  }
-}
 
-void csCEGUIResourceProvider::unloadRawDataContainer (CEGUI::RawDataContainer& data)
-{
-  if (data.getDataPtr())
+  //----------------------------------------------------------------------------//
+  ResourceProvider::~ResourceProvider ()
   {
-    delete[] data.getDataPtr();
-    data.setData(0);
-    data.setSize(0);
   }
-}
+
+  //----------------------------------------------------------------------------//
+  void ResourceProvider::loadRawDataContainer (const CEGUI::String& filename,
+                                                 CEGUI::RawDataContainer& output, 
+                                                 const CEGUI::String& resourceGroup)
+  {
+    csRef<iDataBuffer> buffer = vfs->ReadFile (filename.c_str());
+
+    // Reading failed
+    if (!buffer.IsValid ())
+    {
+      CEGUI::String msg= (uint8*)"ResourceProvider::loadRawDataContainer - "
+        "Filename supplied for loading must be valid";
+      msg += (uint8*)" ["+filename+(uint8*)"]";
+      throw CEGUI::InvalidRequestException(msg);
+    }
+    else
+    {
+      uint8* data = new uint8[buffer->GetSize ()];
+      memcpy (data, buffer->GetUint8 (), sizeof(uint8) * buffer->GetSize ());
+      output.setData(data);
+      output.setSize(buffer->GetSize ());
+    }
+  }
+
+  //----------------------------------------------------------------------------//
+  void ResourceProvider::unloadRawDataContainer (CEGUI::RawDataContainer& data)
+  {
+    if (data.getDataPtr())
+    {
+      delete[] data.getDataPtr();
+      data.setData(0);
+      data.setSize(0);
+    }
+  }
+
+  //----------------------------------------------------------------------------//
+  size_t ResourceProvider::getResourceGroupFileNames(std::vector<CEGUI::String>& out_vec,
+                                                       const CEGUI::String& file_pattern,
+                                                       const CEGUI::String& resource_group)
+  {
+    return 0;
+  }
+
+} CS_PLUGIN_NAMESPACE_END(cegui)

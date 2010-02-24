@@ -424,6 +424,21 @@ void csGraphics2DGLCommon::Report (int severity, const char* msg, ...)
   va_end (args);
 }
 
+const char* csGraphics2DGLCommon::GetHWRenderer()
+{
+	return (char*)glGetString (GL_RENDERER);
+}
+
+const char* csGraphics2DGLCommon::GetHWGLVersion()
+{
+	return (char*)glGetString (GL_VERSION);
+}
+
+const char* csGraphics2DGLCommon::GetHWVendor()
+{
+	return (char*)glGetString (GL_VENDOR);
+}
+
 const char* csGraphics2DGLCommon::GetRendererString (const char* str)
 {
   if (strcmp (str, "renderer") == 0)

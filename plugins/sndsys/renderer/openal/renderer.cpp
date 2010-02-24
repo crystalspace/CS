@@ -47,7 +47,7 @@
 
 #include "al_stringlists.h"
 
-CS_IMPLEMENT_PLUGIN
+extern "C" int libopenal_is_present;
 
 SCF_IMPLEMENT_FACTORY (csSndSysRendererOpenAL)
 
@@ -69,6 +69,12 @@ csSndSysRendererOpenAL::~csSndSysRendererOpenAL()
  */
 bool csSndSysRendererOpenAL::Initialize (iObjectRegistry *obj_reg)
 {
+  if (!libopenal_is_present)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, "OpenAL is not available (libopenal is missing)");
+    return false;
+  }
+  
   // Save the object registry for later use
   m_ObjectRegistry = obj_reg;
 

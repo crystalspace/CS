@@ -21,6 +21,7 @@
 #define __CS_SHADERTECH_H__
 
 #include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
 
 #include "csgfx/shadervarcontext.h"
 #include "csplugincommon/shader/shaderplugin.h"
@@ -80,6 +81,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           csDirtyAccessArray<size_t, csArrayElementHandler<size_t>,
             CS::Memory::LocalBufferAllocator<size_t, 2,
             CS::Memory::AllocatorMalloc, true> > indices;
+            
+          SV() : id (CS::InvalidShaderVarStringID) {}
         };
         SV tex, fallback;
         int textureUnit;
@@ -104,10 +107,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       CS::Graphics::MeshCullMode cullMode;
       bool zoffset;
 
-      ShaderPass () : cullMode (CS::Graphics::cullNormal), zoffset (false), minLights (0)
+      ShaderPass () : mixMode (CS_FX_MESH), zMode (CS_ZBUF_MESH),
+        overrideZmode (false), cullMode (CS::Graphics::cullNormal),
+        zoffset (false), minLights (0)
       { 
-        mixMode = CS_FX_MESH;
-        overrideZmode = false;
       }
 
       // writemasks
@@ -225,7 +228,7 @@ public:
     const csShaderVariableStack& stack);
   bool TeardownPass();
   bool DeactivatePass();
-  void GetUsedShaderVars (csBitArray& bits) const;
+  void GetUsedShaderVars (csBitArray& bits, uint userFlags) const;
 
   bool Load (iLoaderContext* ldr_context, iDocumentNode* node,
       iDocumentNode* parentSV, size_t variant, iHierarchicalCache* cacheTo);

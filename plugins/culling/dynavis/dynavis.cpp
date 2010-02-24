@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include <string.h>
-#include "csver.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
@@ -61,7 +60,7 @@
 #include "wqueue.h"
 #include "exvis.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csDynaVis)
 

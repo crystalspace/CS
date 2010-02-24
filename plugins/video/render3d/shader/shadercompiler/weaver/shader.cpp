@@ -22,6 +22,7 @@
 #include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/hiercache.h"
+#include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 
@@ -42,13 +43,14 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
+  namespace WeaverCommon = CS::PluginCommon::ShaderWeaver;
 
   CS_LEAKGUARD_IMPLEMENT (WeaverShader);
 
   /* Magic value for cache file.
   * The most significant byte serves as a "version", increase when the
   * cache file format changes. */
-  static const uint32 cacheFileMagic = 0x01727677;
+  static const uint32 cacheFileMagic = 0x03727677;
 
   WeaverShader::WeaverShader (WeaverCompiler* compiler) : 
     scfImplementationType (this), compiler (compiler), 
@@ -149,7 +151,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 						   const FileAliases& aliases,
 						   iDocumentNode* docSource,
 						   const char* cacheID, 
-						   const char* cacheTag,
+						   const char* _cacheTag,
 						   iFile* cacheFile,
 						   csRef<iString>& cachingError)
   {
@@ -165,7 +167,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     CS::DocSystem::CloneAttributes (docSource, shaderNode);
     shaderNode->SetAttribute ("compiler", "xmlshader");
     if (cacheID != 0) shaderNode->SetAttribute ("_cacheid", cacheID);
-    if (cacheTag != 0) shaderNode->SetAttribute ("_cachetag", cacheTag);
+    csString cacheTag (_cacheTag);
 
     csRef<iDocumentNode> shadervarsNode =
       shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -182,6 +184,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       CS::DocSystem::CloneNode (svNode, newNode);
     }
 
+    CombinerLoaderSet combiners;
     csRefArray<iDocumentNode> techniqueNodes;
     //for (size_t t = 0; t < techniques.GetSize(); t++)
     for (size_t t = 0; t < 1; t++)
@@ -225,33 +228,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       Synthesizer synth (compiler, shaderName, prePassNodes, passSnippets, nonPassNodes);
     
       csTextProgressMeter pmeter (0);
+      pmeter.SetGranularity (pmeter.GetTickScale());
       csPrintf ("shader %s: ", shaderName);
       synth.Synthesize (shaderNode, shaderVarNodesHelper, techniqueNodes,
-        techSource, &pmeter);
+        techSource, combiners, &pmeter);
     }
     if (techniques.GetSize() > 1)
     {
       csRef<iDocumentNode> newFallback = shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
       newFallback->SetValue ("fallbackshader");
       CS::DocSystem::CloneAttributes (docSource, newFallback);
-      
-      csString shaderNameDecorated (docSource->GetAttributeValue ("name"));
-      size_t atat = shaderNameDecorated.FindFirst ("@@");
-      if (atat != (size_t)-1)
-        shaderNameDecorated.DeleteAt (atat, shaderNameDecorated.Length()-atat);
-      shaderNameDecorated.AppendFmt ("@@%d", techniques[1].priority);
-      newFallback->SetAttribute ("name", shaderNameDecorated);
-      
-      csRef<iDocumentNodeIterator> docNodes = docSource->GetNodes ();
-      while (docNodes->HasNext())
-      {
-        csRef<iDocumentNode> orgNode = docNodes->Next();
-        if (orgNode->Equals (techniques[0].node)) continue;
-        
-        csRef<iDocumentNode> newNode = newFallback->CreateNodeBefore (
-          orgNode->GetType());
-        CS::DocSystem::CloneNode (orgNode, newNode);
-      }
+
+      MakeFallbackShader (newFallback, docSource, techniques);
     }
     else
     {
@@ -267,11 +255,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       techniqueNodes[t]->SetAttributeAsInt ("priority",
         int (techniqueNodes.GetSize()-t));
     
+    /* Include combiner code into cache tag to trigger updating the
+       generated shader */
+    {
+      csStringArray cacheTagExtra;
+      CombinerLoaderSet::GlobalIterator it (combiners.UnlockedGetIterator());
+      while (it.HasNext())
+      {
+        WeaverCommon::iCombinerLoader* combinerLoader = it.Next();
+        cacheTagExtra.Push (combinerLoader->GetCodeString());
+      }
+      cacheTagExtra.Sort ();
+      for (size_t i = 0; i < cacheTagExtra.GetSize(); i++)
+      {
+	cacheTag.Append (";");
+	cacheTag.Append (cacheTagExtra[i]);
+      }
+    }
+    shaderNode->SetAttribute ("_cachetag", cacheTag);
+
     if (cacheFile)
     {
       // Write magic header
       uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
       cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
+
+      uint32 diskCombinerNum = csLittleEndian::UInt32 (combiners.UnlockedGetSize());
+      cacheFile->Write ((char*)&diskCombinerNum, sizeof (diskCombinerNum));
+      {
+	CombinerLoaderSet::GlobalIterator it (combiners.UnlockedGetIterator());
+	while (it.HasNext())
+	{
+	  WeaverCommon::iCombinerLoader* combinerLoader = it.Next();
+	  csRef<iFactory> scfFactory = scfQueryInterface<iFactory> (combinerLoader);
+	  CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, scfFactory->QueryClassID());
+	  CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, combinerLoader->GetCodeString());
+	}
+      }
       
       iDocumentSystem* cacheDocSys = compiler->binDocSys.IsValid()
 	? compiler->binDocSys : compiler->xmlDocSys;
@@ -283,8 +303,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       CS::DocSystem::CloneNode (shaderNode, cacheShaderNode);
       
       csMemFile cachedDocFile;
-      if (cacheDoc->Write (&cachedDocFile) != 0)
-	cachingError.AttachNew (new scfString ("failed to write cache doc"));
+      const char* writeErr = cacheDoc->Write (&cachedDocFile);
+      if (writeErr != 0)
+	cachingError.AttachNew (new scfString (
+	  csString ("failed to write cache doc: ") + writeErr));
       else
       {
 	csRef<iDataBuffer> cachedDocBuf = cachedDocFile.GetAllData ();
@@ -317,6 +339,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       cacheFailReason = "Out of date (magic)";
       return 0;
+    }
+
+    uint32 diskCombinerNum;
+    read = cacheFile->Read ((char*)&diskCombinerNum, sizeof (diskCombinerNum));
+    if (read != sizeof (diskCombinerNum))
+    {
+      cacheFailReason = "Read error";
+      return 0;
+    }
+    for (uint i = 0; i < csLittleEndian::UInt32 (diskCombinerNum); i++)
+    {
+      csString combinerID =
+	CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+      csString combinerCode =
+	CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+
+      csRef<WeaverCommon::iCombinerLoader> loader = 
+	csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
+	  combinerID);
+      if (!loader.IsValid())
+      {
+	cacheFailReason = "Failed to load combiner";
+	return 0;
+      }
+      if (combinerCode != loader->GetCodeString())
+      {
+	cacheFailReason = "Out of date (combiner code)";
+	return 0;
+      }
     }
     
     csRef<iDataBuffer> cachedDocData = 
@@ -527,6 +578,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
     return synthShader;
   }
+
+  void WeaverShader::MakeFallbackShader (iDocumentNode* targetNode,
+    iDocumentNode* docSource,
+    const csArray<TechniqueKeeper>& techniques)
+  {
+    csString shaderNameDecorated (docSource->GetAttributeValue ("name"));
+    size_t atat = shaderNameDecorated.FindFirst ("@@");
+    if (atat != (size_t)-1)
+      shaderNameDecorated.DeleteAt (atat, shaderNameDecorated.Length()-atat);
+    shaderNameDecorated.AppendFmt ("@@%d", techniques[1].priority);
+    targetNode->SetAttribute ("name", shaderNameDecorated);
+    
+    csRef<iDocumentNodeIterator> docNodes = docSource->GetNodes ();
+    while (docNodes->HasNext())
+    {
+      csRef<iDocumentNode> orgNode = docNodes->Next();
+      if (orgNode->Equals (techniques[0].node)) continue;
+      
+      csRef<iDocumentNode> newNode = targetNode->CreateNodeBefore (
+        orgNode->GetType());
+      CS::DocSystem::CloneNode (orgNode, newNode);
+    }
+  }
     
   csRef<iDocumentNode> WeaverShader::GetNodeOrFromFile (iDocumentNode* node)
   {
@@ -562,19 +636,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     realShader = compiler->xmlshader->CompileShader (ldr_context,
       shaderNode);
+    realShaderXML = scfQueryInterfaceSafe<iXMLShaderInternal> (realShader);
       
     return realShader.IsValid();
   }
   
   bool WeaverShader::Precache (iDocumentNode* source,
-                               iHierarchicalCache* cacheTo)
+                               iHierarchicalCache* cacheTo,
+                               bool quick)
   {
     csRef<iDocument> synthShader (DoSynthesis (source, cacheTo, -1));
     
     csRef<iDocumentNode> shaderNode =
       synthShader->GetRoot()->GetNode ("shader");
     
-    return compiler->xmlshader->PrecacheShader (shaderNode, cacheTo);
+    return compiler->xmlshader->PrecacheShader (shaderNode, cacheTo, quick);
   }
   
   void WeaverShader::SelfDestruct ()

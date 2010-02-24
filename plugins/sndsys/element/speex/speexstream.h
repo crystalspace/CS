@@ -57,6 +57,11 @@ public:
   virtual bool SetPosition (size_t newposition) { return false; }
 
   /**
+    * Not permitted (yet) operations.
+    */
+  virtual bool SetLoopBoundaries(size_t &startPosition, size_t &endPosition) { return false; }
+
+  /**
    * Reset the stream back to the beginning.
    */
   virtual bool ResetPosition(bool clear = true);
@@ -76,6 +81,9 @@ public:
   * from the Sound System's main processing thread.
   */
   virtual void AdvancePosition(size_t frame_delta);
+
+  /// Whether this stream always needs to be treated as a stream regardless of size.
+  virtual bool AlwaysStream() const { return true; }
 
 private:
   /// Holds our reference to the underlying data element

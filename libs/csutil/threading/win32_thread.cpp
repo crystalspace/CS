@@ -25,6 +25,42 @@
 
 #include <process.h>
 
+#ifdef CS_COMPILER_MSVC
+// Helper to set thread name in debugger
+#define MS_VC_EXCEPTION 0x406D1388
+
+#pragma pack(push,8)
+typedef struct tagTHREADNAME_INFO
+{
+  DWORD dwType; // Must be 0x1000.
+  LPCSTR szName; // Pointer to name (in user addr space).
+  DWORD dwThreadID; // Thread ID (-1=caller thread).
+  DWORD dwFlags; // Reserved for future use, must be zero.
+} THREADNAME_INFO;
+#pragma pack(pop)
+
+static void SetThreadName (DWORD dwThreadID, const char* threadName)
+{
+  THREADNAME_INFO info;
+  info.dwType = 0x1000;
+  info.szName = threadName;
+  info.dwThreadID = dwThreadID;
+  info.dwFlags = 0;
+
+  __try
+  {
+    RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
+  }
+  __except(EXCEPTION_EXECUTE_HANDLER)
+  {
+  }
+}
+#else
+static void SetThreadName (DWORD dwThreadID, const char* threadName)
+{}
+#endif
+
+
 #if defined (__CYGWIN__) 
 //No _beginthreadex, emulate it
 struct ThreadProxyData
@@ -100,6 +136,9 @@ namespace Implementation
       AtomicOperations::Set (isRunningPtr, 1);
       startupBarrier->Wait ();
       
+      // Set the name, for debugging
+      SetThreadName ((DWORD)-1, runnable->GetName ());
+
       // Run      
       runnable->Run ();
 

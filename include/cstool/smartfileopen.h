@@ -32,9 +32,14 @@ namespace CS
      * "Smartly" try to locate a file given a path that could be: a plain file
      * name, directory, name of a level in /lev/, or .zip file.
      *
-     * Try to open a file given a path that could be any of a VFS path, a 
-     * plain file name or directory in the real file system, name of a level 
-     * in /lev/, or .zip file.
+     * \a path is tried to be interpreted in a number of different ways:
+     * - A VFS directory. Succeeds if a file named \a defaultFilename exists
+     *   in the directory.
+     * - A level name in VFS <tt>/lev/</tt>. Succeeds if a file named 
+     *   \a defaultFilename exists below that directory.
+     * - A <tt>.zip</tt> file name. Succeeds if a file named \a defaultFilename
+     *   exists in the archive.
+     * - A plain file name. Succeeds if the file exists.
      *
      * This is for example useful for tool applications which want to let the
      * user specify paths and file locations in a variety of ways.
@@ -44,10 +49,39 @@ namespace CS
      * \param defaultFilename Default filename, used when the provided path
      *   is a directory or .zip file.
      * \param actualFilename Can return the actual filename opened. (Note:
-     *   is either \a defaultFilename or a pointer into \a path.
+     *   is either \a defaultFilename or a pointer into \a path).
      * \return The file if opening succeeded.
      */
     csPtr<iFile> CS_CRYSTALSPACE_EXPORT SmartFileOpen (iVFS* vfs, 
+      const char* path, const char* defaultFilename = 0, 
+      const char** actualFilename = 0);
+      
+    /**
+     * "Smartly" change to the directory with some file given a path that could
+     * be: a plain file name, directory, name of a level in /lev/, or .zip file.
+     *
+     * \a path is tried to be interpreted in a number of different ways:
+     * - A VFS directory. Succeeds if a file named \a defaultFilename exists
+     *   in the directory.
+     * - A level name in VFS <tt>/lev/</tt>. Succeeds if a file named 
+     *   \a defaultFilename exists below that directory.
+     * - A <tt>.zip</tt> file name. Succeeds if a file named \a defaultFilename
+     *   exists in the archive.
+     * - A plain file name. Succeeds if the file exists.
+     *
+     * This is for example useful for tool applications which want to let the
+     * user specify paths and file locations in a variety of ways.
+     *
+     * \param vfs The VFS interface to use to open the file.
+     * \param path The path that is attempted to be opened.
+     * \param defaultFilename Default filename, used to check whether the
+     *   provided path is a directory or .zip file.
+     * \param actualFilename Can return the filename used to determine the
+     *   directory to change to. (Note: is either \a defaultFilename or a
+     *   pointer into \a path).
+     * \return Whether the changing the directory succeeded.
+     */
+    bool CS_CRYSTALSPACE_EXPORT SmartChDir (iVFS* vfs, 
       const char* path, const char* defaultFilename = 0, 
       const char** actualFilename = 0);
   } // namespace Utility

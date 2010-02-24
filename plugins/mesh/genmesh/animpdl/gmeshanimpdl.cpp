@@ -33,7 +33,7 @@
 #include "imap/services.h"
 #include "gmeshanimpdl.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(GMeshAnimPDL)
 {
@@ -51,6 +51,7 @@ void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
     const GenmeshAnimationPDLFactory::ColorBuffer::MappedLight& factoryLight = 
       factoryBuf.lights[i];
     ColorBuffer::MappedLight newLight;
+    iLight* engLight = 0;
     newLight.colors = factoryLight.colors;
     if (!factoryLight.lightId->sectorName.IsEmpty()
       && !factoryLight.lightId->lightName.IsEmpty())
@@ -58,10 +59,9 @@ void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
       iSector* sector = engine->FindSector (factoryLight.lightId->sectorName);
       if (sector)
       {
-        iLight* engLight = sector->GetLights()->FindByName (
+        engLight = sector->GetLights()->FindByName (
           factoryLight.lightId->lightName);
-        newLight.light = engLight;
-        if (!newLight.light)
+        if (!engLight)
         {
           factory->type->Report (CS_REPORTER_SEVERITY_WARNING, 
             "Could not find light '%s' in sector '%s'", 
@@ -79,9 +79,9 @@ void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
     }
     else
     {
-      newLight.light = engine->FindLightID (
+      engLight = engine->FindLightID (
         (const char*)factoryLight.lightId->lightId);
-      if (!newLight.light)
+      if (!engLight)
       {
         csString hexId;
         for (int i = 0; i < 16; i++)
@@ -90,12 +90,13 @@ void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
           "Could not find light with ID '%s'", hexId.GetData());
       }
     }
-    if (newLight.light)
+    if (engLight)
     {
-      buffer.lights.Push (newLight);
+      engLight->SetLightCallback (this);
+      buffer.lights.Put (engLight, newLight);
     }
   }
-  buffer.lights.ShrinkBestFit();
+  buffer.lightsDirty = true;
 }
 
 void GenmeshAnimationPDL::Prepare ()
@@ -156,22 +157,25 @@ void GenmeshAnimationPDL::UpdateBuffer (ColorBuffer& buffer, csTicks current,
       }
     }
 
-    for (size_t l = 0; l < buffer.lights.GetSize(); l++)
+    ColorBuffer::LightsHash::GlobalIterator iter (buffer.lights.GetIterator());
+    while (iter.HasNext())
     {
-      const ColorBuffer::MappedLight& light = buffer.lights[l];
+      csPtrKey<iLight> l;
+      ColorBuffer::MappedLight& light = iter.Next (l);
       
       csVertexListWalker<float, csColor> color (light.colors, 3);
-      csColor lightColor = light.light->GetColor();
+      csColor lightColor = l->GetColor();
 
       for (size_t n = 0; n < numUpdate; n++)
       {
         combinedColors[n] += *color * lightColor;
         ++color;
       }
+      light.lastUpdateColor = lightColor;
     }
 
-    colorsBuffer.lightsDirty = false;
-    colorsBuffer.lastMeshVersion = version_id;
+    buffer.lightsDirty = false;
+    buffer.lastMeshVersion = version_id;
   }
 }
 
@@ -189,6 +193,8 @@ GenmeshAnimationPDL::~GenmeshAnimationPDL ()
 void GenmeshAnimationPDL::Update(csTicks current, int num_verts, 
                                  uint32 version_id)
 {
+  if (!prepared) Prepare();
+
   if (buffers.GetSize() == 0) return;
 
   // @@@ FIXME: Bit of a waste here to always update custom buffers...
@@ -238,6 +244,45 @@ const csColor4* GenmeshAnimationPDL::UpdateColors (csTicks current,
   if (colorsBuffer.name == 0) return colors;
   UpdateBuffer (colorsBuffer, current, colors, num_colors, version_id);
   return colorsBuffer.combinedColors.GetArray();
+}
+
+void GenmeshAnimationPDL::OnColorChange (iLight* light, const csColor& newcolor)
+{
+  const float updateThresh = 1.0f/256.0f;
+  colorsBuffer.UpdateLight (light, newcolor, updateThresh);
+  for (size_t i = 0; i < buffers.GetSize(); i++) 
+  { 
+    buffers[i].UpdateLight (light, newcolor, updateThresh);
+  } 
+}
+
+void GenmeshAnimationPDL::OnDestroy (iLight* light)
+{
+  colorsBuffer.RemoveLight (light);
+  for (size_t b = 0; b < buffers.GetSize(); b++) 
+  { 
+    buffers[b].RemoveLight (light);
+  }
+}
+
+//-------------------------------------------------------------------------
+
+void GenmeshAnimationPDL::ColorBuffer::UpdateLight (iLight* l, 
+                                                    const csColor& col, 
+                                                    float thresh)
+{
+  MappedLight* light = lights.GetElementPointer (l);
+  if (light == 0) return;
+  csColor diff = light->lastUpdateColor - col;
+  lightsDirty |= (fabsf (diff.red) >= thresh)
+    || (fabsf (diff.green) >= thresh)
+    || (fabsf (diff.blue) >= thresh);
+}
+
+void GenmeshAnimationPDL::ColorBuffer::RemoveLight (iLight* l)
+{
+  lights.DeleteAll (l);
+  lightsDirty = true;
 }
 
 //-------------------------------------------------------------------------

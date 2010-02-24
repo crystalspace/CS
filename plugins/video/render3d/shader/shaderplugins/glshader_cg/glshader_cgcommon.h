@@ -21,6 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __GLSHADER_CGCOMMON_H__
 
 #include "cg_common.h"
+#include "progcache.h"
 
 #include "csplugincommon/opengl/shaderplugin.h"
 #include "csplugincommon/shader/shaderplugin.h"
@@ -76,11 +77,13 @@ protected:
 
   CGprogram program;
   CGprofile programProfile;
+  bool programPositionInvariant;
   csString entrypoint;
   csRefArray<iDocumentNode> cacheKeepNodes;
-  csString objectCode;
-  csString objectCodeCachePathArc, objectCodeCachePathItem;
 
+  // Wrapped PS1.x shader program
+  csRef<iShaderProgram> pswrap;
+  
   enum ProgramType
   {
     progVP, progFP
@@ -145,8 +148,10 @@ protected:
     const char* programStr, ProgramType type,
     const ProfileLimitsPair& customLimits, 
     uint flags = loadLoadToGL | loadApplyVmap | loadFlagUnusedV2FForInit);
-  csString GetPreprocessedProgram (const char* programStr);
+  csString GetAugmentedProgram (const char* programStr,
+    bool initializeUnusedV2F = false);
   void DoDebugDump ();
+  void DebugDumpParam (csString& output, CGparameter param);
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   const char* GetProgramType()
   {
@@ -177,18 +182,17 @@ protected:
   void ApplyVariableMapArrays (const csShaderVariableStack& stack);
   
   bool WriteToCacheWorker (iHierarchicalCache* cache, const ProfileLimits& limits,
-    const ProfileLimitsPair& limitsPair, const char* tag, csString& failReason);
+    const ProfileLimitsPair& limitsPair, const char* tag, 
+    const ProgramObject& program, csString& failReason);
+  bool WriteToCache (iHierarchicalCache* cache, const ProfileLimits& limits,
+    const ProfileLimitsPair& limitsPair, const char* tag,
+    const ProgramObject& program);
   bool WriteToCache (iHierarchicalCache* cache, const ProfileLimits& limits,
     const ProfileLimitsPair& limitsPair, const char* tag);
   
-  bool TryLoadFromCompileCache (const char* source, const ProfileLimits& limits,
-    iHierarchicalCache* cache);
-  bool LoadObjectCodeFromCompileCache (const ProfileLimits& limits,
-    iHierarchicalCache* cache);
-  bool WriteToCompileCache (const char* source, const ProfileLimits& limits,
-    iHierarchicalCache* cache, csString& failReason);
-    
   bool GetProgramNode (iDocumentNode* passProgNode);
+
+  bool LoadProgramWithPS1 ();
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 
@@ -230,9 +234,14 @@ public:
   const csSet<csString>& GetUnusedParameters ()
   { return unusedParams; }
   
+  iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* tag = 0,
+    ProfileLimitsPair* cacheLimits = 0);
   virtual iShaderProgram::CacheLoadResult LoadFromCache (
     iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
-    csRef<iString>* failReason = 0, csRef<iString>* = 0);
+    csRef<iString>* failReason = 0, csRef<iString>* tag = 0)
+  { return LoadFromCache (cache, previous, programNode, failReason, tag, 0); }
 };
 
 }

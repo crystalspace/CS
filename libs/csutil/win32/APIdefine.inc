@@ -56,17 +56,31 @@ int CS_API_NAME::GetRefCount ()
   return refCount;
 }
 
+#define STRINGIZE2(x)   #x
+#define STRINGIZE(x)    STRINGIZE2(x)
+
 bool CS_API_NAME::Available ()
 {
   if (!dllLoaded)
   {
     dllLoaded = true;
-    dll = new CS::Platform::Win32::CacheDLL (CS_API_DLL);
+#if (CS_PROCESSOR_SIZE == 64) && defined(CS_API_DLL64)
+	dll = new CS::Platform::Win32::CacheDLL (CS_API_DLL64);
+#ifdef CS_DEBUG
+    if (!dll || !*dll)
+      csPrintf ("%s: Could not load %s\n", STRINGIZE (CS_API_NAME), 
+		CS_API_DLL64);
+#endif
+#endif
+    if (!dll || !*dll)
+	  dll = new CS::Platform::Win32::CacheDLL (CS_API_DLL);
+#ifdef CS_DEBUG
+    if (!dll || !*dll)
+      csPrintf ("%s: Could not load %s\n", STRINGIZE (CS_API_NAME), 
+		CS_API_DLL);
+#endif
     if ((dll != 0) && (*dll != 0))
     {
-#define STRINGIZE2(x)   #x
-#define STRINGIZE(x)    STRINGIZE2(x)
-      
 #ifdef CS_DEBUG
       bool* flag;
       #define FUNC_GROUP_BEGIN(name)					    \
@@ -95,11 +109,6 @@ bool CS_API_NAME::Available ()
 #undef FUNC_OPT
 #undef FUNC
     }
-#ifdef CS_DEBUG
-    if (!dll || !*dll)
-      csPrintf ("%s: Could not load %s\n", STRINGIZE (CS_API_NAME), 
-	CS_API_DLL);
-#endif
   }
   return dll != 0;
 }

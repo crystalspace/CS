@@ -36,6 +36,7 @@
 #include "iutil/selfdestruct.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
+#include "iengine/rview.h"
 #include "iengine/viscull.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -48,15 +49,18 @@
 class csEngine;
 class csProgressPulse;
 class csSector;
-class csMeshMeshList;
-class csMeshWrapper;
 class csMeshGenerator;
 struct iVisibilityCuller;
-struct iRenderView;
 struct iMeshWrapper;
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+  class csMeshWrapper;
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
+
 /// A list of meshes for a sector.
-class csSectorMeshList : public csMeshList
+class csSectorMeshList : public CS_PLUGIN_NAMESPACE_NAME(Engine)::csMeshList
 {
 public:
   /// constructor
@@ -172,8 +176,7 @@ class csSector : public scfImplementationExt3<csSector,
 {
   // Friends
   friend class csEngine;
-  friend class csMeshMeshList;
-  friend class csMeshWrapper;
+  friend class CS_PLUGIN_NAMESPACE_NAME(Engine)::csMeshWrapper;
   friend class csSectorMeshList;
 
 public:
@@ -302,7 +305,9 @@ public:
   	const csVector3& end, bool accurate = false);
 
   virtual iSector* FollowSegment (csReversibleTransform& t,
-    csVector3& new_position, bool& mirror, bool only_portals = false);
+    csVector3& new_position, bool& mirror, bool only_portals = false,
+    iPortal** transversed_portals = 0, iMeshWrapper** portal_meshes = 0,
+    int firstIndex = 0, int* lastIndex = 0);
   /** @} */
 
   /**\name Callbacks
@@ -541,8 +546,8 @@ private:
   void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, 
     iRenderView* rview, uint32 frustum_mask,
     bool doFade = false, float fade = 1.0f);
-  void ObjectVisible (csMeshWrapper* cmesh, iRenderView* rview, 
-    uint32 frustum_mask, bool doFade, float fade);
+  void ObjectVisible (CS_PLUGIN_NAMESPACE_NAME(Engine)::csMeshWrapper* cmesh,
+    iRenderView* rview, uint32 frustum_mask, bool doFade, float fade);
 
   /**
    * Visibilty number for last VisTest call

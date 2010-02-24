@@ -29,7 +29,7 @@
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csConsoleInput)
 
@@ -339,7 +339,7 @@ void csConsoleInput::Refresh ()
   Console->PutText ("\r");
   Console->PutText ("%s", Prompt);
   Console->PutText ("%s", line.GetData ());
-  Console->SetCursorPos ((int)(PromptLen + vCursorPos));
+  Console->SetCursorPos ((int)(PromptLen + strCursorPos));
   if (InsertMode)
     Console->SetCursorStyle (csConInsertCursor);
   else

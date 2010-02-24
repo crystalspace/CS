@@ -29,7 +29,7 @@ struct iJob;
 
 struct iThreadReturn : public virtual iBase
 {
-  SCF_INTERFACE(iThreadReturn, 1, 1, 0);
+  SCF_INTERFACE(iThreadReturn, 1, 2, 0);
 
   virtual bool IsFinished() = 0;
   virtual bool WasSuccessful() = 0;
@@ -45,6 +45,9 @@ struct iThreadReturn : public virtual iBase
 
   virtual void Wait(bool process = true) = 0;
   virtual void SetWaitPtrs(CS::Threading::Condition* c, CS::Threading::Mutex* m) = 0;
+
+  virtual void SetJob(iJob* job) = 0;
+  virtual iJob* GetJob() const = 0;
 };
 
 enum QueueType

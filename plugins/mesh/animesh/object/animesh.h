@@ -29,6 +29,7 @@
 #include "csutil/scf_implementation.h"
 #include "iengine/movable.h"
 #include "iengine/scenenode.h"
+#include "iengine/material.h"
 #include "imesh/animesh.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
@@ -66,11 +67,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     AnimeshObjectFactory (AnimeshObjectType* objType);
 
     //-- iAnimatedMeshFactory
-    virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices);
+    virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices,
+      const char* name, bool visible);
     virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (
       const csArray<iRenderBuffer*>& indices, 
-      const csArray<csArray<unsigned int> >& boneIndices);
+      const csArray<csArray<unsigned int> >& boneIndices,
+      const char* name,
+      bool visible);
     virtual iAnimatedMeshFactorySubMesh* GetSubMesh (size_t index) const;
+    virtual size_t FindSubMesh (const char* name) const;
     virtual size_t GetSubMeshCount () const;
     virtual void DeleteSubMesh (iAnimatedMeshFactorySubMesh* mesh);
 
@@ -107,6 +112,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       const csReversibleTransform& transform, const char* name);
     virtual size_t GetSocketCount () const;
     virtual iAnimatedMeshSocketFactory* GetSocket (size_t index) const;
+    virtual uint FindSocket (const char* name) const;
 
     //-- iMeshObjectFactory
     virtual csFlags& GetFlags ();
@@ -142,7 +148,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     // required but stupid stuff..
     AnimeshObjectType* objectType;
     iMeshFactoryWrapper* logParent;
-    iMaterialWrapper* material;
+    csRef<iMaterialWrapper> material;
     csFlags factoryFlags;
     uint mixMode;
     csBox3 factoryBB;
@@ -178,8 +184,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
                               iAnimatedMeshFactorySubMesh>
   {
   public:
-    FactorySubmesh ()
-      : scfImplementationType (this)
+    FactorySubmesh (const char* name)
+      : scfImplementationType (this), material(0), name(name)
     {}
 
     virtual iRenderBuffer* GetIndices (size_t set)
@@ -218,6 +224,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       csRef<iRenderBuffer> boneWeightAndIndexBuffer[2];
     };
     csArray<RemappedBones> boneMapping;
+    
+    csRef<iMaterialWrapper> material;
+
+    /// Get the material
+    virtual iMaterialWrapper* GetMaterial () const { return material; }
+
+    /// Set the material, or 0 to use default.
+    virtual void SetMaterial (iMaterialWrapper* m) { material = m; }
+    
+    csString name;
+
+    /// Get the submesh name.
+    virtual const char* GetName () const { return name.GetData(); }
+
+    /// Whether we're visible by default.
+    bool visible;
   };
 
 
@@ -231,6 +253,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     //-- iAnimatedMeshSocketFactory
     virtual const char* GetName () const;
+    virtual void SetName (const char*);
     virtual const csReversibleTransform& GetTransform () const;
     virtual void SetTransform (csReversibleTransform& tf);
     virtual BoneID GetBone () const;
@@ -363,7 +386,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     public:
       Submesh (AnimeshObject* meshObject, FactorySubmesh* factorySubmesh)
         : scfImplementationType (this), meshObject (meshObject),
-        factorySubmesh (factorySubmesh), isRendering (true)
+        factorySubmesh (factorySubmesh), material(0), isRendering (factorySubmesh->visible)
       {}
 
       virtual iAnimatedMeshFactorySubMesh* GetFactorySubMesh ()
@@ -381,8 +404,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         return isRendering;
       }
 
+      virtual iShaderVariableContext* GetShaderVariableContext(size_t buffer) const
+      {
+        return svContexts[buffer];
+      }
+
+      virtual iMaterialWrapper* GetMaterial () const
+      {
+          return material;
+      }
+
+      virtual void SetMaterial (iMaterialWrapper* mat)
+      {
+          material = mat;
+      }
+
       AnimeshObject* meshObject;
       FactorySubmesh* factorySubmesh;
+      csRef<iMaterialWrapper> material;
       bool isRendering;
 
       csRefArray<csShaderVariableContext> svContexts;
@@ -419,7 +458,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     AnimeshObjectFactory* factory;
     iMeshWrapper* logParent;
-    iMaterialWrapper* material;
+    csRef<iMaterialWrapper> material;
     uint mixMode;
     csFlags meshObjectFlags;
 

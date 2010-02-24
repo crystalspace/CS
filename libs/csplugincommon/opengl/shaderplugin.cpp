@@ -225,7 +225,7 @@ namespace CS
     bool ShaderProgramPluginGL::ClipPlanes::AddClipPlane (const csPlane3& plane, 
                                                           ClipSpace space)
     {
-      size_t nextPlane;
+      unsigned long nextPlane;
       if (!CS::Utility::BitOps::ScanBitForward (~currentPlanes, nextPlane))
         return false;
       if (nextPlane >= maxPlanes) return false;
@@ -270,7 +270,7 @@ namespace CS
     
     bool ShaderProgramPluginGL::ClipPlanes::EnableNextClipPlane ()
     {
-      size_t nextPlane;
+      unsigned long nextPlane;
       if (!CS::Utility::BitOps::ScanBitForward (~currentPlanes, nextPlane))
         return false;
       if (nextPlane >= maxPlanes) return false;

@@ -227,6 +227,8 @@ private:
   csPDelArray<csSpriteCal3DSocket> sockets;
   csFlags flags;
   csBox3 obj_bbox;
+  
+  float currentScalingFactor; ///< Stores how much the model has been scaled
 
   csRef<csCal3dSkeletonFactory> skel_factory;
 
@@ -266,6 +268,7 @@ public:
   void SetLoadFlags(int flags);
   void SetBasePath(const char *path);
   void RescaleFactory(float factor);
+  void AbsoluteRescaleFactory(float factor);
   void CalculateAllBoneBoundingBoxes();
 
   bool LoadCoreSkeleton(iVFS *vfs,const char *filename);
@@ -419,6 +422,7 @@ private:
   float idle_override_interval;
   int   idle_action;
   float cyclic_blend_factor;
+  csRandomGen randomGen;
 
   csRef<csCal3dSkeleton> skeleton;
 

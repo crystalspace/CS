@@ -1,0 +1,72 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <technique priority="100">
+    <snippet id="eyeVecWorld" file="/shader-snippets/eye-direction-world.xml" />
+    
+    <snippet id="refract">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<!-- Vector from eye to position -->
+	<input name="eyeVec" type="direction_world" />
+	<!-- Surface normal -->
+	<input name="normal" type="normal_world" />
+	<!-- Index of refraction -->
+	<input name="eta" type ="float" default="complex">
+	  <block location="cg:variablemap">
+	    <variablemap variable="refraction index" 
+	      destination="fragmentIn.eta" />
+	    <variablemap variable="refraction index" 
+	      destination="vertexIn.eta" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="float" name="eta" />
+	  </block>
+	  <block location="cg:vertexIn">
+	    <uniform type="float" name="eta" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    eta = fragmentIn.eta;
+	  </block>
+	  <block location="cg:vertexMain">
+	    eta = vertexIn.eta;
+	  </block>
+	</input>
+	
+	<block location="cg:definitions">
+	  <?Include /shader-snippets/cg-common.cginc?>
+	</block>
+	
+	<block location="cg:vertexMain">
+	  refracted = refraction (normalize (eyeVec), normal, eta, eta*eta);
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  refracted = refraction (normalize (eyeVec), normal, eta, eta*eta);
+	</block>
+	
+	<output name="refracted" type="direction_world" />
+      </technique>
+    </snippet>
+    <connection from="eyeVecWorld" to="refract" />
+  </technique>
+</snippet>

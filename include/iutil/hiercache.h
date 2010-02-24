@@ -40,7 +40,7 @@ struct iDataBuffer;
  */
 struct iHierarchicalCache : public virtual iBase
 {
-  SCF_INTERFACE(iHierarchicalCache, 1,0,2);
+  SCF_INTERFACE(iHierarchicalCache, 1,0,3);
 
   /**
    * Cache some data. Returns true if this succeeded.
@@ -80,6 +80,9 @@ struct iHierarchicalCache : public virtual iBase
   
   /// Get the cache which is the ultimate hierarchical ancestor of a cache
   virtual iHierarchicalCache* GetTopCache() = 0;
+  
+  /// Query if cache can be written to (as some caches may be static/read-only)
+  virtual bool IsCacheWriteable() const = 0;
 };
 
 #endif // __CS_IUTIL_HIERCACHE_H__

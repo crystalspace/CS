@@ -5,7 +5,6 @@ RUNTIME_DATA =
   fancycon.zip
   standard.zip
   ttf-dejavu.zip
-  ttf-vera.zip
   unifont.zip ;
 DEMO_DATA =
   startme.zip
@@ -52,8 +51,11 @@ SubInclude TOP data config-plugins ;
 SubInclude TOP data cube ;
 SubInclude TOP data flarge ;
 SubInclude TOP data frankie ;
+SubInclude TOP data krystal ;
 SubInclude TOP data posteffects ;
 SubInclude TOP data renderlayers ;
 SubInclude TOP data shader ;
 SubInclude TOP data shader-old ;
+SubInclude TOP data shader-snippets ;
 SubInclude TOP data varia ;
+SubInclude TOP data viewmesh ;

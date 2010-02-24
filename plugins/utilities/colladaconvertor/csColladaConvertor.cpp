@@ -38,7 +38,6 @@ using std::stringstream;
 
 #define CS_COLLADA_NORMAL_MAP_3DS 0x0040
 
-CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 {

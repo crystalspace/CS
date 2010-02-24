@@ -389,7 +389,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       // *** This is deprecated behaviour ***
       if(!result.IsValid())
       {
-        ReportWarning("Could not find texture '%s'. Loading texture. This is deprecated behaviour.", 
+        ReportWarning("Could not find texture '%s'. Loading texture. This behaviour is deprecated.", 
           name);
         csRef<iThreadManager> tman = csQueryRegistry<iThreadManager>(object_reg);
         csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(tman));

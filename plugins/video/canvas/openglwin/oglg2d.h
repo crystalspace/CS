@@ -77,6 +77,12 @@ public:
 
   /// Set the window title
   virtual void SetTitle (const char* title);
+  
+  /** Sets the icon of this window with the provided one.
+   *
+   *  @param image the iImage to set as the icon of this window.
+   */  
+  virtual void SetIcon (iImage *image);
   /// Display a nice message box.
   virtual void AlertV (int type, const char* title, const char* okMsg,
   	const char* msg, va_list args);
@@ -128,6 +134,7 @@ protected:
   bool hardwareAccelerated;
 
   csWin32CustomCursors cursors;
+  HICON customIcon;
 };
 
 #endif // __CS_OGLG2D_H__

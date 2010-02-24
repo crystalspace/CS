@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
 	      (C) 2005 by Frank Richter
+              (C) 2009 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,47 +23,47 @@
 #include "csgeom/math.h"
 #include "csutil/sysfunc.h"
 #include "csutil/threadjobqueue.h"
+#include "csutil/randomgen.h"
 
+namespace
+{
+  static CS::Threading::Mutex rgenLock;
+  static csRandomGen rgen;
+}
 
 namespace CS
 {
 namespace Threading
 {
 
-  ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers, ThreadPriority priority,
-    size_t numNonLowWorkers)
+  ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers, ThreadPriority priority)
     : scfImplementationType (this), 
-    numWorkerThreads (numWorkers+numNonLowWorkers), 
-    shutdownQueue (false), outstandingJobs (0)
+    numWorkerThreads (numWorkers), 
+    shutdownQueue (0), outstandingJobs (0)
   {
     allThreadState = new ThreadState*[numWorkerThreads];
 
     // Start up the threads
-    for (size_t i = 0; i < numWorkerThreads; ++i)
+    for (unsigned int i = 0; i < numWorkerThreads; ++i)
     {
-      if(i < numWorkers)
-        allThreadState[i] = new ThreadState (this);
-      else
-        allThreadState[i] = new ThreadState (this, false);
+      allThreadState[i] = new ThreadState (this, i); 
       allThreadState[i]->threadObject->SetPriority(priority);
+
       allThreads.Add (allThreadState[i]->threadObject);
     }
+    
     allThreads.StartAll ();
   }
 
   ThreadedJobQueue::~ThreadedJobQueue ()
   {
+    // Kill all threads, friendly
+    CS::Threading::AtomicOperations::Set (&shutdownQueue, 0xff);    
+    for(size_t i = 0; i < numWorkerThreads; ++i)
     {
-      // Empty the queue for new jobs
-      MutexScopedLock lock (jobMutex);
-      jobQueue.DeleteAll ();
-      jobQueueL.DeleteAll ();
-
-      // Wait for all threads to finish their current job
-      shutdownQueue = true;
+      allThreadState[i]->tsNewJob.NotifyAll ();
     }
 
-    newJob.NotifyAll ();
     allThreads.WaitAll ();
 
     // Deallocate
@@ -74,171 +75,98 @@ namespace Threading
   }
 
 
-  void ThreadedJobQueue::Enqueue (iJob* job, bool lowPriority)
+  void ThreadedJobQueue::Enqueue (iJob* job)
   {
     if (!job)
       return;
 
+    while (true)
     {
-      MutexScopedLock lock (jobMutex);
-      if(lowPriority)
-        jobQueueL.Push (job);
-      else
-        jobQueue.Push (job);
-    }
-    CS::Threading::AtomicOperations::Increment (&outstandingJobs);
-    newJob.NotifyAll ();
-  }
+      // Find a thread (on random) to add it to
+      size_t targetThread = rgen.Get ((uint32)numWorkerThreads);
 
-  void ThreadedJobQueue::PullAndRun (iJob* job)
-  {
-    bool jobUnqued = false;
+      // Lock, add and notify
+      ThreadState* ts = allThreadState[targetThread];
 
-    {
-      MutexScopedLock lock (jobMutex);
-      // Check if in queue
-      jobUnqued = jobQueue.Delete (job) || jobQueueL.Delete (job);
-    }
-
-    if (jobUnqued)
-    {
-      CS::Threading::AtomicOperations::Decrement (&outstandingJobs);
-      job->Run ();
-      return;
-    }
-
-    // Now we have to check the active jobs, just wait until it is done
-    {
-      MutexScopedLock lock (threadStateMutex);
-
-      bool isRunning = false;
-      size_t index;
-
-      for (size_t i = 0; i < numWorkerThreads; ++i)
+      // Might be contended, so try next if locked
+      if (ts->tsMutex.TryLock ())
       {
-        if (allThreadState[i]->currentJob == job)
-        {
-          isRunning = true;
-          index = i;
-          break;
-        }
-      }
+        ts->jobQueue.Push (job);
+        CS::Threading::AtomicOperations::Increment (&outstandingJobs); 
+        ts->tsMutex.Unlock ();
 
-      if (isRunning)
-      {
-        while (allThreadState[index]->currentJob == job)
-          allThreadState[index]->jobFinished.Wait (threadStateMutex);
-      }
+        ts->tsNewJob.NotifyAll ();
 
-    }
-  }
-
-  void ThreadedJobQueue::PopAndRun()
-  {
-    csRef<iJob> job;
-    {
-      MutexScopedLock lock (jobMutex);
-      if(jobQueue.GetSize () > 0)
-      {
-        job = jobQueue.PopTop();
-      }
-      else if(jobQueueL.GetSize () > 0)
-      {
-        job = jobQueueL.PopTop();
+        return;
       }
     }
     
-    if(job.IsValid())
-    {
-      CS::Threading::AtomicOperations::Decrement (&outstandingJobs);
-      job->Run ();
-    }
   }
 
-  void ThreadedJobQueue::Unqueue (iJob* job, bool waitIfCurrent)
+  void ThreadedJobQueue::Dequeue (iJob* job)
   {
-    {
-      MutexScopedLock lock (jobMutex);
-      // Check if in queue
-      bool jobUnqued = jobQueue.Delete (job) || jobQueueL.Delete (job);
+    // Check all the thread queues
+    PullFromQueues (job);
+  }
 
-      if (jobUnqued)
-        return;
+
+  void ThreadedJobQueue::PullAndRun (iJob* job, bool waitForCompletion)
+  {
+    bool removedJob = PullFromQueues (job);
+
+    if (removedJob)
+    {      
+      job->Run ();
     }
-
+    else if (waitForCompletion)
     {
-      // Check the running threads
-      MutexScopedLock lock (threadStateMutex);
-
-      bool isRunning = false;
-      size_t index;
+      // Check if it is running, then wait      
+      ThreadState *ownerTs = 0;
 
       for (size_t i = 0; i < numWorkerThreads; ++i)
       {
-        if (allThreadState[i]->currentJob == job)
+        ThreadState* ts = allThreadState[i];
+        
+        ts->tsMutex.Lock ();
+
+        if (ts->currentJob == job)
         {
-          isRunning = true;
-          index = i;
+          ownerTs = ts;
           break;
         }
+        ts->tsMutex.Unlock (); // Unlock if not right
       }
 
-      if (isRunning && waitIfCurrent)
+      if (ownerTs)
       {
-        while (allThreadState[index]->currentJob == job)
-          allThreadState[index]->jobFinished.Wait (threadStateMutex);
+        // Always enter here with ownerTs->tsMutex locked!
+        while (ownerTs->currentJob == job)
+        {          
+          ownerTs->tsJobFinished.Wait (ownerTs->tsMutex);
+        }
+
+        ownerTs->tsMutex.Unlock (); // Unlock if right
       }
 
+      // All mutex that have been locked are unlocked!
     }
+    // Nothing
   }
-  
-  void ThreadedJobQueue::Wait (iJob* job)
-  {
-    while (true)
+
+  void ThreadedJobQueue::WaitAll ()
+  {   
+    while(!IsFinished ())
     {
+      for (size_t i = 0; i < numWorkerThreads; ++i)
       {
-        // Check the running threads
-        MutexScopedLock lock (threadStateMutex);
+        ThreadState* ts = allThreadState[i];
 
-        bool isRunning = false;
-        size_t index;
-
-        for (size_t i = 0; i < numWorkerThreads; ++i)
+        MutexScopedLock l (ts->tsMutex);
+        if(ts->currentJob || ts->jobQueue.GetSize() > 0)
         {
-          if (allThreadState[i]->currentJob == job)
-          {
-            isRunning = true;
-            index = i;
-            break;
-          }
+          // Have a job, wait for it
+          ts->tsJobFinished.Wait (ts->tsMutex);
         }
-
-        if (isRunning)
-        {
-          /* The job is currently running, so wait until it finished */
-          while (allThreadState[index]->currentJob == job)
-            allThreadState[index]->jobFinished.Wait (threadStateMutex);
-          return;
-        }
-      }
-
-      {
-        MutexScopedLock lock (jobMutex);
-        // Check if in queue
-        bool jobUnqued = jobQueue.Contains (job) || jobQueueL.Contains (job);
-
-        if (!jobUnqued)
-          // Not queued or running at all (any more)
-          return;
-      }
-
-      /* The job is somewhere in a queue.
-      * Just wait for any job to finish and check everything again...
-      */
-      if (!IsFinished())
-      {
-        MutexScopedLock lock(jobFinishedMutex);
-        jobFinished.Wait (jobFinishedMutex);
       }
     }
   }
@@ -249,59 +177,123 @@ namespace Threading
     return c == 0;
   }
 
-  ThreadedJobQueue::QueueRunnable::QueueRunnable (ThreadedJobQueue* queue, 
-    ThreadState* ts, bool doLow)
-    : ownerQueue (queue), threadState (ts), doLow(doLow)
-  {
-  }
-
-  void ThreadedJobQueue::QueueRunnable::Run ()
-  {
-    while (true)
-    {
-      // Get a job
-      {
-        MutexScopedLock lock (ownerQueue->jobMutex);
-        while (ownerQueue->jobQueue.GetSize () == 0 &&
-          (!doLow || ownerQueue->jobQueueL.GetSize () == 0))
-        {
-          if (ownerQueue->shutdownQueue)
-            return;
-          ownerQueue->newJob.Wait (ownerQueue->jobMutex);
-        }
-
-        {
-          MutexScopedLock lock2 (ownerQueue->threadStateMutex);
-          if (ownerQueue->jobQueue.GetSize () > 0)
-            threadState->currentJob = ownerQueue->jobQueue.PopTop ();
-          else if (doLow)
-            threadState->currentJob = ownerQueue->jobQueueL.PopTop ();
-        }
-      }
-
-      // Execute it
-      if (threadState->currentJob)
-      {
-        CS::Threading::AtomicOperations::Decrement (&(ownerQueue->outstandingJobs));
-        threadState->currentJob->Run ();
-      }
-
-      // Clean up
-      {
-        MutexScopedLock lock (ownerQueue->threadStateMutex);
-        threadState->currentJob.Invalidate ();
-        threadState->jobFinished.NotifyAll ();
-      }
-      {
-        ownerQueue->jobFinished.NotifyAll ();
-      }
-    }
-  }
-
   int32 ThreadedJobQueue::GetQueueCount()
   {
     return CS::Threading::AtomicOperations::Read(&outstandingJobs);
   }
+
+  bool ThreadedJobQueue::PullFromQueues (iJob* job)
+  {
+    // Check all the thread queues
+    for (size_t i = 0; i < numWorkerThreads; ++i)
+    {
+      ThreadState* ts = allThreadState[i];
+      MutexScopedLock l (ts->tsMutex);
+
+      bool removedJob = ts->jobQueue.Delete (job);
+
+      if (removedJob)
+      {
+        CS::Threading::AtomicOperations::Decrement(&outstandingJobs);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
+  ThreadedJobQueue::QueueRunnable::QueueRunnable (ThreadedJobQueue* queue, 
+    ThreadState* ts, unsigned int id)
+    : ownerQueue (queue), threadState (ts)
+  {
+    name.Format ("Queue [%p] Runner %d", queue, id);
+  }
+
+  void ThreadedJobQueue::QueueRunnable::Run ()
+  {    
+    while (CS::Threading::AtomicOperations::Read(&(ownerQueue->shutdownQueue)) == 0x0)
+    {
+      // Get a job
+      csRef<iJob> currentJob;
+
+      // Try our own list first
+      // We need to hold this until currentJob is set, otherwise something might slip through in "wait"
+      threadState->tsMutex.Lock ();
+
+      if (threadState->jobQueue.GetSize () > 0)
+      {
+        currentJob = threadState->jobQueue.PopTop ();
+      }
+      
+      if (!currentJob)
+      {        
+        // If we couldn't get any job, try to steal. At most try to steal once
+        // from each of the other threads
+        size_t start;
+        {
+          MutexScopedLock l (rgenLock);
+          start = rgen.Get ((uint32)ownerQueue->numWorkerThreads);
+        }
+
+        for (size_t i = 0, index = start; 
+             i < ownerQueue->numWorkerThreads; 
+             ++i, index = (index + 1) % ownerQueue->numWorkerThreads
+             )
+        {
+          ThreadState* foreignTS = ownerQueue->allThreadState[index];
+          if (foreignTS == threadState)
+            continue;
+
+          // Try to lock it, but never wait for a lock
+          if (foreignTS->tsMutex.TryLock ()) // Lock foreign object A
+          {
+            // Get the job
+            if (foreignTS->jobQueue.GetSize() > 0)
+            {
+              currentJob = foreignTS->jobQueue.PopBottom ();
+              foreignTS->tsMutex.Unlock (); // Unlock foreign object A if success
+              break;
+            }
+
+            foreignTS->tsMutex.Unlock (); // Unlock foreign object A if unsuccessful
+          } 
+        }
+      }
+
+      if (currentJob)
+      {
+        CS::Threading::AtomicOperations::Decrement(&(ownerQueue->outstandingJobs));
+
+        // Got one, execute
+        threadState->currentJob = currentJob;        
+        threadState->tsMutex.Unlock (); // Unlock our own TS after getting a job
+
+        currentJob->Run ();
+
+        {
+          MutexScopedLock l (threadState->tsMutex);
+          threadState->currentJob = 0;
+          currentJob = 0;
+        }
+       
+        threadState->tsJobFinished.NotifyAll ();
+      }
+      else
+      {
+        // Couldn't get one, wait for a newly added job        
+        threadState->tsNewJob.Wait (threadState->tsMutex);
+        threadState->tsMutex.Unlock ();
+      }
+    }
+  }
+
+  const char* ThreadedJobQueue::QueueRunnable::GetName () const
+  {
+    return name.GetDataSafe ();
+  }
+
+
 
 }
 }

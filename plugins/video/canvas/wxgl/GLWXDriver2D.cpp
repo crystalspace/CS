@@ -67,7 +67,7 @@
 
 #include "GLWXDriver2D.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DWX)
 

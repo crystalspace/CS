@@ -977,7 +977,11 @@ protected:
     {
       NewSize++; // Plus one for implicit null byte.
       if (NewSize <= LEN)
+      {
+	// minibuff may still be wholly uninitialized, so ensure a null terminator
+	if (miniused == 0) minibuff[0] = 0;
 	miniused = NewSize;
+      }
       else
       {
 	CS_ASSERT(MaxSize == 0);
@@ -1142,9 +1146,9 @@ public:
 
 #ifndef SWIG
 /**
- * Superclass of csString; normally csStringFast<>.
+ * Superclass of csString; normally csStringFast.
  * \internal This is just an implementation detail to pacify Swig which
- *   otherwise complains that it does not know anything about csStringFast<>.
+ *   otherwise complains that it does not know anything about csStringFast.
  */
 typedef csStringFast<> csStringFastDefault;
 #else
@@ -1153,7 +1157,7 @@ typedef csStringFast<> csStringFastDefault;
 #endif
 
 /**
- * Thin wrapper around csStringFast<> with its default buffer size.
+ * Thin wrapper around csStringFast with its default buffer size.
  */
 class csString : public csStringFastDefault
 {

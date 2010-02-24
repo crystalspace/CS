@@ -252,40 +252,6 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
 
 
 #------------------------------------------------------------------------------
-# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() since
-# CS_CHECK_HOST() may alter the build environment in a way which affects these
-# tests. For instance, these tests might be impacted on Mac OS X by a universal
-# binary build.
-#------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
-    [CS_CREATE_TUPLE([-mmmx])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],
-        [append])])
-CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
-    [CS_CREATE_TUPLE([-msse])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse],
-        [append])])
-CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
-    [CS_CREATE_TUPLE([-msse2])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse2],
-        [append])])
-CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
-    [CS_CREATE_TUPLE([-mfpmath=sse])], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_mfpmath_sse],
-        [append])])
-
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_CHECK_BUILD([for mmintrin.h],
-        [cs_cv_header_mmintrin_h],
-        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
-        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
-        [C++],
-        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
-        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
-
-
-
-#------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
 # required to embed Perl.  Also determine if the glue file can be created with
 # ExtUtils::Embed or if it must be created manually.
@@ -380,79 +346,11 @@ CS_CHECK_PYTHON([emit], [], [Python scripting interface])
 
 
 #------------------------------------------------------------------------------
-# Check if Java2 SDK is installed and which compiler and linker flags are
+# Check if Java SDK is installed and which compiler and linker flags are
 # needed.  Also check if Ant build tool, which is commonly used to build Java
 # projects, is available.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_JAVA_FLAGS],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
-    AC_REQUIRE([CS_CHECK_HOST])
-    AS_IF([test x$cs_host_macosx = xyes && # Not cross-building for Darwin.
-	test -r /System/Library/Frameworks/JavaVM.framework/Headers],
-	[$1_cflags="-I/System/Library/Frameworks/JavaVM.framework/Headers"
-	$1_libs="-framework JavaVM"],
-	[AS_IF([test -n "$JAVA_HOME"],
-	    [$1_dir="$JAVA_HOME"],
-	    [AS_IF([test -n "$2"],
-		[$1_dir=`AS_DIRNAME([$2])`
-		$1_dir=`AS_DIRNAME([$$1_dir])`],
-		[$1_dir=''])])
-	AS_IF([test -n "$$1_dir"],
-	    [$1_cflags="-I$$1_dir/include"
-	    case $host_os in
-		mingw*|cygwin*) cs_java_platform=win32 ;;
-		*) cs_java_platform=`echo $host_os |
-		    sed 's/^\([[^-]]*\).*$/\1/'` ;;
-	    esac
-	    AS_IF([test -n "$cs_java_platform"],
-		[$1_cflags="$$1_cflags
-		    $$1_cflags/$cs_java_platform"])
-	    $1_cflags=CS_PATH_NORMALIZE([$$1_cflags])
-	    for i in `find "$$1_dir/" -name '*jvm.*' -print`; do
-	        echo `AS_DIRNAME([$i])`; done | sort | uniq > conftest.jlib
-	    $1_lflags=`sed 's/^\(.*\)$/-L\1/' < conftest.jlib`
-	    $1_lflags=CS_PATH_NORMALIZE([$$1_lflags])
-	    rm -f conftest.jlib
-	    $1_libs="-ljvm"])])])
-
-JAVA_HOME=CS_PATH_NORMALIZE([$JAVA_HOME])
-
-AS_IF([test -z "$JAVA" && test -n "$JAVACMD"],
-    [JAVA=CS_PATH_NORMALIZE([$JAVACMD])])
-CS_PATH_PROGS([JAVA], [java], [],
-    [$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
-CS_EMIT_BUILD_PROPERTY([JAVA], [$JAVA])
-
-CS_PATH_PROGS([JAVAC], [javac], [],
-    [$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
-CS_EMIT_BUILD_PROPERTY([JAVAC], [$JAVAC])
-
-AC_ARG_WITH([java], [AC_HELP_STRING([--with-java],
-    [use Java scripting interface (default YES)])])
-AS_IF([test -z "$with_java"], [with_java=yes])
-
-AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
-    [CS_JAVA_FLAGS([cs_java], [$JAVAC])
-    CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
-	[AC_LANG_PROGRAM(
-	    [[#if defined(__GNUC__)
-	    typedef long long __int64; /* For GCC on Windows */
-	    #endif
-	    /* Fix for 'jlong' on x86_64. */
-	    #if defined(__x86_64)
-	    #ifdef _LP64 /* 64-bit Solaris */
-	    #undef _LP64
-	    #endif
-	    #endif
-	    #include <jni.h>
-	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);]],
-	    [JNI_GetCreatedJavaVMs(0,0,0);])],
-	[CS_CREATE_TUPLE() \
-        CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
-	[], [CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
-
-CS_PATH_PROGS([ANT], [ant], [], [$PATH$PATH_SEPARATOR$ANT_HOME/bin])
-CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
+CS_CHECK_JAVA([emit])
 
 
 
@@ -504,7 +402,7 @@ CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
 # optimization levels). This is needed for some code we don't have
 # control over (e.g. SWIG-generated code) that breaks strict-aliasing rules.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for flag to disable string-aliasing],
+CS_CHECK_BUILD_FLAGS([for flag to disable strict-aliasing],
     [cs_cv_prog_cxx_no_strict_aliasing],
     [CS_CREATE_TUPLE([-fno-strict-aliasing])], [C++],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.STRICTALIASING.DISABLE],
@@ -609,13 +507,23 @@ CS_CHECK_VTABLE_THUNKS
 
 
 #------------------------------------------------------------------------------
+# Check how to ask the linker to promote warnings to errors.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD_FLAGS([how to treat linker warnings as errors],
+    [cs_cv_prog_link_enable_errors], [CS_CREATE_TUPLE([-Wl,--fatal-warnings])],
+    [C++])
+
+
+
+#------------------------------------------------------------------------------
 # Check how to ask the linker to export all dynamic symbols in debug mode to
 # allow the backtrace() callstack creation code to obtain symbols in all cases.
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
+CS_CHECK_BUILD_FLAGS([how to export all dynamic symbols],
     [cs_cv_prog_link_export_dynamic], [CS_CREATE_TUPLE([-Wl,-E])],
-    [C++], [COMPILER.LFLAGS.debug], [+])
-
+    [C++], [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.debug],
+        [$cs_cv_prog_link_export_dynamic], [+])],
+    [], [], [$cs_cv_prog_link_enable_errors])
 
 
 #------------------------------------------------------------------------------
@@ -719,12 +627,14 @@ AC_MSG_CHECKING([whether to use CPU-specific optimizations])
 AC_ARG_ENABLE([cpu-specific-optimizations],
     [AC_HELP_STRING([--enable-cpu-specific-optimizations=level],
 	[enable CPU-specific optimizations; recognized levels are `no',
-	`minimum' or `min', `maximum' or `max' (default MINIMUM); the `minimum'
-	option selects optimizations which are likely to be supported by
-	reasonably modern hardware, thus making the resulting executables
-	fairly portable; use the `maximum' option with caution since code for
-	one processor will not work with earlier processors (for example, Intel
-	686-specific code will not work with a 586)])],
+	`minimum' or `min', `maximum' or `max', `native' (default MINIMUM);
+	the `minimum' option selects optimizations which are likely to be 
+	supported by reasonably modern hardware, thus making the resulting 
+	executables fairly portable; use the `maximum' option with caution 
+	since code for one processor will not work with earlier processors
+	(for example, Intel 686-specific code will not work with a 586). The
+	`native' option select optimizations specific for the compiling machine
+	(thus giving a fairly unportable executable).])],
     [case $enable_cpu_specific_optimizations in
 	yes|min) enable_cpu_specific_optimizations=minimum ;;
 	max) enable_cpu_specific_optimizations=maximum ;;
@@ -733,25 +643,21 @@ AC_ARG_ENABLE([cpu-specific-optimizations],
 AC_MSG_RESULT([$enable_cpu_specific_optimizations])
 
 case $enable_cpu_specific_optimizations in
-    no|minimum|maximum) ;;
-    *) CS_MSG_ERROR([unrecognized option; use `no', `minimum', or `maximum'])
+    no|minimum|maximum|native) ;;
+    *) CS_MSG_ERROR([unrecognized option; use `no', `minimum', `maximum' or `native'])
        ;;
 esac
 
 AS_IF([test $enable_cpu_specific_optimizations != no],
     [AC_CACHE_CHECK([for code generation flags], [cs_cv_prog_cxx_code_gen],
 	[cs_cv_prog_cxx_code_gen=no
-	AS_IF([test $enable_cpu_specific_optimizations = maximum],
-	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon -mtune=generic])
-	    CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
-	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
-	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686 -mtune=generic])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro -march=i686])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro])])
+	AS_IF([test $enable_cpu_specific_optimizations = native],
+	    [CS_CHECK_CODE_GEN_FLAG([*], [-march=native -mtune=native])])
+	AS_IF([test $enable_cpu_specific_optimizations = maximum \
+		|| test $enable_cpu_specific_optimizations = native],
+	    [CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=generic])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3 -mtune=pentium3])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=pentium3])])
 	AS_IF([test $host_vendor = apple],
 	    [# Work around issue on intel macs, where "-fpmath=sse" is on by
 	     # default, but this breaks compilation when combined with 
@@ -761,8 +667,15 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	     # -march=i686.
 	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=prescott])
 	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=i686])])
+	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=generic])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-march=k8])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=k8])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686 -mtune=generic])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro -march=i686])
+	CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586 -mtune=generic])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium -march=i586])
@@ -778,6 +691,35 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
     AS_IF([test "$cs_cv_prog_cxx_code_gen" != no],
 	[CS_EMIT_BUILD_PROPERTY(
 	    [COMPILER.CFLAGS], [$cs_cv_prog_cxx_code_gen], [+])])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() and
+# the CPU optimization flags detection since these may alter the build 
+# environment in a way which affects the SIMD flags tests. For instance,
+# they might be impacted on Mac OS X by a universal binary build, or only the
+# "-march" parameter chosen by the optimization flags detection may enable
+# support for specific SIMD instructions.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
+    [CS_CREATE_TUPLE([-mmmx])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],
+        [append])], [],	[$cs_cv_prog_cxx_code_gen])
+CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
+    [CS_CREATE_TUPLE([-mfpmath=sse])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_mfpmath_sse],
+        [append])], [],
+	[$cs_cv_prog_cxx_code_gen $cs_cv_prog_cxx_enable_errors])
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_CHECK_BUILD([for mmintrin.h],
+        [cs_cv_header_mmintrin_h],
+        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
+        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
+        [C++],
+        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
+        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
 
 
 
@@ -1104,22 +1046,20 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 	    [[#if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
-	    #define DIRECTINPUT_VERSION 0x0500
+	    #define DIRECTINPUT_VERSION 0x0800
 	    #include <windows.h>
-	    #include <ddraw.h>
 	    #include <dsound.h>
 	    #include <dinput.h>]],
-	    [DirectDrawCreate(0,0,0); 
-	     DirectSoundCreate$1(0,0,0); 
-	     DirectInputCreate(0,0,0,0)])],
-	[CS_CREATE_TUPLE([],[],[-lddraw -ldsound -ldinput]) \
+	    [DirectSoundCreate$1(0,0,0); 
+	     IID* iid;
+	     DirectInput8Create(0,0,*iid,0,0)])],
+	[CS_CREATE_TUPLE([],[],[-ldsound -ldinput8]) \
 	CS_CREATE_TUPLE([-I/usr/include/directx],[],
-	    [-lddraw -ldsound -ldinput])], 
+	    [-ldsound -ldinput8])], 
 	[C++], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx$1], [DIRECTX$1])])])
 
 AS_IF([test $cs_host_family = windows],
     [AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
-    CS_CHECK_DIRECTX([])
     CS_CHECK_DIRECTX([8])])
 
 
@@ -1367,20 +1307,91 @@ AS_IF([test $cs_cv_libode_opcode = yes],
 # Check for bullet physics library.
 #------------------------------------------------------------------------------
 # Note: The pkg-config package name for Bullet 2.x is 'bullet', but the actual
-# libraries are bulletdynamics, bulletcollision and bulletmath. So note that
-# there is actually no 'bullet' library.
-CS_CHECK_LIB_WITH([bullet],
-    [AC_LANG_PROGRAM(
-      [[#include "btBulletDynamicsCommon.h"
-      #include "btBulletCollisionCommon.h"]],
-      [btCollisionDispatcher* d;
-      btBroadphaseInterface* b;
-      btSequentialImpulseConstraintSolver* s;
-      btDefaultCollisionConfiguration* c;
-      btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
-    [], [C++], [], [],
-    [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
-    [bulletdynamics])
+# libraries are bulletdynamics, bulletcollision and bulletmath... sometimes.
+# On some setups/distros the names BulletDynamics, BulletCollision and
+# LinearMath are used (note case and name differences).
+# So note that there is actually no single 'bullet' library. (Having to deal
+# with that and the different library name styles is the reason for most of the
+# complexity of this check.)
+
+AC_ARG_WITH([bullet], [AC_HELP_STRING([--with-bullet=dir],
+    [specify additional location to search Bullet if not detected automatically; 
+    directories searched include dir/include, dir/lib, and dir])])
+
+# Modified versions of _CS_CHECK_LIB_CREATE_FLAG and _CS_CHECK_LIB_CREATE_FLAG
+# to allow checking for multiple libs at once
+AC_DEFUN([_CS_CHECK_BULLET_CREATE_FLAGS],
+    [for cs_lib_item in $3
+    do
+	case $cs_lib_item in
+	    *\|*) CS_SPLIT(
+		    [$cs_lib_item], [cs_check_incdir,cs_check_libdir], [|])
+		_CS_CHECK_BULLET_CREATE_FLAG([$1],
+		    [$cs_check_incdir], [$cs_check_libdir], [$2])
+		;;
+	    *)  _CS_CHECK_BULLET_CREATE_FLAG([$1],
+		    [$cs_lib_item/include], [$cs_lib_item/lib], [$2])
+		_CS_CHECK_BULLET_CREATE_FLAG(
+		    [$1], [$cs_lib_item], [$cs_lib_item], [$2])
+		;;
+	esac
+    done])
+AC_DEFUN([_CS_CHECK_BULLET_CREATE_FLAG],
+   [AS_IF([test -n "$2"], [cs_check_lib_cflag="-I$2"], [cs_check_lib_cflag=''])
+    AS_IF([test -n "$3"], [cs_check_lib_lflag="-L$3"], [cs_check_lib_lflag=''])
+    AS_IF([test -n "$4"], [cs_check_lib_libs="$4"], [cs_check_lib_libs=''])
+    $1="$$1
+	CS_CREATE_TUPLE(
+	    [$cs_check_lib_cflag],
+	    [$cs_check_lib_lflag],
+	    [$cs_check_lib_libs])"])
+
+AS_IF([test -z "$with_bullet"], [with_bullet=yes])
+AS_IF([test "$with_bullet" != no],
+[
+    # If --with-bullet value is same as cached value, then assume other
+    # cached values are also valid; otherwise, ignore all cached values.
+    AS_IF([test "$with_bullet" != "$cs_cv_with_bullet"],
+        [cs_ignore_cache=yes], [cs_ignore_cache=no])
+
+    # Put relevant subdirs of the library directory into PATH and PKGCONFIG
+    PATH_SAVE="$PATH"
+    AS_IF([test $with_bullet != yes],
+        [PATH="$with_bullet/bin$PATH_SEPARATOR$PATH"
+        _CS_CHECK_PKG_CONFIG_PREPARE_PATH([$with_bullet,
+	    $with_bullet/lib/pkgconfig])])
+    
+    cs_check_lib_flags=''
+    # Check for 'bullet' pkg-config package
+    _CS_CHECK_LIB_PKG_CONFIG_FLAGS([cs_check_lib_flags], [bullet])
+    # Generate flag tuples for plain old libs
+    AS_IF([test $with_bullet != yes],
+        [cs_check_lib_paths=$with_bullet],
+        [cs_check_lib_paths="| cs_lib_paths_default "])
+    _CS_CHECK_BULLET_CREATE_FLAGS([cs_check_lib_flags],
+            [-lBulletDynamics -lBulletCollision -lLinearMath], [$cs_check_lib_paths])
+    _CS_CHECK_BULLET_CREATE_FLAGS([cs_check_lib_flags],
+            [-lbulletdynamics -lbulletcollision -lbulletmath], [$cs_check_lib_paths])
+            
+    CS_CHECK_BUILD([for Bullet], [cs_cv_libbullet],
+    	[AC_LANG_PROGRAM(
+      	    [[#include "btBulletDynamicsCommon.h"
+      	    #include "btBulletCollisionCommon.h"]],
+	    [btCollisionDispatcher* d;
+      	    btBroadphaseInterface* b;
+      	    btSequentialImpulseConstraintSolver* s;
+      	    btDefaultCollisionConfiguration* c;
+      	    btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
+        [$cs_check_lib_flags], [C++], [], [], [$cs_ignore_cache],
+        [], [], [])
+    
+    PATH="$PATH_SAVE"
+    AS_IF([test $with_bullet != yes],
+        [_CS_CHECK_PKG_CONFIG_UNPREPARE_PATH])
+],
+[cs_cv_libbullet=no])
+
+cs_cv_with_bullet="$with_bullet"
 
 AS_IF([test $cs_cv_libbullet = yes],
     [CS_CHECK_BUILD([if bullet is sufficiently recent (>=2.68)], [cs_cv_bullet_recent],
@@ -1620,7 +1631,7 @@ AS_IF([test $cs_cv_libCEGUI = yes],
 	[AC_LANG_PROGRAM(
 	    [[#include <falagard/CEGUIFalWidgetLookManager.h>]],
 	    [CEGUI::WidgetLookManager::getSingleton();
-	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
+	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 7)
 	    who took the ram from the ramalamadingdong?
 	    #endif
 	    ])],
@@ -2110,6 +2121,29 @@ CS_CHECK_BUILD([for MAXPATHLEN], [cs_cv_c_macro_maxpathlen],
 
 
 #------------------------------------------------------------------------------
+# On MinGW, with some versions of the MinGW runtime (3.15 and above), using
+# the STL together with -ansi is broken: the C runtime function swprintf()
+# and vswprintf() are not declared, but an STL header (<cwchar>)
+# unconditionally references it.
+# Detect if this is the case.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_FUNCTION_WITH_ANSI],
+    [CS_CHECK_BUILD([if $1 is available when enforcing C++ standards],
+        [cs_cv_have_$1_with_ansi],
+        [AC_LANG_PROGRAM(
+	    [[#include <stdio.h>
+	    #if HAVE_WCHAR_H
+	    #include <wchar.h>
+	    #endif]],
+	    [using ::$1;])],
+        [], [C++], [], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_ANSI_BREAKS_$1]))], [],
+        [$cs_cv_prog_cxx_enable_pedantic])])
+CS_CHECK_FUNCTION_WITH_ANSI([swprintf])
+CS_CHECK_FUNCTION_WITH_ANSI([vswprintf])
+
+
+
+#------------------------------------------------------------------------------
 # Check for BSD-style socket support.  Also test for presence of type
 # socklen_t.  Note that we must not include both <winsock.h> and the Unix
 # socket-related headers at the same time on Cygwin even though they both exist
@@ -2336,6 +2370,22 @@ CS_CHECK_BUILD([for strtof], [cs_cv_strtof],
 
 
 #------------------------------------------------------------------------------
+# Check for bit operation builtins.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_BUILTIN],
+    [CS_CHECK_BUILD([for $1], [cs_cv_func_$1],
+	[AC_LANG_PROGRAM(
+	    [],
+	    [$1(0)])],
+	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))],
+	[], [], [$cs_cv_prog_cxx_enable_pedantic])])
+CS_CHECK_BUILTIN(__builtin_clz)
+CS_CHECK_BUILTIN(__builtin_ctz)
+CS_CHECK_BUILTIN(__builtin_popcount)
+
+
+
+#------------------------------------------------------------------------------
 # Determine if plugin meta-information should be embedded directly into plugin
 # modules or if it should exist in stand-alone .csplugin files.
 #------------------------------------------------------------------------------
@@ -2476,6 +2526,27 @@ AC_MSG_RESULT([$enable_leak_guard])
 AS_IF([test $enable_leak_guard = yes],
     [CS_HEADER_PROPERTY([CS_USE_LEAK_GUARD])])
 
+
+
+#------------------------------------------------------------------------------
+# Check for valgrind headers
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to build with Valgrind support])
+AS_IF([test $cs_build_mode = debug],
+    [enable_valgrind_default=yes], [enable_valgrind_default=no])
+AC_ARG_ENABLE([valgrind], [AC_HELP_STRING([--enable-valgrind],
+    [enable building with special support for Valgrind, proving additional
+    information on memory blocks and states (default YES in 'debug' build mode, 
+    NO otherwise)])],
+    [], [enable_valgrind=$enable_valgrind_default])
+AC_MSG_RESULT([$enable_valgrind])
+AS_IF([test $enable_valgrind = no],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [-DNVALGRIND], [+])
+    CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [-DNVALGRIND], [+])])
+AC_CHECK_HEADERS([valgrind/valgrind.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_VALGRIND_VALGRIND_H])])
+AC_CHECK_HEADERS([valgrind/memcheck.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_VALGRIND_MEMCHECK_H])])
 
 
 #------------------------------------------------------------------------------

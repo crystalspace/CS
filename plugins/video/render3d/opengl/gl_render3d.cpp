@@ -48,6 +48,7 @@
 #include "csutil/bitarray.h"
 #include "csutil/eventnames.h"
 #include "csutil/scfarray.h"
+#include "csutil/measuretime.h"
 
 #include "gl_r2t_ext_fb_o.h"
 #include "gl_r2t_framebuf.h"
@@ -58,8 +59,9 @@ const int CS_CLIPPER_EMPTY = 0xf008412;
 
 // uses CS_CLIPPER_EMPTY
 #include "gl_stringlists.h"
+#include <csplugincommon/opengl/glenum_identstrs.h>
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
@@ -130,7 +132,7 @@ CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(MakeAString, reader, GetReader,
 SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
-  scfImplementationType (this, parent), isOpen (false), 
+  scfImplementationType (this, parent), isOpen (false), frameNum (0), 
   explicitProjection (false), needMatrixUpdate (true), imageUnits (0),
   activeVertexAttribs (0), wantToSwap (false), delayClearFlags (0),
   currentAttachments (0)
@@ -221,6 +223,19 @@ void csGLGraphics3D::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   csReportV (object_reg, severity, "crystalspace.graphics3d.opengl", msg, arg);
   va_end (arg);
+}
+
+void csGLGraphics3D::CheckGLError (const wchar_t* sourceFile, int sourceLine,
+				   const char* call)
+{
+  GLenum glerror = glGetError();
+  if (glerror != GL_NO_ERROR)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+	    "GL error %s in \"%s\" [%ls:%d]",
+	    CS::PluginCommon::OpenGLErrors.StringForIdent (glerror),
+	    call, sourceFile, sourceLine);
+  }
 }
 
 void csGLGraphics3D::SetCorrectStencilState ()
@@ -1014,8 +1029,12 @@ bool csGLGraphics3D::Open ()
       stencilClearWithZ ? "enabled" : "disabled");
 
   shadermgr = csQueryRegistryOrLoad<iShaderManager> (object_reg,
-    "crystalspace.graphics3d.shadermanager");
-  if (!shadermgr) return false;
+    "crystalspace.graphics3d.shadermanager", false);
+  if (!shadermgr && verbose)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Could not load shader manager. Any attempt at 3D rendering will fail.");
+  }
 
   txtmgr.AttachNew (new csGLTextureManager (
     object_reg, GetDriver2D (), config, this));
@@ -1157,6 +1176,9 @@ bool csGLGraphics3D::Open ()
 
 void csGLGraphics3D::SetupShaderVariables()
 {
+  // Allow start up w/o shader manager
+  if (!shadermgr) return;
+
   /* The shadermanager clears all SVs in Open(), but renderer Open() is called
      before the shadermanager's, thus the renderer needs to catch the open
      event twice, the second time setting up SVs */
@@ -1567,10 +1589,10 @@ void csGLGraphics3D::FinishDraw ()
     G2D->FinishDraw ();
 
   DeactivateBuffers (0, 0);
-
+  
   if (currentAttachments != 0)
   {
-    r2tbackend->FinishDraw();
+    r2tbackend->FinishDraw ((current_drawflags & CSDRAW_READBACK) != 0);
     UnsetRenderTargets();
     currentAttachments = 0;
   }
@@ -1600,7 +1622,10 @@ void csGLGraphics3D::Print (csRect const* area)
   }
   G2D->Print (area);
   
-  r2tbackend->NextFrame();
+  //csPrintf ("frame\n");
+  frameNum++;
+  r2tbackend->NextFrame (frameNum);
+  txtmgr->NextFrame (frameNum);
 }
 
 void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
@@ -1668,7 +1693,8 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   queueEntry.attrib = CS_VATTRIB_SECONDARY_COLOR;
   changeQueue.Push (queueEntry);
   
-  for (int i = 0; i < csMin (numTCUnits, 8); i++)
+  const int n = ( numTCUnits < 8 ) ? numTCUnits : 8 ;
+  for (int i = 0; i < n; i++)
   {
     queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
     queueEntry.attrib = (csVertexAttrib)(CS_VATTRIB_TEXCOORD0+i);
@@ -2857,8 +2883,11 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  if (ext->glDisableVertexAttribArrayARB)
 	  {
 	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
-	    ext->glDisableVertexAttribArrayARB (index);
-	    activeVertexAttribs &= ~(1 << index);
+	    if (activeVertexAttribs & (1 << index))
+	    {
+	      ext->glDisableVertexAttribArrayARB (index);
+	      activeVertexAttribs &= ~(1 << index);
+	    }
 	  }
         }
         else

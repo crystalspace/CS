@@ -138,12 +138,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     return colorList.GetSize () - 1;
   }
 
+  void ParticleEffectorLinColor::RemoveColor (size_t index)
+  {
+    colorList.DeleteIndex (index);
+    precalcInvalid = true;
+  }
+
+  void ParticleEffectorLinColor::Clear ()
+  {
+    colorList.DeleteAll ();
+    precalcInvalid = true;
+  }
+
   void ParticleEffectorLinColor::SetColor (size_t index, const csColor4& color)
   {
     if (index >= colorList.GetSize ())
       return;
 
     colorList[index].color = color;
+
+    precalcInvalid = true;
+  }
+
+  void ParticleEffectorLinColor::SetEndTTL (size_t index, float ttl)
+  {
+    if (index >= colorList.GetSize ())
+      return;
+
+    colorList[index].maxTTL = ttl;
 
     precalcInvalid = true;
   }
@@ -262,12 +284,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     return paramList.GetSize () - 1;
   }
 
+  void ParticleEffectorLinear::RemoveParameterSet (size_t index)
+  {
+    paramList.DeleteIndex (index);
+    precalcInvalid = true;
+  }
+
+  void ParticleEffectorLinear::Clear ()
+  {
+    paramList.DeleteAll ();
+    precalcInvalid = true;
+  }
+
   void ParticleEffectorLinear::SetParameterSet (size_t index, const csParticleParameterSet& param)
   {
     if (index >= paramList.GetSize ())
       return;
 
     paramList[index].param = param;
+
+    precalcInvalid = true;
+  }
+
+  void ParticleEffectorLinear::SetEndTTL (size_t index, float ttl)
+  {
+    if (index >= paramList.GetSize ())
+      return;
+
+    paramList[index].maxTTL = ttl;
 
     precalcInvalid = true;
   }

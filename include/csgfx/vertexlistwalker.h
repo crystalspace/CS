@@ -30,7 +30,7 @@
  * Helper class to make it easier to iterate over elements from
  * renderbuffers, with automatic conversion to \a Tbase. Elements
  * can also be queried as \a Tcomplex, which must consist of multiple
- * \a Tbase.
+ * \a Tbase and support left- and right-value operator[].
  * \remarks The element actually returned (converted or not) is stored 
  *  in an array internal to the class. That has the consequence that for a
  *  queried element, you will only get what you expect as long as 
@@ -38,7 +38,7 @@
  *  have to copy it! This also means you cannot really manipulate the
  *  buffer this way...
  */
-template<typename Tbase, typename Tcomplex = Tbase>
+template<typename Tbase, typename Tcomplex = Tbase[4]>
 class csVertexListWalker
 {
 public:
@@ -59,7 +59,6 @@ public:
     bufferComponents = buffer ? buffer->GetComponentCount () : 0;
     components = (desiredComponents != 0) ? desiredComponents : 
       bufferComponents;
-    CS_ASSERT (components <= maxComponents);
     if (buffer)
     {
       elements = buffer->GetElementCount();
@@ -75,17 +74,15 @@ public:
 
   //@{
   /// Get current element.
-  operator Tbase const*() const
+  operator Tcomplex const& () const
   {
     CS_ASSERT(currElement<elements);
-    return convertedComps;
+    return converted;
   }
   const Tcomplex& operator*() const
   {
     CS_ASSERT(currElement<elements);
-    const Tbase* x = convertedComps;
-    const Tcomplex* y = (Tcomplex*)x;
-    return *y;
+    return converted;
   }
   //@}
 
@@ -128,10 +125,8 @@ private:
   size_t components;
   /// Number of components in the buffer
   size_t bufferComponents;
-  /// Max number of components this class can handle
-  enum { maxComponents = 4 };
   /// Converted components are stored here
-  Tbase convertedComps[maxComponents];
+  Tcomplex converted;
   /// Default component values
   const Tbase* const defaultComponents;
   /// Component type
@@ -151,7 +146,7 @@ private:
     uint8* data = bufLock + (currElement * bufferComponents * sizeof (C));
     for (size_t c = 0; c < components; c++)
     {
-      convertedComps[c] = 
+      converted[c] = 
 	(c < bufferComponents) ? Tbase(*(C*)data) :
 	GetDefaultComponent (c);
       data += sizeof (C);
@@ -180,7 +175,7 @@ private:
       }
       else
         newComp = GetDefaultComponent (c);
-      convertedComps[c] = newComp;
+      converted[c] = newComp;
       data += sizeof (C);
     }
   }

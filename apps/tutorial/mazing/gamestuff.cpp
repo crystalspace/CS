@@ -190,28 +190,36 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
   return true;
 }
 
-bool Maze::CreateLight (const csColor& color,
-  	int x, int y, int z)
+iLight* Maze::CreateLight (const csColor& color,
+  	int x, int y, int z, float radius)
 {
   float sx = float (x) * ROOM_DIMENSION;
   float sy = float (y) * ROOM_DIMENSION;
   float sz = float (z) * ROOM_DIMENSION;
   csRef<iLight> light = app->GetEngine ()
-  	->CreateLight (0, csVector3 (sx, sy, sz), ROOM_DIMENSION * 1.5, color);
-  if (!light) return false;
+  	->CreateLight (0, csVector3 (sx, sy, sz), radius, color);
+  if (!light) return 0;
   GetSector (x, y, z)->GetLights ()->Add (light);
-  return true;
+  return light;
+}
+
+bool Maze::CreateMaterials ()
+{
+  using namespace CS::Material;
+  iMaterialWrapper* mat = MaterialBuilder::CreateParallaxMaterial (
+      app->GetObjectRegistry (), "wall_texture",
+      "/lib/std/castle/castle-brick3_d.jpg",
+      "/lib/std/castle/castle-brick1_n.jpg",
+      "/lib/std/castle/castle-brick1_h.jpg",
+      csVector4 (0.3,0.3,0.3,0.3));
+
+  return mat != 0;
 }
 
 bool Maze::CreateGeometry ()
 {
-  // Load the texture we are going to use for all walls.
-  if (!app->GetLoader ()->LoadTexture ("wall_texture", "/lib/std/stone4.gif"))
-    return app->ReportError ("Error loading 'stone4' texture!");
-
-  iMaterialWrapper* wall_material = app->GetEngine ()->GetMaterialList ()
+  iMaterialWrapper* mat = app->GetEngine ()->GetMaterialList ()
   	->FindByName ("wall_texture");
-
   int x, y, z;
   for (x = 0 ; x < MAZE_DIMENSION ; x++)
     for (y = 0 ; y < MAZE_DIMENSION ; y++)
@@ -219,45 +227,45 @@ bool Maze::CreateGeometry ()
         if (!CreateSector (x, y, z))
 	  return false;
 
-  if (!CreateRoom (wall_material, 0, 0, 0, "....#.")) return false;
-  if (!CreateRoom (wall_material, 0, 0, 1, "....##")) return false;
-  if (!CreateRoom (wall_material, 0, 0, 2, "#..#.#")) return false;
-  if (!CreateRoom (wall_material, 1, 0, 0, "...##.")) return false;
-  if (!CreateRoom (wall_material, 1, 0, 1, "....##")) return false;
-  if (!CreateRoom (wall_material, 1, 0, 2, "..#..#")) return false;
-  if (!CreateRoom (wall_material, 2, 0, 0, "#.#.#.")) return false;
-  if (!CreateRoom (wall_material, 2, 0, 1, "....##")) return false;
-  if (!CreateRoom (wall_material, 2, 0, 2, ".....#")) return false;
+  if (!CreateRoom (mat, 0, 0, 0, "....#.")) return false;
+  if (!CreateRoom (mat, 0, 0, 1, "....##")) return false;
+  if (!CreateRoom (mat, 0, 0, 2, "#..#.#")) return false;
+  if (!CreateRoom (mat, 1, 0, 0, "...##.")) return false;
+  if (!CreateRoom (mat, 1, 0, 1, "....##")) return false;
+  if (!CreateRoom (mat, 1, 0, 2, "..#..#")) return false;
+  if (!CreateRoom (mat, 2, 0, 0, "#.#.#.")) return false;
+  if (!CreateRoom (mat, 2, 0, 1, "....##")) return false;
+  if (!CreateRoom (mat, 2, 0, 2, ".....#")) return false;
 
-  if (!CreateRoom (wall_material, 0, 1, 0, "#..#..")) return false;
-  if (!CreateRoom (wall_material, 0, 1, 1, "...##.")) return false;
-  if (!CreateRoom (wall_material, 0, 1, 2, ".#.#.#")) return false;
-  if (!CreateRoom (wall_material, 1, 1, 0, "..#.#.")) return false;
-  if (!CreateRoom (wall_material, 1, 1, 1, "#.#..#")) return false;
-  if (!CreateRoom (wall_material, 1, 1, 2, "..##..")) return false;
-  if (!CreateRoom (wall_material, 2, 1, 0, ".#..#.")) return false;
-  if (!CreateRoom (wall_material, 2, 1, 1, "....##")) return false;
-  if (!CreateRoom (wall_material, 2, 1, 2, "#.#..#")) return false;
+  if (!CreateRoom (mat, 0, 1, 0, "#..#..")) return false;
+  if (!CreateRoom (mat, 0, 1, 1, "...##.")) return false;
+  if (!CreateRoom (mat, 0, 1, 2, ".#.#.#")) return false;
+  if (!CreateRoom (mat, 1, 1, 0, "..#.#.")) return false;
+  if (!CreateRoom (mat, 1, 1, 1, "#.#..#")) return false;
+  if (!CreateRoom (mat, 1, 1, 2, "..##..")) return false;
+  if (!CreateRoom (mat, 2, 1, 0, ".#..#.")) return false;
+  if (!CreateRoom (mat, 2, 1, 1, "....##")) return false;
+  if (!CreateRoom (mat, 2, 1, 2, "#.#..#")) return false;
 
-  if (!CreateRoom (wall_material, 0, 2, 0, ".#.#..")) return false;
-  if (!CreateRoom (wall_material, 0, 2, 1, "...#..")) return false;
-  if (!CreateRoom (wall_material, 0, 2, 2, "...#..")) return false;
-  if (!CreateRoom (wall_material, 1, 2, 0, "..##..")) return false;
-  if (!CreateRoom (wall_material, 1, 2, 1, ".###..")) return false;
-  if (!CreateRoom (wall_material, 1, 2, 2, "..##..")) return false;
-  if (!CreateRoom (wall_material, 2, 2, 0, "..#...")) return false;
-  if (!CreateRoom (wall_material, 2, 2, 1, "..#...")) return false;
-  if (!CreateRoom (wall_material, 2, 2, 2, ".##...")) return false;
+  if (!CreateRoom (mat, 0, 2, 0, ".#.#..")) return false;
+  if (!CreateRoom (mat, 0, 2, 1, "...#..")) return false;
+  if (!CreateRoom (mat, 0, 2, 2, "...#..")) return false;
+  if (!CreateRoom (mat, 1, 2, 0, "..##..")) return false;
+  if (!CreateRoom (mat, 1, 2, 1, ".###..")) return false;
+  if (!CreateRoom (mat, 1, 2, 2, "..##..")) return false;
+  if (!CreateRoom (mat, 2, 2, 0, "..#...")) return false;
+  if (!CreateRoom (mat, 2, 2, 1, "..#...")) return false;
+  if (!CreateRoom (mat, 2, 2, 2, ".##...")) return false;
 
-  if (!CreateLight (csColor (1, 0, 0), 0, 0, 0)) return false;
-  if (!CreateLight (csColor (0, 0, 1), 0, 0, 2)) return false;
-  if (!CreateLight (csColor (0, 1, 0), 1, 0, 1)) return false;
-  if (!CreateLight (csColor (1, 1, 0), 1, 1, 1)) return false;
-  if (!CreateLight (csColor (0, 1, 1), 0, 1, 1)) return false;
-  if (!CreateLight (csColor (1, 1, 1), 2, 1, 2)) return false;
-  if (!CreateLight (csColor (1, 0, 0), 1, 2, 1)) return false;
-  if (!CreateLight (csColor (0, 0, 1), 0, 2, 0)) return false;
-  if (!CreateLight (csColor (0, 1, 0), 2, 2, 0)) return false;
+  if (!CreateLight (csColor (.6, 0, 0),   0, 0, 0)) return false;
+  if (!CreateLight (csColor (0, 0, .6),   0, 0, 2)) return false;
+  if (!CreateLight (csColor (0, .6, 0),   1, 0, 1)) return false;
+  if (!CreateLight (csColor (.6, .6, 0),  1, 1, 1)) return false;
+  if (!CreateLight (csColor (0, .6, .6),  0, 1, 1)) return false;
+  if (!CreateLight (csColor (.6, .6, .6), 2, 1, 2)) return false;
+  if (!CreateLight (csColor (.6, 0, 0),   1, 2, 1)) return false;
+  if (!CreateLight (csColor (0, 0, .6),   0, 2, 0)) return false;
+  if (!CreateLight (csColor (0, .6, 0),   2, 2, 0)) return false;
 
   return true;
 }
@@ -412,6 +420,13 @@ Adversary::Adversary (AppMazing* app,
   Adversary::mesh = mesh;
   current_location = rc;
   moving = false;
+  light = 0;
+}
+
+Adversary::~Adversary ()
+{
+  if (light)
+    app->GetEngine ()->RemoveObject (light);
 }
 
 void Adversary::ThinkAndMove (float elapsed_seconds)
@@ -456,6 +471,11 @@ void Adversary::ThinkAndMove (float elapsed_seconds)
     bool mirror;
     iSector* new_sector = old_sector->FollowSegment (
     	movable->GetTransform (), new_pos, mirror, true);
+    movable->SetSector (new_sector);
+    movable->GetTransform ().SetOrigin (new_pos);
+    movable->UpdateMove ();
+
+    movable = light->GetMovable ();
     movable->SetSector (new_sector);
     movable->GetTransform ().SetOrigin (new_pos);
     movable->UpdateMove ();
@@ -654,7 +674,9 @@ bool Game::CreateAdversary (int x, int y, int z)
   adversaries.Push (adv);
   adversary->QueryObject ()->ObjAdd ((iObject*)adv);
   adv->DecRef ();
-  
+
+  adv->SetLight (maze.CreateLight (csColor (1,1,1), x, y, z, ROOM_DIMENSION));
+
   return true;
 }
 
@@ -667,6 +689,8 @@ bool Game::InitCollisionDetection ()
 
 bool Game::SetupGame ()
 {
+  if (!maze.CreateMaterials ())
+    return app->ReportError("Error creating the materials!");
   if (!maze.CreateGeometry ())
     return app->ReportError("Error creating the geometry!");
 
@@ -676,6 +700,7 @@ bool Game::SetupGame ()
   iEngine* engine = app->GetEngine ();
   engine->Prepare ();
 
+#if 0
   using namespace CS::Lighting;
   size_t i;
   iSectorList* sl = engine->GetSectors ();
@@ -684,6 +709,7 @@ bool Game::SetupGame ()
     iSector* s = sl->Get (i);
     SimpleStaticLighter::ShineLights (s, engine, 8);
   }
+#endif
 
   if (!InitCollisionDetection ())
     return false;

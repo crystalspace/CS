@@ -135,16 +135,16 @@ private:
     int index;
     csColorBox* box;
 
-    ColorIndex() : box(0) {}
+    ColorIndex () : box(0) {}
   };
 
   // The storage for color usage histogram.
-  uint16 *hist;
+  uint16* hist;
   // Total number of colors that were used to create the histogram.
   unsigned int hist_pixels;
 
   // The storage for color space boxes.
-  csColorBox *box;
+  csColorBox* box;
   // Number of valid color boxes.
   int boxcount;
   // The storage for color indices.
@@ -161,7 +161,7 @@ private:
     qsRemap
   } qState;
 
-  static int compare_boxes (const void *i1, const void *i2);
+  static int compare_boxes (const void* i1, const void* i2);
 
 public:
   /// Construct a new quantizer object.
@@ -191,27 +191,27 @@ public:
    *     (actual number of colors on return)
    * \param dither Use/do not use Floyd-Steinberg dithering
    */
-  void DoRGB (csRGBpixel *image, int pixels, int pixperline,
-    uint8 *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither);
+  void DoRGB (csRGBpixel* image, int pixels, int pixperline,
+    uint8*& outimage, csRGBpixel*& outpalette, int& maxcolors, bool dither);
 
   /// Begin quantization
   void Begin ();
   /// Finish quantization
   void End ();
   /// Count the colors in a image and update the color histogram
-  void Count (csRGBpixel *image, int pixels, csRGBpixel *transp = 0);
+  void Count (csRGBpixel* image, int pixels, csRGBpixel* transp = 0);
   /// Bias the color histogram towards given colors (weight = 0..100)
-  void Bias (csRGBpixel *colors, int count, int weight);
+  void Bias (csRGBpixel* colors, int count, int weight);
   /// Compute the optimal palette for all images passed to QuantizeCount()
-  void Palette (csRGBpixel *&outpalette, int &maxcolors,
-    csRGBpixel *transp = 0);
+  void Palette (csRGBpixel*& outpalette, int &maxcolors,
+    csRGBpixel* transp = 0);
   /// Remap a image to the palette computed by Palette()
-  void Remap (csRGBpixel *image, int pixels, uint8 *&outimage,
-    csRGBpixel *transp = 0);
+  void Remap (csRGBpixel* image, int pixels, uint8*& outimage,
+    csRGBpixel* transp = 0);
   /// Same but apply Floyd-Steinberg dithering for nicer (but slower) results.
-  void RemapDither (csRGBpixel *image, int pixels, int pixperline,
-    csRGBpixel *palette, int colors, uint8 *&outimage,
-    csRGBpixel *transp = 0);
+  void RemapDither (csRGBpixel* image, int pixels, int pixperline,
+    csRGBpixel* palette, int colors, uint8*& outimage,
+    csRGBpixel* transp = 0);
 };
 
 /** @} */

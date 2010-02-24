@@ -68,6 +68,13 @@ private:
   bool AutoResize;
 
   CS::Utility::MeshFilter meshFilter;
+
+  // View width.
+  int viewWidth;
+
+  // View height.
+  int viewHeight;
+
 public:
   /// Constructor.
   csView (iEngine *iEngine, iGraphics3D* ig3d);
@@ -96,7 +103,7 @@ public:
   virtual void SetContext (iGraphics3D *ig3d);
 
   /// Set clipping rectangle.
-  virtual void SetRectangle (int x, int y, int w, int h);
+  virtual void SetRectangle (int x, int y, int w, int h, bool restrict = true);
   /// Clear clipper in order to start building a polygon-based clipper.
   virtual void ClearView ();
   /// Add a vertex to clipping polygon (non-rectangular clipping).
@@ -118,6 +125,30 @@ public:
   virtual CS::Utility::MeshFilter& GetMeshFilter ()
   {
     return meshFilter;
+  }
+
+  // Get the view width.
+  virtual int GetWidth () const
+  {
+    return viewWidth;
+  }
+
+  // Get the view height.
+  virtual int GetHeight () const
+  {
+    return viewHeight;
+  }
+
+  // Set the view width.
+  virtual void SetWidth (int w)
+  {
+    viewWidth = w;
+  }
+
+  // Set the view height.
+  virtual void SetHeight (int h)
+  {
+    viewHeight = h;
   }
 };
 

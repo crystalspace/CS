@@ -30,19 +30,22 @@
 
 struct iObjectRegistry;
 struct iScript;
+struct iTextureHandle;
 
 /**
  * Interface for the CS CEGUI wrapper.
  */
 struct iCEGUI : public virtual iBase
 {
-  SCF_INTERFACE (iCEGUI, 1, 0, 0);
+  SCF_INTERFACE (iCEGUI, 3, 0, 0);
 
   /**
    * Initialize the plugin.
    * \param script iScript plugin to use as a scripting module.
    */
   virtual bool Initialize (iScript* script=0) = 0;
+
+  virtual bool IsInitialized () = 0;
 
   /// Render the GUI.
   virtual void Render () const = 0;
@@ -85,6 +88,9 @@ struct iCEGUI : public virtual iBase
 
   /// Keep CEGUI from capturing keyboard events.
   virtual void DisableKeyboardCapture () = 0;
+
+  /// Create a texture from a CS texturehandle.
+  virtual CEGUI::Texture& CreateTexture (iTextureHandle* htxt)= 0;
 };
 
 #endif

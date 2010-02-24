@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2009 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -67,7 +67,10 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_RELAYTOOL],
 	    [enable_relaytool=yes])
     AS_IF([test "$enable_relaytool" != "no"],
 	[CS_PATH_TOOL([RELAYTOOL], [relaytool], [], [$1])
-	CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL], [$RELAYTOOL], [], [], [$2])])])
+	CS_CHECK_PROGS([BASH], [bash])
+	AS_IF([test -n "$BASH"],
+	    [CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL],
+	        [$BASH $RELAYTOOL], [atomic], [], [$2])])])])
 
 
 #------------------------------------------------------------------------------
@@ -82,7 +85,7 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_BASIC],
     CS_EMIT_BUILD_PROPERTY([CMD.MKDIR], [$MKDIR], [], [], [$1])
     CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS], [], [], [$1])
 
-    CS_CHECK_PROGS([INSTALL], [install], [], [], [$1])
+    CS_CHECK_PROGS([INSTALL], [install])
     CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL], [], [], [$1])
     AC_PROG_LN_S
     CS_EMIT_BUILD_PROPERTY([LN_S], [$LN_S], [], [], [$1])])
@@ -142,12 +145,32 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_ICONS],
     # icotool: for creating Win32 ICO files
     CS_CHECK_PROGS([ICOTOOL], [icotool])
     CS_EMIT_BUILD_PROPERTY([CMD.ICOTOOL], [$ICOTOOL], [], [], [$1])
+    AS_IF([test -n "$ICOTOOL"],
+	[AC_CACHE_CHECK([whether icotool supports --raw], [cs_cv_icotool_supports_raw],
+	    [cs_cv_icotool_supports_raw=no
+	    AS_IF([AC_TRY_COMMAND(
+		    [$ICOTOOL 2>/dev/null | grep -e "--raw" >/dev/null 2>&1])],
+		    [cs_cv_icotool_supports_raw=yes])
+	    ])
+	CS_EMIT_BUILD_PROPERTY([ICOTOOL.SUPPORTS_RAW],
+	    [$cs_cv_icotool_supports_raw], [], [], [$1])
+	])
 
     # convert: for various image manipulations from both the svg conversion and
     #  ICO creation.
     CS_CHECK_PROGS([CONVERT], [convert])
-    CS_EMIT_BUILD_PROPERTY([CMD.CONVERT], [$CONVERT], [], [], [$1])])
+    CS_EMIT_BUILD_PROPERTY([CMD.CONVERT], [$CONVERT], [], [], [$1])
 
+    # pngcrush: if available, run over the PNGs created for icons.
+    #  (This is not so much about the size as about stripping "creation" and
+    #  "modification" time comments convert seems to put into PNGs.)
+    CS_CHECK_PROGS([PNGCRUSH], [pngcrush])
+    CS_EMIT_BUILD_PROPERTY([CMD.PNGCRUSH], [$PNGCRUSH], [], [], [$1])
+    
+    # Tools needed to generate OS/X icons.
+    CS_CHECK_PROGS([MAKEICNS], [makeicns])
+    CS_EMIT_BUILD_PROPERTY([CMD.MAKEICNS], [$MAKEICNS], [], [], [$1])
+    ])
 
 #------------------------------------------------------------------------------
 # CS_CHECK_COMMON_LIBS([EMITTER])

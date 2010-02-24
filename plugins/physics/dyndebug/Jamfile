@@ -1,0 +1,8 @@
+SubDir TOP plugins physics dyndebug ;
+
+if $(ODE.AVAILABLE) = "yes" || $(BULLET.AVAILABLE) = "yes"
+{
+  Description dyndebug : "Debugging of physical simulations" ;
+  Plugin dyndebug : [ Wildcard *.cpp *.h ] ;
+  LinkWith dyndebug : crystalspace ;
+}

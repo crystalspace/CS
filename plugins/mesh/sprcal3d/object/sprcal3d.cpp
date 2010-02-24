@@ -62,7 +62,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 // STL include required by cal3d
 #include <string>
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(SprCal3d)
 {
@@ -168,11 +168,11 @@ void csSpriteCal3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 
 csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
   csSpriteCal3DMeshObjectType* pParent, iObjectRegistry* object_reg) : 
-  scfImplementationType (this, (iBase*)pParent), sprcal3d_type (pParent), 
+  scfImplementationType (this, (iBase*)pParent), sprcal3d_type (pParent),
   calCoreModel("no name")
 {
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
-
+  currentScalingFactor = 1;
   skel_factory.AttachNew (new csCal3dSkeletonFactory ());
 }
 
@@ -214,6 +214,12 @@ void csSpriteCal3DMeshObjectFactory::RescaleFactory(float factor)
 {
   calCoreModel.scale(factor);
   calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
+  currentScalingFactor *= factor;
+}
+
+void csSpriteCal3DMeshObjectFactory::AbsoluteRescaleFactory(float factor)
+{
+    RescaleFactory(factor/currentScalingFactor);
 }
 
 bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
@@ -952,7 +958,7 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
     new_socket->SetMeshWrapper (0);
   }
 
-  skeleton = new csCal3dSkeleton (cal_skeleton, factory->skel_factory, this);
+  skeleton.AttachNew(new csCal3dSkeleton (cal_skeleton, factory->skel_factory, this));
 }
 
 
@@ -1511,8 +1517,7 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
     idle_override_interval -= delta;
     if ((idle_override_interval <= 0) && (default_idle_anim != -1))
     {
-      csRandomGen rng;
-      SetIdleOverrides(&rng,default_idle_anim);
+      SetIdleOverrides(&randomGen,default_idle_anim);
       SetAnimAction(factory->anims[idle_action]->name,.25,.25);
     }
   }
@@ -1737,11 +1742,7 @@ void csSpriteCal3DMeshObject::SetDefaultIdleAnim(const char *name)
 {
     default_idle_anim = FindAnim(name);
     if( default_idle_anim != -1 )
-    {
-      float max_interval(factory->anims[default_idle_anim]->max_interval);
-      if(idle_override_interval > max_interval)
-        idle_override_interval = max_interval;
-    }
+      SetIdleOverrides(&randomGen,default_idle_anim);
 }
 
 bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
@@ -2311,8 +2312,10 @@ csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton,
   std::vector<CalBone*> cal_bones = skeleton->getVectorBone ();
   for (size_t i = 0; i < cal_bones.size (); i++)
   {
-    bones.Push (new csCal3dSkeletonBone (cal_bones[i],
-	  skel_factory->GetBone (i), this));
+    csRef<csCal3dSkeletonBone> bone;
+    bone.AttachNew(new csCal3dSkeletonBone (cal_bones[i],
+         skel_factory->GetBone (i), this));
+    bones.Push (bone);
   }
   for (size_t i = 0; i < cal_bones.size (); i++)
   {

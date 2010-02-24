@@ -33,12 +33,25 @@
 class csColor
 {
 public:
-  /// Red (0..1)
-  float red;
-  /// Green (0..1)
-  float green;
-  /// Blue (0..1)
-  float blue;
+#if !defined(__STRICT_ANSI__) && !defined(SWIG)
+  union
+  {
+    struct 
+    {
+#endif
+      /// Red (0..1)
+      float red;
+      /// Green (0..1)
+      float green;
+      /// Blue (0..1)
+      float blue;
+#if !defined(__STRICT_ANSI__) && !defined(SWIG)
+    };
+    /// All components
+    float m[3];
+  };
+#endif
+
 public:
   /// Initialize a color object (contents undefined)
   csColor () { }
@@ -120,6 +133,20 @@ public:
   /// Return luminance of pixel (assuming sRGB color space)
   float Luminance() const
   { return red*0.2126f + green*0.7152f + blue*0.0722f; }
+
+  /// Returns n-th component of the color.
+#ifdef __STRICT_ANSI__
+  inline float operator[] (size_t n) const { return !n?red:n&1?green:blue; }
+#else
+  inline float operator[] (size_t n) const { return m[n]; }
+#endif
+
+  /// Returns n-th component of the color.
+#ifdef __STRICT_ANSI__
+  inline float & operator[] (size_t n) { return !n?red:n&1?green:blue; }
+#else
+  inline float & operator[] (size_t n) { return m[n]; }
+#endif
 };
 
 /// Divide a color by a scalar.
@@ -247,6 +274,14 @@ public:
 	   blue != c.blue ||
 	   alpha != c.alpha;
   }
+
+  /// Returns n-th component of the color.
+  inline float operator[] (size_t n) const
+  { return (n == 3) ? alpha : csColor::operator[] (n); }
+
+  /// Returns n-th component of the color.
+  inline float & operator[] (size_t n)
+  { return (n == 3) ? alpha : csColor::operator[] (n); }
 };
 
 

@@ -257,11 +257,11 @@ namespace CS
           bytesRemaining -= sizeof(csMD5::Digest);
         
           DocStackEntry scanEntry = scanStack.PopTop();
+	  PushReferencedFiles (scanEntry);
           csMD5::Digest entryDigest (scanEntry.ComputeHash ());
           actualHashes.Write ((char*)&entryDigest, sizeof(csMD5::Digest));
           if (memcmp (&diskDigest, &entryDigest, sizeof(csMD5::Digest)) != 0)
             return false;
-	  PushReferencedFiles (scanEntry);
         }
         
         if (bytesRemaining > 0) return false;
@@ -300,7 +300,7 @@ namespace CS
 	buf.AttachNew (new csParasiticDataBuffer (allFileData,
 	  file->GetPos(), bufSize));
 	if (buf->GetSize() != bufSize) return 0;
-	size_t pad = 4 - (bufSize & 3);
+	uint32 pad = 4 - (bufSize & 3);
 	if (pad < 4) bufSize += pad;
 	file->SetPos (file->GetPos() + bufSize);
 	return csPtr<iDataBuffer> (buf);
@@ -593,6 +593,7 @@ namespace CS
       bool MicroArchiveCache::CacheData (const void* data, size_t size,
 	const char* path)
       {
+	if (!parentCache->IsCacheWriteable()) return false;
         csRef<CS::DataBuffer<> > dbuf;
         dbuf.AttachNew (new CS::DataBuffer<> (size));
         memcpy (dbuf->GetData(), data, size);

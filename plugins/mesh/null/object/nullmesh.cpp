@@ -33,7 +33,7 @@
 #include "iutil/objreg.h"
 #include "csqsqrt.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 csNullmeshMeshObject::csNullmeshMeshObject (csNullmeshMeshFactory* factory,
                                             iMeshObjectType* parent)
@@ -110,7 +110,7 @@ void csNullmeshMeshObject::GetRadius (float& rad, csVector3& cent)
 
 //----------------------------------------------------------------------
 csNullmeshMeshFactory::csNullmeshMeshFactory (csNullmeshMeshObjectType* type)
-: scfImplementationType(this), nullmesh_type (type)
+: scfImplementationType(this), nullmesh_type (type), collision_data(0)
 {
   csVector3 b1 (-1, -1, -1);
   csVector3 b2 (1, 1, 1);
