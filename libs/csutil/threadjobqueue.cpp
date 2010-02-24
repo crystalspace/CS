@@ -36,11 +36,15 @@ namespace CS
 namespace Threading
 {
 
-  ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers, ThreadPriority priority)
+  ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers, ThreadPriority priority,
+    const char* name)
     : scfImplementationType (this), 
     numWorkerThreads (numWorkers), 
-    shutdownQueue (0), outstandingJobs (0)
+    shutdownQueue (0), outstandingJobs (0), name (name)
   {
+    if (this->name.IsEmpty())
+      this->name.Format ("Queue [%p]", this);
+
     allThreadState = new ThreadState*[numWorkerThreads];
 
     // Start up the threads
@@ -170,7 +174,7 @@ namespace Threading
       }
     }
   }
-  
+
   bool ThreadedJobQueue::IsFinished ()
   {
     int32 c = CS::Threading::AtomicOperations::Read (&outstandingJobs);
@@ -207,7 +211,7 @@ namespace Threading
     ThreadState* ts, unsigned int id)
     : ownerQueue (queue), threadState (ts)
   {
-    name.Format ("Queue [%p] Runner %d", queue, id);
+    name.Format ("#%u %s", id, queue->GetName());
   }
 
   void ThreadedJobQueue::QueueRunnable::Run ()

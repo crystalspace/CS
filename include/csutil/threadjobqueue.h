@@ -44,7 +44,16 @@ class CS_CRYSTALSPACE_EXPORT ThreadedJobQueue :
   public scfImplementation1<ThreadedJobQueue, iJobQueue>
 {
 public:
-  ThreadedJobQueue (size_t numWorkers = 1, ThreadPriority priority = THREAD_PRIO_NORMAL);
+  /**
+   * Construct job queue.
+   * \param numWorkers Number of worker threads to use.
+   * \param priority Priority of worker threads.
+   * \param name Optional name of the queue.
+   *   Used in worker thread naming and shows up in the debugger,
+   *   if supported.
+   */
+  ThreadedJobQueue (size_t numWorkers = 1, ThreadPriority priority = THREAD_PRIO_NORMAL,
+    const char* name = 0);
   virtual ~ThreadedJobQueue ();
 
   virtual void Enqueue (iJob* job);
@@ -54,10 +63,12 @@ public:
   virtual int32 GetQueueCount();
   virtual void WaitAll ();
 
+  /// Get name of this queue
+  const char* GetName () const { return name; }
 private:
 
   bool PullFromQueues (iJob* job);
-  
+
   // Runnable
   struct ThreadState;  
 
@@ -68,7 +79,6 @@ private:
 
     virtual void Run ();
     virtual const char* GetName () const;
-
   private:
     ThreadedJobQueue* ownerQueue;
     ThreadState* threadState;
@@ -104,6 +114,7 @@ private:
   size_t numWorkerThreads;
   int32 shutdownQueue;
   int32 outstandingJobs;
+  csString name;
 };
 
 }
