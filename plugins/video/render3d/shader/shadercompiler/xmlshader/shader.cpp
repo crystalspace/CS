@@ -1763,7 +1763,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     tech.techNode = wrappedNode;
 
-    //if (cacheTo)
     {
       csRef<csMemFile> cacheFile;
       cacheFile.AttachNew (new csMemFile);
@@ -1797,9 +1796,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           cacheFile.Invalidate();
         if (cacheFile.IsValid())
         {
-          //csRef<iDataBuffer> cacheData (cacheFile->GetAllData());
-          //cacheTo->CacheData (cacheData->GetData(), cacheData->GetSize(),
-            //"/doc");
           cacheData = cacheFile->GetAllData();
         }
       }
