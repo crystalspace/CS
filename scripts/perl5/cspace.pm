@@ -1600,6 +1600,34 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::AtomicRefCount ##############
+
+package cspace::AtomicRefCount;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_AtomicRefCount(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*IncRef = *cspacec::AtomicRefCount_IncRef;
+*DecRef = *cspacec::AtomicRefCount_DecRef;
+*GetRefCount = *cspacec::AtomicRefCount_GetRefCount;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csPluginRequest ##############
 
 package cspace::csPluginRequest;

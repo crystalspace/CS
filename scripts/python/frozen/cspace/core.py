@@ -704,6 +704,19 @@ class InternalRefCount(object):
 InternalRefCount_swigregister = _core.InternalRefCount_swigregister
 InternalRefCount_swigregister(InternalRefCount)
 
+class AtomicRefCount(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_AtomicRefCount(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def IncRef(*args): return _core.AtomicRefCount_IncRef(*args)
+    def DecRef(*args): return _core.AtomicRefCount_DecRef(*args)
+    def GetRefCount(*args): return _core.AtomicRefCount_GetRefCount(*args)
+AtomicRefCount_swigregister = _core.AtomicRefCount_swigregister
+AtomicRefCount_swigregister(AtomicRefCount)
+
 csDefaultRunLoop = _core.csDefaultRunLoop
 csPlatformStartup = _core.csPlatformStartup
 csPlatformShutdown = _core.csPlatformShutdown
