@@ -28,9 +28,8 @@
 #include "ivaria/reporter.h"
 
 #include "csutil/cfgacc.h"
-#include "csutil/csendian.h"
-#include "csutil/memfile.h"
-#include "csutil/parasiticdatabuffer.h"
+#include "csutil/platform.h"
+#include "csutil/threadjobqueue.h"
 #include "csutil/xmltiny.h"
 
 #include "weaver.h"
@@ -115,6 +114,18 @@ csRef<iDocumentNode> WeaverCompiler::CreateAutoNode (csDocumentNodeType type) co
     autoDocRoot->SetValue ("(auto)");
   }
   return autoDocRoot->CreateNodeBefore (type);
+}
+
+iJobQueue* WeaverCompiler::GetSynthQueue()
+{
+  if (!synthQueue.IsValid())
+  {
+    CS::Threading::ThreadedJobQueue* newQueue =
+      new CS::Threading::ThreadedJobQueue (CS::Platform::GetProcessorCount(),
+      CS::Threading::THREAD_PRIO_NORMAL, "weaver synth");
+    synthQueue.AttachNew (newQueue);
+  }
+  return synthQueue;
 }
 
 bool WeaverCompiler::Initialize (iObjectRegistry* object_reg)

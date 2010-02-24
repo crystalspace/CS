@@ -30,6 +30,7 @@ struct iSyntaxService;
 struct iLoaderContext;
 struct iVFS;
 struct iDocumentNode;
+struct iJobQueue;
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
@@ -91,6 +92,7 @@ public:
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;
   csRef<iShaderCompiler> xmlshader;
+  csRef<iJobQueue> synthQueue;
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/weaver/weaver.tok"
 #include "cstool/tokenlist.h"
@@ -100,6 +102,9 @@ public:
    */
   mutable csRef<iDocumentNode> autoDocRoot;
   csRef<iDocumentNode> CreateAutoNode (csDocumentNodeType type) const;
+
+  /// Get the job queue used for shader technique synthesis
+  iJobQueue* GetSynthQueue();
 };
 
 }
