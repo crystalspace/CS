@@ -102,7 +102,8 @@ csCommonImageFile::csCommonImageFile (iObjectRegistry* object_reg, int format)
   jobQueue = csQueryRegistryTagInterface<iJobQueue> (object_reg, queueTag);
   if (!jobQueue.IsValid())
   {
-    jobQueue.AttachNew (new CS::Threading::ThreadedJobQueue ());
+    jobQueue.AttachNew (new CS::Threading::ThreadedJobQueue (1,
+      CS::Threading::THREAD_PRIO_NORMAL, "image load"));
     object_reg->Register (jobQueue, queueTag);
   }
 #endif
