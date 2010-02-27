@@ -55,6 +55,7 @@ LIGHTER2.PLUGINLIST =
   rendstep_std
   rendstep_stencil
   reporter
+  rm_unshadowed
   sequence
   shadermgr
   shaderweaver
@@ -68,10 +69,13 @@ LIGHTER2.PLUGINLIST =
   spr3dldr
   stdpt
   stdrep
+  terrain2
+  terrain2ldr
   bruteblock
   terrainldr
   xmlread
   xmlshader
+  xmltiny
   ;
 
 if $(ZLIB.AVAILABLE) = "yes"
