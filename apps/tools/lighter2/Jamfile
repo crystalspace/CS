@@ -55,7 +55,7 @@ LIGHTER2.PLUGINLIST =
   rendstep_std
   rendstep_stencil
   reporter
-  rm_unshadowed
+  rm_null
   sequence
   shadermgr
   shaderweaver
