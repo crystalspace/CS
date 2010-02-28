@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "crystalspace.h"
+#include "cssysdef.h"
 
 #include "csplugincommon/rendermanager/dependenttarget.h"
 #include "csplugincommon/rendermanager/hdrhelper.h"
@@ -35,7 +35,8 @@
 
 #include "shadow_pssm.h"
 
-
+#include "iutil/verbositymanager.h"
+#include "ivaria/reporter.h"
 
 using namespace CS::RenderManager;
 

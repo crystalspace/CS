@@ -24,6 +24,8 @@
  */
 
 #include "iengine/mesh.h"
+#include "imesh/object.h"
+#include "imesh/objmodel.h"
 #include "csgeom/polyclip.h"
 
 #include "csplugincommon/rendermanager/posteffects.h"

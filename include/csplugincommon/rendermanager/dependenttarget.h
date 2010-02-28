@@ -23,6 +23,8 @@
 /**\file
  * Dependent target manager.
  */
+
+#include "iengine/rendermanager.h"
  
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"

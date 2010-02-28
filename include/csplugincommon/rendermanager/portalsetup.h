@@ -25,6 +25,7 @@
 
 #include "iengine/movable.h"
 #include "iengine/portal.h"
+#include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
