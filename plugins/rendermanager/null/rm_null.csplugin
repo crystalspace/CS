@@ -7,9 +7,6 @@
         <name>crystalspace.rendermanager.null</name>
         <implementation>RMNull</implementation>
         <description>Null Rendermanager (renders nothing)</description>
-        <requires>
-          <class>crystalspace.engine.</class>
-        </requires>
       </class>
     </classes>
   </scf>
