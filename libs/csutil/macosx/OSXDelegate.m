@@ -603,7 +603,8 @@ ND_PROTO(void,dispatch_event)
 
 - (void)applicationDidResignActive:(NSNotification*)n
 {
-  autoResume = !paused;
+  if (!autoResume)
+    autoResume = !paused;
   [self pause];
 }
 
