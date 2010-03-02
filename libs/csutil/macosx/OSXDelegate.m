@@ -607,13 +607,11 @@ ND_PROTO(void,dispatch_event)
 
 - (void)applicationDidBecomeActive:(NSNotification*)n
 {
-  if (autoResume)
-    [self unpause];
+  [self unpause];
 }
 
 - (void)applicationDidResignActive:(NSNotification*)n
 {
-  autoResume = !paused;
   [self pause];
 }
 
@@ -691,7 +689,6 @@ ND_PROTO(void,stop_event_loop)(OSXDelegateHandle handle)
   modifiers = 0;
   mouseHidden = NO;
   paused = NO;
-  autoResume = NO;
   return self;
 }
 
