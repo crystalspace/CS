@@ -379,6 +379,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   void LookAtAnimNode::BlendState (csSkeletalState2* state, float baseWeight)
   {
+    // check that this node is active
+    if (!isPlaying)
+      return;
+
     // don't do anything if the frame duration is null
     if (frameDuration < EPSILON)
       return;
