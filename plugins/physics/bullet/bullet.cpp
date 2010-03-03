@@ -186,6 +186,7 @@ public:
       return;
 
     csOrthoTransform tr = BulletToCS (initialTransform * inversePrincipalAxis);
+
     if (body->mesh)
       body->moveCb->Execute (body->mesh, tr);
     if (body->light)
@@ -1062,12 +1063,18 @@ bool csBulletRigidBody::MakeDynamic (void)
     body->setCollisionFlags (body->getCollisionFlags()
 			     & ~btCollisionObject::CF_STATIC_OBJECT);
 
+    btVector3 linearVelocity (0.0f, 0.0f, 0.0f);
+    btVector3 angularVelocity (0.0f, 0.0f, 0.0f);
+
     // reverse kinematic state
     if (previousState == BULLET_STATE_KINEMATIC)
     {
       body->setCollisionFlags (body->getCollisionFlags()
 			       & ~btCollisionObject::CF_KINEMATIC_OBJECT);
-      
+
+      linearVelocity = body->getInterpolationLinearVelocity ();
+      angularVelocity = body->getInterpolationAngularVelocity ();
+
       // create new motion state
       btTransform principalAxis = motionState->inversePrincipalAxis.inverse ();
       btTransform trans;
@@ -1084,9 +1091,9 @@ bool csBulletRigidBody::MakeDynamic (void)
     body->getCollisionShape()->calculateLocalInertia (mass, localInertia);
     body->setMassProps(mass, localInertia);
     body->setActivationState(ACTIVE_TAG);
-    body->setLinearVelocity (btVector3 (0.0f, 0.0f, 0.0f));
-    body->setAngularVelocity (btVector3 (0.0f, 0.0f, 0.0f));
-    // TODO: no need for updateInertiaTensor();? or instead use inertia = btVector3(0,0,0)?
+    body->setLinearVelocity (linearVelocity);
+    body->setAngularVelocity (angularVelocity);
+    body->updateInertiaTensor ();
 
     // put body back in world
     dynSys->bulletWorld->addRigidBody (body);
