@@ -26,10 +26,6 @@
 #define MODEL_FRANKIE 1
 #define MODEL_KRYSTAL 2
 
-#define DYNDEBUG_NONE 1
-#define DYNDEBUG_COLLIDER 2
-#define DYNDEBUG_MIXED 3
-
 CS_IMPLEMENT_APPLICATION
 
 AvatarTest::AvatarTest ()
@@ -104,16 +100,16 @@ void AvatarTest::Frame ()
   // Update the avatar
   avatarScene->Frame ();
 
-  // Tell 3D driver we're going to display 3D things.
+  // Tell the 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
 
-  // Write FPS and other info
-  if(!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  avatarScene->DisplayKeys ();
+  // Display available keys and other info
+  if (g3d->BeginDraw (CSDRAW_2DGRAPHICS))
+    avatarScene->DisplayKeys ();
 }
 
 bool AvatarTest::OnKeyboard (iEvent &ev)
@@ -132,17 +128,17 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
     // Check for switching of model
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'm')
     {
+      delete avatarScene;
+
       if (avatarModel == MODEL_FRANKIE)
       {
 	avatarModel = MODEL_KRYSTAL;
-	delete avatarScene;
 	avatarScene = new KrystalScene (this);
       }
 
       else
       {
 	avatarModel = MODEL_FRANKIE;
-	delete avatarScene;
 	avatarScene = new FrankieScene (this);
       }
 
@@ -399,6 +395,7 @@ void AvatarTest::CreateRoom ()
   csRef<iMeshWrapper> background =
     CS::Geometry::GeneralMeshBuilder::CreateFactoryAndMesh (engine, room,
 				   "background", "background_factory", &bgBox);
+  background->SetRenderPriority (engine->GetRenderPriority ("sky"));
 
   csRef<iMaterialWrapper> bgMaterial =
     CS::Material::MaterialBuilder::CreateColorMaterial

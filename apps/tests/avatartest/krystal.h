@@ -50,14 +50,10 @@ class KrystalScene : public AvatarScene
  private:
   AvatarTest* avatarTest;
 
-  // FSM node related
-  csRef<iSkeletonFSMNode2> FSMNode;
-
   // Ragdoll node related
   bool krystalDead;
   csRef<iSkeletonRagdollNode2> ragdollNode;
-  CS::Animation::StateID mainFSMState;
-  CS::Animation::StateID ragdollFSMState;
+  iBodyChain* bodyChain;
 };
 
 #endif // __KRYSTAL_H__

@@ -52,6 +52,8 @@ class FrankieScene : public AvatarScene
 
   // FSM node related
   csRef<iSkeletonFSMNode2> FSMNode;
+  CS::Animation::StateID mainFSMState;
+  CS::Animation::StateID ragdollFSMState;
 
   // LookAt node related
   csRef<iSkeletonLookAtNode2> lookAtNode;
@@ -77,13 +79,12 @@ class FrankieScene : public AvatarScene
 
   // Speed node related
   csRef<iSkeletonSpeedNode2> speedNode;
-  int currentSpeed; // We use a 'int' instead of a 'float' to avoid round errors
+  int currentSpeed; // We use a 'int' instead of a 'float' to avoid
+                    // accumulated rounding errors
 
   // Ragdoll node related
   bool frankieDead;
   csRef<iSkeletonRagdollNode2> ragdollNode;
-  CS::Animation::StateID mainFSMState;
-  CS::Animation::StateID ragdollFSMState;
 
   // Morphing related
   float smileWeight;

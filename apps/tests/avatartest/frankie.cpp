@@ -233,7 +233,8 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
 
     // Fling the body a bit
     const csOrthoTransform& tc = avatarTest->view->GetCamera ()->GetTransform ();
-    for (uint i = 0; i < ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
+    uint boneCount = ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC);
+    for (uint i = 0; i < boneCount; i++)
     {
       BoneID boneID = ragdollNode->GetBone (RAGDOLL_STATE_DYNAMIC, i);
       iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);

@@ -116,14 +116,14 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     // OK, it's an animesh, it must be Krystal, start the ragdoll
     krystalDead = true;
 
-    // Set the ragdoll animation node as the active state of the Finite State Machine
-    // (start the ragdoll node so that the rigid bodies are created)
-    FSMNode->SwitchToState (ragdollFSMState);
-    FSMNode->GetStateNode (ragdollFSMState)->Play ();
+    // Set the ragdoll state of the iBodyChain of the whole body as dynamic
+    // (hairs are already in the good state)
+    ragdollNode->SetBodyChainState (bodyChain, RAGDOLL_STATE_DYNAMIC);
 
     // Fling the body a bit
     const csOrthoTransform& tc = avatarTest->view->GetCamera ()->GetTransform ();
-    for (uint i = 0; i < ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
+    uint boneCount = ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC);
+    for (uint i = 0; i < boneCount; i++)
     {
       BoneID boneID = ragdollNode->GetBone (RAGDOLL_STATE_DYNAMIC, i);
       iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
@@ -181,25 +181,16 @@ bool KrystalScene::CreateAvatar ()
     return avatarTest->ReportError ("Can't find Krystal's body mesh description!");
 
   // Create a new animation tree. The structure of the tree is:
-  //   + Finite State Machine node (root node)
+  //   + ragdoll controller node (root node - only if physics are enabled)
   //     + Random node
   //       + idle animation nodes
-  //     + ragdoll controller node
   csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
-
-  // Create the Finite State Machine node
-  csRef<iSkeletonFSMNodeFactory2> FSMNodeFactory =
-    animPacketFactory->CreateFSMNode ("fsm");
-  animPacketFactory->SetAnimationRoot (FSMNodeFactory);
 
   // Create the 'random' node
   csRef<iSkeletonRandomNodeFactory2> randomNodeFactory =
     animPacketFactory->CreateRandomNode ("random");
   randomNodeFactory->SetAutomaticSwitch (true);
-  mainFSMState = FSMNodeFactory->AddState
-    ("main_state", randomNodeFactory);
-  FSMNodeFactory->SetStartState (mainFSMState);
 
   // Create the 'idle01' animation node
   csRef<iSkeletonAnimationNodeFactory2> idle01NodeFactory =
@@ -273,19 +264,38 @@ bool KrystalScene::CreateAvatar ()
     csRef<iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
       avatarTest->ragdollManager->CreateAnimNodeFactory ("ragdoll",
 					     bodySkeleton, avatarTest->dynamicSystem);
-    ragdollFSMState = FSMNodeFactory->AddState
-      ("ragdoll_state", ragdollNodeFactory);
+    animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
+    ragdollNodeFactory->SetChildNode (randomNodeFactory);
 
-    // Create bone chain
-    iBodyChain* chain = bodySkeleton->CreateBodyChain
+    // Create bone chain for whole body and add it to the ragdoll controller. The chain
+    // will be in kinematic mode when Krystal is alive, and in dynamic state when
+    // Krystal has been killed.
+    bodyChain = bodySkeleton->CreateBodyChain
       ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"),
+       //("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("RightUpLeg"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("Head"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
+       /*
        animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
-    ragdollNodeFactory->AddBodyChain (chain, RAGDOLL_STATE_DYNAMIC);
+       */
+    ragdollNodeFactory->AddBodyChain (bodyChain, RAGDOLL_STATE_KINEMATIC);
+
+    // Create bone chain for hairs and add it to the ragdoll controller. The chain will
+    // always be in dynamic mode.
+    iBodyChain* hairChain = bodySkeleton->CreateBodyChain
+      ("hair_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hairs01"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("Hairs06"), 0);
+    ragdollNodeFactory->AddBodyChain (hairChain, RAGDOLL_STATE_DYNAMIC);
   }
+
+  else
+    animPacketFactory->SetAnimationRoot (randomNodeFactory);
 
   // Create the animated mesh
   csRef<iMeshWrapper> avatarMesh =
@@ -297,9 +307,6 @@ bool KrystalScene::CreateAvatar ()
   // We can therefore set them up now.
   iSkeletonAnimNode2* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
-
-  // Setup of the FSM node
-  FSMNode = scfQueryInterface<iSkeletonFSMNode2> (rootNode->FindNode ("fsm"));
 
   // Setup of the ragdoll controller
   if (avatarTest->physicsEnabled)
@@ -320,22 +327,19 @@ bool KrystalScene::CreateAvatar ()
 
 void KrystalScene::ResetScene ()
 {
-  // Reset the position of the animesh
-  csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
-  animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->SetTransform
-    (csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
-  animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->UpdateMove ();
-
-  // Reset initial state of the Finite State Machine
-  FSMNode->SwitchToState (mainFSMState);
-  //FSMNode->SwitchToState (ragdollFSMState);
-  //FSMNodeFactory->SetStartState (ragdollFSMState);
-
-  // The FSM doesn't stop the child nodes
   if (avatarTest->physicsEnabled)
-    ragdollNode->Stop ();
+  {
+    // Reset the position of the animesh
+    csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
+    animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->SetTransform
+      (csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
+    animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->UpdateMove ();
 
-  krystalDead = false;
+    krystalDead = false;
+
+    // Set the ragdoll state of the iBodyChain of the whole body as kinematic
+    ragdollNode->SetBodyChainState (bodyChain, RAGDOLL_STATE_KINEMATIC);
+  }
 }
 
 void KrystalScene::DisplayKeys ()
