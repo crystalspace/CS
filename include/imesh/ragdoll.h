@@ -50,7 +50,7 @@ struct iSkeletonRagdollManager2 : public virtual iBase
 		  iBodySkeleton* skeleton, iDynamicSystem* dynSys) = 0;
 
   /**
-   * Find the specified ragdoll animation node factory.
+   * Find the ragdoll animation node factory with the given name.
    */
   virtual iSkeletonRagdollNodeFactory2* FindAnimNodeFactory
     (const char* name) const = 0;
@@ -79,7 +79,7 @@ enum csSkeletonRagdollState
  */
 struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
-  SCF_INTERFACE(iSkeletonRagdollNodeFactory2, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonRagdollNodeFactory2, 1, 0, 1);
 
   /**
    * Add a new body chain to the ragdoll animation node. Adding more than 
@@ -93,6 +93,28 @@ struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
    * Remove the chain from the ragdoll animation node.
    */
   virtual void RemoveBodyChain (iBodyChain* chain) = 0;
+
+  /**
+   * Set the child animation node of this node. The ragdoll controller will
+   * add its control on top of the animation of the child node. This child
+   * node is not mandatory.
+   *
+   * The orientation/position values of the bones that are in state
+   * RAGDOLL_STATE_INACTIVE or RAGDOLL_STATE_KINEMATIC will be read from the
+   * child node, while the bones in state RAGDOLL_STATE_DYNAMIC will be
+   * overwriten by this node.
+   */
+  virtual void SetChildNode (iSkeletonAnimNodeFactory2* node) = 0;
+
+  /**
+   * Return the child animation node of this node.
+   */
+  virtual iSkeletonAnimNodeFactory2* GetChildNode () = 0;
+
+  /**
+   * Clear the child animation node of this node.
+   */
+  virtual void ClearChildNode () = 0;
 };
 
 /**
