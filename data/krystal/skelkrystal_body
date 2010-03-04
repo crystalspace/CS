@@ -362,8 +362,8 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.05" radius="0.03" friction="0.9" elasticity="0.5" softness="0.5">
-     <move x="0.0" y="0.04" z="0.0" />
+    <collidercapsule length="0.06" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0425" />
     </collidercapsule>
    </colliders>
    <joint>
@@ -371,6 +371,8 @@
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
    </joint>
@@ -380,13 +382,17 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.07" radius="0.03" friction="0.9" elasticity="0.5" softness="0.5" />
+    <collidercapsule length="0.07" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0475" />
+    </collidercapsule>
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
    </joint>
@@ -396,13 +402,77 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.09" radius="0.03" friction="0.9" elasticity="0.5" softness="0.5" />
+    <collidercapsule length="0.06" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0425" />
+    </collidercapsule>
    </colliders>
    <joint>
     <bounce x="0.2" y="0.2" z="0.2" />
     <constraints>
      <distance x="true" y="true" z="true" />
      <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Hairs04">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <collidercapsule length="0.06" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0425" />
+    </collidercapsule>
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Hairs05">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <collidercapsule length="0.06" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0425" />
+    </collidercapsule>
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Hairs06">
+   <properties>
+    <mass value="3.0" />
+   </properties>
+   <colliders>
+    <collidercapsule length="0.1" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.06125" />
+    </collidercapsule>
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
    </joint>
