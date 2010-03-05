@@ -406,7 +406,7 @@ protected:
     if ((node->left == 0) || (node->right == 0))
       y = node;
     else
-      y = Successor (node);
+      y = Predecessor (node);
     Node* x;
     if (y->left != 0)
       x = y->left;
@@ -970,19 +970,20 @@ public:
   {
     Node* n = it.currentNode;
     if (n == 0) return;
-    Node* nPred = Predecessor (n);
+    Node* nSucc = Successor (n);
     DeleteNode (n);
     Node* newNode;
-    if (nPred == 0)
+    if (nSucc == 0)
     {
       newNode = root.p;
       if (newNode != 0)
       {
-        while (newNode->left != 0) newNode = newNode->left;
+        while (newNode->GetRight() != 0)
+	  newNode = newNode->GetRight();
       }
     }
     else
-      newNode = Successor (nPred);
+      newNode = Predecessor (nSucc);
     it.currentNode = newNode;
   }
 

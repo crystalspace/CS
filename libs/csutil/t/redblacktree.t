@@ -51,6 +51,7 @@ private:
 public:
   void testInsert ();
   void testTraverse ();
+  void testDelete ();
   
   void testIterator ();
   void testIteratorConst ();
@@ -73,6 +74,7 @@ public:
   CPPUNIT_TEST_SUITE(RedBlackTreeTest);
     CPPUNIT_TEST(testInsert);
     CPPUNIT_TEST(testTraverse);
+    CPPUNIT_TEST(testDelete);
     CPPUNIT_TEST(testIterator);
     CPPUNIT_TEST(testIteratorConst);
     CPPUNIT_TEST(testIteratorConstRev);
@@ -145,6 +147,23 @@ void RedBlackTreeTest::testTraverse()
   SortTester sortTest (sequenceUniqueSorted, ARRAY_SIZE(sequenceUniqueSorted));
   rbtree.TraverseInOrder (sortTest);
   sortTest.CheckRemaining ();
+}
+
+void RedBlackTreeTest::testDelete()
+{  
+  for (size_t d = 0; d < ARRAY_SIZE(sequenceUnique); d++)
+  {
+    RBTree rbtree;
+    InsertSequence (rbtree, sequenceUnique, ARRAY_SIZE(sequenceUnique));
+    
+    rbtree.Delete (sequenceUnique[d]);
+    
+    for (size_t i = 0; i < ARRAY_SIZE(sequenceUnique); i++)
+    {
+      bool contains = rbtree.Contains (sequenceUnique[i]);
+      CPPUNIT_ASSERT_EQUAL((i == d) ? false : true, contains);
+    }
+  }
 }
 
 void RedBlackTreeTest::testIterator()
