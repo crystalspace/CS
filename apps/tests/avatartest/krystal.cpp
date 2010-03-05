@@ -120,6 +120,11 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     // (hairs are already in the good state)
     ragdollNode->SetBodyChainState (bodyChain, RAGDOLL_STATE_DYNAMIC);
 
+    // Update the display of the dynamics debugger
+    if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
+	|| avatarTest->dynamicsDebugMode == DYNDEBUG_MIXED)
+      avatarTest->dynamicsDebugger->UpdateDisplay ();
+
     // Fling the body a bit
     const csOrthoTransform& tc = avatarTest->view->GetCamera ()->GetTransform ();
     uint boneCount = ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC);
@@ -272,18 +277,11 @@ bool KrystalScene::CreateAvatar ()
     // Krystal has been killed.
     bodyChain = bodySkeleton->CreateBodyChain
       ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"),
-       //("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("RightUpLeg"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("Head"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
-       /*
-       animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
-       */
     ragdollNodeFactory->AddBodyChain (bodyChain, RAGDOLL_STATE_KINEMATIC);
 
     // Create bone chain for hairs and add it to the ragdoll controller. The chain will
@@ -339,6 +337,11 @@ void KrystalScene::ResetScene ()
 
     // Set the ragdoll state of the iBodyChain of the whole body as kinematic
     ragdollNode->SetBodyChainState (bodyChain, RAGDOLL_STATE_KINEMATIC);
+
+    // Update the display of the dynamics debugger
+    if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
+	|| avatarTest->dynamicsDebugMode == DYNDEBUG_MIXED)
+      avatarTest->dynamicsDebugger->UpdateDisplay ();
   }
 }
 

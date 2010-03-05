@@ -162,19 +162,19 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
 
       if (dynamicsDebugMode == DYNDEBUG_NONE)
       {
-	dynamicsDebugMode = DYNDEBUG_COLLIDER;
-	dynamicsDebugger->SetDebugDisplayMode (true);
-	animeshObject->GetMeshWrapper ()->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH);
-      }
-
-      else if (dynamicsDebugMode == DYNDEBUG_COLLIDER)
-      {
 	dynamicsDebugMode = DYNDEBUG_MIXED;
 	dynamicsDebugger->SetDebugDisplayMode (true);
 	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
       }
 
       else if (dynamicsDebugMode == DYNDEBUG_MIXED)
+      {
+	dynamicsDebugMode = DYNDEBUG_COLLIDER;
+	dynamicsDebugger->SetDebugDisplayMode (true);
+	animeshObject->GetMeshWrapper ()->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH);
+      }
+
+      else if (dynamicsDebugMode == DYNDEBUG_COLLIDER)
       {
 	dynamicsDebugMode = DYNDEBUG_NONE;
 	dynamicsDebugger->SetDebugDisplayMode (false);

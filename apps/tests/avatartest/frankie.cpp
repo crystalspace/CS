@@ -231,6 +231,11 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     FSMNode->SwitchToState (ragdollFSMState);
     FSMNode->GetStateNode (ragdollFSMState)->Play ();
 
+    // Update the display of the dynamics debugger
+    if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
+	|| avatarTest->dynamicsDebugMode == DYNDEBUG_MIXED)
+      avatarTest->dynamicsDebugger->UpdateDisplay ();
+
     // Fling the body a bit
     const csOrthoTransform& tc = avatarTest->view->GetCamera ()->GetTransform ();
     uint boneCount = ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC);
@@ -466,7 +471,14 @@ void FrankieScene::ResetScene ()
 
   // The FSM doesn't stop the child nodes
   if (avatarTest->physicsEnabled)
+  {
     ragdollNode->Stop ();
+
+    // Update the display of the dynamics debugger
+    if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
+	|| avatarTest->dynamicsDebugMode == DYNDEBUG_MIXED)
+      avatarTest->dynamicsDebugger->UpdateDisplay ();
+  }
 
   // Reset 'LookAt' controller
   alwaysRotate = false;
