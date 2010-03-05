@@ -104,10 +104,7 @@ namespace CS
 	CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
       texCache (csimg2D, "rgb8", // @@@ FIXME: Use same format as main view ...
 	CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
-    "target",
-    TextureCache::tcacheExactSizeMatch /// @@@ Work around faulty texture cache behaviour.
-                                       /// @@@ Was: TextureCache::tcachePowerOfTwo
-    )
+	"target", TextureCache::tcachePowerOfTwo)
     {
       bufCache.agedPurgeInterval = 5000;
       boxClipperCache.agedPurgeInterval = 5000;
