@@ -793,7 +793,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       }
 
       // set a bone kinematic callback
-      bulletBody->SetKinematicCallback (new BoneKinematicCallback (this, boneData->boneID));
+      csRef<BoneKinematicCallback> ref;
+      ref.AttachNew (new BoneKinematicCallback (this, boneData->boneID));
+      bulletBody->SetKinematicCallback (ref);
 
       // set the rigid body in kinematic state
       bulletBody->MakeKinematic ();
