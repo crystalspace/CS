@@ -69,14 +69,24 @@ namespace RenderManager
 
     /**
      * The data type to use as node key for mesh nodes.
-     * The type must be sortable with csComparator<>, so either operator<
-     * must be implemented or a csComparator<> specialization provided.
+     * The type must implement operator==() and operator<=().
      */
     struct MeshNodeKeyType
     {
       uint8     priority    : 5;
       uint8     isPortal    : 1;
       uint8     meshSorting : 2;
+      
+      bool operator== (const MeshNodeKeyType& other) const
+      {
+	//BIG HACK
+	return (reinterpret_cast<const int8&> (*this) == reinterpret_cast<const int8&> (other));
+      }
+      bool operator<= (const MeshNodeKeyType& other) const
+      {
+	//BIG HACK
+	return (reinterpret_cast<const int8&> (*this) <= reinterpret_cast<const int8&> (other));
+      }
     };
     /** @} */
 

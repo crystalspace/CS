@@ -236,7 +236,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
                                  const csRef<RenderBufferWrapper>& r2)
       {
         if ((r1->GetWidth() >= r2->GetWidth()) 
-	  || (r1->GetHeight() >= r2->GetHeight())) return true;
+	  && (r1->GetHeight() >= r2->GetHeight())) return true;
         return false;
       }
     
@@ -252,7 +252,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
                                  const Dimensions& r2)
       {
         if ((r1->GetWidth() >= r2.width) 
-	  || (r1->GetHeight() >= r2.height)) return true;
+	  && (r1->GetHeight() >= r2.height)) return true;
+        return false;
+      }
+    
+      static bool IsLargerEqual (const Dimensions& r1, 
+                                 const csRef<RenderBufferWrapper>& r2)
+      {
+        if ((r1.width >= r2->GetWidth()) 
+	  && (r1.height >= r2->GetHeight())) return true;
         return false;
       }
     
@@ -286,6 +294,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
                                  const RRTAG& b2)
       {
 	return b1.attachments.GetHash() >= b2.GetHash();
+      }
+      
+      static bool IsLargerEqual (const RRTAG& b1, 
+                                 const FBOWrapper& b2)
+      {
+	return b1.GetHash() >= b2.attachments.GetHash();
       }
     
       static bool IsEqual (const FBOWrapper& b1, 

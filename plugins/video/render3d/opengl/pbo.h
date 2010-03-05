@@ -89,6 +89,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 	return b1->GetSize() >= b2;
       }
     
+      static bool IsLargerEqual (const size_t& b1, 
+				 const csRef<PBOWrapper>& b2)
+      {
+	return b1 >= b2->GetSize();
+      }
+    
       static bool IsEqual (const csRef<PBOWrapper>& b1, 
 			  const size_t& b2)
       {

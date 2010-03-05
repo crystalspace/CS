@@ -75,14 +75,17 @@ namespace RenderManager
       {
         typedef size_t KeyType;
 
-        static bool IsLargerEqual (const PortalBuffers& b1,
-                                   const PortalBuffers& b2);
         static bool IsEqual (const PortalBuffers& b1,
                              const PortalBuffers& b2);
-        static bool IsLargerEqual(const PortalBuffers& b1,
-                                  const KeyType& s2);
-        static bool IsEqual(const PortalBuffers& b1,
+        static bool IsLargerEqual (const PortalBuffers& b1,
+                                   const PortalBuffers& b2);
+			     
+        static bool IsEqual (const PortalBuffers& b1,
                             const KeyType& s2);
+        static bool IsLargerEqual (const PortalBuffers& b1,
+                                  const KeyType& s2);
+        static bool IsLargerEqual (const KeyType& s1,
+                                   const PortalBuffers& b2);
       };
       CS::Utility::GenericResourceCache<PortalBuffers, csTicks,
         PortalBufferConstraint> bufCache;
@@ -601,7 +604,7 @@ namespace RenderManager
       svTexPortal->SetValue (tex);
 
       typename ThisType::PersistentData::PortalBuffers* bufs =
-      persistentData.bufCache.Query (count);
+	persistentData.bufCache.Query (count);
 	
       if (bufs == 0)
       {

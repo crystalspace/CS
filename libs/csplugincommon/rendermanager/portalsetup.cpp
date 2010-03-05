@@ -27,32 +27,23 @@ namespace CS
   {
 #define SPSBPD  StandardPortalSetup_Base::PersistentData
   
-    bool SPSBPD::PortalBufferConstraint::IsLargerEqual (
-      const PortalBuffers& b1, const PortalBuffers& b2)
-    {
-      size_t s1 = b1.coordBuf->GetElementCount ();
-      size_t s2 = b1.coordBuf->GetElementCount ();
-
-      if (s1 > s2) return true;
-      return false;
-    }
-
     bool SPSBPD::PortalBufferConstraint::IsEqual (
       const PortalBuffers& b1, const PortalBuffers& b2)
     {
       size_t s1 = b1.coordBuf->GetElementCount ();
-      size_t s2 = b1.coordBuf->GetElementCount ();
+      size_t s2 = b2.coordBuf->GetElementCount ();
 
       if (s1 == s2) return true;
       return false;
     }
 
     bool SPSBPD::PortalBufferConstraint::IsLargerEqual (
-      const PortalBuffers& b1, const KeyType& s2)
+      const PortalBuffers& b1, const PortalBuffers& b2)
     {
       size_t s1 = b1.coordBuf->GetElementCount ();
+      size_t s2 = b2.coordBuf->GetElementCount ();
 
-      if (s1 > s2) return true;
+      if (s1 >= s2) return true;
       return false;
     }
 
@@ -65,6 +56,24 @@ namespace CS
       return false;
     }
 
+    bool SPSBPD::PortalBufferConstraint::IsLargerEqual (
+      const PortalBuffers& b1, const KeyType& s2)
+    {
+      size_t s1 = b1.coordBuf->GetElementCount ();
+
+      if (s1 >= s2) return true;
+      return false;
+    }
+
+    bool SPSBPD::PortalBufferConstraint::IsLargerEqual (
+      const KeyType& s1, const PortalBuffers& b2)
+    {
+      size_t s2 = b2.coordBuf->GetElementCount ();
+
+      if (s1 >= s2) return true;
+      return false;
+    }
+    
     //-----------------------------------------------------------------------
 
     void SPSBPD::csBoxClipperCached::operator delete (void* p, void* q)

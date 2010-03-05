@@ -347,38 +347,38 @@ namespace CS
 	ElementWrapper (const ElementWrapper& other) : ptr (other.ptr) { }
 	
 	Element* operator->() { return ptr; }
-	operator Element*() const { return ptr; }
 	
-	// FIXME: Comparisons are fragile, rely on csComparator only using <
+	// Comparisons among ElementWrappers
 	bool operator== (const ElementWrapper& other) const
-	{ return ptr == other.ptr; }
+	{
+	  return ResourceSorting::IsEqual (ptr->data, other.ptr->data);
+	}
+	bool operator<= (const ElementWrapper& other) const
+	{
+	  return ResourceSorting::IsLargerEqual (ptr->data, other.ptr->data);
+	}
 	
-	bool operator< (const ElementWrapper& other) const
+	// Comparisons against ResourceSortingKeyType
+	bool operator== (const ResourceSortingKeyType& other) const
 	{
-	  // @@@ Make more efficient...
-	  if (ResourceSorting::IsEqual (ptr->data, other.ptr->data)) return false;
-	  if (ResourceSorting::IsLargerEqual (ptr->data, other.ptr->data)) return false;
-	  return true;
+	  return ResourceSorting::IsEqual (ptr->data, other);
 	}
-	bool operator< (const ResourceSortingKeyType& other) const
+	bool operator<= (const ResourceSortingKeyType& other) const
 	{
-	  // @@@ Make more efficient...
-	  if (ResourceSorting::IsEqual (ptr->data, other)) return false;
-	  if (ResourceSorting::IsLargerEqual (ptr->data, other)) return false;
-	  return true;
+	  return ResourceSorting::IsLargerEqual (ptr->data, other);
 	}
-	friend bool operator< (const ResourceSortingKeyType& key, 
-			       const ElementWrapper& el)
+	friend bool operator<= (const ResourceSortingKeyType& key, 
+			        const ElementWrapper& el)
 	{
-	  // @@@ Make more efficient...
-	  if (ResourceSorting::IsEqual (el.ptr->data, key)) return false;
-	  if (ResourceSorting::IsLargerEqual (el.ptr->data, key)) return true;
-	  return false;
+	  return ResourceSorting::IsLargerEqual (key, el.ptr->data);
 	}
 	
       };
       
       csBlockAllocator<Element> elementAlloc;
+      typedef csRedBlackTree<ElementWrapper,
+	  CS::Container::DefaultRedBlackTreeAllocator<ElementWrapper>,
+	  CS::Container::RedBlackTreeOrderingPartial> AvailableResourcesTree;
       // Tree of available resources
       struct AvailableResourcesWrapper : public ReuseCondition
       {
@@ -391,13 +391,13 @@ namespace CS
 	  RBTraverser (csBlockAllocator<Element>& elementAlloc) :
 	    elementAlloc (elementAlloc) {}
 	  
-	  void operator() (Element* el)
+	  void operator() (ElementWrapper& el)
 	  {
-	    elementAlloc.Free (el);
+	    elementAlloc.Free (el.ptr);
 	  }
 	};
       public:
-	csRedBlackTree<ElementWrapper> v;
+	AvailableResourcesTree v;
         
         AvailableResourcesWrapper (const ReuseCondition& other,
           csBlockAllocator<Element>& elementAlloc)
@@ -427,7 +427,7 @@ namespace CS
 	  typename csList<ElementWrapper>::Iterator listIt (v);
 	  while (listIt.HasNext())
 	  {
-	    Element* el = listIt.Next();
+	    Element* el = listIt.Next().ptr;
 	    elementAlloc.Free (el);
 	  }
 	  v.DeleteAll();
@@ -456,11 +456,11 @@ namespace CS
 	SearchDataTraverser (T* entry, Element*& ret) 
 	  : entry (entry), ret (ret) {}
 	
-        bool operator() (Element* el)
+        bool operator() (ElementWrapper& el)
 	{
-	  if (&(el->data) == entry)
+	  if (&(el.ptr->data) == entry)
 	  {
-	    ret = el;
+	    ret = el.ptr;
 	    return false;
 	  }
 	  return true;
@@ -478,7 +478,7 @@ namespace CS
 	typename csList<ElementWrapper>::Iterator listIt (activeResources.v);
 	while (listIt.HasNext())
 	{
-	  Element* el = listIt.Next();
+	  Element* el = listIt.Next().ptr;
 	  if (&(el->data) == entry) return el;
 	}
 	
@@ -534,9 +534,9 @@ namespace CS
       public:
 	VerifyTraverser (Element* el) : el (el) {}
 	
-        bool operator() (Element* el)
+        bool operator() (ElementWrapper& el)
 	{
-	  CS_ASSERT(el != this->el);
+	  CS_ASSERT(el.ptr != this->el);
 	  return true;
 	}
       };
@@ -567,11 +567,11 @@ namespace CS
 	
 	if (time >= lastPurgeAged + agedPurgeInterval)
 	{
-	  typename csRedBlackTree<ElementWrapper>::Iterator treeIt (
+	  typename AvailableResourcesTree::Iterator treeIt (
 	    availableResources.v.GetIterator ());
 	  while (treeIt.HasNext())
 	  {
-	    Element* el = treeIt.PeekNext ();
+	    Element* el = treeIt.PeekNext ().ptr;
 	    if (GetPurgeCondition().IsPurgeable (*this, 
 		el->GetPurgeAuxiliary(), el->data))
 	    {
@@ -596,7 +596,7 @@ namespace CS
 	  if (GetReuseCondition().IsReusable (*this,
 	      el->GetReuseAuxiliary(), el->data))
 	  {
-	    VerifyElementNotInTree (el);
+	    VerifyElementNotInTree (el.ptr);
 	    availableResources.v.Insert (el);
 	    activeResources.v.Delete (listIt);
 	  }
@@ -608,17 +608,17 @@ namespace CS
       T* Query (const ResourceSortingKeyType& key = 
 	ResourceSortingKeyType(), bool exact = false)
       {
-	const csRedBlackTree<ElementWrapper>& constTree = availableResources.v;
+	const AvailableResourcesTree& constTree = availableResources.v;
 	ElementWrapper const* el;
 	if (exact)
 	  el = constTree.Find (key);
 	else
-	  el = constTree.FindSmallestGreaterEqual (key);
+	  el = constTree.FindGreatestSmallerEqual (key);
 	if (el != 0)
 	{
 	  ElementWrapper myElement = *el;
 	  availableResources.v.DeleteExact (el);
-	  VerifyElementNotInTree (myElement);
+	  VerifyElementNotInTree (myElement.ptr);
 	  activeResources.v.PushFront (myElement);
 	  GetPurgeCondition().MarkActive (*this, myElement->GetPurgeAuxiliary());
 	  GetReuseCondition().MarkActive (*this, myElement->GetReuseAuxiliary());
