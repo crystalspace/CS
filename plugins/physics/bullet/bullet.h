@@ -328,6 +328,7 @@ public:
   virtual csBulletState GetDynamicState () const;
   virtual void SetDynamicState (csBulletState state);
   virtual void SetKinematicCallback (iBulletKinematicCallback* callback);
+  virtual iBulletKinematicCallback* GetKinematicCallback ();
 };
 
 class csBulletCollider : public scfImplementation1<csBulletCollider,

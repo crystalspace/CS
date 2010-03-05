@@ -120,6 +120,11 @@ struct iBulletRigidBody : public virtual iBase
    * If no callback are provided then the dynamic system will use a default one.
    */
   virtual void SetKinematicCallback (iBulletKinematicCallback* callback) = 0;
+
+  /**
+   * Get the callback used to update the transform of the kinematic body.
+   */
+  virtual iBulletKinematicCallback* GetKinematicCallback () = 0;
 };
 
 /**

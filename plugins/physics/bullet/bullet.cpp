@@ -1200,6 +1200,11 @@ void csBulletRigidBody::SetKinematicCallback (iBulletKinematicCallback* callback
   kinematicCb = callback;
 }
 
+iBulletKinematicCallback* csBulletRigidBody::GetKinematicCallback ()
+{
+  return kinematicCb;
+}
+
 bool csBulletRigidBody::Disable (void)
 {
   SetAngularVelocity(csVector3(0));
@@ -2290,6 +2295,9 @@ csOrthoTransform csBulletCollider::GetTransform ()
 
 csOrthoTransform csBulletCollider::GetLocalTransform ()
 {
+  if (isStaticBody || body->dynamicState == BULLET_STATE_STATIC)
+    return localTransform * body->GetTransform ();
+
   return localTransform;
 }
 
@@ -2422,7 +2430,7 @@ void csBulletCollider::MakeDynamic ()
 
 bool csBulletCollider::IsStatic ()
 {
-  return isStaticBody;
+  return isStaticBody || body->dynamicState == BULLET_STATE_STATIC;
 }
 
 float csBulletCollider::GetVolume ()
