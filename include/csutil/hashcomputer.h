@@ -217,4 +217,6 @@ namespace CS
   }
 }
 
+/** @} */
+
 #endif

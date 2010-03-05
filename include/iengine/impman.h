@@ -42,4 +42,6 @@ struct iImposterManager : public virtual iBase
   virtual void Unregister(iImposterMesh* mesh) = 0;
 };
 
+/** @} */
+
 #endif // __CS_IENGINE_IMPMAN_H__
