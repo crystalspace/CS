@@ -50,32 +50,34 @@ public:
    * directory to change to. E.g. both "<tt>/foo/bar/baz</tt>" and 
    * "<tt>/foo/bar/</tt>" will cause a directory change to "<tt>/foo/bar</tt>".
    */
-  void ChangeTo (const char* filename)
+  bool ChangeTo (const char* filename)
   {
-    if (!vfs) return;
+    if (!vfs) return false;
 
     csString dir(filename);
     dir.Truncate(dir.FindLast('/'));
     vfs->PushDir ();
-    vfs->ChDir (dir);
     popCount++;
+
+    return vfs->ChDir (dir);
   }
 
   /**
    * As above, except that the full path is treated as the directory to
    * change to.
    */
-  void ChangeToFull (const char* filename)
+  bool ChangeToFull (const char* filename)
   {
-    if (!vfs) return;
+    if (!vfs) return false;
 
     // We must make a copy of the filename because it can be a direct
     // pointer to vfs->GetCwd() and vfs->PushDir() corrupts that pointer.
     csString copy (filename);
 
     vfs->PushDir ();
-    vfs->ChDir (copy);
     popCount++;
+
+    return vfs->ChDir (copy);
   }
 
   /**
