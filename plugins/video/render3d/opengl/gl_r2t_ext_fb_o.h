@@ -359,6 +359,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 	  : Parent::StoredAuxiliaryInfo (cache, param) {}
       };
       
+      FrameBuffer (uint purgeAge = 6000) : Parent (purgeAge) {}
+      
       template<typename ResourceCacheType>
       void MarkActive (const ResourceCacheType& cache,
 	  StoredAuxiliaryInfo& elementInfo)
