@@ -226,7 +226,7 @@ csKeyComposeResult csKeyComposer::HandleKey (
       RETURN1(ret, b);	      \
   }
 
-  if (CSKEY_IS_SPECIAL (keyEventData.codeRaw))
+  if (CSKEY_IS_SPECIAL (keyEventData.codeCooked))
     RETURN0(csComposeNoChar)
 
   if (lastDead != 0)
