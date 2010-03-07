@@ -124,6 +124,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     virtual uint GetBoneCount (csSkeletonRagdollState state) const;
     virtual BoneID GetBone (csSkeletonRagdollState state, uint index) const;
 
+    virtual void ResetChainTransform (iBodyChain* chain);
+
     //-- iSkeletonAnimPacket2
     virtual void Play ();
 
@@ -163,11 +165,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       csRef<iJoint> joint;
     };
 
+    struct ResetChainData
+    {
+      csRef<iBodyChain> chain;
+      int frameCount;
+    };
+
     void CreateBoneData (iBodyChainNode* chainNode,
 			 csSkeletonRagdollState state);
     void SetChainNodeState (iBodyChainNode* chainNode,
 			    csSkeletonRagdollState state);
     void UpdateBoneState (BoneData* boneData);
+    void ResetChainNodeTransform (iBodyChainNode* chainNode);
 
   private:
     RagdollAnimNodeFactory* factory;
@@ -176,6 +185,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     csHash<ChainData, csString> chains;
     csRef<iSkeletonAnimNode2> childNode;
     csHash<BoneData, BoneID> bones;
+    csArray<ResetChainData> resetChains;
     bool isActive;
     BoneID maxBoneID;
 

@@ -124,7 +124,7 @@ struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
  */
 struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
 {
-  SCF_INTERFACE(iSkeletonRagdollNode2, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonRagdollNode2, 1, 0, 1);
 
   // TODO: remove this function and implement iSkeleton2::GetSceneNode ()
   /**
@@ -136,7 +136,8 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
    * Set the body chain in the specified physical state. The kinematic state 
    * is not yet supported.
    */
-  virtual void SetBodyChainState (iBodyChain* chain, csSkeletonRagdollState state) = 0;
+  virtual void SetBodyChainState (iBodyChain* chain,
+				  csSkeletonRagdollState state) = 0;
 
   /**
    * Get the physical state of the body chain specified.
@@ -162,6 +163,18 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
    * Get a bone from its index.
    */
   virtual BoneID GetBone (csSkeletonRagdollState state, uint index) const = 0;
+
+  /**
+   * Reset the transform of each rigid body of the chain to the initial 'bind'
+   * transform. This can be used only on chains that are in a dynamic state.
+   *
+   * Use this when the bone where the chain is attached is moved abruptly (ie
+   * when the whole mesh is moved sharply, or when the transition of the
+   * animation is not continuous). Otherwise, letting the dynamic simulation
+   * handle such a radical teleportation might lead to an unstable and unwanted
+   * behavior.
+   */
+  virtual void ResetChainTransform (iBodyChain* chain) = 0;
 };
 
 /** @} */
