@@ -136,7 +136,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
     }
 
     // Reset all stored meshes
-    for (csList<MeshData>::Iterator it (storedMeshes); it.HasNext (); )
+    for (csArray<MeshData>::Iterator it = storedMeshes.GetIterator (); it.HasNext (); )
     {
       MeshData &meshData = it.Next ();
 
@@ -237,7 +237,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
       }
 
       // Store the MeshData
-      storedMeshes.PushBack (meshData);
+      storedMeshes.Push (meshData);
     }
 
     // Iterate through each colliders of the dynamic system
@@ -261,7 +261,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
       meshData.debugMesh = CreateColliderMesh (collider, material);
 
       // Store the MeshData
-      storedMeshes.PushBack (meshData);
+      storedMeshes.Push (meshData);
     }
   }
 

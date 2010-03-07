@@ -25,7 +25,7 @@
 #include "iutil/comp.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
-#include "csutil/list.h"
+#include "csutil/array.h"
 #include "ivaria/bullet.h"
 #include "ivaria/dynamicsdebug.h"
 
@@ -119,7 +119,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 
     struct MeshData
     {
-      csWeakRef<iRigidBody> rigidBody;
+      csRef<iRigidBody> rigidBody;
       csRef<iMeshWrapper> originalMesh;
       csRef<iMeshWrapper> debugMesh;
       csRef<BoneKinematicCallback> callback;
@@ -130,7 +130,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
     csRef<iSector> sector;
     csRef<iMaterialWrapper> materials[3];
     bool debugMode;
-    csList<MeshData> storedMeshes;
+    csArray<MeshData> storedMeshes;
   };
 
 
