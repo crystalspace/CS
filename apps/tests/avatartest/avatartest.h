@@ -38,6 +38,9 @@ class AvatarScene
   virtual csVector3 GetCameraStart () = 0;
   virtual csVector3 GetCameraTarget () = 0;
 
+  // Dynamic simuation related
+  virtual float GetSimulationSpeed () = 0;
+
   // From csBaseEventHandler
   virtual void Frame () = 0;
   virtual bool OnKeyboard (iEvent &event) = 0;

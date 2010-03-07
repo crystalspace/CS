@@ -39,11 +39,27 @@ csVector3 KrystalScene::GetCameraStart ()
 
 csVector3 KrystalScene::GetCameraTarget ()
 {
+  // The target of the camera is the hips of Krystal
+  csQuaternion boneRotation;
+  csVector3 boneOffset;
+  animesh->GetSkeleton ()->GetTransformBoneSpace
+    (animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"), boneRotation, boneOffset);
+  csOrthoTransform boneTransform (csMatrix3 (boneRotation.GetConjugate ()),
+				  boneOffset);
   csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
-  csVector3 avatarPosition = animeshObject->GetMeshWrapper ()->QuerySceneNode ()
-    ->GetMovable ()->GetTransform ().GetOrigin ();
+  csVector3 avatarPosition = (boneTransform
+			      * animeshObject->GetMeshWrapper ()->QuerySceneNode ()
+			      ->GetMovable ()->GetTransform ()).GetOrigin ();
   avatarPosition.y = 1.1f;
   return avatarPosition;
+}
+
+float KrystalScene::GetSimulationSpeed ()
+{
+  if (krystalDead)
+    return 0.2f;
+
+  return 1.0f;
 }
 
 void KrystalScene::Frame ()
@@ -96,7 +112,7 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
       {
 	csVector3 force = endBeam - startBeam;
 	force.Normalize ();
-	physicsResult.body->AddForceAtPos (physicsResult.isect, force * 10.0f);
+	physicsResult.body->AddForceAtPos (physicsResult.isect, force * 5.0f);
       }
 
       return true;
@@ -145,8 +161,8 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
-      physicsResult.body->AddForceAtPos (physicsResult.isect, force * 1.0f);
-      physicsResult.body->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 1.0f));
+      physicsResult.body->AddForceAtPos (physicsResult.isect, force * 5.0f);
+      physicsResult.body->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 5.0f));
     }
 
     return true;
@@ -286,7 +302,7 @@ bool KrystalScene::CreateAvatar ()
 
     // Create bone chain for hairs and add it to the ragdoll controller. The chain will
     // always be in dynamic mode.
-    iBodyChain* hairChain = bodySkeleton->CreateBodyChain
+    hairChain = bodySkeleton->CreateBodyChain
       ("hair_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hairs01"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("Hairs06"), 0);
     ragdollNodeFactory->AddBodyChain (hairChain, RAGDOLL_STATE_DYNAMIC);
@@ -314,11 +330,11 @@ bool KrystalScene::CreateAvatar ()
     ragdollNode->SetAnimatedMesh (animesh);
   }
 
-  // Reset the scene so as to put the parameters of the animation nodes in a default state
-  ResetScene ();
-
   // Start animation
   rootNode->Play ();
+
+  // Reset the scene so as to put the parameters of the animation nodes in a default state
+  ResetScene ();
 
   return true;
 }
@@ -335,8 +351,12 @@ void KrystalScene::ResetScene ()
 
     krystalDead = false;
 
-    // Set the ragdoll state of the iBodyChain of the whole body as kinematic
+    // Set the ragdoll state of the 'body' chain as kinematic
     ragdollNode->SetBodyChainState (bodyChain, RAGDOLL_STATE_KINEMATIC);
+
+    // Reset the transform of the 'hairs' chain, since the mesh is moved abruptly,
+    // otherwise it can lead to unstability.
+    ragdollNode->ResetChainTransform (hairChain);
 
     // Update the display of the dynamics debugger
     if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER

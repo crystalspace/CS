@@ -33,6 +33,9 @@ class FrankieScene : public AvatarScene
   csVector3 GetCameraStart ();
   csVector3 GetCameraTarget ();
 
+  // Dynamic simuation related
+  virtual float GetSimulationSpeed ();
+
   // From csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);

@@ -57,6 +57,11 @@ csVector3 FrankieScene::GetCameraTarget ()
   return avatarPosition;
 }
 
+float FrankieScene::GetSimulationSpeed ()
+{
+  return 0.25f;
+}
+
 void FrankieScene::Frame ()
 {
   // First get elapsed time from the virtual clock.

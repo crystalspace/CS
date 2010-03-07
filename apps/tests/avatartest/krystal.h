@@ -33,6 +33,9 @@ class KrystalScene : public AvatarScene
   csVector3 GetCameraStart ();
   csVector3 GetCameraTarget ();
 
+  // Dynamic simuation related
+  virtual float GetSimulationSpeed ();
+
   // From csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
@@ -54,6 +57,7 @@ class KrystalScene : public AvatarScene
   bool krystalDead;
   csRef<iSkeletonRagdollNode2> ragdollNode;
   iBodyChain* bodyChain;
+  iBodyChain* hairChain;
 };
 
 #endif // __KRYSTAL_H__

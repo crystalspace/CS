@@ -95,7 +95,7 @@ void AvatarTest::Frame ()
   // Step the dynamic simulation (we slow down artificially the simulation in
   // order to achieve a 'slow motion' effect)
   if (physicsEnabled)
-    dynamics->Step (speed / 4.0f);
+    dynamics->Step (speed * avatarScene->GetSimulationSpeed ());
 
   // Update the avatar
   avatarScene->Frame ();
