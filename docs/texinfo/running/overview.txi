@@ -87,12 +87,12 @@ todo
 @cindex @file{docconv}
 @cindex Applications, @file{docconv}
 @item docconv
-todo
+An utility to convert between document formats. @xref{Binary XML} for the conversion to and from binary XML.
 
 @cindex @file{eventtest}
 @cindex Applications, @file{eventtest}
 @item eventtest
-A Crystal Space event system testing application.
+An application for the testing of the event system with keyboard, mouse and joystick.
 
 @cindex @file{g2dtest}
 @cindex Applications, @file{g2dtest}
@@ -219,12 +219,12 @@ todo
 @cindex @file{simple1}
 @cindex Applications, @file{simple1}
 @item simple1
-A tutorial application. @xref{Tutorial Simple}.
+A tutorial application. @xref{Tutorial Simple}. The code of this application is a good candidate if you want to test some piece of code.
 
 @cindex @file{simple2}
 @cindex Applications, @file{simple2}
 @item simple2
-A tutorial application. @xref{Tutorial Simple 2}.
+A tutorial application. @xref{Tutorial Simple 2}. The code of this application is a good candidate if you want to test some piece of code.
 
 @cindex @file{simplept}
 @cindex Applications, @file{simplept}
@@ -259,7 +259,7 @@ A test application on the threaded loader.
 @cindex @file{tri3dtest}
 @cindex Applications, @file{tri3dtest}
 @item tri3dtest
-todo
+A test application on the automatic triangulation of a mesh.
 
 @cindex @file{unittest}
 @cindex Applications, @file{unittest}
@@ -296,7 +296,7 @@ achieve a water animation.
 @cindex @file{waterdemo2}
 @cindex Applications, @file{waterdemo2}
 @item waterdemo2
-A demonstration application about the watermesh (@pxref{MeshObject Watermesh}).
+A demonstration application about the 'ocean' watermesh (@pxref{MeshObject Watermesh}).
 
 @cindex @file{wxtest}
 @cindex Applications, @file{wxtest}

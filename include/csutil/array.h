@@ -1155,6 +1155,7 @@ public:
 
   /**
    * Delete the given element from the array.
+   * \return True if the item has been found and deleted, false otherwise.
    * \remarks Performs a linear search of the array to locate \c item, thus it
    *   may be slow for large arrays.
    */
@@ -1182,11 +1183,11 @@ public:
     bool HasNext() const
     { return currentelem < array.GetSize (); }
 
-    /** Returns the next element in the array. */
+    /** Returns the next element in the array and increment the iterator. */
     T& Next()
     { return array.Get(currentelem++); }
 
-    /** Reset the array to the first element */
+    /** Reset the iterator to the first element */
     void Reset()
     { currentelem = 0; }
 

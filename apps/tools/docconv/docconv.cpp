@@ -226,6 +226,8 @@ void DocConv::Main ()
   if (op == OP_HELP)
   {
     csPrintf ("docconv <options> <zipfiles|filenames>\n");
+    csPrintf ("Tool for the conversion between document formats\n\n");
+    csPrintf ("Options for docconv:\n");
     csPrintf ("  -inds=<plugin>:\n");       
     csPrintf ("     Document system plugin for reading world.\n");
     csPrintf ("  -outds=<plugin>:\n");       

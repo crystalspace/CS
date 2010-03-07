@@ -1354,7 +1354,7 @@ void csBugPlug::ListLoadedPlugins ()
 {
   csRef<iPluginManager> plugmgr =  
     csQueryRegistry<iPluginManager> (object_reg);
-  csRef<iPluginIterator> plugiter (plugmgr->GetPlugins ());
+  csRef<iPluginIterator> plugiter (plugmgr->GetPluginInstances ());
 
   csSet<const char*> printedPlugins;
   Report (CS_REPORTER_SEVERITY_DEBUG, 

@@ -1180,11 +1180,11 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
   if (material) *material = 0;
   //Checks all of the cal3d bounding boxes of each bone to see if they hit
 
-  bool hit = false;
+  //bool hit = false;
   std::vector<CalBone *> vectorBone = calModel.getSkeleton()->getVectorBone();
   csArray<bool> bboxhits;
   bboxhits.SetSize (vectorBone.size());
-  int b = 0;
+  //int b = 0;
   // Skip bone bbox test for now since it yields inaccurate results as bone weights
   // < 0.5 are ignored. This results in holes during hit detection.
   /*

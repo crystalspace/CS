@@ -34,7 +34,7 @@
 class csRect;
 
 /**
- * If an image file has animation capabilities, this interface is exhibited.
+ * If an image file has animation capabilities, then this interface is exhibited.
  */
 struct iAnimatedImage : public virtual iBase
 {
@@ -49,8 +49,9 @@ struct iAnimatedImage : public virtual iBase
   virtual bool Animate (csTicks time, csRect* dirtyrect = 0) = 0;
 
   /**
-   * Is this image really animated?
-   * E.g. returns false if an animation has just 1 frame.
+   * Return whether or not this image is really animated, ie if the
+   * animation has more than one frame or not.
+   * \return false if the animation has just 1 frame, true otherwise.
    */
   virtual bool IsAnimated () = 0;
 };

@@ -169,12 +169,9 @@ bool EventTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
     for (size_t i = 0; i < joystickClasses->GetSize (); i++)
     {
       const char* className = joystickClasses->Get (i);
-      csRef<iBase> b = plugmgr->LoadPlugin (className);
-
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-        "crystalspace.application.joytest", "Attempt to load plugin '%s' %s",
-        className, (b != 0) ? "successful" : "failed");
-      if (b != 0) b->DecRef ();
+      csRef<iBase> b = csLoadPlugin<iBase> (plugmgr, className);
+      ReportInfo ("Attempt to load plugin '%s' %s",
+		  className, (b != 0) ? "successful" : "failed");
     }
   }
 

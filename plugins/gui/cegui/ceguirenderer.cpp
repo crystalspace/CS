@@ -202,11 +202,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   //----------------------------------------------------------------------------//
   Renderer::Renderer(iBase *parent) :
     scfImplementationType (this, parent),
+    d_displayDPI(96, 96),
     initialized(false),
     obj_reg(0),
     events(0),
-    scriptModule(0),
-    d_displayDPI(96, 96)
+    scriptModule(0)
   {
     d_defaultTarget = new WindowTarget(*this, obj_reg);
     d_defaultRoot = new CEGUI::RenderingRoot(*d_defaultTarget);

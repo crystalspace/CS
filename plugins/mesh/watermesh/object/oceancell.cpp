@@ -66,10 +66,10 @@ void csOceanCell::SetupVertices()
         gran = 2.0f;
         break;
     }
-  
-    uint maxj = len * gran;
+
+    uint maxj = (uint) (len * gran);
     uint maxjd = maxj - 1;
-    uint maxi = wid * gran;
+    uint maxi = (uint) (wid * gran);
     uint maxid = maxi - 1;
 
     for(uint j = 0; j < maxj; ++j)

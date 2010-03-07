@@ -54,8 +54,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   void GeometryBuffer::draw() const
   {
     // Set up clipping for this buffer
-    g2d->SetClipRect(d_clipRect.d_left, d_clipRect.d_top,
-                     d_clipRect.d_right, d_clipRect.d_bottom);
+    // TODO: need to round to the closer 'int'?
+    g2d->SetClipRect((int) d_clipRect.d_left, (int) d_clipRect.d_top,
+                     (int) d_clipRect.d_right, (int) d_clipRect.d_bottom);
 
     if (!d_sync)
       syncHardwareBuffer();
