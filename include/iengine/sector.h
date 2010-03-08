@@ -563,7 +563,7 @@ struct iSectorList : public virtual iBase
 
   /**
    * Find a sector by its name.
-   * \return The sector with the given name, ot 0 if the name was not found.
+   * \return The sector with the given name, or 0 if the name was not found.
    */
   virtual iSector *FindByName (const char *Name) const = 0;
 };

@@ -42,7 +42,7 @@ namespace CS
 {
 namespace Graphics
 {
-  
+  /// Rendering priority.
   typedef int RenderPriority;
   
   enum MeshCullMode

@@ -133,7 +133,7 @@ public:
       Construct (address + i);
   }
   
-  /// Reallocates a region allocated by \p Allocator.
+  /// Reallocate a region allocated by \p Allocator.
   template<typename Allocator>
   static T* ResizeRegion (Allocator& alloc, T* mem, size_t relevantcount, 
     size_t oldcount, size_t newcount)
@@ -192,7 +192,7 @@ public:
   }
   
   /**
-   * Reallocates a region allocated by \p Allocator. Ensure that all elements
+   * Reallocate a region allocated by \p Allocator. Ensure that all elements
    * are properly moved, ie they are copy-constructed at the new position 
    * in memory, the old instance is then destroyed.
    */
@@ -313,7 +313,7 @@ public:
   {}
 
   /**
-   * Returns "true" if the given capacity is too large for the given count,
+   * Return "true" if the given capacity is too large for the given count,
    * that is, if GetCapacity() would return a value for \a count smaller than 
    * \a capacity.
    */
@@ -1025,7 +1025,8 @@ public:
   }
 
   /**
-   * Return true if the array is empty.
+   * Return whether the array is empty or not.
+   * \return True if the array is empty, false otherwise.
    * \remarks Rigidly equivalent to <tt>return GetSize() == 0</tt>, but more
    *   idiomatic.
    */
@@ -1080,7 +1081,7 @@ public:
 
   /**
    * Delete an element from the array.
-   * return True if the indicated item index was valid, else false.
+   * \return True if the indicated item index was valid, false otherwise.
    * \remarks Deletion speed is proportional to the size of the array and the
    *   location of the element being deleted. If the order of the elements in
    *   the array is not important, then you can instead use DeleteIndexFast()
@@ -1105,7 +1106,7 @@ public:
   /**
    * Delete an element from the array in constant-time, regardless of the
    * array's size.
-   * return True if the indicated item index was valid, else false.
+   * \return True if the indicated item index was valid, false otherwise.
    * \remarks This is a special version of DeleteIndex() which does not
    *   preserve the order of the remaining elements. This characteristic allows
    *   deletions to be performed in constant-time, regardless of the size of
@@ -1179,11 +1180,11 @@ public:
     Iterator& operator=(Iterator const& r)
     { currentelem = r.currentelem; array = r.array; return *this; }
 
-    /** Returns true if the next Next() call will return an element */
+    /** Return true if the next Next() call will return an element */
     bool HasNext() const
     { return currentelem < array.GetSize (); }
 
-    /** Returns the next element in the array and increment the iterator. */
+    /** Return the next element in the array and increment the iterator. */
     T& Next()
     { return array.Get(currentelem++); }
 
@@ -1213,11 +1214,11 @@ public:
     ConstIterator& operator=(ConstIterator const& r)
     { currentelem = r.currentelem; array = r.array; return *this; }
 
-    /** Returns true if the next Next() call will return an element */
+    /** Return true if the next Next() call will return an element */
     bool HasNext() const
     { return currentelem < array.GetSize (); }
 
-    /** Returns the next element in the array. */
+    /** Return the next element in the array. */
     const T& Next()
     { return array.Get(currentelem++); }
 
@@ -1247,11 +1248,11 @@ public:
     ReverseIterator& operator=(ReverseIterator const& r)
     { currentelem = r.currentelem; array = r.array; return *this; }
 
-    /** Returns true if the next Next() call will return an element */
+    /** Return true if the next Next() call will return an element */
     bool HasNext() const
     { return currentelem > 0 && currentelem <= array.GetSize (); }
 
-    /** Returns the next element in the array. */
+    /** Return the next element in the array. */
     T& Next()
     { return array.Get(--currentelem); }
 
@@ -1281,11 +1282,11 @@ public:
     ReverseConstIterator& operator=(ReverseConstIterator const& r)
     { currentelem = r.currentelem; array = r.array; return *this; }
 
-    /** Returns true if the next Next() call will return an element */
+    /** Return true if the next Next() call will return an element */
     bool HasNext() const
     { return currentelem > 0 && currentelem <= array.GetSize (); }
 
-    /** Returns the next element in the array. */
+    /** Return the next element in the array. */
     const T& Next()
     { return array.Get(--currentelem); }
 
@@ -1303,19 +1304,19 @@ public:
     const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
   };
 
-  /** Returns an Iterator which traverses the array. */
+  /** Return an Iterator which traverses the array. */
   Iterator GetIterator()
   { return Iterator(*this); }
 
-  /** Returns an Iterator which traverses the array. */
+  /** Return an Iterator which traverses the array. */
   ConstIterator GetIterator() const
   { return ConstIterator(*this); }
 
-  /** Returns an ReverseIterator which traverses the array in reverse direction. */
+  /** Return an ReverseIterator which traverses the array in reverse direction. */
   ReverseIterator GetReverseIterator()
   { return ReverseIterator(*this); }
 
-  /** Returns an Iterator which traverses the array. */
+  /** Return an Iterator which traverses the array. */
   ReverseConstIterator GetReverseIterator() const
   { return ReverseConstIterator(*this); }
   
