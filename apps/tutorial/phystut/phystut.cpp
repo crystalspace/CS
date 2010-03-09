@@ -484,7 +484,8 @@ bool Simple::OnMouseDown (iEvent& ev)
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
     // Trace the physical beam
-    csRef<iBulletDynamicSystem> bulletSystem = scfQueryInterface<iBulletDynamicSystem> (dynSys);
+    csRef<iBulletDynamicSystem> bulletSystem =
+      scfQueryInterface<iBulletDynamicSystem> (dynSys);
     csBulletHitBeamResult result = bulletSystem->HitBeam (startBeam, endBeam);
 
     // Add a force at the point clicked
@@ -632,6 +633,10 @@ bool Simple::Application ()
   else
   {
     bullet_dynSys = scfQueryInterface<iBulletDynamicSystem> (dynSys);
+
+    // We have some objects of size smaller than 0.035 units, so we scale up the
+    // whole world for a better behavior of the dynamic simulation.
+    bullet_dynSys->SetInternalScale (10.0f);
   }
 
   // Creating the scene's room

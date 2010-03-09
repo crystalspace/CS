@@ -347,9 +347,20 @@ bool AvatarTest::Application ()
       physicsEnabled = false;
     }
 
-    // Create the dynamic's debugger
     else
     {
+      csRef<iBulletDynamicSystem> bulletSystem =
+	scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
+
+      // We have some objects of size smaller than 0.035 units, so we scale up the
+      // whole world for a better behavior of the dynamic simulation.
+      bulletSystem->SetInternalScale (10.0f);
+
+      // The ragdoll model of Krystal is rather complex, we use high accuracy/low
+      // performance parameters for a better behavior of the dynamic simulation.
+      bulletSystem->SetStepParameters (0.008f, 150, 25);
+
+      // Create the dynamic's debugger
       dynamicsDebugger = debuggerManager->CreateDebugger ();
       dynamicsDebugger->SetDynamicSystem (dynamicSystem);
       dynamicsDebugger->SetDebugSector (room);

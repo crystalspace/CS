@@ -57,7 +57,7 @@ csVector3 KrystalScene::GetCameraTarget ()
 float KrystalScene::GetSimulationSpeed ()
 {
   if (krystalDead)
-    return 0.2f;
+    return 0.3f;
 
   return 1.0f;
 }
