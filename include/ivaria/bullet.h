@@ -69,6 +69,39 @@ struct iBulletDynamicSystem : public virtual iBase
    * iSector::HitBeamPortals()
    */
   virtual csBulletHitBeamResult HitBeam (const csVector3 &start, const csVector3 &end) = 0;
+
+
+  /**
+   * Set the internal scale to be applied to the whole dynamic world. Use this
+   * to put back the range of dimensions you use for your objects to the one
+   * Bullet was designed for.
+   *
+   * Bullet does not work well if the dimensions of your objects are smaller
+   * than 0.1 to 1.0 units or bigger than 10 to 100 units. Use this method to
+   * fix the problem.
+   *
+   * \warning You have to call this method before adding any objects in the
+   * dynamic world, otherwise the objects won't have the same scale.
+   */
+  virtual void SetInternalScale (float scale) = 0;
+
+  /**
+   * Set the parameters of the constraint solver. Use this if you want to find a
+   * compromise between accuracy of the simulation and performance cost.
+   * \param timeStep The internal, constant, time step of the simulation, in seconds.
+   * A smaller value gives better accuracy. Default value is 1/60 s (ie 0.0166 s).
+   * \param maxSteps Maximum number of steps that Bullet is allowed to take each
+   * time you call iDynamicSystem::Step(). If you pass a very small time step as
+   * the first parameter, then you must increase the number of maxSteps to
+   * compensate for this, otherwise your simulation is 'losing' time. Default value
+   * is 1. If you pass maxSteps=0 to the function, then it will assume a variable
+   * tick rate. Don't do it.
+   * \param iterations Number of iterations of the constraint solver. A reasonable
+   * range of iterations is from 4 (low quality, good performance) to 20 (good
+   * quality, less but still reasonable performance). Default value is 10. 
+   */
+  virtual void SetStepParameters (float timeStep, size_t maxSteps,
+				  size_t iterations) = 0;
 };
 
 /**
