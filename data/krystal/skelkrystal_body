@@ -382,8 +382,8 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.07" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
-     <move x="0.0" y="0.0" z="0.0475" />
+    <collidercapsule length="0.065" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.045" />
     </collidercapsule>
    </colliders>
    <joint>
@@ -402,8 +402,8 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.06" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
-     <move x="0.0" y="0.0" z="0.0425" />
+    <collidercapsule length="0.05" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0375" />
     </collidercapsule>
    </colliders>
    <joint>
@@ -422,8 +422,8 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.06" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
-     <move x="0.0" y="0.0" z="0.0425" />
+    <collidercapsule length="0.05" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0375" />
     </collidercapsule>
    </colliders>
    <joint>
@@ -442,8 +442,8 @@
     <mass value="1.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.06" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
-     <move x="0.0" y="0.0" z="0.0425" />
+    <collidercapsule length="0.045" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.035" />
     </collidercapsule>
    </colliders>
    <joint>
@@ -462,8 +462,8 @@
     <mass value="3.0" />
    </properties>
    <colliders>
-    <collidercapsule length="0.1" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
-     <move x="0.0" y="0.0" z="0.06125" />
+    <collidercapsule length="0.09" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0575" />
     </collidercapsule>
    </colliders>
    <joint>
