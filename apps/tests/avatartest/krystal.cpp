@@ -103,9 +103,8 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     if (krystalDead)
     {
       // Trace a physical beam to find if a rigid body was hit
-      csRef<iBulletDynamicSystem> bulletSystem =
-	scfQueryInterface<iBulletDynamicSystem> (avatarTest->dynamicSystem);
-      csBulletHitBeamResult physicsResult = bulletSystem->HitBeam (startBeam, endBeam);
+      csBulletHitBeamResult physicsResult =
+	avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
 
       // Apply a big force at the point clicked by the mouse
       if (physicsResult.body)
@@ -132,6 +131,11 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     // OK, it's an animesh, it must be Krystal, start the ragdoll
     krystalDead = true;
 
+    // The ragdoll model of Krystal is rather complex. We therefore use high
+    // accuracy/low performance parameters for a better behavior of the dynamic
+    // simulation.
+    avatarTest->bulletDynamicSystem->SetStepParameters (0.008f, 150, 10);
+
     // Set the ragdoll state of the iBodyChain of the whole body as dynamic
     // (hairs are already in the good state)
     ragdollNode->SetBodyChainState (bodyChain, RAGDOLL_STATE_DYNAMIC);
@@ -152,9 +156,8 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     }
 
     // Trace a physical beam to find which rigid body was hit
-    csRef<iBulletDynamicSystem> bulletSystem =
-      scfQueryInterface<iBulletDynamicSystem> (avatarTest->dynamicSystem);
-    csBulletHitBeamResult physicsResult = bulletSystem->HitBeam (startBeam, endBeam);
+    csBulletHitBeamResult physicsResult =
+      avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
 
     // Apply a big force at the point clicked by the mouse
     if (physicsResult.body)
@@ -283,8 +286,8 @@ bool KrystalScene::CreateAvatar ()
   {
     // Create the ragdoll controller
     csRef<iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
-      avatarTest->ragdollManager->CreateAnimNodeFactory ("ragdoll",
-					     bodySkeleton, avatarTest->dynamicSystem);
+      avatarTest->ragdollManager->CreateAnimNodeFactory
+      ("ragdoll", bodySkeleton, avatarTest->dynamicSystem);
     animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
     ragdollNodeFactory->SetChildNode (randomNodeFactory);
 
@@ -362,6 +365,11 @@ void KrystalScene::ResetScene ()
     if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
 	|| avatarTest->dynamicsDebugMode == DYNDEBUG_MIXED)
       avatarTest->dynamicsDebugger->UpdateDisplay ();
+
+    // There are still big unlinerarities in the transition of Krystal's animations.
+    // These gaps create a bad behavior of the simulation of the hairs, this is
+    // better with lower step parameters.
+    avatarTest->bulletDynamicSystem->SetStepParameters (0.016667f, 1, 10);
   }
 }
 

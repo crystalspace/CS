@@ -349,16 +349,19 @@ bool AvatarTest::Application ()
 
     else
     {
-      csRef<iBulletDynamicSystem> bulletSystem =
+      // Find the Bullet interface of the dynamic system
+      bulletDynamicSystem =
 	scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
 
       // We have some objects of size smaller than 0.035 units, so we scale up the
       // whole world for a better behavior of the dynamic simulation.
-      bulletSystem->SetInternalScale (10.0f);
+      bulletDynamicSystem->SetInternalScale (10.0f);
 
-      // The ragdoll model of Krystal is rather complex, we use high accuracy/low
-      // performance parameters for a better behavior of the dynamic simulation.
-      bulletSystem->SetStepParameters (0.008f, 150, 25);
+      // The ragdoll model of Krystal is rather complex, and the model of Frankie
+      // is unstable because of the overlap of its colliders. We therefore use high
+      // accuracy/low performance parameters for a better behavior of the dynamic
+      // simulation.
+      bulletDynamicSystem->SetStepParameters (0.008f, 150, 10);
 
       // Create the dynamic's debugger
       dynamicsDebugger = debuggerManager->CreateDebugger ();

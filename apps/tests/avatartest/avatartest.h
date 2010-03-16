@@ -85,6 +85,7 @@ private:
   bool physicsEnabled;
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
+  csRef<iBulletDynamicSystem> bulletDynamicSystem;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
