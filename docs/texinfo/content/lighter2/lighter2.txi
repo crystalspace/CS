@@ -24,8 +24,8 @@ a certain user-configured option has to be specified.
 @menu
 * lighter2 Basic Usage Examples:: @code{lighter2} Basic Usage Examples
 * lighter2 User's Manual:: @code{lighter2} User's Manual
-* lighter2 Developer's Manual:: @code{lighter2} Developer's Manual
 * lighter2 Configure Options Reference:: @code{lighter2} Configure Options Reference
+* lighter2 Developer's Manual:: @code{lighter2} Developer's Manual
 @end menu
 
 @importss{content,lighter2,usageExamples.txi}
