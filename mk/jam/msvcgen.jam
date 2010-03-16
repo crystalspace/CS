@@ -1106,36 +1106,48 @@ rule _ApplyStaticPluginFlags
   if $(package)
   {
     # External static plugins.
-    local lflags.debug lflags.release p mode ;
+    local lflags.debug lflags.release p mode arch ;
     # Grab flags
-    local target_lflags.release target_lflags.debug ;
+    local target_lflags.release.x86 target_lflags.debug.x86 ;
+    local target_lflags.release.x64 target_lflags.debug.x64 ;
     local target_relaydeps ;
     for p in $(plugins)
     {
       NotFile $(p) ;
       for mode in debug release
       {
-        local cflags ;
-        if $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION))
-        {
-	  cflags = $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION)) ;
-	}
-	else
+	for arch in x86 x64
 	{
-	  cflags = $(STATICPLUGIN.$(p).CFLAGS.$(mode)) ;
+	  local cflags ;
+	  if $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(arch).$(MSVC_VERSION))
+	  {
+	    cflags = $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(arch).$(MSVC_VERSION)) ;
+	  }
+	  else if $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION))
+	  {
+	    cflags = $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION)) ;
+	  }
+	  else
+	  {
+	    cflags = $(STATICPLUGIN.$(p).CFLAGS.$(mode)) ;
+	  }
+	  if $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(arch).$(MSVC_VERSION))
+	  {
+	    target_lflags.$(mode).$(arch) += $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(arch).$(MSVC_VERSION)) ;
+	  }
+	  else if $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION))
+	  {
+	    target_lflags.$(mode).$(arch) += $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION)) ;
+	  }
+	  else
+	  {
+	    target_lflags.$(mode).$(arch) += $(STATICPLUGIN.$(p).LFLAGS.$(mode)) ;
+	  }
+	  for target in $(1)
+	  {
+	    MsvcCFlags $(target) : $(cflags) : $(arch) ;
+	  }
 	}
-	if $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION))
-	{
-	  target_lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION)) ;
-	}
-	else
-	{
-	  target_lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode)) ;
-	}
-        for target in $(1)
-        {
-          MsvcCFlags $(target) : $(cflags) ;
-        }
       }
       
       local relaydeps = $(STATICPLUGIN.$(p).RELAYDEPS) ;
@@ -1161,10 +1173,13 @@ rule _ApplyStaticPluginFlags
     }
     for mode in debug release
     {
-      local lflags = [ RemoveDupFlags $(target_lflags.$(mode)) ] ;
-      for target in $(1)
+      for arch in x86 x64
       {
-        MsvcLFlags $(target) : $(lflags) : $(mode) ;
+	local lflags = [ RemoveDupFlags $(target_lflags.$(mode).$(arch)) ] ;
+	for target in $(1)
+	{
+	  MsvcLFlags $(target) : $(lflags) : $(mode) : $(arch) ;
+	}
       }
     }
   }
@@ -1523,69 +1538,94 @@ rule StaticPluginLibrary
 # Write out CFLAGS, LFLAGS needed by a plugin
 rule WriteDependencies
 {
-  local cflags.debug cflags.release ;
-  local lflags.debug lflags.release ;
+  #local cflags.debug cflags.release ;
+  #local lflags.debug lflags.release ;
   local depfile = $(<) ;
   local plugin = $(>) ;
   local libname = $(3) ;
-  local depfile_gristed = $(depfile:G=$(plugin)) ;
-  MakeLocate $(depfile_gristed) : [ on $(depfile) GetVar LOCATE ] ;
   
-  # "Artificially" insert static library itself
-  lflags.debug += $(MSVC.PREFIX.library_static)$(libname)_d.lib ;
-  lflags.release += $(MSVC.PREFIX.library_static)$(libname).lib ;
-  # Collect other libs
-  local libs = [ ResolveLibs $($(plugin).NEEDLIBS) ] ;
-  lflags.debug += $(MSVC.PREFIX.library_static)$(libs)_d.lib ;
-  lflags.release += $(MSVC.PREFIX.library_static)$(libs).lib ;
-  
-  # Defines
-  local l ;
-  for l in $($(plugin).EXTERNALLIBS)
-  {
-    if $($(l).DEFINES.DEBUG)
-    {
-      cflags.debug += "\"/D $($(l).DEFINES.DEBUG)\"" ;
-      cflags.release += "\"/D $($(l).DEFINES)\"" ;
-    }
-    else
-    {
-      cflags.debug += "\"/D $($(l).DEFINES)\"" ;
-      cflags.release += "\"/D $($(l).DEFINES)\"" ;
-    }
-  }
-  # Link flags
-  local mode ;
-  for mode in debug release
-  {
-    lflags.$(mode) += $($(plugin).LFLAGS.$(mode))  ;
-    lflags.$(mode) += $($(plugin)_$(mode)_EXTERNALLIBS)  ;
-  }
-  CFLAGS.DEBUG on $(depfile_gristed) = "$(cflags.debug)" ;
-  CFLAGS.RELEASE on $(depfile_gristed) = "$(cflags.release)" ;
-  lflags.debug = [ RemoveDups $(lflags.debug) ] ;
-  LFLAGS.DEBUG on $(depfile_gristed) = "$(lflags.debug)" ;
-  lflags.release = [ RemoveDups $(lflags.release) ] ;
-  LFLAGS.RELEASE on $(depfile_gristed) = "$(lflags.release)" ;
-  LIBNAME on $(depfile_gristed) = $(libname) ;
-  
+  local depfile_gristed_plugin = $(depfile:G=$(plugin)) ;
+  MakeLocate $(depfile_gristed_plugin) : [ on $(depfile) GetVar LOCATE ] ;
   if $($(depfile).FIRSTTIME) != "yes"
   {
-    CreateDepFlagsFile $(depfile_gristed) ;
+    CreateDepFlagsFile $(depfile_gristed_plugin) ;
     $(depfile).FIRSTTIME = "yes" ;
   }
-  WriteDepFlags $(depfile_gristed) : $(plugin) ;
+  WriteDepFlagsPluginAvail $(depfile_gristed_plugin) : $(plugin) ;
+  
+  local mode arch ;
+  for mode in debug release
+  {
+    for arch in x86 x64
+    {
+      local depfile_gristed = $(depfile:G=$(plugin)_$(mode)_$(arch)) ;
+      MakeLocate $(depfile_gristed) : [ on $(depfile) GetVar LOCATE ] ;
+      
+      local lflags cflags ;
+      if "$(mode)" = "debug"
+      {
+	# "Artificially" insert static library itself
+	lflags += $(MSVC.PREFIX.library_static)$(libname)_d.lib ;
+	# Collect other libs
+	local libs = [ ResolveLibs $($(plugin).NEEDLIBS) ] ;
+	lflags += $(MSVC.PREFIX.library_static)$(libs)_d.lib ;
+      }
+      else
+      {
+	# "Artificially" insert static library itself
+	lflags += $(MSVC.PREFIX.library_static)$(libname).lib ;
+	# Collect other libs
+	local libs = [ ResolveLibs $($(plugin).NEEDLIBS) ] ;
+	lflags += $(MSVC.PREFIX.library_static)$(libs).lib ;
+      }
+  
+      # Defines
+      local l ;
+      for l in $($(plugin).EXTERNALLIBS)
+      {
+	if "$(mode)" = "debug"
+	{
+	  if $($(l).DEFINES.DEBUG)
+	  {
+	    cflags += "\"/D $($(l).DEFINES.DEBUG)\"" ;
+	  }
+	  else
+	  {
+	    cflags += "\"/D $($(l).DEFINES)\"" ;
+	  }
+	}
+	else
+	{
+	  cflags += "\"/D $($(l).DEFINES)\"" ;
+	}
+      }
+  
+      # Link flags
+      lflags += $($(plugin).LFLAGS.$(mode))  ;
+      lflags += $($(plugin)_$(mode)_$(arch)_EXTERNALLIBS)  ;
+      CFLAGS on $(depfile_gristed) = "$(cflags)" ;
+      lflags = [ RemoveDups $(lflags) ] ;
+      LFLAGS on $(depfile_gristed) = "$(lflags)" ;
+      MODE on $(depfile_gristed) = "$(mode)" ;
+      ARCH on $(depfile_gristed) = "$(arch)" ;
+  
+      WriteDepFlags $(depfile_gristed) : $(plugin) ;
+      Depends $(depfile_gristed) : $(depfile_gristed_plugin) ;
+      Depends $(depfile) : $(depfile_gristed) ;
+      Always $(depfile_gristed) ;
+    }
+  }
   
   local relaydeps = $($(plugin).RELAYDEPS) ;
   for relaydep in $(relaydeps)
   {
-    RELAYDEP on $(depfile_gristed) = "$(relaydep)" ;
-    RELAYLIBS on $(depfile_gristed) = "$($(plugin).RELAYLIBS.$(relaydep))" ;
-    WriteDepRelayLibs $(depfile_gristed) : $(plugin) ;
+    RELAYDEP on $(depfile_gristed_plugin) = "$(relaydep)" ;
+    RELAYLIBS on $(depfile_gristed_plugin) = "$($(plugin).RELAYLIBS.$(relaydep))" ;
+    WriteDepRelayLibs $(depfile_gristed_plugin) : $(plugin) ;
   }
   
-  Depends $(depfile) : $(depfile_gristed) ;
-  Always $(depfile_gristed) ;
+  Depends $(depfile) : $(depfile_gristed_plugin) ;
+  Always $(depfile_gristed_plugin) ;
 }
 
 actions CreateDepFlagsFile
@@ -1599,14 +1639,18 @@ actions CreateDepFlagsFile
 EOT
 }
 
-actions WriteDepFlags
+actions WriteDepFlagsPluginAvail
 {
   cat << EOT >> $(<)
 STATICPLUGINS.AVAILABLE += $(>) ;
-STATICPLUGIN.$(>).CFLAGS.debug.$(MSVC_VERSION) = $(CFLAGS.DEBUG) ;
-STATICPLUGIN.$(>).CFLAGS.release.$(MSVC_VERSION) = $(CFLAGS.RELEASE) ;
-STATICPLUGIN.$(>).LFLAGS.debug.$(MSVC_VERSION) = $(LFLAGS.DEBUG) ;
-STATICPLUGIN.$(>).LFLAGS.release.$(MSVC_VERSION) = $(LFLAGS.RELEASE) ;
+EOT
+}
+
+actions WriteDepFlags
+{
+  cat << EOT >> $(<)
+STATICPLUGIN.$(>).CFLAGS.$(MODE).$(ARCH).$(MSVC_VERSION) = $(CFLAGS) ;
+STATICPLUGIN.$(>).LFLAGS.$(MODE).$(ARCH).$(MSVC_VERSION) = $(LFLAGS) ;
 EOT
 }
 
