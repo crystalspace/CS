@@ -44,7 +44,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     newP.AttachNew (new AnimationPacket (this));
 
     // Setup the root
-    newP->animRoot = animRoot->CreateInstance (newP, skeleton);
+    if (animRoot)
+      newP->animRoot = animRoot->CreateInstance (newP, skeleton);
 
     return csPtr<iSkeletonAnimPacket2> (newP);
   }
