@@ -133,8 +133,7 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
   virtual void SetAnimatedMesh (iAnimatedMesh* mesh) = 0;
 
   /**
-   * Set the body chain in the specified physical state. The kinematic state 
-   * is not yet supported.
+   * Set the body chain in the specified physical state.
    */
   virtual void SetBodyChainState (iBodyChain* chain,
 				  csSkeletonRagdollState state) = 0;
