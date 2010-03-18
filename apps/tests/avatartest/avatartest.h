@@ -64,6 +64,7 @@ class AvatarTest : public csApplicationFramework, public csBaseEventHandler
 {
   friend class FrankieScene;
   friend class KrystalScene;
+  friend class SintelScene;
 
 private:
   AvatarScene* avatarScene;

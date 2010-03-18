@@ -27,6 +27,9 @@ KrystalScene::KrystalScene (AvatarTest* avatarTest)
 
 KrystalScene::~KrystalScene ()
 {
+  if (!animesh)
+    return;
+
   // Remove the mesh from the scene
   csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
   avatarTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
@@ -34,7 +37,7 @@ KrystalScene::~KrystalScene ()
 
 csVector3 KrystalScene::GetCameraStart ()
 {
-  return csVector3 (0.0f, 0.0f, -2.5f);
+  return csVector3 (0.0f, 1.0f, -2.5f);
 }
 
 csVector3 KrystalScene::GetCameraTarget ()
@@ -396,7 +399,7 @@ void KrystalScene::DisplayKeys ()
   avatarTest->WriteShadow (x, y, fg, "r: reset scene");
   y += lineSize;
 
-  avatarTest->WriteShadow (x, y, fg, "m: switch to Frankie");
+  avatarTest->WriteShadow (x, y, fg, "n: switch to next scene");
   y += lineSize;
 
   // Write FPS and other info

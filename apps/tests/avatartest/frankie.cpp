@@ -35,6 +35,9 @@ FrankieScene::FrankieScene (AvatarTest* avatarTest)
 
 FrankieScene::~FrankieScene ()
 {
+  if (!animesh)
+    return;
+
   // Remove the 'lookat' listener
   lookAtNode->RemoveListener (&lookAtListener);
 
@@ -548,7 +551,7 @@ void FrankieScene::DisplayKeys ()
   avatarTest->WriteShadow (x, y, fg, "r: reset scene");
   y += lineSize;
 
-  avatarTest->WriteShadow (x, y, fg, "m: switch to Krystal");
+  avatarTest->WriteShadow (x, y, fg, "n: switch to next scene");
   y += lineSize;
 
   // Write FPS and other info

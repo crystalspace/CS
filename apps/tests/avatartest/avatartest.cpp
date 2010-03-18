@@ -22,9 +22,11 @@
 #include "avatartest.h"
 #include "frankie.h"
 #include "krystal.h"
+#include "sintel.h"
 
 #define MODEL_FRANKIE 1
 #define MODEL_KRYSTAL 2
+#define MODEL_SINTEL 3
 
 CS_IMPLEMENT_APPLICATION
 
@@ -42,10 +44,10 @@ AvatarTest::~AvatarTest ()
 void AvatarTest::Frame ()
 {
   // First get elapsed time from the virtual clock.
-  csTicks elapsed_time = vc->GetElapsedTicks ();
+  csTicks elapsedTime = vc->GetElapsedTicks ();
 
   // Now rotate the camera according to keyboard state
-  const float speed = elapsed_time / 1000.0f;
+  const float speed = elapsedTime / 1000.0f;
 
   // Compute camera and animesh position
   iCamera* c = view->GetCamera ();
@@ -126,7 +128,7 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
     }
 
     // Check for switching of model
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'm')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'n')
     {
       delete avatarScene;
 
@@ -134,6 +136,12 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
       {
 	avatarModel = MODEL_KRYSTAL;
 	avatarScene = new KrystalScene (this);
+      }
+
+      else if (avatarModel == MODEL_KRYSTAL)
+      {
+	avatarModel = MODEL_SINTEL;
+	avatarScene = new SintelScene (this);
       }
 
       else
@@ -149,6 +157,9 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
 	if (q) q->GetEventOutlet()->Broadcast (csevQuit (GetObjectRegistry ()));
 	return true;
       }
+
+      // Re-initialize camera position
+      view->GetCamera ()->GetTransform ().SetOrigin (avatarScene->GetCameraStart ());
 
       return true;
     }
@@ -198,10 +209,10 @@ bool AvatarTest::OnInitialize (int /*argc*/, char* /*argv*/ [])
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (GetObjectRegistry ()))
   {
-    csPrintf ("Usage: avatartest\n");
+    csPrintf ("Usage: avatartest <OPTIONS>\n");
     csPrintf ("Tests on animesh animation\n\n");
     csPrintf ("Options for avatartest:\n");
-    csPrintf ("  -model=<name>:     set the starting model (frankie, krystal)\n");
+    csPrintf ("  -scene=<name>:     set the starting scene (frankie, krystal, sintel)\n");
     csPrintf ("  -no_physics:       disable physical animations\n");
     csCommandLineHelper::Help (GetObjectRegistry ());
     return false;
@@ -275,17 +286,25 @@ bool AvatarTest::OnInitialize (int /*argc*/, char* /*argv*/ [])
   }
 
   // Read which model to display at first
-  csString modelName = clp->GetOption ("model");
-  if (modelName != "krystal")
-  {
-    if (!modelName.IsEmpty () && modelName != "frankie")
-      printf ("Given model ('%s') is not one of {'frankie', 'krystal'}. Using Frankie\n",
-	      modelName.GetData ());
-
+  csString sceneName = clp->GetOption ("scene");
+  if (sceneName.IsEmpty ())
     avatarModel = MODEL_FRANKIE;
-  }
+
   else
-    avatarModel = MODEL_KRYSTAL;
+  {
+    if (sceneName == "krystal")
+      avatarModel = MODEL_KRYSTAL;
+
+    else if (sceneName == "sintel")
+      avatarModel = MODEL_SINTEL;
+
+    else
+    {
+      printf ("Given model ('%s') is not one of {'frankie', 'krystal', 'sintel'}. Falling back to Frankie\n",
+	      sceneName.GetData ());
+      avatarModel = MODEL_FRANKIE;
+    }
+  }
 
   return true;
 }
@@ -382,6 +401,8 @@ bool AvatarTest::Application ()
   // Create avatar
   if (avatarModel == MODEL_KRYSTAL)
     avatarScene = new KrystalScene (this);
+  if (avatarModel == MODEL_SINTEL)
+    avatarScene = new SintelScene (this);
   else
     avatarScene = new FrankieScene (this);
   if (!avatarScene->CreateAvatar ())
