@@ -1,0 +1,25 @@
+<library>
+ <addon plugin="crystalspace.skeletalanimation.loader">
+  <animationpacket name="Armature_packet">
+     <animation name="idle01">
+<channel bone="0">
+<key time="0" x="-1.54918296857e-007" y="8.73731522688e-008" z="0.139195978642" qx="-0.278141140938" qy="-0.0280011892319" qz="-0.0183514468372" qw="-0.959956586361" />
+<key time="1" x="-1.54918296857e-007" y="8.73731522688e-008" z="0.139195978642" qx="-0.278141140938" qy="-0.0280011892319" qz="-0.0183514468372" qw="-0.959956586361" />
+</channel>
+<channel bone="1">
+<key time="0" x="-1.54918296857e-007" y="8.73731522688e-008" z="0.139195978642" qx="-0.278141140938" qy="-0.0280011892319" qz="-0.0183514468372" qw="-0.959956586361" />
+<key time="1" x="-1.54918296857e-007" y="8.73731522688e-008" z="0.139195978642" qx="-0.278141140938" qy="-0.0280011892319" qz="-0.0183514468372" qw="-0.959956586361" />
+</channel>
+     </animation>
+  </animationpacket>
+  <skeleton name="Armature">
+    <bone name="Head">
+     <transform x="0.0" y="0.0" z="-3.5527136788e-015" qx="0.707106649876" qy="0.0" qz="0.0" qw="-0.707106888294" />
+    </bone>
+    <bone name="Mouth">
+     <transform x="0.0" y="0.102911151946" z="-0.0190681703389" qx="-0.981092810631" qy="0.0" qz="0.0" qw="-0.193537741899" />
+    </bone>
+   <animationpacket>Armature_packet</animationpacket>
+  </skeleton>
+</addon>
+</library>

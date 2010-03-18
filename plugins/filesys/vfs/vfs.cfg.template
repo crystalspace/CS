@@ -59,7 +59,8 @@ VFS.Mount.lib/cubemap  = $(CS_DATADIR)$/cube$/
 VFS.Mount.lib/teapot   = $(CS_DATADIR)$/teapot.zip
 VFS.Mount.lib/kwartz   = $(CS_DATADIR)$/kwartz.zip
 VFS.Mount.lib/frankie  = $(CS_DATADIR)$/frankie$/
-VFS.Mount.lib/krystal = $(CS_DATADIR)$/krystal$/
+VFS.Mount.lib/krystal  = $(CS_DATADIR)$/krystal$/
+VFS.Mount.lib/sintel   = $(CS_DATADIR)$/sintel$/
 VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 
 ; General CEGUI data
