@@ -44,12 +44,13 @@ namespace Graphics
 {
   /// Rendering priority.
   typedef int RenderPriority;
-  
+
+  /// Culling mode of a mesh.
   enum MeshCullMode
   {
-    cullNormal,
-    cullFlipped,
-    cullDisabled
+    cullNormal,    /*!< Normal culling. */
+    cullFlipped,   /*!< Flipped culling. */
+    cullDisabled   /*!< Culling is disabled. */
   };
   
   /**
@@ -201,13 +202,15 @@ namespace Graphics
   };
 
   /**
-  * Start and end for a  range of indices to render.
+  * Start and end for a range of indices to render.
   * The indices are used in the range from \a start (inclusive) to \a end
   * (exclusive): start <= n < end
   */
   struct RenderMeshIndexRange
   {
+    /// Start index.
     unsigned int start;
+    /// End index.
     unsigned int end;
   };
 
