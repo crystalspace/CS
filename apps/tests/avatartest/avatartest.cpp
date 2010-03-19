@@ -401,10 +401,11 @@ bool AvatarTest::Application ()
   // Create avatar
   if (avatarModel == MODEL_KRYSTAL)
     avatarScene = new KrystalScene (this);
-  if (avatarModel == MODEL_SINTEL)
+  else if (avatarModel == MODEL_SINTEL)
     avatarScene = new SintelScene (this);
   else
     avatarScene = new FrankieScene (this);
+
   if (!avatarScene->CreateAvatar ())
     return false;
 
