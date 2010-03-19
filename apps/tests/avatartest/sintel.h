@@ -53,6 +53,9 @@ class SintelScene : public AvatarScene
  private:
   AvatarTest* avatarTest;
 
+  csRef<iMeshWrapper> hairsMesh;
+  csRef<iMeshWrapper> eyesMesh;
+
   // Management of facial expressions 
   struct ActiveMorphComponent
   {

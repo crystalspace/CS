@@ -30,12 +30,18 @@ SintelScene::SintelScene (AvatarTest* avatarTest)
 
 SintelScene::~SintelScene ()
 {
-  if (!animesh)
-    return;
+  // Remove the meshes from the scene
+  if (animesh)
+  {
+    csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
+    avatarTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
+  }
 
-  // Remove the mesh from the scene
-  csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
-  avatarTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
+  if (hairsMesh)
+    avatarTest->engine->RemoveObject (hairsMesh);
+
+  if (eyesMesh)
+    avatarTest->engine->RemoveObject (eyesMesh);
 }
 
 csVector3 SintelScene::GetCameraStart ()
@@ -245,6 +251,26 @@ bool SintelScene::CreateAvatar ()
   if (!animeshFactory)
     return avatarTest->ReportError ("Can't find Sintel's animesh factory!");
 
+  // Load the mesh for the hairs
+  rc = avatarTest->loader->Load ("/lib/sintel/sintel_hairs");
+  if (!rc.success)
+    return avatarTest->ReportError ("Can't load Sintel's hairs library file!");
+
+  csRef<iMeshFactoryWrapper> hairsMeshfact =
+    avatarTest->engine->FindMeshFactory ("sintel_hairs");
+  if (!hairsMeshfact)
+    return avatarTest->ReportError ("Can't find Sintel's hairs mesh factory!");
+
+  // Load the mesh for the eyes
+  rc = avatarTest->loader->Load ("/lib/sintel/sintel_eyes");
+  if (!rc.success)
+    return avatarTest->ReportError ("Can't load Sintel's eyes library file!");
+
+  csRef<iMeshFactoryWrapper> eyesMeshfact =
+    avatarTest->engine->FindMeshFactory ("sintel_eyes");
+  if (!eyesMeshfact)
+    return avatarTest->ReportError ("Can't find Sintel's eyes mesh factory!");
+
   // Create a new animation tree. The structure of the tree is:
   //   + idle animation node (root and only node)
   csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
@@ -329,6 +355,14 @@ bool SintelScene::CreateAvatar ()
 					   avatarTest->room, csVector3 (0.0f));
   animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
+  // Create the hairs
+  hairsMesh = avatarTest->engine->CreateMeshWrapper (hairsMeshfact, "sintel_hairs",
+						     avatarTest->room, csVector3 (0.0f));
+
+  // Create the eyes
+  eyesMesh = avatarTest->engine->CreateMeshWrapper (eyesMeshfact, "sintel_eyes",
+						    avatarTest->room, csVector3 (0.0f));
+
   // Start animation
   iSkeletonAnimNode2* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
@@ -367,8 +401,8 @@ void SintelScene::DisplayKeys ()
   avatarTest->WriteShadow (x, y, fg, "4: set expression 3");
   y += lineSize;
 
-  avatarTest->WriteShadow (x, y, fg, "r: reset scene");
-  y += lineSize;
+  //avatarTest->WriteShadow (x, y, fg, "r: reset scene");
+  //y += lineSize;
 
   avatarTest->WriteShadow (x, y, fg, "n: switch to next scene");
   y += lineSize;
