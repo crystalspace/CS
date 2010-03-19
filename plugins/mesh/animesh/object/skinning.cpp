@@ -34,6 +34,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::MorphVertices ()
   {
+    // Don't do anything if the morph weights haven't be changed
+    if (!morphStateChanged)
+      return;
+
+    // Flag the new morphing version
+    morphStateChanged = false;
+    morphVersion++;
+
     // Check if a morph target is active
     const size_t morphTargetCount = morphTargetWeights.GetSize();
     size_t activeMorphCount = 0;
@@ -47,13 +55,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       return;
     }
 
-    // Setup the morph target VB
+    // Create the render buffer where the targets will be morphed
     if (!postMorphVertices || postMorphVertices == factory->vertexBuffer)
     {
       postMorphVertices = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
         CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
     }
 
+    // Allocate the walkers of the active morph targets
     CS_ALLOC_STACK_ARRAY(uint8, morphWalkersRaw, 
       activeMorphCount * sizeof (MorphTargetOffsetsWalker));
 
@@ -92,6 +101,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       ++srcVerts;
     }
 
+    // Delete the walkers
     for (size_t m = 0; m < activeMorphCount; m++)
     {
       morphWalkers[m].~MorphTargetOffsetsWalker();
@@ -100,8 +110,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 #include "csutil/custom_new_enable.h"
 
-  template<bool SkinV, bool SkinN, bool SkinTB>
-  void AnimeshObject::Skin ()
+  void AnimeshObject::Skin (bool SkinV, bool SkinN, bool SkinTB)
   {
     if (!skeleton)
       return;
@@ -205,31 +214,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       ++srcTangents;
       ++srcBinormals;
     }
-  }
-
-  void AnimeshObject::SkinVertices ()
-  {
-    Skin<true, false, false> ();
-  }
-
-  void AnimeshObject::SkinNormals ()
-  {
-    Skin<false, true, false> ();
-  }
-
-  void AnimeshObject::SkinVerticesAndNormals ()
-  {
-    Skin<true, true, false> ();
-  }
-
-  void AnimeshObject::SkinTangentAndBinormal ()
-  {
-    Skin<false, false, true> ();
-  }
-
-  void AnimeshObject::SkinAll ()
-  {
-    Skin<true, true, true> ();
   }
 
 }

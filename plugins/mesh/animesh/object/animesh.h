@@ -350,14 +350,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void UpdateLocalBoneTransforms ();
     void UpdateSocketTransforms ();
 
-    void SkinVertices ();
-    void SkinNormals ();
-    void SkinVerticesAndNormals ();
-    void SkinTangentAndBinormal ();
-    void SkinAll ();
-
-    template<bool SkinVerts, bool SkinNormals, bool SkinTB>
-    void Skin ();
+    void Skin (bool skinVerts, bool skinNormals, bool skinTB);
 
     void MorphVertices ();
 
@@ -485,11 +478,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRef<iRenderBuffer> postMorphVertices;
 
     csArray<float> morphTargetWeights;
+    unsigned int morphVersion;
+    bool morphStateChanged;
 
-    // Version numbers for the software skinning
-    unsigned int skinVertexVersion, skinNormalVersion, skinTangentVersion, skinBinormalVersion;
-    // Things we skinned in software last frame
-    bool skinVertexLF, skinNormalLF, skinTangentLF, skinBinormalLF;
+    // Version numbers for the skinning
+    unsigned int skinVertexVersion, skinNormalVersion, skinTangentBinormalVersion;
+    unsigned int morphVertexVersion;
+    // Things we skinned last frame
+    bool skinVertexLF, skinNormalLF, skinTangentBinormalLF;
   };
 
 }
