@@ -6,22 +6,22 @@
   </plugins>
   <shaders/>
   <textures>
-    <texture name='face.png'>
-      <file>/lib/sintel/face.png</file>
+    <texture name='sintel_face.png'>
+      <file>/lib/sintel/sintel_face.png</file>
     </texture>
   </textures>
   <materials>
-    <material name='skin_proxy'>
-      <texture>face.png</texture>
+    <material name='sintel_face'>
+      <texture>sintel_face.png</texture>
     </material>
-    <material name='red_proxy'>
-      <texture>face.png</texture>
+    <material name='sintel_eyes'>
+      <texture>sintel_face.png</texture>
     </material>
-    <material name='lips_proxy'>
-      <texture>face.png</texture>
+    <material name='sintel_hairs'>
+      <texture>sintel_face.png</texture>
     </material>
   </materials>
   <sounds/>
-  <library>/lib/sintel/skelArmature</library>
+  <library>/lib/sintel/skelsintel_rig</library>
   <library>/lib/sintel/sintel_head</library>
 </library>
