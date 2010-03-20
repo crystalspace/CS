@@ -1621,10 +1621,12 @@ AS_IF([test $cs_cv_libwx_opengl = yes],
 #----------------------------------------------------------------------------
 # Check for CEGUI.
 #----------------------------------------------------------------------------
+# The check fails on some distros with missing references to libdl
+# (eg on OpenSUSE), so pass -ldl along as well
 CS_CHECK_LIB_WITH([CEGUI],
     [AC_LANG_PROGRAM([[#include <CEGUI.h>]],
     [CEGUI::WindowManager::getSingleton();])], [], [C++],
-    [], [], [], [], [], [CEGUIBase])
+    [], [], [], [], [$cs_cv_libdl_libs], [CEGUIBase])
 
 AS_IF([test $cs_cv_libCEGUI = yes],
     [CS_CHECK_BUILD([if CEGUI is sufficiently recent], [cs_cv_CEGUI_recent],
