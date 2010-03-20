@@ -40,8 +40,9 @@
 
 #include "animeshasset.h"
 #include "cal3dasset.h"
-#include "sprite3dasset.h"
 #include "genmeshasset.h"
+#include "particlesasset.h"
+#include "sprite3dasset.h"
 
 #include "sockettab.h"
 #include "animationtab.h"
@@ -704,7 +705,11 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
       if(!spritewrapper)
         spritewrapper = engine->CreateMeshWrapper(factwrap, "MySprite", room, v);
       else
+      {
+        spritewrapper->GetMovable()->SetSector(room);
         spritewrapper->GetMovable()->SetPosition(v);
+        spritewrapper->GetMovable()->UpdateMove();
+      }
 
       if (AnimeshAsset::Support(spritewrapper))
       {
@@ -723,6 +728,10 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
       else if (GenmeshAsset::Support(spritewrapper))
       {
         asset.AttachNew(new GenmeshAsset(GetObjectRegistry(), spritewrapper));
+      }
+      else if (ParticlesAsset::Support(spritewrapper))
+      {
+        asset.AttachNew(new ParticlesAsset(GetObjectRegistry(), spritewrapper));
       }
       else
       {
