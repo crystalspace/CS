@@ -377,7 +377,8 @@ void ViewMesh::HandleCommandLine()
   const char* scaleTxt = cmdline->GetOption("Scale");
   const char* roomSize = cmdline->GetOption("RoomSize");
   const char* realPath = cmdline->GetOption("R");
-  const char* vfsDir = cmdline->GetOption("C");
+
+  csString vfsDir = cmdline->GetOption("C");
 
   if (realPath)
   {
@@ -385,13 +386,25 @@ void ViewMesh::HandleCommandLine()
     vfs->ChDir ("/tmp/viewmesh");
   }
 
-  if (vfsDir)
+  if(vfsDir.IsEmpty() && meshfilename)
   {
-    vfs->ChDir (vfsDir);
+    vfsDir = csString(meshfilename).Slice(0, csString(meshfilename).FindLast('/'));
   }
-  else if(meshfilename)
+
+  if (!vfsDir.IsEmpty())
   {
-    vfs->ChDir(csString(meshfilename).Slice(0, csString(meshfilename).FindLast('/')));
+    if(!vfs->ChDir (vfsDir))
+    {
+      ReportError("Cannot change to path: %s\n", vfsDir);
+    }
+    else
+    {
+      // Update StdDlg path.
+      CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+      CEGUI::Window* window = winMgr->getWindow("StdDlg/Path");
+      window->setProperty("Text", vfs->GetCwd());
+      StdDlgUpdateLists(vfs->GetCwd());
+    }
   }
 
   if (texturefilename && texturename)
@@ -693,50 +706,48 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
     }
   }
 
-  if (!factwrap) return;
+  if (!factwrap)
+    return;
 
-  if (factwrap) 
+  csRef<iMeshObjectFactory> fact = factwrap->GetMeshObjectFactory();
+  if (fact)
   {
-    csRef<iMeshObjectFactory> fact = factwrap->GetMeshObjectFactory();
-    if (fact)
-    {
-      csVector3 v(0, 0, 0);
-      
-      if(!spritewrapper)
-        spritewrapper = engine->CreateMeshWrapper(factwrap, "MySprite", room, v);
-      else
-      {
-        spritewrapper->GetMovable()->SetSector(room);
-        spritewrapper->GetMovable()->SetPosition(v);
-        spritewrapper->GetMovable()->UpdateMove();
-      }
+    csVector3 v(0, 0, 0);
 
-      if (AnimeshAsset::Support(spritewrapper))
-      {
-        asset.AttachNew(new AnimeshAsset(GetObjectRegistry(), spritewrapper));
-      }
+    if(!spritewrapper)
+      spritewrapper = engine->CreateMeshWrapper(factwrap, "MySprite", room, v);
+    else
+    {
+      spritewrapper->GetMovable()->SetSector(room);
+      spritewrapper->GetMovable()->SetPosition(v);
+      spritewrapper->GetMovable()->UpdateMove();
+    }
+
+    if (AnimeshAsset::Support(spritewrapper))
+    {
+      asset.AttachNew(new AnimeshAsset(GetObjectRegistry(), spritewrapper));
+    }
 #ifdef CS_HAVE_CAL3D
-      else if (Cal3DAsset::Support(spritewrapper))
-      {
-        asset.AttachNew(new Cal3DAsset(GetObjectRegistry(), spritewrapper));
-      }
+    else if (Cal3DAsset::Support(spritewrapper))
+    {
+      asset.AttachNew(new Cal3DAsset(GetObjectRegistry(), spritewrapper));
+    }
 #endif
-      else if (Sprite3DAsset::Support(spritewrapper))
-      {
-        asset.AttachNew(new Sprite3DAsset(GetObjectRegistry(), spritewrapper));
-      }
-      else if (GenmeshAsset::Support(spritewrapper))
-      {
-        asset.AttachNew(new GenmeshAsset(GetObjectRegistry(), spritewrapper));
-      }
-      else if (ParticlesAsset::Support(spritewrapper))
-      {
-        asset.AttachNew(new ParticlesAsset(GetObjectRegistry(), spritewrapper));
-      }
-      else
-      {
-        return;
-      }
+    else if (Sprite3DAsset::Support(spritewrapper))
+    {
+      asset.AttachNew(new Sprite3DAsset(GetObjectRegistry(), spritewrapper));
+    }
+    else if (GenmeshAsset::Support(spritewrapper))
+    {
+      asset.AttachNew(new GenmeshAsset(GetObjectRegistry(), spritewrapper));
+    }
+    else if (ParticlesAsset::Support(spritewrapper))
+    {
+      asset.AttachNew(new ParticlesAsset(GetObjectRegistry(), spritewrapper));
+    }
+    else
+    {
+      return;
     }
   }
 
