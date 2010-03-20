@@ -462,10 +462,18 @@ bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_FONTSERVER,
     CS_REQUEST_IMAGELOADER,
     CS_REQUEST_LEVELLOADER,
-    CS_REQUEST_LEVELSAVER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+  engine->SetSaveableFlag(true);
+
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+    CS_REQUEST_LEVELSAVER,
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
@@ -489,9 +497,6 @@ bool ViewMesh::Application()
 
   g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
-
-  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
-  if (!engine) return ReportError("Failed to locate 3D engine!");
 
   vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
