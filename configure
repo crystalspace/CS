@@ -60974,6 +60974,8 @@ fi
 #----------------------------------------------------------------------------
 # Check for CEGUI.
 #----------------------------------------------------------------------------
+# The check fails on some distros with missing references to libdl
+# (eg on OpenSUSE), so pass -ldl along as well
 
 # Check whether --with-CEGUI was given.
 if test "${with_CEGUI+set}" = set; then
@@ -61914,7 +61916,7 @@ fi
 
 	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
+	LIBS="$cs_libs_test $cs_cv_libdl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -61982,7 +61984,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test $cs_build_ok = yes; then
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libdl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libCEGUI=yes
 		cs_cv_libCEGUI_cflags=$cs_build_cflags
 		cs_cv_libCEGUI_lflags=$cs_build_lflags
@@ -62071,7 +62073,7 @@ fi
 
 	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
+	LIBS="$cs_libs_test $cs_cv_libdl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -62139,7 +62141,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test $cs_build_ok = yes; then
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libdl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libCEGUI=yes
 		cs_cv_libCEGUI_cflags=$cs_build_cflags
 		cs_cv_libCEGUI_lflags=$cs_build_lflags
