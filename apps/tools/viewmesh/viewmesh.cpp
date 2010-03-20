@@ -663,7 +663,9 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
     return;
   }
 
-  csRef<iMeshFactoryWrapper> wrap;
+  csRef<iMeshWrapper> spritewrapper;
+  csRef<iMeshFactoryWrapper> factwrap;
+
   if (!loading->GetResultRefPtr().IsValid())
   {
     // Library file. Find the first factory in our region.
@@ -674,25 +676,34 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
       iMeshFactoryWrapper* f = factories->Get (i);
       if (collection->IsParentOf (f->QueryObject ()))
       {
-        wrap = f;
+        factwrap = f;
         break;
       }
     }
   }
   else
   {
-    wrap = scfQueryInterface<iMeshFactoryWrapper> (loading->GetResultRefPtr());
+    factwrap = scfQueryInterface<iMeshFactoryWrapper> (loading->GetResultRefPtr());
+    if(!factwrap)
+    {
+      spritewrapper = scfQueryInterface<iMeshWrapper> (loading->GetResultRefPtr());
+      factwrap = spritewrapper->GetFactory();
+    }
   }
 
-  if (!wrap) return;
+  if (!factwrap) return;
 
-  if (wrap) 
+  if (factwrap) 
   {
-    csRef<iMeshObjectFactory> fact = wrap->GetMeshObjectFactory();
+    csRef<iMeshObjectFactory> fact = factwrap->GetMeshObjectFactory();
     if (fact)
     {
       csVector3 v(0, 0, 0);
-      csRef<iMeshWrapper> spritewrapper = engine->CreateMeshWrapper(wrap, "MySprite", room, v);
+      
+      if(!spritewrapper)
+        spritewrapper = engine->CreateMeshWrapper(factwrap, "MySprite", room, v);
+      else
+        spritewrapper->GetMovable()->SetPosition(v);
 
       if (AnimeshAsset::Support(spritewrapper))
       {
