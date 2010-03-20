@@ -22,6 +22,14 @@
 
 #include "assetbase.h"
 
+struct iParticleBuiltinEffectorForce;
+struct iParticleBuiltinEffectorLinColor;
+struct iParticleBuiltinEffectorVelocityField;
+struct iParticleBuiltinEffectorLinear;
+struct iParticleBuiltinEmitterSphere;
+struct iParticleBuiltinEmitterCone;
+struct iParticleBuiltinEmitterBox;
+struct iParticleBuiltinEmitterCylinder;
 struct iParticleSystem;
 struct iParticleSystemFactory;
 
@@ -30,6 +38,18 @@ class ParticlesAsset : public AssetBase
 private:
   csRef<iParticleSystem> object;
   csRef<iParticleSystemFactory> factory;
+
+  template<typename T>
+  csPtr<iStringArray> GetCommonProps(T* emitter);
+  csPtr<iStringArray> GetSphereProps(iParticleBuiltinEmitterSphere* emitter);
+  csPtr<iStringArray> GetConeProps(iParticleBuiltinEmitterCone* emitter);
+  csPtr<iStringArray> GetBoxProps(iParticleBuiltinEmitterBox* emitter);
+  csPtr<iStringArray> GetCylinderProps(iParticleBuiltinEmitterCylinder* emitter);
+
+  csPtr<iStringArray> GetForceProps(iParticleBuiltinEffectorForce* effector);
+  csPtr<iStringArray> GetLinColorProps(iParticleBuiltinEffectorLinColor* effector);
+  csPtr<iStringArray> GetVelFieldProps(iParticleBuiltinEffectorVelocityField* effector);
+  csPtr<iStringArray> GetLinearProps(iParticleBuiltinEffectorLinear* effector);
 
 public:
   static bool Support(iMeshWrapper* mesh);
@@ -60,9 +80,17 @@ public:
 
   virtual bool DeleteEmitter(uint idx);
 
+  virtual csPtr<iStringArray> GetEmitterProps(uint indx);
+
+  virtual csPtr<iStringArray> GetEmitterProps(iParticleEmitter* emitter);
+
   virtual iParticleEffector* AddEffector(uint type);
 
   virtual bool DeleteEffector(uint idx);
+
+  virtual csPtr<iStringArray> GetEffectorProps(uint indx);
+
+  virtual csPtr<iStringArray> GetEffectorProps(iParticleEffector* effector);
 };
 
 #endif // PARTICLESASSET_H__

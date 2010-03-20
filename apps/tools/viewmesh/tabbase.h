@@ -34,7 +34,7 @@ struct TabBase : public csRefCount
 protected:
   iObjectRegistry* object_reg;
   csRef<AssetBase> asset;
-  CEGUI::Window* window;
+  CEGUI::Window* baseWindow;
 
   csRef<iCEGUI> cegui;
   CEGUI::WindowManager* winMgr;
@@ -49,7 +49,7 @@ public:
   TabBase(iObjectRegistry* obj_reg, AssetBase* ass);
   virtual ~TabBase();
 
-  CEGUI::Window* GetWindow() { return window; }
+  CEGUI::Window* GetWindow() { return baseWindow; }
 
   AssetBase* GetAsset() { return asset; }
   void SetAsset(AssetBase* ass) { asset = ass; }
@@ -58,7 +58,7 @@ public:
 //-------------------------------------------------------
 
 TabBase::TabBase(iObjectRegistry* obj_reg, AssetBase* ass) 
-  : object_reg(obj_reg), asset(ass), window(0) 
+  : object_reg(obj_reg), asset(ass), baseWindow(0) 
 {
   cegui = csQueryRegistry<iCEGUI> (object_reg);
   winMgr = cegui->GetWindowManagerPtr ();
@@ -66,11 +66,11 @@ TabBase::TabBase(iObjectRegistry* obj_reg, AssetBase* ass)
 
 TabBase::~TabBase() 
 {
-  if (window)
+  if (baseWindow)
   {
     CEGUI::TabControl* ts = (CEGUI::TabControl*)winMgr->getWindow("Root/Control/Tabs");
-    ts->removeTab(window->getName());
-    winMgr->destroyWindow(window);
+    ts->removeTab(baseWindow->getName());
+    winMgr->destroyWindow(baseWindow);
   }
 }
 
@@ -81,7 +81,7 @@ bool TabBase::LoadLayout(const char* layoutFile)
   vfs->PushDir();
   vfs->ChDir ("/viewmesh/");
   
-  window = winMgr->loadWindowLayout(layoutFile);
+  baseWindow = winMgr->loadWindowLayout(layoutFile);
 
   vfs->PopDir();
 
@@ -91,7 +91,7 @@ bool TabBase::LoadLayout(const char* layoutFile)
 bool TabBase::AddToTabs()
 {
   CEGUI::TabControl* ts = (CEGUI::TabControl*)winMgr->getWindow("Root/Control/Tabs");
-  ts->addTab(window);
+  ts->addTab(baseWindow);
 
   return true;
 }

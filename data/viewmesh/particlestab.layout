@@ -105,6 +105,23 @@
         <Property Name='UnifiedPosition' Value='{{0.333,0.0},{0.7,0.0}}'/>
       </Window>
     </Window>
+
+    <Window Type="ice/StaticImage" Name="Particles/Edit" >
+      <Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+
+      <Window Type="ice/Listbox" Name="Particles/Edit/Properties" >
+        <Property Name="Text" Value="Set" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.4,0.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="Particles/Edit/Done" >
+        <Property Name="Text" Value="Done" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.675,0.0},{1.0,-30.0}}'/>
+      </Window>
+    </Window>
   </Window>
 </GUILayout>
 

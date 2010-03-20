@@ -172,9 +172,17 @@ public:
 
   virtual bool DeleteEmitter(uint idx) { return false; }
 
+  virtual csPtr<iStringArray> GetEmitterProps(uint indx) { return 0; }
+
+  virtual csPtr<iStringArray> GetEmitterProps(iParticleEmitter* emitter) { return 0; }
+
   virtual iParticleEffector* AddEffector(uint type) { return false; }
 
   virtual bool DeleteEffector(uint idx) { return false; }
+
+  virtual csPtr<iStringArray> GetEffectorProps(uint indx) { return 0; }
+
+  virtual csPtr<iStringArray> GetEffectorProps(iParticleEffector* effector) { return 0; }
 };
 
 #endif // IASSET_H__

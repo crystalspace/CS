@@ -48,6 +48,8 @@ private:
   bool AddLinColor (const CEGUI::EventArgs& e);
   bool AddVelField (const CEGUI::EventArgs& e);
   bool AddLinear (const CEGUI::EventArgs& e);
+
+  bool DoneEditing (const CEGUI::EventArgs& e);
 };
 
 //-------------------------------------------------------
@@ -132,6 +134,14 @@ ParticlesTab::ParticlesTab(iObjectRegistry* obj_reg, AssetBase* ass)
   window = winMgr->getWindow("Particles/AddLinear");
   window->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&ParticlesTab::AddLinear, this));
+
+  /* ------------------ Editing ------------------ */
+  window = winMgr->getWindow("Particles/Edit");
+  window->hide();
+
+  window = winMgr->getWindow("Particles/Edit/Done");
+  window->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ParticlesTab::DoneEditing, this));
 }
 
 ParticlesTab::~ParticlesTab() 
@@ -140,6 +150,8 @@ ParticlesTab::~ParticlesTab()
 
 bool ParticlesTab::AddEmitter (const CEGUI::EventArgs& e)
 {
+  CEGUI::Window* window = 0;
+
   window = winMgr->getWindow("Particles/main");
   window->hide();
 
@@ -154,8 +166,18 @@ bool ParticlesTab::EditEmitter (const CEGUI::EventArgs& e)
   uint id;
   if (GetSelectedItemID("Particles/EmitterList", id))
   {
-
+    // Update the properties list.
+    csRef<iStringArray> arr = asset->GetEmitterProps(id);
+    UpdateList(arr, "Particles/Edit/Properties");
   }
+
+  CEGUI::Window* window = 0;
+
+  window = winMgr->getWindow("Particles/Edit");
+  window->show();
+
+  window = winMgr->getWindow("Particles/main");
+  window->hide();
 
   return true;
 }
@@ -177,6 +199,8 @@ bool ParticlesTab::DelEmitter (const CEGUI::EventArgs& e)
 
 bool ParticlesTab::AddEffector (const CEGUI::EventArgs& e)
 {
+  CEGUI::Window* window = 0;
+
   window = winMgr->getWindow("Particles/main");
   window->hide();
 
@@ -191,8 +215,18 @@ bool ParticlesTab::EditEffector (const CEGUI::EventArgs& e)
   uint id;
   if (GetSelectedItemID("Particles/EffectorList", id))
   {
-
+    // Update the properties list.
+    csRef<iStringArray> arr = asset->GetEffectorProps(id);
+    UpdateList(arr, "Particles/Edit/Properties");
   }
+
+  CEGUI::Window* window = 0;
+
+  window = winMgr->getWindow("Particles/Edit");
+  window->show();
+
+  window = winMgr->getWindow("Particles/main");
+  window->hide();
 
   return true;
 }
@@ -214,6 +248,7 @@ bool ParticlesTab::DelEffector (const CEGUI::EventArgs& e)
 
 bool ParticlesTab::AddSphere (const CEGUI::EventArgs& e)
 {
+  // Add a sphere emitter.
   iParticleEmitter* emitter = asset->AddEmitter(0);
   if(emitter)
   {
@@ -221,7 +256,14 @@ bool ParticlesTab::AddSphere (const CEGUI::EventArgs& e)
     UpdateList(arr, "Particles/EmitterList");
   }
 
-  window = winMgr->getWindow("Particles/main");
+  // Update the properties list.
+  csRef<iStringArray> arr = asset->GetEmitterProps(emitter);
+  UpdateList(arr, "Particles/Edit/Properties");
+
+  // Show the editing window.
+  CEGUI::Window* window = 0;
+
+  window = winMgr->getWindow("Particles/Edit");
   window->show();
 
   window = winMgr->getWindow("Particles/ChooseEmitter");
@@ -232,6 +274,7 @@ bool ParticlesTab::AddSphere (const CEGUI::EventArgs& e)
 
 bool ParticlesTab::AddCone (const CEGUI::EventArgs& e)
 {
+  // Add a cone emitter.
   iParticleEmitter* emitter = asset->AddEmitter(1);
   if(emitter)
   {
@@ -239,7 +282,14 @@ bool ParticlesTab::AddCone (const CEGUI::EventArgs& e)
     UpdateList(arr, "Particles/EmitterList");
   }
 
-  window = winMgr->getWindow("Particles/main");
+  // Update the properties list.
+  csRef<iStringArray> arr = asset->GetEmitterProps(emitter);
+  UpdateList(arr, "Particles/Edit/Properties");
+
+  // Show the editing window.
+  CEGUI::Window* window = 0;
+
+  window = winMgr->getWindow("Particles/Edit");
   window->show();
 
   window = winMgr->getWindow("Particles/ChooseEmitter");
@@ -250,6 +300,7 @@ bool ParticlesTab::AddCone (const CEGUI::EventArgs& e)
 
 bool ParticlesTab::AddBox (const CEGUI::EventArgs& e)
 {
+  // Add a box emitter.
   iParticleEmitter* emitter = asset->AddEmitter(2);
   if(emitter)
   {
@@ -257,7 +308,14 @@ bool ParticlesTab::AddBox (const CEGUI::EventArgs& e)
     UpdateList(arr, "Particles/EmitterList");
   }
 
-  window = winMgr->getWindow("Particles/main");
+  // Update the properties list.
+  csRef<iStringArray> arr = asset->GetEmitterProps(emitter);
+  UpdateList(arr, "Particles/Edit/Properties");
+
+  // Show the editing window.
+  CEGUI::Window* window = 0;
+
+  window = winMgr->getWindow("Particles/Edit");
   window->show();
 
   window = winMgr->getWindow("Particles/ChooseEmitter");
@@ -268,6 +326,7 @@ bool ParticlesTab::AddBox (const CEGUI::EventArgs& e)
 
 bool ParticlesTab::AddCylinder (const CEGUI::EventArgs& e)
 {
+  // Add a cylinder emitter.
   iParticleEmitter* emitter = asset->AddEmitter(3);
   if(emitter)
   {
@@ -275,10 +334,17 @@ bool ParticlesTab::AddCylinder (const CEGUI::EventArgs& e)
     UpdateList(arr, "Particles/EmitterList");
   }
 
+  // Update the properties list.
+  csRef<iStringArray> arr = asset->GetEmitterProps(emitter);
+  UpdateList(arr, "Particles/Edit/Properties");
+
+  // Show the editing window.
+  CEGUI::Window* window = 0;
+
   window = winMgr->getWindow("Particles/ChooseEmitter");
   window->hide();
 
-  window = winMgr->getWindow("Particles/main");
+  window = winMgr->getWindow("Particles/Edit");
   window->show();
 
   return true;
@@ -286,6 +352,7 @@ bool ParticlesTab::AddCylinder (const CEGUI::EventArgs& e)
 
 bool ParticlesTab::AddForce (const CEGUI::EventArgs& e)
 {
+  // Add a force effector.
   iParticleEffector* effector = asset->AddEffector(0);
   if(effector)
   {
@@ -293,7 +360,14 @@ bool ParticlesTab::AddForce (const CEGUI::EventArgs& e)
     UpdateList(arr, "Particles/EffectorList");
   }
 
-  window = winMgr->getWindow("Particles/main");
+  // Update the properties list.
+  csRef<iStringArray> arr = asset->GetEffectorProps(effector);
+  UpdateList(arr, "Particles/Edit/Properties");
+
+  // Show the editing window.
+  CEGUI::Window* window = 0;
+
+  window = winMgr->getWindow("Particles/Edit");
   window->show();
 
   window = winMgr->getWindow("Particles/ChooseEffector");
@@ -304,6 +378,7 @@ bool ParticlesTab::AddForce (const CEGUI::EventArgs& e)
 
 bool ParticlesTab::AddLinColor (const CEGUI::EventArgs& e)
 {
+  // Add a lincolor effector.
   iParticleEffector* effector = asset->AddEffector(1);
   if(effector)
   {
@@ -311,7 +386,14 @@ bool ParticlesTab::AddLinColor (const CEGUI::EventArgs& e)
     UpdateList(arr, "Particles/EffectorList");
   }
 
-  window = winMgr->getWindow("Particles/main");
+  // Update the properties list.
+  csRef<iStringArray> arr = asset->GetEffectorProps(effector);
+  UpdateList(arr, "Particles/Edit/Properties");
+
+  // Show the editing window.
+  CEGUI::Window* window = 0;
+
+  window = winMgr->getWindow("Particles/Edit");
   window->show();
 
   window = winMgr->getWindow("Particles/ChooseEffector");
@@ -322,6 +404,7 @@ bool ParticlesTab::AddLinColor (const CEGUI::EventArgs& e)
 
 bool ParticlesTab::AddVelField (const CEGUI::EventArgs& e)
 {
+  // Add a velocity field effector.
   iParticleEffector* effector = asset->AddEffector(2);
   if(effector)
   {
@@ -329,7 +412,14 @@ bool ParticlesTab::AddVelField (const CEGUI::EventArgs& e)
     UpdateList(arr, "Particles/EffectorList");
   }
 
-  window = winMgr->getWindow("Particles/main");
+  // Update the properties list.
+  csRef<iStringArray> arr = asset->GetEffectorProps(effector);
+  UpdateList(arr, "Particles/Edit/Properties");
+
+  // Show the editing window.
+  CEGUI::Window* window = 0;
+
+  window = winMgr->getWindow("Particles/Edit");
   window->show();
 
   window = winMgr->getWindow("Particles/ChooseEffector");
@@ -340,6 +430,7 @@ bool ParticlesTab::AddVelField (const CEGUI::EventArgs& e)
 
 bool ParticlesTab::AddLinear (const CEGUI::EventArgs& e)
 {
+  // Add a linear effector.
   iParticleEffector* effector = asset->AddEffector(3);
   if(effector)
   {
@@ -347,10 +438,30 @@ bool ParticlesTab::AddLinear (const CEGUI::EventArgs& e)
     UpdateList(arr, "Particles/EffectorList");
   }
 
-  window = winMgr->getWindow("Particles/main");
+  // Update the properties list.
+  csRef<iStringArray> arr = asset->GetEffectorProps(effector);
+  UpdateList(arr, "Particles/Edit/Properties");
+
+  // Show the editing window.
+  CEGUI::Window* window = 0;
+
+  window = winMgr->getWindow("Particles/Edit");
   window->show();
 
   window = winMgr->getWindow("Particles/ChooseEffector");
+  window->hide();
+
+  return true;
+}
+
+bool ParticlesTab::DoneEditing (const CEGUI::EventArgs& e)
+{
+  CEGUI::Window* window = 0;
+
+  window = winMgr->getWindow("Particles/main");
+  window->show();
+
+  window = winMgr->getWindow("Particles/Edit");
   window->hide();
 
   return true;
