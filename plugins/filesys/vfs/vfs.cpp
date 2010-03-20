@@ -1685,7 +1685,7 @@ bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
 
 char *csVFS::_ExpandPath (const char *Path, bool IsDir)
 {
-  csStringFast<VFS_MAX_PATH_LEN> outname;
+  csStringFast<VFS_MAX_PATH_LEN> outname = "";
   size_t inp = 0, namelen = strlen (Path);
 
   // Copy 'Path' to 'outname', processing FS macros during the way
