@@ -1,0 +1,15 @@
+<meshobj name="fount2">
+    <plugin>crystalspace.mesh.loader.particles</plugin>
+    <params>
+        <factory>fountainFACT</factory>
+        <material>dot</material>
+        <mixmode>
+            <add />
+        </mixmode>
+    </params>
+    <move>
+        <v x="0" y="0" z="0" />
+    </move>
+    <priority>alpha</priority>
+    <ztest />
+</meshobj>

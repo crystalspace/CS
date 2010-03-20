@@ -1,0 +1,15 @@
+<meshobj name="fire1">
+    <priority>alpha</priority>
+    <plugin>crystalspace.mesh.loader.particles</plugin>
+    <ztest />
+    <params>
+        <factory>fireFact</factory>
+        <mixmode>
+            <add />
+        </mixmode>
+        <material>flamelet</material>
+    </params>
+    <move>
+        <v x="0" y="0" z="0" />
+    </move>
+</meshobj>
