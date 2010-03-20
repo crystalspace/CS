@@ -283,6 +283,13 @@ bool GeneralTab::ReloadButton (const CEGUI::EventArgs& e)
       return true;
 
   viewmesh->collection->ReleaseAllObjects();
+
+  size_t reloadLibraryCount = viewmesh->reloadLibraryFilenames.GetSize();
+  for(size_t i=0; i < reloadLibraryCount; ++i)
+  {
+    viewmesh->LoadLibrary(viewmesh->reloadLibraryFilenames[i], false);
+  }
+
   viewmesh->LoadSprite(viewmesh->reloadFilename, viewmesh->reloadFilePath);
 
   return true;

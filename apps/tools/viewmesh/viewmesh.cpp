@@ -50,6 +50,7 @@
 #include "submeshtab.h"
 #include "materialtab.h"
 #include "generaltab.h"
+#include "particlestab.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -441,8 +442,11 @@ void ViewMesh::LoadTexture(const char* file, const char* name)
   }
 }
 
-void ViewMesh::LoadLibrary(const char* file)
+void ViewMesh::LoadLibrary(const char* file, bool record)
 {
+  if(record)
+    reloadLibraryFilenames.Push(file);
+
   loader->LoadLibraryFile(file, collection);
 }
 
@@ -795,6 +799,11 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
   else
     materialTab->Update(false);
 
+  if (asset->SupportsParticles())
+  {
+    RegisterTab<ParticlesTab>();
+  }
+
   ResetCamera();
   loading.Invalidate();
 }
@@ -1076,6 +1085,8 @@ bool ViewMesh::StdDlgFileSelect (const CEGUI::EventArgs& e)
 
   CEGUI::Listbox* list = (CEGUI::Listbox*) winMgr->getWindow("StdDlg/FileSelect");
   CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if (!item) return CS_EVENT_HANDLED;
+
   CEGUI::String text = item->getText();
   if (text.empty()) return CS_EVENT_HANDLED;
 
@@ -1090,6 +1101,8 @@ bool ViewMesh::StdDlgDirSelect (const CEGUI::EventArgs& e)
 
   CEGUI::Listbox* list = (CEGUI::Listbox*) winMgr->getWindow("StdDlg/DirSelect");
   CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if (!item) return CS_EVENT_HANDLED;
+
   CEGUI::String text = item->getText();
   if (text.empty()) return CS_EVENT_HANDLED;
 

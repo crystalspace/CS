@@ -32,6 +32,8 @@
 
 struct iMeshWrapper;
 struct iMaterialWrapper;
+struct iParticleEffector;
+struct iParticleEmitter;
 struct iStringArray;
 class csTransform;
 
@@ -158,6 +160,21 @@ public:
   virtual float GetMorphTargetWeight(const char* name) { return 0.0f; }
 
   virtual bool SetMorphTargetWeight(const char* name, float value) { return false; }
+
+  // Particles
+  virtual bool SupportsParticles() = 0;
+
+  virtual csPtr<iStringArray> GetEmitters() { return 0; }
+
+  virtual csPtr<iStringArray> GetEffectors() { return 0; }
+
+  virtual iParticleEmitter* AddEmitter(uint type) { return false; }
+
+  virtual bool DeleteEmitter(uint idx) { return false; }
+
+  virtual iParticleEffector* AddEffector(uint type) { return false; }
+
+  virtual bool DeleteEffector(uint idx) { return false; }
 };
 
 #endif // IASSET_H__

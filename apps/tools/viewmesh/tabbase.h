@@ -43,6 +43,7 @@ protected:
   bool AddToTabs();
   void UpdateList (csRef<iStringArray> arr, const char* window);
   bool GetSelectedItemText(const char* window, csString& value);
+  bool GetSelectedItemID(const char* window, uint& value);
 
 public:
   TabBase(iObjectRegistry* obj_reg, AssetBase* ass);
@@ -52,8 +53,6 @@ public:
 
   AssetBase* GetAsset() { return asset; }
   void SetAsset(AssetBase* ass) { asset = ass; }
-
-  //virtual iMeshWrapper* GetWindow() = 0;
 };
 
 //-------------------------------------------------------
@@ -112,6 +111,7 @@ void TabBase::UpdateList (csRef<iStringArray> arr, const char* window)
     item->setSelectionBrushImage("ice", "TextSelectionBrush");
     item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
     list->addItem(item);
+    item->setID((uint)i);
     if (i == 0) item->setSelected(true);
   }
 }
@@ -130,6 +130,21 @@ bool TabBase::GetSelectedItemText(const char* window, csString& value)
   if (text.empty()) return false;
 
   value = text.c_str();
+
+  return true;
+}
+
+bool TabBase::GetSelectedItemID(const char* window, uint& value)
+{
+  csRef<iCEGUI> cegui = csQueryRegistry<iCEGUI> (object_reg);
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow(window);
+
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if(!item) return false;
+
+  value = item->getID();
 
   return true;
 }

@@ -75,6 +75,8 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool      camModeRotate;
   bool      camModeZoom;
 
+  csStringArray reloadLibraryFilenames;
+
   csString reloadFilename;
   csString reloadFilePath;
 
@@ -122,7 +124,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
   bool CreateRoom ();
   bool CreateGui ();
-  void LoadLibrary(const char* file);
+  void LoadLibrary(const char* file, bool record = true);
   void LoadTexture(const char* file, const char* name);
   void LoadSprite (const char* file, const char* path = 0);
   void SaveSprite (const char* file, bool binary);

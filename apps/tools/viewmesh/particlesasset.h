@@ -48,6 +48,21 @@ public:
 
   // MorphTargets
   virtual bool SupportsMorphTargets() { return false; }
+
+  // Particles
+  virtual bool SupportsParticles() { return true; }
+
+  virtual csPtr<iStringArray> GetEmitters();
+
+  virtual csPtr<iStringArray> GetEffectors();
+
+  virtual iParticleEmitter* AddEmitter(uint type);
+
+  virtual bool DeleteEmitter(uint idx);
+
+  virtual iParticleEffector* AddEffector(uint type);
+
+  virtual bool DeleteEffector(uint idx);
 };
 
 #endif // PARTICLESASSET_H__

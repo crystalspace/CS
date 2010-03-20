@@ -77,6 +77,9 @@ public:
 
   // MorphTargets
   virtual bool SupportsMorphTargets() { return false; }
+
+  // Particles
+  virtual bool SupportsParticles() { return false; }
 };
 
 #endif // SPRITE3DASSET_H__

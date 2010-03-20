@@ -88,6 +88,9 @@ public:
 
   // MorphTargets
   virtual bool SupportsMorphTargets() { return false; }
+
+  // Particles
+  virtual bool SupportsParticles() { return false; }
 };
 
 #endif // GENMESHASSET_H__
