@@ -45,13 +45,19 @@ AC_PREREQ([2.56])
 #           cs_cv_cslibs_pcpath (pkgconfig search list)
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_CSWIN32LIBS],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
+    [AC_REQUIRE([AC_CANONICAL_BUILD])
+    AC_REQUIRE([AC_CANONICAL_HOST])
     # ensure PKGCONFIG is set since we may meddle with it
     AC_REQUIRE([_CS_CHECK_PKG_CONFIG_PREPARE_PATH]) 
     AC_REQUIRE([CS_CHECK_MNO_CYGWIN])
     case $host_os in
     mingw*|cygwin*)
-        CS_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
+        # Always look for a cs-win32libs version that begins with the host
+	# tuple, even if the default host is used
+	AS_IF([test "$ac_cv_host" == "$ac_cv_build"],
+	    [CS_CHECK_TOOLS([CSLIBS_CONFIG], [$ac_cv_host-cslibs-config])])
+	AS_IF([test -z "$CSLIBS_CONFIG"],
+            [CS_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])])
         AS_IF([test $ac_compiler_gnu = yes],
 	    [cs_cv_cslibs_compiler="--compiler gcc-`$CXX -dumpversion | 
 	      sed 's/\([[0-9]]\?\)\.\([[0-9]]\?\)\.[[0-9]]\?/\1.\2/'`"])
