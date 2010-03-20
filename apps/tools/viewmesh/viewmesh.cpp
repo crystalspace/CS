@@ -687,7 +687,8 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
     if(!factwrap)
     {
       spritewrapper = scfQueryInterface<iMeshWrapper> (loading->GetResultRefPtr());
-      factwrap = spritewrapper->GetFactory();
+      if (spritewrapper)
+        factwrap = spritewrapper->GetFactory();
     }
   }
 
