@@ -276,26 +276,3 @@ bool GenmeshAsset::SetSubMeshMaterial(const char* subMeshName, iMaterialWrapper*
   sm->SetMaterial(mat);
   return true;
 }
-
-
-// MorphTargets
-bool GenmeshAsset::SupportsMorphTargets() 
-{ 
-  return false; 
-}
-
-csPtr<iStringArray> GenmeshAsset::GetMorphTargets()
-{
-  scfStringArray* arr = new scfStringArray;
-  return csPtr<iStringArray>(arr);
-}
-
-float GenmeshAsset::GetMorphTargetWeight(const char* name)
-{
-  return 0.0f;
-}
-
-bool GenmeshAsset::SetMorphTargetWeight(const char* name, float value)
-{
-  return false;
-}

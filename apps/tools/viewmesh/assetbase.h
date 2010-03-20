@@ -95,69 +95,69 @@ public:
   // Animations
   virtual bool SupportsAnimations() = 0;
 
-  virtual csPtr<iStringArray> GetAnimations() = 0;
+  virtual csPtr<iStringArray> GetAnimations() { return 0; }
 
-  virtual const char* GetSelectedAnimation() {return selectedAnimation.GetData();}
+  virtual const char* GetSelectedAnimation() { return selectedAnimation.GetData(); }
 
-  virtual void SetSelectedAnimation(const char* animationName) {selectedAnimation = animationName;}
+  virtual void SetSelectedAnimation(const char* animationName) { selectedAnimation = animationName; }
 
-  virtual bool PlayAnimation(const char* animationName, bool cycle) = 0;
+  virtual bool PlayAnimation(const char* animationName, bool cycle) { return false; }
 
-  virtual bool StopAnimation(const char* animationName) = 0;
+  virtual bool StopAnimation(const char* animationName) { return false; }
 
-  virtual bool GetReverseAction() = 0;
+  virtual bool GetReverseAction() { return false; }
 
-  virtual void SetReverseAction(bool value) = 0;
+  virtual void SetReverseAction(bool value) {}
 
 
   // Sockets
   virtual bool SupportsSockets() = 0;
 
-  virtual csPtr<iStringArray> GetSockets() = 0;
+  virtual csPtr<iStringArray> GetSockets()  { return 0; }
 
-  virtual const char* GetSelectedSocket() {return selectedSocket.GetData();}
+  virtual const char* GetSelectedSocket()  {return selectedSocket.GetData(); }
 
-  virtual void SetSelectedSocket(const char* socketName) {selectedSocket = socketName;}
+  virtual void SetSelectedSocket(const char* socketName) { selectedSocket = socketName; }
 
-  virtual bool AttachMesh(const char* socketName, iMeshWrapper* mesh) = 0;
+  virtual bool AttachMesh(const char* socketName, iMeshWrapper* mesh) { return false; }
 
-  virtual bool AddSocket(const char* socketName) = 0;
+  virtual bool AddSocket(const char* socketName) { return false; }
 
-  virtual bool DeleteSocket(const char* socketName) = 0;
+  virtual bool DeleteSocket(const char* socketName) { return false; }
 
-  virtual SocketDescriptor GetSocketTransform(const char* socketName) = 0;
+  virtual SocketDescriptor GetSocketTransform(const char* socketName) { return SocketDescriptor(); }
 
-  virtual bool SetSocketTransform(const char* socketName, const SocketDescriptor& desc) = 0;
+  virtual bool SetSocketTransform(const char* socketName, const SocketDescriptor& desc) { return false; }
 
-  virtual bool DetachAll() = 0;
+  virtual bool DetachAll() { return false; }
 
 
   // SubMeshes
   virtual bool SupportsSubMeshes() = 0;
 
-  virtual csPtr<iStringArray> GetSubMeshes() = 0;
+  virtual csPtr<iStringArray> GetSubMeshes() { return 0; }
 
-  virtual const char* GetSelectedSubMesh() {return selectedSubMesh.GetData();}
+  virtual const char* GetSelectedSubMesh() { return selectedSubMesh.GetData(); }
 
-  virtual void SetSelectedSubMesh(const char* subMeshName) {selectedSubMesh = subMeshName;}
+  virtual void SetSelectedSubMesh(const char* subMeshName) { selectedSubMesh = subMeshName; }
 
-  virtual bool SetSubMeshRendering(const char* subMeshName, bool value) = 0;
+  virtual bool SetSubMeshRendering(const char* subMeshName, bool value) { return false; }
 
-  virtual bool SetSubMeshMaterial(const char* subMeshName, iMaterialWrapper* mat) = 0;
+  virtual bool SetSubMeshMaterial(const char* subMeshName, iMaterialWrapper* mat) { return false; }
 
 
   // MorphTargets
   virtual bool SupportsMorphTargets() = 0;
 
-  virtual csPtr<iStringArray> GetMorphTargets() = 0;
+  virtual csPtr<iStringArray> GetMorphTargets() { return 0; }
 
-  virtual const char* GetSelectedMorphTarget() {return selectedMorphTarget.GetData();}
+  virtual const char* GetSelectedMorphTarget() { return selectedMorphTarget.GetData(); }
 
-  virtual void SetSelectedMorphTarget(const char* subMeshName) {selectedMorphTarget = subMeshName;}
+  virtual void SetSelectedMorphTarget(const char* subMeshName) { selectedMorphTarget = subMeshName; }
 
-  virtual float GetMorphTargetWeight(const char* name) = 0;
+  virtual float GetMorphTargetWeight(const char* name) { return 0.0f; }
 
-  virtual bool SetMorphTargetWeight(const char* name, float value) = 0;
+  virtual bool SetMorphTargetWeight(const char* name, float value) { return false; }
 };
 
 #endif // IASSET_H__

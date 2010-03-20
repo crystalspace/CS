@@ -87,13 +87,7 @@ public:
 
 
   // MorphTargets
-  virtual bool SupportsMorphTargets();
-
-  virtual csPtr<iStringArray> GetMorphTargets();
-
-  virtual float GetMorphTargetWeight(const char* name);
-
-  virtual bool SetMorphTargetWeight(const char* name, float value);
+  virtual bool SupportsMorphTargets() { return false; }
 };
 
 #endif // GENMESHASSET_H__

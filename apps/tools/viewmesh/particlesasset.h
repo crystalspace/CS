@@ -38,55 +38,16 @@ public:
   virtual ~ParticlesAsset();
 
   // Animations
-  virtual bool SupportsAnimations();
-
-  virtual csPtr<iStringArray> GetAnimations();
-
-  virtual bool PlayAnimation(const char* animationName, bool cycle);
-
-  virtual bool StopAnimation(const char* animationName);
-
-  virtual bool GetReverseAction();
-
-  virtual void SetReverseAction(bool value);
-
+  virtual bool SupportsAnimations() { return false; }
 
   // Sockets
-  virtual bool SupportsSockets();
-
-  virtual csPtr<iStringArray> GetSockets();
-
-  virtual bool AttachMesh(const char* socketName, iMeshWrapper* mesh);
-
-  virtual bool AddSocket(const char* socketName);
-
-  virtual bool DeleteSocket(const char* socketName);
-
-  virtual SocketDescriptor GetSocketTransform(const char* socketName);
-
-  virtual bool SetSocketTransform(const char* socketName, const SocketDescriptor& desc);
-
-  virtual bool DetachAll();
-
+  virtual bool SupportsSockets() { return false; }
 
   // SubMeshes
-  virtual bool SupportsSubMeshes();
-
-  virtual csPtr<iStringArray> GetSubMeshes();
-
-  virtual bool SetSubMeshRendering(const char* subMeshName, bool value);
-
-  virtual bool SetSubMeshMaterial(const char* subMeshName, iMaterialWrapper* mat);
-
+  virtual bool SupportsSubMeshes() { return false; }
 
   // MorphTargets
-  virtual bool SupportsMorphTargets();
-
-  virtual csPtr<iStringArray> GetMorphTargets();
-
-  virtual float GetMorphTargetWeight(const char* name);
-
-  virtual bool SetMorphTargetWeight(const char* name, float value);
+  virtual bool SupportsMorphTargets() { return false; }
 };
 
 #endif // PARTICLESASSET_H__
