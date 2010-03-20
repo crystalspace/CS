@@ -14,13 +14,13 @@
 
       <Window Type="ice/Button" Name="SubMeshes/AttachSMButton" >
         <Property Name="Text" Value="Attach" />
-        <Property Name='UnifiedSize' Value='{{0.0,110.0},{0.0,25.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{1.0,-230.0},{0.5,-30.0}}'/>
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.5,-30.0}}'/>
       </Window>
       <Window Type="ice/Button" Name="SubMeshes/DetachSMButton" >
         <Property Name="Text" Value="Detach" />
-        <Property Name='UnifiedSize' Value='{{0.0,110.0},{0.0,25.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{1.0,-115.0},{0.5,-30.0}}'/>
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{0.5,-30.0}}'/>
       </Window>
 
       <Window Type="ice/Listbox" Name="SubMeshes/MatList" >

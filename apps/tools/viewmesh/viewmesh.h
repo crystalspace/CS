@@ -82,6 +82,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
   csRef<iEngine> engine;
   csRef<iLoader> loader;
+  csRef<iThreadedLoader> tloader;
   csRef<iSaver> saver;
   csRef<iGraphics3D> g3d;
   csRef<iKeyboardDriver> kbd;
@@ -89,7 +90,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   csRef<iVFS> vfs;
   csRef<iView> view;
   csRef<iCEGUI> cegui;
-  csString renderLoop;
+  csRef<iThreadReturn> loading;
   iSector* room;
   int x,y;
   csRef<FramePrinter> printer;

@@ -14,23 +14,23 @@
 
 
       <Window Type="ice/Editbox" Name="MorphTargets/WeightInput" >
-        <Property Name='UnifiedSize' Value='{{0.0,110.0},{0.0,32.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{1.0,-230.0},{1.0,-69.0}}'/>
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,32.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{1.0,-69.0}}'/>
       </Window>
       <Window Type="ice/Editbox" Name="MorphTargets/DelayInput" >
-        <Property Name='UnifiedSize' Value='{{0.0,110.0},{0.0,32.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{1.0,-115.0},{1.0,-69.0}}'/>
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,32.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{1.0,-69.0}}'/>
       </Window>
 
       <Window Type="ice/Button" Name="MorphTargets/BlendButton" >
         <Property Name="Text" Value="Blend" />
-        <Property Name='UnifiedSize' Value='{{0.0,110.0},{0.0,25.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{1.0,-230.0},{1.0,-30.0}}'/>
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{1.0,-30.0}}'/>
       </Window>
       <Window Type="ice/Button" Name="MorphTargets/ClearButton" >
         <Property Name="Text" Value="Clear" />
-        <Property Name='UnifiedSize' Value='{{0.0,110.0},{0.0,25.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{1.0,-115.0},{1.0,-30.0}}'/>
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{1.0,-30.0}}'/>
       </Window>
 
 

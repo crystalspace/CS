@@ -31,7 +31,7 @@ private:
   bool UpdateMaterialSVs (const CEGUI::EventArgs& e);
   bool SetSV (const CEGUI::EventArgs& e);
 
-  bool AddSVItem(uint i, const char* name, const char* value);
+  bool AddSVItem(size_t i, const char* name, const char* value);
 
 public:
   MaterialTab(iObjectRegistry* obj_reg, AssetBase* ass);
@@ -99,23 +99,23 @@ csPtr<iStringArray> MaterialTab::GetMaterials ()
   return csPtr<iStringArray>(arr);
 }
 
-bool MaterialTab::AddSVItem(uint i, const char* name, const char* value)
+bool MaterialTab::AddSVItem(size_t i, const char* name, const char* value)
 {
   CEGUI::MultiColumnList* multiColumnList = static_cast<CEGUI::MultiColumnList*>(winMgr->getWindow("Materials/SVList"));
 
   multiColumnList->addRow();
 
-  CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(name, 100 + i);
+  CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(name, 100 + (uint)i);
   item->setTextColours(CEGUI::colour(0,0,0));
   item->setSelectionBrushImage("ice", "TextSelectionBrush");
   item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
-  multiColumnList->setItem(item, 0, i); // ColumnID, RowID
+  multiColumnList->setItem(item, 0, (uint)i); // ColumnID, RowID
 
-  item = new CEGUI::ListboxTextItem(value, 101 + i);
+  item = new CEGUI::ListboxTextItem(value, 101 + (uint)i);
   item->setTextColours(CEGUI::colour(0,0,0));
   item->setSelectionBrushImage("ice", "TextSelectionBrush");
   item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
-  multiColumnList->setItem(item, 1, i);
+  multiColumnList->setItem(item, 1, (uint)i);
 
   return true;
 }

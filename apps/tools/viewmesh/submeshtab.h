@@ -105,7 +105,8 @@ bool SubMeshTab::DetachSMButton (const CEGUI::EventArgs& e)
 bool SubMeshTab::SelectMatButton (const CEGUI::EventArgs& e)
 {
   csString selectedMaterial;
-  if ((strcmp (asset->GetSelectedSubMesh(), "") != 0)
+  if (asset->GetSelectedSubMesh() &&
+     (strcmp (asset->GetSelectedSubMesh(), "") != 0)
     && GetSelectedItemText("SubMeshes/MatList", selectedMaterial))
   {
     csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
