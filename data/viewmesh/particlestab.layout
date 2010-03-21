@@ -116,6 +116,32 @@
         <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
       </Window>
 
+      <Window Type="ice/Combobox" Name="Particles/Edit/Bool" >
+        <Property Name="ReadOnly" Value="true" />
+        <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.5,0},{0.7,0},{0.7,0}}" />
+      </Window>
+
+      <Window Type="ice/Editbox" Name="Particles/Edit/X" >
+        <Property Name='UnifiedSize' Value='{{0.6,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.25,0.0},{0.5,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Editbox" Name="Particles/Edit/Y" >
+        <Property Name='UnifiedSize' Value='{{0.6,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.25,0.0},{0.6,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Editbox" Name="Particles/Edit/Z" >
+        <Property Name='UnifiedSize' Value='{{0.6,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.25,0.0},{0.7,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Editbox" Name="Particles/Edit/A" >
+        <Property Name='UnifiedSize' Value='{{0.6,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.25,0.0},{0.8,0.0}}'/>
+      </Window>
+
       <Window Type="ice/Button" Name="Particles/Edit/Done" >
         <Property Name="Text" Value="Done" />
         <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>

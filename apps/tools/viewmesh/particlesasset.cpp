@@ -45,6 +45,34 @@ ParticlesAsset::ParticlesAsset(iObjectRegistry* obj_reg, iMeshWrapper* mesh)
 
 ParticlesAsset::~ParticlesAsset()
 {
+  for(size_t i=0; i<commonProps.GetSize(); ++i)
+    delete commonProps[i].valPtr;
+
+  for(size_t i=0; i<sphereProps.GetSize(); ++i)
+    delete sphereProps[i].valPtr;
+
+  for(size_t i=0; i<coneProps.GetSize(); ++i)
+    delete coneProps[i].valPtr;
+
+  for(size_t i=0; i<boxProps.GetSize(); ++i)
+    delete boxProps[i].valPtr;
+
+  for(size_t i=0; i<cylinderProps.GetSize(); ++i)
+    delete cylinderProps[i].valPtr;
+
+  for(size_t i=0; i<forceProps.GetSize(); ++i)
+    delete forceProps[i].valPtr;
+
+  for(size_t i=0; i<lincolorProps.GetSize(); ++i)
+    delete lincolorProps[i].valPtr;
+
+  for(size_t i=0; i<velfieldProps.GetSize(); ++i)
+    delete velfieldProps[i].valPtr;
+
+  for(size_t i=0; i<linearProps.GetSize(); ++i)
+    delete linearProps[i].valPtr;
+
+
   csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
   engine->RemoveObject(spritewrapper);
   engine->RemoveObject(spritewrapper->GetFactory());
@@ -189,11 +217,11 @@ iParticleEmitter* ParticlesAsset::AddEmitter(uint type)
   return emitter;
 }
 
-csPtr<iStringArray> ParticlesAsset::GetEmitterProps(uint indx)
+iParticleEmitter* ParticlesAsset::GetEmitter(uint indx)
 {
   if(indx < object->GetEmitterCount())
   {
-    return GetEmitterProps(object->GetEmitter(indx));
+    return object->GetEmitter(indx);
   }
 
   return 0;
@@ -224,50 +252,96 @@ csPtr<iStringArray> ParticlesAsset::GetCommonProps(T* emitter)
   csString desc;
   scfStringArray* arr = new scfStringArray;
 
-  float duration = emitter->GetDuration();
-  desc.Format("Duration(%g)", duration);
+  // Init the property array.
+  if(commonProps.IsEmpty())
+  {
+    float* duration = new float;
+    commonProps.Push(Property(Float, static_cast<void*>(duration)));
+
+    float* emissionRate = new float;
+    commonProps.Push(Property(Float, static_cast<void*>(emissionRate)));
+
+    bool* enabled = new bool;
+    commonProps.Push(Property(Bool, static_cast<void*>(enabled)));
+
+    csVector2* initMass = new csVector2;
+    commonProps.Push(Property(Vector2, static_cast<void*>(initMass)));
+
+    csVector2* initTTL = new csVector2;
+    commonProps.Push(Property(Vector2, static_cast<void*>(initTTL)));
+
+    csVector3* linVel = new csVector3;
+    commonProps.Push(Property(Vector3, static_cast<void*>(linVel)));
+
+    csVector3* angVel = new csVector3;
+    commonProps.Push(Property(Vector3, static_cast<void*>(angVel)));
+
+    csParticleBuiltinEmitterPlacement* placement = new csParticleBuiltinEmitterPlacement;
+    commonProps.Push(Property(Enum, static_cast<void*>(placement)));
+
+    csVector3* position = new csVector3;
+    commonProps.Push(Property(Vector3, static_cast<void*>(position)));
+
+    float* startTime = new float;
+    commonProps.Push(Property(Float, static_cast<void*>(startTime)));
+
+    bool* uniformVel = new bool;
+    commonProps.Push(Property(Bool, static_cast<void*>(uniformVel)));
+  }
+
+  float* duration = (float*)commonProps[0].valPtr;
+  *duration = emitter->GetDuration();
+  desc.Format("Duration(%g)", *duration);
   arr->Push(desc);
 
-  float emissionRate = emitter->GetEmissionRate();
-  desc.Format("Emission Rate(%g)", emissionRate);
+  float* emissionRate = (float*)commonProps[1].valPtr;
+  *emissionRate = emitter->GetEmissionRate();
+  desc.Format("Emission Rate(%g)", *emissionRate);
   arr->Push(desc);
 
-  bool enabled = emitter->GetEnabled();
-  if(enabled) arr->Push("Enabled(true)");
+  bool* enabled = (bool*)commonProps[2].valPtr;
+  *enabled = emitter->GetEnabled();
+  if(*enabled) arr->Push("Enabled(true)");
   else arr->Push("Enabled(false)");
 
-  float minMass, maxMass;
-  emitter->GetInitialMass(minMass, maxMass);
-  desc.Format("Init Mass(%g, %g)", minMass, maxMass);
+  csVector2* initMass = (csVector2*)commonProps[3].valPtr;
+  emitter->GetInitialMass(initMass->x, initMass->y);
+  desc.Format("Init Mass(%g, %g)", initMass->x, initMass->y);
   arr->Push(desc);
 
-  float minTTL, maxTTL;
-  emitter->GetInitialTTL(minTTL, maxTTL);
-  desc.Format("Init TTL(%g, %g)", minTTL, maxTTL);
+  csVector2* initTTL = (csVector2*)commonProps[4].valPtr;
+  emitter->GetInitialTTL(initTTL->x, initTTL->y);
+  desc.Format("Init TTL(%g, %g)", initTTL->x, initTTL->y);
   arr->Push(desc);
 
-  csVector3 linVel, angVel;
-  emitter->GetInitialVelocity(linVel, angVel);
-  desc.Format("Init Lin Vel(%g, %g, %g)", linVel.x, linVel.y, linVel.z);
-  arr->Push(desc);
-  desc.Format("Init Ang Vel(%g, %g, %g)", angVel.x, angVel.y, angVel.z);
-  arr->Push(desc);
+  csVector3* linVel = (csVector3*)commonProps[5].valPtr;
+  csVector3* angVel = (csVector3*)commonProps[6].valPtr;
+  emitter->GetInitialVelocity(*linVel, *angVel);
 
-  csParticleBuiltinEmitterPlacement placement = emitter->GetParticlePlacement();
-  if(placement == CS_PARTICLE_BUILTIN_CENTER) arr->Push("Placement(center)");
-  else if(placement == CS_PARTICLE_BUILTIN_SURFACE) arr->Push("Placement(surface)");
-  else if(placement == CS_PARTICLE_BUILTIN_VOLUME) arr->Push("Placement(volume)");
-
-  csVector3 position = emitter->GetPosition();
-  desc.Format("Position(%g, %g, %g)", position.x, position.y, position.z);
+  desc.Format("Init Lin Vel(%g, %g, %g)", linVel->x, linVel->y, linVel->z);
+  arr->Push(desc);
+  desc.Format("Init Ang Vel(%g, %g, %g)", angVel->x, angVel->y, angVel->z);
   arr->Push(desc);
 
-  float startTime = emitter->GetStartTime();
-  desc.Format("Start Time(%g)", startTime);
+  csParticleBuiltinEmitterPlacement* placement = (csParticleBuiltinEmitterPlacement*)commonProps[7].valPtr;
+  *placement = emitter->GetParticlePlacement();
+  if(*placement == CS_PARTICLE_BUILTIN_CENTER) arr->Push("Placement(center)");
+  else if(*placement == CS_PARTICLE_BUILTIN_SURFACE) arr->Push("Placement(surface)");
+  else if(*placement == CS_PARTICLE_BUILTIN_VOLUME) arr->Push("Placement(volume)");
+
+  csVector3* position = (csVector3*)commonProps[8].valPtr;
+  *position = emitter->GetPosition();
+  desc.Format("Position(%g, %g, %g)", position->x, position->y, position->z);
   arr->Push(desc);
 
-  bool uniformVel = emitter->GetUniformVelocity();
-  if(uniformVel) arr->Push("Uniform Vel(true)");
+  float* startTime = (float*)commonProps[9].valPtr;
+  *startTime = emitter->GetStartTime();
+  desc.Format("Start Time(%g)", *startTime);
+  arr->Push(desc);
+
+  bool* uniformVel = (bool*)commonProps[10].valPtr;
+  *uniformVel = emitter->GetUniformVelocity();
+  if(*uniformVel) arr->Push("Uniform Vel(true)");
   else arr->Push("Uniform Vel(false)");
 
   return csPtr<iStringArray> (arr);
@@ -275,11 +349,14 @@ csPtr<iStringArray> ParticlesAsset::GetCommonProps(T* emitter)
 
 csPtr<iStringArray> ParticlesAsset::GetSphereProps(iParticleBuiltinEmitterSphere* emitter)
 {
+  sphereProps.Empty();
   csRef<iStringArray> arr = GetCommonProps<iParticleBuiltinEmitterSphere>(emitter);
 
   csString desc;
-  float radius = emitter->GetRadius();
-  desc.Format("Radius(%g)", radius);
+  float* radius = new float;
+  *radius = emitter->GetRadius();
+  desc.Format("Radius(%g)", *radius);
+  sphereProps.Push(Property(Float, static_cast<void*>(radius)));
   arr->Push(desc);
 
   return csPtr<iStringArray> (arr);
@@ -289,14 +366,26 @@ csPtr<iStringArray> ParticlesAsset::GetConeProps(iParticleBuiltinEmitterCone* em
 {
   csRef<iStringArray> arr = GetCommonProps<iParticleBuiltinEmitterCone>(emitter);
 
+  // Init the property array.
+  if(coneProps.IsEmpty())
+  {
+    float* angle = new float;
+    coneProps.Push(Property(Float, static_cast<void*>(angle)));
+
+    csVector3* extent = new csVector3;
+    coneProps.Push(Property(Vector3, static_cast<void*>(extent)));
+  }
+
   csString desc;
 
-  float angle = emitter->GetConeAngle();
-  desc.Format("Cone Angle(%g)", angle);
+  float* angle = (float*)coneProps[0].valPtr;
+  *angle = emitter->GetConeAngle();
+  desc.Format("Cone Angle(%g)", *angle);
   arr->Push(desc);
 
-  const csVector3& extent = emitter->GetExtent();
-  desc.Format("Extent(%g, %g, %g)", extent.x, extent.y, extent.z);
+  csVector3* extent = (csVector3*)coneProps[1].valPtr;
+  *extent = emitter->GetExtent();
+  desc.Format("Extent(%g, %g, %g)", extent->x, extent->y, extent->z);
   arr->Push(desc);
 
   return csPtr<iStringArray> (arr);
@@ -306,9 +395,18 @@ csPtr<iStringArray> ParticlesAsset::GetBoxProps(iParticleBuiltinEmitterBox* emit
 {
   csRef<iStringArray> arr = GetCommonProps<iParticleBuiltinEmitterBox>(emitter);
 
+  // Init the property array.
+  if(boxProps.IsEmpty())
+  {
+    csOBB* box = new csOBB;
+    boxProps.Push(Property(Unknown, static_cast<void*>(box)));
+  }
+
   csString desc;
 
-  desc.Format("Box(%s)", emitter->GetBox().Description().GetData());
+  csOBB* box = (csOBB*)boxProps[0].valPtr;
+  *box = emitter->GetBox();
+  desc.Format("Box(%s)", box->Description().GetData());
   arr->Push(desc);
 
   return csPtr<iStringArray> (arr);
@@ -318,17 +416,191 @@ csPtr<iStringArray> ParticlesAsset::GetCylinderProps(iParticleBuiltinEmitterCyli
 {
   csRef<iStringArray> arr = GetCommonProps<iParticleBuiltinEmitterCylinder>(emitter);
 
+  // Init the property array.
+  if(cylinderProps.IsEmpty())
+  {
+    float* radius = new float;
+    cylinderProps.Push(Property(Float, static_cast<void*>(radius)));
+
+    csVector3* extent = new csVector3;
+    cylinderProps.Push(Property(Vector3, static_cast<void*>(extent)));
+  }
+
   csString desc;
 
-  float angle = emitter->GetRadius();
-  desc.Format("Radius(%g)", angle);
+  float* radius = (float*)cylinderProps[0].valPtr;
+  *radius = emitter->GetRadius();
+  desc.Format("Radius(%g)", radius);
   arr->Push(desc);
 
-  const csVector3& extent = emitter->GetExtent();
-  desc.Format("Extent(%g, %g, %g)", extent.x, extent.y, extent.z);
+  csVector3* extent = (csVector3*)cylinderProps[1].valPtr;
+  *extent = emitter->GetExtent();
+  desc.Format("Extent(%g, %g, %g)", extent->x, extent->y, extent->z);
   arr->Push(desc);
 
   return csPtr<iStringArray> (arr);
+}
+
+PropType ParticlesAsset::GetCommonPropType(uint indx)
+{
+  if (indx < commonProps.GetSize())
+    return commonProps[indx].type;
+
+  return Unknown;
+}
+
+PropType ParticlesAsset::GetSpherePropType(uint indx)
+{
+  PropType propType = GetCommonPropType(indx);
+
+  if(propType == Unknown)
+  {
+    if(indx - commonProps.GetSize() < sphereProps.GetSize())
+      return sphereProps[indx - commonProps.GetSize()].type;
+  }
+
+  return propType;
+}
+
+PropType ParticlesAsset::GetConePropType(uint indx)
+{
+  PropType propType = GetCommonPropType(indx);
+
+  if(propType == Unknown)
+  {
+    if(indx - commonProps.GetSize() < coneProps.GetSize())
+      return coneProps[indx - commonProps.GetSize()].type;
+  }
+
+  return propType;
+}
+
+PropType ParticlesAsset::GetBoxPropType(uint indx)
+{
+  PropType propType = GetCommonPropType(indx);
+
+  if(propType == Unknown)
+  {
+    if(indx - commonProps.GetSize() < boxProps.GetSize())
+      return boxProps[indx - commonProps.GetSize()].type;
+  }
+
+  return propType;
+}
+
+PropType ParticlesAsset::GetCylinderPropType(uint indx)
+{
+  PropType propType = GetCommonPropType(indx);
+
+  if(propType == Unknown)
+  {
+    if(indx - commonProps.GetSize() < cylinderProps.GetSize())
+      return cylinderProps[indx - commonProps.GetSize()].type;
+  }
+
+  return propType;
+}
+
+PropType ParticlesAsset::GetEmitterPropType(iParticleEmitter* emitter, uint indx)
+{
+  // Test for the type.
+  csRef<iParticleBuiltinEmitterSphere> sphere = scfQueryInterface<iParticleBuiltinEmitterSphere>(emitter);
+  if(sphere) return GetSpherePropType(indx);
+
+  csRef<iParticleBuiltinEmitterCone> cone = scfQueryInterface<iParticleBuiltinEmitterCone>(emitter);
+  if(cone) return GetConePropType(indx);
+
+  csRef<iParticleBuiltinEmitterBox> box = scfQueryInterface<iParticleBuiltinEmitterBox>(emitter);
+  if(box) return GetBoxPropType(indx);
+
+  csRef<iParticleBuiltinEmitterCylinder> cylinder = scfQueryInterface<iParticleBuiltinEmitterCylinder>(emitter);
+  if(cylinder) return GetCylinderPropType(indx);
+
+  return Unknown;
+}
+
+template<typename T>
+bool ParticlesAsset::GetPropValue(csArray<Property>& properties, uint indx, T& val)
+{
+  if (indx < properties.GetSize())
+  {
+    switch(properties[indx].type)
+    {
+    case Bool:
+      {
+        val = *static_cast<T*>(properties[indx].valPtr);
+        return true;
+      }
+    case Float:
+      {
+        val = *static_cast<T*>(properties[indx].valPtr);
+        return true;
+      }
+    case Vector2:
+      {
+        val = *static_cast<T*>(properties[indx].valPtr);
+        return true;
+      }
+    case Vector3:
+      {
+        val = *static_cast<T*>(properties[indx].valPtr);
+        return true;
+      }
+    case Color4:
+      {
+        val = *static_cast<T*>(properties[indx].valPtr);
+        return true;
+      }
+    case Enum:
+    case Unknown:
+      {
+        return false;
+      }
+    default:
+      {
+        CS_ASSERT_MSG(false, "Unhandled property type!");
+        return false;
+      }
+    }
+  }
+
+  return false;
+}
+
+
+template<typename T>
+bool ParticlesAsset::GetEmitterPropValueT(iParticleEmitter* emitter, uint id, T& val)
+{
+  // Test for the type.
+  csRef<iParticleBuiltinEmitterSphere> sphere = scfQueryInterface<iParticleBuiltinEmitterSphere>(emitter);
+  if(sphere)
+  {
+    return GetPropValue<T>(commonProps, id, val) ||
+      GetPropValue<T>(sphereProps, id - (uint)commonProps.GetSize(), val);
+  }
+
+  csRef<iParticleBuiltinEmitterCone> cone = scfQueryInterface<iParticleBuiltinEmitterCone>(emitter);
+  if(cone)
+  {
+    return GetPropValue<T>(commonProps, id, val) ||
+      GetPropValue<T>(coneProps, id - (uint)commonProps.GetSize(), val);
+  }
+
+  csRef<iParticleBuiltinEmitterBox> box = scfQueryInterface<iParticleBuiltinEmitterBox>(emitter);
+  if(box)
+  {
+    return GetPropValue<T>(commonProps, id, val) ||
+      GetPropValue<T>(boxProps, id - (uint)commonProps.GetSize(), val);
+  }
+
+  csRef<iParticleBuiltinEmitterCylinder> cylinder = scfQueryInterface<iParticleBuiltinEmitterCylinder>(emitter);
+  if(cylinder)
+  {
+    return GetPropValue<T>(commonProps, id, val) ||
+      GetPropValue<T>(cylinderProps, id - (uint)commonProps.GetSize(), val);
+  }
+
+  return false;
 }
 
 bool ParticlesAsset::DeleteEmitter(uint idx)
@@ -402,11 +674,11 @@ bool ParticlesAsset::DeleteEffector(uint idx)
   return false;
 }
 
-csPtr<iStringArray> ParticlesAsset::GetEffectorProps(uint indx)
+iParticleEffector* ParticlesAsset::GetEffector(uint indx)
 {
   if(indx < object->GetEffectorCount())
   {
-    return GetEffectorProps(object->GetEffector(indx));
+    return object->GetEffector(indx);
   }
 
   return 0;
@@ -435,24 +707,39 @@ csPtr<iStringArray> ParticlesAsset::GetForceProps(iParticleBuiltinEffectorForce*
 {
   scfStringArray* arr = new scfStringArray;
 
+  if(forceProps.IsEmpty())
+  {
+    csVector3* accel = new csVector3;
+    forceProps.Push(Property(Vector3, static_cast<void*>(accel)));
+
+    csVector3* force = new csVector3;
+    forceProps.Push(Property(Vector3, static_cast<void*>(force)));
+
+    csVector3* randAccel = new csVector3;
+    forceProps.Push(Property(Vector3, static_cast<void*>(randAccel)));
+  }
+
   {
     csString desc;
-    const csVector3& accel = effector->GetAcceleration();
-    desc.Format("Accel(%g, %g, %g)", accel.x, accel.y, accel.z);
+    csVector3* accel = (csVector3*)forceProps[0].valPtr;
+    *accel = effector->GetAcceleration();
+    desc.Format("Accel(%g, %g, %g)", accel->x, accel->y, accel->z);
     arr->Push(desc);
   }
 
   {
     csString desc;
-    const csVector3& force = effector->GetForce();
-    desc.Format("Force(%g, %g, %g)", force.x, force.y, force.z);
+    csVector3* force = (csVector3*)forceProps[1].valPtr;
+    *force = effector->GetForce();
+    desc.Format("Force(%g, %g, %g)", force->x, force->y, force->z);
     arr->Push(desc);
   }
 
   {
     csString desc;
-    const csVector3& randAccel = effector->GetRandomAcceleration();
-    desc.Format("Rand Accel(%g, %g, %g)", randAccel.x, randAccel.y, randAccel.z);
+    csVector3* randAccel = (csVector3*)forceProps[2].valPtr;
+    *randAccel = effector->GetRandomAcceleration();
+    desc.Format("Rand Accel(%g, %g, %g)", randAccel->x, randAccel->y, randAccel->z);
     arr->Push(desc);
   }
 
@@ -463,11 +750,21 @@ csPtr<iStringArray> ParticlesAsset::GetLinColorProps(iParticleBuiltinEffectorLin
 {
   scfStringArray* arr = new scfStringArray;
 
+  if(lincolorProps.IsEmpty())
+  {
+    for(size_t i=0; i<effector->GetColorCount(); ++i)
+    {
+      csColor4* color = new csColor4;
+      lincolorProps.Push(Property(Color4, static_cast<void*>(color)));
+    }
+  }
+
   for(size_t i=0; i<effector->GetColorCount(); ++i)
   {
     csString desc;
-    const csColor4& color = effector->GetColor(i);
-    desc.Format("Color(%g, %g, %g, %g)", color.red, color.green, color.blue, color.alpha);
+    csColor4* color = (csColor4*)lincolorProps[i].valPtr;
+    *color = effector->GetColor(i);
+    desc.Format("Color(%g, %g, %g, %g)", color->red, color->green, color->blue, color->alpha);
     arr->Push(desc);
   }
 
@@ -478,18 +775,42 @@ csPtr<iStringArray> ParticlesAsset::GetVelFieldProps(iParticleBuiltinEffectorVel
 {
   scfStringArray* arr = new scfStringArray;
 
+  if(velfieldProps.IsEmpty())
+  {
+    csParticleBuiltinEffectorVFType* vfType = new csParticleBuiltinEffectorVFType;
+    velfieldProps.Push(Property(Enum, static_cast<void*>(vfType)));
+
+    for(size_t i=0; i<effector->GetFParameterCount(); ++i)
+    {
+      float* fParam = new float;
+      velfieldProps.Push(Property(Float, static_cast<void*>(fParam)));
+    }
+
+    for(size_t i=0; i<effector->GetVParameterCount(); ++i)
+    {
+      csVector3* vParam = new csVector3;
+      velfieldProps.Push(Property(Vector3, static_cast<void*>(vParam)));
+    }
+  }
+
   if(effector->GetType() == CS_PARTICLE_BUILTIN_RADIALPOINT)
   {
+    csParticleBuiltinEffectorVFType* vfType = (csParticleBuiltinEffectorVFType*)velfieldProps[0].valPtr;
+    *vfType = effector->GetType();
     arr->Push("Type(radial point)");
   }
   else if(effector->GetType() == CS_PARTICLE_BUILTIN_SPIRAL)
   {
+    csParticleBuiltinEffectorVFType* vfType = (csParticleBuiltinEffectorVFType*)velfieldProps[0].valPtr;
+    *vfType = effector->GetType();
     arr->Push("Type(spiral)");
   }
 
   for(size_t i=0; i<effector->GetFParameterCount(); ++i)
   {
     csString desc;
+    float* fParam = (float*)velfieldProps[1+i].valPtr;
+    *fParam = effector->GetFParameter(i);
     desc.Format("FParam(%g)", effector->GetFParameter(i));
     arr->Push(desc);
   }
@@ -497,8 +818,9 @@ csPtr<iStringArray> ParticlesAsset::GetVelFieldProps(iParticleBuiltinEffectorVel
   for(size_t i=0; i<effector->GetVParameterCount(); ++i)
   {
     csString desc;
-    csVector3 vParam = effector->GetVParameter(i);
-    desc.Format("VParam(%g, %g, %g)", vParam.x, vParam.y, vParam.z);
+    csVector3* vParam = (csVector3*)velfieldProps[1+effector->GetFParameterCount()+i].valPtr;
+    *vParam = effector->GetVParameter(i);
+    desc.Format("VParam(%g, %g, %g)", vParam->x, vParam->y, vParam->z);
     arr->Push(desc);
   }
 
@@ -509,28 +831,135 @@ csPtr<iStringArray> ParticlesAsset::GetLinearProps(iParticleBuiltinEffectorLinea
 {
   scfStringArray* arr = new scfStringArray;
 
+  if(linearProps.IsEmpty())
+  {
+    for(size_t i=0; i<effector->GetParameterSetCount(); ++i)
+    {
+      csVector3* angVel = new csVector3;
+      linearProps.Push(Property(Vector3, static_cast<void*>(angVel)));
+
+      csColor4* color = new csColor4;
+      linearProps.Push(Property(Color4, static_cast<void*>(color)));
+
+      csVector3* linVel = new csVector3;
+      linearProps.Push(Property(Vector3, static_cast<void*>(linVel)));
+
+      float* mass = new float;
+      linearProps.Push(Property(Float, static_cast<void*>(mass)));
+
+      csVector2* particleSize = new csVector2;
+      linearProps.Push(Property(Vector2, static_cast<void*>(particleSize)));
+    }
+  }
+
   for(size_t i=0; i<effector->GetParameterSetCount(); ++i)
   {
-    csParticleParameterSet paramSet = effector->GetParameterSet(i);
-    csVector3 angularVel = paramSet.angularVelocity;
-    csColor4 color = paramSet.color;
-    csVector3 linVel = paramSet.linearVelocity;
-    float mass = paramSet.mass;
-    csVector2 size = paramSet.particleSize;
+    csVector3* angularVel = (csVector3*)linearProps[i*5+0].valPtr;
+    csColor4* color = (csColor4*)linearProps[i*5+1].valPtr;
+    csVector3* linVel = (csVector3*)linearProps[i*5+2].valPtr;
+    float* mass = (float*)linearProps[i*5+3].valPtr;
+    csVector2* size = (csVector2*)linearProps[i*5+4].valPtr;
 
+    const csParticleParameterSet& paramSet = effector->GetParameterSet(i);
+    *angularVel = paramSet.angularVelocity;
+    *color = paramSet.color;
+    *linVel = paramSet.linearVelocity;
+    *mass = paramSet.mass;
+    *size = paramSet.particleSize;
 
     csString desc;
-    desc.Format("ParamSet %d, angVel(%s)", i, angularVel.Description().GetData());
+    desc.Format("ParamSet %d, angVel(%s)", i, angularVel->Description().GetData());
     arr->Push(desc);
-    desc.Format("ParamSet %d, color(%g, %g, %g, %g)", i, color.red, color.green, color.blue, color.alpha);
+    desc.Format("ParamSet %d, color(%g, %g, %g, %g)", i, color->red, color->green, color->blue, color->alpha);
     arr->Push(desc);
-    desc.Format("ParamSet %d, linVel(%g, %g, %g)", i, linVel.x, linVel.y, linVel.z);
+    desc.Format("ParamSet %d, linVel(%g, %g, %g)", i, linVel->x, linVel->y, linVel->z);
     arr->Push(desc);
-    desc.Format("ParamSet %d, mass(%g)", i, mass);
+    desc.Format("ParamSet %d, mass(%g)", i, *mass);
     arr->Push(desc);
-    desc.Format("ParamSet %d, size(%g, %g)", i, size.x, size.y);
+    desc.Format("ParamSet %d, size(%g, %g)", i, size->x, size->y);
     arr->Push(desc);
   }
 
   return csPtr<iStringArray> (arr);
+}
+
+PropType ParticlesAsset::GetForcePropType(uint indx)
+{
+  if(indx < forceProps.GetSize())
+    return forceProps[indx].type;
+
+  return Unknown;
+}
+
+PropType ParticlesAsset::GetLinColorPropType(uint indx)
+{
+  if(indx < lincolorProps.GetSize())
+    return lincolorProps[indx].type;
+
+  return Unknown;
+}
+
+PropType ParticlesAsset::GetVelFieldPropType(uint indx)
+{
+  if(indx < velfieldProps.GetSize())
+    return velfieldProps[indx].type;
+
+  return Unknown;
+}
+
+PropType ParticlesAsset::GetLinearPropType(uint indx)
+{
+  if(indx < linearProps.GetSize())
+    return linearProps[indx].type;
+
+  return Unknown;
+}
+
+PropType ParticlesAsset::GetEffectorPropType(iParticleEffector* effector, uint indx)
+{
+  // Test for the type.
+  csRef<iParticleBuiltinEffectorForce> force = scfQueryInterface<iParticleBuiltinEffectorForce>(effector);
+  if(force) return GetForcePropType(indx);
+
+  csRef<iParticleBuiltinEffectorLinColor> lincolor = scfQueryInterface<iParticleBuiltinEffectorLinColor>(effector);
+  if(lincolor) return GetLinColorPropType(indx);
+
+  csRef<iParticleBuiltinEffectorVelocityField> velfield = scfQueryInterface<iParticleBuiltinEffectorVelocityField>(effector);
+  if(velfield) return GetVelFieldPropType(indx);
+
+  csRef<iParticleBuiltinEffectorLinear> linear = scfQueryInterface<iParticleBuiltinEffectorLinear>(effector);
+  if(linear) return GetLinearPropType(indx);
+
+  return Unknown;
+}
+
+template<typename T>
+bool ParticlesAsset::GetEffectorPropValueT(iParticleEffector* effector, uint id, T& val)
+{
+  // Test for the type.
+  csRef<iParticleBuiltinEffectorForce> force = scfQueryInterface<iParticleBuiltinEffectorForce>(effector);
+  if(force)
+  {
+    return GetPropValue<T>(forceProps, id, val);
+  }
+
+  csRef<iParticleBuiltinEffectorLinColor> lincolor = scfQueryInterface<iParticleBuiltinEffectorLinColor>(effector);
+  if(lincolor)
+  {
+    return GetPropValue<T>(lincolorProps, id, val);
+  }
+
+  csRef<iParticleBuiltinEffectorVelocityField> velfield = scfQueryInterface<iParticleBuiltinEffectorVelocityField>(effector);
+  if(velfield)
+  {
+    return GetPropValue<T>(velfieldProps, id, val);
+  }
+
+  csRef<iParticleBuiltinEffectorLinear> linear = scfQueryInterface<iParticleBuiltinEffectorLinear>(effector);
+  if(linear)
+  {
+    return GetPropValue<T>(linearProps, id, val);
+  }
+
+  return false;
 }

@@ -51,6 +51,43 @@ private:
   csPtr<iStringArray> GetVelFieldProps(iParticleBuiltinEffectorVelocityField* effector);
   csPtr<iStringArray> GetLinearProps(iParticleBuiltinEffectorLinear* effector);
 
+  PropType GetCommonPropType(uint indx);
+  PropType GetSpherePropType(uint indx);
+  PropType GetConePropType(uint indx);
+  PropType GetBoxPropType(uint indx);
+  PropType GetCylinderPropType(uint indx);
+
+  PropType GetForcePropType(uint indx);
+  PropType GetLinColorPropType(uint indx);
+  PropType GetVelFieldPropType(uint indx);
+  PropType GetLinearPropType(uint indx);
+
+  struct Property
+  {
+    PropType type;
+    void* valPtr;
+
+    Property(PropType type, void* valPtr)
+      : type(type), valPtr(valPtr) {}
+  };
+
+  template<typename T>
+  bool GetPropValue(csArray<Property>& properties, uint indx, T& val);
+  template<typename T>
+  bool GetEmitterPropValueT(iParticleEmitter* emitter, uint id, T& val);
+  template<typename T>
+  bool GetEffectorPropValueT(iParticleEffector* effector, uint id, T& val);
+
+  csArray<Property> commonProps;
+  csArray<Property> sphereProps;
+  csArray<Property> coneProps;
+  csArray<Property> boxProps;
+  csArray<Property> cylinderProps;
+  csArray<Property> forceProps;
+  csArray<Property> lincolorProps;
+  csArray<Property> velfieldProps;
+  csArray<Property> linearProps;
+
 public:
   static bool Support(iMeshWrapper* mesh);
 
@@ -80,17 +117,72 @@ public:
 
   virtual bool DeleteEmitter(uint idx);
 
-  virtual csPtr<iStringArray> GetEmitterProps(uint indx);
+  virtual iParticleEmitter* GetEmitter(uint indx);
 
   virtual csPtr<iStringArray> GetEmitterProps(iParticleEmitter* emitter);
+
+  virtual PropType GetEmitterPropType(iParticleEmitter* emitter, uint indx);
+
+  virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, bool& val)
+  {
+    return GetEmitterPropValueT<bool>(emitter, id, val);
+  }
+
+  virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, float& val)
+  {
+    return GetEmitterPropValueT<float>(emitter, id, val);
+  }
+
+  virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, csVector2& val)
+  {
+    return GetEmitterPropValueT<csVector2>(emitter, id, val);
+  }
+
+  virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, csVector3& val)
+  {
+    return GetEmitterPropValueT<csVector3>(emitter, id, val);
+  }
+
+  virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, csColor4& val)
+  {
+    return GetEmitterPropValueT<csColor4>(emitter, id, val);
+  }
+
 
   virtual iParticleEffector* AddEffector(uint type);
 
   virtual bool DeleteEffector(uint idx);
 
-  virtual csPtr<iStringArray> GetEffectorProps(uint indx);
+  virtual iParticleEffector* GetEffector(uint indx);
 
   virtual csPtr<iStringArray> GetEffectorProps(iParticleEffector* effector);
+
+  virtual PropType GetEffectorPropType(iParticleEffector* effector, uint indx);
+
+  virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, bool& val)
+  {
+    return GetEffectorPropValueT<bool>(effector, id, val);
+  }
+
+  virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, float& val)
+  {
+    return GetEffectorPropValueT<float>(effector, id, val);
+  }
+
+  virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, csVector2& val)
+  {
+    return GetEffectorPropValueT<csVector2>(effector, id, val);
+  }
+
+  virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, csVector3& val)
+  {
+    return GetEffectorPropValueT<csVector3>(effector, id, val);
+  }
+
+  virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, csColor4& val)
+  {
+    return GetEffectorPropValueT<csColor4>(effector, id, val);
+  }
 };
 
 #endif // PARTICLESASSET_H__

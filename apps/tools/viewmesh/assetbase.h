@@ -30,17 +30,31 @@
 #include <utility>
 #include <string>
 
+class csColor4;
+class csTransform;
+class csVector2;
+class csVector3;
 struct iMeshWrapper;
 struct iMaterialWrapper;
 struct iParticleEffector;
 struct iParticleEmitter;
 struct iStringArray;
-class csTransform;
 
 struct iObjectRegistry;
 
 typedef std::pair<std::string, std::string> TypeValue;
 typedef std::map<std::string, TypeValue> SocketDescriptor;
+
+enum PropType
+{
+  Bool,
+  Float,
+  Vector2,
+  Vector3,
+  Color4,
+  Enum,
+  Unknown
+};
 
 struct AssetBase : public csRefCount
 {
@@ -172,17 +186,33 @@ public:
 
   virtual bool DeleteEmitter(uint idx) { return false; }
 
-  virtual csPtr<iStringArray> GetEmitterProps(uint indx) { return 0; }
+  virtual iParticleEmitter* GetEmitter(uint indx) { return 0; }
 
   virtual csPtr<iStringArray> GetEmitterProps(iParticleEmitter* emitter) { return 0; }
+
+  virtual PropType GetEmitterPropType(iParticleEmitter* emitter, uint indx) { return Unknown; }
+
+  virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, bool& val) { return false; }
+  virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, float& val) { return false; }
+  virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, csVector2& val) { return false; }
+  virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, csVector3& val) { return false; }
+  virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, csColor4& val) { return false; }
 
   virtual iParticleEffector* AddEffector(uint type) { return false; }
 
   virtual bool DeleteEffector(uint idx) { return false; }
 
-  virtual csPtr<iStringArray> GetEffectorProps(uint indx) { return 0; }
+  virtual iParticleEffector* GetEffector(uint indx) { return 0; }
 
   virtual csPtr<iStringArray> GetEffectorProps(iParticleEffector* effector) { return 0; }
+
+  virtual PropType GetEffectorPropType(iParticleEffector* effector, uint indx) { return Unknown; }
+
+  virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, bool& val) { return false; }
+  virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, float& val) { return false; }
+  virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, csVector2& val) { return false; }
+  virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, csVector3& val) { return false; }
+  virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, csColor4& val) { return false; }
 };
 
 #endif // IASSET_H__
