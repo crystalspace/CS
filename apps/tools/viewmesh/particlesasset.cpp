@@ -349,14 +349,19 @@ csPtr<iStringArray> ParticlesAsset::GetCommonProps(T* emitter)
 
 csPtr<iStringArray> ParticlesAsset::GetSphereProps(iParticleBuiltinEmitterSphere* emitter)
 {
-  sphereProps.Empty();
   csRef<iStringArray> arr = GetCommonProps<iParticleBuiltinEmitterSphere>(emitter);
 
+  // Init the property array.
+  if(sphereProps.IsEmpty())
+  {
+    float* radius = new float;
+    sphereProps.Push(Property(Float, static_cast<void*>(radius)));
+  }
+
   csString desc;
-  float* radius = new float;
+  float* radius = (float*)sphereProps[0].valPtr;
   *radius = emitter->GetRadius();
   desc.Format("Radius(%g)", *radius);
-  sphereProps.Push(Property(Float, static_cast<void*>(radius)));
   arr->Push(desc);
 
   return csPtr<iStringArray> (arr);
@@ -567,7 +572,6 @@ bool ParticlesAsset::GetPropValue(csArray<Property>& properties, uint indx, T& v
   return false;
 }
 
-
 template<typename T>
 bool ParticlesAsset::GetEmitterPropValueT(iParticleEmitter* emitter, uint id, T& val)
 {
@@ -601,6 +605,243 @@ bool ParticlesAsset::GetEmitterPropValueT(iParticleEmitter* emitter, uint id, T&
   }
 
   return false;
+}
+
+template<typename T>
+bool ParticlesAsset::SetPropValue(csArray<Property>& properties, uint id, T& val)
+{
+  if(id < properties.GetSize())
+  {
+    *((T*)properties[id].valPtr) = val;
+    return true;
+  }
+
+  return false;
+}
+
+template<typename T>
+bool ParticlesAsset::SetEmitterPropValueT(iParticleEmitter* emitter, uint id, T& val)
+{
+  // Test for the type.
+  csRef<iParticleBuiltinEmitterSphere> sphere = scfQueryInterface<iParticleBuiltinEmitterSphere>(emitter);
+  if(sphere)
+  {
+    if(SetPropValue<T>(commonProps, id, val))
+    {
+      return UpdateCommonProp<iParticleBuiltinEmitterSphere>(sphere, id);
+    }
+    
+    if(SetPropValue<T>(sphereProps, id - (uint)commonProps.GetSize(), val))
+    {
+      return UpdateSphereProp(sphere, id - (uint)commonProps.GetSize());
+    }
+
+    return false;
+  }
+
+  csRef<iParticleBuiltinEmitterCone> cone = scfQueryInterface<iParticleBuiltinEmitterCone>(emitter);
+  if(cone)
+  {
+    if(SetPropValue<T>(commonProps, id, val))
+    {
+      return UpdateCommonProp<iParticleBuiltinEmitterCone>(cone, id);
+    }
+
+    if(SetPropValue<T>(coneProps, id - (uint)commonProps.GetSize(), val))
+    {
+      return UpdateConeProp(cone, id - (uint)commonProps.GetSize());
+    }
+
+    return false;
+  }
+
+  csRef<iParticleBuiltinEmitterBox> box = scfQueryInterface<iParticleBuiltinEmitterBox>(emitter);
+  if(box)
+  {
+    if(SetPropValue<T>(commonProps, id, val))
+    {
+      return UpdateCommonProp<iParticleBuiltinEmitterBox>(box, id);
+    }
+
+    if(SetPropValue<T>(boxProps, id - (uint)commonProps.GetSize(), val))
+    {
+      return UpdateBoxProp(box, id - (uint)commonProps.GetSize());
+    }
+
+    return false;
+  }
+
+  csRef<iParticleBuiltinEmitterCylinder> cylinder = scfQueryInterface<iParticleBuiltinEmitterCylinder>(emitter);
+  if(cylinder)
+  {
+    if(SetPropValue<T>(commonProps, id, val))
+    {
+      return UpdateCommonProp<iParticleBuiltinEmitterCylinder>(cylinder, id);
+    }
+
+    if(SetPropValue<T>(cylinderProps, id - (uint)commonProps.GetSize(), val))
+    {
+      return UpdateCylinderProp(cylinder, id - (uint)commonProps.GetSize());
+    }
+
+    return false;
+  }
+
+  return false;
+}
+
+template<typename T>
+bool ParticlesAsset::UpdateCommonProp(T* emitter, uint id)
+{
+  switch(id)
+  {
+  case 0:
+    {
+      float* duration = (float*)commonProps[0].valPtr;
+      emitter->SetDuration(*duration);
+      return true;
+    }
+  case 1:
+    {
+      float* emissionRate = (float*)commonProps[1].valPtr;
+      emitter->SetEmissionRate(*emissionRate);
+      return true;
+    }
+  case 2:
+    {
+      bool* enabled = (bool*)commonProps[2].valPtr;
+      emitter->SetEnabled(*enabled);
+      return true;
+    }
+  case 3:
+    {
+      csVector2* initMass = (csVector2*)commonProps[3].valPtr;
+      emitter->SetInitialMass(initMass->x, initMass->y);
+      return true;
+    }
+  case 4:
+    {
+      csVector2* initTTL = (csVector2*)commonProps[4].valPtr;
+      emitter->SetInitialTTL(initTTL->x, initTTL->y);
+      return true;
+    }
+  case 5:
+  case 6:
+    {
+      csVector3* linVel = (csVector3*)commonProps[5].valPtr;
+      csVector3* angVel = (csVector3*)commonProps[6].valPtr;
+      emitter->SetInitialVelocity(*linVel, *angVel);
+      return true;
+    }
+  case 7:
+    {
+      csParticleBuiltinEmitterPlacement* placement = (csParticleBuiltinEmitterPlacement*)commonProps[7].valPtr;
+      emitter->SetParticlePlacement(*placement);
+      return true;
+    }
+  case 8:
+    {
+      csVector3* position = (csVector3*)commonProps[8].valPtr;
+      emitter->SetPosition(*position);
+      return true;
+    }
+  case 9:
+    {
+      float* startTime = (float*)commonProps[9].valPtr;
+      emitter->SetStartTime(*startTime);
+      return true;
+    }
+  case 10:
+    {
+      bool* uniformVel = (bool*)commonProps[10].valPtr;
+      emitter->SetUniformVelocity(*uniformVel);
+      return true;
+    }
+  default:
+    {
+      return false;
+    }
+  }
+}
+
+bool ParticlesAsset::UpdateSphereProp(iParticleBuiltinEmitterSphere* emitter, uint id)
+{
+  switch(id)
+  {
+  case 0:
+    {
+      float* radius = (float*)sphereProps[0].valPtr;
+      emitter->SetRadius(*radius);
+      return true;
+    }
+  default:
+    {
+      return false;
+    }
+  }
+}
+
+bool ParticlesAsset::UpdateConeProp(iParticleBuiltinEmitterCone* emitter, uint id)
+{
+  switch(id)
+  {
+  case 0:
+    {
+      float* angle = (float*)coneProps[0].valPtr;
+      emitter->SetConeAngle(*angle);
+      return true;
+    }
+  case 1:
+    {
+      csVector3* extent = (csVector3*)coneProps[1].valPtr;
+      emitter->SetExtent(*extent);
+      return true;
+    }
+  default:
+    {
+      return false;
+    }
+  }
+}
+
+bool ParticlesAsset::UpdateBoxProp(iParticleBuiltinEmitterBox* emitter, uint id)
+{
+  switch(id)
+  {
+  case 0:
+    {
+      csOBB* box = (csOBB*)boxProps[0].valPtr;
+      emitter->SetBox(*box);
+      return true;
+    }
+  default:
+    {
+      return false;
+    }
+  }
+}
+
+bool ParticlesAsset::UpdateCylinderProp(iParticleBuiltinEmitterCylinder* emitter, uint id)
+{
+  switch(id)
+  {
+  case 0:
+    {
+      float* radius = (float*)cylinderProps[0].valPtr;
+      emitter->SetRadius(*radius);
+      return true;
+    }
+  case 1:
+    {
+      csVector3* extent = (csVector3*)cylinderProps[1].valPtr;
+      emitter->SetExtent(*extent);
+      return true;
+    }
+  default:
+    {
+      return false;
+    }
+  }  
 }
 
 bool ParticlesAsset::DeleteEmitter(uint idx)
@@ -962,4 +1203,164 @@ bool ParticlesAsset::GetEffectorPropValueT(iParticleEffector* effector, uint id,
   }
 
   return false;
+}
+
+template<typename T>
+bool ParticlesAsset::SetEffectorPropValueT(iParticleEffector* effector, uint id, T& val)
+{
+  // Test for the type.
+  csRef<iParticleBuiltinEffectorForce> force = scfQueryInterface<iParticleBuiltinEffectorForce>(effector);
+  if(force)
+  {
+    if(SetPropValue<T>(forceProps, id, val))
+    {
+      return UpdateForceProp(force, id);
+    }
+
+    return false;
+  }
+
+  csRef<iParticleBuiltinEffectorLinColor> lincolor = scfQueryInterface<iParticleBuiltinEffectorLinColor>(effector);
+  if(lincolor)
+  {
+    if(SetPropValue<T>(lincolorProps, id, val))
+    {
+      return UpdateLinColorProp(lincolor, id);
+    }
+
+    return false;
+  }
+
+  csRef<iParticleBuiltinEffectorVelocityField> velfield = scfQueryInterface<iParticleBuiltinEffectorVelocityField>(effector);
+  if(velfield)
+  {
+    if(SetPropValue<T>(velfieldProps, id, val))
+    {
+      return UpdateVelFieldProp(velfield, id);
+    }
+
+    return false;
+  }
+
+  csRef<iParticleBuiltinEffectorLinear> linear = scfQueryInterface<iParticleBuiltinEffectorLinear>(effector);
+  if(linear)
+  {
+    if(SetPropValue<T>(linearProps, id, val))
+    {
+      return UpdateLinearProp(linear, id);
+    }
+
+    return false;
+  }
+
+  return false;
+}
+
+bool ParticlesAsset::UpdateForceProp(iParticleBuiltinEffectorForce* force, uint id)
+{
+  switch(id)
+  {
+  case 0:
+    {
+      csVector3* accel = (csVector3*)forceProps[0].valPtr;
+      force->SetAcceleration(*accel);
+      return true;
+    }
+  case 1:
+    {
+      csVector3* vForce = (csVector3*)forceProps[1].valPtr;
+      force->SetForce(*vForce);
+      return true;
+    }
+  case 2:
+    {
+      csVector3* randAccel = (csVector3*)forceProps[2].valPtr;
+      force->SetRandomAcceleration(*randAccel);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool ParticlesAsset::UpdateLinColorProp(iParticleBuiltinEffectorLinColor* lincolor, uint id)
+{
+  if(id < lincolorProps.GetSize())
+  {
+    csColor4* color = (csColor4*)lincolorProps[id].valPtr;
+    lincolor->SetColor(id, *color);
+    return true;
+  }
+
+  return false;
+}
+
+bool ParticlesAsset::UpdateVelFieldProp(iParticleBuiltinEffectorVelocityField* velfield, uint id)
+{
+  if(0 == id--)
+  {
+    csParticleBuiltinEffectorVFType* vfType = (csParticleBuiltinEffectorVFType*)velfieldProps[0].valPtr;
+    velfield->SetType(*vfType);
+    return true;
+  }
+
+  if(id < velfield->GetFParameterCount())
+  {
+    float* fParam = (float*)velfieldProps[id].valPtr;
+    velfield->SetFParameter(id, *fParam);
+    return true;
+  }
+
+  id -= (uint)velfield->GetFParameterCount();
+  if(id < velfield->GetVParameterCount())
+  {
+    csVector3* vParam = (csVector3*)velfieldProps[id].valPtr;
+    velfield->SetVParameter(id, *vParam);
+    return true;
+  }
+
+  return false;
+}
+
+bool ParticlesAsset::UpdateLinearProp(iParticleBuiltinEffectorLinear* linear, uint id)
+{
+  uint paramSet = id / 5;
+  csParticleParameterSet newSet(linear->GetParameterSet(paramSet));
+
+  switch(id % 5)
+  {
+  case 0:
+    {
+      newSet.angularVelocity = *(csVector3*)linearProps[id].valPtr;
+      break;
+    }
+  case 1:
+    {
+      newSet.color = *(csColor4*)linearProps[id].valPtr;
+      break;
+    }
+  case 2:
+    {
+      newSet.linearVelocity = *(csVector3*)linearProps[id].valPtr;
+      break;
+    }
+  case 3:
+    {
+      newSet.mass = *(float*)linearProps[id].valPtr;
+      break;
+    }
+  case 4:
+    {
+      newSet.particleSize = *(csVector2*)linearProps[id].valPtr;
+      break;
+    }
+  default:
+    {
+      break;
+    }
+  }
+
+  linear->SetParameterSet(paramSet, newSet);
+
+  return true;
 }

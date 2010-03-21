@@ -198,6 +198,12 @@ public:
   virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, csVector3& val) { return false; }
   virtual bool GetEmitterPropValue(iParticleEmitter* emitter, uint id, csColor4& val) { return false; }
 
+  virtual bool SetEmitterPropValue(iParticleEmitter* emitter, uint id, bool& val) { return false; }
+  virtual bool SetEmitterPropValue(iParticleEmitter* emitter, uint id, float& val) { return false; }
+  virtual bool SetEmitterPropValue(iParticleEmitter* emitter, uint id, csVector2& val) { return false; }
+  virtual bool SetEmitterPropValue(iParticleEmitter* emitter, uint id, csVector3& val) { return false; }
+  virtual bool SetEmitterPropValue(iParticleEmitter* emitter, uint id, csColor4& val) { return false; }
+
   virtual iParticleEffector* AddEffector(uint type) { return false; }
 
   virtual bool DeleteEffector(uint idx) { return false; }
@@ -213,6 +219,12 @@ public:
   virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, csVector2& val) { return false; }
   virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, csVector3& val) { return false; }
   virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, csColor4& val) { return false; }
+
+  virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, bool& val) { return false; }
+  virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, float& val) { return false; }
+  virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csVector2& val) { return false; }
+  virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csVector3& val) { return false; }
+  virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csColor4& val) { return false; }
 };
 
 #endif // IASSET_H__

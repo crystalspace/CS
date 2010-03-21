@@ -44,6 +44,7 @@ protected:
   void UpdateList (csRef<iStringArray> arr, const char* window);
   bool GetSelectedItemText(const char* window, csString& value);
   bool GetSelectedItemID(const char* window, uint& value);
+  void SetSelectedItemByID(const char* window, uint id);
 
 public:
   TabBase(iObjectRegistry* obj_reg, AssetBase* ass);
@@ -147,6 +148,15 @@ bool TabBase::GetSelectedItemID(const char* window, uint& value)
   value = item->getID();
 
   return true;
+}
+
+void TabBase::SetSelectedItemByID(const char* window, uint id)
+{
+  csRef<iCEGUI> cegui = csQueryRegistry<iCEGUI> (object_reg);
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow(window);
+  list->setItemSelectState(id, true);
 }
 
 

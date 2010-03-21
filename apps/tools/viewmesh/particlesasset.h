@@ -78,6 +78,26 @@ private:
   template<typename T>
   bool GetEffectorPropValueT(iParticleEffector* effector, uint id, T& val);
 
+  template<typename T>
+  bool SetEmitterPropValueT(iParticleEmitter* emitter, uint id, T& val);
+  template<typename T>
+  bool SetEffectorPropValueT(iParticleEffector* effector, uint id, T& val);
+
+  template<typename T>
+  bool SetPropValue(csArray<Property>& properties, uint id, T& val);
+
+  template<typename T>
+  bool UpdateCommonProp(T* emitter, uint id);
+  bool UpdateSphereProp(iParticleBuiltinEmitterSphere* emitter, uint id);
+  bool UpdateConeProp(iParticleBuiltinEmitterCone* emitter, uint id);
+  bool UpdateBoxProp(iParticleBuiltinEmitterBox* emitter, uint id);
+  bool UpdateCylinderProp(iParticleBuiltinEmitterCylinder* emitter, uint id);
+
+  bool UpdateForceProp(iParticleBuiltinEffectorForce* force, uint id);
+  bool UpdateLinColorProp(iParticleBuiltinEffectorLinColor* lincolor, uint id);
+  bool UpdateVelFieldProp(iParticleBuiltinEffectorVelocityField* velfield, uint id);
+  bool UpdateLinearProp(iParticleBuiltinEffectorLinear* linear, uint id);
+
   csArray<Property> commonProps;
   csArray<Property> sphereProps;
   csArray<Property> coneProps;
@@ -148,6 +168,30 @@ public:
     return GetEmitterPropValueT<csColor4>(emitter, id, val);
   }
 
+  virtual bool SetEmitterPropValue(iParticleEmitter* emitter, uint id, bool& val)
+  {
+    return SetEmitterPropValueT<bool>(emitter, id, val);
+  }
+
+  virtual bool SetEmitterPropValue(iParticleEmitter* emitter, uint id, float& val)
+  {
+    return SetEmitterPropValueT<float>(emitter, id, val);
+  }
+
+  virtual bool SetEmitterPropValue(iParticleEmitter* emitter, uint id, csVector2& val)
+  {
+    return SetEmitterPropValueT<csVector2>(emitter, id, val);
+  }
+
+  virtual bool SetEmitterPropValue(iParticleEmitter* emitter, uint id, csVector3& val)
+  {
+    return SetEmitterPropValueT<csVector3>(emitter, id, val);
+  }
+
+  virtual bool SetEmitterPropValue(iParticleEmitter* emitter, uint id, csColor4& val)
+  {
+    return SetEmitterPropValueT<csColor4>(emitter, id, val);
+  }
 
   virtual iParticleEffector* AddEffector(uint type);
 
@@ -182,6 +226,31 @@ public:
   virtual bool GetEffectorPropValue(iParticleEffector* effector, uint id, csColor4& val)
   {
     return GetEffectorPropValueT<csColor4>(effector, id, val);
+  }
+
+  virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, bool& val)
+  {
+    return SetEffectorPropValueT<bool>(effector, id, val);
+  }
+
+  virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, float& val)
+  {
+    return SetEffectorPropValueT<float>(effector, id, val);
+  }
+
+  virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csVector2& val)
+  {
+    return SetEffectorPropValueT<csVector2>(effector, id, val);
+  }
+
+  virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csVector3& val)
+  {
+    return SetEffectorPropValueT<csVector3>(effector, id, val);
+  }
+
+  virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csColor4& val)
+  {
+    return SetEffectorPropValueT<csColor4>(effector, id, val);
   }
 };
 

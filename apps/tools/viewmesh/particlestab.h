@@ -49,6 +49,12 @@ private:
   bool AddVelField (const CEGUI::EventArgs& e);
   bool AddLinear (const CEGUI::EventArgs& e);
 
+  bool UpdateBool (const CEGUI::EventArgs& e);
+  bool UpdateX (const CEGUI::EventArgs& e);
+  bool UpdateY (const CEGUI::EventArgs& e);
+  bool UpdateZ (const CEGUI::EventArgs& e);
+  bool UpdateA (const CEGUI::EventArgs& e);
+
   bool HandleEditing (const CEGUI::EventArgs& e);
   bool DoneEditing (const CEGUI::EventArgs& e);
 
@@ -158,19 +164,29 @@ ParticlesTab::ParticlesTab(iObjectRegistry* obj_reg, AssetBase* ass)
   item = new CEGUI::ListboxTextItem("False", 1);
   item->setTextColours(CEGUI::colour(0.0f, 0.0f, 0.0f));
   combobox->addItem(item);
+  combobox->subscribeEvent(CEGUI::Combobox::EventListSelectionAccepted,
+    CEGUI::Event::Subscriber(&ParticlesTab::UpdateBool, this));
   combobox->hide();
 
-  window = winMgr->getWindow("Particles/Edit/X");
-  window->hide();
+  CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+  editbox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ParticlesTab::UpdateX, this));
+  editbox->hide();
 
-  window = winMgr->getWindow("Particles/Edit/Y");
-  window->hide();
+  editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Y");
+  editbox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ParticlesTab::UpdateY, this));
+  editbox->hide();
 
-  window = winMgr->getWindow("Particles/Edit/Z");
-  window->hide();
+  editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Z");
+  editbox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ParticlesTab::UpdateZ, this));
+  editbox->hide();
 
-  window = winMgr->getWindow("Particles/Edit/A");
-  window->hide();
+  editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/A");
+  editbox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ParticlesTab::UpdateA, this));
+  editbox->hide();
 
   window = winMgr->getWindow("Particles/Edit/Done");
   window->subscribeEvent(CEGUI::PushButton::EventClicked,
@@ -695,6 +711,397 @@ void ParticlesTab::ShowPropControls(PropType type, uint id)
       break;
     }
   }
+}
+
+bool ParticlesTab::UpdateBool (const CEGUI::EventArgs& e)
+{
+  CEGUI::Combobox* combobox = (CEGUI::Combobox*)winMgr->getWindow("Particles/Edit/Bool");
+  bool val = combobox->getSelectedItem()->getID() == 0;
+
+  uint id;
+  if (GetSelectedItemID("Particles/Edit/Properties", id))
+  {
+    CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Particles/Edit/Properties");
+    float scrollPos = list->getVertScrollbar()->getScrollPosition();
+
+    if(emitter)
+    {
+      asset->SetEmitterPropValue(emitter, id, val);
+      UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+    }
+    else if(effector)
+    {
+      asset->SetEffectorPropValue(effector, id, val);
+      UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+    }
+
+    SetSelectedItemByID("Particles/Edit/Properties", id);
+    list->getVertScrollbar()->setScrollPosition(scrollPos);
+  }
+
+  return true;
+}
+
+bool ParticlesTab::UpdateX (const CEGUI::EventArgs& e)
+{
+  uint id;
+  if (GetSelectedItemID("Particles/Edit/Properties", id))
+  {
+    PropType type;
+    CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Particles/Edit/Properties");
+    float scrollPos = list->getVertScrollbar()->getScrollPosition();
+
+    if(emitter)
+    {
+      type = asset->GetEmitterPropType(emitter, id);
+    }
+    else if(effector)
+    {
+      type = asset->GetEffectorPropType(effector, id);
+    }
+
+    switch(type)
+    {
+    case Float:
+      {
+        float val;
+        CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+        sscanf(editbox->getText().c_str(), "%f", &val);
+
+        if(emitter)
+        {
+          asset->SetEmitterPropValue(emitter, id, val);
+          UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+        }
+        else if(effector)
+        {
+          asset->SetEffectorPropValue(effector, id, val);
+          UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+        }
+
+        break;
+      }
+    case Vector2:
+      {
+        csVector2 val;
+        CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+        sscanf(editbox->getText().c_str(), "%f", &val.x);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Y");
+        sscanf(editbox->getText().c_str(), "%f", &val.y);
+
+        if(emitter)
+        {
+          asset->SetEmitterPropValue(emitter, id, val);
+          UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+        }
+        else if(effector)
+        {
+          asset->SetEffectorPropValue(effector, id, val);
+          UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+        }
+
+        break;
+      }
+    case Vector3:
+      {
+        csVector3 val;
+        CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+        sscanf(editbox->getText().c_str(), "%f", &val.x);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Y");
+        sscanf(editbox->getText().c_str(), "%f", &val.y);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Z");
+        sscanf(editbox->getText().c_str(), "%f", &val.z);
+
+        if(emitter)
+        {
+          asset->SetEmitterPropValue(emitter, id, val);
+          UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+        }
+        else if(effector)
+        {
+          asset->SetEffectorPropValue(effector, id, val);
+          UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+        }
+
+        break;
+      }
+    case Color4:
+      {
+        csColor4 val;
+        CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+        sscanf(editbox->getText().c_str(), "%f", &val.red);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Y");
+        sscanf(editbox->getText().c_str(), "%f", &val.green);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Z");
+        sscanf(editbox->getText().c_str(), "%f", &val.blue);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/A");
+        sscanf(editbox->getText().c_str(), "%f", &val.alpha);
+
+        if(emitter)
+        {
+          asset->SetEmitterPropValue(emitter, id, val);
+          UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+        }
+        else if(effector)
+        {
+          asset->SetEffectorPropValue(effector, id, val);
+          UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+        }
+
+        break;
+      }
+    default:
+      {
+        break;
+      }
+    }
+
+    SetSelectedItemByID("Particles/Edit/Properties", id);
+    list->getVertScrollbar()->setScrollPosition(scrollPos);
+  }
+
+  return true;
+}
+
+bool ParticlesTab::UpdateY (const CEGUI::EventArgs& e)
+{
+  uint id;
+  if (GetSelectedItemID("Particles/Edit/Properties", id))
+  {
+    PropType type;
+    CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Particles/Edit/Properties");
+    float scrollPos = list->getVertScrollbar()->getScrollPosition();
+
+    if(emitter)
+    {
+      type = asset->GetEmitterPropType(emitter, id);
+    }
+    else if(effector)
+    {
+      type = asset->GetEffectorPropType(effector, id);
+    }
+
+    switch(type)
+    {
+    case Vector2:
+      {
+        csVector2 val;
+        CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+        sscanf(editbox->getText().c_str(), "%f", &val.x);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Y");
+        sscanf(editbox->getText().c_str(), "%f", &val.y);
+
+        if(emitter)
+        {
+          asset->SetEmitterPropValue(emitter, id, val);
+          UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+        }
+        else if(effector)
+        {
+          asset->SetEffectorPropValue(effector, id, val);
+          UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+        }
+
+        break;
+      }
+    case Vector3:
+      {
+        csVector3 val;
+        CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+        sscanf(editbox->getText().c_str(), "%f", &val.x);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Y");
+        sscanf(editbox->getText().c_str(), "%f", &val.y);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Z");
+        sscanf(editbox->getText().c_str(), "%f", &val.z);
+
+        if(emitter)
+        {
+          asset->SetEmitterPropValue(emitter, id, val);
+          UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+        }
+        else if(effector)
+        {
+          asset->SetEffectorPropValue(effector, id, val);
+          UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+        }
+
+        break;
+      }
+    case Color4:
+      {
+        csColor4 val;
+        CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+        sscanf(editbox->getText().c_str(), "%f", &val.red);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Y");
+        sscanf(editbox->getText().c_str(), "%f", &val.green);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Z");
+        sscanf(editbox->getText().c_str(), "%f", &val.blue);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/A");
+        sscanf(editbox->getText().c_str(), "%f", &val.alpha);
+
+        if(emitter)
+        {
+          asset->SetEmitterPropValue(emitter, id, val);
+          UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+        }
+        else if(effector)
+        {
+          asset->SetEffectorPropValue(effector, id, val);
+          UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+        }
+
+        break;
+      }
+    default:
+      {
+        break;
+      }
+    }
+
+    SetSelectedItemByID("Particles/Edit/Properties", id);
+    list->getVertScrollbar()->setScrollPosition(scrollPos);
+  }
+
+  return true;
+}
+
+bool ParticlesTab::UpdateZ (const CEGUI::EventArgs& e)
+{
+  uint id;
+  if (GetSelectedItemID("Particles/Edit/Properties", id))
+  {
+    PropType type;
+    CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Particles/Edit/Properties");
+    float scrollPos = list->getVertScrollbar()->getScrollPosition();
+
+    if(emitter)
+    {
+      type = asset->GetEmitterPropType(emitter, id);
+    }
+    else if(effector)
+    {
+      type = asset->GetEffectorPropType(effector, id);
+    }
+
+    switch(type)
+    {
+    case Vector3:
+      {
+        csVector3 val;
+        CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+        sscanf(editbox->getText().c_str(), "%f", &val.x);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Y");
+        sscanf(editbox->getText().c_str(), "%f", &val.y);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Z");
+        sscanf(editbox->getText().c_str(), "%f", &val.z);
+
+        if(emitter)
+        {
+          asset->SetEmitterPropValue(emitter, id, val);
+          UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+        }
+        else if(effector)
+        {
+          asset->SetEffectorPropValue(effector, id, val);
+          UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+        }
+
+        break;
+      }
+    case Color4:
+      {
+        csColor4 val;
+        CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+        sscanf(editbox->getText().c_str(), "%f", &val.red);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Y");
+        sscanf(editbox->getText().c_str(), "%f", &val.green);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Z");
+        sscanf(editbox->getText().c_str(), "%f", &val.blue);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/A");
+        sscanf(editbox->getText().c_str(), "%f", &val.alpha);
+
+        if(emitter)
+        {
+          asset->SetEmitterPropValue(emitter, id, val);
+          UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+        }
+        else if(effector)
+        {
+          asset->SetEffectorPropValue(effector, id, val);
+          UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+        }
+
+        break;
+      }
+    default:
+      {
+        break;
+      }
+    }
+
+    SetSelectedItemByID("Particles/Edit/Properties", id);
+    list->getVertScrollbar()->setScrollPosition(scrollPos);
+  }
+
+  return true;
+}
+
+bool ParticlesTab::UpdateA (const CEGUI::EventArgs& e)
+{
+  uint id;
+  if (GetSelectedItemID("Particles/Edit/Properties", id))
+  {
+    PropType type;
+    CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Particles/Edit/Properties");
+    float scrollPos = list->getVertScrollbar()->getScrollPosition();
+
+    if(emitter)
+    {
+      type = asset->GetEmitterPropType(emitter, id);
+    }
+    else if(effector)
+    {
+      type = asset->GetEffectorPropType(effector, id);
+    }
+
+    switch(type)
+    {
+    case Color4:
+      {
+        csColor4 val;
+        CEGUI::Editbox* editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/X");
+        sscanf(editbox->getText().c_str(), "%f", &val.red);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Y");
+        sscanf(editbox->getText().c_str(), "%f", &val.green);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/Z");
+        sscanf(editbox->getText().c_str(), "%f", &val.blue);
+        editbox = (CEGUI::Editbox*)winMgr->getWindow("Particles/Edit/A");
+        sscanf(editbox->getText().c_str(), "%f", &val.alpha);
+
+        if(emitter)
+        {
+          asset->SetEmitterPropValue(emitter, id, val);
+          UpdateList(asset->GetEmitterProps(emitter), "Particles/Edit/Properties");
+        }
+        else if(effector)
+        {
+          asset->SetEffectorPropValue(effector, id, val);
+          UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+        }
+
+        break;
+      }
+    default:
+      {
+        break;
+      }
+    }
+
+    SetSelectedItemByID("Particles/Edit/Properties", id);
+    list->getVertScrollbar()->setScrollPosition(scrollPos);
+  }
+
+  return true;
 }
 
 #endif // PARTICLESTAB_H__
