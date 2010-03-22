@@ -110,7 +110,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 #include "csutil/custom_new_enable.h"
 
-  void AnimeshObject::Skin (bool SkinV, bool SkinN, bool SkinTB)
+  // We use a template version to benefit of optimizations from the compiler
+  template<bool SkinV, bool SkinN, bool SkinTB>
+  void AnimeshObject::Skin ()
   {
     if (!skeleton)
       return;
@@ -214,6 +216,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       ++srcTangents;
       ++srcBinormals;
     }
+  }
+
+  void AnimeshObject::SkinVertices ()
+  {
+    Skin<true, false, false> ();
+  }
+
+  void AnimeshObject::SkinNormals ()
+  {
+    Skin<false, true, false> ();
+  }
+
+  void AnimeshObject::SkinVerticesAndNormals ()
+  {
+    Skin<true, true, false> ();
+  }
+
+  void AnimeshObject::SkinTangentAndBinormal ()
+  {
+    Skin<false, false, true> ();
+  }
+
+  void AnimeshObject::SkinAll ()
+  {
+    Skin<true, true, true> ();
   }
 
 }

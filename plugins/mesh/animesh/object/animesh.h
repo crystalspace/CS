@@ -350,7 +350,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void UpdateLocalBoneTransforms ();
     void UpdateSocketTransforms ();
 
-    void Skin (bool skinVerts, bool skinNormals, bool skinTB);
+    void SkinVertices ();
+    void SkinNormals ();
+    void SkinVerticesAndNormals ();
+    void SkinTangentAndBinormal ();
+    void SkinAll ();
+
+    template<bool SkinVerts, bool SkinNormals, bool SkinTB>
+    void Skin ();
 
     void MorphVertices ();
 

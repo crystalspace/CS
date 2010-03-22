@@ -1094,7 +1094,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 	if (skeletonVersion != skinVertexVersion
 	    || morphVersion != morphVertexVersion)
 	{
-	  Skin (true, false, false);
+	  SkinVertices ();
 	  skinVertexVersion = skeletonVersion;
 	  morphVertexVersion = morphVersion;
 	}
@@ -1127,7 +1127,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 	// Update the skinning of the normals if needed
         if (skeletonVersion != skinNormalVersion)
         {
-	  Skin (false, true, false);
+	  SkinNormals ();
           skinNormalVersion = skeletonVersion;
         }
         skinNormalLF = true;
@@ -1171,7 +1171,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 	// Update the skinning of the buffers if needed
         if (skeletonVersion != skinTangentBinormalVersion)
         {
-	  Skin (false, false, true);
+	  SkinTangentAndBinormal ();
           skinTangentBinormalVersion = skeletonVersion;
         }
         skinTangentBinormalLF = true;
@@ -1196,8 +1196,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     bool reSkinTangentBinormal = skinTangentBinormalLF
       && skinTangentBinormalVersion != skeletonVersion;
 
-    if (reSkinVertex || reSkinNormal || reSkinTangentBinormal)
-      Skin (reSkinVertex, reSkinNormal, reSkinTangentBinormal);
+    if (reSkinVertex)
+    {
+      if (reSkinNormal)
+      {
+	if (reSkinTangentBinormal)
+	  SkinAll ();
+
+	else
+	  SkinVerticesAndNormals ();
+      }
+
+      else
+      {
+	SkinVertices ();
+
+	if (reSkinTangentBinormal)
+	  SkinTangentAndBinormal ();
+      }
+    }
+
+    else
+    {
+      if (reSkinNormal)
+	SkinNormals ();
+
+      if (reSkinTangentBinormal)
+	SkinTangentAndBinormal ();
+    }
+
 
     if (reSkinVertex)
     {
