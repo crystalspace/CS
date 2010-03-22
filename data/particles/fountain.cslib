@@ -38,7 +38,13 @@
                 <color red="0" green="0.5" blue="1" time="5" />
                 <color red="1" green="1" blue="1" time="0" />
             </effector>
+	    <material>dot</material>
+	    <mixmode>
+		<add />
+	    </mixmode>
         </params>
+	<priority>alpha</priority>
+	<ztest />
     </meshfact>
 </library>
 

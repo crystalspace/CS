@@ -43,6 +43,12 @@
             <effector type="force">
                 <randomacceleration x="2.5" y="0" z="2.5" />
             </effector>
+	    <mixmode>
+		<add />
+	    </mixmode>
+	    <material>snow</material>
         </params>
+      <priority>alpha</priority>
+      <ztest />
     </meshfact>
 </library>
