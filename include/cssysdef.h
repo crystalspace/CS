@@ -1149,4 +1149,25 @@ namespace CS
   CS_NAMESPACE_PACKAGE_NAME::Plugin::name
 /** @} */
 
+/**\def CS_DEPRECATION_WARNINGS_DISABLE(x)
+ * Disable deprecation warnings in following statements. Always try to actually
+ * fix the root cause of a deprecation warning before employing this.
+ * Should be followed by CS_DEPRECATION_WARNINGS_ENABLE after the statements
+ * that caused the warnings.
+ * Suitable for use in macros.
+ */
+/**\def CS_DEPRECATION_WARNINGS_ENABLE(x)
+ * Enable deprecation warnings in following statements. Suitable for use in
+ * macros.
+ */
+#if defined(CS_COMPILER_GCC)
+# define CS_DEPRECATION_WARNINGS_DISABLE	\
+  _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+# define CS_DEPRECATION_WARNINGS_ENABLE	\
+  _Pragma("GCC diagnostic warning \"-Wdeprecated-declarations\"")
+#else
+# define CS_DEPRECATION_WARNINGS_DISABLE
+# define CS_DEPRECATION_WARNINGS_ENABLE
+#endif
+
 #endif // __CS_CSSYSDEF_H__
