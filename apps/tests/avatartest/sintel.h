@@ -81,7 +81,6 @@ class SintelScene : public AvatarScene
   FacialExpression* activeFacialExpression;
   int currentExpressionIndex;
   csArray<ActiveMorphComponent> activeMorphComponents;
-  //csTicks targetExpressionTime;
   bool activeFacialTransition;
 };
 

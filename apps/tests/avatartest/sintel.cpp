@@ -241,13 +241,13 @@ bool SintelScene::CreateAvatar ()
   if (!rc.success)
     return avatarTest->ReportError ("Can't load Sintel library file!");
 
-  csRef<iMeshFactoryWrapper> meshfact =
+  csRef<iMeshFactoryWrapper> meshFact =
     avatarTest->engine->FindMeshFactory ("sintel_head");
-  if (!meshfact)
+  if (!meshFact)
     return avatarTest->ReportError ("Can't find Sintel's mesh factory!");
 
   animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
-    (meshfact->GetMeshObjectFactory ());
+    (meshFact->GetMeshObjectFactory ());
   if (!animeshFactory)
     return avatarTest->ReportError ("Can't find Sintel's animesh factory!");
 
@@ -276,27 +276,52 @@ bool SintelScene::CreateAvatar ()
   csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
-  // Create the 'idle01' animation node
-  csRef<iSkeletonAnimationNodeFactory2> idle01NodeFactory =
-    animPacketFactory->CreateAnimationNode ("idle01");
-  idle01NodeFactory->SetAnimation
-    (animPacketFactory->FindAnimation ("idle01"));
-  animPacketFactory->SetAnimationRoot (idle01NodeFactory);
+  // Create the 'open_mouth' animation node
+  csRef<iSkeletonAnimationNodeFactory2> openMouthNodeFactory =
+    animPacketFactory->CreateAnimationNode ("open_mouth");
+  openMouthNodeFactory->SetAnimation
+    (animPacketFactory->FindAnimation ("open_mouth"));
+  animPacketFactory->SetAnimationRoot (openMouthNodeFactory);
 
-  idle01NodeFactory->SetAutomaticReset (true);
-  idle01NodeFactory->SetAutomaticStop (false);
+  openMouthNodeFactory->SetAutomaticReset (true);
+  openMouthNodeFactory->SetAutomaticStop (false);
+  openMouthNodeFactory->SetCyclic (true);
 
   // Create the facial expressions
   FacialExpression expression;
   MorphComponent component;
 
-  // Expression 1
-  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-e.R");
-  component.weight = 0.5f;
+  // Smile expression
+  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-smile.L");
+  component.weight = 0.7f;
   expression.morphComponents.Push (component);
 
-  component.morphTarget = animeshFactory->FindMorphTarget ("CHEEK-out.R");
-  component.weight = 0.5f;
+  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-smile.R");
+  component.weight = 0.7f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-e.L");
+  component.weight = 0.265f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-e.R");
+  component.weight = 0.265f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("NASAL-sneer.L");
+  component.weight = 0.35f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("NASAL-sneer.R");
+  component.weight = 0.35f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("EYE-squint.L");
+  component.weight = 0.7f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("EYE-squint.R");
+  component.weight = 0.7f;
   expression.morphComponents.Push (component);
 
   facialExpressions.Push (expression);
@@ -351,7 +376,7 @@ bool SintelScene::CreateAvatar ()
 
   // Create the animated mesh
   csRef<iMeshWrapper> avatarMesh =
-    avatarTest->engine->CreateMeshWrapper (meshfact, "sintel",
+    avatarTest->engine->CreateMeshWrapper (meshFact, "sintel",
 					   avatarTest->room, csVector3 (0.0f));
   animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
@@ -366,7 +391,7 @@ bool SintelScene::CreateAvatar ()
   // Start animation
   iSkeletonAnimNode2* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
-  rootNode->Play ();
+  //rootNode->Play ();
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
@@ -389,10 +414,10 @@ void SintelScene::DisplayKeys ()
   avatarTest->WriteShadow (x - 5, y, fg, "Keys available:");
   y += lineSize;
 
-  avatarTest->WriteShadow (x, y, fg, "1: set neutral");
+  avatarTest->WriteShadow (x, y, fg, "1: neutral");
   y += lineSize;
 
-  avatarTest->WriteShadow (x, y, fg, "2: set expression 1");
+  avatarTest->WriteShadow (x, y, fg, "2: smiling");
   y += lineSize;
 
   avatarTest->WriteShadow (x, y, fg, "3: set expression 2");
