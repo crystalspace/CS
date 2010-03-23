@@ -273,7 +273,7 @@ namespace CS
       bool WriteDataBuffer (iFile* file, iDataBuffer* buf)
       {
         size_t bufSize = buf ? buf->GetSize() : 0;
-	uint32 sizeLE = csLittleEndian::UInt32 (bufSize);
+	uint32 sizeLE = csLittleEndian::UInt32 ((uint32)bufSize);
 	if (file->Write ((char*)&sizeLE, sizeof (sizeLE)) != sizeof (sizeLE))
 	  return false;
 	if (buf && (file->Write (buf->GetData(), bufSize) != bufSize))
@@ -356,7 +356,7 @@ namespace CS
           stringsBuf.AttachNew (new CS::DataBuffer<> ((size_t)0));
         if (!WriteDataBuffer (file, stringsBuf)) return false;
         
-        uint32 ofsLE = curFilePos - headPos;
+        uint32 ofsLE = (uint32)(curFilePos - headPos);
         curFilePos = file->GetPos();
         bool ret = false;
         file->SetPos (headPos);
@@ -375,7 +375,7 @@ namespace CS
         uint32 pos = stringPositions.Get (string, (uint32)~0);
         if (pos == (uint32)~0)
         {
-          pos = strings.GetPos();
+          pos = (uint32)strings.GetPos();
           strings.Write (string, strlen (string)+1);
           stringPositions.Put (string, pos);
         }
@@ -508,7 +508,7 @@ namespace CS
           if (file->Write (entry.name, slen) != slen) return false;
           size_t padlen = 4 - (slen & 3);
           if (file->Write (pad, padlen) != padlen) return false;
-          uint32 diskSize = csLittleEndian::UInt32 (entry.size);
+          uint32 diskSize = csLittleEndian::UInt32 ((uint32)entry.size);
 	  if (file->Write ((char*)&diskSize, sizeof (diskSize))
 	      != sizeof (diskSize))
 	    return false;

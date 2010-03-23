@@ -82,10 +82,10 @@ void SimpleStaticLighter::CalculateLighting (iMeshWrapper* mesh,
   {
     const csBox3& world_box = mesh->GetWorldBoundingBox ();
     bool shadowed = true;
-    for (i = 0 ; shadowed && i < 8 ; i++)
+    for (int j = 0 ; shadowed && j < 8 ; j++)
     {
       csSectorHitBeamResult rc = light_sector->HitBeamPortals (center,
-	  world_box.GetCorner (i));
+        world_box.GetCorner (j));
       if (rc.mesh == 0 || rc.mesh == mesh) shadowed = false;
     }
     if (shadowed)
@@ -246,8 +246,8 @@ void SimpleStaticLighter::ShineLights (iSector* sector, iEngine* engine, int max
       ShadowType shadow_type)
 {
   iMeshList* meshes = sector->GetMeshes ();
-  size_t i;
-  for (i = 0 ; i < (size_t)meshes->GetCount () ; i++)
+  int i;
+  for (i = 0 ; i < meshes->GetCount () ; i++)
   {
     iMeshWrapper* mesh = meshes->Get (i);
     ShineLights (mesh, engine, maxlights, shadow_type);
