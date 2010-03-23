@@ -98,7 +98,6 @@ void SintelScene::Frame ()
 				     activeMorphComponent.currentWeight);
 
       // Check if the component can be removed
-      //if (targetExpressionReached
       if (targetReached
 	  && activeMorphComponent.targetWeight < SMALL_EPSILON)
 	activeMorphComponents.DeleteIndex (index);
@@ -326,50 +325,111 @@ bool SintelScene::CreateAvatar ()
 
   facialExpressions.Push (expression);
 
-  // Expression 2
+  // Angry expression
   expression.morphComponents.DeleteAll ();
-  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-e.L");
-  component.weight = 1.0f;
+  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-mad.L");
+  component.weight = 0.7f;
   expression.morphComponents.Push (component);
 
-  component.morphTarget = animeshFactory->FindMorphTarget ("CHEEK-out.L");
-  component.weight = 1.0f;
+  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-mad.R");
+  component.weight = 0.7f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-outer_dn.L");
+  component.weight = 0.35f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-outer_dn.R");
+  component.weight = 0.35f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("NASAL-flare.L");
+  component.weight = 0.7f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("NASAL-flare.R");
+  component.weight = 0.7f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("NASAL-sneer.L");
+  component.weight = 0.35f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("NASAL-sneer.R");
+  component.weight = 0.35f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("SPEC-scrunch");
+  component.weight = 0.5f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-btm_lip_dn_mad.L");
+  component.weight = 0.7f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-btm_lip_dn_mad.R");
+  component.weight = 0.7f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-e.L");
+  component.weight = 0.265f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-e.R");
+  component.weight = 0.265f;
   expression.morphComponents.Push (component);
 
   facialExpressions.Push (expression);
 
-  // Expression 3
+  // Sad expression
   expression.morphComponents.DeleteAll ();
-  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-surp.L");
-  component.weight = 1.0f;
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-sad.L");
+  component.weight = 0.7f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-sad.R");
+  component.weight = 0.7f;
   expression.morphComponents.Push (component);
 
   component.morphTarget = animeshFactory->FindMorphTarget ("BROW-mad.L");
-  component.weight = 1.0f;
-  expression.morphComponents.Push (component);
-
-  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-inner_up.L");
-  component.weight = 1.0f;
-  expression.morphComponents.Push (component);
-
-  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-outer_up.L");
-  component.weight = 1.0f;
-  expression.morphComponents.Push (component);
-
-  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-surp.R");
-  component.weight = 1.0f;
+  component.weight = 0.35f;
   expression.morphComponents.Push (component);
 
   component.morphTarget = animeshFactory->FindMorphTarget ("BROW-mad.R");
-  component.weight = 1.0f;
+  component.weight = 0.35f;
   expression.morphComponents.Push (component);
 
-  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-inner_up.R");
-  component.weight = 1.0f;
+  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-outer_dn.L");
+  component.weight = 0.35f;
   expression.morphComponents.Push (component);
 
-  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-outer_up.R");
-  component.weight = 1.0f;
+  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-outer_dn.R");
+  component.weight = 0.35f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-surp.L");
+  component.weight = 0.25f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("BROW-surp.R");
+  component.weight = 0.25f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("NASAL-flare.L");
+  component.weight = -0.35f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("NASAL-flare.R");
+  component.weight = -0.35f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-frown.L");
+  component.weight = 0.7f;
+  expression.morphComponents.Push (component);
+
+  component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-frown.R");
+  component.weight = 0.7f;
   expression.morphComponents.Push (component);
 
   facialExpressions.Push (expression);
@@ -389,8 +449,8 @@ bool SintelScene::CreateAvatar ()
 						    avatarTest->room, csVector3 (0.0f));
 
   // Start animation
-  iSkeletonAnimNode2* rootNode =
-    animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+  //iSkeletonAnimNode2* rootNode =
+  //  animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
   //rootNode->Play ();
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
@@ -420,10 +480,10 @@ void SintelScene::DisplayKeys ()
   avatarTest->WriteShadow (x, y, fg, "2: smiling");
   y += lineSize;
 
-  avatarTest->WriteShadow (x, y, fg, "3: set expression 2");
+  avatarTest->WriteShadow (x, y, fg, "3: angry");
   y += lineSize;
 
-  avatarTest->WriteShadow (x, y, fg, "4: set expression 3");
+  avatarTest->WriteShadow (x, y, fg, "4: sad");
   y += lineSize;
 
   //avatarTest->WriteShadow (x, y, fg, "r: reset scene");
