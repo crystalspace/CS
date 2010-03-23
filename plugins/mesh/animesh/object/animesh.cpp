@@ -193,7 +193,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       return false;
 
     vertexBuffer = renderBuffer;
-    vertexCount = vertexBuffer->GetElementCount ();
+    vertexCount = (uint)vertexBuffer->GetElementCount ();
 
     //Update the number of bone influences
     boneInfluences.SetSize (vertexCount*4);//@@TODO handle
@@ -298,7 +298,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         // Need remapping, setup the hash
         for (size_t i = 0; i < bm.boneRemappingTable.GetSize (); ++i)
         {
-          mappingHash.PutUnique (bm.boneRemappingTable[i], i);
+          mappingHash.PutUnique (bm.boneRemappingTable[i], (uint)i);
         }
        
         bm.masterBWBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (
@@ -393,7 +393,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRef<MorphTarget> newTarget;
     newTarget.AttachNew (new MorphTarget (this, name));
     size_t targetNum = morphTargets.Push (newTarget);
-    morphTargetNames.Put (name, targetNum);
+    morphTargetNames.Put (name, (uint)targetNum);
     return newTarget;
   }
 
@@ -405,7 +405,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   uint AnimeshObjectFactory::GetMorphTargetCount () const
   {
-    return morphTargets.GetSize();
+    return (uint)morphTargets.GetSize();
   }
 
   void AnimeshObjectFactory::ClearMorphTargets ()
@@ -445,7 +445,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     {
       if(!strcmp(name, sockets[i]->GetName()))
       {
-        return i;
+        return (uint)i;
       }
     }
 

@@ -374,12 +374,12 @@ namespace CS
     {
       bool IsCapacityExcessive (size_t capacity, size_t count) const
       {
-	return size_t (csFindNearestPowerOf2 (count)) < (capacity/2);
+        return size_t (csFindNearestPowerOf2 ((int)count)) < (capacity/2);
       }
       size_t GetCapacity (size_t count) const
       {
-        size_t newCap = csFindNearestPowerOf2 (count);
-	return newCap < MaxGrow ? newCap : MaxGrow;
+        size_t newCap = (size_t)csFindNearestPowerOf2 ((int)count);
+        return newCap < MaxGrow ? newCap : MaxGrow;
       }
     };
   } // namespace Container
