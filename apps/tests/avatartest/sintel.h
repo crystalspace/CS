@@ -31,10 +31,11 @@ class SintelScene : public AvatarScene
 
   // Camera related
   csVector3 GetCameraStart ();
+  float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
 
   // Dynamic simuation related
-  virtual float GetSimulationSpeed ();
+  float GetSimulationSpeed ();
 
   // From csBaseEventHandler
   void Frame ();

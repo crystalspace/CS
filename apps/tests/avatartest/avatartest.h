@@ -36,6 +36,7 @@ class AvatarScene
 
   // Camera related
   virtual csVector3 GetCameraStart () = 0;
+  virtual float GetCameraMinimumDistance () = 0;
   virtual csVector3 GetCameraTarget () = 0;
 
   // Dynamic simuation related

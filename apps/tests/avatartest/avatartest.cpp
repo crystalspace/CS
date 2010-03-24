@@ -52,7 +52,8 @@ void AvatarTest::Frame ()
   // Compute camera and animesh position
   iCamera* c = view->GetCamera ();
   csVector3 cameraPosition = c->GetTransform ().GetOrigin ();
-  csVector3 avatarPosition = avatarScene->GetCameraTarget ();
+  csVector3 cameraTarget = avatarScene->GetCameraTarget ();
+  float minimumDistance = avatarScene->GetCameraMinimumDistance ();
 
   // Move camera
   if (kbd->GetKeyState (CSKEY_SHIFT))
@@ -61,7 +62,7 @@ void AvatarTest::Frame ()
     // the camera to go forwards and backwards (forward only allowed if camera 
     // not too close). Left/Right arrows work also when shift is hold.
     if (kbd->GetKeyState (CSKEY_UP)
-	&& (cameraPosition - avatarPosition).Norm () > 0.5f)
+	&& (cameraPosition - cameraTarget).Norm () > minimumDistance)
       c->Move (CS_VEC_FORWARD * 4 * speed);
     if (kbd->GetKeyState (CSKEY_DOWN))
       c->Move (CS_VEC_BACKWARD * 4 * speed);
@@ -91,7 +92,7 @@ void AvatarTest::Frame ()
   }
 
   // Make the camera look at the animesh
-  c->GetTransform ().LookAt (avatarPosition - c->GetTransform ().GetOrigin (),
+  c->GetTransform ().LookAt (cameraTarget - c->GetTransform ().GetOrigin (),
 			     csVector3 (0.0f, 1.0f, 0.0f) );
 
   // Step the dynamic simulation (we slow down artificially the simulation in

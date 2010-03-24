@@ -49,6 +49,11 @@ csVector3 SintelScene::GetCameraStart ()
   return csVector3 (0.0f, 0.08f, -0.5f);
 }
 
+float SintelScene::GetCameraMinimumDistance ()
+{
+  return 0.4f;
+}
+
 csVector3 SintelScene::GetCameraTarget ()
 {
   return csVector3 (0.0f, 0.15f, 0.0f);

@@ -20,6 +20,9 @@
 */
 #include "krystal.h"
 
+#define CAMERA_MINIMUM_DISTANCE 0.75f
+#define CAMERA_HIPS_DISTANCE 3.0f
+
 KrystalScene::KrystalScene (AvatarTest* avatarTest)
   : avatarTest (avatarTest)
 {
@@ -40,21 +43,55 @@ csVector3 KrystalScene::GetCameraStart ()
   return csVector3 (0.0f, 1.0f, -2.5f);
 }
 
+float KrystalScene::GetCameraMinimumDistance ()
+{
+  return CAMERA_MINIMUM_DISTANCE;
+}
+
 csVector3 KrystalScene::GetCameraTarget ()
 {
-  // The target of the camera is the hips of Krystal
+  // The target of the camera is the hips of Krystal when we are far away,
+  // and the head when we are close
   csQuaternion boneRotation;
   csVector3 boneOffset;
-  animesh->GetSkeleton ()->GetTransformBoneSpace
-    (animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"), boneRotation, boneOffset);
-  csOrthoTransform boneTransform (csMatrix3 (boneRotation.GetConjugate ()),
-				  boneOffset);
   csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
-  csVector3 avatarPosition = (boneTransform
-			      * animeshObject->GetMeshWrapper ()->QuerySceneNode ()
-			      ->GetMovable ()->GetTransform ()).GetOrigin ();
-  avatarPosition.y = 1.1f;
-  return avatarPosition;
+
+  // Compute the position of the hips
+  animesh->GetSkeleton ()->GetTransformAbsSpace
+    (animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"), boneRotation, boneOffset);
+  csOrthoTransform hipsTransform (csMatrix3 (boneRotation.GetConjugate ()),
+				  boneOffset);
+  csVector3 hipsPosition = (hipsTransform
+			    * animeshObject->GetMeshWrapper ()->QuerySceneNode ()
+			    ->GetMovable ()->GetTransform ()).GetOrigin ();
+
+  // Compute the position of the head
+  animesh->GetSkeleton ()->GetTransformAbsSpace
+    (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"), boneRotation, boneOffset);
+  csOrthoTransform headTransform (csMatrix3 (boneRotation.GetConjugate ()),
+				  boneOffset);
+  csVector3 headPosition = (headTransform
+			    * animeshObject->GetMeshWrapper ()->QuerySceneNode ()
+			    ->GetMovable ()->GetTransform ()).GetOrigin ();
+
+  // Compute the distance between the camera and the head
+  float distance = (avatarTest->view->GetCamera ()->GetTransform ().GetOrigin ()
+		    - headPosition).Norm ();
+
+  // Compute the camera target
+  csVector3 cameraTarget;
+  if (distance >= CAMERA_HIPS_DISTANCE)
+    cameraTarget = hipsPosition;
+
+  else if (distance <= CAMERA_MINIMUM_DISTANCE)
+    cameraTarget = headPosition;
+
+  else
+    cameraTarget = hipsPosition + (headPosition - hipsPosition)
+      * (CAMERA_HIPS_DISTANCE - distance)
+      / (CAMERA_HIPS_DISTANCE - CAMERA_MINIMUM_DISTANCE);
+
+  return cameraTarget;
 }
 
 float KrystalScene::GetSimulationSpeed ()
