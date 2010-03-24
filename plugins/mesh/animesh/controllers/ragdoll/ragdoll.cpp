@@ -461,7 +461,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       childNode->BlendState (state, baseWeight);
 
     // reset the chains that have been asked for
-    for (size_t i = resetChains.GetSize () - 1; i >= 0; i--)
+    for (int i = ((int) resetChains.GetSize ()) - 1; i >= 0; i--)
     {
       ResetChainData &chainData = resetChains.Get (i);
       chainData.frameCount--;
