@@ -113,6 +113,7 @@ public:
 
   ParticlesAsset(iObjectRegistry* obj_reg, iMeshWrapper* mesh);
   virtual ~ParticlesAsset();
+  void DeleteProperty (Property& property);
 
   // Animations
   virtual bool SupportsAnimations() { return false; }

@@ -43,34 +43,67 @@ ParticlesAsset::ParticlesAsset(iObjectRegistry* obj_reg, iMeshWrapper* mesh)
   factory = scfQueryInterface<iParticleSystemFactory> (mesh->GetFactory()->GetMeshObjectFactory());
 }
 
+void ParticlesAsset::DeleteProperty (Property& property)
+{
+  switch (property.type)
+  {
+  case Bool:
+    delete static_cast<bool*> (property.valPtr);
+    break;
+
+  case Float:
+    delete static_cast<float*> (property.valPtr);
+    break;
+
+  case Vector2:
+    delete static_cast<csVector2*> (property.valPtr);
+    break;
+
+  case Vector3:
+    delete static_cast<csVector3*> (property.valPtr);
+    break;
+
+  case Color4:
+    delete static_cast<csColor4*> (property.valPtr);
+    break;
+
+  case Enum:
+    delete static_cast<int*> (property.valPtr);
+    break;
+
+  default:
+    break;
+  }
+}
+
 ParticlesAsset::~ParticlesAsset()
 {
   for(size_t i=0; i<commonProps.GetSize(); ++i)
-    delete commonProps[i].valPtr;
+    DeleteProperty (commonProps[i]);
 
   for(size_t i=0; i<sphereProps.GetSize(); ++i)
-    delete sphereProps[i].valPtr;
+    DeleteProperty (sphereProps[i]);
 
   for(size_t i=0; i<coneProps.GetSize(); ++i)
-    delete coneProps[i].valPtr;
+    DeleteProperty (coneProps[i]);
 
   for(size_t i=0; i<boxProps.GetSize(); ++i)
-    delete boxProps[i].valPtr;
+    DeleteProperty (boxProps[i]);
 
   for(size_t i=0; i<cylinderProps.GetSize(); ++i)
-    delete cylinderProps[i].valPtr;
+    DeleteProperty (cylinderProps[i]);
 
   for(size_t i=0; i<forceProps.GetSize(); ++i)
-    delete forceProps[i].valPtr;
+    DeleteProperty (forceProps[i]);
 
   for(size_t i=0; i<lincolorProps.GetSize(); ++i)
-    delete lincolorProps[i].valPtr;
+    DeleteProperty (lincolorProps[i]);
 
   for(size_t i=0; i<velfieldProps.GetSize(); ++i)
-    delete velfieldProps[i].valPtr;
+    DeleteProperty (velfieldProps[i]);
 
   for(size_t i=0; i<linearProps.GetSize(); ++i)
-    delete linearProps[i].valPtr;
+    DeleteProperty (linearProps[i]);
 
 
   csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
@@ -435,7 +468,7 @@ csPtr<iStringArray> ParticlesAsset::GetCylinderProps(iParticleBuiltinEmitterCyli
 
   float* radius = (float*)cylinderProps[0].valPtr;
   *radius = emitter->GetRadius();
-  desc.Format("Radius(%g)", radius);
+  desc.Format("Radius(%g)", *radius);
   arr->Push(desc);
 
   csVector3* extent = (csVector3*)cylinderProps[1].valPtr;

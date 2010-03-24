@@ -396,7 +396,7 @@ void ViewMesh::HandleCommandLine()
   {
     if(!vfs->ChDir (vfsDir))
     {
-      ReportError("Cannot change to path: %s\n", vfsDir);
+      ReportError("Cannot change to path: %s\n", vfsDir.GetData ());
     }
     else
     {
