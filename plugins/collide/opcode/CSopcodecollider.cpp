@@ -99,8 +99,8 @@ void csOPCODECollider::GeometryInitialize (csVector3* vertices,
       indexholder[index++] = triangles[i].c;
     }
 
-    opcMeshInt.SetNbTriangles (tri_count);
-    opcMeshInt.SetNbVertices (vertcount);
+    opcMeshInt.SetNbTriangles ((udword)tri_count);
+    opcMeshInt.SetNbVertices ((udword)vertcount);
 
     // Mesh data
     OPCC.mIMesh = &opcMeshInt;

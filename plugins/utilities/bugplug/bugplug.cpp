@@ -2524,11 +2524,10 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
       	indent, "", sn ? sn : "?");
     }
   }
-  const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()
-  	->GetChildren ();
-  for (size_t i=0; i<children.GetSize (); ++i)
+  csRef<iSceneNodeArray> children = mesh->QuerySceneNode ()->GetChildrenArray ();
+  for (size_t i=0; i<children->GetSize (); ++i)
   {
-    iMeshWrapper* m = children[i]->QueryMesh ();
+    iMeshWrapper* m = children->Get(i)->QueryMesh ();
     if (m)
       Dump (indent+4, m);
   }
@@ -2812,7 +2811,6 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   csRef<iGeneralMeshState> gms (
   	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
-  gms->SetLighting (false);
   gms->SetManualColors (true);
   mw->GetMeshObject ()->SetColor (csColor (0, 0, 0));
   mw->GetMeshObject ()->SetMixMode (mixmode);
@@ -2874,7 +2872,6 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   csRef<iGeneralMeshState> gms (
   	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
-  gms->SetLighting (false);
   gms->SetManualColors (true);
   mw->GetMeshObject ()->SetColor (csColor (0, 0, 0));
   mw->GetMeshObject ()->SetMixMode (mixmode);
@@ -2941,7 +2938,6 @@ void csBugPlug::DebugSectorMesh (
   csRef<iGeneralMeshState> gms (
   	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
-  gms->SetLighting (false);
   gms->SetManualColors (true);
   mw->GetMeshObject ()->SetColor (csColor (0, 0, 0));
   mw->GetMeshObject ()->SetMixMode (mixmode);

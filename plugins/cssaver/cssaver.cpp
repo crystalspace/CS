@@ -919,20 +919,20 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
     }
 
     //Save all childmeshes
-    const csRefArray<iSceneNode>& childlist = meshwrapper->QuerySceneNode ()->
-	    GetChildren ();
-    if (childlist.GetSize () > 0) SaveSectorMeshes(childlist, meshNode);
+    csRef<iSceneNodeArray> childlist = meshwrapper->QuerySceneNode ()->
+	    GetChildrenArray ();
+    if (childlist->GetSize () > 0) SaveSectorMeshes(childlist, meshNode);
   }
   return true;
 }
 
-bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
+bool csSaver::SaveSectorMeshes(csRef<iSceneNodeArray>& meshList,
 		iDocumentNode *parent)
 {
   csStringID base_id = strings->Request ("base");
-  for (size_t i=0; i<meshList.GetSize (); i++)
+  for (size_t i=0; i<meshList->GetSize (); i++)
   {
-    iMeshWrapper* meshwrapper = meshList[i]->QueryMesh ();
+    iMeshWrapper* meshwrapper = meshList->Get(i)->QueryMesh ();
     if (!meshwrapper) continue;
     
     if (collection && !collection->IsParentOf (meshwrapper->QueryObject ()))
@@ -1057,9 +1057,8 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
     }
 
     //Save all childmeshes
-    const csRefArray<iSceneNode>& childlist = meshwrapper->QuerySceneNode ()->
-	    GetChildren ();
-    if (childlist.GetSize () > 0) SaveSectorMeshes(childlist, meshNode);
+    csRef<iSceneNodeArray> childlist = meshwrapper->QuerySceneNode ()->GetChildrenArray ();
+    if (childlist->GetSize () > 0) SaveSectorMeshes(childlist, meshNode);
   }
   return true;
 }
@@ -1179,7 +1178,7 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
     if (!name.Compare("__light__")) lightNode->SetAttribute("name", name);
 
     //Add the light center node
-    csVector3 center = light->GetCenter();
+    csVector3 center = light->GetMovable()->GetPosition();
     csRef<iDocumentNode> centerNode = CreateNode(lightNode, "center");
     centerNode->SetAttributeAsFloat("x", center.x);
     centerNode->SetAttributeAsFloat("y", center.y);

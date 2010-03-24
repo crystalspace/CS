@@ -374,7 +374,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   uint BodyBone::GetBoneColliderCount () const
   {
-    return colliders.GetSize ();
+    return (uint)colliders.GetSize ();
   }
 
   iBodyBoneCollider* BodyBone::GetBoneCollider (uint index) const
@@ -424,7 +424,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   uint BodyChainNode::GetChildCount () const
   {
-    return children.GetSize ();
+    return (uint)children.GetSize ();
   }
 
   iBodyChainNode* BodyChainNode::GetChild (uint index) const

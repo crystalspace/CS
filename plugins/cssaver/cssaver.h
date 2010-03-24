@@ -82,7 +82,7 @@ public:
   bool SavePortal (iPortal *portal, iDocumentNode *parent);
   bool SaveSectorLights(iSector *s, iDocumentNode *parent);
   bool SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent);
-  bool SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
+  bool SaveSectorMeshes(csRef<iSceneNodeArray>& meshList,
 		iDocumentNode *parent);
 
   bool SaveKeys (iDocumentNode* node, iObject* object);

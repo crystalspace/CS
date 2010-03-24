@@ -176,8 +176,8 @@ static btTriangleIndexVertexArray* GenerateTriMeshData
 			  c_vertex[i].z * internalScale);
 
   btTriangleIndexVertexArray* indexVertexArrays =
-    new btTriangleIndexVertexArray (triangleCount, indices, indexStride,
-	vertexCount, (btScalar*) &vertices[0].x (), vertexStride);
+    new btTriangleIndexVertexArray ((int)triangleCount, indices, (int)indexStride,
+	(int)vertexCount, (btScalar*) &vertices[0].x (), vertexStride);
   return indexVertexArrays;
 }
 
@@ -564,7 +564,7 @@ void csBulletDynamicsSystem::CheckCollisions ()
 void csBulletDynamicsSystem::Step (float stepsize)
 {
   if (debugDraw) debugDraw->ClearDebug ();
-  bulletWorld->stepSimulation (stepsize, worldMaxSteps, worldTimeStep);
+  bulletWorld->stepSimulation (stepsize, (int)worldMaxSteps, worldTimeStep);
   CheckCollisions();
 }
 
@@ -599,7 +599,7 @@ iRigidBody* csBulletDynamicsSystem::GetBody (unsigned int index)
 
 int csBulletDynamicsSystem::GetBodysCount ()
 {
-  return dynamicBodies.GetSize ();
+  return (int)dynamicBodies.GetSize ();
 }
 
 csPtr<iBodyGroup> csBulletDynamicsSystem::CreateGroup ()
@@ -762,7 +762,7 @@ void csBulletDynamicsSystem::DestroyColliders ()
 void csBulletDynamicsSystem::DestroyCollider (iDynamicsSystemCollider* collider)
 {
   // TODO: destroy linked joints before
-  int i = colliderBodies.GetSize ();
+  size_t i = colliderBodies.GetSize ();
   while (i >= 0)
   {
     i--;
@@ -861,7 +861,7 @@ void csBulletDynamicsSystem::SetStepParameters (float timeStep, size_t maxSteps,
   worldTimeStep = timeStep;
   worldMaxSteps = maxSteps;
   btContactSolverInfo& info = bulletWorld->getSolverInfo();
-  info.m_numIterations = iterations;
+  info.m_numIterations = (int)iterations;
 }
 
 //-------------------- csBulletRigidBody -----------------------------------
@@ -1966,7 +1966,7 @@ csRef<iDynamicsSystemCollider> csBulletRigidBody::GetCollider (unsigned int inde
 
 int csBulletRigidBody::GetColliderCount ()
 {
-  return colliders.GetSize ();
+  return (int)colliders.GetSize ();
 }
 
 void csBulletRigidBody::Update ()
@@ -2217,8 +2217,8 @@ void csBulletCollider::RebuildMeshGeometry ()
     return;
 
   btTriangleIndexVertexArray* indexVertexArrays =
-    new btTriangleIndexVertexArray (triangleCount, indices, 3 * sizeof (int),
-	      vertexCount, (btScalar*) &vertices[0].x (), sizeof (btVector3));
+    new btTriangleIndexVertexArray ((int)triangleCount, indices, 3 * sizeof (int),
+	      (int)vertexCount, (btScalar*) &vertices[0].x (), sizeof (btVector3));
 
   // this shape is optimized for static concave meshes
   if (isStaticBody || body->dynamicState == BULLET_STATE_STATIC)
@@ -2570,7 +2570,7 @@ float csBulletCollider::GetVolume ()
 	  return 0.0f;
 
 	float volume = 0.0f;
-	int faceCount = vertexCount / 3;
+	int faceCount = (int)vertexCount / 3;
 	btVector3 origin = vertices[indices[0]];
 	for (int i = 1; i < faceCount; i++)
 	{
