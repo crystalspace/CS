@@ -287,7 +287,7 @@ csPtr<iSndSysSource> csSndSysRendererOpenAL::CreateSource(iSndSysStream* stream)
   for (size_t i=0;i<iMax;i++)
     m_Callback[i]->SourceAddNotification ((iSndSysSource*)source);
 
-  return scfQueryInterface<iSndSysSource>( source );
+  return csPtr<iSndSysSource> (source);
 }
 
 bool csSndSysRendererOpenAL::RemoveStream(iSndSysStream* stream)
@@ -309,7 +309,7 @@ bool csSndSysRendererOpenAL::RemoveSource(iSndSysSource* source)
   ScopedRendererLock lock (*this);
 
   // I have got to be overlooking something here.
-  m_Sources.Delete (dynamic_cast<SndSysSourceOpenAL2D*> (source));
+  m_Sources.Delete (static_cast<SndSysSourceOpenAL2D*> (source));
 
   // Notify any callbacks
   size_t iMax = m_Callback.GetSize();
