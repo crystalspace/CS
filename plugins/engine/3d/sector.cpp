@@ -644,7 +644,7 @@ void csSector::ObjectVisible (csMeshWrapper* cmesh, iRenderView* rview,
     csRenderMesh** extraMeshes = cmesh->GetExtraRenderMeshes (numExtra, rview,
 					  frustum_mask);
     CS_ASSERT(!((numExtra != 0) && (extraMeshes == 0)));
-    visMesh.num = numExtra;
+    visMesh.num = (int)numExtra;
     visMesh.rmeshes = extraMeshes;
   }
 }
@@ -686,7 +686,7 @@ csSectorVisibleRenderMeshes* csSector::GetVisibleRenderMeshes (int& num,
     }
     
     oneVisibleMesh[1].imesh = mesh;
-    oneVisibleMesh[1].num = numExtra;
+    oneVisibleMesh[1].num = (int)numExtra;
     oneVisibleMesh[1].rmeshes = extraMeshes;
 
     num = 2;
@@ -697,7 +697,7 @@ csSectorVisibleRenderMeshes* csSector::GetVisibleRenderMeshes (int& num,
 
   ObjectVisible (cmesh, rview, frustum_mask);
 
-  num = renderMeshesScratch.GetSize();
+  num = (int)renderMeshesScratch.GetSize();
   return renderMeshesScratch.GetArray();
 }
 

@@ -295,9 +295,9 @@ static void AppendOrSetData (iGeneralFactoryState* factory,
   for (i = 0 ; i < mesh_triangles.GetSize () ; i++)
   {
     csTriangle tri = mesh_triangles[i];
-    tri.a += cur_vt_count;
-    tri.b += cur_vt_count;
-    tri.c += cur_vt_count;
+    tri.a += (int)cur_vt_count;
+    tri.b += (int)cur_vt_count;
+    tri.c += (int)cur_vt_count;
     factory->AddTriangle (tri);
   }
 }

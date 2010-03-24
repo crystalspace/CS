@@ -458,7 +458,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
       // Create index buffer.
       mesh_indices.Empty();
 
-      for(size_t i=0; i<meshCount; ++i)
+      for(uint i=0; i<(uint)meshCount; ++i)
       {
         mesh_indices.Push (0+4*i);
         mesh_indices.Push (1+4*i);
@@ -469,7 +469,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
       }
 
       mesh->indexstart = 0;
-      mesh->indexend = 6*meshCount;
+      mesh->indexend = (uint)(6*meshCount);
 
       csRef<csRenderBuffer> indexBuffer = csRenderBuffer::CreateIndexRenderBuffer(
         mesh_indices.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, 3*meshCount);

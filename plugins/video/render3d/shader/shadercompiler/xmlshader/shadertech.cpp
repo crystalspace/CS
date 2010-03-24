@@ -1602,7 +1602,7 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
   
   if (cacheFile.IsValid())
   {
-    int32 diskPassNum = csLittleEndian::Int32 (passesCount);
+    int32 diskPassNum = csLittleEndian::Int32 ((int32)passesCount);
     if (cacheFile->Write ((char*)&diskPassNum, sizeof (diskPassNum))
 	!= sizeof (diskPassNum))
       cacheFile.Invalidate();
@@ -1686,7 +1686,7 @@ bool csXMLShaderTech::Precache (iDocumentNode* node, size_t variant,
     passesCount++;
   }
   
-  int32 diskPassNum = csLittleEndian::Int32 (passesCount);
+  int32 diskPassNum = csLittleEndian::Int32 ((int32)passesCount);
   if (cacheFile->Write ((char*)&diskPassNum, sizeof (diskPassNum))
       != sizeof (diskPassNum))
     return false;
@@ -1869,7 +1869,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
       customBuffers[i] = modes.buffers->GetRenderBuffer (
 	thispass->custommapping_buffer[i]);
     }
-    else if (thispass->custommapping_id[i] < (csStringID)stack.GetSize ())
+    else if (thispass->custommapping_id[i] < (CS::StringIDValue)stack.GetSize ())
     {
       csShaderVariable* var = 0;
       var = csGetShaderVariableFromStack (stack, thispass->custommapping_id[i]);
@@ -1928,8 +1928,8 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
       textureHandles[j] = 0;
     texCompare[j] = thispass->textures[j].texCompare;
   }
-  g3d->SetTextureState (textureUnits, textureHandles, textureCount);
-  g3d->SetTextureComparisonModes (textureUnits, texCompare, textureCount);
+  g3d->SetTextureState (textureUnits, textureHandles, (int)textureCount);
+  g3d->SetTextureComparisonModes (textureUnits, texCompare, (int)textureCount);
 
   modes = *mesh;
   if (thispass->alphaMode.autoAlphaMode)
@@ -1937,7 +1937,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     iTextureHandle* tex = 0;
     if (thispass->alphaMode.autoModeTexture != csInvalidStringID)
     {
-      if (thispass->alphaMode.autoModeTexture < (csStringID)stack.GetSize ())
+      if (thispass->alphaMode.autoModeTexture < (CS::StringIDValue)stack.GetSize ())
       {
         csShaderVariable* var = 0;
         var = csGetShaderVariableFromStack (stack, thispass->alphaMode.autoModeTexture);

@@ -257,8 +257,8 @@ bool SndSysDriverDirectSound::CreateBuffer()
 
   // Setup notifications at 0, 1/3 and 2/3 of the buffer
   PositionNotify[0].dwOffset=0;
-  PositionNotify[1].dwOffset=((m_DirectSoundBufferBytes/3) / m_BytesPerFrame) * m_BytesPerFrame; 
-  PositionNotify[2].dwOffset=((m_DirectSoundBufferBytes*2/3) / m_BytesPerFrame) * m_BytesPerFrame;
+  PositionNotify[1].dwOffset=(DWORD)(((m_DirectSoundBufferBytes/3) / m_BytesPerFrame) * m_BytesPerFrame); 
+  PositionNotify[2].dwOffset=(DWORD)(((m_DirectSoundBufferBytes*2/3) / m_BytesPerFrame) * m_BytesPerFrame);
 
   DirectSoundResult=lpDsNotify->SetNotificationPositions(3, PositionNotify);
   if (FAILED(DirectSoundResult))

@@ -125,12 +125,12 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
 
     unsigned int *buf = (unsigned int *)entry->shadow_index_buffer->Lock (
     	CS_BUF_LOCK_NORMAL);
-    entry->edge_start = triangle_count*3;
+    entry->edge_start = (int)triangle_count*3;
     int indexRange = entry->index_range = entry->edge_start;
 
     /* setup shadow caps */
-    size_t i;
-    for (i = 0; i < (size_t)entry->edge_start; i ++) buf[i] = i;
+    uint i;
+    for (i = 0; i < (uint)entry->edge_start; i ++) buf[i] = i;
 
     csVector4 lightPos4 = entry->meshLightPos;
     lightPos4.w = 0;

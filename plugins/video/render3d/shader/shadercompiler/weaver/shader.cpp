@@ -564,7 +564,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   bool WeaverShader::WriteCombinerCodes (iFile* cacheFile,
                                          const CombinerLoaderSet& combiners)
   {
-    uint32 diskCombinerNum = csLittleEndian::UInt32 (combiners.UnlockedGetSize());
+    uint32 diskCombinerNum = csLittleEndian::UInt32 ((uint32)combiners.UnlockedGetSize());
     if (cacheFile->Write ((char*)&diskCombinerNum, sizeof (diskCombinerNum))
         != sizeof (diskCombinerNum))
       return false;

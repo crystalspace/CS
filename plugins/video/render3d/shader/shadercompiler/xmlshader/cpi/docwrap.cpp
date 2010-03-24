@@ -2043,7 +2043,7 @@ bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file,
   ForeignNodeStorage& foreignNodes, const csRefArray<WrappedChild>& children,
   const ConditionsWriter& condWriter)
 {
-  uint32 numChildrenLE = csLittleEndian::UInt32 (children.GetSize());
+  uint32 numChildrenLE = csLittleEndian::UInt32 ((uint32)children.GetSize());
   if (file->Write ((char*)&numChildrenLE, sizeof (numChildrenLE))
       != sizeof (numChildrenLE)) return false;
 

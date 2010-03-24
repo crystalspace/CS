@@ -237,7 +237,7 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
 void SndSysSourceOpenAL2D::Configure( csConfigAccess config ) {
   s_NumberOfBuffers = config->GetInt("SndSys.OpenALBuffers", 4);
 }
-size_t SndSysSourceOpenAL2D::s_NumberOfBuffers = 4;
+ALsizei SndSysSourceOpenAL2D::s_NumberOfBuffers = 4;
 
 bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
 
@@ -260,7 +260,7 @@ bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
     else
     {
       // The second buffer has data
-      alBufferData (buffer, m_Format, data2, length2, m_SampleRate);
+      alBufferData (buffer, m_Format, data2, (ALsizei)length2, m_SampleRate);
     }
   }
   else
@@ -268,7 +268,7 @@ bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
     if (length2 == 0 )
     {
       // The first buffer has data
-      alBufferData (buffer, m_Format, data1, length1, m_SampleRate);
+      alBufferData (buffer, m_Format, data1, (ALsizei)length1, m_SampleRate);
     }
     else
     {
@@ -279,7 +279,7 @@ bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
       memcpy (tempbuffer+length1, data2, length2);
 
       // Add the data to the buffer
-      alBufferData (buffer, m_Format, tempbuffer, length1+length2, m_SampleRate);
+      alBufferData (buffer, m_Format, tempbuffer, (ALsizei)(length1+length2), m_SampleRate);
     }
   }
   return true;

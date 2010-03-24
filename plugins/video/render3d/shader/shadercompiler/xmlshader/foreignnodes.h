@@ -75,7 +75,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (file, docBuf))
 	return false;
       
-      uint32 ofsLE = curFilePos - headPos;
+      uint32 ofsLE = (uint32)(curFilePos - headPos);
       curFilePos = file->GetPos();
       bool ret = false;
       file->SetPos (headPos);

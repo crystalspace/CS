@@ -518,7 +518,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
     o2wtVar->SetType(csShaderVariable::MATRIX);
     o2wtVar->SetValue(renderMeshes[0]->object2world);
   }
-  n = renderMeshes.GetSize();
+  n = (int)renderMeshes.GetSize();
 
   return renderMeshes.GetArray();
 }
@@ -870,8 +870,8 @@ void csWaterMeshObjectFactory::SetupFactory ()
         }
       }
 
-      numVerts = verts.GetSize();
-      numTris = tris.GetSize();
+      numVerts = (int)verts.GetSize();
+      numTris = (int)tris.GetSize();
     }
   
     for(uint i = 0; i < children.GetSize(); i++)

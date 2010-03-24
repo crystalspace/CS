@@ -84,7 +84,7 @@ public:
   }
   void SetBlockResolution (int value)
   {
-    blockResolution = 1 << csLog2 (value);
+    blockResolution = ptrdiff_t(1) << csLog2 (value);
   }
 
   size_t GetMinSteps () const
@@ -510,7 +510,7 @@ void TerrainBlock::SetupGeometry ()
         
         //@@Optimize this!
         *normalData++ = renderData->cell->GetNormal (
-          gridLeft+(int)(x*stepSize), gridTop+(int)(y*stepSize));
+          (int)(gridLeft+x*stepSize), (int)(gridTop+y*stepSize));
 
         if (height < minHeight)
           minHeight = height;

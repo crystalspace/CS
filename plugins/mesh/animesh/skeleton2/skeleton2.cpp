@@ -507,7 +507,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       {
         currState->GetQuaternion (i) = allBones[i].boneRotation;
         currState->GetVector (i) = allBones[i].boneOffset;
-        currState->SetBoneUsed (i);
+        currState->SetBoneUsed ((BoneID)i);
       }
     }
 
@@ -529,7 +529,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       {        
         currState->GetQuaternion (i) = allBones[i].bindRotation;
         currState->GetVector (i) = allBones[i].bindOffset;
-        currState->SetBoneUsed (i);
+        currState->SetBoneUsed ((BoneID)i);
       }
     }
 

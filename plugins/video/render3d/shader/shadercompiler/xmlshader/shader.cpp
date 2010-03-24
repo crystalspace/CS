@@ -382,7 +382,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   bool csShaderConditionResolver::WriteToCache (iFile* cacheFile,
     ConditionsWriter& condWriter)
   {
-    uint32 nextVarLE = nextVariant;
+    uint32 nextVarLE = (uint32)nextVariant;
     nextVarLE = csLittleEndian::UInt32 (nextVarLE);
     if (cacheFile->Write ((char*)&nextVarLE, sizeof (nextVarLE))
       != sizeof (nextVarLE))
@@ -451,7 +451,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     }
     else
     {
-      uint32 varLE = node->variant;
+      uint32 varLE = (uint32)node->variant;
       varLE |= 0x80000000;
       varLE = csLittleEndian::UInt32 (varLE);
       return cacheFile->Write ((char*)&varLE, sizeof (varLE)) == sizeof (varLE);
@@ -908,7 +908,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	}
         if (cacheState)
         {
-	  uint32 diskTechNum = csLittleEndian::UInt32 (techniques.GetSize());
+	  uint32 diskTechNum = csLittleEndian::UInt32 ((uint32)techniques.GetSize());
 	  cacheState = cacheFile->Write ((char*)&diskTechNum, sizeof (diskTechNum))
 	    == sizeof (diskTechNum);
 	    
@@ -1057,9 +1057,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	    progress->Step (1);
 	  else if (csGetTicks() - startTime > 1000)
 	  {
-	    progress = new csTextProgressMeter (0, totalTechs);
+	    progress = new csTextProgressMeter (0, (int)totalTechs);
 	    progress->SetGranularity (progress->GetTickScale());
-	    progress->Step (techsHandled);
+	    progress->Step ((uint)techsHandled);
 	  }
 	  tech.resolver->SetCurrentEval (0);
         }
@@ -1129,7 +1129,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   
     size_t tvc = techsResolver->GetVariantCount();
     if (tvc == 0) tvc = 1;
-    int lightCount = prioTicket/tvc;
+    int lightCount = (int)(prioTicket/tvc);
     
     csShaderPriorityList* p = new csShaderPriorityList;
     size_t tvi = prioTicket%tvc;
@@ -1964,7 +1964,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         != sizeof (diskMinLights))
       return false;
       
-    uint32 diskMetaNum = csLittleEndian::UInt32 (metadata.GetSize());
+    uint32 diskMetaNum = csLittleEndian::UInt32 ((uint32)metadata.GetSize());
     if (cacheFile->Write ((char*)&diskMetaNum, sizeof (diskMetaNum))
         != sizeof (diskMetaNum))
       return false;

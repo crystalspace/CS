@@ -237,7 +237,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     BinEntry newEntry;
     newEntry.crc = CS::Utility::Checksum::CRC32 ((uint8*)str.s, str.len);
     newEntry.lastUsedTime = timestamp;
-    newEntry.dataOffset = stringDataFile->GetSize();
+    newEntry.dataOffset = (uint32)stringDataFile->GetSize();
     stringDataFile->Write (str.s, str.len);
     char null = 0;
     stringDataFile->Write (&null, 1);
@@ -364,7 +364,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       size_t len = strlen (entryStr);
       if (CS::Utility::Checksum::CRC32 ((uint8*)entryStr, len) != newEntry.crc)
         continue;
-      newEntry.dataOffset = newStringsFile->GetPos();
+      newEntry.dataOffset = (uint32)newStringsFile->GetPos();
       if (newStringsFile->Write (entryStr, len+1) != len+1)
         return false;
       newEntries.Put (id, newEntry);

@@ -277,8 +277,8 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
   // Create texture handle. Size is the current screen size (to nearest pow2)
   // as that's the maximum texture size we should have to handle.
   csRef<iTextureManager> texman = g3d->GetTextureManager();
-  csRef<iTextureHandle> texh = texman->CreateTexture(rTexWidth, rTexHeight,
-    csimg2D, "rgba8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+  csRef<iTextureHandle> texh = texman->CreateTexture((int)rTexWidth,
+    (int)rTexHeight, csimg2D, "rgba8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
   texh->SetAlphaType (csAlphaMode::alphaBinary);
 
   // Create the material.
@@ -365,11 +365,11 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   newView->GetMeshFilter().SetFilterMode(MESH_FILTER_INCLUDE);
   newView->GetMeshFilter().AddFilterMesh(csMesh);
   newView->SetAutoResize(false);
-  newView->SetWidth(rTexWidth);
-  newView->SetHeight(rTexHeight);
+  newView->SetWidth((int)rTexWidth);
+  newView->SetHeight((int)rTexHeight);
   newView->SetRectangle((int)csIMesh->texCoords.MinX(),
-    (int)csIMesh->texCoords.MinY(), imposter->texWidth,
-    imposter->texHeight, false);
+    (int)csIMesh->texCoords.MinY(), (int)imposter->texWidth,
+    (int)imposter->texHeight, false);
   newView->UpdateClipper ();
 
   // Normalise the texture coordinates.
@@ -486,7 +486,7 @@ void csImposterManager::AddMeshToImposter(csImposterMesh* imposter)
   for(size_t i=0; i<sectorImposters.GetSize(); ++i)
   {
     sectorImposters[i]->sectorImposter->updatePerFrame =
-      updatePerFrame/sectorImposters.GetSize();
+      (uint)(updatePerFrame/sectorImposters.GetSize());
   }
 }
 
@@ -511,7 +511,7 @@ void csImposterManager::RemoveMeshFromImposter(csImposterMesh* imposter)
         for(size_t i=0; i<sectorImposters.GetSize(); ++i)
         {
           sectorImposters[i]->sectorImposter->updatePerFrame =
-            updatePerFrame/sectorImposters.GetSize();
+            (uint)(updatePerFrame/sectorImposters.GetSize());
         }
       }
 

@@ -556,8 +556,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
     csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
       (meshFact->GetMeshObjectFactory ());
 
-    gmstate->SetVertexCount (vertexCount);
-    gmstate->SetTriangleCount (triangleCount);
+    gmstate->SetVertexCount ((int)vertexCount);
+    gmstate->SetTriangleCount ((int)triangleCount);
 
     for (unsigned int i = 0; i < vertexCount; i++)
       gmstate->GetVertices ()[i] = vertices[i];

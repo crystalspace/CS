@@ -354,7 +354,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   uint RandomNodeFactory::GetNodeCount () const
   {
-    return subFactories.GetSize ();
+    return (uint)subFactories.GetSize ();
   }
 
   void RandomNodeFactory::ClearNodes ()

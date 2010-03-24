@@ -178,7 +178,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 						   iSkeletonAnimNodeFactory2 *nodeFact)
   {
     State newState;
-    CS::Animation::StateID id = stateList.Push (newState);
+    CS::Animation::StateID id = (CS::Animation::StateID)stateList.Push (newState);
     stateList[id].name = name;
     stateList[id].nodeFactory = nodeFact;
     return id;

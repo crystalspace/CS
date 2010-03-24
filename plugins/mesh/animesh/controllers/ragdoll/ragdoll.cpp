@@ -379,11 +379,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     // so that the parent bones are always updated before their children)
     for (size_t i = 0; i <= maxBoneID; i++)
     {
-      if (!bones.Contains (i))
-	continue;
+      if (!bones.Contains ((BoneID)i))
+        continue;
 
       BoneData nullBone;
-      BoneData& boneData = bones.Get (i, nullBone);
+      BoneData& boneData = bones.Get ((BoneID)i, nullBone);
       UpdateBoneState (&boneData);
     }
 
@@ -461,21 +461,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       childNode->BlendState (state, baseWeight);
 
     // reset the chains that have been asked for
-    for (int i = resetChains.GetSize () - 1; i >= 0; i--)
+    for (size_t i = resetChains.GetSize () - 1; i >= 0; i--)
     {
       ResetChainData &chainData = resetChains.Get (i);
       chainData.frameCount--;
 
       if (chainData.frameCount == 0)
       {
-	ResetChainNodeTransform (chainData.chain->GetRootNode ());
-	resetChains.DeleteIndex (i);
+        ResetChainNodeTransform (chainData.chain->GetRootNode ());
+        resetChains.DeleteIndex (i);
       }
     }
 
     // update each bones
     for (csHash<BoneData, BoneID>::GlobalIterator it = bones.GetIterator ();
-	 it.HasNext(); )
+      it.HasNext(); )
     {
       BoneData& boneData = it.Next ();
 
@@ -483,7 +483,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
       // check if the bone is in dynamic state
       if (boneData.state != RAGDOLL_STATE_DYNAMIC)
-	continue;
+        continue;
 
       csOrthoTransform bodyTransform = boneData.rigidBody->GetTransform ();
 

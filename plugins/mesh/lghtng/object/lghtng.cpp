@@ -67,7 +67,6 @@ csLightningMeshObject::csLightningMeshObject (
   if (GenMesh)
   {
     GenState = scfQueryInterface<iGeneralMeshState> (GenMesh);
-    GenState->SetLighting (false);
     GenState->SetManualColors (true);
     GenMesh->SetMaterialWrapper (material);
     GenMesh->SetColor (csColor (1.f, 1.f, 1.f));

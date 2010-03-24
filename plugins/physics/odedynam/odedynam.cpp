@@ -1249,7 +1249,7 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   dTriMeshDataID TriData = dGeomTriMeshDataCreate();
 
   dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float),
-    trimesh->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
+    (int)trimesh->GetVertexCount(), indeces, 3*(int)tr_num, 3*sizeof(int));
 
   geomID = dCreateTriMesh(0, TriData, 0, 0, 0);
 
