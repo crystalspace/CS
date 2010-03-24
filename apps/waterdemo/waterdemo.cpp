@@ -490,8 +490,6 @@ bool csWaterDemo::Initialize ()
 
   gMesh = gFact->NewInstance ();
   gMeshState = scfQueryInterface<iGeneralMeshState> (gMesh);
-  gMeshState->SetShadowCasting (false);
-  gMeshState->SetShadowReceiving (false);
 
   //setup a wrapper too
   gMeshW = engine->CreateMeshWrapper (gMesh, "water", room);

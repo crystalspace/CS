@@ -208,7 +208,7 @@ bool Tri3DTest::Application()
 
     // camera at 0.00000, -1.5, 15.225 initially
     csOrthoTransform camTransf = c->GetTransform();
-    camTransf.SetOrigin(csVector3(0.0, -1.5, 15.225));
+    camTransf.SetOrigin(csVector3(0.0f, -1.5f, 15.225f));
     c->SetTransform(camTransf);
 
     // This calls the default runloop. This will basically just keep
@@ -330,13 +330,13 @@ csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csTriangleMesh& t)
   tmVerts = tm.GetVertices();
 
   csArray<csVector4> availableColors;
-  availableColors.Push(csVector4(1.0, 0.0, 0.0, 1.0)); // red
-  availableColors.Push(csVector4(1.0, 0.5, 0.0, 1.0)); // orange
-  availableColors.Push(csVector4(1.0, 1.0, 0.0, 1.0)); // yellow
-  availableColors.Push(csVector4(0.0, 1.0, 0.0, 1.0)); // green
-  availableColors.Push(csVector4(0.0, 0.0, 1.0, 1.0)); // blue
-  availableColors.Push(csVector4(0.4, 0.0, 1.0, 1.0)); // indigo
-  availableColors.Push(csVector4(1.0, 0.0, 1.0, 1.0)); // violet
+  availableColors.Push(csVector4(1.0f, 0.0f, 0.0f, 1.0f)); // red
+  availableColors.Push(csVector4(1.0f, 0.5f, 0.0f, 1.0f)); // orange
+  availableColors.Push(csVector4(1.0f, 1.0f, 0.0f, 1.0f)); // yellow
+  availableColors.Push(csVector4(0.0f, 1.0f, 0.0f, 1.0f)); // green
+  availableColors.Push(csVector4(0.0f, 0.0f, 1.0f, 1.0f)); // blue
+  availableColors.Push(csVector4(0.4f, 0.0f, 1.0f, 1.0f)); // indigo
+  availableColors.Push(csVector4(1.0f, 0.0f, 1.0f, 1.0f)); // violet
 
   int numAvabColors = (int)availableColors.GetSize();
 

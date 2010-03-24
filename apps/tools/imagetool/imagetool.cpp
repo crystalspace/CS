@@ -643,8 +643,6 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
     return display_help ();
   }
 
-  ImageLoader->SetDithering (opt.dither);
-
   if (opt.splitSubImg)
   {
     for (; optind < argc; ++optind)

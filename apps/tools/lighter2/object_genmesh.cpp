@@ -505,9 +505,7 @@ namespace lighter
       meshWrapper->GetMeshObject());
     if (!genMesh) return; // bail
 
-    genMesh->SetShadowReceiving (false);
     genMesh->SetManualColors (true);
-    genMesh->SetLighting (false);
     genMesh->RemoveRenderBuffer ("color");
     genMesh->RemoveRenderBuffer ("static color");
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");

@@ -135,7 +135,8 @@ void IsoTest::Frame ()
   actor->GetMovable ()->UpdateMove ();
 
   // Move the light.
-  actor_light->SetCenter (actor_pos+csVector3 (0, 2, -1));
+  actor_light->GetMovable()->SetPosition (actor_pos+csVector3 (0, 2, -1));
+  actor_light->GetMovable()->UpdateMove();
 
   CameraIsoLookat(view->GetCustomMatrixCamera(), views[current_view], actor_pos);
 

@@ -135,12 +135,12 @@ void ASndTest::CreateWorld ()
   // Create a small sound source
   sndsource = sndrenderer->CreateSource (sndstream);
   sndsource3d = scfQueryInterface<iSndSysSource3D> (sndsource);
-  sndsource->SetVolume( 1.0 );
-  sndsource3d->SetMinimumDistance( 1 );
-  sndsource3d->SetPosition( csVector3 (30, 5, 10) );
-  light = engine->CreateLight (0, csVector3 (30, 1, 10), 5, csColor (0.15, 0, 0));
+  sndsource->SetVolume( 1.0f );
+  sndsource3d->SetMinimumDistance( 1.0f );
+  sndsource3d->SetPosition( csVector3 (3.0f, 5.0f, 10.0f) );
+  light = engine->CreateLight (0, csVector3 (30.0f, 1.0f, 10.0f), 5.0f, csColor (0.15f, 0.0f, 0.0f));
   ll->Add (light);
-  sprite = engine->CreateMeshWrapper (imeshfact, "Sound1Sprite", world, csVector3 (30, 5, 10));
+  sprite = engine->CreateMeshWrapper (imeshfact, "Sound1Sprite", world, csVector3 (30.0f, 5.0f, 10.0f));
   spstate = scfQueryInterface<iSprite3DState> (sprite->GetMeshObject());
   spstate->SetAction ("default");
 
@@ -148,23 +148,23 @@ void ASndTest::CreateWorld ()
   sndsource = sndrenderer->CreateSource (sndstream);
   sndsource3d = scfQueryInterface<iSndSysSource3D> (sndsource);
   sndsource->SetVolume( 1.0 );
-  sndsource3d->SetMinimumDistance( 2 );
-  sndsource3d->SetPosition( csVector3 (30, 5, 30) );
-  light = engine->CreateLight (0, csVector3 (30, 1, 30), 5, csColor (0.3, 0, 0));
+  sndsource3d->SetMinimumDistance( 2.0f );
+  sndsource3d->SetPosition( csVector3 (3.0f, 5.0f, 30.0f) );
+  light = engine->CreateLight (0, csVector3 (30.0f, 1.0f, 30.0f), 5.0f, csColor (0.3f, 0.0f, 0.0f));
   ll->Add (light);
-  sprite = engine->CreateMeshWrapper (imeshfact, "Sound2Sprite", world, csVector3 (30, 5, 30));
+  sprite = engine->CreateMeshWrapper (imeshfact, "Sound2Sprite", world, csVector3 (30.0f, 5.0f, 30.0f));
   spstate = scfQueryInterface<iSprite3DState> (sprite->GetMeshObject());
   spstate->SetAction ("default");
 
   // Create a large sound source
   sndsource = sndrenderer->CreateSource (sndstream);
   sndsource3d = scfQueryInterface<iSndSysSource3D> (sndsource);
-  sndsource->SetVolume( 1.0 );
-  sndsource3d->SetMinimumDistance( 4 );
-  sndsource3d->SetPosition( csVector3 (10, 5, 30) );
-  light = engine->CreateLight (0, csVector3 (10, 1, 30), 5, csColor (0.6, 0, 0));
+  sndsource->SetVolume( 1.0f );
+  sndsource3d->SetMinimumDistance( 4.0f );
+  sndsource3d->SetPosition( csVector3 (10.0f, 5.0f, 30.0f) );
+  light = engine->CreateLight (0, csVector3 (10.0f, 1.0f, 30.0f), 5.0f, csColor (0.6f, 0.0f, 0.0f));
   ll->Add (light);
-  sprite = engine->CreateMeshWrapper (imeshfact, "Sound3Sprite", world, csVector3 (10, 5, 30));
+  sprite = engine->CreateMeshWrapper (imeshfact, "Sound3Sprite", world, csVector3 (10.0f, 5.0f, 30.0f));
   spstate = scfQueryInterface<iSprite3DState> (sprite->GetMeshObject());
   spstate->SetAction ("default");
 
@@ -177,7 +177,7 @@ void ASndTest::CreateWorld ()
   csRef<iSndSysSource3DDirectionalSimple> sndsource3dds = scfQueryInterface<iSndSysSource3DDirectionalSimple> (sndsource);
   sndsource3dds->SetDirection( csVector3 (0, 0, 1) );
   sndsource3dds->SetDirectionalRadiation( PI/4 );
-  light = engine->CreateLight (0, csVector3 (-10, 5, 39), 5, csColor (0.6, 0, 0));
+  light = engine->CreateLight (0, csVector3 (-10.0f, 5.0f, 39.0f), 5.0f, csColor (0.6f, 0.0f, 0.0f));
   ll->Add (light);
   sprite = engine->CreateMeshWrapper (imeshfact, "Sound4Sprite", world, csVector3 (-10, 5, 30));
   spstate = scfQueryInterface<iSprite3DState> (sprite->GetMeshObject());
@@ -194,7 +194,7 @@ void ASndTest::CreateWorld ()
   sndsource3dd->SetDirectionalRadiationInnerCone( PI/4 );
   sndsource3dd->SetDirectionalRadiationOuterCone( PI/2 );
   sndsource3dd->SetDirectionalRadiationOuterGain( 0 );
-  light = engine->CreateLight (0, csVector3 (-30, 5, 39), 5, csColor (0.6, 0, 0));
+  light = engine->CreateLight (0, csVector3 (-30.0f, 5.0f, 39.0f), 5.0f, csColor (0.6f, 0.0f, 0.0f));
   ll->Add (light);
   sprite = engine->CreateMeshWrapper (imeshfact, "Sound5Sprite", world, csVector3 (-30, 5, 30));
   spstate = scfQueryInterface<iSprite3DState> (sprite->GetMeshObject());

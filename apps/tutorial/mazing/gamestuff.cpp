@@ -121,7 +121,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
   csRef<iGeneralFactoryState> factory_state = scfQueryInterface<
     iGeneralFactoryState> (walls_factory->GetMeshObjectFactory ());
 
-  DensityTextureMapper mapper (.3);
+  DensityTextureMapper mapper (0.3f);
 
   float sx = float (x) * ROOM_DIMENSION;
   float sy = float (y) * ROOM_DIMENSION;
@@ -211,7 +211,7 @@ bool Maze::CreateMaterials ()
       "/lib/std/castle/castle-brick3_d.jpg",
       "/lib/std/castle/castle-brick1_n.jpg",
       "/lib/std/castle/castle-brick1_h.jpg",
-      csVector4 (0.3,0.3,0.3,0.3));
+      csVector4 (0.3f,0.3f,0.3f,0.3f));
 
   return mat != 0;
 }
@@ -257,15 +257,15 @@ bool Maze::CreateGeometry ()
   if (!CreateRoom (mat, 2, 2, 1, "..#...")) return false;
   if (!CreateRoom (mat, 2, 2, 2, ".##...")) return false;
 
-  if (!CreateLight (csColor (.6, 0, 0),   0, 0, 0)) return false;
-  if (!CreateLight (csColor (0, 0, .6),   0, 0, 2)) return false;
-  if (!CreateLight (csColor (0, .6, 0),   1, 0, 1)) return false;
-  if (!CreateLight (csColor (.6, .6, 0),  1, 1, 1)) return false;
-  if (!CreateLight (csColor (0, .6, .6),  0, 1, 1)) return false;
-  if (!CreateLight (csColor (.6, .6, .6), 2, 1, 2)) return false;
-  if (!CreateLight (csColor (.6, 0, 0),   1, 2, 1)) return false;
-  if (!CreateLight (csColor (0, 0, .6),   0, 2, 0)) return false;
-  if (!CreateLight (csColor (0, .6, 0),   2, 2, 0)) return false;
+  if (!CreateLight (csColor (0.6f, 0.0f, 0.0f), 0, 0, 0)) return false;
+  if (!CreateLight (csColor (0.0f, 0.0f, 0.6f), 0, 0, 2)) return false;
+  if (!CreateLight (csColor (0.0f, 0.6f, 0.0f), 1, 0, 1)) return false;
+  if (!CreateLight (csColor (0.6f, 0.6f, 0.0f), 1, 1, 1)) return false;
+  if (!CreateLight (csColor (0.0f, 0.6f, 0.6f), 0, 1, 1)) return false;
+  if (!CreateLight (csColor (0.6f, 0.6f, 0.6f), 2, 1, 2)) return false;
+  if (!CreateLight (csColor (0.6f, 0.0f, 0.0f), 1, 2, 1)) return false;
+  if (!CreateLight (csColor (0.0f, 0.0f, 0.6f), 0, 2, 0)) return false;
+  if (!CreateLight (csColor (0.0f, 0.6f, 0.0f), 2, 2, 0)) return false;
 
   return true;
 }
@@ -592,7 +592,6 @@ bool Game::CreateFactories ()
   	csVector3 (-LASER_WIDTH, -LASER_WIDTH, 0),
   	csVector3 (LASER_WIDTH, LASER_WIDTH, LASER_LENGTH));
   fstate->GenerateBox (laser_box);
-  fstate->SetLighting (false);
   fstate->SetColor (csColor (1.0, 1.0, 1.0));
   // We don't want to hit the player against the laserbeam when it is
   // visible so we disable the collision detection mesh here.

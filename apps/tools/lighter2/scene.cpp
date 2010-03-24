@@ -1292,7 +1292,7 @@ namespace lighter
 	  fileInfo->levelName.GetData(), i);
 	directionMapBaseNames.Push (textureFilename);
 	for (int x = 0; x < specDirectionMapCount; x++)
-	  texturesToSave.Push (GetDirectionMapFilename (i, x));
+	  texturesToSave.Push (GetDirectionMapFilename ((uint)i, x));
       }
     }
   }
@@ -1775,12 +1775,12 @@ namespace lighter
       for (size_t pg = 0; pg < obj->GetPrimitiveGroupNum(); pg++)
       {
         // get all influences for primgroup
-        csArray<Light*> influencingLights (obj->GetLightsAffectingGroup (pg));
+        csArray<Light*> influencingLights (obj->GetLightsAffectingGroup ((uint)pg));
         csArray<InfluencePair> allInfluences;
         allInfluences.SetCapacity (influencingLights.GetSize());
         for (size_t l = 0; l < influencingLights.GetSize(); l++)
         {
-          LightInfluences* infl = &(obj->GetLightInfluences (pg,
+          LightInfluences* infl = &(obj->GetLightInfluences ((uint)pg,
             influencingLights[l]));
           allInfluences.Push (InfluencePair (influencingLights[l], infl));
         }
@@ -1861,7 +1861,7 @@ namespace lighter
           InfluencePair& ip = allInfluences[i];
           
           DirectionMap& dirMap = *(directionMaps[ip.subMap].Get (
-            obj->GetPrimitiveGroupLightmap (pg)));
+            obj->GetPrimitiveGroupLightmap ((uint)pg)));
           dirMap.AddFromLightInfluences (*(ip.infl));
         }
         
@@ -1971,7 +1971,7 @@ namespace lighter
 	  is not supported ... */
 	csRef<iDataBuffer> imgData = globalLighter->imageIO->Save (img,
 	  "image/dds", "format=dxt5");
-	csString fname (GetDirectionMapFilename (d, i));
+	csString fname (GetDirectionMapFilename ((uint)d, i));
 	csRef<iFile> file = globalLighter->vfs->Open (fname, VFS_FILE_WRITE);
 	if (file)
 	{

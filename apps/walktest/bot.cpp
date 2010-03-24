@@ -108,14 +108,16 @@ void Bot::Move (csTicks elapsed_time)
     mesh->GetMovable()->SetSector (s);
     if (light)
     {
-      if (s != light->GetSector ())
+      iSector* currSector = light->GetMovable()->GetSectors()->Get(0);
+      if (s != currSector)
       {
         light->IncRef ();
-        light->GetSector ()->GetLights ()->Remove (light);
+        currSector->GetLights ()->Remove (light);
         s->GetLights ()->Add (light);
         light->DecRef ();
       }
-      light->SetCenter (new_p);
+      light->GetMovable()->SetPosition (new_p);
+      light->GetMovable()->UpdateMove();
     }
   }
   mesh->GetMovable()->UpdateMove ();
