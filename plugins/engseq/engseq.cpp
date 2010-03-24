@@ -842,7 +842,8 @@ public:
   virtual void Do (float time, iBase*)
   {
     csVector3 new_pos = start_pos + time * offset;
-    light->SetCenter (new_pos);
+    light->GetMovable ()->SetPosition (new_pos);
+    light->GetMovable ()->UpdateMove ();
   }
 };
 
@@ -923,7 +924,7 @@ public:
     {
       MoveLightInfo* mi = new MoveLightInfo ();
       mi->light = light;
-      mi->start_pos = light->GetCenter ();
+      mi->start_pos = light->GetMovable ()->GetPosition ();
       mi->offset = offset;
       eseqmgr->FireTimedOperation (dt, duration, mi, 0, sequence_id);
       mi->DecRef ();
