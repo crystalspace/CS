@@ -164,10 +164,12 @@ ParticlesTab::ParticlesTab(iObjectRegistry* obj_reg, AssetBase* ass)
   window = winMgr->getWindow("Particles/Edit/AddProp");
   window->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&ParticlesTab::AddProp, this));
+  window->hide();
 
   window = winMgr->getWindow("Particles/Edit/DeleteProp");
   window->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&ParticlesTab::DeleteProp, this));
+  window->hide();
 
   CEGUI::Combobox* combobox = (CEGUI::Combobox*)winMgr->getWindow("Particles/Edit/Bool");
   CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem("True", 0);
@@ -232,12 +234,6 @@ bool ParticlesTab::EditEmitter (const CEGUI::EventArgs& e)
 
   window = winMgr->getWindow("Particles/Edit");
   window->show();
-
-  window = winMgr->getWindow("Particles/Edit/AddProp");
-  window->hide();
-
-  window = winMgr->getWindow("Particles/Edit/DeleteProp");
-  window->hide();
 
   if (GetSelectedItemID("Particles/EmitterList", id))
   {
@@ -574,6 +570,12 @@ bool ParticlesTab::DoneEditing (const CEGUI::EventArgs& e)
   window->show();
 
   window = winMgr->getWindow("Particles/Edit");
+  window->hide();
+
+  window = winMgr->getWindow("Particles/Edit/AddProp");
+  window->hide();
+
+  window = winMgr->getWindow("Particles/Edit/DeleteProp");
   window->hide();
 
   csRef<iStringArray> arr = asset->GetEffectors();
