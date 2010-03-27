@@ -253,6 +253,8 @@ public:
   {
     return SetEffectorPropValueT<csColor4>(effector, id, val);
   }
+
+  virtual bool DeleteProp(iParticleEffector* effector, uint id);
 };
 
 #endif // PARTICLESASSET_H__

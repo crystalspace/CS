@@ -20,9 +20,10 @@
 #ifndef PARTICLESTAB_H__
 #define PARTICLESTAB_H__
 
-#include "tabbase.h"
-
 #include <ivaria/reporter.h>
+#include "imesh/particles.h"
+
+#include "tabbase.h"
 
 class ParticlesTab : public TabBase
 {
@@ -60,6 +61,9 @@ private:
 
   template<bool Emitter>
   void ShowPropControls(PropType type, uint id);
+
+  bool AddProp (const CEGUI::EventArgs& e);
+  bool DeleteProp (const CEGUI::EventArgs& e);
 
   // Active emitter/effector.
   iParticleEmitter* emitter;
@@ -157,6 +161,14 @@ ParticlesTab::ParticlesTab(iObjectRegistry* obj_reg, AssetBase* ass)
   window->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
     CEGUI::Event::Subscriber(&ParticlesTab::HandleEditing, this));
 
+  window = winMgr->getWindow("Particles/Edit/AddProp");
+  window->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ParticlesTab::AddProp, this));
+
+  window = winMgr->getWindow("Particles/Edit/DeleteProp");
+  window->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ParticlesTab::DeleteProp, this));
+
   CEGUI::Combobox* combobox = (CEGUI::Combobox*)winMgr->getWindow("Particles/Edit/Bool");
   CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem("True", 0);
   item->setTextColours(CEGUI::colour(0.0f, 0.0f, 0.0f));
@@ -221,6 +233,12 @@ bool ParticlesTab::EditEmitter (const CEGUI::EventArgs& e)
   window = winMgr->getWindow("Particles/Edit");
   window->show();
 
+  window = winMgr->getWindow("Particles/Edit/AddProp");
+  window->hide();
+
+  window = winMgr->getWindow("Particles/Edit/DeleteProp");
+  window->hide();
+
   if (GetSelectedItemID("Particles/EmitterList", id))
   {
     emitter = asset->GetEmitter(id);
@@ -274,10 +292,20 @@ bool ParticlesTab::EditEffector (const CEGUI::EventArgs& e)
   window = winMgr->getWindow("Particles/Edit");
   window->show();
 
-
   if (GetSelectedItemID("Particles/EffectorList", id))
   {
     effector = asset->GetEffector(id);
+
+    csRef<iParticleBuiltinEffectorLinColor> lincolor = scfQueryInterface<iParticleBuiltinEffectorLinColor>(effector);
+    csRef<iParticleBuiltinEffectorVelocityField> velfield = scfQueryInterface<iParticleBuiltinEffectorVelocityField>(effector);
+    if(lincolor.IsValid() || velfield.IsValid())
+    {
+      window = winMgr->getWindow("Particles/Edit/AddProp");
+      window->show();
+
+      window = winMgr->getWindow("Particles/Edit/DeleteProp");
+      window->show();
+    }
 
     // Update the properties list.
     csRef<iStringArray> arr = asset->GetEffectorProps(effector);
@@ -547,6 +575,9 @@ bool ParticlesTab::DoneEditing (const CEGUI::EventArgs& e)
 
   window = winMgr->getWindow("Particles/Edit");
   window->hide();
+
+  csRef<iStringArray> arr = asset->GetEffectors();
+  UpdateList(arr, "Particles/EffectorList");
 
   emitter = 0;
   effector = 0;
@@ -1095,6 +1126,40 @@ bool ParticlesTab::UpdateA (const CEGUI::EventArgs& e)
       {
         break;
       }
+    }
+
+    SetSelectedItemByID("Particles/Edit/Properties", id);
+    list->getVertScrollbar()->setScrollPosition(scrollPos);
+  }
+
+  return true;
+}
+
+bool ParticlesTab::AddProp (const CEGUI::EventArgs& e)
+{
+  printf("AddProp!\n");
+  return true;
+}
+
+bool ParticlesTab::DeleteProp (const CEGUI::EventArgs& e)
+{
+  uint id;
+
+  if (effector && GetSelectedItemID("Particles/Edit/Properties", id))
+  {
+    CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Particles/Edit/Properties");
+    float scrollPos = list->getVertScrollbar()->getScrollPosition();
+
+    asset->DeleteProp(effector, id);
+
+    UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+
+    if (list->getItemCount() == 0)
+      return true;
+    
+    if (id >= list->getItemCount())
+    {
+      id = (uint)list->getItemCount()-1;
     }
 
     SetSelectedItemByID("Particles/Edit/Properties", id);

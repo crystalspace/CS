@@ -1397,3 +1397,38 @@ bool ParticlesAsset::UpdateLinearProp(iParticleBuiltinEffectorLinear* linear, ui
 
   return true;
 }
+
+bool ParticlesAsset::DeleteProp(iParticleEffector* effector, uint id)
+{
+  // Test for the type.
+  csRef<iParticleBuiltinEffectorLinColor> lincolor = scfQueryInterface<iParticleBuiltinEffectorLinColor>(effector);
+  if(lincolor)
+  {
+    lincolor->RemoveColor(id);
+    return true;
+  }
+
+  csRef<iParticleBuiltinEffectorVelocityField> velfield = scfQueryInterface<iParticleBuiltinEffectorVelocityField>(effector);
+  if(velfield)
+  {
+    if(id-- == 0)
+    {
+      return false;
+    }
+
+    if(id < velfield->GetFParameterCount())
+    {
+      velfield->RemoveFParameter(id);
+      return true;
+    }
+
+    id -= (uint)velfield->GetFParameterCount();
+    if(id < velfield->GetVParameterCount())
+    {
+      velfield->RemoveVParameter(id);
+      return true;
+    }
+  }
+
+  return false;
+}

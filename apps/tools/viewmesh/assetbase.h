@@ -225,6 +225,8 @@ public:
   virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csVector2& val) { return false; }
   virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csVector3& val) { return false; }
   virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csColor4& val) { return false; }
+
+  virtual bool DeleteProp(iParticleEffector* effector, uint id) { return false; }
 };
 
 #endif // IASSET_H__

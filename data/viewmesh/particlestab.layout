@@ -116,6 +116,18 @@
         <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
       </Window>
 
+      <Window Type="ice/Button" Name="Particles/Edit/AddProp" >
+        <Property Name="Text" Value="Add" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.20,0.0},{0.42,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="Particles/Edit/DeleteProp" >
+        <Property Name="Text" Value="Delete" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.55,0.0},{0.42,0.0}}'/>
+      </Window>
+
       <Window Type="ice/Combobox" Name="Particles/Edit/Bool" >
         <Property Name="ReadOnly" Value="true" />
         <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
