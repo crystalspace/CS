@@ -648,7 +648,7 @@ namespace Geometry //@@Right?
             csBox3 newNodeBB = right->GetBBox ();
             if (left)
             {
-              newNodeBB += right->GetBBox ();
+              newNodeBB += left->GetBBox ();
             }
             node->SetBBox (newNodeBB);
 
