@@ -1160,7 +1160,7 @@ namespace CS
  * Enable deprecation warnings in following statements. Suitable for use in
  * macros.
  */
-#if defined(CS_COMPILER_GCC)
+#if defined(CS_COMPILER_GCC) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1))
 # define CS_DEPRECATION_WARNINGS_DISABLE	\
   _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 # define CS_DEPRECATION_WARNINGS_ENABLE	\
