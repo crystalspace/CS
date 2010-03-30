@@ -84,9 +84,9 @@ void csSectorLightList::PrepareLight (iLight* item)
   csLight* clight = static_cast<csLight*> (item);
   csLightList::PrepareLight (item);
 
-  clight->SetSector (sector);
-
   lightTree.AddObject (clight);
+
+  clight->SetSector (sector);
 }
 
 void csSectorLightList::FreeLight (iLight* item)

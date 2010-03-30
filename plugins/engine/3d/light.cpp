@@ -269,8 +269,13 @@ void csLight::OnSetPosition ()
             sectors.Push (sect);
             sect->GetLights ()->Add (this);
         }
-
-        sect->UpdateLightBounds (this, oldBox);
+	else
+	{
+	  /* Only update if we are in the sector (adding is done with correct
+	     bounding box) */
+	  if (worldBoundingBox != oldBox)
+	    sect->UpdateLightBounds (this, oldBox);
+	}
       }
 
       if(!removingLight && GetParent())
