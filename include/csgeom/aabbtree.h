@@ -72,7 +72,13 @@ namespace Geometry //@@Right?
     ///
     ~AABBTree ()
     {
+    #ifdef CS_DEBUG
+      // Destroy only pointers "in use" to track down leaking nodes
+      DeleteNodeRecursive (rootNode);
+    #else
+      // Don't bother with tree traversal, just free all nodes
       nodeAllocator.DeleteAll ();
+    #endif
     }
 
     /**
@@ -116,10 +122,10 @@ namespace Geometry //@@Right?
     /**
      * 
      */
-    void MoveObject (ObjectType* object, const csBox3& oldBox)
+    bool MoveObject (ObjectType* object, const csBox3& oldBox)
     {
       // Traverse down the tree, recursively updating BB if we have an update
-      MoveObjectRec (object, rootNode, oldBox); 
+      return MoveObjectRec (object, rootNode, oldBox); 
     }
 
     /**
@@ -327,20 +333,6 @@ namespace Geometry //@@Right?
         }
         static_cast<NodeExtraData*> (node)->NodeUpdate (*node->GetChild1(), *node->GetChild2());
       }
-    }
-
-    /**
-     * 
-     */
-    void DestroySubtree (Node* root)
-    {      
-      if (!root->IsLeaf ())
-      {
-        DestroySubtree (root->GetChild1 ());
-        DestroySubtree (root->GetChild2 ());
-      }
-
-      nodeAllocator.Free (root);
     }
 
     /**
@@ -708,7 +700,7 @@ namespace Geometry //@@Right?
             }
 
             // Tree was updated, update our bb
-            if (left->GetObjectCount () > 0)
+            if (!left->IsLeaf() || left->GetObjectCount () > 0)
             {
               newNodeBB += left->GetBBox ();
               static_cast<NodeExtraData*> (node)->NodeUpdate (*left, *right);
@@ -722,12 +714,14 @@ namespace Geometry //@@Right?
 	        node->Copy (right);
 		nodeAllocator.Free (left);
 		nodeAllocator.Free (right);
-                newNodeBB += node->GetBBox ();
+                newNodeBB = node->GetBBox ();
 	      }
 	      else
 	      {
                 node->SetChild1 (0);
+		node->SetLeaf (true);
                 static_cast<NodeExtraData*> (node)->LeafUpdateObjects (0, 0);
+		nodeAllocator.Free (left);
 	      }
             }
 
@@ -746,7 +740,7 @@ namespace Geometry //@@Right?
             }
 
             // Tree was updated, update our bb
-            if (right->GetObjectCount () > 0)
+            if (!right->IsLeaf() || right->GetObjectCount () > 0)
             {
               newNodeBB += right->GetBBox ();
               static_cast<NodeExtraData*> (node)->NodeUpdate (*left, *right);
@@ -757,15 +751,17 @@ namespace Geometry //@@Right?
 	      // of the left node down.
 	      if (left)
 	      {
-	        node->Copy (left);
+		node->Copy (left);
 		nodeAllocator.Free (left);
 		nodeAllocator.Free (right);
-                newNodeBB += node->GetBBox ();
+                newNodeBB = node->GetBBox ();
 	      }
 	      else
 	      {
                 node->SetChild2 (0);
+		node->SetLeaf (true);
                 static_cast<NodeExtraData*> (node)->LeafUpdateObjects (0, 0);
+		nodeAllocator.Free (right);
 	      }
             }
 
@@ -807,7 +803,7 @@ namespace Geometry //@@Right?
     typedef csBlockAllocator<
       Node, 
       CS::Memory::AllocatorAlign<32>,
-      csBlockAllocatorDisposeDelete<Node>,
+      csBlockAllocatorDisposeLeaky<Node>,
       csBlockAllocatorSizeObjectAlign<Node, 32>
     > NodeAllocatorType;
 
@@ -850,6 +846,9 @@ namespace Geometry //@@Right?
       if (isLeaf && !IsLeaf ())
       {
         typeAndFlags |= AABB_NODE_LEAF;
+	// Ensure no children are 'lost'
+	CS_ASSERT(children[0] == 0);
+	CS_ASSERT(children[1] == 0);
         leafObjCount = 0;
       }
       else if (!isLeaf && IsLeaf ())
@@ -876,12 +875,14 @@ namespace Geometry //@@Right?
     ///
     uint GetObjectCount () const
     {
+      CS_ASSERT(IsLeaf ()); // object count is only sensible for leaves
       return leafObjCount;
     }
 
     ///
     bool IsObjectSlotFree () const
     {
+      CS_ASSERT(IsLeaf ()); // object count is only sensible for leaves
       return leafObjCount < objectsPerLeaf;
     }
 
@@ -942,19 +943,17 @@ namespace Geometry //@@Right?
     /// Copy the node contents to this one.
     void Copy (Node* source)
     {
-      if (source->IsLeaf ())
+      typeAndFlags = source->typeAndFlags;
+      if (IsLeaf ())
       {
-	SetLeaf (true);
 	memcpy (leafStorage, source->leafStorage, sizeof (ObjectType*) * objectsPerLeaf);
       }
       else
       {
-	SetLeaf (false);
         SetChild1 (source->GetChild1 ());
         SetChild2 (source->GetChild2 ());
       }
       leafObjCount = source->leafObjCount;
-      typeAndFlags = source->typeAndFlags;
       SetBBox (source->GetBBox ());
       NodeExtraData::operator= (*source);
     }
