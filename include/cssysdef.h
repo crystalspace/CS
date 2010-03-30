@@ -33,6 +33,50 @@
   code itself.
 */
 
+/* Check whether shared or static libs should be used.
+   Relevant defines are CS_USE_SHARED_LIBS, CS_USE_STATIC_LIBS and 
+   CS_BUILD_SHARED_LIBS. While building CS they indicate whether CS is built
+   with shared or static libs; while building external applications they
+   indicate whether the used CS was built with shared or static libs.
+   
+   The reason for this multitude of defines is historical: first, there was
+   CS_BUILD_SHARED_LIBS (default being absent). However, the name is not very
+   clear when seen in the context of external projects (as CS isn't built there,
+   and it doesn't control the building of the external project). Hence,
+   the somewhat clearer CS_USE_SHARED_LIBS was added. CS_USE_STATIC_LIBS was
+   added to provide an orthogonal definition to make clear static libs are
+   used.
+   Lastly, the defaults have changed: if none of the macros are defined the
+   default is CS_USE_SHARED_LIBS. The reason is that, nowadays, shared libs
+   are the default on most platforms anyway. (Especially on MSVC people tend
+   to overlook to set the CS_BUILD_SHARED_LIBS define for an external project 
+   and experience build errors.)
+ */
+ 
+/* CS_USE_ defines have first control over shared lib building, override
+   legacy CS_BUILD_SHARED_LIBS accordingly */
+#if defined(CS_USE_SHARED_LIBS)
+#  if !defined(CS_BUILD_SHARED_LIBS)
+#    define CS_BUILD_SHARED_LIBS
+#  endif
+#elif defined(CS_USE_STATIC_LIBS)
+#  if defined(CS_BUILD_SHARED_LIBS)
+#    undef CS_BUILD_SHARED_LIBS
+#  endif
+#endif
+/* If no CS_USE_ macro is defined and no CS_BUILD_SHARED_LIBS either, default
+   to CS_USE_SHARED_LIBS */
+#if !defined(CS_USE_SHARED_LIBS) && !defined(CS_USE_STATIC_LIBS)
+#  if !defined(CS_BUILD_SHARED_LIBS)
+#    define CS_BUILD_SHARED_LIBS
+#  endif
+#  define CS_USE_SHARED_LIBS
+#endif
+// Sanity check
+#if defined(CS_USE_SHARED_LIBS) && defined(CS_USE_STATIC_LIBS)
+#  error Both CS_USE_SHARED_LIBS and CS_USE_STATIC_LIBS defined, please pick one!
+#endif
+
 /*
  * Pull in platform-specific overrides of the requested functionality.
  */
@@ -52,7 +96,7 @@
 #  define CS_IMPORT_SYM_DLL extern
 #endif
 #ifndef CS_EXPORT_SYM
-#  if defined(CS_BUILD_SHARED_LIBS)
+#  if defined(CS_USE_SHARED_LIBS)
 #    define CS_EXPORT_SYM CS_VISIBILITY_DEFAULT
 #  else
 #    define CS_EXPORT_SYM
@@ -1160,7 +1204,7 @@ namespace CS
  * Enable deprecation warnings in following statements. Suitable for use in
  * macros.
  */
-#if defined(CS_COMPILER_GCC) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1))
+#if defined(CS_COMPILER_GCC)
 # define CS_DEPRECATION_WARNINGS_DISABLE	\
   _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 # define CS_DEPRECATION_WARNINGS_ENABLE	\

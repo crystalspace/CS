@@ -2566,7 +2566,8 @@ AC_ARG_ENABLE([shared], [AC_HELP_STRING([--enable-shared],
 AC_MSG_RESULT([$enable_shared])
 CS_EMIT_BUILD_PROPERTY([BUILD_SHARED_LIBS], [$enable_shared])
 AS_IF([test $enable_shared = yes], 
-  [CS_HEADER_PROPERTY([CS_BUILD_SHARED_LIBS])])
+  [CS_HEADER_PROPERTY([CS_USE_SHARED_LIBS])],
+  [CS_HEADER_PROPERTY([CS_USE_STATIC_LIBS])])
 
 
 
