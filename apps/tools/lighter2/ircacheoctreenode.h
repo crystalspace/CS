@@ -27,14 +27,14 @@ namespace lighter
   {
     size_t count;
     float *weights;
-    IrradianceSample **samples;
+    IrradianceSample const** samples;
   };
 
   class OctreeSampleNode
   {
   private:
     // Data
-    csArray<size_t> samples;
+    csArray<const IrradianceSample*> samples;
     OctreeSampleNode* child[8];
     bool isLeaf;
 
@@ -42,7 +42,6 @@ namespace lighter
     float center[3], size;
 
     // General data for all nodes
-    IrradianceSample* masterArray;
     static double alpha;
 
     // Helper functions
@@ -51,11 +50,10 @@ namespace lighter
     static float Weight(const IrradianceSample *A, const IrradianceSample *B);
 
   public:
-    OctreeSampleNode(IrradianceSample* parentArray,
-      const double newAlpha = -1.0);
+    OctreeSampleNode(const double newAlpha = -1.0);
     ~OctreeSampleNode();
 
-    void AddSample(const size_t newNode);
+    void AddSample(const IrradianceSample* newNode);
     void SetBoundingBox(const float newMin[3], const float newMax[3]);
     void FindSamples(const IrradianceSample *samp, NearestSamples* &nearest);
   };

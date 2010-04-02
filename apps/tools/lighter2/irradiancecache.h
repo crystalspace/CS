@@ -37,7 +37,7 @@ namespace lighter
   {
   public:
     IrradianceCache( const float bboxMin[3], const float bboxMax[3],
-      size_t maxSamples, double maxError = 0.1 );
+      double maxError = 0.1 );
     ~IrradianceCache();
 
     /**
@@ -76,13 +76,12 @@ namespace lighter
 
     bool Expand();
 
-    IrradianceSample *samples;  ///< Internal array of samples
+    /// Memory pool for sample allocation
+    csMemoryPool samplePool;
     OctreeSampleNode *root;     ///< The root of the octree
     double alpha;               ///< The maximum error allowed when estimating irradiance
 
-    size_t initialSize;     ///< Initial allocated sample array size
     size_t storedSamples;   ///< Number of samples stored in the internal array
-    size_t maxSamples;      ///< Actual allocated size of sample array
   };
 };
 

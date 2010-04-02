@@ -23,23 +23,19 @@
 namespace lighter
 {
   IrradianceCache::IrradianceCache(const float bboxMin[3], const float bboxMax[3],
-                      const size_t maxSamps, const double maxError )
+                      const double maxError )
   {
     // Initialize all values
     storedSamples = 0;
-    initialSize = maxSamples = maxSamps;
-
-    // Allocate flat array to store samples
-    samples = (IrradianceSample*)malloc( sizeof( IrradianceSample ) * ( maxSamples ) );
 
     // Create initial root node
-    root = new OctreeSampleNode(samples, maxError);
+    root = new OctreeSampleNode(maxError);
     root->SetBoundingBox(bboxMin, bboxMax);
   }
 
   IrradianceCache::~IrradianceCache()
   {
-    free( samples );
+    delete root;
   }
 
   size_t IrradianceCache :: GetSampleCount() { return storedSamples; }
@@ -50,11 +46,8 @@ namespace lighter
                            const float power[3],
                            const float mean)
   {
-    // Check for storage and attempt to expand if needed
-    if (storedSamples>=maxSamples && !Expand())
-      return;
-
-    IrradianceSample *const node = &(samples[storedSamples]);
+    IrradianceSample *const node = new (samplePool) IrradianceSample;
+    storedSamples++;
 
     for (size_t i=0; i<3; i++)
     {
@@ -64,32 +57,31 @@ namespace lighter
     }
     node->mean = mean;
 
-    root->AddSample(storedSamples);
-
-    storedSamples++;
+    root->AddSample(node);
   }
 
   bool IrradianceCache :: EstimateIrradiance(
       const float pos[3], const float norm[3], float* &power)
   {
     // Put in sample struct
-    IrradianceSample* samp = new IrradianceSample();
-    samp->pos[0] = pos[0];
-    samp->pos[1] = pos[1];
-    samp->pos[2] = pos[2];
-    samp->norm[0] = norm[0];
-    samp->norm[1] = norm[1];
-    samp->norm[2] = norm[2];
+    IrradianceSample samp;
+    samp.pos[0] = pos[0];
+    samp.pos[1] = pos[1];
+    samp.pos[2] = pos[2];
+    samp.norm[0] = norm[0];
+    samp.norm[1] = norm[1];
+    samp.norm[2] = norm[2];
 
     // Build nearest struct
     NearestSamples* nearest = new NearestSamples();
     nearest->weights = new float[storedSamples];
-    nearest->samples = new IrradianceSample*[storedSamples];
+    nearest->samples = new IrradianceSample const*[storedSamples];
     nearest->count = 0;
 
     // Search Octree
-    root->FindSamples(samp, nearest);
+    root->FindSamples(&samp, nearest);
 
+    bool res;
     // Check results
     if(nearest->count > 0)
     {
@@ -100,7 +92,7 @@ namespace lighter
       for(size_t i=0; i<nearest->count; i++)
       {
         // Get local copies of data
-        IrradianceSample *Pi = nearest->samples[i];
+        const IrradianceSample *Pi = nearest->samples[i];
         float Wi = nearest->weights[i];
 
         // Add weighted power contribution
@@ -118,37 +110,17 @@ namespace lighter
       power[2] /= weightSum;
 
       // Signal success
-      return true;
+      res = true;
     }
     
     // No valid samples found
-    return false;
-  }
-
-
-  bool IrradianceCache :: Expand()
-  {
-    // Increase size by initial amount
-    size_t newMax = maxSamples + initialSize;
-
-    // Allocate a new array
-    IrradianceSample *newSamples =
-      (IrradianceSample*)malloc( sizeof( IrradianceSample ) * ( newMax ) );
-    if(newSamples == NULL) return false;
-
-    // Copy over old data
-    for(size_t i=0; i<maxSamples; i++)
-      newSamples[i] = samples[i];
-
-    // Free old array
-    free(samples);
-
-    // Replace old variables
-    samples = newSamples;
-    maxSamples = newMax;
-
-    // return success
-    return true;
+    res = false;
+    
+    delete[] nearest->weights;
+    delete[] nearest->samples;
+    delete nearest;
+    
+    return res;
   }
 
 };

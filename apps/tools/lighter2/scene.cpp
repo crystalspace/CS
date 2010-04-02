@@ -146,9 +146,9 @@ namespace lighter
     if(photonMap != NULL)
     {
       // First, initialize the irradiance cache
-      if(irradianceCache != NULL) delete irradianceCache;
+      delete irradianceCache;
       irradianceCache = new IrradianceCache(
-        photonMap->GetBBoxMin(), photonMap->GetBBoxMax(), 1000);
+        photonMap->GetBBoxMin(), photonMap->GetBBoxMax());
 
       // Balance the photons
       photonMap->Balance(prog);
@@ -205,7 +205,7 @@ namespace lighter
     if(irradianceCache == NULL)
     {
       irradianceCache = new IrradianceCache(
-        photonMap->GetBBoxMin(), photonMap->GetBBoxMax(), 1000);
+        photonMap->GetBBoxMin(), photonMap->GetBBoxMax());
     }
 
     irradianceCache->Store(fPos, fNorm, fPow, mean);

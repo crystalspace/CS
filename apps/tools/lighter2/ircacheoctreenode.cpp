@@ -26,15 +26,12 @@ namespace lighter
 {
   double OctreeSampleNode::alpha = 0.1;
 
-  OctreeSampleNode::OctreeSampleNode(IrradianceSample* parentArray,
-    const double newAlpha)
+  OctreeSampleNode::OctreeSampleNode(const double newAlpha)
   {
     if(newAlpha > 0.0)
     {
       OctreeSampleNode::alpha = newAlpha;
     }
-
-    masterArray = parentArray;
 
     isLeaf = true;
 
@@ -48,7 +45,7 @@ namespace lighter
   OctreeSampleNode::~OctreeSampleNode()
   {
     for(size_t i=0; i<8; i++)
-      if(child[i] != NULL) delete child[i];
+      delete child[i];
   }
 
   bool OctreeSampleNode::Shadowed(const IrradianceSample *A,
@@ -115,7 +112,7 @@ namespace lighter
     // Check all samples at this node
     for(size_t i=0; i<samples.GetSize(); i++)
     {
-      IrradianceSample *Pi = &(masterArray[samples[i]]);
+      const IrradianceSample *Pi = samples[i];
       if(!Shadowed(samp, Pi))
       {
         float weight = Weight(samp, Pi);
@@ -153,14 +150,14 @@ namespace lighter
     }
   }
 
-  void OctreeSampleNode::AddSample(const size_t newNode)
+  void OctreeSampleNode::AddSample(const IrradianceSample* newSample)
   {
     // Check if size is within specified limits
     float validRange =
-      masterArray[newNode].mean*OctreeSampleNode::alpha;
+      newSample->mean*OctreeSampleNode::alpha;
     if(size > 2.0*validRange && size < 4.0*validRange)
     {
-      samples.Push(newNode);
+      samples.Push (newSample);
     }
 
     // Otherwise, it doesn't go here
@@ -170,9 +167,9 @@ namespace lighter
       if(isLeaf) SplitNode();
 
       // Find child that bounds this new sample
-      bool xPlus = (masterArray[newNode].pos[0] >= center[0]);
-      bool yPlus = (masterArray[newNode].pos[1] >= center[1]);
-      bool zPlus = (masterArray[newNode].pos[2] >= center[2]);
+      bool xPlus = (newSample->pos[0] >= center[0]);
+      bool yPlus = (newSample->pos[1] >= center[1]);
+      bool zPlus = (newSample->pos[2] >= center[2]);
 
       // Only three tests to find the proper octant
       if(xPlus)
@@ -181,22 +178,22 @@ namespace lighter
         {
           if(zPlus)
           {
-            child[0]->AddSample(newNode);
+            child[0]->AddSample(newSample);
           }
           else
           {
-            child[4]->AddSample(newNode);
+            child[4]->AddSample(newSample);
           }
         }
         else
         {
           if(zPlus)
           {
-            child[3]->AddSample(newNode);
+            child[3]->AddSample(newSample);
           }
           else
           {
-            child[7]->AddSample(newNode);
+            child[7]->AddSample(newSample);
           }
         }
       }
@@ -206,22 +203,22 @@ namespace lighter
         {
           if(zPlus)
           {
-            child[1]->AddSample(newNode);
+            child[1]->AddSample(newSample);
           }
           else
           {
-            child[5]->AddSample(newNode);
+            child[5]->AddSample(newSample);
           }
         }
         else
         {
           if(zPlus)
           {
-            child[2]->AddSample(newNode);
+            child[2]->AddSample(newSample);
           }
           else
           {
-            child[6]->AddSample(newNode);
+            child[6]->AddSample(newSample);
           }
         }
       }
@@ -238,7 +235,7 @@ namespace lighter
     // Allocate children nodes
     for(size_t i=0; i<8; i++)
     {
-      child[i] = new OctreeSampleNode(masterArray);
+      child[i] = new OctreeSampleNode;
     }
 
     // Build child node bounding cubes
