@@ -134,7 +134,7 @@ namespace lighter
               csVector3 hNorm = hit.primitive->ComputeNormal(hit.hitPoint);
 
               // Make sure normal is facing towards source point
-              if(dirToSource*hNorm < 0.0) hNorm -= hNorm;
+              if(dirToSource*hNorm < 0.0) hNorm = -hNorm;
 
               // Sample the photon map at the hit point and accumulate the energy
               final += sector->SamplePhoton(hit.hitPoint, hNorm, searchRadius);
@@ -146,8 +146,11 @@ namespace lighter
         c = final * (PI / (numFinalGatherMSubdivs*numFinalGatherNSubdivs));
 
         // Cache the results
-        sector->AddToIRCache(point, normal, c, rayCount/meanDist);
-        globalStats.photonmapping.irCachePrimary++;
+	if (meanDist > 0) // avoid NaN in division below
+	{
+	  sector->AddToIRCache(point, normal, c, rayCount/meanDist);
+	  globalStats.photonmapping.irCachePrimary++;
+	}
       }
     }
 
@@ -330,7 +333,41 @@ namespace lighter
       // Record photon based on enabled options
       if((depth == 0 && !ignoreDirect) || depth > 0)
       {
-        sect->AddPhoton(reflColor, hit.hitPoint, L);
+	if (depth == 0)
+	{
+	  /*
+	    PHOTON ATTENUATION HACK
+	    [res] Photon mapping models an actual physical process. CS lights
+	    can have some decidedly unphysical properties.
+	    Take attenuation: when using photon mapping, lights inherently
+	    appear attenuated by the square of the distance from the light.
+	    How so? Well, imagine all the photons emitted from a light source
+	    on a sphere. The bigger you make the sphere, the more distant the
+	    photons get from each other. But since the number of photons stays
+	    the same, but they're spread over a bigger surface, the light gets
+	    attenuated. Since the sphere's surface grows with the square of
+	    it's radius we get said attenuation.
+	    Now, CS has that attenuation mode ("realistic") ... but also others
+	    which don't resemble anything physical at all (linear
+	    attenuation...). Now, in the interest of visual consistency - the
+	    same light should appear about the same, be it computed statically
+	    by raytracing, statically by photon mapping or in realtime.
+	    So for photon mapping direct lighting we hack the photon power so
+	    the inherent attenuation is counteracted and we get a result
+	    similar to what raytracing lighting would produce.
+	   */
+	  csColor hackedColor (reflColor);
+	  float photonWorldDistance = (photon.origin - hit.hitPoint).Norm();
+	  float csLightAtten = photon.source->ComputeAttenuation (photonWorldDistance);
+	  /* Note for directional lights: if they ever get photon mapping
+	     support - they don't have an inherent 'realistic' attenuation;
+	     instead, they would have inherent 'none' attenuation. */
+	  hackedColor *= csLightAtten/(photonWorldDistance*photonWorldDistance); 
+	  // Hack end
+	  sect->AddPhoton(hackedColor, hit.hitPoint, L);
+	}
+	else
+	  sect->AddPhoton(reflColor, hit.hitPoint, L);
       }
 
       // If indirect lighting is enabled, scatter the photon
