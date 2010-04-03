@@ -254,6 +254,7 @@ public:
     return SetEffectorPropValueT<csColor4>(effector, id, val);
   }
 
+  virtual bool AddProp(iParticleEffector* effector);
   virtual bool DeleteProp(iParticleEffector* effector, uint id);
 };
 

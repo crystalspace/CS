@@ -457,6 +457,12 @@ bool ParticlesTab::AddForce (const CEGUI::EventArgs& e)
   window = winMgr->getWindow("Particles/Edit");
   window->show();
 
+  window = winMgr->getWindow("Particles/Edit/AddProp");
+  window->show();
+
+  window = winMgr->getWindow("Particles/Edit/DeleteProp");
+  window->show();
+
   window = winMgr->getWindow("Particles/ChooseEffector");
   window->hide();
 
@@ -482,6 +488,12 @@ bool ParticlesTab::AddLinColor (const CEGUI::EventArgs& e)
   CEGUI::Window* window = 0;
 
   window = winMgr->getWindow("Particles/Edit");
+  window->show();
+
+  window = winMgr->getWindow("Particles/Edit/AddProp");
+  window->show();
+
+  window = winMgr->getWindow("Particles/Edit/DeleteProp");
   window->show();
 
   window = winMgr->getWindow("Particles/ChooseEffector");
@@ -511,6 +523,12 @@ bool ParticlesTab::AddVelField (const CEGUI::EventArgs& e)
   window = winMgr->getWindow("Particles/Edit");
   window->show();
 
+  window = winMgr->getWindow("Particles/Edit/AddProp");
+  window->show();
+
+  window = winMgr->getWindow("Particles/Edit/DeleteProp");
+  window->show();
+
   window = winMgr->getWindow("Particles/ChooseEffector");
   window->hide();
 
@@ -536,6 +554,12 @@ bool ParticlesTab::AddLinear (const CEGUI::EventArgs& e)
   CEGUI::Window* window = 0;
 
   window = winMgr->getWindow("Particles/Edit");
+  window->show();
+
+  window = winMgr->getWindow("Particles/Edit/AddProp");
+  window->show();
+
+  window = winMgr->getWindow("Particles/Edit/DeleteProp");
   window->show();
 
   window = winMgr->getWindow("Particles/ChooseEffector");
@@ -1139,7 +1163,28 @@ bool ParticlesTab::UpdateA (const CEGUI::EventArgs& e)
 
 bool ParticlesTab::AddProp (const CEGUI::EventArgs& e)
 {
-  printf("AddProp!\n");
+  if (effector)
+  {
+    csRef<iParticleBuiltinEffectorLinColor> lincolor = scfQueryInterface<iParticleBuiltinEffectorLinColor>(effector);
+    if(lincolor)
+    {
+      CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Particles/Edit/Properties");
+      float scrollPos = list->getVertScrollbar()->getScrollPosition();
+
+      asset->AddProp(effector);
+      UpdateList(asset->GetEffectorProps(effector), "Particles/Edit/Properties");
+
+      SetSelectedItemByID("Particles/Edit/Properties", (uint)list->getItemCount()-1);
+      list->getVertScrollbar()->setScrollPosition(scrollPos);
+    }
+
+    csRef<iParticleBuiltinEffectorVelocityField> velfield = scfQueryInterface<iParticleBuiltinEffectorVelocityField>(effector);
+    if(velfield)
+    {
+
+    }
+  }
+
   return true;
 }
 

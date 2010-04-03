@@ -1024,21 +1024,24 @@ csPtr<iStringArray> ParticlesAsset::GetLinColorProps(iParticleBuiltinEffectorLin
 {
   scfStringArray* arr = new scfStringArray;
 
-  if(lincolorProps.IsEmpty())
+  while(lincolorProps.GetSize() < 2 * effector->GetColorCount())
   {
-    for(size_t i=0; i<effector->GetColorCount(); ++i)
-    {
-      csColor4* color = new csColor4;
-      lincolorProps.Push(Property(Color4, static_cast<void*>(color)));
-    }
+    float* ttl = new float;
+    csColor4* color = new csColor4;
+    lincolorProps.Push(Property(Color4, static_cast<void*>(color)));
+    lincolorProps.Push(Property(Float, static_cast<void*>(ttl)));
   }
 
   for(size_t i=0; i<effector->GetColorCount(); ++i)
   {
     csString desc;
-    csColor4* color = (csColor4*)lincolorProps[i].valPtr;
+    csColor4* color = (csColor4*)lincolorProps[2*i].valPtr;
+    float* ttl = (float*)lincolorProps[2*i+1].valPtr;
     *color = effector->GetColor(i);
+    *ttl = effector->GetEndTTL(i);
     desc.Format("Color(%g, %g, %g, %g)", color->red, color->green, color->blue, color->alpha);
+    arr->Push(desc);
+    desc.Format("TTL(%g)", *ttl);
     arr->Push(desc);
   }
 
@@ -1320,8 +1323,17 @@ bool ParticlesAsset::UpdateLinColorProp(iParticleBuiltinEffectorLinColor* lincol
 {
   if(id < lincolorProps.GetSize())
   {
-    csColor4* color = (csColor4*)lincolorProps[id].valPtr;
-    lincolor->SetColor(id, *color);
+    if(lincolorProps[id].type == Color4)
+    {
+      csColor4* color = (csColor4*)lincolorProps[id].valPtr;
+      lincolor->SetColor(id/2, *color);
+    }
+    else if(lincolorProps[id].type == Float)
+    {
+      float* ttl = (float*)lincolorProps[id].valPtr;
+      lincolor->SetEndTTL(id/2, *ttl);
+    }
+
     return true;
   }
 
@@ -1396,6 +1408,24 @@ bool ParticlesAsset::UpdateLinearProp(iParticleBuiltinEffectorLinear* linear, ui
   linear->SetParameterSet(paramSet, newSet);
 
   return true;
+}
+
+bool ParticlesAsset::AddProp(iParticleEffector* effector)
+{
+  // Test for the type.
+  csRef<iParticleBuiltinEffectorLinColor> lincolor = scfQueryInterface<iParticleBuiltinEffectorLinColor>(effector);
+  if(lincolor)
+  {
+    lincolor->AddColor(csColor4(0.0f, 0.0f, 0.0f), 0.0f);
+    return true;
+  }
+
+  csRef<iParticleBuiltinEffectorVelocityField> velfield = scfQueryInterface<iParticleBuiltinEffectorVelocityField>(effector);
+  if(velfield)
+  {
+  }
+
+  return false;
 }
 
 bool ParticlesAsset::DeleteProp(iParticleEffector* effector, uint id)

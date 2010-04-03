@@ -226,6 +226,7 @@ public:
   virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csVector3& val) { return false; }
   virtual bool SetEffectorPropValue(iParticleEffector* effector, uint id, csColor4& val) { return false; }
 
+  virtual bool AddProp(iParticleEffector* effector) { return false; }
   virtual bool DeleteProp(iParticleEffector* effector, uint id) { return false; }
 };
 
