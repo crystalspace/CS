@@ -161,14 +161,13 @@ namespace lighter
     if(irradianceCache == NULL) return false;
 
     // Check cache to see if we can reuse old results
-    float* result = new float[3];
+    float result[3];
     float fPos[3] = { point.x, point.y, point.z };
     float fNorm[3] = { normal.x, normal.y, normal.z };
     
     if(irradianceCache->EstimateIrradiance(fPos, fNorm, result))
     {
       irrad.Set(result[0], result[1], result[2]);
-      delete [] result;
       return true;
     }
 

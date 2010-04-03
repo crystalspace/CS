@@ -68,7 +68,7 @@ namespace lighter
     bool EstimateIrradiance(
       const float pos[3],
       const float norm[3],
-      float* &power);
+      float* power);
 
     size_t GetSampleCount();
 
