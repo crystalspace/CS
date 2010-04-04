@@ -48,8 +48,8 @@ class SintelScene : public AvatarScene
   // User interaction with the scene
   void ResetScene ();
 
-  // Display of comments 
-  void DisplayKeys ();
+  // Display of information on the state of the scene
+  void UpdateStateDescription ();
 
  private:
   AvatarTest* avatarTest;

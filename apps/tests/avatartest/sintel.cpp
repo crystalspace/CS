@@ -18,6 +18,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+#include "cssysdef.h"
 #include "sintel.h"
 
 #define EXPRESSION_TRANSITION_DURATION 250.0f
@@ -26,6 +28,16 @@ SintelScene::SintelScene (AvatarTest* avatarTest)
   : avatarTest (avatarTest), activeFacialExpression (0),
     currentExpressionIndex (0), activeFacialTransition (false)
 {
+  // Define the available keys
+  avatarTest->keyDescriptions.DeleteAll ();
+  avatarTest->keyDescriptions.Push ("arrow keys: move camera");
+  avatarTest->keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->keyDescriptions.Push ("1: neutral");
+  avatarTest->keyDescriptions.Push ("2: smiling");
+  avatarTest->keyDescriptions.Push ("3: angry");
+  avatarTest->keyDescriptions.Push ("4: sad");
+  avatarTest->keyDescriptions.Push ("r: reset scene");
+  avatarTest->keyDescriptions.Push ("n: switch to next scene");
 }
 
 SintelScene::~SintelScene ()
@@ -468,42 +480,7 @@ void SintelScene::ResetScene ()
 {
 }
 
-void SintelScene::DisplayKeys ()
+void SintelScene::UpdateStateDescription ()
 {
-  int x = 20;
-  int y = 20;
-  int fg = avatarTest->g2d->FindRGB (255, 150, 100);
-  int lineSize = 18;
-
-  // Write available keys
-  avatarTest->WriteShadow (x - 5, y, fg, "Keys available:");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "1: neutral");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "2: smiling");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "3: angry");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "4: sad");
-  y += lineSize;
-
-  //avatarTest->WriteShadow (x, y, fg, "r: reset scene");
-  //y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "n: switch to next scene");
-  y += lineSize;
-
-  // Write FPS and other info
-  y = 480;
-  csTicks elapsed_time = avatarTest->vc->GetElapsedTicks ();
-  const float speed = elapsed_time / 1000.0f;
-  if (speed != 0.0f)
-  {
-    avatarTest->WriteShadow (x, y, fg, "FPS: %.2f", 1.0f / speed);
-    y += lineSize;
-  }
+  avatarTest->stateDescriptions.DeleteAll ();
 }

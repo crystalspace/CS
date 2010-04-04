@@ -19,25 +19,17 @@
 #ifndef __PHYSTUT_H__
 #define __PHYSTUT_H__
 
-#include <stdarg.h>
-#include <crystalspace.h>
+#include "cstool/csdemoapplication.h"
+#include "ivaria/dynamics.h"
+#include "ivaria/bullet.h"
+#include "ivaria/ode.h"
 #include "ivaria/dynamicsdebug.h"
+#include "imesh/animesh.h"
+#include "imesh/ragdoll.h"
 
-class Simple : public csApplicationFramework, public csBaseEventHandler
+class Simple : public csDemoApplication
 {
 private:
-  // Engine related
-  csRef<iEngine> engine;
-  csRef<iLoader> loader;
-  csRef<iGraphics3D> g3d;
-  csRef<iGraphics2D> g2d;
-  csRef<iKeyboardDriver> kbd;
-  csRef<iVirtualClock> vc;
-  csRef<iView> view;
-  csRef<iCollideSystem> cdsys;
-  csRef<FramePrinter> printer;
-  csRef<iFont> courierFont;
-
   // Physics related
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;
@@ -49,7 +41,6 @@ private:
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
   csRef<iMeshWrapper> walls;
-  iSector* room;
 
   // Configuration related
   int solver;
@@ -66,7 +57,7 @@ private:
   float dynamicSpeed;
 
   // Camera related
-  int cameraMode;
+  int physicalCameraMode;
   csRef<iRigidBody> cameraBody;
   float rotX, rotY, rotZ;
 
@@ -83,34 +74,27 @@ private:
   // Camera
   void UpdateCameraMode ();
 
-  // Spawning meshes
-  bool CreateStarCollider ();
-  iRigidBody* CreateBox ();
-  iRigidBody* CreateSphere ();
-  iRigidBody* CreateCylinder ();
-  iRigidBody* CreateCapsule ();
-  iRigidBody* CreateMesh ();
-  iRigidBody* CreateConvexMesh ();
-  iJoint* CreateJointed ();
-  void CreateChain ();
+  // Spawning objects
+  bool SpawnStarCollider ();
+  iRigidBody* SpawnBox ();
+  iRigidBody* SpawnSphere ();
+  iRigidBody* SpawnCylinder ();
+  iRigidBody* SpawnCapsule ();
+  iRigidBody* SpawnMesh ();
+  iRigidBody* SpawnConvexMesh ();
+  iJoint* SpawnJointed ();
+  void SpawnChain ();
   void LoadRagdoll ();
-  void CreateRagdoll ();
+  void SpawnRagdoll ();
   void CreateWalls (const csVector3& radius);
-
-  // Display of comments 
-  void DisplayKeys ();
-  void WriteShadow (int x,int y,int fg,const char *str,...);
-  void Write(int x,int y,int fg,int bg,const char *str,...);
 
 public:
   Simple ();
   ~Simple ();
 
   //-- csApplicationFramework
-  void OnExit ();
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();
 };
 
 #endif // __PHYSTUT_H__
-

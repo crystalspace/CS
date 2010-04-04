@@ -18,6 +18,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+#include "cssysdef.h"
 #include "frankie.h"
 
 #define LOOKAT_CAMERA 1
@@ -31,6 +33,21 @@
 FrankieScene::FrankieScene (AvatarTest* avatarTest)
   : avatarTest (avatarTest), targetReached (false), lookAtListener (this)
 {
+  // Define the available keys
+  avatarTest->keyDescriptions.DeleteAll ();
+  avatarTest->keyDescriptions.Push ("arrow keys: move camera");
+  avatarTest->keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->keyDescriptions.Push ("+/-: walk faster/slower");
+  avatarTest->keyDescriptions.Push ("t: toggle 'LookAt' target mode");
+  avatarTest->keyDescriptions.Push ("a: toggle 'LookAt: always rotate' mode");
+  avatarTest->keyDescriptions.Push ("s: toggle 'LookAt: rotation speed'");
+  if (avatarTest->physicsEnabled)
+  {
+    avatarTest->keyDescriptions.Push ("left mouse: kill Frankie");
+    avatarTest->keyDescriptions.Push ("d: display active colliders");
+  }
+  avatarTest->keyDescriptions.Push ("r: reset scene");
+  avatarTest->keyDescriptions.Push ("n: switch to next scene");
 }
 
 FrankieScene::~FrankieScene ()
@@ -515,85 +532,31 @@ void FrankieScene::ResetScene ()
   frankieDead = false;
 }
 
-void FrankieScene::DisplayKeys ()
+void FrankieScene::UpdateStateDescription ()
 {
-  int x = 20;
-  int y = 20;
-  int fg = avatarTest->g2d->FindRGB (255, 150, 100);
-  int lineSize = 18;
-
-  // Write available keys
-  avatarTest->WriteShadow (x - 5, y, fg, "Keys available:");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "arrow keys: move camera");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "SHIFT-up/down keys: camera closer/farther");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "+/-: walk faster/slower");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "t: toggle 'LookAt' target mode");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "a: toggle 'LookAt: always rotate' mode");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "s: toggle 'LookAt: rotation speed'");
-  y += lineSize;
-
-  if (avatarTest->physicsEnabled)
-  {
-    avatarTest->WriteShadow (x, y, fg, "left mouse: kill Frankie");
-    y += lineSize;
-
-    avatarTest->WriteShadow (x, y, fg, "d: display active colliders");
-    y += lineSize;
-  }
-
-  avatarTest->WriteShadow (x, y, fg, "r: reset scene");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "n: switch to next scene");
-  y += lineSize;
-
-  // Write FPS and other info
-  y = 480;
+  avatarTest->stateDescriptions.DeleteAll ();
 
   if (targetMode == LOOKAT_CAMERA)
-    avatarTest->WriteShadow (x, y, fg, "Watch out, Frankie is looking at you!");
+    avatarTest->stateDescriptions.Push ("Watch out, Frankie is looking at you!");
   else if (targetMode == LOOKAT_POSITION)
-    avatarTest->WriteShadow (x, y, fg, "Frankie is looking at something");
+    avatarTest->stateDescriptions.Push ("Frankie is looking at something");
   else if (targetMode == LOOKAT_NOTHING)
-    avatarTest->WriteShadow (x, y, fg, "Frankie doesn't care about anything");
-  y += lineSize;
+    avatarTest->stateDescriptions.Push ("Frankie doesn't care about anything");
 
   if (alwaysRotate)
-    avatarTest->WriteShadow (x, y, fg, "Always rotate: ON");
+    avatarTest->stateDescriptions.Push ("Always rotate: ON");
   else
-    avatarTest->WriteShadow (x, y, fg, "Always rotate: OFF");
-  y += lineSize;
+    avatarTest->stateDescriptions.Push ("Always rotate: OFF");
 
   if (rotationSpeed == ROTATION_SLOW)
-    avatarTest->WriteShadow (x, y, fg, "Rotation speed: really slow");
+    avatarTest->stateDescriptions.Push ("Rotation speed: really slow");
   else if (rotationSpeed == ROTATION_NORMAL)
-    avatarTest->WriteShadow (x, y, fg, "Rotation speed: normal");
+    avatarTest->stateDescriptions.Push ("Rotation speed: normal");
   else if (rotationSpeed == ROTATION_IMMEDIATE)
-    avatarTest->WriteShadow (x, y, fg, "Rotation speed: infinite");
-  y += lineSize;
+    avatarTest->stateDescriptions.Push ("Rotation speed: infinite");
 
-  avatarTest->WriteShadow (x, y, fg, "Walk speed: %.1f",
-	      ((float) currentSpeed) / 10.0f);
-  y += lineSize;
-
-  csTicks elapsed_time = avatarTest->vc->GetElapsedTicks ();
-  const float speed = elapsed_time / 1000.0f;
-  if (speed != 0.0f)
-  {
-    avatarTest->WriteShadow (x, y, fg, "FPS: %.2f", 1.0f / speed);
-    y += lineSize;
-  }
+  csString txt;
+  txt.Format ("Walk speed: %.1f", ((float) currentSpeed) / 10.0f);
+  avatarTest->stateDescriptions.Push (txt);
 }
 

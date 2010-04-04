@@ -21,8 +21,14 @@
 #ifndef __AVATARTEST_H__
 #define __AVATARTEST_H__
 
-#include <stdarg.h>
-#include <crystalspace.h>
+#include "cstool/csdemoapplication.h"
+#include "imesh/animesh.h"
+#include "imesh/ragdoll.h"
+#include "imesh/lookat.h"
+#include "imesh/basicskelanim.h"
+#include "ivaria/dynamics.h"
+#include "ivaria/bullet.h"
+#include "ivaria/dynamicsdebug.h"
 
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
@@ -53,15 +59,15 @@ class AvatarScene
   // User interaction with the scene
   virtual void ResetScene () = 0;
 
-  // Display of comments 
-  virtual void DisplayKeys () = 0;
+  // Display of information on the state of the scene
+  virtual void UpdateStateDescription () = 0;
 
   // Animesh
   csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
 };
 
-class AvatarTest : public csApplicationFramework, public csBaseEventHandler
+class AvatarTest : public csDemoApplication
 {
   friend class FrankieScene;
   friend class KrystalScene;
@@ -69,19 +75,7 @@ class AvatarTest : public csApplicationFramework, public csBaseEventHandler
 
 private:
   AvatarScene* avatarScene;
-
-  // Engine related
-  csRef<iEngine> engine;
-  csRef<iLoader> loader;
-  csRef<iGraphics3D> g3d;
-  csRef<iGraphics2D> g2d;
-  csRef<iKeyboardDriver> kbd;
-  csRef<iVirtualClock> vc;
-  csRef<iView> view;
-  csRef<FramePrinter> printer;
-
-  csRef<iFont> courierFont;
-  iSector* room;
+  int avatarSceneType;
 
   // Physics related
   bool physicsEnabled;
@@ -102,20 +96,11 @@ private:
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
 
-  // Creation of objects
-  void CreateRoom ();
-  int avatarModel;
-
-  // Display of comments 
-  void WriteShadow (int x, int y, int fg, const char *str,...);
-  void Write(int x, int y, int fg, int bg, const char *str,...);
-
  public:
   AvatarTest ();
   ~AvatarTest ();
 
   //-- csApplicationFramework
-  void OnExit ();
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();
 };
