@@ -9,27 +9,7 @@
 #import "csplugincommon/macosx/OSXDelegate2D.h"
 
 
-// Create a small category for NSOpenGLContext to give access to the CGL context
-@interface NSOpenGLContext (CGLContextAccess)
-
-// Return the CGL context
-- (CGLContextObj) getCGLContext;
-
-@end
-
-@implementation NSOpenGLContext (CGLContextAccess)
-
-// getCGLContext
-// Returns the (private) CGL context
-- (CGLContextObj) getCGLContext
-{
-    return _contextAuxiliary;
-}
-
-@end
-
 ///// Delegate category
-
 
 @interface OSXDelegate2D (OpenGL)
 
@@ -125,7 +105,7 @@ NSOpenGLContext *context;
     // Make the context we created be the current GL context
     [context makeCurrentContext];
 
-    return [context getCGLContext];
+    return (CGLContextObj)[context CGLContextObj];
 }
 
 // getOpenGLPixelFormat
