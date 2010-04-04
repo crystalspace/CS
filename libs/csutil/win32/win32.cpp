@@ -670,7 +670,7 @@ bool Win32Assistant::HandleEvent (iEvent& e)
    #endif
 
     csPrintf ("Win32-specific options:\n");
-    csPrintf ("  -[no]console       Create a debug console (default = %s)\n",     
+    csPrintf ("  -[no]console       Create a debug console (default = %s)\n\n",
       defcon);
   }
   return false;

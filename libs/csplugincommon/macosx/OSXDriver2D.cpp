@@ -147,7 +147,7 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
     else if (ev.Name == commandLineHelpEvt)
     {
       csPrintf("Options for MacOS X 2D graphics drivers:\n"
-	       "  -screen=<num>      Screen number to display on (default=0)\n");
+	       "  -screen=<num>      Screen number to display on (default=0)\n\n");
       handled = true;
     }
     else if (ev.Name == keyboardDownEvt)

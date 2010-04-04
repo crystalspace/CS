@@ -107,19 +107,18 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
       else
         csPrintf ("Options for unknown plugin:\n");
       Help (config);
+      csPrintf ("\n");
     }
   }
 
   //@@@???
   csPrintf (
 "General options:\n"
-"  -help              this help\n"
-"  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n"
-"  -cfgfile=<file>    load a configuration file\n"
-"  -cfgset=<key=val>  specify a configuration setting\n"
-"  -plugin=<s>        load the plugin after all others\n"
-"  -verbose           be more verbose; print better diagnostic messages\n"
-"  -video=<s>         the 3D rendering driver (opengl, software, ...)\n");
+"  -help              Print this help\n"
+"  -cfgfile=<file>    Load a configuration file\n"
+"  -cfgset=<key=val>  Specify a configuration setting\n"
+"  -plugin=<s>        Load the plugin after all others\n"
+"  -verbose           Be more verbose; print better diagnostic messages\n");
 }
 
 bool csCommandLineHelper::CheckHelp (iObjectRegistry* object_reg,
