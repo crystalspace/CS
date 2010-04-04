@@ -634,6 +634,8 @@ csODEDynamicSystem::csODEDynamicSystem (iObjectRegistry* object_reg,
       object_reg, "crystalspace.shared.stringset");
   base_id = strings->Request ("base");
   colldet_id = strings->Request ("colldet");
+
+  dWorldSetGravity (worldID, 0.0f, -9.81f, 0.0f);
 }
 
 csODEDynamicSystem::~csODEDynamicSystem ()
