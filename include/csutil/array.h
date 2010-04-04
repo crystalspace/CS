@@ -47,7 +47,7 @@
 
 /**
  * A functor template which encapsulates a key and a comparison function for
- * use with key-related csArray<> searching methods, such as FindKey() and
+ * use with key-related csArray searching methods, such as FindKey() and
  * FindSortedKey().  Being a template instaniated upon two (possibly distinct)
  * types, this allows the searching methods to perform type-safe searches even
  * when the search key type differs from the contained element type.  The
@@ -60,7 +60,7 @@ class csArrayCmp
 public:
   /**
    * Type of the comparison function which compares a key against an element
-   * contained in a csArray<>.  T is the type of the contained element.  K is
+   * contained in a csArray.  T is the type of the contained element.  K is
    * the type of the search key.
    */
   typedef int(*CF)(T const&, K const&);
@@ -396,7 +396,7 @@ const size_t csArrayItemNotFound = (size_t)-1;
  * copy-constructor and are destroyed when they are removed from the array or
  * the array is destroyed.
  * \note If you want to store reference-counted object pointers, such as iFoo*,
- * then you should consider csRefArray<>, which is more idiomatic than
+ * then you should consider csRefArray, which is more idiomatic than
  * csArray<csRef<iFoo> >.
  */
 template <class T,
@@ -1340,7 +1340,7 @@ public:
 };
 
 /**
- * Convenience class to make a version of csArray<> that does a
+ * Convenience class to make a version of csArray that does a
  * safe-copy in case of reallocation of the array. Useful for weak
  * references.
  */
