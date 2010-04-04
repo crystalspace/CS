@@ -190,6 +190,9 @@ bool ImposterTest::SetupModules()
   g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
+  csRef<iConfigManager> cfman = csQueryRegistry<iConfigManager>(GetObjectRegistry());
+  cfman->SetInt("Engine.Imposters.UpdatePerFrame", 25);
+
   engine = csQueryRegistry<iEngine> (GetObjectRegistry());
   if (!engine) return ReportError("Failed to locate 3D engine!");
 
@@ -256,7 +259,7 @@ void ImposterTest::CreateRoom ()
   // First we make a primitive for our geometry.
   using namespace CS::Geometry;
   DensityTextureMapper mapper (0.3f);
-  TesselatedBox box (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
+  TesselatedBox box (csVector3 (-6, -6, -6), csVector3 (6, 6, 6));
   box.SetLevel (3);
   box.SetMapper (&mapper);
   box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
@@ -328,7 +331,6 @@ void ImposterTest::CreateSprites ()
   i->SetRotationTolerance(0.40f);
   i->SetCameraRotationTolerance(3.0f);
   i->SetShader("lighting_imposter");
-  i->SetInstancing(false);
   i->SetRenderReal(true);
 
   look_point = csVector3 (1, 1, 1);

@@ -38,18 +38,22 @@ struct iSharedVariable;
  */
 struct iImposterFactory : public virtual iBase
 {
-  SCF_INTERFACE(iImposterFactory, 1, 1, 0);
+  SCF_INTERFACE(iImposterFactory, 1, 3, 0);
 
-  /**
-   * Given a mesh, activate and update its imposter.
-   * Return the render mesh for this imposter.
-   */
-  virtual bool UpdateImposter(iMeshWrapper* mesh, iRenderView* rview) = 0;
+ /**
+  * Given a mesh, activate its imposter.
+  */
+  virtual void AddImposter(iMeshWrapper* mesh, iRenderView* rview) = 0;
 
-  /**
-   * Given a mesh, deactivate and remove its imposter.
-   */
+ /**
+  * Given a mesh, deactivate and remove its imposter.
+  */
   virtual void RemoveImposter(iMeshWrapper* mesh) = 0;
+
+ /**
+  * Whether we are currently rendering the imposter
+  */
+  virtual bool RenderingImposter(iMeshWrapper* mesh) = 0;
 
   /**
    * Sets the minimum imposter distance.
@@ -94,11 +98,6 @@ struct iImposterFactory : public virtual iBase
   virtual void SetShader(const char* shader) = 0;
 
   /**
-   * Sets what method of impostering (instancing or not) to use.
-   */
-  virtual void SetInstancing(bool instancing) = 0;
-
-  /**
   * Sets whether to render the real mesh while waiting for the imposter to init.
   */
   virtual void SetRenderReal(bool renderReal) = 0;
@@ -106,33 +105,7 @@ struct iImposterFactory : public virtual iBase
 
 struct iImposterMesh : public virtual iBase
 {
-  SCF_INTERFACE(iImposterMesh, 1, 0, 0);
-
-  /**
-   * Whether this imposter is currently instancing any meshes.
-   */
-  virtual bool IsInstancing() = 0;
-
-  /**
-   * Add an instance of the passed mesh.
-   * Returns true if able to add an instance for this mesh.
-   * Returns false otherwise.
-   */
-  virtual bool Add(iMeshWrapper* mesh, iRenderView* rview) = 0;
-
-  /**
-   * Update the instance of the passed mesh.
-   * Returns true if able to update an instance for this mesh.
-   * Returns false otherwise.
-   */
-  virtual bool Update(iMeshWrapper* mesh, iRenderView* rview) = 0;
-
-  /**
-   * Remove the instance of the passed mesh.
-   * Returns false if not currently instancing this mesh.
-   * Returns true otherwise.
-   */
-  virtual bool Remove(iMeshWrapper* mesh) = 0;
+  SCF_INTERFACE(iImposterMesh, 1, 1, 0);
 
   /**
    * Destroy this imposter.

@@ -517,14 +517,19 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
 
   if (factory && drawing_imposter != rview->GetCamera())
   {
-    csRef<iImposterFactory> factwrap = scfQueryInterfaceSafe<iImposterFactory> (factory);
+    csRef<iImposterFactory> factwrap = scfQueryInterface<iImposterFactory> (factory);
     if (factwrap)
     {
       if (UseImposter (rview))
       {
-        if(factwrap->UpdateImposter (this, rview))
+        if (!using_imposter)
         {
+          factwrap->AddImposter (this, rview);
           using_imposter = true;
+        }
+
+        if(factwrap->RenderingImposter (this))
+        {
           n = 0;
           return 0;
         }

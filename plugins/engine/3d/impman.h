@@ -99,7 +99,6 @@ private:
     bool update;
     bool remove;
 
-    float lastDistance;
     size_t texWidth;
     size_t texHeight;
 
@@ -109,8 +108,7 @@ private:
 
     ImposterMat(iImposterMesh* imesh)
       : init(false), update(false),
-      remove(false), lastDistance(FLT_MAX),
-      allocatedSpace(0)
+      remove(false), allocatedSpace(0)
     {
       mesh = static_cast<csImposterMesh*>(imesh);
     }
@@ -133,10 +131,15 @@ private:
   bool InitialiseImposter(ImposterMat* imposter);
 
   /* Updated an imposter. */
-  bool UpdateImposter(ImposterMat* imposter);
+  void UpdateImposter(ImposterMat* imposter);
 
-  csRefArray<ImposterMat> imposterMats;
+  /* Hash of imposter mesh<->mat */
+  csHash<csRef<ImposterMat>, csPtrKey<iImposterMesh> > imposterMats;
+
+  /* Queues for processing updates to imposters */
+  csRefArray<ImposterMat> initQueue;
   csRefArray<ImposterMat> updateQueue;
+  csRefArray<ImposterMat> removeQueue;
 
   csEngine* engine;
 

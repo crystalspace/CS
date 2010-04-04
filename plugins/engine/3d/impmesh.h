@@ -54,29 +54,8 @@ class csImposterMesh : public scfImplementationExt2<
 	csImposterMesh, csObjectModel, iImposterMesh, iMeshObject>
 {
 private:
-  // Imposter instance data.
-  struct Instance
-  {
-    iMeshWrapper* mesh;
-    csRef<csShaderVariable> transformVar;
-    csRef<csShaderVariable> fadeFactor;
-
-    Instance(iMeshWrapper* mesh) : mesh(mesh)
-    {
-    }
-  };
-
-  // Array of imposter instances.
-  csArray<Instance*> instances;
-
   // Mesh billboard for this imposter.
   csRef<iMeshWrapper> mesh;
-
-  // Array of transform vars for the imposter instances.
-  csRef<csShaderVariable> transformVars;
-
-  // Array of fade factors for the imposter instances.
-  csRef<csShaderVariable> fadeFactors;
 
   // Factory that we're created from.
   iImposterFactory* fact;
@@ -87,12 +66,6 @@ private:
   csEngine *engine;
 
   iSector* sector;
-
-  // Whether or not we're instancing.
-  bool instance;
-
-  // True if we're ready to be removed.
-  bool removeMe;
 
   // Shader to use on the imposter material.
   csString shader;
@@ -128,13 +101,16 @@ private:
   csBox2 texCoords;
 
   // The camera this mesh is being viewed through.
-  csWeakRef<iCamera> camera;
+  csRef<iCamera> camera;
 
-  // The distance to the closest instance of this imposter.
-  float closestInstance;
+  // The distance to the real mesh of this imposter.
+  float realDistance;
 
-  // The closest instance of the mesh.
-  csWeakRef<iMeshWrapper> closestInstanceMesh;
+  // The last distance at which we requested a material update.
+  float lastDistance;
+
+  // The original mesh.
+  csWeakRef<iMeshWrapper> originalMesh;
 
   // True if currently awaiting an update.
   bool isUpdating;
@@ -156,22 +132,20 @@ private:
   // Number of meshes to update (for batching).
   uint updatePerFrame;
 
-  void AddSVToMesh(iMeshWrapper* mesh, csShaderVariable* sv);
-
-  void CreateInstance(iMeshWrapper* pmesh);
-
-  void DestroyInstance(Instance* instance);
-
   void InitMesh();
 
   bool WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh);
 
   void SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRenderView* rview);
 
-  void SetupRenderMeshesInstance(csRenderMesh*& mesh,  bool rmCreated, iCamera* camera);
 
   // For batched imposter sorting.
   static int ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s);
+
+  /**
+   * Update the imposter.
+   */
+  void Update(iRenderView* rview);
 
   friend class csImposterManager;
 
@@ -179,38 +153,11 @@ public:
   csImposterMesh (csEngine* engine, iSector* sector);
 
   csImposterMesh (csEngine* engine, iImposterFactory* fact,
-    iMeshWrapper* mesh, iRenderView* rview, bool instance, const char* shader);
-  virtual ~csImposterMesh () {}
+    iMeshWrapper* mesh, iRenderView* rview, const char* shader);
+  virtual ~csImposterMesh () {};
 
   ///////////////////// iImposterMesh /////////////////////
-
-  /**
-   * Whether this imposter is currently instancing any meshes.
-   */
-  virtual bool IsInstancing()
-  { return (!instance && !removeMe) || instances.GetSize() != 0; }
-
-  /**
-   * Add an instance of the passed mesh.
-   * Returns true if able to add an instance for this mesh.
-   * Returns false otherwise.
-   */
-  virtual bool Add(iMeshWrapper* mesh, iRenderView* rview);
-
-  /**
-   * Update the instance of the passed mesh.
-   * Returns false if the mesh instance was removed (no longer valid for this imposter).
-   * Returns true otherwise.
-   */
-  virtual bool Update(iMeshWrapper* mesh, iRenderView* rview);
-
-  /**
-   * Remove the instance of the passed mesh.
-   * Returns false if not currently instancing this mesh.
-   * Returns true otherwise.
-   */
-  virtual bool Remove(iMeshWrapper* mesh);
-
+  
   /**
    * Destroy this imposter.
    */
@@ -237,7 +184,7 @@ public:
 
   virtual void GetRadius (float& rad, csVector3& cent)
   {
-    instances[0]->mesh->GetMeshObject()->GetObjectModel()->GetRadius(rad, cent);
+    originalMesh->GetMeshObject()->GetObjectModel()->GetRadius(rad, cent);
   }
 
   ///////////////////// iMeshObject /////////////////////

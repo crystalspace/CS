@@ -666,6 +666,9 @@ csSectorVisibleRenderMeshes* csSector::GetVisibleRenderMeshes (int& num,
       meshes[i]->db_mesh_name = cmesh->GetName ();
   #endif
 
+    if (meshes == 0 && num == 0)
+      return 0;
+
     oneVisibleMesh[0].imesh = mesh;
     oneVisibleMesh[0].num = num;
     oneVisibleMesh[0].rmeshes = meshes;
