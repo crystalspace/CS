@@ -274,7 +274,7 @@ OSStatus csSndSysDriverCoreAudio::AudioProc(AudioDeviceID inDevice,
   // number of frames provided
     OSStatus stat = 0;
     size_t framesFilled = attached_renderer->FillDriverBuffer( convert_buffer, convert_size, 0, 0);
-	size_t bytesWritten = outOutputData->mBuffers[0].mDataByteSize;
+    UInt32 bytesWritten = outOutputData->mBuffers[0].mDataByteSize;
     stat = AudioConverterConvertBuffer(converter, framesFilled * playback_format.Bits/8 * playback_format.Channels, convert_buffer, &bytesWritten, outOutputData->mBuffers[0].mData); 
     if(stat){
 	  //attached_renderer->RecordEvent(SSEC_DRIVER,SSEL_DEBUG, "Audio convert error %c%c%c%c", SPLIT_TO_CHARS(stat));
