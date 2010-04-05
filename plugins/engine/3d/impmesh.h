@@ -50,37 +50,28 @@ CS_PLUGIN_NAMESPACE_END(Engine)
 /**
  * Class representing the mesh/imposter relation.
  */
-class csImposterMesh : public scfImplementationExt2<
-	csImposterMesh, csObjectModel, iImposterMesh, iMeshObject>
+class csImposterMesh : public scfImplementation1<
+	csImposterMesh, iImposterMesh>
 {
 private:
-  // Mesh billboard for this imposter.
-  csRef<iMeshWrapper> mesh;
-
   // Factory that we're created from.
   iImposterFactory* fact;
 
+  // Imposter manager ptr.
   csRef<iImposterManager> impman;
 
-  // Convenience shortcut
-  csEngine *engine;
-
+  // Sector that the imposter is in.
   iSector* sector;
 
   // Shader to use on the imposter material.
   csString shader;
 
-  // Flags that indicate that we have been updated.
+  // Indicates whether we need a material update.
   bool materialUpdateNeeded;
-  bool matDirty;
-  bool meshDirty;
 
   // Saved values for update checking.
   csVector3 meshLocalDir;
   csVector3 cameraLocalDir;
-
-  // Rendermesh holder for this mesh
-  csRenderMeshHolder rmHolder;
 
   // Rect for billboard
   csPoly3D vertices;
@@ -90,12 +81,6 @@ private:
 
   // Imposter material.
   csRef<iMaterialWrapper> mat;
-
-  // Imposter meshes (for batched rendering).
-  csRefArray<csImposterMesh> imposterMeshes;
-
-  // Number of meshes at last update.
-  size_t numImposterMeshes;
 
   // Texture coordinates.
   csBox2 texCoords;
@@ -115,32 +100,12 @@ private:
   // True if currently awaiting an update.
   bool isUpdating;
 
-  // Flags for iMeshObject.
-  csFlags flags;
-
-  // Bounding box.
-  csBox3 bbox;
-
-  csRef<iGraphics3D> g3d;
-
   // True if r2t has been performed for this imposter.
   bool rendered;
-
-  // Current mesh being updated.
-  uint currentMesh;
-
-  // Number of meshes to update (for batching).
-  uint updatePerFrame;
 
   void InitMesh();
 
   bool WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh);
-
-  void SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRenderView* rview);
-
-
-  // For batched imposter sorting.
-  static int ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s);
 
   /**
    * Update the imposter.
@@ -148,10 +113,9 @@ private:
   void Update(iRenderView* rview);
 
   friend class csImposterManager;
+  friend class csBatchedImposterMesh;
 
 public:
-  csImposterMesh (csEngine* engine, iSector* sector);
-
   csImposterMesh (csEngine* engine, iImposterFactory* fact,
     iMeshWrapper* mesh, iRenderView* rview, const char* shader);
   virtual ~csImposterMesh () {};
@@ -170,6 +134,58 @@ public:
   {
     return rendered;
   }
+};
+
+class csBatchedImposterMesh : public scfImplementationExt1<
+	csBatchedImposterMesh, csObjectModel, iMeshObject>
+{
+private:
+  // Convenience shortcut
+  csEngine *engine;
+
+  iSector* sector;
+
+  // Imposter batch meshwrapper.
+  csRef<iMeshWrapper> mesh;
+
+  // Imposter batch material.
+  csRef<iMaterialWrapper> mat;
+
+  // Flags that indicate that we have been updated.
+  bool meshDirty;
+
+  // Rendermesh holder for this mesh
+  csRenderMeshHolder rmHolder;
+
+  // Imposter meshes (for batched rendering).
+  csRefArray<csImposterMesh> imposterMeshes;
+
+  // Flags for iMeshObject.
+  csFlags flags;
+
+  // Bounding box.
+  csBox3 bbox;
+
+  // Current mesh being updated.
+  uint currentMesh;
+
+  // Number of meshes to update (for batching).
+  uint updatePerFrame;
+
+  // Number of imposter meshes we're currently batching.
+  uint numImposterMeshes;
+
+  void SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRenderView* rview);
+
+  // For batched imposter sorting.
+  static int ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s);
+
+  friend class csImposterManager;
+
+public:
+  csBatchedImposterMesh (csEngine* engine, iSector* sector);
+  virtual ~csBatchedImposterMesh () {};
+
 
   ///////////////////// iObjectModel /////////////////////
   virtual const csBox3& GetObjectBoundingBox()
@@ -184,7 +200,7 @@ public:
 
   virtual void GetRadius (float& rad, csVector3& cent)
   {
-    originalMesh->GetMeshObject()->GetObjectModel()->GetRadius(rad, cent);
+    mesh->GetMeshObject()->GetObjectModel()->GetRadius(rad, cent);
   }
 
   ///////////////////// iMeshObject /////////////////////

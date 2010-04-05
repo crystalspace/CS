@@ -33,38 +33,10 @@
 #include "light.h"
 #include "engine.h"
 
-csImposterMesh::csImposterMesh (csEngine* engine, iSector* sector) : scfImplementationType(this),
-engine(engine), sector(sector), materialUpdateNeeded(false),
-matDirty(true), meshDirty(true), numImposterMeshes(0), lastDistance(FLT_MAX), rendered(false),
-currentMesh(0)
-{
-  // Create meshwrapper.
-  csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
-  cmesh->SetName("imposter");
-  cmesh->SetRenderPriority(engine->GetRenderPriority("alpha"));
-  mesh = csPtr<iMeshWrapper>(cmesh);
-
-  // Set bbox so that it's never culled.
-  mesh->GetMeshObject()->GetObjectModel()->SetObjectBoundingBox(
-    csBox3(-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
-    CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE));
-
-  mesh->GetMovable()->SetPosition(csVector3(0.0f));
-  mesh->GetMovable()->SetSector(sector);
-  mesh->GetMovable()->UpdateMove();
-
-  mesh->GetFlags().Set(CS_ENTITY_NOLIGHTING | CS_ENTITY_NOSHADOWS | CS_ENTITY_NOSHADOWRECEIVE);
-  flags.Set(CS_ENTITY_NOLIGHTING | CS_ENTITY_NOSHADOWS | CS_ENTITY_NOSHADOWRECEIVE);
-
-  csRef<iConfigManager> cfman = csQueryRegistry<iConfigManager>(engine->GetObjectRegistry());
-  updatePerFrame = cfman->GetInt("Engine.Imposters.UpdatePerFrame", 10);
-}
-
 csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
                                 iMeshWrapper* pmesh, iRenderView* rview,
                                 const char* shader) :
-scfImplementationType(this), fact(fact), engine(engine),
-shader(shader), materialUpdateNeeded(false), matDirty(true), meshDirty(true),
+scfImplementationType(this), fact(fact), shader(shader), materialUpdateNeeded(false),
 lastDistance(FLT_MAX), isUpdating(false), rendered(false)
 {
   // Misc inits.
@@ -73,7 +45,6 @@ lastDistance(FLT_MAX), isUpdating(false), rendered(false)
   cameraLocalDir.Set (0, 0, 0);
   camera = rview->GetCamera()->Clone();
   sector = pmesh->GetMovable()->GetSectors()->Get(0);
-  g3d = csQueryRegistry<iGraphics3D>(engine->GetObjectRegistry());
 
   // Set the initial distance.
   originalMesh = pmesh;
@@ -198,13 +169,38 @@ bool csImposterMesh::WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh)
   return true;
 }
 
+csBatchedImposterMesh::csBatchedImposterMesh (csEngine* engine, iSector* sector) : scfImplementationType(this),
+engine(engine), sector(sector), meshDirty(true), currentMesh(0)
+{
+  // Create meshwrapper.
+  csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
+  cmesh->SetName("imposter");
+  cmesh->SetRenderPriority(engine->GetRenderPriority("alpha"));
+  mesh = csPtr<iMeshWrapper>(cmesh);
+
+  // Set bbox so that it's never culled.
+  mesh->GetMeshObject()->GetObjectModel()->SetObjectBoundingBox(
+    csBox3(-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
+    CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE));
+
+  mesh->GetMovable()->SetPosition(csVector3(0.0f));
+  mesh->GetMovable()->SetSector(sector);
+  mesh->GetMovable()->UpdateMove();
+
+  mesh->GetFlags().Set(CS_ENTITY_NOLIGHTING | CS_ENTITY_NOSHADOWS | CS_ENTITY_NOSHADOWRECEIVE);
+  flags.Set(CS_ENTITY_NOLIGHTING | CS_ENTITY_NOSHADOWS | CS_ENTITY_NOSHADOWRECEIVE);
+
+  csRef<iConfigManager> cfman = csQueryRegistry<iConfigManager>(engine->GetObjectRegistry());
+  updatePerFrame = cfman->GetInt("Engine.Imposters.UpdatePerFrame", 10);
+}
+
 //static arrays that keep the imposterdata
 CS_IMPLEMENT_STATIC_VAR (GetMeshIndices, csDirtyAccessArray<uint>, ());
 CS_IMPLEMENT_STATIC_VAR (GetMeshVertices, csDirtyAccessArray<csVector3>, ());
 CS_IMPLEMENT_STATIC_VAR (GetMeshTexels, csDirtyAccessArray<csVector2>, ());
 CS_IMPLEMENT_STATIC_VAR (GetMeshColors, csDirtyAccessArray<csVector4>, ());
 
-csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview, 
+csRenderMesh** csBatchedImposterMesh::GetRenderMeshes (int& num, iRenderView* rview, 
                                                 iMovable* movable, uint32 frustum_mask)
 {
   // Get an unused mesh
@@ -232,7 +228,7 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
   return &mesh;
 }
 
-int csImposterMesh::ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s)
+int csBatchedImposterMesh::ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s)
 {
   // Get distance from camera.
   csReversibleTransform tr_o2c = f->camera->GetTransform ();
@@ -250,7 +246,7 @@ int csImposterMesh::ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* c
   return (distancef > distances) ? -1 : 1;
 }
 
-void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRenderView* rview)
+void csBatchedImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRenderView* rview)
 {
   csDirtyAccessArray<uint>& mesh_indices = *GetMeshIndices ();
   csDirtyAccessArray<csVector3>& mesh_vertices = *GetMeshVertices ();
@@ -275,8 +271,8 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
     mesh->variablecontext = new csShaderVariableContext();
   }
 
-  // Material or mesh changed.
-  if (matDirty || meshDirty || rmCreated)
+  // Mesh changed.
+  if (meshDirty || rmCreated)
   {
     // Update material pointer.
     mesh->material = mat;
@@ -290,7 +286,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
     }
 
     // Check for new imposter meshes.
-    size_t meshCount = sortedMeshes.GetSize();
+    uint meshCount = (uint)sortedMeshes.GetSize();
 
     if(numImposterMeshes != meshCount || rmCreated)
     {
@@ -300,7 +296,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
       // Create index buffer.
       mesh_indices.Empty();
 
-      for(uint i=0; i<(uint)meshCount; ++i)
+      for(uint i=0; i<meshCount; ++i)
       {
         mesh_indices.Push (0+4*i);
         mesh_indices.Push (1+4*i);
@@ -311,7 +307,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
       }
 
       mesh->indexstart = 0;
-      mesh->indexend = (uint)(6*meshCount);
+      mesh->indexend = 6*meshCount;
 
       csRef<csRenderBuffer> indexBuffer = csRenderBuffer::CreateIndexRenderBuffer(
         mesh_indices.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, 3*meshCount);
@@ -322,7 +318,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
       static csVector4 c (1, 1, 1, 1.0);
       mesh_colors.Empty ();
 
-      for(size_t i=0; i<meshCount; ++i)
+      for(uint i=0; i<meshCount; ++i)
       {
         mesh_colors.Push (c);
         mesh_colors.Push (c);
@@ -337,7 +333,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
 
       // Create normals buffer.
       csDirtyAccessArray<csVector3> normals;
-      for(size_t i=0; i<meshCount; ++i)
+      for(uint i=0; i<meshCount; ++i)
       {
         normals.Push(sortedMeshes[i]->normals);
         normals.Push(sortedMeshes[i]->normals);
@@ -353,7 +349,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
 
     // Create texels buffer.
     mesh_texels.Empty ();
-    for(size_t i=0; i<meshCount; ++i)
+    for(uint i=0; i<meshCount; ++i)
     {
       mesh_texels.Push (csVector2 (sortedMeshes[i]->texCoords.MaxX(),1-sortedMeshes[i]->texCoords.MaxY()));
       mesh_texels.Push (csVector2 (sortedMeshes[i]->texCoords.MaxX(),1-sortedMeshes[i]->texCoords.MinY()));
@@ -368,7 +364,7 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
 
     // Create vertex buffer.
     mesh_vertices.Empty ();
-    for(size_t i=0; i<meshCount; ++i)
+    for(uint i=0; i<meshCount; ++i)
     {
       mesh_vertices.Push(sortedMeshes[i]->vertices.GetVertices()[0]);
       mesh_vertices.Push(sortedMeshes[i]->vertices.GetVertices()[1]);
@@ -381,7 +377,6 @@ void csImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRen
     vertBuffer->CopyInto (mesh_vertices.GetArray(), mesh_vertices.GetSize());
     mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertBuffer);
 
-    matDirty = false;
     meshDirty = false;
   }
 }

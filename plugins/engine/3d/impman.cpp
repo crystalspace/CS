@@ -64,13 +64,6 @@ bool csImposterManager::HandleEvent(iEvent &ev)
 {
   for(size_t i=0; i<removeQueue.GetSize(); ++i)
   {
-    csImposterMesh* cmesh = static_cast<csImposterMesh*>(&*(removeQueue[i]->mesh));
-    if(cmesh->mesh)
-    {
-      cmesh->mesh->GetMovable()->SetSector(0);
-      cmesh->mesh->GetMovable()->UpdateMove();
-    }
-
     RemoveMeshFromImposter(removeQueue[i]->mesh);
     imposterMats.Delete(csPtrKey<iImposterMesh>(removeQueue[i]->mesh), removeQueue[i]);
   }
@@ -404,8 +397,6 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   rmTargets->RegisterRenderTarget(csIMesh->mat->GetMaterial()->GetTexture(), newView,
     0, iRenderManagerTargets::updateOnce | iRenderManagerTargets::assumeAlwaysUsed | iRenderManagerTargets::clearScreen);
 
-  csIMesh->matDirty = true;
-
   // If this is the init (the imposter isn't init yet).
   if(!imposter->init)
   {
@@ -462,7 +453,7 @@ void csImposterManager::AddMeshToImposter(csImposterMesh* imposter)
   newSectorI.AttachNew(new SectorImposter());
 
   newSectorI->sector = imposter->sector;
-  newSectorI->sectorImposter.AttachNew(new csImposterMesh(engine, newSectorI->sector));
+  newSectorI->sectorImposter.AttachNew(new csBatchedImposterMesh(engine, newSectorI->sector));
   newSectorI->sectorImposter->imposterMeshes.Push(imposter);
   newSectorI->sectorImposter->mat = imposter->mat;
 
@@ -482,7 +473,7 @@ void csImposterManager::RemoveMeshFromImposter(csImposterMesh* imposter)
     if(imposter->sector == sectorImposters[i]->sector &&
       imposter->mat == sectorImposters[i]->sectorImposter->mat)
     {
-      csImposterMesh* imposterMesh = sectorImposters[i]->sectorImposter;
+      csBatchedImposterMesh* imposterMesh = sectorImposters[i]->sectorImposter;
       imposterMesh->meshDirty = true;
       imposterMesh->imposterMeshes.Delete(imposter);
 

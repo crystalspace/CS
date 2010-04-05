@@ -158,7 +158,7 @@ private:
   struct SectorImposter : CS::Utility::FastRefCount<SectorImposter>
   {
     csWeakRef<iSector> sector;
-    csRef<csImposterMesh> sectorImposter;
+    csRef<csBatchedImposterMesh> sectorImposter;
   };
 
   csRefArray<SectorImposter> sectorImposters;
