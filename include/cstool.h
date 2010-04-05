@@ -27,6 +27,7 @@
 #include "cstool/collider.h"
 #include "cstool/csanim2d.h"
 #include "cstool/csapplicationframework.h"
+#include "cstool/csdemoapplication.h"
 #include "cstool/csfxscr.h"
 #include "cstool/cspixmap.h"
 #include "cstool/csview.h"
