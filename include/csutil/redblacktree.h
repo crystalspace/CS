@@ -661,22 +661,6 @@ protected:
     if (node->left != 0) RecursiveTraverseInOrder (node->left, callback);
   }
 
-  //@{
-  /// Locate key that is equal to 'other'
-  template<typename K2>
-  K* Find (const K2& other)
-  {
-    Node* n = LocateNode<K2> (root, other);
-    return n ? &(n->GetKey()) : 0;
-  }
-  template<typename K2>
-  K& Find (const K2& other, K& fallback)
-  {
-    Node* n = LocateNode<K2> (root, other);
-    return n ? n->GetKey() : fallback;
-  }
-  //@}
-
   /// Duplicate a subtree
   void RecursiveCopy (Node*& to, Node* parent, const Node* from)
   {
