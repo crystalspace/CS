@@ -68,6 +68,8 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> pData,
 
 SndSysOggSoundStream::~SndSysOggSoundStream ()
 {
+  //Closes the bitstream and cleans up loose ends.
+  ov_clear(&m_VorbisFile);
 }
 
 const char *SndSysOggSoundStream::GetDescription()
