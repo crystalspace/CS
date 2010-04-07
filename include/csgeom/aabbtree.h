@@ -313,6 +313,9 @@ namespace Geometry //@@Right?
           node->SetChild1 (node1);
           node->SetChild2 (node2);
           static_cast<NodeExtraData*> (node)->NodeUpdate (*node1, *node2);
+          
+          // update bbox
+          node->GetBBox() += object->GetBBox();
         }
       }
       else
@@ -585,7 +588,7 @@ namespace Geometry //@@Right?
         Node* result = FindObjectNodeRec (node->GetChild1 (), object);        
         
         if (!result)
-          FindObjectNodeRec (node->GetChild2 (), object);
+          result = FindObjectNodeRec (node->GetChild2 (), object);
 
         return result;
       }
