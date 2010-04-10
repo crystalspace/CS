@@ -327,8 +327,10 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Get screen bounding box of the mesh.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());
-  imposter->texWidth = (size_t)(rbox.sbox.MaxX() - rbox.sbox.MinX());
-  imposter->texHeight = (size_t)(rbox.sbox.MaxY() - rbox.sbox.MinY());
+  float screenSpaceWidth = rbox.sbox.MaxX() - rbox.sbox.MinX();
+  float screenSpaceHeight = rbox.sbox.MaxY() - rbox.sbox.MinY();
+  imposter->texWidth = csFindNearestPowerOf2((int)screenSpaceWidth);
+  imposter->texHeight = csFindNearestPowerOf2((int)screenSpaceHeight);
 
   if(maxWidth == 0 || maxHeight == 0)
   {
@@ -375,8 +377,8 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
     csIMesh->texCoords.MaxX()/rTexWidth,
     csIMesh->texCoords.MaxY()/rTexHeight);
 
-  float widthRatio = g3d->GetWidth()/(float)rTexWidth;
-  float heightRatio = g3d->GetHeight()/(float)rTexHeight;
+  float widthRatio = (imposter->texWidth / screenSpaceWidth) * (g3d->GetWidth() / (float)rTexWidth);
+  float heightRatio = (imposter->texHeight / screenSpaceHeight) * (g3d->GetHeight() / (float)rTexHeight);
   float newMinX = (rTexWidth/2-imposter->texWidth/2);
   float newMinY = (rTexHeight/2-imposter->texHeight/2);
 
