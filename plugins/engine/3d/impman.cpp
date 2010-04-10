@@ -427,11 +427,13 @@ void csImposterManager::UpdateImposter(ImposterMat* imposter)
   if(maxHeight < texHeight)
     texHeight = maxHeight;
 
-  if(imposter->texHeight < texHeight || imposter->texWidth < texWidth)
+  if(csIMesh->materialUpdateNeeded || imposter->texHeight < texHeight || imposter->texWidth < texWidth)
   {
     RemoveMeshFromImposter(imposter->mesh);
     InitialiseImposter(imposter);
     AddMeshToImposter(imposter->mesh);
+
+    csIMesh->materialUpdateNeeded = false;
   }
 
   // Finished updating.
