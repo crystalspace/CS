@@ -997,7 +997,8 @@ namespace CS
       defined (CS_PROCESSOR_MIPS) || \
       defined (CS_PROCESSOR_SPARC) || \
       defined (CS_PROCESSOR_ALPHA) || \
-      defined (CS_PROCESSOR_M68K)
+      defined (CS_PROCESSOR_M68K) || \
+      defined (CS_PROCESSOR_ARM)
 #    define CS_IEEE_DOUBLE_FORMAT
 #  endif
 #endif
