@@ -109,24 +109,40 @@ void csImposterMesh::InitMesh()
   const csOrthoTransform oldt = camera->GetTransform();
 
   // Look at mesh
-  csVector3 meshcenter = originalMesh->GetWorldBoundingBox().GetCenter();
+  const csBox3& wbbox = originalMesh->GetWorldBoundingBox();
+  csVector3 meshcenter = wbbox.GetCenter();
   csVector3 campos = camera->GetTransform().GetOrigin();
   camera->GetTransform ().LookAt(meshcenter-campos, camera->GetTransform().GetT2O().Col2());
 
-  // Get screen bounding box
-  csScreenBoxResult screenbox = originalMesh->GetScreenBoundingBox(camera);
+  // Calculate the min and max coordinates of the bbox in camera space.
+  csVector3 c = camera->GetTransform().Other2This(wbbox.GetCorner(0));
+  float minX = c.x, maxX = c.x, minY = c.y, maxY = c.y, minZ = c.z;
 
-  // Unproject screen bounding box into camera space.
-  csVector3 v1 = camera->InvPerspective(screenbox.sbox.GetCorner(3), screenbox.cbox.MinZ());
-  csVector3 v2 = camera->InvPerspective(screenbox.sbox.GetCorner(2), screenbox.cbox.MinZ());
-  csVector3 v3 = camera->InvPerspective(screenbox.sbox.GetCorner(0), screenbox.cbox.MinZ());
-  csVector3 v4 = camera->InvPerspective(screenbox.sbox.GetCorner(1), screenbox.cbox.MinZ());
+  for (int i=1; i<7; ++i)
+  {
+    c = camera->GetTransform().Other2This(wbbox.GetCorner(i));
 
-  // Get world space vertex coordinates.
-  vertices[0] = camera->GetTransform().This2Other(v1);
-  vertices[1] = camera->GetTransform().This2Other(v2);
-  vertices[2] = camera->GetTransform().This2Other(v3);
-  vertices[3] = camera->GetTransform().This2Other(v4);
+    if(c.x < minX)
+      minX = c.x;
+
+    if(c.x > maxX)
+      maxX = c.x;
+
+    if(c.y < minY)
+      minY = c.y;
+
+    if(c.y > maxY)
+      maxY = c.y;
+
+    if(c.z < minZ)
+      minZ = c.z;
+  }
+
+  // Create a 2d bbox and calculate the world space vertex coordinates.
+  vertices[0] = camera->GetTransform().This2Other(csVector3(maxX, maxY, minZ));
+  vertices[1] = camera->GetTransform().This2Other(csVector3(maxX, minY, minZ));
+  vertices[2] = camera->GetTransform().This2Other(csVector3(minX, minY, minZ));
+  vertices[3] = camera->GetTransform().This2Other(csVector3(minX, maxY, minZ));
 
   // Get normals.
   normals = camera->GetTransform().This2Other(csVector3(0, 0, -1));
