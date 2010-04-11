@@ -150,7 +150,6 @@
 #include "csutil/systemopenmanager.h"
 #include "csutil/threadevent.h"
 #include "csutil/threading/atomicops.h"
-#include "csutil/threading/atomicops_gcc_arm.h"
 #include "csutil/threading/barrier.h"
 #include "csutil/threading/condition.h"
 #include "csutil/threading/mutex.h"
