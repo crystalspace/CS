@@ -72,10 +72,7 @@ CS_MASTER_HEADER_REJECTS +=
 # are platform-specific.
 CS_MASTER_HEADER_REJECTS +=
   [ ConcatDirs csutil generic   regex.h             ]
-  [ ConcatDirs csutil threading atomicops_gcc_ppc.h ]
-  [ ConcatDirs csutil threading atomicops_gcc_x86.h ]
-  [ ConcatDirs csutil threading atomicops_msvc.h    ]
-  [ ConcatDirs csutil threading atomicops_sparc.h   ]
+  [ Wildcard [ ConcatDirs csutil threading ] : atomicops_*.h ]
   [ ConcatDirs csutil threading pthread_condition.h ]
   [ ConcatDirs csutil threading pthread_mutex.h     ]
   [ ConcatDirs csutil threading pthread_thread.h    ]
