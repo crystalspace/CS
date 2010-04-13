@@ -40,6 +40,9 @@ template <typename K, typename Allocator,
   template<typename K, typename K2> class Ordering>
 class csRedBlackTree;
 
+template <typename K, typename T>
+class csRedBlackTreePayload;
+
 namespace CS
 {
   namespace Container
@@ -107,16 +110,62 @@ namespace CS
     {
     };
     
-    /// Total ordering for red-black-trees.
+    template<typename T> struct RedBlackExtractKey
+    {
+      typedef T Key;
+      const Key& key;
+      RedBlackExtractKey(const Key& a) : key(a) {}
+    };
+
+    template<typename T, typename U> struct RedBlackExtractKey<csRedBlackTreePayload<T, U> > : RedBlackExtractKey<T>
+    {
+      RedBlackExtractKey(const csRedBlackTreePayload<T, U>& a) : RedBlackExtractKey<T>(a.GetKey()) {}
+    };
+    
+    /**
+     * Strict weak ordering (http://en.wikipedia.org/wiki/Strict_weak_ordering)
+     * for red-black-trees.
+     * \par
+     * requires the key type to implement <tt>operator<()</tt> and <tt>operator==()</tt>
+     * \par
+     * the following axioms shall be true:
+     * !(a < a),
+     * a < b <=> !(b < a),
+     * a < b && b < c <=> a < c
+     */
+    template <typename K, typename K2>
+    class RedBlackTreeOrderingStrictWeak
+    {
+      const typename RedBlackExtractKey<K>::Key& a;
+      const typename RedBlackExtractKey<K2>::Key& b;
+    public:
+      RedBlackTreeOrderingStrictWeak (const K& a, const K2& b)
+       : a (RedBlackExtractKey<K>(a).key), b (RedBlackExtractKey<K2>(b).key) {}
+      
+      bool AeqB () const { return a == b; }
+      bool AleB () const { return a < b; }
+      bool BleA () const { return b < a; }
+    };
+    
+    /**
+     * Total ordering (http://en.wikipedia.org/wiki/Total_ordering) for red-black-trees.
+     * \par
+     * requires the key type to implement <tt>operator<=()</tt> and <tt>operator==()</tt>.
+     * \par
+     * the following axioms shall be true:
+     * a <= a,
+     * a <= b && b <= a <=> a == b,
+     * a <= b && b <= c => a <= c
+     */
     template <typename K, typename K2>
     class RedBlackTreeOrderingTotal
     {
-      const K& a;
-      const K2& b;
+      const typename RedBlackExtractKey<K>::Key& a;
+      const typename RedBlackExtractKey<K2>::Key& b;
       bool lt;
     public:
       RedBlackTreeOrderingTotal (const K& a, const K2& b)
-       : a (a), b (b), lt (a <= b) {}
+       : a (RedBlackExtractKey<K>(a).key), b (RedBlackExtractKey<K2>(b).key), lt (this->a <= this->b) {}
       
       bool AeqB () const { return a == b; }
       bool AleB () const { return lt; }
@@ -128,15 +177,28 @@ namespace CS
       bool BleA () const { return !lt; }
     };
     
-    /// Partial ordering for red-black-trees.
+    /**
+     * Partial ordering (http://en.wikipedia.org/wiki/Partial_order) for red-black-trees.
+     * Not that this will change the runtime characteristics. In the worst case - no key is
+     * comparable to the other - operations may take linear time instead of logarithmic as
+     * operations degenerate into an exhaustive search.
+     * \par
+     * requires the key type to implement <tt>operator<()</tt> and <tt>operator==()</tt>.
+     * \par
+     * the following axioms shall be true:
+     * a <= a,
+     * a <= b && b <= a <=> a == b,
+     * a <= b && b <= c <=> a <= c,
+     * !(a <= b) && !(b <= a) <=> a and b are incomparable
+     */
     template <typename K, typename K2>
     class RedBlackTreeOrderingPartial
     {
-      const K& a;
-      const K2& b;
+      const typename RedBlackExtractKey<K>::Key& a;
+      const typename RedBlackExtractKey<K2>::Key& b;
     public:
       RedBlackTreeOrderingPartial (const K& a, const K2& b)
-       : a (a), b (b) {}
+       : a (RedBlackExtractKey<K>(a).key), b (RedBlackExtractKey<K2>(b).key) {}
       
       bool AeqB () const { return a == b; }
       bool AleB () const { return a <= b; }
@@ -152,30 +214,19 @@ namespace CS
  * key Find() will return an <em>equivalent</em> key, not necessarily the
  * <em>identical</em> key.
  *
- * \par Ordering
- * By default, a <em>totally ordered</em> (http://en.wikipedia.org/wiki/Total_ordering)
- * key type is assumed. However, it is possible to use a key type that is only
- * <em>partially ordered</em> (http://en.wikipedia.org/wiki/Partial_order) -
- * however, this will change the runtime characteristics. In the worst case -
- * no key comparable to any other key - operations may take linear time
- * instead of logarithmic time as operations degenerate into an
- * exhaustive search. 
- *
  * \par
  * The ordering of the key is controlled by changing the \a Ordering template
- * parameter. The default, total ordering is selected by
+ * parameter which defaults to total ordering. Total ordering is selected by
  * CS::Container::RedBlackTreeOrderingTotal. Partial ordering is selected
- * by CS::Container::RedBlackTreeOrderingPartial.
- *
- * \par Operators, key types
- * As a minimum, \a K must have <tt>operator==()</tt> and <tt>operator<=()</tt>.
+ * by CS::Container::RedBlackTreeOrderingPartial. Strict Weak ordering is
+ * selected by CS::Container::RedBlackTreeOrderingStrictWeak.
  *
  * \par
  * The various "Find" methods can take keys of an alternative type (designated
- * \a K2). Operators available must cover the comparisons <tt>K == K2</tt>,
- * <tt>K <= K2</tt> and <tt>K2 <= K</tt>. The ordering of \a K2 should, sensibly,
- * be the same as that of \a K.
+ * \a K2). Operators available must cover the comparisons of the ordering parameter.
+ * The ordering of \a K2 should, sensibly, be the same as that of \a K.
  *
+ * \remark The key has to fullfill the requirements made by the Ordering class.
  * \remark Only stores keys. If you need a key-value-map, look at
  *  csRedBlackTreeMap.
  * \remark The allocator has to return memory blocks at least aligned to
@@ -526,9 +577,9 @@ protected:
     bool rightTree = _o.BleA();
     // (!leftTree && !rightTree) => node can be in either subtree
     if (leftTree || (!leftTree && !rightTree))
-      n = LocateNode (node->left, other);
+      n = LocateNode<K2> (node->left, other);
     if ((n == 0) && (rightTree || (!leftTree && !rightTree)))
-      n = LocateNode (node->right, other);
+      n = LocateNode<K2> (node->right, other);
     return n;
   }
   /// Find the node which has a given instance of a key
@@ -719,7 +770,7 @@ public:
    */
   bool Delete (const K& key)
   {
-    Node* n = LocateNode (root.p, key);
+    Node* n = LocateNode<K> (root.p, key);
     if (n == 0) return false;
     DeleteNode (n);
     return true;
@@ -739,7 +790,7 @@ public:
   /// Check whether a key is in the tree.
   bool In (const K& key) const
   {
-    return (LocateNode (root.p, key) != 0);
+    return (LocateNode<K> (root.p, key) != 0);
   }
   /**
    * Check whether a key is in the tree.
@@ -760,7 +811,10 @@ public:
   const K& Find (const K2& other, const K& fallback) const
   {
     Node* n = LocateNode<K2> (root.p, other);
-    return n ? n->GetKey() : fallback;
+    if(n)
+      return n->GetKey();
+    else
+      return fallback;
   }
   //@}
 
@@ -1037,30 +1091,6 @@ public:
   const K& GetKey() const { return key; }
   const T& GetValue() const { return value; }
   T& GetValue() { return value; }
-  bool operator == (const csRedBlackTreePayload& other) const
-  {
-    return key == other.key;
-  }
-  bool operator == (const K& other) const
-  {
-    return key == other;
-  }
-  friend bool operator== (const K& a, const csRedBlackTreePayload& b)
-  {
-    return a == b.key;
-  }
-  bool operator <= (const csRedBlackTreePayload& other) const
-  {
-    return key <= other.key;
-  }
-  bool operator <= (const K& other) const
-  {
-    return key <= other;
-  }
-  friend bool operator <= (const K& k1, const csRedBlackTreePayload& k2)
-  {
-    return k1 <= k2.key;
-  }
   operator const T&() const { return value; }
   operator T&() { return value; }
 };
@@ -1073,10 +1103,12 @@ template <typename K, typename T,
           typename Allocator =
             csFixedSizeAllocator<
               sizeof(CS::Container::RedBlackTreeNode<
-                      csRedBlackTreePayload<K, T> >)> >
-class csRedBlackTreeMap : protected csRedBlackTree<csRedBlackTreePayload<K, T>, Allocator>
+                      csRedBlackTreePayload<K, T> >)>,
+          template<typename K1, typename K2> class Ordering =
+            CS::Container::RedBlackTreeOrderingTotal >
+class csRedBlackTreeMap : protected csRedBlackTree<csRedBlackTreePayload<K, T>, Allocator, Ordering>
 {
-  typedef csRedBlackTree<csRedBlackTreePayload<K, T>, Allocator > supahclass;
+  typedef csRedBlackTree<csRedBlackTreePayload<K, T>, Allocator, Ordering > supahclass;
 
   template<typename CB>
   class TraverseCB
