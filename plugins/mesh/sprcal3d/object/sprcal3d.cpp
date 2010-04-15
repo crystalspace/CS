@@ -1175,7 +1175,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 
 bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr, int* polygon_idx,
-    iMaterialWrapper** material, csArray<iMaterialWrapper*>* materials)
+    iMaterialWrapper** material, iMaterialArray* materials)
 {
   if (material) *material = 0;
   //Checks all of the cal3d bounding boxes of each bone to see if they hit

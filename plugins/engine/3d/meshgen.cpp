@@ -757,7 +757,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
         end.y = samplebox.MinY ();
         bool hit = false;
         iMaterialWrapper* hit_material = 0;
-        csArray<iMaterialWrapper*> hit_materials;
+        csRef<iArrayChangeAll<iMaterialWrapper*> > hit_materials;
         for (i = 0 ; i < cell.meshes.GetSize () ; i++)
         {
           csHitBeamResult rc = cell.meshes[i]->HitBeam (start, end,
@@ -769,7 +769,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             hit_material = rc.material;
             if(hit_material == 0)
             {
-                hit_materials = rc.materials;
+              hit_materials = rc.materials;
             }
             hit = true;
           }
@@ -795,11 +795,11 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             {
               // Get the highest material factor.
               float factorh = 0;
-              for(size_t m=0; m<hit_materials.GetSize(); ++m)
+              for(size_t m=0; m<hit_materials->GetSize(); ++m)
               {
                 for (size_t mi=0 ; mi<mftable.GetSize (); ++mi)
                 {
-                  if (mftable[mi].material == hit_materials.Get(m))
+                  if (mftable[mi].material == hit_materials->Get(m))
                   {
                     if(mftable[mi].factor > factorh)
                     {

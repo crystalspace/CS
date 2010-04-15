@@ -774,7 +774,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   bool AnimeshObject::HitBeamObject (const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr, int* polygon_idx,
-    iMaterialWrapper** material, csArray<iMaterialWrapper*>* materials)
+    iMaterialWrapper** material, iMaterialArray* materials)
   {
     return csIntersect3::BoxSegment (factory->factoryBB, csSegment3 (start, end),
       isect, pr) != 0;

@@ -247,7 +247,7 @@ public:
   	const csVector3& end, csVector3& isect, float* pr) { return false; }
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0, csArray<iMaterialWrapper*>* materials = 0) { return false; }
+	iMaterialWrapper** material = 0, iMaterialArray* materials = 0) { return false; }
   virtual void SetMeshWrapper (iMeshWrapper* logparent) {}
   virtual bool SetColor (const csColor& color) { return false; }
   virtual bool GetColor (csColor& color) const { return false; }

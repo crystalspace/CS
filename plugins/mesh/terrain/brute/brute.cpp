@@ -2424,8 +2424,8 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
                                      const csVector3& end, 
                                      csVector3& isect, float* pr,
                                      int* polygon_idx,
-				                             iMaterialWrapper** material,
-                                     csArray<iMaterialWrapper*>* materials)
+				     iMaterialWrapper** material,
+                                     iMaterialArray* materials)
 {
   if (polygon_idx) *polygon_idx = -1;
   csSegment3 seg (start, end);
@@ -2444,7 +2444,7 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
   {
     rc = HitBeam (rootblock, seg, isect, pr);
   }
-  if (material && rc)
+  if ((material || materials) && rc)
   {
     int x = int ((isect.x - region.MinX ()) * wm);
     int y = materialMapH - int ((isect.z - region.MinY ()) * hm);
@@ -2457,11 +2457,12 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
       const csBitArray& bits = globalMaterialsUsed[i];
       if (bits[idx])
       {
-        *material = palette[i];
+	if (material) *material = palette[i];
+	if (materials) materials->Push (palette[i]);
 	return rc;
       }
     }
-    *material = 0;
+    if (material) *material = 0;
   }
   return rc;
 }

@@ -27,6 +27,7 @@
 #include "csutil/scf_interface.h"
 #include "iutil/array.h"
 #include "ivideo/shader/shader.h"
+#include "imesh/object.h"
 
 class csVector3;
 struct csCollisionPair;
@@ -629,7 +630,7 @@ struct iTerrainSystem : public virtual iBase
    */
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                            bool oneHit, iTerrainVector3Array* points,
-                           csArray<iMaterialWrapper*>* materials) = 0;
+                           iMaterialArray* materials) = 0;
 
   /**
    * Collide segment with the terrain

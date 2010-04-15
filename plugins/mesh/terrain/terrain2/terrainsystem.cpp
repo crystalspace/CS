@@ -196,7 +196,7 @@ void csTerrainSystem::SetMaterialPalette (const csRefArray<iMaterialWrapper>& mp
 
 bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
                                end, bool oneHit, iTerrainVector3Array* points,
-                               csArray<iMaterialWrapper*>* materials)
+                               iMaterialArray* materials)
 {
   if (!collider) 
     return false;
@@ -221,10 +221,8 @@ bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
       if (cells[i]->CollideSegment (seg.End (), seg.Start (), oneHit, points)
           && oneHit)
       {
-        if(materials != 0)
-        {
+        if (materials)
           materials->Push(cells[i]->GetBaseMaterial());
-        }
         return true;
       }
     }
@@ -554,7 +552,7 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
 
 bool csTerrainSystem::HitBeamOutline (const csVector3& start,
         const csVector3& end, csVector3& isect, float* pr,
-        csArray<iMaterialWrapper*>* materials)
+        iMaterialArray* materials)
 {
   //@@TODO: See if this needs some touch-up
   csRef<iTerrainVector3Array> collArray;
@@ -600,12 +598,15 @@ bool csTerrainSystem::HitBeamObject (const csVector3& start,
         const csVector3& end,
         csVector3& isect, float* pr, int* polygon_idx,
         iMaterialWrapper** material,
-        csArray<iMaterialWrapper*>* materials)
+        iMaterialArray* materials)
 {
   if (polygon_idx) *polygon_idx = -1;
-  if (material) *material = NULL;
+  if (material) *material = 0;
 
-  return HitBeamOutline (start, end, isect, pr, materials);
+  bool rc = HitBeamOutline (start, end, isect, pr, materials);
+  if (material && materials->GetSize () >= 1)
+    *material = materials->Get (0);
+  return rc;
 }
 
 csColliderType csTerrainSystem::GetColliderType ()

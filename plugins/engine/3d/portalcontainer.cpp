@@ -1019,7 +1019,7 @@ bool csPortalContainer::HitBeamOutline (const csVector3& start,
 bool csPortalContainer::HitBeamObject (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr,
 	int* polygon_idx, iMaterialWrapper** material,
-  csArray<iMaterialWrapper*>* materials)
+	iMaterialArray* materials)
 {
   if (material) *material = 0;
   Prepare ();
