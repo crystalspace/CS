@@ -11,7 +11,7 @@ Crystal Space.
 
 @menu
 * Walktest:: Walktest, the Basic Test Application
-* Applications Overview:: Quick Overview
+* Applications Overview:: Applications Overview
 @end menu
 
 @imports{running,walktest.txi}

@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Applications Overview, , Walktest, Running The Demos
-@section Quick Overview
+@section Applications Overview
 @cindex Applications, Quick Overview
 @cindex Applications, Overview
 @cindex Quick Overview, Applications
@@ -148,7 +148,7 @@ todo
 @cindex @file{lighter2}
 @cindex Applications, @file{lighter2}
 @item lighter2
-todo
+Tool to compute static lighting for a CrystalSpace world. @xref{Using lighter2}.
 
 @cindex @file{maya2spr}
 @cindex Applications, @file{maya2spr}
@@ -189,7 +189,7 @@ todo
 @cindex @file{phystut}
 @cindex Applications, @file{phystut}
 @item phystut
-An application to test and demonstrate the use of the physics plugin (@pxref{Collision Detection}).
+An application to test and demonstrate the use of the physics plugin. @xref{Collision Detection}.
 
 @cindex @file{pysimp}
 @cindex Applications, @file{pysimp}
@@ -199,7 +199,7 @@ An extremely simple example demonstrating use of the Python plug-in module.
 @cindex @file{shadertut}
 @cindex Applications, @file{shadertut}
 @item shadertut
-todo
+A tutorial on the usage of shaders.
 
 @cindex @file{shagnetron}
 @cindex Applications, @file{shagnetron}
@@ -296,7 +296,7 @@ achieve a water animation.
 @cindex @file{waterdemo2}
 @cindex Applications, @file{waterdemo2}
 @item waterdemo2
-A demonstration application about the 'ocean' watermesh (@pxref{MeshObject Watermesh}).
+A demonstration application about the 'ocean' watermesh. @xref{MeshObject Watermesh}.
 
 @cindex @file{wxtest}
 @cindex Applications, @file{wxtest}
