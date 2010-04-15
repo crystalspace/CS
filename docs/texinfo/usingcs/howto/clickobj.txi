@@ -11,12 +11,12 @@ has clicked.
 Best way to explain this is by showing code:
 
 @example
-iMeshWrapper* ClickedObject (iCamera* camera, int mousex, int mousey)
+iMeshWrapper* ClickedObject (iCamera* camera, iGraphics2D* g2d, int mousex, int mousey)
 @{
   // Setup a 2D vector with our mouse position.  We invert the y
   // (based on vertical screen dimension) because CS assumes y=0
   // is down for 3D calculations.
-  csVector2 v2d (mousex, camera->GetShiftY () * 2 - mousey);
+  csVector2 v2d (mousex, g2d->GetHeight () - mousey);
 
   // We calculate the inverse perspective of this 2D point at
   // z=100.  This results in a 3D position in camera space at
