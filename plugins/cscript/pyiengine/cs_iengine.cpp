@@ -2551,30 +2551,30 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_csArrayCapacityFixedGrowT_16_t swig_types[28]
 #define SWIGTYPE_p_csArrayCapacityVariableGrow swig_types[29]
 #define SWIGTYPE_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[30]
-#define SWIGTYPE_p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[31]
-#define SWIGTYPE_p_csBox2 swig_types[32]
-#define SWIGTYPE_p_csBox3 swig_types[33]
-#define SWIGTYPE_p_csColor swig_types[34]
-#define SWIGTYPE_p_csColor4 swig_types[35]
-#define SWIGTYPE_p_csConfigFile swig_types[36]
-#define SWIGTYPE_p_csFlags swig_types[37]
-#define SWIGTYPE_p_csFog swig_types[38]
-#define SWIGTYPE_p_csFrustum swig_types[39]
-#define SWIGTYPE_p_csHitBeamResult swig_types[40]
-#define SWIGTYPE_p_csImageBase swig_types[41]
-#define SWIGTYPE_p_csImageMemory swig_types[42]
-#define SWIGTYPE_p_csMatrix3 swig_types[43]
-#define SWIGTYPE_p_csObject swig_types[44]
-#define SWIGTYPE_p_csOrthoTransform swig_types[45]
-#define SWIGTYPE_p_csPlane3 swig_types[46]
-#define SWIGTYPE_p_csPtrT_iCustomMatrixCamera_t swig_types[47]
-#define SWIGTYPE_p_csPtrT_iLoaderContext_t swig_types[48]
-#define SWIGTYPE_p_csPtrT_iObjectWatcher_t swig_types[49]
-#define SWIGTYPE_p_csPtrT_iPerspectiveCamera_t swig_types[50]
-#define SWIGTYPE_p_csPtrT_iVisibilityObjectIterator_t swig_types[51]
-#define SWIGTYPE_p_csRefArrayT_iObject_t swig_types[52]
-#define SWIGTYPE_p_csRefArrayT_iSceneNode_t swig_types[53]
-#define SWIGTYPE_p_csRefT_iLight_t swig_types[54]
+#define SWIGTYPE_p_csBox2 swig_types[31]
+#define SWIGTYPE_p_csBox3 swig_types[32]
+#define SWIGTYPE_p_csColor swig_types[33]
+#define SWIGTYPE_p_csColor4 swig_types[34]
+#define SWIGTYPE_p_csConfigFile swig_types[35]
+#define SWIGTYPE_p_csFlags swig_types[36]
+#define SWIGTYPE_p_csFog swig_types[37]
+#define SWIGTYPE_p_csFrustum swig_types[38]
+#define SWIGTYPE_p_csHitBeamResult swig_types[39]
+#define SWIGTYPE_p_csImageBase swig_types[40]
+#define SWIGTYPE_p_csImageMemory swig_types[41]
+#define SWIGTYPE_p_csMatrix3 swig_types[42]
+#define SWIGTYPE_p_csObject swig_types[43]
+#define SWIGTYPE_p_csOrthoTransform swig_types[44]
+#define SWIGTYPE_p_csPlane3 swig_types[45]
+#define SWIGTYPE_p_csPtrT_iCustomMatrixCamera_t swig_types[46]
+#define SWIGTYPE_p_csPtrT_iLoaderContext_t swig_types[47]
+#define SWIGTYPE_p_csPtrT_iObjectWatcher_t swig_types[48]
+#define SWIGTYPE_p_csPtrT_iPerspectiveCamera_t swig_types[49]
+#define SWIGTYPE_p_csPtrT_iVisibilityObjectIterator_t swig_types[50]
+#define SWIGTYPE_p_csRefArrayT_iObject_t swig_types[51]
+#define SWIGTYPE_p_csRefArrayT_iSceneNode_t swig_types[52]
+#define SWIGTYPE_p_csRefT_iLight_t swig_types[53]
+#define SWIGTYPE_p_csRefT_iMaterialArray_t swig_types[54]
 #define SWIGTYPE_p_csRefT_iSectorCallback_t swig_types[55]
 #define SWIGTYPE_p_csRefT_iThreadReturn_t swig_types[56]
 #define SWIGTYPE_p_csRefT_iThreadedLoader_t swig_types[57]
@@ -26058,7 +26058,7 @@ fail:
 SWIGINTERN PyObject *_wrap_csHitBeamResult_materials_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csHitBeamResult *arg1 = (csHitBeamResult *) 0 ;
-  csArray< iMaterialWrapper * > *arg2 = (csArray< iMaterialWrapper * > *) 0 ;
+  csRef< iMaterialArray > *arg2 = (csRef< iMaterialArray > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -26072,11 +26072,11 @@ SWIGINTERN PyObject *_wrap_csHitBeamResult_materials_set(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csHitBeamResult_materials_set" "', argument " "1"" of type '" "csHitBeamResult *""'"); 
   }
   arg1 = reinterpret_cast< csHitBeamResult * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csRefT_iMaterialArray_t, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csHitBeamResult_materials_set" "', argument " "2"" of type '" "csArray< iMaterialWrapper * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csHitBeamResult_materials_set" "', argument " "2"" of type '" "csRef< iMaterialArray > *""'"); 
   }
-  arg2 = reinterpret_cast< csArray< iMaterialWrapper * > * >(argp2);
+  arg2 = reinterpret_cast< csRef< iMaterialArray > * >(argp2);
   if (arg1) (arg1)->materials = *arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -26091,7 +26091,7 @@ SWIGINTERN PyObject *_wrap_csHitBeamResult_materials_get(PyObject *SWIGUNUSEDPAR
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  csArray< iMaterialWrapper * > *result = 0 ;
+  csRef< iMaterialArray > *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"csHitBeamResult_materials_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csHitBeamResult, 0 |  0 );
@@ -26099,8 +26099,8 @@ SWIGINTERN PyObject *_wrap_csHitBeamResult_materials_get(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csHitBeamResult_materials_get" "', argument " "1"" of type '" "csHitBeamResult *""'"); 
   }
   arg1 = reinterpret_cast< csHitBeamResult * >(argp1);
-  result = (csArray< iMaterialWrapper * > *)& ((arg1)->materials);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  result = (csRef< iMaterialArray > *)& ((arg1)->materials);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefT_iMaterialArray_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -38626,7 +38626,6 @@ static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayCapacityFixedGrowT_16_t = {"_p_csArrayCapacityFixedGrowT_16_t", "CS::Container::ArrayCapacityDefault *|csArrayCapacityFixedGrow< 16 > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayCapacityVariableGrow = {"_p_csArrayCapacityVariableGrow", "csArrayCapacityDefault *|csArrayCapacityVariableGrow *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csImageIOFileFormatDescriptions *|csArray< csImageIOFileFormatDescription const *,csArrayElementHandler< csImageIOFileFormatDescription const * >,CS::Memory::AllocatorMalloc,csArrayCapacityFixedGrow< 16 > > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csArray< iMaterialWrapper *,csArrayElementHandler< iMaterialWrapper * >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > *|csArray< iMaterialWrapper * > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csBox2 = {"_p_csBox2", "csBox2 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csBox3 = {"_p_csBox3", "csBox3 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csColor = {"_p_csColor", "csColor *", 0, 0, (void*)0, 0};
@@ -38646,6 +38645,7 @@ static swig_type_info _swigt__p_csPtrT_iVisibilityObjectIterator_t = {"_p_csPtrT
 static swig_type_info _swigt__p_csRefArrayT_iObject_t = {"_p_csRefArrayT_iObject_t", "csRefArray< iObject > *|csObjectContainer *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefArrayT_iSceneNode_t = {"_p_csRefArrayT_iSceneNode_t", "csRefArray< iSceneNode > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefT_iLight_t = {"_p_csRefT_iLight_t", "csRef< iLight > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csRefT_iMaterialArray_t = {"_p_csRefT_iMaterialArray_t", "csRef< iMaterialArray > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefT_iSectorCallback_t = {"_p_csRefT_iSectorCallback_t", "csRef< iSectorCallback > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefT_iThreadReturn_t = {"_p_csRefT_iThreadReturn_t", "csRef< iThreadReturn > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefT_iThreadedLoader_t = {"_p_csRefT_iThreadedLoader_t", "csRef< iThreadedLoader > *", 0, 0, (void*)0, 0};
@@ -38872,7 +38872,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csArrayCapacityFixedGrowT_16_t,
   &_swigt__p_csArrayCapacityVariableGrow,
   &_swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
-  &_swigt__p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   &_swigt__p_csBox2,
   &_swigt__p_csBox3,
   &_swigt__p_csColor,
@@ -38896,6 +38895,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csRefArrayT_iObject_t,
   &_swigt__p_csRefArrayT_iSceneNode_t,
   &_swigt__p_csRefT_iLight_t,
+  &_swigt__p_csRefT_iMaterialArray_t,
   &_swigt__p_csRefT_iSectorCallback_t,
   &_swigt__p_csRefT_iThreadReturn_t,
   &_swigt__p_csRefT_iThreadedLoader_t,
@@ -39118,7 +39118,6 @@ static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_csArrayCapacityFixedGrowT_16_t[] = {  {&_swigt__p_csArrayCapacityFixedGrowT_16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayCapacityVariableGrow[] = {  {&_swigt__p_csArrayCapacityVariableGrow, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBox2[] = {  {&_swigt__p_csBox2, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBox3[] = {  {&_swigt__p_csBox3, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csColor[] = {  {&_swigt__p_csColor, 0, 0, 0},  {&_swigt__p_csColor4, _p_csColor4To_p_csColor, 0, 0},{0, 0, 0, 0}};
@@ -39138,6 +39137,7 @@ static swig_cast_info _swigc__p_csPtrT_iVisibilityObjectIterator_t[] = {  {&_swi
 static swig_cast_info _swigc__p_csRefArrayT_iObject_t[] = {  {&_swigt__p_csRefArrayT_iObject_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefArrayT_iSceneNode_t[] = {  {&_swigt__p_csRefArrayT_iSceneNode_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefT_iLight_t[] = {  {&_swigt__p_csRefT_iLight_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csRefT_iMaterialArray_t[] = {  {&_swigt__p_csRefT_iMaterialArray_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefT_iSectorCallback_t[] = {  {&_swigt__p_csRefT_iSectorCallback_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefT_iThreadReturn_t[] = {  {&_swigt__p_csRefT_iThreadReturn_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefT_iThreadedLoader_t[] = {  {&_swigt__p_csRefT_iThreadedLoader_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -39364,7 +39364,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csArrayCapacityFixedGrowT_16_t,
   _swigc__p_csArrayCapacityVariableGrow,
   _swigc__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
-  _swigc__p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   _swigc__p_csBox2,
   _swigc__p_csBox3,
   _swigc__p_csColor,
@@ -39388,6 +39387,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csRefArrayT_iObject_t,
   _swigc__p_csRefArrayT_iSceneNode_t,
   _swigc__p_csRefT_iLight_t,
+  _swigc__p_csRefT_iMaterialArray_t,
   _swigc__p_csRefT_iSectorCallback_t,
   _swigc__p_csRefT_iThreadReturn_t,
   _swigc__p_csRefT_iThreadedLoader_t,
