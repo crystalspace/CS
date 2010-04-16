@@ -260,7 +260,7 @@ void csEmitMix::GetValue(csVector3& value, csVector3& given)
 
 void csEmitMix::AddEmitter (float weight, iEmitGen3D* emit)
 {
-  struct part *np = new struct csEmitMix::part;
+  struct part *np = new struct csEmitMix::part ();
   np->next = list;
   np->emit = emit;
   list = np;
