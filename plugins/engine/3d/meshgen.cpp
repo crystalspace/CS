@@ -767,10 +767,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             pos.position = rc.isect;
             end.y = rc.isect.y + 0.0001;
             hit_material = rc.material;
-            if(hit_material == 0)
-            {
-              hit_materials = rc.materials;
-            }
+            hit_materials = rc.materials;
             hit = true;
           }
         }
@@ -780,18 +777,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
           {
             // We use material density tables.
             float factor = default_material_factor;
-            if(hit_material != 0)
-            {
-              for (size_t mi = 0 ; mi < mftable.GetSize () ; mi++)
-              {
-                if (mftable[mi].material == hit_material)
-                {
-                  factor = mftable[mi].factor;
-                  break;
-                }
-              }
-            }
-            else
+            if(hit_materials != 0)
             {
               // Get the highest material factor.
               float factorh = 0;
@@ -813,6 +799,17 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
               if(factorh > 0)
               {
                 factor = factorh;
+              }
+            }
+	    else
+            {
+              for (size_t mi = 0 ; mi < mftable.GetSize () ; mi++)
+              {
+                if (mftable[mi].material == hit_material)
+                {
+                  factor = mftable[mi].factor;
+                  break;
+                }
               }
             }
 
