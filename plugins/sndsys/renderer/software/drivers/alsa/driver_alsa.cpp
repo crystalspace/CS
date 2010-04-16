@@ -315,7 +315,7 @@ bool SndSysDriverALSA::SetupSWParams()
   }
 
   
-  /*
+  /*  
   // start the transfer when the buffer is almost full: 
   // (buffer_size / avail_min) * avail_min 
   err = snd_pcm_sw_params_set_start_threshold(handle, swparams, (buffer_size / period_size) * period_size);
@@ -330,15 +330,6 @@ bool SndSysDriverALSA::SetupSWParams()
     return err;
   }
   */
-
-  // Align transfers to 1 sample
-  result = snd_pcm_sw_params_set_xfer_align(m_pPCMDevice, pSWParams, 1);
-  if (result < 0) 
-  {
-    RecordEvent(SSEL_ERROR, "Failed to set sound software transfer to 1 sample.  Error [%s]", 
-      snd_strerror(result));
-    return false;
-  }
 
   // Apply the parameters
   result = snd_pcm_sw_params(m_pPCMDevice, pSWParams);
