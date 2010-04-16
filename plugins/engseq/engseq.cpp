@@ -1889,7 +1889,8 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
     {
       csVector3 v;
       // Setup perspective vertex, invert mouse Y axis.
-      csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
+      csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
+      csVector2 p (mouse_x, g2d->GetHeight () - mouse_y);
 
       v = camera->InvPerspective (p, 1);
       csVector3 vw = camera->GetTransform ().This2Other (v);
