@@ -62,6 +62,9 @@
             <file>/shader/lighting/fullbright.xml</file>
         </shader>
         <shader>
+            <file>/shader/lighting/fullbright_instance.xml</file>
+        </shader>
+        <shader>
             <file>/shader/lighting/lighting_default_instance.xml</file>
         </shader>
         <shader>
@@ -237,21 +240,21 @@
         <meshgen name="grass">
             <geometry>
                 <factory maxdist="30" name="treebark_bare" />
-                <radius>1</radius>
+                <radius>.3</radius>
                 <density>0.02</density>
                 <materialfactor material="Grass" factor=".4" />
                 <defaultmaterialfactor>.7</defaultmaterialfactor>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="tree" />
-                <radius>1</radius>
+                <radius>.3</radius>
                 <density>0.02</density>
                 <materialfactor material="Grass" factor="1" />
                 <defaultmaterialfactor>.1</defaultmaterialfactor>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="tree_skimp" />
-                <radius>1</radius>
+                <radius>.3</radius>
                 <density>0.01</density>
                 <materialfactor material="Grass" factor="1" />
                 <defaultmaterialfactor>.1</defaultmaterialfactor>
@@ -261,8 +264,8 @@
                 <factory maxdist="30" name="GrassLow" />
                 <radius>0.1</radius>
                 <density>1</density>
-                <!-- bugged? <materialfactor material="Grass" factor="1" /> -->
-                <defaultmaterialfactor>.1</defaultmaterialfactor>
+                <materialfactor material="Grass" factor="1" />
+                <defaultmaterialfactor>.01</defaultmaterialfactor>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="bush2" />
@@ -277,7 +280,7 @@
                 <factory maxdist="30" name="TallGrassLow" />
                 <radius>0.1</radius>
                 <density>.1</density>
-                <!-- bugged? <materialfactor material="Grass" factor="1" /> -->
+                <materialfactor material="Grass" factor="1" />
                 <defaultmaterialfactor>.1</defaultmaterialfactor>
             </geometry>
             <geometry>

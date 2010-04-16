@@ -20,8 +20,8 @@
     <materials>
         <material name="grass.dds">
             <texture>grass.dds</texture>
-            <shader type="base">lighting_default_instance_binalpha</shader>
-            <shader type="diffuse">lighting_default_instance_binalpha</shader>
+            <shader type="base">lighting_fullbright_instance</shader>
+            <shader type="diffuse">lighting_fullbright_instance</shader>
         </material>
     </materials>
     <meshfact name="Grass">

@@ -4464,5 +4464,8 @@
             <t v1="2959" v2="2957" v3="2956" />
             <autonormals />
         </params>
+           <!--
+            <imposter range="1.0" tolerance="45.0" camera_tolerance="45.0" shader="lighting_imposter" />
+           -->
     </meshfact>
 </library>
