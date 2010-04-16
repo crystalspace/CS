@@ -174,14 +174,14 @@ struct iCamera : public virtual iBase
   virtual void SetFOVAngle (float fov, int width) = 0;
 
   /**
-   * Set the X shift amount. The parameter specified the desired X coordinate
+   * Get the X shift amount. The parameter specified the desired X coordinate
    * on screen of the projection center of the camera.
    * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
    */
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetShiftX () const = 0;
   /**
-   * Set the Y shift amount. The parameter specified the desired Y coordinate
+   * Get the Y shift amount. The parameter specified the desired Y coordinate
    * on screen of the projection center of the camera.
    * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
    */
@@ -369,12 +369,12 @@ struct iPerspectiveCamera : public virtual iBase
   virtual void SetFOVAngle (float fov, float width) = 0;
 
   /**
-   * Set the X shift amount. The parameter specified the desired X coordinate
+   * Get the X shift amount. The parameter specified the desired X coordinate
    * on the normalized screen of the projection center of the camera.
    */
   virtual float GetShiftX () const = 0;
   /**
-   * Set the Y shift amount. The parameter specified the desired Y coordinate
+   * Get the Y shift amount. The parameter specified the desired Y coordinate
    * on the normalized screen of the projection center of the camera.
    */
   virtual float GetShiftY () const = 0;
