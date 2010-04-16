@@ -142,12 +142,13 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
   {
     // Trying to kill Krystal
 
-    // Compute the beam points to check what was hit
+    // We will trace a beam to the point clicked by the mouse to check if
+    // something is hit. Let's start by computing the beam end points.
     int mouseX = csMouseEventHelper::GetX (&ev);
     int mouseY = csMouseEventHelper::GetY (&ev);
 
     csRef<iCamera> camera = avatarTest->view->GetCamera ();
-    csVector2 v2d (mouseX, camera->GetShiftY () * 2 - mouseY);
+    csVector2 v2d (mouseX, avatarTest->g2d->GetHeight () - mouseY);
     csVector3 v3d = camera->InvPerspective (v2d, 10000);
     csVector3 startBeam = camera->GetTransform ().GetOrigin ();
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -181,7 +182,7 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     if (!animesh)
       return false;
 
-    // OK, it's an animesh, it must be Krystal, start the ragdoll
+    // OK, it's an animesh, it must be Krystal, let's kill her
     krystalDead = true;
 
     // The ragdoll model of Krystal is rather complex. We therefore use high
@@ -218,7 +219,8 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
       physicsResult.body->AddForceAtPos (physicsResult.isect, force * 5.0f);
-      physicsResult.body->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 5.0f));
+      physicsResult.body->SetLinearVelocity (tc.GetT2O ()
+					     * csVector3 (0.0f, 0.0f, 5.0f));
     }
 
     return true;

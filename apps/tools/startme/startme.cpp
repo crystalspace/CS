@@ -44,7 +44,7 @@ void StartMe::Frame ()
   int mouse_x = mouse->GetLastX ();
   int mouse_y = mouse->GetLastY ();
   iCamera* camera = view->GetCamera ();
-  csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
+  csVector2 p (mouse_x, g3d->GetDriver2D ()->GetHeight () - mouse_y);
 
   csVector3 light_v, star_v;
 

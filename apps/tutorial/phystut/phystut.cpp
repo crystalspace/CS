@@ -459,9 +459,9 @@ bool Simple::OnMouseDown (iEvent& ev)
     int mouseX = csMouseEventHelper::GetX (&ev);
     int mouseY = csMouseEventHelper::GetY (&ev);
 
-    // Compute the beam points
+    // Compute the end beam points
     csRef<iCamera> camera = view->GetCamera ();
-    csVector2 v2d (mouseX, camera->GetShiftY () * 2 - mouseY);
+    csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
     csVector3 v3d = camera->InvPerspective (v2d, 10000);
     csVector3 startBeam = camera->GetTransform ().GetOrigin ();
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);

@@ -169,10 +169,6 @@ void csWaterDemo::SetupFrame ()
   }
 */
 
-  r3d->SetPerspectiveAspect (r3d->GetDriver2D ()->GetHeight ());
-  r3d->SetPerspectiveCenter (r3d->GetDriver2D ()->GetWidth ()/2,
-                             r3d->GetDriver2D ()->GetHeight ()/2);
-
   // Tell 3D driver we're going to display 3D things.
   if (!r3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER))
     return;

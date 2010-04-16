@@ -209,12 +209,13 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
   {
     // Trying to kill Frankie
 
-    // Compute the beam points to check what was hit
+    // We will trace a beam to the point clicked by the mouse to check if
+    // something is hit. Let's start by computing the beam end points.
     int mouseX = csMouseEventHelper::GetX (&ev);
     int mouseY = csMouseEventHelper::GetY (&ev);
 
     csRef<iCamera> camera = avatarTest->view->GetCamera ();
-    csVector2 v2d (mouseX, camera->GetShiftY () * 2 - mouseY);
+    csVector2 v2d (mouseX, avatarTest->g2d->GetHeight () - mouseY);
     csVector3 v3d = camera->InvPerspective (v2d, 10000);
     csVector3 startBeam = camera->GetTransform ().GetOrigin ();
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -225,7 +226,8 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
       // Trace a physical beam to find if a rigid body was hit
       csRef<iBulletDynamicSystem> bulletSystem =
 	scfQueryInterface<iBulletDynamicSystem> (avatarTest->dynamicSystem);
-      csBulletHitBeamResult physicsResult = bulletSystem->HitBeam (startBeam, endBeam);
+      csBulletHitBeamResult physicsResult =
+	bulletSystem->HitBeam (startBeam, endBeam);
 
       // Apply a big force at the point clicked by the mouse
       if (physicsResult.body)
@@ -249,7 +251,7 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     if (!animesh)
       return false;
 
-    // OK, it's an animesh, it must be Frankie, start the ragdoll
+    // OK, it's an animesh, it must be Frankie, let's kill him
     frankieDead = true;
 
     // Close the eyes of Frankie as he is dead

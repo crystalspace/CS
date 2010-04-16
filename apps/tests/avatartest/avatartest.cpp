@@ -166,6 +166,10 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
       // Re-initialize camera position
       view->GetCamera ()->GetTransform ().SetOrigin (avatarScene->GetCameraStart ());
 
+      // Toggle the debug mode of the dynamic system
+      dynamicsDebugMode = DYNDEBUG_NONE;
+      dynamicsDebugger->SetDebugDisplayMode (false);
+
       return true;
     }
 
