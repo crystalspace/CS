@@ -523,7 +523,6 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     {
       if (UseImposter (rview))
       {
-	printf ("YES!\n"); fflush (stdout);
         if (!using_imposter)
         {
           factwrap->AddImposter (this, rview);
