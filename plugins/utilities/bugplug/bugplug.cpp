@@ -921,19 +921,29 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_FOV:
       if (catcher->camera)
 	{
-	  csString buf;
-        int fov = catcher->camera->GetFOV ();
-	  buf.Format ("%d", fov);
-	  EnterEditMode (cmd, "Enter new fov value:", buf);
+	  csRef<iPerspectiveCamera> pcamera =
+	    scfQueryInterface<iPerspectiveCamera> (catcher->camera);
+	  if (pcamera)
+	    {
+	      csString buf;
+	      float fov = pcamera->GetFOV ();
+	      buf.Format ("%f", fov);
+	      EnterEditMode (cmd, "Enter new fov value:", buf);
+	    }
 	}
 	break;
     case DEBUGCMD_FOVANGLE:
       if (catcher->camera)
 	{
-	  csString buf;
-        float fov = catcher->camera->GetFOVAngle ();
-	  buf.Format ("%g", fov);
-	  EnterEditMode (cmd, "Enter new fov angle:", buf);
+	  csRef<iPerspectiveCamera> pcamera =
+	    scfQueryInterface<iPerspectiveCamera> (catcher->camera);
+	  if (pcamera)
+	    {
+	      csString buf;
+	      float fov = pcamera->GetFOVAngle ();
+	      buf.Format ("%g", fov);
+	      EnterEditMode (cmd, "Enter new fov angle:", buf);
+	    }
 	}
 	break;
     case DEBUGCMD_DEBUGSECTOR:
@@ -2075,7 +2085,6 @@ void csBugPlug::EnterEditMode (int cmd, const char* msg, const char* def)
 void csBugPlug::ExitEditMode ()
 {
   if (edit_string.Length () == 0) return;
-  int i;
   float f;
   switch (edit_command)
   {
@@ -2084,14 +2093,24 @@ void csBugPlug::ExitEditMode ()
       G2D->SetGamma (f);
       break;
     case DEBUGCMD_FOV:
-      csScanStr (edit_string, "%d", &i);
+      csScanStr (edit_string, "%f", &f);
       if (catcher->camera)
-        catcher->camera->SetFOV (i, G3D->GetWidth ());
+	{
+	  csRef<iPerspectiveCamera> pcamera =
+	    scfQueryInterface<iPerspectiveCamera> (catcher->camera);
+	  if (pcamera)
+	    pcamera->SetFOV (f, 1.0f);
+	}
       break;
     case DEBUGCMD_FOVANGLE:
       csScanStr (edit_string, "%f", &f);
       if (catcher->camera)
-        catcher->camera->SetFOVAngle (f, G3D->GetWidth ());
+	{
+	  csRef<iPerspectiveCamera> pcamera =
+	    scfQueryInterface<iPerspectiveCamera> (catcher->camera);
+	  if (pcamera)
+	    pcamera->SetFOVAngle (f, 1.0f);
+	}
       break;
     case DEBUGCMD_SELECTMESH:
       if (catcher->camera)
@@ -2596,11 +2615,26 @@ void csBugPlug::Dump (iCamera* c)
   const char* sn = c->GetSector ()->QueryObject ()->GetName ();
   if (!sn) sn = "?";
   csPlane3* far_plane = c->GetFarPlane ();
-  Report (CS_REPORTER_SEVERITY_DEBUG,
-  	"Camera: %s (mirror=%d, fov=%d, fovangle=%g,",
-  	sn, (int)c->IsMirrored (), (int)c->GetFOV (), c->GetFOVAngle ());
-  Report (CS_REPORTER_SEVERITY_DEBUG, "    shiftx=%g shifty=%g camnr=%ld)",
-  	c->GetShiftX (), c->GetShiftY (), c->GetCameraNumber ());
+  csRef<iPerspectiveCamera> pcamera =
+    scfQueryInterface<iPerspectiveCamera> (catcher->camera);
+
+  if (pcamera)
+    {
+      Report (CS_REPORTER_SEVERITY_DEBUG,
+	      "Camera: %s (mirror=%d, fov=%g, fovangle=%g,",
+	      sn, (int)c->IsMirrored (), pcamera->GetFOV (), pcamera->GetFOVAngle ());
+      Report (CS_REPORTER_SEVERITY_DEBUG, "    shiftx=%g shifty=%g camnr=%ld)",
+	      pcamera->GetShiftX (), pcamera->GetShiftY (), c->GetCameraNumber ());
+    }
+
+  else
+    {
+      Report (CS_REPORTER_SEVERITY_DEBUG,
+	      "Camera: %s (mirror=%d, ", sn, (int)c->IsMirrored ());
+      Report (CS_REPORTER_SEVERITY_DEBUG, "    camnr=%ld)",
+	      c->GetCameraNumber ());
+    }
+
   if (far_plane)
     Report (CS_REPORTER_SEVERITY_DEBUG, "    far_plane=(%g,%g,%g,%g)",
     	far_plane->A (), far_plane->B (), far_plane->C (), far_plane->D ());
