@@ -43,7 +43,6 @@ struct iSndSysStream;
  */
 struct iSndSysData : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysData,0,2,0);
 
   /// Get the format of the sound data.

@@ -45,7 +45,6 @@ struct csSndSysSoundFormat;
  */
 struct iSndSysSoftwareDriver : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSoftwareDriver,0,2,0);
 
   /**
