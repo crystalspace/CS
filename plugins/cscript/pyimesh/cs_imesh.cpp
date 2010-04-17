@@ -3506,6 +3506,8 @@ SWIGINTERN int iSprite3DState_scfGetVersion(){ return scfInterfaceTraits<iSprite
 SWIGINTERN void delete_iSprite3DState(iSprite3DState *self){ if (self) self->DecRef (); }
 SWIGINTERN int iSpriteCal3DState_scfGetVersion(){ return scfInterfaceTraits<iSpriteCal3DState>::GetVersion(); }
 SWIGINTERN void delete_iSpriteCal3DState(iSpriteCal3DState *self){ if (self) self->DecRef (); }
+SWIGINTERN int iMaterialArray_scfGetVersion(){ return scfInterfaceTraits<iMaterialArray>::GetVersion(); }
+SWIGINTERN void delete_iMaterialArray(iMaterialArray *self){ if (self) self->DecRef (); }
 SWIGINTERN int iMeshObject_scfGetVersion(){ return scfInterfaceTraits<iMeshObject>::GetVersion(); }
 SWIGINTERN void delete_iMeshObject(iMeshObject *self){ if (self) self->DecRef (); }
 SWIGINTERN int iMeshObjectFactory_scfGetVersion(){ return scfInterfaceTraits<iMeshObjectFactory>::GetVersion(); }
@@ -32039,13 +32041,13 @@ SWIGINTERN PyObject *iSpriteCal3DState_swigregister(PyObject *SWIGUNUSEDPARM(sel
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_new_iMaterialArray(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iMaterialArray_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  iMaterialArray *result = 0 ;
+  int result;
   
-  if(!PyArg_UnpackTuple(args,(char *)"new_iMaterialArray",0,0)) SWIG_fail;
-  result = (iMaterialArray *)new iMaterialArray();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iMaterialArray, SWIG_POINTER_NEW |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"iMaterialArray_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iMaterialArray_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -32065,7 +32067,7 @@ SWIGINTERN PyObject *_wrap_delete_iMaterialArray(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iMaterialArray" "', argument " "1"" of type '" "iMaterialArray *""'"); 
   }
   arg1 = reinterpret_cast< iMaterialArray * >(argp1);
-  delete arg1;
+  delete_iMaterialArray(arg1);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -50053,7 +50055,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSpriteCal3DState_scfGetVersion", _wrap_iSpriteCal3DState_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSpriteCal3DState", _wrap_delete_iSpriteCal3DState, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_swigregister", iSpriteCal3DState_swigregister, METH_VARARGS, NULL},
-	 { (char *)"new_iMaterialArray", _wrap_new_iMaterialArray, METH_VARARGS, NULL},
+	 { (char *)"iMaterialArray_scfGetVersion", _wrap_iMaterialArray_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iMaterialArray", _wrap_delete_iMaterialArray, METH_VARARGS, NULL},
 	 { (char *)"iMaterialArray_swigregister", iMaterialArray_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iMeshObjectDrawCallback_BeforeDrawing", _wrap_iMeshObjectDrawCallback_BeforeDrawing, METH_VARARGS, NULL},

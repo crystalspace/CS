@@ -1566,15 +1566,14 @@ CS_MESH_STATICSHAPE = _imesh.CS_MESH_STATICSHAPE
 CS_FACTORY_STATICSHAPE = _imesh.CS_FACTORY_STATICSHAPE
 class iMaterialArray(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _imesh.new_iMaterialArray(*args)
-        try: self.this.append(this)
-        except: self.this = this
+    scfGetVersion = staticmethod(_imesh.iMaterialArray_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iMaterialArray
     __del__ = lambda self : None;
 iMaterialArray_swigregister = _imesh.iMaterialArray_swigregister
 iMaterialArray_swigregister(iMaterialArray)
+iMaterialArray_scfGetVersion = _imesh.iMaterialArray_scfGetVersion
 
 class iMeshObjectDrawCallback(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

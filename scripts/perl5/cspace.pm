@@ -17309,12 +17309,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_iMaterialArray(@_);
-    bless $self, $pkg if defined($self);
-}
-
+*scfGetVersion = *cspacec::iMaterialArray_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
