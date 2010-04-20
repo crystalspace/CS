@@ -195,6 +195,8 @@ public:
 
   //-- iBulletDynamicSystem
   virtual void DebugDraw (iView* view);
+  virtual void SetDebugMode (csBulletDebugMode mode);
+  virtual csBulletDebugMode GetDebugMode ();
   virtual csBulletHitBeamResult HitBeam (const csVector3 &start, const csVector3 &end);
   virtual void SetInternalScale (float scale);
   virtual void SetStepParameters (float timeStep, size_t maxSteps,

@@ -49,16 +49,29 @@ struct csBulletHitBeamResult
 };
 
 /**
+ * The debug modes to be used with iBulletDynamicSystem::DebugDraw().
+ */
+enum csBulletDebugMode
+{
+  BULLET_DEBUG_NOTHING = 0,     /*!< Nothing will be displayed. */
+  BULLET_DEBUG_COLLIDERS = 1,   /*!< Display the colliders of the bodies. */
+  BULLET_DEBUG_AABB = 2,        /*!< Display the axis aligned bounding boxes of the bodies. */
+  BULLET_DEBUG_JOINTS = 4       /*!< Display the joint positions and limits. */
+};
+
+/**
  * The Bullet implementation of iDynamicSystem also implements this
  * interface.
  * \sa iDynamicSystem iODEDynamicSystemState
  */
 struct iBulletDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 1);
+  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 2);
 
   /**
-   * Draw debug information for all colliders managed by bullet.
+   * Draw the debug informations of the dynamic system. This has to be called
+   * at each frame, and will add 2D lines on top of the rendered scene. The
+   * objects to be displayed are defined by SetDebugMode().
    */
   virtual void DebugDraw (iView* rview) = 0;
 
@@ -102,6 +115,19 @@ struct iBulletDynamicSystem : public virtual iBase
    */
   virtual void SetStepParameters (float timeStep, size_t maxSteps,
 				  size_t iterations) = 0;
+
+  /**
+   * Set the mode to be used when displaying debug informations. The default value
+   * is 'BULLET_DEBUG_COLLIDERS | BULLET_DEBUG_JOINTS'.
+   * \remark Don't forget to call DebugDraw() at each frame to effectively display
+   * the debug informations.
+   */
+  virtual void SetDebugMode (csBulletDebugMode mode) = 0;
+
+  /**
+   * Return the current mode used when displaying debug informations.
+   */
+  virtual csBulletDebugMode GetDebugMode () = 0;
 };
 
 /**

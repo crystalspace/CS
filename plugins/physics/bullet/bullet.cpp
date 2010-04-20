@@ -148,6 +148,8 @@ static btTriangleIndexVertexArray* GenerateTriMeshData
   csRef<iTriangleMesh> trimesh = FindColdetTriangleMesh(mesh, base_id, colldet_id);
   if (!trimesh)
     return 0;
+
+  // TODO: remove double vertices
   csTriangle *c_triangle = trimesh->GetTriangles();
   triangleCount = trimesh->GetTriangleCount();
   vertexCount = trimesh->GetVertexCount ();
@@ -332,11 +334,13 @@ private:
 
 public:
   csBulletDebugDraw (float inverseInternalScale)
+    : mode (DBG_DrawWireframe | DBG_DrawConstraints | DBG_DrawConstraintLimits),
+      inverseInternalScale (inverseInternalScale)
   {
-    mode = DBG_DrawWireframe;
-    this->inverseInternalScale = inverseInternalScale;
   }
+
   virtual ~csBulletDebugDraw () { }
+
   virtual void drawLine (const btVector3& from, const btVector3& to,
       const btVector3& color)
   {
@@ -346,46 +350,72 @@ public:
     l.color.Set (color.getX (), color.getY (), color.getZ ());
     lines.Push (l);
   }
-  virtual void drawContactPoint (const btVector3& pointOnB,
-      const btVector3& normalOnB, btScalar distance, int lifeTime,
-      const btVector3& color)
+
+  virtual void drawContactPoint (const btVector3 &PointOnB,
+				 const btVector3 &normalOnB,
+				 btScalar distance, int lifeTime,
+				 const btVector3 &color)
+  {}
+
+  virtual void reportErrorWarning (const char *warningString)
+  {}
+
+  virtual void draw3dText (const btVector3 &location, const char *textString)
+  {}
+
+  void SetDebugMode (csBulletDebugMode mode)
   {
+    this->mode = 0;
+    if (mode & BULLET_DEBUG_COLLIDERS)
+      this->mode |= DBG_DrawWireframe;
+    if (mode & BULLET_DEBUG_AABB)
+      this->mode |= DBG_DrawAabb;
+    if (mode & BULLET_DEBUG_JOINTS)
+      this->mode |= DBG_DrawConstraints | DBG_DrawConstraintLimits;
   }
-  virtual void reportErrorWarning (const char* warning)
+
+  csBulletDebugMode GetDebugMode ()
   {
-  }
-  virtual void draw3dText (const btVector3& location,
-      const char* textString)
-  {
+    csBulletDebugMode mode = BULLET_DEBUG_NOTHING;
+    if (this->mode & DBG_DrawWireframe)
+      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_COLLIDERS);
+    if (this->mode & DBG_DrawAabb)
+      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_AABB);
+    if (this->mode & DBG_DrawConstraints)
+      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_JOINTS);
+    return mode;
   }
 
   virtual void setDebugMode (int m)
   {
     mode = m;
   }
+
   virtual int getDebugMode () const
   {
     return mode;
   }
-  void ClearDebug ()
-  {
-    lines.Empty ();
-  }
+
   void DebugDraw (iView* view)
   {
-    size_t i;
     iGraphics3D* g3d = view->GetContext ();
     iGraphics2D* g2d = g3d->GetDriver2D ();
-    iCamera* cam = view->GetCamera ();
-    csTransform tr_w2c = cam->GetTransform ();
-    float fov = g3d->GetPerspectiveAspect ();
-    for (i = 0 ; i < lines.GetSize () ; i++)
+    csTransform tr_w2c = view->GetCamera ()->GetTransform ();
+    int fov = g2d->GetHeight ();
+
+    if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
+      return;
+
+    for (size_t i = 0 ; i < lines.GetSize () ; i++)
     {
       csBulletDebugLine& l = lines[i];
       int color = g2d->FindRGB (int (l.color.red * 255),
-	  int (l.color.green * 255), int (l.color.blue * 255));
+				int (l.color.green * 255),
+				int (l.color.blue * 255));
       g3d->DrawLine (tr_w2c * l.p1, tr_w2c * l.p2, fov, color);
     }
+
+    lines.Empty ();
   }
 };
 
@@ -563,7 +593,6 @@ void csBulletDynamicsSystem::CheckCollisions ()
 
 void csBulletDynamicsSystem::Step (float stepsize)
 {
-  if (debugDraw) debugDraw->ClearDebug ();
   bulletWorld->stepSimulation (stepsize, (int)worldMaxSteps, worldTimeStep);
   CheckCollisions();
 }
@@ -802,10 +831,38 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
     debugDraw = new csBulletDebugDraw (inverseInternalScale);
     bulletWorld->setDebugDrawer (debugDraw);
   }
-  else
+
+  bulletWorld->debugDrawWorld();
+  debugDraw->DebugDraw (view);
+}
+
+void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
+{
+  if (mode == BULLET_DEBUG_NOTHING)
   {
-    debugDraw->DebugDraw (view);
+    if (debugDraw)
+    {
+      delete debugDraw;
+      bulletWorld->setDebugDrawer (0);
+    }
+    return;
   }
+
+  if (!debugDraw)
+  {
+    debugDraw = new csBulletDebugDraw (inverseInternalScale);
+    bulletWorld->setDebugDrawer (debugDraw);
+  }
+
+  debugDraw->SetDebugMode (mode);
+}
+
+csBulletDebugMode csBulletDynamicsSystem::GetDebugMode ()
+{
+  if (!debugDraw)
+    return BULLET_DEBUG_NOTHING;
+
+  return debugDraw->GetDebugMode ();
 }
 
 csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
@@ -833,6 +890,8 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
 
 void csBulletDynamicsSystem::SetInternalScale (float scale)
 {
+  CS_ASSERT(!dynamicBodies.GetSize ());
+
   // save gravity
   csVector3 tempGravity = GetGravity ();
 
@@ -1151,7 +1210,7 @@ bool csBulletRigidBody::MakeDynamic (void)
 
     // set body dynamic
     btVector3 localInertia (0.0f, 0.0f, 0.0f);
-    body->getCollisionShape()->calculateLocalInertia (mass, localInertia);
+    compoundShape->calculateLocalInertia (mass, localInertia);
     body->setMassProps(mass, localInertia);
     body->setActivationState(ACTIVE_TAG);
     body->setLinearVelocity (linearVelocity);
