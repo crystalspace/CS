@@ -50,6 +50,9 @@
 
 class csPixmap;
 
+/**
+ * Various camera modes which can be used with csDemoApplication.
+ */
 enum csDemoCameraMode
 {
   CSDEMO_CAMERA_NONE = 0,         /*!< The application will manage the camera by itself */
@@ -58,13 +61,27 @@ enum csDemoCameraMode
   CSDEMO_CAMERA_ROTATE_ORIGIN     /*!< The camera can only rotate relatively to the origin of the scene */
 };
 
+/**
+ * A generic tool to print the command line help when the '-help' option is used.
+ */
 class csDemoCommandLineHelper
 {
  public:
+  /**
+   * Constructor.
+   * \param applicationCommand Name of the executable (eg "myapp").
+   * \param applicationCommandUsage Syntax to use the executable (eg "myapp
+   * <OPTIONS> filename"). Additional lines of text with examples of use can also
+   * be added.
+   * \param applicationDescription User friendly description of the application.
+   */
   csDemoCommandLineHelper (const char* applicationCommand,
 			   const char* applicationCommandUsage,
 			   const char* applicationDescription);
 
+  /**
+   * Print to standard output all command options and usages of this executable.
+   */
   void WriteHelp (iObjectRegistry* registry);
 
   /// Command line options displayed when the '-help' option is used
@@ -103,7 +120,7 @@ class csDemoCommandLineHelper
  * - management of the camera
  * - display of the available keys
  * - display of the information on the state of the application
- * - display of Crystal Space's logo
+ * - display of the Crystal Space logo
  * - management of the command line's help
  *
  * Here is an example for the most simple use of this class:
@@ -202,19 +219,11 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
   /// Base implementation of a method inherited from csBaseEventHandler
   virtual bool OnMouseMove (iEvent &event);
 
-  /// Camera mode
-  csDemoCameraMode cameraMode;
-
   /**
    * Basic initialization for the creation of the main sector. It creates
    * a background far away, initializes the camera, and adds a few lights.
    */
   virtual bool CreateRoom ();
-
-  /// Display of a 2D text with a shadow
-  void WriteShadow (int x, int y, int color, const char *str,...);
-  /// Display of a 2D text
-  void Write (int x, int y, int fg, int color, const char *str,...);
 
   /// Array of string describing the available keys
   csStringArray keyDescriptions;
@@ -224,16 +233,35 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
   // Command line help
   csDemoCommandLineHelper commandLineHelper;
 
+  /// Display of a 2D text with a shadow
+  void WriteShadow (int x, int y, int color, const char *str,...);
+  /// Display of a 2D text
+  void Write (int x, int y, int fg, int color, const char *str,...);
+
+  /// Set the camera mode to be used. Default value is CSDEMO_CAMERA_MOVE_NORMAL.
+  void SetCameraMode (csDemoCameraMode cameraMode);
+  /// Return the current camera mode.
+  csDemoCameraMode GetCameraMode ();
+
+  /**
+   * Set whether or not the 2D info and logo must be displayed, or simply the 3D
+   * rendering. Default value is true.
+   */
+  void SetGUIDisplayed (bool displayed);
+  /// Return whether or not the 2D info and logo are currently displayed.
+  bool GetGUIDisplayed ();
+
  public:
   /**
    * Constructor. The parameters of this constructor are used mainly to display
    * information when the '-help' option is used.
    * \param applicationName Name of the application, used to set
    * csApplicationFramework::SetApplicationName().
-   * \param applicationCommand Name of the executable
+   * \param applicationCommand Name of the executable (eg "myapp").
    * \param applicationCommandUsage Syntax to use the executable (eg "myapp
-   * <OPTIONS> filename"). Additional examples of use can also be added.
-   * \param applicationDescription Description of the application
+   * <OPTIONS> filename"). Additional lines of text with examples of use can also
+   * be added.
+   * \param applicationDescription User friendly description of the application.
    */
   csDemoApplication (const char* applicationName, const char* applicationCommand,
 		     const char* applicationCommandUsage,
@@ -253,6 +281,7 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
   void UpdateCamera ();
   void FixCameraForOrigin (const csVector3 & desiredOrigin);
 
+  csDemoCameraMode cameraMode;
   csVector3 cameraTarget;
   float cameraDist;
   float cameraYaw;
@@ -266,6 +295,9 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
 
   // Crystal Space logo
   csPixmap* cslogo;
+
+  // Whether the 2D GUI (help and logo) should be displayed
+  bool guiDisplayed;
 
   // Computing of frames per second
   uint frameCount;

@@ -64,9 +64,9 @@ csDemoApplication::csDemoApplication (const char* applicationName,
 				      const char* applicationCommand,
 				      const char* applicationCommandUsage,
 				      const char* applicationDescription)
-  : cameraMode (CSDEMO_CAMERA_MOVE_NORMAL),
-    commandLineHelper (applicationCommand, applicationCommandUsage, applicationDescription),
-    cslogo (0), frameCount (0), frameTime (0), currentFPS (0.0f)
+  : commandLineHelper (applicationCommand, applicationCommandUsage, applicationDescription),
+    cameraMode (CSDEMO_CAMERA_MOVE_NORMAL), cslogo (0), guiDisplayed (true), frameCount (0),
+    frameTime (0), currentFPS (0.0f)
 {
   SetApplicationName (applicationName);
 
@@ -201,6 +201,10 @@ void csDemoApplication::Frame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+
+  // It's over if we don't have to display the 2D information and the logo.
+  if (!guiDisplayed)
+    return;
 
   // Tell the 3D driver we're going to display 2D things.
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
@@ -394,31 +398,6 @@ bool csDemoApplication::OnMouseMove (iEvent& e)
   return false;
 }
 
-void csDemoApplication::WriteShadow (int x, int y, int fg, const char *str,...)
-{
-  csString buf;
-  va_list arg;
-
-  va_start (arg, str);
-  buf.FormatV (str, arg);
-  va_end (arg);
-
-  Write (x + 1, y - 1, 0, -1, "%s", buf.GetData ());
-  Write (x, y, fg, -1, "%s", buf.GetData ());
-}
-
-void csDemoApplication::Write (int x, int y, int fg, int bg, const char *str,...)
-{
-  csString buf;
-  va_list arg;
-
-  va_start (arg,str);
-  buf.FormatV (str, arg);
-  va_end (arg);
-
-  g2d->Write (font, x, y, fg, bg, buf);
-}
-
 void csDemoApplication::OnExit ()
 {
   printer.Invalidate ();
@@ -575,4 +554,49 @@ bool csDemoApplication::CreateRoom ()
   CS::Lighting::SimpleStaticLighter::ShineLights (room, engine, 4);
 
   return true;
+}
+
+void csDemoApplication::WriteShadow (int x, int y, int fg, const char *str,...)
+{
+  csString buf;
+  va_list arg;
+
+  va_start (arg, str);
+  buf.FormatV (str, arg);
+  va_end (arg);
+
+  Write (x + 1, y - 1, 0, -1, "%s", buf.GetData ());
+  Write (x, y, fg, -1, "%s", buf.GetData ());
+}
+
+void csDemoApplication::Write (int x, int y, int fg, int bg, const char *str,...)
+{
+  csString buf;
+  va_list arg;
+
+  va_start (arg,str);
+  buf.FormatV (str, arg);
+  va_end (arg);
+
+  g2d->Write (font, x, y, fg, bg, buf);
+}
+
+void csDemoApplication::SetCameraMode (csDemoCameraMode cameraMode)
+{
+  this->cameraMode = cameraMode;
+}
+
+csDemoCameraMode csDemoApplication::GetCameraMode ()
+{
+  return cameraMode;
+}
+
+void csDemoApplication::SetGUIDisplayed (bool displayed)
+{
+  guiDisplayed = displayed;
+}
+
+bool csDemoApplication::GetGUIDisplayed ()
+{
+  return guiDisplayed;
 }
