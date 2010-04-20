@@ -260,7 +260,7 @@ bool StartMe::OnMouseDown (iEvent& /*event*/)
 
 bool StartMe::LoadTextures ()
 {
-  if (!loader->LoadTexture ("spark", "/lib/std/spark.png"))
+  if (!loader->LoadTexture ("spark", "/lib/std/sparka.dds"))
     return ReportError ("Error loading '%s' texture!", "spark");
 
   vfs->ChDir ("/lib/startme");
