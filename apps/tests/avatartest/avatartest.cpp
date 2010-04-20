@@ -43,11 +43,12 @@ AvatarTest::AvatarTest ()
   cameraMode = CSDEMO_CAMERA_NONE;
 
   // Command line options
-  commandOptions.Push (CommandOption
-		       ("scene=<name>",
-			"Set the starting scene (frankie, krystal, sintel)"));
-  commandOptions.Push (CommandOption
-		       ("no_physics", "Disable the physical animations"));
+  commandLineHelper.commandOptions.Push
+    (csDemoCommandLineHelper::CommandOption
+     ("scene=<name>", "Set the starting scene (frankie, krystal, sintel)"));
+  commandLineHelper.commandOptions.Push
+    (csDemoCommandLineHelper::CommandOption
+     ("no_physics", "Disable the physical animations"));
 }
 
 AvatarTest::~AvatarTest ()

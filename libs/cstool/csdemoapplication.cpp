@@ -26,16 +26,53 @@
 #include "cstool/materialbuilder.h"
 #include "cstool/csdemoapplication.h"
 
+csDemoCommandLineHelper::csDemoCommandLineHelper (const char* applicationCommand,
+						  const char* applicationCommandUsage,
+						  const char* applicationDescription)
+  : applicationCommand (applicationCommand),
+    applicationCommandUsage (applicationCommandUsage),
+    applicationDescription (applicationDescription)
+{
+}
+
+void csDemoCommandLineHelper::WriteHelp (iObjectRegistry* registry)
+{
+  csPrintf ("%s\n\n", applicationDescription.GetData ());
+  csPrintf ("Usage: %s\n\n", applicationCommandUsage.GetData ());
+  csPrintf ("Available options:\n\n");
+
+  if (commandOptions.GetSize ())
+    csPrintf ("Specific options for %s:\n", applicationCommand.GetData ());
+
+  for (csArray<CommandOption>::Iterator it = commandOptions.GetIterator ();
+       it.HasNext (); )
+  {
+    CommandOption commandOption = it.Next ();
+    csPrintf ("  -%-*s%s\n", 18, commandOption.option.GetData (),
+	      commandOption.description.GetData ());
+  }
+
+  if (commandOptions.GetSize ())
+    csPrintf ("\n");
+
+  csCommandLineHelper::Help (registry);
+}
+
+// ---------------------------------------------------------------------
+
 csDemoApplication::csDemoApplication (const char* applicationName,
 				      const char* applicationCommand,
 				      const char* applicationCommandUsage,
 				      const char* applicationDescription)
   : cameraMode (CSDEMO_CAMERA_MOVE_NORMAL),
-    applicationCommand (applicationCommand),
-    applicationCommandUsage (applicationCommandUsage),
-    applicationDescription (applicationDescription), cslogo (0)
+    commandLineHelper (applicationCommand, applicationCommandUsage, applicationDescription),
+    cslogo (0), frameCount (0), frameTime (0), currentFPS (0.0f)
 {
   SetApplicationName (applicationName);
+
+  // Define the default text for the available keys
+  keyDescriptions.Push ("arrow keys: move camera");
+  keyDescriptions.Push ("SHIFT-arrow keys: move camera sideways");
 }
 
 csDemoApplication::~csDemoApplication ()
@@ -45,8 +82,20 @@ csDemoApplication::~csDemoApplication ()
 
 void csDemoApplication::Frame ()
 {
+  // Get elasped time
   csTicks elapsed_time = vc->GetElapsedTicks ();
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
+
+  // Update FPS data
+  frameCount++;
+  frameTime += elapsed_time;
+
+  if (frameTime > 500)
+  {
+    currentFPS = ((float) (frameCount * 1000)) / (float) frameTime;
+    frameCount = 0;
+    frameTime = 0;
+  }
 
   // Update the camera
   iCamera* camera = view->GetCamera ();
@@ -181,8 +230,7 @@ void csDemoApplication::Frame ()
   // Display state description
   int y = g2d->GetHeight () - margin - lineSize;
 
-  if (speed != 0.0f)
-    WriteShadow (margin, y, fontColor, "FPS: %.2f", 1.0f / speed);
+  WriteShadow (margin, y, fontColor, "FPS: %.2f", currentFPS);
   y -= lineSize;
 
   for (csStringArray::ReverseIterator it = stateDescriptions.GetReverseIterator ();
@@ -381,25 +429,7 @@ bool csDemoApplication::OnInitialize (int argc, char* argv[])
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (GetObjectRegistry ()))
   {
-    csPrintf ("%s\n\n", applicationDescription.GetData ());
-    csPrintf ("Usage: %s\n\n", applicationCommandUsage.GetData ());
-    csPrintf ("Available options:\n\n");
-
-    if (commandOptions.GetSize ())
-      csPrintf ("Specific options for %s:\n", applicationCommand.GetData ());
-
-    for (csArray<CommandOption>::Iterator it = commandOptions.GetIterator ();
-	 it.HasNext (); )
-    {
-      CommandOption commandOption = it.Next ();
-      csPrintf ("  -%-*s%s\n", 18, commandOption.option.GetData (),
-		commandOption.description.GetData ());
-    }
-
-    if (commandOptions.GetSize ())
-      csPrintf ("\n");
-
-    csCommandLineHelper::Help (GetObjectRegistry ());
+    commandLineHelper.WriteHelp (GetObjectRegistry ());
     return false;
   }
 
@@ -472,10 +502,6 @@ bool csDemoApplication::Application ()
     if (textureHandle)
       cslogo = new csSimplePixmap (textureHandle);
   }
-
-  // Define the default text for the available keys
-  keyDescriptions.Push ("arrow keys: move camera");
-  keyDescriptions.Push ("SHIFT-arrow keys: move camera sideways");
 
   return true;
 }

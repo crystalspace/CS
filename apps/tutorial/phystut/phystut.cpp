@@ -44,9 +44,9 @@ Simple::Simple ()
   cameraMode = CSDEMO_CAMERA_NONE;
 
   // Command line options
-  commandOptions.Push (CommandOption
-		       ("phys_engine=<name>",
-			"Specify which physics plugin to use (ode, bullet)"));
+  commandLineHelper.commandOptions.Push
+    (csDemoCommandLineHelper::CommandOption
+     ("phys_engine=<name>", "Specify which physics plugin to use (ode, bullet)"));
 }
 
 Simple::~Simple ()
@@ -204,6 +204,10 @@ void Simple::Frame ()
 
   // Default behavior from csDemoApplication
   csDemoApplication::Frame ();
+
+  // Display debug informations
+  if (do_bullet_debug)
+    bullet_dynSys->DebugDraw (view);
 }
 
 bool Simple::OnKeyboard (iEvent &ev)
@@ -533,6 +537,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     return ReportError ("No iDynamics plugin!");
 
   // Now that we know the physical plugin in use, we can define the available keys
+  keyDescriptions.DeleteAll ();
   keyDescriptions.Push ("b: spawn a box");
   keyDescriptions.Push ("s: spawn a sphere");
   if (phys_engine_id == BULLET_ID)

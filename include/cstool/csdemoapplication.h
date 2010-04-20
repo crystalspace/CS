@@ -58,6 +58,38 @@ enum csDemoCameraMode
   CSDEMO_CAMERA_ROTATE_ORIGIN     /*!< The camera can only rotate relatively to the origin of the scene */
 };
 
+class csDemoCommandLineHelper
+{
+ public:
+  csDemoCommandLineHelper (const char* applicationCommand,
+			   const char* applicationCommandUsage,
+			   const char* applicationDescription);
+
+  void WriteHelp (iObjectRegistry* registry);
+
+  /// Command line options displayed when the '-help' option is used
+  struct CommandOption
+  {
+    /// Constructor
+    CommandOption (const char* option, const char* description)
+    : option (option), description (description) {}
+
+    /// Name of the option
+    csString option;
+    /// Description of the option
+    csString description;
+  };
+
+  /// Array of command line options displayed when the '-help' option is used
+  csArray<CommandOption> commandOptions;
+
+ private:
+  // Command line help
+  csString applicationCommand;
+  csString applicationCommandUsage;
+  csString applicationDescription;
+};
+
 /**
  * Crystal Space demo application framework class. This is a base class
  * providing the basic functionalities for Crystal Space's demo and test
@@ -189,21 +221,8 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
   /// Array of string describing the state of the application
   csStringArray stateDescriptions;
 
-  /// Command line options displayed when the '-help' option is used
-  struct CommandOption
-  {
-    /// Constructor
-    CommandOption (const char* option, const char* description)
-    : option (option), description (description) {}
-
-    /// Name of the option
-    csString option;
-    /// Description of the option
-    csString description;
-  };
-
-  /// Array of command line options displayed when the '-help' option is used
-  csArray<CommandOption> commandOptions;
+  // Command line help
+  csDemoCommandLineHelper commandLineHelper;
 
  public:
   /**
@@ -229,11 +248,6 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
   virtual bool Application ();
 
  private:
-  // Command line help
-  csString applicationCommand;
-  csString applicationCommandUsage;
-  csString applicationDescription;
-
   // Camera related
   void ResetCamera ();
   void UpdateCamera ();
@@ -252,6 +266,11 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
 
   // Crystal Space logo
   csPixmap* cslogo;
+
+  // Computing of frames per second
+  uint frameCount;
+  int frameTime;
+  float currentFPS;
 };
 
 /** @} */
