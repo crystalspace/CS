@@ -230,7 +230,7 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
   /// Array of string describing the state of the application
   csStringArray stateDescriptions;
 
-  // Command line help
+  /// Command line helper
   csDemoCommandLineHelper commandLineHelper;
 
   /// Display of a 2D text with a shadow
