@@ -40,7 +40,7 @@ AvatarTest::AvatarTest ()
   // Configure the options for csDemoApplication
 
   // We manage the camera by ourselves
-  cameraMode = CSDEMO_CAMERA_NONE;
+  SetCameraMode (CSDEMO_CAMERA_NONE);
 
   // Command line options
   commandLineHelper.commandOptions.Push
