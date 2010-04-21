@@ -736,6 +736,26 @@ protected:
     RecursiveDelete (node->right);
     FreeNode (node);
   }
+
+  //@{
+  /// Locate key that is equal to \a other
+  template<typename K2>
+  K* FindInternal (const K2& other)
+  {
+    Node* n = LocateNode<K2> (root.p, other);
+    return n ? &(n->GetKey()) : 0;
+  }
+  template<typename K2>
+  K& FindInternal (const K2& other, K& fallback)
+  {
+    Node* n = LocateNode<K2> (root.p, other);
+    if(n)
+      return n->GetKey();
+    else
+      return fallback;
+  }
+  //@}
+
 public:
   /**
    * Construct a new tree.
@@ -1145,9 +1165,9 @@ public:
    */
   bool Delete (const K& key)
   {
-    csRedBlackTreePayload<K, T>* payload = Find (key);
+    csRedBlackTreePayload<K, T>* payload = FindInternal (key);
     if (payload == 0) return false;
-    return supahclass::Delete (*payload);
+    return supahclass::DeleteExact (payload);
   }
   //@{
   /**
@@ -1156,13 +1176,13 @@ public:
    */
   const T* GetElementPointer (const K& key) const
   {
-    csRedBlackTreePayload<K, T>* payload = Find (key);
+    const csRedBlackTreePayload<K, T>* payload = Find (key);
     if (payload == 0) return 0;
     return &payload->GetValue();
   }
   T* GetElementPointer (const K& key)
   {
-    csRedBlackTreePayload<K, T>* payload = Find (key);
+    csRedBlackTreePayload<K, T>* payload = FindInternal (key);
     if (payload == 0) return 0;
     return &payload->GetValue();
   }
@@ -1180,7 +1200,7 @@ public:
   }
   T& Get (const K& key, T& fallback)
   {
-    csRedBlackTreePayload<K, T>* payload = Find (key);
+    csRedBlackTreePayload<K, T>* payload = FindInternal (key);
     if (payload == 0) return fallback;
     return payload->GetValue();
   }

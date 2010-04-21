@@ -66,6 +66,8 @@ public:
   void testGSE2 ();
   void testSGE2 ();
   
+  void testMapInsert ();
+  void testMapDelete ();
   void testMapIterator ();
   void testMapIteratorConst ();
   void testMapIteratorRev ();
@@ -85,6 +87,8 @@ public:
     CPPUNIT_TEST(testSGE);
     CPPUNIT_TEST(testGSE2);
     CPPUNIT_TEST(testSGE2);
+    CPPUNIT_TEST(testMapInsert);
+    CPPUNIT_TEST(testMapDelete);
     CPPUNIT_TEST(testMapIterator);
     CPPUNIT_TEST(testMapIteratorConst);
     CPPUNIT_TEST(testMapIteratorRev);
@@ -330,6 +334,52 @@ void RedBlackTreeTest::testSGE2 ()
 
 static const int sequenceMapUnique[][2] = {{23, 6}, {42, 7}, {-10, 0}, {2, 3},
   {3, 4}, {1, 2}, {70, 9}, {69, 8}, {5, 5}, {0, 1}};
+
+void RedBlackTreeTest::testMapInsert()
+{
+  RBMap rbmap;
+  
+  for (size_t i = 0; i < ARRAY_SIZE(sequenceMapUnique); i++)
+  {
+    rbmap.Put (sequenceMapUnique[i][0], sequenceMapUnique[i][1]);
+  }
+  
+  for (size_t i = 0; i < ARRAY_SIZE(sequenceMapUnique); i++)
+  {
+    int* t = rbmap.GetElementPointer(sequenceMapUnique[i][0]);
+    CPPUNIT_ASSERT (t);
+    CPPUNIT_ASSERT (*t == sequenceMapUnique[i][1]);
+  }
+}
+
+void RedBlackTreeTest::testMapDelete()
+{
+  for (size_t d = 0; d < ARRAY_SIZE(sequenceMapUnique); d++)
+  {
+    RBMap rbmap;
+    
+    for (size_t i = 0; i < ARRAY_SIZE(sequenceMapUnique); i++)
+    {
+      rbmap.Put (sequenceMapUnique[i][0], sequenceMapUnique[i][1]);
+    }
+    
+    CPPUNIT_ASSERT (rbmap.Delete (sequenceMapUnique[d][0]));
+    
+    for (size_t i = 0; i < ARRAY_SIZE(sequenceMapUnique); i++)
+    {
+      int* t = rbmap.GetElementPointer(sequenceMapUnique[i][0]);
+      if (i == d)
+      {
+        CPPUNIT_ASSERT (!t);
+      }
+      else
+      {
+        CPPUNIT_ASSERT (t);
+        CPPUNIT_ASSERT (*t == sequenceMapUnique[i][1]);
+      }
+    }
+  }
+}
 
 void RedBlackTreeTest::testMapIterator ()
 {
