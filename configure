@@ -13018,6 +13018,7 @@ fi
         sparc*) cs_host_cpu=sparc ;;
         mips*) cs_host_cpu=mips ;;
         alpha*) cs_host_cpu=alpha ;;
+	arm*) cs_host_cpu=arm ;;
         *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="`$as_echo "$cs_host_cpu" | $as_tr_cpp`"
@@ -55519,8 +55520,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "-lBulletDynamics -lBulletCollision -lLinearMath"; then
-  cs_check_lib_libs="-lBulletDynamics -lBulletCollision -lLinearMath"
+    if test -n "-lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath"; then
+  cs_check_lib_libs="-lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath"
 else
   cs_check_lib_libs=''
 fi
@@ -55540,8 +55541,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "-lBulletDynamics -lBulletCollision -lLinearMath"; then
-  cs_check_lib_libs="-lBulletDynamics -lBulletCollision -lLinearMath"
+    if test -n "-lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath"; then
+  cs_check_lib_libs="-lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath"
 else
   cs_check_lib_libs=''
 fi
@@ -55560,8 +55561,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "-lBulletDynamics -lBulletCollision -lLinearMath"; then
-  cs_check_lib_libs="-lBulletDynamics -lBulletCollision -lLinearMath"
+    if test -n "-lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath"; then
+  cs_check_lib_libs="-lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath"
 else
   cs_check_lib_libs=''
 fi
@@ -55616,8 +55617,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "-lbulletdynamics -lbulletcollision -lbulletmath"; then
-  cs_check_lib_libs="-lbulletdynamics -lbulletcollision -lbulletmath"
+    if test -n "-lbulletsoftbody -lbulletdynamics -lbulletcollision -lbulletmath"; then
+  cs_check_lib_libs="-lbulletsoftbody -lbulletdynamics -lbulletcollision -lbulletmath"
 else
   cs_check_lib_libs=''
 fi
@@ -55637,8 +55638,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "-lbulletdynamics -lbulletcollision -lbulletmath"; then
-  cs_check_lib_libs="-lbulletdynamics -lbulletcollision -lbulletmath"
+    if test -n "-lbulletsoftbody -lbulletdynamics -lbulletcollision -lbulletmath"; then
+  cs_check_lib_libs="-lbulletsoftbody -lbulletdynamics -lbulletcollision -lbulletmath"
 else
   cs_check_lib_libs=''
 fi
@@ -55657,8 +55658,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "-lbulletdynamics -lbulletcollision -lbulletmath"; then
-  cs_check_lib_libs="-lbulletdynamics -lbulletcollision -lbulletmath"
+    if test -n "-lbulletsoftbody -lbulletdynamics -lbulletcollision -lbulletmath"; then
+  cs_check_lib_libs="-lbulletsoftbody -lbulletdynamics -lbulletcollision -lbulletmath"
 else
   cs_check_lib_libs=''
 fi
@@ -77115,6 +77116,7 @@ cs_header_text="${cs_header_text}#define CS_LONG_SIZE $ac_cv_sizeof_long
         sparc*) cs_host_cpu=sparc ;;
         mips*) cs_host_cpu=mips ;;
         alpha*) cs_host_cpu=alpha ;;
+	arm*) cs_host_cpu=arm ;;
         *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="`$as_echo "$cs_host_cpu" | $as_tr_cpp`"
