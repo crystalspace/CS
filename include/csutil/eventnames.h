@@ -52,8 +52,8 @@ public:
 
 /**
  * The csEventNameRegistry transforms textual event names (e.g., 
- * "crystalspace.input.joystick.3.button") into easier-to-manage csEventIDs 
- * (which, in non-debug builds, are really just csStringIDs).
+ * "crystalspace.input.joystick.3.button") into easier-to-manage csEventID's 
+ * (which, in non-debug builds, are really just csStringID's).
  * Also offers easy methods for querying parentage relationships between
  * two event names.
  * 
@@ -66,7 +66,7 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
  private:
   /**
    * Do not allocate for yourself!  This object uses the singleton pattern
-   * and should be retrieved with the static csEventNameRegistry::GetRegistry 
+   * and should be retrieved with the static csEventNameRegistry::GetRegistry()
    * method.
    */
   csEventNameRegistry (iObjectRegistry *);
