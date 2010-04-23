@@ -28,6 +28,7 @@
 struct iView;
 struct iRigidBody;
 struct iBulletKinematicCallback;
+struct iBulletSoftBody;
 
 /**
  * Return structure for the iBulletDynamicSystem::HitBeam() routine.
@@ -128,6 +129,70 @@ struct iBulletDynamicSystem : public virtual iBase
    * Return the current mode used when displaying debug informations.
    */
   virtual csBulletDebugMode GetDebugMode () = 0;
+
+  /**
+   * Set whether this dynamic world can handle soft bodies or not.
+   * \warning You have to call this method before adding any objects in the
+   * dynamic world.
+   */
+  virtual void SetSoftBodyWorld (bool isSoftBodyWorld) = 0;
+
+  /**
+   * Return whether this dynamic world can handle soft bodies or not.
+   */
+  virtual bool GetSoftBodyWorld () = 0;
+
+  /**
+   * Return the number of soft bodies in this dynamic world.
+   */
+  virtual size_t GetSoftBodyCount () = 0;
+
+  /**
+   * Return the soft body at the given index.
+   */
+  virtual iBulletSoftBody* GetSoftBody (size_t index) = 0;
+
+  /**
+   * Create a soft body rope.
+   * \param start Start position of the rope.
+   * \param end End position of the rope.
+   * \param segmentCount Number of segments in the rope.
+   * \remark You must call SetSoftBodyWorld() prior to this.
+   */
+  virtual iBulletSoftBody* CreateRope (csVector3 start, csVector3 end,
+				       uint segmentCount) = 0;
+
+  /**
+   * Remove the given soft body from this dynamic world and delete it.
+   */
+  virtual void RemoveSoftBody (iBulletSoftBody* body) = 0;
+};
+
+/**
+ * A soft body is a physical body that can be deformed by the physical
+ * simulation. It can be used to simulate eg ropes, clothes or any soft
+ * 3D object.
+ * \sa iRigidBody iBulletRigidBody
+ */
+struct iBulletSoftBody : public virtual iBase
+{
+  SCF_INTERFACE(iBulletSoftBody, 1, 0, 0);
+
+  /**
+   * Draw the debug informations of this soft body. This has to be called
+   * at each frame, and will add 2D lines on top of the rendered scene.
+   */
+  virtual void DebugDraw (iView* rview) = 0;
+
+  /**
+   * Set the total mass of this body.
+   */
+  virtual void SetMass (float mass) = 0;
+
+  /**
+   * Return the total mass of this body.
+   */
+  virtual float GetMass () = 0;
 };
 
 /**
@@ -147,7 +212,7 @@ enum csBulletState
 /**
  * The Bullet implementation of iRigidBody also implements this
  * interface.
- * \sa iRigidBody
+ * \sa iRigidBody iBulletSoftBody
  */
 struct iBulletRigidBody : public virtual iBase
 {

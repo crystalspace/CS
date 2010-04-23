@@ -17,16 +17,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
-#include "csgeom/matrix3.h"
-#include "csgeom/transfrm.h"
 #include "csgeom/quaternion.h"
-#include "csgeom/vector3.h"
 #include "csgeom/sphere.h"
 #include "csgeom/tri.h"
 #include "igeom/trimesh.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
-#include "iengine/camera.h"
 #include "iengine/light.h"
 #include "imesh/genmesh.h"
 #include "imesh/objmodel.h"
@@ -34,8 +30,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/sysfunc.h"
 #include "iutil/objreg.h"
 #include "ivaria/view.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
 
 #include "csutil/custom_new_disable.h"
 
@@ -44,10 +38,16 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "btBulletCollisionCommon.h"
 #include "BulletCollision/Gimpact/btGImpactShape.h"
 #include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
+#include "BulletSoftBody/btSoftBody.h"
+#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
+#include "BulletSoftBody/btSoftBodyHelpers.h"
 
 #include "csutil/custom_new_enable.h"
 
+#include "common.h"
 #include "bullet.h"
+#include "softbodies.h"
 
 #define COLLISION_THRESHOLD 0.01f
 
@@ -55,61 +55,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
 SCF_IMPLEMENT_FACTORY (csBulletDynamics)
-
-//---------------------------------------------------------------------------
-
-static csReversibleTransform BulletToCS (const btTransform& trans, float inverseInternalScale)
-{
-  const btVector3& trans_o = trans.getOrigin ();
-  csVector3 origin (trans_o.getX () * inverseInternalScale,
-		    trans_o.getY () * inverseInternalScale,
-		    trans_o.getZ () * inverseInternalScale);
-  const btMatrix3x3& trans_m = trans.getBasis ();
-  const btVector3& row0 = trans_m.getRow (0);
-  const btVector3& row1 = trans_m.getRow (1);
-  const btVector3& row2 = trans_m.getRow (2);
-  csMatrix3 m (
-      row0.getX (), row1.getX (), row2.getX (),
-      row0.getY (), row1.getY (), row2.getY (),
-      row0.getZ (), row1.getZ (), row2.getZ ());
-  return csReversibleTransform (m, origin);
-}
-
-static btTransform CSToBullet (const csReversibleTransform& tr, float internalScale)
-{
-  const csVector3& origin = tr.GetOrigin ();
-  btVector3 trans_o (origin.x * internalScale,
-		     origin.y * internalScale,
-		     origin.z * internalScale);
-  const csMatrix3& m = tr.GetO2T ();
-  btMatrix3x3 trans_m (
-      m.m11, m.m21, m.m31,
-      m.m12, m.m22, m.m32,
-      m.m13, m.m23, m.m33);
-  return btTransform (trans_m, trans_o);
-}
-
-static inline btMatrix3x3 CSToBullet (const csMatrix3& m)
-{
-  return btMatrix3x3 (
-      m.m11, m.m21, m.m31,
-      m.m12, m.m22, m.m32,
-      m.m13, m.m23, m.m33);
-}
-
-static inline csVector3 BulletToCS (const btVector3& v, float inverseInternalScale)
-{
-  return csVector3 (v.getX () * inverseInternalScale,
-		    v.getY () * inverseInternalScale,
-		    v.getZ () * inverseInternalScale);
-}
-
-static inline btVector3 CSToBullet (const csVector3& v, float internalScale)
-{
-  return btVector3 (v.x * internalScale,
-		    v.y * internalScale,
-		    v.z * internalScale);
-}
 
 //---------------------------------------------------------------------------
 
@@ -317,108 +262,6 @@ void csBulletDynamics::Step (float stepsize)
     stepCallbacks[i]->Step (stepsize);
 }
 
-//----------------------- csBulletDebugDraw ----------------------------
-
-struct csBulletDebugLine
-{
-  csVector3 p1, p2;
-  csColor color;
-};
-
-class csBulletDebugDraw : public btIDebugDraw
-{
-private:
-  csArray<csBulletDebugLine> lines;
-  int mode;
-  float inverseInternalScale;
-
-public:
-  csBulletDebugDraw (float inverseInternalScale)
-    : mode (DBG_DrawWireframe | DBG_DrawConstraints | DBG_DrawConstraintLimits),
-      inverseInternalScale (inverseInternalScale)
-  {
-  }
-
-  virtual ~csBulletDebugDraw () { }
-
-  virtual void drawLine (const btVector3& from, const btVector3& to,
-      const btVector3& color)
-  {
-    csBulletDebugLine l;
-    l.p1.Set (BulletToCS (from, inverseInternalScale));
-    l.p2.Set (BulletToCS (to, inverseInternalScale));
-    l.color.Set (color.getX (), color.getY (), color.getZ ());
-    lines.Push (l);
-  }
-
-  virtual void drawContactPoint (const btVector3 &PointOnB,
-				 const btVector3 &normalOnB,
-				 btScalar distance, int lifeTime,
-				 const btVector3 &color)
-  {}
-
-  virtual void reportErrorWarning (const char *warningString)
-  {}
-
-  virtual void draw3dText (const btVector3 &location, const char *textString)
-  {}
-
-  void SetDebugMode (csBulletDebugMode mode)
-  {
-    this->mode = 0;
-    if (mode & BULLET_DEBUG_COLLIDERS)
-      this->mode |= DBG_DrawWireframe;
-    if (mode & BULLET_DEBUG_AABB)
-      this->mode |= DBG_DrawAabb;
-    if (mode & BULLET_DEBUG_JOINTS)
-      this->mode |= DBG_DrawConstraints | DBG_DrawConstraintLimits;
-  }
-
-  csBulletDebugMode GetDebugMode ()
-  {
-    csBulletDebugMode mode = BULLET_DEBUG_NOTHING;
-    if (this->mode & DBG_DrawWireframe)
-      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_COLLIDERS);
-    if (this->mode & DBG_DrawAabb)
-      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_AABB);
-    if (this->mode & DBG_DrawConstraints)
-      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_JOINTS);
-    return mode;
-  }
-
-  virtual void setDebugMode (int m)
-  {
-    mode = m;
-  }
-
-  virtual int getDebugMode () const
-  {
-    return mode;
-  }
-
-  void DebugDraw (iView* view)
-  {
-    iGraphics3D* g3d = view->GetContext ();
-    iGraphics2D* g2d = g3d->GetDriver2D ();
-    csTransform tr_w2c = view->GetCamera ()->GetTransform ();
-    int fov = g2d->GetHeight ();
-
-    if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
-      return;
-
-    for (size_t i = 0 ; i < lines.GetSize () ; i++)
-    {
-      csBulletDebugLine& l = lines[i];
-      int color = g2d->FindRGB (int (l.color.red * 255),
-				int (l.color.green * 255),
-				int (l.color.blue * 255));
-      g3d->DrawLine (tr_w2c * l.p1, tr_w2c * l.p2, fov, color);
-    }
-
-    lines.Empty ();
-  }
-};
-
 //----------------------- csBulletDynamicsSystem ----------------------------
 
 // TODO: these AABB values will not fit to every worlds
@@ -426,7 +269,7 @@ public:
 
 csBulletDynamicsSystem::csBulletDynamicsSystem
   (iObjectRegistry* object_reg)
-    : scfImplementationType (this), gimpactRegistered (false),
+    : scfImplementationType (this), isSoftWorld (false), gimpactRegistered (false),
       internalScale (1.0f), inverseInternalScale (1.0f),
       worldTimeStep (1.0f / 60.0f), worldMaxSteps (1), debugDraw (0)
 {
@@ -460,6 +303,7 @@ csBulletDynamicsSystem::~csBulletDynamicsSystem ()
   joints.DeleteAll ();
   dynamicBodies.DeleteAll ();
   colliderBodies.DeleteAll ();
+  softBodies.DeleteAll ();
 
   delete bulletWorld;
   delete debugDraw;
@@ -471,7 +315,11 @@ csBulletDynamicsSystem::~csBulletDynamicsSystem ()
 
 void csBulletDynamicsSystem::SetGravity (const csVector3& v)
 {
-  bulletWorld->setGravity (CSToBullet (v, internalScale));
+  btVector3 gravity = CSToBullet (v, internalScale);
+  bulletWorld->setGravity (gravity);
+
+  if (isSoftWorld)
+    softWorldInfo.m_gravity = gravity;
 }
 
 const csVector3 csBulletDynamicsSystem::GetGravity () const
@@ -623,6 +471,7 @@ iRigidBody* csBulletDynamicsSystem::FindBody (const char* name)
 
 iRigidBody* csBulletDynamicsSystem::GetBody (unsigned int index)
 {
+  CS_ASSERT(index < dynamicBodies.GetSize ());
   return dynamicBodies[index];
 }
 
@@ -805,6 +654,7 @@ void csBulletDynamicsSystem::DestroyCollider (iDynamicsSystemCollider* collider)
 
 csRef<iDynamicsSystemCollider> csBulletDynamicsSystem::GetCollider (unsigned int index) 
 {
+  CS_ASSERT(index < colliderBodies.GetSize ());
   return ((csBulletRigidBody*) colliderBodies[index])->colliders[0];
 }
 
@@ -834,6 +684,15 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
 
   bulletWorld->debugDrawWorld();
   debugDraw->DebugDraw (view);
+
+  if (isSoftWorld)
+  {
+    btSoftRigidDynamicsWorld* softWorld =
+      static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+    btSoftBodyArray& softbodies (softWorld->getSoftBodyArray ());
+    for (int i = 0; i < softbodies.size (); i++)
+      btSoftBodyHelpers::Draw (softbodies[i], debugDraw);
+  }
 }
 
 void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
@@ -921,6 +780,101 @@ void csBulletDynamicsSystem::SetStepParameters (float timeStep, size_t maxSteps,
   worldMaxSteps = maxSteps;
   btContactSolverInfo& info = bulletWorld->getSolverInfo();
   info.m_numIterations = (int)iterations;
+}
+
+void csBulletDynamicsSystem::SetSoftBodyWorld (bool isSoftBodyWorld)
+{
+  CS_ASSERT(!dynamicBodies.GetSize ());
+
+  if (isSoftWorld == isSoftBodyWorld)
+    return;
+
+  isSoftWorld = isSoftBodyWorld;
+
+  // re-create configuration, dispatcher & dynamics world
+  btVector3 gravity = bulletWorld->getGravity ();
+  delete bulletWorld;
+  delete dispatcher;
+  delete configuration;
+
+  if (isSoftWorld)
+  {
+    configuration = new btSoftBodyRigidBodyCollisionConfiguration ();
+    dispatcher = new btCollisionDispatcher (configuration);
+    bulletWorld = new btSoftRigidDynamicsWorld
+      (dispatcher, broadphase, solver, configuration);
+
+    softWorldInfo.m_broadphase = broadphase;
+    softWorldInfo.m_dispatcher = dispatcher;
+    softWorldInfo.m_gravity = gravity;
+    softWorldInfo.air_density = 1.2f;
+    softWorldInfo.water_density = 1000.0f;
+    softWorldInfo.water_offset = -1.0f;
+    softWorldInfo.water_normal = btVector3 (0.0f, 1.0f, 0.0f);
+    softWorldInfo.m_sparsesdf.Initialize ();
+  }
+
+  else
+  {
+    configuration = new btDefaultCollisionConfiguration ();
+    dispatcher = new btCollisionDispatcher (configuration);
+    bulletWorld = new btDiscreteDynamicsWorld
+      (dispatcher, broadphase, solver, configuration);
+  }
+
+  bulletWorld->setGravity (gravity);
+}
+
+size_t csBulletDynamicsSystem::GetSoftBodyCount ()
+{
+  if (!isSoftWorld)
+    return 0;
+
+  btSoftRigidDynamicsWorld* softWorld =
+    static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+  return softWorld->getSoftBodyArray ().size ();
+}
+
+iBulletSoftBody* csBulletDynamicsSystem::GetSoftBody (size_t index)
+{
+  CS_ASSERT(isSoftWorld && index < softBodies.GetSize ());
+  return softBodies[index];
+}
+
+bool csBulletDynamicsSystem::GetSoftBodyWorld ()
+{
+  return isSoftWorld;
+}
+
+iBulletSoftBody* csBulletDynamicsSystem::CreateRope
+(csVector3 start, csVector3 end, uint segmentCount)
+{
+  CS_ASSERT(isSoftWorld);
+
+  btSoftBody* body = btSoftBodyHelpers::CreateRope
+    (softWorldInfo, CSToBullet (start, internalScale),
+     CSToBullet (end, internalScale), segmentCount, 3);
+
+  btSoftRigidDynamicsWorld* softWorld =
+    static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+  softWorld->addSoftBody (body);
+
+  csRef<csBulletSoftBody> csBody;
+  csBody.AttachNew (new csBulletSoftBody (this, body));
+
+  softBodies.Push (csBody);
+  return csBody;
+}
+
+void csBulletDynamicsSystem::RemoveSoftBody (iBulletSoftBody* body)
+{
+  csBulletSoftBody* csBody = dynamic_cast<csBulletSoftBody*> (body);
+  CS_ASSERT (csBody);
+  btSoftRigidDynamicsWorld* softWorld =
+    static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+  softWorld->removeSoftBody (csBody->body);
+
+  softBodies.Delete (body);
 }
 
 //-------------------- csBulletRigidBody -----------------------------------

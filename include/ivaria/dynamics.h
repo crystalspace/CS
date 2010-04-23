@@ -451,7 +451,7 @@ struct iBodyGroup : public virtual iBase
  * Main users of this interface:
  * - iDynamicSystem
  *
- * \sa iBulletRigidBody
+ * \sa iBulletRigidBody iBulletSoftBody
  */
 struct iRigidBody : public virtual iBase
 {

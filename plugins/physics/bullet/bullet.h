@@ -105,18 +105,22 @@ class csBulletDynamicsSystem : public scfImplementationExt2<
   friend class csBulletMotionState;
   friend class csBulletKinematicMotionState;
   friend class csBulletRigidBody;
+  friend class csBulletSoftBody;
   friend class csBulletCollider;
   friend class csBulletJoint;
 
 private:
+  bool isSoftWorld;
   btDynamicsWorld* bulletWorld;
   btCollisionDispatcher* dispatcher;
   btDefaultCollisionConfiguration* configuration;
   btSequentialImpulseConstraintSolver* solver;
   btBroadphaseInterface* broadphase;
+  btSoftBodyWorldInfo softWorldInfo;
 
   csRefArrayObject<iRigidBody> dynamicBodies;
   csRefArrayObject<iRigidBody> colliderBodies;
+  csRefArrayObject<iBulletSoftBody> softBodies;
   csRefArray<iJoint> joints;
   csRef<csBulletDefaultMoveCallback> moveCb;
   bool gimpactRegistered;
@@ -197,10 +201,18 @@ public:
   virtual void DebugDraw (iView* view);
   virtual void SetDebugMode (csBulletDebugMode mode);
   virtual csBulletDebugMode GetDebugMode ();
-  virtual csBulletHitBeamResult HitBeam (const csVector3 &start, const csVector3 &end);
+  virtual csBulletHitBeamResult HitBeam (const csVector3 &start,
+					 const csVector3 &end);
   virtual void SetInternalScale (float scale);
   virtual void SetStepParameters (float timeStep, size_t maxSteps,
 				  size_t iterations);
+  virtual void SetSoftBodyWorld (bool isSoftBodyWorld);
+  virtual bool GetSoftBodyWorld ();
+  virtual size_t GetSoftBodyCount ();
+  virtual iBulletSoftBody* GetSoftBody (size_t index);
+  virtual iBulletSoftBody* CreateRope (csVector3 start, csVector3 end,
+				       uint segmentCount);
+  virtual void RemoveSoftBody (iBulletSoftBody* body);
 };
 
 class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
