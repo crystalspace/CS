@@ -1369,9 +1369,9 @@ AS_IF([test "$with_bullet" != no],
         [cs_check_lib_paths=$with_bullet],
         [cs_check_lib_paths="| cs_lib_paths_default "])
     _CS_CHECK_BULLET_CREATE_FLAGS([cs_check_lib_flags],
-            [-lBulletDynamics -lBulletCollision -lLinearMath], [$cs_check_lib_paths])
+            [-lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath], [$cs_check_lib_paths])
     _CS_CHECK_BULLET_CREATE_FLAGS([cs_check_lib_flags],
-            [-lbulletdynamics -lbulletcollision -lbulletmath], [$cs_check_lib_paths])
+            [-lbulletsoftbody -lbulletdynamics -lbulletcollision -lbulletmath], [$cs_check_lib_paths])
             
     CS_CHECK_BUILD([for Bullet], [cs_cv_libbullet],
     	[AC_LANG_PROGRAM(
