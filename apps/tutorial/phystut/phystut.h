@@ -36,6 +36,7 @@ private:
   csRef<iBulletDynamicSystem> bullet_dynSys;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
+  bool isSoftBodyWorld;
 
   // Meshes
   csRef<iMeshFactoryWrapper> boxFact;
@@ -86,6 +87,7 @@ private:
   void SpawnChain ();
   void LoadRagdoll ();
   void SpawnRagdoll ();
+  void SpawnRope ();
   void CreateWalls (const csVector3& radius);
 
 public:

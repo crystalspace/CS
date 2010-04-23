@@ -47,6 +47,9 @@ Simple::Simple ()
   commandLineHelper.commandOptions.Push
     (csDemoCommandLineHelper::CommandOption
      ("phys_engine=<name>", "Specify which physics plugin to use (ode, bullet)"));
+  commandLineHelper.commandOptions.Push
+    (csDemoCommandLineHelper::CommandOption
+     ("disable_soft", "Disable the soft bodies"));
 }
 
 Simple::~Simple ()
@@ -166,8 +169,15 @@ void Simple::Frame ()
   csString txt;
 
   stateDescriptions.Push (csString ("Physics engine: ") + phys_engine_name);
-  txt.Format ("Physical objects count: %d", dynSys->GetBodysCount ());
+
+  txt.Format ("Rigid bodies count: %d", dynSys->GetBodysCount ());
   stateDescriptions.Push (txt);
+
+  if (isSoftBodyWorld)
+  {
+    txt.Format ("Soft bodies count: %d", (int) bullet_dynSys->GetSoftBodyCount ());
+    stateDescriptions.Push (txt);
+  }
 
   if (phys_engine_id == ODE_ID)
   {
@@ -208,6 +218,11 @@ void Simple::Frame ()
   // Display debug informations
   if (do_bullet_debug)
     bullet_dynSys->DebugDraw (view);
+
+  // Display all soft bodies
+  else if (isSoftBodyWorld)
+    for (size_t i = 0; i < bullet_dynSys->GetSoftBodyCount (); i++)
+      bullet_dynSys->GetSoftBody (i)->DebugDraw (view);
 }
 
 bool Simple::OnKeyboard (iEvent &ev)
@@ -287,6 +302,12 @@ bool Simple::OnKeyboard (iEvent &ev)
 	     && phys_engine_id == BULLET_ID)
     {
       SpawnRagdoll ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'y'
+	     && phys_engine_id == BULLET_ID)
+    {
+      SpawnRope ();
       return true;
     }
 
@@ -532,7 +553,11 @@ bool Simple::OnInitialize (int argc, char* argv[])
     csRef<iPluginManager> plugmgr = 
       csQueryRegistry<iPluginManager> (GetObjectRegistry ());
     dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
+
+    // Check whether the soft bodies are enabled or not
+    isSoftBodyWorld = !clp->GetBoolOption ("disable_soft", false);
   }
+
   if (!dyn)
     return ReportError ("No iDynamics plugin!");
 
@@ -554,6 +579,8 @@ bool Simple::OnInitialize (int argc, char* argv[])
     keyDescriptions.Push ("h: spawn a chain");
     keyDescriptions.Push ("r: spawn a Frankie's ragdoll");
   }
+  if (isSoftBodyWorld)
+    keyDescriptions.Push ("y: spawn a rope");
   keyDescriptions.Push ("SPACE: spawn random object");
   if (phys_engine_id == BULLET_ID)
     keyDescriptions.Push ("left mouse: fire!");
@@ -613,6 +640,10 @@ bool Simple::Application ()
     // We have some objects of size smaller than 0.035 units, so we scale up the
     // whole world for a better behavior of the dynamic simulation.
     bullet_dynSys->SetInternalScale (10.0f);
+
+    // Enable soft bodies
+    if (isSoftBodyWorld)
+      bullet_dynSys->SetSoftBodyWorld (true);
   }
 
   // Create the dynamic's debugger
@@ -1309,6 +1340,13 @@ void Simple::SpawnRagdoll ()
 
   // Update the display of the dynamics debugger
   dynamicsDebugger->UpdateDisplay ();
+}
+
+void Simple::SpawnRope ()
+{
+  iBulletSoftBody* body = bullet_dynSys->CreateRope
+    (csVector3 (-3.0f, 0.0f, -3.0f), csVector3 (3.0f, 0.0f, 3.0f), 20);
+  body->SetMass (2.0f);
 }
 
 void Simple::CreateWalls (const csVector3& /*radius*/)
