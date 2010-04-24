@@ -168,8 +168,11 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
       view->GetCamera ()->GetTransform ().SetOrigin (avatarScene->GetCameraStart ());
 
       // Toggle the debug mode of the dynamic system
-      dynamicsDebugMode = DYNDEBUG_NONE;
-      dynamicsDebugger->SetDebugDisplayMode (false);
+      if (physicsEnabled)
+      {
+	dynamicsDebugMode = DYNDEBUG_NONE;
+	dynamicsDebugger->SetDebugDisplayMode (false);
+      }
 
       return true;
     }

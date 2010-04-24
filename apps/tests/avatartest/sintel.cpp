@@ -309,11 +309,11 @@ bool SintelScene::CreateAvatar ()
 
   // Smile expression
   component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-smile.L");
-  component.weight = 0.7f;
+  component.weight = 0.73f;
   expression.morphComponents.Push (component);
 
   component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-smile.R");
-  component.weight = 0.7f;
+  component.weight = 0.73f;
   expression.morphComponents.Push (component);
 
   component.morphTarget = animeshFactory->FindMorphTarget ("MOUTH-e.L");

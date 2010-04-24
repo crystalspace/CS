@@ -78,7 +78,7 @@ csVector3 FrankieScene::GetCameraTarget ()
   csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
   csVector3 avatarPosition = animeshObject->GetMeshWrapper ()->QuerySceneNode ()
     ->GetMovable ()->GetTransform ().GetOrigin ();
-  avatarPosition.y = 0.45f;
+  avatarPosition.y = 0.35f;
   return avatarPosition;
 }
 
