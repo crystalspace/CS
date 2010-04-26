@@ -309,4 +309,16 @@ MACRO worklibout GET path([workroot, 'libs']);
 MACRO workbuild(tail)
   GET path([workroot, 'build', my.doc.project.0, tail.join('')]);
 
+#------------------------------------------------------------------------------
+# Get current target MSVC version as an easily comparable integer
+# (major version * 10 + minor version).
+#------------------------------------------------------------------------------
+MACRO comparable_msvc_version BLOCK;
+  IF my.doc.msvcversion.0 < 71;
+    GET my.doc.msvcversion.0 * 10;
+  ELSE;
+    GET my.doc.msvcversion.0;
+  END;
+END;
+  
 END %]

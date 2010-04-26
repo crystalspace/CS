@@ -27,6 +27,7 @@ InstallData [ Wildcard *.cslib *.jam *.tlib ] : build msvcgen ;
 MsvcGenSubDir TOP mk msvc : common ;
 MsvcGenSubDir TOP mk msvc8 : 8 ;
 MsvcGenSubDir TOP mk msvc9 : 9 ;
+MsvcGenSubDir TOP mk msvc10 : 10 ;
 MsvcGenTemplateDir TOP mk msvcgen ;
 
 # We need to customize the list of build configurations.

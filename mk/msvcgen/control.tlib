@@ -30,20 +30,36 @@
 #    types
 #        Regular expression controlling which files will be used to populate
 #        the group.  Filenames matching `types' will be included in the group.
+#    itemtype
+#        "Item type" for msbuild projects (as used by VC10) - the name of
+#        elements under the output <ItemGroup> created for the group.
 #------------------------------------------------------------------------------
 groups = [
   {
     name => 'Source Files'
     types => '\.(?i:c|cc|cpp|cxx|m|mm)$'
+    itemtype => 'ClCompile'
   },
   {
     name => 'Header Files'
     types => '\.(?i:h|hh|hpp|hxx)$'
+    itemtype => 'ClInclude'
   },
   {
     name => 'Resource Files'
-    types => '\.(?!(?i:h|hh|hpp|hxx|c|cc|cpp|cxx|m|mm)$)\w*$'
-  }
+    types => '\.rc$'
+    itemtype => 'ResourceCompile'
+  },
+  {
+    name => 'Manifest Files'
+    types => '\.manifest$'
+    itemtype => 'Manifest'
+  },
+  {
+    name => 'Other Files'
+    types => '\.(?!(?i:h|hh|hpp|hxx|c|cc|cpp|cxx|m|mm|rc|manifest)$)\w*$'
+    itemtype => 'None'
+  },
 ];
 
 #------------------------------------------------------------------------------
@@ -200,17 +216,23 @@ platforms = [
     name => 'Win32',
     suffix => '',
     targetmachine => 1,
+    targetmachine10 => 'MachineX86',
     min_vc_version => 70,
     debugformat_debug => 4,
-    debugformat_release => 3
+    debugformat_release => 3,
+    debugformat10_debug => 'EditAndContinue',
+    debugformat10_release => 'ProgramDatabase'
   },
   {
     name => 'x64',
     suffix => '-x64',
     targetmachine => 17,
+    targetmachine10 => 'MachineX64',
     min_vc_version => 80,
     debugformat_debug => 3,
-    debugformat_release => 3
+    debugformat_release => 3,
+    debugformat10_debug => 'ProgramDatabase',
+    debugformat10_release => 'ProgramDatabase'
   }
 ];
 

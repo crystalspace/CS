@@ -35,7 +35,7 @@ Microsoft Visual Studio Solution File, Format Version [% my.doc.formatversion.0 
 [% my.doc.headercomment.0 %]
 [% FOREACH project IN projects -%]
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "[% project %]", "
-	[%- project %].vcproj", "{[% guids.$project %]}"
+	[%- project %].[% my.doc.projectext.0 %]", "{[% guids.$project %]}"
 EndProject
 [% END -%]
 Global

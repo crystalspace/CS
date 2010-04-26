@@ -41,7 +41,7 @@
 #
 #==============================================================================
 
-MSVCGEN_SUPPORTED_VERSIONS = 6 7 71 8 9 ;
+MSVCGEN_SUPPORTED_VERSIONS = 6 7 71 8 9 10 ;
 MSVCGEN_BUILD_ROOT ?= [ ConcatDirs $(BUILDTOP) out ] ;
 MSVCGEN_BUILD_TEMP ?= [ ConcatDirs $(MSVCGEN_BUILD_ROOT) msvcgen ] ;
 
@@ -509,6 +509,17 @@ if $(MSVC_VERSION) = 6
   SUFWSP = dsw ;
   MSVC_FORCE_CRLF = yes ;
   MSVC_TEMPLATE_SUFFIX = 6 ;
+  MSVC_MANIFEST_IN_PROJECT = no ;
+}
+else if $(MSVC_VERSION) = 10 # Version 10
+{
+  SUFPRJ = vcxproj ;
+  SUFWSP = sln ;
+  MSVC_FORCE_CRLF = no ;
+  MSVC_TEMPLATE_SUFFIX = 10 ;
+  MSVC_FORMATVERSION_WSP = 11.00 ;
+  MSVC_WSP_HEADERCOMMENT = "# Visual C++ Express 2010" ;
+  MSVC_MANIFEST_IN_PROJECT = yes ;
 }
 else # Versions 7, 71, 8, 9 and "unknown"
 {
@@ -520,23 +531,27 @@ else # Versions 7, 71, 8, 9 and "unknown"
   {
     MSVC_FORMATVERSION_PRJ = 7.00 ;
     MSVC_FORMATVERSION_WSP = 7.00 ;
+    MSVC_MANIFEST_IN_PROJECT = no ;
   }
   else if $(MSVC_VERSION) = 71
   {
     MSVC_FORMATVERSION_PRJ = 7.10 ;
     MSVC_FORMATVERSION_WSP = 8.00 ;
+    MSVC_MANIFEST_IN_PROJECT = no ;
   }
   else if $(MSVC_VERSION) = 8
   {
     MSVC_FORMATVERSION_PRJ = 8.00 ;
     MSVC_FORMATVERSION_WSP = 9.00 ;
     MSVC_WSP_HEADERCOMMENT = "# Visual C++ Express 2005" ;
+    MSVC_MANIFEST_IN_PROJECT = yes ;
   }
   else if $(MSVC_VERSION) = 9
   {
     MSVC_FORMATVERSION_PRJ = 9.00 ;
     MSVC_FORMATVERSION_WSP = 10.00 ;
     MSVC_WSP_HEADERCOMMENT = "# Visual C++ Express 2008" ;
+    MSVC_MANIFEST_IN_PROJECT = yes ;
   }
   else
   {
@@ -730,6 +745,7 @@ rule MsvcGenWorkspace1
     "reject|$(rejects)"
     "formatversion|$(MSVC_FORMATVERSION_WSP)"
     "headercomment|$(MSVC_WSP_HEADERCOMMENT)"
+    "projectext|$(SUFPRJ)"
     $(MSVCGEN_VARIABLES)
     : notfile : $(respdir) ;
   MsvcRmTemps msvcgen : $(respfile) ;
@@ -977,7 +993,7 @@ rule MsvcProject
         MANIFEST_NAME on $(manifestrc) = $(manifest) ;
         GenerateWin32ManifestRc $(manifestrc) ;
         Depends $(manifestrc) : $(manifest) ;
-        if $(MSVC_VERSION) >= 8
+        if "$(MSVC_MANIFEST_IN_PROJECT)" = "yes"
         {
           # VC8: Manifest appears in project along other files, a special build
           # tool cares about the embedding into a resource. (The resource goop
@@ -1423,7 +1439,7 @@ rule Plugin
   MakeLocate $(plugin_impl_file) : $(outdircommon) ;
   WritePluginImplement $(plugin_impl_file) ;
   Depends msvcgen : $(plugin_impl_file) ;
-  $(<)_EXTRASOURCES = $(plugin_impl_file:R=$(outdircommon))
+  $(<)_EXTRASOURCES = $(plugin_impl_file:R=$(outdircommon)) ;
   
   local metafile ;
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
@@ -1696,22 +1712,9 @@ rule CompileGroups
 
 rule LinkWith
 {
-  local libs = [ ResolveLibs $(>) ] ;
   ExternalLibs $(<) : $($(>).EXTERNALLIBS) ;
-  local w ;
-  for w in $(MSVC.WORKSPACES)
-  {
-    local l ;
-    for l in $(libs)_MSVCNAME
-    {
-      if $($(l))
-      {
-	ResponseFile $($(w)_WKS_RESPFILE) : "$($(<)_MSVCNAME)|$($(l))" :
-	  notfile : $($(w)_WKS_RESPDIR) ;
-      }
-    }
-  }
-  $(<).NEEDLIBS = $(libs) ;
+  local libs = [ ResolveLibs $(>) ] ;
+  LibDepends $(<) : $(libs) ;
 }
 
 rule LibDepends
@@ -1729,6 +1732,16 @@ rule LibDepends
       }
     }
   }
+  local l ;
+  for l in $(libs)_MSVCNAME
+  {
+    if ! [ IsElem $(l) : $($(<).NEEDLIBS) ]
+    {
+      ResponseFile $($(<)_PRJ_RESPFILE) : "depends|$($(l))" :
+        notfile : $($(<)_PRJ_RESPDIR) ;
+      $(<).NEEDLIBS += $(l) ;
+    }
+  }  
 }
 
 rule RelayLibs
