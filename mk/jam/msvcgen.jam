@@ -746,6 +746,7 @@ rule MsvcGenWorkspace1
     "formatversion|$(MSVC_FORMATVERSION_WSP)"
     "headercomment|$(MSVC_WSP_HEADERCOMMENT)"
     "projectext|$(SUFPRJ)"
+    "msvcversion|$(MSVC_VERSION)"
     $(MSVCGEN_VARIABLES)
     : notfile : $(respdir) ;
   MsvcRmTemps msvcgen : $(respfile) ;

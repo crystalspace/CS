@@ -20,25 +20,52 @@
 #==============================================================================
   PROCESS macros.tlib;
   PROCESS control.tlib;
-
+  
   my = {};
   load(respfile, 'doc');
   FOREACH f IN my.doc.customize; PROCESS $f | null; END;
+
+  # Sort builds by name (VS does the same upon saving, so generating a solution
+  # with sorted build names reduces the differences between generated and
+  # VS-saved solutions)
+  builds = builds.sort('name');
+  mutators = mutators.sort('namesuffix');
 
   projects = filter(my.doc.project).split('\|').sort;
   guids = {};
   FOREACH project IN projects;
 	guids.$project = guid(project);
   END;
+  
+  MACRO config_name_complete
+    GET build.name _ mutator.namesuffix _ "|" _ platform.name;
+  
+  # Note: the basic solution format is the same since VS 2002; however, over
+  # the time, the sections changed. The VC version checks scattered through
+  # the template are an attempt to generate solutions that match what VS
+  # itself would write as closely as possible.
 END -%]
 Microsoft Visual Studio Solution File, Format Version [% my.doc.formatversion.0 %]
 [% my.doc.headercomment.0 %]
 [% FOREACH project IN projects -%]
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "[% project %]", "
 	[%- project %].[% my.doc.projectext.0 %]", "{[% guids.$project %]}"
+[%- IF comparable_msvc_version >= 71 -%]
+[% FILTER null;
+deps = filter(my.doc.$project).split('\|').sort;
+END -%]
+[% IF deps.size > 0 %]
+	ProjectSection(ProjectDependencies) = postProject
+[% FOREACH dep IN deps -%]
+		{[% guids.$dep %]} = {[% guids.$dep %]}
+[% END -%]
+	EndProjectSection
+[%- END %]
+[% END -%]
 EndProject
 [% END -%]
 Global
+[%- IF comparable_msvc_version < 80 %]
 	GlobalSection(SolutionConfiguration) = preSolution
 [% n = 0; FOREACH build IN builds -%]
   [% FOREACH mutator IN mutators -%]
@@ -46,6 +73,18 @@ Global
   [% END -%]
 [% END -%]
 	EndGlobalSection
+[%- ELSE %]
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+[%- FOREACH build IN builds ~%]
+  [% FOREACH mutator IN mutators ~%]
+    [% FOREACH platform IN platforms %]
+		[% config_name_complete %] = [% config_name_complete %]
+    [%~ END %]
+  [%~ END %]
+[%- END %]
+	EndGlobalSection
+[% END -%]
+[% IF comparable_msvc_version == 70 -%]
 	GlobalSection(ProjectDependencies) = postSolution
 [% FOREACH project IN projects; g = guids.$project; n = 0 -%]
 [% FOREACH dep IN filter(my.doc.$project).split('\|').sort -%]
@@ -53,20 +92,26 @@ Global
 [% END -%]
 [% END -%]
 	EndGlobalSection
+[%- END -%]
+[% IF comparable_msvc_version < 80 -%]
 	GlobalSection(ProjectConfiguration) = postSolution
-[% FOREACH project IN projects; g = guids.$project -%]
+[%- ELSE -%]
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+[%- END %]
+[%- FOREACH project IN projects; g = guids.$project -%]
 [% FOREACH build IN builds -%]
-  [% FOREACH mutator IN mutators -%]
-    [% FOREACH platform IN platforms -%]
-		{[% g %]}.[% build.name %][% mutator.namesuffix %].ActiveCfg = [% build.name %][% mutator.namesuffix %]|[% platform.name %]
-		{[% g %]}.[% build.name %][% mutator.namesuffix %].Build.0 = [% build.name %][% mutator.namesuffix %]|[% platform.name %]
-    [% END -%]
-  [% END -%]
+  [%~ FOREACH mutator IN mutators -%]
+    [%~ FOREACH platform IN platforms %]
+		{[% g %]}.[% config_name_complete %].ActiveCfg = [% config_name_complete %]
+		{[% g %]}.[% config_name_complete %].Build.0 = [% config_name_complete %]
+    [%~ END %]
+  [%~ END -%]
 [% END -%]
-[% END -%]
+[% END %]
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
+[% IF comparable_msvc_version >= 80 -%]
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ExtensibilityAddIns) = postSolution
-	EndGlobalSection
+[%- END %]
 EndGlobal
