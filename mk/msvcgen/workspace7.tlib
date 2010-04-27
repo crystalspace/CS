@@ -61,7 +61,7 @@ END -%]
 [% END -%]
 	EndProjectSection
 [%- END %]
-[% END -%]
+[%- END %]
 EndProject
 [% END -%]
 Global
@@ -73,7 +73,7 @@ Global
   [% END -%]
 [% END -%]
 	EndGlobalSection
-[%- ELSE %]
+[% ELSE %]
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 [%- FOREACH build IN builds ~%]
   [% FOREACH mutator IN mutators ~%]
@@ -92,7 +92,7 @@ Global
 [% END -%]
 [% END -%]
 	EndGlobalSection
-[%- END -%]
+[% END -%]
 [% IF comparable_msvc_version < 80 -%]
 	GlobalSection(ProjectConfiguration) = postSolution
 [%- ELSE -%]
@@ -113,5 +113,5 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-[%- END %]
+[% END -%]
 EndGlobal
