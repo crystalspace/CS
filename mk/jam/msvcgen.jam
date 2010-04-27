@@ -1554,8 +1554,6 @@ rule StaticPluginLibrary
 # Write out CFLAGS, LFLAGS needed by a plugin
 rule WriteDependencies
 {
-  #local cflags.debug cflags.release ;
-  #local lflags.debug lflags.release ;
   local depfile = $(<) ;
   local plugin = $(>) ;
   local libname = $(3) ;
@@ -1723,21 +1721,21 @@ rule LibDepends
   for w in $(MSVC.WORKSPACES)
   {
     local l ;
-    for l in $(libs)_MSVCNAME
+    for l in $(libs)
     {
-      if $($(l))
+      if $($(l)_MSVCNAME)
       {
-	ResponseFile $($(w)_WKS_RESPFILE) : "$($(<)_MSVCNAME)|$($(l))" :
+	ResponseFile $($(w)_WKS_RESPFILE) : "$($(<)_MSVCNAME)|$($(l)_MSVCNAME)" :
 	  notfile : $($(w)_WKS_RESPDIR) ;
       }
     }
   }
   local l ;
-  for l in $(libs)_MSVCNAME
+  for l in $(libs)
   {
     if ! [ IsElem $(l) : $($(<).NEEDLIBS) ]
     {
-      ResponseFile $($(<)_PRJ_RESPFILE) : "depends|$($(l))" :
+      ResponseFile $($(<)_PRJ_RESPFILE) : "depends|$($(l)_MSVCNAME)" :
         notfile : $($(<)_PRJ_RESPDIR) ;
       $(<).NEEDLIBS += $(l) ;
     }
