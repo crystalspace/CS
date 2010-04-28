@@ -45,6 +45,9 @@ class csVector2;
 class csVector3;
 class csEllipsoid;
 
+/**
+ * A submesh of a genmesh.
+ */
 struct iGeneralMeshSubMesh : public virtual iBase
 {
   SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 3);
