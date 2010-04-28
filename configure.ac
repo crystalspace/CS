@@ -1964,17 +1964,24 @@ CS_SYS_PLUGIN_MAIN
 
 
 #------------------------------------------------------------------------------
-# Check for sizeof(long) to determine whether the platform is 32 or 64 bit.
+# Check for sizeof(void*) to determine whether the platform is 32 or 64 bit.
 # Also needed by the PRIx99 macros provided by CS.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_LONG_BITS],
-    [AC_CHECK_SIZEOF([long])
-    AS_IF([test $ac_cv_sizeof_long = 8],
-	[cs_long_bits=64], [cs_long_bits=32])])
+AC_DEFUN([CS_CHECK_VOIDP_BITS],
+    [AC_CHECK_SIZEOF([void*])
+    AS_IF([test $ac_cv_sizeof_voidp = 8],
+	[cs_voidp_bits=64], [cs_voidp_bits=32])])
 
-CS_CHECK_LONG_BITS
-CS_HEADER_PROPERTY([CS_PROCESSOR_SIZE], [$cs_long_bits])
-CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [$cs_long_bits])
+CS_CHECK_VOIDP_BITS
+CS_HEADER_PROPERTY([CS_PROCESSOR_SIZE], [$cs_voidp_bits])
+CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [$cs_voidp_bits])
+
+
+
+#------------------------------------------------------------------------------
+# Check for sizeof(long).
+#------------------------------------------------------------------------------
+AC_CHECK_SIZEOF([long])
 CS_HEADER_PROPERTY([CS_LONG_SIZE], [$ac_cv_sizeof_long])
 
 
