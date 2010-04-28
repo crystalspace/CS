@@ -37,9 +37,16 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   csBulletSoftBody (csBulletDynamicsSystem* dynSys, btSoftBody* body);
   ~csBulletSoftBody ();
 
+  //-- iBulletSoftBody
   virtual void DebugDraw (iView* rview);
   virtual void SetMass (float mass);
   virtual float GetMass ();
+  virtual size_t GetVertexCount ();
+  virtual csVector3 GetVertexPosition (size_t index);
+  virtual void AnchorVertex (size_t vertexIndex);
+  virtual void AnchorVertex (size_t vertexIndex, iRigidBody* body);
+  virtual void SetRigidity (float rigidity);
+  virtual float GetRigidity ();
 
  private:
   csBulletDynamicsSystem* dynSys;

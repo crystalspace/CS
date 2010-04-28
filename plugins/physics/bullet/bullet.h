@@ -212,6 +212,14 @@ public:
   virtual iBulletSoftBody* GetSoftBody (size_t index);
   virtual iBulletSoftBody* CreateRope (csVector3 start, csVector3 end,
 				       uint segmentCount);
+  virtual iBulletSoftBody* CreateCloth (csVector3 corner1, csVector3 corner2,
+					csVector3 corner3, csVector3 corner4,
+					uint segmentCount1, uint segmentCount2,
+					bool withDiagonals = false);
+  virtual iBulletSoftBody* CreateSoftBody (iGeneralFactoryState* genmeshFactory,
+					   const csOrthoTransform& bodyTransform);
+  virtual iBulletSoftBody* CreateSoftBody (csVector3* vertices, size_t vertexCount,
+					   csTriangle* triangles, size_t triangleCount);
   virtual void RemoveSoftBody (iBulletSoftBody* body);
 };
 
@@ -223,6 +231,7 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
   friend class csBulletDynamicsSystem;
   friend class csBulletCollider;
   friend class csBulletJoint;
+  friend class csBulletSoftBody;
 
   csBulletDynamicsSystem* dynSys;
   btRigidBody* body;

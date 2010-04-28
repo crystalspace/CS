@@ -807,9 +807,10 @@ void csBulletDynamicsSystem::SetSoftBodyWorld (bool isSoftBodyWorld)
     softWorldInfo.m_broadphase = broadphase;
     softWorldInfo.m_dispatcher = dispatcher;
     softWorldInfo.m_gravity = gravity;
+    //softWorldInfo.air_density = 0.0f;
     softWorldInfo.air_density = 1.2f;
-    softWorldInfo.water_density = 1000.0f;
-    softWorldInfo.water_offset = -1.0f;
+    softWorldInfo.water_density = 0.0f;
+    softWorldInfo.water_offset = 0.0f;
     softWorldInfo.water_normal = btVector3 (0.0f, 1.0f, 0.0f);
     softWorldInfo.m_sparsesdf.Initialize ();
   }
@@ -853,7 +854,119 @@ iBulletSoftBody* csBulletDynamicsSystem::CreateRope
 
   btSoftBody* body = btSoftBodyHelpers::CreateRope
     (softWorldInfo, CSToBullet (start, internalScale),
-     CSToBullet (end, internalScale), segmentCount, 3);
+     CSToBullet (end, internalScale), segmentCount, 0);
+
+  btSoftRigidDynamicsWorld* softWorld =
+    static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+  softWorld->addSoftBody (body);
+
+  csRef<csBulletSoftBody> csBody;
+  csBody.AttachNew (new csBulletSoftBody (this, body));
+
+  softBodies.Push (csBody);
+  return csBody;
+}
+
+iBulletSoftBody* csBulletDynamicsSystem::CreateCloth
+(csVector3 corner1, csVector3 corner2, csVector3 corner3, csVector3 corner4,
+ uint segmentCount1, uint segmentCount2, bool withDiagonals)
+{
+  CS_ASSERT(isSoftWorld);
+
+  btSoftBody* body = btSoftBodyHelpers::CreatePatch
+    (softWorldInfo, CSToBullet (corner1, internalScale),
+     CSToBullet (corner2, internalScale), CSToBullet (corner3, internalScale),
+     CSToBullet (corner4, internalScale), segmentCount1, segmentCount2, 0,
+     withDiagonals);
+
+  btSoftRigidDynamicsWorld* softWorld =
+    static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+  softWorld->addSoftBody (body);
+
+  csRef<csBulletSoftBody> csBody;
+  csBody.AttachNew (new csBulletSoftBody (this, body));
+
+  softBodies.Push (csBody);
+  return csBody;
+}
+
+iBulletSoftBody* csBulletDynamicsSystem::CreateSoftBody
+(iGeneralFactoryState* genmeshFactory, const csOrthoTransform& bodyTransform)
+{
+  CS_ASSERT(isSoftWorld);
+
+  btScalar* vertices = new btScalar[genmeshFactory->GetVertexCount () * 3];
+  for (int i = 0; i < genmeshFactory->GetVertexCount (); i++)
+  {
+    csVector3 vertex = genmeshFactory->GetVertices ()[i]
+      * bodyTransform.GetInverse() * internalScale;
+    vertices[i * 3] = vertex[0];
+    vertices[i * 3 + 1] = vertex[1];
+    vertices[i * 3 + 2] = vertex[2];
+  }
+
+  int* triangles = new int[genmeshFactory->GetTriangleCount () * 3];
+  for (int i = 0; i < genmeshFactory->GetTriangleCount (); i++)
+  {
+    csTriangle& triangle = genmeshFactory->GetTriangles ()[i];
+    triangles[i * 3] = triangle.a;
+    triangles[i * 3 + 1] = triangle.b;
+    triangles[i * 3 + 2] = triangle.c;
+  }
+
+  btSoftBody* body = btSoftBodyHelpers::CreateFromTriMesh
+    (softWorldInfo, vertices, triangles, genmeshFactory->GetTriangleCount ());
+
+  body->generateBendingConstraints(2);
+  body->m_cfg.piterations	=	10;
+  body->m_cfg.collisions|=btSoftBody::fCollision::VF_SS;
+  body->m_materials[0]->m_kLST	=	1;
+
+  btSoftRigidDynamicsWorld* softWorld =
+    static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+  softWorld->addSoftBody (body);
+
+  csRef<csBulletSoftBody> csBody;
+  csBody.AttachNew (new csBulletSoftBody (this, body));
+
+  softBodies.Push (csBody);
+  return csBody;
+}
+
+iBulletSoftBody* csBulletDynamicsSystem::CreateSoftBody
+(csVector3* vertices, size_t vertexCount,
+ csTriangle* triangles, size_t triangleCount)
+{
+  CS_ASSERT(isSoftWorld);
+
+  btScalar* btVertices = new btScalar[vertexCount * 3];
+  for (size_t i = 0; i < vertexCount; i++)
+  {
+    csVector3& vertex = vertices[i];
+    btVertices[i * 3] = vertex[0] * internalScale;
+    btVertices[i * 3 + 1] = vertex[1] * internalScale;
+    btVertices[i * 3 + 2] = vertex[2] * internalScale;
+  }
+
+  int* btTriangles = new int[triangleCount * 3];
+  for (size_t i = 0; i < triangleCount; i++)
+  {
+    csTriangle& triangle = triangles[i];
+    btTriangles[i * 3] = triangle.a;
+    btTriangles[i * 3 + 1] = triangle.b;
+    btTriangles[i * 3 + 2] = triangle.c;
+  }
+
+  btSoftBody* body = btSoftBodyHelpers::CreateFromTriMesh
+    (softWorldInfo, btVertices, btTriangles, triangleCount);
+
+  body->generateBendingConstraints(2);
+  body->m_cfg.piterations	=	10;
+  body->m_cfg.collisions|=btSoftBody::fCollision::VF_SS;
+  body->m_materials[0]->m_kLST	=	1;
+
+  delete btVertices;
+  delete btTriangles;
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);

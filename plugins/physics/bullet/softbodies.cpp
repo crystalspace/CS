@@ -86,5 +86,42 @@ float csBulletSoftBody::GetMass ()
   return body->getTotalMass ();
 }
 
+size_t csBulletSoftBody::GetVertexCount ()
+{
+  return body->m_nodes.size ();
+}
+
+csVector3 csBulletSoftBody::GetVertexPosition (size_t index)
+{
+  CS_ASSERT(index < (size_t) body->m_nodes.size ());
+  return BulletToCS (body->m_nodes[index].m_x, dynSys->inverseInternalScale);
+}
+
+void csBulletSoftBody::AnchorVertex (size_t vertexIndex)
+{
+  CS_ASSERT(vertexIndex < (size_t) body->m_nodes.size ());
+  body->setMass (vertexIndex, 0.0f);
+}
+
+void csBulletSoftBody::AnchorVertex (size_t vertexIndex, iRigidBody* body)
+{
+  csBulletRigidBody* rigidBody = dynamic_cast<csBulletRigidBody*> (body);
+  CS_ASSERT(rigidBody
+	    && vertexIndex < (size_t) this->body->m_nodes.size ()
+	    && rigidBody->body);
+  this->body->appendAnchor (vertexIndex, rigidBody->body);
+}
+
+void csBulletSoftBody::SetRigidity (float rigidity)
+{
+  CS_ASSERT(rigidity >= 0.0f && rigidity <= 1.0f);
+  body->m_materials[0]->m_kLST = rigidity;
+}
+
+float csBulletSoftBody::GetRigidity ()
+{
+  return body->m_materials[0]->m_kLST;
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(Bullet)

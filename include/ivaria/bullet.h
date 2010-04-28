@@ -29,6 +29,7 @@ struct iView;
 struct iRigidBody;
 struct iBulletKinematicCallback;
 struct iBulletSoftBody;
+struct csTriangle;
 
 /**
  * Return structure for the iBulletDynamicSystem::HitBeam() routine.
@@ -67,7 +68,7 @@ enum csBulletDebugMode
  */
 struct iBulletDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 2);
+  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 3);
 
   /**
    * Draw the debug informations of the dynamic system. This has to be called
@@ -163,6 +164,43 @@ struct iBulletDynamicSystem : public virtual iBase
 				       uint segmentCount) = 0;
 
   /**
+   * Create a soft body cloth.
+   * \param corner1 The position of the top left corner.
+   * \param corner2 The position of the top right corner.
+   * \param corner3 The position of the bottom left corner.
+   * \param corner4 The position of the bottom right corner.
+   * \param segmentCount1 Number of horizontal segments in the cloth.
+   * \param segmentCount2 Number of vertical segments in the cloth.
+   * \param withDiagonals Whether there must be diagonal segments in the cloth
+   * or not. Diagonal segments will make the cloth more rigid.
+   * \remark You must call SetSoftBodyWorld() prior to this.
+   */
+  virtual iBulletSoftBody* CreateCloth (csVector3 corner1, csVector3 corner2,
+					csVector3 corner3, csVector3 corner4,
+					uint segmentCount1, uint segmentCount2,
+					bool withDiagonals = false) = 0;
+
+  /**
+   * Create a 3D soft body from a genmesh.
+   * \param genmeshFactory The genmesh factory to use.
+   * \param bodyTransform The initial transform of the soft body.
+   * \remark You must call SetSoftBodyWorld() prior to this.
+   */
+  virtual iBulletSoftBody* CreateSoftBody (iGeneralFactoryState* genmeshFactory,
+					   const csOrthoTransform& bodyTransform) = 0;
+
+  /**
+   * Create a custom 3D soft body.
+   * \param vertices The vertices of the soft body. The position is absolute.
+   * \param vertexCount The count of vertices of the soft body.
+   * \param triangles The faces of the soft body.
+   * \param triangleCount The count of faces of the soft body.
+   * \remark You must call SetSoftBodyWorld() prior to this.
+   */
+  virtual iBulletSoftBody* CreateSoftBody (csVector3* vertices, size_t vertexCount,
+					   csTriangle* triangles, size_t triangleCount) = 0;
+
+  /**
    * Remove the given soft body from this dynamic world and delete it.
    */
   virtual void RemoveSoftBody (iBulletSoftBody* body) = 0;
@@ -176,7 +214,7 @@ struct iBulletDynamicSystem : public virtual iBase
  */
 struct iBulletSoftBody : public virtual iBase
 {
-  SCF_INTERFACE(iBulletSoftBody, 1, 0, 0);
+  SCF_INTERFACE(iBulletSoftBody, 1, 0, 1);
 
   /**
    * Draw the debug informations of this soft body. This has to be called
@@ -193,6 +231,38 @@ struct iBulletSoftBody : public virtual iBase
    * Return the total mass of this body.
    */
   virtual float GetMass () = 0;
+
+  /**
+   * Return the count of vertices of this soft body.
+   */
+  virtual size_t GetVertexCount () = 0;
+
+  /**
+   * Return the absolute position of the given vertex.
+   */
+  virtual csVector3 GetVertexPosition (size_t index) = 0;
+
+  /**
+   * Anchor the given vertex to its current position. This vertex will no more move.
+   */
+  virtual void AnchorVertex (size_t vertexIndex) = 0;
+
+  /**
+   * Anchor the given vertex to the given rigid body. The relative position of the
+   * vertex and the body will remain constant.
+   */
+  virtual void AnchorVertex (size_t vertexIndex, iRigidBody* body) = 0;
+
+  /**
+   * Set the rigidity of this body. The value should be in the 0 to 1 range, with
+   * 0 meaning soft and 1 meaning rigid.
+   */
+  virtual void SetRigidity (float rigidity) = 0;
+
+  /**
+   * Get the rigidity of this body.
+   */
+  virtual float GetRigidity () = 0;
 };
 
 /**
