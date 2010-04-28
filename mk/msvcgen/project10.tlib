@@ -143,15 +143,18 @@ END -%]
     <[% group.itemtype %] Include="[% path([my.doc.sourceroot.0, file]) %]" />
   [%- END %]
   [%- FOREACH file IN items2 %]
+    [%- IF file.match('\\.(h|hpp|rc)$') %]
     <[% group.itemtype %] Include="[% path([my.doc.sourceroot.0, file]) %]" />
-    [%- UNLESS file.match('\\.(h|hpp|rc)$') %]
-    [%- FOREACH build IN builds %]
-      [% FOREACH mutator IN mutators -%]
-        [% FOREACH platform IN platforms -%]
+    [%- ELSE %]
+    <[% group.itemtype %] Include="[% path([my.doc.sourceroot.0, file]) %]">
+    [%~ FOREACH build IN builds %]
+      [%~ FOREACH mutator IN mutators %]
+        [%~ FOREACH platform IN platforms %]
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='[% build.name %][% mutator.namesuffix %]|[% platform.name %]'">[% workbuild([file.replace('/', '_'), '.obj']) %]</ObjectFileName>
         [%~ END %]
       [%~ END %]
     [%~ END %]
+    </[% group.itemtype %]>
     [%~ END %]
   [%~ END %]
   </ItemGroup>
