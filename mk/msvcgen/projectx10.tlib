@@ -243,5 +243,8 @@ copy /y "$(TargetPath)" [% path([workroot, 'bin\\']) %]
 </Command>
 [% END %]
 
-[% MACRO postbuild_release GET postbuild_common %]
-[% MACRO postbuild_debug   GET postbuild_common %]
+[% MACRO postbuild_appcon	GET postbuild_common %]
+[% MACRO postbuild_appgui	GET postbuild_common %]
+[% MACRO postbuild_library	GET postbuild_common %]
+[% MACRO postbuild_plugin	GET postbuild_common %]
+[% MACRO postbuild_dll		GET postbuild_common %]
