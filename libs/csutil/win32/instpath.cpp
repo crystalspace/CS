@@ -38,7 +38,7 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
 					   char *oInstallPath, 
 					   DWORD iBufferSize)
 {
-  char * pValueName = "InstallPath";
+  const char * pValueName = "InstallPath";
   DWORD dwType;
   DWORD bufSize = iBufferSize;
   HKEY m_pKey;
