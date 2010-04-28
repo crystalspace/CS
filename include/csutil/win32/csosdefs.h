@@ -410,7 +410,7 @@ struct DIR;
 // just to avoid windows.h inclusion
 #define csSW_SHOWNORMAL 1
 
-#if defined(CS_COMPILER_GCC) && defined(__STRICT_ANSI__)
+#if defined(CS_COMPILER_GCC) && defined(__STRICT_ANSI__) && !(CS_PROCESSOR_SIZE == 64)
 // Need those...
   extern int		_argc;
   extern char**	_argv;
