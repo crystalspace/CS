@@ -88,6 +88,8 @@ private:
   void LoadRagdoll ();
   void SpawnRagdoll ();
   void SpawnRope ();
+  void SpawnCloth ();
+  void SpawnSoftBody ();
   void CreateWalls (const csVector3& radius);
 
 public:

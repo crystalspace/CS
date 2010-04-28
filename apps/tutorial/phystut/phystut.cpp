@@ -33,9 +33,9 @@ Simple::Simple ()
   : csDemoApplication ("CrystalSpace.PhysTut", "phystut",
 		       "phystut <OPTIONS>",
 		       "Physics tutorial for Crystal Space."),
-    solver (0), autodisable (false), do_bullet_debug (false),
-    remainingStepDuration (0.0f), debugMode (false), allStatic (false),
-    pauseDynamic (false), dynamicSpeed (1.0f),
+    isSoftBodyWorld (false), solver (0), autodisable (false),
+    do_bullet_debug (false), remainingStepDuration (0.0f), debugMode (false),
+    allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
     physicalCameraMode (CAMERA_DYNAMIC)    
 {
   // Configure the options for csDemoApplication
@@ -305,9 +305,21 @@ bool Simple::OnKeyboard (iEvent &ev)
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'y'
-	     && phys_engine_id == BULLET_ID)
+	     && phys_engine_id == BULLET_ID && isSoftBodyWorld)
     {
       SpawnRope ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'u'
+	     && phys_engine_id == BULLET_ID && isSoftBodyWorld)
+    {
+      SpawnCloth ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'i'
+	     && phys_engine_id == BULLET_ID && isSoftBodyWorld)
+    {
+      SpawnSoftBody ();
       return true;
     }
 
@@ -580,7 +592,11 @@ bool Simple::OnInitialize (int argc, char* argv[])
     keyDescriptions.Push ("r: spawn a Frankie's ragdoll");
   }
   if (isSoftBodyWorld)
+  {
     keyDescriptions.Push ("y: spawn a rope");
+    keyDescriptions.Push ("u: spawn a cloth");
+    keyDescriptions.Push ("i: spawn a soft body");
+  }
   keyDescriptions.Push ("SPACE: spawn random object");
   if (phys_engine_id == BULLET_ID)
     keyDescriptions.Push ("left mouse: fire!");
@@ -829,6 +845,7 @@ iRigidBody* Simple::SpawnBox ()
 
 bool Simple::SpawnStarCollider ()
 {
+  // Find the 'star' mesh factory
   csRef<iMeshFactoryWrapper> starFact;
   starFact = engine->FindMeshFactory ("genstar");
   if (!starFact)
@@ -836,10 +853,7 @@ bool Simple::SpawnStarCollider ()
     loader->Load ("/lib/std/star.xml");
     starFact = engine->FindMeshFactory ("genstar");
     if (!starFact)
-    {
       return ReportError ("Error loading 'star.xml'!");
-      return false;
-    }
   }
 
   // Use the camera transform.
@@ -1022,9 +1036,6 @@ iRigidBody* Simple::SpawnCylinder ()
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1)
 		   - artificialOffset);
   rb->SetOrientation (csXRotMatrix3 (PI / 5.0));
-  //csOrthoTransform bodyTransform (csMatrix3 (), tc.GetOrigin ()
-  //         + tc.GetT2O () * csVector3 (0, 0, 1) - artificialOffset);
-  //rb->SetTransform (bodyTransform);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
@@ -1344,9 +1355,78 @@ void Simple::SpawnRagdoll ()
 
 void Simple::SpawnRope ()
 {
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Spawn a box
+  iRigidBody* box = SpawnBox ();
+
+  // Spawn a first rope and attach it to the box
   iBulletSoftBody* body = bullet_dynSys->CreateRope
-    (csVector3 (-3.0f, 0.0f, -3.0f), csVector3 (3.0f, 0.0f, 3.0f), 20);
+    (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0),
+     tc.GetOrigin () + tc.GetT2O () * csVector3 (-0.2f, 0, 1), 20);
   body->SetMass (2.0f);
+  body->AnchorVertex (0);
+  body->AnchorVertex (body->GetVertexCount () - 1, box);
+
+  // Spawn a second rope and attach it to the box
+  body = bullet_dynSys->CreateRope
+    (tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 0),
+     tc.GetOrigin () + tc.GetT2O () * csVector3 (0.2f, 0, 1), 20);
+  body->SetMass (1.0f);
+  body->AnchorVertex (0);
+  body->AnchorVertex (body->GetVertexCount () - 1, box);
+}
+
+void Simple::SpawnCloth ()
+{
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create the cloth
+  iBulletSoftBody* body = bullet_dynSys->CreateCloth
+    (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 1),
+     tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 1),
+     tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 0, 1),
+     tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 0, 1),
+     10, 10, true);
+  body->SetMass (5.0f);
+
+  // Attach the two top corners
+  body->AnchorVertex (0);
+  body->AnchorVertex (9);
+}
+
+void Simple::SpawnSoftBody ()
+{
+  // Create the ball mesh factory.
+  csRef<iMeshFactoryWrapper> ballFact = engine->CreateMeshFactory(
+  	"crystalspace.mesh.object.genmesh", "ballFact");
+  if (!ballFact)
+  {
+    ReportError ("Error creating mesh object factory!");
+    return;
+  }
+
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<
+    iGeneralFactoryState> (ballFact->GetMeshObjectFactory ());
+  const float r (rand()%5/10. + .2);
+  csVector3 radius (r, r, r);
+  csEllipsoid ellips (csVector3 (0), radius);
+  gmstate->GenerateSphere (ellips, 16);
+
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create the soft body
+  iBulletSoftBody* body = bullet_dynSys->CreateSoftBody
+    (gmstate, csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, 1.0f)) * tc);
+  // This would have worked too
+  //iBulletSoftBody* body = bullet_dynSys->CreateSoftBody
+  //  (gmstate->GetVertices (), gmstate->GetVertexCount (),
+  //   gmstate->GetTriangles (), gmstate->GetTriangleCount ());
+  body->SetMass (2.0f);
+  body->SetRigidity (0.8f);
 }
 
 void Simple::CreateWalls (const csVector3& /*radius*/)
@@ -1413,7 +1493,8 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
   collider->SetTransform (t);
 
   // If we use the Bullet plugin, then use a plane collider for the floor
-  if (phys_engine_id == ODE_ID)
+  // Also, soft bodies don't work well with planes, so use a box in this case
+  if (phys_engine_id == ODE_ID || isSoftBodyWorld)
   {
     t.SetOrigin(csVector3(0.0f, -10.0f, 0.0f));
     dynSys->AttachColliderBox (size, t, 10.0f, 0.0f);
