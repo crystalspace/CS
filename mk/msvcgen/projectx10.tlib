@@ -46,7 +46,7 @@
   my.doc.rawtarget.0 _ library_dll_versuffix _ '-vc' _ my.doc.msvcversion.0 _ platform.suffix _ suffix
 %]
 [% MACRO library_lib_outfile(suffix) BLOCK -%]
-[% worklibout %]\[% my.doc.project.0 %][% suffix %]
+[% path(['out', glue([build.tag, my.doc.msvcversion.0, platform.suffix]), 'libs']) %]\[% my.doc.project.0 %][% suffix %]
 [%- END %]
 
 [% MACRO PropertiesConfiguration_app BLOCK -%]
@@ -231,7 +231,7 @@ Condition="'$(Configuration)|$(Platform)'=='[% build.name %][% mutator.namesuffi
 [% END %]
 
 [% MACRO library_outfile(suffix) BLOCK -%]
-      <OutputFile>[% library_lib_outfile(suffix) %].lib</OutputFile>
+      <OutputFile>[% path([my.doc.buildroot.0, library_lib_outfile(suffix)]) %].lib</OutputFile>
 [% END %]
 [% MACRO librarian_library_release GET library_outfile('') %]
 [% MACRO librarian_library_debug   GET library_outfile('_d') %]
