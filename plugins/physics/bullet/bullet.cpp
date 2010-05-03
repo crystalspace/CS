@@ -744,6 +744,55 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
     }
   }
 
+  // Check for soft bodies
+  if (!result.body && isSoftWorld)
+  {
+    btSoftRigidDynamicsWorld* softWorld =
+      static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+
+    btSoftBodyArray& sbs = softWorld->getSoftBodyArray ();
+    for (int ib = 0; ib < sbs.size (); ++ib)
+    {
+      btSoftBody* psb = sbs[ib];
+      btSoftBody::sRayCast ray;
+      if (psb->rayTest (rayFrom, rayTo, ray) && ray.fraction < 1.00f)
+      {
+	result.softBody = (csBulletSoftBody*) psb->getUserPointer ();
+	btVector3 impact = rayFrom + (rayTo - rayFrom) * ray.fraction;
+	result.isect = BulletToCS (impact, inverseInternalScale);
+
+	// find the closest vertex
+	switch(ray.feature)
+	{
+	case btSoftBody::eFeature::Face:
+	  {
+	    btSoftBody::Face& face = psb->m_faces[ray.index];
+	    btSoftBody::Node* node = face.m_n[0];
+	    float distance = (node->m_x - impact).length2();
+	    for (int i = 1; i < 3; i++)
+	    {
+	      float nodeDistance = (face.m_n[i]->m_x - impact).length2();
+	      if (nodeDistance < distance)
+	      {
+		node = face.m_n[i];
+		distance = nodeDistance;
+	      }
+	    }
+
+	    result.vertexIndex = size_t (node - &psb->m_nodes[0]);
+	  }
+	  break;
+
+	default:
+	  // TODO: may need other types?
+	  break;
+	}
+
+	break;
+      }
+    }
+  }
+
   return result;
 }
 
@@ -807,7 +856,6 @@ void csBulletDynamicsSystem::SetSoftBodyWorld (bool isSoftBodyWorld)
     softWorldInfo.m_broadphase = broadphase;
     softWorldInfo.m_dispatcher = dispatcher;
     softWorldInfo.m_gravity = gravity;
-    //softWorldInfo.air_density = 0.0f;
     softWorldInfo.air_density = 1.2f;
     softWorldInfo.water_density = 0.0f;
     softWorldInfo.water_offset = 0.0f;

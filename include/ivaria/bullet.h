@@ -32,22 +32,36 @@ struct iBulletSoftBody;
 struct csTriangle;
 
 /**
- * Return structure for the iBulletDynamicSystem::HitBeam() routine.
+ * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
+ * whether a dynamic, kinematic or soft body has been hit.
  * \sa csHitBeamResult csSectorHitBeamResult
  */
 struct csBulletHitBeamResult
 {
-  csBulletHitBeamResult () : body (0), isect (0.0f) {}
+  csBulletHitBeamResult () : body (0), softBody (0), isect (0.0f), vertexIndex (0) {}
 
   /**
-   * The resulting dynamic or kinematic body that was hit, or 0 if no body was hit.
+   * The resulting dynamic or kinematic body that was hit, or 0 if no body was
+   * hit or if it is a soft body which is hit.
    */
   iRigidBody* body;
+
+  /**
+   * The resulting soft body that was hit, or 0 if no soft body was hit or if it
+   * is a dynamic/kinematic soft body which is hit.
+   */
+  iBulletSoftBody* softBody;
 
   /**
    * Intersection point in world space.
    */
   csVector3 isect;
+
+  /**
+   * The index of the closest vertex of the soft body to be hit. This is only valid
+   * if it is a soft body which is hit (ie softBody is different than 0).
+   */
+  size_t vertexIndex;
 };
 
 /**
@@ -181,7 +195,7 @@ struct iBulletDynamicSystem : public virtual iBase
 					bool withDiagonals = false) = 0;
 
   /**
-   * Create a 3D soft body from a genmesh.
+   * Create a volumetric soft body from a genmesh.
    * \param genmeshFactory The genmesh factory to use.
    * \param bodyTransform The initial transform of the soft body.
    * \remark You must call SetSoftBodyWorld() prior to this.
@@ -190,7 +204,7 @@ struct iBulletDynamicSystem : public virtual iBase
 					   const csOrthoTransform& bodyTransform) = 0;
 
   /**
-   * Create a custom 3D soft body.
+   * Create a custom volumetric soft body.
    * \param vertices The vertices of the soft body. The position is absolute.
    * \param vertexCount The count of vertices of the soft body.
    * \param triangles The faces of the soft body.
@@ -209,12 +223,17 @@ struct iBulletDynamicSystem : public virtual iBase
 /**
  * A soft body is a physical body that can be deformed by the physical
  * simulation. It can be used to simulate eg ropes, clothes or any soft
- * 3D object.
+ * volumetric object.
+ *
+ * A soft body does not have a positional transform by itself, but the
+ * position of every vertex of the body can be queried through GetVertexCount().
+ *
+ * A soft body can neither be static or kinematic, it is always dynamic.
  * \sa iRigidBody iBulletRigidBody
  */
 struct iBulletSoftBody : public virtual iBase
 {
-  SCF_INTERFACE(iBulletSoftBody, 1, 0, 1);
+  SCF_INTERFACE(iBulletSoftBody, 1, 0, 2);
 
   /**
    * Draw the debug informations of this soft body. This has to be called
@@ -263,6 +282,31 @@ struct iBulletSoftBody : public virtual iBase
    * Get the rigidity of this body.
    */
   virtual float GetRigidity () = 0;
+
+  /**
+   * Set the linear velocity of the whole body.
+   */
+  virtual void SetLinearVelocity (csVector3 velocity) = 0;
+
+  /**
+   * Set the linear velocity of the given vertex of the body.
+   */
+  virtual void SetLinearVelocity (csVector3 velocity, size_t vertexIndex) = 0;
+
+  /**
+   * Get the linear velocity of the given vertex of the body.
+   */
+  virtual csVector3 GetLinearVelocity (size_t vertexIndex) = 0;
+
+  /**
+   * Add a force to the whole body.
+   */
+  virtual void AddForce (csVector3 force) = 0;
+
+  /**
+   * Add a force at the given vertex of the body.
+   */
+  virtual void AddForce (csVector3 force, size_t vertexIndex) = 0;
 };
 
 /**

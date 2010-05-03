@@ -47,6 +47,11 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   virtual void AnchorVertex (size_t vertexIndex, iRigidBody* body);
   virtual void SetRigidity (float rigidity);
   virtual float GetRigidity ();
+  virtual void SetLinearVelocity (csVector3 velocity);
+  virtual void SetLinearVelocity (csVector3 velocity, size_t vertexIndex);
+  virtual csVector3 GetLinearVelocity (size_t vertexIndex);
+  virtual void AddForce (csVector3 force);
+  virtual void AddForce (csVector3 force, size_t vertexIndex);
 
  private:
   csBulletDynamicsSystem* dynSys;

@@ -46,6 +46,7 @@ csBulletSoftBody::csBulletSoftBody (csBulletDynamicsSystem* dynSys,
 				    btSoftBody* body)
   : scfImplementationType (this), dynSys (dynSys), body (body)
 {
+  body->setUserPointer (this);
 }
 
 csBulletSoftBody::~csBulletSoftBody ()
@@ -121,6 +122,39 @@ void csBulletSoftBody::SetRigidity (float rigidity)
 float csBulletSoftBody::GetRigidity ()
 {
   return body->m_materials[0]->m_kLST;
+}
+
+void csBulletSoftBody::SetLinearVelocity (csVector3 velocity)
+{
+  // Strangely, Bullet defines adding velocities of soft bodies with a scale of 100...
+  body->setVelocity (CSToBullet (velocity * 100.0f, dynSys->inverseInternalScale));
+}
+
+void csBulletSoftBody::SetLinearVelocity (csVector3 velocity, size_t vertexIndex)
+{
+  CS_ASSERT (vertexIndex < (size_t) body->m_nodes.size ());
+  // Strangely, Bullet defines adding velocities of soft bodies with a scale of 100...
+  body->addVelocity (CSToBullet (velocity * 100.0f, dynSys->inverseInternalScale)
+		     - body->m_nodes[vertexIndex].m_v, vertexIndex);
+}
+
+csVector3 csBulletSoftBody::GetLinearVelocity (size_t vertexIndex)
+{
+  CS_ASSERT (vertexIndex < (size_t) body->m_nodes.size ());
+  return BulletToCS (body->m_nodes[vertexIndex].m_v, dynSys->inverseInternalScale);
+}
+
+void csBulletSoftBody::AddForce (csVector3 force)
+{
+  // Strangely, Bullet defines adding forces to soft bodies with a scale of 100...
+  body->addForce (CSToBullet (force * 100.0f, dynSys->inverseInternalScale));
+}
+
+void csBulletSoftBody::AddForce (csVector3 force, size_t vertexIndex)
+{
+  CS_ASSERT (vertexIndex < (size_t) body->m_nodes.size ());
+  // Strangely, Bullet defines adding forces to soft bodies indices with a scale of 10000...
+  body->addForce (CSToBullet (force * 10000.0f, dynSys->inverseInternalScale), vertexIndex);
 }
 
 }
