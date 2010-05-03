@@ -522,6 +522,14 @@ bool Simple::OnMouseDown (iEvent& ev)
       //result.body->AddForceAtRelPos (force, relativePosition);
     }
 
+    else if (result.softBody)
+    {
+      csVector3 force = endBeam - startBeam;
+      force.Normalize ();
+      force *= 2.0f;
+      result.softBody->AddForce (force, result.vertexIndex);
+    }
+
     return true;
   }
 
@@ -1366,6 +1374,7 @@ void Simple::SpawnRope ()
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (-0.2f, 0, 1), 20);
   body->SetMass (2.0f);
+  body->SetRigidity (0.95f);
   body->AnchorVertex (0);
   body->AnchorVertex (body->GetVertexCount () - 1, box);
 
@@ -1374,6 +1383,7 @@ void Simple::SpawnRope ()
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 0),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (0.2f, 0, 1), 20);
   body->SetMass (1.0f);
+  body->SetRigidity (0.95f);
   body->AnchorVertex (0);
   body->AnchorVertex (body->GetVertexCount () - 1, box);
 }
@@ -1427,6 +1437,12 @@ void Simple::SpawnSoftBody ()
   //   gmstate->GetTriangles (), gmstate->GetTriangleCount ());
   body->SetMass (2.0f);
   body->SetRigidity (0.8f);
+
+  // Fling the body.
+  body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+  // This would have worked too
+  //for (size_t i = 0; i < body->GetVertexCount (); i++)
+  //  body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5), i);
 }
 
 void Simple::CreateWalls (const csVector3& /*radius*/)
