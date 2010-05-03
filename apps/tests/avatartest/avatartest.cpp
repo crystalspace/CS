@@ -179,7 +179,7 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
 
     // Toggle the debug mode of the dynamic system
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'd'
-	     && physicsEnabled)
+	     && physicsEnabled && avatarScene->HasPhysicalObjects ())
     {
       csRef<iMeshObject> animeshObject =
 	scfQueryInterface<iMeshObject> (avatarScene->animesh);

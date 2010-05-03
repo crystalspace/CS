@@ -47,6 +47,7 @@ class AvatarScene
 
   // Dynamic simuation related
   virtual float GetSimulationSpeed () = 0;
+  virtual bool HasPhysicalObjects () = 0;
 
   // From csBaseEventHandler
   virtual void Frame () = 0;

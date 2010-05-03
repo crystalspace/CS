@@ -87,6 +87,11 @@ float FrankieScene::GetSimulationSpeed ()
   return 0.25f;
 }
 
+bool FrankieScene::HasPhysicalObjects ()
+{
+  return true;
+}
+
 void FrankieScene::Frame ()
 {
   // First get elapsed time from the virtual clock.
