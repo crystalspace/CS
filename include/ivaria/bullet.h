@@ -233,7 +233,7 @@ struct iBulletDynamicSystem : public virtual iBase
  */
 struct iBulletSoftBody : public virtual iBase
 {
-  SCF_INTERFACE(iBulletSoftBody, 1, 0, 2);
+  SCF_INTERFACE(iBulletSoftBody, 2, 0, 0);
 
   /**
    * Draw the debug informations of this soft body. This has to be called
@@ -249,17 +249,17 @@ struct iBulletSoftBody : public virtual iBase
   /**
    * Return the total mass of this body.
    */
-  virtual float GetMass () = 0;
+  virtual float GetMass () const = 0;
 
   /**
    * Return the count of vertices of this soft body.
    */
-  virtual size_t GetVertexCount () = 0;
+  virtual size_t GetVertexCount () const = 0;
 
   /**
    * Return the absolute position of the given vertex.
    */
-  virtual csVector3 GetVertexPosition (size_t index) = 0;
+  virtual csVector3 GetVertexPosition (size_t index) const = 0;
 
   /**
    * Anchor the given vertex to its current position. This vertex will no more move.
@@ -281,7 +281,7 @@ struct iBulletSoftBody : public virtual iBase
   /**
    * Get the rigidity of this body.
    */
-  virtual float GetRigidity () = 0;
+  virtual float GetRigidity () const = 0;
 
   /**
    * Set the linear velocity of the whole body.
@@ -296,7 +296,7 @@ struct iBulletSoftBody : public virtual iBase
   /**
    * Get the linear velocity of the given vertex of the body.
    */
-  virtual csVector3 GetLinearVelocity (size_t vertexIndex) = 0;
+  virtual csVector3 GetLinearVelocity (size_t vertexIndex) const = 0;
 
   /**
    * Add a force to the whole body.

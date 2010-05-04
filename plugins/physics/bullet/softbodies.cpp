@@ -82,17 +82,17 @@ void csBulletSoftBody::SetMass (float mass)
   softWorld->addSoftBody (body);
 }
 
-float csBulletSoftBody::GetMass ()
+float csBulletSoftBody::GetMass () const
 {
   return body->getTotalMass ();
 }
 
-size_t csBulletSoftBody::GetVertexCount ()
+size_t csBulletSoftBody::GetVertexCount () const
 {
   return body->m_nodes.size ();
 }
 
-csVector3 csBulletSoftBody::GetVertexPosition (size_t index)
+csVector3 csBulletSoftBody::GetVertexPosition (size_t index) const
 {
   CS_ASSERT(index < (size_t) body->m_nodes.size ());
   return BulletToCS (body->m_nodes[index].m_x, dynSys->inverseInternalScale);
@@ -119,7 +119,7 @@ void csBulletSoftBody::SetRigidity (float rigidity)
   body->m_materials[0]->m_kLST = rigidity;
 }
 
-float csBulletSoftBody::GetRigidity ()
+float csBulletSoftBody::GetRigidity () const
 {
   return body->m_materials[0]->m_kLST;
 }
@@ -138,7 +138,7 @@ void csBulletSoftBody::SetLinearVelocity (csVector3 velocity, size_t vertexIndex
 		     - body->m_nodes[vertexIndex].m_v, vertexIndex);
 }
 
-csVector3 csBulletSoftBody::GetLinearVelocity (size_t vertexIndex)
+csVector3 csBulletSoftBody::GetLinearVelocity (size_t vertexIndex) const
 {
   CS_ASSERT (vertexIndex < (size_t) body->m_nodes.size ());
   return BulletToCS (body->m_nodes[vertexIndex].m_v, dynSys->inverseInternalScale);
