@@ -432,7 +432,7 @@ bool Simple::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'i')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'I')
     {
       // Toggle autodisable.
       dynSys->EnableAutoDisable (!dynSys->AutoDisableEnabled ());
@@ -629,7 +629,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
   if (phys_engine_id == BULLET_ID)
     keyDescriptions.Push ("?: toggle display of collisions");
   keyDescriptions.Push ("g: toggle gravity");
-  keyDescriptions.Push ("i: toggle autodisable");
+  keyDescriptions.Push ("I: toggle autodisable");
   if (phys_engine_id == ODE_ID)
   {
     keyDescriptions.Push ("1: enable StepFast solver");
