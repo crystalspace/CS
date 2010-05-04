@@ -147,7 +147,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 
   void SoftBodyControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
-    printf ("SoftBodyControl::Update\n");
     if (!softBody)
       return;
 
