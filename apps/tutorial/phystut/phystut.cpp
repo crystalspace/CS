@@ -576,6 +576,19 @@ bool Simple::OnInitialize (int argc, char* argv[])
 
     // Check whether the soft bodies are enabled or not
     isSoftBodyWorld = !clp->GetBoolOption ("disable_soft", false);
+
+    // Load the soft body animation control plugin & factory
+    if (isSoftBodyWorld)
+    {
+      csRef<iSoftBodyAnimationControlType> softBodyAnimationType =
+	csLoadPlugin<iSoftBodyAnimationControlType>
+	(plugmgr, "crystalspace.dynamics.softanim");
+
+      csRef<iGenMeshAnimationControlFactory> animationFactory =
+	softBodyAnimationType->CreateAnimationControlFactory ();
+      softBodyAnimationFactory =
+	scfQueryInterface<iSoftBodyAnimationControlFactory> (animationFactory);
+    }
   }
 
   if (!dyn)
@@ -1437,6 +1450,20 @@ void Simple::SpawnSoftBody ()
   //   gmstate->GetTriangles (), gmstate->GetTriangleCount ());
   body->SetMass (2.0f);
   body->SetRigidity (0.8f);
+
+  // Create the mesh
+  gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+  			            ballFact, "soft_body", room));
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Init the animation control for the animation of the genmesh
+  csRef<iGeneralMeshState> meshState =
+    scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  csRef<iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  animationControl->SetSoftBody (body);
 
   // Fling the body.
   body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
