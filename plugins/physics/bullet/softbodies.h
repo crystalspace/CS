@@ -52,6 +52,8 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   virtual csVector3 GetLinearVelocity (size_t vertexIndex) const;
   virtual void AddForce (csVector3 force);
   virtual void AddForce (csVector3 force, size_t vertexIndex);
+  virtual size_t GetTriangleCount () const;
+  virtual csTriangle GetTriangle (size_t index) const;
 
  private:
   csBulletDynamicsSystem* dynSys;

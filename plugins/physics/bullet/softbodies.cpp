@@ -157,5 +157,19 @@ void csBulletSoftBody::AddForce (csVector3 force, size_t vertexIndex)
   body->addForce (CSToBullet (force * 10000.0f, dynSys->inverseInternalScale), vertexIndex);
 }
 
+size_t csBulletSoftBody::GetTriangleCount () const
+{
+  return body->m_faces.size ();
+}
+
+csTriangle csBulletSoftBody::GetTriangle (size_t index) const
+{
+  CS_ASSERT(index < (size_t) body->m_faces.size ());
+  btSoftBody::Face& face = body->m_faces[index];
+  return csTriangle (face.m_n[0] - &body->m_nodes[0],
+		     face.m_n[1] - &body->m_nodes[0],
+		     face.m_n[2] - &body->m_nodes[0]);
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(Bullet)

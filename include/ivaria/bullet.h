@@ -24,12 +24,16 @@
  */
 
 #include "csutil/scf_interface.h"
+#include "iutil/objreg.h"
+#include "iengine/mesh.h"
+#include "iengine/engine.h"
+#include "imesh/genmesh.h"
+#include "csgeom/tri.h"
 
 struct iView;
 struct iRigidBody;
 struct iBulletKinematicCallback;
 struct iBulletSoftBody;
-struct csTriangle;
 
 /**
  * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
@@ -233,7 +237,7 @@ struct iBulletDynamicSystem : public virtual iBase
  */
 struct iBulletSoftBody : public virtual iBase
 {
-  SCF_INTERFACE(iBulletSoftBody, 2, 0, 0);
+  SCF_INTERFACE(iBulletSoftBody, 2, 0, 1);
 
   /**
    * Draw the debug informations of this soft body. This has to be called
@@ -257,7 +261,7 @@ struct iBulletSoftBody : public virtual iBase
   virtual size_t GetVertexCount () const = 0;
 
   /**
-   * Return the absolute position of the given vertex.
+   * Return the position in world coordinates of the given vertex.
    */
   virtual csVector3 GetVertexPosition (size_t index) const = 0;
 
@@ -307,6 +311,61 @@ struct iBulletSoftBody : public virtual iBase
    * Add a force at the given vertex of the body.
    */
   virtual void AddForce (csVector3 force, size_t vertexIndex) = 0;
+
+  /**
+   * Return the count of triangles of this soft body.
+   */
+  virtual size_t GetTriangleCount () const = 0;
+
+  /**
+   * Return the triangle with the given index.
+   */
+  virtual csTriangle GetTriangle (size_t index) const = 0;
+};
+
+/**
+ * General helper class for iBulletSoftBody.
+ */
+struct csBulletSoftBodyHelper
+{
+  /**
+   * Create a genmesh from the given cloth soft body.
+   */
+  static csPtr<iMeshFactoryWrapper> CreateClothGenMeshFactory
+  (iObjectRegistry* object_reg, const char* factoryName, iBulletSoftBody* cloth)
+  {
+    csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+
+    // Create the cloth mesh factory.
+    csRef<iMeshFactoryWrapper> clothFact = engine->CreateMeshFactory
+      ("crystalspace.mesh.object.genmesh", factoryName);
+    if (!clothFact)
+      return 0;
+
+    csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
+      (clothFact->GetMeshObjectFactory ());
+
+    // Create the vertices of the genmesh
+    gmstate->SetVertexCount (cloth->GetVertexCount ());
+    csVector3* vertices = gmstate->GetVertices ();
+    for (size_t i = 0; i < cloth->GetVertexCount (); i++)
+      vertices[i] = cloth->GetVertexPosition (i);
+
+    // Create the triangles of the genmesh
+    gmstate->SetTriangleCount (cloth->GetTriangleCount () * 2);
+    csTriangle* triangles = gmstate->GetTriangles ();
+    for (size_t i = 0; i < cloth->GetTriangleCount (); i++)
+    {
+      csTriangle triangle = cloth->GetTriangle (i);
+      triangles[i * 2] = triangle;
+      triangles[i * 2 + 1] = csTriangle (triangle[2], triangle[1], triangle[0]);
+    }
+
+    gmstate->CalculateNormals ();
+    gmstate->Invalidate ();
+
+    return csPtr<iMeshFactoryWrapper> (clothFact);
+  }
 };
 
 /**

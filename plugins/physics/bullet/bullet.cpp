@@ -684,15 +684,6 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
 
   bulletWorld->debugDrawWorld();
   debugDraw->DebugDraw (view);
-
-  if (isSoftWorld)
-  {
-    btSoftRigidDynamicsWorld* softWorld =
-      static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
-    btSoftBodyArray& softbodies (softWorld->getSoftBodyArray ());
-    for (int i = 0; i < softbodies.size (); i++)
-      btSoftBodyHelpers::Draw (softbodies[i], debugDraw);
-  }
 }
 
 void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
@@ -702,6 +693,7 @@ void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
     if (debugDraw)
     {
       delete debugDraw;
+      debugDraw = 0;
       bulletWorld->setDebugDrawer (0);
     }
     return;
@@ -926,6 +918,7 @@ iBulletSoftBody* csBulletDynamicsSystem::CreateCloth
      CSToBullet (corner2, internalScale), CSToBullet (corner3, internalScale),
      CSToBullet (corner4, internalScale), segmentCount1, segmentCount2, 0,
      withDiagonals);
+  body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
@@ -966,9 +959,9 @@ iBulletSoftBody* csBulletDynamicsSystem::CreateSoftBody
     (softWorldInfo, vertices, triangles, genmeshFactory->GetTriangleCount ());
 
   body->generateBendingConstraints(2);
-  body->m_cfg.piterations	=	10;
-  body->m_cfg.collisions|=btSoftBody::fCollision::VF_SS;
-  body->m_materials[0]->m_kLST	=	1;
+  body->m_cfg.piterations = 10;
+  body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
+  body->m_materials[0]->m_kLST = 1;
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
@@ -1009,9 +1002,9 @@ iBulletSoftBody* csBulletDynamicsSystem::CreateSoftBody
     (softWorldInfo, btVertices, btTriangles, triangleCount);
 
   body->generateBendingConstraints(2);
-  body->m_cfg.piterations	=	10;
-  body->m_cfg.collisions|=btSoftBody::fCollision::VF_SS;
-  body->m_materials[0]->m_kLST	=	1;
+  body->m_cfg.piterations = 10;
+  body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
+  body->m_materials[0]->m_kLST = 1;
 
   delete btVertices;
   delete btTriangles;
