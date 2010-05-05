@@ -20,6 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/sphere.h"
 #include "imesh/genmesh.h"
 #include "cstool/genmeshbuilder.h"
+#include "cstool/materialbuilder.h"
 #include "phystut.h"
 
 #define ODE_ID 1
@@ -219,10 +220,14 @@ void Simple::Frame ()
   if (do_bullet_debug)
     bullet_dynSys->DebugDraw (view);
 
-  // Display all soft bodies
+  // Display the rope soft bodies
   else if (isSoftBodyWorld)
     for (size_t i = 0; i < bullet_dynSys->GetSoftBodyCount (); i++)
-      bullet_dynSys->GetSoftBody (i)->DebugDraw (view);
+    {
+      iBulletSoftBody* softBody = bullet_dynSys->GetSoftBody (i);
+      if (!softBody->GetTriangleCount ())
+	softBody->DebugDraw (view);
+    }
 }
 
 bool Simple::OnKeyboard (iEvent &ev)
@@ -1418,6 +1423,28 @@ void Simple::SpawnCloth ()
   // Attach the two top corners
   body->AnchorVertex (0);
   body->AnchorVertex (9);
+
+  // Create the cloth mesh factory
+  csRef<iMeshFactoryWrapper> clothFact =
+    csBulletSoftBodyHelper::CreateClothGenMeshFactory
+    (GetObjectRegistry (), "clothFact", body);
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
+    (clothFact->GetMeshObjectFactory ());
+
+  // Create the mesh
+  gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+  			            clothFact, "cloth_body", room));
+  iMaterialWrapper* mat = CS::Material::MaterialBuilder::CreateColorMaterial
+    (GetObjectRegistry (), "cloth", csColor4 (1.0f, 0.0f, 0.0f, 1.0f));
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Init the animation control for the animation of the genmesh
+  csRef<iGeneralMeshState> meshState =
+    scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  csRef<iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  animationControl->SetSoftBody (body);
 }
 
 void Simple::SpawnSoftBody ()
