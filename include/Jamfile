@@ -84,6 +84,12 @@ CS_MASTER_HEADER_REJECTS +=
   [ ConcatDirs csutil threading win32_tls.h         ]
   ;
 
+# List of headers that should not appear in the master-headers because they 
+# may somehow conflict with platform headers.
+CS_MASTER_HEADER_REJECTS +=
+  [ ConcatDirs csutil   win32 DbgHelpAPI.h ]
+  ;
+  
 {
   local CSWIN32LIBS_REJECTS =
     CEGUI*.h
