@@ -226,10 +226,10 @@ struct iBulletDynamicSystem : public virtual iBase
  * volumetric object.
  *
  * A soft body does not have a positional transform by itself, but the
- * position of every vertex of the body can be queried through GetVertexCount().
+ * position of every vertex of the body can be queried through GetVertexPosition().
  *
  * A soft body can neither be static or kinematic, it is always dynamic.
- * \sa iRigidBody iBulletRigidBody
+ * \sa iRigidBody iBulletRigidBody iSoftBodyAnimationControl
  */
 struct iBulletSoftBody : public virtual iBase
 {
