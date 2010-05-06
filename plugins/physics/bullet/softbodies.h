@@ -40,13 +40,20 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   //-- iBulletSoftBody
   virtual void DebugDraw (iView* rview);
   virtual void SetMass (float mass);
-  virtual float GetMass ();
-  virtual size_t GetVertexCount ();
-  virtual csVector3 GetVertexPosition (size_t index);
+  virtual float GetMass () const;
+  virtual size_t GetVertexCount () const;
+  virtual csVector3 GetVertexPosition (size_t index) const;
   virtual void AnchorVertex (size_t vertexIndex);
   virtual void AnchorVertex (size_t vertexIndex, iRigidBody* body);
   virtual void SetRigidity (float rigidity);
-  virtual float GetRigidity ();
+  virtual float GetRigidity () const;
+  virtual void SetLinearVelocity (csVector3 velocity);
+  virtual void SetLinearVelocity (csVector3 velocity, size_t vertexIndex);
+  virtual csVector3 GetLinearVelocity (size_t vertexIndex) const;
+  virtual void AddForce (csVector3 force);
+  virtual void AddForce (csVector3 force, size_t vertexIndex);
+  virtual size_t GetTriangleCount () const;
+  virtual csTriangle GetTriangle (size_t index) const;
 
  private:
   csBulletDynamicsSystem* dynSys;

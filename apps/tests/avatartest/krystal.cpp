@@ -115,6 +115,11 @@ float KrystalScene::GetSimulationSpeed ()
   return 1.0f;
 }
 
+bool KrystalScene::HasPhysicalObjects ()
+{
+  return true;
+}
+
 void KrystalScene::Frame ()
 {
 }

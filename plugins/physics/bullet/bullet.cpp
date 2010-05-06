@@ -684,15 +684,6 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
 
   bulletWorld->debugDrawWorld();
   debugDraw->DebugDraw (view);
-
-  if (isSoftWorld)
-  {
-    btSoftRigidDynamicsWorld* softWorld =
-      static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
-    btSoftBodyArray& softbodies (softWorld->getSoftBodyArray ());
-    for (int i = 0; i < softbodies.size (); i++)
-      btSoftBodyHelpers::Draw (softbodies[i], debugDraw);
-  }
 }
 
 void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
@@ -702,6 +693,7 @@ void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
     if (debugDraw)
     {
       delete debugDraw;
+      debugDraw = 0;
       bulletWorld->setDebugDrawer (0);
     }
     return;
@@ -741,6 +733,55 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
       result.body = (csBulletRigidBody*) body->getUserPointer ();
       result.isect = BulletToCS (rayCallback.m_hitPointWorld,
 				 inverseInternalScale);
+    }
+  }
+
+  // Check for soft bodies
+  if (!result.body && isSoftWorld)
+  {
+    btSoftRigidDynamicsWorld* softWorld =
+      static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+
+    btSoftBodyArray& sbs = softWorld->getSoftBodyArray ();
+    for (int ib = 0; ib < sbs.size (); ++ib)
+    {
+      btSoftBody* psb = sbs[ib];
+      btSoftBody::sRayCast ray;
+      if (psb->rayTest (rayFrom, rayTo, ray) && ray.fraction < 1.00f)
+      {
+	result.softBody = (csBulletSoftBody*) psb->getUserPointer ();
+	btVector3 impact = rayFrom + (rayTo - rayFrom) * ray.fraction;
+	result.isect = BulletToCS (impact, inverseInternalScale);
+
+	// find the closest vertex
+	switch(ray.feature)
+	{
+	case btSoftBody::eFeature::Face:
+	  {
+	    btSoftBody::Face& face = psb->m_faces[ray.index];
+	    btSoftBody::Node* node = face.m_n[0];
+	    float distance = (node->m_x - impact).length2();
+	    for (int i = 1; i < 3; i++)
+	    {
+	      float nodeDistance = (face.m_n[i]->m_x - impact).length2();
+	      if (nodeDistance < distance)
+	      {
+		node = face.m_n[i];
+		distance = nodeDistance;
+	      }
+	    }
+
+	    result.vertexIndex = size_t (node - &psb->m_nodes[0]);
+	  }
+	  break;
+
+	default:
+	  // TODO: may need other types?
+	  break;
+	}
+
+	break;
+      }
     }
   }
 
@@ -807,7 +848,6 @@ void csBulletDynamicsSystem::SetSoftBodyWorld (bool isSoftBodyWorld)
     softWorldInfo.m_broadphase = broadphase;
     softWorldInfo.m_dispatcher = dispatcher;
     softWorldInfo.m_gravity = gravity;
-    //softWorldInfo.air_density = 0.0f;
     softWorldInfo.air_density = 1.2f;
     softWorldInfo.water_density = 0.0f;
     softWorldInfo.water_offset = 0.0f;
@@ -878,6 +918,7 @@ iBulletSoftBody* csBulletDynamicsSystem::CreateCloth
      CSToBullet (corner2, internalScale), CSToBullet (corner3, internalScale),
      CSToBullet (corner4, internalScale), segmentCount1, segmentCount2, 0,
      withDiagonals);
+  body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
@@ -918,9 +959,9 @@ iBulletSoftBody* csBulletDynamicsSystem::CreateSoftBody
     (softWorldInfo, vertices, triangles, genmeshFactory->GetTriangleCount ());
 
   body->generateBendingConstraints(2);
-  body->m_cfg.piterations	=	10;
-  body->m_cfg.collisions|=btSoftBody::fCollision::VF_SS;
-  body->m_materials[0]->m_kLST	=	1;
+  body->m_cfg.piterations = 10;
+  body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
+  body->m_materials[0]->m_kLST = 1;
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
@@ -961,9 +1002,9 @@ iBulletSoftBody* csBulletDynamicsSystem::CreateSoftBody
     (softWorldInfo, btVertices, btTriangles, triangleCount);
 
   body->generateBendingConstraints(2);
-  body->m_cfg.piterations	=	10;
-  body->m_cfg.collisions|=btSoftBody::fCollision::VF_SS;
-  body->m_materials[0]->m_kLST	=	1;
+  body->m_cfg.piterations = 10;
+  body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
+  body->m_materials[0]->m_kLST = 1;
 
   delete btVertices;
   delete btTriangles;
