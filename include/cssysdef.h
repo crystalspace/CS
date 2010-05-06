@@ -409,13 +409,12 @@ extern csStaticVarCleanupFN csStaticVarCleanup;
 
 #include "csutil/threading/atomicops.h"
 #include "csutil/threading/mutex.h"
-static CS::Threading::Mutex staticVarLock;
 
-#ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
-#  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(Name)              \
-void Name (void (*p)())                                                \
+#define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION_A(Name, FuncAttr)    \
+static CS::Threading::Mutex Name_ ## staticVarLock;                    \
+FuncAttr void Name (void (*p)())                                       \
 {                                                                      \
-  CS::Threading::MutexScopedLock lock(staticVarLock);                  \
+  CS::Threading::MutexScopedLock lock (Name_ ## staticVarLock);        \
   static void (**a)() = 0;                                             \
   static int lastEntry = 0;                                            \
   static int maxEntries = 0;                                           \
@@ -442,6 +441,9 @@ void Name (void (*p)())                                                \
     maxEntries = 0;                                                    \
   }                                                                    \
 }
+#ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
+#  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(Name)              \
+      CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION_A(Name, )
 #endif
 
 #ifndef CS_DEFINE_STATIC_VARIABLE_REGISTRATION
