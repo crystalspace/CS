@@ -407,6 +407,7 @@ int vswprintf ();
 typedef void (*csStaticVarCleanupFN) (void (*p)());
 extern csStaticVarCleanupFN csStaticVarCleanup;
 
+#include "csutil/threading/atomicops.h"
 #include "csutil/threading/mutex.h"
 static CS::Threading::Mutex staticVarLock;
 
@@ -581,6 +582,36 @@ void Name (void (*p)())                                                \
         csStaticVarCleanup (0);
 #endif
 
+/* Body of getter function, mostly the same across different CS_STATIC_VAR_*
+  variants.
+  'Ptr' is a variable of type 'Type*' that receives the value of 'Val' (where
+  the actual object is stored). See CS_IMPLEMENT_STATIC_VAR for explanation
+  of initParam and kill_how.
+  
+  'Val' is read atomically. If it's 0, a new object is created. If another
+  thread concurrently requests the value, it's ensured that the value is
+  consistent (both the returned and stored value).
+*/
+#define CS_STATIC_VAR_GETTER_COMMON(Type, Ptr, initParam, Val, kill_how)\
+  while (true)								\
+  {									\
+    Ptr = reinterpret_cast<Type*> (					\
+      CS::Threading::AtomicOperations::Read (				\
+	reinterpret_cast<void**> (&Val)));				\
+    if (Ptr != 0) break;						\
+    Ptr = new Type initParam;                              		\
+    if (CS::Threading::AtomicOperations::CompareAndSet (		\
+	reinterpret_cast<void**> (&Val), Ptr, 0) != 0)			\
+    {									\
+      delete Ptr;							\
+    }									\
+    else								\
+    {									\
+      csStaticVarCleanup (kill_how);        				\
+      break;								\
+    }                                                                   \
+  }
+
 /**\def CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam,kill_how)
  * Implement a file-scoped static variable that is created on demand. Defines a
  * 'getter' function to access the variable and a 'destruction' function. The
@@ -595,8 +626,8 @@ void Name (void (*p)())                                                \
 
 #ifndef CS_IMPLEMENT_STATIC_VAR_EXT
 #define CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,kill_how) \
-namespace {                                                            \
-static Type *getterFunc ## _v=0;                                        \
+namespace {                                                             \
+static Type* getterFunc ## _v = 0;                                      \
 static Type* getterFunc ();                                             \
 static void getterFunc ## _kill ();					\
 static void getterFunc ## _kill_array ();				\
@@ -614,12 +645,10 @@ void getterFunc ## _kill_array ()                                	\
 }                                                                       \
 Type* getterFunc ()                                                     \
 {                                                                       \
-  if (!getterFunc ## _v)                                                \
-  {                                                                     \
-    getterFunc ## _v = new Type initParam;                              \
-    csStaticVarCleanup (getterFunc ## kill_how);        		\
-  }                                                                     \
-  return getterFunc ## _v;                                              \
+  Type* p;								\
+  CS_STATIC_VAR_GETTER_COMMON(Type, p, initParam, getterFunc ## _v,	\
+    getterFunc ## kill_how);						\
+  return p;								\
 }                                                                       \
 }
 #endif
@@ -670,7 +699,7 @@ static void getterFunc ## _kill_array ();
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR_EXT
 #define CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,\
   kill_how)                                                    	\
-Type *Class::var = 0;                                          	\
+Type* Class::var = 0;                                          	\
 void Class::getterFunc ## _kill ()               	        \
 {                                                              	\
   delete getterFunc ();                                 	\
@@ -683,12 +712,10 @@ void Class::getterFunc ## _kill_array ()         	        \
 }                                                              	\
 Type* Class::getterFunc ()                                     	\
 {                                                              	\
-  if (!var)                                                    	\
-  {                                                            	\
-    var = new Type initParam;                                  	\
-    csStaticVarCleanup (getterFunc ## kill_how); 	        \
-  }                                                            	\
-  return var;                                                  	\
+  Type* p;							\
+  CS_STATIC_VAR_GETTER_COMMON(Type, p, initParam, var,		\
+    getterFunc ## kill_how);					\
+  return p;							\
 }
 #endif
 
@@ -720,12 +747,10 @@ void Class::getterFunc ## _kill ()                             \
 }                                                              \
 Type &Class::getterFunc ()                                     \
 {                                                              \
-  if (!var)                                                    \
-  {                                                            \
-    var = new Type initParam;                                  \
-    csStaticVarCleanup (getterFunc ## kill_how);               \
-  }                                                            \
-  return *var;                                                 \
+  Type* p;							\
+  CS_STATIC_VAR_GETTER_COMMON(Type, p, initParam, var,		\
+    getterFunc ## kill_how);					\
+  return *p;							\
 }
 #endif
 
