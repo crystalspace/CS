@@ -29,6 +29,7 @@
 #include "ivaria/dynamics.h"
 #include "ivaria/bullet.h"
 #include "ivaria/dynamicsdebug.h"
+#include "ivaria/softanim.h"
 
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
@@ -85,6 +86,7 @@ private:
   csRef<iBulletDynamicSystem> bulletDynamicSystem;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
+  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   int dynamicsDebugMode;
 
   // Animation node plugin managers

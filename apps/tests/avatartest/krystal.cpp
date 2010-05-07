@@ -264,6 +264,16 @@ bool KrystalScene::CreateAvatar ()
   if (!bodySkeleton)
     return avatarTest->ReportError ("Can't find Krystal's body mesh description!");
 
+  // Load Krystal's skirt
+  rc = avatarTest->loader->Load ("/lib/krystal/krystal_skirt.xml");
+  if (!rc.success)
+    return avatarTest->ReportError ("Can't load Krystal's skirt library file!");
+
+  csRef<iMeshFactoryWrapper> skirtMeshFact =
+    avatarTest->engine->FindMeshFactory ("krystal_skirt");
+  if (!skirtMeshFact)
+    return avatarTest->ReportError ("Can't find Krystal's skirt mesh factory!");
+
   // Create a new animation tree. The structure of the tree is:
   //   + ragdoll controller node (root node - only if physics are enabled)
   //     + Random node
@@ -351,9 +361,9 @@ bool KrystalScene::CreateAvatar ()
     animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
     ragdollNodeFactory->SetChildNode (randomNodeFactory);
 
-    // Create bone chain for whole body and add it to the ragdoll controller. The chain
-    // will be in kinematic mode when Krystal is alive, and in dynamic state when
-    // Krystal has been killed.
+    // Create a bone chain for the whole body and add it to the ragdoll controller.
+    // The chain will be in kinematic mode when Krystal is alive, and in dynamic state
+    // when Krystal has been killed.
     bodyChain = bodySkeleton->CreateBodyChain
       ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("Head"),
@@ -363,12 +373,32 @@ bool KrystalScene::CreateAvatar ()
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
     ragdollNodeFactory->AddBodyChain (bodyChain, RAGDOLL_STATE_KINEMATIC);
 
-    // Create bone chain for hairs and add it to the ragdoll controller. The chain will
-    // always be in dynamic mode.
+    // Create a bone chain for the hairs and add it to the ragdoll controller. The chain
+    // will always be in dynamic mode.
     hairChain = bodySkeleton->CreateBodyChain
       ("hair_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hairs01"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("Hairs06"), 0);
     ragdollNodeFactory->AddBodyChain (hairChain, RAGDOLL_STATE_DYNAMIC);
+
+    // Create the soft body for the skirt
+    csRef<iGeneralFactoryState> skirtFactoryState =
+      scfQueryInterface<iGeneralFactoryState> (skirtMeshFact->GetMeshObjectFactory ());
+    skirtBody = avatarTest->bulletDynamicSystem->CreateSoftBody
+      (skirtFactoryState, csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
+    skirtBody->SetMass (2.0f);
+    skirtBody->SetRigidity (0.02f);
+
+    // Create the mesh of the skirt
+    skirtFactoryState->SetAnimationControlFactory (avatarTest->softBodyAnimationFactory);
+    csRef<iMeshWrapper> skirtMesh = avatarTest->engine->CreateMeshWrapper
+      (skirtMeshFact, "krystal_skirt", avatarTest->room, csVector3 (0.0f));
+
+    // Init the animation control for the animation of the genmesh
+    csRef<iGeneralMeshState> skirtMeshState =
+      scfQueryInterface<iGeneralMeshState> (skirtMesh->GetMeshObject ());
+    csRef<iSoftBodyAnimationControl> animationControl =
+      scfQueryInterface<iSoftBodyAnimationControl> (skirtMeshState->GetAnimationControl ());
+    animationControl->SetSoftBody (skirtBody);
   }
 
   else
@@ -391,6 +421,28 @@ bool KrystalScene::CreateAvatar ()
     ragdollNode =
       scfQueryInterface<iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
     ragdollNode->SetAnimatedMesh (animesh);
+
+    // Start the ragdoll animation node in order to have the rigid bodies created
+    ragdollNode->Play ();
+
+    // Find the rigid body of the spine of Krystal
+    iRigidBody* hipsBody = ragdollNode->GetBoneRigidBody
+      (animeshFactory->GetSkeletonFactory ()->FindBone ("ToSpine"));
+
+    // Attach the skirt to the rigid body of the spine of Krystal.
+    // The indices of the vertices have been found by a manual examination
+    // of the vertex list
+    skirtBody->AnchorVertex (7, hipsBody);
+    skirtBody->AnchorVertex (8, hipsBody);
+    skirtBody->AnchorVertex (10, hipsBody);
+    skirtBody->AnchorVertex (67, hipsBody);
+    skirtBody->AnchorVertex (68, hipsBody);
+    skirtBody->AnchorVertex (69, hipsBody);
+    skirtBody->AnchorVertex (70, hipsBody);
+    skirtBody->AnchorVertex (76, hipsBody);
+    skirtBody->AnchorVertex (77, hipsBody);
+    skirtBody->AnchorVertex (78, hipsBody);
+    skirtBody->AnchorVertex (79, hipsBody);
   }
 
   // Start animation
@@ -418,7 +470,7 @@ void KrystalScene::ResetScene ()
     ragdollNode->SetBodyChainState (bodyChain, RAGDOLL_STATE_KINEMATIC);
 
     // Reset the transform of the 'hairs' chain, since the mesh is moved abruptly,
-    // otherwise it can lead to unstability.
+    // otherwise it can lead to unstability of the physical simulation.
     ragdollNode->ResetChainTransform (hairChain);
 
     // Update the display of the dynamics debugger
