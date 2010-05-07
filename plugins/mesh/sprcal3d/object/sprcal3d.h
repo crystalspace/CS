@@ -715,6 +715,7 @@ public:
   }
 
   bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat);
+  iMaterialWrapper* GetMaterial(const char *mesh_name) const;
 
   float GetAnimationTime()
   {

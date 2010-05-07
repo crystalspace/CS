@@ -589,6 +589,9 @@ struct iSpriteCal3DState : public virtual iBase
   /// Change the material on a named submesh.  Returns true if successful.
   virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat) = 0;
 
+  /// Get the material of a named submesh.  Returns NULL if an error occured.
+  virtual iMaterialWrapper* GetMaterial(const char *mesh_name) const = 0;
+
   /**\name Time
    * @{ */
   /// Set the animation time adjustment factor.  1=normal speed.
