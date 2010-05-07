@@ -29,6 +29,7 @@
 #include "iengine/engine.h"
 #include "imesh/genmesh.h"
 #include "csgeom/tri.h"
+#include "cstool/primitives.h"
 
 struct iView;
 struct iRigidBody;
@@ -362,6 +363,14 @@ struct csBulletSoftBodyHelper
     }
 
     gmstate->CalculateNormals ();
+
+    // Set up the texels of the genmesh
+    csVector2* texels = gmstate->GetTexels ();
+    csVector3* normals = gmstate->GetNormals ();
+    CS::Geometry::TextureMapper* mapper = new CS::Geometry::DensityTextureMapper (1.0f);
+    for (size_t i = 0; i < cloth->GetVertexCount (); i++)
+      texels[i] = mapper->Map (vertices[i], normals[i], i);
+
     gmstate->Invalidate ();
 
     return csPtr<iMeshFactoryWrapper> (clothFact);
