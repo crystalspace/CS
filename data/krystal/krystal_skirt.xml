@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+  <plugins>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
+  </plugins>
+  <shaders/>
+  <textures>
+    <texture name="krystal_hairs.png">
+      <file>/lib/krystal/krystal_hairs.png</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name="Material">
+      <texture>krystal_hairs.png</texture>
+    </material>
+  </materials>
+  <sounds/>
+  <settings>
+    <clearscreen>yes</clearscreen>
+    <clearzbuf>yes</clearzbuf>
+  </settings>
+  <library>/lib/krystal/krystal_skirt</library>
+  <triggers/>
+  <sector name="Scene">
+    <cullerp plugin="crystalspace.culling.frustvis"/>
+    <meshobj name="krystal_skirt">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>krystal_skirt</factory>
+      </params>
+      <zuse/>
+    </meshobj>
+  </sector>
+  <sequences/>
+</world>
