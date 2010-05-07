@@ -809,8 +809,18 @@ void csBulletDynamicsSystem::SetInternalScale (float scale)
   delete broadphase;
   const int maxProxies = 32766;
   broadphase = new btAxisSweep3 (worldAabbMin, worldAabbMax, maxProxies);
-  bulletWorld = new btDiscreteDynamicsWorld (dispatcher,
-      broadphase, solver, configuration);
+
+  if (isSoftWorld)
+  {
+    bulletWorld = new btSoftRigidDynamicsWorld
+      (dispatcher, broadphase, solver, configuration);
+    softWorldInfo.m_broadphase = broadphase;
+  }
+
+  else
+    bulletWorld = new btDiscreteDynamicsWorld
+      (dispatcher, broadphase, solver, configuration);
+
   SetGravity (tempGravity);
 }
 
