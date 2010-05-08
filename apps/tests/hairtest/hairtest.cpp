@@ -184,7 +184,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
 		       iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
 		       iSkeletonBasicNodesManager2),
-	CS_REQUEST_PLUGIN("crystalspace.material.hairmaterial", iFurMaterial),
+	CS_REQUEST_PLUGIN("crystalspace.material.furmaterial.hairmaterial", iFurMaterial),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -259,7 +259,7 @@ bool HairTest::Application ()
 
   furmaterial = csQueryRegistry<iFurMaterial> (GetObjectRegistry ());
   if (!furmaterial)
-     ReportError("Failed to locate ifurmaterial plugin!");
+    return ReportError("Failed to locate ifurmaterial plugin!");
 /*
   furmaterial->DoSomething (1, csVector3 (2, 3, 4));
   printf ("%d\n", furmaterial->GetSomething ());

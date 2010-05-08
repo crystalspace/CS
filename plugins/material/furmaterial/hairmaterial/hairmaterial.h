@@ -5,6 +5,8 @@
 #include <csgeom/vector3.h>
 #include <imaterial/furmaterial.h>
 
+#include "csutil/scf_implementation.h"
+
 struct iObjectRegistry;
 
 /**

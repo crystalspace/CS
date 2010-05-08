@@ -1,0 +1,3 @@
+SubDir TOP plugins material furmaterial ;
+
+SubInclude TOP plugins material furmaterial hairmaterial ;

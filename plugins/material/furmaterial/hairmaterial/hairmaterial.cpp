@@ -4,7 +4,6 @@
 
 #include "hairmaterial.h"
 
-CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (HairMaterial)
 
 HairMaterial::HairMaterial (iBase* parent) :

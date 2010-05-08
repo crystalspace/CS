@@ -1,0 +1,5 @@
+SubDir TOP apps tests hairtest ;
+
+Description hairtest : "tests on hairs" ;
+Application hairtest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith hairtest : crystalspace ;
