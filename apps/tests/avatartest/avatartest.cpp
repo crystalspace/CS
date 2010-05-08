@@ -123,6 +123,11 @@ void AvatarTest::Frame ()
 
   // Default behavior from csDemoApplication
   csDemoApplication::Frame ();
+
+  // Display the Bullet debug information
+  if (avatarScene->HasPhysicalObjects ()
+      && dynamicsDebugMode == DYNDEBUG_BULLET)
+    bulletDynamicSystem->DebugDraw (view);
 }
 
 bool AvatarTest::OnKeyboard (iEvent &ev)
@@ -199,6 +204,13 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
       }
 
       else if (dynamicsDebugMode == DYNDEBUG_COLLIDER)
+      {
+	dynamicsDebugMode = DYNDEBUG_BULLET;
+	dynamicsDebugger->SetDebugDisplayMode (false);
+	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
+      }
+
+      else if (dynamicsDebugMode == DYNDEBUG_BULLET)
       {
 	dynamicsDebugMode = DYNDEBUG_NONE;
 	dynamicsDebugger->SetDebugDisplayMode (false);
@@ -370,8 +382,7 @@ bool AvatarTest::Application ()
 	// whole world for a better behavior of the dynamic simulation.
 	bulletDynamicSystem->SetInternalScale (10.0f);
 
-	// The ragdoll model of Krystal is rather complex, and the model of Frankie
-	// is unstable because of the overlap of its colliders. We therefore use high
+	// The physical scene are rather complex in this demo. We therefore use high
 	// accuracy/low performance parameters for a better behavior of the dynamic
 	// simulation.
 	bulletDynamicSystem->SetStepParameters (0.008f, 150, 10);

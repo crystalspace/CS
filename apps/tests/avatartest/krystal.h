@@ -60,6 +60,9 @@ class KrystalScene : public AvatarScene
   csRef<iSkeletonRagdollNode2> ragdollNode;
   iBodyChain* bodyChain;
   iBodyChain* hairChain;
+
+  // Krystal's skirt
+  csRef<iMeshWrapper> skirtMesh;
   iBulletSoftBody* skirtBody;
 };
 

@@ -34,6 +34,7 @@
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
 #define DYNDEBUG_COLLIDER 3
+#define DYNDEBUG_BULLET 4
 
 // Base class to be implemented for all different models
 class AvatarScene
@@ -64,7 +65,7 @@ class AvatarScene
   // Display of information on the state of the scene
   virtual void UpdateStateDescription () = 0;
 
-  // Animesh
+  // Animesh objects
   csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
 };

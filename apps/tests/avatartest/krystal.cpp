@@ -43,12 +43,18 @@ KrystalScene::KrystalScene (AvatarTest* avatarTest)
 
 KrystalScene::~KrystalScene ()
 {
-  if (!animesh)
-    return;
+  // Remove the meshes and soft bodies from the scene
+  if (animesh)
+  {
+    csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
+    avatarTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
+  }
 
-  // Remove the mesh from the scene
-  csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
-  avatarTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
+  if (skirtMesh)
+    avatarTest->engine->RemoveObject (skirtMesh);
+
+  if (skirtBody)
+    avatarTest->bulletDynamicSystem->RemoveSoftBody (skirtBody);
 }
 
 csVector3 KrystalScene::GetCameraStart ()
@@ -390,7 +396,7 @@ bool KrystalScene::CreateAvatar ()
 
     // Create the mesh of the skirt
     skirtFactoryState->SetAnimationControlFactory (avatarTest->softBodyAnimationFactory);
-    csRef<iMeshWrapper> skirtMesh = avatarTest->engine->CreateMeshWrapper
+    skirtMesh = avatarTest->engine->CreateMeshWrapper
       (skirtMeshFact, "krystal_skirt", avatarTest->room, csVector3 (0.0f));
 
     // Init the animation control for the animation of the genmesh
