@@ -21,9 +21,13 @@
 
 #if !defined(CS_NO_PROVIDE_NULLPTR) && !defined(CS_HAS_NULLPTR)
 
+/*
+  Based on "library implementation" in C++ Standards Committee paper 2431
+  http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2431.pdf
+*/
 namespace std
 { 
-  const class nullptr_t
+  class nullptr_t
   {
   private:
     void operator&() const;
@@ -44,7 +48,7 @@ namespace std
 }
 
 using ::std::nullptr_t;
-nullptr_t nullptr;
+const nullptr_t nullptr = {};
 
 #endif // #if !defined(CS_NO_PROVIDE_NULLPTR) && !defined(CS_HAS_NULLPTR)
 
