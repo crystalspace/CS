@@ -31728,6 +31728,40 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetMaterial(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSpriteCal3DState *arg1 = (iSpriteCal3DState *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  iMaterialWrapper *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetMaterial",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetMaterial" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
+  }
+  arg1 = reinterpret_cast< iSpriteCal3DState * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSpriteCal3DState_GetMaterial" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (iMaterialWrapper *)(arg1)->GetMaterial((char const *)arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetTimeFactor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSpriteCal3DState *arg1 = (iSpriteCal3DState *) 0 ;
@@ -50042,6 +50076,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSpriteCal3DState_ClearMorphTarget", _wrap_iSpriteCal3DState_ClearMorphTarget, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_FindSocket", _wrap_iSpriteCal3DState_FindSocket, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_SetMaterial", _wrap_iSpriteCal3DState_SetMaterial, METH_VARARGS, NULL},
+	 { (char *)"iSpriteCal3DState_GetMaterial", _wrap_iSpriteCal3DState_GetMaterial, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_SetTimeFactor", _wrap_iSpriteCal3DState_SetTimeFactor, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_GetTimeFactor", _wrap_iSpriteCal3DState_GetTimeFactor, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_GetAnimationTime", _wrap_iSpriteCal3DState_GetAnimationTime, METH_VARARGS, NULL},

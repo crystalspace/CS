@@ -1544,6 +1544,7 @@ class iSpriteCal3DState(core.iBase):
     def ClearMorphTarget(*args): return _imesh.iSpriteCal3DState_ClearMorphTarget(*args)
     def FindSocket(*args): return _imesh.iSpriteCal3DState_FindSocket(*args)
     def SetMaterial(*args): return _imesh.iSpriteCal3DState_SetMaterial(*args)
+    def GetMaterial(*args): return _imesh.iSpriteCal3DState_GetMaterial(*args)
     def SetTimeFactor(*args): return _imesh.iSpriteCal3DState_SetTimeFactor(*args)
     def GetTimeFactor(*args): return _imesh.iSpriteCal3DState_GetTimeFactor(*args)
     def GetAnimationTime(*args): return _imesh.iSpriteCal3DState_GetAnimationTime(*args)
