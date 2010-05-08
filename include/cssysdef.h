@@ -1242,4 +1242,7 @@ namespace CS
 # define CS_DEPRECATION_WARNINGS_ENABLE
 #endif
 
+// Include nullptr fallback (for convenience).
+#include "csutil/nullptr.h"
+
 #endif // __CS_CSSYSDEF_H__
