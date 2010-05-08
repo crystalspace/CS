@@ -1916,6 +1916,15 @@ CS_CHECK_BUILD([for sysconf(_SC_NPROCESSORS_ONLN)], [cs_cv_sysconf_processors],
     [],[],
     [CS_HEADER_PROPERTY([CS_HAVE_SYSCONF_PROCESSORS])])
    
+#------------------------------------------------------------------------------
+# Check for nullptr
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for nullptr], [cs_cv__nullptr],
+    [AC_LANG_PROGRAM(
+	[[]],
+	[void* p = nullptr;])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAS_NULLPTR])])
 
 
 #------------------------------------------------------------------------------
