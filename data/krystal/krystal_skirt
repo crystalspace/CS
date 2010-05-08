@@ -1,9 +1,10 @@
 <library>
   <meshfact name='krystal_skirt'>
     <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
-    <zuse/>
+    <priority>alpha</priority>
+    <ztest/>
     <params>
-      <material>Material</material>
+      <material>skirt_material</material>
       <manualcolors/>
       <v x="0.200424" y="0.579353" z="-0.112544" red="0.996" green="0.996" blue="0.996" u="0.351876" v="0.266763" nx="-0.820002" ny="-0.111301" nz="0.561388"/>
       <v x="0.175565" y="0.558191" z="-0.125057" red="0.996" green="0.996" blue="0.996" u="0.327279" v="0.269832" nx="-0.877773" ny="-0.300974" nz="-0.372692"/>
