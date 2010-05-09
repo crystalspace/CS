@@ -260,10 +260,10 @@ bool HairTest::Application ()
   furmaterial = csQueryRegistry<iFurMaterial> (GetObjectRegistry ());
   if (!furmaterial)
     return ReportError("Failed to locate ifurmaterial plugin!");
-/*
+
   furmaterial->DoSomething (1, csVector3 (2, 3, 4));
   printf ("%d\n", furmaterial->GetSomething ());
-*/
+
   // Default behavior from csDemoApplication for the creation of the scene
   if (!csDemoApplication::CreateRoom ())
     return false;
