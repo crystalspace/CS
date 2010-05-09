@@ -1,8 +1,5 @@
 /*
-  Copyright (C) 2009-10 Christian Van Brussel, Communications and Remote
-      Sensing Laboratory of the School of Engineering at the 
-      Universite catholique de Louvain, Belgium
-      http://www.tele.ucl.ac.be
+  Copyright (C) 2010 Alexandru - Teodor Voicu
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public

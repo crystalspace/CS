@@ -1,5 +1,23 @@
-#ifndef __FUR_MATERIAL_H__
-#define __FUR_MATERIAL_H__
+/*
+  Copyright (C) 2010 Alexandru - Teodor Voicu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __FUR_INTERF_H__
+#define __FUR_INTERF_H__
 
 #include <csutil/scf.h>
 #include <ivideo/material.h>
@@ -14,7 +32,7 @@ struct iFurMaterialType : public virtual iBase
   SCF_INTERFACE (iFurMaterialType, 1, 0, 0);
 
   virtual void ClearFurMaterials () = 0;
-  virtual void RemoveFurMaterial (const char *name) = 0;
+  virtual void RemoveFurMaterial (const char *name,iFurMaterial* furMaterial) = 0;
   virtual iFurMaterial* CreateFurMaterial (const char *name) = 0;
   virtual iFurMaterial* FindFurMaterial (const char *name) const = 0;
 };
@@ -26,7 +44,7 @@ struct iFurMaterialType : public virtual iBase
  */
 struct iFurMaterial : public virtual iBase
 {
-SCF_INTERFACE (iFurMaterial, 1, 0, 0);
+  SCF_INTERFACE (iFurMaterial, 1, 0, 0);
   /// Do something.
   virtual void DoSomething (int param, const csVector3&) = 0;
   /// Get something.
@@ -38,4 +56,4 @@ SCF_INTERFACE (iFurMaterial, 1, 0, 0);
   virtual void SetColor (const csColor4& color) = 0;
   virtual csColor4 GetColor () const = 0;
 };
-#endif // __FUR_MATERIAL_H__
+#endif // __FUR_INTERF_H__
