@@ -26,9 +26,15 @@ public:
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-  // From iMyApi.
+  // From iFurMaterial.
   virtual void DoSomething (int param, const csVector3&);
   virtual int GetSomething () const;
+
+  virtual void SetLength (float len);
+  virtual float GetLength () const;
+
+  virtual void SetColor (const csColor4& color);
+  virtual csColor4 GetColor () const;
 };
 
 #endif // __HAIR_MATERIAL_H__
