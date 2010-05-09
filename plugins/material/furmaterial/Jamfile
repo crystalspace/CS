@@ -1,3 +1,8 @@
 SubDir TOP plugins material furmaterial ;
 
-SubInclude TOP plugins material furmaterial hairmaterial ;
+Description furmaterial : "Fur Material Manager plugin" ;
+
+Plugin furmaterial
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith furmaterial : crystalspace ;

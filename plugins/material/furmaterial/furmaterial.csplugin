@@ -4,9 +4,9 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.material.furmaterial.hairmaterial</name>
-        <implementation>HairMaterial</implementation>
-        <description>My Special Game Plugin</description>
+        <name>crystalspace.material.furmaterial</name>
+        <implementation>FurMaterial</implementation>
+        <description>Fur Material Plugin</description>
         <requires>
           <class>crystalspace.graphics3d.</class>
         </requires>

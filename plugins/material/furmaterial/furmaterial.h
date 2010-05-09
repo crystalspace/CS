@@ -13,15 +13,15 @@ struct iObjectRegistry;
 * This is the implementation for our API and
 * also the implementation of the plugin.
 */
-class HairMaterial : public scfImplementation2<HairMaterial,iFurMaterial,iComponent>
+class FurMaterial : public scfImplementation2<FurMaterial,iFurMaterial,iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csVector3 store_v;
 
 public:
-  HairMaterial (iBase* parent);
-  virtual ~HairMaterial ();
+  FurMaterial (iBase* parent);
+  virtual ~FurMaterial ();
 
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);

@@ -1,8 +1,0 @@
-SubDir TOP plugins material furmaterial hairmaterial ;
-
-Description hairmaterial : "Engine Sequence Manager plugin" ;
-
-Plugin hairmaterial
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith hairmaterial : crystalspace ;
