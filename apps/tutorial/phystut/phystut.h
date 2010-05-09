@@ -24,6 +24,7 @@
 #include "ivaria/bullet.h"
 #include "ivaria/ode.h"
 #include "ivaria/dynamicsdebug.h"
+#include "ivaria/softanim.h"
 #include "imesh/animesh.h"
 #include "imesh/ragdoll.h"
 
@@ -36,6 +37,7 @@ private:
   csRef<iBulletDynamicSystem> bullet_dynSys;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
+  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   bool isSoftBodyWorld;
 
   // Meshes

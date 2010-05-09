@@ -20,6 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/sphere.h"
 #include "imesh/genmesh.h"
 #include "cstool/genmeshbuilder.h"
+#include "cstool/materialbuilder.h"
 #include "phystut.h"
 
 #define ODE_ID 1
@@ -219,10 +220,14 @@ void Simple::Frame ()
   if (do_bullet_debug)
     bullet_dynSys->DebugDraw (view);
 
-  // Display all soft bodies
+  // Display the rope soft bodies
   else if (isSoftBodyWorld)
     for (size_t i = 0; i < bullet_dynSys->GetSoftBodyCount (); i++)
-      bullet_dynSys->GetSoftBody (i)->DebugDraw (view);
+    {
+      iBulletSoftBody* softBody = bullet_dynSys->GetSoftBody (i);
+      if (!softBody->GetTriangleCount ())
+	softBody->DebugDraw (view);
+    }
 }
 
 bool Simple::OnKeyboard (iEvent &ev)
@@ -432,7 +437,7 @@ bool Simple::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'i')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'I')
     {
       // Toggle autodisable.
       dynSys->EnableAutoDisable (!dynSys->AutoDisableEnabled ());
@@ -522,6 +527,14 @@ bool Simple::OnMouseDown (iEvent& ev)
       //result.body->AddForceAtRelPos (force, relativePosition);
     }
 
+    else if (result.softBody)
+    {
+      csVector3 force = endBeam - startBeam;
+      force.Normalize ();
+      force *= 2.0f;
+      result.softBody->AddForce (force, result.vertexIndex);
+    }
+
     return true;
   }
 
@@ -568,6 +581,19 @@ bool Simple::OnInitialize (int argc, char* argv[])
 
     // Check whether the soft bodies are enabled or not
     isSoftBodyWorld = !clp->GetBoolOption ("disable_soft", false);
+
+    // Load the soft body animation control plugin & factory
+    if (isSoftBodyWorld)
+    {
+      csRef<iSoftBodyAnimationControlType> softBodyAnimationType =
+	csLoadPlugin<iSoftBodyAnimationControlType>
+	(plugmgr, "crystalspace.dynamics.softanim");
+
+      csRef<iGenMeshAnimationControlFactory> animationFactory =
+	softBodyAnimationType->CreateAnimationControlFactory ();
+      softBodyAnimationFactory =
+	scfQueryInterface<iSoftBodyAnimationControlFactory> (animationFactory);
+    }
   }
 
   if (!dyn)
@@ -608,7 +634,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
   if (phys_engine_id == BULLET_ID)
     keyDescriptions.Push ("?: toggle display of collisions");
   keyDescriptions.Push ("g: toggle gravity");
-  keyDescriptions.Push ("i: toggle autodisable");
+  keyDescriptions.Push ("I: toggle autodisable");
   if (phys_engine_id == ODE_ID)
   {
     keyDescriptions.Push ("1: enable StepFast solver");
@@ -1366,6 +1392,7 @@ void Simple::SpawnRope ()
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (-0.2f, 0, 1), 20);
   body->SetMass (2.0f);
+  body->SetRigidity (0.95f);
   body->AnchorVertex (0);
   body->AnchorVertex (body->GetVertexCount () - 1, box);
 
@@ -1374,6 +1401,7 @@ void Simple::SpawnRope ()
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 0),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (0.2f, 0, 1), 20);
   body->SetMass (1.0f);
+  body->SetRigidity (0.95f);
   body->AnchorVertex (0);
   body->AnchorVertex (body->GetVertexCount () - 1, box);
 }
@@ -1395,6 +1423,28 @@ void Simple::SpawnCloth ()
   // Attach the two top corners
   body->AnchorVertex (0);
   body->AnchorVertex (9);
+
+  // Create the cloth mesh factory
+  csRef<iMeshFactoryWrapper> clothFact =
+    csBulletSoftBodyHelper::CreateClothGenMeshFactory
+    (GetObjectRegistry (), "clothFact", body);
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
+    (clothFact->GetMeshObjectFactory ());
+
+  // Create the mesh
+  gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+  			            clothFact, "cloth_body", room));
+  iMaterialWrapper* mat = CS::Material::MaterialBuilder::CreateColorMaterial
+    (GetObjectRegistry (), "cloth", csColor4 (1.0f, 0.0f, 0.0f, 1.0f));
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Init the animation control for the animation of the genmesh
+  csRef<iGeneralMeshState> meshState =
+    scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  csRef<iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  animationControl->SetSoftBody (body);
 }
 
 void Simple::SpawnSoftBody ()
@@ -1427,6 +1477,26 @@ void Simple::SpawnSoftBody ()
   //   gmstate->GetTriangles (), gmstate->GetTriangleCount ());
   body->SetMass (2.0f);
   body->SetRigidity (0.8f);
+
+  // Create the mesh
+  gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+  			            ballFact, "soft_body", room));
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Init the animation control for the animation of the genmesh
+  csRef<iGeneralMeshState> meshState =
+    scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  csRef<iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  animationControl->SetSoftBody (body);
+
+  // Fling the body.
+  body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+  // This would have worked too
+  //for (size_t i = 0; i < body->GetVertexCount (); i++)
+  //  body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5), i);
 }
 
 void Simple::CreateWalls (const csVector3& /*radius*/)

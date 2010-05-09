@@ -17267,6 +17267,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ClearMorphTarget = *cspacec::iSpriteCal3DState_ClearMorphTarget;
 *FindSocket = *cspacec::iSpriteCal3DState_FindSocket;
 *SetMaterial = *cspacec::iSpriteCal3DState_SetMaterial;
+*GetMaterial = *cspacec::iSpriteCal3DState_GetMaterial;
 *SetTimeFactor = *cspacec::iSpriteCal3DState_SetTimeFactor;
 *GetTimeFactor = *cspacec::iSpriteCal3DState_GetTimeFactor;
 *GetAnimationTime = *cspacec::iSpriteCal3DState_GetAnimationTime;

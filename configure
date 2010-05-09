@@ -1515,185 +1515,185 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-mno-cygwin     Compile with the -mno-cygwin option. (default YES)
   --enable-as-needed      Utilize --as-needed linker flag, if supported by
-                          linker and if the used binutils version is recent
-                          enough to support it properly (default YES)
+                          linker and if the used binutils version is recent
+                          enough to support it properly (default YES)
   --enable-gc-sections    Utilize --gc-sections linker flag for some targets
                           (default YES)
   --enable-relaytool      enable use of relaytool for some libraries (default
                           YES)
   --enable-static-baselibs
                           Link statically againts libgcc and libstdc++. Use
-                          with caution; enabling this option may cause issues
-                          when dynamically linking against other C++ modules.
-                          (default NO)
+                          with caution; enabling  this option may cause
+                          issues when dynamically linking against other C++
+                          modules. (default NO)
   --enable-universal-binary
                           build Mac OS X universal binaries (default YES on
-                          Mac OS X with universal SDK installed, else NO)
+                          Mac OS X with universal SDK installed, else NO)
   --enable-cpu-specific-optimizations=level
                           enable CPU-specific optimizations; recognized levels
-                          are `no', `minimum' or `min', `maximum' or `max',
-                          `native' (default MINIMUM); the `minimum' option
+                          are `no', `minimum' or `min', `maximum' or `max',
+                          `native' (default MINIMUM); the `minimum' option
                           selects optimizations which are likely to be
                           supported by reasonably modern hardware, thus making
-                          the resulting executables fairly portable; use the
-                          `maximum' option with caution since code for one
-                          processor will not work with earlier processors (for
-                          example, Intel 686-specific code will not work with
-                          a 586). The `native' option select optimizations
-                          specific for the compiling machine (thus giving a
-                          fairly unportable executable).
-  --enable-optimize       build with optimizations enabled (default YES); same
-                          as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO); same
+                          the resulting  executables fairly portable; use the
+                          `maximum' option with caution  since code for one
+                          processor will not work with earlier processors
+                          (for example, Intel 686-specific code will not work
+                          with a 586). The `native' option select
+                          optimizations specific for the compiling machine
+                          (thus giving a fairly unportable executable).
+  --enable-optimize       build with optimizations enabled (default YES);
+                          same as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO); same
                           as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO); same
+  --enable-profile        build with profiling information (default NO); same
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile' (default OPTIMIZE)
+                          `debug', `profile' (default OPTIMIZE)
   --enable-separate-debug-info
                           split debug information into separate files.
-                          (default YES if binutils >= 2.17 and build mode not
-                          'profile', otherwise default NO)
+                          (default YES if  binutils >= 2.17 and build mode
+                          not 'profile',  otherwise default NO)
   --enable-optimize-mode-debug-info
                           whether to enable debug information even in optimize
-                          builds. (default YES if separate debug information
-                          is enabled, otherwise default NO)
+                          builds.  (default YES if separate debug information
+                          is enabled,  otherwise default NO)
   --enable-meta-info-embedding
                           store plugin meta-information directly inside plugin
-                          modules if supported by platform; if disabled,
-                          meta-information is stored in stand-alone .csplugin
+                          modules if supported by platform; if disabled,
+                          meta-information is stored in stand-alone .csplugin
                           files; this option is enabled by default for
                           non-Unix platforms and on Unix platforms with
-                          ELF-format object files; it is disabled by default
-                          on Unix platforms if ELF is not available and the
-                          project uses a non-GPL-compatible license (such as
+                          ELF-format object files; it is disabled by default
+                          on Unix platforms if ELF is not available and the
+                          project uses a non-GPL-compatible license (such as
                           LGPL) since the non-ELF Unix embedding technology
-                          requires the GPL-licensed libbfd library; if ELF is
-                          not available, enable this option on Unix only if
-                          you are certain you want a GPL-licensed library
+                          requires the GPL-licensed libbfd library; if ELF is
+                          not available, enable this option on Unix only if
+                          you are certain you want a GPL-licensed library
                           infecting your project
   --enable-ptmalloc       enable the built-in ptmalloc which provides fast
-                          memory allocations, but may cause problems in rare
+                          memory allocations, but may cause problems in rare
                           cases. (default YES)
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
-                          common memory management mistakes (default NO)
+                          common memory management mistakes (default NO)
   --enable-checking-allocations
                           make allocations by default `checking' if the
-                          extensive memory debugger is enabled (default NO)
+                          extensive memory debugger is enabled (default NO)
   --enable-memory-tracker enable the memory tracker which checks memory usage
-                          per source file (default NO)
+                          per source file (default NO)
   --enable-ref-tracker    enable the reference tracker which dumps information
-                          about leaked references (default NO)
+                           about leaked references (default NO)
   --enable-leak-guard     enable the leak guard protection which warns about
-                          objects not freed at program exit (default NO)
+                          objects not freed at program exit (default NO)
   --enable-valgrind       enable building with special support for Valgrind,
-                          proving additional information on memory blocks and
-                          states (default YES in 'debug' build mode, NO
+                          proving additional information on memory blocks and
+                          states (default YES in 'debug' build mode,  NO
                           otherwise)
   --enable-shared         enable creation of shared libraries (default YES on
-                          Win32 and Linux, NO otherwise)
+                          Win32 and Linux,  NO otherwise)
   --enable-make-emulation enable emulation layer allowing project to be built
-                          with `make', in addition to `jam' (default YES)
+                          with `make', in addition to `jam' (default YES)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-perl             use Perl5 scripting interface (default NO)
-  --without-python        do not use Python scripting interface
+  --without-python        do not use Python scripting interface
   --with-java             use Java (default YES)
   --with-x11=dir          specify additional location to search libx11 if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-xext=dir         specify additional location to search libxext if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-x                use the X Window System
   --with-xxf86vm=dir      specify additional location to search libxxf86vm if
-                          not detected automatically; directories searched
+                          not detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
   --with-xaw7=dir         specify additional location to search libxaw7 if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-z=dir            specify additional location to search libz if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-png=dir          specify additional location to search libpng if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-jpeg=dir         specify additional location to search libjpeg if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-lcms=dir         specify additional location to search liblcms if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-mng=dir          specify additional location to search libmng if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-cairo=dir        specify additional location to search libcairo if
-                          not detected automatically; directories searched
+                          not detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
   --with-cairomm=dir      specify additional location to search libcairomm if
-                          not detected automatically; directories searched
+                          not detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
   --with-vgvm=dir         specify additional location to search libvgvm if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-ogg=dir          specify additional location to search libogg if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-vorbis=dir       specify additional location to search libvorbis if
-                          not detected automatically; directories searched
+                          not detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
   --with-vorbisfile=dir   specify additional location to search libvorbisfile
-                          if not detected automatically; directories searched
-                          include dir/include, dir/lib, and dir
+                          if not detected automatically;  directories
+                          searched include dir/include, dir/lib, and dir
   --with-speex=dir        specify additional location to search libspeex if
-                          not detected automatically; directories searched
+                          not detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
   --with-3ds=dir          specify additional location to search lib3ds if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
-  --with-ode=dir          specify additional location to search libode if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
-  --with-bullet=dir       specify additional location to search Bullet if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
-  --with-freetype2=dir    specify additional location to search libfreetype2
-                          if not detected automatically; directories searched
+                          detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
+  --with-ode=dir          specify additional location to search libode if not
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
+  --with-bullet=dir       specify additional location to search Bullet if not
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
+  --with-freetype2=dir    specify additional location to search libfreetype2
+                          if not detected automatically;  directories
+                          searched include dir/include, dir/lib, and dir
   --with-cal3d=dir        specify additional location to search libcal3d if
-                          not detected automatically; directories searched
+                          not detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
   --with-wx=dir           specify additional location to search libwx if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-CEGUI=dir        specify additional location to search libCEGUI if
-                          not detected automatically; directories searched
+                          not detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
   --with-GTK=dir          specify additional location to search libGTK if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-Cg=dir           specify additional location to search libCg if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-CgGL=dir         specify additional location to search libCgGL if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
   --with-jackasyn=dir     specify additional location to search libjackasyn if
-                          not detected automatically; directories searched
+                          not detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
   --with-asound=dir       specify additional location to search libasound if
-                          not detected automatically; directories searched
+                          not detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
   --with-cppunit=dir      specify additional location to search libcppunit if
-                          not detected automatically; directories searched
+                          not detected automatically;  directories searched
                           include dir/include, dir/lib, and dir
   --with-bfd=dir          specify additional location to search libbfd if not
-                          detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          detected automatically;  directories searched
+                          include dir/include, dir/lib, and dir
 
 Some influential environment variables:
   CC          C compiler command
@@ -27121,9 +27121,9 @@ $as_echo "$as_me: not updating unwritable cache $cache_file" >&6;}
   fi
 fi
 rm -f confcache
-    { { $as_echo "$as_me:$LINENO: error: []  unrecognized mode --enable-mode=$enableval; use
+    { { $as_echo "$as_me:$LINENO: error: []  unrecognized mode --enable-mode=$enableval; use
     \`optimize', \`debug', or \`profile'" >&5
-$as_echo "$as_me: error: []  unrecognized mode --enable-mode=$enableval; use
+$as_echo "$as_me: error: []  unrecognized mode --enable-mode=$enableval; use
     \`optimize', \`debug', or \`profile'" >&2;}
    { (exit 1); exit 1; }; } ;;
     esac
@@ -75382,6 +75382,337 @@ else
 fi
 
 
+#------------------------------------------------------------------------------
+# Check for nullptr
+#------------------------------------------------------------------------------
+if test "" != yes; then
+  { $as_echo "$as_me:$LINENO: checking for nullptr" >&5
+$as_echo_n "checking for nullptr... " >&6; }
+if test "${cs_cv__nullptr+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+void* p = nullptr;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  cs_build_ok=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv__nullptr=yes
+		cs_cv__nullptr_cflags=$cs_build_cflags
+		cs_cv__nullptr_lflags=$cs_build_lflags
+		cs_cv__nullptr_libs=$cs_build_libs
+else
+  cs_cv__nullptr=no
+fi
+
+fi
+{ $as_echo "$as_me:$LINENO: result: $cs_cv__nullptr" >&5
+$as_echo "$cs_cv__nullptr" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: checking for nullptr" >&5
+$as_echo_n "checking for nullptr... " >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+void* p = nullptr;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  cs_build_ok=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv__nullptr=yes
+		cs_cv__nullptr_cflags=$cs_build_cflags
+		cs_cv__nullptr_lflags=$cs_build_lflags
+		cs_cv__nullptr_libs=$cs_build_libs
+else
+  cs_cv__nullptr=no
+fi
+
+	    { $as_echo "$as_me:$LINENO: result: $cs_cv__nullptr" >&5
+$as_echo "$cs_cv__nullptr" >&6; }
+fi
+
+    if test $cs_cv__nullptr = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAS_NULLPTR
+"
+else
+  cs_cv__nullptr_cflags=''
+	cs_cv__nullptr_lflags=''
+	cs_cv__nullptr_libs=''
+
+fi
+
 
 
 #------------------------------------------------------------------------------
@@ -81982,6 +82313,12 @@ _ACEOF
 fi
 
 done
+
+
+
+
+
+
 
 
 
@@ -93549,7 +93886,7 @@ $debug ||
 if test -n "$CONFIG_FILES"; then
 
 
-ac_cr=`echo X | tr X '\015'`
+ac_cr=''
 ac_cs_awk_cr=`$AWK 'BEGIN { print "a\rb" }' </dev/null 2>/dev/null`
 if test "$ac_cs_awk_cr" = "a${ac_cr}b"; then
   ac_cs_awk_cr='\\r'

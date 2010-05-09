@@ -34,8 +34,9 @@ class KrystalScene : public AvatarScene
   float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
 
-  // Dynamic simuation related
+  // Dynamic simulation related
   float GetSimulationSpeed ();
+  bool HasPhysicalObjects ();
 
   // From csBaseEventHandler
   void Frame ();
@@ -59,6 +60,12 @@ class KrystalScene : public AvatarScene
   csRef<iSkeletonRagdollNode2> ragdollNode;
   iBodyChain* bodyChain;
   iBodyChain* hairChain;
+
+  // Krystal's hairs & skirt
+  csRef<iMeshWrapper> hairsMesh;
+  csRef<iMeshWrapper> skirtMesh;
+  iBulletSoftBody* hairsBody;
+  iBulletSoftBody* skirtBody;
 };
 
 #endif // __KRYSTAL_H__

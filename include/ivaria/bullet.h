@@ -24,30 +24,49 @@
  */
 
 #include "csutil/scf_interface.h"
+#include "iutil/objreg.h"
+#include "iengine/mesh.h"
+#include "iengine/engine.h"
+#include "imesh/genmesh.h"
+#include "csgeom/tri.h"
+#include "cstool/primitives.h"
 
 struct iView;
 struct iRigidBody;
 struct iBulletKinematicCallback;
 struct iBulletSoftBody;
-struct csTriangle;
 
 /**
- * Return structure for the iBulletDynamicSystem::HitBeam() routine.
+ * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
+ * whether a dynamic, kinematic or soft body has been hit.
  * \sa csHitBeamResult csSectorHitBeamResult
  */
 struct csBulletHitBeamResult
 {
-  csBulletHitBeamResult () : body (0), isect (0.0f) {}
+  csBulletHitBeamResult () : body (0), softBody (0), isect (0.0f), vertexIndex (0) {}
 
   /**
-   * The resulting dynamic or kinematic body that was hit, or 0 if no body was hit.
+   * The resulting dynamic or kinematic body that was hit, or 0 if no body was
+   * hit or if it is a soft body which is hit.
    */
   iRigidBody* body;
+
+  /**
+   * The resulting soft body that was hit, or 0 if no soft body was hit or if it
+   * is a dynamic/kinematic soft body which is hit.
+   */
+  iBulletSoftBody* softBody;
 
   /**
    * Intersection point in world space.
    */
   csVector3 isect;
+
+  /**
+   * The index of the closest vertex of the soft body to be hit. This is only valid
+   * if it is a soft body which is hit (ie softBody is different than 0).
+   */
+  size_t vertexIndex;
 };
 
 /**
@@ -181,7 +200,7 @@ struct iBulletDynamicSystem : public virtual iBase
 					bool withDiagonals = false) = 0;
 
   /**
-   * Create a 3D soft body from a genmesh.
+   * Create a volumetric soft body from a genmesh.
    * \param genmeshFactory The genmesh factory to use.
    * \param bodyTransform The initial transform of the soft body.
    * \remark You must call SetSoftBodyWorld() prior to this.
@@ -190,7 +209,7 @@ struct iBulletDynamicSystem : public virtual iBase
 					   const csOrthoTransform& bodyTransform) = 0;
 
   /**
-   * Create a custom 3D soft body.
+   * Create a custom volumetric soft body.
    * \param vertices The vertices of the soft body. The position is absolute.
    * \param vertexCount The count of vertices of the soft body.
    * \param triangles The faces of the soft body.
@@ -209,12 +228,17 @@ struct iBulletDynamicSystem : public virtual iBase
 /**
  * A soft body is a physical body that can be deformed by the physical
  * simulation. It can be used to simulate eg ropes, clothes or any soft
- * 3D object.
- * \sa iRigidBody iBulletRigidBody
+ * volumetric object.
+ *
+ * A soft body does not have a positional transform by itself, but the
+ * position of every vertex of the body can be queried through GetVertexPosition().
+ *
+ * A soft body can neither be static or kinematic, it is always dynamic.
+ * \sa iRigidBody iBulletRigidBody iSoftBodyAnimationControl
  */
 struct iBulletSoftBody : public virtual iBase
 {
-  SCF_INTERFACE(iBulletSoftBody, 1, 0, 1);
+  SCF_INTERFACE(iBulletSoftBody, 2, 0, 1);
 
   /**
    * Draw the debug informations of this soft body. This has to be called
@@ -230,17 +254,17 @@ struct iBulletSoftBody : public virtual iBase
   /**
    * Return the total mass of this body.
    */
-  virtual float GetMass () = 0;
+  virtual float GetMass () const = 0;
 
   /**
    * Return the count of vertices of this soft body.
    */
-  virtual size_t GetVertexCount () = 0;
+  virtual size_t GetVertexCount () const = 0;
 
   /**
-   * Return the absolute position of the given vertex.
+   * Return the position in world coordinates of the given vertex.
    */
-  virtual csVector3 GetVertexPosition (size_t index) = 0;
+  virtual csVector3 GetVertexPosition (size_t index) const = 0;
 
   /**
    * Anchor the given vertex to its current position. This vertex will no more move.
@@ -262,7 +286,95 @@ struct iBulletSoftBody : public virtual iBase
   /**
    * Get the rigidity of this body.
    */
-  virtual float GetRigidity () = 0;
+  virtual float GetRigidity () const = 0;
+
+  /**
+   * Set the linear velocity of the whole body.
+   */
+  virtual void SetLinearVelocity (csVector3 velocity) = 0;
+
+  /**
+   * Set the linear velocity of the given vertex of the body.
+   */
+  virtual void SetLinearVelocity (csVector3 velocity, size_t vertexIndex) = 0;
+
+  /**
+   * Get the linear velocity of the given vertex of the body.
+   */
+  virtual csVector3 GetLinearVelocity (size_t vertexIndex) const = 0;
+
+  /**
+   * Add a force to the whole body.
+   */
+  virtual void AddForce (csVector3 force) = 0;
+
+  /**
+   * Add a force at the given vertex of the body.
+   */
+  virtual void AddForce (csVector3 force, size_t vertexIndex) = 0;
+
+  /**
+   * Return the count of triangles of this soft body.
+   */
+  virtual size_t GetTriangleCount () const = 0;
+
+  /**
+   * Return the triangle with the given index.
+   */
+  virtual csTriangle GetTriangle (size_t index) const = 0;
+};
+
+/**
+ * General helper class for iBulletSoftBody.
+ */
+struct csBulletSoftBodyHelper
+{
+  /**
+   * Create a genmesh from the given cloth soft body.
+   */
+  static csPtr<iMeshFactoryWrapper> CreateClothGenMeshFactory
+  (iObjectRegistry* object_reg, const char* factoryName, iBulletSoftBody* cloth)
+  {
+    csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+
+    // Create the cloth mesh factory.
+    csRef<iMeshFactoryWrapper> clothFact = engine->CreateMeshFactory
+      ("crystalspace.mesh.object.genmesh", factoryName);
+    if (!clothFact)
+      return 0;
+
+    csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
+      (clothFact->GetMeshObjectFactory ());
+
+    // Create the vertices of the genmesh
+    gmstate->SetVertexCount (cloth->GetVertexCount ());
+    csVector3* vertices = gmstate->GetVertices ();
+    for (size_t i = 0; i < cloth->GetVertexCount (); i++)
+      vertices[i] = cloth->GetVertexPosition (i);
+
+    // Create the triangles of the genmesh
+    gmstate->SetTriangleCount (cloth->GetTriangleCount () * 2);
+    csTriangle* triangles = gmstate->GetTriangles ();
+    for (size_t i = 0; i < cloth->GetTriangleCount (); i++)
+    {
+      csTriangle triangle = cloth->GetTriangle (i);
+      triangles[i * 2] = triangle;
+      triangles[i * 2 + 1] = csTriangle (triangle[2], triangle[1], triangle[0]);
+    }
+
+    gmstate->CalculateNormals ();
+
+    // Set up the texels of the genmesh
+    csVector2* texels = gmstate->GetTexels ();
+    csVector3* normals = gmstate->GetNormals ();
+    CS::Geometry::TextureMapper* mapper = new CS::Geometry::DensityTextureMapper (1.0f);
+    for (size_t i = 0; i < cloth->GetVertexCount (); i++)
+      texels[i] = mapper->Map (vertices[i], normals[i], i);
+
+    gmstate->Invalidate ();
+
+    return csPtr<iMeshFactoryWrapper> (clothFact);
+  }
 };
 
 /**

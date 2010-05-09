@@ -123,6 +123,11 @@ void AvatarTest::Frame ()
 
   // Default behavior from csDemoApplication
   csDemoApplication::Frame ();
+
+  // Display the Bullet debug information
+  if (avatarScene->HasPhysicalObjects ()
+      && dynamicsDebugMode == DYNDEBUG_BULLET)
+    bulletDynamicSystem->DebugDraw (view);
 }
 
 bool AvatarTest::OnKeyboard (iEvent &ev)
@@ -179,7 +184,7 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
 
     // Toggle the debug mode of the dynamic system
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'd'
-	     && physicsEnabled)
+	     && physicsEnabled && avatarScene->HasPhysicalObjects ())
     {
       csRef<iMeshObject> animeshObject =
 	scfQueryInterface<iMeshObject> (avatarScene->animesh);
@@ -199,6 +204,13 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
       }
 
       else if (dynamicsDebugMode == DYNDEBUG_COLLIDER)
+      {
+	dynamicsDebugMode = DYNDEBUG_BULLET;
+	dynamicsDebugger->SetDebugDisplayMode (false);
+	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
+      }
+
+      else if (dynamicsDebugMode == DYNDEBUG_BULLET)
       {
 	dynamicsDebugMode = DYNDEBUG_NONE;
 	dynamicsDebugger->SetDebugDisplayMode (false);
@@ -342,24 +354,48 @@ bool AvatarTest::Application ()
       bulletDynamicSystem =
 	scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
 
-      // We have some objects of size smaller than 0.035 units, so we scale up the
-      // whole world for a better behavior of the dynamic simulation.
-      bulletDynamicSystem->SetInternalScale (10.0f);
+      // Set the dynamic system as a soft body world in order to animate the skirt of Krystal
+      bulletDynamicSystem->SetSoftBodyWorld (true);
 
-      // The ragdoll model of Krystal is rather complex, and the model of Frankie
-      // is unstable because of the overlap of its colliders. We therefore use high
-      // accuracy/low performance parameters for a better behavior of the dynamic
-      // simulation.
-      bulletDynamicSystem->SetStepParameters (0.008f, 150, 10);
+      // Load the soft body animation control plugin & factory
+      csRef<iPluginManager> plugmgr = 
+	csQueryRegistry<iPluginManager> (GetObjectRegistry ());
+      csRef<iSoftBodyAnimationControlType> softBodyAnimationType =
+	csLoadPlugin<iSoftBodyAnimationControlType>
+	(plugmgr, "crystalspace.dynamics.softanim");
 
-      // Create the dynamic's debugger
-      dynamicsDebugger = debuggerManager->CreateDebugger ();
-      dynamicsDebugger->SetDynamicSystem (dynamicSystem);
-      dynamicsDebugger->SetDebugSector (room);
+      if (!softBodyAnimationType)
+      {
+	ReportWarning
+	  ("Can't load soft body animation plugin, continuing with reduced functionalities");
+	physicsEnabled = false;
+      }
 
-      // Set up the physical collider for the roof
-      dynamicSystem->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), 0.0f),
-					  10.0f, 0.0f);
+      else
+      {
+	csRef<iGenMeshAnimationControlFactory> animationFactory =
+	  softBodyAnimationType->CreateAnimationControlFactory ();
+	softBodyAnimationFactory =
+	  scfQueryInterface<iSoftBodyAnimationControlFactory> (animationFactory);
+
+	// We have some objects of size smaller than 0.035 units, so we scale up the
+	// whole world for a better behavior of the dynamic simulation.
+	bulletDynamicSystem->SetInternalScale (10.0f);
+
+	// The physical scene are rather complex in this demo. We therefore use high
+	// accuracy/low performance parameters for a better behavior of the dynamic
+	// simulation.
+	bulletDynamicSystem->SetStepParameters (0.008f, 150, 10);
+
+	// Create the dynamic's debugger
+	dynamicsDebugger = debuggerManager->CreateDebugger ();
+	dynamicsDebugger->SetDynamicSystem (dynamicSystem);
+	dynamicsDebugger->SetDebugSector (room);
+
+	// Set up the physical collider for the roof
+	dynamicSystem->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), 0.0f),
+					    10.0f, 0.0f);
+      }
     }
   }
 

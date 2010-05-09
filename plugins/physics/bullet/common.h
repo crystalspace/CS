@@ -112,7 +112,7 @@ private:
 public:
   csBulletDebugDraw (float inverseInternalScale)
     : mode (DBG_DrawWireframe | DBG_DrawConstraints | DBG_DrawConstraintLimits),
-      inverseInternalScale (inverseInternalScale)
+    inverseInternalScale (inverseInternalScale)
   {
   }
 
