@@ -99,6 +99,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/noncopyable.h"
 #include "csutil/nulcache.h"
+#include "csutil/nullptr.h"
 #include "csutil/objiter.h"
 #include "csutil/objreg.h"
 #include "csutil/parasiticdatabuffer.h"
