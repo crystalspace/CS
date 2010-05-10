@@ -9,6 +9,9 @@
     <texture name='krystal_body_h'>
       <file>/lib/krystal/krystal_body_h.png</file>
     </texture>
+    <texture name='krystal_spec'>
+      <file>/lib/krystal/krystal_body_spec.png</file>
+    </texture>
     <texture name='krystal_hairs.png'>
       <file>/lib/krystal/krystal_hairs.png</file>
     </texture>
@@ -16,9 +19,7 @@
   <materials>
     <material name='krystal_material'>
       <texture>krystal_body_h</texture>
-    </material>
-    <material name='hairs_material'>
-      <texture>krystal_hairs.png</texture>
+      <shadervar type="texture" name="tex specular">krystal_spec</shadervar>
     </material>
   </materials>
   <sounds/>
