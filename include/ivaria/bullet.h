@@ -74,10 +74,10 @@ struct csBulletHitBeamResult
  */
 enum csBulletDebugMode
 {
-  BULLET_DEBUG_NOTHING = 0,     /*!< Nothing will be displayed. */
-  BULLET_DEBUG_COLLIDERS = 1,   /*!< Display the colliders of the bodies. */
-  BULLET_DEBUG_AABB = 2,        /*!< Display the axis aligned bounding boxes of the bodies. */
-  BULLET_DEBUG_JOINTS = 4       /*!< Display the joint positions and limits. */
+  CS_BULLET_DEBUG_NOTHING = 0,     /*!< Nothing will be displayed. */
+  CS_BULLET_DEBUG_COLLIDERS = 1,   /*!< Display the colliders of the bodies. */
+  CS_BULLET_DEBUG_AABB = 2,        /*!< Display the axis aligned bounding boxes of the bodies. */
+  CS_BULLET_DEBUG_JOINTS = 4       /*!< Display the joint positions and limits. */
 };
 
 /**
@@ -139,7 +139,7 @@ struct iBulletDynamicSystem : public virtual iBase
 
   /**
    * Set the mode to be used when displaying debug informations. The default value
-   * is 'BULLET_DEBUG_COLLIDERS | BULLET_DEBUG_JOINTS'.
+   * is 'CS_BULLET_DEBUG_COLLIDERS | CS_BULLET_DEBUG_JOINTS'.
    * \remark Don't forget to call DebugDraw() at each frame to effectively display
    * the debug informations.
    */
@@ -382,11 +382,11 @@ struct csBulletSoftBodyHelper
  */
 enum csBulletState
 {
-  BULLET_STATE_STATIC = 0,     /*!< The body is static, ie this body won't move
+  CS_BULLET_STATE_STATIC = 0,     /*!< The body is static, ie this body won't move
 				 anymore but dynamic objects will still collide with it. */
-  BULLET_STATE_DYNAMIC,        /*!< The body is dynamic, ie the motion of 
+  CS_BULLET_STATE_DYNAMIC,        /*!< The body is dynamic, ie the motion of 
 				  the body is controlled by the dynamic simulation. */
-  BULLET_STATE_KINEMATIC       /*!< The body is kinematic, ie the motion 
+  CS_BULLET_STATE_KINEMATIC       /*!< The body is kinematic, ie the motion 
 				  of the body is controlled by the animation system,
 				  but it interacts with the dynamic simulation. */
 };

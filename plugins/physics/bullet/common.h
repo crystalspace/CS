@@ -143,23 +143,23 @@ public:
   void SetDebugMode (csBulletDebugMode mode)
   {
     this->mode = 0;
-    if (mode & BULLET_DEBUG_COLLIDERS)
+    if (mode & CS_BULLET_DEBUG_COLLIDERS)
       this->mode |= DBG_DrawWireframe;
-    if (mode & BULLET_DEBUG_AABB)
+    if (mode & CS_BULLET_DEBUG_AABB)
       this->mode |= DBG_DrawAabb;
-    if (mode & BULLET_DEBUG_JOINTS)
+    if (mode & CS_BULLET_DEBUG_JOINTS)
       this->mode |= DBG_DrawConstraints | DBG_DrawConstraintLimits;
   }
 
   csBulletDebugMode GetDebugMode ()
   {
-    csBulletDebugMode mode = BULLET_DEBUG_NOTHING;
+    csBulletDebugMode mode = CS_BULLET_DEBUG_NOTHING;
     if (this->mode & DBG_DrawWireframe)
-      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_COLLIDERS);
+      mode = (csBulletDebugMode) (mode | CS_BULLET_DEBUG_COLLIDERS);
     if (this->mode & DBG_DrawAabb)
-      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_AABB);
+      mode = (csBulletDebugMode) (mode | CS_BULLET_DEBUG_AABB);
     if (this->mode & DBG_DrawConstraints)
-      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_JOINTS);
+      mode = (csBulletDebugMode) (mode | CS_BULLET_DEBUG_JOINTS);
     return mode;
   }
 

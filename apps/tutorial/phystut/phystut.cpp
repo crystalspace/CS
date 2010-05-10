@@ -1318,7 +1318,7 @@ void Simple::LoadRagdoll ()
   csRef<iSkeletonRagdollNodeFactory2> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll",
 					   bodySkeleton, dynSys);
-  ragdollFactory->AddBodyChain (chain, RAGDOLL_STATE_DYNAMIC);
+  ragdollFactory->AddBodyChain (chain, CS_RAGDOLL_STATE_DYNAMIC);
 
   // Set the ragdoll anim node as the only node of the animation tree
   animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ()
@@ -1367,9 +1367,9 @@ void Simple::SpawnRagdoll ()
   // Fling the body.
   // (start the ragdoll node before so that the rigid bodies are created)
   ragdoll->Play ();
-  for (uint i = 0; i < ragdoll->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
+  for (uint i = 0; i < ragdoll->GetBoneCount (CS_RAGDOLL_STATE_DYNAMIC); i++)
   {
-    BoneID boneID = ragdoll->GetBone (RAGDOLL_STATE_DYNAMIC, i);
+    BoneID boneID = ragdoll->GetBone (CS_RAGDOLL_STATE_DYNAMIC, i);
     iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
     rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
     rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));

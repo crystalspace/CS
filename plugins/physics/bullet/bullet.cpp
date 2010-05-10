@@ -688,7 +688,7 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
 
 void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
 {
-  if (mode == BULLET_DEBUG_NOTHING)
+  if (mode == CS_BULLET_DEBUG_NOTHING)
   {
     if (debugDraw)
     {
@@ -711,7 +711,7 @@ void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
 csBulletDebugMode csBulletDynamicsSystem::GetDebugMode ()
 {
   if (!debugDraw)
-    return BULLET_DEBUG_NOTHING;
+    return CS_BULLET_DEBUG_NOTHING;
 
   return debugDraw->GetDebugMode ();
 }
@@ -1045,7 +1045,7 @@ void csBulletDynamicsSystem::RemoveSoftBody (iBulletSoftBody* body)
 
 csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic)
   : scfImplementationType (this), dynSys (dynSys), body (0),
-    dynamicState (isStatic? BULLET_STATE_STATIC : BULLET_STATE_DYNAMIC),
+    dynamicState (isStatic? CS_BULLET_STATE_STATIC : CS_BULLET_STATE_DYNAMIC),
     customMass (false), mass (1.0f)
 {
   btTransform identity;
@@ -1107,7 +1107,7 @@ void csBulletRigidBody::RebuildBody ()
     int shapeCount = compoundShape->getNumChildShapes ();
 
     // compute new principal axis
-    if (dynamicState == BULLET_STATE_DYNAMIC)
+    if (dynamicState == CS_BULLET_STATE_DYNAMIC)
     {
       // compute the masses of the shapes
       CS_ALLOC_STACK_ARRAY(btScalar, masses, shapeCount); 
@@ -1180,7 +1180,7 @@ void csBulletRigidBody::RebuildBody ()
     }
   }
 
-  else if (dynamicState == BULLET_STATE_DYNAMIC)
+  else if (dynamicState == CS_BULLET_STATE_DYNAMIC)
   {
     // compound hasn't been changed
     bodyMass = mass;
@@ -1221,7 +1221,7 @@ void csBulletRigidBody::RebuildBody ()
 
 bool csBulletRigidBody::MakeStatic (void)
 {
-  if (body && dynamicState != BULLET_STATE_STATIC)
+  if (body && dynamicState != CS_BULLET_STATE_STATIC)
   {
     csBulletState previousState = dynamicState;
 
@@ -1231,7 +1231,7 @@ bool csBulletRigidBody::MakeStatic (void)
       if (colliders[i]->shape
 	  && colliders[i]->geomType == TRIMESH_COLLIDER_GEOMETRY)
       {
-	dynamicState = BULLET_STATE_STATIC;
+	dynamicState = CS_BULLET_STATE_STATIC;
 	colliders[i]->RebuildMeshGeometry ();
 	hasTrimesh = true;
       }
@@ -1248,7 +1248,7 @@ bool csBulletRigidBody::MakeStatic (void)
     body->setMassProps (0.0f, btVector3 (0.0f, 0.0f, 0.0f));
 
     // reverse kinematic state
-    if (previousState == BULLET_STATE_KINEMATIC)
+    if (previousState == CS_BULLET_STATE_KINEMATIC)
     {
       body->setCollisionFlags (body->getCollisionFlags()
 			       & ~btCollisionObject::CF_KINEMATIC_OBJECT);
@@ -1268,26 +1268,26 @@ bool csBulletRigidBody::MakeStatic (void)
     dynSys->bulletWorld->addRigidBody (body);
   }
 
-  dynamicState = BULLET_STATE_STATIC;
+  dynamicState = CS_BULLET_STATE_STATIC;
 
   return true;
 }
 
 bool csBulletRigidBody::MakeDynamic (void)
 {
-  if (body && dynamicState != BULLET_STATE_DYNAMIC)
+  if (body && dynamicState != CS_BULLET_STATE_DYNAMIC)
   {
     csBulletState previousState = dynamicState;
 
     // rebuild body if a child collider was a concave mesh
-    if (previousState == BULLET_STATE_STATIC)
+    if (previousState == CS_BULLET_STATE_STATIC)
     {
       bool hasTrimesh = false;
       for (unsigned int i = 0; i < colliders.GetSize (); i++)
 	if (colliders[i]->shape
 	    && colliders[i]->geomType == TRIMESH_COLLIDER_GEOMETRY)
 	{
-	  dynamicState = BULLET_STATE_DYNAMIC;
+	  dynamicState = CS_BULLET_STATE_DYNAMIC;
 	  colliders[i]->RebuildMeshGeometry ();
 	  hasTrimesh = true;
 	}
@@ -1307,7 +1307,7 @@ bool csBulletRigidBody::MakeDynamic (void)
     btVector3 angularVelocity (0.0f, 0.0f, 0.0f);
 
     // reverse kinematic state
-    if (previousState == BULLET_STATE_KINEMATIC)
+    if (previousState == CS_BULLET_STATE_KINEMATIC)
     {
       body->setCollisionFlags (body->getCollisionFlags()
 			       & ~btCollisionObject::CF_KINEMATIC_OBJECT);
@@ -1339,26 +1339,26 @@ bool csBulletRigidBody::MakeDynamic (void)
     dynSys->bulletWorld->addRigidBody (body);
   }
 
-  dynamicState = BULLET_STATE_DYNAMIC;
+  dynamicState = CS_BULLET_STATE_DYNAMIC;
 
   return true;
 }
 
 void csBulletRigidBody::MakeKinematic ()
 {
-  if (body && dynamicState != BULLET_STATE_KINEMATIC)
+  if (body && dynamicState != CS_BULLET_STATE_KINEMATIC)
   {
     csBulletState previousState = dynamicState;
 
     // rebuild body if a child collider was a concave mesh
-    if (previousState == BULLET_STATE_STATIC)
+    if (previousState == CS_BULLET_STATE_STATIC)
     {
       bool hasTrimesh = false;
       for (unsigned int i = 0; i < colliders.GetSize (); i++)
 	if (colliders[i]->shape
 	    && colliders[i]->geomType == TRIMESH_COLLIDER_GEOMETRY)
 	{
-	  dynamicState = BULLET_STATE_KINEMATIC;
+	  dynamicState = CS_BULLET_STATE_KINEMATIC;
 	  colliders[i]->RebuildMeshGeometry ();
 	  hasTrimesh = true;
 	}
@@ -1399,14 +1399,14 @@ void csBulletRigidBody::MakeKinematic ()
     dynSys->bulletWorld->addRigidBody (body);
   }
 
-  dynamicState = BULLET_STATE_KINEMATIC;
+  dynamicState = CS_BULLET_STATE_KINEMATIC;
 
   return;
 }
 
 bool csBulletRigidBody::IsStatic (void)
 {
-  return dynamicState == BULLET_STATE_STATIC;
+  return dynamicState == CS_BULLET_STATE_STATIC;
 }
 
 csBulletState csBulletRigidBody::GetDynamicState () const
@@ -1418,15 +1418,15 @@ void csBulletRigidBody::SetDynamicState (csBulletState state)
 {
   switch (state)
     {
-    case BULLET_STATE_STATIC:
+    case CS_BULLET_STATE_STATIC:
       MakeStatic ();
       break;
 
-    case BULLET_STATE_DYNAMIC:
+    case CS_BULLET_STATE_DYNAMIC:
       MakeDynamic ();
       break;
 
-    case BULLET_STATE_KINEMATIC:
+    case CS_BULLET_STATE_KINEMATIC:
       MakeKinematic ();
       break;
 
@@ -1812,7 +1812,7 @@ void csBulletRigidBody::SetLinearVelocity (const csVector3& vel)
 {
   CS_ASSERT (body);
 
-  if (dynamicState == BULLET_STATE_DYNAMIC)
+  if (dynamicState == CS_BULLET_STATE_DYNAMIC)
   {
     body->setLinearVelocity (CSToBullet (vel, dynSys->internalScale));
     body->activate ();
@@ -1831,7 +1831,7 @@ void csBulletRigidBody::SetAngularVelocity (const csVector3& vel)
 {
   CS_ASSERT (body);
 
-  if (dynamicState == BULLET_STATE_DYNAMIC)
+  if (dynamicState == CS_BULLET_STATE_DYNAMIC)
   {
     body->setAngularVelocity (btVector3 (vel.x, vel.y, vel.z));
     body->activate ();
@@ -1880,7 +1880,7 @@ void csBulletRigidBody::GetProperties (float* mass, csVector3* center,
 
 float csBulletRigidBody::GetMass ()
 {
-  if (dynamicState != BULLET_STATE_DYNAMIC)
+  if (dynamicState != CS_BULLET_STATE_DYNAMIC)
     return 0.0f;
 
   if (body)
@@ -2299,7 +2299,7 @@ bool csBulletCollider::CreatePlaneGeometry (const csPlane3& plane)
   delete[] indices; indices = 0;
 
   // Bullet doesn't support dynamic plane shapes
-  if (!isStaticBody && body->dynamicState != BULLET_STATE_STATIC)
+  if (!isStaticBody && body->dynamicState != CS_BULLET_STATE_STATIC)
     return false;
   
   csVector3 normal = plane.GetNormal ();
@@ -2358,7 +2358,7 @@ bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
     return false;
 
   // this shape is optimized for static concave meshes
-  if (isStaticBody || body->dynamicState == BULLET_STATE_STATIC)
+  if (isStaticBody || body->dynamicState == CS_BULLET_STATE_STATIC)
   {
     btBvhTriangleMeshShape* concaveShape =
       new btBvhTriangleMeshShape (indexVertexArrays, true);
@@ -2398,7 +2398,7 @@ void csBulletCollider::RebuildMeshGeometry ()
 	      (int)vertexCount, (btScalar*) &vertices[0].x (), sizeof (btVector3));
 
   // this shape is optimized for static concave meshes
-  if (isStaticBody || body->dynamicState == BULLET_STATE_STATIC)
+  if (isStaticBody || body->dynamicState == CS_BULLET_STATE_STATIC)
   {
     btBvhTriangleMeshShape* concaveShape =
       new btBvhTriangleMeshShape (indexVertexArrays, true);
@@ -2571,7 +2571,7 @@ csOrthoTransform csBulletCollider::GetTransform ()
 
 csOrthoTransform csBulletCollider::GetLocalTransform ()
 {
-  if (isStaticBody || body->dynamicState == BULLET_STATE_STATIC)
+  if (isStaticBody || body->dynamicState == CS_BULLET_STATE_STATIC)
     return localTransform * body->GetTransform ();
 
   return localTransform;
@@ -2702,7 +2702,7 @@ void csBulletCollider::MakeDynamic ()
 
 bool csBulletCollider::IsStatic ()
 {
-  return isStaticBody || body->dynamicState == BULLET_STATE_STATIC;
+  return isStaticBody || body->dynamicState == CS_BULLET_STATE_STATIC;
 }
 
 float csBulletCollider::GetVolume ()
