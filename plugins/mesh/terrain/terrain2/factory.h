@@ -152,6 +152,8 @@ public:
     const csVector2& position, const csVector3& size);
   virtual iTerrainFactoryCell* AddCell ();
 
+  virtual void RemoveCell (iTerrainFactoryCell*);
+
   virtual void SetMaxLoadedCells (size_t value);
   virtual void SetVirtualViewDistance (float distance);
   virtual void SetAutoPreLoad (bool mode);

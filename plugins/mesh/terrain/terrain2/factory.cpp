@@ -190,6 +190,11 @@ iTerrainFactoryCell* csTerrainFactory::AddCell()
   return cell;
 }
 
+void csTerrainFactory::RemoveCell (iTerrainFactoryCell* cell)
+{
+  cells.Delete ((csTerrainFactoryCell*)cell);
+}
+
 void csTerrainFactory::SetMaxLoadedCells (size_t value)
 {
   maxLoadedCells = value;
