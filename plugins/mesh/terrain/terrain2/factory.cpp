@@ -192,7 +192,7 @@ iTerrainFactoryCell* csTerrainFactory::AddCell()
 
 void csTerrainFactory::RemoveCell (iTerrainFactoryCell* cell)
 {
-  cells.Delete ((csTerrainFactoryCell*)cell);
+  cells.Delete (static_cast<csTerrainFactoryCell*>(cell));
 }
 
 void csTerrainFactory::SetMaxLoadedCells (size_t value)

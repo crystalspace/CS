@@ -66,12 +66,12 @@ void csTerrainSystem::RemoveCell (iTerrainCell* cell)
 {
   ComputeBBox();
 
-  cells.Delete((csTerrainCell*)cell);
+  cells.Delete(static_cast<csTerrainCell*>(cell));
 }
 
 iTerrainCell* csTerrainSystem::AddCell (iTerrainFactoryCell* cellf)
 {
-  csRef<csTerrainCell> c = ((csTerrainFactoryCell*)cellf)->CreateCell (this);
+  csRef<csTerrainCell> c = (static_cast<csTerrainFactoryCell*>(cellf))->CreateCell (this);
   this->AddCell (c);
   return c;
 }
