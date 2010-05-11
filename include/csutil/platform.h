@@ -26,9 +26,9 @@ namespace CS {
   namespace Platform {
 
     /**
-     * Retrieve the number of kB of physical system memory.
+     * Retrieve the number of KiB of physical system memory.
      *
-     * @returns Physical system memory (in kB) on success, or 0 on failure.
+     * @returns Physical system memory (in KiB) on success, or 0 on failure.
      */
    CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemorySize();
 
