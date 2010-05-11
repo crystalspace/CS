@@ -35,7 +35,7 @@ public:
 
   ~ListAccessQueue()
   {
-    ProcessQueue(total);
+    ProcessAll ();
   }
 
   void Enqueue(iJob* job, QueueType type)
@@ -76,7 +76,14 @@ public:
     }
   }
 
-  int32 GetQueueCount() const { return total; }
+  int32 GetQueueCount() const
+  { return CS::Threading::AtomicOperations::Read (&total); }
+  
+  void ProcessAll ()
+  {
+    while (GetQueueCount() > 0)
+      ProcessQueue (total);
+  }
 
 private:
   inline void ProcessHighQueue(uint& i, uint& num)
