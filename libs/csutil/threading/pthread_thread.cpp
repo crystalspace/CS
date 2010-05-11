@@ -64,8 +64,12 @@ namespace Implementation
       startupBarrier->Wait ();
 
     #ifdef CS_HAVE_PTHREAD_SETNAME_NP
-      // Set the name, for debugging
-      pthread_setname_np (thread->threadHandle, runnable->GetName ());
+      {
+	// Set the name, for debugging
+	const char* threadName = runnable->GetName ();
+	if (threadName)
+	  pthread_setname_np (thread->threadHandle, threadName);
+      }
     #endif
       
       // Run      
