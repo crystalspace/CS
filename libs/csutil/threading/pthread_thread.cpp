@@ -68,7 +68,7 @@ namespace Implementation
 	// Set the name, for debugging
 	const char* threadName = runnable->GetName ();
 	if (threadName)
-	  pthread_setname_np (thread->threadHandle, threadName);
+	  pthread_setname_np (pthread_self(), threadName);
       }
     #endif
       
