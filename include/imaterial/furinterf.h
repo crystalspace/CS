@@ -42,7 +42,7 @@ struct iFurMaterialType : public virtual iBase
  * that you use better comments than this one in a
  * real situation.
  */
-struct iFurMaterial : public virtual iBase
+struct iFurMaterial : public virtual iMaterial
 {
   SCF_INTERFACE (iFurMaterial, 1, 0, 0);
   /// Do something.

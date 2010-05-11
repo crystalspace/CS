@@ -80,7 +80,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   CS_LEAKGUARD_IMPLEMENT(FurMaterial);
 
   FurMaterial::FurMaterial (FurMaterialType* manager, const char *name) :
-  scfImplementationType (this), manager (manager), name (name)
+    scfImplementationType (this), manager (manager), name (name)
   {
   }
 
@@ -122,6 +122,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     return csColor4(0);
   }
 
+  void FurMaterial::SetShader (csStringID type, iShader* shd)
+  {
+	  shaders.PutUnique (type, shd);
+  }
+
+  iShader* FurMaterial::GetShader(csStringID type)
+  {
+	  return shaders.Get (type, (iShader*)0);
+  }
+
+  iShader* FurMaterial::GetFirstShader (const csStringID* types,
+	  size_t numTypes)
+  {
+	  iShader* s = 0;
+	  for (size_t i = 0; i < numTypes; i++)
+	  {
+		  s = shaders.Get (types[i], (iShader*)0);
+		  if (s != 0) break;
+	  }
+	  return s;
+  }
+
+  iTextureHandle *FurMaterial::GetTexture ()
+  {
+	  return 0;
+  }
+
+  iTextureHandle* FurMaterial::GetTexture (CS::ShaderVarStringID name)
+  {
+	  return 0;
+  }  
 }
 
 CS_PLUGIN_NAMESPACE_END(FurMaterial)

@@ -22,6 +22,7 @@
 #include <iutil/comp.h>
 #include <csgeom/vector3.h>
 #include <imaterial/furinterf.h>
+#include <csgfx/shadervarcontext.h>
 
 #include "csutil/scf_implementation.h"
 
@@ -52,7 +53,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	  csHash<csRef<iFurMaterial>, csString> furMaterialHash;
   };
 
-  class FurMaterial : public scfImplementation1<FurMaterial,iFurMaterial>
+  class FurMaterial : public scfImplementation2<FurMaterial,
+	  scfFakeInterface<iShaderVariableContext>,iFurMaterial>,
+	  public CS::ShaderVariableContextImpl
   {
   public:
     CS_LEAKGUARD_DECLARE(FurMaterial);
@@ -68,6 +71,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     virtual void SetColor (const csColor4& color);
     virtual csColor4 GetColor () const;
+	
+	/*
+	// From iShaderVariableContext
+	virtual void AddVariable (csShaderVariable *variable);
+	virtual void Clear ();
+	virtual const csRefArray <csShaderVariable>& GetShaderVariables () const;
+	virtual csShaderVariable* GetVariable (CS::ShaderVarStringID name) const;
+	csShaderVariable* GetVariableAdd (CS::ShaderVarStringID name);
+	virtual bool IsEmpty () const;
+	virtual void PushVariables (csShaderVariableStack &stack) const;
+	virtual bool RemoveVariable (CS::ShaderVarStringID name);
+	virtual bool RemoveVariable (csShaderVariable *variable);
+	virtual void ReplaceVariable (csShaderVariable *variable);
+    */
+
+	// From iMaterial
+    /// Associate a shader with a shader type
+    virtual void SetShader (csStringID type, iShader* shader);
+    /// Get shader associated with a shader type
+    virtual iShader* GetShader (csStringID type);
+
+    /// Get all Shaders
+    const csHash<csRef<iShader>, csStringID>& GetShaders() const
+    { return shaders; }
+
+    /// Get texture.
+    virtual iTextureHandle* GetTexture ();
+    /// Get a texture from the material.
+    virtual iTextureHandle* GetTexture (CS::ShaderVarStringID name);
+
+    virtual iShader* GetFirstShader (const csStringID* types, size_t numTypes);
 
   protected:
 	  FurMaterialType* manager;
@@ -75,6 +109,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   private:
 	  csVector3 store_v;
+	  /// Shader associated with material
+	  csHash<csRef<iShader>, csStringID> shaders;
   };
 
 }
