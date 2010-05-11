@@ -63,6 +63,11 @@ namespace Implementation
       AtomicOperations::Set (isRunningPtr, 1);
       startupBarrier->Wait ();
 
+    #ifdef CS_HAVE_PTHREAD_SETNAME_NP
+      // Set the name, for debugging
+      pthread_setname_np (thread->threadHandle, runnable->GetName ());
+    #endif
+      
       // Run      
       runnable->Run ();
 
