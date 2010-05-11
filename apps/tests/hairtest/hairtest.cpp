@@ -181,7 +181,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
 		       iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
 		       iSkeletonBasicNodesManager2),
-	CS_REQUEST_PLUGIN("crystalspace.material.furmaterial", iFurMaterial),
+	CS_REQUEST_PLUGIN("crystalspace.material.furmaterial", iFurMaterialType),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -254,12 +254,13 @@ bool HairTest::Application ()
   if (!basicNodesManager)
     return ReportError("Failed to locate iSkeletonBasicNodesManager2 plugin!");
 
-  furmaterial = csQueryRegistry<iFurMaterial> (GetObjectRegistry ());
-  if (!furmaterial)
-    return ReportError("Failed to locate ifurmaterial plugin!");
+  furMaterialType = csQueryRegistry<iFurMaterialType> (GetObjectRegistry ());
+  if (!furMaterialType)
+    return ReportError("Failed to locate iFurMaterialType plugin!");
 
-  furmaterial->DoSomething (1, csVector3 (2, 3, 4));
-  printf ("%d\n", furmaterial->GetSomething ());
+  furMaterial = furMaterialType->CreateFurMaterial("hair");
+  furMaterial->DoSomething (1, csVector3 (2, 3, 4));
+  printf ("%d\n", furMaterial->GetSomething ());
 
   // Default behavior from csDemoApplication for the creation of the scene
   if (!csDemoApplication::CreateRoom ())

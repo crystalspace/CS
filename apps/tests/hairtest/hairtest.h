@@ -27,7 +27,7 @@
 #include "ivaria/bullet.h"
 #include "ivaria/dynamicsdebug.h"
 
-#include "imaterial/furmaterial.h"
+#include "imaterial/furinterf.h"
 
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
@@ -89,7 +89,8 @@ private:
   csRef<iSkeletonRagdollManager2> ragdollManager;
 
   // Material plugin manager
-  csRef<iFurMaterial> furmaterial;
+  csRef<iFurMaterialType> furMaterialType;
+  csRef<iFurMaterial> furMaterial;
 
   //-- csBaseEventHandler
   void Frame ();

@@ -5,8 +5,8 @@
     <classes>
       <class>
         <name>crystalspace.material.furmaterial</name>
-        <implementation>FurMaterial</implementation>
-        <description>Fur Material Plugin</description>
+        <implementation>FurMaterialType</implementation>
+        <description>Fur Material Type Plugin</description>
         <requires>
           <class>crystalspace.graphics3d.</class>
         </requires>

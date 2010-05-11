@@ -21,57 +21,63 @@
 
 #include <iutil/comp.h>
 #include <csgeom/vector3.h>
-#include <imaterial/furmaterial.h>
+#include <imaterial/furinterf.h>
 
 #include "csutil/scf_implementation.h"
 
 struct iObjectRegistry;
 
-class FurMaterialType : public scfImplementation2<FurMaterialType,iFurMaterialType,iComponent>
+CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 {
-private:
-  iObjectRegistry* object_reg;
-  csHash<csRef<iFurMaterial>, csString> furMaterialHash;
-public:
-  FurMaterialType (iBase* parent);
-  virtual ~FurMaterialType ();
+  class FurMaterialType : public 
+	  scfImplementation2<FurMaterialType,iFurMaterialType,iComponent>
+  {
+  public:
+    CS_LEAKGUARD_DECLARE(FurMaterialType);
 
-  // From iComponent	
-  virtual bool Initialize (iObjectRegistry*);
+    FurMaterialType (iBase* parent);
+    virtual ~FurMaterialType ();
+
+    // From iComponent	
+    virtual bool Initialize (iObjectRegistry*);
   
-  // From iFurMaterialType
-  virtual void ClearFurMaterials ();
-  virtual void RemoveFurMaterial (const char *name, iFurMaterial* furMaterial);
-  virtual iFurMaterial* CreateFurMaterial (const char *name);
-  virtual iFurMaterial* FindFurMaterial (const char *name) const;
-};
+    // From iFurMaterialType
+    virtual void ClearFurMaterials ();
+    virtual void RemoveFurMaterial (const char *name, iFurMaterial* furMaterial);
+    virtual iFurMaterial* CreateFurMaterial (const char *name);
+    virtual iFurMaterial* FindFurMaterial (const char *name) const;
 
-/**
-* This is the implementation for our API and
-* also the implementation of the plugin.
-*/
-class FurMaterial : public scfImplementation2<FurMaterial,iFurMaterial,iComponent>
-{
-private:
-  iObjectRegistry* object_reg;
-  csVector3 store_v;
+  private:
+	  iObjectRegistry* object_reg;
+	  csHash<csRef<iFurMaterial>, csString> furMaterialHash;
+  };
 
-public:
-  FurMaterial (iBase* parent);
-  virtual ~FurMaterial ();
+  class FurMaterial : public scfImplementation1<FurMaterial,iFurMaterial>
+  {
+  public:
+    CS_LEAKGUARD_DECLARE(FurMaterial);
+    FurMaterial (FurMaterialType* manager, const char *name);
+    virtual ~FurMaterial ();
 
-  // From iComponent.
-  virtual bool Initialize (iObjectRegistry*);
+    // From iFurMaterial.
+    virtual void DoSomething (int param, const csVector3&);
+    virtual int GetSomething () const;
 
-  // From iFurMaterial.
-  virtual void DoSomething (int param, const csVector3&);
-  virtual int GetSomething () const;
+    virtual void SetLength (float len);
+    virtual float GetLength () const;
 
-  virtual void SetLength (float len);
-  virtual float GetLength () const;
+    virtual void SetColor (const csColor4& color);
+    virtual csColor4 GetColor () const;
 
-  virtual void SetColor (const csColor4& color);
-  virtual csColor4 GetColor () const;
-};
+  protected:
+	  FurMaterialType* manager;
+	  csString name;
+
+  private:
+	  csVector3 store_v;
+  };
+
+}
+CS_PLUGIN_NAMESPACE_END(FurMaterial)
 
 #endif // __FUR_MATERIAL_H__
