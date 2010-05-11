@@ -97,6 +97,7 @@ END -%]
 				AdditionalDependencies="[% compose('libs', [], ' ') %]"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="[% composedirs('libdirs', []) %]"
+				LargeAddressAware="2"
 				TargetMachine="[% platform.targetmachine %]"/>
 			<Tool
 				Name="VCLibrarianTool"
