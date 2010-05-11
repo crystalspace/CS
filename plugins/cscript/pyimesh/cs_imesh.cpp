@@ -15524,6 +15524,162 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_SetRendering(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactorySubMesh *arg1 = (iAnimatedMeshFactorySubMesh *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactorySubMesh_SetRendering",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactorySubMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactorySubMesh_SetRendering" "', argument " "1"" of type '" "iAnimatedMeshFactorySubMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactorySubMesh * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshFactorySubMesh_SetRendering" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  (arg1)->SetRendering(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_IsRendering(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactorySubMesh *arg1 = (iAnimatedMeshFactorySubMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactorySubMesh_IsRendering",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactorySubMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactorySubMesh_IsRendering" "', argument " "1"" of type '" "iAnimatedMeshFactorySubMesh const *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactorySubMesh * >(argp1);
+  result = (bool)((iAnimatedMeshFactorySubMesh const *)arg1)->IsRendering();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_SetRenderPriority(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactorySubMesh *arg1 = (iAnimatedMeshFactorySubMesh *) 0 ;
+  CS::Graphics::RenderPriority arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactorySubMesh_SetRenderPriority",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactorySubMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactorySubMesh_SetRenderPriority" "', argument " "1"" of type '" "iAnimatedMeshFactorySubMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactorySubMesh * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshFactorySubMesh_SetRenderPriority" "', argument " "2"" of type '" "CS::Graphics::RenderPriority""'");
+  } 
+  arg2 = static_cast< CS::Graphics::RenderPriority >(val2);
+  (arg1)->SetRenderPriority(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_GetRenderPriority(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactorySubMesh *arg1 = (iAnimatedMeshFactorySubMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  CS::Graphics::RenderPriority result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactorySubMesh_GetRenderPriority",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactorySubMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactorySubMesh_GetRenderPriority" "', argument " "1"" of type '" "iAnimatedMeshFactorySubMesh const *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactorySubMesh * >(argp1);
+  result = (CS::Graphics::RenderPriority)((iAnimatedMeshFactorySubMesh const *)arg1)->GetRenderPriority();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_SetZBufMode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactorySubMesh *arg1 = (iAnimatedMeshFactorySubMesh *) 0 ;
+  csZBufMode arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactorySubMesh_SetZBufMode",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactorySubMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactorySubMesh_SetZBufMode" "', argument " "1"" of type '" "iAnimatedMeshFactorySubMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactorySubMesh * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshFactorySubMesh_SetZBufMode" "', argument " "2"" of type '" "csZBufMode""'");
+  } 
+  arg2 = static_cast< csZBufMode >(val2);
+  (arg1)->SetZBufMode(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_GetZBufMode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedMeshFactorySubMesh *arg1 = (iAnimatedMeshFactorySubMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csZBufMode result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactorySubMesh_GetZBufMode",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedMeshFactorySubMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactorySubMesh_GetZBufMode" "', argument " "1"" of type '" "iAnimatedMeshFactorySubMesh const *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedMeshFactorySubMesh * >(argp1);
+  result = (csZBufMode)((iAnimatedMeshFactorySubMesh const *)arg1)->GetZBufMode();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iAnimatedMeshFactorySubMesh_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -40599,6 +40755,67 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iTerrainSystem_AddCell(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainSystem *arg1 = (iTerrainSystem *) 0 ;
+  iTerrainFactoryCell *arg2 = (iTerrainFactoryCell *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  iTerrainCell *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_AddCell",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_AddCell" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iTerrainFactoryCell, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainSystem_AddCell" "', argument " "2"" of type '" "iTerrainFactoryCell *""'"); 
+  }
+  arg2 = reinterpret_cast< iTerrainFactoryCell * >(argp2);
+  result = (iTerrainCell *)(arg1)->AddCell(arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainSystem_RemoveCell(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainSystem *arg1 = (iTerrainSystem *) 0 ;
+  iTerrainCell *arg2 = (iTerrainCell *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_RemoveCell",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_RemoveCell" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainSystem_RemoveCell" "', argument " "2"" of type '" "iTerrainCell *""'"); 
+  }
+  arg2 = reinterpret_cast< iTerrainCell * >(argp2);
+  (arg1)->RemoveCell(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iTerrainSystem_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -43533,6 +43750,36 @@ fail:
     "  Possible C/C++ prototypes are:\n"
     "    GetCell(iTerrainFactory *,size_t)\n"
     "    GetCell(iTerrainFactory *,char const *)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainFactory_RemoveCell(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainFactory *arg1 = (iTerrainFactory *) 0 ;
+  iTerrainFactoryCell *arg2 = (iTerrainFactoryCell *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactory_RemoveCell",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactory_RemoveCell" "', argument " "1"" of type '" "iTerrainFactory *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainFactory * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iTerrainFactoryCell, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainFactory_RemoveCell" "', argument " "2"" of type '" "iTerrainFactoryCell *""'"); 
+  }
+  arg2 = reinterpret_cast< iTerrainFactoryCell * >(argp2);
+  (arg1)->RemoveCell(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -49591,6 +49838,12 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iAnimatedMeshFactorySubMesh_GetMaterial", _wrap_iAnimatedMeshFactorySubMesh_GetMaterial, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_SetMaterial", _wrap_iAnimatedMeshFactorySubMesh_SetMaterial, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_GetName", _wrap_iAnimatedMeshFactorySubMesh_GetName, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactorySubMesh_SetRendering", _wrap_iAnimatedMeshFactorySubMesh_SetRendering, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactorySubMesh_IsRendering", _wrap_iAnimatedMeshFactorySubMesh_IsRendering, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactorySubMesh_SetRenderPriority", _wrap_iAnimatedMeshFactorySubMesh_SetRenderPriority, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactorySubMesh_GetRenderPriority", _wrap_iAnimatedMeshFactorySubMesh_GetRenderPriority, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactorySubMesh_SetZBufMode", _wrap_iAnimatedMeshFactorySubMesh_SetZBufMode, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactorySubMesh_GetZBufMode", _wrap_iAnimatedMeshFactorySubMesh_GetZBufMode, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_scfGetVersion", _wrap_iAnimatedMeshFactorySubMesh_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iAnimatedMeshFactorySubMesh", _wrap_delete_iAnimatedMeshFactorySubMesh, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactorySubMesh_swigregister", iAnimatedMeshFactorySubMesh_swigregister, METH_VARARGS, NULL},
@@ -50325,6 +50578,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTerrainSystem_RemoveCellLoadListener", _wrap_iTerrainSystem_RemoveCellLoadListener, METH_VARARGS, NULL},
 	 { (char *)"iTerrainSystem_AddCellHeightUpdateListener", _wrap_iTerrainSystem_AddCellHeightUpdateListener, METH_VARARGS, NULL},
 	 { (char *)"iTerrainSystem_RemoveCellHeightUpdateListener", _wrap_iTerrainSystem_RemoveCellHeightUpdateListener, METH_VARARGS, NULL},
+	 { (char *)"iTerrainSystem_AddCell", _wrap_iTerrainSystem_AddCell, METH_VARARGS, NULL},
+	 { (char *)"iTerrainSystem_RemoveCell", _wrap_iTerrainSystem_RemoveCell, METH_VARARGS, NULL},
 	 { (char *)"iTerrainSystem_scfGetVersion", _wrap_iTerrainSystem_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTerrainSystem", _wrap_delete_iTerrainSystem, METH_VARARGS, NULL},
 	 { (char *)"iTerrainSystem_swigregister", iTerrainSystem_swigregister, METH_VARARGS, NULL},
@@ -50406,6 +50661,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTerrainFactory_GetDefaultCell", _wrap_iTerrainFactory_GetDefaultCell, METH_VARARGS, NULL},
 	 { (char *)"iTerrainFactory_AddCell", _wrap_iTerrainFactory_AddCell, METH_VARARGS, NULL},
 	 { (char *)"iTerrainFactory_GetCell", _wrap_iTerrainFactory_GetCell, METH_VARARGS, NULL},
+	 { (char *)"iTerrainFactory_RemoveCell", _wrap_iTerrainFactory_RemoveCell, METH_VARARGS, NULL},
 	 { (char *)"iTerrainFactory_scfGetVersion", _wrap_iTerrainFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTerrainFactory", _wrap_delete_iTerrainFactory, METH_VARARGS, NULL},
 	 { (char *)"iTerrainFactory_swigregister", iTerrainFactory_swigregister, METH_VARARGS, NULL},

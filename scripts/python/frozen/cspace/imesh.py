@@ -721,6 +721,12 @@ class iAnimatedMeshFactorySubMesh(core.iBase):
     def GetMaterial(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetMaterial(*args)
     def SetMaterial(*args): return _imesh.iAnimatedMeshFactorySubMesh_SetMaterial(*args)
     def GetName(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetName(*args)
+    def SetRendering(*args): return _imesh.iAnimatedMeshFactorySubMesh_SetRendering(*args)
+    def IsRendering(*args): return _imesh.iAnimatedMeshFactorySubMesh_IsRendering(*args)
+    def SetRenderPriority(*args): return _imesh.iAnimatedMeshFactorySubMesh_SetRenderPriority(*args)
+    def GetRenderPriority(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetRenderPriority(*args)
+    def SetZBufMode(*args): return _imesh.iAnimatedMeshFactorySubMesh_SetZBufMode(*args)
+    def GetZBufMode(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetZBufMode(*args)
     scfGetVersion = staticmethod(_imesh.iAnimatedMeshFactorySubMesh_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iAnimatedMeshFactorySubMesh
     __del__ = lambda self : None;
@@ -1964,6 +1970,8 @@ class iTerrainSystem(core.iBase):
     def RemoveCellLoadListener(*args): return _imesh.iTerrainSystem_RemoveCellLoadListener(*args)
     def AddCellHeightUpdateListener(*args): return _imesh.iTerrainSystem_AddCellHeightUpdateListener(*args)
     def RemoveCellHeightUpdateListener(*args): return _imesh.iTerrainSystem_RemoveCellHeightUpdateListener(*args)
+    def AddCell(*args): return _imesh.iTerrainSystem_AddCell(*args)
+    def RemoveCell(*args): return _imesh.iTerrainSystem_RemoveCell(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainSystem_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainSystem
     __del__ = lambda self : None;
@@ -2072,6 +2080,7 @@ class iTerrainFactory(core.iBase):
     def GetDefaultCell(*args): return _imesh.iTerrainFactory_GetDefaultCell(*args)
     def AddCell(*args): return _imesh.iTerrainFactory_AddCell(*args)
     def GetCell(*args): return _imesh.iTerrainFactory_GetCell(*args)
+    def RemoveCell(*args): return _imesh.iTerrainFactory_RemoveCell(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainFactory
     __del__ = lambda self : None;

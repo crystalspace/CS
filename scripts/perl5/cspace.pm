@@ -994,6 +994,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetAlwaysRunNow = *cspacec::iThreadManager_SetAlwaysRunNow;
 *GetAlwaysRunNow = *cspacec::iThreadManager_GetAlwaysRunNow;
 *Exiting = *cspacec::iThreadManager_Exiting;
+*ProcessAll = *cspacec::iThreadManager_ProcessAll;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15539,6 +15540,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_GetMaterial;
 *SetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_SetMaterial;
 *GetName = *cspacec::iAnimatedMeshFactorySubMesh_GetName;
+*SetRendering = *cspacec::iAnimatedMeshFactorySubMesh_SetRendering;
+*IsRendering = *cspacec::iAnimatedMeshFactorySubMesh_IsRendering;
+*SetRenderPriority = *cspacec::iAnimatedMeshFactorySubMesh_SetRenderPriority;
+*GetRenderPriority = *cspacec::iAnimatedMeshFactorySubMesh_GetRenderPriority;
+*SetZBufMode = *cspacec::iAnimatedMeshFactorySubMesh_SetZBufMode;
+*GetZBufMode = *cspacec::iAnimatedMeshFactorySubMesh_GetZBufMode;
 *scfGetVersion = *cspacec::iAnimatedMeshFactorySubMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -18179,6 +18186,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveCellLoadListener = *cspacec::iTerrainSystem_RemoveCellLoadListener;
 *AddCellHeightUpdateListener = *cspacec::iTerrainSystem_AddCellHeightUpdateListener;
 *RemoveCellHeightUpdateListener = *cspacec::iTerrainSystem_RemoveCellHeightUpdateListener;
+*AddCell = *cspacec::iTerrainSystem_AddCell;
+*RemoveCell = *cspacec::iTerrainSystem_RemoveCell;
 *scfGetVersion = *cspacec::iTerrainSystem_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -18350,6 +18359,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetDefaultCell = *cspacec::iTerrainFactory_GetDefaultCell;
 *AddCell = *cspacec::iTerrainFactory_AddCell;
 *GetCell = *cspacec::iTerrainFactory_GetCell;
+*RemoveCell = *cspacec::iTerrainFactory_RemoveCell;
 *scfGetVersion = *cspacec::iTerrainFactory_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
