@@ -29,6 +29,7 @@
 #include "csutil/ref.h"
 #include "csutil/scf_interface.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/weakref.h"
 #include "iutil/databuff.h"
 #include "iutil/job.h"
 
@@ -151,11 +152,11 @@ protected:
   {
   public:
     /// The actual image loader.
-    csRef<iImageFileLoader> currentLoader;
+    csWeakRef<csCommonImageFile> fileToLoad;
     /// Result of the iImageFileLoader::LoadData() call.
     bool loadResult;
     /// Create new instance with a given image loader.
-    LoaderJob (iImageFileLoader* loader);
+    LoaderJob (csCommonImageFile* fileToLoad);
     virtual ~LoaderJob();
 
     virtual void Run();
@@ -167,10 +168,9 @@ protected:
   mutable csRef<LoaderJob> loadJob;
   /// Reference to job queue.
   mutable csRef<iJobQueue> jobQueue;
-#else
+#endif
   // This is mutable so MakeImageData() can be called.
   mutable csRef<iImageFileLoader> currentLoader;
-#endif
   iObjectRegistry* object_reg;
 
   csCommonImageFile (iObjectRegistry* object_reg, int format);
@@ -199,9 +199,9 @@ protected:
   virtual bool HasKeyColor () const 
   { 
 #ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
-    if (loadJob)
+    if (currentLoader)
     {
-      return loadJob->currentLoader->HasKeyColor();
+      return currentLoader->HasKeyColor();
     }
 #endif
     return has_keycolour; 
@@ -210,11 +210,11 @@ protected:
   virtual void GetKeyColor (int &r, int &g, int &b) const
   { 
 #ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
-    if (loadJob)
+    if (currentLoader)
     {
       // Keycolor may only be available after loading...
       WaitForJob();
-      loadJob->currentLoader->GetKeyColor (r, g, b);
+      currentLoader->GetKeyColor (r, g, b);
       return;
     }
 #endif

@@ -77,8 +77,8 @@ void csCommonImageFileLoader::ApplyTo (csImageMemory* image)
 
 //---------------------------------------------------------------------------
 
-csCommonImageFile::LoaderJob::LoaderJob (iImageFileLoader* loader) 
-  : scfImplementationType (this), currentLoader (loader)
+csCommonImageFile::LoaderJob::LoaderJob (csCommonImageFile* fileToLoad) 
+  : scfImplementationType (this), fileToLoad (fileToLoad)
 {
 }
 
@@ -88,6 +88,13 @@ csCommonImageFile::LoaderJob::~LoaderJob()
 
 void csCommonImageFile::LoaderJob::Run()
 {
+  csRef<iImageFileLoader> currentLoader;
+  {
+    csRef<csCommonImageFile> fileToLoad (this->fileToLoad);
+    if (!fileToLoad.IsValid()) return;
+    currentLoader = fileToLoad->currentLoader;
+    if (!currentLoader.IsValid()) return;
+  }
   loadResult = currentLoader->LoadData ();
 }
 
@@ -121,9 +128,6 @@ csCommonImageFile::~csCommonImageFile()
 #include "csutil/custom_new_disable.h"
 bool csCommonImageFile::Load (csRef<iDataBuffer> source)
 {
-#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
-  csRef<iImageFileLoader> currentLoader;
-#endif
   currentLoader = InitLoader (source);
   if (!currentLoader.IsValid()) return false;
   const uint format = currentLoader->GetFormat();
@@ -134,7 +138,7 @@ bool csCommonImageFile::Load (csRef<iDataBuffer> source)
   CS_ASSERT ((w != 0) && (h != 0));
   SetDimensions (w, h);
 #ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
-  loadJob.AttachNew (new LoaderJob (currentLoader));
+  loadJob.AttachNew (new LoaderJob (this));
   jobQueue->Enqueue (loadJob);
   return true;
 #else
@@ -158,7 +162,8 @@ void csCommonImageFile::MakeImageData() const
     WaitForJob();
     // Ugly ugly ugly so we can call ApplyTo()...
     csImageMemory* thisNonConst = const_cast<csCommonImageFile*> (this);
-    loadJob->currentLoader->ApplyTo (thisNonConst);
+    currentLoader->ApplyTo (thisNonConst);
+    currentLoader = 0;
     loadJob = 0;
     jobQueue = 0;
   }
@@ -211,7 +216,6 @@ const char* csCommonImageFile::GetRawFormat() const
 #ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
   if (!loadJob) return 0;
   //WaitForJob();
-  csRef<iImageFileLoader> currentLoader (loadJob->currentLoader);
 #endif
   if (currentLoader.IsValid())
   {
@@ -224,11 +228,9 @@ const char* csCommonImageFile::GetRawFormat() const
 
 csRef<iDataBuffer> csCommonImageFile::GetRawData() const
 {
-  csRef<iDataBuffer> d;
 #ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
-  if (!loadJob) return d;
+  if (!loadJob) return csRef<iDataBuffer> ();
   WaitForJob();
-  csRef<iImageFileLoader> currentLoader (loadJob->currentLoader);
 #endif
   if (currentLoader.IsValid()
     && (DataTypeString (currentLoader->GetDataType()) != 0))
