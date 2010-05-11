@@ -43,6 +43,9 @@ public:
 
   void Process(uint num = 1);
   bool Wait(csRefArray<iThreadReturn>& threadReturns, bool process = true);
+  
+  /// Process all pending events
+  void ProcessAll ();
 
   inline void PushToQueue(QueueType queueType, iJob* job)
   {

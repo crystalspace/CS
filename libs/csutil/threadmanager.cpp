@@ -170,3 +170,10 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool proces
 
   return success;
 }
+
+void csThreadManager::ProcessAll ()
+{
+  threadQueue->WaitAll ();
+  listQueue->ProcessAll ();  
+}
+
