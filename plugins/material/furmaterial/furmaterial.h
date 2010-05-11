@@ -21,7 +21,7 @@
 
 #include <iutil/comp.h>
 #include <csgeom/vector3.h>
-#include <imaterial/furinterf.h>
+#include <imaterial/furmaterial.h>
 #include <csgfx/shadervarcontext.h>
 
 #include "csutil/scf_implementation.h"

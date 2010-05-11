@@ -27,7 +27,7 @@
 #include "ivaria/bullet.h"
 #include "ivaria/dynamicsdebug.h"
 
-#include "imaterial/furinterf.h"
+#include "imaterial/furmaterial.h"
 
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
