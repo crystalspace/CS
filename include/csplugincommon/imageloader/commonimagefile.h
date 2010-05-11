@@ -135,7 +135,7 @@ public:
   }
 };
 
-#define THREADED_LOADING
+#define CSCOMMONIMAGEFILE_THREADED_LOADING
 
 /**
  * A base class for image loader plugin iImage implementations.
@@ -161,7 +161,7 @@ protected:
     virtual void Run();
   };
 
-#ifdef THREADED_LOADING
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
   /// Reference to the job for loading this image.
   // This and jobQueue are mutable so MakeImageData() can be called.
   mutable csRef<LoaderJob> loadJob;
@@ -198,7 +198,7 @@ protected:
 
   virtual bool HasKeyColor () const 
   { 
-#ifdef THREADED_LOADING
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
     if (loadJob)
     {
       return loadJob->currentLoader->HasKeyColor();
@@ -209,7 +209,7 @@ protected:
 
   virtual void GetKeyColor (int &r, int &g, int &b) const
   { 
-#ifdef THREADED_LOADING
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
     if (loadJob)
     {
       // Keycolor may only be available after loading...
