@@ -34,6 +34,7 @@ CSUTIL.GENERIC +=
   findlib.cpp
   getopt.cpp
   loadlib.cpp
+  memutil_impl_virtsize.cpp
   mmap.cpp
   pathutil.cpp
   platformconfig.cpp 

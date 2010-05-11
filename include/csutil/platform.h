@@ -32,6 +32,13 @@ namespace CS {
      */
    CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemorySize();
 
+  /**
+   * Retrieve the maximum number of KiB of virtual address space available to the
+   * process.
+   * \returns Virtual address space size (in KiB) on success, or 0 on failure.
+   */
+  CS_CRYSTALSPACE_EXPORT size_t GetMaxVirtualSize();
+
    /**
     * Retrieve the number of processors in the system.
     * \returns Number of processors, or 0 on failure.

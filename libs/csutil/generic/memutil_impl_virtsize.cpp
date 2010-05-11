@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 by Scott Johnson <scottj@cs.umn.edu>
+Copyright (C) 2010 by Frank Richter
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -16,29 +16,24 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
-#include "csutil/platform.h"
 #include "../memutil.h"
 
 namespace CS {
   namespace Platform {
     namespace Implementation {
 
-      size_t GetPhysicalMemorySize ()
+      size_t GetMaxVirtualSize()
       {
-        MEMORYSTATUSEX memAmount;
-        memAmount.dwLength = sizeof(memAmount);
-        GlobalMemoryStatusEx (&memAmount);
-        return (memAmount.ullTotalPhys / 1024); 
+	// Guess available virtual address space ...
+      #if CS_PROCESSOR_SIZE == 32
+	// 32-bit: 2GiB virtual address space
+	return 2 * 1024 * 1024;
+      #else
+	// 64-bit: 8TiB virtual address space
+	return 8 * 1024 * 1024 * 1024;
+      #endif
       }
 
-      size_t GetMaxVirtualSize ()
-      {
-        MEMORYSTATUSEX memAmount;
-        memAmount.dwLength = sizeof(memAmount);
-        GlobalMemoryStatusEx (&memAmount);
-        return (memAmount.ullTotalVirtual / 1024); 
-      }
     } // End namespace Implementation
   } // End namespace Platform
 } // End namespace CS
