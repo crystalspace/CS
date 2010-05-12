@@ -18,6 +18,8 @@
 #ifndef __HAIRTEST_H__
 #define __HAIRTEST_H__
 
+#include "crystalspace.h"
+
 #include "cstool/csdemoapplication.h"
 #include "imesh/animesh.h"
 #include "imesh/ragdoll.h"
@@ -28,6 +30,8 @@
 #include "ivaria/dynamicsdebug.h"
 
 #include "imaterial/furmaterial.h"
+
+#include "ivaria/icegui.h"
 
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
@@ -92,6 +96,10 @@ private:
   csRef<iFurMaterialType> furMaterialType;
   csRef<iFurMaterial> furMaterial;
 
+  // GUI related
+  csRef<iVFS> vfs;
+  csRef<iCEGUI> cegui;
+
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
@@ -101,9 +109,19 @@ private:
   HairTest ();
   ~HairTest ();
 
+  // Handle exit button clicked event
+  bool OnExitButtonClicked (const CEGUI::EventArgs& e);
+  
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();
+
+  // Declare the name of this event handler.
+  CS_EVENTHANDLER_NAMES("application.hairtest")
+      
+  /* Declare that we're not terribly interested in having events
+     delivered to us before or after other modules, plugins, etc. */
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __HAIRTEST_H__

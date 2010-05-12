@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+    <Window Type="DefaultWindow" Name="root">
+        <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Window Type="ice/FrameWindow" Name="HairTest/MainWindow" >
+            <Property Name="Text" Value="HairTest - MainWindow" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{0.2,0}}" />
+            <Property Name="UnifiedMinSize" Value="{{1,0},{0.2,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+            <Property Name="CloseButtonEnabled" Value="True" />
+            <Window Type="ice/Button" Name="HairTest/MainWindow/Quit" >
+                <Property Name="Text" Value="Exit Demo" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.1,0},{0.99,0},{0.3,0}}" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

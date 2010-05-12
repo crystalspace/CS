@@ -30,6 +30,7 @@ HairTest::HairTest ()
 {
   // We manage the camera by ourselves
   SetCameraMode (CSDEMO_CAMERA_NONE);
+  SetGUIDisplayed(false);
 }
 
 HairTest::~HairTest ()
@@ -120,6 +121,16 @@ void HairTest::Frame ()
 
   // Default behavior from csDemoApplication
   csDemoApplication::Frame ();
+
+  cegui->Render ();
+}
+
+bool HairTest::OnExitButtonClicked (const CEGUI::EventArgs&)
+{
+	csRef<iEventQueue> q =
+		csQueryRegistry<iEventQueue> (GetObjectRegistry());
+	if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+	return true;
 }
 
 bool HairTest::OnKeyboard (iEvent &ev)
@@ -177,11 +188,12 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     return false;
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
+	CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
 		       iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
 		       iSkeletonBasicNodesManager2),
 	CS_REQUEST_PLUGIN("crystalspace.material.furmaterial", iFurMaterialType),
+	CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -257,10 +269,45 @@ bool HairTest::Application ()
   furMaterialType = csQueryRegistry<iFurMaterialType> (GetObjectRegistry ());
   if (!furMaterialType)
     return ReportError("Failed to locate iFurMaterialType plugin!");
-
+/*
   furMaterial = furMaterialType->CreateFurMaterial("hair");
   furMaterial->DoSomething (1, csVector3 (2, 3, 4));
   printf ("%d\n", furMaterial->GetSomething ());
+*/
+  cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
+  if (!cegui) return ReportError("Failed to locate CEGUI plugin!");
+
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+  if (!vfs) return ReportError("Failed to locate VFS!");
+
+  // Initialize GUI
+
+  // Initialize CEGUI wrapper
+  cegui->Initialize ();
+
+  // Set the logging level
+  cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
+
+  vfs->ChDir ("/cegui/");
+
+  // Load the ice skin (which uses Falagard skinning system)
+  cegui->GetSchemeManagerPtr ()->create("ice.scheme");
+
+  cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
+
+  cegui->GetFontManagerPtr ()->createFreeTypeFont("DejaVuSans", 10, true, "/fonts/ttf/DejaVuSans.ttf");
+
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  // Load layout and set as root
+  vfs->ChDir ("/hairtest/");
+  cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("ice.layout"));
+
+  // Subscribe to the clicked event for the exit button
+  CEGUI::Window* btn = winMgr->getWindow("HairTest/MainWindow/Quit");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+	  CEGUI::Event::Subscriber(&HairTest::OnExitButtonClicked, this));
+
 
   // Default behavior from csDemoApplication for the creation of the scene
   if (!csDemoApplication::CreateRoom ())
