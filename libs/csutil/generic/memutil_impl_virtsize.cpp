@@ -30,7 +30,7 @@ namespace CS {
 	return 2 * 1024 * 1024;
       #else
 	// 64-bit: 8TiB virtual address space
-	return 8 * 1024 * 1024 * 1024;
+	return 8 * size_t (1024 * 1024 * 1024);
       #endif
       }
 
