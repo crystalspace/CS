@@ -48,7 +48,8 @@ void HairTest::Frame ()
   
   // Rotate by angle
   const float angle = 4 * speed;
-  
+
+
   // Compute camera and animesh position
   iCamera* camera = view->GetCamera ();
   csVector3 cameraPosition = camera->GetTransform ().GetOrigin ();
@@ -127,10 +128,42 @@ void HairTest::Frame ()
 
 bool HairTest::OnExitButtonClicked (const CEGUI::EventArgs&)
 {
-	csRef<iEventQueue> q =
-		csQueryRegistry<iEventQueue> (GetObjectRegistry());
-	if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
-	return true;
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (GetObjectRegistry());
+  if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+  return true;
+}
+
+bool HairTest::OnCollidersButtonClicked (const CEGUI::EventArgs&)
+{
+  SwitchDynamics();
+  return true;
+}
+
+void HairTest::SwitchDynamics()
+{
+  csRef<iMeshObject> animeshObject = 
+	scfQueryInterface<iMeshObject> (avatarScene->animesh);
+
+  if (dynamicsDebugMode == DYNDEBUG_NONE)
+  {
+	dynamicsDebugMode = DYNDEBUG_MIXED;
+	dynamicsDebugger->SetDebugDisplayMode (true);
+	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
+  }
+
+  else if (dynamicsDebugMode == DYNDEBUG_MIXED)
+  {
+	dynamicsDebugMode = DYNDEBUG_COLLIDER;
+	dynamicsDebugger->SetDebugDisplayMode (true);
+	animeshObject->GetMeshWrapper ()->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH);
+  }
+
+  else if (dynamicsDebugMode == DYNDEBUG_COLLIDER)
+  {
+	dynamicsDebugMode = DYNDEBUG_NONE;
+	dynamicsDebugger->SetDebugDisplayMode (false);
+	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
+  }
 }
 
 bool HairTest::OnKeyboard (iEvent &ev)
@@ -145,30 +178,7 @@ bool HairTest::OnKeyboard (iEvent &ev)
     if (csKeyEventHelper::GetCookedCode (&ev) == 'd'
 	     && physicsEnabled && avatarScene->HasPhysicalObjects ())
     {
-      csRef<iMeshObject> animeshObject =
-	scfQueryInterface<iMeshObject> (avatarScene->animesh);
-
-      if (dynamicsDebugMode == DYNDEBUG_NONE)
-      {
-	dynamicsDebugMode = DYNDEBUG_MIXED;
-	dynamicsDebugger->SetDebugDisplayMode (true);
-	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
-      }
-
-      else if (dynamicsDebugMode == DYNDEBUG_MIXED)
-      {
-	dynamicsDebugMode = DYNDEBUG_COLLIDER;
-	dynamicsDebugger->SetDebugDisplayMode (true);
-	animeshObject->GetMeshWrapper ()->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH);
-      }
-
-      else if (dynamicsDebugMode == DYNDEBUG_COLLIDER)
-      {
-	dynamicsDebugMode = DYNDEBUG_NONE;
-	dynamicsDebugger->SetDebugDisplayMode (false);
-	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
-      }
-
+	  SwitchDynamics();
       return true;
     }
   }
@@ -178,7 +188,33 @@ bool HairTest::OnKeyboard (iEvent &ev)
 
 bool HairTest::OnMouseDown (iEvent& ev)
 {
+  uint button = csMouseEventHelper::GetButton (&ev);
+  switch (button)
+  {
+  case csmbRight:
+    mouseMovement = true;
+	break;
+  }
+
   return avatarScene->OnMouseDown (ev);
+}
+
+bool HairTest::OnMouseUp (iEvent& ev)
+{
+  uint button = csMouseEventHelper::GetButton (&ev);
+  switch (button)
+  {
+  case csmbRight:
+    mouseMovement = false;
+	break;
+  }
+
+  return false;
+}
+
+bool HairTest::OnMouseMove (iEvent& ev)
+{
+  return false;
 }
 
 bool HairTest::OnInitialize (int argc, char* argv[])
@@ -205,6 +241,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
   csRef<iCommandLineParser> clp =
     csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
   physicsEnabled = true;
+  mouseMovement = false;
 
   while (physicsEnabled)
   {
@@ -308,6 +345,9 @@ bool HairTest::Application ()
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
 	  CEGUI::Event::Subscriber(&HairTest::OnExitButtonClicked, this));
 
+  winMgr->getWindow("HairTest/MainWindow/Colliders") 
+	  -> subscribeEvent(CEGUI::PushButton::EventClicked,
+	  CEGUI::Event::Subscriber(&HairTest::OnCollidersButtonClicked, this));
 
   // Default behavior from csDemoApplication for the creation of the scene
   if (!csDemoApplication::CreateRoom ())

@@ -36,7 +36,6 @@ KrystalScene::KrystalScene (HairTest* hairTest)
   {
     hairTest->keyDescriptions.Push ("d: display active colliders");
   }
-  hairTest->keyDescriptions.Push ("r: reset scene");
 }
 
 KrystalScene::~KrystalScene ()
@@ -124,17 +123,6 @@ void KrystalScene::Frame ()
 
 bool KrystalScene::OnKeyboard (iEvent &ev)
 {
-  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
-  if (eventtype == csKeyEventTypeDown)
-  {
-    // Reset of the scene
-    if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
-    {
-      ResetScene ();
-      return true;
-    }
-  }
-
   return false;
 }
 

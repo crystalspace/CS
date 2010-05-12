@@ -8,11 +8,16 @@
             <Property Name="UnifiedMaxSize" Value="{{1,0},{0.2,0}}" />
             <Property Name="UnifiedMinSize" Value="{{1,0},{0.2,0}}" />
             <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
-            <Property Name="CloseButtonEnabled" Value="True" />
+            <Property Name="CloseButtonEnabled" Value="False" />
             <Window Type="ice/Button" Name="HairTest/MainWindow/Quit" >
-                <Property Name="Text" Value="Exit Demo" />
+                <Property Name="Text" Value="Exit" />
                 <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
                 <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.1,0},{0.99,0},{0.3,0}}" />
+            </Window>
+            <Window Type="ice/Button" Name="HairTest/MainWindow/Colliders" >
+              <Property Name="Text" Value="Colliders" />
+              <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+              <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.1,0},{0.1,0},{0.3,0}}" />
             </Window>
         </Window>
     </Window>

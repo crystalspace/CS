@@ -56,7 +56,7 @@ class AvatarScene
   virtual void Frame () = 0;
   virtual bool OnKeyboard (iEvent &event) = 0;
   virtual bool OnMouseDown (iEvent &event) = 0;
-
+  
   // Creation of objects
   virtual bool CreateAvatar () = 0;
 
@@ -100,17 +100,26 @@ private:
   csRef<iVFS> vfs;
   csRef<iCEGUI> cegui;
 
+  bool mouseMovement;
+
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
+  bool OnMouseUp (iEvent &event);
+  bool OnMouseMove (iEvent &event);
 
- public:
+  int lastMouseX, lastMouseY;
+
+  // Switch Active Colliders displayed
+  void SwitchDynamics();
+public:
   HairTest ();
   ~HairTest ();
 
   // Handle exit button clicked event
   bool OnExitButtonClicked (const CEGUI::EventArgs& e);
+  bool OnCollidersButtonClicked (const CEGUI::EventArgs& e);
   
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);
