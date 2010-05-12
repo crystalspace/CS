@@ -66,6 +66,8 @@ VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 VFS.Mount.cegui  			= $@(CS_DATADIR)$/cegui$/
 ; CEgui test
 VFS.Mount.ceguitest  	= $@(CS_DATADIR)$/ceguitest$/
+; CEgui hairtest
+VFS.Mount.hairtest  	= $@(CS_DATADIR)$/hairtest$/
 ; Viewmesh
 VFS.Mount.viewmesh   	= $@(CS_DATADIR)$/viewmesh$/
 ; Simpvs
