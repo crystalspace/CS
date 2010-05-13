@@ -37,6 +37,7 @@ namespace Threading
 
 namespace Implementation
 {
+  class ThreadLocalBase;
 
   // Thread base-class for win32
   class CS_CRYSTALSPACE_EXPORT ThreadBase : public CS::Utility::AtomicRefCount
