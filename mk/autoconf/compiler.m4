@@ -270,7 +270,7 @@ AC_DEFUN([CS_PROG_LINK],[
 	[AC_HELP_STRING([--large-address-aware],
 	    [Utilize --large-address-aware linker flag (default YES)])])
     AS_IF([test -z "$enable_large_address_aware"], 
-	[enable_gc_sections=yes])
+	[enable_large_address_aware=yes])
     AS_IF([test "$enable_large_address_aware" != "no"],
 	[CS_EMIT_BUILD_FLAGS([if --large-address-aware is supported], 
 	    [cs_cv_prog_link_large_address_aware], 
