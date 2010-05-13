@@ -19,6 +19,12 @@
 #include "cssysdef.h"
 #include "csgeom/plane3.h"
 
+#include "csutil/custom_new_disable.h"
+#include <CEGUI.h>
+#include <CEGUIWindowManager.h>
+#include <CEGUILogger.h>
+#include "csutil/custom_new_enable.h"
+
 #include "hairtest.h"
 #include "krystal.h"
 
@@ -48,7 +54,6 @@ void HairTest::Frame ()
   
   // Rotate by angle
   const float angle = 4 * speed;
-
 
   // Compute camera and animesh position
   iCamera* camera = view->GetCamera ();
@@ -113,9 +118,6 @@ void HairTest::Frame ()
   // order to achieve a 'slow motion' effect)
   if (physicsEnabled)
     dynamics->Step (speed * avatarScene->GetSimulationSpeed ());
-
-  // Update the avatar
-  avatarScene->Frame ();
 
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
@@ -183,38 +185,25 @@ bool HairTest::OnKeyboard (iEvent &ev)
     }
   }
 
-  return avatarScene->OnKeyboard (ev);
+  return false;
 }
 
 bool HairTest::OnMouseDown (iEvent& ev)
-{
-  uint button = csMouseEventHelper::GetButton (&ev);
-  switch (button)
-  {
-  case csmbRight:
-    mouseMovement = true;
-	break;
-  }
-
-  return avatarScene->OnMouseDown (ev);
+{ 
+  bool result = csDemoApplication::OnMouseDown(ev);
+  return result;
 }
 
 bool HairTest::OnMouseUp (iEvent& ev)
 {
-  uint button = csMouseEventHelper::GetButton (&ev);
-  switch (button)
-  {
-  case csmbRight:
-    mouseMovement = false;
-	break;
-  }
-
-  return false;
+  bool result = csDemoApplication::OnMouseUp(ev);
+  return result;
 }
 
 bool HairTest::OnMouseMove (iEvent& ev)
 {
-  return false;
+  bool result = csDemoApplication::OnMouseMove(ev);
+  return result;
 }
 
 bool HairTest::OnInitialize (int argc, char* argv[])
@@ -241,7 +230,6 @@ bool HairTest::OnInitialize (int argc, char* argv[])
   csRef<iCommandLineParser> clp =
     csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
   physicsEnabled = true;
-  mouseMovement = false;
 
   while (physicsEnabled)
   {
@@ -341,11 +329,11 @@ bool HairTest::Application ()
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("ice.layout"));
 
   // Subscribe to the clicked event for the exit button
-  CEGUI::Window* btn = winMgr->getWindow("HairTest/MainWindow/Quit");
+  CEGUI::Window* btn = winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Quit");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
 	  CEGUI::Event::Subscriber(&HairTest::OnExitButtonClicked, this));
 
-  winMgr->getWindow("HairTest/MainWindow/Colliders") 
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Colliders") 
 	  -> subscribeEvent(CEGUI::PushButton::EventClicked,
 	  CEGUI::Event::Subscriber(&HairTest::OnCollidersButtonClicked, this));
 

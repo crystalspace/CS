@@ -20,6 +20,10 @@
 
 #include "crystalspace.h"
 
+#include "csutil/custom_new_disable.h"
+#include <CEGUI.h>
+#include "csutil/custom_new_enable.h"
+
 #include "cstool/csdemoapplication.h"
 #include "imesh/animesh.h"
 #include "imesh/ragdoll.h"
@@ -52,11 +56,6 @@ class AvatarScene
   virtual float GetSimulationSpeed () = 0;
   virtual bool HasPhysicalObjects () = 0;
 
-  // From csBaseEventHandler
-  virtual void Frame () = 0;
-  virtual bool OnKeyboard (iEvent &event) = 0;
-  virtual bool OnMouseDown (iEvent &event) = 0;
-  
   // Creation of objects
   virtual bool CreateAvatar () = 0;
 
@@ -99,8 +98,6 @@ private:
   // GUI related
   csRef<iVFS> vfs;
   csRef<iCEGUI> cegui;
-
-  bool mouseMovement;
 
   //-- csBaseEventHandler
   void Frame ();

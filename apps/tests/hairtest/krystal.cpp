@@ -117,20 +117,6 @@ bool KrystalScene::HasPhysicalObjects ()
   return true;
 }
 
-void KrystalScene::Frame ()
-{
-}
-
-bool KrystalScene::OnKeyboard (iEvent &ev)
-{
-  return false;
-}
-
-bool KrystalScene::OnMouseDown (iEvent &ev)
-{
-  return false;
-}
-
 bool KrystalScene::CreateAvatar ()
 {
   printf ("Loading Krystal...\n");

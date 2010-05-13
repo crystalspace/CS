@@ -38,11 +38,6 @@ class KrystalScene : public AvatarScene
   float GetSimulationSpeed ();
   bool HasPhysicalObjects ();
 
-  // From csBaseEventHandler
-  void Frame ();
-  bool OnKeyboard (iEvent &event);
-  bool OnMouseDown (iEvent &event);
-
   // Creation of objects
   bool CreateAvatar ();
 
