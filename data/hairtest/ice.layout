@@ -9,6 +9,7 @@
             <Property Name="UnifiedMaxSize" Value="{{1,0},{0.2,0}}" />
             <Property Name="UnifiedMinSize" Value="{{1,0},{0.2,0}}" />
             <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+            <Property Name="SizingEnabled" Value="False"/>
             <Property Name="CloseButtonEnabled" Value="False" />
      
             <Window Type="ice/TabControl" Name="HairTest/MainWindow/Tab" >
@@ -19,18 +20,18 @@
 
                     <Window Type="ice/StaticImage" Name="HairTest/MainWindow/Tab/Page1/Image" >
                         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
-                    </Window>
 
-                    <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Quit" >
-                        <Property Name="Text" Value="Exit" />
-                        <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.1,0},{0.99,0},{0.4,0}}" />
-                    </Window>
-                  
-                    <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Colliders" >
-                        <Property Name="Text" Value="Colliders" />
-                        <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.1,0},{0.1,0},{0.4,0}}" />
-                    </Window>
+                        <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Quit" >
+                            <Property Name="Text" Value="Exit" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.1,0},{0.99,0},{0.4,0}}" />
+                        </Window>
+                      
+                        <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Colliders" >
+                            <Property Name="Text" Value="Colliders" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.1,0},{0.1,0},{0.4,0}}" />
+                        </Window>
 
+                    </Window>
                 </Window>
 
                 <Window Type="DefaultWindow" Name="HairTest/MainWindow/Tab/Page2">
