@@ -56,9 +56,9 @@
  *
  * The relative SVN revision is computed by the script `rcsrev`.
  */
-//CS_RCSREV_OFFSET 19
+//CS_RCSREV_OFFSET 0
 #ifndef CS_VERSION_RCSREV
-#define CS_VERSION_RCSREV	632
+#define CS_VERSION_RCSREV	563
 #endif
 
 /**\name Version number definitions (numeric)
@@ -68,7 +68,7 @@
 /// Minor version (even are stable versions, odd are development versions)
 #define CS_VERSION_NUM_MINOR  	4
 /// Maintenance release
-#define CS_VERSION_NUM_RELEASE	0
+#define CS_VERSION_NUM_RELEASE	1
 /**
  * Build number.
  * (Actually, a version number dependent on the SVN revision this version was

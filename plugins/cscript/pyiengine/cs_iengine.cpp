@@ -11952,7 +11952,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateBaseMaterial(PyObject *SWIGUNUSEDPARM(s
   arg2 = reinterpret_cast< iTextureWrapper * >(argp2);
   result = (arg1)->CreateBaseMaterial(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMaterial> ref((csPtr<iMaterial>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12867,7 +12867,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateLight__SWIG_0(PyObject *SWIGUNUSEDPARM(
   arg6 = static_cast< csLightDynamicType >(val6);
   result = (arg1)->CreateLight((char const *)arg2,(csVector3 const &)*arg3,arg4,(csColor const &)*arg5,arg6);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLight> ref((csPtr<iLight>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12946,7 +12946,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateLight__SWIG_1(PyObject *SWIGUNUSEDPARM(
   arg5 = reinterpret_cast< csColor * >(argp5);
   result = (arg1)->CreateLight((char const *)arg2,(csVector3 const &)*arg3,arg4,(csColor const &)*arg5);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLight> ref((csPtr<iLight>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13228,7 +13228,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetLightIterator__SWIG_0(PyObject *SWIGUNUSED
   arg2 = reinterpret_cast< iBase * >(argp2);
   result = (arg1)->GetLightIterator(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLightIterator> ref((csPtr<iLightIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13262,7 +13262,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetLightIterator__SWIG_1(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< iEngine * >(argp1);
   result = (arg1)->GetLightIterator();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLightIterator> ref((csPtr<iLightIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13345,7 +13345,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetLightIteratorRegion(PyObject *SWIGUNUSEDPA
   arg2 = reinterpret_cast< iRegion * >(argp2);
   result = (arg1)->GetLightIteratorRegion(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLightIterator> ref((csPtr<iLightIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13388,7 +13388,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetLightIteratorCollection__SWIG_0(PyObject *
   arg2 = reinterpret_cast< iCollection * >(argp2);
   result = (arg1)->GetLightIteratorCollection(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLightIterator> ref((csPtr<iLightIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13422,7 +13422,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetLightIteratorCollection__SWIG_1(PyObject *
   arg1 = reinterpret_cast< iEngine * >(argp1);
   result = (arg1)->GetLightIteratorCollection();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLightIterator> ref((csPtr<iLightIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14201,7 +14201,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbySectors__SWIG_0(PyObject *SWIGUNUSED
   arg4 = static_cast< float >(val4);
   result = (arg1)->GetNearbySectors(arg2,(csVector3 const &)*arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSectorIterator> ref((csPtr<iSectorIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14256,7 +14256,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbySectors__SWIG_1(PyObject *SWIGUNUSED
   arg3 = reinterpret_cast< csBox3 * >(argp3);
   result = (arg1)->GetNearbySectors(arg2,(csBox3 const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSectorIterator> ref((csPtr<iSectorIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14509,7 +14509,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_0(PyObject *SWIGUNUSE
   arg5 = reinterpret_cast< csVector3 * >(argp5);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3,arg4,(csVector3 const &)*arg5);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14573,7 +14573,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_1(PyObject *SWIGUNUSE
   arg4 = reinterpret_cast< iSector * >(argp4);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14628,7 +14628,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_2(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14704,7 +14704,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_3(PyObject *SWIGUNUSE
   arg5 = reinterpret_cast< csVector3 * >(argp5);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3,arg4,(csVector3 const &)*arg5);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14768,7 +14768,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_4(PyObject *SWIGUNUSE
   arg4 = reinterpret_cast< iSector * >(argp4);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14823,7 +14823,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_5(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14900,7 +14900,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_6(PyObject *SWIGUNUSE
   arg5 = reinterpret_cast< csVector3 * >(argp5);
   result = (arg1)->CreateMeshWrapper((char const *)arg2,(char const *)arg3,arg4,(csVector3 const &)*arg5);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14967,7 +14967,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_7(PyObject *SWIGUNUSE
   arg4 = reinterpret_cast< iSector * >(argp4);
   result = (arg1)->CreateMeshWrapper((char const *)arg2,(char const *)arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15025,7 +15025,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_8(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateMeshWrapper((char const *)arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15073,7 +15073,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_9(PyObject *SWIGUNUSE
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateMeshWrapper((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15359,7 +15359,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateSectorWallsMesh(PyObject *SWIGUNUSEDPAR
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateSectorWallsMesh(arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15414,7 +15414,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateThingMesh(PyObject *SWIGUNUSEDPARM(self
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateThingMesh(arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15500,7 +15500,7 @@ SWIGINTERN PyObject *_wrap_iEngine_LoadMeshWrapper(PyObject *SWIGUNUSEDPARM(self
   arg6 = reinterpret_cast< csVector3 * >(argp6);
   result = (arg1)->LoadMeshWrapper((char const *)arg2,(char const *)arg3,arg4,arg5,(csVector3 const &)*arg6);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15607,7 +15607,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_0(PyObject *SWIGUNUSEDP
   arg5 = static_cast< bool >(val5);
   result = (arg1)->GetNearbyMeshes(arg2,(csVector3 const &)*arg3,arg4,arg5);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15671,7 +15671,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_1(PyObject *SWIGUNUSEDP
   arg4 = static_cast< float >(val4);
   result = (arg1)->GetNearbyMeshes(arg2,(csVector3 const &)*arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15735,7 +15735,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_2(PyObject *SWIGUNUSEDP
   arg4 = static_cast< bool >(val4);
   result = (arg1)->GetNearbyMeshes(arg2,(csBox3 const &)*arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15790,7 +15790,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_3(PyObject *SWIGUNUSEDP
   arg3 = reinterpret_cast< csBox3 * >(argp3);
   result = (arg1)->GetNearbyMeshes(arg2,(csBox3 const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15866,7 +15866,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_4(PyObject *SWIGUNUSEDP
   arg5 = static_cast< bool >(val5);
   result = (arg1)->GetNearbyMeshes(arg2,(csVector3 const &)*arg3,(csVector3 const &)*arg4,arg5);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15933,7 +15933,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_5(PyObject *SWIGUNUSEDP
   arg4 = reinterpret_cast< csVector3 * >(argp4);
   result = (arg1)->GetNearbyMeshes(arg2,(csVector3 const &)*arg3,(csVector3 const &)*arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -16495,7 +16495,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshFactory__SWIG_0(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateMeshFactory((char const *)arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshFactoryWrapper> ref((csPtr<iMeshFactoryWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -16552,7 +16552,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshFactory__SWIG_1(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateMeshFactory(arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshFactoryWrapper> ref((csPtr<iMeshFactoryWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -16598,7 +16598,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshFactory__SWIG_2(PyObject *SWIGUNUSE
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateMeshFactory((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshFactoryWrapper> ref((csPtr<iMeshFactoryWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -16728,7 +16728,7 @@ SWIGINTERN PyObject *_wrap_iEngine_LoadMeshFactory(PyObject *SWIGUNUSEDPARM(self
   arg4 = reinterpret_cast< iDataBuffer * >(argp4);
   result = (arg1)->LoadMeshFactory((char const *)arg2,(char const *)arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshFactoryWrapper> ref((csPtr<iMeshFactoryWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17205,7 +17205,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetCollections(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iEngine * >(argp1);
   result = (arg1)->GetCollections();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iCollectionArray> ref((csPtr<iCollectionArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17367,7 +17367,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateCamera(PyObject *SWIGUNUSEDPARM(self), 
   arg1 = reinterpret_cast< iEngine * >(argp1);
   result = (arg1)->CreateCamera();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iCamera> ref((csPtr<iCamera>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17750,7 +17750,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_0(PyObject *SWIGUNUSEDPARM
   }
   arg4 = reinterpret_cast< iSector * >(argp4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,334,TYPEMAP_IN_ARRAY_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,334,TYPEMAP_IN_ARRAY_BODY@*/
     if (!PyList_Check(obj4))
     {
       PyErr_SetString(PyExc_TypeError, "not a list");
@@ -17784,7 +17784,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_0(PyObject *SWIGUNUSEDPARM
   arg7 = reinterpret_cast< iPortal ** >(argp7);
   result = (arg1)->CreatePortal((char const *)arg2,arg3,arg4,arg5,arg6,*arg7);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17872,7 +17872,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_1(PyObject *SWIGUNUSEDPARM
   }
   arg5 = reinterpret_cast< iSector * >(argp5);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,334,TYPEMAP_IN_ARRAY_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,334,TYPEMAP_IN_ARRAY_BODY@*/
     if (!PyList_Check(obj5))
     {
       PyErr_SetString(PyExc_TypeError, "not a list");
@@ -17906,7 +17906,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_1(PyObject *SWIGUNUSEDPARM
   arg8 = reinterpret_cast< iPortal ** >(argp8);
   result = (arg1)->CreatePortal((char const *)arg2,arg3,(csVector3 const &)*arg4,arg5,arg6,arg7,*arg8);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18066,7 +18066,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortalContainer__SWIG_0(PyObject *SWIGU
   arg4 = reinterpret_cast< csVector3 * >(argp4);
   result = (arg1)->CreatePortalContainer((char const *)arg2,arg3,(csVector3 const &)*arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18121,7 +18121,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortalContainer__SWIG_1(PyObject *SWIGU
   arg3 = reinterpret_cast< iSector * >(argp3);
   result = (arg1)->CreatePortalContainer((char const *)arg2,arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18167,7 +18167,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortalContainer__SWIG_2(PyObject *SWIGU
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreatePortalContainer((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -19217,7 +19217,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyObjects__SWIG_0(PyObject *SWIGUNUSED
   arg5 = static_cast< bool >(val5);
   result = (arg1)->GetNearbyObjects(arg2,(csVector3 const &)*arg3,arg4,arg5);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iObjectIterator> ref((csPtr<iObjectIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -19281,7 +19281,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyObjects__SWIG_1(PyObject *SWIGUNUSED
   arg4 = static_cast< float >(val4);
   result = (arg1)->GetNearbyObjects(arg2,(csVector3 const &)*arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iObjectIterator> ref((csPtr<iObjectIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -19407,7 +19407,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleObjects__SWIG_0(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< csVector3 * >(argp3);
   result = (arg1)->GetVisibleObjects(arg2,(csVector3 const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iObjectIterator> ref((csPtr<iObjectIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -19462,7 +19462,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleMeshes__SWIG_0(PyObject *SWIGUNUSED
   arg3 = reinterpret_cast< csVector3 * >(argp3);
   result = (arg1)->GetVisibleMeshes(arg2,(csVector3 const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -19517,7 +19517,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleObjects__SWIG_1(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< csFrustum * >(argp3);
   result = (arg1)->GetVisibleObjects(arg2,(csFrustum const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iObjectIterator> ref((csPtr<iObjectIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -19625,7 +19625,7 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleMeshes__SWIG_1(PyObject *SWIGUNUSED
   arg3 = reinterpret_cast< csFrustum * >(argp3);
   result = (arg1)->GetVisibleMeshes(arg2,(csFrustum const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -19712,7 +19712,7 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateFrustumView(PyObject *SWIGUNUSEDPARM(se
   arg1 = reinterpret_cast< iEngine * >(argp1);
   result = (arg1)->CreateFrustumView();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iFrustumView> ref((csPtr<iFrustumView>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -25712,7 +25712,7 @@ SWIGINTERN PyObject *_wrap_iSceneNode_GetChildrenArray(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< iSceneNode * >(argp1);
   result = ((iSceneNode const *)arg1)->GetChildrenArray();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSceneNodeArray> ref((csPtr<iSceneNodeArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -28552,7 +28552,7 @@ SWIGINTERN PyObject *_wrap_iMeshFactoryWrapper_CreateMeshWrapper(PyObject *SWIGU
   arg1 = reinterpret_cast< iMeshFactoryWrapper * >(argp1);
   result = (arg1)->CreateMeshWrapper();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -35422,7 +35422,7 @@ SWIGINTERN PyObject *_wrap_iPortalContainer_CreatePortal(PyObject *SWIGUNUSEDPAR
   }
   arg1 = reinterpret_cast< iPortalContainer * >(argp1);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,334,TYPEMAP_IN_ARRAY_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,334,TYPEMAP_IN_ARRAY_BODY@*/
     if (!PyList_Check(obj1))
     {
       PyErr_SetString(PyExc_TypeError, "not a list");
@@ -35942,7 +35942,7 @@ SWIGINTERN PyObject *_wrap_iRenderLoopManager_Create(PyObject *SWIGUNUSEDPARM(se
   arg1 = reinterpret_cast< iRenderLoopManager * >(argp1);
   result = (arg1)->Create();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iRenderLoop> ref((csPtr<iRenderLoop>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -36236,7 +36236,7 @@ SWIGINTERN PyObject *_wrap_iRenderLoopManager_Load(PyObject *SWIGUNUSEDPARM(self
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->Load((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iRenderLoop> ref((csPtr<iRenderLoop>&)result); /* explicit cast */
     
     if (!ref.IsValid())

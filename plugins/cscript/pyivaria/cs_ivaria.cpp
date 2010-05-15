@@ -5008,7 +5008,7 @@ SWIGINTERN PyObject *_wrap_iDecalManager_CreateDecalTemplate(PyObject *SWIGUNUSE
   arg2 = reinterpret_cast< iMaterialWrapper * >(argp2);
   result = (arg1)->CreateDecalTemplate(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDecalTemplate> ref((csRef<iDecalTemplate>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -10983,7 +10983,7 @@ SWIGINTERN PyObject *_wrap_iCollideSystem_CreateCollider__SWIG_0(PyObject *SWIGU
   arg2 = reinterpret_cast< iTriangleMesh * >(argp2);
   result = (arg1)->CreateCollider(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iCollider> ref((csPtr<iCollider>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -11026,7 +11026,7 @@ SWIGINTERN PyObject *_wrap_iCollideSystem_CreateCollider__SWIG_1(PyObject *SWIGU
   arg2 = reinterpret_cast< iTerraFormer * >(argp2);
   result = (arg1)->CreateCollider(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iCollider> ref((csPtr<iCollider>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -11069,7 +11069,7 @@ SWIGINTERN PyObject *_wrap_iCollideSystem_CreateCollider__SWIG_2(PyObject *SWIGU
   arg2 = reinterpret_cast< iTerrainSystem * >(argp2);
   result = (arg1)->CreateCollider(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iCollider> ref((csPtr<iCollider>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12466,7 +12466,7 @@ SWIGINTERN PyObject *_wrap_iDynamics_CreateSystem(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iDynamics * >(argp1);
   result = (arg1)->CreateSystem();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDynamicSystem> ref((csPtr<iDynamicSystem>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13176,7 +13176,7 @@ SWIGINTERN PyObject *_wrap_iDynamicSystem_CreateGroup(PyObject *SWIGUNUSEDPARM(s
   arg1 = reinterpret_cast< iDynamicSystem * >(argp1);
   result = (arg1)->CreateGroup();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iBodyGroup> ref((csPtr<iBodyGroup>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13240,7 +13240,7 @@ SWIGINTERN PyObject *_wrap_iDynamicSystem_CreateJoint(PyObject *SWIGUNUSEDPARM(s
   arg1 = reinterpret_cast< iDynamicSystem * >(argp1);
   result = (arg1)->CreateJoint();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iJoint> ref((csPtr<iJoint>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15482,7 +15482,7 @@ SWIGINTERN PyObject *_wrap_iRigidBody_GetGroup(PyObject *SWIGUNUSEDPARM(self), P
   arg1 = reinterpret_cast< iRigidBody * >(argp1);
   result = (arg1)->GetGroup();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iBodyGroup> ref((csRef<iBodyGroup>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22818,7 +22818,7 @@ SWIGINTERN PyObject *_wrap_iODEDynamicSystemState_CreateBallJoint(PyObject *SWIG
   arg1 = reinterpret_cast< iODEDynamicSystemState * >(argp1);
   result = (arg1)->CreateBallJoint();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iODEBallJoint> ref((csPtr<iODEBallJoint>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22852,7 +22852,7 @@ SWIGINTERN PyObject *_wrap_iODEDynamicSystemState_CreateHingeJoint(PyObject *SWI
   arg1 = reinterpret_cast< iODEDynamicSystemState * >(argp1);
   result = (arg1)->CreateHingeJoint();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iODEHingeJoint> ref((csPtr<iODEHingeJoint>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22886,7 +22886,7 @@ SWIGINTERN PyObject *_wrap_iODEDynamicSystemState_CreateHinge2Joint(PyObject *SW
   arg1 = reinterpret_cast< iODEDynamicSystemState * >(argp1);
   result = (arg1)->CreateHinge2Joint();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iODEHinge2Joint> ref((csPtr<iODEHinge2Joint>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22920,7 +22920,7 @@ SWIGINTERN PyObject *_wrap_iODEDynamicSystemState_CreateAMotorJoint(PyObject *SW
   arg1 = reinterpret_cast< iODEDynamicSystemState * >(argp1);
   result = (arg1)->CreateAMotorJoint();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iODEAMotorJoint> ref((csPtr<iODEAMotorJoint>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22954,7 +22954,7 @@ SWIGINTERN PyObject *_wrap_iODEDynamicSystemState_CreateUniversalJoint(PyObject 
   arg1 = reinterpret_cast< iODEDynamicSystemState * >(argp1);
   result = (arg1)->CreateUniversalJoint();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iODEUniversalJoint> ref((csPtr<iODEUniversalJoint>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22988,7 +22988,7 @@ SWIGINTERN PyObject *_wrap_iODEDynamicSystemState_CreateSliderJoint(PyObject *SW
   arg1 = reinterpret_cast< iODEDynamicSystemState * >(argp1);
   result = (arg1)->CreateSliderJoint();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iODESliderJoint> ref((csPtr<iODESliderJoint>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -33568,7 +33568,7 @@ SWIGINTERN PyObject *_wrap_iSequenceManager_NewSequence(PyObject *SWIGUNUSEDPARM
   arg1 = reinterpret_cast< iSequenceManager * >(argp1);
   result = (arg1)->NewSequence();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSequence> ref((csPtr<iSequence>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -34043,7 +34043,7 @@ SWIGINTERN PyObject *_wrap_iScriptValue_GetString(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iScriptValue * >(argp1);
   result = ((iScriptValue const *)arg1)->GetString();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iString> ref((csRef<iString>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -34099,7 +34099,7 @@ SWIGINTERN PyObject *_wrap_iScriptValue_GetObject(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iScriptValue * >(argp1);
   result = ((iScriptValue const *)arg1)->GetObject();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iScriptObject> ref((csRef<iScriptObject>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -34184,7 +34184,7 @@ SWIGINTERN PyObject *_wrap_iScriptObject_GetClass(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iScriptObject * >(argp1);
   result = ((iScriptObject const *)arg1)->GetClass();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iString> ref((csRef<iString>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -35979,7 +35979,7 @@ SWIGINTERN PyObject *_wrap_iScript_New__SWIG_0(PyObject *SWIGUNUSEDPARM(self), P
   arg3 = reinterpret_cast< csRefArray<iScriptValue > * >(argp3);
   result = (arg1)->New((char const *)arg2,(csRefArray<iScriptValue > const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iScriptObject> ref((csPtr<iScriptObject>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -36025,7 +36025,7 @@ SWIGINTERN PyObject *_wrap_iScript_New__SWIG_1(PyObject *SWIGUNUSEDPARM(self), P
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->New((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iScriptObject> ref((csPtr<iScriptObject>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -36240,7 +36240,7 @@ SWIGINTERN PyObject *_wrap_iScript_NewObject__varargs__(PyObject *SWIGUNUSEDPARM
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->NewObject((char const *)arg2,(char const *)arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iScriptObject> ref((csRef<iScriptObject>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -37544,7 +37544,7 @@ SWIGINTERN PyObject *_wrap_iTerraFormer_GetSampler__SWIG_0(PyObject *SWIGUNUSEDP
   arg4 = static_cast< unsigned int >(val4);
   result = (arg1)->GetSampler(arg2,arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerraSampler> ref((csPtr<iTerraSampler>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -37604,7 +37604,7 @@ SWIGINTERN PyObject *_wrap_iTerraFormer_GetSampler__SWIG_1(PyObject *SWIGUNUSEDP
   arg3 = static_cast< unsigned int >(val3);
   result = (arg1)->GetSampler(arg2,arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerraSampler> ref((csPtr<iTerraSampler>&)result); /* explicit cast */
     
     if (!ref.IsValid())

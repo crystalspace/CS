@@ -10501,7 +10501,7 @@ SWIGINTERN PyObject *_wrap_iSCF_GetPluginMetadata(PyObject *SWIGUNUSEDPARM(self)
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->GetPluginMetadata((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocument> ref((csRef<iDocument>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -11356,7 +11356,7 @@ SWIGINTERN PyObject *_wrap_iSCF_QueryClassList(PyObject *SWIGUNUSEDPARM(self), P
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->QueryClassList((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iStringArray> ref((csRef<iStringArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12075,7 +12075,7 @@ SWIGINTERN PyObject *_wrap_iDebugHelper_StateTest(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iDebugHelper * >(argp1);
   result = (arg1)->StateTest();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iString> ref((csPtr<iString>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12140,7 +12140,7 @@ SWIGINTERN PyObject *_wrap_iDebugHelper_Dump__SWIG_0(PyObject *SWIGUNUSEDPARM(se
   arg1 = reinterpret_cast< iDebugHelper * >(argp1);
   result = (arg1)->Dump();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iString> ref((csPtr<iString>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -20043,7 +20043,7 @@ SWIGINTERN PyObject *_wrap_iReporter_GetMessageIterator(PyObject *SWIGUNUSEDPARM
   arg1 = reinterpret_cast< iReporter * >(argp1);
   result = (arg1)->GetMessageIterator();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iReporterIterator> ref((csPtr<iReporterIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -20920,7 +20920,7 @@ SWIGINTERN PyObject *_wrap_iCacheManager_ReadCache(PyObject *SWIGUNUSEDPARM(self
   arg4 = static_cast< uint32 >(val4);
   result = (arg1)->ReadCache((char const *)arg2,(char const *)arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -21873,7 +21873,7 @@ SWIGINTERN PyObject *_wrap_iFile_GetAllData__SWIG_0(PyObject *SWIGUNUSEDPARM(sel
   arg2 = static_cast< bool >(val2);
   result = (arg1)->GetAllData(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -21907,7 +21907,7 @@ SWIGINTERN PyObject *_wrap_iFile_GetAllData__SWIG_1(PyObject *SWIGUNUSEDPARM(sel
   arg1 = reinterpret_cast< iFile * >(argp1);
   result = (arg1)->GetAllData();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22214,7 +22214,7 @@ SWIGINTERN PyObject *_wrap_iVFS_ExpandPath__SWIG_0(PyObject *SWIGUNUSEDPARM(self
   arg3 = static_cast< bool >(val3);
   result = ((iVFS const *)arg1)->ExpandPath((char const *)arg2,arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22260,7 +22260,7 @@ SWIGINTERN PyObject *_wrap_iVFS_ExpandPath__SWIG_1(PyObject *SWIGUNUSEDPARM(self
   arg2 = reinterpret_cast< char * >(buf2);
   result = ((iVFS const *)arg1)->ExpandPath((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22389,7 +22389,7 @@ SWIGINTERN PyObject *_wrap_iVFS_FindFiles(PyObject *SWIGUNUSEDPARM(self), PyObje
   arg2 = reinterpret_cast< char * >(buf2);
   result = ((iVFS const *)arg1)->FindFiles((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iStringArray> ref((csPtr<iStringArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22444,7 +22444,7 @@ SWIGINTERN PyObject *_wrap_iVFS_Open(PyObject *SWIGUNUSEDPARM(self), PyObject *a
   arg3 = static_cast< int >(val3);
   result = (arg1)->Open((char const *)arg2,arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iFile> ref((csPtr<iFile>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22499,7 +22499,7 @@ SWIGINTERN PyObject *_wrap_iVFS_ReadFile__SWIG_0(PyObject *SWIGUNUSEDPARM(self),
   arg3 = static_cast< bool >(val3);
   result = (arg1)->ReadFile((char const *)arg2,arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -22545,7 +22545,7 @@ SWIGINTERN PyObject *_wrap_iVFS_ReadFile__SWIG_1(PyObject *SWIGUNUSEDPARM(self),
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->ReadFile((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -23048,7 +23048,7 @@ SWIGINTERN PyObject *_wrap_iVFS_MountRoot(PyObject *SWIGUNUSEDPARM(self), PyObje
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->MountRoot((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iStringArray> ref((csRef<iStringArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -23592,7 +23592,7 @@ SWIGINTERN PyObject *_wrap_iVFS_GetRealPath(PyObject *SWIGUNUSEDPARM(self), PyOb
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->GetRealPath((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -23628,7 +23628,7 @@ SWIGINTERN PyObject *_wrap_iVFS_GetMounts(PyObject *SWIGUNUSEDPARM(self), PyObje
   arg1 = reinterpret_cast< iVFS * >(argp1);
   result = (arg1)->GetMounts();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iStringArray> ref((csRef<iStringArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -23672,7 +23672,7 @@ SWIGINTERN PyObject *_wrap_iVFS_GetRealMountPaths(PyObject *SWIGUNUSEDPARM(self)
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->GetRealMountPaths((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iStringArray> ref((csRef<iStringArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -24107,7 +24107,7 @@ SWIGINTERN PyObject *_wrap_iObject_GetIterator(PyObject *SWIGUNUSEDPARM(self), P
   arg1 = reinterpret_cast< iObject * >(argp1);
   result = (arg1)->GetIterator();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iObjectIterator> ref((csPtr<iObjectIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -25652,7 +25652,7 @@ SWIGINTERN PyObject *_wrap_csQueryRegistryTag(PyObject *SWIGUNUSEDPARM(self), Py
   arg2 = reinterpret_cast< char * >(buf2);
   result = csQueryRegistryTag(arg1,(char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iBase> ref((csPtr<iBase>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -29393,7 +29393,7 @@ SWIGINTERN PyObject *_wrap_iEventOutlet_CreateEvent(PyObject *SWIGUNUSEDPARM(sel
   arg1 = reinterpret_cast< iEventOutlet * >(argp1);
   result = (arg1)->CreateEvent();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iEvent> ref((csPtr<iEvent>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -34370,7 +34370,7 @@ SWIGINTERN PyObject *_wrap_iEventQueue_CreateEventOutlet(PyObject *SWIGUNUSEDPAR
   arg2 = reinterpret_cast< iEventPlug * >(argp2);
   result = (arg1)->CreateEventOutlet(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iEventOutlet> ref((csPtr<iEventOutlet>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -34470,7 +34470,7 @@ SWIGINTERN PyObject *_wrap_iEventQueue_CreateEvent(PyObject *SWIGUNUSEDPARM(self
   arg2 = &temp2;
   result = (arg1)->CreateEvent((csEventID const &)*arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iEvent> ref((csPtr<iEvent>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -34515,7 +34515,7 @@ SWIGINTERN PyObject *_wrap_iEventQueue_CreateBroadcastEvent(PyObject *SWIGUNUSED
   arg2 = &temp2;
   result = (arg1)->CreateBroadcastEvent((csEventID const &)*arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iEvent> ref((csPtr<iEvent>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -34579,7 +34579,7 @@ SWIGINTERN PyObject *_wrap_iEventQueue_Get(PyObject *SWIGUNUSEDPARM(self), PyObj
   arg1 = reinterpret_cast< iEventQueue * >(argp1);
   result = (arg1)->Get();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iEvent> ref((csPtr<iEvent>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -35311,7 +35311,7 @@ SWIGINTERN PyObject *_wrap_csEventNameRegistry_GetRegistry(PyObject *SWIGUNUSEDP
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
   result = csEventNameRegistry::GetRegistry(arg1);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iEventNameRegistry> ref((csRef<iEventNameRegistry>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -37309,7 +37309,7 @@ SWIGINTERN PyObject *_wrap_iPluginManager_GetPlugins(PyObject *SWIGUNUSEDPARM(se
   arg1 = reinterpret_cast< iPluginManager * >(argp1);
   result = (arg1)->GetPlugins();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iPluginIterator> ref((csPtr<iPluginIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -37721,7 +37721,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   arg3 = static_cast< bool >(val3);
   result = csLoadPluginAlways(arg1,(char const *)arg2,arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iBase> ref((csPtr<iBase>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -37767,7 +37767,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   arg2 = reinterpret_cast< char * >(buf2);
   result = csLoadPluginAlways(arg1,(char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iBase> ref((csPtr<iBase>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -38439,7 +38439,7 @@ SWIGINTERN PyObject *_wrap_csObject_GetIterator(PyObject *SWIGUNUSEDPARM(self), 
   arg1 = reinterpret_cast< csObject * >(argp1);
   result = (arg1)->GetIterator();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iObjectIterator> ref((csPtr<iObjectIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -43041,7 +43041,7 @@ SWIGINTERN PyObject *_wrap_iConfigFile_Enumerate__SWIG_0(PyObject *SWIGUNUSEDPAR
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->Enumerate((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iConfigIterator> ref((csPtr<iConfigIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -43077,7 +43077,7 @@ SWIGINTERN PyObject *_wrap_iConfigFile_Enumerate__SWIG_1(PyObject *SWIGUNUSEDPAR
   arg1 = reinterpret_cast< iConfigFile * >(argp1);
   result = (arg1)->Enumerate();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iConfigIterator> ref((csPtr<iConfigIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -43733,7 +43733,7 @@ SWIGINTERN PyObject *_wrap_iConfigFile_GetTuple(PyObject *SWIGUNUSEDPARM(self), 
   arg2 = reinterpret_cast< char * >(buf2);
   result = ((iConfigFile const *)arg1)->GetTuple((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iStringArray> ref((csPtr<iStringArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -44483,7 +44483,7 @@ SWIGINTERN PyObject *_wrap_iConfigIterator_GetTuple(PyObject *SWIGUNUSEDPARM(sel
   arg1 = reinterpret_cast< iConfigIterator * >(argp1);
   result = ((iConfigIterator const *)arg1)->GetTuple();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iStringArray> ref((csPtr<iStringArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -46048,7 +46048,7 @@ SWIGINTERN PyObject *_wrap_iDocumentAttributeIterator_Next(PyObject *SWIGUNUSEDP
   arg1 = reinterpret_cast< iDocumentAttributeIterator * >(argp1);
   result = (arg1)->Next();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentAttribute> ref((csRef<iDocumentAttribute>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -46424,7 +46424,7 @@ SWIGINTERN PyObject *_wrap_iDocumentNodeIterator_Next(PyObject *SWIGUNUSEDPARM(s
   arg1 = reinterpret_cast< iDocumentNodeIterator * >(argp1);
   result = (arg1)->Next();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentNode> ref((csRef<iDocumentNode>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -46712,7 +46712,7 @@ SWIGINTERN PyObject *_wrap_iDocumentNode_GetParent(PyObject *SWIGUNUSEDPARM(self
   arg1 = reinterpret_cast< iDocumentNode * >(argp1);
   result = (arg1)->GetParent();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentNode> ref((csRef<iDocumentNode>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -46746,7 +46746,7 @@ SWIGINTERN PyObject *_wrap_iDocumentNode_GetNodes__SWIG_0(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< iDocumentNode * >(argp1);
   result = (arg1)->GetNodes();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentNodeIterator> ref((csRef<iDocumentNodeIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -46790,7 +46790,7 @@ SWIGINTERN PyObject *_wrap_iDocumentNode_GetNodes__SWIG_1(PyObject *SWIGUNUSEDPA
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->GetNodes((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentNodeIterator> ref((csRef<iDocumentNodeIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -46875,7 +46875,7 @@ SWIGINTERN PyObject *_wrap_iDocumentNode_GetNode(PyObject *SWIGUNUSEDPARM(self),
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->GetNode((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentNode> ref((csRef<iDocumentNode>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -47060,7 +47060,7 @@ SWIGINTERN PyObject *_wrap_iDocumentNode_CreateNodeBefore__SWIG_0(PyObject *SWIG
   arg3 = reinterpret_cast< iDocumentNode * >(argp3);
   result = (arg1)->CreateNodeBefore(arg2,arg3);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentNode> ref((csRef<iDocumentNode>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -47103,7 +47103,7 @@ SWIGINTERN PyObject *_wrap_iDocumentNode_CreateNodeBefore__SWIG_1(PyObject *SWIG
   arg2 = static_cast< csDocumentNodeType >(val2);
   result = (arg1)->CreateNodeBefore(arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentNode> ref((csRef<iDocumentNode>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -47255,7 +47255,7 @@ SWIGINTERN PyObject *_wrap_iDocumentNode_GetAttributes(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< iDocumentNode * >(argp1);
   result = (arg1)->GetAttributes();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentAttributeIterator> ref((csRef<iDocumentAttributeIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -47299,7 +47299,7 @@ SWIGINTERN PyObject *_wrap_iDocumentNode_GetAttribute(PyObject *SWIGUNUSEDPARM(s
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->GetAttribute((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentAttribute> ref((csRef<iDocumentAttribute>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -47809,7 +47809,7 @@ SWIGINTERN PyObject *_wrap_iDocument_CreateRoot(PyObject *SWIGUNUSEDPARM(self), 
   arg1 = reinterpret_cast< iDocument * >(argp1);
   result = (arg1)->CreateRoot();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentNode> ref((csRef<iDocumentNode>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -47843,7 +47843,7 @@ SWIGINTERN PyObject *_wrap_iDocument_GetRoot(PyObject *SWIGUNUSEDPARM(self), PyO
   arg1 = reinterpret_cast< iDocument * >(argp1);
   result = (arg1)->GetRoot();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocumentNode> ref((csRef<iDocumentNode>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -48590,7 +48590,7 @@ SWIGINTERN PyObject *_wrap_iDocumentSystem_CreateDocument(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< iDocumentSystem * >(argp1);
   result = (arg1)->CreateDocument();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocument> ref((csRef<iDocument>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -49510,7 +49510,7 @@ SWIGINTERN PyObject *_wrap_csConfigFile_Enumerate__SWIG_0(PyObject *SWIGUNUSEDPA
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->Enumerate((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iConfigIterator> ref((csPtr<iConfigIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -49546,7 +49546,7 @@ SWIGINTERN PyObject *_wrap_csConfigFile_Enumerate__SWIG_1(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< csConfigFile * >(argp1);
   result = (arg1)->Enumerate();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iConfigIterator> ref((csPtr<iConfigIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -50119,7 +50119,7 @@ SWIGINTERN PyObject *_wrap_csConfigFile_GetTuple(PyObject *SWIGUNUSEDPARM(self),
   arg2 = reinterpret_cast< char * >(buf2);
   result = ((csConfigFile const *)arg1)->GetTuple((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iStringArray> ref((csPtr<iStringArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -51123,7 +51123,7 @@ SWIGINTERN PyObject *_wrap_csTinyDocumentSystem_CreateDocument(PyObject *SWIGUNU
   arg1 = reinterpret_cast< csTinyDocumentSystem * >(argp1);
   result = (arg1)->CreateDocument();
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDocument> ref((csRef<iDocument>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -55913,7 +55913,7 @@ SWIGINTERN PyObject *_wrap_CS_LOAD_PLUGIN_ALWAYS(PyObject *SWIGUNUSEDPARM(self),
   arg2 = reinterpret_cast< char * >(buf2);
   result = CS_LOAD_PLUGIN_ALWAYS(arg1,(char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp2/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp4/V1.4/include/bindings/python/pythpre.i,114,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iBase> ref((csPtr<iBase>&)result); /* explicit cast */
     
     if (!ref.IsValid())
