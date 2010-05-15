@@ -23006,7 +23006,7 @@ sub ACQUIRE {
 
 package cspace::csProcTexture;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::scfProcTexture cspace );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
 *swig_last_cur_time_get = *cspacec::csProcTexture_last_cur_time_get;
@@ -23033,6 +23033,7 @@ sub DESTROY {
 *GetDimension = *cspacec::csProcTexture_GetDimension;
 *GetRandom = *cspacec::csProcTexture_GetRandom;
 *GetTextureWrapper = *cspacec::csProcTexture_GetTextureWrapper;
+*SelfDestruct = *cspacec::csProcTexture_SelfDestruct;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
