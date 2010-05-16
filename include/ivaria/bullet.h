@@ -35,6 +35,7 @@ struct iView;
 struct iRigidBody;
 struct iBulletKinematicCallback;
 struct iBulletSoftBody;
+struct iBulletPivotJoint;
 
 /**
  * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
@@ -87,7 +88,7 @@ enum csBulletDebugMode
  */
 struct iBulletDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 3);
+  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 4);
 
   /**
    * Draw the debug informations of the dynamic system. This has to be called
@@ -97,13 +98,13 @@ struct iBulletDynamicSystem : public virtual iBase
   virtual void DebugDraw (iView* rview) = 0;
 
   /**
-   * Follow a beam from start to end and return the first dynamic or kinematic rigid body
-   * that is hit. Static objects doesn't count.
+   * Follow a beam from start to end and return the first rigid or soft body
+   * that is hit. For rigid bodies, only dynamic or kinematic objects can be hit,
+   * static objects doesn't count.
    * \sa csBulletHitBeamResult iMeshWrapper::HitBeam() iSector::HitBeam()
    * iSector::HitBeamPortals()
    */
   virtual csBulletHitBeamResult HitBeam (const csVector3 &start, const csVector3 &end) = 0;
-
 
   /**
    * Set the internal scale to be applied to the whole dynamic world. Use this
@@ -223,6 +224,16 @@ struct iBulletDynamicSystem : public virtual iBase
    * Remove the given soft body from this dynamic world and delete it.
    */
   virtual void RemoveSoftBody (iBulletSoftBody* body) = 0;
+
+  /**
+   * Create a pivot joint and add it to the simulation.
+   */
+  virtual csPtr<iBulletPivotJoint> CreatePivotJoint () = 0;
+
+  /**
+   * Remove the given pivot joint from the simulation.
+   */
+  virtual void RemovePivotJoint (iBulletPivotJoint* joint) = 0;
 };
 
 /**
@@ -450,6 +461,38 @@ struct iBulletKinematicCallback : public virtual iBase
    */
   virtual void GetBodyTransform (iRigidBody* body,
 				 csOrthoTransform& transform) const = 0;
+};
+
+/**
+ * A joint to attach to a rigid body in order to manipulate it. It is contrained
+ * in translation and has free rotation. You can move freely the position of the
+ * joint, the body will keep attached to the joint.
+ */
+struct iBulletPivotJoint : public virtual iBase
+{
+  SCF_INTERFACE (iBulletPivotJoint, 1, 0, 0);
+
+  /**
+   * Attach a rigid body to the joint.
+   * \param body The rigid body to attach to the joint.
+   * \param position The initial position of the joint, in world coordinates.
+   */
+  virtual void Attach (iRigidBody* body, const csVector3& position) = 0;
+
+  /**
+   * Return the body attached to this joint, or 0 if there are none.
+   */
+  virtual iRigidBody* GetAttachedBody () const = 0;
+
+  /**
+   * Set the new position of the joint, in world coordinates.
+   */
+  virtual void SetPosition (const csVector3& position) = 0;
+
+  /**
+   * Get the current position of the joint, in world coordinates.
+   */
+  virtual csVector3 GetPosition () const = 0;
 };
 
 #endif // __CS_IVARIA_BULLET_H__
