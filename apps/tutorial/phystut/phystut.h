@@ -33,8 +33,8 @@ class Simple : public csDemoApplication
 private:
   // Physics related
   csRef<iDynamics> dyn;
-  csRef<iDynamicSystem> dynSys;
-  csRef<iBulletDynamicSystem> bullet_dynSys;
+  csRef<iDynamicSystem> dynamicSystem;
+  csRef<iBulletDynamicSystem> bulletDynamicSystem;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
@@ -74,6 +74,10 @@ private:
   csRef<iBulletPivotJoint> dragJoint;
   float dragDistance;
   int mouseX, mouseY;
+
+  // Cut & Paste related
+  csRef<iRigidBody> clipboardBody;
+  csRef<iMeshWrapper> clipboardMesh;
 
   //-- csBaseEventHandler
   void Frame ();
