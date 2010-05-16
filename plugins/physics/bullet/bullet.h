@@ -160,6 +160,7 @@ public:
   virtual void Step (float stepsize);
 
   virtual csPtr<iRigidBody> CreateBody ();
+  virtual void AddBody (iRigidBody* body);
   virtual void RemoveBody (iRigidBody* body);
   virtual iRigidBody *FindBody (const char *name);
   virtual iRigidBody *GetBody (unsigned int index);
@@ -254,6 +255,7 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
   csRef<iMeshWrapper> mesh;
   csRef<iLight> light;
   csRef<iCamera> camera;
+  bool insideWorld;
 
   csArray<btCollisionObject*> contactObjects;
   csArray<btCollisionObject*> lastContactObjects;

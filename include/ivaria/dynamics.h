@@ -128,7 +128,7 @@ struct iDynamicsSystemCollider;
  */
 struct iDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE (iDynamicSystem, 0, 0, 3);
+  SCF_INTERFACE (iDynamicSystem, 0, 0, 4);
 
   /// Return the underlying object
   virtual iObject *QueryObject (void) = 0;
@@ -347,6 +347,14 @@ struct iDynamicSystem : public virtual iBase
   virtual bool AttachColliderCapsule (float length, float radius,
     const csOrthoTransform& trans, float friction,
     float elasticity, float softness = 0.01f) = 0;
+
+  /**
+   * Add a rigid body to this dynamic system after having removed it frome another
+   * one with RemoveBody().
+   * \warning For the Bullet plugin, it won't work if you use dynamic systems which
+   * have different internal scales set through iBulletDynamicSystem::SetInternalScale().
+   */
+  virtual void AddBody (iRigidBody* body) = 0;
 };
 
 /**

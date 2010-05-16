@@ -378,12 +378,32 @@ csPtr<iRigidBody> csBulletDynamicsSystem::CreateBody ()
   return csPtr<iRigidBody> (body);
 }
 
+void csBulletDynamicsSystem::AddBody (iRigidBody* body)
+{
+  csBulletRigidBody* csBody = dynamic_cast<csBulletRigidBody*> (body);
+  CS_ASSERT (csBody);
+  if (csBody->body)
+  {
+    // remove from the previous dynamic system
+    if (csBody->insideWorld)
+      csBody->dynSys->bulletWorld->removeRigidBody (csBody->body);
+
+    // add the body to this dynamic system
+    bulletWorld->addRigidBody (csBody->body);
+    csBody->body->forceActivationState (ACTIVE_TAG);
+    csBody->dynSys = this;
+    csBody->insideWorld = true;
+  }
+  dynamicBodies.Push (csBody);
+}
+
 void csBulletDynamicsSystem::RemoveBody (iRigidBody* body)
 {
   csBulletRigidBody* csBody = dynamic_cast<csBulletRigidBody*> (body);
   CS_ASSERT (csBody);
   if (csBody->body)
     bulletWorld->removeRigidBody (csBody->body);
+  csBody->insideWorld = false;
 
   dynamicBodies.Delete (body);
 }
@@ -985,23 +1005,21 @@ void csBulletDynamicsSystem::RemovePivotJoint (iBulletPivotJoint* joint)
 csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic)
   : scfImplementationType (this), dynSys (dynSys), body (0),
     dynamicState (isStatic? CS_BULLET_STATE_STATIC : CS_BULLET_STATE_DYNAMIC),
-    customMass (false), mass (1.0f)
+    customMass (false), mass (1.0f), compoundChanged (false), insideWorld (false)
 {
   btTransform identity;
   identity.setIdentity ();
   motionState = new csBulletMotionState (this, identity, identity);
   compoundShape = new btCompoundShape ();
-  compoundChanged = false;
   moveCb = dynSys->GetDefaultMoveCallback ();
 }
 
 csBulletRigidBody::~csBulletRigidBody ()
 {
-  if (body)
-  {
+  if (insideWorld)
     dynSys->bulletWorld->removeRigidBody (body);
-    delete body;
-  }
+
+  delete body;
   delete motionState;
   delete compoundShape;
 }
@@ -1019,8 +1037,11 @@ void csBulletRigidBody::RebuildBody ()
     linearVelocity = body->getLinearVelocity ();
     angularVelocity = body->getAngularVelocity ();
 
-    dynSys->bulletWorld->removeRigidBody (body);
+    if (insideWorld)
+      dynSys->bulletWorld->removeRigidBody (body);
+
     delete body;
+    body = 0;
   }
 
   // create body infos
@@ -1147,6 +1168,7 @@ void csBulletRigidBody::RebuildBody ()
   body = new btRigidBody (infos);
   body->setUserPointer (userPointer);
   dynSys->bulletWorld->addRigidBody (body);
+  insideWorld = true;
 
   // put back angular/linear velocity
   if (wasBody)
@@ -1179,7 +1201,8 @@ bool csBulletRigidBody::MakeStatic (void)
 	RebuildBody ();
 
     // remove body from world
-    dynSys->bulletWorld->removeRigidBody (body);
+    if (insideWorld)
+      dynSys->bulletWorld->removeRigidBody (body);
 
     // set in static state
     body->setCollisionFlags (body->getCollisionFlags()
@@ -1204,7 +1227,8 @@ bool csBulletRigidBody::MakeStatic (void)
     }
 
     // put body back in world
-    dynSys->bulletWorld->addRigidBody (body);
+    if (insideWorld)
+      dynSys->bulletWorld->addRigidBody (body);
   }
 
   dynamicState = CS_BULLET_STATE_STATIC;
@@ -1236,7 +1260,8 @@ bool csBulletRigidBody::MakeDynamic (void)
     }
 
     // remove body from world
-    dynSys->bulletWorld->removeRigidBody (body);
+    if (insideWorld)
+      dynSys->bulletWorld->removeRigidBody (body);
 
     // set body dynamic
     body->setCollisionFlags (body->getCollisionFlags()
@@ -1275,7 +1300,8 @@ bool csBulletRigidBody::MakeDynamic (void)
     body->updateInertiaTensor ();
 
     // put body back in world
-    dynSys->bulletWorld->addRigidBody (body);
+    if (insideWorld)
+      dynSys->bulletWorld->addRigidBody (body);
   }
 
   dynamicState = CS_BULLET_STATE_DYNAMIC;
@@ -1307,7 +1333,8 @@ void csBulletRigidBody::MakeKinematic ()
     }
 
     // remove body from world
-    dynSys->bulletWorld->removeRigidBody (body);
+    if (insideWorld)
+      dynSys->bulletWorld->removeRigidBody (body);
 
     // check if we need to create a default kinematic callback
     if (!kinematicCb)
@@ -1335,7 +1362,8 @@ void csBulletRigidBody::MakeKinematic ()
     body->setInterpolationAngularVelocity (btVector3(0.0f, 0.0f, 0.0f));
 
     // put body back in world
-    dynSys->bulletWorld->addRigidBody (body);
+    if (insideWorld)
+      dynSys->bulletWorld->addRigidBody (body);
   }
 
   dynamicState = CS_BULLET_STATE_KINEMATIC;
@@ -1660,7 +1688,7 @@ void csBulletRigidBody::SetPosition (const csVector3& pos)
   // TODO: refuse if kinematic
 
   // remove body from the world
-  if (body)
+  if (insideWorld)
     dynSys->bulletWorld->removeRigidBody (body);
 
   // create new motion state
@@ -1678,10 +1706,10 @@ void csBulletRigidBody::SetPosition (const csVector3& pos)
 
   // put back body in the world
   if (body)
-  {
     body->setMotionState (motionState);
+
+  if (insideWorld)
     dynSys->bulletWorld->addRigidBody (body);
-  }
 }
 
 const csVector3 csBulletRigidBody::GetPosition () const
@@ -1692,7 +1720,7 @@ const csVector3 csBulletRigidBody::GetPosition () const
 void csBulletRigidBody::SetOrientation (const csMatrix3& rot)
 {
   // remove body from the world
-  if (body)
+  if (insideWorld)
     dynSys->bulletWorld->removeRigidBody (body);
 
   // create new motion state
@@ -1711,10 +1739,10 @@ void csBulletRigidBody::SetOrientation (const csMatrix3& rot)
 
   // put back body in the world
   if (body)
-  {
     body->setMotionState (motionState);
+
+  if (insideWorld)
     dynSys->bulletWorld->addRigidBody (body);
-  }
 }
 
 const csMatrix3 csBulletRigidBody::GetOrientation () const
@@ -1725,7 +1753,7 @@ const csMatrix3 csBulletRigidBody::GetOrientation () const
 void csBulletRigidBody::SetTransform (const csOrthoTransform& trans)
 {
   // remove body from the world
-  if (body)
+  if (insideWorld)
     dynSys->bulletWorld->removeRigidBody (body);
 
   // create new motion state
@@ -1736,10 +1764,10 @@ void csBulletRigidBody::SetTransform (const csOrthoTransform& trans)
 
   // put back body in the world
   if (body)
-  {
     body->setMotionState (motionState);
+
+  if (insideWorld)
     dynSys->bulletWorld->addRigidBody (body);
-  }
 }
 
 const csOrthoTransform csBulletRigidBody::GetTransform () const
