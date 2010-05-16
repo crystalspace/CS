@@ -37,7 +37,7 @@ Simple::Simple ()
     isSoftBodyWorld (false), solver (0), autodisable (false),
     do_bullet_debug (false), remainingStepDuration (0.0f), debugMode (false),
     allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
-    physicalCameraMode (CAMERA_DYNAMIC)    
+    physicalCameraMode (CAMERA_DYNAMIC), dragging (false)
 {
   // Configure the options for csDemoApplication
 
@@ -132,6 +132,20 @@ void Simple::Frame ()
     quaternion.SetEulerAngles (csVector3 (rotX, rotY, rotZ));
     csOrthoTransform ot (quaternion.GetConjugate ().GetMatrix (), c->GetTransform().GetOrigin ());
     c->SetTransform (ot);
+  }
+ if (dragging)
+  {
+    // Keep the drag joint at the same distance to the camera
+    csRef<iCamera> camera = view->GetCamera ();
+    csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+    csVector3 v3d = camera->InvPerspective (v2d, 10000);
+    csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+    csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+    csVector3 newPosition = endBeam - startBeam;
+    newPosition.Normalize ();
+    newPosition = camera->GetTransform ().GetOrigin () + newPosition * dragDistance;
+    dragJoint->SetPosition (newPosition);
   }
 
   // Step the dynamic simulation
@@ -493,10 +507,10 @@ bool Simple::OnKeyboard (iEvent &ev)
 
 bool Simple::OnMouseDown (iEvent& ev)
 {
+  // Left mouse button: Shoot!
   if (csMouseEventHelper::GetButton (&ev) == 0
       && phys_engine_id == BULLET_ID)
   {
-    // Shoot!
     // Find the rigid body that was clicked on
     int mouseX = csMouseEventHelper::GetX (&ev);
     int mouseY = csMouseEventHelper::GetY (&ev);
@@ -537,6 +551,62 @@ bool Simple::OnMouseDown (iEvent& ev)
 
     return true;
   }
+
+  // Right mouse button: dragging
+  else if (csMouseEventHelper::GetButton (&ev) == 1
+	   && phys_engine_id == BULLET_ID)
+  {
+    // Find the rigid body that was clicked on
+    int mouseX = csMouseEventHelper::GetX (&ev);
+    int mouseY = csMouseEventHelper::GetY (&ev);
+
+    // Compute the end beam points
+    csRef<iCamera> camera = view->GetCamera ();
+    csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+    csVector3 v3d = camera->InvPerspective (v2d, 10000);
+    csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+    csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+    // Trace the physical beam
+    csRef<iBulletDynamicSystem> bulletSystem =
+      scfQueryInterface<iBulletDynamicSystem> (dynSys);
+    csBulletHitBeamResult result = bulletSystem->HitBeam (startBeam, endBeam);
+
+    if (!result.body)
+      return false;
+
+    // Create a pivot joint at the point clicked
+    dragJoint = bulletSystem->CreatePivotJoint ();
+    dragJoint->Attach (result.body, result.isect);
+
+    dragging = true;
+    dragDistance = (result.isect - startBeam).Norm ();
+  }
+
+  return false;
+}
+
+bool Simple::OnMouseUp (iEvent& ev)
+{
+  if (dragging)
+  {
+    dragging = false;
+
+    // Remove the drag joint
+    bullet_dynSys->RemovePivotJoint (dragJoint);
+    dragJoint = 0;
+
+    return true;
+  }
+
+  return false;
+}
+
+bool Simple::OnMouseMove (iEvent& ev)
+{
+  // Save the mouse position
+  mouseX = csMouseEventHelper::GetX (&ev);
+  mouseY = csMouseEventHelper::GetY (&ev);
 
   return false;
 }
@@ -625,7 +695,10 @@ bool Simple::OnInitialize (int argc, char* argv[])
   }
   keyDescriptions.Push ("SPACE: spawn random object");
   if (phys_engine_id == BULLET_ID)
+  {
     keyDescriptions.Push ("left mouse: fire!");
+    keyDescriptions.Push ("right mouse: drag object");
+  }
   keyDescriptions.Push ("f: toggle camera modes");
   keyDescriptions.Push ("t: toggle all bodies dynamic/static");
   keyDescriptions.Push ("p: pause the simulation");
@@ -1079,7 +1152,7 @@ iRigidBody* Simple::SpawnCapsule ()
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the capsule mesh factory.
-  csRef<iMeshFactoryWrapper> capsuleFact = engine->CreateMeshFactory(
+  csRef<iMeshFactoryWrapper> capsuleFact = engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", "capsuleFact");
   if (!capsuleFact)
   {
@@ -1087,8 +1160,8 @@ iRigidBody* Simple::SpawnCapsule ()
     return 0;
   }
 
-  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<
-    iGeneralFactoryState> (capsuleFact->GetMeshObjectFactory ());
+  csRef<iGeneralFactoryState> gmstate =
+    scfQueryInterface<iGeneralFactoryState> (capsuleFact->GetMeshObjectFactory ());
   const float radius (rand() % 10 / 50. + .2);
   const float length (rand() % 3 / 50. + .7);
   gmstate->GenerateCapsule (length, radius, 10);

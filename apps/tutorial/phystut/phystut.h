@@ -69,10 +69,18 @@ private:
   CS::Animation::StateID ragdollState;
   csRef<iMeshWrapper> ragdollMesh;
 
+  // Dragging related
+  bool dragging;
+  csRef<iBulletPivotJoint> dragJoint;
+  float dragDistance;
+  int mouseX, mouseY;
+
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
+  bool OnMouseUp (iEvent &event);
+  bool OnMouseMove (iEvent &event);
 
   // Camera
   void UpdateCameraMode ();
