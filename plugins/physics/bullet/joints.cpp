@@ -357,7 +357,7 @@ void csBulletPivotJoint::SetPosition (const csVector3& position)
   if (constraint)
   {
     constraint->setPivotB (CSToBullet (position, dynSys->internalScale));
-    body->body->setActivationState (DISABLE_DEACTIVATION);
+    body->body->forceActivationState (ACTIVE_TAG);
   }
 }
 
