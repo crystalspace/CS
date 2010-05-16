@@ -20,7 +20,10 @@
 #define __FUR_INTERF_H__
 
 #include <csutil/scf.h>
+
 #include <ivideo/material.h>
+#include <ivaria/view.h>
+#include <iengine/sector.h>
 
 struct iFurMaterial;
 
@@ -53,7 +56,8 @@ struct iFurMaterial : public virtual iMaterial
   virtual void SetLength (float len) = 0;
   virtual float GetLength () const = 0;
 
-  virtual void SetColor (const csColor4& color) = 0;
-  virtual csColor4 GetColor () const = 0;
+  /// Generate geometry
+  virtual void GenerateGeometry (iSector *room, int controlPoints, int numberOfStrains) = 0;
+  virtual void UpdateGeometry (iView *view) = 0;
 };
 #endif // __FUR_INTERF_H__

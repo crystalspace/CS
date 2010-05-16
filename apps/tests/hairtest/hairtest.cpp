@@ -122,6 +122,9 @@ void HairTest::Frame ()
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
 
+  // Update furmaterial geometry
+  furMaterial->UpdateGeometry(view);
+
   // Default behavior from csDemoApplication
   csDemoApplication::Frame ();
 
@@ -294,11 +297,7 @@ bool HairTest::Application ()
   furMaterialType = csQueryRegistry<iFurMaterialType> (GetObjectRegistry ());
   if (!furMaterialType)
     return ReportError("Failed to locate iFurMaterialType plugin!");
-/*
-  furMaterial = furMaterialType->CreateFurMaterial("hair");
-  furMaterial->DoSomething (1, csVector3 (2, 3, 4));
-  printf ("%d\n", furMaterial->GetSomething ());
-*/
+
   cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!cegui) return ReportError("Failed to locate CEGUI plugin!");
 
@@ -387,6 +386,12 @@ bool HairTest::Application ()
 
   // Initialize camera position
   view->GetCamera ()->GetTransform ().SetOrigin (avatarScene->GetCameraStart ());
+
+  // Initializa fur material
+  furMaterial = furMaterialType->CreateFurMaterial("hair");
+  furMaterial->GenerateGeometry(room,2,10);
+  furMaterial->DoSomething (1, csVector3 (2, 3, 4));
+  printf ("%d\n", furMaterial->GetSomething ());
 
   // Run the application
   Run();

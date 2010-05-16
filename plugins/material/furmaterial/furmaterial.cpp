@@ -15,7 +15,6 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include <cssysdef.h>
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
@@ -64,7 +63,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   iFurMaterial* FurMaterialType::CreateFurMaterial (const char *name)
   {
     csRef<iFurMaterial> newFur;
-    newFur.AttachNew(new FurMaterial (this, name));
+    newFur.AttachNew(new FurMaterial (this, name, object_reg));
     return furMaterialHash.PutUnique (name, newFur);
   }
 
@@ -79,8 +78,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   CS_LEAKGUARD_IMPLEMENT(FurMaterial);
 
-  FurMaterial::FurMaterial (FurMaterialType* manager, const char *name) :
-    scfImplementationType (this), manager (manager), name (name)
+  FurMaterial::FurMaterial (FurMaterialType* manager, const char *name, 
+	iObjectRegistry* object_reg) :
+      scfImplementationType (this), manager (manager), name (name), 
+	    object_reg(object_reg), length(0.5f)
   {
   }
 
@@ -104,22 +105,117 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::SetLength (float len)
   {
-
+	length = len;
   }
 
   float FurMaterial::GetLength () const
   {
-    return 0;
+    return length;
   }
 
-  void FurMaterial::SetColor (const csColor4& color)
+  void FurMaterial::GenerateGeometry(iSector *room, int controlPoints, int numberOfStrains)
   {
+    assert(controlPoints > 1);
 
+	this->controlPoints = controlPoints;
+	this->numberOfStrains = numberOfStrains;
+
+    csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+	if (!engine) csApplicationFramework::ReportError("Failed to locate iEngine plugin!");
+
+	// First create the factory:
+	csRef<iMeshFactoryWrapper> factory = engine->CreateMeshFactory (
+		"crystalspace.mesh.object.genmesh", "hairFactory");
+
+	factoryState = scfQueryInterface<iGeneralFactoryState> (
+		factory->GetMeshObjectFactory ());
+
+	factoryState -> SetVertexCount (numberOfStrains * 2 * controlPoints);
+	factoryState -> SetTriangleCount ( numberOfStrains * 2 * (controlPoints - 1));
+
+	for ( int i = 0 ; i < numberOfStrains ; i ++ )
+	{
+	  for ( int j = 0 ; j < controlPoints ; j ++ )
+	  {
+		factoryState -> GetVertices()[i * 2 * controlPoints + 2 * j].Set
+		  ( csVector3(i/10.0f, j * length / (controlPoints - 1), -1));
+		factoryState -> GetVertices()[i * 2 * controlPoints + 2 * j + 1].Set
+		  ( csVector3(i/10.0f + 0.01f, j * length / (controlPoints - 1), -1));
+	  }
+
+	  for ( int j = 0 ; j < 2 * (controlPoints - 1) ; j ++ )
+	  {
+		if (j % 2 == 0)
+		{
+	      factoryState -> GetTriangles( )[i * 2 * (controlPoints - 1) + j ].Set
+		    ( 2 * i + i * 2 * (controlPoints - 1) + j , 
+			  2 * i + i * 2 * (controlPoints - 1) + j + 3 , 
+			  2 * i + i * 2 * (controlPoints - 1) + j + 1 );
+		  //printf("%d %d %d\n", 2 * i + j , 2 * i + j + 3 , 2 * i + j + 1);
+		}
+		else
+		{
+		  factoryState -> GetTriangles( )[i * 2 * (controlPoints - 1) + j ].Set
+			( 2 * i + i * 2 * (controlPoints - 1) + j + 1 , 
+			  2 * i + i * 2 * (controlPoints - 1) + j + 2 , 
+			  2 * i + i * 2 * (controlPoints - 1) + j - 1 );
+		  //printf("%d %d %d\n", 2 * i + j + 1 , 2 * i + j + 2 , 2 * i + j - 1);
+		}
+	  }
+	}
+
+	factoryState -> CalculateNormals();
+	
+	// Make a ball using the genmesh plug-in.
+	csRef<iMeshWrapper> meshWrapper =
+		engine->CreateMeshWrapper (factory, "hair", room, csVector3 (0, 0, 0));
+
+	csRef<iMaterialWrapper> materialWrapper = 
+		CS::Material::MaterialBuilder::CreateColorMaterial
+		(object_reg,"hairDummyMaterial",csColor(0,1,0));
+
+	meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
   }
 
-  csColor4 FurMaterial::GetColor () const
+  void FurMaterial::UpdateGeometry (iView *view)
   {
-    return csColor4(0);
+    const csOrthoTransform& tc = view -> GetCamera() ->GetTransform ();
+
+	factoryState -> SetVertexCount (numberOfStrains * 2 * controlPoints);
+	factoryState -> SetTriangleCount ( numberOfStrains * 2 * (controlPoints - 1));
+
+	for ( int i = 0 ; i < numberOfStrains ; i ++ )
+	{
+	  for ( int j = 0 ; j < controlPoints ; j ++ )
+	  {
+		factoryState -> GetVertices()[i * 2 * controlPoints + 2 * j].Set
+		  ( tc.GetT2O() * csVector3(i/10.0f, j * length / (controlPoints - 1), -1));
+		factoryState -> GetVertices()[i * 2 * controlPoints + 2 * j + 1].Set
+		  ( tc.GetT2O() * csVector3(i/10.0f + 0.01f, j * length / (controlPoints - 1), -1));
+	  }
+
+	  for ( int j = 0 ; j < 2 * (controlPoints - 1) ; j ++ )
+	  {
+		if (j % 2 == 0)
+		{
+	      factoryState -> GetTriangles( )[i * 2 * (controlPoints - 1) + j ].Set
+		    ( 2 * i + i * 2 * (controlPoints - 1) + j , 
+			  2 * i + i * 2 * (controlPoints - 1) + j + 3 , 
+			  2 * i + i * 2 * (controlPoints - 1) + j + 1 );
+		  //printf("%d %d %d\n", 2 * i + j , 2 * i + j + 3 , 2 * i + j + 1);
+		}
+		else
+		{
+		  factoryState -> GetTriangles( )[i * 2 * (controlPoints - 1) + j ].Set
+			( 2 * i + i * 2 * (controlPoints - 1) + j + 1 , 
+			  2 * i + i * 2 * (controlPoints - 1) + j + 2 , 
+			  2 * i + i * 2 * (controlPoints - 1) + j - 1 );
+		  //printf("%d %d %d\n", 2 * i + j + 1 , 2 * i + j + 2 , 2 * i + j - 1);
+		}
+	  }
+	}
+
+	factoryState -> CalculateNormals();
   }
 
   void FurMaterial::SetShader (csStringID type, iShader* shd)

@@ -23,6 +23,9 @@
 #include <csgeom/vector3.h>
 #include <imaterial/furmaterial.h>
 #include <csgfx/shadervarcontext.h>
+#include <include/imesh/genmesh.h>
+
+#include "crystalspace.h"
 
 #include "csutil/scf_implementation.h"
 
@@ -59,7 +62,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   {
   public:
     CS_LEAKGUARD_DECLARE(FurMaterial);
-    FurMaterial (FurMaterialType* manager, const char *name);
+    FurMaterial (FurMaterialType* manager, const char *name,
+	  iObjectRegistry* object_reg);
     virtual ~FurMaterial ();
 
     // From iFurMaterial.
@@ -69,9 +73,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     virtual void SetLength (float len);
     virtual float GetLength () const;
 
-    virtual void SetColor (const csColor4& color);
-    virtual csColor4 GetColor () const;
-	
+	virtual void GenerateGeometry (iSector *room, int controlPoints, int numberOfStrains);
+
+	virtual void UpdateGeometry(iView *view);
+
 	/*
 	// From iShaderVariableContext
 	virtual void AddVariable (csShaderVariable *variable);
@@ -108,9 +113,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	  csString name;
 
   private:
+	  iObjectRegistry* object_reg;
 	  csVector3 store_v;
 	  /// Shader associated with material
 	  csHash<csRef<iShader>, csStringID> shaders;
+	  /// Fur geometry
+	  float length;
+	  int controlPoints;
+	  int numberOfStrains;
+	  csRef<iGeneralFactoryState> factoryState;
   };
 
 }
