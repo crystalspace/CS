@@ -411,7 +411,7 @@ bool AvatarTest::Application ()
 	// Set up the physical collider for the roof (soft bodies don't like plane
 	// colliders, so use a box instead)
 	csOrthoTransform t;
-	t.SetOrigin(csVector3(0.0f, -100.0f, 0.0f));
+	t.SetOrigin(csVector3(0.0f, -50.0f, 0.0f));
 	dynamicSystem->AttachColliderBox (csVector3 (100.0f), t, 10.0f, 0.0f);
       }
 
