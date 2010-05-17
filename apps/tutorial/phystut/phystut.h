@@ -73,6 +73,7 @@ private:
   bool dragging;
   csRef<iBulletPivotJoint> dragJoint;
   float dragDistance;
+  float linearDampening, angularDampening;
   int mouseX, mouseY;
 
   // Cut & Paste related

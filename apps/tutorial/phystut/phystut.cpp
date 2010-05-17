@@ -629,6 +629,14 @@ bool Simple::OnMouseDown (iEvent& ev)
 
     dragging = true;
     dragDistance = (result.isect - startBeam).Norm ();
+
+    // Set some dampening on the rigid body to have a more stable dragging
+    csRef<iBulletRigidBody> csBody =
+      scfQueryInterface<iBulletRigidBody> (result.body);
+    linearDampening = csBody->GetLinearDampener ();
+    angularDampening = csBody->GetRollingDampener ();
+    csBody->SetLinearDampener (0.9f);
+    csBody->SetRollingDampener (0.9f);
   }
 
   return false;
@@ -639,6 +647,12 @@ bool Simple::OnMouseUp (iEvent& ev)
   if (dragging)
   {
     dragging = false;
+
+    // Put back the original dampening on the rigid body
+    csRef<iBulletRigidBody> csBody =
+      scfQueryInterface<iBulletRigidBody> (dragJoint->GetAttachedBody ());
+    csBody->SetLinearDampener (linearDampening);
+    csBody->SetRollingDampener (angularDampening);
 
     // Remove the drag joint
     bulletDynamicSystem->RemovePivotJoint (dragJoint);
@@ -788,7 +802,11 @@ bool Simple::Application ()
   // Create the dynamic system
   dynamicSystem = dyn->CreateSystem ();
   if (!dynamicSystem) return ReportError ("Error creating dynamic system!");
-  dynamicSystem->SetRollingDampener(.995f);
+
+  // Set some linear and angular dampening in order to have a reduction of
+  // the movements of the objects
+  dynamicSystem->SetLinearDampener(0.1f);
+  dynamicSystem->SetRollingDampener(0.1f);
 
   // Configure the physical plugins
   if (phys_engine_id == ODE_ID)
