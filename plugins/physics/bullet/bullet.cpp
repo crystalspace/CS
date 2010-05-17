@@ -194,7 +194,9 @@ csBulletDynamicsSystem::csBulletDynamicsSystem
     : scfImplementationType (this), isSoftWorld (false), softWorldInfo (0),
       gimpactRegistered (false), internalScale (1.0f), inverseInternalScale (1.0f),
       worldTimeStep (1.0f / 60.0f), worldMaxSteps (1), linearDampening (0.0f),
-      angularDampening (0.0f), debugDraw (0)
+      angularDampening (0.0f), autoDisableEnabled (true),
+      linearDisableThreshold (0.8f), angularDisableThreshold (1.0f),
+      timeDisableThreshold (0.0), debugDraw (0)
 {
   // create base Bullet objects
   configuration = new btDefaultCollisionConfiguration ();
@@ -273,21 +275,22 @@ float csBulletDynamicsSystem::GetRollingDampener () const
   return angularDampening;
 }
 
-void csBulletDynamicsSystem::EnableAutoDisable (bool)
+void csBulletDynamicsSystem::EnableAutoDisable (bool enable)
 {
-  // @@@ TODO
+  autoDisableEnabled = enable;
 }
 
 bool csBulletDynamicsSystem::AutoDisableEnabled ()
 {
-  // @@@ TODO
-  return false;
+  return autoDisableEnabled;
 }
 
-void csBulletDynamicsSystem::SetAutoDisableParams (float /*linear*/,
-  float /*angular*/, int /*steps*/, float /*time*/)
+void csBulletDynamicsSystem::SetAutoDisableParams (float linear,
+  float angular, int steps, float time)
 {
-  // @@@ TODO
+  linearDisableThreshold = linear;
+  angularDisableThreshold = angular;
+  timeDisableThreshold = time;
 }
 
 void csBulletDynamicsSystem::CheckCollision(csBulletRigidBody& cs_obA,btCollisionObject *obB,btPersistentManifold &contactManifold)
@@ -1176,6 +1179,13 @@ void csBulletRigidBody::RebuildBody ()
     body->setAngularVelocity (angularVelocity);
   }
 
+  // set deactivation parameters
+  if (!dynSys->autoDisableEnabled)
+    body->setActivationState (DISABLE_DEACTIVATION);
+  body->setSleepingThresholds (dynSys->linearDisableThreshold,
+			       dynSys->angularDisableThreshold);
+  body->setDeactivationTime (dynSys->timeDisableThreshold);
+
   // TODO: update any connected joints
 }
 
@@ -1292,8 +1302,13 @@ bool csBulletRigidBody::MakeDynamic (void)
     // set body dynamic
     btVector3 localInertia (0.0f, 0.0f, 0.0f);
     compoundShape->calculateLocalInertia (mass, localInertia);
-    body->setMassProps(mass, localInertia);
-    body->setActivationState(ACTIVE_TAG);
+    body->setMassProps (mass, localInertia);
+
+    if (!dynSys->autoDisableEnabled)
+      body->setActivationState (DISABLE_DEACTIVATION);
+    else
+      body->forceActivationState (ACTIVE_TAG);
+
     body->setLinearVelocity (linearVelocity);
     body->setAngularVelocity (angularVelocity);
     body->updateInertiaTensor ();

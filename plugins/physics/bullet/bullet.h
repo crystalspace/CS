@@ -133,6 +133,10 @@ private:
   size_t worldMaxSteps;
   float linearDampening;
   float angularDampening;
+  bool autoDisableEnabled;
+  float linearDisableThreshold;
+  float angularDisableThreshold;
+  float timeDisableThreshold;
 
   // For getting collision mesh data.
   csStringID baseId;
