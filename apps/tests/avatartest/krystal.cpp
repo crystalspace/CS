@@ -395,45 +395,48 @@ bool KrystalScene::CreateAvatar ()
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
     ragdollNodeFactory->AddBodyChain (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
 
-    // Create the soft body for the hairs
-    csRef<iGeneralFactoryState> hairsFactoryState =
-      scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
-    hairsBody = avatarTest->bulletDynamicSystem->CreateSoftBody
-      (hairsFactoryState, csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
-    hairsBody->SetMass (2.0f);
-    hairsBody->SetRigidity (0.02f);
+    if (avatarTest->softBodiesEnabled)
+    {
+      // Create the soft body for the hairs
+      csRef<iGeneralFactoryState> hairsFactoryState =
+	scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
+      hairsBody = avatarTest->bulletDynamicSystem->CreateSoftBody
+	(hairsFactoryState, csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
+      hairsBody->SetMass (2.0f);
+      hairsBody->SetRigidity (0.02f);
 
-    // Create the mesh of the hairs
-    hairsFactoryState->SetAnimationControlFactory (avatarTest->softBodyAnimationFactory);
-    hairsMesh = avatarTest->engine->CreateMeshWrapper
-      (hairsMeshFact, "krystal_hairs", avatarTest->room, csVector3 (0.0f));
+      // Create the mesh of the hairs
+      hairsFactoryState->SetAnimationControlFactory (avatarTest->softBodyAnimationFactory);
+      hairsMesh = avatarTest->engine->CreateMeshWrapper
+	(hairsMeshFact, "krystal_hairs", avatarTest->room, csVector3 (0.0f));
 
-    // Init the animation control for the animation of the genmesh
-    csRef<iGeneralMeshState> hairsMeshState =
-      scfQueryInterface<iGeneralMeshState> (hairsMesh->GetMeshObject ());
-    csRef<iSoftBodyAnimationControl> animationControl =
-      scfQueryInterface<iSoftBodyAnimationControl> (hairsMeshState->GetAnimationControl ());
-    animationControl->SetSoftBody (hairsBody);
+      // Init the animation control for the animation of the genmesh
+      csRef<iGeneralMeshState> hairsMeshState =
+	scfQueryInterface<iGeneralMeshState> (hairsMesh->GetMeshObject ());
+      csRef<iSoftBodyAnimationControl> animationControl =
+	scfQueryInterface<iSoftBodyAnimationControl> (hairsMeshState->GetAnimationControl ());
+      animationControl->SetSoftBody (hairsBody);
 
-    // Create the soft body for the skirt
-    csRef<iGeneralFactoryState> skirtFactoryState =
-      scfQueryInterface<iGeneralFactoryState> (skirtMeshFact->GetMeshObjectFactory ());
-    skirtBody = avatarTest->bulletDynamicSystem->CreateSoftBody
-      (skirtFactoryState, csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, -0.055f)));
-    skirtBody->SetMass (2.0f);
-    skirtBody->SetRigidity (0.02f);
+      // Create the soft body for the skirt
+      csRef<iGeneralFactoryState> skirtFactoryState =
+	scfQueryInterface<iGeneralFactoryState> (skirtMeshFact->GetMeshObjectFactory ());
+      skirtBody = avatarTest->bulletDynamicSystem->CreateSoftBody
+	(skirtFactoryState, csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, -0.055f)));
+      skirtBody->SetMass (2.0f);
+      skirtBody->SetRigidity (0.02f);
 
-    // Create the mesh of the skirt
-    skirtFactoryState->SetAnimationControlFactory (avatarTest->softBodyAnimationFactory);
-    skirtMesh = avatarTest->engine->CreateMeshWrapper
-      (skirtMeshFact, "krystal_skirt", avatarTest->room, csVector3 (0.0f));
+      // Create the mesh of the skirt
+      skirtFactoryState->SetAnimationControlFactory (avatarTest->softBodyAnimationFactory);
+      skirtMesh = avatarTest->engine->CreateMeshWrapper
+	(skirtMeshFact, "krystal_skirt", avatarTest->room, csVector3 (0.0f));
 
-    // Init the animation control for the animation of the genmesh
-    csRef<iGeneralMeshState> skirtMeshState =
-      scfQueryInterface<iGeneralMeshState> (skirtMesh->GetMeshObject ());
-    animationControl =
-      scfQueryInterface<iSoftBodyAnimationControl> (skirtMeshState->GetAnimationControl ());
-    animationControl->SetSoftBody (skirtBody);
+      // Init the animation control for the animation of the genmesh
+      csRef<iGeneralMeshState> skirtMeshState =
+	scfQueryInterface<iGeneralMeshState> (skirtMesh->GetMeshObject ());
+      animationControl =
+	scfQueryInterface<iSoftBodyAnimationControl> (skirtMeshState->GetAnimationControl ());
+      animationControl->SetSoftBody (skirtBody);
+    }
   }
 
   else
@@ -460,36 +463,39 @@ bool KrystalScene::CreateAvatar ()
     // Start the ragdoll animation node in order to have the rigid bodies created
     ragdollNode->Play ();
 
-    // Find the rigid body of the head of Krystal
-    iRigidBody* headBody = ragdollNode->GetBoneRigidBody
-      (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
+    if (avatarTest->softBodiesEnabled)
+    {
+      // Find the rigid body of the head of Krystal
+      iRigidBody* headBody = ragdollNode->GetBoneRigidBody
+	(animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
 
-    // Attach the hairs to the rigid body of the head of Krystal.
-    // We are lazy and simply attach all the vertices higher than a threshold.
-    for (size_t i = 0; i < hairsBody->GetVertexCount (); i++)
-      if (hairsBody->GetVertexPosition (i)[1] > 1.7f)
-	hairsBody->AnchorVertex (i, headBody);
+      // Attach the hairs to the rigid body of the head of Krystal.
+      // We are lazy and simply attach all the vertices higher than a threshold.
+      for (size_t i = 0; i < hairsBody->GetVertexCount (); i++)
+	if (hairsBody->GetVertexPosition (i)[1] > 1.7f)
+	  hairsBody->AnchorVertex (i, headBody);
 
-    // Find the rigid body of the spine of Krystal
-    iRigidBody* spineBody = ragdollNode->GetBoneRigidBody
-      (animeshFactory->GetSkeletonFactory ()->FindBone ("ToSpine"));
+      // Find the rigid body of the spine of Krystal
+      iRigidBody* spineBody = ragdollNode->GetBoneRigidBody
+	(animeshFactory->GetSkeletonFactory ()->FindBone ("ToSpine"));
 
-    // Attach the skirt to the rigid body of the spine of Krystal.
-    // The indices of the vertices have been found by a manual investigation
-    // of the vertex list
-    skirtBody->AnchorVertex (7, spineBody);
-    skirtBody->AnchorVertex (8, spineBody);
-    skirtBody->AnchorVertex (10, spineBody);
-    skirtBody->AnchorVertex (67, spineBody);
-    skirtBody->AnchorVertex (68, spineBody);
-    skirtBody->AnchorVertex (69, spineBody);
-    skirtBody->AnchorVertex (70, spineBody);
-    skirtBody->AnchorVertex (71, spineBody);
-    skirtBody->AnchorVertex (76, spineBody);
-    skirtBody->AnchorVertex (77, spineBody);
-    skirtBody->AnchorVertex (78, spineBody);
-    skirtBody->AnchorVertex (79, spineBody);
-    skirtBody->AnchorVertex (80, spineBody);
+      // Attach the skirt to the rigid body of the spine of Krystal.
+      // The indices of the vertices have been found by a manual investigation
+      // of the vertex list
+      skirtBody->AnchorVertex (7, spineBody);
+      skirtBody->AnchorVertex (8, spineBody);
+      skirtBody->AnchorVertex (10, spineBody);
+      skirtBody->AnchorVertex (67, spineBody);
+      skirtBody->AnchorVertex (68, spineBody);
+      skirtBody->AnchorVertex (69, spineBody);
+      skirtBody->AnchorVertex (70, spineBody);
+      skirtBody->AnchorVertex (71, spineBody);
+      skirtBody->AnchorVertex (76, spineBody);
+      skirtBody->AnchorVertex (77, spineBody);
+      skirtBody->AnchorVertex (78, spineBody);
+      skirtBody->AnchorVertex (79, spineBody);
+      skirtBody->AnchorVertex (80, spineBody);
+    }
   }
 
   // Start animation

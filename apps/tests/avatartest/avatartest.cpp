@@ -49,6 +49,9 @@ AvatarTest::AvatarTest ()
   commandLineHelper.commandOptions.Push
     (csDemoCommandLineHelper::CommandOption
      ("no_physics", "Disable the physical animations"));
+  commandLineHelper.commandOptions.Push
+    (csDemoCommandLineHelper::CommandOption
+     ("disable_soft", "Disable the soft bodies"));
 }
 
 AvatarTest::~AvatarTest ()
@@ -291,6 +294,26 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
       break;
     }
 
+    // Check whether the soft bodies are enabled or not
+    softBodiesEnabled = !clp->GetBoolOption ("disable_soft", false);
+
+    // Load the soft body animation control plugin & factory
+    if (softBodiesEnabled)
+    {
+      csRef<iPluginManager> plugmgr = 
+	csQueryRegistry<iPluginManager> (GetObjectRegistry ());
+      softBodyAnimationType = csLoadPlugin<iSoftBodyAnimationControlType>
+	(plugmgr, "crystalspace.dynamics.softanim");
+
+      if (!softBodyAnimationType)
+      {
+	ReportWarning
+	  ("Can't load soft body animation plugin, continuing with reduced functionalities");
+	softBodiesEnabled = false;
+	break;
+      }
+    }
+
     break;
   }
 
@@ -351,7 +374,7 @@ bool AvatarTest::Application ()
     else
     {
       // Set up some deactivation and dampening parameters
-      dynamicSystem->SetAutoDisableParams (1.6f, 2.5f, 0.0f, 0.8f);
+      dynamicSystem->SetAutoDisableParams (1.6f, 2.5f, 0, 0.8f);
       dynamicSystem->SetLinearDampener (0.05f);
       dynamicSystem->SetRollingDampener (0.85f);
 
@@ -359,48 +382,43 @@ bool AvatarTest::Application ()
       bulletDynamicSystem =
 	scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
 
-      // Set the dynamic system as a soft body world in order to animate the skirt of Krystal
-      bulletDynamicSystem->SetSoftBodyWorld (true);
+      // We have some objects of size smaller than 0.035 units, so we scale up the
+      // whole world for a better behavior of the dynamic simulation.
+      bulletDynamicSystem->SetInternalScale (10.0f);
 
-      // Load the soft body animation control plugin & factory
-      csRef<iPluginManager> plugmgr = 
-	csQueryRegistry<iPluginManager> (GetObjectRegistry ());
-      csRef<iSoftBodyAnimationControlType> softBodyAnimationType =
-	csLoadPlugin<iSoftBodyAnimationControlType>
-	(plugmgr, "crystalspace.dynamics.softanim");
+      // The physical scene are rather complex in this demo. We therefore use high
+      // accuracy/low performance parameters for a better behavior of the dynamic
+      // simulation.
+      bulletDynamicSystem->SetStepParameters (0.008f, 150, 10);
 
-      if (!softBodyAnimationType)
+      // Create the dynamic's debugger
+      dynamicsDebugger = debuggerManager->CreateDebugger ();
+      dynamicsDebugger->SetDynamicSystem (dynamicSystem);
+      dynamicsDebugger->SetDebugSector (room);
+
+      if (softBodiesEnabled)
       {
-	ReportWarning
-	  ("Can't load soft body animation plugin, continuing with reduced functionalities");
-	physicsEnabled = false;
-      }
+	// Set the dynamic system as a soft body world in order to animate the skirt
+	// of Krystal
+	bulletDynamicSystem->SetSoftBodyWorld (true);
 
-      else
-      {
+	// Create the soft body animation factory
 	csRef<iGenMeshAnimationControlFactory> animationFactory =
 	  softBodyAnimationType->CreateAnimationControlFactory ();
 	softBodyAnimationFactory =
 	  scfQueryInterface<iSoftBodyAnimationControlFactory> (animationFactory);
 
-	// We have some objects of size smaller than 0.035 units, so we scale up the
-	// whole world for a better behavior of the dynamic simulation.
-	bulletDynamicSystem->SetInternalScale (10.0f);
+	// Set up the physical collider for the roof (soft bodies don't like plane
+	// colliders, so use a box instead)
+	csOrthoTransform t;
+	t.SetOrigin(csVector3(0.0f, -100.0f, 0.0f));
+	dynamicSystem->AttachColliderBox (csVector3 (100.0f), t, 10.0f, 0.0f);
+      }
 
-	// The physical scene are rather complex in this demo. We therefore use high
-	// accuracy/low performance parameters for a better behavior of the dynamic
-	// simulation.
-	bulletDynamicSystem->SetStepParameters (0.008f, 150, 10);
-
-	// Create the dynamic's debugger
-	dynamicsDebugger = debuggerManager->CreateDebugger ();
-	dynamicsDebugger->SetDynamicSystem (dynamicSystem);
-	dynamicsDebugger->SetDebugSector (room);
-
-	// Set up the physical collider for the roof
+      // Set up the physical collider for the roof
+      else
 	dynamicSystem->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), 0.0f),
 					    10.0f, 0.0f);
-      }
     }
   }
 

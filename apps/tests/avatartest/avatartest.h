@@ -87,8 +87,12 @@ private:
   csRef<iBulletDynamicSystem> bulletDynamicSystem;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
-  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   int dynamicsDebugMode;
+
+  // Soft bodies related
+  csRef<iSoftBodyAnimationControlType> softBodyAnimationType;
+  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
+  bool softBodiesEnabled;
 
   // Animation node plugin managers
   csRef<iSkeletonLookAtManager2> lookAtManager;
