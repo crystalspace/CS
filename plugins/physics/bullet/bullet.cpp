@@ -193,7 +193,8 @@ csBulletDynamicsSystem::csBulletDynamicsSystem
   (iObjectRegistry* object_reg)
     : scfImplementationType (this), isSoftWorld (false), softWorldInfo (0),
       gimpactRegistered (false), internalScale (1.0f), inverseInternalScale (1.0f),
-      worldTimeStep (1.0f / 60.0f), worldMaxSteps (1), debugDraw (0)
+      worldTimeStep (1.0f / 60.0f), worldMaxSteps (1), linearDampening (0.0f),
+      angularDampening (0.0f), debugDraw (0)
 {
   // create base Bullet objects
   configuration = new btDefaultCollisionConfiguration ();
@@ -252,26 +253,24 @@ const csVector3 csBulletDynamicsSystem::GetGravity () const
   return BulletToCS (v, inverseInternalScale);
 }
 
-void csBulletDynamicsSystem::SetLinearDampener (float)
+void csBulletDynamicsSystem::SetLinearDampener (float dampening)
 {
-  // @@@ TODO
+  linearDampening = dampening;
 }
 
 float csBulletDynamicsSystem::GetLinearDampener () const
 {
-  // @@@ TODO
-  return 0;
+  return linearDampening;
 }
 
-void csBulletDynamicsSystem::SetRollingDampener (float)
+void csBulletDynamicsSystem::SetRollingDampener (float dampening)
 {
-  // @@@ TODO
+  angularDampening = dampening;
 }
 
 float csBulletDynamicsSystem::GetRollingDampener () const
 {
-  // @@@ TODO
-  return 0;
+  return angularDampening;
 }
 
 void csBulletDynamicsSystem::EnableAutoDisable (bool)
@@ -1005,7 +1004,8 @@ void csBulletDynamicsSystem::RemovePivotJoint (iBulletPivotJoint* joint)
 csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic)
   : scfImplementationType (this), dynSys (dynSys), body (0),
     dynamicState (isStatic? CS_BULLET_STATE_STATIC : CS_BULLET_STATE_DYNAMIC),
-    customMass (false), mass (1.0f), compoundChanged (false), insideWorld (false)
+    customMass (false), mass (1.0f), compoundChanged (false), insideWorld (false),
+    linearDampening (dynSys->linearDampening), angularDampening (dynSys->angularDampening)
 {
   btTransform identity;
   identity.setIdentity ();
@@ -1157,12 +1157,11 @@ void csBulletRigidBody::RebuildBody ()
 						  compoundShape, localInertia);
 
   // TODO: add ability to have different material properties for each collider?
+  // TODO: use collider's softness
   infos.m_friction = colliders[0]->friction;
   infos.m_restitution = colliders[0]->elasticity;
-  // TODO: is damping the same than softness?
-  // Use instead the linear/rolling dampener of the dynamic system?
-  infos.m_linearDamping = colliders[0]->softness;
-  infos.m_angularDamping = colliders[0]->softness;
+  infos.m_linearDamping = linearDampening;
+  infos.m_angularDamping = angularDampening;
 
   // create new rigid body
   body = new btRigidBody (infos);
@@ -2128,6 +2127,32 @@ void csBulletRigidBody::Update ()
     // remainder case for all other callbacks
     moveCb->Execute (trans);
   }
+}
+
+void csBulletRigidBody::SetLinearDampener (float d)
+{
+  linearDampening = d;
+
+  if (body)
+    body->setDamping (linearDampening, angularDampening);
+}
+
+float csBulletRigidBody::GetLinearDampener () const
+{
+  return linearDampening;
+}
+
+void csBulletRigidBody::SetRollingDampener (float d)
+{
+  angularDampening = d;
+
+  if (body)
+    body->setDamping (linearDampening, angularDampening);
+}
+
+float csBulletRigidBody::GetRollingDampener () const
+{
+  return angularDampening;
 }
 
 //--------------------- csBulletDefaultMoveCallback -------------------------

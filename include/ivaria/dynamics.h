@@ -136,12 +136,32 @@ struct iDynamicSystem : public virtual iBase
   virtual void SetGravity (const csVector3& v) = 0;
   /// Get the global gravity.
   virtual const csVector3 GetGravity () const = 0;
-  /// Set the global linear dampener.
+
+  /**
+   * Set the global linear dampener. The dampening correspond to how
+   * much the movements of the objects will be reduced. It is a value
+   * between 0 and 1, giving the ratio of speed that will be reduced
+   * in one second. 0 means that the movement will not be reduced, while
+   * 1 means that the object will not move.
+   * The default value is 0.
+   * \sa iBulletRigidBody::SetLinearDampener()
+   */
   virtual void SetLinearDampener (float d) = 0;
+
   /// Get the global linear dampener setting.
   virtual float GetLinearDampener () const = 0;
-  /// Set the global rolling dampener.
+
+  /**
+   * Set the global angular dampener. The dampening correspond to how
+   * much the movements of the objects will be reduced. It is a value
+   * between 0 and 1, giving the ratio of speed that will be reduced
+   * in one second. 0 means that the movement will not be reduced, while
+   * 1 means that the object will not move.
+   * The default value is 0.
+   * \sa iBulletRigidBody::SetRollingDampener()
+   */
   virtual void SetRollingDampener (float d) = 0;
+
   /// Get the global rolling dampener setting.
   virtual float GetRollingDampener () const = 0;
 

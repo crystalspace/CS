@@ -409,7 +409,7 @@ enum csBulletState
  */
 struct iBulletRigidBody : public virtual iBase
 {
-  SCF_INTERFACE(iBulletRigidBody, 1, 0, 0);
+  SCF_INTERFACE(iBulletRigidBody, 1, 0, 1);
 
   /**
    * Set a body in the kinematic state, ie the motion of the body is
@@ -442,6 +442,38 @@ struct iBulletRigidBody : public virtual iBase
    * Get the callback used to update the transform of the kinematic body.
    */
   virtual iBulletKinematicCallback* GetKinematicCallback () = 0;
+
+  /**
+   * Set the linear dampener for this rigid body. The dampening correspond to
+   * how much the movements of the objects will be reduced. It is a value
+   * between 0 and 1, giving the ratio of speed that will be reduced
+   * in one second. 0 means that the movement will not be reduced, while
+   * 1 means that the object will not move.
+   * The default value is 0.
+   * \sa iDynamicSystem::SetLinearDampener()
+   */
+  virtual void SetLinearDampener (float d) = 0;
+
+  /**
+   * Get the linear dampener for this rigid body.
+   */
+  virtual float GetLinearDampener () const = 0;
+
+  /**
+   * Set the angular dampener for this rigid body. The dampening correspond to
+   * how much the movements of the objects will be reduced. It is a value
+   * between 0 and 1, giving the ratio of speed that will be reduced
+   * in one second. 0 means that the movement will not be reduced, while
+   * 1 means that the object will not move.
+   * The default value is 0.
+   * \sa iDynamicSystem::SetRollingDampener()
+   */
+  virtual void SetRollingDampener (float d) = 0;
+
+  /**
+   * Get the angular dampener for this rigid body.
+   */
+  virtual float GetRollingDampener () const = 0;
 };
 
 /**
