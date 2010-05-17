@@ -172,18 +172,21 @@ struct iDynamicSystem : public virtual iBase
    */
   virtual void EnableAutoDisable (bool enable) = 0;
   /// Return whether the AutoDisable is on or off.
-  virtual bool AutoDisableEnabled () =0;
+  virtual bool AutoDisableEnabled () = 0;
   /**
    * Set the parameters for AutoDisable.
-   * \param linear Maximum linear movement to disable a body
-   * \param angular Maximum angular movement to disable a body
+   * \param linear Maximum linear movement to disable a body. Default value is 0.8.
+   * \param angular Maximum angular movement to disable a body. Default value is 1.0.
    * \param steps Minimum number of steps the body meets linear and angular
-   * requirements before it is disabled.
+   * requirements before it is disabled. Default value is 0.
    * \param time Minimum time the body needs to meet linear and angular
-   * movement requirements before it is disabled.
+   * movement requirements before it is disabled. Default value is 0.0.
+   * \remark With the Bullet plugin, the 'steps' parameter is ignored.
+   * \remark With the Bullet plugin, calling this method will not affect bodies already
+   * created.
    */
   virtual void SetAutoDisableParams (float linear, float angular, int steps,
-  	float time)=0;
+  	float time) = 0;
 
   /// Step the simulation forward by stepsize.
   virtual void Step (float stepsize) = 0;
