@@ -7156,6 +7156,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetCollider = *cspacec::iDynamicSystem_GetCollider;
 *GetColliderCount = *cspacec::iDynamicSystem_GetColliderCount;
 *AttachColliderCapsule = *cspacec::iDynamicSystem_AttachColliderCapsule;
+*AddBody = *cspacec::iDynamicSystem_AddBody;
 *scfGetVersion = *cspacec::iDynamicSystem_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
