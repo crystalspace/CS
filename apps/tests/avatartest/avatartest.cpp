@@ -350,6 +350,11 @@ bool AvatarTest::Application ()
 
     else
     {
+      // Set up some deactivation and dampening parameters
+      dynamicSystem->SetAutoDisableParams (1.6f, 2.5f, 0.0f, 0.8f);
+      dynamicSystem->SetLinearDampener (0.05f);
+      dynamicSystem->SetRollingDampener (0.85f);
+
       // Find the Bullet interface of the dynamic system
       bulletDynamicSystem =
 	scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
