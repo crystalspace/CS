@@ -33,6 +33,50 @@
   code itself.
 */
 
+/* Check whether shared or static libs should be used.
+   Relevant defines are CS_USE_SHARED_LIBS, CS_USE_STATIC_LIBS and 
+   CS_BUILD_SHARED_LIBS. While building CS they indicate whether CS is built
+   with shared or static libs; while building external applications they
+   indicate whether the used CS was built with shared or static libs.
+   
+   The reason for this multitude of defines is historical: first, there was
+   CS_BUILD_SHARED_LIBS (default being absent). However, the name is not very
+   clear when seen in the context of external projects (as CS isn't built there,
+   and it doesn't control the building of the external project). Hence,
+   the somewhat clearer CS_USE_SHARED_LIBS was added. CS_USE_STATIC_LIBS was
+   added to provide an orthogonal definition to make clear static libs are
+   used.
+   Lastly, the defaults have changed: if none of the macros are defined the
+   default is CS_USE_SHARED_LIBS. The reason is that, nowadays, shared libs
+   are the default on most platforms anyway. (Especially on MSVC people tend
+   to overlook to set the CS_BUILD_SHARED_LIBS define for an external project 
+   and experience build errors.)
+ */
+ 
+/* CS_USE_ defines have first control over shared lib building, override
+   legacy CS_BUILD_SHARED_LIBS accordingly */
+#if defined(CS_USE_SHARED_LIBS)
+#  if !defined(CS_BUILD_SHARED_LIBS)
+#    define CS_BUILD_SHARED_LIBS
+#  endif
+#elif defined(CS_USE_STATIC_LIBS)
+#  if defined(CS_BUILD_SHARED_LIBS)
+#    undef CS_BUILD_SHARED_LIBS
+#  endif
+#endif
+/* If no CS_USE_ macro is defined and no CS_BUILD_SHARED_LIBS either, default
+   to CS_USE_SHARED_LIBS */
+#if !defined(CS_USE_SHARED_LIBS) && !defined(CS_USE_STATIC_LIBS)
+#  if !defined(CS_BUILD_SHARED_LIBS)
+#    define CS_BUILD_SHARED_LIBS
+#  endif
+#  define CS_USE_SHARED_LIBS
+#endif
+// Sanity check
+#if defined(CS_USE_SHARED_LIBS) && defined(CS_USE_STATIC_LIBS)
+#  error Both CS_USE_SHARED_LIBS and CS_USE_STATIC_LIBS defined, please pick one!
+#endif
+
 /*
  * Pull in platform-specific overrides of the requested functionality.
  */
@@ -52,7 +96,7 @@
 #  define CS_IMPORT_SYM_DLL extern
 #endif
 #ifndef CS_EXPORT_SYM
-#  if defined(CS_BUILD_SHARED_LIBS)
+#  if defined(CS_USE_SHARED_LIBS)
 #    define CS_EXPORT_SYM CS_VISIBILITY_DEFAULT
 #  else
 #    define CS_EXPORT_SYM
@@ -363,14 +407,14 @@ int vswprintf ();
 typedef void (*csStaticVarCleanupFN) (void (*p)());
 extern csStaticVarCleanupFN csStaticVarCleanup;
 
+#include "csutil/threading/atomicops.h"
 #include "csutil/threading/mutex.h"
-static CS::Threading::Mutex staticVarLock;
 
-#ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
-#  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(Name)              \
-void Name (void (*p)())                                                \
+#define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION_A(Name, FuncAttr)    \
+static CS::Threading::Mutex Name_ ## staticVarLock;                    \
+FuncAttr void Name (void (*p)())                                       \
 {                                                                      \
-  CS::Threading::MutexScopedLock lock(staticVarLock);                  \
+  CS::Threading::MutexScopedLock lock (Name_ ## staticVarLock);        \
   static void (**a)() = 0;                                             \
   static int lastEntry = 0;                                            \
   static int maxEntries = 0;                                           \
@@ -397,6 +441,9 @@ void Name (void (*p)())                                                \
     maxEntries = 0;                                                    \
   }                                                                    \
 }
+#ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
+#  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(Name)              \
+      CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION_A(Name, )
 #endif
 
 #ifndef CS_DEFINE_STATIC_VARIABLE_REGISTRATION
@@ -537,6 +584,36 @@ void Name (void (*p)())                                                \
         csStaticVarCleanup (0);
 #endif
 
+/* Body of getter function, mostly the same across different CS_STATIC_VAR_*
+  variants.
+  'Ptr' is a variable of type 'Type*' that receives the value of 'Val' (where
+  the actual object is stored). See CS_IMPLEMENT_STATIC_VAR for explanation
+  of initParam and kill_how.
+  
+  'Val' is read atomically. If it's 0, a new object is created. If another
+  thread concurrently requests the value, it's ensured that the value is
+  consistent (both the returned and stored value).
+*/
+#define CS_STATIC_VAR_GETTER_COMMON(Type, Ptr, initParam, Val, kill_how)\
+  while (true)								\
+  {									\
+    Ptr = reinterpret_cast<Type*> (					\
+      CS::Threading::AtomicOperations::Read (				\
+	reinterpret_cast<void**> (&Val)));				\
+    if (Ptr != 0) break;						\
+    Ptr = new Type initParam;                              		\
+    if (CS::Threading::AtomicOperations::CompareAndSet (		\
+	reinterpret_cast<void**> (&Val), Ptr, 0) != 0)			\
+    {									\
+      delete Ptr;							\
+    }									\
+    else								\
+    {									\
+      csStaticVarCleanup (kill_how);        				\
+      break;								\
+    }                                                                   \
+  }
+
 /**\def CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam,kill_how)
  * Implement a file-scoped static variable that is created on demand. Defines a
  * 'getter' function to access the variable and a 'destruction' function. The
@@ -551,8 +628,8 @@ void Name (void (*p)())                                                \
 
 #ifndef CS_IMPLEMENT_STATIC_VAR_EXT
 #define CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,kill_how) \
-namespace {                                                            \
-static Type *getterFunc ## _v=0;                                        \
+namespace {                                                             \
+static Type* getterFunc ## _v = 0;                                      \
 static Type* getterFunc ();                                             \
 static void getterFunc ## _kill ();					\
 static void getterFunc ## _kill_array ();				\
@@ -570,12 +647,10 @@ void getterFunc ## _kill_array ()                                	\
 }                                                                       \
 Type* getterFunc ()                                                     \
 {                                                                       \
-  if (!getterFunc ## _v)                                                \
-  {                                                                     \
-    getterFunc ## _v = new Type initParam;                              \
-    csStaticVarCleanup (getterFunc ## kill_how);        		\
-  }                                                                     \
-  return getterFunc ## _v;                                              \
+  Type* p;								\
+  CS_STATIC_VAR_GETTER_COMMON(Type, p, initParam, getterFunc ## _v,	\
+    getterFunc ## kill_how);						\
+  return p;								\
 }                                                                       \
 }
 #endif
@@ -626,7 +701,7 @@ static void getterFunc ## _kill_array ();
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR_EXT
 #define CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,\
   kill_how)                                                    	\
-Type *Class::var = 0;                                          	\
+Type* Class::var = 0;                                          	\
 void Class::getterFunc ## _kill ()               	        \
 {                                                              	\
   delete getterFunc ();                                 	\
@@ -639,12 +714,10 @@ void Class::getterFunc ## _kill_array ()         	        \
 }                                                              	\
 Type* Class::getterFunc ()                                     	\
 {                                                              	\
-  if (!var)                                                    	\
-  {                                                            	\
-    var = new Type initParam;                                  	\
-    csStaticVarCleanup (getterFunc ## kill_how); 	        \
-  }                                                            	\
-  return var;                                                  	\
+  Type* p;							\
+  CS_STATIC_VAR_GETTER_COMMON(Type, p, initParam, var,		\
+    getterFunc ## kill_how);					\
+  return p;							\
 }
 #endif
 
@@ -676,12 +749,10 @@ void Class::getterFunc ## _kill ()                             \
 }                                                              \
 Type &Class::getterFunc ()                                     \
 {                                                              \
-  if (!var)                                                    \
-  {                                                            \
-    var = new Type initParam;                                  \
-    csStaticVarCleanup (getterFunc ## kill_how);               \
-  }                                                            \
-  return *var;                                                 \
+  Type* p;							\
+  CS_STATIC_VAR_GETTER_COMMON(Type, p, initParam, var,		\
+    getterFunc ## kill_how);					\
+  return *p;							\
 }
 #endif
 
@@ -953,7 +1024,8 @@ namespace CS
       defined (CS_PROCESSOR_MIPS) || \
       defined (CS_PROCESSOR_SPARC) || \
       defined (CS_PROCESSOR_ALPHA) || \
-      defined (CS_PROCESSOR_M68K)
+      defined (CS_PROCESSOR_M68K) || \
+      defined (CS_PROCESSOR_ARM)
 #    define CS_IEEE_DOUBLE_FORMAT
 #  endif
 #endif
@@ -1148,5 +1220,29 @@ namespace CS
 #define CS_PLUGIN_NAMESPACE_NAME(name)                                      \
   CS_NAMESPACE_PACKAGE_NAME::Plugin::name
 /** @} */
+
+/**\def CS_DEPRECATION_WARNINGS_DISABLE(x)
+ * Disable deprecation warnings in following statements. Always try to actually
+ * fix the root cause of a deprecation warning before employing this.
+ * Should be followed by CS_DEPRECATION_WARNINGS_ENABLE after the statements
+ * that caused the warnings.
+ * Suitable for use in macros.
+ */
+/**\def CS_DEPRECATION_WARNINGS_ENABLE(x)
+ * Enable deprecation warnings in following statements. Suitable for use in
+ * macros.
+ */
+#if defined(CS_COMPILER_GCC) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1))
+# define CS_DEPRECATION_WARNINGS_DISABLE	\
+  _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+# define CS_DEPRECATION_WARNINGS_ENABLE	\
+  _Pragma("GCC diagnostic warning \"-Wdeprecated-declarations\"")
+#else
+# define CS_DEPRECATION_WARNINGS_DISABLE
+# define CS_DEPRECATION_WARNINGS_ENABLE
+#endif
+
+// Include nullptr fallback (for convenience).
+#include "csutil/nullptr.h"
 
 #endif // __CS_CSSYSDEF_H__

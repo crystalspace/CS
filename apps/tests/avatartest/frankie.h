@@ -31,7 +31,12 @@ class FrankieScene : public AvatarScene
 
   // Camera related
   csVector3 GetCameraStart ();
+  float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
+
+  // Dynamic simulation related
+  float GetSimulationSpeed ();
+  bool HasPhysicalObjects ();
 
   // From csBaseEventHandler
   void Frame ();
@@ -44,18 +49,11 @@ class FrankieScene : public AvatarScene
   // User interaction with the scene
   void ResetScene ();
 
-  // Display of comments 
-  void DisplayKeys ();
+  // Display of information on the state of the scene
+  void UpdateStateDescription ();
 
  private:
   AvatarTest* avatarTest;
-
-  // Animesh
-  csRef<iAnimatedMeshFactory> animeshFactory;
-  csRef<iAnimatedMesh> animesh;
-
-  // FSM node related
-  csRef<iSkeletonFSMNode2> FSMNode;
 
   // LookAt node related
   csRef<iSkeletonLookAtNode2> lookAtNode;
@@ -81,13 +79,14 @@ class FrankieScene : public AvatarScene
 
   // Speed node related
   csRef<iSkeletonSpeedNode2> speedNode;
-  int currentSpeed; // We use a 'int' instead of a 'float' to avoid round errors
+  int currentSpeed; // We use a 'int' instead of a 'float' to avoid
+                    // accumulated rounding errors
 
   // Ragdoll node related
   bool frankieDead;
   csRef<iSkeletonRagdollNode2> ragdollNode;
-  CS::Animation::StateID mainFSMState;
-  CS::Animation::StateID ragdollFSMState;
+  iBodyChain* bodyChain;
+  iBodyChain* tailChain;
 
   // Morphing related
   float smileWeight;

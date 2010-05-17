@@ -30,10 +30,8 @@
 #include "csutil/csstring.h"
 #include "csutil/documenthelper.h"
 #include "csutil/fifo.h"
-#include "csutil/platform.h"
 #include "csutil/scopeddelete.h"
 #include "csutil/threading/mutex.h"
-#include "csutil/threadjobqueue.h"
 #include "csutil/xmltiny.h"
 
 #include "combiner_default.h"
@@ -139,8 +137,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         techNum *= graphs[g].GetSize();
       }
     #ifdef THREADED_TECH_SYNTHESIS
-      CS::Threading::ThreadedJobQueue synthQueue (
-	csClamp (CS::Platform::GetProcessorCount(), (uint)techNum, (uint)1));
+      csRef<iJobQueue> synthQueue (compiler->GetSynthQueue ());
     #endif
       csArray<csRefArray<SynthesizeTechnique> > synthTechs;
       csArray<csArray<size_t> > graphIndices;
@@ -197,7 +194,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      shaderVarNodesHelper, shaderNode, snippet, graph, combiners));
 	    techPasses.Push (synthTech);
 	  #ifdef THREADED_TECH_SYNTHESIS
-	    synthQueue.Enqueue (synthTech);
+	    synthQueue->Enqueue (synthTech);
 	  #endif
 	    techGraphIndices.Push (g);
           }
@@ -290,7 +287,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  
 	  SynthesizeTechnique* synthTech = synthTechs[t].Get (p);
 	#ifdef THREADED_TECH_SYNTHESIS
-	  synthQueue.PullAndRun (synthTech, true);
+	  synthQueue->PullAndRun (synthTech, true);
 	#else
 	  synthTech->Run();
 	#endif

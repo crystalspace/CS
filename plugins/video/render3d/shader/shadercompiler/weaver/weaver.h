@@ -23,6 +23,7 @@
 #include "iutil/comp.h"
 #include "ivideo/shader/shader.h"
 
+#include "csutil/threading/tls.h"
 #include "csutil/weakref.h"
 #include "csutil/scf_implementation.h"
 
@@ -30,6 +31,7 @@ struct iSyntaxService;
 struct iLoaderContext;
 struct iVFS;
 struct iDocumentNode;
+struct iJobQueue;
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
@@ -91,6 +93,7 @@ public:
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;
   csRef<iShaderCompiler> xmlshader;
+  csRef<iJobQueue> synthQueue;
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/weaver/weaver.tok"
 #include "cstool/tokenlist.h"
@@ -98,8 +101,11 @@ public:
   /* When loading a snippet, sometimes document nodes have to be created.
      These are created from this "auto document".
    */
-  mutable csRef<iDocumentNode> autoDocRoot;
+  CS::Threading::ThreadLocal<csRef<iDocumentNode> > autoDocRoot;
   csRef<iDocumentNode> CreateAutoNode (csDocumentNodeType type) const;
+
+  /// Get the job queue used for shader technique synthesis
+  iJobQueue* GetSynthQueue();
 };
 
 }

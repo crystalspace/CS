@@ -34,7 +34,7 @@ struct TabBase : public csRefCount
 protected:
   iObjectRegistry* object_reg;
   csRef<AssetBase> asset;
-  CEGUI::Window* window;
+  CEGUI::Window* baseWindow;
 
   csRef<iCEGUI> cegui;
   CEGUI::WindowManager* winMgr;
@@ -43,23 +43,23 @@ protected:
   bool AddToTabs();
   void UpdateList (csRef<iStringArray> arr, const char* window);
   bool GetSelectedItemText(const char* window, csString& value);
+  bool GetSelectedItemID(const char* window, uint& value);
+  void SetSelectedItemByID(const char* window, uint id);
 
 public:
   TabBase(iObjectRegistry* obj_reg, AssetBase* ass);
   virtual ~TabBase();
 
-  CEGUI::Window* GetWindow() { return window; }
+  CEGUI::Window* GetWindow() { return baseWindow; }
 
   AssetBase* GetAsset() { return asset; }
   void SetAsset(AssetBase* ass) { asset = ass; }
-
-  //virtual iMeshWrapper* GetWindow() = 0;
 };
 
 //-------------------------------------------------------
 
 TabBase::TabBase(iObjectRegistry* obj_reg, AssetBase* ass) 
-  : object_reg(obj_reg), asset(ass), window(0) 
+  : object_reg(obj_reg), asset(ass), baseWindow(0) 
 {
   cegui = csQueryRegistry<iCEGUI> (object_reg);
   winMgr = cegui->GetWindowManagerPtr ();
@@ -67,11 +67,11 @@ TabBase::TabBase(iObjectRegistry* obj_reg, AssetBase* ass)
 
 TabBase::~TabBase() 
 {
-  if (window)
+  if (baseWindow)
   {
     CEGUI::TabControl* ts = (CEGUI::TabControl*)winMgr->getWindow("Root/Control/Tabs");
-    ts->removeTab(window->getName());
-    winMgr->destroyWindow(window);
+    ts->removeTab(baseWindow->getName());
+    winMgr->destroyWindow(baseWindow);
   }
 }
 
@@ -82,7 +82,7 @@ bool TabBase::LoadLayout(const char* layoutFile)
   vfs->PushDir();
   vfs->ChDir ("/viewmesh/");
   
-  window = winMgr->loadWindowLayout(layoutFile);
+  baseWindow = winMgr->loadWindowLayout(layoutFile);
 
   vfs->PopDir();
 
@@ -92,7 +92,7 @@ bool TabBase::LoadLayout(const char* layoutFile)
 bool TabBase::AddToTabs()
 {
   CEGUI::TabControl* ts = (CEGUI::TabControl*)winMgr->getWindow("Root/Control/Tabs");
-  ts->addTab(window);
+  ts->addTab(baseWindow);
 
   return true;
 }
@@ -112,6 +112,7 @@ void TabBase::UpdateList (csRef<iStringArray> arr, const char* window)
     item->setSelectionBrushImage("ice", "TextSelectionBrush");
     item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
     list->addItem(item);
+    item->setID((uint)i);
     if (i == 0) item->setSelected(true);
   }
 }
@@ -132,6 +133,30 @@ bool TabBase::GetSelectedItemText(const char* window, csString& value)
   value = text.c_str();
 
   return true;
+}
+
+bool TabBase::GetSelectedItemID(const char* window, uint& value)
+{
+  csRef<iCEGUI> cegui = csQueryRegistry<iCEGUI> (object_reg);
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow(window);
+
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if(!item) return false;
+
+  value = item->getID();
+
+  return true;
+}
+
+void TabBase::SetSelectedItemByID(const char* window, uint id)
+{
+  csRef<iCEGUI> cegui = csQueryRegistry<iCEGUI> (object_reg);
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow(window);
+  list->setItemSelectState(id, true);
 }
 
 

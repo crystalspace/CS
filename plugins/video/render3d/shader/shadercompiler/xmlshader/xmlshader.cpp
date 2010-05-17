@@ -166,6 +166,7 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (
   csRef<csXMLShader> shader;
   if (do_verbose) startTime = csGetTicks();
   shader.AttachNew (new csXMLShader (this, ldr_context, templ, forcepriority));
+  if (!shader->Load (templ)) return 0;
   if (do_verbose) endTime = csGetTicks();
   shader->SetName (templ->GetAttributeValue ("name"));
   shader->SetDescription (templ->GetAttributeValue ("description"));

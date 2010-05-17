@@ -45,7 +45,6 @@ VFS.Mount.lev/partsys  = $(CS_MAPDIR)$/partsys$/
 VFS.Mount.lev/terrain  = $(CS_MAPDIR)$/terrain$/
 VFS.Mount.lev/terrainf = $(CS_MAPDIR)$/terrainf$/
 VFS.Mount.lev/terraina = $(CS_MAPDIR)$/terraina$/
-VFS.Mount.lev/terrainp = $(CS_MAPDIR)$/terrainp$/
 VFS.Mount.lev/r3dsmtest = $(CS_MAPDIR)$/r3dsmtest$/
 VFS.Mount.lev/castle   = $(CS_MAPDIR)$/castle$/
 VFS.Mount.lev/castle-staticlit = $(CS_MAPDIR)$/castle-staticlit$/
@@ -59,7 +58,8 @@ VFS.Mount.lib/cubemap  = $(CS_DATADIR)$/cube$/
 VFS.Mount.lib/teapot   = $(CS_DATADIR)$/teapot.zip
 VFS.Mount.lib/kwartz   = $(CS_DATADIR)$/kwartz.zip
 VFS.Mount.lib/frankie  = $(CS_DATADIR)$/frankie$/
-VFS.Mount.lib/krystal = $(CS_DATADIR)$/krystal$/
+VFS.Mount.lib/krystal  = $(CS_DATADIR)$/krystal$/
+VFS.Mount.lib/sintel   = $(CS_DATADIR)$/sintel$/
 VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 
 ; General CEGUI data

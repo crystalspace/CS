@@ -24,6 +24,7 @@
  * Superclass for procedural textures. 
  */
 
+#include "csutil/sysfunc.h"
 #include "csextern.h"
 
 #include "csutil/csobject.h"
@@ -33,9 +34,11 @@
 #include "itexture/iproctex.h"
 #include "itexture/itexfact.h"
 #include "iengine/texture.h"
+#include "iengine/engine.h"
 #include "igraphic/image.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
+#include "iutil/selfdestruct.h"
 #include "ivideo/graph2d.h"
 
 
@@ -63,8 +66,8 @@ struct iProcTexCallback : public virtual iBase
  * takes care of scheduling when a procedural texture needs updating.
  */
 class CS_CRYSTALSPACE_EXPORT csProcTexture : 
-  public scfImplementationExt2<csProcTexture, csObject, iTextureWrapper,
-  iProcTexture>, public ThreadedCallable<csProcTexture>
+  public scfImplementationExt3<csProcTexture, csObject, iTextureWrapper,
+  iProcTexture, iSelfDestruct>, public ThreadedCallable<csProcTexture>
 {
   friend struct csProcTexCallback;
   friend class csProcTexEventHandler;
@@ -90,6 +93,7 @@ protected:
   csRef<iGraphics3D> g3d;
   csRef<iGraphics2D> g2d;
   iObjectRegistry* object_reg;
+  csRef<iEngine> engine;
   bool anim_prepared;
 
   bool key_color;
@@ -222,6 +226,9 @@ public:
   /// Get the texture corresponding with this procedural texture.
   iTextureWrapper* GetTextureWrapper ()
   { return this; }
+
+  /// release engine instances
+  virtual void SelfDestruct ();
 
 };
 

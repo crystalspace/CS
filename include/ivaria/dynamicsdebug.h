@@ -22,7 +22,7 @@
 #define __CS_IVARIA_DYNAMICSDEBUG_H__
 
 /**\file
- * Debugging of dynamics systems
+ * Debugging of dynamic systems
  */
 
 #include "csutil/scf.h"
@@ -30,6 +30,8 @@
 struct iDynamicSystemDebugger;
 struct iDynamicSystem;
 struct iSector;
+struct iMaterialWrapper;
+enum csBulletState;
 
 /**
  * Creation of dynamic system debuggers.
@@ -50,7 +52,7 @@ struct iDynamicsDebuggerManager : public virtual iBase
  */
 struct iDynamicSystemDebugger : public virtual iBase
 {
-  SCF_INTERFACE(iDynamicSystemDebugger, 1, 0, 0);
+  SCF_INTERFACE(iDynamicSystemDebugger, 1, 0, 1);
 
   /**
    * Set the dynamic system that has to be debugged.
@@ -73,6 +75,37 @@ struct iDynamicSystemDebugger : public virtual iBase
    * back the initial meshes.
    */
   virtual void SetDebugDisplayMode (bool debugMode) = 0;
+
+  /**
+   * Update the list of colliders that are displayed. Call this when you have
+   * added or removed some dynamic bodies to/from the dynamic system.
+   */
+  virtual void UpdateDisplay () = 0;
+
+  /**
+   * Set the material to be used for the colliders of the rigid bodies that are
+   * in 'static' state. If 0 is passed then the rigid bodies in 'static' state
+   * won't be displayed. If this method is not used, then a default red colored
+   * material will be used.
+   */
+  virtual void SetStaticBodyMaterial (iMaterialWrapper* material) = 0;
+
+  /**
+   * Set the material to be used for the colliders of the rigid bodies that are
+   * in 'dynamic' state. If 0 is passed then the rigid bodies in 'dynamic' state
+   * won't be displayed. If this method is not used, then a default green colored
+   * material will be used.
+   */
+  virtual void SetDynamicBodyMaterial (iMaterialWrapper* material) = 0;
+
+  /**
+   * Set the material to be used for the colliders of the rigid bodies that are
+   * in the given state. If 0 is passed then the rigid bodies in the given state
+   * won't be displayed. If this method is not used, then a default blue colored
+   * material will be used.
+   */
+  virtual void SetBodyStateMaterial (csBulletState state,
+				     iMaterialWrapper* material) = 0;
 };
 
 #endif // __CS_IVARIA_DYNAMICSDEBUG_H__

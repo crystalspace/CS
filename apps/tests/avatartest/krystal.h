@@ -31,7 +31,12 @@ class KrystalScene : public AvatarScene
 
   // Camera related
   csVector3 GetCameraStart ();
+  float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
+
+  // Dynamic simulation related
+  float GetSimulationSpeed ();
+  bool HasPhysicalObjects ();
 
   // From csBaseEventHandler
   void Frame ();
@@ -44,15 +49,23 @@ class KrystalScene : public AvatarScene
   // User interaction with the scene
   void ResetScene ();
 
-  // Display of comments 
-  void DisplayKeys ();
+  // Display of information on the state of the scene
+  void UpdateStateDescription ();
 
  private:
   AvatarTest* avatarTest;
 
-  // Animesh
-  csRef<iAnimatedMeshFactory> animeshFactory;
-  csRef<iAnimatedMesh> animesh;
+  // Ragdoll node related
+  bool krystalDead;
+  csRef<iSkeletonRagdollNode2> ragdollNode;
+  iBodyChain* bodyChain;
+  iBodyChain* hairChain;
+
+  // Krystal's hairs & skirt
+  csRef<iMeshWrapper> hairsMesh;
+  csRef<iMeshWrapper> skirtMesh;
+  iBulletSoftBody* hairsBody;
+  iBulletSoftBody* skirtBody;
 };
 
 #endif // __KRYSTAL_H__

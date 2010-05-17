@@ -530,25 +530,41 @@ struct iSectorList : public virtual iBase
   /// Return the number of sectors in this list.
   virtual int GetCount () const = 0;
 
-  /// Return a sector by index.
+  /// Return the sector at the given index.
   virtual iSector *Get (int n) const = 0;
 
-  /// Add a sector.
+  /**
+   * Add a sector.
+   * \return The index of the newly added sector.
+   */
   virtual int Add (iSector *obj) = 0;
 
-  /// Remove a sector.
+  /**
+   * Remove a sector.
+   * \return True if the sector has been found and deleted, false otherwise.
+   */
   virtual bool Remove (iSector *obj) = 0;
 
-  /// Remove the nth sector.
+  /**
+   * Remove the sector at the given index.
+   * \return True if the given index was valid, false otherwise.
+   */
   virtual bool Remove (int n) = 0;
 
   /// Remove all sectors.
   virtual void RemoveAll () = 0;
 
-  /// Find a sector and return its index.
+  /**
+   * Find a sector and return its index.
+   * \return The index of the sector, or csArrayItemNotFound if the sector was
+   * not found
+   */
   virtual int Find (iSector *obj) const = 0;
 
-  /// Find a sector by name.
+  /**
+   * Find a sector by its name.
+   * \return The sector with the given name, or 0 if the name was not found.
+   */
   virtual iSector *FindByName (const char *Name) const = 0;
 };
 
@@ -566,7 +582,10 @@ struct iSectorIterator : public virtual iBase
   /// Return true if there are more elements.
   virtual bool HasNext () const = 0;
 
-  /// Get sector from iterator. Return 0 at end.
+  /**
+   * Return the next sector in the list and increment the iterator. Return
+   * 0 at the end.
+   */
   virtual iSector* Next () = 0;
 
   /**
@@ -575,7 +594,7 @@ struct iSectorIterator : public virtual iBase
    */
   virtual const csVector3& GetLastPosition () const = 0;
 
-  /// Restart iterator.
+  /// Reset the iterator to the first element.
   virtual void Reset () = 0;
 };
 

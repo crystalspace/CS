@@ -271,7 +271,6 @@ namespace genmeshify
     newObj->SetMixMode (mobj->GetMixMode ());
     csRef<iGeneralMeshState> gmObj = 
       scfQueryInterface<iGeneralMeshState> (newObj);
-    gmObj->SetShadowReceiving (false);
     /* Bit of a trick to make unlit polys work: if no lightmap is attached,
      * vertex lighting will be used. For this case set a manual color of
      * 1,1,1 to get fullbright. */
@@ -879,7 +878,7 @@ namespace genmeshify
     csRef<iDocumentNode> meshNode = to->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     meshNode->SetValue ("mesh");
 
-    int vc = triMesh->GetVertexCount();
+    int vc = (int)triMesh->GetVertexCount();
     const csVector3* vertices = triMesh->GetVertices ();
     for (int v = 0; v < vc; v++)
     {
@@ -889,7 +888,7 @@ namespace genmeshify
       if (!app->synsrv->WriteVector (vertNode, vertices[v])) return false;
     }
 
-    int tc = triMesh->GetTriangleCount ();
+    int tc = (int)triMesh->GetTriangleCount ();
     const csTriangle* tris = triMesh->GetTriangles ();
     for (int t = 0; t < tc; t++)
     {

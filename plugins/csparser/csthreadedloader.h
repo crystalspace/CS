@@ -582,7 +582,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
       iStreamSource* ssource, iMissingLoaderData* missingdata, bool do_verbose);
 
-    bool Load (iDataBuffer* buffer, const char* fname, iCollection* collection,
+    bool Load (iThreadReturn* ret, iDataBuffer* buffer, const char* fname, iCollection* collection,
       iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
       bool do_verbose = false);
 

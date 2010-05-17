@@ -1175,16 +1175,19 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 
 bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr, int* polygon_idx,
-    iMaterialWrapper** material, csArray<iMaterialWrapper*>* materials)
+    iMaterialWrapper** material, iMaterialArray* materials)
 {
   if (material) *material = 0;
   //Checks all of the cal3d bounding boxes of each bone to see if they hit
 
-  bool hit = false;
+  //bool hit = false;
   std::vector<CalBone *> vectorBone = calModel.getSkeleton()->getVectorBone();
   csArray<bool> bboxhits;
   bboxhits.SetSize (vectorBone.size());
-  int b = 0;
+  //int b = 0;
+  // Skip bone bbox test for now since it yields inaccurate results as bone weights
+  // < 0.5 are ignored. This results in holes during hit detection.
+  /*
   std::vector<CalBone *>::iterator iteratorBone = vectorBone.begin();
   while (iteratorBone != vectorBone.end())
   {
@@ -1212,8 +1215,12 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
     ++iteratorBone;
     b++;
   }
+  */
 
-  if(hit)
+  // TODO: Temporary fix since cal3d returns overly small bone bboxes that leaves
+  // holes in the hit detection. The bone bbox calculations need to be redone.
+  // For now we test all tris, slow but it fixes the bug.
+  if(true)
   {
     // This routine is slow, but it is intended to be accurate.
     if (polygon_idx) *polygon_idx = -1;
@@ -1246,6 +1253,8 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
         {
           bool bboxhit = false;
           int f;
+          // Temporary fix for wrong bone bbox calculation: always test against all tris.
+          bboxhit = true;
           for(f=0;!bboxhit&&f<3;f++)
           {
             std::vector<CalCoreSubmesh::Influence> influ  = 
@@ -2119,6 +2128,20 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,
   meshes[meshIdx].matRef = mat;
 
   return true;
+}
+
+iMaterialWrapper* csSpriteCal3DMeshObject::GetMaterial(const char *mesh_name)
+{
+  int idx = factory->FindMeshName(mesh_name);
+  if (idx == -1)
+    return NULL;
+          
+  size_t meshIdx = FindMesh( factory->meshes[idx]->calCoreMeshID );
+    
+  if (meshIdx == csArrayItemNotFound ) 
+    return NULL;
+
+  return meshes[meshIdx].matRef;
 }
 
 void csSpriteCal3DMeshObject::SetTimeFactor(float timeFactor)

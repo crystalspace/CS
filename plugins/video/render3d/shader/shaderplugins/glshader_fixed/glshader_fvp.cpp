@@ -85,7 +85,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 
     for(i = 0; i < lights.GetSize (); ++i)
     {
-      GLenum glLight = (GLenum)GL_LIGHT0+i;
+      GLenum glLight = GL_LIGHT0+(GLenum)i;
       glEnable (glLight);
 
       LightingEntry& entry = lights[i];
@@ -555,7 +555,7 @@ void csGLShaderFVP::ResetState ()
   if (do_lighting)
   {
     for (i = 0; i < lights.GetSize (); ++i)
-      glDisable ((GLenum)GL_LIGHT0+i);
+      glDisable (GL_LIGHT0+(GLenum)i);
 
     if (colorMaterial != 0)
       glDisable (GL_COLOR_MATERIAL);

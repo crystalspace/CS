@@ -849,6 +849,7 @@ struct iGraphics3D : public virtual iBase
    * \remarks The coordinates are vertically mirrored in comparison to screen
    *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
    *   top.
+   * \deprecated Use explicit camera's projection matrix instead
    */
   CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void SetPerspectiveCenter (int x, int y) = 0;
@@ -858,17 +859,22 @@ struct iGraphics3D : public virtual iBase
    * \remarks The coordinates are vertically mirrored in comparison to screen
    *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
    *   top.
+   * \deprecated Use explicit camera's projection matrix instead
    */
   CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void GetPerspectiveCenter (int& x, int& y) const = 0;
 
   /**
    * Set aspect ratio for perspective projection.
+   * \deprecated Use explicit camera's projection matrix instead
    */
   CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void SetPerspectiveAspect (float aspect) = 0;
 
-  /// Get aspect ratio.
+  /**
+   * Get aspect ratio.
+   * \deprecated Use explicit camera's projection matrix instead
+   */
   CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual float GetPerspectiveAspect () const = 0;
  
@@ -1086,13 +1092,13 @@ struct iGraphics3D : public virtual iBase
   virtual csZBufMode GetZMode () = 0;
 
   /**
-   * \deprecated Deprecated in 1.3.
+   * \deprecated Deprecated in 1.3. Use RenderMeshModes::zoffset instead.
    */
   CS_DEPRECATED_METHOD_MSG("Nonfunctional. Use RenderMeshModes::zoffset instead")
   virtual void EnableZOffset () = 0;
 
   /**
-   * \deprecated Deprecated in 1.3.
+   * \deprecated Deprecated in 1.3. Use RenderMeshModes::zoffset instead.
    */
   CS_DEPRECATED_METHOD_MSG("Nonfunctional. Use RenderMeshModes::zoffset instead")
   virtual void DisableZOffset () = 0;

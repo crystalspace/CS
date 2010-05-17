@@ -95,7 +95,7 @@ SCF_IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 ///// Windowed-mode palette stuff //////
 
 static HPALETTE hWndPalette = 0;
-
+/*
 static void ClearSystemPalette ()
 {
   struct
@@ -161,7 +161,7 @@ static void CreateIdentityPalette (csRGBpixel *p)
   if (!hWndPalette)
     SystemFatalError (L"Error creating identity palette.");
 }
-
+*/
 csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
   scfImplementationType (this, iParent),
   m_nGraphicsReady (true),

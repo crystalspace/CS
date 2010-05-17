@@ -518,7 +518,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
     o2wtVar->SetType(csShaderVariable::MATRIX);
     o2wtVar->SetValue(renderMeshes[0]->object2world);
   }
-  n = renderMeshes.GetSize();
+  n = (int)renderMeshes.GetSize();
 
   return renderMeshes.GetArray();
 }
@@ -560,10 +560,11 @@ bool csWaterMeshObject::HitBeamOutline (const csVector3& start,
 
 bool csWaterMeshObject::HitBeamObject (const csVector3& start,
                                        const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
-                                       iMaterialWrapper** material, csArray<iMaterialWrapper*>* materials)
+                                       iMaterialWrapper** material, iMaterialArray* materials)
 {
   
   if (material) *material = csWaterMeshObject::material;
+  if (materials) materials->Push (csWaterMeshObject::material);
   if (polygon_idx) *polygon_idx = -1;
   // This is the slow version. Use for an accurate hit on the object.
   // It will cycle through every triangle in the mesh serching for the
@@ -870,8 +871,8 @@ void csWaterMeshObjectFactory::SetupFactory ()
         }
       }
 
-      numVerts = verts.GetSize();
-      numTris = tris.GetSize();
+      numVerts = (int)verts.GetSize();
+      numTris = (int)tris.GetSize();
     }
   
     for(uint i = 0; i < children.GetSize(); i++)

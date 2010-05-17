@@ -249,7 +249,7 @@ bool csTerrainThreadedDataFeeder::Load (iTerrainCell* cell)
 
     for (size_t m = 0; m < data->materialmapData.GetSize (); ++m)
     {
-      cell->SetMaterialMask (m, data->materialmapData[m].GetArray (),
+      cell->SetMaterialMask ((uint)m, data->materialmapData[m].GetArray (),
         data->materialMapWidth, data->materialMapHeight);
     }       
 

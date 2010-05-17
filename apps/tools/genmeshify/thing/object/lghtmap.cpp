@@ -262,7 +262,7 @@ const char* csLightMap::ReadFromCache (
     pswanted.y2 = csFloatToShort (spoly->Vobj (1).y);
     pswanted.z2 = csFloatToShort (spoly->Vobj (1).z);
   }
-  pswanted.lm_size = lm_size;
+  pswanted.lm_size = (int32)lm_size;
   pswanted.lm_cnt = 111;
 
   char type[5];
@@ -390,7 +390,7 @@ const char* csLightMap::ReadFromCache (
   size = csLittleEndian::Convert (size);
 
   unsigned int expected_size;
-  expected_size = lh.dyn_cnt * (sizeof (LightSave) + lm_size);
+  expected_size = (uint)(lh.dyn_cnt * (sizeof (LightSave) + lm_size));
   if (expected_size != size)
   {
     // Skip the data in the cache so we can potentially proceed
@@ -422,9 +422,9 @@ const char* csLightMap::ReadFromCache (
       if ((smDataBuffer->GetSize() != lm_size)
         || (!file->SetPos (file->GetPos() + lm_size)))
         return "File too short while reading pseudo-dynamic lightmap data!";
-      size -= lm_size;
+      size -= (uint32)lm_size;
       smap->map = smDataBuffer;
-      smap->CalcMaxShadow (lm_size);
+      smap->CalcMaxShadow ((long)lm_size);
     }
     else
     {

@@ -29,6 +29,7 @@
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/engine.h"
 #include "iengine/portal.h"
+#include "iengine/material.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
@@ -517,14 +518,19 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
 
   if (factory && drawing_imposter != rview->GetCamera())
   {
-    csRef<iImposterFactory> factwrap = scfQueryInterfaceSafe<iImposterFactory> (factory);
+    csRef<iImposterFactory> factwrap = scfQueryInterface<iImposterFactory> (factory);
     if (factwrap)
     {
       if (UseImposter (rview))
       {
-        if(factwrap->UpdateImposter (this, rview))
+        if (!using_imposter)
         {
+          factwrap->AddImposter (this, rview);
           using_imposter = true;
+        }
+
+        if(factwrap->RenderingImposter (this))
+        {
           n = 0;
           return 0;
         }
@@ -969,7 +975,8 @@ csHitBeamResult csMeshWrapper::HitBeam (
   {
     if (do_material)
     {
-      rc.hit = meshobj->HitBeamObject (startObj, endObj, rc.isect, &rc.r, 0, &rc.material, &rc.materials);
+      rc.materials.AttachNew (new scfArray<iMaterialArray> ());
+      rc.hit = meshobj->HitBeamObject (startObj, endObj, rc.isect, &rc.r, 0, &rc.material, rc.materials);
     }
     else
     {

@@ -1,0 +1,482 @@
+<library>
+ <library>/lib/krystal/skelkrystal_colliders</library>
+ <addon plugin="crystalspace.mesh.loader.animesh.body">
+ <skeleton name="krystal_body" skeletonfact="krystal_rig">
+  <bone name="Hips">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <!--colliderconvexmesh mesh="coll_Hips" /-->
+    <collidersphere x="0.0" y="0.0" z="0.0" radius="0.035" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+  </bone>
+  <bone name="ToSpine">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_ToSpine" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.05" y="-0.2" z="-0.2" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Spine">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <!--colliderconvexmesh mesh="coll_Spine" friction="0.9" elasticity="0.5" softness="0.5" /-->
+    <collidersphere x="0.0" y="0.0" z="0.055" radius="0.035" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.05" y="-0.2" z="-0.2" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Spine1">
+   <properties>
+    <mass value="5.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_Spine1" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.05" y="-0.2" z="-0.2" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Neck">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <collidersphere x="0.0" y="0.0" z="0.0" radius="0.035" friction="0.9" elasticity="0.5" softness="0.5" />
+    <!--colliderconvexmesh mesh="coll_Neck" friction="0.9" elasticity="0.5" softness="0.5" /-->
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.05" y="-0.2" z="-0.2" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Head">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_Head" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="RightUpLeg">
+   <properties>
+    <mass value="3.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_RightUpLeg" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.0" y="-0.2" z="-0.2" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="RightLeg">
+   <properties>
+    <mass value="2.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_RightLeg" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="true" z="true">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.0" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="RightFoot">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_RightFoot" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="LeftUpLeg">
+   <properties>
+    <mass value="3.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_LeftUpLeg" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.0" y="-0.2" z="-0.2" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="LeftLeg">
+   <properties>
+    <mass value="2.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_LeftLeg" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="true" z="true">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.0" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="LeftFoot">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_LeftFoot" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="RightShoulder">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <!--colliderconvexmesh mesh="coll_RightShoulder" friction="0.9" elasticity="0.5" softness="0.5" /-->
+    <collidersphere x="0.0" y="0.0" z="0.0" radius="0.035" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.01" y="-0.2" z="-0.1" />
+      <max x="0.01" y="0.2" z="0.1" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="RightArm">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_RightArm" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.2" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="RightForeArm">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_RightForeArm" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="true">
+      <min x="-0.1" y="-0.0" z="-0.83" />
+      <max x="0.1" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="RightHand">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_RightHand" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.0" y="-0.2" z="-0.7" />
+      <max x="0.0" y="0.2" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="LeftShoulder">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <!--colliderconvexmesh mesh="coll_LeftShoulder" friction="0.9" elasticity="0.5" softness="0.5" /-->
+    <collidersphere x="0.0" y="0.0" z="0.0" radius="0.035" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.01" y="-0.2" z="-0.1" />
+      <max x="0.01" y="0.2" z="0.1" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="LeftArm">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_LeftArm" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.2" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="LeftForeArm">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_LeftForeArm" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="LeftHand">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <colliderconvexmesh mesh="coll_LeftHand" friction="0.9" elasticity="0.5" softness="0.5" />
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.0" y="-0.2" z="-0.7" />
+      <max x="0.0" y="0.2" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Hairs01">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <collidercapsule length="0.06" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0425" />
+    </collidercapsule>
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Hairs02">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <collidercapsule length="0.065" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.045" />
+    </collidercapsule>
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Hairs03">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <collidercapsule length="0.05" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0375" />
+    </collidercapsule>
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Hairs04">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <collidercapsule length="0.05" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0375" />
+    </collidercapsule>
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Hairs05">
+   <properties>
+    <mass value="1.0" />
+   </properties>
+   <colliders>
+    <collidercapsule length="0.045" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.035" />
+    </collidercapsule>
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+  <bone name="Hairs06">
+   <properties>
+    <mass value="3.0" />
+   </properties>
+   <colliders>
+    <collidercapsule length="0.09" radius="0.025" friction="0.9" elasticity="0.5" softness="0.5">
+     <move x="0.0" y="0.0" z="0.0575" />
+    </collidercapsule>
+   </colliders>
+   <joint>
+    <bounce x="0.2" y="0.2" z="0.2" />
+    <constraints>
+     <distance x="true" y="true" z="true" />
+     <angle x="false" y="false" z="false">
+      <min x="-0.83" y="-0.83" z="-0.83" />
+      <max x="0.83" y="0.83" z="0.83" />
+     </angle>
+    </constraints>
+   </joint>
+  </bone>
+ </skeleton>
+ </addon>
+</library>

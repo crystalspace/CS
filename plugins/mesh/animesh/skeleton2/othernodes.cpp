@@ -354,7 +354,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   uint RandomNodeFactory::GetNodeCount () const
   {
-    return subFactories.GetSize ();
+    return (uint)subFactories.GetSize ();
   }
 
   void RandomNodeFactory::ClearNodes ()
@@ -466,6 +466,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   iSkeletonAnimNode2* RandomNode::GetCurrentNode () const
   {
+    if (!subNodes.GetSize ())
+      return 0;
+
     return subNodes[currentNode];
   }
 
@@ -475,7 +478,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       return;
 
     active = true;
-    subNodes[currentNode]->Play ();
+    if (subNodes.GetSize ())
+      subNodes[currentNode]->Play ();
     FireStateChangeCb (true);
   }
 
@@ -485,22 +489,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       return;
 
     active = false;
-    subNodes[currentNode]->Stop ();
+    if (subNodes.GetSize ())
+      subNodes[currentNode]->Stop ();
     FireStateChangeCb (false);
   }
 
   void RandomNode::SetPlaybackPosition (float time)
   {
+    if (!subNodes.GetSize ())
+      return;
+
     subNodes[currentNode]->SetPlaybackPosition (time);
   }
 
   float RandomNode::GetPlaybackPosition () const
   {
+    if (!subNodes.GetSize ())
+      return 0.0f;
+
     return subNodes[currentNode]->GetPlaybackPosition ();
   }
 
   float RandomNode::GetDuration () const
   {
+    if (!subNodes.GetSize ())
+      return 0.0f;
+
     return subNodes[currentNode]->GetDuration ();
   }
 
@@ -516,7 +530,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void RandomNode::BlendState (csSkeletalState2* state, float baseWeight)
   {
-    if (!active)
+    if (!active || !subNodes.GetSize ())
       return;
 
     subNodes[currentNode]->BlendState (state, baseWeight);    
@@ -524,7 +538,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void RandomNode::TickAnimation (float dt)
   {
-    if (!active)
+    if (!active || !subNodes.GetSize ())
       return;
 
     subNodes[currentNode]->TickAnimation (dt * playbackSpeed);
@@ -532,7 +546,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   bool RandomNode::IsActive () const
   {
-    return active && subNodes[currentNode]->IsActive ();
+    return active
+      && (!subNodes.GetSize () || subNodes[currentNode]->IsActive ());
   }
 
   iSkeletonAnimNodeFactory2* RandomNode::GetFactory () const

@@ -412,7 +412,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       }
     }
   #else
-    uint32 diskSize = csLittleEndian::UInt32 (strlen (source));
+    uint32 diskSize = csLittleEndian::UInt32 ((uint32)strlen (source));
     if (cacheFile.Write ((char*)&diskSize, sizeof (diskSize))
 	!= sizeof (diskSize))
     {

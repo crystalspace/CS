@@ -50,64 +50,28 @@ CS_PLUGIN_NAMESPACE_END(Engine)
 /**
  * Class representing the mesh/imposter relation.
  */
-class csImposterMesh : public scfImplementationExt2<
-	csImposterMesh, csObjectModel, iImposterMesh, iMeshObject>
+class csImposterMesh : public scfImplementation1<
+	csImposterMesh, iImposterMesh>
 {
 private:
-  // Imposter instance data.
-  struct Instance
-  {
-    iMeshWrapper* mesh;
-    csRef<csShaderVariable> transformVar;
-    csRef<csShaderVariable> fadeFactor;
-
-    Instance(iMeshWrapper* mesh) : mesh(mesh)
-    {
-    }
-  };
-
-  // Array of imposter instances.
-  csArray<Instance*> instances;
-
-  // Mesh billboard for this imposter.
-  csRef<iMeshWrapper> mesh;
-
-  // Array of transform vars for the imposter instances.
-  csRef<csShaderVariable> transformVars;
-
-  // Array of fade factors for the imposter instances.
-  csRef<csShaderVariable> fadeFactors;
-
   // Factory that we're created from.
   iImposterFactory* fact;
 
+  // Imposter manager ptr.
   csRef<iImposterManager> impman;
 
-  // Convenience shortcut
-  csEngine *engine;
-
+  // Sector that the imposter is in.
   iSector* sector;
-
-  // Whether or not we're instancing.
-  bool instance;
-
-  // True if we're ready to be removed.
-  bool removeMe;
 
   // Shader to use on the imposter material.
   csString shader;
 
-  // Flags that indicate that we have been updated.
+  // Indicates whether we need a material update.
   bool materialUpdateNeeded;
-  bool matDirty;
-  bool meshDirty;
 
   // Saved values for update checking.
   csVector3 meshLocalDir;
   csVector3 cameraLocalDir;
-
-  // Rendermesh holder for this mesh
-  csRenderMeshHolder rmHolder;
 
   // Rect for billboard
   csPoly3D vertices;
@@ -118,99 +82,46 @@ private:
   // Imposter material.
   csRef<iMaterialWrapper> mat;
 
-  // Imposter meshes (for batched rendering).
-  csRefArray<csImposterMesh> imposterMeshes;
-
-  // Number of meshes at last update.
-  size_t numImposterMeshes;
-
   // Texture coordinates.
   csBox2 texCoords;
 
   // The camera this mesh is being viewed through.
-  csWeakRef<iCamera> camera;
+  csRef<iCamera> camera;
 
-  // The distance to the closest instance of this imposter.
-  float closestInstance;
+  // The distance to the real mesh of this imposter.
+  float realDistance;
 
-  // The closest instance of the mesh.
-  csWeakRef<iMeshWrapper> closestInstanceMesh;
+  // The last distance at which we requested a material update.
+  float lastDistance;
+
+  // The original mesh.
+  csWeakRef<iMeshWrapper> originalMesh;
 
   // True if currently awaiting an update.
   bool isUpdating;
 
-  // Flags for iMeshObject.
-  csFlags flags;
-
-  // Bounding box.
-  csBox3 bbox;
-
-  csRef<iGraphics3D> g3d;
-
   // True if r2t has been performed for this imposter.
   bool rendered;
-
-  // Current mesh being updated.
-  uint currentMesh;
-
-  // Number of meshes to update (for batching).
-  uint updatePerFrame;
-
-  void AddSVToMesh(iMeshWrapper* mesh, csShaderVariable* sv);
-
-  void CreateInstance(iMeshWrapper* pmesh);
-
-  void DestroyInstance(Instance* instance);
 
   void InitMesh();
 
   bool WithinTolerance(iRenderView *rview, iMeshWrapper* pmesh);
 
-  void SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRenderView* rview);
-
-  void SetupRenderMeshesInstance(csRenderMesh*& mesh,  bool rmCreated, iCamera* camera);
-
-  // For batched imposter sorting.
-  static int ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s);
+  /**
+   * Update the imposter.
+   */
+  void Update(iRenderView* rview);
 
   friend class csImposterManager;
+  friend class csBatchedImposterMesh;
 
 public:
-  csImposterMesh (csEngine* engine, iSector* sector);
-
   csImposterMesh (csEngine* engine, iImposterFactory* fact,
-    iMeshWrapper* mesh, iRenderView* rview, bool instance, const char* shader);
-  virtual ~csImposterMesh () {}
+    iMeshWrapper* mesh, iRenderView* rview, const char* shader);
+  virtual ~csImposterMesh () {};
 
   ///////////////////// iImposterMesh /////////////////////
-
-  /**
-   * Whether this imposter is currently instancing any meshes.
-   */
-  virtual bool IsInstancing()
-  { return (!instance && !removeMe) || instances.GetSize() != 0; }
-
-  /**
-   * Add an instance of the passed mesh.
-   * Returns true if able to add an instance for this mesh.
-   * Returns false otherwise.
-   */
-  virtual bool Add(iMeshWrapper* mesh, iRenderView* rview);
-
-  /**
-   * Update the instance of the passed mesh.
-   * Returns false if the mesh instance was removed (no longer valid for this imposter).
-   * Returns true otherwise.
-   */
-  virtual bool Update(iMeshWrapper* mesh, iRenderView* rview);
-
-  /**
-   * Remove the instance of the passed mesh.
-   * Returns false if not currently instancing this mesh.
-   * Returns true otherwise.
-   */
-  virtual bool Remove(iMeshWrapper* mesh);
-
+  
   /**
    * Destroy this imposter.
    */
@@ -223,6 +134,58 @@ public:
   {
     return rendered;
   }
+};
+
+class csBatchedImposterMesh : public scfImplementationExt1<
+	csBatchedImposterMesh, csObjectModel, iMeshObject>
+{
+private:
+  // Convenience shortcut
+  csEngine *engine;
+
+  iSector* sector;
+
+  // Imposter batch meshwrapper.
+  csRef<iMeshWrapper> mesh;
+
+  // Imposter batch material.
+  csRef<iMaterialWrapper> mat;
+
+  // Flags that indicate that we have been updated.
+  bool meshDirty;
+
+  // Rendermesh holder for this mesh
+  csRenderMeshHolder rmHolder;
+
+  // Imposter meshes (for batched rendering).
+  csRefArray<csImposterMesh> imposterMeshes;
+
+  // Flags for iMeshObject.
+  csFlags flags;
+
+  // Bounding box.
+  csBox3 bbox;
+
+  // Current mesh being updated.
+  uint currentMesh;
+
+  // Number of meshes to update (for batching).
+  uint updatePerFrame;
+
+  // Number of imposter meshes we're currently batching.
+  uint numImposterMeshes;
+
+  void SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreated, iRenderView* rview);
+
+  // For batched imposter sorting.
+  static int ImposterMeshSort(csImposterMesh* const& f, csImposterMesh* const& s);
+
+  friend class csImposterManager;
+
+public:
+  csBatchedImposterMesh (csEngine* engine, iSector* sector);
+  virtual ~csBatchedImposterMesh () {};
+
 
   ///////////////////// iObjectModel /////////////////////
   virtual const csBox3& GetObjectBoundingBox()
@@ -237,7 +200,7 @@ public:
 
   virtual void GetRadius (float& rad, csVector3& cent)
   {
-    instances[0]->mesh->GetMeshObject()->GetObjectModel()->GetRadius(rad, cent);
+    mesh->GetMeshObject()->GetObjectModel()->GetRadius(rad, cent);
   }
 
   ///////////////////// iMeshObject /////////////////////
@@ -284,7 +247,7 @@ public:
   	const csVector3& end, csVector3& isect, float* pr) { return false; }
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0, csArray<iMaterialWrapper*>* materials = 0) { return false; }
+	iMaterialWrapper** material = 0, iMaterialArray* materials = 0) { return false; }
   virtual void SetMeshWrapper (iMeshWrapper* logparent) {}
   virtual bool SetColor (const csColor& color) { return false; }
   virtual bool GetColor (csColor& color) const { return false; }

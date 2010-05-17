@@ -34,6 +34,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 
+#include "imesh/object.h"
+
 struct iCamera;
 struct iLODControl;
 struct iMeshFactoryList;
@@ -196,7 +198,7 @@ struct csHitBeamResult
    * Only for HitBeamObject and HitBeam: the materials that were hit. Can be
    * empty in the case that the meshobject doesn't support getting the material.
    */
-  csArray<iMaterialWrapper*> materials;
+  csRef<iMaterialArray> materials;
   /**
    * Only for HitBeamBBox: Face number that was hit.
    * \sa csIntersect3::BoxSegment

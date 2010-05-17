@@ -49,7 +49,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
       csGLGraphics3D::ext->glGenBuffersARB (1, &pbo);
       GLuint oldBuffer = csGLGraphics3D::statecache->GetBufferARB (target);
       csGLGraphics3D::statecache->SetBufferARB (target, pbo, true);
-      csGLGraphics3D::ext->glBufferDataARB (target, size, 0, GL_STREAM_READ_ARB);
+      csGLGraphics3D::ext->glBufferDataARB (target, (GLsizei)size, 0, GL_STREAM_READ_ARB);
       csGLGraphics3D::statecache->SetBufferARB (target, oldBuffer);
       PBO_PRINTF ("created %zu PBO %lu\n", size, (unsigned long)pbo);
     }

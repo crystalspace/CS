@@ -25,6 +25,7 @@
 
 #include "iengine/movable.h"
 #include "iengine/portal.h"
+#include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
@@ -74,14 +75,17 @@ namespace RenderManager
       {
         typedef size_t KeyType;
 
-        static bool IsLargerEqual (const PortalBuffers& b1,
-                                   const PortalBuffers& b2);
         static bool IsEqual (const PortalBuffers& b1,
                              const PortalBuffers& b2);
-        static bool IsLargerEqual(const PortalBuffers& b1,
-                                  const KeyType& s2);
-        static bool IsEqual(const PortalBuffers& b1,
+        static bool IsLargerEqual (const PortalBuffers& b1,
+                                   const PortalBuffers& b2);
+			     
+        static bool IsEqual (const PortalBuffers& b1,
                             const KeyType& s2);
+        static bool IsLargerEqual (const PortalBuffers& b1,
+                                  const KeyType& s2);
+        static bool IsLargerEqual (const KeyType& s1,
+                                   const PortalBuffers& b2);
       };
       CS::Utility::GenericResourceCache<PortalBuffers, csTicks,
         PortalBufferConstraint> bufCache;
@@ -437,11 +441,6 @@ namespace RenderManager
       int sb_minY = int (screenBox.MinY());
       int txt_w = int (ceil (screenBox.MaxX() - screenBox.MinX()));
       int txt_h = int (ceil (screenBox.MaxY() - screenBox.MinY()));
-
-      // Work around faulty texture cache behaviour.
-      txt_w = csFindNearestPowerOf2 (txt_w);
-      txt_h = csFindNearestPowerOf2 (txt_h);
-
       int real_w, real_h;
       csRef<iTextureHandle> tex = persistentData.texCache.QueryUnusedTexture (txt_w, txt_h,
 		  real_w, real_h);
@@ -600,7 +599,7 @@ namespace RenderManager
       svTexPortal->SetValue (tex);
 
       typename ThisType::PersistentData::PortalBuffers* bufs =
-      persistentData.bufCache.Query (count);
+	persistentData.bufCache.Query (count);
 	
       if (bufs == 0)
       {

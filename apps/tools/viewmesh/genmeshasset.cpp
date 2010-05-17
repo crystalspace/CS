@@ -121,7 +121,7 @@ csPtr<iStringArray> GenmeshAsset::GetSockets()
 
   for (size_t i = 0; i < skeleton->GetFactory()->GetSocketsCount(); i++)
   {
-    iSkeletonSocketFactory* sock = skeleton->GetFactory()->GetSocket(i);
+    iSkeletonSocketFactory* sock = skeleton->GetFactory()->GetSocket((int)i);
     if (!sock) continue;
 
     csString s = sock->GetName();
@@ -228,7 +228,7 @@ bool GenmeshAsset::DetachAll()
   if (!skeleton) return false;
   for (size_t i = 0; i < skeleton->GetFactory()->GetSocketsCount(); i++)
   {
-    iSkeletonSocketFactory* sock = skeleton->GetFactory()->GetSocket(i);
+    iSkeletonSocketFactory* sock = skeleton->GetFactory()->GetSocket((int)i);
     if (!sock) continue;
 
     AttachMesh(sock->GetName(), 0);
@@ -275,27 +275,4 @@ bool GenmeshAsset::SetSubMeshMaterial(const char* subMeshName, iMaterialWrapper*
   if (!sm) return false;
   sm->SetMaterial(mat);
   return true;
-}
-
-
-// MorphTargets
-bool GenmeshAsset::SupportsMorphTargets() 
-{ 
-  return false; 
-}
-
-csPtr<iStringArray> GenmeshAsset::GetMorphTargets()
-{
-  scfStringArray* arr = new scfStringArray;
-  return csPtr<iStringArray>(arr);
-}
-
-float GenmeshAsset::GetMorphTargetWeight(const char* name)
-{
-  return 0.0f;
-}
-
-bool GenmeshAsset::SetMorphTargetWeight(const char* name, float value)
-{
-  return false;
 }

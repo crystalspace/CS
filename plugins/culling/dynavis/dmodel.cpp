@@ -110,7 +110,7 @@ const csOBB& csDynavisObjectModel::GetOBB ()
     {
       size_t num_vertices = trianglemesh->GetVertexCount ();
       csVector3* verts = trianglemesh->GetVertices ();
-      obb.FindOBB (verts, num_vertices);
+      obb.FindOBB (verts, (int)num_vertices);
       has_obb = true;
     }
   }

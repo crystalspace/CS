@@ -14,8 +14,8 @@
     <materials>
         <material name="sage2.png">
             <texture>sage2.png</texture>
-            <shader type="base">lighting_default_instance_binalpha</shader>
-            <shader type="diffuse">lighting_default_instance_binalpha</shader>
+            <shader type="base">lighting_fullbright_instance</shader>
+            <shader type="diffuse">lighting_fullbright_instance</shader>
         </material>
     </materials>
     <meshfact name="bush2">
@@ -2569,7 +2569,6 @@
             <t v1="847" v2="845" v3="844" />
             <t v1="844" v2="845" v3="846" />
             <t v1="844" v2="846" v3="847" />
-            <defaultcolor red=".5" green=".5" blue=".5" />
         </params>
     </meshfact>
 </library>

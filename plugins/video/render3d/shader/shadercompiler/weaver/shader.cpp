@@ -47,10 +47,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
   CS_LEAKGUARD_IMPLEMENT (WeaverShader);
 
+  struct WeaverShader::CacheInfo
+  {
+    CS::PluginCommon::ShaderCacheHelper::ShaderDocHasher hasher;
+    csString shaderName;
+    csString cacheID_base;
+
+    CacheInfo (WeaverCompiler* compiler, iDocumentNode* source)
+     : hasher (compiler->objectreg, 0)
+    {
+      hasher = CS::PluginCommon::ShaderCacheHelper::ShaderDocHasher (
+        compiler->objectreg, source);
+      
+      shaderName = source->GetAttributeValue ("name");
+      csMD5::Digest sourceDigest (csMD5::Encode (CS::DocSystem::FlattenNode (source)));
+      cacheID_base = sourceDigest.HexString();
+    }
+  };
+
   /* Magic value for cache file.
   * The most significant byte serves as a "version", increase when the
   * cache file format changes. */
-  static const uint32 cacheFileMagic = 0x03727677;
+  static const uint32 cacheFileMagic = 0x04727677;
 
   WeaverShader::WeaverShader (WeaverCompiler* compiler) : 
     scfImplementationType (this), compiler (compiler), 
@@ -147,16 +165,283 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return true;
   }
 
-  csRef<iDocument> WeaverShader::LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
+  csRef<iDocument> WeaverShader::TryLoadShader (CacheInfo& ci,
+                                                iDocumentNode* source,
+                                                iHierarchicalCache* shaderCache)
+  {
+    csString cacheID_header;
+    cacheID_header.Format ("%sWH", ci.cacheID_base.GetData());
+    bool cacheValid = (shaderCache != 0) && !ci.shaderName.IsEmpty()
+      && !cacheID_header.IsEmpty();
+    bool useShaderCache = cacheValid;
+    csString cacheFailReason;
+
+    csRef<iDocument> synthShader;
+    if (useShaderCache)
+    {
+      useShaderCache = false;
+      csString cacheFileName;
+      cacheFileName.Format ("/%s/%s",
+	ci.shaderName.GetData(), cacheID_header.GetData());
+      csRef<iFile> cacheFile;
+      {
+	csRef<iDataBuffer> cacheData;
+	cacheData = shaderCache->ReadCache (cacheFileName);
+	if (cacheData.IsValid())
+	{
+	  cacheFile.AttachNew (new csMemFile (cacheData, true));
+	}
+      }
+      if (cacheFile.IsValid())
+      {
+	do
+	{
+	  // Read magic header
+	  uint32 diskMagic;
+	  size_t read = cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic));
+	  if (read != sizeof (diskMagic))
+	  {
+	    cacheFailReason = "Read error";
+	    break;
+	  }
+	  if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
+	  {
+	    cacheFailReason = "Out of date (magic)";
+	    break;
+	  }
+	  
+	  // Extract hash stream
+	  csRef<iDataBuffer> hashStream = 
+	    CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
+	  if (!hashStream.IsValid())
+	  {
+	    cacheFailReason = "Read error";
+	    break;
+	  }
+	  
+	  useShaderCache = ci.hasher.ValidateHashStream (hashStream);
+	  if (!useShaderCache)
+	  {
+	    cacheFailReason = "Out of date (hash)";
+	    break;
+	  }
+
+          if (!ValidateCombinerCodes (cacheFile, cacheFailReason))
+	  {
+	    break;
+	  }
+
+          csRef<iDataBuffer> cachedDocData = 
+            CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
+          if (!cachedDocData.IsValid())
+          {
+            cacheFailReason = "Failed to read cached doc";
+            return 0;
+          }
+          
+          csRef<iDocument> cacheDoc;
+          cacheDoc = compiler->binDocSys->CreateDocument();
+          if (cacheDoc->Parse (cachedDocData) != 0)
+          {
+            cacheDoc = compiler->xmlDocSys->CreateDocument();
+            if (cacheDoc->Parse (cachedDocData) != 0)
+            {
+	      cacheFailReason = "Failed to parse cached doc";
+	      return 0;
+            }
+          }
+          synthShader = cacheDoc;
+        }
+	while (false);
+      }
+    }
+    
+    if (compiler->do_verbose && (!cacheFailReason.IsEmpty()))
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "Could not get shader '%s' from cache because: %s",
+        ci.shaderName.GetData(), cacheFailReason.GetData());
+    }
+
+    return synthShader;
+  }
+
+  bool WeaverShader::ValidateCombinerCodes (iFile* cacheFile,
+    csString& cacheFailReason)
+  {
+    uint32 diskCombinerNum;
+    size_t read = cacheFile->Read ((char*)&diskCombinerNum, sizeof (diskCombinerNum));
+    if (read != sizeof (diskCombinerNum))
+    {
+      cacheFailReason = "Read error";
+      return false;
+    }
+    for (uint i = 0; i < csLittleEndian::UInt32 (diskCombinerNum); i++)
+    {
+      csString combinerID =
+	CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+      if (combinerID.IsEmpty()) return false;
+      csString combinerCode =
+	CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+
+      csRef<WeaverCommon::iCombinerLoader> loader = 
+	csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
+	  combinerID);
+      if (!loader.IsValid())
+      {
+	cacheFailReason = "Failed to load combiner";
+	return false;
+      }
+      if (combinerCode != loader->GetCodeString())
+      {
+	cacheFailReason = "Out of date (combiner code)";
+	return false;
+      }
+    }
+    return true;
+  }
+
+  csRef<iDocument> WeaverShader::SynthesizeShaderAndCache (CacheInfo& ci,
+    iDocumentNode* source, iHierarchicalCache* cacheTo, int forcepriority)
+  {
+    FileAliases aliases;
+    csArray<TechniqueKeeper> techniques;
+    Parse (source, techniques, forcepriority, aliases);
+
+    csString cacheID_header;
+    cacheID_header.Format ("%sWH", ci.cacheID_base.GetData());
+    csString cacheFileName;
+    cacheFileName.Format ("/%s/%s",
+      ci.shaderName.GetData(), cacheID_header.GetData());
+
+    csRef<iString> cacheState;
+
+    csRef<iFile> cacheFile;
+    // Prep for writing to cache
+    cacheFile.AttachNew (new csMemFile ());
+    // Write magic header
+    uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
+    if (cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic)) != sizeof (diskMagic))
+    {
+      cacheState.AttachNew (new scfString ("error writing to cache file"));
+      cacheFile = 0;
+    }
+    // Write hash stream
+    csRef<iDataBuffer> hashStream = ci.hasher.GetHashStream ();
+    if (cacheFile.IsValid())
+    {
+      if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+        cacheFile, hashStream))
+      {
+        cacheState.AttachNew (new scfString ("error writing hash stream"));
+        cacheFile = 0;
+      }
+    }
+
+    
+    csRef<iDocument> synthShader;
+    {
+      // Hash hash stream (to get a smaller ID)
+      csMD5::Digest hashDigest (csMD5::Encode (hashStream->GetData(),
+        hashStream->GetSize()));
+      /* In theory, anything would work as long as (a) it changes when
+      some file the shader uses changes (b) the tag is reasonably
+      unique (also over multiple program runs).
+      E.g. a UUID, recomputed when the shader is 'touched',
+      could do as well. */
+      
+      csString cacheTag (CS::Utility::EncodeBase64 (
+        &hashDigest, sizeof (hashDigest)));
+
+      CombinerLoaderSet combiners;
+      synthShader = SynthesizeShader (techniques, aliases, source, ci.cacheID_base,
+        cacheTag, cacheTag, combiners);
+
+      if (cacheFile.IsValid()
+          && !WriteCombinerCodes (cacheFile, combiners))
+      {
+        cacheState.AttachNew (new scfString ("error writing to cache file"));
+        cacheFile = 0;
+      }
+
+      if (cacheFile.IsValid())
+      {
+        iDocumentSystem* cacheDocSys = compiler->binDocSys.IsValid()
+	  ? compiler->binDocSys : compiler->xmlDocSys;
+  	
+        csRef<iDocumentNode> shaderNode =
+          synthShader->GetRoot()->GetNode ("shader");
+
+        /* Store only a "torso" shader document.
+           This is (obviously) much smaller. Since we provide a cache tag to
+           xmlshader it will compare that against the cache tag it stored and
+           fail to load the cached shader if these mismatch.
+           Since that tag is derived from the shaderweaver source, any change
+           to the weaver source will invalidate the cached xmlshader as well.
+         */
+        csRef<iDocument> cacheDoc = cacheDocSys->CreateDocument();
+        csRef<iDocumentNode> cacheDocRoot = cacheDoc->CreateRoot();
+        csRef<iDocumentNode> cacheShaderNode = cacheDocRoot->CreateNodeBefore (
+	  CS_NODE_ELEMENT);
+        cacheShaderNode->SetValue ("shader");
+        /* This instructs xmlshader to fail loading if it can't load the shader
+           from the cache */
+        cacheShaderNode->SetAttributeAsInt ("_forceCacheLoad", 1);
+        CS::DocSystem::CloneAttributes (shaderNode, cacheShaderNode);
+        csRef<iDocumentNode> tokenChild =
+          cacheShaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
+        // This is needed so xmlshader doesn't reject the torso right away
+        tokenChild->SetValue ("Boo");
+        
+        csMemFile cachedDocFile;
+        const char* writeErr = cacheDoc->Write (&cachedDocFile);
+        if (writeErr != 0)
+        {
+	  cacheState.AttachNew (new scfString (
+	    csString ("failed to write cache doc: ") + writeErr));
+          cacheFile = 0;
+        }
+        else
+        {
+	  csRef<iDataBuffer> cachedDocBuf = cachedDocFile.GetAllData ();
+	  if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+	    cacheFile, cachedDocBuf))
+	  {
+	    cacheState.AttachNew (new scfString ("failed to write cache doc buffer"));
+            cacheFile = 0;
+	  }
+        }
+      }
+
+      csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
+      if (!cacheTo->CacheData (allCacheData->GetData(),
+          allCacheData->GetSize(), cacheFileName)
+        && compiler->do_verbose)
+      {
+        cacheState.AttachNew (new scfString ("error writing to cache"));
+      }
+      if (cacheState.IsValid() && compiler->do_verbose)
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Could not cache '%s' because: %s",
+	  ci.shaderName.GetData(), cacheState->GetData());
+      }
+    }
+    CS_ASSERT (synthShader.IsValid());
+      
+    DumpWeaved (ci, synthShader);
+    
+    return synthShader;
+  }
+
+  csRef<iDocument> WeaverShader::SynthesizeShader (const csArray<TechniqueKeeper>& techniques,
 						   const FileAliases& aliases,
 						   iDocumentNode* docSource,
 						   const char* cacheID, 
 						   const char* _cacheTag,
-						   iFile* cacheFile,
-						   csRef<iString>& cachingError)
+                                                   csString& cacheTag,
+                                                   CombinerLoaderSet& combiners)
   {
-    realShader.Invalidate();
-    
     csRef<iDocumentSystem> docsys;
     docsys.AttachNew (new csTinyDocumentSystem);
     csRef<iDocument> synthesizedDoc = docsys->CreateDocument ();
@@ -167,7 +452,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     CS::DocSystem::CloneAttributes (docSource, shaderNode);
     shaderNode->SetAttribute ("compiler", "xmlshader");
     if (cacheID != 0) shaderNode->SetAttribute ("_cacheid", cacheID);
-    csString cacheTag (_cacheTag);
+    cacheTag = _cacheTag;
 
     csRef<iDocumentNode> shadervarsNode =
       shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -180,11 +465,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       csRef<iDocumentNode> svNode = shaderVarNodes->Next ();
       csRef<iDocumentNode> newNode = 
-	shadervarsNode->CreateNodeBefore (svNode->GetType ());
+	    shadervarsNode->CreateNodeBefore (svNode->GetType ());
       CS::DocSystem::CloneNode (svNode, newNode);
     }
 
-    CombinerLoaderSet combiners;
     csRefArray<iDocumentNode> techniqueNodes;
     //for (size_t t = 0; t < techniques.GetSize(); t++)
     for (size_t t = 0; t < 1; t++)
@@ -199,7 +483,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csPDelArray<Snippet> passSnippets;
       while (it->HasNext ())
       {
-	csRef<iDocumentNode> child = it->Next ();
+        csRef<iDocumentNode> child = it->Next ();
 	bool handled = false;
 	if (child->GetType () == CS_NODE_ELEMENT)
 	{
@@ -269,289 +553,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       for (size_t i = 0; i < cacheTagExtra.GetSize(); i++)
       {
 	cacheTag.Append (";");
-	cacheTag.Append (cacheTagExtra[i]);
+        cacheTag.Append (cacheTagExtra[i]);
       }
     }
     shaderNode->SetAttribute ("_cachetag", cacheTag);
 
-    if (cacheFile)
-    {
-      // Write magic header
-      uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
-      cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
-
-      uint32 diskCombinerNum = csLittleEndian::UInt32 (combiners.UnlockedGetSize());
-      cacheFile->Write ((char*)&diskCombinerNum, sizeof (diskCombinerNum));
-      {
-	CombinerLoaderSet::GlobalIterator it (combiners.UnlockedGetIterator());
-	while (it.HasNext())
-	{
-	  WeaverCommon::iCombinerLoader* combinerLoader = it.Next();
-	  csRef<iFactory> scfFactory = scfQueryInterface<iFactory> (combinerLoader);
-	  CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, scfFactory->QueryClassID());
-	  CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, combinerLoader->GetCodeString());
-	}
-      }
-      
-      iDocumentSystem* cacheDocSys = compiler->binDocSys.IsValid()
-	? compiler->binDocSys : compiler->xmlDocSys;
-	
-      csRef<iDocument> cacheDoc = cacheDocSys->CreateDocument();
-      csRef<iDocumentNode> cacheDocRoot = cacheDoc->CreateRoot();
-      csRef<iDocumentNode> cacheShaderNode = cacheDocRoot->CreateNodeBefore (
-	CS_NODE_ELEMENT);
-      CS::DocSystem::CloneNode (shaderNode, cacheShaderNode);
-      
-      csMemFile cachedDocFile;
-      const char* writeErr = cacheDoc->Write (&cachedDocFile);
-      if (writeErr != 0)
-	cachingError.AttachNew (new scfString (
-	  csString ("failed to write cache doc: ") + writeErr));
-      else
-      {
-	csRef<iDataBuffer> cachedDocBuf = cachedDocFile.GetAllData ();
-	if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
-	  cacheFile, cachedDocBuf))
-	{
-	  cachingError.AttachNew (new scfString ("failed to write cache doc buffer"));
-	}
-      }
-    }
-      
     return synthesizedDoc;
   }
-  
-  csRef<iDocument> WeaverShader::LoadTechsFromCache (iFile* cacheFile,
-                                                     const char*& cacheFailReason)
+
+  bool WeaverShader::WriteCombinerCodes (iFile* cacheFile,
+                                         const CombinerLoaderSet& combiners)
   {
-    size_t read;
-  
-    csRef<iDataBuffer> cacheData = cacheFile->GetAllData();
-    // Read magic header
-    uint32 diskMagic;
-    read = cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic));
-    if (read != sizeof (diskMagic))
-    {
-      cacheFailReason = "Read error";
-      return 0;
-    }
-    if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
-    {
-      cacheFailReason = "Out of date (magic)";
-      return 0;
-    }
+    uint32 diskCombinerNum = csLittleEndian::UInt32 ((uint32)combiners.UnlockedGetSize());
+    if (cacheFile->Write ((char*)&diskCombinerNum, sizeof (diskCombinerNum))
+        != sizeof (diskCombinerNum))
+      return false;
 
-    uint32 diskCombinerNum;
-    read = cacheFile->Read ((char*)&diskCombinerNum, sizeof (diskCombinerNum));
-    if (read != sizeof (diskCombinerNum))
+    CombinerLoaderSet::GlobalIterator it (combiners.UnlockedGetIterator());
+    while (it.HasNext())
     {
-      cacheFailReason = "Read error";
-      return 0;
-    }
-    for (uint i = 0; i < csLittleEndian::UInt32 (diskCombinerNum); i++)
-    {
-      csString combinerID =
-	CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-      csString combinerCode =
-	CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-
-      csRef<WeaverCommon::iCombinerLoader> loader = 
-	csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
-	  combinerID);
-      if (!loader.IsValid())
-      {
-	cacheFailReason = "Failed to load combiner";
-	return 0;
-      }
-      if (combinerCode != loader->GetCodeString())
-      {
-	cacheFailReason = "Out of date (combiner code)";
-	return 0;
-      }
+      WeaverCommon::iCombinerLoader* combinerLoader = it.Next();
+      csRef<iFactory> scfFactory = scfQueryInterface<iFactory> (combinerLoader);
+      if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, scfFactory->QueryClassID())
+          || !CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, combinerLoader->GetCodeString()))
+        return false;
     }
     
-    csRef<iDataBuffer> cachedDocData = 
-      CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
-    if (!cachedDocData.IsValid())
-    {
-      cacheFailReason = "Failed to read cached doc";
-      return 0;
-    }
-    
-    csRef<iDocument> cacheDoc;
-    cacheDoc = compiler->binDocSys->CreateDocument();
-    if (cacheDoc->Parse (cachedDocData) != 0)
-    {
-      cacheDoc = compiler->xmlDocSys->CreateDocument();
-      if (cacheDoc->Parse (cachedDocData) != 0)
-      {
-	cacheFailReason = "Failed to parse cached doc";
-	return 0;
-      }
-    }
-    
-    return cacheDoc;
+    return true;
   }
-  
-  csRef<iDocument> WeaverShader::DoSynthesis (iDocumentNode* source,
-                                              iHierarchicalCache* shaderCache,
-                                              int forcepriority)
+
+  void WeaverShader::DumpWeaved (CacheInfo& ci, iDocument* synthShader)
   {
-    FileAliases aliases;
-    csArray<TechniqueKeeper> techniques;
-    Parse (source, techniques, forcepriority, aliases);
-    
-    CS::PluginCommon::ShaderCacheHelper::ShaderDocHasher hasher (
-      compiler->objectreg, source);
-    
-    csString shaderName (source->GetAttributeValue ("name"));
-    csString cacheID_base;
-    csString cacheID_header;
-    csString cacheID_tech;
-    {
-      csMD5::Digest sourceDigest (csMD5::Encode (CS::DocSystem::FlattenNode (source)));
-      cacheID_base = sourceDigest.HexString();
-      cacheID_header.Format ("%sWH", cacheID_base.GetData());
-      cacheID_tech.Format ("%sWT", cacheID_base.GetData());
-    }
-    bool cacheValid = (shaderCache != 0) && !shaderName.IsEmpty()
-      && !cacheID_header.IsEmpty() && !cacheID_tech.IsEmpty();
-    bool useShaderCache = cacheValid;
-    csString cacheFailReason;
-      
-    if (useShaderCache)
-    {
-      useShaderCache = false;
-      csString cacheFileName;
-      cacheFileName.Format ("/%s/%s",
-	shaderName.GetData(), cacheID_header.GetData());
-      csRef<iFile> cacheFile;
-      {
-	csRef<iDataBuffer> cacheData;
-	cacheData = shaderCache->ReadCache (cacheFileName);
-	if (cacheData.IsValid())
-	{
-	  cacheFile.AttachNew (new csMemFile (cacheData, true));
-	}
-      }
-      if (cacheFile.IsValid())
-      {
-	do
-	{
-	  // Read magic header
-	  uint32 diskMagic;
-	  size_t read = cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic));
-	  if (read != sizeof (diskMagic))
-	  {
-	    cacheFailReason = "Read error";
-	    break;
-	  }
-	  if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
-	  {
-	    cacheFailReason = "Out of date (magic)";
-	    break;
-	  }
-	  
-	  // Extract hash stream
-	  csRef<iDataBuffer> hashStream = 
-	    CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
-	  if (!hashStream.IsValid())
-	  {
-	    cacheFailReason = "Read error";
-	    break;
-	  }
-	  
-	  useShaderCache = hasher.ValidateHashStream (hashStream);
-	  if (!useShaderCache)
-	  {
-	    cacheFailReason = "Out of date (hash)";
-	    break;
-	  }
-	}
-	while (false);
-      }
-      if (!useShaderCache)
-      {
-	// Getting from cache failed, so prep for writing to cache
-	cacheFile.AttachNew (new csMemFile ());
-	// Write magic header
-	uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
-	cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
-	// Write hash stream
-	csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
-	if (CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
-	  cacheFile, hashStream))
-	{
-	  csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
-	  if (!shaderCache->CacheData (allCacheData->GetData(),
-	      allCacheData->GetSize(), cacheFileName)
-	    && compiler->do_verbose)
-	  {
-	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "Could not cache header data for '%s'",
-	      shaderName.GetData());
-	  }
-	}
-      }
-    }
-    
-    csRef<iDocument> synthShader;
-    {
-      csRef<iDataBuffer> cacheData;
-      if (useShaderCache)
-	cacheData = shaderCache->ReadCache (csString().Format ("/%s/%s",
-	  shaderName.GetData(), cacheID_tech.GetData()));
-      if (cacheData.IsValid())
-      {
-	csMemFile cacheFile (cacheData, true);
-	const char* techCacheFailReason = 0;
-	synthShader = LoadTechsFromCache (&cacheFile, techCacheFailReason);
-	if (techCacheFailReason != 0)
-	  cacheFailReason.Format ("Could not get cached techniques: %s",
-	    techCacheFailReason);
-      }
-    }
-    
-    if (!synthShader.IsValid())
-    {
-      csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
-      // Hash hash stream (to get a smaller ID)
-      csMD5::Digest hashDigest (csMD5::Encode (hashStream->GetData(),
-        hashStream->GetSize()));
-      /* In theory, anything would work as long as (a) it changes when
-      some file the shader uses changes (b) the tag is reasonably
-      unique (also over multiple program runs).
-      E.g. a UUID, recomputed when the shader is 'touched',
-      could do as well. */
-      
-      csString cacheTag (CS::Utility::EncodeBase64 (
-        &hashDigest, sizeof (hashDigest)));
-      
-      csRef<iString> cacheState;
-      csMemFile cacheFile;
-      synthShader = LoadTechsFromDoc (techniques, aliases, 
-	source, cacheID_base, cacheTag, cacheValid ? &cacheFile : 0,
-	cacheState);
-      if (cacheValid && !cacheState.IsValid ())
-      {
-	csRef<iDataBuffer> allCacheData = cacheFile.GetAllData();
-	if (!shaderCache->CacheData (allCacheData->GetData(),
-	  allCacheData->GetSize(), 
-	  csString().Format ("/%s/%s",
-            shaderName.GetData(), cacheID_tech.GetData())))
-        {
-          cacheState.AttachNew (new scfString ("error writing to cache"));
-        }
-      }
-      if (cacheState.IsValid() && compiler->do_verbose)
-      {
-	compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Could not cache '%s' because: %s",
-	  shaderName.GetData(), cacheState->GetData());
-      }
-    }
-    CS_ASSERT (synthShader.IsValid());
-      
     if (compiler->doDumpWeaved)
     {
       csRef<iDocument> dumpDoc = compiler->xmlDocSys->CreateDocument ();
@@ -559,6 +591,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csRef<iDocumentNode> rootNode = dumpDoc->CreateRoot();
       CS::DocSystem::CloneNode (synthShader->GetRoot(), rootNode);
       
+      csString shaderName (ci.shaderName);
       if (shaderName.IsEmpty())
       {
 	static size_t counter = 0;
@@ -568,15 +601,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	csString().Format ("/tmp/shader/generated_%s.xml",
 	  shaderName.GetData()));
     }
-    
-    if (compiler->do_verbose && (!cacheFailReason.IsEmpty()))
-    {
-      compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-        "Could not get shader '%s' from cache because: %s",
-        shaderName.GetData(), cacheFailReason.GetData());
-    }
-
-    return synthShader;
   }
 
   void WeaverShader::MakeFallbackShader (iDocumentNode* targetNode,
@@ -628,14 +652,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
     iHierarchicalCache* shaderCache = shadermgr->GetShaderCache();
     
-    csRef<iDocument> synthShader (DoSynthesis (source, shaderCache,
-      forcepriority));
-    
-    csRef<iDocumentNode> shaderNode =
-      synthShader->GetRoot()->GetNode ("shader");
-    
-    realShader = compiler->xmlshader->CompileShader (ldr_context,
-      shaderNode);
+    CacheInfo ci (compiler, source);
+
+    realShader.Invalidate();
+    csRef<iDocument> xmlShader (TryLoadShader (ci, source, shaderCache));
+    if (xmlShader.IsValid())
+    {
+      csRef<iDocumentNode> shaderNode =
+        xmlShader->GetRoot()->GetNode ("shader");
+      
+      realShader = compiler->xmlshader->CompileShader (ldr_context,
+        shaderNode);
+    }
+    if (!realShader.IsValid())
+    {
+      xmlShader = SynthesizeShaderAndCache (ci, source, shaderCache,
+        forcepriority);
+
+      csRef<iDocumentNode> shaderNode =
+        xmlShader->GetRoot()->GetNode ("shader");
+      
+      realShader = compiler->xmlshader->CompileShader (ldr_context,
+        shaderNode);
+    }
+
     realShaderXML = scfQueryInterfaceSafe<iXMLShaderInternal> (realShader);
       
     return realShader.IsValid();
@@ -645,10 +685,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                                iHierarchicalCache* cacheTo,
                                bool quick)
   {
-    csRef<iDocument> synthShader (DoSynthesis (source, cacheTo, -1));
+    CacheInfo ci (compiler, source);
+
+    csRef<iDocument> xmlShader (SynthesizeShaderAndCache (ci, source, cacheTo,
+        -1));
     
     csRef<iDocumentNode> shaderNode =
-      synthShader->GetRoot()->GetNode ("shader");
+      xmlShader->GetRoot()->GetNode ("shader");
     
     return compiler->xmlshader->PrecacheShader (shaderNode, cacheTo, quick);
   }

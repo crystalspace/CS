@@ -909,6 +909,7 @@ bool csGLGraphics3D::Open ()
   //ext->InitGL_ATI_separate_stencil ();
   ext->InitGL_EXT_secondary_color ();
   ext->InitGL_EXT_blend_func_separate ();
+  ext->InitGL_ARB_occlusion_query ();
   ext->InitGL_GREMEDY_string_marker ();
   
   // Some 'assumed state' is for extensions, so set again
@@ -2002,7 +2003,7 @@ void csGLGraphics3D::SetupInstance (size_t instParamNum,
             GLenum tu = GL_TEXTURE0 + (target - CS_VATTRIB_TEXCOORD0);
             for (size_t n = 0; n < maxN; n++)
             {
-              ext->glMultiTexCoord4fvARB (tu + n, &matrix[n*4]);
+              ext->glMultiTexCoord4fvARB (tu + (GLenum)n, &matrix[n*4]);
             }
           }
         }
@@ -2014,7 +2015,7 @@ void csGLGraphics3D::SetupInstance (size_t instParamNum,
             GLenum attr = (target - CS_VATTRIB_GENERIC_FIRST);
             for (size_t n = 0; n < maxN; n++)
             {
-              ext->glVertexAttrib4fvARB (attr + n, &matrix[n*4]);
+              ext->glVertexAttrib4fvARB (attr + (GLenum)n, &matrix[n*4]);
             }
           }
         }

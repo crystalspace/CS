@@ -84,9 +84,9 @@ void csSectorLightList::PrepareLight (iLight* item)
   csLight* clight = static_cast<csLight*> (item);
   csLightList::PrepareLight (item);
 
-  clight->SetSector (sector);
-
   lightTree.AddObject (clight);
+
+  clight->SetSector (sector);
 }
 
 void csSectorLightList::FreeLight (iLight* item)
@@ -644,7 +644,7 @@ void csSector::ObjectVisible (csMeshWrapper* cmesh, iRenderView* rview,
     csRenderMesh** extraMeshes = cmesh->GetExtraRenderMeshes (numExtra, rview,
 					  frustum_mask);
     CS_ASSERT(!((numExtra != 0) && (extraMeshes == 0)));
-    visMesh.num = numExtra;
+    visMesh.num = (int)numExtra;
     visMesh.rmeshes = extraMeshes;
   }
 }
@@ -666,6 +666,9 @@ csSectorVisibleRenderMeshes* csSector::GetVisibleRenderMeshes (int& num,
       meshes[i]->db_mesh_name = cmesh->GetName ();
   #endif
 
+    if (meshes == 0 && num == 0)
+      return 0;
+
     oneVisibleMesh[0].imesh = mesh;
     oneVisibleMesh[0].num = num;
     oneVisibleMesh[0].rmeshes = meshes;
@@ -686,7 +689,7 @@ csSectorVisibleRenderMeshes* csSector::GetVisibleRenderMeshes (int& num,
     }
     
     oneVisibleMesh[1].imesh = mesh;
-    oneVisibleMesh[1].num = numExtra;
+    oneVisibleMesh[1].num = (int)numExtra;
     oneVisibleMesh[1].rmeshes = extraMeshes;
 
     num = 2;
@@ -697,7 +700,7 @@ csSectorVisibleRenderMeshes* csSector::GetVisibleRenderMeshes (int& num,
 
   ObjectVisible (cmesh, rview, frustum_mask);
 
-  num = renderMeshesScratch.GetSize();
+  num = (int)renderMeshesScratch.GetSize();
   return renderMeshesScratch.GetArray();
 }
 

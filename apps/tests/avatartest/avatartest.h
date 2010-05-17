@@ -21,9 +21,22 @@
 #ifndef __AVATARTEST_H__
 #define __AVATARTEST_H__
 
-#include <stdarg.h>
-#include <crystalspace.h>
+#include "cstool/csdemoapplication.h"
+#include "imesh/animesh.h"
+#include "imesh/ragdoll.h"
+#include "imesh/lookat.h"
+#include "imesh/basicskelanim.h"
+#include "ivaria/dynamics.h"
+#include "ivaria/bullet.h"
+#include "ivaria/dynamicsdebug.h"
+#include "ivaria/softanim.h"
 
+#define DYNDEBUG_NONE 1
+#define DYNDEBUG_MIXED 2
+#define DYNDEBUG_COLLIDER 3
+#define DYNDEBUG_BULLET 4
+
+// Base class to be implemented for all different models
 class AvatarScene
 {
  public:
@@ -31,7 +44,12 @@ class AvatarScene
 
   // Camera related
   virtual csVector3 GetCameraStart () = 0;
+  virtual float GetCameraMinimumDistance () = 0;
   virtual csVector3 GetCameraTarget () = 0;
+
+  // Dynamic simuation related
+  virtual float GetSimulationSpeed () = 0;
+  virtual bool HasPhysicalObjects () = 0;
 
   // From csBaseEventHandler
   virtual void Frame () = 0;
@@ -44,35 +62,33 @@ class AvatarScene
   // User interaction with the scene
   virtual void ResetScene () = 0;
 
-  // Display of comments 
-  virtual void DisplayKeys () = 0;
+  // Display of information on the state of the scene
+  virtual void UpdateStateDescription () = 0;
+
+  // Animesh objects
+  csRef<iAnimatedMeshFactory> animeshFactory;
+  csRef<iAnimatedMesh> animesh;
 };
 
-class AvatarTest : public csApplicationFramework, public csBaseEventHandler
+class AvatarTest : public csDemoApplication
 {
   friend class FrankieScene;
   friend class KrystalScene;
+  friend class SintelScene;
 
 private:
   AvatarScene* avatarScene;
-
-  // Engine related
-  csRef<iEngine> engine;
-  csRef<iLoader> loader;
-  csRef<iGraphics3D> g3d;
-  csRef<iGraphics2D> g2d;
-  csRef<iKeyboardDriver> kbd;
-  csRef<iVirtualClock> vc;
-  csRef<iView> view;
-  csRef<FramePrinter> printer;
-
-  csRef<iFont> courierFont;
-  iSector* room;
+  int avatarSceneType;
 
   // Physics related
   bool physicsEnabled;
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
+  csRef<iBulletDynamicSystem> bulletDynamicSystem;
+  csRef<iDynamicsDebuggerManager> debuggerManager;
+  csRef<iDynamicSystemDebugger> dynamicsDebugger;
+  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
+  int dynamicsDebugMode;
 
   // Animation node plugin managers
   csRef<iSkeletonLookAtManager2> lookAtManager;
@@ -84,20 +100,11 @@ private:
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
 
-  // Creation of objects
-  void CreateRoom ();
-  int avatarModel;
-
-  // Display of comments 
-  void WriteShadow (int x, int y, int fg, const char *str,...);
-  void Write(int x, int y, int fg, int bg, const char *str,...);
-
  public:
   AvatarTest ();
   ~AvatarTest ();
 
   //-- csApplicationFramework
-  void OnExit ();
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();
 };

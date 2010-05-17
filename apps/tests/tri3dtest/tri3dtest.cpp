@@ -25,7 +25,7 @@ using CS::Geometry::csContour3;
 Tri3DTest::Tri3DTest()
 {
     SetApplicationName ("CrystalSpace.Tri3DTest");
-    untrimesh = NULL;
+    //untrimesh = 0;
 }
 
 Tri3DTest::~Tri3DTest()
@@ -112,16 +112,16 @@ void Tri3DTest::Frame()
 
   g3d->FinishDraw();
 
-  if (rMeshObj.vertices != NULL)
+  if (rMeshObj.vertices != 0)
   {
     delete[] rMeshObj.vertices;
-    rMeshObj.vertices = NULL;
+    rMeshObj.vertices = 0;
   }
 
-  if (rMeshObj.colors != NULL)
+  if (rMeshObj.colors != 0)
   {
     delete[] rMeshObj.colors;
-    rMeshObj.colors = NULL;
+    rMeshObj.colors = 0;
   }
 }
 
@@ -208,7 +208,7 @@ bool Tri3DTest::Application()
 
     // camera at 0.00000, -1.5, 15.225 initially
     csOrthoTransform camTransf = c->GetTransform();
-    camTransf.SetOrigin(csVector3(0.0, -1.5, 15.225));
+    camTransf.SetOrigin(csVector3(0.0f, -1.5f, 15.225f));
     c->SetTransform(camTransf);
 
     // This calls the default runloop. This will basically just keep
@@ -317,26 +317,26 @@ int main (int argc, char* argv[])
 
 csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csTriangleMesh& t)
 {
-  csVector3* verts = NULL;
+  csVector3* verts = 0;
   csVector3* tmVerts;
-  csVector4* cols = NULL;
+  csVector4* cols = 0;
   csSimpleRenderMesh rendMesh;
   rendMesh.vertexCount = 0;
-  rendMesh.vertices = NULL;
-  rendMesh.colors = NULL;
+  rendMesh.vertices = 0;
+  rendMesh.colors = 0;
 
 
   verts = new csVector3[tm.GetTriangleCount() * 3];
   tmVerts = tm.GetVertices();
 
   csArray<csVector4> availableColors;
-  availableColors.Push(csVector4(1.0, 0.0, 0.0, 1.0)); // red
-  availableColors.Push(csVector4(1.0, 0.5, 0.0, 1.0)); // orange
-  availableColors.Push(csVector4(1.0, 1.0, 0.0, 1.0)); // yellow
-  availableColors.Push(csVector4(0.0, 1.0, 0.0, 1.0)); // green
-  availableColors.Push(csVector4(0.0, 0.0, 1.0, 1.0)); // blue
-  availableColors.Push(csVector4(0.4, 0.0, 1.0, 1.0)); // indigo
-  availableColors.Push(csVector4(1.0, 0.0, 1.0, 1.0)); // violet
+  availableColors.Push(csVector4(1.0f, 0.0f, 0.0f, 1.0f)); // red
+  availableColors.Push(csVector4(1.0f, 0.5f, 0.0f, 1.0f)); // orange
+  availableColors.Push(csVector4(1.0f, 1.0f, 0.0f, 1.0f)); // yellow
+  availableColors.Push(csVector4(0.0f, 1.0f, 0.0f, 1.0f)); // green
+  availableColors.Push(csVector4(0.0f, 0.0f, 1.0f, 1.0f)); // blue
+  availableColors.Push(csVector4(0.4f, 0.0f, 1.0f, 1.0f)); // indigo
+  availableColors.Push(csVector4(1.0f, 0.0f, 1.0f, 1.0f)); // violet
 
   int numAvabColors = (int)availableColors.GetSize();
 
@@ -373,13 +373,13 @@ csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csTriangleMesh& t)
 
 csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csContour3& c)
 {
-  csVector3* verts = NULL;
-  csVector4* cols = NULL;
+  csVector3* verts = 0;
+  csVector4* cols = 0;
 
   csSimpleRenderMesh rendMesh;
   rendMesh.vertexCount = 0;
-  rendMesh.vertices = NULL;
-  rendMesh.colors = NULL;
+  rendMesh.vertices = 0;
+  rendMesh.colors = 0;
 
   verts = new csVector3[c.GetSize()];
   cols = new csVector4[c.GetSize()];

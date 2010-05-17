@@ -50,7 +50,7 @@ struct iSkeletonRagdollManager2 : public virtual iBase
 		  iBodySkeleton* skeleton, iDynamicSystem* dynSys) = 0;
 
   /**
-   * Find the specified ragdoll animation node factory.
+   * Find the ragdoll animation node factory with the given name.
    */
   virtual iSkeletonRagdollNodeFactory2* FindAnimNodeFactory
     (const char* name) const = 0;
@@ -66,10 +66,10 @@ struct iSkeletonRagdollManager2 : public virtual iBase
  */
 enum csSkeletonRagdollState
 {
-  RAGDOLL_STATE_INACTIVE = 0,   /*!< The chain is physically inactive. */
-  RAGDOLL_STATE_DYNAMIC,        /*!< The chain is dynamic, ie the motion of 
+  CS_RAGDOLL_STATE_INACTIVE = 0,   /*!< The chain is physically inactive. */
+  CS_RAGDOLL_STATE_DYNAMIC,        /*!< The chain is dynamic, ie the motion of 
 				  the chain is controlled by the dynamic simulation. */
-  RAGDOLL_STATE_KINEMATIC       /*!< The chain is kinematic, ie the motion 
+  CS_RAGDOLL_STATE_KINEMATIC       /*!< The chain is kinematic, ie the motion 
 				  of the chain is controlled by the animation system,
 				  but its bones do interact with the dynamic simulation. */
 };
@@ -79,7 +79,7 @@ enum csSkeletonRagdollState
  */
 struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
-  SCF_INTERFACE(iSkeletonRagdollNodeFactory2, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonRagdollNodeFactory2, 1, 0, 1);
 
   /**
    * Add a new body chain to the ragdoll animation node. Adding more than 
@@ -87,12 +87,34 @@ struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
    * \param state The initial state of the body chain.
    */
   virtual void AddBodyChain (iBodyChain* chain,
-                  csSkeletonRagdollState state = RAGDOLL_STATE_INACTIVE) = 0;
+                  csSkeletonRagdollState state = CS_RAGDOLL_STATE_INACTIVE) = 0;
 
   /**
    * Remove the chain from the ragdoll animation node.
    */
   virtual void RemoveBodyChain (iBodyChain* chain) = 0;
+
+  /**
+   * Set the child animation node of this node. The ragdoll controller will
+   * add its control on top of the animation of the child node. This child
+   * node is not mandatory.
+   *
+   * The orientation/position values of the bones that are in state
+   * CS_RAGDOLL_STATE_INACTIVE or CS_RAGDOLL_STATE_KINEMATIC will be read from the
+   * child node, while the bones in state CS_RAGDOLL_STATE_DYNAMIC will be
+   * overwriten by this node.
+   */
+  virtual void SetChildNode (iSkeletonAnimNodeFactory2* node) = 0;
+
+  /**
+   * Return the child animation node of this node.
+   */
+  virtual iSkeletonAnimNodeFactory2* GetChildNode () = 0;
+
+  /**
+   * Clear the child animation node of this node.
+   */
+  virtual void ClearChildNode () = 0;
 };
 
 /**
@@ -102,7 +124,7 @@ struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
  */
 struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
 {
-  SCF_INTERFACE(iSkeletonRagdollNode2, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonRagdollNode2, 1, 0, 1);
 
   // TODO: remove this function and implement iSkeleton2::GetSceneNode ()
   /**
@@ -111,10 +133,10 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
   virtual void SetAnimatedMesh (iAnimatedMesh* mesh) = 0;
 
   /**
-   * Set the body chain in the specified physical state. The kinematic state 
-   * is not yet supported.
+   * Set the body chain in the specified physical state.
    */
-  virtual void SetBodyChainState (iBodyChain* chain, csSkeletonRagdollState state) = 0;
+  virtual void SetBodyChainState (iBodyChain* chain,
+				  csSkeletonRagdollState state) = 0;
 
   /**
    * Get the physical state of the body chain specified.
@@ -140,6 +162,18 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
    * Get a bone from its index.
    */
   virtual BoneID GetBone (csSkeletonRagdollState state, uint index) const = 0;
+
+  /**
+   * Reset the transform of each rigid body of the chain to the initial 'bind'
+   * transform. This can be used only on chains that are in a dynamic state.
+   *
+   * Use this when the bone where the chain is attached is moved abruptly (ie
+   * when the whole mesh is moved sharply, or when the transition of the
+   * animation is not continuous). Otherwise, letting the dynamic simulation
+   * handle such a radical teleportation might lead to an unstable and unwanted
+   * behavior.
+   */
+  virtual void ResetChainTransform (iBodyChain* chain) = 0;
 };
 
 /** @} */

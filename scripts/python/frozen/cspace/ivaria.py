@@ -535,6 +535,7 @@ class iDynamicSystem(core.iBase):
     def GetCollider(*args): return _ivaria.iDynamicSystem_GetCollider(*args)
     def GetColliderCount(*args): return _ivaria.iDynamicSystem_GetColliderCount(*args)
     def AttachColliderCapsule(*args): return _ivaria.iDynamicSystem_AttachColliderCapsule(*args)
+    def AddBody(*args): return _ivaria.iDynamicSystem_AddBody(*args)
     scfGetVersion = staticmethod(_ivaria.iDynamicSystem_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iDynamicSystem
     __del__ = lambda self : None;

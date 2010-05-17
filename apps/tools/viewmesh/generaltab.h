@@ -90,7 +90,7 @@ GeneralTab::GeneralTab(ViewMesh* viewmesh, iObjectRegistry* obj_reg, AssetBase* 
   CEGUI::RadioButton* radio = static_cast<CEGUI::RadioButton*> (btn);
   radio->setGroupID (1);
   radio->setID (101);
-  radio->setSelected (true);
+  radio->setSelected (false);
 
   btn = winMgr->getWindow("General/LooktooriginRadio");
   btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
@@ -106,7 +106,7 @@ GeneralTab::GeneralTab(ViewMesh* viewmesh, iObjectRegistry* obj_reg, AssetBase* 
   radio = static_cast<CEGUI::RadioButton*> (btn);
   radio->setGroupID (1);
   radio->setID (103);
-  radio->setSelected (false);
+  radio->setSelected (true);
 
   btn = winMgr->getWindow("General/ThreePointLighting");
   btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
@@ -283,6 +283,13 @@ bool GeneralTab::ReloadButton (const CEGUI::EventArgs& e)
       return true;
 
   viewmesh->collection->ReleaseAllObjects();
+
+  size_t reloadLibraryCount = viewmesh->reloadLibraryFilenames.GetSize();
+  for(size_t i=0; i < reloadLibraryCount; ++i)
+  {
+    viewmesh->LoadLibrary(viewmesh->reloadLibraryFilenames[i], false);
+  }
+
   viewmesh->LoadSprite(viewmesh->reloadFilename, viewmesh->reloadFilePath);
 
   return true;

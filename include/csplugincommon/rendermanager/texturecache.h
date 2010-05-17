@@ -47,16 +47,6 @@ namespace RenderManager
         int w, h;
       };
 
-      static bool IsLargerEqual (const csRef<iTextureHandle>& t1, 
-                                 const csRef<iTextureHandle>& t2)
-      {
-        int tw1, th1, tw2, th2;
-        t1->GetRendererDimensions (tw1, th1);
-        t2->GetRendererDimensions (tw2, th2);
-        
-        return ((tw1 >= tw2) || (th1 >= th2));
-      }
-    
       static bool IsEqual (const csRef<iTextureHandle>& t1, 
                            const csRef<iTextureHandle>& t2)
       {
@@ -69,13 +59,13 @@ namespace RenderManager
       }
     
       static bool IsLargerEqual (const csRef<iTextureHandle>& t1, 
-                                 const KeyType& t2)
+                                 const csRef<iTextureHandle>& t2)
       {
-        int tw1, th1;
+        int tw1, th1, tw2, th2;
         t1->GetRendererDimensions (tw1, th1);
+        t2->GetRendererDimensions (tw2, th2);
         
-        if ((tw1 >= t2.w) || (th1 >= t2.h)) return true;
-        return false;
+        return ((tw1 >= tw2) && (th1 >= th2));
       }
     
       static bool IsEqual (const csRef<iTextureHandle>& t1, 
@@ -85,6 +75,26 @@ namespace RenderManager
         t1->GetRendererDimensions (tw1, th1);
         
         if ((tw1 == t2.w) && (th1 == t2.h)) return true;
+        return false;
+      }
+    
+      static bool IsLargerEqual (const csRef<iTextureHandle>& t1, 
+                                 const KeyType& t2)
+      {
+        int tw1, th1;
+        t1->GetRendererDimensions (tw1, th1);
+        
+        if ((tw1 >= t2.w) && (th1 >= t2.h)) return true;
+        return false;
+      }
+        
+      static bool IsLargerEqual (const KeyType& t1, 
+                                 const csRef<iTextureHandle>& t2)
+      {
+        int tw2, th2;
+        t2->GetRendererDimensions (tw2, th2);
+        
+        if ((t1.w >= tw2) && (t1.h >= th2)) return true;
         return false;
       }
     
@@ -209,7 +219,7 @@ namespace RenderManager
       newTex->SetTextureClass (texClass);
 
       backend.AddActive (newTex);
-
+      
       return newTex;
     }
 
@@ -257,7 +267,7 @@ namespace RenderManager
       this->texClass = texClass;
       Clear();
     }
-  private:
+  protected:
     csRef<iGraphics3D> g3d;
 
     CS::Utility::GenericResourceCache<csRef<iTextureHandle>,

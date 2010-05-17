@@ -183,6 +183,9 @@ AS_IF([test $cs_cv_sys_pthread_mutex_recursive != no],
 	[$cs_cv_sys_pthread_mutex_recursive])])
 CS_CHECK_PTHREAD_ATFORK([cs_cv_sys_pthread_atfork])
 CS_EMIT_BUILD_PROPERTY([PTHREAD.ATFORK.AVAILABLE], [$cs_cv_sys_pthread_atfork])
+CS_CHECK_PTHREAD_SETNAME_NP([cs_cv_sys_pthread_setname_np])
+AS_IF([test cs_cv_sys_pthread_setname_np = yes],
+    [CS_HEADER_PROPERTY([CS_HAVE_PTHREAD_SETNAME_NP])])
 
 
 
@@ -1369,9 +1372,9 @@ AS_IF([test "$with_bullet" != no],
         [cs_check_lib_paths=$with_bullet],
         [cs_check_lib_paths="| cs_lib_paths_default "])
     _CS_CHECK_BULLET_CREATE_FLAGS([cs_check_lib_flags],
-            [-lBulletDynamics -lBulletCollision -lLinearMath], [$cs_check_lib_paths])
+            [-lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath], [$cs_check_lib_paths])
     _CS_CHECK_BULLET_CREATE_FLAGS([cs_check_lib_flags],
-            [-lbulletdynamics -lbulletcollision -lbulletmath], [$cs_check_lib_paths])
+            [-lbulletsoftbody -lbulletdynamics -lbulletcollision -lbulletmath], [$cs_check_lib_paths])
             
     CS_CHECK_BUILD([for Bullet], [cs_cv_libbullet],
     	[AC_LANG_PROGRAM(
@@ -1621,10 +1624,12 @@ AS_IF([test $cs_cv_libwx_opengl = yes],
 #----------------------------------------------------------------------------
 # Check for CEGUI.
 #----------------------------------------------------------------------------
+# The check fails on some distros with missing references to libdl
+# (eg on OpenSUSE), so pass -ldl along as well
 CS_CHECK_LIB_WITH([CEGUI],
     [AC_LANG_PROGRAM([[#include <CEGUI.h>]],
     [CEGUI::WindowManager::getSingleton();])], [], [C++],
-    [], [], [], [], [], [CEGUIBase])
+    [], [], [], [], [$cs_cv_libdl_libs], [CEGUIBase])
 
 AS_IF([test $cs_cv_libCEGUI = yes],
     [CS_CHECK_BUILD([if CEGUI is sufficiently recent], [cs_cv_CEGUI_recent],
@@ -1914,6 +1919,15 @@ CS_CHECK_BUILD([for sysconf(_SC_NPROCESSORS_ONLN)], [cs_cv_sysconf_processors],
     [],[],
     [CS_HEADER_PROPERTY([CS_HAVE_SYSCONF_PROCESSORS])])
    
+#------------------------------------------------------------------------------
+# Check for nullptr
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for nullptr], [cs_cv__nullptr],
+    [AC_LANG_PROGRAM(
+	[[]],
+	[void* p = nullptr;])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAS_NULLPTR])])
 
 
 #------------------------------------------------------------------------------
@@ -1962,17 +1976,24 @@ CS_SYS_PLUGIN_MAIN
 
 
 #------------------------------------------------------------------------------
-# Check for sizeof(long) to determine whether the platform is 32 or 64 bit.
+# Check for sizeof(void*) to determine whether the platform is 32 or 64 bit.
 # Also needed by the PRIx99 macros provided by CS.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_LONG_BITS],
-    [AC_CHECK_SIZEOF([long])
-    AS_IF([test $ac_cv_sizeof_long = 8],
-	[cs_long_bits=64], [cs_long_bits=32])])
+AC_DEFUN([CS_CHECK_VOIDP_BITS],
+    [AC_CHECK_SIZEOF([void*])
+    AS_IF([test $ac_cv_sizeof_voidp = 8],
+	[cs_voidp_bits=64], [cs_voidp_bits=32])])
 
-CS_CHECK_LONG_BITS
-CS_HEADER_PROPERTY([CS_PROCESSOR_SIZE], [$cs_long_bits])
-CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [$cs_long_bits])
+CS_CHECK_VOIDP_BITS
+CS_HEADER_PROPERTY([CS_PROCESSOR_SIZE], [$cs_voidp_bits])
+CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [$cs_voidp_bits])
+
+
+
+#------------------------------------------------------------------------------
+# Check for sizeof(long).
+#------------------------------------------------------------------------------
+AC_CHECK_SIZEOF([long])
 CS_HEADER_PROPERTY([CS_LONG_SIZE], [$ac_cv_sizeof_long])
 
 
@@ -2564,7 +2585,8 @@ AC_ARG_ENABLE([shared], [AC_HELP_STRING([--enable-shared],
 AC_MSG_RESULT([$enable_shared])
 CS_EMIT_BUILD_PROPERTY([BUILD_SHARED_LIBS], [$enable_shared])
 AS_IF([test $enable_shared = yes], 
-  [CS_HEADER_PROPERTY([CS_BUILD_SHARED_LIBS])])
+  [CS_HEADER_PROPERTY([CS_USE_SHARED_LIBS])],
+  [CS_HEADER_PROPERTY([CS_USE_STATIC_LIBS])])
 
 
 

@@ -1574,7 +1574,7 @@ uint32 csBinaryDocument::GetOutStringID (const char* str)
   val = outStrHash->Request (str);
   if (val == csInvalidStringID)
   {
-    val = (csStringID)(outStrStorage->GetPos() - outStrTabOfs);
+    val = (CS::StringIDValue)(outStrStorage->GetPos() - outStrTabOfs);
     outStrStorage->Write (str, strlen (str) + 1);
     outStrHash->Register (str, val);
   }

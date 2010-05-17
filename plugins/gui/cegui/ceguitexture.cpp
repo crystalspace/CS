@@ -90,8 +90,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     // this should never happen as CEGUI itself will only ask for RGBA
     if (pixFmt != CEGUI::Texture::PF_RGBA)
       return;
-    image.AttachNew(new csImageMemory (buffer_size.d_width, buffer_size.d_height, buffPtr, 
-      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+    // TODO: need to round to the closer 'int'?
+    image.AttachNew(new csImageMemory ((int) buffer_size.d_width, (int)buffer_size.d_height,
+				       buffPtr, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
 
     iTextureManager* txtmgr = g3d->GetTextureManager();
     if (txtmgr)

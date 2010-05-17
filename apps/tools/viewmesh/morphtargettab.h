@@ -76,6 +76,8 @@ bool MorphTargetTab::SelMorph (const CEGUI::EventArgs& e)
   CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("MorphTargets/List");
 
   CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if (!item) return true;
+
   const CEGUI::String& text = item->getText();
   if (text.empty()) return true;
 

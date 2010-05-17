@@ -25,6 +25,101 @@
 
 using namespace CS::Threading;
 
+csThreadManager::ListAccessQueue::ListAccessQueue() : total(0)
+{
+}
+
+csThreadManager::ListAccessQueue::~ListAccessQueue()
+{
+  ProcessAll ();
+}
+
+void csThreadManager::ListAccessQueue::Enqueue(iJob* job, QueueType type)
+{
+  if(type == HIGH)
+  {
+    RecursiveMutexScopedLock lock(highQueueLock);
+    highqueue.Push(job);
+  }
+  else if(type == MED)
+  {
+    RecursiveMutexScopedLock lock(medQueueLock);
+    medqueue.Push(job);
+  }
+  else if(type == LOW)
+  {
+    RecursiveMutexScopedLock lock(lowQueueLock);
+    lowqueue.Push(job);
+  }
+  
+  AtomicOperations::Increment(&total);
+}
+
+void csThreadManager::ListAccessQueue::ProcessQueue(uint num)
+{
+  uint i=0;
+
+  ProcessHighQueue(i, num);
+
+  if(i<num)
+  {
+    ProcessMedQueue(i, num);
+  }
+
+  if(i<num)
+  {
+    ProcessLowQueue(i, num);
+  }
+}
+
+int32 csThreadManager::ListAccessQueue::GetQueueCount() const
+{ 
+  return AtomicOperations::Read (&total);
+}
+
+void csThreadManager::ListAccessQueue::ProcessAll ()
+{
+  while (GetQueueCount() > 0)
+    ProcessQueue (total);
+}
+
+inline void csThreadManager::ListAccessQueue::ProcessHighQueue(uint& i, uint& num)
+{
+  RecursiveMutexScopedLock lock(highQueueLock);
+  for(; i<num && highqueue.GetSize() != 0; i++)
+  {
+    AtomicOperations::Decrement(&total);
+    highqueue.PopTop()->Run();
+  }
+}
+
+inline void csThreadManager::ListAccessQueue::ProcessMedQueue(uint& i, uint& num)
+{
+  ProcessHighQueue(i, num);
+  RecursiveMutexScopedLock lock(medQueueLock);
+  for(; i<num && medqueue.GetSize() != 0; i++)
+  {
+    AtomicOperations::Decrement(&total);
+    medqueue.PopTop()->Run();
+    ProcessHighQueue(i, num);
+  }
+}
+
+inline void csThreadManager::ListAccessQueue::ProcessLowQueue(uint& i, uint& num)
+{
+  ProcessHighQueue(i, num);
+  RecursiveMutexScopedLock lock(lowQueueLock);
+  for(; i<num && lowqueue.GetSize() != 0; i++)
+  {
+    AtomicOperations::Decrement(&total);
+    lowqueue.PopTop()->Run();
+    ProcessHighQueue(i, num);
+    ProcessMedQueue(i, num);
+  }
+}
+  
+//---------------------------------------------------------------------------
+  
 ThreadID csThreadManager::tid;
 
 csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this), 
@@ -42,7 +137,8 @@ csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationTyp
   }
 
   // Have 'processor count' extra processing threads.
-  threadQueue.AttachNew(new ThreadedJobQueue(threadCount, THREAD_PRIO_LOW));
+  threadQueue.AttachNew(new ThreadedJobQueue(threadCount, THREAD_PRIO_LOW,
+    "thread manager"));
   listQueue.AttachNew(new ListAccessQueue());
 
   // Event handler.
@@ -169,3 +265,10 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool proces
 
   return success;
 }
+
+void csThreadManager::ProcessAll ()
+{
+  threadQueue->WaitAll ();
+  listQueue->ProcessAll ();  
+}
+

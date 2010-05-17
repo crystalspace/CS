@@ -264,20 +264,25 @@ void csLight::OnSetPosition ()
       for (int i = 0; i < list->GetCount (); ++i)
       {
         csSector* sect = static_cast<csSector*> (list->Get (i));
-        if(GetParent() && sectors.Find(sect) == csArrayItemNotFound)
+        if(GetParent() && (size_t) sectors.Find(sect) == csArrayItemNotFound)
         {
             sectors.Push (sect);
             sect->GetLights ()->Add (this);
         }
-
-        sect->UpdateLightBounds (this, oldBox);
+	else
+	{
+	  /* Only update if we are in the sector (adding is done with correct
+	     bounding box) */
+	  if (worldBoundingBox != oldBox)
+	    sect->UpdateLightBounds (this, oldBox);
+	}
       }
 
       if(!removingLight && GetParent())
       {
         for(size_t i = 0; i < sectors.GetSize (); ++i)
         {
-          if(list->Find(sectors[i]) == csArrayItemNotFound)
+          if((size_t) list->Find(sectors[i]) == csArrayItemNotFound)
           {
             removingLight = true;
             sectors[i]->GetLights ()->Remove (this);

@@ -100,13 +100,9 @@ bool WalkTestViews::SplitView ()
     int height = csQint(bbox.MaxY() - bbox.MinY());
     views[0]->SetRectangle((int)bbox.MinX(), (int)bbox.MinY(), width / 2, height);
     views[0]->GetCamera()->SetViewportSize (width, height);
-    views[0]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (width / 4),
-                                                        bbox.MinY() + (height / 2));
     views[1]->GetCamera()->SetViewportSize (width, height);
     views[1]->SetRectangle((int)bbox.MinX() + (width / 2), (int)bbox.MinY(), 
                                     width / 2, height);
-    views[1]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (3 * width / 4),
-                                                        bbox.MinY() + (height / 2));
     split = (view == views[0]) ? 0 : 1;
     walktest->Report(CS_REPORTER_SEVERITY_NOTIFY, "Splitting to 2 views");
     return true;
@@ -126,8 +122,6 @@ bool WalkTestViews::UnsplitView ()
     int height = csQint(bbox1.MaxY() - bbox1.MinY());
     view->GetCamera()->SetViewportSize (width, height);
     view->SetRectangle((int)bbox1.MinX(), (int)bbox1.MinY(), width, height);
-    view->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (width / 2), 
-                                                    bbox2.MinY() + (height / 2));
     split = -1;
     walktest->Report(CS_REPORTER_SEVERITY_NOTIFY, "Unsplitting view");
     return true;

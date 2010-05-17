@@ -18,6 +18,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+#include "cssysdef.h"
 #include "frankie.h"
 
 #define LOOKAT_CAMERA 1
@@ -31,10 +33,29 @@
 FrankieScene::FrankieScene (AvatarTest* avatarTest)
   : avatarTest (avatarTest), targetReached (false), lookAtListener (this)
 {
+  // Define the available keys
+  avatarTest->keyDescriptions.DeleteAll ();
+  avatarTest->keyDescriptions.Push ("arrow keys: move camera");
+  avatarTest->keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->keyDescriptions.Push ("+/-: walk faster/slower");
+  avatarTest->keyDescriptions.Push ("t: toggle 'LookAt' target mode");
+  avatarTest->keyDescriptions.Push ("a: toggle 'LookAt: always rotate' mode");
+  avatarTest->keyDescriptions.Push ("s: toggle 'LookAt: rotation speed'");
+  if (avatarTest->physicsEnabled)
+  {
+    avatarTest->keyDescriptions.Push ("f: toggle physical tail");
+    avatarTest->keyDescriptions.Push ("left mouse: kill Frankie");
+    avatarTest->keyDescriptions.Push ("d: display active colliders");
+  }
+  avatarTest->keyDescriptions.Push ("r: reset scene");
+  avatarTest->keyDescriptions.Push ("n: switch to next scene");
 }
 
 FrankieScene::~FrankieScene ()
 {
+  if (!animesh)
+    return;
+
   // Remove the 'lookat' listener
   lookAtNode->RemoveListener (&lookAtListener);
 
@@ -48,13 +69,28 @@ csVector3 FrankieScene::GetCameraStart ()
   return csVector3 (0.0f, 0.0f, -1.25f);
 }
 
+float FrankieScene::GetCameraMinimumDistance ()
+{
+  return 0.75f;
+}
+
 csVector3 FrankieScene::GetCameraTarget ()
 {
   csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
   csVector3 avatarPosition = animeshObject->GetMeshWrapper ()->QuerySceneNode ()
     ->GetMovable ()->GetTransform ().GetOrigin ();
-  avatarPosition.y = 0.5f;
+  avatarPosition.y = 0.35f;
   return avatarPosition;
+}
+
+float FrankieScene::GetSimulationSpeed ()
+{
+  return 0.25f;
+}
+
+bool FrankieScene::HasPhysicalObjects ()
+{
+  return true;
 }
 
 void FrankieScene::Frame ()
@@ -108,7 +144,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    // Toggle 'always rotate' option of the 'LookAt' controller
+    // Toggle the 'always rotate' option of the 'LookAt' controller
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
       alwaysRotate = !alwaysRotate;
@@ -116,7 +152,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    // Toggle rotation speed of the 'LookAt' controller
+    // Toggle the rotation speed of the 'LookAt' controller
     else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
     {
       if (rotationSpeed == ROTATION_SLOW)
@@ -140,7 +176,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    // Update walk speed of the 'speed' controller
+    // Update the walking speed of the 'speed' controller
     else if (csKeyEventHelper::GetCookedCode (&ev) == '+')
     {
       if (currentSpeed < 58)
@@ -161,6 +197,27 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       return true;
     }
 
+    // Toggle the physical animation of the tail
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'f'
+	     && avatarTest->physicsEnabled
+	     && !frankieDead)
+    {
+      // If the tail is animated by the classical animation then put the tail chain
+      // in kinematic state
+      if (ragdollNode->GetBodyChainState (tailChain) == CS_RAGDOLL_STATE_DYNAMIC)
+	ragdollNode->SetBodyChainState (tailChain, CS_RAGDOLL_STATE_KINEMATIC);
+
+      // If the tail is animated by the physical simulation then put the tail chain
+      // in dynamic state
+      else
+	ragdollNode->SetBodyChainState (tailChain, CS_RAGDOLL_STATE_DYNAMIC);
+
+      // Update the display of the dynamics debugger
+      if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
+	  || avatarTest->dynamicsDebugMode == DYNDEBUG_MIXED)
+	avatarTest->dynamicsDebugger->UpdateDisplay ();
+    }
+
     // Reset of the scene
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
     {
@@ -179,12 +236,13 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
   {
     // Trying to kill Frankie
 
-    // Compute the beam points to check what was hit
+    // We will trace a beam to the point clicked by the mouse to check if
+    // something is hit. Let's start by computing the beam end points.
     int mouseX = csMouseEventHelper::GetX (&ev);
     int mouseY = csMouseEventHelper::GetY (&ev);
 
     csRef<iCamera> camera = avatarTest->view->GetCamera ();
-    csVector2 v2d (mouseX, camera->GetShiftY () * 2 - mouseY);
+    csVector2 v2d (mouseX, avatarTest->g2d->GetHeight () - mouseY);
     csVector3 v3d = camera->InvPerspective (v2d, 10000);
     csVector3 startBeam = camera->GetTransform ().GetOrigin ();
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -195,7 +253,8 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
       // Trace a physical beam to find if a rigid body was hit
       csRef<iBulletDynamicSystem> bulletSystem =
 	scfQueryInterface<iBulletDynamicSystem> (avatarTest->dynamicSystem);
-      csBulletHitBeamResult physicsResult = bulletSystem->HitBeam (startBeam, endBeam);
+      csBulletHitBeamResult physicsResult =
+	bulletSystem->HitBeam (startBeam, endBeam);
 
       // Apply a big force at the point clicked by the mouse
       if (physicsResult.body)
@@ -219,23 +278,28 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     if (!animesh)
       return false;
 
-    // OK, it's an animesh, it must be Frankie, start the ragdoll
+    // OK, it's an animesh, it must be Frankie, let's kill him
     frankieDead = true;
 
     // Close the eyes of Frankie as he is dead
     animesh->SetMorphTargetWeight
       (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
 
-    // Set the ragdoll animation node as the active state of the Finite State Machine
-    // (start the ragdoll node so that the rigid bodies are created)
-    FSMNode->SwitchToState (ragdollFSMState);
-    FSMNode->GetStateNode (ragdollFSMState)->Play ();
+    // Set the ragdoll state of the iBodyChain of the body and the tail as dynamic
+    ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_DYNAMIC);
+    ragdollNode->SetBodyChainState (tailChain, CS_RAGDOLL_STATE_DYNAMIC);
+
+    // Update the display of the dynamics debugger
+    if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
+	|| avatarTest->dynamicsDebugMode == DYNDEBUG_MIXED)
+      avatarTest->dynamicsDebugger->UpdateDisplay ();
 
     // Fling the body a bit
     const csOrthoTransform& tc = avatarTest->view->GetCamera ()->GetTransform ();
-    for (uint i = 0; i < ragdollNode->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
+    uint boneCount = ragdollNode->GetBoneCount (CS_RAGDOLL_STATE_DYNAMIC);
+    for (uint i = 0; i < boneCount; i++)
     {
-      BoneID boneID = ragdollNode->GetBone (RAGDOLL_STATE_DYNAMIC, i);
+      BoneID boneID = ragdollNode->GetBone (CS_RAGDOLL_STATE_DYNAMIC, i);
       iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
       rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 0.1f));
     }
@@ -282,7 +346,7 @@ bool FrankieScene::CreateAvatar ()
   // Load bodymesh (animesh's physical properties)
   rc = avatarTest->loader->Load ("/lib/frankie/skelfrankie_body");
   if (!rc.success)
-    return avatarTest->ReportError ("Can't load frankie's body mesh file!");
+    return avatarTest->ReportError ("Can't load Frankie's body mesh file!");
 
   csRef<iBodyManager> bodyManager =
     csQueryRegistry<iBodyManager> (avatarTest->GetObjectRegistry ());
@@ -291,25 +355,16 @@ bool FrankieScene::CreateAvatar ()
     return avatarTest->ReportError ("Can't find Frankie's body mesh description!");
 
   // Create a new animation tree. The structure of the tree is:
-  //   + Finite State Machine node (root node)
+  //   + ragdoll controller node (root node - only if physics are enabled)
   //     + 'LookAt' controller node
   //       + 'speed' controller node
   //         + animation nodes for all speeds
-  //     + ragdoll controller node
   csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
-
-  // Create the Finite State Machine node
-  csRef<iSkeletonFSMNodeFactory2> FSMNodeFactory =
-    animPacketFactory->CreateFSMNode ("fsm");
-  animPacketFactory->SetAnimationRoot (FSMNodeFactory);
 
   // Create the 'LookAt' controller
   csRef<iSkeletonLookAtNodeFactory2> lookAtNodeFactory =
     avatarTest->lookAtManager->CreateAnimNodeFactory ("lookat", bodySkeleton);
-  mainFSMState = FSMNodeFactory->AddState
-    ("main_state", lookAtNodeFactory);
-  FSMNodeFactory->SetStartState (mainFSMState);
 
   // Create the 'idle' animation node
   csRef<iSkeletonAnimationNodeFactory2> idleNodeFactory =
@@ -388,16 +443,29 @@ bool FrankieScene::CreateAvatar ()
     csRef<iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
       avatarTest->ragdollManager->CreateAnimNodeFactory ("ragdoll",
 					     bodySkeleton, avatarTest->dynamicSystem);
-    ragdollFSMState = FSMNodeFactory->AddState
-      ("ragdoll_state", ragdollNodeFactory);
+    animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
+    ragdollNodeFactory->SetChildNode (lookAtNodeFactory);
 
-    // Create bone chain
-    iBodyChain* chain = bodySkeleton->CreateBodyChain
+    // Create a bone chain for the whole body and add it to the ragdoll controller.
+    // The chain will be in kinematic mode when Frankie is alive, and in dynamic state
+    // when Frankie has been killed.
+    bodyChain = bodySkeleton->CreateBodyChain
       ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Pelvis"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"), 0);
+    ragdollNodeFactory->AddBodyChain (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
+
+    // Create a bone chain for the tail of Frankie and add it to the ragdoll controller.
+    // The chain will be in kinematic mode most of the time, and in dynamic mode when the
+    // user ask for it with the 'f' key or when Frankie has been killed.
+    tailChain = bodySkeleton->CreateBodyChain
+      ("tail_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_1"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"), 0);
-    ragdollNodeFactory->AddBodyChain (chain, RAGDOLL_STATE_DYNAMIC);
+    ragdollNodeFactory->AddBodyChain (tailChain, CS_RAGDOLL_STATE_KINEMATIC);
   }
+
+  else
+    animPacketFactory->SetAnimationRoot (lookAtNodeFactory);
 
   // Create the animated mesh
   csRef<iMeshWrapper> avatarMesh =
@@ -406,12 +474,9 @@ bool FrankieScene::CreateAvatar ()
   animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
   // When the animated mesh is created, the animation nodes are created too.
-  // We can therefore set them up
+  // We can therefore set them up now.
   iSkeletonAnimNode2* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
-
-  // Setup of the FSM node
-  FSMNode = scfQueryInterface<iSkeletonFSMNode2> (rootNode->FindNode ("fsm"));
 
   // Setup of the LookAt controller
   lookAtNode = scfQueryInterface<iSkeletonLookAtNode2> (rootNode->FindNode ("lookat"));
@@ -454,17 +519,25 @@ void FrankieScene::LookAtListener::TargetLost ()
 
 void FrankieScene::ResetScene ()
 {
-  // Reset animesh position
+  // Reset the position of the animesh
   csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
   animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->SetTransform
     (csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
+  animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->UpdateMove ();
 
-  // Reset initial Finite State Machine state
-  FSMNode->SwitchToState (mainFSMState);
+  frankieDead = false;
 
-  // The FSM doesn't stop the child nodes
   if (avatarTest->physicsEnabled)
-    ragdollNode->Stop ();
+  {
+    // Set the ragdoll state of the 'body' and 'tail' chains as kinematic
+    ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
+    ragdollNode->SetBodyChainState (tailChain, CS_RAGDOLL_STATE_KINEMATIC);
+
+    // Update the display of the dynamics debugger
+    if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
+	|| avatarTest->dynamicsDebugMode == DYNDEBUG_MIXED)
+      avatarTest->dynamicsDebugger->UpdateDisplay ();
+  }
 
   // Reset 'LookAt' controller
   alwaysRotate = false;
@@ -484,86 +557,33 @@ void FrankieScene::ResetScene ()
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("wings_in"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.0f);
-
-  frankieDead = false;
 }
 
-void FrankieScene::DisplayKeys ()
+void FrankieScene::UpdateStateDescription ()
 {
-  int x = 20;
-  int y = 20;
-  int fg = avatarTest->g2d->FindRGB (255, 150, 100);
-  int lineSize = 18;
-
-  // Write available keys
-  avatarTest->WriteShadow (x - 5, y, fg, "Keys available:");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "arrow keys: move camera");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "SHIFT-up/down keys: camera closer/farther");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "+/-: walk faster/slower");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "t: toggle 'LookAt' target mode");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "a: toggle 'LookAt: always rotate' mode");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "s: toggle 'LookAt: rotation speed'");
-  y += lineSize;
-
-  if (avatarTest->physicsEnabled)
-  {
-    avatarTest->WriteShadow (x, y, fg, "left mouse: kill Frankie");
-    y += lineSize;
-  }
-
-  avatarTest->WriteShadow (x, y, fg, "r: reset scene");
-  y += lineSize;
-
-  avatarTest->WriteShadow (x, y, fg, "m: switch to Krystal");
-  y += lineSize;
-
-  // Write FPS and other info
-  y = 480;
+  avatarTest->stateDescriptions.DeleteAll ();
 
   if (targetMode == LOOKAT_CAMERA)
-    avatarTest->WriteShadow (x, y, fg, "Watch out, Frankie is looking at you!");
+    avatarTest->stateDescriptions.Push ("Watch out, Frankie is looking at you!");
   else if (targetMode == LOOKAT_POSITION)
-    avatarTest->WriteShadow (x, y, fg, "Frankie is looking at something");
+    avatarTest->stateDescriptions.Push ("Frankie is looking at something");
   else if (targetMode == LOOKAT_NOTHING)
-    avatarTest->WriteShadow (x, y, fg, "Frankie doesn't care about anything");
-  y += lineSize;
+    avatarTest->stateDescriptions.Push ("Frankie doesn't care about anything");
 
   if (alwaysRotate)
-    avatarTest->WriteShadow (x, y, fg, "Always rotate: ON");
+    avatarTest->stateDescriptions.Push ("Always rotate: ON");
   else
-    avatarTest->WriteShadow (x, y, fg, "Always rotate: OFF");
-  y += lineSize;
+    avatarTest->stateDescriptions.Push ("Always rotate: OFF");
 
   if (rotationSpeed == ROTATION_SLOW)
-    avatarTest->WriteShadow (x, y, fg, "Rotation speed: really slow");
+    avatarTest->stateDescriptions.Push ("Rotation speed: really slow");
   else if (rotationSpeed == ROTATION_NORMAL)
-    avatarTest->WriteShadow (x, y, fg, "Rotation speed: normal");
+    avatarTest->stateDescriptions.Push ("Rotation speed: normal");
   else if (rotationSpeed == ROTATION_IMMEDIATE)
-    avatarTest->WriteShadow (x, y, fg, "Rotation speed: infinite");
-  y += lineSize;
+    avatarTest->stateDescriptions.Push ("Rotation speed: infinite");
 
-  avatarTest->WriteShadow (x, y, fg, "Walk speed: %.1f",
-	      ((float) currentSpeed) / 10.0f);
-  y += lineSize;
-
-  csTicks elapsed_time = avatarTest->vc->GetElapsedTicks ();
-  const float speed = elapsed_time / 1000.0f;
-  if (speed != 0.0f)
-  {
-    avatarTest->WriteShadow (x, y, fg, "FPS: %.2f", 1.0f / speed);
-    y += lineSize;
-  }
+  csString txt;
+  txt.Format ("Walk speed: %.1f", ((float) currentSpeed) / 10.0f);
+  avatarTest->stateDescriptions.Push (txt);
 }
 

@@ -185,7 +185,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   public:
     FactorySubmesh (const char* name)
-      : scfImplementationType (this), material(0), name(name)
+      : scfImplementationType (this), material(0), name(name), visible (true),
+      renderPriority (7), zbufMode (CS_ZBUF_USE)
     {}
 
     virtual iRenderBuffer* GetIndices (size_t set)
@@ -238,8 +239,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     /// Get the submesh name.
     virtual const char* GetName () const { return name.GetData(); }
 
-    /// Whether we're visible by default.
+    virtual void SetRendering (bool doRender)
+      { visible = doRender; }
+    virtual bool IsRendering () const
+      { return visible; }
+    virtual void SetRenderPriority (CS::Graphics::RenderPriority rp)
+      { renderPriority = rp; }
+    virtual CS::Graphics::RenderPriority GetRenderPriority () const
+      { return renderPriority; }
+    virtual void SetZBufMode (csZBufMode mode)
+      { zbufMode = mode; }
+    virtual csZBufMode GetZBufMode () const
+      { return zbufMode; }
+
     bool visible;
+    CS::Graphics::RenderPriority renderPriority;
+    csZBufMode zbufMode;
   };
 
 
@@ -313,7 +328,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       const csVector3& end, csVector3& isect, float* pr);
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
       csVector3& isect, float* pr, int* polygon_idx,
-      iMaterialWrapper** material, csArray<iMaterialWrapper*>* materials);
+      iMaterialWrapper** material, iMaterialArray* materials);
 
     virtual void SetMeshWrapper (iMeshWrapper* logparent);
     virtual iMeshWrapper* GetMeshWrapper () const;
@@ -485,11 +500,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRef<iRenderBuffer> postMorphVertices;
 
     csArray<float> morphTargetWeights;
+    unsigned int morphVersion;
+    bool morphStateChanged;
 
-    // Version numbers for the software skinning
-    unsigned int skinVertexVersion, skinNormalVersion, skinTangentVersion, skinBinormalVersion;
-    // Things we skinned in software last frame
-    bool skinVertexLF, skinNormalLF, skinTangentLF, skinBinormalLF;
+    // Version numbers for the skinning
+    unsigned int skinVertexVersion, skinNormalVersion, skinTangentBinormalVersion;
+    unsigned int morphVertexVersion;
+    // Things we skinned last frame
+    bool skinVertexLF, skinNormalLF, skinTangentBinormalLF;
   };
 
 }

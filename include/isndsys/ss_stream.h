@@ -60,7 +60,6 @@ enum
 //
 struct iSndSysStream : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysStream,1,1,1);
 
   /// Retrieve a description of this stream.  
@@ -311,7 +310,6 @@ struct iSndSysStream : public virtual iBase
 //
 struct iSndSysStreamCallback : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysStreamCallback,0,1,0);
 
   /// Called when this stream loops

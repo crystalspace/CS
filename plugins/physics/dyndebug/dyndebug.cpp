@@ -84,8 +84,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
   CS_LEAKGUARD_IMPLEMENT(DynamicsDebugger);
 
   DynamicsDebugger::DynamicsDebugger (DebuggerManager* manager)
-    : scfImplementationType (this), manager (manager)
+    : scfImplementationType (this), manager (manager), debugMode (false)
   {
+    // Init debug materials
+    materials[0] = CS::Material::MaterialBuilder::CreateColorMaterial
+      (manager->object_reg, "dyndebug_static", csColor (0, 0, 1));
+    materials[1] = CS::Material::MaterialBuilder::CreateColorMaterial
+      (manager->object_reg, "dyndebug_dynamic", csColor (0, 1, 0));
+    materials[2] = CS::Material::MaterialBuilder::CreateColorMaterial
+      (manager->object_reg, "dyndebug_kinematic", csColor (0, 0, 1));
   }
 
   void DynamicsDebugger::SetDynamicSystem (iDynamicSystem* system)
@@ -100,6 +107,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 
   void DynamicsDebugger::SetDebugDisplayMode (bool debugMode)
   {
+    // Check display mode has changed
+    if (debugMode == this->debugMode)
+      return;
+
+    this->debugMode = debugMode;
+
+    UpdateDisplay ();
+  }
+
+  void DynamicsDebugger::UpdateDisplay ()
+  {
     // Check dynsys available
     if (!system)
     {
@@ -107,23 +125,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 		       "No dynamic system defined");
       return;
     }
-
-    // Check debug material available
-    if (!material)
-      material = CS::Material::MaterialBuilder::CreateColorMaterial
-	(manager->object_reg, "dynsysdebug", csColor (1, 0, 0));
-
-    if (!material)
-    {
-      manager->Report (CS_REPORTER_SEVERITY_WARNING,
-		       "No debug material defined");
-      return;
-    }
-
-    // Check display mode has changed
-    if (debugMode == this->debugMode)
-      return;
-    this->debugMode = debugMode;
 
     // Find the pointer to the engine plugin
     csRef<iEngine> engine = csQueryRegistry<iEngine> (manager->object_reg);
@@ -134,7 +135,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
       return;
     }
 
-    // TODO: remove all previous debug meshes
+    // Reset all stored meshes
+    for (csArray<MeshData>::Iterator it = storedMeshes.GetIterator (); it.HasNext (); )
+    {
+      MeshData &meshData = it.Next ();
+
+      // Remove the debug mesh
+      if (meshData.debugMesh)
+      {
+	engine->RemoveObject (meshData.debugMesh);
+	if (meshData.rigidBody)
+	  meshData.rigidBody->AttachMesh (0);
+      }
+
+      // Put back the original mesh
+      if (meshData.originalMesh)
+      {
+	meshData.originalMesh->GetMovable ()->SetSector (sector);
+	meshData.rigidBody->AttachMesh (meshData.originalMesh);
+      }
+
+      // Put back the kinematic callback
+      if (meshData.callback && meshData.rigidBody)
+      {
+	csRef<iBulletRigidBody> bulletBody =
+	  scfQueryInterface<iBulletRigidBody> (meshData.rigidBody);
+	bulletBody->SetKinematicCallback (meshData.callback->callback);
+      }
+    }
+    storedMeshes.DeleteAll ();
+
+    // If not in debug mode then it is over
+    if (!debugMode)
+      return;
 
     // Iterate through each rigid body
     for (unsigned int bodyIndex = 0;
@@ -143,53 +176,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
     {
       iRigidBody* body = system->GetBody (bodyIndex);
 
-      MeshData meshData;
+      // Search the bullet interface of the rigid body
+      csRef<iBulletRigidBody> bulletBody =
+	scfQueryInterface<iBulletRigidBody> (body);
 
-      // If in debug mode, then store the original attached mesh
-      if (debugMode)
+      // Find the material to be used for this object
+      csBulletState state = CS_BULLET_STATE_DYNAMIC;
+      if (bulletBody)
+	state = bulletBody->GetDynamicState ();
+      else if (body->IsStatic ())
+	state = CS_BULLET_STATE_STATIC;
+
+      iMaterialWrapper* material = materials[state];
+      if (!material)
+	continue;
+
+      // Create the MeshData object
+      MeshData meshData;
+      meshData.rigidBody = body;
+
+      // Store the current mesh attached to the rigid body
+      // TODO: not debug mesh stored twice?
+      meshData.originalMesh = body->GetAttachedMesh ();
+      if (meshData.originalMesh)
       {
 	// TODO: store the sector of the mesh
-	csRef<iMeshWrapper> mesh = body->GetAttachedMesh ();
-	if (mesh)
-	{
-	  engine->RemoveObject (mesh);
-	  meshData.mesh = mesh;
-	}
-
-	storedMeshes.PutUnique (body, meshData);
-      }
-
-      // Else, go back to normal mode
-      else
-      {
-	if (storedMeshes.Contains (body))
-	{
-	  // Remove the debug mesh
-	  engine->RemoveObject (body->GetAttachedMesh ());
-
-	  // Put back the original attached mesh
-	  MeshData nullData;
-	  meshData = storedMeshes.Get (body, nullData);
-
-	  if (meshData.mesh)
-	  {
-	    meshData.mesh->GetMovable ()->SetSector (sector);
-	    body->AttachMesh (meshData.mesh);
-	  }
-
-	  else
-	    body->AttachMesh (0);
-
-	  // Erase body reference
-	  storedMeshes.DeleteAll (body);
-	}
-
-	continue;
+	engine->RemoveObject (meshData.originalMesh);
       }
 
       // TODO: display the joints too
       // TODO: use iDynamicsSystemCollider::FillWithColliderGeometry instead?
-      // TODO: use specific colors for objects static/dynamic/active/inactive
+      // TODO: use specific colors for objects active/inactive
       // TODO: display collisions
 
       // Iterate through each collider
@@ -201,105 +218,159 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 	csRef<iDynamicsSystemCollider> collider =
 	  body->GetCollider (colliderIndex);
 
-	switch (collider->GetGeometryType ())
-	  {
-	  case BOX_COLLIDER_GEOMETRY:
-	    {
-	      // Get box geometry
-	      csVector3 boxSize;
-	      collider->GetBoxGeometry (boxSize);
-	      boxSize /= 2.0;
-	      const csBox3 box(-boxSize, boxSize);
+	csRef<iMeshWrapper> mesh = CreateColliderMesh (collider, material);
 
-	      // Create box
-	      csRef<iMeshWrapper> mesh =
-		CreateBoxMesh (box, material, collider->GetLocalTransform (),
-			       sector);
-	      body->AttachMesh (mesh);
-	    }
-	    break;
+	// Register the new debug mesh
+	if (mesh)
+	{
+	  body->AttachMesh (mesh);
+	  meshData.debugMesh = mesh;
+	}
 
-	  case SPHERE_COLLIDER_GEOMETRY:
-	    {
-	      // Get sphere geometry
-	      csSphere sphere;
-	      collider->GetSphereGeometry (sphere);
-
-	      // Create sphere
-	      csRef<iMeshWrapper> mesh =
-		CreateSphereMesh (sphere, material, sector);
-	      body->AttachMesh (mesh);
-	    }
-	    break;
-
-	  case CYLINDER_COLLIDER_GEOMETRY:
-	    {
-	      // Get cylinder geometry
-	      float length, radius;
-	      collider->GetCylinderGeometry (length, radius);
-
-	      // Create cylinder
-	      csRef<iMeshWrapper> mesh =
-		CreateCylinderMesh (length, radius, material,
-				    collider->GetLocalTransform (), sector);
-	      body->AttachMesh (mesh);
-	    }
-	    break;
-
-	  case CAPSULE_COLLIDER_GEOMETRY:
-	    {
-	      // Get capsule geometry
-	      float length, radius;
-	      collider->GetCapsuleGeometry (length, radius);
-
-	      // Create capsule
-	      csRef<iMeshWrapper> mesh =
-		CreateCapsuleMesh (length, radius, material,
-				   collider->GetLocalTransform (), sector);
-	      body->AttachMesh (mesh);
-	    }
-	    break;
-
-	  case TRIMESH_COLLIDER_GEOMETRY:
-	    {
-	      // Get mesh geometry
-	      csVector3* vertices = 0;
-	      int* indices = 0;
-	      size_t vertexCount, triangleCount;
-	      collider->GetMeshGeometry (vertices, vertexCount, indices, triangleCount);
-
-	      // Create mesh
-	      csRef<iMeshWrapper> mesh =
-		CreateCustomMesh (vertices, vertexCount, indices, triangleCount, material,
-				collider->GetLocalTransform (), sector);
-	      body->AttachMesh (mesh);
-	    }
-	    break;
-
-	  case CONVEXMESH_COLLIDER_GEOMETRY:
-	    {
-	      // Get mesh geometry
-	      csVector3* vertices = 0;
-	      int* indices = 0;
-	      size_t vertexCount, triangleCount;
-	      collider->GetConvexMeshGeometry (vertices, vertexCount, indices, triangleCount);
-
-	      // Create mesh
-	      csRef<iMeshWrapper> mesh =
-		CreateCustomMesh (vertices, vertexCount, indices, triangleCount, material,
-				collider->GetLocalTransform (), sector);
-	      body->AttachMesh (mesh);
-	    }
-	    break;
-
-	  default:
-	    // TODO: plan meshes
-	    break;
-	  }
+	// If the body is kinematic then create a new kinematic callback
+	if (mesh && state == CS_BULLET_STATE_KINEMATIC)
+	{
+	  meshData.callback.AttachNew
+	    (new BoneKinematicCallback (mesh, bulletBody->GetKinematicCallback ()));
+	  bulletBody->SetKinematicCallback (meshData.callback);
+	}
       }
+
+      // Store the MeshData
+      storedMeshes.Push (meshData);
     }
 
-    // TODO: do the same with the static colliders of the dynamic system
+    // Iterate through each colliders of the dynamic system
+    for (unsigned int colliderIndex = 0;
+	 colliderIndex < (unsigned int) system->GetColliderCount ();
+	 colliderIndex++)
+    {
+      iDynamicsSystemCollider* collider = system->GetCollider (colliderIndex);
+
+      // Find the material to be used for this object
+      csBulletState state = CS_BULLET_STATE_DYNAMIC;
+      if (collider->IsStatic ())
+	state = CS_BULLET_STATE_STATIC;
+
+      iMaterialWrapper* material = materials[state];
+      if (!material)
+	continue;
+
+      // Create the MeshData object
+      MeshData meshData;
+      meshData.debugMesh = CreateColliderMesh (collider, material);
+
+      // Store the MeshData
+      storedMeshes.Push (meshData);
+    }
+  }
+
+  void DynamicsDebugger::SetStaticBodyMaterial (iMaterialWrapper* material)
+  {
+    materials[0] = material;
+  }
+
+  void DynamicsDebugger::SetDynamicBodyMaterial (iMaterialWrapper* material)
+  {
+    materials[1] = material;
+  }
+
+  void DynamicsDebugger::SetBodyStateMaterial (csBulletState state,
+					       iMaterialWrapper* material)
+  {
+    materials[state] = material;
+  }
+
+  csRef<iMeshWrapper> DynamicsDebugger::CreateColliderMesh
+    (iDynamicsSystemCollider* collider, iMaterialWrapper* material)
+  {
+    csRef<iMeshWrapper> mesh;
+
+    switch (collider->GetGeometryType ())
+      {
+      case BOX_COLLIDER_GEOMETRY:
+	{
+	  // Get box geometry
+	  csVector3 boxSize;
+	  collider->GetBoxGeometry (boxSize);
+	  boxSize /= 2.0;
+	  const csBox3 box(-boxSize, boxSize);
+
+	  // Create box
+	  mesh = CreateBoxMesh (box, material, collider->GetLocalTransform (),
+				sector);
+	}
+	break;
+
+      case SPHERE_COLLIDER_GEOMETRY:
+	{
+	  // Get sphere geometry
+	  csSphere sphere;
+	  collider->GetSphereGeometry (sphere);
+
+	  // Create sphere
+	  mesh = CreateSphereMesh (sphere, material, sector);
+	}
+	break;
+
+      case CYLINDER_COLLIDER_GEOMETRY:
+	{
+	  // Get cylinder geometry
+	  float length, radius;
+	  collider->GetCylinderGeometry (length, radius);
+
+	  // Create cylinder
+	  mesh = CreateCylinderMesh (length, radius, material,
+				     collider->GetLocalTransform (), sector);
+	}
+	break;
+
+      case CAPSULE_COLLIDER_GEOMETRY:
+	{
+	  // Get capsule geometry
+	  float length, radius;
+	  collider->GetCapsuleGeometry (length, radius);
+
+	  // Create capsule
+	  mesh = CreateCapsuleMesh (length, radius, material,
+				    collider->GetLocalTransform (), sector);
+	}
+	break;
+
+      case TRIMESH_COLLIDER_GEOMETRY:
+	{
+	  // Get mesh geometry
+	  csVector3* vertices = 0;
+	  int* indices = 0;
+	  size_t vertexCount, triangleCount;
+	  collider->GetMeshGeometry (vertices, vertexCount, indices, triangleCount);
+
+	  // Create mesh
+	  mesh = CreateCustomMesh (vertices, vertexCount, indices, triangleCount,
+				   material, collider->GetLocalTransform (), sector);
+	}
+	break;
+
+      case CONVEXMESH_COLLIDER_GEOMETRY:
+	{
+	  // Get mesh geometry
+	  csVector3* vertices = 0;
+	  int* indices = 0;
+	  size_t vertexCount, triangleCount;
+	  collider->GetConvexMeshGeometry (vertices, vertexCount, indices, triangleCount);
+
+	  // Create mesh
+	  mesh = CreateCustomMesh (vertices, vertexCount, indices, triangleCount, material,
+				   collider->GetLocalTransform (), sector);
+	}
+	break;
+
+      default:
+	// TODO: plan meshes
+	break;
+      }
+
+    return mesh;
   }
 
   csRef<iMeshWrapper> DynamicsDebugger::CreateBoxMesh (csBox3 box,
@@ -485,8 +556,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
     csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
       (meshFact->GetMeshObjectFactory ());
 
-    gmstate->SetVertexCount (vertexCount);
-    gmstate->SetTriangleCount (triangleCount);
+    gmstate->SetVertexCount ((int)vertexCount);
+    gmstate->SetTriangleCount ((int)triangleCount);
 
     for (unsigned int i = 0; i < vertexCount; i++)
       gmstate->GetVertices ()[i] = vertices[i];
@@ -507,6 +578,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
     mesh->GetMeshObject ()->SetMaterialWrapper (material);
 
     return mesh;
+  }
+
+  BoneKinematicCallback::BoneKinematicCallback (iMeshWrapper* mesh,
+			   iBulletKinematicCallback* callback)
+    : scfImplementationType (this), mesh (mesh), callback (callback)
+  {
+  }
+
+  BoneKinematicCallback::~BoneKinematicCallback ()
+  {
+  }
+
+  void BoneKinematicCallback::GetBodyTransform
+    (iRigidBody* body, csOrthoTransform& transform) const
+  {
+    callback->GetBodyTransform (body, transform);
+    mesh->GetMovable ()->SetTransform (transform);
+    mesh->GetMovable ()->UpdateMove ();
   }
 
 }

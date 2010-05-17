@@ -108,7 +108,7 @@ namespace CS
       csVertexSet resultingSet;
 
       // clip the first ear in ears
-      int earIndex = ears.Top();
+      size_t earIndex = ears.Top();
       ears.Pop();
       
       // get the index in the clip poly array of the ear
@@ -117,16 +117,19 @@ namespace CS
       // this vertex is the one we want to remove
       size_t indexToReturn = originalIndices[earIndex];
 
-      // build the set of vertices that make up the triangle we just
-      // clipped
-      int prevIndex = (int)earIndex - 1;
-      while (prevIndex < 0)
+      // build the set of vertices that make up the triangle we just clipped
+      size_t prevIndex;
+      if (earIndex == 0)
       {
-        prevIndex += originalIndices.GetSize();
+        prevIndex = originalIndices.GetSize() - 1;
+      }
+      else
+      {
+        prevIndex = earIndex - 1;
       }
 
-      int nextIndex = earIndex + 1;
-      while (nextIndex >= (int)originalIndices.GetSize())
+      size_t nextIndex = earIndex + 1;
+      while (nextIndex >= originalIndices.GetSize())
       {
         nextIndex -= originalIndices.GetSize();
       }
@@ -250,22 +253,22 @@ namespace CS
         // correctly
         if (leftIndex > rightIndex)
         {
-          result.AddTriangle(leftIndex, earIndex, rightIndex);
+          result.AddTriangle((int)leftIndex, (int)earIndex, (int)rightIndex);
         }
 
         else
         {
-          result.AddTriangle(rightIndex, earIndex, leftIndex);
+          result.AddTriangle((int)rightIndex, (int)earIndex, (int)leftIndex);
         }
       }
 
       // if we're done, then make sure to add the remainder to
       // the triangle mesh
-      int firstIndex = clipper.GetOriginalIndex(0);
-      int secondIndex = clipper.GetOriginalIndex(1);
-      int thirdIndex = clipper.GetOriginalIndex(2);
+      size_t firstIndex = clipper.GetOriginalIndex(0);
+      size_t secondIndex = clipper.GetOriginalIndex(1);
+      size_t thirdIndex = clipper.GetOriginalIndex(2);
 
-      result.AddTriangle(firstIndex, secondIndex, thirdIndex);
+      result.AddTriangle((int)firstIndex, (int)secondIndex, (int)thirdIndex);
 
       // @@@FIXME: Finish implementing.
       return true;

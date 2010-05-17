@@ -882,7 +882,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     // enable all kinds of useful FPU exceptions on a x86
     // note that we can't do it above since at least on OS/2 each dynamic
     // library on loading/initialization resets the control word to default
-    csControl87 (0x33, 0x3f);
+    //csControl87 (0x33, 0x3f);
   #else
     // this will disable exceptions on DJGPP (for the non-debug version)
     csControl87 (0x3f, 0x3f);
@@ -1127,17 +1127,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Reinit console object for 3D engine use.
   if (myConsole) myConsole->Clear ();
 
-  // We use the width and height from the 3D renderer because this
-  // can be different from the frame size (rendering in less res than
-  // real window for example).
-  int w3d = Gfx3D->GetWidth ();
-  int h3d = Gfx3D->GetHeight ();
   // clear all backbuffers to black
   // and Zbuffer, mainly to make better zbufdumps
   Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
   myG2D->ClearAll (myG2D->FindRGB(0,0,0));
   Gfx3D->FinishDraw ();
 #ifdef CS_DEBUG
+  // We use the width and height from the 3D renderer because this
+  // can be different from the frame size (rendering in less res than
+  // real window for example).
+  int w3d = Gfx3D->GetWidth ();
+  int h3d = Gfx3D->GetHeight ();
   myG2D->SetClipRect (2, 2, w3d - 2, h3d - 2);
 #endif
 

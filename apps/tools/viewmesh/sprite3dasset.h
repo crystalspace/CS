@@ -73,23 +73,13 @@ public:
 
 
   // SubMeshes
-  virtual bool SupportsSubMeshes();
-
-  virtual csPtr<iStringArray> GetSubMeshes();
-
-  virtual bool SetSubMeshRendering(const char* subMeshName, bool value);
-
-  virtual bool SetSubMeshMaterial(const char* subMeshName, iMaterialWrapper* mat);
-
+  virtual bool SupportsSubMeshes() { return false; }
 
   // MorphTargets
-  virtual bool SupportsMorphTargets();
+  virtual bool SupportsMorphTargets() { return false; }
 
-  virtual csPtr<iStringArray> GetMorphTargets();
-
-  virtual float GetMorphTargetWeight(const char* name);
-
-  virtual bool SetMorphTargetWeight(const char* name, float value);
+  // Particles
+  virtual bool SupportsParticles() { return false; }
 };
 
 #endif // SPRITE3DASSET_H__

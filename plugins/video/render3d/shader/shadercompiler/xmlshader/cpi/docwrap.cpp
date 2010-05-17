@@ -1963,16 +1963,16 @@ bool csWrappedDocumentNode::GetAttributeValueAsBool (const char* name,
 static const uint32 cachedWrappedDocMagic = 0x01214948;
 
 bool csWrappedDocumentNode::StoreToCache (iFile* cacheFile,
-  const ConditionsWriter& condWriter)
+  ForeignNodeStorage& foreignNodes, const ConditionsWriter& condWriter)
 {
   uint32 magicLE = csLittleEndian::UInt32 (cachedWrappedDocMagic);
   if (cacheFile->Write ((char*)&magicLE, sizeof (magicLE)) != sizeof (magicLE))
     return false;
 
-  ForeignNodeStorage foreignNodes (shared->plugin);
-  if (!foreignNodes.StartUse (cacheFile)) return false;
-  if (!StoreToCache (cacheFile, foreignNodes, condWriter)) return false;
-  if (!foreignNodes.EndUse ()) return false;
+  //ForeignNodeStorage foreignNodes (shared->plugin);
+  //if (!foreignNodes.StartUse (cacheFile)) return false;
+  if (!StoreToCacheReal (cacheFile, foreignNodes, condWriter)) return false;
+  //if (!foreignNodes.EndUse ()) return false;
   return true;
 }
 
@@ -1981,7 +1981,7 @@ void csWrappedDocumentNode::CollectUsedConditions (ConditionsWriter& condWrite)
   CollectUsedConditions (wrappedChildren, condWrite);
 }
 
-bool csWrappedDocumentNode::StoreToCache (iFile* cacheFile,
+bool csWrappedDocumentNode::StoreToCacheReal (iFile* cacheFile,
                                           ForeignNodeStorage& foreignNodes,
                                           const ConditionsWriter& condWriter)
 {
@@ -1999,6 +1999,7 @@ bool csWrappedDocumentNode::StoreToCache (iFile* cacheFile,
 }
 
 bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
+  ForeignNodeReader& foreignNodes, 
   const ConditionsReader& condReader, ConditionDumper& condDump)
 {
   uint32 magic;
@@ -2007,14 +2008,14 @@ bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
   if (csLittleEndian::UInt32 (magic) != cachedWrappedDocMagic)
     return false;
 
-  ForeignNodeReader foreignNodes (shared->plugin);
-  if (!foreignNodes.StartUse (cacheFile)) return false;
-  if (!ReadFromCache (cacheFile, foreignNodes, condReader, condDump)) return false;
-  if (!foreignNodes.EndUse ()) return false;
+  //ForeignNodeReader foreignNodes (shared->plugin);
+  //if (!foreignNodes.StartUse (cacheFile)) return false;
+  if (!ReadFromCacheReal (cacheFile, foreignNodes, condReader, condDump)) return false;
+  //if (!foreignNodes.EndUse ()) return false;
   return true;
 }
 
-bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
+bool csWrappedDocumentNode::ReadFromCacheReal (iFile* cacheFile,
                                            ForeignNodeReader& foreignNodes,
                                            const ConditionsReader& condReader,
 					   ConditionDumper& condDump)
@@ -2023,6 +2024,7 @@ bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
   if (cacheFile->Read ((char*)&wrappedNodeLE, sizeof (wrappedNodeLE))
       != sizeof (wrappedNodeLE)) return false;
   wrappedNode = foreignNodes.GetNode (csLittleEndian::Int32 (wrappedNodeLE));
+  if (!wrappedNode.IsValid()) return false;
   
   return ReadWrappedChildren (cacheFile, foreignNodes, wrappedChildren,
     condReader, condDump);
@@ -2041,7 +2043,7 @@ bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file,
   ForeignNodeStorage& foreignNodes, const csRefArray<WrappedChild>& children,
   const ConditionsWriter& condWriter)
 {
-  uint32 numChildrenLE = csLittleEndian::UInt32 (children.GetSize());
+  uint32 numChildrenLE = csLittleEndian::UInt32 ((uint32)children.GetSize());
   if (file->Write ((char*)&numChildrenLE, sizeof (numChildrenLE))
       != sizeof (numChildrenLE)) return false;
 
@@ -2089,7 +2091,7 @@ bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file,
     {
       csWrappedDocumentNode* child = static_cast<csWrappedDocumentNode*> (
 	(iWrappedDocumentNode*)wrapper);
-      if (!child->StoreToCache (file, foreignNodes, condWriter))
+      if (!child->StoreToCacheReal (file, foreignNodes, condWriter))
 	return false;
     }
     if (!StoreWrappedChildren (file, foreignNodes, children[i]->childrenWrappers,
@@ -2158,7 +2160,7 @@ bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
     {
       csWrappedDocumentNode* childWrapper = new csWrappedDocumentNode (
         this, resolver, shared);
-      if (!childWrapper->ReadFromCache (file, foreignNodes, condReader, condDump))
+      if (!childWrapper->ReadFromCacheReal (file, foreignNodes, condReader, condDump))
         return false;
       child->childNode.AttachNew (childWrapper);
     }
@@ -2460,12 +2462,12 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
 
 csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperFromCache (
   iFile* cacheFile, iConditionResolver* resolver, csConditionEvaluator& evaluator,
-  const ConditionsReader& condReader, csString* dumpOut)
+  ForeignNodeReader& foreignNodes, const ConditionsReader& condReader, csString* dumpOut)
 {
   ConditionDumper condDump (dumpOut, &evaluator);
   csWrappedDocumentNode* node;
   node = new csWrappedDocumentNode (0, resolver, this);
-  if (!node->ReadFromCache (cacheFile, condReader, condDump))
+  if (!node->ReadFromCache (cacheFile, foreignNodes, condReader, condDump))
   {
     delete node;
     return 0;

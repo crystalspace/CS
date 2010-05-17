@@ -2,6 +2,7 @@ SubDir TOP plugins rendermanager ;
 
 UberPlugin legacy_rl : rm_rlcompat ;
 
+SubInclude TOP plugins rendermanager null ;
 SubInclude TOP plugins rendermanager rlcompat ;
 SubInclude TOP plugins rendermanager shadow_pssm ;
 SubInclude TOP plugins rendermanager unshadowed ;

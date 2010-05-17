@@ -71,7 +71,9 @@ typedef int scfInterfaceVersion;
 */
 #define SCF_INTERFACE(Name,Major,Minor,Micro)             \
 struct InterfaceTraits {                                  \
+  CS_DEPRECATION_WARNINGS_DISABLE  			  \
   typedef Name InterfaceType;                             \
+  CS_DEPRECATION_WARNINGS_ENABLE                          \
   CS_FORCEINLINE static scfInterfaceVersion GetVersion() \
   { return SCF_CONSTRUCT_VERSION(Major, Minor, Micro); }  \
   CS_FORCEINLINE static char const * GetName() { return #Name; }  \

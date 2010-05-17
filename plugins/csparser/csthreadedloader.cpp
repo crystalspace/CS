@@ -550,7 +550,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return false;
     }
 
-    bool res = Load (buf, fname, collection, ssource, missingdata, keepFlags, do_verbose);
+    bool res = Load (ret, buf, fname, collection, ssource, missingdata, keepFlags, do_verbose);
 
     if(sync && res)
     {
@@ -567,7 +567,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csVfsDirectoryChanger dirChange(vfs);
     dirChange.ChangeToFull(cwd);
 
-    bool res = Load(buffer, 0, collection, ssource, missingdata, keepFlags, do_verbose);
+    bool res = Load(ret, buffer, 0, collection, ssource, missingdata, keepFlags, do_verbose);
 
     if(sync && res)
     {
@@ -4467,7 +4467,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
   }
 
-  bool csThreadedLoader::Load (iDataBuffer* buffer, const char* fname, iCollection* collection,
+  bool csThreadedLoader::Load (iThreadReturn* ret, iDataBuffer* buffer, const char* fname, iCollection* collection,
     iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
   {
     if (TestXML (buffer->GetData ()))
@@ -4482,9 +4482,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (doc)
       {
         csRef<iDocumentNode> node = doc->GetRoot ();
-        csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-	csString cwd = vfs->GetCwd ();
-        return LoadNodeTC(itr, false, cwd, node, collection, 0, ssource, missingdata, keepFlags, do_verbose);
+	      csString cwd = vfs->GetCwd ();
+        return LoadNodeTC(ret, false, cwd, node, collection, 0, ssource, missingdata, keepFlags, do_verbose);
       }
       else
       {
@@ -4513,6 +4512,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           iMeshFactoryWrapper* ff = l->Load (fname ? fname : "__model__", buffer);
           if(ff)
           {
+            ret->SetResult(scfQueryInterfaceSafe<iBase>(ff));
             return true;
           }
         }

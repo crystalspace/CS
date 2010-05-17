@@ -27,6 +27,7 @@
 #include "csutil/scf_interface.h"
 #include "iutil/array.h"
 #include "ivideo/shader/shader.h"
+#include "imesh/object.h"
 
 class csVector3;
 struct csCollisionPair;
@@ -549,6 +550,8 @@ struct iTerrainCellLoadCallback : public virtual iBase
   virtual void OnCellUnload (iTerrainCell* cell) = 0;
 };
 
+struct iTerrainFactoryCell;
+
 /**
  * This class represents the terrain object as a set of cells. The object
  * can be rendered and collided with. To gain access to some operations that
@@ -557,7 +560,7 @@ struct iTerrainCellLoadCallback : public virtual iBase
  */
 struct iTerrainSystem : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainSystem, 2, 1, 0);
+  SCF_INTERFACE (iTerrainSystem, 2, 1, 1);
 
   /**
    * Query a cell by name
@@ -629,7 +632,7 @@ struct iTerrainSystem : public virtual iBase
    */
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                            bool oneHit, iTerrainVector3Array* points,
-                           csArray<iMaterialWrapper*>* materials) = 0;
+                           iMaterialArray* materials) = 0;
 
   /**
    * Collide segment with the terrain
@@ -837,7 +840,21 @@ struct iTerrainSystem : public virtual iBase
   /**
    * Remove a listener to the cell height update callback
    */
-  virtual void RemoveCellHeightUpdateListener (iTerrainCellHeightDataCallback* cb) = 0;  
+  virtual void RemoveCellHeightUpdateListener (iTerrainCellHeightDataCallback* cb) = 0;
+
+  /**
+   * Add a cell to the terrain instance based on the given iTerrainFactoryCell.
+   *
+   * \return added cell
+   * \rem If you change the renderer, collider or feeder after adding cells
+   * you might get into trouble.
+   */
+  virtual iTerrainCell* AddCell (iTerrainFactoryCell*) = 0;
+
+  /**
+   * Remove the given cell from this instance
+   */
+  virtual void RemoveCell (iTerrainCell*) = 0;
 };
 
 /**
@@ -1401,7 +1418,7 @@ struct iTerrainFactoryCell : public virtual iBase
 /// Provides an interface for creating terrain system
 struct iTerrainFactory : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainFactory, 2, 0, 2);
+  SCF_INTERFACE (iTerrainFactory, 2, 0, 3);
 
   /**
    * Set desired renderer (there is a single renderer for the whole terrain)
@@ -1513,6 +1530,9 @@ struct iTerrainFactory : public virtual iBase
 
   /// Get a cell in this factory by name
   virtual iTerrainFactoryCell* GetCell (const char* name) = 0;
+
+  /// Remove the given cell from this factory
+  virtual void RemoveCell (iTerrainFactoryCell*) = 0;
 };
 
 

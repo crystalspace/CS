@@ -172,8 +172,9 @@ in-order to successfully compile and link your application.  They are:
 @itemize @bullet
 @item @samp{CS_WIN32_CSCONFIG}
 @item @samp{__CRYSTAL_SPACE__}
-@item @samp{CS_BUILD_SHARED_LIBS} if Crystal Space was built ``with DLLs''
-(the default)
+@item @samp{CS_USE_SHARED_LIBS} if Crystal Space was built ``with DLLs''
+(the default) or @samp{CS_USE_STATIC_LIBS} if Crystal Space was built
+``with static libs''
 @item @samp{CS_RELEASE} or @samp{CS_DEBUG}
 @end itemize
 
@@ -200,7 +201,7 @@ the @emph{Properties} dialog box, which can be seen in the image below.
 Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
 definitions in the @emph{Preprocessor Definitions} text box i.e.  for a debug
 build with Crystal Space built with DLLs 
-@samp{CS_WIN32_CSCONFIG;__CRYSTAL_SPACE__;CS_BUILD_SHARED_LIBS;CS_DEBUG},
+@samp{CS_WIN32_CSCONFIG;__CRYSTAL_SPACE__;CS_USE_SHARED_LIBS;CS_DEBUG},
 making sure to separate with semi-colons.  Alternatively, you can click the
 elipsis (@dots{}) button to pull up an easier view.  An example of the ones
 entered for a debug build can be seen in the image below.
@@ -213,7 +214,7 @@ Now do similar for the release configuration.  Open the C/C++ folder and select
 @emph{Preprocessor}.  Insert the appropriate definitions in the 
 @emph{Preprocessor Definitions} text box i.e.  for a release build with 
 Crystal Space built with DLLs 
-@samp{CS_WIN32_CSCONFIG;__CRYSTAL_SPACE__;CS_BUILD_SHARED_LIBS;CS_RELEASE},
+@samp{CS_WIN32_CSCONFIG;__CRYSTAL_SPACE__;CS_USE_SHARED_LIBS;CS_RELEASE},
 making sure to separate with semi-colons.  Alternatively, you can click the
 elipsis (@dots{}) button to pull up an easier view.  An example the ones
 entered for a release build can be seen in the image below.

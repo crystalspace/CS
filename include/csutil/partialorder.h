@@ -49,7 +49,7 @@
  * There must be a csHashComputer for type T.
  */
 template <class T>
-class CS_CRYSTALSPACE_EXPORT csPartialOrder
+class csPartialOrder
 {
 protected:
   class Node

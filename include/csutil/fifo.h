@@ -27,7 +27,7 @@
 #include "csutil/array.h"
 
 /**
- * A FIFO implemented on top of csArray<>, but faster than using just
+ * A FIFO implemented on top of csArray, but faster than using just
  * a single array.
  */
 template <class T, class ElementHandler = csArrayElementHandler<T>,
@@ -45,7 +45,7 @@ private:
   csArray<T, ElementHandler, MemoryAllocator, CapacityHandler> a1, a2;
 public:
   /**
-   * Construct the FIFO. See csArray<> documentation for meaning of
+   * Construct the FIFO. See csArray documentation for meaning of
    * parameters.
    */
   csFIFO (size_t icapacity = 0,

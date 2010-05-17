@@ -108,7 +108,7 @@ private:
   size_t requestedLength;
 
   /// The number of OpenAL buffers to maintain.
-  static size_t s_NumberOfBuffers;
+  static ALsizei s_NumberOfBuffers;
 
   /// The OpenAL source
   ALuint m_Source;

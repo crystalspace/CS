@@ -1,0 +1,54 @@
+<library>
+    <textures>
+        <texture name="snow">
+            <file>/lib/std/snow.jpg</file>
+        </texture>
+    </textures>
+    <shaders>
+        <shader>
+            <file>/shader/particles/basic.xml</file>
+        </shader>
+    </shaders>
+    <materials>
+        <material name="snow">
+            <texture>snow</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+    </materials>
+    <meshfact name="snowFact">
+        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+        <params>
+            <particlesize x="0.17" y="0.17" />
+            <minbb>
+                <min x="-5" y="-0.3" z="-5" />
+                <max x="10" y="6" z="10" />
+            </minbb>
+            <sortmode>none</sortmode>
+            <emitter type="box">
+                <emissionrate>250</emissionrate>
+                <mass min="5" max="7.5" />
+                <box>
+                    <min x="-5" y="6" z="-5" />
+                    <max x="10" y="6" z="10" />
+                </box>
+                <uniformvelocity />
+                <initialvelocity x="0" y="-1.42" z="0" />
+                <initialttl min="5" max="5" />
+                <placement>volume</placement>
+            </emitter>
+            <effector type="lincolor">
+                <color red="0" green="0" blue="1" time="5" />
+            </effector>
+            <effector type="force">
+                <randomacceleration x="2.5" y="0" z="2.5" />
+            </effector>
+	    <mixmode>
+		<add />
+	    </mixmode>
+	    <material>snow</material>
+        </params>
+      <priority>alpha</priority>
+      <ztest />
+    </meshfact>
+</library>

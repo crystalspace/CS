@@ -5,6 +5,7 @@ if $(ZLIB.AVAILABLE) = "yes"
 Description vfs : "Virtual File System plugin" ;
 Plugin vfs : [ Wildcard *.cpp *.h ] ;
 LinkWith vfs : crystalspace ;
+CFlags vfs : [ FDefines CS_CONFIGDIR='\"$(appconfdir)\"' ] ;
 
 rule VfsCfgGen
 {

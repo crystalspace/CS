@@ -36,14 +36,13 @@
 #include "iengine/renderloop.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/material.h"
-#include "cstool/genmeshbuilder.h"
-#include "cstool/simplestaticlighter.h"
 #include "csutil/scfstringarray.h"
 
 #include "animeshasset.h"
 #include "cal3dasset.h"
-#include "sprite3dasset.h"
 #include "genmeshasset.h"
+#include "particlesasset.h"
+#include "sprite3dasset.h"
 
 #include "sockettab.h"
 #include "animationtab.h"
@@ -51,6 +50,7 @@
 #include "submeshtab.h"
 #include "materialtab.h"
 #include "generaltab.h"
+#include "particlestab.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -66,153 +66,153 @@ CS_IMPLEMENT_APPLICATION
 //---------------------------------------------------------------------------
 
 ViewMesh::ViewMesh () : 
-  camMode(movenormal), roomsize(5), scale(1), move_sprite_speed(0)
-{
-  SetApplicationName ("CrystalSpace.ViewMesh");
-}
-
-ViewMesh::~ViewMesh ()
-{
-}
-
-void ViewMesh::Frame()
-{
-  csTicks elapsed_time = vc->GetElapsedTicks ();
-  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
-
-  iCamera* c = view->GetCamera();
-  csVector3 orig = c->GetTransform().GetOrigin();
-
-  if (!asset) camMode = movenormal;
-
-  switch (camMode)
+  camMode(rotateorigin), roomsize(5), scale(1), move_sprite_speed(0)
   {
-    case movenormal:
+    SetApplicationName ("CrystalSpace.ViewMesh");
+  }
+
+  ViewMesh::~ViewMesh ()
+  {
+  }
+
+  void ViewMesh::Frame()
+  {
+    csTicks elapsed_time = vc->GetElapsedTicks ();
+    float speed = (elapsed_time / 1000.0) * (0.06 * 20);
+
+    iCamera* c = view->GetCamera();
+    csVector3 orig = c->GetTransform().GetOrigin();
+
+    if (asset)
     {
-      if (kbd->GetKeyState (CSKEY_SHIFT))
+      switch (camMode)
       {
-        if (kbd->GetKeyState (CSKEY_UP))
-          camTarget += c->GetTransform().This2OtherRelative(
-	      csVector3(0,1,0)) * 4 * speed;
-        if (kbd->GetKeyState (CSKEY_DOWN))
-          camTarget -= c->GetTransform().This2OtherRelative(
-	      csVector3(0,1,0)) * 4 * speed;
-        if (kbd->GetKeyState (CSKEY_RIGHT))
-          camTarget += c->GetTransform().This2OtherRelative(
-	      csVector3(1,0,0)) * 4 * speed;
-        if (kbd->GetKeyState (CSKEY_LEFT))
-          camTarget -= c->GetTransform().This2OtherRelative(
-	      csVector3(1,0,0)) * 4 * speed;
+      case movenormal:
+        {
+          if (kbd->GetKeyState (CSKEY_SHIFT))
+          {
+            if (kbd->GetKeyState (CSKEY_UP))
+              camTarget += c->GetTransform().This2OtherRelative(
+              csVector3(0,1,0)) * 4 * speed;
+            if (kbd->GetKeyState (CSKEY_DOWN))
+              camTarget -= c->GetTransform().This2OtherRelative(
+              csVector3(0,1,0)) * 4 * speed;
+            if (kbd->GetKeyState (CSKEY_RIGHT))
+              camTarget += c->GetTransform().This2OtherRelative(
+              csVector3(1,0,0)) * 4 * speed;
+            if (kbd->GetKeyState (CSKEY_LEFT))
+              camTarget -= c->GetTransform().This2OtherRelative(
+              csVector3(1,0,0)) * 4 * speed;
+          }
+          else
+          {
+            if (kbd->GetKeyState (CSKEY_UP))
+              camTarget += (camTarget - orig).Unit() * 4 * speed;
+            if (kbd->GetKeyState (CSKEY_DOWN))
+              camTarget -= (camTarget - orig).Unit() * 4 * speed;
+          }
+
+          UpdateCamera();
+          orig = c->GetTransform().GetOrigin();
+          if (!kbd->GetKeyState (CSKEY_SHIFT))
+          {
+            if (kbd->GetKeyState (CSKEY_RIGHT))
+              camYaw += speed;
+            if (kbd->GetKeyState (CSKEY_LEFT))
+              camYaw -= speed;
+          }
+          if (kbd->GetKeyState (CSKEY_PGUP))
+            camPitch = csMin<float>(3.14159f * 0.5f - 0.01f, camPitch + speed);
+          if (kbd->GetKeyState (CSKEY_PGDN))
+            camPitch = csMax<float>(-3.14159f * 0.5f + 0.01f, camPitch - speed);
+
+          UpdateCamera();
+          csVector3 deltaOrig = c->GetTransform().GetOrigin() - orig;
+          camTarget -= deltaOrig;
+          UpdateCamera();
+          break;
+        }
+      case moveorigin:
+        {
+          if (kbd->GetKeyState (CSKEY_DOWN))
+            orig.z -= 4 * speed;
+          if (kbd->GetKeyState (CSKEY_UP))
+            orig.z += 4 * speed;
+          if (kbd->GetKeyState (CSKEY_LEFT))
+            orig.x -= 4 * speed;
+          if (kbd->GetKeyState (CSKEY_RIGHT))
+            orig.x += 4 * speed;
+          if (kbd->GetKeyState (CSKEY_PGUP))
+            orig.y += 4 * speed;
+          if (kbd->GetKeyState (CSKEY_PGDN))
+            orig.y -= 4 * speed;
+          FixCameraForOrigin(orig);
+          UpdateCamera();
+          break;
+        }
+      case rotateorigin:
+        {
+          if (kbd->GetKeyState (CSKEY_LEFT))
+            camYaw += speed;
+          if (kbd->GetKeyState (CSKEY_RIGHT))
+            camYaw -= speed;
+          if (kbd->GetKeyState (CSKEY_UP))
+            camPitch = csMin<float>(3.14159f * 0.5f - 0.01f, camPitch + speed);
+          if (kbd->GetKeyState (CSKEY_DOWN))
+            camPitch = csMax<float>(-3.14159f * 0.5f + 0.01f, camPitch - speed);
+          if (kbd->GetKeyState (CSKEY_PGUP))
+            camDist = csMax<float>(0.01f, camDist - speed * 4);
+          if (kbd->GetKeyState (CSKEY_PGDN))
+            camDist += speed * 4;
+          UpdateCamera();
+          break;
+        }
+      default:
+        break;
       }
-      else
+
+      csRef<iMovable> mov = asset->GetMesh()->GetMovable();
+      csVector3 pos = mov->GetFullPosition();    
+      mov->MovePosition(csVector3(pos.x, pos.y, -move_sprite_speed*elapsed_time/1000.0f));
+      mov->UpdateMove();
+      if (pos.z > roomsize) 
       {
-        if (kbd->GetKeyState (CSKEY_UP))
-          camTarget += (camTarget - orig).Unit() * 4 * speed;
-        if (kbd->GetKeyState (CSKEY_DOWN))
-          camTarget -= (camTarget - orig).Unit() * 4 * speed;
+        pos.z = -roomsize;
+        mov->SetPosition(pos);
       }
-
-      UpdateCamera();
-	  orig = c->GetTransform().GetOrigin();
-      if (!kbd->GetKeyState (CSKEY_SHIFT))
+      else if (pos.z < -roomsize) 
       {
-        if (kbd->GetKeyState (CSKEY_RIGHT))
-          camYaw += speed;
-        if (kbd->GetKeyState (CSKEY_LEFT))
-          camYaw -= speed;
-	  }
-      if (kbd->GetKeyState (CSKEY_PGUP))
-        camPitch = csMin<float>(3.14159f * 0.5f - 0.01f, camPitch + speed);
-      if (kbd->GetKeyState (CSKEY_PGDN))
-        camPitch = csMax<float>(-3.14159f * 0.5f + 0.01f, camPitch - speed);
+        pos.z = roomsize;
+        mov->SetPosition(pos);
+      }
+    }
 
-      UpdateCamera();
-	  csVector3 deltaOrig = c->GetTransform().GetOrigin() - orig;
-	  camTarget -= deltaOrig;
-	  UpdateCamera();
-      break;
-    }
-    case moveorigin:
-    {
-      if (kbd->GetKeyState (CSKEY_DOWN))
-        orig.z -= 4 * speed;
-      if (kbd->GetKeyState (CSKEY_UP))
-        orig.z += 4 * speed;
-      if (kbd->GetKeyState (CSKEY_LEFT))
-        orig.x -= 4 * speed;
-      if (kbd->GetKeyState (CSKEY_RIGHT))
-        orig.x += 4 * speed;
-      if (kbd->GetKeyState (CSKEY_PGUP))
-        orig.y += 4 * speed;
-      if (kbd->GetKeyState (CSKEY_PGDN))
-        orig.y -= 4 * speed;
-      FixCameraForOrigin(orig);
-      UpdateCamera();
-      break;
-    }
-    case rotateorigin:
-    {
-      if (kbd->GetKeyState (CSKEY_LEFT))
-        camYaw += speed;
-      if (kbd->GetKeyState (CSKEY_RIGHT))
-        camYaw -= speed;
-      if (kbd->GetKeyState (CSKEY_UP))
-        camPitch = csMin<float>(3.14159f * 0.5f - 0.01f, camPitch + speed);
-      if (kbd->GetKeyState (CSKEY_DOWN))
-        camPitch = csMax<float>(-3.14159f * 0.5f + 0.01f, camPitch - speed);
-      if (kbd->GetKeyState (CSKEY_PGUP))
-        camDist = csMax<float>(0.01f, camDist - speed * 4);
-      if (kbd->GetKeyState (CSKEY_PGDN))
-        camDist += speed * 4;
-      UpdateCamera();
-      break;
-    }
-    default:
-      break;
+    if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
+      | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+      return;
+
+    view->Draw ();
+
+    if (loading)
+      LoadSprite(reloadFilename, reloadFilePath);
+
+    cegui->Render();
   }
 
-  if (asset)
+  void ViewMesh::ResetCamera()
   {
-    csRef<iMovable> mov = asset->GetMesh()->GetMovable();
-    csVector3 pos = mov->GetFullPosition();    
-    mov->MovePosition(csVector3(pos.x,pos.y,
-	  -move_sprite_speed*elapsed_time/1000.0f));
-    mov->UpdateMove();
-    if (pos.z > roomsize) 
+    camTarget.Set(0,0,0);
+    if (asset)
     {
-      pos.z = -roomsize;
-      mov->SetPosition(pos);
+      csBox3 box;
+      box = asset->GetMesh()->GetWorldBoundingBox();
+      camTarget = box.GetCenter();
     }
-    else if (pos.z < -roomsize) 
-    {
-      pos.z = roomsize;
-      mov->SetPosition(pos);
-    }
+
+    camDist = 3.5f;
+    camYaw = 0.0f;
+    camPitch = -0.2f;
   }
-
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
-	| CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
-    return;
-
-  view->Draw ();
-  //if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  cegui->Render();
-}
-
-void ViewMesh::ResetCamera()
-{
-  camTarget.Set(0,0,0);
-  if (asset)
-  {
-    csBox3 box;
-    box = asset->GetMesh()->GetWorldBoundingBox();
-    camTarget = box.GetCenter();
-  }
-
-  camDist = 3.5f;
-  camYaw = 0.0f;
-  camPitch = -0.2f;
-}
 
 void ViewMesh::UpdateCamera()
 {
@@ -262,6 +262,9 @@ bool ViewMesh::OnMouseDown (iEvent& e)
 {
   const float mouseWheelZoomAmount = 0.25f;
 
+  if (!asset)
+    return false;
+
   uint button = csMouseEventHelper::GetButton(&e);
   switch (button)
   {
@@ -288,6 +291,9 @@ bool ViewMesh::OnMouseDown (iEvent& e)
 
 bool ViewMesh::OnMouseUp (iEvent& e)
 {
+  if (!asset)
+    return false;
+
   uint button = csMouseEventHelper::GetButton(&e);
   switch (button)
   {
@@ -343,7 +349,6 @@ void ViewMesh::Help ()
   csPrintf ("  -L=<file>          Load a library file (for textures/materials)\n");
   csPrintf ("  -Scale=<ratio>     Scale the Object\n");
   csPrintf ("  -RoomSize=<units>  Radius and height (4*) of the room (default 5)\n");
-  csPrintf ("  -RenderLoop=<loop> 'standard', 'diffuse', ... (default standard)\n");
   csPrintf ("  -R=<realpath>      Real path from where to load the model\n");
   csPrintf ("  -C=<vfsdir>        Current VFS directory\n");
   csPrintf ("  <file>             Load the specified mesh object from the VFS path (meshfact or library)\n");
@@ -373,7 +378,8 @@ void ViewMesh::HandleCommandLine()
   const char* scaleTxt = cmdline->GetOption("Scale");
   const char* roomSize = cmdline->GetOption("RoomSize");
   const char* realPath = cmdline->GetOption("R");
-  const char* vfsDir = cmdline->GetOption("C");
+
+  csString vfsDir = cmdline->GetOption("C");
 
   if (realPath)
   {
@@ -381,13 +387,25 @@ void ViewMesh::HandleCommandLine()
     vfs->ChDir ("/tmp/viewmesh");
   }
 
-  if (vfsDir)
+  if(vfsDir.IsEmpty() && meshfilename)
   {
-    vfs->ChDir (vfsDir);
+    vfsDir = csString(meshfilename).Slice(0, csString(meshfilename).FindLast('/'));
   }
-  else if(meshfilename)
+
+  if (!vfsDir.IsEmpty())
   {
-    vfs->ChDir(csString(meshfilename).Slice(0, csString(meshfilename).FindLast('/')));
+    if(!vfs->ChDir (vfsDir))
+    {
+      ReportError("Cannot change to path: %s\n", vfsDir.GetData ());
+    }
+    else
+    {
+      // Update StdDlg path.
+      CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+      CEGUI::Window* window = winMgr->getWindow("StdDlg/Path");
+      window->setProperty("Text", vfs->GetCwd());
+      StdDlgUpdateLists(vfs->GetCwd());
+    }
   }
 
   if (texturefilename && texturename)
@@ -408,7 +426,6 @@ void ViewMesh::HandleCommandLine()
     csScanStr (scaleTxt, "%f", &newScale);
     ScaleSprite(newScale);
   }
-
 }
 
 void ViewMesh::LoadTexture(const char* file, const char* name)
@@ -425,8 +442,11 @@ void ViewMesh::LoadTexture(const char* file, const char* name)
   }
 }
 
-void ViewMesh::LoadLibrary(const char* file)
+void ViewMesh::LoadLibrary(const char* file, bool record)
 {
+  if(record)
+    reloadLibraryFilenames.Push(file);
+
   loader->LoadLibraryFile(file, collection);
 }
 
@@ -446,10 +466,18 @@ bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_FONTSERVER,
     CS_REQUEST_IMAGELOADER,
     CS_REQUEST_LEVELLOADER,
-    CS_REQUEST_LEVELSAVER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+  engine->SetSaveableFlag(true);
+
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+    CS_REQUEST_LEVELSAVER,
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
@@ -474,9 +502,6 @@ bool ViewMesh::Application()
   g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
-  if (!engine) return ReportError("Failed to locate 3D engine!");
-
   vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
@@ -488,6 +513,9 @@ bool ViewMesh::Application()
 
   loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
+
+  tloader = csQueryRegistry<iThreadedLoader> (GetObjectRegistry());
+  if (!tloader) return ReportError("Failed to locate threaded Loader!");
 
   saver = csQueryRegistry<iSaver> (GetObjectRegistry());
   if (!saver) return ReportError("Failed to locate Saver!");
@@ -502,38 +530,12 @@ bool ViewMesh::Application()
   collection = engine->CreateCollection ("viewmesh_region");
   reloadFilename = "";
 
-  csRef<iCommandLineParser> cmdline =
-    csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
-  renderLoop = cmdline->GetOption ("RenderLoop");
-
-  if (!loader->LoadShader ("/shader/light.xml"))
-    return false;
-  if (!loader->LoadShader ("/shader/light_bumpmap.xml"))
-    return false;
-  if (!loader->LoadShader ("/shader/ambient.xml"))
-    return false;
-  if (!loader->LoadShader ("/shader/reflectsphere.xml"))
-    return false;
-  if (!loader->LoadShader ("/shader/parallax/parallax.xml"))
-    return false;
-  if (!loader->LoadShader ("/shader/parallaxAtt/parallaxAtt.xml"))
-    return false;
-  if (!loader->LoadShader ("/shader/specular/light_spec_bumpmap.xml"))
-    return false;
-
   if (!CreateRoom())
     return false;
   if (!CreateGui ())
     return false;
 
   HandleCommandLine();
-
-  engine->Prepare ();
-
-  using namespace CS::Lighting;
-  SimpleStaticLighter::ShineLights (room, engine, 4);
-
-  view->GetCamera ()->SetSector (room);
 
   ResetCamera();
   UpdateCamera();
@@ -554,70 +556,22 @@ bool ViewMesh::Application()
 
 bool ViewMesh::CreateRoom ()
 {
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    return ReportError("Error loading 'stone4' texture!");
-
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
-
-  if (!renderLoop.IsEmpty ())
-  {
-    iRenderLoopManager* rloopmgr = engine->GetRenderLoopManager ();
-    csString rl = "/shader/std_rloop_";
-    rl += renderLoop;
-    rl += ".xml";
-    csRef<iRenderLoop> rloop = rloopmgr->Load (rl);
-    if (!rloop)
-      return ReportError("Bad renderloop '%s'", (const char*)renderLoop);
-    if (!engine->SetCurrentDefaultRenderloop (rloop))
-      return ReportError ("Couldn't set renderloop in engine!");
-
-    if (renderLoop != "standard")
-    {
-      csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
-      	object_reg, "crystalspace.shared.stringset");
-      csRef<iShaderManager> shadermgr = csQueryRegistry<iShaderManager> (
-      	  object_reg);
-      iMaterial* mat = tm->GetMaterial ();
-      csStringID t = strset->Request ("ambient");
-      iShader* sh = shadermgr->GetShader ("ambient");
-      mat->SetShader (t, sh);
-      t = strset->Request ("diffuse");
-      sh = shadermgr->GetShader ("light");
-      mat->SetShader (t, sh);
-    }
-  }
-
   room = engine->CreateSector ("room");
-
-  // First we make a primitive for our geometry.
-  using namespace CS::Geometry;
-  DensityTextureMapper mapper (0.3f);
-  TesselatedBox box (
-    csVector3 (-roomsize, -roomsize/2, -roomsize),
-    csVector3 (roomsize, 3*roomsize/2, roomsize));
-  box.SetLevel (3);
-  box.SetMapper (&mapper);
-  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
-
-  // Now we make a factory and a mesh at once.
-  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "walls", "walls_factory", &box);
-  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+  view->GetCamera ()->SetSector (room);
 
   csRef<iLight> light;
-  iLightList* ll = room->GetLights ();
-
   light = engine->CreateLight
     (0, csVector3(-roomsize/2, roomsize/2, 0), 2*roomsize, csColor(1, 1, 1));
-  ll->Add (light);
+  room->GetLights ()->Add (light);
 
   light = engine->CreateLight
     (0, csVector3(roomsize/2, roomsize/2,  0), 2*roomsize, csColor(1, 1, 1));
-  ll->Add (light);
+  room->GetLights ()->Add (light);
 
   light = engine->CreateLight
     (0, csVector3(0, roomsize/2, -roomsize/2), 2*roomsize, csColor(1, 1, 1));
-  ll->Add (light);
+  room->GetLights ()->Add (light);
+
   return true;
 }
 
@@ -677,9 +631,8 @@ bool ViewMesh::CreateGui()
   btn->setProperty("Text", vfs->GetCwd());
   StdDlgUpdateLists(vfs->GetCwd());
 
-  // Create default tabs.
+  // Create default tab.
   generalTab.AttachNew(new GeneralTab(this, GetObjectRegistry(), 0));
-  materialTab.AttachNew(new MaterialTab(GetObjectRegistry(), 0));
 
   return true;
 }
@@ -689,26 +642,54 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
   reloadFilename = filename;
   if (path)
     vfs->ChDir(path);
-  else
-    reloadFilePath = vfs->GetCwd();
+
+  reloadFilePath = vfs->GetCwd();
 
   if (asset)
   {
     generalTab->SetAsset(0);
-    materialTab->SetAsset(0);
+    materialTab.Invalidate();
     UnRegisterTabs ();
     asset.Invalidate();
   }
 
-  printf ("Loading model '%s' from vfs dir '%s'\n",
-		  filename, vfs->GetCwd ()); fflush (stdout);
-  csLoadResult rc = loader->Load (filename, collection, false, true);
+  if (!loading)
+  {
+    printf ("Loading model '%s' from vfs dir '%s'\n",
+      filename, vfs->GetCwd ()); fflush (stdout);
 
-  if (!rc.success)
+    loading = tloader->LoadFile (vfs->GetCwd(), filename, collection);
+  }
+
+  if (!loading->IsFinished())
+  {
+    // Write loading message.
+    csRef<iFontServer> fs = g3d->GetDriver2D()->GetFontServer ();
+    if (fs)
+    {
+      if (g3d->BeginDraw (CSDRAW_2DGRAPHICS))
+      {
+        csRef<iFont> courierFont = fs->LoadFont (CSFONT_COURIER);
+        int fg = g3d->GetDriver2D()->FindRGB (255, 150, 100);
+        int x = g3d->GetWidth() - 80;
+        int y = g3d->GetHeight() - 20;
+        g3d->GetDriver2D()->Write(courierFont, x, y, fg, -1, "Loading...");
+      }
+    }
+
     return;
+  }
 
-  csRef<iMeshFactoryWrapper> wrap;
-  if (rc.result == 0)
+  if (!loading->WasSuccessful())
+  {
+    loading.Invalidate();
+    return;
+  }
+
+  csRef<iMeshWrapper> spritewrapper;
+  csRef<iMeshFactoryWrapper> factwrap;
+
+  if (!loading->GetResultRefPtr().IsValid())
   {
     // Library file. Find the first factory in our region.
     iMeshFactoryList* factories = engine->GetMeshFactories ();
@@ -718,48 +699,64 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
       iMeshFactoryWrapper* f = factories->Get (i);
       if (collection->IsParentOf (f->QueryObject ()))
       {
-        wrap = f;
+        factwrap = f;
         break;
       }
     }
   }
   else
   {
-    wrap = scfQueryInterface<iMeshFactoryWrapper> (rc.result);
+    factwrap = scfQueryInterface<iMeshFactoryWrapper> (loading->GetResultRefPtr());
+    if(!factwrap)
+    {
+      spritewrapper = scfQueryInterface<iMeshWrapper> (loading->GetResultRefPtr());
+      if (spritewrapper)
+        factwrap = spritewrapper->GetFactory();
+    }
   }
 
-  if (!wrap) return;
+  if (!factwrap)
+    return;
 
-  if (wrap) 
+  csRef<iMeshObjectFactory> fact = factwrap->GetMeshObjectFactory();
+  if (fact)
   {
-    csRef<iMeshObjectFactory> fact = wrap->GetMeshObjectFactory();
-    if (fact)
-    {
-      csVector3 v(0, 0, 0);
-      csRef<iMeshWrapper> spritewrapper = engine->CreateMeshWrapper(wrap, "MySprite", room, v);
+    csVector3 v(0, 0, 0);
 
-      if (AnimeshAsset::Support(spritewrapper))
-      {
-        asset.AttachNew(new AnimeshAsset(GetObjectRegistry(), spritewrapper));
-      }
+    if(!spritewrapper)
+      spritewrapper = engine->CreateMeshWrapper(factwrap, "MySprite", room, v);
+    else
+    {
+      spritewrapper->GetMovable()->SetSector(room);
+      spritewrapper->GetMovable()->SetPosition(v);
+      spritewrapper->GetMovable()->UpdateMove();
+    }
+
+    if (AnimeshAsset::Support(spritewrapper))
+    {
+      asset.AttachNew(new AnimeshAsset(GetObjectRegistry(), spritewrapper));
+    }
 #ifdef CS_HAVE_CAL3D
-      else if (Cal3DAsset::Support(spritewrapper))
-      {
-        asset.AttachNew(new Cal3DAsset(GetObjectRegistry(), spritewrapper));
-      }
+    else if (Cal3DAsset::Support(spritewrapper))
+    {
+      asset.AttachNew(new Cal3DAsset(GetObjectRegistry(), spritewrapper));
+    }
 #endif
-      else if (Sprite3DAsset::Support(spritewrapper))
-      {
-        asset.AttachNew(new Sprite3DAsset(GetObjectRegistry(), spritewrapper));
-      }
-      else if (GenmeshAsset::Support(spritewrapper))
-      {
-        asset.AttachNew(new GenmeshAsset(GetObjectRegistry(), spritewrapper));
-      }
-      else
-      {
-        return;
-      }
+    else if (Sprite3DAsset::Support(spritewrapper))
+    {
+      asset.AttachNew(new Sprite3DAsset(GetObjectRegistry(), spritewrapper));
+    }
+    else if (GenmeshAsset::Support(spritewrapper))
+    {
+      asset.AttachNew(new GenmeshAsset(GetObjectRegistry(), spritewrapper));
+    }
+    else if (ParticlesAsset::Support(spritewrapper))
+    {
+      asset.AttachNew(new ParticlesAsset(GetObjectRegistry(), spritewrapper));
+    }
+    else
+    {
+      return;
     }
   }
 
@@ -772,10 +769,11 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
     csVector3 sprpos = box.GetCenter();
     csVector3 campos = view->GetCamera ()->GetTransform ().GetOrigin();
     view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (campos.x, sprpos.y, campos.z));
-//    camMode = rotateorigin;
   }
 
   generalTab->SetAsset(asset);
+
+  materialTab.AttachNew(new MaterialTab(GetObjectRegistry(), 0));
   materialTab->SetAsset(asset);
 
   if (asset->SupportsSockets())
@@ -800,6 +798,14 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
   }
   else
     materialTab->Update(false);
+
+  if (asset->SupportsParticles())
+  {
+    RegisterTab<ParticlesTab>();
+  }
+
+  ResetCamera();
+  loading.Invalidate();
 }
 
 void ViewMesh::SaveSprite (const char* filename, bool binary)
@@ -964,6 +970,10 @@ void ViewMesh::MoveLights (const csVector3 &a, const csVector3 &b,
   ll->Get (0)->GetMovable()->SetPosition (a);
   ll->Get (1)->GetMovable()->SetPosition (b);
   ll->Get (2)->GetMovable()->SetPosition (c);
+
+  ll->Get (0)->GetMovable()->UpdateMove();
+  ll->Get (1)->GetMovable()->UpdateMove();
+  ll->Get (2)->GetMovable()->UpdateMove();
 }
 
 //---------------------------------------------------------------------------
@@ -1075,6 +1085,8 @@ bool ViewMesh::StdDlgFileSelect (const CEGUI::EventArgs& e)
 
   CEGUI::Listbox* list = (CEGUI::Listbox*) winMgr->getWindow("StdDlg/FileSelect");
   CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if (!item) return CS_EVENT_HANDLED;
+
   CEGUI::String text = item->getText();
   if (text.empty()) return CS_EVENT_HANDLED;
 
@@ -1089,6 +1101,8 @@ bool ViewMesh::StdDlgDirSelect (const CEGUI::EventArgs& e)
 
   CEGUI::Listbox* list = (CEGUI::Listbox*) winMgr->getWindow("StdDlg/DirSelect");
   CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if (!item) return CS_EVENT_HANDLED;
+
   CEGUI::String text = item->getText();
   if (text.empty()) return CS_EVENT_HANDLED;
 

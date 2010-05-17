@@ -177,10 +177,18 @@ struct iTextureList : public virtual iBase
 {
   SCF_INTERFACE (iTextureList, 2, 0, 0);
 
-  /// Create a new texture.
+  /**
+   * Create a new texture.
+   * Remember that the texture needs to be <em>registered</em> before it can
+   * be used.
+   */
   virtual iTextureWrapper *NewTexture (iImage *image) = 0;
 
-  // Create a new texture but don't add it to the engine list.
+  /**
+   * Create a new texture but don't add it to the engine list.
+   * Remember that the texture needs to be <em>registered</em> before it can
+   * be used.
+   */
   virtual csPtr<iTextureWrapper> CreateTexture (iImage *image) = 0;
 
   /**

@@ -263,7 +263,7 @@ namespace CS
     {
       if (n >= maxPlanes) return false;
       
-      glEnable (GL_CLIP_PLANE0 + n);
+      glEnable (GL_CLIP_PLANE0 + (GLenum)n);
       currentPlanes |= 1 << n;
       return true;
     }
@@ -285,7 +285,7 @@ namespace CS
     {
       for (size_t i = 0; i < maxPlanes; i++)
       {
-        if (currentPlanes & (1 << i)) glDisable (GL_CLIP_PLANE0 + i);
+        if (currentPlanes & (1 << i)) glDisable (GL_CLIP_PLANE0 + (GLenum)i);
       }
       currentPlanes = 0;
     }

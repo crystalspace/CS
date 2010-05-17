@@ -19,6 +19,8 @@
 #ifndef __FOREIGNNODES_H__
 #define __FOREIGNNODES_H__
 
+#include "csutil/documenthelper.h"
+
 #include "xmlshader.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
@@ -33,6 +35,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     csRef<iDocument> doc;
     csRef<iDocumentNode> baseNode;
     int32 currentID;
+    csHash<int32, csString> knownNodes;
   public:
     ForeignNodeStorage (csXMLShaderCompiler* plugin)
     {
@@ -72,7 +75,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (file, docBuf))
 	return false;
       
-      uint32 ofsLE = curFilePos - headPos;
+      uint32 ofsLE = (uint32)(curFilePos - headPos);
       curFilePos = file->GetPos();
       bool ret = false;
       file->SetPos (headPos);
@@ -86,20 +89,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     
     int32 StoreNodeShallow (iDocumentNode* node)
     {
-      csRef<iDocumentNode> storeNode = baseNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      storeNode->SetValueAsInt (currentID);
-      csRef<iDocumentNode> realStoreNode = storeNode->CreateNodeBefore (node->GetType());
-      realStoreNode->SetValue (node->GetValue());
-      CS::DocSystem::CloneAttributes (node, realStoreNode);
-      return currentID++;
+      csString nodeHash (CS::DocSystem::FlattenNodeShallow (node));
+      int32 nodeID = knownNodes.Get (nodeHash, -1);
+      if (nodeID == -1)
+      {
+        csRef<iDocumentNode> storeNode = baseNode->CreateNodeBefore (CS_NODE_ELEMENT);
+        storeNode->SetValueAsInt (currentID);
+        csRef<iDocumentNode> realStoreNode = storeNode->CreateNodeBefore (node->GetType());
+        realStoreNode->SetValue (node->GetValue());
+        CS::DocSystem::CloneAttributes (node, realStoreNode);
+        nodeID = currentID++;
+        knownNodes.Put (nodeHash, nodeID);
+      }
+      return nodeID;
     }
     int32 StoreNodeDeep (iDocumentNode* node)
     {
-      csRef<iDocumentNode> storeNode = baseNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      storeNode->SetValueAsInt (currentID);
-      csRef<iDocumentNode> realStoreNode = storeNode->CreateNodeBefore (node->GetType());
-      CS::DocSystem::CloneNode (node, realStoreNode);
-      return currentID++;
+      csString nodeHash (CS::DocSystem::FlattenNode (node));
+      int32 nodeID = knownNodes.Get (nodeHash, -1);
+      if (nodeID == -1)
+      {
+        csRef<iDocumentNode> storeNode = baseNode->CreateNodeBefore (CS_NODE_ELEMENT);
+        storeNode->SetValueAsInt (currentID);
+        csRef<iDocumentNode> realStoreNode = storeNode->CreateNodeBefore (node->GetType());
+        CS::DocSystem::CloneNode (node, realStoreNode);
+        nodeID = currentID++;
+        knownNodes.Put (nodeHash, nodeID);
+      }
+      return nodeID;
     }
   };
   
@@ -178,6 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     
     csRef<iDocumentNode> GetNode (int32 ID)
     {
+      if (size_t (ID) >= nodes.GetSize()) return 0;
       return nodes[ID];
     }
   };

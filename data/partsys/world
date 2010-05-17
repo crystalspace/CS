@@ -166,221 +166,21 @@
         <plugin name="hazeFact">crystalspace.mesh.loader.factory.haze</plugin>
         <plugin name="haze">crystalspace.mesh.loader.haze</plugin>
     </plugins>
-    <meshfact name="fireFact">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <params>
-            <particlesize x="0.4" y="0.6" />
-            <sortmode>none</sortmode>
-            <minbb>
-                <min x="-1" y="0" z="-1" />
-                <max x="1" y="5" z="1" />
-            </minbb>
-            <emitter type="box">
-                <emissionrate>250</emissionrate>
-                <mass min="5" max="7.5" />
-                <box>
-                    <min x="-1" y="0" z="-1" />
-                    <max x="1" y="0" z="1" />
-                </box>
-                <uniformvelocity />
-                <initialvelocity x="0" y="1" z="0" />
-                <initialttl min="1" max="1" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="lincolor">
-                <color red="0.00" green="0.00" blue="0.00" time="1" />
-                <color red="1.00" green="0.35" blue="0.00" time="0.96" />
-                <color red="1.00" green="0.22" blue="0.00" time="0.9" />
-                <color red="1.00" green="0.12" blue="0.00" time="0.8" />
-                <color red="0.80" green="0.02" blue="0.00" time="0.7" />
-                <color red="0.60" green="0.00" blue="0.00" time="0.75" />
-                <color red="0.40" green="0.00" blue="0.00" time="0.5625" />
-                <color red="0.20" green="0.05" blue="0.05" time="0.375" />
-                <color red="0.10" green="0.10" blue="0.10" time="0.1875" />
-                <color red="0.00" green="0.00" blue="0.00" time="0" />
-            </effector>
-            <effector type="force">
-                <randomacceleration x="2" y="2" z="2" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="fireFACT">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <params>
-            <particlesize x="0.3" y="0.3" />
-            <sortmode>none</sortmode>
-            <emitter type="sphere">
-                <emissionrate>300</emissionrate>
-                <mass min="1" max="1" />
-                <radius>0.3</radius>
-                <uniformvelocity />
-                <initialvelocity x="0" y="4" z="0" />
-                <initialttl min="1" max="1.5" />
-            </emitter>
-            <effector type="force">
-                <acceleration x="0" y="-1" z="0" />
-            </effector>
-            <effector type="lincolor">
-                <color red="1.00" green="0.35" blue="0.00" alpha="0" time="1.5" />
-                <color red="1.00" green="0.22" blue="0.00" alpha=".1" time="1.3125" />
-                <color red="1.00" green="0.12" blue="0.00" alpha=".3" time="1.125" />
-                <color red="0.80" green="0.02" blue="0.00" alpha=".8" time="0.9375" />
-                <color red="0.60" green="0.00" blue="0.00" alpha=".9" time="0.75" />
-                <color red="0.40" green="0.00" blue="0.00" alpha=".97" time="0.5625" />
-                <color red="0.20" green="0.00" blue="0.00" alpha="1" time="0.375" />
-                <color red="0.00" green="0.00" blue="0.00" alpha="1" time="0.1875" />
-                <color red="0.00" green="0.00" blue="0.00" alpha="1" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="flameFact">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <params>
-            <particlesize x="0.04" y="0.08" />
-            <sortmode>none</sortmode>
-            <emitter type="sphere">
-                <radius>.1</radius>
-                <emissionrate>250</emissionrate>
-                <mass min="5" max="7.5" />
-                <uniformvelocity />
-                <initialvelocity x="0" y="1" z="0" />
-                <initialttl min="1" max="1" />
-                <placement>center</placement>
-            </emitter>
-            <effector type="lincolor">
-                <color red="0.00" green="0.00" blue="0.00" time="1" />
-                <color red="1.00" green="0.35" blue="0.00" time="0.96" />
-                <color red="1.00" green="0.22" blue="0.00" time="0.9" />
-                <color red="1.00" green="0.12" blue="0.00" time="0.8" />
-                <color red="0.80" green="0.02" blue="0.00" time="0.7" />
-                <color red="0.60" green="0.00" blue="0.00" time="0.75" />
-                <color red="0.40" green="0.00" blue="0.00" time="0.5625" />
-                <color red="0.20" green="0.05" blue="0.05" time="0.375" />
-                <color red="0.10" green="0.10" blue="0.10" time="0.1875" />
-                <color red="0.00" green="0.00" blue="0.00" time="0" />
-            </effector>
-            <effector type="force">
-                <randomacceleration x="2.5" y="2.5" z="2.5" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="rainFact">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <params>
-            <particlesize x="0.02" y="0.37" />
-            <minbb>
-                <min x="-10" y="0" z="-5" />
-                <max x="5" y="6" z="10" />
-            </minbb>
-            <sortmode>none</sortmode>
-            <renderorientation>common</renderorientation>
-            <commondirection x="0" y="1" z="0" />
-            <emitter type="box">
-                <emissionrate>250</emissionrate>
-                <mass min="5" max="7.5" />
-                <box>
-                    <min x="-10" y="6" z="-5" />
-                    <max x="5" y="6" z="10" />
-                </box>
-                <uniformvelocity />
-                <initialvelocity x="0" y="-2.84" z="0" />
-                <initialttl min="2.5" max="2.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="lincolor">
-                <color red="0" green="0" blue="1" time="2.5" />
-                <color red="1" green="0" blue="0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="snowFact">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <params>
-            <particlesize x="0.17" y="0.17" />
-            <minbb>
-                <min x="-5" y="-0.3" z="-5" />
-                <max x="10" y="6" z="10" />
-            </minbb>
-            <sortmode>none</sortmode>
-            <emitter type="box">
-                <emissionrate>250</emissionrate>
-                <mass min="5" max="7.5" />
-                <box>
-                    <min x="-5" y="6" z="-5" />
-                    <max x="10" y="6" z="10" />
-                </box>
-                <uniformvelocity />
-                <initialvelocity x="0" y="-1.42" z="0" />
-                <initialttl min="5" max="5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="lincolor">
-                <color red="0" green="0" blue="1" time="5" />
-            </effector>
-            <effector type="force">
-                <randomacceleration x="2.5" y="0" z="2.5" />
-            </effector>
-        </params>
-    </meshfact>
+    <library>/data/particles/fire1.cslib</library>
+    <library>/data/particles/fire2.cslib</library>
+    <library>/data/particles/flame.cslib</library>
+    <library>/data/particles/rain.cslib</library>
+    <library>/data/particles/snow.cslib</library>
     <meshfact name="emitFact">
         <plugin>emitFact</plugin>
         <params />
     </meshfact>
-    <meshfact name="spiralFact">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <params>
-            <particlesize x="0.03" y="0.03" />
-            <emitter type="sphere">
-                <radius>0.05</radius>
-                <placement>volume</placement>
-                <mass min="7.5" max="10" />
-                <initialttl min="2" max="2.5" />
-                <emissionrate>200</emissionrate>
-                <uniformvelocity />
-                <initialvelocity x="2.8" y="1" z="2.8" />
-            </emitter>
-            <effector type="velocityfield">
-                <type>spiral</type>
-                <fparam>1.2</fparam>
-                <vparam x="0" y="0" z="0" />
-                <vparam x="0" y="1" z="0" />
-                <vparam x="24" y="0" z="24" />
-            </effector>
-            <effector type="lincolor">
-                <color red="0" green="0" blue="1" time="10" />
-                <color red="0" green="0.5" blue="1" time="5" />
-                <color red="1" green="1" blue="1" time="0" />
-            </effector>
-        </params>
-    </meshfact>
+    <library>/data/particles/spiral.cslib</library>
     <meshfact name="hazeFact">
         <plugin>hazeFact</plugin>
         <params />
     </meshfact>
-    <meshfact name="fountainFACT">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <params>
-            <particlesize x="0.1" y="0.1" />
-            <emitter type="cone">
-                <extent x="0" y="2" z="1" />
-                <coneangle>0.2</coneangle>
-                <placement>center</placement>
-                <mass min="7.5" max="10" />
-                <initialttl min="10" max="10.5" />
-                <emissionrate>70</emissionrate>
-                <!-- <uniformvelocity /> -->
-                <initialvelocity x="1.8" y="0" z="0" />
-            </emitter>
-            <effector type="force">
-                <acceleration x="0" y="-0.3" z="0" />
-            </effector>
-            <effector type="lincolor">
-                <color red="0" green="0" blue="1" time="10" />
-                <color red="0" green="0.5" blue="1" time="5" />
-                <color red="1" green="1" blue="1" time="0" />
-            </effector>
-        </params>
-    </meshfact>
+    <library>/data/particles/fountain.cslib</library>
     <meshfact name="factory_room_walls">
         <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
         <params>
@@ -901,16 +701,10 @@
             <plugin>crystalspace.mesh.loader.particles</plugin>
             <params>
                 <factory>fountainFACT</factory>
-                <material>dot</material>
-                <mixmode>
-                    <add />
-                </mixmode>
             </params>
             <move>
                 <v x="10" y="0" z="-15" />
             </move>
-            <priority>alpha</priority>
-            <ztest />
         </meshobj>
     </sector>
     <meshfact name="factory_room0,1_walls">

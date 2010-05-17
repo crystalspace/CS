@@ -435,7 +435,7 @@ static LONG WINAPI ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
 }
 
 // Work around lack of ULONG_PTR on older platform SDKs
-#if !defined(__int3264) || (_MSC_VER < 1300)
+#if !defined(__int3264) || (defined(_MSC_VER) && (_MSC_VER < 1300))
 #undef ULONG_PTR
 #define ULONG_PTR ULONG
 #endif

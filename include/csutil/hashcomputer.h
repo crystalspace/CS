@@ -76,8 +76,8 @@ public:
 /**
 * csHashComputer<> specialization for an integral type.
 */
-template<>
-class csHashComputer<void*> : public csHashComputerIntegral<void*> {};
+template<class T>
+class csHashComputer<T*> : public csHashComputerIntegral<T*> {};
 
 template<>
 class csHashComputer<int> : public csHashComputerIntegral<int> {}; 
@@ -216,5 +216,7 @@ namespace CS
 
   }
 }
+
+/** @} */
 
 #endif

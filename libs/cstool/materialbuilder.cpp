@@ -16,8 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csgeom/math3d.h"
+
 #include "cstool/materialbuilder.h"
+
+#include "csgeom/math3d.h"
+#include "csgfx/imagememory.h"
 #include "iutil/objreg.h"
 #include "iutil/strset.h"
 #include "ivideo/shader/shader.h"
@@ -26,7 +29,6 @@
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "csutil/cscolor.h"
-#include "cstool/proctex.h"
 
 namespace CS
 {
@@ -105,44 +107,6 @@ iMaterialWrapper* MaterialBuilder::CreateParallaxMaterial (iObjectRegistry* obje
 
 //------------------------ ColorMaterial ----------------------
 
-class ColorTexture : public csProcTexture
-{
- private:
-  csColor color;
-
-public:
-  ColorTexture (csColor color)
-    : csProcTexture (), color (color)
-  {
-    mat_w = mat_h = 1;
-    DisableAutoUpdate ();
-  }
-
-  virtual ~ColorTexture () { }
-
-  virtual bool PrepareAnim ()
-  {
-    if (anim_prepared) return true;
-    if (!csProcTexture::PrepareAnim ()) return false;
-
-    // Draw the texture
-    Animate (0);
-
-    return true;
-  }
-
-  virtual void Animate (csTicks current_time)
-  {
-    g3d->SetRenderTarget (GetTextureWrapper ()->GetTextureHandle ());
-    if (!g3d->BeginDraw(CSDRAW_2DGRAPHICS)) return;
-    g3d->GetDriver2D()->DrawPixel (0, 0, g3d->GetDriver2D()->FindRGB
-				   ((int) (color.red * 255.0),
-				    (int) (color.green * 255.0),
-				    (int) (color.blue * 255.0)));
-    g3d->FinishDraw ();
-  }
-};
-
 iMaterialWrapper* MaterialBuilder::CreateColorMaterial(iObjectRegistry* object_reg,
       const char* matname, csColor color)
 {
@@ -154,16 +118,19 @@ iMaterialWrapper* MaterialBuilder::CreateColorMaterial(iObjectRegistry* object_r
   if (material) return material;
 
   // Create texture & register material
-  ColorTexture texture (color);
+  csRef<csImageMemory> colorImg;
+  colorImg.AttachNew (new csImageMemory (1, 1));
+  static_cast<csRGBpixel*> (colorImg->GetImagePtr())->Set (
+    (int) (color.red * 255.0),
+    (int) (color.green * 255.0),
+    (int) (color.blue * 255.0),
+    255);
+  
+  csRef<iTextureWrapper> colorTexWrapper =
+    engine->GetTextureList()->CreateTexture (colorImg);
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  material = texture.Initialize (object_reg, engine,
-					g3d->GetTextureManager (), matname);
-  if (!material) return 0;
-
-  // Draw the texture
-  texture.PrepareAnim ();
-
-  return material;
+  colorTexWrapper->Register (g3d->GetTextureManager ());
+  return engine->CreateMaterial (matname, colorTexWrapper);
 }
 
 } // namespace Material

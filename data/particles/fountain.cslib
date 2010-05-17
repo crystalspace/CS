@@ -1,0 +1,50 @@
+<library>
+    <textures>
+        <texture name="dot">
+            <file>dot.png</file>
+        </texture>
+    </textures>
+    <shaders>
+        <shader>
+            <file>/shader/particles/basic.xml</file>
+        </shader>
+    </shaders>
+    <materials>
+        <material name="dot">
+            <texture>dot</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+    </materials>
+    <meshfact name="fountainFACT">
+        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+        <params>
+            <particlesize x="0.1" y="0.1" />
+            <emitter type="cone">
+                <extent x="0" y="2" z="1" />
+                <coneangle>0.2</coneangle>
+                <placement>center</placement>
+                <mass min="7.5" max="10" />
+                <initialttl min="10" max="10.5" />
+                <emissionrate>70</emissionrate>
+                <!-- <uniformvelocity /> -->
+                <initialvelocity x="1.8" y="0" z="0" />
+            </emitter>
+            <effector type="force">
+                <acceleration x="0" y="-0.3" z="0" />
+            </effector>
+            <effector type="lincolor">
+                <color red="0" green="0" blue="1" time="10" />
+                <color red="0" green="0.5" blue="1" time="5" />
+                <color red="1" green="1" blue="1" time="0" />
+            </effector>
+	    <material>dot</material>
+	    <mixmode>
+		<add />
+	    </mixmode>
+        </params>
+	<priority>alpha</priority>
+	<ztest />
+    </meshfact>
+</library>
+

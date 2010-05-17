@@ -97,7 +97,7 @@ struct iSceneNode : public virtual iBase
   /**
    * The children of this scene node.
    */
-  CS_DEPRECATED_METHOD_MSG("Use csPtr<iSceneNodeArray> GetChildren() const")
+  CS_DEPRECATED_METHOD_MSG("Use csPtr<iSceneNodeArray> GetChildrenArray() const")
   virtual const csRefArray<iSceneNode>& GetChildren () const = 0;
 
   /**

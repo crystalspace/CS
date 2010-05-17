@@ -1113,9 +1113,9 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
     }
     for (j = 0 ; j < outline_info.num_outline_edges ; j++)
     {
-      int vt1 = outline_info.outline_edges[j*2+0];
-      int vt2 = outline_info.outline_edges[j*2+1];
-      csPrintf ("  E%zu: %d-%d\n", j, vt1, vt2);
+      size_t vt1 = outline_info.outline_edges[j*2+0];
+      size_t vt2 = outline_info.outline_edges[j*2+1];
+      csPrintf ("  E%zu: %u-%u\n", j, vt1, vt2);
     }
 
     csRef<iString> str = tcovbuf->Dump ();
@@ -2658,8 +2658,8 @@ void csDynaVis::Dump (iGraphics3D* g3d)
 	    size_t* e = outline_info.outline_edges;
 	    for (j = 0 ; j < outline_info.num_outline_edges ; j++)
 	    {
-	      int vt1 = *e++;
-	      int vt2 = *e++;
+	      size_t vt1 = *e++;
+	      size_t vt2 = *e++;
 	      csVector3 camv1 = trans.Other2This (verts[vt1]);
 	      if (camv1.z <= 0.0) continue;
 	      csVector3 camv2 = trans.Other2This (verts[vt2]);
@@ -3156,16 +3156,16 @@ bool csDynaVis::DebugCommand (const char* cmd)
         excul->GetObjectStatus (visobj_wrap, vispix, totpix);
 
 	tot_objects++;
-	tot_poly += trimesh->GetTriangleCount ();
+	tot_poly += (int)trimesh->GetTriangleCount ();
 	if (vispix)
 	{
 	  tot_vis_exact++;
-	  tot_poly_exact += trimesh->GetTriangleCount ();
+	  tot_poly_exact += (int)trimesh->GetTriangleCount ();
 	}
 	if (visobj_wrap->history->reason >= VISIBLE)
 	{
 	  tot_vis_dynavis++;
-	  tot_poly_dynavis += trimesh->GetTriangleCount ();
+	  tot_poly_dynavis += (int)trimesh->GetTriangleCount ();
 	}
       }
 

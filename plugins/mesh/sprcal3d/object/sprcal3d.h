@@ -587,7 +587,7 @@ public:
       csVector3& intersect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
       csVector3& intersect, float* pr, int* = 0,
-      iMaterialWrapper** = 0, csArray<iMaterialWrapper*>* materials = 0);
+      iMaterialWrapper** = 0, iMaterialArray* materials = 0);
 
   virtual bool SetColor (const csColor& /*col*/)
   {
@@ -715,6 +715,7 @@ public:
   }
 
   bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat);
+  iMaterialWrapper* GetMaterial(const char *mesh_name);
 
   float GetAnimationTime()
   {

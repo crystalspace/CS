@@ -20,6 +20,7 @@
 #define __CS_IMESH_OBJECT_H__
 
 #include "csutil/scf.h"
+#include "iutil/array.h"
 
 /**\file
  * Mesh object and mesh object factory interfaces
@@ -81,6 +82,15 @@ class csVector3;
  */
 #define CS_FACTORY_STATICSHAPE 2
 /** @} */
+
+/**
+ * An array of materials.
+ */
+struct iMaterialArray : public iArrayChangeAll<iMaterialWrapper*>
+{
+  SCF_IARRAYCHANGEALL_INTERFACE (iMaterialArray);
+};
+
 
 /**
  * Set a callback which is called just before the object is drawn.
@@ -209,7 +219,8 @@ struct iMeshObject : public virtual iBase
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0, csArray<iMaterialWrapper*>* materials = 0) = 0;
+	iMaterialWrapper** material = 0,
+	iMaterialArray* materials = 0) = 0;
 
   /**
    * Set a reference to the mesh wrapper holding the mesh objects.

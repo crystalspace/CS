@@ -242,7 +242,7 @@ void csDecal::AddStaticPoly (const csPoly3D & p)
   const csVector2 & minTexCoord = decalTemplate->GetMinTexCoord ();
   csVector2 texCoordRange = decalTemplate->GetMaxTexCoord () - minTexCoord;
 
-  tri[0] = vertexCount;
+  tri[0] = (int)vertexCount;
   for (a = 0; a < vertCount; ++a)
   {
 #ifdef CS_DECAL_CLIP_DECAL
@@ -295,8 +295,8 @@ void csDecal::AddStaticPoly (const csPoly3D & p)
     // create the index buffer for each triangle in the poly
     if (a >= 2)
     {
-      tri[1] = vertIdx-1;
-      tri[2] = vertIdx;
+      tri[1] = (int)vertIdx-1;
+      tri[2] = (int)vertIdx;
       indexBuffer->CopyInto (&tri, 3, indexCount);
       indexCount += 3;
     }
@@ -342,8 +342,8 @@ void csDecal::EndMesh ()
   pRenderMesh->geometryInstance = (void *)bufferHolder;
   //variableContext.AttachNew(new csShaderVariableContext);
   //pRenderMesh->variablecontext = variableContext;
-  currMesh->AddExtraRenderMesh(pRenderMesh, 
-    decalTemplate->GetRenderPriority (), decalTemplate->GetZBufMode ());
+  currMesh->AddExtraRenderMesh(pRenderMesh, decalTemplate->GetZBufMode ());
+  pRenderMesh->renderPrio = decalTemplate->GetRenderPriority ();
 }
 
 bool csDecal::Age (csTicks ticks)

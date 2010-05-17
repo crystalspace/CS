@@ -408,7 +408,7 @@ namespace RenderManager
       static bool IsLargerEqual (const DimensionData& b1, 
                                  const DimensionData& b2)
       {
-	return (b1.dim.x >= b2.dim.x) || (b1.dim.y >= b2.dim.y);
+	return (b1.dim.x >= b2.dim.x) && (b1.dim.y >= b2.dim.y);
       }
     
       static bool IsEqual (const DimensionData& b1, 
@@ -420,7 +420,7 @@ namespace RenderManager
       static bool IsLargerEqual (const DimensionData& b1, 
                                  const Dimensions& b2)
       {
-	return (b1.dim.x >= b2.x) || (b1.dim.y >= b2.y);
+	return (b1.dim.x >= b2.x) && (b1.dim.y >= b2.y);
       }
     
       static bool IsEqual (const DimensionData& b1, 
@@ -429,6 +429,11 @@ namespace RenderManager
 	return (b1.dim.x == b2.x) && (b1.dim.y == b2.y);
       }
     
+      static bool IsLargerEqual (const Dimensions& b1, 
+                                 const DimensionData& b2)
+      {
+	return (b1.x >= b2.dim.x) && (b1.y >= b2.dim.y);
+      }
     };
     CS::Utility::GenericResourceCache<DimensionData,
       uint, DimensionCacheSorting, 

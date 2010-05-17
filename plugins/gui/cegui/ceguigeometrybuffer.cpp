@@ -54,8 +54,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   void GeometryBuffer::draw() const
   {
     // Set up clipping for this buffer
-    g2d->SetClipRect(d_clipRect.d_left, d_clipRect.d_top,
-                     d_clipRect.d_right, d_clipRect.d_bottom);
+    // TODO: need to round to the closer 'int'?
+    g2d->SetClipRect((int) d_clipRect.d_left, (int) d_clipRect.d_top,
+                     (int) d_clipRect.d_right, (int) d_clipRect.d_bottom);
 
     if (!d_sync)
       syncHardwareBuffer();
@@ -134,7 +135,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 
       simple.object2world = d_matrix.GetTransform();
 
-      simple.indexStart = indexBuf.GetSize();
+      simple.indexStart = (int)indexBuf.GetSize();
       simple.indexEnd = simple.indexStart;
 
       renderMeshes.Push(simple);
@@ -149,7 +150,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     {
       const CEGUI::Vertex& vs = vbuff[i];
       // convert from CEGUI::Vertex to something directly usable by CS.
-      indexBuf.Push(vertBuf.GetSize());
+      indexBuf.Push((int)vertBuf.GetSize());
       csVector3 v(vs.position.d_x + d_texelOffset.d_x, 
                   vs.position.d_y + d_texelOffset.d_y, 
                   vs.position.d_z);
@@ -194,13 +195,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   //----------------------------------------------------------------------------//
   uint GeometryBuffer::getVertexCount() const
   {
-    return vertBuf.GetSize();
+    return (int)vertBuf.GetSize();
   }
 
   //----------------------------------------------------------------------------//
   uint GeometryBuffer::getBatchCount() const
   {
-    return renderMeshes.GetSize();
+    return (int)renderMeshes.GetSize();
   }
 
   //----------------------------------------------------------------------------//

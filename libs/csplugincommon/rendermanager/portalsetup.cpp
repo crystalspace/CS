@@ -27,32 +27,23 @@ namespace CS
   {
 #define SPSBPD  StandardPortalSetup_Base::PersistentData
   
-    bool SPSBPD::PortalBufferConstraint::IsLargerEqual (
-      const PortalBuffers& b1, const PortalBuffers& b2)
-    {
-      size_t s1 = b1.coordBuf->GetElementCount ();
-      size_t s2 = b1.coordBuf->GetElementCount ();
-
-      if (s1 > s2) return true;
-      return false;
-    }
-
     bool SPSBPD::PortalBufferConstraint::IsEqual (
       const PortalBuffers& b1, const PortalBuffers& b2)
     {
       size_t s1 = b1.coordBuf->GetElementCount ();
-      size_t s2 = b1.coordBuf->GetElementCount ();
+      size_t s2 = b2.coordBuf->GetElementCount ();
 
       if (s1 == s2) return true;
       return false;
     }
 
     bool SPSBPD::PortalBufferConstraint::IsLargerEqual (
-      const PortalBuffers& b1, const KeyType& s2)
+      const PortalBuffers& b1, const PortalBuffers& b2)
     {
       size_t s1 = b1.coordBuf->GetElementCount ();
+      size_t s2 = b2.coordBuf->GetElementCount ();
 
-      if (s1 > s2) return true;
+      if (s1 >= s2) return true;
       return false;
     }
 
@@ -65,6 +56,24 @@ namespace CS
       return false;
     }
 
+    bool SPSBPD::PortalBufferConstraint::IsLargerEqual (
+      const PortalBuffers& b1, const KeyType& s2)
+    {
+      size_t s1 = b1.coordBuf->GetElementCount ();
+
+      if (s1 >= s2) return true;
+      return false;
+    }
+
+    bool SPSBPD::PortalBufferConstraint::IsLargerEqual (
+      const KeyType& s1, const PortalBuffers& b2)
+    {
+      size_t s2 = b2.coordBuf->GetElementCount ();
+
+      if (s1 >= s2) return true;
+      return false;
+    }
+    
     //-----------------------------------------------------------------------
 
     void SPSBPD::csBoxClipperCached::operator delete (void* p, void* q)
@@ -95,10 +104,7 @@ namespace CS
 	CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
       texCache (csimg2D, "rgb8", // @@@ FIXME: Use same format as main view ...
 	CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
-    "target",
-    TextureCache::tcacheExactSizeMatch /// @@@ Work around faulty texture cache behaviour.
-                                       /// @@@ Was: TextureCache::tcachePowerOfTwo
-    )
+	"target", TextureCache::tcachePowerOfTwo)
     {
       bufCache.agedPurgeInterval = 5000;
       boxClipperCache.agedPurgeInterval = 5000;

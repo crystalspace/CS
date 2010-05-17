@@ -174,7 +174,7 @@ private:
   csEngine* engine;
 
   /// Hash of active imposters.
-  csRefArray<iImposterMesh> imposters;
+  csHash<csRef<iImposterMesh>, csPtrKey<iMeshWrapper> > imposters;
 
   /// Imposter Threshold Range.
   float min_imposter_distance;
@@ -184,9 +184,6 @@ private:
   float imposter_camera_rotation_tolerance;
 
   csString imposter_shader;
-
-  // Whether to use pseudo-instanced impostering.
-  bool imposter_instancing;
 
   // Whether to render the 'real' mesh while waiting for the imposter to init.
   bool imposter_renderReal;
@@ -322,9 +319,14 @@ public:
   //---------- iImposterFactory Functions -----------------//
 
   /**
-   * Given a mesh, activate and update its imposter.
+   * Given a mesh, activate its imposter.
    */
-  virtual bool UpdateImposter (iMeshWrapper* mesh, iRenderView* rview);
+  virtual void AddImposter (iMeshWrapper* mesh, iRenderView* rview);
+
+ /**
+  * Whether we are currently rendering the imposter
+  */
+  virtual bool RenderingImposter(iMeshWrapper* mesh);
 
   /**
    * Given a mesh, deactivate and remove its imposter.
@@ -396,14 +398,6 @@ public:
   virtual void SetShader(const char* shader)
   {
     imposter_shader = shader;
-  }
-
- /**
-  * Sets what method of impostering (instanced or not) to use.
-  */
-  virtual void SetInstancing(bool instancing)
-  {
-    imposter_instancing = instancing;
   }
 
   /**

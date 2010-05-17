@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Applications Overview, , Walktest, Running The Demos
-@section Quick Overview
+@section Applications Overview
 @cindex Applications, Quick Overview
 @cindex Applications, Overview
 @cindex Quick Overview, Applications
@@ -87,12 +87,12 @@ todo
 @cindex @file{docconv}
 @cindex Applications, @file{docconv}
 @item docconv
-todo
+An utility to convert between document formats. @xref{Binary XML} for the conversion to and from binary XML.
 
 @cindex @file{eventtest}
 @cindex Applications, @file{eventtest}
 @item eventtest
-A Crystal Space event system testing application.
+An application for the testing of the event system with keyboard, mouse and joystick.
 
 @cindex @file{g2dtest}
 @cindex Applications, @file{g2dtest}
@@ -148,7 +148,7 @@ todo
 @cindex @file{lighter2}
 @cindex Applications, @file{lighter2}
 @item lighter2
-todo
+Tool to compute static lighting for a CrystalSpace world. @xref{Using lighter2}.
 
 @cindex @file{maya2spr}
 @cindex Applications, @file{maya2spr}
@@ -189,7 +189,7 @@ todo
 @cindex @file{phystut}
 @cindex Applications, @file{phystut}
 @item phystut
-An application to test and demonstrate the use of the physics plugin (@pxref{Collision Detection}).
+An application to test and demonstrate the use of the physics plugin. @xref{Collision Detection}.
 
 @cindex @file{pysimp}
 @cindex Applications, @file{pysimp}
@@ -199,7 +199,7 @@ An extremely simple example demonstrating use of the Python plug-in module.
 @cindex @file{shadertut}
 @cindex Applications, @file{shadertut}
 @item shadertut
-todo
+A tutorial on the usage of shaders.
 
 @cindex @file{shagnetron}
 @cindex Applications, @file{shagnetron}
@@ -219,12 +219,12 @@ todo
 @cindex @file{simple1}
 @cindex Applications, @file{simple1}
 @item simple1
-A tutorial application. @xref{Tutorial Simple}.
+A tutorial application. @xref{Tutorial Simple}. The code of this application is a good candidate if you want to test some piece of code.
 
 @cindex @file{simple2}
 @cindex Applications, @file{simple2}
 @item simple2
-A tutorial application. @xref{Tutorial Simple 2}.
+A tutorial application. @xref{Tutorial Simple 2}. The code of this application is a good candidate if you want to test some piece of code.
 
 @cindex @file{simplept}
 @cindex Applications, @file{simplept}
@@ -259,7 +259,7 @@ A test application on the threaded loader.
 @cindex @file{tri3dtest}
 @cindex Applications, @file{tri3dtest}
 @item tri3dtest
-todo
+A test application on the automatic triangulation of a mesh.
 
 @cindex @file{unittest}
 @cindex Applications, @file{unittest}
@@ -296,7 +296,7 @@ achieve a water animation.
 @cindex @file{waterdemo2}
 @cindex Applications, @file{waterdemo2}
 @item waterdemo2
-A demonstration application about the watermesh (@pxref{MeshObject Watermesh}).
+A demonstration application about the 'ocean' watermesh. @xref{MeshObject Watermesh}.
 
 @cindex @file{wxtest}
 @cindex Applications, @file{wxtest}

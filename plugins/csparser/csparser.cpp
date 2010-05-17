@@ -201,8 +201,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     imposter->SetShader(node->GetAttributeValue("shader"));
 
-    imposter->SetInstancing(node->GetAttributeValueAsBool("instance"));
-
     imposter->SetRenderReal(node->GetAttributeValueAsBool("render_real"));
 
     return true;

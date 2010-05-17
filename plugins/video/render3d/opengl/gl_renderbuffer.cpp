@@ -413,7 +413,7 @@ csGLVBOBufferManager::VBOBuffer* csGLVBOBufferManager::GetNewVBOBuffer (
     numSlots = VBO_SLOT_PER_BUFFER[slotSizeIdx];
     numSlotBitmap = (numSlots + 31) / 32;
     bigBuffer = false;
-    slotSize = (1 << slotSizePO2);
+    slotSize = (ptrdiff_t(1) << slotSizePO2);
   }
   else
   {

@@ -83,7 +83,11 @@ struct iPluginManager : public virtual iBase
    * initialize it.
    * If the #lpiInitialize flag is given then the plugin will be initialized 
    * (that is, the iComponent's Initialize() method is called) and QueryOptions()
-   * will be called.
+   * will be called. <b>This is risky.</b> In a multi-threaded situation two
+   * threads may request the same plugin (almost) simultaneously; if one thread
+   * does not request initialization, but another thread does (and assumes to
+   * get an initialized instance), the other thread may in fact receive an
+   * uninitialized instance (and likely break). Use this flag with caution!
    * If the #lpiReportErrors flag is given then loading failures are 
    * reported using the reporter.
    * If the #lpiLoadDependencies flag is given dependent plugins (as specified

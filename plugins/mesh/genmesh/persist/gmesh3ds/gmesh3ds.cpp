@@ -160,7 +160,7 @@ bool csGenmesh3DSFactoryLoader::LoadMeshObjectData (
       if (mt.material == mat)
       {
         found = true;
-        mt.tris.Push (tri_idx);
+        mt.tris.Push ((uint)tri_idx);
         break;
       }
     }
@@ -168,7 +168,7 @@ bool csGenmesh3DSFactoryLoader::LoadMeshObjectData (
     {
       size_t ii = materials_and_tris.Push (csMatAndTris ());
       materials_and_tris[ii].material = mat;
-      materials_and_tris[ii].tris.Push (tri_idx);
+      materials_and_tris[ii].tris.Push ((uint)tri_idx);
     }
     curFace++;
   }

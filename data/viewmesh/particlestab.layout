@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Particles" >
+    <Property Name="Text" Value="Particles" />
+    <Window Type="ice/StaticImage" Name="Particles/main" >
+      <Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+
+      <Window Type="ice/Listbox" Name="Particles/EmitterList" >
+        <Property Name="Text" Value="Set" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.4,0.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="Particles/AddEmitter" >
+        <Property Name="Text" Value="Add" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.42,0.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Particles/EditEmitter" >
+        <Property Name="Text" Value="Edit" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.35,0.0},{0.42,0.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Particles/DelEmitter" >
+        <Property Name="Text" Value="Delete" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.675,0.0},{0.42,0.0}}'/>
+      </Window>
+      
+      
+
+      <Window Type="ice/Listbox" Name="Particles/EffectorList" >
+        <Property Name="BackgroundEnabled" Value="False" />
+        <Property Name="FrameEnabled" Value="True" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.4,0.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.51,0.0}}'/>
+      </Window>
+      
+      <Window Type="ice/Button" Name="Particles/AddEffector" >
+        <Property Name="Text" Value="Add" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.025,0.0},{1.0,-30.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Particles/EditEffector" >
+        <Property Name="Text" Value="Edit" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.35,0.0},{1.0,-30.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Particles/DelEffector" >
+        <Property Name="Text" Value="Delete" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.675,0.0},{1.0,-30.0}}'/>
+      </Window>
+    </Window>
+
+    <Window Type="ice/StaticImage" Name="Particles/ChooseEmitter" >
+      <Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+
+      <Window Type="ice/Button" Name="Particles/AddSphere" >
+        <Property Name="Text" Value="Sphere" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.333,0.0},{0.1,0.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Particles/AddCone" >
+        <Property Name="Text" Value="Cone" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.333,0.0},{0.3,0.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Particles/AddBox" >
+        <Property Name="Text" Value="Box" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.333,0.0},{0.5,0.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Particles/AddCylinder" >
+        <Property Name="Text" Value="Cylinder" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.333,0.0},{0.7,0.0}}'/>
+      </Window>
+    </Window>
+
+    <Window Type="ice/StaticImage" Name="Particles/ChooseEffector" >
+      <Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+
+      <Window Type="ice/Button" Name="Particles/AddForce" >
+        <Property Name="Text" Value="Force" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.333,0.0},{0.1,0.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Particles/AddLinColor" >
+        <Property Name="Text" Value="LinColor" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.333,0.0},{0.3,0.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Particles/AddVelField" >
+        <Property Name="Text" Value="VelField" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.333,0.0},{0.5,0.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Particles/AddLinear" >
+        <Property Name="Text" Value="Linear" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.333,0.0},{0.7,0.0}}'/>
+      </Window>
+    </Window>
+
+    <Window Type="ice/StaticImage" Name="Particles/Edit" >
+      <Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+
+      <Window Type="ice/Listbox" Name="Particles/Edit/Properties" >
+        <Property Name="Text" Value="Set" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.4,0.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="Particles/Edit/AddProp" >
+        <Property Name="Text" Value="Add" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.42,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="Particles/Edit/EditProp" >
+        <Property Name="Text" Value="Edit" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.35,0.0},{0.42,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="Particles/Edit/DeleteProp" >
+        <Property Name="Text" Value="Delete" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.675,0.0},{0.42,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Combobox" Name="Particles/Edit/Bool" >
+        <Property Name="ReadOnly" Value="true" />
+        <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.5,0},{0.7,0},{0.7,0}}" />
+      </Window>
+
+      <Window Type="ice/Editbox" Name="Particles/Edit/X" >
+        <Property Name='UnifiedSize' Value='{{0.6,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.25,0.0},{0.5,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Editbox" Name="Particles/Edit/Y" >
+        <Property Name='UnifiedSize' Value='{{0.6,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.25,0.0},{0.6,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Editbox" Name="Particles/Edit/Z" >
+        <Property Name='UnifiedSize' Value='{{0.6,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.25,0.0},{0.7,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Editbox" Name="Particles/Edit/A" >
+        <Property Name='UnifiedSize' Value='{{0.6,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.25,0.0},{0.8,0.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="Particles/Edit/Done" >
+        <Property Name="Text" Value="Done" />
+        <Property Name='UnifiedSize' Value='{{0.3,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.675,0.0},{1.0,-30.0}}'/>
+      </Window>
+    </Window>
+  </Window>
+</GUILayout>
+

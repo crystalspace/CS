@@ -44,7 +44,7 @@ void StartMe::Frame ()
   int mouse_x = mouse->GetLastX ();
   int mouse_y = mouse->GetLastY ();
   iCamera* camera = view->GetCamera ();
-  csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
+  csVector2 p (mouse_x, g3d->GetDriver2D ()->GetHeight () - mouse_y);
 
   csVector3 light_v, star_v;
 
@@ -108,7 +108,8 @@ void StartMe::Frame ()
   }
 
   light_v = camera->InvPerspective (p, DEMO_MESH_Z-3);
-  pointer_light->SetCenter (light_v);
+  pointer_light->GetMovable()->SetPosition (light_v);
+  pointer_light->GetMovable()->UpdateMove();
 
   csVector3 start_v, end_v;
   start_v = camera->InvPerspective (p, DEMO_MESH_Z-4);
@@ -259,7 +260,7 @@ bool StartMe::OnMouseDown (iEvent& /*event*/)
 
 bool StartMe::LoadTextures ()
 {
-  if (!loader->LoadTexture ("spark", "/lib/std/spark.png"))
+  if (!loader->LoadTexture ("spark", "/lib/std/sparka.dds"))
     return ReportError ("Error loading '%s' texture!", "spark");
 
   vfs->ChDir ("/lib/startme");
@@ -427,7 +428,6 @@ void StartMe::CreateRoom ()
   spark_state->SetTriangleCount (2);
   spark_state->GetTriangles ()[0].Set (2, 1, 0);
   spark_state->GetTriangles ()[1].Set (3, 2, 0);
-  spark_state->SetLighting (false);
   spark_fact->GetMeshObjectFactory ()->SetMixMode (CS_FX_ADD);
   spark_state->SetColor (csColor (1, 1, 1));
   spark_fact->GetMeshObjectFactory ()->SetMaterialWrapper (spark_mat);

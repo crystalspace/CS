@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- rm_null.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.rendermanager.null</name>
+        <implementation>RMNull</implementation>
+        <description>Null Rendermanager (renders nothing)</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

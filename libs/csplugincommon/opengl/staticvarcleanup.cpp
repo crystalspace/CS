@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/memdebug.h"
 
-#ifdef CS_BUILD_SHARED_LIBS
+#ifdef CS_USE_SHARED_LIBS
 CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION;
 CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
 

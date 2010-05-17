@@ -1,0 +1,54 @@
+<library>
+    <textures>
+        <texture name="dot">
+            <file>dot.png</file>
+        </texture>
+    </textures>
+    <shaders>
+        <shader>
+            <file>/shader/particles/basic.xml</file>
+        </shader>
+    </shaders>
+    <materials>
+        <material name="particle">
+            <texture>dot</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+    </materials>
+    <meshfact name="fireFACT">
+        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+        <params>
+            <particlesize x="0.3" y="0.3" />
+            <sortmode>none</sortmode>
+            <emitter type="sphere">
+                <emissionrate>300</emissionrate>
+                <mass min="1" max="1" />
+                <radius>0.3</radius>
+                <uniformvelocity />
+                <initialvelocity x="0" y="4" z="0" />
+                <initialttl min="1" max="1.5" />
+            </emitter>
+            <effector type="force">
+                <acceleration x="0" y="-1" z="0" />
+            </effector>
+            <effector type="lincolor">
+                <color red="1.00" green="0.35" blue="0.00" alpha="0" time="1.5" />
+                <color red="1.00" green="0.22" blue="0.00" alpha=".1" time="1.3125" />
+                <color red="1.00" green="0.12" blue="0.00" alpha=".3" time="1.125" />
+                <color red="0.80" green="0.02" blue="0.00" alpha=".8" time="0.9375" />
+                <color red="0.60" green="0.00" blue="0.00" alpha=".9" time="0.75" />
+                <color red="0.40" green="0.00" blue="0.00" alpha=".97" time="0.5625" />
+                <color red="0.20" green="0.00" blue="0.00" alpha="1" time="0.375" />
+                <color red="0.00" green="0.00" blue="0.00" alpha="1" time="0.1875" />
+                <color red="0.00" green="0.00" blue="0.00" alpha="1" time="0" />
+            </effector>
+	    <material>particle</material>
+	    <mixmode>
+		<add />
+	    </mixmode>
+        </params>
+	<priority>alpha</priority>
+	<ztest />
+    </meshfact>
+</library>

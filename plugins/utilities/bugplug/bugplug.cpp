@@ -921,19 +921,29 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_FOV:
       if (catcher->camera)
 	{
-	  csString buf;
-        int fov = catcher->camera->GetFOV ();
-	  buf.Format ("%d", fov);
-	  EnterEditMode (cmd, "Enter new fov value:", buf);
+	  csRef<iPerspectiveCamera> pcamera =
+	    scfQueryInterface<iPerspectiveCamera> (catcher->camera);
+	  if (pcamera)
+	    {
+	      csString buf;
+	      float fov = pcamera->GetFOV ();
+	      buf.Format ("%f", fov);
+	      EnterEditMode (cmd, "Enter new fov value:", buf);
+	    }
 	}
 	break;
     case DEBUGCMD_FOVANGLE:
       if (catcher->camera)
 	{
-	  csString buf;
-        float fov = catcher->camera->GetFOVAngle ();
-	  buf.Format ("%g", fov);
-	  EnterEditMode (cmd, "Enter new fov angle:", buf);
+	  csRef<iPerspectiveCamera> pcamera =
+	    scfQueryInterface<iPerspectiveCamera> (catcher->camera);
+	  if (pcamera)
+	    {
+	      csString buf;
+	      float fov = pcamera->GetFOVAngle ();
+	      buf.Format ("%g", fov);
+	      EnterEditMode (cmd, "Enter new fov angle:", buf);
+	    }
 	}
 	break;
     case DEBUGCMD_DEBUGSECTOR:
@@ -1354,7 +1364,7 @@ void csBugPlug::ListLoadedPlugins ()
 {
   csRef<iPluginManager> plugmgr =  
     csQueryRegistry<iPluginManager> (object_reg);
-  csRef<iPluginIterator> plugiter (plugmgr->GetPlugins ());
+  csRef<iPluginIterator> plugiter (plugmgr->GetPluginInstances ());
 
   csSet<const char*> printedPlugins;
   Report (CS_REPORTER_SEVERITY_DEBUG, 
@@ -2075,7 +2085,6 @@ void csBugPlug::EnterEditMode (int cmd, const char* msg, const char* def)
 void csBugPlug::ExitEditMode ()
 {
   if (edit_string.Length () == 0) return;
-  int i;
   float f;
   switch (edit_command)
   {
@@ -2084,14 +2093,24 @@ void csBugPlug::ExitEditMode ()
       G2D->SetGamma (f);
       break;
     case DEBUGCMD_FOV:
-      csScanStr (edit_string, "%d", &i);
+      csScanStr (edit_string, "%f", &f);
       if (catcher->camera)
-        catcher->camera->SetFOV (i, G3D->GetWidth ());
+	{
+	  csRef<iPerspectiveCamera> pcamera =
+	    scfQueryInterface<iPerspectiveCamera> (catcher->camera);
+	  if (pcamera)
+	    pcamera->SetFOV (f, 1.0f);
+	}
       break;
     case DEBUGCMD_FOVANGLE:
       csScanStr (edit_string, "%f", &f);
       if (catcher->camera)
-        catcher->camera->SetFOVAngle (f, G3D->GetWidth ());
+	{
+	  csRef<iPerspectiveCamera> pcamera =
+	    scfQueryInterface<iPerspectiveCamera> (catcher->camera);
+	  if (pcamera)
+	    pcamera->SetFOVAngle (f, 1.0f);
+	}
       break;
     case DEBUGCMD_SELECTMESH:
       if (catcher->camera)
@@ -2524,11 +2543,10 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
       	indent, "", sn ? sn : "?");
     }
   }
-  const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()
-  	->GetChildren ();
-  for (size_t i=0; i<children.GetSize (); ++i)
+  csRef<iSceneNodeArray> children = mesh->QuerySceneNode ()->GetChildrenArray ();
+  for (size_t i=0; i<children->GetSize (); ++i)
   {
-    iMeshWrapper* m = children[i]->QueryMesh ();
+    iMeshWrapper* m = children->Get(i)->QueryMesh ();
     if (m)
       Dump (indent+4, m);
   }
@@ -2597,11 +2615,26 @@ void csBugPlug::Dump (iCamera* c)
   const char* sn = c->GetSector ()->QueryObject ()->GetName ();
   if (!sn) sn = "?";
   csPlane3* far_plane = c->GetFarPlane ();
-  Report (CS_REPORTER_SEVERITY_DEBUG,
-  	"Camera: %s (mirror=%d, fov=%d, fovangle=%g,",
-  	sn, (int)c->IsMirrored (), (int)c->GetFOV (), c->GetFOVAngle ());
-  Report (CS_REPORTER_SEVERITY_DEBUG, "    shiftx=%g shifty=%g camnr=%ld)",
-  	c->GetShiftX (), c->GetShiftY (), c->GetCameraNumber ());
+  csRef<iPerspectiveCamera> pcamera =
+    scfQueryInterface<iPerspectiveCamera> (catcher->camera);
+
+  if (pcamera)
+    {
+      Report (CS_REPORTER_SEVERITY_DEBUG,
+	      "Camera: %s (mirror=%d, fov=%g, fovangle=%g,",
+	      sn, (int)c->IsMirrored (), pcamera->GetFOV (), pcamera->GetFOVAngle ());
+      Report (CS_REPORTER_SEVERITY_DEBUG, "    shiftx=%g shifty=%g camnr=%ld)",
+	      pcamera->GetShiftX (), pcamera->GetShiftY (), c->GetCameraNumber ());
+    }
+
+  else
+    {
+      Report (CS_REPORTER_SEVERITY_DEBUG,
+	      "Camera: %s (mirror=%d, ", sn, (int)c->IsMirrored ());
+      Report (CS_REPORTER_SEVERITY_DEBUG, "    camnr=%ld)",
+	      c->GetCameraNumber ());
+    }
+
   if (far_plane)
     Report (CS_REPORTER_SEVERITY_DEBUG, "    far_plane=(%g,%g,%g,%g)",
     	far_plane->A (), far_plane->B (), far_plane->C (), far_plane->D ());
@@ -2812,7 +2845,6 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   csRef<iGeneralMeshState> gms (
   	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
-  gms->SetLighting (false);
   gms->SetManualColors (true);
   mw->GetMeshObject ()->SetColor (csColor (0, 0, 0));
   mw->GetMeshObject ()->SetMixMode (mixmode);
@@ -2874,7 +2906,6 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   csRef<iGeneralMeshState> gms (
   	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
-  gms->SetLighting (false);
   gms->SetManualColors (true);
   mw->GetMeshObject ()->SetColor (csColor (0, 0, 0));
   mw->GetMeshObject ()->SetMixMode (mixmode);
@@ -2941,7 +2972,6 @@ void csBugPlug::DebugSectorMesh (
   csRef<iGeneralMeshState> gms (
   	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
-  gms->SetLighting (false);
   gms->SetManualColors (true);
   mw->GetMeshObject ()->SetColor (csColor (0, 0, 0));
   mw->GetMeshObject ()->SetMixMode (mixmode);

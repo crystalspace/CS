@@ -56,7 +56,6 @@ struct iSndSysSoftwareFilter3DProperties
  */
 struct iSndSysSoftwareFilter3D : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSoftwareFilter3D,0,1,0);
 
   /**
@@ -92,7 +91,6 @@ struct iSndSysSoftwareFilter3D : public virtual iBase
 //   is delivered to the lower level.
 struct iSndSysSoftwareOutputFilter : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSoftwareOutputFilter,0,1,0);
 
   /// Return TRUE to acknowledge that the format is supported and the filter

@@ -16,10 +16,12 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "phystut.h"
+#include "cssysdef.h"
+#include "csgeom/sphere.h"
+#include "imesh/genmesh.h"
+#include "cstool/genmeshbuilder.h"
 #include "cstool/materialbuilder.h"
-
-CS_IMPLEMENT_APPLICATION
+#include "phystut.h"
 
 #define ODE_ID 1
 #define BULLET_ID 2
@@ -28,14 +30,27 @@ CS_IMPLEMENT_APPLICATION
 #define CAMERA_KINEMATIC 2
 #define CAMERA_FREE 3
 
-//-----------------------------------------------------------------------------
-
 Simple::Simple ()
-  : solver (0), autodisable (false), do_bullet_debug (false),
-    remainingStepDuration (0.0f), debugMode (false), allStatic (false),
-    pauseDynamic (false), dynamicSpeed (1.0f), cameraMode (CAMERA_DYNAMIC)    
+  : csDemoApplication ("CrystalSpace.PhysTut", "phystut",
+		       "phystut <OPTIONS>",
+		       "Physics tutorial for Crystal Space."),
+    isSoftBodyWorld (false), solver (0), autodisable (false),
+    do_bullet_debug (false), remainingStepDuration (0.0f), debugMode (false),
+    allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
+    physicalCameraMode (CAMERA_DYNAMIC), dragging (false)
 {
-  SetApplicationName ("CrystalSpace.PhysTut");
+  // Configure the options for csDemoApplication
+
+  // We manage the camera by ourselves
+  SetCameraMode (CSDEMO_CAMERA_NONE);
+
+  // Command line options
+  commandLineHelper.commandOptions.Push
+    (csDemoCommandLineHelper::CommandOption
+     ("phys_engine=<name>", "Specify which physics plugin to use (ode, bullet)"));
+  commandLineHelper.commandOptions.Push
+    (csDemoCommandLineHelper::CommandOption
+     ("disable_soft", "Disable the soft bodies"));
 }
 
 Simple::~Simple ()
@@ -51,7 +66,7 @@ void Simple::Frame ()
   const float speed = elapsed_time / 1000.0;
 
   // Camera is controlled by a rigid body
-  if (cameraMode == CAMERA_DYNAMIC)
+  if (physicalCameraMode == CAMERA_DYNAMIC)
   {
     if (kbd->GetKeyState (CSKEY_RIGHT))
       view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_RIGHT, speed);
@@ -118,6 +133,20 @@ void Simple::Frame ()
     csOrthoTransform ot (quaternion.GetConjugate ().GetMatrix (), c->GetTransform().GetOrigin ());
     c->SetTransform (ot);
   }
+ if (dragging)
+  {
+    // Keep the drag joint at the same distance to the camera
+    csRef<iCamera> camera = view->GetCamera ();
+    csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+    csVector3 v3d = camera->InvPerspective (v2d, 10000);
+    csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+    csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+    csVector3 newPosition = endBeam - startBeam;
+    newPosition.Normalize ();
+    newPosition = camera->GetTransform ().GetOrigin () + newPosition * dragDistance;
+    dragJoint->SetPosition (newPosition);
+  }
 
   // Step the dynamic simulation
   if (!pauseDynamic)
@@ -146,82 +175,80 @@ void Simple::Frame ()
   // (in this mode we want to control the orientation of the camera,
   // so we update the camera position by ourselves instead of using
   // 'cameraBody->AttachCamera (camera)')
-  if (cameraMode == CAMERA_DYNAMIC)
+  if (physicalCameraMode == CAMERA_DYNAMIC)
+    view->GetCamera ()->GetTransform ().SetOrigin
+      (cameraBody->GetTransform ().GetOrigin ());
+
+  // Update the demo's state information
+  stateDescriptions.DeleteAll ();
+  csString txt;
+
+  stateDescriptions.Push (csString ("Physics engine: ") + phys_engine_name);
+
+  txt.Format ("Rigid bodies count: %d", dynamicSystem->GetBodysCount ());
+  stateDescriptions.Push (txt);
+
+  if (isSoftBodyWorld)
   {
-    view->GetCamera()->GetTransform().SetOrigin
-      (cameraBody->GetTransform().GetOrigin());
+    txt.Format ("Soft bodies count: %d", (int) bulletDynamicSystem->GetSoftBodyCount ());
+    stateDescriptions.Push (txt);
   }
 
-  // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-    return;
-
-  // Tell the camera to render into the frame buffer.
-  view->Draw ();
-
-  // Display collisions 
-  if(!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  if (do_bullet_debug)
+  if (phys_engine_id == ODE_ID)
   {
-    bullet_dynSys->DebugDraw (view);
+    if (solver==0)
+      stateDescriptions.Push (csString ("Solver: WorldStep"));
+    else if (solver==1)
+      stateDescriptions.Push (csString ("Solver: StepFast"));
+    else if (solver==2)
+      stateDescriptions.Push (csString ("Solver: QuickStep"));
   }
 
-  // Write FPS and other info
-  int y = 390;
-  int lineSize = 15;
-  WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Physics engine: %s", 
-    phys_engine_name.GetData ());
-  y += lineSize;
+  if (autodisable)
+    stateDescriptions.Push (csString ("AutoDisable: ON"));
+  else
+    stateDescriptions.Push (csString ("AutoDisable: OFF"));
 
-  switch (cameraMode)
+  switch (physicalCameraMode)
     {
     case CAMERA_DYNAMIC:
-      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Camera mode: dynamic");
+      stateDescriptions.Push (csString ("Camera mode: dynamic"));
       break;
 
     case CAMERA_FREE:
-      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Camera mode: free");
+      stateDescriptions.Push (csString ("Camera mode: free"));
       break;
 
     case CAMERA_KINEMATIC:
-      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Camera mode: kinematic");
+      stateDescriptions.Push (csString ("Camera mode: kinematic"));
       break;
 
     default:
       break;
     }
-  y += lineSize;
 
-  if( speed != 0.0f)
-    WriteShadow ( 10, y, g2d->FindRGB (255, 150, 100),"FPS: %.2f",
-	1.0f/speed);
-  y += lineSize;
+  // Default behavior from csDemoApplication
+  csDemoApplication::Frame ();
 
-  WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"%d Objects",
-	       dynSys->GetBodysCount ());
-  y += lineSize;
+  // Display debug informations
+  if (do_bullet_debug)
+    bulletDynamicSystem->DebugDraw (view);
 
-  if (phys_engine_id == ODE_ID)
-  {
-    if (solver==0)
-      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Solver: WorldStep");
-    else if (solver==1)
-      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Solver: StepFast");
-    else if (solver==2)
-      WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
-    y += lineSize;
-  }
-
-  if (autodisable)
-    WriteShadow (10, y, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
-  y += lineSize;
-
-  // Write available keys
-  DisplayKeys ();
+  // Display the rope soft bodies
+  else if (isSoftBodyWorld)
+    for (size_t i = 0; i < bulletDynamicSystem->GetSoftBodyCount (); i++)
+    {
+      iBulletSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
+      if (!softBody->GetTriangleCount ())
+	softBody->DebugDraw (view);
+    }
 }
 
 bool Simple::OnKeyboard (iEvent &ev)
 {
+  // Default behavior from csDemoApplication
+  csDemoApplication::OnKeyboard (ev);
+
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
   {
@@ -230,13 +257,13 @@ bool Simple::OnKeyboard (iEvent &ev)
 	int primitiveCount = phys_engine_id == BULLET_ID ? 7 : 4;
 	switch (rand() % primitiveCount)
 	  {
-	  case 0: CreateBox (); break;
-	  case 1: CreateSphere (); break;
-	  case 2: CreateMesh (); break;
-	  case 3: CreateJointed (); break;
-	  case 4: CreateCylinder (); break;
-	  case 5: CreateCapsule (); break;
-	  case 6: CreateRagdoll (); break;
+	  case 0: SpawnBox (); break;
+	  case 1: SpawnSphere (); break;
+	  case 2: SpawnMesh (); break;
+	  case 3: SpawnJointed (); break;
+	  case 4: SpawnCylinder (); break;
+	  case 5: SpawnCapsule (); break;
+	  case 6: SpawnRagdoll (); break;
 	  default: break;
 	  }
 	return true;
@@ -244,77 +271,95 @@ bool Simple::OnKeyboard (iEvent &ev)
 
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'b')
     {
-      CreateBox ();
+      SpawnBox ();
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
     {
-      CreateSphere ();
+      SpawnSphere ();
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'c'
 	     && phys_engine_id == BULLET_ID)
     {
-      CreateCylinder ();
+      SpawnCylinder ();
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'a'
 	     && phys_engine_id == BULLET_ID)
     {
-      CreateCapsule ();
+      SpawnCapsule ();
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'm')
     {
-      CreateMesh ();
+      SpawnMesh ();
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'v')
     {
-      CreateConvexMesh ();
+      SpawnConvexMesh ();
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == '*')
     {
-      CreateStarCollider ();
+      SpawnStarCollider ();
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'j')
     {
-      CreateJointed ();
+      SpawnJointed ();
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'h'
 	     && phys_engine_id == BULLET_ID)
     {
-      CreateChain ();
+      SpawnChain ();
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'r'
 	     && phys_engine_id == BULLET_ID)
     {
-      CreateRagdoll ();
+      SpawnRagdoll ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'y'
+	     && phys_engine_id == BULLET_ID && isSoftBodyWorld)
+    {
+      SpawnRope ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'u'
+	     && phys_engine_id == BULLET_ID && isSoftBodyWorld)
+    {
+      SpawnCloth ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'i'
+	     && phys_engine_id == BULLET_ID && isSoftBodyWorld)
+    {
+      SpawnSoftBody ();
       return true;
     }
 
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'f')
     {
       // Toggle camera mode
-      switch (cameraMode)
+      switch (physicalCameraMode)
 	{
 	case CAMERA_DYNAMIC:
-	  cameraMode = CAMERA_FREE;
+	  physicalCameraMode = CAMERA_FREE;
 	  break;
 
 	case CAMERA_FREE:
 	  if (phys_engine_id == BULLET_ID)
-	    cameraMode = CAMERA_KINEMATIC;
+	    physicalCameraMode = CAMERA_KINEMATIC;
 	  else
-	    cameraMode = CAMERA_DYNAMIC;
+	    physicalCameraMode = CAMERA_DYNAMIC;
 	  break;
 
 	case CAMERA_KINEMATIC:
-	  cameraMode = CAMERA_DYNAMIC;
+	  physicalCameraMode = CAMERA_DYNAMIC;
 	  break;
 	}
 
@@ -332,9 +377,9 @@ bool Simple::OnKeyboard (iEvent &ev)
       else
 	printf ("Toggling all bodies to dynamic mode\n");
 
-      for (int i = 0; i < dynSys->GetBodysCount (); i++)
+      for (int i = 0; i < dynamicSystem->GetBodysCount (); i++)
       {
-	iRigidBody* body = dynSys->GetBody (i);
+	iRigidBody* body = dynamicSystem->GetBody (i);
 	if (allStatic)
 	  body->MakeStatic ();
 	else
@@ -401,17 +446,17 @@ bool Simple::OnKeyboard (iEvent &ev)
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
     {
       // Toggle gravity.
-      dynSys->SetGravity (dynSys->GetGravity () == 0 ?
-			  csVector3 (0,-7,0) : csVector3 (0));
+      dynamicSystem->SetGravity (dynamicSystem->GetGravity () == 0 ?
+				 csVector3 (0.0f, -9.81f, 0.0f) : csVector3 (0));
       return true;
     }
 
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'i')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'I')
     {
       // Toggle autodisable.
-      dynSys->EnableAutoDisable (!dynSys->AutoDisableEnabled ());
-      //dynSys->SetAutoDisableParams(1.5f,2.5f,6,0.0f);
-      autodisable = dynSys->AutoDisableEnabled ();
+      dynamicSystem->EnableAutoDisable (!dynamicSystem->AutoDisableEnabled ());
+      //dynamicSystem->SetAutoDisableParams(1.5f,2.5f,6,0.0f);
+      autodisable = dynamicSystem->AutoDisableEnabled ();
       return true;
     }
 
@@ -420,7 +465,7 @@ bool Simple::OnKeyboard (iEvent &ev)
     {
       // Toggle stepfast.
       csRef<iODEDynamicSystemState> osys = 
-	scfQueryInterface<iODEDynamicSystemState> (dynSys);
+	scfQueryInterface<iODEDynamicSystemState> (dynamicSystem);
       osys->EnableStepFast (0);
       solver=0;
       return true;
@@ -430,7 +475,7 @@ bool Simple::OnKeyboard (iEvent &ev)
     {
       // Toggle stepfast.
       csRef<iODEDynamicSystemState> osys = 
-	scfQueryInterface<iODEDynamicSystemState> (dynSys);
+	scfQueryInterface<iODEDynamicSystemState> (dynamicSystem);
       osys->EnableStepFast (1);
       solver=1;
       return true;
@@ -440,21 +485,68 @@ bool Simple::OnKeyboard (iEvent &ev)
     {
       // Toggle quickstep.
       csRef<iODEDynamicSystemState> osys = 
-	scfQueryInterface<iODEDynamicSystemState> (dynSys);
+	scfQueryInterface<iODEDynamicSystemState> (dynamicSystem);
       osys->EnableQuickStep (1);
       solver=2;
       return true;
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
+
+    // Cut operation
+    else if (csKeyEventHelper::GetRawCode (&ev) == 'x'
+	     && kbd->GetKeyState (CSKEY_CTRL)
+	     && phys_engine_id == BULLET_ID)
     {
-      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (GetObjectRegistry ()));
-      if (q) q->GetEventOutlet()->Broadcast (csevQuit (GetObjectRegistry ()));
-      return true;
+      // Trace a beam to find if a rigid body was under the mouse cursor
+      csRef<iCamera> camera = view->GetCamera ();
+      csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+      csVector3 v3d = camera->InvPerspective (v2d, 10000);
+      csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+      csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+      csBulletHitBeamResult result = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+
+      if (result.body)
+      {
+	// Remove the body and the mesh from the simulation, and put them in the clipboard
+	clipboardBody = result.body;
+	dynamicSystem->RemoveBody (clipboardBody);
+	clipboardMesh = result.body->GetAttachedMesh ();
+	room->GetMeshes ()->Remove (clipboardMesh);
+
+	// Update the display of the dynamics debugger
+	dynamicsDebugger->UpdateDisplay ();
+      }
+    }
+
+    // Paste operation
+    else if (csKeyEventHelper::GetRawCode (&ev) == 'v'
+	     && kbd->GetKeyState (CSKEY_CTRL)
+	     && phys_engine_id == BULLET_ID
+	     && clipboardBody.IsValid ())
+    {
+      // Compute the new position of the body
+      csRef<iCamera> camera = view->GetCamera ();
+      csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+      csVector3 v3d = camera->InvPerspective (v2d, 10000);
+      csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+      csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+      csVector3 newPosition = endBeam - startBeam;
+      newPosition.Normalize ();
+      clipboardBody->SetPosition (camera->GetTransform ().GetOrigin () + newPosition * 1.5f);
+
+      // Put back the body from the clipboard to the simulation
+      dynamicSystem->AddBody (clipboardBody);
+      room->GetMeshes ()->Add (clipboardMesh);
+      clipboardBody = 0;
+      clipboardMesh = 0;
+
+      // Update the display of the dynamics debugger
+      dynamicsDebugger->UpdateDisplay ();
     }
   }
 
   // Slow down the camera's body
-  else if (cameraMode == CAMERA_DYNAMIC
+  else if (physicalCameraMode == CAMERA_DYNAMIC
 	   && (eventtype == csKeyEventTypeUp)
 	   && ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) 
 	       || (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
@@ -468,24 +560,23 @@ bool Simple::OnKeyboard (iEvent &ev)
 
 bool Simple::OnMouseDown (iEvent& ev)
 {
+  // Left mouse button: Shoot!
   if (csMouseEventHelper::GetButton (&ev) == 0
       && phys_engine_id == BULLET_ID)
   {
-    // Shoot!
     // Find the rigid body that was clicked on
     int mouseX = csMouseEventHelper::GetX (&ev);
     int mouseY = csMouseEventHelper::GetY (&ev);
 
-    // Compute the beam points
+    // Compute the end beam points
     csRef<iCamera> camera = view->GetCamera ();
-    csVector2 v2d (mouseX, camera->GetShiftY () * 2 - mouseY);
+    csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
     csVector3 v3d = camera->InvPerspective (v2d, 10000);
     csVector3 startBeam = camera->GetTransform ().GetOrigin ();
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
     // Trace the physical beam
-    csRef<iBulletDynamicSystem> bulletSystem = scfQueryInterface<iBulletDynamicSystem> (dynSys);
-    csBulletHitBeamResult result = bulletSystem->HitBeam (startBeam, endBeam);
+    csBulletHitBeamResult result = bulletDynamicSystem->HitBeam (startBeam, endBeam);
 
     // Add a force at the point clicked
     if (result.body)
@@ -501,35 +592,81 @@ bool Simple::OnMouseDown (iEvent& ev)
       //result.body->AddForceAtRelPos (force, relativePosition);
     }
 
+    else if (result.softBody)
+    {
+      csVector3 force = endBeam - startBeam;
+      force.Normalize ();
+      force *= 2.0f;
+      result.softBody->AddForce (force, result.vertexIndex);
+    }
+
+    return true;
+  }
+
+  // Right mouse button: dragging
+  else if (csMouseEventHelper::GetButton (&ev) == 1
+	   && phys_engine_id == BULLET_ID)
+  {
+    // Find the rigid body that was clicked on
+    int mouseX = csMouseEventHelper::GetX (&ev);
+    int mouseY = csMouseEventHelper::GetY (&ev);
+
+    // Compute the end beam points
+    csRef<iCamera> camera = view->GetCamera ();
+    csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+    csVector3 v3d = camera->InvPerspective (v2d, 10000);
+    csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+    csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+    // Trace the physical beam
+    csBulletHitBeamResult result = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+    if (!result.body)
+      return false;
+
+    // Create a pivot joint at the point clicked
+    dragJoint = bulletDynamicSystem->CreatePivotJoint ();
+    dragJoint->Attach (result.body, result.isect);
+
+    dragging = true;
+    dragDistance = (result.isect - startBeam).Norm ();
+  }
+
+  return false;
+}
+
+bool Simple::OnMouseUp (iEvent& ev)
+{
+  if (dragging)
+  {
+    dragging = false;
+
+    // Remove the drag joint
+    bulletDynamicSystem->RemovePivotJoint (dragJoint);
+    dragJoint = 0;
+
     return true;
   }
 
   return false;
 }
 
-bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
+bool Simple::OnMouseMove (iEvent& ev)
 {
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (GetObjectRegistry ()))
-  {
-    csPrintf ("Usage: phystut [OPTIONS]\n");
-    csPrintf ("Physics tutorial for crystalspace\n\n");
-    csPrintf ("Options for phystut:\n");
-    csPrintf ("  -phys_engine:      specify which physics plugin to use (ode, bullet)\n");
-    csCommandLineHelper::Help (GetObjectRegistry ());
+  // Save the mouse position
+  mouseX = csMouseEventHelper::GetX (&ev);
+  mouseY = csMouseEventHelper::GetY (&ev);
+
+  return false;
+}
+
+bool Simple::OnInitialize (int argc, char* argv[])
+{
+  // Default behavior from csDemoApplication
+  if (!csDemoApplication::OnInitialize (argc, argv))
     return false;
-  }
 
   // Request plugins
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
-    CS_REQUEST_VFS,
-    CS_REQUEST_OPENGL3D,
-    CS_REQUEST_ENGINE,
-    CS_REQUEST_FONTSERVER,
-    CS_REQUEST_IMAGELOADER,
-    CS_REQUEST_LEVELLOADER,
-    CS_REQUEST_REPORTER,
-    CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug",
 		       iDynamicsDebuggerManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll",
@@ -546,6 +683,7 @@ bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
   phys_engine_name = clp->GetOption ("phys_engine");
   if (phys_engine_name == "ode")
   {
+    phys_engine_name = "ODE";
     phys_engine_id = ODE_ID;
     csRef<iPluginManager> plugmgr = 
       csQueryRegistry<iPluginManager> (GetObjectRegistry ());
@@ -553,46 +691,90 @@ bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
   }
   else 
   {
-    phys_engine_name = "bullet";
+    phys_engine_name = "Bullet";
     phys_engine_id = BULLET_ID;
     csRef<iPluginManager> plugmgr = 
       csQueryRegistry<iPluginManager> (GetObjectRegistry ());
     dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
+
+    // Check whether the soft bodies are enabled or not
+    isSoftBodyWorld = !clp->GetBoolOption ("disable_soft", false);
+
+    // Load the soft body animation control plugin & factory
+    if (isSoftBodyWorld)
+    {
+      csRef<iSoftBodyAnimationControlType> softBodyAnimationType =
+	csLoadPlugin<iSoftBodyAnimationControlType>
+	(plugmgr, "crystalspace.dynamics.softanim");
+
+      csRef<iGenMeshAnimationControlFactory> animationFactory =
+	softBodyAnimationType->CreateAnimationControlFactory ();
+      softBodyAnimationFactory =
+	scfQueryInterface<iSoftBodyAnimationControlFactory> (animationFactory);
+    }
   }
+
   if (!dyn)
     return ReportError ("No iDynamics plugin!");
+
+  // Now that we know the physical plugin in use, we can define the available keys
+  keyDescriptions.DeleteAll ();
+  keyDescriptions.Push ("b: spawn a box");
+  keyDescriptions.Push ("s: spawn a sphere");
+  if (phys_engine_id == BULLET_ID)
+  {
+    keyDescriptions.Push ("c: spawn a cylinder");
+    keyDescriptions.Push ("a: spawn a capsule");
+  }
+  keyDescriptions.Push ("v: spawn a convex mesh");
+  keyDescriptions.Push ("m: spawn a concave mesh");
+  keyDescriptions.Push ("*: spawn a static concave mesh");
+  keyDescriptions.Push ("j: spawn two jointed bodies");
+  if (phys_engine_id == BULLET_ID)
+  {
+    keyDescriptions.Push ("h: spawn a chain");
+    keyDescriptions.Push ("r: spawn a Frankie's ragdoll");
+  }
+  if (isSoftBodyWorld)
+  {
+    keyDescriptions.Push ("y: spawn a rope");
+    keyDescriptions.Push ("u: spawn a cloth");
+    keyDescriptions.Push ("i: spawn a soft body");
+  }
+  keyDescriptions.Push ("SPACE: spawn random object");
+  if (phys_engine_id == BULLET_ID)
+  {
+    keyDescriptions.Push ("left mouse: fire!");
+    keyDescriptions.Push ("right mouse: drag object");
+    keyDescriptions.Push ("CTRL-x: cut selected object");
+    keyDescriptions.Push ("CTRL-v: paste object");
+  }
+  keyDescriptions.Push ("f: toggle camera modes");
+  keyDescriptions.Push ("t: toggle all bodies dynamic/static");
+  keyDescriptions.Push ("p: pause the simulation");
+  keyDescriptions.Push ("o: toggle speed of simulation");
+  keyDescriptions.Push ("d: toggle display of colliders");
+  if (phys_engine_id == BULLET_ID)
+    keyDescriptions.Push ("?: toggle display of collisions");
+  keyDescriptions.Push ("g: toggle gravity");
+  keyDescriptions.Push ("I: toggle autodisable");
+  if (phys_engine_id == ODE_ID)
+  {
+    keyDescriptions.Push ("1: enable StepFast solver");
+    keyDescriptions.Push ("2: disable StepFast solver");
+    keyDescriptions.Push ("3: enable QuickStep solver");
+  }
 
   return true;
 }
 
-void Simple::OnExit ()
-{
-  printer.Invalidate ();
-}
-
 bool Simple::Application ()
 {
-  if (!OpenApplication (GetObjectRegistry ()))
-    return ReportError ("Error opening system!");
+  // Default behavior from csDemoApplication
+  if (!csDemoApplication::Application ())
+    return false;
 
-  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry ());
-  if (!g3d) return ReportError ("Failed to locate 3D renderer!");
-
-  engine = csQueryRegistry<iEngine> (GetObjectRegistry ());
-  if (!engine) return ReportError ("Failed to locate 3D engine!");
-
-  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry ());
-  if (!vc) return ReportError ("Failed to locate Virtual Clock!");
-
-  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry ());
-  if (!kbd) return ReportError ("Failed to locate Keyboard Driver!");
-
-  loader = csQueryRegistry<iLoader> (GetObjectRegistry ());
-  if (!loader) return ReportError ("Failed to locate Loader!");
-
-  g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
-  if (!g2d) return ReportError ("Failed to locate 2D renderer!");
-
+  // Find references to main objects
   debuggerManager =
     csQueryRegistry<iDynamicsDebuggerManager> (GetObjectRegistry ());
   if (!debuggerManager)
@@ -603,101 +785,71 @@ bool Simple::Application ()
   if (!ragdollManager)
     return ReportError ("Failed to locate ragdoll manager!");
 
-  csRef<iFontServer> fs = g3d->GetDriver2D()->GetFontServer ();
-  if (!fs) return ReportError ("Failed to locate font server!");
-  courierFont = fs->LoadFont (CSFONT_COURIER);
-
   // Create the dynamic system
-  dynSys = dyn->CreateSystem ();
-  if (!dynSys) return ReportError ("Error creating dynamic system!");
+  dynamicSystem = dyn->CreateSystem ();
+  if (!dynamicSystem) return ReportError ("Error creating dynamic system!");
+  dynamicSystem->SetRollingDampener(.995f);
 
-  dynSys->SetGravity (csVector3 (0,-7,0));
-  dynSys->SetRollingDampener(.995f);
-
-  // Create the dynamic's debugger
-  dynamicsDebugger = debuggerManager->CreateDebugger ();
-  dynamicsDebugger->SetDynamicSystem (dynSys);
-
+  // Configure the physical plugins
   if (phys_engine_id == ODE_ID)
   {
-    csRef<iODEDynamicSystemState> osys= 
-      scfQueryInterface<iODEDynamicSystemState> (dynSys);
+    csRef<iODEDynamicSystemState> osys = 
+      scfQueryInterface<iODEDynamicSystemState> (dynamicSystem);
     osys->SetContactMaxCorrectingVel (.1f);
     osys->SetContactSurfaceLayer (.0001f);
   }
   else
   {
-    bullet_dynSys = scfQueryInterface<iBulletDynamicSystem> (dynSys);
+    bulletDynamicSystem = scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
+
+    // We have some objects of size smaller than 0.035 units, so we scale up the
+    // whole world for a better behavior of the dynamic simulation.
+    bulletDynamicSystem->SetInternalScale (10.0f);
+
+    // Enable soft bodies
+    if (isSoftBodyWorld)
+      bulletDynamicSystem->SetSoftBodyWorld (true);
   }
 
-  // Creating the scene's room
-  room = engine->CreateSector ("room");
-  dynamicsDebugger->SetDebugSector (room);
+  // Create the dynamic's debugger
+  dynamicsDebugger = debuggerManager->CreateDebugger ();
+  dynamicsDebugger->SetDynamicSystem (dynamicSystem);
 
-  view = csPtr<iView> (new csView (engine, g3d));
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+  // Don't display static colliders as the z-fighting with the original mesh
+  // is very ugly
+  dynamicsDebugger->SetStaticBodyMaterial (0);
 
-  // First we make a primitive for our geometry.
-  using namespace CS::Geometry;
-  DensityTextureMapper mapper (0.3f);
-  TesselatedBox box (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
-  box.SetLevel (3);
-  box.SetMapper (&mapper);
-  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
-
-  // Now we make a factory and a mesh at once.
-  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "walls", "walls_factory", &box);
-
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+  // Default behavior from csDemoApplication for the creation of the scene
+  if (!csDemoApplication::CreateRoom ())
     return false;
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
-  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
-  // Creating the background (usefull when the camera is free and is moved 
-  // outside of the room)
-  CS::Geometry::DensityTextureMapper bgMapper (0.3f);
-  CS::Geometry::TesselatedBox bgBox (csVector3 (-4000), csVector3 (4000));
-  bgBox.SetMapper(&bgMapper);
-  bgBox.SetFlags(CS::Geometry::Primitives::CS_PRIMBOX_INSIDE);
-  
-  csRef<iMeshWrapper> background =
-    CS::Geometry::GeneralMeshBuilder::CreateFactoryAndMesh(engine, room,
-				   "background", "background_factory", &bgBox);
+  // Creating the scene's room
+  dynamicsDebugger->SetDebugSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3));
+  CreateWalls (csVector3 (5));
 
-  csRef<iMaterialWrapper> bgMaterial =
-    CS::Material::MaterialBuilder::CreateColorMaterial
-    (GetObjectRegistry (), "background", csColor (0.898f));
-  background->GetMeshObject()->SetMaterialWrapper(bgMaterial);
-
-  // Creating lights
+  // Set our own lights
   csRef<iLight> light;
-  iLightList* ll = room->GetLights ();
+  iLightList* lightList = room->GetLights ();
+  lightList->RemoveAll ();
 
-  // This light is for the background
   light = engine->CreateLight(0, csVector3(10), 9000, csColor (1));
-  ll->Add (light);
+  lightList->Add (light);
 
-  // Other lights
   light = engine->CreateLight (0, csVector3 (3, 0, 0), 8, csColor (1, 0, 0));
-  ll->Add (light);
+  lightList->Add (light);
 
   light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8, csColor (0, 0, 1));
-  ll->Add (light);
+  lightList->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 0, 3), 8, csColor (0, 1, 0));
-  ll->Add (light);
+  lightList->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, -3, 0), 8, csColor (1, 1, 0));
-  ll->Add (light);
+  lightList->Add (light);
 
   engine->Prepare ();
-
-  using namespace CS::Lighting;
-  SimpleStaticLighter::ShineLights (room, engine, 4);
+  CS::Lighting::SimpleStaticLighter::ShineLights (room, engine, 4);
 
   // Preload some meshes and materials
   iTextureWrapper* txt = loader->LoadTexture ("spark",
@@ -717,9 +869,6 @@ bool Simple::Application ()
   meshFact = loader->LoadMeshObjectFactory ("/varia/physmesh");
   if (!meshFact) return ReportError ("Error loading mesh object factory!");
 
-  // Create the physical walls
-  CreateWalls (csVector3 (5));
-
   // Init the camera
   UpdateCameraMode ();
 
@@ -727,8 +876,7 @@ bool Simple::Application ()
   if (phys_engine_id == BULLET_ID)
     LoadRagdoll ();
 
-  printer.AttachNew (new FramePrinter (GetObjectRegistry ()));
-
+  // Run the application
   Run();
 
   return true;
@@ -736,7 +884,7 @@ bool Simple::Application ()
 
 void Simple::UpdateCameraMode ()
 {
-  switch (cameraMode)
+  switch (physicalCameraMode)
     {
     // The camera is controlled by a rigid body
     case CAMERA_DYNAMIC:
@@ -755,7 +903,7 @@ void Simple::UpdateCameraMode ()
 	// Create a new rigid body
 	else
 	{
-	  cameraBody = dynSys->CreateBody ();
+	  cameraBody = dynamicSystem->CreateBody ();
 	  cameraBody->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
 	  cameraBody->SetTransform (view->GetCamera ()->GetTransform ());
 	  cameraBody->AttachColliderSphere
@@ -768,7 +916,7 @@ void Simple::UpdateCameraMode ()
     // The camera is free
     case CAMERA_FREE:
       {
-	dynSys->RemoveBody (cameraBody);
+	dynamicSystem->RemoveBody (cameraBody);
 	cameraBody = 0;
 
 	// Update rotX, rotY, rotZ
@@ -780,6 +928,9 @@ void Simple::UpdateCameraMode ()
 	rotY = eulerAngles.y;
 	rotZ = eulerAngles.z;
 
+	// Update the display of the dynamics debugger
+	dynamicsDebugger->UpdateDisplay ();
+
 	break;
       }
 
@@ -787,7 +938,7 @@ void Simple::UpdateCameraMode ()
     case CAMERA_KINEMATIC:
       {
 	// Create a body
-	cameraBody = dynSys->CreateBody ();
+	cameraBody = dynamicSystem->CreateBody ();
 	cameraBody->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
 	cameraBody->SetTransform (view->GetCamera ()->GetTransform ());
 	cameraBody->AttachColliderSphere
@@ -810,7 +961,7 @@ void Simple::UpdateCameraMode ()
     }
 }
 
-iRigidBody* Simple::CreateBox ()
+iRigidBody* Simple::SpawnBox ()
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -819,7 +970,7 @@ iRigidBody* Simple::CreateBox ()
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (boxFact, "box", room));
 
   // Create a body and attach the mesh.
-  csRef<iRigidBody> rb = dynSys->CreateBody ();
+  csRef<iRigidBody> rb = dynamicSystem->CreateBody ();
   rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
   rb->AttachMesh (mesh);
@@ -835,11 +986,15 @@ iRigidBody* Simple::CreateBox ()
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
 
+  // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
+
   return rb;
 }
 
-bool Simple::CreateStarCollider ()
+bool Simple::SpawnStarCollider ()
 {
+  // Find the 'star' mesh factory
   csRef<iMeshFactoryWrapper> starFact;
   starFact = engine->FindMeshFactory ("genstar");
   if (!starFact)
@@ -847,10 +1002,7 @@ bool Simple::CreateStarCollider ()
     loader->Load ("/lib/std/star.xml");
     starFact = engine->FindMeshFactory ("genstar");
     if (!starFact)
-    {
       return ReportError ("Error loading 'star.xml'!");
-      return false;
-    }
   }
 
   // Use the camera transform.
@@ -866,14 +1018,14 @@ bool Simple::CreateStarCollider ()
   bool staticCollider = true;
   if (staticCollider)
   {
-    csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
+    csRef<iDynamicsSystemCollider> collider = dynamicSystem->CreateCollider ();
     collider->CreateMeshGeometry (star);
     collider->SetTransform (tc);
   }
 
   else
   {
-    csRef<iRigidBody> rb = dynSys->CreateBody ();
+    csRef<iRigidBody> rb = dynamicSystem->CreateBody ();
     rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
     rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 2));
 
@@ -889,10 +1041,13 @@ bool Simple::CreateStarCollider ()
     rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
   }
 
+  // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
+
   return true;
 }
 
-iRigidBody* Simple::CreateMesh ()
+iRigidBody* Simple::SpawnMesh ()
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -901,7 +1056,7 @@ iRigidBody* Simple::CreateMesh ()
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (meshFact, "mesh", room));
 
   // Create a body and attach the mesh.
-  csRef<iRigidBody> rb = dynSys->CreateBody ();
+  csRef<iRigidBody> rb = dynamicSystem->CreateBody ();
   rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 2));
   rb->AttachMesh (mesh);
@@ -923,10 +1078,13 @@ iRigidBody* Simple::CreateMesh ()
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
 
+  // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
+
   return rb;
 }
 
-iRigidBody* Simple::CreateSphere ()
+iRigidBody* Simple::SpawnSphere ()
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -963,7 +1121,7 @@ iRigidBody* Simple::CreateSphere ()
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
   // Create a body and attach the mesh.
-  csRef<iRigidBody> rb = dynSys->CreateBody ();
+  csRef<iRigidBody> rb = dynamicSystem->CreateBody ();
   rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1)
 		   - artificialOffset);
@@ -976,10 +1134,13 @@ iRigidBody* Simple::CreateSphere ()
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
 
+  // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
+
   return rb;
 }
 
-iRigidBody* Simple::CreateCylinder ()
+iRigidBody* Simple::SpawnCylinder ()
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -1013,7 +1174,7 @@ iRigidBody* Simple::CreateCylinder ()
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
   // Create a body and attach the mesh.
-  csRef<iRigidBody> rb = dynSys->CreateBody ();
+  csRef<iRigidBody> rb = dynamicSystem->CreateBody ();
   rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->AttachMesh (mesh);
 
@@ -1024,24 +1185,24 @@ iRigidBody* Simple::CreateCylinder ()
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1)
 		   - artificialOffset);
   rb->SetOrientation (csXRotMatrix3 (PI / 5.0));
-  //csOrthoTransform bodyTransform (csMatrix3 (), tc.GetOrigin ()
-  //         + tc.GetT2O () * csVector3 (0, 0, 1) - artificialOffset);
-  //rb->SetTransform (bodyTransform);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
 
+  // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
+
   return rb;
 }
 
-iRigidBody* Simple::CreateCapsule ()
+iRigidBody* Simple::SpawnCapsule ()
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the capsule mesh factory.
-  csRef<iMeshFactoryWrapper> capsuleFact = engine->CreateMeshFactory(
+  csRef<iMeshFactoryWrapper> capsuleFact = engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", "capsuleFact");
   if (!capsuleFact)
   {
@@ -1049,8 +1210,8 @@ iRigidBody* Simple::CreateCapsule ()
     return 0;
   }
 
-  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<
-    iGeneralFactoryState> (capsuleFact->GetMeshObjectFactory ());
+  csRef<iGeneralFactoryState> gmstate =
+    scfQueryInterface<iGeneralFactoryState> (capsuleFact->GetMeshObjectFactory ());
   const float radius (rand() % 10 / 50. + .2);
   const float length (rand() % 3 / 50. + .7);
   gmstate->GenerateCapsule (length, radius, 10);
@@ -1064,7 +1225,7 @@ iRigidBody* Simple::CreateCapsule ()
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
   // Create a body and attach the mesh.
-  csRef<iRigidBody> rb = dynSys->CreateBody ();
+  csRef<iRigidBody> rb = dynamicSystem->CreateBody ();
   rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->AttachMesh (mesh);
 
@@ -1077,10 +1238,13 @@ iRigidBody* Simple::CreateCapsule ()
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
 
+  // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
+
   return rb;
 }
 
-iRigidBody* Simple::CreateConvexMesh ()
+iRigidBody* Simple::SpawnConvexMesh ()
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -1109,7 +1273,7 @@ iRigidBody* Simple::CreateConvexMesh ()
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
   // Create a body and attach the mesh.
-  csRef<iRigidBody> rb = dynSys->CreateBody ();
+  csRef<iRigidBody> rb = dynamicSystem->CreateBody ();
   rb->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
   rb->AttachMesh (mesh);
 
@@ -1122,21 +1286,24 @@ iRigidBody* Simple::CreateConvexMesh ()
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
 
+  // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
+
   return rb;
 }
 
-iJoint* Simple::CreateJointed ()
+iJoint* Simple::SpawnJointed ()
 {
   // Create and position objects.
-  iRigidBody* rb1 = CreateBox();
+  iRigidBody* rb1 = SpawnBox();
   rb1->SetPosition (rb1->GetPosition () +
     rb1->GetOrientation () * csVector3 (-.5, 0, 0));
-  iRigidBody* rb2 = CreateSphere();
+  iRigidBody* rb2 = SpawnSphere();
   rb2->SetPosition (rb2->GetPosition () +
     rb2->GetOrientation () * csVector3 (.5, 0, 0));
 
   // Create a joint and attach bodies.
-  csRef<iJoint> joint = dynSys->CreateJoint ();
+  csRef<iJoint> joint = dynamicSystem->CreateJoint ();
   joint->Attach (rb1, rb2);
 
   // Constrain translation.
@@ -1150,6 +1317,9 @@ iJoint* Simple::CreateJointed ()
   joint->SetRotConstraints (false, false, false, false);
 
   joint->RebuildJoint ();
+
+  // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
 
   return joint;
 }
@@ -1167,57 +1337,60 @@ void ConstraintJoint (iJoint* joint)
   joint->SetRotConstraints (false, false, false, false);
 }
 
-void Simple::CreateChain ()
+void Simple::SpawnChain ()
 {
-  iRigidBody* rb1 = CreateBox();
+  iRigidBody* rb1 = SpawnBox();
   csVector3 initPos = rb1->GetPosition () + csVector3 (0.0f, 5.0f, 0.0f);
   rb1->MakeStatic ();
   rb1->SetPosition (initPos);
 
   csVector3 offset (0.0f, 1.3f, 0.0f);
 
-  iRigidBody* rb2 = CreateCapsule();
+  iRigidBody* rb2 = SpawnCapsule();
   rb2->SetLinearVelocity (csVector3 (0.0f));
   rb2->SetAngularVelocity (csVector3 (0.0f));
   rb2->SetPosition (initPos - offset);
   rb2->SetOrientation (csXRotMatrix3 (PI / 2.0f));
 
-  iRigidBody* rb3 = CreateBox();
+  iRigidBody* rb3 = SpawnBox();
   rb3->SetLinearVelocity (csVector3 (0.0f));
   rb3->SetAngularVelocity (csVector3 (0.0f));
   rb3->SetPosition (initPos - 2.0f * offset);
 
-  iRigidBody* rb4 = CreateCapsule();
+  iRigidBody* rb4 = SpawnCapsule();
   rb4->SetLinearVelocity (csVector3 (0.0f));
   rb4->SetAngularVelocity (csVector3 (0.0f));
   rb4->SetPosition (initPos - 3.0f * offset);
   rb4->SetOrientation (csXRotMatrix3 (PI / 2.0f));
 
-  iRigidBody* rb5 = CreateBox();
+  iRigidBody* rb5 = SpawnBox();
   rb5->SetLinearVelocity (csVector3 (0.0f));
   rb5->SetAngularVelocity (csVector3 (0.0f));
   rb5->SetPosition (initPos - 4.0f * offset);
 
   // Create joints and attach bodies.
-  csRef<iJoint> joint = dynSys->CreateJoint ();
+  csRef<iJoint> joint = dynamicSystem->CreateJoint ();
   joint->Attach (rb1, rb2, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
 
-  joint = dynSys->CreateJoint ();
+  joint = dynamicSystem->CreateJoint ();
   joint->Attach (rb2, rb3, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
 
-  joint = dynSys->CreateJoint ();
+  joint = dynamicSystem->CreateJoint ();
   joint->Attach (rb3, rb4, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
 
-  joint = dynSys->CreateJoint ();
+  joint = dynamicSystem->CreateJoint ();
   joint->Attach (rb4, rb5, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
+
+  // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
 }
 
 void Simple::LoadRagdoll ()
@@ -1267,15 +1440,15 @@ void Simple::LoadRagdoll ()
   // Create ragdoll animation node factory
   csRef<iSkeletonRagdollNodeFactory2> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll",
-					   bodySkeleton, dynSys);
-  ragdollFactory->AddBodyChain (chain, RAGDOLL_STATE_DYNAMIC);
+					   bodySkeleton, dynamicSystem);
+  ragdollFactory->AddBodyChain (chain, CS_RAGDOLL_STATE_DYNAMIC);
 
   // Set the ragdoll anim node as the only node of the animation tree
   animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ()
     ->SetAnimationRoot (ragdollFactory);
 }
 
-void Simple::CreateRagdoll ()
+void Simple::SpawnRagdoll ()
 {
   // Load frankie's factory if not yet done
   csRef<iMeshFactoryWrapper> meshfact =
@@ -1317,17 +1490,157 @@ void Simple::CreateRagdoll ()
   // Fling the body.
   // (start the ragdoll node before so that the rigid bodies are created)
   ragdoll->Play ();
-  for (uint i = 0; i < ragdoll->GetBoneCount (RAGDOLL_STATE_DYNAMIC); i++)
+  for (uint i = 0; i < ragdoll->GetBoneCount (CS_RAGDOLL_STATE_DYNAMIC); i++)
   {
-    BoneID boneID = ragdoll->GetBone (RAGDOLL_STATE_DYNAMIC, i);
+    BoneID boneID = ragdoll->GetBone (CS_RAGDOLL_STATE_DYNAMIC, i);
     iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
     rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
     rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));
   }
+
+  // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
+}
+
+void Simple::SpawnRope ()
+{
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Spawn a box
+  iRigidBody* box = SpawnBox ();
+
+  // Spawn a first rope and attach it to the box
+  iBulletSoftBody* body = bulletDynamicSystem->CreateRope
+    (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0),
+     tc.GetOrigin () + tc.GetT2O () * csVector3 (-0.2f, 0, 1), 20);
+  body->SetMass (2.0f);
+  body->SetRigidity (0.95f);
+  body->AnchorVertex (0);
+  body->AnchorVertex (body->GetVertexCount () - 1, box);
+
+  // Spawn a second rope and attach it to the box
+  body = bulletDynamicSystem->CreateRope
+    (tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 0),
+     tc.GetOrigin () + tc.GetT2O () * csVector3 (0.2f, 0, 1), 20);
+  body->SetMass (1.0f);
+  body->SetRigidity (0.95f);
+  body->AnchorVertex (0);
+  body->AnchorVertex (body->GetVertexCount () - 1, box);
+}
+
+void Simple::SpawnCloth ()
+{
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create the cloth
+  iBulletSoftBody* body = bulletDynamicSystem->CreateCloth
+    (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 1),
+     tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 1),
+     tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 0, 1),
+     tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 0, 1),
+     10, 10, true);
+  body->SetMass (5.0f);
+
+  // Attach the two top corners
+  body->AnchorVertex (0);
+  body->AnchorVertex (9);
+
+  // Create the cloth mesh factory
+  csRef<iMeshFactoryWrapper> clothFact =
+    csBulletSoftBodyHelper::CreateClothGenMeshFactory
+    (GetObjectRegistry (), "clothFact", body);
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
+    (clothFact->GetMeshObjectFactory ());
+
+  // Create the mesh
+  gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+  			            clothFact, "cloth_body", room));
+  iMaterialWrapper* mat = CS::Material::MaterialBuilder::CreateColorMaterial
+    (GetObjectRegistry (), "cloth", csColor4 (1.0f, 0.0f, 0.0f, 1.0f));
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Init the animation control for the animation of the genmesh
+  csRef<iGeneralMeshState> meshState =
+    scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  csRef<iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  animationControl->SetSoftBody (body);
+}
+
+void Simple::SpawnSoftBody ()
+{
+  // Create the ball mesh factory.
+  csRef<iMeshFactoryWrapper> ballFact = engine->CreateMeshFactory(
+  	"crystalspace.mesh.object.genmesh", "ballFact");
+  if (!ballFact)
+  {
+    ReportError ("Error creating mesh object factory!");
+    return;
+  }
+
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<
+    iGeneralFactoryState> (ballFact->GetMeshObjectFactory ());
+  const float r (rand()%5/10. + .2);
+  csVector3 radius (r, r, r);
+  csEllipsoid ellips (csVector3 (0), radius);
+  gmstate->GenerateSphere (ellips, 16);
+
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create the soft body
+  iBulletSoftBody* body = bulletDynamicSystem->CreateSoftBody
+    (gmstate, csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, 1.0f)) * tc);
+  // This would have worked too
+  //iBulletSoftBody* body = bulletDynamicSystem->CreateSoftBody
+  //  (gmstate->GetVertices (), gmstate->GetVertexCount (),
+  //   gmstate->GetTriangles (), gmstate->GetTriangleCount ());
+  body->SetMass (2.0f);
+  body->SetRigidity (0.8f);
+
+  // Create the mesh
+  gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+  			            ballFact, "soft_body", room));
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Init the animation control for the animation of the genmesh
+  csRef<iGeneralMeshState> meshState =
+    scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  csRef<iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  animationControl->SetSoftBody (body);
+
+  // Fling the body.
+  body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+  // This would have worked too
+  //for (size_t i = 0; i < body->GetVertexCount (); i++)
+  //  body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5), i);
 }
 
 void Simple::CreateWalls (const csVector3& /*radius*/)
 {
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+    ReportWarning ("Could not load texture 'stone'");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+
   csOrthoTransform t;
 
 #if 0
@@ -1340,7 +1653,7 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
   //  * Decrease the time step. 1/300th of a second minimum
   //  * Slow down objects
   //  * Play with softness, cfm, etc.
-  dynSys->AttachColliderMesh (walls, t, 10, 1);
+  dynamicSystem->AttachColliderMesh (walls, t, 10, 1);
 #endif
 
 #if 0
@@ -1358,158 +1671,41 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
   // Just to make sure everything works we create half of the colliders
   // using dynsys->CreateCollider() and the other half using
   // dynsys->AttachColliderBox().
-  csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
+  csRef<iDynamicsSystemCollider> collider = dynamicSystem->CreateCollider ();
   collider->CreateBoxGeometry (size);
   collider->SetTransform (t);
 
   t.SetOrigin(csVector3(-10.0f, 0.0f, 0.0f));
-  collider = dynSys->CreateCollider ();
+  collider = dynamicSystem->CreateCollider ();
   collider->CreateBoxGeometry (size);
   collider->SetTransform (t);
 
   t.SetOrigin(csVector3(0.0f, 10.0f, 0.0f));
-  collider = dynSys->CreateCollider ();
+  collider = dynamicSystem->CreateCollider ();
   collider->CreateBoxGeometry (size);
   collider->SetTransform (t);
 
   // If we use the Bullet plugin, then use a plane collider for the floor
-  if (phys_engine_id == ODE_ID)
+  // Also, soft bodies don't work well with planes, so use a box in this case
+  if (phys_engine_id == ODE_ID || isSoftBodyWorld)
   {
     t.SetOrigin(csVector3(0.0f, -10.0f, 0.0f));
-    dynSys->AttachColliderBox (size, t, 10.0f, 0.0f);
+    dynamicSystem->AttachColliderBox (size, t, 10.0f, 0.0f);
   }
   else
-    dynSys->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), -5.0f), 10.0f, 0.0f);
+    dynamicSystem->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), -5.0f),
+					10.0f, 0.0f);
 
   t.SetOrigin(csVector3(0.0f, 0.0f, 10.0f));
-  dynSys->AttachColliderBox (size, t, 10.0f, 0.0f);
+  dynamicSystem->AttachColliderBox (size, t, 10.0f, 0.0f);
+
   t.SetOrigin(csVector3(0.0f, 0.0f, -10.0f));
-  dynSys->AttachColliderBox (size, t, 10.0f, 0.0f);
-
-  
-}
-
-void Simple::WriteShadow (int x,int y,int fg,const char *str,...)
-{
-  csString buf;
-
-  va_list arg;
-  va_start (arg, str);
-  buf.FormatV (str, arg);
-  va_end (arg);
-
-  Write (x+1, y-1, 0, -1, "%s", buf.GetData());
-  Write (x, y, fg, -1, "%s", buf.GetData());
-}
-
-void Simple::Write(int x,int y,int fg,int bg,const char *str,...)
-{
-  va_list arg;
-  csString buf;
-
-  va_start (arg,str);
-  buf.FormatV (str, arg);
-  va_end (arg);
-
-  g2d->Write (courierFont, x, y, fg, bg, buf);
-}
-
-void Simple::DisplayKeys ()
-{
-  int x = 20;
-  int y = 20;
-  int fg = g2d->FindRGB (255, 150, 100);
-  int lineSize = 15;
-
-  WriteShadow (x - 5, y, fg, "Keys available:");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "b: spawn a box");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "s: spawn a sphere");
-  y += lineSize;
-
-  if (phys_engine_id == BULLET_ID)
-  {
-    WriteShadow (x, y, fg, "c: spawn a cylinder");
-    y += lineSize;
-
-    WriteShadow (x, y, fg, "a: spawn a capsule");
-    y += lineSize;
-  }
-
-  WriteShadow (x, y, fg, "v: spawn a convex mesh");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "m: spawn a concave mesh");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "*: spawn a static concave mesh");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "j: spawn two jointed bodies");
-  y += lineSize;
-
-  if (phys_engine_id == BULLET_ID)
-  {
-    WriteShadow (x, y, fg, "h: spawn a chain");
-    y += lineSize;
-
-    WriteShadow (x, y, fg, "r: spawn a frankie's ragdoll");
-    y += lineSize;
-  }
-
-  WriteShadow (x, y, fg, "SPACE: spawn random object");
-  y += lineSize;
-
-  if (phys_engine_id == BULLET_ID)
-  {
-    WriteShadow (x, y, fg, "left mouse: fire!");
-    y += lineSize;
-  }
-
-  WriteShadow (x, y, fg, "f: toggle camera modes");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "t: toggle all bodies dynamic/static");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "p: pause the simulation");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "o: toggle speed of simulation");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "d: toggle display of colliders");
-  y += lineSize;
-
-  if (phys_engine_id == BULLET_ID)
-  {
-    WriteShadow (x, y, fg, "?: toggle display of collisions");
-    y += lineSize;
-  }
-
-  WriteShadow (x, y, fg, "g: toggle gravity");
-  y += lineSize;
-
-  WriteShadow (x, y, fg, "i: toggle autodisable");
-  y += lineSize;
-
-  if (phys_engine_id == ODE_ID)
-  {
-    WriteShadow (x, y, fg, "1: enable StepFast solver");
-    y += lineSize;
-
-    WriteShadow (x, y, fg, "2: disable StepFast solver");
-    y += lineSize;
-
-    WriteShadow (x, y, fg, "3: enable QuickStep solver");
-    y += lineSize;
-  }
+  dynamicSystem->AttachColliderBox (size, t, 10.0f, 0.0f);
 }
 
 //---------------------------------------------------------------------------
+
+CS_IMPLEMENT_APPLICATION
 
 int main (int argc, char* argv[])
 {

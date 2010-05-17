@@ -37,7 +37,6 @@ struct iSndSysData;
  */
 struct iSndSysLoader : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysLoader,0,3,0);
 
   /// Create a sound object from raw input data.

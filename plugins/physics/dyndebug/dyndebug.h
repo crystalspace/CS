@@ -25,7 +25,8 @@
 #include "iutil/comp.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
-#include "csutil/refarr.h"
+#include "csutil/array.h"
+#include "ivaria/bullet.h"
 #include "ivaria/dynamicsdebug.h"
 
 struct iDynamicSystem;
@@ -39,6 +40,7 @@ class csSphere;
 CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 {
   class DynamicsDebugger;
+  class BoneKinematicCallback;
 
   class DebuggerManager : public scfImplementation2<DebuggerManager,
     iDynamicsDebuggerManager, iComponent>
@@ -75,9 +77,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
     //-- iDynamicSystemDebugger
     virtual void SetDynamicSystem (iDynamicSystem* system);
     virtual void SetDebugSector (iSector* sector);
+
     virtual void SetDebugDisplayMode (bool debugMode);
+    virtual void UpdateDisplay ();
+
+    virtual void SetStaticBodyMaterial (iMaterialWrapper* material);
+    virtual void SetDynamicBodyMaterial (iMaterialWrapper* material);
+    virtual void SetBodyStateMaterial (csBulletState state,
+				       iMaterialWrapper* material);
 
   private:
+    csRef<iMeshWrapper> CreateColliderMesh (iDynamicsSystemCollider* collider,
+					    iMaterialWrapper* material);
+
     csRef<iMeshWrapper> CreateBoxMesh (csBox3 box,
 				       iMaterialWrapper* material,
 				       csOrthoTransform transform,
@@ -107,16 +119,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 
     struct MeshData
     {
-      csRef<iMeshWrapper> mesh;
-      //csOrthoTransform transform;
+      csRef<iRigidBody> rigidBody;
+      csRef<iMeshWrapper> originalMesh;
+      csRef<iMeshWrapper> debugMesh;
+      csRef<BoneKinematicCallback> callback;
     };
 
     DebuggerManager* manager;
     csRef<iDynamicSystem> system;
     csRef<iSector> sector;
-    csRef<iMaterialWrapper> material;
+    csRef<iMaterialWrapper> materials[3];
     bool debugMode;
-    csHash<MeshData, csPtrKey<iRigidBody> > storedMeshes;
+    csArray<MeshData> storedMeshes;
+  };
+
+
+  class BoneKinematicCallback : public scfImplementation1
+    <BoneKinematicCallback, iBulletKinematicCallback>
+  {
+  public:
+    BoneKinematicCallback (iMeshWrapper* mesh,
+			   iBulletKinematicCallback* callback);
+    ~BoneKinematicCallback ();
+
+    void GetBodyTransform (iRigidBody* body, csOrthoTransform& transform) const;
+
+  private:
+    csWeakRef<iMeshWrapper> mesh;
+    csRef<iBulletKinematicCallback> callback;
+
+    friend class DynamicsDebugger;
   };
 
 }

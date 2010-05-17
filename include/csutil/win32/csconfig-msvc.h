@@ -73,8 +73,6 @@
 
 #define CS_EMBED_PLUGIN_META
 
-//#define CS_BUILD_SHARED_LIBS
-
 #ifdef _WIN64
 #  define CS_PROCESSOR_SIZE 64
 #else
@@ -124,6 +122,11 @@
 // Check for support of native aligned allocation
 #if defined(CS_COMPILER_MSVC) && defined(_MSC_VER) && (_MSC_VER >= 1300)
   #define CS_HAVE__ALIGNED_MALLOC
+#endif
+
+// Check for support of nullptr
+#if defined(CS_COMPILER_MSVC) && defined(_MSC_VER) && (_MSC_VER >= 1600)
+  #define CS_HAS_NULLPTR
 #endif
 
 #endif // __CS_WIN32_CSCONFIG_H__

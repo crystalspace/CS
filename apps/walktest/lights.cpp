@@ -174,29 +174,29 @@ bool WalkTestLights::HandleDynLight (iLight* dyn)
   LightStruct* ls = (LightStruct*)(WalkDataObject::GetData(dyn->QueryObject ()));
   switch (ls->type)
   {
-    case DYN_TYPE_MISSILE:
+  case DYN_TYPE_MISSILE:
     {
       MissileStruct* ms = (MissileStruct*)(WalkDataObject::GetData(
-      	dyn->QueryObject ()));
+        dyn->QueryObject ()));
       csVector3 v (0, 0, 2.5);
-      csVector3 old = dyn->GetCenter ();
+      csVector3 old = dyn->GetMovable()->GetPosition ();
       v = old + ms->dir.GetT2O () * v;
-      iSector* s = dyn->GetSector ();
+      iSector* s = dyn->GetMovable()->GetSectors()->Get(0);
       bool mirror = false;
       csVector3 old_v = v;
       s = s->FollowSegment (ms->dir, v, mirror);
       if (ABS (v.x-old_v.x) > SMALL_EPSILON ||
-      	ABS (v.y-old_v.y) > SMALL_EPSILON ||
-	ABS (v.z-old_v.z) > SMALL_EPSILON)
+        ABS (v.y-old_v.y) > SMALL_EPSILON ||
+        ABS (v.z-old_v.z) > SMALL_EPSILON)
       {
         v = old;
         if (ms->sprite)
-      	{
-	  ms->sprite->GetMovable ()->ClearSectors ();
-	  Sys->Engine->GetMeshes ()->Remove (ms->sprite);
-	}
-	csRef<WalkDataObject> ido (
-		CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
+        {
+          ms->sprite->GetMovable ()->ClearSectors ();
+          Sys->Engine->GetMeshes ()->Remove (ms->sprite);
+        }
+        csRef<WalkDataObject> ido (
+          CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
         dyn->QueryObject ()->ObjRemove (ido);
         if (ms->snd)
         {
@@ -205,23 +205,23 @@ bool WalkTestLights::HandleDynLight (iLight* dyn)
         delete ms;
         if (Sys->mySound)
         {
-	  if (Sys->wMissile_boom)
-	  {
-	    csRef<iSndSysStream> st = Sys->mySound->CreateStream (
-		Sys->wMissile_boom->GetData (), CS_SND3D_ABSOLUTE);
-	    csRef<iSndSysSource> sndsource = Sys->mySound->
-	      	CreateSource (st);
-	    if (sndsource)
-	    {
-	      csRef<iSndSysSource3D> sndsource3d
-		= scfQueryInterface<iSndSysSource3D> (sndsource);
+          if (Sys->wMissile_boom)
+          {
+            csRef<iSndSysStream> st = Sys->mySound->CreateStream (
+              Sys->wMissile_boom->GetData (), CS_SND3D_ABSOLUTE);
+            csRef<iSndSysSource> sndsource = Sys->mySound->
+              CreateSource (st);
+            if (sndsource)
+            {
+              csRef<iSndSysSource3D> sndsource3d
+                = scfQueryInterface<iSndSysSource3D> (sndsource);
 
-	      sndsource3d->SetPosition (v);
-	      sndsource->SetVolume (1.0f);
-	      st->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
-	      st->Unpause ();
-	    }
-	  }
+              sndsource3d->SetPosition (v);
+              sndsource->SetVolume (1.0f);
+              st->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
+              st->Unpause ();
+            }
+          }
         }
         ExplosionStruct* es = new ExplosionStruct;
         es->type = DYN_TYPE_EXPLOSION;
@@ -229,34 +229,36 @@ bool WalkTestLights::HandleDynLight (iLight* dyn)
         es->dir = 1;
         WalkDataObject* esdata = new WalkDataObject (es);
         dyn->QueryObject ()->ObjAdd (esdata);
-	esdata->DecRef ();
-	WalkTestParticleDemos::Explosion (Sys, dyn->GetSector (),
-		dyn->GetCenter (), "explo");
+        esdata->DecRef ();
+        WalkTestParticleDemos::Explosion (Sys,
+          dyn->GetMovable ()->GetSectors ()->Get (0),
+          dyn->GetMovable ()->GetPosition (), "explo");
         return false;
       }
       else ms->dir.SetOrigin (v);
-      if (dyn->GetSector () != s)
+      iSector* sector = dyn->GetMovable ()->GetSectors ()->Get (0);
+      if (sector != s)
       {
-	dyn->IncRef ();
-        dyn->GetSector ()->GetLights ()->Remove (dyn);
+        dyn->IncRef ();
+        sector->GetLights ()->Remove (dyn);
         s->GetLights ()->Add (dyn);
-	dyn->DecRef ();
+        dyn->DecRef ();
       }
-      dyn->SetCenter (v);
+      dyn->GetMovable ()->SetPosition (v);
       if (ms->sprite) move_mesh (ms->sprite, s, v);
       if (Sys->mySound && ms->snd)
       {
-	csRef<iSndSysSource3D> sndsource3d
-		= scfQueryInterface<iSndSysSource3D> (ms->snd);
-	sndsource3d->SetPosition (v);
-	ms->snd->SetVolume (1.0f);
+        csRef<iSndSysSource3D> sndsource3d
+          = scfQueryInterface<iSndSysSource3D> (ms->snd);
+        sndsource3d->SetPosition (v);
+        ms->snd->SetVolume (1.0f);
       }
       break;
     }
-    case DYN_TYPE_EXPLOSION:
+  case DYN_TYPE_EXPLOSION:
     {
       ExplosionStruct* es = (ExplosionStruct*)(WalkDataObject::GetData(
-      	dyn->QueryObject ()));
+        dyn->QueryObject ()));
       if (es->dir == 1)
       {
         es->radius += 3;
@@ -271,7 +273,8 @@ bool WalkTestLights::HandleDynLight (iLight* dyn)
 		CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
 	  dyn->QueryObject ()->ObjRemove (ido);
 	  delete es;
-	  dyn->GetSector ()->GetLights ()->Remove (dyn);
+    iSector* sector = dyn->GetMovable ()->GetSectors ()->Get (0);
+	  sector->GetLights ()->Remove (dyn);
 	  return true;
 	}
       }
@@ -293,7 +296,8 @@ bool WalkTestLights::HandleDynLight (iLight* dyn)
         dyn->SetColor (csColor ((rl->dyn_r1+7.*dyn->GetColor ().red)/8.,
 		(rl->dyn_g1+7.*dyn->GetColor ().green)/8.,
 		(rl->dyn_b1+7.*dyn->GetColor ().blue)/8.));
-      dyn->SetCenter (dyn->GetCenter () + csVector3 (0, rl->dyn_move_dir, 0));
+      dyn->GetMovable()->SetPosition (dyn->GetMovable()->GetPosition () + csVector3 (0, rl->dyn_move_dir, 0));
+      dyn->GetMovable()->UpdateMove();
       break;
     }
   }

@@ -23,6 +23,8 @@
  * Standard shader variable setup
  */
 
+#include "iengine/portal.h"
+#include "iengine/sector.h"
 #include "ivideo/material.h"
 
 #include "csplugincommon/rendermanager/rendertree.h"

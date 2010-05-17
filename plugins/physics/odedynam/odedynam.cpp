@@ -634,6 +634,8 @@ csODEDynamicSystem::csODEDynamicSystem (iObjectRegistry* object_reg,
       object_reg, "crystalspace.shared.stringset");
   base_id = strings->Request ("base");
   colldet_id = strings->Request ("colldet");
+
+  dWorldSetGravity (worldID, 0.0f, -9.81f, 0.0f);
 }
 
 csODEDynamicSystem::~csODEDynamicSystem ()
@@ -1249,7 +1251,7 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   dTriMeshDataID TriData = dGeomTriMeshDataCreate();
 
   dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float),
-    trimesh->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
+    (int)trimesh->GetVertexCount(), indeces, 3*(int)tr_num, 3*sizeof(int));
 
   geomID = dCreateTriMesh(0, TriData, 0, 0, 0);
 

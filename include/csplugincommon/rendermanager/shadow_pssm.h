@@ -25,6 +25,8 @@
 
 #include "ivideo/shader/shader.h"
 
+#include "csutil/cfgacc.h"
+
 #include "cstool/meshfilter.h"
 
 #include "csplugincommon/rendermanager/operations.h"
@@ -34,6 +36,7 @@
 #include "csplugincommon/rendermanager/viscull.h"
 
 #include "csgeom/matrix4.h"
+#include "csgeom/projections.h"
 
 class csShaderVariable;
 

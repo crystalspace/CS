@@ -39,6 +39,7 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
         sparc*) cs_host_cpu=sparc ;;
         mips*) cs_host_cpu=mips ;;
         alpha*) cs_host_cpu=alpha ;;
+	arm*) cs_host_cpu=arm ;;
         *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="AS_TR_CPP([$cs_host_cpu])"

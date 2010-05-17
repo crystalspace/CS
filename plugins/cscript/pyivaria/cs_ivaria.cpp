@@ -15542,6 +15542,36 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iDynamicSystem_AddBody(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicSystem *arg1 = (iDynamicSystem *) 0 ;
+  iRigidBody *arg2 = (iRigidBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicSystem_AddBody",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicSystem_AddBody" "', argument " "1"" of type '" "iDynamicSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iRigidBody, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDynamicSystem_AddBody" "', argument " "2"" of type '" "iRigidBody *""'"); 
+  }
+  arg2 = reinterpret_cast< iRigidBody * >(argp2);
+  (arg1)->AddBody(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iDynamicSystem_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -39797,6 +39827,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iDynamicSystem_GetCollider", _wrap_iDynamicSystem_GetCollider, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_GetColliderCount", _wrap_iDynamicSystem_GetColliderCount, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AttachColliderCapsule", _wrap_iDynamicSystem_AttachColliderCapsule, METH_VARARGS, NULL},
+	 { (char *)"iDynamicSystem_AddBody", _wrap_iDynamicSystem_AddBody, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_scfGetVersion", _wrap_iDynamicSystem_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iDynamicSystem", _wrap_delete_iDynamicSystem, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_swigregister", iDynamicSystem_swigregister, METH_VARARGS, NULL},

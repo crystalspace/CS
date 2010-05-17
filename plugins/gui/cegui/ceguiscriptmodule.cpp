@@ -57,9 +57,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   int CEGUIScriptModule::executeScriptGlobal (
     const CEGUI::String &function_name)
   {
-    int ret;
-    scripting->Call (function_name.c_str() , ret, " ");
-    return ret;
+    csRef<iScriptValue> ret = scripting->Call (function_name.c_str());
+    return ret->GetInt();
   }
 
   //----------------------------------------------------------------------------//

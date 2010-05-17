@@ -97,9 +97,9 @@ namespace WaterMesh
       
     inline void SetOHeight(float h) { oHeight = h; }
       
-    inline uint GetNumVerts() { return verts.GetSize(); }
-    inline uint GetNumIndexes() { return tris.GetSize() * 3; }
-    inline uint GetNumTris() { return tris.GetSize(); }        
+    inline uint GetNumVerts() { return (uint)verts.GetSize(); }
+    inline uint GetNumIndexes() { return (uint)tris.GetSize() * 3; }
+    inline uint GetNumTris() { return (uint)tris.GetSize(); }        
   };
   
   class csOceanNode
