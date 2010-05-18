@@ -306,6 +306,12 @@ bool Simple::OnKeyboard (iEvent &ev)
       SpawnStarCollider ();
       return true;
     }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'q'
+	     && phys_engine_id == BULLET_ID)
+    {
+      SpawnCompound ();
+      return true;
+    }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'j')
     {
       SpawnJointed ();
@@ -743,6 +749,8 @@ bool Simple::OnInitialize (int argc, char* argv[])
   keyDescriptions.Push ("v: spawn a convex mesh");
   keyDescriptions.Push ("m: spawn a concave mesh");
   keyDescriptions.Push ("*: spawn a static concave mesh");
+  if (phys_engine_id == BULLET_ID)
+    keyDescriptions.Push ("q: spawn a compound body");
   keyDescriptions.Push ("j: spawn two jointed bodies");
   if (phys_engine_id == BULLET_ID)
   {
@@ -1305,6 +1313,96 @@ iRigidBody* Simple::SpawnConvexMesh ()
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
 
   // Update the display of the dynamics debugger
+  dynamicsDebugger->UpdateDisplay ();
+
+  return rb;
+}
+
+iRigidBody* Simple::SpawnCompound ()
+{
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create the capsule mesh factory.
+  csRef<iMeshFactoryWrapper> capsuleFact = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "capsuleFact");
+  if (!capsuleFact)
+  {
+    ReportError ("Error creating mesh object factory!");
+    return 0;
+  }
+
+  csRef<iGeneralFactoryState> gmstate =
+    scfQueryInterface<iGeneralFactoryState> (capsuleFact->GetMeshObjectFactory ());
+  gmstate->GenerateCapsule (0.7f, 0.3f, 10);
+  capsuleFact->HardTransform
+    (csReversibleTransform (csYRotMatrix3 (PI/2), csVector3 (-0.2f)));
+
+  // Create the mesh.
+  csRef<iMeshWrapper> capsuleMesh (engine->CreateMeshWrapper
+			    (capsuleFact, "capsule", room));
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+  capsuleMesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Create the sphere mesh factory.
+  csRef<iMeshFactoryWrapper> sphereFact = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "sphereFact");
+  if (!sphereFact)
+  {
+    ReportError ("Error creating mesh object factory!");
+    return 0;
+  }
+
+  gmstate =
+    scfQueryInterface<iGeneralFactoryState> (sphereFact->GetMeshObjectFactory ());
+  gmstate->GenerateSphere (csEllipsoid (csVector3 (-0.2f, 0.3f, -0.1f), csVector3 (0.3f)), 16);
+
+  // Create the mesh.
+  csRef<iMeshWrapper> sphereMesh (engine->CreateMeshWrapper
+			    (sphereFact, "sphere", room));
+  sphereMesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Create the box mesh factory.
+  csRef<iMeshFactoryWrapper> boxFact = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "boxFact");
+  if (!boxFact)
+  {
+    ReportError ("Error creating mesh object factory!");
+    return 0;
+  }
+
+  gmstate =
+    scfQueryInterface<iGeneralFactoryState> (boxFact->GetMeshObjectFactory ());
+  gmstate->GenerateBox (csBox3 (csVector3 (0.1f, -0.1f, 0.2f), csVector3 (0.3f)));
+
+  // Create the mesh.
+  csRef<iMeshWrapper> boxMesh (engine->CreateMeshWrapper
+			    (boxFact, "box", room));
+  boxMesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Set the sphere and box meshes as child nodes of the capsule mesh
+  sphereMesh->QuerySceneNode ()->SetParent (capsuleMesh->QuerySceneNode ());
+  boxMesh->QuerySceneNode ()->SetParent (capsuleMesh->QuerySceneNode ());
+
+  // Create a body and attach the capsule mesh.
+  csRef<iRigidBody> rb = dynamicSystem->CreateBody ();
+  rb->SetProperties (4.0f, csVector3 (0.0f), csMatrix3 ());
+  rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
+  rb->AttachMesh (capsuleMesh);
+
+  // Create and attach the colliders.
+  csOrthoTransform t;
+  t.SetOrigin (csVector3 (-0.2f));
+  rb->AttachColliderCapsule (0.7f, 0.3f, t, 10, 1, 0.8f);
+  rb->AttachColliderSphere (0.3f, csVector3 (-0.2f, 0.3f, -0.1f), 10, 1, 0.8f);
+  t.SetOrigin (csVector3 (0.2f, 0.1f, 0.25f));
+  rb->AttachColliderBox (csVector3 (0.2f, 0.4f, 0.1f), t, 10, 1, 0.8f);
+
+  // Fling the body.
+  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
+  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+
+  // Update the display of the dynamics debugger.
   dynamicsDebugger->UpdateDisplay ();
 
   return rb;

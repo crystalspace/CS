@@ -98,6 +98,7 @@ private:
   iRigidBody* SpawnCapsule ();
   iRigidBody* SpawnMesh ();
   iRigidBody* SpawnConvexMesh ();
+  iRigidBody* SpawnCompound ();
   iJoint* SpawnJointed ();
   void SpawnChain ();
   void LoadRagdoll ();
