@@ -122,9 +122,6 @@ void HairTest::Frame ()
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
 
-  // Update furmaterial geometry
-  furMaterial->UpdateGeometry(view);
-
   // Default behavior from csDemoApplication
   csDemoApplication::Frame ();
 
@@ -389,7 +386,7 @@ bool HairTest::Application ()
 
   // Initializa fur material
   furMaterial = furMaterialType->CreateFurMaterial("hair");
-  furMaterial->GenerateGeometry(room,2,10);
+  furMaterial->GenerateGeometry(view,room,2,10);
   furMaterial->DoSomething (1, csVector3 (2, 3, 4));
   printf ("%d\n", furMaterial->GetSomething ());
 

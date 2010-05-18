@@ -23,7 +23,7 @@
 #include <csgeom/vector3.h>
 #include <imaterial/furmaterial.h>
 #include <csgfx/shadervarcontext.h>
-#include <include/imesh/genmesh.h>
+#include <imesh/genmesh.h>
 
 #include "crystalspace.h"
 
@@ -33,9 +33,9 @@ struct iObjectRegistry;
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 {
-  class FurMaterialType : public 
-	  scfImplementation2<FurMaterialType,iFurMaterialType,iComponent>
-  {
+class FurMaterialType : public 
+	scfImplementation2<FurMaterialType,iFurMaterialType,iComponent>
+{
   public:
     CS_LEAKGUARD_DECLARE(FurMaterialType);
 
@@ -54,12 +54,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   private:
 	  iObjectRegistry* object_reg;
 	  csHash<csRef<iFurMaterial>, csString> furMaterialHash;
-  };
+};
 
-  class FurMaterial : public scfImplementation2<FurMaterial,
-	  scfFakeInterface<iShaderVariableContext>,iFurMaterial>,
-	  public CS::ShaderVariableContextImpl
-  {
+class FurMaterialFactory : public scfImplementation1<FurMaterialFactory, 
+	iGenMeshAnimationControlFactory>
+{
+public:
+	CS_LEAKGUARD_DECLARE(FurMaterialFactory);
+
+	FurMaterialFactory ();
+
+	//-- iGenMeshAnimationControlFactory
+	virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (iMeshObject* mesh);
+	virtual const char* Load (iDocumentNode* node);
+	virtual const char* Save (iDocumentNode* parent);
+};
+
+class FurMaterial : public scfImplementation2<FurMaterial,
+	scfFakeInterface<iShaderVariableContext>,
+	iFurMaterial>, public CS::ShaderVariableContextImpl
+{
   public:
     CS_LEAKGUARD_DECLARE(FurMaterial);
     FurMaterial (FurMaterialType* manager, const char *name,
@@ -73,9 +87,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     virtual void SetLength (float len);
     virtual float GetLength () const;
 
-	virtual void GenerateGeometry (iSector *room, int controlPoints, int numberOfStrains);
-
-	virtual void UpdateGeometry(iView *view);
+	virtual void GenerateGeometry (iView *view,iSector *room, int controlPoints, int numberOfStrains);
 
 	/*
 	// From iShaderVariableContext
@@ -109,20 +121,63 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     virtual iShader* GetFirstShader (const csStringID* types, size_t numTypes);
 
   protected:
-	  FurMaterialType* manager;
-	  csString name;
+	FurMaterialType* manager;
+	csString name;
 
   private:
-	  iObjectRegistry* object_reg;
-	  csVector3 store_v;
-	  /// Shader associated with material
-	  csHash<csRef<iShader>, csStringID> shaders;
-	  /// Fur geometry
-	  float length;
-	  int controlPoints;
-	  int numberOfStrains;
-	  csRef<iGeneralFactoryState> factoryState;
-  };
+	iObjectRegistry* object_reg;
+	csVector3 store_v;
+	/// Shader associated with material
+	csHash<csRef<iShader>, csStringID> shaders;
+	/// Fur geometry
+	float length;
+	int controlPoints;
+	int numberOfStrains;
+	csRef<iGeneralFactoryState> factoryState;
+	csRef<iView> view;
+};
+
+class FurMaterialControl : public scfImplementation1 
+    <FurMaterialControl, iGenMeshAnimationControl>
+{
+  public:
+	CS_LEAKGUARD_DECLARE(FurMaterialAnimationControl);
+
+    FurMaterialControl (iMeshObject* mesh);
+    virtual ~FurMaterialControl ();
+
+    //-- general factory state
+	virtual void SetGeneralFactoryState (iGeneralFactoryState* factory);
+	virtual void SetLength (float len);
+	virtual void SetControlPoints (int control);
+	virtual void SetNumberOfStrains (int strais);
+	virtual void SetView (iView* view);
+
+	//-- iGenMeshAnimationControl
+	virtual bool AnimatesColors () const;
+	virtual bool AnimatesNormals () const;
+	virtual bool AnimatesTexels () const;
+	virtual bool AnimatesVertices () const;
+	virtual void Update (csTicks current, int num_verts, uint32 version_id);
+	virtual const csColor4* UpdateColors (csTicks current, const csColor4* colors,
+		int num_colors, uint32 version_id);
+	virtual const csVector3* UpdateNormals (csTicks current, const csVector3* normals,
+		int num_normals, uint32 version_id);
+	virtual const csVector2* UpdateTexels (csTicks current, const csVector2* texels,
+		int num_texels, uint32 version_id);
+	virtual const csVector3* UpdateVertices (csTicks current, const csVector3* verts,
+		int num_verts, uint32 version_id);
+
+  private:
+    csWeakRef<iMeshObject> mesh;
+    csTicks lastTicks;
+	/// Fur geometry
+	float length;
+	int controlPoints;
+	int numberOfStrains;
+	csRef<iGeneralFactoryState> factoryState;
+	csRef<iView> view;
+};
 
 }
 CS_PLUGIN_NAMESPACE_END(FurMaterial)

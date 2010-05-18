@@ -113,10 +113,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     return length;
   }
 
-  void FurMaterial::GenerateGeometry(iSector *room, int controlPoints, int numberOfStrains)
+  void FurMaterial::GenerateGeometry(iView *view,iSector *room, int controlPoints, int numberOfStrains)
   {
-    assert(controlPoints > 1);
+    CS_ASSERT(controlPoints > 1);
 
+	this->view = view;
 	this->controlPoints = controlPoints;
 	this->numberOfStrains = numberOfStrains;
 
@@ -175,9 +176,116 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		(object_reg,"hairDummyMaterial",csColor(0,1,0));
 
 	meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
+
+	csRef<iGeneralMeshState> meshState =
+		scfQueryInterface<iGeneralMeshState> (meshWrapper->GetMeshObject ());
+
+	csRef<FurMaterialControl> animationControl;
+
+	animationControl.AttachNew(new FurMaterialControl(meshWrapper->GetMeshObject ()));
+
+	animationControl->SetControlPoints(controlPoints);
+	animationControl->SetGeneralFactoryState(factoryState);
+	animationControl->SetLength(length);
+	animationControl->SetNumberOfStrains(numberOfStrains);
+	animationControl->SetView(view);
+
+	meshState -> SetAnimationControl(animationControl);
   }
 
-  void FurMaterial::UpdateGeometry (iView *view)
+  void FurMaterial::SetShader (csStringID type, iShader* shd)
+  {
+	  shaders.PutUnique (type, shd);
+  }
+
+  iShader* FurMaterial::GetShader(csStringID type)
+  {
+	  return shaders.Get (type, (iShader*)0);
+  }
+
+  iShader* FurMaterial::GetFirstShader (const csStringID* types,
+	  size_t numTypes)
+  {
+	  iShader* s = 0;
+	  for (size_t i = 0; i < numTypes; i++)
+	  {
+		  s = shaders.Get (types[i], (iShader*)0);
+		  if (s != 0) break;
+	  }
+	  return s;
+  }
+
+  iTextureHandle *FurMaterial::GetTexture ()
+  {
+	  return 0;
+  }
+
+  iTextureHandle* FurMaterial::GetTexture (CS::ShaderVarStringID name)
+  {
+	  return 0;
+  }  
+
+  /********************
+   *  FurMaterialControl
+   ********************/
+
+  CS_LEAKGUARD_IMPLEMENT(FurMaterialControl);
+
+  FurMaterialControl::FurMaterialControl (iMeshObject* mesh)
+    : scfImplementationType (this), mesh (mesh), lastTicks (0)
+  {
+  }
+
+  FurMaterialControl::~FurMaterialControl ()
+  {
+  }  
+
+  void FurMaterialControl::SetGeneralFactoryState(iGeneralFactoryState *factory)
+  {
+	factoryState = factory;
+  }
+
+  void FurMaterialControl::SetLength (float len)
+  {
+	length = len;
+  }
+
+  void FurMaterialControl::SetControlPoints (int control)
+  {
+    controlPoints = control;
+  }
+
+  void FurMaterialControl::SetNumberOfStrains (int strais)
+  {
+	numberOfStrains = strais;
+  }
+
+  void FurMaterialControl::SetView (iView* view)
+  {
+    this->view = view;
+  }
+
+  bool FurMaterialControl::AnimatesColors () const
+  {
+    return false;
+  }
+
+  bool FurMaterialControl::AnimatesNormals () const
+  {
+	return false;
+  }
+
+  bool FurMaterialControl::AnimatesTexels () const
+  {
+	return false;
+  }
+
+  bool FurMaterialControl::AnimatesVertices () const
+  {
+	return true;
+  }
+
+  void FurMaterialControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
     const csOrthoTransform& tc = view -> GetCamera() ->GetTransform ();
 
@@ -216,39 +324,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	}
 
 	factoryState -> CalculateNormals();
+
   }
 
-  void FurMaterial::SetShader (csStringID type, iShader* shd)
+  const csColor4* FurMaterialControl::UpdateColors (csTicks current, 
+	const csColor4* colors, int num_colors, uint32 version_id)
   {
-	  shaders.PutUnique (type, shd);
+	return colors;
   }
 
-  iShader* FurMaterial::GetShader(csStringID type)
+  const csVector3* FurMaterialControl::UpdateNormals (csTicks current, 
+	const csVector3* normals, int num_normals, uint32 version_id)
   {
-	  return shaders.Get (type, (iShader*)0);
+	return normals;
   }
 
-  iShader* FurMaterial::GetFirstShader (const csStringID* types,
-	  size_t numTypes)
+  const csVector2* FurMaterialControl::UpdateTexels (csTicks current, 
+	const csVector2* texels, int num_texels, uint32 version_id)
   {
-	  iShader* s = 0;
-	  for (size_t i = 0; i < numTypes; i++)
-	  {
-		  s = shaders.Get (types[i], (iShader*)0);
-		  if (s != 0) break;
-	  }
-	  return s;
+	return texels;
   }
 
-  iTextureHandle *FurMaterial::GetTexture ()
+  const csVector3* FurMaterialControl::UpdateVertices (csTicks current, 
+	const csVector3* verts, int num_verts, uint32 version_id)
   {
-	  return 0;
+	return 0;
   }
-
-  iTextureHandle* FurMaterial::GetTexture (CS::ShaderVarStringID name)
-  {
-	  return 0;
-  }  
 }
 
 CS_PLUGIN_NAMESPACE_END(FurMaterial)

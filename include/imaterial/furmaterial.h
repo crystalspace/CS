@@ -45,7 +45,7 @@ struct iFurMaterialType : public virtual iBase
  * that you use better comments than this one in a
  * real situation.
  */
-struct iFurMaterial : public virtual iMaterial
+struct iFurMaterial : public virtual iMaterial 
 {
   SCF_INTERFACE (iFurMaterial, 1, 0, 0);
   /// Do something.
@@ -57,7 +57,6 @@ struct iFurMaterial : public virtual iMaterial
   virtual float GetLength () const = 0;
 
   /// Generate geometry
-  virtual void GenerateGeometry (iSector *room, int controlPoints, int numberOfStrains) = 0;
-  virtual void UpdateGeometry (iView *view) = 0;
+  virtual void GenerateGeometry (iView* view, iSector *room, int controlPoints, int numberOfStrains) = 0;
 };
 #endif // __FUR_INTERF_H__
