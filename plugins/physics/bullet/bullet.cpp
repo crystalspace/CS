@@ -1217,6 +1217,7 @@ bool csBulletRigidBody::MakeStatic (void)
     body->setCollisionFlags (body->getCollisionFlags()
 			     | btCollisionObject::CF_STATIC_OBJECT);
     body->setMassProps (0.0f, btVector3 (0.0f, 0.0f, 0.0f));
+    body->updateInertiaTensor ();
 
     // reverse kinematic state
     if (previousState == CS_BULLET_STATE_KINEMATIC)
