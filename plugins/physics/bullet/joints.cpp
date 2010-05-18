@@ -343,7 +343,6 @@ void csBulletPivotJoint::Attach (iRigidBody* body,
     (*this->body->body, localPivot);
   dynSys->bulletWorld->addConstraint (constraint);
 
-  constraint->m_setting.m_impulseClamp = 30.0f;
   constraint->m_setting.m_tau = 0.1f;
 }
 
