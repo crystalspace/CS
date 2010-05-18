@@ -116,6 +116,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurMaterial::GenerateGeometry(iView *view,iSector *room, int controlPoints, int numberOfStrains)
   {
     CS_ASSERT(controlPoints > 1);
+	CS_ASSERT(numberOfStrains > 1);
 
 	this->view = view;
 	this->controlPoints = controlPoints;
@@ -131,36 +132,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	factoryState = scfQueryInterface<iGeneralFactoryState> (
 		factory->GetMeshObjectFactory ());
 
-	factoryState -> SetVertexCount (numberOfStrains * 2 * controlPoints);
-	factoryState -> SetTriangleCount ( numberOfStrains * 2 * (controlPoints - 1));
+	factoryState -> SetVertexCount ( numberOfStrains * numberOfStrains * 2 * 
+	  controlPoints );
+	factoryState -> SetTriangleCount ( numberOfStrains * numberOfStrains * 2 * 
+	  (controlPoints - 1));
 
-	for ( int i = 0 ; i < numberOfStrains ; i ++ )
+	csVector3 *vbuf = factoryState->GetVertices (); 
+    csTriangle *ibuf = factoryState->GetTriangles ();
+
+	for ( int x = 0 ; x < numberOfStrains ; x ++ )
+	  for ( int z = 0 ; z < numberOfStrains ; z ++ )
 	{
-	  for ( int j = 0 ; j < controlPoints ; j ++ )
+	  for ( int y = 0 ; y < controlPoints ; y ++ )
 	  {
-		factoryState -> GetVertices()[i * 2 * controlPoints + 2 * j].Set
-		  ( csVector3(i/10.0f, j * length / (controlPoints - 1), -1));
-		factoryState -> GetVertices()[i * 2 * controlPoints + 2 * j + 1].Set
-		  ( csVector3(i/10.0f + 0.01f, j * length / (controlPoints - 1), -1));
+		vbuf[ ( x * numberOfStrains + z ) * 2 * controlPoints + 2 * y].Set
+		    ( csVector3( (float) x / (numberOfStrains - 1), 
+		    y * length / (controlPoints - 1), (float) z / (numberOfStrains - 1)));
+		vbuf[( x * numberOfStrains + z ) * 2 * controlPoints + 2 * y + 1].Set
+		    ( csVector3( (float) x / (numberOfStrains - 1) + 0.01f, 
+		    y * length / (controlPoints - 1), (float) z / (numberOfStrains - 1)));
 	  }
 
-	  for ( int j = 0 ; j < 2 * (controlPoints - 1) ; j ++ )
+	  for ( int y = 0 ; y < 2 * (controlPoints - 1) ; y ++ )
 	  {
-		if (j % 2 == 0)
+		if (y % 2 == 0)
 		{
-	      factoryState -> GetTriangles( )[i * 2 * (controlPoints - 1) + j ].Set
-		    ( 2 * i + i * 2 * (controlPoints - 1) + j , 
-			  2 * i + i * 2 * (controlPoints - 1) + j + 3 , 
-			  2 * i + i * 2 * (controlPoints - 1) + j + 1 );
-		  //printf("%d %d %d\n", 2 * i + j , 2 * i + j + 3 , 2 * i + j + 1);
+		  ibuf[( x * numberOfStrains + z ) * 2 * (controlPoints - 1) + y ].Set
+			  ( 2 * ( x * numberOfStrains + z ) * controlPoints + y , 
+			    2 * ( x * numberOfStrains + z ) * controlPoints + y + 3 , 
+			    2 * ( x * numberOfStrains + z ) * controlPoints + y + 1 );
+		  //printf("%d %d %d\n", 2 * x + y , 2 * x + y + 3 , 2 * x + y + 1);
 		}
 		else
 		{
-		  factoryState -> GetTriangles( )[i * 2 * (controlPoints - 1) + j ].Set
-			( 2 * i + i * 2 * (controlPoints - 1) + j + 1 , 
-			  2 * i + i * 2 * (controlPoints - 1) + j + 2 , 
-			  2 * i + i * 2 * (controlPoints - 1) + j - 1 );
-		  //printf("%d %d %d\n", 2 * i + j + 1 , 2 * i + j + 2 , 2 * i + j - 1);
+		  ibuf[( x * numberOfStrains + z ) * 2 * (controlPoints - 1) + y ].Set
+			  ( 2 * ( x * numberOfStrains + z ) * controlPoints + y + 1 , 
+			    2 * ( x * numberOfStrains + z ) * controlPoints + y + 2 , 
+			    2 * ( x * numberOfStrains + z ) * controlPoints + y - 1 );
+		  //printf("%d %d %d\n", 2 * x + y + 1 , 2 * x + y + 2 , 2 * x + y - 1);
 		}
 	  }
 	}
@@ -288,43 +297,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurMaterialControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
     const csOrthoTransform& tc = view -> GetCamera() ->GetTransform ();
+	
+	csVector3 *vbuf = factoryState->GetVertices (); 
 
-	factoryState -> SetVertexCount (numberOfStrains * 2 * controlPoints);
-	factoryState -> SetTriangleCount ( numberOfStrains * 2 * (controlPoints - 1));
-
-	for ( int i = 0 ; i < numberOfStrains ; i ++ )
+	for ( int x = 0 ; x < numberOfStrains ; x ++ )
+	  for ( int z = 0 ; z < numberOfStrains ; z ++ )
 	{
-	  for ( int j = 0 ; j < controlPoints ; j ++ )
+	  for ( int y = 0 ; y < controlPoints ; y ++ )
 	  {
-		factoryState -> GetVertices()[i * 2 * controlPoints + 2 * j].Set
-		  ( tc.GetT2O() * csVector3(i/10.0f, j * length / (controlPoints - 1), -1));
-		factoryState -> GetVertices()[i * 2 * controlPoints + 2 * j + 1].Set
-		  ( tc.GetT2O() * csVector3(i/10.0f + 0.01f, j * length / (controlPoints - 1), -1));
-	  }
-
-	  for ( int j = 0 ; j < 2 * (controlPoints - 1) ; j ++ )
-	  {
-		if (j % 2 == 0)
-		{
-	      factoryState -> GetTriangles( )[i * 2 * (controlPoints - 1) + j ].Set
-		    ( 2 * i + i * 2 * (controlPoints - 1) + j , 
-			  2 * i + i * 2 * (controlPoints - 1) + j + 3 , 
-			  2 * i + i * 2 * (controlPoints - 1) + j + 1 );
-		  //printf("%d %d %d\n", 2 * i + j , 2 * i + j + 3 , 2 * i + j + 1);
-		}
-		else
-		{
-		  factoryState -> GetTriangles( )[i * 2 * (controlPoints - 1) + j ].Set
-			( 2 * i + i * 2 * (controlPoints - 1) + j + 1 , 
-			  2 * i + i * 2 * (controlPoints - 1) + j + 2 , 
-			  2 * i + i * 2 * (controlPoints - 1) + j - 1 );
-		  //printf("%d %d %d\n", 2 * i + j + 1 , 2 * i + j + 2 , 2 * i + j - 1);
-		}
+		vbuf[ ( x * numberOfStrains + z ) * 2 * controlPoints + 2 * y].Set
+		    ( tc.GetT2O() * csVector3( (float) x / (numberOfStrains - 1), 
+		    y * length / (controlPoints - 1), (float) z / (numberOfStrains - 1)));
+		vbuf[( x * numberOfStrains + z ) * 2 * controlPoints + 2 * y + 1].Set
+		    ( tc.GetT2O() * csVector3( (float) x / (numberOfStrains - 1) + 0.01f, 
+		    y * length / (controlPoints - 1), (float) z / (numberOfStrains - 1)));
 	  }
 	}
 
 	factoryState -> CalculateNormals();
-
   }
 
   const csColor4* FurMaterialControl::UpdateColors (csTicks current, 
