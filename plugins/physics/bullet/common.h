@@ -255,11 +255,14 @@ public:
 
 class csBulletKinematicMotionState : public csBulletMotionState
 {
+  csOrthoTransform principalAxis;
+
 public:
   csBulletKinematicMotionState (csBulletRigidBody* body,
 		       const btTransform& initialTransform,
 		       const btTransform& principalAxis)
-    : csBulletMotionState (body, initialTransform, principalAxis)
+    : csBulletMotionState (body, initialTransform, principalAxis),
+    principalAxis (BulletToCS (principalAxis, body->dynSys->inverseInternalScale))
   {
   }
 
@@ -271,7 +274,7 @@ public:
     // get the body transform from the callback
     csOrthoTransform transform;
     body->kinematicCb->GetBodyTransform (body, transform);
-    trans = CSToBullet (transform, body->dynSys->internalScale);
+    trans = CSToBullet (principalAxis * transform, body->dynSys->internalScale);
   }
 };
 

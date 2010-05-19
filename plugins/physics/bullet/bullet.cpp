@@ -1359,7 +1359,6 @@ void csBulletRigidBody::MakeKinematic ()
     btTransform principalAxis = motionState->inversePrincipalAxis.inverse ();
     btTransform trans;
     motionState->getWorldTransform (trans);
-    trans = trans * motionState->inversePrincipalAxis;
     delete motionState;
     motionState = new csBulletKinematicMotionState
       (this, trans, principalAxis);
@@ -1869,7 +1868,7 @@ float csBulletRigidBody::GetMass ()
     return 0.0f;
 
   if (body)
-    return 1.0 / body->getInvMass ();    
+    return 1.0 / body->getInvMass ();
 
   return mass;
 }
