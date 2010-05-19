@@ -27,6 +27,7 @@
 #include "iutil/array.h"
 #include "ivideo/shader/shader.h"
 #include "imesh/object.h"
+#include "imesh/terrain2.h"
 
 class csVector2;
 class csVector3;
