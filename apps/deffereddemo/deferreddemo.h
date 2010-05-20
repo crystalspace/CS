@@ -47,8 +47,6 @@ public:
 
   /// Returns true if the application sould shutdown after the current frame.
   bool ShouldShutdown() const { return shouldShutdown; }
-  
-  //CS_EVENTHANDLER_PHASE_LOGIC("application.deferreddemo");
 
 protected:
 
@@ -104,6 +102,8 @@ protected:
   csRef<iView> view;
 
   csRef<iTextureHandle> colorBuffer0;
+  csRef<iTextureHandle> colorBuffer1;
+  csRef<iTextureHandle> colorBuffer2;
   csRef<iTextureHandle> depthBuffer;
 
   float viewRotX;

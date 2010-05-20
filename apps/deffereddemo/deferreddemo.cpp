@@ -45,6 +45,7 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
       CS_REQUEST_LEVELLOADER,
       CS_REQUEST_REPORTER,
       CS_REQUEST_REPORTERLISTENER,
+      CS_REQUEST_PLUGIN("crystalspace.rendermanager.rlcompat", iRenderManager),
       CS_REQUEST_END))
   {
     return ReportError("Failed to initialize plugins!");
@@ -111,12 +112,13 @@ bool DeferredDemo::SetupModules()
   if (!loader) 
     return ReportError("Failed to locate Loader!");
 
-  rm = engine->GetRenderManager ();
-  if (!rm.IsValid ())
+  rm = csQueryRegistry<iRenderManager> (GetObjectRegistry());
+  if (!rm)
     return ReportError("Failed to locate Render Manager!");
 
   return true;
 }
+
 
 //----------------------------------------------------------------------
 bool DeferredDemo::LoadScene()
@@ -164,12 +166,32 @@ bool DeferredDemo::SetupScene()
   colorBuffer0 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
     graphics2D->GetHeight (),
     csimg2D,
-    "rgba32_f",
+    "rgba8",
     flags,
     NULL);
 
   if(!colorBuffer0)
     return ReportError("Couldn't create color buffer 0!");
+
+  colorBuffer1 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
+    graphics2D->GetHeight (),
+    csimg2D,
+    "rgba8",
+    flags,
+    NULL);
+
+  if(!colorBuffer1)
+    return ReportError("Couldn't create color buffer 1!");
+
+  colorBuffer2 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
+    graphics2D->GetHeight (),
+    csimg2D,
+    "rgba8",
+    flags,
+    NULL);
+
+  if(!colorBuffer2)
+    return ReportError("Couldn't create color buffer 2!");
 
   depthBuffer  = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
     graphics2D->GetHeight (),
@@ -274,10 +296,19 @@ void DeferredDemo::Frame ()
 {
   UpdateCamera ();
 
+  engine->SetRenderManager (rm);
+
   // Attach render targets.
   if(!graphics3D->SetRenderTarget (colorBuffer0, false, 0, rtaColor0))
   {
     ReportError("Could not attach color buffer 0!");
+    Quit ();
+    return;
+  }
+
+  if(!graphics3D->SetRenderTarget (colorBuffer1, false, 0, rtaColor1))
+  {
+    ReportError("Could not attach color buffer 1!");
     Quit ();
     return;
   }
@@ -298,22 +329,52 @@ void DeferredDemo::Frame ()
     return;
   }
 
- // graphics3D->BeginDraw (engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS);
-
   view->Draw ();
 
   graphics3D->UnsetRenderTargets ();
 
-  //view->Draw ();
-
   graphics3D->BeginDraw (CSDRAW_2DGRAPHICS);
 
+  // Draws the buffers
   int w, h;
   colorBuffer0->GetRendererDimensions (w, h);
 
   graphics3D->DrawPixmap (colorBuffer0, 
-    graphics2D->GetWidth () / 4, 
-    graphics2D->GetHeight () / 4, 
+    0, 
+    0, 
+    graphics2D->GetWidth () / 2, 
+    graphics2D->GetHeight () / 2, 
+    0, 
+    0, 
+    w, 
+    h,
+    0);
+
+  graphics3D->DrawPixmap (colorBuffer1, 
+    graphics2D->GetWidth () / 2, 
+    0, 
+    graphics2D->GetWidth () / 2, 
+    graphics2D->GetHeight () / 2, 
+    0, 
+    0, 
+    w, 
+    h,
+    0);
+
+  graphics3D->DrawPixmap (colorBuffer2, 
+    0,
+    graphics2D->GetHeight () / 2, 
+    graphics2D->GetWidth () / 2, 
+    graphics2D->GetHeight () / 2, 
+    0, 
+    0, 
+    w, 
+    h,
+    0);
+  
+  graphics3D->DrawPixmap (depthBuffer, 
+    graphics2D->GetWidth () / 2, 
+    graphics2D->GetHeight () / 2, 
     graphics2D->GetWidth () / 2, 
     graphics2D->GetHeight () / 2, 
     0, 
