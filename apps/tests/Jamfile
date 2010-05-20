@@ -5,6 +5,7 @@ SubInclude TOP apps tests avatartest ;
 SubInclude TOP apps tests ceguitest ;
 SubInclude TOP apps tests consoletest ;
 SubInclude TOP apps tests csbench ;
+SubInclude TOP apps tests csterrainedtest ;
 SubInclude TOP apps tests eventtest ;
 SubInclude TOP apps tests g2dtest ;
 SubInclude TOP apps tests imptest ;
