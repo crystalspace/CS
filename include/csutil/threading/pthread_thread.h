@@ -36,7 +36,7 @@ namespace Implementation
 {
 
   // Thread base-class for pthreads
-  class CS_CRYSTALSPACE_EXPORT ThreadBase
+  class CS_CRYSTALSPACE_EXPORT ThreadBase : public CS::Utility::AtomicRefCount
   {
   public:
     ThreadBase (Runnable* runnable);

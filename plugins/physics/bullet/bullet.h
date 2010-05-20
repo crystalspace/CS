@@ -38,7 +38,7 @@ class csBulletCollider;
 
 /**
 * This is the implementation for a default dynamics move callback.
-* It can update mesh, light or camera's positions.
+* It can update the position of the attached mesh, light or camera.
 */
 class csBulletDefaultMoveCallback : public scfImplementation1<
   csBulletDefaultMoveCallback, iDynamicsMoveCallback>
@@ -55,8 +55,9 @@ public:
 };
 
 /**
-* This is the implementation for a default dynamics move callback.
-* It can update mesh, light or camera's positions.
+* This is the implementation for a default kinematics move callback.
+* It can update the position of the rigid body from the state of the
+* attached mesh, light or camera.
 */
 class csBulletDefaultKinematicCallback : public scfImplementation1<
   csBulletDefaultKinematicCallback, iBulletKinematicCallback>
@@ -108,6 +109,7 @@ class csBulletDynamicsSystem : public scfImplementationExt2<
   friend class csBulletSoftBody;
   friend class csBulletCollider;
   friend class csBulletJoint;
+  friend class csBulletPivotJoint;
 
 private:
   bool isSoftWorld;
@@ -116,18 +118,25 @@ private:
   btDefaultCollisionConfiguration* configuration;
   btSequentialImpulseConstraintSolver* solver;
   btBroadphaseInterface* broadphase;
-  btSoftBodyWorldInfo softWorldInfo;
+  btSoftBodyWorldInfo* softWorldInfo;
 
   csRefArrayObject<iRigidBody> dynamicBodies;
   csRefArrayObject<iRigidBody> colliderBodies;
   csRefArrayObject<iBulletSoftBody> softBodies;
   csRefArray<iJoint> joints;
+  csRefArray<iBulletPivotJoint> pivotJoints;
   csRef<csBulletDefaultMoveCallback> moveCb;
   bool gimpactRegistered;
   float internalScale;
   float inverseInternalScale;
   float worldTimeStep;
   size_t worldMaxSteps;
+  float linearDampening;
+  float angularDampening;
+  bool autoDisableEnabled;
+  float linearDisableThreshold;
+  float angularDisableThreshold;
+  float timeDisableThreshold;
 
   // For getting collision mesh data.
   csStringID baseId;
@@ -157,6 +166,7 @@ public:
   virtual void Step (float stepsize);
 
   virtual csPtr<iRigidBody> CreateBody ();
+  virtual void AddBody (iRigidBody* body);
   virtual void RemoveBody (iRigidBody* body);
   virtual iRigidBody *FindBody (const char *name);
   virtual iRigidBody *GetBody (unsigned int index);
@@ -221,6 +231,8 @@ public:
   virtual iBulletSoftBody* CreateSoftBody (csVector3* vertices, size_t vertexCount,
 					   csTriangle* triangles, size_t triangleCount);
   virtual void RemoveSoftBody (iBulletSoftBody* body);
+  virtual csPtr<iBulletPivotJoint> CreatePivotJoint ();
+  virtual void RemovePivotJoint (iBulletPivotJoint* joint);
 };
 
 class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
@@ -231,6 +243,7 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
   friend class csBulletDynamicsSystem;
   friend class csBulletCollider;
   friend class csBulletJoint;
+  friend class csBulletPivotJoint;
   friend class csBulletSoftBody;
 
   csBulletDynamicsSystem* dynSys;
@@ -248,6 +261,9 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
   csRef<iMeshWrapper> mesh;
   csRef<iLight> light;
   csRef<iCamera> camera;
+  bool insideWorld;
+  float linearDampening;
+  float angularDampening;
 
   csArray<btCollisionObject*> contactObjects;
   csArray<btCollisionObject*> lastContactObjects;
@@ -361,6 +377,10 @@ public:
   virtual void SetDynamicState (csBulletState state);
   virtual void SetKinematicCallback (iBulletKinematicCallback* callback);
   virtual iBulletKinematicCallback* GetKinematicCallback ();
+  virtual void SetLinearDampener (float d);
+  virtual float GetLinearDampener () const;
+  virtual void SetRollingDampener (float d);
+  virtual float GetRollingDampener () const;
 };
 
 class csBulletCollider : public scfImplementation1<csBulletCollider,
@@ -434,107 +454,6 @@ public:
   virtual bool IsStatic ();
 
   float GetVolume ();
-};
-
-#define BULLET_JOINT_NONE 0
-#define BULLET_JOINT_HINGE 1
-#define BULLET_JOINT_POINT2POINT 2
-#define BULLET_JOINT_6DOF 3
-#define BULLET_JOINT_CONETWIST 4
-
-class csBulletJoint : public scfImplementation1<csBulletJoint, iJoint>
-{
-private:
-  csBulletDynamicsSystem* dynSys;
-
-  int jointType; // One of BULLET_JOINT_xxx
-
-  // Pointer to either btGeneric6DofContraint (in case of BULLET_JOINT_6DOF),
-  // btHingeConstraint (BULLET_JOINT_HINGE), or btPoint2PointConstraint
-  // (BULLET_JOINT_POINT2POINT).
-  btTypedConstraint* constraint;
-
-  csRef<csBulletRigidBody> bodies[2];
-
-  bool trans_constraint_x;
-  bool trans_constraint_y;
-  bool trans_constraint_z;
-  csVector3 min_dist;
-  csVector3 max_dist;
-
-  bool rot_constraint_x;
-  bool rot_constraint_y;
-  bool rot_constraint_z;
-  csVector3 min_angle;
-  csVector3 max_angle;
-
-  csVector3 bounce;
-  csVector3 desired_velocity;
-  csVector3 maxforce;
-
-  csOrthoTransform transform;
-  csVector3 angular_constraints_axis[2];
-
-  /**
-   * Compute the bullet joint type that best matches the current
-   * configuration.
-   */
-  int ComputeBestBulletJointType ();
-
-public:
-  csBulletJoint (csBulletDynamicsSystem* dynSys);
-  virtual ~csBulletJoint ();
- 
-  virtual bool RebuildJoint ();
-
-  virtual void Attach (iRigidBody* body1, iRigidBody* body2,
-		       bool force_update = true);
-  virtual csRef<iRigidBody> GetAttachedBody (int body)
-  {
-    CS_ASSERT (body >= 0 && body <= 1);
-    return bodies[body];
-  }
-
-  virtual void SetTransform (const csOrthoTransform& trans,
-			     bool force_update = true);
-  virtual csOrthoTransform GetTransform () { return transform; }
-
-  virtual void SetTransConstraints (bool x, bool y, bool z,
-				    bool force_update = true);
-  virtual bool IsXTransConstrained () { return trans_constraint_x; }
-  virtual bool IsYTransConstrained () { return trans_constraint_y; }
-  virtual bool IsZTransConstrained () { return trans_constraint_z; }
-  virtual void SetMinimumDistance (const csVector3& min,
-				   bool force_update = true);
-  virtual csVector3 GetMinimumDistance () { return min_dist; }
-  virtual void SetMaximumDistance (const csVector3& max,
-				   bool force_update = true);
-  virtual csVector3 GetMaximumDistance () { return max_dist; }
-
-  virtual void SetRotConstraints (bool x, bool y, bool z,
-				  bool force_update = true);
-  virtual bool IsXRotConstrained () { return rot_constraint_x; }
-  virtual bool IsYRotConstrained () { return rot_constraint_y; }
-  virtual bool IsZRotConstrained () { return rot_constraint_z; }
-
-  virtual void SetMinimumAngle (const csVector3& min, bool force_update = true);
-  virtual csVector3 GetMinimumAngle () { return min_angle; }
-  virtual void SetMaximumAngle (const csVector3& max, bool force_update = true);
-  virtual csVector3 GetMaximumAngle () { return max_angle; }
-
-  virtual void SetBounce (const csVector3& bounce, bool force_update = true);
-  virtual csVector3 GetBounce () { return bounce; }
-
-  virtual void SetDesiredVelocity (const csVector3& velocity,
-				   bool force_update = true);
-  virtual csVector3 GetDesiredVelocity () { return desired_velocity; }
-
-  virtual void SetMaxForce (const csVector3& maxForce, bool force_update = true);
-  virtual csVector3 GetMaxForce () { return maxforce; }
-
-  virtual void SetAngularConstraintAxis (const csVector3& axis, int body,
-					 bool force_update = true);
-  virtual csVector3 GetAngularConstraintAxis (int body);
 };
 
 }

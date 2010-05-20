@@ -32,6 +32,7 @@
 #include "imesh/haze.h"
 #include "imesh/lghtng.h"
 #include "imesh/lookat.h"
+#include "imesh/modifiableterrain.h"
 #include "imesh/nullmesh.h"
 #include "imesh/object.h"
 #include "imesh/objmodel.h"

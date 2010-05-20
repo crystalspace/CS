@@ -34,8 +34,9 @@ class SintelScene : public AvatarScene
   float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
 
-  // Dynamic simuation related
+  // Dynamic simulation related
   float GetSimulationSpeed ();
+  bool HasPhysicalObjects ();
 
   // From csBaseEventHandler
   void Frame ();

@@ -9,17 +9,17 @@ Since Crystal Space has enough developers to warrant the use of @sc{svn} to
 manage its code base, there are some rules you need to keep in mind if you
 are going to be making changes of any sort to the @sc{svn} source tree.
 
-The repository for Crystal Space is located at 
-@file{https://svn.sourceforge.net/svnroot/crystal/CS}. The latest bleeding
-edge version can be found in the @file{trunk} subdirectory, assorted branches
-in @file{branches}.
+The repository for Crystal Space is located at
+@file{https://crystal.svn.sourceforge.net/svnroot/crystal/CS}. The latest
+bleeding edge version can be found in the @file{trunk} subdirectory, assorted
+branches in @file{branches}.
 
 For further instructions, please refer to the following document:
 
 @uref{http://sourceforge.net/svn/?group_id=649}
 
-Checkout the @file{https://svn.sourceforge.net/svnroot/crystal/CS/trunk} to 
-download the source code.  See the documentation for your @sc{svn} client on 
+Checkout @file{https://crystal.svn.sourceforge.net/svnroot/crystal/CS/trunk} to
+download the source code.  See the documentation for your @sc{svn} client on
 how to do this.
 
 If you do not have a developer account, you will be able to check out files,

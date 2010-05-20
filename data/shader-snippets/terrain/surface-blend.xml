@@ -1,0 +1,181 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+
+    <input file="/shader-snippets/texCoord.inp"	/>
+
+    <block location="cg:definitions">
+      <?Include /shader-snippets/terrain/funcs.cginc ?>
+    </block>
+
+    <input name="Position" type="position4_object" />
+    <!-- Surface normal -->
+    <input name="normal" type="normal_object" />
+
+    <!-- TexMaterial1 =================================================== -->
+    <input name="TexMaterial1" type="tex2d" default="complex" condition='vars."tex material1".texture'>
+      <block location="pass"><texture name="tex material1" destination="fragmentIn.TexMaterial1" /></block>
+      <block location="cg:fragmentIn"><uniform type="tex2d" name="TexMaterial1" /></block>
+      <block location="cg:fragmentMain">TexMaterial1 = fragmentIn.TexMaterial1;</block>
+      </input>
+
+      <block location="cg:variablemap"><variablemap variable="material1 texscale" destination="fragmentIn.texScale1" /></block>
+      <block location="cg:fragmentIn"><uniform type="float2" name="texScale1" /></block>
+
+      <block location="cg:variablemap"><variablemap variable="material1 attributes" destination="fragmentIn.attributes1" /></block>
+      <block location="cg:fragmentIn"><uniform type="float4" name="attributes1" /></block>
+
+      <!-- TexMaterial2 =================================================== -->
+      <input name="TexMaterial2" type="tex2d" default="complex" condition='vars."tex material2".texture'>
+      <block location="pass">
+        <texture name="tex material2" destination="fragmentIn.TexMaterial2" />
+      </block>
+      <block location="cg:fragmentIn">
+        <uniform type="tex2d" name="TexMaterial2" />
+      </block>
+      <block location="cg:fragmentMain">TexMaterial2 = fragmentIn.TexMaterial2;</block>
+      </input>
+
+      <block location="cg:variablemap">
+        <variablemap variable="material2 texscale" destination="fragmentIn.texScale2" />
+      </block>
+      <block location="cg:fragmentIn">
+        <uniform type="float2" name="texScale2" />
+      </block>
+
+    <block location="cg:variablemap">
+      <variablemap variable="material2 attributes" destination="fragmentIn.attributes2" />
+    </block>
+    <block location="cg:fragmentIn">
+      <uniform type="float4" name="attributes2" />
+    </block>
+    
+    <!-- TexMaterial3 =================================================== -->
+    <input name="TexMaterial3" type="tex2d" default="complex" condition='vars."tex material3".texture'>
+      <block location="pass">
+        <texture name="tex material3" destination="fragmentIn.TexMaterial3" />
+      </block>
+      <block location="cg:fragmentIn">
+        <uniform type="tex2d" name="TexMaterial3" />
+      </block>
+      <block location="cg:fragmentMain">TexMaterial3 = fragmentIn.TexMaterial3;</block>
+    </input>
+
+    <block location="cg:variablemap">
+      <variablemap variable="material3 texscale" destination="fragmentIn.texScale3" />
+    </block>
+    <block location="cg:fragmentIn">
+      <uniform type="float2" name="texScale3" />
+    </block>
+
+    <block location="cg:variablemap">
+      <variablemap variable="material3 attributes" destination="fragmentIn.attributes3" />
+    </block>
+    <block location="cg:fragmentIn">
+      <uniform type="float4" name="attributes3" />
+    </block>
+    
+    <!-- TexMaterial4 =================================================== -->
+    <input name="TexMaterial4" type="tex2d" default="complex" condition='vars."tex material4".texture'>
+       <block location="pass">
+          <texture name="tex material4" destination="fragmentIn.TexMaterial4" />
+       </block>
+       <block location="cg:fragmentIn">
+          <uniform type="tex2d" name="TexMaterial4" />
+       </block>
+       <block location="cg:fragmentMain">TexMaterial4 = fragmentIn.TexMaterial4;</block>
+    </input>
+    
+    <block location="cg:variablemap">
+      <variablemap variable="material4 texscale" destination="fragmentIn.texScale4" />
+    </block>
+    <block location="cg:fragmentIn">
+      <uniform type="float2" name="texScale4" />
+    </block>
+    
+    <block location="cg:variablemap">
+      <variablemap variable="material4 attributes" destination="fragmentIn.attributes4" />
+    </block>
+    <block location="cg:fragmentIn">
+      <uniform type="float4" name="attributes4" />
+    </block>
+
+    <!-- ================================================================================= -->
+
+    <block location="cg:vertexToFragment">
+      <varying type="float2" name="heightAngle" />
+    </block>
+
+    <block location="cg:vertexMain">
+      float3 Normals = normalize(normal);
+
+      float3 UP = {0.00,1,0.00};
+      UP = normalize(mul((float3x3)objectToWorld, UP));
+
+      //Slope
+      heightAngle.y = (acos(Normals.y));
+      //Height
+      heightAngle.x = mul (objectToWorld, float4(Position.xyz, 1.0)).y;
+    </block>
+
+    <block location="cg:fragmentMain">
+      float4 tex1 = tex2D(TexMaterial1, texCoord*fragmentIn.texScale1);
+      float w1 = HeightWeight(fragmentIn.attributes1, heightAngle.x);
+      w1 *= SlopeWeight(fragmentIn.attributes1, heightAngle.y);
+
+      float accW = w1;
+      float4 outD = tex1;
+
+      <?if vars."tex material2".texture ?>
+           float4 tex2 = tex2D(TexMaterial2, texCoord*fragmentIn.texScale2);
+           float w2 = HeightWeight(fragmentIn.attributes2, heightAngle.x);
+           w2 *= SlopeWeight(fragmentIn.attributes2, heightAngle.y);
+           accW += w2;
+           outD = lerp(outD, tex2, max(0.0f, w2 / accW));
+      <?endif?>
+
+      <?if vars."tex material3".texture ?>
+            float4 tex3 = tex2D(TexMaterial3, texCoord*fragmentIn.texScale3);
+            float w3 = HeightWeight(fragmentIn.attributes3, heightAngle.x);
+            w3 *= SlopeWeight(fragmentIn.attributes3, heightAngle.y);
+            accW += w3;
+            outD = lerp(outD, tex3, max(0.0f, w3 / accW));
+      <?endif?>
+      
+      <?if vars."tex material4".texture ?>
+            float4 tex4 = tex2D(TexMaterial4, texCoord*fragmentIn.texScale3);
+            float w4 = HeightWeight(fragmentIn.attributes4, heightAngle.x);
+            w4 *= SlopeWeight(fragmentIn.attributes4, heightAngle.y);
+            accW += w4;
+            outD = lerp(outD, tex4, max(0.0f, w4 / accW));
+      <?endif?>
+
+      surfaceColor = outD;
+      surfaceColor.a = 1;
+      surfaceColor_attr_perfragment = true;
+    </block>
+
+    <output name="surfaceColor" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+</snippet>

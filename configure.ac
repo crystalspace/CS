@@ -183,6 +183,9 @@ AS_IF([test $cs_cv_sys_pthread_mutex_recursive != no],
 	[$cs_cv_sys_pthread_mutex_recursive])])
 CS_CHECK_PTHREAD_ATFORK([cs_cv_sys_pthread_atfork])
 CS_EMIT_BUILD_PROPERTY([PTHREAD.ATFORK.AVAILABLE], [$cs_cv_sys_pthread_atfork])
+CS_CHECK_PTHREAD_SETNAME_NP([cs_cv_sys_pthread_setname_np])
+AS_IF([test cs_cv_sys_pthread_setname_np = yes],
+    [CS_HEADER_PROPERTY([CS_HAVE_PTHREAD_SETNAME_NP])])
 
 
 
@@ -1916,6 +1919,15 @@ CS_CHECK_BUILD([for sysconf(_SC_NPROCESSORS_ONLN)], [cs_cv_sysconf_processors],
     [],[],
     [CS_HEADER_PROPERTY([CS_HAVE_SYSCONF_PROCESSORS])])
    
+#------------------------------------------------------------------------------
+# Check for nullptr
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for nullptr], [cs_cv__nullptr],
+    [AC_LANG_PROGRAM(
+	[[]],
+	[void* p = nullptr;])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAS_NULLPTR])])
 
 
 #------------------------------------------------------------------------------
