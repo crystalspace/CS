@@ -291,7 +291,7 @@ if you have permission to do so, it is best to install the library.
 @cindex @sc{cegui}
 @cindex Libraries, @sc{cegui}
 
-@emph{Version:} 0.5.x required
+@emph{Version:} 0.7.x required
 
 Crystal Space uses @sc{cegui} for some of it's own tool programs (e.g. 
 @file{viewmesh}) but also allows external programs to utilize @sc{cegui} for

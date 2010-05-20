@@ -33,8 +33,8 @@ class Simple : public csDemoApplication
 private:
   // Physics related
   csRef<iDynamics> dyn;
-  csRef<iDynamicSystem> dynSys;
-  csRef<iBulletDynamicSystem> bullet_dynSys;
+  csRef<iDynamicSystem> dynamicSystem;
+  csRef<iBulletDynamicSystem> bulletDynamicSystem;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
@@ -69,10 +69,23 @@ private:
   CS::Animation::StateID ragdollState;
   csRef<iMeshWrapper> ragdollMesh;
 
+  // Dragging related
+  bool dragging;
+  csRef<iBulletPivotJoint> dragJoint;
+  float dragDistance;
+  float linearDampening, angularDampening;
+  int mouseX, mouseY;
+
+  // Cut & Paste related
+  csRef<iRigidBody> clipboardBody;
+  csRef<iMeshWrapper> clipboardMesh;
+
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
+  bool OnMouseUp (iEvent &event);
+  bool OnMouseMove (iEvent &event);
 
   // Camera
   void UpdateCameraMode ();
@@ -85,6 +98,7 @@ private:
   iRigidBody* SpawnCapsule ();
   iRigidBody* SpawnMesh ();
   iRigidBody* SpawnConvexMesh ();
+  iRigidBody* SpawnCompound ();
   iJoint* SpawnJointed ();
   void SpawnChain ();
   void LoadRagdoll ();

@@ -112,6 +112,25 @@ AC_DEFUN([CS_CHECK_PTHREAD_ATFORK],
 		[$cs_cv_sys_pthread_libs])])],
 	[$1=no])])
 
+#------------------------------------------------------------------------------
+# CS_CHECK_PTHREAD_SETNAME_NP(CACHE-VAR)
+#     Checks whether the pthread library contains pthread_setname_np(). Sets
+#     CACHE-VAR to "yes" or "no", according to the test result.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_PTHREAD_SETNAME_NP],
+    [AS_IF([test $cs_cv_sys_pthread = yes],
+	[AC_CACHE_CHECK([for pthread_setname_np support], [$1],
+	    [CS_BUILD_IFELSE(
+		[AC_LANG_PROGRAM(
+		    [[#include <pthread.h>]],
+		    [pthread_setname_np (0, "hello");])],
+		[], [],
+		[$1=yes], [$1=no],
+		[$cs_cv_sys_pthread_cflags -D_GNU_SOURCE],
+		[$cs_cv_sys_pthread_lflags],
+		[$cs_cv_sys_pthread_libs])])],
+	[$1=no])])
+
 m4_define([cs_pthread_flags],
     [CS_CREATE_TUPLE() \
     CS_CREATE_TUPLE([], [], [-lpthread]) \

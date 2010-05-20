@@ -40,6 +40,7 @@
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
 #define DYNDEBUG_COLLIDER 3
+#define DYNDEBUG_BULLET 4
 
 // Base class to be implemented for all different models
 class AvatarScene

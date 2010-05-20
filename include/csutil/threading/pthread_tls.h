@@ -29,28 +29,29 @@ namespace CS
   {
     namespace Implementation
     {
-      template<typename T>
       class ThreadLocalBase
       {
       public:
-        ThreadLocalBase()
+	typedef void (* DestructorFn)(void*);
+	
+        ThreadLocalBase (DestructorFn dtor = 0)
         {
-          pthread_key_create(&threadIndex, NULL);
+          pthread_key_create (&threadIndex, dtor);
         }
 
-        virtual ~ThreadLocalBase()
+        ~ThreadLocalBase()
         {
-          pthread_key_delete(threadIndex);
+          pthread_key_delete (threadIndex);
         }
 
-        virtual void SetValue(T data)
+        void SetValue(void* data) const
         {
-          pthread_setspecific(threadIndex, reinterpret_cast<void*>(data));
+          pthread_setspecific(threadIndex, data);
         }
 
-        T GetValue() const
+        void* GetValue() const
         {
-          return reinterpret_cast<T>(pthread_getspecific(threadIndex));
+          return pthread_getspecific(threadIndex);
         }
 
       protected:

@@ -1,0 +1,8 @@
+SubDir TOP apps tests csterrainedtest ;
+
+Description csterrainedtest : "Modifiable Terrain Test Application" ;
+Application csterrainedtest :
+  [ Wildcard *.h *.cpp ] ;
+CFlags csterrainedtest : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+LinkWith csterrainedtest : crystalspace ;
+FileListEntryApplications csterrainedtest : app-demo ;
