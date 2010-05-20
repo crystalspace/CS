@@ -685,47 +685,72 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
   // Check for soft bodies
   if (!result.body && isSoftWorld)
   {
+    // Find the closest body hit
     btSoftRigidDynamicsWorld* softWorld =
       static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+
+    bool hitFound = false;
+    float closestFraction;
+    btSoftBody::sRayCast closestRay;
+    btSoftBody* closestBody;
 
     btSoftBodyArray& sbs = softWorld->getSoftBodyArray ();
     for (int ib = 0; ib < sbs.size (); ++ib)
     {
       btSoftBody* psb = sbs[ib];
       btSoftBody::sRayCast ray;
-      if (psb->rayTest (rayFrom, rayTo, ray) && ray.fraction < 1.00f)
+
+      if (psb->rayTest (rayFrom, rayTo, ray))
       {
-	result.softBody = (csBulletSoftBody*) psb->getUserPointer ();
-	btVector3 impact = rayFrom + (rayTo - rayFrom) * ray.fraction;
-	result.isect = BulletToCS (impact, inverseInternalScale);
-
-	// find the closest vertex
-	switch(ray.feature)
+	if (!hitFound)
 	{
-	case btSoftBody::eFeature::Face:
-	  {
-	    btSoftBody::Face& face = psb->m_faces[ray.index];
-	    btSoftBody::Node* node = face.m_n[0];
-	    float distance = (node->m_x - impact).length2();
-	    for (int i = 1; i < 3; i++)
-	    {
-	      float nodeDistance = (face.m_n[i]->m_x - impact).length2();
-	      if (nodeDistance < distance)
-	      {
-		node = face.m_n[i];
-		distance = nodeDistance;
-	      }
-	    }
-
-	    result.vertexIndex = size_t (node - &psb->m_nodes[0]);
-	  }
-	  break;
-
-	default:
-	  // TODO: may need other types?
-	  break;
+	  closestFraction = ray.fraction;
+	  closestRay = ray;
+	  closestBody = psb;
+	  hitFound = true;
 	}
 
+	else if (ray.fraction < closestFraction)
+	{
+	  closestFraction = ray.fraction;
+	  closestRay = ray;
+	  closestBody = psb;
+	}
+      }
+    }
+
+    // Set up the result data structure
+    if (hitFound)
+    {
+      result.softBody = (csBulletSoftBody*) closestBody->getUserPointer ();
+      btVector3 impact = rayFrom + (rayTo - rayFrom) * closestRay.fraction;
+      result.isect = BulletToCS (impact, inverseInternalScale);
+
+      // find the closest vertex
+      switch (closestRay.feature)
+      {
+      case btSoftBody::eFeature::Face:
+	{
+	  btSoftBody::Face& face = closestBody->m_faces[closestRay.index];
+	  btSoftBody::Node* node = face.m_n[0];
+	  float distance = (node->m_x - impact).length2 ();
+
+	  for (int i = 1; i < 3; i++)
+	  {
+	    float nodeDistance = (face.m_n[i]->m_x - impact).length2 ();
+	    if (nodeDistance < distance)
+	    {
+	      node = face.m_n[i];
+	      distance = nodeDistance;
+	    }
+	  }
+
+	  result.vertexIndex = size_t (node - &closestBody->m_nodes[0]);
+	}
+	break;
+
+      default:
+	// TODO: may need other types?
 	break;
       }
     }
