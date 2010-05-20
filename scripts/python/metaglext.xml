@@ -7218,8 +7218,8 @@
     <token name="GL_FRAMEBUFFER_STATUS_ERROR_EXT" value="0x8CDE" />
     <token name="GL_FRAMEBUFFER_BINDING_EXT" value="0x8CA6" />
     <token name="GL_RENDERBUFFER_BINDINGS_EXT" value="0x8CA7" />
-    <token name="GL_MAX_COLOR_ATTACHMENTS_EXT" value="0x8CA8" />
-    <token name="GL_RENDERBUFFER_SIZE_EXT" value="0x8CA9" />
+    <token name="GL_MAX_COLOR_ATTACHMENTS_EXT" value="0x8CDF" />
+    <token name="GL_MAX_RENDERBUFFER_SIZE_EXT" value="0x84E8" />
     <token name="GL_INVALID_FRAMEBUFFER_OPERATION_EXT" value="0x0506" />
 
     <function name="glIsRenderbufferEXT" return="GLboolean" pointer="false">

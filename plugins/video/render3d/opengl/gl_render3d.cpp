@@ -955,7 +955,7 @@ bool csGLGraphics3D::Open ()
     rendercaps.DestinationAlpha = abits > 0;
   }
 
-  rendercaps.MaxRTColorAttachments = 0;
+  rendercaps.MaxRTColorAttachments = 1;
   if (ext->CS_GL_EXT_framebuffer_object)
   {
     GLint attachments;
