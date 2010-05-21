@@ -130,6 +130,14 @@ void HairTest::Frame ()
 	&& dynamicsDebugMode == DYNDEBUG_BULLET)
 	bulletDynamicSystem->DebugDraw (view);
 
+  for (size_t i = 0; i < bulletDynamicSystem->GetSoftBodyCount (); i++)
+  {
+	iBulletSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
+	// Ropes are characterized by the fact that they have no triangle
+	if (!softBody->GetTriangleCount ())
+	  softBody->DebugDraw (view);
+  }
+
   cegui->Render ();
 }
 

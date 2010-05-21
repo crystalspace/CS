@@ -229,15 +229,14 @@ bool KrystalScene::CreateAvatar ()
   idle05NodeFactory->SetAutomaticStop (false);
   idle06NodeFactory->SetAutomaticStop (false);
   standNodeFactory->SetAutomaticStop (false);
-/*
+
   randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle04NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
-*/
-  randomNodeFactory->AddNode (standNodeFactory, 10.0f);
+  randomNodeFactory->AddNode (standNodeFactory, 1.0f);
 
   if (hairTest->physicsEnabled)
   {
@@ -263,11 +262,11 @@ bool KrystalScene::CreateAvatar ()
 	// Create the geometry for the hairs
 	csRef<iGeneralFactoryState> hairsFactoryState =
 		scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
-  
+/*  
       // Create the mesh of the hairs
 	hairsMesh = hairTest->engine->CreateMeshWrapper
 		(hairsMeshFact, "krystal_hairs", hairTest->room, csVector3 (0.0f));
-	
+*/	
   }
 
   else
@@ -294,27 +293,31 @@ bool KrystalScene::CreateAvatar ()
 	// Start the ragdoll animation node in order to have the rigid bodies created
 	ragdollNode->Play ();
 
-	// Find the rigid body of the head of Krystal
 	iRigidBody* headBody = ragdollNode->GetBoneRigidBody
-      (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
+		(animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
 
-	// Create the soft body for the hairs
-	csRef<iGeneralFactoryState> hairsFactoryState =
-	  scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
+	iAnimatedMeshSubMesh* skullmesh = animesh -> GetSubMesh(1);
+	//skullmesh ->GetFactorySubMesh();
+    iRenderBuffer* indices = skullmesh->GetFactorySubMesh()->GetIndices(0);
+
+	//skullmesh->GetFactorySubMesh();//iAnimatedMeshFactorySubMesh
+	iRenderBuffer* vertices = animeshFactory->GetVertices();
+
+	csRenderBufferLock<csVector3> positions (vertices, CS_BUF_LOCK_READ);
 
 	csVector3 pos;
-	for(int i = 0; i < hairsFactoryState->GetVertexCount(); i ++)
-	{
-      if (hairsFactoryState->GetVertices()[i].y > 1.7f)
-	  {
-		pos = hairsFactoryState->GetVertices()[i];
-		hairsBody = hairTest->bulletDynamicSystem->CreateRope(pos,pos + csVector3(0,0.5f,0),5);
-		hairsBody->SetMass (2.0f);
-		hairsBody->SetRigidity (0.95f);
-		hairsBody->AnchorVertex (0, headBody);
-	  }
-	}
-	
+	CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);
+
+    while (tris.HasNext())
+    {
+      CS::TriangleT<size_t> tri (tris.Next ());
+
+	  pos = positions.Get(tri.b);
+	  hairsBody = hairTest->bulletDynamicSystem->CreateRope(pos,pos + csVector3(0,0.5f,0),5);
+	  hairsBody->SetMass (0.1f);
+ 	  hairsBody->SetRigidity (0.99f);
+	  hairsBody->AnchorVertex (0, headBody);
+    }
   }
 
   // Start animation
