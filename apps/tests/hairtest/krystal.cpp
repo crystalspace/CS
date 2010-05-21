@@ -314,9 +314,9 @@ bool KrystalScene::CreateAvatar ()
 
 	  if(uniqueIndices.Contains(tri.a) == csArrayItemNotFound)
 	    uniqueIndices.Push(tri.a);
-	  if(!uniqueIndices.Contains(tri.b) == csArrayItemNotFound)
+	  if(uniqueIndices.Contains(tri.b) == csArrayItemNotFound)
 	    uniqueIndices.Push(tri.b);
-	  if(!uniqueIndices.Contains(tri.c) == csArrayItemNotFound)
+	  if(uniqueIndices.Contains(tri.c) == csArrayItemNotFound)
 	    uniqueIndices.Push(tri.c);
     }
 
