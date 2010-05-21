@@ -37,13 +37,14 @@ namespace Implementation
     class ThreadStartParams : public CS::Memory::CustomAllocated
     {
     public:
-      ThreadStartParams (Runnable* runner, int32* isRunningPtr, 
+      ThreadStartParams (ThreadBase* thread, Runnable* runner, int32* isRunningPtr, 
         Barrier* startupBarrier)
-        : runnable (runner), isRunningPtr (isRunningPtr), 
+        : thread (thread), runnable (runner), isRunningPtr (isRunningPtr), 
         startupBarrier (startupBarrier)
       {
       }
 
+      ThreadBase* thread;
       Runnable* runnable;
       int32* isRunningPtr;
       Barrier* startupBarrier;
@@ -53,6 +54,7 @@ namespace Implementation
     {
       // Extract the parameters
       ThreadStartParams* tp = static_cast<ThreadStartParams*> (param);
+      csRef<ThreadBase> thread (tp->thread);
       int32* isRunningPtr = tp->isRunningPtr;
       Runnable* runnable = tp->runnable;
       Barrier* startupBarrier = tp->startupBarrier;
@@ -61,6 +63,15 @@ namespace Implementation
       AtomicOperations::Set (isRunningPtr, 1);
       startupBarrier->Wait ();
 
+    #ifdef CS_HAVE_PTHREAD_SETNAME_NP
+      {
+	// Set the name, for debugging
+	const char* threadName = runnable->GetName ();
+	if (threadName)
+	  pthread_setname_np (pthread_self(), threadName);
+      }
+    #endif
+      
       // Run      
       runnable->Run ();
 
@@ -83,7 +94,7 @@ namespace Implementation
   {
     if (!IsRunning ())
     {      
-      ThreadStartParams param (runnable, &isRunning, &startupBarrier);
+      ThreadStartParams param (this, runnable, &isRunning, &startupBarrier);
 
       pthread_attr_t attr;
       pthread_attr_init(&attr);

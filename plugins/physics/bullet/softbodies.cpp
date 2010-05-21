@@ -46,6 +46,7 @@ csBulletSoftBody::csBulletSoftBody (csBulletDynamicsSystem* dynSys,
 				    btSoftBody* body)
   : scfImplementationType (this), dynSys (dynSys), body (body)
 {
+  body->setUserPointer (this);
 }
 
 csBulletSoftBody::~csBulletSoftBody ()
@@ -81,17 +82,17 @@ void csBulletSoftBody::SetMass (float mass)
   softWorld->addSoftBody (body);
 }
 
-float csBulletSoftBody::GetMass ()
+float csBulletSoftBody::GetMass () const
 {
   return body->getTotalMass ();
 }
 
-size_t csBulletSoftBody::GetVertexCount ()
+size_t csBulletSoftBody::GetVertexCount () const
 {
   return body->m_nodes.size ();
 }
 
-csVector3 csBulletSoftBody::GetVertexPosition (size_t index)
+csVector3 csBulletSoftBody::GetVertexPosition (size_t index) const
 {
   CS_ASSERT(index < (size_t) body->m_nodes.size ());
   return BulletToCS (body->m_nodes[index].m_x, dynSys->inverseInternalScale);
@@ -118,9 +119,53 @@ void csBulletSoftBody::SetRigidity (float rigidity)
   body->m_materials[0]->m_kLST = rigidity;
 }
 
-float csBulletSoftBody::GetRigidity ()
+float csBulletSoftBody::GetRigidity () const
 {
   return body->m_materials[0]->m_kLST;
+}
+
+void csBulletSoftBody::SetLinearVelocity (csVector3 velocity)
+{
+  body->setVelocity (CSToBullet (velocity, dynSys->internalScale));
+}
+
+void csBulletSoftBody::SetLinearVelocity (csVector3 velocity, size_t vertexIndex)
+{
+  CS_ASSERT (vertexIndex < (size_t) body->m_nodes.size ());
+  body->addVelocity (CSToBullet (velocity, dynSys->internalScale)
+		     - body->m_nodes[vertexIndex].m_v, vertexIndex);
+}
+
+csVector3 csBulletSoftBody::GetLinearVelocity (size_t vertexIndex) const
+{
+  CS_ASSERT (vertexIndex < (size_t) body->m_nodes.size ());
+  return BulletToCS (body->m_nodes[vertexIndex].m_v, dynSys->inverseInternalScale);
+}
+
+void csBulletSoftBody::AddForce (csVector3 force)
+{
+  body->addForce (CSToBullet (force, dynSys->internalScale));
+}
+
+void csBulletSoftBody::AddForce (csVector3 force, size_t vertexIndex)
+{
+  CS_ASSERT (vertexIndex < (size_t) body->m_nodes.size ());
+  // TODO: why a correction factor of 100?
+  body->addForce (CSToBullet (force * 100.0f, dynSys->internalScale), vertexIndex);
+}
+
+size_t csBulletSoftBody::GetTriangleCount () const
+{
+  return body->m_faces.size ();
+}
+
+csTriangle csBulletSoftBody::GetTriangle (size_t index) const
+{
+  CS_ASSERT(index < (size_t) body->m_faces.size ());
+  btSoftBody::Face& face = body->m_faces[index];
+  return csTriangle (face.m_n[0] - &body->m_nodes[0],
+		     face.m_n[1] - &body->m_nodes[0],
+		     face.m_n[2] - &body->m_nodes[0]);
 }
 
 }

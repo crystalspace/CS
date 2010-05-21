@@ -20,7 +20,6 @@
 #define __CS_CSUTIL_THREADMANAGER_H__
 
 #include "csutil/eventhandlers.h"
-#include "csutil/listaccessqueue.h"
 #include "csutil/objreg.h"
 #include "csutil/threadevent.h"
 #include "csutil/threadjobqueue.h"
@@ -36,6 +35,29 @@ struct iEvent;
 class CS_CRYSTALSPACE_EXPORT csThreadManager : public scfImplementation1<csThreadManager,
   iThreadManager>
 {
+  class ListAccessQueue : public csRefCount
+  {
+  public:
+    ListAccessQueue();
+    ~ListAccessQueue();
+
+    void Enqueue(iJob* job, QueueType type);
+    void ProcessQueue(uint num);
+    int32 GetQueueCount() const;
+    void ProcessAll ();
+  private:
+    inline void ProcessHighQueue(uint& i, uint& num);
+    inline void ProcessMedQueue(uint& i, uint& num);
+    inline void ProcessLowQueue(uint& i, uint& num);
+
+    CS::Threading::RecursiveMutex highQueueLock;
+    CS::Threading::RecursiveMutex medQueueLock;
+    CS::Threading::RecursiveMutex lowQueueLock;
+    csFIFO<csRef<iJob> > highqueue;
+    csFIFO<csRef<iJob> > medqueue;
+    csFIFO<csRef<iJob> > lowqueue;
+    int32 total;
+  };
 public:
   csThreadManager(iObjectRegistry* objReg);
   virtual ~csThreadManager();
@@ -43,6 +65,9 @@ public:
 
   void Process(uint num = 1);
   bool Wait(csRefArray<iThreadReturn>& threadReturns, bool process = true);
+  
+  /// Process all pending events
+  void ProcessAll ();
 
   inline void PushToQueue(QueueType queueType, iJob* job)
   {

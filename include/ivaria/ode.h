@@ -175,11 +175,11 @@ struct iODEDynamicSystemState : public virtual iBase
   virtual bool AutoDisableEnabled () =0;
   /**
    * Set the parameters for AutoDisable.
-   * /param linear Maximum linear movement to disable a body
-   * /param angular Maximum angular movement to disable a body
-   * /param steps Minimum number of steps the body meets linear and angular
+   * \param linear Maximum linear movement to disable a body
+   * \param angular Maximum angular movement to disable a body
+   * \param steps Minimum number of steps the body meets linear and angular
    *        requirements before it is disabled.
-   * /param time Minimum time the body needs to meet linear and angular movement
+   * \param time Minimum time the body needs to meet linear and angular movement
    *        requirements before it is disabled.
    */
   virtual void SetAutoDisableParams (float linear, float angular, int steps,
@@ -700,23 +700,23 @@ struct iODEAMotorJoint : public virtual iODEGeneralJointState
 
   /**
    * Set AMotor axis.
-   * /param axis_num - axis number
-   * /param rel_orient - ``relative orientation'' mode:
-   * 0: The axis is anchored to the global frame.
-   * 1: The axis is anchored to the first body.
-   * 2: The axis is anchored to the second body.
-   * /param x, y, z - axis
+   * \param axis_num - axis number
+   * \param rel_orient - ``relative orientation'' mode:
+   * - 0: The axis is anchored to the global frame.
+   * - 1: The axis is anchored to the first body.
+   * - 2: The axis is anchored to the second body.
+   * \param x, y, z - axis
    */
   virtual void SetAMotorAxis (int axis_num, int rel_orient, float x, float y,
   	float z) = 0;
 
   /**
    * Set AMotor axis.
-   * /param axis_num - axis number
-   * /param rel_orient - ``relative orientation'' mode:
-   * 0: The axis is anchored to the global frame.
-   * 1: The axis is anchored to the first body.
-   * 2: The axis is anchored to the second body.
+   * \param axis_num - axis number
+   * \param rel_orient - ``relative orientation'' mode:
+   * - 0: The axis is anchored to the global frame.
+   * - 1: The axis is anchored to the first body.
+   * - 2: The axis is anchored to the second body.
    */
   virtual void SetAMotorAxis (int axis_num, int rel_orient,
   	const csVector3 &axis) = 0;
@@ -728,9 +728,9 @@ struct iODEAMotorJoint : public virtual iODEGeneralJointState
 
   /**
    * Get ``relative orientation'' mode:
-   * 0: The axis is anchored to the global frame.
-   * 1: The axis is anchored to the first body.
-   * 2: The axis is anchored to the second body.
+   * - 0: The axis is anchored to the global frame.
+   * - 1: The axis is anchored to the first body.
+   * - 2: The axis is anchored to the second body.
    */
   virtual int GetAMotorAxisRelOrientation (int axis_num) = 0;
 

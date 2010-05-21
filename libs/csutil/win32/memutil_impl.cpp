@@ -31,6 +31,14 @@ namespace CS {
         GlobalMemoryStatusEx (&memAmount);
         return (memAmount.ullTotalPhys / 1024); 
       }
+
+      size_t GetMaxVirtualSize ()
+      {
+        MEMORYSTATUSEX memAmount;
+        memAmount.dwLength = sizeof(memAmount);
+        GlobalMemoryStatusEx (&memAmount);
+        return (memAmount.ullTotalVirtual / 1024); 
+      }
     } // End namespace Implementation
   } // End namespace Platform
 } // End namespace CS

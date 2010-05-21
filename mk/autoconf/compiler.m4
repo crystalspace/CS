@@ -264,6 +264,19 @@ AC_DEFUN([CS_PROG_LINK],[
 	    [C++], 
 	    [CS_EMIT_BUILD_PROPERTY([LINK.GC_SECTIONS], 
 	        [$cs_cv_prog_link_gc_sections])])])
+    
+    # Check if linker supports --large-address-aware.
+    AC_ARG_ENABLE([large-address-aware], 
+	[AC_HELP_STRING([--large-address-aware],
+	    [Utilize --large-address-aware linker flag (default YES)])])
+    AS_IF([test -z "$enable_large_address_aware"], 
+	[enable_large_address_aware=yes])
+    AS_IF([test "$enable_large_address_aware" != "no"],
+	[CS_EMIT_BUILD_FLAGS([if --large-address-aware is supported], 
+	    [cs_cv_prog_link_large_address_aware], 
+	    [CS_CREATE_TUPLE([-Wl,--large-address-aware])], 
+	    [C++], 
+	    [CMD.LINK], [+])])
 ])
 
 #-----------------------------------------------------------------------------

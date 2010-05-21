@@ -77,8 +77,8 @@ void csCommonImageFileLoader::ApplyTo (csImageMemory* image)
 
 //---------------------------------------------------------------------------
 
-csCommonImageFile::LoaderJob::LoaderJob (iImageFileLoader* loader) 
-  : scfImplementationType (this), currentLoader (loader)
+csCommonImageFile::LoaderJob::LoaderJob (csCommonImageFile* fileToLoad) 
+  : scfImplementationType (this), fileToLoad (fileToLoad)
 {
 }
 
@@ -88,6 +88,13 @@ csCommonImageFile::LoaderJob::~LoaderJob()
 
 void csCommonImageFile::LoaderJob::Run()
 {
+  csRef<iImageFileLoader> currentLoader;
+  {
+    csRef<csCommonImageFile> fileToLoad (this->fileToLoad);
+    if (!fileToLoad.IsValid()) return;
+    currentLoader = fileToLoad->currentLoader;
+    if (!currentLoader.IsValid()) return;
+  }
   loadResult = currentLoader->LoadData ();
 }
 
@@ -97,7 +104,7 @@ void csCommonImageFile::LoaderJob::Run()
 csCommonImageFile::csCommonImageFile (iObjectRegistry* object_reg, int format) 
   : scfImplementationType (this, format), object_reg (object_reg) 
 {
-#ifdef THREADED_LOADING
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
   static const char queueTag[] = "crystalspace.jobqueue.imageload";
   jobQueue = csQueryRegistryTagInterface<iJobQueue> (object_reg, queueTag);
   if (!jobQueue.IsValid())
@@ -112,18 +119,15 @@ csCommonImageFile::csCommonImageFile (iObjectRegistry* object_reg, int format)
 
 csCommonImageFile::~csCommonImageFile()
 {
-#ifdef THREADED_LOADING
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
   if (loadJob.IsValid())
-    jobQueue->Dequeue (loadJob);
+    jobQueue->Dequeue (loadJob, true);
 #endif
 }
 
 #include "csutil/custom_new_disable.h"
 bool csCommonImageFile::Load (csRef<iDataBuffer> source)
 {
-#ifdef THREADED_LOADING
-  csRef<iImageFileLoader> currentLoader;
-#endif
   currentLoader = InitLoader (source);
   if (!currentLoader.IsValid()) return false;
   const uint format = currentLoader->GetFormat();
@@ -133,8 +137,8 @@ bool csCommonImageFile::Load (csRef<iDataBuffer> source)
   const int h = currentLoader->GetHeight();
   CS_ASSERT ((w != 0) && (h != 0));
   SetDimensions (w, h);
-#ifdef THREADED_LOADING
-  loadJob.AttachNew (new LoaderJob (currentLoader));
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
+  loadJob.AttachNew (new LoaderJob (this));
   jobQueue->Enqueue (loadJob);
   return true;
 #else
@@ -145,20 +149,21 @@ bool csCommonImageFile::Load (csRef<iDataBuffer> source)
 
 void csCommonImageFile::WaitForJob() const
 {
-#ifdef THREADED_LOADING
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
   jobQueue->PullAndRun (loadJob);
 #endif
 }
 
 void csCommonImageFile::MakeImageData() const
 {
-#ifdef THREADED_LOADING
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
   if (loadJob)
   {
     WaitForJob();
     // Ugly ugly ugly so we can call ApplyTo()...
     csImageMemory* thisNonConst = const_cast<csCommonImageFile*> (this);
-    loadJob->currentLoader->ApplyTo (thisNonConst);
+    currentLoader->ApplyTo (thisNonConst);
+    currentLoader = 0;
     loadJob = 0;
     jobQueue = 0;
   }
@@ -208,11 +213,9 @@ const char* csCommonImageFile::DataTypeString (csLoaderDataType dataType)
 
 const char* csCommonImageFile::GetRawFormat() const
 {
-#ifdef THREADED_LOADING
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
   if (!loadJob) return 0;
   //WaitForJob();
-  csRef<iImageFileLoader> currentLoader = 
-    loadJob->currentLoader;
 #endif
   if (currentLoader.IsValid())
   {
@@ -225,12 +228,9 @@ const char* csCommonImageFile::GetRawFormat() const
 
 csRef<iDataBuffer> csCommonImageFile::GetRawData() const
 {
-  csRef<iDataBuffer> d;
-#ifdef THREADED_LOADING
-  if (!loadJob) return d;
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
+  if (!loadJob) return csRef<iDataBuffer> ();
   WaitForJob();
-  csRef<iImageFileLoader> currentLoader = 
-    loadJob->currentLoader;
 #endif
   if (currentLoader.IsValid()
     && (DataTypeString (currentLoader->GetDataType()) != 0))
