@@ -40,12 +40,15 @@ KrystalScene::KrystalScene (HairTest* hairTest)
 
 KrystalScene::~KrystalScene ()
 {
-  if (!animesh)
-    return;
+  if (animesh)
+  {
+    // Remove the mesh from the scene
+    csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
+    hairTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
+  }
 
-  // Remove the mesh from the scene
-  csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
-  hairTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
+  if (hairsBody)
+	hairTest->bulletDynamicSystem->RemoveSoftBody (hairsBody);
 }
 
 csVector3 KrystalScene::GetCameraStart ()
@@ -147,6 +150,16 @@ bool KrystalScene::CreateAvatar ()
   if (!bodySkeleton)
     return hairTest->ReportError ("Can't find Krystal's body mesh description!");
 
+  // Load Krystal's hairs
+  rc = hairTest->loader->Load ("/lib/krystal/krystal_hairs.xml");
+  if (!rc.success)
+	  return hairTest->ReportError ("Can't load Krystal's hairs library file!");
+
+  csRef<iMeshFactoryWrapper> hairsMeshFact =
+	  hairTest->engine->FindMeshFactory ("krystal_hairs");
+  if (!hairsMeshFact)
+	  return hairTest->ReportError ("Can't find Krystal's hairs mesh factory!");  
+
   // Create a new animation tree. The structure of the tree is:
   //   + ragdoll controller node (root node - only if physics are enabled)
   //     + Random node
@@ -245,14 +258,16 @@ bool KrystalScene::CreateAvatar ()
        animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
-    ragdollNodeFactory->AddBodyChain (bodyChain, RAGDOLL_STATE_KINEMATIC);
+    ragdollNodeFactory->AddBodyChain (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
 
-    // Create bone chain for hairs and add it to the ragdoll controller. The chain will
-    // always be in dynamic mode.
-    hairChain = bodySkeleton->CreateBodyChain
-      ("hair_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hairs01"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("Hairs06"), 0);
-    ragdollNodeFactory->AddBodyChain (hairChain, RAGDOLL_STATE_DYNAMIC);
+	// Create the geometry for the hairs
+	csRef<iGeneralFactoryState> hairsFactoryState =
+		scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
+  
+      // Create the mesh of the hairs
+	hairsMesh = hairTest->engine->CreateMeshWrapper
+		(hairsMeshFact, "krystal_hairs", hairTest->room, csVector3 (0.0f));
+	
   }
 
   else
@@ -275,6 +290,31 @@ bool KrystalScene::CreateAvatar ()
     ragdollNode =
       scfQueryInterface<iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
     ragdollNode->SetAnimatedMesh (animesh);
+
+	// Start the ragdoll animation node in order to have the rigid bodies created
+	ragdollNode->Play ();
+
+	// Find the rigid body of the head of Krystal
+	iRigidBody* headBody = ragdollNode->GetBoneRigidBody
+      (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
+
+	// Create the soft body for the hairs
+	csRef<iGeneralFactoryState> hairsFactoryState =
+	  scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
+
+	csVector3 pos;
+	for(int i = 0; i < hairsFactoryState->GetVertexCount(); i ++)
+	{
+      if (hairsFactoryState->GetVertices()[i].y > 1.7f)
+	  {
+		pos = hairsFactoryState->GetVertices()[i];
+		hairsBody = hairTest->bulletDynamicSystem->CreateRope(pos,pos + csVector3(0,0.5f,0),5);
+		hairsBody->SetMass (2.0f);
+		hairsBody->SetRigidity (0.95f);
+		hairsBody->AnchorVertex (0, headBody);
+	  }
+	}
+	
   }
 
   // Start animation
@@ -299,11 +339,7 @@ void KrystalScene::ResetScene ()
     krystalDead = false;
 
     // Set the ragdoll state of the 'body' chain as kinematic
-    ragdollNode->SetBodyChainState (bodyChain, RAGDOLL_STATE_KINEMATIC);
-
-    // Reset the transform of the 'hairs' chain, since the mesh is moved abruptly,
-    // otherwise it can lead to unstability.
-    ragdollNode->ResetChainTransform (hairChain);
+    ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
 
     // Update the display of the dynamics debugger
     if (hairTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
