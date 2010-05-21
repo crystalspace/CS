@@ -349,7 +349,6 @@ public:
   virtual void Step (float stepsize);
 
   virtual csPtr<iRigidBody> CreateBody ();
-  virtual void AddBody (iRigidBody* body) { /* TODO */ }
   virtual void RemoveBody (iRigidBody* body);
   virtual iRigidBody *FindBody (const char *name);
   iRigidBody *GetBody (unsigned int index);

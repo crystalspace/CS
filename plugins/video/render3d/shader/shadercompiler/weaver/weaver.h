@@ -23,7 +23,6 @@
 #include "iutil/comp.h"
 #include "ivideo/shader/shader.h"
 
-#include "csutil/threading/tls.h"
 #include "csutil/weakref.h"
 #include "csutil/scf_implementation.h"
 
@@ -101,7 +100,7 @@ public:
   /* When loading a snippet, sometimes document nodes have to be created.
      These are created from this "auto document".
    */
-  CS::Threading::ThreadLocal<csRef<iDocumentNode> > autoDocRoot;
+  mutable csRef<iDocumentNode> autoDocRoot;
   csRef<iDocumentNode> CreateAutoNode (csDocumentNodeType type) const;
 
   /// Get the job queue used for shader technique synthesis

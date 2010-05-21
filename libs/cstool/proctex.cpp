@@ -146,11 +146,6 @@ csProcTexture::~csProcTexture ()
 
 }
 
-void csProcTexture::SelfDestruct ()
-{
-  engine->GetTextureList ()->Remove (static_cast<iTextureWrapper*>(this));
-}
-
 THREADED_CALLABLE_IMPL1(csProcTexture, SetupProcEventHandler,
 	iObjectRegistry* object_reg)
 {
@@ -194,7 +189,7 @@ iTextureWrapper* csProcTexture::CreateTexture (iObjectRegistry* object_reg)
 {
   csRef<iTextureWrapper> tex;
 
-  engine = csQueryRegistry<iEngine> (object_reg);
+  csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
   csRef<iThreadedLoader> tldr = csQueryRegistry<iThreadedLoader> (object_reg);
   csRef<iTextureManager> texman = csQueryRegistry<iTextureManager> (object_reg);
   if (proc_image)

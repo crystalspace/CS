@@ -36,6 +36,7 @@ SintelScene::SintelScene (AvatarTest* avatarTest)
   avatarTest->keyDescriptions.Push ("2: smiling");
   avatarTest->keyDescriptions.Push ("3: angry");
   avatarTest->keyDescriptions.Push ("4: sad");
+  avatarTest->keyDescriptions.Push ("r: reset scene");
   avatarTest->keyDescriptions.Push ("n: switch to next scene");
 }
 
@@ -73,11 +74,6 @@ csVector3 SintelScene::GetCameraTarget ()
 float SintelScene::GetSimulationSpeed ()
 {
   return 1.0f;
-}
-
-bool SintelScene::HasPhysicalObjects ()
-{
-  return false;
 }
 
 void SintelScene::Frame ()

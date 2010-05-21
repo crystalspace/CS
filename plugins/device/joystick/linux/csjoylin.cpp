@@ -156,7 +156,7 @@ bool csLinuxJoystick::Init ()
     }
     else if (verbose || errno != ENOENT)
     {
-      Report (CS_REPORTER_SEVERITY_DEBUG,
+      Report (CS_REPORTER_SEVERITY_WARNING,
               "Failed to open joystick device %s - error: %s\n",
               it->GetStr (),
               strerror (errno));

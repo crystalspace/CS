@@ -160,13 +160,6 @@ bool DeferredDemo::SetupScene()
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
 
-  // Checks for support of at least 4 color buffer attachment points.
-  const csGraphics3DCaps *caps = graphics3D->GetCaps();
-  if (caps->MaxRTColorAttachments < 3)
-    return ReportError("Graphics3D does not support at least 3 color buffer attachments!");
-  else
-    ReportInfo("Graphics3D supports %d color buffer attachments.", caps->MaxRTColorAttachments);
-
   // Creates the off-screen buffer
   int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
 

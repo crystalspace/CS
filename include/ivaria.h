@@ -44,7 +44,6 @@
 #include "ivaria/script.h"
 #include "ivaria/sequence.h"
 #include "ivaria/simpleformer.h"
-#include "ivaria/softanim.h"
 #include "ivaria/stdrep.h"
 #include "ivaria/terraform.h"
 #include "ivaria/translator.h"

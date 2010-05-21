@@ -538,7 +538,7 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   {
     csRef<iThreadManager> threadMgr (csQueryRegistry<iThreadManager> (r));
     if (threadMgr)
-      threadMgr->ProcessAll ();
+      threadMgr->Process ((uint)~0);
   }
 
   // Explicitly unload all plugins from the plugin manager because

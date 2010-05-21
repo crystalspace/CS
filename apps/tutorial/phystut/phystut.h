@@ -24,7 +24,6 @@
 #include "ivaria/bullet.h"
 #include "ivaria/ode.h"
 #include "ivaria/dynamicsdebug.h"
-#include "ivaria/softanim.h"
 #include "imesh/animesh.h"
 #include "imesh/ragdoll.h"
 
@@ -33,11 +32,10 @@ class Simple : public csDemoApplication
 private:
   // Physics related
   csRef<iDynamics> dyn;
-  csRef<iDynamicSystem> dynamicSystem;
-  csRef<iBulletDynamicSystem> bulletDynamicSystem;
+  csRef<iDynamicSystem> dynSys;
+  csRef<iBulletDynamicSystem> bullet_dynSys;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
-  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   bool isSoftBodyWorld;
 
   // Meshes
@@ -69,23 +67,10 @@ private:
   CS::Animation::StateID ragdollState;
   csRef<iMeshWrapper> ragdollMesh;
 
-  // Dragging related
-  bool dragging;
-  csRef<iBulletPivotJoint> dragJoint;
-  float dragDistance;
-  float linearDampening, angularDampening;
-  int mouseX, mouseY;
-
-  // Cut & Paste related
-  csRef<iRigidBody> clipboardBody;
-  csRef<iMeshWrapper> clipboardMesh;
-
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
-  bool OnMouseUp (iEvent &event);
-  bool OnMouseMove (iEvent &event);
 
   // Camera
   void UpdateCameraMode ();
@@ -98,7 +83,6 @@ private:
   iRigidBody* SpawnCapsule ();
   iRigidBody* SpawnMesh ();
   iRigidBody* SpawnConvexMesh ();
-  iRigidBody* SpawnCompound ();
   iJoint* SpawnJointed ();
   void SpawnChain ();
   void LoadRagdoll ();

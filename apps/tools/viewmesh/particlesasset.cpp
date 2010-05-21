@@ -181,7 +181,7 @@ csPtr<iStringArray> ParticlesAsset::GetEffectors()
     }
     else if (lc)
     {
-      desc.Format ("LinCol(%d)", (int) lc->GetColorCount());
+      desc.Format ("LinCol(%d)", lc->GetColorCount());
     }
     else if (vf)
     {
@@ -1145,15 +1145,15 @@ csPtr<iStringArray> ParticlesAsset::GetLinearProps(iParticleBuiltinEffectorLinea
     *size = paramSet.particleSize;
 
     csString desc;
-    desc.Format("ParamSet %d, angVel(%s)", (int) i, angularVel->Description().GetData());
+    desc.Format("ParamSet %d, angVel(%s)", i, angularVel->Description().GetData());
     arr->Push(desc);
-    desc.Format("ParamSet %d, color(%g, %g, %g, %g)", (int) i, color->red, color->green, color->blue, color->alpha);
+    desc.Format("ParamSet %d, color(%g, %g, %g, %g)", i, color->red, color->green, color->blue, color->alpha);
     arr->Push(desc);
-    desc.Format("ParamSet %d, linVel(%g, %g, %g)", (int) i, linVel->x, linVel->y, linVel->z);
+    desc.Format("ParamSet %d, linVel(%g, %g, %g)", i, linVel->x, linVel->y, linVel->z);
     arr->Push(desc);
-    desc.Format("ParamSet %d, mass(%g)", (int) i, *mass);
+    desc.Format("ParamSet %d, mass(%g)", i, *mass);
     arr->Push(desc);
-    desc.Format("ParamSet %d, size(%g, %g)", (int) i, size->x, size->y);
+    desc.Format("ParamSet %d, size(%g, %g)", i, size->x, size->y);
     arr->Push(desc);
   }
 

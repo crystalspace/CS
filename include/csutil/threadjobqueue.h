@@ -57,8 +57,8 @@ public:
   virtual ~ThreadedJobQueue ();
 
   virtual void Enqueue (iJob* job);
-  virtual JobStatus Dequeue (iJob* job, bool waitForCompletion);
-  virtual JobStatus PullAndRun (iJob* job, bool waitForCompletion = true);
+  virtual void Dequeue (iJob* job);
+  virtual void PullAndRun (iJob* job, bool waitForCompletion = false);
   virtual bool IsFinished ();  
   virtual int32 GetQueueCount();
   virtual void WaitAll ();
@@ -68,7 +68,6 @@ public:
 private:
 
   bool PullFromQueues (iJob* job);
-  JobStatus CheckCompletion (iJob* job, bool waitForCompletion);
 
   // Runnable
   struct ThreadState;  
@@ -81,16 +80,13 @@ private:
     virtual void Run ();
     virtual const char* GetName () const;
   private:
-    friend class ThreadedJobQueue;
-    
     ThreadedJobQueue* ownerQueue;
-    int32 shutdownQueue;
-    csRef<ThreadState> threadState;
+    ThreadState* threadState;
     csString name;
   };
 
   // Per thread state
-  struct ThreadState : public CS::Utility::AtomicRefCount
+  struct ThreadState
   {
     ThreadState (ThreadedJobQueue* queue, unsigned int id)
     {
@@ -110,12 +106,13 @@ private:
     csFIFO<csRef<iJob> > jobQueue;
   };
 
-  csRef<ThreadState>* allThreadState;
+  ThreadState** allThreadState;
   ThreadGroup allThreads;
 
   Mutex finishMutex;
 
   size_t numWorkerThreads;
+  int32 shutdownQueue;
   int32 outstandingJobs;
   csString name;
 };

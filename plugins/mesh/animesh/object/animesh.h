@@ -185,8 +185,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   public:
     FactorySubmesh (const char* name)
-      : scfImplementationType (this), material(0), name(name), visible (true),
-      renderPriority (7), zbufMode (CS_ZBUF_USE)
+      : scfImplementationType (this), material(0), name(name)
     {}
 
     virtual iRenderBuffer* GetIndices (size_t set)
@@ -239,22 +238,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     /// Get the submesh name.
     virtual const char* GetName () const { return name.GetData(); }
 
-    virtual void SetRendering (bool doRender)
-      { visible = doRender; }
-    virtual bool IsRendering () const
-      { return visible; }
-    virtual void SetRenderPriority (CS::Graphics::RenderPriority rp)
-      { renderPriority = rp; }
-    virtual CS::Graphics::RenderPriority GetRenderPriority () const
-      { return renderPriority; }
-    virtual void SetZBufMode (csZBufMode mode)
-      { zbufMode = mode; }
-    virtual csZBufMode GetZBufMode () const
-      { return zbufMode; }
-
+    /// Whether we're visible by default.
     bool visible;
-    CS::Graphics::RenderPriority renderPriority;
-    csZBufMode zbufMode;
   };
 
 

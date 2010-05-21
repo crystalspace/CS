@@ -13367,27 +13367,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iThreadManager_ProcessAll(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iThreadManager *arg1 = (iThreadManager *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iThreadManager_ProcessAll",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThreadManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThreadManager_ProcessAll" "', argument " "1"" of type '" "iThreadManager *""'"); 
-  }
-  arg1 = reinterpret_cast< iThreadManager * >(argp1);
-  (arg1)->ProcessAll();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_delete_iThreadManager(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iThreadManager *arg1 = (iThreadManager *) 0 ;
@@ -59128,7 +59107,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iThreadManager_SetAlwaysRunNow", _wrap_iThreadManager_SetAlwaysRunNow, METH_VARARGS, NULL},
 	 { (char *)"iThreadManager_GetAlwaysRunNow", _wrap_iThreadManager_GetAlwaysRunNow, METH_VARARGS, NULL},
 	 { (char *)"iThreadManager_Exiting", _wrap_iThreadManager_Exiting, METH_VARARGS, NULL},
-	 { (char *)"iThreadManager_ProcessAll", _wrap_iThreadManager_ProcessAll, METH_VARARGS, NULL},
 	 { (char *)"delete_iThreadManager", _wrap_delete_iThreadManager, METH_VARARGS, NULL},
 	 { (char *)"iThreadManager_swigregister", iThreadManager_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iDebugHelper_GetSupportedTests", _wrap_iDebugHelper_GetSupportedTests, METH_VARARGS, NULL},

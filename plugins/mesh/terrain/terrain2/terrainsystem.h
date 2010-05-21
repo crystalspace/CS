@@ -54,10 +54,6 @@ public:
 
   virtual ~csTerrainSystem ();
 
-  iTerrainCell* AddCell (iTerrainFactoryCell*);
-
-  virtual void RemoveCell (iTerrainCell*);
-
   void AddCell (csTerrainCell* cell);
 
   void FireLoadCallbacks (csTerrainCell* cell);

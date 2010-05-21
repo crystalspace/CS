@@ -18,6 +18,7 @@
 
 #include "csutil/platform.h"
 #include "memutil.h"
+#include "memutil.h"
 
 namespace CS {
   namespace Platform {
@@ -36,20 +37,5 @@ namespace CS {
       return memorySize;
 
     } // End GetPhysicalMemorySize()      
-
-    size_t GetMaxVirtualSize()
-    {
-      static size_t memorySize = 0;
-      static bool cacheValid = false;
-
-      if (!cacheValid)
-      {
-        memorySize = CS::Platform::Implementation::GetMaxVirtualSize();
-        cacheValid = true;
-      }
-
-      return memorySize;
-
-    }
   } // End namespace Platform
 } // End namespace CS

@@ -60,8 +60,6 @@ namespace CS
     csRef<iEngine> engine;
     /// View used to render the tiles
     csRef<iView> shotView;
-    /// Original camera
-    csRef<iCamera> originalCam;
     
     /**
      * Draw the view, set up to cover the current tile.
@@ -95,7 +93,7 @@ namespace CS
     virtual csRef<iImage> PostProcessImage (csImageMemory* img);
     
     /// Setup the shotView member.
-    void Setup (iCamera* camera, iEngine* engine, iGraphics3D* g3d);
+    void Setup (iPerspectiveCamera* camera, iEngine* engine, iGraphics3D* g3d);
   public:
     /// Initialize for dimensions \p width and \p height.
     UberScreenshotMaker (uint width, uint height, iCamera* camera, 

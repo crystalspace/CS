@@ -37,10 +37,9 @@ namespace Threading
 
 namespace Implementation
 {
-  class ThreadLocalBase;
 
   // Thread base-class for win32
-  class CS_CRYSTALSPACE_EXPORT ThreadBase : public CS::Utility::AtomicRefCount
+  class CS_CRYSTALSPACE_EXPORT ThreadBase
   {
   public:
     ThreadBase (Runnable* runnable);
@@ -69,13 +68,6 @@ namespace Implementation
       return priority;
     }
 
-  protected:
-    friend class ThreadLocalBase;
-    
-    // TLS cleanup stuff
-    static void RegisterTlsInstance (ThreadLocalBase* tls);
-    static void UnregisterTlsInstance (ThreadLocalBase* tls);
-    static void CleanupAllTlsInstances ();
   private:
     csRef<Runnable> runnable;
 
@@ -85,8 +77,6 @@ namespace Implementation
     int32 isRunning;
     ThreadPriority priority;
     Barrier startupBarrier;
-
-    static unsigned int __stdcall proxyFunc (void* param);
   };
 
 

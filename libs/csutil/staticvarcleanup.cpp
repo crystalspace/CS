@@ -20,8 +20,8 @@
 #include "cssysdef.h"
 #include "csutil/memdebug.h"
 
-CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION_A (csStaticVarCleanup_csutil,
-					     CS_CRYSTALSPACE_EXPORT)
+CS_CRYSTALSPACE_EXPORT 
+CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil)
 
 #ifdef CS_USE_SHARED_LIBS
 CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);

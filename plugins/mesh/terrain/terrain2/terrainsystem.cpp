@@ -37,8 +37,6 @@
 #include "terrainsystem.h"
 #include "cell.h"
 
-#include "factory.h"
-
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
 
@@ -60,22 +58,6 @@ csTerrainSystem::~csTerrainSystem ()
   if (renderer)
     renderer->DisconnectTerrain (this);
 }
-
-
-void csTerrainSystem::RemoveCell (iTerrainCell* cell)
-{
-  ComputeBBox();
-
-  cells.Delete(static_cast<csTerrainCell*>(cell));
-}
-
-iTerrainCell* csTerrainSystem::AddCell (iTerrainFactoryCell* cellf)
-{
-  csRef<csTerrainCell> c = (static_cast<csTerrainFactoryCell*>(cellf))->CreateCell (this);
-  this->AddCell (c);
-  return c;
-}
-
 
 void csTerrainSystem::AddCell (csTerrainCell* cell)
 {

@@ -52,47 +52,23 @@ struct iJob : public virtual iBase
  */
 struct iJobQueue : public virtual iBase
 {
-  SCF_INTERFACE(iJobQueue,4,1,0);
+  SCF_INTERFACE(iJobQueue,4,0,0);
   
   /// Add a job to the queue.
   virtual void Enqueue (iJob* job) = 0;
 
   /**
-   * Status values for Dequeue and PullAndRun
-   */
-  enum JobStatus
-  {
-    /// The job was not enqueued
-    NotEnqueued,
-    /// The job is currently running
-    Pending,
-    /**
-     * The job was pulled from a queue and executed (PullAndRun()) resp.
-     * dropped (PullAndDrop())
-     */
-    Dequeued
-  };
-  
-  /**
    * Remove a job from the queue.
-   * If the job is currently running, this will wait for it to finish
-   * if \a waitForCompletion is \c true, otherwise nothing is done.
-   * \remarks The job queue will continue to hold a reference to the job
-   *   if it is currently running (return value \c Pending). Wait for
-   *   job completion if this is not desired.
+   * If the job is currently running,this will be a no-operation.
    */
-  virtual JobStatus Dequeue (iJob* job, bool waitForCompletion = false) = 0;
+  virtual void Dequeue (iJob* job) = 0;
   
   /**
-   * Check if a job is still in the queue and, 
-   * if so, remove it from the queue and run it immediately.
-   * If a job is currently running, either wait for it 
-   * (\a waitForCompletion is \c true) to finish or just let it be.
-   * \remarks The job queue will continue to hold a reference to the job
-   *   if it is currently running (return value \c Pending). Wait for
-   *   job completion if this is not desired.
+   * Check if a job is still in the queue. 
+   * If yes, remove it from the queue and run it immediately.
+   * If a job is currently running, we can either wait for it or just let it be
    */
-  virtual JobStatus PullAndRun (iJob* job, bool waitForCompletion = true) = 0;
+  virtual void PullAndRun (iJob* job, bool waitForCompletion = true) = 0;
   
   /**
    * Wait for all jobs in queue to finish executing.

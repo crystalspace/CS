@@ -79,6 +79,7 @@ void WeaverCompiler::Report (int severity, iDocumentNode* node,
 csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
   const char* filename, iDocumentNode* node) const
 {
+  // @@@ TODO: Make thread safe
   csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
   if (!file)
   {
@@ -104,14 +105,15 @@ csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
 
 csRef<iDocumentNode> WeaverCompiler::CreateAutoNode (csDocumentNodeType type) const
 {
-  if (!autoDocRoot->IsValid ())
+  // @@@ TODO: Mutex for thread safety
+  if (!autoDocRoot.IsValid ())
   {
     csRef<iDocument> autoDoc = xmlDocSys->CreateDocument ();
     csRef<iDocumentNode> root = autoDoc->CreateRoot ();
-    *autoDocRoot = root->CreateNodeBefore (CS_NODE_ELEMENT);
-    (*autoDocRoot)->SetValue ("(auto)");
+    autoDocRoot = root->CreateNodeBefore (CS_NODE_ELEMENT);
+    autoDocRoot->SetValue ("(auto)");
   }
-  return (*autoDocRoot)->CreateNodeBefore (type);
+  return autoDocRoot->CreateNodeBefore (type);
 }
 
 iJobQueue* WeaverCompiler::GetSynthQueue()
@@ -181,7 +183,7 @@ csPtr<iShader> WeaverCompiler::CompileShader (
   if (do_verbose) startTime = csGetTicks();
   shader.AttachNew (new WeaverShader (this));
   bool loadRet = shader->Load (ldr_context, templ, forcepriority);
-  autoDocRoot->Invalidate ();
+  autoDocRoot.Invalidate ();
   if (!loadRet)
     return 0;
   if (do_verbose) 
@@ -288,7 +290,7 @@ bool WeaverCompiler::PrecacheShader (iDocumentNode* templ,
   if (do_verbose) startTime = csGetTicks();
   shader.AttachNew (new WeaverShader (this));
   bool loadRet = shader->Precache (templ, cache, quick);
-  autoDocRoot->Invalidate ();
+  autoDocRoot.Invalidate ();
   if (!loadRet)
     return false;
   if (do_verbose) 
