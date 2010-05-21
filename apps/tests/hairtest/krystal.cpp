@@ -46,11 +46,12 @@ KrystalScene::~KrystalScene ()
     csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
     hairTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
   }
-
+/*
   for (size_t i = 0; i < hairsBody.GetSize(); i ++)
 	hairTest->bulletDynamicSystem->RemoveSoftBody (hairsBody.Get(i));
 
   hairsBody.DeleteAll();
+*/
 }
 
 csVector3 KrystalScene::GetCameraStart ()
@@ -329,8 +330,9 @@ bool KrystalScene::CreateAvatar ()
 	  bulletBody->SetMass (0.1f);
 	  bulletBody->SetRigidity (0.99f);
 	  bulletBody->AnchorVertex (0, headBody);
-	  hairsBody.Push(bulletBody);
+	  //hairsBody.Push(bulletBody);
 	}
+
   }
 
   // Start animation
