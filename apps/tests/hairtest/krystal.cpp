@@ -47,8 +47,10 @@ KrystalScene::~KrystalScene ()
     hairTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
   }
 
-  if (hairsBody)
-	hairTest->bulletDynamicSystem->RemoveSoftBody (hairsBody);
+  for (int i = 0; i < hairsBody.GetSize(); i ++)
+	hairTest->bulletDynamicSystem->RemoveSoftBody (hairsBody.Get(i));
+
+  hairsBody.DeleteAll();
 }
 
 csVector3 KrystalScene::GetCameraStart ()
@@ -297,27 +299,38 @@ bool KrystalScene::CreateAvatar ()
 		(animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
 
 	iAnimatedMeshSubMesh* skullmesh = animesh -> GetSubMesh(1);
-	//skullmesh ->GetFactorySubMesh();
-    iRenderBuffer* indices = skullmesh->GetFactorySubMesh()->GetIndices(0);
 
-	//skullmesh->GetFactorySubMesh();//iAnimatedMeshFactorySubMesh
+	iRenderBuffer* indices = skullmesh->GetFactorySubMesh()->GetIndices(0);
 	iRenderBuffer* vertices = animeshFactory->GetVertices();
 
 	csRenderBufferLock<csVector3> positions (vertices, CS_BUF_LOCK_READ);
-
-	csVector3 pos;
+	csArray<int> uniqueIndices;
 	CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);
 
+	// chose unique indices
     while (tris.HasNext())
     {
       CS::TriangleT<size_t> tri (tris.Next ());
 
-	  pos = positions.Get(tri.b);
-	  hairsBody = hairTest->bulletDynamicSystem->CreateRope(pos,pos + csVector3(0,0.5f,0),5);
-	  hairsBody->SetMass (0.1f);
- 	  hairsBody->SetRigidity (0.99f);
-	  hairsBody->AnchorVertex (0, headBody);
+	  if(uniqueIndices.Contains(tri.a) == csArrayItemNotFound)
+	    uniqueIndices.Push(tri.a);
+	  if(!uniqueIndices.Contains(tri.b) == csArrayItemNotFound)
+	    uniqueIndices.Push(tri.b);
+	  if(!uniqueIndices.Contains(tri.c) == csArrayItemNotFound)
+	    uniqueIndices.Push(tri.c);
     }
+
+	// attach rope for them
+	for (int i = 0; i < uniqueIndices.GetSize(); i ++)
+	{
+  	  csVector3 pos = positions.Get(uniqueIndices.Get(i));
+	  csRef<iBulletSoftBody> bulletBody = hairTest->bulletDynamicSystem->
+		CreateRope(pos,pos + csVector3(0,0.5f,0),5);
+	  bulletBody->SetMass (0.1f);
+	  bulletBody->SetRigidity (0.99f);
+	  bulletBody->AnchorVertex (0, headBody);
+	  hairsBody.Push(bulletBody);
+	}
   }
 
   // Start animation
