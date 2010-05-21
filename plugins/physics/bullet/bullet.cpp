@@ -404,7 +404,14 @@ void csBulletDynamicsSystem::RemoveBody (iRigidBody* body)
   csBulletRigidBody* csBody = dynamic_cast<csBulletRigidBody*> (body);
   CS_ASSERT (csBody);
   if (csBody->body)
+  {
+    // wake up all connected bodies
+    for (size_t i = 0; i < csBody->contactObjects.GetSize (); i++)
+      csBody->contactObjects[i]->activate ();
+
+    // remove the body from the world
     bulletWorld->removeRigidBody (csBody->body);
+  }
   csBody->insideWorld = false;
 
   dynamicBodies.Delete (body);
@@ -1728,7 +1735,13 @@ void csBulletRigidBody::SetPosition (const csVector3& pos)
 
   // remove body from the world
   if (insideWorld)
+  {
     dynSys->bulletWorld->removeRigidBody (body);
+
+    // wake up all connected bodies
+    for (size_t i = 0; i < contactObjects.GetSize (); i++)
+      contactObjects[i]->activate ();
+  }
 
   // create new motion state
   // TODO: is it really necessary? 
@@ -1760,7 +1773,13 @@ void csBulletRigidBody::SetOrientation (const csMatrix3& rot)
 {
   // remove body from the world
   if (insideWorld)
+  {
     dynSys->bulletWorld->removeRigidBody (body);
+
+    // wake up all connected bodies
+    for (size_t i = 0; i < contactObjects.GetSize (); i++)
+      contactObjects[i]->activate ();
+  }
 
   // create new motion state
   btMatrix3x3 rotation (CSToBullet (rot));
@@ -1793,7 +1812,13 @@ void csBulletRigidBody::SetTransform (const csOrthoTransform& trans)
 {
   // remove body from the world
   if (insideWorld)
+  {
     dynSys->bulletWorld->removeRigidBody (body);
+
+    // wake up all connected bodies
+    for (size_t i = 0; i < contactObjects.GetSize (); i++)
+      contactObjects[i]->activate ();
+  }
 
   // create new motion state
   btTransform tr = CSToBullet (trans, dynSys->internalScale);
