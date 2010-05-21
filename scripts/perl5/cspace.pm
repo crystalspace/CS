@@ -994,6 +994,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetAlwaysRunNow = *cspacec::iThreadManager_SetAlwaysRunNow;
 *GetAlwaysRunNow = *cspacec::iThreadManager_GetAlwaysRunNow;
 *Exiting = *cspacec::iThreadManager_Exiting;
+*ProcessAll = *cspacec::iThreadManager_ProcessAll;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7155,6 +7156,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetCollider = *cspacec::iDynamicSystem_GetCollider;
 *GetColliderCount = *cspacec::iDynamicSystem_GetColliderCount;
 *AttachColliderCapsule = *cspacec::iDynamicSystem_AttachColliderCapsule;
+*AddBody = *cspacec::iDynamicSystem_AddBody;
 *scfGetVersion = *cspacec::iDynamicSystem_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -15539,6 +15541,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_GetMaterial;
 *SetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_SetMaterial;
 *GetName = *cspacec::iAnimatedMeshFactorySubMesh_GetName;
+*SetRendering = *cspacec::iAnimatedMeshFactorySubMesh_SetRendering;
+*IsRendering = *cspacec::iAnimatedMeshFactorySubMesh_IsRendering;
+*SetRenderPriority = *cspacec::iAnimatedMeshFactorySubMesh_SetRenderPriority;
+*GetRenderPriority = *cspacec::iAnimatedMeshFactorySubMesh_GetRenderPriority;
+*SetZBufMode = *cspacec::iAnimatedMeshFactorySubMesh_SetZBufMode;
+*GetZBufMode = *cspacec::iAnimatedMeshFactorySubMesh_GetZBufMode;
 *scfGetVersion = *cspacec::iAnimatedMeshFactorySubMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17267,6 +17275,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ClearMorphTarget = *cspacec::iSpriteCal3DState_ClearMorphTarget;
 *FindSocket = *cspacec::iSpriteCal3DState_FindSocket;
 *SetMaterial = *cspacec::iSpriteCal3DState_SetMaterial;
+*GetMaterial = *cspacec::iSpriteCal3DState_GetMaterial;
 *SetTimeFactor = *cspacec::iSpriteCal3DState_SetTimeFactor;
 *GetTimeFactor = *cspacec::iSpriteCal3DState_GetTimeFactor;
 *GetAnimationTime = *cspacec::iSpriteCal3DState_GetAnimationTime;
@@ -18178,6 +18187,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveCellLoadListener = *cspacec::iTerrainSystem_RemoveCellLoadListener;
 *AddCellHeightUpdateListener = *cspacec::iTerrainSystem_AddCellHeightUpdateListener;
 *RemoveCellHeightUpdateListener = *cspacec::iTerrainSystem_RemoveCellHeightUpdateListener;
+*AddCell = *cspacec::iTerrainSystem_AddCell;
+*RemoveCell = *cspacec::iTerrainSystem_RemoveCell;
 *scfGetVersion = *cspacec::iTerrainSystem_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -18349,6 +18360,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetDefaultCell = *cspacec::iTerrainFactory_GetDefaultCell;
 *AddCell = *cspacec::iTerrainFactory_AddCell;
 *GetCell = *cspacec::iTerrainFactory_GetCell;
+*RemoveCell = *cspacec::iTerrainFactory_RemoveCell;
 *scfGetVersion = *cspacec::iTerrainFactory_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -22995,7 +23007,7 @@ sub ACQUIRE {
 
 package cspace::csProcTexture;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::scfProcTexture cspace );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
 *swig_last_cur_time_get = *cspacec::csProcTexture_last_cur_time_get;
@@ -23022,6 +23034,7 @@ sub DESTROY {
 *GetDimension = *cspacec::csProcTexture_GetDimension;
 *GetRandom = *cspacec::csProcTexture_GetRandom;
 *GetTextureWrapper = *cspacec::csProcTexture_GetTextureWrapper;
+*SelfDestruct = *cspacec::csProcTexture_SelfDestruct;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

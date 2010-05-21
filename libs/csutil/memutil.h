@@ -37,6 +37,16 @@ namespace CS {
       */
     size_t GetPhysicalMemorySize();
 
+   /**
+    * Implementation-dependant virtual address size retrieval function.
+    *
+    * Used by CS::Platform::GetMaxVirtualSize().  Do not call this
+    * function directly, use CS::Platform::GetMaxVirtualSize().
+    *
+    * \sa CS::Platform::GetMaxVirtualSize()
+    */
+   size_t GetMaxVirtualSize();
+
     } // End namespace Implementation
   } // End namespace Platform
 } // End namespace CS

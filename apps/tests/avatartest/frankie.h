@@ -55,11 +55,6 @@ class FrankieScene : public AvatarScene
  private:
   AvatarTest* avatarTest;
 
-  // FSM node related
-  csRef<iSkeletonFSMNode2> FSMNode;
-  CS::Animation::StateID mainFSMState;
-  CS::Animation::StateID ragdollFSMState;
-
   // LookAt node related
   csRef<iSkeletonLookAtNode2> lookAtNode;
   char targetMode;
@@ -90,6 +85,8 @@ class FrankieScene : public AvatarScene
   // Ragdoll node related
   bool frankieDead;
   csRef<iSkeletonRagdollNode2> ragdollNode;
+  iBodyChain* bodyChain;
+  iBodyChain* tailChain;
 
   // Morphing related
   float smileWeight;

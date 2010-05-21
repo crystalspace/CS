@@ -369,7 +369,7 @@ struct iSkeleton;
  */
 struct iSpriteCal3DState : public virtual iBase
 {
-  SCF_INTERFACE (iSpriteCal3DState, 2, 1, 0);
+  SCF_INTERFACE (iSpriteCal3DState, 2, 1, 1);
 
   /**\name Animation management
    * @{ */
@@ -588,6 +588,9 @@ struct iSpriteCal3DState : public virtual iBase
 
   /// Change the material on a named submesh.  Returns true if successful.
   virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat) = 0;
+
+  /// Get the material of a named submesh.  Returns NULL if an error occured.
+  virtual iMaterialWrapper* GetMaterial(const char *mesh_name) = 0;
 
   /**\name Time
    * @{ */
