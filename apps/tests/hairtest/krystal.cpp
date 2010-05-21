@@ -47,7 +47,7 @@ KrystalScene::~KrystalScene ()
     hairTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
   }
 
-  for (int i = 0; i < hairsBody.GetSize(); i ++)
+  for (size_t i = 0; i < hairsBody.GetSize(); i ++)
 	hairTest->bulletDynamicSystem->RemoveSoftBody (hairsBody.Get(i));
 
   hairsBody.DeleteAll();
@@ -321,7 +321,7 @@ bool KrystalScene::CreateAvatar ()
     }
 
 	// attach rope for them
-	for (int i = 0; i < uniqueIndices.GetSize(); i ++)
+	for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
 	{
   	  csVector3 pos = positions.Get(uniqueIndices.Get(i));
 	  csRef<iBulletSoftBody> bulletBody = hairTest->bulletDynamicSystem->

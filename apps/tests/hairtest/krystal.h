@@ -58,7 +58,7 @@ class KrystalScene : public AvatarScene
 
   // Krystal's hairs 
   csRef<iMeshWrapper> hairsMesh;
-  csArray<csRef<iBulletSoftBody>> hairsBody;
+  csArray<csRef<iBulletSoftBody> > hairsBody;
 };
 
 #endif // __KRYSTAL_H__
