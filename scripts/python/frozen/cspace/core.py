@@ -486,7 +486,6 @@ class iThreadManager(iBase):
     def SetAlwaysRunNow(*args): return _core.iThreadManager_SetAlwaysRunNow(*args)
     def GetAlwaysRunNow(*args): return _core.iThreadManager_GetAlwaysRunNow(*args)
     def Exiting(*args): return _core.iThreadManager_Exiting(*args)
-    def ProcessAll(*args): return _core.iThreadManager_ProcessAll(*args)
     __swig_destroy__ = _core.delete_iThreadManager
     __del__ = lambda self : None;
 iThreadManager_swigregister = _core.iThreadManager_swigregister

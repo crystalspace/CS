@@ -128,7 +128,7 @@ struct iDynamicsSystemCollider;
  */
 struct iDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE (iDynamicSystem, 0, 0, 4);
+  SCF_INTERFACE (iDynamicSystem, 0, 0, 3);
 
   /// Return the underlying object
   virtual iObject *QueryObject (void) = 0;
@@ -136,32 +136,12 @@ struct iDynamicSystem : public virtual iBase
   virtual void SetGravity (const csVector3& v) = 0;
   /// Get the global gravity.
   virtual const csVector3 GetGravity () const = 0;
-
-  /**
-   * Set the global linear dampener. The dampening correspond to how
-   * much the movements of the objects will be reduced. It is a value
-   * between 0 and 1, giving the ratio of speed that will be reduced
-   * in one second. 0 means that the movement will not be reduced, while
-   * 1 means that the object will not move.
-   * The default value is 0.
-   * \sa iBulletRigidBody::SetLinearDampener()
-   */
+  /// Set the global linear dampener.
   virtual void SetLinearDampener (float d) = 0;
-
   /// Get the global linear dampener setting.
   virtual float GetLinearDampener () const = 0;
-
-  /**
-   * Set the global angular dampener. The dampening correspond to how
-   * much the movements of the objects will be reduced. It is a value
-   * between 0 and 1, giving the ratio of speed that will be reduced
-   * in one second. 0 means that the movement will not be reduced, while
-   * 1 means that the object will not move.
-   * The default value is 0.
-   * \sa iBulletRigidBody::SetRollingDampener()
-   */
+  /// Set the global rolling dampener.
   virtual void SetRollingDampener (float d) = 0;
-
   /// Get the global rolling dampener setting.
   virtual float GetRollingDampener () const = 0;
 
@@ -172,21 +152,18 @@ struct iDynamicSystem : public virtual iBase
    */
   virtual void EnableAutoDisable (bool enable) = 0;
   /// Return whether the AutoDisable is on or off.
-  virtual bool AutoDisableEnabled () = 0;
+  virtual bool AutoDisableEnabled () =0;
   /**
    * Set the parameters for AutoDisable.
-   * \param linear Maximum linear movement to disable a body. Default value is 0.8.
-   * \param angular Maximum angular movement to disable a body. Default value is 1.0.
+   * \param linear Maximum linear movement to disable a body
+   * \param angular Maximum angular movement to disable a body
    * \param steps Minimum number of steps the body meets linear and angular
-   * requirements before it is disabled. Default value is 0.
+   * requirements before it is disabled.
    * \param time Minimum time the body needs to meet linear and angular
-   * movement requirements before it is disabled. Default value is 0.0.
-   * \remark With the Bullet plugin, the 'steps' parameter is ignored.
-   * \remark With the Bullet plugin, calling this method will not affect bodies already
-   * created.
+   * movement requirements before it is disabled.
    */
   virtual void SetAutoDisableParams (float linear, float angular, int steps,
-  	float time) = 0;
+  	float time)=0;
 
   /// Step the simulation forward by stepsize.
   virtual void Step (float stepsize) = 0;
@@ -370,14 +347,6 @@ struct iDynamicSystem : public virtual iBase
   virtual bool AttachColliderCapsule (float length, float radius,
     const csOrthoTransform& trans, float friction,
     float elasticity, float softness = 0.01f) = 0;
-
-  /**
-   * Add a rigid body to this dynamic system after having removed it frome another
-   * one with RemoveBody().
-   * \warning For the Bullet plugin, it won't work if you use dynamic systems which
-   * have different internal scales set through iBulletDynamicSystem::SetInternalScale().
-   */
-  virtual void AddBody (iRigidBody* body) = 0;
 };
 
 /**

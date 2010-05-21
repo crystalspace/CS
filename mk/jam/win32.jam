@@ -447,13 +447,14 @@ rule SystemInstallApplication
   local suffix = $(4) ;
   if "$(suffix)"
   {
-    local target_suffixed = "$(<:B)-$(suffix)$(<:S)" ;
+    local target_suffixed = $(<)-$(suffix) ;
     local installed =
       [ DoInstallFile $(<) : $(bindir) $(2) : $(target_suffixed) : $(INSTALL_PROGRAM) ] ;
     Depends install_bin : $(installed) ;
+    NotFile $(target_suffixed) ;
     local linktarget = $(<:D=$(bindir)) ;
     Depends install_bin : [ 
-      InstallSymLink $(linktarget) : $(installed) ] ;
+      InstallSymLink $(linktarget) : $(target_suffixed) ] ;
   }
   else
   {

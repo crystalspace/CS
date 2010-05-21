@@ -72,7 +72,7 @@ enum QueueType
 
 struct iThreadManager : public virtual iBase
 {
-  SCF_INTERFACE(iThreadManager, 3, 0, 1);
+  SCF_INTERFACE(iThreadManager, 3, 0, 0);
 
   virtual void Init(iConfigManager* config) = 0;
   virtual void Process(uint num = 1) = 0;
@@ -83,8 +83,6 @@ struct iThreadManager : public virtual iBase
   virtual void SetAlwaysRunNow(bool v) = 0;
   virtual bool GetAlwaysRunNow() = 0;
   virtual bool Exiting() = 0;
-  /// Process all pending events
-  virtual void ProcessAll () = 0;
 };
 
 // Interface macros

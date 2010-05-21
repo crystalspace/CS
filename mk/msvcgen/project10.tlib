@@ -116,7 +116,6 @@ END -%]
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>[% composedirs('libdirs', []) %];%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <TargetMachine>[% platform.targetmachine10 %]</TargetMachine>
-      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <Lib>
 [% interpolate('librarian') -%]

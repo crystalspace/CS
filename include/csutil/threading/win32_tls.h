@@ -23,60 +23,41 @@
 #error "This file is only for Windows and requires you to include csysdefs.h before"
 #else
 
-#include "thread.h"
-
 namespace CS
 {
   namespace Threading
   {
     namespace Implementation
     {
+      template<typename T>
       class ThreadLocalBase
       {
       public:
-	typedef void (* DestructorFn)(void*);
-	
-        ThreadLocalBase (DestructorFn dtor = 0) : dtor (dtor)
+        ThreadLocalBase()
         {
           threadIndex = TlsAlloc();
-	  // Register for later cleanup
-	  if (dtor != 0)
-	    ThreadBase::RegisterTlsInstance (this);
         }
 
-        ~ThreadLocalBase()
+        virtual ~ThreadLocalBase()
         {
-	  // Remove from cleanup set
-	  if (dtor != 0)
-	    ThreadBase::UnregisterTlsInstance (this);
-	  
           if(threadIndex != TLS_OUT_OF_INDEXES)
           {
             TlsFree(threadIndex);
           }
         }
 
-        void SetValue(void* data) const
+        virtual void SetValue(T data)
         {
-          TlsSetValue(threadIndex, data);
+          TlsSetValue(threadIndex, reinterpret_cast<LPVOID>(data));
         }
 
-        void* GetValue() const
+        T GetValue() const
         {
-          return TlsGetValue(threadIndex);
+          return reinterpret_cast<T>(TlsGetValue(threadIndex));
         }
 
       protected:
-	friend class ThreadBase;
-	
-	void CleanupInstance ()
-	{
-	  void* p = TlsGetValue (threadIndex);
-	  if (p != 0) dtor (p);
-	}
-	
         DWORD threadIndex;
-	DestructorFn dtor;
       };
     }
   } // Threading

@@ -29,12 +29,10 @@
 #include "ivaria/dynamics.h"
 #include "ivaria/bullet.h"
 #include "ivaria/dynamicsdebug.h"
-#include "ivaria/softanim.h"
 
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
 #define DYNDEBUG_COLLIDER 3
-#define DYNDEBUG_BULLET 4
 
 // Base class to be implemented for all different models
 class AvatarScene
@@ -65,7 +63,7 @@ class AvatarScene
   // Display of information on the state of the scene
   virtual void UpdateStateDescription () = 0;
 
-  // Animesh objects
+  // Animesh
   csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
 };
@@ -88,11 +86,6 @@ private:
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
-
-  // Soft bodies related
-  csRef<iSoftBodyAnimationControlType> softBodyAnimationType;
-  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
-  bool softBodiesEnabled;
 
   // Animation node plugin managers
   csRef<iSkeletonLookAtManager2> lookAtManager;

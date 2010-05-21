@@ -138,7 +138,7 @@ Condition="'$(Configuration)|$(Platform)'=='[% build.name %][% mutator.namesuffi
 
 
 [% MACRO precompiled_header BLOCK -%]
-[%- IF my.doc.pch.0 %]
+[%- IF my.doc.pch.0 -%]
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>[% my.doc.pch.0 %]</PrecompiledHeaderFile>
 [% END -%]

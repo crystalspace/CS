@@ -645,7 +645,7 @@ class iProcTexCallback(core.iBase):
 iProcTexCallback_swigregister = _cstool.iProcTexCallback_swigregister
 iProcTexCallback_swigregister(iProcTexCallback)
 
-class csProcTexture(object):
+class csProcTexture(scfProcTexture):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
@@ -663,7 +663,6 @@ class csProcTexture(object):
     def GetDimension(*args): return _cstool.csProcTexture_GetDimension(*args)
     GetRandom = staticmethod(_cstool.csProcTexture_GetRandom)
     def GetTextureWrapper(*args): return _cstool.csProcTexture_GetTextureWrapper(*args)
-    def SelfDestruct(*args): return _cstool.csProcTexture_SelfDestruct(*args)
 csProcTexture_swigregister = _cstool.csProcTexture_swigregister
 csProcTexture_swigregister(csProcTexture)
 csProcTexture_GetRandom = _cstool.csProcTexture_GetRandom

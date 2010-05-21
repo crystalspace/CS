@@ -26,18 +26,11 @@ namespace CS {
   namespace Platform {
 
     /**
-     * Retrieve the number of KiB of physical system memory.
+     * Retrieve the number of kB of physical system memory.
      *
-     * @returns Physical system memory (in KiB) on success, or 0 on failure.
+     * @returns Physical system memory (in kB) on success, or 0 on failure.
      */
    CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemorySize();
-
-  /**
-   * Retrieve the maximum number of KiB of virtual address space available to the
-   * process.
-   * \returns Virtual address space size (in KiB) on success, or 0 on failure.
-   */
-  CS_CRYSTALSPACE_EXPORT size_t GetMaxVirtualSize();
 
    /**
     * Retrieve the number of processors in the system.

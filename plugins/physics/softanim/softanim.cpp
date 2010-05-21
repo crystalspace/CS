@@ -25,9 +25,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/bullet.h"
 #include "imesh/object.h"
-#include "imesh/objmodel.h"
 #include "iengine/mesh.h"
-#include "cstool/objmodel.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 {
@@ -104,8 +102,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
   CS_LEAKGUARD_IMPLEMENT(SoftBodyControl);
 
   SoftBodyControl::SoftBodyControl (iMeshObject* mesh)
-    : scfImplementationType (this), mesh (mesh), lastTicks (0),
-    meshPosition (0.0f)
+    : scfImplementationType (this), mesh (mesh), lastTicks (0)
   {
   }
 
@@ -114,8 +111,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     softBody = body;
     vertices.SetSize (softBody->GetVertexCount ());
 
-    // initialize the vertices and mesh position
-    Update (0, 0, 0);
+    // initialize the genmesh position
+    meshPosition.Set (0.0f);
+    for (size_t i = 0; i < softBody->GetVertexCount (); i++)
+      meshPosition += softBody->GetVertexPosition (i);
+    meshPosition /= softBody->GetVertexCount ();
+    mesh->GetMeshWrapper ()->GetMovable ()->SetPosition (meshPosition);
+    mesh->GetMeshWrapper ()->GetMovable ()->UpdateMove ();
   }
 
   iBulletSoftBody* SoftBodyControl::GetSoftBody ()
@@ -145,32 +147,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 
   void SoftBodyControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
-    if (current)
-      lastTicks = current;
-
     if (!softBody)
       return;
 
-    // update the position of the vertices and compute the next position of the mesh
-    csVector3 lastPosition = meshPosition;
-    meshPosition.Set (0.0f);
-    for (size_t i = 0; i < softBody->GetVertexCount (); i++)
-    {
-      csVector3 position = softBody->GetVertexPosition (i);
-      vertices[i] = position - lastPosition;
-      meshPosition += position;
-    }
-    meshPosition /= softBody->GetVertexCount ();
-
     // update the position of the mesh
-    mesh->GetMeshWrapper ()->GetMovable ()->SetPosition (lastPosition);
+    mesh->GetMeshWrapper ()->GetMovable ()->SetPosition (meshPosition);
     mesh->GetMeshWrapper ()->GetMovable ()->UpdateMove ();
-
-    // invalidate the vertices of the factory of the mesh. This will cause the genmesh
-    // to recompute its bounding box.
-    csRef<iGeneralFactoryState> meshState =
-      scfQueryInterface<iGeneralFactoryState> (mesh->GetFactory());
-    meshState->Invalidate ();
   }
 
   const csColor4* SoftBodyControl::UpdateColors (csTicks current, const csColor4* colors,
@@ -197,10 +179,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     if (!softBody)
       return verts;
 
+    if (lastTicks == current)
+      return vertices.GetArray ();
+    lastTicks = current;
+
     CS_ASSERT(num_verts == (int) softBody->GetVertexCount ());
 
-    if (version_id == 0 || lastTicks != current)
-      Update (current, num_verts, version_id);
+    // update the position of the vertices and compute the new position of the mesh
+    csVector3 lastPosition = meshPosition;
+    meshPosition.Set (0.0f);
+    for (int i = 0; i < num_verts; i++)
+    {
+      csVector3 position = softBody->GetVertexPosition (i);
+      vertices[i] = position - lastPosition;
+      meshPosition += position;
+    }
+    meshPosition /= softBody->GetVertexCount ();
 
     return vertices.GetArray ();
   }

@@ -101,13 +101,10 @@ namespace Threading
    * Object representing a separate execution thread.
    * Used to create, manage and control execution threads.
    */
-  class Thread : private CS::NonCopyable, 
+  class Thread : public csRefCount, private CS::NonCopyable, 
     private Implementation::ThreadBase
   {
   public:
-    using ThreadBase::IncRef;
-    using ThreadBase::DecRef;
-    using ThreadBase::GetRefCount;
 
     /**
      * Initialize a new thread object.

@@ -1953,21 +1953,15 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   else
     modes.alphaType = thispass->alphaMode.alphaType;
   // Override mixmode, if requested
-  uint originalMixMode = modes.mixmode;
   if ((thispass->mixMode & CS_MIXMODE_TYPE_MASK) != CS_FX_MESH)
     modes.mixmode = thispass->mixMode;
 
   modes.cullMode = thispass->cullMode;
   
-  /* Grab mixmode alpha from _original_ mixmode.
-     This is more sensible than possibly taking it from the shader, which
-     would mean hardcoding the alpha in the shader. Not only are there other
-     ways to do that, taking the alpha from the original mixmode allows to
-     quickly make a mesh semi-transparent or such. */
   float alpha = 1.0f;
-  if (originalMixMode & CS_FX_MASK_ALPHA)
+  if (modes.mixmode & CS_FX_MASK_ALPHA)
   {
-    alpha = 1.0f - (float)(originalMixMode & CS_FX_MASK_ALPHA) / 255.0f;
+    alpha = 1.0f - (float)(modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
   }
   parent->shadermgr->GetVariableAdd (
     parent->compiler->string_mixmode_alpha)->SetValue (alpha);

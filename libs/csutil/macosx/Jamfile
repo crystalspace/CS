@@ -9,7 +9,6 @@ CSUTIL.GENERIC +=
   getopt.cpp
   loadlib.cpp
   memutil_impl.cpp
-  memutil_impl_virtsize.cpp
   mmap.cpp
   pathutil.cpp 
   pluginpaths.cpp

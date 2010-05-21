@@ -55,10 +55,6 @@ class KrystalScene : public AvatarScene
   csRef<iSkeletonRagdollNode2> ragdollNode;
   iBodyChain* bodyChain;
   iBodyChain* hairChain;
-
-  // Krystal's hairs 
-  csRef<iMeshWrapper> hairsMesh;
-  csRef<iBulletSoftBody> hairsBody;
 };
 
 #endif // __KRYSTAL_H__

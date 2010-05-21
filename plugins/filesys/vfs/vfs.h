@@ -137,20 +137,10 @@ private:
   public:
     static int Compare (VfsNode* const&, VfsNode* const&);
   } NodeList;
-  
-  struct VfsTls
-  {
-    // Current working directory (in fact, the automatically-added prefix path)
-    // NOTE: cwd ALWAYS ends in '/'!
-    csString cwd;
-    // Directory stack (used in PushDir () and PopDir ())
-    csStringArray dirstack;
-    
-    VfsTls();
-  };
 
-  // Thread-local values
-  CS::Threading::ThreadLocal<VfsTls> tls;
+  // Current working directory (in fact, the automatically-added prefix path)
+  // NOTE: cwd ALWAYS ends in '/'!
+  CS::Threading::ThreadLocal<char*> cwd;
   // The installation directory (the value of $@)
   char *basedir;
   // Full path of application's resource directory (the value of $*)
@@ -160,6 +150,8 @@ private:
   char *appdir;
   // The initialization file
   csConfigFile config;
+  // Directory stack (used in PushDir () and PopDir ())
+  CS::Threading::ThreadLocal<csStringArray*> dirstack;
   // Reference to the object registry.
   iObjectRegistry *object_reg;
   // ChDirAuto() may need to generate unique temporary names for mount points.
@@ -278,6 +270,9 @@ public:
   virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath);
 
 private:
+  /// Check the current dir is valid, and (re-)init if needed.
+  void CheckCurrentDir();
+
   /// Same as ExpandPath() but with less overhead
   char *_ExpandPath (const char *Path, bool IsDir = false);
 

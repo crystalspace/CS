@@ -85,7 +85,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
     //-- iSkeletonRagdollNodeFactory2
     virtual void AddBodyChain (iBodyChain* chain,
-			       csSkeletonRagdollState state = CS_RAGDOLL_STATE_INACTIVE);
+			       csSkeletonRagdollState state = RAGDOLL_STATE_INACTIVE);
     virtual void RemoveBodyChain (iBodyChain* chain);
 
     virtual void SetChildNode (iSkeletonAnimNodeFactory2* node);

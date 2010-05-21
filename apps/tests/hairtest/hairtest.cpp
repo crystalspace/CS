@@ -125,11 +125,6 @@ void HairTest::Frame ()
   // Default behavior from csDemoApplication
   csDemoApplication::Frame ();
 
-  // Display the Bullet debug information
-  if (avatarScene->HasPhysicalObjects ()
-	&& dynamicsDebugMode == DYNDEBUG_BULLET)
-	bulletDynamicSystem->DebugDraw (view);
-
   cegui->Render ();
 }
 
@@ -166,13 +161,6 @@ void HairTest::SwitchDynamics()
   }
 
   else if (dynamicsDebugMode == DYNDEBUG_COLLIDER)
-  {
-	dynamicsDebugMode = DYNDEBUG_BULLET;
-	dynamicsDebugger->SetDebugDisplayMode (false);
-	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
-  }
-
-  else if (dynamicsDebugMode == DYNDEBUG_BULLET)
   {
 	dynamicsDebugMode = DYNDEBUG_NONE;
 	dynamicsDebugger->SetDebugDisplayMode (false);
@@ -385,8 +373,6 @@ bool HairTest::Application ()
       dynamicSystem->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), 0.0f),
 					  10.0f, 0.0f);
     }
-
-	bulletDynamicSystem->SetSoftBodyWorld (true);
   }
 
   // Create avatar

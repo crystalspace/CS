@@ -2130,20 +2130,6 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,
   return true;
 }
 
-iMaterialWrapper* csSpriteCal3DMeshObject::GetMaterial(const char *mesh_name)
-{
-  int idx = factory->FindMeshName(mesh_name);
-  if (idx == -1)
-    return NULL;
-          
-  size_t meshIdx = FindMesh( factory->meshes[idx]->calCoreMeshID );
-    
-  if (meshIdx == csArrayItemNotFound ) 
-    return NULL;
-
-  return meshes[meshIdx].matRef;
-}
-
 void csSpriteCal3DMeshObject::SetTimeFactor(float timeFactor)
 {
   calModel.getMixer()->setTimeFactor(timeFactor);

@@ -126,13 +126,15 @@ float csBulletSoftBody::GetRigidity () const
 
 void csBulletSoftBody::SetLinearVelocity (csVector3 velocity)
 {
-  body->setVelocity (CSToBullet (velocity, dynSys->internalScale));
+  // Strangely, Bullet defines adding velocities of soft bodies with a scale of 100...
+  body->setVelocity (CSToBullet (velocity * 100.0f, dynSys->inverseInternalScale));
 }
 
 void csBulletSoftBody::SetLinearVelocity (csVector3 velocity, size_t vertexIndex)
 {
   CS_ASSERT (vertexIndex < (size_t) body->m_nodes.size ());
-  body->addVelocity (CSToBullet (velocity, dynSys->internalScale)
+  // Strangely, Bullet defines adding velocities of soft bodies with a scale of 100...
+  body->addVelocity (CSToBullet (velocity * 100.0f, dynSys->inverseInternalScale)
 		     - body->m_nodes[vertexIndex].m_v, vertexIndex);
 }
 
@@ -144,14 +146,15 @@ csVector3 csBulletSoftBody::GetLinearVelocity (size_t vertexIndex) const
 
 void csBulletSoftBody::AddForce (csVector3 force)
 {
-  body->addForce (CSToBullet (force, dynSys->internalScale));
+  // Strangely, Bullet defines adding forces to soft bodies with a scale of 100...
+  body->addForce (CSToBullet (force * 100.0f, dynSys->inverseInternalScale));
 }
 
 void csBulletSoftBody::AddForce (csVector3 force, size_t vertexIndex)
 {
   CS_ASSERT (vertexIndex < (size_t) body->m_nodes.size ());
-  // TODO: why a correction factor of 100?
-  body->addForce (CSToBullet (force * 100.0f, dynSys->internalScale), vertexIndex);
+  // Strangely, Bullet defines adding forces to soft bodies indices with a scale of 10000...
+  body->addForce (CSToBullet (force * 10000.0f, dynSys->inverseInternalScale), vertexIndex);
 }
 
 size_t csBulletSoftBody::GetTriangleCount () const

@@ -705,7 +705,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         CS::Graphics::RenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
           frameNum);
 
-        // Setup the render mesh
+        // Setup the RM
         meshPtr->clip_portal = clip_portal;
         meshPtr->clip_plane = clip_plane;
         meshPtr->clip_z_plane = clip_z_plane;
@@ -717,8 +717,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
         meshPtr->mixmode = mixMode;
         meshPtr->buffers = sm->bufferHolders[j];
-        meshPtr->renderPrio = fsm->renderPriority;
-        meshPtr->z_buf_mode = fsm->zbufMode;
 
         meshPtr->object2world = o2wt;
         meshPtr->bbox = GetObjectBoundingBox();
