@@ -84,10 +84,10 @@ class FurMaterial : public scfImplementation2<FurMaterial,
     virtual void DoSomething (int param, const csVector3&);
     virtual int GetSomething () const;
 
-    virtual void SetLength (float len);
-    virtual float GetLength () const;
-
-	virtual void GenerateGeometry (iView *view,iSector *room, int controlPoints, int numberOfStrains);
+	virtual void GenerateGeometry (iView *view,iSector *room, 
+	  int controlPoints, int numberOfStrains, float length);
+	virtual void GenerateGeometry (iView* view, iSector *room, 
+	  csRefArray<iBulletSoftBody> hairStrands);
 
 	/*
 	// From iShaderVariableContext
@@ -130,9 +130,6 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	/// Shader associated with material
 	csHash<csRef<iShader>, csStringID> shaders;
 	/// Fur geometry
-	float length;
-	int controlPoints;
-	int numberOfStrains;
 	csRef<iGeneralFactoryState> factoryState;
 	csRef<iView> view;
 };
@@ -148,9 +145,7 @@ class FurMaterialControl : public scfImplementation1
 
     //-- general factory state
 	virtual void SetGeneralFactoryState (iGeneralFactoryState* factory);
-	virtual void SetLength (float len);
-	virtual void SetControlPoints (int control);
-	virtual void SetNumberOfStrains (int strais);
+	virtual void SetHairStrands (csRefArray<iBulletSoftBody> hairStrands);
 	virtual void SetView (iView* view);
 
 	//-- iGenMeshAnimationControl
@@ -172,11 +167,9 @@ class FurMaterialControl : public scfImplementation1
     csWeakRef<iMeshObject> mesh;
     csTicks lastTicks;
 	/// Fur geometry
-	float length;
-	int controlPoints;
-	int numberOfStrains;
 	csRef<iGeneralFactoryState> factoryState;
 	csRef<iView> view;
+	csRefArray<iBulletSoftBody> hairStrands;
 };
 
 }

@@ -25,6 +25,8 @@
 #include <ivaria/view.h>
 #include <iengine/sector.h>
 
+#include "crystalspace.h"
+
 struct iFurMaterial;
 
 class csVector3;
@@ -53,10 +55,10 @@ struct iFurMaterial : public virtual iMaterial
   /// Get something.
   virtual int GetSomething () const = 0;
 
-  virtual void SetLength (float len) = 0;
-  virtual float GetLength () const = 0;
-
   /// Generate geometry
-  virtual void GenerateGeometry (iView* view, iSector *room, int controlPoints, int numberOfStrains) = 0;
+  virtual void GenerateGeometry (iView* view, iSector *room, int controlPoints, 
+	int numberOfStrains, float length) = 0;
+  virtual void GenerateGeometry (iView* view, iSector *room, 
+	csRefArray<iBulletSoftBody> hairStrands) = 0;
 };
 #endif // __FUR_INTERF_H__

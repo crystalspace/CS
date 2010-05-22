@@ -163,6 +163,12 @@ bool KrystalScene::CreateAvatar ()
   if (!hairsMeshFact)
 	  return hairTest->ReportError ("Can't find Krystal's hairs mesh factory!");  
 
+  // Load furMaterial
+  csRef<iFurMaterialType> furMaterialType = csQueryRegistry<iFurMaterialType> 
+	(hairTest->object_reg);
+  if (!furMaterialType)
+	  return hairTest->ReportError("Failed to locate iFurMaterialType plugin!");
+
   // Create a new animation tree. The structure of the tree is:
   //   + ragdoll controller node (root node - only if physics are enabled)
   //     + Random node
@@ -232,7 +238,7 @@ bool KrystalScene::CreateAvatar ()
   idle05NodeFactory->SetAutomaticStop (false);
   idle06NodeFactory->SetAutomaticStop (false);
   standNodeFactory->SetAutomaticStop (false);
-
+/*
   randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
@@ -240,7 +246,7 @@ bool KrystalScene::CreateAvatar ()
   randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
   randomNodeFactory->AddNode (standNodeFactory, 1.0f);
-
+*/
   if (hairTest->physicsEnabled)
   {
     // Create the ragdoll controller
@@ -333,6 +339,12 @@ bool KrystalScene::CreateAvatar ()
 	  hairsBody.Push(bulletBody);
 	}
   }
+
+  // Initializa fur material
+  csRef<iFurMaterial> furMaterial = furMaterialType->CreateFurMaterial("hair");
+  furMaterial->GenerateGeometry(hairTest->view, hairTest->room, hairsBody);
+  furMaterial->DoSomething (1, csVector3 (2, 3, 4));
+  printf ("%d\n", furMaterial->GetSomething ());
 
   // Start animation
   rootNode->Play ();

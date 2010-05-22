@@ -92,10 +92,6 @@ private:
   csRef<iSkeletonBasicNodesManager2> basicNodesManager;
   csRef<iSkeletonRagdollManager2> ragdollManager;
 
-  // Material plugin manager
-  csRef<iFurMaterialType> furMaterialType;
-  csRef<iFurMaterial> furMaterial;
-
   // GUI related
   csRef<iVFS> vfs;
   csRef<iCEGUI> cegui;

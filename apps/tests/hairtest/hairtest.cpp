@@ -129,7 +129,7 @@ void HairTest::Frame ()
   if (avatarScene->HasPhysicalObjects ()
 	&& dynamicsDebugMode == DYNDEBUG_BULLET)
 	bulletDynamicSystem->DebugDraw (view);
-
+/*
   for (size_t i = 0; i < bulletDynamicSystem->GetSoftBodyCount (); i++)
   {
 	iBulletSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
@@ -137,7 +137,7 @@ void HairTest::Frame ()
 	if (!softBody->GetTriangleCount ())
 	  softBody->DebugDraw (view);
   }
-
+*/
   cegui->Render ();
 }
 
@@ -311,10 +311,6 @@ bool HairTest::Application ()
   if (!basicNodesManager)
     return ReportError("Failed to locate iSkeletonBasicNodesManager2 plugin!");
 
-  furMaterialType = csQueryRegistry<iFurMaterialType> (GetObjectRegistry ());
-  if (!furMaterialType)
-    return ReportError("Failed to locate iFurMaterialType plugin!");
-
   cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!cegui) return ReportError("Failed to locate CEGUI plugin!");
 
@@ -405,12 +401,6 @@ bool HairTest::Application ()
 
   // Initialize camera position
   view->GetCamera ()->GetTransform ().SetOrigin (avatarScene->GetCameraStart ());
-
-  // Initializa fur material
-  furMaterial = furMaterialType->CreateFurMaterial("hair");
-  furMaterial->GenerateGeometry(view,room,4,20);
-  furMaterial->DoSomething (1, csVector3 (2, 3, 4));
-  printf ("%d\n", furMaterial->GetSomething ());
 
   // Run the application
   Run();
