@@ -330,9 +330,8 @@ bool KrystalScene::CreateAvatar ()
 	  bulletBody->SetMass (0.1f);
 	  bulletBody->SetRigidity (0.99f);
 	  bulletBody->AnchorVertex (0, headBody);
-	  //hairsBody.Push(bulletBody);
+	  hairsBody.Push(bulletBody);
 	}
-
   }
 
   // Start animation
