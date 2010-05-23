@@ -1,6 +1,0 @@
-SubDir TOP apps deffereddemo ;
-
-Description deffereddemo : "Demonstrates the use of Deffered Shading." ;
-Application deffereddemo : [ Wildcard *.cpp *.h ] ;
-LinkWith deffereddemo : crystalspace ;
-FileListEntryApplications deffereddemo : app-demo ;
