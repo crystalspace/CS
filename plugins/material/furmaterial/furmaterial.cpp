@@ -370,8 +370,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		vbuf[ x * 2 * controlPoints + 2 * y].Set
 		  ( hairStrands.Get(x)->GetVertexPosition(y) );
 		vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		  ( ( hairStrands.Get(x)->GetVertexPosition(y) + 
-		    csVector3(0.01f,0,0) ) );
+		  ( hairStrands.Get(x)->GetVertexPosition(y) + 
+		    tc.GetT2O() * csVector3(0.01f,0,0) );
 	  }
 
 	  int a, b, c;

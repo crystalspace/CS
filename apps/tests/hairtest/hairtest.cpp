@@ -208,24 +208,6 @@ bool HairTest::OnKeyboard (iEvent &ev)
   return false;
 }
 
-bool HairTest::OnMouseDown (iEvent& ev)
-{ 
-  bool result = csDemoApplication::OnMouseDown(ev);
-  return result;
-}
-
-bool HairTest::OnMouseUp (iEvent& ev)
-{
-  bool result = csDemoApplication::OnMouseUp(ev);
-  return result;
-}
-
-bool HairTest::OnMouseMove (iEvent& ev)
-{
-  bool result = csDemoApplication::OnMouseMove(ev);
-  return result;
-}
-
 bool HairTest::OnInitialize (int argc, char* argv[])
 {
   // Default behavior from csDemoApplication

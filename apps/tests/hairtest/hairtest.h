@@ -99,11 +99,6 @@ private:
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
-  bool OnMouseDown (iEvent &event);
-  bool OnMouseUp (iEvent &event);
-  bool OnMouseMove (iEvent &event);
-
-  int lastMouseX, lastMouseY;
 
   // Switch Active Colliders displayed
   void SwitchDynamics();
