@@ -97,6 +97,9 @@ protected:
 
   csRef<FramePrinter> printer;
 
+  // Cache event names.
+  csEventID quitEventID;
+
 protected:
 
   csRef<iView> view;

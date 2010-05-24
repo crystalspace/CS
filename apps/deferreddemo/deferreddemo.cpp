@@ -45,7 +45,7 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
       CS_REQUEST_LEVELLOADER,
       CS_REQUEST_REPORTER,
       CS_REQUEST_REPORTERLISTENER,
-      CS_REQUEST_PLUGIN("crystalspace.rendermanager.rlcompat", iRenderManager),
+      CS_REQUEST_PLUGIN("crystalspace.rendermanager.deferred", iRenderManager),
       CS_REQUEST_END))
   {
     return ReportError("Failed to initialize plugins!");
@@ -74,6 +74,9 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
 
   shouldShutdown = false;
   
+  // Setup chached event names.
+  quitEventID = csevQuit (GetObjectRegistry());
+
   return true;
 }
 
@@ -397,7 +400,7 @@ void DeferredDemo::Frame ()
 //----------------------------------------------------------------------
 bool DeferredDemo::OnUnhandledEvent (iEvent &event)
 {
-  if (event.Name == csevQuit (GetObjectRegistry()))
+  if (event.Name == quitEventID)
     return OnQuit (event);
 
   return false;
