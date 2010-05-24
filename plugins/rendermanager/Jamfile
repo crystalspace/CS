@@ -4,3 +4,5 @@ SubInclude TOP plugins rendermanager null ;
 SubInclude TOP plugins rendermanager rlcompat ;
 SubInclude TOP plugins rendermanager shadow_pssm ;
 SubInclude TOP plugins rendermanager unshadowed ;
+SubInclude TOP plugins rendermanager deferred ;
+
