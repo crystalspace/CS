@@ -224,7 +224,7 @@ struct LightSpot : Light
   half3 dir;
   half spot;
   
-  void Init (LightSpace space, half3 normal, half falloffInner, half falloffOuter)
+  void Init (LightSpace space, half falloffInner, half falloffOuter)
   {
     dir = -space.GetDirection();
     spot = Light_Spot (space.GetSurfaceToLight(), dir, falloffInner, falloffOuter);
