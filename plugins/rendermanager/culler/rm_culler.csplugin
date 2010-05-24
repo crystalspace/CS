@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- rm_culler.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.rendermanager.culler</name>
+        <implementation>RMCuller</implementation>
+        <description>Rendermanager (culler)</description>
+        <requires>
+          <class>crystalspace.engine.</class>
+          <class>crystalspace.graphics3d.</class>         
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>
