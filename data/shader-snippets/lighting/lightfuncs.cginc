@@ -183,12 +183,16 @@ struct LightPropertiesShadowMap
 };
 LightPropertiesShadowMap lightPropsSM;
 
+// Common interface for all light types
 interface Light
 {
+  // Get direction of incidence
   half3 GetIncidence();
+  // Get incidence-dependent attenuation
   half GetAttenuation();
 };
 
+// Directional light
 struct LightDirectional : Light
 {
   half3 dir;
@@ -201,6 +205,7 @@ struct LightDirectional : Light
   half GetAttenuation() { return 1; }
 };
 
+// Directional light
 struct LightPoint : Light
 {
   half3 dir;
@@ -213,6 +218,7 @@ struct LightPoint : Light
   half GetAttenuation() { return 1; }
 };
 
+// Directional light
 struct LightSpot : Light
 {
   half3 dir;
@@ -228,7 +234,7 @@ struct LightSpot : Light
 };
 ]]>
 
-Light GetCurrentLight (LightSpace lightSpace, int lightNum, half3 surfNormal)
+Light GetCurrentLight (LightSpace lightSpace, int lightNum)
 {
 <?if vars."light type".int == consts.CS_LIGHT_DIRECTIONAL ?>
   LightDirectional ld;
@@ -236,7 +242,7 @@ Light GetCurrentLight (LightSpace lightSpace, int lightNum, half3 surfNormal)
   return ld;
 <?elsif vars."light type".int == consts.CS_LIGHT_SPOTLIGHT ?>
   LightSpot ls;
-  ls.Init (lightSpace, surfNormal, 
+  ls.Init (lightSpace, 
     lightProps.falloffInner[lightNum],
     lightProps.falloffOuter[lightNum]);
   return ls;
