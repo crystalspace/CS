@@ -230,16 +230,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		{
 		  ibuf[ x * 2 * (controlPoints - 1) + y ].Set
 			  ( 2 * x * controlPoints + y , 
-			    2 * x * controlPoints + y + 3 , 
-			    2 * x * controlPoints + y + 1 );
+			    2 * x * controlPoints + y + 1 , 
+			    2 * x * controlPoints + y + 3 );
 		  //printf("%d %d %d\n", 2 * x + y , 2 * x + y + 3 , 2 * x + y + 1);
 		}
 		else
 		{
 		  ibuf[ x * 2 * (controlPoints - 1) + y ].Set
 			  ( 2 * x * controlPoints + y + 1 , 
-			    2 * x * controlPoints + y + 2 , 
-			    2 * x * controlPoints + y - 1 );
+			    2 * x * controlPoints + y - 1 , 
+			    2 * x * controlPoints + y + 2 );
 		  //printf("%d %d %d\n", 2 * x + y + 1 , 2 * x + y + 2 , 2 * x + y - 1);
 		}
 	  }
@@ -361,19 +361,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	int numberOfStrains = hairStrands.GetSize();
 
 	csVector3 *vbuf = factoryState->GetVertices (); 
-	csTriangle *ibuf = factoryState->GetTriangles ();
+	//csTriangle *ibuf = factoryState->GetTriangles ();
 
 	for ( int x = 0 ; x < numberOfStrains ; x ++ )
 	{
-	  for ( int y = 0 ; y < controlPoints ; y ++ )
+	  int y = 0;
+	  csVector3 strip = csVector3(0);
+
+	  for ( y = 0 ; y < controlPoints - 1 ; y ++ )
 	  {
+		csVector2 firstPoint = csVector2(hairStrands.Get(x)->GetVertexPosition(y).x,
+		  hairStrands.Get(x)->GetVertexPosition(y).y);
+		csVector2 secondPoint = csVector2(hairStrands.Get(x)->GetVertexPosition(y + 1).x,
+		  hairStrands.Get(x)->GetVertexPosition(y + 1).y);
+
+		csVector2 diff = firstPoint - secondPoint;
+		if (diff.Norm() > 0.0001f)
+		  diff = diff / diff.Norm();
+		else
+		  diff = csVector2(0);
+
+		strip = 0.01f * csVector3(diff.y,diff.x,0);
+
 		vbuf[ x * 2 * controlPoints + 2 * y].Set
 		  ( hairStrands.Get(x)->GetVertexPosition(y) );
 		vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
 		  ( hairStrands.Get(x)->GetVertexPosition(y) + 
-		    tc.GetT2O() * csVector3(0.01f,0,0) );
+		    tc.GetT2O() * strip );
 	  }
 
+	  vbuf[ x * 2 * controlPoints + 2 * y].Set
+		( hairStrands.Get(x)->GetVertexPosition(y) );
+	  vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
+		( hairStrands.Get(x)->GetVertexPosition(y) + 
+		  tc.GetT2O() * strip );	  
+/*
 	  int a, b, c;
 	  for ( int y = 0 ; y < 2 * (controlPoints - 1) ; y ++ )
 	  {
@@ -400,7 +422,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 			ibuf[ x * 2 * (controlPoints - 1) + y ].Set( a, c, b );
 		}
 	  }
-
+*/
 	}
 	factoryState -> CalculateNormals();
   }
