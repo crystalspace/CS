@@ -104,11 +104,6 @@ protected:
 
   csRef<iView> view;
 
-  csRef<iTextureHandle> colorBuffer0;
-  csRef<iTextureHandle> colorBuffer1;
-  csRef<iTextureHandle> colorBuffer2;
-  csRef<iTextureHandle> depthBuffer;
-
   float viewRotX;
   float viewRotY;
 

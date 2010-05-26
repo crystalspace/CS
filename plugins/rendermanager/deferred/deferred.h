@@ -66,6 +66,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
   public:
 
+    bool AttachGbuffer(iGraphics3D *graphics3D);
+    bool DetachGBuffer(iGraphics3D *graphics3D);
+    void DrawGBuffer(iGraphics3D *graphics3D, iGraphics2D *graphics2D);
+
     iObjectRegistry *objRegistry;
 
     RenderTreeType::PersistentData treePersistent;
@@ -74,7 +78,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     CS::RenderManager::MultipleRenderLayer renderLayer;
 
     csRef<iShaderManager> shaderManager;
+
     csRef<iTextureHandle> accumBuffer;
+
+    // The textures that make up the GBuffer.
+    csRef<iTextureHandle> colorBuffer0;
+    csRef<iTextureHandle> colorBuffer1;
+    csRef<iTextureHandle> colorBuffer2;
+    csRef<iTextureHandle> depthBuffer;
 
     int maxPortalRecurse;
   };

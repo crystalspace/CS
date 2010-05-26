@@ -61,6 +61,82 @@ CS::RenderManager::RenderView *CreateNewRenderView(CS::RenderManager::RenderView
   return rview;
 }
 
+/**
+ * Renderer for multiple contexts where all objects are drawn
+ * to a single render target.
+ *
+ * Usage: 
+ *  1. Attach desired render targets.
+ *  2. Using a reverse iterator, iterate over all contexts.
+ *  3. Call FinishDraw()
+ *
+ * Example:
+ * \code
+ * // ... contexts setup etc. ...
+ *
+ * {
+ *   DeferredTreeRenderer<RenderTree> render (renderView->GetGraphics3D (),
+ *     shaderManager);
+ *
+ *   ForEachContextReverse (renderTree, render);
+ *   g3d->FinishDraw();
+ * }
+ *
+ * // ... apply post processing ...
+ * \endcode
+ */
+template<typename RenderTree>
+class DeferredTreeRenderer
+{
+public:
+
+  DeferredTreeRenderer(iGraphics3D* g3d, iShaderManager *shaderMgr)
+    : 
+  meshRender(g3d, shaderMgr),
+  graphics3D(g3d),
+  shaderMgr(shaderMgr)
+  {}
+
+  ~DeferredTreeRenderer() {}
+
+  /**
+   * Render all contexts.
+   */
+  void operator()(typename RenderTree::ContextNode *context)
+  {
+    RenderView *rview = context->renderView;
+    
+    iEngine *engine = rview->GetEngine ();
+    iCamera *cam = rview->GetCamera ();
+    iClipper2D *clipper = rview->GetClipper ();
+    
+    // Setup the camera etc.. @@should be delayed as well
+    graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
+    graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
+
+    int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
+    graphics3D->BeginDraw (drawFlags);
+
+    // Render all mesh nodes in context
+    size_t layerCount = context->svArrays.GetNumLayers();
+    for (size_t layer = 0; layer < layerCount; ++layer)
+    {
+      meshRender.SetLayer (layer);
+
+      graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
+      ForEachMeshNode (*context, meshRender);
+    }
+  }
+ 
+private:
+
+  SimpleContextRender<RenderTree> meshRender;
+
+  iGraphics3D *graphics3D;
+  iShaderManager *shaderMgr;
+};
+
+//----------------------------------------------------------------------
 template<typename RenderTreeType, typename LayerConfigType>
 class StandardContextSetup
 {
@@ -220,6 +296,58 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     return false;
   }
 
+  colorBuffer0 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
+    graphics2D->GetHeight (),
+    csimg2D,
+    "rgba8",
+    flags,
+    NULL);
+
+  if(!colorBuffer0)
+  {
+    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, "Could not create color buffer 0!");
+    return false;
+  }
+
+  colorBuffer1 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
+    graphics2D->GetHeight (),
+    csimg2D,
+    "rgba8",
+    flags,
+    NULL);
+
+  if(!colorBuffer1)
+  {
+    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, "Could not create color buffer 1!");
+    return false;
+  }
+
+  colorBuffer2 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
+    graphics2D->GetHeight (),
+    csimg2D,
+    "rgba8",
+    flags,
+    NULL);
+
+  if(!colorBuffer2)
+  {
+    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, "Could not create color buffer 2!");
+    return false;
+  }
+
+  depthBuffer  = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
+    graphics2D->GetHeight (),
+    csimg2D,
+    "d24s8",
+    flags,
+    NULL);
+
+  if(!depthBuffer)
+  {
+    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, "Could not create depth buffer!");
+    return false;
+  }
+
   return true;
 }
 
@@ -269,15 +397,21 @@ bool RMDeferred::RenderView(iView *view)
     contextSetup (*startContext, portalData);
   }
 
+  AttachGbuffer (graphics3D);
+
   // Render all contexts, back to front
   {
     graphics3D->SetZMode (CS_ZBUF_MESH);
 
-    SimpleTreeRenderer<RenderTreeType> render (graphics3D, shaderManager);
+    DeferredTreeRenderer<RenderTreeType> render (graphics3D, shaderManager);
     ForEachContextReverse (renderTree, render);
+
+    graphics3D->FinishDraw ();
   }
 
-  DebugFrameRender (rview, renderTree);
+  DetachGBuffer (graphics3D);
+
+  DrawGBuffer (graphics3D, graphics2D);
 
   return true;
 }
@@ -286,6 +420,86 @@ bool RMDeferred::RenderView(iView *view)
 bool RMDeferred::PrecacheView(iView *view)
 {
   return RenderView (view);
+}
+
+//----------------------------------------------------------------------
+bool RMDeferred::AttachGbuffer(iGraphics3D *graphics3D)
+{
+  if(!graphics3D->SetRenderTarget (colorBuffer0, false, 0, rtaColor0))
+    return false;
+
+  if(!graphics3D->SetRenderTarget (colorBuffer1, false, 0, rtaColor1))
+    return false;
+
+  if(!graphics3D->SetRenderTarget (depthBuffer, false, 0, rtaDepth))
+    return false;
+  
+  if (!graphics3D->ValidateRenderTargets ())
+    return false;
+
+  return true;
+}
+
+//----------------------------------------------------------------------
+bool RMDeferred::DetachGBuffer(iGraphics3D *graphics3D)
+{
+  graphics3D->UnsetRenderTargets ();
+
+  return true;
+}
+
+//----------------------------------------------------------------------
+void RMDeferred::DrawGBuffer(iGraphics3D *graphics3D, iGraphics2D *graphics2D)
+{
+  graphics3D->BeginDraw (CSDRAW_2DGRAPHICS);
+
+  // Draws the buffers
+  int w, h;
+  colorBuffer0->GetRendererDimensions (w, h);
+
+  graphics3D->DrawPixmap (colorBuffer0, 
+    0, 
+    0, 
+    graphics2D->GetWidth () / 2, 
+    graphics2D->GetHeight () / 2, 
+    0, 
+    0, 
+    w, 
+    h,
+    0);
+
+  graphics3D->DrawPixmap (colorBuffer1, 
+    graphics2D->GetWidth () / 2, 
+    0, 
+    graphics2D->GetWidth () / 2, 
+    graphics2D->GetHeight () / 2, 
+    0, 
+    0, 
+    w, 
+    h,
+    0);
+
+  graphics3D->DrawPixmap (colorBuffer2, 
+    0,
+    graphics2D->GetHeight () / 2, 
+    graphics2D->GetWidth () / 2, 
+    graphics2D->GetHeight () / 2, 
+    0, 
+    0, 
+    w, 
+    h,
+    0);
+  
+  graphics3D->DrawPixmap (depthBuffer, 
+    graphics2D->GetWidth () / 2, 
+    graphics2D->GetHeight () / 2, 
+    graphics2D->GetWidth () / 2, 
+    graphics2D->GetHeight () / 2, 
+    0, 
+    0, 
+    w, 
+    h,
+    0);
 }
 
 }

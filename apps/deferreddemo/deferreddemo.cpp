@@ -168,49 +168,6 @@ bool DeferredDemo::SetupScene()
   else
     ReportInfo("Graphics3D supports %d color buffer attachments.", caps->MaxRTColorAttachments);
 
-  // Creates the off-screen buffer
-  int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
-
-  colorBuffer0 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
-    graphics2D->GetHeight (),
-    csimg2D,
-    "rgba8",
-    flags,
-    NULL);
-
-  if(!colorBuffer0)
-    return ReportError("Couldn't create color buffer 0!");
-
-  colorBuffer1 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
-    graphics2D->GetHeight (),
-    csimg2D,
-    "rgba8",
-    flags,
-    NULL);
-
-  if(!colorBuffer1)
-    return ReportError("Couldn't create color buffer 1!");
-
-  colorBuffer2 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
-    graphics2D->GetHeight (),
-    csimg2D,
-    "rgba8",
-    flags,
-    NULL);
-
-  if(!colorBuffer2)
-    return ReportError("Couldn't create color buffer 2!");
-
-  depthBuffer  = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
-    graphics2D->GetHeight (),
-    csimg2D,
-    "d24s8",
-    flags,
-    NULL);
-
-  if(!depthBuffer)
-    return ReportError("Couldn't create depth buffer!");
-
   engine->SetClearScreen (true);
   engine->Prepare ();
 
@@ -306,90 +263,7 @@ void DeferredDemo::Frame ()
 
   engine->SetRenderManager (rm);
 
-  // Attach render targets.
-  if(!graphics3D->SetRenderTarget (colorBuffer0, false, 0, rtaColor0))
-  {
-    ReportError("Could not attach color buffer 0!");
-    Quit ();
-    return;
-  }
-
-  if(!graphics3D->SetRenderTarget (colorBuffer1, false, 0, rtaColor1))
-  {
-    ReportError("Could not attach color buffer 1!");
-    Quit ();
-    return;
-  }
-
-  if(!graphics3D->SetRenderTarget (depthBuffer, false, 0, rtaDepth))
-  {
-    ReportError("Could not attach depth buffer!");
-    graphics3D->UnsetRenderTargets ();
-    Quit ();
-    return;
-  }
-  
-  if (!graphics3D->ValidateRenderTargets ())
-  {
-    ReportError("Invalid offscreen buffer!");
-    graphics3D->UnsetRenderTargets ();
-    Quit ();
-    return;
-  }
-
   view->Draw ();
-
-  graphics3D->UnsetRenderTargets ();
-
-  graphics3D->BeginDraw (CSDRAW_2DGRAPHICS);
-
-  // Draws the buffers
-  int w, h;
-  colorBuffer0->GetRendererDimensions (w, h);
-
-  graphics3D->DrawPixmap (colorBuffer0, 
-    0, 
-    0, 
-    graphics2D->GetWidth () / 2, 
-    graphics2D->GetHeight () / 2, 
-    0, 
-    0, 
-    w, 
-    h,
-    0);
-
-  graphics3D->DrawPixmap (colorBuffer1, 
-    graphics2D->GetWidth () / 2, 
-    0, 
-    graphics2D->GetWidth () / 2, 
-    graphics2D->GetHeight () / 2, 
-    0, 
-    0, 
-    w, 
-    h,
-    0);
-
-  graphics3D->DrawPixmap (colorBuffer2, 
-    0,
-    graphics2D->GetHeight () / 2, 
-    graphics2D->GetWidth () / 2, 
-    graphics2D->GetHeight () / 2, 
-    0, 
-    0, 
-    w, 
-    h,
-    0);
-  
-  graphics3D->DrawPixmap (depthBuffer, 
-    graphics2D->GetWidth () / 2, 
-    graphics2D->GetHeight () / 2, 
-    graphics2D->GetWidth () / 2, 
-    graphics2D->GetHeight () / 2, 
-    0, 
-    0, 
-    w, 
-    h,
-    0);
 
   graphics3D->FinishDraw ();
   graphics3D->Print (NULL);
