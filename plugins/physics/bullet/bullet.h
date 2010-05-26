@@ -233,6 +233,7 @@ public:
   virtual void RemoveSoftBody (iBulletSoftBody* body);
   virtual csPtr<iBulletPivotJoint> CreatePivotJoint ();
   virtual void RemovePivotJoint (iBulletPivotJoint* joint);
+  virtual bool SaveBulletWorld (const char* filename);
 };
 
 class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,

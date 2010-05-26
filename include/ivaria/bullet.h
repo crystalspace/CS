@@ -234,6 +234,12 @@ struct iBulletDynamicSystem : public virtual iBase
    * Remove the given pivot joint from the simulation.
    */
   virtual void RemovePivotJoint (iBulletPivotJoint* joint) = 0;
+
+  /**
+   * Save the current state of the dynamic world in a .bullet serialization file.
+   * \return True if the operation succeeds, false otherwise.
+   */
+  virtual bool SaveBulletWorld (const char* filename) = 0;
 };
 
 /**

@@ -1034,6 +1034,32 @@ void csBulletDynamicsSystem::RemovePivotJoint (iBulletPivotJoint* joint)
   pivotJoints.Delete (joint);
 }
 
+bool csBulletDynamicsSystem::SaveBulletWorld (const char* filename)
+{
+#ifndef CS_HAVE_BULLET76
+  return false;
+#else
+
+  //create a large enough buffer. There is no method to pre-calculate the buffer size yet.
+  int maxSerializeBufferSize = 1024 * 1024 * 5;
+ 
+  btDefaultSerializer* serializer = new btDefaultSerializer (maxSerializeBufferSize);
+  bulletWorld->serialize (serializer);
+ 
+  FILE* file = fopen (filename,"wb");
+  if (!file) return false;
+
+  if (fwrite (serializer->getBufferPointer (), serializer->getCurrentBufferSize (), 1, file)
+      != 1)
+    return false;
+
+  if (fclose(file) == EOF) return false;
+
+  return true;
+
+#endif
+}
+
 //-------------------- csBulletRigidBody -----------------------------------
 
 csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic)
@@ -1462,23 +1488,23 @@ bool csBulletRigidBody::Disable (void)
 {
   SetAngularVelocity(csVector3(0));
   SetLinearVelocity(csVector3(0));
-  body->setInterpolationWorldTransform(body->getWorldTransform());
+  body->setInterpolationWorldTransform (body->getWorldTransform());
   if (body)
-    body->setActivationState(ISLAND_SLEEPING);
+    body->setActivationState (ISLAND_SLEEPING);
   return false;
 }
 
 bool csBulletRigidBody::Enable (void)
 {
   if (body)
-    body->setActivationState(ACTIVE_TAG);
+    body->setActivationState (ACTIVE_TAG);
   return true;
 }
 
 bool csBulletRigidBody::IsEnabled (void)
 {
   if (body)
-    return body->isActive();
+    return body->isActive ();
   return false;
 }
 
