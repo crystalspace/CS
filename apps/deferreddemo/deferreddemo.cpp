@@ -45,7 +45,6 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
       CS_REQUEST_LEVELLOADER,
       CS_REQUEST_REPORTER,
       CS_REQUEST_REPORTERLISTENER,
-      CS_REQUEST_PLUGIN("crystalspace.rendermanager.deferred", iRenderManager),
       CS_REQUEST_END))
   {
     return ReportError("Failed to initialize plugins!");
@@ -115,13 +114,12 @@ bool DeferredDemo::SetupModules()
   if (!loader) 
     return ReportError("Failed to locate Loader!");
 
-  rm = csQueryRegistry<iRenderManager> (GetObjectRegistry());
+  rm = csLoadPlugin<iRenderManager> (GetObjectRegistry(), "crystalspace.rendermanager.deferred");
   if (!rm)
-    return ReportError("Failed to locate Render Manager!");
+    return ReportError("Failed to load deferred Render Manager!");
 
   return true;
 }
-
 
 //----------------------------------------------------------------------
 bool DeferredDemo::LoadScene()
