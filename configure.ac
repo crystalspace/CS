@@ -1409,12 +1409,12 @@ AS_IF([test $cs_cv_libbullet = yes],
 	[$cs_cv_libbullet_libs])])
 
 AS_IF([test $cs_cv_libbullet = yes],
-    [CS_CHECK_BUILD([if bullet is sufficiently recent (>=2.76)], [cs_cv_bullet_recent76],
+    [CS_CHECK_BUILD([for bullet serializer], [cs_cv_bullet_serializer],
 	[AC_LANG_PROGRAM(
 	    [[#include "btBulletDynamicsCommon.h"]],
 	    [btDefaultSerializer* serializer = new btDefaultSerializer (1024);])],
 	[], [C++],
-	[CS_HEADER_PROPERTY([CS_HAVE_BULLET76])], [], [],
+	[CS_HEADER_PROPERTY([CS_HAVE_BULLET_SERIALIZER])], [], [],
 	[$cs_cv_libbullet_cflags],
 	[$cs_cv_libbullet_lflags],
 	[$cs_cv_libbullet_libs])])
