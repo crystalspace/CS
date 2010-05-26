@@ -98,6 +98,7 @@ class SoftBodyControl : public scfImplementation2<SoftBodyControl,
     csWeakRef<iMeshObject> mesh;
     csRef<iBulletSoftBody> softBody;
     csDirtyAccessArray<csVector3> vertices;
+    csDirtyAccessArray<csVector3> normals;
     csTicks lastTicks;
     csVector3 meshPosition;
 };
