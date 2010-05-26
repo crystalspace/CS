@@ -98,6 +98,16 @@ csVector3 csBulletSoftBody::GetVertexPosition (size_t index) const
   return BulletToCS (body->m_nodes[index].m_x, dynSys->inverseInternalScale);
 }
 
+csVector3 csBulletSoftBody::GetVertexNormal (size_t index) const
+{
+  CS_ASSERT(index < (size_t) body->m_nodes.size ());
+  csVector3 normal (body->m_nodes[index].m_n.getX (),
+		    body->m_nodes[index].m_n.getY (),
+		    body->m_nodes[index].m_n.getZ ());
+  normal.Normalize ();
+  return normal;
+}
+
 void csBulletSoftBody::AnchorVertex (size_t vertexIndex)
 {
   CS_ASSERT(vertexIndex < (size_t) body->m_nodes.size ());

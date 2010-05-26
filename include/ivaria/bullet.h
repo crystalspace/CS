@@ -255,7 +255,7 @@ struct iBulletDynamicSystem : public virtual iBase
  */
 struct iBulletSoftBody : public virtual iBase
 {
-  SCF_INTERFACE(iBulletSoftBody, 2, 0, 1);
+  SCF_INTERFACE(iBulletSoftBody, 2, 0, 2);
 
   /**
    * Draw the debug informations of this soft body. This has to be called
@@ -339,6 +339,11 @@ struct iBulletSoftBody : public virtual iBase
    * Return the triangle with the given index.
    */
   virtual csTriangle GetTriangle (size_t index) const = 0;
+
+  /**
+   * Return the normal vector in world coordinates for the given vertex.
+   */
+  virtual csVector3 GetVertexNormal (size_t index) const = 0;
 };
 
 /**

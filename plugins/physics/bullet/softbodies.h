@@ -43,6 +43,7 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   virtual float GetMass () const;
   virtual size_t GetVertexCount () const;
   virtual csVector3 GetVertexPosition (size_t index) const;
+  virtual csVector3 GetVertexNormal (size_t index) const;
   virtual void AnchorVertex (size_t vertexIndex);
   virtual void AnchorVertex (size_t vertexIndex, iRigidBody* body);
   virtual void SetRigidity (float rigidity);
