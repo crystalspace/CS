@@ -20,14 +20,31 @@
 #define __DEFERRED_H__
 
 #include "cssysdef.h"
-#include "itexture.h"
+
+#include "csplugincommon/rendermanager/standardtreetraits.h"
+#include "csplugincommon/rendermanager/dependenttarget.h"
+#include "csplugincommon/rendermanager/rendertree.h"
+#include "csplugincommon/rendermanager/debugcommon.h"
+#include "csplugincommon/rendermanager/renderlayers.h"
+
+#include "iutil/comp.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/rendermanager.h"
-#include "iutil/comp.h"
+#include "itexture.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
-  class RMDeferred : public scfImplementation2<RMDeferred, iRenderManager, iComponent>
+  typedef CS::RenderManager::RenderTree<CS::RenderManager::RenderTreeStandardTraits> 
+    RenderTreeType;
+
+  template<typename RenderTreeType, typename LayerConfigType>
+  class StandardContextSetup;
+
+  class RMDeferred : public scfImplementation3<RMDeferred, 
+                                               iRenderManager, 
+                                               iComponent, 
+                                               scfFakeInterface<iDebugHelper> >,
+                     public CS::RenderManager::RMDebugCommon<RenderTreeType>
   {
   public:
 
@@ -41,12 +58,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     virtual bool RenderView(iView *view);
     virtual bool PrecacheView(iView *view);
 
-  protected:
+    typedef StandardContextSetup<RenderTreeType, CS::RenderManager::MultipleRenderLayer> 
+      ContextSetupType;
+
+    typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, ContextSetupType> 
+      PortalSetupType;
+
+  public:
 
     iObjectRegistry *objRegistry;
 
+    RenderTreeType::PersistentData treePersistent;
+    PortalSetupType::PersistentData portalPersistent;
+
+    CS::RenderManager::MultipleRenderLayer renderLayer;
+
+    csRef<iShaderManager> shaderManager;
     csRef<iTextureHandle> accumBuffer;
 
+    int maxPortalRecurse;
   };
 }
 CS_PLUGIN_NAMESPACE_END(RMDeferred)
