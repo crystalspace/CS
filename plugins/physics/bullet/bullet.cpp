@@ -1036,7 +1036,7 @@ void csBulletDynamicsSystem::RemovePivotJoint (iBulletPivotJoint* joint)
 
 bool csBulletDynamicsSystem::SaveBulletWorld (const char* filename)
 {
-#ifndef CS_HAVE_BULLET76
+#ifndef CS_HAVE_BULLET_SERIALIZER
   return false;
 #else
 

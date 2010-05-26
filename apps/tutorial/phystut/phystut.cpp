@@ -550,7 +550,7 @@ bool Simple::OnKeyboard (iEvent &ev)
       dynamicsDebugger->UpdateDisplay ();
     }
 
-#ifdef CS_HAVE_BULLET76
+#ifdef CS_HAVE_BULLET_SERIALIZER
     // Save a .bullet file
     else if (csKeyEventHelper::GetRawCode (&ev) == 's'
 	     && kbd->GetKeyState (CSKEY_CTRL)
@@ -802,7 +802,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     keyDescriptions.Push ("2: disable StepFast solver");
     keyDescriptions.Push ("3: enable QuickStep solver");
   }
-#ifdef CS_HAVE_BULLET76
+#ifdef CS_HAVE_BULLET_SERIALIZER
   if (phys_engine_id == BULLET_ID)
     keyDescriptions.Push ("CTRL-s: save the dynamic world");
 #endif
