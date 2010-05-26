@@ -56738,9 +56738,9 @@ fi
 
 if test $cs_cv_libbullet = yes; then
   if test "" != yes; then
-  { $as_echo "$as_me:$LINENO: checking if bullet is sufficiently recent (>=2.76)" >&5
-$as_echo_n "checking if bullet is sufficiently recent (>=2.76)... " >&6; }
-if test "${cs_cv_bullet_recent76+set}" = set; then
+  { $as_echo "$as_me:$LINENO: checking for bullet serializer" >&5
+$as_echo_n "checking for bullet serializer... " >&6; }
+if test "${cs_cv_bullet_serializer+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
   ac_ext=cpp
@@ -56886,20 +56886,20 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libbullet_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libbullet_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libbullet_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_bullet_recent76=yes
-		cs_cv_bullet_recent76_cflags=$cs_build_cflags
-		cs_cv_bullet_recent76_lflags=$cs_build_lflags
-		cs_cv_bullet_recent76_libs=$cs_build_libs
+	cs_cv_bullet_serializer=yes
+		cs_cv_bullet_serializer_cflags=$cs_build_cflags
+		cs_cv_bullet_serializer_lflags=$cs_build_lflags
+		cs_cv_bullet_serializer_libs=$cs_build_libs
 else
-  cs_cv_bullet_recent76=no
+  cs_cv_bullet_serializer=no
 fi
 
 fi
-{ $as_echo "$as_me:$LINENO: result: $cs_cv_bullet_recent76" >&5
-$as_echo "$cs_cv_bullet_recent76" >&6; }
+{ $as_echo "$as_me:$LINENO: result: $cs_cv_bullet_serializer" >&5
+$as_echo "$cs_cv_bullet_serializer" >&6; }
 else
-  { $as_echo "$as_me:$LINENO: checking if bullet is sufficiently recent (>=2.76)" >&5
-$as_echo_n "checking if bullet is sufficiently recent (>=2.76)... " >&6; }
+  { $as_echo "$as_me:$LINENO: checking for bullet serializer" >&5
+$as_echo_n "checking for bullet serializer... " >&6; }
 	    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -57043,25 +57043,25 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libbullet_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libbullet_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libbullet_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_bullet_recent76=yes
-		cs_cv_bullet_recent76_cflags=$cs_build_cflags
-		cs_cv_bullet_recent76_lflags=$cs_build_lflags
-		cs_cv_bullet_recent76_libs=$cs_build_libs
+	cs_cv_bullet_serializer=yes
+		cs_cv_bullet_serializer_cflags=$cs_build_cflags
+		cs_cv_bullet_serializer_lflags=$cs_build_lflags
+		cs_cv_bullet_serializer_libs=$cs_build_libs
 else
-  cs_cv_bullet_recent76=no
+  cs_cv_bullet_serializer=no
 fi
 
-	    { $as_echo "$as_me:$LINENO: result: $cs_cv_bullet_recent76" >&5
-$as_echo "$cs_cv_bullet_recent76" >&6; }
+	    { $as_echo "$as_me:$LINENO: result: $cs_cv_bullet_serializer" >&5
+$as_echo "$cs_cv_bullet_serializer" >&6; }
 fi
 
-    if test $cs_cv_bullet_recent76 = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAVE_BULLET76
+    if test $cs_cv_bullet_serializer = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_BULLET_SERIALIZER
 "
 else
-  cs_cv_bullet_recent76_cflags=''
-	cs_cv_bullet_recent76_lflags=''
-	cs_cv_bullet_recent76_libs=''
+  cs_cv_bullet_serializer_cflags=''
+	cs_cv_bullet_serializer_lflags=''
+	cs_cv_bullet_serializer_libs=''
 
 fi
 
