@@ -549,6 +549,22 @@ bool Simple::OnKeyboard (iEvent &ev)
       // Update the display of the dynamics debugger
       dynamicsDebugger->UpdateDisplay ();
     }
+
+#ifdef CS_HAVE_BULLET76
+    // Save a .bullet file
+    else if (csKeyEventHelper::GetRawCode (&ev) == 's'
+	     && kbd->GetKeyState (CSKEY_CTRL)
+	     && phys_engine_id == BULLET_ID)
+    {
+      const char* filename = "phystut_world.bullet";
+      if (bulletDynamicSystem->SaveBulletWorld (filename))
+	printf ("Dynamic world successfully saved as file %s\n", filename);
+      else
+	printf ("Problem saving dynamic world to file %s\n", filename);
+
+      return true;
+    }
+#endif
   }
 
   // Slow down the camera's body
@@ -786,6 +802,10 @@ bool Simple::OnInitialize (int argc, char* argv[])
     keyDescriptions.Push ("2: disable StepFast solver");
     keyDescriptions.Push ("3: enable QuickStep solver");
   }
+#ifdef CS_HAVE_BULLET76
+  if (phys_engine_id == BULLET_ID)
+    keyDescriptions.Push ("CTRL-s: save the dynamic world");
+#endif
 
   return true;
 }
