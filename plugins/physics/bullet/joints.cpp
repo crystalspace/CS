@@ -24,12 +24,9 @@
 // Bullet includes.
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
-#include "BulletCollision/Gimpact/btGImpactShape.h"
-#include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
-
-struct btSoftBodyWorldInfo;
 
 #include "joints.h"
+#include "rigidbodies.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {

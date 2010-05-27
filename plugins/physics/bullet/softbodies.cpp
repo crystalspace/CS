@@ -30,14 +30,13 @@
 // Bullet includes.
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
-#include "BulletCollision/Gimpact/btGImpactShape.h"
-#include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
 #include "BulletSoftBody/btSoftBody.h"
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 #include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
 #include "BulletSoftBody/btSoftBodyHelpers.h"
 
 #include "softbodies.h"
+#include "rigidbodies.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
