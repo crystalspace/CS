@@ -316,7 +316,10 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Set up camera.
   csRef<iCustomMatrixCamera> newCamera = engine->CreateCustomMatrixCamera(csIMesh->camera);
-  newCamera->GetCamera()->SetSector(csMesh->GetMovable()->GetSectors()->Get(0));
+  iSectorList* sectorList = csMesh->GetMovable ()->GetSectors ();
+  if (sectorList->GetCount () == 0)
+    return false;
+  newCamera->GetCamera()->SetSector(sectorList->Get(0));
 
   // Move camera to look at mesh.
   csVector3 mesh_pos = csMesh->GetWorldBoundingBox ().GetCenter ();
