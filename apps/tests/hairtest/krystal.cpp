@@ -301,7 +301,7 @@ bool KrystalScene::CreateAvatar ()
 
 	// Start the ragdoll animation node in order to have the rigid bodies created
 	ragdollNode->Play ();
-
+/*
 	iRigidBody* headBody = ragdollNode->GetBoneRigidBody
 		(animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
 
@@ -309,8 +309,10 @@ bool KrystalScene::CreateAvatar ()
 
 	iRenderBuffer* indices = skullmesh->GetFactorySubMesh()->GetIndices(0);
 	iRenderBuffer* vertices = animeshFactory->GetVertices();
+	iRenderBuffer* texCoord = animeshFactory->GetTexCoords();
 
 	csRenderBufferLock<csVector3> positions (vertices, CS_BUF_LOCK_READ);
+	csRenderBufferLock<csVector2> texcoords (texCoord, CS_BUF_LOCK_READ);
 	csArray<int> uniqueIndices;
 	CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);
 
@@ -327,6 +329,16 @@ bool KrystalScene::CreateAvatar ()
 	    uniqueIndices.Push(tri.c);
     }
 
+	csRef<iImage> densityMap = hairTest->loader->
+	  LoadImage("/lib/krystal/krystal_body_h.png",CS_IMGFMT_TRUECOLOR);
+
+	if(!densityMap)
+	  return hairTest->ReportError ("Can't find Krystal's density map!");
+
+	csRGBpixel *data = (csRGBpixel *)densityMap->GetImageData ();
+	int width = densityMap->GetWidth();
+	int height = densityMap->GetHeight();
+
 	// attach rope for them
 	for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
 	{
@@ -337,14 +349,22 @@ bool KrystalScene::CreateAvatar ()
 	  bulletBody->SetRigidity (0.99f);
 	  bulletBody->AnchorVertex (0, headBody);
 	  hairsBody.Push(bulletBody);
+
+	  csVector2 texcoord = texcoords.Get(uniqueIndices.Get(i));
+	  const csRGBpixel& heixel = data[(int)(texcoord.x * width) + width * 
+		(int)(texcoord.y * height)];
+	  printf("%u ", heixel.red);
+	  //printf("%f %f\n", texcoord.x, texcoord.y);
 	}
+	*/
   }
 
   // Initializa fur material
   csRef<iFurMaterial> furMaterial = furMaterialType->CreateFurMaterial("hair");
-  furMaterial->GenerateGeometry(hairTest->view, hairTest->room, hairsBody);
-  furMaterial->DoSomething (1, csVector3 (2, 3, 4));
-  printf ("%d\n", furMaterial->GetSomething ());
+  //furMaterial->GenerateGeometry(hairTest->view, hairTest->room, hairsBody);
+  furMaterial->SetMeshFactory(animeshFactory);
+  furMaterial->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
+  furMaterial->GenerateGeometry(hairTest->view, hairTest->room);
 
   // Start animation
   rootNode->Play ();

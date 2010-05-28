@@ -37,9 +37,9 @@ struct iFurMaterialType : public virtual iBase
   SCF_INTERFACE (iFurMaterialType, 1, 0, 0);
 
   virtual void ClearFurMaterials () = 0;
-  virtual void RemoveFurMaterial (const char *name,iFurMaterial* furMaterial) = 0;
-  virtual iFurMaterial* CreateFurMaterial (const char *name) = 0;
-  virtual iFurMaterial* FindFurMaterial (const char *name) const = 0;
+  virtual void RemoveFurMaterial (const char* name,iFurMaterial* furMaterial) = 0;
+  virtual iFurMaterial* CreateFurMaterial (const char* name) = 0;
+  virtual iFurMaterial* FindFurMaterial (const char* name) const = 0;
 };
 
 /**
@@ -50,15 +50,15 @@ struct iFurMaterialType : public virtual iBase
 struct iFurMaterial : public virtual iMaterial 
 {
   SCF_INTERFACE (iFurMaterial, 1, 0, 0);
-  /// Do something.
-  virtual void DoSomething (int param, const csVector3&) = 0;
-  /// Get something.
-  virtual int GetSomething () const = 0;
-
   /// Generate geometry
-  virtual void GenerateGeometry (iView* view, iSector *room, int controlPoints, 
-	int numberOfStrains, float length) = 0;
-  virtual void GenerateGeometry (iView* view, iSector *room, 
+  virtual void GenerateGeometry (iView* view, iSector* room, 
 	csRefArray<iBulletSoftBody> hairStrands) = 0;
+  virtual void GenerateGeometry (iView* view, iSector* room) = 0;
+
+  virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory ) = 0;
+  virtual void SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
+	meshFactorySubMesh ) = 0;
+  virtual void SetDensitymap ( iImage* densitymap ) = 0;
+  virtual void SetHeightmap ( iImage* heightmap ) = 0;
 };
 #endif // __FUR_INTERF_H__

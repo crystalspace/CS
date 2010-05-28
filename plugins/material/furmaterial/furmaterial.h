@@ -56,18 +56,25 @@ class FurMaterialType : public
 	  csHash<csRef<iFurMaterial>, csString> furMaterialHash;
 };
 
-class FurMaterialFactory : public scfImplementation1<FurMaterialFactory, 
-	iGenMeshAnimationControlFactory>
+struct csGuideHairReference
 {
-public:
-	CS_LEAKGUARD_DECLARE(FurMaterialFactory);
+  size_t index;
+  float distance;
+};
 
-	FurMaterialFactory ();
+struct csHairStrand
+{
+  csVector3 *controlPoints;
+  size_t controlPointsCount;
 
-	//-- iGenMeshAnimationControlFactory
-	virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (iMeshObject* mesh);
-	virtual const char* Load (iDocumentNode* node);
-	virtual const char* Save (iDocumentNode* parent);
+  csGuideHairReference *guideHairs;
+  size_t guideHairsCount;
+};
+
+struct csGuideHair
+{
+  csVector3 *controlPoints;
+  size_t controlPointsCount;
 };
 
 class FurMaterial : public scfImplementation2<FurMaterial,
@@ -80,28 +87,18 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	  iObjectRegistry* object_reg);
     virtual ~FurMaterial ();
 
-    // From iFurMaterial.
-    virtual void DoSomething (int param, const csVector3&);
-    virtual int GetSomething () const;
-
-	virtual void GenerateGeometry (iView *view,iSector *room, 
-	  int controlPoints, int numberOfStrains, float length);
+	// From iFurMaterial
 	virtual void GenerateGeometry (iView* view, iSector *room, 
 	  csRefArray<iBulletSoftBody> hairStrands);
-
-	/*
-	// From iShaderVariableContext
-	virtual void AddVariable (csShaderVariable *variable);
-	virtual void Clear ();
-	virtual const csRefArray <csShaderVariable>& GetShaderVariables () const;
-	virtual csShaderVariable* GetVariable (CS::ShaderVarStringID name) const;
-	csShaderVariable* GetVariableAdd (CS::ShaderVarStringID name);
-	virtual bool IsEmpty () const;
-	virtual void PushVariables (csShaderVariableStack &stack) const;
-	virtual bool RemoveVariable (CS::ShaderVarStringID name);
-	virtual bool RemoveVariable (csShaderVariable *variable);
-	virtual void ReplaceVariable (csShaderVariable *variable);
-    */
+    virtual void GenerateGeometry (iView* view, iSector *room);
+	// Temporary - Set Mesh and Submesh
+    virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory);
+	virtual void SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
+	  meshFactorySubMesh );
+	// Temporary - Set Densitymap
+    virtual void SetDensitymap ( iImage* densitymap );
+	// Temporary - Set Heightmap
+    virtual void SetHeightmap ( iImage* heightmap );
 
 	// From iMaterial
     /// Associate a shader with a shader type
@@ -126,12 +123,21 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 
   private:
 	iObjectRegistry* object_reg;
-	csVector3 store_v;
 	/// Shader associated with material
 	csHash<csRef<iShader>, csStringID> shaders;
 	/// Fur geometry
 	csRef<iGeneralFactoryState> factoryState;
 	csRef<iView> view;
+	csArray<csHairStrand> hairStrands;
+	csArray<csGuideHair> guideHairs;
+	/// Temp fur geometry
+	csRef<iAnimatedMeshFactory> meshFactory;
+	csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
+	csRef<iImage> densitymap;
+	csRef<iImage> heightmap;
+	
+	/// functions
+	void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes);
 };
 
 class FurMaterialControl : public scfImplementation1 
@@ -155,13 +161,13 @@ class FurMaterialControl : public scfImplementation1
 	virtual bool AnimatesVertices () const;
 	virtual void Update (csTicks current, int num_verts, uint32 version_id);
 	virtual const csColor4* UpdateColors (csTicks current, const csColor4* colors,
-		int num_colors, uint32 version_id);
+	  int num_colors, uint32 version_id);
 	virtual const csVector3* UpdateNormals (csTicks current, const csVector3* normals,
-		int num_normals, uint32 version_id);
+	  int num_normals, uint32 version_id);
 	virtual const csVector2* UpdateTexels (csTicks current, const csVector2* texels,
-		int num_texels, uint32 version_id);
+	  int num_texels, uint32 version_id);
 	virtual const csVector3* UpdateVertices (csTicks current, const csVector3* verts,
-		int num_verts, uint32 version_id);
+	  int num_verts, uint32 version_id);
 
   private:
     csWeakRef<iMeshObject> mesh;
