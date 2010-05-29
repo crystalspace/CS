@@ -192,6 +192,11 @@ public:
    */
   void SetSingleMesh (iMeshWrapper* mesh) { single_mesh = mesh; }
 
+  csEngine* GetEngine() const
+  {
+	return engine;
+  }
+
   /**\name iSector 
    * @{ */
   virtual iObject *QueryObject ()
@@ -346,6 +351,14 @@ public:
   void UpdateLightBounds (CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* light,
     const csBox3& oldBox);
 
+  //bool SetVisibilityCullerPointer (iVisibilityCuller* culCuller,
+  //	iDocumentNode* culler_params=0);
+  virtual bool SetVisibilityCullerPointer (iVisibilityCuller* culCuller,
+  	iDocumentNode* culler_params=0);
+
+	/// Required by ThreadedCallable
+  iObjectRegistry* GetObjectRegistry() const;
+
   /** @} */
 
   /**\name Mesh generators
@@ -447,6 +460,7 @@ private:
   void UpdateFogSVs ();
 
   void SetupSVNames();
+
 private:
   // PRIVATE MEMBERS
 
@@ -502,9 +516,6 @@ private:
 
   /// Engine handle.
   csEngine* engine;
-
-  /// Required by ThreadedCallable
-  iObjectRegistry* GetObjectRegistry() const;
 
   /// Optional renderloop.
   iRenderLoop* renderloop;

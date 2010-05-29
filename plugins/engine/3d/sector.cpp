@@ -103,6 +103,7 @@ void csSectorLightList::UpdateLightBounds (csLight* light, const csBox3& oldBox)
 
 //---------------------------------------------------------------------------
 
+
 csSector::csSector (csEngine *engine) :
   scfImplementationType (this), lights (this), engine (engine)
 {
@@ -301,6 +302,41 @@ void csSector::PrecacheDraw ()
 }
 
 //----------------------------------------------------------------------
+
+bool csSector::SetVisibilityCullerPointer (iVisibilityCuller* culCuller,
+  	iDocumentNode* culler_params)
+{
+
+  culler = culCuller;
+
+  if (!culler)
+  {
+    return false;
+  }
+
+  const char* err = culler->ParseCullerParameters (culler_params);
+  if (err)
+  {
+    engine->Error ("Error loading visibility culler: %s!",
+    	err);
+    return false;
+  }
+
+  // load cache data
+  csString cachename;
+  cachename.Format ("%s", GetName ());
+  culler->Setup (cachename);
+
+  // Loop through all meshes and register them to the visibility culler.
+  int i;
+  for (i = 0; i < meshes.GetCount (); i++)
+  {
+    iMeshWrapper* m = meshes.Get (i);
+    m->GetMovable ()->UpdateMove ();
+    RegisterEntireMeshToCuller (m);
+  }
+  return true;
+}
 
 bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 	iDocumentNode* culler_params)

@@ -19,6 +19,9 @@
 
 #include "cssysdef.h"
 
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+
 #include "csplugincommon/rendermanager/dependenttarget.h"
 #include "csplugincommon/rendermanager/hdrhelper.h"
 #include "csplugincommon/rendermanager/lightsetup.h"
@@ -34,6 +37,11 @@
 #include "csplugincommon/rendermanager/viscull.h"
 
 #include "frustvis.h"
+#include "plugins/engine/3d/light.h"
+#include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/meshgen.h"
+#include "plugins/engine/3d/sector.h"
+#include "plugins/engine/3d/engine.h"
 
 #include "rm_culler.h"
 
@@ -52,6 +60,7 @@ SCF_IMPLEMENT_FACTORY(RMCuller)
 template<typename RenderTreeType, typename LayerConfigType>
 class StandardContextSetup
 {
+	friend class csEngine;
 public:
 	typedef StandardContextSetup<RenderTreeType, LayerConfigType> ThisType;
 	typedef StandardPortalSetup<RenderTreeType, ThisType> PortalSetupType;
@@ -74,7 +83,7 @@ public:
     typename PortalSetupType::ContextSetupData& portalSetupData)
   {
     CS::RenderManager::RenderView* rview = context.renderView;
-    iSector* sector = rview->GetThisSector ();
+    csSector* sector = (csSector*)rview->GetThisSector ();
 
     if (recurseCount > maxPortalRecurse) return;
     
@@ -89,21 +98,31 @@ public:
       context.owner.AddDebugClipPlanes (rview);
 
     // Do the culling
-	csFrustumVis fvCuller(0);
-	sector->SetVisibilityCullerPlugin("crystalspace.culling.frustvis");
+	//csFrustumVis fvCuller(0);
+	/*sector->SetVisibilityCullerPlugin("crystalspace.culling.frustvis");
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+	Viscull<RenderTreeType> (context, rview, culler);*/
 
+	//engine;
+	
 	/*csRef<iPluginManager> plugmgr = 
-  		csQueryRegistry<iPluginManager> (sector->engine->objectRegistry);
+		csQueryRegistry<iPluginManager> (sector->GetEngine()->objectRegistry);
 	int i;
-	for (i = 0; i < sector->meshes.GetCount (); i++)
+	for (i = 0; i < sector->GetMeshes()->GetCount (); i++)
 	{
-		iMeshWrapper* m = sector->meshes.Get (i);
+		iMeshWrapper* m = sector->GetMeshes()->Get (i);
 		m->GetMovable ()->UpdateMove ();
 		sector->RegisterEntireMeshToCuller (m);
-	}
-	iVisibilityCuller* culler;*/
-    Viscull<RenderTreeType> (context, rview, culler);
+	}*/
+	csFrustumVis fvCuller(0);
+	fvCuller.Initialize(sector->GetObjectRegistry());
+	//csRef<iVisibilityCuller> culler;//=&fvCuller;
+	iVisibilityCuller* culCuller=&fvCuller;
+	//csRef<iPluginManager> plugmgr = 
+  	//	csQueryRegistry<iPluginManager> (sector->GetEngine()->objectRegistry);
+	//culler = csLoadPlugin<iVisibilityCuller> (plugmgr, "crystalspace.culling.frustvis");
+	sector->SetVisibilityCullerPointer(culCuller);
+    Viscull<RenderTreeType> (context, rview, culCuller);
 
     // Set up all portals
     {
