@@ -36,6 +36,8 @@ struct iRigidBody;
 struct iBulletKinematicCallback;
 struct iBulletSoftBody;
 struct iBulletPivotJoint;
+struct iBulletTerrainCollider;
+struct iTerrainCell;
 
 /**
  * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
@@ -88,7 +90,7 @@ enum csBulletDebugMode
  */
 struct iBulletDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 4);
+  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 5);
 
   /**
    * Draw the debug informations of the dynamic system. This has to be called
@@ -240,6 +242,20 @@ struct iBulletDynamicSystem : public virtual iBase
    * \return True if the operation succeeds, false otherwise.
    */
   virtual bool SaveBulletWorld (const char* filename) = 0;
+
+  /**
+   * Create a new terrain collider and add it to the simulation. All the heights of
+   * the terrain must be kept between minimumHeight and maximumHeight, even when the
+   * terrain is deformed. If these values are not provided then they will be computed
+   * from the current state of the cell.
+   */
+  virtual iBulletTerrainCollider* AttachColliderTerrain (iTerrainCell* cell,
+							 float minimumHeight = 0,
+							 float maximumHeight = 0) = 0;
+  /**
+   * Remove the given terrain collider from the simulation.
+   */
+  virtual void DestroyCollider (iBulletTerrainCollider* collider) = 0;
 };
 
 /**
@@ -536,6 +552,15 @@ struct iBulletPivotJoint : public virtual iBase
    * Get the current position of the joint, in world coordinates.
    */
   virtual csVector3 GetPosition () const = 0;
+};
+
+/**
+ * A terrain collider for the dynamic simulation.
+ */
+struct iBulletTerrainCollider : public virtual iBase
+{
+  SCF_INTERFACE (iBulletTerrainCollider, 1, 0, 0);
+
 };
 
 #endif // __CS_IVARIA_BULLET_H__

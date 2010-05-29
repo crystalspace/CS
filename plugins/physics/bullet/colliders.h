@@ -25,6 +25,8 @@
 #include "bullet.h"
 #include "common.h"
 
+class btHeightfieldTerrainShape;
+
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
@@ -101,6 +103,21 @@ public:
   virtual bool IsStatic ();
 
   float GetVolume ();
+};
+
+class csBulletTerrainCollider : public scfImplementation1<csBulletTerrainCollider,
+  iBulletTerrainCollider>
+{
+ public:
+  csBulletTerrainCollider (csBulletDynamicsSystem* dynSys, iTerrainCell* cell,
+			   float minimumHeight, float maximumHeight);
+  virtual ~csBulletTerrainCollider ();
+
+ private:
+  csBulletDynamicsSystem* dynSys;
+  float* heightData;
+  btHeightfieldTerrainShape* shape;
+  btRigidBody* body;
 };
 
 }

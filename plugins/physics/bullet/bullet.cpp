@@ -153,6 +153,7 @@ csBulletDynamicsSystem::~csBulletDynamicsSystem ()
   dynamicBodies.DeleteAll ();
   colliderBodies.DeleteAll ();
   softBodies.DeleteAll ();
+  terrainColliders.DeleteAll ();
 
   delete bulletWorld;
   delete debugDraw;
@@ -983,6 +984,21 @@ bool csBulletDynamicsSystem::SaveBulletWorld (const char* filename)
   return true;
 
 #endif
+}
+
+iBulletTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
+(iTerrainCell* cell, float minimumHeight, float maximumHeight)
+{
+  csRef<csBulletTerrainCollider> terrain;
+  terrain.AttachNew
+    (new csBulletTerrainCollider (this, cell, minimumHeight, maximumHeight));
+  terrainColliders.Push (terrain);
+  return terrain;
+}
+
+void csBulletDynamicsSystem::DestroyCollider (iBulletTerrainCollider* collider)
+{
+  terrainColliders.Delete (collider);
 }
 
 }

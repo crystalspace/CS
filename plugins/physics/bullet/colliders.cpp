@@ -24,11 +24,13 @@
 #include "csgeom/sphere.h"
 #include "igeom/trimesh.h"
 #include "imesh/objmodel.h"
+#include "imesh/terrain2.h"
 
 // Bullet includes.
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
 #include "BulletCollision/Gimpact/btGImpactShape.h"
+#include "BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 
 #include "colliders.h"
 #include "rigidbodies.h"
@@ -640,6 +642,72 @@ float csBulletCollider::GetVolume ()
   }
 
   return 0.0f;
+}
+
+//----------------------- csBulletTerrainCollider ----------------------------
+
+csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys,
+						  iTerrainCell* cell,
+						  float minimumHeight, float maximumHeight)
+  :  scfImplementationType (this), dynSys (dynSys)
+{
+  // Make sure that the cel data has been loaded
+  cell->SetLoadState (iTerrainCell::Loaded);
+  csLockedHeightData cellData = cell->GetHeightData ();
+
+  // Check if the min/max have to be computed
+  bool needExtremum = minimumHeight == 0.0f && maximumHeight == 0.0f;
+  if (needExtremum)
+    minimumHeight = maximumHeight = cellData.data[0];
+
+  // Initialize the terrain height data
+  heightData = new float[cell->GetGridHeight () * cell->GetGridWidth ()];
+  for (int i = 0; i < cell->GetGridWidth (); i++)
+    for (int j = 0; j < cell->GetGridHeight (); j++)
+    {
+      float height = heightData[(cell->GetGridWidth () - i - 1) * cell->GetGridWidth () + j]
+	= cellData.data[i * cell->GetGridWidth () + j];
+
+      if (needExtremum)
+	{
+	  minimumHeight = MIN (minimumHeight, height);
+	  maximumHeight = MAX (maximumHeight, height);
+	}
+    }
+
+  // Create the terrain shape
+  shape = new btHeightfieldTerrainShape (cell->GetGridWidth (), cell->GetGridHeight (),
+					 heightData, 1.0f, minimumHeight, maximumHeight,
+					 1, PHY_FLOAT, false);
+
+  // Apply the local scaling on the shape
+  csVector3 cellSize = cell->GetSize ();
+  btVector3 localScale (cellSize[0] * dynSys->internalScale / (cell->GetGridWidth () - 1),
+			dynSys->internalScale,
+			cellSize[2] * dynSys->internalScale / (cell->GetGridHeight () - 1));
+  shape->setLocalScaling (localScale);
+
+  // Set the origin to the middle of the heightfield
+  btTransform tr;
+  tr.setIdentity ();
+  csVector2 cellPosition = cell->GetPosition ();
+  tr.setOrigin (btVector3 ((cellPosition[0] + cellSize[0] / 2) * dynSys->internalScale,
+			   (maximumHeight - minimumHeight) * 0.5f * dynSys->internalScale,
+			   (cellPosition[1] + cellSize[2] / 2) * dynSys->internalScale));
+
+  // Create the rigid body and add it to the world
+  body = new btRigidBody (0, 0, shape, btVector3 (0, 0, 0));	
+  body->setWorldTransform (tr);
+  dynSys->bulletWorld->addRigidBody (body);
+}
+
+csBulletTerrainCollider::~csBulletTerrainCollider ()
+{
+  dynSys->bulletWorld->removeRigidBody (body);
+
+  delete body;
+  delete shape;
+  delete heightData;
 }
 
 }
