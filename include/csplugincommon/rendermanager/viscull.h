@@ -95,15 +95,15 @@ namespace RenderManager
 	      if (rm->portal)
 	      {
   #ifdef CS_DEBUG
-		typename ContextNodeType::PortalHolder h = {db_mesh_name, rm->portal, imesh};
+			typename ContextNodeType::PortalHolder h = {db_mesh_name, rm->portal, imesh};
   #else
-		typename ContextNodeType::PortalHolder h = {rm->portal, imesh};
+			typename ContextNodeType::PortalHolder h = {rm->portal, imesh};
   #endif
-		context.allPortals.Push (h);              
+			context.allPortals.Push (h);              
 	      }
 	      else
 	      {
-		context.AddRenderMesh (rm, renderPrio, sm);
+			context.AddRenderMesh (rm, renderPrio, sm);
 	      }
 	    }
 	  }
