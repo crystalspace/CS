@@ -162,13 +162,13 @@ bool KrystalScene::CreateAvatar ()
 	  hairTest->engine->FindMeshFactory ("krystal_hairs");
   if (!hairsMeshFact)
 	  return hairTest->ReportError ("Can't find Krystal's hairs mesh factory!");  
-/*
+
   // Load furPhysicsControl
   csRef<iFurPhysicsControl> furPhysicsControl = csQueryRegistry<iFurPhysicsControl> 
 	  (hairTest->object_reg);
   if (!furPhysicsControl)
 	  return hairTest->ReportError("Failed to locate iFurPhysicsControl plugin!");
-*/
+
   // Load furMaterial
   csRef<iFurMaterialType> furMaterialType = csQueryRegistry<iFurMaterialType> 
 	(hairTest->object_reg);
@@ -365,10 +365,16 @@ bool KrystalScene::CreateAvatar ()
 	*/
   }
 
-
+  iRigidBody* headBody = ragdollNode->GetBoneRigidBody
+	  (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
+  
+  furPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
+  furPhysicsControl->SetRigidBody(headBody);
 
   // Initializa fur material
   csRef<iFurMaterial> furMaterial = furMaterialType->CreateFurMaterial("hair");
+  furMaterial->SetPhysicsControl(furPhysicsControl);
+  
   furMaterial->SetMeshFactory(animeshFactory);
   furMaterial->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
   furMaterial->GenerateGeometry(hairTest->view, hairTest->room);

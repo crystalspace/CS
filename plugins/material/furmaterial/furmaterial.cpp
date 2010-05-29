@@ -394,12 +394,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   CS_LEAKGUARD_IMPLEMENT(FurPhysicsControl);	
 
   FurPhysicsControl::FurPhysicsControl (iBase* parent)
-    : scfImplementationType (this, parent)
+    : scfImplementationType (this, parent), object_reg(0)
   {
   }
 
   FurPhysicsControl::~FurPhysicsControl ()
   {
+  }
+
+  // From iComponent
+  bool FurPhysicsControl::Initialize (iObjectRegistry* r)
+  {
+    object_reg = r;
+    return true;
   }
 
   //-- iFurPhysicsControl
@@ -437,7 +444,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   {
     csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
 
-	CS_ASSERT(coordinatesCount == bulletBody->GetVertexCount());
+	CS_ASSERT(coordinatesCount != bulletBody->GetVertexCount());
 
 	for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
 	  coordinates[i] = bulletBody->GetVertexPosition(i);

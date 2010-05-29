@@ -173,14 +173,17 @@ class FurAnimationControl : public scfImplementation1
 	FurMaterial* furMaterial;
 };
 
-class FurPhysicsControl : public scfImplementation1 <FurPhysicsControl, 
-	iFurPhysicsControl>
+class FurPhysicsControl : public scfImplementation2 <FurPhysicsControl, 
+	iFurPhysicsControl, iComponent>
 {
   public:
 	CS_LEAKGUARD_DECLARE(FurPhysicsControl);
 
     FurPhysicsControl (iBase* parent);
     virtual ~FurPhysicsControl ();
+
+	// From iComponent	
+	virtual bool Initialize (iObjectRegistry*);
 
     //-- iFurPhysicsControl
 	virtual void SetRigidBody (iRigidBody* rigidBody);
@@ -195,6 +198,7 @@ class FurPhysicsControl : public scfImplementation1 <FurPhysicsControl,
 	virtual void RemoveAllStrands ();
 
   private:
+	iObjectRegistry* object_reg;
 	csHash<csRef<iBulletSoftBody>, size_t > guideRopes;
 	csRef<iRigidBody> rigidBody;
 	csRef<iBulletDynamicSystem> bulletDynamicSystem;
