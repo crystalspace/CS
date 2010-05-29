@@ -81,7 +81,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   FurMaterial::FurMaterial (FurMaterialType* manager, const char *name, 
 	iObjectRegistry* object_reg) :
       scfImplementationType (this), manager (manager), name (name), 
-	    object_reg(object_reg)
+	    object_reg(object_reg), physicsControl(0)
   {
   }
 
@@ -96,6 +96,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	iRenderBuffer* indices = meshFactorySubMesh->GetIndices(0);
 
 	GenerateGuidHairs(indices,vertexes);
+	SynchronizeGuideHairs();
 	//GenerateHairStrands
 
 	this->view = view;
@@ -163,6 +164,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 	csRef<iGeneralMeshState> meshState =
 		scfQueryInterface<iGeneralMeshState> (meshWrapper->GetMeshObject ());
+
+	csRef<FurAnimationControl> animationControl;
+	animationControl.AttachNew(new FurAnimationControl(this));
+	meshState -> SetAnimationControl(animationControl);
   }
 
   void FurMaterial::GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes)
@@ -200,86 +205,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	}
   }
 
-  void FurMaterial::GenerateGeometry (iView* view, iSector* room, 
-    csRefArray<iBulletSoftBody> hairStrands)
+  void FurMaterial::SynchronizeGuideHairs ()
   {
-	this->view = view;
-	int controlPoints = hairStrands.Get(0)->GetVertexCount();
-	int numberOfStrains = hairStrands.GetSize();
+	if (!physicsControl) // no physics support
+	  return;
 
-    csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
-	if (!engine) csApplicationFramework::ReportError("Failed to locate iEngine plugin!");
+	for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
+	  physicsControl->InitializeStrand(i,guideHairs.Get(i).controlPoints, 
+	    guideHairs.Get(i).controlPointsCount);
+  }
 
-	// First create the factory:
-	csRef<iMeshFactoryWrapper> factory = engine->CreateMeshFactory (
-		"crystalspace.mesh.object.genmesh", "hairFactory");
-
-	factoryState = scfQueryInterface<iGeneralFactoryState> (
-		factory->GetMeshObjectFactory ());
-
-	factoryState -> SetVertexCount ( numberOfStrains * 2 * 
-	  controlPoints );
-	factoryState -> SetTriangleCount ( numberOfStrains * 2 * 
-	  (controlPoints - 1));
-
-	csVector3 *vbuf = factoryState->GetVertices (); 
-    csTriangle *ibuf = factoryState->GetTriangles ();
-
-	for ( int x = 0 ; x < numberOfStrains ; x ++ )
-	{
-	  for ( int y = 0 ; y < controlPoints ; y ++ )
-	  {
-		vbuf[ x * 2 * controlPoints + 2 * y].Set
-		    ( hairStrands.Get(x)->GetVertexPosition(y) );
-		vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		    ( hairStrands.Get(x)->GetVertexPosition(y) + csVector3(0.01f,0,0) );
-	  }
-
-	  for ( int y = 0 ; y < 2 * (controlPoints - 1) ; y ++ )
-	  {
-		if (y % 2 == 0)
-		{
-		  ibuf[ x * 2 * (controlPoints - 1) + y ].Set
-			  ( 2 * x * controlPoints + y , 
-			    2 * x * controlPoints + y + 1 , 
-			    2 * x * controlPoints + y + 3 );
-		  //printf("%d %d %d\n", 2 * x + y , 2 * x + y + 3 , 2 * x + y + 1);
-		}
-		else
-		{
-		  ibuf[ x * 2 * (controlPoints - 1) + y ].Set
-			  ( 2 * x * controlPoints + y + 1 , 
-			    2 * x * controlPoints + y - 1 , 
-			    2 * x * controlPoints + y + 2 );
-		  //printf("%d %d %d\n", 2 * x + y + 1 , 2 * x + y + 2 , 2 * x + y - 1);
-		}
-	  }
-	}
-
-	factoryState -> CalculateNormals();
-	
-	// Make a ball using the genmesh plug-in.
-	csRef<iMeshWrapper> meshWrapper =
-		engine->CreateMeshWrapper (factory, "hair", room, csVector3 (0, 0, 0));
-
-	csRef<iMaterialWrapper> materialWrapper = 
-		CS::Material::MaterialBuilder::CreateColorMaterial
-		(object_reg,"hairDummyMaterial",csColor(0,1,0));
-
-	meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
-
-	csRef<iGeneralMeshState> meshState =
-		scfQueryInterface<iGeneralMeshState> (meshWrapper->GetMeshObject ());
-
-	csRef<FurMaterialControl> animationControl;
-
-	animationControl.AttachNew(new FurMaterialControl(meshWrapper->GetMeshObject ()));
-
-	animationControl->SetGeneralFactoryState(factoryState);
-	animationControl->SetView(view);
-	animationControl->SetHairStrands(hairStrands);
-
-	meshState -> SetAnimationControl(animationControl);
+  void FurMaterial::SetPhysicsControl (iFurPhysicsControl* physicsControl)
+  {
+	this->physicsControl = physicsControl;
   }
 
   void FurMaterial::SetMeshFactory ( iAnimatedMeshFactory* meshFactory)
@@ -336,64 +274,55 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   }  
 
   /********************
-   *  FurMaterialControl
+   *  FurAnimationControl
    ********************/
 
-  CS_LEAKGUARD_IMPLEMENT(FurMaterialControl);
+  CS_LEAKGUARD_IMPLEMENT(FurAnimationControl);
 
-  FurMaterialControl::FurMaterialControl (iMeshObject* mesh)
-    : scfImplementationType (this), mesh (mesh), lastTicks (0)
+  FurAnimationControl::FurAnimationControl (FurMaterial* furMaterial)
+    : scfImplementationType (this), lastTicks (0), furMaterial(furMaterial)
   {
   }
 
-  FurMaterialControl::~FurMaterialControl ()
+  FurAnimationControl::~FurAnimationControl ()
   {
   }  
 
-  void FurMaterialControl::SetGeneralFactoryState(iGeneralFactoryState *factory)
-  {
-	factoryState = factory;
-  }
-
-  void FurMaterialControl::SetHairStrands(csRefArray<iBulletSoftBody> hairStrands)
-  {
-    this->hairStrands = hairStrands;
-  }
-
-  void FurMaterialControl::SetView (iView* view)
-  {
-    this->view = view;
-  }
-
-  bool FurMaterialControl::AnimatesColors () const
+  bool FurAnimationControl::AnimatesColors () const
   {
     return false;
   }
 
-  bool FurMaterialControl::AnimatesNormals () const
+  bool FurAnimationControl::AnimatesNormals () const
   {
 	return false;
   }
 
-  bool FurMaterialControl::AnimatesTexels () const
+  bool FurAnimationControl::AnimatesTexels () const
   {
 	return false;
   }
 
-  bool FurMaterialControl::AnimatesVertices () const
+  bool FurAnimationControl::AnimatesVertices () const
   {
 	return true;
   }
 
-  void FurMaterialControl::Update (csTicks current, int num_verts, uint32 version_id)
+  void FurAnimationControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
-    const csOrthoTransform& tc = view -> GetCamera() ->GetTransform ();
-	
-	int controlPoints = hairStrands.Get(0)->GetVertexCount();
-	int numberOfStrains = hairStrands.GetSize();
+	// first update the control points
+	if (furMaterial->physicsControl)
+	  for (size_t i = 0 ; i < furMaterial->guideHairs.GetSize(); i ++)
+		furMaterial->physicsControl->AnimateStrand(i,
+		  furMaterial->guideHairs.Get(i).controlPoints,
+		  furMaterial->guideHairs.Get(i).controlPointsCount);
 
-	csVector3 *vbuf = factoryState->GetVertices (); 
-	//csTriangle *ibuf = factoryState->GetTriangles ();
+    const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
+	
+	int controlPoints = furMaterial->guideHairs.Get(0).controlPointsCount;
+	int numberOfStrains = furMaterial->guideHairs.GetSize();
+
+	csVector3 *vbuf = furMaterial->factoryState->GetVertices (); 
 
 	for ( int x = 0 ; x < numberOfStrains ; x ++ )
 	{
@@ -402,10 +331,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 	  for ( y = 0 ; y < controlPoints - 1 ; y ++ )
 	  {
-		csVector2 firstPoint = csVector2(hairStrands.Get(x)->GetVertexPosition(y).x,
-		  hairStrands.Get(x)->GetVertexPosition(y).y);
-		csVector2 secondPoint = csVector2(hairStrands.Get(x)->GetVertexPosition(y + 1).x,
-		  hairStrands.Get(x)->GetVertexPosition(y + 1).y);
+		csVector2 firstPoint = csVector2(furMaterial->guideHairs.Get(x).controlPoints[y].x,
+		  furMaterial->guideHairs.Get(x).controlPoints[y].y);
+		csVector2 secondPoint = csVector2(furMaterial->guideHairs.Get(x).controlPoints[y + 1].x,
+		  furMaterial->guideHairs.Get(x).controlPoints[y + 1].y);
 
 		csVector2 diff = firstPoint - secondPoint;
 		if (diff.Norm() > 0.0001f)
@@ -416,72 +345,114 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		strip = 0.01f * csVector3(diff.y,diff.x,0);
 
 		vbuf[ x * 2 * controlPoints + 2 * y].Set
-		  ( hairStrands.Get(x)->GetVertexPosition(y) );
+		  ( furMaterial->guideHairs.Get(x).controlPoints[y] );
 		vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		  ( hairStrands.Get(x)->GetVertexPosition(y) + 
+		  ( furMaterial->guideHairs.Get(x).controlPoints[y] + 
 		    tc.GetT2O() * strip );
 	  }
 
 	  vbuf[ x * 2 * controlPoints + 2 * y].Set
-		( hairStrands.Get(x)->GetVertexPosition(y) );
+		( furMaterial->guideHairs.Get(x).controlPoints[y] );
 	  vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		( hairStrands.Get(x)->GetVertexPosition(y) + 
+		( furMaterial->guideHairs.Get(x).controlPoints[y] + 
 		  tc.GetT2O() * strip );	  
-/*
-	  int a, b, c;
-	  for ( int y = 0 ; y < 2 * (controlPoints - 1) ; y ++ )
-	  {
-		if (y % 2 == 0)
-		{
-		  a = 2 * x * controlPoints + y;
-		  b = 2 * x * controlPoints + y + 3;
-		  c = 2 * x * controlPoints + y + 1;
-			
-		  if (csMath3::Visible(tc.GetOrigin(), vbuf[a], vbuf[b], vbuf[c]) )
-		    ibuf[ x * 2 * (controlPoints - 1) + y ].Set( a, b, c );
-		  else
-			ibuf[ x * 2 * (controlPoints - 1) + y ].Set( a, c, b );
-		}
-		else
-		{
-		  a = 2 * x * controlPoints + y + 1;
-		  b = 2 * x * controlPoints + y + 2;
-		  c = 2 * x * controlPoints + y - 1;
-
-		  if (csMath3::Visible(tc.GetOrigin(), vbuf[a], vbuf[b], vbuf[c]) )
-		    ibuf[ x * 2 * (controlPoints - 1) + y ].Set( a, b, c );
-		  else
-			ibuf[ x * 2 * (controlPoints - 1) + y ].Set( a, c, b );
-		}
-	  }
-*/
 	}
-	factoryState -> CalculateNormals();
+	furMaterial->factoryState -> CalculateNormals();
+	
   }
 
-  const csColor4* FurMaterialControl::UpdateColors (csTicks current, 
+  const csColor4* FurAnimationControl::UpdateColors (csTicks current, 
 	const csColor4* colors, int num_colors, uint32 version_id)
   {
 	return colors;
   }
 
-  const csVector3* FurMaterialControl::UpdateNormals (csTicks current, 
+  const csVector3* FurAnimationControl::UpdateNormals (csTicks current, 
 	const csVector3* normals, int num_normals, uint32 version_id)
   {
 	return normals;
   }
 
-  const csVector2* FurMaterialControl::UpdateTexels (csTicks current, 
+  const csVector2* FurAnimationControl::UpdateTexels (csTicks current, 
 	const csVector2* texels, int num_texels, uint32 version_id)
   {
 	return texels;
   }
 
-  const csVector3* FurMaterialControl::UpdateVertices (csTicks current, 
+  const csVector3* FurAnimationControl::UpdateVertices (csTicks current, 
 	const csVector3* verts, int num_verts, uint32 version_id)
   {
 	return 0;
   }
-}
 
+
+  /********************
+   *  FurPhysicsControl
+   ********************/
+  SCF_IMPLEMENT_FACTORY (FurPhysicsControl)
+
+  CS_LEAKGUARD_IMPLEMENT(FurPhysicsControl);	
+
+  FurPhysicsControl::FurPhysicsControl (iBase* parent)
+    : scfImplementationType (this, parent)
+  {
+  }
+
+  FurPhysicsControl::~FurPhysicsControl ()
+  {
+  }
+
+  //-- iFurPhysicsControl
+  
+  void FurPhysicsControl::SetRigidBody (iRigidBody* rigidBody)
+  {
+	this->rigidBody = rigidBody;
+  }
+
+  void FurPhysicsControl::SetBulletDynamicSystem (iBulletDynamicSystem* 
+	bulletDynamicSystem)
+  {
+	this->bulletDynamicSystem = bulletDynamicSystem;
+  }
+
+  // Initialize the strand with the given ID
+  void FurPhysicsControl::InitializeStrand (size_t strandID, const csVector3* 
+	coordinates, size_t coordinatesCount)
+  {
+  	csVector3 first = coordinates[0];
+	csVector3 last = coordinates[coordinatesCount - 1];
+	
+	csRef<iBulletSoftBody> bulletBody = bulletDynamicSystem->
+	  CreateRope(first, last, coordinatesCount);
+	bulletBody->SetMass (0.1f);
+	bulletBody->SetRigidity (0.99f);
+	bulletBody->AnchorVertex (0, rigidBody);
+	
+	guideRopes.PutUnique(strandID, bulletBody);
+  }
+
+  // Animate the strand with the given ID
+  void FurPhysicsControl::AnimateStrand (size_t strandID, csVector3* 
+	coordinates, size_t coordinatesCount)
+  {
+    csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
+
+	CS_ASSERT(coordinatesCount == bulletBody->GetVertexCount());
+
+	for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
+	  coordinates[i] = bulletBody->GetVertexPosition(i);
+  }
+
+  void FurPhysicsControl::RemoveStrand (size_t strandID)
+  {
+    guideRopes.Delete(strandID, guideRopes.Get (strandID, 0));
+  }
+
+  void FurPhysicsControl::RemoveAllStrands ()
+  {
+	guideRopes.DeleteAll();
+  }
+
+}
 CS_PLUGIN_NAMESPACE_END(FurMaterial)
+

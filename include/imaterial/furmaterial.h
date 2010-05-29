@@ -32,6 +32,26 @@ struct iFurMaterial;
 class csVector3;
 class csColor4;
 
+struct iFurPhysicsControl : public virtual iBase
+{
+	SCF_INTERFACE (iFurPhysicsControl, 1, 0, 0);
+	
+	virtual void SetRigidBody (iRigidBody* rigidBody) = 0;
+	virtual void SetBulletDynamicSystem (iBulletDynamicSystem* 
+	  bulletDynamicSystem) = 0;
+
+	// Initialize the strand with the given ID
+	virtual void InitializeStrand (size_t strandID, const csVector3* coordinates,
+		size_t coordinatesCount) = 0;
+
+	// Animate the strand with the given ID
+	virtual void AnimateStrand (size_t strandID, csVector3* coordinates, size_t
+		coordinatesCount) = 0;
+
+	virtual void RemoveStrand (size_t strandID) = 0;
+	virtual void RemoveAllStrands () = 0;
+};
+
 struct iFurMaterialType : public virtual iBase
 {
   SCF_INTERFACE (iFurMaterialType, 1, 0, 0);
@@ -51,9 +71,9 @@ struct iFurMaterial : public virtual iMaterial
 {
   SCF_INTERFACE (iFurMaterial, 1, 0, 0);
   /// Generate geometry
-  virtual void GenerateGeometry (iView* view, iSector* room, 
-	csRefArray<iBulletSoftBody> hairStrands) = 0;
   virtual void GenerateGeometry (iView* view, iSector* room) = 0;
+
+  virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl) = 0;
 
   virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory ) = 0;
   virtual void SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
@@ -61,4 +81,5 @@ struct iFurMaterial : public virtual iMaterial
   virtual void SetDensitymap ( iImage* densitymap ) = 0;
   virtual void SetHeightmap ( iImage* heightmap ) = 0;
 };
+
 #endif // __FUR_INTERF_H__
