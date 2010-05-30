@@ -95,13 +95,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	//iRenderBuffer* texCoord = meshFactory->GetTexCoords();
 	iRenderBuffer* indices = meshFactorySubMesh->GetIndices(0);
 
-	GenerateGuidHairs(indices,vertexes);
+	GenerateGuidHairs(indices, vertexes);
 	SynchronizeGuideHairs();
-	//GenerateHairStrands
+	GenerateHairStrands(indices, vertexes);
 
 	this->view = view;
-	int controlPoints = guideHairs.Get(0).controlPointsCount;
-	int numberOfStrains = guideHairs.GetSize();
+	int controlPoints = hairStrands.Get(0).controlPointsCount;
+	int numberOfStrains = hairStrands.GetSize();
 
     csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
 	if (!engine) csApplicationFramework::ReportError("Failed to locate iEngine plugin!");
@@ -124,9 +124,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	  for ( int y = 0 ; y < controlPoints ; y ++ )
 	  {
 		vbuf[ x * 2 * controlPoints + 2 * y].Set
-		  ( guideHairs.Get(x).controlPoints[y] );
+		  ( hairStrands.Get(x).controlPoints[y] );
 		vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		  ( guideHairs.Get(x).controlPoints[y] - csVector3(0.01f,0,0) );
+		  ( hairStrands.Get(x).controlPoints[y] - csVector3(0.01f,0,0) );
 	  }
 
 	  for ( int y = 0 ; y < 2 * (controlPoints - 1) ; y ++ )
@@ -213,6 +213,62 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
 	  physicsControl->InitializeStrand(i,guideHairs.Get(i).controlPoints, 
 	    guideHairs.Get(i).controlPointsCount);
+  }
+
+  void FurMaterial::GenerateHairStrands (iRenderBuffer* indices, iRenderBuffer* 
+	vertexes)
+  {
+	csRenderBufferLock<csVector3> positions (vertexes, CS_BUF_LOCK_READ);
+	CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES); 
+	csArray<int> uniqueIndices;
+
+	csRandomGen rng (csGetTicks ());
+	float bA, bB, bC; // barycentric coefficients
+
+	int density = 10;
+
+	// for every triangle
+    while (tris.HasNext())
+    {
+      CS::TriangleT<size_t> tri (tris.Next ());
+
+	  if(uniqueIndices.Contains(tri.a) == csArrayItemNotFound)
+		  uniqueIndices.Push(tri.a);
+	  if(uniqueIndices.Contains(tri.b) == csArrayItemNotFound)
+		  uniqueIndices.Push(tri.b);
+	  if(uniqueIndices.Contains(tri.c) == csArrayItemNotFound)
+		  uniqueIndices.Push(tri.c);
+
+	  for ( int i = 0 ; i < density ; i ++ )
+	  {
+		csHairStrand hairStrand;
+
+		bA = rng.Get();
+		bB = rng.Get() * (1 - bA);
+		bC = 1 - bA - bB;
+
+		hairStrand.guideHairsCount = 3;
+		hairStrand.guideHairs = new csGuideHairReference[hairStrand.guideHairsCount];
+
+		hairStrand.guideHairs[0].distance = bA;
+		hairStrand.guideHairs[0].index = uniqueIndices.Contains(tri.a);
+		hairStrand.guideHairs[1].distance = bB;
+		hairStrand.guideHairs[1].index = uniqueIndices.Contains(tri.b);
+		hairStrand.guideHairs[2].distance = bC;
+		hairStrand.guideHairs[2].index = uniqueIndices.Contains(tri.c);
+
+		csVector3 pos = bA * positions.Get(tri.a) + bB * positions.Get(tri.b) +
+		  bC * positions.Get(tri.c);
+
+		hairStrand.controlPointsCount = 5;
+		hairStrand.controlPoints = new csVector3[ hairStrand.controlPointsCount ];
+
+		for ( size_t i = 0 ; i < hairStrand.controlPointsCount ; i ++ )
+		  hairStrand.controlPoints[i] = csVector3(pos.x,pos.y + i * 0.05f, pos.z);
+
+		hairStrands.Push(hairStrand);		
+	  }
+    }
   }
 
   void FurMaterial::SetPhysicsControl (iFurPhysicsControl* physicsControl)
@@ -308,8 +364,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	return true;
   }
 
+  void FurAnimationControl::UpdateHairStrand (csHairStrand* hairStrand)
+  {
+	for ( size_t i = 0 ; i < hairStrand->controlPointsCount; i++ )
+	{
+	  hairStrand->controlPoints[i] = csVector3(0);
+	  for ( size_t j = 0 ; j < hairStrand->guideHairsCount ; j ++ )
+	    hairStrand->controlPoints[i] += hairStrand->guideHairs[j].distance * 
+		  furMaterial->guideHairs.Get(hairStrand->guideHairs[j].index).controlPoints[i];
+	}
+  }
+
   void FurAnimationControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
+	  
 	// first update the control points
 	if (furMaterial->physicsControl)
 	  for (size_t i = 0 ; i < furMaterial->guideHairs.GetSize(); i ++)
@@ -317,10 +385,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		  furMaterial->guideHairs.Get(i).controlPoints,
 		  furMaterial->guideHairs.Get(i).controlPointsCount);
 
+	// then update the hair strands
+	if (furMaterial->physicsControl)
+	  for (size_t i = 0 ; i < furMaterial->hairStrands.GetSize(); i ++)
+		UpdateHairStrand(&furMaterial->hairStrands.Get(i));
+
     const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
 	
-	int controlPoints = furMaterial->guideHairs.Get(0).controlPointsCount;
-	int numberOfStrains = furMaterial->guideHairs.GetSize();
+	int controlPoints = furMaterial->hairStrands.Get(0).controlPointsCount;
+	int numberOfStrains = furMaterial->hairStrands.GetSize();
 
 	csVector3 *vbuf = furMaterial->factoryState->GetVertices (); 
 
@@ -331,10 +404,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 	  for ( y = 0 ; y < controlPoints - 1 ; y ++ )
 	  {
-		csVector2 firstPoint = csVector2(furMaterial->guideHairs.Get(x).controlPoints[y].x,
-		  furMaterial->guideHairs.Get(x).controlPoints[y].y);
-		csVector2 secondPoint = csVector2(furMaterial->guideHairs.Get(x).controlPoints[y + 1].x,
-		  furMaterial->guideHairs.Get(x).controlPoints[y + 1].y);
+		csVector2 firstPoint = csVector2(furMaterial->hairStrands.Get(x).controlPoints[y].x,
+		  furMaterial->hairStrands.Get(x).controlPoints[y].y);
+		csVector2 secondPoint = csVector2(furMaterial->hairStrands.Get(x).controlPoints[y + 1].x,
+		  furMaterial->hairStrands.Get(x).controlPoints[y + 1].y);
 
 		csVector2 diff = firstPoint - secondPoint;
 		if (diff.Norm() > 0.0001f)
@@ -342,19 +415,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		else
 		  diff = csVector2(0);
 
-		strip = 0.01f * csVector3(diff.y,diff.x,0);
+		strip = 0.005f * csVector3(diff.y,diff.x,0);
 
 		vbuf[ x * 2 * controlPoints + 2 * y].Set
-		  ( furMaterial->guideHairs.Get(x).controlPoints[y] );
+		  ( furMaterial->hairStrands.Get(x).controlPoints[y] );
 		vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		  ( furMaterial->guideHairs.Get(x).controlPoints[y] + 
+		  ( furMaterial->hairStrands.Get(x).controlPoints[y] + 
 		    tc.GetT2O() * strip );
 	  }
 
 	  vbuf[ x * 2 * controlPoints + 2 * y].Set
-		( furMaterial->guideHairs.Get(x).controlPoints[y] );
+		( furMaterial->hairStrands.Get(x).controlPoints[y] );
 	  vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		( furMaterial->guideHairs.Get(x).controlPoints[y] + 
+		( furMaterial->hairStrands.Get(x).controlPoints[y] + 
 		  tc.GetT2O() * strip );	  
 	}
 	furMaterial->factoryState -> CalculateNormals();

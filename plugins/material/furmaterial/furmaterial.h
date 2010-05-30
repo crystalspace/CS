@@ -141,6 +141,8 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	/// functions
 	void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes);
 	void SynchronizeGuideHairs();
+	void GenerateHairStrands(iRenderBuffer* indices, iRenderBuffer* vertexes);
+	void SynchronizeHairsStrands();
 };
 
 class FurAnimationControl : public scfImplementation1 
@@ -171,6 +173,9 @@ class FurAnimationControl : public scfImplementation1
     csWeakRef<iMeshObject> mesh;
     csTicks lastTicks;
 	FurMaterial* furMaterial;
+
+	// functions
+	virtual void UpdateHairStrand(csHairStrand* hairStrand);
 };
 
 class FurPhysicsControl : public scfImplementation2 <FurPhysicsControl, 
