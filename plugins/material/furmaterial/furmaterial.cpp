@@ -400,6 +400,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   FurPhysicsControl::~FurPhysicsControl ()
   {
+	guideRopes.DeleteAll();
   }
 
   // From iComponent
@@ -429,7 +430,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   	csVector3 first = coordinates[0];
 	csVector3 last = coordinates[coordinatesCount - 1];
 	
-	csRef<iBulletSoftBody> bulletBody = bulletDynamicSystem->
+	iBulletSoftBody* bulletBody = bulletDynamicSystem->
 	  CreateRope(first, last, coordinatesCount);
 	bulletBody->SetMass (0.1f);
 	bulletBody->SetRigidity (0.99f);
@@ -444,6 +445,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   {
     csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
 
+	if(!bulletBody)
+	  return;
+
 	CS_ASSERT(coordinatesCount != bulletBody->GetVertexCount());
 
 	for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
@@ -452,7 +456,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurPhysicsControl::RemoveStrand (size_t strandID)
   {
-    guideRopes.Delete(strandID, guideRopes.Get (strandID, 0));
+	csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
+	if(!bulletBody)
+		return;
+
+    guideRopes.Delete(strandID, bulletBody);
   }
 
   void FurPhysicsControl::RemoveAllStrands ()
