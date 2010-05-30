@@ -1714,14 +1714,17 @@ AS_IF([test $cs_host_family != windows],
 # won't be available, causing problems. Normally any app calls some libm
 # function. However, the default test program doesn't, so the link test fails.
 # And the same applies to pthread, too.
-# The workaround is to explicitly strip -Wl,--as-needed from LDFLAGS.
+# The workaround is to append -Wl,--no-as-needed at the end of LDFLAGS.
+# Note that just stripping the --as-needed doesn't work as the flag may also
+# be set by a script that is set as CXX in which case the --as-needed cannot
+# be found by us and therefore not stripped.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LIBCG],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     AC_REQUIRE([CS_CHECK_PTHREAD])
     AC_REQUIRE([CS_PROG_LINK])
     LDFLAGS_BACKUP="$LDFLAGS"
-    LDFLAGS=`echo "$LDFLAGS" | sed s/-Wl,--as-needed//`
+    LDFLAGS=$LDFLAGS -Wl,--no-as-needed
     CS_CHECK_LIB_WITH([Cg],
     	[AC_LANG_PROGRAM(
     	    [[#include <Cg/cg.h>]],
