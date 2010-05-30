@@ -1,5 +1,6 @@
 SubDir TOP plugins rendermanager ;
 
+SubInclude TOP plugins rendermanager culler ;
 SubInclude TOP plugins rendermanager null ;
 SubInclude TOP plugins rendermanager rlcompat ;
 SubInclude TOP plugins rendermanager shadow_pssm ;

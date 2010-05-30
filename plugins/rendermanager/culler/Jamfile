@@ -1,0 +1,10 @@
+SubDir TOP plugins rendermanager culler ;
+
+Description rm_culler : "Rendermanager (culler)" ;
+
+Plugin rm_culler : 
+  [ Wildcard *.cpp *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include csplugincommon rendermanager ] : *.h ]
+;
+CompileGroups rm_culler : rendermanagers ;
+LinkWith rm_culler : crystalspace ;
