@@ -68,7 +68,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     bool AttachGbuffer(iGraphics3D *graphics3D);
     bool DetachGBuffer(iGraphics3D *graphics3D);
-    void DrawGBuffer(iGraphics3D *graphics3D, iGraphics2D *graphics2D);
+
+    bool AttachAccumBuffer(iGraphics3D *graphics3D);
+    bool DetachAccumBuffer(iGraphics3D *graphics3D);
 
     iObjectRegistry *objRegistry;
 
@@ -78,6 +80,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     CS::RenderManager::MultipleRenderLayer renderLayer;
 
     csRef<iShaderManager> shaderManager;
+    csRef<iStringSet> stringSet;
 
     csRef<iTextureHandle> accumBuffer;
 

@@ -1,0 +1,33 @@
+<include>
+<program>
+ 
+struct vertex2fragment 
+{ 
+	float4 Position : POSITION;
+	float3 TexCoord : TEXCOORD0;
+	float4 LightDir : TEXCOORD1;
+};
+ 
+ 
+struct fragmentOutput
+{
+  float4 Color0 : COLOR0;
+  float4 Color1 : COLOR1;
+  float4 Color2 : COLOR2;
+};
+ 
+fragmentOutput main (vertex2fragment IN,
+                      uniform sampler2D TexDiffuse)
+{
+  fragmentOutput output;
+  
+  output.Color0 = float4(1, 0, 0, 1);
+  output.Color1 = float4(0, 1, 0, 1);
+  output.Color2 = float4(0, 0, 1, 1);
+
+  return output;
+}
+
+</program>
+</include>
+

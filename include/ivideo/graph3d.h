@@ -802,7 +802,9 @@ enum csRenderTargetAttachment
    */
 
   /// Number of supported attachments
-  rtaNumAttachments
+  rtaNumAttachments,
+  /// Number of supported color attachment points.
+  rtaNumColorAttachments = rtaNumAttachments - 1
 };
 
 namespace CS

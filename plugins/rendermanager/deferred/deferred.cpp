@@ -62,6 +62,29 @@ CS::RenderManager::RenderView *CreateNewRenderView(CS::RenderManager::RenderView
 }
 
 /**
+ * Draws the given texture over the contents of the entire screen.
+ */
+void DrawFullscreenTexture(iTextureHandle *tex, iGraphics3D *graphics3D)
+{
+  iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
+
+  int w, h;
+  tex->GetRendererDimensions (w, h);
+
+  graphics3D->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARSCREEN);
+  graphics3D->DrawPixmap (tex, 
+                          0, 
+                          0,
+                          graphics2D->GetWidth (),
+                          graphics2D->GetHeight (),
+                          0,
+                          0,
+                          w,
+                          h,
+                          0);
+}
+
+/**
  * Renderer for multiple contexts where all objects are drawn
  * to a single render target.
  *
@@ -136,6 +159,65 @@ private:
   iShaderManager *shaderMgr;
 };
 
+/**
+ * Shader setup functor.
+ * Setup per mesh & layer shader arrays for each node.
+ * Uses the default shader as supplied by layerConfig.
+ * Assumes that the contextLocalId in each mesh is set.
+ *
+ * Typically used through SetupStandardShader().
+ */
+template<typename RenderTree, typename LayerConfigType>
+class DefaultLayerShaderSetup
+{
+public:
+  DefaultLayerShaderSetup (ShaderArrayType& shaderArray, const LayerConfigType& layerConfig)
+    : 
+  shaderArray (shaderArray), 
+  layerConfig (layerConfig)
+  {}
+
+  void operator() (typename RenderTree::MeshNode* node)
+  {
+    // Get the shader
+    const size_t totalMeshes = node->owner.totalRenderMeshes;
+
+    for (size_t i = 0; i < node->meshes.GetSize (); ++i)
+    {
+      typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
+      
+      csRenderMesh* rm = mesh.renderMesh;
+
+      for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
+      {
+        size_t layerOffset = layer*totalMeshes;
+        shaderArray[mesh.contextLocalId+layerOffset] = layerConfig.GetDefaultShader (layer);
+      }
+    }
+  }
+
+private:
+  ShaderArrayType& shaderArray;
+  const LayerConfigType& layerConfig;
+};
+
+//----------------------------------------------------------------------
+template<typename ContextNodeType, typename LayerConfigType>
+void SetupDefaultLayerShader(ContextNodeType& context, 
+                             iShaderManager* shaderManager,
+                             const LayerConfigType& layerConfig)
+{
+  context.shaderArray.SetSize (context.totalRenderMeshes*layerConfig.GetLayerCount ());
+
+  // Shader setup
+  typedef typename ContextNodeType::TreeType Tree;
+  typedef DefaultLayerShaderSetup<Tree, LayerConfigType> ShaderSetupType;
+  
+  typename ShaderSetupType shaderSetup (context.shaderArray, layerConfig);
+
+  ForEachMeshNode (context, shaderSetup);
+}
+
 //----------------------------------------------------------------------
 template<typename RenderTreeType, typename LayerConfigType>
 class StandardContextSetup
@@ -207,13 +289,11 @@ public:
     // Setup the material&mesh SVs
     {
       StandardSVSetup<RenderTreeType, MultipleRenderLayer> svSetup (context.svArrays, layerConfig);
-
       ForEachMeshNode (context, svSetup);
     }
 
-    SetupStandardShader (context, shaderManager, layerConfig);
-
     // Setup shaders and tickets
+    SetupDefaultLayerShader (context, shaderManager, layerConfig);
     SetupStandardTicket (context, shaderManager, layerConfig);
   }
 
@@ -244,6 +324,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
     
   shaderManager = csQueryRegistry<iShaderManager> (objRegistry);
+  stringSet = csQueryRegistryTagInterface<iStringSet> (objRegistry, "crystalspace.shared.stringset");
 
   treePersistent.Initialize (shaderManager);
   portalPersistent.Initialize (shaderManager, graphics3D, treePersistent.debugPersist);
@@ -268,7 +349,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
   if (!layersValid)
   {
-    if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
+    if (!loader->LoadShader ("/shader/deferred/fill_gbuffer.xml"))
     {
       csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
 	messageID, "Could not load lighting_default shader");
@@ -277,7 +358,13 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     csReport (objRegistry, CS_REPORTER_SEVERITY_NOTIFY, messageID,
 	"Using default render layers");
 
-    CS::RenderManager::AddDefaultBaseLayers (objRegistry, renderLayer);
+    SingleRenderLayer baseLayer (shaderManager->GetShader ("fill_gbuffer"));
+
+    baseLayer.AddShaderType (stringSet->Request("base"));
+    baseLayer.AddShaderType (stringSet->Request("ambient"));
+    baseLayer.AddShaderType (stringSet->Request("standard"));
+
+    renderLayer.AddLayers (baseLayer);
   }
 
   // Creates the accumulation buffer.
@@ -389,6 +476,18 @@ bool RMDeferred::RenderView(iView *view)
   RenderTreeType renderTree (treePersistent);
   RenderTreeType::ContextNode *startContext = renderTree.CreateContext (rview);
 
+  // Add textures to be visualized.
+  {
+    int w, h;
+    colorBuffer0->GetRendererDimensions (w, h);
+    float aspect = (float)w / h;
+    renderTree.AddDebugTexture (colorBuffer0, aspect);
+    renderTree.AddDebugTexture (colorBuffer1, aspect);
+    renderTree.AddDebugTexture (colorBuffer2, aspect);
+    renderTree.AddDebugTexture (depthBuffer, aspect);
+    renderTree.AddDebugTexture (accumBuffer, aspect);
+  }
+
   // Setup the main context
   {
     ContextSetupType contextSetup (this, renderLayer);
@@ -397,10 +496,10 @@ bool RMDeferred::RenderView(iView *view)
     contextSetup (*startContext, portalData);
   }
 
-  AttachGbuffer (graphics3D);
-
   // Render all contexts, back to front
+  AttachGbuffer (graphics3D);
   {
+    // TODO: Output data to GBuffer.
     graphics3D->SetZMode (CS_ZBUF_MESH);
 
     DeferredTreeRenderer<RenderTreeType> render (graphics3D, shaderManager);
@@ -408,10 +507,26 @@ bool RMDeferred::RenderView(iView *view)
 
     graphics3D->FinishDraw ();
   }
-
   DetachGBuffer (graphics3D);
 
-  DrawGBuffer (graphics3D, graphics2D);
+  // Fills the accumulation buffer.
+  AttachAccumBuffer (graphics3D);
+  {
+    //TODO: Iterate through lights adding results into accumulation buffer.
+    DrawFullscreenTexture (colorBuffer0, graphics3D);
+
+    graphics3D->FinishDraw ();
+  }
+  DetachAccumBuffer (graphics3D);
+
+  // Output the final result to the backbuffer.
+  {
+    DrawFullscreenTexture (accumBuffer, graphics3D);
+
+    graphics3D->FinishDraw ();
+  }
+
+  renderTree.RenderDebugTextures (graphics3D);
 
   return true;
 }
@@ -431,6 +546,9 @@ bool RMDeferred::AttachGbuffer(iGraphics3D *graphics3D)
   if(!graphics3D->SetRenderTarget (colorBuffer1, false, 0, rtaColor1))
     return false;
 
+  if(!graphics3D->SetRenderTarget (colorBuffer2, false, 0, rtaColor2))
+    return false;
+
   if(!graphics3D->SetRenderTarget (depthBuffer, false, 0, rtaDepth))
     return false;
   
@@ -444,62 +562,26 @@ bool RMDeferred::AttachGbuffer(iGraphics3D *graphics3D)
 bool RMDeferred::DetachGBuffer(iGraphics3D *graphics3D)
 {
   graphics3D->UnsetRenderTargets ();
+  return true;
+}
+
+//----------------------------------------------------------------------
+bool RMDeferred::AttachAccumBuffer(iGraphics3D *graphics3D)
+{
+  if(!graphics3D->SetRenderTarget (accumBuffer, false, 0, rtaColor0))
+    return false;
+  
+  if (!graphics3D->ValidateRenderTargets ())
+    return false;
 
   return true;
 }
 
 //----------------------------------------------------------------------
-void RMDeferred::DrawGBuffer(iGraphics3D *graphics3D, iGraphics2D *graphics2D)
+bool RMDeferred::DetachAccumBuffer(iGraphics3D *graphics3D)
 {
-  graphics3D->BeginDraw (CSDRAW_2DGRAPHICS);
-
-  // Draws the buffers
-  int w, h;
-  colorBuffer0->GetRendererDimensions (w, h);
-
-  graphics3D->DrawPixmap (colorBuffer0, 
-    0, 
-    0, 
-    graphics2D->GetWidth () / 2, 
-    graphics2D->GetHeight () / 2, 
-    0, 
-    0, 
-    w, 
-    h,
-    0);
-
-  graphics3D->DrawPixmap (colorBuffer1, 
-    graphics2D->GetWidth () / 2, 
-    0, 
-    graphics2D->GetWidth () / 2, 
-    graphics2D->GetHeight () / 2, 
-    0, 
-    0, 
-    w, 
-    h,
-    0);
-
-  graphics3D->DrawPixmap (colorBuffer2, 
-    0,
-    graphics2D->GetHeight () / 2, 
-    graphics2D->GetWidth () / 2, 
-    graphics2D->GetHeight () / 2, 
-    0, 
-    0, 
-    w, 
-    h,
-    0);
-  
-  graphics3D->DrawPixmap (depthBuffer, 
-    graphics2D->GetWidth () / 2, 
-    graphics2D->GetHeight () / 2, 
-    graphics2D->GetWidth () / 2, 
-    graphics2D->GetHeight () / 2, 
-    0, 
-    0, 
-    w, 
-    h,
-    0);
+  graphics3D->UnsetRenderTargets ();
+  return true;
 }
 
 }
