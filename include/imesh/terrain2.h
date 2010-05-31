@@ -323,6 +323,9 @@ struct csTerrainColliderCollideSegmentResult
   /// Triangle we hit.
   csVector3 a, b, c;	
   //@}
+  
+  csTerrainColliderCollideSegmentResult()
+   : hit (false), isect (0), a (0), b (0), c (0) {}
 };
 
 /// Provides an interface for custom collision

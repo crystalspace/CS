@@ -257,8 +257,8 @@ void csRectFlattenModifier::Displace(iTerrainCell* cell, float intensity) const
 
   float val = (center.y/cell->GetSize().z)*intensity;
 
-  for (size_t y = 0; y < area.ymax-area.ymin; y++)
-    for (size_t x = 0; x < area.xmax-area.xmin; x++)
+  for (size_t y = 0; y < size_t (area.ymax-area.ymin); y++)
+    for (size_t x = 0; x < size_t (area.xmax-area.xmin); x++)
     {
       data.data[y * data.pitch + x] = val;
     }
