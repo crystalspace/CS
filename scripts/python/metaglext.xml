@@ -1259,6 +1259,10 @@
     <token name="GL_DRAW_BUFFER13" value="0x8832" />
     <token name="GL_DRAW_BUFFER14" value="0x8833" />
     <token name="GL_DRAW_BUFFER15" value="0x8834" />
+    <function name="glDrawBuffers" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="bufs" type="GLenum" const="true" pointer="true" />
+    </function>
     <!-- Promoted: ARB_texture_non_power_of_two -->
     <!-- Promoted: ARB_point_sprite -->
     <token name="GL_POINT_SPRITE" value="0x8861" />
@@ -7381,6 +7385,10 @@
     <token name="GL_DRAW_BUFFER13_ARB" value="0x8832" />
     <token name="GL_DRAW_BUFFER14_ARB" value="0x8833" />
     <token name="GL_DRAW_BUFFER15_ARB" value="0x8834" />
+    <function name="glDrawBuffersARB" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="bufs" type="GLenum" const="true" pointer="true" />
+    </function>
   </extension>
   <extension name="GL_EXT_blend_equation_separate" type="GL">
     <function name="glBlendEquationSeparateEXT" return="GLvoid" pointer="false">
