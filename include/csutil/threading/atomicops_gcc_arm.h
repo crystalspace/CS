@@ -29,7 +29,7 @@ namespace Threading
   class AtomicOperationsArmGCC
   {
 
-    public:
+    private:
 
     //NOTE: This could be a big problem with static linking but 
     //      I couldn't find a better way to implement it.
