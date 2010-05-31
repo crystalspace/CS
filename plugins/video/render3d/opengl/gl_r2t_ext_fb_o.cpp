@@ -86,8 +86,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     // Bind textures
     static const GLenum fbAttachments[rtaNumAttachments] = 
     {
-      GL_DEPTH_ATTACHMENT_EXT, GL_COLOR_ATTACHMENT0_EXT
+      GL_DEPTH_ATTACHMENT_EXT, 
+      GL_COLOR_ATTACHMENT0_EXT,
+      GL_COLOR_ATTACHMENT1_EXT,
+      GL_COLOR_ATTACHMENT2_EXT,
+      GL_COLOR_ATTACHMENT3_EXT,
+      GL_COLOR_ATTACHMENT4_EXT,
+      GL_COLOR_ATTACHMENT5_EXT,
+      GL_COLOR_ATTACHMENT6_EXT,
+      GL_COLOR_ATTACHMENT7_EXT,
+      GL_COLOR_ATTACHMENT8_EXT,
+      GL_COLOR_ATTACHMENT9_EXT,
+      GL_COLOR_ATTACHMENT10_EXT,
+      GL_COLOR_ATTACHMENT11_EXT,
+      GL_COLOR_ATTACHMENT12_EXT,
+      GL_COLOR_ATTACHMENT13_EXT,
+      GL_COLOR_ATTACHMENT14_EXT,
+      GL_COLOR_ATTACHMENT15_EXT,
     };
+
     initialAttachments = 0;
     for (int a = 0; a < rtaNumAttachments; a++)
     {
@@ -156,6 +173,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
       FBO_PRINTF ("Created FBO %u\n", framebuffer);
     }
     ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
+    SetDrawBuffers();
   #ifdef CS_DEBUG
     boundFBO = framebuffer;
   #endif
@@ -169,6 +187,58 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   #endif
   }
 
+  void FBOWrapper::SetDrawBuffers() const
+  {
+    static GLenum OPENGL_COLOR_ATTACHMENT_ENUMS[] = 
+    {
+      GL_COLOR_ATTACHMENT0_EXT,
+      GL_COLOR_ATTACHMENT1_EXT,
+      GL_COLOR_ATTACHMENT2_EXT,
+      GL_COLOR_ATTACHMENT3_EXT,
+      GL_COLOR_ATTACHMENT4_EXT,
+      GL_COLOR_ATTACHMENT5_EXT,
+      GL_COLOR_ATTACHMENT6_EXT,
+      GL_COLOR_ATTACHMENT7_EXT,
+      GL_COLOR_ATTACHMENT8_EXT,
+      GL_COLOR_ATTACHMENT9_EXT,
+      GL_COLOR_ATTACHMENT10_EXT,
+      GL_COLOR_ATTACHMENT11_EXT,
+      GL_COLOR_ATTACHMENT12_EXT,
+      GL_COLOR_ATTACHMENT13_EXT,
+      GL_COLOR_ATTACHMENT14_EXT,
+      GL_COLOR_ATTACHMENT15_EXT,
+    };
+
+    CS_ASSERT ((sizeof(OPENGL_COLOR_ATTACHMENT_ENUMS) / sizeof(GLenum)) == rtaNumColorAttachments);
+
+    // Builds the attachment array passed into glDrawBuffers.
+    GLint count = 0;
+    GLenum buffers[rtaNumColorAttachments] = { 0 };
+    
+    // NOTE: We assume that the color attachment enumerates increases as:
+    //  rtaColor0 = N where N is some constant >= 0
+    //  rtaColor1 = rtaColor0 + 1
+    //  rtaColor2 = rtaColor1 + 1
+    //   ... etc.
+
+    for (int i = 0; i < rtaNumColorAttachments; i++)
+    {
+      csRenderTargetAttachment attachment = (csRenderTargetAttachment)(rtaColor0 + i);
+
+      const WRTAG::RTA &rta = attachments.GetAttachment (attachment);
+      if (rta.IsValid ())
+      {
+        buffers[count] = OPENGL_COLOR_ATTACHMENT_ENUMS[i];
+        count++;
+      }
+    }
+
+    if (count > 0 && ext->glDrawBuffers)
+    {
+      ext->glDrawBuffers (count, buffers);
+    }
+  }
+
   //-------------------------------------------------------------------------
 
   csGLRender2TextureEXTfbo::csGLRender2TextureEXTfbo (csGLGraphics3D* G3D) :
@@ -176,6 +246,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     viewportSet (false)
   {
     GLenum fbStatus = GL_FRAMEBUFFER_UNSUPPORTED_EXT;
+
+    /* Make sure we have access to glDrawBuffers for rendering to multiple 
+     * render targets. */
+    G3D->ext->InitGL_version_2_0();
 
     /* Try to determine a working depth, and if available, stencil buffer 
      * format.*/
