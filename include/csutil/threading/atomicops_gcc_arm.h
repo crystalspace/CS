@@ -29,18 +29,19 @@ namespace Threading
   class AtomicOperationsArmGCC
   {
 
-    private:
+    public:
 
     //NOTE: This could be a big problem with static linking but 
     //      I couldn't find a better way to implement it.
     //      (Each plugin will have his copy making the lock useless)
     static char AtomicLock;
 
-    inline char Swpb(volatile char *target, char value)
+    inline static char Swpb(volatile char *target, char value)
     {
        register int ret;
        asm volatile("swpb %0 , %1, [%2]"
-                    : "=&r"(ret), "r"(value), "r"(target)
+                    : "=&r"(ret)
+                    : "r"(value), "r"(target)
                     : "cc", "memory");
        return ret;
     }
