@@ -213,7 +213,7 @@ void SetupDefaultLayerShader(ContextNodeType& context,
   typedef typename ContextNodeType::TreeType Tree;
   typedef DefaultLayerShaderSetup<Tree, LayerConfigType> ShaderSetupType;
   
-  typename ShaderSetupType shaderSetup (context.shaderArray, layerConfig);
+  ShaderSetupType shaderSetup (context.shaderArray, layerConfig);
 
   ForEachMeshNode (context, shaderSetup);
 }
