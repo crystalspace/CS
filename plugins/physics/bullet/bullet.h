@@ -83,7 +83,7 @@ class csBulletDynamicsSystem : public scfImplementationExt2<
   friend class csBulletCollider;
   friend class csBulletJoint;
   friend class csBulletPivotJoint;
-  friend class csBulletTerrainCollider;
+  friend class HeightMapCollider;
 
 private:
   bool isSoftWorld;
@@ -220,7 +220,16 @@ public:
 
   virtual bool SaveBulletWorld (const char* filename);
 
+  virtual iBulletTerrainCollider* AttachColliderTerrain (csLockedHeightData& heightData,
+							 int gridWidth, int gridHeight,
+							 csVector3 gridSize,
+							 csOrthoTransform& transform,
+							 float minimumHeight = 0,
+							 float maximumHeight = 0);
   virtual iBulletTerrainCollider* AttachColliderTerrain (iTerrainCell* cell,
+							 float minimumHeight = 0,
+							 float maximumHeight = 0);
+  virtual iBulletTerrainCollider* AttachColliderTerrain (iTerrainSystem* terrain,
 							 float minimumHeight = 0,
 							 float maximumHeight = 0);
   virtual void DestroyCollider (iBulletTerrainCollider* collider);

@@ -22,6 +22,8 @@
 #ifndef __CS_BULLET_COLLIDERS_H__
 #define __CS_BULLET_COLLIDERS_H__
 
+#include "iengine/movable.h"
+
 #include "bullet.h"
 #include "common.h"
 
@@ -105,19 +107,42 @@ public:
   float GetVolume ();
 };
 
-class csBulletTerrainCollider : public scfImplementation1<csBulletTerrainCollider,
-  iBulletTerrainCollider>
+class HeightMapCollider
 {
  public:
-  csBulletTerrainCollider (csBulletDynamicsSystem* dynSys, iTerrainCell* cell,
-			   float minimumHeight, float maximumHeight);
-  virtual ~csBulletTerrainCollider ();
+  HeightMapCollider (csBulletDynamicsSystem* dynSys,
+		     csLockedHeightData heightData,
+		     int gridWidth, int gridHeight,
+		     csVector3 gridSize,
+		     csOrthoTransform transform,
+		     float minimumHeight, float maximumHeight);
+  virtual ~HeightMapCollider ();
 
  private:
   csBulletDynamicsSystem* dynSys;
   float* heightData;
   btHeightfieldTerrainShape* shape;
   btRigidBody* body;
+};
+
+class csBulletTerrainCollider : public scfImplementation1<csBulletTerrainCollider,
+  iBulletTerrainCollider>
+{
+ public:
+  csBulletTerrainCollider (csBulletDynamicsSystem* dynSys,
+			   csLockedHeightData& heightData,
+			   int gridWidth, int gridHeight,
+			   csVector3 gridSize,
+			   csOrthoTransform& transform,
+			   float minimumHeight, float maximumHeight);
+  csBulletTerrainCollider (csBulletDynamicsSystem* dynSys, iTerrainCell* cell,
+			   float minimumHeight, float maximumHeight);
+  csBulletTerrainCollider (csBulletDynamicsSystem* dynSys, iTerrainSystem* terrain,
+			   float minimumHeight, float maximumHeight);
+  virtual ~csBulletTerrainCollider ();
+
+ private:
+  csArray<HeightMapCollider*> colliders;
 };
 
 }

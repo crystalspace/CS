@@ -987,11 +987,34 @@ bool csBulletDynamicsSystem::SaveBulletWorld (const char* filename)
 }
 
 iBulletTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
+(csLockedHeightData& heightData, int gridWidth, int gridHeight,
+ csVector3 gridSize, csOrthoTransform& transform,
+ float minimumHeight, float maximumHeight)
+{
+  csRef<csBulletTerrainCollider> terrain;
+  terrain.AttachNew
+    (new csBulletTerrainCollider (this, heightData, gridWidth, gridHeight,
+				  gridSize, transform, minimumHeight, maximumHeight));
+  terrainColliders.Push (terrain);
+  return terrain;
+}
+
+iBulletTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
 (iTerrainCell* cell, float minimumHeight, float maximumHeight)
 {
   csRef<csBulletTerrainCollider> terrain;
   terrain.AttachNew
     (new csBulletTerrainCollider (this, cell, minimumHeight, maximumHeight));
+  terrainColliders.Push (terrain);
+  return terrain;
+}
+
+iBulletTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
+(iTerrainSystem* system, float minimumHeight, float maximumHeight)
+{
+  csRef<csBulletTerrainCollider> terrain;
+  terrain.AttachNew
+    (new csBulletTerrainCollider (this, system, minimumHeight, maximumHeight));
   terrainColliders.Push (terrain);
   return terrain;
 }

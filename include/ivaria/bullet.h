@@ -37,7 +37,9 @@ struct iBulletKinematicCallback;
 struct iBulletSoftBody;
 struct iBulletPivotJoint;
 struct iBulletTerrainCollider;
+struct csLockedHeightData;
 struct iTerrainCell;
+struct iTerrainSystem;
 
 /**
  * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
@@ -90,7 +92,7 @@ enum csBulletDebugMode
  */
 struct iBulletDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 5);
+  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 6);
 
   /**
    * Draw the debug informations of the dynamic system. This has to be called
@@ -248,8 +250,48 @@ struct iBulletDynamicSystem : public virtual iBase
    * the terrain must be kept between minimumHeight and maximumHeight, even when the
    * terrain is deformed. If these values are not provided then they will be computed
    * from the current state of the cell.
+   * \param heightData The height map of the terrain
+   * \param gridWidth The width of the height map data
+   * \param gridWidth The height of the height map data
+   * \param gridSize The size of the terrain, in world units
+   * \param transform The position of the terrain
+   * \param minimumHeight The minimum height that will ever be contained in the height map
+   * \param maximumHeight The maximum height that will ever be contained in the height map
+   * \param 
+   */
+  virtual iBulletTerrainCollider* AttachColliderTerrain (csLockedHeightData& heightData,
+							 int gridWidth, int gridHeight,
+							 csVector3 gridSize,
+							 csOrthoTransform& transform,
+							 float minimumHeight = 0,
+							 float maximumHeight = 0) = 0;
+
+  /**
+   * Create a new terrain collider and add it to the simulation. All the heights of
+   * the terrain must be kept between minimumHeight and maximumHeight, even when the
+   * terrain is deformed. If these values are not provided then they will be computed
+   * from the current state of the cell.
+   * \param cell The terrain cell from which the collider will be created
+   * \param minimumHeight The minimum height that will ever be contained in the height map
+   * \param maximumHeight The maximum height that will ever be contained in the height map
    */
   virtual iBulletTerrainCollider* AttachColliderTerrain (iTerrainCell* cell,
+							 float minimumHeight = 0,
+							 float maximumHeight = 0) = 0;
+
+  /**
+   * Create a new terrain collider and add it to the simulation. This will create a
+   * collider for each cell of the terrain.
+   *
+   * All the heights of
+   * the terrain must be kept between minimumHeight and maximumHeight, even when the
+   * terrain is deformed. If these values are not provided then they will be computed
+   * from the current state of the cell.
+   * \param cell The terrain from which the colliders will be created
+   * \param minimumHeight The minimum height that will ever be contained in the height map
+   * \param maximumHeight The maximum height that will ever be contained in the height map
+   */
+  virtual iBulletTerrainCollider* AttachColliderTerrain (iTerrainSystem* terrain,
 							 float minimumHeight = 0,
 							 float maximumHeight = 0) = 0;
   /**
