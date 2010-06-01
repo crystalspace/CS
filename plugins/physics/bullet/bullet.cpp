@@ -694,7 +694,9 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
 
 void csBulletDynamicsSystem::SetInternalScale (float scale)
 {
-  CS_ASSERT(!dynamicBodies.GetSize ());
+  CS_ASSERT(!dynamicBodies.GetSize ()
+	    && !colliderBodies.GetSize ()
+	    && !terrainColliders.GetSize ());
 
   // save gravity
   csVector3 tempGravity = GetGravity ();
@@ -739,7 +741,9 @@ void csBulletDynamicsSystem::SetStepParameters (float timeStep, size_t maxSteps,
 
 void csBulletDynamicsSystem::SetSoftBodyWorld (bool isSoftBodyWorld)
 {
-  CS_ASSERT(!dynamicBodies.GetSize ());
+  CS_ASSERT(!dynamicBodies.GetSize ()
+	    && !colliderBodies.GetSize ()
+	    && !terrainColliders.GetSize ());
 
   if (isSoftWorld == isSoftBodyWorld)
     return;
@@ -806,11 +810,12 @@ bool csBulletDynamicsSystem::GetSoftBodyWorld ()
 iBulletSoftBody* csBulletDynamicsSystem::CreateRope
 (csVector3 start, csVector3 end, uint segmentCount)
 {
-  CS_ASSERT(isSoftWorld);
+  CS_ASSERT(isSoftWorld
+	    && segmentCount > 1);
 
   btSoftBody* body = btSoftBodyHelpers::CreateRope
     (*softWorldInfo, CSToBullet (start, internalScale),
-     CSToBullet (end, internalScale), segmentCount, 0);
+     CSToBullet (end, internalScale), segmentCount - 1, 0);
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
