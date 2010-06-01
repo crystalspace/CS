@@ -96,10 +96,8 @@ class FurMaterial : public scfImplementation2<FurMaterial,
     virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory);
 	virtual void SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
 	  meshFactorySubMesh );
-	// Temporary - Set Densitymap
-    virtual void SetDensitymap ( iImage* densitymap );
-	// Temporary - Set Heightmap
-    virtual void SetHeightmap ( iImage* heightmap );
+	// Set Material
+	virtual void SetMaterial ( iMaterial* material );
 
 	// From iMaterial
     /// Associate a shader with a shader type
@@ -135,14 +133,18 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	/// Temp fur geometry
 	csRef<iAnimatedMeshFactory> meshFactory;
 	csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
-	csRef<iImage> densitymap;
-	csRef<iImage> heightmap;
-	
+	iTextureHandle* densitymap;
+	iTextureHandle* heightmap;
+	csRef<iMaterial> material;
+	csRef<iShaderVarStringSet> svStrings;
+
 	/// functions
 	void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes);
 	void SynchronizeGuideHairs();
 	void GenerateHairStrands(iRenderBuffer* indices, iRenderBuffer* vertexes);
 	void SynchronizeHairsStrands();
+	void SetDensitymap();
+	void SetHeightmap();
 };
 
 class FurAnimationControl : public scfImplementation1 

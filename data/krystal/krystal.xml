@@ -24,6 +24,8 @@
     <material name='skull_material'>
       <texture>krystal_body_h</texture>
       <shadervar type="texture" name="tex specular">krystal_spec</shadervar>
+      <shadervar type="texture" name="density map">krystal_body_h</shadervar>
+      <shadervar type="texture" name="height map">krystal_body_h</shadervar>
     </material>
   </materials>
   <sounds/>

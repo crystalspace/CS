@@ -83,6 +83,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       scfImplementationType (this), manager (manager), name (name), 
 	    object_reg(object_reg), physicsControl(0)
   {
+    svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+	  object_reg, "crystalspace.shader.variablenameset");
+    if (!svStrings) 
+	  printf ("No SV names string set!");
   }
 
   FurMaterial::~FurMaterial ()
@@ -287,14 +291,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	this->meshFactorySubMesh = meshFactorySubMesh;
   }
 
-  void FurMaterial::SetDensitymap ( iImage* densitymap )
+  void FurMaterial::SetMaterial ( iMaterial* material )
   {
-	this->densitymap = densitymap;
+	this->material = material;
+	SetDensitymap();
+	SetHeightmap();
   }
 
-  void FurMaterial::SetHeightmap ( iImage* heightmap )
+  void FurMaterial::SetDensitymap ()
   {
-	this->heightmap = heightmap;
+	CS::ShaderVarName densitymapName (svStrings, "density map");	
+	csRef<csShaderVariable> shaderVariable = 
+		material->GetVariable(densitymapName);
+
+	shaderVariable->GetValue(densitymap);
+	//printf("%s\n", densitymap->GetImageName());
+  }
+
+  void FurMaterial::SetHeightmap ()
+  {
+	CS::ShaderVarName heightmapName (svStrings, "height map");	
+	csRef<csShaderVariable> shaderVariable = 
+		material->GetVariable(heightmapName);
+
+	shaderVariable->GetValue(heightmap);
+	//printf("%s\n", heightmap->GetImageName());
   }
 
   void FurMaterial::SetShader (csStringID type, iShader* shd)

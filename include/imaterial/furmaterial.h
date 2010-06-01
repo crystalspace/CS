@@ -78,8 +78,7 @@ struct iFurMaterial : public virtual iMaterial
   virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory ) = 0;
   virtual void SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
 	meshFactorySubMesh ) = 0;
-  virtual void SetDensitymap ( iImage* densitymap ) = 0;
-  virtual void SetHeightmap ( iImage* heightmap ) = 0;
+  virtual void SetMaterial ( iMaterial* material ) = 0;
 };
 
 #endif // __FUR_INTERF_H__

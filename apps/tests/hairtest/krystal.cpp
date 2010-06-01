@@ -142,6 +142,11 @@ bool KrystalScene::CreateAvatar ()
   if (!animeshFactory)
     return hairTest->ReportError ("Can't find Krystal's animesh factory!");
 
+  csRef<iMaterialWrapper> skullMaterial = 
+	hairTest->engine->FindMaterial("skull_material");
+  if (!skullMaterial)	
+    return hairTest->ReportError ("Can't find Krystal's skull material!");
+
   // Load bodymesh (animesh's physical properties)
   rc = hairTest->loader->Load ("/lib/krystal/skelkrystal_body");
   if (!rc.success)
@@ -366,7 +371,7 @@ bool KrystalScene::CreateAvatar ()
   }
 
   iRigidBody* headBody = ragdollNode->GetBoneRigidBody
-	  (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
+	(animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
   
   furPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
   furPhysicsControl->SetRigidBody(headBody);
@@ -375,6 +380,7 @@ bool KrystalScene::CreateAvatar ()
   csRef<iFurMaterial> furMaterial = furMaterialType->CreateFurMaterial("hair");
   furMaterial->SetPhysicsControl(furPhysicsControl);
   
+  furMaterial->SetMaterial(skullMaterial->GetMaterial());
   furMaterial->SetMeshFactory(animeshFactory);
   furMaterial->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
   furMaterial->GenerateGeometry(hairTest->view, hairTest->room);
