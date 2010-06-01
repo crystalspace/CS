@@ -1903,8 +1903,7 @@ void Simple::CreateTerrain ()
   }
 
   // Create a terrain collider for each cell of the terrain
-  for (size_t i = 0; i < terrain->GetCellCount (); i++)
-    bulletDynamicSystem->AttachColliderTerrain (terrain->GetCell (i));
+  bulletDynamicSystem->AttachColliderTerrain (terrain);
 }
 
 //---------------------------------------------------------------------------
