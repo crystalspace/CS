@@ -137,6 +137,7 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	iTextureHandle* heightmap;
 	csRef<iMaterial> material;
 	csRef<iShaderVarStringSet> svStrings;
+	float strandWidth;
 
 	/// functions
 	void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes);
@@ -145,6 +146,7 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	void SynchronizeHairsStrands();
 	void SetDensitymap();
 	void SetHeightmap();
+	void SetStrandWidth();
 };
 
 class FurAnimationControl : public scfImplementation1 

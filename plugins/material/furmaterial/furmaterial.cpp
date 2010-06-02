@@ -130,7 +130,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		vbuf[ x * 2 * controlPoints + 2 * y].Set
 		  ( hairStrands.Get(x).controlPoints[y] );
 		vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		  ( hairStrands.Get(x).controlPoints[y] - csVector3(0.01f,0,0) );
+		  ( hairStrands.Get(x).controlPoints[y] );
 	  }
 
 	  for ( int y = 0 ; y < 2 * (controlPoints - 1) ; y ++ )
@@ -140,15 +140,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		  ibuf[ x * 2 * (controlPoints - 1) + y ].Set
 			  ( 2 * x * controlPoints + y , 
 			    2 * x * controlPoints + y + 1 , 
-			    2 * x * controlPoints + y + 3 );
+			    2 * x * controlPoints + y + 2 );
 		  //printf("%d %d %d\n", 2 * x + y , 2 * x + y + 3 , 2 * x + y + 1);
 		}
 		else
 		{
 		  ibuf[ x * 2 * (controlPoints - 1) + y ].Set
-			  ( 2 * x * controlPoints + y + 1 , 
-			    2 * x * controlPoints + y - 1 , 
-			    2 * x * controlPoints + y + 2 );
+			  ( 2 * x * controlPoints + y , 
+			    2 * x * controlPoints + y + 2 , 
+			    2 * x * controlPoints + y + 1 );
 		  //printf("%d %d %d\n", 2 * x + y + 1 , 2 * x + y + 2 , 2 * x + y - 1);
 		}
 	  }
@@ -253,22 +253,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 		hairStrand.guideHairsCount = 3;
 		hairStrand.guideHairs = new csGuideHairReference[hairStrand.guideHairsCount];
+		int indexA = uniqueIndices.Contains(tri.a);
+		int indexB = uniqueIndices.Contains(tri.b);
+		int indexC = uniqueIndices.Contains(tri.c);
 
 		hairStrand.guideHairs[0].distance = bA;
-		hairStrand.guideHairs[0].index = uniqueIndices.Contains(tri.a);
+		hairStrand.guideHairs[0].index = indexA;
 		hairStrand.guideHairs[1].distance = bB;
-		hairStrand.guideHairs[1].index = uniqueIndices.Contains(tri.b);
+		hairStrand.guideHairs[1].index = indexB;
 		hairStrand.guideHairs[2].distance = bC;
-		hairStrand.guideHairs[2].index = uniqueIndices.Contains(tri.c);
+		hairStrand.guideHairs[2].index = indexC;
 
 		csVector3 pos = bA * positions.Get(tri.a) + bB * positions.Get(tri.b) +
 		  bC * positions.Get(tri.c);
 
-		hairStrand.controlPointsCount = 5;
+		hairStrand.controlPointsCount = csMin(
+		  (csMin(guideHairs.Get(indexA).controlPointsCount,
+		    guideHairs.Get(indexB).controlPointsCount)),
+		  (guideHairs.Get(indexC).controlPointsCount));
+
 		hairStrand.controlPoints = new csVector3[ hairStrand.controlPointsCount ];
 
 		for ( size_t i = 0 ; i < hairStrand.controlPointsCount ; i ++ )
-		  hairStrand.controlPoints[i] = csVector3(pos.x,pos.y + i * 0.05f, pos.z);
+		{
+		  hairStrand.controlPoints[i] = csVector3(0);
+		  for ( size_t j = 0 ; j < hairStrand.guideHairsCount ; j ++ )
+		    hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
+			  guideHairs.Get(hairStrand.guideHairs[j].index).controlPoints[i];
+		}
 
 		hairStrands.Push(hairStrand);		
 	  }
@@ -296,13 +308,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	this->material = material;
 	SetDensitymap();
 	SetHeightmap();
+	SetStrandWidth();
   }
 
   void FurMaterial::SetDensitymap ()
   {
 	CS::ShaderVarName densitymapName (svStrings, "density map");	
-	csRef<csShaderVariable> shaderVariable = 
-		material->GetVariable(densitymapName);
+	csRef<csShaderVariable> shaderVariable = material->GetVariable(densitymapName);
 
 	shaderVariable->GetValue(densitymap);
 	//printf("%s\n", densitymap->GetImageName());
@@ -311,11 +323,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurMaterial::SetHeightmap ()
   {
 	CS::ShaderVarName heightmapName (svStrings, "height map");	
-	csRef<csShaderVariable> shaderVariable = 
-		material->GetVariable(heightmapName);
+	csRef<csShaderVariable> shaderVariable = material->GetVariable(heightmapName);
 
 	shaderVariable->GetValue(heightmap);
 	//printf("%s\n", heightmap->GetImageName());
+  }
+
+  void FurMaterial::SetStrandWidth()
+  {
+	CS::ShaderVarName strandWidthName (svStrings, "width");	
+	csRef<csShaderVariable> shaderVariable = material->GetVariable(strandWidthName);
+
+	shaderVariable->GetValue(strandWidth);
   }
 
   void FurMaterial::SetShader (csStringID type, iShader* shd)
@@ -423,7 +442,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	  int y = 0;
 	  csVector3 strip = csVector3(0);
 
-	  for ( y = 0 ; y < controlPoints - 1 ; y ++ )
+	  for ( y = 0 ; y < controlPoints - 1; y ++ )
 	  {
 		csVector2 firstPoint = csVector2(furMaterial->hairStrands.Get(x).controlPoints[y].x,
 		  furMaterial->hairStrands.Get(x).controlPoints[y].y);
@@ -436,7 +455,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		else
 		  diff = csVector2(0);
 
-		strip = 0.005f * csVector3(diff.y,diff.x,0);
+		strip = furMaterial->strandWidth * csVector3(diff.y,diff.x,0);
 
 		vbuf[ x * 2 * controlPoints + 2 * y].Set
 		  ( furMaterial->hairStrands.Get(x).controlPoints[y] );
@@ -449,10 +468,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		( furMaterial->hairStrands.Get(x).controlPoints[y] );
 	  vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
 		( furMaterial->hairStrands.Get(x).controlPoints[y] + 
-		  tc.GetT2O() * strip );	  
+		  tc.GetT2O() * strip );
 	}
-	furMaterial->factoryState -> CalculateNormals();
-	
   }
 
   const csColor4* FurAnimationControl::UpdateColors (csTicks current, 
@@ -542,7 +559,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	if(!bulletBody)
 	  return;
 
-	CS_ASSERT(coordinatesCount != bulletBody->GetVertexCount());
+	//CS_ASSERT(coordinatesCount != bulletBody->GetVertexCount());
+	//printf("%d\t%d\n", coordinatesCount, bulletBody->GetVertexCount());
 
 	for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
 	  coordinates[i] = bulletBody->GetVertexPosition(i);
