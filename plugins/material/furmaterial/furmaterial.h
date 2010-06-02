@@ -129,6 +129,7 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	csRef<iView> view;
 	csArray<csHairStrand> hairStrands;
 	csArray<csGuideHair> guideHairs;
+	csArray<csTriangle> guideHairsTriangles;
 	csRef<iFurPhysicsControl> physicsControl;
 	/// Temp fur geometry
 	csRef<iAnimatedMeshFactory> meshFactory;

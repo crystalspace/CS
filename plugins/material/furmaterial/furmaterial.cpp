@@ -193,6 +193,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	    uniqueIndices.Push(tri.b);
 	  if(uniqueIndices.Contains(tri.c) == csArrayItemNotFound)
 	    uniqueIndices.Push(tri.c);
+
+	  csTriangle triangleNew = csTriangle(uniqueIndices.Contains(tri.a),
+		uniqueIndices.Contains(tri.b), uniqueIndices.Contains(tri.c));
+	  guideHairsTriangles.Push(triangleNew);
     }
 
 	// generate the guide hairs - this should be done based on heightmap
@@ -224,28 +228,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurMaterial::GenerateHairStrands (iRenderBuffer* indices, iRenderBuffer* 
 	vertexes)
   {
-	csRenderBufferLock<csVector3> positions (vertexes, CS_BUF_LOCK_READ);
-	CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES); 
-	csArray<int> uniqueIndices;
-
 	csRandomGen rng (csGetTicks ());
 	float bA, bB, bC; // barycentric coefficients
 
-	int density = 10;
+	int density = 5;
 
 	// for every triangle
-    while (tris.HasNext())
+    for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
     {
-      CS::TriangleT<size_t> tri (tris.Next ());
-
-	  if(uniqueIndices.Contains(tri.a) == csArrayItemNotFound)
-		  uniqueIndices.Push(tri.a);
-	  if(uniqueIndices.Contains(tri.b) == csArrayItemNotFound)
-		  uniqueIndices.Push(tri.b);
-	  if(uniqueIndices.Contains(tri.c) == csArrayItemNotFound)
-		  uniqueIndices.Push(tri.c);
-
-	  for ( int i = 0 ; i < density ; i ++ )
+	  for ( int den = 0 ; den < density ; den ++ )
 	  {
 		csHairStrand hairStrand;
 
@@ -255,9 +246,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 		hairStrand.guideHairsCount = 3;
 		hairStrand.guideHairs = new csGuideHairReference[hairStrand.guideHairsCount];
-		int indexA = uniqueIndices.Contains(tri.a);
-		int indexB = uniqueIndices.Contains(tri.b);
-		int indexC = uniqueIndices.Contains(tri.c);
+		int indexA = guideHairsTriangles.Get(iter).a;
+		int indexB = guideHairsTriangles.Get(iter).b;
+		int indexC = guideHairsTriangles.Get(iter).c;
 
 		hairStrand.guideHairs[0].distance = bA;
 		hairStrand.guideHairs[0].index = indexA;
@@ -265,9 +256,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		hairStrand.guideHairs[1].index = indexB;
 		hairStrand.guideHairs[2].distance = bC;
 		hairStrand.guideHairs[2].index = indexC;
-
-		csVector3 pos = bA * positions.Get(tri.a) + bB * positions.Get(tri.b) +
-		  bC * positions.Get(tri.c);
 
 		hairStrand.controlPointsCount = csMin(
 		  (csMin(guideHairs.Get(indexA).controlPointsCount,
