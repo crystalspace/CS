@@ -140,15 +140,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		  ibuf[ x * 2 * (controlPoints - 1) + y ].Set
 			  ( 2 * x * controlPoints + y , 
 			    2 * x * controlPoints + y + 1 , 
-			    2 * x * controlPoints + y + 2 );
+			    2 * x * controlPoints + y + 3 );
 		  //printf("%d %d %d\n", 2 * x + y , 2 * x + y + 3 , 2 * x + y + 1);
 		}
 		else
 		{
 		  ibuf[ x * 2 * (controlPoints - 1) + y ].Set
-			  ( 2 * x * controlPoints + y , 
-			    2 * x * controlPoints + y + 2 , 
-			    2 * x * controlPoints + y + 1 );
+			  ( 2 * x * controlPoints + y + 1 , 
+			    2 * x * controlPoints + y - 1 , 
+			    2 * x * controlPoints + y + 2 );
 		  //printf("%d %d %d\n", 2 * x + y + 1 , 2 * x + y + 2 , 2 * x + y - 1);
 		}
 	  }
@@ -162,7 +162,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 	csRef<iMaterialWrapper> materialWrapper = 
 		CS::Material::MaterialBuilder::CreateColorMaterial
-		(object_reg,"hairDummyMaterial",csColor(0,1,0));
+		(object_reg,"hairDummyMaterial",csColor(1,0,0));
+
+	materialWrapper->SetMaterial(material);
 
 	meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
 
@@ -470,6 +472,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		( furMaterial->hairStrands.Get(x).controlPoints[y] + 
 		  tc.GetT2O() * strip );
 	}
+
+	furMaterial->factoryState->CalculateNormals();
   }
 
   const csColor4* FurAnimationControl::UpdateColors (csTicks current, 

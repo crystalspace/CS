@@ -1,0 +1,8 @@
+<shader compiler="xmlshader" name="fur_cg">
+    <technique priority="200">
+    <pass>
+        <vp plugin="glcg" file="/shader/fur/fur_cg.cgvp" />
+        <fp plugin="glcg" file="/shader/fur/fur_cg.cgfp" />
+    </pass>
+    </technique>
+</shader>
