@@ -103,7 +103,6 @@ void csSectorLightList::UpdateLightBounds (csLight* light, const csBox3& oldBox)
 
 //---------------------------------------------------------------------------
 
-
 csSector::csSector (csEngine *engine) :
   scfImplementationType (this), lights (this), engine (engine)
 {
@@ -303,41 +302,6 @@ void csSector::PrecacheDraw ()
 
 //----------------------------------------------------------------------
 
-bool csSector::SetVisibilityCullerPointer (iVisibilityCuller* culCuller,
-  	iDocumentNode* culler_params)
-{
-
-  culler = culCuller;
-
-  if (!culler)
-  {
-    return false;
-  }
-
-  const char* err = culler->ParseCullerParameters (culler_params);
-  if (err)
-  {
-    engine->Error ("Error loading visibility culler: %s!",
-    	err);
-    return false;
-  }
-
-  // load cache data
-  csString cachename;
-  cachename.Format ("%s", GetName ());
-  culler->Setup (cachename);
-
-  // Loop through all meshes and register them to the visibility culler.
-  int i;
-  for (i = 0; i < meshes.GetCount (); i++)
-  {
-    iMeshWrapper* m = meshes.Get (i);
-    m->GetMovable ()->UpdateMove ();
-    RegisterEntireMeshToCuller (m);
-  }
-  return true;
-}
-
 bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 	iDocumentNode* culler_params)
 {
@@ -368,8 +332,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   culler->Setup (cachename);
 
   // Loop through all meshes and register them to the visibility culler.
-  int i;
-  for (i = 0; i < meshes.GetCount (); i++)
+  for (int i = 0; i < meshes.GetCount (); i++)
   {
     iMeshWrapper* m = meshes.Get (i);
     m->GetMovable ()->UpdateMove ();
@@ -381,7 +344,29 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 
 iVisibilityCuller* csSector::GetVisibilityCuller ()
 {
-  if (!culler) SetVisibilityCullerPlugin ("crystalspace.culling.frustvis");
+  if (!culler)
+  {
+    // Check for a culler in the RM.
+    csRef<iRenderManagerVisCull> rmVC = scfQueryInterfaceSafe<iRenderManagerVisCull> (engine->renderManager);
+
+    if (rmVC)
+    {
+      culler = rmVC->GetVisCuller ();
+
+      // Loop through all meshes and register them to the visibility culler.
+      for (int i = 0; i < meshes.GetCount (); i++)
+      {
+        iMeshWrapper* m = meshes.Get (i);
+        m->GetMovable ()->UpdateMove ();
+        RegisterEntireMeshToCuller (m);
+      }
+    }
+    else // Else try to load frustvis.
+    {
+      SetVisibilityCullerPlugin ("crystalspace.culling.frustvis");
+    }
+  }
+
   CS_ASSERT (culler != 0);
   return culler;
 }

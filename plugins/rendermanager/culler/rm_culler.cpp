@@ -97,32 +97,28 @@ public:
     if (context.owner.IsDebugFlagEnabled (rmanager->dbgFlagClipPlanes))
       context.owner.AddDebugClipPlanes (rview);
 
-    // Do the culling
-	//csFrustumVis fvCuller(0);
-	/*sector->SetVisibilityCullerPlugin("crystalspace.culling.frustvis");
+    /**
+     * Do the culling.
+     * If the culler is external, call the generic Viscull.
+     * Else call our own culler.
+     */
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
-	Viscull<RenderTreeType> (context, rview, culler);*/
+    if (rmanager->visCullers.Contains (culler))
+    {
+      // Implement awesome culler here.
+      csFrustumVis* visCuller = static_cast<csFrustumVis*> (culler);
 
-	//engine;
-	
-	/*csRef<iPluginManager> plugmgr = 
-		csQueryRegistry<iPluginManager> (sector->GetEngine()->objectRegistry);
-	int i;
-	for (i = 0; i < sector->GetMeshes()->GetCount (); i++)
-	{
-		iMeshWrapper* m = sector->GetMeshes()->Get (i);
-		m->GetMovable ()->UpdateMove ();
-		sector->RegisterEntireMeshToCuller (m);
-	}*/
-	csFrustumVis fvCuller(0);
-	fvCuller.Initialize(sector->GetObjectRegistry());
-	//csRef<iVisibilityCuller> culler;//=&fvCuller;
-	iVisibilityCuller* culCuller=&fvCuller;
-	//csRef<iPluginManager> plugmgr = 
-  	//	csQueryRegistry<iPluginManager> (sector->GetEngine()->objectRegistry);
-	//culler = csLoadPlugin<iVisibilityCuller> (plugmgr, "crystalspace.culling.frustvis");
-	sector->SetVisibilityCullerPointer(culCuller);
-    Viscull<RenderTreeType> (context, rview, culCuller);
+      const CS::Utility::MeshFilter* filter = &rview->GetMeshFilter();
+      CS::RenderManager::Implementation::ViscullCallback<RenderTreeType> cb (context, rview, filter);
+
+      int renderW = 0, renderH = 0;
+      context.GetTargetDimensions (renderW, renderH);
+      visCuller->VisTest (rview, &cb, renderW, renderH);
+    }
+    else
+    {
+      Viscull<RenderTreeType> (context, rview, culler);
+    }
 
     // Set up all portals
     {
@@ -214,7 +210,8 @@ private:
 
 
 RMCuller::RMCuller (iBase* parent)
-  : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
+  : scfImplementationType (this, parent),
+  doHDRExposure (false), targets (*this)
 {
   SetTreePersistent (treePersistent);
 }
@@ -458,6 +455,14 @@ bool RMCuller::Initialize(iObjectRegistry* objectReg)
     &postEffects);
   
   return true;
+}
+
+iVisibilityCuller* RMCuller::GetVisCuller ()
+{
+  csFrustumVis* fvCuller = new csFrustumVis();
+  fvCuller->Initialize (objectReg);
+  visCullers.AddNoTest (fvCuller);
+  return fvCuller;
 }
 
 }

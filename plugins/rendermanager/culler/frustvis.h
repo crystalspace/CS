@@ -72,11 +72,10 @@ public:
 };
 
 /**
- * A simple frustum based visisibility culling system.
+ * A simple frustum based visibility culling system.
  */
 class csFrustumVis :
-  public scfImplementation3<csFrustumVis,
-    iVisibilityCuller, iEventHandler, iComponent>
+  public scfImplementation1<csFrustumVis, iVisibilityCuller>
 {
 public:
   // List of objects to iterate over (after VisTest()).
@@ -120,7 +119,7 @@ private:
 	uint32 cur_timestamp, uint32 frustum_mask);
 
 public:
-  csFrustumVis (iBase *iParent);
+  csFrustumVis ();
   virtual ~csFrustumVis ();
   virtual bool Initialize (iObjectRegistry *object_reg);
 
@@ -169,11 +168,6 @@ public:
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = true);
   virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
-
-  bool HandleEvent (iEvent& ev);
-
-  CS_EVENTHANDLER_NAMES("crystalspace.frustvis")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __CS_FRUSTVIS_H__

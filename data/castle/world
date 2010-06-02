@@ -678,7 +678,6 @@
         </portals>
         <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
-        <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="Cube.582">
             <plugin>genmesh</plugin>
             <params>
@@ -1069,7 +1068,6 @@
         </portals>
         <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
-        <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.011">
             <plugin>particles</plugin>
             <priority>transp</priority>
@@ -1350,7 +1348,6 @@
         </portals>
         <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
-        <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.013">
             <plugin>particles</plugin>
             <priority>transp</priority>
@@ -1666,7 +1663,6 @@
         </portals>
         <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
-        <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.006">
             <plugin>particles</plugin>
             <priority>transp</priority>
@@ -2253,7 +2249,6 @@
         </portals>
         <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
-        <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.001">
             <plugin>particles</plugin>
             <priority>transp</priority>
@@ -2672,7 +2667,6 @@
         </portals>
         <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
-        <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.010">
             <plugin>particles</plugin>
             <priority>transp</priority>
@@ -2843,7 +2837,6 @@
         </portals>
         <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
-        <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.002">
             <plugin>particles</plugin>
             <priority>transp</priority>
@@ -3638,7 +3631,6 @@
         </portals>
         <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
-        <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.015">
             <plugin>particles</plugin>
             <priority>transp</priority>
@@ -3947,7 +3939,6 @@
     </meshfact>
     <sector name="space">
         <ambient blue="1" green="1" red="1" />
-        <cullerp plugin="crystalspace.culling.dynavis" />
         <light name="Lamp">
             <center y="-1.65113e-005" x="30.009" z="19.9007" />
             <color blue="1.0" green="1.0" red="1.0" />
@@ -4128,7 +4119,6 @@
         </portals>
         <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
-        <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.009">
             <plugin>particles</plugin>
             <priority>transp</priority>

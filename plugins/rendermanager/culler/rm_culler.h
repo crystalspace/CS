@@ -35,13 +35,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMCuller)
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
 
-  class RMCuller : public scfImplementation5<RMCuller, 
-                                                 iRenderManager, 
-                                                 iRenderManagerTargets,
-                                                 iRenderManagerPostEffects,
-                                                 iComponent,
-                                                 scfFakeInterface<iDebugHelper> >,
-                       public CS::RenderManager::RMDebugCommon<RenderTreeType>
+  class RMCuller : public scfImplementation6<RMCuller, 
+                                             iRenderManager,
+                                             iRenderManagerTargets,
+                                             iRenderManagerPostEffects,
+                                             iRenderManagerVisCull,
+                                             iComponent,
+                                             scfFakeInterface<iDebugHelper> >,
+                   public CS::RenderManager::RMDebugCommon<RenderTreeType>
   {
   public:
     RMCuller (iBase* parent);
@@ -64,7 +65,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMCuller)
     {
       targets.MarkAsUsed (target);
     }
-  
+
     void ClearLayers() { postEffects.ClearLayers(); }
     bool AddLayersFromDocument (iDocumentNode* node)
     {
@@ -104,6 +105,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMCuller)
 
     typedef CS::RenderManager::AutoFX::FramebufferTex<RenderTreeType>
       AutoFramebufferTexType;
+
+    //---- iRenderManagerVisCull ----
+    virtual iVisibilityCuller* GetVisCuller ();
+
   public:
     iObjectRegistry* objectReg;
 
@@ -134,10 +139,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMCuller)
 
     TargetManagerType targets;
     csSet<RenderTreeType::ContextNode*> contextsScannedForTargets;
-    
-    uint dbgFlagClipPlanes;
-  };
 
+    uint dbgFlagClipPlanes;
+
+    /// Set of our cullers.
+    csSet<iVisibilityCuller*> visCullers;
+  };
 }
 CS_PLUGIN_NAMESPACE_END(RMCuller)
 

@@ -49,11 +49,6 @@
 #include "ivaria/reporter.h"
 #include "frustvis.h"
 
-
-
-SCF_IMPLEMENT_FACTORY (csFrustumVis)
-
-
 //----------------------------------------------------------------------
 
 class csFrustVisObjIt :
@@ -143,8 +138,7 @@ public:
 
 //----------------------------------------------------------------------
 
-csFrustumVis::csFrustumVis (iBase *iParent) :
-  scfImplementationType (this, iParent),
+csFrustumVis::csFrustumVis () : scfImplementationType (this),
   vistest_objects (256),
   visobj_vector (256),
   update_queue (151, 59)
@@ -158,13 +152,6 @@ csFrustumVis::csFrustumVis (iBase *iParent) :
 
 csFrustumVis::~csFrustumVis ()
 {
-  if (object_reg)
-  {
-    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
-    if (q)
-      CS::RemoveWeakListener (q, weakEventHandler);
-  }
-
   while (visobj_vector.GetSize () > 0)
   {
     csRef<csFrustVisObjectWrapper> visobj_wrap = visobj_vector.Pop ();
@@ -176,18 +163,6 @@ csFrustumVis::~csFrustumVis ()
     kdtree->RemoveObject (visobj_wrap->child);
   }
   delete kdtree;
-}
-
-bool csFrustumVis::HandleEvent (iEvent& ev)
-{
-  if (ev.Name == CanvasResize)
-  {
-    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
-    scr_width = g3d->GetWidth ();
-    scr_height = g3d->GetHeight ();
-    //printf ("Got resize %dx%d!\n", scr_width, scr_height);fflush (stdout);
-  }
-  return false;
 }
 
 bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
@@ -213,15 +188,6 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   csRef<csFrustVisObjectDescriptor> desc;
   desc.AttachNew (new csFrustVisObjectDescriptor ());
   kdtree->SetObjectDescriptor (desc);
-
-  csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
-  if (g2d)
-  {
-    CanvasResize = csevCanvasResize(object_reg, g2d);
-    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
-    if (q)
-      CS::RegisterWeakListener (q, this, CanvasResize, weakEventHandler);
-  }
 
   return true;
 }

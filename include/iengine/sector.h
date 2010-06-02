@@ -392,9 +392,6 @@ struct iSector : public virtual iBase
    */
   virtual bool SetVisibilityCullerPlugin (const char* name,
   	iDocumentNode* culler_params = 0) = 0;
-
-   virtual bool SetVisibilityCullerPointer (iVisibilityCuller* culCuller,
-  	iDocumentNode* culler_params=0) = 0;
   /**
    * Get the visibility culler that is used for this sector.
    * If there is no culler yet a culler of type 'crystalspace.culling.frustvis'
