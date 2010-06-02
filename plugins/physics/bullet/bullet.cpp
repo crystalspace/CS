@@ -996,10 +996,10 @@ iBulletTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
  csVector3 gridSize, csOrthoTransform& transform,
  float minimumHeight, float maximumHeight)
 {
-  csRef<csBulletTerrainCollider> terrain;
+  csRef<csBulletTerrainCellCollider> terrain;
   terrain.AttachNew
-    (new csBulletTerrainCollider (this, heightData, gridWidth, gridHeight,
-				  gridSize, transform, minimumHeight, maximumHeight));
+    (new csBulletTerrainCellCollider (this, heightData, gridWidth, gridHeight,
+				      gridSize, transform, minimumHeight, maximumHeight));
   terrainColliders.Push (terrain);
   return terrain;
 }
@@ -1007,9 +1007,9 @@ iBulletTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
 iBulletTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
 (iTerrainCell* cell, float minimumHeight, float maximumHeight)
 {
-  csRef<csBulletTerrainCollider> terrain;
+  csRef<csBulletTerrainCellCollider> terrain;
   terrain.AttachNew
-    (new csBulletTerrainCollider (this, cell, minimumHeight, maximumHeight));
+    (new csBulletTerrainCellCollider (this, cell, minimumHeight, maximumHeight));
   terrainColliders.Push (terrain);
   return terrain;
 }

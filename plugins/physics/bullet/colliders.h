@@ -22,7 +22,7 @@
 #ifndef __CS_BULLET_COLLIDERS_H__
 #define __CS_BULLET_COLLIDERS_H__
 
-#include "iengine/movable.h"
+#include "imesh/terrain2.h"
 
 #include "bullet.h"
 #include "common.h"
@@ -125,24 +125,48 @@ class HeightMapCollider
   btRigidBody* body;
 };
 
-class csBulletTerrainCollider : public scfImplementation1<csBulletTerrainCollider,
+class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCellCollider,
   iBulletTerrainCollider>
 {
  public:
-  csBulletTerrainCollider (csBulletDynamicsSystem* dynSys,
-			   csLockedHeightData& heightData,
-			   int gridWidth, int gridHeight,
-			   csVector3 gridSize,
-			   csOrthoTransform& transform,
-			   float minimumHeight, float maximumHeight);
-  csBulletTerrainCollider (csBulletDynamicsSystem* dynSys, iTerrainCell* cell,
-			   float minimumHeight, float maximumHeight);
+  csBulletTerrainCellCollider (csBulletDynamicsSystem* dynSys,
+			       csLockedHeightData& heightData,
+			       int gridWidth, int gridHeight,
+			       csVector3 gridSize,
+			       csOrthoTransform& transform,
+			       float minimumHeight, float maximumHeight);
+  csBulletTerrainCellCollider (csBulletDynamicsSystem* dynSys, iTerrainCell* cell,
+			       float minimumHeight, float maximumHeight);
+  virtual ~csBulletTerrainCellCollider ();
+
+ private:
+  HeightMapCollider* collider;
+};
+
+class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollider,
+  iBulletTerrainCollider, iTerrainCellLoadCallback>
+{
+ public:
   csBulletTerrainCollider (csBulletDynamicsSystem* dynSys, iTerrainSystem* terrain,
 			   float minimumHeight, float maximumHeight);
   virtual ~csBulletTerrainCollider ();
 
+  //-- iTerrainCellLoadCallback
+  virtual void OnCellLoad (iTerrainCell *cell);
+  virtual void OnCellPreLoad (iTerrainCell *cell);
+  virtual void OnCellUnload (iTerrainCell *cell);
+
  private:
-  csArray<HeightMapCollider*> colliders;
+  struct ColliderData
+  {
+    iTerrainCell* cell;
+    HeightMapCollider* collider;
+  };
+
+  csArray<ColliderData> colliders;
+  csBulletDynamicsSystem* dynSys;
+  float minimumHeight;
+  float maximumHeight;
 };
 
 }

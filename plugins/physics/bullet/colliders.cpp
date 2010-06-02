@@ -24,7 +24,7 @@
 #include "csgeom/sphere.h"
 #include "igeom/trimesh.h"
 #include "imesh/objmodel.h"
-#include "imesh/terrain2.h"
+#include "iengine/movable.h"
 
 // Bullet includes.
 #include "btBulletDynamicsCommon.h"
@@ -707,23 +707,23 @@ HeightMapCollider::~HeightMapCollider ()
   delete heightData;
 }
 
-//----------------------- csBulletTerrainCollider ----------------------------
+//----------------------- csBulletTerrainCellCollider ----------------------------
 
-csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys,
-						  csLockedHeightData& heightData,
-						  int gridWidth, int gridHeight,
-						  csVector3 gridSize,
-						  csOrthoTransform& transform,
-						  float minimumHeight, float maximumHeight)
+csBulletTerrainCellCollider::csBulletTerrainCellCollider (csBulletDynamicsSystem* dynSys,
+						      csLockedHeightData& heightData,
+						      int gridWidth, int gridHeight,
+						      csVector3 gridSize,
+						      csOrthoTransform& transform,
+						      float minimumHeight, float maximumHeight)
   :  scfImplementationType (this)
 {
   // Create the terrain collider
-  colliders.Push (new HeightMapCollider
-		  (dynSys, heightData, gridWidth, gridHeight, gridSize,
-		   transform, minimumHeight, maximumHeight));
+  collider = new HeightMapCollider
+    (dynSys, heightData, gridWidth, gridHeight, gridSize,
+     transform, minimumHeight, maximumHeight);
 }
 
-csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys,
+csBulletTerrainCellCollider::csBulletTerrainCellCollider (csBulletDynamicsSystem* dynSys,
 						  iTerrainCell* cell,
 						  float minimumHeight, float maximumHeight)
   :  scfImplementationType (this)
@@ -742,17 +742,29 @@ csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys
 			   + terrainTransform.This2OtherRelative (position));
 
   // Create the terrain collider
-  colliders.Push
-    (new HeightMapCollider (dynSys, cell->GetHeightData (), cell->GetGridWidth (),
-			    cell->GetGridHeight (), cell->GetSize (),
-			    cellTransform, minimumHeight, maximumHeight));
+  collider =
+    new HeightMapCollider (dynSys, cell->GetHeightData (), cell->GetGridWidth (),
+			   cell->GetGridHeight (), cell->GetSize (),
+			   cellTransform, minimumHeight, maximumHeight);
 }
+
+csBulletTerrainCellCollider::~csBulletTerrainCellCollider ()
+{
+  delete collider;
+}
+
+//----------------------- csBulletTerrainCollider ----------------------------
 
 csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys,
 						  iTerrainSystem* terrain,
 						  float minimumHeight, float maximumHeight)
-  :  scfImplementationType (this)
+  :  scfImplementationType (this), dynSys (dynSys), minimumHeight (minimumHeight),
+     maximumHeight (maximumHeight)
 {
+  // Listen to the loading callbacks
+  // TODO: listen also to iTerrainCellHeightDataCallback
+  terrain->AddCellLoadListener (this);
+
   // Find the transform of the terrain
   csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (terrain);
   csOrthoTransform terrainTransform = mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
@@ -762,9 +774,9 @@ csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys
   {
     iTerrainCell* cell = terrain->GetCell (i);
 
-    // TODO: add only cells already loaded + listen to load/modify events
-    // Make sure that the cell data has been loaded
-    cell->SetLoadState (iTerrainCell::Loaded);
+    // Check if the cell has already been loaded
+    if (cell->GetLoadState () != iTerrainCell::Loaded)
+      continue;
 
     // Compute the transform of the cell
     csOrthoTransform cellTransform (terrainTransform);
@@ -773,17 +785,57 @@ csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys
 			     + terrainTransform.This2OtherRelative (position));
 
     // Create the terrain collider
-    colliders.Push
-      (new HeightMapCollider (dynSys, cell->GetHeightData (), cell->GetGridWidth (),
-			      cell->GetGridHeight (), cell->GetSize (),
-			      cellTransform, minimumHeight, maximumHeight));
+    ColliderData colliderData;
+    colliderData.cell = cell;
+    colliderData.collider = new HeightMapCollider (dynSys, cell->GetHeightData (),
+						   cell->GetGridWidth (),
+						   cell->GetGridHeight (), cell->GetSize (),
+						   cellTransform, minimumHeight, maximumHeight);
+    colliders.Push (colliderData);
   }
 }
 
 csBulletTerrainCollider::~csBulletTerrainCollider ()
 {
   for (size_t i = 0; i < colliders.GetSize (); i++)
-    delete (colliders[i]);
+    delete colliders[i].collider;
+}
+
+void csBulletTerrainCollider::OnCellLoad (iTerrainCell *cell)
+{
+  // Find the transform of the terrain
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (cell->GetTerrain ());
+  csOrthoTransform terrainTransform = mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
+
+  // Compute the transform of the cell
+  csOrthoTransform cellTransform (terrainTransform);
+  csVector3 position (cell->GetPosition ()[0], 0.0f, cell->GetPosition ()[1]);
+  cellTransform.SetOrigin (terrainTransform.GetOrigin ()
+			   + terrainTransform.This2OtherRelative (position));
+
+  // Create the terrain collider
+  ColliderData colliderData;
+  colliderData.cell = cell;
+  colliderData.collider = new HeightMapCollider (dynSys, cell->GetHeightData (),
+						 cell->GetGridWidth (),
+						 cell->GetGridHeight (), cell->GetSize (),
+						 cellTransform, minimumHeight, maximumHeight);
+  colliders.Push (colliderData);
+}
+
+void csBulletTerrainCollider::OnCellPreLoad (iTerrainCell *cell)
+{
+}
+
+void csBulletTerrainCollider::OnCellUnload (iTerrainCell *cell)
+{
+  for (size_t i = 0; i < colliders.GetSize (); i++)
+    if (colliders[i].cell == cell)
+    {
+      delete colliders[i].collider;
+      colliders.DeleteIndexFast (i);
+      break;
+    }
 }
 
 }
