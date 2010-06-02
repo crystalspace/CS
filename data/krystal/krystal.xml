@@ -28,10 +28,14 @@
     <material name='skull_material'>
       <texture>krystal_body_h</texture>
       <shader type='standard'>fur_cg</shader>
+<!-- Uncomment the following line for red hair -->	  
+<!--	  
+	  <shadervar type="vector3" name="mat furcolor">1,0,0</shadervar>
+-->	  
       <shadervar type="texture" name="tex specular">krystal_spec</shadervar>
       <shadervar type="texture" name="density map">krystal_body_h</shadervar>
       <shadervar type="texture" name="height map">krystal_body_h</shadervar>
-	  <shadervar type="float" name="width">0.003</shadervar>
+	  <shadervar type="float" name="width">0.005</shadervar>
     </material>
   </materials>
   <sounds/>

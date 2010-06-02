@@ -296,9 +296,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurMaterial::SetMaterial ( iMaterial* material )
   {
 	this->material = material;
+
+	SetColor(csColor(1,1,0));
 	SetDensitymap();
 	SetHeightmap();
 	SetStrandWidth();
+  }
+
+  void FurMaterial::SetColor(csColor color)
+  {
+	CS::ShaderVarName furColorName (svStrings, "mat furcolor");	
+	csRef<csShaderVariable> shaderVariable = 
+	  material->GetVariable(furColorName);
+	if(!shaderVariable)
+	{
+	  shaderVariable = material->GetVariableAdd(furColorName);
+	  shaderVariable->SetValue(color);	
+	}
   }
 
   void FurMaterial::SetDensitymap ()

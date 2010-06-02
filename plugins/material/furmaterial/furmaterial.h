@@ -148,6 +148,7 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	void SetDensitymap();
 	void SetHeightmap();
 	void SetStrandWidth();
+	void SetColor(csColor color);
 };
 
 class FurAnimationControl : public scfImplementation1 
