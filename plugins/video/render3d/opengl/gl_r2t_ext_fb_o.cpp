@@ -189,7 +189,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
   void FBOWrapper::SetDrawBuffers() const
   {
-    static GLenum OPENGL_COLOR_ATTACHMENT_ENUMS[] = 
+    static GLenum openGLColorAttachmentEnums[] = 
     {
       GL_COLOR_ATTACHMENT0_EXT,
       GL_COLOR_ATTACHMENT1_EXT,
@@ -209,7 +209,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
       GL_COLOR_ATTACHMENT15_EXT,
     };
 
-    CS_ASSERT ((sizeof(OPENGL_COLOR_ATTACHMENT_ENUMS) / sizeof(GLenum)) == rtaNumColorAttachments);
+    CS_ASSERT ((sizeof(openGLColorAttachmentEnums) / sizeof(GLenum)) == rtaNumColorAttachments);
 
     // Builds the attachment array passed into glDrawBuffers.
     GLint count = 0;
@@ -228,14 +228,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
       const WRTAG::RTA &rta = attachments.GetAttachment (attachment);
       if (rta.IsValid ())
       {
-        buffers[count] = OPENGL_COLOR_ATTACHMENT_ENUMS[i];
+        buffers[count] = openGLColorAttachmentEnums[i];
         count++;
       }
     }
 
-    if (count > 0 && ext->glDrawBuffers)
+    if (count > 0 && ext->glDrawBuffersARB)
     {
-      ext->glDrawBuffers (count, buffers);
+      ext->glDrawBuffersARB (count, buffers);
     }
   }
 
@@ -247,9 +247,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   {
     GLenum fbStatus = GL_FRAMEBUFFER_UNSUPPORTED_EXT;
 
-    /* Make sure we have access to glDrawBuffers for rendering to multiple 
+    /* Make sure we have access to glDrawBuffersARB for rendering to multiple 
      * render targets. */
-    G3D->ext->InitGL_version_2_0();
+    G3D->ext->InitGL_ARB_draw_buffers ();
 
     /* Try to determine a working depth, and if available, stencil buffer 
      * format.*/
