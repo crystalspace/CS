@@ -1,19 +1,19 @@
 /*
-  Copyright (C) 2008 by Joe Forte
+    Copyright (C) 2008 by Joe Forte
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Library General Public License for more details.
 
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -82,6 +82,22 @@ void DrawFullscreenTexture(iTextureHandle *tex, iGraphics3D *graphics3D)
                           w,
                           h,
                           0);
+}
+
+/**
+ * Iterate over all lights within a context, call functor for each one.
+ * Does not use any blocking at all.
+ */
+template<typename ContextType, typename Fn>
+void ForEachLight(ContextType& context, Fn& fn)
+{
+  iLightList *list = context.sector->GetLights ();
+
+  const int count = list->GetCount ();
+  for (int i = 0; i < count; i++)
+  {
+    fn (list->Get (i));
+  }
 }
 
 /**
@@ -328,6 +344,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
 
   treePersistent.Initialize (shaderManager);
   portalPersistent.Initialize (shaderManager, graphics3D, treePersistent.debugPersist);
+  lightRenderPersistent.Initialize (registry);
   
   // Read Config settings.
   csConfigAccess cfg (objRegistry);
@@ -352,7 +369,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     if (!loader->LoadShader ("/shader/deferred/fill_gbuffer.xml"))
     {
       csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
-	messageID, "Could not load lighting_default shader");
+	messageID, "Could not load fill_gbuffer shader");
     }
 
     csReport (objRegistry, CS_REPORTER_SEVERITY_NOTIFY, messageID,
@@ -483,9 +500,7 @@ bool RMDeferred::RenderView(iView *view)
     float aspect = (float)w / h;
     renderTree.AddDebugTexture (colorBuffer0, aspect);
     renderTree.AddDebugTexture (colorBuffer1, aspect);
-    renderTree.AddDebugTexture (colorBuffer2, aspect);
     renderTree.AddDebugTexture (depthBuffer, aspect);
-    renderTree.AddDebugTexture (accumBuffer, aspect);
   }
 
   // Setup the main context
@@ -512,8 +527,17 @@ bool RMDeferred::RenderView(iView *view)
   // Fills the accumulation buffer.
   AttachAccumBuffer (graphics3D);
   {
-    //TODO: Iterate through lights adding results into accumulation buffer.
     DrawFullscreenTexture (colorBuffer0, graphics3D);
+
+    int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | startContext->drawFlags;
+    drawFlags &= ~CSDRAW_CLEARSCREEN;
+
+    graphics3D->BeginDraw (drawFlags);
+    graphics3D->SetWorldToCamera (startContext->cameraTransform.GetInverse ());
+    
+    //Iterate through lights adding results into accumulation buffer.
+    DeferredLightRenderer render (graphics3D, shaderManager, stringSet, rview, lightRenderPersistent);
+    ForEachLight (*startContext, render);
 
     graphics3D->FinishDraw ();
   }

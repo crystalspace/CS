@@ -22,21 +22,13 @@
 
   <technique priority="200" lights="0">
     <pass>
-
-      <mixmode>
-        <srcalphaadd />
-      </mixmode>
       
       <buffer source="normal" destination="normal" />
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glcg" file="/shader/deferred/fill_gbuffer.cgvp" />
       
       <texture destination="TexDiffuse" name="tex diffuse" />
-      <fp plugin="glcg">
-        <cgfp>
-          <?Include /shader/deferred/fill_gbuffer.cgfp ?>
-        </cgfp>
-      </fp>
+      <fp plugin="glcg" file="/shader/deferred/fill_gbuffer.cgfp" />
       
     </pass>
   </technique>

@@ -1,14 +1,15 @@
-<include>
+<cgfp>
 <program>
+<![CDATA[
  
 struct vertex2fragment 
 { 
-	float4 Position : POSITION;
-	float3 TexCoord : TEXCOORD0;
-	float4 LightDir : TEXCOORD1;
+  float4 Position : POSITION;
+  float3 TexCoord : TEXCOORD0;
+  float4 ViewNormal : TEXCOORD1;
+  float4 ViewPosition : TEXCOORD2;
 };
- 
- 
+
 struct fragmentOutput
 {
   float4 Color0 : COLOR0;
@@ -16,18 +17,18 @@ struct fragmentOutput
   float4 Color2 : COLOR2;
 };
  
-fragmentOutput main (vertex2fragment IN,
-                      uniform sampler2D TexDiffuse)
+fragmentOutput main(vertex2fragment IN,
+                    uniform sampler2D TexDiffuse)
 {
   fragmentOutput output;
   
-  output.Color0 = float4(1, 0, 0, 1);
-  output.Color1 = float4(0, 1, 0, 1);
-  output.Color2 = float4(0, 0, 1, 1);
+  output.Color0 = float4 (tex2D (TexDiffuse, IN.TexCoord).rgb, 1.0);
+  output.Color1 = (normalize(IN.ViewNormal) + 1) * 0.5;
+  output.Color2 = float4 (0, 0, 0, 0);
 
   return output;
 }
 
+]]>
 </program>
-</include>
-
+</cgfp>

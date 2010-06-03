@@ -4,29 +4,32 @@
 
 struct app2vertex 
 {
-	float4 Position : POSITION;
-	float4 Normal : NORMAL;
-	float4 TexCoord : TEXCOORD0;
+  float4 Position : POSITION;
+  float4 Normal : NORMAL;
+  float4 TexCoord : TEXCOORD0;
 };
 
 struct vertex2fragment 
 { 
-	float4 Position : POSITION;
-	float4 TexCoord : TEXCOORD0;
+  float4 Position : POSITION;
+  float4 TexCoord : TEXCOORD0;
+  float4 ViewNormal : TEXCOORD1;
 };
 
-vertex2fragment main (app2vertex IN,
-	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,
-	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
-	uniform float4x4 ModelViewProj : state.matrix.mvp)
+vertex2fragment main(app2vertex IN,
+                     uniform float4x4 ModelView : state.matrix.modelview,
+                     uniform float4x4 ModelViewI : state.matrix.modelview.inverse,
+                     uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
+                     uniform float4x4 ModelViewProj : state.matrix.mvp)
 {
-	vertex2fragment OUT;
+  vertex2fragment OUT;
 
-	float4 pos = mul (ModelViewProj, IN.Position);
-	OUT.Position = pos;
-	OUT.TexCoord = IN.TexCoord;
-        
-	return OUT;
+  float4 pos = mul (ModelViewProj, IN.Position);
+  OUT.Position = pos;
+  OUT.TexCoord = IN.TexCoord;
+  OUT.ViewNormal = mul (ModelViewIT, IN.Normal);
+
+  return OUT;
 }
 
 ]]>
