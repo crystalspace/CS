@@ -140,15 +140,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		  ibuf[ x * 2 * (controlPoints - 1) + y ].Set
 			  ( 2 * x * controlPoints + y , 
 			    2 * x * controlPoints + y + 1 , 
-			    2 * x * controlPoints + y + 3 );
+			    2 * x * controlPoints + y + 2 );
 		  //printf("%d %d %d\n", 2 * x + y , 2 * x + y + 3 , 2 * x + y + 1);
 		}
 		else
 		{
 		  ibuf[ x * 2 * (controlPoints - 1) + y ].Set
-			  ( 2 * x * controlPoints + y + 1 , 
-			    2 * x * controlPoints + y - 1 , 
-			    2 * x * controlPoints + y + 2 );
+			  ( 2 * x * controlPoints + y , 
+			    2 * x * controlPoints + y + 2 , 
+			    2 * x * controlPoints + y + 1 );
 		  //printf("%d %d %d\n", 2 * x + y + 1 , 2 * x + y + 2 , 2 * x + y - 1);
 		}
 	  }
@@ -164,7 +164,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		CS::Material::MaterialBuilder::CreateColorMaterial
 		(object_reg,"hairDummyMaterial",csColor(1,0,0));
 
-	materialWrapper->SetMaterial(material);
+	//materialWrapper->SetMaterial(material);
 
 	meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
 
@@ -459,7 +459,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		else
 		  diff = csVector2(0);
 
-		strip = furMaterial->strandWidth * csVector3(diff.y,diff.x,0);
+		//strip = furMaterial->strandWidth * csVector3(diff.y,diff.x,0);
+		strip = ( diff.y > 0 ? 1 : -1 ) * furMaterial->strandWidth * csVector3(1, 0, 0);
 
 		vbuf[ x * 2 * controlPoints + 2 * y].Set
 		  ( furMaterial->hairStrands.Get(x).controlPoints[y] );
@@ -548,7 +549,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	csVector3 last = coordinates[coordinatesCount - 1];
 	
 	iBulletSoftBody* bulletBody = bulletDynamicSystem->
-	  CreateRope(first, last, coordinatesCount);
+	  CreateRope(first, last, coordinatesCount - 2);	//	replace with -1
 	bulletBody->SetMass (0.1f);
 	bulletBody->SetRigidity (0.99f);
 	bulletBody->AnchorVertex (0, rigidBody);
@@ -565,7 +566,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	if(!bulletBody)
 	  return;
 
-	//CS_ASSERT(coordinatesCount != bulletBody->GetVertexCount());
+	CS_ASSERT(coordinatesCount == bulletBody->GetVertexCount());
 	//printf("%d\t%d\n", coordinatesCount, bulletBody->GetVertexCount());
 
 	for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
