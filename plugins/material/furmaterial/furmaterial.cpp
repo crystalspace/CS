@@ -451,46 +451,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 		csVector3 firstPoint = furMaterial->hairStrands.Get(x).controlPoints[y];
 		csVector3 secondPoint = furMaterial->hairStrands.Get(x).controlPoints[y + 1];
-/*
-		csVector3 A = firstPoint - secondPoint;
-		csVector3 B = firstPoint - tc.GetOrigin();
-		A.Cross(A, B);
-		
-		strip = furMaterial->strandWidth * 10 * A;
-*/
-		csVector3 diff = firstPoint - secondPoint;
-		if (diff.Norm() > 0.0001f)
-		  diff = diff / diff.Norm();
-		else
-		  diff = csVector3(0);
+		csVector3 normal;
 
-		strip = furMaterial->strandWidth * csVector3(diff.y, sqrt(diff.x*diff.x+diff.z*diff.z), 0);
-/*
-		csVector2 firstPoint = csVector2(furMaterial->hairStrands.Get(x).controlPoints[y].x,
-		  furMaterial->hairStrands.Get(x).controlPoints[y].y);
-		csVector2 secondPoint = csVector2(furMaterial->hairStrands.Get(x).controlPoints[y + 1].x,
-		  furMaterial->hairStrands.Get(x).controlPoints[y + 1].y);
+		csMath3::CalcNormal(normal, firstPoint, secondPoint, tc.GetOrigin());
+		normal.Normalize();
+		strip = furMaterial->strandWidth * normal;
 
-		csVector2 diff = firstPoint - secondPoint;
-		if (diff.Norm() > 0.0001f)
-		  diff = diff / diff.Norm();
-		else
-		  diff = csVector2(0);
-
-		strip = furMaterial->strandWidth * csVector3(diff.y, -diff.x, 0);
-*/
-		vbuf[ x * 2 * controlPoints + 2 * y].Set
-		  ( furMaterial->hairStrands.Get(x).controlPoints[y] );
-		vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		  ( furMaterial->hairStrands.Get(x).controlPoints[y] + 
-		    tc.GetT2O() * strip );
+		vbuf[ x * 2 * controlPoints + 2 * y].Set( firstPoint );
+		vbuf[ x * 2 * controlPoints + 2 * y + 1].Set( firstPoint + strip );
 	  }
 
 	  vbuf[ x * 2 * controlPoints + 2 * y].Set
 		( furMaterial->hairStrands.Get(x).controlPoints[y] );
 	  vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		( furMaterial->hairStrands.Get(x).controlPoints[y] + 
-		  tc.GetT2O() * strip );
+		( furMaterial->hairStrands.Get(x).controlPoints[y] + strip );
 	}
 
 	furMaterial->factoryState->CalculateNormals();
@@ -585,10 +559,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 	CS_ASSERT(coordinatesCount == bulletBody->GetVertexCount());
 	//printf("%d\t%d\n", coordinatesCount, bulletBody->GetVertexCount());
-/*
+
 	for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
 	  coordinates[i] = bulletBody->GetVertexPosition(i);
-*/
+/*
 	if (strandID % 3 == 0)
 		for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
 			coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
@@ -601,6 +575,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
 			coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
 								csVector3(0,0,1);
+*/
   }
 
   void FurPhysicsControl::RemoveStrand (size_t strandID)

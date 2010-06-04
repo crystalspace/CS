@@ -249,7 +249,7 @@ bool KrystalScene::CreateAvatar ()
   idle05NodeFactory->SetAutomaticStop (false);
   idle06NodeFactory->SetAutomaticStop (false);
   standNodeFactory->SetAutomaticStop (false);
-/*
+
   randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
@@ -257,7 +257,7 @@ bool KrystalScene::CreateAvatar ()
   randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
   randomNodeFactory->AddNode (standNodeFactory, 1.0f);
-*/
+
   if (hairTest->physicsEnabled)
   {
     // Create the ragdoll controller
