@@ -87,6 +87,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	  object_reg, "crystalspace.shader.variablenameset");
     if (!svStrings) 
 	  printf ("No SV names string set!");
+
+	engine = csQueryRegistry<iEngine> (object_reg);
+	if (!engine) printf ("Failed to locate 3D engine!");
+
+	loader = csQueryRegistry<iLoader> (object_reg);
+	if (!loader) printf ("Failed to locate Loader!");
+
+	csLoadResult rc = loader ->Load ("/hairtest/fur.xml");
+	if (!rc.success)
+	  printf ("Can't load Fur library file!");
+
+	csRef<iMaterialWrapper> furMaterialWrapper = 
+	  engine->FindMaterial("fur_material");
+	if (!furMaterialWrapper)	
+	  printf ("Can't find fur material!");
+
+	furMaterial = furMaterialWrapper->GetMaterial();
   }
 
   FurMaterial::~FurMaterial ()
@@ -164,7 +181,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		CS::Material::MaterialBuilder::CreateColorMaterial
 		(object_reg,"hairDummyMaterial",csColor(1,0,0));
 
-	//materialWrapper->SetMaterial(material);
+	materialWrapper->SetMaterial(furMaterial);
 
 	meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
 
@@ -307,12 +324,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   {
 	CS::ShaderVarName furColorName (svStrings, "mat furcolor");	
 	csRef<csShaderVariable> shaderVariable = 
-	  material->GetVariable(furColorName);
+	  furMaterial->GetVariable(furColorName);
 	if(!shaderVariable)
 	{
-	  shaderVariable = material->GetVariableAdd(furColorName);
+	  shaderVariable = furMaterial->GetVariableAdd(furColorName);
 	  shaderVariable->SetValue(color);	
 	}
+  }
+
+  void FurMaterial::SetStrandWidth()
+  {
+	  CS::ShaderVarName strandWidthName (svStrings, "width");	
+	  csRef<csShaderVariable> shaderVariable = furMaterial->GetVariable(strandWidthName);
+
+	  shaderVariable->GetValue(strandWidth);
   }
 
   void FurMaterial::SetDensitymap ()
@@ -331,14 +356,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 	shaderVariable->GetValue(heightmap);
 	//printf("%s\n", heightmap->GetImageName());
-  }
-
-  void FurMaterial::SetStrandWidth()
-  {
-	CS::ShaderVarName strandWidthName (svStrings, "width");	
-	csRef<csShaderVariable> shaderVariable = material->GetVariable(strandWidthName);
-
-	shaderVariable->GetValue(strandWidth);
   }
 
   void FurMaterial::SetShader (csStringID type, iShader* shd)

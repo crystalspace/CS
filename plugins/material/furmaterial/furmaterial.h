@@ -139,7 +139,10 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	csRef<iMaterial> material;
 	csRef<iShaderVarStringSet> svStrings;
 	float strandWidth;
-
+	/// Model
+	csRef<iEngine> engine;
+	csRef<iLoader> loader;
+	csRef<iMaterial> furMaterial;
 	/// functions
 	void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes);
 	void SynchronizeGuideHairs();

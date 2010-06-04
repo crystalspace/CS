@@ -1,4 +1,4 @@
 SubDir TOP data hairtest ;
 
-InstallData [ Wildcard *.layout ] : data hairtest ;
-FileListEntriesData [ Wildcard *.layout ] : hairtest : data-demo ;
+InstallData [ Wildcard *.layout *.xml ] : data hairtest ;
+FileListEntriesData [ Wildcard *.layout *.xml ] : hairtest : data-demo ;

@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <shaders>
+    <shader>
+      <file>/shader/fur/fur_cg.xml</file>
+    </shader>
+  </shaders>
+  <textures/>
+  <materials>
+    <material name='fur_material'>
+      <shader type='standard'>fur_cg</shader>
+	  <shadervar type="float" name="width">0.005</shadervar>	  
+<!-- Uncomment the following line for red hair -->	  
+<!--	  
+	  <shadervar type="vector3" name="mat furcolor">1,0,0</shadervar>
+-->	  
+    </material>
+  </materials>
+  <sounds/>
+</library>
