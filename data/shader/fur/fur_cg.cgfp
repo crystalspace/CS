@@ -1,16 +1,14 @@
 <cgfp>
-  <variablemap variable="mat furcolor" destination="furColor" />
+  <variablemap variable="mat furcolor" destination="FurColor" />
   <program>
         <![CDATA[
-struct vertex2fragment { 
-float4 Hposition : POSITION;
-};
-
-float4 main (vertex2fragment IN,
-	uniform float4 furColor) : COLOR
+        
+float4 main (in float4 Color : COLOR0,
+          	uniform float4 FurColor) : COLOR
 {
-	return furColor;
+	return Color + FurColor;
 }
+
         ]]>
     </program>
 </cgfp>
