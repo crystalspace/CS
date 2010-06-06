@@ -21,7 +21,7 @@ SHELL ?= "/bin/sh" ;
 
 MACOSX_ENVIRONMENT = "export MACOSX_DEPLOYMENT_TARGET=10.2" ;
 
-PLUGIN.LFLAGS += "-bundle" ;
+PLUGIN.LFLAGS += "" ;
 
 # We use the ugly -Wl form, which does not contain embedded whitespace (unlike
 # "-framework AppKit"), to help external projects which use the result of
@@ -208,7 +208,7 @@ rule SystemLinkPlugin
 actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
 {
     $(MACOSX_ENVIRONMENT)
-    $(CMD.LINK) -bundle -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+    $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
 # LinkApplicationConsole exe : objects
