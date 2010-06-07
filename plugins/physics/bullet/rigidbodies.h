@@ -29,7 +29,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
 class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
-  csObject, iRigidBody, iBulletRigidBody>
+  csObject, iRigidBody, iBulletRigidBody>, public BulletBody
 {
   friend class csBulletMotionState;
   friend class csBulletKinematicMotionState;

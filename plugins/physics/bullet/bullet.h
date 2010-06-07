@@ -36,9 +36,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 class csBulletMotionState;
 class csBulletDebugDraw;
 class csBulletRigidBody;
+class csBulletSoftBody;
 class csBulletCollider;
 class csBulletTerrainCollider;
+class csBulletTerrainCellCollider;
 class csBulletDefaultMoveCallback;
+
+struct BulletBody
+{
+  virtual ~BulletBody () {}
+
+  csBulletBodyType bodyType;
+};
 
 /**
  * This is the implementation for the actual plugin.
@@ -191,8 +200,9 @@ public:
   virtual void SetDebugMode (csBulletDebugMode mode);
   virtual csBulletDebugMode GetDebugMode ();
 
-  virtual csBulletHitBeamResult HitBeam (const csVector3 &start,
-					 const csVector3 &end);
+  virtual bool HitBeam (const csVector3 &start,
+			const csVector3 &end,
+			csBulletHitBeamResult& result);
 
   virtual void SetInternalScale (float scale);
   virtual void SetStepParameters (float timeStep, size_t maxSteps,

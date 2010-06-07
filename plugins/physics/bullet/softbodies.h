@@ -29,7 +29,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
 class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
-  iBulletSoftBody>
+    iBulletSoftBody>, public BulletBody
 {
   friend class csBulletDynamicsSystem;
 

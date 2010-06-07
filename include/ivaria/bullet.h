@@ -42,25 +42,29 @@ struct iTerrainCell;
 struct iTerrainSystem;
 
 /**
- * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
- * whether a dynamic, kinematic or soft body has been hit.
- * \sa csHitBeamResult csSectorHitBeamResult
+ * The type of the body for a Bullet's collider.
  */
-struct csBulletHitBeamResult
+enum csBulletBodyType
 {
-  csBulletHitBeamResult () : body (0), softBody (0), isect (0.0f), vertexIndex (0) {}
+  CS_BULLET_UNDEFINED_BODY = 0,     /*!< Undefined body type. */
+  CS_BULLET_RIGID_BODY,             /*!< The body is a rigid body. */
+  CS_BULLET_SOFT_BODY,              /*!< The body is a soft body. */
+  CS_BULLET_TERRAIN                 /*!< The body is a terrain collider. */
+};
+
+/**
+ * Return structure for the iBulletDynamicSystem::HitBeam() routine,
+ * used when the object hit is a rigid body.
+ */
+struct csBulletRigidBodyHitBeamResult
+{
+  csBulletRigidBodyHitBeamResult ()
+    : body (0), isect (0.0f), normal (0.0f) {}
 
   /**
-   * The resulting dynamic or kinematic body that was hit, or 0 if no body was
-   * hit or if it is a soft body which is hit.
+   * The resulting rigid body that was hit.
    */
   iRigidBody* body;
-
-  /**
-   * The resulting soft body that was hit, or 0 if no soft body was hit or if it
-   * is a dynamic/kinematic soft body which is hit.
-   */
-  iBulletSoftBody* softBody;
 
   /**
    * Intersection point in world space.
@@ -68,10 +72,142 @@ struct csBulletHitBeamResult
   csVector3 isect;
 
   /**
-   * The index of the closest vertex of the soft body to be hit. This is only valid
-   * if it is a soft body which is hit (ie softBody is different than 0).
+   * Normal to the surface of the rigid body at the intersection point.
+   */
+  csVector3 normal;
+};
+
+/**
+ * Return structure for the iBulletDynamicSystem::HitBeam() routine,
+ * used when the object hit is a soft body.
+ */
+struct csBulletSoftBodyHitBeamResult
+{
+  csBulletSoftBodyHitBeamResult ()
+    : body (0), isect (0.0f), normal (0.0f), vertexIndex (0) {}
+
+  /**
+   * The resulting soft body that was hit.
+   */
+  iBulletSoftBody* body;
+
+  /**
+   * Intersection point in world space.
+   */
+  csVector3 isect;
+
+  /**
+   * Normal to the surface of the soft body at the intersection point.
+   */
+  csVector3 normal;
+
+  /**
+   * The index of the vertex closest to the intersection point.
    */
   size_t vertexIndex;
+};
+
+/**
+ * Return structure for the iBulletDynamicSystem::HitBeam() routine,
+ * used when the object hit is a terrain collider.
+ */
+struct csBulletTerrainHitBeamResult
+{
+  csBulletTerrainHitBeamResult ()
+    : terrain (0), isect (0.0f), normal (0.0f) {}
+
+  iBulletTerrainCollider* terrain;
+
+  /**
+   * Intersection point in world space.
+   */
+  csVector3 isect;
+
+  /**
+   * Normal to the surface of the terrain at the intersection point.
+   */
+  csVector3 normal;
+};
+
+/**
+ * Return structure for the iBulletDynamicSystem::HitBeam() routine.
+ *
+ * \sa csHitBeamResult csSectorHitBeamResult
+ */
+struct csBulletHitBeamResult
+{
+  csBulletHitBeamResult ()
+  : hasHit (false), bodyType (CS_BULLET_UNDEFINED_BODY), resultData (0) {}
+  virtual ~csBulletHitBeamResult ()
+  {
+    switch (bodyType)
+      {
+      case CS_BULLET_RIGID_BODY:
+	delete (csBulletRigidBodyHitBeamResult*) resultData;
+	break;
+      case CS_BULLET_SOFT_BODY:
+	delete (csBulletSoftBodyHitBeamResult*) resultData;
+	break;
+      case CS_BULLET_TERRAIN:
+	delete (csBulletTerrainHitBeamResult*) resultData;
+	break;
+      default:
+	break;
+      }
+  }
+
+  /**
+   * Whether the beam has hit a body or not.
+   */
+  bool hasHit;
+
+  /**
+   * The type of the body that was hit.
+   */
+  csBulletBodyType bodyType;
+
+  /**
+   * The data structure holding the results of the iBulletDynamicSystem::HitBeam()
+   * routine.
+   *
+   * You have to cast this data structure to a csBulletRigidBodyHitBeamResult,
+   * a csBulletSoftBodyHitBeamResult, or a csBulletTerrainHitBeamResult, depending
+   * on the value of the 'bodyType' field. If hasHit is false, then this pointer
+   * equals null.
+   *
+   * Here is an example of use:
+   * \code
+   *    csBulletHitBeamResult hitResult;
+   *    if (!bulletDynamicSystem->HitBeam (startBeam, endBeam, hitResult))
+   *      return false;
+   *
+   *    switch (hitResult.bodyType)
+   *      {
+   *      case CS_BULLET_RIGID_BODY:
+   *        csBulletRigidBodyHitBeamResult* result =   
+   *	      (csBulletRigidBodyHitBeamResult*) hitResult.resultData;
+   *        // ...
+   * 	    break;
+   *
+   *      case CS_BULLET_SOFT_BODY:
+   *        csBulletSoftBodyHitBeamResult* result =   
+   *	      (csBulletSoftBodyHitBeamResult*) hitResult.resultData;
+   *        // ...
+   * 	    break;
+   *
+   *      case CS_BULLET_TERRAIN:
+   *        csBulletTerrainHitBeamResult* result =   
+   *	      (csBulletTerrainHitBeamResult*) hitResult.resultData;
+   *        // ...
+   * 	    break;
+   *
+   *      default:
+   *	    break;
+   *      }
+   * 
+   * \endcode
+   */
+  void* resultData;
 };
 
 /**
@@ -92,7 +228,7 @@ enum csBulletDebugMode
  */
 struct iBulletDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE(iBulletDynamicSystem, 2, 0, 6);
+  SCF_INTERFACE(iBulletDynamicSystem, 3, 0, 0);
 
   /**
    * Draw the debug informations of the dynamic system. This has to be called
@@ -102,13 +238,13 @@ struct iBulletDynamicSystem : public virtual iBase
   virtual void DebugDraw (iView* rview) = 0;
 
   /**
-   * Follow a beam from start to end and return the first rigid or soft body
-   * that is hit. For rigid bodies, only dynamic or kinematic objects can be hit,
-   * static objects doesn't count.
+   * Follow a beam from start to end and return the first body that is hit.
+   * \return True if a body was hit, false otherwise.
    * \sa csBulletHitBeamResult iMeshWrapper::HitBeam() iSector::HitBeam()
    * iSector::HitBeamPortals()
    */
-  virtual csBulletHitBeamResult HitBeam (const csVector3 &start, const csVector3 &end) = 0;
+  virtual bool HitBeam (const csVector3 &start, const csVector3 &end,
+			csBulletHitBeamResult &result) = 0;
 
   /**
    * Set the internal scale to be applied to the whole dynamic world. Use this

@@ -41,6 +41,7 @@ csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isSta
     customMass (false), mass (1.0f), compoundChanged (false), insideWorld (false),
     linearDampening (dynSys->linearDampening), angularDampening (dynSys->angularDampening)
 {
+  bodyType = CS_BULLET_RIGID_BODY;
   btTransform identity;
   identity.setIdentity ();
   motionState = new csBulletMotionState (this, identity, identity);
@@ -80,7 +81,6 @@ void csBulletRigidBody::RebuildBody ()
 
   // create body infos
   btVector3 localInertia (0.0f, 0.0f, 0.0f);
-  void* userPointer (0);
   float bodyMass (0);
 
   // update the compound shape if changed
@@ -170,7 +170,6 @@ void csBulletRigidBody::RebuildBody ()
 
       mass = bodyMass = totalMass;
       compoundShape->calculateLocalInertia (totalMass, localInertia);
-      userPointer = (void *) this;
     }
   }
 
@@ -179,7 +178,6 @@ void csBulletRigidBody::RebuildBody ()
     // compound hasn't been changed
     bodyMass = mass;
     compoundShape->calculateLocalInertia (bodyMass, localInertia);
-    userPointer = (void *) this;
   }
 
   // don't do anything if there are no valid colliders
@@ -199,7 +197,7 @@ void csBulletRigidBody::RebuildBody ()
 
   // create new rigid body
   body = new btRigidBody (infos);
-  body->setUserPointer (userPointer);
+  body->setUserPointer ((BulletBody*) this);
   dynSys->bulletWorld->addRigidBody (body);
   insideWorld = true;
 

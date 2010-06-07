@@ -647,6 +647,7 @@ float csBulletCollider::GetVolume ()
 //----------------------- HeightMapCollider ----------------------------
 
 HeightMapCollider::HeightMapCollider (csBulletDynamicsSystem* dynSys,
+				      BulletBody* csBody,
 				      csLockedHeightData gridData,
 				      int gridWidth, int gridHeight,
 				      csVector3 gridSize,
@@ -695,6 +696,7 @@ HeightMapCollider::HeightMapCollider (csBulletDynamicsSystem* dynSys,
   // Create the rigid body and add it to the world
   body = new btRigidBody (0, 0, shape, btVector3 (0, 0, 0));	
   body->setWorldTransform (tr);
+  body->setUserPointer (csBody);
   dynSys->bulletWorld->addRigidBody (body);
 }
 
@@ -717,9 +719,11 @@ csBulletTerrainCellCollider::csBulletTerrainCellCollider (csBulletDynamicsSystem
 						      float minimumHeight, float maximumHeight)
   :  scfImplementationType (this)
 {
+  bodyType = CS_BULLET_TERRAIN;
+
   // Create the terrain collider
   collider = new HeightMapCollider
-    (dynSys, heightData, gridWidth, gridHeight, gridSize,
+    (dynSys, (BulletBody*) this, heightData, gridWidth, gridHeight, gridSize,
      transform, minimumHeight, maximumHeight);
 }
 
@@ -728,6 +732,8 @@ csBulletTerrainCellCollider::csBulletTerrainCellCollider (csBulletDynamicsSystem
 						  float minimumHeight, float maximumHeight)
   :  scfImplementationType (this)
 {
+  bodyType = CS_BULLET_TERRAIN;
+
   // Make sure that the cell data has been loaded
   cell->SetLoadState (iTerrainCell::Loaded);
 
@@ -743,8 +749,8 @@ csBulletTerrainCellCollider::csBulletTerrainCellCollider (csBulletDynamicsSystem
 
   // Create the terrain collider
   collider =
-    new HeightMapCollider (dynSys, cell->GetHeightData (), cell->GetGridWidth (),
-			   cell->GetGridHeight (), cell->GetSize (),
+    new HeightMapCollider (dynSys, (BulletBody*) this, cell->GetHeightData (),
+			   cell->GetGridWidth (), cell->GetGridHeight (), cell->GetSize (),
 			   cellTransform, minimumHeight, maximumHeight);
 }
 
@@ -761,6 +767,8 @@ csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys
   :  scfImplementationType (this), dynSys (dynSys), minimumHeight (minimumHeight),
      maximumHeight (maximumHeight)
 {
+  bodyType = CS_BULLET_TERRAIN;
+
   // Listen to the loading callbacks
   // TODO: listen also to iTerrainCellHeightDataCallback
   terrain->AddCellLoadListener (this);
@@ -787,7 +795,8 @@ csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys
     // Create the terrain collider
     ColliderData colliderData;
     colliderData.cell = cell;
-    colliderData.collider = new HeightMapCollider (dynSys, cell->GetHeightData (),
+    colliderData.collider = new HeightMapCollider (dynSys, (BulletBody*) this,
+						   cell->GetHeightData (),
 						   cell->GetGridWidth (),
 						   cell->GetGridHeight (), cell->GetSize (),
 						   cellTransform, minimumHeight, maximumHeight);
@@ -816,7 +825,7 @@ void csBulletTerrainCollider::OnCellLoad (iTerrainCell *cell)
   // Create the terrain collider
   ColliderData colliderData;
   colliderData.cell = cell;
-  colliderData.collider = new HeightMapCollider (dynSys, cell->GetHeightData (),
+  colliderData.collider = new HeightMapCollider (dynSys, (BulletBody*) this, cell->GetHeightData (),
 						 cell->GetGridWidth (),
 						 cell->GetGridHeight (), cell->GetSize (),
 						 cellTransform, minimumHeight, maximumHeight);

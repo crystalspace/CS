@@ -276,17 +276,23 @@ void csBulletDynamicsSystem::CheckCollisions ()
   // find new contacts by inspecting the bullet contact manifolds.
   for (int i = 0; i < numManifolds; i++)
   {
-    btPersistentManifold* contactManifold = bulletWorld->getDispatcher()->getManifoldByIndexInternal(i);
-    btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
-    btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
-    if (contactManifold->getNumContacts())
+    btPersistentManifold* contactManifold =
+      bulletWorld->getDispatcher ()->getManifoldByIndexInternal (i);
+    btCollisionObject* obA =
+      static_cast<btCollisionObject*> (contactManifold->getBody0 ());
+    btCollisionObject* obB =
+      static_cast<btCollisionObject*> (contactManifold->getBody1 ());
+    if (contactManifold->getNumContacts ())
     {
-        csBulletRigidBody *cs_obA = (csBulletRigidBody*)obA->getUserPointer();
-        if (cs_obA)
-          CheckCollision(*cs_obA, obB, *contactManifold);
-        csBulletRigidBody *cs_obB = (csBulletRigidBody*)obB->getUserPointer();
-        if (cs_obB)
-          CheckCollision(*cs_obB, obA, *contactManifold);
+      csBulletRigidBody *cs_obA =
+	dynamic_cast<csBulletRigidBody*> ((BulletBody*) obA->getUserPointer ());
+      if (cs_obA)
+	CheckCollision(*cs_obA, obB, *contactManifold);
+
+      csBulletRigidBody *cs_obB =
+	dynamic_cast<csBulletRigidBody*> ((BulletBody*) obB->getUserPointer ());
+      if (cs_obB)
+	CheckCollision(*cs_obB, obA, *contactManifold);
     }
   }
 }
@@ -595,101 +601,111 @@ csBulletDebugMode csBulletDynamicsSystem::GetDebugMode ()
   return debugDraw->GetDebugMode ();
 }
 
-csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
-(const csVector3 &start, const csVector3 &end)
+bool csBulletDynamicsSystem::HitBeam
+(const csVector3 &start, const csVector3 &end, csBulletHitBeamResult& result)
 {
   btVector3 rayFrom = CSToBullet (start, internalScale);
   btVector3 rayTo = CSToBullet (end, internalScale);
   btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
   bulletWorld->rayTest (rayFrom, rayTo, rayCallback);
 
-  csBulletHitBeamResult result;
   if (rayCallback.hasHit())
   {
-    btRigidBody* body = btRigidBody::upcast (rayCallback.m_collisionObject);
-    if (body)
-    {
-      result.body = (csBulletRigidBody*) body->getUserPointer ();
-      result.isect = BulletToCS (rayCallback.m_hitPointWorld,
-				 inverseInternalScale);
-    }
-  }
+    BulletBody* bulletBody =
+      static_cast<BulletBody*> (rayCallback.m_collisionObject->getUserPointer ());
 
-  // Check for soft bodies
-  if (!result.body && isSoftWorld)
-  {
-    // Find the closest body hit
-    btSoftRigidDynamicsWorld* softWorld =
-      static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
-
-    bool hitFound = false;
-    float closestFraction;
-    btSoftBody::sRayCast closestRay;
-    btSoftBody* closestBody;
-
-    btSoftBodyArray& sbs = softWorld->getSoftBodyArray ();
-    for (int ib = 0; ib < sbs.size (); ++ib)
-    {
-      btSoftBody* psb = sbs[ib];
-      btSoftBody::sRayCast ray;
-
-      if (psb->rayTest (rayFrom, rayTo, ray))
+    switch (bulletBody->bodyType)
       {
-	if (!hitFound)
+      case CS_BULLET_RIGID_BODY:
 	{
-	  closestFraction = ray.fraction;
-	  closestRay = ray;
-	  closestBody = psb;
-	  hitFound = true;
+	csBulletRigidBodyHitBeamResult* bodyResult =
+	  new csBulletRigidBodyHitBeamResult ();
+	result.hasHit = true;
+	result.bodyType = CS_BULLET_RIGID_BODY;
+	result.resultData = bodyResult;
+	bodyResult->body = dynamic_cast<csBulletRigidBody*> (bulletBody);
+	bodyResult->isect = BulletToCS (rayCallback.m_hitPointWorld,
+				       inverseInternalScale);
+	bodyResult->normal = BulletToCS (rayCallback.m_hitNormalWorld,
+					inverseInternalScale);	
+	return true;
+	break;
 	}
 
-	else if (ray.fraction < closestFraction)
+      case CS_BULLET_TERRAIN:
 	{
-	  closestFraction = ray.fraction;
-	  closestRay = ray;
-	  closestBody = psb;
+	csBulletTerrainHitBeamResult* bodyResult =
+	  new csBulletTerrainHitBeamResult ();
+	result.hasHit = true;
+	result.bodyType = CS_BULLET_TERRAIN;
+	result.resultData = bodyResult;
+	bodyResult->terrain = dynamic_cast<iBulletTerrainCollider*> (bulletBody);
+	bodyResult->isect = BulletToCS (rayCallback.m_hitPointWorld,
+					inverseInternalScale);
+	bodyResult->normal = BulletToCS (rayCallback.m_hitNormalWorld,
+					 inverseInternalScale);	
+	return true;
+	break;
 	}
-      }
-    }
 
-    // Set up the result data structure
-    if (hitFound)
-    {
-      result.softBody = (csBulletSoftBody*) closestBody->getUserPointer ();
-      btVector3 impact = rayFrom + (rayTo - rayFrom) * closestRay.fraction;
-      result.isect = BulletToCS (impact, inverseInternalScale);
-
-      // find the closest vertex
-      switch (closestRay.feature)
-      {
-      case btSoftBody::eFeature::Face:
+      case CS_BULLET_SOFT_BODY:
 	{
-	  btSoftBody::Face& face = closestBody->m_faces[closestRay.index];
-	  btSoftBody::Node* node = face.m_n[0];
-	  float distance = (node->m_x - impact).length2 ();
+	btSoftBody* body = btSoftBody::upcast (rayCallback.m_collisionObject);
+	btSoftBody::sRayCast ray;
+	if (body->rayTest (rayFrom, rayTo, ray))
+	{
+	  csBulletSoftBodyHitBeamResult* bodyResult =
+	    new csBulletSoftBodyHitBeamResult ();
+	  result.hasHit = true;
+	  result.bodyType = CS_BULLET_SOFT_BODY;
+	  result.resultData = bodyResult;
+	  bodyResult->body = dynamic_cast<csBulletSoftBody*> (bulletBody);
+	  bodyResult->isect = BulletToCS (rayCallback.m_hitPointWorld,
+					  inverseInternalScale);
+	  bodyResult->normal = BulletToCS (rayCallback.m_hitNormalWorld,
+					   inverseInternalScale);	
 
-	  for (int i = 1; i < 3; i++)
+	  // Find the closest vertex that was hit
+	  btVector3 impact = rayFrom + (rayTo - rayFrom) * ray.fraction;
+	  switch (ray.feature)
 	  {
-	    float nodeDistance = (face.m_n[i]->m_x - impact).length2 ();
-	    if (nodeDistance < distance)
+	  case btSoftBody::eFeature::Face:
 	    {
-	      node = face.m_n[i];
-	      distance = nodeDistance;
+	      btSoftBody::Face& face = body->m_faces[ray.index];
+	      btSoftBody::Node* node = face.m_n[0];
+	      float distance = (node->m_x - impact).length2 ();
+
+	      for (int i = 1; i < 3; i++)
+	      {
+		float nodeDistance = (face.m_n[i]->m_x - impact).length2 ();
+		if (nodeDistance < distance)
+		{
+		  node = face.m_n[i];
+		  distance = nodeDistance;
+		}
+	      }
+
+	      bodyResult->vertexIndex = size_t (node - &body->m_nodes[0]);
 	    }
+	    break;
+
+	  default:
+	    // TODO: may need other types?
+	    break;
 	  }
 
-	  result.vertexIndex = size_t (node - &closestBody->m_nodes[0]);
+	  return true;
 	}
+	}
+
 	break;
 
       default:
-	// TODO: may need other types?
 	break;
-      }
-    }
+	}
   }
 
-  return result;
+  return false;
 }
 
 void csBulletDynamicsSystem::SetInternalScale (float scale)

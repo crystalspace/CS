@@ -111,7 +111,8 @@ class HeightMapCollider
 {
  public:
   HeightMapCollider (csBulletDynamicsSystem* dynSys,
-		     csLockedHeightData heightData,
+		     BulletBody* csBody,
+		     csLockedHeightData gridData,
 		     int gridWidth, int gridHeight,
 		     csVector3 gridSize,
 		     csOrthoTransform transform,
@@ -126,7 +127,7 @@ class HeightMapCollider
 };
 
 class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCellCollider,
-  iBulletTerrainCollider>
+  iBulletTerrainCollider>, public BulletBody
 {
  public:
   csBulletTerrainCellCollider (csBulletDynamicsSystem* dynSys,
@@ -144,7 +145,7 @@ class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCel
 };
 
 class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollider,
-  iBulletTerrainCollider, iTerrainCellLoadCallback>
+  iBulletTerrainCollider, iTerrainCellLoadCallback>, public BulletBody
 {
  public:
   csBulletTerrainCollider (csBulletDynamicsSystem* dynSys, iTerrainSystem* terrain,
