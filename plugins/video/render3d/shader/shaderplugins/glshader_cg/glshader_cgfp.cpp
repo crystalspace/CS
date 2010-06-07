@@ -191,63 +191,8 @@ bool csShaderGLCGFP::TryCompile (uint loadFlags,
   {
     testForUnused.Push ("PARAM__clip_out_packed_distances1_UNUSED");
     testForUnused.Push ("PARAM__clip_out_packed_distances2_UNUSED");
-  
-    /* A list of unused variables to test for has been given. Test piecemeal
-     * which variables are really unused */
-    csSet<csString> allNewUnusedParams;
-    const size_t maxSteps = 8;
-    size_t step = maxSteps;
-    size_t offset = 0;
-    while (offset < testForUnused.GetSize())
-    {
-      unusedParams.DeleteAll();
-      for (size_t i = 0; i < offset; i++)
-	unusedParams.Add (testForUnused[i]);
-      for (size_t i = offset+step; i < testForUnused.GetSize(); i++)
-	unusedParams.Add (testForUnused[i]);
-      bool compileSucceeded = DefaultLoadProgram (0, programStr, progFP, 
-	limits, 
-	loadIgnoreErrors | (loadFlags & loadIgnoreConfigProgramOpts));
-	
-      if (compileSucceeded)
-      {
-        // Subset compiled fine, extract unused params
-	csSet<csString> newUnusedParams;
-	CollectUnusedParameters (newUnusedParams);
-	for (size_t i = 0; i < step; i++)
-	{
-	  if (offset+i >= testForUnused.GetSize()) break;
-	  const char* s = testForUnused[offset+i];
-	  if (newUnusedParams.Contains (s))
-	  {
-	    allNewUnusedParams.Add (s);
-	    WriteAdditionalDumpInfo ("Detected unused param", s);
-	  }
-	}
-        offset += step;
-        step = maxSteps;
-      }
-      else if (step > 1)
-      {
-        /* We might trip over a large array for whose elements can not be
-           allocated. Try will less parameters. */
-        step = step/2;
-      }
-      else
-      {
-        // Test for that single variable failed ... pretend it's unused
-        allNewUnusedParams.Add (testForUnused[offset]);
-	WriteAdditionalDumpInfo ("Detected (single) unused param", testForUnused[offset]);
-        offset += step;
-        step = maxSteps;
-      }
-    }
-    unusedParams = allNewUnusedParams;
   }
-  else
-  {
-    unusedParams.DeleteAll();
-  }
+  unusedParams.DeleteAll();
   if (!DefaultLoadProgram (0, programStr, progFP, 
       limits, (loadFlags & (~loadApplyVmap)) | loadFlagUnusedV2FForInit))
     return false;
@@ -255,7 +200,7 @@ bool csShaderGLCGFP::TryCompile (uint loadFlags,
     * pass 2.
     * @@@ FIXME: two passes are not always needed.
     */
-  CollectUnusedParameters (unusedParams);
+  CollectUnusedParameters (unusedParams, testForUnused);
   bool ret = DefaultLoadProgram (this, programStr, progFP, 
     limits, loadFlags | loadFlagUnusedV2FForInit);
     
