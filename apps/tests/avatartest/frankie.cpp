@@ -251,17 +251,17 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     if (frankieDead)
     {
       // Trace a physical beam to find if a rigid body was hit
-      csRef<iBulletDynamicSystem> bulletSystem =
-	scfQueryInterface<iBulletDynamicSystem> (avatarTest->dynamicSystem);
-      csBulletHitBeamResult physicsResult =
-	bulletSystem->HitBeam (startBeam, endBeam);
-
-      // Apply a big force at the point clicked by the mouse
-      if (physicsResult.body)
+      csBulletHitBeamResult hitResult;
+      if (avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam, hitResult)
+	  && hitResult.bodyType == CS_BULLET_RIGID_BODY)
       {
+	csBulletRigidBodyHitBeamResult* physicsResult =
+	  (csBulletRigidBodyHitBeamResult*) hitResult.resultData;
+
+	// Apply a big force at the point clicked by the mouse
 	csVector3 force = endBeam - startBeam;
 	force.Normalize ();
-	physicsResult.body->AddForceAtPos (physicsResult.isect, force * 10.0f);
+	physicsResult->body->AddForceAtPos (physicsResult->isect, force * 10.0f);
       }
 
       return true;
@@ -305,17 +305,19 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     }
 
     // Trace a physical beam to find which rigid body was hit
-    csRef<iBulletDynamicSystem> bulletSystem =
-      scfQueryInterface<iBulletDynamicSystem> (avatarTest->dynamicSystem);
-    csBulletHitBeamResult physicsResult = bulletSystem->HitBeam (startBeam, endBeam);
-
-    // Apply a big force at the point clicked by the mouse
-    if (physicsResult.body)
+    csBulletHitBeamResult hitResult;
+    if (avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam, hitResult)
+	&& hitResult.bodyType == CS_BULLET_RIGID_BODY)
     {
+      csBulletRigidBodyHitBeamResult* physicsResult =
+	(csBulletRigidBodyHitBeamResult*) hitResult.resultData;
+
+      // Apply a big force at the point clicked by the mouse
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
-      physicsResult.body->AddForceAtPos (physicsResult.isect, force * 1.0f);
-      physicsResult.body->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 1.0f));
+      physicsResult->body->AddForceAtPos (physicsResult->isect, force * 1.0f);
+      physicsResult->body->SetLinearVelocity (tc.GetT2O ()
+					      * csVector3 (0.0f, 0.0f, 1.0f));
     }
 
     return true;
