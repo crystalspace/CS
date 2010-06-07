@@ -1,0 +1,55 @@
+<cgfp>
+  <program>
+        <![CDATA[
+        
+// hair shader
+
+// vertex shader to fragment shader
+struct v2fConnector {
+  float3 angles             : TEXCOORD1;
+
+  fixed4 diffuseColor       : COLOR0;
+  fixed3 ambientColor       : COLOR1;   // this is ALMOST BLACK
+};
+
+float4 main(v2fConnector v2f,
+                  // Parameters for the hair model
+                  uniform half Rcol,
+                  uniform half TTcol,
+
+                  // Lookup tables for the hair model (fixed point)
+                  uniform sampler2D lookup1fixed,
+                  uniform sampler2D lookup2fixed
+            
+                  ) : COLOR
+{
+  Rcol = 1.87639;
+  TTcol = 10.70201;
+  
+  /* Compute the longitudinal reflectance component */
+  half2 uv1 = v2f.angles.xy;
+  half4 m = h4tex2D(lookup1fixed, uv1);
+  
+  /* Compute the azimuthal reflectance component */
+  half2 uv2;
+  uv2.x = m.w;
+  uv2.y = v2f.angles.z;
+  half4 ntt = h4tex2D(lookup2fixed, uv2);
+
+  /* Combine longitudinal and azimuthal reflectance */ 
+  half3 lighting;
+  lighting = (m.r * ntt.a * Rcol.r).xxx;	  // Primary highlight  
+  lighting = m.b * ntt.rgb * TTcol.r;      // Transmittance (using MTRT instead of MTT)
+  lighting += v2f.diffuseColor.rgb;	        // Diffuse lighting
+
+  float4 COL;
+  COL.rgb = lighting + v2f.diffuseColor.rgb*0.2 + v2f.ambientColor; 
+  
+  //COL.rgb = v2f.ambientColor;
+  COL.a = v2f.diffuseColor.a;
+
+  return COL;
+}
+        ]]>
+    </program>
+</cgfp>

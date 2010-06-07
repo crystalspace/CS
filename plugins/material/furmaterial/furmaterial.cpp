@@ -113,10 +113,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurMaterial::GenerateGeometry (iView* view, iSector *room)
   {
 	iRenderBuffer* vertexes = meshFactory->GetVertices();
+	iRenderBuffer* normals = meshFactory->GetNormals();
 	//iRenderBuffer* texCoord = meshFactory->GetTexCoords();
 	iRenderBuffer* indices = meshFactorySubMesh->GetIndices(0);
 
-	GenerateGuidHairs(indices, vertexes);
+	GenerateGuidHairs(indices, vertexes, normals);
 	SynchronizeGuideHairs();
 	GenerateHairStrands(indices, vertexes);
 
@@ -193,11 +194,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	meshState -> SetAnimationControl(animationControl);
   }
 
-  void FurMaterial::GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes)
+  void FurMaterial::GenerateGuidHairs(iRenderBuffer* indices, 
+	iRenderBuffer* vertexes, iRenderBuffer* normals)
   {
 	csRenderBufferLock<csVector3> positions (vertexes, CS_BUF_LOCK_READ);
+	csRenderBufferLock<csVector3> norms (normals, CS_BUF_LOCK_READ);
 	CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);    
 	csArray<int> uniqueIndices;
+		
+	csVector3 *normsArray = new csVector3[positions.GetSize()];
 
 	// chose unique indices
     while (tris.HasNext())
@@ -214,19 +219,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	  csTriangle triangleNew = csTriangle(uniqueIndices.Contains(tri.a),
 		uniqueIndices.Contains(tri.b), uniqueIndices.Contains(tri.c));
 	  guideHairsTriangles.Push(triangleNew);
+
+	  csVector3 normal;
+
+	  csMath3::CalcNormal(normal, positions.Get(tri.a), positions.Get(tri.b), 
+		positions.Get(tri.c));
+	  normal.Normalize();
+
+	  normsArray[tri.a] = normal;
+	  normsArray[tri.b] = normal;
+	  normsArray[tri.c] = normal;
     }
 
 	// generate the guide hairs - this should be done based on heightmap
 	for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
 	{
-  	  csVector3 pos = positions.Get(uniqueIndices.Get(i));
+  	  csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
+	    displaceEps * normsArray[uniqueIndices.Get(i)];
 	  
 	  csGuideHair guideHair;
 	  guideHair.controlPointsCount = 5;
 	  guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 	  
-	  for ( size_t i = 0 ; i < guideHair.controlPointsCount ; i ++ )
-		guideHair.controlPoints[i] = csVector3(pos.x,pos.y + i * 0.05f, pos.z);
+	  for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
+		guideHair.controlPoints[j] = pos + j * 50.f * normsArray[uniqueIndices.Get(i)];
 
 	  guideHairs.Push(guideHair);
 	}
@@ -248,7 +264,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	csRandomGen rng (csGetTicks ());
 	float bA, bB, bC; // barycentric coefficients
 
-	int density = 5;
+	float density = 5;
+
+	CS::ShaderVarName densityName (svStrings, "density");	
+	csRef<csShaderVariable> shaderVariable = furMaterial->GetVariable(densityName);
+
+	if (shaderVariable)
+	  shaderVariable->GetValue(density);
 
 	// for every triangle
     for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
@@ -318,6 +340,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	SetDensitymap();
 	SetHeightmap();
 	SetStrandWidth();
+	SetDisplaceEps();
   }
 
   void FurMaterial::SetColor(csColor color)
@@ -356,6 +379,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 	shaderVariable->GetValue(heightmap);
 	//printf("%s\n", heightmap->GetImageName());
+  }
+
+  void FurMaterial::SetDisplaceEps()
+  {
+    displaceEps = 0.02f;
+	
+	CS::ShaderVarName displaceEpsName (svStrings, "displaceEps");	
+	csRef<csShaderVariable> shaderVariable = 
+	  furMaterial->GetVariable(displaceEpsName);
+
+	if (shaderVariable)
+	  shaderVariable->GetValue(displaceEps);
   }
 
   void FurMaterial::SetShader (csStringID type, iShader* shd)
@@ -438,7 +473,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurAnimationControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
-	  
+
 	// first update the control points
 	if (furMaterial->physicsControl)
 	  for (size_t i = 0 ; i < furMaterial->guideHairs.GetSize(); i ++)
@@ -452,7 +487,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		UpdateHairStrand(&furMaterial->hairStrands.Get(i));
 
     const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
-	
+/*	
+	CS::ShaderVarName objEyePos (furMaterial->svStrings, "objEyePos");	
+	csRef<csShaderVariable> shaderVariable = furMaterial->furMaterial->GetVariable(objEyePos);
+
+	shaderVariable->SetValue(tc.GetOrigin());
+*/
 	int controlPoints = furMaterial->hairStrands.Get(0).controlPointsCount;
 	int numberOfStrains = furMaterial->hairStrands.GetSize();
 
@@ -555,9 +595,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   {
   	csVector3 first = coordinates[0];
 	csVector3 last = coordinates[coordinatesCount - 1];
-	
+
 	iBulletSoftBody* bulletBody = bulletDynamicSystem->
-	  CreateRope(first, last, coordinatesCount - 2);	//	replace with -1
+	  CreateRope(first, first + csVector3(0, 1, 0) * (last - first).Norm() , 
+	    coordinatesCount - 2);	//	replace with -1
 	bulletBody->SetMass (0.1f);
 	bulletBody->SetRigidity (0.99f);
 	bulletBody->AnchorVertex (0, rigidBody);

@@ -1,0 +1,90 @@
+<cgvp>
+  <variablemap variable="objEyePos" destination="objEyePos" />
+<program>
+<![CDATA[
+struct a2vConnector {
+    float4 objCoord : POSITION;
+    float3 objNormal : NORMAL;
+};
+
+struct v2fConnector {
+  float4 projCoord          : POSITION;
+
+  float3 angles             : TEXCOORD1;
+
+  half4 diffuseColor       : COLOR0;
+  half3 ambientColor       : COLOR1;
+};
+
+v2fConnector main(a2vConnector a2v,
+                  uniform float4x4 modelViewProj : state.matrix.mvp,
+
+                  // Light and eye directions in object space
+                  uniform float3 objLightDir,
+                  uniform float3 objEyePos,
+
+                  // Reflectance model parameters
+                  uniform float DiffuseCol,
+                  uniform float AmbientCol,
+                  
+                  uniform float3 worldPointLight0Pos,
+                  uniform float3 PointLightColor
+                  )
+{
+  v2fConnector v2f;
+  objEyePos = float3(-3,1,0);
+  objLightDir = float3(0,-1,0);
+  AmbientCol = 0;
+  DiffuseCol = 0.75;
+  PointLightColor = 1;
+  worldPointLight0Pos = float3(0,-9000,0);
+  float4 objColor = float4(0,0,0,1);
+  //a2v.objCoord.xyz += float3(0,0.02,0)
+  
+  /* Compute the tangent from adjacent vertices */
+  float3 objTangent = normalize(a2v.objNormal - a2v.objCoord.xyz);
+
+  /* Project */
+  float4 objCoord = a2v.objCoord;    
+  float4 projCoord = mul(modelViewProj, objCoord);
+  v2f.projCoord = projCoord;
+
+  float3 objEyeDir = normalize(objEyePos - objCoord.xyz);  
+
+  /* Compute longitudinal angles */
+  float2 uv1;
+  uv1.x = dot(objLightDir, objTangent);
+  uv1.y = dot(objEyeDir, objTangent);
+  v2f.angles.xy = 0.5 + 0.5*uv1;
+
+  /* Compute the azimuthal angle */
+  float3 lightPerp = objLightDir - uv1.x * objTangent;  
+  float3 eyePerp = objEyeDir - uv1.y * objTangent;  
+  float cosPhi = dot(eyePerp, lightPerp) * rsqrt(dot(eyePerp, eyePerp) * dot(lightPerp, lightPerp));
+  v2f.angles.z = 0.5*cosPhi + 0.5;
+
+  /* Compute diffuse lighting with phi-dependent component */
+  float diffuse = sqrt(max(0, 1 - uv1.x*uv1.x));
+
+  /* Pass colors */
+  v2f.diffuseColor.rgb = diffuse*objColor.rgb * DiffuseCol;
+  v2f.diffuseColor.a = objColor.a;
+  v2f.ambientColor = objColor.rgb * AmbientCol;
+
+
+  // compute point light lighting  
+  float3 Delta = worldPointLight0Pos-a2v.objCoord;
+  float3 pointLightDir = normalize(Delta);
+  float NDL = dot(objTangent, pointLightDir);
+
+  float pointLightDist = sqrt(dot(Delta,Delta)) * (1.0/400.0);
+  float att = min(1,max(0,pointLightDist));
+
+  v2f.ambientColor = (1.0-att) * PointLightColor;
+
+  return v2f;
+}
+
+]]>
+</program>
+</cgvp>

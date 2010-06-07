@@ -143,8 +143,10 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	csRef<iEngine> engine;
 	csRef<iLoader> loader;
 	csRef<iMaterial> furMaterial;
+	float displaceEps;
 	/// functions
-	void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes);
+	void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
+	  iRenderBuffer* normals);
 	void SynchronizeGuideHairs();
 	void GenerateHairStrands(iRenderBuffer* indices, iRenderBuffer* vertexes);
 	void SynchronizeHairsStrands();
@@ -152,6 +154,7 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	void SetHeightmap();
 	void SetStrandWidth();
 	void SetColor(csColor color);
+	void SetDisplaceEps();
 };
 
 class FurAnimationControl : public scfImplementation1 
