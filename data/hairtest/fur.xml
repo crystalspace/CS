@@ -7,6 +7,9 @@
     <shader>
       <file>/shader/fur/marschner_naludemo_cg.xml</file>
     </shader>	
+    <shader>
+      <file>/shader/fur/marschner_cg.xml</file>
+    </shader>	
   </shaders>
   <textures>
     <texture name='lookup1'>
@@ -18,7 +21,7 @@
   </textures>
   <materials>
     <material name='fur_material'>
-      <shader type='standard'>marschner_naludemo_cg</shader>
+      <shader type='standard'>marschner_cg</shader>
 	  
 	  <shadervar type="float" name="width">0.0025</shadervar>
 	  <shadervar type="float" name="density">10</shadervar>

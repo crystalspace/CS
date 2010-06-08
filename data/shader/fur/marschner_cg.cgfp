@@ -1,0 +1,71 @@
+<cgfp>
+  <variablemap variable="mat furcolor" destination="FurColor" />
+  <program>
+        <![CDATA[
+        
+static const float PI = 3.14159265f;
+
+struct vertex2fragment { 
+	float4 Position : POSITION;
+	float4 LightDir : TEXCOORD0;
+	float4 EyeVec : TEXCOORD1;
+};
+
+//Gaussian distribution
+float GaussianDistribution(float mu, float sigma, float x)
+{
+	float o = x - mu;
+	return (1 / ( sigma * sqrt( 2 * PI ) )) * exp( - o * o  / ( 2 * sigma * sigma ) );
+}
+
+// functions implementing Marschner
+float M( float shift, float width, float averageTheta)
+{
+	return GaussianDistribution(shift, width, averageTheta);
+}
+
+float3 EuclidianToSpherical (float3 vector)
+{
+	return float3( atan( vector[1], vector[0] ), PI/2 - acos( vector[2] ), 0 );
+}
+		
+float4 main (vertex2fragment IN,
+			uniform float4 FurColor) : COLOR
+{
+	//Fiber properties
+	float refraction = 1.55;
+	float3 absorption = 0.2;
+	float eccentricity = 0.85;
+
+	//Surface properties
+	float shiftR = -10; 
+	float shiftTT = -shiftR/2;
+	float shiftTRT = -3*shiftR/2;
+	float widthR = 5;
+	float widthTT = widthR/2;
+	float widthTRT = 2*widthR;
+	
+	//Glints
+	float glintScale = 0.5;
+	float causticWidth = 10;
+	float causticFade = 0.2;
+	float causticLimit = 0.5;
+
+	//Turn into spherical coordinates
+	float3 eye = EuclidianToSpherical(IN.EyeVec);
+	float3 light = EuclidianToSpherical(IN.LightDir);
+	
+	//Compute params
+	float differenceTheta = abs( eye[1] - light[1] ) / 2;
+	float halfTheta = ( eye[1] + light[1] ) / 2;
+	
+	float MR = M( shiftR, widthR, halfTheta );
+	float MTT = M( shiftTT, widthTT, halfTheta );
+	float MTRT = M( shiftTRT, widthTRT, halfTheta );
+
+	return FurColor;
+}
+
+        ]]>
+    </program>
+</cgfp>
