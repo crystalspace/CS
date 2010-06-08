@@ -194,7 +194,7 @@ AS_IF([test cs_cv_sys_pthread_setname_np = yes],
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to link base g++ libraries statically])
 AC_ARG_ENABLE([static-baselibs], [AC_HELP_STRING([--enable-static-baselibs],
-    [Link statically againts libgcc and libstdc++. Use with caution; enabling 
+    [Link statically against libgcc and libstdc++. Use with caution; enabling 
     this option may cause issues when dynamically linking against other C++
     modules. (default NO)])],
     [], [enable_static_baselibs=no])
