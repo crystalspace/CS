@@ -147,12 +147,20 @@ rule RelayLFlags
   else
   {
     local relayparamslist = "--relay $(2)" ;
-    local lflags = $(1[1]) ;
+    local lflags = "" ;
+    local lflags_path = "" ;
     # Concatenate arrays into single strings
     local lf ;
-    for lf in $(1[2-])
+    for lf in $(1)
     {
-      lflags = "$(lflags) $(lf)" ;
+      if [ Match ^-L(.*)$ : $(lf) ]
+      {
+        lflags_path = "$(lflags_path) $(lf)" ;
+      }
+      else
+      {
+        lflags = "$(lflags) $(lf)" ;
+      }
     }
     local relayparam = $(relayparamslist[1]) ;
     local r ;
@@ -173,7 +181,7 @@ rule RelayLFlags
     }
     local extlib result_lflags ;
     result_lflags +=  
-      "`CFLAGS=\"$(cflags)\" $(CMD.RELAYTOOL) --out-dir $(LOCATE_TARGET) $(minimalparam) $(relayparam) $(lflags)`"  ; 
+      "`CFLAGS=\"$(cflags)\" $(CMD.RELAYTOOL) $(lflags_path) --out-dir $(LOCATE_TARGET) $(minimalparam) $(relayparam) $(lflags)`"  ; 
     return $(result_lflags) ;
   }
 }
@@ -230,7 +238,7 @@ rule RelayLibs
     
     ExtraObjects $(<) : [ RelayObjs $(<) : $(3) : $(2) ] ;
     CFlags $(<) : $($(extlib).CFLAGS) ;
-    LFlags $(<) : [ RelayLFlags $($(extlib).LFLAGS) : $(3) : $(minimal_list) ] : noexternal ;
+    LFlags $(<) : [ RelayLFlags $(COMPILER.LFLAGS) $($(extlib).LFLAGS) : $(3) : $(minimal_list) ] : noexternal ;
     
     $(<).RELAYDEPS += $(extlib) ;
     $(<).RELAYLIBS.$(extlib) = $(3) ;
