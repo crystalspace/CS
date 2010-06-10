@@ -21,7 +21,7 @@
   </textures>
   <materials>
     <material name='fur_material'>
-      <shader type='standard'>fur_cg</shader>
+      <shader type='standard'>marschner_cg</shader>
 	  
 	  <shadervar type="float" name="width">0.005</shadervar>
 	  <shadervar type="float" name="density">5</shadervar>

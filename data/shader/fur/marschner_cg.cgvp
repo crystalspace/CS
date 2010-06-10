@@ -29,6 +29,7 @@ vertex2fragment main (app2vertex IN,
 {
 	vertex2fragment OUT;
 	
+	LightPos = float4(-3, 3, 0, 0);
 	float3 objLight = mul(ModelViewI, LightPos).xyz;
 	objLight -= IN.Position;
 	
@@ -37,11 +38,14 @@ vertex2fragment main (app2vertex IN,
 	obj2tang[1] = IN.BiNormal;
 	obj2tang[2] = IN.Normal;
 	
-	float3 tangLight = mul (obj2tang, objLight);
+    float3 objTangent = normalize(IN.Normal - IN.Position.xyz);	
 	
+	float3 tangLight = mul (obj2tang, objLight);
+	//float3 tangLight = dot (objTangent, objLight);
 	
 	float3 eyeVec = ModelViewIT[3] - IN.Position;
 	float3 tangEyeVec = mul (obj2tang, eyeVec);
+	//float3 tangEyeVec = dot (objTangent, eyeVec);
 	
 	OUT.Position = mul (ModelViewProj, IN.Position);
 	OUT.oLightDir = normalize(tangLight.xyz);

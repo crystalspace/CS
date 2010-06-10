@@ -524,7 +524,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		( furMaterial->hairStrands.Get(x).controlPoints[y] + strip );
 	}
 
-	//furMaterial->factoryState->CalculateNormals();
+	furMaterial->factoryState->CalculateNormals();
   }
 
   const csColor4* FurAnimationControl::UpdateColors (csTicks current, 
