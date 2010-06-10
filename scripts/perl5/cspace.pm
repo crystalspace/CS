@@ -22945,32 +22945,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::scfProcTexture ##############
-
-package cspace::scfProcTexture;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::csObject cspace::iTextureWrapper cspace::iProcTexture cspace );
-%OWNER = ();
-*IncRef = *cspacec::scfProcTexture_IncRef;
-*DecRef = *cspacec::scfProcTexture_DecRef;
-*GetRefCount = *cspacec::scfProcTexture_GetRefCount;
-*QueryInterface = *cspacec::scfProcTexture_QueryInterface;
-*AddRefOwner = *cspacec::scfProcTexture_AddRefOwner;
-*RemoveRefOwner = *cspacec::scfProcTexture_RemoveRefOwner;
-*GetInterfaceMetadata = *cspacec::scfProcTexture_GetInterfaceMetadata;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::iProcTexCallback ##############
 
 package cspace::iProcTexCallback;
