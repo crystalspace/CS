@@ -1,0 +1,55 @@
+<cgfp>
+
+<variablemap variable="projection transform inverse" destination="ProjInv" />
+<variablemap variable="light position" destination="lightPos" />
+<variablemap variable="light color" destination="lightCol" />
+<variablemap variable="light range" destination="lightRange" />
+  
+<program>
+<![CDATA[
+
+float4x4 ProjInv;
+ 
+struct vertex2fragment 
+{ 
+  float4 Position  : POSITION;
+  float4 ScreenPos : TEXCOORD0;
+};
+
+// Unproject screen position.
+float3 ScreenToWorldPosition(float3 screen)
+{  
+  float4 world = mul (ProjInv, float4 (screen, 1.0));
+  return world.xyz / world.w;
+}
+ 
+float4 main(vertex2fragment IN,
+            uniform float3 lightPos,
+            uniform float3 lightCol,
+            uniform float lightRange,
+            uniform sampler2D gBuffer0,
+            uniform sampler2D gBuffer1,
+            uniform sampler2D gBufferDepth) : COLOR
+{
+  // Do the perspective divide and converts to texture space.
+  float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
+  float2 screenUV = screenXY * 0.5 + 0.5;
+  
+  float4 albedo = tex2D (gBuffer0, screenUV);
+  float4 normal = tex2D (gBuffer1, screenUV);
+  float4 depth  = tex2D (gBufferDepth, screenUV);
+  
+  float3 p = ScreenToWorldPosition (float3 (screenXY.x, screenXY.y, depth.x));
+  float3 n = normal.xyz * 2.0 - 1;
+  float3 L = normalize (p - lightPos);
+  
+  // Compute phong lighting.
+  float3 color = albedo.xyz * lightCol * saturate (dot (n, L));
+
+  float4 output = float4 (color, 1.0);
+  return output;
+}
+
+]]>
+</program>
+</cgfp>

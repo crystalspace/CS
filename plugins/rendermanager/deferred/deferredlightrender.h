@@ -107,16 +107,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         sphereMesh->GetMeshObject ()->SetMaterialWrapper (sphereMaterial);
 
-        // TODO: Replace with real deferred lighting shader.
         csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
-        if (!loader->LoadShader ("/shader/particles/basic_fixed.xml"))
+        if (!loader->LoadShader ("/shader/deferred/point_light.xml"))
         {
           csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
             messageID, "Could not load basic_fixed shader");
         }
 
-        sphereMaterial->GetMaterial ()->SetShader (stringSet->Request ("base"), 
-          shaderManager->GetShader ("particles_basic_fixed"));
+        iShader *shader = shaderManager->GetShader ("deferred_point_light");
+        sphereMaterial->GetMaterial ()->SetShader (stringSet->Request ("base"), shader);
       }
 
     };
@@ -124,7 +123,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     DeferredLightRenderer(iGraphics3D *g3d, 
                           iShaderManager *shaderMgr,
                           iStringSet *stringSet,
-                          CS::RenderManager::RenderView *rview, 
+                          CS::RenderManager::RenderView *rview,
+                          iTextureHandle *gBuffer0, 
+                          iTextureHandle *gBuffer1,
+                          iTextureHandle *gBufferDepth,
                           PersistentData &persistent)
       : 
     graphics3D(g3d),
@@ -132,7 +134,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     stringSet(stringSet),
     rview(rview),
     persistentData(persistent)
-    {}
+    {
+      iShaderVarStringSet *svStringSet = shaderMgr->GetSVNameStringset ();
+
+      iShader *shader = persistentData.sphereMaterial->GetMaterial ()->GetShader (stringSet->Request ("base"));
+
+      csShaderVariable *gBuffer0SV = shader->GetVariableAdd (svStringSet->Request ("tex gbuffer 0"));
+      csShaderVariable *gBuffer1SV = shader->GetVariableAdd (svStringSet->Request ("tex gbuffer 1"));
+      csShaderVariable *gBufferDSV = shader->GetVariableAdd (svStringSet->Request ("tex gbuffer depth"));
+
+      gBuffer0SV->SetValue (gBuffer0);
+      gBuffer1SV->SetValue (gBuffer1);
+      gBufferDSV->SetValue (gBufferDepth);
+    }
 
     ~DeferredLightRenderer() {}
 
@@ -184,8 +198,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       if (num == 0)
         return;
 
+      // Setup shader variables.
       iMaterial *mat = persistentData.sphereMaterial->GetMaterial ();
       iShader *shader = mat->GetShader (stringSet->Request ("base"));
+
+      iShaderVarStringSet *svStringSet = shaderMgr->GetSVNameStringset ();
+
+      csShaderVariable *lightPosSV = shader->GetVariableAdd (svStringSet->Request ("light position"));
+      csShaderVariable *lightColSV = shader->GetVariableAdd (svStringSet->Request ("light color"));
+      csShaderVariable *lightRangeSV = shader->GetVariableAdd (svStringSet->Request ("light range"));
+
+      // Transform light position to view space.
+      csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
+      lightPos = graphics3D->GetWorldToCamera ().Other2This (lightPos);
+
+      lightPosSV->SetValue (lightPos);
+      lightColSV->SetValue (light->GetColor ());
+      lightRangeSV->SetValue (range);
+
+      shader->PushVariables (svStack);
+
+      // Draw the point light mesh.
       const size_t ticket = shader->GetTicket (*meshes[0], svStack);
       const size_t numPasses = shader->GetNumberOfPasses (ticket);
 
@@ -197,10 +230,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         for (int i = 0; i < num; i++)
         {
           csRenderMesh *m = meshes[i];
-          m->object2world = transform;
-
+          
           if(!shader->SetupPass (ticket, m, *m, svStack))
             continue;
+
+           m->object2world = transform;
+           m->cullMode = CS::Graphics::cullFlipped; // TODO: Set cullmode based on camera position.
 
           graphics3D->DrawMesh (m, *m, svStack);
           

@@ -527,16 +527,26 @@ bool RMDeferred::RenderView(iView *view)
   // Fills the accumulation buffer.
   AttachAccumBuffer (graphics3D);
   {
-    DrawFullscreenTexture (colorBuffer0, graphics3D);
+    //DrawFullscreenTexture (colorBuffer0, graphics3D);
 
     int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | startContext->drawFlags;
     drawFlags &= ~CSDRAW_CLEARSCREEN;
+
+    graphics2D->Clear (graphics2D->FindRGB (255, 0, 0));
 
     graphics3D->BeginDraw (drawFlags);
     graphics3D->SetWorldToCamera (startContext->cameraTransform.GetInverse ());
     
     //Iterate through lights adding results into accumulation buffer.
-    DeferredLightRenderer render (graphics3D, shaderManager, stringSet, rview, lightRenderPersistent);
+    DeferredLightRenderer render (graphics3D, 
+      shaderManager, 
+      stringSet, 
+      rview, 
+      colorBuffer0, 
+      colorBuffer1,
+      depthBuffer,
+      lightRenderPersistent);
+    
     ForEachLight (*startContext, render);
 
     graphics3D->FinishDraw ();
