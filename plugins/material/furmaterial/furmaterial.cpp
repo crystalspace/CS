@@ -242,7 +242,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	  guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 	  
 	  for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
-		guideHair.controlPoints[j] = pos + j * 50.f * normsArray[uniqueIndices.Get(i)];
+		guideHair.controlPoints[j] = pos + j * 75.f * normsArray[uniqueIndices.Get(i)];
 
 	  guideHairs.Push(guideHair);
 	}
@@ -524,7 +524,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		( furMaterial->hairStrands.Get(x).controlPoints[y] + strip );
 	}
 
-	furMaterial->factoryState->CalculateNormals();
+	//furMaterial->factoryState->CalculateNormals();
   }
 
   const csColor4* FurAnimationControl::UpdateColors (csTicks current, 
