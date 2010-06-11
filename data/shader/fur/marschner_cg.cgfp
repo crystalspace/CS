@@ -207,8 +207,9 @@ float4 Roots (uniform float p, uniform float eta, uniform float targetAngle)
 {
 	//o(p,y) = (6pc / PI - 2)y - 8(pc/PI^3)y^3 + pPI, c = asin( 1/eta )^-1
 	float c = asin(1 / eta);
-	c = 0.0001f;
+	//c = 0.0001f;
 	return CubicSolver( -8 * ( p * c / (PI * PI * PI) ), 0, ( 6 * p * c / PI - 2 ), p * PI - targetAngle );	
+	//return LinearSolver( -2, - targetAngle );	
 }
 
 float3 A(float3 absorption, float3 light, float p, float gammaI, float refraction, float etaPerpendicular, float etaParallel)
@@ -253,7 +254,7 @@ float3 NP (float3 absorption, float3 light, float p, float refraction, float eta
 	float3 result = 0;
 
 	// roots.w is not good some times ?!
-	// roots[3] = 1;
+	roots[3] = 3;
 	for (float index = 0; index < roots[3] ; index+=1 )
 	{
 		float gammaI = roots[index];
@@ -310,6 +311,7 @@ float4 main (vertex2fragment IN,
 	float etaPerpendicular = BravaisIndex( differenceTheta, refraction );
 	float etaParallel = (refraction * refraction) / etaPerpendicular;	
 	float differenceAzimuth = mod( abs( eye[0] - light[0] ), 2 * PI );
+	//differenceAzimuth = 0;
 	float cosDifferenceTheta = cos( differenceTheta );
 	float invSqrCosDifferenceTheta = 1 / (cosDifferenceTheta * cosDifferenceTheta);
 	float cosLight = cos( light[1] );
@@ -321,11 +323,11 @@ float4 main (vertex2fragment IN,
 	//float4 roots = Roots (1, etaPerpendicular, TargetAngle(1, differenceAzimuth));
 	
 	float4 OUT = 0;
-	//OUT.xyz += MR * NR * finalScale * 100;
-	OUT.xyz += NTT * finalScale * 10 ;
-	//OUT.xyz = (roots[3] == 1);
+	//OUT.xyz += NR * 1000;
+	//OUT.xyz += NTT * finalScale;
+	OUT.xyz = (MTT + MR + MTRT) * finalScale * 15 * FurColor;
 	
-	return OUT ;//* FurColor;
+	return OUT;
 	//Fresnel(1, 1, 1, 1, 1.4f);	
 	//A(1, light, 1, 3, 1, 1, 1);
 	//return CubicSolver(1, -1, 1, -1);
