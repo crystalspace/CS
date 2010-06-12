@@ -21,10 +21,10 @@
   </textures>
   <materials>
     <material name='fur_material'>
-      <shader type='standard'>marschner_cg</shader>
+      <shader type='standard'>marschner_naludemo_cg</shader>
 	  
-	  <shadervar type="float" name="width">0.005</shadervar>
-	  <shadervar type="float" name="density">5</shadervar>
+	  <shadervar type="float" name="width">0.0025</shadervar>
+	  <shadervar type="float" name="density">10</shadervar>
 	  <shadervar type="float" name="displaceEps">25</shadervar>
 	  
       <shadervar type="texture" name="tex lookup1">lookup1</shadervar>

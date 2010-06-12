@@ -487,7 +487,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		UpdateHairStrand(&furMaterial->hairStrands.Get(i));
 
     const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
-/*	
+/*
 	CS::ShaderVarName objEyePos (furMaterial->svStrings, "objEyePos");	
 	csRef<csShaderVariable> shaderVariable = furMaterial->furMaterial->GetVariable(objEyePos);
 
