@@ -29,6 +29,65 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
 
   /**
+   * Creates a transform that will transform a sphere centered at the origin 
+   * with a radius of 1 to match the position and size of the given point light.
+   */
+  inline csReversibleTransform CreatePointLightTransform(iLight *light)
+  {
+    csVector3 pos = light->GetMovable ()->GetFullPosition ();
+    float range = light->GetCutoffDistance ();
+
+    csMatrix3 scale (range, 0.0f,  0.0f,
+                     0.0f,  range, 0.0f,
+                     0.0f,  0.0f,  range);
+
+    return csReversibleTransform (scale, pos);
+  }
+
+  /**
+   * Returns true if the given point is inside the volume of the given point light.
+   */
+  inline bool IsPointInsidePointLight(const csVector3 &p, iLight *light)
+  {
+    const float r = light->GetCutoffDistance ();
+    const csVector3 c = light->GetMovable ()->GetFullPosition ();
+
+    return (p - c).SquaredNorm () <= (r * r);
+  }
+
+  /**
+   * Returns true if the given point is inside the volume of the given spot light.
+   */
+  inline bool IsPointInsideSpotLight(const csVector3 &p, iLight *light)
+  {
+    // TODO
+    return false;
+  }
+
+  /**
+   * Returns true if the given point is inside the volume of the given light.
+   */
+  inline bool IsPointInsideLight(const csVector3 &p, iLight *light)
+  {
+      switch (light->GetType ())
+      {
+      case CS_LIGHT_POINTLIGHT:
+        return IsPointInsidePointLight (p, light);
+        break;
+      case CS_LIGHT_SPOTLIGHT:
+        return IsPointInsideSpotLight (p, light);
+        break;
+      case CS_LIGHT_DIRECTIONAL:
+        return true; // All points are affected by a directional light.
+        break;
+      default:
+        CS_ASSERT(false);
+      };
+
+      return false;
+  }
+
+  /**
    * Renderer for a single context where all lights are drawn
    * using information from a GBuffer.
    *
@@ -137,11 +196,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     {
       iShaderVarStringSet *svStringSet = shaderMgr->GetSVNameStringset ();
 
-      iShader *shader = persistentData.sphereMaterial->GetMaterial ()->GetShader (stringSet->Request ("base"));
-
-      csShaderVariable *gBuffer0SV = shader->GetVariableAdd (svStringSet->Request ("tex gbuffer 0"));
-      csShaderVariable *gBuffer1SV = shader->GetVariableAdd (svStringSet->Request ("tex gbuffer 1"));
-      csShaderVariable *gBufferDSV = shader->GetVariableAdd (svStringSet->Request ("tex gbuffer depth"));
+      csShaderVariable *gBuffer0SV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer 0"));
+      csShaderVariable *gBuffer1SV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer 1"));
+      csShaderVariable *gBufferDSV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer depth"));
 
       gBuffer0SV->SetValue (gBuffer0);
       gBuffer1SV->SetValue (gBuffer1);
@@ -175,27 +232,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     void RenderPointLight(iLight *light)
     {
-      csShaderVariableStack &svStack = shaderMgr->GetShaderVariableStack ();
-
-      csVector3 pos = light->GetMovable ()->GetFullPosition ();
-      float range = light->GetCutoffDistance ();
-
-      csMatrix3 scale (range, 0.0f,  0.0f,
-                       0.0f,  range, 0.0f,
-                       0.0f,  0.0f,  range);
-
-      csReversibleTransform transform (scale, pos);
-
       iMeshObject *obj = persistentData.sphereMesh->GetMeshObject ();
-      obj->SetColor (light->GetColor ());
 
       int num = 0;
-      csRenderMesh **meshes = obj->GetRenderMeshes (num, 
-        rview, 
-        persistentData.sphereMesh->GetMovable (), 
-        0);
+      csRenderMesh **meshes = obj->GetRenderMeshes (num, rview, 
+        persistentData.sphereMesh->GetMovable (), 0);
 
-      if (num == 0)
+      if (num <= 0)
         return;
 
       // Setup shader variables.
@@ -210,39 +253,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       // Transform light position to view space.
       csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
-      lightPos = graphics3D->GetWorldToCamera ().Other2This (lightPos);
+      lightPos = graphics3D->GetWorldToCamera ().This2Other (lightPos);
 
       lightPosSV->SetValue (lightPos);
       lightColSV->SetValue (light->GetColor ());
-      lightRangeSV->SetValue (range);
+      lightRangeSV->SetValue (light->GetCutoffDistance ());
 
+      // Update shader stack.
+      csShaderVariableStack &svStack = shaderMgr->GetShaderVariableStack ();
       shader->PushVariables (svStack);
 
       // Draw the point light mesh.
-      const size_t ticket = shader->GetTicket (*meshes[0], svStack);
-      const size_t numPasses = shader->GetNumberOfPasses (ticket);
+      csVector3 camPos = rview->GetCamera ()->GetTransform ().GetO2TTranslation ();
 
-      for (size_t p = 0; p < numPasses; p++)
-      {
-        if (!shader->ActivatePass (ticket, p)) 
-          continue;
-
-        for (int i = 0; i < num; i++)
-        {
-          csRenderMesh *m = meshes[i];
-          
-          if(!shader->SetupPass (ticket, m, *m, svStack))
-            continue;
-
-           m->object2world = transform;
-           m->cullMode = CS::Graphics::cullFlipped; // TODO: Set cullmode based on camera position.
-
-          graphics3D->DrawMesh (m, *m, svStack);
-          
-          shader->TeardownPass (ticket);
-        }
-        shader->DeactivatePass (ticket);
-      }
+      DrawLightMesh (meshes, 
+                     num, 
+                     CreatePointLightTransform (light), 
+                     shader, 
+                     svStack,
+                     IsPointInsideLight (camPos, light));
     }
 
     void RenderSpotLight(iLight *light)
@@ -251,6 +280,50 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     void RenderDirectionalLight(iLight *light)
     {
+    }
+
+    /**
+     * Draws the given light mesh using the supplied shader.
+     */
+    void DrawLightMesh(csRenderMesh **meshes, 
+                       int n, 
+                       const csReversibleTransform &transform,
+                       iShader *shader,
+                       csShaderVariableStack &svStack,
+                       bool insideLight)
+    {
+      CS_ASSERT (n > 0);
+
+      const size_t ticket = shader->GetTicket (*meshes[0], svStack);
+      const size_t numPasses = shader->GetNumberOfPasses (ticket);
+
+      CS::Graphics::MeshCullMode cullMode = CS::Graphics::cullNormal;
+      if (insideLight)
+        cullMode = CS::Graphics::cullFlipped;
+
+      for (size_t p = 0; p < numPasses; p++)
+      {
+        if (!shader->ActivatePass (ticket, p)) 
+          continue;
+
+        for (int i = 0; i < n; i++)
+        {
+          csRenderMesh *m = meshes[i];
+          
+          if(!shader->SetupPass (ticket, m, *m, svStack))
+            continue;
+
+          // Always use additive blending so we do not loose the contribution from other lights.
+          m->mixmode = CS_FX_ADD;
+          m->cullMode = cullMode;
+          m->object2world = transform;
+
+          graphics3D->DrawMesh (m, *m, svStack);
+          
+          shader->TeardownPass (ticket);
+        }
+        shader->DeactivatePass (ticket);
+      }
     }
 
     iGraphics3D *graphics3D;

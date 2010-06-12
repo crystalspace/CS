@@ -1,9 +1,9 @@
 <cgfp>
 
 <variablemap variable="projection transform inverse" destination="ProjInv" />
-<variablemap variable="light position" destination="lightPos" />
-<variablemap variable="light color" destination="lightCol" />
-<variablemap variable="light range" destination="lightRange" />
+<variablemap variable="light position" destination="LightPos" />
+<variablemap variable="light color" destination="LightCol" />
+<variablemap variable="light range" destination="LightRange" />
   
 <program>
 <![CDATA[
@@ -11,8 +11,7 @@
 float4x4 ProjInv;
  
 struct vertex2fragment 
-{ 
-  float4 Position  : POSITION;
+{
   float4 ScreenPos : TEXCOORD0;
 };
 
@@ -24,14 +23,14 @@ float3 ScreenToWorldPosition(float3 screen)
 }
  
 float4 main(vertex2fragment IN,
-            uniform float3 lightPos,
-            uniform float3 lightCol,
-            uniform float lightRange,
+            uniform float3 LightPos,
+            uniform float3 LightCol,
+            uniform float LightRange,
             uniform sampler2D gBuffer0,
             uniform sampler2D gBuffer1,
             uniform sampler2D gBufferDepth) : COLOR
 {
-  // Do the perspective divide and converts to texture space.
+  // Do the perspective divide and convert to texture space.
   float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
   float2 screenUV = screenXY * 0.5 + 0.5;
   
@@ -40,11 +39,16 @@ float4 main(vertex2fragment IN,
   float4 depth  = tex2D (gBufferDepth, screenUV);
   
   float3 p = ScreenToWorldPosition (float3 (screenXY.x, screenXY.y, depth.x));
-  float3 n = normal.xyz * 2.0 - 1;
-  float3 L = normalize (p - lightPos);
+  float3 n = normal.xyz * 2.0 - 1.0;
+  float3 L = p - LightPos;
+  
+  float dist = length (L);
+  L = L / dist;
+  
+  float att = 1.0 - (dist / LightRange);
   
   // Compute phong lighting.
-  float3 color = albedo.xyz * lightCol * saturate (dot (n, L));
+  float3 color = albedo.rgb * LightCol * saturate (dot (n, L)) * att;
 
   float4 output = float4 (color, 1.0);
   return output;

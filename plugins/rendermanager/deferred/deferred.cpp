@@ -532,7 +532,7 @@ bool RMDeferred::RenderView(iView *view)
     int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | startContext->drawFlags;
     drawFlags &= ~CSDRAW_CLEARSCREEN;
 
-    graphics2D->Clear (graphics2D->FindRGB (255, 0, 0));
+    graphics2D->Clear (graphics2D->FindRGB (0, 0, 0));
 
     graphics3D->BeginDraw (drawFlags);
     graphics3D->SetWorldToCamera (startContext->cameraTransform.GetInverse ());

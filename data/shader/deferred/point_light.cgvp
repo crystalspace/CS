@@ -4,7 +4,7 @@
 
 struct app2vertex 
 {
-  float4 Position : POSITION;
+  float3 Position : POSITION;
 };
 
 struct vertex2fragment 
@@ -18,7 +18,7 @@ vertex2fragment main(app2vertex IN,
 {
   vertex2fragment OUT;
 
-  float4 pos = mul (ModelViewProj, IN.Position);
+  float4 pos = mul (ModelViewProj, float4 (IN.Position, 1.0));
   OUT.Position = pos;
   OUT.ScreenPos = pos;
 

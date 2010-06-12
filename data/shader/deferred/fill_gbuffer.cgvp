@@ -4,16 +4,16 @@
 
 struct app2vertex 
 {
-  float4 Position : POSITION;
-  float4 Normal : NORMAL;
-  float4 TexCoord : TEXCOORD0;
+  float3 Position : POSITION;
+  float3 Normal : NORMAL;
+  float2 TexCoord : TEXCOORD0;
 };
 
 struct vertex2fragment 
 { 
   float4 Position : POSITION;
-  float4 TexCoord : TEXCOORD0;
-  float4 ViewNormal : TEXCOORD1;
+  float2 TexCoord : TEXCOORD0;
+  float3 ViewNormal : TEXCOORD1;
 };
 
 vertex2fragment main(app2vertex IN,
@@ -24,10 +24,10 @@ vertex2fragment main(app2vertex IN,
 {
   vertex2fragment OUT;
 
-  float4 pos = mul (ModelViewProj, IN.Position);
+  float4 pos = mul (ModelViewProj, float4 (IN.Position, 1.0));
   OUT.Position = pos;
   OUT.TexCoord = IN.TexCoord;
-  OUT.ViewNormal = mul (ModelViewIT, IN.Normal);
+  OUT.ViewNormal = mul (ModelViewIT, float4 (IN.Normal, 0.0));
 
   return OUT;
 }

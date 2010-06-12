@@ -4,9 +4,8 @@
  
 struct vertex2fragment 
 { 
-  float4 Position : POSITION;
-  float3 TexCoord : TEXCOORD0;
-  float4 ViewNormal : TEXCOORD1;
+  float2 TexCoord : TEXCOORD0;
+  float3 ViewNormal : TEXCOORD1;
 };
 
 struct fragmentOutput
@@ -21,8 +20,10 @@ fragmentOutput main(vertex2fragment IN,
 {
   fragmentOutput output;
   
+  float3 n = (normalize(IN.ViewNormal) + 1) * 0.5;
+  
   output.Color0 = float4 (tex2D (TexDiffuse, IN.TexCoord).rgb, 1.0);
-  output.Color1 = (normalize(IN.ViewNormal) + 1) * 0.5;
+  output.Color1 = float4 (n.xyz, 0.0);
   output.Color2 = float4 (0, 0, 0, 0);
 
   return output;
