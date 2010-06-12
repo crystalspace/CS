@@ -45,6 +45,9 @@ public:
   
   bool Precache (const ProfileLimitsPair& limitsPair,
     const char* tag, iHierarchicalCache* cache);
+  iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* tag = 0);
 
   virtual csVertexAttrib ResolveBufferDestination (const char* binding);
 };

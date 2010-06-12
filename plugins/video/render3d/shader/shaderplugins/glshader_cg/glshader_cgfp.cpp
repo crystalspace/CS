@@ -165,6 +165,22 @@ bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
   return ret;
 }
 
+iShaderProgram::CacheLoadResult csShaderGLCGFP::LoadFromCache (
+  iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
+  csRef<iString>* failReason, csRef<iString>* tag)
+{
+  if (!shaderPlug->enableFP)
+  {
+    if (failReason)
+      failReason->AttachNew (new scfString ("Cg FP not available or disabled"));
+    /* Claim a load success, but invalid shader, to prevent loading from
+	scratch (which will fail anyway) */
+    return loadSuccessShaderInvalid;
+  }
+  return csShaderGLCGCommon::LoadFromCache (cache, previous, programNode,
+    failReason, tag, &cacheLimits);
+}
+
 bool csShaderGLCGFP::TryCompile (uint loadFlags,
                                  const ProfileLimitsPair& limits)
 {
