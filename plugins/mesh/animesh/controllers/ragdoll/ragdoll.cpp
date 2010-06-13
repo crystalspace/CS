@@ -485,6 +485,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       if (boneData.state != CS_RAGDOLL_STATE_DYNAMIC)
         continue;
 
+      // Get the bind transform of the bone
+      csQuaternion skeletonRotation;
+      csVector3 skeletonOffset;
+      skeleton->GetFactory ()->GetTransformBoneSpace (boneData.boneID, skeletonRotation,
+						      skeletonOffset);
+
       csOrthoTransform bodyTransform = boneData.rigidBody->GetTransform ();
 
       BoneID parentBoneID = skeleton->GetFactory ()->GetBoneParent (boneData.boneID);
@@ -508,8 +514,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
 	// reset the bone offset & rotation
 	state->SetBoneUsed (boneData.boneID);
-	state->GetVector (boneData.boneID) = boneOffset;
-	state->GetQuaternion (boneData.boneID) = boneRotation;
+	state->GetVector (boneData.boneID) = boneOffset - skeletonOffset;
+	state->GetQuaternion (boneData.boneID) = boneRotation * skeletonRotation.GetConjugate ();
 
 	continue;
       }
@@ -526,10 +532,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
 	// apply the new transform to the csSkeletalState2
 	state->SetBoneUsed (boneData.boneID);
-	state->GetVector (boneData.boneID) = relativeTransform.GetOrigin ();
+	state->GetVector (boneData.boneID) = relativeTransform.GetOrigin () - skeletonOffset;
 	csQuaternion quaternion;
 	quaternion.SetMatrix (relativeTransform.GetT2O ());
-	state->GetQuaternion (boneData.boneID) = quaternion;
+	state->GetQuaternion (boneData.boneID) = quaternion * skeletonRotation.GetConjugate ();
 
 	continue;
       }

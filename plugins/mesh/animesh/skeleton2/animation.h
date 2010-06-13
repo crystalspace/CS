@@ -99,8 +99,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     virtual CS::Animation::ChannelID FindChannel (BoneID bone) const;
 
+    virtual size_t GetChannelCount () const;
+
+    virtual BoneID GetChannelBone (CS::Animation::ChannelID channel) const;
+
     virtual void AddKeyFrame (CS::Animation::ChannelID channel, float time, 
       const csQuaternion& rotation, const csVector3& offset);
+
+    virtual void SetKeyFrame (CS::Animation::ChannelID channel, 
+			      CS::Animation::KeyFrameID keyframe,
+			      const csQuaternion& rotation, const csVector3& offset);
 
     virtual size_t GetKeyFrameCount (CS::Animation::ChannelID channel) const;
 
@@ -115,6 +123,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       float baseWeight, float playbackTime, bool isPlayingCyclic) const;
 
     virtual float GetDuration () const;
+
+    virtual void SetFramesInBindSpace (bool isBindSpace);
+
+    virtual bool GetFramesInBindSpace () const;
 
   private:
     csString name;
@@ -143,6 +155,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     csPDelArray<AnimationChannel> channels;
 
     float duration;
+    bool isBindSpace;
   };     
 
 }
