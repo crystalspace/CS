@@ -15958,6 +15958,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetTwoKeyFrames = *cspacec::iSkeletonAnimation2_GetTwoKeyFrames;
 *BlendState = *cspacec::iSkeletonAnimation2_BlendState;
 *GetDuration = *cspacec::iSkeletonAnimation2_GetDuration;
+*SetKeyFrame = *cspacec::iSkeletonAnimation2_SetKeyFrame;
+*SetFramesInBindSpace = *cspacec::iSkeletonAnimation2_SetFramesInBindSpace;
+*GetFramesInBindSpace = *cspacec::iSkeletonAnimation2_GetFramesInBindSpace;
+*GetChannelCount = *cspacec::iSkeletonAnimation2_GetChannelCount;
+*GetChannelBone = *cspacec::iSkeletonAnimation2_GetChannelBone;
 *scfGetVersion = *cspacec::iSkeletonAnimation2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
