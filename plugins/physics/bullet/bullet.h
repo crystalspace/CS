@@ -200,9 +200,8 @@ public:
   virtual void SetDebugMode (csBulletDebugMode mode);
   virtual csBulletDebugMode GetDebugMode ();
 
-  virtual bool HitBeam (const csVector3 &start,
-			const csVector3 &end,
-			csBulletHitBeamResult& result);
+  virtual csBulletHitBeamResult HitBeam (const csVector3 &start,
+					 const csVector3 &end);
 
   virtual void SetInternalScale (float scale);
   virtual void SetStepParameters (float timeStep, size_t maxSteps,

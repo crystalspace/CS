@@ -601,13 +601,15 @@ csBulletDebugMode csBulletDynamicsSystem::GetDebugMode ()
   return debugDraw->GetDebugMode ();
 }
 
-bool csBulletDynamicsSystem::HitBeam
-(const csVector3 &start, const csVector3 &end, csBulletHitBeamResult& result)
+csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
+(const csVector3 &start, const csVector3 &end)
 {
   btVector3 rayFrom = CSToBullet (start, internalScale);
   btVector3 rayTo = CSToBullet (end, internalScale);
   btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
   bulletWorld->rayTest (rayFrom, rayTo, rayCallback);
+
+  csBulletHitBeamResult result;
 
   if (rayCallback.hasHit())
   {
@@ -618,34 +620,28 @@ bool csBulletDynamicsSystem::HitBeam
       {
       case CS_BULLET_RIGID_BODY:
 	{
-	csBulletRigidBodyHitBeamResult* bodyResult =
-	  new csBulletRigidBodyHitBeamResult ();
-	result.hasHit = true;
-	result.bodyType = CS_BULLET_RIGID_BODY;
-	result.resultData = bodyResult;
-	bodyResult->body = dynamic_cast<csBulletRigidBody*> (bulletBody);
-	bodyResult->isect = BulletToCS (rayCallback.m_hitPointWorld,
-				       inverseInternalScale);
-	bodyResult->normal = BulletToCS (rayCallback.m_hitNormalWorld,
-					inverseInternalScale);	
-	return true;
-	break;
+	  result.hasHit = true;
+	  result.bodyType = CS_BULLET_RIGID_BODY;
+	  result.rigidBody = dynamic_cast<csBulletRigidBody*> (bulletBody);
+	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
+				     inverseInternalScale);
+	  result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
+				      inverseInternalScale);	
+	  return result;
+	  break;
 	}
 
       case CS_BULLET_TERRAIN:
 	{
-	csBulletTerrainHitBeamResult* bodyResult =
-	  new csBulletTerrainHitBeamResult ();
-	result.hasHit = true;
-	result.bodyType = CS_BULLET_TERRAIN;
-	result.resultData = bodyResult;
-	bodyResult->terrain = dynamic_cast<iBulletTerrainCollider*> (bulletBody);
-	bodyResult->isect = BulletToCS (rayCallback.m_hitPointWorld,
-					inverseInternalScale);
-	bodyResult->normal = BulletToCS (rayCallback.m_hitNormalWorld,
-					 inverseInternalScale);	
-	return true;
-	break;
+	  result.hasHit = true;
+	  result.bodyType = CS_BULLET_TERRAIN;
+	  result.terrain = dynamic_cast<iBulletTerrainCollider*> (bulletBody);
+	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
+				     inverseInternalScale);
+	  result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
+				      inverseInternalScale);	
+	  return result;
+	  break;
 	}
 
       case CS_BULLET_SOFT_BODY:
@@ -654,18 +650,16 @@ bool csBulletDynamicsSystem::HitBeam
 	btSoftBody::sRayCast ray;
 	if (body->rayTest (rayFrom, rayTo, ray))
 	{
-	  csBulletSoftBodyHitBeamResult* bodyResult =
-	    new csBulletSoftBodyHitBeamResult ();
 	  result.hasHit = true;
 	  result.bodyType = CS_BULLET_SOFT_BODY;
-	  result.resultData = bodyResult;
-	  bodyResult->body = dynamic_cast<csBulletSoftBody*> (bulletBody);
-	  bodyResult->isect = BulletToCS (rayCallback.m_hitPointWorld,
-					  inverseInternalScale);
-	  bodyResult->normal = BulletToCS (rayCallback.m_hitNormalWorld,
-					   inverseInternalScale);	
+	  result.softBody = dynamic_cast<csBulletSoftBody*> (bulletBody);
+	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
+				     inverseInternalScale);
+	  result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
+				      inverseInternalScale);	
 
 	  // Find the closest vertex that was hit
+	  // TODO: there must be something more efficient than a second ray test
 	  btVector3 impact = rayFrom + (rayTo - rayFrom) * ray.fraction;
 	  switch (ray.feature)
 	  {
@@ -685,7 +679,7 @@ bool csBulletDynamicsSystem::HitBeam
 		}
 	      }
 
-	      bodyResult->vertexIndex = size_t (node - &body->m_nodes[0]);
+	      result.vertexIndex = size_t (node - &body->m_nodes[0]);
 	    }
 	    break;
 
@@ -694,7 +688,7 @@ bool csBulletDynamicsSystem::HitBeam
 	    break;
 	  }
 
-	  return true;
+	  return result;
 	}
 	}
 
@@ -702,10 +696,10 @@ bool csBulletDynamicsSystem::HitBeam
 
       default:
 	break;
-	}
+      }
   }
 
-  return false;
+  return result;
 }
 
 void csBulletDynamicsSystem::SetInternalScale (float scale)
