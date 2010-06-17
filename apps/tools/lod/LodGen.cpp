@@ -560,21 +560,7 @@ inline bool LodGen::IsDegenerate(csTriangle& tri)
 
 void LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
 {
-  WindowRecord wr;
-  if (u == UPDATE_EDGES)
-  {
-    int wrs = window_records.GetSize();
-    if (wrs == 0)
-    {
-      wr.start_index = 0;
-      wr.end_index = num_triangles;
-    }
-    else
-    {
-      wr = window_records[wrs - 1];
-    }
-  }
-
+  SlidingWindow sw = sliding_windows[sliding_windows.GetSize()-1];
   IncidentTris incident = k.incident_tris[v0]; // copy
   for (unsigned int i = 0; i < incident.GetSize(); i++)
   {
@@ -587,7 +573,7 @@ void LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
         edges.Delete(Edge(new_tri[j], new_tri[(j+1)%3]));
       assert(itri < num_triangles);
       ordered_tris.Push(itri);
-      wr.start_index++;
+      sw.start_index++;
     }
     assert(incident.GetSize() > k.incident_tris[v0].GetSize());
     for (int j = 0; j < 3; j++)
@@ -598,20 +584,17 @@ void LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
       k.tri_buffer.Push(new_tri);
       AddTriangle(k, k.tri_buffer.GetSize()-1);
       if (u == UPDATE_EDGES)
-        wr.end_index++;
+        sw.end_index++;
     }
   }
   if (u == UPDATE_EDGES)
   {
-    window_records.Push(wr);
+    sliding_windows.Push(sw);
   }
 }
 
 void LodGen::GenerateLODs()
 {
-  csArray<WindowRecord> x;
-  x.SetSize(0);
-  window_records.SetSize(0);
   k.incident_tris.SetSize(num_vertices);
   for (int i = 0; i < num_triangles; i++)
   {
@@ -624,6 +607,11 @@ void LodGen::GenerateLODs()
       edges.PushSmart(e);
     }
   }
+  
+  SlidingWindow sw;
+  sw.start_index = 0;
+  sw.end_index = num_triangles;
+  sliding_windows.Push(sw);
   
   unsigned int min_size = edges.GetSize() / 2;
   

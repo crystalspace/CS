@@ -30,9 +30,8 @@ struct WorkMesh
   csArray<IncidentTris> incident_tris; // map from vertices to incident triangles
 };
 
-struct WindowRecord
+struct SlidingWindow
 {
-  WindowRecord() {}
   int start_index;
   int end_index;
 };
@@ -42,7 +41,6 @@ enum UpdateEdges { NO_UPDATE_EDGES, UPDATE_EDGES };
 class LodGen
 {
 protected:
-  csArray<WindowRecord> window_records;
   int num_vertices;
   csVector3* vertices;
   int num_triangles;
@@ -51,6 +49,7 @@ protected:
   csArray<Edge> edges;
   WorkMesh k;
   csArray<int> ordered_tris;
+  csArray<SlidingWindow> sliding_windows;
 
 public:
   void SetVertices(int n, csVector3* v) { num_vertices = n; vertices = v; }
