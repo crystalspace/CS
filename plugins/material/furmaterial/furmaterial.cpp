@@ -224,25 +224,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 	  csMath3::CalcNormal(normal, positions.Get(tri.a), positions.Get(tri.b), 
 		positions.Get(tri.c));
-	  normal.Normalize();
+	  //normal.Normalize();
+	  float norm = sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+	  normal.x /= norm;
+	  normal.y /= norm;
+	  normal.z /= norm;
 
+	  csVector3 normalA = norms.Get(tri.a);
+	  normalA.Normalize();
+	  csVector3 normalB = norms.Get(tri.b);
+	  normalB.Normalize();
+	  csVector3 normalC = norms.Get(tri.c);
+	  normalC.Normalize();
+
+	  // this doesn't work
+	  normsArray[tri.a] = normalA;
+	  normsArray[tri.b] = normalB;
+	  normsArray[tri.c] = normalC;
+/*
+	  // this works - vs1 - Z switched with Y
+	  normsArray[tri.a] = csVector3(normalA.x, normalA.z, normalA.y);
+	  normsArray[tri.b] = csVector3(normalB.x, normalB.z, normalB.y);
+	  normsArray[tri.c] = csVector3(normalC.x, normalC.z, normalC.y);
+/*
+	  // this works - vs2 - my normal
 	  normsArray[tri.a] = normal;
 	  normsArray[tri.b] = normal;
 	  normsArray[tri.c] = normal;
+*/
     }
 
 	// generate the guide hairs - this should be done based on heightmap
 	for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
 	{
   	  csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
-	    displaceEps * normsArray[uniqueIndices.Get(i)];
+	    0 * normsArray[uniqueIndices.Get(i)];
 	  
 	  csGuideHair guideHair;
 	  guideHair.controlPointsCount = 5;
 	  guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 	  
 	  for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
-		guideHair.controlPoints[j] = pos + j * 75.f * normsArray[uniqueIndices.Get(i)];
+		guideHair.controlPoints[j] = pos + j * 0.05f * normsArray[uniqueIndices.Get(i)];
 
 	  guideHairs.Push(guideHair);
 	}
