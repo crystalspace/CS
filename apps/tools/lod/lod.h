@@ -67,14 +67,14 @@ private:
    * This routine is called from the event handler in response to a 
    * csevKeyboard event.
    */
-  //bool OnKeyboard (iEvent&);
+  bool OnKeyboard (iEvent&);
 
   /**
    * Setup everything that needs to be rendered on screen. This routine
    * is called from the event handler in response to a csevFrame
    * broadcast message.
    */
-  //void Frame ();
+  void Frame ();
   
   csRef<iThreadReturn> loading;
   void LoadSprite(const char* filename);

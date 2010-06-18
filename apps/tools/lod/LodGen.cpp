@@ -7,7 +7,7 @@
  *
  */
 
-#include <vector>
+#include <iostream>
 using namespace std;
 
 #include "csgeom.h"
@@ -558,20 +558,21 @@ inline bool LodGen::IsDegenerate(csTriangle& tri)
   return tri[0] == tri[1] || tri[0] == tri[2] || tri[1] == tri[2];
 }
 
-void LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
+bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
 {
   SlidingWindow sw = sliding_windows[sliding_windows.GetSize()-1];
   IncidentTris incident = k.incident_tris[v0]; // copy
   for (unsigned int i = 0; i < incident.GetSize(); i++)
   {
     int itri = incident[i];
+    if (itri >= num_triangles)
+      return false;
     csTriangle new_tri = k.tri_buffer[itri];
     RemoveTriangle(k, itri);
     if (u == UPDATE_EDGES)
     {
       for (int j = 0; j < 3; j++)
         edges.Delete(Edge(new_tri[j], new_tri[(j+1)%3]));
-      assert(itri < num_triangles);
       ordered_tris.Push(itri);
       sw.start_index++;
     }
@@ -591,6 +592,7 @@ void LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
   {
     sliding_windows.Push(sw);
   }
+  return true;
 }
 
 void LodGen::GenerateLODs()
@@ -617,6 +619,7 @@ void LodGen::GenerateLODs()
   
   while (edges.GetSize() > min_size)
   {
+    cout << edges.GetSize() << " ";
     float min_d = 1.0e30;
     int min_v0, min_v1;
     
@@ -625,27 +628,34 @@ void LodGen::GenerateLODs()
       WorkMesh k_prime = k;
       int v0 = edges[i].v0;
       int v1 = edges[i].v1;
-      Collapse(k_prime, v0, v1);
-      float d = SumOfSquareDist(k_prime);
-      if (d < min_d)
+      bool result = Collapse(k_prime, v0, v1);
+      if (result)
       {
-        min_d = d;
-        min_v0 = v0;
-        min_v1 = v1;
+        float d = SumOfSquareDist(k_prime);
+        if (d < min_d)
+        {
+          min_d = d;
+          min_v0 = v0;
+          min_v1 = v1;
+        }
       }
       k_prime = k;
-      Collapse(k_prime, v1, v0);
-      d = SumOfSquareDist(k_prime);
-      if (d < min_d)
+      result = Collapse(k_prime, v1, v0);
+      if (result)
       {
-        min_d = d;
-        min_v0 = v1;
-        min_v1 = v0;
+        float d = SumOfSquareDist(k_prime);
+        if (d < min_d)
+        {
+          min_d = d;
+          min_v0 = v1;
+          min_v1 = v0;
+        }
       }
       if (min_d == 0.0)
         break;
     }
     Collapse(k, min_v0, min_v1, UPDATE_EDGES);
   }
+  cout << "End" << endl;
 }
 

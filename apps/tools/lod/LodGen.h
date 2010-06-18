@@ -15,7 +15,7 @@ struct Edge
 {
   int v0;
   int v1;
-  Edge(int a, int b) { assert(a != b); if (a < b) { v0 = a; v1 = b; } else  { v0 = b; v1 = a; } }
+  Edge(int a, int b) { assert(a != b); if (a < b) { v0 = a; v1 = b; } else { v0 = b; v1 = a; } }
   inline bool operator==(const Edge& e1) const
   {
     assert(v0 < v1 && e1.v0 < e1.v1);
@@ -60,6 +60,6 @@ protected:
   bool IsDegenerate(csTriangle& tri);
   void AddTriangle(WorkMesh& k, int itri);
   void RemoveTriangle(WorkMesh& k, int itri);
-  void Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u = NO_UPDATE_EDGES);
+  bool Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u = NO_UPDATE_EDGES);
   float SumOfSquareDist(WorkMesh& k);
 };

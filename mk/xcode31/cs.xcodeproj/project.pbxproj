@@ -13919,7 +13919,7 @@
 			buildConfigurationList = 1DEB918F08733D9F0010E9CD /* Build configuration list for PBXLegacyTarget "cs" */;
 			buildPhases = (
 			);
-			buildToolPath = "./xcode-build";
+			buildToolPath = ./jam;
 			buildWorkingDirectory = ../..;
 			dependencies = (
 			);
@@ -13957,6 +13957,9 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				OS = macosx;
+				OSPLAT = "";
+				OSVER = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "cs-debug";
@@ -13968,6 +13971,9 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OS = macosx;
+				OSPLAT = "";
+				OSVER = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "cs-release";
@@ -14003,6 +14009,9 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				OS = macosx;
+				OSPLAT = "";
+				OSVER = "";
 				PRODUCT_NAME = lod;
 			};
 			name = Debug;
@@ -14013,6 +14022,9 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OS = macosx;
+				OSPLAT = "";
+				OSVER = "";
 				PRODUCT_NAME = lod;
 				ZERO_LINK = NO;
 			};
@@ -14027,6 +14039,9 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				OS = macosx;
+				OSPLAT = "";
+				OSVER = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = simple2;
@@ -14038,6 +14053,9 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OS = macosx;
+				OSPLAT = "";
+				OSVER = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "cs-release";

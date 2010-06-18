@@ -37,6 +37,90 @@ Lod::~Lod ()
 {
 }
 
+void Lod::Frame ()
+{
+  // First get elapsed time from the virtual clock.
+  csTicks elapsed_time = vc->GetElapsedTicks ();
+  // Now rotate the camera according to keyboard state
+  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
+  
+  iCamera* c = view->GetCamera ();
+  
+  if (kbd->GetKeyState (CSKEY_SHIFT))
+  {
+    // If the user is holding down shift, the arrow keys will cause
+    // the camera to strafe up, down, left or right from it's
+    // current position.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      c->Move (CS_VEC_RIGHT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      c->Move (CS_VEC_LEFT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_UP * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_DOWN * 4 * speed);
+  }
+  else
+  {
+    // left and right cause the camera to rotate on the global Y
+    // axis; page up and page down cause the camera to rotate on the
+    // _camera's_ X axis (more on this in a second) and up and down
+    // arrows cause the camera to go forwards and backwards.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      rotY += speed;
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      rotY -= speed;
+    if (kbd->GetKeyState (CSKEY_PGUP))
+      rotX += speed;
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      rotX -= speed;
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_FORWARD * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_BACKWARD * 4 * speed);
+  }
+  
+  // We now assign a new rotation transformation to the camera.  You
+  // can think of the rotation this way: starting from the zero
+  // position, you first rotate "rotY" radians on your Y axis to get
+  // the first rotation.  From there you rotate "rotX" radians on the
+  // your X axis to get the final rotation.  We multiply the
+  // individual rotations on each axis together to get a single
+  // rotation matrix.  The rotations are applied in right to left
+  // order .
+  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform ().GetOrigin ());
+  c->SetTransform (ot);
+  
+  rm->RenderView (view);
+}
+
+bool Lod::OnKeyboard (iEvent& ev)
+{
+  // We got a keyboard event.
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType (&ev);
+  if (eventtype == csKeyEventTypeDown)
+  {
+    // The user pressed a key (as opposed to releasing it).
+    utf32_char code = csKeyEventHelper::GetCookedCode (&ev);
+    if (code == CSKEY_ESC)
+    {
+      // The user pressed escape to exit the application.
+      // The proper way to quit a Crystal Space application
+      // is by broadcasting a csevQuit event. That will cause the
+      // main runloop to stop. To do that we get the event queue from
+      // the object registry and then post the event.
+      csRef<iEventQueue> q = 
+      csQueryRegistry<iEventQueue> (GetObjectRegistry ());
+      if (q.IsValid ()) q->GetEventOutlet ()->Broadcast (
+        csevQuit (GetObjectRegistry ()));
+    }
+  }
+  
+  return false;
+}
+
+
 // 1
 bool Lod::OnInitialize (int /*argc*/, char* /*argv*/ [])
 {
@@ -48,9 +132,9 @@ bool Lod::OnInitialize (int /*argc*/, char* /*argv*/ [])
   // on the commandline.
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_VFS,
-    CS_REQUEST_NULL3D,
+    CS_REQUEST_OPENGL3D,
     CS_REQUEST_ENGINE,
-    //CS_REQUEST_FONTSERVER,
+    CS_REQUEST_FONTSERVER,
     CS_REQUEST_IMAGELOADER,
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
@@ -303,11 +387,15 @@ void Lod::CreateSprites ()
     ReportError("Error loading texture!");
 
   // Load a sprite template from disk.
+  /*
   csRef<iMeshFactoryWrapper> imeshfact (
     loader->LoadMeshObjectFactory ("/lib/std/sprite1"));
   if (imeshfact == 0)
     ReportError("Error loading mesh object factory!");
+   */
 
+  iMeshFactoryWrapper* imeshfact = engine->FindMeshFactory("lodbarrel");
+  
   // Create the sprite and add it to the engine.
   csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
     imeshfact, "MySprite", room,
@@ -315,9 +403,11 @@ void Lod::CreateSprites ()
   csMatrix3 m; m.Identity ();
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
+  /*
   csRef<iSprite3DState> spstate (
     scfQueryInterface<iSprite3DState> (sprite->GetMeshObject ()));
   spstate->SetAction ("default");
+   */
   //spstate->SetMixMode (CS_FX_SETALPHA (.5));
 
   // The following two calls are not needed since CS_ZBUF_USE and
