@@ -3,7 +3,8 @@
 <variablemap variable="projection transform inverse" destination="ProjInv" />
 <variablemap variable="light position" destination="LightPos" />
 <variablemap variable="light color" destination="LightCol" />
-<variablemap variable="light range" destination="LightRange" />
+<variablemap variable="light specular" destination="LightSpec" />
+<variablemap variable="light attenuation" destination="AttenVec" />
   
 <program>
 <![CDATA[
@@ -15,6 +16,35 @@ struct vertex2fragment
   float4 ScreenPos : TEXCOORD0;
 };
 
+// Computes linear attenuation.
+float Attenuation_Linear(float d, float invLightRadius)
+{
+  return saturate (1 - d * invLightRadius);
+}
+
+// Computes constant, linear, quadratic (CLQ) attenuation.
+float Attenuation_CLQ(float d, float3 coeff)
+{
+  return 1 / dot (float3 (1, d, d*d), coeff);
+}
+
+// Computes the attenuation for the current point light.
+float Attenuation(float dist, float4 attenVec)
+{
+  float invAttenRadius = attenVec.w;
+  
+  if (invAttenRadius > 0)
+    return Attenuation_Linear (dist, invAttenRadius);
+
+  return Attenuation_CLQ (dist, attenVec.xyz);
+}
+
+// Extracts the depth from the given depth buffer sample.
+float ExtractDepth(float4 depth)
+{
+  return 1 - 2 * depth.x;
+}
+
 // Unproject screen position.
 float3 ScreenToWorldPosition(float3 screen)
 {  
@@ -25,7 +55,8 @@ float3 ScreenToWorldPosition(float3 screen)
 float4 main(vertex2fragment IN,
             uniform float3 LightPos,
             uniform float3 LightCol,
-            uniform float LightRange,
+            uniform float3 LightSpec,
+            uniform float4 AttenVec,
             uniform sampler2D gBuffer0,
             uniform sampler2D gBuffer1,
             uniform sampler2D gBufferDepth) : COLOR
@@ -38,20 +69,26 @@ float4 main(vertex2fragment IN,
   float4 normal = tex2D (gBuffer1, screenUV);
   float4 depth  = tex2D (gBufferDepth, screenUV);
   
-  float3 p = ScreenToWorldPosition (float3 (screenXY.x, screenXY.y, depth.x));
+  float3 screen = float3 (screenXY.x, -screenXY.y, ExtractDepth (depth));
+  float3 p = ScreenToWorldPosition (screen);
   float3 n = normal.xyz * 2.0 - 1.0;
-  float3 L = p - LightPos;
+  float3 L = LightPos - p;
   
   float dist = length (L);
   L = L / dist;
   
-  float att = 1.0 - (dist / LightRange);
+  // Since we are in view space we know that the eye position is at the origin.
+  float3 V = -normalize (p); 
+  float3 H = normalize (L + V);
+  
+  float att = Attenuation (dist, AttenVec);
   
   // Compute phong lighting.
-  float3 color = albedo.rgb * LightCol * saturate (dot (n, L)) * att;
+  float3 diff = albedo.rgb * LightCol * saturate (dot (n, L));
+  float3 spec = LightSpec * pow (saturate (dot (n, H)), 128);
+  float3 color = (diff) * att;
 
-  float4 output = float4 (color, 1.0);
-  return output;
+  return float4 (color, 1.0);
 }
 
 ]]>

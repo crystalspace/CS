@@ -403,7 +403,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   colorBuffer0 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
     graphics2D->GetHeight (),
     csimg2D,
-    "rgba8",
+    "rgba16_f",
     flags,
     NULL);
 
@@ -416,7 +416,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   colorBuffer1 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
     graphics2D->GetHeight (),
     csimg2D,
-    "rgba8",
+    "rgba16_f",
     flags,
     NULL);
 
@@ -429,7 +429,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   colorBuffer2 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
     graphics2D->GetHeight (),
     csimg2D,
-    "rgba8",
+    "rgba16_f",
     flags,
     NULL);
 
@@ -514,7 +514,6 @@ bool RMDeferred::RenderView(iView *view)
   // Render all contexts, back to front
   AttachGbuffer (graphics3D);
   {
-    // TODO: Output data to GBuffer.
     graphics3D->SetZMode (CS_ZBUF_MESH);
 
     DeferredTreeRenderer<RenderTreeType> render (graphics3D, shaderManager);

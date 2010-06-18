@@ -23,6 +23,7 @@ DeferredDemo::DeferredDemo()
 :
 viewRotX(0.0f),
 viewRotY(0.0f),
+useDeferredShading(true),
 shouldShutdown(false)
 {
   SetApplicationName ("CrystalSpace.DeferredDemo");
@@ -117,6 +118,8 @@ bool DeferredDemo::SetupModules()
   rm = csLoadPlugin<iRenderManager> (GetObjectRegistry(), "crystalspace.rendermanager.deferred");
   if (!rm)
     return ReportError("Failed to load deferred Render Manager!");
+
+  rm_default = engine->GetRenderManager ();
 
   return true;
 }
@@ -261,7 +264,10 @@ void DeferredDemo::Frame ()
 {
   UpdateCamera ();
 
-  engine->SetRenderManager (rm);
+  if (useDeferredShading)
+    engine->SetRenderManager (rm);
+  else
+    engine->SetRenderManager (rm_default);
 
   view->Draw ();
 
@@ -285,13 +291,21 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
   if (eventtype == csKeyEventTypeDown)
   {
     utf32_char code = csKeyEventHelper::GetCookedCode(&event);
-    if(code == CSKEY_ESC)
+    if (code == CSKEY_ESC)
     {
       if (eventQueue.IsValid ()) 
       {
         eventQueue->GetEventOutlet ()->Broadcast( csevQuit(GetObjectRegistry()) );
         return true;
       }
+    }
+    else if (code == 'd')
+    {
+      useDeferredShading = true;
+    }
+    else if (code == 'f')
+    {
+      useDeferredShading = false;
     }
   }
 

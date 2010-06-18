@@ -87,6 +87,7 @@ protected:
   csRef<iGraphics3D> graphics3D;
 
   csRef<iRenderManager> rm;
+  csRef<iRenderManager> rm_default;
 
   csRef<iLoader> loader;
 
@@ -106,6 +107,8 @@ protected:
 
   float viewRotX;
   float viewRotY;
+
+  bool useDeferredShading;
 
 private:
 

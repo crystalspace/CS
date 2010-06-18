@@ -37,11 +37,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csVector3 pos = light->GetMovable ()->GetFullPosition ();
     float range = light->GetCutoffDistance ();
 
-    csMatrix3 scale (range, 0.0f,  0.0f,
-                     0.0f,  range, 0.0f,
-                     0.0f,  0.0f,  range);
+    csMatrix3 scale (range,  0.0f,  0.0f,
+                      0.0f, range,  0.0f,
+                      0.0f,  0.0f, range);
 
     return csReversibleTransform (scale, pos);
+  }
+
+  /**
+   * Creates a transform that will transform a 1x1x1 cube centered at the origin
+   * to match the given bounding box (assumed to be in world space).
+   */
+  inline csReversibleTransform CreateBBoxTransform(const csBox3 &bbox)
+  {
+    csVector3 size = bbox.GetSize ();
+
+    csMatrix3 scale (size.x,   0.0f,   0.0f,
+                       0.0f, size.y,   0.0f,
+                       0.0f,   0.0f, size.z);
+
+    csReversibleTransform (scale, bbox.GetCenter ());
   }
 
   /**
@@ -131,6 +146,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       /* Mesh used for drawing spot lights. */
       csRef<iMeshWrapper> coneMesh;
       csRef<iMaterialWrapper> coneMaterial;
+
+      /* Mesh and material used for drawing point lights. */
+      csRef<iMeshWrapper> pointMesh;
+      csRef<iMaterialWrapper> pointMaterial;
 
       /**
        * Initialize persistent data, must be called once before using the
@@ -249,7 +268,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       csShaderVariable *lightPosSV = shader->GetVariableAdd (svStringSet->Request ("light position"));
       csShaderVariable *lightColSV = shader->GetVariableAdd (svStringSet->Request ("light color"));
-      csShaderVariable *lightRangeSV = shader->GetVariableAdd (svStringSet->Request ("light range"));
+      csShaderVariable *lightSpecSV = shader->GetVariableAdd (svStringSet->Request ("light specular"));
+      csShaderVariable *lightAttenSV = shader->GetVariableAdd (svStringSet->Request ("light attenuation"));
 
       // Transform light position to view space.
       csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
@@ -257,10 +277,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       lightPosSV->SetValue (lightPos);
       lightColSV->SetValue (light->GetColor ());
-      lightRangeSV->SetValue (light->GetCutoffDistance ());
+      lightSpecSV->SetValue (light->GetSpecularColor ());
+      lightAttenSV->SetValue (light->GetAttenuationConstants ());
 
       // Update shader stack.
-      csShaderVariableStack &svStack = shaderMgr->GetShaderVariableStack ();
+      csShaderVariableStack svStack = shaderMgr->GetShaderVariableStack ();
       shader->PushVariables (svStack);
 
       // Draw the point light mesh.
@@ -313,13 +334,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
           if(!shader->SetupPass (ticket, m, *m, svStack))
             continue;
 
-          // Always use additive blending so we do not loose the contribution from other lights.
+          // Use additive blending so we do not loose the contributions from other lights.
           m->mixmode = CS_FX_ADD;
           m->cullMode = cullMode;
           m->object2world = transform;
 
           graphics3D->DrawMesh (m, *m, svStack);
-          
+
           shader->TeardownPass (ticket);
         }
         shader->DeactivatePass (ticket);

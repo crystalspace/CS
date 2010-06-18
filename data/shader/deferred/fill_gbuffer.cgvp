@@ -27,7 +27,7 @@ vertex2fragment main(app2vertex IN,
   float4 pos = mul (ModelViewProj, float4 (IN.Position, 1.0));
   OUT.Position = pos;
   OUT.TexCoord = IN.TexCoord;
-  OUT.ViewNormal = mul (ModelViewIT, float4 (IN.Normal, 0.0));
+  OUT.ViewNormal = mul (ModelViewIT, float4 (IN.Normal, 0.0)).xyz;
 
   return OUT;
 }
