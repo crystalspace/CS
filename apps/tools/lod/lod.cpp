@@ -361,9 +361,11 @@ void Lod::CreateRoom ()
   box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
 
   // Now we make a factory and a mesh at once.
+  /*
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
     engine, room, "walls", "walls_factory", &box);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
+   */
 
   // Now we need light to see something.
   csRef<iLight> light;

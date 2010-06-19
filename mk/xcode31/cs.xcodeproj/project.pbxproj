@@ -13932,6 +13932,9 @@
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "Eduardo Poyart";
+			};
 			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "cs" */;
 			compatibilityVersion = "Xcode 3.1";
 			hasScannedForEncodings = 1;
@@ -13957,9 +13960,8 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				OS = macosx;
 				OSPLAT = "";
-				OSVER = "";
+				OSVER = x;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "cs-debug";
@@ -13971,9 +13973,8 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				OS = macosx;
 				OSPLAT = "";
-				OSVER = "";
+				OSVER = x;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "cs-release";
@@ -14009,9 +14010,8 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				OS = macosx;
 				OSPLAT = "";
-				OSVER = "";
+				OSVER = x;
 				PRODUCT_NAME = lod;
 			};
 			name = Debug;
@@ -14022,9 +14022,8 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				OS = macosx;
 				OSPLAT = "";
-				OSVER = "";
+				OSVER = x;
 				PRODUCT_NAME = lod;
 				ZERO_LINK = NO;
 			};
@@ -14039,9 +14038,8 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				OS = macosx;
 				OSPLAT = "";
-				OSVER = "";
+				OSVER = x;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = simple2;
@@ -14053,9 +14051,8 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				OS = macosx;
 				OSPLAT = "";
-				OSVER = "";
+				OSVER = x;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "cs-release";
