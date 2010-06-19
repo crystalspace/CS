@@ -1,11 +1,12 @@
-<cgfp>
+<include>
 <program>
-<![CDATA[
  
 struct vertex2fragment 
 { 
-  float2 TexCoord : TEXCOORD0;
-  float3 ViewNormal : TEXCOORD1;
+  float2 TexCoord     : TEXCOORD0;
+  float3 ViewNormal   : TEXCOORD1;
+  float3 ViewTangent  : TEXCOORD2;
+  float3 ViewBiNormal : TEXCOORD3;
 };
 
 struct fragmentOutput
@@ -16,19 +17,34 @@ struct fragmentOutput
 };
  
 fragmentOutput main(vertex2fragment IN,
-                    uniform sampler2D TexDiffuse)
+                    uniform sampler2D TexDiffuse,
+                    uniform sampler2D TexNormal)
 {
   fragmentOutput output;
   
-  float3 n = (normalize(IN.ViewNormal) + 1) * 0.5;
+  <?if vars."tex normal".texture ?>
+    float3 n = tex2D (TexNormal, IN.TexCoord).rgb * 2 - 1;
+    
+    // Transform normal from tangent space to view space.
+    float3 N = normalize (IN.ViewNormal);
+    float3 T = normalize (IN.ViewTangent);
+    float3 B = normalize (IN.ViewBiNormal);
+    
+    float3x3 tan2view = transpose (float3x3 (T, B, N));
+    n = mul (tan2view, n);
+  <?else?>
+    float3 n = IN.ViewNormal;
+  <?endif?>
+  
+  // Normalize and map into the range [0,1].
+  n = (normalize (n) + 1) * 0.5;
   
   output.Color0 = float4 (tex2D (TexDiffuse, IN.TexCoord).rgb, 1.0);
-  output.Color1 = float4 (n.xyz, 0.0);
+  output.Color1 = float4 (n, 0.0);
   output.Color2 = float4 (0, 0, 0, 0);
 
   return output;
 }
 
-]]>
 </program>
-</cgfp>
+</include>

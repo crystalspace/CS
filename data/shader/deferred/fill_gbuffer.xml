@@ -24,11 +24,18 @@
     <pass>
       
       <buffer source="normal" destination="normal" />
+      <buffer source="tangent" destination="texture coordinate 1" />
+      <buffer source="binormal" destination="texture coordinate 2" />
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glcg" file="/shader/deferred/fill_gbuffer.cgvp" />
-      
+
+      <texture destination="TexNormal" name="tex normal" />
       <texture destination="TexDiffuse" name="tex diffuse" />
-      <fp plugin="glcg" file="/shader/deferred/fill_gbuffer.cgfp" />
+      <fp plugin="glcg">
+        <cgfp>
+          <?Include fill_gbuffer.cgfp ?>
+        </cgfp>
+      </fp>
       
     </pass>
   </technique>
