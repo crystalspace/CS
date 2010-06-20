@@ -492,6 +492,8 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    * \param sides Number of sides.
    */
   virtual void GenerateCylinder (float l, float r, uint sides) = 0;
+  
+  virtual void SetProgLODData() = 0;
 };
 
 /**

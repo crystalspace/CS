@@ -247,27 +247,22 @@ void Lod::LoadSprite(const char* filename)
   iMeshFactoryWrapper* factwrap = engine->FindMeshFactory("lodbarrel");
   
   csRef<iMeshObjectFactory> fact = factwrap->GetMeshObjectFactory();
-  if (fact)
-  {
-    iObjectModel* om = fact->GetObjectModel();
-    csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet>(object_reg, "crystalspace.shared.stringset");
-    csStringID base_id = strset->Request("base");
-    iTriangleMesh* tm = om->GetTriangleData(base_id);
-    int nv = tm->GetVertexCount();
-    csVector3* vertices = tm->GetVertices();
-    int nt = tm->GetTriangleCount();
-    csTriangle* triangles = tm->GetTriangles();
-    LodGen lodgen;
-    lodgen.SetVertices(nv, vertices);
-    lodgen.SetTriangles(nt, triangles);
-    lodgen.GenerateLODs();
-    /*
-    csTriangleMesh* cstm = (csTriangleMesh*) iTriangleMesh;
-    cstm->Clear();
-    for (int i = 0; i < lodgen.GetTriangleCount())
-      cstm->AddTriangle(lodgen.GetTriangle(i)[0], lodgen.GetTriangle(i)[1], lodgen.GetTriangle(i)[2]);
-     */
-  }
+  assert(fact);
+  
+  csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
+  assert(fstate);
+
+  int nv = fstate->GetVertexCount();
+  csVector3* vertices = fstate->GetVertices();
+  int nt = fstate->GetTriangleCount();
+  csTriangle* triangles = fstate->GetTriangles();
+  LodGen lodgen;
+  lodgen.SetVertices(nv, vertices);
+  lodgen.SetTriangles(nt, triangles);
+  lodgen.GenerateLODs();
+  fstate->SetTriangleCount(0);
+  for (int i = 0; i < lodgen.GetTriangleCount(); i++)
+    fstate->AddTriangle(lodgen.GetTriangle(i));
   
   loading.Invalidate();
 }
@@ -351,7 +346,7 @@ void Lod::CreateRoom ()
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
     ReportError ("Error loading 'stone4' texture!");
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  //iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   // We create a new sector called "room".
   room = engine->CreateSector ("room");

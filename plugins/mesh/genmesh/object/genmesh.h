@@ -642,6 +642,11 @@ public:
   {
     return autonormals;
   }
+  
+  virtual void SetProgLODData()
+  {
+    
+  }
 
   //------------------------ iMeshObjectFactory implementation --------------
   virtual csFlags& GetFlags () { return flags; }

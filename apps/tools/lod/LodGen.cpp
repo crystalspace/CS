@@ -622,7 +622,7 @@ void LodGen::GenerateLODs()
   
   while (edges.GetSize() > min_size)
   {
-    cout << edges.GetSize() << " ";
+    cout << edges.GetSize();
     float min_d = 1.0e30;
     int min_v0, min_v1;
     
@@ -657,8 +657,13 @@ void LodGen::GenerateLODs()
       if (min_d == 0.0)
         break;
     }
+    cout << ": " << min_d << " - " << min_v0 << ", " << min_v1 << endl;
     Collapse(k, min_v0, min_v1, UPDATE_EDGES);
   }
+  for (unsigned int i = 0; i < removed_tris.GetSize(); i++)
+    ordered_tris.Push(k.tri_buffer[removed_tris[i]]);
+  for (unsigned int i = 0; i < added_tris.GetSize(); i++)
+    ordered_tris.Push(k.tri_buffer[added_tris[i]]);
   cout << "End" << endl;
 }
 
