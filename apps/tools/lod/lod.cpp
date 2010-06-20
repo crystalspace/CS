@@ -261,6 +261,12 @@ void Lod::LoadSprite(const char* filename)
     lodgen.SetVertices(nv, vertices);
     lodgen.SetTriangles(nt, triangles);
     lodgen.GenerateLODs();
+    /*
+    csTriangleMesh* cstm = (csTriangleMesh*) iTriangleMesh;
+    cstm->Clear();
+    for (int i = 0; i < lodgen.GetTriangleCount())
+      cstm->AddTriangle(lodgen.GetTriangle(i)[0], lodgen.GetTriangle(i)[1], lodgen.GetTriangle(i)[2]);
+     */
   }
   
   loading.Invalidate();

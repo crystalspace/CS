@@ -508,20 +508,20 @@ void PointTriangleDistanceUnitTests()
   unittests(1.0);
 }
 
-float LodGen::SumOfSquareDist(WorkMesh& k)
+float LodGen::SumOfSquareDist(const WorkMesh& k) const
 {
   float s, t, d2;
   float sum = 0.0;
   for (int i = 0; i < num_vertices; i++)
   {
-    csVector3& v = vertices[i];
+    const csVector3& v = vertices[i];
     float min_d2 = 1.0e30;
     for (unsigned int j = 0; j < k.tri_indices.GetSize(); j++)
     {
-      csTriangle& tri = k.tri_buffer[k.tri_indices[j]];
-      csVector3& p0 = vertices[tri[0]];
-      csVector3& p1 = vertices[tri[1]];
-      csVector3& p2 = vertices[tri[2]];
+      const csTriangle& tri = k.tri_buffer[k.tri_indices[j]];
+      const csVector3& p0 = vertices[tri[0]];
+      const csVector3& p1 = vertices[tri[1]];
+      const csVector3& p2 = vertices[tri[2]];
       PointTriangleDistance(v, p0, p1, p2, s, t, d2);
       if (d2 < min_d2)
       {
@@ -553,27 +553,27 @@ void LodGen::RemoveTriangle(WorkMesh& k, int itri)
     k.incident_tris[tri[i]].Delete(itri);
 }
 
-inline bool LodGen::IsDegenerate(csTriangle& tri)
+inline bool LodGen::IsDegenerate(const csTriangle& tri) const
 {
   return tri[0] == tri[1] || tri[0] == tri[2] || tri[1] == tri[2];
 }
 
 bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
 {
-  SlidingWindow sw = sliding_windows[sliding_windows.GetSize()-1];
+  SlidingWindow sw = sliding_windows[sliding_windows.GetSize()-1]; // copy
   IncidentTris incident = k.incident_tris[v0]; // copy
   for (unsigned int i = 0; i < incident.GetSize(); i++)
   {
     int itri = incident[i];
     if (itri >= num_triangles)
       return false;
-    csTriangle new_tri = k.tri_buffer[itri];
+    csTriangle new_tri = k.tri_buffer[itri]; // copy
     RemoveTriangle(k, itri);
     if (u == UPDATE_EDGES)
     {
       for (int j = 0; j < 3; j++)
         edges.Delete(Edge(new_tri[j], new_tri[(j+1)%3]));
-      ordered_tris.Push(itri);
+      removed_tris.Push(itri);
       sw.start_index++;
     }
     assert(incident.GetSize() > k.incident_tris[v0].GetSize());
@@ -585,7 +585,10 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
       k.tri_buffer.Push(new_tri);
       AddTriangle(k, k.tri_buffer.GetSize()-1);
       if (u == UPDATE_EDGES)
+      {
+        added_tris.Push(k.tri_buffer.GetSize()-1);
         sw.end_index++;
+      }
     }
   }
   if (u == UPDATE_EDGES)
@@ -600,7 +603,7 @@ void LodGen::GenerateLODs()
   k.incident_tris.SetSize(num_vertices);
   for (int i = 0; i < num_triangles; i++)
   {
-    csTriangle& tri = triangles[i];
+    const csTriangle& tri = triangles[i];
     k.tri_buffer.Push(tri);
     AddTriangle(k, i);
     for (int j = 0; j < 3; j++)

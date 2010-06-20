@@ -42,24 +42,28 @@ class LodGen
 {
 protected:
   int num_vertices;
-  csVector3* vertices;
+  const csVector3* vertices;
   int num_triangles;
-  csTriangle* triangles;
+  const csTriangle* triangles;
   
   csArray<Edge> edges;
   WorkMesh k;
-  csArray<int> ordered_tris;
+  csArray<int> removed_tris;
+  csArray<int> added_tris;
+  csArray<csTriangle> ordered_tris;
   csArray<SlidingWindow> sliding_windows;
 
 public:
-  void SetVertices(int n, csVector3* v) { num_vertices = n; vertices = v; }
-  void SetTriangles(int n, csTriangle* t) { num_triangles = n; triangles = t; }
+  void SetVertices(int n, const csVector3* v) { num_vertices = n; vertices = v; }
+  void SetTriangles(int n, const csTriangle* t) { num_triangles = n; triangles = t; }
   void GenerateLODs();
+  int GetTriangleCount() const { return ordered_tris.GetSize(); }
+  const csTriangle& GetTriangle(int i) const { return ordered_tris[i]; }
   
 protected:
-  bool IsDegenerate(csTriangle& tri);
+  bool IsDegenerate(const csTriangle& tri) const;
   void AddTriangle(WorkMesh& k, int itri);
   void RemoveTriangle(WorkMesh& k, int itri);
   bool Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u = NO_UPDATE_EDGES);
-  float SumOfSquareDist(WorkMesh& k);
+  float SumOfSquareDist(const WorkMesh& k) const;
 };
