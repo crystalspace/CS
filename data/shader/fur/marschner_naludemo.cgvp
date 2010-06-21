@@ -5,15 +5,11 @@
 struct a2vConnector {
     float4 objCoord : POSITION;
     float3 objNormal : NORMAL;
-	float3 Tangent : TEXCOORD0;
-	float3 BiNormal : TEXCOORD1;	
 };
 
 struct v2fConnector {
   float4 projCoord          : POSITION;
-
   float3 angles             : TEXCOORD1;
-
   half4 diffuseColor       : COLOR0;
   half3 ambientColor       : COLOR1;
 };
@@ -32,38 +28,20 @@ v2fConnector main(a2vConnector a2v,
                   uniform float3 worldPointLight0Pos,
                   uniform float3 PointLightColor,
 				  
-				uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
-				uniform float4x4 ModelViewI : state.matrix.modelview.inverse				  
-                  )
+				  uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans)
 {
   v2fConnector v2f;
   
-  float4 LightPos = float4 (-9000, -9000, 0, 0);
+  float4 LightPos = float4 (0, 0, 9000, 0);
 
-  float3 objLight = mul(ModelViewI, LightPos).xyz;
-	objLight -= a2v.objCoord;
+  objLightDir = normalize(LightPos.xyz -  a2v.objCoord.xyz);
+  objEyePos = ModelViewIT[3].xyz;
 	
-	float3x3 obj2tang;
-	obj2tang[0] = a2v.objCoord;
-	obj2tang[1] = a2v.BiNormal;
-	obj2tang[2] = a2v.Tangent;
-	
-	float3 tangLight = mul (obj2tang, objLight);
-	
-	float3 eyeVec = ModelViewIT[3] - a2v.objCoord;
-	float3 tangEyeVec = mul (obj2tang, eyeVec);
-	
-	objLightDir = normalize(tangLight.xyz);
-	objEyePos = normalize(tangEyeVec.xyz);
-  
-  //objEyePos = float3(-3,1,0);
-  //objLightDir = float3(0,-1,0);
   AmbientCol = 0;
   DiffuseCol = 0.75;
   PointLightColor = 1;
   worldPointLight0Pos = LightPos.xyz;  
   float4 objColor = float4(1,0,0,1);
-  //a2v.objCoord.xyz += float3(0,0.02,0)
   
   /* Compute the tangent from adjacent vertices */
   float3 objTangent = normalize(a2v.objNormal - a2v.objCoord.xyz);

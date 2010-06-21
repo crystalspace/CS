@@ -148,7 +148,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		vbuf[ x * 2 * controlPoints + 2 * y].Set
 		  ( hairStrands.Get(x).controlPoints[y] );
 		vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-		  ( hairStrands.Get(x).controlPoints[y] );
+		  ( hairStrands.Get(x).controlPoints[y] + csVector3(-0.01f,0,0) );
 	  }
 
 	  for ( int y = 0 ; y < 2 * (controlPoints - 1) ; y ++ )
@@ -220,45 +220,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		uniqueIndices.Contains(tri.b), uniqueIndices.Contains(tri.c));
 	  guideHairsTriangles.Push(triangleNew);
 
-	  csVector3 normal;
-
-	  csMath3::CalcNormal(normal, positions.Get(tri.a), positions.Get(tri.b), 
-		positions.Get(tri.c));
-	  //normal.Normalize();
-	  float norm = sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-	  normal.x /= norm;
-	  normal.y /= norm;
-	  normal.z /= norm;
-
-	  csVector3 normalA = norms.Get(tri.a);
-	  normalA.Normalize();
-	  csVector3 normalB = norms.Get(tri.b);
-	  normalB.Normalize();
-	  csVector3 normalC = norms.Get(tri.c);
-	  normalC.Normalize();
-
-	  // this doesn't work
-	  normsArray[tri.a] = normalA;
-	  normsArray[tri.b] = normalB;
-	  normsArray[tri.c] = normalC;
-/*
-	  // this works - vs1 - Z switched with Y
-	  normsArray[tri.a] = csVector3(normalA.x, normalA.z, normalA.y);
-	  normsArray[tri.b] = csVector3(normalB.x, normalB.z, normalB.y);
-	  normsArray[tri.c] = csVector3(normalC.x, normalC.z, normalC.y);
-/*
-	  // this works - vs2 - my normal
-	  normsArray[tri.a] = normal;
-	  normsArray[tri.b] = normal;
-	  normsArray[tri.c] = normal;
-*/
+	  normsArray[tri.a] = csVector3( norms.Get(tri.a).x, norms.Get(tri.a).z, norms.Get(tri.a).y );
+	  normsArray[tri.b] = csVector3( norms.Get(tri.b).x, norms.Get(tri.b).z, norms.Get(tri.b).y );
+	  normsArray[tri.c] = csVector3( norms.Get(tri.c).x, norms.Get(tri.c).z, norms.Get(tri.c).y );
     }
 
 	// generate the guide hairs - this should be done based on heightmap
 	for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
 	{
   	  csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
-	    0 * normsArray[uniqueIndices.Get(i)];
+	    displaceEps * normsArray[uniqueIndices.Get(i)];
 	  
 	  csGuideHair guideHair;
 	  guideHair.controlPointsCount = 5;
@@ -266,6 +237,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	  
 	  for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
 		guideHair.controlPoints[j] = pos + j * 0.05f * normsArray[uniqueIndices.Get(i)];
+		//guideHair.controlPoints[j] = pos + j * 0.05f * csVector3(0,1,0);
 
 	  guideHairs.Push(guideHair);
 	}
@@ -489,8 +461,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	{
 	  hairStrand->controlPoints[i] = csVector3(0);
 	  for ( size_t j = 0 ; j < hairStrand->guideHairsCount ; j ++ )
-	    hairStrand->controlPoints[i] += hairStrand->guideHairs[j].distance * 
-		  furMaterial->guideHairs.Get(hairStrand->guideHairs[j].index).controlPoints[i];
+	    hairStrand->controlPoints[i] += hairStrand->guideHairs[j].distance * (
+		  furMaterial->guideHairs.Get(hairStrand->guideHairs[j].index).controlPoints[i] + 
+		  (int)pow(-1,i) * csVector3(0.0f,0,0.0f));
 	}
   }
 
@@ -516,6 +489,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 	shaderVariable->SetValue(tc.GetOrigin());
 */
+	//printf("%f\n", tc.GetOrigin().y);
+
 	int controlPoints = furMaterial->hairStrands.Get(0).controlPointsCount;
 	int numberOfStrains = furMaterial->hairStrands.GetSize();
 
@@ -548,6 +523,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	}
 
 	furMaterial->factoryState->CalculateNormals();
+	furMaterial->factoryState->Invalidate();
   }
 
   const csColor4* FurAnimationControl::UpdateColors (csTicks current, 

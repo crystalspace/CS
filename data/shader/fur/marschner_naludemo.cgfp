@@ -7,7 +7,6 @@
 // vertex shader to fragment shader
 struct v2fConnector {
   float3 angles             : TEXCOORD1;
-
   fixed4 diffuseColor       : COLOR0;
   fixed3 ambientColor       : COLOR1;   // this is ALMOST BLACK
 };
@@ -24,7 +23,7 @@ float4 main(v2fConnector v2f,
                   ) : COLOR
 {
   Rcol = 1.87639;
-  TTcol = 2.70201;
+  TTcol = 1.70201;
   
   /* Compute the longitudinal reflectance component */
   half2 uv1 = v2f.angles.xy;
@@ -32,7 +31,7 @@ float4 main(v2fConnector v2f,
   
   /* Compute the azimuthal reflectance component */
   half2 uv2;
-  uv2.x = m.w;
+  uv2.x = cos( (asin (v2f.angles.x) - asin (v2f.angles.y) ) / 2 ); //m.w;
   uv2.y = v2f.angles.z;
   half4 ntt = h4tex2D(lookup2fixed, uv2);
 

@@ -6,7 +6,7 @@
   </plugins>
   <shaders>
     <shader>
-      <file>/shader/fur/fur_cg.xml</file>
+      <file>/shader/fur/kajiya_kay_cg.xml</file>
     </shader>
   </shaders>
   <textures>
@@ -19,9 +19,22 @@
     <texture name='krystal_hairs.png'>
       <file>/lib/krystal/krystal_hairs.png</file>
     </texture>
+    <texture name='lookup1'>
+      <file>/hairtest/lookup1.png</file>
+    </texture>
+    <texture name='lookup2'>
+      <file>/hairtest/lookup2.png</file>
+    </texture>	
   </textures>
   <materials>
     <material name='krystal_material'>
+<!-- Uncomment the following line for red hair -->	  
+<!--		
+	  <shader type='standard'>kajiya_kay_cg</shader>
+-->	  	  
+	  <shadervar type="vector3" name="mat furcolor">1,1,0</shadervar>
+      <shadervar type="texture" name="tex lookup1">lookup1</shadervar>
+      <shadervar type="texture" name="tex lookup2">lookup2</shadervar>	  
       <texture>krystal_body_h</texture>
       <shadervar type="texture" name="tex specular">krystal_spec</shadervar>
     </material>
