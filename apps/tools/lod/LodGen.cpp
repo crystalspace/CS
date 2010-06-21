@@ -574,6 +574,7 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
       for (int j = 0; j < 3; j++)
         edges.Delete(Edge(new_tri[j], new_tri[(j+1)%3]));
       removed_tris.Push(itri);
+      cout << "Rem " << itri << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
       sw.start_index++;
     }
     assert(incident.GetSize() > k.incident_tris[v0].GetSize());
@@ -586,7 +587,8 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
       AddTriangle(k, k.tri_buffer.GetSize()-1);
       if (u == UPDATE_EDGES)
       {
-        added_tris.Push(k.tri_buffer.GetSize()-1);
+        //added_tris.Push(k.tri_buffer.GetSize()-1);
+        cout << "Add " << k.tri_buffer.GetSize()-1 << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
         sw.end_index++;
       }
     }
@@ -595,6 +597,9 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
   {
     sliding_windows.Push(sw);
   }
+  for (unsigned int i = 0; i < k.tri_indices.GetSize(); i++)
+    for (int j = 0; j < 3; j++)
+      assert(k.tri_buffer[k.tri_indices[i]][j] != v0);
   return true;
 }
 
@@ -657,13 +662,15 @@ void LodGen::GenerateLODs()
       if (min_d == 0.0)
         break;
     }
+    assert(min_d != 1.0e30);
     cout << ": " << min_d << " - " << min_v0 << ", " << min_v1 << endl;
-    Collapse(k, min_v0, min_v1, UPDATE_EDGES);
+    bool result = Collapse(k, min_v0, min_v1, UPDATE_EDGES);
+    assert(result);
   }
   for (unsigned int i = 0; i < removed_tris.GetSize(); i++)
     ordered_tris.Push(k.tri_buffer[removed_tris[i]]);
-  for (unsigned int i = 0; i < added_tris.GetSize(); i++)
-    ordered_tris.Push(k.tri_buffer[added_tris[i]]);
+  for (unsigned int i = 0; i < k.tri_indices.GetSize(); i++)
+    ordered_tris.Push(k.tri_buffer[k.tri_indices[i]]);
   cout << "End" << endl;
 }
 

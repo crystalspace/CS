@@ -24,6 +24,8 @@ using namespace std;
 #include "LodGen.h"
 #include "lod.h"
 
+#define SCENE_BARREL 1
+
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
@@ -186,6 +188,37 @@ bool Lod::Application ()
   return true;
 }
 
+void Lod::AddVertUnique(const csVector3& v, csArray<csVector3>& vertices, csArray<int>& vert_map) const
+{
+  static const float epsilon = 0.00001;
+  int vindex = -1;
+  for (unsigned int i = 0; i < vertices.GetSize(); i++)
+  {
+    if (fabs(v[0] - vertices[i][0]) < epsilon && fabs(v[1] - vertices[i][1]) < epsilon && fabs(v[2] - vertices[i][2]) < epsilon)
+    {
+      vindex = i;
+      break;
+    }
+  }
+  if (vindex == -1)
+  {
+    vertices.Push(v);
+    vert_map.Push(vertices.GetSize() - 1);
+  }
+  else
+  {
+    vert_map.Push(vindex);
+  }
+}
+
+void Lod::AddTriangleMapped(const csTriangle& t, csArray<csTriangle>& triangles, const csArray<int>& vert_map) const
+{
+  csTriangle new_tri;
+  for (int i = 0; i < 3; i++)
+    new_tri[i] = vert_map[t[i]];
+  triangles.Push(new_tri);
+}
+
 void Lod::LoadSprite(const char* filename)
 {
   /*
@@ -243,8 +276,11 @@ void Lod::LoadSprite(const char* filename)
 
   if (!loader->LoadLibraryFile(filename))
     cout << "Error loading library file " << filename << endl;
-  
+#if SCENE_BARREL
   iMeshFactoryWrapper* factwrap = engine->FindMeshFactory("lodbarrel");
+#else
+  iMeshFactoryWrapper* factwrap = engine->FindMeshFactory("lodbox");
+#endif
   
   csRef<iMeshObjectFactory> fact = factwrap->GetMeshObjectFactory();
   assert(fact);
@@ -253,16 +289,43 @@ void Lod::LoadSprite(const char* filename)
   assert(fstate);
 
   int nv = fstate->GetVertexCount();
-  csVector3* vertices = fstate->GetVertices();
+  csArray<csVector3> vertices;
+  csArray<int> vert_map;
+  csVector3* fstate_vertices = fstate->GetVertices();
+  for (int i = 0; i < nv; i++)
+    AddVertUnique(fstate_vertices[i], vertices, vert_map);
   int nt = fstate->GetTriangleCount();
-  csTriangle* triangles = fstate->GetTriangles();
-  LodGen lodgen;
-  lodgen.SetVertices(nv, vertices);
-  lodgen.SetTriangles(nt, triangles);
+  csArray<csTriangle> triangles;
+  csTriangle* fstate_triangles = fstate->GetTriangles();
+  for (int i = 0; i < nt; i++)
+    AddTriangleMapped(fstate_triangles[i], triangles, vert_map);
+  LodGen lodgen(vertices, triangles);
   lodgen.GenerateLODs();
-  fstate->SetTriangleCount(0);
-  for (int i = 0; i < lodgen.GetTriangleCount(); i++)
+  
+  fstate->SetVertexCount(0);
+  csVector2 texcoord(0.0, 0.0);
+  csVector3 normal(0.0, 1.0, 0.0);
+  csColor4 color(0.0, 0.0, 0.0, 1.0);
+  
+  for (unsigned int i = 0; i < vertices.GetSize(); i++)
+    fstate->AddVertex(vertices[i], texcoord, normal, color);
+  
+  // Test by rendering level 1
+  fstate->SetTriangleCount(0);  
+  assert(lodgen.GetSlidingWindowCount() >= 2);
+  int imin = lodgen.GetSlidingWindow(1).start_index;
+  for (int i = imin; i < lodgen.GetTriangleCount(); i++)
+  {
+    cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
     fstate->AddTriangle(lodgen.GetTriangle(i));
+  }
+   /*
+  for (int i = 0; i < nt; i++)
+  {
+    cout << triangles[i][0] << " " << triangles[i][1] << " " << triangles[i][2] << endl;
+    fstate->AddTriangle(triangles[i]);
+  }
+   */
   
   loading.Invalidate();
 }
@@ -304,8 +367,12 @@ bool Lod::SetupModules ()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-  
+ 
+#if SCENE_BARREL
   CreateLODs("/lev/lodtest/lodbarrel");
+#else
+  CreateLODs("/lev/lodtest/lodbox");
+#endif
   //CreateLODs("/lib/std/sprite1");
 
   // Here we create our world.
@@ -397,7 +464,11 @@ void Lod::CreateSprites ()
     ReportError("Error loading mesh object factory!");
    */
 
+#if SCENE_BARREL
   iMeshFactoryWrapper* imeshfact = engine->FindMeshFactory("lodbarrel");
+#else
+  iMeshFactoryWrapper* imeshfact = engine->FindMeshFactory("lodbox");
+#endif
   
   // Create the sprite and add it to the engine.
   csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (

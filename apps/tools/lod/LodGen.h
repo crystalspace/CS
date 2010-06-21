@@ -41,24 +41,26 @@ enum UpdateEdges { NO_UPDATE_EDGES, UPDATE_EDGES };
 class LodGen
 {
 protected:
+  const csArray<csVector3>& vertices;
+  const csArray<csTriangle>& triangles;
   int num_vertices;
-  const csVector3* vertices;
   int num_triangles;
-  const csTriangle* triangles;
   
   csArray<Edge> edges;
   WorkMesh k;
   csArray<int> removed_tris;
-  csArray<int> added_tris;
+  //csArray<int> added_tris;
   csArray<csTriangle> ordered_tris;
   csArray<SlidingWindow> sliding_windows;
 
 public:
-  void SetVertices(int n, const csVector3* v) { num_vertices = n; vertices = v; }
-  void SetTriangles(int n, const csTriangle* t) { num_triangles = n; triangles = t; }
+  LodGen(const csArray<csVector3>& v, const csArray<csTriangle>& t): 
+    vertices(v), triangles(t), num_vertices(v.GetSize()), num_triangles(t.GetSize()) {}
   void GenerateLODs();
   int GetTriangleCount() const { return ordered_tris.GetSize(); }
   const csTriangle& GetTriangle(int i) const { return ordered_tris[i]; }
+  int GetSlidingWindowCount() const { return sliding_windows.GetSize(); }
+  const SlidingWindow& GetSlidingWindow(int i) const { return sliding_windows[i]; }
   
 protected:
   bool IsDegenerate(const csTriangle& tri) const;

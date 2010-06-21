@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		3703057E11CE807A006FBC82 /* lodbarrel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = lodbarrel; sourceTree = "<group>"; };
+		3703058511CE80AE006FBC82 /* lodbox */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = lodbox; sourceTree = "<group>"; };
 		370440E011BB3B2700EAFC31 /* demo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = demo.cpp; sourceTree = "<group>"; };
 		370440E111BB3B2700EAFC31 /* demo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = demo.h; sourceTree = "<group>"; };
 		370440E211BB3B2700EAFC31 /* demoldr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = demoldr.cpp; sourceTree = "<group>"; };
@@ -4577,6 +4579,15 @@
 			name = cs;
 			sourceTree = "<group>";
 		};
+		3703057D11CE807A006FBC82 /* lodtest */ = {
+			isa = PBXGroup;
+			children = (
+				3703057E11CE807A006FBC82 /* lodbarrel */,
+				3703058511CE80AE006FBC82 /* lodbox */,
+			);
+			path = lodtest;
+			sourceTree = "<group>";
+		};
 		370440DE11BB3B2700EAFC31 /* apps */ = {
 			isa = PBXGroup;
 			children = (
@@ -5627,6 +5638,7 @@
 				370445AC11BB3B2900EAFC31 /* isomap */,
 				370445AF11BB3B2900EAFC31 /* Jamfile */,
 				370445B011BB3B2900EAFC31 /* krystal */,
+				3703057D11CE807A006FBC82 /* lodtest */,
 				370445BA11BB3B2900EAFC31 /* oceantest */,
 				370445BC11BB3B2900EAFC31 /* parallaxtest */,
 				370445CF11BB3B2900EAFC31 /* particles */,

@@ -87,6 +87,8 @@ private:
   void CreateSprites();
 
   bool SetupModules ();
+  void AddVertUnique(const csVector3& v, csArray<csVector3>& vertices, csArray<int>& vert_map) const;
+  void AddTriangleMapped(const csTriangle& t, csArray<csTriangle>& triangles, const csArray<int>& vert_map) const;
 
 public:
 
