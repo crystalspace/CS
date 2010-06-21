@@ -463,7 +463,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	  for ( size_t j = 0 ; j < hairStrand->guideHairsCount ; j ++ )
 	    hairStrand->controlPoints[i] += hairStrand->guideHairs[j].distance * (
 		  furMaterial->guideHairs.Get(hairStrand->guideHairs[j].index).controlPoints[i] + 
-		  (int)pow(-1,i) * csVector3(0.0f,0,0.0f));
+		  (int)pow(-1.0,(int)i) * csVector3(0.0f,0,0.0f));
 	}
   }
 

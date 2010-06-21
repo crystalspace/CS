@@ -5,9 +5,11 @@
     <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
   </plugins>
   <shaders>
+<!-- 
     <shader>
       <file>/shader/fur/kajiya_kay_cg.xml</file>
     </shader>
+-->	
   </shaders>
   <textures>
     <texture name='krystal_body_h'>
