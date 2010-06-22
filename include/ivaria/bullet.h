@@ -342,7 +342,7 @@ struct iBulletDynamicSystem : public virtual iBase
  * position of every vertex of the body can be queried through GetVertexPosition().
  *
  * A soft body can neither be static or kinematic, it is always dynamic.
- * \sa iRigidBody iBulletRigidBody iSoftBodyAnimationControl
+ * \sa iRigidBody iBulletRigidBody iSoftBodyAnimationControl csBulletSoftBodyHelper
  */
 struct iBulletSoftBody : public virtual iBase
 {
@@ -444,6 +444,11 @@ struct csBulletSoftBodyHelper
 {
   /**
    * Create a genmesh from the given cloth soft body.
+   * The genmesh will be double-sided, in order to have correct normals on both
+   * sides of the cloth (ie the vertices of the soft body will be duplicated for the
+   * genmesh).
+   * \warning Don't forget to use doubleSided = true in
+   * iSoftBodyAnimationControl::SetSoftBody()
    */
   static csPtr<iMeshFactoryWrapper> CreateClothGenMeshFactory
   (iObjectRegistry* object_reg, const char* factoryName, iBulletSoftBody* cloth)
@@ -460,10 +465,14 @@ struct csBulletSoftBodyHelper
       (clothFact->GetMeshObjectFactory ());
 
     // Create the vertices of the genmesh
-    gmstate->SetVertexCount (cloth->GetVertexCount ());
+    size_t vertexCount = cloth->GetVertexCount ();
+    gmstate->SetVertexCount (vertexCount * 2);
     csVector3* vertices = gmstate->GetVertices ();
-    for (size_t i = 0; i < cloth->GetVertexCount (); i++)
+    for (size_t i = 0; i < vertexCount; i++)
+    {
       vertices[i] = cloth->GetVertexPosition (i);
+      vertices[i + vertexCount] = cloth->GetVertexPosition (i);
+    }
 
     // Create the triangles of the genmesh
     gmstate->SetTriangleCount (cloth->GetTriangleCount () * 2);
@@ -472,7 +481,9 @@ struct csBulletSoftBodyHelper
     {
       csTriangle triangle = cloth->GetTriangle (i);
       triangles[i * 2] = triangle;
-      triangles[i * 2 + 1] = csTriangle (triangle[2], triangle[1], triangle[0]);
+      triangles[i * 2 + 1] = csTriangle (triangle[2] + vertexCount,
+					 triangle[1] + vertexCount,
+					 triangle[0] + vertexCount);
     }
 
     gmstate->CalculateNormals ();
@@ -481,7 +492,7 @@ struct csBulletSoftBodyHelper
     csVector2* texels = gmstate->GetTexels ();
     csVector3* normals = gmstate->GetNormals ();
     CS::Geometry::TextureMapper* mapper = new CS::Geometry::DensityTextureMapper (1.0f);
-    for (size_t i = 0; i < cloth->GetVertexCount (); i++)
+    for (size_t i = 0; i < vertexCount * 2; i++)
       texels[i] = mapper->Map (vertices[i], normals[i], i);
 
     gmstate->Invalidate ();

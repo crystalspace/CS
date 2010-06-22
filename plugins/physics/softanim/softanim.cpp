@@ -109,11 +109,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
   {
   }
 
-  void SoftBodyControl::SetSoftBody (iBulletSoftBody* body)
+  void SoftBodyControl::SetSoftBody (iBulletSoftBody* body, bool doubleSided)
   {
     softBody = body;
-    vertices.SetSize (softBody->GetVertexCount ());
-    normals.SetSize (softBody->GetVertexCount ());
+    this->doubleSided = doubleSided;
+    vertices.SetSize (softBody->GetVertexCount () * 2);
+    normals.SetSize (softBody->GetVertexCount () * 2);
 
     // initialize the vertices and mesh position
     meshPosition.Set (0.0f);
@@ -164,6 +165,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
       meshPosition += position;
 
       normals[i] = softBody->GetVertexNormal (i);
+
+      if (doubleSided)
+      {
+	vertices[i + softBody->GetVertexCount ()] = vertices[i];
+	normals[i + softBody->GetVertexCount ()] = - normals[i];
+      }
     }
     meshPosition /= softBody->GetVertexCount ();
 
@@ -190,7 +197,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     if (!softBody)
       return normals;
 
-    CS_ASSERT(num_normals == (int) softBody->GetVertexCount ());
+    CS_ASSERT(doubleSided ? num_normals == 2 * (int) softBody->GetVertexCount ()
+	      : num_normals == (int) softBody->GetVertexCount ());
 
     return this->normals.GetArray ();
   }
@@ -207,7 +215,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     if (!softBody)
       return verts;
 
-    CS_ASSERT(num_verts == (int) softBody->GetVertexCount ());
+    CS_ASSERT(doubleSided ? num_verts == 2 * (int) softBody->GetVertexCount ()
+	      : num_verts == (int) softBody->GetVertexCount ());
 
     return vertices.GetArray ();
   }
