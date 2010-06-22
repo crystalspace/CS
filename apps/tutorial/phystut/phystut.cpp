@@ -1720,7 +1720,7 @@ void Simple::SpawnCloth ()
     scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
   csRef<iSoftBodyAnimationControl> animationControl =
     scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
-  animationControl->SetSoftBody (body);
+  animationControl->SetSoftBody (body, true);
 }
 
 void Simple::SpawnSoftBody ()
