@@ -1,0 +1,5 @@
+SubDir TOP apps tutorial testcull ;
+
+Description testcull : "tutorial part two, sprite" ;
+Application testcull : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith testcull : crystalspace ;
