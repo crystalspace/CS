@@ -463,10 +463,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	  for ( size_t j = 0 ; j < hairStrand->guideHairsCount ; j ++ )
 	    hairStrand->controlPoints[i] += hairStrand->guideHairs[j].distance * (
 		  furMaterial->guideHairs.Get(hairStrand->guideHairs[j].index).controlPoints[i] + 
-		  (int)pow(-1.0,(int)i) * csVector3(0.0f,0,0.0f));
+		  (int)pow(-1.0,(int)i) * csVector3(0.0f,0.0f,0.0f));
 	}
   }
-
+  
   void FurAnimationControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
 
@@ -524,6 +524,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 	furMaterial->factoryState->CalculateNormals();
 	furMaterial->factoryState->Invalidate();
+
+ 	furMaterial->factoryState->AddRenderBuffer(CS_BUFFER_TANGENT, 
+		furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT));
+	furMaterial->factoryState->RemoveRenderBuffer(CS_BUFFER_TANGENT);
+
   }
 
   const csColor4* FurAnimationControl::UpdateColors (csTicks current, 

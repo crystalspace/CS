@@ -10,11 +10,12 @@
     <shader>
       <file>/shader/fur/marschner_cg.xml</file>
     </shader>	
-<!--		
     <shader>
       <file>/shader/fur/kajiya_kay_cg.xml</file>
     </shader>	
--->		
+    <shader>
+      <file>/shader/fur/phong_cg.xml</file>
+    </shader>		
   </shaders>
   <textures>
     <texture name='lookup1'>
@@ -26,7 +27,7 @@
   </textures>
   <materials>
     <material name='fur_material'>
-      <shader type='standard'>marschner_naludemo_cg</shader>
+      <shader type='standard'>phong_cg</shader>
 	  
 	  <shadervar type="float" name="width">0.005</shadervar>
 	  <shadervar type="float" name="density">5</shadervar>

@@ -5,6 +5,7 @@
 struct a2vConnector {
     float4 objCoord : POSITION;
     float3 objNormal : NORMAL;
+	float3 Tangent: TEXCOORD0;
 };
 
 struct v2fConnector {
@@ -27,7 +28,6 @@ v2fConnector main(a2vConnector a2v,
                   
                   uniform float3 worldPointLight0Pos,
                   uniform float3 PointLightColor,
-				  
 				  uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans)
 {
   v2fConnector v2f;
@@ -44,8 +44,8 @@ v2fConnector main(a2vConnector a2v,
   float4 objColor = float4(1,0,0,1);
   
   /* Compute the tangent from adjacent vertices */
-  float3 objTangent = normalize(a2v.objNormal - a2v.objCoord.xyz);
-
+  float3 objTangent = normalize(a2v.Tangent - a2v.objCoord.xyz );
+  
   /* Project */
   float4 objCoord = a2v.objCoord;    
   float4 projCoord = mul(modelViewProj, objCoord);

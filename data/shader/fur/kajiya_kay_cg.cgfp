@@ -1,0 +1,35 @@
+<cgfp>
+  <program>
+        <![CDATA[
+
+struct vertex2fragment { 
+	float4 HPosition : POSITION;
+	float3 LightVec : TEXCOORD0;	
+	float3 WorldNormal : TEXCOORD1;		
+	float3 WorldView: TEXCOORD2;	
+};
+
+float4 main (vertex2fragment IN) : COLOR
+{
+	float4 OUT = float4(0, 0, 0, 1);
+	float3 scolor = 1;
+	float3 dcolor = float3(1,0,0);
+
+	float3 Ln = normalize(IN.LightVec);
+	float3 Nn = normalize(IN.WorldNormal);
+	float3 Vn = normalize(IN.WorldView);	
+	
+	float tangentLight = dot(Nn, Ln);
+	float tangentEye = dot(Nn, Vn);
+	
+	float diffuse = sin( acos( tangentLight ) );
+	float spec = pow( tangentLight * tangentEye + sin( acos( tangentLight ) ) * sin( acos( tangentEye ) ) , 60.0);
+
+	OUT.xyz = dcolor * ( min( diffuse , 1.0) ) + scolor * ( min( spec, 1.0 ) );
+	
+	return OUT;
+}
+
+        ]]>
+    </program>
+</cgfp>

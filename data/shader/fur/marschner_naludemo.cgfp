@@ -23,7 +23,7 @@ float4 main(v2fConnector v2f,
                   ) : COLOR
 {
   Rcol = 1.87639;
-  TTcol = 1.70201;
+  TTcol = 3.70201;
   
   /* Compute the longitudinal reflectance component */
   half2 uv1 = v2f.angles.xy;
