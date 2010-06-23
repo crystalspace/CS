@@ -204,6 +204,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                           CS::RenderManager::RenderView *rview,
                           iTextureHandle *gBuffer0, 
                           iTextureHandle *gBuffer1,
+                          iTextureHandle *gBuffer2,
                           iTextureHandle *gBufferDepth,
                           PersistentData &persistent)
       : 
@@ -217,10 +218,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       csShaderVariable *gBuffer0SV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer 0"));
       csShaderVariable *gBuffer1SV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer 1"));
+      csShaderVariable *gBuffer2SV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer 2"));
       csShaderVariable *gBufferDSV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer depth"));
 
       gBuffer0SV->SetValue (gBuffer0);
       gBuffer1SV->SetValue (gBuffer1);
+      gBuffer2SV->SetValue (gBuffer2);
       gBufferDSV->SetValue (gBufferDepth);
     }
 
@@ -263,25 +266,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       // Setup shader variables.
       iMaterial *mat = persistentData.sphereMaterial->GetMaterial ();
       iShader *shader = mat->GetShader (stringSet->Request ("base"));
+      iShaderVariableContext *lightSVContext = light->GetSVContext ();
 
       iShaderVarStringSet *svStringSet = shaderMgr->GetSVNameStringset ();
-
-      csShaderVariable *lightPosSV = shader->GetVariableAdd (svStringSet->Request ("light position"));
-      csShaderVariable *lightColSV = shader->GetVariableAdd (svStringSet->Request ("light color"));
-      csShaderVariable *lightSpecSV = shader->GetVariableAdd (svStringSet->Request ("light specular"));
-      csShaderVariable *lightAttenSV = shader->GetVariableAdd (svStringSet->Request ("light attenuation"));
 
       // Transform light position to view space.
       csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
       lightPos = graphics3D->GetWorldToCamera ().This2Other (lightPos);
 
+      csShaderVariable *lightPosSV = lightSVContext->GetVariableAdd (svStringSet->Request ("light position view"));
       lightPosSV->SetValue (lightPos);
-      lightColSV->SetValue (light->GetColor ());
-      lightSpecSV->SetValue (light->GetSpecularColor ());
-      lightAttenSV->SetValue (light->GetAttenuationConstants ());
 
       // Update shader stack.
       csShaderVariableStack svStack = shaderMgr->GetShaderVariableStack ();
+      lightSVContext->PushVariables (svStack);
       shader->PushVariables (svStack);
 
       // Draw the point light mesh.

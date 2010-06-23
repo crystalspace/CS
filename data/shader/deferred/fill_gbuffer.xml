@@ -24,13 +24,17 @@
     <pass>
       
       <buffer source="normal" destination="normal" />
-      <buffer source="tangent" destination="texture coordinate 1" />
-      <buffer source="binormal" destination="texture coordinate 2" />
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <buffer source="texture coordinates lightmap" destination="texture coordinate 1" />
+      <buffer source="tangent" destination="texture coordinate 2" />
+      <buffer source="binormal" destination="texture coordinate 3" />
       <vp plugin="glcg" file="/shader/deferred/fill_gbuffer.cgvp" />
 
-      <texture destination="TexNormal" name="tex normal" />
       <texture destination="TexDiffuse" name="tex diffuse" />
+      <texture destination="TexSpecular" name="tex specular" />
+      <texture destination="TexHeight" name="tex height" />
+      <texture destination="TexNormal" name="tex normal" />
+      <texture destination="TexLightMap" name="tex lightmap" />
       <fp plugin="glcg">
         <cgfp>
           <?Include fill_gbuffer.cgfp ?>

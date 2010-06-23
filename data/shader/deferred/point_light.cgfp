@@ -1,9 +1,10 @@
 <cgfp>
 
 <variablemap variable="projection transform inverse" destination="ProjInv" />
-<variablemap variable="light position" destination="LightPos" />
-<variablemap variable="light color" destination="LightCol" />
+<variablemap variable="light position view" destination="LightPos" />
+<variablemap variable="light diffuse" destination="LightDiff" />
 <variablemap variable="light specular" destination="LightSpec" />
+<variablemap variable="light ambient" destination="LightAmbient" />
 <variablemap variable="light attenuation" destination="AttenVec" />
   
 <program>
@@ -54,20 +55,23 @@ float3 ScreenToWorldPosition(float3 screen)
  
 float4 main(vertex2fragment IN,
             uniform float3 LightPos,
-            uniform float3 LightCol,
+            uniform float3 LightDiff,
             uniform float3 LightSpec,
+            uniform float3 LightAmbient,
             uniform float4 AttenVec,
             uniform sampler2D gBuffer0,
             uniform sampler2D gBuffer1,
+            uniform sampler2D gBuffer2,
             uniform sampler2D gBufferDepth) : COLOR
 {
   // Do the perspective divide and convert to texture space.
   float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
   float2 screenUV = screenXY * 0.5 + 0.5;
   
-  float4 albedo = tex2D (gBuffer0, screenUV);
-  float4 normal = tex2D (gBuffer1, screenUV);
-  float4 depth  = tex2D (gBufferDepth, screenUV);
+  float4 albedo   = tex2D (gBuffer0, screenUV);
+  float4 normal   = tex2D (gBuffer1, screenUV);
+  float4 lightmap = tex2D (gBuffer2, screenUV);
+  float4 depth    = tex2D (gBufferDepth, screenUV);
   
   float3 screen = float3 (screenXY.x, -screenXY.y, ExtractDepth (depth));
   float3 p = ScreenToWorldPosition (screen);
@@ -82,11 +86,12 @@ float4 main(vertex2fragment IN,
   float3 H = normalize (L + V);
   
   float att = Attenuation (dist, AttenVec);
+  float specAmt = albedo.w;
   
   // Compute phong lighting.
-  float3 diff = albedo.rgb * LightCol * saturate (dot (n, L));
-  float3 spec = LightSpec * pow (saturate (dot (n, H)), 128);
-  float3 color = (diff) * att;
+  float3 diff = albedo.rgb * LightDiff * saturate (dot (n, L));
+  float3 spec = LightSpec * specAmt * pow (saturate (dot (n, H)), 32);
+  float3 color = (diff + spec) * att;
 
   return float4 (color, 1.0);
 }

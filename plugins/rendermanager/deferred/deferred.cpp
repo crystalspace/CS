@@ -114,8 +114,8 @@ void ForEachLight(ContextType& context, Fn& fn)
  * // ... contexts setup etc. ...
  *
  * {
- *   DeferredTreeRenderer<RenderTree> render (renderView->GetGraphics3D (),
- *     shaderManager);
+ *   DeferredTreeRenderer<RenderTree, UpdateFunctor> 
+ *     render (renderView->GetGraphics3D (), shaderManager);
  *
  *   ForEachContextReverse (renderTree, render);
  *   g3d->FinishDraw();
@@ -155,14 +155,13 @@ public:
 
     int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
     graphics3D->BeginDraw (drawFlags);
+    graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
 
     // Render all mesh nodes in context
     size_t layerCount = context->svArrays.GetNumLayers();
     for (size_t layer = 0; layer < layerCount; ++layer)
     {
       meshRender.SetLayer (layer);
-
-      graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
       ForEachMeshNode (*context, meshRender);
     }
   }
@@ -375,7 +374,10 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     csReport (objRegistry, CS_REPORTER_SEVERITY_NOTIFY, messageID,
 	"Using default render layers");
 
-    SingleRenderLayer baseLayer (shaderManager->GetShader ("fill_gbuffer"));
+    iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
+    iShader *shader = shaderManager->GetShader ("fill_gbuffer");
+
+    SingleRenderLayer baseLayer (shader);
 
     baseLayer.AddShaderType (stringSet->Request("base"));
     baseLayer.AddShaderType (stringSet->Request("ambient"));
@@ -500,6 +502,7 @@ bool RMDeferred::RenderView(iView *view)
     float aspect = (float)w / h;
     renderTree.AddDebugTexture (colorBuffer0, aspect);
     renderTree.AddDebugTexture (colorBuffer1, aspect);
+    renderTree.AddDebugTexture (colorBuffer2, aspect);
     renderTree.AddDebugTexture (depthBuffer, aspect);
   }
 
@@ -526,8 +529,6 @@ bool RMDeferred::RenderView(iView *view)
   // Fills the accumulation buffer.
   AttachAccumBuffer (graphics3D);
   {
-    //DrawFullscreenTexture (colorBuffer0, graphics3D);
-
     int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | startContext->drawFlags;
     drawFlags &= ~CSDRAW_CLEARSCREEN;
 
@@ -543,6 +544,7 @@ bool RMDeferred::RenderView(iView *view)
       rview, 
       colorBuffer0, 
       colorBuffer1,
+      colorBuffer2,
       depthBuffer,
       lightRenderPersistent);
     
