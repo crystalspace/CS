@@ -34,6 +34,8 @@
 class Simple : public csApplicationFramework, public csBaseEventHandler
 {
 private:
+
+  csRef<iVFS> vfs;
   /// A pointer to the 3D engine.
   csRef<iEngine> engine;
 

@@ -220,7 +220,7 @@ bool Simple::SetupModules ()
  
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 15, -3));
 
   // We use some other "helper" event handlers to handle 
   // pushing our work into the 3D engine and rendering it
@@ -252,10 +252,15 @@ void Simple::CreateRoom ()
   box.SetMapper (&mapper);
   box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
 
+
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
     engine, room, "walls", "walls_factory", &box);
+
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
+  //g3d->d
+
+  //csRenderMesh **rmeshes=walls->GetRenderMeshes(rm->RenderView(view),;
 
   // Now we need light to see something.
   csRef<iLight> light;

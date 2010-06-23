@@ -178,6 +178,8 @@ bool Simple::Application ()
 
 bool Simple::SetupModules ()
 {
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+  if(!vfs) return ReportError("Failed to locate Virtual File System!");
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
@@ -223,7 +225,7 @@ bool Simple::SetupModules ()
 
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 15, -3));
 
   // We use some other "helper" event handlers to handle 
   // pushing our work into the 3D engine and rendering it
@@ -259,6 +261,37 @@ void Simple::CreateRoom ()
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
     engine, room, "walls", "walls_factory", &box);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
+
+  if(!vfs->Mount("/modelpath/","G:\\Programare\\GSoC\\CS\\"))
+  {
+	  ReportError("Failed to mount specified location!");
+	  return;
+  }
+
+  loader->Load("/modelpath/house.xml");
+  csRef<iMeshFactoryWrapper> meshFactW=engine->FindMeshFactory("House");
+  
+  if(meshFactW==NULL)
+  {
+	  ReportError("Failed to find mesh factory!");
+	  return;
+  }
+  csRef<iMeshWrapper> house (engine->CreateMeshWrapper (
+    meshFactW, "MyHouse", room,
+    csVector3 (0, 0, 0),true));
+
+  if(house==NULL)
+  {
+	  ReportError("Failed to create mesh wrapper!");
+	  return;
+  }
+
+  csMatrix3 m; m.Identity ();
+  m*=0.1f;
+  house->GetMovable ()->SetTransform (m);
+
+  house->SetZBufMode (CS_ZBUF_USE);
+  house->SetRenderPriority (engine->GetObjectRenderPriority ());
 
   // Now we need light to see something.
   csRef<iLight> light;
