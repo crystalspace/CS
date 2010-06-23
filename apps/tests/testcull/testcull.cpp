@@ -13,7 +13,7 @@ Testcull::~Testcull ()
 {
 }
 
-csSimpleRenderMesh ConstructBBoxMesh(csBox3 &box)
+csSimpleRenderMesh ConstructBBoxMesh(csBox3 &box,csRenderMeshType rmtype,csZBufMode zbuf)
 {
 	csSimpleRenderMesh srm;
 	csVector3* verts = 0;
@@ -42,16 +42,30 @@ csSimpleRenderMesh ConstructBBoxMesh(csBox3 &box)
 	verts[14]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
 	verts[15]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
 
-	verts[16]=csVector3(box.MinX(),box.MaxY(),box.MinZ());
-	verts[17]=csVector3(box.MinX(),box.MaxY(),box.MaxZ());
-	verts[18]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
-	verts[19]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
+	if(rmtype==CS_MESHTYPE_QUADS)
+	{
+		verts[16]=csVector3(box.MinX(),box.MaxY(),box.MinZ());
+		verts[17]=csVector3(box.MinX(),box.MaxY(),box.MaxZ());
+		verts[18]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
+		verts[19]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
 
-	verts[20]=csVector3(box.MaxX(),box.MinY(),box.MinZ());
-	verts[21]=csVector3(box.MaxX(),box.MinY(),box.MaxZ());
-	verts[22]=csVector3(box.MinX(),box.MinY(),box.MaxZ());
-	verts[23]=csVector3(box.MinX(),box.MinY(),box.MinZ());
+		verts[20]=csVector3(box.MaxX(),box.MinY(),box.MinZ());
+		verts[21]=csVector3(box.MaxX(),box.MinY(),box.MaxZ());
+		verts[22]=csVector3(box.MinX(),box.MinY(),box.MaxZ());
+		verts[23]=csVector3(box.MinX(),box.MinY(),box.MinZ());
+	}
+	else
+	{
+		verts[16]=csVector3(box.MinX(),box.MinY(),box.MinZ());
+		verts[17]=csVector3(box.MinX(),box.MaxY(),box.MinZ());
+		verts[18]=csVector3(box.MinX(),box.MinY(),box.MaxZ());
+		verts[19]=csVector3(box.MinX(),box.MaxY(),box.MaxZ());
 
+		verts[20]=csVector3(box.MaxX(),box.MinY(),box.MinZ());
+		verts[21]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
+		verts[22]=csVector3(box.MaxX(),box.MinY(),box.MaxZ());
+		verts[23]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
+	}
 	cols[0]=csVector4(0.0f,1.0f,0.0f);
 	for(int i=1;i<24; ++i)
 	{
@@ -62,12 +76,12 @@ csSimpleRenderMesh ConstructBBoxMesh(csBox3 &box)
 	srm.colors=cols;
 	srm.vertexCount=24;
 
-	srm.meshtype = CS_MESHTYPE_QUADS;
+	srm.meshtype = rmtype;
 	csAlphaMode alf;
 	alf.alphaType = alf.alphaSmooth;
 	alf.autoAlphaMode = false;
 	srm.alphaType = alf;
-	srm.z_buf_mode=CS_ZBUF_USE;
+	srm.z_buf_mode=zbuf;
 	return srm;
 }
 
@@ -112,6 +126,11 @@ void Testcull::Frame ()
       c->Move (CS_VEC_FORWARD * 4 * speed);
     if (kbd->GetKeyState (CSKEY_DOWN))
       c->Move (CS_VEC_BACKWARD * 4 * speed);
+
+	if (kbd->GetKeyState(CSKEY_F1))
+		bUseBB=!bUseBB;
+	if( kbd->GetKeyState(CSKEY_F2))
+		bShowBB=!bShowBB;
   }
 
   // We now assign a new rotation transformation to the camera.  You
@@ -125,59 +144,99 @@ void Testcull::Frame ()
   csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
   csOrthoTransform ot (rot, c->GetTransform ().GetOrigin ());
   c->SetTransform (ot);
-  g3d->GetDriver2D()->Clear(0);
-
-  //rm->RenderView (view);
+  //g3d->GetDriver2D()->Clear(0);
 
   int auxNumVisible=0;
+  int k=0;
   if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
 	ReportError("Cannot prepare renderer for 3D drawing.");
   }
-  
+
+  for(int i=0;i<1;i++)
+  {
+	engine->Draw(c,view->GetClipper(),house[i]);
+	bboxes[i]=house[i]->GetWorldBoundingBox();
+  }
+
   for(int i=0;i<numHouses;i++)
   {
 	  if(!invisible[i]) 
 		  engine->Draw(c,view->GetClipper(),house[i]);
   }
-  //g3d->SetWriteMask(false,false,false,false);
-  for(int i=0;i<numHouses;i++)
-  {
-	csBox3 box=house[i]->GetWorldBoundingBox();
-	csSimpleRenderMesh srm=ConstructBBoxMesh(box);
-	g3d->DrawSimpleMesh(srm);
-  }
-  g3d->SetWriteMask(true,true,true,true);
 
-  //g3d->SetWriteMask(false,false,false,false);
-  for(int i=0;i<numHouses;i++)
+  if(bShowBB)
   {
-	  unsigned int sample=10;
-	  if(g3d->QueryFinished(queries[i]))
+	  k=0;
+	  for(int i=0;i<sqrtl(numHouses);i++)
 	  {
-		g3d->BeginOcclusionQuery(queries[i]);
-			csBox3 box=house[i]->GetWorldBoundingBox();
-			csSimpleRenderMesh srm=ConstructBBoxMesh(box);
+		  for(int j=0;j<sqrtl(numHouses);j++)
+		  {
+			bboxes[k]=house[k]->GetWorldBoundingBox();
+			csSimpleRenderMesh srm=ConstructBBoxMesh(bboxes[k],CS_MESHTYPE_LINES,CS_ZBUF_USE);
 			g3d->DrawSimpleMesh(srm);
-		g3d->EndOcclusionQuery();
-		/*if(g3d->IsVisible(queries[i],sample))
-		{
-			auxNumVisible++;
-			invisible[i]=false;
-		}
-		else
-		{
-			invisible[i]=true;
-		}*/
+			//engine->Draw(c,view->GetClipper(),house[k]);
+			k++;
+		  }
+	  }
+	  }
+  g3d->SetWriteMask(false,false,false,false);
+  //g3d->SetWriteMask(true,true,true,true);
+
+  k=0;
+  for(int i=0;i<sqrtl(numHouses);i++)
+  {
+	  for(int j=0;j<sqrtl(numHouses);j++)
+	  {
+		  if(bUseBB)
+		  {
+			bboxes[k]=house[k]->GetWorldBoundingBox();
+			csSimpleRenderMesh srm=ConstructBBoxMesh(bboxes[k],CS_MESHTYPE_QUADS,CS_ZBUF_USE);
+			g3d->DrawSimpleMesh(srm);
+		  }
+		  else engine->Draw(c,view->GetClipper(),house[k]);
+		  k++;
 	  }
   }
-  //g3d->SetWriteMask(true,true,true,true);
+  
+  
+  //g3d->SetWriteMask(false,false,false,false);
+  k=0;
+  for(int i=0;i<sqrtl(numHouses);i++)
+  {
+	  for(int j=0;j<sqrtl(numHouses);j++)
+	  {
+		  unsigned int sample=0;
+		  if(g3d->QueryFinished(queries[k]))
+		  {
+			g3d->BeginOcclusionQuery(queries[k]);
+				if(bUseBB)
+				{
+					csSimpleRenderMesh srm=ConstructBBoxMesh(bboxes[k],CS_MESHTYPE_QUADS,CS_ZBUF_USE);
+					g3d->DrawSimpleMesh(srm);
+				}
+				else engine->Draw(c,view->GetClipper(),house[k]);
+			g3d->EndOcclusionQuery();
+			if(g3d->IsVisible(queries[k],sample))
+			{
+				auxNumVisible++;
+				invisible[k]=false;
+			}
+			else
+			{
+				invisible[k]=true;
+			}
+			k++;
+		  }
+	  }
+  }
+  g3d->SetWriteMask(true,true,true,true);
 
   g3d->FinishDraw();
 
   if(auxNumVisible!=numVisible)
   {
-	  printf("Number of visible objects: %d\n",auxNumVisible);
+	  printf("Number of visible and invisible objects: %d %d\n",auxNumVisible,numHouses-auxNumVisible);
 	  numVisible=auxNumVisible;
   }
 
@@ -336,7 +395,7 @@ bool Testcull::SetupModules ()
 
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -30));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -50));
 
   // We use some other "helper" event handlers to handle 
   // pushing our work into the 3D engine and rendering it
@@ -400,21 +459,39 @@ void Testcull::CreateRoom ()
 	  return;
   }
 
-  numVisible=numHouses=2;
+  int k=0;
+  char aux[100],name[]="MyHouse";
+
+  numVisible=numHouses=16;
+
   for(int i=0;i<numHouses;i++)
-	  invisible[i]=false;
+	invisible[i]=false;
+  for(int i=0;i<sqrtl(numHouses);i++)
+  {
+	  for(int j=0;j<sqrtl(numHouses);j++)
+	  {
+		  sprintf(aux,"%s%d",name,k);
+		  house[k] = csRef<iMeshWrapper>(engine->CreateMeshWrapper (
+			meshFactW, aux, room,
+			csVector3 (-20*sqrtl(numHouses)/2+20*i, 0,20*j),true));
+		  k++;
+	  }
+  }
 
-  house[0] = csRef<iMeshWrapper>(engine->CreateMeshWrapper (
-    meshFactW, "MyHouse", room,
-    csVector3 (10, 0, 0),true));
-
-  house[1] = csRef<iMeshWrapper> (engine->CreateMeshWrapper (
+  /*house[1] = csRef<iMeshWrapper> (engine->CreateMeshWrapper (
     meshFactW, "MyHouse2", room,
-    csVector3 (-10, 0, 0),true));
+    csVector3 (0, 0, 0),true));
+
+   house[2] = csRef<iMeshWrapper> (engine->CreateMeshWrapper (
+    meshFactW, "MyHouse3", room,
+    csVector3 (20, 0, 0),true));*/
  
   house[0]->GetMovable ()->SetTransform (m);
   house[1]->GetMovable ()->SetTransform (m);
+  house[2]->GetMovable ()->SetTransform (m);
 
+  bUseBB=true;
+  bShowBB=true;
   //house[0]->GetMeshObject()->
 	//rm->
  // int num=0;

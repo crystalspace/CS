@@ -38,9 +38,12 @@ private:
 
   csRef<FramePrinter> printer;
 
+  bool bUseBB;
+  bool bShowBB;
   int oldNum,newNum,numHouses,numVisible;
   unsigned int *queries;
   csRef<iMeshWrapper> house[100];
+  csBox3 bboxes[100];
   bool invisible[100];
 
   /**
