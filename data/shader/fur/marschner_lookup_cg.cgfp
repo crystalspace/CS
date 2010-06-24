@@ -6,7 +6,8 @@ struct vertex2fragment {
 	float4 HPosition : POSITION;
 	float3 LightVec : TEXCOORD0;	
 	float3 WorldNormal : TEXCOORD1;		
-	float3 WorldView: TEXCOORD2;	
+	float3 WorldView: TEXCOORD2;
+	float3 AmbientColor: TEXCOORD3;	
 };
 
 float4 main (vertex2fragment IN,
@@ -15,7 +16,10 @@ float4 main (vertex2fragment IN,
 			uniform sampler2D lookup2fixed ) : COLOR
 {
 	float4 OUT = float4(0, 0, 0, 1);
-
+    float AmbientCol = 0.1;
+    float DiffuseCol = 0.65;
+	float4 objColor = float4( 0.51, 0.34, 0.25, 1.0 );
+	
 	float MR_ct = 0.079;
 	float MTT_ct = 0.159;
 	float MTRT_ct = 0.039;
@@ -45,9 +49,22 @@ float4 main (vertex2fragment IN,
 	float2 uv2 = float2( cos_fd, cos_qd ) * 0.5 + 0.5;
 	float4 N = tex2D(lookup2fixed, uv2);
 	
-	//OUT.xyz = M.g * 10;
-	OUT.xyz = float3( 0.51, 0.34, 0.25 ) + ( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd);
+    /* Compute diffuse lighting with phi-dependent component */
+    float diffuse = sqrt(max(0.0001, 1 - uv1.x * uv1.x));
+
+    /* Pass colors */
+	float4 diffuseColor;
+    diffuseColor.rgb = diffuse * objColor.rgb * DiffuseCol;
+    diffuseColor.a = objColor.a;
+	float3 ambientColor;
+	ambientColor = objColor.rgb * AmbientCol;	
 	
+	float3 lighting = (( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd));
+	lighting += diffuseColor.rgb;
+	
+	OUT.xyz = lighting + diffuseColor.rgb * 0.2 + IN.AmbientColor;
+	
+	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd) + objColor.xyz;
 	return OUT;
 }
 
