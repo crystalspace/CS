@@ -12,15 +12,15 @@ struct v2fConnector {
 };
 
 float4 main(v2fConnector v2f,
-                  // Parameters for the hair model
-                  uniform half Rcol,
-                  uniform half TTcol,
+			// Parameters for the hair model
+			uniform half Rcol,
+			uniform half TTcol,
 
-                  // Lookup tables for the hair model (fixed point)
-                  uniform sampler2D lookup1fixed,
-                  uniform sampler2D lookup2fixed
-            
-                  ) : COLOR
+			// Lookup tables for the hair model (fixed point)
+			uniform sampler2D lookup1fixed,
+			uniform sampler2D lookup2fixed
+		
+			) : COLOR
 {
   Rcol = 1.87639;
   TTcol = 3.70201;
@@ -31,7 +31,7 @@ float4 main(v2fConnector v2f,
   
   /* Compute the azimuthal reflectance component */
   half2 uv2;
-  uv2.x = cos( (asin (v2f.angles.x) - asin (v2f.angles.y) ) / 2 ); //m.w;
+  uv2.x = cos( (asin (2 * v2f.angles.x - 1) - asin (2 * v2f.angles.y - 1) ) / 2 ) * 0.5 + 0.5; //m.w;
   uv2.y = v2f.angles.z;
   half4 ntt = h4tex2D(lookup2fixed, uv2);
 
