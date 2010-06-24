@@ -48,10 +48,22 @@ public:
   /// Returns true if the application sould shutdown after the current frame.
   bool ShouldShutdown() const { return shouldShutdown; }
 
+  /// Prints help text for the demo app.
+  void Help();
+
 protected:
 
   /// The deferred shading demos run method.
   void RunDemo();
+
+  /// Loads settings for the demo.
+  bool LoadSettings();
+
+  /// Loads the logo.
+  bool LoadLogo();
+
+  /// Draws the logo if possible.
+  void DrawLogo();
 
   /// Updates the cameras position and rotation.
   void UpdateCamera();
@@ -61,6 +73,9 @@ protected:
 
   /// Loads the demo scene.
   bool LoadScene();
+
+  /// Loads application data.
+  bool LoadAppData();
 
   /// Setup the demo scene.
   bool SetupScene();
@@ -100,6 +115,7 @@ protected:
 
   // Cache event names.
   csEventID quitEventID;
+  csEventID cmdLineHelpEventID;
 
 protected:
 
@@ -108,7 +124,17 @@ protected:
   float viewRotX;
   float viewRotY;
 
-  bool useDeferredShading;
+protected:
+
+  csString cfgWorldDir;
+  csString cfgWorldFile;
+  csString cfgLogoFile;
+
+  bool cfgDrawLogo;
+  bool cfgUseDeferredShading;
+
+  // The logo texture.
+  csRef<iTextureHandle> logoTex;
 
 private:
 

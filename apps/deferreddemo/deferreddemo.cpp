@@ -18,21 +18,29 @@
 
 #include "deferreddemo.h"
 
+const char *DEFAULT_CFG_WORLDDIR = "/lev/castle";
+const char *DEFAULT_CFG_LOGOFILE = "/lib/std/cslogo2.png";
+
 //----------------------------------------------------------------------
 DeferredDemo::DeferredDemo()
 :
 viewRotX(0.0f),
 viewRotY(0.0f),
-useDeferredShading(true),
 shouldShutdown(false)
 {
   SetApplicationName ("CrystalSpace.DeferredDemo");
+
+  // Sets default cfg values.
+  cfgWorldDir = DEFAULT_CFG_WORLDDIR;
+  cfgWorldFile = "world";
+
+  cfgDrawLogo = true;
+  cfgUseDeferredShading = true;
 }
 
 //----------------------------------------------------------------------
 DeferredDemo::~DeferredDemo()
-{
-}
+{}
 
 //----------------------------------------------------------------------
 bool DeferredDemo::OnInitialize(int argc, char *argv[])
@@ -59,6 +67,7 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
     csevQuit (GetObjectRegistry()),
     csevFrame (GetObjectRegistry()),
     csevKeyboardEvent (GetObjectRegistry()),
+    csevCommandLineHelp (GetObjectRegistry()),
 
     CS_EVENTLIST_END
   };
@@ -76,6 +85,12 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
   
   // Setup chached event names.
   quitEventID = csevQuit (GetObjectRegistry());
+  cmdLineHelpEventID = csevCommandLineHelp (GetObjectRegistry());
+
+  // Load deferred demo config file.
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
+  cfg->AddDomain ("/config/deferreddemo.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
 
   return true;
 }
@@ -128,11 +143,50 @@ bool DeferredDemo::SetupModules()
 bool DeferredDemo::LoadScene()
 {
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
-  if (!vfs->ChDir ("/lev/castle"))
-    return ReportError("Could not navigate to level directory!");
+  if (!vfs->ChDir (cfgWorldDir))
+    return ReportError("Could not navigate to level directory '%s'!", cfgWorldDir.GetDataSafe ());
 
-  if (!loader->LoadMapFile ("world"))
+  if (!loader->LoadMapFile (cfgWorldFile))
      return ReportError("Could not load level!");
+
+  return true;
+}
+
+//----------------------------------------------------------------------
+bool DeferredDemo::LoadAppData()
+{
+  LoadLogo ();
+
+  return true;
+}
+
+//----------------------------------------------------------------------
+bool DeferredDemo::LoadSettings()
+{
+  const char *val = NULL;
+
+  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
+  csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
+
+  val = cmdline->GetOption ("worlddir");
+  if (val)
+    cfgWorldDir = val;
+  else
+    cfgWorldDir = cfg->GetStr ("Deferreddemo.Settings.WorldDirectory", DEFAULT_CFG_WORLDDIR);
+
+  cfgWorldFile = cfg->GetStr ("Deferreddemo.Settings.WorldFile", "world");
+  cfgLogoFile = cfg->GetStr ("Deferreddemo.Settings.LogoFile", DEFAULT_CFG_LOGOFILE);
+
+
+  if (cmdline->GetOption ("nologo"))
+    cfgDrawLogo = false;
+  else
+    cfgDrawLogo = cfg->GetBool ("Deferreddemo.Settings.DrawLogo", true);
+
+  if (cmdline->GetOption ("forward"))
+    cfgUseDeferredShading = false;
+  else
+    cfgUseDeferredShading = !cfg->GetBool ("Deferreddemo.Settings.UseForward", false);
 
   return true;
 }
@@ -178,6 +232,19 @@ bool DeferredDemo::SetupScene()
 }
 
 //----------------------------------------------------------------------
+void DeferredDemo::Help()
+{
+  csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
+
+  csPrintf ("Options for DeferredDemo:\n");
+  csPrintf ("  -nologo            do not draw logo.\n");
+  csPrintf ("  -forward           use forward rendering on startup.\n");
+  csPrintf ("  -world=<file>      use given world file instead of 'world'\n");
+  csPrintf ("  -worlddir=<path>   load map from VFS <path> (default '%s')\n", 
+    cfg->GetStr ("Walktest.Settings.WorldFile", DEFAULT_CFG_WORLDDIR));
+}
+
+//----------------------------------------------------------------------
 bool DeferredDemo::Application()
 {
   if (!OpenApplication (GetObjectRegistry()))
@@ -185,7 +252,18 @@ bool DeferredDemo::Application()
     return ReportError("Error opening system!");
   }
 
-  if (SetupModules() && LoadScene() && SetupScene())
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (GetObjectRegistry()))
+  {
+    csCommandLineHelper::Help (GetObjectRegistry());
+    return true;
+  }
+
+  if (SetupModules() && 
+      LoadSettings() && 
+      LoadAppData() &&
+      LoadScene() &&
+      SetupScene())
   {
     RunDemo();
   }
@@ -260,16 +338,64 @@ void DeferredDemo::UpdateCamera()
 }
 
 //----------------------------------------------------------------------
+bool DeferredDemo::LoadLogo()
+{
+  logoTex = loader->LoadTexture (cfgLogoFile.GetDataSafe (), CS_TEXTURE_2D, NULL);
+
+  if (!logoTex.IsValid ())
+  {
+    return ReportError("Could not load logo '%s'!", cfgLogoFile.GetDataSafe ());
+  }
+
+  return true;
+}
+
+//----------------------------------------------------------------------
+void DeferredDemo::DrawLogo()
+{
+  if (!cfgDrawLogo || !logoTex.IsValid ())
+    return;
+
+  int w, h;
+  logoTex->GetRendererDimensions (w, h);
+
+  int screenW = graphics2D->GetWidth ();
+
+  // Margin to the edge of the screen, as a fraction of screen width
+  const float marginFraction = 0.01f;
+  const int margin = (int)screenW * marginFraction;
+
+  // Width of the logo, as a fraction of screen width
+  const float widthFraction = 0.3f;
+  const int width = (int)screenW * widthFraction;
+  const int height = width * h / w;
+
+  graphics3D->BeginDraw (CSDRAW_2DGRAPHICS);
+  graphics3D->DrawPixmap (logoTex, 
+                          screenW - width - margin, 
+                          margin,
+                          width,
+                          height,
+                          0,
+                          0,
+                          w,
+                          h,
+                          0);
+}
+
+//----------------------------------------------------------------------
 void DeferredDemo::Frame ()
 {
   UpdateCamera ();
 
-  if (useDeferredShading)
+  if (cfgUseDeferredShading)
     engine->SetRenderManager (rm);
   else
     engine->SetRenderManager (rm_default);
 
   view->Draw ();
+
+  DrawLogo ();
 
   graphics3D->FinishDraw ();
   graphics3D->Print (NULL);
@@ -279,7 +405,14 @@ void DeferredDemo::Frame ()
 bool DeferredDemo::OnUnhandledEvent (iEvent &event)
 {
   if (event.Name == quitEventID)
+  {
     return OnQuit (event);
+  }
+  else if (event.Name == cmdLineHelpEventID)
+  {
+    Help ();
+    return true;
+  }
 
   return false;
 }
@@ -301,11 +434,11 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     }
     else if (code == 'd')
     {
-      useDeferredShading = true;
+      cfgUseDeferredShading = true;
     }
     else if (code == 'f')
     {
-      useDeferredShading = false;
+      cfgUseDeferredShading = false;
     }
   }
 
