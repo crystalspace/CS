@@ -30,15 +30,12 @@ namespace lighter
   SwapManager::SwapManager (size_t maxSize) : entryAlloc (1000),   
     currentCacheSize (0), swappedOutSize (0), currentUnlockTime (1)
   {
-    size_t maxVirtSize = CS::Platform::GetMaxVirtualSize();
-    size_t maxVirtBytes;
-    if (maxVirtSize > SIZE_MAX / 1024)
-      maxVirtBytes = SIZE_MAX;
-    else
-      maxVirtBytes = maxVirtSize * 1024;
-    /* Cap maximum cache to half the max virtual address space to
-       avoid that we run out of virtual address space */
-    maxCacheSize = csMin (maxSize, maxVirtBytes / 2);
+#if CS_PROCESSOR_SIZE == 32
+    //@@ Try to make sure we don't run out of virtual address space, don't use above 1GB for swapcache
+    maxCacheSize = csMin (maxSize, size_t (1u<<30));
+#else
+    maxCacheSize = maxSize;
+#endif
   }
 
   SwapManager::~SwapManager ()

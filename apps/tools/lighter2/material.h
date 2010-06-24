@@ -19,6 +19,7 @@
 #ifndef __MATERIAL_H__
 #define __MATERIAL_H__
 
+#include "common.h"
 #include "swappable.h"
 
 namespace lighter
@@ -99,11 +100,20 @@ namespace lighter
   struct RadMaterial
   {
     csRef<MaterialImage<csColor> > filterImage;
+	
+	  // The original texture image
+    CS::ImageAutoConvert * textureImg;
      
     RadMaterial() {}
     
     bool IsTransparent () const { return filterImage.IsValid(); }
     void ComputeFilterImage (iImage* img);
+    
+    void SetTextureImage (iImage * img);
+	  
+    //Returns the color at uv coordinates in original texture
+	  csColor GetTextureValue(csVector2 uv) const;
+
   };
   typedef csHash<RadMaterial, csString> MaterialHash;
 } // namespace lighter

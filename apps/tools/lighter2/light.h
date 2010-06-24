@@ -205,18 +205,17 @@ namespace lighter
      * If the light is not a proxy simply returns pointer to itself.
      */
     virtual Light* GetOriginalLight () { return this; }
-  protected:
-    /// Constructor
-    Light (Sector* owner, bool deltaDistribution);
 
-    /// Helper methods to attenuate light
+     /// Helper methods to attenuate light
     inline float ComputeAttenuation (float sqD)
     {
       return attenuationFunc (sqD, attenuationConsts);
     }
 
+ protected:
+    /// Constructor
+    Light (Sector* owner, bool deltaDistribution);
  
-
     // Data
 
     // Atteunation related

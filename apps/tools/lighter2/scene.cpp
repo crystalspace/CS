@@ -25,12 +25,23 @@
 #include "object_genmesh.h"
 #include "object_terrain2.h"
 
+#include "photonmap.h"
+#include "irradiancecache.h"
+
 #include <functional>
 
 using namespace CS;
 
 namespace lighter
 {
+  Sector::~Sector()
+  {
+    delete kdTree;
+    if (photonMap != NULL)
+    {
+      delete photonMap;
+    }
+  }
 
   void Sector::Initialize (Statistics::Progress& progress)
   {
@@ -92,6 +103,117 @@ namespace lighter
     ObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
     KDTreeBuilder builder;
     kdTree = builder.BuildTree (objIt, progress);
+  }
+
+  void Sector::InitPhotonMap()
+  { 
+    if(photonMap == NULL)
+    {
+      photonMap = new PhotonMap(
+        2 * globalConfig.GetIndirectProperties ().numPhotons);
+    }
+  }
+
+  void Sector::AddPhoton(const csColor power, const csVector3 pos,
+      const csVector3 dir )
+  {
+    if(photonMap == NULL)
+    {
+      photonMap = new PhotonMap(
+        2 * globalConfig.GetIndirectProperties ().numPhotons);
+    }
+
+    const float fPower[3] = { power.red, power.green, power.blue };
+    const float fPos[3] = { pos.x, pos.y, pos.z };
+    const float fDir[3] = { dir.x, dir.y, dir.z };
+
+    photonMap->Store(fPower, fPos, fDir);
+  }
+
+  void Sector::ScalePhotons(const float scale)
+  {
+    if(photonMap != NULL) photonMap->ScalePhotonPower(scale);
+  }
+
+  size_t Sector::GetPhotonCount()
+  {
+    if(photonMap != NULL) return photonMap->GetPhotonCount();
+    return 0;
+  }
+
+  void Sector::BalancePhotons(Statistics::ProgressState& prog)
+  {
+    if(photonMap != NULL)
+    {
+      // First, initialize the irradiance cache
+      if(irradianceCache != NULL) delete irradianceCache;
+      irradianceCache = new IrradianceCache(
+        photonMap->GetBBoxMin(), photonMap->GetBBoxMax(), 1000);
+
+      // Balance the photons
+      photonMap->Balance(prog);
+    }
+  }
+
+  bool Sector::SampleIRCache(const csVector3 point, const csVector3 normal,
+                    csColor &irrad)
+  {
+    if(irradianceCache == NULL) return false;
+
+    // Check cache to see if we can reuse old results
+    float* result = new float[3];
+    float fPos[3] = { point.x, point.y, point.z };
+    float fNorm[3] = { normal.x, normal.y, normal.z };
+    
+    if(irradianceCache->EstimateIrradiance(fPos, fNorm, result))
+    {
+      irrad.Set(result[0], result[1], result[2]);
+      delete [] result;
+      return true;
+    }
+
+    return false;
+  }
+
+  csColor Sector::SamplePhoton(const csVector3 point, const csVector3 normal,
+                    const float searchRad)
+  {
+    if(photonMap == NULL) return csColor(0, 0, 0);
+
+    // Local copy of the global options
+    const static size_t densitySamples =
+      globalConfig.GetIndirectProperties ().maxDensitySamples;
+
+    // Sample the photon map
+    float result[3] = {0, 0, 0};
+    float fPos[3] = { point.x, point.y, point.z };
+    float fNorm[3] = { normal.x, normal.y, normal.z };
+    photonMap->IrradianceEstimate(result, fPos, fNorm, searchRad, densitySamples);
+
+    // Return result as a csColor
+    return csColor(result[0], result[1], result[2]);
+  }
+
+  void Sector::AddToIRCache(const csVector3 point, const csVector3 normal,
+                      const csColor irrad, const float mean)
+  {
+    float fPow[3] = { irrad.red, irrad.green, irrad.blue };
+    float fPos[3] = { point.x, point.y, point.z };
+    float fNorm[3] = { normal.x, normal.y, normal.z };
+
+    // Add sample to the irradiance cache for reuse
+    if(irradianceCache == NULL)
+    {
+      irradianceCache = new IrradianceCache(
+        photonMap->GetBBoxMin(), photonMap->GetBBoxMax(), 1000);
+    }
+
+    irradianceCache->Store(fPos, fNorm, fPow, mean);
+  }
+
+  void Sector::SavePhotonMap(const char* filename)
+  {
+    if(photonMap != NULL) photonMap->SaveToFile(filename);
   }
 
   //-------------------------------------------------------------------------
@@ -741,6 +863,8 @@ namespace lighter
     csRef<iDocumentNode> worldNode = 
       fileInfo->GetDocument()->GetRoot()->GetNode ("world");
 
+    globalStats.scene.numSectors = sectorList->GetCount ();
+
     if (worldNode.IsValid ())
     {
       csRef<iDocumentNodeIterator> sectorNodeIt = 
@@ -852,6 +976,7 @@ namespace lighter
 
     // Parse all meshes (should have selector later!)
     iMeshList *meshList = sector->GetMeshes ();
+    globalStats.scene.numObjects += meshList->GetCount ();
 
     u = updateFreq = progress.GetUpdateFrequency (meshList->GetCount ());
     progressStep = updateFreq * (1.0f / meshList->GetCount ());
@@ -880,6 +1005,8 @@ namespace lighter
     csSet<csString> lightNames;
     // Parse all lights (should have selector later!)
     iLightList *lightList = sector->GetLights ();
+    globalStats.scene.numLights = lightList->GetCount ();
+
     for (int i = lightList->GetCount (); i-- > 0;)
     {
       iLight *light = lightList->Get (i);
@@ -901,6 +1028,19 @@ namespace lighter
       lightNames.AddNoTest (lightName);
 
       bool isPD = light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
+
+      // Force to realistic attenuation if requested
+      if(globalConfig.GetLighterProperties ().forceRealistic)
+      {
+        light->SetAttenuationMode( CS_ATTN_REALISTIC );
+      }
+
+      // Scale light power to help avoid dark scenes when forcing realistic att
+      if(globalConfig.GetLighterProperties ().lightPowerScale != 1.0)
+      {
+        light->SetColor( light->GetColor()*
+          globalConfig.GetLighterProperties ().lightPowerScale);
+      }
 
       // IneQuation was here
       csRef<Light> intLight;
@@ -960,6 +1100,7 @@ namespace lighter
 
       intLight->SetAttenuation (light->GetAttenuationMode (),
         light->GetAttenuationConstants ());
+
       intLight->SetPDLight (isPD);
       intLight->SetLightID (light->GetLightID());
       intLight->SetName (lightName);
@@ -1212,10 +1353,11 @@ namespace lighter
       if (texwrap != 0)
       {
         iImage* teximg = texwrap->GetImageFile ();
+        radMat.SetTextureImage(teximg);
         if (teximg != 0)
         {
           if (teximg->GetFormat() & CS_IMGFMT_ALPHA)
-            radMat.ComputeFilterImage (teximg);
+			radMat.ComputeFilterImage (teximg);
         }
       }
     }
@@ -1292,7 +1434,7 @@ namespace lighter
 	  fileInfo->levelName.GetData(), i);
 	directionMapBaseNames.Push (textureFilename);
 	for (int x = 0; x < specDirectionMapCount; x++)
-	  texturesToSave.Push (GetDirectionMapFilename ((uint)i, x));
+	  texturesToSave.Push (GetDirectionMapFilename (i, x));
       }
     }
   }
@@ -1775,12 +1917,12 @@ namespace lighter
       for (size_t pg = 0; pg < obj->GetPrimitiveGroupNum(); pg++)
       {
         // get all influences for primgroup
-        csArray<Light*> influencingLights (obj->GetLightsAffectingGroup ((uint)pg));
+        csArray<Light*> influencingLights (obj->GetLightsAffectingGroup (pg));
         csArray<InfluencePair> allInfluences;
         allInfluences.SetCapacity (influencingLights.GetSize());
         for (size_t l = 0; l < influencingLights.GetSize(); l++)
         {
-          LightInfluences* infl = &(obj->GetLightInfluences ((uint)pg,
+          LightInfluences* infl = &(obj->GetLightInfluences (pg,
             influencingLights[l]));
           allInfluences.Push (InfluencePair (influencingLights[l], infl));
         }
@@ -1861,7 +2003,7 @@ namespace lighter
           InfluencePair& ip = allInfluences[i];
           
           DirectionMap& dirMap = *(directionMaps[ip.subMap].Get (
-            obj->GetPrimitiveGroupLightmap ((uint)pg)));
+            obj->GetPrimitiveGroupLightmap (pg)));
           dirMap.AddFromLightInfluences (*(ip.infl));
         }
         
@@ -1971,7 +2113,7 @@ namespace lighter
 	  is not supported ... */
 	csRef<iDataBuffer> imgData = globalLighter->imageIO->Save (img,
 	  "image/dds", "format=dxt5");
-	csString fname (GetDirectionMapFilename ((uint)d, i));
+	csString fname (GetDirectionMapFilename (d, i));
 	csRef<iFile> file = globalLighter->vfs->Open (fname, VFS_FILE_WRITE);
 	if (file)
 	{
@@ -2450,7 +2592,8 @@ namespace lighter
   
   void Scene::LightingPostProcessor::ApplyAmbient (Lightmap* lightmap)
   {
-    //if (!<indirect lighting enabled>)
+    if (globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_NONE &&
+        globalConfig.GetLighterProperties ().globalAmbient)
     {
       csColor amb;
       globalLighter->engine->GetAmbientLight (amb);
@@ -2460,7 +2603,8 @@ namespace lighter
 
   void Scene::LightingPostProcessor::ApplyAmbient (csColor* colors, size_t numColors)
   {
-    //if (!<indirect lighting enabled>)
+    if (globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_NONE &&
+        globalConfig.GetLighterProperties ().globalAmbient)
     {
       csColor amb;
       globalLighter->engine->GetAmbientLight (amb);

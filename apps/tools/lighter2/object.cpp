@@ -285,7 +285,7 @@ namespace lighter
 	allPrimitives.SetCapacity (allPrimitives.GetSize() + factPrims.GetSize());
 	for (i = 0; i < factPrims.GetSize(); i++)
 	{
-	  Primitive newPrim (vertexData, (uint)j);
+	  Primitive newPrim (vertexData, j);
 	  
 	  Primitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
 	  //prim.SetOriginalPrimitive (&factPrims[i]);

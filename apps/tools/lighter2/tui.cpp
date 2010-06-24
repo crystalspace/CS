@@ -71,6 +71,10 @@ namespace lighter
     if (drawFlags & TUI_DRAW_RAYCORE)
       DrawRayCore ();
 
+    // Draw photonmapper stats
+    if (drawFlags & TUI_DRAW_PMCORE)
+      DrawPMCore ();
+
     // Draw global settings
     if (drawFlags & TUI_DRAW_SETTINGS)
       DrawSettings ();
@@ -92,6 +96,12 @@ namespace lighter
     if (simpleMode)
     {
       DrawSimpleEnd ();
+    }
+
+    else
+    {
+      for(size_t i=0; i<25; i++)
+        csPrintf("\n");
     }
   }
 
@@ -146,19 +156,19 @@ namespace lighter
     csPrintf ("| Part progress:                                                              |\n");
     csPrintf ("|                                                                             |\n");
     csPrintf ("|-----------------------------------------------------------------------------|\n");
-    csPrintf ("| Rays:    | Settings   | Scene Stats                                         |\n");
-    csPrintf ("|          | [ ] DL     | S:                                                  |\n");
-    csPrintf ("|          | [ ] GI     | O:                                                  |\n");
-    csPrintf ("|          | [ ] LMs    | L:                                                  |\n");
-    csPrintf ("|          | [ ] AO     | LM:                                                 |\n");
-    csPrintf ("|          | PLM:       |                                                     |\n");
-    csPrintf ("|          |            | KD-stats                                            |\n");
-    csPrintf ("|          | ALM:       | N:                                                  |\n");
-    csPrintf ("|          |            | D:                                                  |\n");
-    csPrintf ("|          | Density:   | P:                                                  |\n");
-    csPrintf ("|          |            |                                                     |\n");
-    csPrintf ("|          |            | SwapCache                                           |\n");
-    csPrintf ("|          |            |                                                     |\n");
+    csPrintf ("| Raytracer Stats    | Photon Map Stats   | Settings   | Scene Stats          |\n");
+    csPrintf ("|                    |                    | [ ] Raytrc |   Sectors:           |\n");
+    csPrintf ("|   Direct:          |   Photns:          | [ ] PtnMap |   Meshes:            |\n");
+    csPrintf ("|   Photns:          |   Lookps:          | [ ] LMs    |   Lights:            |\n");
+    csPrintf ("|   Reflec:          |   KD-Dth:          | [ ] AO     |   LM:                |\n");
+    csPrintf ("|   Refrac:          |                    |-----------------------------------|\n");
+    csPrintf ("|   FinalG:          | Irradiance Cache   | KD-Tree Stats                     |\n");
+    csPrintf ("|                    |                    |   Nodes:                          |\n");
+    csPrintf ("| Total:             |   Prime:           |   Depth:                          |\n");
+    csPrintf ("|                    |   Secnd:           |   Prims:                          |\n");
+    csPrintf ("|                    |   Lookps:          |-----------------------------------|\n");
+    csPrintf ("|                    |   Splits:          | SwapCache                         |\n");
+    csPrintf ("|                    |                    |                                   |\n");
     csPrintf ("|- CS Messages ---------------------------------------------------------------|\n");
     csPrintf ("|                                                                             |\n");
     csPrintf ("|                                                                             |\n");
@@ -170,10 +180,16 @@ namespace lighter
 
   void TUI::DrawStats () const
   {
-    csPrintf (CS_ANSI_CURSOR(30,14) "%8zu / %8zu", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
-    csPrintf (CS_ANSI_CURSOR(30,15) "%8zu / %8.03f", globalStats.kdtree.maxDepth, 
+    // Scene stats
+    csPrintf (CS_ANSI_CURSOR(67,8) "%8zu", globalStats.scene.numSectors);
+    csPrintf (CS_ANSI_CURSOR(67,9) "%8zu", globalStats.scene.numObjects);
+    csPrintf (CS_ANSI_CURSOR(67,10) "%8zu", globalStats.scene.numLights);
+
+    // KD-Tree stats
+    csPrintf (CS_ANSI_CURSOR(54,14) "%8zu / %8zu", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+    csPrintf (CS_ANSI_CURSOR(54,15) "%8zu / %8.03f", globalStats.kdtree.maxDepth, 
       (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
-    csPrintf (CS_ANSI_CURSOR(30,16) "%8zu / %8.03f", globalStats.kdtree.numPrimitives, 
+    csPrintf (CS_ANSI_CURSOR(54,16) "%8zu / %8.03f", globalStats.kdtree.numPrimitives, 
       (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
@@ -201,50 +217,179 @@ namespace lighter
   
   void TUI::DrawSwapCacheStats () const
   {
-    csPrintf (CS_ANSI_CURSOR(28,19) 
-      "                                                   ");
+    csPrintf (CS_ANSI_CURSOR(45,19) 
+      "                                 ");
     if (globalLighter->swapManager)
     {
       uint64 swappedIn, swappedOut, maxSize;
       globalLighter->swapManager->GetSizes (swappedIn, swappedOut, maxSize);
-      csPrintf (CS_ANSI_CURSOR(28,19) "%s/%s in, %s out",
-	FormatByteSize (swappedIn).GetData(),
-	FormatByteSize (maxSize).GetData(),
-	FormatByteSize (swappedOut).GetData());
+      csPrintf (CS_ANSI_CURSOR(47,19) "%s/%s in, %s out",
+	                FormatByteSize (swappedIn).GetData(),
+	                FormatByteSize (maxSize).GetData(),
+	                FormatByteSize (swappedOut).GetData());
     }
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
 
   void TUI::DrawSettings () const
   {
-    csPrintf (CS_ANSI_CURSOR(15,8) "%s", globalConfig.GetLighterProperties ().doDirectLight ? "X" : "");
-    csPrintf (CS_ANSI_CURSOR(15,9) "%s", false ? "X" : "");
-    csPrintf (CS_ANSI_CURSOR(15,10) "%s", true ? "X" : "");
-    csPrintf (CS_ANSI_CURSOR(15,11) "%s", false ? "X" : "");
-  
-    csPrintf (CS_ANSI_CURSOR(14,13) "%#4.2g", globalConfig.GetDIProperties ().pointLightMultiplier);
-    csPrintf (CS_ANSI_CURSOR(14,15) "%#4.2g", globalConfig.GetDIProperties ().areaLightMultiplier);
+    csPrintf (CS_ANSI_CURSOR(46,8) "%s",
+      globalConfig.GetLighterProperties ().directLightEngine == LIGHT_ENGINE_RAYTRACER
+      ? "X" : "");
 
-    csPrintf (CS_ANSI_CURSOR(14,17) "%#4.2g", globalConfig.GetLMProperties ().lmDensity);
+    csPrintf (CS_ANSI_CURSOR(46,9) "%s",
+      (globalConfig.GetLighterProperties ().directLightEngine == LIGHT_ENGINE_PHOTONMAPPER ||
+       globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_PHOTONMAPPER)
+      ? "X" : "");
+
+    csPrintf (CS_ANSI_CURSOR(46,10) "%s", true ? "X" : "");
+    csPrintf (CS_ANSI_CURSOR(46,11) "%s", false ? "X" : "");
+  
+//    csPrintf (CS_ANSI_CURSOR(46,13) "%#4.2g", globalConfig.GetDIProperties ().pointLightMultiplier);
+//    csPrintf (CS_ANSI_CURSOR(46,15) "%#4.2g", globalConfig.GetDIProperties ().areaLightMultiplier);
+
+//    csPrintf (CS_ANSI_CURSOR(46,17) "%#4.2g", globalConfig.GetLMProperties ().lmDensity);
 
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
 
   void TUI::DrawRayCore () const
   {
-    // Rays
-    const char* siConv[] = {" ", "K", "M", "G", "T"};
+    // Suffix for ray units (none, thousands, millions, billions, trillians)
+    const char* siConv[] = {" ", "K", "M", "B", "T"};
 
-    uint64 rays = globalStats.raytracer.numRays;
-    int prefix = 0;
+    // Make local copies of counters
+    uint64 directRays = globalStats.raytracer.numShadowRays;
+    uint64 lightRays = globalStats.raytracer.numLightRays;
+    uint64 reflectRays = globalStats.raytracer.numReflectionRays;
+    uint64 refractRays = globalStats.raytracer.numRefractionRays;
+    uint64 finalGatherRays = globalStats.raytracer.numFinalGatherRays;
+    uint64 totalRays = globalStats.raytracer.numRays;
+
+    // Adjust counter precision and compute suffix to indicate units
+    int directSuffix = 0, lightSuffix = 0, reflectSuffix = 0,
+        refractSuffix = 0, finalGatherSuffix = 0,
+        totalSuffix = 0;
     
-    while (rays > CONST_UINT64(99999) && prefix < 5)
+    while (totalRays > CONST_UINT64(99999) && totalSuffix < 5)
     {
-      rays /= CONST_UINT64(1000);
-      prefix++;
+      totalRays /= CONST_UINT64(1000);
+      totalSuffix++;
     }
 
-    csPrintf (CS_ANSI_CURSOR(3,8) "%6" PRIu64 " %s", rays, siConv[prefix]);
+    while (directRays > CONST_UINT64(99999) && directSuffix < 5)
+    {
+      directRays /= CONST_UINT64(1000);
+      directSuffix++;
+    }
+
+    while (lightRays > CONST_UINT64(99999) && lightSuffix < 5)
+    {
+      lightRays /= CONST_UINT64(1000);
+      lightSuffix++;
+    }
+
+    while (reflectRays > CONST_UINT64(99999) && reflectSuffix < 5)
+    {
+      reflectRays /= CONST_UINT64(1000);
+      reflectSuffix++;
+    }
+
+    while (refractRays > CONST_UINT64(99999) && refractSuffix < 5)
+    {
+      refractRays /= CONST_UINT64(1000);
+      refractSuffix++;
+    }
+
+    while (finalGatherRays > CONST_UINT64(99999) && finalGatherSuffix < 5)
+    {
+      finalGatherRays /= CONST_UINT64(1000);
+      finalGatherSuffix++;
+    }
+
+    // Output ray counters with suffix
+    csPrintf (CS_ANSI_CURSOR(12,9) "%6" PRIu64 " %s", directRays, siConv[directSuffix]);
+    csPrintf (CS_ANSI_CURSOR(12,10) "%6" PRIu64 " %s", lightRays, siConv[lightSuffix]);
+    csPrintf (CS_ANSI_CURSOR(12,11) "%6" PRIu64 " %s", reflectRays, siConv[reflectSuffix]);
+    csPrintf (CS_ANSI_CURSOR(12,12) "%6" PRIu64 " %s", refractRays, siConv[refractSuffix]);
+    csPrintf (CS_ANSI_CURSOR(12,13) "%6" PRIu64 " %s", finalGatherRays, siConv[finalGatherSuffix]);
+    csPrintf (CS_ANSI_CURSOR(10,15) "%8" PRIu64 " %s", totalRays, siConv[totalSuffix]);
+
+    csPrintf (CS_ANSI_CURSOR(1,1));
+  }
+
+  void TUI::DrawPMCore () const
+  {
+    // Suffix for ray units (none, thousands, millions, billions, trillians)
+    const char* siConv[] = {" ", "K", "M", "B", "T"};
+
+    // Make local copies of counters
+    uint64 photons = globalStats.photonmapping.numStoredPhotons;
+    uint64 lookups = globalStats.photonmapping.numKDLookups;
+    uint64 KDdepth = globalStats.photonmapping.KDTreeDepth;
+    uint64 irPrim = globalStats.photonmapping.irCachePrimary;
+    uint64 irSecnd = globalStats.photonmapping.irCacheSecondary;
+    uint64 irLookups = globalStats.photonmapping.irCacheLookups;
+    uint64 irSplits = globalStats.photonmapping.irCacheSplits;
+
+    // Adjust counter precision and compute suffix to indicate units
+    int photonSuffix = 0, lookupSuffix = 0, KDdepthSuffix = 0,
+        primarySuffix = 0, secondarySuffix = 0,
+        irSplitsSuffix = 0, irLookupsSuffix = 0;
+    
+    while (photons > CONST_UINT64(99999) && photonSuffix < 5)
+    {
+      photons /= CONST_UINT64(1000);
+      photonSuffix++;
+    }
+
+    while (lookups > CONST_UINT64(99999) && lookupSuffix < 5)
+    {
+      lookups /= CONST_UINT64(1000);
+      lookupSuffix++;
+    }
+
+    while (KDdepth > CONST_UINT64(99999) && KDdepthSuffix < 5)
+    {
+      KDdepth /= CONST_UINT64(1000);
+      KDdepthSuffix++;
+    }
+
+    while (irPrim > CONST_UINT64(99999) && primarySuffix < 5)
+    {
+      irPrim /= CONST_UINT64(1000);
+      primarySuffix++;
+    }
+
+    while (irSecnd > CONST_UINT64(99999) && secondarySuffix < 5)
+    {
+      irSecnd /= CONST_UINT64(1000);
+      secondarySuffix++;
+    }
+
+    while (irSplits > CONST_UINT64(99999) && irSplitsSuffix < 5)
+    {
+      irSplits /= CONST_UINT64(1000);
+      irSplitsSuffix++;
+    }
+
+    while (irLookups > CONST_UINT64(99999) && irLookupsSuffix < 5)
+    {
+      irLookups /= CONST_UINT64(1000);
+      irLookupsSuffix++;
+    }
+
+    // Output photon counters with suffix
+    csPrintf (CS_ANSI_CURSOR(33,9) "%6" PRIu64 " %s", photons, siConv[photonSuffix]);
+    csPrintf (CS_ANSI_CURSOR(33,10) "%6" PRIu64 " %s", lookups, siConv[lookupSuffix]);
+    csPrintf (CS_ANSI_CURSOR(33,11) "%6" PRIu64 " %s", KDdepth, siConv[KDdepthSuffix]);
+
+    csPrintf (CS_ANSI_CURSOR(32,15) "%7" PRIu64 " %s", irPrim, siConv[primarySuffix]);
+    csPrintf (CS_ANSI_CURSOR(32,16) "%7" PRIu64 " %s", irSecnd, siConv[secondarySuffix]);
+    csPrintf (CS_ANSI_CURSOR(33,17) "%6" PRIu64 " %s", irLookups, siConv[irLookupsSuffix]);
+    csPrintf (CS_ANSI_CURSOR(33,18) "%6" PRIu64 " %s", irSplits, siConv[irSplitsSuffix]);
+
+    csPrintf (CS_ANSI_CURSOR(1,1));
   }
 
   void TUI::DrawProgress () const

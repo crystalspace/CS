@@ -114,15 +114,106 @@ namespace lighter
     };
     GlobalProgress progress;
 
+    class ProgressState
+    {
+      Statistics::Progress& progress;
+      size_t updateFreq;
+      size_t u;
+      float progressStep;
+
+    public:
+      ProgressState (Statistics::Progress& progress, size_t total) : 
+        progress (progress), 
+        updateFreq (progress.GetUpdateFrequency (total)), u (updateFreq),
+        progressStep (float (updateFreq) / total) {}
+
+      CS_FORCEINLINE void Advance ()
+      {
+        if (--u == 0)
+        {
+          progress.IncProgress (progressStep);
+          u = updateFreq;
+          globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE | TUI::TUI_DRAW_PMCORE);
+        }
+      }
+    };
+
     struct Raytracer
     {
       Raytracer ()
-        : numRays (0)
+        : numRays (0), numEyeRays (0), numLightRays (0),
+          numReflectionRays (0), numRefractionRays (0),
+          numShadowRays (0)
       {}
 
-      /// Number of rays traced
-      uint64 numRays;      
+      /// Total number of rays traced
+      uint64 numRays;
+
+      /// Number of rays shot from eye for direct lighting
+      uint64 numEyeRays;
+
+      /// Number of rays shot from lights for photon mapping
+      uint64 numLightRays;
+
+      /// Number of rays generated as the result of reflection
+      uint64 numReflectionRays;
+
+      /// Number of rays generated as the results of refraction
+      uint64 numRefractionRays;
+
+      /// Number of rays generated to test for occlusion of light sources
+      uint64 numShadowRays;
+
+      /// Number of rays generated to gather photons for indirect lighting
+      uint64 numFinalGatherRays;
     } raytracer;
+
+    struct Photonmapping
+    {
+      Photonmapping ()
+        : numStoredPhotons(0), numKDLookups(0),
+          KDTreeDepth(0), irCachePrimary(0),
+          irCacheSecondary(0), irCacheSplits(0),
+          irCacheLookups(0)
+      {}
+
+      /// Total number of photons stored (different from traced)
+      uint64 numStoredPhotons;
+
+      /// Number of KD tree lookups
+      uint64 numKDLookups;
+
+      /// Depth of the photon map KD tree (after balancing
+      uint64 KDTreeDepth;
+
+      /// Primary samples in the IR Cache
+      uint64 irCachePrimary;
+
+      /// Secondary evaluations from the IR cache
+      uint64 irCacheSecondary;
+
+      /// Number of nodes splits in the IR cache octree
+      uint64 irCacheSplits;
+
+      /// Number of lookups into the IR cache
+      uint64 irCacheLookups;
+    } photonmapping;
+
+    struct Scene
+    {
+      Scene ()
+        : numSectors (0), numObjects (0), numLights (0)
+      {}
+
+      /// Number of sectors in world
+      size_t numSectors;
+
+      /// Number of objects in world
+      size_t numObjects;
+
+      /// Number of lights in world
+      size_t numLights;
+    } scene;
 
     struct KDTree
     {
