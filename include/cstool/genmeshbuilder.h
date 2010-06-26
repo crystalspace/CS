@@ -325,6 +325,41 @@ public:
 };
 
 /**
+ * A Cone.
+ */
+class CS_CRYSTALSPACE_EXPORT Cone : public Primitive
+{
+private:
+  float l, r;
+  uint sides;
+  TextureMapper* mapper;
+
+public:
+  /**
+   * Generate a cone of given length and radius.
+   * \param l Capsule length.
+   * \param r Capsule radius.
+   * \param sides Number of sides.
+   */
+  Cone (float h, float r, uint sides);
+  virtual ~Cone () { }
+
+  /**
+   * Set the mapper. There is no default mapper. You have to specify one.
+   */
+  void SetMapper (TextureMapper* mapper)
+  {
+    Cone::mapper = mapper;
+  }
+
+  virtual void Append (iGeneralFactoryState* state);
+  virtual bool Append (iMeshFactoryWrapper* factory)
+  {
+    return Primitive::Append (factory);
+  }
+};
+
+/**
  * Tools related to creating genmesh instances and factories.
  */
 class CS_CRYSTALSPACE_EXPORT GeneralMeshBuilder
