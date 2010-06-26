@@ -26,7 +26,7 @@ namespace CS
 {
 namespace Threading
 {
-  class AtomicOperationsArmGCC
+  class CS_CRYSTALSPACE_EXPORT AtomicOperationsArmGCC
   {
 
     private:
