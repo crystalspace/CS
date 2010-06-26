@@ -45,7 +45,7 @@
 // Base class to be implemented for all different models
 class AvatarScene
 {
- public:
+public:
   virtual ~AvatarScene () {}
 
   // Camera related
@@ -109,17 +109,17 @@ public:
   // Handle exit button clicked event
   bool OnExitButtonClicked (const CEGUI::EventArgs& e);
   bool OnCollidersButtonClicked (const CEGUI::EventArgs& e);
-  
+
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();
 
   // Declare the name of this event handler.
   CS_EVENTHANDLER_NAMES("application.hairtest")
-      
-  /* Declare that we're not terribly interested in having events
-     delivered to us before or after other modules, plugins, etc. */
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+
+    /* Declare that we're not terribly interested in having events
+    delivered to us before or after other modules, plugins, etc. */
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __HAIRTEST_H__

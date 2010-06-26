@@ -29,10 +29,10 @@
 #include "krystal.h"
 
 HairTest::HairTest ()
-  : csDemoApplication ("CrystalSpace.HairTest", "hairtest",
-		       "hairtest <OPTIONS>",
-		       "Tests on the animation of objects iAnimatedMesh."),
-    avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
+: csDemoApplication ("CrystalSpace.HairTest", "hairtest",
+                     "hairtest <OPTIONS>",
+                     "Tests on the animation of objects iAnimatedMesh."),
+                     avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // We manage the camera by ourselves
   SetCameraMode (CSDEMO_CAMERA_NONE);
@@ -51,7 +51,7 @@ void HairTest::Frame ()
 
   // Now rotate the camera according to keyboard state
   const float speed = elapsedTime / 1000.0f;
-  
+
   // Rotate by angle
   const float angle = 4 * speed;
 
@@ -62,8 +62,8 @@ void HairTest::Frame ()
   float minimumDistance = avatarScene->GetCameraMinimumDistance ();
 
   float radius = sqrt ( ( cameraTarget.x - cameraPosition.x ) * ( cameraTarget.x - cameraPosition.x ) + 
-						( cameraTarget.y - cameraPosition.y ) * ( cameraTarget.y - cameraPosition.y ) + 
-						( cameraTarget.z - cameraPosition.z ) * ( cameraTarget.z - cameraPosition.z ));
+    ( cameraTarget.y - cameraPosition.y ) * ( cameraTarget.y - cameraPosition.y ) + 
+    ( cameraTarget.z - cameraPosition.z ) * ( cameraTarget.z - cameraPosition.z ));
   float lateral = sin(angle) * radius;
   float straight = cos(angle) * radius;
 
@@ -74,7 +74,7 @@ void HairTest::Frame ()
     // the camera to go forwards and backwards (forward only allowed if camera 
     // not too close). Left/Right arrows work also when shift is hold.
     if (kbd->GetKeyState (CSKEY_UP)
-	&& (cameraPosition - cameraTarget).Norm () > minimumDistance)
+      && (cameraPosition - cameraTarget).Norm () > minimumDistance)
       camera->Move (CS_VEC_FORWARD * 4 * speed);
     if (kbd->GetKeyState (CSKEY_DOWN))
       camera->Move (CS_VEC_BACKWARD * 4 * speed);
@@ -91,28 +91,28 @@ void HairTest::Frame ()
     {
       camera ->GetTransform().SetOrigin(csVector3(cameraTarget));
       camera ->Move(CS_VEC_BACKWARD * straight);
-	  camera ->Move(CS_VEC_RIGHT * lateral);
+      camera ->Move(CS_VEC_RIGHT * lateral);
     }
     if (kbd->GetKeyState (CSKEY_LEFT))
-	{
-	  camera ->GetTransform().SetOrigin(csVector3(cameraTarget));
-	  camera ->Move(CS_VEC_BACKWARD * straight);
-	  camera ->Move(CS_VEC_LEFT * lateral);
-	}
+    {
+      camera ->GetTransform().SetOrigin(csVector3(cameraTarget));
+      camera ->Move(CS_VEC_BACKWARD * straight);
+      camera ->Move(CS_VEC_LEFT * lateral);
+    }
     // Avoid gimbal lock of camera
     cameraPosition.Normalize ();
     float cameraDot = cameraPosition * csVector3 (0.0f, 1.0f, 0.0f);
     if (kbd->GetKeyState (CSKEY_UP)
-	&& cameraDot < 0.98f)
+      && cameraDot < 0.98f)
       camera->Move (CS_VEC_UP * 4 * speed);
     if (kbd->GetKeyState (CSKEY_DOWN)
-	&& cameraDot > -0.98f)
+      && cameraDot > -0.98f)
       camera->Move (CS_VEC_DOWN * 4 * speed);
   }
 
   // Make the camera look at the animesh
   camera->GetTransform ().LookAt (cameraTarget - camera->GetTransform ().GetOrigin (),
-				  csVector3 (0.0f, 1.0f, 0.0f) );
+    csVector3 (0.0f, 1.0f, 0.0f) );
 
   // Step the dynamic simulation (we slow down artificially the simulation in
   // order to achieve a 'slow motion' effect)
@@ -127,17 +127,17 @@ void HairTest::Frame ()
 
   // Display the Bullet debug information
   if (avatarScene->HasPhysicalObjects ()
-	&& dynamicsDebugMode == DYNDEBUG_BULLET)
-	bulletDynamicSystem->DebugDraw (view);
-/*
+    && dynamicsDebugMode == DYNDEBUG_BULLET)
+    bulletDynamicSystem->DebugDraw (view);
+  /*
   for (size_t i = 0; i < bulletDynamicSystem->GetSoftBodyCount (); i++)
   {
-	iBulletSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
-	// Ropes are characterized by the fact that they have no triangle
-	if (!softBody->GetTriangleCount ())
-	  softBody->DebugDraw (view);
+  iBulletSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
+  // Ropes are characterized by the fact that they have no triangle
+  if (!softBody->GetTriangleCount ())
+  softBody->DebugDraw (view);
   }
-*/
+  */
   cegui->Render ();
 }
 
@@ -157,34 +157,34 @@ bool HairTest::OnCollidersButtonClicked (const CEGUI::EventArgs&)
 void HairTest::SwitchDynamics()
 {
   csRef<iMeshObject> animeshObject = 
-	scfQueryInterface<iMeshObject> (avatarScene->animesh);
+    scfQueryInterface<iMeshObject> (avatarScene->animesh);
 
   if (dynamicsDebugMode == DYNDEBUG_NONE)
   {
-	dynamicsDebugMode = DYNDEBUG_MIXED;
-	dynamicsDebugger->SetDebugDisplayMode (true);
-	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
+    dynamicsDebugMode = DYNDEBUG_MIXED;
+    dynamicsDebugger->SetDebugDisplayMode (true);
+    animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
   }
 
   else if (dynamicsDebugMode == DYNDEBUG_MIXED)
   {
-	dynamicsDebugMode = DYNDEBUG_COLLIDER;
-	dynamicsDebugger->SetDebugDisplayMode (true);
-	animeshObject->GetMeshWrapper ()->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH);
+    dynamicsDebugMode = DYNDEBUG_COLLIDER;
+    dynamicsDebugger->SetDebugDisplayMode (true);
+    animeshObject->GetMeshWrapper ()->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH);
   }
 
   else if (dynamicsDebugMode == DYNDEBUG_COLLIDER)
   {
-	dynamicsDebugMode = DYNDEBUG_BULLET;
-	dynamicsDebugger->SetDebugDisplayMode (false);
-	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
+    dynamicsDebugMode = DYNDEBUG_BULLET;
+    dynamicsDebugger->SetDebugDisplayMode (false);
+    animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
   }
 
   else if (dynamicsDebugMode == DYNDEBUG_BULLET)
   {
-	dynamicsDebugMode = DYNDEBUG_NONE;
-	dynamicsDebugger->SetDebugDisplayMode (false);
-	animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
+    dynamicsDebugMode = DYNDEBUG_NONE;
+    dynamicsDebugger->SetDebugDisplayMode (false);
+    animeshObject->GetMeshWrapper ()->GetFlags ().Reset (CS_ENTITY_INVISIBLEMESH);
   }
 }
 
@@ -198,9 +198,9 @@ bool HairTest::OnKeyboard (iEvent &ev)
   {
     // Toggle the debug mode of the dynamic system
     if (csKeyEventHelper::GetCookedCode (&ev) == 'd'
-	     && physicsEnabled && avatarScene->HasPhysicalObjects ())
+      && physicsEnabled && avatarScene->HasPhysicalObjects ())
     {
-	  SwitchDynamics();
+      SwitchDynamics();
       return true;
     }
   }
@@ -215,14 +215,14 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     return false;
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
-	CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
-		       iSkeletonLookAtManager2),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
+    iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
-		       iSkeletonBasicNodesManager2),
-	CS_REQUEST_PLUGIN("crystalspace.material.furmaterial", iFurMaterialType),
-	CS_REQUEST_PLUGIN("crystalspace.physics.furphysics", iFurPhysicsControl),
-  CS_REQUEST_PLUGIN("crystalspace.material.furmaterialwrapper", iFurMaterialWrapper),
-	CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
+    iSkeletonBasicNodesManager2),
+    CS_REQUEST_PLUGIN("crystalspace.material.furmaterial", iFurMaterialType),
+    CS_REQUEST_PLUGIN("crystalspace.physics.furphysics", iFurPhysicsControl),
+    CS_REQUEST_PLUGIN("crystalspace.material.furmaterialwrapper", iFurMaterialWrapper),
+    CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -245,7 +245,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     if (!dynamics)
     {
       ReportWarning
-	("Can't load Bullet plugin, continuing with reduced functionalities");
+        ("Can't load Bullet plugin, continuing with reduced functionalities");
       physicsEnabled = false;
       break;
     }
@@ -257,7 +257,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     if (!debuggerManager)
     {
       ReportWarning
-	("Can't load Dynamics Debugger plugin, continuing with reduced functionalities");
+        ("Can't load Dynamics Debugger plugin, continuing with reduced functionalities");
       physicsEnabled = false;
       break;
     }
@@ -269,7 +269,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     if (!ragdollManager)
     {
       ReportWarning
-	("Can't load ragdoll plugin, continuing with reduced functionalities");
+        ("Can't load ragdoll plugin, continuing with reduced functionalities");
       physicsEnabled = false;
       break;
     }
@@ -327,11 +327,11 @@ bool HairTest::Application ()
   // Subscribe to the clicked event for the exit button
   CEGUI::Window* btn = winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Quit");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
-	  CEGUI::Event::Subscriber(&HairTest::OnExitButtonClicked, this));
+    CEGUI::Event::Subscriber(&HairTest::OnExitButtonClicked, this));
 
   winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Colliders") 
-	  -> subscribeEvent(CEGUI::PushButton::EventClicked,
-	  CEGUI::Event::Subscriber(&HairTest::OnCollidersButtonClicked, this));
+    -> subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&HairTest::OnCollidersButtonClicked, this));
 
   // Default behavior from csDemoApplication for the creation of the scene
   if (!csDemoApplication::CreateRoom ())
@@ -344,7 +344,7 @@ bool HairTest::Application ()
     if (!dynamicSystem) 
     {
       ReportWarning
-	("Can't create dynamic system, continuing with reduced functionalities");
+        ("Can't create dynamic system, continuing with reduced functionalities");
       physicsEnabled = false;
     }
 
@@ -352,7 +352,7 @@ bool HairTest::Application ()
     {
       // Find the Bullet interface of the dynamic system
       bulletDynamicSystem =
-	scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
+        scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
 
       // We have some objects of size smaller than 0.035 units, so we scale up the
       // whole world for a better behavior of the dynamic simulation.
@@ -371,10 +371,10 @@ bool HairTest::Application ()
 
       // Set up the physical collider for the roof
       dynamicSystem->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), 0.0f),
-					  10.0f, 0.0f);
+        10.0f, 0.0f);
     }
 
-	bulletDynamicSystem->SetSoftBodyWorld (true);
+    bulletDynamicSystem->SetSoftBodyWorld (true);
   }
 
   // Create avatar

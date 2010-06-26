@@ -1,8 +1,8 @@
 /*
   Copyright (C) 2010 Christian Van Brussel, Communications and Remote
-      Sensing Laboratory of the School of Engineering at the 
-      Universite catholique de Louvain, Belgium
-      http://www.tele.ucl.ac.be
+  Sensing Laboratory of the School of Engineering at the 
+    Universite catholique de Louvain, Belgium
+    http://www.tele.ucl.ac.be
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -26,7 +26,7 @@
 #define CAMERA_HIPS_DISTANCE 3.0f
 
 KrystalScene::KrystalScene (HairTest* hairTest)
-  : hairTest (hairTest)
+: hairTest (hairTest)
 {
   // Define the available keys
   hairTest->keyDescriptions.DeleteAll ();
@@ -46,12 +46,12 @@ KrystalScene::~KrystalScene ()
     csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
     hairTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
   }
-/*
+  /*
   for (size_t i = 0; i < hairsBody.GetSize(); i ++)
-	hairTest->bulletDynamicSystem->RemoveSoftBody (hairsBody.Get(i));
+  hairTest->bulletDynamicSystem->RemoveSoftBody (hairsBody.Get(i));
 
   hairsBody.DeleteAll();
-*/
+  */
 }
 
 csVector3 KrystalScene::GetCameraStart ()
@@ -76,23 +76,23 @@ csVector3 KrystalScene::GetCameraTarget ()
   animesh->GetSkeleton ()->GetTransformAbsSpace
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"), boneRotation, boneOffset);
   csOrthoTransform hipsTransform (csMatrix3 (boneRotation.GetConjugate ()),
-				  boneOffset);
+    boneOffset);
   csVector3 hipsPosition = (hipsTransform
-			    * animeshObject->GetMeshWrapper ()->QuerySceneNode ()
-			    ->GetMovable ()->GetTransform ()).GetOrigin ();
+    * animeshObject->GetMeshWrapper ()->QuerySceneNode ()
+    ->GetMovable ()->GetTransform ()).GetOrigin ();
 
   // Compute the position of the head
   animesh->GetSkeleton ()->GetTransformAbsSpace
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"), boneRotation, boneOffset);
   csOrthoTransform headTransform (csMatrix3 (boneRotation.GetConjugate ()),
-				  boneOffset);
+    boneOffset);
   csVector3 headPosition = (headTransform
-			    * animeshObject->GetMeshWrapper ()->QuerySceneNode ()
-			    ->GetMovable ()->GetTransform ()).GetOrigin ();
+    * animeshObject->GetMeshWrapper ()->QuerySceneNode ()
+    ->GetMovable ()->GetTransform ()).GetOrigin ();
 
   // Compute the distance between the camera and the head
   float distance = (hairTest->view->GetCamera ()->GetTransform ().GetOrigin ()
-		    - headPosition).Norm ();
+    - headPosition).Norm ();
 
   // Compute the camera target
   csVector3 cameraTarget;
@@ -104,8 +104,8 @@ csVector3 KrystalScene::GetCameraTarget ()
 
   else
     cameraTarget = hipsPosition + (headPosition - hipsPosition)
-      * (CAMERA_HIPS_DISTANCE - distance)
-      / (CAMERA_HIPS_DISTANCE - CAMERA_MINIMUM_DISTANCE);
+    * (CAMERA_HIPS_DISTANCE - distance)
+    / (CAMERA_HIPS_DISTANCE - CAMERA_MINIMUM_DISTANCE);
 
   return cameraTarget;
 }
@@ -143,7 +143,7 @@ bool KrystalScene::CreateAvatar ()
     return hairTest->ReportError ("Can't find Krystal's animesh factory!");
 
   csRef<iMaterialWrapper> skullMaterial = 
-	hairTest->engine->FindMaterial("skull_material");
+    hairTest->engine->FindMaterial("skull_material");
   if (!skullMaterial)	
     return hairTest->ReportError ("Can't find Krystal's skull material!");
 
@@ -161,18 +161,18 @@ bool KrystalScene::CreateAvatar ()
   // Load Krystal's hairs
   rc = hairTest->loader->Load ("/lib/krystal/krystal_hairs.xml");
   if (!rc.success)
-	  return hairTest->ReportError ("Can't load Krystal's hairs library file!");
+    return hairTest->ReportError ("Can't load Krystal's hairs library file!");
 
   csRef<iMeshFactoryWrapper> hairsMeshFact =
-	  hairTest->engine->FindMeshFactory ("krystal_hairs");
+    hairTest->engine->FindMeshFactory ("krystal_hairs");
   if (!hairsMeshFact)
-	  return hairTest->ReportError ("Can't find Krystal's hairs mesh factory!");  
+    return hairTest->ReportError ("Can't find Krystal's hairs mesh factory!");  
 
   // Load furPhysicsControl
   csRef<iFurPhysicsControl> furPhysicsControl = csQueryRegistry<iFurPhysicsControl> 
-	  (hairTest->object_reg);
+    (hairTest->object_reg);
   if (!furPhysicsControl)
-	  return hairTest->ReportError("Failed to locate iFurPhysicsControl plugin!");
+    return hairTest->ReportError("Failed to locate iFurPhysicsControl plugin!");
 
   // Load furMaterialWrapper
   csRef<iFurMaterialWrapper> furMaterialWrapper = csQueryRegistry<iFurMaterialWrapper> 
@@ -182,9 +182,9 @@ bool KrystalScene::CreateAvatar ()
 
   // Load furMaterial
   csRef<iFurMaterialType> furMaterialType = csQueryRegistry<iFurMaterialType> 
-	(hairTest->object_reg);
+    (hairTest->object_reg);
   if (!furMaterialType)
-	  return hairTest->ReportError("Failed to locate iFurMaterialType plugin!");
+    return hairTest->ReportError("Failed to locate iFurMaterialType plugin!");
 
   // Create a new animation tree. The structure of the tree is:
   //   + ragdoll controller node (root node - only if physics are enabled)
@@ -255,7 +255,7 @@ bool KrystalScene::CreateAvatar ()
   idle05NodeFactory->SetAutomaticStop (false);
   idle06NodeFactory->SetAutomaticStop (false);
   standNodeFactory->SetAutomaticStop (false);
-/*
+  /*
   randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
@@ -263,7 +263,7 @@ bool KrystalScene::CreateAvatar ()
   randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
   randomNodeFactory->AddNode (standNodeFactory, 1.0f);
-*/
+  */
   if (hairTest->physicsEnabled)
   {
     // Create the ragdoll controller
@@ -278,21 +278,21 @@ bool KrystalScene::CreateAvatar ()
     // Krystal has been killed.
     bodyChain = bodySkeleton->CreateBodyChain
       ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("Head"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
+      animeshFactory->GetSkeletonFactory ()->FindBone ("Head"),
+      animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"),
+      animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
+      animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
+      animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
     ragdollNodeFactory->AddBodyChain (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
 
-	// Create the geometry for the hairs
-	csRef<iGeneralFactoryState> hairsFactoryState =
-		scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
-/*
-      // Create the mesh of the hairs
-	hairsMesh = hairTest->engine->CreateMeshWrapper
-		(hairsMeshFact, "krystal_hairs", hairTest->room, csVector3 (0.0f));
-*/
+    // Create the geometry for the hairs
+    csRef<iGeneralFactoryState> hairsFactoryState =
+      scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
+    /*
+    // Create the mesh of the hairs
+    hairsMesh = hairTest->engine->CreateMeshWrapper
+    (hairsMeshFact, "krystal_hairs", hairTest->room, csVector3 (0.0f));
+    */
   }
 
   else
@@ -301,7 +301,7 @@ bool KrystalScene::CreateAvatar ()
   // Create the animated mesh
   csRef<iMeshWrapper> avatarMesh =
     hairTest->engine->CreateMeshWrapper (meshfact, "krystal",
-					   hairTest->room, csVector3 (0.0f));
+    hairTest->room, csVector3 (0.0f));
   animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
   // When the animated mesh is created, the animation nodes are created too.
@@ -316,8 +316,8 @@ bool KrystalScene::CreateAvatar ()
       scfQueryInterface<iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
     ragdollNode->SetAnimatedMesh (animesh);
 
-	// Start the ragdoll animation node in order to have the rigid bodies created
-	ragdollNode->Play ();
+    // Start the ragdoll animation node in order to have the rigid bodies created
+    ragdollNode->Play ();
   }
 
   iRigidBody* headBody = ragdollNode->GetBoneRigidBody
@@ -341,7 +341,7 @@ bool KrystalScene::CreateAvatar ()
   csRef<iFurMaterial> furMaterial = furMaterialType->CreateFurMaterial("hair");
   furMaterial->SetPhysicsControl(furPhysicsControl);
   furMaterial->SetFurMaterialWrapper(furMaterialWrapper);
-  
+
   furMaterial->SetMaterial(skullMaterial->GetMaterial());
   furMaterial->SetMeshFactory(animeshFactory);
   furMaterial->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
@@ -375,7 +375,7 @@ void KrystalScene::ResetScene ()
 
     // Update the display of the dynamics debugger
     if (hairTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
-	|| hairTest->dynamicsDebugMode == DYNDEBUG_MIXED)
+      || hairTest->dynamicsDebugMode == DYNDEBUG_MIXED)
       hairTest->dynamicsDebugger->UpdateDisplay ();
 
     // There are still big unlinerarities in the transition of Krystal's animations.

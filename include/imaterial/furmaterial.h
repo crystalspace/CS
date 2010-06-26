@@ -34,27 +34,27 @@ class csColor4;
 
 struct iFurPhysicsControl : public virtual iBase
 {
-	SCF_INTERFACE (iFurPhysicsControl, 1, 0, 0);
-	
-	virtual void SetRigidBody (iRigidBody* rigidBody) = 0;
-	virtual void SetBulletDynamicSystem (iBulletDynamicSystem* 
-	  bulletDynamicSystem) = 0;
+  SCF_INTERFACE (iFurPhysicsControl, 1, 0, 0);
 
-	// Initialize the strand with the given ID
-	virtual void InitializeStrand (size_t strandID, const csVector3* coordinates,
-		size_t coordinatesCount) = 0;
+  virtual void SetRigidBody (iRigidBody* rigidBody) = 0;
+  virtual void SetBulletDynamicSystem (iBulletDynamicSystem* 
+    bulletDynamicSystem) = 0;
 
-	// Animate the strand with the given ID
-	virtual void AnimateStrand (size_t strandID, csVector3* coordinates, size_t
-		coordinatesCount) = 0;
+  // Initialize the strand with the given ID
+  virtual void InitializeStrand (size_t strandID, const csVector3* coordinates,
+    size_t coordinatesCount) = 0;
 
-	virtual void RemoveStrand (size_t strandID) = 0;
-	virtual void RemoveAllStrands () = 0;
+  // Animate the strand with the given ID
+  virtual void AnimateStrand (size_t strandID, csVector3* coordinates, size_t
+    coordinatesCount) = 0;
+
+  virtual void RemoveStrand (size_t strandID) = 0;
+  virtual void RemoveAllStrands () = 0;
 };
 
 struct iFurMaterialWrapper : public virtual iBase
 {
-	SCF_INTERFACE (iFurMaterialWrapper, 1, 0, 0);
+  SCF_INTERFACE (iFurMaterialWrapper, 1, 0, 0);
 
   virtual iMaterial* GetMaterial() = 0;
   virtual void SetMaterial(iMaterial* material) = 0;
@@ -73,10 +73,10 @@ struct iFurMaterialType : public virtual iBase
 };
 
 /**
- * This is the API for our plugin. It is recommended
- * that you use better comments than this one in a
- * real situation.
- */
+* This is the API for our plugin. It is recommended
+* that you use better comments than this one in a
+* real situation.
+*/
 struct iFurMaterial : public virtual iMaterial 
 {
   SCF_INTERFACE (iFurMaterial, 1, 0, 0);
@@ -89,7 +89,7 @@ struct iFurMaterial : public virtual iMaterial
 
   virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory ) = 0;
   virtual void SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
-	meshFactorySubMesh ) = 0;
+    meshFactorySubMesh ) = 0;
   virtual void SetMaterial ( iMaterial* material ) = 0;
 };
 
