@@ -748,7 +748,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     }
 
     CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("rgba8"));
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
 
     csRef<iDataBuffer> db = M->Readback(readbackFmt);
 
@@ -756,12 +756,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     uint8* buf = db->GetUint8();
 
     for (size_t i = 0 ; i < db->GetSize() ; i ++ )
-      if ( i % 4 == 0 )
+      if ( ( (i + 1) % 4 )== 0 ) // alpha 0, red 1, etc
         buf[i] = 255;
       else
-        buf[i] = buf[i];
+        buf[i] = buf[i] / 2;
 
-    M->Blit(0, 0, width, height - 1, buf, iTextureHandle::RGBA8888);
+    M->Blit(0, 0, width, height / 2, buf, iTextureHandle::RGBA8888);
+    M->Blit(0, height / 2, width, height / 2, buf + (width * height * 2), iTextureHandle::RGBA8888);
 
     db = M->Readback(readbackFmt);
     buf = db->GetUint8();
