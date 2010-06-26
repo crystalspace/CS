@@ -98,6 +98,8 @@ class FurMaterial : public scfImplementation2<FurMaterial,
 	  meshFactorySubMesh );
 	// Set Material
 	virtual void SetMaterial ( iMaterial* material );
+  // Set FurMaterialWrapper
+  virtual void SetFurMaterialWrapper( iFurMaterialWrapper* furMaterialWrapper);
 
 	// From iMaterial
     /// Associate a shader with a shader type
@@ -117,109 +119,145 @@ class FurMaterial : public scfImplementation2<FurMaterial,
     virtual iShader* GetFirstShader (const csStringID* types, size_t numTypes);
 
   protected:
-	FurMaterialType* manager;
-	csString name;
+    FurMaterialType* manager;
+	  csString name;
 
   private:
-	iObjectRegistry* object_reg;
-	/// Shader associated with material
-	csHash<csRef<iShader>, csStringID> shaders;
-	/// Fur geometry
-	csRef<iGeneralFactoryState> factoryState;
-	csRef<iView> view;
-	csArray<csHairStrand> hairStrands;
-	csArray<csGuideHair> guideHairs;
-	csArray<csTriangle> guideHairsTriangles;
-	csRef<iFurPhysicsControl> physicsControl;
-	/// Temp fur geometry
-	csRef<iAnimatedMeshFactory> meshFactory;
-	csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
-	iTextureHandle* densitymap;
-	iTextureHandle* heightmap;
-	csRef<iMaterial> material;
-	csRef<iShaderVarStringSet> svStrings;
-	float strandWidth;
-	/// Model
-	csRef<iEngine> engine;
-	csRef<iLoader> loader;
-	csRef<iMaterial> furMaterial;
-	float displaceEps;
-	/// functions
-	void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
-	  iRenderBuffer* normals);
-	void SynchronizeGuideHairs();
-	void GenerateHairStrands(iRenderBuffer* indices, iRenderBuffer* vertexes);
-	void SynchronizeHairsStrands();
-	void SetDensitymap();
-	void SetHeightmap();
-	void SetStrandWidth();
-	void SetColor(csColor color);
-	void SetDisplaceEps();
+	  iObjectRegistry* object_reg;
+	  /// Shader associated with material
+	  csHash<csRef<iShader>, csStringID> shaders;
+	  /// Fur geometry
+	  csRef<iGeneralFactoryState> factoryState;
+	  csRef<iView> view;
+	  csArray<csHairStrand> hairStrands;
+	  csArray<csGuideHair> guideHairs;
+	  csArray<csTriangle> guideHairsTriangles;
+	  csRef<iFurPhysicsControl> physicsControl;
+    csRef<iFurMaterialWrapper> furMaterialWrapper;
+	  /// Temp fur geometry
+	  csRef<iAnimatedMeshFactory> meshFactory;
+	  csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
+	  iTextureHandle* densitymap;
+	  iTextureHandle* heightmap;
+	  csRef<iMaterial> material;
+	  csRef<iShaderVarStringSet> svStrings;
+	  float strandWidth;
+	  /// Model
+	  csRef<iEngine> engine;
+	  csRef<iLoader> loader;
+	  float displaceEps;
+	  /// functions
+	  void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
+	    iRenderBuffer* normals);
+	  void SynchronizeGuideHairs();
+	  void GenerateHairStrands(iRenderBuffer* indices, iRenderBuffer* vertexes);
+	  void SynchronizeHairsStrands();
+	  void SetDensitymap();
+	  void SetHeightmap();
+	  void SetStrandWidth();
+	  void SetColor(csColor color);
+	  void SetDisplaceEps();
 };
 
 class FurAnimationControl : public scfImplementation1 
     <FurAnimationControl, iGenMeshAnimationControl>
 {
   public:
-	CS_LEAKGUARD_DECLARE(FurAnimationControl);
+	  CS_LEAKGUARD_DECLARE(FurAnimationControl);
 
     FurAnimationControl (FurMaterial* furMaterial);
     virtual ~FurAnimationControl ();
 
-	//-- iGenMeshAnimationControl
-	virtual bool AnimatesColors () const;
-	virtual bool AnimatesNormals () const;
-	virtual bool AnimatesTexels () const;
-	virtual bool AnimatesVertices () const;
-	virtual void Update (csTicks current, int num_verts, uint32 version_id);
-	virtual const csColor4* UpdateColors (csTicks current, const csColor4* colors,
-	  int num_colors, uint32 version_id);
-	virtual const csVector3* UpdateNormals (csTicks current, const csVector3* normals,
-	  int num_normals, uint32 version_id);
-	virtual const csVector2* UpdateTexels (csTicks current, const csVector2* texels,
-	  int num_texels, uint32 version_id);
-	virtual const csVector3* UpdateVertices (csTicks current, const csVector3* verts,
-	  int num_verts, uint32 version_id);
+	  //-- iGenMeshAnimationControl
+	  virtual bool AnimatesColors () const;
+	  virtual bool AnimatesNormals () const;
+	  virtual bool AnimatesTexels () const;
+	  virtual bool AnimatesVertices () const;
+	  virtual void Update (csTicks current, int num_verts, uint32 version_id);
+	  virtual const csColor4* UpdateColors (csTicks current, const csColor4* colors,
+	    int num_colors, uint32 version_id);
+	  virtual const csVector3* UpdateNormals (csTicks current, const csVector3* normals,
+	    int num_normals, uint32 version_id);
+	  virtual const csVector2* UpdateTexels (csTicks current, const csVector2* texels,
+	    int num_texels, uint32 version_id);
+	  virtual const csVector3* UpdateVertices (csTicks current, const csVector3* verts,
+	    int num_verts, uint32 version_id);
 
   private:
     csWeakRef<iMeshObject> mesh;
     csTicks lastTicks;
-	FurMaterial* furMaterial;
+	  FurMaterial* furMaterial;
 
-	// functions
-	virtual void UpdateHairStrand(csHairStrand* hairStrand);
+	  // functions
+	  virtual void UpdateHairStrand(csHairStrand* hairStrand);
 };
 
 class FurPhysicsControl : public scfImplementation2 <FurPhysicsControl, 
 	iFurPhysicsControl, iComponent>
 {
   public:
-	CS_LEAKGUARD_DECLARE(FurPhysicsControl);
+    CS_LEAKGUARD_DECLARE(FurPhysicsControl);
 
     FurPhysicsControl (iBase* parent);
     virtual ~FurPhysicsControl ();
 
-	// From iComponent	
-	virtual bool Initialize (iObjectRegistry*);
+    // From iComponent	
+    virtual bool Initialize (iObjectRegistry*);
 
-    //-- iFurPhysicsControl
-	virtual void SetRigidBody (iRigidBody* rigidBody);
-	virtual void SetBulletDynamicSystem (iBulletDynamicSystem* bulletDynamicSystem);
-	// Initialize the strand with the given ID
-	virtual void InitializeStrand (size_t strandID, const csVector3* coordinates,
-	  size_t coordinatesCount);
-	// Animate the strand with the given ID
-	virtual void AnimateStrand (size_t strandID, csVector3* coordinates, size_t
-	  coordinatesCount);
-	virtual void RemoveStrand (size_t strandID);
-	virtual void RemoveAllStrands ();
+      //-- iFurPhysicsControl
+    virtual void SetRigidBody (iRigidBody* rigidBody);
+    virtual void SetBulletDynamicSystem (iBulletDynamicSystem* bulletDynamicSystem);
+    // Initialize the strand with the given ID
+    virtual void InitializeStrand (size_t strandID, const csVector3* coordinates,
+      size_t coordinatesCount);
+    // Animate the strand with the given ID
+    virtual void AnimateStrand (size_t strandID, csVector3* coordinates, size_t
+      coordinatesCount);
+    virtual void RemoveStrand (size_t strandID);
+    virtual void RemoveAllStrands ();
 
   private:
-	iObjectRegistry* object_reg;
-	csHash<csRef<iBulletSoftBody>, size_t > guideRopes;
-	csRef<iRigidBody> rigidBody;
-	csRef<iBulletDynamicSystem> bulletDynamicSystem;
+    iObjectRegistry* object_reg;
+    csHash<csRef<iBulletSoftBody>, size_t > guideRopes;
+    csRef<iRigidBody> rigidBody;
+    csRef<iBulletDynamicSystem> bulletDynamicSystem;
 };
+
+class FurMaterialWrapper : public scfImplementation2 <FurMaterialWrapper, 
+  iFurMaterialWrapper, iComponent> 
+{
+  public:
+    CS_LEAKGUARD_DECLARE(FurMaterialWrapper);
+
+    FurMaterialWrapper (iBase* parent);
+    virtual ~FurMaterialWrapper ();
+
+    // From iComponent	
+    virtual bool Initialize (iObjectRegistry*);
+
+    // From iFurMaterialWrapper
+    virtual iMaterial* GetMaterial();
+    virtual void SetMaterial(iMaterial* material);
+    virtual void Invalidate();
+    virtual void Update();
+
+  private:
+    iObjectRegistry* object_reg;
+    iMaterial* material;
+    bool valid;
+    // Shader
+	  csRef<iShaderVarStringSet> svStrings;
+    int width, height;
+    iTextureHandle *M;
+    // Marschner specific functions
+    void UpdateTextures();
+    void UpdateM();
+    void UpdateN();
+    // Marschner temp functions
+    void Marschner();
+    void SaveImage(uint8 *buf, const char* texname);
+};
+
 }
 CS_PLUGIN_NAMESPACE_END(FurMaterial)
 

@@ -174,6 +174,12 @@ bool KrystalScene::CreateAvatar ()
   if (!furPhysicsControl)
 	  return hairTest->ReportError("Failed to locate iFurPhysicsControl plugin!");
 
+  // Load furMaterialWrapper
+  csRef<iFurMaterialWrapper> furMaterialWrapper = csQueryRegistry<iFurMaterialWrapper> 
+    (hairTest->object_reg);
+  if (!furMaterialWrapper)
+    return hairTest->ReportError("Failed to locate iFurMaterialWrapper plugin!");
+
   // Load furMaterial
   csRef<iFurMaterialType> furMaterialType = csQueryRegistry<iFurMaterialType> 
 	(hairTest->object_reg);
@@ -249,7 +255,7 @@ bool KrystalScene::CreateAvatar ()
   idle05NodeFactory->SetAutomaticStop (false);
   idle06NodeFactory->SetAutomaticStop (false);
   standNodeFactory->SetAutomaticStop (false);
-
+/*
   randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
@@ -257,7 +263,7 @@ bool KrystalScene::CreateAvatar ()
   randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
   randomNodeFactory->AddNode (standNodeFactory, 1.0f);
-
+*/
   if (hairTest->physicsEnabled)
   {
     // Create the ragdoll controller
@@ -312,73 +318,29 @@ bool KrystalScene::CreateAvatar ()
 
 	// Start the ragdoll animation node in order to have the rigid bodies created
 	ragdollNode->Play ();
-/*
-	iRigidBody* headBody = ragdollNode->GetBoneRigidBody
-		(animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
-
-	iAnimatedMeshSubMesh* skullmesh = animesh -> GetSubMesh(1);
-
-	iRenderBuffer* indices = skullmesh->GetFactorySubMesh()->GetIndices(0);
-	iRenderBuffer* vertices = animeshFactory->GetVertices();
-	iRenderBuffer* texCoord = animeshFactory->GetTexCoords();
-
-	csRenderBufferLock<csVector3> positions (vertices, CS_BUF_LOCK_READ);
-	csRenderBufferLock<csVector2> texcoords (texCoord, CS_BUF_LOCK_READ);
-	csArray<int> uniqueIndices;
-	CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);
-
-	// chose unique indices
-    while (tris.HasNext())
-    {
-      CS::TriangleT<size_t> tri (tris.Next ());
-
-	  if(uniqueIndices.Contains(tri.a) == csArrayItemNotFound)
-	    uniqueIndices.Push(tri.a);
-	  if(uniqueIndices.Contains(tri.b) == csArrayItemNotFound)
-	    uniqueIndices.Push(tri.b);
-	  if(uniqueIndices.Contains(tri.c) == csArrayItemNotFound)
-	    uniqueIndices.Push(tri.c);
-    }
-
-	csRef<iImage> densityMap = hairTest->loader->
-	  LoadImage("/lib/krystal/krystal_body_h.png",CS_IMGFMT_TRUECOLOR);
-
-	if(!densityMap)
-	  return hairTest->ReportError ("Can't find Krystal's density map!");
-
-	csRGBpixel *data = (csRGBpixel *)densityMap->GetImageData ();
-	int width = densityMap->GetWidth();
-	int height = densityMap->GetHeight();
-
-	// attach rope for them
-	for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
-	{
-  	  csVector3 pos = positions.Get(uniqueIndices.Get(i));
-	  csRef<iBulletSoftBody> bulletBody = hairTest->bulletDynamicSystem->
-		CreateRope(pos,pos + csVector3(0,0.25f,0),5);
-	  bulletBody->SetMass (0.1f);
-	  bulletBody->SetRigidity (0.99f);
-	  bulletBody->AnchorVertex (0, headBody);
-	  hairsBody.Push(bulletBody);
-
-	  csVector2 texcoord = texcoords.Get(uniqueIndices.Get(i));
-	  const csRGBpixel& heixel = data[(int)(texcoord.x * width) + width * 
-		(int)(texcoord.y * height)];
-	  printf("%u ", heixel.red);
-	  //printf("%f %f\n", texcoord.x, texcoord.y);
-	}
-	*/
   }
 
   iRigidBody* headBody = ragdollNode->GetBoneRigidBody
-	(animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
-  
+    (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
+
+  rc = hairTest-> loader ->Load ("/hairtest/fur_material.xml");
+  if (!rc.success)
+    hairTest->ReportError("Can't load Fur library file!");
+
+  csRef<iMaterialWrapper> materialWrapper = 
+    hairTest->engine->FindMaterial("marschner_material");
+  if (!materialWrapper)
+    hairTest->ReportError("Can't find marschner material!");
+
+  furMaterialWrapper->SetMaterial(materialWrapper->GetMaterial());
+
   furPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
   furPhysicsControl->SetRigidBody(headBody);
 
   // Initialize fur material
   csRef<iFurMaterial> furMaterial = furMaterialType->CreateFurMaterial("hair");
   furMaterial->SetPhysicsControl(furPhysicsControl);
+  furMaterial->SetFurMaterialWrapper(furMaterialWrapper);
   
   furMaterial->SetMaterial(skullMaterial->GetMaterial());
   furMaterial->SetMeshFactory(animeshFactory);

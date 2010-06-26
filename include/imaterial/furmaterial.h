@@ -52,6 +52,16 @@ struct iFurPhysicsControl : public virtual iBase
 	virtual void RemoveAllStrands () = 0;
 };
 
+struct iFurMaterialWrapper : public virtual iBase
+{
+	SCF_INTERFACE (iFurMaterialWrapper, 1, 0, 0);
+
+  virtual iMaterial* GetMaterial() = 0;
+  virtual void SetMaterial(iMaterial* material) = 0;
+  virtual void Invalidate() = 0;
+  virtual void Update() = 0;
+};
+
 struct iFurMaterialType : public virtual iBase
 {
   SCF_INTERFACE (iFurMaterialType, 1, 0, 0);
@@ -74,6 +84,8 @@ struct iFurMaterial : public virtual iMaterial
   virtual void GenerateGeometry (iView* view, iSector* room) = 0;
 
   virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl) = 0;
+
+  virtual void SetFurMaterialWrapper( iFurMaterialWrapper* furMaterialWrapper) = 0;
 
   virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory ) = 0;
   virtual void SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 

@@ -81,29 +81,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   FurMaterial::FurMaterial (FurMaterialType* manager, const char *name, 
 	iObjectRegistry* object_reg) :
       scfImplementationType (this), manager (manager), name (name), 
-	    object_reg(object_reg), physicsControl(0)
+	    object_reg(object_reg), physicsControl(0), furMaterialWrapper(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
 	  object_reg, "crystalspace.shader.variablenameset");
+    
     if (!svStrings) 
-	  printf ("No SV names string set!");
+	    printf ("No SV names string set!");
 
-	engine = csQueryRegistry<iEngine> (object_reg);
-	if (!engine) printf ("Failed to locate 3D engine!");
+	  engine = csQueryRegistry<iEngine> (object_reg);
+	  if (!engine) printf ("Failed to locate 3D engine!");
 
-	loader = csQueryRegistry<iLoader> (object_reg);
-	if (!loader) printf ("Failed to locate Loader!");
-
-	csLoadResult rc = loader ->Load ("/hairtest/fur.xml");
-	if (!rc.success)
-	  printf ("Can't load Fur library file!");
-
-	csRef<iMaterialWrapper> furMaterialWrapper = 
-	  engine->FindMaterial("fur_material");
-	if (!furMaterialWrapper)	
-	  printf ("Can't find fur material!");
-
-	furMaterial = furMaterialWrapper->GetMaterial();
+	  loader = csQueryRegistry<iLoader> (object_reg);
+	  if (!loader) printf ("Failed to locate Loader!");
   }
 
   FurMaterial::~FurMaterial ()
@@ -182,7 +172,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 		CS::Material::MaterialBuilder::CreateColorMaterial
 		(object_reg,"hairDummyMaterial",csColor(1,0,0));
 
-	materialWrapper->SetMaterial(furMaterial);
+  if (furMaterialWrapper && furMaterialWrapper->GetMaterial())
+	  materialWrapper->SetMaterial(furMaterialWrapper->GetMaterial());
 
 	meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
 
@@ -262,7 +253,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	float density = 5;
 
 	CS::ShaderVarName densityName (svStrings, "density");	
-	csRef<csShaderVariable> shaderVariable = furMaterial->GetVariable(densityName);
+	csRef<csShaderVariable> shaderVariable = material->GetVariable(densityName);
 
 	if (shaderVariable)
 	  shaderVariable->GetValue(density);
@@ -313,47 +304,52 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::SetPhysicsControl (iFurPhysicsControl* physicsControl)
   {
-	this->physicsControl = physicsControl;
+		this->physicsControl = physicsControl;
   }
 
   void FurMaterial::SetMeshFactory ( iAnimatedMeshFactory* meshFactory)
   {
-	this->meshFactory = meshFactory;
+		this->meshFactory = meshFactory;
   }
 
   void FurMaterial::SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
-	meshFactorySubMesh )
+	  meshFactorySubMesh )
   { 
-	this->meshFactorySubMesh = meshFactorySubMesh;
+	  this->meshFactorySubMesh = meshFactorySubMesh;
+  }
+
+  void FurMaterial::SetFurMaterialWrapper( iFurMaterialWrapper* furMaterialWrapper)
+  {
+    this->furMaterialWrapper = furMaterialWrapper;
   }
 
   void FurMaterial::SetMaterial ( iMaterial* material )
   {
-	this->material = material;
+	  this->material = material;
 
-	SetColor(csColor(1,1,0));
-	SetDensitymap();
-	SetHeightmap();
-	SetStrandWidth();
-	SetDisplaceEps();
+	  SetColor(csColor(1,1,0));
+	  SetDensitymap();
+	  SetHeightmap();
+	  SetStrandWidth();
+	  SetDisplaceEps();
   }
 
   void FurMaterial::SetColor(csColor color)
   {
-	CS::ShaderVarName furColorName (svStrings, "mat furcolor");	
-	csRef<csShaderVariable> shaderVariable = 
-	  furMaterial->GetVariable(furColorName);
-	if(!shaderVariable)
-	{
-	  shaderVariable = furMaterial->GetVariableAdd(furColorName);
-	  shaderVariable->SetValue(color);	
-	}
+	  CS::ShaderVarName furColorName (svStrings, "mat furcolor");	
+	  csRef<csShaderVariable> shaderVariable = 
+	    material->GetVariable(furColorName);
+	  if(!shaderVariable)
+	  {
+	    shaderVariable = material->GetVariableAdd(furColorName);
+	    shaderVariable->SetValue(color);	
+	  }
   }
 
   void FurMaterial::SetStrandWidth()
   {
 	  CS::ShaderVarName strandWidthName (svStrings, "width");	
-	  csRef<csShaderVariable> shaderVariable = furMaterial->GetVariable(strandWidthName);
+	  csRef<csShaderVariable> shaderVariable = material->GetVariable(strandWidthName);
 
 	  shaderVariable->GetValue(strandWidth);
   }
@@ -382,7 +378,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 	
 	CS::ShaderVarName displaceEpsName (svStrings, "displaceEps");	
 	csRef<csShaderVariable> shaderVariable = 
-	  furMaterial->GetVariable(displaceEpsName);
+	  material->GetVariable(displaceEpsName);
 
 	if (shaderVariable)
 	  shaderVariable->GetValue(displaceEps);
@@ -469,6 +465,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   
   void FurAnimationControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
+    // update shader
+    if (furMaterial->furMaterialWrapper)
+      furMaterial->furMaterialWrapper->Update();
 
 	// first update the control points
 	if (furMaterial->physicsControl)
@@ -570,7 +569,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   FurPhysicsControl::~FurPhysicsControl ()
   {
-	guideRopes.DeleteAll();
+    guideRopes.DeleteAll();
   }
 
   // From iComponent
@@ -642,16 +641,172 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurPhysicsControl::RemoveStrand (size_t strandID)
   {
-	csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
-	if(!bulletBody)
-		return;
+    csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
+    if(!bulletBody)
+	    return;
 
     guideRopes.Delete(strandID, bulletBody);
   }
 
   void FurPhysicsControl::RemoveAllStrands ()
   {
-	guideRopes.DeleteAll();
+    guideRopes.DeleteAll();
+  }
+
+
+  /************************
+   *  FurMaterialWrapper
+   ************************/  
+  SCF_IMPLEMENT_FACTORY (FurMaterialWrapper)
+
+  CS_LEAKGUARD_IMPLEMENT(FurMaterialWrapper);	
+
+  FurMaterialWrapper::FurMaterialWrapper (iBase* parent)
+    : scfImplementationType (this, parent), object_reg(0), material(0), 
+      valid(false), width(0), height(0), M(0)
+  {
+  }
+
+  FurMaterialWrapper::~FurMaterialWrapper ()
+  {
+  }
+
+  // From iComponent
+  bool FurMaterialWrapper::Initialize (iObjectRegistry* r)
+  {
+    object_reg = r;
+    
+    svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+      object_reg, "crystalspace.shader.variablenameset");
+
+    if (!svStrings) 
+      printf ("No SV names string set!");
+
+    return true;
+  }
+  
+  // From iFurMaterialWrapper
+  iMaterial* FurMaterialWrapper::GetMaterial()
+  {
+    return material;
+  }
+
+  void FurMaterialWrapper::SetMaterial(iMaterial* material)
+  {
+    this->material = material;
+  }
+
+  void FurMaterialWrapper::Invalidate()
+  {
+    valid = false;
+  }
+  
+  void FurMaterialWrapper::Update()
+  {
+    if(!valid)
+    {
+      UpdateTextures();
+      valid = true;
+    }
+  }
+
+  // Marschner specific methods
+  void FurMaterialWrapper::UpdateTextures()
+  {
+    Marschner();
+  }
+
+  void FurMaterialWrapper::UpdateM()
+  {
+
+  }
+
+  void FurMaterialWrapper::UpdateN()
+  {
+
+  }
+
+
+  void FurMaterialWrapper::Marschner()
+  {
+    if(!material)
+      return;
+
+    if(!M)
+    {
+      CS::ShaderVarName strandWidthName (svStrings, "tex M");	
+      csRef<csShaderVariable> shaderVariable = material->GetVariable(strandWidthName);
+      shaderVariable->GetValue(M);
+
+      if(!M) 
+      {
+        printf ("Failed to load M texture!\n");
+        return;
+      }
+
+      M->GetRendererDimensions(width, height);
+    }
+
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("rgba8"));
+
+    csRef<iDataBuffer> db = M->Readback(readbackFmt);
+
+    CS_ASSERT(db->GetSize() == (size_t)(width * height * 4));
+    uint8* buf = db->GetUint8();
+
+    for (size_t i = 0 ; i < db->GetSize() ; i ++ )
+      if ( i % 4 == 0 )
+        buf[i] = 255;
+      else
+        buf[i] = buf[i];
+
+    M->Blit(0, 0, width, height - 1, buf, iTextureHandle::RGBA8888);
+
+    db = M->Readback(readbackFmt);
+    buf = db->GetUint8();
+
+    SaveImage(buf, "/data/hairtest/debug/M_debug.png");
+  }
+
+  void FurMaterialWrapper::SaveImage(uint8* buf, const char* texname)
+  {
+    csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
+    csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
+
+    if(!buf)
+    {
+      printf("Bad data buffer!\n");
+      return;
+    }
+
+    csRef<iImage> image;
+    image.AttachNew(new csImageMemory (width, height, buf,false,
+      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+
+    if(!image.IsValid())
+    {
+      printf("Error loading image\n");
+      return;
+    }
+
+    csPrintf ("Saving %zu KB of data.\n", 
+      csImageTools::ComputeDataSize (image)/1024);
+
+    csRef<iDataBuffer> db = imageio->Save (image, "image/png", "progressive");
+    if (db)
+    {
+      if (!VFS->WriteFile (texname, (const char*)db->GetData (), db->GetSize ()))
+      {
+        printf("Failed to write file '%s'!", texname);
+        return;
+      }
+    }
+    else
+    {
+      printf("Failed to save png image for basemap!");
+      return;
+    }	    
   }
 
 }
