@@ -750,10 +750,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       for( int x = 0 ; x < width ; x ++ )
         for (int y = 0 ; y < height; y ++)
         {
-          m_buf[ 4 * (x * height + y ) ] = 255; // red
-          m_buf[ 4 * (x * height + y ) + 1 ] = 0; // green
-          m_buf[ 4 * (x * height + y ) + 2 ] = 0; // blue
-          m_buf[ 4 * (x * height + y ) + 3 ] = 255; // alpha
+          m_buf[ 4 * (x + y * width ) ] = 255; // red
+          m_buf[ 4 * (x + y * width ) + 1 ] = 0; // green
+          m_buf[ 4 * (x + y * width ) + 2 ] = 0; // blue
+          m_buf[ 4 * (x + y * width ) + 3 ] = 255; // alpha
         }
     }
 
@@ -783,13 +783,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       {
         float sin_thI = -1.0f + (x * 2.0f) / width;
         float sin_thR = -1.0f + (y * 2.0f) / height;
-        float thI = (180 * asinf(sin_thI) / PI);
-        float thR = (180 * asinf(sin_thR) / PI);
+        float thI = (180 * asin(sin_thI) / PI);
+        float thR = (180 * asin(sin_thR) / PI);
         float thH = (thR + thI) / 2;
         float thH_a = thH - a;
 
         float gauss = MarschnerHelper::GaussianDistribution(b, thH_a);
-        gauss_matrix[x * height + y] = gauss;
+        gauss_matrix[x + y * width] = gauss;
 
         if (255 * gauss > max)
           max = 255 * gauss;
@@ -799,8 +799,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     for (int x = 0; x < width; x++)
       for (int y = 0; y < height; y++)
       {
-        float gauss = gauss_matrix[x * height + y];
-        m_buf[4 * (x * height + y) + channel] = (uint8)(255 * 255 * gauss / max);
+        float gauss = gauss_matrix[x + y * width];
+        m_buf[4 * (x + y * width) + channel] = (uint8)(255 * 255 * gauss / max);
       }
 
     return max;
@@ -812,10 +812,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     {
       CS::ShaderVarName strandWidthName (svStrings, "tex N");	
       csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(strandWidthName);
-      shaderVariable->GetValue(N);
 
-//       N = g3d->GetTextureManager()->CreateTexture(width, height, csimg2D, "abgr8", 
-//         CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
+       N = g3d->GetTextureManager()->CreateTexture(width, height, csimg2D, "abgr8", 
+         CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
 
       if(!N)
       {
@@ -823,23 +822,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         return;
       }
 
-//      shaderVariable->SetValue(N);
+      shaderVariable->SetValue(N);
 
       n_buf = new uint8 [width * height * 4];
 
       for( int x = 0 ; x < width ; x ++ )
         for (int y = 0 ; y < height; y ++)
         {
-          n_buf[ 4 * (x * height + y ) ] = 0; // red
-          n_buf[ 4 * (x * height + y ) + 1 ] = 255; // green
-          n_buf[ 4 * (x * height + y ) + 2 ] = 0; // blue
-          n_buf[ 4 * (x * height + y ) + 3 ] = 255; // alpha
+          n_buf[ 4 * (x + y * width ) ] = 0; // red
+          n_buf[ 4 * (x + y * width ) + 1 ] = 0; // green
+          n_buf[ 4 * (x + y * width ) + 2 ] = 0; // blue
+          n_buf[ 4 * (x + y * width ) + 3 ] = 255; // alpha
         }
     }
 
+    for( int x = 0 ; x < width ; x ++ )
+      for (int y = 0 ; y < height; y ++)
+      {
+        float cos_phiD = -1.0f + (x * 2.0f) / width;
+        float cos_thD = -1.0f + (y * 2.0f) / height;
+        float phiD = acos(cos_phiD);
+        float thD = acos(cos_thD);
+        n_buf[ 4 * (x + y * width ) ] = (uint8)(255 * SimpleNP(phiD, thD)); // red
+        n_buf[ 4 * (x + y * width ) ] = (uint8)(255 * ComputeNP(0, phiD, thD)); // red
+        n_buf[ 4 * (x + y * width ) + 1 ] = (uint8)(255 * ComputeNP(1, phiD, thD)); // green
+        n_buf[ 4 * (x + y * width ) + 2 ] = (uint8)(255 * ComputeNP(2, phiD, thD)); // blue
+      }
+
     // send buffer to texture
-//     N->Blit(0, 0, width, height / 2, n_buf);
-//     N->Blit(0, height / 2, width, height / 2, n_buf + (width * height * 2));
+    N->Blit(0, 0, width, height / 2, n_buf);
+    N->Blit(0, height / 2, width, height / 2, n_buf + (width * height * 2));
 
     // test new texture
     CS::StructuredTextureFormat readbackFmt 
@@ -847,6 +859,78 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     csRef<iDataBuffer> db = N->Readback(readbackFmt);
     SaveImage(db->GetUint8(), "/data/hairtest/debug/N_debug.png");
+  }
+
+  float FurMaterialWrapper::ComputeT(float absorption, float gammaT)
+  {
+    float l = 1 + cos(2 * gammaT);	// l = ls / cos qt = 2r cos h0t / cos qt
+    return exp(-2.0f * absorption * l);
+  }
+
+  float FurMaterialWrapper::ComputeA(float absorption, int p, float h, 
+    float refraction, float etaPerpendicular, float etaParallel)
+  {
+    float gammaI = asin(h);
+
+    //A(0; h) = F(h0; h00; gi)
+    if (p == 0)
+      return MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
+
+    //A(p; h) = ( (1 - F(h0; h00; gi) ) ^ 2 ) * ( F(1 / h0; 1 / h00; gi) ^ (p - 1) ) * ( T(s0a; h) ^ p )
+    float gammaT = asin(h / etaPerpendicular);	// h0 sin gt = h
+
+    float fresnel = MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
+    float invFrenel = MarschnerHelper::Fresnel(1 / etaPerpendicular, 1 / etaParallel, gammaT);
+    float t = ComputeT(absorption, gammaT);
+
+    return (1.0f - fresnel) * (1.0f - fresnel) * pow(invFrenel, p - 1.0f) * pow(t, p);
+  }
+
+  float FurMaterialWrapper::ComputeNP(int p, float phi, float thD)
+  {
+    float refraction = mc->eta;
+    float absorption = mc->absorption;
+
+    float etaPerpendicular = MarschnerHelper::BravaisIndex(thD, refraction);
+    float etaParallel = (refraction * refraction) / etaPerpendicular;
+
+    csVector4 roots = EquationsSolver::Roots(p, etaPerpendicular, phi);
+    float result = 0;
+
+    for (int index = 0; index < roots.w; index++ )
+    {
+      float gammaI = roots[index];
+
+      //if (fabs(gammaI) <= PI/2)
+      {
+        float h = sin(gammaI);
+        float finalAbsorption = ComputeA(absorption, p, h, refraction, 
+          etaPerpendicular, etaParallel);
+        float inverseDerivateAngle = 
+          EquationsSolver::InverseFirstDerivate(p, etaPerpendicular, h);
+
+        result += finalAbsorption * 2 * fabs(inverseDerivateAngle); //0.5 here
+      }
+    }
+
+    return csMin(1.0f, result);
+  }
+
+  float FurMaterialWrapper::SimpleNP(float phi, float thD )
+  {
+    float refraction = mc->eta;
+
+    float etaPerpendicular = MarschnerHelper::BravaisIndex(thD, refraction);
+    float etaParallel = (refraction * refraction) / etaPerpendicular;
+    float gammaI = -phi / 2.0f;
+
+    float h = sin(gammaI);
+
+    float result = (sqrt(1 - h * h));
+
+    result *= MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
+
+    return csMin(1.0f, result);
   }
 
   void FurMaterialWrapper::SaveImage(uint8* buf, const char* texname)
