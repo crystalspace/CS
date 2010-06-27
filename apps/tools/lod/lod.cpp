@@ -313,8 +313,9 @@ void Lod::LoadSprite(const char* filename)
   // Test by rendering level 1
   fstate->SetTriangleCount(0);  
   assert(lodgen.GetSlidingWindowCount() >= 2);
-  int imin = lodgen.GetSlidingWindow(1).start_index;
-  for (int i = imin; i < lodgen.GetTriangleCount(); i++)
+  int start_index = lodgen.GetSlidingWindow(18).start_index;
+  int end_index = lodgen.GetSlidingWindow(18).end_index;
+  for (int i = start_index; i < end_index; i++)
   {
     cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
     fstate->AddTriangle(lodgen.GetTriangle(i));
