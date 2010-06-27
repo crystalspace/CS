@@ -17,7 +17,6 @@
     <material name='marschner_material'>
       <shader type='standard'>marschner_lookup_cg</shader>
 	  
-      <shadervar type="texture" name="tex M">M</shadervar>
       <shadervar type="texture" name="tex N">N</shadervar>	  
 	  
 <!-- Uncomment the following line for red hair -->	  

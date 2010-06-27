@@ -246,18 +246,57 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     iMaterial* material;
     bool valid;
     // Shader
+    csRef<iGraphics3D> g3d;
     csRef<iShaderVarStringSet> svStrings;
     int width, height;
-    iTextureHandle *M;
+    csRef<iTextureHandle> M;
+    uint8* m_buf;
+    float* gauss_matrix;
+    iTextureHandle* N;
+    uint8* n_buf;
     // Marschner specific functions
-    void UpdateTextures();
     void UpdateM();
+    float ComputeM(float a, float b, int channel);
     void UpdateN();
     // Marschner temp functions
-    void Marschner();
     void SaveImage(uint8 *buf, const char* texname);
   };
 
+  class MarschnerConstants
+  {
+  public:
+    // Surface properties
+    static const float aR = -10;
+    static const float aTT = - (-10) / 2;
+    static const float aTRT = - 3 * (-10) / 2;
+
+    static const float bR = 5;
+    static const float bTT = (5) / 2;
+    static const float bTRT = 2 * (5);
+
+    // Fiber properties
+    static const float eta = 1.55;
+    static const float absorption = 0.2;
+    static const float eccentricity = 0.85;
+
+    // Glints
+    static const float kG = 0.5;
+    static const float wc = 10;
+    static const float Dh0 = 0.2;
+    static const float DhM = 0.5;
+  };
+
+  class MarschnerHelper
+  {
+  public:
+    
+    // Gaussian distribution - http://en.wikipedia.org/wiki/Normal_distribution
+    static float GaussianDistribution(float sigma, float x_mu)
+    {
+      return ((1.0f / (fabsf(sigma) * sqrt(2.0f * PI))) *
+        exp(-(x_mu * x_mu) / (2.0f * sigma * sigma)));
+    }
+  };
 }
 CS_PLUGIN_NAMESPACE_END(FurMaterial)
 

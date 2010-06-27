@@ -663,7 +663,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   FurMaterialWrapper::FurMaterialWrapper (iBase* parent)
     : scfImplementationType (this, parent), object_reg(0), material(0), 
-    valid(false), width(0), height(0), M(0)
+    valid(false), width(256), height(256), M(0), m_buf(0), gauss_matrix(0),
+    N(0), n_buf(0)
   {
   }
 
@@ -678,9 +679,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
-
+  
     if (!svStrings) 
-      printf ("No SV names string set!");
+    {
+      printf ("No SV names string set!\n");
+      return false;
+    }
+
+    g3d = csQueryRegistry<iGraphics3D> (object_reg);
+    
+    if (!g3d) 
+    {
+      printf("No g3d found!\n");
+      return false;
+    }
 
     return true;
   }
@@ -703,71 +715,136 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterialWrapper::Update()
   {
-    if(!valid)
+    if(!valid && material)
     {
-      UpdateTextures();
+      UpdateM();
+      UpdateN();
       valid = true;
     }
   }
 
   // Marschner specific methods
-  void FurMaterialWrapper::UpdateTextures()
-  {
-    Marschner();
-  }
-
   void FurMaterialWrapper::UpdateM()
   {
-
-  }
-
-  void FurMaterialWrapper::UpdateN()
-  {
-
-  }
-
-
-  void FurMaterialWrapper::Marschner()
-  {
-    if(!material)
-      return;
-
     if(!M)
     {
       CS::ShaderVarName strandWidthName (svStrings, "tex M");	
-      csRef<csShaderVariable> shaderVariable = material->GetVariable(strandWidthName);
-      shaderVariable->GetValue(M);
+      csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(strandWidthName);
 
-      if(!M) 
+      M = g3d->GetTextureManager()->CreateTexture(width, height, csimg2D, "abgr8", 
+        CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
+
+      if(!M)
       {
         printf ("Failed to load M texture!\n");
         return;
       }
 
-      M->GetRendererDimensions(width, height);
+      shaderVariable->SetValue(M);
+
+      m_buf = new uint8 [width * height * 4];
+      gauss_matrix = new float [width * height];
+
+      for( int x = 0 ; x < width ; x ++ )
+        for (int y = 0 ; y < height; y ++)
+        {
+          m_buf[ 4 * (x * height + y ) ] = 255; // red
+          m_buf[ 4 * (x * height + y ) + 1 ] = 0; // green
+          m_buf[ 4 * (x * height + y ) + 2 ] = 0; // blue
+          m_buf[ 4 * (x * height + y ) + 3 ] = 255; // alpha
+        }
     }
 
+    ComputeM(MarschnerConstants::aR, MarschnerConstants::bR, 0);
+    ComputeM(MarschnerConstants::aTT, MarschnerConstants::bTT, 1);
+    ComputeM(MarschnerConstants::aTRT, MarschnerConstants::bTRT, 2);
+
+    // send buffer to texture
+    M->Blit(0, 0, width, height / 2, m_buf);
+    M->Blit(0, height / 2, width, height / 2, m_buf + (width * height * 2));
+
+    // test new texture
     CS::StructuredTextureFormat readbackFmt 
       (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
 
     csRef<iDataBuffer> db = M->Readback(readbackFmt);
+    SaveImage(db->GetUint8(), "/data/hairtest/debug/M_debug.png");
+  }
 
-    CS_ASSERT(db->GetSize() == (size_t)(width * height * 4));
-    uint8* buf = db->GetUint8();
+  float FurMaterialWrapper::ComputeM(float a, float b, int channel)
+  {
+    float max = 0;
+    
+    // find max
+    for (int x = 0; x < width; x++)
+      for (int y = 0; y < height; y++)    
+      {
+        float sin_thI = -1.0f + (x * 2.0f) / width;
+        float sin_thR = -1.0f + (y * 2.0f) / height;
+        float thI = (180 * asinf(sin_thI) / PI);
+        float thR = (180 * asinf(sin_thR) / PI);
+        float thH = (thR + thI) / 2;
+        float thH_a = thH - a;
 
-    for (size_t i = 0 ; i < db->GetSize() ; i ++ )
-      if ( ( (i + 1) % 4 )== 0 ) // alpha 0, red 1, etc
-        buf[i] = 255;
-      else
-        buf[i] = buf[i] / 2;
+        float gauss = MarschnerHelper::GaussianDistribution(b, thH_a);
+        gauss_matrix[x * height + y] = gauss;
 
-    M->Blit(0, 0, width, height / 2, buf, iTextureHandle::RGBA8888);
-    M->Blit(0, height / 2, width, height / 2, buf + (width * height * 2), iTextureHandle::RGBA8888);
+        if (255 * gauss > max)
+          max = 255 * gauss;
+      }
 
-    db = M->Readback(readbackFmt);
-    buf = db->GetUint8();
+    // normalize
+    for (int x = 0; x < width; x++)
+      for (int y = 0; y < height; y++)
+      {
+        float gauss = gauss_matrix[x * height + y];
+        m_buf[4 * (x * height + y) + channel] = (uint8)(255 * 255 * gauss / max);
+      }
 
-    SaveImage(buf, "/data/hairtest/debug/M_debug.png");
+    return max;
+  }
+
+  void FurMaterialWrapper::UpdateN()
+  {
+    if(!N)
+    {
+      CS::ShaderVarName strandWidthName (svStrings, "tex N");	
+      csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(strandWidthName);
+      shaderVariable->GetValue(N);
+
+//       N = g3d->GetTextureManager()->CreateTexture(width, height, csimg2D, "abgr8", 
+//         CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
+
+      if(!N)
+      {
+        printf ("Failed to load N texture!\n");
+        return;
+      }
+
+//      shaderVariable->SetValue(N);
+
+      n_buf = new uint8 [width * height * 4];
+
+      for( int x = 0 ; x < width ; x ++ )
+        for (int y = 0 ; y < height; y ++)
+        {
+          n_buf[ 4 * (x * height + y ) ] = 0; // red
+          n_buf[ 4 * (x * height + y ) + 1 ] = 255; // green
+          n_buf[ 4 * (x * height + y ) + 2 ] = 0; // blue
+          n_buf[ 4 * (x * height + y ) + 3 ] = 255; // alpha
+        }
+    }
+
+    // send buffer to texture
+//     N->Blit(0, 0, width, height / 2, n_buf);
+//     N->Blit(0, height / 2, width, height / 2, n_buf + (width * height * 2));
+
+    // test new texture
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+
+    csRef<iDataBuffer> db = N->Readback(readbackFmt);
+    SaveImage(db->GetUint8(), "/data/hairtest/debug/N_debug.png");
   }
 
   void FurMaterialWrapper::SaveImage(uint8* buf, const char* texname)
