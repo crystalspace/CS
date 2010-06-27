@@ -223,6 +223,65 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iBulletDynamicSystem> bulletDynamicSystem;
   };
 
+  class MarschnerConstants
+  {
+  public:         
+    MarschnerConstants::MarschnerConstants()
+    {
+      // Surface properties
+      aR = -10;
+      aTT = - (-10) / 2;
+      aTRT = - 3 * (-10) / 2;
+
+      bR = 5;
+      bTT = (5) / 2;
+      bTRT = 2 * (5);
+
+      // Fiber properties
+      eta = 1.55;
+      absorption = 0.2;
+      eccentricity = 0.85;
+
+      // Glints
+      kG = 0.5;
+      wc = 10;
+      Dh0 = 0.2;
+      DhM = 0.5;
+    }
+
+    // Surface properties
+    float aR;
+    float aTT;
+    float aTRT;
+
+    float bR;
+    float bTT;
+    float bTRT;
+
+    // Fiber properties
+    float eta;
+    float absorption;
+    float eccentricity;
+
+    // Glints
+    float kG;
+    float wc;
+    float Dh0;
+    float DhM;
+  };
+
+  class MarschnerHelper
+  {
+  public:
+
+    // Gaussian distribution - http://en.wikipedia.org/wiki/Normal_distribution
+    static float GaussianDistribution(float sigma, float x_mu)
+    {
+      return ((1.0f / (fabsf(sigma) * sqrt(2.0f * PI))) *
+        exp(-(x_mu * x_mu) / (2.0f * sigma * sigma)));
+    }
+  };
+
   class FurMaterialWrapper : public scfImplementation2 <FurMaterialWrapper, 
     iFurMaterialWrapper, iComponent> 
   {
@@ -254,6 +313,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float* gauss_matrix;
     iTextureHandle* N;
     uint8* n_buf;
+    MarschnerConstants* mc;
     // Marschner specific functions
     void UpdateM();
     float ComputeM(float a, float b, int channel);
@@ -262,43 +322,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     void SaveImage(uint8 *buf, const char* texname);
   };
 
-  class MarschnerConstants
-  {
-  public:
-    // Surface properties
-    static const float aR = -10;
-    static const float aTT = - (-10) / 2;
-    static const float aTRT = - 3 * (-10) / 2;
-
-    static const float bR = 5;
-    static const float bTT = (5) / 2;
-    static const float bTRT = 2 * (5);
-
-    // Fiber properties
-    static const float eta = 1.55;
-    static const float absorption = 0.2;
-    static const float eccentricity = 0.85;
-
-    // Glints
-    static const float kG = 0.5;
-    static const float wc = 10;
-    static const float Dh0 = 0.2;
-    static const float DhM = 0.5;
-  };
-
-  class MarschnerHelper
-  {
-  public:
-    
-    // Gaussian distribution - http://en.wikipedia.org/wiki/Normal_distribution
-    static float GaussianDistribution(float sigma, float x_mu)
-    {
-      return ((1.0f / (fabsf(sigma) * sqrt(2.0f * PI))) *
-        exp(-(x_mu * x_mu) / (2.0f * sigma * sigma)));
-    }
-  };
 }
 CS_PLUGIN_NAMESPACE_END(FurMaterial)
-
 
 #endif // __FUR_MATERIAL_H__

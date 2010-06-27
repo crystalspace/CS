@@ -694,6 +694,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       return false;
     }
 
+    mc = new MarschnerConstants();
+
     return true;
   }
 
@@ -755,9 +757,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         }
     }
 
-    ComputeM(MarschnerConstants::aR, MarschnerConstants::bR, 0);
-    ComputeM(MarschnerConstants::aTT, MarschnerConstants::bTT, 1);
-    ComputeM(MarschnerConstants::aTRT, MarschnerConstants::bTRT, 2);
+    ComputeM(mc->aR, mc->bR, 0);
+    ComputeM(mc->aTT, mc->bTT, 1);
+    ComputeM(mc->aTRT, mc->bTRT, 2);
 
     // send buffer to texture
     M->Blit(0, 0, width, height / 2, m_buf);
@@ -886,7 +888,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       return;
     }	    
   }
-
 }
 CS_PLUGIN_NAMESPACE_END(FurMaterial)
 
