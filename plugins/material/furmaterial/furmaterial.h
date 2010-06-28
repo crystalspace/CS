@@ -226,7 +226,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   class MarschnerConstants
   {
   public:         
-    MarschnerConstants::MarschnerConstants()
+    MarschnerConstants()
     {
       // Surface properties
       aR = -10;
