@@ -782,6 +782,9 @@ public:
   virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
     size_t numMeshes, uint flags = 0);
 
+  //virtual void DrawSimpleMaskedMeshes (const csSimpleRenderMesh* meshes,
+	//			       size_t numMeshes, uint flags);
+
   virtual iHalo* CreateHalo (float, float, float,
     unsigned char *, int, int);
   void RemoveHalo (csOpenGLHalo* halo);
@@ -789,6 +792,17 @@ public:
 
   virtual bool PerformExtension (char const* command, ...);
   virtual bool PerformExtensionV (char const* command, va_list args);
+
+  virtual void InitQueries(unsigned int*& queries, int& old_num_queries, int& num_queries);
+  virtual bool QueryFinished(unsigned int& occlusion_query);
+  virtual bool IsVisible(unsigned int& occlusion_query, unsigned int& sampleLimit);
+  virtual void BeginOcclusionQuery (unsigned int& occlusion_query);
+  virtual void EndOcclusionQuery ();
+
+  virtual void DrawQuad();
+  virtual void DrawMeshBasic(const CS::Graphics::CoreRenderMesh* mymesh,
+							const CS::Graphics::RenderMeshModes& modes);
+
   //=========================================================================
 
 

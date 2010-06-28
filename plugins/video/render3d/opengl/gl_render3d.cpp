@@ -2095,6 +2095,22 @@ void csGLGraphics3D::TeardownInstance (size_t instParamNum,
   }
 }
 
+void csGLGraphics3D::DrawQuad()
+{
+	static float angle=0.0f;
+	glPushMatrix();
+		glColor4f(1.0f,0.0f,0.0f,1.0f);
+		glRotatef(angle,0,1,0);
+		glBegin(GL_QUADS);
+			glVertex3f(-5,5,1);
+			glVertex3f(5,5,1);
+			glVertex3f(5,-5,1);
+			glVertex3f(-5,-5,1);
+		glEnd();
+	glPopMatrix();
+	angle+=0.01f;
+}
+
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const csShaderVariableStack& stacks)
@@ -2373,6 +2389,248 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   RenderRelease (iIndexbuf);
   // Restore cull mode
   if (cullMode == CS::Graphics::cullFlipped) statecache->SetCullFace (cullFace);
+  //statecache->Disable_GL_POLYGON_OFFSET_FILL ();
+}
+
+void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
+    const csRenderMeshModes& modes)
+{
+	if (cliptype == CS_CLIPPER_EMPTY) 
+    return;
+
+  CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
+
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p ('%s')", mymesh, mymesh->db_mesh_name));
+  SwapIfNeeded();
+
+  SetupProjection ();
+
+  SetupClipper (mymesh->clip_portal, 
+                mymesh->clip_plane, 
+                mymesh->clip_z_plane,
+		(mymesh->indexend-mymesh->indexstart)/3);
+  if (debug_inhibit_draw) 
+    return;
+
+  const csReversibleTransform& o2w = mymesh->object2world;
+
+  bool needMatrix = !o2w.IsIdentity();
+  if (needMatrix)
+  {
+    float matrix[16];
+    makeGLMatrix (o2w, matrix);
+    statecache->SetMatrixMode (GL_MODELVIEW);
+    glPushMatrix ();
+    glMultMatrixf (matrix);
+  }
+
+  ApplyBufferChanges();
+
+  iRenderBuffer* iIndexbuf = (modes.buffers
+  	? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX)
+	: 0);
+
+  /*if (!iIndexbuf)
+  {
+    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stacks, string_indices);
+    CS_ASSERT (indexBufSV);
+    indexBufSV->GetValue (iIndexbuf);
+    CS_ASSERT(iIndexbuf);
+  }*/
+  
+  const size_t indexCompsBytes = 
+    csRenderBufferComponentSizes[iIndexbuf->GetComponentType()];
+  CS_ASSERT_MSG("Expecting index buffers to have only 1 component",
+    (iIndexbuf->GetComponentCount() == 1));
+  if (!(mymesh->multiRanges && mymesh->rangesNum))
+  {
+    CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= iIndexbuf->GetSize());
+    CS_ASSERT((indexCompsBytes * mymesh->indexend) <= iIndexbuf->GetSize());
+  }
+
+  GLenum primitivetype = GL_TRIANGLES;
+  int primNum_divider = 1, primNum_sub = 0;
+  switch (mymesh->meshtype)
+  {
+    case CS_MESHTYPE_QUADS:
+      primNum_divider = 2;
+      primitivetype = GL_QUADS;
+      break;
+    case CS_MESHTYPE_TRIANGLESTRIP:
+      primNum_sub = 2;
+      primitivetype = GL_TRIANGLE_STRIP;
+      break;
+    case CS_MESHTYPE_TRIANGLEFAN:
+      primNum_sub = 2;
+      primitivetype = GL_TRIANGLE_FAN;
+      break;
+    case CS_MESHTYPE_POINTS:
+      primitivetype = GL_POINTS;
+      break;
+    case CS_MESHTYPE_POINT_SPRITES:
+    {
+      if(!(ext->CS_GL_ARB_point_sprite && ext->CS_GL_ARB_point_parameters))
+      {
+        break;
+      }
+      primitivetype = GL_POINTS;
+      break;
+    }
+    case CS_MESHTYPE_LINES:
+      primNum_divider = 2;
+      primitivetype = GL_LINES;
+      break;
+    case CS_MESHTYPE_LINESTRIP:
+      primNum_sub = 1;
+      primitivetype = GL_LINE_STRIP;
+      break;
+    case CS_MESHTYPE_TRIANGLES:
+    default:
+      primNum_divider = 3;
+      primitivetype = GL_TRIANGLES;
+      break;
+  }
+  if (ext->CS_GL_ARB_point_sprite)
+  {
+    if (primitivetype == GL_POINTS)
+      statecache->Enable_GL_POINT_SPRITE_ARB();
+    else
+      statecache->Disable_GL_POINT_SPRITE_ARB();
+  }
+
+  // Based on the kind of clipping we need we set or clip mask.
+  int clip_mask, clip_value;
+  if (clipportal_floating)
+  {
+    clip_mask = stencil_clip_mask;
+    clip_value = stencil_clip_value;
+  }
+  else if (clipping_stencil_enabled)
+  {
+    clip_mask = stencil_clip_mask;
+    clip_value = 0;
+  }
+  else
+  {
+    clip_mask = 0;
+    clip_value = 0;
+  }
+    
+  GLenum cullFace;
+  statecache->GetCullFace (cullFace);
+    
+  CS::Graphics::MeshCullMode cullMode = modes.cullMode;
+  // Flip face culling if we do mirroring
+  //if (mirrorflag)
+  //  cullMode = CS::Graphics::GetFlippedCullMode (cullMode);
+  
+  if (cullMode == CS::Graphics::cullDisabled)
+  {
+    statecache->Disable_GL_CULL_FACE ();
+  }
+  else
+  {
+    statecache->Enable_GL_CULL_FACE ();
+    
+    // Flip culling if shader wants it
+    if (cullMode == CS::Graphics::cullFlipped)
+      statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
+  }
+
+  const uint mixmode = modes.mixmode;
+  statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
+
+  if (modes.zoffset)
+    statecache->Enable_GL_POLYGON_OFFSET_FILL ();
+  else
+    statecache->Disable_GL_POLYGON_OFFSET_FILL ();
+
+  GLenum compType = compGLtypes[iIndexbuf->GetComponentType()];
+  void* bufData =
+    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS);
+  statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
+  if (bufData != (void*)-1)
+  {
+    SetMixMode (mixmode, modes.alphaType, modes.alphaTest);
+
+    if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
+    {
+      CS_ASSERT_MSG ("Meshes can't have zmesh zmode. You deserve some spanking", 
+        (modes.z_buf_mode != CS_ZBUF_MESH) && 
+        (modes.z_buf_mode != CS_ZBUF_MESH2));
+      SetZModeInternal ((current_zmode == CS_ZBUF_MESH2) ? 
+        GetZModePass2 (modes.z_buf_mode) : modes.z_buf_mode);
+      /*if (current_zmode == CS_ZBUF_MESH2)
+      {
+      glPolygonOffset (0.15f, 6.0f); 
+      statecache->Enable_GL_POLYGON_OFFSET_FILL ();
+      }*/
+    }
+
+    {
+      CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh_DrawElements);
+      if (mymesh->multiRanges && mymesh->rangesNum)
+      {
+        size_t num_tri = 0;
+        for (size_t r = 0; r < mymesh->rangesNum; r++)
+        {
+          CS::Graphics::RenderMeshIndexRange range = mymesh->multiRanges[r];
+          if (bugplug) num_tri += (range.end-range.start)/primNum_divider - primNum_sub;
+          glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+            (GLuint)iIndexbuf->GetRangeEnd(), range.end - range.start,
+            compType, 
+            ((uint8*)bufData) + (indexCompsBytes * range.start));
+        }
+        if (bugplug)
+        {
+          bugplug->AddCounter ("Triangle Count", (int)num_tri);
+          bugplug->AddCounter ("Mesh Count", 1);
+        }
+      }
+      else
+      {
+        if (bugplug)
+        {
+          size_t num_tri = (mymesh->indexend-mymesh->indexstart)/primNum_divider - primNum_sub;
+          bugplug->AddCounter ("Triangle Count", (int)num_tri);
+          bugplug->AddCounter ("Mesh Count", 1);
+        }
+
+        if (modes.doInstancing)
+        {
+          const size_t instParamNum = modes.instParamNum;
+          const csVertexAttrib* const instParamsTargets = modes.instParamsTargets;
+          for (size_t n = 0; n < modes.instanceNum; n++)
+          {
+            SetupInstance (instParamNum, instParamsTargets, modes.instParams[n]);
+            glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+              (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+              compType, 
+              ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+            TeardownInstance (instParamNum, instParamsTargets);
+          }
+        }
+        else
+        {
+          // @@@ Temporary comment. If runnung Ubuntu 8.04 on a machine with Intel
+          // hardware and you get an error that traces back to the function below.
+          // Please see: http://trac.crystalspace3d.org/trac/CS/ticket/551 in the
+          // first instance.
+          glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+            (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+            compType, 
+            ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+        }
+      }
+    }
+  }
+
+  if (needMatrix)
+    glPopMatrix ();
+  //indexbuf->RenderRelease ();
+  RenderRelease (iIndexbuf);
+  // Restore cull mode
+  //if (cullMode == CS::Graphics::cullFlipped) statecache->SetCullFace (cullFace);
   //statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 }
 
@@ -2737,22 +2995,22 @@ void csGLGraphics3D::ApplyBufferChanges()
       switch (att)
       {
       case CS_VATTRIB_POSITION:
-	if (!isFloat && (normalized
-	    || (((1 << compTypeBase) & wants_short_int) == 0)))
-        {
-          // Set up shadow buffer
-          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
-          compType = buffer->GetComponentType();
-        }
+		if (!isFloat && (normalized
+			|| (((1 << compTypeBase) & wants_short_int) == 0)))
+			{
+			  // Set up shadow buffer
+			  buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+			  compType = buffer->GetComponentType();
+			}
         break;
       case CS_VATTRIB_NORMAL:
-	if (!isFloat && (!normalized
-	    || (((1 << compTypeBase) & wants_byte_short_int) == 0)))
-        {
-          // Set up shadow buffer
-          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
-          compType = buffer->GetComponentType();
-        }
+		if (!isFloat && (!normalized
+			|| (((1 << compTypeBase) & wants_byte_short_int) == 0)))
+			{
+			  // Set up shadow buffer
+			  buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+			  compType = buffer->GetComponentType();
+			}
         break;
       case CS_VATTRIB_COLOR:
         if (!isFloat && !normalized)
@@ -2776,13 +3034,13 @@ void csGLGraphics3D::ApplyBufferChanges()
       default:
         if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
         {
-	if (!isFloat && (normalized
-	    || (((1 << compTypeBase) & wants_short_int) == 0)))
-	  {
-	    // Set up shadow buffer
-	    buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
-	    compType = buffer->GetComponentType();
-	  }
+			if (!isFloat && (normalized
+				|| (((1 << compTypeBase) & wants_short_int) == 0)))
+			  {
+				// Set up shadow buffer
+				buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+				compType = buffer->GetComponentType();
+			  }
         }
       }
 	
@@ -2799,21 +3057,20 @@ void csGLGraphics3D::ApplyBufferChanges()
           compGLType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_NORMAL:
-	statecache->Enable_GL_NORMAL_ARRAY ();
-        statecache->SetNormalPointer (compGLType, (GLsizei)buffer->GetStride (), 
-          data);
+			statecache->Enable_GL_NORMAL_ARRAY ();
+			statecache->SetNormalPointer (compGLType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_COLOR:
-	statecache->Enable_GL_COLOR_ARRAY ();
-        statecache->SetColorPointer (buffer->GetComponentCount (),
-          compGLType, (GLsizei)buffer->GetStride (), data);
+			statecache->Enable_GL_COLOR_ARRAY ();
+			statecache->SetColorPointer (buffer->GetComponentCount (),
+			compGLType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_SECONDARY_COLOR:
         if (ext->CS_GL_EXT_secondary_color)
         {
-	  statecache->Enable_GL_SECONDARY_COLOR_ARRAY_EXT ();
-	  statecache->SetSecondaryColorPointerExt (buffer->GetComponentCount (),
-	    compGLType, (GLsizei)buffer->GetStride (), data);
+			statecache->Enable_GL_SECONDARY_COLOR_ARRAY_EXT ();
+			statecache->SetSecondaryColorPointerExt (buffer->GetComponentCount (),
+			compGLType, (GLsizei)buffer->GetStride (), data);
         }
         break;
       default:
@@ -2825,24 +3082,24 @@ void csGLGraphics3D::ApplyBufferChanges()
           {
             statecache->SetCurrentTCUnit (unit);
           } 
-	  statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
-          statecache->SetTexCoordPointer (buffer->GetComponentCount (),
+			statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
+			statecache->SetTexCoordPointer (buffer->GetComponentCount (),
             compGLType, (GLsizei)buffer->GetStride (), data);
         }
         else if (CS_VATTRIB_IS_GENERIC(att))
         {
-	  if (ext->glEnableVertexAttribArrayARB)
-	  {
-	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
-	    statecache->ApplyBufferBinding (csGLStateCacheContext::boElementArray);
-	    if (!(activeVertexAttribs & (1 << index)))
-	    {
-	      ext->glEnableVertexAttribArrayARB (index);
-	      activeVertexAttribs |= (1 << index);
-	    }
-	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
-              compGLType, normalized, (GLsizei)buffer->GetStride (), data);
-	  }
+		  if (ext->glEnableVertexAttribArrayARB)
+		  {
+			GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
+			statecache->ApplyBufferBinding (csGLStateCacheContext::boElementArray);
+			if (!(activeVertexAttribs & (1 << index)))
+			{
+			  ext->glEnableVertexAttribArrayARB (index);
+			  activeVertexAttribs |= (1 << index);
+			}
+			ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
+				  compGLType, normalized, (GLsizei)buffer->GetStride (), data);
+		  }
         }
         else
         {
@@ -3571,12 +3828,12 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
 
       iTextureHandle* tex = 0;
       csShaderVariable *texVar = csGetShaderVariableFromStack (stack, 
-	mesh.alphaType.autoModeTexture);
+		mesh.alphaType.autoModeTexture);
       if (texVar)
-	texVar->GetValue (tex);
+		texVar->GetValue (tex);
 
       if (tex == 0)
-	tex = mesh.texture;
+		tex = mesh.texture;
       if (tex != 0)
 	autoMode = tex->GetAlphaType ();
 
@@ -3602,27 +3859,27 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
     {
       if (mesh.shader != 0)
       {
-	mesh.shader->ActivatePass (shaderTicket, p);
-	mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stack);
+		mesh.shader->ActivatePass (shaderTicket, p);
+		mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stack);
       }
       else if (mesh.renderBuffers)
       {
-	ActivateBuffers (mesh.renderBuffers, defaultBufferMapping);
+		ActivateBuffers (mesh.renderBuffers, defaultBufferMapping);
       }
       else
       {
-	ActivateBuffers (scrapBufferHolder, defaultBufferMapping);
+		ActivateBuffers (scrapBufferHolder, defaultBufferMapping);
       }
       DrawMesh (&rmesh, modes, stack);
       if (mesh.shader != 0)
       {
-	mesh.shader->TeardownPass (shaderTicket);
-	mesh.shader->DeactivatePass (shaderTicket);
-	needDisableBuffers = false;
+		mesh.shader->TeardownPass (shaderTicket);
+		mesh.shader->DeactivatePass (shaderTicket);
+		needDisableBuffers = false;
       }
       else
       {
-	needDisableBuffers = true;
+		needDisableBuffers = true;
       }
     }
 
@@ -3659,6 +3916,7 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
   }
 }
 
+
 bool csGLGraphics3D::PerformExtensionV (char const* command, va_list /*args*/)
 {
   if (!strcasecmp (command, "applybufferchanges"))
@@ -3676,6 +3934,45 @@ bool csGLGraphics3D::PerformExtension (char const* command, ...)
   bool rc = PerformExtensionV(command, args);
   va_end (args);
   return rc;
+}
+
+void csGLGraphics3D::InitQueries(unsigned int*& queries, int& old_num_queries, int& num_queries)
+{
+  if (num_queries != 0)
+  {
+    if (queries != 0 && old_num_queries != 0)
+    {
+      ext->glDeleteQueriesARB(old_num_queries, (GLuint*)queries);
+      delete[] queries;
+    }
+    queries = new GLuint[num_queries];
+  }
+
+  ext->glGenQueriesARB((GLsizei)num_queries, (GLuint*)queries);
+}
+
+bool csGLGraphics3D::QueryFinished(unsigned int& occlusion_query)
+{
+  GLint available;
+  ext->glGetQueryObjectivARB((GLuint)occlusion_query, GL_QUERY_RESULT_AVAILABLE_ARB, &available);
+  return (available != 0);
+}
+
+bool csGLGraphics3D::IsVisible(unsigned int& occlusion_query, unsigned int& sampleLimit)
+{
+  GLuint sampleCount;
+  ext->glGetQueryObjectuivARB((GLuint)occlusion_query, GL_QUERY_RESULT_ARB, &sampleCount);
+  return (sampleCount > (GLuint)sampleLimit);
+}
+
+void csGLGraphics3D::BeginOcclusionQuery (unsigned int& occlusion_query)
+{
+  ext->glBeginQueryARB(GL_SAMPLES_PASSED_ARB, (GLuint)occlusion_query);
+}
+
+void csGLGraphics3D::EndOcclusionQuery ()
+{
+  ext->glEndQueryARB(GL_SAMPLES_PASSED_ARB);
 }
 
 csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,
@@ -4190,7 +4487,7 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
     }
   }
 }
-
+		
 int csGLGraphics3D::GetCurrentDrawFlags () const
 {
   return current_drawflags;
