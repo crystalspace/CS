@@ -958,6 +958,7 @@ struct iGraphics3D : public virtual iBase
   virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
                          const CS::Graphics::RenderMeshModes& modes,
                          const csShaderVariableStack& stack) = 0;
+
   /**
   * Draw a csSimpleRenderMesh on the screen.
   * Simple render meshes are intended for cases where setting up
@@ -1199,6 +1200,30 @@ struct iGraphics3D : public virtual iBase
    */
   virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
     size_t numMeshes, uint flags = 0) = 0;
+
+    /**
+   * Initialise a set of occlusion queries.
+   */
+  virtual void InitQueries (unsigned int*& queries, int& old_num_queries,
+    int& num_queries) = 0;
+
+  /**
+   * Returns whether an occlusion query has finished.
+   */
+  virtual bool QueryFinished (unsigned int& occlusion_query) = 0;
+
+  /**
+   * Check via occlusion query whether a mesh is visible.
+   */
+  virtual bool IsVisible (unsigned int& occlusion_query, unsigned int& sampleLimit) = 0;
+
+  virtual void BeginOcclusionQuery (unsigned int& occlusion_query) = 0;
+  virtual void EndOcclusionQuery () = 0;
+
+  virtual void DrawQuad() = 0;
+
+  virtual void DrawMeshBasic(const CS::Graphics::CoreRenderMesh* mymesh,
+							const CS::Graphics::RenderMeshModes& modes) = 0;
 };
 
 /** @} */
