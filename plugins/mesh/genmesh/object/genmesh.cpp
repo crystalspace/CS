@@ -390,8 +390,14 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     meshPtr->clip_z_plane = clip_z_plane;
     meshPtr->do_mirror = camera->IsMirrored ();
     meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+    int start_index, end_index;
+    factory->GetSlidingWindow(10, start_index, end_index);
+    meshPtr->indexstart = start_index;
+    meshPtr->indexend = end_index;
+    /*
     meshPtr->indexstart = 0;
     meshPtr->indexend = (uint)index_buffer->GetElementCount();
+     */
     meshPtr->material = mater;
     CS_ASSERT (mater != 0);
     meshPtr->worldspace_origin = wo;

@@ -49,7 +49,6 @@ protected:
   csArray<Edge> edges;
   WorkMesh k;
   csArray<int> removed_tris;
-  //csArray<int> added_tris;
   csArray<csTriangle> ordered_tris;
   csArray<SlidingWindow> sliding_windows;
 

@@ -126,7 +126,8 @@ bool Lod::OnKeyboard (iEvent& ev)
 // 1
 bool Lod::OnInitialize (int /*argc*/, char* /*argv*/ [])
 {
-  PointTriangleDistanceUnitTests();
+  //PointTriangleDistanceUnitTests();
+  
   // RequestPlugins() will load all plugins we specify. In addition
   // it will also check if there are plugins that need to be loaded
   // from the config system (both the application config and CS or
@@ -310,6 +311,7 @@ void Lod::LoadSprite(const char* filename)
   for (unsigned int i = 0; i < vertices.GetSize(); i++)
     fstate->AddVertex(vertices[i], texcoord, normal, color);
   
+  /*
   // Test by rendering level 1
   fstate->SetTriangleCount(0);  
   assert(lodgen.GetSlidingWindowCount() >= 2);
@@ -319,6 +321,21 @@ void Lod::LoadSprite(const char* filename)
   {
     cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
     fstate->AddTriangle(lodgen.GetTriangle(i));
+  }
+   */
+
+  fstate->SetTriangleCount(0);
+  assert(lodgen.GetSlidingWindowCount() >= 2);
+  for (int i = 0; i < lodgen.GetTriangleCount(); i++)
+  {
+    cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
+    fstate->AddTriangle(lodgen.GetTriangle(i));
+  }
+  
+  fstate->ClearSlidingWindows();
+  for (int i = 0; i < lodgen.GetSlidingWindowCount(); i++)
+  {
+    fstate->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
   }
    /*
   for (int i = 0; i < nt; i++)

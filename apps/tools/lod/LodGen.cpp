@@ -587,7 +587,6 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
       AddTriangle(k, k.tri_buffer.GetSize()-1);
       if (u == UPDATE_EDGES)
       {
-        //added_tris.Push(k.tri_buffer.GetSize()-1);
         cout << "Add " << k.tri_buffer.GetSize()-1 << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
         sw.end_index++;
       }

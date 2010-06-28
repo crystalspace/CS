@@ -415,6 +415,15 @@ public:
   void ClearLegacyBuffers (uint mask = (uint)CS_BUFFER_ALL_MASK);
   void UpdateFromLegacyBuffers();
   
+  struct SlidingWindow
+  {
+    int start_index;
+    int end_index;
+    SlidingWindow() {}
+    SlidingWindow(int s, int e): start_index(s), end_index(e) {}
+  };
+  csArray<SlidingWindow> sliding_windows;
+  
   SubMeshesContainer subMeshes;
 
   bool default_lighting;
@@ -646,6 +655,22 @@ public:
   virtual void SetProgLODData()
   {
     
+  }
+  
+  virtual void ClearSlidingWindows()
+  {
+    sliding_windows.SetSize(0);
+  }
+  
+  virtual void AddSlidingWindow(int start_index, int end_index)
+  {
+    sliding_windows.Push(SlidingWindow(start_index, end_index));
+  }
+  
+  virtual void GetSlidingWindow(int index, int& out_start_index, int& out_end_index) const
+  {
+    out_start_index = sliding_windows[index].start_index;
+    out_end_index = sliding_windows[index].end_index;
   }
 
   //------------------------ iMeshObjectFactory implementation --------------
