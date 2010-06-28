@@ -318,6 +318,9 @@ namespace RenderManager
         /// Mesh flags
         csFlags meshFlags;
 
+		// Occlusion Querry ID
+		unsigned int* occlusionQuery;
+
         /// "Local ID" in the context; used for array indexing
         size_t contextLocalId;
         
@@ -453,39 +456,39 @@ namespace RenderManager
 			  CS::Graphics::RenderPriority renderPrio,
 			  typename MeshNode::SingleMesh& singleMeshTemplate)
       {
-	typename TreeTraits::MeshNodeKeyType meshKey = 
-	  TreeTraits::GetMeshNodeKey (renderPrio, *rm);
-	
-	// Get the mesh node
-	MeshNode* meshNode = meshNodes.Get (meshKey, 0);
-	if (!meshNode)
-	{
-	  // Get a new one
-	  meshNode = owner.CreateMeshNode (*this, meshKey);
-    
-	  RenderTree::TreeTraitsType::SetupMeshNode(*meshNode, renderPrio, *rm);
-	  meshNodes.Put (meshKey, meshNode);
-	}
-    
-	csRef<csShaderVariable> svObjectToWorld;
-	svObjectToWorld.AttachNew (new csShaderVariable (
-	  owner.GetPersistentData ().svObjectToWorldName));
-	svObjectToWorld->SetValue (rm->object2world);
-	csRef<csShaderVariable> svObjectToWorldInv;
-	svObjectToWorldInv.AttachNew (new csShaderVariable (
-	  owner.GetPersistentData ().svObjectToWorldInvName));
-	svObjectToWorldInv->SetValue (rm->object2world.GetInverse());
-    
-	typename MeshNode::SingleMesh sm (singleMeshTemplate);
-	sm.renderMesh = rm;
-	sm.svObjectToWorld = svObjectToWorld;
-	sm.svObjectToWorldInv = svObjectToWorldInv;
-	if (rm->z_buf_mode != (csZBufMode)~0) 
-	  sm.zmode = rm->z_buf_mode;
-    
-	meshNode->meshes.Push (sm);
-	totalRenderMeshes++;
-      }
+		typename TreeTraits::MeshNodeKeyType meshKey = 
+		  TreeTraits::GetMeshNodeKey (renderPrio, *rm);
+		
+		// Get the mesh node
+		MeshNode* meshNode = meshNodes.Get (meshKey, 0);
+		if (!meshNode)
+		{
+		  // Get a new one
+		  meshNode = owner.CreateMeshNode (*this, meshKey);
+	    
+		  RenderTree::TreeTraitsType::SetupMeshNode(*meshNode, renderPrio, *rm);
+		  meshNodes.Put (meshKey, meshNode);
+		}
+	    
+		csRef<csShaderVariable> svObjectToWorld;
+		svObjectToWorld.AttachNew (new csShaderVariable (
+		  owner.GetPersistentData ().svObjectToWorldName));
+		svObjectToWorld->SetValue (rm->object2world);
+		csRef<csShaderVariable> svObjectToWorldInv;
+		svObjectToWorldInv.AttachNew (new csShaderVariable (
+		  owner.GetPersistentData ().svObjectToWorldInvName));
+		svObjectToWorldInv->SetValue (rm->object2world.GetInverse());
+	    
+		typename MeshNode::SingleMesh sm (singleMeshTemplate);
+		sm.renderMesh = rm;
+		sm.svObjectToWorld = svObjectToWorld;
+		sm.svObjectToWorldInv = svObjectToWorldInv;
+		if (rm->z_buf_mode != (csZBufMode)~0) 
+		  sm.zmode = rm->z_buf_mode;
+	    
+		meshNode->meshes.Push (sm);
+		totalRenderMeshes++;
+	  }
 
       /// Add a new render layer after \a layer
       void InsertLayer (size_t after)

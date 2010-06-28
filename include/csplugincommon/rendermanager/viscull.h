@@ -62,7 +62,7 @@ namespace RenderManager
 
       virtual void ObjectVisible (iVisibilityObject *visobject, 
         iMeshWrapper *imesh, uint32 frustum_mask)
-      {
+	  {
         if (!(filter && filter->IsMeshFiltered (imesh)))
         {
           // Get the meshes
@@ -108,7 +108,7 @@ namespace RenderManager
 	    }
 	  }
 	}
-      }
+      } // end objectvisible
 
     private:      
       ContextNodeType& context;

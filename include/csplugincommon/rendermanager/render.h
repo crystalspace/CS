@@ -88,14 +88,14 @@ namespace RenderManager
         {
           context.postEffects->SetEffectsOutputTarget (
             context.renderTargets[a].texHandle);
-	  g3d->SetRenderTarget (
-	    context.postEffects->GetScreenTarget (), false,
-	    context.renderTargets[a].subtexture, 
-	    csRenderTargetAttachment (a));
+		  g3d->SetRenderTarget (
+			context.postEffects->GetScreenTarget (), false,
+			context.renderTargets[a].subtexture, 
+			csRenderTargetAttachment (a));
         }
         else
-	  g3d->SetRenderTarget (context.renderTargets[a].texHandle, false,
-	    context.renderTargets[a].subtexture, csRenderTargetAttachment (a));
+		  g3d->SetRenderTarget (context.renderTargets[a].texHandle, false,
+			context.renderTargets[a].subtexture, csRenderTargetAttachment (a));
       }
     }
 
@@ -107,7 +107,7 @@ namespace RenderManager
    * Render mesh nodes within one context.
    * Does not handle setting render targets or camera transform.
    */
-  template<typename RenderTree>
+  template<typename RenderTree, bool occlusionQueries = false>
   class SimpleContextRender
   {
   public:
@@ -187,7 +187,17 @@ namespace RenderManager
           if (!shader->SetupPass (ticket, mesh.renderMesh, modes, svStack)) continue;
           modes.z_buf_mode = mesh.zmode;
 
+		  if (occlusionQueries)
+          {
+            g3d->BeginOcclusionQuery(*mesh.occlusionQuery);
+          }
+
           g3d->DrawMesh (mesh.renderMesh, modes, svStack);
+
+		  if (occlusionQueries)
+          {
+            g3d->EndOcclusionQuery();
+          }
 
           shader->TeardownPass (ticket);
         }
@@ -258,7 +268,7 @@ namespace RenderManager
           lastTarget[a] = context->renderTargets[a].texHandle;
           lastSubtexture[a] = context->renderTargets[a].subtexture;
         }
-	lastRenderView = context->renderView;
+		lastRenderView = context->renderView;
       }
 
       // Push the context
@@ -295,8 +305,8 @@ namespace RenderManager
       {
         iGraphics2D* G2D = g3d->GetDriver2D();
         g3d->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
-	int bgcolor_clear = G2D->FindRGB (0, 255, 255);
-	G2D->Clear (bgcolor_clear);
+		int bgcolor_clear = G2D->FindRGB (0, 255, 255);
+		G2D->Clear (bgcolor_clear);
       }
       
       // Setup the camera etc.. @@should be delayed as well
