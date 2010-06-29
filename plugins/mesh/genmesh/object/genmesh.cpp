@@ -113,6 +113,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   g3d = csQueryRegistry<iGraphics3D> (factory->object_reg);
   buffers_version = (uint)-1;
   mesh_colors_dirty_flag = true;
+  forced_prog_lod_level = -1;
 }
 
 csGenmeshMeshObject::~csGenmeshMeshObject ()
@@ -311,10 +312,15 @@ iRenderBuffer* csGenmeshMeshObject::GetPositions()
   
   return factory->GetPositions ();
 }
-
+  
 #include "csutil/custom_new_disable.h"
 
 #include "csutil/custom_new_disable.h"
+
+int csGenmeshMeshObject::ComputeProgLODLevel()
+{
+  return 10;
+}  
 
 csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 	int& n, iRenderView* rview, 
@@ -391,13 +397,22 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     meshPtr->do_mirror = camera->IsMirrored ();
     meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
     int start_index, end_index;
-    factory->GetSlidingWindow(10, start_index, end_index);
+    if (factory->GetSlidingWindowSize() == 0)
+    {
+      start_index = 0;
+      end_index = (uint)index_buffer->GetElementCount();
+    }
+    else
+    {
+      int prog_lod_level;
+      if (forced_prog_lod_level == -1)
+        prog_lod_level = ComputeProgLODLevel();
+      else
+        prog_lod_level = forced_prog_lod_level;
+      factory->GetSlidingWindow(prog_lod_level, start_index, end_index);
+    }
     meshPtr->indexstart = start_index;
     meshPtr->indexend = end_index;
-    /*
-    meshPtr->indexstart = 0;
-    meshPtr->indexend = (uint)index_buffer->GetElementCount();
-     */
     meshPtr->material = mater;
     CS_ASSERT (mater != 0);
     meshPtr->worldspace_origin = wo;

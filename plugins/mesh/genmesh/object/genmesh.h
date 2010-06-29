@@ -161,6 +161,7 @@ private:
   float current_lod;
   uint32 current_features;
   csFlags flags;
+  int forced_prog_lod_level;
 
   struct LegacyLightingData
   {
@@ -190,6 +191,9 @@ private:
 
   /// Get positions buffer
   iRenderBuffer* GetPositions();
+  
+  int ComputeProgLODLevel();
+  
 public:
   /// Constructor.
   csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory);
@@ -361,6 +365,11 @@ public:
   friend class ShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
+  
+  virtual void ForceProgLODLevel(int level)
+  {
+    forced_prog_lod_level = level;
+  }
 };
 
 /**
@@ -652,14 +661,14 @@ public:
     return autonormals;
   }
   
-  virtual void SetProgLODData()
-  {
-    
-  }
-  
   virtual void ClearSlidingWindows()
   {
     sliding_windows.SetSize(0);
+  }
+  
+  virtual int GetSlidingWindowSize() const
+  {
+    return sliding_windows.GetSize();
   }
   
   virtual void AddSlidingWindow(int start_index, int end_index)
@@ -669,10 +678,11 @@ public:
   
   virtual void GetSlidingWindow(int index, int& out_start_index, int& out_end_index) const
   {
+    CS_ASSERT(index >= 0 && index < sliding_windows.GetSize());
     out_start_index = sliding_windows[index].start_index;
     out_end_index = sliding_windows[index].end_index;
   }
-
+  
   //------------------------ iMeshObjectFactory implementation --------------
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();

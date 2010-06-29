@@ -30,7 +30,7 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-Lod::Lod ()
+Lod::Lod (): lod_level(0)
 {
   SetApplicationName ("CrystalSpace.Lod");
 }
@@ -97,6 +97,18 @@ void Lod::Frame ()
   rm->RenderView (view);
 }
 
+void Lod::UpdateLODLevel()
+{
+  csRef<iMeshWrapper> sprite = engine->FindMeshObject("MySprite");
+  csRef<iMeshObject> mobj = sprite->GetMeshObject();
+  assert(mobj);
+
+  csRef<iGeneralMeshState> mstate = scfQueryInterface<iGeneralMeshState>(mobj);
+  assert(mstate);
+
+  mstate->ForceProgLODLevel(lod_level);
+}
+
 bool Lod::OnKeyboard (iEvent& ev)
 {
   // We got a keyboard event.
@@ -116,6 +128,22 @@ bool Lod::OnKeyboard (iEvent& ev)
       csQueryRegistry<iEventQueue> (GetObjectRegistry ());
       if (q.IsValid ()) q->GetEventOutlet ()->Broadcast (
         csevQuit (GetObjectRegistry ()));
+    }
+    else if (code == 'l')
+    {
+      if (lod_level < num_lod_levels - 1)
+      {
+        lod_level++;
+        UpdateLODLevel();
+      }
+    }
+    else if (code == 'k')
+    {
+      if (lod_level > 0)
+      {
+        lod_level--;
+        UpdateLODLevel();
+      }
     }
   }
   
@@ -507,6 +535,14 @@ void Lod::CreateSprites ()
   // can do this.
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
+    
+  csRef<iMeshObjectFactory> fact = imeshfact->GetMeshObjectFactory();
+  assert(fact);
+  
+  csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
+  assert(fstate);
+  
+  num_lod_levels = fstate->GetSlidingWindowSize();
 }
 
 /*-------------------------------------------------------------------------*

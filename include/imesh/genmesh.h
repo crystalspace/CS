@@ -243,6 +243,8 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
    */
   virtual iGeneralMeshSubMesh* FindSubMesh (const char* name) const = 0;
   /** @} */
+  
+  virtual void ForceProgLODLevel(int level) = 0;
 };
 
 /**
@@ -493,9 +495,8 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    */
   virtual void GenerateCylinder (float l, float r, uint sides) = 0;
   
-  virtual void SetProgLODData() = 0;
-  
   virtual void ClearSlidingWindows() = 0;
+  virtual int GetSlidingWindowSize() const = 0;
   virtual void AddSlidingWindow(int start_index, int end_index) = 0;
   virtual void GetSlidingWindow(int index, int& out_start_index, int& out_end_index) const = 0;
 };
