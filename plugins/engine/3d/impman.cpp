@@ -325,8 +325,8 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
   csVector3 mesh_pos = csMesh->GetWorldBoundingBox ().GetCenter ();
   const csVector3& cam_pos = newCamera->GetCamera()->GetTransform ().GetOrigin ();
   csVector3 camdir = mesh_pos-cam_pos;
-  newCamera->GetCamera()->GetTransform ().LookAt (camdir,
-    newCamera->GetCamera()->GetTransform().GetT2O().Col2());
+  csVector3 up = newCamera->GetCamera()->GetTransform().GetT2O().Col2();
+  newCamera->GetCamera()->GetTransform ().LookAt (camdir, up);
 
   // Get screen bounding box of the mesh.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());

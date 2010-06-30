@@ -182,7 +182,7 @@ struct iMeshGeneratorGeometry : public virtual iBase
  */
 struct iMeshGenerator : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGenerator, 1, 0, 0);
+  SCF_INTERFACE(iMeshGenerator, 1, 0, 1);
 
   /**
    * Get the iObject for this mesh generator.
@@ -296,6 +296,12 @@ struct iMeshGenerator : public virtual iBase
    * Remove a mesh.
    */
   virtual void RemoveMesh (size_t idx) = 0;
+
+  /**
+   * Clear the block at a certain position. This is useful for regenerating
+   * the block after making changes to the density map (for example).
+   */
+  virtual void ClearPosition (const csVector3& pos) = 0;
 };
 
 /** @} */
