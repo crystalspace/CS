@@ -100,6 +100,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     virtual void SetMaterial ( iMaterial* material );
     // Set FurMaterialWrapper
     virtual void SetFurMaterialWrapper( iFurMaterialWrapper* furMaterialWrapper);
+    // Get FurMaterialWrapper
+    virtual iFurMaterialWrapper* GetFurMaterialWrapper( );
 
     // From iMaterial
     /// Associate a shader with a shader type

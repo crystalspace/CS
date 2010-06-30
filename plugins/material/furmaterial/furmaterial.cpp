@@ -323,6 +323,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     this->furMaterialWrapper = furMaterialWrapper;
   }
 
+  iFurMaterialWrapper* FurMaterial::GetFurMaterialWrapper( )
+  {
+    return furMaterialWrapper;
+  }
+
   void FurMaterial::SetMaterial ( iMaterial* material )
   {
     this->material = material;

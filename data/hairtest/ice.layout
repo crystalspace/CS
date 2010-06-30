@@ -39,6 +39,12 @@
   
                     <Window Type="ice/StaticImage" Name="HairTest/MainWindow/Tab/Page2/Image" >
                         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+						
+                        <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page2/Update" >
+                            <Property Name="Text" Value="Update" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.1,0},{0.1,0},{0.4,0}}" />
+                        </Window>
+						
                     </Window>
 
                 </Window>

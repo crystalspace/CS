@@ -154,6 +154,12 @@ bool HairTest::OnCollidersButtonClicked (const CEGUI::EventArgs&)
   return true;
 }
 
+bool HairTest::OnUpdateButtonClicked (const CEGUI::EventArgs&)
+{
+  avatarScene->furMaterial->GetFurMaterialWrapper()->Invalidate();
+  return true;
+}
+
 void HairTest::SwitchDynamics()
 {
   csRef<iMeshObject> animeshObject = 
@@ -332,6 +338,10 @@ bool HairTest::Application ()
   winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Colliders") 
     -> subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&HairTest::OnCollidersButtonClicked, this));
+
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page2/Update") 
+    -> subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&HairTest::OnUpdateButtonClicked, this));
 
   // Default behavior from csDemoApplication for the creation of the scene
   if (!csDemoApplication::CreateRoom ())

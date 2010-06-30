@@ -69,6 +69,9 @@ public:
   // Animesh
   csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
+  // Fur material
+  csRef<iFurMaterial> furMaterial;
+
 };
 
 class HairTest : public csDemoApplication
@@ -109,6 +112,7 @@ public:
   // Handle exit button clicked event
   bool OnExitButtonClicked (const CEGUI::EventArgs& e);
   bool OnCollidersButtonClicked (const CEGUI::EventArgs& e);
+  bool OnUpdateButtonClicked (const CEGUI::EventArgs& e);
 
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);
