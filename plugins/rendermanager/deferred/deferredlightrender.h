@@ -25,8 +25,20 @@
 #include "ivideo/graph3d.h"
 #include "cstool/genmeshbuilder.h"
 
+#include "csutil/cfgacc.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
+
+  /**
+   * Given the cosine of the angle a, returns the cosine of the angle a / 2.
+   * 
+   * cos(a/2) = +or- sqrt((1 + cos(a)) / 2) NOTE: The + form is returned.
+   */
+  inline float CosineHalfAngle(float c)
+  {
+    return sqrt ((1 + c) / 2.0f);
+  }
 
   /**
    * Creates a transform that will transform a sphere centered at the origin 
@@ -45,6 +57,54 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
   }
 
   /**
+   * Creates a transform that will transform a cone cone with a height and 
+   * radius of 1, aligned with the positive y-axis, and its base centered at 
+   * the origin.
+   */
+  inline csReversibleTransform CreateSpotLightTransform(iLight *light)
+  {
+    iMovable *movable = light->GetMovable ();
+    csVector3 pos = movable->GetFullPosition ();
+    float range = light->GetCutoffDistance ();
+
+    float inner, outer;
+    light->GetSpotLightFalloff (inner, outer);
+
+    /* To compute the radius of the light cone we note the following diagram:
+     *
+     *         /|         Where r is the radius of the cone base,
+     *        /t|               h is the height of the cone (h = range),
+     *     a /  | h             t is half the outer falloff angle (outer = cos(2t)),
+     *      /___|               a is the length of the hypotenuse.
+     *        r
+     *
+     *  From this diagram we know that cos(t) = h/a and, from pythagoras theorem, 
+     *  a^2 = h^2 + r^2.
+     *  
+     *  From these equations we can solve for r:
+     *    1. a^2 = h^2 + r^2 => r = sqrt(a^2 - h^2)
+     *    2. cos(t) = h/a => a = h/cos(t)
+     *
+     *  Combining 1. and 2. we get:
+     *    r = sqrt((h/cos(t))^2 - h^2)
+     *      = sqrt(h^2*(1 - cos(t)^2) / cos(t)^2) 
+     *      = h/cos(t) * sqrt(1 - cos(t)^2)
+     */
+
+    /* Use the half-angle formula to relate cos(a) to cos(a/2). */
+    float houter = CosineHalfAngle (outer);
+
+    float r = (range / houter) * sqrt (1 - houter * houter);
+
+    csMatrix3 m (r, 0,      0,
+                 0, 0, -range,
+                 0, r,      0);
+    csVector3 v (0, 0, range);
+
+    return csReversibleTransform (m, v) * movable->GetFullTransform ();
+  }
+
+  /**
    * Creates a transform that will transform a 1x1x1 cube centered at the origin
    * to match the given bounding box (assumed to be in world space).
    */
@@ -57,6 +117,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                        0.0f,   0.0f, size.z);
 
     csReversibleTransform (scale, bbox.GetCenter ());
+  }
+    /**
+   * Creates a transform that will transform a 1x1x1 cube centered at the origin
+   * to match the given bounding box (assumed to be in world space).
+   */
+  inline csReversibleTransform CreateLightTransform(iLight *light)
+  {
+      switch (light->GetType ())
+      {
+      case CS_LIGHT_POINTLIGHT:
+        return CreatePointLightTransform (light);
+        break;
+      case CS_LIGHT_DIRECTIONAL:
+        /* TODO */
+        break;
+      case CS_LIGHT_SPOTLIGHT:
+        return CreateSpotLightTransform (light);
+        break;
+      default:
+        CS_ASSERT(false);
+      };
+
+      return csReversibleTransform ();
   }
 
   /**
@@ -75,8 +158,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
    */
   inline bool IsPointInsideSpotLight(const csVector3 &p, iLight *light)
   {
-    // TODO
-    return false;
+    iMovable *movable = light->GetMovable ();
+    csVector3 pos = movable->GetFullPosition ();
+    float range = light->GetCutoffDistance ();
+
+    float inner, outer;
+    light->GetSpotLightFalloff (inner, outer);
+
+    // Gets the spot light direction.
+    csReversibleTransform light2world = movable->GetFullTransform ();
+    csVector3 d = csVector3::Unit (light2world.GetT2O () * csVector3 (0.0f, 0.0f, 1.0f));
+    csVector3 u = p - pos;
+
+    float dot_ud = u * d;
+    if (dot_ud <= 0.0f || dot_ud >= range)
+      return false;
+
+    float cang = dot_ud / u.Norm ();
+
+    /* Use the half-angle formula to relate cos(a) to cos(a/2). */
+    float houter = CosineHalfAngle (outer);
+
+    if (cang < houter)
+      return false;
+
+    return true;
   }
 
   /**
@@ -143,7 +249,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       csRef<iMeshWrapper> sphereMesh; 
       csRef<iMaterialWrapper> sphereMaterial;
 
-      /* Mesh used for drawing spot lights. */
+      /* Mesh used for drawing spot lights. Assumed to be a cone with a 
+       * height and radius of 1, aligned with the positive y-axis, and its
+       * base centered at the origin. */
       csRef<iMeshWrapper> coneMesh;
       csRef<iMaterialWrapper> coneMaterial;
 
@@ -162,13 +270,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         const char *messageID = "crystalspace.rendermanager.deferred.lightrender";
 
         csRef<iEngine> engine = csQueryRegistry<iEngine> (objRegistry);
+        csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
         csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager> (objRegistry);
         csRef<iStringSet> stringSet = csQueryRegistryTagInterface<iStringSet> (objRegistry, 
           "crystalspace.shared.stringset");
 
+        csConfigAccess cfg (objRegistry);
+
         // Builds the sphere.
         csEllipsoid ellipsoid(csVector3 (0.0f, 0.0f, 0.0f), csVector3 (1.0f, 1.0f, 1.0f));
-        int sphereDetail = 32; // TODO: make customizable.
+        int sphereDetail = cfg->GetInt ("RenderManager.Deferred.SphereDetail", 32);
 
         CS::Geometry::Sphere spherePrim (ellipsoid, sphereDetail);
 
@@ -185,15 +296,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         sphereMesh->GetMeshObject ()->SetMaterialWrapper (sphereMaterial);
 
-        csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
         if (!loader->LoadShader ("/shader/deferred/point_light.xml"))
         {
           csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
-            messageID, "Could not load basic_fixed shader");
+            messageID, "Could not load deferred_point_light shader");
         }
 
-        iShader *shader = shaderManager->GetShader ("deferred_point_light");
-        sphereMaterial->GetMaterial ()->SetShader (stringSet->Request ("base"), shader);
+        iShader *pointLightShader = shaderManager->GetShader ("deferred_point_light");
+        sphereMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), pointLightShader);
+
+        // Builds the cone.
+        int coneDetail = cfg->GetInt ("RenderManager.Deferred.ConeDetail", 32);
+        CS::Geometry::Cone conePrim (1.0f, 1.0f, coneDetail);
+
+        csRef<iMeshFactoryWrapper> coneFactory = GeneralMeshBuilder::CreateFactory (engine, 
+          "crystalspace.rendermanager.deferred.lightrender.cone", 
+          &conePrim);
+
+        coneMesh = coneFactory->CreateMeshWrapper ();
+
+        // Creates the cone material.
+        coneMaterial = engine->CreateMaterial (
+          "crystalspace.rendermanager.deferred.lightrender.cone", 
+          NULL);
+
+        coneMesh->GetMeshObject ()->SetMaterialWrapper (coneMaterial);
+
+        if (!loader->LoadShader ("/shader/deferred/spot_light.xml"))
+        {
+          csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+            messageID, "Could not load deferred_spot_light shader");
+        }
+
+        iShader *spotLightShader = shaderManager->GetShader ("deferred_spot_light");
+        coneMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), spotLightShader);
       }
 
     };
@@ -252,10 +388,71 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
    
   private:
 
+    /**
+     * Sets shader variables spacific to the given light.
+     */
+    void SetupLightShaderVars(iLight *light)
+    {
+      const csReversibleTransform &world2camera = graphics3D->GetWorldToCamera ();
+
+      iShaderVarStringSet *svStringSet = shaderMgr->GetSVNameStringset ();
+      iShaderVariableContext *lightSVContext = light->GetSVContext ();
+      iMovable *movable = light->GetMovable ();
+      csLightType type = light->GetType ();
+
+      // Transform light position to view space.
+      if (type == CS_LIGHT_POINTLIGHT || type == CS_LIGHT_SPOTLIGHT)
+      {
+        csVector3 lightPos = movable->GetFullPosition ();
+        lightPos = world2camera.This2Other (lightPos);
+
+        csShaderVariable *lightPosSV = lightSVContext->GetVariableAdd (
+          svStringSet->Request ("light position view"));
+        lightPosSV->SetValue (lightPos);
+      }
+
+      // Transform light direction to view space.
+      if (type == CS_LIGHT_DIRECTIONAL || type == CS_LIGHT_SPOTLIGHT)
+      {
+        csVector3 lightDir = movable->GetFullTransform ().This2Other (
+          csVector3 (0.0f, 0.0f, 1.0f));
+        lightDir = world2camera.This2Other (lightDir);
+
+        csShaderVariable *lightDirSV = lightSVContext->GetVariableAdd (
+          svStringSet->Request ("light direction view"));
+        lightDirSV->SetValue (csVector3::Unit (lightDir));
+      }
+    }
+
     void RenderPointLight(iLight *light)
     {
-      iMeshObject *obj = persistentData.sphereMesh->GetMeshObject ();
+      RenderLight (light,
+                   persistentData.sphereMesh->GetMeshObject (),
+                   persistentData.sphereMaterial->GetMaterial ());
+    }
 
+    void RenderSpotLight(iLight *light)
+    {
+      graphics3D->SetRenderState (G3DRENDERSTATE_EDGES, 1);
+
+      RenderLight (light,
+                   persistentData.coneMesh->GetMeshObject (),
+                   persistentData.coneMaterial->GetMaterial ());
+      
+      graphics3D->SetRenderState (G3DRENDERSTATE_EDGES, 0);
+    }
+
+    void RenderDirectionalLight(iLight *light)
+    {
+    }
+
+    /**
+     * Renders a light mesh.
+     */
+    void RenderLight(iLight *light, 
+                     iMeshObject *obj, 
+                     iMaterial *mat)
+    {
       int num = 0;
       csRenderMesh **meshes = obj->GetRenderMeshes (num, rview, 
         persistentData.sphereMesh->GetMovable (), 0);
@@ -264,41 +461,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         return;
 
       // Setup shader variables.
-      iMaterial *mat = persistentData.sphereMaterial->GetMaterial ();
-      iShader *shader = mat->GetShader (stringSet->Request ("base"));
-      iShaderVariableContext *lightSVContext = light->GetSVContext ();
-
-      iShaderVarStringSet *svStringSet = shaderMgr->GetSVNameStringset ();
-
-      // Transform light position to view space.
-      csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
-      lightPos = graphics3D->GetWorldToCamera ().This2Other (lightPos);
-
-      csShaderVariable *lightPosSV = lightSVContext->GetVariableAdd (svStringSet->Request ("light position view"));
-      lightPosSV->SetValue (lightPos);
+      SetupLightShaderVars (light);
 
       // Update shader stack.
       csShaderVariableStack svStack = shaderMgr->GetShaderVariableStack ();
+      iShader *shader = mat->GetShader (stringSet->Request ("gbuffer use"));
+      iShaderVariableContext *lightSVContext = light->GetSVContext ();
+
+      svStack.Clear ();
+      shaderMgr->PushVariables (svStack);
       lightSVContext->PushVariables (svStack);
       shader->PushVariables (svStack);
 
       // Draw the point light mesh.
-      csVector3 camPos = rview->GetCamera ()->GetTransform ().GetO2TTranslation ();
-
+      iCamera *cam = rview->GetCamera ();
+      csVector3 camPos = cam->GetTransform ().This2Other (csVector3 (0.0f, 0.0f, 1.0f));
+      
       DrawLightMesh (meshes, 
                      num, 
-                     CreatePointLightTransform (light), 
+                     CreateLightTransform (light), 
                      shader, 
                      svStack,
                      IsPointInsideLight (camPos, light));
-    }
-
-    void RenderSpotLight(iLight *light)
-    {
-    }
-
-    void RenderDirectionalLight(iLight *light)
-    {
     }
 
     /**
@@ -329,7 +513,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         {
           csRenderMesh *m = meshes[i];
           
-          if(!shader->SetupPass (ticket, m, *m, svStack))
+          if (!shader->SetupPass (ticket, m, *m, svStack))
             continue;
 
           // Use additive blending so we do not loose the contributions from other lights.

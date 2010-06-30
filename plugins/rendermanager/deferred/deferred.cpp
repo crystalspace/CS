@@ -174,65 +174,6 @@ private:
   iShaderManager *shaderMgr;
 };
 
-/**
- * Shader setup functor.
- * Setup per mesh & layer shader arrays for each node.
- * Uses the default shader as supplied by layerConfig.
- * Assumes that the contextLocalId in each mesh is set.
- *
- * Typically used through SetupStandardShader().
- */
-template<typename RenderTree, typename LayerConfigType>
-class DefaultLayerShaderSetup
-{
-public:
-  DefaultLayerShaderSetup (ShaderArrayType& shaderArray, const LayerConfigType& layerConfig)
-    : 
-  shaderArray (shaderArray), 
-  layerConfig (layerConfig)
-  {}
-
-  void operator() (typename RenderTree::MeshNode* node)
-  {
-    // Get the shader
-    const size_t totalMeshes = node->owner.totalRenderMeshes;
-
-    for (size_t i = 0; i < node->meshes.GetSize (); ++i)
-    {
-      typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
-      
-      csRenderMesh* rm = mesh.renderMesh;
-
-      for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
-      {
-        size_t layerOffset = layer*totalMeshes;
-        shaderArray[mesh.contextLocalId+layerOffset] = layerConfig.GetDefaultShader (layer);
-      }
-    }
-  }
-
-private:
-  ShaderArrayType& shaderArray;
-  const LayerConfigType& layerConfig;
-};
-
-//----------------------------------------------------------------------
-template<typename ContextNodeType, typename LayerConfigType>
-void SetupDefaultLayerShader(ContextNodeType& context, 
-                             iShaderManager* shaderManager,
-                             const LayerConfigType& layerConfig)
-{
-  context.shaderArray.SetSize (context.totalRenderMeshes*layerConfig.GetLayerCount ());
-
-  // Shader setup
-  typedef typename ContextNodeType::TreeType Tree;
-  typedef DefaultLayerShaderSetup<Tree, LayerConfigType> ShaderSetupType;
-  
-  ShaderSetupType shaderSetup (context.shaderArray, layerConfig);
-
-  ForEachMeshNode (context, shaderSetup);
-}
-
 //----------------------------------------------------------------------
 template<typename RenderTreeType, typename LayerConfigType>
 class StandardContextSetup
@@ -308,7 +249,7 @@ public:
     }
 
     // Setup shaders and tickets
-    SetupDefaultLayerShader (context, shaderManager, layerConfig);
+    SetupStandardShader (context, shaderManager, layerConfig);
     SetupStandardTicket (context, shaderManager, layerConfig);
   }
 
@@ -378,10 +319,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     iShader *shader = shaderManager->GetShader ("fill_gbuffer");
 
     SingleRenderLayer baseLayer (shader);
-
-    baseLayer.AddShaderType (stringSet->Request("base"));
-    baseLayer.AddShaderType (stringSet->Request("ambient"));
-    baseLayer.AddShaderType (stringSet->Request("standard"));
+    baseLayer.AddShaderType (stringSet->Request("gbuffer fill"));
 
     renderLayer.AddLayers (baseLayer);
   }

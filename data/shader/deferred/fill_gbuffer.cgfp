@@ -1,9 +1,10 @@
 <include>
 
 <variablemap variable="mat flatcolor" destination="FlatColor" />
-<variablemap variable="specular" destination="Specular" />
+<variablemap variable="specular" destination="ConstSpecular" />
+<variablemap variable="combined ambient" destination="CombinedAmbient" />
 <variablemap variable="world2camera transform inverse" destination="Camera2World" />
-  
+
 <program>
 
 <?Include /shader-snippets/cg-common.cginc?>
@@ -74,7 +75,8 @@ float2 ComputeParallaxOcclusion(sampler2D texHeight,
 
 fragmentOutput main(vertex2fragment IN,
                     uniform float3 FlatColor,
-                    uniform float3 Specular,
+                    uniform float3 ConstSpecular,
+                    uniform float3 CombinedAmbient,
                     uniform float3x3 Camera2World,
                     uniform sampler2D TexDiffuse,
                     uniform sampler2D TexNormal,
@@ -103,8 +105,6 @@ fragmentOutput main(vertex2fragment IN,
                                                 Ntan,
                                                 float2 (2, 6),
                                                 0.02);
-
-    //TexCoord += ComputeParallaxOffset (TexHeight, TexCoord, eyeVec, 0.04);
   <?else?>
     float2 TexCoord = IN.TexCoord;
   <?endif?>
@@ -116,16 +116,20 @@ fragmentOutput main(vertex2fragment IN,
   <?endif?>
 
   <?if vars."tex specular".texture ?>
-    float3 specColor = tex2D (TexSpecular, TexCoord).rgb;
+    float3 specular = tex2D (TexSpecular, TexCoord).rgb;
   <?else?>
-    float3 specColor = float3 (0.0, 0.0, 0.0);
+    float3 specular = diffuse;
   <?endif?>
 
+  specular = specular * ConstSpecular;
+
   <?if vars."tex lightmap".texture ?>
-    float3 lightmap = tex2D (TexLightMap, IN.TexCoordLM).rgb;
+    float3 ambient = tex2D (TexLightMap, IN.TexCoordLM).rgb;
   <?else?>
-    float3 lightmap = float3 (0.0, 0.0, 0.0);
+    float3 ambient = CombinedAmbient;
   <?endif?>
+
+  ambient = CombinedAmbient;
 
   <?if vars."tex normal".texture ?>
     // Transform normal from tangent space to view space.
@@ -140,12 +144,12 @@ fragmentOutput main(vertex2fragment IN,
 
   fragmentOutput output;
 
-  output.Color0 = float4 (diffuse, Specular.r);
-  output.Color1 = float4 (normal, 0.0);
-  output.Color2 = float4 (lightmap, 0.0);
+  output.Color0 = float4 (diffuse, ambient.r);
+  output.Color1 = float4 (normal, ambient.g);
+  output.Color2 = float4 (specular, ambient.b);
 
   return output;
-}
+  }
 
 </program>
 </include>

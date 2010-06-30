@@ -2,10 +2,15 @@
 
 <variablemap variable="projection transform inverse" destination="ProjInv" />
 <variablemap variable="light position view" destination="LightPos" />
+<variablemap variable="light direction view" destination="LightDir" />
+<variablemap variable="light direction view" destination="LightDir" />
+<variablemap variable="light outer falloff" destination="OuterFalloff" />
+<variablemap variable="light inner falloff" destination="InnerFalloff" />
 <variablemap variable="light diffuse" destination="LightDiff" />
 <variablemap variable="light specular" destination="LightSpec" />
+<variablemap variable="light ambient" destination="LightAmbient" />
 <variablemap variable="light attenuation" destination="AttenVec" />
-
+  
 <program>
 
 <?Include /shader/deferred/light_common.cginc?>
@@ -20,9 +25,13 @@ struct vertex2fragment
 float4 main(vertex2fragment IN,
             uniform float4x4 ProjInv,
             uniform float3 LightPos,
+            uniform float3 LightDir,
             uniform float3 LightDiff,
             uniform float3 LightSpec,
+            uniform float3 LightAmbient,
             uniform float4 AttenVec,
+            uniform float OuterFalloff,
+            uniform float InnerFalloff,
             uniform sampler2D gBuffer0,
             uniform sampler2D gBuffer1,
             uniform sampler2D gBuffer2,
@@ -34,7 +43,7 @@ float4 main(vertex2fragment IN,
   
   float4 albedo   = tex2D (gBuffer0, screenUV);
   float4 normal   = tex2D (gBuffer1, screenUV);
-  float4 specular = tex2D (gBuffer2, screenUV);
+  float4 lightmap = tex2D (gBuffer2, screenUV);
   float4 depth    = tex2D (gBufferDepth, screenUV);
   
   float3 screen = GetScreenPosition (screenXY, depth);
@@ -50,14 +59,15 @@ float4 main(vertex2fragment IN,
   float3 H = normalize (L + V);
   
   float att = Attenuation (dist, AttenVec);
-  float3 ambient = float3 (albedo.a, normal.a, specular.a);
+  float specAmt = albedo.w;
   
   // Compute phong lighting.
   float3 diff = albedo.rgb * LightDiff * saturate (dot (n, L));
-  float3 spec = LightSpec * specular.rgb * pow (saturate (dot (n, H)), 32);
+  float3 spec = LightSpec * specAmt * pow (saturate (dot (n, H)), 32);
   float3 color = (diff + spec) * att;
 
-  return float4 (color, 1.0);
+  return float4 (1, 0, 0, 1.0);
+  //return float4 (color, 1.0);
 }
 
 ]]>
