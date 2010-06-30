@@ -902,6 +902,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csVector4 roots = EquationsSolver::Roots(p, etaPerpendicular, phi);
     float result = 0;
 
+//     if (roots.w != int(roots.w))
+//       printf("%f\t%d\t%d\t%f\t%f\n", roots.w, int(roots.w), p, etaPerpendicular, phi);
+
     for (int index = 0; index < roots.w; index++ )
     {
       float gammaI = roots[index];
