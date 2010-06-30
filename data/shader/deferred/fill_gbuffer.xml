@@ -19,6 +19,9 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <shader compiler="xmlshader" name="fill_gbuffer" lights="0">
+  <shadervars>
+    <shadervar name="specular" type="vector4">1,1,1,1</shadervar>
+  </shadervars>
 
   <technique priority="200" lights="0">
     <pass>
@@ -31,7 +34,7 @@
       <vp plugin="glcg" file="/shader/deferred/fill_gbuffer.cgvp" />
 
       <texture destination="TexDiffuse" name="tex diffuse" />
-      <texture destination="TexSpecular" name="tex specular" />
+      <texture destination="TexSpecular" name="tex specular" fallback="tex diffuse" />
       <texture destination="TexHeight" name="tex height" />
       <texture destination="TexNormal" name="tex normal" />
       <texture destination="TexLightMap" name="tex lightmap" />

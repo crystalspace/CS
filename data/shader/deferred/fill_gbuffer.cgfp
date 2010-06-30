@@ -115,12 +115,7 @@ fragmentOutput main(vertex2fragment IN,
     float3 diffuse = FlatColor;
   <?endif?>
 
-  <?if vars."tex specular".texture ?>
-    float3 specular = tex2D (TexSpecular, TexCoord).rgb;
-  <?else?>
-    float3 specular = diffuse;
-  <?endif?>
-
+  float3 specular = tex2D (TexSpecular, TexCoord).rgb;
   specular = specular * ConstSpecular;
 
   <?if vars."tex lightmap".texture ?>
