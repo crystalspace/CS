@@ -438,8 +438,6 @@ public:
     if (fabs(C) < EPSILON)	//	x = 0 solution
     {
       roots = QuadraticSolver(1, A, B);
-      roots[(int)roots.w] = 0;
-      roots.w++;
     }
     else
     {
