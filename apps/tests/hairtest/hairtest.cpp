@@ -160,6 +160,13 @@ bool HairTest::OnUpdateButtonClicked (const CEGUI::EventArgs&)
   return true;
 }
 
+bool HairTest::OnEventThumbTrackEnded (const CEGUI::EventArgs&)
+{
+  printf("%f\n", scrollbar1->getScrollPosition());
+  return true;
+}
+
+
 void HairTest::SwitchDynamics()
 {
   csRef<iMeshObject> animeshObject = 
@@ -342,6 +349,12 @@ bool HairTest::Application ()
   winMgr->getWindow("HairTest/MainWindow/Tab/Page2/Update") 
     -> subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&HairTest::OnUpdateButtonClicked, this));
+
+  scrollbar1 = (CEGUI::Scrollbar*)winMgr->
+    getWindow("HairTest/MainWindow/Tab/Page2/Slider1");
+
+  scrollbar1->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+    CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEnded, this));
 
   // Default behavior from csDemoApplication for the creation of the scene
   if (!csDemoApplication::CreateRoom ())

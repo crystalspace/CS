@@ -98,6 +98,7 @@ private:
   // GUI related
   csRef<iVFS> vfs;
   csRef<iCEGUI> cegui;
+  CEGUI::Scrollbar* scrollbar1;
 
   //-- csBaseEventHandler
   void Frame ();
@@ -113,6 +114,7 @@ public:
   bool OnExitButtonClicked (const CEGUI::EventArgs& e);
   bool OnCollidersButtonClicked (const CEGUI::EventArgs& e);
   bool OnUpdateButtonClicked (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEnded (const CEGUI::EventArgs& e);
 
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);
