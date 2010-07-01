@@ -515,7 +515,7 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
   for (int i = 0; i < num_vertices; i++)
   {
     const csVector3& v = vertices[i];
-    float min_d2 = 1.0e30;
+    float min_d2 = FLT_MAX;
     for (unsigned int j = 0; j < k.tri_indices.GetSize(); j++)
     {
       const csTriangle& tri = k.tri_buffer[k.tri_indices[j]];
@@ -530,7 +530,7 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
           break;
       }
     }
-    assert(min_d2 < 1.0e30);
+    assert(min_d2 < FLT_MAX);
     sum += min_d2;
   }
   return sum;
@@ -574,7 +574,7 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
       for (int j = 0; j < 3; j++)
         edges.Delete(Edge(new_tri[j], new_tri[(j+1)%3]));
       removed_tris.Push(itri);
-      cout << "Rem " << itri << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
+      //cout << "Rem " << itri << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
       sw.start_index++;
     }
     assert(incident.GetSize() > k.incident_tris[v0].GetSize());
@@ -587,7 +587,7 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
       AddTriangle(k, k.tri_buffer.GetSize()-1);
       if (u == UPDATE_EDGES)
       {
-        cout << "Add " << k.tri_buffer.GetSize()-1 << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
+        //cout << "Add " << k.tri_buffer.GetSize()-1 << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
         sw.end_index++;
       }
     }
@@ -622,12 +622,13 @@ void LodGen::GenerateLODs()
   sw.end_index = num_triangles;
   sliding_windows.Push(sw);
   
-  unsigned int min_size = edges.GetSize() / 2;
+  unsigned int min_size = 0 /*edges.GetSize() / 2*/;
+  int collapse_counter = 0;
   
   while (edges.GetSize() > min_size)
   {
     cout << edges.GetSize();
-    float min_d = 1.0e30;
+    float min_d = FLT_MAX;
     int min_v0, min_v1;
     
     for (unsigned int i = 0; i < edges.GetSize(); i++)
@@ -661,10 +662,13 @@ void LodGen::GenerateLODs()
       if (min_d == 0.0)
         break;
     }
-    assert(min_d != 1.0e30);
+    //assert(min_d != FLT_MAX);
+    if (min_d == FLT_MAX)
+      break;
     cout << ": " << min_d << " - " << min_v0 << ", " << min_v1 << endl;
     bool result = Collapse(k, min_v0, min_v1, UPDATE_EDGES);
     assert(result);
+    collapse_counter++;
   }
   for (unsigned int i = 0; i < removed_tris.GetSize(); i++)
     ordered_tris.Push(k.tri_buffer[removed_tris[i]]);
