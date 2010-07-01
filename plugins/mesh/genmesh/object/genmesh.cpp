@@ -319,7 +319,7 @@ iRenderBuffer* csGenmeshMeshObject::GetPositions()
 
 int csGenmeshMeshObject::ComputeProgLODLevel()
 {
-  return 10;
+  return 0;
 }  
 
 csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (

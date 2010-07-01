@@ -670,6 +670,9 @@ void LodGen::GenerateLODs()
     ordered_tris.Push(k.tri_buffer[removed_tris[i]]);
   for (unsigned int i = 0; i < k.tri_indices.GetSize(); i++)
     ordered_tris.Push(k.tri_buffer[k.tri_indices[i]]);
+  for (unsigned int i = 0; i < ordered_tris.GetSize(); i++)
+    for (unsigned int j = 0; j < 3; j++)
+      assert(ordered_tris[i][j] >= 0 && ordered_tris[i][j] < vertices.GetSize());
   cout << "End" << endl;
 }
 

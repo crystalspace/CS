@@ -39,6 +39,7 @@ private:
   csRef<iLoader> loader;
   csRef<iThreadedLoader> tloader;
   csRef<iCollection> collection;
+  csRef<iMeshFactoryWrapper> imeshfactw;
 
   /// A pointer to the 3D renderer plugin.
   csRef<iGraphics3D> g3d;
@@ -80,7 +81,6 @@ private:
   void Frame ();
   
   csRef<iThreadReturn> loading;
-  void LoadSprite(const char* filename);
   void CreateLODs(const char* filename);
   
   /// Here we will create our little, simple world.

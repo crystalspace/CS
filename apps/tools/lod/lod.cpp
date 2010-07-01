@@ -24,8 +24,6 @@ using namespace std;
 #include "LodGen.h"
 #include "lod.h"
 
-#define SCENE_BARREL 1
-
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
@@ -248,19 +246,9 @@ void Lod::AddTriangleMapped(const csTriangle& t, csArray<csTriangle>& triangles,
   triangles.Push(new_tri);
 }
 
-void Lod::LoadSprite(const char* filename)
+void Lod::CreateLODs(const char* filename)
 {
-  /*
-  if (!loading)
-  {    
-    loading = tloader->LoadFile ("/lev/castle/factories/", filename);
-  }
-  
-  while(!loading->IsFinished())
-  {
-    printf("Loading...\n");
-    sleep(1);
-  }
+  loading = tloader->LoadFileWait("/lev/lodtest/", filename);
   
   if (!loading->WasSuccessful())
   {
@@ -270,48 +258,54 @@ void Lod::LoadSprite(const char* filename)
   }
   
   csRef<iMeshWrapper> spritewrapper;
-  csRef<iMeshFactoryWrapper> factwrap;
   
   if (!loading->GetResultRefPtr().IsValid())
   {
     // Library file. Find the first factory in our region.
     iMeshFactoryList* factories = engine->GetMeshFactories ();
+    if (factories->GetCount() == 0)
+    {
+      cout << "No factories in file" << endl;
+      return;
+    }
+    iMeshFactoryWrapper* f = factories->Get (0);
+    imeshfactw = f;
+    /*
     int i;
-    int ct = factories->GetCount ();
     for (i = 0 ; i < factories->GetCount () ; i++)
     {
       iMeshFactoryWrapper* f = factories->Get (i);
       if (collection->IsParentOf (f->QueryObject ()))
       {
-        factwrap = f;
+        imeshfactw = f;
         break;
       }
     }
+    */
   }
   else
   {
-    factwrap = scfQueryInterface<iMeshFactoryWrapper> (loading->GetResultRefPtr());
-    if(!factwrap)
+    imeshfactw = scfQueryInterface<iMeshFactoryWrapper> (loading->GetResultRefPtr());
+    if(!imeshfactw)
     {
       spritewrapper = scfQueryInterface<iMeshWrapper> (loading->GetResultRefPtr());
       if (spritewrapper)
-        factwrap = spritewrapper->GetFactory();
+        imeshfactw = spritewrapper->GetFactory();
     }
   }
   
-  if (!factwrap)
+  if (!imeshfactw)
+  {
+    cout << "Could not find loaded mesh" << endl;
     return;
-   */
-
+  }
+  
+  /*
   if (!loader->LoadLibraryFile(filename))
     cout << "Error loading library file " << filename << endl;
-#if SCENE_BARREL
-  iMeshFactoryWrapper* factwrap = engine->FindMeshFactory("lodbarrel");
-#else
-  iMeshFactoryWrapper* factwrap = engine->FindMeshFactory("lodbox");
-#endif
+  */
   
-  csRef<iMeshObjectFactory> fact = factwrap->GetMeshObjectFactory();
+  csRef<iMeshObjectFactory> fact = imeshfactw->GetMeshObjectFactory();
   assert(fact);
   
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
@@ -376,12 +370,6 @@ void Lod::LoadSprite(const char* filename)
   loading.Invalidate();
 }
 
-
-void Lod::CreateLODs(const char* filename)
-{
-  LoadSprite(filename);
-}
-
 bool Lod::SetupModules ()
 {
   // Now get the pointer to various modules we need. We fetch them
@@ -414,12 +402,9 @@ bool Lod::SetupModules ()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
  
-#if SCENE_BARREL
-  CreateLODs("/lev/lodtest/lodbarrel");
-#else
-  CreateLODs("/lev/lodtest/lodbox");
-#endif
-  //CreateLODs("/lib/std/sprite1");
+  //CreateLODs("lodbarrel");
+  CreateLODs("genMesh.002");
+  //CreateLODs("lodbox");
 
   // Here we create our world.
   CreateRoom ();
@@ -501,24 +486,10 @@ void Lod::CreateSprites ()
   iTextureWrapper* txt = loader->LoadTexture ("spark", "/lib/std/spark.png");
   if (txt == 0)
     ReportError("Error loading texture!");
-
-  // Load a sprite template from disk.
-  /*
-  csRef<iMeshFactoryWrapper> imeshfact (
-    loader->LoadMeshObjectFactory ("/lib/std/sprite1"));
-  if (imeshfact == 0)
-    ReportError("Error loading mesh object factory!");
-   */
-
-#if SCENE_BARREL
-  iMeshFactoryWrapper* imeshfact = engine->FindMeshFactory("lodbarrel");
-#else
-  iMeshFactoryWrapper* imeshfact = engine->FindMeshFactory("lodbox");
-#endif
   
   // Create the sprite and add it to the engine.
   csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
-    imeshfact, "MySprite", room,
+    imeshfactw, "MySprite", room,
     csVector3 (-3, 5, 3)));
   csMatrix3 m; m.Identity ();
   sprite->GetMovable ()->SetTransform (m);
@@ -536,7 +507,7 @@ void Lod::CreateSprites ()
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
     
-  csRef<iMeshObjectFactory> fact = imeshfact->GetMeshObjectFactory();
+  csRef<iMeshObjectFactory> fact = imeshfactw->GetMeshObjectFactory();
   assert(fact);
   
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
