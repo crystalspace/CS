@@ -390,13 +390,15 @@ public:
   // Solve a * x + b = 0
   static csVector4 LinearSolver(float a, float b)
   {
-    csVector4 roots = csVector4(0);
+    csVector4 roots = csVector4();
 
     if (fabs(a) > EPSILON)
     {
       roots[0] = -b / a;
       roots[3] = 1;
     }
+    else
+      roots[3] = 0;
 
     return roots;
   }
@@ -410,7 +412,7 @@ public:
       return LinearSolver(b, c);
     else
     {
-      roots = csVector4(0);
+      roots = csVector4();
 
       float D = b * b - 4 * a * c;
 
@@ -427,6 +429,8 @@ public:
         roots[1] = (-b - delta) / (2 * a);
         roots[3] = 2;
       }
+      else
+        roots[3] = 0;
     }
 
     return roots;
@@ -440,10 +444,12 @@ public:
     if (fabs(C) < EPSILON)	//	x = 0 solution
     {
       roots = QuadraticSolver(1, A, B);
+      roots[ (int)roots.w ] = 0;
+      roots.w ++;
     }
     else
     {
-      roots = csVector4(0);
+      roots = csVector4();
 
       float Q = (3 * B - A * A) / 9;
       float R = (9 * A * B - 27 * C - 2 * A * A * A) / 54;
