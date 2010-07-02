@@ -20,9 +20,9 @@
         </requires>
       </class>
       <class>
-        <name>crystalspace.material.furmaterialwrapper</name>
-        <implementation>FurMaterialWrapper</implementation>
-        <description>Fur Material Wrapper Plugin</description>
+        <name>crystalspace.material.furstrandmaterial</name>
+        <implementation>FurStrandMaterial</implementation>
+        <description>Fur Strand MaterialPlugin</description>
         <requires>
           <class>crystalspace.graphics3d.</class>
         </requires>

@@ -81,7 +81,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   FurMaterial::FurMaterial (FurMaterialType* manager, const char *name, 
     iObjectRegistry* object_reg) :
   scfImplementationType (this), manager (manager), name (name), 
-    object_reg(object_reg), physicsControl(0), furMaterialWrapper(0)
+    object_reg(object_reg), physicsControl(0), furStrandMaterial(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -172,8 +172,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       CS::Material::MaterialBuilder::CreateColorMaterial
       (object_reg,"hairDummyMaterial",csColor(1,0,0));
 
-    if (furMaterialWrapper && furMaterialWrapper->GetMaterial())
-      materialWrapper->SetMaterial(furMaterialWrapper->GetMaterial());
+    if (furStrandMaterial && furStrandMaterial->GetMaterial())
+      materialWrapper->SetMaterial(furStrandMaterial->GetMaterial());
 
     meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
 
@@ -318,14 +318,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     this->meshFactorySubMesh = meshFactorySubMesh;
   }
 
-  void FurMaterial::SetFurMaterialWrapper( iFurMaterialWrapper* furMaterialWrapper)
+  void FurMaterial::SetFurMaterialWrapper( iFurStrandMaterial* furStrandMaterial)
   {
-    this->furMaterialWrapper = furMaterialWrapper;
+    this->furStrandMaterial = furStrandMaterial;
   }
 
-  iFurMaterialWrapper* FurMaterial::GetFurMaterialWrapper( )
+  iFurStrandMaterial* FurMaterial::GetFurMaterialWrapper( )
   {
-    return furMaterialWrapper;
+    return furStrandMaterial;
   }
 
   void FurMaterial::SetMaterial ( iMaterial* material )
@@ -471,8 +471,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurAnimationControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
     // update shader
-    if (furMaterial->furMaterialWrapper)
-      furMaterial->furMaterialWrapper->Update();
+    if (furMaterial->furStrandMaterial)
+      furMaterial->furStrandMaterial->Update();
 
     // first update the control points
     if (furMaterial->physicsControl)
@@ -660,25 +660,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 
   /************************
-  *  FurMaterialWrapper
+  *  FurStrandMaterial
   ************************/  
-  SCF_IMPLEMENT_FACTORY (FurMaterialWrapper)
+  SCF_IMPLEMENT_FACTORY (FurStrandMaterial)
 
-    CS_LEAKGUARD_IMPLEMENT(FurMaterialWrapper);	
+    CS_LEAKGUARD_IMPLEMENT(FurStrandMaterial);	
 
-  FurMaterialWrapper::FurMaterialWrapper (iBase* parent)
+  FurStrandMaterial::FurStrandMaterial (iBase* parent)
     : scfImplementationType (this, parent), object_reg(0), material(0), 
     valid(false), width(256), height(256), M(0), m_buf(0), gauss_matrix(0),
     N(0), n_buf(0)
   {
   }
 
-  FurMaterialWrapper::~FurMaterialWrapper ()
+  FurStrandMaterial::~FurStrandMaterial ()
   {
   }
 
   // From iComponent
-  bool FurMaterialWrapper::Initialize (iObjectRegistry* r)
+  bool FurStrandMaterial::Initialize (iObjectRegistry* r)
   {
     object_reg = r;
 
@@ -704,23 +704,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     return true;
   }
 
-  // From iFurMaterialWrapper
-  iMaterial* FurMaterialWrapper::GetMaterial()
+  // From iFurStrandMaterial
+  iMaterial* FurStrandMaterial::GetMaterial()
   {
     return material;
   }
 
-  void FurMaterialWrapper::SetMaterial(iMaterial* material)
+  void FurStrandMaterial::SetMaterial(iMaterial* material)
   {
     this->material = material;
   }
 
-  void FurMaterialWrapper::Invalidate()
+  void FurStrandMaterial::Invalidate()
   {
     valid = false;
   }
 
-  void FurMaterialWrapper::Update()
+  void FurStrandMaterial::Update()
   {
     if(!valid && material)
     {
@@ -731,7 +731,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   }
 
   // Marschner specific methods
-  void FurMaterialWrapper::UpdateM()
+  void FurStrandMaterial::UpdateM()
   {
     if(!M)
     {
@@ -778,7 +778,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     SaveImage(db->GetUint8(), "/data/hairtest/debug/M_debug.png");
   }
 
-  float FurMaterialWrapper::ComputeM(float a, float b, int channel)
+  float FurStrandMaterial::ComputeM(float a, float b, int channel)
   {
     float max = 0;
     
@@ -811,7 +811,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     return max;
   }
 
-  void FurMaterialWrapper::UpdateN()
+  void FurStrandMaterial::UpdateN()
   {
     if(!N)
     {
@@ -866,13 +866,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     SaveImage(db->GetUint8(), "/data/hairtest/debug/N_debug.png");
   }
 
-  float FurMaterialWrapper::ComputeT(float absorption, float gammaT)
+  float FurStrandMaterial::ComputeT(float absorption, float gammaT)
   {
     float l = 1 + cos(2 * gammaT);	// l = ls / cos qt = 2r cos h0t / cos qt
     return exp(-2.0f * absorption * l);
   }
 
-  float FurMaterialWrapper::ComputeA(float absorption, int p, float h, 
+  float FurStrandMaterial::ComputeA(float absorption, int p, float h, 
     float refraction, float etaPerpendicular, float etaParallel)
   {
     float gammaI = asin(h);
@@ -891,7 +891,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     return (1.0f - fresnel) * (1.0f - fresnel) * pow(invFrenel, p - 1.0f) * pow(t, p);
   }
 
-  float FurMaterialWrapper::ComputeNP(int p, float phi, float thD)
+  float FurStrandMaterial::ComputeNP(int p, float phi, float thD)
   {
     float refraction = mc->eta;
     float absorption = mc->absorption;
@@ -924,7 +924,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     return csMin(1.0f, result);
   }
 
-  float FurMaterialWrapper::SimpleNP(float phi, float thD )
+  float FurStrandMaterial::SimpleNP(float phi, float thD )
   {
     float refraction = mc->eta;
 
@@ -941,7 +941,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     return csMin(1.0f, result);
   }
 
-  void FurMaterialWrapper::SaveImage(uint8* buf, const char* texname)
+  void FurStrandMaterial::SaveImage(uint8* buf, const char* texname)
   {
     csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
     csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);

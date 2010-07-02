@@ -234,7 +234,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     iSkeletonBasicNodesManager2),
     CS_REQUEST_PLUGIN("crystalspace.material.furmaterial", iFurMaterialType),
     CS_REQUEST_PLUGIN("crystalspace.physics.furphysics", iFurPhysicsControl),
-    CS_REQUEST_PLUGIN("crystalspace.material.furmaterialwrapper", iFurMaterialWrapper),
+    CS_REQUEST_PLUGIN("crystalspace.material.furstrandmaterial", iFurStrandMaterial),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");

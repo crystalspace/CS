@@ -174,11 +174,11 @@ bool KrystalScene::CreateAvatar ()
   if (!furPhysicsControl)
     return hairTest->ReportError("Failed to locate iFurPhysicsControl plugin!");
 
-  // Load furMaterialWrapper
-  csRef<iFurMaterialWrapper> furMaterialWrapper = csQueryRegistry<iFurMaterialWrapper> 
+  // Load furStrandMaterial
+  csRef<iFurStrandMaterial> furStrandMaterial = csQueryRegistry<iFurStrandMaterial> 
     (hairTest->object_reg);
-  if (!furMaterialWrapper)
-    return hairTest->ReportError("Failed to locate iFurMaterialWrapper plugin!");
+  if (!furStrandMaterial)
+    return hairTest->ReportError("Failed to locate iFurStrandMaterial plugin!");
 
   // Load furMaterial
   csRef<iFurMaterialType> furMaterialType = csQueryRegistry<iFurMaterialType> 
@@ -332,7 +332,7 @@ bool KrystalScene::CreateAvatar ()
   if (!materialWrapper)
     hairTest->ReportError("Can't find marschner material!");
 
-  furMaterialWrapper->SetMaterial(materialWrapper->GetMaterial());
+  furStrandMaterial->SetMaterial(materialWrapper->GetMaterial());
 
   furPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
   furPhysicsControl->SetRigidBody(headBody);
@@ -340,7 +340,7 @@ bool KrystalScene::CreateAvatar ()
   // Initialize fur material
   furMaterial = furMaterialType->CreateFurMaterial("hair");
   furMaterial->SetPhysicsControl(furPhysicsControl);
-  furMaterial->SetFurMaterialWrapper(furMaterialWrapper);
+  furMaterial->SetFurMaterialWrapper(furStrandMaterial);
 
   furMaterial->SetMaterial(skullMaterial->GetMaterial());
   furMaterial->SetMeshFactory(animeshFactory);

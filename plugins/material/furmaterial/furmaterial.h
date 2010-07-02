@@ -98,10 +98,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       meshFactorySubMesh );
     // Set Material
     virtual void SetMaterial ( iMaterial* material );
-    // Set FurMaterialWrapper
-    virtual void SetFurMaterialWrapper( iFurMaterialWrapper* furMaterialWrapper);
-    // Get FurMaterialWrapper
-    virtual iFurMaterialWrapper* GetFurMaterialWrapper( );
+    // Set FurStrandMaterial
+    virtual void SetFurMaterialWrapper( iFurStrandMaterial* furStrandMaterial);
+    // Get FurStrandMaterial
+    virtual iFurStrandMaterial* GetFurMaterialWrapper( );
 
     // From iMaterial
     /// Associate a shader with a shader type
@@ -135,7 +135,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csArray<csGuideHair> guideHairs;
     csArray<csTriangle> guideHairsTriangles;
     csRef<iFurPhysicsControl> physicsControl;
-    csRef<iFurMaterialWrapper> furMaterialWrapper;
+    csRef<iFurStrandMaterial> furStrandMaterial;
     /// Temp fur geometry
     csRef<iAnimatedMeshFactory> meshFactory;
     csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
@@ -272,19 +272,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float DhM;
   };
 
-  class FurMaterialWrapper : public scfImplementation2 <FurMaterialWrapper, 
-    iFurMaterialWrapper, iComponent> 
+  class FurStrandMaterial : public scfImplementation2 <FurStrandMaterial, 
+    iFurStrandMaterial, iComponent> 
   {
   public:
-    CS_LEAKGUARD_DECLARE(FurMaterialWrapper);
+    CS_LEAKGUARD_DECLARE(FurStrandMaterial);
 
-    FurMaterialWrapper (iBase* parent);
-    virtual ~FurMaterialWrapper ();
+    FurStrandMaterial (iBase* parent);
+    virtual ~FurStrandMaterial ();
 
     // From iComponent	
     virtual bool Initialize (iObjectRegistry*);
 
-    // From iFurMaterialWrapper
+    // From iFurStrandMaterial
     virtual iMaterial* GetMaterial();
     virtual void SetMaterial(iMaterial* material);
     virtual void Invalidate();
