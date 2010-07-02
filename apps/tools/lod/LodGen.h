@@ -49,7 +49,6 @@ protected:
   
   WorkMesh k;
   csArray<csTriangle> ordered_tris;
-  int window_shift;
   int top_limit;
 
 public:
