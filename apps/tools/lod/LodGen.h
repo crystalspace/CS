@@ -24,20 +24,20 @@ struct Edge
   }
 };
 
-struct WorkMesh
-{
-  csArray<csTriangle> tri_buffer;
-  csArray<int> tri_indices;
-  csArray<IncidentTris> incident_tris; // map from vertices to incident triangles
-};
-
 struct SlidingWindow
 {
   int start_index;
   int end_index;
 };
 
-enum UpdateEdges { NO_UPDATE_EDGES, UPDATE_EDGES };
+struct WorkMesh
+{
+  csArray<csTriangle> tri_buffer;
+  csArray<int> tri_indices;
+  csArray<IncidentTris> incident_tris; // map from vertices to incident triangles
+  csArray<Edge> edges;
+  csArray<SlidingWindow> sliding_windows;
+};
 
 class LodGen
 {
@@ -47,12 +47,10 @@ protected:
   int num_vertices;
   int num_triangles;
   
-  csArray<Edge> edges;
   WorkMesh k;
-  csArray<int> removed_tris;
   csArray<csTriangle> ordered_tris;
-  csArray<SlidingWindow> sliding_windows;
   int window_shift;
+  int top_limit;
 
 public:
   LodGen(const csArray<csVector3>& v, const csArray<csTriangle>& t): 
@@ -60,13 +58,16 @@ public:
   void GenerateLODs();
   int GetTriangleCount() const { return ordered_tris.GetSize(); }
   const csTriangle& GetTriangle(int i) const { return ordered_tris[i]; }
-  int GetSlidingWindowCount() const { return sliding_windows.GetSize(); }
-  const SlidingWindow& GetSlidingWindow(int i) const { return sliding_windows[i]; }
+  int GetSlidingWindowCount() const { return k.sliding_windows.GetSize(); }
+  const SlidingWindow& GetSlidingWindow(int i) const { return k.sliding_windows[i]; }
   
 protected:
   bool IsDegenerate(const csTriangle& tri) const;
   void AddTriangle(WorkMesh& k, int itri);
-  void RemoveTriangle(WorkMesh& k, int itri);
-  bool Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u = NO_UPDATE_EDGES);
+  void RemoveTriangleFromIncidentTris(WorkMesh& k, int itri);
+  bool Collapse(WorkMesh& k, int v0, int v1);
   float SumOfSquareDist(const WorkMesh& k) const;
+  int FindInWindow(const WorkMesh& k, const SlidingWindow& sw, int itri) const;
+  void SwapIndex(WorkMesh& k, int i0, int i1);
+  void VerifyMesh(WorkMesh& k);
 };

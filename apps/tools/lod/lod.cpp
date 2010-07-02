@@ -132,6 +132,7 @@ bool Lod::OnKeyboard (iEvent& ev)
       if (lod_level < num_lod_levels - 1)
       {
         lod_level++;
+        cout << lod_level << " ";
         UpdateLODLevel();
       }
     }
@@ -140,6 +141,7 @@ bool Lod::OnKeyboard (iEvent& ev)
       if (lod_level > 0)
       {
         lod_level--;
+        cout << lod_level << " ";
         UpdateLODLevel();
       }
     }
@@ -406,6 +408,7 @@ bool Lod::SetupModules ()
   //CreateLODs("genMesh.002");
   //CreateLODs("lodbox");
   //CreateLODs("genbment2_tables");
+  //CreateLODs("simple");
 
   // Here we create our world.
   CreateRoom ();

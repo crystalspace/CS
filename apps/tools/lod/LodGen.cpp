@@ -512,11 +512,12 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
 {
   float s, t, d2;
   float sum = 0.0;
+  const SlidingWindow& sw = k.sliding_windows[k.sliding_windows.GetSize()-1];
   for (int i = 0; i < num_vertices; i++)
   {
     const csVector3& v = vertices[i];
     float min_d2 = FLT_MAX;
-    for (unsigned int j = 0; j < k.tri_indices.GetSize(); j++)
+    for (int j = sw.start_index; j < sw.end_index; j++)
     {
       const csTriangle& tri = k.tri_buffer[k.tri_indices[j]];
       const csVector3& p0 = vertices[tri[0]];
@@ -545,12 +546,14 @@ void LodGen::AddTriangle(WorkMesh& k, int itri)
     k.incident_tris[tri[i]].PushSmart(itri);
 }
 
-void LodGen::RemoveTriangle(WorkMesh& k, int itri)
+void LodGen::RemoveTriangleFromIncidentTris(WorkMesh& k, int itri)
 {
   csTriangle& tri = k.tri_buffer[itri];
-  k.tri_indices.Delete(itri);
   for (int i = 0; i < 3; i++)
-    k.incident_tris[tri[i]].Delete(itri);
+  {
+    bool result = k.incident_tris[tri[i]].Delete(itri);
+    assert(result);
+  }
 }
 
 inline bool LodGen::IsDegenerate(const csTriangle& tri) const
@@ -558,33 +561,42 @@ inline bool LodGen::IsDegenerate(const csTriangle& tri) const
   return tri[0] == tri[1] || tri[0] == tri[2] || tri[1] == tri[2];
 }
 
-bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
+int LodGen::FindInWindow(const WorkMesh& k, const SlidingWindow& sw, int itri) const
 {
-  SlidingWindow sw;
-  if (u == UPDATE_EDGES)
-  {
-    sw = sliding_windows[sliding_windows.GetSize()-1]; // copy
-    sw.start_index += window_shift;
-    sw.end_index += window_shift;
-    window_shift = 0;
-  }
+  for (int i = sw.start_index; i < sw.end_index; i++)
+    if (k.tri_indices[i] == itri)
+      return i;
+  assert(0);
+}
+
+void LodGen::SwapIndex(WorkMesh& k, int i0, int i1)
+{
+  int temp = k.tri_indices[i0];
+  k.tri_indices[i0] = k.tri_indices[i1];
+  k.tri_indices[i1] = temp;
+}
+
+bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
+{
+  SlidingWindow sw = k.sliding_windows[k.sliding_windows.GetSize()-1]; // copy
+  sw.start_index += window_shift;
+  sw.end_index += window_shift;
   
   IncidentTris incident = k.incident_tris[v0]; // copy
   for (unsigned int i = 0; i < incident.GetSize(); i++)
   {
     int itri = incident[i];
-    if (itri >= num_triangles)
+    int h = FindInWindow(k, sw, itri);
+    if (h >= top_limit)
       return false;
     csTriangle new_tri = k.tri_buffer[itri]; // copy
-    RemoveTriangle(k, itri);
-    if (u == UPDATE_EDGES)
-    {
-      for (int j = 0; j < 3; j++)
-        edges.Delete(Edge(new_tri[j], new_tri[(j+1)%3]));
-      removed_tris.Push(itri);
-      //cout << "Rem " << itri << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
-      sw.start_index++;
-    }
+    RemoveTriangleFromIncidentTris(k, itri);
+    SwapIndex(k, sw.start_index, h);
+    for (int j = 0; j < 3; j++)
+      k.edges.Delete(Edge(new_tri[j], new_tri[(j+1)%3]));
+    //cout << "Rem " << itri << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
+    sw.start_index++;
+
     assert(incident.GetSize() > k.incident_tris[v0].GetSize());
     for (int j = 0; j < 3; j++)
       if (new_tri[j] == v0)
@@ -593,21 +605,57 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
     {
       k.tri_buffer.Push(new_tri);
       AddTriangle(k, k.tri_buffer.GetSize()-1);
-      if (u == UPDATE_EDGES)
+      //cout << "Add " << k.tri_buffer.GetSize()-1 << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
+      sw.end_index++;
+    }
+  }
+  k.sliding_windows.Push(sw);
+
+  /*
+  for (int i = sw.start_index; i < sw.end_index; i++)
+    for (int j = 0; j < 3; j++)
+      assert(k.tri_buffer[k.tri_indices[i]][j] != v0);
+  */
+  return true;
+}
+
+struct MeshVerification
+{
+  Edge e;
+  int num_t;
+  //int t0;
+  //int t1;
+  bool operator==(const MeshVerification& m) const { return e == m.e; }
+};
+
+void LodGen::VerifyMesh(WorkMesh& k)
+{
+  csArray<MeshVerification> mvs;
+  SlidingWindow& sw = k.sliding_windows[k.sliding_windows.GetSize()-1];
+  for (int i = sw.start_index; i < sw.end_index; i++)
+  {
+    csTriangle& tri = k.tri_buffer[k.tri_indices[i]];
+    for (int j = 0; j < 3; j++)
+    {
+      Edge e(tri[j], tri[(j+1)%3]);
+      MeshVerification mv;
+      mv.e = e;
+      int i = mvs.Find(mv);
+      if (i == csArrayItemNotFound)
       {
-        //cout << "Add " << k.tri_buffer.GetSize()-1 << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
-        sw.end_index++;
+        mv.num_t = 1;
+        mvs.Push(mv);
+      }
+      else
+      {
+        mvs[i].num_t++;
       }
     }
   }
-  if (u == UPDATE_EDGES)
+  for (int i = 0; i < mvs.GetSize(); i++)
   {
-    sliding_windows.Push(sw);
+    //assert(mvs[i].num_t >= 1 && mvs[i].num_t <= 2);
   }
-  for (unsigned int i = 0; i < k.tri_indices.GetSize(); i++)
-    for (int j = 0; j < 3; j++)
-      assert(k.tri_buffer[k.tri_indices[i]][j] != v0);
-  return true;
 }
 
 void LodGen::GenerateLODs()
@@ -621,36 +669,38 @@ void LodGen::GenerateLODs()
     for (int j = 0; j < 3; j++)
     {
       Edge e(tri[j], tri[(j+1)%3]);
-      edges.PushSmart(e);
+      k.edges.PushSmart(e);
     }
   }
   
   SlidingWindow sw;
   sw.start_index = 0;
   sw.end_index = num_triangles;
-  sliding_windows.Push(sw);
+  top_limit = sw.end_index;
+  k.sliding_windows.Push(sw);
   int collapse_counter = 0;
-  unsigned int min_num_triangles = 50;
+  int min_num_triangles = 100;
+  //int min_num_triangles = 4;
   window_shift = 0;
   
   while (1)
   {
     unsigned int min_size = 0 /*edges.GetSize() / 2*/;
     
-    while (edges.GetSize() > min_size)
+    while (k.edges.GetSize() > min_size)
     {
-      cout << edges.GetSize();
       float min_d = FLT_MAX;
       int min_v0, min_v1;
       
-      for (unsigned int i = 0; i < edges.GetSize(); i++)
+      for (unsigned int i = 0; i < k.edges.GetSize(); i++)
       {
+        int v0 = k.edges[i].v0;
+        int v1 = k.edges[i].v1;
         WorkMesh k_prime = k;
-        int v0 = edges[i].v0;
-        int v1 = edges[i].v1;
         bool result = Collapse(k_prime, v0, v1);
         if (result)
         {
+          //VerifyMesh(k_prime);
           float d = SumOfSquareDist(k_prime);
           if (d < min_d)
           {
@@ -663,6 +713,7 @@ void LodGen::GenerateLODs()
         result = Collapse(k_prime, v1, v0);
         if (result)
         {
+          //VerifyMesh(k_prime);
           float d = SumOfSquareDist(k_prime);
           if (d < min_d)
           {
@@ -677,31 +728,76 @@ void LodGen::GenerateLODs()
       //assert(min_d != FLT_MAX);
       if (min_d == FLT_MAX)
         break;
-      cout << ": " << min_d << " - " << min_v0 << ", " << min_v1 << endl;
-      bool result = Collapse(k, min_v0, min_v1, UPDATE_EDGES);
+      cout << k.edges.GetSize() << ": " << min_d << " - " << min_v0 << ", " << min_v1 << endl;
+      bool result = Collapse(k, min_v0, min_v1);
       assert(result);
+      VerifyMesh(k);
       collapse_counter++;
+      //if (collapse_counter == 9)
+      //{
+      //  int a = 0;
+      //}
+      window_shift = 0;
+      cout << "T: ";
+      for (unsigned int i = 0; i < k.tri_indices.GetSize(); i++)
+        cout << i << "=" << k.tri_indices[i] << " ";
+      cout << endl << "W: ";
+      for (unsigned int i = 0; i < k.sliding_windows.GetSize(); i++)
+        cout << k.sliding_windows[i].start_index << "-" << k.sliding_windows[i].end_index << " ";
+      cout << endl << "Top limit = " << top_limit << endl;
+      //if (collapse_counter == 9)
+      //  break;
     }
-    if (k.tri_indices.GetSize() < min_num_triangles)
+    SlidingWindow& sw = k.sliding_windows[k.sliding_windows.GetSize()-1];
+    int curr_num_triangles = sw.end_index - sw.start_index;
+    if (curr_num_triangles < min_num_triangles)
       break;
+    //if (collapse_counter == 9)
+    //  break;
     // Replicate index buffer
-    window_shift = k.tri_indices.GetSize();
-    for (int i = 0; i < window_shift; i++)
-      removed_tris.Push(k.tri_indices[i]);
-    num_triangles += window_shift;
-    edges.SetSize(0);
-    for (int i = 0; i < window_shift; i++)
+    //window_shift = curr_num_triangles;
+    cout << "Replicating: " << curr_num_triangles << endl;
+    //for (int i = sw.start_index; i < sw.end_index; i++)
+    //  k.tri_indices.Push(k.tri_indices[i]);
+
+    //k.incident_tris.SetSize(0);
+    //k.incident_tris.SetSize(num_vertices);
+    k.edges.SetSize(0);
+    sw.start_index += curr_num_triangles;
+    sw.end_index += curr_num_triangles;
+    top_limit = sw.end_index;
+    for (int i = sw.start_index; i < sw.end_index; i++)
+    {
+      int itri = k.tri_indices[i-curr_num_triangles];
+      k.tri_indices.Push(itri);
+      const csTriangle& tri = k.tri_buffer[itri];
+      //for (int i = 0; i < 3; i++)
+      //  k.incident_tris[tri[i]].PushSmart(itri);
+      
+      for (int j = 0; j < 3; j++)
+      {
+        Edge e(tri[j], tri[(j+1)%3]);
+        k.edges.PushSmart(e);
+      }
+    }
+    VerifyMesh(k);
+    
+    /*
+    for (int i = sw.start_index; i < sw.end_index; i++)
     {
       const csTriangle& tri = k.tri_buffer[k.tri_indices[i]];
       for (int j = 0; j < 3; j++)
       {
         Edge e(tri[j], tri[(j+1)%3]);
-        edges.PushSmart(e);
+        k.edges.PushSmart(e);
       }
-    }    
+    }
+    */
   }
+  /*
   for (unsigned int i = 0; i < removed_tris.GetSize(); i++)
     ordered_tris.Push(k.tri_buffer[removed_tris[i]]);
+  */
   for (unsigned int i = 0; i < k.tri_indices.GetSize(); i++)
     ordered_tris.Push(k.tri_buffer[k.tri_indices[i]]);
   for (unsigned int i = 0; i < ordered_tris.GetSize(); i++)
