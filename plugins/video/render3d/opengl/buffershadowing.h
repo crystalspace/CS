@@ -34,23 +34,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     public scfImplementation1<BufferShadowingHelper,
                               iRenderBufferCallback>
   {
-    /// Supported shadow data
-    enum
-    {
-      floatVertexData = 0,
-      
-      numShadowTypes
-    };
-    
     struct ShadowedData
     {
       csRef<iRenderBuffer> shadowBuffer;
       uint originalBufferVersion;
       
       ShadowedData() : originalBufferVersion(~0) {}
-      bool IsNew() const { return originalBufferVersion == uint (~0); }
     };
-    typedef ShadowedData ShadowedBuffers[numShadowTypes];
+    struct ShadowedBuffers
+    {
+      ShadowedData floatVertexData;
+    };
     typedef csHash<ShadowedBuffers, csPtrKey<iRenderBuffer>,
       CS::Memory::AllocatorMalloc,
       csArraySafeCopyElementHandler<
@@ -58,7 +52,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
       > ShadowedBuffersHash;
     ShadowedBuffersHash shadowedBuffers;
     
-    ShadowedData& GetShadowedData (iRenderBuffer* originalBuffer, unsigned int shadowData);
+    ShadowedBuffers& GetShadowedData (iRenderBuffer* originalBuffer);
   public:
     BufferShadowingHelper() : scfImplementationType (this) {}
     

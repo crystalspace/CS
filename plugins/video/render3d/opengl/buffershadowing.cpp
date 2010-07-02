@@ -29,15 +29,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     shadowedBuffers.DeleteAll (buffer);
   }
       
-  BufferShadowingHelper::ShadowedData& BufferShadowingHelper::GetShadowedData (
-    iRenderBuffer* originalBuffer, unsigned int shadowData)
+  BufferShadowingHelper::ShadowedBuffers& BufferShadowingHelper::GetShadowedData (
+    iRenderBuffer* originalBuffer)
   {
-    ShadowedBuffers def;
-    ShadowedBuffers& buffers = shadowedBuffers.GetOrCreate (originalBuffer, def);
-    ShadowedData& data = buffers[shadowData];
-    if (data.IsNew())
+    ShadowedBuffers* buffers = shadowedBuffers.GetElementPointer (originalBuffer);
+    if (!buffers)
+    {
+      ShadowedBuffers& newBuffers = shadowedBuffers.GetOrCreate (originalBuffer);
       originalBuffer->SetCallback (this);
-    return data;
+      return newBuffers;
+    }
+    return *buffers;
   }
   
   iRenderBuffer* BufferShadowingHelper::QueryFloatVertexDataBuffer (
@@ -45,7 +47,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   {
     CS_ASSERT(!originalBuffer->IsIndexBuffer());
 
-    ShadowedData& shadowData = GetShadowedData (originalBuffer, floatVertexData);
+    ShadowedData& shadowData = GetShadowedData (originalBuffer).floatVertexData;
     if (!shadowData.shadowBuffer
 	|| (shadowData.originalBufferVersion != originalBuffer->GetVersion()))
     {
