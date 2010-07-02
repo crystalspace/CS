@@ -70,4 +70,6 @@ protected:
   int FindInWindow(const WorkMesh& k, const SlidingWindow& sw, int itri) const;
   void SwapIndex(WorkMesh& k, int i0, int i1);
   void VerifyMesh(WorkMesh& k);
+  bool IsTriangleCoincident(const csTriangle& t0, const csTriangle& t1) const;
+  bool IsCoincident(const WorkMesh& k, const csTriangle& tri) const;
 };
