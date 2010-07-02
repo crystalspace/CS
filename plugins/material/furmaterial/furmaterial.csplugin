@@ -13,7 +13,7 @@
       </class>
       <class>
         <name>crystalspace.physics.furphysics</name>
-        <implementation>FurPhysicsControl</implementation>
+        <implementation>HairPhysicsControl</implementation>
         <description>Fur Material Type Plugin</description>
         <requires>
           <class>crystalspace.graphics3d.</class>
@@ -21,7 +21,7 @@
       </class>
       <class>
         <name>crystalspace.material.furstrandmaterial</name>
-        <implementation>FurStrandMaterial</implementation>
+        <implementation>HairStrandGenerator</implementation>
         <description>Fur Strand MaterialPlugin</description>
         <requires>
           <class>crystalspace.graphics3d.</class>

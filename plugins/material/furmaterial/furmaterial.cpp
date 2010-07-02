@@ -20,6 +20,8 @@
 #include <iutil/plugin.h>
 
 #include "furmaterial.h"
+#include "hairphysicscontrol.h"
+#include "hairstrandgenerator.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 {
@@ -81,7 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   FurMaterial::FurMaterial (FurMaterialType* manager, const char *name, 
     iObjectRegistry* object_reg) :
   scfImplementationType (this), manager (manager), name (name), 
-    object_reg(object_reg), physicsControl(0), furStrandMaterial(0)
+    object_reg(object_reg), physicsControl(0), hairStrandGenerator(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -172,8 +174,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       CS::Material::MaterialBuilder::CreateColorMaterial
       (object_reg,"hairDummyMaterial",csColor(1,0,0));
 
-    if (furStrandMaterial && furStrandMaterial->GetMaterial())
-      materialWrapper->SetMaterial(furStrandMaterial->GetMaterial());
+    if (hairStrandGenerator && hairStrandGenerator->GetMaterial())
+      materialWrapper->SetMaterial(hairStrandGenerator->GetMaterial());
 
     meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
 
@@ -318,14 +320,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     this->meshFactorySubMesh = meshFactorySubMesh;
   }
 
-  void FurMaterial::SetFurMaterialWrapper( iFurStrandMaterial* furStrandMaterial)
+  void FurMaterial::SetFurMaterialWrapper( iFurStrandGenerator* hairStrandGenerator)
   {
-    this->furStrandMaterial = furStrandMaterial;
+    this->hairStrandGenerator = hairStrandGenerator;
   }
 
-  iFurStrandMaterial* FurMaterial::GetFurMaterialWrapper( )
+  iFurStrandGenerator* FurMaterial::GetFurMaterialWrapper( )
   {
-    return furStrandMaterial;
+    return hairStrandGenerator;
   }
 
   void FurMaterial::SetMaterial ( iMaterial* material )
@@ -471,8 +473,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurAnimationControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
     // update shader
-    if (furMaterial->furStrandMaterial)
-      furMaterial->furStrandMaterial->Update();
+    if (furMaterial->hairStrandGenerator)
+      furMaterial->hairStrandGenerator->Update();
 
     // first update the control points
     if (furMaterial->physicsControl)
@@ -559,427 +561,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     return 0;
   }
 
-
-  /********************
-  *  FurPhysicsControl
-  ********************/
-  SCF_IMPLEMENT_FACTORY (FurPhysicsControl)
-
-    CS_LEAKGUARD_IMPLEMENT(FurPhysicsControl);	
-
-  FurPhysicsControl::FurPhysicsControl (iBase* parent)
-    : scfImplementationType (this, parent), object_reg(0)
-  {
-  }
-
-  FurPhysicsControl::~FurPhysicsControl ()
-  {
-    guideRopes.DeleteAll();
-  }
-
-  // From iComponent
-  bool FurPhysicsControl::Initialize (iObjectRegistry* r)
-  {
-    object_reg = r;
-    return true;
-  }
-
-  //-- iFurPhysicsControl
-
-  void FurPhysicsControl::SetRigidBody (iRigidBody* rigidBody)
-  {
-    this->rigidBody = rigidBody;
-  }
-
-  void FurPhysicsControl::SetBulletDynamicSystem (iBulletDynamicSystem* 
-    bulletDynamicSystem)
-  {
-    this->bulletDynamicSystem = bulletDynamicSystem;
-  }
-
-  // Initialize the strand with the given ID
-  void FurPhysicsControl::InitializeStrand (size_t strandID, const csVector3* 
-    coordinates, size_t coordinatesCount)
-  {
-    csVector3 first = coordinates[0];
-    csVector3 last = coordinates[coordinatesCount - 1];
-
-    iBulletSoftBody* bulletBody = bulletDynamicSystem->
-      CreateRope(first, first + csVector3(0, 1, 0) * (last - first).Norm() , 
-      coordinatesCount - 2);	//	replace with -1
-    bulletBody->SetMass (0.1f);
-    bulletBody->SetRigidity (0.99f);
-    bulletBody->AnchorVertex (0, rigidBody);
-
-    guideRopes.PutUnique(strandID, bulletBody);
-  }
-
-  // Animate the strand with the given ID
-  void FurPhysicsControl::AnimateStrand (size_t strandID, csVector3* 
-    coordinates, size_t coordinatesCount)
-  {
-    csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
-
-    if(!bulletBody)
-      return;
-
-    CS_ASSERT(coordinatesCount == bulletBody->GetVertexCount());
-    //printf("%d\t%d\n", coordinatesCount, bulletBody->GetVertexCount());
-
-    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
-      coordinates[i] = bulletBody->GetVertexPosition(i);
-    /*
-    if (strandID % 3 == 0)
-    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
-    coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
-    csVector3(1,0,0);
-    else if (strandID % 3 == 1)
-    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
-    coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
-    csVector3(0,1,0);
-    else
-    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
-    coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
-    csVector3(0,0,1);
-    */
-  }
-
-  void FurPhysicsControl::RemoveStrand (size_t strandID)
-  {
-    csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
-    if(!bulletBody)
-      return;
-
-    guideRopes.Delete(strandID, bulletBody);
-  }
-
-  void FurPhysicsControl::RemoveAllStrands ()
-  {
-    guideRopes.DeleteAll();
-  }
-
-
-  /************************
-  *  FurStrandMaterial
-  ************************/  
-  SCF_IMPLEMENT_FACTORY (FurStrandMaterial)
-
-    CS_LEAKGUARD_IMPLEMENT(FurStrandMaterial);	
-
-  FurStrandMaterial::FurStrandMaterial (iBase* parent)
-    : scfImplementationType (this, parent), object_reg(0), material(0), 
-    valid(false), width(256), height(256), M(0), m_buf(0), gauss_matrix(0),
-    N(0), n_buf(0)
-  {
-  }
-
-  FurStrandMaterial::~FurStrandMaterial ()
-  {
-  }
-
-  // From iComponent
-  bool FurStrandMaterial::Initialize (iObjectRegistry* r)
-  {
-    object_reg = r;
-
-    svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
-      object_reg, "crystalspace.shader.variablenameset");
-  
-    if (!svStrings) 
-    {
-      printf ("No SV names string set!\n");
-      return false;
-    }
-
-    g3d = csQueryRegistry<iGraphics3D> (object_reg);
-    
-    if (!g3d) 
-    {
-      printf("No g3d found!\n");
-      return false;
-    }
-
-    mc = new MarschnerConstants();
-
-    return true;
-  }
-
-  // From iFurStrandMaterial
-  iMaterial* FurStrandMaterial::GetMaterial()
-  {
-    return material;
-  }
-
-  void FurStrandMaterial::SetMaterial(iMaterial* material)
-  {
-    this->material = material;
-  }
-
-  void FurStrandMaterial::Invalidate()
-  {
-    valid = false;
-  }
-
-  void FurStrandMaterial::Update()
-  {
-    if(!valid && material)
-    {
-      UpdateM();
-      UpdateN();
-      valid = true;
-    }
-  }
-
-  // Marschner specific methods
-  void FurStrandMaterial::UpdateM()
-  {
-    if(!M)
-    {
-      CS::ShaderVarName strandWidthName (svStrings, "tex M");	
-      csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(strandWidthName);
-
-      M = g3d->GetTextureManager()->CreateTexture(width, height, csimg2D, "abgr8", 
-        CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
-
-      if(!M)
-      {
-        printf ("Failed to load M texture!\n");
-        return;
-      }
-
-      shaderVariable->SetValue(M);
-
-      m_buf = new uint8 [width * height * 4];
-      gauss_matrix = new float [width * height];
-
-      for( int x = 0 ; x < width ; x ++ )
-        for (int y = 0 ; y < height; y ++)
-        {
-          m_buf[ 4 * (x + y * width ) ] = 255; // red
-          m_buf[ 4 * (x + y * width ) + 1 ] = 0; // green
-          m_buf[ 4 * (x + y * width ) + 2 ] = 0; // blue
-          m_buf[ 4 * (x + y * width ) + 3 ] = 255; // alpha
-        }
-    }
-
-    ComputeM(mc->aR, mc->bR, 0);
-    ComputeM(mc->aTT, mc->bTT, 1);
-    ComputeM(mc->aTRT, mc->bTRT, 2);
-
-    // send buffer to texture
-    M->Blit(0, 0, width, height / 2, m_buf);
-    M->Blit(0, height / 2, width, height / 2, m_buf + (width * height * 2));
-
-    // test new texture
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-
-    csRef<iDataBuffer> db = M->Readback(readbackFmt);
-    SaveImage(db->GetUint8(), "/data/hairtest/debug/M_debug.png");
-  }
-
-  float FurStrandMaterial::ComputeM(float a, float b, int channel)
-  {
-    float max = 0;
-    
-    // find max
-    for (int x = 0; x < width; x++)
-      for (int y = 0; y < height; y++)    
-      {
-        float sin_thI = -1.0f + (x * 2.0f) / width;
-        float sin_thR = -1.0f + (y * 2.0f) / height;
-        float thI = (180 * asin(sin_thI) / PI);
-        float thR = (180 * asin(sin_thR) / PI);
-        float thH = (thR + thI) / 2;
-        float thH_a = thH - a;
-
-        float gauss = MarschnerHelper::GaussianDistribution(b, thH_a);
-        gauss_matrix[x + y * width] = gauss;
-
-        if (255 * gauss > max)
-          max = 255 * gauss;
-      }
-
-    // normalize
-    for (int x = 0; x < width; x++)
-      for (int y = 0; y < height; y++)
-      {
-        float gauss = gauss_matrix[x + y * width];
-        m_buf[4 * (x + y * width) + channel] = (uint8)(255 * 255 * gauss / max);
-      }
-
-    return max;
-  }
-
-  void FurStrandMaterial::UpdateN()
-  {
-    if(!N)
-    {
-      CS::ShaderVarName strandWidthName (svStrings, "tex N");	
-      csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(strandWidthName);
-
-       N = g3d->GetTextureManager()->CreateTexture(width, height, csimg2D, "abgr8", 
-         CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
-
-      if(!N)
-      {
-        printf ("Failed to load N texture!\n");
-        return;
-      }
-
-      shaderVariable->SetValue(N);
-
-      n_buf = new uint8 [width * height * 4];
-
-      for( int x = 0 ; x < width ; x ++ )
-        for (int y = 0 ; y < height; y ++)
-        {
-          n_buf[ 4 * (x + y * width ) ] = 0; // red
-          n_buf[ 4 * (x + y * width ) + 1 ] = 0; // green
-          n_buf[ 4 * (x + y * width ) + 2 ] = 0; // blue
-          n_buf[ 4 * (x + y * width ) + 3 ] = 255; // alpha
-        }
-    }
-
-    for( int x = 0 ; x < width ; x ++ )
-      for (int y = 0 ; y < height; y ++)
-      {
-        float cos_phiD = -1.0f + (x * 2.0f) / width;
-        float cos_thD = -1.0f + (y * 2.0f) / height;
-        float phiD = acos(cos_phiD);
-        float thD = acos(cos_thD);
-        n_buf[ 4 * (x + y * width ) ] = (uint8)(255 * SimpleNP(phiD, thD)); // red
-        n_buf[ 4 * (x + y * width ) ] = (uint8)(255 * ComputeNP(0, phiD, thD)); // red
-        n_buf[ 4 * (x + y * width ) + 1 ] = (uint8)(255 * ComputeNP(1, phiD, thD)); // green
-        n_buf[ 4 * (x + y * width ) + 2 ] = (uint8)(255 * ComputeNP(2, phiD, thD)); // blue
-      }
-
-    // send buffer to texture
-    N->Blit(0, 0, width, height / 2, n_buf);
-    N->Blit(0, height / 2, width, height / 2, n_buf + (width * height * 2));
-
-    // test new texture
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-
-    csRef<iDataBuffer> db = N->Readback(readbackFmt);
-    SaveImage(db->GetUint8(), "/data/hairtest/debug/N_debug.png");
-  }
-
-  float FurStrandMaterial::ComputeT(float absorption, float gammaT)
-  {
-    float l = 1 + cos(2 * gammaT);	// l = ls / cos qt = 2r cos h0t / cos qt
-    return exp(-2.0f * absorption * l);
-  }
-
-  float FurStrandMaterial::ComputeA(float absorption, int p, float h, 
-    float refraction, float etaPerpendicular, float etaParallel)
-  {
-    float gammaI = asin(h);
-
-    //A(0; h) = F(h0; h00; gi)
-    if (p == 0)
-      return MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
-
-    //A(p; h) = ( (1 - F(h0; h00; gi) ) ^ 2 ) * ( F(1 / h0; 1 / h00; gi) ^ (p - 1) ) * ( T(s0a; h) ^ p )
-    float gammaT = asin(h / etaPerpendicular);	// h0 sin gt = h
-
-    float fresnel = MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
-    float invFrenel = MarschnerHelper::Fresnel(1 / etaPerpendicular, 1 / etaParallel, gammaT);
-    float t = ComputeT(absorption, gammaT);
-
-    return (1.0f - fresnel) * (1.0f - fresnel) * pow(invFrenel, p - 1.0f) * pow(t, p);
-  }
-
-  float FurStrandMaterial::ComputeNP(int p, float phi, float thD)
-  {
-    float refraction = mc->eta;
-    float absorption = mc->absorption;
-
-    float etaPerpendicular = MarschnerHelper::BravaisIndex(thD, refraction);
-    float etaParallel = (refraction * refraction) / etaPerpendicular;
-
-    csVector4 roots = EquationsSolver::Roots(p, etaPerpendicular, phi);
-    float result = 0;
-
-//     if (roots.w != int(roots.w))
-//       printf("%f\t%d\t%d\t%f\t%f\n", roots.w, int(roots.w), p, etaPerpendicular, phi);
-
-    for (int index = 0; index < roots.w; index++ )
-    {
-      float gammaI = roots[index];
-
-      //if (fabs(gammaI) <= PI/2)
-      {
-        float h = sin(gammaI);
-        float finalAbsorption = ComputeA(absorption, p, h, refraction, 
-          etaPerpendicular, etaParallel);
-        float inverseDerivateAngle = 
-          EquationsSolver::InverseFirstDerivate(p, etaPerpendicular, h);
-
-        result += finalAbsorption * 2 * fabs(inverseDerivateAngle); //0.5 here
-      }
-    }
-
-    return csMin(1.0f, result);
-  }
-
-  float FurStrandMaterial::SimpleNP(float phi, float thD )
-  {
-    float refraction = mc->eta;
-
-    float etaPerpendicular = MarschnerHelper::BravaisIndex(thD, refraction);
-    float etaParallel = (refraction * refraction) / etaPerpendicular;
-    float gammaI = -phi / 2.0f;
-
-    float h = sin(gammaI);
-
-    float result = (sqrt(1 - h * h));
-
-    result *= MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
-
-    return csMin(1.0f, result);
-  }
-
-  void FurStrandMaterial::SaveImage(uint8* buf, const char* texname)
-  {
-    csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
-    csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
-
-    if(!buf)
-    {
-      printf("Bad data buffer!\n");
-      return;
-    }
-
-    csRef<iImage> image;
-    image.AttachNew(new csImageMemory (width, height, buf,false,
-      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-
-    if(!image.IsValid())
-    {
-      printf("Error loading image\n");
-      return;
-    }
-
-    csPrintf ("Saving %zu KB of data.\n", 
-      csImageTools::ComputeDataSize (image)/1024);
-
-    csRef<iDataBuffer> db = imageio->Save (image, "image/png", "progressive");
-    if (db)
-    {
-      if (!VFS->WriteFile (texname, (const char*)db->GetData (), db->GetSize ()))
-      {
-        printf("Failed to write file '%s'!", texname);
-        return;
-      }
-    }
-    else
-    {
-      printf("Failed to save png image for basemap!");
-      return;
-    }	    
-  }
 }
 CS_PLUGIN_NAMESPACE_END(FurMaterial)
 

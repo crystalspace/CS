@@ -168,17 +168,17 @@ bool KrystalScene::CreateAvatar ()
   if (!hairsMeshFact)
     return hairTest->ReportError ("Can't find Krystal's hairs mesh factory!");  
 
-  // Load furPhysicsControl
-  csRef<iFurPhysicsControl> furPhysicsControl = csQueryRegistry<iFurPhysicsControl> 
+  // Load hairPhysicsControl
+  csRef<iFurPhysicsControl> hairPhysicsControl = csQueryRegistry<iFurPhysicsControl> 
     (hairTest->object_reg);
-  if (!furPhysicsControl)
+  if (!hairPhysicsControl)
     return hairTest->ReportError("Failed to locate iFurPhysicsControl plugin!");
 
-  // Load furStrandMaterial
-  csRef<iFurStrandMaterial> furStrandMaterial = csQueryRegistry<iFurStrandMaterial> 
+  // Load hairStrandGenerator
+  csRef<iFurStrandGenerator> hairStrandGenerator = csQueryRegistry<iFurStrandGenerator> 
     (hairTest->object_reg);
-  if (!furStrandMaterial)
-    return hairTest->ReportError("Failed to locate iFurStrandMaterial plugin!");
+  if (!hairStrandGenerator)
+    return hairTest->ReportError("Failed to locate iFurStrandGenerator plugin!");
 
   // Load furMaterial
   csRef<iFurMaterialType> furMaterialType = csQueryRegistry<iFurMaterialType> 
@@ -332,15 +332,15 @@ bool KrystalScene::CreateAvatar ()
   if (!materialWrapper)
     hairTest->ReportError("Can't find marschner material!");
 
-  furStrandMaterial->SetMaterial(materialWrapper->GetMaterial());
+  hairStrandGenerator->SetMaterial(materialWrapper->GetMaterial());
 
-  furPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
-  furPhysicsControl->SetRigidBody(headBody);
+  hairPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
+  hairPhysicsControl->SetRigidBody(headBody);
 
   // Initialize fur material
   furMaterial = furMaterialType->CreateFurMaterial("hair");
-  furMaterial->SetPhysicsControl(furPhysicsControl);
-  furMaterial->SetFurMaterialWrapper(furStrandMaterial);
+  furMaterial->SetPhysicsControl(hairPhysicsControl);
+  furMaterial->SetFurMaterialWrapper(hairStrandGenerator);
 
   furMaterial->SetMaterial(skullMaterial->GetMaterial());
   furMaterial->SetMeshFactory(animeshFactory);
