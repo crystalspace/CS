@@ -15,6 +15,7 @@ struct Edge
 {
   int v0;
   int v1;
+  Edge() {}
   Edge(int a, int b) { assert(a != b); if (a < b) { v0 = a; v1 = b; } else { v0 = b; v1 = a; } }
   inline bool operator==(const Edge& e1) const
   {
@@ -51,6 +52,7 @@ protected:
   csArray<int> removed_tris;
   csArray<csTriangle> ordered_tris;
   csArray<SlidingWindow> sliding_windows;
+  int window_shift;
 
 public:
   LodGen(const csArray<csVector3>& v, const csArray<csTriangle>& t): 

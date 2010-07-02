@@ -560,7 +560,15 @@ inline bool LodGen::IsDegenerate(const csTriangle& tri) const
 
 bool LodGen::Collapse(WorkMesh& k, int v0, int v1, UpdateEdges u)
 {
-  SlidingWindow sw = sliding_windows[sliding_windows.GetSize()-1]; // copy
+  SlidingWindow sw;
+  if (u == UPDATE_EDGES)
+  {
+    sw = sliding_windows[sliding_windows.GetSize()-1]; // copy
+    sw.start_index += window_shift;
+    sw.end_index += window_shift;
+    window_shift = 0;
+  }
+  
   IncidentTris incident = k.incident_tris[v0]; // copy
   for (unsigned int i = 0; i < incident.GetSize(); i++)
   {
@@ -621,54 +629,76 @@ void LodGen::GenerateLODs()
   sw.start_index = 0;
   sw.end_index = num_triangles;
   sliding_windows.Push(sw);
-  
-  unsigned int min_size = 0 /*edges.GetSize() / 2*/;
   int collapse_counter = 0;
+  unsigned int min_num_triangles = 50;
+  window_shift = 0;
   
-  while (edges.GetSize() > min_size)
+  while (1)
   {
-    cout << edges.GetSize();
-    float min_d = FLT_MAX;
-    int min_v0, min_v1;
+    unsigned int min_size = 0 /*edges.GetSize() / 2*/;
     
-    for (unsigned int i = 0; i < edges.GetSize(); i++)
+    while (edges.GetSize() > min_size)
     {
-      WorkMesh k_prime = k;
-      int v0 = edges[i].v0;
-      int v1 = edges[i].v1;
-      bool result = Collapse(k_prime, v0, v1);
-      if (result)
+      cout << edges.GetSize();
+      float min_d = FLT_MAX;
+      int min_v0, min_v1;
+      
+      for (unsigned int i = 0; i < edges.GetSize(); i++)
       {
-        float d = SumOfSquareDist(k_prime);
-        if (d < min_d)
+        WorkMesh k_prime = k;
+        int v0 = edges[i].v0;
+        int v1 = edges[i].v1;
+        bool result = Collapse(k_prime, v0, v1);
+        if (result)
         {
-          min_d = d;
-          min_v0 = v0;
-          min_v1 = v1;
+          float d = SumOfSquareDist(k_prime);
+          if (d < min_d)
+          {
+            min_d = d;
+            min_v0 = v0;
+            min_v1 = v1;
+          }
         }
-      }
-      k_prime = k;
-      result = Collapse(k_prime, v1, v0);
-      if (result)
-      {
-        float d = SumOfSquareDist(k_prime);
-        if (d < min_d)
+        k_prime = k;
+        result = Collapse(k_prime, v1, v0);
+        if (result)
         {
-          min_d = d;
-          min_v0 = v1;
-          min_v1 = v0;
+          float d = SumOfSquareDist(k_prime);
+          if (d < min_d)
+          {
+            min_d = d;
+            min_v0 = v1;
+            min_v1 = v0;
+          }
         }
+        if (min_d == 0.0)
+          break;
       }
-      if (min_d == 0.0)
+      //assert(min_d != FLT_MAX);
+      if (min_d == FLT_MAX)
         break;
+      cout << ": " << min_d << " - " << min_v0 << ", " << min_v1 << endl;
+      bool result = Collapse(k, min_v0, min_v1, UPDATE_EDGES);
+      assert(result);
+      collapse_counter++;
     }
-    //assert(min_d != FLT_MAX);
-    if (min_d == FLT_MAX)
+    if (k.tri_indices.GetSize() < min_num_triangles)
       break;
-    cout << ": " << min_d << " - " << min_v0 << ", " << min_v1 << endl;
-    bool result = Collapse(k, min_v0, min_v1, UPDATE_EDGES);
-    assert(result);
-    collapse_counter++;
+    // Replicate index buffer
+    window_shift = k.tri_indices.GetSize();
+    for (int i = 0; i < window_shift; i++)
+      removed_tris.Push(k.tri_indices[i]);
+    num_triangles += window_shift;
+    edges.SetSize(0);
+    for (int i = 0; i < window_shift; i++)
+    {
+      const csTriangle& tri = k.tri_buffer[k.tri_indices[i]];
+      for (int j = 0; j < 3; j++)
+      {
+        Edge e(tri[j], tri[(j+1)%3]);
+        edges.PushSmart(e);
+      }
+    }    
   }
   for (unsigned int i = 0; i < removed_tris.GetSize(); i++)
     ordered_tris.Push(k.tri_buffer[removed_tris[i]]);
@@ -676,7 +706,7 @@ void LodGen::GenerateLODs()
     ordered_tris.Push(k.tri_buffer[k.tri_indices[i]]);
   for (unsigned int i = 0; i < ordered_tris.GetSize(); i++)
     for (unsigned int j = 0; j < 3; j++)
-      assert(ordered_tris[i][j] >= 0 && ordered_tris[i][j] < vertices.GetSize());
+      assert(ordered_tris[i][j] >= 0 && ordered_tris[i][j] < (int)vertices.GetSize());
   cout << "End" << endl;
 }
 
