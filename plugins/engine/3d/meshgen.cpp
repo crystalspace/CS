@@ -226,6 +226,7 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.sqmaxdistance = maxdist * maxdist;
   g.factory->GetMeshObjectFactory ()->SetMixMode (CS_FX_COPY);
   g.mesh = generator->engine->CreateMeshWrapper (g.factory, 0);
+  g.mesh->GetFlags ().Set (CS_ENTITY_NOHITBEAM);
   g.mesh->SetZBufModeRecursive (CS_ZBUF_USE); 
   g.vertexInfoArray.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
   g.vertexInfoArray.transformVar->SetType (csShaderVariable::ARRAY); 
