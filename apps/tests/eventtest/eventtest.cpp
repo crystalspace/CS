@@ -31,6 +31,23 @@ EventTest::~EventTest ()
 {
 }
 
+static const char* GetMouseButtonString (int button)
+{
+  switch (button)
+  {
+  case csmbLeft:        return "[Left]";
+  case csmbRight:       return "[Right]";
+  case csmbMiddle:      return "[Middle]";
+  case csmbWheelUp:     return "[WheelUp]";
+  case csmbWheelDown:   return "[WheelDown]";
+  case csmbHWheelLeft:  return "[HWheelLeft]";
+  case csmbHWheelRight: return "[HWheelRight]";
+  case csmbExtra1:      return "[Extra1]";
+  case csmbExtra2:      return "[Extra2]";
+  default:  return "";
+  }
+}
+
 bool EventTest::HandleEvent (iEvent &ev)
 {
   csRef<iEventNameRegistry> namereg = csEventNameRegistry::GetRegistry (
@@ -70,21 +87,22 @@ bool EventTest::HandleEvent (iEvent &ev)
     csMouseEventHelper::GetEventData (&ev, data);
     int x = csMouseEventHelper::GetX (&ev);
     int y = csMouseEventHelper::GetY (&ev);
-    uint but = csMouseEventHelper::GetButton (&ev);
+    int but = csMouseEventHelper::GetButton (&ev);
     bool butstate = csMouseEventHelper::GetButtonState (&ev);
     uint32 butmask = csMouseEventHelper::GetButtonMask (&ev);
 
     csInputDefinition def (namereg, &ev, modifiers, true); //do we want cooked?
     csString str = def.ToString ();
-    csPrintf ("Mouse %s: but=%d(state=%d,mask=%08" PRIu32 ") "
-        "device=%d x=%d y=%d mods=%08" PRIu32 " desc='%s'\n",
+    csPrintf ("Mouse %s: but=%d%s (state=%d,mask=%08" PRIx32 ") "
+        "device=%d x=%d y=%d mods=%08" PRIx32 " desc='%s'\n",
 	type == csMouseEventTypeMove ? "MOVE" :
     	type == csMouseEventTypeUp ? "UP" :
 	type == csMouseEventTypeDown ? "DO" :
 	type == csMouseEventTypeClick ? "CLICK" :
 	type == csMouseEventTypeDoubleClick ? "DBL" :
 	"?",
-	but, butstate, butmask, device, x, y,
+	but, GetMouseButtonString (but),
+        butstate, butmask, device, x, y,
 	modifiers, str.GetData ());
     fflush (stdout);
   }
