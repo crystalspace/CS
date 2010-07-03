@@ -457,7 +457,7 @@ CS_LEAKGUARD_IMPLEMENT(EquationsSolver);
 // Solve a * x + b = 0
 CubicSolution EquationsSolver::LinearSolver(float a, float b)
 {
-  CubicSolution roots = CubicSolution();
+  CubicSolution roots;
 
   if (fabs(a) > EPSILON)
   {
@@ -476,7 +476,7 @@ CubicSolution EquationsSolver::QuadraticSolver(float a, float b, float c)
   if (fabs(a) < EPSILON)
     return LinearSolver(b, c);
 
-  CubicSolution roots = CubicSolution();
+  CubicSolution roots;
 
   float D = b * b - 4 * a * c;
 
@@ -513,8 +513,6 @@ CubicSolution EquationsSolver::NormalizedCubicSolver(float A, float B, float C)
   }
   else
   {
-    roots = CubicSolution();
-
     float Q = (3 * B - A * A) / 9;
     float R = (9 * A * B - 27 * C - 2 * A * A * A) / 54;
     float D = Q * Q * Q + R * R;

@@ -130,19 +130,10 @@ public:
   static double Fresnel(float etaPerpendicular, float etaParallel, float angle);
 };
 
-class CubicSolution
+struct CubicSolution
 {
-public:
   float X1, X2, X3;
   size_t count;
-
-  CubicSolution()
-  {
-  }
-
-  virtual ~CubicSolution()
-  {
-  }
 
   inline float operator[] (size_t n) const 
   { return (n&2) ? X3 : ( (n&1) ? X2 : X1 ) ; }
