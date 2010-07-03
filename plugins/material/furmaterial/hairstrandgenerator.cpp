@@ -265,13 +265,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float etaPerpendicular = MarschnerHelper::BravaisIndex(thD, refraction);
     float etaParallel = (refraction * refraction) / etaPerpendicular;
 
-    csVector4 roots = EquationsSolver::Roots(p, etaPerpendicular, phi);
+    CubicSolution roots = EquationsSolver::Roots(p, etaPerpendicular, phi);
     float result = 0;
 
 //     if (roots.w != int(roots.w))
 //       printf("%f\t%d\t%d\t%f\t%f\n", roots.w, int(roots.w), p, etaPerpendicular, phi);
 
-    for (int index = 0; index < roots.w; index++ )
+    for (size_t index = 0; index < roots.count; index++ )
     {
       float gammaI = roots[index];
 
@@ -455,69 +455,65 @@ double MarschnerHelper::Fresnel(float etaPerpendicular, float etaParallel, float
 CS_LEAKGUARD_IMPLEMENT(EquationsSolver);	
 
 // Solve a * x + b = 0
-csVector4 EquationsSolver::LinearSolver(float a, float b)
+CubicSolution EquationsSolver::LinearSolver(float a, float b)
 {
-  csVector4 roots = csVector4();
+  CubicSolution roots = CubicSolution();
 
   if (fabs(a) > EPSILON)
   {
-    roots[0] = -b / a;
-    roots[3] = 1;
+    roots.X1 = -b / a;
+    roots.count = 1;
   }
   else
-    roots[3] = 0;
+    roots.count = 0;
 
   return roots;
 }
 
 // Solve a * x ^ 2 + b * x + c = 0
-csVector4 EquationsSolver::QuadraticSolver(float a, float b, float c)
+CubicSolution EquationsSolver::QuadraticSolver(float a, float b, float c)
 {
-  csVector4 roots;
-
   if (fabs(a) < EPSILON)
     return LinearSolver(b, c);
-  else
+
+  CubicSolution roots = CubicSolution();
+
+  float D = b * b - 4 * a * c;
+
+  if (fabs(D) < EPSILON)
   {
-    roots = csVector4();
-
-    float D = b * b - 4 * a * c;
-
-    if (fabs(D) < EPSILON)
-    {
-      roots[0] = -b / (2 * a);
-      roots[1] = -b / (2 * a);
-      roots[3] = 2;
-    }
-    else if (D > 0)
-    {
-      float delta = sqrt(D);
-      roots[0] = (-b + delta) / (2 * a);
-      roots[1] = (-b - delta) / (2 * a);
-      roots[3] = 2;
-    }
-    else
-      roots[3] = 0;
+    roots.X1 = -b / (2 * a);
+    roots.X2 = roots.X1;
+    roots.count = 2;
   }
+  else if (D > 0)
+  {
+    float delta = sqrt(D);
+    roots.X1 = (-b + delta) / (2 * a);
+    roots.X2 = (-b - delta) / (2 * a);
+    roots.count = 2;
+  }
+  else
+    roots.count = 0;
 
   return roots;
 }
 
 // Solve x ^ 3 + A * x ^ 2 + B * x + C = 0 - 
 //  http://en.wikipedia.org/wiki/Cubic_function
-csVector4 EquationsSolver::NormalizedCubicSolver(float A, float B, float C)
+CubicSolution EquationsSolver::NormalizedCubicSolver(float A, float B, float C)
 {
-  csVector4 roots;
+  CubicSolution roots;
 
   if (fabs(C) < EPSILON)	//	x = 0 solution
   {
     roots = QuadraticSolver(1, A, B);
-    roots[ (int)roots.w ] = 0;
-    roots.w ++;
+    roots[ roots.count ] = 0;
+    roots.count ++;
   }
   else
   {
-    roots = csVector4();
+    roots = CubicSolution();
 
     float Q = (3 * B - A * A) / 9;
     float R = (9 * A * B - 27 * C - 2 * A * A * A) / 54;
@@ -529,17 +525,17 @@ csVector4 EquationsSolver::NormalizedCubicSolver(float A, float B, float C)
       float s = SIGN(R + sqrtD) * pow(fabs(R + sqrtD), 1.0f / 3.0f);
       float t = SIGN(R - sqrtD) * pow(fabs(R - sqrtD), 1.0f / 3.0f);
 
-      roots[0] = (-A / 3 + (s + t));
-      roots[3] = 1;
+      roots.X1 = (-A / 3 + (s + t));
+      roots.count = 1;
     }
     else	// 3 roots
     {
       float theta = acos(R / sqrt(-(Q * Q * Q)));
       float sqrtQ = sqrt(-Q);
-      roots[0] = (2 * sqrtQ * cos(theta / 3) - A / 3);
-      roots[1] = (2 * sqrtQ * cos((theta + 2 * PI) / 3) - A / 3);
-      roots[2] = (2 * sqrtQ * cos((theta + 4 * PI) / 3) - A / 3);
-      roots[3] = 3;
+      roots.X1 = (2 * sqrtQ * cos(theta / 3) - A / 3);
+      roots.X2 = (2 * sqrtQ * cos((theta + 2 * PI) / 3) - A / 3);
+      roots.X3 = (2 * sqrtQ * cos((theta + 4 * PI) / 3) - A / 3);
+      roots.count = 3;
     }
   }
 
@@ -548,9 +544,9 @@ csVector4 EquationsSolver::NormalizedCubicSolver(float A, float B, float C)
 
 // Solve a * x ^ 3 + b * x ^ 2 + c * x  + d = 0 - 
 //  http://en.wikipedia.org/wiki/Cubic_function
-csVector4 EquationsSolver::CubicSolver(float a, float b, float c, float d)
+CubicSolution EquationsSolver::CubicSolver(float a, float b, float c, float d)
 {
-  csVector4 roots;
+  CubicSolution roots;
 
   if (fabs(a) < EPSILON)
     roots = QuadraticSolver(b, c, d);
@@ -561,7 +557,7 @@ csVector4 EquationsSolver::CubicSolver(float a, float b, float c, float d)
 }
 
 // Solve o(p,y) - phi = 0
-csVector4 EquationsSolver::Roots(float p, float etaPerpendicular, float phi)
+CubicSolution EquationsSolver::Roots(float p, float etaPerpendicular, float phi)
 {
 
   float c = asin(1 / etaPerpendicular);

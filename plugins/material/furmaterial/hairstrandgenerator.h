@@ -130,26 +130,47 @@ public:
   static double Fresnel(float etaPerpendicular, float etaParallel, float angle);
 };
 
+class CubicSolution
+{
+public:
+  float X1, X2, X3;
+  size_t count;
+
+  CubicSolution()
+  {
+  }
+
+  virtual ~CubicSolution()
+  {
+  }
+
+  inline float operator[] (size_t n) const 
+  { return (n&2) ? X3 : ( (n&1) ? X2 : X1 ) ; }
+
+  inline float & operator[] (size_t n) 
+  { return (n&2) ? X3 : ( (n&1) ? X2 : X1 ) ; }
+};
+
 class EquationsSolver
 {
 public:
   CS_LEAKGUARD_DECLARE(EquationsSolver);
   // Solve a * x + b = 0
-  static csVector4 LinearSolver(float a, float b);
+  static CubicSolution LinearSolver(float a, float b);
 
   // Solve a * x ^ 2 + b * x + c = 0
-  static csVector4 QuadraticSolver(float a, float b, float c);
+  static CubicSolution QuadraticSolver(float a, float b, float c);
 
   // Solve x ^ 3 + A * x ^ 2 + B * x + C = 0 - 
   //  http://en.wikipedia.org/wiki/Cubic_function
-  static csVector4 NormalizedCubicSolver(float A, float B, float C);
+  static CubicSolution NormalizedCubicSolver(float A, float B, float C);
 
   // Solve a * x ^ 3 + b * x ^ 2 + c * x  + d = 0 - 
   //  http://en.wikipedia.org/wiki/Cubic_function
-  static csVector4 CubicSolver(float a, float b, float c, float d);
+  static CubicSolution CubicSolver(float a, float b, float c, float d);
 
   // Solve o(p,y) - phi = 0
-  static csVector4 Roots(float p, float etaPerpendicular, float phi);
+  static CubicSolution Roots(float p, float etaPerpendicular, float phi);
 
   // computes the derivative of the polynomial relative to h.
   static float InverseFirstDerivate(float p, float etaPerpendicular, float h);
