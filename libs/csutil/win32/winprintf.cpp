@@ -96,13 +96,11 @@ static int WriteConsoleUTF8 (HANDLE hCon, const utf8_char* inStr, size_t inLen)
 
 static int _cs_fputs (const char* string, FILE* stream)
 {
-  UINT cp = CP_ACP;
   HANDLE hCon = 0; 
   WORD textAttr = 0, oldAttr = 0;
   bool isTTY = (_isatty (_fileno (stream)) != 0);
   if (isTTY) 
   {
-    cp = GetConsoleOutputCP ();
     hCon = (HANDLE)_get_osfhandle (_fileno (stream));
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo (hCon, &csbi);
