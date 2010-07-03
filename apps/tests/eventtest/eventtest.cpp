@@ -46,11 +46,15 @@ bool EventTest::HandleEvent (iEvent &ev)
     uint32 type = csKeyEventHelper::GetEventType (&ev);
     csString str = csInputDefinition::GetKeyString (namereg, key,
     	&key_modifiers, true);
-    printf ("Key %s: raw=%" PRId32 "(%c) "
-        "cooked=%" PRId32 "(%c) rep=%d mods=%08" PRIu32 " desc='%s'\n",
+    char rawStr[CS_UC_MAX_UTF8_ENCODED+1];
+    rawStr[csUnicodeTransform::EncodeUTF8 (key, (utf8_char*)rawStr, sizeof (rawStr))] = 0;
+    char cookedStr[CS_UC_MAX_UTF8_ENCODED+1];
+    cookedStr[csUnicodeTransform::EncodeUTF8 (cooked, (utf8_char*)cookedStr, sizeof (cookedStr))] = 0;
+    csPrintf ("Key %s: raw=%" PRId32 "(%s) "
+        "cooked=%" PRId32 "(%s) rep=%d mods=%08" PRIu32 " desc='%s'\n",
     	type == csKeyEventTypeUp ? "UP" : "DO",
-	key, (key >= 32 && key < 128) ? (char)key : '-',
-	cooked, (cooked >= 32 && cooked < 128) ? (char)cooked : '-',
+	key, ((key >= 32) && !CSKEY_IS_SPECIAL(key)) ? rawStr : "-",
+	cooked, ((cooked >= 32) && !CSKEY_IS_SPECIAL(cooked)) ? cookedStr : "-",
 	autorep, modifiers, str.GetData ());
     fflush (stdout);
   }
@@ -72,7 +76,7 @@ bool EventTest::HandleEvent (iEvent &ev)
 
     csInputDefinition def (namereg, &ev, modifiers, true); //do we want cooked?
     csString str = def.ToString ();
-    printf ("Mouse %s: but=%d(state=%d,mask=%08" PRIu32 ") "
+    csPrintf ("Mouse %s: but=%d(state=%d,mask=%08" PRIu32 ") "
         "device=%d x=%d y=%d mods=%08" PRIu32 " desc='%s'\n",
 	type == csMouseEventTypeMove ? "MOVE" :
     	type == csMouseEventTypeUp ? "UP" :
@@ -100,7 +104,7 @@ bool EventTest::HandleEvent (iEvent &ev)
       uint but = csJoystickEventHelper::GetButton (&ev);
       bool butstate = csJoystickEventHelper::GetButtonState (&ev);
       uint32 butmask = csJoystickEventHelper::GetButtonMask (&ev);
-      printf ("Joystick %s: device=%d but=%d(state=%d,mask=%08" PRIu32 ") "
+      csPrintf ("Joystick %s: device=%d but=%d(state=%d,mask=%08" PRIu32 ") "
           "mods=%08" PRIu32 " desc='%s'\n",
           butstate ? "DO" : "UP", device, but, butstate, butmask,
           modifiers, str.GetData ());
@@ -110,7 +114,7 @@ bool EventTest::HandleEvent (iEvent &ev)
       size_t pos = str.Find ("Axis");
       str.SubString (desc, pos + 4, (size_t)-1);
       uint axisnum = atoi(desc.GetData ());
-      printf ("Joystick MOVE: device=%d axis=%" PRId32 " value=%d "
+      csPrintf ("Joystick MOVE: device=%d axis=%" PRId32 " value=%d "
           "mods=%08" PRIu32 " desc='%s'\n",
           device, axisnum, data.axes[axisnum], modifiers, str.GetData ());
     }
