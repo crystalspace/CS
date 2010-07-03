@@ -22,6 +22,7 @@
 #include "csutil/ansiparse.h"
 #include "csutil/csstring.h"
 #include "csutil/csunicode.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
@@ -55,6 +56,43 @@ static const WORD ansiToWindows[8] =
   FOREGROUND_BLUE | FOREGROUND_GREEN,
   FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED
 };
+
+static int WriteConsoleUTF8 (HANDLE hCon, const utf8_char* inStr, size_t inLen)
+{
+  // According to MSDN, WriteConsole() takes at most 64K characters
+  static const size_t maxConsoleWrite = 64*1024;
+
+  wchar_t wideBuf[maxConsoleWrite];
+  size_t remaining = inLen;
+  while (remaining > 0)
+  {
+    size_t wideBufRemain = maxConsoleWrite;
+    wchar_t* wideBufOut = wideBuf;
+
+    while (wideBufRemain > 0)
+    {
+      utf32_char ch;
+      int srcEncSize = csUnicodeTransform::UTF8Decode (inStr, remaining, ch);
+      utf16_char ch_wide[CS_UC_MAX_UTF16_ENCODED];
+      int dstEncSize = csUnicodeTransform::EncodeUTF16 (ch, ch_wide, CS_UC_MAX_UTF16_ENCODED);
+      if (size_t (dstEncSize) <= wideBufRemain)
+      {
+        memcpy (wideBufOut, ch_wide, dstEncSize * sizeof (wchar_t));
+        wideBufOut += dstEncSize;
+        wideBufRemain -= dstEncSize;
+        inStr += srcEncSize;
+        remaining -= srcEncSize;
+        if (remaining == 0) break;
+      }
+      else
+        break;
+    }
+
+    if (!WriteConsoleW (hCon, wideBuf, maxConsoleWrite - wideBufRemain, nullptr, nullptr))
+      return EOF;
+  }
+  return 0;
+}
 
 static int _cs_fputs (const char* string, FILE* stream)
 {
@@ -240,11 +278,11 @@ static int _cs_fputs (const char* string, FILE* stream)
 	oldAttr = textAttr;
       }
       int rc;
-      if (isTTY && (cp != CP_UTF8))
+      if (isTTY)
       {
-	/* We're writing to a console, the UTF-8 text has to be converted to the 
-	 * output codepage. */
-	rc = fputs (cswinCtoA (tmp, cp), stream);
+	/* We're writing to a console - give Windows the string in Unicode
+           and let it do the conversion */
+        rc = WriteConsoleUTF8 (hCon, (utf8_char*)tmp.GetData(), tmp.Length());
       }
       else
       {
