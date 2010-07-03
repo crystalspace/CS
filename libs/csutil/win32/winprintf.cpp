@@ -110,7 +110,6 @@ static int _cs_fputs (const char* string, FILE* stream)
   }
 
   size_t ret = 0;
-  csString tmp;
   size_t ansiCommandLen;
   csAnsiParser::CommandClass cmdClass;
   size_t textLen;
@@ -118,7 +117,7 @@ static int _cs_fputs (const char* string, FILE* stream)
   while (csAnsiParser::ParseAnsi (string, ansiCommandLen, cmdClass, textLen))
   {
     ret += textLen;
-    tmp.Replace (string + ansiCommandLen, textLen);
+    const char* textPtr = string + ansiCommandLen;
     
     if (isTTY && (cmdClass != csAnsiParser::classNone && 
                   cmdClass != csAnsiParser::classUnknown))
@@ -282,13 +281,12 @@ static int _cs_fputs (const char* string, FILE* stream)
       {
 	/* We're writing to a console - give Windows the string in Unicode
            and let it do the conversion */
-        rc = WriteConsoleUTF8 (hCon, (utf8_char*)tmp.GetData(), tmp.Length());
+        rc = WriteConsoleUTF8 (hCon, (utf8_char*)textPtr, textLen);
       }
       else
       {
-	/* Not much to do - the text can be dumped to the stream,
-	 * Windows will care about proper output. */
-	rc = fputs (tmp.GetDataSafe(), stream);
+	/* Not much to do - dump raw text to the stream. */
+	rc = fwrite (textPtr, 1, textLen, stream);
       }
 
       if (rc == EOF)
