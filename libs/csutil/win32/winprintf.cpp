@@ -306,25 +306,25 @@ static int _cs_vfprintf (FILE* stream, const char* format, va_list args)
 {
   int rc;
 
-  int bufsize, newsize = 128;
-  char* str = 0;
+  const size_t initialBufSize = 128;
+  char localBuf[initialBufSize];
+  char* str = localBuf;
   
-  do
+  // use cs_vsnprintf() for consistency across all platforms.
+  size_t newsize = cs_vsnprintf (str, initialBufSize, format, args);
+  if (newsize >= initialBufSize)
   {
-    delete[] str;
-    bufsize = newsize + 1;
-    str = new char[bufsize];
-    // use cs_vsnprintf() for consistency across all platforms.
-    newsize = cs_vsnprintf (str, bufsize, format, args);
+    size_t bufsize = newsize+1;
+    str = (char*)cs_malloc (bufsize);
+    cs_vsnprintf (str, bufsize, format, args);
   }
-  while (bufsize < (newsize + 1));
 
-  // _cs_fputs() will do codepage convertion, if necessary
+  // _cs_fputs() will do codepage conversion, if necessary
   rc = _cs_fputs (str, stream);
-  delete[] str;
+  if (str != localBuf) cs_free (str);
   // On success _cs_fputs() returns a value >= 0, but
   // _cs_vfprintf() should return the number of chars written.
-  return ((rc >= 0) ? (newsize - 1) : -1);
+  return ((rc >= 0) ? newsize : -1);
 }
 
 // Replacement for printf(); exact same prototype/functionality as printf()
