@@ -98,7 +98,13 @@ private:
   // GUI related
   csRef<iVFS> vfs;
   csRef<iCEGUI> cegui;
-  CEGUI::Scrollbar* scrollbar1;
+  csRef<iShaderVarStringSet> svStrings;
+  CEGUI::Scrollbar* sliderShiftR;
+  CEGUI::Scrollbar* sliderShiftTT;
+  CEGUI::Scrollbar* sliderShiftTRT;
+  CEGUI::Scrollbar* sliderWidthR;
+  CEGUI::Scrollbar* sliderWidthTT;
+  CEGUI::Scrollbar* sliderWidthTRT;
 
   //-- csBaseEventHandler
   void Frame ();
@@ -113,8 +119,12 @@ public:
   // Handle exit button clicked event
   bool OnExitButtonClicked (const CEGUI::EventArgs& e);
   bool OnCollidersButtonClicked (const CEGUI::EventArgs& e);
-  bool OnUpdateButtonClicked (const CEGUI::EventArgs& e);
-  bool OnEventThumbTrackEnded (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedShiftR (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedShiftTT (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedShiftTRT (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedWidthR (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedWidthTT (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedWidthTRT (const CEGUI::EventArgs& e);
 
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);

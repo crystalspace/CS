@@ -101,7 +101,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     // Set HairStrandGenerator
     virtual void SetFurMaterialWrapper( iFurStrandGenerator* hairStrandGenerator);
     // Get HairStrandGenerator
-    virtual iFurStrandGenerator* GetFurMaterialWrapper( );
+    virtual iFurStrandGenerator* GetFurStrandGenerator( );
 
     // From iMaterial
     /// Associate a shader with a shader type

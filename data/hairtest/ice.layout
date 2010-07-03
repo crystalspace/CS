@@ -5,9 +5,9 @@
         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
 
         <Window Type="ice/FrameWindow" Name="HairTest/MainWindow" >
-            <Property Name="Text" Value="HairTest - MainWindow" />
-            <Property Name="UnifiedMaxSize" Value="{{1,0},{0,150.0}}" />
-            <Property Name="UnifiedMinSize" Value="{{1,0},{0,150.0}}" />
+            <Property Name="Text" Value="Hair Editor" />
+            <Property Name="UnifiedMaxSize" Value="{{0,800},{0,150.0}}" />
+            <Property Name="UnifiedMinSize" Value="{{0,800},{0,150.0}}" />
             <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
             <Property Name="SizingEnabled" Value="False"/>
             <Property Name="CloseButtonEnabled" Value="False" />
@@ -16,46 +16,95 @@
                 <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
 
                 <Window Type="DefaultWindow" Name="HairTest/MainWindow/Tab/Page1">
-                    <Property Name="Text" Value="HairTest - Page1" />
+                    <Property Name="Text" Value="General" />
 
                     <Window Type="ice/StaticImage" Name="HairTest/MainWindow/Tab/Page1/Image" >
                         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
 
                         <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Quit" >
                             <Property Name="Text" Value="Exit" />
-                            <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.1,0},{0.99,0},{0.4,0}}" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.1,0},{0.99,0},{0.3,0}}" />
                         </Window>
                       
                         <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Colliders" >
                             <Property Name="Text" Value="Colliders" />
-                            <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.1,0},{0.1,0},{0.4,0}}" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.1,0},{0.1,0},{0.3,0}}" />
                         </Window>
 
                     </Window>
                 </Window>
 
                 <Window Type="DefaultWindow" Name="HairTest/MainWindow/Tab/Page2">
-                    <Property Name="Text" Value="HairTest - Page2" />
+                    <Property Name="Text" Value="Surface properties" />
   
                     <Window Type="ice/StaticImage" Name="HairTest/MainWindow/Tab/Page2/Image" >
                         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
 						
-                        <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page2/Update" >
-                            <Property Name="Text" Value="Update" />
-                            <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.7,0},{0.99,0},{0.99,0}}" />
-                        </Window>
-						
 						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page2/StaticText1" >
-							<Property Name="Text" Value="Param:" />
+							<Property Name="Text" Value="Shift R:" />
 							<Property Name="BackgroundEnabled" Value="False" />
 							<Property Name="FrameEnabled" Value="False" />
-                            <Property Name="UnifiedAreaRect" Value="{{0.0,0},{0.1,0},{0.1,0},{0.3,0}}" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.025,0},{0.05,0},{0.125,0},{0.2,0}}" />
 						</Window>						
 					  
                         <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page2/Slider1" >
-                            <Property Name="Text" Value="Update" />
-                            <Property Name="UnifiedAreaRect" Value="{{0.1,0},{0.1,0},{0.45,0},{0.3,0}}" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.125,0},{0.05,0},{0.475,0},{0.2,0}}" />
                         </Window>						
+						
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page2/StaticText2" >
+							<Property Name="Text" Value="Shift TT:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.025,0},{0.3,0},{0.125,0},{0.45,0}}" />
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page2/Slider2" >
+                            <Property Name="UnifiedAreaRect" Value="{{0.125,0},{0.3,0},{0.475,0},{0.45,0}}" />
+                        </Window>							
+						
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page2/StaticText3" >
+							<Property Name="Text" Value="Shift TRT:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.025,0},{0.55,0},{0.125,0},{0.7,0}}" />
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page2/Slider3" >
+                            <Property Name="UnifiedAreaRect" Value="{{0.125,0},{0.55,0},{0.475,0},{0.7,0}}" />
+                        </Window>						
+						
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page2/StaticText4" >
+							<Property Name="Text" Value="Width R:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.525,0},{0.05,0},{0.625,0},{0.2,0}}" />
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page2/Slider4" >
+                            <Property Name="UnifiedAreaRect" Value="{{0.625,0},{0.05,0},{0.975,0},{0.2,0}}" />
+                        </Window>							
+						
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page2/StaticText5" >
+							<Property Name="Text" Value="Width TT:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.525,0},{0.3,0},{0.625,0},{0.45,0}}" />
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page2/Slider5" >
+                            <Property Name="UnifiedAreaRect" Value="{{0.625,0},{0.3,0},{0.975,0},{0.45,0}}" />
+                        </Window>						
+						
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page2/StaticText6" >
+							<Property Name="Text" Value="Width TRT:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.525,0},{0.55,0},{0.625,0},{0.7,0}}" />
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page2/Slider6" >
+                            <Property Name="UnifiedAreaRect" Value="{{0.625,0},{0.55,0},{0.975,0},{0.7,0}}" />
+                        </Window>							
 						
                     </Window>
 

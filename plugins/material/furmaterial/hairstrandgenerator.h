@@ -35,10 +35,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 {
   class MarschnerConstants
   {
+/*
+  Surface properties
+    aR longitudinal shift: R lobe -10 to -5
+    aTT longitudinal shift: TT lobe -aR/2
+    aTRT longitudinal shift: TRT lobe -3aR/2
+ 
+    bR longitudinal width (stdev.): R lobe 5 to 10
+    bTT longitudinal width (stdev.): TT lobe bR/2
+    bTRT longitudinal width (stdev.): TRT lobe 2bR
+  
+   Fiber properties
+	eta: 1.55
+	absorption: 0.2 to inf
+	eccentricity: 0.85 to 1
+ 
+   Glints
+    kG glint scale factor: 0.5 to 5
+    wc azimuthal width of caustic: 10 to 25
+    Dh0 fade range for caustic merge: 0.2 to 0.4
+    DhM caustic intensity limit: 0.5
+*/
   public:         
     CS_LEAKGUARD_DECLARE(MarschnerConstants);
+    // Synchronized shader variables with this class
     MarschnerConstants();
-    virtual ~MarschnerConstants();
 
     // Surface properties
     float aR;
@@ -92,7 +113,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float* gauss_matrix;
     csRef<iTextureHandle> N;
     uint8* n_buf;
+    // Marschner constants functions
     MarschnerConstants* mc;
+    void UpdateConstans();
     // Marschner specific functions
     void UpdateM();
     float ComputeM(float a, float b, int channel);
@@ -134,6 +157,9 @@ struct CubicSolution
 {
   float X1, X2, X3;
   size_t count;
+
+  CubicSolution()
+  { count = 0; }
 
   inline float operator[] (size_t n) const 
   { return (n&2) ? X3 : ( (n&1) ? X2 : X1 ) ; }

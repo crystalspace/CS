@@ -88,12 +88,104 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void HairStrandGenerator::Update()
   {
+    UpdateConstans();
+
     if(!valid && material)
     {
       UpdateM();
       UpdateN();
       valid = true;
     }
+  }
+
+  void HairStrandGenerator::UpdateConstans()
+  {
+    if(!M)
+    {
+      // Surface properties
+      CS::ShaderVarName aR (svStrings, "aR");	
+      material->GetVariableAdd(aR)->SetValue(mc->aR);
+
+      CS::ShaderVarName aTT (svStrings, "aTT");	
+      material->GetVariableAdd(aTT)->SetValue(mc->aTT);
+
+      CS::ShaderVarName aTRT (svStrings, "aTRT");	
+      material->GetVariableAdd(aTRT)->SetValue(mc->aTRT);
+
+      CS::ShaderVarName bR (svStrings, "bR");	
+      material->GetVariableAdd(bR)->SetValue(mc->bR);
+
+      CS::ShaderVarName bTT (svStrings, "bTT");	
+      material->GetVariableAdd(bTT)->SetValue(mc->bTT);
+
+      CS::ShaderVarName bTRT (svStrings, "bTRT");	
+      material->GetVariableAdd(bTRT)->SetValue(mc->bTRT);
+
+      // Fiber properties
+      CS::ShaderVarName eta (svStrings, "eta");	
+      material->GetVariableAdd(eta)->SetValue(mc->eta);
+
+      CS::ShaderVarName absorption (svStrings, "absorption");	
+      material->GetVariableAdd(absorption)->SetValue(mc->absorption);
+
+      CS::ShaderVarName eccentricity (svStrings, "eccentricity");	
+      material->GetVariableAdd(eccentricity)->SetValue(mc->eccentricity);
+
+      // Glints
+      CS::ShaderVarName kG (svStrings, "kG");	
+      material->GetVariableAdd(kG)->SetValue(mc->kG);
+
+      CS::ShaderVarName wc (svStrings, "wc");	
+      material->GetVariableAdd(wc)->SetValue(mc->wc);
+
+      CS::ShaderVarName Dh0 (svStrings, "Dh0");	
+      material->GetVariableAdd(Dh0)->SetValue(mc->Dh0);
+
+      CS::ShaderVarName DhM (svStrings, "DhM");	
+      material->GetVariableAdd(DhM)->SetValue(mc->DhM);
+    }
+
+    // Surface properties
+    CS::ShaderVarName aR (svStrings, "aR");	
+    material->GetVariableAdd(aR)->GetValue(mc->aR);
+
+    CS::ShaderVarName aTT (svStrings, "aTT");	
+    material->GetVariableAdd(aTT)->GetValue(mc->aTT);
+
+    CS::ShaderVarName aTRT (svStrings, "aTRT");	
+    material->GetVariableAdd(aTRT)->GetValue(mc->aTRT);
+
+    CS::ShaderVarName bR (svStrings, "bR");	
+    material->GetVariableAdd(bR)->GetValue(mc->bR);
+
+    CS::ShaderVarName bTT (svStrings, "bTT");	
+    material->GetVariableAdd(bTT)->GetValue(mc->bTT);
+
+    CS::ShaderVarName bTRT (svStrings, "bTRT");	
+    material->GetVariableAdd(bTRT)->GetValue(mc->bTRT);
+
+    // Fiber properties
+    CS::ShaderVarName eta (svStrings, "eta");	
+    material->GetVariableAdd(eta)->GetValue(mc->eta);
+
+    CS::ShaderVarName absorption (svStrings, "absorption");	
+    material->GetVariableAdd(absorption)->GetValue(mc->absorption);
+
+    CS::ShaderVarName eccentricity (svStrings, "eccentricity");	
+    material->GetVariableAdd(eccentricity)->GetValue(mc->eccentricity);
+
+    // Glints
+    CS::ShaderVarName kG (svStrings, "kG");	
+    material->GetVariableAdd(kG)->GetValue(mc->kG);
+
+    CS::ShaderVarName wc (svStrings, "wc");	
+    material->GetVariableAdd(wc)->GetValue(mc->wc);
+
+    CS::ShaderVarName Dh0 (svStrings, "Dh0");	
+    material->GetVariableAdd(Dh0)->GetValue(mc->Dh0);
+
+    CS::ShaderVarName DhM (svStrings, "DhM");	
+    material->GetVariableAdd(DhM)->GetValue(mc->DhM);
   }
 
   // Marschner specific methods
@@ -374,10 +466,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     wc = 10;
     Dh0 = 0.2;
     DhM = 0.5;
-  }
-
-  MarschnerConstants::~MarschnerConstants ()
-  {
   }
 }
 CS_PLUGIN_NAMESPACE_END(FurMaterial)

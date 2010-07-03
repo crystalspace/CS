@@ -325,7 +325,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     this->hairStrandGenerator = hairStrandGenerator;
   }
 
-  iFurStrandGenerator* FurMaterial::GetFurMaterialWrapper( )
+  iFurStrandGenerator* FurMaterial::GetFurStrandGenerator( )
   {
     return hairStrandGenerator;
   }
