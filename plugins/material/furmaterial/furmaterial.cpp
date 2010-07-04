@@ -320,7 +320,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     this->meshFactorySubMesh = meshFactorySubMesh;
   }
 
-  void FurMaterial::SetFurMaterialWrapper( iFurStrandGenerator* hairStrandGenerator)
+  void FurMaterial::SetFurStrandGenerator( iFurStrandGenerator* hairStrandGenerator)
   {
     this->hairStrandGenerator = hairStrandGenerator;
   }

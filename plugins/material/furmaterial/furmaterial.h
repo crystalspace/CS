@@ -99,7 +99,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     // Set Material
     virtual void SetMaterial ( iMaterial* material );
     // Set HairStrandGenerator
-    virtual void SetFurMaterialWrapper( iFurStrandGenerator* hairStrandGenerator);
+    virtual void SetFurStrandGenerator( iFurStrandGenerator* hairStrandGenerator);
     // Get HairStrandGenerator
     virtual iFurStrandGenerator* GetFurStrandGenerator( );
 

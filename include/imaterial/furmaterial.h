@@ -85,7 +85,7 @@ struct iFurMaterial : public virtual iMaterial
 
   virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl) = 0;
 
-  virtual void SetFurMaterialWrapper( iFurStrandGenerator* furStrandMaterial) = 0;
+  virtual void SetFurStrandGenerator( iFurStrandGenerator* furStrandMaterial) = 0;
   virtual iFurStrandGenerator* GetFurStrandGenerator( ) = 0;
 
   virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory ) = 0;
