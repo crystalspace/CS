@@ -114,8 +114,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     GenerateHairStrands(indices, vertexes);
 
     this->view = view;
-    int controlPoints = hairStrands.Get(0).controlPointsCount;
     int numberOfStrains = hairStrands.GetSize();
+
+    if( !numberOfStrains ) 
+      return;
+
+    int controlPoints = hairStrands.Get(0).controlPointsCount;
 
     csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
     if (!engine) csApplicationFramework::ReportError("Failed to locate iEngine plugin!");
@@ -497,8 +501,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     */
     //printf("%f\n", tc.GetOrigin().y);
 
-    int controlPoints = furMaterial->hairStrands.Get(0).controlPointsCount;
     int numberOfStrains = furMaterial->hairStrands.GetSize();
+
+    if (!numberOfStrains)
+      return;
+
+    int controlPoints = furMaterial->hairStrands.Get(0).controlPointsCount;
 
     csVector3 *vbuf = furMaterial->factoryState->GetVertices (); 
 
