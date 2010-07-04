@@ -23195,6 +23195,8 @@ sub csmbWheelUp () { $cspacec::csmbWheelUp }
 sub csmbWheelDown () { $cspacec::csmbWheelDown }
 sub csmbExtra1 () { $cspacec::csmbExtra1 }
 sub csmbExtra2 () { $cspacec::csmbExtra2 }
+sub csmbHWheelLeft () { $cspacec::csmbHWheelLeft }
+sub csmbHWheelRight () { $cspacec::csmbHWheelRight }
 sub csKeyModifierTypeShift () { $cspacec::csKeyModifierTypeShift }
 sub csKeyModifierTypeCtrl () { $cspacec::csKeyModifierTypeCtrl }
 sub csKeyModifierTypeAlt () { $cspacec::csKeyModifierTypeAlt }
