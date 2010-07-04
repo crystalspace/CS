@@ -100,11 +100,12 @@ private:
   csRef<iCEGUI> cegui;
   csRef<iShaderVarStringSet> svStrings;
   CEGUI::Scrollbar* sliderShiftR;
-  CEGUI::Scrollbar* sliderShiftTT;
-  CEGUI::Scrollbar* sliderShiftTRT;
   CEGUI::Scrollbar* sliderWidthR;
-  CEGUI::Scrollbar* sliderWidthTT;
-  CEGUI::Scrollbar* sliderWidthTRT;
+  CEGUI::Scrollbar* sliderAbsorption;
+  CEGUI::Scrollbar* sliderEccentricity;
+  CEGUI::Scrollbar* sliderGlintScale;
+  CEGUI::Scrollbar* sliderCausticWidth;
+  CEGUI::Scrollbar* sliderCausticMerge;
 
   //-- csBaseEventHandler
   void Frame ();
@@ -120,11 +121,12 @@ public:
   bool OnExitButtonClicked (const CEGUI::EventArgs& e);
   bool OnCollidersButtonClicked (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedShiftR (const CEGUI::EventArgs& e);
-  bool OnEventThumbTrackEndedShiftTT (const CEGUI::EventArgs& e);
-  bool OnEventThumbTrackEndedShiftTRT (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedWidthR (const CEGUI::EventArgs& e);
-  bool OnEventThumbTrackEndedWidthTT (const CEGUI::EventArgs& e);
-  bool OnEventThumbTrackEndedWidthTRT (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedAbsorption (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedEccentricity (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedGlintScale (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedCausticWidth (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedCausticMerge (const CEGUI::EventArgs& e);
 
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);

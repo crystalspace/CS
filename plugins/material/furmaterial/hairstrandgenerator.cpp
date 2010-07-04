@@ -106,25 +106,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       CS::ShaderVarName aR (svStrings, "aR");	
       material->GetVariableAdd(aR)->SetValue(mc->aR);
 
-      CS::ShaderVarName aTT (svStrings, "aTT");	
-      material->GetVariableAdd(aTT)->SetValue(mc->aTT);
-
-      CS::ShaderVarName aTRT (svStrings, "aTRT");	
-      material->GetVariableAdd(aTRT)->SetValue(mc->aTRT);
-
       CS::ShaderVarName bR (svStrings, "bR");	
       material->GetVariableAdd(bR)->SetValue(mc->bR);
 
-      CS::ShaderVarName bTT (svStrings, "bTT");	
-      material->GetVariableAdd(bTT)->SetValue(mc->bTT);
-
-      CS::ShaderVarName bTRT (svStrings, "bTRT");	
-      material->GetVariableAdd(bTRT)->SetValue(mc->bTRT);
-
       // Fiber properties
-      CS::ShaderVarName eta (svStrings, "eta");	
-      material->GetVariableAdd(eta)->SetValue(mc->eta);
-
       CS::ShaderVarName absorption (svStrings, "absorption");	
       material->GetVariableAdd(absorption)->SetValue(mc->absorption);
 
@@ -140,34 +125,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       CS::ShaderVarName Dh0 (svStrings, "Dh0");	
       material->GetVariableAdd(Dh0)->SetValue(mc->Dh0);
-
-      CS::ShaderVarName DhM (svStrings, "DhM");	
-      material->GetVariableAdd(DhM)->SetValue(mc->DhM);
     }
 
     // Surface properties
     CS::ShaderVarName aR (svStrings, "aR");	
     material->GetVariableAdd(aR)->GetValue(mc->aR);
-
-    CS::ShaderVarName aTT (svStrings, "aTT");	
-    material->GetVariableAdd(aTT)->GetValue(mc->aTT);
-
-    CS::ShaderVarName aTRT (svStrings, "aTRT");	
-    material->GetVariableAdd(aTRT)->GetValue(mc->aTRT);
+    mc->aTT = -mc->aR/2;
+    mc->aTRT = -3 * mc->aR/2;
 
     CS::ShaderVarName bR (svStrings, "bR");	
     material->GetVariableAdd(bR)->GetValue(mc->bR);
-
-    CS::ShaderVarName bTT (svStrings, "bTT");	
-    material->GetVariableAdd(bTT)->GetValue(mc->bTT);
-
-    CS::ShaderVarName bTRT (svStrings, "bTRT");	
-    material->GetVariableAdd(bTRT)->GetValue(mc->bTRT);
+    mc->bTT = mc->bR/2;
+    mc->bTRT = 2 * mc->bR;
 
     // Fiber properties
-    CS::ShaderVarName eta (svStrings, "eta");	
-    material->GetVariableAdd(eta)->GetValue(mc->eta);
-
     CS::ShaderVarName absorption (svStrings, "absorption");	
     material->GetVariableAdd(absorption)->GetValue(mc->absorption);
 
@@ -183,9 +154,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     CS::ShaderVarName Dh0 (svStrings, "Dh0");	
     material->GetVariableAdd(Dh0)->GetValue(mc->Dh0);
-
-    CS::ShaderVarName DhM (svStrings, "DhM");	
-    material->GetVariableAdd(DhM)->GetValue(mc->DhM);
   }
 
   // Marschner specific methods
@@ -448,9 +416,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   MarschnerConstants::MarschnerConstants()
   {
     // Surface properties
-    aR = -10;
-    aTT = - (-10) / 2;
-    aTRT = - 3 * (-10) / 2;
+    aR = -5;
+    aTT = - (-5) / 2;
+    aTRT = - 3 * (-5) / 2;
 
     bR = 5;
     bTT = (5) / 2;

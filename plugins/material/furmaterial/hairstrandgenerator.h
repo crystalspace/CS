@@ -45,12 +45,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     bTT longitudinal width (stdev.): TT lobe bR/2
     bTRT longitudinal width (stdev.): TRT lobe 2bR
   
-   Fiber properties
-	eta: 1.55
-	absorption: 0.2 to inf
-	eccentricity: 0.85 to 1
+  Fiber properties
+	  eta: 1.55
+	  absorption: 0.2 to inf
+	  eccentricity: 0.85 to 1
  
-   Glints
+  Glints
     kG glint scale factor: 0.5 to 5
     wc azimuthal width of caustic: 10 to 25
     Dh0 fade range for caustic merge: 0.2 to 0.4
