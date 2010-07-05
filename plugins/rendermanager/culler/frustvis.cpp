@@ -48,61 +48,7 @@
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
 #include "frustvis.h"
-
-//----------------------------------------------------------------------
-
-class csFrustVisObjIt :
-  public scfImplementation1<csFrustVisObjIt, iVisibilityObjectIterator>
-{
-private:
-  csFrustumVis::VistestObjectsArray* vector;
-  size_t position;
-  bool* vistest_objects_inuse;
-
-public:
-  csFrustVisObjIt (csFrustumVis::VistestObjectsArray* vector,
-    bool* vistest_objects_inuse) :
-    scfImplementationType(this)
-  {
-    csFrustVisObjIt::vector = vector;
-    csFrustVisObjIt::vistest_objects_inuse = vistest_objects_inuse;
-    if (vistest_objects_inuse) *vistest_objects_inuse = true;
-    Reset ();
-  }
-  virtual ~csFrustVisObjIt ()
-  {
-    // If the vistest_objects_inuse pointer is not 0 we set the
-    // bool to false to indicate we're no longer using the base
-    // vector. Otherwise we delete the vector.
-    if (vistest_objects_inuse)
-      *vistest_objects_inuse = false;
-    else
-      delete vector;
-  }
-
-  virtual iVisibilityObject* Next()
-  {
-    if (position == (size_t)-1) return 0;
-    iVisibilityObject* vo = vector->Get (position);
-    position++;
-    if (position == vector->GetSize ())
-      position = (size_t)-1;
-    return vo;
-  }
-
-  virtual void Reset()
-  {
-    if (vector == 0 || vector->GetSize () < 1)
-      position = (size_t)-1;
-    else
-      position = 0;
-  }
-
-  virtual bool HasNext () const
-  {
-    return ((position != (size_t)-1) && position <= vector->GetSize ());
-  }
-};
+#include "chcpp.h"
 
 //----------------------------------------------------------------------
 
@@ -172,6 +118,11 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   delete kdtree;
 
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  g3d->GetDriver2D()->PerformExtension("getextmanager", &ext);
+  ext->InitGL_ARB_occlusion_query();
+
+  ext->glGenQueriesARB( 50, idtag );
+
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -339,15 +290,9 @@ void csFrustumVis::UpdateObject (csFrustVisObjectWrapper* visobj_wrap)
   visobj_wrap->update_number = movable->GetUpdateNumber ();
 }
 
-struct FrustTest_Front2BackData
-{
-  csVector3 pos;
-  iRenderView* rview;
-  csPlane3* frustum;
-  // this is the callback to call when we discover a visible node
-  iVisibilityCullerListener* viscallback;
-};
-
+/*--------------------------------------------------------------------*/
+/*        IMPORTANT...does the essense of the frustum culling         */
+/*--------------------------------------------------------------------*/
 int csFrustumVis::TestNodeVisibility (csKDTree* treenode,
 	FrustTest_Front2BackData* data, uint32& frustum_mask)
 {
@@ -378,7 +323,10 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
   const csBox3& obj_bbox = obj->child->GetBBox ();
   if (obj_bbox.Contains (data->pos))
   {
+	 // ext->glBeginQuery(GL_SAMPLES_PASSED_ARB,idtag[1]);
+
     data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
+	//ext->glEndQuery(GL_SAMPLES_PASSED_ARB);
     return true;
   }
   
@@ -422,54 +370,9 @@ static void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
 
 }
 
-void csFrustumVis::FrustTest_Traverse (csKDTree* treenode,
-	FrustTest_Front2BackData* data,
-	uint32 cur_timestamp, uint32 frustum_mask)
-{
-  // In the first part of this test we are going to test if the node
-  // itself is visible. If it is not then we don't need to continue.
-  int nodevis = TestNodeVisibility (treenode, data, frustum_mask);
-  if (nodevis == NODE_INVISIBLE)
-    return;
-
-  if (nodevis == NODE_VISIBLE && frustum_mask == 0)
-  {
-    // Special case. The node is visible and the frustum mask is 0.
-    // This means that the node is completely visible and it doesn't
-    // make sense to continue testing visibility. However we need
-    // to call the callback on all visible objects. So we traverse the
-    // tree manually from this point on. To stop the Front2Back traversal
-    // we return false here.
-    CallVisibilityCallbacksForSubtree (treenode, data, cur_timestamp);
-    return;
-  }
-
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
-  int i;
-  for (i = 0 ; i < num_objects ; i++)
-  {
-    if (objects[i]->timestamp != cur_timestamp)
-    {
-      objects[i]->timestamp = cur_timestamp;
-      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-      	objects[i]->GetObject ();
-      TestObjectVisibility (visobj_wrap, data, frustum_mask);
-    }
-  }
-
-  csKDTree* child1 = treenode->GetChild1 ();
-  if (child1) FrustTest_Traverse (child1, data, cur_timestamp, frustum_mask);
-  csKDTree* child2 = treenode->GetChild2 ();
-  if (child2) FrustTest_Traverse (child2, data, cur_timestamp, frustum_mask);
-
-  return;
-}
-
+/*------------------------------------------------------------------*/
+/*--------------------------- MAIN DADDY ---------------------------*/
+/*------------------------------------------------------------------*/
 bool csFrustumVis::VisTest (iRenderView* rview, 
                             iVisibilityCullerListener* viscallback, int, int)
 {
@@ -483,6 +386,18 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   if (viscallback == 0)
     return false;
 
+  iGraphics3D *g3d=rview->GetGraphics3D();
+  iGraphics2D *g2d=rview->GetGraphics2D();
+
+  if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+  {
+    //ReportError("Cannot prepare renderer for 3D drawing.");
+	printf("Cannot prepare renderer for 3D drawing\n");
+        return false;
+  }
+
+  g3d->FinishDraw();
+
   // Data for the vis tester.
   FrustTest_Front2BackData data;
 
@@ -490,13 +405,64 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   csRenderContext* ctxt = rview->GetRenderContext ();
   data.frustum = ctxt->clip_planes;
   uint32 frustum_mask = ctxt->clip_planes_mask;
+  uint32 cur_timestamp = kdtree->NewTraversal ();
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
   data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   data.rview = rview;
   data.viscallback = viscallback;
-  FrustTest_Traverse (kdtree, &data, kdtree->NewTraversal (), frustum_mask);
+
+  NodeTraverseData ntd;
+  ntd.u32Frustum_Mast=frustum_mask;
+  ntd.kdtParent=NULL;
+  ntd.kdtNode=kdtree;
+  T_Queue.PushBack(NodeTraverseData(NULL,kdtree,frustum_mask));
+
+  while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
+  {
+    NodeTraverseData ntdAux=T_Queue.Front();
+    T_Queue.PopFront();
+
+    int nodevis = TestNodeVisibility (ntdAux.kdtNode, &data,frustum_mask);
+    if (nodevis == NODE_INVISIBLE)
+      continue;
+
+    if (nodevis == NODE_VISIBLE && frustum_mask == 0)
+    {
+      CallVisibilityCallbacksForSubtree (ntdAux.kdtNode, &data, cur_timestamp);
+      continue;
+    }
+
+    ntdAux.kdtNode->Distribute ();
+
+    int num_objects;
+    csKDTreeChild** objects;
+    num_objects = ntdAux.kdtNode->GetObjectCount ();
+    objects = ntdAux.kdtNode->GetObjects ();
+    int i;
+    for (i = 0 ; i < num_objects ; i++)
+    {
+      if (objects[i]->timestamp != cur_timestamp)
+      {
+        objects[i]->timestamp = cur_timestamp;
+        csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	  objects[i]->GetObject ();
+        TestObjectVisibility (visobj_wrap, &data, frustum_mask);
+      }
+    }
+
+    csKDTree* child1 = ntdAux.kdtNode->GetChild1 ();
+    if (child1) 
+    {
+      T_Queue.PushBack(NodeTraverseData(ntdAux.kdtNode,child1,frustum_mask));
+    }
+    csKDTree* child2 = ntdAux.kdtNode->GetChild2 ();
+    if (child2)
+    {
+      T_Queue.PushBack(NodeTraverseData(ntdAux.kdtNode,child2,frustum_mask));
+    }
+  }
 
   return true;
 }

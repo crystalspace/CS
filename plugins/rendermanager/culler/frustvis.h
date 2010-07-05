@@ -22,7 +22,9 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
+#include "csplugincommon/rendermanager/rendertree.h"
 #include "csutil/array.h"
+#include "csutil/list.h"
 #include "csutil/parray.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/hash.h"
@@ -33,6 +35,14 @@
 #include "iengine/viscull.h"
 #include "iengine/movable.h"
 #include "iengine/mesh.h"
+#include <csplugincommon/opengl/glextmanager.h>
+
+enum NodeVisibility
+{
+  NODE_INVISIBLE,
+  NODE_VISIBLE,
+  NODE_INSIDE
+};
 
 class csKDTree;
 class csKDTreeChild;
@@ -40,7 +50,32 @@ class csFrustumVis;
 struct iMovable;
 struct iMeshWrapper;
 
-struct FrustTest_Front2BackData;
+struct FrustTest_Front2BackData
+{
+  csVector3 pos;
+  iRenderView* rview;
+  csPlane3* frustum;
+  // this is the callback to call when we discover a visible node
+  iVisibilityCullerListener* viscallback;
+};
+
+//----------------------------------------------------------------------
+
+struct NodeTraverseData
+{
+  NodeTraverseData() : kdtParent(0), kdtNode(0), u32Frustum_Mast(0)
+  {
+  }
+  NodeTraverseData(csKDTree* kdtP,csKDTree* kdtN, uint32 frustum_mask)
+  {
+    kdtParent=kdtP;
+    kdtNode=kdtN;
+    u32Frustum_Mast=frustum_mask;
+  }
+  csKDTree* kdtParent;
+  csKDTree* kdtNode;
+  uint32 u32Frustum_Mast;
+};
 
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
@@ -55,6 +90,8 @@ public:
   csKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
+
+  bool bVisible;
 
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
@@ -84,6 +121,8 @@ public:
     VistestObjectsArray;
   VistestObjectsArray vistest_objects;
   bool vistest_objects_inuse;	// If true the vector is in use.
+  csGLExtensionManager* ext;	// <--- pointer to extention manager, used for occlusion culling
+  unsigned int idtag[100];
 
 private:
   iObjectRegistry *object_reg;
@@ -113,19 +152,16 @@ private:
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
-  // Traverse the kdtree for frustum culling.
-  void FrustTest_Traverse (csKDTree* treenode,
-	FrustTest_Front2BackData* data,
-	uint32 cur_timestamp, uint32 frustum_mask);
+  csList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
+  csList<NodeTraverseData> I_Queue; // I queue (invisible queue)
+  csList<NodeTraverseData> V_Queue; // V queue (visible queue)
+  csList<NodeTraverseData> Q_Queue; // Q queue (query queue)
 
 public:
   csFrustumVis ();
   virtual ~csFrustumVis ();
   virtual bool Initialize (iObjectRegistry *object_reg);
 
-#define NODE_INSIDE 2
-#define NODE_VISIBLE 1
-#define NODE_INVISIBLE 0
   // Test visibility for the given node. Returns 2 if camera is inside node,
   // 1 if visible normally, or 0 if not visible.
   // This function will also modify the frustum_mask in 'data'. So
@@ -168,6 +204,61 @@ public:
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = true);
   virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
+};
+
+/*----------------------------------------------------------------------------*/
+
+class csFrustVisObjIt :
+  public scfImplementation1<csFrustVisObjIt, iVisibilityObjectIterator>
+{
+private:
+  csFrustumVis::VistestObjectsArray* vector;
+  size_t position;
+  bool* vistest_objects_inuse;
+
+public:
+  csFrustVisObjIt (csFrustumVis::VistestObjectsArray* vector,
+    bool* vistest_objects_inuse) :
+    scfImplementationType(this)
+  {
+    csFrustVisObjIt::vector = vector;
+    csFrustVisObjIt::vistest_objects_inuse = vistest_objects_inuse;
+    if (vistest_objects_inuse) *vistest_objects_inuse = true;
+    Reset ();
+  }
+  virtual ~csFrustVisObjIt ()
+  {
+    // If the vistest_objects_inuse pointer is not 0 we set the
+    // bool to false to indicate we're no longer using the base
+    // vector. Otherwise we delete the vector.
+    if (vistest_objects_inuse)
+      *vistest_objects_inuse = false;
+    else
+      delete vector;
+  }
+
+  virtual iVisibilityObject* Next()
+  {
+    if (position == (size_t)-1) return 0;
+    iVisibilityObject* vo = vector->Get (position);
+    position++;
+    if (position == vector->GetSize ())
+      position = (size_t)-1;
+    return vo;
+  }
+
+  virtual void Reset()
+  {
+    if (vector == 0 || vector->GetSize () < 1)
+      position = (size_t)-1;
+    else
+      position = 0;
+  }
+
+  virtual bool HasNext () const
+  {
+    return ((position != (size_t)-1) && position <= vector->GetSize ());
+  }
 };
 
 #endif // __CS_FRUSTVIS_H__
