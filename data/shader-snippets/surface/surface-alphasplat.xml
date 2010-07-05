@@ -275,7 +275,6 @@
         tempColor = tex2D (texDiffuse8, texCoord*texture_scale);
         tempColor *= tex2D (texAlpha2, texCoord).w;
         surfaceColor += tempColor;
-      <?endif?>
 
       <?if vars."tex alpha 3".texture ?>
         tempColor = tex2D (texDiffuse9, texCoord*texture_scale);
@@ -289,7 +288,8 @@
         tempColor = tex2D (texDiffuse11, texCoord*texture_scale);
         tempColor *= tex2D (texAlpha3, texCoord).z;
         surfaceColor += tempColor;
-      <?endif?>
+      <?endif?><?! vars."tex alpha 3".texture ?>
+      <?endif?><?! vars."tex alpha 2".texture ?>
 
       surfaceColor_attr_perfragment = true;
     </block>
