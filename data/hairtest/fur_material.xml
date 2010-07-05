@@ -17,9 +17,10 @@
     <material name='marschner_material'>
       <shader type='standard'>marschner_lookup_cg</shader>
 	  
+	  <shadervar type="vector3" name="hair color">0.51, 0.34, 0.25</shadervar>
 <!-- Uncomment the following line for red hair -->	  
 <!--	  
-	  <shadervar type="vector3" name="mat furcolor">1,0,0</shadervar>
+	  <shadervar type="vector3" name="light 0 position">1,0,0</shadervar>
 -->	  
     </material>
   </materials>

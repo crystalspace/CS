@@ -255,15 +255,15 @@ bool KrystalScene::CreateAvatar ()
   idle05NodeFactory->SetAutomaticStop (false);
   idle06NodeFactory->SetAutomaticStop (false);
   standNodeFactory->SetAutomaticStop (false);
-  /*
-  randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
-  randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
-  randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
-  randomNodeFactory->AddNode (idle04NodeFactory, 1.0f);
-  randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
-  randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
-  randomNodeFactory->AddNode (standNodeFactory, 1.0f);
-  */
+  
+//   randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
+//   randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
+//   //randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
+//   randomNodeFactory->AddNode (idle04NodeFactory, 1.0f);
+//   //randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
+//   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
+//   randomNodeFactory->AddNode (standNodeFactory, 1.0f);
+  
   if (hairTest->physicsEnabled)
   {
     // Create the ragdoll controller
@@ -347,7 +347,23 @@ bool KrystalScene::CreateAvatar ()
   furMaterial->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
   furMaterial->GenerateGeometry(hairTest->view, hairTest->room);
 
-  //hairTest->room->GetLights()->RemoveAll();
+  // add light info for marschner
+  csRef<iShaderVarStringSet> svStrings = 
+    csQueryRegistryTagInterface<iShaderVarStringSet> (
+      hairTest->object_reg, "crystalspace.shader.variablenameset");
+
+  if (!svStrings) 
+    csPrintfErr ("No SV names string set!");
+
+  csRef<iLight> mainLight = hairTest->room->GetLights()->Get(0); 
+
+  CS::ShaderVarName lightPositionName (svStrings, "light 0 position");	
+  materialWrapper->GetMaterial()-> GetVariableAdd(lightPositionName)
+    ->SetValue(mainLight->GetMovable()->GetFullPosition());
+
+  CS::ShaderVarName lightDiffuse (svStrings, "light 0 diffuse");	
+  materialWrapper->GetMaterial()-> GetVariableAdd(lightDiffuse)
+    ->SetValue(mainLight->GetColor());
 
   // Start animation
   rootNode->Play ();

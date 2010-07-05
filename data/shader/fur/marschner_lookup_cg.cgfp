@@ -1,4 +1,7 @@
 <cgfp>
+  <variablemap variable="light 0 diffuse" destination="DiffuseCol" />
+  <variablemap variable="hair color" destination="objColor" />
+  <variablemap variable="constants M" destination="constantsM" />  
   <program>
         <![CDATA[
 
@@ -13,16 +16,17 @@ struct vertex2fragment {
 float4 main (vertex2fragment IN,
 			// Lookup tables for the hair model (fixed point)
 			uniform sampler2D lookup1fixed,
-			uniform sampler2D lookup2fixed ) : COLOR
+			uniform sampler2D lookup2fixed,
+			uniform float DiffuseCol,
+			uniform float4 objColor,
+			uniform float3 constantsM) : COLOR
 {
 	float4 OUT = float4(0, 0, 0, 1);
-    float AmbientCol = 0.1;
-    float DiffuseCol = 0.65;
-	float4 objColor = float4( 0.51, 0.34, 0.25, 1.0 );
+    DiffuseCol = 0.65;
 	
-	float MR_ct = 0.079;
-	float MTT_ct = 0.159;
-	float MTRT_ct = 0.039;
+	float MR_ct = constantsM.x;
+	float MTT_ct = constantsM.y;
+	float MTRT_ct = constantsM.z;
 	
 	float3 Ln = normalize(IN.LightVec);
 	float3 Nn = normalize(IN.WorldNormal);
@@ -44,6 +48,7 @@ float4 main (vertex2fragment IN,
 	
 	float cos_fd = dot( eyePerp, lightPerp ) * rsqrt( dot( eyePerp, eyePerp ) * dot( lightPerp, lightPerp ));
 	float cos_qd = cos( ( asin( sin_qi ) - asin( sin_qo ) ) / 2.0 );
+	//cos_qd = (M.w - 0.5) * 2.0;
 	
     /* Compute the azimuthal reflectance component */
 	float2 uv2 = float2( cos_fd, cos_qd ) * 0.5 + 0.5;
@@ -56,8 +61,6 @@ float4 main (vertex2fragment IN,
 	float4 diffuseColor;
     diffuseColor.rgb = diffuse * objColor.rgb * DiffuseCol;
     diffuseColor.a = objColor.a;
-	float3 ambientColor;
-	ambientColor = objColor.rgb * AmbientCol;	
 	
 	float3 lighting = (( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd));
 	lighting += diffuseColor.rgb;
@@ -65,6 +68,8 @@ float4 main (vertex2fragment IN,
 	OUT.xyz = lighting + diffuseColor.rgb * 0.2 + IN.AmbientColor;
 	
 	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd) + objColor.xyz;
+	//OUT.xyz = M.r / MR_ct;
+	//OUT.xyz = N.a;
 	return OUT;
 }
 

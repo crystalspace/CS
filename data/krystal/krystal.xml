@@ -5,13 +5,11 @@
     <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
   </plugins>
   <shaders>
-<!-- 
-    <shader>
-      <file>/shader/fur/kajiya_kay_cg.xml</file>
-    </shader>
--->	
     <shader>
       <file>/shader/fur/marschner_naludemo_cg.xml</file>
+    </shader>
+	<shader>
+      <file>/shader/fur/marschner_lookup_cg.xml</file>
     </shader>
   </shaders>
   <textures>
@@ -24,35 +22,20 @@
     <texture name='krystal_hairs.png'>
       <file>/lib/krystal/krystal_hairs.png</file>
     </texture>
-    <texture name='lookup1'>
-      <file>/hairtest/lookup1.png</file>
-    </texture>
-    <texture name='lookup2'>
-      <file>/hairtest/lookup2.png</file>
-    </texture>	
   </textures>
   <materials>
     <material name='krystal_material'>
-<!--		
-	  <shader type='standard'>kajiya_kay_cg</shader>
--->	  	  
-	  <shadervar type="vector3" name="mat furcolor">1,1,0</shadervar>
-      <shadervar type="texture" name="tex lookup1">lookup1</shadervar>
-      <shadervar type="texture" name="tex lookup2">lookup2</shadervar>	  
       <texture>krystal_body_h</texture>
       <shadervar type="texture" name="tex specular">krystal_spec</shadervar>
     </material>
     <material name='skull_material'>
-<!--		
-	  <shader type='standard'>marschner_naludemo_cg</shader>	
--->	  	  
+<!-- 	
+	  <shader type='standard'>marschner_lookup_cg</shader>	
+-->	  	
 	  <shadervar type="float" name="width">0.005</shadervar>
 	  <shadervar type="float" name="density">5</shadervar>
 	  <shadervar type="float" name="displaceEps">0.02</shadervar>
 
-      <shadervar type="texture" name="tex lookup1">lookup1</shadervar>
-      <shadervar type="texture" name="tex lookup2">lookup2</shadervar>	  	  
-	  
       <texture>krystal_body_h</texture>
       <shadervar type="texture" name="tex specular">krystal_spec</shadervar>
       <shadervar type="texture" name="density map">krystal_body_h</shadervar>

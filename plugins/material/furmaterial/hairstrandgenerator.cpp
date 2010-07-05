@@ -88,10 +88,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void HairStrandGenerator::Update()
   {
-    UpdateConstans();
-
     if(!valid && material)
     {
+      UpdateConstans();
       UpdateM();
       UpdateN();
       valid = true;
@@ -188,9 +187,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         }
     }
 
-    ComputeM(mc->aR, mc->bR, 0);
-    ComputeM(mc->aTT, mc->bTT, 1);
-    ComputeM(mc->aTRT, mc->bTRT, 2);
+    csVector3 constantsM;
+    constantsM.x = ComputeM(mc->aR, mc->bR, 0) / 255.0f;
+    constantsM.y = ComputeM(mc->aTT, mc->bTT, 1) / 255.0f;
+    constantsM.z = ComputeM(mc->aTRT, mc->bTRT, 2) / 255.0f;
+
+    // alpha is qd
+    for( int x = 0 ; x < width ; x ++ )
+      for (int y = 0 ; y < height; y ++)
+      {
+        float sin_thI = -1.0f + (x * 2.0f) / (width - 1);
+        float sin_thR = -1.0f + (y * 2.0f) / (height - 1);
+        float thI = asin(sin_thI);
+        float thR = asin(sin_thR);
+        float cos_thD = cos( (thI - thR) / 2.0f );
+        m_buf[ 4 * (x + y * width ) + 3 ] = 
+          (uint8)( ( 255.0f * (cos_thD + 1.0f) ) / 2.0f);
+      }
+
+    CS::ShaderVarName constantsMName (svStrings, "constants M");	
+    material->GetVariableAdd(constantsMName)->SetValue(constantsM);
 
     // send buffer to texture
     M->Blit(0, 0, width, height / 2, m_buf);
@@ -212,8 +228,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     for (int x = 0; x < width; x++)
       for (int y = 0; y < height; y++)    
       {
-        float sin_thI = -1.0f + (x * 2.0f) / width;
-        float sin_thR = -1.0f + (y * 2.0f) / height;
+        float sin_thI = -1.0f + (x * 2.0f) / (width - 1);
+        float sin_thR = -1.0f + (y * 2.0f) / (height - 1);
         float thI = (180 * asin(sin_thI) / PI);
         float thR = (180 * asin(sin_thR) / PI);
         float thH = (thR + thI) / 2;
@@ -270,8 +286,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     for( int x = 0 ; x < width ; x ++ )
       for (int y = 0 ; y < height; y ++)
       {
-        float cos_phiD = -1.0f + (x * 2.0f) / width;
-        float cos_thD = -1.0f + (y * 2.0f) / height;
+        float cos_phiD = -1.0f + (x * 2.0f) / (width - 1);
+        float cos_thD = -1.0f + (y * 2.0f) / (height - 1);
         float phiD = acos(cos_phiD);
         float thD = acos(cos_thD);
         n_buf[ 4 * (x + y * width ) ] = (uint8)(255 * SimpleNP(phiD, thD)); // red

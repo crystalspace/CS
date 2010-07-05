@@ -1,4 +1,5 @@
 <cgvp>
+  <variablemap variable="light 0 position" destination="LightPos" />
 <program>
 <![CDATA[
 
@@ -21,9 +22,9 @@ struct vertex2fragment {
 vertex2fragment main (app2vertex IN,
 	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
 	uniform float4x4 ModelViewProj : state.matrix.mvp,
-	uniform float3 LightPos)
+	uniform float4 LightPos)
 {
-	LightPos = float3(9000, 0, 0);
+	LightPos = float4(9000, 0, 0, 0);
 	float3 PointLightColor = 0.1;
 
 	vertex2fragment OUT;
@@ -36,7 +37,7 @@ vertex2fragment main (app2vertex IN,
 	float3 Pw = Po.xyz;
 	
 	// light vector
-	OUT.LightVec = LightPos - Pw;
+	OUT.LightVec = Pw - LightPos.xyz;
 
 	// view vector in world coords:
 	OUT.WorldView = normalize(ModelViewIT[3].xyz - Pw);
