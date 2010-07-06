@@ -91,13 +91,13 @@ struct NodeTraverseData
   {
     if(!kdtNode) return false;
     //if(!((csVisibilityObjectHistory*)kdtNode->GetUserObject())) return false;
-    return ((csVisibilityObjectHistory*)kdtNode->GetUserObject())->GetVisibility();
+    return static_cast<csVisibilityObjectHistory*>(kdtNode->GetUserObject())->GetVisibility();
   }
 
   void SetVisibility(bool bV) const
   {
     if(!kdtNode) return ;
-    ((csVisibilityObjectHistory*)kdtNode->GetUserObject())->SetVisibility(bV);
+    static_cast<csVisibilityObjectHistory*>(kdtNode->GetUserObject())->SetVisibility(bV);
   }
 
   csKDTree* kdtParent;
