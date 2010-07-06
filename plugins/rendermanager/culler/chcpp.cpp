@@ -50,3 +50,23 @@
 #include "frustvis.h"
 #include "chcpp.h"
 
+void csFrustumVis::QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode)
+{
+  I_Queue.PushBack(ntdNode);
+  if(I_Queue.Size()>=PREV_INV_BATCH_SIZE)
+  {
+    // here we'll issue multi queries
+  }
+}
+
+/* Pulls up the visibility */
+void csFrustumVis::PullUpVisibility(NodeTraverseData &ntdNode)
+{
+  NodeTraverseData ntdAux=ntdNode;
+  while(ntdAux.kdtParent && !ntdAux.GetVisibility())
+  {
+    ntdAux.SetVisibility(true);
+    ntdAux.kdtNode=ntdAux.kdtParent;
+    ntdAux.kdtParent=ntdAux.kdtParent->GetParent();
+  }
+}

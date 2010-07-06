@@ -413,11 +413,38 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   data.rview = rview;
   data.viscallback = viscallback;
 
-  NodeTraverseData ntd;
-  ntd.u32Frustum_Mast=frustum_mask;
-  ntd.kdtParent=NULL;
-  ntd.kdtNode=kdtree;
-  T_Queue.PushBack(NodeTraverseData(NULL,kdtree,frustum_mask));
+  NodeTraverseData ntdRoot;
+  ntdRoot.u32Frustum_Mast=frustum_mask;
+  ntdRoot.kdtParent=NULL;
+  ntdRoot.kdtNode=kdtree;
+  
+  ntdRoot.kdtNode->SetUserObject(new csVisibilityObjectHistory());
+  T_Queue.PushBack(ntdRoot);
+
+  /*int num=0;
+  csKDTree *node;
+  NodeTraverseData ntdAux;
+  ntdAux=T_Queue.Front();
+  while((node=ntdAux.kdtNode->GetChild1()))
+  {
+    num++;
+    printf("%d - ",ntdAux.GetVisibility());
+    ntdAux.kdtParent=ntdAux.kdtNode;
+    ntdAux.kdtNode=node;
+  }
+
+  PullUpVisibility(ntdAux);
+  printf("\n\n");
+
+  ntdAux=T_Queue.Front();
+  while((node=ntdAux.kdtNode->GetChild1()))
+  {
+    num++;
+    printf("%d - ",ntdAux.GetVisibility());
+    ntdAux.kdtParent=ntdAux.kdtNode;
+    ntdAux.kdtNode=node;
+  }*/
+
 
   while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
   {
@@ -463,6 +490,8 @@ bool csFrustumVis::VisTest (iRenderView* rview,
       T_Queue.PushBack(NodeTraverseData(ntdAux.kdtNode,child2,frustum_mask));
     }
   }
+
+  // here we should process the remaining nodes in the multi query
 
   return true;
 }

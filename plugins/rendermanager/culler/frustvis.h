@@ -31,11 +31,13 @@
 #include "csutil/set.h"
 #include "csutil/weakref.h"
 #include "csgeom/plane3.h"
+#include "csgeom/kdtree.h"
 #include "imesh/objmodel.h"
 #include "iengine/viscull.h"
 #include "iengine/movable.h"
 #include "iengine/mesh.h"
 #include <csplugincommon/opengl/glextmanager.h>
+#include "chcpp.h"
 
 enum NodeVisibility
 {
@@ -66,15 +68,47 @@ struct NodeTraverseData
   NodeTraverseData() : kdtParent(0), kdtNode(0), u32Frustum_Mast(0)
   {
   }
+  /*NodeTraverseData(NodeTraverseData &ntd)
+  {
+    kdtParent=ntd.kdtParent;
+    kdtNode=ntd.kdtNode;
+    // add a new user object only if there's none
+    if(kdtNode && !kdtNode->GetUserObject())
+      kdtNode->SetUserObject(new csVisibilityObjectHistory());
+    u32Frustum_Mast=ntd.u32Frustum_Mast;
+  }*/
   NodeTraverseData(csKDTree* kdtP,csKDTree* kdtN, uint32 frustum_mask)
   {
     kdtParent=kdtP;
     kdtNode=kdtN;
+    // add a new user object only if there's none
+    if(kdtNode && !kdtNode->GetUserObject())
+      kdtNode->SetUserObject(new csVisibilityObjectHistory());
     u32Frustum_Mast=frustum_mask;
   }
+
+  bool GetVisibility() const
+  {
+    if(!kdtNode) return false;
+    //if(!((csVisibilityObjectHistory*)kdtNode->GetUserObject())) return false;
+    return ((csVisibilityObjectHistory*)kdtNode->GetUserObject())->GetVisibility();
+  }
+
+  void SetVisibility(bool bV) const
+  {
+    if(!kdtNode) return ;
+    ((csVisibilityObjectHistory*)kdtNode->GetUserObject())->SetVisibility(bV);
+  }
+
   csKDTree* kdtParent;
   csKDTree* kdtNode;
   uint32 u32Frustum_Mast;
+
+  ~NodeTraverseData()
+  {
+    //delete kdtNode->GetUserObject();
+    //kdtNode->SetUserObject(0);
+  }
 };
 
 /**
@@ -152,10 +186,13 @@ private:
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
-  csList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
-  csList<NodeTraverseData> I_Queue; // I queue (invisible queue)
-  csList<NodeTraverseData> V_Queue; // V queue (visible queue)
-  csList<NodeTraverseData> Q_Queue; // Q queue (query queue)
+  CHCList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
+  CHCList<NodeTraverseData> I_Queue; // I queue (invisible queue)
+  CHCList<NodeTraverseData> V_Queue; // V queue (nodes that are scheduled for testing in the current frame)
+  CHCList<NodeTraverseData> Q_Queue; // Q queue (query queue)
+
+  void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
+  void PullUpVisibility(NodeTraverseData &ntdNode);
 
 public:
   csFrustumVis ();
