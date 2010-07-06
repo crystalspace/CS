@@ -493,13 +493,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         UpdateHairStrand(&furMaterial->hairStrands.Get(i));
 
     const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
-    /*
-    CS::ShaderVarName objEyePos (furMaterial->svStrings, "objEyePos");	
-    csRef<csShaderVariable> shaderVariable = furMaterial->furMaterial->GetVariable(objEyePos);
-
-    shaderVariable->SetValue(tc.GetOrigin());
-    */
-    //printf("%f\n", tc.GetOrigin().y);
 
     int numberOfStrains = furMaterial->hairStrands.GetSize();
 
@@ -509,39 +502,51 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     int controlPoints = furMaterial->hairStrands.Get(0).controlPointsCount;
 
     csVector3 *vbuf = furMaterial->factoryState->GetVertices (); 
+    iRenderBuffer *tangents = furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT);
+    csRenderBufferLock<csVector3> tan (tangents, CS_BUF_LOCK_NORMAL);
 
     for ( int x = 0 ; x < numberOfStrains ; x ++ )
     {
       int y = 0;
+      csVector3 tangent = csVector3(0);
       csVector3 strip = csVector3(0);
 
       for ( y = 0 ; y < controlPoints - 1; y ++ )
       {
-
         csVector3 firstPoint = furMaterial->hairStrands.Get(x).controlPoints[y];
         csVector3 secondPoint = furMaterial->hairStrands.Get(x).controlPoints[y + 1];
-        csVector3 normal;
-
-        csMath3::CalcNormal(normal, firstPoint, secondPoint, tc.GetOrigin());
-        normal.Normalize();
-        strip = furMaterial->strandWidth * normal;
+        
+        csVector3 binormal;
+        csMath3::CalcNormal(binormal, firstPoint, secondPoint, tc.GetOrigin());
+        binormal.Normalize();
+        strip = furMaterial->strandWidth * binormal;
 
         vbuf[ x * 2 * controlPoints + 2 * y].Set( firstPoint );
         vbuf[ x * 2 * controlPoints + 2 * y + 1].Set( firstPoint + strip );
+
+        csVector3 normal;
+        csMath3::CalcNormal(normal, firstPoint, firstPoint + strip, secondPoint);
+        tangent.Cross(binormal, normal);
+
+        tan.Get(x * 2 * controlPoints + 2 * y).Set( tangent );
+        tan.Get(x * 2 * controlPoints + 2 * y + 1).Set( tangent );
       }
 
       vbuf[ x * 2 * controlPoints + 2 * y].Set
         ( furMaterial->hairStrands.Get(x).controlPoints[y] );
       vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
         ( furMaterial->hairStrands.Get(x).controlPoints[y] + strip );
+
+      tan.Get(x * 2 * controlPoints + 2 * y).Set( tangent );
+      tan.Get(x * 2 * controlPoints + 2 * y + 1).Set( tangent );
     }
 
-    furMaterial->factoryState->CalculateNormals();
-    furMaterial->factoryState->Invalidate();
-
-    furMaterial->factoryState->AddRenderBuffer(CS_BUFFER_TANGENT, 
-      furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT));
-    furMaterial->factoryState->RemoveRenderBuffer(CS_BUFFER_TANGENT);
+//     furMaterial->factoryState->CalculateNormals();
+//     furMaterial->factoryState->Invalidate();
+// 
+//     furMaterial->factoryState->AddRenderBuffer(CS_BUFFER_TANGENT, 
+//       furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT));
+//     furMaterial->factoryState->RemoveRenderBuffer(CS_BUFFER_TANGENT);
 
   }
 
