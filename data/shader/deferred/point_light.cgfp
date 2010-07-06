@@ -32,10 +32,10 @@ float4 main(vertex2fragment IN,
   float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
   float2 screenUV = screenXY * 0.5 + 0.5;
   
-  float4 albedo   = tex2D (gBuffer0, screenUV);
-  float4 normal   = tex2D (gBuffer1, screenUV);
-  float4 specular = tex2D (gBuffer2, screenUV);
-  float4 depth    = tex2D (gBufferDepth, screenUV);
+  float4 albedo  = tex2D (gBuffer0, screenUV);
+  float4 normal  = tex2D (gBuffer1, screenUV);
+  float4 ambient = tex2D (gBuffer2, screenUV);
+  float4 depth   = tex2D (gBufferDepth, screenUV);
   
   float3 screen = GetScreenPosition (screenXY, depth);
   float3 p = ScreenToWorldPosition (screen, ProjInv);
@@ -50,11 +50,11 @@ float4 main(vertex2fragment IN,
   float3 H = normalize (L + V);
   
   float att = Attenuation (dist, AttenVec);
-  float3 ambient = float3 (albedo.a, normal.a, specular.a);
+  float3 specular = float3 (albedo.a, normal.a, ambient.a);
   
   // Compute phong lighting.
   float3 diff = albedo.rgb * LightDiff * saturate (dot (n, L));
-  float3 spec = LightSpec * specular.rgb * pow (saturate (dot (n, H)), 32);
+  float3 spec = LightSpec * specular * pow (saturate (dot (n, H)), 32);
   float3 color = (diff + spec) * att;
 
   return float4 (color, 1.0);

@@ -3,7 +3,6 @@
 <variablemap variable="mat flatcolor" destination="FlatColor" />
 <variablemap variable="specular" destination="ConstSpecular" />
 <variablemap variable="combined ambient" destination="CombinedAmbient" />
-<variablemap variable="world2camera transform inverse" destination="Camera2World" />
 
 <program>
 
@@ -77,7 +76,6 @@ fragmentOutput main(vertex2fragment IN,
                     uniform float3 FlatColor,
                     uniform float3 ConstSpecular,
                     uniform float3 CombinedAmbient,
-                    uniform float3x3 Camera2World,
                     uniform sampler2D TexDiffuse,
                     uniform sampler2D TexNormal,
                     uniform sampler2D TexSpecular,
@@ -124,8 +122,6 @@ fragmentOutput main(vertex2fragment IN,
     float3 ambient = CombinedAmbient;
   <?endif?>
 
-  ambient = CombinedAmbient;
-
   <?if vars."tex normal".texture ?>
     // Transform normal from tangent space to view space.
     float3 normal = tex2D (TexNormal, TexCoord).rgb * 2 - 1;
@@ -139,12 +135,12 @@ fragmentOutput main(vertex2fragment IN,
 
   fragmentOutput output;
 
-  output.Color0 = float4 (diffuse, ambient.r);
-  output.Color1 = float4 (normal, ambient.g);
-  output.Color2 = float4 (specular, ambient.b);
+  output.Color0 = float4 (diffuse, specular.r);
+  output.Color1 = float4 (normal, specular.g);
+  output.Color2 = float4 (ambient, specular.b);
 
   return output;
-  }
+}
 
 </program>
 </include>

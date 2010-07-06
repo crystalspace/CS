@@ -475,16 +475,18 @@ bool RMDeferred::RenderView(iView *view)
     graphics3D->BeginDraw (drawFlags);
     graphics3D->SetWorldToCamera (startContext->cameraTransform.GetInverse ());
     
-    //Iterate through lights adding results into accumulation buffer.
-    DeferredLightRenderer render (graphics3D, 
-      shaderManager, 
-      stringSet, 
-      rview, 
-      colorBuffer0, 
-      colorBuffer1,
-      colorBuffer2,
-      depthBuffer,
-      lightRenderPersistent);
+    // Iterate through lights adding results into accumulation buffer.
+    DeferredLightRenderer render (graphics3D,
+                                  shaderManager,
+                                  stringSet,
+                                  rview,
+                                  colorBuffer0,
+                                  colorBuffer1,
+                                  colorBuffer2,
+                                  depthBuffer,
+                                  lightRenderPersistent);
+
+    render.OutputAmbientLight ();
     
     ForEachLight (*startContext, render);
 

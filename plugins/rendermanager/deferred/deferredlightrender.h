@@ -22,6 +22,7 @@
 #include "cssysdef.h"
 
 #include "csgeom/vector3.h"
+#include "csgeom/projections.h"
 #include "ivideo/graph3d.h"
 #include "cstool/genmeshbuilder.h"
 
@@ -143,6 +144,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
   }
 
   /**
+   * Creates an orthographic projection suitable for drawing fullscreen quads.
+   */
+  inline CS::Math::Matrix4 CreateOrthoProj(iGraphics3D *graphics3D)
+  {
+    float w = graphics3D->GetDriver2D ()->GetWidth ();
+    float h =  graphics3D->GetDriver2D ()->GetHeight ();
+
+    return CS::Math::Projections::Ortho (0, w, 0, h, -1.0f, 10.0f);
+  }
+
+  /**
    * Returns true if the given point is inside the volume of the given point light.
    */
   inline bool IsPointInsidePointLight(const csVector3 &p, iLight *light)
@@ -215,17 +227,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
    * Usage: 
    *  1. Fill GBuffer with desired information.
    *  2. Attach accumulation buffer to receive lighting data.
-   *  3. Iterate over each light in the context.
-   *  4. Call FinishDraw()
+   *  3. Output ambient light.
+   *  4. Iterate over each light in the context.
+   *  5. Call FinishDraw()
    *
    * Example:
    * \code
    * // ... Fill GBuffer with data etc. ...
    *
    * {
-   *   DeferredLightRenderer render (g3d, stringSet, rview
-   *     shaderManager, persistentData);
+   *   DeferredLightRenderer render (...);
    *
+   *   render.OutputAmbientLight();
    *   ForEachLight (context, render);
    *   g3d->FinishDraw();
    * }
@@ -244,20 +257,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
      */
     struct PersistentData
     {
-      /* Mesh used for drawing point lights. Assumed to be center and the 
+      /* Mesh used for drawing point lights. Assumed to be center at the 
        * origin with a radius of 1. */
       csRef<iMeshWrapper> sphereMesh; 
-      csRef<iMaterialWrapper> sphereMaterial;
 
       /* Mesh used for drawing spot lights. Assumed to be a cone with a 
        * height and radius of 1, aligned with the positive y-axis, and its
        * base centered at the origin. */
       csRef<iMeshWrapper> coneMesh;
-      csRef<iMaterialWrapper> coneMaterial;
 
-      /* Mesh and material used for drawing point lights. */
-      csRef<iMeshWrapper> pointMesh;
+      /* Mesh and material used for drawing ambient light. Assumed to be in the
+       * xy plane with the bottom left corner at the origin with a width and 
+       * height of 1 along the positive x and y axes. */
+      csRef<iMeshWrapper> quadMesh;
+
+      /* Materials used for computing lighting results. */
       csRef<iMaterialWrapper> pointMaterial;
+      csRef<iMaterialWrapper> spotMaterial;
+      csRef<iMaterialWrapper> ambientMaterial;
 
       /**
        * Initialize persistent data, must be called once before using the
@@ -289,12 +306,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         sphereMesh = sphereFactory->CreateMeshWrapper ();
 
-        // Creates the spheres material.
-        sphereMaterial = engine->CreateMaterial (
-          "crystalspace.rendermanager.deferred.lightrender.sphere", 
+        // Creates the point light material.
+        pointMaterial = engine->CreateMaterial (
+          "crystalspace.rendermanager.deferred.lightrender.point", 
           NULL);
 
-        sphereMesh->GetMeshObject ()->SetMaterialWrapper (sphereMaterial);
+        sphereMesh->GetMeshObject ()->SetMaterialWrapper (pointMaterial);
 
         if (!loader->LoadShader ("/shader/deferred/point_light.xml"))
         {
@@ -303,7 +320,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         }
 
         iShader *pointLightShader = shaderManager->GetShader ("deferred_point_light");
-        sphereMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), pointLightShader);
+        pointMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), pointLightShader);
 
         // Builds the cone.
         int coneDetail = cfg->GetInt ("RenderManager.Deferred.ConeDetail", 32);
@@ -315,12 +332,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         coneMesh = coneFactory->CreateMeshWrapper ();
 
-        // Creates the cone material.
-        coneMaterial = engine->CreateMaterial (
-          "crystalspace.rendermanager.deferred.lightrender.cone", 
+        // Creates the spot light material.
+        spotMaterial = engine->CreateMaterial (
+          "crystalspace.rendermanager.deferred.lightrender.spot", 
           NULL);
 
-        coneMesh->GetMeshObject ()->SetMaterialWrapper (coneMaterial);
+        coneMesh->GetMeshObject ()->SetMaterialWrapper (spotMaterial);
 
         if (!loader->LoadShader ("/shader/deferred/spot_light.xml"))
         {
@@ -329,7 +346,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         }
 
         iShader *spotLightShader = shaderManager->GetShader ("deferred_spot_light");
-        coneMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), spotLightShader);
+        spotMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), spotLightShader);
+
+        // Builds the quad.
+        CS::Geometry::TesselatedQuad quadPrim (csVector3 (0.0f, 0.0f, 0.0f), 
+                                               csVector3 (0.0f, 1.0f, 0.0f),
+                                               csVector3 (1.0f, 0.0f, 0.0f));
+
+        csRef<iMeshFactoryWrapper> quadFactory = GeneralMeshBuilder::CreateFactory (engine, 
+          "crystalspace.rendermanager.deferred.lightrender.quad", 
+          &quadPrim);
+
+        quadMesh = quadFactory->CreateMeshWrapper ();
+
+        // Creates the ambient material.
+        ambientMaterial = engine->CreateMaterial (
+          "crystalspace.rendermanager.deferred.lightrender.ambient", 
+          NULL);
+
+        quadMesh->GetMeshObject ()->SetMaterialWrapper (ambientMaterial);
+
+        if (!loader->LoadShader ("/shader/deferred/ambient_light.xml"))
+        {
+          csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+            messageID, "Could not load deferred_ambient_light shader");
+        }
+
+        iShader *ambientLightShader = shaderManager->GetShader ("deferred_ambient_light");
+        ambientMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), ambientLightShader);
       }
 
     };
@@ -364,6 +408,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     }
 
     ~DeferredLightRenderer() {}
+
+    /**
+     * Outputs the ambient light present in the gbuffer. Call once per-frame.
+     */
+    void OutputAmbientLight()
+    {
+      RenderAmbientLight ();
+    }
 
     /**
      * Renders a single light.
@@ -428,7 +480,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     {
       RenderLight (light,
                    persistentData.sphereMesh->GetMeshObject (),
-                   persistentData.sphereMaterial->GetMaterial ());
+                   persistentData.pointMaterial->GetMaterial ());
     }
 
     void RenderSpotLight(iLight *light)
@@ -437,13 +489,66 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       RenderLight (light,
                    persistentData.coneMesh->GetMeshObject (),
-                   persistentData.coneMaterial->GetMaterial ());
+                   persistentData.spotMaterial->GetMaterial ());
       
       graphics3D->SetRenderState (G3DRENDERSTATE_EDGES, 0);
     }
 
     void RenderDirectionalLight(iLight *light)
     {
+    }
+
+    void RenderAmbientLight()
+    {
+      iMeshObject *obj = persistentData.quadMesh->GetMeshObject ();
+      iMaterial *mat = persistentData.ambientMaterial->GetMaterial ();
+
+      int num = 0;
+      csRenderMesh **meshes = obj->GetRenderMeshes (num, rview, 
+        persistentData.quadMesh->GetMovable (), 0);
+
+      if (num <= 0)
+        return;
+
+      // Switches to using orthographic projection. 
+      csReversibleTransform oldView = graphics3D->GetWorldToCamera ();
+      CS::Math::Matrix4 oldProj = graphics3D->GetProjectionMatrix ();
+
+      graphics3D->SetWorldToCamera (csReversibleTransform ());
+      graphics3D->SetProjectionMatrix (CreateOrthoProj (graphics3D));
+
+      // Update shader stack.
+      csShaderVariableStack svStack = shaderMgr->GetShaderVariableStack ();
+      iShader *shader = mat->GetShader (stringSet->Request ("gbuffer use"));
+
+      svStack.Clear ();
+      shaderMgr->PushVariables (svStack);
+      shader->PushVariables (svStack);
+
+      // Create quad transform.
+      float w = graphics3D->GetDriver2D ()->GetWidth ();
+      float h = graphics3D->GetDriver2D ()->GetHeight ();
+
+      csMatrix3 S (w, 0, 0,
+                   0, h, 0,
+                   0, 0, 1);
+
+      csReversibleTransform M (S, csVector3 (0.0f, 0.0f, 0.0f));
+
+      // Draw the ambient light quad.
+      DrawLightMesh (meshes, 
+                     num, 
+                     M, 
+                     shader, 
+                     svStack,
+                     false);
+
+      // Restores old transforms.
+      graphics3D->SetWorldToCamera (oldView);
+      graphics3D->SetProjectionMatrix (oldProj);
+
+      // Needed for the change in projection matrix to take effect. 
+      graphics3D->BeginDraw (CSDRAW_3DGRAPHICS);
     }
 
     /**
@@ -473,7 +578,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       lightSVContext->PushVariables (svStack);
       shader->PushVariables (svStack);
 
-      // Draw the point light mesh.
+      // Draw the light mesh.
       iCamera *cam = rview->GetCamera ();
       csVector3 camPos = cam->GetTransform ().This2Other (csVector3 (0.0f, 0.0f, 1.0f));
       
