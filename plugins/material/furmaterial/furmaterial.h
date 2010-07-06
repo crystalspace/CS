@@ -138,6 +138,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csArray<csTriangle> guideHairsTriangles;
     csRef<iFurPhysicsControl> physicsControl;
     csRef<iFurStrandGenerator> hairStrandGenerator;
+    csRandomGen *rng;
     /// Temp fur geometry
     csRef<iAnimatedMeshFactory> meshFactory;
     csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;

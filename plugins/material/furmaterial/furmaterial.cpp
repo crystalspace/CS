@@ -96,10 +96,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     loader = csQueryRegistry<iLoader> (object_reg);
     if (!loader) printf ("Failed to locate Loader!");
+
+    rng = new csRandomGen(csGetTicks());
   }
 
   FurMaterial::~FurMaterial ()
   {
+    delete rng;
   }
 
   void FurMaterial::GenerateGeometry (iView* view, iSector *room)
@@ -245,12 +248,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::SetLOD(float LOD)
   {
-    csRandomGen rng (csGetTicks ());
-    
     // first is always active
     for (size_t i = 1 ; i < guideHairs.GetSize(); i ++)
     {
-      if ( rng.Get() > LOD )
+      if ( rng->Get() > LOD )
         guideHairs.Get(i).isActive = false;
     }
 
@@ -276,7 +277,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurMaterial::GenerateHairStrands (iRenderBuffer* indices, iRenderBuffer* 
     vertexes)
   {
-    csRandomGen rng (csGetTicks ());
     float bA, bB, bC; // barycentric coefficients
 
     float density = 5;
@@ -294,8 +294,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       {
         csHairStrand hairStrand;
 
-        bA = rng.Get();
-        bB = rng.Get() * (1 - bA);
+        bA = rng->Get();
+        bB = rng->Get() * (1 - bA);
         bC = 1 - bA - bB;
 
         hairStrand.guideHairsCount = 3;
