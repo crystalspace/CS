@@ -229,6 +229,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         displaceEps * normsArray[uniqueIndices.Get(i)];
 
       csGuideHair guideHair;
+      guideHair.isActive = true;
       guideHair.controlPointsCount = 5;
       guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 
@@ -238,6 +239,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       guideHairs.Push(guideHair);
     }
+
+    SetLOD(0.5f);
+  }
+
+  void FurMaterial::SetLOD(float LOD)
+  {
+    csRandomGen rng (csGetTicks ());
+    
+    // first is always active
+    for (size_t i = 1 ; i < guideHairs.GetSize(); i ++)
+    {
+      if ( rng.Get() > LOD )
+        guideHairs.Get(i).isActive = false;
+    }
+
+    // print the number of control hairs
+    int count = 0;
+    for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
+      if (guideHairs.Get(i).isActive)
+        count++;
+    csPrintf("%d\n",count);
   }
 
   void FurMaterial::SynchronizeGuideHairs ()
@@ -246,8 +268,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       return;
 
     for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
-      physicsControl->InitializeStrand(i,guideHairs.Get(i).controlPoints, 
-      guideHairs.Get(i).controlPointsCount);
+      if (guideHairs.Get(i).isActive)
+        physicsControl->InitializeStrand(i,guideHairs.Get(i).controlPoints, 
+          guideHairs.Get(i).controlPointsCount);
   }
 
   void FurMaterial::GenerateHairStrands (iRenderBuffer* indices, iRenderBuffer* 
@@ -483,9 +506,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     // first update the control points
     if (furMaterial->physicsControl)
       for (size_t i = 0 ; i < furMaterial->guideHairs.GetSize(); i ++)
-        furMaterial->physicsControl->AnimateStrand(i,
-        furMaterial->guideHairs.Get(i).controlPoints,
-        furMaterial->guideHairs.Get(i).controlPointsCount);
+        if (furMaterial->guideHairs.Get(i).isActive)
+          furMaterial->physicsControl->AnimateStrand(i,
+            furMaterial->guideHairs.Get(i).controlPoints,
+            furMaterial->guideHairs.Get(i).controlPointsCount);
+        else
+          for (size_t j = 0 ; j < furMaterial->guideHairs.Get(i).controlPointsCount ; j ++ )
+            furMaterial->guideHairs.Get(i).controlPoints[j] = 
+              furMaterial->guideHairs.Get(i - 1).controlPoints[j];
 
     // then update the hair strands
     if (furMaterial->physicsControl)
@@ -526,7 +554,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
         csVector3 normal;
         csMath3::CalcNormal(normal, firstPoint, firstPoint + strip, secondPoint);
-        tangent.Cross(binormal, normal);
+        tangent.Cross(-binormal, normal);
 
         tan.Get(x * 2 * controlPoints + 2 * y).Set( tangent );
         tan.Get(x * 2 * controlPoints + 2 * y + 1).Set( tangent );

@@ -75,6 +75,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   {
     csVector3 *controlPoints;
     size_t controlPointsCount;
+    bool isActive;
   };
 
   class FurMaterial : public scfImplementation2<FurMaterial,
@@ -91,6 +92,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     // From iFurMaterial
     virtual void GenerateGeometry (iView* view, iSector *room);
+    virtual void SetLOD(float LOD);
     virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl);
     // Temporary - Set Mesh and Submesh
     virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory);
