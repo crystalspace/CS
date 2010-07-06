@@ -278,6 +278,8 @@ public:
   virtual ~csKDTree ();
   /// Set the parent.
   void SetParent (csKDTree* p) { parent = p; }
+  /// Get the parent.
+  csKDTree* GetParent () const { return parent; }
 
   /// For debugging: set the object descriptor.
   void SetObjectDescriptor (iKDTreeObjectDescriptor* descriptor)
