@@ -233,7 +233,8 @@ namespace CS
 	  context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
 	  
 	  csTicks currentTicks = csGetTicks ();
-	  bool forceUpdate = (persist.texUpdateInterval == 0)
+	  bool forceUpdate = (persist.currentFrame != meshReflectRefract.lastUpdateFrame);
+	  forceUpdate &= (persist.texUpdateInterval == 0)
 	    || ((currentTicks - meshReflectRefract.lastUpdate) >
 	      persist.texUpdateInterval);
 	    
@@ -285,9 +286,6 @@ namespace CS
 	      
 	    forceUpdate = cameraDiff >= persist.cameraChangeThresh;
 	  }
-	  
-	  // But never force an update if we already rendered in this frame
-	  forceUpdate &= (persist.currentFrame != meshReflectRefract.lastUpdateFrame);
   
 	  bool usesReflTex = names.IsBitSetTolerant (persist.svTexPlaneRefl);
 	  bool usesReflDepthTex = names.IsBitSetTolerant (persist.svTexPlaneReflDepth);
@@ -522,30 +520,16 @@ namespace CS
 	      reflCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER
 		| CSDRAW_NOCLIPCLEAR;
 	      reflCtx->shadervars = meshReflectRefract.clipPlaneReflContext;
-	
-	      if (meshReflectRefract.reflectSV)
-	      {
-		svReflection = meshReflectRefract.reflectSV;
-	      }
-	      else
-	      {
-		svReflection.AttachNew (new csShaderVariable (
-		  persist.svTexPlaneRefl));
-		meshReflectRefract.reflectSV = svReflection;
-	      }
+		
+	      svReflection.AttachNew (new csShaderVariable (
+		persist.svTexPlaneRefl));
 	      svReflection->SetValue (tex);
+	      meshReflectRefract.reflectSV = svReflection;
 	      
-	      if (meshReflectRefract.reflectDepthSV)
-	      {
-		svReflectionDepth = meshReflectRefract.reflectDepthSV;
-	      }
-	      else
-	      {
-		svReflectionDepth.AttachNew (new csShaderVariable (
-		  persist.svTexPlaneReflDepth));
-		meshReflectRefract.reflectDepthSV = svReflectionDepth;
-	      }
+	      svReflectionDepth.AttachNew (new csShaderVariable (
+		persist.svTexPlaneReflDepth));
 	      svReflectionDepth->SetValue (texDepth);
+	      meshReflectRefract.reflectDepthSV = svReflectionDepth;
 	      
 	      if (renderTree.IsDebugFlagEnabled (persist.dbgReflRefrTex))
 	      {
@@ -626,30 +610,16 @@ namespace CS
 		| CSDRAW_NOCLIPCLEAR;
 	      refrCtx->shadervars = meshReflectRefract.clipPlaneRefrContext;
 		
-	      // Attach refraction texture to mesh
-	      if (meshReflectRefract.refractSV)
-	      {
-		svRefraction = meshReflectRefract.refractSV;
-	      }
-	      else
-	      {
-		svRefraction.AttachNew (new csShaderVariable (
-		  persist.svTexPlaneRefr));
-		meshReflectRefract.refractSV = svRefraction;
-	      }
+	      // Attach reflection texture to mesh
+	      svRefraction.AttachNew (new csShaderVariable (
+		persist.svTexPlaneRefr));
 	      svRefraction->SetValue (tex);
+	      meshReflectRefract.refractSV = svRefraction;
 	      
-	      if (meshReflectRefract.refractDepthSV)
-	      {
-		svRefractionDepth = meshReflectRefract.refractDepthSV;
-	      }
-	      else
-	      {
-		svRefractionDepth.AttachNew (new csShaderVariable (
-		  persist.svTexPlaneRefrDepth));
-		meshReflectRefract.refractDepthSV = svRefractionDepth;
-	      }
+	      svRefractionDepth.AttachNew (new csShaderVariable (
+		persist.svTexPlaneRefrDepth));
 	      svRefractionDepth->SetValue (texDepth);
+	      meshReflectRefract.refractDepthSV = svRefractionDepth;
 	      
 	      if (renderTree.IsDebugFlagEnabled (persist.dbgReflRefrTex))
 	      {

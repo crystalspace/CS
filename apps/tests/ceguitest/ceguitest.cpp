@@ -220,14 +220,7 @@ bool CEGUITest::OnKeyboard(iEvent& ev)
         csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
-    csPrintf("Keyboard event fell through or no input window, like a 'Editbox', was active.\n");
   }
-  return false;
-}
-
-bool CEGUITest::OnMouseDown(iEvent& ev)
-{
-  csPrintf("Mouse event fell through or user clicked outside a window.\n");
   return false;
 }
 

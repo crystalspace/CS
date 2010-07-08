@@ -316,17 +316,14 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
 
   // Set up camera.
   csRef<iCustomMatrixCamera> newCamera = engine->CreateCustomMatrixCamera(csIMesh->camera);
-  iSectorList* sectorList = csMesh->GetMovable ()->GetSectors ();
-  if (sectorList->GetCount () == 0)
-    return false;
-  newCamera->GetCamera()->SetSector(sectorList->Get(0));
+  newCamera->GetCamera()->SetSector(csMesh->GetMovable()->GetSectors()->Get(0));
 
   // Move camera to look at mesh.
   csVector3 mesh_pos = csMesh->GetWorldBoundingBox ().GetCenter ();
   const csVector3& cam_pos = newCamera->GetCamera()->GetTransform ().GetOrigin ();
   csVector3 camdir = mesh_pos-cam_pos;
-  csVector3 up = newCamera->GetCamera()->GetTransform().GetT2O().Col2();
-  newCamera->GetCamera()->GetTransform ().LookAt (camdir, up);
+  newCamera->GetCamera()->GetTransform ().LookAt (camdir,
+    newCamera->GetCamera()->GetTransform().GetT2O().Col2());
 
   // Get screen bounding box of the mesh.
   csScreenBoxResult rbox = csMesh->GetScreenBoundingBox(newCamera->GetCamera());

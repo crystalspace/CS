@@ -87,11 +87,7 @@ enum csMouseButton
   /// Thumb button 1 (e.g. on 5-button mice)
   csmbExtra1 = 5,
   /// Thumb button 2 (e.g. on 5-button mice)
-  csmbExtra2 = 6,
-  /// Horizontal wheel was scrolled left
-  csmbHWheelLeft = 7,
-  /// Horizontal wheel was scrolled right
-  csmbHWheelRight = 8
+  csmbExtra2 = 6
 };
 
 /** @} */

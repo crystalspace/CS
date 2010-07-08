@@ -37,6 +37,8 @@
  */
 #define OGG_DECODE_BUFFER_SIZE 4096
 
+extern cs_ov_callbacks *GetCallbacks();
+
 SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> pData, 
 					    OggDataStore *pDataStore, csSndSysSoundFormat *pRenderFormat, 
               int Mode3D) :
@@ -58,7 +60,7 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> pData,
   // Initialize ogg file
   memset(&m_VorbisFile,0,sizeof(OggVorbis_File));
   ov_open_callbacks (&m_StreamData,&m_VorbisFile,0,0,
-    SndSysOggSoundData::ogg_callbacks);
+    *(ov_callbacks*)GetCallbacks());
 
   // Set to not a valid stream
   m_CurrentOggStream=-1;

@@ -43,9 +43,6 @@ private:
   // Meshes
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
-
-  // Environments
-  int environment;
   csRef<iMeshWrapper> walls;
 
   // Configuration related
@@ -109,9 +106,7 @@ private:
   void SpawnRope ();
   void SpawnCloth ();
   void SpawnSoftBody ();
-
   void CreateWalls (const csVector3& radius);
-  void CreateTerrain ();
 
 public:
   Simple ();

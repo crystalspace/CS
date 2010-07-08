@@ -35,7 +35,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
-//----------------------- Bullet-CS matrices and vectors conversion ----------------------------
+//---------------------------------------------------------------------------
 
 static inline csReversibleTransform BulletToCS (const btTransform& trans,
 						float inverseInternalScale)
@@ -208,9 +208,46 @@ public:
 public:
   csBulletMotionState (csBulletRigidBody* body,
 		       const btTransform& initialTransform,
-		       const btTransform& principalAxis);
+		       const btTransform& principalAxis)
+    : btDefaultMotionState (initialTransform), body (body),
+      inversePrincipalAxis (principalAxis.inverse ())
+  {
+    if (body->body)
+      body->body->setInterpolationWorldTransform (initialTransform);
 
-  virtual void setWorldTransform (const btTransform& trans);
+    // update attached object
+    if (!body->moveCb)
+      return;
+
+    csOrthoTransform tr = BulletToCS (initialTransform * inversePrincipalAxis,
+				      body->dynSys->inverseInternalScale);
+
+    if (body->mesh)
+      body->moveCb->Execute (body->mesh, tr);
+    if (body->light)
+      body->moveCb->Execute (body->light, tr);
+    if (body->camera)
+      body->moveCb->Execute (body->camera, tr);
+  }
+
+  virtual void setWorldTransform (const btTransform& trans)
+  {
+    btDefaultMotionState::setWorldTransform (trans);
+
+    // update attached object
+    if (!body->moveCb)
+      return;
+
+    csOrthoTransform tr = BulletToCS (trans * inversePrincipalAxis,
+				      body->dynSys->inverseInternalScale);
+
+    if (body->mesh)
+      body->moveCb->Execute (body->mesh, tr);
+    if (body->light)
+      body->moveCb->Execute (body->light, tr);
+    if (body->camera)
+      body->moveCb->Execute (body->camera, tr);
+  }
 };
 
 
@@ -223,9 +260,22 @@ class csBulletKinematicMotionState : public csBulletMotionState
 public:
   csBulletKinematicMotionState (csBulletRigidBody* body,
 		       const btTransform& initialTransform,
-				const btTransform& principalAxis);
+		       const btTransform& principalAxis)
+    : csBulletMotionState (body, initialTransform, principalAxis),
+    principalAxis (BulletToCS (principalAxis, body->dynSys->inverseInternalScale))
+  {
+  }
 
-  virtual void getWorldTransform (btTransform& trans) const;
+  virtual void getWorldTransform (btTransform& trans) const
+  {
+    if (!body->kinematicCb)
+      return;
+
+    // get the body transform from the callback
+    csOrthoTransform transform;
+    body->kinematicCb->GetBodyTransform (body, transform);
+    trans = CSToBullet (principalAxis * transform, body->dynSys->internalScale);
+  }
 };
 
 }

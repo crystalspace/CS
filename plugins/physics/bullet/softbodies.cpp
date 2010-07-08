@@ -30,13 +30,14 @@
 // Bullet includes.
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
+#include "BulletCollision/Gimpact/btGImpactShape.h"
+#include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
 #include "BulletSoftBody/btSoftBody.h"
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 #include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
 #include "BulletSoftBody/btSoftBodyHelpers.h"
 
 #include "softbodies.h"
-#include "rigidbodies.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
@@ -45,8 +46,7 @@ csBulletSoftBody::csBulletSoftBody (csBulletDynamicsSystem* dynSys,
 				    btSoftBody* body)
   : scfImplementationType (this), dynSys (dynSys), body (body)
 {
-  bodyType = CS_BULLET_SOFT_BODY;
-  body->setUserPointer ((BulletBody*) this);
+  body->setUserPointer (this);
 }
 
 csBulletSoftBody::~csBulletSoftBody ()
@@ -96,16 +96,6 @@ csVector3 csBulletSoftBody::GetVertexPosition (size_t index) const
 {
   CS_ASSERT(index < (size_t) body->m_nodes.size ());
   return BulletToCS (body->m_nodes[index].m_x, dynSys->inverseInternalScale);
-}
-
-csVector3 csBulletSoftBody::GetVertexNormal (size_t index) const
-{
-  CS_ASSERT(index < (size_t) body->m_nodes.size ());
-  csVector3 normal (body->m_nodes[index].m_n.getX (),
-		    body->m_nodes[index].m_n.getY (),
-		    body->m_nodes[index].m_n.getZ ());
-  normal.Normalize ();
-  return normal;
 }
 
 void csBulletSoftBody::AnchorVertex (size_t vertexIndex)

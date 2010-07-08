@@ -115,22 +115,6 @@ bool csShaderGLCGVP::Precache (const ProfileLimitsPair& limits,
   return ret;
 }
 
-iShaderProgram::CacheLoadResult csShaderGLCGVP::LoadFromCache (
-  iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
-  csRef<iString>* failReason, csRef<iString>* tag)
-{
-  if (!shaderPlug->enableVP)
-  {
-    if (failReason)
-      failReason->AttachNew (new scfString ("Cg VP not available or disabled"));
-    /* Claim a load success, but invalid shader, to prevent loading from
-	scratch (which will fail anyway) */
-    return loadSuccessShaderInvalid;
-  }
-  return csShaderGLCGCommon::LoadFromCache (cache, previous, programNode,
-    failReason, tag, 0);
-}
-
 csVertexAttrib csShaderGLCGVP::ResolveBufferDestination (const char* binding)
 {
   csVertexAttrib dest = CS_VATTRIB_INVALID;

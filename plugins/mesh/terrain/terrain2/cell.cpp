@@ -419,7 +419,9 @@ csTerrainColliderCollideSegmentResult csTerrainCell::CollideSegment (
 
   if (!collider || !collisionProperties->GetCollidable ()) 
   {
-    return csTerrainColliderCollideSegmentResult ();
+    csTerrainColliderCollideSegmentResult rc;
+    rc.hit = false;
+    return rc;
   }
 
   return collider->CollideSegment (this, start, end);

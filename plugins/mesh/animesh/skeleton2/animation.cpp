@@ -161,8 +161,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS_LEAKGUARD_IMPLEMENT(Animation);
 
   Animation::Animation (const char* name)
-    : scfImplementationType (this), name (name), duration (0),
-    isBindSpace (false)
+    : scfImplementationType (this), name (name), duration (0)
   {
   }
 
@@ -197,19 +196,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return InvalidChannelID;
   }
 
-  size_t Animation::GetChannelCount () const
-  {
-    return channels.GetSize ();
-  }
-
-  BoneID Animation::GetChannelBone (CS::Animation::ChannelID channel) const
-  {
-    CS_ASSERT(channel < channels.GetSize ());
-
-    AnimationChannel* ch = channels[channel];
-    return ch->bone;
-  }
-
   void Animation::AddKeyFrame (ChannelID channel, float time, 
     const csQuaternion& rotation, const csVector3& offset)
   {
@@ -226,22 +212,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       duration = time;
 
     ch->keyFrames.InsertSorted (k, KeyFrameCompare);
-  }
-
-  void Animation::SetKeyFrame (CS::Animation::ChannelID channel, 
-			       CS::Animation::KeyFrameID keyframe,
-			       const csQuaternion& rotation,
-			       const csVector3& offset)
-  {
-    CS_ASSERT(channel < channels.GetSize ());
-
-    AnimationChannel* ch = channels[channel];
-
-    CS_ASSERT(keyframe < ch->keyFrames.GetSize ());
-
-    KeyFrame& k = ch->keyFrames[keyframe];
-    k.rotation = rotation;
-    k.offset = offset;
   }
 
   size_t Animation::GetKeyFrameCount (ChannelID channel) const
@@ -385,16 +355,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   float Animation::GetDuration () const
   {
     return duration;
-  }
-
-  void Animation::SetFramesInBindSpace (bool isBindSpace)
-  {
-    this->isBindSpace = isBindSpace;
-  }
-
-  bool Animation::GetFramesInBindSpace () const
-  {
-    return isBindSpace;
   }
 
   int Animation::KeyFrameCompare (KeyFrame const& k1, KeyFrame const& k2)

@@ -93,15 +93,15 @@ public:
   /// Create a new mouse event
   static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, 
     csTicks, csEventID name, csMouseEventType etype, int x, int y, 
-    uint32 AxesChanged, int button, bool buttonstate, uint32 buttonMask, 
+    uint32 AxesChanged, uint button, bool buttonstate, uint32 buttonMask, 
     const csKeyModifiers& modifiers);
   static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
     csEventID name, uint8 n, csMouseEventType etype, int x, int y, 
-    uint32 axesChanged, int button, bool buttonstate, uint32 buttonMask, 
+    uint32 axesChanged, uint button, bool buttonstate, uint32 buttonMask, 
     const csKeyModifiers& modifiers);
   static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
     csEventID name, uint8 n, csMouseEventType etype, const int32 *axes, 
-    uint8 numAxes, uint32 axesChanged, int button, bool buttonstate, 
+    uint8 numAxes, uint32 axesChanged, uint button, bool buttonstate, 
     uint32 buttonMask, const csKeyModifiers& modifiers);
   //@}
 
@@ -109,7 +109,7 @@ public:
   static CS_DEPRECATED_METHOD_MSG("Use the variant with csKeyModifiers modifiers")
   csEvent *NewEvent (csRef<iEventNameRegistry> &reg, 
     csTicks t, csEventID name, csMouseEventType etype, int x, int y, 
-    uint32 AxesChanged, int button, bool buttonstate, uint32 buttonMask, 
+    uint32 AxesChanged, uint button, bool buttonstate, uint32 buttonMask, 
     uint32 modifiers)
   {
     csKeyModifiers m;
@@ -121,7 +121,7 @@ public:
   static CS_DEPRECATED_METHOD_MSG("Use the variant with csKeyModifiers modifiers")
   csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks t, 
     csEventID name, uint8 n, csMouseEventType etype, int x, int y, 
-    uint32 axesChanged, int button, bool buttonstate, uint32 buttonMask, 
+    uint32 axesChanged, uint button, bool buttonstate, uint32 buttonMask, 
     uint32 modifiers)
   {
     csKeyModifiers m;
@@ -133,7 +133,7 @@ public:
   static CS_DEPRECATED_METHOD_MSG("Use the variant with csKeyModifiers modifiers")
   csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks t, 
     csEventID name, uint8 n, csMouseEventType etype, const int32 *axes, 
-    uint8 numAxes, uint32 axesChanged, int button, bool buttonstate, 
+    uint8 numAxes, uint32 axesChanged, uint button, bool buttonstate, 
     uint32 buttonMask, uint32 modifiers)
   {
     csKeyModifiers m;
@@ -157,7 +157,7 @@ public:
   /// retrieve number of axes
   static uint GetNumAxes(const iEvent *event);
   /// retrieve button code
-  static int GetButton(const iEvent *event);
+  static uint GetButton(const iEvent *event);
   /// retrieve button state (pressed/released)
   static bool GetButtonState(const iEvent *event);
   /// Retrieve current button mask

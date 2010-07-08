@@ -60,7 +60,7 @@ struct datastore
 
 static void png_write (png_structp png, png_bytep data, png_size_t length)
 {
-  datastore *ds = (datastore *)png_get_io_ptr (png);
+  datastore *ds = (datastore *)png->io_ptr;
   if (ds->pos + (long)length > ds->length)
   {
     ds->data = (unsigned char*)cs_realloc (ds->data, ds->pos + (long)length);
@@ -173,7 +173,7 @@ error2:
   }
 
   /* Catch processing errors */
-  if (setjmp(png_jmpbuf(png)))
+  if (setjmp(png->jmpbuf))
   {
     /* If we get here, we had a problem reading the file */
     png_destroy_write_struct (&png, &info);
@@ -355,7 +355,7 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, const char *mime,
 void ImagePngFile::PngLoader::ImagePngRead (png_structp png, png_bytep data, 
 					    png_size_t size)
 {
-  ImagePngRawData *self = (ImagePngRawData *) png_get_io_ptr (png);
+  ImagePngRawData *self = (ImagePngRawData *) png->io_ptr;
 
   if (self->r_size < size)
     png_error (png, "Read Error");
@@ -394,7 +394,7 @@ bool ImagePngFile::PngLoader::InitOk ()
     return false;
   }
 
-  if (setjmp (png_jmpbuf (png)))
+  if (setjmp (png->jmpbuf))
   {
 nomem2:
     // If we get here, we had a problem reading the file
@@ -524,7 +524,7 @@ bool ImagePngFile::PngLoader::LoadData ()
 {
   size_t rowbytes, exp_rowbytes;
 
-  if (setjmp (png_jmpbuf (png)))
+  if (setjmp (png->jmpbuf))
   {
 nomem2:
     // If we get here, we had a problem reading the file
@@ -560,7 +560,7 @@ nomem2:
 
   png_bytep * const row_pointers = new png_bytep[Height];
 
-  if (setjmp (png_jmpbuf (png)))             // Set a new exception handler
+  if (setjmp (png->jmpbuf))             // Set a new exception handler
   {
     delete [] row_pointers;
     goto nomem2;
