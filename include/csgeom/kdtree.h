@@ -393,7 +393,9 @@ public:
    * constantly but it should give a rough idea about the complexity
    * of this node.
    */
-  inline int GetEstimatedObjectCount () { return estimate_total_objects; }
+  inline int GetEstimatedObjectCount () const { return estimate_total_objects; }
+
+  inline bool IsLeaf() const { return !GetChild1 (); }
 
   /**
    * Return the array of objects in this node.
