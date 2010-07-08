@@ -190,19 +190,19 @@ bool Demo::OnKeyboard(iEvent& ev)
         csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
-    else if (code == CSKEY_UP)
+    else if ((code == CSKEY_UP) || (code == 'w'))
     {
       player->Step(1);
     }
-    else if (code == CSKEY_DOWN)
+    else if ((code == CSKEY_DOWN) || (code == 's'))
     {
       player->Step(-1);
     }
-    else if (code == CSKEY_LEFT)
+    else if ((code == CSKEY_LEFT) || (code == 'a'))
     {
       player->Strafe(-1);
     }
-    else if (code == CSKEY_RIGHT)
+    else if ((code == CSKEY_RIGHT) || (code == 'd'))
     {
       player->Strafe(1);
     }
@@ -238,11 +238,11 @@ bool Demo::OnKeyboard(iEvent& ev)
   }
   else if (eventtype == csKeyEventTypeUp)
   {
-    if (code == CSKEY_UP || code == CSKEY_DOWN)
+    if (code == CSKEY_UP || code == CSKEY_DOWN || (code == 'w') || (code == 's'))
     {
       player->Step(0);
     }
-    else if (code == CSKEY_LEFT || code == CSKEY_RIGHT)
+    else if (code == CSKEY_LEFT || code == CSKEY_RIGHT || (code == 'a') || (code == 'd'))
     {
       player->Strafe(0);
     }
