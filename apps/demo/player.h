@@ -29,7 +29,7 @@ private:
   bool HandleEvent(iEvent& ev);
 
 public:
-  Player(iObjectRegistry* or);
+  Player(iObjectRegistry*);
   ~Player();
 
   void Fire(int x, int y);

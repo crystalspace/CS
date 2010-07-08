@@ -63,7 +63,7 @@ protected:
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 
 public:
-  Entity(iObjectRegistry* or);
+  Entity(iObjectRegistry*);
   ~Entity();
 
   iMeshWrapper* LoadMesh(const char* name, const char* file);

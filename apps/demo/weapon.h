@@ -51,7 +51,7 @@ public:
   csRef<iMeshWrapper> mesh;
 
 public:
-  Weapon(iObjectRegistry* or);
+  Weapon(iObjectRegistry*);
   ~Weapon();
 
   bool IsReady();
