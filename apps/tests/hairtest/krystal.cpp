@@ -342,9 +342,9 @@ bool KrystalScene::CreateAvatar ()
   furMaterial->SetPhysicsControl(hairPhysicsControl);
   furMaterial->SetFurStrandGenerator(hairStrandGenerator);
 
-  furMaterial->SetMaterial(skullMaterial->GetMaterial());
   furMaterial->SetMeshFactory(animeshFactory);
   furMaterial->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
+  furMaterial->SetMaterial(skullMaterial->GetMaterial());
   furMaterial->GenerateGeometry(hairTest->view, hairTest->room);
 
   // add light info for marschner
@@ -364,6 +364,8 @@ bool KrystalScene::CreateAvatar ()
   CS::ShaderVarName lightDiffuse (svStrings, "light 0 diffuse");	
   materialWrapper->GetMaterial()-> GetVariableAdd(lightDiffuse)
     ->SetValue(mainLight->GetColor());
+
+  //hairTest->room->GetLights()->RemoveAll();
 
   // Start animation
   rootNode->Play ();

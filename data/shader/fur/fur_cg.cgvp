@@ -5,6 +5,8 @@
 struct app2vertex {
 	float4 Position : POSITION;
 	float4 Normal : NORMAL;
+	float3 Tangent : TEXCOORD0;
+	float3 Binormal : TEXCOORD1;	
 };
 
 struct vertex2fragment { 
@@ -23,10 +25,11 @@ vertex2fragment main (app2vertex IN,
 	uniform float3 LightColor)
 {
 	vertex2fragment OUT;
-    LightPos = float4(0,0,-9000,1);
+    LightPos = float4(9000,0,0,1);
     LightColor = float3(1); 
 
 	float3 eyeNormal = normalize( IN.Normal.xyz );
+	float3 eyeTangent = normalize( IN.Tangent.xyz );
 	
 	float3 camera = ModelViewIT[3].xyz;
 	// for camera
@@ -37,7 +40,11 @@ vertex2fragment main (app2vertex IN,
 	vertToLight = normalize(vertToLight);
   
 	OUT.Hposition = mul (ModelViewProj, IN.Position);
-	OUT.Color.rgb = LightColor * max(dot (eyeNormal, vertToLight),0) ;
+	OUT.Color.b = max(dot (eyeNormal, vertToLight),0);
+	OUT.Color.r = max(dot (eyeTangent, vertToLight),0);
+	OUT.Color.g = 0;
+	OUT.Color.rgb = OUT.Color.r;
+	//OUT.Color.rgb = LightColor * max(dot (eyeNormal, vertToLight), 0);
 	return OUT;
 }
 

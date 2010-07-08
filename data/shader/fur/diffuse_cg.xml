@@ -1,0 +1,10 @@
+<shader compiler="xmlshader" name="diffuse_cg">
+    <technique priority="200">
+    <pass>
+        <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+        <vp plugin="glcg" file="/shader/fur/diffuse_cg.cgvp" />
+        <texture name="tex diffuse" destination="TexDiffuse" />
+        <fp plugin="glcg" file="/shader/fur/diffuse_cg.cgfp" />
+    </pass>
+    </technique>
+</shader>

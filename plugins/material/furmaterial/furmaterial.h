@@ -153,7 +153,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float displaceEps;
     /// functions
     void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
-      iRenderBuffer* normals);
+      iRenderBuffer* normals, iRenderBuffer* texCoords);
+    void SaveImage(uint8* buf, const char* texname,int width, int height);
     void SynchronizeGuideHairs();
     void GenerateHairStrands(iRenderBuffer* indices, iRenderBuffer* vertexes);
     void SynchronizeHairsStrands();

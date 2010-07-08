@@ -6,7 +6,7 @@
   </plugins>
   <shaders>
     <shader>
-      <file>/shader/fur/marschner_naludemo_cg.xml</file>
+      <file>/shader/fur/diffuse_cg.xml</file>
     </shader>
 	<shader>
       <file>/shader/fur/marschner_lookup_cg.xml</file>
@@ -25,6 +25,10 @@
   </textures>
   <materials>
     <material name='krystal_material'>
+<!-- 	
+	  <shader type='standard'>diffuse_cg</shader>	
+      <shadervar type="texture" name="tex diffuse">krystal_body_h</shadervar>
+-->	  	
       <texture>krystal_body_h</texture>
       <shadervar type="texture" name="tex specular">krystal_spec</shadervar>
     </material>
@@ -35,11 +39,11 @@
 	  <shadervar type="float" name="width">0.005</shadervar>
 	  <shadervar type="float" name="density">5</shadervar>
 	  <shadervar type="float" name="displaceEps">0.02</shadervar>
+      <shadervar type="texture" name="density map">krystal_spec</shadervar>
+      <shadervar type="texture" name="height map">krystal_spec</shadervar>
 
       <texture>krystal_body_h</texture>
       <shadervar type="texture" name="tex specular">krystal_spec</shadervar>
-      <shadervar type="texture" name="density map">krystal_body_h</shadervar>
-      <shadervar type="texture" name="height map">krystal_body_h</shadervar>
     </material>
   </materials>
   <sounds/>

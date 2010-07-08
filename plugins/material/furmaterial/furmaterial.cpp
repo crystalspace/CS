@@ -109,10 +109,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   {
     iRenderBuffer* vertexes = meshFactory->GetVertices();
     iRenderBuffer* normals = meshFactory->GetNormals();
-    //iRenderBuffer* texCoord = meshFactory->GetTexCoords();
     iRenderBuffer* indices = meshFactorySubMesh->GetIndices(0);
+    iRenderBuffer* texCoords = meshFactory->GetTexCoords();
 
-    GenerateGuidHairs(indices, vertexes, normals);
+    GenerateGuidHairs(indices, vertexes, normals, texCoords);
     SynchronizeGuideHairs();
     GenerateHairStrands(indices, vertexes);
 
@@ -195,12 +195,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   }
 
   void FurMaterial::GenerateGuidHairs(iRenderBuffer* indices, 
-    iRenderBuffer* vertexes, iRenderBuffer* normals)
+    iRenderBuffer* vertexes, iRenderBuffer* normals, iRenderBuffer* texCoords)
   {
     csRenderBufferLock<csVector3> positions (vertexes, CS_BUF_LOCK_READ);
+    csRenderBufferLock<csVector2> UV (texCoords, CS_BUF_LOCK_READ);
     csRenderBufferLock<csVector3> norms (normals, CS_BUF_LOCK_READ);
     CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);    
     csArray<int> uniqueIndices;
+
+    // density map
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+
+    csRef<iDataBuffer> densitymapDB = densitymap->Readback(readbackFmt);
+    int densitymapW, densitymapH;
+    densitymap->GetOriginalDimensions(densitymapW, densitymapH);
+    uint8* densitymapData = densitymapDB->GetUint8();
+
+    //csPrintf("%s\n", densitymap->GetImageName());
 
     csVector3 *normsArray = new csVector3[positions.GetSize()];
 
@@ -228,6 +240,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     // generate the guide hairs - this should be done based on heightmap
     for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
     {
+      csVector2 uv = UV.Get(uniqueIndices.Get(i));
+      
+      densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
+        (int)(uv.y * densitymapH) * densitymapW ) ] = 255;
+      
       csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
         displaceEps * normsArray[uniqueIndices.Get(i)];
 
@@ -238,13 +255,57 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
         guideHair.controlPoints[j] = pos + j * 0.05f * normsArray[uniqueIndices.Get(i)];
-      //guideHair.controlPoints[j] = pos + j * 0.05f * csVector3(0,1,0);
 
       guideHairs.Push(guideHair);
     }
 
+    SaveImage(densitymapData, "/data/krystal/krystal_debug.png",
+      densitymapW, densitymapH);
+    
     SetLOD(0.5f);
   }
+
+  void FurMaterial::SaveImage(uint8* buf, const char* texname, 
+    int width, int height)
+  {
+    csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
+    csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
+
+    if(!buf)
+    {
+      printf("Bad data buffer!\n");
+      return;
+    }
+
+    csRef<iImage> image;
+    image.AttachNew(new csImageMemory (width, height, buf,false,
+      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+
+    if(!image.IsValid())
+    {
+      printf("Error loading image\n");
+      return;
+    }
+
+    csPrintf ("Saving %zu KB of data.\n", 
+      csImageTools::ComputeDataSize (image)/1024);
+
+    csRef<iDataBuffer> db = imageio->Save (image, "image/png", "progressive");
+    if (db)
+    {
+      if (!VFS->WriteFile (texname, (const char*)db->GetData (), db->GetSize ()))
+      {
+        printf("Failed to write file '%s'!", texname);
+        return;
+      }
+    }
+    else
+    {
+      printf("Failed to save png image for basemap!");
+      return;
+    }	    
+  }
+
 
   void FurMaterial::SetLOD(float LOD)
   {
@@ -394,7 +455,51 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<csShaderVariable> shaderVariable = material->GetVariable(densitymapName);
 
     shaderVariable->GetValue(densitymap);
-    //printf("%s\n", densitymap->GetImageName());
+    
+    // density map
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+    
+    csRef<iDataBuffer> densitymapDB = densitymap->Readback(readbackFmt);
+    int densitymapW, densitymapH;
+    densitymap->GetOriginalDimensions(densitymapW, densitymapH);
+    uint8* densitymapData = densitymapDB->GetUint8();
+
+    iRenderBuffer* texCoords = meshFactory->GetTexCoords();
+    csRenderBufferLock<csVector2> UV (texCoords, CS_BUF_LOCK_READ);
+    
+    for (size_t i = 0 ; i < UV.GetSize(); i ++)
+    {
+      csVector2 uv = UV.Get(i);
+
+      densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
+        (int)(uv.y * densitymapH) * densitymapW ) ] = 255;
+    }
+
+    SaveImage(densitymapData, "/data/krystal/krystal_debug_full.png",
+      densitymapW, densitymapH);
+
+    csRef<iImage> densityMap = loader-> 
+      LoadImage("/lib/krystal/krystal_body_spec.png",CS_IMGFMT_TRUECOLOR);
+
+    if(!densityMap)
+      csPrintfErr("Can't find Krystal's density map!");
+
+    csRGBpixel *data = (csRGBpixel *)densityMap->GetImageData ();
+    int width = densityMap->GetWidth();
+    int height = densityMap->GetHeight();
+
+    for (size_t i = 0 ; i < UV.GetSize(); i ++)
+    {
+      csVector2 texcoord = UV.Get(i);
+      csRGBpixel &heixel = data[(int)(texcoord.x * width) + width * 
+        (int)(texcoord.y * height)];
+
+      heixel.red = 255;
+    }
+
+    SaveImage((uint8*)data, "/data/krystal/krystal_debug_full_2.png",
+      width, height);
   }
 
   void FurMaterial::SetHeightmap ()
