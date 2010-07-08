@@ -347,27 +347,30 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
 static void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
 	FrustTest_Front2BackData* data, uint32 cur_timestamp)
 {
-  int num_objects = treenode->GetObjectCount ();
-  csKDTreeChild** objects = treenode->GetObjects ();
-  int i;
-  for (i = 0 ; i < num_objects ; i++)
+  if(treenode->IsLeaf())
   {
-    if (objects[i]->timestamp != cur_timestamp)
+    int num_objects = treenode->GetObjectCount ();
+    csKDTreeChild** objects = treenode->GetObjects ();
+    for (int i = 0 ; i < num_objects ; i++)
     {
-      objects[i]->timestamp = cur_timestamp;
-      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-      	objects[i]->GetObject ();
-      iMeshWrapper* mesh = visobj_wrap->mesh;
-      if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
-        data->viscallback->ObjectVisible (visobj_wrap->visobj, mesh, 0);
+      if (objects[i]->timestamp != cur_timestamp)
+      {
+        objects[i]->timestamp = cur_timestamp;
+        csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	  objects[i]->GetObject ();
+        iMeshWrapper* mesh = visobj_wrap->mesh;
+        if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
+          data->viscallback->ObjectVisible (visobj_wrap->visobj, mesh, 0);
+      }
     }
   }
-
-  csKDTree* child1 = treenode->GetChild1 ();
-  if (child1) CallVisibilityCallbacksForSubtree (child1, data, cur_timestamp);
-  csKDTree* child2 = treenode->GetChild2 ();
-  if (child2) CallVisibilityCallbacksForSubtree (child2, data, cur_timestamp);
-
+  else
+  {
+    csKDTree* child1 = treenode->GetChild1 ();
+    if (child1) CallVisibilityCallbacksForSubtree (child1, data, cur_timestamp);
+    csKDTree* child2 = treenode->GetChild2 ();
+    if (child2) CallVisibilityCallbacksForSubtree (child2, data, cur_timestamp);
+  }
 }
 
 /*------------------------------------------------------------------*/
@@ -398,23 +401,20 @@ bool csFrustumVis::VisTest (iRenderView* rview,
 
   g3d->FinishDraw();
 
-  // Data for the vis tester.
-  FrustTest_Front2BackData data;
-
   // First get the current view frustum from the rview.
   csRenderContext* ctxt = rview->GetRenderContext ();
-  data.frustum = ctxt->clip_planes;
+  f2bData.frustum = ctxt->clip_planes;
   uint32 frustum_mask = ctxt->clip_planes_mask;
   uint32 cur_timestamp = kdtree->NewTraversal ();
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
-  data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
-  data.rview = rview;
-  data.viscallback = viscallback;
+  f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  f2bData.rview = rview;
+  f2bData.viscallback = viscallback;
 
   NodeTraverseData ntdRoot;
-  ntdRoot.u32Frustum_Mast=frustum_mask;
+  ntdRoot.u32Frustum_Mask=frustum_mask;
   ntdRoot.kdtParent=NULL;
   ntdRoot.kdtNode=kdtree;
   
@@ -451,48 +451,25 @@ bool csFrustumVis::VisTest (iRenderView* rview,
     NodeTraverseData ntdAux=T_Queue.Front();
     T_Queue.PopFront();
 
-    int nodevis = TestNodeVisibility (ntdAux.kdtNode, &data,frustum_mask);
+    int nodevis = TestNodeVisibility (ntdAux.kdtNode, &f2bData,frustum_mask);
     if (nodevis == NODE_INVISIBLE)
       continue;
 
     if (nodevis == NODE_VISIBLE && frustum_mask == 0)
     {
-      CallVisibilityCallbacksForSubtree (ntdAux.kdtNode, &data, cur_timestamp);
+      CallVisibilityCallbacksForSubtree (ntdAux.kdtNode, &f2bData, cur_timestamp);
+      //printf("Done\n");
       continue;
     }
 
+    // important...never try and traverse before doing a distribute
+    // unless the node is fully visible, in which case it doesn't matter
     ntdAux.kdtNode->Distribute ();
 
-    int num_objects;
-    csKDTreeChild** objects;
-    num_objects = ntdAux.kdtNode->GetObjectCount ();
-    objects = ntdAux.kdtNode->GetObjects ();
-    int i;
-    for (i = 0 ; i < num_objects ; i++)
-    {
-      if (objects[i]->timestamp != cur_timestamp)
-      {
-        objects[i]->timestamp = cur_timestamp;
-        csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-      	  objects[i]->GetObject ();
-        TestObjectVisibility (visobj_wrap, &data, frustum_mask);
-      }
-    }
-
-    csKDTree* child1 = ntdAux.kdtNode->GetChild1 ();
-    if (child1) 
-    {
-      T_Queue.PushBack(NodeTraverseData(ntdAux.kdtNode,child1,frustum_mask));
-    }
-    csKDTree* child2 = ntdAux.kdtNode->GetChild2 ();
-    if (child2)
-    {
-      T_Queue.PushBack(NodeTraverseData(ntdAux.kdtNode,child2,frustum_mask));
-    }
+    TraverseNode(ntdAux,cur_timestamp);
   }
 
   // here we should process the remaining nodes in the multi query
-
   return true;
 }
 

@@ -70,3 +70,29 @@ void csFrustumVis::PullUpVisibility(NodeTraverseData &ntdNode)
     ntdAux.kdtParent=ntdAux.kdtParent->GetParent();
   }
 }
+
+void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode,const int cur_timestamp)
+{
+  if (ntdNode.IsLeaf()) // if node is leaf we render it
+  {
+    const int num_objects = ntdNode.kdtNode->GetObjectCount ();
+    csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
+    for (int i = 0 ; i < num_objects ; i++)
+    {
+      if (objects[i]->timestamp != cur_timestamp)
+      {
+        objects[i]->timestamp = cur_timestamp;
+        csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	  objects[i]->GetObject ();
+        TestObjectVisibility (visobj_wrap, &f2bData, ntdNode.GetFrustumMask());
+      }
+    }
+  }
+  else // else we push it's children on to the traverse queue
+  {
+    csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
+    T_Queue.PushBack(NodeTraverseData(ntdNode.kdtNode,child1,ntdNode.GetFrustumMask()));
+    csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
+    T_Queue.PushBack(NodeTraverseData(ntdNode.kdtNode,child2,ntdNode.GetFrustumMask()));
+  }
+}

@@ -39,6 +39,9 @@
 #include <csplugincommon/opengl/glextmanager.h>
 #include "chcpp.h"
 
+typedef CS::RenderManager::RenderTree<
+CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
+
 enum NodeVisibility
 {
   NODE_INVISIBLE,
@@ -65,7 +68,7 @@ struct FrustTest_Front2BackData
 
 struct NodeTraverseData
 {
-  NodeTraverseData() : kdtParent(0), kdtNode(0), u32Frustum_Mast(0)
+  NodeTraverseData() : kdtParent(0), kdtNode(0), u32Frustum_Mask(0)
   {
   }
   /*NodeTraverseData(NodeTraverseData &ntd)
@@ -84,30 +87,45 @@ struct NodeTraverseData
     // add a new user object only if there's none
     if(kdtNode && !kdtNode->GetUserObject())
       kdtNode->SetUserObject(new csVisibilityObjectHistory());
-    u32Frustum_Mast=frustum_mask;
+    u32Frustum_Mask=frustum_mask;
+  }
+
+  csVisibilityObjectHistory* GetVisibilityObjectHistory() const
+  {
+    if(!kdtNode) return 0;
+    return static_cast<csVisibilityObjectHistory*>(kdtNode->GetUserObject());
+  }
+
+  bool IsLeaf() const
+  {
+    if(!kdtNode) return false;
+    return kdtNode->IsLeaf();
   }
 
   bool GetVisibility() const
   {
     if(!kdtNode) return false;
     //if(!((csVisibilityObjectHistory*)kdtNode->GetUserObject())) return false;
-    return static_cast<csVisibilityObjectHistory*>(kdtNode->GetUserObject())->GetVisibility();
+    return GetVisibilityObjectHistory()->GetVisibility();
   }
 
   void SetVisibility(bool bV) const
   {
     if(!kdtNode) return ;
-    static_cast<csVisibilityObjectHistory*>(kdtNode->GetUserObject())->SetVisibility(bV);
+    GetVisibilityObjectHistory()->SetVisibility(bV);
+  }
+
+  uint32 GetFrustumMask() const
+  {
+    return u32Frustum_Mask;
   }
 
   csKDTree* kdtParent;
   csKDTree* kdtNode;
-  uint32 u32Frustum_Mast;
+  uint32 u32Frustum_Mask;
 
   ~NodeTraverseData()
   {
-    //delete kdtNode->GetUserObject();
-    //kdtNode->SetUserObject(0);
   }
 };
 
@@ -191,8 +209,16 @@ private:
   CHCList<NodeTraverseData> V_Queue; // V queue (nodes that are scheduled for testing in the current frame)
   CHCList<NodeTraverseData> Q_Queue; // Q queue (query queue)
 
+  // Frustum data (front to back)
+  FrustTest_Front2BackData f2bData;
+  // Render context.
+  RenderTreeType::ContextNode* OQContext;
+  // Render tree.
+  RenderTreeType* rtRenderTree;
+
   void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
   void PullUpVisibility(NodeTraverseData &ntdNode);
+  void TraverseNode(NodeTraverseData &ntdNode,const int cur_timestamp);
 
 public:
   csFrustumVis ();
