@@ -52,6 +52,19 @@ float ExtractDepth(float4 depth)
   return 1 - 2 * depth.x;
 }
 
+// Extracts the normal from the given normal buffer sample.
+float3 ExtractNormal(float4 normal)
+{
+  return normal.xyz * 2.0 - 1.0;
+  
+  /* Extract normal where only x and y are stored.
+  float2 nxy = normal.xy * 2.0 - 1.0;
+  float z = -sqrt (1 - dot (nxy));
+  
+  return float3 (nxy, z);
+  */
+}
+
 // Returns the screen position given the projected screen XY 
 // position and the depth buffer sample.
 float3 GetScreenPosition(float2 screenXY, float4 depth)
