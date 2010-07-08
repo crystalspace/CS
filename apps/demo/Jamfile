@@ -6,6 +6,6 @@ Description csdemo : "Demo" ;
 Application csdemo : [ Wildcard *.cpp *.h ] ;
 CFlags csdemo : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
 LinkWith csdemo : crystalspace ;
-ExternalLibs ceguitest : CEGUI ;
+ExternalLibs csdemo : CEGUI ;
 FileListEntryApplications csdemo : app-demo ;
 }
