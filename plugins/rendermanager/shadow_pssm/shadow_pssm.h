@@ -24,6 +24,7 @@
 #include "csplugincommon/rendermanager/debugcommon.h"
 #include "csplugincommon/rendermanager/hdrexposure.h"
 #include "csplugincommon/rendermanager/shadow_pssm.h"
+#include "csplugincommon/rendermanager/posteffectssupport.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/comp.h"
 #include "iengine/rendermanager.h"
@@ -45,10 +46,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
   class RMShadowedPSSM : public scfImplementation5<RMShadowedPSSM, 
                                                  iRenderManager, 
                                                  iRenderManagerTargets,
-                                                 iRenderManagerPostEffects,
+                                                 scfFakeInterface<iRenderManagerPostEffects>,
                                                  iComponent,
                                                  scfFakeInterface<iDebugHelper> >,
-                         public CS::RenderManager::RMDebugCommon<RenderTreeType>
+                         public CS::RenderManager::RMDebugCommon<RenderTreeType>,
+		         public CS::RenderManager::PostEffectsSupport
   {
   public:
     RMShadowedPSSM (iBase* parent);
@@ -71,19 +73,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     virtual void MarkAsUsed (iTextureHandle* target)
     {
       targets.MarkAsUsed (target);
-    }
-
-    //---- iRenderManagerPostEffects ----
-    void ClearLayers() { postEffects.ClearLayers(); }
-    bool AddLayersFromDocument (iDocumentNode* node)
-    {
-      CS::RenderManager::PostEffectLayersParser postEffectsParser (objectReg);
-      return postEffectsParser.AddLayersFromDocument (node, postEffects);
-    }
-    bool AddLayersFromFile (const char* filename)
-    {
-      CS::RenderManager::PostEffectLayersParser postEffectsParser (objectReg);
-      return postEffectsParser.AddLayersFromFile (filename, postEffects);
     }
 
     //---- iComponent ----
@@ -142,7 +131,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
       reflectRefractPersistent;
     AutoFramebufferTexType::PersistentData framebufferTexPersistent;
 
-    CS::RenderManager::PostEffectManager       postEffects;
     CS::RenderManager::HDRHelper hdr;
     CS::RenderManager::HDR::Exposure::Configurable hdrExposure;
     bool doHDRExposure;

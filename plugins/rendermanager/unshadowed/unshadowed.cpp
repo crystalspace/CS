@@ -393,14 +393,8 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   treePersistent.Initialize (shaderManager);
   dbgFlagClipPlanes =
     treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes.view");
-  postEffects.Initialize (objectReg);
-  
-  const char* effectsFile = cfg->GetStr ("RenderManager.Unshadowed.Effects", 0);
-  if (effectsFile)
-  {
-    PostEffectLayersParser postEffectsParser (objectReg);
-    postEffectsParser.AddLayersFromFile (effectsFile, postEffects);
-  }
+    
+  PostEffectsSupport::Initialize (objectReg, "RenderManager.Unshadowed");
   
   HDRSettings hdrSettings (cfg, "RenderManager.Unshadowed");
   if (hdrSettings.IsEnabled())
