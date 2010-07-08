@@ -139,8 +139,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     virtual void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
 
   private:
-    void InitializeTracking ();
-
     LookAtAnimNodeFactory* factory;
     csWeakRef<iSceneNode> sceneNode;
     csWeakRef<iSkeleton2> skeleton;
@@ -157,7 +155,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     float maximumSpeed;
     bool alwaysRotate;
     float frameDuration;
-    float previousPitch, previousYaw;
+    float previousPitch, previousYaw, previousRoll;
+    bool trackingInitialized;
     char listenerStatus;
     float listenerMinimumDelay;
     float listenerDelay;

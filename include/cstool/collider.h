@@ -215,9 +215,9 @@ public:
   	iMeshWrapper* mesh);
 
   /**
-   * Initialize collision detection (i.e. create csColliderWrapper) for
-   * all objects in the engine. If the optional region is given only
-   * the objects from that region will be initialized.
+   * Initialize collision detection (ie create csColliderWrapper) for
+   * all objects in the engine. If the optional collection is given only
+   * the objects from that collection will be initialized.
    */
   static void InitializeCollisionWrappers (iCollideSystem* colsys,
       iEngine* engine, iCollection* collection = 0);

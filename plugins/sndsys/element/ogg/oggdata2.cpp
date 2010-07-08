@@ -80,21 +80,13 @@ static long cs_ogg_tell (void *datasource)
   return (long)streamdata->position;
 }
 
-cs_ov_callbacks::cs_ov_callbacks ()
+const ov_callbacks SndSysOggSoundData::ogg_callbacks =
 {
-  read_func = cs_ogg_read;
-  seek_func = cs_ogg_seek;
-  close_func = cs_ogg_close;
-  tell_func = cs_ogg_tell;
-}
-
-
-cs_ov_callbacks ogg_callbacks;
-
-cs_ov_callbacks *GetCallbacks()
-{
-  return &ogg_callbacks;
-}
+  cs_ogg_read,	// read_func
+  cs_ogg_seek,	// seek_func
+  cs_ogg_close,	// close_func
+  cs_ogg_tell	// tell_func
+};
 
 SndSysOggSoundData::SndSysOggSoundData (iBase *pParent, iDataBuffer* pDataBuffer) :
   SndSysBasicData(pParent),
@@ -141,7 +133,7 @@ void SndSysOggSoundData::Initialize()
   OggVorbis_File f;
   memset (&f, 0, sizeof(OggVorbis_File));
   /*bool ok = */ov_open_callbacks(&StreamData, &f, 0, 0, 
-    *(ov_callbacks*)GetCallbacks ()) /*== 0*/;
+    ogg_callbacks) /*== 0*/;
 
   // The ogg vorbis functions can deal with 64 bit counts of samples, we only use 32 bit for now
   pcm_count=ov_pcm_total(&f, -1);
@@ -174,7 +166,7 @@ bool SndSysOggSoundData::IsOgg (iDataBuffer* Buffer)
   OggVorbis_File f;
   memset (&f, 0, sizeof(OggVorbis_File));
   bool ok = 
-    ov_test_callbacks(&streamdata, &f, 0, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
+    ov_test_callbacks(&streamdata, &f, 0, 0, ogg_callbacks) == 0;
   ov_clear (&f);
   return ok;
 }

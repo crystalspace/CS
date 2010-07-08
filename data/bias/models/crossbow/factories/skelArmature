@@ -1,0 +1,130 @@
+<skelfact>
+<bone name="root">
+<move>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010" />
+<matrix>
+<rotx>1.58559045297</rotx>
+<rotz>-0.00172050934485</rotz>
+<roty>-0.00168288426219</roty>
+</matrix>
+</move>
+</bone>
+<bone name="string">
+<move>
+<v x="0.0" y="0.0" z="0.300000011921" />
+<matrix>
+<roty>-3.14159265359</roty>
+</matrix>
+</move>
+</bone>
+<bone name="arrow">
+<move>
+<v x="0.40000000596" y="0.0" z="-0.199999988079" />
+<matrix>
+<roty>-3.14159265359</roty>
+</matrix>
+</move>
+</bone>
+<script name="shoot">
+<frame duration="0.0">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="-0.00671926280484" y="-0.00285127689131" z="0.0592251569033"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="7.8558921814e-005" y="-0.0055786552839" z="0.418646454811"/>
+</move></bone></frame>
+<frame duration="75.0">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="-4.65661287308e-010" y="2.32830643654e-010" z="0.400000035763"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="-4.65661287308e-010" z="1.29999995232"/>
+</move></bone></frame>
+<frame duration="208.333333333">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="0.0" z="0.269999980927"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="0.0" z="4.2000002861"/>
+</move></bone></frame>
+<frame duration="41.6666666667">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="0.0" z="0.272666841745"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="-2.0" z="3.69163155556"/>
+</move></bone></frame>
+<frame duration="125.0">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="0.0" z="0.297151297331"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="-1.99167716503" z="-0.893007218838"/>
+</move></bone></frame>
+<frame duration="41.6666666667">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="0.0" z="0.300000011921"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="0.0" z="-1.79999995232"/>
+</move></bone></frame>
+</script>
+<script name="loaded">
+<frame duration="0.0">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="-0.00671926280484" y="-0.00285127689131" z="0.0592251569033"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="7.8558921814e-005" y="-0.0055786552839" z="0.418646454811"/>
+</move></bone></frame>
+<frame duration="791.666666667">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="-0.00671926280484" y="-0.00285127689131" z="0.0592251569033"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="7.8558921814e-005" y="-0.0055786552839" z="0.418646454811"/>
+</move></bone></frame>
+</script>
+<script name="reload">
+<frame duration="0.0">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="0.0" z="0.300000011921"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="0.0" z="-1.79999995232"/>
+</move></bone></frame>
+<frame duration="208.333333333">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="0.0" z="0.222658380866"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.199999988079" y="0.143468171358" z="0.259818851948"/>
+</move></bone></frame>
+<frame duration="166.666666667">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.0" y="0.0" z="0.117241054773"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="0.00196027755737" y="0.00283685326576" z="0.394391834736"/>
+</move></bone></frame>
+<frame duration="416.666666667">
+<bone name="root"><move><matrix><rotx>1.58559045297</rotx><rotz>-0.00172050934485</rotz><roty>-0.00168288426219</roty></matrix>
+<v x="-1.16415321827e-010" y="-1.0" z="-2.73978173482e-010"/>
+</move></bone><bone name="string"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="-0.00671926280484" y="-0.00285127689131" z="0.0592251569033"/>
+</move></bone><bone name="arrow"><move><matrix><rotx>0.0</rotx><rotz>0.0</rotz><roty>-3.14159265359</roty></matrix>
+<v x="7.8558921814e-005" y="-0.0055786552839" z="0.418646454811"/>
+</move></bone></frame>
+</script>
+</skelfact>

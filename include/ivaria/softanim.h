@@ -74,12 +74,17 @@ struct iSoftBodyAnimationControlFactory : public iGenMeshAnimationControlFactory
  */
 struct iSoftBodyAnimationControl : public iGenMeshAnimationControl
 {
-  SCF_INTERFACE (iSoftBodyAnimationControl, 1, 0, 0);
+  SCF_INTERFACE (iSoftBodyAnimationControl, 2, 0, 0);
 
   /**
    * Set the soft body to be used to animate the genmesh.
+   * \param body The soft body that will be used to animate this genmesh.
+   * \param doubleSided True if the genmesh is double-sided (ie this is a cloth
+   * soft body), false otherwise. If the genmesh is double-sided, then the duplicated
+   * vertices must be added at the end of the vertex array, so that a vertex of index
+   * 'i' is duplicated at index 'i + body->GetVertexCount ()'.
    */
-  virtual void SetSoftBody (iBulletSoftBody* body) = 0;
+  virtual void SetSoftBody (iBulletSoftBody* body, bool doubleSided = false) = 0;
 
   /**
    * Get the soft body used to animate the genmesh.

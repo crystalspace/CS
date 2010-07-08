@@ -1,106 +1,91 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2010 Jelle Hellemans
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
+    This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #ifndef __DEMO_H__
 #define __DEMO_H__
 
-#include <stdarg.h>
-#include "csgeom/math2d.h"
-#include "csgeom/math3d.h"
-#include "csutil/stringarray.h"
-#include "iutil/eventnames.h"
+#include "crystalspace.h"
 
-struct iEngine;
-struct iSector;
-struct iView;
-struct iFont;
-struct iFile;
-struct iKeyboardDriver;
-struct iImageLoader;
-struct iLoaderPlugin;
-struct iMeshWrapper;
-struct iConsoleOutput;
-struct iVirtualClock;
-struct iObjectRegistry;
-struct iGraphics3D;
-struct iGraphics2D;
-struct iLoader;
-struct iVFS;
-struct iEvent;
-class DemoSequenceManager;
-class csTransform;
-class FramePrinter;
+#include "csutil/custom_new_disable.h"
+#include <CEGUI.h>
+#include "csutil/custom_new_enable.h"
 
-class Demo
+#include "ivaria/icegui.h"
+
+#include "player.h"
+
+class Demo : public csApplicationFramework, public csBaseEventHandler
 {
-public:
-  csRef<iEngine> engine;
-  iSector* room;
-  csRef<iView> view;
-  csRef<iGraphics3D> myG3D;
-  csRef<iGraphics2D> myG2D;
-  csRef<iVFS> myVFS;
-  csRef<iKeyboardDriver> kbd;
-  csRef<iConsoleOutput> myConsole;
-  iObjectRegistry* object_reg;
-  csRef<iVirtualClock> vc;
-  csRef<iLoader> loader;
-  csRef<FramePrinter> printer;
+private:
+  bool do_freelook;
 
-  csEventID Frame;
-  csEventID KeyboardDown;
-  csEventID MouseDown;
-  csEventID MouseMove;
-
-  DemoSequenceManager* seqmgr;
-  csRef<iFont> font;
-  int col_red, col_blue, col_white, col_black;
-  int col_yellow, col_cyan, col_green, col_gray;
-  csString message;
-  csTicks message_timer;
-  bool message_error;
-
-  int do_demo;
-  size_t selected_demo;
-  csStringArray demos;
-  int first_y;	// First y location where list of demo files start.
+  csRef<Player> player;
 
 private:
-  void GfxWrite (int x, int y, int fg, int bg, const char *str, ...);
-  void FileWrite (iFile* file, const char *str, ...);
+  iSector *room;
+  float rotX, rotY;
 
-  void DrawEditInfo ();
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
+  csRef<iView> view;
+  csRef<iVFS> vfs;
+  csRef<iCEGUI> cegui;
+  csRef<FramePrinter> printer;
 
-  bool LoadDemoFile (const char* demofile);
+  void Frame();
+
+  bool OnKeyboard(iEvent&);
+  bool OnMouseDown(iEvent&);
+  bool OnMouseMove(iEvent&);
+
+
+  void CreateRoom(); 
 
 public:
-  Demo ();
-  virtual ~Demo ();
+  Demo();
+  ~Demo();
 
-  void Report (int severity, const char* msg, ...);
+  // Handle exit button clicked event
+  bool OnExitButtonClicked (const CEGUI::EventArgs& e);
 
-  bool Initialize (int argc, const char* const argv[],
-    const char *iConfigName);
-  void SetupFrame ();
-  bool DemoHandleEvent (iEvent &Event);
+  void OnExit();
+  bool OnInitialize(int argc, char* argv[]);
 
-  void ShowMessage (const char* msg, ...);
-  void ShowError (const char* msg, ...);
+  bool Application();
+  
+  // Declare the name of this event handler.
+  CS_EVENTHANDLER_NAMES("application.demo")
+      
+  /* Declare that we want to receive events *after* the CEGUI plugin. */
+  virtual const csHandlerID * GenericPrec (csRef<iEventHandlerRegistry> &r1, 
+    csRef<iEventNameRegistry> &r2, csEventID event) const 
+  {
+    static csHandlerID precConstraint[2];
+    
+    precConstraint[0] = r1->GetGenericID("crystalspace.cegui");
+    precConstraint[1] = CS_HANDLERLIST_END;
+    return precConstraint;
+  }
+
+  CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
 };
 
-#endif // __DEMO_H__
+#endif

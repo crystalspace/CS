@@ -563,45 +563,54 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     if (!animationPacket || !animationPacket->GetAnimationRoot ())
       return;
 
+    // Update the root node
     iSkeletonAnimNode2* rootNode = animationPacket->GetAnimationRoot ();
-    // 
     rootNode->TickAnimation (dt);
    
-    //
+    // If the root node is active then update the skeleton
     if (rootNode->IsActive ())
     {
-      // Use a pool for these...
+      // TODO: Use a pool for these...
       csRef<csSkeletalState2> finalState;
       finalState.AttachNew (new csSkeletalState2);
       finalState->Setup (allBones.GetSize ());
 
+      // Blend the root node into the skeleton state
       rootNode->BlendState (finalState);
 
-      // Apply the bone state
+      // Apply the skeleton state
       for (size_t i = 0; i < allBones.GetSize (); ++i)
       {
         Bone& boneRef = allBones[i];
 
-        if (boneRef.created && finalState->IsBoneUsed ((BoneID)i))
+	// Apply the bone state
+        if (boneRef.created && finalState->IsBoneUsed ((BoneID) i))
         {
+	  csQuaternion skeletonRotation;
+	  csVector3 skeletonOffset;
+	  factory->GetTransformBoneSpace ((BoneID) i, skeletonRotation,
+					 skeletonOffset);
+
+
           const csQuaternion& q = finalState->GetQuaternion (i);
+
+	  // Normalize the quaternion if needed
           if (q.Norm () > 0)
-          {
-            boneRef.boneRotation = q.Unit ();
-          }          
+            boneRef.boneRotation = q.Unit () * skeletonRotation;
+
           else
-          {
-            boneRef.boneRotation = q;
-          }
+            boneRef.boneRotation = q * skeletonRotation;
            
-          boneRef.boneOffset = finalState->GetVector (i);
+          boneRef.boneOffset = finalState->GetVector (i) + skeletonOffset;
 
           cachedTransformsDirty = true;
         }
       }
       
       version++;      
-    }    
+    }
+
+    // If the root node is not active then reset the bone state.
     else if (versionLastReset != version)
     {      
       for (size_t i = 0; i < allBones.GetSize (); ++i)
@@ -701,8 +710,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     cachedTransformsDirty = false;
   }
-
-
 
 }
 CS_PLUGIN_NAMESPACE_END(Skeleton2)

@@ -22,6 +22,7 @@
 #include "csutil/ansiparse.h"
 #include "csutil/csstring.h"
 #include "csutil/csunicode.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
@@ -56,15 +57,50 @@ static const WORD ansiToWindows[8] =
   FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED
 };
 
+static int WriteConsoleUTF8 (HANDLE hCon, const utf8_char* inStr, size_t inLen)
+{
+  // According to MSDN, WriteConsole() takes at most 64K characters
+  static const size_t maxConsoleWrite = 64*1024;
+
+  wchar_t wideBuf[maxConsoleWrite];
+  size_t remaining = inLen;
+  while (remaining > 0)
+  {
+    size_t wideBufRemain = maxConsoleWrite;
+    wchar_t* wideBufOut = wideBuf;
+
+    while (wideBufRemain > 0)
+    {
+      utf32_char ch;
+      int srcEncSize = csUnicodeTransform::UTF8Decode (inStr, remaining, ch);
+      utf16_char ch_wide[CS_UC_MAX_UTF16_ENCODED];
+      int dstEncSize = csUnicodeTransform::EncodeUTF16 (ch, ch_wide, CS_UC_MAX_UTF16_ENCODED);
+      if (size_t (dstEncSize) <= wideBufRemain)
+      {
+        memcpy (wideBufOut, ch_wide, dstEncSize * sizeof (wchar_t));
+        wideBufOut += dstEncSize;
+        wideBufRemain -= dstEncSize;
+        inStr += srcEncSize;
+        remaining -= srcEncSize;
+        if (remaining == 0) break;
+      }
+      else
+        break;
+    }
+
+    if (!WriteConsoleW (hCon, wideBuf, maxConsoleWrite - wideBufRemain, nullptr, nullptr))
+      return EOF;
+  }
+  return 0;
+}
+
 static int _cs_fputs (const char* string, FILE* stream)
 {
-  UINT cp = CP_ACP;
   HANDLE hCon = 0; 
   WORD textAttr = 0, oldAttr = 0;
   bool isTTY = (_isatty (_fileno (stream)) != 0);
   if (isTTY) 
   {
-    cp = GetConsoleOutputCP ();
     hCon = (HANDLE)_get_osfhandle (_fileno (stream));
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo (hCon, &csbi);
@@ -72,7 +108,6 @@ static int _cs_fputs (const char* string, FILE* stream)
   }
 
   size_t ret = 0;
-  csString tmp;
   size_t ansiCommandLen;
   csAnsiParser::CommandClass cmdClass;
   size_t textLen;
@@ -80,7 +115,7 @@ static int _cs_fputs (const char* string, FILE* stream)
   while (csAnsiParser::ParseAnsi (string, ansiCommandLen, cmdClass, textLen))
   {
     ret += textLen;
-    tmp.Replace (string + ansiCommandLen, textLen);
+    const char* textPtr = string + ansiCommandLen;
     
     if (isTTY && (cmdClass != csAnsiParser::classNone && 
                   cmdClass != csAnsiParser::classUnknown))
@@ -240,17 +275,16 @@ static int _cs_fputs (const char* string, FILE* stream)
 	oldAttr = textAttr;
       }
       int rc;
-      if (isTTY && (cp != CP_UTF8))
+      if (isTTY)
       {
-	/* We're writing to a console, the UTF-8 text has to be converted to the 
-	 * output codepage. */
-	rc = fputs (cswinCtoA (tmp, cp), stream);
+	/* We're writing to a console - give Windows the string in Unicode
+           and let it do the conversion */
+        rc = WriteConsoleUTF8 (hCon, (utf8_char*)textPtr, textLen);
       }
       else
       {
-	/* Not much to do - the text can be dumped to the stream,
-	 * Windows will care about proper output. */
-	rc = fputs (tmp.GetDataSafe(), stream);
+	/* Not much to do - dump raw text to the stream. */
+	rc = fwrite (textPtr, 1, textLen, stream);
       }
 
       if (rc == EOF)
@@ -268,25 +302,25 @@ static int _cs_vfprintf (FILE* stream, const char* format, va_list args)
 {
   int rc;
 
-  int bufsize, newsize = 128;
-  char* str = 0;
+  const size_t initialBufSize = 128;
+  char localBuf[initialBufSize];
+  char* str = localBuf;
   
-  do
+  // use cs_vsnprintf() for consistency across all platforms.
+  size_t newsize = cs_vsnprintf (str, initialBufSize, format, args);
+  if (newsize >= initialBufSize)
   {
-    delete[] str;
-    bufsize = newsize + 1;
-    str = new char[bufsize];
-    // use cs_vsnprintf() for consistency across all platforms.
-    newsize = cs_vsnprintf (str, bufsize, format, args);
+    size_t bufsize = newsize+1;
+    str = (char*)cs_malloc (bufsize);
+    cs_vsnprintf (str, bufsize, format, args);
   }
-  while (bufsize < (newsize + 1));
 
-  // _cs_fputs() will do codepage convertion, if necessary
+  // _cs_fputs() will do codepage conversion, if necessary
   rc = _cs_fputs (str, stream);
-  delete[] str;
+  if (str != localBuf) cs_free (str);
   // On success _cs_fputs() returns a value >= 0, but
   // _cs_vfprintf() should return the number of chars written.
-  return ((rc >= 0) ? (newsize - 1) : -1);
+  return ((rc >= 0) ? newsize : -1);
 }
 
 // Replacement for printf(); exact same prototype/functionality as printf()
