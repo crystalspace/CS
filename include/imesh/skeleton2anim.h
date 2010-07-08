@@ -231,61 +231,69 @@ struct iSkeletonAnimPacket2 : public virtual iBase
  */
 struct iSkeletonAnimation2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeletonAnimation2, 2, 0, 0);
+  SCF_INTERFACE(iSkeletonAnimation2, 2, 0, 1);
 
   /**
-   * Get the animation name
+   * Get the name of the animation.
    */
   virtual const char* GetName () const = 0;
 
   /**
-   * Add a new channel associated with bone.
-   * If a channel already exists, it will be returned.
-   * \param bone bone id to associate channel with.
+   * Add a new channel associated with the given bone.
+   * If a channel already exists, then it will be returned.
+   * \param bone The bone id associated to the channel.
+   * \return The channel associated to the bone.
    */
   virtual CS::Animation::ChannelID AddChannel (BoneID bone) = 0;
 
   /**
    * Find the channel associated with a specific bone, if any.
+   * \return The associated channel, or InvalidChannelID if there is none.
    */
   virtual CS::Animation::ChannelID FindChannel (BoneID bone) const = 0;
 
   /**
-   * Add a key frame at given time within channel.
-   * \param channel channel id
-   * \param time key frame time
-   * \param key key frame data
+   * Add a key frame at the given time within the given channel.
+   * \param channel Id of the channel.
+   * \param time The time of the key frame.
+   * \param rotation The rotation of the bone for the key frame.
+   * \param offset The position of the bone for the key frame.
+   * \remark The rotation and offset must be in the space defined by
+   * GetFramesInBoneSpace().
    */
   virtual void AddKeyFrame (CS::Animation::ChannelID channel, float time, 
     const csQuaternion& rotation, const csVector3& offset) = 0;
   
   /**
-   * Get total number of key frames in channel.
-   * \param channel channel id
+   * Get the total number of key frames in the given channel.
+   * \param channel The id of the channel.
    */
   virtual size_t GetKeyFrameCount (CS::Animation::ChannelID channel) const = 0;
 
   /**
-   * Get a specific key frame within channel.
-   * \param channel channel id
-   * \param keyframe key frame number to get
-   * \param bone bone id associated with channel
-   * \param time time associated with key frame
-   * \param key key frame data
+   * Get a specific key frame within the given channel.
+   * \param channel The id of the channel.
+   * \param keyframe The index of the key frame to get.
+   * \param bone The id of the bone associated with the channel.
+   * \param time The time associated with the key frame.
+   * \param rotation The rotation of the bone for the key frame.
+   * \param offset The position of the bone for the key frame.
    */
   virtual void GetKeyFrame (CS::Animation::ChannelID channel, 
     CS::Animation::KeyFrameID keyframe, BoneID& bone,
     float& time, csQuaternion& rotation, csVector3& offset) = 0;  
 
   /**
-   * Get the two key frames on "either side" of time.
-   * \param channel channel id
-   * \param time time to get key frames for
-   * \param bone bone id associated with channel
-   * \param timeBefore time associated with key frame before given time
-   * \param before key frame data before given time
-   * \param timeAfter time associated with key frame after given time
-   * \param after key frame data after given time
+   * Get the two key frames on "either side" of the given time.
+   * \param channel The id of the channel.
+   * \param time The time to get the key frames for.
+   * \param bone The id of the bone associated with the channel.
+   * \param timeBefore The time associated with the key frame before the given time.
+   * \param beforeRot The rotation of the bone for the key frame before the given time.
+   * \param beforeOffset The position of the bone for the key frame before the given time.
+   * \param timeAfter The time associated with the key frame after the given time
+   * \param afterRot The rotation of the bone for the key frame after the given time.
+   * \param afterOffset The position of the bone for the key frame after the given time.
    */
   virtual void GetTwoKeyFrames (CS::Animation::ChannelID channel, float time, BoneID& bone,
     float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
@@ -294,18 +302,56 @@ struct iSkeletonAnimation2 : public virtual iBase
   /**
    * Blend the animation into a skeletal state buffer at a specific playback 
    * position.
-   * \param state result state object
-   * \param baseWeight base weight for blending
-   * \param playbackTime current playback time
-   * \param isPlayingCyclic if the playing should be cyclic
+   * \param state The skeletal state where the result will be blended.
+   * \param baseWeight The base weight to be used for blending.
+   * \param playbackTime The current playback time.
+   * \param isPlayingCyclic If the playing should be cyclic or not.
    */
   virtual void BlendState (csSkeletalState2* state, 
     float baseWeight, float playbackTime, bool isPlayingCyclic) const = 0;
 
   /**
-   * Get the total duration of the animation
+   * Get the total duration of the animation.
    */
   virtual float GetDuration () const = 0;
+
+  /**
+   * Reset the rotation and position values of a given key frame.
+   * \param channel The id of the channel.
+   * \param keyframe The index of the key frame to set.
+   * \param rotation The rotation of the bone for the key frame.
+   * \param offset The position of the bone for the key frame.
+   */
+  virtual void SetKeyFrame (CS::Animation::ChannelID channel, 
+    CS::Animation::KeyFrameID keyframe, const csQuaternion& rotation,
+    const csVector3& offset) = 0;  
+
+  /**
+   * Set whether the data defined with AddKeyFrame() are in bind
+   * space or in bone space. By default the data will be in bone space,
+   * but it is more efficient to introduce them directly in bind space.
+   * \param isBindSpace True if the data are in bind space, false if they
+   * are in bone space.
+   */
+  virtual void SetFramesInBindSpace (bool isBindSpace) = 0;
+
+  /**
+   * Return whether or not the frames are defined in bind space or in bone
+   * space.
+   * \return True if the frames are in bind space, false if they are in bone
+   * space.
+   */
+  virtual bool GetFramesInBindSpace () const = 0;
+
+  /**
+   * Get the count of channels in this animation.
+   */
+  virtual size_t GetChannelCount () const = 0;
+
+  /**
+   * Get the id of the bone associated with the given channel.
+   */
+  virtual BoneID GetChannelBone (CS::Animation::ChannelID channel) const = 0;
 };
 
 

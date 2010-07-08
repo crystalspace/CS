@@ -38,7 +38,6 @@
 #include "csgeom/projections.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
-#include "csgfx/vertexlistwalker.h"
 #include "csplugincommon/opengl/assumedstate.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csplugincommon/opengl/glstates.h"
@@ -65,54 +64,6 @@ const int CS_CLIPPER_EMPTY = 0xf008412;
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
-
-void csGLGraphics3D::BufferShadowDataHelper::RenderBufferDestroyed (
-  iRenderBuffer* buffer)
-{
-  shadowedBuffers.DeleteAll (buffer);
-}
-    
-iRenderBuffer* csGLGraphics3D::BufferShadowDataHelper::GetSupportedRenderBuffer (
-  iRenderBuffer* originalBuffer)
-{
-  CS_ASSERT(!originalBuffer->IsIndexBuffer());
-
-  ShadowedBuffer& shadowData = shadowedBuffers.GetOrCreate (originalBuffer);
-  if (!shadowData.shadowBuffer
-      || (shadowData.originalBufferVersion != originalBuffer->GetVersion()))
-  {
-    if (shadowData.IsNew())
-      originalBuffer->SetCallback (this);
-  
-    if (!shadowData.shadowBuffer
-        || (shadowData.shadowBuffer->GetComponentCount()
-	  != originalBuffer->GetComponentCount())
-	|| (shadowData.shadowBuffer->GetElementCount()
-	  != originalBuffer->GetElementCount()))
-    {
-      shadowData.shadowBuffer = csRenderBuffer::CreateRenderBuffer (
-        originalBuffer->GetElementCount(),
-        originalBuffer->GetBufferType(),
-        CS_BUFCOMP_FLOAT,
-        originalBuffer->GetComponentCount());
-    }
-    shadowData.originalBufferVersion = originalBuffer->GetVersion();
-    
-    // The vertex list walker actually already does all the conversion we need
-    csVertexListWalker<float> src (originalBuffer);
-    csRenderBufferLock<float> dst (shadowData.shadowBuffer);
-    size_t copySize = sizeof(float) * shadowData.shadowBuffer->GetComponentCount();
-    for (size_t i = 0; i < dst.GetSize(); i++)
-    {
-      memcpy ((float*)(dst++), (const float*)src, copySize);
-      ++src;
-    }
-  }
-  
-  return shadowData.shadowBuffer;
-}
-
-//---------------------------------------------------------------------------
 
 CS_DECLARE_PROFILER
 CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
@@ -180,7 +131,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   cliptype = CS_CLIPPER_NONE;
 
   r2tbackend = 0;
-  bufferShadowDataHelper.AttachNew (new BufferShadowDataHelper);
+  bufferShadowDataHelper.AttachNew (new BufferShadowingHelper);
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -2741,7 +2692,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	    || (((1 << compTypeBase) & wants_short_int) == 0)))
         {
           // Set up shadow buffer
-          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
           compType = buffer->GetComponentType();
         }
         break;
@@ -2750,7 +2701,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	    || (((1 << compTypeBase) & wants_byte_short_int) == 0)))
         {
           // Set up shadow buffer
-          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
           compType = buffer->GetComponentType();
         }
         break;
@@ -2758,7 +2709,7 @@ void csGLGraphics3D::ApplyBufferChanges()
         if (!isFloat && !normalized)
         {
           // Set up shadow buffer
-          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
           compType = buffer->GetComponentType();
         }
         break;
@@ -2768,7 +2719,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  if (!isFloat && !normalized)
 	  {
 	    // Set up shadow buffer
-	    buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+	    buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
 	    compType = buffer->GetComponentType();
 	  }
         }
@@ -2780,7 +2731,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	    || (((1 << compTypeBase) & wants_short_int) == 0)))
 	  {
 	    // Set up shadow buffer
-	    buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+	    buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
 	    compType = buffer->GetComponentType();
 	  }
         }

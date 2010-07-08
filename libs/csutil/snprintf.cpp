@@ -59,7 +59,7 @@ int cs_vasprintf (char** buf, const char* fmt, va_list args)
   do
   {
     bufsize = newsize;
-    *buf = (char*)realloc (*buf, bufsize);
+    *buf = (char*)cs_realloc (*buf, bufsize);
     newsize = cs_vsnprintf (*buf, bufsize, fmt, args) + 1;
   }
   while (newsize >= bufsize);

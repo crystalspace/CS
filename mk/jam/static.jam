@@ -267,7 +267,7 @@ rule LinkStaticPlugins
       {
         CFlags $(target) : $(STATICPLUGIN.$(p).RELAYCFLAGS.$(relaydep)) ;
         lflags = [ MergeRemovingDups $(lflags) : 
-          [ RelayLFlags $(STATICPLUGIN.$(p).RELAYLFLAGS.$(relaydep)) :
+          [ RelayLFlags $(COMPILER.LFLAGS) $(STATICPLUGIN.$(p).RELAYLFLAGS.$(relaydep)) :
             $(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep)) ] ] ;
 	# @@@ If we can get the .a file name for the static plugin lib
 	# we could pass that for the minimal-objects
@@ -305,7 +305,7 @@ rule LinkStaticPlugins
 	  $($(STATICPLUGINS.LIBRARY)_TARGET)
 	] ;
 	lflags = [ MergeRemovingDups $(lflags) : 
-	  [ RelayLFlags $($(relaydep).LFLAGS) :
+	  [ RelayLFlags $(COMPILER.LFLAGS) $($(relaydep).LFLAGS) :
 	    $($(p).RELAYLIBS.$(relaydep)) : $(libpath) ] ] ;
 	relayobjs += [ RelayObjs $(target) :
 	    $($(p).RELAYLIBS.$(relaydep)) : $(relaydep) ] ;

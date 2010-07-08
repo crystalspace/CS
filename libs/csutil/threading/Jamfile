@@ -8,14 +8,14 @@ local rejects ;
   case WIN32 :				# Windows 
     
     rejects += pthread_condition.h pthread_mutex.h pthread_thread.cpp 
-               pthread_thread.h ;
+               pthread_thread.h atomicops_gcc_arm.cpp ;
     
     CSUTIL.GENERIC += win32_thread.cpp ;
   case * :					# MacOS/X, Posix, Unix, GNU/Linux, etc.
     
     rejects += win32_thread.cpp ;
     
-    CSUTIL.GENERIC += pthread_thread.cpp ;
+    CSUTIL.GENERIC += pthread_thread.cpp atomicops_gcc_arm.cpp ;
     CSLIB.EXTERNAL_LIBS += PTHREAD ;
   }
 

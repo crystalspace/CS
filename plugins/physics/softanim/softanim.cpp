@@ -109,12 +109,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
   {
   }
 
-  void SoftBodyControl::SetSoftBody (iBulletSoftBody* body)
+  void SoftBodyControl::SetSoftBody (iBulletSoftBody* body, bool doubleSided)
   {
     softBody = body;
-    vertices.SetSize (softBody->GetVertexCount ());
+    this->doubleSided = doubleSided;
+    vertices.SetSize (softBody->GetVertexCount () * 2);
+    normals.SetSize (softBody->GetVertexCount () * 2);
 
     // initialize the vertices and mesh position
+    meshPosition.Set (0.0f);
+    for (size_t i = 0; i < softBody->GetVertexCount (); i++)
+      meshPosition += softBody->GetVertexPosition (i);
+    meshPosition /= softBody->GetVertexCount ();
+
     Update (0, 0, 0);
   }
 
@@ -130,7 +137,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 
   bool SoftBodyControl::AnimatesNormals () const
   {
-    return false;
+    return true;
   }
 
   bool SoftBodyControl::AnimatesTexels () const
@@ -145,9 +152,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 
   void SoftBodyControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
-    if (current)
-      lastTicks = current;
-
     if (!softBody)
       return;
 
@@ -159,6 +163,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
       csVector3 position = softBody->GetVertexPosition (i);
       vertices[i] = position - lastPosition;
       meshPosition += position;
+
+      normals[i] = softBody->GetVertexNormal (i);
+
+      if (doubleSided)
+      {
+	vertices[i + softBody->GetVertexCount ()] = vertices[i];
+	normals[i + softBody->GetVertexCount ()] = - normals[i];
+      }
     }
     meshPosition /= softBody->GetVertexCount ();
 
@@ -182,7 +194,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
   const csVector3* SoftBodyControl::UpdateNormals (csTicks current, const csVector3* normals,
 						   int num_normals, uint32 version_id)
   {
-    return normals;
+    if (!softBody)
+      return normals;
+
+    CS_ASSERT(doubleSided ? num_normals == 2 * (int) softBody->GetVertexCount ()
+	      : num_normals == (int) softBody->GetVertexCount ());
+
+    return this->normals.GetArray ();
   }
 
   const csVector2* SoftBodyControl::UpdateTexels (csTicks current, const csVector2* texels,
@@ -197,10 +215,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     if (!softBody)
       return verts;
 
-    CS_ASSERT(num_verts == (int) softBody->GetVertexCount ());
-
-    if (version_id == 0 || lastTicks != current)
-      Update (current, num_verts, version_id);
+    CS_ASSERT(doubleSided ? num_verts == 2 * (int) softBody->GetVertexCount ()
+	      : num_verts == (int) softBody->GetVertexCount ());
 
     return vertices.GetArray ();
   }

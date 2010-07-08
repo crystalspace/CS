@@ -76,7 +76,7 @@ class SoftBodyControl : public scfImplementation2<SoftBodyControl,
     SoftBodyControl (iMeshObject* mesh);
 
     //-- iSoftBodyAnimationControl
-    virtual void SetSoftBody (iBulletSoftBody* body);
+    virtual void SetSoftBody (iBulletSoftBody* body, bool doubleSided = false);
     virtual iBulletSoftBody* GetSoftBody ();
 
     //-- iGenMeshAnimationControl
@@ -97,7 +97,9 @@ class SoftBodyControl : public scfImplementation2<SoftBodyControl,
   private:
     csWeakRef<iMeshObject> mesh;
     csRef<iBulletSoftBody> softBody;
+    bool doubleSided;
     csDirtyAccessArray<csVector3> vertices;
+    csDirtyAccessArray<csVector3> normals;
     csTicks lastTicks;
     csVector3 meshPosition;
 };

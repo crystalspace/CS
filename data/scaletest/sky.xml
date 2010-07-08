@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader compiler="xmlshader" name="sky">
+
+    <shadervars>
+      <shadervar name="sun_pos" type="vector3">0.0051, 0.75988, 0.8009</shadervar>
+      <shadervar name="term" type="vector4">0.309735, 0.325331, 7303.479004, 1</shadervar>
+      <shadervar name="sun direction" type="vector3">0.0051, 0.475988, 0.6009</shadervar>
+    </shadervars>
+
+  <technique priority="100">
+    <pass>
+      <mixmode>
+        <blendop src="one" dst="srcalpha_inv" />
+        <alphatest>disable</alphatest>
+      </mixmode>
+
+      <?if vars."tex diffuse".texture ?>
+        <texture name="tex diffuse" destination="diffuse" />
+      <?else?>
+        <!-- need to bind at least some texture -->
+        <texture name="standardtex white" destination="diffuse" />
+      <?endif?>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+
+      <vp plugin="glcg">
+        <cgvp>
+          <variablemap variable="sun_pos" destination="sun_pos" />
+          <variablemap variable="sun direction" destination="sun_vec" />
+          <variablemap variable="term" destination="term" />
+          <variablemap variable="object2world transform" destination="objectToWorld" />
+          <program>
+            <![CDATA[
+// Application to vertex
+struct a2v {
+  float4 Position : POSITION;
+  float3 Normal : NORMAL;
+  float2 TexCoord : TEXCOORD0;
+  float4 Color : COLOR;
+};
+
+// Vertex to fragment
+struct v2f {
+  float4 Position : POSITION;
+  float2 TexCoord0 : TEXCOORD0;
+  float3 viewvec : TEXCOORD1;
+  float3 worldpos : TEXCOORD2;
+  float4 Color : COLOR0;
+};
+
+// Perez model of distribution of sky luminance
+// A - darkening or brightening of the horizon
+// B - luminance gradient near the horizon
+// C - relative intensity of circumsolar region
+// D - width of the circumsolar region
+// E - relative backscattered light
+// theta - zenith angle
+// gamma - sun angle
+float4 perez(float cos_theta, float gamma, float cos_gamma_q)
+{
+  const float T = 5;
+  const float4 A = float4(
+        -0.0193*T - 0.2592,
+        -0.0167*T - 0.2608,
+         0.1787*T - 1.4630,
+         0);
+  const float4 B = float4(
+/*
+        -0.0665*T + 0.0008,
+        -0.0950*T + 0.0092,
+        -0.3554*T + 0.4275,
+        0);
+*/
+        -0.0959*T + 0.0012,
+        -0.1371*T + 0.0133,
+        -0.5127*T + 0.6168,
+         0);
+  const float4 C = float4(
+        -0.0004*T + 0.2125,
+        -0.0079*T + 0.2102,
+        -0.0227*T + 5.3251,
+         0);
+  const float4 D = float4(
+/*
+        -0.0641*T - 0.8989,
+        -0.0441*T - 1.6537,
+         0.1206*T - 2.5771,
+         0);
+*/
+        -0.0925*T - 1.2968,
+        -0.0636*T - 2.3858,
+         0.1740*T - 3.7180,
+         0);
+  const float4 E = float4(
+        -0.0033*T + 0.0452,
+        -0.0109*T + 0.0529,
+        -0.0670*T + 0.3703,
+         0);
+  //return (1 + A*exp(B/cos_theta))*(1 + C*exp(D*gamma) + E*cos_gamma_q);
+  return (1 + A*exp2(B/cos_theta))*(1 + C*exp2(D*gamma) + E*cos_gamma_q);
+}
+
+// Scale Y to [0,1] range
+float scale_Y(float Y)
+{
+  return 1 - exp(-Y/10000*2);
+  //return Y/10000;
+}
+
+// Convert color from xyY1 to RGB
+float4 xyY_to_RGB(float4 xyY)
+{
+/*
+  const float3x3 matr_XYZ_to_RGB = float3x3(
+         3.240479, -1.53715,  -0.49853,
+        -0.969256,  1.875991,  0.041556,
+         0.055648, -0.203043,  1.057311);
+
+  float3 XYZ = float3(xyY.x * xyY.z / xyY.y, xyY.z, (1 - xyY.x - xyY.y) * xyY.z / xyY.y);
+  float3 c = mul(matr_XYZ_to_RGB, XYZ);
+*/
+
+  const float3x3 matr_xy1_to_RGB = float3x3(
+         3.7390, -1.0386, -0.4985,
+        -1.0108,  1.8344,  0.0416,
+        -1.0017, -1.2604,  1.0573);
+
+  float3 c = mul(matr_xy1_to_RGB, float3(xyY.x, xyY.y, 1)) * xyY.z / xyY.y;
+
+  if (c.z < 0 || c.x < 0 || c.y < 0)
+  {
+     c.x = 0.025;
+     c.y = 0.025;
+     c.z = 0.0;
+  }
+
+  return float4(c.xyz, 0);
+}
+
+v2f main (a2v IN,
+  uniform float3 sun_vec,
+  uniform float3 sun_pos,
+  uniform float4 term,
+  uniform float4x4 objectToWorld,
+  uniform float4x4 ModelView : state.matrix.modelview,
+  uniform float4x4 ModelViewI : state.matrix.modelview.inverse,
+  uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
+  uniform float4x4 ModelViewProj : state.matrix.mvp)
+{
+  v2f OUT;
+
+  // Here we working in model coords. TODO: convert to eye coord space.
+  float3 Pos = normalize(IN.Position.xzy);
+  Pos.y *= -1;
+
+  if (Pos.z < 0) Pos.z = 0;
+
+  float cos_zenith_angle = dot(float3(0,1,0), sun_vec);
+  //float cos_sun = dot(Pos, sun_pos);
+  float cos_sun = dot(Pos, sun_vec); // This isn't quite correct.
+  float dist_sun = acos(cos_sun);
+
+  float4 f;
+  float4 c,d;
+
+  f = perez(cos_zenith_angle, dist_sun, cos_sun*cos_sun);
+  f = term*f;
+  f.z = scale_Y(f.z);
+  c = xyY_to_RGB(f);
+
+  // Assign the luminance to the alpha.
+  //c.a = f.z;
+  c.a = max(c.x*c.y*c.z, f.z);
+  //c.a = 1;
+
+  OUT.Position = mul(ModelViewProj, IN.Position);
+  OUT.TexCoord0 = IN.TexCoord;
+  OUT.viewvec = IN.Position;
+  OUT.worldpos = mul(objectToWorld, IN.Position);
+  OUT.Color = c;
+
+  return OUT;
+}
+            ]]>
+          </program>
+        </cgvp>
+      </vp>
+
+      <texture destination="night" name="tex night" />
+      <fp plugin="glcg">
+        <cgfp>
+          <variablemap variable="sun direction" destination="sun_vec" />
+          <program>
+            <![CDATA[
+            struct vertex2fragment {
+              float4 Position : POSITION;
+              float4 Color    : COLOR0;
+              float2 TexCoord0 : TEXCOORD0;
+              float3 viewvec : TEXCOORD1;
+              float3 worldpos : TEXCOORD2;
+            };
+
+            float4 main (vertex2fragment IN,
+              uniform float3 sun_vec,
+              uniform sampler2D night) : COLOR
+            {
+              //=[ Sun constants]===================
+              float sun_strength = 200.85;
+              float sun_shininess = 2900;
+              
+              // Add some atmosphere scattering.
+              float3 Pos = IN.worldpos.xzy;
+              float at = step(Pos.z, 500.0f);
+              float fade = 1 - smoothstep(0, 500.0f, Pos.z);
+              float4 atmos = float4(0.1,0.1,0.2,1.0) * at * fade * 0.7;
+
+              float3 sunlight = sun_strength*pow(saturate(dot(normalize(IN.viewvec), sun_vec)),sun_shininess)*float3(1.2, 0.4, 0.1);
+
+              float4 result = IN.Color;
+              
+              result += float4(sunlight,1);
+              
+              result = lerp(tex2D(night, IN.TexCoord0), result, saturate(IN.Color.a*1.5));
+              result.a = 1;
+
+              return max(result, atmos);
+            }
+            ]]>
+          </program>
+        </cgfp>
+      </fp>
+
+    </pass>
+  </technique>
+
+</shader>

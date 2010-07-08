@@ -271,7 +271,7 @@ public:
         
       result.x = pos.x + cell_result.x * scale_u;
       result.y = h0 + dh * correct_t;
-      result.z = pos.y + height - cell_result.y * scale_v;
+      result.z = pos.y + ((height - 1) - cell_result.y) * scale_v;
 
       return (cell_result.x >=0 && cell_result.x <= width - 1 &&
               cell_result.y >=0 && cell_result.y <= height - 1);

@@ -122,7 +122,7 @@ uint32 csKeyEventHelper::GetModifiersBits (const csKeyModifiers& m)
 csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   csTicks iTime, csEventID name, csMouseEventType mType, 
   int mx, int my, uint32 axesChanged,
-  uint mButton, bool mButtonState, 
+  int mButton, bool mButtonState, 
   uint32 buttonMask, const csKeyModifiers& modifiers)
 {
   csEvent *ev = new csEvent(iTime, name, false);
@@ -134,7 +134,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   ev->Add("mAxes", (void *) axes, 2 * sizeof(int32)); /* makes copy */
   ev->Add("mNumAxes", (uint8) 2);
   ev->Add("mAxesChanged", (uint32) axesChanged);
-  ev->Add("mButton", (uint8) mButton);
+  ev->Add("mButton", (int8) mButton);
   ev->Add("mButtonState", mButtonState);
   ev->Add("mButtonMask", buttonMask);
   ev->Add("keyModifiers", &modifiers, sizeof (csKeyModifiers));
@@ -144,7 +144,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
 csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   csTicks iTime, csEventID name, uint8 n, csMouseEventType mType, 
   int x, int y, uint32 axesChanged, 
-  uint button, bool buttonState, 
+  int button, bool buttonState, 
   uint32 buttonMask, const csKeyModifiers& modifiers)
 {
   csEvent *ev = new csEvent(iTime, name, false);
@@ -156,7 +156,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   ev->Add("mAxes", (void *) axes, 2 * sizeof(int)); /* makes copy */
   ev->Add("mNumAxes", (uint8) 2);
   ev->Add("mAxesChanged", (uint32) axesChanged);
-  ev->Add("mButton", (uint8) button);
+  ev->Add("mButton", (int8) button);
   ev->Add("mButtonState", buttonState);
   ev->Add("mButtonMask", buttonMask);
   ev->Add("keyModifiers", &modifiers, sizeof (csKeyModifiers));
@@ -166,7 +166,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
 csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   csTicks iTime, csEventID name, uint8 n, csMouseEventType mType,
   const int32 *axes, uint8 numAxes, uint32 axesChanged, 
-  uint button, bool buttonState, uint32 buttonMask, 
+  int button, bool buttonState, uint32 buttonMask, 
   const csKeyModifiers& modifiers)
 {
   csEvent *ev = new csEvent (iTime, name, false);
@@ -177,7 +177,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   ev->Add("mAxes", (void *) axes, numAxes * sizeof(int)); /* makes copy */
   ev->Add("mNumAxes", (uint8) numAxes);
   ev->Add("mAxesChanged", (uint32) axesChanged);
-  ev->Add("mButton", (uint8) button);
+  ev->Add("mButton", (int8) button);
   ev->Add("mButtonState", buttonState);
   ev->Add("mButtonMask", buttonMask);
   ev->Add("keyModifiers", &modifiers, sizeof (csKeyModifiers));
@@ -214,9 +214,9 @@ int csMouseEventHelper::GetAxis (const iEvent *event, uint axis)
     return 0;
 }
 
-uint csMouseEventHelper::GetButton (const iEvent *event)
+int csMouseEventHelper::GetButton (const iEvent *event)
 {
-  uint8 res = 0;
+  int8 res = 0;
   event->Retrieve("mButton", res);
   return res;
 }
@@ -264,9 +264,10 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
   }
   data.x = data.axes[0];
   data.y = data.axes[1];
-  ok = event->Retrieve("mButton", ui8);
+  int i8;
+  ok = event->Retrieve("mButton", i8);
   CS_ASSERT(ok == csEventErrNone);
-  data.Button = ui8;
+  data.Button = i8;
   const void* m;
   size_t mSize;
   ok = event->Retrieve("keyModifiers", m, mSize);
