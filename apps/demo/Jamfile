@@ -4,6 +4,7 @@ if $(CEGUI.AVAILABLE) = "yes"
 {
 Description csdemo : "Demo" ;
 Application csdemo : [ Wildcard *.cpp *.h ] ;
+CFlags csdemo : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
 LinkWith csdemo : crystalspace ;
 ExternalLibs ceguitest : CEGUI ;
 FileListEntryApplications csdemo : app-demo ;
