@@ -18,7 +18,7 @@
 
 #include "player.h"
 
-Player::Player(iObjectRegistry* or) : Entity(or)
+Player::Player(iObjectRegistry* obj_reg) : Entity(obj_reg)
 {
   csRef<iView> view (csQueryRegistry<iView> (object_reg));
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));

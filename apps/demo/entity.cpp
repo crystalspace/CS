@@ -43,7 +43,7 @@ iMeshWrapper* Entity::LoadMesh(const char* name, const char* file)
   return m;
 }
 
-Entity::Entity(iObjectRegistry* or) : scfImplementationType(this), object_reg(or)
+Entity::Entity(iObjectRegistry* obj_reg) : scfImplementationType(this), object_reg(obj_reg)
 {
   vc = csQueryRegistry<iVirtualClock> (object_reg);
   eventQueue = csQueryRegistry<iEventQueue> (object_reg);

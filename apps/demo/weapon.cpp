@@ -18,7 +18,7 @@
 
 #include "weapon.h"
 
-Weapon::Weapon(iObjectRegistry* or) : scfImplementationType(this), object_reg(or)
+Weapon::Weapon(iObjectRegistry* obj_reg) : scfImplementationType(this), object_reg(obj_reg)
 {
   vc = csQueryRegistry<iVirtualClock> (object_reg);
   eventQueue = csQueryRegistry<iEventQueue> (object_reg);
