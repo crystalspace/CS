@@ -31,6 +31,8 @@
 
 struct iObjectRegistry;
 
+#define GUIDE_HAIRS_COUNT 3
+
 CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 {
   class FurMaterialType : public 
@@ -67,14 +69,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csVector3 *controlPoints;
     size_t controlPointsCount;
 
-    csGuideHairReference *guideHairs;
-    size_t guideHairsCount;
+    csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT];
   };
 
   struct csGuideHair
   {
     csVector3 *controlPoints;
     size_t controlPointsCount;
+    csVector2 uv;
+    bool isActive;  //  obsolete
+  };
+
+  struct csGuideHairLOD
+  {
+    csVector3 *controlPoints;
+    size_t controlPointsCount;
+
+    csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT];
+    csVector2 uv;
+
     bool isActive;
   };
 
@@ -136,6 +149,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csArray<csHairStrand> hairStrands;
     csArray<csGuideHair> guideHairs;
     csArray<csTriangle> guideHairsTriangles;
+    csArray<csGuideHairLOD> guideHairsLOD;
     csRef<iFurPhysicsControl> physicsControl;
     csRef<iFurStrandGenerator> hairStrandGenerator;
     csRandomGen *rng;
@@ -154,10 +168,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     /// functions
     void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
       iRenderBuffer* normals, iRenderBuffer* texCoords);
-    void SaveImage(uint8* buf, const char* texname,int width, int height);
     void SynchronizeGuideHairs();
-    void GenerateHairStrands(iRenderBuffer* indices, iRenderBuffer* vertexes);
-    void SynchronizeHairsStrands();
+    void GenerateGuideHairsLOD();
+    void GenerateHairStrands();
+    /// debug
+    void SaveUVImage();
+    void SaveImage(uint8* buf, const char* texname,int width, int height);
+    /// setters
     void SetDensitymap();
     void SetHeightmap();
     void SetStrandWidth();

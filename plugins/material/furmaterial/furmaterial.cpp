@@ -113,8 +113,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     iRenderBuffer* texCoords = meshFactory->GetTexCoords();
 
     GenerateGuidHairs(indices, vertexes, normals, texCoords);
+    GenerateGuideHairsLOD();
     SynchronizeGuideHairs();
-    GenerateHairStrands(indices, vertexes);
+    GenerateHairStrands();
+
+    SaveUVImage();
 
     this->view = view;
     int numberOfStrains = hairStrands.GetSize();
@@ -203,18 +206,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);    
     csArray<int> uniqueIndices;
 
-    // density map
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-
-    csRef<iDataBuffer> densitymapDB = densitymap->Readback(readbackFmt);
-    int densitymapW, densitymapH;
-    densitymap->GetOriginalDimensions(densitymapW, densitymapH);
-    uint8* densitymapData = densitymapDB->GetUint8();
-
-    //csPrintf("%s\n", densitymap->GetImageName());
-
-    // chose unique indices
+    // choose unique indices
     while (tris.HasNext())
     {
       CS::TriangleT<size_t> tri (tris.Next ());
@@ -234,16 +226,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     // generate the guide hairs - this should be done based on heightmap
     for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
     {
-      csVector2 uv = UV.Get(uniqueIndices.Get(i));
-
-      densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
-        (int)(uv.y * densitymapH) * densitymapW ) ] = 255;
-
       csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
         displaceEps * norms.Get(uniqueIndices.Get(i));
 
       csGuideHair guideHair;
       guideHair.isActive = true;
+      guideHair.uv = UV.Get(uniqueIndices.Get(i));;
       guideHair.controlPointsCount = 5;
       guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 
@@ -253,20 +241,163 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       guideHairs.Push(guideHair);
     }
   
-    // put UV for all model, minus the hair skull mesh
-//     for(size_t i = 0; i < UV.GetSize(); i ++)
-//       if (uniqueIndices.Contains(i) == csArrayItemNotFound)
-//       {
-//         csVector2 uv = UV.Get(i);
-// 
-//         densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
-//           (int)(uv.y * densitymapH) * densitymapW ) ] = 255;
-//       }
+    //SetLOD(1.0f);
+  }
+
+  void FurMaterial::GenerateGuideHairsLOD()
+  {
+    // generate guide hairs for LOD
+    for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
+    {
+      int indexA = guideHairsTriangles.Get(iter).a;
+      int indexB = guideHairsTriangles.Get(iter).b;
+      int indexC = guideHairsTriangles.Get(iter).c;
+
+      // average density
+
+      // make new guide hair
+      csGuideHairLOD guideHairLOD;
+      float bA, bB, bC; // barycentric coefficients
+
+      bA = rng->Get();
+      bB = rng->Get() * (1 - bA);
+      bC = 1 - bA - bB;
+
+      guideHairLOD.guideHairs[0].distance = bA;
+      guideHairLOD.guideHairs[0].index = indexA;
+      guideHairLOD.guideHairs[1].distance = bB;
+      guideHairLOD.guideHairs[1].index = indexB;
+      guideHairLOD.guideHairs[2].distance = bC;
+      guideHairLOD.guideHairs[2].index = indexC;
+
+      guideHairLOD.isActive = false;
+
+      guideHairLOD.uv = guideHairs.Get(indexA).uv * bA + 
+        guideHairs.Get(indexB).uv * bB + guideHairs.Get(indexC).uv * bC;
+
+      // generate control points
+
+      // add new triangles
+      guideHairsLOD.Push(guideHairLOD);
+      //csTriangle ADC = csTriangle();
+    }    
+  }
+
+  void FurMaterial::SynchronizeGuideHairs ()
+  {
+    if (!physicsControl) // no physics support
+      return;
+
+    for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
+      if (guideHairs.Get(i).isActive)
+        physicsControl->InitializeStrand(i,guideHairs.Get(i).controlPoints, 
+          guideHairs.Get(i).controlPointsCount);
+  }
+
+  void FurMaterial::GenerateHairStrands ()
+  {
+    float bA, bB, bC; // barycentric coefficients
+
+    float density = 5;
+
+    CS::ShaderVarName densityName (svStrings, "density");	
+    csRef<csShaderVariable> shaderVariable = material->GetVariable(densityName);
+
+    if (shaderVariable)
+      shaderVariable->GetValue(density);
+
+    // for every triangle
+    for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
+    {
+      for ( int den = 0 ; den < density ; den ++ )
+      {
+        csHairStrand hairStrand;
+
+        bA = rng->Get();
+        bB = rng->Get() * (1 - bA);
+        bC = 1 - bA - bB;
+
+        int indexA = guideHairsTriangles.Get(iter).a;
+        int indexB = guideHairsTriangles.Get(iter).b;
+        int indexC = guideHairsTriangles.Get(iter).c;
+
+        hairStrand.guideHairs[0].distance = bA;
+        hairStrand.guideHairs[0].index = indexA;
+        hairStrand.guideHairs[1].distance = bB;
+        hairStrand.guideHairs[1].index = indexB;
+        hairStrand.guideHairs[2].distance = bC;
+        hairStrand.guideHairs[2].index = indexC;
+
+        hairStrand.controlPointsCount = csMin(
+          (csMin(guideHairs.Get(indexA).controlPointsCount,
+          guideHairs.Get(indexB).controlPointsCount)),
+          (guideHairs.Get(indexC).controlPointsCount));
+
+        hairStrand.controlPoints = new csVector3[ hairStrand.controlPointsCount ];
+
+        for ( size_t i = 0 ; i < hairStrand.controlPointsCount ; i ++ )
+        {
+          hairStrand.controlPoints[i] = csVector3(0);
+          for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
+            hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
+            guideHairs.Get(hairStrand.guideHairs[j].index).controlPoints[i];
+        }
+
+        hairStrands.Push(hairStrand);		
+      }
+    }
+  }
+
+  void FurMaterial::SetLOD(float LOD)
+  {
+    // first is always active
+    for (size_t i = 1 ; i < guideHairs.GetSize(); i ++)
+    {
+      if ( rng->Get() > LOD )
+        guideHairs.Get(i).isActive = false;
+    }
+
+    // print the number of control hairs
+    int count = 0;
+    for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
+      if (guideHairs.Get(i).isActive)
+        count++;
+    csPrintf("%d\n",count);
+  }
+
+  void FurMaterial::SaveUVImage()
+  {
+    // density map
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+
+    csRef<iDataBuffer> densitymapDB = densitymap->Readback(readbackFmt);
+    int densitymapW, densitymapH;
+    densitymap->GetOriginalDimensions(densitymapW, densitymapH);
+    uint8* densitymapData = densitymapDB->GetUint8();
+
+    //csPrintf("%s\n", densitymap->GetImageName());
+
+    // from normal guide ropes
+    for (size_t i = 0 ; i < guideHairs.GetSize() ; i ++)
+    {
+      csVector2 uv = guideHairs.Get(i).uv;
+
+      densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
+        (int)(uv.y * densitymapH) * densitymapW ) + 1 ] = 255;
+    }
+
+    // from LOD guide ropes
+    for (size_t i = 0 ; i < guideHairsLOD.GetSize() ; i ++)
+    {
+      csVector2 uv = guideHairsLOD.Get(i).uv;
+
+      densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
+        (int)(uv.y * densitymapH) * densitymapW ) ] = 255;
+    }
 
     SaveImage(densitymapData, "/data/krystal/krystal_debug.png",
       densitymapW, densitymapH);
-    
-    //SetLOD(1.0f);
   }
 
   void FurMaterial::SaveImage(uint8* buf, const char* texname, 
@@ -308,92 +439,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       printf("Failed to save png image for basemap!");
       return;
     }	    
-  }
-
-
-  void FurMaterial::SetLOD(float LOD)
-  {
-    // first is always active
-    for (size_t i = 1 ; i < guideHairs.GetSize(); i ++)
-    {
-      if ( rng->Get() > LOD )
-        guideHairs.Get(i).isActive = false;
-    }
-
-    // print the number of control hairs
-    int count = 0;
-    for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
-      if (guideHairs.Get(i).isActive)
-        count++;
-    csPrintf("%d\n",count);
-  }
-
-  void FurMaterial::SynchronizeGuideHairs ()
-  {
-    if (!physicsControl) // no physics support
-      return;
-
-    for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
-      if (guideHairs.Get(i).isActive)
-        physicsControl->InitializeStrand(i,guideHairs.Get(i).controlPoints, 
-          guideHairs.Get(i).controlPointsCount);
-  }
-
-  void FurMaterial::GenerateHairStrands (iRenderBuffer* indices, iRenderBuffer* 
-    vertexes)
-  {
-    float bA, bB, bC; // barycentric coefficients
-
-    float density = 5;
-
-    CS::ShaderVarName densityName (svStrings, "density");	
-    csRef<csShaderVariable> shaderVariable = material->GetVariable(densityName);
-
-    if (shaderVariable)
-      shaderVariable->GetValue(density);
-
-    // for every triangle
-    for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
-    {
-      for ( int den = 0 ; den < density ; den ++ )
-      {
-        csHairStrand hairStrand;
-
-        bA = rng->Get();
-        bB = rng->Get() * (1 - bA);
-        bC = 1 - bA - bB;
-
-        hairStrand.guideHairsCount = 3;
-        hairStrand.guideHairs = new csGuideHairReference[hairStrand.guideHairsCount];
-        int indexA = guideHairsTriangles.Get(iter).a;
-        int indexB = guideHairsTriangles.Get(iter).b;
-        int indexC = guideHairsTriangles.Get(iter).c;
-
-        hairStrand.guideHairs[0].distance = bA;
-        hairStrand.guideHairs[0].index = indexA;
-        hairStrand.guideHairs[1].distance = bB;
-        hairStrand.guideHairs[1].index = indexB;
-        hairStrand.guideHairs[2].distance = bC;
-        hairStrand.guideHairs[2].index = indexC;
-
-        hairStrand.controlPointsCount = csMin(
-          (csMin(guideHairs.Get(indexA).controlPointsCount,
-          guideHairs.Get(indexB).controlPointsCount)),
-          (guideHairs.Get(indexC).controlPointsCount));
-
-        hairStrand.controlPoints = new csVector3[ hairStrand.controlPointsCount ];
-
-        for ( size_t i = 0 ; i < hairStrand.controlPointsCount ; i ++ )
-        {
-          hairStrand.controlPoints[i] = csVector3(0);
-          for ( size_t j = 0 ; j < hairStrand.guideHairsCount ; j ++ )
-            hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
-            guideHairs.Get(hairStrand.guideHairs[j].index).controlPoints[i];
-        }
-
-        hairStrands.Push(hairStrand);		
-      }
-    }
   }
 
   void FurMaterial::SetPhysicsControl (iFurPhysicsControl* physicsControl)
@@ -554,7 +599,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     for ( size_t i = 0 ; i < hairStrand->controlPointsCount; i++ )
     {
       hairStrand->controlPoints[i] = csVector3(0);
-      for ( size_t j = 0 ; j < hairStrand->guideHairsCount ; j ++ )
+      for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
         hairStrand->controlPoints[i] += hairStrand->guideHairs[j].distance * (
         furMaterial->guideHairs.Get(hairStrand->guideHairs[j].index).controlPoints[i] + 
         (int)pow(-1.0,(int)i) * csVector3(0.0f,0.0f,0.0f));
