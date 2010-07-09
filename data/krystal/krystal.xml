@@ -40,9 +40,8 @@
 	  <shadervar type="float" name="width">0.005</shadervar>
 	  <shadervar type="float" name="density">5</shadervar>
 	  <shadervar type="float" name="displaceEps">0.02</shadervar>
-      <shadervar type="texture" name="density map">krystal_spec</shadervar>
-      <shadervar type="texture" name="height map">krystal_spec</shadervar>
-      <shadervar type="texture" name="tex specular">krystal_spec</shadervar>	  
+      <shadervar type="texture" name="density map">krystal_skull</shadervar>
+      <shadervar type="texture" name="height map">krystal_skull</shadervar>
     </material>
   </materials>
   <sounds/>
