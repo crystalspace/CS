@@ -70,7 +70,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     iBulletSoftBody* bulletBody = bulletDynamicSystem->
       CreateRope(first, first + csVector3(0, 1, 0) * (last - first).Norm() , 
-      coordinatesCount - 2);	//	replace with -1
+      coordinatesCount - 1);	//	replace with -1
     bulletBody->SetMass (0.1f);
     bulletBody->SetRigidity (0.99f);
     bulletBody->AnchorVertex (0, rigidBody);

@@ -499,12 +499,14 @@ bool HairTest::Application ()
       dynamicsDebugger->SetDynamicSystem (dynamicSystem);
       dynamicsDebugger->SetDebugSector (room);
 
-      // Set up the physical collider for the roof
-      dynamicSystem->AttachColliderPlane (csPlane3 (csVector3 (0.0f, 1.0f, 0.0f), 0.0f),
-        10.0f, 0.0f);
-    }
+      bulletDynamicSystem->SetSoftBodyWorld (true);
 
-    bulletDynamicSystem->SetSoftBodyWorld (true);
+      // Set up the physical collider for the roof (soft bodies don't like plane
+      // colliders, so use a box instead)
+      csOrthoTransform t;
+      t.SetOrigin(csVector3(0.0f, -50.0f, 0.0f));
+      dynamicSystem->AttachColliderBox (csVector3 (100.0f), t, 10.0f, 0.0f);
+    }
   }
 
   // Create avatar
