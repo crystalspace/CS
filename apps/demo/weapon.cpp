@@ -18,6 +18,8 @@
 
 #include "weapon.h"
 
+#include "entity.h"
+
 Weapon::Weapon(iObjectRegistry* obj_reg) : scfImplementationType(this), object_reg(obj_reg)
 {
   vc = csQueryRegistry<iVirtualClock> (object_reg);
@@ -106,6 +108,62 @@ bool Weapon::Fire()
   return true;
 }
 
-void Weapon::ApplyDamage()
+void Weapon::ApplyDamage(Entity* entity)
 {
+  int type = 0;
+  int maxHP = 50;
+  int points = 50;
+
+  if (type == 0) // melee damage
+  {
+    entity->HP -= points;
+    entity->PlayAnimation("hit", false);
+  }
+  else if (type == 1) // ice damage
+  {
+    entity->HP -= points;
+    if (points > maxHP/2)
+    {
+      entity->Step(0);
+
+      entity->ChangeMaterial ();
+      entity->PlayAnimation("hit", true);
+      if (entity->HP <= 0 && !entity->frozen) // Don't explode immediatly.
+        entity->HP = 1;
+      entity->frozen = true;
+    }
+    else
+      entity->PlayAnimation("hit", false);
+  }
+  else
+    return;
+
+  /*
+  if (frozen)
+  {
+    entity->frozensound.sndstream->ResetPosition();
+    entity->frozensound.sndstream->Unpause ();
+  }
+  else
+  {
+    entity->hitsound.sndstream->ResetPosition();
+    entity->hitsound.sndstream->Unpause ();
+  }
+  */
+
+  if (entity->HP <= 0)
+  {
+    entity->Step(0);
+    if (entity->frozen)
+    {
+      printf("I: exploded!\n");
+      entity->Explode();
+    }
+    else
+    {
+      printf("I: died!\n");
+      entity->PlayAnimation("die", true);
+    }
+    entity->died = true;
+  }
 }

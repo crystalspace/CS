@@ -16,50 +16,29 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef __WEAPON_H__
-#define __WEAPON_H__
+#ifndef __MONSTER_H__
+#define __MONSTER_H__
 
 #include "crystalspace.h"
 
-class Entity;
+#include "entity.h"
 
-class Weapon :  public scfImplementation1<Weapon,iEventHandler> 
+class Monster : public Entity 
 {
 private:
-  iObjectRegistry* object_reg;
+  void Behaviour();
 
-private:
-  csRef<iVirtualClock> vc;
-  /// The queue of events waiting to be handled.
-  csRef<iEventQueue> eventQueue;
-  /// The event name registry, used to convert event names to IDs and back.
-  csRef<iEventNameRegistry> nameRegistry;
-
-  bool HandleEvent(iEvent& ev);
-
-  CS_EVENTHANDLER_NAMES ("demo.weapon")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
-
-private:
-  bool registered;
-  void Register();
-  void UnRegister();
-
-  bool reloading;
-  int reloadtime;
-  int reloadingtime;
-
-public:
   csRef<iMeshWrapper> mesh;
 
+  float awareRadius;
+
 public:
-  Weapon(iObjectRegistry*);
-  ~Weapon();
+  Monster(iObjectRegistry*, iMeshWrapper*);
+  ~Monster();
 
-  bool IsReady();
-  bool Fire();
+  virtual void PlayAnimation(const char*, bool);
 
-  void ApplyDamage(Entity* entity);
+  virtual csVector3 GetPosition();
 };
 
 #endif

@@ -40,13 +40,15 @@ Player::Player(iObjectRegistry* obj_reg) : Entity(obj_reg)
 
 
   weapon->mesh = LoadMesh("gencrossbow", "/data/bias/models/crossbow/crossbow");
+
+  weapon->mesh->SetFlagsRecursive(CS_ENTITY_NOHITBEAM);
 }
 
 Player::~Player()
 {
 }
 
-bool Player::HandleEvent(iEvent& ev)
+void Player::Behaviour()
 {
   //Update weapon transform
   csRef<iView> view (csQueryRegistry<iView> (object_reg));
@@ -68,16 +70,6 @@ bool Player::HandleEvent(iEvent& ev)
   weapon->mesh->GetMovable()->Transform(csYRotMatrix3(yrot));
   weapon->mesh->GetMovable()->SetSector(sector);
   weapon->mesh->GetMovable()->UpdateMove();
-
-  //Update movement
-  csTicks elapsed_time = vc->GetElapsedTicks ();
-
-  float delta = float (elapsed_time) / 1000.0f;
-  collider_actor.Move (delta, speed, velocity, angle_velocity);
-
-  InterpolateMovement ();
-
-  return false;
 }
 
 void Player::Fire(int x, int y)
@@ -90,8 +82,20 @@ void Player::Fire(int x, int y)
 
     if (weapon->Fire() && result.mesh)
     {
-      printf("PLAYER HIT\n");
-      weapon->ApplyDamage();
+      printf("PLAYER HIT %s\n", result.mesh->QueryObject()->GetName());
+
+      iObject* ob = result.mesh->QueryObject()->GetChild("Entity");
+      if (ob)
+      {
+        weapon->ApplyDamage((Entity*)ob);
+        printf("HITT\n");
+      }
     }
   }
+}
+
+csVector3 Player::GetPosition()
+{
+  csRef<iView> view (csQueryRegistry<iView> (object_reg));
+  return view->GetCamera()->GetTransform().GetOrigin();
 }

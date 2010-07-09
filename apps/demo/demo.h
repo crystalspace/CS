@@ -28,6 +28,7 @@
 #include "ivaria/icegui.h"
 
 #include "player.h"
+#include "monster.h"
 
 class Demo : public csApplicationFramework, public csBaseEventHandler
 {
@@ -35,6 +36,8 @@ private:
   bool do_freelook;
 
   csRef<Player> player;
+
+  csRefArray<Monster> monsters;
 
 private:
   iSector *room;

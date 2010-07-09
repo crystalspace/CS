@@ -23,7 +23,7 @@
 
 #include "weapon.h"
 
-class Entity :  public scfImplementation1<Entity,iEventHandler> 
+class Entity :  public scfImplementation2<Entity,iEventHandler, iObject> 
 {
 protected:
   iObjectRegistry* object_reg;
@@ -48,6 +48,11 @@ protected:
 
   csRef<Weapon> weapon;
 
+public:
+  int HP;
+  bool frozen;
+  bool died;
+
 protected:
   csRef<iVirtualClock> vc;
   /// The queue of events waiting to be handled.
@@ -55,12 +60,13 @@ protected:
   /// The event name registry, used to convert event names to IDs and back.
   csRef<iEventNameRegistry> nameRegistry;
 
-  virtual bool HandleEvent(iEvent& ev);
-
   virtual void Behaviour();
 
   CS_EVENTHANDLER_NAMES ("demo.entity")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
+
+private:
+  virtual bool HandleEvent(iEvent& ev);
 
 public:
   Entity(iObjectRegistry*);
@@ -68,14 +74,38 @@ public:
 
   iMeshWrapper* LoadMesh(const char* name, const char* file);
 
-  virtual void Fire(int x, int y);
-
   virtual void Strafe(float speed);
   virtual void Step(float speed);
   virtual void Jump();
   virtual void Rotate(float speed);
   virtual void RotateCam(float x, float y);
   virtual void InterpolateMovement();
+
+  virtual void PlayAnimation(const char*, bool) {}// = 0;
+  virtual void Explode() {}// = 0;
+  virtual void ChangeMaterial() {}// = 0;
+
+
+  virtual csVector3 GetPosition() = 0;
+
+
+  //iObject interface
+  void SetName (const char *iName) {}
+  const char* GetName () const { return "Entity"; }
+  uint GetID () const { return 0; }
+  void SetObjectParent (iObject *obj) {}
+  iObject* GetObjectParent () const { return 0; }
+  void ObjAdd (iObject *obj) {}
+  void ObjRemove (iObject *obj) {}
+  void ObjRemoveAll () {}
+  void ObjAddChildren (iObject *Parent) {}
+  iObject* GetChild (int iInterfaceID, int iVersion, const char *Name, bool FirstName) const { return 0; }
+  iObject* GetChild (const char *Name) const { return 0; }
+  csPtr<iObjectIterator> GetIterator () { return 0; }
+  void ObjReleaseOld (iObject *obj) {}
+  void AddNameChangeListener (iObjectNameChangeListener* listener) {}
+  void RemoveNameChangeListener (iObjectNameChangeListener* listener) {}
+  iObject* GetChild (int iInterfaceID, int iVersion, const char *Name = 0) const { return 0; }
 };
 
 #endif

@@ -26,13 +26,15 @@
 class Player : public Entity 
 {
 private:
-  bool HandleEvent(iEvent& ev);
+  void Behaviour();
 
 public:
   Player(iObjectRegistry*);
   ~Player();
 
   void Fire(int x, int y);
+
+  virtual csVector3 GetPosition();
 };
 
 #endif

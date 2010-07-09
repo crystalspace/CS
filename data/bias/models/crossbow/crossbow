@@ -15,12 +15,6 @@
     <shader>
       <file>/shader/character/character2.xml</file>
     </shader>
-    <shader>
-      <file>/shader/light_bumpmap.xml</file>
-    </shader>
-    <shader>
-      <file>/shader/ambient.xml</file>
-    </shader>
   </shaders>
   
   
@@ -39,6 +33,7 @@
   <materials>
     <material name='crossbowcrossbow6mi9.png'>
       <texture>crossbow.png</texture>
+      <shader type='depthwrite'>*null</shader>
       <shader type='diffuse'>character_bump2</shader>
       <shader type='ambient'>character2</shader>
       <shadervar type='texture' name='tex normal'>BUMPnormalmap.png</shadervar>

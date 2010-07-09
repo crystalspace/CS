@@ -30,8 +30,6 @@ iMeshWrapper* Entity::LoadMesh(const char* name, const char* file)
   size_t pos = s.find_last_of("/");
   s = s.substr(0, pos+1);
 
-  printf(s.c_str());
-
   vfs->ChDir (s.c_str());
   bool l = loader->LoadLibraryFile(file);
   if (!l) printf("LoadMesh failed!\n");
@@ -60,7 +58,7 @@ Entity::Entity(iObjectRegistry* obj_reg) : scfImplementationType(this), object_r
 
   cfg_jumpspeed = 0.08f;
 
-  speed = 1.0f;
+  speed = 0.6f;
   desired_velocity.Set(0.0f);
   velocity.Set(0.0f);
   desired_angle_velocity.Set(0.0f);
@@ -72,8 +70,14 @@ Entity::Entity(iObjectRegistry* obj_reg) : scfImplementationType(this), object_r
   collider_actor.SetCollideSystem (collide_system);
   collider_actor.SetEngine (engine);
   collider_actor.SetCD (true);
+  collider_actor.SetGravity(9.806);
 
   weapon.AttachNew(new Weapon(object_reg));
+
+
+  HP = 50;
+  frozen = false;
+  died = false;
 }
 
 Entity::~Entity()
@@ -82,8 +86,6 @@ Entity::~Entity()
 
 bool Entity::HandleEvent(iEvent& ev)
 {
-  Behaviour();
-
   //Update movement
   csTicks elapsed_time = vc->GetElapsedTicks ();
 
@@ -92,27 +94,13 @@ bool Entity::HandleEvent(iEvent& ev)
 
   InterpolateMovement ();
 
+  Behaviour();
+
   return false;
 }
 
 void Entity::Behaviour()
 {
-}
-
-void Entity::Fire(int x, int y)
-{
-  if (weapon->IsReady())
-  {
-    csRef<iView> view (csQueryRegistry<iView> (object_reg));
-    csScreenTargetResult result = csEngineTools::FindScreenTarget (
-      csVector2 (x, y), 1000.0f, view->GetCamera ());
-
-    if (weapon->Fire() && result.mesh)
-    {
-      printf("ENTITY HIT\n");
-      weapon->ApplyDamage();
-    }
-  }
 }
 
 void Entity::Strafe (float speed)
