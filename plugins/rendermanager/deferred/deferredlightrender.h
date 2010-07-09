@@ -41,6 +41,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     return sqrt ((1 + c) / 2.0f);
   }
 
+   /**
+    * Returns the given lights direction (only valid for spot and directional lights).
+    */
+  inline csVector3 GetLightDir(iLight *light)
+  {
+    iMovable *mov = light->GetMovable ();
+    csVector3 d = mov->GetFullTransform ().GetT2O () * csVector3 (0.0f, 0.0f, 1.0f);
+
+    return csVector3::Unit (d);
+  }
+
   /**
    * Creates a transform that will transform a sphere centered at the origin 
    * with a radius of 1 to match the position and size of the given point light.
@@ -75,7 +86,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
      *
      *         /|         Where r is the radius of the cone base,
      *        /t|               h is the height of the cone (h = range),
-     *     a /  | h             t is half the outer falloff angle (outer = cos(2t)),
+     *     a /  | h             t is half the outer falloff angle (outer = cos(t)),
      *      /___|               a is the length of the hypotenuse.
      *        r
      *
@@ -91,35 +102,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
      *      = sqrt(h^2*(1 - cos(t)^2) / cos(t)^2) 
      *      = h/cos(t) * sqrt(1 - cos(t)^2)
      */
+    float r = (range / outer) * sqrt (1 - outer * outer);
 
-    /* Use the half-angle formula to relate cos(a) to cos(a/2). */
-    float houter = CosineHalfAngle (outer);
-
-    float r = (range / houter) * sqrt (1 - houter * houter);
-
+    // Transforms the cone into light space.
     csMatrix3 m (r, 0,      0,
                  0, 0, -range,
                  0, r,      0);
-    csVector3 v (0, 0, range);
+    csVector3 v (0, 0,  range);
 
     return csReversibleTransform (m, v) * movable->GetFullTransform ();
   }
 
   /**
    * Creates a transform that will transform a 1x1x1 cube centered at the origin
-   * to match the given bounding box (assumed to be in world space).
+   * to match the given directional light.
    */
-  inline csReversibleTransform CreateBBoxTransform(const csBox3 &bbox)
+  inline csReversibleTransform CreateDirectionalLightTransform(iLight *light)
   {
-    csVector3 size = bbox.GetSize ();
+    iMovable *movable = light->GetMovable ();
 
-    csMatrix3 scale (size.x,   0.0f,   0.0f,
-                       0.0f, size.y,   0.0f,
-                       0.0f,   0.0f, size.z);
+    float z = light->GetCutoffDistance ();
+    float r = light->GetDirectionalCutoffRadius ();
 
-    csReversibleTransform (scale, bbox.GetCenter ());
+    csMatrix3 S (r, 0, 0,
+                 0, z, 0,
+                 0, 0, r);
+
+    csMatrix3 T = S * movable->GetFullTransform ().GetO2T ();
+
+    return csReversibleTransform (T, movable->GetFullPosition ());
   }
-    /**
+
+  /**
    * Creates a transform that will transform a 1x1x1 cube centered at the origin
    * to match the given bounding box (assumed to be in world space).
    */
@@ -131,7 +145,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         return CreatePointLightTransform (light);
         break;
       case CS_LIGHT_DIRECTIONAL:
-        /* TODO */
+        return CreateDirectionalLightTransform (light);
         break;
       case CS_LIGHT_SPOTLIGHT:
         return CreateSpotLightTransform (light);
@@ -149,7 +163,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
   inline CS::Math::Matrix4 CreateOrthoProj(iGraphics3D *graphics3D)
   {
     float w = graphics3D->GetDriver2D ()->GetWidth ();
-    float h =  graphics3D->GetDriver2D ()->GetHeight ();
+    float h = graphics3D->GetDriver2D ()->GetHeight ();
 
     return CS::Math::Projections::Ortho (0, w, 0, h, -1.0f, 10.0f);
   }
@@ -170,16 +184,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
    */
   inline bool IsPointInsideSpotLight(const csVector3 &p, iLight *light)
   {
-    iMovable *movable = light->GetMovable ();
-    csVector3 pos = movable->GetFullPosition ();
+    csVector3 pos = light->GetMovable ()->GetFullPosition ();
     float range = light->GetCutoffDistance ();
 
     float inner, outer;
     light->GetSpotLightFalloff (inner, outer);
 
     // Gets the spot light direction.
-    csReversibleTransform light2world = movable->GetFullTransform ();
-    csVector3 d = csVector3::Unit (light2world.GetT2O () * csVector3 (0.0f, 0.0f, 1.0f));
+    csVector3 d = GetLightDir (light);
     csVector3 u = p - pos;
 
     float dot_ud = u * d;
@@ -189,12 +201,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     float cang = dot_ud / u.Norm ();
 
     /* Use the half-angle formula to relate cos(a) to cos(a/2). */
-    float houter = CosineHalfAngle (outer);
+    float houter =  (outer);
 
     if (cang < houter)
-      return false;
+      return true;
 
-    return true;
+    return false;
+  }
+
+  /**
+   * Returns true if the given point is inside the volume of the given directional light.
+   */
+  inline bool IsPointInsideDirectionalLight(const csVector3 &p, iLight *light)
+  {
+    csBox3 box;
+    box.SetCenter (csVector3 (0.0f, 0.0f, 0.0f));
+    box.SetSize (csVector3 (2.0f, 2.0f, 2.0f));
+
+    // Transform the point to object space and test.
+    csReversibleTransform obj2world = CreateDirectionalLightTransform (light);
+    csVector3 objPos = obj2world.Other2This (p);
+
+    return !box.In (objPos);
   }
 
   /**
@@ -211,7 +239,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         return IsPointInsideSpotLight (p, light);
         break;
       case CS_LIGHT_DIRECTIONAL:
-        return true; // All points are affected by a directional light.
+        return IsPointInsideDirectionalLight (p, light);
         break;
       default:
         CS_ASSERT(false);
@@ -266,6 +294,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
        * base centered at the origin. */
       csRef<iMeshWrapper> coneMesh;
 
+      /* Mesh and material used for drawing directional lights. Assumed to be
+       * a 1x1x1 box centered at the origin. */
+      csRef<iMeshWrapper> boxMesh;
+
       /* Mesh and material used for drawing ambient light. Assumed to be in the
        * xy plane with the bottom left corner at the origin with a width and 
        * height of 1 along the positive x and y axes. */
@@ -274,6 +306,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       /* Materials used for computing lighting results. */
       csRef<iMaterialWrapper> pointMaterial;
       csRef<iMaterialWrapper> spotMaterial;
+      csRef<iMaterialWrapper> directionalMaterial;
       csRef<iMaterialWrapper> ambientMaterial;
 
       /**
@@ -347,6 +380,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         iShader *spotLightShader = shaderManager->GetShader ("deferred_spot_light");
         spotMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), spotLightShader);
+
+        // Builds the box.
+        csBox3 box;
+        box.SetCenter (csVector3 (0.0f, 0.0f, 0.0f));
+        box.SetSize (csVector3 (2.0f, 2.0f, 2.0f));
+        CS::Geometry::TesselatedBox boxPrim (box);
+
+        csRef<iMeshFactoryWrapper> boxFactory = GeneralMeshBuilder::CreateFactory (engine, 
+          "crystalspace.rendermanager.deferred.lightrender.box", 
+          &boxPrim);
+
+        boxMesh = boxFactory->CreateMeshWrapper ();
+
+        // Creates the directional material.
+        directionalMaterial = engine->CreateMaterial (
+          "crystalspace.rendermanager.deferred.lightrender.directional", 
+          NULL);
+
+        boxMesh->GetMeshObject ()->SetMaterialWrapper (directionalMaterial);
+
+        if (!loader->LoadShader ("/shader/deferred/directional_light.xml"))
+        {
+          csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+            messageID, "Could not load deferred_directional_light shader");
+        }
+
+        iShader *directionalLightShader = shaderManager->GetShader ("deferred_directional_light");
+        directionalMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), 
+          directionalLightShader);
 
         // Builds the quad.
         CS::Geometry::TesselatedQuad quadPrim (csVector3 (0.0f, 0.0f, 0.0f), 
@@ -466,9 +528,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       // Transform light direction to view space.
       if (type == CS_LIGHT_DIRECTIONAL || type == CS_LIGHT_SPOTLIGHT)
       {
-        csVector3 lightDir = movable->GetFullTransform ().This2Other (
-          csVector3 (0.0f, 0.0f, 1.0f));
-        lightDir = world2camera.This2Other (lightDir);
+        csVector3 lightDir = GetLightDir (light);
+        lightDir = world2camera.GetT2O () * lightDir;
 
         csShaderVariable *lightDirSV = lightSVContext->GetVariableAdd (
           svStringSet->Request ("light direction view"));
@@ -485,23 +546,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     void RenderSpotLight(iLight *light)
     {
-      graphics3D->SetRenderState (G3DRENDERSTATE_EDGES, 1);
-
       RenderLight (light,
                    persistentData.coneMesh->GetMeshObject (),
                    persistentData.spotMaterial->GetMaterial ());
-      
-      graphics3D->SetRenderState (G3DRENDERSTATE_EDGES, 0);
     }
 
     void RenderDirectionalLight(iLight *light)
     {
+      RenderLight (light,
+                   persistentData.boxMesh->GetMeshObject (),
+                   persistentData.directionalMaterial->GetMaterial ());
     }
 
     void RenderAmbientLight()
     {
       iMeshObject *obj = persistentData.quadMesh->GetMeshObject ();
-      iMaterial *mat = persistentData.ambientMaterial->GetMaterial ();
+      iMaterial *mat = persistentData.spotMaterial->GetMaterial ();
 
       int num = 0;
       csRenderMesh **meshes = obj->GetRenderMeshes (num, rview, 
@@ -510,13 +570,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       if (num <= 0)
         return;
 
-      // Switches to using orthographic projection. 
-      csReversibleTransform oldView = graphics3D->GetWorldToCamera ();
-      CS::Math::Matrix4 oldProj = graphics3D->GetProjectionMatrix ();
-
-      graphics3D->SetWorldToCamera (csReversibleTransform ());
-      graphics3D->SetProjectionMatrix (CreateOrthoProj (graphics3D));
-
       // Update shader stack.
       csShaderVariableStack svStack = shaderMgr->GetShaderVariableStack ();
       iShader *shader = mat->GetShader (stringSet->Request ("gbuffer use"));
@@ -524,6 +577,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       svStack.Clear ();
       shaderMgr->PushVariables (svStack);
       shader->PushVariables (svStack);
+
+      // Switches to using orthographic projection. 
+      csReversibleTransform oldView = graphics3D->GetWorldToCamera ();
+      CS::Math::Matrix4 oldProj = graphics3D->GetProjectionMatrix ();
+
+      graphics3D->SetWorldToCamera (csReversibleTransform ());
+      graphics3D->SetProjectionMatrix (CreateOrthoProj (graphics3D));
 
       // Create quad transform.
       float w = graphics3D->GetDriver2D ()->GetWidth ();
