@@ -21,6 +21,7 @@
 #include "csplugincommon/rendermanager/posteffectssupport.h"
 
 #include "csutil/cfgacc.h"
+#include "imap/loader.h"
 
 namespace CS
 {
