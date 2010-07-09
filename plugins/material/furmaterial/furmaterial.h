@@ -80,15 +80,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     bool isActive;  //  obsolete
   };
 
-  struct csGuideHairLOD
+  struct csGuideHairLOD : csGuideHair
   {
-    csVector3 *controlPoints;
-    size_t controlPointsCount;
-
     csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT];
-    csVector2 uv;
-
-    bool isActive;
   };
 
   class FurMaterial : public scfImplementation2<FurMaterial,
@@ -157,6 +151,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iAnimatedMeshFactory> meshFactory;
     csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
     iTextureHandle* densitymap;
+    float densityFactor;
     iTextureHandle* heightmap;
     csRef<iMaterial> material;
     csRef<iShaderVarStringSet> svStrings;

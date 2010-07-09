@@ -246,14 +246,72 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::GenerateGuideHairsLOD()
   {
+    // density map
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+
+    csRef<iDataBuffer> densitymapDB = densitymap->Readback(readbackFmt);
+    int densitymapW, densitymapH;
+    densitymap->GetOriginalDimensions(densitymapW, densitymapH);
+    uint8* densitymapData = densitymapDB->GetUint8();
+
     // generate guide hairs for LOD
     for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
     {
-      int indexA = guideHairsTriangles.Get(iter).a;
-      int indexB = guideHairsTriangles.Get(iter).b;
-      int indexC = guideHairsTriangles.Get(iter).c;
+      csTriangle currentTriangle = guideHairsTriangles.Get(iter);
 
-      // average density
+      size_t indexA = currentTriangle.a;
+      size_t indexB = currentTriangle.b;
+      size_t indexC = currentTriangle.c;
+
+      csGuideHair A, B, C;
+      
+      if ( indexA < guideHairs.GetSize())
+        A = guideHairs.Get(indexA);
+      else
+        A = guideHairsLOD.Get(indexA - guideHairs.GetSize());
+
+      if ( indexB < guideHairs.GetSize())
+        B = guideHairs.Get(indexB);
+      else
+        B = guideHairsLOD.Get(indexB - guideHairs.GetSize());
+
+      if ( indexC < guideHairs.GetSize())
+        C = guideHairs.Get(indexC);
+      else
+        C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
+
+      // average density - modify to use convolution matrix or such
+      float density = (densitymapData[ 4 * ((int)(A.uv.x * densitymapW) + 
+        (int)(A.uv.y * densitymapH) * densitymapW )] + 
+        densitymapData[ 4 * ((int)(B.uv.x * densitymapW) + 
+        (int)(B.uv.y * densitymapH) * densitymapW )] + 
+        densitymapData[ 4 * ((int)(C.uv.x * densitymapW) + 
+        (int)(C.uv.y * densitymapH) * densitymapW )] ) / (3.0f);
+ 
+      // triangle area
+      if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
+        ( C.controlPointsCount == 0 ) )
+        continue;
+
+      float a, b, c;
+      a = csVector3::Norm(B.controlPoints[0] - C.controlPoints[0]);
+      b = csVector3::Norm(A.controlPoints[0] - C.controlPoints[0]);
+      c = csVector3::Norm(B.controlPoints[0] - A.controlPoints[0]);
+
+      // just for debug
+      a = csVector2::Norm(B.uv - C.uv);
+      b = csVector2::Norm(A.uv - C.uv);
+      c = csVector2::Norm(B.uv - A.uv);
+
+      float s = (a + b + c) / 2.0f;
+      float area = sqrt(s * (s - a) * (s - b) * (s - c));
+
+      //csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
+
+      // if a new guide hair is needed
+      if ( (density * area) < densityFactor)
+        continue;
 
       // make new guide hair
       csGuideHairLOD guideHairLOD;
@@ -272,15 +330,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       guideHairLOD.isActive = false;
 
-      guideHairLOD.uv = guideHairs.Get(indexA).uv * bA + 
-        guideHairs.Get(indexB).uv * bB + guideHairs.Get(indexC).uv * bC;
+      guideHairLOD.uv = A.uv * bA + B.uv * bB + C.uv * bC;
 
       // generate control points
+      guideHairLOD.controlPointsCount = csMin( (csMin( A.controlPointsCount,
+        B.controlPointsCount) ), C.controlPointsCount);
+
+      guideHairLOD.controlPoints = new csVector3[ guideHairLOD.controlPointsCount ];
+
+      for ( size_t i = 0 ; i < guideHairLOD.controlPointsCount ; i ++ )
+      {
+        guideHairLOD.controlPoints[i] = csVector3(0);
+        for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
+          if ( guideHairLOD.guideHairs[j].index < guideHairs.GetSize() )
+            guideHairLOD.controlPoints[i] += guideHairLOD.guideHairs[j].distance *
+              guideHairs.Get(guideHairLOD.guideHairs[j].index).controlPoints[i];
+          else
+            guideHairLOD.controlPoints[i] += guideHairLOD.guideHairs[j].distance *
+              guideHairsLOD.Get(guideHairLOD.guideHairs[j].index - 
+                guideHairs.GetSize()).controlPoints[i];
+      }
 
       // add new triangles
       guideHairsLOD.Push(guideHairLOD);
-      //csTriangle ADC = csTriangle();
+      size_t indexD = guideHairsLOD.GetSize() - 1 + guideHairs.GetSize();
+      csTriangle ADC = csTriangle(indexA, indexD, indexC);
+      csTriangle ADB = csTriangle(indexA, indexD, indexB);
+      csTriangle BDC = csTriangle(indexB, indexD, indexC);
+
+      guideHairsTriangles.Push(ADC);
+      guideHairsTriangles.Push(ADB);
+      guideHairsTriangles.Push(BDC);
     }    
+
+    //csPrintf("end generate guide hairs LOD\n");
   }
 
   void FurMaterial::SynchronizeGuideHairs ()
@@ -306,6 +389,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     if (shaderVariable)
       shaderVariable->GetValue(density);
 
+    //csPrintf("start\n");
+
     // for every triangle
     for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
     {
@@ -317,9 +402,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         bB = rng->Get() * (1 - bA);
         bC = 1 - bA - bB;
 
-        int indexA = guideHairsTriangles.Get(iter).a;
-        int indexB = guideHairsTriangles.Get(iter).b;
-        int indexC = guideHairsTriangles.Get(iter).c;
+        size_t indexA = guideHairsTriangles.Get(iter).a;
+        size_t indexB = guideHairsTriangles.Get(iter).b;
+        size_t indexC = guideHairsTriangles.Get(iter).c;
+
+        //csPrintf("%d\t%d\t%d\n", indexA, indexB, indexC);
+        // temp fix
+        if (indexA >= guideHairs.GetSize() || indexB >= guideHairs.GetSize() ||
+          indexC >= guideHairs.GetSize())
+          continue;
 
         hairStrand.guideHairs[0].distance = bA;
         hairStrand.guideHairs[0].index = indexA;
@@ -346,6 +437,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         hairStrands.Push(hairStrand);		
       }
     }
+    //csPrintf("end\n");
   }
 
   void FurMaterial::SetLOD(float LOD)
@@ -504,6 +596,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<csShaderVariable> shaderVariable = material->GetVariable(densitymapName);
 
     shaderVariable->GetValue(densitymap);
+
+    CS::ShaderVarName densityFactorName (svStrings, "densityFactor");	
+    material->GetVariable(densityFactorName)->GetValue(densityFactor);
   }
 
   void FurMaterial::SetHeightmap ()
