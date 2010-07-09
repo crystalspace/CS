@@ -110,8 +110,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   CS_LEAKGUARD_IMPLEMENT(LookAtAnimNodeFactory);
 
   LookAtAnimNodeFactory::LookAtAnimNodeFactory (LookAtManager* manager,
-						const char *name, iBodySkeleton* skeleton)
-    : scfImplementationType (this), manager (manager), name (name), skeleton (skeleton)
+						const char *name,
+						iBodySkeleton* skeleton)
+    : scfImplementationType (this), manager (manager), name (name),
+    skeleton (skeleton)
   {
   }
 
@@ -166,11 +168,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   CS_LEAKGUARD_IMPLEMENT(LookAtAnimNode);
 
   LookAtAnimNode::LookAtAnimNode (LookAtAnimNodeFactory* factory, 
-				  iSkeleton2* skeleton, iSkeletonAnimNode2* childNode)
+				  iSkeleton2* skeleton,
+				  iSkeletonAnimNode2* childNode)
     : scfImplementationType (this), factory (factory), skeleton (skeleton),
     childNode (childNode), boneID (InvalidBoneID), targetMode (TARGET_NONE),
     isPlaying (false), maximumSpeed (PI), alwaysRotate (false),
-    listenerMinimumDelay (0.1f)
+    trackingInitialized (true), listenerMinimumDelay (0.1f)
   {
   }
 
@@ -213,7 +216,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     // init tracking
     if (trackingStatus == STATUS_BASE_REACHED
 	&& isPlaying)
-      InitializeTracking ();
+      trackingInitialized = false;
 
     // call listeners
     if (listenerStatus == STATUS_TARGET_REACHED)
@@ -235,7 +238,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     // init tracking
     if (trackingStatus == STATUS_BASE_REACHED
 	&& isPlaying)
-      InitializeTracking ();
+      trackingInitialized = false;
 
     // call listeners
     if (listenerStatus == STATUS_TARGET_REACHED)
@@ -257,7 +260,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     // init tracking
     if (trackingStatus == STATUS_BASE_REACHED
 	&& isPlaying)
-      InitializeTracking ();
+      trackingInitialized = false;
 
     // call listeners
     if (listenerStatus == STATUS_TARGET_REACHED)
@@ -279,7 +282,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
       for (size_t i = 0; i < listeners.GetSize (); i++)
 	listeners[i]->TargetLost ();
 
-    // save new target
+    // save null target
     targetMode = TARGET_NONE;
     trackingStatus = STATUS_HEADING_BASE;
     listenerStatus = STATUS_HEADING_BASE;
@@ -312,20 +315,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     listeners.Delete (listener);
   }
 
-  void LookAtAnimNode::InitializeTracking ()
-  {
-    csQuaternion rotation;
-    csVector3 offset;
-    skeleton->GetTransformBoneSpace (boneID, rotation, offset);
-    csOrthoTransform currentTransform (csMatrix3 (rotation), offset);
-    skeleton->GetFactory ()->GetTransformBoneSpace (boneID, rotation, offset);
-    csOrthoTransform initialTransform (csMatrix3 (rotation), offset);
-    rotation.SetMatrix ((currentTransform * initialTransform.GetInverse ()).GetO2T ());
-    csVector3 eulerAngles = rotation.GetEulerAngles ();
-    previousPitch = eulerAngles.x;
-    previousYaw = eulerAngles.y;
-  }
-
   void LookAtAnimNode::Play ()
   {
     CS_ASSERT (boneID != InvalidBoneID);
@@ -336,7 +325,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
       STATUS_BASE_REACHED : STATUS_HEADING_TARGET;
     frameDuration = 0.0f;
     listenerDelay = 0.0f;
-    InitializeTracking ();
+    trackingInitialized = false;
 
     // start child node
     if (childNode)
@@ -430,23 +419,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
       csQuaternion rotation;
       csVector3 offset;
       skeleton->GetTransformAbsSpace (parentBoneID, rotation, offset);
-      csOrthoTransform parentBoneTransform (csMatrix3 (rotation.GetConjugate ()), offset);
-      parentTransform = parentBoneTransform * parentTransform;
+      csOrthoTransform parentAbsTransform (csMatrix3 (rotation.GetConjugate ()), offset);
+      parentTransform = parentAbsTransform * parentTransform;
     }
 
-    // compute initial 'Bind' transform
-    csQuaternion initialBoneQuaternion;
-    csVector3 initialBoneOffset;
-    skeleton->GetFactory ()->GetTransformBoneSpace (boneID, initialBoneQuaternion,
-						    initialBoneOffset);
+    // Get the bind transform of the bone
+    csQuaternion skeletonRotation;
+    csVector3 skeletonOffset;
+    skeleton->GetFactory ()->GetTransformBoneSpace (boneID, skeletonRotation,
+						    skeletonOffset);
 
     // check if a child bone has already set this bone
     bool transformAlreadySet = state->IsBoneUsed (boneID);
 
     // compute current transform of bone
     // (don't change position if a child node has already made it)
-    csOrthoTransform boneTransform (csMatrix3 (initialBoneQuaternion),
-		   transformAlreadySet ? state->GetVector (boneID) : initialBoneOffset);
+    csOrthoTransform boneTransform (csMatrix3 (skeletonRotation),
+				    transformAlreadySet ?
+				    state->GetVector (boneID) : skeletonOffset);
     boneTransform = boneTransform * parentTransform;
 
     // compute target position
@@ -464,19 +454,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
       }
     }
 
-    // compute needed pitch/yaw to achieve the lookat
-    float targetPitch, targetYaw;
+    // compute needed pitch/yaw/roll to achieve the lookat
+    float targetPitch, targetYaw, targetRoll = 0;
     bool wasConstrained = false;
     if (targetMode != TARGET_NONE
 	&& !targetInvalid)
     {
       // compute new pitch/yaw
-      target.Normalize ();    
+      target.Normalize ();
       targetPitch = -asin (target.y);
 
       // (take care of round errors)
       float cosPitch = cos (targetPitch);
-      float fraction = fabs (cosPitch) > SMALL_EPSILON ? target.x / cosPitch : 1.0f;
+      float fraction = fabs (cosPitch) > SMALL_EPSILON ?
+	target.x / cosPitch : 1.0f;
       if (fraction > 1.0f)
 	fraction = 1.0f;
       else if (fraction < -1.0f)
@@ -559,25 +550,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     }
 
     // check if we head for base pose
-    if (trackingStatus == STATUS_HEADING_BASE)
+    if (trackingStatus == STATUS_HEADING_BASE
+	|| !trackingInitialized)
     {
       // take rotations from child node if any
       if (transformAlreadySet)
       {
-	csQuaternion quaternion = initialBoneQuaternion.GetConjugate ()
-	  * state->GetQuaternion (boneID);
+	csQuaternion quaternion = skeletonRotation.GetConjugate ()
+	  * state->GetQuaternion (boneID) * skeletonRotation;
 	csVector3 eulerAngles = quaternion.GetEulerAngles ();
 	targetPitch = eulerAngles.x;
 	targetYaw = eulerAngles.y;
-	// TODO: the roll param is not used, this makes a break when transitioning
-	// in and out STATUS_BASE_REACHED
-	// -> apply a portion of it when transitioning from this state
+	targetRoll = eulerAngles.z;
       }
 
       else
       {
 	targetPitch = 0.0f;
 	targetYaw = 0.0f;
+	targetRoll = 0.0f;
+      }
+
+      if (!trackingInitialized)
+      {
+	previousPitch = targetPitch;
+	previousYaw = targetYaw;
+	previousRoll = targetRoll;
+	trackingInitialized = true;
       }
     }
 
@@ -590,9 +589,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 	// TODO: find shortest and non-blocked path to the target
 	float deltaPitch = targetPitch - previousPitch;
 	float deltaYaw = targetYaw - previousYaw;
+	float deltaRoll = targetRoll - previousRoll;
 
 	// compute rotational speed
-	float currentSpeed = sqrt (deltaPitch * deltaPitch + deltaYaw * deltaYaw)
+	float currentSpeed = sqrt (deltaPitch * deltaPitch
+				   + deltaYaw * deltaYaw
+				   + deltaRoll * deltaRoll)
 	  / frameDuration;
 
 	// apply constraint
@@ -601,6 +603,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 	  float ratio = maximumSpeed / currentSpeed;
 	  targetPitch = previousPitch + deltaPitch * ratio;
 	  targetYaw = previousYaw + deltaYaw * ratio;
+	  targetRoll = previousRoll + deltaRoll * ratio;
 
 	  // constraint yaw between -PI/2 and 3*PI/2
 	  if (targetYaw < -PI * 0.5f)
@@ -629,6 +632,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     frameDuration = 0.0f;
     previousPitch = targetPitch;
     previousYaw = targetYaw;
+    previousRoll = targetRoll;
 
     // check if we must simply play the child animation
     if (trackingStatus == STATUS_BASE_REACHED)
@@ -636,14 +640,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
     // set new quaternion
     csQuaternion newQuaternion;
-    newQuaternion.SetEulerAngles (csVector3 (targetPitch, targetYaw, 0));
-    newQuaternion = initialBoneQuaternion * newQuaternion;
+    newQuaternion.SetEulerAngles (csVector3 (targetPitch, targetYaw, targetRoll));
+    newQuaternion =
+      skeletonRotation * newQuaternion * skeletonRotation.GetConjugate ();
 
     // apply new transform
     if (!transformAlreadySet)
     {
       state->SetBoneUsed (boneID);
-      state->GetVector (boneID) = initialBoneOffset;
+      state->GetVector (boneID) = csVector3 (0.0f);
     }
     state->GetQuaternion (boneID) = newQuaternion;
 

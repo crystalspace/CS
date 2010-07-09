@@ -75,12 +75,19 @@ struct iMaterial : public virtual iShaderVariableContext
 
   /**
    * Get the base ("tex diffuse") texture from the material.
+   * \remarks A material can have an arbitrary number of textures attached,
+   *  however not necessarily a diffuse texture.
+   *  What texture is used to what effect depends on the actual shader(s) used
+   *  at runtime.
    */
   virtual iTextureHandle *GetTexture () = 0;
 
   /**
    * Get a texture from the material.
-   */
+   * \remarks A material can have an arbitrary number of textures attached.
+   *  What texture is used to what effect depends on the actual shader(s) used
+   *  at runtime.
+   */ // A link to a list of common texture names would be great.
   virtual iTextureHandle* GetTexture (CS::ShaderVarStringID name) = 0;
 
   /**

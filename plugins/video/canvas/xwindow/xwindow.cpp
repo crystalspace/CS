@@ -612,7 +612,19 @@ static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
 
 static int TranslateXMouseButton (int xbutton)
 {
-  static int buttonMapping[] = {csmbNone, csmbLeft, csmbMiddle, csmbRight};
+  /* [res] Mappings were determined July 2010 with Xorg-server 1.7
+     It seems that with Xorg 7.0 the buttons 6/7 where changed to be wheel
+     buttons as well. Prior to that, these buttons were the "extra" (thumb)
+     buttons instead.
+  */
+  static int buttonMapping[] =
+  {
+    csmbNone,
+    csmbLeft, csmbMiddle, csmbRight,	// Standard buttons
+    csmbWheelUp, csmbWheelDown,		// Wheel, vertical (the common kind)
+    csmbHWheelLeft, csmbHWheelRight,	// Wheel, horizontal (the rare kind)
+    csmbExtra1, csmbExtra2		// Thumb buttons
+  };
   const int buttonMapCount =
     sizeof (buttonMapping) / sizeof (buttonMapping[0]);
   

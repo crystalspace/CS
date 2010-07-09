@@ -995,6 +995,7 @@ void ViewMesh::StdDlgUpdateLists(const char* filename)
   dirlist->addItem(item);
 
   csRef<iStringArray> files = vfs->FindFiles(filename);
+  files->Sort (false);
   
   for (size_t i = 0; i < files->GetSize(); i++)
   {

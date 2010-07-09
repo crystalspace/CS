@@ -15958,6 +15958,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetTwoKeyFrames = *cspacec::iSkeletonAnimation2_GetTwoKeyFrames;
 *BlendState = *cspacec::iSkeletonAnimation2_BlendState;
 *GetDuration = *cspacec::iSkeletonAnimation2_GetDuration;
+*SetKeyFrame = *cspacec::iSkeletonAnimation2_SetKeyFrame;
+*SetFramesInBindSpace = *cspacec::iSkeletonAnimation2_SetFramesInBindSpace;
+*GetFramesInBindSpace = *cspacec::iSkeletonAnimation2_GetFramesInBindSpace;
+*GetChannelCount = *cspacec::iSkeletonAnimation2_GetChannelCount;
+*GetChannelBone = *cspacec::iSkeletonAnimation2_GetChannelBone;
 *scfGetVersion = *cspacec::iSkeletonAnimation2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -22945,32 +22950,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::scfProcTexture ##############
-
-package cspace::scfProcTexture;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::csObject cspace::iTextureWrapper cspace::iProcTexture cspace );
-%OWNER = ();
-*IncRef = *cspacec::scfProcTexture_IncRef;
-*DecRef = *cspacec::scfProcTexture_DecRef;
-*GetRefCount = *cspacec::scfProcTexture_GetRefCount;
-*QueryInterface = *cspacec::scfProcTexture_QueryInterface;
-*AddRefOwner = *cspacec::scfProcTexture_AddRefOwner;
-*RemoveRefOwner = *cspacec::scfProcTexture_RemoveRefOwner;
-*GetInterfaceMetadata = *cspacec::scfProcTexture_GetInterfaceMetadata;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::iProcTexCallback ##############
 
 package cspace::iProcTexCallback;
@@ -23216,6 +23195,8 @@ sub csmbWheelUp () { $cspacec::csmbWheelUp }
 sub csmbWheelDown () { $cspacec::csmbWheelDown }
 sub csmbExtra1 () { $cspacec::csmbExtra1 }
 sub csmbExtra2 () { $cspacec::csmbExtra2 }
+sub csmbHWheelLeft () { $cspacec::csmbHWheelLeft }
+sub csmbHWheelRight () { $cspacec::csmbHWheelRight }
 sub csKeyModifierTypeShift () { $cspacec::csKeyModifierTypeShift }
 sub csKeyModifierTypeCtrl () { $cspacec::csKeyModifierTypeCtrl }
 sub csKeyModifierTypeAlt () { $cspacec::csKeyModifierTypeAlt }

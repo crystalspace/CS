@@ -666,6 +666,16 @@ void csMouseDriver::DoButton (uint number, int button, bool down,
                  k->GetModifiersState()));
   Post(ev);
 
+  /* Wheel behave differently from 'normal' buttons as only 'up' events are
+     sent for them, never 'down' events */
+  bool isWheel = (button == csmbWheelUp) || (button == csmbWheelDown)
+    || (button == csmbHWheelLeft) || (button == csmbHWheelRight);
+  if (isWheel)
+  {
+    Button [number][button] = down = false;
+    buttonMask &= ~(1 << button);
+  }
+
   if ((button == LastClickButton[number])
       && (evtime - LastClickTime[number] <= DoubleClickTime))
   {
@@ -737,7 +747,7 @@ void csMouseDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
 		(NameRegistry,
 		 csGetTicks (), csevMouseMove(NameRegistry, number),
 		 number, csMouseEventTypeMove,
-		 axes, numAxes, cflags, 0, false, 
+		 axes, numAxes, cflags, csmbNone, false, 
 		 buttonMask,
                  k->GetModifiersState()));
   Post (ev);

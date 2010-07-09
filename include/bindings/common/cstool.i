@@ -25,7 +25,7 @@
 
 %include "cstool/pen.h"
 
-%template(scfProcTexture) scfImplementationExt2<csProcTexture, csObject, iTextureWrapper, iProcTexture>;
+%template(scfProcTexture) scfImplementationExt3<csProcTexture, csObject, iTextureWrapper, iProcTexture, iSelfDestruct>;
 %include "cstool/proctex.h"
 %include "cstool/proctxtanim.h"
 

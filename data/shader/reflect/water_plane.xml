@@ -20,6 +20,7 @@
 <shader compiler="shaderweaver" name="reflect_water_plane" lights="1">
   <shadervar name="water perturb scale" type="vector4">0.1,0.1,0,0</shadervar>
   <shadervar name="water fog color" type="vector4">0,0.17,0.49,0.6</shadervar>
+  <shadervar name="water fog density" type="float">0.3</shadervar>
   <technique priority="200">
     <tag>water_complex</tag>
     <pass>
@@ -174,8 +175,7 @@
 	<explicit from="output" to="fogColor" />
       </connection>
       <!-- @@@ Another workaround: don't pick up saturated distance -->
-      <!-- @@@ And ofc. make an SV/aliasable -->
-      <parameter id="refractFogDensity" type="float">0.3</parameter>
+      <parameter id="refractFogDensity" type="shadervar" weavertype="float">water fog density</parameter>
       <connection from="refractFogDensity" to="fog_refraction">
 	<explicit from="output" to="fogDensity" />
       </connection>
@@ -298,7 +298,13 @@
       </connection>
       
       <parameter id="refractFogColor" type="shadervar" weavertype="rgba">water fog color</parameter>
-      <connection from="refractFogColor" to="fog_refraction" />
+      <connection from="refractFogColor" to="fog_refraction">
+	<explicit from="output" to="fogColor" />
+      </connection>
+      <parameter id="refractFogDensity" type="shadervar" weavertype="float">water fog density</parameter>
+      <connection from="refractFogDensity" to="fog_refraction">
+	<explicit from="output" to="fogDensity" />
+      </connection>
       
       <parameter id="perturbScaleSV" type="shadervar" weavertype="float4">water perturb scale</parameter>
       <connection from="perturbScaleSV" to="perturb_norm_refl" />

@@ -344,61 +344,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
 
     else
     {
-      // the blending should only be made by these two lines
-      //subNodes[slowNode]->BlendState (state, baseWeight * (1.0f - speedRatio));
-      //subNodes[fastNode]->BlendState (state, baseWeight * speedRatio);
-
-      uint boneCount = skeleton->GetFactory ()->GetTopBoneID ();
-
-      csRef<csSkeletalState2> slowState;
-      slowState.AttachNew (new csSkeletalState2 ());
-      slowState->Setup (boneCount + 1);
-
-      csRef<csSkeletalState2> fastState;
-      fastState.AttachNew (new csSkeletalState2 ());
-      fastState->Setup (boneCount + 1);
-
-      subNodes[slowNode]->BlendState (slowState, 1.0f);
-      subNodes[fastNode]->BlendState (fastState, 1.0f);
-
-      // TODO: this doesn't use the baseweight nor the previous state
-      for (uint i = 0; i < boneCount; i++)
-      {
-	// if not both nodes use this bone then the pose can simply be copied
-	if (!slowState->IsBoneUsed (i) && !fastState->IsBoneUsed (i))
-	  continue;
-
-	if (slowState->IsBoneUsed (i) && !fastState->IsBoneUsed (i))
-	{
-	  state->SetBoneUsed (i);
-	  state->GetVector (i) = slowState->GetVector (i);
-	  state->GetQuaternion (i) = slowState->GetQuaternion (i);
-	  continue;
-	}
-
-	if (!slowState->IsBoneUsed (i) && fastState->IsBoneUsed (i))
-	{
-	  state->SetBoneUsed (i);
-	  state->GetVector (i) = fastState->GetVector (i);
-	  state->GetQuaternion (i) = fastState->GetQuaternion (i);
-	  continue;
-	}
-
-	// put the transforms in bone space before blending them
-	csQuaternion rotation; 
-	csVector3 offset;
-	skeleton->GetFactory ()->GetTransformAbsSpace (i, rotation, offset);
-
-	csQuaternion slowBoneQuaternion = slowState->GetQuaternion (i) * rotation.GetConjugate ();
-	csQuaternion fastBoneQuaternion = fastState->GetQuaternion (i) * rotation.GetConjugate ();
-
-	// blend the transforms then put them back in absolute space
-	state->SetBoneUsed (i);
-	state->GetVector (i) = csLerp (slowState->GetVector (i) - offset,
-				       fastState->GetVector (i) - offset, speedRatio) + offset;
-	state->GetQuaternion (i) =
-	  slowBoneQuaternion.SLerp (fastBoneQuaternion, speedRatio) * rotation;
-      }
+      subNodes[slowNode]->BlendState (state, baseWeight);
+      subNodes[fastNode]->BlendState (state, baseWeight * speedRatio);
     }
   }
 

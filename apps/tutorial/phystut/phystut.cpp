@@ -19,6 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cssysdef.h"
 #include "csgeom/sphere.h"
 #include "imesh/genmesh.h"
+#include "imesh/terrain2.h"
 #include "cstool/genmeshbuilder.h"
 #include "cstool/materialbuilder.h"
 #include "phystut.h"
@@ -30,13 +31,16 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define CAMERA_KINEMATIC 2
 #define CAMERA_FREE 3
 
+#define ENVIRONMENT_WALLS 1
+#define ENVIRONMENT_TERRAIN 2
+
 Simple::Simple ()
   : csDemoApplication ("CrystalSpace.PhysTut", "phystut",
 		       "phystut <OPTIONS>",
 		       "Physics tutorial for Crystal Space."),
-    isSoftBodyWorld (false), solver (0), autodisable (false),
-    do_bullet_debug (false), remainingStepDuration (0.0f), debugMode (false),
-    allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
+    isSoftBodyWorld (false), environment (ENVIRONMENT_WALLS), solver (0),
+    autodisable (false), do_bullet_debug (false), remainingStepDuration (0.0f),
+    debugMode (false), allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
     physicalCameraMode (CAMERA_DYNAMIC), dragging (false)
 {
   // Configure the options for csDemoApplication
@@ -51,6 +55,9 @@ Simple::Simple ()
   commandLineHelper.commandOptions.Push
     (csDemoCommandLineHelper::CommandOption
      ("disable_soft", "Disable the soft bodies"));
+  commandLineHelper.commandOptions.Push
+    (csDemoCommandLineHelper::CommandOption
+     ("terrain", "Start with the terrain environment"));
 }
 
 Simple::~Simple ()
@@ -93,19 +100,20 @@ void Simple::Frame ()
   {
     iCamera* c = view->GetCamera();
 
+    float cameraSpeed = environment == ENVIRONMENT_WALLS ? 4 : 30;
     if (kbd->GetKeyState (CSKEY_SHIFT))
     {
       // If the user is holding down shift, the arrow keys will cause
       // the camera to strafe up, down, left or right from it's
       // current position.
       if (kbd->GetKeyState (CSKEY_RIGHT))
-	c->Move (CS_VEC_RIGHT * 4 * speed);
+	c->Move (CS_VEC_RIGHT * cameraSpeed * speed);
       if (kbd->GetKeyState (CSKEY_LEFT))
-	c->Move (CS_VEC_LEFT * 4 * speed);
+	c->Move (CS_VEC_LEFT * cameraSpeed * speed);
       if (kbd->GetKeyState (CSKEY_UP))
-	c->Move (CS_VEC_UP * 4 * speed);
+	c->Move (CS_VEC_UP * cameraSpeed * speed);
       if (kbd->GetKeyState (CSKEY_DOWN))
-	c->Move (CS_VEC_DOWN * 4 * speed);
+	c->Move (CS_VEC_DOWN * cameraSpeed * speed);
     }
     else
     {
@@ -122,9 +130,9 @@ void Simple::Frame ()
       if (kbd->GetKeyState (CSKEY_PGDN))
 	rotX += speed;
       if (kbd->GetKeyState (CSKEY_UP))
-	c->Move (CS_VEC_FORWARD * 4 * speed);
+	c->Move (CS_VEC_FORWARD * cameraSpeed * speed);
       if (kbd->GetKeyState (CSKEY_DOWN))
-	c->Move (CS_VEC_BACKWARD * 4 * speed);
+	c->Move (CS_VEC_BACKWARD * cameraSpeed * speed);
     }
 
     // We now assign a new rotation transformation to the camera.
@@ -133,7 +141,8 @@ void Simple::Frame ()
     csOrthoTransform ot (quaternion.GetConjugate ().GetMatrix (), c->GetTransform().GetOrigin ());
     c->SetTransform (ot);
   }
- if (dragging)
+
+  if (dragging)
   {
     // Keep the drag joint at the same distance to the camera
     csRef<iCamera> camera = view->GetCamera ();
@@ -508,15 +517,17 @@ bool Simple::OnKeyboard (iEvent &ev)
       csVector3 v3d = camera->InvPerspective (v2d, 10000);
       csVector3 startBeam = camera->GetTransform ().GetOrigin ();
       csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
-      csBulletHitBeamResult result = bulletDynamicSystem->HitBeam (startBeam, endBeam);
 
-      if (result.body)
+      csBulletHitBeamResult hitResult = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+      if (hitResult.hasHit
+	  && hitResult.bodyType == CS_BULLET_RIGID_BODY)
       {
 	// Remove the body and the mesh from the simulation, and put them in the clipboard
-	clipboardBody = result.body;
+	clipboardBody = hitResult.rigidBody;
 	dynamicSystem->RemoveBody (clipboardBody);
-	clipboardMesh = result.body->GetAttachedMesh ();
-	room->GetMeshes ()->Remove (clipboardMesh);
+	clipboardMesh = hitResult.rigidBody->GetAttachedMesh ();
+	if (clipboardMesh)
+	  room->GetMeshes ()->Remove (clipboardMesh);
 
 	// Update the display of the dynamics debugger
 	dynamicsDebugger->UpdateDisplay ();
@@ -549,6 +560,22 @@ bool Simple::OnKeyboard (iEvent &ev)
       // Update the display of the dynamics debugger
       dynamicsDebugger->UpdateDisplay ();
     }
+
+#ifdef CS_HAVE_BULLET_SERIALIZER
+    // Save a .bullet file
+    else if (csKeyEventHelper::GetRawCode (&ev) == 's'
+	     && kbd->GetKeyState (CSKEY_CTRL)
+	     && phys_engine_id == BULLET_ID)
+    {
+      const char* filename = "phystut_world.bullet";
+      if (bulletDynamicSystem->SaveBulletWorld (filename))
+	printf ("Dynamic world successfully saved as file %s\n", filename);
+      else
+	printf ("Problem saving dynamic world to file %s\n", filename);
+
+      return true;
+    }
+#endif
   }
 
   // Slow down the camera's body
@@ -582,28 +609,38 @@ bool Simple::OnMouseDown (iEvent& ev)
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
     // Trace the physical beam
-    csBulletHitBeamResult result = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+    csBulletHitBeamResult hitResult =
+      bulletDynamicSystem->HitBeam (startBeam, endBeam);
+    if (!hitResult.hasHit)
+      return false;
 
     // Add a force at the point clicked
-    if (result.body)
+    if (hitResult.bodyType == CS_BULLET_RIGID_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
       force *= 2.0f;
-      result.body->AddForceAtPos (force, result.isect);
+
+      // Check if the body hit is not static or kinematic
+      csRef<iBulletRigidBody> bulletBody =
+	scfQueryInterface<iBulletRigidBody> (hitResult.rigidBody);
+      if (bulletBody->GetDynamicState () != CS_BULLET_STATE_DYNAMIC)
+	return false;
+
+      hitResult.rigidBody->AddForceAtPos (force, hitResult.isect);
 
       // This would work too
-      //csOrthoTransform transform (result.body->GetTransform ());
-      //csVector3 relativePosition = transform.Other2This (result.isect);
-      //result.body->AddForceAtRelPos (force, relativePosition);
+      //csOrthoTransform transform (hitResult.rigidBody->GetTransform ());
+      //csVector3 relativePosition = transform.Other2This (hitResult.isect);
+      //hitResult.rigidBody->AddForceAtRelPos (force, relativePosition);
     }
 
-    else if (result.softBody)
+    else if (hitResult.bodyType == CS_BULLET_SOFT_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
       force *= 2.0f;
-      result.softBody->AddForce (force, result.vertexIndex);
+      hitResult.softBody->AddForce (force, hitResult.vertexIndex);
     }
 
     return true;
@@ -625,24 +662,30 @@ bool Simple::OnMouseDown (iEvent& ev)
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
     // Trace the physical beam
-    csBulletHitBeamResult result = bulletDynamicSystem->HitBeam (startBeam, endBeam);
-    if (!result.body)
+    csBulletHitBeamResult hitResult = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+    if (!hitResult.hasHit)
+      return false;
+
+    // Check if we hit a rigid body
+    if (hitResult.bodyType != CS_BULLET_RIGID_BODY)
       return false;
 
     // Create a pivot joint at the point clicked
     dragJoint = bulletDynamicSystem->CreatePivotJoint ();
-    dragJoint->Attach (result.body, result.isect);
+    dragJoint->Attach (hitResult.rigidBody, hitResult.isect);
 
     dragging = true;
-    dragDistance = (result.isect - startBeam).Norm ();
+    dragDistance = (hitResult.isect - startBeam).Norm ();
 
     // Set some dampening on the rigid body to have a more stable dragging
-    csRef<iBulletRigidBody> csBody =
-      scfQueryInterface<iBulletRigidBody> (result.body);
-    linearDampening = csBody->GetLinearDampener ();
-    angularDampening = csBody->GetRollingDampener ();
-    csBody->SetLinearDampener (0.9f);
-    csBody->SetRollingDampener (0.9f);
+    csRef<iBulletRigidBody> bulletBody =
+      scfQueryInterface<iBulletRigidBody> (hitResult.rigidBody);
+    linearDampening = bulletBody->GetLinearDampener ();
+    angularDampening = bulletBody->GetRollingDampener ();
+    bulletBody->SetLinearDampener (0.9f);
+    bulletBody->SetRollingDampener (0.9f);
+
+    return true;
   }
 
   return false;
@@ -655,10 +698,10 @@ bool Simple::OnMouseUp (iEvent& ev)
     dragging = false;
 
     // Put back the original dampening on the rigid body
-    csRef<iBulletRigidBody> csBody =
+    csRef<iBulletRigidBody> bulletBody =
       scfQueryInterface<iBulletRigidBody> (dragJoint->GetAttachedBody ());
-    csBody->SetLinearDampener (linearDampening);
-    csBody->SetRollingDampener (angularDampening);
+    bulletBody->SetLinearDampener (linearDampening);
+    bulletBody->SetRollingDampener (angularDampening);
 
     // Remove the drag joint
     bulletDynamicSystem->RemovePivotJoint (dragJoint);
@@ -732,6 +775,10 @@ bool Simple::OnInitialize (int argc, char* argv[])
       softBodyAnimationFactory =
 	scfQueryInterface<iSoftBodyAnimationControlFactory> (animationFactory);
     }
+
+    // Check which environment has to be loaded
+    if (clp->GetBoolOption ("terrain", false))
+      environment = ENVIRONMENT_TERRAIN;
   }
 
   if (!dyn)
@@ -786,7 +833,14 @@ bool Simple::OnInitialize (int argc, char* argv[])
     keyDescriptions.Push ("2: disable StepFast solver");
     keyDescriptions.Push ("3: enable QuickStep solver");
   }
-
+#ifdef CS_HAVE_BULLET_SERIALIZER
+  if (phys_engine_id == BULLET_ID)
+    keyDescriptions.Push ("CTRL-s: save the dynamic world");
+#endif
+  /*
+  if (phys_engine_id == BULLET_ID)
+    keyDescriptions.Push ("CTRL-n: next environment");
+  */
   return true;
 }
 
@@ -845,37 +899,20 @@ bool Simple::Application ()
   // is very ugly
   dynamicsDebugger->SetStaticBodyMaterial (0);
 
-  // Default behavior from csDemoApplication for the creation of the scene
-  if (!csDemoApplication::CreateRoom ())
-    return false;
+  // Create the environment
+  if (environment == ENVIRONMENT_WALLS)
+  {
+    CreateWalls (csVector3 (5));
+    view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3));
+  }
+  else
+  {
+    CreateTerrain ();
+    view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 30, -3));
+  }
 
-  // Creating the scene's room
+  // Initialize the dynamics debugger
   dynamicsDebugger->SetDebugSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3));
-  CreateWalls (csVector3 (5));
-
-  // Set our own lights
-  csRef<iLight> light;
-  iLightList* lightList = room->GetLights ();
-  lightList->RemoveAll ();
-
-  light = engine->CreateLight(0, csVector3(10), 9000, csColor (1));
-  lightList->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (3, 0, 0), 8, csColor (1, 0, 0));
-  lightList->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8, csColor (0, 0, 1));
-  lightList->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (0, 0, 3), 8, csColor (0, 1, 0));
-  lightList->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (0, -3, 0), 8, csColor (1, 1, 0));
-  lightList->Add (light);
-
-  engine->Prepare ();
-  CS::Lighting::SimpleStaticLighter::ShineLights (room, engine, 4);
 
   // Preload some meshes and materials
   iTextureWrapper* txt = loader->LoadTexture ("spark",
@@ -1683,7 +1720,7 @@ void Simple::SpawnCloth ()
     scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
   csRef<iSoftBodyAnimationControl> animationControl =
     scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
-  animationControl->SetSoftBody (body);
+  animationControl->SetSoftBody (body, true);
 }
 
 void Simple::SpawnSoftBody ()
@@ -1699,7 +1736,7 @@ void Simple::SpawnSoftBody ()
 
   csRef<iGeneralFactoryState> gmstate = scfQueryInterface<
     iGeneralFactoryState> (ballFact->GetMeshObjectFactory ());
-  const float r (rand()%5/10. + .2);
+  const float r (rand()%5/10. + .4);
   csVector3 radius (r, r, r);
   csEllipsoid ellips (csVector3 (0), radius);
   gmstate->GenerateSphere (ellips, 16);
@@ -1740,6 +1777,10 @@ void Simple::SpawnSoftBody ()
 
 void Simple::CreateWalls (const csVector3& /*radius*/)
 {
+  // Default behavior from csDemoApplication for the creation of the scene
+  if (!csDemoApplication::CreateRoom ())
+    return;
+
   // First we make a primitive for our geometry.
   using namespace CS::Geometry;
   DensityTextureMapper mapper (0.3f);
@@ -1749,7 +1790,7 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
   box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
 
   // Now we make a factory and a mesh at once.
-  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+  walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
@@ -1817,6 +1858,70 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
 
   t.SetOrigin(csVector3(0.0f, 0.0f, -10.0f));
   dynamicSystem->AttachColliderBox (size, t, 10.0f, 0.0f);
+
+  // Set our own lights
+  room->SetDynamicAmbientLight (csColor (0.3, 0.3, 0.3));
+
+  csRef<iLight> light;
+  iLightList* lightList = room->GetLights ();
+  lightList->RemoveAll ();
+
+  light = engine->CreateLight(0, csVector3(10), 9000, csColor (1));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (3, 0, 0), 8, csColor (1, 0, 0));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8, csColor (0, 0, 1));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (0, 0, 3), 8, csColor (0, 1, 0));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (0, -3, 0), 8, csColor (1, 1, 0));
+  lightList->Add (light);
+
+  engine->Prepare ();
+  CS::Lighting::SimpleStaticLighter::ShineLights (room, engine, 4);
+}
+
+void Simple::CreateTerrain ()
+{
+  printf ("Loading terrain...\n");
+
+  // Load the level file
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
+  VFS->ChDir ("/lev/terraini");
+
+  if (!loader->LoadMapFile ("world"))
+  {
+    ReportError("Error couldn't load terrain level!");
+    return;
+  }
+
+  // Setup the sector
+  room = engine->FindSector ("room");
+  view->GetCamera ()->SetSector (room);
+  engine->Prepare ();
+
+  // Find the terrain mesh
+  csRef<iMeshWrapper> terrainWrapper = engine->FindMeshObject ("Terrain");
+  if (!terrainWrapper)
+  {
+    ReportError("Error cannot find the terrain mesh!");
+    return;
+  }
+
+  csRef<iTerrainSystem> terrain =
+    scfQueryInterface<iTerrainSystem> (terrainWrapper->GetMeshObject ());
+  if (!terrain)
+  {
+    ReportError("Error cannot find the terrain interface!");
+    return;
+  }
+
+  // Create a terrain collider for each cell of the terrain
+  bulletDynamicSystem->AttachColliderTerrain (terrain);
 }
 
 //---------------------------------------------------------------------------
