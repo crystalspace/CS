@@ -214,8 +214,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     //csPrintf("%s\n", densitymap->GetImageName());
 
-    csVector3 *normsArray = new csVector3[positions.GetSize()];
-
     // chose unique indices
     while (tris.HasNext())
     {
@@ -231,10 +229,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       csTriangle triangleNew = csTriangle(uniqueIndices.Contains(tri.a),
         uniqueIndices.Contains(tri.b), uniqueIndices.Contains(tri.c));
       guideHairsTriangles.Push(triangleNew);
-
-      normsArray[tri.a] = csVector3( norms.Get(tri.a).x, norms.Get(tri.a).z, norms.Get(tri.a).y );
-      normsArray[tri.b] = csVector3( norms.Get(tri.b).x, norms.Get(tri.b).z, norms.Get(tri.b).y );
-      normsArray[tri.c] = csVector3( norms.Get(tri.c).x, norms.Get(tri.c).z, norms.Get(tri.c).y );
     }
 
     // generate the guide hairs - this should be done based on heightmap
@@ -246,7 +240,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         (int)(uv.y * densitymapH) * densitymapW ) ] = 255;
       
       csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
-        displaceEps * normsArray[uniqueIndices.Get(i)];
+        displaceEps * norms.Get(uniqueIndices.Get(i));
 
       csGuideHair guideHair;
       guideHair.isActive = true;
@@ -254,7 +248,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 
       for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
-        guideHair.controlPoints[j] = pos + j * 0.05f * normsArray[uniqueIndices.Get(i)];
+        guideHair.controlPoints[j] = pos + j * 0.05f * norms.Get(uniqueIndices.Get(i));
 
       guideHairs.Push(guideHair);
     }
@@ -262,7 +256,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     SaveImage(densitymapData, "/data/krystal/krystal_debug.png",
       densitymapW, densitymapH);
     
-    SetLOD(0.5f);
+    //SetLOD(1.0f);
   }
 
   void FurMaterial::SaveImage(uint8* buf, const char* texname, 
