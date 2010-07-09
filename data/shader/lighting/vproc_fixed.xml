@@ -124,74 +124,12 @@
       <alphaoperation operation="modulate" />
     </layer>
   <?Endtemplate?>
-  
-  <?Template LightmapPass?>
-    <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-      <pass>
-	<!-- First pass: blend with copy -->
-	<texture name="tex diffuse" destination="diffuse" />
-	<buffer source="texture coordinate 0" destination="texture coordinate diffuse" />
-	<?endif?>
-	<?if vars."tex lightmap".texture ?>
-	  <buffer source="texture coordinate lightmap" destination="texture coordinate lighting" />
-	  <texture name="tex lightmap" destination="lighting" />
-	<?elsif vars."static color".buffer ?>
-	  <buffer source="static color" destination="color" />
-	<?endif?>
-	<vp plugin="glfixed">
-	  <fixedvp>
-	    <constantcolor layer="lighting" type="expr">
-	      <sexp>(* "dynamic ambient" 0.5)</sexp>
-	    </constantcolor>
-	    <constantcolor layer="diffuse" type="shadervar">mixmode alpha</constantcolor>
-	  </fixedvp>
-	</vp>
-	<fp plugin="glfixed">
-	  <fixedfp>
-	    <?if vars."tex lightmap".texture ?>
-	      <layer name="lighting">
-		<colorsource num="0" source="texture" modifier="color"/>
-		<colorsource num="1" source="constant color" modifier="color"/>
-		<coloroperation operation="add" />
-		<alphasource num="0" source="texture" modifier="alpha"/>
-		<alphaoperation operation="replace" />
-	      </layer>
-	    <?elsif vars."static color".buffer ?>
-	      <layer name="lighting">
-		<colorsource num="0" source="primary color" modifier="color"/>
-		<colorsource num="1" source="constant color" modifier="color"/>
-		<coloroperation operation="add" />
-		<alphasource num="0" source="texture" modifier="alpha"/>
-		<alphaoperation operation="replace" />
-	      </layer>
-	    <?else?>
-	      <layer name="lighting">
-		<colorsource num="0" source="constant color" modifier="color"/>
-		<coloroperation operation="replace" />
-		<alphasource num="0" source="texture" modifier="alpha"/>
-		<alphaoperation operation="replace" />
-	      </layer>
-	    <?endif?>
-	    <layer name="diffuse">
-	      <colorsource num="0" source="texture" modifier="color"/>
-	      <alphasource num="0" source="texture" modifier="alpha"/>
-	      <colorsource num="1" source="previous layer" modifier="color"/>
-	      <coloroperation operation="modulate" scale="2" />
-	      <alphasource num="1" source="constant color" modifier="alpha"/>
-	      <alphaoperation operation="modulate" />
-	    </layer>
-	  </fixedfp>
-	</fp>
-      </pass>
-    <?endif?>
-  <?Endtemplate?>
 
   <?Template TheTechniques N ?>
     <!-- Tech with separate specular -->
     <technique priority="$N$50">
-      <?LightmapPass?>
       <pass>
-	<?if (vars."pass number".int == 0) && !((vars."pass do_ambient") && (vars."tex lightmap".texture || vars."static color".buffer)) ?>
+	<?if vars."pass number".int == 0 ?>
 	  <!-- First pass: blend with copy -->
 	<?else?>
 	  <!-- Later pass: blend with add -->
@@ -264,7 +202,6 @@
     </technique>
     <!-- Tech without separate specular -->
     <technique priority="$N$00">
-      <?LightmapPass?>
       <pass>
 	<?if vars."pass number".int == 0 ?>
 	  <!-- First pass: blend with copy -->

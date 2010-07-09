@@ -47,7 +47,7 @@ private:
 
   struct nv_input
   {
-    nv_input () : portion (0), input (0), mapping (0), component (0) {}
+    nv_input () {}
     nv_input (GLenum p, GLenum v, GLenum i, GLenum m, GLenum c)
       : portion (p), variable (v), input (i), mapping (m), component (c)
     {      
@@ -76,8 +76,6 @@ private:
     short numInputs;
     nv_input inputs[4];
     nv_output output;
-    
-    nv_combiner_stage() : numInputs (0) {}
   };
   struct nv_constant_pair
   {

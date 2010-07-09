@@ -523,7 +523,14 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   treePersistent.Initialize (shaderManager);
   dbgFlagClipPlanes =
     treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes.view");
-  PostEffectsSupport::Initialize (objectReg, "RenderManager.ShadowPSSM");
+  postEffects.Initialize (objectReg);
+  
+  const char* effectsFile = cfg->GetStr ("RenderManager.ShadowPSSM.Effects", 0);
+  if (effectsFile)
+  {
+    PostEffectLayersParser postEffectsParser (objectReg);
+    postEffectsParser.AddLayersFromFile (effectsFile, postEffects);
+  }
   
   HDRSettings hdrSettings (cfg, "RenderManager.ShadowPSSM");
   if (hdrSettings.IsEnabled())

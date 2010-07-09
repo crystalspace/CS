@@ -90,6 +90,78 @@ static void SystemFatalError (wchar_t* str, HRESULT hRes = ~0)
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
+#define CS_WIN_PALETTE_SIZE 256
+
+///// Windowed-mode palette stuff //////
+
+static HPALETTE hWndPalette = 0;
+/*
+static void ClearSystemPalette ()
+{
+  struct
+  {
+    WORD Version;
+    WORD nEntries;
+    PALETTEENTRY aEntries[CS_WIN_PALETTE_SIZE];
+  } Palette;
+
+  Palette.Version = 0x300;
+  Palette.nEntries = CS_WIN_PALETTE_SIZE;
+
+  int c;
+  for (c = 0; c < CS_WIN_PALETTE_SIZE; c++)
+  {
+    Palette.aEntries[c].peRed = 0;
+    Palette.aEntries[c].peGreen = 0;
+    Palette.aEntries[c].peBlue = 0;
+    Palette.aEntries[c].peFlags = PC_NOCOLLAPSE;
+  }
+
+  HDC hdc = GetDC (0);
+
+  HPALETTE BlackPal, OldPal;
+  BlackPal = CreatePalette ((LOGPALETTE *)&Palette);
+  OldPal = SelectPalette (hdc,BlackPal,FALSE);
+  RealizePalette (hdc);
+  SelectPalette (hdc, OldPal, FALSE);
+  DeleteObject (BlackPal);
+
+  ReleaseDC (0, hdc);
+}
+
+static void CreateIdentityPalette (csRGBpixel *p)
+{
+  struct
+  {
+    WORD Version;
+    WORD nEntries;
+    PALETTEENTRY aEntries[CS_WIN_PALETTE_SIZE];
+  } Palette;
+
+  Palette.Version = 0x300;
+  Palette.nEntries = CS_WIN_PALETTE_SIZE;
+
+  if (hWndPalette)
+    DeleteObject (hWndPalette);
+
+  Palette.aEntries[0].peFlags = 0;
+  Palette.aEntries[0].peFlags = 0;
+
+  int i;
+  for (i = 1; i < CS_WIN_PALETTE_SIZE; i++)
+  {
+    Palette.aEntries[i].peRed = p[i].red;
+    Palette.aEntries[i].peGreen = p[i].green;
+    Palette.aEntries[i].peBlue = p[i].blue;
+    Palette.aEntries[i].peFlags = PC_RESERVED;
+  }
+
+  hWndPalette = CreatePalette ((LOGPALETTE *)&Palette);
+
+  if (!hWndPalette)
+    SystemFatalError (L"Error creating identity palette.");
+}
+*/
 csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
   scfImplementationType (this, iParent),
   m_nGraphicsReady (true),
@@ -551,6 +623,7 @@ void csGraphics2DOpenGL::Close (void)
     wglDeleteContext (hGLRC);
   }
 
+  DeleteObject (hWndPalette);
   ReleaseDC (m_hWnd, hDC);
 
   if (m_hWnd != 0)

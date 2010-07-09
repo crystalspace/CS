@@ -31,41 +31,12 @@
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 
-#include "iengine/mesh.h"
-#include "iengine/movable.h"
-
 #include "modifiabledatafeeder.h"
 #include "feederhelper.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
 SCF_IMPLEMENT_FACTORY (csTerrainModifiableDataFeeder)
-
-
-//Some helper functions.
-csRect WorldArea(iTerrainCell* cell)
-{
-  int width = cell->GetGridWidth();
-  int height = cell->GetGridHeight();
-  csVector2 v = cell->GetPosition();
-
-  csRef<iMeshObject> terrain = scfQueryInterface<iMeshObject> (cell->GetTerrain());
-  csReversibleTransform terrainTransform = terrain->GetMeshWrapper ()->GetMovable ()->GetTransform ();
-  
-  csBox3 box(csVector3(v.x, 0, v.y), csVector3(v.x+width, 0, v.y+height));
-  box = terrainTransform.This2Other(box);
-  csRect area(box.MinX(), box.MinZ(), box.MaxX(), box.MaxZ());
-  return area;
-}
-
-csRect CellArea(iTerrainCell* cell, const csRect worldArea)
-{
-  csVector2 v = cell->GetPosition();
-
-  csRect area(worldArea.xmin-v.x, worldArea.ymin-v.y, worldArea.xmax-v.x, worldArea.ymax-v.y);
-  return area;
-}
-
 
 csTerrainModifiableDataFeeder::csTerrainModifiableDataFeeder (iBase* parent)
   : scfImplementationType (this, parent)
@@ -167,13 +138,6 @@ bool csTerrainModifiableDataFeeder::Load (iTerrainCell* cell)
     }
   }
 
-  //Apply modifiers
-  for (size_t j = 0; j < modifiers.GetSize(); j++)
-    if (modifiers[j]->InBounds(WorldArea(cell)))
-    {
-      modifiers[j]->Displace(cell, 1.0f);
-    }
-
   return true;
 }
 
@@ -188,7 +152,10 @@ iTerrainModifier* csTerrainModifiableDataFeeder::AddModifier (const csVector3& c
 
   for (size_t i = 0; i < cells.GetSize(); i++)
   {
-    if (mod->InBounds(WorldArea(cells[i])))
+    int width = cells[i]->GetGridWidth();
+    int height = cells[i]->GetGridHeight();
+    csVector2 v = cells[i]->GetPosition();
+    if (mod->InBounds(csBox2(v.x, v.y, v.x+width, v.y+height)))
     {
       mod->Displace(cells[i], 1.0f);
     }
@@ -201,11 +168,13 @@ void csTerrainModifiableDataFeeder::RemoveModifier (iTerrainModifier* modifier)
 {
   if (modifiers.Delete(modifier))
   {
-    //Collect all cells that are altered by this modifier.
     csRefArray<iTerrainCell> affectedCells;
     for (size_t i = 0; i < cells.GetSize(); i++)
     {
-      if (modifier->InBounds(WorldArea(cells[i])))
+      int width = cells[i]->GetGridWidth();
+      int height = cells[i]->GetGridHeight();
+      csVector2 v = cells[i]->GetPosition();
+      if (modifier->InBounds(csBox2(v.x, v.y, v.x+width, v.y+height)))
       {
         affectedCells.Push(cells[i]);
       }
@@ -247,7 +216,10 @@ void csTerrainModifiableDataFeeder::RemoveModifier (iTerrainModifier* modifier)
     for (size_t j = 0; j < modifiers.GetSize(); j++)
       for (size_t i = 0; i < affectedCells.GetSize(); i++)
       {
-        if (modifiers[j]->InBounds(WorldArea(affectedCells[i])))
+        int width = affectedCells[i]->GetGridWidth();
+        int height = affectedCells[i]->GetGridHeight();
+        csVector2 v = affectedCells[i]->GetPosition();
+        if (modifiers[j]->InBounds(csBox2(v.x, v.y, v.x+width, v.y+height)))
         {
           modifiers[j]->Displace(affectedCells[i], 1.0f);
         }
@@ -272,11 +244,12 @@ void csTerrainModifiableDataFeeder::SetParameter (const char* param, const char*
 
 void csRectFlattenModifier::Displace(iTerrainCell* cell, float intensity) const
 {
-  csRect area = WorldArea(cell);
+  int width = cell->GetGridWidth();
+  int height = cell->GetGridHeight();
+  csVector2 v = cell->GetPosition();
 
-  area.Intersect(bb.MinX(), bb.MinY(), bb.MaxX(), bb.MaxY());
-
-  area = CellArea(cell, area);
+  csRect area(0, 0, width, height);
+  area.Intersect(bb.MinX()-v.x, bb.MinY()-v.y, bb.MaxX()-v.x, bb.MaxY()-v.y);
 
   //printf("area: %d, %d - %d, %d\n\n", area.xmin, area.ymin%256, area.xmax, area.ymax);
 
@@ -284,8 +257,8 @@ void csRectFlattenModifier::Displace(iTerrainCell* cell, float intensity) const
 
   float val = (center.y/cell->GetSize().z)*intensity;
 
-  for (size_t y = 0; y < size_t (area.Height()); y++)
-    for (size_t x = 0; x < size_t (area.Width()); x++)
+  for (size_t y = 0; y < area.ymax-area.ymin; y++)
+    for (size_t x = 0; x < area.xmax-area.xmin; x++)
     {
       data.data[y * data.pitch + x] = val;
     }

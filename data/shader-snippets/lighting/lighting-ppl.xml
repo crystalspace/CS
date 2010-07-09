@@ -89,7 +89,7 @@
 	    LightSpaceWorld lightSpace;
 	    lightSpace.Init (i, positionW);
 	    
-	    Light light = GetCurrentLight (lightSpace, i);
+	    Light light = GetCurrentLight (lightSpace, i, normal);
 	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
 	    float3 d, s;
 	    ComputeLight (lightSpace, light, myEyeToSurf, normal, 32,

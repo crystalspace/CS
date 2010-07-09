@@ -48,7 +48,6 @@ private:
   void Frame();
 
   bool OnKeyboard(iEvent&);
-  bool OnMouseDown(iEvent&);
   void CreateRoom(); 
 
 public:
@@ -66,18 +65,9 @@ public:
   // Declare the name of this event handler.
   CS_EVENTHANDLER_NAMES("application.ceguitest")
       
-  /* Declare that we want to receive events *after* the CEGUI plugin. */
-  virtual const csHandlerID * GenericPrec (csRef<iEventHandlerRegistry> &r1, 
-    csRef<iEventNameRegistry> &r2, csEventID event) const 
-  {
-    static csHandlerID precConstraint[2];
-    
-    precConstraint[0] = r1->GetGenericID("crystalspace.cegui");
-    precConstraint[1] = CS_HANDLERLIST_END;
-    return precConstraint;
-  }
-
-  CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
+  /* Declare that we're not terribly interested in having events
+     delivered to us before or after other modules, plugins, etc. */
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif

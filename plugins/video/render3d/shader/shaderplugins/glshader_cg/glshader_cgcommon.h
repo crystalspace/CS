@@ -167,8 +167,7 @@ protected:
   void OutputClipPreamble (csString& str);
   void WriteClipApplications (csString& str);
   
-  void CollectUnusedParameters (csSet<csString>& unusedParams,
-				const csStringArray& unusedCandidates);
+  void CollectUnusedParameters (csSet<csString>& unusedParams);
   template<typename Setter>
   void SetParameterValue (const Setter& setter,
     ShaderParameter* sparam, csShaderVariable* var);

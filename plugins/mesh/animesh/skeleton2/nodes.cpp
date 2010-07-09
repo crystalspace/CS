@@ -190,39 +190,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     csRef<iSkeletonAnimNode2> ref;
     ref.AttachNew (new AnimationNode (this));
-
-    // Convert the animation data to bind space if it was not yet made.
-    if (!animation->GetFramesInBindSpace ())
-    {
-      for (size_t channel = 0; channel < animation->GetChannelCount ();
-	   channel++)
-      {
-	// Get the bind transform of the bone
-	BoneID boneID = animation->GetChannelBone (channel);
-	csQuaternion skeletonRotation;
-	csVector3 skeletonOffset;
-	skeleton->GetFactory ()->GetTransformBoneSpace (boneID, skeletonRotation,
-						       skeletonOffset);
-
-	// Convert each keyframe for this bone
-	for (size_t keyframe = 0;
-	     keyframe < animation->GetKeyFrameCount (channel); keyframe++)
-	{
-	  float time;
-	  csQuaternion keyframeRotation;
-	  csVector3 keyframeOffset;
-	  animation->GetKeyFrame (channel, keyframe, boneID, time,
-				  keyframeRotation, keyframeOffset);
-
-	  animation->SetKeyFrame (channel, keyframe,
-				  keyframeRotation * skeletonRotation.GetConjugate (),
-				  keyframeOffset - skeletonOffset);
-	}
-      }
-
-      animation->SetFramesInBindSpace (true);
-    }
-
     return csPtr<iSkeletonAnimNode2> (ref);
   }
 
@@ -243,7 +210,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS_LEAKGUARD_IMPLEMENT(AnimationNode);
 
   AnimationNode::AnimationNode (AnimationNodeFactory* factory)
-    : scfImplementationType (this), BaseNodeSingle (this), factory (factory),
+    : scfImplementationType (this), BaseNodeSingle (this), factory (factory), 
     isPlaying (false), playbackPosition (0), playbackSpeed (factory->playbackSpeed)
   {}
   

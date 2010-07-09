@@ -239,7 +239,9 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
     {
       containedName = csevMouseButton(name_reg, deviceNumber);
       mouseButton = csMouseEventHelper::GetButton(ev);
-      csKeyEventHelper::GetModifiers (ev, modifiers);
+      uint32 mModifiers;
+      ev->Retrieve("keyModifiers", mModifiers);
+      csKeyEventHelper::GetModifiers (mModifiers, modifiers);
     }
     else if (CS_IS_MOUSE_MOVE_EVENT(name_reg, *ev, deviceNumber))
     {
@@ -270,7 +272,9 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
     {
       containedName = csevJoystickButton(name_reg, deviceNumber);
       joystickButton = csJoystickEventHelper::GetButton(ev);
-      csKeyEventHelper::GetModifiers (ev, modifiers);
+      uint32 jModifiers;
+      ev->Retrieve("keyModifiers", jModifiers);
+      csKeyEventHelper::GetModifiers (jModifiers, modifiers);
     }
     else if (CS_IS_JOYSTICK_MOVE_EVENT(name_reg, *ev, deviceNumber))
     {

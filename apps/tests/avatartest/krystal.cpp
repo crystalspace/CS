@@ -174,15 +174,15 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     if (krystalDead)
     {
       // Trace a physical beam to find if a rigid body was hit
-      csBulletHitBeamResult hitResult =
+      csBulletHitBeamResult physicsResult =
 	avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
-      if (hitResult.hasHit
-	  && hitResult.bodyType == CS_BULLET_RIGID_BODY)
+
+      // Apply a big force at the point clicked by the mouse
+      if (physicsResult.body)
       {
-	// Apply a big force at the point clicked by the mouse
 	csVector3 force = endBeam - startBeam;
 	force.Normalize ();
-	hitResult.rigidBody->AddForceAtPos (hitResult.isect, force * 5.0f);
+	physicsResult.body->AddForceAtPos (physicsResult.isect, force * 5.0f);
       }
 
       return true;
@@ -227,17 +227,17 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     }
 
     // Trace a physical beam to find which rigid body was hit
-    csBulletHitBeamResult hitResult =
+    csBulletHitBeamResult physicsResult =
       avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
-    if (hitResult.hasHit
-	&& hitResult.bodyType == CS_BULLET_RIGID_BODY)
+
+    // Apply a big force at the point clicked by the mouse
+    if (physicsResult.body)
     {
-      // Apply a big force at the point clicked by the mouse
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
-      hitResult.rigidBody->AddForceAtPos (hitResult.isect, force * 5.0f);
-      hitResult.rigidBody->SetLinearVelocity (tc.GetT2O ()
-					      * csVector3 (0.0f, 0.0f, 5.0f));
+      physicsResult.body->AddForceAtPos (physicsResult.isect, force * 5.0f);
+      physicsResult.body->SetLinearVelocity (tc.GetT2O ()
+					     * csVector3 (0.0f, 0.0f, 5.0f));
     }
 
     return true;

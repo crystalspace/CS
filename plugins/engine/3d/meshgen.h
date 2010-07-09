@@ -548,8 +548,6 @@ public:
   virtual iMeshWrapper* GetMesh (size_t idx) { return meshes[idx]; }
   virtual void RemoveMesh (size_t idx);
 
-  virtual void ClearPosition (const csVector3& pos);
-
   //--------------------- iSelfDestruct implementation -------------------//
 
   virtual void SelfDestruct ();

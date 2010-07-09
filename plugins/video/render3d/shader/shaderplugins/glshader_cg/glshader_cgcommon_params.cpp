@@ -541,57 +541,33 @@ static csString GetParamUnusedMacroName (const char* cgName)
   return s;
 }
 
-namespace
+void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)
 {
-  struct CgParamUsage
-  {
-    CGparameter param;
-    bool used;
-    csString macroName;
-  };
-}
-
-void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams,
-						  const csStringArray& unusedCandidates)
-{
-  csArray<CgParamUsage> unusedCgParams;
+  csArray<CGparameter> unusedCgParams;
   csSet<uint> sharedResources;
   CGparameter cgParam = cgGetFirstLeafParameter (program, CG_PROGRAM);
   while (cgParam)
   {
-    const char* paramName = cgGetParameterName (cgParam); 
-    // Cg seems to emit internal-ish globals with $ in the name, ignore these
-    if (strchr (paramName, '$') == 0)
+    CGresource paramRes = cgGetParameterResource (cgParam);
+    /* At least Cg 2.1.0.12 evidently has a cool feature where it packs
+       vertexToFragment data automatically (e.g. you have 9 V2F fields, one 
+       of them is a float2, the other a simple float -> these two are packed
+       into one field). However, the field that is packed into another field
+       is incorrectly marked as unused. The only hint to it being actually 
+       used in the compiled program is that the resource is not UNDEFINED and
+       that a parameter using the same resource was not unused.
+       So if we come across a parameter that is reported unused, but its
+       resource was found used earlier, we also assume that parameter to be
+       used.
+     */
+    if (!cgIsParameterUsed (cgParam, program))
     {
-      CgParamUsage usage;
-      usage.param = cgParam;
-      usage.macroName = GetParamUnusedMacroName (paramName);
-      CGresource paramRes = cgGetParameterResource (cgParam);
-      /* At least Cg 2.1.0.12 evidently has a cool feature where it packs
-	vertexToFragment data automatically (e.g. you have 9 V2F fields, one 
-	of them is a float2, the other a simple float -> these two are packed
-	into one field). However, the field that is packed into another field
-	is incorrectly marked as unused. The only hint to it being actually 
-	used in the compiled program is that the resource is not UNDEFINED and
-	that a parameter using the same resource was not unused.
-	So if we come across a parameter that is reported unused, but its
-	resource was found used earlier, we also assume that parameter to be
-	used.
-      */
-      if (!cgIsParameterUsed (cgParam, program))
-      {
-	usage.used = false;
-	/* The 'main' shared resource user may only appear later, so postpone
-	  parameter checking */
-      }
-      else
-      {
-	usage.used = true;
-	if (paramRes != CG_UNDEFINED)
-	  sharedResources.Add (paramRes);
-      }
-      unusedCgParams.Push (usage);
+      /* The 'main' shared resource user may only appear later, so postpone
+         parameter checking */
+      unusedCgParams.Push (cgParam);
     }
+    else if (paramRes != CG_UNDEFINED)
+      sharedResources.Add (paramRes);
 
     cgParam = cgGetNextLeafParameter (cgParam);
   }
@@ -600,54 +576,29 @@ void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams,
   cgParam = cgGetFirstLeafParameter (program, CG_GLOBAL);
   while (cgParam)
   {
-    const char* paramName = cgGetParameterName (cgParam); 
-    // Cg seems to emit internal-ish globals with $ in the name, ignore these
-    if (strchr (paramName, '$') == 0)
+    CGresource paramRes = cgGetParameterResource (cgParam);
+    if (!cgIsParameterUsed (cgParam, program))
     {
-      CgParamUsage usage;
-      usage.param = cgParam;
-      usage.macroName = GetParamUnusedMacroName (paramName);
-      CGresource paramRes = cgGetParameterResource (cgParam);
-      if (!cgIsParameterUsed (cgParam, program))
-      {
-	usage.used = false;
-	/* The 'main' shared resource user may only appear later, so postpone
-	  parameter checking */
-      }
-      else
-      {
-	usage.used = true;
-	if (paramRes != CG_UNDEFINED)
-	  sharedResources.Add (paramRes);
-      }
-      unusedCgParams.Push (usage);
+      /* The 'main' shared resource user may only appear later, so postpone
+         parameter checking */
+      unusedCgParams.Push (cgParam);
     }
+    else if (paramRes != CG_UNDEFINED)
+      sharedResources.Add (paramRes);
 
     cgParam = cgGetNextLeafParameter (cgParam);
   }
   
-  csSet<csString> seenParams;
   for (size_t p = 0; p < unusedCgParams.GetSize(); p++)
   {
-    const CgParamUsage& param = unusedCgParams[p];
-    CGresource paramRes = cgGetParameterResource (param.param);
-    if (!param.used && !sharedResources.Contains (paramRes))
+    cgParam = unusedCgParams[p];
+    CGresource paramRes = cgGetParameterResource (cgParam);
+    if (!sharedResources.Contains (paramRes))
     {
-      unusedParams.Add (param.macroName);
-    }
-    seenParams.Add (param.macroName);
-  }
-  
-  /* Check list of given unused candidates.
-     If we have a candidate, but it doesn't appear among the enumerated
-     parameters, consider it unused. */
-  csStringArray::ConstIterator candidatesIterator (unusedCandidates.GetIterator());
-  while (candidatesIterator.HasNext())
-  {
-    const csString& candidate = candidatesIterator.Next ();
-    if (!seenParams.Contains (candidate))
-    {
-      unusedParams.Add (candidate);
+      const char* paramName = cgGetParameterName (cgParam); 
+      if (strchr (paramName, '$') == 0)
+	// Cg seems to emit internal-ish globals with $ in the name, ignore these
+	unusedParams.Add (GetParamUnusedMacroName (paramName));
     }
   }
 }

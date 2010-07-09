@@ -931,11 +931,6 @@ class iSkeletonAnimation2(core.iBase):
     def GetTwoKeyFrames(*args): return _imesh.iSkeletonAnimation2_GetTwoKeyFrames(*args)
     def BlendState(*args): return _imesh.iSkeletonAnimation2_BlendState(*args)
     def GetDuration(*args): return _imesh.iSkeletonAnimation2_GetDuration(*args)
-    def SetKeyFrame(*args): return _imesh.iSkeletonAnimation2_SetKeyFrame(*args)
-    def SetFramesInBindSpace(*args): return _imesh.iSkeletonAnimation2_SetFramesInBindSpace(*args)
-    def GetFramesInBindSpace(*args): return _imesh.iSkeletonAnimation2_GetFramesInBindSpace(*args)
-    def GetChannelCount(*args): return _imesh.iSkeletonAnimation2_GetChannelCount(*args)
-    def GetChannelBone(*args): return _imesh.iSkeletonAnimation2_GetChannelBone(*args)
     scfGetVersion = staticmethod(_imesh.iSkeletonAnimation2_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonAnimation2
     __del__ = lambda self : None;

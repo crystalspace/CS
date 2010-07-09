@@ -132,7 +132,8 @@ void csMeshGeneratorGeometry::GetDensityMapFactor (float x, float z,
 {
   if (density_map)
   {
-    density_map->SampleFloat (density_map_type, x, z, data); 
+    if (density_map.IsValid ())
+      density_map->SampleFloat (density_map_type, x, z, data); 
     data *= density_map_factor;  
   }
   else data = 1.0f;
@@ -226,7 +227,6 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.sqmaxdistance = maxdist * maxdist;
   g.factory->GetMeshObjectFactory ()->SetMixMode (CS_FX_COPY);
   g.mesh = generator->engine->CreateMeshWrapper (g.factory, 0);
-  g.mesh->GetFlags ().Set (CS_ENTITY_NOHITBEAM);
   g.mesh->SetZBufModeRecursive (CS_ZBUF_USE); 
   g.vertexInfoArray.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
   g.vertexInfoArray.transformVar->SetType (csShaderVariable::ARRAY); 
@@ -853,13 +853,6 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
       inuse_blocks->prev = block;
       inuse_blocks = block;
     }
-    // It is possible that our positionMap got cleared so we may have to
-    // recalculate it here.
-    if (!cell.positionMap)
-    {
-      cell.positionMap = new PositionMap(cell.box);
-      GeneratePositions (cidx, cell, block);
-    }
   }
   else if (cache_blocks.GetSize () > 0)
   {
@@ -1055,20 +1048,6 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
       }
     }
   }
-}
-
-void csMeshGenerator::ClearPosition (const csVector3& pos)
-{
-  SetupSampleBox ();
-
-  int cellx = GetCellX (pos.x);
-  int cellz = GetCellZ (pos.z);
-
-  int cidx = cellz*cell_dim + cellx;
-  csMGCell& cell = cells[cidx];
-  FreeMeshesInBlock (cidx, cell);
-  delete cell.positionMap;
-  cell.positionMap = 0;
 }
 
 void csMeshGenerator::AllocateBlocks (const csVector3& pos)
