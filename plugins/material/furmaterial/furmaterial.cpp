@@ -474,7 +474,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     for (size_t i = 0 ; i < guideHairsLOD.GetSize(); i ++)
       if (guideHairsLOD.Get(i).isActive)
         count++;
-    csPrintf("%d\n",count);
+    csPrintf("Active LOD ropes: %d\n",count);
   }
 
   void FurMaterial::SaveUVImage()
@@ -508,7 +508,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         (int)(uv.y * densitymapH) * densitymapW ) ] = 255;
     }
 
-    csPrintf("%d\n", guideHairsLOD.GetSize() + guideHairs.GetSize());
+    csPrintf("Total guide ropes: %d\n", guideHairsLOD.GetSize() + guideHairs.GetSize());
 
     SaveImage(densitymapData, "/data/krystal/krystal_debug.png",
       densitymapW, densitymapH);
