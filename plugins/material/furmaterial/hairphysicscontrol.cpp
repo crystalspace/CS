@@ -115,6 +115,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       return;
 
     guideRopes.Delete(strandID, bulletBody);
+    
+    bulletDynamicSystem->RemoveSoftBody(bulletBody);
   }
 
   void HairPhysicsControl::RemoveAllStrands ()

@@ -83,7 +83,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   FurMaterial::FurMaterial (FurMaterialType* manager, const char *name, 
     iObjectRegistry* object_reg) :
   scfImplementationType (this), manager (manager), name (name), 
-    object_reg(object_reg), physicsControl(0), hairStrandGenerator(0)
+    object_reg(object_reg), physicsControl(0), hairStrandGenerator(0), rng(0),
+    LOD(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -456,12 +457,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::SetLOD(float LOD)
   {
-    // deactivate all
+    if ( fabs( this->LOD - LOD ) < EPSILON )
+      return;
+
+    this->LOD = LOD;
+
     if (!physicsControl) // no physics support
       return;
 
+    // deactivate all
+    for (size_t i = 0 ; i < guideHairsLOD.GetSize(); i ++)
+    {
+      guideHairsLOD.Get(i).isActive = false;
+      physicsControl->RemoveStrand(i + guideHairs.GetSize());
+    }
     // LOD ropes use ropes as well
-    for (size_t i = 1 ; i < guideHairsLOD.GetSize(); i ++)
+    for (size_t i = 0 ; i < guideHairsLOD.GetSize(); i ++)
       if ( rng->Get() < LOD )
       {
         guideHairsLOD.Get(i).isActive = true;
@@ -783,6 +794,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     cameraOrigin = tc.GetOrigin();
     csVector3 *tangentBuffer = tan;
+
+    // set LOD
+    float distance = csVector3::Norm(cameraOrigin - 
+      furMaterial->hairStrands.Get(0).controlPoints[0]);
+
+    if (distance < 2.0f)
+      furMaterial->SetLOD(1.0f);
+    else if (distance < 5.0f)
+      furMaterial->SetLOD(0.5f);
+    else
+      furMaterial->SetLOD(0.0f);
 
     for ( int x = 0 ; x < numberOfStrains ; x ++, 
       vbuf += 2 * controlPointsCount, tangentBuffer += 2 * controlPointsCount)

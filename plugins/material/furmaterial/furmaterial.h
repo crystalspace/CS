@@ -147,6 +147,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iFurPhysicsControl> physicsControl;
     csRef<iFurStrandGenerator> hairStrandGenerator;
     csRandomGen *rng;
+    float LOD;
     /// Temp fur geometry
     csRef<iAnimatedMeshFactory> meshFactory;
     csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
