@@ -278,7 +278,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
 
   csRef<iGraphics3D> graphics3D = csQueryRegistry<iGraphics3D> (objRegistry);
   iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
-    
+   
   shaderManager = csQueryRegistry<iShaderManager> (objRegistry);
   stringSet = csQueryRegistryTagInterface<iStringSet> (objRegistry, "crystalspace.shared.stringset");
 
@@ -340,55 +340,17 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     return false;
   }
 
-  colorBuffer0 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
-    graphics2D->GetHeight (),
-    csimg2D,
-    "rgba16_f",
-    flags,
-    NULL);
+  GBuffer::Description desc;
+  desc.colorBufferCount = 3;
+  desc.hasDepthBuffer = true;
+  desc.width = graphics2D->GetWidth ();
+  desc.height = graphics2D->GetHeight ();
 
-  if(!colorBuffer0)
+  if (!gbuffer.Initialize (desc, 
+                           graphics3D, 
+                           shaderManager->GetSVNameStringset (), 
+                           objRegistry))
   {
-    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, "Could not create color buffer 0!");
-    return false;
-  }
-
-  colorBuffer1 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
-    graphics2D->GetHeight (),
-    csimg2D,
-    "rgba16_f",
-    flags,
-    NULL);
-
-  if(!colorBuffer1)
-  {
-    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, "Could not create color buffer 1!");
-    return false;
-  }
-
-  colorBuffer2 = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
-    graphics2D->GetHeight (),
-    csimg2D,
-    "rgba16_f",
-    flags,
-    NULL);
-
-  if(!colorBuffer2)
-  {
-    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, "Could not create color buffer 2!");
-    return false;
-  }
-
-  depthBuffer  = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
-    graphics2D->GetHeight (),
-    csimg2D,
-    "d24s8",
-    flags,
-    NULL);
-
-  if(!depthBuffer)
-  {
-    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, "Could not create depth buffer!");
     return false;
   }
 
@@ -433,15 +395,25 @@ bool RMDeferred::RenderView(iView *view)
   RenderTreeType renderTree (treePersistent);
   RenderTreeType::ContextNode *startContext = renderTree.CreateContext (rview);
 
-  // Add textures to be visualized.
+  // Add gbuffer textures to be visualized.
   {
-    int w, h;
-    colorBuffer0->GetRendererDimensions (w, h);
-    float aspect = (float)w / h;
-    renderTree.AddDebugTexture (colorBuffer0, aspect);
-    renderTree.AddDebugTexture (colorBuffer1, aspect);
-    renderTree.AddDebugTexture (colorBuffer2, aspect);
-    renderTree.AddDebugTexture (depthBuffer, aspect);
+    size_t count = gbuffer.GetColorBufferCount ();
+    if (count > 0)
+    {
+      int w, h;
+      gbuffer.GetColorBuffer (0)->GetRendererDimensions (w, h);
+      float aspect = (float)w / h;
+      
+      for (size_t i = 0; i < count; i++)
+      {
+        renderTree.AddDebugTexture (gbuffer.GetColorBuffer (i), aspect);
+      }
+
+      if (gbuffer.GetDepthBuffer ())
+      {
+        renderTree.AddDebugTexture (gbuffer.GetDepthBuffer (), aspect);
+      }
+    }
   }
 
   // Setup the main context
@@ -453,7 +425,7 @@ bool RMDeferred::RenderView(iView *view)
   }
 
   // Render all contexts, back to front
-  AttachGbuffer (graphics3D);
+  gbuffer.Attach ();
   {
     graphics3D->SetZMode (CS_ZBUF_MESH);
 
@@ -462,7 +434,7 @@ bool RMDeferred::RenderView(iView *view)
 
     graphics3D->FinishDraw ();
   }
-  DetachGBuffer (graphics3D);
+  gbuffer.Detach ();
 
   // Fills the accumulation buffer.
   AttachAccumBuffer (graphics3D);
@@ -480,10 +452,7 @@ bool RMDeferred::RenderView(iView *view)
                                   shaderManager,
                                   stringSet,
                                   rview,
-                                  colorBuffer0,
-                                  colorBuffer1,
-                                  colorBuffer2,
-                                  depthBuffer,
+                                  gbuffer,
                                   lightRenderPersistent);
 
     render.OutputAmbientLight ();
@@ -510,34 +479,6 @@ bool RMDeferred::RenderView(iView *view)
 bool RMDeferred::PrecacheView(iView *view)
 {
   return RenderView (view);
-}
-
-//----------------------------------------------------------------------
-bool RMDeferred::AttachGbuffer(iGraphics3D *graphics3D)
-{
-  if(!graphics3D->SetRenderTarget (colorBuffer0, false, 0, rtaColor0))
-    return false;
-
-  if(!graphics3D->SetRenderTarget (colorBuffer1, false, 0, rtaColor1))
-    return false;
-
-  if(!graphics3D->SetRenderTarget (colorBuffer2, false, 0, rtaColor2))
-    return false;
-
-  if(!graphics3D->SetRenderTarget (depthBuffer, false, 0, rtaDepth))
-    return false;
-  
-  if (!graphics3D->ValidateRenderTargets ())
-    return false;
-
-  return true;
-}
-
-//----------------------------------------------------------------------
-bool RMDeferred::DetachGBuffer(iGraphics3D *graphics3D)
-{
-  graphics3D->UnsetRenderTargets ();
-  return true;
 }
 
 //----------------------------------------------------------------------

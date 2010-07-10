@@ -32,6 +32,7 @@
 #include "iengine/rendermanager.h"
 #include "itexture.h"
 
+#include "gbuffer.h"
 #include "deferredlightrender.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
@@ -68,9 +69,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
   public:
 
-    bool AttachGbuffer(iGraphics3D *graphics3D);
-    bool DetachGBuffer(iGraphics3D *graphics3D);
-
     bool AttachAccumBuffer(iGraphics3D *graphics3D);
     bool DetachAccumBuffer(iGraphics3D *graphics3D);
 
@@ -92,6 +90,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csRef<iTextureHandle> colorBuffer1;
     csRef<iTextureHandle> colorBuffer2;
     csRef<iTextureHandle> depthBuffer;
+
+    GBuffer gbuffer;
 
     int maxPortalRecurse;
   };

@@ -28,6 +28,8 @@
 
 #include "csutil/cfgacc.h"
 
+#include "gbuffer.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
 
@@ -444,10 +446,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                           iShaderManager *shaderMgr,
                           iStringSet *stringSet,
                           CS::RenderManager::RenderView *rview,
-                          iTextureHandle *gBuffer0, 
-                          iTextureHandle *gBuffer1,
-                          iTextureHandle *gBuffer2,
-                          iTextureHandle *gBufferDepth,
+                          GBuffer &gbuffer,
                           PersistentData &persistent)
       : 
     graphics3D(g3d),
@@ -456,17 +455,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     rview(rview),
     persistentData(persistent)
     {
-      iShaderVarStringSet *svStringSet = shaderMgr->GetSVNameStringset ();
-
-      csShaderVariable *gBuffer0SV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer 0"));
-      csShaderVariable *gBuffer1SV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer 1"));
-      csShaderVariable *gBuffer2SV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer 2"));
-      csShaderVariable *gBufferDSV = shaderMgr->GetVariableAdd (svStringSet->Request ("tex gbuffer depth"));
-
-      gBuffer0SV->SetValue (gBuffer0);
-      gBuffer1SV->SetValue (gBuffer1);
-      gBuffer2SV->SetValue (gBuffer2);
-      gBufferDSV->SetValue (gBufferDepth);
+      gbuffer.UpdateShaderVars (shaderMgr);
     }
 
     ~DeferredLightRenderer() {}
