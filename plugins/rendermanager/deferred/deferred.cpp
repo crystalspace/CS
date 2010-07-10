@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 by Joe Forte
+    Copyright (C) 2010 by Joe Forte
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -332,7 +332,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     csimg2D,
     "rgba16_f",
     flags,
-    NULL);
+    nullptr);
 
   if (!accumBuffer)
   {
@@ -345,6 +345,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   desc.hasDepthBuffer = true;
   desc.width = graphics2D->GetWidth ();
   desc.height = graphics2D->GetHeight ();
+  desc.colorBufferFormat = nullptr;
 
   if (!gbuffer.Initialize (desc, 
                            graphics3D, 

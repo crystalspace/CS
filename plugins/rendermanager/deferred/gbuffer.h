@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 by Joe Forte
+    Copyright (C) 2010 by Joe Forte
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,9 +21,7 @@
 
 #include "cssysdef.h"
 
-#include "iutil/comp.h"
-#include "csutil/scf_implementation.h"
-#include "iengine/rendermanager.h"
+#include "csutil/scfstr.h"
 #include "itexture.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
@@ -47,10 +45,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       size_t colorBufferCount;
       bool hasDepthBuffer;
+
+      // Set to NULL to use the default format.
+      const char *colorBufferFormat;
     };
 
-    GBuffer() : graphics3D (NULL), isAttached (false) {}
-    ~GBuffer() { Detach (); }
+    GBuffer() : graphics3D (nullptr), isAttached (false) {}
+    ~GBuffer() { CS_ASSERT(!IsAttached ()); }
 
     /// Initializes the gbuffer.
     bool Initialize(const Description &desc, 
@@ -63,6 +64,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       const int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
       const int w = desc.width;
       const int h = desc.height;
+
+      const char *colorFmt = desc.colorBufferFormat;
+      if (!colorFmt)
+        colorFmt = "rgba16_f";
 
       iTextureManager *texMgr = g3D->GetTextureManager ();
 
@@ -77,35 +82,46 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                  "Too many color buffers requested (%d requested, device supports %d)!", 
                  desc.colorBufferCount, 
                  caps->MaxRTColorAttachments);
-
         return false;
       }
 
       size_t count = desc.colorBufferCount;
       for (size_t i = 0; i < count; i++)
       {
-        csRef<iTextureHandle> colorBuffer = texMgr->CreateTexture (w, h, csimg2D, 
-          "rgba16_f", flags, NULL);
+        scfString errString;
 
-        if(!colorBuffer)
+        csRef<iTextureHandle> colorBuffer = texMgr->CreateTexture (w, h, csimg2D, 
+          colorFmt, flags, &errString);
+
+        if (!colorBuffer)
         {
           csReport(registry, CS_REPORTER_SEVERITY_ERROR, messageID, 
-            "Could not create color buffer %d!", i);
+            "Could not create color buffer %d! %s", i, errString.GetCsString ().GetDataSafe ());
           return false;
         }
 
-        char buff[64];
-        cs_snprintf (buff, sizeof(char) * 64, "tex gbuffer %d", i);
+        csString svName;
+        svName.Format ("tex gbuffer %d", i);
 
         colorBuffers.Push (colorBuffer);
-        colorBufferSVNames.Push (stringSet->Request (buff));
+        colorBufferSVNames.Push (stringSet->Request (svName.GetDataSafe ()));
       }
 
       if (desc.hasDepthBuffer)
       {
-        depthBuffer = texMgr->CreateTexture (w, h, csimg2D, "d24s8", flags, NULL);
+        const char *depthFmt[] = { "d24s8", "d32", "d16" };
+        const size_t fmtCount = sizeof(depthFmt) / sizeof(const char *);
 
-        if(!depthBuffer)
+        // Iterate through the depth formats until we find a valid format.
+        for (size_t i = 0; i < fmtCount; i++)
+        {
+          depthBuffer = texMgr->CreateTexture (w, h, csimg2D, depthFmt[i], flags, NULL);
+
+          if (depthBuffer)
+            break;
+        }
+
+        if (!depthBuffer)
         {
           csReport(registry, CS_REPORTER_SEVERITY_ERROR, messageID, 
             "Could not create depth buffer!");
@@ -116,6 +132,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       }
 
       graphics3D = g3D;
+
+      // Test if the gbuffer format is supported.
+      if (!Attach ())
+      {
+        csReport(registry, CS_REPORTER_SEVERITY_ERROR, messageID, 
+            "Failed to attach GBuffer to the device!");
+        return false;
+      }
+
+      if (!g3D->ValidateRenderTargets ())
+      {
+        Detach ();
+        csReport(registry, CS_REPORTER_SEVERITY_ERROR, messageID, 
+            "GBuffer format is not support by the device!");
+        return false;
+      }
+
+      if (!Detach ())
+      {
+        csReport(registry, CS_REPORTER_SEVERITY_WARNING, messageID, 
+            "Failed to detach GBuffer!");
+      }
 
       return true;
     }
@@ -128,20 +166,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       if (IsAttached ())
         return false;
 
-      size_t count = GetColorBufferCount();
+      size_t count = GetColorBufferCount ();
       for (size_t i = 0; i < count; i++)
       {
         csRenderTargetAttachment attach = (csRenderTargetAttachment)((size_t)rtaColor0 + i);
 
-        if(!graphics3D->SetRenderTarget (GetColorBuffer (i), false, 0, attach))
+        if (!graphics3D->SetRenderTarget (GetColorBuffer (i), false, 0, attach))
           return false;
       }
 
-      if(!graphics3D->SetRenderTarget (GetDepthBuffer (), false, 0, rtaDepth))
-        return false;
-      
-      if (!graphics3D->ValidateRenderTargets ())
-        return false;
+      if (HasDepthBuffer ())
+      {
+        if (!graphics3D->SetRenderTarget (GetDepthBuffer (), false, 0, rtaDepth))
+          return false;
+      }
 
       isAttached = true;
 
@@ -153,8 +191,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     {
       if (IsAttached ())
       {
-        CS_ASSERT (graphics3D);
-        
         graphics3D->UnsetRenderTargets ();
         isAttached = false;
       }
@@ -171,15 +207,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /// Updates shader variables.
     bool UpdateShaderVars(iShaderVariableContext *ctx)
     {
-      size_t count = GetColorBufferCount();
+      size_t count = GetColorBufferCount ();
       for (size_t i = 0; i < count; i++)
       {
         csShaderVariable *colorSV = ctx->GetVariableAdd (colorBufferSVNames[i]);
         colorSV->SetValue (GetColorBuffer (i));
       }
 
-      csShaderVariable *depthSV = ctx->GetVariableAdd (depthBufferSVName);
-      depthSV->SetValue (GetDepthBuffer ());
+      if (HasDepthBuffer ())
+      {
+        csShaderVariable *depthSV = ctx->GetVariableAdd (depthBufferSVName);
+        depthSV->SetValue (GetDepthBuffer ());
+      }
 
       return true;
     }
@@ -193,8 +232,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /// Returns the ith color buffer.
     iTextureHandle *GetColorBuffer(size_t i)
     {
-      CS_ASSERT(i < GetColorBufferCount());
       return colorBuffers[i];
+    }
+
+    /// Returns true if a depth buffer is present.
+    bool HasDepthBuffer() const
+    {
+      return depthBuffer.IsValid ();
     }
 
     /// Returns the depth buffer.

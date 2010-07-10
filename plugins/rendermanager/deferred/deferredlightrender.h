@@ -201,11 +201,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       return false;
 
     float cang = dot_ud / u.Norm ();
-
-    /* Use the half-angle formula to relate cos(a) to cos(a/2). */
-    float houter =  (outer);
-
-    if (cang < houter)
+    if (cang < outer)
       return true;
 
     return false;

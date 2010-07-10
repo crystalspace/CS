@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008 by Joe Forte
+  Copyright (C) 2010 by Joe Forte
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
