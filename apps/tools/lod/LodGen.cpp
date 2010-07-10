@@ -677,6 +677,7 @@ struct MeshVerification
 
 void LodGen::VerifyMesh(WorkMesh& k)
 {
+  return;
   csArray<MeshVerification> mvs;
   SlidingWindow& sw = k.sliding_windows[k.sliding_windows.GetSize()-1];
   for (int i = sw.start_index; i < sw.end_index; i++)
@@ -740,7 +741,7 @@ void LodGen::GenerateLODs()
   int collapse_counter = 0;
   int min_num_triangles = num_triangles / 6;
   int edge_start = 0;
-  int edge_step = 4;
+  int edge_step = 64;
   
   while (1)
   {

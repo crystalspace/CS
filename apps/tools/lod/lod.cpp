@@ -105,6 +105,13 @@ void Lod::UpdateLODLevel()
   assert(mstate);
 
   mstate->ForceProgLODLevel(lod_level);
+  
+  csRef<iMeshFactoryWrapper> fact = sprite->GetFactory();
+  csRef<iMeshObjectFactory> fobj = fact->GetMeshObjectFactory();
+  csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fobj);
+  int s, e;
+  fstate->GetSlidingWindow(lod_level, s, e);
+  cout << "Level: " << lod_level << " Triangles: " << (e-s)/3 << endl;
 }
 
 bool Lod::OnKeyboard (iEvent& ev)
@@ -132,7 +139,6 @@ bool Lod::OnKeyboard (iEvent& ev)
       if (lod_level < num_lod_levels - 1)
       {
         lod_level++;
-        cout << lod_level << " ";
         UpdateLODLevel();
       }
     }
@@ -141,7 +147,6 @@ bool Lod::OnKeyboard (iEvent& ev)
       if (lod_level > 0)
       {
         lod_level--;
-        cout << lod_level << " ";
         UpdateLODLevel();
       }
     }
@@ -217,36 +222,55 @@ bool Lod::Application ()
   return true;
 }
 
-void Lod::AddVertUnique(const csVector3& v, csArray<csVector3>& vertices, csArray<int>& vert_map) const
+struct VertexAttributes
 {
-  static const float epsilon = 0.00001;
-  int vindex = -1;
-  for (unsigned int i = 0; i < vertices.GetSize(); i++)
+  csVector2 uv;
+  csVector3 normal;
+  csColor4 color;
+  VertexAttributes(const csVector2& u, const csVector3& n, const csColor4& c): uv(u), normal(n), color(c) {}
+};
+
+class UniqueVertMesh
+{
+public:
+  csArray<csVector3> vertices;
+  csArray<csTriangle> triangles;
+  csArray<VertexAttributes> attr;
+protected:
+  csArray<int> vert_map;
+public:
+  void AddVertUnique(const csVector3& v, const VertexAttributes& a)
   {
-    if (fabs(v[0] - vertices[i][0]) < epsilon && fabs(v[1] - vertices[i][1]) < epsilon && fabs(v[2] - vertices[i][2]) < epsilon)
+    static const float epsilon = 0.00001;
+    int vindex = -1;
+    for (unsigned int i = 0; i < vertices.GetSize(); i++)
     {
-      vindex = i;
-      break;
+      if (fabs(v[0] - vertices[i][0]) < epsilon && fabs(v[1] - vertices[i][1]) < epsilon && fabs(v[2] - vertices[i][2]) < epsilon)
+      {
+        vindex = i;
+        break;
+      }
+    }
+    if (vindex == -1)
+    {
+      vertices.Push(v);
+      attr.Push(a);
+      vert_map.Push(vertices.GetSize() - 1);
+    }
+    else
+    {
+      vert_map.Push(vindex);
     }
   }
-  if (vindex == -1)
+  
+  void AddTriangleMapped(const csTriangle& t)
   {
-    vertices.Push(v);
-    vert_map.Push(vertices.GetSize() - 1);
-  }
-  else
-  {
-    vert_map.Push(vindex);
-  }
-}
-
-void Lod::AddTriangleMapped(const csTriangle& t, csArray<csTriangle>& triangles, const csArray<int>& vert_map) const
-{
-  csTriangle new_tri;
-  for (int i = 0; i < 3; i++)
-    new_tri[i] = vert_map[t[i]];
-  triangles.Push(new_tri);
-}
+    csTriangle new_tri;
+    for (int i = 0; i < 3; i++)
+      new_tri[i] = vert_map[t[i]];
+    triangles.Push(new_tri);
+  }  
+};
 
 void Lod::CreateLODs(const char* filename)
 {
@@ -314,26 +338,23 @@ void Lod::CreateLODs(const char* filename)
   assert(fstate);
 
   int nv = fstate->GetVertexCount();
-  csArray<csVector3> vertices;
-  csArray<int> vert_map;
-  csVector3* fstate_vertices = fstate->GetVertices();
+  UniqueVertMesh m;
+  const csVector3* fstate_vertices = fstate->GetVertices();
+  const csVector2* fstate_uv = fstate->GetTexels();
+  const csVector3* fstate_normals = fstate->GetNormals();
+  const csColor4*  fstate_colors = fstate->GetColors();
   for (int i = 0; i < nv; i++)
-    AddVertUnique(fstate_vertices[i], vertices, vert_map);
+    m.AddVertUnique(fstate_vertices[i], VertexAttributes(fstate_uv[i], fstate_normals[i], fstate_colors[i]));
   int nt = fstate->GetTriangleCount();
-  csArray<csTriangle> triangles;
   csTriangle* fstate_triangles = fstate->GetTriangles();
   for (int i = 0; i < nt; i++)
-    AddTriangleMapped(fstate_triangles[i], triangles, vert_map);
-  LodGen lodgen(vertices, triangles);
+    m.AddTriangleMapped(fstate_triangles[i]);
+  LodGen lodgen(m.vertices, m.triangles);
   lodgen.GenerateLODs();
   
   fstate->SetVertexCount(0);
-  csVector2 texcoord(0.0, 0.0);
-  csVector3 normal(0.0, 1.0, 0.0);
-  csColor4 color(0.0, 0.0, 0.0, 1.0);
-  
-  for (unsigned int i = 0; i < vertices.GetSize(); i++)
-    fstate->AddVertex(vertices[i], texcoord, normal, color);
+  for (unsigned int i = 0; i < m.vertices.GetSize(); i++)
+    fstate->AddVertex(m.vertices[i], m.attr[i].uv, m.attr[i].normal, m.attr[i].color);
   
   /*
   // Test by rendering level 1
@@ -409,6 +430,7 @@ bool Lod::SetupModules ()
   //CreateLODs("lodbox");
   //CreateLODs("genbment2_tables");
   //CreateLODs("simple");
+  //CreateLODs("kwartz.lib");
 
   // Here we create our world.
   CreateRoom ();
