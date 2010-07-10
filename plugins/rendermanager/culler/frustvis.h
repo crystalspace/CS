@@ -23,6 +23,7 @@
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
 #include "csplugincommon/rendermanager/rendertree.h"
+#include "csplugincommon/rendermanager/render.h"
 #include "csutil/array.h"
 #include "csutil/list.h"
 #include "csutil/parray.h"
@@ -36,11 +37,10 @@
 #include "iengine/viscull.h"
 #include "iengine/movable.h"
 #include "iengine/mesh.h"
-#include <csplugincommon/opengl/glextmanager.h>
 #include "chcpp.h"
 
-typedef CS::RenderManager::RenderTree<
-CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
+//typedef CS::RenderManager::RenderTree<
+//CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
 
 enum NodeVisibility
 {
@@ -68,7 +68,7 @@ struct FrustTest_Front2BackData
 
 struct NodeTraverseData
 {
-  NodeTraverseData() : kdtParent(0), kdtNode(0), u32Frustum_Mask(0)
+  NodeTraverseData() : kdtParent(0), kdtNode(0), u32Frustum_Mask(0), u32Timestamp(0)
   {
   }
   /*NodeTraverseData(NodeTraverseData &ntd)
@@ -80,7 +80,7 @@ struct NodeTraverseData
       kdtNode->SetUserObject(new csVisibilityObjectHistory());
     u32Frustum_Mast=ntd.u32Frustum_Mast;
   }*/
-  NodeTraverseData(csKDTree* kdtP,csKDTree* kdtN, uint32 frustum_mask)
+  NodeTraverseData(csKDTree* kdtN, csKDTree* kdtP, const uint32 frustum_mask,const uint32 timestamp=0)
   {
     kdtParent=kdtP;
     kdtNode=kdtN;
@@ -88,6 +88,7 @@ struct NodeTraverseData
     if(kdtNode && !kdtNode->GetUserObject())
       kdtNode->SetUserObject(new csVisibilityObjectHistory());
     u32Frustum_Mask=frustum_mask;
+    u32Timestamp=timestamp;
   }
 
   csVisibilityObjectHistory* GetVisibilityObjectHistory() const
@@ -105,14 +106,7 @@ struct NodeTraverseData
   bool GetVisibility() const
   {
     if(!kdtNode) return false;
-    //if(!((csVisibilityObjectHistory*)kdtNode->GetUserObject())) return false;
     return GetVisibilityObjectHistory()->GetVisibility();
-  }
-
-  void SetVisibility(bool bV) const
-  {
-    if(!kdtNode) return ;
-    GetVisibilityObjectHistory()->SetVisibility(bV);
   }
 
   uint32 GetFrustumMask() const
@@ -120,9 +114,31 @@ struct NodeTraverseData
     return u32Frustum_Mask;
   }
 
+  uint32 GetTimestamp() const
+  {
+    return u32Timestamp;
+  }
+
+  void SetVisibility(const bool bV) const
+  {
+    if(!kdtNode) return ;
+    GetVisibilityObjectHistory()->SetVisibility(bV);
+  }
+
+  void SetFrustumMask(uint32 frust_mask)
+  {
+    u32Frustum_Mask=frust_mask;
+  }
+
+  void SetTimestamp(uint32 timestamp)
+  {
+    u32Timestamp=timestamp;
+  }
+
   csKDTree* kdtParent;
   csKDTree* kdtNode;
   uint32 u32Frustum_Mask;
+  uint32 u32Timestamp;
 
   ~NodeTraverseData()
   {
@@ -173,11 +189,10 @@ public:
     VistestObjectsArray;
   VistestObjectsArray vistest_objects;
   bool vistest_objects_inuse;	// If true the vector is in use.
-  csGLExtensionManager* ext;	// <--- pointer to extention manager, used for occlusion culling
-  unsigned int idtag[100];
 
 private:
   iObjectRegistry *object_reg;
+  csRef<iShaderManager> smShaderManager;
   csEventID CanvasResize;
   csRef<iEventHandler> weakEventHandler;
   csKDTree* kdtree;
@@ -204,6 +219,9 @@ private:
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
+  csRef<iGraphics3D> g3d;
+  csRef<iGraphics2D> g2d;
+
   CHCList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
   CHCList<NodeTraverseData> I_Queue; // I queue (invisible queue)
   CHCList<NodeTraverseData> V_Queue; // V queue (nodes that are scheduled for testing in the current frame)
@@ -215,15 +233,25 @@ private:
   RenderTreeType::ContextNode* OQContext;
   // Render tree.
   RenderTreeType* rtRenderTree;
+  // Persistent Data
+  RenderTreeType::PersistentData pdTreePersistent;
 
+  void SetupContext(RenderTreeType::ContextNode& context, iShaderManager* shaderManager);
+
+  bool WasVisible(NodeTraverseData &ntdNode,const int cur_timestamp) const;
   void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
   void PullUpVisibility(NodeTraverseData &ntdNode);
   void TraverseNode(NodeTraverseData &ntdNode,const int cur_timestamp);
+
+  void IssueQueries(iRenderView* rview, csKDTreeChild **objects, int num_obj);
 
 public:
   csFrustumVis ();
   virtual ~csFrustumVis ();
   virtual bool Initialize (iObjectRegistry *object_reg);
+
+  void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
+	FrustTest_Front2BackData* data, uint32 cur_timestamp);
 
   // Test visibility for the given node. Returns 2 if camera is inside node,
   // 1 if visible normally, or 0 if not visible.
@@ -321,6 +349,26 @@ public:
   virtual bool HasNext () const
   {
     return ((position != (size_t)-1) && position <= vector->GetSize ());
+  }
+};
+
+class csFrustVisObjectDescriptor : public scfImplementation1<
+	csFrustVisObjectDescriptor, iKDTreeObjectDescriptor>
+{
+public:
+  csFrustVisObjectDescriptor () : scfImplementationType (this) { }
+  ~csFrustVisObjectDescriptor () { }
+  virtual csPtr<iString> DescribeObject (csKDTreeChild* child)
+  {
+    scfString* str = new scfString ();
+    const csBox3& b = child->GetBBox ();
+    csFrustVisObjectWrapper* obj = (csFrustVisObjectWrapper*)(
+    	child->GetObject ());
+    str->Format ("'%s' (%g,%g,%g)-(%g,%g,%g)",
+    	obj->mesh->QueryObject ()->GetName (),
+	b.MinX (), b.MinY (), b.MinZ (),
+	b.MaxX (), b.MaxY (), b.MaxZ ());
+    return str;
   }
 };
 

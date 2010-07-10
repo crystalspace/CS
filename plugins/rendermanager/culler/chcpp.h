@@ -1,57 +1,76 @@
 #ifndef _CHCPP_H_
 #define _CHCPP_H_
 
+#include "csplugincommon/rendermanager/operations.h"
+#include "csplugincommon/rendermanager/posteffects.h"
+#include "csplugincommon/rendermanager/render.h"
+#include "csplugincommon/rendermanager/renderlayers.h"
+#include "csplugincommon/rendermanager/shadersetup.h"
+#include "csplugincommon/rendermanager/standardsorter.h"
+#include "csplugincommon/rendermanager/svsetup.h"
+
+using namespace CS::RenderManager;
+
+typedef CS::RenderManager::RenderTree<
+CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
+
 // empirically robust constant (might need tweaking)
 #define PREV_INV_BATCH_SIZE 25
 
-template <class T, class MemoryAllocator = CS::Memory::AllocatorMalloc>
-class CHCList
+/*  A small implementation of a list based on the csList class.
+ * the main difference between CHCList and csList is that CHCList
+ * keeps track of how many elements the list has. This is strictly
+ * for convenience is the CHCList is mostly limited in use to this
+ * particular implementation of the CHC++ algorithm
+ */
+template <class T>
+class CHCList : public csList<T>
 {
+  int n;
 public:
   CHCList() : n(0)
   {
+    csList<T>::csList();
   }
-  int n;
-  csList<T> list;
-  typename csList<T>::Iterator PushFront(T elem)
+  typename csList<T>::Iterator PushFront(const T& elem)
   {
     ++n;
-    return list.PushFront(elem);
+    return csList::PushFront(elem);
   }
 
-  typename csList<T>::Iterator PushBack(T elem)
+  typename csList<T>::Iterator PushBack(const T& elem)
   {
     ++n;
-    return list.PushBack(elem);
+    return csList::PushBack(elem);
   }
 
   bool PopFront()
   {
-    if(list.IsEmpty()) return false;
+    if(csList::IsEmpty()) return false;
     --n;
-    return list.PopFront();
+    return csList::PopFront();
   }
 
   bool PopBack()
   {
-    if(list.IsEmpty()) return false;
+    if(csList::IsEmpty()) return false;
     --n;
-    return list.PopBack();
+    return csList::PopBack();
   }
   
   bool IsEmpty()
   {
-    return list.IsEmpty();
+    return csList::IsEmpty();
   }
 
   T & Front()
   {
-    return list.Front();
+    return csList::Front();
   }
 
   T & Back()
   {
-    return list.Back();
+    return csList::Back();
   }
 
   int Size() const
@@ -59,7 +78,6 @@ public:
     return n;
   }
 };
-
 
 /*  Class to hold the visibility information of a kdtree node.
  * The implementation is one that facilitates the use of the  

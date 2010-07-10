@@ -44,8 +44,10 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
+#include "iengine/sector.h"
 #include "imesh/object.h"
 #include "iutil/object.h"
+#include "imap/loader.h"
 #include "ivaria/reporter.h"
 #include "frustvis.h"
 #include "chcpp.h"
@@ -62,26 +64,6 @@ void csFrustVisObjectWrapper::MovableChanged (iMovable* /*movable*/)
   frustvis->AddObjectToUpdateQueue (this);
 }
 
-class csFrustVisObjectDescriptor : public scfImplementation1<
-	csFrustVisObjectDescriptor, iKDTreeObjectDescriptor>
-{
-public:
-  csFrustVisObjectDescriptor () : scfImplementationType (this) { }
-  ~csFrustVisObjectDescriptor () { }
-  virtual csPtr<iString> DescribeObject (csKDTreeChild* child)
-  {
-    scfString* str = new scfString ();
-    const csBox3& b = child->GetBBox ();
-    csFrustVisObjectWrapper* obj = (csFrustVisObjectWrapper*)(
-    	child->GetObject ());
-    str->Format ("'%s' (%g,%g,%g)-(%g,%g,%g)",
-    	obj->mesh->QueryObject ()->GetName (),
-	b.MinX (), b.MinY (), b.MinZ (),
-	b.MaxX (), b.MaxY (), b.MaxZ ());
-    return str;
-  }
-};
-
 //----------------------------------------------------------------------
 
 csFrustumVis::csFrustumVis () : scfImplementationType (this),
@@ -94,6 +76,8 @@ csFrustumVis::csFrustumVis () : scfImplementationType (this),
   current_vistest_nr = 1;
   vistest_objects_inuse = false;
   updating = false;
+  OQContext = 0;
+  rtRenderTree = 0;
 }
 
 csFrustumVis::~csFrustumVis ()
@@ -109,6 +93,13 @@ csFrustumVis::~csFrustumVis ()
     kdtree->RemoveObject (visobj_wrap->child);
   }
   delete kdtree;
+
+  if (rtRenderTree)
+    delete rtRenderTree;
+  g3d->Close();
+  g2d->Close();
+  smShaderManager->Clear();
+  OQContext=0;
 }
 
 bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
@@ -117,12 +108,8 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
-  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  g3d->GetDriver2D()->PerformExtension("getextmanager", &ext);
-  ext->InitGL_ARB_occlusion_query();
-
-  ext->glGenQueriesARB( 50, idtag );
-
+  //csRef<iGraphics3D> 
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -139,6 +126,19 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   csRef<csFrustVisObjectDescriptor> desc;
   desc.AttachNew (new csFrustVisObjectDescriptor ());
   kdtree->SetObjectDescriptor (desc);
+
+  //csRef<iGraphics2D> 
+  g2d = csQueryRegistry<iGraphics2D> (object_reg);
+  csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
+
+  smShaderManager = csQueryRegistry<iShaderManager>(object_reg);
+  pdTreePersistent.Initialize(smShaderManager);
+  rtRenderTree = new RenderTreeType (pdTreePersistent);
+
+  csRef<iLoader> loader = csQueryRegistry<iLoader>(object_reg);
+  loader->LoadShader("/shader/early_z/z_only.xml");
+
+  OQContext=0;
 
   return true;
 }
@@ -323,10 +323,7 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
   const csBox3& obj_bbox = obj->child->GetBBox ();
   if (obj_bbox.Contains (data->pos))
   {
-	 // ext->glBeginQuery(GL_SAMPLES_PASSED_ARB,idtag[1]);
-
     data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
-	//ext->glEndQuery(GL_SAMPLES_PASSED_ARB);
     return true;
   }
   
@@ -344,13 +341,35 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
 
 //======== VisTest =========================================================
 
-static void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
+void csFrustumVis::CallVisibilityCallbacksForSubtree (csKDTree* treenode,
 	FrustTest_Front2BackData* data, uint32 cur_timestamp)
 {
   if(treenode->IsLeaf())
   {
     int num_objects = treenode->GetObjectCount ();
     csKDTreeChild** objects = treenode->GetObjects ();
+
+    if(num_objects)
+    {
+      unsigned int *queries;
+      int numq=1,oldq=0;
+      g3d->OQInitQueries(queries,oldq,numq);
+
+      g3d->OQBeginQuery(queries[0]);
+      IssueQueries(data->rview,objects,num_objects);
+      g3d->OQEndQuery();
+
+      while(!g3d->OQueryFinished(queries[0])) 1;
+      if(g3d->OQueryFinished(queries[0]))
+      {
+        printf("yeah...\n");
+        if(g3d->OQIsVisible(queries[0],0)) printf("it is...\n");
+        else printf("but it isn't\n");
+      }
+      else printf("nope\n");
+      g3d->OQDelQueries(queries,numq);
+      delete [] queries;
+    }
     for (int i = 0 ; i < num_objects ; i++)
     {
       if (objects[i]->timestamp != cur_timestamp)
@@ -389,8 +408,8 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   if (viscallback == 0)
     return false;
 
-  iGraphics3D *g3d=rview->GetGraphics3D();
-  iGraphics2D *g2d=rview->GetGraphics2D();
+  //g3d=rview->GetGraphics3D();
+  //g2d=rview->GetGraphics2D();
 
   if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
@@ -400,6 +419,15 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   }
 
   g3d->FinishDraw();
+
+  /*if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+  {
+    //ReportError("Cannot prepare renderer for 3D drawing.");
+	printf("Cannot prepare renderer for 3D drawing\n");
+        return false;
+  }
+
+  g3d->FinishDraw();*/
 
   // First get the current view frustum from the rview.
   csRenderContext* ctxt = rview->GetRenderContext ();
@@ -412,14 +440,26 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   f2bData.rview = rview;
   f2bData.viscallback = viscallback;
-
-  NodeTraverseData ntdRoot;
-  ntdRoot.u32Frustum_Mask=frustum_mask;
-  ntdRoot.kdtParent=NULL;
-  ntdRoot.kdtNode=kdtree;
-  
-  ntdRoot.kdtNode->SetUserObject(new csVisibilityObjectHistory());
+  NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
   T_Queue.PushBack(ntdRoot);
+
+  
+
+  unsigned int *queries;
+  int numq=1,oldq=0;
+  g3d->OQInitQueries(queries,oldq,numq);
+
+  g3d->OQBeginQuery(queries[0]);
+  IssueQueries(rview,ntdRoot.kdtNode->GetObjects(),ntdRoot.kdtNode->GetEstimatedObjectCount());
+  g3d->OQEndQuery();
+
+  while(!g3d->OQueryFinished(queries[0])) 1;
+  printf("occ finished...");
+  if(g3d->OQIsVisible(queries[0],0)) printf("visible\n");
+  else printf("not visible\n");
+  g3d->OQDelQueries(queries,numq);
+  delete [] queries;
+
 
   /*int num=0;
   csKDTree *node;
@@ -445,8 +485,21 @@ bool csFrustumVis::VisTest (iRenderView* rview,
     ntdAux.kdtNode=node;
   }*/
 
+  /*bool change;
+  if(WasVisible(NodeTraverseData(kdtree,0,frustum_mask,cur_timestamp-1),cur_timestamp))
+  {
+    printf("Yes......\n");
+    change=rand()%2;
 
-  while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
+  }
+  else
+  {
+    printf("No\n");
+    change=rand()%2;
+  }*/
+
+
+  /*while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
   {
     NodeTraverseData ntdAux=T_Queue.Front();
     T_Queue.PopFront();
@@ -458,7 +511,6 @@ bool csFrustumVis::VisTest (iRenderView* rview,
     if (nodevis == NODE_VISIBLE && frustum_mask == 0)
     {
       CallVisibilityCallbacksForSubtree (ntdAux.kdtNode, &f2bData, cur_timestamp);
-      //printf("Done\n");
       continue;
     }
 
@@ -467,7 +519,12 @@ bool csFrustumVis::VisTest (iRenderView* rview,
     ntdAux.kdtNode->Distribute ();
 
     TraverseNode(ntdAux,cur_timestamp);
-  }
+  }*/
+
+  //printf("Done\n\n");
+  
+  //if(change) ntdRoot.SetVisibility(true);
+  //else ntdRoot.SetVisibility(false);
 
   // here we should process the remaining nodes in the multi query
   return true;
@@ -514,8 +571,8 @@ static bool FrustTestPlanes_Front2Back (csKDTree* treenode,
   csKDTreeChild** objects;
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
-  int i;
-  for (i = 0 ; i < num_objects ; i++)
+
+  for (int i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
     {
@@ -623,8 +680,7 @@ static bool FrustTestBox_Front2Back (csKDTree* treenode, void* userdata,
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
-  int i;
-  for (i = 0 ; i < num_objects ; i++)
+  for (int i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
     {
@@ -708,8 +764,7 @@ static bool FrustTestSphere_Front2Back (csKDTree* treenode,
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
-  int i;
-  for (i = 0 ; i < num_objects ; i++)
+  for (int i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
     {
@@ -822,8 +877,7 @@ static bool IntersectSegmentSloppy_Front2Back (csKDTree* treenode,
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
-  int i;
-  for (i = 0 ; i < num_objects ; i++)
+  for (int i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
     {

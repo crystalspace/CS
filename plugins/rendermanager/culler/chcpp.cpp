@@ -50,6 +50,75 @@
 #include "frustvis.h"
 #include "chcpp.h"
 
+void csFrustumVis::SetupContext(RenderTreeType::ContextNode& context, iShaderManager* shaderManager)
+{
+  CS::RenderManager::RenderView* rview = context.renderView;
+
+  SingleMeshContextNumbering<RenderTreeType> numbering;
+  ForEachMeshNode (context, numbering);
+
+  csRef<iStringSet> strSet = csQueryRegistryTagInterface<iStringSet> 
+    (csFrustumVis::object_reg, "crystalspace.shared.stringset");
+
+  csStringID shaderType = strSet->Request("depthwrite");
+  SingleRenderLayer renderLayer(shaderType, shaderManager->GetShader("z_only"), 0, 0);
+  renderLayer.SetAmbient(true);
+  SetupStandardSVs (context, renderLayer, shaderManager, rview->GetThisSector ());
+
+  SetupStandardShader (context, shaderManager, renderLayer);
+  SetupStandardTicket (context, shaderManager, renderLayer);
+}
+
+void csFrustumVis::IssueQueries(iRenderView* rview, csKDTreeChild **objects, int num_obj)
+{
+  int numMeshes;
+  if (!OQContext)
+  {
+    RenderView* renderView = (RenderView*)rview;
+    OQContext = rtRenderTree->CreateContext(renderView);
+  }
+
+  for(int i=0 ; i<num_obj ; i++)
+  {
+    numMeshes=0;
+    csRef<iMeshWrapper> mw=static_cast<csFrustVisObjectWrapper*>(objects[i]->GetObject())->mesh;
+    uint32 frust_mask=rview->GetRenderContext ()->clip_planes_mask;
+
+    csSectorVisibleRenderMeshes* meshList = rview->GetThisSector()->GetVisibleRenderMeshes (
+    numMeshes, mw, rview, frust_mask);
+
+    for (int m = 0; m < numMeshes; m++)
+    {
+      RenderTreeType::MeshNode::SingleMesh sm;
+      sm.meshWrapper = meshList[m].imesh;
+      sm.meshObjSVs = meshList[m].imesh->GetSVContext();
+      sm.zmode = meshList[m].imesh->GetZBufMode ();
+      sm.meshFlags = meshList[m].imesh->GetFlags();
+
+      CS::Graphics::RenderPriority rp;
+      rp=meshList[m].imesh->GetRenderPriority ();
+
+      for (int j = 0; j < meshList[m].num; ++j)
+      {
+        csRenderMesh* rm = meshList[m].rmeshes[j];
+	OQContext->AddRenderMesh (rm, rp, sm);
+      }
+    }
+  }
+
+  SetupContext (*OQContext, smShaderManager);
+
+  // Render the stuff
+  g3d->SetZMode (CS_ZBUF_MESH);
+  {
+    SimpleTreeRenderer<RenderTreeType> render (g3d, smShaderManager);
+    ForEachContextReverse (*rtRenderTree, render);
+  }
+
+  rtRenderTree->DestroyContext(OQContext);
+  OQContext = 0;
+}
+
 void csFrustumVis::QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode)
 {
   I_Queue.PushBack(ntdNode);
@@ -73,6 +142,7 @@ void csFrustumVis::PullUpVisibility(NodeTraverseData &ntdNode)
 
 void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode,const int cur_timestamp)
 {
+  ntdNode.SetTimestamp(cur_timestamp);
   if (ntdNode.IsLeaf()) // if node is leaf we render it
   {
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
@@ -88,11 +158,17 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode,const int cur_timestam
       }
     }
   }
-  else // else we push it's children on to the traverse queue
+  else // else we queue its children on to the traverse queue
   {
+    ntdNode.SetVisibility(false);
     csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
-    T_Queue.PushBack(NodeTraverseData(ntdNode.kdtNode,child1,ntdNode.GetFrustumMask()));
+    T_Queue.PushBack(NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
-    T_Queue.PushBack(NodeTraverseData(ntdNode.kdtNode,child2,ntdNode.GetFrustumMask()));
+    T_Queue.PushBack(NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
   }
+}
+
+bool csFrustumVis::WasVisible(NodeTraverseData &ntdNode,const int cur_timestamp) const
+{
+  return (ntdNode.GetVisibility() && ntdNode.GetTimestamp()!=cur_timestamp);
 }
