@@ -772,46 +772,55 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     if (!numberOfStrains)
       return;
 
-    int controlPoints = furMaterial->hairStrands.Get(0).controlPointsCount;
+    int controlPointsCount = furMaterial->hairStrands.Get(0).controlPointsCount;
 
     csVector3 *vbuf = furMaterial->factoryState->GetVertices (); 
     iRenderBuffer *tangents = furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT);
     csRenderBufferLock<csVector3> tan (tangents, CS_BUF_LOCK_NORMAL);
 
-    for ( int x = 0 ; x < numberOfStrains ; x ++ )
+    csVector3 tangent, binormal, cameraOrigin;
+    csVector3 strip, firstPoint, secondPoint;
+
+    cameraOrigin = tc.GetOrigin();
+    csVector3 *tangentBuffer = tan;
+
+    for ( int x = 0 ; x < numberOfStrains ; x ++, 
+      vbuf += 2 * controlPointsCount, tangentBuffer += 2 * controlPointsCount)
     {
       int y = 0;
-      csVector3 tangent = csVector3(0);
-      csVector3 strip = csVector3(0);
+      tangent = csVector3(0);
+      strip = csVector3(0);
 
-      for ( y = 0 ; y < controlPoints - 1; y ++ )
+      csVector3 *controlPoints = furMaterial->hairStrands.Get(x).controlPoints;
+
+      for ( y = 0 ; y < controlPointsCount - 1; 
+        y ++, controlPoints ++, vbuf += 2, tangentBuffer += 2 )
       {
-        csVector3 firstPoint = furMaterial->hairStrands.Get(x).controlPoints[y];
-        csVector3 secondPoint = furMaterial->hairStrands.Get(x).controlPoints[y + 1];
+        firstPoint = *controlPoints;
+        secondPoint = *(controlPoints + 1);
         
-        csVector3 binormal;
-        csMath3::CalcNormal(binormal, firstPoint, secondPoint, tc.GetOrigin());
+        csMath3::CalcNormal(binormal, firstPoint, secondPoint, cameraOrigin);
         binormal.Normalize();
         strip = furMaterial->strandWidth * binormal;
 
-        vbuf[ x * 2 * controlPoints + 2 * y].Set( firstPoint );
-        vbuf[ x * 2 * controlPoints + 2 * y + 1].Set( firstPoint + strip );
+        (*vbuf) = firstPoint;
+        (*(vbuf + 1)) = firstPoint + strip;
 
-        csVector3 normal;
-        csMath3::CalcNormal(normal, firstPoint, firstPoint + strip, secondPoint);
-        tangent.Cross(-binormal, normal);
+//         csMath3::CalcNormal(normal, firstPoint, firstPoint + strip, secondPoint);
+        tangent = secondPoint - firstPoint;
 
-        tan.Get(x * 2 * controlPoints + 2 * y).Set( tangent );
-        tan.Get(x * 2 * controlPoints + 2 * y + 1).Set( tangent );
+        (*tangentBuffer) = tangent;
+        (*(tangentBuffer + 1)) = tangent;
       }
 
-      vbuf[ x * 2 * controlPoints + 2 * y].Set
-        ( furMaterial->hairStrands.Get(x).controlPoints[y] );
-      vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
-        ( furMaterial->hairStrands.Get(x).controlPoints[y] + strip );
+      (*vbuf) = *controlPoints;
+      (*(vbuf + 1)) = *controlPoints + strip;
 
-      tan.Get(x * 2 * controlPoints + 2 * y).Set( tangent );
-      tan.Get(x * 2 * controlPoints + 2 * y + 1).Set( tangent );
+      (*tangentBuffer) = tangent;
+      (*(tangentBuffer + 1)) = tangent;
+
+      vbuf -= 2 * y;
+      tangentBuffer -= 2 * y;
     }
 
 //     furMaterial->factoryState->CalculateNormals();
