@@ -2545,6 +2545,8 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
   else
     statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
+  glColor3f(1.0f,1.0f,1.0f);
+
   GLenum compType = compGLtypes[iIndexbuf->GetComponentType()];
   void* bufData =
     RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS);
@@ -3936,7 +3938,7 @@ bool csGLGraphics3D::PerformExtension (char const* command, ...)
   return rc;
 }
 
-void csGLGraphics3D::InitQueries(unsigned int*& queries, int& old_num_queries, int& num_queries)
+void csGLGraphics3D::OQInitQueries(unsigned int*& queries, int& old_num_queries, int& num_queries)
 {
   if (num_queries != 0)
   {
@@ -3951,26 +3953,34 @@ void csGLGraphics3D::InitQueries(unsigned int*& queries, int& old_num_queries, i
   ext->glGenQueriesARB((GLsizei)num_queries, (GLuint*)queries);
 }
 
-bool csGLGraphics3D::QueryFinished(unsigned int& occlusion_query)
+void csGLGraphics3D::OQDelQueries(unsigned int*& queries, int& num_queries)
+{
+  if(num_queries != 0 && queries != 0)
+  {
+    ext->glDeleteQueriesARB(num_queries, (GLuint*)queries);
+  }
+}
+
+bool csGLGraphics3D::OQueryFinished(unsigned int& occlusion_query)
 {
   GLint available;
   ext->glGetQueryObjectivARB((GLuint)occlusion_query, GL_QUERY_RESULT_AVAILABLE_ARB, &available);
   return (available != 0);
 }
 
-bool csGLGraphics3D::IsVisible(unsigned int& occlusion_query, unsigned int& sampleLimit)
+bool csGLGraphics3D::OQIsVisible(unsigned int& occlusion_query, unsigned int sampleLimit)
 {
   GLuint sampleCount;
   ext->glGetQueryObjectuivARB((GLuint)occlusion_query, GL_QUERY_RESULT_ARB, &sampleCount);
   return (sampleCount > (GLuint)sampleLimit);
 }
 
-void csGLGraphics3D::BeginOcclusionQuery (unsigned int& occlusion_query)
+void csGLGraphics3D::OQBeginQuery (unsigned int& occlusion_query)
 {
   ext->glBeginQueryARB(GL_SAMPLES_PASSED_ARB, (GLuint)occlusion_query);
 }
 
-void csGLGraphics3D::EndOcclusionQuery ()
+void csGLGraphics3D::OQEndQuery ()
 {
   ext->glEndQueryARB(GL_SAMPLES_PASSED_ARB);
 }
