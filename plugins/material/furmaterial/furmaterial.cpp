@@ -117,6 +117,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     SynchronizeGuideHairs();
     GenerateHairStrands();
 
+    SetLOD(0.0f);
+
     SaveUVImage();
 
     this->view = view;
@@ -230,7 +232,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         displaceEps * norms.Get(uniqueIndices.Get(i));
 
       csGuideHair guideHair;
-      guideHair.isActive = true;
       guideHair.uv = UV.Get(uniqueIndices.Get(i));;
       guideHair.controlPointsCount = 5;
       guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
@@ -240,8 +241,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       guideHairs.Push(guideHair);
     }
-  
-    //SetLOD(1.0f);
   }
 
   void FurMaterial::GenerateGuideHairsLOD()
@@ -300,9 +299,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       c = csVector3::Norm(B.controlPoints[0] - A.controlPoints[0]);
 
       // just for debug
-      a = csVector2::Norm(B.uv - C.uv);
-      b = csVector2::Norm(A.uv - C.uv);
-      c = csVector2::Norm(B.uv - A.uv);
+//       a = csVector2::Norm(B.uv - C.uv);
+//       b = csVector2::Norm(A.uv - C.uv);
+//       c = csVector2::Norm(B.uv - A.uv);
 
       float s = (a + b + c) / 2.0f;
       float area = sqrt(s * (s - a) * (s - b) * (s - c));
@@ -348,7 +347,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
           else
             guideHairLOD.controlPoints[i] += guideHairLOD.guideHairs[j].distance *
               guideHairsLOD.Get(guideHairLOD.guideHairs[j].index - 
-                guideHairs.GetSize()).controlPoints[i];
+              guideHairs.GetSize()).controlPoints[i];
       }
 
       // add new triangles
@@ -372,9 +371,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       return;
 
     for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
-      if (guideHairs.Get(i).isActive)
-        physicsControl->InitializeStrand(i,guideHairs.Get(i).controlPoints, 
-          guideHairs.Get(i).controlPointsCount);
+      physicsControl->InitializeStrand(i,guideHairs.Get(i).controlPoints, 
+        guideHairs.Get(i).controlPointsCount);
   }
 
   void FurMaterial::GenerateHairStrands ()
@@ -406,11 +404,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         size_t indexB = guideHairsTriangles.Get(iter).b;
         size_t indexC = guideHairsTriangles.Get(iter).c;
 
+        csGuideHair A, B, C;
+
+        if ( indexA < guideHairs.GetSize())
+          A = guideHairs.Get(indexA);
+        else
+          A = guideHairsLOD.Get(indexA - guideHairs.GetSize());
+
+        if ( indexB < guideHairs.GetSize())
+          B = guideHairs.Get(indexB);
+        else
+          B = guideHairsLOD.Get(indexB - guideHairs.GetSize());
+
+        if ( indexC < guideHairs.GetSize())
+          C = guideHairs.Get(indexC);
+        else
+          C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
+
         //csPrintf("%d\t%d\t%d\n", indexA, indexB, indexC);
-        // temp fix
-        if (indexA >= guideHairs.GetSize() || indexB >= guideHairs.GetSize() ||
-          indexC >= guideHairs.GetSize())
-          continue;
 
         hairStrand.guideHairs[0].distance = bA;
         hairStrand.guideHairs[0].index = indexA;
@@ -419,10 +430,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         hairStrand.guideHairs[2].distance = bC;
         hairStrand.guideHairs[2].index = indexC;
 
-        hairStrand.controlPointsCount = csMin(
-          (csMin(guideHairs.Get(indexA).controlPointsCount,
-          guideHairs.Get(indexB).controlPointsCount)),
-          (guideHairs.Get(indexC).controlPointsCount));
+        hairStrand.controlPointsCount = csMin( (csMin( A.controlPointsCount,
+          B.controlPointsCount) ), C.controlPointsCount);
 
         hairStrand.controlPoints = new csVector3[ hairStrand.controlPointsCount ];
 
@@ -430,8 +439,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         {
           hairStrand.controlPoints[i] = csVector3(0);
           for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-            hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
-            guideHairs.Get(hairStrand.guideHairs[j].index).controlPoints[i];
+            if ( hairStrand.guideHairs[j].index < guideHairs.GetSize() )
+              hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
+                guideHairs.Get(hairStrand.guideHairs[j].index).controlPoints[i];
+            else
+              hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
+                guideHairsLOD.Get(hairStrand.guideHairs[j].index - 
+                guideHairs.GetSize()).controlPoints[i];
         }
 
         hairStrands.Push(hairStrand);		
@@ -442,17 +456,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::SetLOD(float LOD)
   {
-    // first is always active
-    for (size_t i = 1 ; i < guideHairs.GetSize(); i ++)
-    {
-      if ( rng->Get() > LOD )
-        guideHairs.Get(i).isActive = false;
-    }
+    // deactivate all
+    if (!physicsControl) // no physics support
+      return;
+
+    // LOD ropes use ropes as well
+    for (size_t i = 1 ; i < guideHairsLOD.GetSize(); i ++)
+      if ( rng->Get() < LOD )
+      {
+        guideHairsLOD.Get(i).isActive = true;
+        physicsControl->InitializeStrand(i + guideHairs.GetSize(), 
+          guideHairsLOD.Get(i).controlPoints, guideHairsLOD.Get(i).controlPointsCount);
+      }
 
     // print the number of control hairs
     int count = 0;
-    for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
-      if (guideHairs.Get(i).isActive)
+    for (size_t i = 0 ; i < guideHairsLOD.GetSize(); i ++)
+      if (guideHairsLOD.Get(i).isActive)
         count++;
     csPrintf("%d\n",count);
   }
@@ -487,6 +507,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
         (int)(uv.y * densitymapH) * densitymapW ) ] = 255;
     }
+
+    csPrintf("%d\n", guideHairsLOD.GetSize() + guideHairs.GetSize());
 
     SaveImage(densitymapData, "/data/krystal/krystal_debug.png",
       densitymapW, densitymapH);
@@ -689,15 +711,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     return true;
   }
 
-  void FurAnimationControl::UpdateHairStrand (csHairStrand* hairStrand)
+  void FurAnimationControl::UpdateGuideHairs()
   {
-    for ( size_t i = 0 ; i < hairStrand->controlPointsCount; i++ )
+    // update guide ropes
+    for (size_t i = 0 ; i < furMaterial->guideHairs.GetSize(); i ++)
+      furMaterial->physicsControl->AnimateStrand(i,
+        furMaterial->guideHairs.Get(i).controlPoints,
+        furMaterial->guideHairs.Get(i).controlPointsCount);
+
+    // update guide ropes LOD
+    for (size_t i = 0 ; i < furMaterial->guideHairsLOD.GetSize(); i ++)
+      if ( furMaterial->guideHairsLOD.Get(i).isActive )
+        furMaterial->physicsControl->AnimateStrand(i + furMaterial->guideHairs.GetSize(),
+          furMaterial->guideHairsLOD.Get(i).controlPoints,
+          furMaterial->guideHairsLOD.Get(i).controlPointsCount);        
+      else
+        UpdateControlPoints(furMaterial->guideHairsLOD.Get(i).controlPoints,
+          furMaterial->guideHairsLOD.Get(i).controlPointsCount,
+          furMaterial->guideHairsLOD.Get(i).guideHairs);      
+  }
+
+  void FurAnimationControl::UpdateControlPoints(csVector3 *controlPoints,
+    size_t controlPointsCount, csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT])
+  {
+    for ( size_t i = 0 ; i < controlPointsCount; i++ )
     {
-      hairStrand->controlPoints[i] = csVector3(0);
+      controlPoints[i] = csVector3(0);
       for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-        hairStrand->controlPoints[i] += hairStrand->guideHairs[j].distance * (
-        furMaterial->guideHairs.Get(hairStrand->guideHairs[j].index).controlPoints[i] + 
-        (int)pow(-1.0,(int)i) * csVector3(0.0f,0.0f,0.0f));
+        if ( guideHairs[j].index < furMaterial->guideHairs.GetSize() )
+          controlPoints[i] += guideHairs[j].distance * 
+            (furMaterial->guideHairs.Get(guideHairs[j].index).controlPoints[i]);
+        else
+          controlPoints[i] += guideHairs[j].distance * 
+            (furMaterial->guideHairsLOD.Get(guideHairs[j].index - 
+            furMaterial->guideHairs.GetSize()).controlPoints[i]);
     }
   }
 
@@ -709,20 +756,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     // first update the control points
     if (furMaterial->physicsControl)
-      for (size_t i = 0 ; i < furMaterial->guideHairs.GetSize(); i ++)
-        if (furMaterial->guideHairs.Get(i).isActive)
-          furMaterial->physicsControl->AnimateStrand(i,
-            furMaterial->guideHairs.Get(i).controlPoints,
-            furMaterial->guideHairs.Get(i).controlPointsCount);
-        else
-          for (size_t j = 0 ; j < furMaterial->guideHairs.Get(i).controlPointsCount ; j ++ )
-            furMaterial->guideHairs.Get(i).controlPoints[j] = 
-              furMaterial->guideHairs.Get(i - 1).controlPoints[j];
+      UpdateGuideHairs();
 
     // then update the hair strands
     if (furMaterial->physicsControl)
       for (size_t i = 0 ; i < furMaterial->hairStrands.GetSize(); i ++)
-        UpdateHairStrand(&furMaterial->hairStrands.Get(i));
+        UpdateControlPoints(furMaterial->hairStrands.Get(i).controlPoints,
+          furMaterial->hairStrands.Get(i).controlPointsCount,
+          furMaterial->hairStrands.Get(i).guideHairs);
 
     const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
 

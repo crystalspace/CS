@@ -77,12 +77,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csVector3 *controlPoints;
     size_t controlPointsCount;
     csVector2 uv;
-    bool isActive;  //  obsolete
   };
 
   struct csGuideHairLOD : csGuideHair
   {
     csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT];
+    bool isActive;  //  ropes vs interpolate
   };
 
   class FurMaterial : public scfImplementation2<FurMaterial,
@@ -207,7 +207,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     FurMaterial* furMaterial;
 
     // functions
-    virtual void UpdateHairStrand(csHairStrand* hairStrand);
+    void UpdateGuideHairs();
+    void UpdateControlPoints(csVector3 *controlPoints, size_t controlPointsCount, 
+      csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT]);
   };
 
 }

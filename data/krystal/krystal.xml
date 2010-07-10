@@ -41,10 +41,10 @@
 	  <shader type='standard'>diffuse_cg</shader>	
       <shadervar type="texture" name="tex diffuse">krystal_skull_densitymap</shadervar>	  
 -->	  	
-	  <shadervar type="float" name="width">0.005</shadervar>
+	  <shadervar type="float" name="width">0.0015</shadervar>
 	  <shadervar type="float" name="density">5</shadervar>
 	  <shadervar type="float" name="displaceEps">0.02</shadervar>
-	  <shadervar type="float" name="densityFactor">0.2</shadervar>
+	  <shadervar type="float" name="densityFactor">0.04</shadervar>
       <shadervar type="texture" name="density map">krystal_skull_densitymap</shadervar>
       <shadervar type="texture" name="height map">krystal_skull</shadervar>
     </material>
