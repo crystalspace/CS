@@ -106,6 +106,9 @@ private:
   CEGUI::Scrollbar* sliderGlintScale;
   CEGUI::Scrollbar* sliderCausticWidth;
   CEGUI::Scrollbar* sliderCausticMerge;
+  CEGUI::Scrollbar* sliderR;
+  CEGUI::Scrollbar* sliderG;
+  CEGUI::Scrollbar* sliderB;
 
   //-- csBaseEventHandler
   void Frame ();
@@ -127,6 +130,9 @@ public:
   bool OnEventThumbTrackEndedGlintScale (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedCausticWidth (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedCausticMerge (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedR (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedG (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedB (const CEGUI::EventArgs& e);
 
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);

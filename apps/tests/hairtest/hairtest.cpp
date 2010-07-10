@@ -227,6 +227,52 @@ bool HairTest::OnEventThumbTrackEndedCausticMerge (const CEGUI::EventArgs&)
   return true;
 }
 
+// RGB hair color
+bool HairTest::OnEventThumbTrackEndedR (const CEGUI::EventArgs&)
+{
+  CS::ShaderVarName objColor (svStrings, "hair color");	
+  
+  csVector3 color; 
+  avatarScene->furMaterial->GetFurStrandGenerator()->GetMaterial()
+    ->GetVariableAdd(objColor)->GetValue(color);
+  
+  avatarScene->furMaterial->GetFurStrandGenerator()->GetMaterial()
+    ->GetVariableAdd(objColor)->SetValue(csVector3( 
+    sliderR->getScrollPosition(), color.y, color.z ) );
+
+  return true;
+}
+
+bool HairTest::OnEventThumbTrackEndedG (const CEGUI::EventArgs&)
+{
+  CS::ShaderVarName objColor (svStrings, "hair color");	
+
+  csVector3 color; 
+  avatarScene->furMaterial->GetFurStrandGenerator()->GetMaterial()
+    ->GetVariableAdd(objColor)->GetValue(color);
+
+  avatarScene->furMaterial->GetFurStrandGenerator()->GetMaterial()
+    ->GetVariableAdd(objColor)->SetValue(csVector3( 
+    color.x, sliderG->getScrollPosition(), color.z ) );
+
+  return true;
+}
+
+bool HairTest::OnEventThumbTrackEndedB (const CEGUI::EventArgs&)
+{
+  CS::ShaderVarName objColor (svStrings, "hair color");	
+
+  csVector3 color; 
+  avatarScene->furMaterial->GetFurStrandGenerator()->GetMaterial()
+    ->GetVariableAdd(objColor)->GetValue(color);
+
+  avatarScene->furMaterial->GetFurStrandGenerator()->GetMaterial()
+    ->GetVariableAdd(objColor)->SetValue(csVector3( 
+    color.x, color.y , sliderB->getScrollPosition()) );
+
+  return true;
+}
+
 void HairTest::SwitchDynamics()
 {
   csRef<iMeshObject> animeshObject = 
@@ -463,6 +509,25 @@ bool HairTest::Application ()
   sliderCausticMerge->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
     CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedCausticMerge, this));  
 
+  // RGB hair color
+  sliderR = (CEGUI::Scrollbar*)winMgr->
+    getWindow("HairTest/MainWindow/Tab/Page1/Slider1");
+
+  sliderR->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+    CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedR, this));  
+
+  sliderG = (CEGUI::Scrollbar*)winMgr->
+    getWindow("HairTest/MainWindow/Tab/Page1/Slider2");
+
+  sliderG->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+    CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedG, this));  
+
+  sliderB = (CEGUI::Scrollbar*)winMgr->
+    getWindow("HairTest/MainWindow/Tab/Page1/Slider3");
+
+  sliderB->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+    CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedB, this));  
+
   // Default behavior from csDemoApplication for the creation of the scene
   if (!csDemoApplication::CreateRoom ())
     return false;
@@ -514,6 +579,16 @@ bool HairTest::Application ()
 
   if (!avatarScene->CreateAvatar ())
     return false;
+
+  // Set default color sliders
+  CS::ShaderVarName objColor (svStrings, "hair color");	
+
+  csVector3 color; 
+  avatarScene->furMaterial->GetFurStrandGenerator()->GetMaterial()
+    ->GetVariableAdd(objColor)->GetValue(color);
+  sliderR->setScrollPosition(color.x);
+  sliderG->setScrollPosition(color.y);
+  sliderB->setScrollPosition(color.z);
 
   // Initialize camera position
   view->GetCamera ()->GetTransform ().SetOrigin (avatarScene->GetCameraStart ());

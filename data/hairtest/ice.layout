@@ -31,6 +31,39 @@
                             <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.1,0},{0.1,0},{0.3,0}}" />
                         </Window>
 
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page1/StaticText1" >
+							<Property Name="Text" Value="R:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.245,0},{0.05,0},{0.275,0},{0.2,0}}" />
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page1/Slider1" >
+                            <Property Name="UnifiedAreaRect" Value="{{0.275,0},{0.05,0},{0.725,0},{0.2,0}}" />
+                        </Window>						
+						
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page1/StaticText2" >
+							<Property Name="Text" Value="G:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.245,0},{0.3,0},{0.275,0},{0.45,0}}" />
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page1/Slider2" >
+                            <Property Name="UnifiedAreaRect" Value="{{0.275,0},{0.3,0},{0.725,0},{0.45,0}}" />
+                        </Window>	
+
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page1/StaticText3" >
+							<Property Name="Text" Value="B:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.245,0},{0.55,0},{0.275,0},{0.7,0}}" />
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page1/Slider3" >
+                            <Property Name="UnifiedAreaRect" Value="{{0.275,0},{0.55,0},{0.725,0},{0.7,0}}" />
+                        </Window>							
+						
                     </Window>
                 </Window>
 
