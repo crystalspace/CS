@@ -62,13 +62,13 @@ float4 main (vertex2fragment IN,
     diffuseColor.rgb = diffuse * objColor.rgb * DiffuseCol;
     diffuseColor.a = objColor.a;
 	
-	float3 lighting = (( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd));
+	float3 lighting = ( M.r * N.r + M.g * N.g + M.b * N.b ) /  max(0.2, cos_qd * cos_qd);
 	lighting += diffuseColor.rgb;
 	
 	OUT.xyz = lighting + diffuseColor.rgb * 0.2 + IN.AmbientColor;
 	
 	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd) + objColor.xyz;
-	//OUT.xyz = M.r / MR_ct;
+	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / max(0.2, cos_qd * cos_qd);
 	//OUT.xyz = N.a;
 	return OUT;
 }
