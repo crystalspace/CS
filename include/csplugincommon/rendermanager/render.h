@@ -187,17 +187,17 @@ namespace RenderManager
           if (!shader->SetupPass (ticket, mesh.renderMesh, modes, svStack)) continue;
           modes.z_buf_mode = mesh.zmode;
 
-	  if (occlusionQueries)
+	  /*if (occlusionQueries)
           {
             g3d->BeginOcclusionQuery(*mesh.occlusionQuery);
-          }
+          }*/
 
           g3d->DrawMesh (mesh.renderMesh, modes, svStack);
 
-	  if (occlusionQueries)
+	  /*if (occlusionQueries)
           {
             g3d->EndOcclusionQuery();
-          }
+          }*/
 
           shader->TeardownPass (ticket);
         }
@@ -268,7 +268,7 @@ namespace RenderManager
           lastTarget[a] = context->renderTargets[a].texHandle;
           lastSubtexture[a] = context->renderTargets[a].subtexture;
         }
-		lastRenderView = context->renderView;
+	lastRenderView = context->renderView;
       }
 
       // Push the context

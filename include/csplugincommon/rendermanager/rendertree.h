@@ -318,8 +318,8 @@ namespace RenderManager
         /// Mesh flags
         csFlags meshFlags;
 
-		// Occlusion Querry ID
-		unsigned int* occlusionQuery;
+	// Occlusion Querry ID
+	//unsigned int* occlusionQuery;
 
         /// "Local ID" in the context; used for array indexing
         size_t contextLocalId;
