@@ -123,12 +123,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     SaveUVImage();
 
     this->view = view;
-    int numberOfStrains = hairStrands.GetSize();
+    size_t numberOfStrains = hairStrands.GetSize();
 
     if( !numberOfStrains ) 
       return;
 
-    int controlPoints = hairStrands.Get(0).controlPointsCount;
+    size_t controlPointsCount = 0;
+    
+    for ( size_t i = 0 ; i < numberOfStrains ; i ++ )
+      controlPointsCount += hairStrands.Get(i).controlPointsCount;
 
     csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
     if (!engine) csApplicationFramework::ReportError("Failed to locate iEngine plugin!");
@@ -140,38 +143,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     factoryState = scfQueryInterface<iGeneralFactoryState> (
       factory->GetMeshObjectFactory ());
 
-    factoryState -> SetVertexCount ( numberOfStrains * 2 * controlPoints );
-    factoryState -> SetTriangleCount ( numberOfStrains * 2 * (controlPoints - 1));
+    factoryState -> SetVertexCount ( 2 * controlPointsCount );
+    factoryState -> SetTriangleCount ( 2 * ( controlPointsCount - numberOfStrains ) );
 
     csVector3 *vbuf = factoryState->GetVertices (); 
     csTriangle *ibuf = factoryState->GetTriangles ();
 
-    for ( int x = 0 ; x < numberOfStrains ; x ++ )
+    for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
+      controlPointSum += hairStrands.Get(x).controlPointsCount, x++ )
     {
-      for ( int y = 0 ; y < controlPoints ; y ++ )
+      for ( size_t y = 0 ; y < hairStrands.Get(x).controlPointsCount ; y ++ )
       {
-        vbuf[ x * 2 * controlPoints + 2 * y].Set
+        vbuf[ 2 * controlPointSum + 2 * y].Set
           ( hairStrands.Get(x).controlPoints[y] );
-        vbuf[ x * 2 * controlPoints + 2 * y + 1].Set
+        vbuf[ 2 * controlPointSum + 2 * y + 1].Set
           ( hairStrands.Get(x).controlPoints[y] + csVector3(-0.01f,0,0) );
       }
 
-      for ( int y = 0 ; y < 2 * (controlPoints - 1) ; y ++ )
+      for ( size_t y = 0 ; y < 2 * (hairStrands.Get(x).controlPointsCount - 1) ; y ++ )
       {
         if (y % 2 == 0)
         {
-          ibuf[ x * 2 * (controlPoints - 1) + y ].Set
-            ( 2 * x * controlPoints + y , 
-            2 * x * controlPoints + y + 1 , 
-            2 * x * controlPoints + y + 2 );
+          ibuf[ 2 * (controlPointSum - x) + y ].Set
+            ( 2 * controlPointSum + y , 
+            2 * controlPointSum + y + 1 , 
+            2 * controlPointSum + y + 2 );
           //printf("%d %d %d\n", 2 * x + y , 2 * x + y + 3 , 2 * x + y + 1);
         }
         else
         {
-          ibuf[ x * 2 * (controlPoints - 1) + y ].Set
-            ( 2 * x * controlPoints + y , 
-            2 * x * controlPoints + y + 2 , 
-            2 * x * controlPoints + y + 1 );
+          ibuf[ 2 * (controlPointSum - x) + y ].Set
+            ( 2 * controlPointSum + y , 
+            2 * controlPointSum + y + 2 , 
+            2 * controlPointSum + y + 1 );
           //printf("%d %d %d\n", 2 * x + y + 1 , 2 * x + y + 2 , 2 * x + y - 1);
         }
       }
@@ -209,6 +213,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);    
     csArray<int> uniqueIndices;
 
+    // density map
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+
+    csRef<iDataBuffer> heightmapDB = heightmap->Readback(readbackFmt);
+    int heightmapW, heightmapH;
+    heightmap->GetOriginalDimensions(heightmapW, heightmapH);
+    uint8* heightmapData = heightmapDB->GetUint8();
+
     // choose unique indices
     while (tris.HasNext())
     {
@@ -226,19 +239,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       guideHairsTriangles.Push(triangleNew);
     }
 
-    // generate the guide hairs - this should be done based on heightmap
+    // generate the guide hairs
     for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
     {
       csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
-        displaceEps * norms.Get(uniqueIndices.Get(i));
+        displaceDistance * norms.Get(uniqueIndices.Get(i));
 
       csGuideHair guideHair;
-      guideHair.uv = UV.Get(uniqueIndices.Get(i));;
-      guideHair.controlPointsCount = 5;
+      guideHair.uv = UV.Get(uniqueIndices.Get(i));
+
+      // based on heightmap
+      // point heightmap - modify to use convolution matrix or such
+      float height = heightmapData[ 4 * ((int)(guideHair.uv.x * heightmapW) + 
+        (int)(guideHair.uv.y * heightmapH) * heightmapW )] / 255.0f;
+
+//       csPrintf("%f\t%f\t%f\t", height, heightFactor, controlPointsDistance );
+//       csPrintf("%d\n", (int)( (height * heightFactor) / controlPointsDistance) );
+
+      guideHair.controlPointsCount = (int)( (height * heightFactor) / controlPointsDistance);
       guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 
       for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
-        guideHair.controlPoints[j] = pos + j * 0.05f * norms.Get(uniqueIndices.Get(i));
+        guideHair.controlPoints[j] = pos + j * controlPointsDistance * 
+          norms.Get(uniqueIndices.Get(i));
 
       guideHairs.Push(guideHair);
     }
@@ -459,6 +482,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         hairStrand.controlPointsCount = csMin( (csMin( A.controlPointsCount,
           B.controlPointsCount) ), C.controlPointsCount);
 
+//         csPrintf("%d\n", hairStrand.controlPointsCount);
+
         hairStrand.controlPoints = new csVector3[ hairStrand.controlPointsCount ];
 
         for ( size_t i = 0 ; i < hairStrand.controlPointsCount ; i ++ )
@@ -524,6 +549,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     densitymap->GetOriginalDimensions(densitymapW, densitymapH);
     uint8* densitymapData = densitymapDB->GetUint8();
 
+    // height map
+    csRef<iDataBuffer> heightmapDB = heightmap->Readback(readbackFmt);
+    int heightmapW, heightmapH;
+    heightmap->GetOriginalDimensions(heightmapW, heightmapH);
+    uint8* heightmapData = heightmapDB->GetUint8();
+
     //csPrintf("%s\n", densitymap->GetImageName());
 
     // from normal guide ropes
@@ -533,6 +564,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
         (int)(uv.y * densitymapH) * densitymapW ) + 1 ] = 255;
+
+      heightmapData[ 4 * ((int)(uv.x * heightmapW) + 
+        (int)(uv.y * heightmapH) * heightmapW ) + 1 ] = 255;
     }
 
     // from LOD guide ropes
@@ -564,8 +598,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     csPrintf("Total guide ropes: %d\n", guideHairsLOD.GetSize() + guideHairs.GetSize());
 
-    SaveImage(densitymapData, "/data/krystal/krystal_debug.png",
+    SaveImage(densitymapData, "/data/krystal/krystal_skull_densitymap_debug.png",
       densitymapW, densitymapH);
+
+    SaveImage(heightmapData, "/data/krystal/krystal_skull_heightmap_debug.png",
+      heightmapW, heightmapH);
   }
 
   void FurMaterial::SaveImage(uint8* buf, const char* texname, 
@@ -643,7 +680,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     SetDensitymap();
     SetHeightmap();
     SetStrandWidth();
-    SetDisplaceEps();
+    SetDisplaceDistance();
   }
 
   void FurMaterial::SetColor(csColor color)
@@ -683,19 +720,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<csShaderVariable> shaderVariable = material->GetVariable(heightmapName);
 
     shaderVariable->GetValue(heightmap);
-    //printf("%s\n", heightmap->GetImageName());
+
+    CS::ShaderVarName heightFactorName (svStrings, "heightFactor");	
+    material->GetVariable(heightFactorName)->GetValue(heightFactor);
   }
 
-  void FurMaterial::SetDisplaceEps()
+  void FurMaterial::SetDisplaceDistance()
   {
-    displaceEps = 0.02f;
+    displaceDistance = 0.02f;
 
-    CS::ShaderVarName displaceEpsName (svStrings, "displaceEps");	
-    csRef<csShaderVariable> shaderVariable = 
-      material->GetVariable(displaceEpsName);
+    CS::ShaderVarName displaceDistanceName (svStrings, "displaceDistance");	
+    material->GetVariableAdd(displaceDistanceName)->GetValue(displaceDistance);
 
-    if (shaderVariable)
-      shaderVariable->GetValue(displaceEps);
+    controlPointsDistance = 0.05f;
+
+    CS::ShaderVarName controlPointsDistanceName (svStrings, "controlPointsDistance");	
+    material->GetVariableAdd(controlPointsDistanceName)->GetValue(controlPointsDistance);
   }
 
   void FurMaterial::SetShader (csStringID type, iShader* shd)
@@ -739,16 +779,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   FurAnimationControl::FurAnimationControl (FurMaterial* furMaterial)
     : scfImplementationType (this), lastTicks (0), furMaterial(furMaterial)
   {
-    int numberOfStrains = furMaterial->hairStrands.GetSize();
+    size_t numberOfStrains = furMaterial->hairStrands.GetSize();
     
     if( !numberOfStrains ) 
       return;
 
-    int controlPointsCount = furMaterial->hairStrands.Get(0).controlPointsCount;
+    size_t controlPointsCount = 0;
 
-    tangentShift = new csVector3 [ numberOfStrains * controlPointsCount ];
+    for ( size_t i = 0 ; i < numberOfStrains ; i ++ )
+      controlPointsCount += furMaterial->hairStrands.Get(i).controlPointsCount;
 
-    for ( int i = 0 ; i < numberOfStrains * controlPointsCount ; i ++)
+    tangentShift = new csVector3 [ controlPointsCount ];
+
+    for ( size_t i = 0 ; i < controlPointsCount ; i ++)
       tangentShift[i] = csVector3(furMaterial->rng->Get(), furMaterial->rng->Get(), 
         furMaterial->rng->Get()) * 0.01f;
   }
@@ -839,8 +882,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     if (!numberOfStrains)
       return;
 
-    int controlPointsCount = furMaterial->hairStrands.Get(0).controlPointsCount;
-
+//     size_t controlPointsCount = 0;
+// 
+//     for ( size_t i = 0 ; i < numberOfStrains ; i ++ )
+//       controlPointsCount += furMaterial->hairStrands.Get(i).controlPointsCount;
+    
     csVector3 *vbuf = furMaterial->factoryState->GetVertices (); 
     iRenderBuffer *tangents = furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT);
     csRenderBufferLock<csVector3> tan (tangents, CS_BUF_LOCK_NORMAL);
@@ -870,6 +916,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       strip = csVector3(0);
 
       csVector3 *controlPoints = furMaterial->hairStrands.Get(x).controlPoints;
+      int controlPointsCount = furMaterial->hairStrands.Get(x).controlPointsCount;
 
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
         vbuf += 2, tangentBuffer += 2, tanShift ++ )

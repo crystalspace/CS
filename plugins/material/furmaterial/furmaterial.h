@@ -151,16 +151,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     /// Temp fur geometry
     csRef<iAnimatedMeshFactory> meshFactory;
     csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
+    csRef<iMaterial> material;
+    csRef<iShaderVarStringSet> svStrings;
+    /// Density & Height maps
     iTextureHandle* densitymap;
     float densityFactor;
     iTextureHandle* heightmap;
-    csRef<iMaterial> material;
-    csRef<iShaderVarStringSet> svStrings;
+    float heightFactor;
+    float displaceDistance;
     float strandWidth;
+    float controlPointsDistance;
     /// Model
     csRef<iEngine> engine;
     csRef<iLoader> loader;
-    float displaceEps;
     /// functions
     void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
       iRenderBuffer* normals, iRenderBuffer* texCoords);
@@ -175,7 +178,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     void SetHeightmap();
     void SetStrandWidth();
     void SetColor(csColor color);
-    void SetDisplaceEps();
+    void SetDisplaceDistance();
   };
 
   class FurAnimationControl : public scfImplementation1 

@@ -25,6 +25,9 @@
     <texture name='krystal_skull_densitymap'>
       <file>/lib/krystal/krystal_skull_densitymap.png</file>
     </texture>	
+    <texture name='krystal_skull_heightmap'>
+      <file>/lib/krystal/krystal_skull_heightmap.png</file>
+    </texture>		
   </textures>
   <materials>
     <material name='krystal_material'>
@@ -42,10 +45,12 @@
       <shadervar type="texture" name="tex diffuse">krystal_skull_densitymap</shadervar>	  
 -->	  	
 	  <shadervar type="float" name="width">0.0015</shadervar>
-	  <shadervar type="float" name="displaceEps">0.02</shadervar>
-	  <shadervar type="float" name="densityFactor">25</shadervar>
+	  <shadervar type="float" name="displaceDistance">0.02</shadervar>
 	  <shadervar type="texture" name="density map">krystal_skull_densitymap</shadervar>
-      <shadervar type="texture" name="height map">krystal_skull</shadervar>
+	  <shadervar type="float" name="densityFactor">20</shadervar>
+      <shadervar type="texture" name="height map">krystal_skull_heightmap</shadervar>
+	  <shadervar type="float" name="heightFactor">0.5</shadervar>
+	  <shadervar type="float" name="controlPointsDistance">0.05</shadervar>
     </material>
   </materials>
   <sounds/>
