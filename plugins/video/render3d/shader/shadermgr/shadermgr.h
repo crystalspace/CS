@@ -164,11 +164,6 @@ public:
   virtual const csSet<csStringID>& GetTags (csShaderTagPresence presence,
     int& count);
 
-  virtual iStringSet* GetStringSet () const
-  {
-    return strings;
-  }
-
   virtual iShaderVarStringSet* GetSVNameStringset () const
   {
     return stringsSvName;
