@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_FRUSTVIS_H__
-#define __CS_FRUSTVIS_H__
+#ifndef __CS_OCCCULL_H__
+#define __CS_OCCCULL_H__
 
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -192,7 +192,6 @@ public:
 
 private:
   iObjectRegistry *object_reg;
-  csRef<iShaderManager> smShaderManager;
   csEventID CanvasResize;
   csRef<iEventHandler> weakEventHandler;
   csKDTree* kdtree;
@@ -219,8 +218,9 @@ private:
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
-  csRef<iGraphics3D> g3d;
-  csRef<iGraphics2D> g2d;
+  iGraphics3D* g3d;
+  iShaderManager* smShaderManager;
+  //csRef<iShaderManager> smShaderManager;
 
   CHCList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
   CHCList<NodeTraverseData> I_Queue; // I queue (invisible queue)
@@ -241,7 +241,7 @@ private:
   bool WasVisible(NodeTraverseData &ntdNode,const int cur_timestamp) const;
   void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
   void PullUpVisibility(NodeTraverseData &ntdNode);
-  void TraverseNode(NodeTraverseData &ntdNode,const int cur_timestamp);
+  void TraverseNode(iRenderView* rview,NodeTraverseData &ntdNode,const int cur_timestamp);
 
   void IssueQueries(iRenderView* rview, csKDTreeChild **objects, int num_obj);
 
@@ -277,6 +277,8 @@ public:
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview, 
     iVisibilityCullerListener* viscallback, int w = 0, int h = 0);
+  virtual bool csFrustumVis::VisTest (iRenderView* rview, 
+    iVisibilityCullerListener* viscallback,iShaderManager* smShaderMan, int w=0, int h=0);
   virtual void PrecacheCulling () { VisTest ((iRenderView*)0, 0); }
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);

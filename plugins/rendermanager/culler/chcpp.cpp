@@ -81,7 +81,7 @@ void csFrustumVis::IssueQueries(iRenderView* rview, csKDTreeChild **objects, int
   for(int i=0 ; i<num_obj ; i++)
   {
     numMeshes=0;
-    csRef<iMeshWrapper> mw=static_cast<csFrustVisObjectWrapper*>(objects[i]->GetObject())->mesh;
+    iMeshWrapper* mw=static_cast<csFrustVisObjectWrapper*>(objects[i]->GetObject())->mesh;
     uint32 frust_mask=rview->GetRenderContext ()->clip_planes_mask;
 
     csSectorVisibleRenderMeshes* meshList = rview->GetThisSector()->GetVisibleRenderMeshes (
@@ -101,7 +101,14 @@ void csFrustumVis::IssueQueries(iRenderView* rview, csKDTreeChild **objects, int
       for (int j = 0; j < meshList[m].num; ++j)
       {
         csRenderMesh* rm = meshList[m].rmeshes[j];
-	OQContext->AddRenderMesh (rm, rp, sm);
+        if (rm->portal)
+	{
+          //ContextNodeType::PortalHolder h = {rm->portal, imesh};
+	  //OQContext->allPortals.Push (h);
+        }
+        else
+	  OQContext->AddRenderMesh (rm, rp, sm);
+        //g3d->DrawMeshBasic(rm,*rm);
       }
     }
   }
@@ -140,13 +147,33 @@ void csFrustumVis::PullUpVisibility(NodeTraverseData &ntdNode)
   }
 }
 
-void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode,const int cur_timestamp)
+void csFrustumVis::TraverseNode(iRenderView* rview,NodeTraverseData &ntdNode,const int cur_timestamp)
 {
   ntdNode.SetTimestamp(cur_timestamp);
   if (ntdNode.IsLeaf()) // if node is leaf we render it
   {
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
     csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
+
+    unsigned int *queries;
+    int numq=1,oldq=0;
+    g3d->OQInitQueries(queries,oldq,numq);
+
+    g3d->OQBeginQuery(queries[0]);
+    IssueQueries(rview,objects,num_objects);
+    g3d->OQEndQuery();
+
+    while(!g3d->OQueryFinished(queries[0])) 1;
+    printf("occ finished for %d...",num_objects);
+    if(g3d->OQIsVisible(queries[0],0))
+    {
+      printf("visible\n");
+    }
+    else
+      printf("not visible\n");
+    g3d->OQDelQueries(queries,numq);
+    delete [] queries;
+
     for (int i = 0 ; i < num_objects ; i++)
     {
       if (objects[i]->timestamp != cur_timestamp)

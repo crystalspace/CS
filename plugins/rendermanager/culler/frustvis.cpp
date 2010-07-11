@@ -94,11 +94,6 @@ csFrustumVis::~csFrustumVis ()
   }
   delete kdtree;
 
-  if (rtRenderTree)
-    delete rtRenderTree;
-  g3d->Close();
-  g2d->Close();
-  smShaderManager->Clear();
   OQContext=0;
 }
 
@@ -108,8 +103,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
-  //csRef<iGraphics3D> 
-  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -127,13 +121,8 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   desc.AttachNew (new csFrustVisObjectDescriptor ());
   kdtree->SetObjectDescriptor (desc);
 
-  //csRef<iGraphics2D> 
-  g2d = csQueryRegistry<iGraphics2D> (object_reg);
-  csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
-
-  smShaderManager = csQueryRegistry<iShaderManager>(object_reg);
-  pdTreePersistent.Initialize(smShaderManager);
-  rtRenderTree = new RenderTreeType (pdTreePersistent);
+  //smShaderManager = csQueryRegistry<iShaderManager>(object_reg);
+  //pdTreePersistent.Initialize(smShaderManager);
 
   csRef<iLoader> loader = csQueryRegistry<iLoader>(object_reg);
   loader->LoadShader("/shader/early_z/z_only.xml");
@@ -349,27 +338,6 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (csKDTree* treenode,
     int num_objects = treenode->GetObjectCount ();
     csKDTreeChild** objects = treenode->GetObjects ();
 
-    if(num_objects)
-    {
-      unsigned int *queries;
-      int numq=1,oldq=0;
-      g3d->OQInitQueries(queries,oldq,numq);
-
-      g3d->OQBeginQuery(queries[0]);
-      IssueQueries(data->rview,objects,num_objects);
-      g3d->OQEndQuery();
-
-      while(!g3d->OQueryFinished(queries[0])) 1;
-      if(g3d->OQueryFinished(queries[0]))
-      {
-        printf("yeah...\n");
-        if(g3d->OQIsVisible(queries[0],0)) printf("it is...\n");
-        else printf("but it isn't\n");
-      }
-      else printf("nope\n");
-      g3d->OQDelQueries(queries,numq);
-      delete [] queries;
-    }
     for (int i = 0 ; i < num_objects ; i++)
     {
       if (objects[i]->timestamp != cur_timestamp)
@@ -408,8 +376,7 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   if (viscallback == 0)
     return false;
 
-  //g3d=rview->GetGraphics3D();
-  //g2d=rview->GetGraphics2D();
+  g3d=rview->GetGraphics3D();
 
   if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
@@ -417,17 +384,9 @@ bool csFrustumVis::VisTest (iRenderView* rview,
 	printf("Cannot prepare renderer for 3D drawing\n");
         return false;
   }
-
   g3d->FinishDraw();
 
-  /*if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
-  {
-    //ReportError("Cannot prepare renderer for 3D drawing.");
-	printf("Cannot prepare renderer for 3D drawing\n");
-        return false;
-  }
-
-  g3d->FinishDraw();*/
+  rtRenderTree = new RenderTreeType (pdTreePersistent);
 
   // First get the current view frustum from the rview.
   csRenderContext* ctxt = rview->GetRenderContext ();
@@ -443,63 +402,7 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
   T_Queue.PushBack(ntdRoot);
 
-  
-
-  unsigned int *queries;
-  int numq=1,oldq=0;
-  g3d->OQInitQueries(queries,oldq,numq);
-
-  g3d->OQBeginQuery(queries[0]);
-  IssueQueries(rview,ntdRoot.kdtNode->GetObjects(),ntdRoot.kdtNode->GetEstimatedObjectCount());
-  g3d->OQEndQuery();
-
-  while(!g3d->OQueryFinished(queries[0])) 1;
-  printf("occ finished...");
-  if(g3d->OQIsVisible(queries[0],0)) printf("visible\n");
-  else printf("not visible\n");
-  g3d->OQDelQueries(queries,numq);
-  delete [] queries;
-
-
-  /*int num=0;
-  csKDTree *node;
-  NodeTraverseData ntdAux;
-  ntdAux=T_Queue.Front();
-  while((node=ntdAux.kdtNode->GetChild1()))
-  {
-    num++;
-    printf("%d - ",ntdAux.GetVisibility());
-    ntdAux.kdtParent=ntdAux.kdtNode;
-    ntdAux.kdtNode=node;
-  }
-
-  PullUpVisibility(ntdAux);
-  printf("\n\n");
-
-  ntdAux=T_Queue.Front();
-  while((node=ntdAux.kdtNode->GetChild1()))
-  {
-    num++;
-    printf("%d - ",ntdAux.GetVisibility());
-    ntdAux.kdtParent=ntdAux.kdtNode;
-    ntdAux.kdtNode=node;
-  }*/
-
-  /*bool change;
-  if(WasVisible(NodeTraverseData(kdtree,0,frustum_mask,cur_timestamp-1),cur_timestamp))
-  {
-    printf("Yes......\n");
-    change=rand()%2;
-
-  }
-  else
-  {
-    printf("No\n");
-    change=rand()%2;
-  }*/
-
-
-  /*while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
+  while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
   {
     NodeTraverseData ntdAux=T_Queue.Front();
     T_Queue.PopFront();
@@ -518,15 +421,80 @@ bool csFrustumVis::VisTest (iRenderView* rview,
     // unless the node is fully visible, in which case it doesn't matter
     ntdAux.kdtNode->Distribute ();
 
-    TraverseNode(ntdAux,cur_timestamp);
-  }*/
+    TraverseNode(rview,ntdAux,cur_timestamp);
+  }
 
-  //printf("Done\n\n");
-  
-  //if(change) ntdRoot.SetVisibility(true);
-  //else ntdRoot.SetVisibility(false);
+  if(rtRenderTree)
+  {
+    delete rtRenderTree;
+    rtRenderTree = 0;
+  }
+  return true;
+}
+
+bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscallback,
+                            iShaderManager* smShaderMan, int, int)
+{
+  UpdateObjects ();
+  current_vistest_nr++;
+
+  // just make sure we have a callback
+  if (viscallback == 0)
+    return false;
+
+  g3d=rview->GetGraphics3D();
+
+  if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+  {
+    //ReportError("Cannot prepare renderer for 3D drawing.");
+	printf("Cannot prepare renderer for 3D drawing\n");
+        return false;
+  }
+  g3d->FinishDraw();
+
+  smShaderManager = smShaderMan;
+  pdTreePersistent.Initialize(smShaderManager);
+  rtRenderTree = new RenderTreeType (pdTreePersistent);
+
+  csRenderContext* ctxt = rview->GetRenderContext ();
+  f2bData.frustum = ctxt->clip_planes;
+  uint32 frustum_mask = ctxt->clip_planes_mask;
+  uint32 cur_timestamp = kdtree->NewTraversal ();
+
+  // The big routine: traverse from front to back and mark all objects
+  // visible that are visible.
+  f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  f2bData.rview = rview;
+  f2bData.viscallback = viscallback;
+  NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
+  T_Queue.PushBack(ntdRoot);
+
+  while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
+  {
+    NodeTraverseData ntdAux=T_Queue.Front();
+    T_Queue.PopFront();
+
+    int nodevis = TestNodeVisibility (ntdAux.kdtNode, &f2bData,frustum_mask);
+    if (nodevis == NODE_INVISIBLE)
+      continue;
+
+    if (nodevis == NODE_VISIBLE && frustum_mask == 0)
+    {
+      CallVisibilityCallbacksForSubtree (ntdAux.kdtNode, &f2bData, cur_timestamp);
+      continue;
+    }
+
+    // important...never try and traverse before doing a distribute
+    // unless the node is fully visible, in which case it doesn't matter
+    ntdAux.kdtNode->Distribute ();
+
+    TraverseNode(rview,ntdAux,cur_timestamp);
+  }
 
   // here we should process the remaining nodes in the multi query
+
+  delete rtRenderTree;
+  rtRenderTree = 0;
   return true;
 }
 
