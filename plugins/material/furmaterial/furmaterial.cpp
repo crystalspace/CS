@@ -696,10 +696,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   FurAnimationControl::FurAnimationControl (FurMaterial* furMaterial)
     : scfImplementationType (this), lastTicks (0), furMaterial(furMaterial)
   {
+    int numberOfStrains = furMaterial->hairStrands.GetSize();
+    
+    if( !numberOfStrains ) 
+      return;
+
+    int controlPointsCount = furMaterial->hairStrands.Get(0).controlPointsCount;
+
+    tangentShift = new csVector3 [ numberOfStrains * controlPointsCount ];
+
+    for ( int i = 0 ; i < numberOfStrains * controlPointsCount ; i ++)
+      tangentShift[i] = csVector3(furMaterial->rng->Get(), furMaterial->rng->Get(), 
+        furMaterial->rng->Get()) * 0.01f;
   }
 
   FurAnimationControl::~FurAnimationControl ()
   {
+    delete tangentShift;
   }  
 
   bool FurAnimationControl::AnimatesColors () const
@@ -794,20 +807,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     cameraOrigin = tc.GetOrigin();
     csVector3 *tangentBuffer = tan;
+    csVector3 *tanShift = tangentShift;
 
     // set LOD
     float distance = csVector3::Norm(cameraOrigin - 
       furMaterial->hairStrands.Get(0).controlPoints[0]);
 
-    if (distance < 2.0f)
-      furMaterial->SetLOD(1.0f);
-    else if (distance < 5.0f)
-      furMaterial->SetLOD(0.5f);
-    else
-      furMaterial->SetLOD(0.0f);
+//     if (distance < 2.0f)
+//       furMaterial->SetLOD(1.0f);
+//     else if (distance < 5.0f)
+//       furMaterial->SetLOD(0.5f);
+//     else
+//       furMaterial->SetLOD(0.0f);
 
-    for ( int x = 0 ; x < numberOfStrains ; x ++, 
-      vbuf += 2 * controlPointsCount, tangentBuffer += 2 * controlPointsCount)
+    for ( int x = 0 ; x < numberOfStrains ; x ++)
     {
       int y = 0;
       tangent = csVector3(0);
@@ -815,8 +828,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       csVector3 *controlPoints = furMaterial->hairStrands.Get(x).controlPoints;
 
-      for ( y = 0 ; y < controlPointsCount - 1; 
-        y ++, controlPoints ++, vbuf += 2, tangentBuffer += 2 )
+      for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
+        vbuf += 2, tangentBuffer += 2, tanShift ++ )
       {
         firstPoint = *controlPoints;
         secondPoint = *(controlPoints + 1);
@@ -828,8 +841,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         (*vbuf) = firstPoint;
         (*(vbuf + 1)) = firstPoint + strip;
 
-//         csMath3::CalcNormal(normal, firstPoint, firstPoint + strip, secondPoint);
-        tangent = secondPoint - firstPoint;
+        tangent = (secondPoint - firstPoint);
+//         tangent.Normalize();
+//         normal.Cross(binormal, tangent);
+        
+        tangent += (*tanShift);
 
         (*tangentBuffer) = tangent;
         (*(tangentBuffer + 1)) = tangent;
@@ -841,8 +857,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       (*tangentBuffer) = tangent;
       (*(tangentBuffer + 1)) = tangent;
 
-      vbuf -= 2 * y;
-      tangentBuffer -= 2 * y;
+      vbuf += 2;
+      tangentBuffer += 2;
+      tanShift ++;
     }
 
 //     furMaterial->factoryState->CalculateNormals();

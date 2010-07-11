@@ -22,7 +22,7 @@ float4 main (vertex2fragment IN,
 			uniform float3 constantsM) : COLOR
 {
 	float4 OUT = float4(0, 0, 0, 1);
-    DiffuseCol = 0.65;
+    DiffuseCol = 0.55;
 	
 	float MR_ct = constantsM.x;
 	float MTT_ct = constantsM.y;

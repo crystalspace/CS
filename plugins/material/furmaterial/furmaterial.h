@@ -206,7 +206,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csWeakRef<iMeshObject> mesh;
     csTicks lastTicks;
     FurMaterial* furMaterial;
-
+    csVector3* tangentShift;
     // functions
     void UpdateGuideHairs();
     void UpdateControlPoints(csVector3 *controlPoints, size_t controlPointsCount, 
