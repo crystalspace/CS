@@ -420,11 +420,6 @@ struct iShaderManager : public virtual iShaderVariableContext
     int& count) = 0;
 
   /**
-   * Get the general stringset.
-   */
-  virtual iStringSet* GetStringSet () const = 0;
-
-  /**
    * Get the stringset used for shader variable names
    */
   virtual iShaderVarStringSet* GetSVNameStringset () const = 0;
