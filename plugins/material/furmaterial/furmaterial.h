@@ -68,6 +68,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   {
     csVector3 *controlPoints;
     size_t controlPointsCount;
+    float tipRatio;
 
     csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT];
   };
@@ -161,6 +162,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float displaceDistance;
     float strandWidth;
     float controlPointsDistance;
+    int strictHeightmap;
     /// Model
     csRef<iEngine> engine;
     csRef<iLoader> loader;

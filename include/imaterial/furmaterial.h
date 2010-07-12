@@ -41,7 +41,7 @@ struct iFurPhysicsControl : public virtual iBase
     bulletDynamicSystem) = 0;
 
   // Initialize the strand with the given ID
-  virtual void InitializeStrand (size_t strandID, const csVector3* coordinates,
+  virtual void InitializeStrand (size_t strandID, csVector3* coordinates,
     size_t coordinatesCount) = 0;
 
   // Animate the strand with the given ID

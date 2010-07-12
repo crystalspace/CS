@@ -49,7 +49,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     virtual void SetRigidBody (iRigidBody* rigidBody);
     virtual void SetBulletDynamicSystem (iBulletDynamicSystem* bulletDynamicSystem);
     // Initialize the strand with the given ID
-    virtual void InitializeStrand (size_t strandID, const csVector3* coordinates,
+    virtual void InitializeStrand (size_t strandID, csVector3* coordinates,
       size_t coordinatesCount);
     // Animate the strand with the given ID
     virtual void AnimateStrand (size_t strandID, csVector3* coordinates, size_t

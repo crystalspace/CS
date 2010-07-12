@@ -213,7 +213,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);    
     csArray<int> uniqueIndices;
 
-    // density map
+    // height map
     CS::StructuredTextureFormat readbackFmt 
       (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
 
@@ -410,6 +410,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     densitymap->GetOriginalDimensions(densitymapW, densitymapH);
     uint8* densitymapData = densitymapDB->GetUint8();
 
+    csRef<iDataBuffer> heightmapDB = heightmap->Readback(readbackFmt);
+    int heightmapW, heightmapH;
+    heightmap->GetOriginalDimensions(heightmapW, heightmapH);
+    uint8* heightmapData = heightmapDB->GetUint8();
+
     float bA, bB, bC; // barycentric coefficients
 
     // for every triangle
@@ -484,6 +489,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
 //         csPrintf("%d\n", hairStrand.controlPointsCount);
 
+        csVector2 uv = A.uv * bA + B.uv * bB + C.uv * bC;
+
+        // based on heightmap
+        // point heightmap - modify to use convolution matrix or such
+        float height = heightmapData[ 4 * ((int)(uv.x * heightmapW) + 
+          (int)(uv.y * heightmapH) * heightmapW )] / 255.0f;
+
+        float realDistance = height * heightFactor;
+        float realTipDistance = realDistance - ((hairStrand.controlPointsCount - 2) 
+          * controlPointsDistance ) ;
+
+//         csPrintf("%f\t%f\t%f\n", height, realDistance, realTipDistance);
+
+        hairStrand.tipRatio = realTipDistance / controlPointsDistance;
+
         hairStrand.controlPoints = new csVector3[ hairStrand.controlPointsCount ];
 
         for ( size_t i = 0 ; i < hairStrand.controlPointsCount ; i ++ )
@@ -497,6 +517,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
               hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
                 guideHairsLOD.Get(hairStrand.guideHairs[j].index - 
                 guideHairs.GetSize()).controlPoints[i];
+        }
+
+        if ( strictHeightmap && hairStrand.controlPointsCount > 1 )
+        {
+          csVector3 direction = hairStrand.controlPoints[hairStrand.controlPointsCount - 1] - 
+            hairStrand.controlPoints[hairStrand.controlPointsCount - 2];
+          float distance = csVector3::Norm(direction);
+          direction.Normalize();
+
+          hairStrand.controlPoints[hairStrand.controlPointsCount - 1] =
+            hairStrand.controlPoints[hairStrand.controlPointsCount - 2] +
+            direction * distance * hairStrand.tipRatio;
         }
 
         hairStrands.Push(hairStrand);		
@@ -723,6 +755,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     CS::ShaderVarName heightFactorName (svStrings, "heightFactor");	
     material->GetVariable(heightFactorName)->GetValue(heightFactor);
+
+    CS::ShaderVarName strictHeightmapName (svStrings, "strictHeightmap");	
+    material->GetVariable(strictHeightmapName)->GetValue(strictHeightmap);
   }
 
   void FurMaterial::SetDisplaceDistance()
@@ -871,9 +906,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     // then update the hair strands
     if (furMaterial->physicsControl)
       for (size_t i = 0 ; i < furMaterial->hairStrands.GetSize(); i ++)
-        UpdateControlPoints(furMaterial->hairStrands.Get(i).controlPoints,
-          furMaterial->hairStrands.Get(i).controlPointsCount,
-          furMaterial->hairStrands.Get(i).guideHairs);
+      {
+        csHairStrand hairStrand = furMaterial->hairStrands.Get(i);
+
+        UpdateControlPoints(hairStrand.controlPoints,
+          hairStrand.controlPointsCount, hairStrand.guideHairs);
+
+        if ( furMaterial->strictHeightmap && hairStrand.controlPointsCount > 1 )
+        {
+          csVector3 direction = hairStrand.controlPoints[hairStrand.controlPointsCount - 1] - 
+            hairStrand.controlPoints[hairStrand.controlPointsCount - 2];
+          float distance = csVector3::Norm(direction);
+          direction.Normalize();
+
+          hairStrand.controlPoints[hairStrand.controlPointsCount - 1] =
+            hairStrand.controlPoints[hairStrand.controlPointsCount - 2] +
+            direction * distance * hairStrand.tipRatio;
+        }
+      }
 
     const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
 
@@ -882,11 +932,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     if (!numberOfStrains)
       return;
 
-//     size_t controlPointsCount = 0;
-// 
-//     for ( size_t i = 0 ; i < numberOfStrains ; i ++ )
-//       controlPointsCount += furMaterial->hairStrands.Get(i).controlPointsCount;
-    
     csVector3 *vbuf = furMaterial->factoryState->GetVertices (); 
     iRenderBuffer *tangents = furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT);
     csRenderBufferLock<csVector3> tan (tangents, CS_BUF_LOCK_NORMAL);

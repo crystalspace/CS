@@ -62,9 +62,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   }
 
   // Initialize the strand with the given ID
-  void HairPhysicsControl::InitializeStrand (size_t strandID, const csVector3* 
+  void HairPhysicsControl::InitializeStrand (size_t strandID, csVector3* 
     coordinates, size_t coordinatesCount)
   {
+    if (coordinatesCount <= 2)
+    {
+      for (size_t i = 0 ; i < coordinatesCount; i++)
+        coordinates[i] = csVector3(0);
+      return;
+    }
+
     csVector3 first = coordinates[0];
     csVector3 last = coordinates[coordinatesCount - 1];
 
