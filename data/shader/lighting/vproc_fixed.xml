@@ -131,7 +131,6 @@
 	<!-- First pass: blend with copy -->
 	<texture name="tex diffuse" destination="diffuse" />
 	<buffer source="texture coordinate 0" destination="texture coordinate diffuse" />
-	<?endif?>
 	<?if vars."tex lightmap".texture ?>
 	  <buffer source="texture coordinate lightmap" destination="texture coordinate lighting" />
 	  <texture name="tex lightmap" destination="lighting" />
