@@ -17,7 +17,13 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<shader compiler="shaderweaver" name="z_only">
+
+<!--
+	The main difference between this shader and the early_z shader is the fact that
+	we enable colors in this one. Without setting all color channels to true the occlusion
+	queries don't seem to want to work.
+-->
+<shader compiler="shaderweaver" name="occ_queries">
   <technique priority="200">
     <pass>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
