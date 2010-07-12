@@ -112,6 +112,14 @@ void CSCEGUIConfTest::Frame()
   int margin = 15;
   int fontColor = g2d->FindRGB (255, 150, 100);
 
+  //TODO: Remove
+  csRef<iConfigManager> app_cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
+  myBool = app_cfg->GetBool("CSCEGUIConfTest.myBool", false);
+  myInt = app_cfg->GetInt("CSCEGUIConfTest.myInt", 0);
+  myFloat = app_cfg->GetFloat("CSCEGUIConfTest.myFloat", 0.0f);
+  myString = app_cfg->GetStr("CSCEGUIConfTest.myString", "");
+  //End remove.
+
   WriteShadow(margin, 0, fontColor,  "myBool    %s", myBool?"True":"False");
   WriteShadow(margin, 15, fontColor, "myInt     %d", myInt);
   WriteShadow(margin, 30, fontColor, "myFloat   %f", myFloat);
