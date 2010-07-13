@@ -24,14 +24,14 @@
 #include "csutil/scf_implementation.h"
 
 #include "iutil/eventh.h"
+#include "csutil/cseventq.h"
+#include "iutil/event.h"
 
 #include "iutil/cfgnotifier.h"
 
 struct iObjectRegistry;
 struct iEventQueue;
 struct iEventNameRegistry;
-struct iEventHandler;
-struct iEvent;
 
 namespace CS
 {
@@ -69,7 +69,7 @@ namespace CS
     {
     public:
       ConfigListener(iObjectRegistry* obj_reg, const char* key, T& val)
-        : scfImplementationType (this), obj_reg(obj_reg), value(val)
+        : scfImplementation1<ConfigListener<T>, iEventHandler> (this), obj_reg(obj_reg), value(val)
       {
         eventQueue = csQueryRegistry<iEventQueue> (obj_reg);
         nameRegistry = csEventNameRegistry::GetRegistry(obj_reg);
