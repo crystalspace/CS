@@ -38,6 +38,7 @@
 #include "ivaria/reporter.h"
 #include "csutil/cfgacc.h"
 
+#include "deferredviscull.h"
 #include "deferred.h"
 
 using namespace CS::RenderManager;
@@ -214,8 +215,9 @@ public:
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
 
     // Do the culling
-    iVisibilityCuller* culler = sector->GetVisibilityCuller ();
-    Viscull<RenderTreeType> (context, rview, culler);
+    iVisibilityCuller *culler = sector->GetVisibilityCuller ();
+    DeferredViscullCallback<RenderTreeType> callback (context, rview, &rview->GetMeshFilter ());
+    CustomCallbackViscull<RenderTreeType> (context, rview, culler, &callback);
 
     // Set up all portals
     {
@@ -457,7 +459,7 @@ bool RMDeferred::RenderView(iView *view)
                                   lightRenderPersistent);
 
     render.OutputAmbientLight ();
-    
+
     ForEachLight (*startContext, render);
 
     graphics3D->FinishDraw ();

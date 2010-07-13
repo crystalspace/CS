@@ -546,11 +546,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     void RenderAmbientLight()
     {
       iMeshObject *obj = persistentData.quadMesh->GetMeshObject ();
-      iMaterial *mat = persistentData.spotMaterial->GetMaterial ();
+      iMaterial *mat = persistentData.ambientMaterial->GetMaterial ();
 
       int num = 0;
       csRenderMesh **meshes = obj->GetRenderMeshes (num, rview, 
         persistentData.quadMesh->GetMovable (), 0);
+
+      meshes[0]->z_buf_mode = CS_ZBUF_NONE;
 
       if (num <= 0)
         return;

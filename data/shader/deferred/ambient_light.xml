@@ -27,10 +27,7 @@
 
       <vp plugin="glcg" file="/shader/deferred/ambient_light.cgvp" />
 
-      <texture destination="gBuffer0" name="tex gbuffer 0" />
-      <texture destination="gBuffer1" name="tex gbuffer 1" />
       <texture destination="gBuffer2" name="tex gbuffer 2" />
-      <texture destination="gBufferDepth" name="tex gbuffer depth" />
       <fp plugin="glcg" file="/shader/deferred/ambient_light.cgfp" />
 
     </pass>

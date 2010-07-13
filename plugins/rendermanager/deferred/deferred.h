@@ -85,12 +85,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     csRef<iTextureHandle> accumBuffer;
 
-    // The textures that make up the GBuffer.
-    csRef<iTextureHandle> colorBuffer0;
-    csRef<iTextureHandle> colorBuffer1;
-    csRef<iTextureHandle> colorBuffer2;
-    csRef<iTextureHandle> depthBuffer;
-
     GBuffer gbuffer;
 
     int maxPortalRecurse;
