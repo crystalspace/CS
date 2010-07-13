@@ -187,10 +187,26 @@ bool CSCEGUIConfTest::Application()
   vfs->ChDir ("/data/csceguiconftest/");
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("csceguiconftest.layout"));
 
-  // Subscribe to the clicked event for the exit button
-  CEGUI::Window* btn = winMgr->getWindow("Demo7/Window1/Quit");
-  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&CSCEGUIConfTest::OnExitButtonClicked, this));
+  CEGUI::Window* info = winMgr->getWindow("Options/Info");
+  CEGUI::Listbox* list = static_cast<CEGUI::Listbox*>(winMgr->getWindow("Options/List"));
+
+  list->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::SubscriberSlot(&CSCEGUIConfTest::OnListSelection, this));
+
+
+  static const char* windows[] = {"options-test", "options-video"};
+  for (size_t i = 0; i < 2; i++)
+  {
+    CEGUI::String s = windows[i];
+    CEGUI::Window* w = winMgr->loadWindowLayout(s+".layout");
+    if (i) w->setVisible(false);
+    info->addChildWindow(w);
+    CEGUI::String name = w->getName();
+    name = name.substr(strlen("Options/Info/"));
+    CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(name, (CEGUI::uint)i);
+    item->setTextColours(CEGUI::colour(0.f, 0.f, 0.f)); 
+    list->addItem(item);
+  }
 
   // These are used store the current orientation of the camera.
   rotY = rotX = 0;
@@ -204,11 +220,31 @@ bool CSCEGUIConfTest::Application()
   return true;
 }
 
-bool CSCEGUIConfTest::OnExitButtonClicked (const CEGUI::EventArgs&)
+bool CSCEGUIConfTest::OnListSelection (const CEGUI::EventArgs& e)
 {
-  csRef<iEventQueue> q =
-    csQueryRegistry<iEventQueue> (GetObjectRegistry());
-  if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+  using namespace CEGUI;
+
+  const WindowEventArgs& ddea = static_cast<const WindowEventArgs&>(e);
+
+  // Get the listbox.
+  CEGUI::Listbox* listbox = static_cast<CEGUI::Listbox*>(ddea.window);
+
+  // Get the item.
+  CEGUI::ListboxItem* item = listbox->getFirstSelectedItem();
+  if (!item) { return true;}
+
+  // And switch.
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+  CEGUI::Window* info = winMgr->getWindow("Options/Info");
+  for (size_t i = 0; i < info->getChildCount(); i++)
+  {
+    Window* child = info->getChildAtIdx(i);
+    if (item->getText() == child->getName().substr(strlen("Options/Info/")))
+      child->setVisible(true);
+    else if (!child->isAutoWindow())
+      child->setVisible(false);
+  }
+
   return true;
 }
 

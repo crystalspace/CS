@@ -52,7 +52,7 @@ public:
   ~CSCEGUIConfTest();
 
   // Handle exit button clicked event
-  bool OnExitButtonClicked (const CEGUI::EventArgs& e);
+  bool OnListSelection (const CEGUI::EventArgs& e);
 
   bool OnInitialize(int argc, char* argv[]);
 

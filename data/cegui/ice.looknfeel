@@ -11,6 +11,7 @@
 
       <PropertyLinkDefinition name="DontUse1" widget="__auto_name__" targetProperty="FrameEnabled" initialValue="False"/>
       <PropertyLinkDefinition name="DontUse2" widget="__auto_combobox__" targetProperty="ClippedByParent" initialValue="False"/>
+      <PropertyLinkDefinition name="DontUse3" widget="__auto_name__" targetProperty="BackgroundEnabled" initialValue="False"/>
       <Child type="ice/StaticText" nameSuffix="__auto_name__">
         <Area>
           <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
