@@ -4,19 +4,19 @@
 
 #include "cssysdef.h"
 
+#include <csutil/refarr.h>
+
 //#include <CEGUI.h>
-#include <CEGUIBase.h>
+//#include <CEGUIBase.h>
 #include <CEGUIWindow.h>
 #include <CEGUIWindowFactory.h>
+
+#include <string>
+#include <vector>
 
 #include "setting.h"
 #include "settingproperties.h"
 
-
-#if defined(_MSC_VER)
-#  pragma warning(push)
-#  pragma warning(disable : 4251)
-#endif
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {
@@ -24,11 +24,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   \brief
     Base class for a Setting widget
   */
-  class /*CEGUIEXPORT*/ SettingBase : public CEGUI::Window
+  class SettingBase : public CEGUI::Window
   {
   private:
-    static SettingProperties::ConfigType d_ConfigType;
-    static SettingProperties::ConfigName d_ConfigName;
+    static SettingProperties::ConfigTypes d_ConfigTypes;
+    static SettingProperties::ConfigNames d_ConfigNames;
 
   private:
     virtual void onTextChanged(CEGUI::WindowEventArgs& e);
@@ -37,9 +37,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   protected:
     virtual void Update() = 0;
     iObjectRegistry* obj_reg;
-    Setting setting;
-    CEGUI::String configType;
-    CEGUI::String configName;
+    csRefArray<Setting> settings;
+
+    void Tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters = " ");
     
   protected:
     CEGUI::Window* getNameW() const;
@@ -49,22 +49,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 
   public:
     virtual bool isHit(const CEGUI::Point& position) const {return false;}
-    //virtual void initialiseComponents(void);
 
   public:
     SettingBase(const CEGUI::String& type, const CEGUI::String& name, iObjectRegistry* obj_reg);
     virtual ~SettingBase(void);
 
-    const CEGUI::String& getConfigType() const;
-    void setConfigType(const CEGUI::String& value);
+    CEGUI::String getConfigTypes() const;
+    void setConfigTypes(const CEGUI::String& value);
 
-    const CEGUI::String& getConfigName() const;
-    void setConfigName(const CEGUI::String& value);
+    CEGUI::String getConfigNames() const;
+    void setConfigNames(const CEGUI::String& value);
   };
 } CS_PLUGIN_NAMESPACE_END(cegui)
-
-#if defined(_MSC_VER)
-#  pragma warning(pop)
-#endif
 
 #endif // SETTINGBASE_H

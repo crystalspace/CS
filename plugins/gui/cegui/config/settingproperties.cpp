@@ -13,24 +13,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   {
     using namespace CEGUI;
 
-    String ConfigType::get(const PropertyReceiver* receiver) const
+    String ConfigTypes::get(const PropertyReceiver* receiver) const
     {
-      return static_cast<const SettingBase*>(receiver)->getConfigType();
+      return static_cast<const SettingBase*>(receiver)->getConfigTypes();
     }
 
-    void ConfigType::set(PropertyReceiver* receiver, const String& value)
+    void ConfigTypes::set(PropertyReceiver* receiver, const String& value)
     {
-      static_cast<SettingBase*>(receiver)->setConfigType(value);
+      static_cast<SettingBase*>(receiver)->setConfigTypes(value);
     }
 
-    String ConfigName::get(const PropertyReceiver* receiver) const
+    String ConfigNames::get(const PropertyReceiver* receiver) const
     {
-      return static_cast<const SettingBase*>(receiver)->getConfigName();
+      return static_cast<const SettingBase*>(receiver)->getConfigNames();
     }
 
-    void ConfigName::set(PropertyReceiver* receiver, const String& value)
+    void ConfigNames::set(PropertyReceiver* receiver, const String& value)
     {
-      static_cast<SettingBase*>(receiver)->setConfigName(value);
+      static_cast<SettingBase*>(receiver)->setConfigNames(value);
     }
 
     String MinimumValue::get(const PropertyReceiver* receiver) const

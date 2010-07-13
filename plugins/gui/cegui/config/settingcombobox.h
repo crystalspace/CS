@@ -26,11 +26,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 
   private:
     virtual void Update();
-    CEGUI::String values;
+    CEGUI::String valuesString;
+    typedef std::map<std::string, std::vector<std::string> > Values;
+    Values values;
 
-    CEGUI::String GetValue(const CEGUI::String& key);
-    CEGUI::String GetKey(const CEGUI::String& value);
-    std::vector<CEGUI::String> GetKeys();
+    std::string GetValue(const std::string& key);
+    std::string GetKey(const std::string& value);
 
   protected:
     virtual bool testClassName_impl(const CEGUI::String& class_name) const
@@ -56,7 +57,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     SettingComboBox(const CEGUI::String& type, const CEGUI::String& name, iObjectRegistry* obj_reg);
     virtual ~SettingComboBox(void);
 
-    CEGUI::String getValues() const;
+    const CEGUI::String& getValues() const;
     void setValues(const CEGUI::String& value);
   };
 

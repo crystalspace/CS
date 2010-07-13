@@ -8,20 +8,18 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {
-  using namespace CEGUI;
-
-  const String SettingSlider::EventNamespace("SettingSlider");
-  const String SettingSlider::WidgetTypeName("CEGUI/SettingSlider");
+  const CEGUI::String SettingSlider::EventNamespace("SettingSlider");
+  const CEGUI::String SettingSlider::WidgetTypeName("CEGUI/SettingSlider");
 
   SettingProperties::MinimumValue SettingSlider::d_MinimumValue;
 
   //Child Widget name suffix constants
-  const String SettingSlider::SliderNameSuffix( "__auto_slider__" );
-  const String SettingSlider::ValueNameSuffix( "__auto_value__" );
+  const CEGUI::String SettingSlider::SliderNameSuffix( "__auto_slider__" );
+  const CEGUI::String SettingSlider::ValueNameSuffix( "__auto_value__" );
 
 
   //CEGUI_DEFINE_WINDOW_FACTORY(SettingSlider)
-  SettingSlider::SettingSlider(const String& type, const String& name, iObjectRegistry* obj_reg) 
+  SettingSlider::SettingSlider(const CEGUI::String& type, const CEGUI::String& name, iObjectRegistry* obj_reg) 
     : SettingBase(type, name, obj_reg), minVal(0.0f)
   {
     addProperty(&d_MinimumValue);
@@ -43,23 +41,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 
   void SettingSlider::Update()
   {
-    if (!setting)
+    CEGUI::Slider* slider = getSliderW();
+    CEGUI::Window* value = getValueW();
+    for (size_t i = 0; i < settings.GetSize(); i++)
     {
-      setting.SetValueType(configType.c_str());
-      setting.SetValueName(configName.c_str());
-    }
-    else
-    {
-      Slider* slider = getSliderW();
-      float v; setting.Get(v);
-      slider->setCurrentValue(Scale0Max(v, getMinimumValue(), slider->getMaxValue()));
-      Window* value = getValueW();
-      value->setText(setting.GetAsString());
-    }
+      csRef<Setting> setting = settings.Get(i);
+      if (setting->IsValid())
+      {
+        float v; setting->Get(v);
+        slider->setCurrentValue(Scale0Max(v, getMinimumValue(), slider->getMaxValue()));
+        value->setText(setting->GetAsString());
+      }
+    }  
   }
 
-  void SettingSlider::onFontChanged(WindowEventArgs& e)
+  void SettingSlider::onFontChanged(CEGUI::WindowEventArgs& e)
   {
+    using namespace CEGUI;
     Window* name = getNameW();
     Slider* slider = getSliderW();
     Window* value = getValueW();
@@ -68,16 +66,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     value->setFont(Window::getFont());
   }
 
-  bool SettingSlider::onSliderChanged(const EventArgs& e)
+  bool SettingSlider::onSliderChanged(const CEGUI::EventArgs& e)
   {
-    Slider* slider = getSliderW();
+    CEGUI::Slider* slider = getSliderW();
     float val = slider->getCurrentValue();
     val = ScaleMinMax(val, getMinimumValue(), slider->getMaxValue());
-    if (setting)
+    CEGUI::Window* value = getValueW();   
+
+    for (size_t i = 0; i < settings.GetSize(); i++)
     {
-      setting.Set(val);
-      Window* value = getValueW();
-      value->setText(setting.GetAsString());
+      csRef<Setting> setting = settings.Get(i);
+      if (setting->IsValid())
+      {
+        setting->Set(val);
+        value->setText(setting->GetAsString());
+      }
     }
 
     return true;
@@ -94,26 +97,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     Update();
   }
 
-  Slider* SettingSlider::getSliderW() const
+  CEGUI::Slider* SettingSlider::getSliderW() const
   {
-    return static_cast<Slider*>(WindowManager::getSingleton().getWindow(getName() + SliderNameSuffix));
+    return static_cast<CEGUI::Slider*>(CEGUI::WindowManager::getSingleton().getWindow(getName() + SliderNameSuffix));
   }
 
-  Window* SettingSlider::getValueW() const
+  CEGUI::Window* SettingSlider::getValueW() const
   {
-    return WindowManager::getSingleton().getWindow(getName() + ValueNameSuffix);
+    return CEGUI::WindowManager::getSingleton().getWindow(getName() + ValueNameSuffix);
   }
 
-  void SettingSlider::initialiseComponents(void)
+  void SettingSlider::initialiseComponents()
   {
-    Slider* slider = getSliderW();
+    CEGUI::Slider* slider = getSliderW();
 
     // Hack, Init max value because else the
     // sliderthumb doesn't get positioned correctly later.
     slider->setMaxValue(100000.0f);
 
     // internal event wiring
-    slider->subscribeEvent(Slider::EventValueChanged, Event::Subscriber(&SettingSlider::onSliderChanged, this));
+    slider->subscribeEvent(CEGUI::Slider::EventValueChanged, CEGUI::Event::Subscriber(&SettingSlider::onSliderChanged, this));
 
     // put components in their initial positions
     performChildWindowLayout();

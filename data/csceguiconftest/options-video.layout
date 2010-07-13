@@ -9,8 +9,8 @@
             <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,0.0}}'/>
 
             <Property Name='Text' Value='Resolution'/>
-            <Property Name='ConfigType' Value='int,int'/>
-            <Property Name='ConfigName' Value='Video.ScreenWidth,Video.ScreenHeight'/>
+            <Property Name='ConfigTypes' Value='int,int'/>
+            <Property Name='ConfigNames' Value='Video.ScreenWidth,Video.ScreenHeight'/>
             <Property Name='Values' Value='High:1920,1080;Normal:1280,1024;Low:1024,768;Very Low:800,600' />
           </Window>
 
@@ -19,8 +19,8 @@
           <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,35.0}}'/>
 
           <Property Name='Text' Value='Full Screen'/>
-          <Property Name='ConfigType' Value='bool'/>
-          <Property Name='ConfigName' Value='Video.FullScreen'/>
+          <Property Name='ConfigTypes' Value='bool'/>
+          <Property Name='ConfigNames' Value='Video.FullScreen'/>
           <Property Name='Values' Value='True:True;False:False'/>
         </Window>
 
@@ -29,8 +29,8 @@
           <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,70.0}}'/>
           
           <Property Name='Text' Value='Texture Quality'/>
-          <Property Name='ConfigType' Value='int'/>
-          <Property Name='ConfigName' Value='Video.OpenGL.TextureDownsample'/>
+          <Property Name='ConfigTypes' Value='int'/>
+          <Property Name='ConfigNames' Value='Video.OpenGL.TextureDownsample'/>
           <Property Name='Values' Value='Very High:0;High:1;Normal:2;Low:3;Very Low:4;Lowest:5'/>
         </Window>
 
@@ -39,8 +39,8 @@
           <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,105.0}}'/>
           
           <Property Name='Text' Value='Texture Filtering'/>
-          <Property Name='ConfigType' Value='string'/>
-          <Property Name='ConfigName' Value='Video.OpenGL.TextureFilter'/>
+          <Property Name='ConfigTypes' Value='string'/>
+          <Property Name='ConfigNames' Value='Video.OpenGL.TextureFilter'/>
           <Property Name='Values' Value='None:none;Nearest:nearest;Bilinear:bilinear;Trilinear:trilinear;'/>
         </Window>
 
@@ -49,8 +49,8 @@
           <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,140.0}}'/>
 
           <Property Name='Text' Value='Antialiasing'/>
-          <Property Name='ConfigType' Value='int'/>
-          <Property Name='ConfigName' Value='Video.OpenGL.MultiSamples'/>
+          <Property Name='ConfigTypes' Value='int'/>
+          <Property Name='ConfigNames' Value='Video.OpenGL.MultiSamples'/>
           <Property Name='MinimumValue' Value='0.0'/>
           <Property Name='MaximumValue' Value='3.0'/>
           <Property Name='ClickStepSize' Value='1.0'/>
@@ -61,8 +61,8 @@
           <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,175.0}}'/>
 
           <Property Name='Text' Value='Anisotrophic Filtering'/>
-          <Property Name='ConfigType' Value='int'/>
-          <Property Name='ConfigName' Value='Video.OpenGL.MultiSamples'/>
+          <Property Name='ConfigTypes' Value='int'/>
+          <Property Name='ConfigNames' Value='Video.OpenGL.TextureFilterAnisotropy'/>
           <Property Name='MinimumValue' Value='1.0'/>
           <Property Name='MaximumValue' Value='4.0'/>
           <Property Name='ClickStepSize' Value='1.0'/>

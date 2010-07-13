@@ -28,13 +28,15 @@
 #include <iutil/eventq.h>
 #include <csutil/eventnames.h>
 
+#include <csutil/refcount.h>
+
 #include <string>
 
 #include "CEGUIString.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {
-    class Setting
+  class Setting : public csRefCount
     {
     public:
       enum SettingType
@@ -57,7 +59,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
       void SetValueName(const std::string& value) { name = value; }
       void SetValueType(const std::string& value);
 
-      operator bool() { return !name.empty() && settingType != Undefined; }
+      const std::string& GetValueName() { return name; }
+      std::string GetValueType();
+
+      bool IsDefault();
+
+      bool IsValid() { return !name.empty() && settingType != Undefined; }
 
       template<typename T>
       void Get(T& value);
@@ -73,11 +80,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     template<> void Setting::Get<int>(int& value);
     template<> void Setting::Get<float>(float& value);
     template<> void Setting::Get<CEGUI::String>(CEGUI::String& value);
+    template<> void Setting::Get<std::string>(std::string& value);
 
     template<> void Setting::Set<bool>(const bool& value);
     template<> void Setting::Set<int>(const int& value);
     template<> void Setting::Set<float>(const float& value);
     template<> void Setting::Set<CEGUI::String>(const CEGUI::String& value);
+    template<> void Setting::Set<std::string>(const std::string& value);
 
 } CS_PLUGIN_NAMESPACE_END(cegui)
 

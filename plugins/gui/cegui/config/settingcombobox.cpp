@@ -10,18 +10,16 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {
-  using namespace CEGUI;
-
-  const String SettingComboBox::EventNamespace("SettingComboBox");
-  const String SettingComboBox::WidgetTypeName("CEGUI/SettingComboBox");
+  const CEGUI::String SettingComboBox::EventNamespace("SettingComboBox");
+  const CEGUI::String SettingComboBox::WidgetTypeName("CEGUI/SettingComboBox");
 
   SettingProperties::Values SettingComboBox::d_Values;
 
   //Child Widget name suffix constants
-  const String SettingComboBox::ComboboxSuffix( "__auto_combobox__" );
+  const CEGUI::String SettingComboBox::ComboboxSuffix( "__auto_combobox__" );
 
 
-  SettingComboBox::SettingComboBox(const String& type, const String& name, iObjectRegistry* obj_reg) : SettingBase(type, name, obj_reg)
+  SettingComboBox::SettingComboBox(const CEGUI::String& type, const CEGUI::String& name, iObjectRegistry* obj_reg) : SettingBase(type, name, obj_reg)
   {
     addProperty(&d_Values);
   }
@@ -32,42 +30,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 
   void SettingComboBox::Update()
   {
-    if (!setting)
+    CEGUI::Combobox* box = getComboBoxW();
+
+    if (settings.GetSize())
     {
-      setting.SetValueType(configType.c_str());
-      setting.SetValueName(configName.c_str());
-    }
-    else
-    {
-      Combobox* box = getComboBoxW();
-      box->getEditbox()->setText(GetKey(setting.GetAsString()));
-      if (box->getItemCount() == 0)
+      csRef<Setting> setting = settings.Get(0);
+      if (setting->IsValid())
       {
-        std::vector<String> keys = GetKeys();
-        for (size_t i =0; i < keys.size(); i++)
-        {
-          CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(keys[i], (CEGUI::uint)i);
-          item->setTextColours(colour(0.f, 0.f, 0.f)); 
-          box->getDropList()->addItem(item);
-        }
+        if (setting->IsDefault())
+          box->getEditbox()->setText("Default");
+        else
+          box->getEditbox()->setText(GetKey(setting->GetAsString().c_str()));
+      }
+    }
+
+    if (box->getItemCount() == 0)
+    {
+      Values::const_iterator it = values.begin();
+      for (size_t i = 0; it != values.end(); it++, i++)
+      {
+        CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(it->first.c_str(), (CEGUI::uint)i);
+        item->setTextColours(CEGUI::colour(0.f, 0.f, 0.f)); 
+        box->getDropList()->addItem(item);
       }
     }
   }
 
-  void SettingComboBox::onFontChanged(WindowEventArgs& e)
+  void SettingComboBox::onFontChanged(CEGUI::WindowEventArgs& e)
   {
-    Window* name = getNameW();
-    Combobox* box = getComboBoxW();
-    name->setFont(Window::getFont());
-    box->setFont(Window::getFont());
+    CEGUI::Window* name = getNameW();
+    CEGUI::Combobox* box = getComboBoxW();
+    name->setFont(CEGUI::Window::getFont());
+    box->setFont(CEGUI::Window::getFont());
   }
 
-  void SettingComboBox::onSized(WindowEventArgs& e)
+  void SettingComboBox::onSized(CEGUI::WindowEventArgs& e)
   {
-    Window::onSized(e);
-    Combobox* box = getComboBoxW();
+    CEGUI::Window::onSized(e);
+    CEGUI::Combobox* box = getComboBoxW();
     box->getEditbox()->setReadOnly(true);
-
 
     // Calculate height.
     float h = box->getEditbox()->getPixelSize().d_height+5.0f;
@@ -76,101 +77,100 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
       h += box->getListboxItemFromIndex(i)->getPixelSize().d_height;
     }
 
-    box->setHeight(UDim(0.0f, h));
+    box->setHeight(CEGUI::UDim(0.0f, h));
     box->setClippedByParent(false);
     box->getDropList()->getVertScrollbar()->setEnabled(false);
     box->getDropList()->getVertScrollbar()->setAlpha(0.0f);
   }
 
-  std::vector<String> Split(const String& string, const char& c)
+  std::string SettingComboBox::GetValue(const std::string& key)
   {
-    std::vector<String> strs;
-    String tmp(string);
-    while (tmp.find_first_of(c) != String::npos)
-    {
-      String s(tmp.substr(0, tmp.find_first_of(c)));
-      strs.push_back(s);
-      tmp = tmp.substr(tmp.find_first_of(c)+1);
-    }
-    if (!tmp.empty())
-      strs.push_back(tmp);
-    return strs;
-  }
+    Values::const_iterator it = values.find(key);
+    if (it != values.end() && it->second.size()) return it->second[0];
 
-  String SettingComboBox::GetValue(const String& key)
-  {
-    std::vector<String> strs = Split(values, ';');
-    for (size_t i =0; i < strs.size(); i++)
-    {
-      std::vector<String> pair = Split(strs[i], ':');
-      if (pair.size() == 2 && pair[0] == key)
-        return pair[1];
-    }
     return "ERROR 1";
   }
 
-  String SettingComboBox::GetKey(const String& value)
+  std::string SettingComboBox::GetKey(const std::string& value)
   {
-    // If the value is empty, default setting is assumed.
-    if (value.empty()) return "Default";
-
-    std::vector<String> strs = Split(values, ';');
-    for (size_t i =0; i < strs.size(); i++)
+    Values::const_iterator it = values.begin();
+    for (; it != values.end(); it++)
     {
-      std::vector<String> pair = Split(strs[i], ':');
-      if (pair.size() == 2 && pair[1] == value)
-        return pair[0];
+      std::vector<std::string>::const_iterator itt = it->second.begin();
+      for (; itt != it->second.end(); itt++)
+      {
+        if (*itt == value) return it->first;
+      }
     }
+
     return "ERROR 2";
   }
 
-  std::vector<String> SettingComboBox::GetKeys()
+  bool SettingComboBox::onSelectionAccepted(const CEGUI::EventArgs& e)
   {
-    std::vector<String> keys;
-    std::vector<String> strs = Split(values, ';');
-    for (size_t i =0; i < strs.size(); i++)
-    {
-      std::vector<String> pair = Split(strs[i], ':');
-      if (pair.size() == 2)
-        keys.push_back(pair[0]);
-    }
-    return keys;
-  }
+    CEGUI::Combobox* box = getComboBoxW();
+    CEGUI::String key = box->getSelectedItem()->getText();
+    const std::vector<std::string>& vals = values[key.c_str()];
 
-  bool SettingComboBox::onSelectionAccepted(const EventArgs& e)
-  {
-    Combobox* box = getComboBoxW();
-    String key = box->getSelectedItem()->getText();
-    if (setting)
+    if (vals.size() != settings.GetSize())
     {
-      setting.Set(GetValue(key));
+      printf("E: onSelectionAccepted failed!\n");
+      return true;
+    }
+
+    std::vector<std::string>::const_iterator it = vals.begin();
+    for (size_t i = 0; it != vals.end(); it++, i++)
+    {
+      settings.Get(i)->Set(*it);
     }
 
     return true;
   }
 
-  String SettingComboBox::getValues() const
+  const CEGUI::String& SettingComboBox::getValues() const
   {
-    return values;
+    return valuesString;
   }
 
-  void SettingComboBox::setValues(const String& value)
+  void SettingComboBox::setValues(const CEGUI::String& value)
   {
-    values = value;
+    valuesString = value;
+    values.clear();
+
+    std::vector<std::string> pairs;
+    Tokenize(value.c_str(), pairs, ";");
+
+    std::vector<std::string>::const_iterator it = pairs.begin();
+    for (; it != pairs.end(); it++)
+    {
+      std::vector<std::string> pair;
+      Tokenize(*it, pair, ":");
+
+      if (pair.size() != 2)
+      {
+        printf("E: setValues failed.\n");
+        continue;
+      }
+
+      std::vector<std::string> vals;
+      Tokenize(pair[1], vals, ",");
+      values[pair[0]] = vals;
+    }
+
     Update();
   }
 
-  Combobox* SettingComboBox::getComboBoxW() const
+  CEGUI::Combobox* SettingComboBox::getComboBoxW() const
   {
-    return static_cast<Combobox*>(WindowManager::getSingleton().getWindow(getName() + ComboboxSuffix));
+    return static_cast<CEGUI::Combobox*>(CEGUI::WindowManager::getSingleton().getWindow(getName() + ComboboxSuffix));
   }
 
-  void SettingComboBox::initialiseComponents(void)
+  void SettingComboBox::initialiseComponents()
   {
-    Combobox* box = getComboBoxW();
+    CEGUI::Combobox* box = getComboBoxW();
 
     // internal event wiring
-    box->subscribeEvent(Combobox::EventListSelectionAccepted, Event::Subscriber(&SettingComboBox::onSelectionAccepted, this));
+    box->subscribeEvent(CEGUI::Combobox::EventListSelectionAccepted, CEGUI::Event::Subscriber(&SettingComboBox::onSelectionAccepted, this));
 
     // put components in their initial positions
     performChildWindowLayout();

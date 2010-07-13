@@ -13,10 +13,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 namespace SettingProperties
 {
 
-  class ConfigType : public CEGUI::Property
+  class ConfigTypes : public CEGUI::Property
   {
   public:
-    ConfigType() : CEGUI::Property("ConfigType",
+    ConfigTypes() : CEGUI::Property("ConfigTypes",
                             "Value is a text string.",
                             "")
     {}
@@ -25,10 +25,10 @@ namespace SettingProperties
     void set(CEGUI::PropertyReceiver* receiver, const CEGUI::String& value);
   };
 
-  class ConfigName : public CEGUI::Property
+  class ConfigNames : public CEGUI::Property
   {
   public:
-    ConfigName() : CEGUI::Property("ConfigName",
+    ConfigNames() : CEGUI::Property("ConfigNames",
                             "Value is a text string.",
                             "")
     {}
