@@ -48,7 +48,7 @@ template <class T> class csRef;
     if (obj)					    \
     {						    \
       cmd;                                          \
-      csRefTrackerAccess::SetDescription (obj,	    \
+      csRefTrackerAccess::SetDescriptionWeak (obj,  \
 	typeid(T).name());			    \
       csRefTrackerAccess::Match ## x (obj, rc, tag);\
     }						    \
