@@ -52,6 +52,18 @@ KrystalScene::~KrystalScene ()
 
   hairsBody.DeleteAll();
   */
+
+  if (hairsMesh)
+    hairTest->engine->RemoveObject (hairsMesh);
+
+  if (hairsBody)
+    hairTest->bulletDynamicSystem->RemoveSoftBody (hairsBody);
+
+  if (skirtMesh)
+    hairTest->engine->RemoveObject (skirtMesh);
+
+  if (skirtBody)
+    hairTest->bulletDynamicSystem->RemoveSoftBody (skirtBody);
 }
 
 csVector3 KrystalScene::GetCameraStart ()
@@ -168,6 +180,16 @@ bool KrystalScene::CreateAvatar ()
   if (!hairsMeshFact)
     return hairTest->ReportError ("Can't find Krystal's hairs mesh factory!");  
 
+  // Load Krystal's skirt
+  rc = hairTest->loader->Load ("/lib/krystal/krystal_skirt.xml");
+  if (!rc.success)
+    return hairTest->ReportError ("Can't load Krystal's skirt library file!");
+
+  csRef<iMeshFactoryWrapper> skirtMeshFact =
+    hairTest->engine->FindMeshFactory ("krystal_skirt");
+  if (!skirtMeshFact)
+    return hairTest->ReportError ("Can't find Krystal's skirt mesh factory!");
+
   // Load hairPhysicsControl
   csRef<iFurPhysicsControl> hairPhysicsControl = csQueryRegistry<iFurPhysicsControl> 
     (hairTest->object_reg);
@@ -256,13 +278,13 @@ bool KrystalScene::CreateAvatar ()
   idle06NodeFactory->SetAutomaticStop (false);
   standNodeFactory->SetAutomaticStop (false);
   
-//   randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
-//   //randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (idle04NodeFactory, 1.0f);
-//   //randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (standNodeFactory, 1.0f);
+  randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
+  randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
+  //randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
+  randomNodeFactory->AddNode (idle04NodeFactory, 1.0f);
+  //randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
+  randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
+  randomNodeFactory->AddNode (standNodeFactory, 1.0f);
   
   if (hairTest->physicsEnabled)
   {
@@ -285,6 +307,10 @@ bool KrystalScene::CreateAvatar ()
       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
     ragdollNodeFactory->AddBodyChain (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
 
+    // Create the mesh of the skirt
+    skirtMesh = hairTest->engine->CreateMeshWrapper
+      (skirtMeshFact, "krystal_skirt", hairTest->room, csVector3 (0.0f));
+
     // Create the geometry for the hairs
     csRef<iGeneralFactoryState> hairsFactoryState =
       scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
@@ -293,6 +319,7 @@ bool KrystalScene::CreateAvatar ()
     hairsMesh = hairTest->engine->CreateMeshWrapper
     (hairsMeshFact, "krystal_hairs", hairTest->room, csVector3 (0.0f));
     */
+
   }
 
   else

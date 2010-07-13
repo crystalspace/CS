@@ -56,9 +56,11 @@ private:
   iBodyChain* bodyChain;
   iBodyChain* hairChain;
 
-  // Krystal's hairs 
+  // Krystal's hairs & skirt (soft bodies)
   csRef<iMeshWrapper> hairsMesh;
-  csRefArray<iBulletSoftBody> hairsBody;
+  csRef<iMeshWrapper> skirtMesh;
+  csRef<iBulletSoftBody> hairsBody;
+  csRef<iBulletSoftBody> skirtBody;
 };
 
 #endif // __KRYSTAL_H__
