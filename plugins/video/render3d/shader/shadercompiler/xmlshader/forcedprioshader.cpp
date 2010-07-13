@@ -20,6 +20,8 @@
 
 #include "forcedprioshader.h"
 
+#include "iutil/string.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
   ForcedPriorityShader::ForcedPriorityShader (csXMLShader* parent, size_t techNum)
