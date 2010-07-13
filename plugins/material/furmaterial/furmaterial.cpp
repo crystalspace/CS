@@ -570,6 +570,53 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csPrintf("Active LOD ropes: %d\n",count);
   }
 
+  void FurMaterial::GaussianBlur(iTextureHandle *texture)
+  {
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+
+    csRef<iDataBuffer> bufDB = texture->Readback(readbackFmt);
+    int width, height;
+    texture->GetOriginalDimensions(width, height);
+    uint8* buf = bufDB->GetUint8();
+
+    int gaussianMask[][5] = { {1, 4, 6, 4, 1}, {4, 16, 24, 16, 4}, {6, 24, 36, 24, 6},
+      {4, 16, 24, 16, 4}, {1, 4, 6, 4, 1}};
+
+    int *dest = new int [ 4 * width * height ];
+
+    for (int x = 0; x < width; x ++)
+      for (int y = 0; y < height; y ++)
+        for (int channel = 0; channel < 4; channel ++)
+        {
+          int baseCoord = 4 * (x + y * width) + channel;
+          dest[ baseCoord ] = 0;
+
+          for (int x_offset = -2 ; x_offset <= 2; x_offset ++)
+            for (int y_offset = -2; y_offset <= 2; y_offset ++)
+            {
+              int coord = 4 * (x + x_offset + (y + y_offset) * width) + channel;
+              if (x + x_offset >= 0 && x + x_offset < width &&
+                y + y_offset >= 0 && y + y_offset < height)
+                dest[ baseCoord ] += buf[ coord ] * 
+                  gaussianMask[2 + x_offset][2 + y_offset];
+            }
+        }
+
+      for (int x = 0; x < width; x ++)
+        for (int y = 0; y < height; y ++)
+          for (int channel = 0; channel < 4; channel ++)
+            buf[4 * (x + y * width) + channel] = 
+              (uint8)(dest[4 * (x + y * width) + channel] / 256);
+
+      // send buffer to texture
+      densitymap->Blit(0, 0, width, height / 2, buf);
+      densitymap->Blit(0, height / 2, width, height / 2, 
+        buf + (width * height * 2));
+
+      delete dest;
+  }
+
   void FurMaterial::SaveUVImage()
   {
     // density map
@@ -744,6 +791,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     CS::ShaderVarName densityFactorName (svStrings, "densityFactor");	
     material->GetVariable(densityFactorName)->GetValue(densityFactor);
+
+    // apply a Gaussian blur
+    GaussianBlur(densitymap);
   }
 
   void FurMaterial::SetHeightmap ()

@@ -173,6 +173,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     void GenerateGuideHairsLOD();
     void GenerateHairStrands();
     /// debug
+    void GaussianBlur(iTextureHandle* texture);
     void SaveUVImage();
     void SaveImage(uint8* buf, const char* texname,int width, int height);
     /// setters
