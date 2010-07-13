@@ -178,6 +178,26 @@ public:
   bool PerformExtensionV (char const* /*command*/, va_list /*args*/)
   { return false; }
 
+  /**
+   * Initialise a set of occlusion queries.
+   */
+  void OQInitQueries (unsigned int*& queries, int& old_num_queries,
+    int& num_queries) {}
+
+  void OQDelQueries (unsigned int*& queries, int& num_queries) {}
+
+  /**
+   * Returns whether an occlusion query has finished.
+   */
+  bool OQueryFinished (unsigned int& occlusion_query) {}
+
+  /**
+   * Check via occlusion query whether a mesh is visible.
+   */
+  bool OQIsVisible (unsigned int& occlusion_query, unsigned int sampleLimit) { return true; }
+  void OQBeginQuery (unsigned int& occlusion_query) {}
+  void OQEndQuery () {}
+
 private:
   iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;
