@@ -112,13 +112,13 @@ void CSCEGUIConfTest::Frame()
   int margin = 15;
   int fontColor = g2d->FindRGB (255, 150, 100);
 
-  //TODO: Remove
+  /*//TODO: Remove
   csRef<iConfigManager> app_cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   myBool = app_cfg->GetBool("CSCEGUIConfTest.myBool", false);
   myInt = app_cfg->GetInt("CSCEGUIConfTest.myInt", 0);
   myFloat = app_cfg->GetFloat("CSCEGUIConfTest.myFloat", 0.0f);
   myString = app_cfg->GetStr("CSCEGUIConfTest.myString", "");
-  //End remove.
+  //End remove.*/
 
   WriteShadow(margin, 0, fontColor,  "myBool    %s", myBool?"True":"False");
   WriteShadow(margin, 15, fontColor, "myInt     %d", myInt);
@@ -159,6 +159,13 @@ bool CSCEGUIConfTest::Application()
   // Default behavior from csDemoApplication
   if (!csDemoApplication::Application ())
     return false;
+
+  configEventNotifier.AttachNew(new CS::Utility::ConfigEventNotifier(GetObjectRegistry()));
+
+  myBoolL.AttachNew(new CS::Utility::ConfigListener<bool>(GetObjectRegistry(), "CSCEGUIConfTest.myBool", myBool));
+  myIntL.AttachNew(new CS::Utility::ConfigListener<int>(GetObjectRegistry(), "CSCEGUIConfTest.myInt", myInt));
+  myFloatL.AttachNew(new CS::Utility::ConfigListener<float>(GetObjectRegistry(), "CSCEGUIConfTest.myFloat", myFloat));
+  //myStringL.AttachNew(new CS::Utility::ConfigListener<csString>(GetObjectRegistry(), "CSCEGUIConfTest.myString", myString));
 
   vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs) return ReportError("Failed to locate VFS!");

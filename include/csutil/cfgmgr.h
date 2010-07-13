@@ -28,6 +28,7 @@
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/cfgnotifier.h"
 
 
 class csConfigManagerIterator;
@@ -38,9 +39,10 @@ class csConfigManagerIterator;
  * iConfigManager interface for full details.
  */
 class CS_CRYSTALSPACE_EXPORT csConfigManager
-  : public scfImplementation2<csConfigManager,
+  : public scfImplementation3<csConfigManager,
                               iConfigManager,
-                              scfFakeInterface<iConfigFile> >
+                              scfFakeInterface<iConfigFile>,
+                              iConfigNotifier>
 {
 public:
 
@@ -238,6 +240,16 @@ public:
   /// set the final comment at the end of the configuration file
   virtual void SetEOFComment(const char *Text);
 
+  /**
+   * Adds the given iConfigListener to the notifier's list.
+   */
+  virtual void AddListener (iConfigListener*);
+
+  /**
+   * Removes the given iConfigListener from the notifier's list.
+   */
+  virtual void RemoveListener (iConfigListener*);
+
 private:
   friend class csConfigManagerIterator;
   /// optimize mode?
@@ -258,6 +270,14 @@ private:
   void FlushRemoved(size_t n);
   size_t FindRemoved(const char *Filename) const;
   void RemoveDomain(class csConfigDomain *cfg);
+
+  csRefArray<iConfigListener> listeners;
+
+  void NotifyListenersSetFloat(const char* key, float value);
+  void NotifyListenersSetInt(const char* key, int value);
+  void NotifyListenersSetBool(const char* key, bool value);
+  void NotifyListenersSetStr(const char* key, const char* value);
+  void NotifyListenersSetTuple(const char* key, iStringArray* value);
 };
 
 #endif // __CS_CFGMGR_H__

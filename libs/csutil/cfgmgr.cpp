@@ -530,30 +530,35 @@ void csConfigManager::SetStr (const char *Key, const char *Value)
 {
   DynamicDomain->Cfg->SetStr(Key, Value);
   ClearKeyAboveDynamic(Key);
+  NotifyListenersSetStr(Key, Value);
 }
 
 void csConfigManager::SetInt (const char *Key, int Value)
 {
   DynamicDomain->Cfg->SetInt(Key, Value);
   ClearKeyAboveDynamic(Key);
+  NotifyListenersSetInt(Key, Value);
 }
 
 void csConfigManager::SetFloat (const char *Key, float Value)
 {
   DynamicDomain->Cfg->SetFloat(Key, Value);
   ClearKeyAboveDynamic(Key);
+  NotifyListenersSetFloat(Key, Value);
 }
 
 void csConfigManager::SetBool (const char *Key, bool Value)
 {
   DynamicDomain->Cfg->SetBool(Key, Value);
   ClearKeyAboveDynamic(Key);
+  NotifyListenersSetBool(Key, Value);
 }
 
 void csConfigManager::SetTuple (const char *Key, iStringArray* Value)
 {
   DynamicDomain->Cfg->SetTuple(Key, Value);
   ClearKeyAboveDynamic(Key);
+  NotifyListenersSetTuple(Key, Value);
 }
 
 bool csConfigManager::SetComment (const char *Key, const char *Text)
@@ -587,6 +592,46 @@ void csConfigManager::SetEOFComment(const char *Text)
   for (csConfigDomain *d=DynamicDomain->Next; d!=0; d=d->Next)
     if (d->Cfg)
       d->Cfg->SetEOFComment(0);
+}
+
+void csConfigManager::AddListener (iConfigListener* l)
+{
+  listeners.PushSmart(l);
+}
+
+void csConfigManager::RemoveListener (iConfigListener* l)
+{
+  listeners.Delete(l);
+}
+
+void csConfigManager::NotifyListenersSetFloat(const char* key, float value)
+{
+  for (size_t i = 0; i < listeners.GetSize(); i++)
+    listeners.Get(i)->SetFloat(key, value);
+}
+
+void csConfigManager::NotifyListenersSetInt(const char* key, int value)
+{
+  for (size_t i = 0; i < listeners.GetSize(); i++)
+    listeners.Get(i)->SetInt(key, value);
+}
+
+void csConfigManager::NotifyListenersSetBool(const char* key, bool value)
+{
+  for (size_t i = 0; i < listeners.GetSize(); i++)
+    listeners.Get(i)->SetBool(key, value);
+}
+
+void csConfigManager::NotifyListenersSetStr(const char* key, const char* value)
+{
+  for (size_t i = 0; i < listeners.GetSize(); i++)
+    listeners.Get(i)->SetStr(key, value);
+}
+
+void csConfigManager::NotifyListenersSetTuple(const char* key, iStringArray* value)
+{
+  for (size_t i = 0; i < listeners.GetSize(); i++)
+    listeners.Get(i)->SetTuple(key, value);
 }
 
 void csConfigManager::ClearKeyAboveDynamic(const char *Key)
