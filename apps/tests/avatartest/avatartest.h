@@ -36,7 +36,7 @@
 #define DYNDEBUG_COLLIDER 3
 #define DYNDEBUG_BULLET 4
 
-// Base class to be implemented for all different models
+// Base class to be implemented for all different scenes
 class AvatarScene
 {
  public:
@@ -103,6 +103,11 @@ private:
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
+
+  //-- csDemoApplication
+  csVector3 GetCameraStart ();
+  float GetCameraMinimumDistance ();
+  csVector3 GetCameraTarget ();
 
  public:
   AvatarTest ();

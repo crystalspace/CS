@@ -112,10 +112,10 @@ void CSCEGUIConfTest::Frame()
   int margin = 15;
   int fontColor = g2d->FindRGB (255, 150, 100);
 
-  WriteShadow(margin, 0, fontColor,  "myBool    %s", myBool?"True":"False");
-  WriteShadow(margin, 15, fontColor, "myInt     %d", myInt);
-  WriteShadow(margin, 30, fontColor, "myFloat   %f", myFloat);
-  WriteShadow(margin, 45, fontColor, "myString  %s", myString.GetData());
+  hudHelper.WriteShadow(margin, 0, fontColor,  "myBool    %s", myBool?"True":"False");
+  hudHelper.WriteShadow(margin, 15, fontColor, "myInt     %d", myInt);
+  hudHelper.WriteShadow(margin, 30, fontColor, "myFloat   %f", myFloat);
+  hudHelper.WriteShadow(margin, 45, fontColor, "myString  %s", myString.GetData());
 }
 
 bool CSCEGUIConfTest::OnInitialize(int argc, char* argv [])

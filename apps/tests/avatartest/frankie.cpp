@@ -34,21 +34,21 @@ FrankieScene::FrankieScene (AvatarTest* avatarTest)
   : avatarTest (avatarTest), targetReached (false), lookAtListener (this)
 {
   // Define the available keys
-  avatarTest->keyDescriptions.DeleteAll ();
-  avatarTest->keyDescriptions.Push ("arrow keys: move camera");
-  avatarTest->keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
-  avatarTest->keyDescriptions.Push ("+/-: walk faster/slower");
-  avatarTest->keyDescriptions.Push ("t: toggle 'LookAt' target mode");
-  avatarTest->keyDescriptions.Push ("a: toggle 'LookAt: always rotate' mode");
-  avatarTest->keyDescriptions.Push ("s: toggle 'LookAt: rotation speed'");
+  avatarTest->hudHelper.keyDescriptions.DeleteAll ();
+  avatarTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
+  avatarTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->hudHelper.keyDescriptions.Push ("+/-: walk faster/slower");
+  avatarTest->hudHelper.keyDescriptions.Push ("t: toggle 'LookAt' target mode");
+  avatarTest->hudHelper.keyDescriptions.Push ("a: toggle 'LookAt: always rotate' mode");
+  avatarTest->hudHelper.keyDescriptions.Push ("s: toggle 'LookAt: rotation speed'");
   if (avatarTest->physicsEnabled)
   {
-    avatarTest->keyDescriptions.Push ("f: toggle physical tail");
-    avatarTest->keyDescriptions.Push ("left mouse: kill Frankie");
-    avatarTest->keyDescriptions.Push ("d: display active colliders");
+    avatarTest->hudHelper.keyDescriptions.Push ("f: toggle physical tail");
+    avatarTest->hudHelper.keyDescriptions.Push ("left mouse: kill Frankie");
+    avatarTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
   }
-  avatarTest->keyDescriptions.Push ("r: reset scene");
-  avatarTest->keyDescriptions.Push ("n: switch to next scene");
+  avatarTest->hudHelper.keyDescriptions.Push ("r: reset scene");
+  avatarTest->hudHelper.keyDescriptions.Push ("n: switch to next scene");
 }
 
 FrankieScene::~FrankieScene ()
@@ -559,29 +559,29 @@ void FrankieScene::ResetScene ()
 
 void FrankieScene::UpdateStateDescription ()
 {
-  avatarTest->stateDescriptions.DeleteAll ();
+  avatarTest->hudHelper.stateDescriptions.DeleteAll ();
 
   if (targetMode == LOOKAT_CAMERA)
-    avatarTest->stateDescriptions.Push ("Watch out, Frankie is looking at you!");
+    avatarTest->hudHelper.stateDescriptions.Push ("Watch out, Frankie is looking at you!");
   else if (targetMode == LOOKAT_POSITION)
-    avatarTest->stateDescriptions.Push ("Frankie is looking at something");
+    avatarTest->hudHelper.stateDescriptions.Push ("Frankie is looking at something");
   else if (targetMode == LOOKAT_NOTHING)
-    avatarTest->stateDescriptions.Push ("Frankie doesn't care about anything");
+    avatarTest->hudHelper.stateDescriptions.Push ("Frankie doesn't care about anything");
 
   if (alwaysRotate)
-    avatarTest->stateDescriptions.Push ("Always rotate: ON");
+    avatarTest->hudHelper.stateDescriptions.Push ("Always rotate: ON");
   else
-    avatarTest->stateDescriptions.Push ("Always rotate: OFF");
+    avatarTest->hudHelper.stateDescriptions.Push ("Always rotate: OFF");
 
   if (rotationSpeed == ROTATION_SLOW)
-    avatarTest->stateDescriptions.Push ("Rotation speed: really slow");
+    avatarTest->hudHelper.stateDescriptions.Push ("Rotation speed: really slow");
   else if (rotationSpeed == ROTATION_NORMAL)
-    avatarTest->stateDescriptions.Push ("Rotation speed: normal");
+    avatarTest->hudHelper.stateDescriptions.Push ("Rotation speed: normal");
   else if (rotationSpeed == ROTATION_IMMEDIATE)
-    avatarTest->stateDescriptions.Push ("Rotation speed: infinite");
+    avatarTest->hudHelper.stateDescriptions.Push ("Rotation speed: infinite");
 
   csString txt;
   txt.Format ("Walk speed: %.1f", ((float) currentSpeed) / 10.0f);
-  avatarTest->stateDescriptions.Push (txt);
+  avatarTest->hudHelper.stateDescriptions.Push (txt);
 }
 

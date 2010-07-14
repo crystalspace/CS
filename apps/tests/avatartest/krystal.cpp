@@ -29,16 +29,16 @@ KrystalScene::KrystalScene (AvatarTest* avatarTest)
   : avatarTest (avatarTest)
 {
   // Define the available keys
-  avatarTest->keyDescriptions.DeleteAll ();
-  avatarTest->keyDescriptions.Push ("arrow keys: move camera");
-  avatarTest->keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->hudHelper.keyDescriptions.DeleteAll ();
+  avatarTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
+  avatarTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
   if (avatarTest->physicsEnabled)
   {
-    avatarTest->keyDescriptions.Push ("d: display active colliders");
-    avatarTest->keyDescriptions.Push ("left mouse: kill Krystal");
+    avatarTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
+    avatarTest->hudHelper.keyDescriptions.Push ("left mouse: kill Krystal");
   }
-  avatarTest->keyDescriptions.Push ("r: reset scene");
-  avatarTest->keyDescriptions.Push ("n: switch to next scene");
+  avatarTest->hudHelper.keyDescriptions.Push ("r: reset scene");
+  avatarTest->hudHelper.keyDescriptions.Push ("n: switch to next scene");
 }
 
 KrystalScene::~KrystalScene ()
@@ -536,5 +536,5 @@ void KrystalScene::ResetScene ()
 
 void KrystalScene::UpdateStateDescription ()
 {
-  avatarTest->stateDescriptions.DeleteAll ();
+  avatarTest->hudHelper.stateDescriptions.DeleteAll ();
 }

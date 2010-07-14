@@ -46,18 +46,15 @@ Simple::Simple ()
   // Configure the options for csDemoApplication
 
   // We manage the camera by ourselves
-  SetCameraMode (CSDEMO_CAMERA_NONE);
+  cameraHelper.SetCameraMode (CSDEMO_CAMERA_NONE);
 
   // Command line options
-  commandLineHelper.commandOptions.Push
-    (csDemoCommandLineHelper::CommandOption
-     ("phys_engine=<name>", "Specify which physics plugin to use (ode, bullet)"));
-  commandLineHelper.commandOptions.Push
-    (csDemoCommandLineHelper::CommandOption
-     ("disable_soft", "Disable the soft bodies"));
-  commandLineHelper.commandOptions.Push
-    (csDemoCommandLineHelper::CommandOption
-     ("terrain", "Start with the terrain environment"));
+  commandLineHelper.AddCommandLineOption
+    ("phys_engine=<name>", "Specify which physics plugin to use (ode, bullet)");
+  commandLineHelper.AddCommandLineOption
+    ("disable_soft", "Disable the soft bodies");
+  commandLineHelper.AddCommandLineOption
+    ("terrain", "Start with the terrain environment");
 }
 
 Simple::~Simple ()
@@ -189,47 +186,47 @@ void Simple::Frame ()
       (cameraBody->GetTransform ().GetOrigin ());
 
   // Update the demo's state information
-  stateDescriptions.DeleteAll ();
+  hudHelper.stateDescriptions.DeleteAll ();
   csString txt;
 
-  stateDescriptions.Push (csString ("Physics engine: ") + phys_engine_name);
+  hudHelper.stateDescriptions.Push (csString ("Physics engine: ") + phys_engine_name);
 
   txt.Format ("Rigid bodies count: %d", dynamicSystem->GetBodysCount ());
-  stateDescriptions.Push (txt);
+  hudHelper.stateDescriptions.Push (txt);
 
   if (isSoftBodyWorld)
   {
     txt.Format ("Soft bodies count: %d", (int) bulletDynamicSystem->GetSoftBodyCount ());
-    stateDescriptions.Push (txt);
+    hudHelper.stateDescriptions.Push (txt);
   }
 
   if (phys_engine_id == ODE_ID)
   {
     if (solver==0)
-      stateDescriptions.Push (csString ("Solver: WorldStep"));
+      hudHelper.stateDescriptions.Push (csString ("Solver: WorldStep"));
     else if (solver==1)
-      stateDescriptions.Push (csString ("Solver: StepFast"));
+      hudHelper.stateDescriptions.Push (csString ("Solver: StepFast"));
     else if (solver==2)
-      stateDescriptions.Push (csString ("Solver: QuickStep"));
+      hudHelper.stateDescriptions.Push (csString ("Solver: QuickStep"));
   }
 
   if (autodisable)
-    stateDescriptions.Push (csString ("AutoDisable: ON"));
+    hudHelper.stateDescriptions.Push (csString ("AutoDisable: ON"));
   else
-    stateDescriptions.Push (csString ("AutoDisable: OFF"));
+    hudHelper.stateDescriptions.Push (csString ("AutoDisable: OFF"));
 
   switch (physicalCameraMode)
     {
     case CAMERA_DYNAMIC:
-      stateDescriptions.Push (csString ("Camera mode: dynamic"));
+      hudHelper.stateDescriptions.Push (csString ("Camera mode: dynamic"));
       break;
 
     case CAMERA_FREE:
-      stateDescriptions.Push (csString ("Camera mode: free"));
+      hudHelper.stateDescriptions.Push (csString ("Camera mode: free"));
       break;
 
     case CAMERA_KINEMATIC:
-      stateDescriptions.Push (csString ("Camera mode: kinematic"));
+      hudHelper.stateDescriptions.Push (csString ("Camera mode: kinematic"));
       break;
 
     default:
@@ -785,61 +782,61 @@ bool Simple::OnInitialize (int argc, char* argv[])
     return ReportError ("No iDynamics plugin!");
 
   // Now that we know the physical plugin in use, we can define the available keys
-  keyDescriptions.DeleteAll ();
-  keyDescriptions.Push ("b: spawn a box");
-  keyDescriptions.Push ("s: spawn a sphere");
+  hudHelper.keyDescriptions.DeleteAll ();
+  hudHelper.keyDescriptions.Push ("b: spawn a box");
+  hudHelper.keyDescriptions.Push ("s: spawn a sphere");
   if (phys_engine_id == BULLET_ID)
   {
-    keyDescriptions.Push ("c: spawn a cylinder");
-    keyDescriptions.Push ("a: spawn a capsule");
+    hudHelper.keyDescriptions.Push ("c: spawn a cylinder");
+    hudHelper.keyDescriptions.Push ("a: spawn a capsule");
   }
-  keyDescriptions.Push ("v: spawn a convex mesh");
-  keyDescriptions.Push ("m: spawn a concave mesh");
-  keyDescriptions.Push ("*: spawn a static concave mesh");
+  hudHelper.keyDescriptions.Push ("v: spawn a convex mesh");
+  hudHelper.keyDescriptions.Push ("m: spawn a concave mesh");
+  hudHelper.keyDescriptions.Push ("*: spawn a static concave mesh");
   if (phys_engine_id == BULLET_ID)
-    keyDescriptions.Push ("q: spawn a compound body");
-  keyDescriptions.Push ("j: spawn two jointed bodies");
+    hudHelper.keyDescriptions.Push ("q: spawn a compound body");
+  hudHelper.keyDescriptions.Push ("j: spawn two jointed bodies");
   if (phys_engine_id == BULLET_ID)
   {
-    keyDescriptions.Push ("h: spawn a chain");
-    keyDescriptions.Push ("r: spawn a Frankie's ragdoll");
+    hudHelper.keyDescriptions.Push ("h: spawn a chain");
+    hudHelper.keyDescriptions.Push ("r: spawn a Frankie's ragdoll");
   }
   if (isSoftBodyWorld)
   {
-    keyDescriptions.Push ("y: spawn a rope");
-    keyDescriptions.Push ("u: spawn a cloth");
-    keyDescriptions.Push ("i: spawn a soft body");
+    hudHelper.keyDescriptions.Push ("y: spawn a rope");
+    hudHelper.keyDescriptions.Push ("u: spawn a cloth");
+    hudHelper.keyDescriptions.Push ("i: spawn a soft body");
   }
-  keyDescriptions.Push ("SPACE: spawn random object");
+  hudHelper.keyDescriptions.Push ("SPACE: spawn random object");
   if (phys_engine_id == BULLET_ID)
   {
-    keyDescriptions.Push ("left mouse: fire!");
-    keyDescriptions.Push ("right mouse: drag object");
-    keyDescriptions.Push ("CTRL-x: cut selected object");
-    keyDescriptions.Push ("CTRL-v: paste object");
+    hudHelper.keyDescriptions.Push ("left mouse: fire!");
+    hudHelper.keyDescriptions.Push ("right mouse: drag object");
+    hudHelper.keyDescriptions.Push ("CTRL-x: cut selected object");
+    hudHelper.keyDescriptions.Push ("CTRL-v: paste object");
   }
-  keyDescriptions.Push ("f: toggle camera modes");
-  keyDescriptions.Push ("t: toggle all bodies dynamic/static");
-  keyDescriptions.Push ("p: pause the simulation");
-  keyDescriptions.Push ("o: toggle speed of simulation");
-  keyDescriptions.Push ("d: toggle display of colliders");
+  hudHelper.keyDescriptions.Push ("f: toggle camera modes");
+  hudHelper.keyDescriptions.Push ("t: toggle all bodies dynamic/static");
+  hudHelper.keyDescriptions.Push ("p: pause the simulation");
+  hudHelper.keyDescriptions.Push ("o: toggle speed of simulation");
+  hudHelper.keyDescriptions.Push ("d: toggle display of colliders");
   if (phys_engine_id == BULLET_ID)
-    keyDescriptions.Push ("?: toggle display of collisions");
-  keyDescriptions.Push ("g: toggle gravity");
-  keyDescriptions.Push ("I: toggle autodisable");
+    hudHelper.keyDescriptions.Push ("?: toggle display of collisions");
+  hudHelper.keyDescriptions.Push ("g: toggle gravity");
+  hudHelper.keyDescriptions.Push ("I: toggle autodisable");
   if (phys_engine_id == ODE_ID)
   {
-    keyDescriptions.Push ("1: enable StepFast solver");
-    keyDescriptions.Push ("2: disable StepFast solver");
-    keyDescriptions.Push ("3: enable QuickStep solver");
+    hudHelper.keyDescriptions.Push ("1: enable StepFast solver");
+    hudHelper.keyDescriptions.Push ("2: disable StepFast solver");
+    hudHelper.keyDescriptions.Push ("3: enable QuickStep solver");
   }
 #ifdef CS_HAVE_BULLET_SERIALIZER
   if (phys_engine_id == BULLET_ID)
-    keyDescriptions.Push ("CTRL-s: save the dynamic world");
+    hudHelper.keyDescriptions.Push ("CTRL-s: save the dynamic world");
 #endif
   /*
   if (phys_engine_id == BULLET_ID)
-    keyDescriptions.Push ("CTRL-n: next environment");
+    hudHelper.keyDescriptions.Push ("CTRL-n: next environment");
   */
   return true;
 }
