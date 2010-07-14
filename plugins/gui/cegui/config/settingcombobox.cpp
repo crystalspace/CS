@@ -121,7 +121,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     std::vector<std::string>::const_iterator it = vals.begin();
     for (size_t i = 0; it != vals.end(); it++, i++)
     {
-      settings.Get(i)->Set(*it);
+      settings.Get(i)->SetFromString(*it);
     }
 
     return true;

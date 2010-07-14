@@ -45,15 +45,15 @@ namespace CS
       ~ConfigEventNotifier();
 
       /// Called when a null-terminated string value has been set.
-      virtual void SetStr (const char* key, const char* value);
+      virtual void Set (const char* key, const char* value);
       /// Called when an integer value has been set.
-      virtual void SetInt (const char* key, int value);
+      virtual void Set (const char* key, int value);
       /// Called when a floating-point value has been set.
-      virtual void SetFloat (const char* key, float value);
+      virtual void Set (const char* key, float value);
       /// Called when a boolean value has been set.
-      virtual void SetBool (const char* key, bool value);
+      virtual void Set (const char* key, bool value);
       /// Called when a tuple value has been set.
-      virtual void SetTuple (const char* key, iStringArray* value);
+      virtual void Set (const char* key, iStringArray* value);
 
     private:
       iObjectRegistry* obj_reg;
@@ -74,7 +74,11 @@ namespace CS
         eventQueue = csQueryRegistry<iEventQueue> (obj_reg);
         nameRegistry = csEventNameRegistry::GetRegistry(obj_reg);
 
-        eventQueue->RegisterListener (this, nameRegistry->GetID(key));
+        csString eventName = "crystalspace.config.";
+        eventName += key;
+        eventName.Downcase();
+
+        eventQueue->RegisterListener (this, nameRegistry->GetID(eventName.GetData()));
       }
 
       ~ConfigListener()
@@ -93,7 +97,6 @@ namespace CS
 
       virtual bool HandleEvent(iEvent& ev)
       {
-        printf("ConfigListener::HandleEvent 1\n");
         if (ev.Retrieve("value", value) != csEventErrNone)
           printf("E: ConfigListener::HandleEvent failed!\n");
         return true;
@@ -102,6 +105,16 @@ namespace CS
       CS_EVENTHANDLER_NAMES ("crystalspace.ConfigListener")
       CS_EVENTHANDLER_NIL_CONSTRAINTS
     };
+
+    template<>
+    bool ConfigListener<csString>::HandleEvent(iEvent& ev)
+    {
+      const char* tmp;
+      if (ev.Retrieve("value", tmp) != csEventErrNone)
+        printf("E: ConfigListener<csString>::HandleEvent failed!\n");
+      value = tmp;
+      return true;
+    }
 
     
   } // namespace Utility

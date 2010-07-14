@@ -72,6 +72,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
       template<typename T>
       void Set(const T& value);
 
+      template<typename T>
+      void SetFromOther(const T& value);
+
       CEGUI::String GetAsString();
       void SetFromString(const CEGUI::String& value);
     };
@@ -87,6 +90,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     template<> void Setting::Set<float>(const float& value);
     template<> void Setting::Set<CEGUI::String>(const CEGUI::String& value);
     template<> void Setting::Set<std::string>(const std::string& value);
+
+    template void Setting::SetFromOther(const bool& value);
+    template void Setting::SetFromOther(const int& value);
+    template void Setting::SetFromOther(const float& value);
 
 } CS_PLUGIN_NAMESPACE_END(cegui)
 

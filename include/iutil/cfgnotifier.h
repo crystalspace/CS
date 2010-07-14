@@ -35,15 +35,15 @@ struct iConfigListener : public virtual iBase
   SCF_INTERFACE(iConfigListener, 1,0,0);
 
   /// Called when a null-terminated string value has been set.
-  virtual void SetStr (const char* key, const char* value) = 0;
+  virtual void Set (const char* key, const char* value) = 0;
   /// Called when an integer value has been set.
-  virtual void SetInt (const char* key, int value) = 0;
+  virtual void Set (const char* key, int value) = 0;
   /// Called when a floating-point value has been set.
-  virtual void SetFloat (const char* key, float value) = 0;
+  virtual void Set (const char* key, float value) = 0;
   /// Called when a boolean value has been set.
-  virtual void SetBool (const char* key, bool value) = 0;
+  virtual void Set (const char* key, bool value) = 0;
   /// Called when a tuple value has been set.
-  virtual void SetTuple (const char* key, iStringArray* value) = 0;
+  virtual void Set (const char* key, iStringArray* value) = 0;
 };
 
 /**

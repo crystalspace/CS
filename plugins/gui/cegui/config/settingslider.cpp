@@ -78,7 +78,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
       csRef<Setting> setting = settings.Get(i);
       if (setting->IsValid())
       {
-        setting->Set(val);
+        setting->SetFromOther(val);
         value->setText(setting->GetAsString());
       }
     }

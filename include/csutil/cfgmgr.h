@@ -273,11 +273,12 @@ private:
 
   csRefArray<iConfigListener> listeners;
 
-  void NotifyListenersSetFloat(const char* key, float value);
-  void NotifyListenersSetInt(const char* key, int value);
-  void NotifyListenersSetBool(const char* key, bool value);
-  void NotifyListenersSetStr(const char* key, const char* value);
-  void NotifyListenersSetTuple(const char* key, iStringArray* value);
+  template<typename T>
+  void NotifyListeners(const char* key, T value)
+  {
+    for (size_t i = 0; i < listeners.GetSize(); i++)
+      listeners.Get(i)->Set(key, value);
+  }
 };
 
 #endif // __CS_CFGMGR_H__

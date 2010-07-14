@@ -18,6 +18,9 @@
 
 #include "setting.h"
 
+#include <iostream>
+#include <sstream>
+
 #include "CEGUIPropertyHelper.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
@@ -111,6 +114,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
       default:
         break;
       }
+    }
+
+    template<typename T>
+    void Setting::SetFromOther(const T& value)
+    {
+      std::stringstream str;
+      str << value;
+      SetFromString(str.str().c_str());
     }
 
     //--[Bool]------------------------------

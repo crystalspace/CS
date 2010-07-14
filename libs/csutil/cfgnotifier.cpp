@@ -45,61 +45,72 @@ namespace CS
     ConfigEventNotifier::~ConfigEventNotifier()
     {
       csRef<iConfigManager> app_cfg = csQueryRegistry<iConfigManager> (obj_reg);
+      if (!app_cfg) return;
       csRef<iConfigNotifier> cn = scfQueryInterface<iConfigNotifier>(app_cfg);
+      if (!cn) return;
       cn->RemoveListener(this);
     }
 
-    void ConfigEventNotifier::SetStr (const char* key, const char* value)
+    void ConfigEventNotifier::Set (const char* key, const char* value)
     {
-      printf("ConfigEventNotifier::Set char 1\n");
       if (eventQueue && nameRegistry)
       {
-        csRef<iEvent> ev = eventQueue->CreateBroadcastEvent(nameRegistry->GetID(key));
+        csString eventName = "crystalspace.config.";
+        eventName += key;
+        eventName.Downcase();
+        csRef<iEvent> ev = eventQueue->CreateBroadcastEvent(nameRegistry->GetID(eventName.GetData()));
         ev->Add("value", value);
         eventQueue->Post(ev);
       }
     }
 
-    void ConfigEventNotifier::SetInt (const char* key, int value)
+    void ConfigEventNotifier::Set (const char* key, int value)
     {
-      printf("ConfigEventNotifier::Set int 1\n");
       if (eventQueue && nameRegistry)
       {
-        printf("ConfigEventNotifier::Set 2\n");
-        csRef<iEvent> ev = eventQueue->CreateBroadcastEvent(nameRegistry->GetID(key));
+        csString eventName = "crystalspace.config.";
+        eventName += key;
+        eventName.Downcase();
+        csRef<iEvent> ev = eventQueue->CreateBroadcastEvent(nameRegistry->GetID(eventName.GetData()));
         ev->Add("value", value);
         eventQueue->Post(ev);
       }
     }
 
-    void ConfigEventNotifier::SetFloat (const char* key, float value)
+    void ConfigEventNotifier::Set (const char* key, float value)
     {
-      printf("ConfigEventNotifier::Set float 1\n");
       if (eventQueue && nameRegistry)
       {
-        csRef<iEvent> ev = eventQueue->CreateBroadcastEvent(nameRegistry->GetID(key));
+        csString eventName = "crystalspace.config.";
+        eventName += key;
+        eventName.Downcase();
+        csRef<iEvent> ev = eventQueue->CreateBroadcastEvent(nameRegistry->GetID(eventName.GetData()));
         ev->Add("value", value);
         eventQueue->Post(ev);
       }
     }
 
-    void ConfigEventNotifier::SetBool (const char* key, bool value)
+    void ConfigEventNotifier::Set (const char* key, bool value)
     {
-      printf("ConfigEventNotifier::Set bool 1\n");
       if (eventQueue && nameRegistry)
       {
-        csRef<iEvent> ev = eventQueue->CreateBroadcastEvent(nameRegistry->GetID(key));
+        csString eventName = "crystalspace.config.";
+        eventName += key;
+        eventName.Downcase();
+        csRef<iEvent> ev = eventQueue->CreateBroadcastEvent(nameRegistry->GetID(eventName.GetData()));
         ev->Add("value", value);
         eventQueue->Post(ev);
       }
     }
 
-    void ConfigEventNotifier::SetTuple (const char* key, iStringArray* value)
+    void ConfigEventNotifier::Set (const char* key, iStringArray* value)
     {
-      printf("ConfigEventNotifier::Set iStringArray 1\n");
       if (eventQueue && nameRegistry)
       {
-        csRef<iEvent> ev = eventQueue->CreateBroadcastEvent(nameRegistry->GetID(key));
+        csString eventName = "crystalspace.config.";
+        eventName += key;
+        eventName.Downcase();
+        csRef<iEvent> ev = eventQueue->CreateBroadcastEvent(nameRegistry->GetID(eventName.GetData()));
         ev->Add("value", (iBase*)value);
         eventQueue->Post(ev);
       }
