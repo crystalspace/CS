@@ -27,6 +27,7 @@
 #include "iutil/cache.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/cfgnotifier.h"
 #include "iutil/cmdline.h"
 #include "iutil/comp.h"
 #include "iutil/csinput.h"
