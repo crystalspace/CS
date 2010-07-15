@@ -1,5 +1,5 @@
 <cgvp>
-  <variablemap variable="light 0 position" destination="LightPos" />
+  <variablemap variable="light position world[0]" destination="LightPos" />
 <program>
 <![CDATA[
 
@@ -13,23 +13,21 @@ struct app2vertex {
 struct vertex2fragment { 
 	float4 HPosition : POSITION;
 	float3 LightVec : TEXCOORD0;	
-	float3 WorldNormal : TEXCOORD1;		
-	float3 WorldView: TEXCOORD2;
-	float3 AmbientColor: TEXCOORD3;
+	float3 WorldNormal : TEXCOORD1;	
+	float3 WorldTangent : TEXCOORD2;	
+	float3 WorldView: TEXCOORD3;
 };
 
 // main function
 vertex2fragment main (app2vertex IN,
 	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
 	uniform float4x4 ModelViewProj : state.matrix.mvp,
-	uniform float4 LightPos)
+	uniform float3 LightPos)
 {
-	LightPos = float4(9000, 0, 0, 0);
-	float3 PointLightColor = 0.1;
-
 	vertex2fragment OUT;
 
-	OUT.WorldNormal = IN.Tangent;
+	OUT.WorldNormal = IN.Normal;
+	OUT.WorldTangent = IN.Tangent;
 	
 	// position in object coords:	
 	float4 Po = float4(IN.Position.x, IN.Position.y, IN.Position.z, 1.0);
@@ -43,12 +41,6 @@ vertex2fragment main (app2vertex IN,
 	OUT.WorldView = normalize(ModelViewIT[3].xyz - Pw);
 	// pos in clip coords:
 	OUT.HPosition = mul(ModelViewProj, Po);
-	
-	// compute point light lighting  
-	float3 Delta = OUT.LightVec;
-	float pointLightDist = sqrt( dot( Delta, Delta ) ) * (1.0 / 400.0);
-	float att = min(1, max( 0, pointLightDist ) );
-	OUT.AmbientColor = (1.0 - att) * PointLightColor;
 	  
 	return OUT;	// output of vertex shader
 }

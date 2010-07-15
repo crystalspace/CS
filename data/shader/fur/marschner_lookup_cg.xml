@@ -1,4 +1,4 @@
-<shader compiler="xmlshader" name="marschner_lookup_cg">
+<shader compiler="xmlshader" name="marschner_lookup_cg" lights="1">
     <technique priority="200">
     <pass>
       <buffer source="normal" destination="normal" />

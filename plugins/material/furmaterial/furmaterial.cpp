@@ -182,6 +182,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     }
 
     factoryState -> CalculateNormals();
+    factoryState -> Invalidate();
 
     // Make a ball using the genmesh plug-in.
     csRef<iMeshWrapper> meshWrapper =
@@ -212,15 +213,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRenderBufferLock<csVector3> norms (normals, CS_BUF_LOCK_READ);
     CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);    
     csArray<int> uniqueIndices;
-
-    // height map
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-
-    csRef<iDataBuffer> heightmapDB = heightmap->Readback(readbackFmt);
-    int heightmapW, heightmapH;
-    heightmap->GetOriginalDimensions(heightmapW, heightmapH);
-    uint8* heightmapData = heightmapDB->GetUint8();
 
     // choose unique indices
     while (tris.HasNext())
@@ -267,17 +259,69 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     }
   }
 
+  float FurMaterial::TriangleAreaDensity(csGuideHair A, csGuideHair B, csGuideHair C)
+  {
+    csVector2 a = csVector2(A.uv.x * densitymapW, A.uv.y * densitymapH);
+    csVector2 b = csVector2(B.uv.x * densitymapW, B.uv.y * densitymapH);
+    csVector2 c = csVector2(C.uv.x * densitymapW, C.uv.y * densitymapH);
+
+    float baseA = csVector2::Norm(b - c);
+    float baseB = csVector2::Norm(a - c);
+    float baseC = csVector2::Norm(b - a);
+
+    float s = (baseA + baseB + baseC) / 2.0f;
+    float area = sqrt(s * (s - baseA) * (s - baseB) * (s - baseC));
+
+    if (area < EPSILON)
+      return 0;
+
+    float hA = (2 * area) / baseA;
+    float hB = (2 * area) / baseB;
+    float hC = (2 * area) / baseC;
+
+    float density = 0;
+    int count = 0;
+
+    for( float bA = 0.0; bA <= 1.0; bA += 1 / hA )
+      for (float bB = 0.0; bB <= 1.0 - bA; bB += 1 / baseA)
+      {
+        count++;
+        float bC = 1 - bA - bB;
+        csVector2 newPoint = a * bA + b * bB + c * bC;
+        density += densitymapData[4 * ((int)newPoint.x + (int)newPoint.y * densitymapW )];
+      }
+
+    for( float bB = 0.0; bB <= 1.0; bB += 1 / hB )
+      for (float bA = 0.0; bA <= 1.0 - bB; bA += 1 / baseB)
+      {
+        count++;
+        float bC = 1 - bA - bB;
+        csVector2 newPoint = a * bA + b * bB + c * bC;
+        density += densitymapData[4 * ((int)newPoint.x + (int)newPoint.y * densitymapW )];
+      }
+
+    for( float bC = 0.0; bC <= 1.0; bC += 1 / hC )
+      for (float bA = 0.0; bA <= 1.0 - bC; bA += 1 / baseC)
+      {
+        count++;
+        float bB = 1 - bA - bC;
+        csVector2 newPoint = a * bA + b * bB + c * bC;
+        density += densitymapData[4 * ((int)newPoint.x + (int)newPoint.y * densitymapW )];
+      }
+
+    if (count != 0)
+      density /= count;
+
+    // the old method based on average mean
+//     density = (densitymapData[ 4 * ((int)a.x + (int)a.y * densitymapW )] + 
+//       densitymapData[ 4 * ((int)b.x + (int)b.y * densitymapW )] + 
+//       densitymapData[ 4 * ((int)c.x + (int)c.y * densitymapW )] ) / (3.0f);
+
+    return density;
+  }
+
   void FurMaterial::GenerateGuideHairsLOD()
   {
-    // density map
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-
-    csRef<iDataBuffer> densitymapDB = densitymap->Readback(readbackFmt);
-    int densitymapW, densitymapH;
-    densitymap->GetOriginalDimensions(densitymapW, densitymapH);
-    uint8* densitymapData = densitymapDB->GetUint8();
-
     // generate guide hairs for LOD
     for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
     {
@@ -304,14 +348,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       else
         C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
 
-      // average density - modify to use convolution matrix or such
-      float density = (densitymapData[ 4 * ((int)(A.uv.x * densitymapW) + 
-        (int)(A.uv.y * densitymapH) * densitymapW )] + 
-        densitymapData[ 4 * ((int)(B.uv.x * densitymapW) + 
-        (int)(B.uv.y * densitymapH) * densitymapW )] + 
-        densitymapData[ 4 * ((int)(C.uv.x * densitymapW) + 
-        (int)(C.uv.y * densitymapH) * densitymapW )] ) / (3.0f);
- 
       // triangle area
       if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
         ( C.controlPointsCount == 0 ) )
@@ -329,6 +365,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       float s = (a + b + c) / 2.0f;
       float area = sqrt(s * (s - a) * (s - b) * (s - c));
+
+      // average density - modify to use convolution matrix or such
+      float density = TriangleAreaDensity(A, B, C);
 
       //csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
 
@@ -401,20 +440,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::GenerateHairStrands ()
   {
-    // density map
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-
-    csRef<iDataBuffer> densitymapDB = densitymap->Readback(readbackFmt);
-    int densitymapW, densitymapH;
-    densitymap->GetOriginalDimensions(densitymapW, densitymapH);
-    uint8* densitymapData = densitymapDB->GetUint8();
-
-    csRef<iDataBuffer> heightmapDB = heightmap->Readback(readbackFmt);
-    int heightmapW, heightmapH;
-    heightmap->GetOriginalDimensions(heightmapW, heightmapH);
-    uint8* heightmapData = heightmapDB->GetUint8();
-
     float bA, bB, bC; // barycentric coefficients
 
     // for every triangle
@@ -443,14 +468,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       else
         C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
 
-      // average density - modify to use convolution matrix or such
-      float density = (densitymapData[ 4 * ((int)(A.uv.x * densitymapW) + 
-        (int)(A.uv.y * densitymapH) * densitymapW )] + 
-        densitymapData[ 4 * ((int)(B.uv.x * densitymapW) + 
-        (int)(B.uv.y * densitymapH) * densitymapW )] + 
-        densitymapData[ 4 * ((int)(C.uv.x * densitymapW) + 
-        (int)(C.uv.y * densitymapH) * densitymapW )] ) / (3.0f);
-
       // triangle area
       if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
         ( C.controlPointsCount == 0 ) )
@@ -463,6 +480,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       float s = (a + b + c) / 2.0f;
       float area = sqrt(s * (s - a) * (s - b) * (s - c));
+
+      // average density - modify to use convolution matrix or such
+      float density = TriangleAreaDensity(A, B, C);
 
 //       csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
 
@@ -619,21 +639,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::SaveUVImage()
   {
-    // density map
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-
-    csRef<iDataBuffer> densitymapDB = densitymap->Readback(readbackFmt);
-    int densitymapW, densitymapH;
-    densitymap->GetOriginalDimensions(densitymapW, densitymapH);
-    uint8* densitymapData = densitymapDB->GetUint8();
-
-    // height map
-    csRef<iDataBuffer> heightmapDB = heightmap->Readback(readbackFmt);
-    int heightmapW, heightmapH;
-    heightmap->GetOriginalDimensions(heightmapW, heightmapH);
-    uint8* heightmapData = heightmapDB->GetUint8();
-
     //csPrintf("%s\n", densitymap->GetImageName());
 
     // from normal guide ropes
@@ -792,6 +797,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     CS::ShaderVarName densityFactorName (svStrings, "densityFactor");	
     material->GetVariable(densityFactorName)->GetValue(densityFactor);
 
+    // density map
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+
+    csRef<iDataBuffer> densitymapDB = densitymap->Readback(readbackFmt);
+    densitymap->GetOriginalDimensions(densitymapW, densitymapH);
+    densitymapData = densitymapDB->GetUint8();
+
     // apply a Gaussian blur
     GaussianBlur(densitymap);
   }
@@ -808,6 +821,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     CS::ShaderVarName strictHeightmapName (svStrings, "strictHeightmap");	
     material->GetVariable(strictHeightmapName)->GetValue(strictHeightmap);
+
+    // height map
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+
+    csRef<iDataBuffer> heightmapDB = heightmap->Readback(readbackFmt);
+    heightmap->GetOriginalDimensions(heightmapW, heightmapH);
+    heightmapData = heightmapDB->GetUint8();
   }
 
   void FurMaterial::SetDisplaceDistance()
@@ -982,11 +1003,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     if (!numberOfStrains)
       return;
 
-    csVector3 *vbuf = furMaterial->factoryState->GetVertices (); 
+    csVector3 *vbuf = furMaterial->factoryState->GetVertices(); 
+    csVector3 *normals = furMaterial->factoryState->GetNormals(); 
     iRenderBuffer *tangents = furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT);
     csRenderBufferLock<csVector3> tan (tangents, CS_BUF_LOCK_NORMAL);
 
-    csVector3 tangent, binormal, cameraOrigin;
+    csVector3 normal, tangent, binormal, cameraOrigin;
     csVector3 strip, firstPoint, secondPoint;
 
     cameraOrigin = tc.GetOrigin();
@@ -1014,7 +1036,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       int controlPointsCount = furMaterial->hairStrands.Get(x).controlPointsCount;
 
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
-        vbuf += 2, tangentBuffer += 2, tanShift ++ )
+        vbuf += 2, tangentBuffer += 2, tanShift ++, normals += 2 )
       {
         firstPoint = *controlPoints;
         secondPoint = *(controlPoints + 1);
@@ -1026,10 +1048,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         (*vbuf) = firstPoint;
         (*(vbuf + 1)) = firstPoint + strip;
 
-        tangent = (secondPoint - firstPoint);
-//         tangent.Normalize();
-//         normal.Cross(binormal, tangent);
+        tangent = firstPoint - secondPoint;
+        tangent.Normalize();
+        normal.Cross(tangent, binormal);
         
+        (*normals) = normal;
+        (*(normals + 1)) = normal;
+
         tangent += (*tanShift);
 
         (*tangentBuffer) = tangent;
@@ -1042,13 +1067,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       (*tangentBuffer) = tangent;
       (*(tangentBuffer + 1)) = tangent;
 
+      (*normals) = normal;
+      (*(normals + 1)) = normal;
+
       vbuf += 2;
       tangentBuffer += 2;
+      normals += 2;
       tanShift ++;
     }
 
 //     furMaterial->factoryState->CalculateNormals();
-//     furMaterial->factoryState->Invalidate();
+    furMaterial->factoryState->Invalidate();
 // 
 //     furMaterial->factoryState->AddRenderBuffer(CS_BUFFER_TANGENT, 
 //       furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT));

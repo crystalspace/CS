@@ -156,8 +156,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iShaderVarStringSet> svStrings;
     /// Density & Height maps
     iTextureHandle* densitymap;
+    int densitymapW, densitymapH;
+    uint8* densitymapData;
     float densityFactor;
     iTextureHandle* heightmap;
+    int heightmapW, heightmapH;
+    uint8* heightmapData;
     float heightFactor;
     float displaceDistance;
     float strandWidth;
@@ -172,6 +176,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     void SynchronizeGuideHairs();
     void GenerateGuideHairsLOD();
     void GenerateHairStrands();
+    float TriangleAreaDensity(csGuideHair A, csGuideHair B, csGuideHair C);
     /// debug
     void GaussianBlur(iTextureHandle* texture);
     void SaveUVImage();

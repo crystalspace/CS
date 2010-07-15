@@ -1,6 +1,8 @@
 <cgfp>
-  <variablemap variable="light 0 diffuse" destination="DiffuseCol" />
-  <variablemap variable="hair color" destination="objColor" />
+  <variablemap variable="light diffuse[0]" destination="LightColor" />
+  <variablemap variable="light ambient" destination="AmbientColor" />
+  <variablemap variable="diffuse type" destination="DiffuseType" />
+  <variablemap variable="hair color" destination="HairColor" />
   <variablemap variable="constants M" destination="constantsM" />  
   <program>
         <![CDATA[
@@ -8,21 +10,22 @@
 struct vertex2fragment { 
 	float4 HPosition : POSITION;
 	float3 LightVec : TEXCOORD0;	
-	float3 WorldNormal : TEXCOORD1;		
-	float3 WorldView: TEXCOORD2;
-	float3 AmbientColor: TEXCOORD3;	
+	float3 WorldNormal : TEXCOORD1;
+	float3 WorldTangent : TEXCOORD2;
+	float3 WorldView: TEXCOORD3;
 };
 
 float4 main (vertex2fragment IN,
 			// Lookup tables for the hair model (fixed point)
 			uniform sampler2D lookup1fixed,
 			uniform sampler2D lookup2fixed,
-			uniform float DiffuseCol,
-			uniform float4 objColor,
+			uniform int DiffuseType,
+			uniform float3 AmbientColor,
+			uniform float3 LightColor,
+			uniform float4 HairColor,
 			uniform float3 constantsM) : COLOR
 {
 	float4 OUT = float4(0, 0, 0, 1);
-    DiffuseCol = 0.55;
 	
 	float MR_ct = constantsM.x;
 	float MTT_ct = constantsM.y;
@@ -30,10 +33,11 @@ float4 main (vertex2fragment IN,
 	
 	float3 Ln = normalize(IN.LightVec);
 	float3 Nn = normalize(IN.WorldNormal);
-	float3 Vn = normalize(IN.WorldView);	
+	float3 Tn = normalize(IN.WorldTangent);
+	float3 Vn = normalize(IN.WorldView);
 	
-	float sin_qi = dot(Nn, Ln);
-	float sin_qo = dot(Nn, Vn);
+	float sin_qi = dot(Tn, Ln);
+	float sin_qo = dot(Tn, Vn);
 	
 	/* Compute the longitudinal reflectance component */
 	float2 uv1 = float2( sin_qi , sin_qo ) * 0.5 + 0.5;
@@ -43,8 +47,8 @@ float4 main (vertex2fragment IN,
 	M.y *= MTT_ct;
 	M.z *= MTRT_ct;
 	
-	float3 lightPerp = normalize(Ln - sin_qi * Nn);
-	float3 eyePerp = normalize(Vn - sin_qo * Nn);
+	float3 lightPerp = normalize(Ln - sin_qi * Tn);
+	float3 eyePerp = normalize(Vn - sin_qo * Tn);
 	
 	float cos_fd = dot( eyePerp, lightPerp ) * rsqrt( dot( eyePerp, eyePerp ) * dot( lightPerp, lightPerp ));
 	float cos_qd = cos( ( asin( sin_qi ) - asin( sin_qo ) ) / 2.0 );
@@ -54,20 +58,30 @@ float4 main (vertex2fragment IN,
 	float2 uv2 = float2( cos_fd, cos_qd ) * 0.5 + 0.5;
 	float4 N = tex2D(lookup2fixed, uv2);
 	
-    /* Compute diffuse lighting with phi-dependent component */
-    float diffuse = sqrt(max(0.0001, 1 - uv1.x * uv1.x));
-
     /* Pass colors */
 	float4 diffuseColor;
-    diffuseColor.rgb = diffuse * objColor.rgb * DiffuseCol;
-    diffuseColor.a = objColor.a;
+    diffuseColor.a = HairColor.a;
+
+	if (DiffuseType == 0)	//	no diffuse light
+		diffuseColor = 0;
+	else if (DiffuseType == 1)	//	standard diffuse light
+		diffuseColor.rgb = 0.5 * max (dot(Nn, -Ln) , 0.2) * LightColor;
+	else if (DiffuseType == 2)	//	marschner diffuse from NVIDIA Nalu
+		diffuseColor.rgb = 0.4 * sqrt(max(0.0001, 1 - sin_qi * sin_qi)) * LightColor;
+	else if (DiffuseType == 3)	//	a test diffuse that looks good on the current hair color
+		diffuseColor.rgb = LightColor * HairColor.xyz * HairColor.xyz;
+	else if (DiffuseType == 4)	//	Kajiya and Kay diffuse
+		diffuseColor.rgb = 0.4 * sin(acos(sin_qi)) * LightColor;
+	else	//	ambiental instead of diffuse
+		diffuseColor.rgb = 0.2 * LightColor;
+		
+
+	float3 specularColor = ( M.r * N.r + M.g * N.g + M.b * N.b ) /  max(0.2, cos_qd * cos_qd);
+	specularColor *= LightColor;
 	
-	float3 lighting = ( M.r * N.r + M.g * N.g + M.b * N.b ) /  max(0.2, cos_qd * cos_qd);
-	lighting += diffuseColor.rgb;
+	OUT.xyz = specularColor + HairColor.xyz * (diffuseColor + AmbientColor);
 	
-	OUT.xyz = lighting + diffuseColor.rgb * 0.2 + IN.AmbientColor;
-	
-	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd) + objColor.xyz;
+	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd) + HairColor.xyz;
 	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / max(0.2, cos_qd * cos_qd);
 	//OUT.xyz = N.a;
 	return OUT;

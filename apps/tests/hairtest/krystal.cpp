@@ -382,17 +382,13 @@ bool KrystalScene::CreateAvatar ()
   if (!svStrings) 
     csPrintfErr ("No SV names string set!");
 
-  csRef<iLight> mainLight = hairTest->room->GetLights()->Get(0); 
+  hairTest->room->GetLights()->RemoveAll();
 
-  CS::ShaderVarName lightPositionName (svStrings, "light 0 position");	
-  materialWrapper->GetMaterial()-> GetVariableAdd(lightPositionName)
-    ->SetValue(mainLight->GetMovable()->GetFullPosition());
-
-  CS::ShaderVarName lightDiffuse (svStrings, "light 0 diffuse");	
-  materialWrapper->GetMaterial()-> GetVariableAdd(lightDiffuse)
-    ->SetValue(mainLight->GetColor());
-
-  //hairTest->room->GetLights()->RemoveAll();
+  // This light is for the background
+  csRef<iLight> light = 
+    hairTest->engine->CreateLight(0, csVector3(10,10, 0), 9000, csColor (1));
+  light->SetAttenuationMode (CS_ATTN_NONE);
+  hairTest->room->GetLights()->Add (light);
 
   // Start animation
   rootNode->Play ();
