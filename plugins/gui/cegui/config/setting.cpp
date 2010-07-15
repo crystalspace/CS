@@ -123,6 +123,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
       str << value;
       SetFromString(str.str().c_str());
     }
+    
+    template void Setting::SetFromOther(const bool& value);
+    template void Setting::SetFromOther(const int& value);
+    template void Setting::SetFromOther(const float& value);
 
     //--[Bool]------------------------------
     template<>

@@ -91,10 +91,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     template<> void Setting::Set<CEGUI::String>(const CEGUI::String& value);
     template<> void Setting::Set<std::string>(const std::string& value);
 
-    template<> void Setting::SetFromOther<bool>(const bool& value);
-    template<> void Setting::SetFromOther<int>(const int& value);
-    template<> void Setting::SetFromOther<float>(const float& value);
-
 } CS_PLUGIN_NAMESPACE_END(cegui)
 
 #endif // SETTING_H
