@@ -29,7 +29,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
 class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
-  csObject, iRigidBody, iBulletRigidBody>, public BulletBody
+    csObject, iRigidBody, iBulletRigidBody>
 {
   friend class csBulletMotionState;
   friend class csBulletKinematicMotionState;
@@ -38,6 +38,8 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
   friend class csBulletJoint;
   friend class csBulletPivotJoint;
   friend class csBulletSoftBody;
+
+  csBulletBodyType bodyType;
 
   csBulletDynamicsSystem* dynSys;
   btRigidBody* body;
@@ -69,6 +71,10 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
 public: 
   csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic = false);
   virtual ~csBulletRigidBody ();
+
+  //-- iBulletBody
+  virtual csBulletBodyType GetType ()
+  { return bodyType; }
 
   //-- iRigidBody
   virtual iObject* QueryObject (void) { return (iObject*) this; }

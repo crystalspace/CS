@@ -42,13 +42,6 @@ class csBulletTerrainCollider;
 class csBulletTerrainCellCollider;
 class csBulletDefaultMoveCallback;
 
-struct BulletBody
-{
-  virtual ~BulletBody () {}
-
-  csBulletBodyType bodyType;
-};
-
 /**
  * This is the implementation for the actual plugin.
  * It is responsible for creating iDynamicSystem.

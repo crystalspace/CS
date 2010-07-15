@@ -285,12 +285,12 @@ void csBulletDynamicsSystem::CheckCollisions ()
     if (contactManifold->getNumContacts ())
     {
       csBulletRigidBody *cs_obA =
-	dynamic_cast<csBulletRigidBody*> ((BulletBody*) obA->getUserPointer ());
+	dynamic_cast<csBulletRigidBody*> ((iBulletBody*) obA->getUserPointer ());
       if (cs_obA)
 	CheckCollision(*cs_obA, obB, *contactManifold);
 
       csBulletRigidBody *cs_obB =
-	dynamic_cast<csBulletRigidBody*> ((BulletBody*) obB->getUserPointer ());
+	dynamic_cast<csBulletRigidBody*> ((iBulletBody*) obB->getUserPointer ());
       if (cs_obB)
 	CheckCollision(*cs_obB, obA, *contactManifold);
     }
@@ -613,15 +613,16 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
 
   if (rayCallback.hasHit())
   {
-    BulletBody* bulletBody =
-      static_cast<BulletBody*> (rayCallback.m_collisionObject->getUserPointer ());
+    iBulletBody* bulletBody =
+      static_cast<iBulletBody*> (rayCallback.m_collisionObject->getUserPointer ());
 
-    switch (bulletBody->bodyType)
+    switch (bulletBody->GetType ())
       {
       case CS_BULLET_RIGID_BODY:
 	{
 	  result.hasHit = true;
 	  result.bodyType = CS_BULLET_RIGID_BODY;
+	  result.body = bulletBody;
 	  result.rigidBody = dynamic_cast<csBulletRigidBody*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
 				     inverseInternalScale);
@@ -635,6 +636,7 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
 	{
 	  result.hasHit = true;
 	  result.bodyType = CS_BULLET_TERRAIN;
+	  result.body = bulletBody;
 	  result.terrain = dynamic_cast<iBulletTerrainCollider*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
 				     inverseInternalScale);
@@ -652,6 +654,7 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
 	{
 	  result.hasHit = true;
 	  result.bodyType = CS_BULLET_SOFT_BODY;
+	  result.body = bulletBody;
 	  result.softBody = dynamic_cast<csBulletSoftBody*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
 				     inverseInternalScale);

@@ -197,7 +197,7 @@ void csBulletRigidBody::RebuildBody ()
 
   // create new rigid body
   body = new btRigidBody (infos);
-  body->setUserPointer ((BulletBody*) this);
+  body->setUserPointer ((iBulletBody*) this);
   dynSys->bulletWorld->addRigidBody (body);
   insideWorld = true;
 

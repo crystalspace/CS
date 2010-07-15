@@ -52,6 +52,11 @@ enum csBulletBodyType
   CS_BULLET_TERRAIN                 /*!< The body is a terrain collider. */
 };
 
+struct iBulletBody : public virtual iBase
+{
+  virtual csBulletBodyType GetType () = 0;
+};
+
 /**
  * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
  * whether a rigid body, a soft body or a physical terrain collider has been hit.
@@ -73,6 +78,11 @@ struct csBulletHitBeamResult
    * The type of the body that was hit.
    */
   csBulletBodyType bodyType;
+
+  /**
+   * The resulting body that was hit, or 0 if no body was hit.
+   */
+  iBulletBody* body;
 
   /**
    * The resulting rigid body that was hit, or 0 if no rigid body was hit.
@@ -344,7 +354,7 @@ struct iBulletDynamicSystem : public virtual iBase
  * A soft body can neither be static or kinematic, it is always dynamic.
  * \sa iRigidBody iBulletRigidBody iSoftBodyAnimationControl csBulletSoftBodyHelper
  */
-struct iBulletSoftBody : public virtual iBase
+struct iBulletSoftBody : public iBulletBody
 {
   SCF_INTERFACE(iBulletSoftBody, 2, 0, 2);
 
@@ -520,7 +530,7 @@ enum csBulletState
  * interface.
  * \sa iRigidBody iBulletSoftBody
  */
-struct iBulletRigidBody : public virtual iBase
+struct iBulletRigidBody : public iBulletBody
 {
   SCF_INTERFACE(iBulletRigidBody, 1, 0, 1);
 
@@ -643,7 +653,7 @@ struct iBulletPivotJoint : public virtual iBase
 /**
  * A terrain collider for the dynamic simulation.
  */
-struct iBulletTerrainCollider : public virtual iBase
+struct iBulletTerrainCollider : public iBulletBody
 {
   SCF_INTERFACE (iBulletTerrainCollider, 1, 0, 0);
 

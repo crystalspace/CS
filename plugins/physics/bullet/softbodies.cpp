@@ -46,7 +46,7 @@ csBulletSoftBody::csBulletSoftBody (csBulletDynamicsSystem* dynSys,
   : scfImplementationType (this), dynSys (dynSys), body (body)
 {
   bodyType = CS_BULLET_SOFT_BODY;
-  body->setUserPointer ((BulletBody*) this);
+  body->setUserPointer ((iBulletBody*) this);
 }
 
 csBulletSoftBody::~csBulletSoftBody ()

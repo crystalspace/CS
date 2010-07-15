@@ -111,7 +111,7 @@ class HeightMapCollider
 {
  public:
   HeightMapCollider (csBulletDynamicsSystem* dynSys,
-		     BulletBody* csBody,
+		     iBulletBody* csBody,
 		     csLockedHeightData gridData,
 		     int gridWidth, int gridHeight,
 		     csVector3 gridSize,
@@ -127,7 +127,7 @@ class HeightMapCollider
 };
 
 class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCellCollider,
-  iBulletTerrainCollider>, public BulletBody
+  iBulletTerrainCollider>
 {
  public:
   csBulletTerrainCellCollider (csBulletDynamicsSystem* dynSys,
@@ -140,17 +140,26 @@ class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCel
 			       float minimumHeight, float maximumHeight);
   virtual ~csBulletTerrainCellCollider ();
 
+  //-- iBulletBody
+  virtual csBulletBodyType GetType ()
+  { return bodyType; }
+
  private:
+  csBulletBodyType bodyType;
   HeightMapCollider* collider;
 };
 
 class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollider,
-  iBulletTerrainCollider, iTerrainCellLoadCallback>, public BulletBody
+  iBulletTerrainCollider, iTerrainCellLoadCallback>
 {
  public:
   csBulletTerrainCollider (csBulletDynamicsSystem* dynSys, iTerrainSystem* terrain,
 			   float minimumHeight, float maximumHeight);
   virtual ~csBulletTerrainCollider ();
+
+  //-- iBulletBody
+  virtual csBulletBodyType GetType ()
+  { return bodyType; }
 
   //-- iTerrainCellLoadCallback
   virtual void OnCellLoad (iTerrainCell *cell);
@@ -158,6 +167,8 @@ class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollide
   virtual void OnCellUnload (iTerrainCell *cell);
 
  private:
+  csBulletBodyType bodyType;
+
   struct ColliderData
   {
     iTerrainCell* cell;

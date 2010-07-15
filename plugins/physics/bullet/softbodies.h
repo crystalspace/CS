@@ -29,13 +29,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
 class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
-    iBulletSoftBody>, public BulletBody
+    iBulletSoftBody>
 {
   friend class csBulletDynamicsSystem;
 
  public:
   csBulletSoftBody (csBulletDynamicsSystem* dynSys, btSoftBody* body);
   ~csBulletSoftBody ();
+
+  //-- iBulletBody
+  virtual csBulletBodyType GetType ()
+  { return bodyType; }
 
   //-- iBulletSoftBody
   virtual void DebugDraw (iView* rview);
@@ -57,6 +61,7 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   virtual csTriangle GetTriangle (size_t index) const;
 
  private:
+  csBulletBodyType bodyType;
   csBulletDynamicsSystem* dynSys;
   btSoftBody* body;
 };
