@@ -12,31 +12,31 @@
     </shader>
     <shader>
       <file>/shader/character/character2.xml</file>
-    </shader>   
+    </shader>
   </shaders>
 	
   <textures>
-    <texture name='kwarz_diffuse2.jpg'>
-      <file>textures/kwarz_diffuse2.jpg</file>
+    <texture name='cat_diffuse.jpg'>
+      <file>textures/cat_diffuse.jpg</file>
     </texture>
     
     <texture name='kwarz_ice.png'>
           <file>textures/ice.png</file>
     </texture>
     
-    <texture name='BUMPkwarz_normals.jpg'>
-      <file>textures/kwarz_normals.jpg</file>
+    <texture name='BUMPcat_normals.jpg'>
+      <file>textures/cat_normals.jpg</file>
       <class>normalmap</class>
     </texture>
   </textures>
   
   <materials>
-    <material name='kwartz-parallaxkwarz_diffuse2.jpg'>
-      <texture>kwarz_diffuse2.jpg</texture>
-      <shader type='depthwrite'>*null</shader>
-      <shader type='diffuse'>character_bump2</shader>
-      <shader type='ambient'>character2</shader>
-      <shadervar type='texture' name='tex normal'>BUMPkwarz_normals.jpg</shadervar>
+      <material name='kwartz-parallaxcat_diffuse.jpg'>
+        <texture>cat_diffuse.jpg</texture>
+        <shader type='depthwrite'>*null</shader>
+        <shader type='diffuse'>character_bump2</shader>
+        <shader type='ambient'>character2</shader>
+        <shadervar type='texture' name='tex normal'>BUMPcat_normals.jpg</shadervar>
     </material>
     
     <material name='kwartz-ice'>
@@ -52,6 +52,6 @@
   </materials>
   
   
-   <library>factories/genkwartz</library>
+   <library>factories/gencatscratch</library>
 
 </library>

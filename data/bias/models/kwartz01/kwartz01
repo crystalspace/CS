@@ -12,12 +12,12 @@
     </shader>
     <shader>
       <file>/shader/character/character2.xml</file>
-    </shader>   
+    </shader>
   </shaders>
 	
   <textures>
-    <texture name='kwarz_diffuse2.jpg'>
-      <file>textures/kwarz_diffuse2.jpg</file>
+    <texture name='kwarz_diffuse.jpg'>
+      <file>textures/kwarz_diffuse.jpg</file>
     </texture>
     
     <texture name='kwarz_ice.png'>
@@ -31,8 +31,8 @@
   </textures>
   
   <materials>
-    <material name='kwartz-parallaxkwarz_diffuse2.jpg'>
-      <texture>kwarz_diffuse2.jpg</texture>
+    <material name='kwartz-parallaxkwarz_diffuse.jpg'>
+      <texture>kwarz_diffuse.jpg</texture>
       <shader type='depthwrite'>*null</shader>
       <shader type='diffuse'>character_bump2</shader>
       <shader type='ambient'>character2</shader>

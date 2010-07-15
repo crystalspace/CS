@@ -38,8 +38,9 @@ Player::Player(iObjectRegistry* obj_reg) : Entity(obj_reg)
   collider_actor.InitializeColliders (view->GetCamera (), legs, body, shift);
   collider_actor.SetCamera (view->GetCamera (), true);
 
-
   weapon->mesh = LoadMesh("gencrossbow", "/data/bias/models/crossbow/crossbow");
+  weapon->attackAnimation = "shoot";
+  weapon->reloadAnimation = "reload";
 
   weapon->mesh->SetFlagsRecursive(CS_ENTITY_NOHITBEAM);
 }

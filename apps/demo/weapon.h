@@ -51,6 +51,8 @@ private:
 
 public:
   csRef<iMeshWrapper> mesh;
+  csString attackAnimation;
+  csString reloadAnimation;
 
 public:
   Weapon(iObjectRegistry*);

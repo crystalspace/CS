@@ -137,6 +137,14 @@ void Entity::RotateCam (float x, float y)
   collider_actor.SetRotation (rot);
 }
 
+void Entity::Stop()
+{
+  desired_velocity = 0;
+  velocity = 0;
+  desired_angle_velocity = 0;
+  angle_velocity = 0;
+}
+
 void Entity::InterpolateMovement ()
 {
   float elapsed = vc->GetElapsedTicks () / 1000.0f;

@@ -19,6 +19,7 @@
 #include "weapon.h"
 
 #include "entity.h"
+#include "monster.h"
 
 Weapon::Weapon(iObjectRegistry* obj_reg) : scfImplementationType(this), object_reg(obj_reg)
 {
@@ -31,6 +32,9 @@ Weapon::Weapon(iObjectRegistry* obj_reg) : scfImplementationType(this), object_r
 
   reloadtime = 1300;
   reloadingtime = 0;
+
+  attackAnimation = "attack";
+  reloadAnimation = "";
 }
 
 void Weapon::Register()
@@ -90,8 +94,8 @@ bool Weapon::Fire()
     iSkeleton* skeleton = animcontrol->GetSkeleton ();
 
     skeleton->StopAll();
-    skeleton->Execute("shoot");
-    skeleton->Append("reload");
+    skeleton->Execute(attackAnimation.GetData());
+    if (!reloadAnimation.IsEmpty())skeleton->Append(reloadAnimation.GetData());
   }
 
   /*
@@ -110,9 +114,18 @@ bool Weapon::Fire()
 
 void Weapon::ApplyDamage(Entity* entity)
 {
-  int type = 0;
+  if (entity->died) return;
+
+  int type = 1;
   int maxHP = 50;
   int points = 50;
+
+  Monster* m = dynamic_cast<Monster*>(entity);
+  if (m)
+  { // Make monsters 'look around' when they're hit
+    // Don't just stand there and take it!
+    m->awareRadius *= 2;
+  }
 
   if (type == 0) // melee damage
   {

@@ -81,6 +81,9 @@ public:
   virtual void RotateCam(float x, float y);
   virtual void InterpolateMovement();
 
+  virtual void Stop();
+
+
   virtual void PlayAnimation(const char*, bool) {}// = 0;
   virtual void Explode() {}// = 0;
   virtual void ChangeMaterial() {}// = 0;

@@ -74,14 +74,16 @@ Monster::Monster(iObjectRegistry* obj_reg, iMeshWrapper* spawn) : Entity(obj_reg
 
   mesh->QueryObject()->ObjAdd(this);
 
+  weapon->mesh = mesh;
 
-  float cfg_body_height = cfg->GetFloat ("Walktest.CollDet.BodyHeight", 1.4f);
+
+  float cfg_body_height = cfg->GetFloat ("Walktest.CollDet.BodyHeight", 0.5f);
   float cfg_body_width = cfg->GetFloat ("Walktest.CollDet.BodyWidth", 0.5f);
   float cfg_body_depth = cfg->GetFloat ("Walktest.CollDet.BodyDepth", 0.5f);
-  float cfg_eye_offset = cfg->GetFloat ("Walktest.CollDet.EyeOffset", -0.7f);
+  float cfg_eye_offset = cfg->GetFloat ("Walktest.CollDet.EyeOffset", 1.2f);
   float cfg_legs_width = cfg->GetFloat ("Walktest.CollDet.LegsWidth", 0.4f);
   float cfg_legs_depth = cfg->GetFloat ("Walktest.CollDet.LegsDepth", 0.4f);
-  float cfg_legs_offset = cfg->GetFloat ("Walktest.CollDet.LegsOffset", -1.1f);
+  float cfg_legs_offset = cfg->GetFloat ("Walktest.CollDet.LegsOffset", 0.0f);
 
   csVector3 legs (cfg_legs_width, cfg_eye_offset-cfg_legs_offset, cfg_legs_depth);
   csVector3 body (cfg_body_width, cfg_body_height, cfg_body_depth);
@@ -89,11 +91,8 @@ Monster::Monster(iObjectRegistry* obj_reg, iMeshWrapper* spawn) : Entity(obj_reg
 
   collider_actor.InitializeColliders (mesh, legs, body, shift);
 
-  collider_actor.SetOnGround(false);
 
-
-
-  awareRadius = 10.0f;
+  awareRadius = curAwareRadius = 10.0f;
 }
 
 Monster::~Monster()
@@ -110,8 +109,10 @@ void Monster::Behaviour()
 
   csRef<iBase> base = csQueryRegistryTag(object_reg, "Player");
   Player* player = dynamic_cast<Player*>(&*base);
+
+  if (!player) return;
   
-  if (player && weapon->IsReady())
+  if (weapon->IsReady())
   {
     //printf("I: player found!\n");
     csVector3 v1, v2;
@@ -120,14 +121,15 @@ void Monster::Behaviour()
 
     if ((v2 - v1).Norm() < 2) // We're at the player
     {
-      Step(0);
+      // Stop all movement.
+      Stop();
       if (weapon->Fire())
       {
         printf("Monster HIT\n");
         weapon->ApplyDamage(player);
       }
     }
-    else if (sqrt (csSquaredDist::PointPoint (v1, v2)) < awareRadius) // chase the player
+    else if (sqrt (csSquaredDist::PointPoint (v1, v2)) < curAwareRadius) // chase the player
     {
       float len = sqrt (csSquaredDist::PointPoint (v1, v2));
       float angle = acos ((v2.x-v1.x) / len);
@@ -140,14 +142,13 @@ void Monster::Behaviour()
 
       Step(-1);
     }
+    else
+    {
+      Step(0);
+      angleToReachFlag = false;
+    }
   }
-  else
-  {
-    Step(0);
-    angleToReachFlag = false;
-  }
-
-
+  
   if (angleToReachFlag)
   {
     float currentAngle = Matrix2YRot(mesh->GetMovable()->GetTransform().GetT2O());
@@ -157,6 +158,7 @@ void Monster::Behaviour()
     {
       csTicks elapsed_time = vc->GetElapsedTicks ();
       float delta = float (elapsed_time) / 1000.0f;
+      delta *= 1700.0f;
       float angle = 100.0f * cfg_rotate_maxspeed * cfg_walk_maxspeed_multreal * delta;
 
       float yrot_delta = fabs (atan2f (sin (desiredAngle - currentAngle), cos (desiredAngle - currentAngle)));
@@ -202,4 +204,61 @@ void Monster::PlayAnimation (const char* script, bool lock)
       skeleton->Append("idle");
     }
   }
+}
+
+void Monster::Explode()
+{
+  // Stop all movement.
+  Stop();
+
+  csVector3 pos = mesh->GetMovable()->GetPosition();
+  iSector* sector = mesh->GetMovable()->GetSectors()->Get(0);
+
+  //Remove old mesh.
+  csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
+  engine->WantToDie(mesh);
+
+  // Change the mesh.
+  mesh = LoadMesh("gengibs", "/data/bias/models/iceblocks/gibs");
+  mesh->GetMovable()->SetPosition(sector, pos);
+  mesh->GetMovable()->UpdateMove();
+
+  collider_actor.InitializeColliders (mesh, csVector3(0), csVector3(0), csVector3(0));
+
+  // Add more gibs
+  iMeshFactoryWrapper* fact = engine->FindMeshFactory("gengibs");
+  csRef<iMeshWrapper> meshexplo;
+
+  //1
+  meshexplo = fact->CreateMeshWrapper();
+  meshexplo->GetMovable()->Transform(csYRotMatrix3(0));
+  meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
+  meshexplo->GetMovable()->UpdateMove();
+
+  //2
+  meshexplo = fact->CreateMeshWrapper();
+  meshexplo->GetMovable()->Transform(csYRotMatrix3(-1.97051f));
+  meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
+  meshexplo->GetMovable()->UpdateMove();
+
+  //3
+  meshexplo = fact->CreateMeshWrapper();
+  meshexplo->GetMovable()->Transform(csYRotMatrix3(2.9665f));
+  meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
+  meshexplo->GetMovable()->UpdateMove();
+}
+
+void Monster::ChangeMaterial()
+{
+  // Get the new material.
+  csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
+  iMaterialWrapper* newmatw = engine->FindMaterial("kwartz-ice");
+  if (!newmatw) return;
+
+  // Get MeshObject.
+  iMeshObject* meshobj = mesh->GetMeshObject();
+  if (!meshobj) return;
+
+  // Change the material.
+  meshobj->SetMaterialWrapper(newmatw);
 }

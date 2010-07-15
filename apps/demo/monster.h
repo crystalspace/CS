@@ -30,7 +30,8 @@ private:
 
   csRef<iMeshWrapper> mesh;
 
-  float awareRadius;
+public:
+  float awareRadius, curAwareRadius;
 
 public:
   Monster(iObjectRegistry*, iMeshWrapper*);
@@ -39,6 +40,9 @@ public:
   virtual void PlayAnimation(const char*, bool);
 
   virtual csVector3 GetPosition();
+
+  virtual void Explode();
+  virtual void ChangeMaterial();
 };
 
 #endif

@@ -287,7 +287,7 @@ void Demo::CreateRoom ()
 {
   room = engine->CreateSector ("room");
 
-#if 0
+#if 1
   bool succ= vfs->Mount("/bias/", "$@data$/bias$/world.zip");
   vfs->ChDir("/bias/");
   bool suc = loader->LoadMapFile("/bias/world", false);
@@ -322,6 +322,9 @@ void Demo::CreateRoom ()
   view->GetCamera()->SetSector(room);
   view->GetCamera()->GetTransform().SetOrigin(csVector3(0,2,0));
 
+  csRef<iCollideSystem> collide_system (csQueryRegistry<iCollideSystem> (object_reg));
+  csColliderHelper::InitializeCollisionWrappers (collide_system, engine);
+
   //monsters
   {
     DensityTextureMapper mapper (0.3f);
@@ -332,9 +335,54 @@ void Demo::CreateRoom ()
 
     // Now we make a factory and a mesh at once.
     csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "entity_kwartz02.006", "monster_factory", &box);
+      engine, room, "entity_kwartz02.001", "monster_factory1", &box);
     m->GetMeshObject ()->SetMaterialWrapper (tm);
     m->GetMovable()->SetPosition(room, csVector3(5,1,5));
+    m->GetMovable()->UpdateMove();
+  }
+
+  {
+    DensityTextureMapper mapper (0.3f);
+    TesselatedBox box (csVector3 (0, 0, 0), csVector3 (1, 2, 1));
+    box.SetLevel (3);
+    box.SetMapper (&mapper);
+    box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+    // Now we make a factory and a mesh at once.
+    csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "entity_kwartz01.002", "monster_factory2", &box);
+    m->GetMeshObject ()->SetMaterialWrapper (tm);
+    m->GetMovable()->SetPosition(room, csVector3(-5,1,-5));
+    m->GetMovable()->UpdateMove();
+  }
+
+  {
+    DensityTextureMapper mapper (0.3f);
+    TesselatedBox box (csVector3 (0, 0, 0), csVector3 (1, 2, 1));
+    box.SetLevel (3);
+    box.SetMapper (&mapper);
+    box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+    // Now we make a factory and a mesh at once.
+    csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "entity_knight.003", "monster_factory3", &box);
+    m->GetMeshObject ()->SetMaterialWrapper (tm);
+    m->GetMovable()->SetPosition(room, csVector3(5,1,-5));
+    m->GetMovable()->UpdateMove();
+  }
+
+  {
+    DensityTextureMapper mapper (0.3f);
+    TesselatedBox box (csVector3 (0, 0, 0), csVector3 (1, 2, 1));
+    box.SetLevel (3);
+    box.SetMapper (&mapper);
+    box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+    // Now we make a factory and a mesh at once.
+    csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "entity_catscratch.004", "monster_factory4", &box);
+    m->GetMeshObject ()->SetMaterialWrapper (tm);
+    m->GetMovable()->SetPosition(room, csVector3(-5,1,5));
     m->GetMovable()->UpdateMove();
   }
 
@@ -342,15 +390,15 @@ void Demo::CreateRoom ()
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (0, csVector3 (-3, 5, 0), 1000,
-        csColor (1, 0, 0));
+        csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (3, 5,  0), 1000,
-        csColor (0, 0, 1));
+        csColor (0, 0, 1), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 5, -3), 1000,
-        csColor (0, 1, 0));
+        csColor (0, 1, 0), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
   ll->Add (light);
 
   engine->Prepare ();
