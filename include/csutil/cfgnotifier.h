@@ -63,28 +63,12 @@ namespace CS
       csRef<iEventNameRegistry> nameRegistry;
     };
 
-    template<typename T>
-    class CS_CRYSTALSPACE_EXPORT ConfigListener :
-      public scfImplementation1<ConfigListener<T>, iEventHandler>
+    class CS_CRYSTALSPACE_EXPORT ConfigListenerBase :
+      public scfImplementation1<ConfigListenerBase, iEventHandler>
     {
     public:
-      ConfigListener(iObjectRegistry* obj_reg, const char* key, T& val)
-        : scfImplementation1<ConfigListener<T>, iEventHandler> (this), obj_reg(obj_reg), value(val)
-      {
-        eventQueue = csQueryRegistry<iEventQueue> (obj_reg);
-        nameRegistry = csEventNameRegistry::GetRegistry(obj_reg);
-
-        csString eventName = "crystalspace.config.";
-        eventName += key;
-        eventName.Downcase();
-
-        eventQueue->RegisterListener (this, nameRegistry->GetID(eventName.GetData()));
-      }
-
-      ~ConfigListener()
-      {
-        if (eventQueue) eventQueue->RemoveListener (this);
-      }
+      ConfigListenerBase (iObjectRegistry* obj_reg, const char* key);
+      ~ConfigListenerBase ();
 
     private:
       iObjectRegistry* obj_reg;
@@ -93,6 +77,21 @@ namespace CS
       /// The event name registry, used to convert event names to IDs and back.
       csRef<iEventNameRegistry> nameRegistry;
 
+      CS_EVENTHANDLER_NAMES ("crystalspace.ConfigListener")
+      CS_EVENTHANDLER_NIL_CONSTRAINTS
+    };
+    
+    template<typename T>
+    class ConfigListener : public scfImplementationExt0<ConfigListener<T>, ConfigListenerBase>
+    {
+    public:
+      ConfigListener(iObjectRegistry* obj_reg, const char* key, T& val)
+        : scfImplementationExt0<ConfigListener<T>, ConfigListenerBase> (this, obj_reg, key),
+	  value(val)
+      {
+      }
+
+    private:
       T& value;
 
       virtual bool HandleEvent(iEvent& ev)
@@ -101,22 +100,31 @@ namespace CS
           printf("E: ConfigListener::HandleEvent failed!\n");
         return true;
       }
-
-      CS_EVENTHANDLER_NAMES ("crystalspace.ConfigListener")
-      CS_EVENTHANDLER_NIL_CONSTRAINTS
     };
 
     template<>
-    bool ConfigListener<csString>::HandleEvent(iEvent& ev)
+    class ConfigListener<csString> : public scfImplementationExt0<ConfigListener<csString>, ConfigListenerBase>
     {
-      const char* tmp;
-      if (ev.Retrieve("value", tmp) != csEventErrNone)
-        printf("E: ConfigListener<csString>::HandleEvent failed!\n");
-      value = tmp;
-      return true;
-    }
+    public:
+      ConfigListener(iObjectRegistry* obj_reg, const char* key, csString& val)
+        : scfImplementationExt0<ConfigListener<csString>, ConfigListenerBase> (this, obj_reg, key),
+	  value (val)
+      {
+      }
 
-    
+    private:
+      csString& value;
+
+      virtual bool HandleEvent(iEvent& ev)
+      {
+	const char* tmp;
+	if (ev.Retrieve("value", tmp) != csEventErrNone)
+	  printf("E: ConfigListener<csString>::HandleEvent failed!\n");
+	value = tmp;
+	return true;
+      }
+    };
+
   } // namespace Utility
 } // namespace CS
 

@@ -116,5 +116,26 @@ namespace CS
       }
     }
     
+    //-----------------------------------------------------------------------
+    
+    ConfigListenerBase::ConfigListenerBase (iObjectRegistry* obj_reg, const char* key)
+      : scfImplementation1<ConfigListenerBase, iEventHandler> (this), obj_reg (obj_reg)
+    {
+      eventQueue = csQueryRegistry<iEventQueue> (obj_reg);
+      nameRegistry = csEventNameRegistry::GetRegistry(obj_reg);
+
+      csString eventName = "crystalspace.config.";
+      eventName += key;
+      eventName.Downcase();
+
+      eventQueue->RegisterListener (this, nameRegistry->GetID (eventName.GetData()));
+    }
+
+    ConfigListenerBase::~ConfigListenerBase ()
+    {
+      if (eventQueue) eventQueue->RemoveListener (this);
+    }
+    
+    
   } // namespace Utility
 } // namespace CS
