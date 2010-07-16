@@ -17,7 +17,7 @@
     <material name='marschner_material'>
       <shader type='standard'>marschner_lookup_cg</shader>
 	  
-	  <shadervar type="int" name="diffuse type">5</shadervar>
+	  <shadervar type="int" name="diffuse type">4</shadervar>
 	  <shadervar type="vector3" name="hair color">0.51, 0.34, 0.25</shadervar>
 <!-- Uncomment the following line for red hair -->	  
 <!--	  

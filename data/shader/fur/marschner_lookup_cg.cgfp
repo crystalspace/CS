@@ -13,6 +13,7 @@ struct vertex2fragment {
 	float3 WorldNormal : TEXCOORD1;
 	float3 WorldTangent : TEXCOORD2;
 	float3 WorldView: TEXCOORD3;
+	float3 TangentShift : TEXCOORD4;	
 };
 
 float4 main (vertex2fragment IN,
@@ -79,8 +80,8 @@ float4 main (vertex2fragment IN,
 	float3 specularColor = ( M.r * N.r + M.g * N.g + M.b * N.b ) /  max(0.2, cos_qd * cos_qd);
 	specularColor *= LightColor;
 	
-	OUT.xyz = specularColor + HairColor.xyz * (diffuseColor + AmbientColor);
-	
+	OUT.xyz = specularColor + (0.8 + 0.4 * IN.TangentShift.x ) * HairColor.xyz * (diffuseColor + AmbientColor);
+	//OUT.xyz = diffuseColor.rgb;
 	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd) + HairColor.xyz;
 	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / max(0.2, cos_qd * cos_qd);
 	//OUT.xyz = N.a;

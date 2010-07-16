@@ -900,6 +900,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     for ( size_t i = 0 ; i < controlPointsCount ; i ++)
       tangentShift[i] = csVector3(furMaterial->rng->Get(), furMaterial->rng->Get(), 
         furMaterial->rng->Get()) * 0.01f;
+
+    iRenderBuffer *binormals = furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_BINORMAL);
+    csRenderBufferLock<csVector3> bin (binormals, CS_BUF_LOCK_NORMAL);
+
+    for ( size_t i = 0 ; i < 2 * controlPointsCount ; i ++)
+      bin[i] = csVector3(furMaterial->rng->Get(), furMaterial->rng->Get(), 
+        furMaterial->rng->Get());
   }
 
   FurAnimationControl::~FurAnimationControl ()

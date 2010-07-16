@@ -16,6 +16,7 @@ struct vertex2fragment {
 	float3 WorldNormal : TEXCOORD1;	
 	float3 WorldTangent : TEXCOORD2;	
 	float3 WorldView: TEXCOORD3;
+	float3 TangentShift : TEXCOORD4;
 };
 
 // main function
@@ -28,6 +29,7 @@ vertex2fragment main (app2vertex IN,
 
 	OUT.WorldNormal = IN.Normal;
 	OUT.WorldTangent = IN.Tangent;
+	OUT.TangentShift = IN.Binormal;
 	
 	// position in object coords:	
 	float4 Po = float4(IN.Position.x, IN.Position.y, IN.Position.z, 1.0);
