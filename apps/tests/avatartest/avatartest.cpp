@@ -336,8 +336,6 @@ bool AvatarTest::Application ()
   if (!csDemoApplication::CreateRoom ())
     return false;
 
-  room->SetDynamicAmbientLight (csColor (0.3f, 0.2f, 0.2f));
-
   // Create the dynamic system
   if (physicsEnabled)
   {
