@@ -434,14 +434,14 @@ private:
 
   struct ImageUnit : public CS::Memory::CustomAllocated
   {
-    GLuint target;    
     csGLBasicTextureHandle* texture;
     
-    ImageUnit (): target (0), texture (0) {}
+    ImageUnit (): texture (0) {}
   };
   GLint numImageUnits;
   ImageUnit* imageUnits;
   GLint numTCUnits;
+  void SetSeamlessCubemapFlag ();
 
   //@{
   /**

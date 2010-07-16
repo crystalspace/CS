@@ -862,6 +862,8 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_EXT_blend_func_separate ();
   ext->InitGL_ARB_occlusion_query ();
   ext->InitGL_GREMEDY_string_marker ();
+  ext->InitGL_ARB_seamless_cube_map ();
+  ext->InitGL_AMD_seamless_cubemap_per_texture ();
   
   // Some 'assumed state' is for extensions, so set again
   CS::PluginCommon::GL::SetAssumedState (statecache, ext);
@@ -2080,6 +2082,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   }
 
   ApplyBufferChanges();
+  SetSeamlessCubemapFlag ();
 
   iRenderBuffer* iIndexbuf = (modes.buffers
   	? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX)
@@ -2869,6 +2872,35 @@ void csGLGraphics3D::ApplyBufferChanges()
     }
   }
   changeQueue.Empty();
+}
+
+void csGLGraphics3D::SetSeamlessCubemapFlag ()
+{
+  if (ext->CS_GL_AMD_seamless_cubemap_per_texture
+      || !ext->CS_GL_ARB_seamless_cube_map)
+    return;
+  
+  bool hasCube = false;
+  bool seamlessFlag = true;
+  for (int unit = 0; unit < numImageUnits; unit++)
+  {
+    if (!imageUnits[unit].texture) continue;
+    if (imageUnits[unit].texture->texType != iTextureHandle::texTypeCube) continue;
+    hasCube = true;
+    if (imageUnits[unit].texture->IsSeamlessCubemapDisabled ())
+    {
+      seamlessFlag = false;
+      break;
+    }
+  }
+  
+  if (hasCube)
+  {
+    if (seamlessFlag)
+      statecache->Enable_GL_TEXTURE_CUBE_MAP_SEAMLESS ();
+    else
+      statecache->Disable_GL_TEXTURE_CUBE_MAP_SEAMLESS ();
+  }
 }
 
 void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
