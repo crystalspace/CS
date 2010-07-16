@@ -82,6 +82,7 @@ struct iFurMaterial : public virtual iMaterial
   SCF_INTERFACE (iFurMaterial, 1, 0, 0);
   /// Generate geometry
   virtual void GenerateGeometry (iView* view, iSector* room) = 0;
+  virtual void SetLOD(float LOD) = 0; 
 
   virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl) = 0;
 

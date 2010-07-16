@@ -373,6 +373,7 @@ bool KrystalScene::CreateAvatar ()
   furMaterial->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
   furMaterial->SetMaterial(skullMaterial->GetMaterial());
   furMaterial->GenerateGeometry(hairTest->view, hairTest->room);
+  furMaterial->SetLOD(0);
 
   // add light info for marschner
   csRef<iShaderVarStringSet> svStrings = 

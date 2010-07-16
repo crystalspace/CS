@@ -118,8 +118,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     SynchronizeGuideHairs();
     GenerateHairStrands();
 
-    SetLOD(0.0f);
-
     SaveUVImage();
 
     this->view = view;
@@ -1021,17 +1019,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     cameraOrigin = tc.GetOrigin();
     csVector3 *tangentBuffer = tan;
     csVector3 *tanShift = tangentShift;
-
-    // set LOD
-    float distance = csVector3::Norm(cameraOrigin - 
-      furMaterial->hairStrands.Get(0).controlPoints[0]);
-
-//     if (distance < 2.0f)
-//       furMaterial->SetLOD(1.0f);
-//     else if (distance < 5.0f)
-//       furMaterial->SetLOD(0.5f);
-//     else
-//       furMaterial->SetLOD(0.0f);
 
     for ( int x = 0 ; x < numberOfStrains ; x ++)
     {
