@@ -26,24 +26,29 @@
 #include "cstool/materialbuilder.h"
 #include "cstool/csdemoapplication.h"
 
-// ------------------------ csDemoCommandLineHelper ------------------------
+namespace CS
+{
+namespace Demo
+{
 
-csDemoCommandLineHelper::csDemoCommandLineHelper (const char* applicationCommand,
-						  const char* applicationCommandUsage,
-						  const char* applicationDescription)
+// ------------------------ CommandLineHelper ------------------------
+
+CommandLineHelper::CommandLineHelper (const char* applicationCommand,
+				      const char* applicationCommandUsage,
+				      const char* applicationDescription)
   : applicationCommand (applicationCommand),
     applicationCommandUsage (applicationCommandUsage),
     applicationDescription (applicationDescription)
 {
 }
 
-void csDemoCommandLineHelper::AddCommandLineOption (const char* option,
+void CommandLineHelper::AddCommandLineOption (const char* option,
 						    const char* description)
 {
   commandOptions.Push (CommandOption (option, description));
 }
 
-void csDemoCommandLineHelper::WriteHelp (iObjectRegistry* registry) const
+void CommandLineHelper::WriteHelp (iObjectRegistry* registry) const
 {
   csPrintf ("%s\n\n", applicationDescription.GetData ());
   csPrintf ("Usage: %s\n\n", applicationCommandUsage.GetData ());
@@ -66,20 +71,20 @@ void csDemoCommandLineHelper::WriteHelp (iObjectRegistry* registry) const
   csCommandLineHelper::Help (registry);
 }
 
-// ------------------------ csDemoHUDHelper ------------------------
+// ------------------------ HUDHelper ------------------------
 
-csDemoHUDHelper::csDemoHUDHelper (csDemoApplication* demoApplication)
+HUDHelper::HUDHelper (DemoApplication* demoApplication)
   : demoApplication (demoApplication), cslogo (0),
     frameCount (0), frameTime (0), currentFPS (0.0f), currentKeyPage (0)
 {
 }
 
-csDemoHUDHelper::~csDemoHUDHelper ()
+HUDHelper::~HUDHelper ()
 {
   delete cslogo;
 }
 
-void csDemoHUDHelper::Initialize ()
+void HUDHelper::Initialize ()
 {
   // Load the font
   csRef<iFontServer> fontServer = demoApplication->g2d->GetFontServer ();
@@ -102,7 +107,7 @@ void csDemoHUDHelper::Initialize ()
   }
 }
 
-bool csDemoHUDHelper::OnKeyboard (iEvent &event)
+bool HUDHelper::OnKeyboard (iEvent &event)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&event);
   if (eventtype == csKeyEventTypeDown)
@@ -116,7 +121,7 @@ bool csDemoHUDHelper::OnKeyboard (iEvent &event)
   return false;
 }
 
-void csDemoHUDHelper::WriteShadow (int x, int y, int fg, const char *str,...)
+void HUDHelper::WriteShadow (int x, int y, int fg, const char *str,...)
 {
   csString buf;
   va_list arg;
@@ -129,7 +134,7 @@ void csDemoHUDHelper::WriteShadow (int x, int y, int fg, const char *str,...)
   Write (x, y, fg, -1, "%s", buf.GetData ());
 }
 
-void csDemoHUDHelper::Write (int x, int y, int fg, int bg, const char *str,...)
+void HUDHelper::Write (int x, int y, int fg, int bg, const char *str,...)
 {
   csString buf;
   va_list arg;
@@ -141,7 +146,7 @@ void csDemoHUDHelper::Write (int x, int y, int fg, int bg, const char *str,...)
   demoApplication->g2d->Write (font, x, y, fg, bg, buf);
 }
 
-void csDemoHUDHelper::DisplayHUD ()
+void HUDHelper::DisplayHUD ()
 {
   // Get elasped time
   csTicks elapsed_time = demoApplication->vc->GetElapsedTicks ();
@@ -226,15 +231,15 @@ void csDemoHUDHelper::DisplayHUD ()
 		  logoMargin);
 }
 
-// ------------------------ csDemoCameraHelper ------------------------
+// ------------------------ CameraHelper ------------------------
 
-csDemoCameraHelper::csDemoCameraHelper (csDemoApplication* demoApplication)
+CameraHelper::CameraHelper (DemoApplication* demoApplication)
   : demoApplication (demoApplication), cameraMode (CSDEMO_CAMERA_MOVE_FREE),
     mouseMoveEnabled (true)
 {
 }
 
-void csDemoCameraHelper::Frame ()
+void CameraHelper::Frame ()
 {
   // Get elasped time
   csTicks elapsed_time = demoApplication->vc->GetElapsedTicks ();
@@ -319,7 +324,7 @@ void csDemoCameraHelper::Frame ()
 			  cameraDist - speed * 4);
 	else
 	  cameraPitch =
-	    csMin<float> (3.14159f * 0.5f + 0.01f, cameraPitch - speed * 2.5f);
+	    csMax<float> (-3.14159f * 0.5f + 0.01f, cameraPitch - speed * 2.5f);
       }
       if (demoApplication->kbd->GetKeyState (CSKEY_DOWN))
       {
@@ -327,7 +332,7 @@ void csDemoCameraHelper::Frame ()
 	  cameraDist += speed * 4;
 	else
 	  cameraPitch =
-	    csMax<float> (-3.14159f * 0.5f - 0.01f, cameraPitch + speed * 2.5f);
+	    csMin<float> (3.14159f * 0.5f - 0.01f, cameraPitch + speed * 2.5f);
       }
       if (demoApplication->kbd->GetKeyState (CSKEY_PGUP))
 	cameraDist =
@@ -343,7 +348,7 @@ void csDemoCameraHelper::Frame ()
   }
 }
 
-bool csDemoCameraHelper::OnMouseDown (iEvent &event)
+bool CameraHelper::OnMouseDown (iEvent &event)
 {
   if (!mouseMoveEnabled)
     return false;
@@ -377,7 +382,7 @@ bool csDemoCameraHelper::OnMouseDown (iEvent &event)
   return false;
 }
 
-bool csDemoCameraHelper::OnMouseUp (iEvent &event)
+bool CameraHelper::OnMouseUp (iEvent &event)
 {
   if (!mouseMoveEnabled)
     return false;
@@ -402,7 +407,7 @@ bool csDemoCameraHelper::OnMouseUp (iEvent &event)
   return false;
 }
 
-bool csDemoCameraHelper::OnMouseMove (iEvent &event)
+bool CameraHelper::OnMouseMove (iEvent &event)
 {
   if (!mouseMoveEnabled)
     return false;
@@ -426,6 +431,8 @@ bool csDemoCameraHelper::OnMouseMove (iEvent &event)
   {
     cameraYaw += dx;
     cameraPitch += dy;
+    cameraPitch = csMax<float> (-3.14159f * 0.5f + 0.01f, cameraPitch);
+    cameraPitch = csMin<float> (3.14159f * 0.5f - 0.01f, cameraPitch);
   }
   if (cameraModeZoom)
   {
@@ -439,27 +446,27 @@ bool csDemoCameraHelper::OnMouseMove (iEvent &event)
   return false;
 }
 
-void csDemoCameraHelper::SetCameraMode (csDemoCameraMode cameraMode)
+void CameraHelper::SetCameraMode (CameraMode cameraMode)
 {
   this->cameraMode = cameraMode;
 }
 
-csDemoCameraMode csDemoCameraHelper::GetCameraMode ()
+CameraMode CameraHelper::GetCameraMode ()
 {
   return cameraMode;
 }
 
-void csDemoCameraHelper::SetMouseMoveEnabled (bool enabled)
+void CameraHelper::SetMouseMoveEnabled (bool enabled)
 {
   mouseMoveEnabled = enabled;
 }
 
-bool csDemoCameraHelper::GetMouseMoveEnabled ()
+bool CameraHelper::GetMouseMoveEnabled ()
 {
   return mouseMoveEnabled;
 }
 
-void csDemoCameraHelper::ResetCamera ()
+void CameraHelper::ResetCamera ()
 {
   cameraModePan = false;
   cameraModeRotate = false;
@@ -469,7 +476,7 @@ void csDemoCameraHelper::ResetCamera ()
   UpdateCamera ();
 }
 
-void csDemoCameraHelper::Initialize ()
+void CameraHelper::Initialize ()
 {
   if (cameraMode != CSDEMO_CAMERA_NONE)
   {
@@ -482,7 +489,7 @@ void csDemoCameraHelper::Initialize ()
   }
 }
 
-void csDemoCameraHelper::UpdateCamera ()
+void CameraHelper::UpdateCamera ()
 {
   csVector3 cameraPos;
   csVector3 cameraTarget = cameraModePan ?
@@ -501,7 +508,7 @@ void csDemoCameraHelper::UpdateCamera ()
     (cameraTarget - cameraPos, csVector3 (0,1,0));
 }
 
-void csDemoCameraHelper::UpdateCameraOrigin
+void CameraHelper::UpdateCameraOrigin
 (const csVector3& desiredOrigin)
 {
   // calculate distance, yaw, and pitch values that will put the
@@ -528,19 +535,19 @@ void csDemoCameraHelper::UpdateCameraOrigin
   }
 }
 
-// ------------------------ csDemoApplication ------------------------
+// ------------------------ DemoApplication ------------------------
 
-csDemoApplication::csDemoApplication (const char* applicationName,
-				      const char* applicationCommand,
-				      const char* applicationCommandUsage,
-				      const char* applicationDescription)
+DemoApplication::DemoApplication (const char* applicationName,
+				  const char* applicationCommand,
+				  const char* applicationCommandUsage,
+				  const char* applicationDescription)
   : commandLineHelper (applicationCommand, applicationCommandUsage, applicationDescription),
     hudHelper (this), cameraHelper (this), hudDisplayed (true)
 {
   SetApplicationName (applicationName);
 }
 
-void csDemoApplication::Frame ()
+void DemoApplication::Frame ()
 {
   // Update the camera
   cameraHelper.Frame ();
@@ -557,7 +564,7 @@ void csDemoApplication::Frame ()
     hudHelper.DisplayHUD ();
 }
 
-bool csDemoApplication::OnKeyboard (iEvent &event)
+bool DemoApplication::OnKeyboard (iEvent &event)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&event);
   if (eventtype == csKeyEventTypeDown)
@@ -574,27 +581,27 @@ bool csDemoApplication::OnKeyboard (iEvent &event)
   return hudHelper.OnKeyboard (event);
 }
 
-bool csDemoApplication::OnMouseDown (iEvent& e)
+bool DemoApplication::OnMouseDown (iEvent& e)
 {
   return cameraHelper.OnMouseDown (e);
 }
 
-bool csDemoApplication::OnMouseUp (iEvent& e)
+bool DemoApplication::OnMouseUp (iEvent& e)
 {
   return cameraHelper.OnMouseUp (e);
 }
 
-bool csDemoApplication::OnMouseMove (iEvent& e)
+bool DemoApplication::OnMouseMove (iEvent& e)
 {
   return cameraHelper.OnMouseMove (e);
 }
 
-void csDemoApplication::OnExit ()
+void DemoApplication::OnExit ()
 {
   printer.Invalidate ();
 }
 
-bool csDemoApplication::OnInitialize (int argc, char* argv[])
+bool DemoApplication::OnInitialize (int argc, char* argv[])
 {
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (GetObjectRegistry ()))
@@ -623,7 +630,7 @@ bool csDemoApplication::OnInitialize (int argc, char* argv[])
   return true;
 }
 
-bool csDemoApplication::Application ()
+bool DemoApplication::Application ()
 {
   // Open the application and load engine objects
   if (!OpenApplication (GetObjectRegistry ()))
@@ -659,7 +666,7 @@ bool csDemoApplication::Application ()
   return true;
 }
 
-bool csDemoApplication::CreateRoom ()
+bool DemoApplication::CreateRoom ()
 {
   // Create the main sector
   room = engine->CreateSector ("room");
@@ -691,7 +698,7 @@ bool csDemoApplication::CreateRoom ()
   iLightList* lightList = room->GetLights ();
 
   // This light is for the background
-  light = engine->CreateLight (0, csVector3 (-1, 1, 0), 9000, csColor (1));
+  light = engine->CreateLight (0, csVector3 (-1, -1, 0), 9000, csColor (1));
   light->SetAttenuationMode (CS_ATTN_NONE);
   lightList->Add (light);
 
@@ -717,17 +724,21 @@ bool csDemoApplication::CreateRoom ()
   lightList->Add (light);
 
   engine->Prepare ();
-  CS::Lighting::SimpleStaticLighter::ShineLights (room, engine, 4);
+  CS::Lighting::SimpleStaticLighter::ShineLights
+    (room, engine, CS::Lighting::SimpleStaticLighter::CS_SHADOW_FULL);
 
   return true;
 }
 
-void csDemoApplication::SetHUDDisplayed (bool displayed)
+void DemoApplication::SetHUDDisplayed (bool displayed)
 {
   hudDisplayed = displayed;
 }
 
-bool csDemoApplication::GetHUDDisplayed ()
+bool DemoApplication::GetHUDDisplayed ()
 {
   return hudDisplayed;
 }
+
+} // namespace Demo
+} // namespace CS

@@ -50,35 +50,41 @@
 #include "cstool/simplestaticlighter.h"
 
 class csPixmap;
-class csDemoApplication;
 
-// ------------------------ csDemoCommandLineHelper ------------------------
+namespace CS
+{
+namespace Demo
+{
+
+class DemoApplication;
+
+// ------------------------ CommandLineHelper ------------------------
 
 /**
  * A generic tool to print the command line help when the '-help' option is used
  * on a demo application.
  * To use this tool, you should define the applicationCommand,
  * applicationCommandUsage and applicationDescription variables (to be defined in
- * the constructor csDemoCommandLineHelper()), and add the needed command line
+ * the constructor CommandLineHelper()), and add the needed command line
  * options through AddCommandLineOption().
  * 
  * When the WriteHelp() method is called, this tool will write to the standard
  * output a help text of the following structure:
  * \verbatim
- * applicationDescription
- *
- * Usage: applicationCommandUsage
- *
- * Available options:
- *
- * Specific options for applicationCommand:
- * <list of options defined in the commandOptions array>
- *
- * General options:
- * <list of general options>
- * \endverbatim
+<applicationDescription>
+
+Usage: <applicationCommandUsage>
+
+Available options:
+
+Specific options for <applicationCommand>:
+<list of options>
+
+General options:
+<list of CS general options>
+\endverbatim
  */
-class CS_CRYSTALSPACE_EXPORT csDemoCommandLineHelper
+class CS_CRYSTALSPACE_EXPORT CommandLineHelper
 {
  public:
   /**
@@ -89,9 +95,9 @@ class CS_CRYSTALSPACE_EXPORT csDemoCommandLineHelper
    * be added.
    * \param applicationDescription User friendly description of the application.
    */
-  csDemoCommandLineHelper (const char* applicationCommand,
-			   const char* applicationCommandUsage,
-			   const char* applicationDescription);
+  CommandLineHelper (const char* applicationCommand,
+		     const char* applicationCommandUsage,
+		     const char* applicationDescription);
 
   /**
    * Add a command option to be described in the help text.
@@ -127,32 +133,32 @@ class CS_CRYSTALSPACE_EXPORT csDemoCommandLineHelper
   csArray<CommandOption> commandOptions;
 };
 
-// ------------------------ csDemoHUDHelper ------------------------
+// ------------------------ HUDHelper ------------------------
 
 /**
  * A generic tool managing the display of the HUD for applications
- * implementing csDemoApplication.
+ * implementing DemoApplication.
  * The HUD consists of the Crystal Space logo, the list of available keys
  * that can be used to interact with the demo, and a list of strings
  * describing the current state of the application.
  */
-class CS_CRYSTALSPACE_EXPORT csDemoHUDHelper
+class CS_CRYSTALSPACE_EXPORT HUDHelper
 {
-  friend class csDemoApplication;
+  friend class DemoApplication;
 
  public:
   /**
    * Constructor.
    */
-  csDemoHUDHelper (csDemoApplication* demoApplication);
+  HUDHelper (DemoApplication* demoApplication);
   /**
    * Destructor.
    */
-  ~csDemoHUDHelper ();
+  ~HUDHelper ();
 
   /**
    * Update the current state of the HUD depending on the keyboard events.
-   * This should be called automatically by csDemoApplication.
+   * This should be called automatically by DemoApplication.
    */
   bool OnKeyboard (iEvent &event);
 
@@ -182,7 +188,7 @@ class CS_CRYSTALSPACE_EXPORT csDemoHUDHelper
 
   /**
    * Display the HUD. This has to be called on each frame, after 3D drawings have
-   * been done. This should be done automatically within csDemoApplication::Frame().
+   * been done. This should be done automatically within DemoApplication::Frame().
    */
   void DisplayHUD ();
 
@@ -190,7 +196,7 @@ class CS_CRYSTALSPACE_EXPORT csDemoHUDHelper
   // Initialization of the main pointers.
   void Initialize ();
 
-  csDemoApplication* demoApplication;
+  DemoApplication* demoApplication;
   // Reference to the font used to display information
   csRef<iFont> font;
   // Crystal Space logo
@@ -206,12 +212,12 @@ class CS_CRYSTALSPACE_EXPORT csDemoHUDHelper
   uint maxKeys;
 };
 
-// ------------------------ csDemoCameraHelper ------------------------
+// ------------------------ CameraHelper ------------------------
 
 /**
- * Various camera modes which can be used with csDemoCameraHelper.
+ * Various camera modes which can be used with CameraHelper.
  */
-enum csDemoCameraMode
+enum CameraMode
 {
   CSDEMO_CAMERA_NONE = 0,         /*!< The application will manage the camera by itself */
   CSDEMO_CAMERA_MOVE_FREE,        /*!< The camera is free to move */
@@ -219,19 +225,46 @@ enum csDemoCameraMode
   CSDEMO_CAMERA_ROTATE            /*!< The camera rotates around the target */
 };
 
+class CS_CRYSTALSPACE_EXPORT CameraManager
+{
+ public:
+  /**
+   * Return the start position of the camera. This is used at start or
+   * when CameraHelper::ResetCamera() is called.
+   */
+  virtual csVector3 GetCameraStart ()
+  { return csVector3 (0.0f, 0.0f, -3.0f); }
+
+  /**
+   * Return the closest distance there can be between the camera and its
+   * target. This is relevant only for the CSDEMO_CAMERA_MOVE_LOOKAT and
+   * CSDEMO_CAMERA_ROTATE camera modes.
+   */
+  virtual float GetCameraMinimumDistance ()
+  { return 0.1f; }
+
+  /**
+   * Return the camera target, ie what it is looking at. This is relevant
+   * only for the CSDEMO_CAMERA_MOVE_LOOKAT and CSDEMO_CAMERA_ROTATE camera
+   * modes.
+   */
+  virtual csVector3 GetCameraTarget ()
+  { return csVector3 (0.0f); }
+};
+
 /**
  * A generic tool managing the movements of the camera with the keyboard
  * and/or the mouse.
  */
-class CS_CRYSTALSPACE_EXPORT csDemoCameraHelper
+class CS_CRYSTALSPACE_EXPORT CameraHelper
 {
-  friend class csDemoApplication;
+  friend class DemoApplication;
 
  public:
   /**
    * Constructor.
    */
-  csDemoCameraHelper (csDemoApplication* demoApplication);
+  CameraHelper (DemoApplication* demoApplication);
 
   /// Update the position of the camera. The behavior depends on the current camera mode.
   void Frame ();
@@ -243,9 +276,9 @@ class CS_CRYSTALSPACE_EXPORT csDemoCameraHelper
   bool OnMouseMove (iEvent &event);
 
   /// Set the camera mode to be used. Default value is CSDEMO_CAMERA_MOVE_NORMAL.
-  void SetCameraMode (csDemoCameraMode cameraMode);
+  void SetCameraMode (CameraMode cameraMode);
   /// Return the current camera mode.
-  csDemoCameraMode GetCameraMode ();
+  CameraMode GetCameraMode ();
 
   /**
    * Set whether the camera can be moved or not through the mouse.
@@ -254,9 +287,9 @@ class CS_CRYSTALSPACE_EXPORT csDemoCameraHelper
    * the mouse while holding one of the following button:
    * - left button: the camera is moved sideways
    * - right button: the camera is rotated around the target returned
-   * by csDemoApplication::GetCameraTarget().
+   * by DemoApplication::GetCameraTarget().
    * - middle button: the camera is moved forward and backward. The camera
-   * cannot get closer than csDemoApplication::GetCameraMinimumDistance().
+   * cannot get closer than DemoApplication::GetCameraMinimumDistance().
    */
   void SetMouseMoveEnabled (bool enabled);
   /**
@@ -266,7 +299,7 @@ class CS_CRYSTALSPACE_EXPORT csDemoCameraHelper
 
   /**
    * Reset the camera position to the position returned by
-   * csDemoApplication::GetCameraStart().
+   * DemoApplication::GetCameraStart().
    */
   void ResetCamera ();
 
@@ -274,12 +307,12 @@ class CS_CRYSTALSPACE_EXPORT csDemoCameraHelper
   // Initialization of the data
   void Initialize ();
 
-  csDemoApplication* demoApplication;
+  DemoApplication* demoApplication;
 
   void UpdateCamera ();
   void UpdateCameraOrigin (const csVector3& desiredOrigin);
 
-  csDemoCameraMode cameraMode;
+  CameraMode cameraMode;
   bool mouseMoveEnabled;
   csVector3 panCameraTarget;
   float cameraDist;
@@ -293,7 +326,7 @@ class CS_CRYSTALSPACE_EXPORT csDemoCameraHelper
   int lastMouseX, lastMouseY;
 };
 
-// ------------------------ csDemoApplication ------------------------
+// ------------------------ DemoApplication ------------------------
 
 /**
  * Crystal Space demo application framework class. This class and its companions
@@ -305,10 +338,10 @@ class CS_CRYSTALSPACE_EXPORT csDemoCameraHelper
  * The basic functionalities provided by this class are:
  * - creation of the main objects of the engine
  * - default creation of the scene
- * - management of the camera (class csDemoCameraHelper).
+ * - management of the camera (class CameraHelper).
  * - display of the available keys, Crystal Space logo and other informations
- * (class csDemoHUDHelper).
- * - management of the command line's help (class csDemoCommandLineHelper).
+ * (class HUDHelper).
+ * - management of the command line's help (class CommandLineHelper).
  *
  * Here is an example for the most simple use of this class:
  * \code
@@ -317,7 +350,7 @@ class CS_CRYSTALSPACE_EXPORT csDemoCameraHelper
  *
  * #include "cstool/csdemoapplication.h"
  *
- * class MyApp : public csDemoApplication
+ * class MyApp : public CS::Demo::DemoApplication
  * {
  * public:
  *   MyApp();
@@ -331,21 +364,21 @@ class CS_CRYSTALSPACE_EXPORT csDemoCameraHelper
  * #include "example.h"
  *
  * MyApp::MyApp ()
- *   : csDemoApplication ("CrystalSpace.MyApp", "myapplication", "myapplication",
+ *   : DemoApplication ("CrystalSpace.MyApp", "myapplication", "myapplication",
  *		          "Description of 'myapplication'.")
  * {
- *   // Configure the options for csDemoApplication
+ *   // Configure the options for DemoApplication
  * }
  *
  * bool MyApp::Application ()
  * {
- *   // Default behavior from csDemoApplication
- *   if (!csDemoApplication::Application ())
+ *   // Default behavior from DemoApplication
+ *   if (!DemoApplication::Application ())
  *     return false;
  *
  *   // Initialize here your application
  *
- *   // Default behavior from csDemoApplication for the creation of the scene
+ *   // Default behavior from DemoApplication for the creation of the scene
  *   if (!CreateRoom ())
  *     return false;
  *
@@ -370,11 +403,11 @@ class CS_CRYSTALSPACE_EXPORT csDemoCameraHelper
  * }
  * \endcode
  */
-class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
-  public csBaseEventHandler
+class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
+  public csBaseEventHandler, public CameraManager
 {
-  friend class csDemoHUDHelper;
-  friend class csDemoCameraHelper;
+  friend class HUDHelper;
+  friend class CameraHelper;
 
  protected:
   /// Reference to the engine
@@ -409,14 +442,17 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
   virtual bool OnMouseMove (iEvent &event);
 
   /**
-   * Default initialization for the creation of the main sector (csDemoApplication::room). It
+   * Default initialization for the creation of the main sector (DemoApplication::room). It
    * creates a grey uniform background far away, initializes the camera, and adds a few lights.
    */
   virtual bool CreateRoom ();
 
+  //-- CameraManager
   /**
    * Return the start position of the camera. This is used at start or
-   * when csDemoCameraHelper::ResetCamera() is called.
+   * when CameraHelper::ResetCamera() is called.
+   *
+   * This method is inherited from CameraManager.
    */
   virtual csVector3 GetCameraStart ()
   { return csVector3 (0.0f, 0.0f, -3.0f); }
@@ -424,6 +460,8 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
    * Return the closest distance there can be between the camera and its
    * target. This is relevant only for the CSDEMO_CAMERA_MOVE_LOOKAT and
    * CSDEMO_CAMERA_ROTATE camera modes.
+   *
+   * This method is inherited from CameraManager.
    */
   virtual float GetCameraMinimumDistance ()
   { return 0.1f; }
@@ -431,18 +469,20 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
    * Return the camera target, ie what it is looking at. This is relevant
    * only for the CSDEMO_CAMERA_MOVE_LOOKAT and CSDEMO_CAMERA_ROTATE camera
    * modes.
+   *
+   * This method is inherited from CameraManager.
    */
   virtual csVector3 GetCameraTarget ()
   { return csVector3 (0.0f); }
 
   /// Command line helper
-  csDemoCommandLineHelper commandLineHelper;
+  CommandLineHelper commandLineHelper;
 
   /// HUD helper
-  csDemoHUDHelper hudHelper;
+  HUDHelper hudHelper;
 
   /// Camera helper
-  csDemoCameraHelper cameraHelper;
+  CameraHelper cameraHelper;
 
   /**
    * Set whether or not the HUD must be displayed. Default value is true.
@@ -463,9 +503,9 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
    * be added.
    * \param applicationDescription User friendly description of the application.
    */
-  csDemoApplication (const char* applicationName, const char* applicationCommand,
-		     const char* applicationCommandUsage,
-		     const char* applicationDescription);
+  DemoApplication (const char* applicationName, const char* applicationCommand,
+		   const char* applicationCommandUsage,
+		   const char* applicationDescription);
 
   /// Base implementation of the method inherited from csApplicationFramework
   virtual void OnExit ();
@@ -478,6 +518,9 @@ class CS_CRYSTALSPACE_EXPORT csDemoApplication : public csApplicationFramework,
   // Whether the HUD should be displayed or not
   bool hudDisplayed;
 };
+
+} // namespace Demo
+} // namespace CS
 
 /** @} */
 
