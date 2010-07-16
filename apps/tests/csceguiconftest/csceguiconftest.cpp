@@ -27,7 +27,7 @@
 
 CS_IMPLEMENT_APPLICATION
 
-CSCEGUIConfTest::CSCEGUIConfTest() : csDemoApplication ("CrystalSpace.CSCEGUIConfTest", "csceguiconftest",
+CSCEGUIConfTest::CSCEGUIConfTest() : DemoApplication ("CrystalSpace.CSCEGUIConfTest", "csceguiconftest",
 		       "csceguiconftest <OPTIONS>",
 		       "")
 {
@@ -121,8 +121,8 @@ void CSCEGUIConfTest::Frame()
 bool CSCEGUIConfTest::OnInitialize(int argc, char* argv [])
 {
 
-  // Default behavior from csDemoApplication
-  //if (!csDemoApplication::OnInitialize (argc, argv))
+  // Default behavior from DemoApplication
+  //if (!DemoApplication::OnInitialize (argc, argv))
   //  return false;
 
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
@@ -148,8 +148,8 @@ bool CSCEGUIConfTest::OnInitialize(int argc, char* argv [])
 
 bool CSCEGUIConfTest::Application()
 {
-  // Default behavior from csDemoApplication
-  if (!csDemoApplication::Application ())
+  // Default behavior from DemoApplication
+  if (!DemoApplication::Application ())
     return false;
 
   configEventNotifier.AttachNew(new CS::Utility::ConfigEventNotifier(GetObjectRegistry()));
@@ -249,7 +249,7 @@ bool CSCEGUIConfTest::OnListSelection (const CEGUI::EventArgs& e)
 
 bool CSCEGUIConfTest::OnKeyboard(iEvent& ev)
 {
-  csDemoApplication::OnKeyboard (ev);
+  DemoApplication::OnKeyboard (ev);
   return false;
 }
 

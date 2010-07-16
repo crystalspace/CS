@@ -70,7 +70,7 @@ class AvatarScene
   csRef<iAnimatedMesh> animesh;
 };
 
-class AvatarTest : public csDemoApplication
+class AvatarTest : public CS::Demo::DemoApplication
 {
   friend class FrankieScene;
   friend class KrystalScene;
@@ -104,7 +104,7 @@ private:
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
 
-  //-- csDemoApplication
+  //-- CS::Demo::CameraManager
   csVector3 GetCameraStart ();
   float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();

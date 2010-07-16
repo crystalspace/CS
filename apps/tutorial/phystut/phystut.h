@@ -28,7 +28,7 @@
 #include "imesh/animesh.h"
 #include "imesh/ragdoll.h"
 
-class Simple : public csDemoApplication
+class Simple : public CS::Demo::DemoApplication
 {
 private:
   // Physics related

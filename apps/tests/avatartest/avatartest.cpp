@@ -32,15 +32,15 @@
 #define MODEL_SINTEL 3
 
 AvatarTest::AvatarTest ()
-  : csDemoApplication ("CrystalSpace.AvatarTest", "avatartest",
-		       "avatartest <OPTIONS>",
-		       "Tests on the animation of objects iAnimatedMesh."),
+  : DemoApplication ("CrystalSpace.AvatarTest", "avatartest",
+		     "avatartest <OPTIONS>",
+		     "Tests on the animation of objects iAnimatedMesh."),
     avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
 {
-  // Configure the options for csDemoApplication
+  // Configure the options for DemoApplication
 
   // Set the camera mode
-  cameraHelper.SetCameraMode (CSDEMO_CAMERA_ROTATE);
+  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
 
   // Command line options
   commandLineHelper.AddCommandLineOption
@@ -96,8 +96,8 @@ void AvatarTest::Frame ()
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
 
-  // Default behavior from csDemoApplication
-  csDemoApplication::Frame ();
+  // Default behavior from DemoApplication
+  DemoApplication::Frame ();
 
   // Display the Bullet debug information
   if (avatarScene->HasPhysicalObjects ()
@@ -107,8 +107,8 @@ void AvatarTest::Frame ()
 
 bool AvatarTest::OnKeyboard (iEvent &ev)
 {
-  // Default behavior from csDemoApplication
-  csDemoApplication::OnKeyboard (ev);
+  // Default behavior from DemoApplication
+  DemoApplication::OnKeyboard (ev);
 
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
@@ -201,8 +201,8 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
 
 bool AvatarTest::OnMouseDown (iEvent& ev)
 {
-  // Default behavior from csDemoApplication
-  if (csDemoApplication::OnMouseDown (ev))
+  // Default behavior from DemoApplication
+  if (DemoApplication::OnMouseDown (ev))
     return true;
 
   return avatarScene->OnMouseDown (ev);
@@ -210,8 +210,8 @@ bool AvatarTest::OnMouseDown (iEvent& ev)
 
 bool AvatarTest::OnInitialize (int argc, char* argv[])
 {
-  // Default behavior from csDemoApplication
-  if (!csDemoApplication::OnInitialize (argc, argv))
+  // Default behavior from DemoApplication
+  if (!DemoApplication::OnInitialize (argc, argv))
     return false;
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
@@ -319,8 +319,8 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
 
 bool AvatarTest::Application ()
 {
-  // Default behavior from csDemoApplication
-  if (!csDemoApplication::Application ())
+  // Default behavior from DemoApplication
+  if (!DemoApplication::Application ())
     return false;
 
   // Find references to the plugins of the animation nodes
@@ -332,8 +332,8 @@ bool AvatarTest::Application ()
   if (!basicNodesManager)
     return ReportError("Failed to locate iSkeletonBasicNodesManager2 plugin!");
 
-  // Default behavior from csDemoApplication for the creation of the scene
-  if (!csDemoApplication::CreateRoom ())
+  // Default behavior from DemoApplication for the creation of the scene
+  if (!DemoApplication::CreateRoom ())
     return false;
 
   // Create the dynamic system

@@ -31,7 +31,7 @@
 
 struct iSector;
 
-class CSCEGUIConfTest : public csDemoApplication
+class CSCEGUIConfTest : public CS::Demo::DemoApplication
 {
 private:
   bool myBool;

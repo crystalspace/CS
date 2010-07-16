@@ -35,18 +35,18 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define ENVIRONMENT_TERRAIN 2
 
 Simple::Simple ()
-  : csDemoApplication ("CrystalSpace.PhysTut", "phystut",
-		       "phystut <OPTIONS>",
-		       "Physics tutorial for Crystal Space."),
+  : DemoApplication ("CrystalSpace.PhysTut", "phystut",
+		     "phystut <OPTIONS>",
+		     "Physics tutorial for Crystal Space."),
     isSoftBodyWorld (false), environment (ENVIRONMENT_WALLS), solver (0),
     autodisable (false), do_bullet_debug (false), remainingStepDuration (0.0f),
     debugMode (false), allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
     physicalCameraMode (CAMERA_DYNAMIC), dragging (false)
 {
-  // Configure the options for csDemoApplication
+  // Configure the options for DemoApplication
 
   // We manage the camera by ourselves
-  cameraHelper.SetCameraMode (CSDEMO_CAMERA_NONE);
+  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_NONE);
 
   // Command line options
   commandLineHelper.AddCommandLineOption
@@ -233,8 +233,8 @@ void Simple::Frame ()
       break;
     }
 
-  // Default behavior from csDemoApplication
-  csDemoApplication::Frame ();
+  // Default behavior from DemoApplication
+  DemoApplication::Frame ();
 
   // Display debug informations
   if (do_bullet_debug)
@@ -252,8 +252,8 @@ void Simple::Frame ()
 
 bool Simple::OnKeyboard (iEvent &ev)
 {
-  // Default behavior from csDemoApplication
-  csDemoApplication::OnKeyboard (ev);
+  // Default behavior from DemoApplication
+  DemoApplication::OnKeyboard (ev);
 
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
@@ -721,8 +721,8 @@ bool Simple::OnMouseMove (iEvent& ev)
 
 bool Simple::OnInitialize (int argc, char* argv[])
 {
-  // Default behavior from csDemoApplication
-  if (!csDemoApplication::OnInitialize (argc, argv))
+  // Default behavior from DemoApplication
+  if (!DemoApplication::OnInitialize (argc, argv))
     return false;
 
   // Request plugins
@@ -843,8 +843,8 @@ bool Simple::OnInitialize (int argc, char* argv[])
 
 bool Simple::Application ()
 {
-  // Default behavior from csDemoApplication
-  if (!csDemoApplication::Application ())
+  // Default behavior from DemoApplication
+  if (!DemoApplication::Application ())
     return false;
 
   // Find references to main objects
@@ -1774,8 +1774,8 @@ void Simple::SpawnSoftBody ()
 
 void Simple::CreateWalls (const csVector3& /*radius*/)
 {
-  // Default behavior from csDemoApplication for the creation of the scene
-  if (!csDemoApplication::CreateRoom ())
+  // Default behavior from DemoApplication for the creation of the scene
+  if (!DemoApplication::CreateRoom ())
     return;
 
   // First we make a primitive for our geometry.
