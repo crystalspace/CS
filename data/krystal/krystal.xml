@@ -28,6 +28,9 @@
     <texture name='krystal_skull_heightmap'>
       <file>/lib/krystal/krystal_skull_heightmap.png</file>
     </texture>		
+    <texture name='krystal_skull_contour'>
+      <file>/lib/krystal/krystal_skull_contour.png</file>
+    </texture>		
   </textures>
   <materials>
     <material name='krystal_material'>
@@ -42,10 +45,11 @@
       <texture>krystal_skull</texture>
 <!-- 	
 	  <shader type='standard'>diffuse_cg</shader>	
-      <shadervar type="texture" name="tex diffuse">krystal_skull_densitymap</shadervar>	  
+      <shadervar type="texture" name="tex diffuse">krystal_skull_contour</shadervar>	  	  
 -->	  	
 	  <shadervar type="float" name="width">0.0015</shadervar>
 	  <shadervar type="float" name="displaceDistance">0.02</shadervar>
+      <shadervar type="texture" name="contour map">krystal_skull_contour</shadervar>
 	  <shadervar type="texture" name="density map">krystal_skull_densitymap</shadervar>
 	  <shadervar type="float" name="densityFactor">20</shadervar>
       <shadervar type="texture" name="height map">krystal_skull_heightmap</shadervar>

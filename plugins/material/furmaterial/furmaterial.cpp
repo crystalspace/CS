@@ -113,7 +113,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     iRenderBuffer* indices = meshFactorySubMesh->GetIndices(0);
     iRenderBuffer* texCoords = meshFactory->GetTexCoords();
 
-    GenerateGuidHairs(indices, vertexes, normals, texCoords);
+    GenerateGuideHairs(indices, vertexes, normals, texCoords);
+    GenerateMesh();
     GenerateGuideHairsLOD();
     SynchronizeGuideHairs();
     GenerateHairStrands();
@@ -203,7 +204,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     meshState -> SetAnimationControl(animationControl);
   }
 
-  void FurMaterial::GenerateGuidHairs(iRenderBuffer* indices, 
+  void FurMaterial::GenerateMesh()
+  {
+    CS::Geometry::csContour3 untrimesh;
+    csTriangleMesh tm;
+
+    // setup our untriangulated mesh
+    for (size_t i = 0 ; i < guideHairs.GetSize() ; i ++)
+    {
+      csVector2 uv = guideHairs.Get(i).uv;
+
+      int index = (int)(uv.x * contourmap.width) + 
+        (int)(uv.y * contourmap.height) * contourmap.width;
+
+      if ( contourmap.data[4 * index + 2] == 255 && 
+          contourmap.data[4 * index] == 0 &&
+          contourmap.data[4 * index + 1] == 0 && 
+          guideHairs.Get(i).controlPointsCount > 0 )
+      {
+        untrimesh.Push(guideHairs.Get(i).controlPoints[0]);
+        contourmap.data[4 * index + 1] = 255;
+      }
+    }
+
+    csPrintf("%d\t%d\t%d\n", guideHairs.GetSize(), untrimesh.GetSize(), tm.GetTriangleCount());
+
+    // triangulate the mesh
+//     CS::Geometry::Triangulate3D::Process(untrimesh, tm);
+
+    csPrintf("%d\t%d\t%d\n", guideHairs.GetSize(), untrimesh.GetSize(), tm.GetTriangleCount());
+  }
+
+  void FurMaterial::GenerateGuideHairs(iRenderBuffer* indices, 
     iRenderBuffer* vertexes, iRenderBuffer* normals, iRenderBuffer* texCoords)
   {
     csRenderBufferLock<csVector3> positions (vertexes, CS_BUF_LOCK_READ);
@@ -240,8 +272,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       // based on heightmap
       // point heightmap - modify to use convolution matrix or such
-      float height = heightmapData[ 4 * ((int)(guideHair.uv.x * heightmapW) + 
-        (int)(guideHair.uv.y * heightmapH) * heightmapW )] / 255.0f;
+      float height = heightmap.data[ 4 * ((int)(guideHair.uv.x * heightmap.width) + 
+        (int)(guideHair.uv.y * heightmap.height) * heightmap.width )] / 255.0f;
 
 //       csPrintf("%f\t%f\t%f\t", height, heightFactor, controlPointsDistance );
 //       csPrintf("%d\n", (int)( (height * heightFactor) / controlPointsDistance) );
@@ -259,9 +291,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   float FurMaterial::TriangleAreaDensity(csGuideHair A, csGuideHair B, csGuideHair C)
   {
-    csVector2 a = csVector2(A.uv.x * densitymapW, A.uv.y * densitymapH);
-    csVector2 b = csVector2(B.uv.x * densitymapW, B.uv.y * densitymapH);
-    csVector2 c = csVector2(C.uv.x * densitymapW, C.uv.y * densitymapH);
+    csVector2 a = csVector2(A.uv.x * densitymap.width, A.uv.y * densitymap.height);
+    csVector2 b = csVector2(B.uv.x * densitymap.width, B.uv.y * densitymap.height);
+    csVector2 c = csVector2(C.uv.x * densitymap.width, C.uv.y * densitymap.height);
 
     float baseA = csVector2::Norm(b - c);
     float baseB = csVector2::Norm(a - c);
@@ -286,7 +318,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         count++;
         float bC = 1 - bA - bB;
         csVector2 newPoint = a * bA + b * bB + c * bC;
-        density += densitymapData[4 * ((int)newPoint.x + (int)newPoint.y * densitymapW )];
+        density += densitymap.data[4 * ((int)newPoint.x + (int)newPoint.y * densitymap.width )];
       }
 
     for( float bB = 0.0; bB <= 1.0; bB += 1 / hB )
@@ -295,7 +327,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         count++;
         float bC = 1 - bA - bB;
         csVector2 newPoint = a * bA + b * bB + c * bC;
-        density += densitymapData[4 * ((int)newPoint.x + (int)newPoint.y * densitymapW )];
+        density += densitymap.data[4 * ((int)newPoint.x + (int)newPoint.y * densitymap.width )];
       }
 
     for( float bC = 0.0; bC <= 1.0; bC += 1 / hC )
@@ -304,16 +336,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         count++;
         float bB = 1 - bA - bC;
         csVector2 newPoint = a * bA + b * bB + c * bC;
-        density += densitymapData[4 * ((int)newPoint.x + (int)newPoint.y * densitymapW )];
+        density += densitymap.data[4 * ((int)newPoint.x + (int)newPoint.y * densitymap.width )];
       }
 
     if (count != 0)
       density /= count;
 
     // the old method based on average mean
-//     density = (densitymapData[ 4 * ((int)a.x + (int)a.y * densitymapW )] + 
-//       densitymapData[ 4 * ((int)b.x + (int)b.y * densitymapW )] + 
-//       densitymapData[ 4 * ((int)c.x + (int)c.y * densitymapW )] ) / (3.0f);
+//     density = (densitymap.data[ 4 * ((int)a.x + (int)a.y * densitymap.width )] + 
+//       densitymap.data[ 4 * ((int)b.x + (int)b.y * densitymap.width )] + 
+//       densitymap.data[ 4 * ((int)c.x + (int)c.y * densitymap.width )] ) / (3.0f);
 
     return density;
   }
@@ -511,8 +543,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
         // based on heightmap
         // point heightmap - modify to use convolution matrix or such
-        float height = heightmapData[ 4 * ((int)(uv.x * heightmapW) + 
-          (int)(uv.y * heightmapH) * heightmapW )] / 255.0f;
+        float height = heightmap.data[ 4 * ((int)(uv.x * heightmap.width) + 
+          (int)(uv.y * heightmap.height) * heightmap.width )] / 255.0f;
 
         float realDistance = height * heightFactor;
         float realTipDistance = realDistance - ((hairStrand.controlPointsCount - 2) 
@@ -588,14 +620,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csPrintf("Active LOD ropes: %d\n",count);
   }
 
-  void FurMaterial::GaussianBlur(iTextureHandle *texture)
+  void FurMaterial::GaussianBlur(TextureData texture)
   {
     CS::StructuredTextureFormat readbackFmt 
       (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
 
-    csRef<iDataBuffer> bufDB = texture->Readback(readbackFmt);
+    csRef<iDataBuffer> bufDB = texture.handle->Readback(readbackFmt);
     int width, height;
-    texture->GetOriginalDimensions(width, height);
+    texture.handle->GetOriginalDimensions(width, height);
     uint8* buf = bufDB->GetUint8();
 
     int gaussianMask[][5] = { {1, 4, 6, 4, 1}, {4, 16, 24, 16, 4}, {6, 24, 36, 24, 6},
@@ -628,8 +660,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
               (uint8)(dest[4 * (x + y * width) + channel] / 256);
 
       // send buffer to texture
-      densitymap->Blit(0, 0, width, height / 2, buf);
-      densitymap->Blit(0, height / 2, width, height / 2, 
+      densitymap.handle->Blit(0, 0, width, height / 2, buf);
+      densitymap.handle->Blit(0, height / 2, width, height / 2, 
         buf + (width * height * 2));
 
       delete dest;
@@ -644,11 +676,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     {
       csVector2 uv = guideHairs.Get(i).uv;
 
-      densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
-        (int)(uv.y * densitymapH) * densitymapW ) + 1 ] = 255;
+      densitymap.data[ 4 * ((int)(uv.x * densitymap.width) + 
+        (int)(uv.y * densitymap.height) * densitymap.width ) + 1 ] = 255;
 
-      heightmapData[ 4 * ((int)(uv.x * heightmapW) + 
-        (int)(uv.y * heightmapH) * heightmapW ) + 1 ] = 255;
+      heightmap.data[ 4 * ((int)(uv.x * heightmap.width) + 
+        (int)(uv.y * heightmap.height) * heightmap.width ) + 1 ] = 255;
+
+      if ( contourmap.data[ 4 * ((int)(uv.x * contourmap.width) + 
+        (int)(uv.y * contourmap.height) * contourmap.width ) ] == 255)
+        contourmap.data[ 4 * ((int)(uv.x * contourmap.width) + 
+          (int)(uv.y * contourmap.height) * contourmap.width ) ] = 0;
     }
 
     // from LOD guide ropes
@@ -656,8 +693,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     {
       csVector2 uv = guideHairsLOD.Get(i).uv;
 
-      densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
-        (int)(uv.y * densitymapH) * densitymapW ) ] = 255;
+      densitymap.data[ 4 * ((int)(uv.x * densitymap.width) + 
+        (int)(uv.y * densitymap.height) * densitymap.width ) ] = 255;
     }
 
     // from hair strands
@@ -674,17 +711,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
           uv += guideHairsReference[j].distance * (guideHairsLOD.Get(
             guideHairsReference[j].index - guideHairs.GetSize()).uv);
 
-      densitymapData[ 4 * ((int)(uv.x * densitymapW) + 
-        (int)(uv.y * densitymapH) * densitymapW ) + 2 ] = 255;
+      densitymap.data[ 4 * ((int)(uv.x * densitymap.width) + 
+        (int)(uv.y * densitymap.height) * densitymap.width ) + 2 ] = 255;
     }
 
     csPrintf("Total guide ropes: %d\n", guideHairsLOD.GetSize() + guideHairs.GetSize());
 
-    SaveImage(densitymapData, "/data/krystal/krystal_skull_densitymap_debug.png",
-      densitymapW, densitymapH);
+    SaveImage(densitymap.data, "/data/krystal/krystal_skull_densitymap_debug.png",
+      densitymap.width, densitymap.height);
 
-    SaveImage(heightmapData, "/data/krystal/krystal_skull_heightmap_debug.png",
-      heightmapW, heightmapH);
+    SaveImage(heightmap.data, "/data/krystal/krystal_skull_heightmap_debug.png",
+      heightmap.width, heightmap.height);
+
+    SaveImage(contourmap.data, "/data/krystal/krystal_skull_contour_debug.png",
+      contourmap.width, contourmap.height);
   }
 
   void FurMaterial::SaveImage(uint8* buf, const char* texname, 
@@ -759,6 +799,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     this->material = material;
 
     SetColor(csColor(1,1,0));
+    SetContourmap();
     SetDensitymap();
     SetHeightmap();
     SetStrandWidth();
@@ -785,12 +826,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     shaderVariable->GetValue(strandWidth);
   }
 
+  void FurMaterial::SetContourmap ()
+  {
+    CS::ShaderVarName contourmapName (svStrings, "contour map");	
+    csRef<csShaderVariable> shaderVariable = material->GetVariable(contourmapName);
+
+    shaderVariable->GetValue(contourmap.handle);
+
+    // contour map
+    CS::StructuredTextureFormat readbackFmt 
+      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+
+    csRef<iDataBuffer> contourmapDB = contourmap.handle ->Readback(readbackFmt);
+    contourmap.handle->GetOriginalDimensions(contourmap.width, contourmap.height);
+    contourmap.data = contourmapDB->GetUint8();
+  }
+
   void FurMaterial::SetDensitymap ()
   {
     CS::ShaderVarName densitymapName (svStrings, "density map");	
     csRef<csShaderVariable> shaderVariable = material->GetVariable(densitymapName);
 
-    shaderVariable->GetValue(densitymap);
+    shaderVariable->GetValue(densitymap.handle);
 
     CS::ShaderVarName densityFactorName (svStrings, "densityFactor");	
     material->GetVariable(densityFactorName)->GetValue(densityFactor);
@@ -799,9 +856,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     CS::StructuredTextureFormat readbackFmt 
       (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
 
-    csRef<iDataBuffer> densitymapDB = densitymap->Readback(readbackFmt);
-    densitymap->GetOriginalDimensions(densitymapW, densitymapH);
-    densitymapData = densitymapDB->GetUint8();
+    csRef<iDataBuffer> densitymapDB = densitymap.handle->Readback(readbackFmt);
+    densitymap.handle->GetOriginalDimensions(densitymap.width, densitymap.height);
+    densitymap.data = densitymapDB->GetUint8();
 
     // apply a Gaussian blur
     GaussianBlur(densitymap);
@@ -812,7 +869,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     CS::ShaderVarName heightmapName (svStrings, "height map");	
     csRef<csShaderVariable> shaderVariable = material->GetVariable(heightmapName);
 
-    shaderVariable->GetValue(heightmap);
+    shaderVariable->GetValue(heightmap.handle);
 
     CS::ShaderVarName heightFactorName (svStrings, "heightFactor");	
     material->GetVariable(heightFactorName)->GetValue(heightFactor);
@@ -824,9 +881,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     CS::StructuredTextureFormat readbackFmt 
       (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
 
-    csRef<iDataBuffer> heightmapDB = heightmap->Readback(readbackFmt);
-    heightmap->GetOriginalDimensions(heightmapW, heightmapH);
-    heightmapData = heightmapDB->GetUint8();
+    csRef<iDataBuffer> heightmapDB = heightmap.handle->Readback(readbackFmt);
+    heightmap.handle->GetOriginalDimensions(heightmap.width, heightmap.height);
+    heightmap.data = heightmapDB->GetUint8();
   }
 
   void FurMaterial::SetDisplaceDistance()

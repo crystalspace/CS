@@ -86,6 +86,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     bool isActive;  //  ropes vs interpolate
   };
 
+  struct TextureData
+  {
+    iTextureHandle* handle;
+    int width, height;
+    uint8* data;
+  };
+
   class FurMaterial : public scfImplementation2<FurMaterial,
     scfFakeInterface<iShaderVariableContext>,
     iFurMaterial>, public CS::ShaderVariableContextImpl
@@ -155,13 +162,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iMaterial> material;
     csRef<iShaderVarStringSet> svStrings;
     /// Density & Height maps
-    iTextureHandle* densitymap;
-    int densitymapW, densitymapH;
-    uint8* densitymapData;
+    TextureData contourmap;
+    TextureData densitymap;
     float densityFactor;
-    iTextureHandle* heightmap;
-    int heightmapW, heightmapH;
-    uint8* heightmapData;
+    TextureData heightmap;
     float heightFactor;
     float displaceDistance;
     float strandWidth;
@@ -171,17 +175,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iEngine> engine;
     csRef<iLoader> loader;
     /// functions
-    void GenerateGuidHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
+    void GenerateMesh();
+    void GenerateGuideHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
       iRenderBuffer* normals, iRenderBuffer* texCoords);
     void SynchronizeGuideHairs();
     void GenerateGuideHairsLOD();
     void GenerateHairStrands();
     float TriangleAreaDensity(csGuideHair A, csGuideHair B, csGuideHair C);
     /// debug
-    void GaussianBlur(iTextureHandle* texture);
+    void GaussianBlur(TextureData texture);
     void SaveUVImage();
     void SaveImage(uint8* buf, const char* texname,int width, int height);
     /// setters
+    void SetContourmap();
     void SetDensitymap();
     void SetHeightmap();
     void SetStrandWidth();
