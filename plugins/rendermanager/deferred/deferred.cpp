@@ -38,7 +38,6 @@
 #include "ivaria/reporter.h"
 #include "csutil/cfgacc.h"
 
-#include "deferredviscull.h"
 #include "deferred.h"
 
 using namespace CS::RenderManager;
@@ -72,6 +71,7 @@ void DrawFullscreenTexture(iTextureHandle *tex, iGraphics3D *graphics3D)
   int w, h;
   tex->GetRendererDimensions (w, h);
 
+  graphics3D->SetZMode (CS_ZBUF_NONE);
   graphics3D->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARSCREEN);
   graphics3D->DrawPixmap (tex, 
                           0, 
@@ -98,6 +98,70 @@ void ForEachLight(ContextType& context, Fn& fn)
   for (int i = 0; i < count; i++)
   {
     fn (list->Get (i));
+  }
+}
+
+/**
+ * Iterate over all mesh nodes within context, call functor for each opaque one.
+ * Does not use any blocking at all.
+ */
+template<typename ContextType, typename Fn>
+void ForEachOpaqueMeshNode(ContextType &context, Fn &fn)
+{
+  typedef CS::RenderManager::Implementation::NoOperationBlock<
+    typename ContextType::TreeType::MeshNode*
+  > noBlockType;
+
+  typename ContextType::TreeType::MeshNodeTreeIteratorType it = 
+    context.meshNodes.GetIterator ();
+
+  noBlockType noBlock;
+  // Helper object for calling function
+  CS::RenderManager::Implementation::OperationCaller<
+    Fn, 
+    noBlockType,
+    typename OperationTraits<Fn>::Ordering
+  > caller (fn, noBlock);
+
+  while (it.HasNext ())
+  {
+    typename ContextType::TreeType::MeshNode *node = it.Next ();
+    CS_ASSERT_MSG("Null node encountered, should not be possible", node);
+
+    if (!node->isTransparent)
+      caller (node);
+  }
+}
+
+/**
+ * Iterate over all mesh nodes within context, call functor for each transparent one.
+ * Does not use any blocking at all.
+ */
+template<typename ContextType, typename Fn>
+void ForEachTransparentMeshNode(ContextType &context, Fn &fn)
+{
+  typedef CS::RenderManager::Implementation::NoOperationBlock<
+    typename ContextType::TreeType::MeshNode*
+  > noBlockType;
+
+  typename ContextType::TreeType::MeshNodeTreeIteratorType it = 
+    context.meshNodes.GetIterator ();
+
+  noBlockType noBlock;
+  // Helper object for calling function
+  CS::RenderManager::Implementation::OperationCaller<
+    Fn, 
+    noBlockType,
+    typename OperationTraits<Fn>::Ordering
+  > caller (fn, noBlock);
+
+  while (it.HasNext ())
+  {
+    typename ContextType::TreeType::MeshNode *node = it.Next ();
+    CS_ASSERT_MSG("Null node encountered, should not be possible", node);
+
+    if (node->isTransparent)
+      caller (node);
   }
 }
 
@@ -158,12 +222,61 @@ public:
     graphics3D->BeginDraw (drawFlags);
     graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
 
-    // Render all mesh nodes in context
-    size_t layerCount = context->svArrays.GetNumLayers();
+    size_t layerCount = context->svArrays.GetNumLayers ();
     for (size_t layer = 0; layer < layerCount; ++layer)
     {
       meshRender.SetLayer (layer);
-      ForEachMeshNode (*context, meshRender);
+      ForEachOpaqueMeshNode (*context, meshRender);
+    }
+  }
+ 
+private:
+
+  SimpleContextRender<RenderTree> meshRender;
+
+  iGraphics3D *graphics3D;
+  iShaderManager *shaderMgr;
+};
+
+/**
+ * Renderer for multiple contexts where all transparent objects are drawn.
+ */
+template<typename RenderTree>
+class TransparentMeshTreeRenderer
+{
+public:
+
+  TransparentMeshTreeRenderer(iGraphics3D* g3d, iShaderManager *shaderMgr)
+    : 
+  meshRender(g3d, shaderMgr),
+  graphics3D(g3d),
+  shaderMgr(shaderMgr)
+  {}
+
+  ~TransparentMeshTreeRenderer() {}
+
+  /**
+   * Render all contexts.
+   */
+  void operator()(typename RenderTree::ContextNode *context)
+  {
+    RenderView *rview = context->renderView;
+    
+    iEngine *engine = rview->GetEngine ();
+    iCamera *cam = rview->GetCamera ();
+    iClipper2D *clipper = rview->GetClipper ();
+    
+    // Setup the camera etc.. @@should be delayed as well
+    graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
+    graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
+
+    graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
+
+    size_t layerCount = context->svArrays.GetNumLayers ();
+    for (size_t layer = 0; layer < layerCount; ++layer)
+    {
+      meshRender.SetLayer (layer);
+      ForEachTransparentMeshNode (*context, meshRender);
     }
   }
  
@@ -216,8 +329,7 @@ public:
 
     // Do the culling
     iVisibilityCuller *culler = sector->GetVisibilityCuller ();
-    DeferredViscullCallback<RenderTreeType> callback (context, rview, &rview->GetMeshFilter ());
-    CustomCallbackViscull<RenderTreeType> (context, rview, culler, &callback);
+    Viscull<RenderTreeType> (context, rview, culler);
 
     // Set up all portals
     {
@@ -440,7 +552,7 @@ bool RMDeferred::RenderView(iView *view)
   gbuffer.Detach ();
 
   // Fills the accumulation buffer.
-  AttachAccumBuffer (graphics3D);
+  AttachAccumBuffer (graphics3D, false);
   {
     int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | startContext->drawFlags;
     drawFlags &= ~CSDRAW_CLEARSCREEN;
@@ -459,8 +571,17 @@ bool RMDeferred::RenderView(iView *view)
                                   lightRenderPersistent);
 
     render.OutputAmbientLight ();
-
     ForEachLight (*startContext, render);
+  }
+  DetachAccumBuffer (graphics3D);
+
+  // Draws the transparent objects.
+   AttachAccumBuffer (graphics3D, true);
+  {
+    graphics3D->SetZMode (CS_ZBUF_MESH);
+
+    TransparentMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderManager);
+    render (startContext);
 
     graphics3D->FinishDraw ();
   }
@@ -485,10 +606,16 @@ bool RMDeferred::PrecacheView(iView *view)
 }
 
 //----------------------------------------------------------------------
-bool RMDeferred::AttachAccumBuffer(iGraphics3D *graphics3D)
+bool RMDeferred::AttachAccumBuffer(iGraphics3D *graphics3D, bool useGbufferDepth)
 {
-  if(!graphics3D->SetRenderTarget (accumBuffer, false, 0, rtaColor0))
+  if (!graphics3D->SetRenderTarget (accumBuffer, false, 0, rtaColor0))
     return false;
+
+  if (useGbufferDepth && gbuffer.HasDepthBuffer ())
+  {
+    if (!graphics3D->SetRenderTarget (gbuffer.GetDepthBuffer (), false, 0, rtaDepth))
+      return false; 
+  }
   
   if (!graphics3D->ValidateRenderTargets ())
     return false;

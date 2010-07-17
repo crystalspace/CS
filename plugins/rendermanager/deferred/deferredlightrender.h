@@ -545,17 +545,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     void RenderAmbientLight()
     {
-      iMeshObject *obj = persistentData.quadMesh->GetMeshObject ();
       iMaterial *mat = persistentData.ambientMaterial->GetMaterial ();
-
-      int num = 0;
-      csRenderMesh **meshes = obj->GetRenderMeshes (num, rview, 
-        persistentData.quadMesh->GetMovable (), 0);
-
-      meshes[0]->z_buf_mode = CS_ZBUF_NONE;
-
-      if (num <= 0)
-        return;
 
       // Update shader stack.
       csShaderVariableStack svStack = shaderMgr->GetShaderVariableStack ();
@@ -565,37 +555,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       shaderMgr->PushVariables (svStack);
       shader->PushVariables (svStack);
 
-      // Switches to using orthographic projection. 
-      csReversibleTransform oldView = graphics3D->GetWorldToCamera ();
-      CS::Math::Matrix4 oldProj = graphics3D->GetProjectionMatrix ();
-
-      graphics3D->SetWorldToCamera (csReversibleTransform ());
-      graphics3D->SetProjectionMatrix (CreateOrthoProj (graphics3D));
-
-      // Create quad transform.
-      float w = graphics3D->GetDriver2D ()->GetWidth ();
-      float h = graphics3D->GetDriver2D ()->GetHeight ();
-
-      csMatrix3 S (w, 0, 0,
-                   0, h, 0,
-                   0, 0, 1);
-
-      csReversibleTransform M (S, csVector3 (0.0f, 0.0f, 0.0f));
-
-      // Draw the ambient light quad.
-      DrawLightMesh (meshes, 
-                     num, 
-                     M, 
-                     shader, 
-                     svStack,
-                     false);
-
-      // Restores old transforms.
-      graphics3D->SetWorldToCamera (oldView);
-      graphics3D->SetProjectionMatrix (oldProj);
-
-      // Needed for the change in projection matrix to take effect. 
-      graphics3D->BeginDraw (CSDRAW_3DGRAPHICS);
+      DrawFullscreenQuad (shader, svStack, CS_ZBUF_NONE);
     }
 
     /**
@@ -679,6 +639,73 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         }
         shader->DeactivatePass (ticket);
       }
+    }
+
+    /**
+     * Draws a fullscreen quad using the supplied shader.
+     */
+    void DrawFullscreenQuad(iShader *shader,
+                            csShaderVariableStack &svStack,
+                            csZBufMode zmode)
+    {
+      iMeshObject *obj = persistentData.quadMesh->GetMeshObject ();
+
+      int num = 0;
+      csRenderMesh **meshes = obj->GetRenderMeshes (num, rview, 
+        persistentData.quadMesh->GetMovable (), 0);
+
+      if (num <= 0)
+        return;
+
+      // Switches to using orthographic projection. 
+      csReversibleTransform oldView = graphics3D->GetWorldToCamera ();
+      CS::Math::Matrix4 oldProj = graphics3D->GetProjectionMatrix ();
+
+      graphics3D->SetWorldToCamera (csReversibleTransform ());
+      graphics3D->SetProjectionMatrix (CreateOrthoProj (graphics3D));
+
+      // Create quad transform.
+      float w = graphics3D->GetDriver2D ()->GetWidth ();
+      float h = graphics3D->GetDriver2D ()->GetHeight ();
+
+      csMatrix3 S (w, 0, 0,
+                   0, h, 0,
+                   0, 0, 1);
+
+      csReversibleTransform T (S, csVector3 (0.0f, 0.0f, 0.0f));
+
+      const size_t ticket = shader->GetTicket (*meshes[0], svStack);
+      const size_t numPasses = shader->GetNumberOfPasses (ticket);
+
+      for (size_t p = 0; p < numPasses; p++)
+      {
+        if (!shader->ActivatePass (ticket, p)) 
+          continue;
+
+        for (int i = 0; i < num; i++)
+        {
+          csRenderMesh *m = meshes[i];
+
+          if (!shader->SetupPass (ticket, m, *m, svStack))
+            continue;
+
+          // Use additive blending so we do not loose the contributions from other lights.
+          m->z_buf_mode = zmode;
+          m->object2world = T;
+
+          graphics3D->DrawMesh (m, *m, svStack);
+
+          shader->TeardownPass (ticket);
+        }
+        shader->DeactivatePass (ticket);
+      }
+
+      // Restores old transforms.
+      graphics3D->SetWorldToCamera (oldView);
+      graphics3D->SetProjectionMatrix (oldProj);
+
+      // Needed for the change in projection matrix to take effect. 
+      graphics3D->BeginDraw (CSDRAW_3DGRAPHICS);
     }
 
     iGraphics3D *graphics3D;

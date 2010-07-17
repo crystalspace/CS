@@ -33,11 +33,13 @@
 #include "itexture.h"
 
 #include "gbuffer.h"
+#include "deferredtreetraits.h"
+#include "deferredrendertree.h"
 #include "deferredlightrender.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
-  typedef CS::RenderManager::RenderTree<CS::RenderManager::RenderTreeStandardTraits> 
+  typedef DeferredRenderTree<DeferredRenderTreeTraits> 
     RenderTreeType;
 
   template<typename RenderTreeType, typename LayerConfigType>
@@ -69,7 +71,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
   public:
 
-    bool AttachAccumBuffer(iGraphics3D *graphics3D);
+    bool AttachAccumBuffer(iGraphics3D *graphics3D, bool useGbufferDepth = false);
     bool DetachAccumBuffer(iGraphics3D *graphics3D);
 
     iObjectRegistry *objRegistry;
