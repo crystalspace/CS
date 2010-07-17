@@ -933,6 +933,7 @@ CS_TEXTURE_NPOTS = _ivideo.CS_TEXTURE_NPOTS
 CS_TEXTURE_SCALE_UP = _ivideo.CS_TEXTURE_SCALE_UP
 CS_TEXTURE_SCALE_DOWN = _ivideo.CS_TEXTURE_SCALE_DOWN
 CS_TEXTURE_CREATE_CLEAR = _ivideo.CS_TEXTURE_CREATE_CLEAR
+CS_TEXTURE_CUBEMAP_DISABLE_SEAMLESS = _ivideo.CS_TEXTURE_CUBEMAP_DISABLE_SEAMLESS
 class iTextureManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
