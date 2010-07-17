@@ -121,7 +121,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float ComputeM(float a, float b, int channel);
     void UpdateN();
     float SimpleNP(float phi, float thD );
-    float ComputeT(float absorption, float gammaT);
+    float ComputeT(float absorption, float gammaT, int p);
     float ComputeA(float absorption, int p, float h, float refraction, 
       float etaPerpendicular, float etaParallel);
     float ComputeNP(int p, float phiD, float thD);

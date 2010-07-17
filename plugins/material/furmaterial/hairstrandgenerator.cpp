@@ -308,10 +308,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     SaveImage(db->GetUint8(), "/data/hairtest/debug/N_debug.png");
   }
 
-  float HairStrandGenerator::ComputeT(float absorption, float gammaT)
+  float HairStrandGenerator::ComputeT(float absorption, float gammaT, int p)
   {
-    float l = 1 + cos(2 * gammaT);	// l = ls / cos qt = 2r cos h0t / cos qt
-    return exp(-2.0f * absorption * l);
+    float l = 2 * cos(gammaT);	// l = ls / cos qt = 2r cos h0t / cos qt
+    return exp(absorption * l * p);
   }
 
   float HairStrandGenerator::ComputeA(float absorption, int p, float h, 
@@ -327,10 +327,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float gammaT = asin(h / etaPerpendicular);	// h0 sin gt = h
 
     float fresnel = MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
-    float invFrenel = MarschnerHelper::Fresnel(1 / etaPerpendicular, 1 / etaParallel, gammaT);
-    float t = ComputeT(absorption, gammaT);
+    float invFresnel = MarschnerHelper::Fresnel(1 / etaPerpendicular, 1 / etaParallel, gammaT);
+    float t = ComputeT(absorption, gammaT, p);
 
-    return (1.0f - fresnel) * (1.0f - fresnel) * pow(invFrenel, p - 1.0f) * pow(t, p);
+    fresnel = (1 - fresnel) * (1 - invFresnel);
+    if (p > 1)
+      fresnel = fresnel * invFresnel;
+
+    return fresnel * t;
   }
 
   float HairStrandGenerator::ComputeNP(int p, float phi, float thD)
@@ -359,7 +363,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         float inverseDerivateAngle = 
           EquationsSolver::InverseFirstDerivate(p, etaPerpendicular, h);
 
-        result += finalAbsorption * 2 * fabs(inverseDerivateAngle); //0.5 here
+        result += finalAbsorption * 0.5f * fabs(inverseDerivateAngle); //0.5 here
       }
     }
 

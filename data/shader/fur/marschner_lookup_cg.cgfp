@@ -72,7 +72,7 @@ float4 main (vertex2fragment IN,
 	else if (DiffuseType == 3)	//	a test diffuse that looks good on the current hair color
 		diffuseColor.rgb = LightColor * HairColor.xyz * HairColor.xyz;
 	else if (DiffuseType == 4)	//	Kajiya and Kay diffuse
-		diffuseColor.rgb = 0.4 * sin(acos(sin_qi)) * LightColor;
+		diffuseColor.rgb = 0.2 * sin(acos(sin_qi)) * LightColor;
 	else	//	ambiental instead of diffuse
 		diffuseColor.rgb = 0.2 * LightColor;
 		
