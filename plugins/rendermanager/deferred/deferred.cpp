@@ -166,6 +166,143 @@ void ForEachTransparentMeshNode(ContextType &context, Fn &fn)
 }
 
 /**
+ * Sets up shaders based on their transparency. 
+ */
+template<typename RenderTree, typename LayerConfigType>
+class DeferredShaderSetup
+{
+public:
+  DeferredShaderSetup(ShaderArrayType &shaderArray, 
+                      const LayerConfigType &layerConfig,
+                      int deferredLayer)
+    : 
+  shaderArray(shaderArray), 
+  layerConfig(layerConfig), 
+  deferredLayer(deferredLayer)
+  {}
+
+  void operator() (typename RenderTree::MeshNode *node)
+  {
+    if (node->isTransparent)
+      TransparentSetup (node);
+    else
+      OpaqueSetup (node);
+  }
+
+   /**
+   * Sets up a mesh node to not use the deferred layer.
+   */
+  void TransparentSetup(typename RenderTree::MeshNode *node)
+  {
+    // Get the shader
+    const size_t totalMeshes = node->owner.totalRenderMeshes;
+
+    const size_t meshCount = node->meshes.GetSize ();
+    for (size_t i = 0; i < meshCount; i++)
+    {
+      typename RenderTree::MeshNode::SingleMesh &mesh = node->meshes[i];
+      csRenderMesh *rm = mesh.renderMesh;
+
+      // Setup the deferred layer.
+      size_t layerOffset = deferredLayer * totalMeshes;
+      shaderArray[mesh.contextLocalId + layerOffset] = nullptr;
+
+      // Setup the forward rendering layers.
+      const size_t layerCount = layerConfig.GetLayerCount ();
+      for (size_t layer = 0; layer < layerCount; layer++)
+      {
+        if (layer == deferredLayer)
+          continue;
+
+        size_t layerOffset = layer * totalMeshes;
+
+        iShader *shader = nullptr;
+        if (rm->material)
+        {
+          size_t layerShaderNum;
+          const csStringID *layerShaders = layerConfig.GetShaderTypes (layer, layerShaderNum);
+
+          shader = rm->material->GetMaterial ()->GetFirstShader (layerShaders, layerShaderNum);
+        }
+        
+        if (shader)
+          shaderArray[mesh.contextLocalId + layerOffset] = shader;
+        else
+          shaderArray[mesh.contextLocalId + layerOffset] = layerConfig.GetDefaultShader (layer);
+      }
+    }
+  }
+
+  /**
+   * Sets up a mesh node to only use the deferred layer.
+   */
+  void OpaqueSetup(typename RenderTree::MeshNode *node)
+  {
+    // Get the shader
+    const size_t totalMeshes = node->owner.totalRenderMeshes;
+
+    const size_t meshCount = node->meshes.GetSize ();
+    for (size_t i = 0; i < meshCount; i++)
+    {
+      typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
+      csRenderMesh *rm = mesh.renderMesh;
+
+      // Setup the deferred layer.
+      iShader *shader = nullptr;
+      if (rm->material)
+      {
+        size_t layerShaderNum;
+        const csStringID* layerShaders = layerConfig.GetShaderTypes (deferredLayer, layerShaderNum);
+
+        shader = rm->material->GetMaterial ()->GetFirstShader (layerShaders, layerShaderNum);
+      }
+
+      size_t layerOffset = deferredLayer * totalMeshes;
+      if (shader)
+        shaderArray[mesh.contextLocalId + layerOffset] = shader;
+      else
+        shaderArray[mesh.contextLocalId + layerOffset] = layerConfig.GetDefaultShader (deferredLayer);
+
+      // Setup the forward rendering layers.
+      const size_t layerCount = layerConfig.GetLayerCount ();
+      for (size_t layer = 0; layer < layerCount; layer++)
+      {
+        if (layer == deferredLayer)
+          continue;
+
+        size_t layerOffset = layer * totalMeshes;
+        shaderArray[mesh.contextLocalId + layerOffset] = nullptr;
+      }
+    }
+  }
+
+private:
+  ShaderArrayType &shaderArray;
+  const LayerConfigType &layerConfig;
+  int deferredLayer;
+};
+
+/**
+ * Iterates through the mesh nodes executing the DeferredShaderSetup functor.
+ */
+template<typename ContextNodeType, typename LayerConfigType>
+void DeferredSetupShader(ContextNodeType &context, 
+                         iShaderManager *shaderManager,
+                         const LayerConfigType &layerConfig,
+                         int deferredLayer)
+{
+  context.shaderArray.SetSize (context.totalRenderMeshes * layerConfig.GetLayerCount ());
+
+  // Shader setup
+  typedef typename ContextNodeType::TreeType Tree;
+  
+  typename DeferredShaderSetup<Tree, LayerConfigType>
+    shaderSetup (context.shaderArray, layerConfig, deferredLayer);
+
+  ForEachMeshNode (context, shaderSetup);
+}
+
+/**
  * Renderer for multiple contexts where all objects are drawn
  * to a single render target.
  *
@@ -194,11 +331,12 @@ class DeferredTreeRenderer
 {
 public:
 
-  DeferredTreeRenderer(iGraphics3D* g3d, iShaderManager *shaderMgr)
+  DeferredTreeRenderer(iGraphics3D *g3d, iShaderManager *shaderMgr, int deferredLayer)
     : 
   meshRender(g3d, shaderMgr),
   graphics3D(g3d),
-  shaderMgr(shaderMgr)
+  shaderMgr(shaderMgr),
+  deferredLayer(deferredLayer)
   {}
 
   ~DeferredTreeRenderer() {}
@@ -222,12 +360,8 @@ public:
     graphics3D->BeginDraw (drawFlags);
     graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
 
-    size_t layerCount = context->svArrays.GetNumLayers ();
-    for (size_t layer = 0; layer < layerCount; ++layer)
-    {
-      meshRender.SetLayer (layer);
-      ForEachOpaqueMeshNode (*context, meshRender);
-    }
+    meshRender.SetLayer (deferredLayer);
+    ForEachOpaqueMeshNode (*context, meshRender);
   }
  
 private:
@@ -236,6 +370,8 @@ private:
 
   iGraphics3D *graphics3D;
   iShaderManager *shaderMgr;
+
+  int deferredLayer;
 };
 
 /**
@@ -246,11 +382,12 @@ class TransparentMeshTreeRenderer
 {
 public:
 
-  TransparentMeshTreeRenderer(iGraphics3D* g3d, iShaderManager *shaderMgr)
+  TransparentMeshTreeRenderer(iGraphics3D* g3d, iShaderManager *shaderMgr, int deferredLayer)
     : 
   meshRender(g3d, shaderMgr),
   graphics3D(g3d),
-  shaderMgr(shaderMgr)
+  shaderMgr(shaderMgr),
+  deferredLayer(deferredLayer)
   {}
 
   ~TransparentMeshTreeRenderer() {}
@@ -275,6 +412,9 @@ public:
     size_t layerCount = context->svArrays.GetNumLayers ();
     for (size_t layer = 0; layer < layerCount; ++layer)
     {
+      if (layer == deferredLayer)
+        continue;
+
       meshRender.SetLayer (layer);
       ForEachTransparentMeshNode (*context, meshRender);
     }
@@ -286,6 +426,8 @@ private:
 
   iGraphics3D *graphics3D;
   iShaderManager *shaderMgr;
+
+  int deferredLayer;
 };
 
 //----------------------------------------------------------------------
@@ -301,7 +443,8 @@ public:
   rmanager(rmanager), 
   layerConfig(layerConfig),
   recurseCount(0), 
-  maxPortalRecurse(rmanager->maxPortalRecurse)
+  maxPortalRecurse(rmanager->maxPortalRecurse),
+  deferredLayer(rmanager->deferredLayer)
   {}
 
   StandardContextSetup (const StandardContextSetup &other, const LayerConfigType &layerConfig)
@@ -309,7 +452,8 @@ public:
   rmanager(other.rmanager), 
   layerConfig(layerConfig),
   recurseCount(other.recurseCount),
-  maxPortalRecurse(other.maxPortalRecurse)
+  maxPortalRecurse(other.maxPortalRecurse),
+  deferredLayer(other.deferredLayer)
   {}
 
   void operator()(typename RenderTreeType::ContextNode &context, 
@@ -363,7 +507,7 @@ public:
     }
 
     // Setup shaders and tickets
-    SetupStandardShader (context, shaderManager, layerConfig);
+    DeferredSetupShader (context, shaderManager, layerConfig, deferredLayer);
     SetupStandardTicket (context, shaderManager, layerConfig);
   }
 
@@ -374,6 +518,7 @@ private:
   const LayerConfigType &layerConfig;
 
   int recurseCount;
+  int deferredLayer;
   int maxPortalRecurse;
 };
 
@@ -408,7 +553,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   maxPortalRecurse = cfg->GetInt("RenderManager.Deferred.MaxPortalRecurse", 30);
 
   bool layersValid = false;
-  const char* layersFile = cfg->GetStr ("RenderManager.Deferred.Layers", 0);
+  const char* layersFile = cfg->GetStr ("RenderManager.Deferred.Layers", nullptr);
   if (layersFile)
   {
     csReport (objRegistry, CS_REPORTER_SEVERITY_NOTIFY, messageID, 
@@ -439,6 +584,16 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     baseLayer.AddShaderType (stringSet->Request("gbuffer fill"));
 
     renderLayer.AddLayers (baseLayer);
+
+    deferredLayer = 0;
+
+    if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
+    {
+      csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+        messageID, "Could not load lighting_default shader");
+    }
+
+    CS::RenderManager::AddDefaultBaseLayers (objRegistry, renderLayer);
   }
 
   // Creates the accumulation buffer.
@@ -547,7 +702,7 @@ bool RMDeferred::RenderView(iView *view)
   {
     graphics3D->SetZMode (CS_ZBUF_MESH);
 
-    DeferredTreeRenderer<RenderTreeType> render (graphics3D, shaderManager);
+    DeferredTreeRenderer<RenderTreeType> render (graphics3D, shaderManager, deferredLayer);
     ForEachContextReverse (renderTree, render);
 
     graphics3D->FinishDraw ();
@@ -583,7 +738,7 @@ bool RMDeferred::RenderView(iView *view)
   {
     graphics3D->SetZMode (CS_ZBUF_MESH);
 
-    TransparentMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderManager);
+    TransparentMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderManager, deferredLayer);
     render (startContext);
 
     graphics3D->FinishDraw ();

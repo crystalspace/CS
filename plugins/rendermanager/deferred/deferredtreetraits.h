@@ -25,6 +25,8 @@
 #include "ivideo/rendermesh.h"
 #include "csutil/comparator.h"
 #include "csutil/compileassert.h"
+#include "csutil/stringarray.h"
+#include "csutil/cfgacc.h"
 #include "csplugincommon/rendermanager/renderview.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"
 
@@ -58,7 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /// Any extra data that needs to persist between frames
     struct PersistentDataExtraDataType
     {
-      csArray<CS::Graphics::RenderPriority> transparentPriorities;
+      csBitArray transparentPriorities;
     };
 
     /**
@@ -88,16 +90,50 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /// Initializes the extra persistent data.
     static void Initialize(PersistentDataExtraDataType &data, iObjectRegistry *registry)
     {
-      // TODO: make customizable.
-      data.transparentPriorities.Push (9);
-      data.transparentPriorities.Push (10);
+      const char *messageID = "crystalspace.rendermanager.deferred.treetraits";
+
+      csConfigAccess cfg (registry);
+
+      const char *str = cfg->GetStr ("RenderManager.Deferred.TransparentPriorities", "9,10");
+      csStringArray strArray;
+      strArray.SplitString (str, ",", csStringArray::delimIgnore);
+
+      int maxPriority = -1;
+      csArray<CS::Graphics::RenderPriority> priorities;
+      for (size_t i = 0; i < strArray.GetSize (); i++)
+      {
+        int n = atoi (strArray[i]);
+        if (n < 0)
+        {
+          csReport (registry, CS_REPORTER_SEVERITY_WARNING,
+            messageID, "The transparent render priority '%s' is negative and being ignored.", strArray[i]);
+        }
+        else
+        {
+          priorities.Push (n);
+          if (n > maxPriority)
+            maxPriority = n;
+        }
+      }
+
+      if (maxPriority >= 0)
+      {
+        data.transparentPriorities.SetSize ((size_t)maxPriority + 1);
+        for (size_t i = 0; i < priorities.GetSize (); i++)
+        {
+          data.transparentPriorities.SetBit (priorities[i]);
+        }
+      }
+
     }
 
     /// Returns true if a mesh in the given priority is considered transparent.
     static bool IsTransparent(CS::Graphics::RenderPriority priority,
                               const PersistentDataExtraDataType &data)
     {
-      return data.transparentPriorities.Find (priority) != csArrayItemNotFound;
+      if (priority < (int)data.transparentPriorities.GetSize ())
+        return data.transparentPriorities.IsBitSet (priority);
+      return false;
     }
 
     // Enable/disables

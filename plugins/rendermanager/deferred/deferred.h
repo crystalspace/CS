@@ -88,6 +88,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     GBuffer gbuffer;
 
+    int deferredLayer;
     int maxPortalRecurse;
   };
 }
