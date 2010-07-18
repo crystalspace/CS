@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2007 by Marten Svanfeldt
+    Copyright (C) 2010 by Joe Forte
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,10 +20,6 @@
 #ifndef __CS_DEFERREDTREETRAITS_H__
 #define __CS_DEFERREDTREETRAITS_H__
 
-/**\file
- * Standard render tree traits
- */
-
 #include "iengine/mesh.h"
 #include "ivaria/view.h"
 #include "ivideo/rendermesh.h"
@@ -34,15 +31,9 @@
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
   /**
-   * Standard traits for customizing the deferred render tree class.
-   *
-   * Render tree traits specify additional data stored with
-   * meshes, contexts and others in a render tree. 
-   * To provide custom traits, create a class and either provide a new, custom
-   * type for a trait or typedef in the respective type from
-   * RenderTreeStandardTraits.
+   * Render tree traits used by the deferred render manager.
    */
-  class DeferredRenderTreeTraits
+  class RenderTreeDeferredTraits
   {
   public:
     /**\name Standard types
@@ -50,8 +41,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /// Any extra data that should be defined for each mesh node
     struct MeshNodeExtraDataType
     {
-      int   priority;
-      bool  isTransparent;
+      int priority;
+      bool isTransparent;
     };
 
     /// Any extra data that should be defined for each context node
@@ -62,6 +53,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /// Any extra data per mesh in a single mesh 
     struct MeshExtraDataType
     {
+    };
+
+    /// Any extra data that needs to persist between frames
+    struct PersistentDataExtraDataType
+    {
+      csArray<CS::Graphics::RenderPriority> transparentPriorities;
     };
 
     /**
@@ -88,6 +85,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     };
     /** @} */
 
+    /// Initializes the extra persistent data.
+    static void Initialize(PersistentDataExtraDataType &data, iObjectRegistry *registry)
+    {
+      // TODO: make customizable.
+      data.transparentPriorities.Push (9);
+      data.transparentPriorities.Push (10);
+    }
+
+    /// Returns true if a mesh in the given priority is considered transparent.
+    static bool IsTransparent(CS::Graphics::RenderPriority priority,
+                              const PersistentDataExtraDataType &data)
+    {
+      return data.transparentPriorities.Find (priority) != csArrayItemNotFound;
+    }
+
     // Enable/disables
 
     /**\name Standard functions
@@ -95,8 +107,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /// Given a iMeshWrapper and a csRenderMesh, get the correct mesh node index
     static CS_FORCEINLINE 
     MeshNodeKeyType GetMeshNodeKey (CS::Graphics::RenderPriority defaultPriority, 
-				    const csRenderMesh& rendermesh,
-                                    bool isTrasparent)
+                                    const csRenderMesh& rendermesh,
+                                    const PersistentDataExtraDataType& data)
     {
       MeshNodeKeyType result = {0};
 
@@ -105,7 +117,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       else
         result.priority = defaultPriority;
       result.isPortal = rendermesh.portal != 0;
-      result.isTransparent = isTrasparent;
+      result.isTransparent = IsTransparent (result.priority, data);
 
       return result;
     }
@@ -115,13 +127,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     static CS_FORCEINLINE_TEMPLATEMETHOD 
     void SetupMeshNode (T& meshNode, CS::Graphics::RenderPriority defaultPriority, 
                         const csRenderMesh& rendermesh,
-                        bool isTrasparent)
+                        const PersistentDataExtraDataType& data)
     {
       if (rendermesh.renderPrio >= 0)
         meshNode.priority = rendermesh.renderPrio;
       else
         meshNode.priority = defaultPriority;
-      meshNode.isTransparent = isTrasparent;
+      meshNode.isTransparent = IsTransparent (meshNode.priority, data);
     }
     /** @} */
   };
@@ -129,14 +141,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 CS_PLUGIN_NAMESPACE_END(RMDeferred)
 
 // Make sure the size matches so that we can use the comparison hack below
-CS_COMPILE_ASSERT(sizeof(CS::Plugin::RMDeferred::DeferredRenderTreeTraits::MeshNodeKeyType) == sizeof(int16));
+CS_COMPILE_ASSERT(sizeof(CS::Plugin::RMDeferred::RenderTreeDeferredTraits::MeshNodeKeyType) == sizeof(int16));
 
 template<>
-class csComparator<CS::Plugin::RMDeferred::DeferredRenderTreeTraits::MeshNodeKeyType>
+class csComparator<CS::Plugin::RMDeferred::RenderTreeDeferredTraits::MeshNodeKeyType>
 {
 public:
-  static int Compare (CS::Plugin::RMDeferred::DeferredRenderTreeTraits::MeshNodeKeyType const& mk1, 
-    CS::Plugin::RMDeferred::DeferredRenderTreeTraits::MeshNodeKeyType const& mk2)
+  static int Compare (CS::Plugin::RMDeferred::RenderTreeDeferredTraits::MeshNodeKeyType const& mk1, 
+    CS::Plugin::RMDeferred::RenderTreeDeferredTraits::MeshNodeKeyType const& mk2)
   {
     //BIG HACK
     return (int) (reinterpret_cast<const int16&> (mk1) - reinterpret_cast<const int16&> (mk2));

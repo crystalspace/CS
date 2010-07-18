@@ -34,12 +34,11 @@
 
 #include "gbuffer.h"
 #include "deferredtreetraits.h"
-#include "deferredrendertree.h"
 #include "deferredlightrender.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
-  typedef DeferredRenderTree<DeferredRenderTreeTraits> 
+  typedef CS::RenderManager::RenderTree<RenderTreeDeferredTraits> 
     RenderTreeType;
 
   template<typename RenderTreeType, typename LayerConfigType>

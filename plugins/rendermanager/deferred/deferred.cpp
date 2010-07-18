@@ -399,6 +399,9 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   treePersistent.Initialize (shaderManager);
   portalPersistent.Initialize (shaderManager, graphics3D, treePersistent.debugPersist);
   lightRenderPersistent.Initialize (registry);
+
+  // Initialize the extra data in the persistent tree data.
+  RenderTreeType::TreeTraitsType::Initialize (treePersistent, registry);
   
   // Read Config settings.
   csConfigAccess cfg (objRegistry);
