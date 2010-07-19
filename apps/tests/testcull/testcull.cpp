@@ -161,16 +161,19 @@ void Testcull::Frame ()
   c->SetTransform (ot);
   //rmanager->RenderView(view);
 
-  CS::RenderManager::RenderView rview(c,view->GetClipper(),g3d,g2d);
-  rview.SetEngine(engine);
-  rview.SetOriginalCamera(c);
-  //rview.GetClipPlane ().Set (0, 0, -1, 0);
-  c->SetViewportSize (rview.GetGraphics3D()->GetWidth(),
-    rview.GetGraphics3D()->GetHeight());
+  c->SetViewportSize (g3d->GetWidth(), g3d->GetHeight());
+  g3d->SetClipper (view->GetClipper(), CS_CLIPPER_TOPLEVEL);  // We are at top-level.
+  g3d->ResetNearPlane ();
+  g3d->SetProjectionMatrix (c->GetProjectionMatrix ());
+  const csReversibleTransform& camt = c->GetTransform ();
+  g3d->SetWorldToCamera (camt.GetInverse ());
   float leftx = -c->GetShiftX () * c->GetInvFOV ();
   float rightx = (g3d->GetWidth () - c->GetShiftX ()) * c->GetInvFOV ();
   float topy = -c->GetShiftY () * c->GetInvFOV ();
   float boty = (g3d->GetHeight () - c->GetShiftY ()) * c->GetInvFOV ();
+  CS::RenderManager::RenderView rview(c,view->GetClipper(),g3d,g2d);
+  rview.SetEngine(engine);
+  rview.SetOriginalCamera(c);
   rview.SetFrustum (leftx, rightx, topy, boty);
   
   if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
