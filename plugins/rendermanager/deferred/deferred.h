@@ -68,7 +68,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, ContextSetupType> 
       PortalSetupType;
 
+    typedef CS::RenderManager::LightSetup<RenderTreeType, CS::RenderManager::MultipleRenderLayer> 
+      LightSetupType;
+
   public:
+
+    void AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
+    int LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer &layers);
 
     bool AttachAccumBuffer(iGraphics3D *graphics3D, bool useGbufferDepth = false);
     bool DetachAccumBuffer(iGraphics3D *graphics3D);
@@ -77,11 +83,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     RenderTreeType::PersistentData treePersistent;
     PortalSetupType::PersistentData portalPersistent;
+    LightSetupType::PersistentData lightPersistent;
     DeferredLightRenderer::PersistentData lightRenderPersistent;
 
     CS::RenderManager::MultipleRenderLayer renderLayer;
 
     csRef<iShaderManager> shaderManager;
+    csRef<iLightManager> lightManager;
     csRef<iStringSet> stringSet;
 
     csRef<iTextureHandle> accumBuffer;

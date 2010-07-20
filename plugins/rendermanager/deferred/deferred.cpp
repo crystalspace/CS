@@ -508,7 +508,18 @@ public:
 
     // Setup shaders and tickets
     DeferredSetupShader (context, shaderManager, layerConfig, deferredLayer);
-    SetupStandardTicket (context, shaderManager, layerConfig);
+
+    // Setup lighting (only needed for transparent objects)
+    RMDeferred::LightSetupType::ShadowParamType shadowParam;
+    RMDeferred::LightSetupType lightSetup (rmanager->lightPersistent, 
+                                           rmanager->lightManager,
+                                           context.svArrays, 
+                                           layerConfig, 
+                                           shadowParam);
+
+    ForEachTransparentMeshNode (context, lightSetup);
+
+    SetupStandardTicket (context, shaderManager, lightSetup.GetPostLightingLayers ());
   }
 
 private:
@@ -539,10 +550,12 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
    
   shaderManager = csQueryRegistry<iShaderManager> (objRegistry);
+  lightManager = csQueryRegistry<iLightManager> (objRegistry);
   stringSet = csQueryRegistryTagInterface<iStringSet> (objRegistry, "crystalspace.shared.stringset");
 
   treePersistent.Initialize (shaderManager);
   portalPersistent.Initialize (shaderManager, graphics3D, treePersistent.debugPersist);
+  lightPersistent.Initialize (registry, treePersistent.debugPersist);
   lightRenderPersistent.Initialize (registry);
 
   // Initialize the extra data in the persistent tree data.
@@ -550,10 +563,10 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   
   // Read Config settings.
   csConfigAccess cfg (objRegistry);
-  maxPortalRecurse = cfg->GetInt("RenderManager.Deferred.MaxPortalRecurse", 30);
+  maxPortalRecurse = cfg->GetInt ("RenderManager.Deferred.MaxPortalRecurse", 30);
 
   bool layersValid = false;
-  const char* layersFile = cfg->GetStr ("RenderManager.Deferred.Layers", nullptr);
+  const char *layersFile = cfg->GetStr ("RenderManager.Deferred.Layers", nullptr);
   if (layersFile)
   {
     csReport (objRegistry, CS_REPORTER_SEVERITY_NOTIFY, messageID, 
@@ -562,30 +575,30 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     layersValid = CS::RenderManager::AddLayersFromFile (objRegistry, layersFile, renderLayer);
     
     if (!layersValid) 
+    {
       renderLayer.Clear();
+    }
+    else
+    {
+       // Locates the deferred shading layer.
+      deferredLayer = LocateDeferredLayer (renderLayer);
+      if (deferredLayer <= 0)
+      {
+        csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+          messageID, "The render layers file '%s' does not contain a 'gbuffer fill' layer.", layersFile);
+
+        AddDeferredLayer (renderLayer, deferredLayer);
+      }
+    }
   }
   
   csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
   if (!layersValid)
   {
-    if (!loader->LoadShader ("/shader/deferred/fill_gbuffer.xml"))
-    {
-      csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
-	messageID, "Could not load fill_gbuffer shader");
-    }
-
     csReport (objRegistry, CS_REPORTER_SEVERITY_NOTIFY, messageID,
-	"Using default render layers");
+      "Using default render layers");
 
-    iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
-    iShader *shader = shaderManager->GetShader ("fill_gbuffer");
-
-    SingleRenderLayer baseLayer (shader);
-    baseLayer.AddShaderType (stringSet->Request("gbuffer fill"));
-
-    renderLayer.AddLayers (baseLayer);
-
-    deferredLayer = 0;
+    AddDeferredLayer (renderLayer, deferredLayer);
 
     if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
     {
@@ -656,6 +669,7 @@ bool RMDeferred::RenderView(iView *view)
   rview->SetFrustum (l, r, t, b);
 
   portalPersistent.UpdateNewFrame ();
+  lightPersistent.UpdateNewFrame ();
 
   iEngine *engine = view->GetEngine ();
   engine->UpdateNewFrame ();  
@@ -761,6 +775,52 @@ bool RMDeferred::RenderView(iView *view)
 bool RMDeferred::PrecacheView(iView *view)
 {
   return RenderView (view);
+}
+
+//----------------------------------------------------------------------
+void RMDeferred::AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer)
+{
+  const char *messageID = "crystalspace.rendermanager.deferred";
+
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
+
+  if (!loader->LoadShader ("/shader/deferred/fill_gbuffer.xml"))
+  {
+    csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+      messageID, "Could not load fill_gbuffer shader");
+  }
+
+  iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
+  iShader *shader = shaderManager->GetShader ("fill_gbuffer");
+
+  SingleRenderLayer baseLayer (shader, 0, 0);
+  baseLayer.AddShaderType (stringSet->Request("gbuffer fill"));
+
+  renderLayer.AddLayers (baseLayer);
+
+  addedLayer = renderLayer.GetLayerCount () - 1;
+}
+
+//----------------------------------------------------------------------
+int RMDeferred::LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer &layers)
+{
+  csStringID deferredShaderType = stringSet->Request("gbuffer fill");
+
+  size_t count = renderLayer.GetLayerCount ();
+  for (size_t i = 0; i < count; i++)
+  {
+    size_t num;
+    const csStringID *strID = renderLayer.GetShaderTypes (i, num);
+    for (size_t j = 0; j < num; j++)
+    {
+      if (strID[j] == deferredShaderType)
+      {
+        return i;
+      }
+    }
+  }
+
+  return -1;
 }
 
 //----------------------------------------------------------------------

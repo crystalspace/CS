@@ -27,6 +27,7 @@
 #include "csutil/compileassert.h"
 #include "csutil/stringarray.h"
 #include "csutil/cfgacc.h"
+#include "csplugincommon/rendermanager/lightsetup.h"
 #include "csplugincommon/rendermanager/renderview.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"
 
@@ -48,7 +49,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     };
 
     /// Any extra data that should be defined for each context node
-    struct ContextNodeExtraDataType
+    struct ContextNodeExtraDataType 
+      : public CS::RenderManager::RenderTreeLightingTraits::ContextNodeExtraDataType
     {
     };
     
@@ -92,39 +94,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     {
       const char *messageID = "crystalspace.rendermanager.deferred.treetraits";
 
+      csRef<iEngine> engine = csQueryRegistry<iEngine> (registry);
       csConfigAccess cfg (registry);
-
-      const char *str = cfg->GetStr ("RenderManager.Deferred.TransparentPriorities", "9,10");
+      
+      const char *str = cfg->GetStr ("RenderManager.Deferred.TransparentPriorities", "alpha,transp");
       csStringArray strArray;
       strArray.SplitString (str, ",", csStringArray::delimIgnore);
 
-      int maxPriority = -1;
-      csArray<CS::Graphics::RenderPriority> priorities;
       for (size_t i = 0; i < strArray.GetSize (); i++)
       {
-        int n = atoi (strArray[i]);
-        if (n < 0)
+        long p = engine->GetRenderPriority (strArray[i]);
+        if (p <= 0)
         {
           csReport (registry, CS_REPORTER_SEVERITY_WARNING,
-            messageID, "The transparent render priority '%s' is negative and being ignored.", strArray[i]);
+            messageID, "Unknown render priority '%s' specified.", strArray[i]);
         }
         else
         {
-          priorities.Push (n);
-          if (n > maxPriority)
-            maxPriority = n;
+          if ((long)data.transparentPriorities.GetSize() <= p)
+            data.transparentPriorities.SetSize (p + 1);
+          data.transparentPriorities.SetBit (p);
         }
       }
-
-      if (maxPriority >= 0)
-      {
-        data.transparentPriorities.SetSize ((size_t)maxPriority + 1);
-        for (size_t i = 0; i < priorities.GetSize (); i++)
-        {
-          data.transparentPriorities.SetBit (priorities[i]);
-        }
-      }
-
     }
 
     /// Returns true if a mesh in the given priority is considered transparent.
