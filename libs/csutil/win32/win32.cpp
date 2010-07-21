@@ -113,6 +113,7 @@ private:
   /// The window class name for this assistant
   uint8* windowClass;
 
+  void HandleWheelMessage (HWND hWnd, bool isHWheel, WPARAM wParam, LPARAM lParam);
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
   static LRESULT CALLBACK CBTProc (int nCode, WPARAM wParam, LPARAM lParam);
@@ -705,11 +706,31 @@ int Win32Assistant::GetCmdShow () const
 #define	WM_XBUTTONUP	0x020c
 #endif
 
+#ifndef WM_MOUSEHWHEEL
+#define	WM_MOUSEHWHEEL	0x020e
+#endif
+
 struct CreateInfo
 {
   Win32Assistant* assistant;
   iGraphics2D* canvas;
 };
+
+void Win32Assistant::HandleWheelMessage (HWND hWnd, bool isHWheel, WPARAM wParam, LPARAM lParam)
+{
+  int wheelDelta = (short)HIWORD (wParam);
+  // @@@ Only emit events when WHEEL_DELTA wheel ticks accumulated?
+  POINT coords;
+  coords.x = short (LOWORD (lParam));
+  coords.y = short (HIWORD (lParam));
+  ScreenToClient(hWnd, &coords);
+  int button;
+  if (isHWheel)
+    button = wheelDelta > 0 ? csmbHWheelRight : csmbHWheelLeft;
+  else
+    button = wheelDelta > 0 ? csmbWheelUp : csmbWheelDown;
+  EventOutlet->Mouse (button, true, coords.x, coords.y);
+}
 
 LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
@@ -829,21 +850,10 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       return TRUE;
     }
     case WM_MOUSEWHEEL:
+    case WM_MOUSEHWHEEL:
     {
       if (assistant != 0)
-      {
-        iEventOutlet* outlet = assistant->GetEventOutlet();
-	int wheelDelta = (short)HIWORD (wParam);
-	// @@@ Only emit events when WHEEL_DELTA wheel ticks accumulated?
-	POINT coords;
-	coords.x = short (LOWORD (lParam));
-	coords.y = short (HIWORD (lParam));
-	ScreenToClient(hWnd, &coords);
-	outlet->Mouse (wheelDelta > 0 ? csmbWheelUp : csmbWheelDown, true,
-	  coords.x, coords.y);
-	//outlet->Mouse (wheelDelta > 0 ? csmbWheelUp : csmbWheelDown, false,
-	  //coords.x, coords.y); 
-      }
+        assistant->HandleWheelMessage (hWnd, message == WM_MOUSEHWHEEL, wParam, lParam);
       return 0;
     }
     case WM_XBUTTONUP:

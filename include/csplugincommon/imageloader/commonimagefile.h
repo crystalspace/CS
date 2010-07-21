@@ -29,6 +29,7 @@
 #include "csutil/ref.h"
 #include "csutil/scf_interface.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/weakref.h"
 #include "iutil/databuff.h"
 #include "iutil/job.h"
 
@@ -135,7 +136,7 @@ public:
   }
 };
 
-#define THREADED_LOADING
+#define CSCOMMONIMAGEFILE_THREADED_LOADING
 
 /**
  * A base class for image loader plugin iImage implementations.
@@ -149,28 +150,30 @@ protected:
   class CS_CRYSTALSPACE_EXPORT LoaderJob : 
     public scfImplementation1<LoaderJob, iJob>
   {
-  public:
     /// The actual image loader.
-    csRef<iImageFileLoader> currentLoader;
+    CS::Threading::Mutex fileToLoadLock;
+    csCommonImageFile* fileToLoad;
+  public:
     /// Result of the iImageFileLoader::LoadData() call.
     bool loadResult;
     /// Create new instance with a given image loader.
-    LoaderJob (iImageFileLoader* loader);
+    LoaderJob (csCommonImageFile* fileToLoad);
     virtual ~LoaderJob();
 
     virtual void Run();
+    
+    void ClearFileToLoad ();
   };
 
-#ifdef THREADED_LOADING
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
   /// Reference to the job for loading this image.
   // This and jobQueue are mutable so MakeImageData() can be called.
   mutable csRef<LoaderJob> loadJob;
   /// Reference to job queue.
   mutable csRef<iJobQueue> jobQueue;
-#else
+#endif
   // This is mutable so MakeImageData() can be called.
   mutable csRef<iImageFileLoader> currentLoader;
-#endif
   iObjectRegistry* object_reg;
 
   csCommonImageFile (iObjectRegistry* object_reg, int format);
@@ -198,10 +201,10 @@ protected:
 
   virtual bool HasKeyColor () const 
   { 
-#ifdef THREADED_LOADING
-    if (loadJob)
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
+    if (currentLoader)
     {
-      return loadJob->currentLoader->HasKeyColor();
+      return currentLoader->HasKeyColor();
     }
 #endif
     return has_keycolour; 
@@ -209,12 +212,12 @@ protected:
 
   virtual void GetKeyColor (int &r, int &g, int &b) const
   { 
-#ifdef THREADED_LOADING
-    if (loadJob)
+#ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
+    if (currentLoader)
     {
       // Keycolor may only be available after loading...
       WaitForJob();
-      loadJob->currentLoader->GetKeyColor (r, g, b);
+      currentLoader->GetKeyColor (r, g, b);
       return;
     }
 #endif

@@ -7658,4 +7658,8 @@
     <token name="GL_RG" value="0x8227" />
     <token name="GL_RG_INTEGER" value="0x8228" />
   </extension>
+  <extension name="GL_ARB_seamless_cube_map" type="GL">
+    <token name="GL_TEXTURE_CUBE_MAP_SEAMLESS" value="0x884F" />
+  </extension>
+  <extension name="GL_AMD_seamless_cubemap_per_texture" type="GL" />
 </extensionlist>

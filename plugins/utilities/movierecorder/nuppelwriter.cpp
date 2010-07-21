@@ -142,7 +142,7 @@ void NuppelWriter::writeFrame(unsigned char *frameBuffer,
   memset(&frameh, 0, sizeof(frameh));
   frameh.frametype = 'V';
   frameh.keyframe = frameofgop;
-  frameh.timecode = (int) (frameNumber * frameRate * 1000.0);
+  frameh.timecode = (int) (frameNumber / frameRate * 1000.0);
 
   if (rgb) {
     /* Nonstandard: uncompressed bottom-up RGB24 */

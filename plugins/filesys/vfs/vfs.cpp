@@ -186,6 +186,10 @@ public:
     UpdateTime ();
     CS_ASSERT(RefCount >= 0);
   }
+  int GetRefCount () const
+  {
+    return CS::Threading::AtomicOperations::Read (&RefCount);
+  }
   bool CheckUp ()
   {
     return (RefCount == 0) &&
@@ -1507,6 +1511,11 @@ int csVFS::VfsVector::Compare (VfsNode* const& Item1, VfsNode* const& Item2)
 
 SCF_IMPLEMENT_FACTORY (csVFS)
 
+csVFS::VfsTls::VfsTls() : dirstack (8, 8)
+{
+  char s[2] = { VFS_PATH_SEPARATOR, 0 };
+  cwd = s;
+}
 
 csVFS::csVFS (iBase *iParent) :
   scfImplementationType(this, iParent),
@@ -1517,17 +1526,12 @@ csVFS::csVFS (iBase *iParent) :
   auto_name_counter(0),
   verbosity(VERBOSITY_NONE)
 {
-  dirstack = new csStringArray(8,8);
   heap.AttachNew (new HeapRefCounted);
-  cwd.SetValue((char*)cs_malloc (2));
-  cwd [0] = VFS_PATH_SEPARATOR;
-  cwd [1] = 0;
   ArchiveCache = new VfsArchiveCache ();
 }
 
 csVFS::~csVFS ()
 {
-  cs_free (cwd);
   cs_free (basedir);
   cs_free (resdir);
   cs_free (appdir);
@@ -1805,21 +1809,6 @@ bool csVFS::CheckIfMounted(char const* virtual_path)
   return ok;
 }
 
-void csVFS::CheckCurrentDir()
-{
-  if (cwd == 0)
-  {
-    cwd.SetValue((char*)cs_malloc (2));
-    cwd [0] = VFS_PATH_SEPARATOR;
-    cwd [1] = 0;
-  }
-
-  if (dirstack == 0)
-  {
-    dirstack = new csStringArray(8,8);
-  }
-}
-
 bool csVFS::ChDir (const char *Path)
 {
   csString copy (Path);
@@ -1827,25 +1816,20 @@ bool csVFS::ChDir (const char *Path)
   char *newwd = _ExpandPath (copy, true);
   if (!newwd)
     return false;
-  CheckCurrentDir();
-  cs_free(cwd);
-  char* dir = (char*)cs_malloc(strlen(newwd)+1);
-  cwd.SetValue(dir);
-  memcpy(dir, newwd, strlen(newwd)+1);
+  tls->cwd = newwd;
+  cs_free (newwd);
   ArchiveCache->CheckUp ();
   return true;
 }
 
 const char* csVFS::GetCwd ()
 {
-  CheckCurrentDir();
-  return cwd;
+  return tls->cwd;
 }
 
 void csVFS::PushDir (char const* Path)
 {
-  CheckCurrentDir();
-  dirstack.GetValue()->Push (cwd);
+  tls->dirstack.Push (tls->cwd);
 
   if (Path != 0)
     ChDir(Path);
@@ -1853,10 +1837,9 @@ void csVFS::PushDir (char const* Path)
 
 bool csVFS::PopDir ()
 {
-  CheckCurrentDir();
-  if (!dirstack.GetValue()->GetSize ())
+  if (!tls->dirstack.GetSize ())
     return false;
-  char *olddir = (char *) dirstack.GetValue()->Pop ();
+  char *olddir = (char *) tls->dirstack.Pop ();
   bool retcode = ChDir (olddir);
   delete[] olddir;
   return retcode;

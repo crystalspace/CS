@@ -23,6 +23,9 @@
 
 #include "imesh/skeleton2.h"
 
+#include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
+
 struct iRenderBuffer;
 struct iMaterialWrapper;
 struct iShaderVariableContext;
@@ -55,7 +58,7 @@ struct csAnimatedMeshBoneInfluence
 };
 
 /**
- * Factory for sockets attached to animated meshes
+ * Factory for sockets attached to iAnimatedMesh's
  */
 struct iAnimatedMeshSocketFactory : public virtual iBase
 {
@@ -70,37 +73,37 @@ public:
   /**
    * Set the name of the socket
    */
-  virtual void SetName (const char* ) = 0;
+  virtual void SetName (const char* name) = 0;
   
   /**
-   * Get the bone to socket transform of the socket
+   * Get the 'bone to socket transform' of the socket
    */
   virtual const csReversibleTransform& GetTransform () const = 0;
 
   /**
-   * Set the bone to socket transform of the socket
+   * Set the 'bone to socket transform' of the socket
    */
-  virtual void SetTransform (csReversibleTransform& tf) = 0;
+  virtual void SetTransform (csReversibleTransform& transform) = 0;
   
   /**
-   * Get the bone ID associated with the socket
+   * Get the ID of the bone associated with the socket
    */
   virtual BoneID GetBone () const = 0;
 
   /**
-   * Set the bone ID associated with the socket
+   * Set the bone associated with the socket
    */
-  virtual void SetBone (BoneID) = 0;
+  virtual void SetBone (BoneID boneID) = 0;
 
   /**
-   * Get the associated mesh factory
+   * Get the associated animated mesh factory
    */
   virtual iAnimatedMeshFactory* GetFactory () = 0;
 };
 
 /**
  * Sockets attached to animated meshes. Sockets are designed to 
- * attach external objects to animated meshes.
+ * attach external objects to iAnimatedMesh's.
  */
 struct iAnimatedMeshSocket : public virtual iBase
 {
@@ -113,27 +116,27 @@ public:
   virtual const char* GetName () const = 0;
 
   /**
-   * Get the socket factory this socket was created from
+   * Get the factory of this socket
    */
   virtual iAnimatedMeshSocketFactory* GetFactory () = 0;
 
   /**
-   * Get the bone to socket transform of the socket
+   * Get the 'bone to socket transform' of the socket
    */
   virtual const csReversibleTransform& GetTransform () const = 0;
 
   /**
-   * Set the bone to socket transform of the socket
+   * Set the 'bone to socket transform' of the socket
    */
   virtual void SetTransform (csReversibleTransform& tf) = 0;
 
   /**
-   * Get the full transform of the socket
+   * Get the full transform of the socket, in world coordinate
    */
   virtual const csReversibleTransform GetFullTransform () const = 0;
 
   /**
-   * Get the bone ID associated with the socket
+   * Get the ID of the bone associated with the socket
    */
   virtual BoneID GetBone () const = 0;
 
@@ -161,7 +164,7 @@ public:
  * @{ */
 
 /**
- * State of animated mesh object factory
+ * State of an animated mesh object factory
  */
 struct iAnimatedMeshFactory : public virtual iBase
 {
@@ -181,7 +184,7 @@ struct iAnimatedMeshFactory : public virtual iBase
 
   /**
    * Create a new submesh.
-   * This creates a submesh which have several triangle sets<->bone mapping pairs.
+   * This creates a submesh which have several 'triangle sets<->bone' mapping pairs.
    * Such a submesh is useful when you want to limit the number of bones per
    * batch rendered.
    * \param indices Array of index buffers to use per part
@@ -208,7 +211,7 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual size_t GetSubMeshCount () const = 0;
 
   /**
-   * Remove a submesh from factory.
+   * Remove a submesh from this factory.
    */
   virtual void DeleteSubMesh (iAnimatedMeshFactorySubMesh* mesh) = 0;
 
@@ -223,14 +226,14 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual uint GetVertexCount () const = 0;
 
   /**
-   * Get a pointer to the buffer specifying vertices.
-   * The buffer is at least as many entries as specified by the vertex count.
+   * Get a pointer to the buffer specifying the vertices.
+   * The buffer has at least as many entries as specified by the vertex count.
    * You must call Invalidate() after modifying it.
    */
   virtual iRenderBuffer* GetVertices () = 0;
 
   /**
-   * Set the render buffer to use for vertices.
+   * Set the render buffer to use for the vertices.
    * The buffer must contain at least three components per elements and its
    * length will specify the number of vertices within the mesh.
    * \returns false if the buffer doesn't follow required specifications
@@ -238,71 +241,71 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual bool SetVertices (iRenderBuffer* renderBuffer) = 0;
 
   /**
-   * Get a pointer to the buffer specifying texture coordinates.
-   * The buffer is at least as many entries as specified by the vertex count.
+   * Get a pointer to the buffer specifying the texture coordinates.
+   * The buffer hass at least as many entries as specified by the vertex count.
    * You must call Invalidate() after modifying it.
    */
   virtual iRenderBuffer* GetTexCoords () = 0;
 
   /**
-   * Set the render buffer to use for texture coordinates.
-   * Must hold at least as many elements as the vertex buffer.
+   * Set the render buffer to use for the texture coordinates.
+   * It must hold at least as many elements as the vertex buffer.
    * \returns false if the buffer doesn't follow required specifications
    */
   virtual bool SetTexCoords (iRenderBuffer* renderBuffer) = 0;
 
   /**
-   * Get a pointer to the buffer specifying vertex normals.
-   * The buffer is at least as many entries as specified by the vertex count.
+   * Get a pointer to the buffer specifying the vertex normals.
+   * The buffer has at least as many entries as specified by the vertex count.
    * You must call Invalidate() after modifying it.
    */
   virtual iRenderBuffer* GetNormals () = 0;
 
   /**
-   * Set the render buffer to use for normals.   
-   * Must hold at least as many elements as the vertex buffer.
+   * Set the render buffer to use for the normals.   
+   * It must hold at least as many elements as the vertex buffer.
    * \returns false if the buffer doesn't follow required specifications
    */
   virtual bool SetNormals (iRenderBuffer* renderBuffer) = 0;
 
   /**
-   * Get a pointer to the buffer specifying vertex tangents.
-   * The buffer is at least as many entries as specified by the vertex count.
+   * Get a pointer to the buffer specifying the vertex tangents.
+   * The buffer has at least as many entries as specified by the vertex count.
    * You must call Invalidate() after modifying it.
    */
   virtual iRenderBuffer* GetTangents () = 0;
 
   /**
-   * Set the render buffer to use for tangents.   
-   * Must hold at least as many elements as the vertex buffer.
+   * Set the render buffer to use for the tangents.   
+   * It must hold at least as many elements as the vertex buffer.
    * \returns false if the buffer doesn't follow required specifications
    */
   virtual bool SetTangents (iRenderBuffer* renderBuffer) = 0;
 
   /**
-   * Get a pointer to the buffer specifying vertex binormals.
-   * The buffer is at least as many entries as specified by the vertex count.
+   * Get a pointer to the buffer specifying the vertex binormals.
+   * The buffer hass at least as many entries as specified by the vertex count.
    * You must call Invalidate() after modifying it.
    */
   virtual iRenderBuffer* GetBinormals () = 0;
 
   /**
-   * Set the render buffer to use for binormals.   
-   * Must hold at least as many elements as the vertex buffer.
+   * Set the render buffer to use for the binormals.   
+   * It must hold at least as many elements as the vertex buffer.
    * \returns false if the buffer doesn't follow required specifications
    */
   virtual bool SetBinormals (iRenderBuffer* renderBuffer) = 0;
 
   /**
-   * Get a pointer to the buffer specifying vertex color.
-   * The buffer is at least as many entries as specified by the vertex count.
+   * Get a pointer to the buffer specifying the vertex color.
+   * The buffer hass at least as many entries as specified by the vertex count.
    * You must call Invalidate() after modifying it.
    */
   virtual iRenderBuffer* GetColors () = 0;
 
   /**
-   * Set the render buffer to use for vertex color.   
-   * Must hold at least as many elements as the vertex buffer.
+   * Set the render buffer to use for the vertex color.   
+   * It must hold at least as many elements as the vertex buffer.
    * \returns false if the buffer doesn't follow required specifications
    */
   virtual bool SetColors (iRenderBuffer* renderBuffer) = 0;
@@ -388,7 +391,7 @@ struct iAnimatedMeshFactory : public virtual iBase
 
   /**
    * Create a new socket
-   * \param bone Bone id to connect socket for
+   * \param bone ID of the bone to connect the socket
    * \param transform Initial transform
    * \param name Name of the socket, optional
    */
@@ -396,7 +399,7 @@ struct iAnimatedMeshFactory : public virtual iBase
     const csReversibleTransform& transform, const char* name) = 0;
 
   /**
-   * Get the number of sockets in factory
+   * Get the number of sockets in this factory
    */
   virtual size_t GetSocketCount () const = 0;
 
@@ -414,11 +417,12 @@ struct iAnimatedMeshFactory : public virtual iBase
 };
 
 /**
- * Sub mesh (part) of an animated mesh factory
+ * Sub mesh (part) of an animated mesh factory. It can be used to apply
+ * various materials and rendering parameters on sub-parts of the animated mesh.
  */
 struct iAnimatedMeshFactorySubMesh : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshFactorySubMesh, 1, 2, 0);
+  SCF_INTERFACE(iAnimatedMeshFactorySubMesh, 1, 2, 1);
 
   /**
    * Get the index buffer for this submesh. Defines a triangle list.
@@ -431,24 +435,54 @@ struct iAnimatedMeshFactorySubMesh : public virtual iBase
   virtual uint GetIndexSetCount () const = 0;
 
   /**
-   * Get the bone indices used by a given index set
+   * Get the bone indices used by the given index set
    */
   virtual const csArray<unsigned int>& GetBoneIndices (size_t set) = 0;
 
   /**
-   * Get the material
+   * Get the material of this submesh
    */
   virtual iMaterialWrapper* GetMaterial () const = 0;
 
   /**
-   * Set the material, or 0 to use default.
+   * Set the material of this submesh, or 0 to use default.
    */
   virtual void SetMaterial (iMaterialWrapper* material) = 0;
 
   /**
-   * Get the submesh name.
+   * Get the name of this submesh.
    */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Set whether or not the submesh has to be rendered by default.
+   */
+  virtual void SetRendering (bool doRender) = 0;
+
+  /**
+   * Get whether or not the submesh has to be rendered by default.
+   */
+  virtual bool IsRendering () const = 0;
+
+  /**
+   * Set the render priority of this submesh.
+   */
+  virtual void SetRenderPriority (CS::Graphics::RenderPriority rp) = 0;
+
+  /**
+   * Get the render priority of this submesh.
+   */
+  virtual CS::Graphics::RenderPriority GetRenderPriority () const = 0;
+
+  /**
+   * Set the Z-buf drawing mode of this submesh.
+   */
+  virtual void SetZBufMode (csZBufMode mode) = 0;
+
+  /**
+   * Get the Z-buf drawing mode of this submesh.
+   */
+  virtual csZBufMode GetZBufMode () const = 0;
 };
 
 /**
@@ -507,71 +541,73 @@ struct iAnimatedMesh : public virtual iBase
 };
 
 /**
- * Sub mesh (part) of an animated mesh
+ * Sub mesh (part) of an animated mesh. It can be used to apply
+ * various materials and rendering parameters on sub-parts of the animated mesh.
  */
 struct iAnimatedMeshSubMesh : public virtual iBase
 {
   SCF_INTERFACE(iAnimatedMeshSubMesh, 1, 2, 0);
 
   /**
-   * Get the factory submesh
+   * Get the factory of this submesh
    */
   virtual iAnimatedMeshFactorySubMesh* GetFactorySubMesh () = 0;
 
   /**
-   * Set current rendering state for this submesh
+   * Set whether or not this submesh has to be rendered.
    */
   virtual void SetRendering (bool doRender) = 0;
 
   /**
-   * Get current rendering state for this submesh
+   * Get whether or not this submesh has to be rendered.
    */
   virtual bool IsRendering () const = 0;
 
   /**
    * Get a shader variable context for this submesh.
    */
-  virtual iShaderVariableContext* GetShaderVariableContext(size_t buffer) const = 0;
+  virtual iShaderVariableContext* GetShaderVariableContext (size_t buffer) const = 0;
 
  /**
-  * Get the material.
+  * Get the material of this submesh.
   */
   virtual iMaterialWrapper* GetMaterial () const = 0;
 
  /**
-  * Set the material, or 0 to use factory material.
+  * Set the material of this submesh, or 0 to use the material of the factory.
   */
   virtual void SetMaterial (iMaterialWrapper* material) = 0;
 };
 
 /**
- * A morph target
+ * A morph target. It can be used to deform by morphing the vertices of an
+ * animated mesh.
  */
 struct iAnimatedMeshMorphTarget : public virtual iBase
 {
   SCF_INTERFACE(iAnimatedMeshMorphTarget, 2, 0, 0);
 
   /**
-   * Set the render buffer to use for vertex offsets.   
-   * Must hold at least as many elements as the vertex buffer of the owning
+   * Set the render buffer to use for the vertex offsets.   
+   * It must hold at least as many elements as the vertex buffer of the owning
    * mesh object.
    * \returns false if the buffer doesn't follow required specifications
    */
   virtual bool SetVertexOffsets (iRenderBuffer* renderBuffer) = 0;
 
   /**
-   * Get the buffer of vertex offsets
+   * Get the buffer of the vertex offsets
    * Remember to call Invalidate() after changing this data.
    */
   virtual iRenderBuffer* GetVertexOffsets () = 0;
 
   /**
-   * Update target after changes to its vertex offsets
+   * Update the morph target after some changes to its vertex offsets
    */
   virtual void Invalidate () = 0;
 
   /// Get the name of this morph target
-  virtual const char* GetName() const = 0;
+  virtual const char* GetName () const = 0;
 };
 
 

@@ -486,6 +486,7 @@ class iThreadManager(iBase):
     def SetAlwaysRunNow(*args): return _core.iThreadManager_SetAlwaysRunNow(*args)
     def GetAlwaysRunNow(*args): return _core.iThreadManager_GetAlwaysRunNow(*args)
     def Exiting(*args): return _core.iThreadManager_Exiting(*args)
+    def ProcessAll(*args): return _core.iThreadManager_ProcessAll(*args)
     __swig_destroy__ = _core.delete_iThreadManager
     __del__ = lambda self : None;
 iThreadManager_swigregister = _core.iThreadManager_swigregister
@@ -1468,6 +1469,8 @@ csmbWheelUp = _core.csmbWheelUp
 csmbWheelDown = _core.csmbWheelDown
 csmbExtra1 = _core.csmbExtra1
 csmbExtra2 = _core.csmbExtra2
+csmbHWheelLeft = _core.csmbHWheelLeft
+csmbHWheelRight = _core.csmbHWheelRight
 csKeyModifierTypeShift = _core.csKeyModifierTypeShift
 csKeyModifierTypeCtrl = _core.csKeyModifierTypeCtrl
 csKeyModifierTypeAlt = _core.csKeyModifierTypeAlt

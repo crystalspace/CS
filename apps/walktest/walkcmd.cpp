@@ -1755,6 +1755,14 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_CMD (cmd);
     Sys->lights->DelLights ();
   }
+  else if (!csStrCaseCmp (cmd, "flashlight"))
+  {
+    RECORD_CMD (cmd);
+    bool active = Sys->lights->IsFlashlightEnabled();
+    csCommandProcessor::change_boolean (arg, &active, "flashlight");
+    if (active != Sys->lights->IsFlashlightEnabled())
+      Sys->lights->EnableFlashlight (active);
+  }
   else if (!csStrCaseCmp (cmd, "snd_play"))
   {
     if (Sys->mySound)

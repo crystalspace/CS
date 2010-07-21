@@ -347,13 +347,14 @@ struct iSkeleton2 : public virtual iBase
 
 /**
  * Holds the state of an animesh skeleton for a frame, ie the position
- * and rotation of each bone of the skeleton.
+ * and rotation of each bone of the skeleton. These transforms are in
+ * bind space.
  */
 class csSkeletalState2 : public csRefCount
 {
 public:
 
-  ///
+  /// Constructor
   csSkeletalState2 ()
     : boneVecs (0), boneQuats (0), numberOfBones (0)
   {}
@@ -366,8 +367,8 @@ public:
   }
 
   /**
-   * Return the position vector of the specified bone.
-   * \param i the BoneID of the bone.
+   * Return the position vector of the specified bone, in bone space.
+   * \param i The BoneID of the bone.
    */
   inline const csVector3& GetVector (size_t i) const
   {
@@ -375,8 +376,8 @@ public:
   }
 
   /**
-   * Return the position vector of the specified bone.
-   * \param i the BoneID of the bone.
+   * Return the position vector of the specified bone, in bone space.
+   * \param i The BoneID of the bone.
    */
   inline csVector3& GetVector (size_t i) 
   {
@@ -385,8 +386,8 @@ public:
 
 
   /**
-   * Return the rotation quaternion of the specified bone.
-   * \param i the BoneID of the bone.
+   * Return the rotation quaternion of the specified bone, in bone space.
+   * \param i The BoneID of the bone.
    */
   inline const csQuaternion& GetQuaternion (size_t i) const
   {
@@ -394,8 +395,8 @@ public:
   }
 
   /**
-   * Return the rotation quaternion of the specified bone.
-   * \param i the BoneID of the bone.
+   * Return the rotation quaternion of the specified bone, in bone space.
+   * \param i The BoneID of the bone.
    */
   inline csQuaternion& GetQuaternion (size_t i) 
   {
@@ -404,8 +405,8 @@ public:
 
   /**
    * Return true if the position and rotation values have been set for
-   * the specified bone, false otherwise (default values will therefore
-   * be used).
+   * the specified bone, false otherwise (last position and rotation values
+   * which have been set for this bone will therefore be kept).
    */
   inline bool IsBoneUsed (BoneID bone) const
   {

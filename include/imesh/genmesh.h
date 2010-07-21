@@ -361,7 +361,7 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 
   /**
    * Automatically calculate normals based on the current mesh.
-   * /param compress if true (default) then calculate the normals
+   * \param compress if true (default) then calculate the normals
    * based on compressed vertices.
    */
   virtual void CalculateNormals (bool compress = true) = 0;

@@ -542,7 +542,7 @@ public:
 
         return false;
       }
-      CS_EVENTHANDLER_PHASE_2D("crystalspace.bugplug.frame.logic")
+      CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.bugplug.frame.logic")
     };
     csRef<LogicEventHandler> logicEventHandler;
 };

@@ -41,6 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     uint NumMathInstructionSlots;
     uint NumTemps;
     uint NumTexInstructionSlots;
+    uint extensions;
     
     ProfileLimits (
       CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendor,

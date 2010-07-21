@@ -46,6 +46,10 @@
 #include "ceguiresourceprovider.h"
 #include "ceguiscriptmodule.h"
 
+#include "windowfactory.h"
+#include "config/settingslider.h"
+#include "config/settingcombobox.h"
+
 #include <vector>
 
 namespace CEGUI
@@ -209,6 +213,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     csRef<iGraphics3D> g3d;
     csRef<iGraphics2D> g2d;
 
+    csWindowFactory<SettingSlider> settingsSliderFact;
+    csWindowFactory<SettingComboBox> settingComboBoxFact;
   };
 
 

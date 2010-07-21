@@ -29,15 +29,14 @@ SintelScene::SintelScene (AvatarTest* avatarTest)
     currentExpressionIndex (0), activeFacialTransition (false)
 {
   // Define the available keys
-  avatarTest->keyDescriptions.DeleteAll ();
-  avatarTest->keyDescriptions.Push ("arrow keys: move camera");
-  avatarTest->keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
-  avatarTest->keyDescriptions.Push ("1: neutral");
-  avatarTest->keyDescriptions.Push ("2: smiling");
-  avatarTest->keyDescriptions.Push ("3: angry");
-  avatarTest->keyDescriptions.Push ("4: sad");
-  avatarTest->keyDescriptions.Push ("r: reset scene");
-  avatarTest->keyDescriptions.Push ("n: switch to next scene");
+  avatarTest->hudHelper.keyDescriptions.DeleteAll ();
+  avatarTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
+  avatarTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->hudHelper.keyDescriptions.Push ("1: neutral");
+  avatarTest->hudHelper.keyDescriptions.Push ("2: smiling");
+  avatarTest->hudHelper.keyDescriptions.Push ("3: angry");
+  avatarTest->hudHelper.keyDescriptions.Push ("4: sad");
+  avatarTest->hudHelper.keyDescriptions.Push ("n: switch to next scene");
 }
 
 SintelScene::~SintelScene ()
@@ -74,6 +73,11 @@ csVector3 SintelScene::GetCameraTarget ()
 float SintelScene::GetSimulationSpeed ()
 {
   return 1.0f;
+}
+
+bool SintelScene::HasPhysicalObjects ()
+{
+  return false;
 }
 
 void SintelScene::Frame ()
@@ -482,5 +486,5 @@ void SintelScene::ResetScene ()
 
 void SintelScene::UpdateStateDescription ()
 {
-  avatarTest->stateDescriptions.DeleteAll ();
+  avatarTest->hudHelper.stateDescriptions.DeleteAll ();
 }

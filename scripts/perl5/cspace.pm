@@ -994,6 +994,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetAlwaysRunNow = *cspacec::iThreadManager_SetAlwaysRunNow;
 *GetAlwaysRunNow = *cspacec::iThreadManager_GetAlwaysRunNow;
 *Exiting = *cspacec::iThreadManager_Exiting;
+*ProcessAll = *cspacec::iThreadManager_ProcessAll;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7155,6 +7156,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetCollider = *cspacec::iDynamicSystem_GetCollider;
 *GetColliderCount = *cspacec::iDynamicSystem_GetColliderCount;
 *AttachColliderCapsule = *cspacec::iDynamicSystem_AttachColliderCapsule;
+*AddBody = *cspacec::iDynamicSystem_AddBody;
 *scfGetVersion = *cspacec::iDynamicSystem_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -15539,6 +15541,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_GetMaterial;
 *SetMaterial = *cspacec::iAnimatedMeshFactorySubMesh_SetMaterial;
 *GetName = *cspacec::iAnimatedMeshFactorySubMesh_GetName;
+*SetRendering = *cspacec::iAnimatedMeshFactorySubMesh_SetRendering;
+*IsRendering = *cspacec::iAnimatedMeshFactorySubMesh_IsRendering;
+*SetRenderPriority = *cspacec::iAnimatedMeshFactorySubMesh_SetRenderPriority;
+*GetRenderPriority = *cspacec::iAnimatedMeshFactorySubMesh_GetRenderPriority;
+*SetZBufMode = *cspacec::iAnimatedMeshFactorySubMesh_SetZBufMode;
+*GetZBufMode = *cspacec::iAnimatedMeshFactorySubMesh_GetZBufMode;
 *scfGetVersion = *cspacec::iAnimatedMeshFactorySubMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -15950,6 +15958,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetTwoKeyFrames = *cspacec::iSkeletonAnimation2_GetTwoKeyFrames;
 *BlendState = *cspacec::iSkeletonAnimation2_BlendState;
 *GetDuration = *cspacec::iSkeletonAnimation2_GetDuration;
+*SetKeyFrame = *cspacec::iSkeletonAnimation2_SetKeyFrame;
+*SetFramesInBindSpace = *cspacec::iSkeletonAnimation2_SetFramesInBindSpace;
+*GetFramesInBindSpace = *cspacec::iSkeletonAnimation2_GetFramesInBindSpace;
+*GetChannelCount = *cspacec::iSkeletonAnimation2_GetChannelCount;
+*GetChannelBone = *cspacec::iSkeletonAnimation2_GetChannelBone;
 *scfGetVersion = *cspacec::iSkeletonAnimation2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17267,6 +17280,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ClearMorphTarget = *cspacec::iSpriteCal3DState_ClearMorphTarget;
 *FindSocket = *cspacec::iSpriteCal3DState_FindSocket;
 *SetMaterial = *cspacec::iSpriteCal3DState_SetMaterial;
+*GetMaterial = *cspacec::iSpriteCal3DState_GetMaterial;
 *SetTimeFactor = *cspacec::iSpriteCal3DState_SetTimeFactor;
 *GetTimeFactor = *cspacec::iSpriteCal3DState_GetTimeFactor;
 *GetAnimationTime = *cspacec::iSpriteCal3DState_GetAnimationTime;
@@ -18178,6 +18192,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveCellLoadListener = *cspacec::iTerrainSystem_RemoveCellLoadListener;
 *AddCellHeightUpdateListener = *cspacec::iTerrainSystem_AddCellHeightUpdateListener;
 *RemoveCellHeightUpdateListener = *cspacec::iTerrainSystem_RemoveCellHeightUpdateListener;
+*AddCell = *cspacec::iTerrainSystem_AddCell;
+*RemoveCell = *cspacec::iTerrainSystem_RemoveCell;
 *scfGetVersion = *cspacec::iTerrainSystem_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -18349,6 +18365,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetDefaultCell = *cspacec::iTerrainFactory_GetDefaultCell;
 *AddCell = *cspacec::iTerrainFactory_AddCell;
 *GetCell = *cspacec::iTerrainFactory_GetCell;
+*RemoveCell = *cspacec::iTerrainFactory_RemoveCell;
 *scfGetVersion = *cspacec::iTerrainFactory_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -22933,32 +22950,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::scfProcTexture ##############
-
-package cspace::scfProcTexture;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::csObject cspace::iTextureWrapper cspace::iProcTexture cspace );
-%OWNER = ();
-*IncRef = *cspacec::scfProcTexture_IncRef;
-*DecRef = *cspacec::scfProcTexture_DecRef;
-*GetRefCount = *cspacec::scfProcTexture_GetRefCount;
-*QueryInterface = *cspacec::scfProcTexture_QueryInterface;
-*AddRefOwner = *cspacec::scfProcTexture_AddRefOwner;
-*RemoveRefOwner = *cspacec::scfProcTexture_RemoveRefOwner;
-*GetInterfaceMetadata = *cspacec::scfProcTexture_GetInterfaceMetadata;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::iProcTexCallback ##############
 
 package cspace::iProcTexCallback;
@@ -22995,7 +22986,7 @@ sub ACQUIRE {
 
 package cspace::csProcTexture;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::scfProcTexture cspace );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
 *swig_last_cur_time_get = *cspacec::csProcTexture_last_cur_time_get;
@@ -23022,6 +23013,7 @@ sub DESTROY {
 *GetDimension = *cspacec::csProcTexture_GetDimension;
 *GetRandom = *cspacec::csProcTexture_GetRandom;
 *GetTextureWrapper = *cspacec::csProcTexture_GetTextureWrapper;
+*SelfDestruct = *cspacec::csProcTexture_SelfDestruct;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -23203,6 +23195,8 @@ sub csmbWheelUp () { $cspacec::csmbWheelUp }
 sub csmbWheelDown () { $cspacec::csmbWheelDown }
 sub csmbExtra1 () { $cspacec::csmbExtra1 }
 sub csmbExtra2 () { $cspacec::csmbExtra2 }
+sub csmbHWheelLeft () { $cspacec::csmbHWheelLeft }
+sub csmbHWheelRight () { $cspacec::csmbHWheelRight }
 sub csKeyModifierTypeShift () { $cspacec::csKeyModifierTypeShift }
 sub csKeyModifierTypeCtrl () { $cspacec::csKeyModifierTypeCtrl }
 sub csKeyModifierTypeAlt () { $cspacec::csKeyModifierTypeAlt }
@@ -23520,6 +23514,7 @@ sub CS_TEXTURE_NPOTS () { $cspacec::CS_TEXTURE_NPOTS }
 sub CS_TEXTURE_SCALE_UP () { $cspacec::CS_TEXTURE_SCALE_UP }
 sub CS_TEXTURE_SCALE_DOWN () { $cspacec::CS_TEXTURE_SCALE_DOWN }
 sub CS_TEXTURE_CREATE_CLEAR () { $cspacec::CS_TEXTURE_CREATE_CLEAR }
+sub CS_TEXTURE_CUBEMAP_DISABLE_SEAMLESS () { $cspacec::CS_TEXTURE_CUBEMAP_DISABLE_SEAMLESS }
 sub CS_MATERIAL_VARNAME_FLATCOLOR () { $cspacec::CS_MATERIAL_VARNAME_FLATCOLOR }
 sub CS_MATERIAL_TEXTURE_DIFFUSE () { $cspacec::CS_MATERIAL_TEXTURE_DIFFUSE }
 sub CS_AXIS_NONE () { $cspacec::CS_AXIS_NONE }

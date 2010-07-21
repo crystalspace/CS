@@ -35,7 +35,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
-//---------------------------------------------------------------------------
+//----------------------- Bullet-CS matrices and vectors conversion ----------------------------
 
 static inline csReversibleTransform BulletToCS (const btTransform& trans,
 						float inverseInternalScale)
@@ -112,7 +112,7 @@ private:
 public:
   csBulletDebugDraw (float inverseInternalScale)
     : mode (DBG_DrawWireframe | DBG_DrawConstraints | DBG_DrawConstraintLimits),
-      inverseInternalScale (inverseInternalScale)
+    inverseInternalScale (inverseInternalScale)
   {
   }
 
@@ -143,23 +143,23 @@ public:
   void SetDebugMode (csBulletDebugMode mode)
   {
     this->mode = 0;
-    if (mode & BULLET_DEBUG_COLLIDERS)
+    if (mode & CS_BULLET_DEBUG_COLLIDERS)
       this->mode |= DBG_DrawWireframe;
-    if (mode & BULLET_DEBUG_AABB)
+    if (mode & CS_BULLET_DEBUG_AABB)
       this->mode |= DBG_DrawAabb;
-    if (mode & BULLET_DEBUG_JOINTS)
+    if (mode & CS_BULLET_DEBUG_JOINTS)
       this->mode |= DBG_DrawConstraints | DBG_DrawConstraintLimits;
   }
 
   csBulletDebugMode GetDebugMode ()
   {
-    csBulletDebugMode mode = BULLET_DEBUG_NOTHING;
+    csBulletDebugMode mode = CS_BULLET_DEBUG_NOTHING;
     if (this->mode & DBG_DrawWireframe)
-      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_COLLIDERS);
+      mode = (csBulletDebugMode) (mode | CS_BULLET_DEBUG_COLLIDERS);
     if (this->mode & DBG_DrawAabb)
-      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_AABB);
+      mode = (csBulletDebugMode) (mode | CS_BULLET_DEBUG_AABB);
     if (this->mode & DBG_DrawConstraints)
-      mode = (csBulletDebugMode) (mode | BULLET_DEBUG_JOINTS);
+      mode = (csBulletDebugMode) (mode | CS_BULLET_DEBUG_JOINTS);
     return mode;
   }
 
@@ -196,6 +196,37 @@ public:
   }
 };
 
+//------------------------ csBulletMotionState ----------------------
+
+class csBulletMotionState : public btDefaultMotionState
+{
+public:
+  csBulletRigidBody* body;
+  // we save the inverse of the principal axis for performance reasons
+  btTransform inversePrincipalAxis;
+
+public:
+  csBulletMotionState (csBulletRigidBody* body,
+		       const btTransform& initialTransform,
+		       const btTransform& principalAxis);
+
+  virtual void setWorldTransform (const btTransform& trans);
+};
+
+
+//------------------------ csBulletKinematicMotionState ----------------------
+
+class csBulletKinematicMotionState : public csBulletMotionState
+{
+  csOrthoTransform principalAxis;
+
+public:
+  csBulletKinematicMotionState (csBulletRigidBody* body,
+		       const btTransform& initialTransform,
+				const btTransform& principalAxis);
+
+  virtual void getWorldTransform (btTransform& trans) const;
+};
 
 }
 CS_PLUGIN_NAMESPACE_END(Bullet)

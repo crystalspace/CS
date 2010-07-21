@@ -34,7 +34,6 @@
 #include "ivideo/shader/shader.h"
 
 struct iGraphics3D;
-struct iLoader;
 struct iObjectRegistry;
 struct iRenderView;
 struct iShader;
@@ -464,12 +463,12 @@ namespace RenderManager
   
   // @@@ TODO: give a simple example
   /// Helper to parse post processing effect configurations.
-  class CS_CRYSTALSPACE_EXPORT PostEffectLayersParser
+  class CS_CRYSTALSPACE_EXPORT PostEffectLayersParser :
+    public CS::Memory::CustomAllocated
   {
     csStringHash xmltokens;
     iObjectRegistry* objReg;
     csRef<iSyntaxService> synldr;
-    csRef<iLoader> loader;
     
     typedef csHash<PostEffectManager::Layer*, csString> ParsedLayers;
     typedef csDirtyAccessArray<PostEffectManager::LayerInputMap> InputsArray;
@@ -483,6 +482,7 @@ namespace RenderManager
   public:
     /// Create.
     PostEffectLayersParser (iObjectRegistry* objReg);
+    ~PostEffectLayersParser();
   
     /// Parse from a document node,
     bool AddLayersFromDocument (iDocumentNode* node, PostEffectManager& effects);

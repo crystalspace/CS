@@ -1,0 +1,46 @@
+<library>
+	<plugins>
+		<plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+		<plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
+	</plugins>
+
+	<shaders>
+		<shader>
+			<file>sky.xml</file>
+		</shader>
+	</shaders>
+
+  <textures>
+    <texture name="nightsky">
+      <file>textures/stars.png</file>
+      <class>nocompress</class>
+    </texture>
+  </textures> 
+
+  <materials>
+		<material name="sky">
+      <!--<shader type="depthwrite">*null</shader>-->
+			<shader type="standard">sky</shader>
+      <shadervar type="texture" name="tex night">nightsky</shadervar>
+		</material>
+	</materials>
+
+	<meshfact name="skydome">
+		<plugin>genmeshfact</plugin>
+		<params>
+			<material>sky</material>
+			<lighting>no</lighting>
+			<sphere rimvertices='16' reversed="true">
+				<radius y='2500' x='2500' z='2500'/>
+				<center y='0' x='0' z='0'/>
+			</sphere>
+			<color red="1" green="1" blue="1" />
+		</params>
+		<trimesh>
+			<id>shadows</id>
+		</trimesh>
+		<zuse />
+		<noshadows />
+		<nolighting />
+	</meshfact>
+</library>

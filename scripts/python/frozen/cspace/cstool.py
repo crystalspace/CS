@@ -621,20 +621,6 @@ class csMemoryPen(iPen):
 csMemoryPen_swigregister = _cstool.csMemoryPen_swigregister
 csMemoryPen_swigregister(csMemoryPen)
 
-class scfProcTexture(core.csObject,iengine.iTextureWrapper,csgfx.iProcTexture):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def IncRef(*args): return _cstool.scfProcTexture_IncRef(*args)
-    def DecRef(*args): return _cstool.scfProcTexture_DecRef(*args)
-    def GetRefCount(*args): return _cstool.scfProcTexture_GetRefCount(*args)
-    def QueryInterface(*args): return _cstool.scfProcTexture_QueryInterface(*args)
-    def AddRefOwner(*args): return _cstool.scfProcTexture_AddRefOwner(*args)
-    def RemoveRefOwner(*args): return _cstool.scfProcTexture_RemoveRefOwner(*args)
-    def GetInterfaceMetadata(*args): return _cstool.scfProcTexture_GetInterfaceMetadata(*args)
-scfProcTexture_swigregister = _cstool.scfProcTexture_swigregister
-scfProcTexture_swigregister(scfProcTexture)
-
 class iProcTexCallback(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
@@ -645,7 +631,7 @@ class iProcTexCallback(core.iBase):
 iProcTexCallback_swigregister = _cstool.iProcTexCallback_swigregister
 iProcTexCallback_swigregister(iProcTexCallback)
 
-class csProcTexture(scfProcTexture):
+class csProcTexture(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
@@ -663,6 +649,7 @@ class csProcTexture(scfProcTexture):
     def GetDimension(*args): return _cstool.csProcTexture_GetDimension(*args)
     GetRandom = staticmethod(_cstool.csProcTexture_GetRandom)
     def GetTextureWrapper(*args): return _cstool.csProcTexture_GetTextureWrapper(*args)
+    def SelfDestruct(*args): return _cstool.csProcTexture_SelfDestruct(*args)
 csProcTexture_swigregister = _cstool.csProcTexture_swigregister
 csProcTexture_swigregister(csProcTexture)
 csProcTexture_GetRandom = _cstool.csProcTexture_GetRandom

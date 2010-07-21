@@ -116,6 +116,9 @@ private:
   // End a loop.
   void EndLoop ();
 
+  /* Internal variant of RemoveAllListeners() which optionally omits creation
+     of a new event tree (in case of destruction) */
+  void RemoveAllListeners (bool recreateEventTree);
 public:
 
   /// Initialize the event queue
