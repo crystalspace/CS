@@ -114,7 +114,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     iRenderBuffer* texCoords = meshFactory->GetTexCoords();
 
     GenerateGuideHairs(indices, vertexes, normals, texCoords);
-    GenerateMesh();
     GenerateGuideHairsLOD();
     SynchronizeGuideHairs();
     GenerateHairStrands();
@@ -204,37 +203,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<FurAnimationControl> animationControl;
     animationControl.AttachNew(new FurAnimationControl(this));
     meshState -> SetAnimationControl(animationControl);
-  }
-
-  void FurMaterial::GenerateMesh()
-  {
-    CS::Geometry::csContour3 untrimesh;
-    csTriangleMesh tm;
-
-    // setup our untriangulated mesh
-    for (size_t i = 0 ; i < guideHairs.GetSize() ; i ++)
-    {
-      csVector2 uv = guideHairs.Get(i).uv;
-
-      int index = (int)(uv.x * contourmap.width) + 
-        (int)(uv.y * contourmap.height) * contourmap.width;
-
-      if ( contourmap.data[4 * index + 2] == 255 && 
-          contourmap.data[4 * index] == 0 &&
-          contourmap.data[4 * index + 1] == 0 && 
-          guideHairs.Get(i).controlPointsCount > 0 )
-      {
-        untrimesh.Push(guideHairs.Get(i).controlPoints[0]);
-        contourmap.data[4 * index + 1] = 255;
-      }
-    }
-
-    csPrintf("%d\t%d\t%d\n", guideHairs.GetSize(), untrimesh.GetSize(), tm.GetTriangleCount());
-
-    // triangulate the mesh
-//     CS::Geometry::Triangulate3D::Process(untrimesh, tm);
-
-    csPrintf("%d\t%d\t%d\n", guideHairs.GetSize(), untrimesh.GetSize(), tm.GetTriangleCount());
   }
 
   void FurMaterial::GenerateGuideHairs(iRenderBuffer* indices, 
@@ -690,10 +658,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       heightmap.data[ 4 * ((int)(uv.x * heightmap.width) + 
         (int)(uv.y * heightmap.height) * heightmap.width ) + 1 ] = 255;
 
-      if ( contourmap.data[ 4 * ((int)(uv.x * contourmap.width) + 
-        (int)(uv.y * contourmap.height) * contourmap.width ) ] == 255)
-        contourmap.data[ 4 * ((int)(uv.x * contourmap.width) + 
-          (int)(uv.y * contourmap.height) * contourmap.width ) ] = 0;
     }
 
     // from LOD guide ropes
@@ -731,8 +695,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     SaveImage(heightmap.data, "/data/krystal/krystal_skull_heightmap_debug.png",
       heightmap.width, heightmap.height);
 
-    SaveImage(contourmap.data, "/data/krystal/krystal_skull_contour_debug.png",
-      contourmap.width, contourmap.height);
   }
 
   void FurMaterial::SaveImage(uint8* buf, const char* texname, 
@@ -807,7 +769,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     this->material = material;
 
     SetColor(csColor(1,1,0));
-    SetContourmap();
     SetDensitymap();
     SetHeightmap();
     SetStrandWidth();
@@ -832,22 +793,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<csShaderVariable> shaderVariable = material->GetVariable(strandWidthName);
 
     shaderVariable->GetValue(strandWidth);
-  }
-
-  void FurMaterial::SetContourmap ()
-  {
-    CS::ShaderVarName contourmapName (svStrings, "contour map");	
-    csRef<csShaderVariable> shaderVariable = material->GetVariable(contourmapName);
-
-    shaderVariable->GetValue(contourmap.handle);
-
-    // contour map
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-
-    csRef<iDataBuffer> contourmapDB = contourmap.handle ->Readback(readbackFmt);
-    contourmap.handle->GetOriginalDimensions(contourmap.width, contourmap.height);
-    contourmap.data = contourmapDB->GetUint8();
   }
 
   void FurMaterial::SetDensitymap ()

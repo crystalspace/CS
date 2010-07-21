@@ -162,7 +162,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iMaterial> material;
     csRef<iShaderVarStringSet> svStrings;
     /// Density & Height maps
-    TextureData contourmap;
     TextureData densitymap;
     float densityFactor;
     TextureData heightmap;
@@ -175,7 +174,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iEngine> engine;
     csRef<iLoader> loader;
     /// functions
-    void GenerateMesh();
     void GenerateGuideHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
       iRenderBuffer* normals, iRenderBuffer* texCoords);
     void SynchronizeGuideHairs();
@@ -187,7 +185,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     void SaveUVImage();
     void SaveImage(uint8* buf, const char* texname,int width, int height);
     /// setters
-    void SetContourmap();
     void SetDensitymap();
     void SetHeightmap();
     void SetStrandWidth();
