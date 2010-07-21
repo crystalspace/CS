@@ -141,6 +141,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     factoryState = scfQueryInterface<iGeneralFactoryState> (
       factory->GetMeshObjectFactory ());
+// factoryState->SetShadowCasting(true);
+// factoryState->SetShadowReceiving(true);
 
     factoryState -> SetVertexCount ( 2 * controlPointsCount );
     factoryState -> SetTriangleCount ( 2 * ( controlPointsCount - numberOfStrains ) );
@@ -472,116 +474,122 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   {
     float bA, bB, bC; // barycentric coefficients
 
-    // for every triangle
-    for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
+    // density
+    for (int den = 0 , change = 1 ; change ; den ++)
     {
-      csTriangle currentTriangle = guideHairsTriangles.Get(iter);
-
-      size_t indexA = currentTriangle.a;
-      size_t indexB = currentTriangle.b;
-      size_t indexC = currentTriangle.c;
-
-      csGuideHair A, B, C;
-
-      if ( indexA < guideHairs.GetSize())
-        A = guideHairs.Get(indexA);
-      else
-        A = guideHairsLOD.Get(indexA - guideHairs.GetSize());
-
-      if ( indexB < guideHairs.GetSize())
-        B = guideHairs.Get(indexB);
-      else
-        B = guideHairsLOD.Get(indexB - guideHairs.GetSize());
-
-      if ( indexC < guideHairs.GetSize())
-        C = guideHairs.Get(indexC);
-      else
-        C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
-
-      // triangle area
-      if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
-        ( C.controlPointsCount == 0 ) )
-        continue;
-
-      float a, b, c;
-      a = csVector3::Norm(B.controlPoints[0] - C.controlPoints[0]);
-      b = csVector3::Norm(A.controlPoints[0] - C.controlPoints[0]);
-      c = csVector3::Norm(B.controlPoints[0] - A.controlPoints[0]);
-
-      float s = (a + b + c) / 2.0f;
-      float area = sqrt(s * (s - a) * (s - b) * (s - c));
-
-      // average density - modify to use convolution matrix or such
-      float density = TriangleAreaDensity(A, B, C);
-
-//       csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
-
-      // how many new guide hairs are needed
-      for ( int den = 0 ; den < 5 * (density * area * densityFactor); den ++ )
+      change = 0;
+      // for every triangle
+      for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
       {
-        csHairStrand hairStrand;
+        csTriangle currentTriangle = guideHairsTriangles.Get(iter);
 
-        bA = rng->Get();
-        bB = rng->Get() * (1 - bA);
-        bC = 1 - bA - bB;
+        size_t indexA = currentTriangle.a;
+        size_t indexB = currentTriangle.b;
+        size_t indexC = currentTriangle.c;
 
-        //csPrintf("%d\t%d\t%d\n", indexA, indexB, indexC);
+        csGuideHair A, B, C;
 
-        hairStrand.guideHairs[0].distance = bA;
-        hairStrand.guideHairs[0].index = indexA;
-        hairStrand.guideHairs[1].distance = bB;
-        hairStrand.guideHairs[1].index = indexB;
-        hairStrand.guideHairs[2].distance = bC;
-        hairStrand.guideHairs[2].index = indexC;
+        if ( indexA < guideHairs.GetSize())
+          A = guideHairs.Get(indexA);
+        else
+          A = guideHairsLOD.Get(indexA - guideHairs.GetSize());
 
-        hairStrand.controlPointsCount = csMin( (csMin( A.controlPointsCount,
-          B.controlPointsCount) ), C.controlPointsCount);
+        if ( indexB < guideHairs.GetSize())
+          B = guideHairs.Get(indexB);
+        else
+          B = guideHairsLOD.Get(indexB - guideHairs.GetSize());
 
-//         csPrintf("%d\n", hairStrand.controlPointsCount);
+        if ( indexC < guideHairs.GetSize())
+          C = guideHairs.Get(indexC);
+        else
+          C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
 
-        csVector2 uv = A.uv * bA + B.uv * bB + C.uv * bC;
+        // triangle area
+        if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
+          ( C.controlPointsCount == 0 ) )
+          continue;
 
-        // based on heightmap
-        // point heightmap - modify to use convolution matrix or such
-        float height = heightmap.data[ 4 * ((int)(uv.x * heightmap.width) + 
-          (int)(uv.y * heightmap.height) * heightmap.width )] / 255.0f;
+        float a, b, c;
+        a = csVector3::Norm(B.controlPoints[0] - C.controlPoints[0]);
+        b = csVector3::Norm(A.controlPoints[0] - C.controlPoints[0]);
+        c = csVector3::Norm(B.controlPoints[0] - A.controlPoints[0]);
 
-        float realDistance = height * heightFactor;
-        float realTipDistance = realDistance - ((hairStrand.controlPointsCount - 2) 
-          * controlPointsDistance ) ;
+        float s = (a + b + c) / 2.0f;
+        float area = sqrt(s * (s - a) * (s - b) * (s - c));
 
-//         csPrintf("%f\t%f\t%f\n", height, realDistance, realTipDistance);
+        // average density - modify to use convolution matrix or such
+        float density = TriangleAreaDensity(A, B, C);
 
-        hairStrand.tipRatio = realTipDistance / controlPointsDistance;
+  //       csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
 
-        hairStrand.controlPoints = new csVector3[ hairStrand.controlPointsCount ];
-
-        for ( size_t i = 0 ; i < hairStrand.controlPointsCount ; i ++ )
+        // how many new guide hairs are needed
+        if ( den < 5 * (density * area * densityFactor))
         {
-          hairStrand.controlPoints[i] = csVector3(0);
-          for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-            if ( hairStrand.guideHairs[j].index < guideHairs.GetSize() )
-              hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
-                guideHairs.Get(hairStrand.guideHairs[j].index).controlPoints[i];
-            else
-              hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
-                guideHairsLOD.Get(hairStrand.guideHairs[j].index - 
-                guideHairs.GetSize()).controlPoints[i];
+          change = 1;
+          csHairStrand hairStrand;
+
+          bA = rng->Get();
+          bB = rng->Get() * (1 - bA);
+          bC = 1 - bA - bB;
+
+          //csPrintf("%d\t%d\t%d\n", indexA, indexB, indexC);
+
+          hairStrand.guideHairs[0].distance = bA;
+          hairStrand.guideHairs[0].index = indexA;
+          hairStrand.guideHairs[1].distance = bB;
+          hairStrand.guideHairs[1].index = indexB;
+          hairStrand.guideHairs[2].distance = bC;
+          hairStrand.guideHairs[2].index = indexC;
+
+          hairStrand.controlPointsCount = csMin( (csMin( A.controlPointsCount,
+            B.controlPointsCount) ), C.controlPointsCount);
+
+  //         csPrintf("%d\n", hairStrand.controlPointsCount);
+
+          csVector2 uv = A.uv * bA + B.uv * bB + C.uv * bC;
+
+          // based on heightmap
+          // point heightmap - modify to use convolution matrix or such
+          float height = heightmap.data[ 4 * ((int)(uv.x * heightmap.width) + 
+            (int)(uv.y * heightmap.height) * heightmap.width )] / 255.0f;
+
+          float realDistance = height * heightFactor;
+          float realTipDistance = realDistance - ((hairStrand.controlPointsCount - 2) 
+            * controlPointsDistance ) ;
+
+  //         csPrintf("%f\t%f\t%f\n", height, realDistance, realTipDistance);
+
+          hairStrand.tipRatio = realTipDistance / controlPointsDistance;
+
+          hairStrand.controlPoints = new csVector3[ hairStrand.controlPointsCount ];
+
+          for ( size_t i = 0 ; i < hairStrand.controlPointsCount ; i ++ )
+          {
+            hairStrand.controlPoints[i] = csVector3(0);
+            for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
+              if ( hairStrand.guideHairs[j].index < guideHairs.GetSize() )
+                hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
+                  guideHairs.Get(hairStrand.guideHairs[j].index).controlPoints[i];
+              else
+                hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
+                  guideHairsLOD.Get(hairStrand.guideHairs[j].index - 
+                  guideHairs.GetSize()).controlPoints[i];
+          }
+
+          if ( strictHeightmap && hairStrand.controlPointsCount > 1 )
+          {
+            csVector3 direction = hairStrand.controlPoints[hairStrand.controlPointsCount - 1] - 
+              hairStrand.controlPoints[hairStrand.controlPointsCount - 2];
+            float distance = csVector3::Norm(direction);
+            direction.Normalize();
+
+            hairStrand.controlPoints[hairStrand.controlPointsCount - 1] =
+              hairStrand.controlPoints[hairStrand.controlPointsCount - 2] +
+              direction * distance * hairStrand.tipRatio;
+          }
+
+          hairStrands.Push(hairStrand);		
         }
-
-        if ( strictHeightmap && hairStrand.controlPointsCount > 1 )
-        {
-          csVector3 direction = hairStrand.controlPoints[hairStrand.controlPointsCount - 1] - 
-            hairStrand.controlPoints[hairStrand.controlPointsCount - 2];
-          float distance = csVector3::Norm(direction);
-          direction.Normalize();
-
-          hairStrand.controlPoints[hairStrand.controlPointsCount - 1] =
-            hairStrand.controlPoints[hairStrand.controlPointsCount - 2] +
-            direction * distance * hairStrand.tipRatio;
-        }
-
-        hairStrands.Push(hairStrand);		
       }
     }
     //csPrintf("end\n");
