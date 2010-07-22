@@ -209,7 +209,7 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
 
     // Set the ragdoll state of the iBodyChain of the whole body as dynamic
     // (hairs are already in the good state)
-    ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_DYNAMIC);
+    ragdollNode->SetBodyChainState (bodyChain, CS::Animation::CS_RAGDOLL_STATE_DYNAMIC);
 
     // Update the display of the dynamics debugger
     if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
@@ -218,10 +218,10 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
 
     // Fling the body a bit
     const csOrthoTransform& tc = avatarTest->view->GetCamera ()->GetTransform ();
-    uint boneCount = ragdollNode->GetBoneCount (CS_RAGDOLL_STATE_DYNAMIC);
+    uint boneCount = ragdollNode->GetBoneCount (CS::Animation::CS_RAGDOLL_STATE_DYNAMIC);
     for (uint i = 0; i < boneCount; i++)
     {
-      BoneID boneID = ragdollNode->GetBone (CS_RAGDOLL_STATE_DYNAMIC, i);
+      BoneID boneID = ragdollNode->GetBone (CS::Animation::CS_RAGDOLL_STATE_DYNAMIC, i);
       iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
       rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 0.1f));
     }
@@ -393,7 +393,7 @@ bool KrystalScene::CreateAvatar ()
        animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
-    ragdollNodeFactory->AddBodyChain (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
+    ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::CS_RAGDOLL_STATE_KINEMATIC);
 
     if (avatarTest->softBodiesEnabled)
     {
@@ -520,7 +520,7 @@ void KrystalScene::ResetScene ()
     krystalDead = false;
 
     // Set the ragdoll state of the 'body' chain as kinematic
-    ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
+    ragdollNode->SetBodyChainState (bodyChain, CS::Animation::CS_RAGDOLL_STATE_KINEMATIC);
 
     // Update the display of the dynamics debugger
     if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
