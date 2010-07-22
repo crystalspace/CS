@@ -97,14 +97,15 @@ namespace CS
       reuseAux->reusable = true;
     }
     
-    SPSBPD::PersistentData() :
+    SPSBPD::PersistentData(int textCachOptions) :
       bufCache (CS::Utility::ResourceCache::ReuseConditionAfterTime<uint> (),
 	CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
       boxClipperCache (CS::Utility::ResourceCache::ReuseConditionFlagged (),
 	CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
       texCache (csimg2D, "rgb8", // @@@ FIXME: Use same format as main view ...
 	CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
-	"target", TextureCache::tcachePowerOfTwo)
+	"target", textCachOptions), 
+      fixedTexCacheWidth (0), fixedTexCacheHeight (0)
     {
       bufCache.agedPurgeInterval = 5000;
       boxClipperCache.agedPurgeInterval = 5000;
