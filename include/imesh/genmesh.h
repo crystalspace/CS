@@ -50,7 +50,7 @@ class csEllipsoid;
  */
 struct iGeneralMeshSubMesh : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 3);
+  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 4);
   
   /// Get the index render buffer
   virtual iRenderBuffer* GetIndices () = 0;
@@ -90,6 +90,20 @@ struct iGeneralMeshSubMesh : public virtual iBase
   
   /// Get back-to-front sorting for submesh.
   virtual bool GetBack2Front () const = 0;
+
+  /**
+   * Set the range of index of vertices to be displayed. A value of (size_t) ~0 for 'end'
+   * means that the size of the array of indices has to be used instead. If both 'start'
+   * equals 0 and 'end' equals (size_t) ~0, then the default values will be used.
+   */
+  virtual void SetIndexRange (size_t start, size_t end) = 0;
+
+  /**
+   * Get the range of index of vertices to be displayed. A value of (size_t) ~0 for 'end'
+   * means that the size of the array of indices has to be used instead. If both 'start'
+   * equals 0 and 'end' equals (size_t) ~0, then the default values will be used.
+   */
+  virtual void GetIndexRange (size_t& start, size_t& end) const = 0;
 };
 
 /**

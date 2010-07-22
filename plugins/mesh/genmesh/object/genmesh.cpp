@@ -382,16 +382,19 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 
     uint smMixMode = subMesh.SubMeshProxy::GetMixmode();
     meshPtr->mixmode = (smMixMode != (uint)~0) ? smMixMode 
-      : subMeshes.GetDefaultSubmesh()->SubMeshProxy::GetMixmode ();;
+      : subMeshes.GetDefaultSubmesh()->SubMeshProxy::GetMixmode ();
     meshPtr->z_buf_mode = subMesh.SubMeshProxy::GetZMode();
     meshPtr->renderPrio = subMesh.SubMeshProxy::GetRenderPriority();
+    size_t indexStart, indexEnd;
+    subMesh.SubMeshProxy::GetIndexRange(indexStart, indexEnd);
     meshPtr->clip_portal = clip_portal;
     meshPtr->clip_plane = clip_plane;
     meshPtr->clip_z_plane = clip_z_plane;
     meshPtr->do_mirror = camera->IsMirrored ();
     meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
-    meshPtr->indexstart = 0;
-    meshPtr->indexend = (uint)index_buffer->GetElementCount();
+    meshPtr->indexstart = indexStart;
+    meshPtr->indexend =
+      indexEnd == (size_t) ~0 ? (uint)index_buffer->GetElementCount() : indexEnd;
     meshPtr->material = mater;
     CS_ASSERT (mater != 0);
     meshPtr->worldspace_origin = wo;

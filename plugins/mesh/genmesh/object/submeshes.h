@@ -75,19 +75,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     csZBufMode zmode;
     CS::Graphics::RenderPriority renderPrio;
     bool back2front;
+    size_t indexStart, indexEnd;
     // Cache b2f tree for rendering
     csBSPTree* b2fTree;
     csFrameDataHolder<csRef<iRenderBuffer> > b2fIndices;
 
     SubMesh () : scfImplementationType (this), bbox_valid (false), name (0), 
       MixMode ((uint)~0), zmode ((csZBufMode)~0), renderPrio (-1),
-      back2front (false), b2fTree (0)
+      back2front (false), indexStart (0), indexEnd ((size_t)~0), b2fTree (0)
     { }
     SubMesh (const SubMesh& other) : scfImplementationType (this), 
       index_buffer (other.index_buffer), bbox (other.bbox),
       bbox_valid (other.bbox_valid), name (other.name), 
       material (other.material), MixMode (other.MixMode), zmode (other.zmode),
-      renderPrio (other.renderPrio), back2front (other.back2front), b2fTree (0)
+      renderPrio (other.renderPrio), back2front (other.back2front),
+      indexStart (other.indexStart), indexEnd (other.indexEnd), b2fTree (0)
     { }
     ~SubMesh()
     {
@@ -125,6 +127,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       back2front = enable;
     }
     bool GetBack2Front () const { return back2front; }
+    void SetIndexRange (size_t start, size_t end)
+    { indexStart = start; indexEnd = end; }
+    void GetIndexRange (size_t& start, size_t& end) const
+    { start = indexStart; end = indexEnd; }
 
     void SetIndices (iRenderBuffer* newIndices);
     
@@ -187,7 +193,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       bitMixMode,
       bitZMode,
       bitRenderPrio,
-      bitBack2Front
+      bitBack2Front,
+      bitIndexRange
     };
     csRef<iMaterialWrapper> material;
     // Override mixmode from parent.
@@ -197,6 +204,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     csFlags overrideFlags;
     csRef<csRenderBufferHolder> bufferHolder;
     bool back2front;
+    size_t indexStart, indexEnd;
 
     class RenderBufferAccessor : 
       public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
@@ -295,6 +303,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     {
       if (GetOverrideFlag (bitBack2Front)) return back2front;
       return parentSubMesh->SubMesh::GetBack2Front ();
+    }
+    void SetIndexRange (size_t start, size_t end)
+    {
+      SetOverrideFlag (bitIndexRange, start != 0 && end != (size_t) ~0);
+      indexStart = start; indexEnd = end;
+    }
+    void GetIndexRange (size_t& start, size_t& end) const
+    {
+      if (GetOverrideFlag (bitIndexRange))
+      {
+	start = indexStart;
+	end = indexEnd;
+      }
+      else parentSubMesh->SubMesh::GetIndexRange (start, end);
     }
 
     virtual csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
