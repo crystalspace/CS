@@ -198,7 +198,7 @@ void csBulletRigidBody::RebuildBody ()
 
   // create new rigid body
   body = new btRigidBody (infos);
-  body->setUserPointer ((iBulletBody*) this);
+  body->setUserPointer (static_cast<iBody*> (this));
   dynSys->bulletWorld->addRigidBody (body);
   insideWorld = true;
 
@@ -446,12 +446,12 @@ void csBulletRigidBody::SetDynamicState (CS::Physics::Bullet::BodyState state)
     }
 }
 
-void csBulletRigidBody::SetKinematicCallback (iBulletKinematicCallback* callback)
+void csBulletRigidBody::SetKinematicCallback (iKinematicCallback* callback)
 {
   kinematicCb = callback;
 }
 
-iBulletKinematicCallback* csBulletRigidBody::GetKinematicCallback ()
+iKinematicCallback* csBulletRigidBody::GetKinematicCallback ()
 {
   return kinematicCb;
 }
@@ -1161,7 +1161,7 @@ void csBulletRigidBody::SetCollisionCallback (iDynamicsCollisionCallback* cb)
   collCb = cb;
 }
 
-void csBulletRigidBody::Collision (iRigidBody * other, const csVector3& pos,
+void csBulletRigidBody::Collision (::iRigidBody * other, const csVector3& pos,
       const csVector3& normal, float depth)
 {
   if (collCb)
@@ -1283,7 +1283,7 @@ csBulletDefaultKinematicCallback::~csBulletDefaultKinematicCallback ()
 }
 
 void csBulletDefaultKinematicCallback::GetBodyTransform
-(iRigidBody* body, csOrthoTransform& transform) const
+(::iRigidBody* body, csOrthoTransform& transform) const
 {
   iMeshWrapper* mesh = body->GetAttachedMesh ();
   if (mesh)

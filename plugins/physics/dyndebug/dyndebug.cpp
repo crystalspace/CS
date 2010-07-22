@@ -158,8 +158,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
       // Put back the kinematic callback
       if (meshData.callback && meshData.rigidBody)
       {
-	csRef<iBulletRigidBody> bulletBody =
-	  scfQueryInterface<iBulletRigidBody> (meshData.rigidBody);
+	csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	  scfQueryInterface<CS::Physics::Bullet::iRigidBody> (meshData.rigidBody);
 	bulletBody->SetKinematicCallback (meshData.callback->callback);
       }
     }
@@ -177,8 +177,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
       iRigidBody* body = system->GetBody (bodyIndex);
 
       // Search the bullet interface of the rigid body
-      csRef<iBulletRigidBody> bulletBody =
-	scfQueryInterface<iBulletRigidBody> (body);
+      csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	scfQueryInterface<CS::Physics::Bullet::iRigidBody> (body);
 
       // Find the material to be used for this object
       CS::Physics::Bullet::BodyState state =
@@ -583,7 +583,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
   }
 
   BoneKinematicCallback::BoneKinematicCallback (iMeshWrapper* mesh,
-			   iBulletKinematicCallback* callback)
+			   CS::Physics::Bullet::iKinematicCallback* callback)
     : scfImplementationType (this), mesh (mesh), callback (callback)
   {
   }

@@ -33,10 +33,6 @@
 
 struct iView;
 struct iRigidBody;
-struct iBulletKinematicCallback;
-struct iBulletSoftBody;
-struct iBulletPivotJoint;
-struct iBulletTerrainCollider;
 struct csLockedHeightData;
 struct iTerrainCell;
 struct iTerrainSystem;
@@ -47,6 +43,11 @@ namespace Physics
 {
 namespace Bullet
 {
+
+struct iKinematicCallback;
+struct iSoftBody;
+struct iPivotJoint;
+struct iTerrainCollider;
 
 /**
  * The type of a Bullet's collider.
@@ -59,45 +60,34 @@ enum BodyType
   CS_BULLET_TERRAIN                 /*!< The body is a terrain collider. */
 };
 
-} //namespace Bullet
-} //namespace Physics
-} //namespace CS
-
 /**
- * A generic body in a Bullet's dynamic simulation
+ * A generic body in Bullet's dynamic simulation
  */
-struct iBulletBody : public virtual iBase
+struct iBody : public virtual iBase
 {
-  SCF_INTERFACE(iBulletBody, 1, 0, 0);
+  SCF_INTERFACE(CS::Physics::Bullet::iBody, 1, 0, 0);
 
   /// Return the type of this body
-  virtual CS::Physics::Bullet::BodyType GetType () const = 0;
+  virtual BodyType GetType () const = 0;
 
   /**
    * Query the iRigidBody interface of this body. It returns null if the
    * interface is not valid, ie GetType() is not CS::Physics::Bullet::CS_BULLET_RIGID_BODY.
    */
-  virtual iRigidBody* QueryRigidBody () = 0;
+  virtual ::iRigidBody* QueryRigidBody () = 0;
 
   /**
    * Query the iBulletSoftBody interface of this body. It returns null if the
    * interface is not valid, ie GetType() is not CS::Physics::Bullet::CS_BULLET_SOFT_BODY.
    */
-  virtual iBulletSoftBody* QuerySoftBody () = 0;
+  virtual iSoftBody* QuerySoftBody () = 0;
 
   /**
    * Query the iBulletTerrainCollider interface of this body. It returns null if the
    * interface is not valid, ie GetType() is not CS::Physics::Bullet::CS_BULLET_TERRAIN.
    */
-  virtual iBulletTerrainCollider* QueryTerrainCollider () = 0;
+  virtual iTerrainCollider* QueryTerrainCollider () = 0;
 };
-
-namespace CS
-{
-namespace Physics
-{
-namespace Bullet
-{
 
 /**
  * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
@@ -118,9 +108,27 @@ struct HitBeamResult
   /**
    * The resulting body that was hit, or 0 if no body was hit.
    */
-  iBulletBody* body;
+  iBody* body;
 
   /**
+<<<<<<< .mine
+   * The resulting rigid body that was hit, or 0 if no rigid body was hit.
+   */
+  iRigidBody* rigidBody;
+
+  /**
+   * The resulting soft body that was hit, or 0 if no soft body was hit.
+   */
+  iSoftBody* softBody;
+
+  /**
+   * The resulting terrain collider that was hit, or 0 if no terrain collider was hit.
+   */
+  iTerrainCollider* terrain;
+
+  /**
+=======
+>>>>>>> .r34546
    * Intersection point in world space.
    */
   csVector3 isect;
@@ -148,18 +156,14 @@ enum DebugMode
   CS_BULLET_DEBUG_JOINTS = 4       /*!< Display the joint positions and limits. */
 };
 
-} //namespace Bullet
-} //namespace Physics
-} //namespace CS
-
 /**
  * The Bullet implementation of iDynamicSystem also implements this
  * interface.
  * \sa iDynamicSystem iODEDynamicSystemState
  */
-struct iBulletDynamicSystem : public virtual iBase
+struct iDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE(iBulletDynamicSystem, 3, 0, 0);
+  SCF_INTERFACE(CS::Physics::Bullet::iDynamicSystem, 3, 0, 0);
 
   /**
    * Draw the debug informations of the dynamic system. This has to be called
@@ -171,11 +175,11 @@ struct iBulletDynamicSystem : public virtual iBase
   /**
    * Follow a beam from start to end and return the first body that is hit.
    * \return True if a body was hit, false otherwise.
-   * \sa CS::Physics::Bullet::HitBeamResult iMeshWrapper::HitBeam() iSector::HitBeam()
+   * \sa HitBeamResult iMeshWrapper::HitBeam() iSector::HitBeam()
    * iSector::HitBeamPortals()
    */
-  virtual CS::Physics::Bullet::HitBeamResult HitBeam (const csVector3 &start,
-						      const csVector3 &end) = 0;
+  virtual HitBeamResult HitBeam (const csVector3 &start,
+				 const csVector3 &end) = 0;
 
   /**
    * Set the internal scale to be applied to the whole dynamic world. Use this
@@ -215,12 +219,12 @@ struct iBulletDynamicSystem : public virtual iBase
    * \remark Don't forget to call DebugDraw() at each frame to effectively display
    * the debug informations.
    */
-  virtual void SetDebugMode (CS::Physics::Bullet::DebugMode mode) = 0;
+  virtual void SetDebugMode (DebugMode mode) = 0;
 
   /**
    * Return the current mode used when displaying debug informations.
    */
-  virtual CS::Physics::Bullet::DebugMode GetDebugMode () = 0;
+  virtual DebugMode GetDebugMode () = 0;
 
   /**
    * Set whether this dynamic world can handle soft bodies or not.
@@ -242,7 +246,7 @@ struct iBulletDynamicSystem : public virtual iBase
   /**
    * Return the soft body at the given index.
    */
-  virtual iBulletSoftBody* GetSoftBody (size_t index) = 0;
+  virtual iSoftBody* GetSoftBody (size_t index) = 0;
 
   /**
    * Create a soft body rope.
@@ -251,8 +255,8 @@ struct iBulletDynamicSystem : public virtual iBase
    * \param segmentCount Number of segments in the rope.
    * \remark You must call SetSoftBodyWorld() prior to this.
    */
-  virtual iBulletSoftBody* CreateRope (csVector3 start, csVector3 end,
-				       uint segmentCount) = 0;
+  virtual iSoftBody* CreateRope (csVector3 start, csVector3 end,
+				 uint segmentCount) = 0;
 
   /**
    * Create a soft body cloth.
@@ -266,10 +270,10 @@ struct iBulletDynamicSystem : public virtual iBase
    * or not. Diagonal segments will make the cloth more rigid.
    * \remark You must call SetSoftBodyWorld() prior to this.
    */
-  virtual iBulletSoftBody* CreateCloth (csVector3 corner1, csVector3 corner2,
-					csVector3 corner3, csVector3 corner4,
-					uint segmentCount1, uint segmentCount2,
-					bool withDiagonals = false) = 0;
+  virtual iSoftBody* CreateCloth (csVector3 corner1, csVector3 corner2,
+				  csVector3 corner3, csVector3 corner4,
+				  uint segmentCount1, uint segmentCount2,
+				  bool withDiagonals = false) = 0;
 
   /**
    * Create a volumetric soft body from a genmesh.
@@ -277,8 +281,8 @@ struct iBulletDynamicSystem : public virtual iBase
    * \param bodyTransform The initial transform of the soft body.
    * \remark You must call SetSoftBodyWorld() prior to this.
    */
-  virtual iBulletSoftBody* CreateSoftBody (iGeneralFactoryState* genmeshFactory,
-					   const csOrthoTransform& bodyTransform) = 0;
+  virtual iSoftBody* CreateSoftBody (iGeneralFactoryState* genmeshFactory,
+				     const csOrthoTransform& bodyTransform) = 0;
 
   /**
    * Create a custom volumetric soft body.
@@ -288,23 +292,23 @@ struct iBulletDynamicSystem : public virtual iBase
    * \param triangleCount The count of faces of the soft body.
    * \remark You must call SetSoftBodyWorld() prior to this.
    */
-  virtual iBulletSoftBody* CreateSoftBody (csVector3* vertices, size_t vertexCount,
-					   csTriangle* triangles, size_t triangleCount) = 0;
+  virtual iSoftBody* CreateSoftBody (csVector3* vertices, size_t vertexCount,
+				     csTriangle* triangles, size_t triangleCount) = 0;
 
   /**
    * Remove the given soft body from this dynamic world and delete it.
    */
-  virtual void RemoveSoftBody (iBulletSoftBody* body) = 0;
+  virtual void RemoveSoftBody (iSoftBody* body) = 0;
 
   /**
    * Create a pivot joint and add it to the simulation.
    */
-  virtual csPtr<iBulletPivotJoint> CreatePivotJoint () = 0;
+  virtual csPtr<iPivotJoint> CreatePivotJoint () = 0;
 
   /**
    * Remove the given pivot joint from the simulation.
    */
-  virtual void RemovePivotJoint (iBulletPivotJoint* joint) = 0;
+  virtual void RemovePivotJoint (iPivotJoint* joint) = 0;
 
   /**
    * Save the current state of the dynamic world in a .bullet serialization file.
@@ -326,12 +330,12 @@ struct iBulletDynamicSystem : public virtual iBase
    * \param maximumHeight The maximum height that will ever be contained in the height map
    * \param 
    */
-  virtual iBulletTerrainCollider* AttachColliderTerrain (csLockedHeightData& heightData,
-							 int gridWidth, int gridHeight,
-							 csVector3 gridSize,
-							 csOrthoTransform& transform,
-							 float minimumHeight = 0,
-							 float maximumHeight = 0) = 0;
+  virtual iTerrainCollider* AttachColliderTerrain (csLockedHeightData& heightData,
+						   int gridWidth, int gridHeight,
+						   csVector3 gridSize,
+						   csOrthoTransform& transform,
+						   float minimumHeight = 0,
+						   float maximumHeight = 0) = 0;
 
   /**
    * Create a new terrain collider and add it to the simulation. All the heights of
@@ -342,9 +346,9 @@ struct iBulletDynamicSystem : public virtual iBase
    * \param minimumHeight The minimum height that will ever be contained in the height map
    * \param maximumHeight The maximum height that will ever be contained in the height map
    */
-  virtual iBulletTerrainCollider* AttachColliderTerrain (iTerrainCell* cell,
-							 float minimumHeight = 0,
-							 float maximumHeight = 0) = 0;
+  virtual iTerrainCollider* AttachColliderTerrain (iTerrainCell* cell,
+						   float minimumHeight = 0,
+						   float maximumHeight = 0) = 0;
 
   /**
    * Create a new terrain collider and add it to the simulation. This will create a
@@ -358,13 +362,13 @@ struct iBulletDynamicSystem : public virtual iBase
    * \param minimumHeight The minimum height that will ever be contained in the height map
    * \param maximumHeight The maximum height that will ever be contained in the height map
    */
-  virtual iBulletTerrainCollider* AttachColliderTerrain (iTerrainSystem* terrain,
-							 float minimumHeight = 0,
-							 float maximumHeight = 0) = 0;
+  virtual iTerrainCollider* AttachColliderTerrain (iTerrainSystem* terrain,
+						   float minimumHeight = 0,
+						   float maximumHeight = 0) = 0;
   /**
    * Remove the given terrain collider from the simulation.
    */
-  virtual void DestroyCollider (iBulletTerrainCollider* collider) = 0;
+  virtual void DestroyCollider (iTerrainCollider* collider) = 0;
 };
 
 /**
@@ -379,9 +383,9 @@ struct iBulletDynamicSystem : public virtual iBase
  * \sa iRigidBody iBulletRigidBody iSoftBodyAnimationControl
  * CS::Physics::Bullet::SoftBodyHelper
  */
-struct iBulletSoftBody : public iBulletBody
+struct iSoftBody : public iBody
 {
-  SCF_INTERFACE(iBulletSoftBody, 2, 0, 2);
+  SCF_INTERFACE(CS::Physics::Bullet::iSoftBody, 2, 0, 2);
 
   /**
    * Draw the debug informations of this soft body. This has to be called
@@ -472,13 +476,6 @@ struct iBulletSoftBody : public iBulletBody
   virtual csVector3 GetVertexNormal (size_t index) const = 0;
 };
 
-namespace CS
-{
-namespace Physics
-{
-namespace Bullet
-{
-
 /**
  * General helper class for iBulletSoftBody.
  */
@@ -493,7 +490,7 @@ struct SoftBodyHelper
    * iSoftBodyAnimationControl::SetSoftBody()
    */
   static csPtr<iMeshFactoryWrapper> CreateClothGenMeshFactory
-  (iObjectRegistry* object_reg, const char* factoryName, iBulletSoftBody* cloth)
+  (iObjectRegistry* object_reg, const char* factoryName, iSoftBody* cloth)
   {
     csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
 
@@ -557,18 +554,14 @@ enum BodyState
 				    but it interacts with the dynamic simulation. */
 };
 
-} //namespace Bullet
-} //namespace Physics
-} //namespace CS
-
 /**
  * The Bullet implementation of iRigidBody also implements this
  * interface.
  * \sa iRigidBody iBulletSoftBody
  */
-struct iBulletRigidBody : public iBulletBody
+struct iRigidBody : public iBody
 {
-  SCF_INTERFACE(iBulletRigidBody, 1, 0, 1);
+  SCF_INTERFACE(CS::Physics::Bullet::iRigidBody, 1, 0, 1);
 
   /**
    * Set a body in the kinematic state, ie the motion of the body is
@@ -583,24 +576,24 @@ struct iBulletRigidBody : public iBulletBody
   /**
    * Return the current state of the body.
    */
-  virtual CS::Physics::Bullet::BodyState GetDynamicState () const = 0;
+  virtual BodyState GetDynamicState () const = 0;
 
   /**
    * Set the current state of the body.
    * \sa iRigidBody::MakeStatic() iRigidBody::MakeDynamic() MakeKinematic()
    */
-  virtual void SetDynamicState (CS::Physics::Bullet::BodyState state) = 0;
+  virtual void SetDynamicState (BodyState state) = 0;
 
   /**
    * Set the callback to be used to update the transform of the kinematic body.
    * If no callback are provided then the dynamic system will use a default one.
    */
-  virtual void SetKinematicCallback (iBulletKinematicCallback* callback) = 0;
+  virtual void SetKinematicCallback (iKinematicCallback* callback) = 0;
 
   /**
    * Get the callback used to update the transform of the kinematic body.
    */
-  virtual iBulletKinematicCallback* GetKinematicCallback () = 0;
+  virtual iKinematicCallback* GetKinematicCallback () = 0;
 
   /**
    * Set the linear dampener for this rigid body. The dampening correspond to
@@ -643,14 +636,14 @@ struct iBulletRigidBody : public iBulletBody
  * iRigidBody::AttachLight(), iRigidBody::AttachCamera()).
  * \sa iBulletRigidBody::SetKinematicCallback()
  */
-struct iBulletKinematicCallback : public virtual iBase
+struct iKinematicCallback : public virtual iBase
 {
-  SCF_INTERFACE (iBulletKinematicCallback, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics::Bullet::iKinematicCallback, 1, 0, 0);
 
   /**
    * Update the new transform of the rigid body.
    */
-  virtual void GetBodyTransform (iRigidBody* body,
+  virtual void GetBodyTransform (::iRigidBody* body,
 				 csOrthoTransform& transform) const = 0;
 };
 
@@ -659,16 +652,16 @@ struct iBulletKinematicCallback : public virtual iBase
  * in translation and has free rotation. You can move freely the position of the
  * joint, the body will keep attached to the joint.
  */
-struct iBulletPivotJoint : public virtual iBase
+struct iPivotJoint : public virtual iBase
 {
-  SCF_INTERFACE (iBulletPivotJoint, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics::Bullet::iPivotJoint, 1, 0, 0);
 
   /**
    * Attach a rigid body to the joint.
    * \param body The rigid body to attach to the joint.
    * \param position The initial position of the joint, in world coordinates.
    */
-  virtual void Attach (iRigidBody* body, const csVector3& position) = 0;
+  virtual void Attach (::iRigidBody* body, const csVector3& position) = 0;
 
   /**
    * Return the body attached to this joint, or 0 if there are none.
@@ -689,11 +682,17 @@ struct iBulletPivotJoint : public virtual iBase
 /**
  * A terrain collider for the dynamic simulation.
  */
-struct iBulletTerrainCollider : public iBulletBody
+struct iTerrainCollider : public iBody
 {
-  SCF_INTERFACE (iBulletTerrainCollider, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics::Bullet::iTerrainCollider, 1, 0, 0);
 
 };
+
+} //namespace Bullet
+} //namespace Physics
+} //namespace CS
+
+typedef CS::Physics::Bullet::iDynamicSystem iBulletDynamicSystem;
 
 #endif // __CS_IVARIA_BULLET_H__
 

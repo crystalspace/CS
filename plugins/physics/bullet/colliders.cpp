@@ -647,7 +647,7 @@ float csBulletCollider::GetVolume ()
 //----------------------- HeightMapCollider ----------------------------
 
 HeightMapCollider::HeightMapCollider (csBulletDynamicsSystem* dynSys,
-				      iBulletBody* csBody,
+				      iBody* csBody,
 				      csLockedHeightData gridData,
 				      int gridWidth, int gridHeight,
 				      csVector3 gridSize,
@@ -723,7 +723,7 @@ csBulletTerrainCellCollider::csBulletTerrainCellCollider (csBulletDynamicsSystem
 
   // Create the terrain collider
   collider = new HeightMapCollider
-    (dynSys, (iBulletBody*) this, heightData, gridWidth, gridHeight, gridSize,
+    (dynSys, this, heightData, gridWidth, gridHeight, gridSize,
      transform, minimumHeight, maximumHeight);
 }
 
@@ -749,7 +749,7 @@ csBulletTerrainCellCollider::csBulletTerrainCellCollider (csBulletDynamicsSystem
 
   // Create the terrain collider
   collider =
-    new HeightMapCollider (dynSys, (iBulletBody*) this, cell->GetHeightData (),
+    new HeightMapCollider (dynSys, this, cell->GetHeightData (),
 			   cell->GetGridWidth (), cell->GetGridHeight (), cell->GetSize (),
 			   cellTransform, minimumHeight, maximumHeight);
 }
@@ -795,7 +795,7 @@ csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys
     // Create the terrain collider
     ColliderData colliderData;
     colliderData.cell = cell;
-    colliderData.collider = new HeightMapCollider (dynSys, (iBulletBody*) this,
+    colliderData.collider = new HeightMapCollider (dynSys, this,
 						   cell->GetHeightData (),
 						   cell->GetGridWidth (),
 						   cell->GetGridHeight (), cell->GetSize (),
@@ -825,7 +825,7 @@ void csBulletTerrainCollider::OnCellLoad (iTerrainCell *cell)
   // Create the terrain collider
   ColliderData colliderData;
   colliderData.cell = cell;
-  colliderData.collider = new HeightMapCollider (dynSys, (iBulletBody*) this, cell->GetHeightData (),
+  colliderData.collider = new HeightMapCollider (dynSys, this, cell->GetHeightData (),
 						 cell->GetGridWidth (),
 						 cell->GetGridHeight (), cell->GetSize (),
 						 cellTransform, minimumHeight, maximumHeight);

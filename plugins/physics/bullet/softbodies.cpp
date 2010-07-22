@@ -46,7 +46,7 @@ csBulletSoftBody::csBulletSoftBody (csBulletDynamicsSystem* dynSys,
   : scfImplementationType (this), dynSys (dynSys), body (body)
 {
   bodyType = CS::Physics::Bullet::CS_BULLET_SOFT_BODY;
-  body->setUserPointer ((iBulletBody*) this);
+  body->setUserPointer (static_cast<iBody*> (this));
 }
 
 csBulletSoftBody::~csBulletSoftBody ()
@@ -114,9 +114,9 @@ void csBulletSoftBody::AnchorVertex (size_t vertexIndex)
   body->setMass (vertexIndex, 0.0f);
 }
 
-void csBulletSoftBody::AnchorVertex (size_t vertexIndex, iRigidBody* body)
+void csBulletSoftBody::AnchorVertex (size_t vertexIndex, ::iRigidBody* body)
 {
-  csBulletRigidBody* rigidBody = dynamic_cast<csBulletRigidBody*> (body);
+  csBulletRigidBody* rigidBody = static_cast<csBulletRigidBody*> (body);
   CS_ASSERT(rigidBody
 	    && vertexIndex < (size_t) this->body->m_nodes.size ()
 	    && rigidBody->body);

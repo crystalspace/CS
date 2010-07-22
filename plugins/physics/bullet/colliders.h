@@ -111,7 +111,7 @@ class HeightMapCollider
 {
  public:
   HeightMapCollider (csBulletDynamicsSystem* dynSys,
-		     iBulletBody* csBody,
+		     iBody* csBody,
 		     csLockedHeightData gridData,
 		     int gridWidth, int gridHeight,
 		     csVector3 gridSize,
@@ -127,7 +127,7 @@ class HeightMapCollider
 };
 
 class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCellCollider,
-  iBulletTerrainCollider>
+  iTerrainCollider>
 {
  public:
   csBulletTerrainCellCollider (csBulletDynamicsSystem* dynSys,
@@ -140,14 +140,14 @@ class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCel
 			       float minimumHeight, float maximumHeight);
   virtual ~csBulletTerrainCellCollider ();
 
-  //-- iBulletBody
+  //-- iBody
   virtual CS::Physics::Bullet::BodyType GetType () const
   { return bodyType; }
-  virtual iRigidBody* QueryRigidBody ()
+  virtual ::iRigidBody* QueryRigidBody ()
   { return 0; }
-  virtual iBulletSoftBody* QuerySoftBody ()
+  virtual CS::Physics::Bullet::iSoftBody* QuerySoftBody ()
   { return 0; }
-  virtual iBulletTerrainCollider* QueryTerrainCollider ()
+  virtual CS::Physics::Bullet::iTerrainCollider* QueryTerrainCollider ()
   { return this; }
 
  private:
@@ -156,7 +156,7 @@ class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCel
 };
 
 class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollider,
-  iBulletTerrainCollider, iTerrainCellLoadCallback>
+  iTerrainCollider, iTerrainCellLoadCallback>
 {
  public:
   csBulletTerrainCollider (csBulletDynamicsSystem* dynSys, iTerrainSystem* terrain,
@@ -166,11 +166,11 @@ class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollide
   //-- iBulletBody
   virtual CS::Physics::Bullet::BodyType GetType () const
   { return bodyType; }
-  virtual iRigidBody* QueryRigidBody ()
+  virtual ::iRigidBody* QueryRigidBody ()
   { return 0; }
-  virtual iBulletSoftBody* QuerySoftBody ()
+  virtual CS::Physics::Bullet::iSoftBody* QuerySoftBody ()
   { return 0; }
-  virtual iBulletTerrainCollider* QueryTerrainCollider ()
+  virtual CS::Physics::Bullet::iTerrainCollider* QueryTerrainCollider ()
   { return this; }
 
   //-- iTerrainCellLoadCallback

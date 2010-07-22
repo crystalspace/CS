@@ -194,7 +194,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   };
 
   class BoneKinematicCallback : public scfImplementation1
-    <BoneKinematicCallback, iBulletKinematicCallback>
+    <BoneKinematicCallback, CS::Physics::Bullet::iKinematicCallback>
   {
   public:
     BoneKinematicCallback (RagdollAnimNode* ragdollNode, BoneID boneID);

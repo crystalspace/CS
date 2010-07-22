@@ -74,7 +74,7 @@ private:
 
   // Dragging related
   bool dragging;
-  csRef<iBulletPivotJoint> dragJoint;
+  csRef<CS::Physics::Bullet::iPivotJoint> dragJoint;
   float dragDistance;
   float linearDampening, angularDampening;
   int mouseX, mouseY;

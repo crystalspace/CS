@@ -135,18 +135,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 
 
   class BoneKinematicCallback : public scfImplementation1
-    <BoneKinematicCallback, iBulletKinematicCallback>
+    <BoneKinematicCallback, CS::Physics::Bullet::iKinematicCallback>
   {
   public:
     BoneKinematicCallback (iMeshWrapper* mesh,
-			   iBulletKinematicCallback* callback);
+			   CS::Physics::Bullet::iKinematicCallback* callback);
     ~BoneKinematicCallback ();
 
     void GetBodyTransform (iRigidBody* body, csOrthoTransform& transform) const;
 
   private:
     csWeakRef<iMeshWrapper> mesh;
-    csRef<iBulletKinematicCallback> callback;
+    csRef<CS::Physics::Bullet::iKinematicCallback> callback;
 
     friend class DynamicsDebugger;
   };

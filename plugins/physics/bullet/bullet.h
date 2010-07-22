@@ -74,9 +74,11 @@ public:
   virtual bool Initialize (iObjectRegistry* object_reg);  
 };
 
+using namespace CS::Physics::Bullet;
+  
 class csBulletDynamicsSystem : public scfImplementationExt2<
-  csBulletDynamicsSystem, csObject, iDynamicSystem,
-  iBulletDynamicSystem>
+  csBulletDynamicsSystem, csObject, ::iDynamicSystem,
+  iDynamicSystem>
 {
   friend class csBulletMotionState;
   friend class csBulletKinematicMotionState;
@@ -96,12 +98,12 @@ private:
   btBroadphaseInterface* broadphase;
   btSoftBodyWorldInfo* softWorldInfo;
 
-  csRefArrayObject<iRigidBody> dynamicBodies;
+  csRefArrayObject< ::iRigidBody> dynamicBodies;
   csRefArrayObject<iRigidBody> colliderBodies;
-  csRefArrayObject<iBulletSoftBody> softBodies;
+  csRefArrayObject<iSoftBody> softBodies;
   csRefArray<iJoint> joints;
-  csRefArray<iBulletPivotJoint> pivotJoints;
-  csRefArray<iBulletTerrainCollider> terrainColliders;
+  csRefArray<iPivotJoint> pivotJoints;
+  csRefArray<iTerrainCollider> terrainColliders;
 
   csRef<csBulletDefaultMoveCallback> moveCb;
 
@@ -146,11 +148,11 @@ public:
     float time);
   virtual void Step (float stepsize);
 
-  virtual csPtr<iRigidBody> CreateBody ();
-  virtual void AddBody (iRigidBody* body);
-  virtual void RemoveBody (iRigidBody* body);
-  virtual iRigidBody *FindBody (const char *name);
-  virtual iRigidBody *GetBody (unsigned int index);
+  virtual csPtr< ::iRigidBody> CreateBody ();
+  virtual void AddBody (::iRigidBody* body);
+  virtual void RemoveBody (::iRigidBody* body);
+  virtual ::iRigidBody *FindBody (const char *name);
+  virtual ::iRigidBody *GetBody (unsigned int index);
   virtual int GetBodysCount ();
 
   virtual csPtr<iBodyGroup> CreateGroup ();
@@ -190,11 +192,11 @@ public:
 
   //-- iBulletDynamicSystem
   virtual void DebugDraw (iView* view);
-  virtual void SetDebugMode (CS::Physics::Bullet::DebugMode mode);
-  virtual CS::Physics::Bullet::DebugMode GetDebugMode ();
+  virtual void SetDebugMode (DebugMode mode);
+  virtual DebugMode GetDebugMode ();
 
-  virtual CS::Physics::Bullet::HitBeamResult HitBeam (const csVector3 &start,
-						      const csVector3 &end);
+  virtual HitBeamResult HitBeam (const csVector3 &start,
+				 const csVector3 &end);
 
   virtual void SetInternalScale (float scale);
   virtual void SetStepParameters (float timeStep, size_t maxSteps,
@@ -203,38 +205,38 @@ public:
   virtual void SetSoftBodyWorld (bool isSoftBodyWorld);
   virtual bool GetSoftBodyWorld ();
   virtual size_t GetSoftBodyCount ();
-  virtual iBulletSoftBody* GetSoftBody (size_t index);
+  virtual iSoftBody* GetSoftBody (size_t index);
 
-  virtual iBulletSoftBody* CreateRope (csVector3 start, csVector3 end,
-				       uint segmentCount);
-  virtual iBulletSoftBody* CreateCloth (csVector3 corner1, csVector3 corner2,
-					csVector3 corner3, csVector3 corner4,
-					uint segmentCount1, uint segmentCount2,
-					bool withDiagonals = false);
-  virtual iBulletSoftBody* CreateSoftBody (iGeneralFactoryState* genmeshFactory,
-					   const csOrthoTransform& bodyTransform);
-  virtual iBulletSoftBody* CreateSoftBody (csVector3* vertices, size_t vertexCount,
-					   csTriangle* triangles, size_t triangleCount);
-  virtual void RemoveSoftBody (iBulletSoftBody* body);
+  virtual iSoftBody* CreateRope (csVector3 start, csVector3 end,
+				 uint segmentCount);
+  virtual iSoftBody* CreateCloth (csVector3 corner1, csVector3 corner2,
+				  csVector3 corner3, csVector3 corner4,
+				  uint segmentCount1, uint segmentCount2,
+				  bool withDiagonals = false);
+  virtual iSoftBody* CreateSoftBody (iGeneralFactoryState* genmeshFactory,
+				     const csOrthoTransform& bodyTransform);
+  virtual iSoftBody* CreateSoftBody (csVector3* vertices, size_t vertexCount,
+				     csTriangle* triangles, size_t triangleCount);
+  virtual void RemoveSoftBody (iSoftBody* body);
 
-  virtual csPtr<iBulletPivotJoint> CreatePivotJoint ();
-  virtual void RemovePivotJoint (iBulletPivotJoint* joint);
+  virtual csPtr<iPivotJoint> CreatePivotJoint ();
+  virtual void RemovePivotJoint (iPivotJoint* joint);
 
   virtual bool SaveBulletWorld (const char* filename);
 
-  virtual iBulletTerrainCollider* AttachColliderTerrain (csLockedHeightData& heightData,
-							 int gridWidth, int gridHeight,
-							 csVector3 gridSize,
-							 csOrthoTransform& transform,
-							 float minimumHeight = 0,
-							 float maximumHeight = 0);
-  virtual iBulletTerrainCollider* AttachColliderTerrain (iTerrainCell* cell,
-							 float minimumHeight = 0,
-							 float maximumHeight = 0);
-  virtual iBulletTerrainCollider* AttachColliderTerrain (iTerrainSystem* terrain,
-							 float minimumHeight = 0,
-							 float maximumHeight = 0);
-  virtual void DestroyCollider (iBulletTerrainCollider* collider);
+  virtual iTerrainCollider* AttachColliderTerrain (csLockedHeightData& heightData,
+						   int gridWidth, int gridHeight,
+						   csVector3 gridSize,
+						   csOrthoTransform& transform,
+						   float minimumHeight = 0,
+						   float maximumHeight = 0);
+  virtual iTerrainCollider* AttachColliderTerrain (iTerrainCell* cell,
+						   float minimumHeight = 0,
+						   float maximumHeight = 0);
+  virtual iTerrainCollider* AttachColliderTerrain (iTerrainSystem* terrain,
+						   float minimumHeight = 0,
+						   float maximumHeight = 0);
+  virtual void DestroyCollider (iTerrainCollider* collider);
 };
 
 }

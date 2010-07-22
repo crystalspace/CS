@@ -244,7 +244,7 @@ void Simple::Frame ()
   else if (isSoftBodyWorld)
     for (size_t i = 0; i < bulletDynamicSystem->GetSoftBodyCount (); i++)
     {
-      iBulletSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
+      CS::Physics::Bullet::iSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
       if (!softBody->GetTriangleCount ())
 	softBody->DebugDraw (view);
     }
@@ -620,8 +620,8 @@ bool Simple::OnMouseDown (iEvent& ev)
       force *= 2.0f;
 
       // Check if the body hit is not static or kinematic
-      csRef<iBulletRigidBody> bulletBody =
-	scfQueryInterface<iBulletRigidBody> (hitResult.body->QueryRigidBody ());
+      csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	scfQueryInterface<CS::Physics::Bullet::iRigidBody> (hitResult.body->QueryRigidBody ());
       if (bulletBody->GetDynamicState () != CS::Physics::Bullet::CS_BULLET_STATE_DYNAMIC)
 	return false;
 
@@ -677,8 +677,8 @@ bool Simple::OnMouseDown (iEvent& ev)
     dragDistance = (hitResult.isect - startBeam).Norm ();
 
     // Set some dampening on the rigid body to have a more stable dragging
-    csRef<iBulletRigidBody> bulletBody =
-      scfQueryInterface<iBulletRigidBody> (hitResult.body->QueryRigidBody ());
+    csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+      scfQueryInterface<CS::Physics::Bullet::iRigidBody> (hitResult.body->QueryRigidBody ());
     linearDampening = bulletBody->GetLinearDampener ();
     angularDampening = bulletBody->GetRollingDampener ();
     bulletBody->SetLinearDampener (0.9f);
@@ -697,8 +697,8 @@ bool Simple::OnMouseUp (iEvent& ev)
     dragging = false;
 
     // Put back the original dampening on the rigid body
-    csRef<iBulletRigidBody> bulletBody =
-      scfQueryInterface<iBulletRigidBody> (dragJoint->GetAttachedBody ());
+    csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+      scfQueryInterface<CS::Physics::Bullet::iRigidBody> (dragJoint->GetAttachedBody ());
     bulletBody->SetLinearDampener (linearDampening);
     bulletBody->SetRollingDampener (angularDampening);
 
@@ -1007,8 +1007,8 @@ void Simple::UpdateCameraMode ()
 	  (0.8f, csVector3 (0.0f), 10.0f, 1.0f, 0.8f);
 
 	// Make it kinematic
-	csRef<iBulletRigidBody> bulletBody =
-	  scfQueryInterface<iBulletRigidBody> (cameraBody);
+	csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	  scfQueryInterface<CS::Physics::Bullet::iRigidBody> (cameraBody);
 	bulletBody->MakeKinematic ();
 
 	// Attach the camera to the body so as to benefit of the default
@@ -1663,7 +1663,7 @@ void Simple::SpawnRope ()
   iRigidBody* box = SpawnBox ();
 
   // Spawn a first rope and attach it to the box
-  iBulletSoftBody* body = bulletDynamicSystem->CreateRope
+  CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateRope
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (-0.2f, 0, 1), 20);
   body->SetMass (2.0f);
@@ -1687,7 +1687,7 @@ void Simple::SpawnCloth ()
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the cloth
-  iBulletSoftBody* body = bulletDynamicSystem->CreateCloth
+  CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateCloth
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 1),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 1),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 0, 1),
@@ -1744,7 +1744,7 @@ void Simple::SpawnSoftBody ()
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the soft body
-  iBulletSoftBody* body = bulletDynamicSystem->CreateSoftBody
+  CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateSoftBody
     (gmstate, csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, 1.0f)) * tc);
   // This would have worked too
   //iBulletSoftBody* body = bulletDynamicSystem->CreateSoftBody

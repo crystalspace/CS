@@ -826,8 +826,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     else if (boneData->state == CS::Animation::CS_RAGDOLL_STATE_KINEMATIC)
     {
       // find the bullet interface of the rigid body
-      csRef<iBulletRigidBody> bulletBody =
-	scfQueryInterface<iBulletRigidBody> (boneData->rigidBody);
+      csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	scfQueryInterface<CS::Physics::Bullet::iRigidBody> (boneData->rigidBody);
 
       if (!bulletBody)
       {

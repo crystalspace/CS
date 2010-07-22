@@ -24,7 +24,16 @@
 #include "csutil/scf_interface.h"
 #include "imesh/genmesh.h"
 
-struct iBulletSoftBody;
+namespace CS
+{
+  namespace Physics
+  {
+    namespace Bullet
+    {
+      struct iSoftBody;
+    } // namespace Bullet
+  } // namespace Physics
+} // namespace CS
 
 /**
  * Animation control type for a genmesh animated by a iBulletSoftBody.
@@ -84,12 +93,12 @@ struct iSoftBodyAnimationControl : public iGenMeshAnimationControl
    * vertices must be added at the end of the vertex array, so that a vertex of index
    * 'i' is duplicated at index 'i + body->GetVertexCount ()'.
    */
-  virtual void SetSoftBody (iBulletSoftBody* body, bool doubleSided = false) = 0;
+  virtual void SetSoftBody (CS::Physics::Bullet::iSoftBody* body, bool doubleSided = false) = 0;
 
   /**
    * Get the soft body used to animate the genmesh.
    */
-  virtual iBulletSoftBody* GetSoftBody () = 0;
+  virtual CS::Physics::Bullet::iSoftBody* GetSoftBody () = 0;
 };
 
 #endif // __CS_IVARIA_SOFTBODYANIM_H__
