@@ -247,6 +247,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       return depthBuffer;
     }
 
+    /// Gets the width and height of the buffers.
+    bool GetDimensions (int &w, int &h)
+    {
+      if (GetColorBufferCount () > 0)
+        return GetColorBuffer (0)->GetRendererDimensions (w, h);
+
+      return false;
+    }
+
   private:
 
     csRefArray<iTextureHandle> colorBuffers;

@@ -45,7 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     struct MeshNodeExtraDataType
     {
       int priority;
-      bool isTransparent;
+      bool useForwardRendering;
     };
 
     /// Any extra data that should be defined for each context node
@@ -62,7 +62,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /// Any extra data that needs to persist between frames
     struct PersistentDataExtraDataType
     {
-      csBitArray transparentPriorities;
+      csBitArray forwardPriorities;
     };
 
     /**
@@ -71,10 +71,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
      */
     struct MeshNodeKeyType
     {
-      uint16 priority      : 12;
-      uint16 isPortal      : 1;
-      uint16 isTransparent : 1;
-      uint16 meshSorting   : 2;
+      uint16 priority            : 12;
+      uint16 isPortal            : 1;
+      uint16 useForwardRendering : 1;
+      uint16 meshSorting         : 2;
       
       bool operator== (const MeshNodeKeyType& other) const
       {
@@ -97,7 +97,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       csRef<iEngine> engine = csQueryRegistry<iEngine> (registry);
       csConfigAccess cfg (registry);
       
-      const char *str = cfg->GetStr ("RenderManager.Deferred.TransparentPriorities", "alpha,transp");
+      const char *str = cfg->GetStr ("RenderManager.Deferred.ForwardPriorities", "alpha,transp,portal");
       csStringArray strArray;
       strArray.SplitString (str, ",", csStringArray::delimIgnore);
 
@@ -111,19 +111,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         }
         else
         {
-          if ((long)data.transparentPriorities.GetSize() <= p)
-            data.transparentPriorities.SetSize (p + 1);
-          data.transparentPriorities.SetBit (p);
+          if ((long)data.forwardPriorities.GetSize() <= p)
+            data.forwardPriorities.SetSize (p + 1);
+          data.forwardPriorities.SetBit (p);
         }
       }
     }
 
     /// Returns true if a mesh in the given priority is considered transparent.
-    static bool IsTransparent(CS::Graphics::RenderPriority priority,
-                              const PersistentDataExtraDataType &data)
+    static bool UseForwardRendering(CS::Graphics::RenderPriority priority,
+                                    const PersistentDataExtraDataType &data)
     {
-      if (priority < (int)data.transparentPriorities.GetSize ())
-        return data.transparentPriorities.IsBitSet (priority);
+      if (priority < (int)data.forwardPriorities.GetSize ())
+        return data.forwardPriorities.IsBitSet (priority);
       return false;
     }
 
@@ -144,7 +144,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       else
         result.priority = defaultPriority;
       result.isPortal = rendermesh.portal != 0;
-      result.isTransparent = IsTransparent (result.priority, data);
+      result.useForwardRendering = UseForwardRendering (result.priority, data);
 
       return result;
     }
@@ -160,7 +160,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         meshNode.priority = rendermesh.renderPrio;
       else
         meshNode.priority = defaultPriority;
-      meshNode.isTransparent = IsTransparent (meshNode.priority, data);
+      meshNode.useForwardRendering = UseForwardRendering (meshNode.priority, data);
     }
     /** @} */
   };

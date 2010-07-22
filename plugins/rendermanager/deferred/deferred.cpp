@@ -102,11 +102,11 @@ void ForEachLight(ContextType& context, Fn& fn)
 }
 
 /**
- * Iterate over all mesh nodes within context, call functor for each opaque one.
- * Does not use any blocking at all.
+ * Iterate over all mesh nodes within context, call functor for each one
+ * not marked to use forward rendering. Does not use any blocking at all.
  */
 template<typename ContextType, typename Fn>
-void ForEachOpaqueMeshNode(ContextType &context, Fn &fn)
+void ForEachDeferredMeshNode(ContextType &context, Fn &fn)
 {
   typedef CS::RenderManager::Implementation::NoOperationBlock<
     typename ContextType::TreeType::MeshNode*
@@ -128,17 +128,17 @@ void ForEachOpaqueMeshNode(ContextType &context, Fn &fn)
     typename ContextType::TreeType::MeshNode *node = it.Next ();
     CS_ASSERT_MSG("Null node encountered, should not be possible", node);
 
-    if (!node->isTransparent)
+    if (!node->useForwardRendering)
       caller (node);
   }
 }
 
 /**
- * Iterate over all mesh nodes within context, call functor for each transparent one.
- * Does not use any blocking at all.
+ * Iterate over all mesh nodes within context, call functor for each one 
+ * marked to use forward rendering. Does not use any blocking at all.
  */
 template<typename ContextType, typename Fn>
-void ForEachTransparentMeshNode(ContextType &context, Fn &fn)
+void ForEachForwardMeshNode(ContextType &context, Fn &fn)
 {
   typedef CS::RenderManager::Implementation::NoOperationBlock<
     typename ContextType::TreeType::MeshNode*
@@ -160,13 +160,13 @@ void ForEachTransparentMeshNode(ContextType &context, Fn &fn)
     typename ContextType::TreeType::MeshNode *node = it.Next ();
     CS_ASSERT_MSG("Null node encountered, should not be possible", node);
 
-    if (node->isTransparent)
+    if (node->useForwardRendering)
       caller (node);
   }
 }
 
 /**
- * Sets up shaders based on their transparency. 
+ * Sets up shaders for objects that can choose to use deferred or forward shading. 
  */
 template<typename RenderTree, typename LayerConfigType>
 class DeferredShaderSetup
@@ -183,16 +183,16 @@ public:
 
   void operator() (typename RenderTree::MeshNode *node)
   {
-    if (node->isTransparent)
-      TransparentSetup (node);
+    if (node->useForwardRendering)
+      ForwardSetup (node);
     else
-      OpaqueSetup (node);
+      DeferredSetup (node);
   }
 
    /**
    * Sets up a mesh node to not use the deferred layer.
    */
-  void TransparentSetup(typename RenderTree::MeshNode *node)
+  void ForwardSetup(typename RenderTree::MeshNode *node)
   {
     // Get the shader
     const size_t totalMeshes = node->owner.totalRenderMeshes;
@@ -236,7 +236,7 @@ public:
   /**
    * Sets up a mesh node to only use the deferred layer.
    */
-  void OpaqueSetup(typename RenderTree::MeshNode *node)
+  void DeferredSetup(typename RenderTree::MeshNode *node)
   {
     // Get the shader
     const size_t totalMeshes = node->owner.totalRenderMeshes;
@@ -303,6 +303,62 @@ void DeferredSetupShader(ContextNodeType &context,
 }
 
 /**
+ * Renderer for multiple contexts where all forward rendering objects are drawn.
+ */
+template<typename RenderTree>
+class ForwardMeshTreeRenderer
+{
+public:
+
+  ForwardMeshTreeRenderer(iGraphics3D* g3d, iShaderManager *shaderMgr, int deferredLayer)
+    : 
+  meshRender(g3d, shaderMgr),
+  graphics3D(g3d),
+  shaderMgr(shaderMgr),
+  deferredLayer(deferredLayer)
+  {}
+
+  ~ForwardMeshTreeRenderer() {}
+
+  /**
+   * Render all contexts.
+   */
+  void operator()(typename RenderTree::ContextNode *context)
+  {
+    RenderView *rview = context->renderView;
+    
+    iEngine *engine = rview->GetEngine ();
+    iCamera *cam = rview->GetCamera ();
+    iClipper2D *clipper = rview->GetClipper ();
+    
+    // Setup the camera etc.. @@should be delayed as well
+    graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
+    graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
+
+    graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
+
+    size_t layerCount = context->svArrays.GetNumLayers ();
+    for (size_t layer = 0; layer < layerCount; ++layer)
+    {
+      if (layer == deferredLayer)
+        continue;
+
+      meshRender.SetLayer (layer);
+      ForEachForwardMeshNode (*context, meshRender);
+    }
+  }
+ 
+private:
+
+  SimpleContextRender<RenderTree> meshRender;
+
+  iGraphics3D *graphics3D;
+  iShaderManager *shaderMgr;
+
+  int deferredLayer;
+};
+
+/**
  * Renderer for multiple contexts where all objects are drawn
  * to a single render target.
  *
@@ -331,11 +387,19 @@ class DeferredTreeRenderer
 {
 public:
 
-  DeferredTreeRenderer(iGraphics3D *g3d, iShaderManager *shaderMgr, int deferredLayer)
+  DeferredTreeRenderer(iGraphics3D *g3d, 
+                       iShaderManager *shaderMgr,
+                       iStringSet *stringSet,
+                       GBuffer &gbuffer,
+                       DeferredLightRenderer::PersistentData &lightRenderPersistent,
+                       int deferredLayer)
     : 
   meshRender(g3d, shaderMgr),
   graphics3D(g3d),
   shaderMgr(shaderMgr),
+  stringSet(stringSet),
+  gbuffer(gbuffer),
+  lightRenderPersistent(lightRenderPersistent),
   deferredLayer(deferredLayer)
   {}
 
@@ -347,85 +411,122 @@ public:
   void operator()(typename RenderTree::ContextNode *context)
   {
     RenderView *rview = context->renderView;
-    
+
     iEngine *engine = rview->GetEngine ();
     iCamera *cam = rview->GetCamera ();
     iClipper2D *clipper = rview->GetClipper ();
-    
-    // Setup the camera etc.. @@should be delayed as well
-    graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
-    graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
-    int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
-    graphics3D->BeginDraw (drawFlags);
-    graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
+    iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
 
-    meshRender.SetLayer (deferredLayer);
-    ForEachOpaqueMeshNode (*context, meshRender);
-  }
- 
-private:
-
-  SimpleContextRender<RenderTree> meshRender;
-
-  iGraphics3D *graphics3D;
-  iShaderManager *shaderMgr;
-
-  int deferredLayer;
-};
-
-/**
- * Renderer for multiple contexts where all transparent objects are drawn.
- */
-template<typename RenderTree>
-class TransparentMeshTreeRenderer
-{
-public:
-
-  TransparentMeshTreeRenderer(iGraphics3D* g3d, iShaderManager *shaderMgr, int deferredLayer)
-    : 
-  meshRender(g3d, shaderMgr),
-  graphics3D(g3d),
-  shaderMgr(shaderMgr),
-  deferredLayer(deferredLayer)
-  {}
-
-  ~TransparentMeshTreeRenderer() {}
-
-  /**
-   * Render all contexts.
-   */
-  void operator()(typename RenderTree::ContextNode *context)
-  {
-    RenderView *rview = context->renderView;
-    
-    iEngine *engine = rview->GetEngine ();
-    iCamera *cam = rview->GetCamera ();
-    iClipper2D *clipper = rview->GetClipper ();
-    
-    // Setup the camera etc.. @@should be delayed as well
-    graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
-    graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
-
-    graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
-
-    size_t layerCount = context->svArrays.GetNumLayers ();
-    for (size_t layer = 0; layer < layerCount; ++layer)
+    // Fill the gbuffer
+    gbuffer.Attach ();
     {
-      if (layer == deferredLayer)
-        continue;
+      graphics3D->SetZMode (CS_ZBUF_MESH);
 
-      meshRender.SetLayer (layer);
-      ForEachTransparentMeshNode (*context, meshRender);
+      // Setup the camera etc.. @@should be delayed as well
+      graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
+      graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
+
+      int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
+      graphics3D->BeginDraw (drawFlags);
+      graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
+
+      meshRender.SetLayer (deferredLayer);
+      ForEachDeferredMeshNode (*context, meshRender);
+
+      graphics3D->FinishDraw ();
     }
+    gbuffer.Detach ();
+
+    // Fills the accumulation buffer
+    AttachAccumBuffer (context, false);
+    {
+      int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
+      drawFlags &= ~CSDRAW_CLEARSCREEN;
+
+      graphics2D->Clear (graphics2D->FindRGB (0, 0, 0));
+
+      graphics3D->BeginDraw (drawFlags);
+      graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
+
+      // Iterate through lights adding results into accumulation buffer.
+      DeferredLightRenderer render (graphics3D,
+                                    shaderMgr,
+                                    stringSet,
+                                    rview,
+                                    gbuffer,
+                                    lightRenderPersistent);
+
+      render.OutputAmbientLight ();
+      ForEachLight (*context, render);
+    }
+    DetachAccumBuffer ();
+
+    // Draws the forward shaded objects.
+    AttachAccumBuffer (context, true);
+    {
+      graphics3D->SetZMode (CS_ZBUF_MESH);
+
+      ForwardMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderMgr, deferredLayer);
+      render (context);
+
+      graphics3D->FinishDraw ();
+    }
+    DetachAccumBuffer ();
   }
  
+protected:
+
+  bool AttachAccumBuffer(typename RenderTree::ContextNode *context, bool useGbufferDepth)
+  { 
+    iTextureHandle *buf = context->renderTargets[rtaColor0].texHandle;
+    int subTex = context->renderTargets[rtaColor0].subtexture;
+
+    if (!buf)
+    {
+      // TODO: Add proper support for simple portals.
+      CS_ASSERT (false);
+      return false;
+    }
+
+    // Assume that the portal texture matches the gbuffer dimensions.
+    int w, h;
+    int bufW, bufH;
+    gbuffer.GetDimensions (w, h);
+    buf->GetRendererDimensions (bufW, bufH);
+
+    CS_ASSERT (w == bufW && h == bufH);
+
+    if (!graphics3D->SetRenderTarget (buf, false, subTex, rtaColor0))
+      return false;
+
+    if (useGbufferDepth && gbuffer.HasDepthBuffer ())
+    {
+      if (!graphics3D->SetRenderTarget (gbuffer.GetDepthBuffer (), false, 0, rtaDepth))
+        return false; 
+    }
+
+    if (!graphics3D->ValidateRenderTargets ())
+      return false;
+    
+    return true;
+  }
+
+  void DetachAccumBuffer()
+  {
+    graphics3D->UnsetRenderTargets ();
+  }
+
 private:
 
   SimpleContextRender<RenderTree> meshRender;
 
   iGraphics3D *graphics3D;
   iShaderManager *shaderMgr;
+  iStringSet *stringSet;
+
+  GBuffer &gbuffer;
+  DeferredLightRenderer::PersistentData &lightRenderPersistent;
 
   int deferredLayer;
 };
@@ -517,7 +618,7 @@ public:
                                            layerConfig, 
                                            shadowParam);
 
-    ForEachTransparentMeshNode (context, lightSetup);
+    ForEachForwardMeshNode (context, lightSetup);
 
     SetupStandardTicket (context, shaderManager, lightSetup.GetPostLightingLayers ());
   }
@@ -534,7 +635,10 @@ private:
 };
 
 //----------------------------------------------------------------------
-RMDeferred::RMDeferred(iBase *parent) : scfImplementationType(this, parent)
+RMDeferred::RMDeferred(iBase *parent) 
+  : 
+scfImplementationType(this, parent),
+portalPersistent(CS::RenderManager::TextureCache::tcacheExactSizeMatch)
 {
   SetTreePersistent (treePersistent);
 }
@@ -564,6 +668,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   // Read Config settings.
   csConfigAccess cfg (objRegistry);
   maxPortalRecurse = cfg->GetInt ("RenderManager.Deferred.MaxPortalRecurse", 30);
+  showGBuffer = cfg->GetBool ("RenderManager.Deferred.VisualizeGBuffer", false);
 
   bool layersValid = false;
   const char *layersFile = cfg->GetStr ("RenderManager.Deferred.Layers", nullptr);
@@ -615,7 +720,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   accumBuffer = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
     graphics2D->GetHeight (),
     csimg2D,
-    "rgba16_f",
+    "rgb16_f",
     flags,
     nullptr);
 
@@ -625,6 +730,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     return false;
   }
 
+  // Create GBuffer
   GBuffer::Description desc;
   desc.colorBufferCount = 3;
   desc.hasDepthBuffer = true;
@@ -639,6 +745,14 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   {
     return false;
   }
+
+  // Fix portal texture cache to only query textures that match the gbuffer dimensions.
+  portalPersistent.fixedTexCacheWidth = desc.width;
+  portalPersistent.fixedTexCacheHeight = desc.height;
+
+  // Make sure the texture cache creates matching texture buffers.
+  portalPersistent.texCache.SetFormat ("rgb16_f");
+  portalPersistent.texCache.SetFlags (flags);
 
   return true;
 }
@@ -683,25 +797,8 @@ bool RMDeferred::RenderView(iView *view)
   RenderTreeType::ContextNode *startContext = renderTree.CreateContext (rview);
 
   // Add gbuffer textures to be visualized.
-  {
-    size_t count = gbuffer.GetColorBufferCount ();
-    if (count > 0)
-    {
-      int w, h;
-      gbuffer.GetColorBuffer (0)->GetRendererDimensions (w, h);
-      float aspect = (float)w / h;
-      
-      for (size_t i = 0; i < count; i++)
-      {
-        renderTree.AddDebugTexture (gbuffer.GetColorBuffer (i), aspect);
-      }
-
-      if (gbuffer.GetDepthBuffer ())
-      {
-        renderTree.AddDebugTexture (gbuffer.GetDepthBuffer (), aspect);
-      }
-    }
-  }
+  if (showGBuffer)
+    ShowGBuffer (renderTree);
 
   // Setup the main context
   {
@@ -711,53 +808,17 @@ bool RMDeferred::RenderView(iView *view)
     contextSetup (*startContext, portalData);
   }
 
-  // Render all contexts, back to front
-  gbuffer.Attach ();
   {
-    graphics3D->SetZMode (CS_ZBUF_MESH);
+    startContext->renderTargets[rtaColor0].texHandle = accumBuffer;
 
-    DeferredTreeRenderer<RenderTreeType> render (graphics3D, shaderManager, deferredLayer);
+    DeferredTreeRenderer<RenderTreeType> render (graphics3D,
+                                                 shaderManager,
+                                                 stringSet,
+                                                 gbuffer,
+                                                 lightRenderPersistent,
+                                                 deferredLayer);
     ForEachContextReverse (renderTree, render);
-
-    graphics3D->FinishDraw ();
   }
-  gbuffer.Detach ();
-
-  // Fills the accumulation buffer.
-  AttachAccumBuffer (graphics3D, false);
-  {
-    int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | startContext->drawFlags;
-    drawFlags &= ~CSDRAW_CLEARSCREEN;
-
-    graphics2D->Clear (graphics2D->FindRGB (0, 0, 0));
-
-    graphics3D->BeginDraw (drawFlags);
-    graphics3D->SetWorldToCamera (startContext->cameraTransform.GetInverse ());
-    
-    // Iterate through lights adding results into accumulation buffer.
-    DeferredLightRenderer render (graphics3D,
-                                  shaderManager,
-                                  stringSet,
-                                  rview,
-                                  gbuffer,
-                                  lightRenderPersistent);
-
-    render.OutputAmbientLight ();
-    ForEachLight (*startContext, render);
-  }
-  DetachAccumBuffer (graphics3D);
-
-  // Draws the transparent objects.
-   AttachAccumBuffer (graphics3D, true);
-  {
-    graphics3D->SetZMode (CS_ZBUF_MESH);
-
-    TransparentMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderManager, deferredLayer);
-    render (startContext);
-
-    graphics3D->FinishDraw ();
-  }
-  DetachAccumBuffer (graphics3D);
 
   // Output the final result to the backbuffer.
   {
@@ -765,6 +826,8 @@ bool RMDeferred::RenderView(iView *view)
 
     graphics3D->FinishDraw ();
   }
+
+  DebugFrameRender (rview, renderTree);
 
   renderTree.RenderDebugTextures (graphics3D);
 
@@ -846,6 +909,28 @@ bool RMDeferred::DetachAccumBuffer(iGraphics3D *graphics3D)
 {
   graphics3D->UnsetRenderTargets ();
   return true;
+}
+
+//----------------------------------------------------------------------
+void RMDeferred::ShowGBuffer(RenderTreeType &tree)
+{
+  size_t count = gbuffer.GetColorBufferCount ();
+  if (count > 0)
+  {
+    int w, h;
+    gbuffer.GetColorBuffer (0)->GetRendererDimensions (w, h);
+    float aspect = (float)w / h;
+
+    for (size_t i = 0; i < count; i++)
+    {
+      tree.AddDebugTexture (gbuffer.GetColorBuffer (i), aspect);
+    }
+
+    if (gbuffer.GetDepthBuffer ())
+    {
+      tree.AddDebugTexture (gbuffer.GetDepthBuffer (), aspect);
+    }
+  }
 }
 
 }

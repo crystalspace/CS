@@ -79,6 +79,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     bool AttachAccumBuffer(iGraphics3D *graphics3D, bool useGbufferDepth = false);
     bool DetachAccumBuffer(iGraphics3D *graphics3D);
 
+    void ShowGBuffer(RenderTreeType &tree);
+
     iObjectRegistry *objRegistry;
 
     RenderTreeType::PersistentData treePersistent;
@@ -98,6 +100,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     int deferredLayer;
     int maxPortalRecurse;
+
+    bool showGBuffer;
   };
 }
 CS_PLUGIN_NAMESPACE_END(RMDeferred)
