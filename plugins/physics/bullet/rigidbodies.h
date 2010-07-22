@@ -39,7 +39,7 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
   friend class csBulletPivotJoint;
   friend class csBulletSoftBody;
 
-  csBulletBodyType bodyType;
+  CS::Physics::Bullet::BodyType bodyType;
 
   csBulletDynamicsSystem* dynSys;
   btRigidBody* body;
@@ -51,7 +51,7 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
   csRef<iBulletKinematicCallback> kinematicCb;
 
   btCompoundShape* compoundShape;
-  csBulletState dynamicState;
+  CS::Physics::Bullet::BodyState dynamicState;
   bool customMass;
   float mass;
   bool compoundChanged;
@@ -73,7 +73,7 @@ public:
   virtual ~csBulletRigidBody ();
 
   //-- iBulletBody
-  virtual csBulletBodyType GetType ()
+  virtual CS::Physics::Bullet::BodyType GetType ()
   { return bodyType; }
 
   //-- iRigidBody
@@ -175,8 +175,8 @@ public:
 
   //-- iBulletRigidBody
   virtual void MakeKinematic ();
-  virtual csBulletState GetDynamicState () const;
-  virtual void SetDynamicState (csBulletState state);
+  virtual CS::Physics::Bullet::BodyState GetDynamicState () const;
+  virtual void SetDynamicState (CS::Physics::Bullet::BodyState state);
 
   virtual void SetKinematicCallback (iBulletKinematicCallback* callback);
   virtual iBulletKinematicCallback* GetKinematicCallback ();

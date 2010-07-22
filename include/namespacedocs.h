@@ -137,6 +137,19 @@ namespace CS
   }
 
   /**
+   * Objects of a dynamic simulation
+   */
+  namespace Physics
+  {
+    /**
+     * Objects of a dynamic simulation with the Bullet plugin
+     */
+    namespace Bullet
+    {
+    }
+  }
+
+  /**
    * Classes for render manager plugin implementation
    */
   namespace RenderManager

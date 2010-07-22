@@ -141,11 +141,11 @@ class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCel
   virtual ~csBulletTerrainCellCollider ();
 
   //-- iBulletBody
-  virtual csBulletBodyType GetType ()
+  virtual CS::Physics::Bullet::BodyType GetType ()
   { return bodyType; }
 
  private:
-  csBulletBodyType bodyType;
+  CS::Physics::Bullet::BodyType bodyType;
   HeightMapCollider* collider;
 };
 
@@ -158,7 +158,7 @@ class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollide
   virtual ~csBulletTerrainCollider ();
 
   //-- iBulletBody
-  virtual csBulletBodyType GetType ()
+  virtual CS::Physics::Bullet::BodyType GetType ()
   { return bodyType; }
 
   //-- iTerrainCellLoadCallback
@@ -167,7 +167,7 @@ class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollide
   virtual void OnCellUnload (iTerrainCell *cell);
 
  private:
-  csBulletBodyType bodyType;
+  CS::Physics::Bullet::BodyType bodyType;
 
   struct ColliderData
   {

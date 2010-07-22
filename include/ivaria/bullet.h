@@ -41,10 +41,17 @@ struct csLockedHeightData;
 struct iTerrainCell;
 struct iTerrainSystem;
 
+namespace CS
+{
+namespace Physics
+{
+namespace Bullet
+{
+
 /**
- * The type of the body for a Bullet's collider.
+ * The type of a Bullet's collider.
  */
-enum csBulletBodyType
+enum BodyType
 {
   CS_BULLET_UNDEFINED_BODY = 0,     /*!< Undefined body type. */
   CS_BULLET_RIGID_BODY,             /*!< The body is a rigid body. */
@@ -52,21 +59,38 @@ enum csBulletBodyType
   CS_BULLET_TERRAIN                 /*!< The body is a terrain collider. */
 };
 
+} //namespace Bullet
+} //namespace Physics
+} //namespace CS
+
+/**
+ * A generic body in a Bullet's dynamic simulation
+ */
 struct iBulletBody : public virtual iBase
 {
-  virtual csBulletBodyType GetType () = 0;
+  SCF_INTERFACE(iBulletBody, 1, 0, 0);
+
+  virtual CS::Physics::Bullet::BodyType GetType () = 0;
 };
+
+namespace CS
+{
+namespace Physics
+{
+namespace Bullet
+{
 
 /**
  * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
  * whether a rigid body, a soft body or a physical terrain collider has been hit.
  * \sa csHitBeamResult csSectorHitBeamResult
  */
-struct csBulletHitBeamResult
+struct HitBeamResult
 {
-  csBulletHitBeamResult ()
-  : hasHit (false), bodyType (CS_BULLET_UNDEFINED_BODY), rigidBody (0), softBody (0),
-    terrain (0), isect (0.0f), normal (0.0f), vertexIndex (0)
+  HitBeamResult ()
+  : hasHit (false), bodyType (CS::Physics::Bullet::CS_BULLET_UNDEFINED_BODY),
+    rigidBody (0), softBody (0), terrain (0), isect (0.0f), normal (0.0f),
+    vertexIndex (0)
   {}
 
   /**
@@ -77,7 +101,7 @@ struct csBulletHitBeamResult
   /**
    * The type of the body that was hit.
    */
-  csBulletBodyType bodyType;
+  CS::Physics::Bullet::BodyType bodyType;
 
   /**
    * The resulting body that was hit, or 0 if no body was hit.
@@ -120,13 +144,17 @@ struct csBulletHitBeamResult
 /**
  * The debug modes to be used with iBulletDynamicSystem::DebugDraw().
  */
-enum csBulletDebugMode
+enum DebugMode
 {
   CS_BULLET_DEBUG_NOTHING = 0,     /*!< Nothing will be displayed. */
   CS_BULLET_DEBUG_COLLIDERS = 1,   /*!< Display the colliders of the bodies. */
   CS_BULLET_DEBUG_AABB = 2,        /*!< Display the axis aligned bounding boxes of the bodies. */
   CS_BULLET_DEBUG_JOINTS = 4       /*!< Display the joint positions and limits. */
 };
+
+} //namespace Bullet
+} //namespace Physics
+} //namespace CS
 
 /**
  * The Bullet implementation of iDynamicSystem also implements this
@@ -147,11 +175,11 @@ struct iBulletDynamicSystem : public virtual iBase
   /**
    * Follow a beam from start to end and return the first body that is hit.
    * \return True if a body was hit, false otherwise.
-   * \sa csBulletHitBeamResult iMeshWrapper::HitBeam() iSector::HitBeam()
+   * \sa CS::Physics::Bullet::HitBeamResult iMeshWrapper::HitBeam() iSector::HitBeam()
    * iSector::HitBeamPortals()
    */
-  virtual csBulletHitBeamResult HitBeam (const csVector3 &start,
-					 const csVector3 &end) = 0;
+  virtual CS::Physics::Bullet::HitBeamResult HitBeam (const csVector3 &start,
+						      const csVector3 &end) = 0;
 
   /**
    * Set the internal scale to be applied to the whole dynamic world. Use this
@@ -191,12 +219,12 @@ struct iBulletDynamicSystem : public virtual iBase
    * \remark Don't forget to call DebugDraw() at each frame to effectively display
    * the debug informations.
    */
-  virtual void SetDebugMode (csBulletDebugMode mode) = 0;
+  virtual void SetDebugMode (CS::Physics::Bullet::DebugMode mode) = 0;
 
   /**
    * Return the current mode used when displaying debug informations.
    */
-  virtual csBulletDebugMode GetDebugMode () = 0;
+  virtual CS::Physics::Bullet::DebugMode GetDebugMode () = 0;
 
   /**
    * Set whether this dynamic world can handle soft bodies or not.
@@ -352,7 +380,8 @@ struct iBulletDynamicSystem : public virtual iBase
  * position of every vertex of the body can be queried through GetVertexPosition().
  *
  * A soft body can neither be static or kinematic, it is always dynamic.
- * \sa iRigidBody iBulletRigidBody iSoftBodyAnimationControl csBulletSoftBodyHelper
+ * \sa iRigidBody iBulletRigidBody iSoftBodyAnimationControl
+ * CS::Physics::Bullet::SoftBodyHelper
  */
 struct iBulletSoftBody : public iBulletBody
 {
@@ -447,10 +476,17 @@ struct iBulletSoftBody : public iBulletBody
   virtual csVector3 GetVertexNormal (size_t index) const = 0;
 };
 
+namespace CS
+{
+namespace Physics
+{
+namespace Bullet
+{
+
 /**
  * General helper class for iBulletSoftBody.
  */
-struct csBulletSoftBodyHelper
+struct SoftBodyHelper
 {
   /**
    * Create a genmesh from the given cloth soft body.
@@ -514,16 +550,20 @@ struct csBulletSoftBodyHelper
 /**
  * The physical state of a rigid body.
  */
-enum csBulletState
+enum BodyState
 {
   CS_BULLET_STATE_STATIC = 0,     /*!< The body is static, ie this body won't move
-				 anymore but dynamic objects will still collide with it. */
+				    anymore but dynamic objects will still collide with it. */
   CS_BULLET_STATE_DYNAMIC,        /*!< The body is dynamic, ie the motion of 
-				  the body is controlled by the dynamic simulation. */
+				    the body is controlled by the dynamic simulation. */
   CS_BULLET_STATE_KINEMATIC       /*!< The body is kinematic, ie the motion 
-				  of the body is controlled by the animation system,
-				  but it interacts with the dynamic simulation. */
+				    of the body is controlled by the animation system,
+				    but it interacts with the dynamic simulation. */
 };
+
+} //namespace Bullet
+} //namespace Physics
+} //namespace CS
 
 /**
  * The Bullet implementation of iRigidBody also implements this
@@ -547,13 +587,13 @@ struct iBulletRigidBody : public iBulletBody
   /**
    * Return the current state of the body.
    */
-  virtual csBulletState GetDynamicState () const = 0;
+  virtual CS::Physics::Bullet::BodyState GetDynamicState () const = 0;
 
   /**
    * Set the current state of the body.
    * \sa iRigidBody::MakeStatic() iRigidBody::MakeDynamic() MakeKinematic()
    */
-  virtual void SetDynamicState (csBulletState state) = 0;
+  virtual void SetDynamicState (CS::Physics::Bullet::BodyState state) = 0;
 
   /**
    * Set the callback to be used to update the transform of the kinematic body.

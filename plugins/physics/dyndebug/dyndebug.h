@@ -83,7 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 
     virtual void SetStaticBodyMaterial (iMaterialWrapper* material);
     virtual void SetDynamicBodyMaterial (iMaterialWrapper* material);
-    virtual void SetBodyStateMaterial (csBulletState state,
+    virtual void SetBodyStateMaterial (CS::Physics::Bullet::BodyState state,
 				       iMaterialWrapper* material);
 
   private:

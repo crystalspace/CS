@@ -163,7 +163,7 @@ bool csBulletCollider::CreatePlaneGeometry (const csPlane3& plane)
   delete[] indices; indices = 0;
 
   // Bullet doesn't support dynamic plane shapes
-  if (!isStaticBody && body->dynamicState != CS_BULLET_STATE_STATIC)
+  if (!isStaticBody && body->dynamicState != CS::Physics::Bullet::CS_BULLET_STATE_STATIC)
     return false;
   
   csVector3 normal = plane.GetNormal ();
@@ -222,7 +222,7 @@ bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
     return false;
 
   // this shape is optimized for static concave meshes
-  if (isStaticBody || body->dynamicState == CS_BULLET_STATE_STATIC)
+  if (isStaticBody || body->dynamicState == CS::Physics::Bullet::CS_BULLET_STATE_STATIC)
   {
     btBvhTriangleMeshShape* concaveShape =
       new btBvhTriangleMeshShape (indexVertexArrays, true);
@@ -262,7 +262,7 @@ void csBulletCollider::RebuildMeshGeometry ()
 	      (int)vertexCount, (btScalar*) &vertices[0].x (), sizeof (btVector3));
 
   // this shape is optimized for static concave meshes
-  if (isStaticBody || body->dynamicState == CS_BULLET_STATE_STATIC)
+  if (isStaticBody || body->dynamicState == CS::Physics::Bullet::CS_BULLET_STATE_STATIC)
   {
     btBvhTriangleMeshShape* concaveShape =
       new btBvhTriangleMeshShape (indexVertexArrays, true);
@@ -435,7 +435,7 @@ csOrthoTransform csBulletCollider::GetTransform ()
 
 csOrthoTransform csBulletCollider::GetLocalTransform ()
 {
-  if (isStaticBody || body->dynamicState == CS_BULLET_STATE_STATIC)
+  if (isStaticBody || body->dynamicState == CS::Physics::Bullet::CS_BULLET_STATE_STATIC)
     return localTransform * body->GetTransform ();
 
   return localTransform;
@@ -566,7 +566,7 @@ void csBulletCollider::MakeDynamic ()
 
 bool csBulletCollider::IsStatic ()
 {
-  return isStaticBody || body->dynamicState == CS_BULLET_STATE_STATIC;
+  return isStaticBody || body->dynamicState == CS::Physics::Bullet::CS_BULLET_STATE_STATIC;
 }
 
 float csBulletCollider::GetVolume ()
@@ -719,7 +719,7 @@ csBulletTerrainCellCollider::csBulletTerrainCellCollider (csBulletDynamicsSystem
 						      float minimumHeight, float maximumHeight)
   :  scfImplementationType (this)
 {
-  bodyType = CS_BULLET_TERRAIN;
+  bodyType = CS::Physics::Bullet::CS_BULLET_TERRAIN;
 
   // Create the terrain collider
   collider = new HeightMapCollider
@@ -732,7 +732,7 @@ csBulletTerrainCellCollider::csBulletTerrainCellCollider (csBulletDynamicsSystem
 						  float minimumHeight, float maximumHeight)
   :  scfImplementationType (this)
 {
-  bodyType = CS_BULLET_TERRAIN;
+  bodyType = CS::Physics::Bullet::CS_BULLET_TERRAIN;
 
   // Make sure that the cell data has been loaded
   cell->SetLoadState (iTerrainCell::Loaded);
@@ -767,7 +767,7 @@ csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys
   :  scfImplementationType (this), dynSys (dynSys), minimumHeight (minimumHeight),
      maximumHeight (maximumHeight)
 {
-  bodyType = CS_BULLET_TERRAIN;
+  bodyType = CS::Physics::Bullet::CS_BULLET_TERRAIN;
 
   // Listen to the loading callbacks
   // TODO: listen also to iTerrainCellHeightDataCallback

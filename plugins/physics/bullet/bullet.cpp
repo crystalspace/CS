@@ -571,9 +571,9 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
   debugDraw->DebugDraw (view);
 }
 
-void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
+void csBulletDynamicsSystem::SetDebugMode (CS::Physics::Bullet::DebugMode mode)
 {
-  if (mode == CS_BULLET_DEBUG_NOTHING)
+  if (mode == CS::Physics::Bullet::CS_BULLET_DEBUG_NOTHING)
   {
     if (debugDraw)
     {
@@ -593,15 +593,15 @@ void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
   debugDraw->SetDebugMode (mode);
 }
 
-csBulletDebugMode csBulletDynamicsSystem::GetDebugMode ()
+CS::Physics::Bullet::DebugMode csBulletDynamicsSystem::GetDebugMode ()
 {
   if (!debugDraw)
-    return CS_BULLET_DEBUG_NOTHING;
+    return CS::Physics::Bullet::CS_BULLET_DEBUG_NOTHING;
 
   return debugDraw->GetDebugMode ();
 }
 
-csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
+CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
 (const csVector3 &start, const csVector3 &end)
 {
   btVector3 rayFrom = CSToBullet (start, internalScale);
@@ -609,7 +609,7 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
   btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
   bulletWorld->rayTest (rayFrom, rayTo, rayCallback);
 
-  csBulletHitBeamResult result;
+  CS::Physics::Bullet::HitBeamResult result;
 
   if (rayCallback.hasHit())
   {
@@ -618,10 +618,10 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
 
     switch (bulletBody->GetType ())
       {
-      case CS_BULLET_RIGID_BODY:
+      case CS::Physics::Bullet::CS_BULLET_RIGID_BODY:
 	{
 	  result.hasHit = true;
-	  result.bodyType = CS_BULLET_RIGID_BODY;
+	  result.bodyType = CS::Physics::Bullet::CS_BULLET_RIGID_BODY;
 	  result.body = bulletBody;
 	  result.rigidBody = dynamic_cast<csBulletRigidBody*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
@@ -632,10 +632,10 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
 	  break;
 	}
 
-      case CS_BULLET_TERRAIN:
+      case CS::Physics::Bullet::CS_BULLET_TERRAIN:
 	{
 	  result.hasHit = true;
-	  result.bodyType = CS_BULLET_TERRAIN;
+	  result.bodyType = CS::Physics::Bullet::CS_BULLET_TERRAIN;
 	  result.body = bulletBody;
 	  result.terrain = dynamic_cast<iBulletTerrainCollider*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
@@ -646,14 +646,14 @@ csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
 	  break;
 	}
 
-      case CS_BULLET_SOFT_BODY:
+      case CS::Physics::Bullet::CS_BULLET_SOFT_BODY:
 	{
 	btSoftBody* body = btSoftBody::upcast (rayCallback.m_collisionObject);
 	btSoftBody::sRayCast ray;
 	if (body->rayTest (rayFrom, rayTo, ray))
 	{
 	  result.hasHit = true;
-	  result.bodyType = CS_BULLET_SOFT_BODY;
+	  result.bodyType = CS::Physics::Bullet::CS_BULLET_SOFT_BODY;
 	  result.body = bulletBody;
 	  result.softBody = dynamic_cast<csBulletSoftBody*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,

@@ -251,10 +251,10 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     if (frankieDead)
     {
       // Trace a physical beam to find if a rigid body was hit
-      csBulletHitBeamResult hitResult =
+      CS::Physics::Bullet::HitBeamResult hitResult =
 	avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
       if (hitResult.hasHit
-	  && hitResult.bodyType == CS_BULLET_RIGID_BODY)
+	  && hitResult.bodyType == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
       {
 	// Apply a big force at the point clicked by the mouse
 	csVector3 force = endBeam - startBeam;
@@ -303,10 +303,10 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     }
 
     // Trace a physical beam to find which rigid body was hit
-    csBulletHitBeamResult hitResult =
+    CS::Physics::Bullet::HitBeamResult hitResult =
       avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
     if (hitResult.hasHit
-	&& hitResult.bodyType == CS_BULLET_RIGID_BODY)
+	&& hitResult.bodyType == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
     {
       // Apply a big force at the point clicked by the mouse
       csVector3 force = endBeam - startBeam;

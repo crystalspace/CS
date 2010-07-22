@@ -38,7 +38,7 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   ~csBulletSoftBody ();
 
   //-- iBulletBody
-  virtual csBulletBodyType GetType ()
+  virtual CS::Physics::Bullet::BodyType GetType ()
   { return bodyType; }
 
   //-- iBulletSoftBody
@@ -61,7 +61,7 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   virtual csTriangle GetTriangle (size_t index) const;
 
  private:
-  csBulletBodyType bodyType;
+  CS::Physics::Bullet::BodyType bodyType;
   csBulletDynamicsSystem* dynSys;
   btSoftBody* body;
 };

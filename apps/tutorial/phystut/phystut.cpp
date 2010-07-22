@@ -515,9 +515,10 @@ bool Simple::OnKeyboard (iEvent &ev)
       csVector3 startBeam = camera->GetTransform ().GetOrigin ();
       csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
-      csBulletHitBeamResult hitResult = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+      CS::Physics::Bullet::HitBeamResult hitResult =
+	bulletDynamicSystem->HitBeam (startBeam, endBeam);
       if (hitResult.hasHit
-	  && hitResult.bodyType == CS_BULLET_RIGID_BODY)
+	  && hitResult.bodyType == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
       {
 	// Remove the body and the mesh from the simulation, and put them in the clipboard
 	clipboardBody = hitResult.rigidBody;
@@ -606,13 +607,13 @@ bool Simple::OnMouseDown (iEvent& ev)
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
     // Trace the physical beam
-    csBulletHitBeamResult hitResult =
+    CS::Physics::Bullet::HitBeamResult hitResult =
       bulletDynamicSystem->HitBeam (startBeam, endBeam);
     if (!hitResult.hasHit)
       return false;
 
     // Add a force at the point clicked
-    if (hitResult.bodyType == CS_BULLET_RIGID_BODY)
+    if (hitResult.bodyType == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
@@ -621,7 +622,7 @@ bool Simple::OnMouseDown (iEvent& ev)
       // Check if the body hit is not static or kinematic
       csRef<iBulletRigidBody> bulletBody =
 	scfQueryInterface<iBulletRigidBody> (hitResult.rigidBody);
-      if (bulletBody->GetDynamicState () != CS_BULLET_STATE_DYNAMIC)
+      if (bulletBody->GetDynamicState () != CS::Physics::Bullet::CS_BULLET_STATE_DYNAMIC)
 	return false;
 
       hitResult.rigidBody->AddForceAtPos (force, hitResult.isect);
@@ -632,7 +633,7 @@ bool Simple::OnMouseDown (iEvent& ev)
       //hitResult.rigidBody->AddForceAtRelPos (force, relativePosition);
     }
 
-    else if (hitResult.bodyType == CS_BULLET_SOFT_BODY)
+    else if (hitResult.bodyType == CS::Physics::Bullet::CS_BULLET_SOFT_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
@@ -659,12 +660,13 @@ bool Simple::OnMouseDown (iEvent& ev)
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
     // Trace the physical beam
-    csBulletHitBeamResult hitResult = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+    CS::Physics::Bullet::HitBeamResult hitResult =
+      bulletDynamicSystem->HitBeam (startBeam, endBeam);
     if (!hitResult.hasHit)
       return false;
 
     // Check if we hit a rigid body
-    if (hitResult.bodyType != CS_BULLET_RIGID_BODY)
+    if (hitResult.bodyType != CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
       return false;
 
     // Create a pivot joint at the point clicked
@@ -1699,7 +1701,7 @@ void Simple::SpawnCloth ()
 
   // Create the cloth mesh factory
   csRef<iMeshFactoryWrapper> clothFact =
-    csBulletSoftBodyHelper::CreateClothGenMeshFactory
+    CS::Physics::Bullet::SoftBodyHelper::CreateClothGenMeshFactory
     (GetObjectRegistry (), "clothFact", body);
   csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
     (clothFact->GetMeshObjectFactory ());
