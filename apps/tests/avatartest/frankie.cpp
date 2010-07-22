@@ -283,6 +283,9 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     animesh->SetMorphTargetWeight
       (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
 
+    // Stop the child animations, there is only the ragdoll controller which is active
+    lookAtNode->Stop ();
+
     // Set the ragdoll state of the iBodyChain of the body and the tail as dynamic
     ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_DYNAMIC);
     ragdollNode->SetBodyChainState (tailChain, CS_RAGDOLL_STATE_DYNAMIC);
@@ -544,6 +547,7 @@ void FrankieScene::ResetScene ()
   lookAtNode->SetTarget (avatarTest->view->GetCamera(), csVector3 (0.0f));
   rotationSpeed = ROTATION_NORMAL;
   lookAtNode->SetMaximumSpeed (5.0f);
+  lookAtNode->Play ();
 
   // Reset 'speed' controller
   currentSpeed = 0;
