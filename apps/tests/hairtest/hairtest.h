@@ -109,6 +109,9 @@ private:
   CEGUI::Scrollbar* sliderR;
   CEGUI::Scrollbar* sliderG;
   CEGUI::Scrollbar* sliderB;
+  CEGUI::Scrollbar* sliderGuideLOD;
+  CEGUI::Scrollbar* sliderStrandLOD;
+  CEGUI::Scrollbar* sliderOverallLOD;
 
   //-- csBaseEventHandler
   void Frame ();
@@ -133,6 +136,9 @@ public:
   bool OnEventThumbTrackEndedR (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedG (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedB (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedGuideLOD (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedStrandLOD (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedOverallLOD (const CEGUI::EventArgs& e);
 
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);

@@ -84,7 +84,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     iObjectRegistry* object_reg) :
   scfImplementationType (this), manager (manager), name (name), 
     object_reg(object_reg), physicsControl(0), hairStrandGenerator(0), rng(0),
-    LOD(0)
+    guideLOD(0), strandLOD(0), hairStrandsLODSize(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -122,7 +122,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     this->view = view;
     size_t numberOfStrains = hairStrands.GetSize();
-
+    hairStrandsLODSize = hairStrands.GetSize();
+    
     if( !numberOfStrains ) 
       return;
 
@@ -259,7 +260,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     }
   }
 
-  float FurMaterial::TriangleAreaDensity(csGuideHair A, csGuideHair B, csGuideHair C)
+  float FurMaterial::TriangleDensity(csGuideHair A, csGuideHair B, csGuideHair C)
   {
     csVector2 a = csVector2(A.uv.x * densitymap.width, A.uv.y * densitymap.height);
     csVector2 b = csVector2(B.uv.x * densitymap.width, B.uv.y * densitymap.height);
@@ -367,7 +368,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       float area = sqrt(s * (s - a) * (s - b) * (s - c));
 
       // average density - modify to use convolution matrix or such
-      float density = TriangleAreaDensity(A, B, C);
+      float density = TriangleDensity(A, B, C);
 
       //csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
 
@@ -486,7 +487,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         float area = sqrt(s * (s - a) * (s - b) * (s - c));
 
         // average density - modify to use convolution matrix or such
-        float density = TriangleAreaDensity(A, B, C);
+        float density = TriangleDensity(A, B, C);
 
   //       csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
 
@@ -563,12 +564,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     //csPrintf("end\n");
   }
 
-  void FurMaterial::SetLOD(float LOD)
+  void FurMaterial::SetGuideLOD(float guideLOD)
   {
-    if ( fabs( this->LOD - LOD ) < EPSILON )
+    if ( fabs( this->guideLOD - guideLOD ) < EPSILON )
       return;
 
-    this->LOD = LOD;
+    this->guideLOD = guideLOD;
 
     if (!physicsControl) // no physics support
       return;
@@ -581,7 +582,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     }
     // LOD ropes use ropes as well
     for (size_t i = 0 ; i < guideHairsLOD.GetSize(); i ++)
-      if ( rng->Get() < LOD )
+      if ( rng->Get() < guideLOD )
       {
         guideHairsLOD.Get(i).isActive = true;
         physicsControl->InitializeStrand(i + guideHairs.GetSize(), 
@@ -594,6 +595,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       if (guideHairsLOD.Get(i).isActive)
         count++;
     csPrintf("Active LOD ropes: %d\n",count);
+  }
+
+  void FurMaterial::SetStrandLOD(float strandLOD)
+  {
+    this->strandLOD = strandLOD;
+    size_t totalGuideHairsCount = guideHairs.GetSize() + guideHairsLOD.GetSize();
+    hairStrandsLODSize = totalGuideHairsCount + 
+      (size_t)(strandLOD * (hairStrands.GetSize() - totalGuideHairsCount));
+
+    strandWidthLOD = 1 / ( strandLOD * 0.75f + 0.25f ) * strandWidth;
   }
 
   void FurMaterial::GaussianBlur(TextureData texture)
@@ -793,6 +804,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<csShaderVariable> shaderVariable = material->GetVariable(strandWidthName);
 
     shaderVariable->GetValue(strandWidth);
+    strandWidthLOD = strandWidth;
   }
 
   void FurMaterial::SetDensitymap ()
@@ -989,9 +1001,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     if (furMaterial->physicsControl)
       UpdateGuideHairs();
 
+    size_t numberOfStrains = furMaterial->hairStrandsLODSize;
+
+    if (!numberOfStrains)
+      return;
+
     // then update the hair strands
     if (furMaterial->physicsControl)
-      for (size_t i = 0 ; i < furMaterial->hairStrands.GetSize(); i ++)
+      for (size_t i = 0 ; i < numberOfStrains; i ++)
       {
         csHairStrand hairStrand = furMaterial->hairStrands.Get(i);
 
@@ -1013,11 +1030,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
 
-    int numberOfStrains = furMaterial->hairStrands.GetSize();
-
-    if (!numberOfStrains)
-      return;
-
     csVector3 *vbuf = furMaterial->factoryState->GetVertices(); 
     csVector3 *normals = furMaterial->factoryState->GetNormals(); 
     iRenderBuffer *tangents = furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT);
@@ -1030,7 +1042,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csVector3 *tangentBuffer = tan;
     csVector3 *tanShift = tangentShift;
 
-    for ( int x = 0 ; x < numberOfStrains ; x ++)
+    size_t triangleCount = 0;
+
+    for ( size_t x = 0 ; x < numberOfStrains ; x ++)
     {
       int y = 0;
       tangent = csVector3(0);
@@ -1038,6 +1052,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       csVector3 *controlPoints = furMaterial->hairStrands.Get(x).controlPoints;
       int controlPointsCount = furMaterial->hairStrands.Get(x).controlPointsCount;
+      triangleCount += 2 * controlPointsCount - 2;
 
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
         vbuf += 2, tangentBuffer += 2, tanShift ++, normals += 2 )
@@ -1047,7 +1062,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         
         csMath3::CalcNormal(binormal, firstPoint, secondPoint, cameraOrigin);
         binormal.Normalize();
-        strip = furMaterial->strandWidth * binormal;
+        strip = furMaterial->strandWidthLOD * binormal;
 
         (*vbuf) = firstPoint;
         (*(vbuf + 1)) = firstPoint + strip;
@@ -1065,20 +1080,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         (*(tangentBuffer + 1)) = tangent;
       }
 
-      (*vbuf) = *controlPoints;
-      (*(vbuf + 1)) = *controlPoints + strip;
+      if (controlPointsCount >= 1)
+      {
+        (*vbuf) = *controlPoints;
+        (*(vbuf + 1)) = *controlPoints + strip;
 
-      (*tangentBuffer) = tangent;
-      (*(tangentBuffer + 1)) = tangent;
+        (*tangentBuffer) = tangent;
+        (*(tangentBuffer + 1)) = tangent;
 
-      (*normals) = normal;
-      (*(normals + 1)) = normal;
+        (*normals) = normal;
+        (*(normals + 1)) = normal;
 
-      vbuf += 2;
-      tangentBuffer += 2;
-      normals += 2;
-      tanShift ++;
+        vbuf += 2;
+        tangentBuffer += 2;
+        normals += 2;
+        tanShift ++;
+      }
     }
+
+    furMaterial->factoryState->GetSubMesh(0)->SetIndexRange(0, 3 * triangleCount);
 
 //     furMaterial->factoryState->CalculateNormals();
     furMaterial->factoryState->Invalidate();

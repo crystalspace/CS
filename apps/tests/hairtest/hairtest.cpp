@@ -273,6 +273,25 @@ bool HairTest::OnEventThumbTrackEndedB (const CEGUI::EventArgs&)
   return true;
 }
 
+bool HairTest::OnEventThumbTrackEndedGuideLOD (const CEGUI::EventArgs&)
+{
+  avatarScene->furMaterial->SetGuideLOD(sliderGuideLOD->getScrollPosition());
+
+  return true;
+}
+
+bool HairTest::OnEventThumbTrackEndedStrandLOD (const CEGUI::EventArgs&)
+{
+  avatarScene->furMaterial->SetStrandLOD(sliderStrandLOD->getScrollPosition());
+
+  return true;
+}
+
+bool HairTest::OnEventThumbTrackEndedOverallLOD (const CEGUI::EventArgs&)
+{
+  return true;
+}
+
 void HairTest::SwitchDynamics()
 {
   csRef<iMeshObject> animeshObject = 
@@ -594,6 +613,27 @@ bool HairTest::Application ()
     sliderG->setScrollPosition(color.y);
     sliderB->setScrollPosition(color.z);
   }
+
+  sliderGuideLOD = (CEGUI::Scrollbar*)winMgr->
+    getWindow("HairTest/MainWindow/Tab/Page3/Slider1");
+
+  sliderGuideLOD->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+    CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedGuideLOD, this));  
+
+  sliderStrandLOD = (CEGUI::Scrollbar*)winMgr->
+    getWindow("HairTest/MainWindow/Tab/Page3/Slider2");
+
+  sliderStrandLOD->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+    CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedStrandLOD, this));  
+
+  sliderStrandLOD->setScrollPosition(1.0f);
+
+  sliderOverallLOD = (CEGUI::Scrollbar*)winMgr->
+    getWindow("HairTest/MainWindow/Tab/Page3/Slider3");
+
+  sliderOverallLOD->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+    CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedOverallLOD, this)); 
+
   // Initialize camera position
   view->GetCamera ()->GetTransform ().SetOrigin (avatarScene->GetCameraStart ());
 

@@ -107,7 +107,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     // From iFurMaterial
     virtual void GenerateGeometry (iView* view, iSector *room);
-    virtual void SetLOD(float LOD);
+    virtual void SetGuideLOD(float guideLOD);
+    virtual void SetStrandLOD(float strandLOD);
     virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl);
     // Temporary - Set Mesh and Submesh
     virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory);
@@ -155,7 +156,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iFurPhysicsControl> physicsControl;
     csRef<iFurStrandGenerator> hairStrandGenerator;
     csRandomGen *rng;
-    float LOD;
+    float guideLOD;
+    float strandLOD;
+    size_t hairStrandsLODSize;
     /// Temp fur geometry
     csRef<iAnimatedMeshFactory> meshFactory;
     csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
@@ -168,6 +171,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float heightFactor;
     float displaceDistance;
     float strandWidth;
+    float strandWidthLOD;
     float controlPointsDistance;
     int strictHeightmap;
     /// Model
@@ -179,7 +183,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     void SynchronizeGuideHairs();
     void GenerateGuideHairsLOD();
     void GenerateHairStrands();
-    float TriangleAreaDensity(csGuideHair A, csGuideHair B, csGuideHair C);
+    float TriangleDensity(csGuideHair A, csGuideHair B, csGuideHair C);
     /// debug
     void GaussianBlur(TextureData texture);
     void SaveUVImage();
