@@ -15,228 +15,6 @@ using namespace std;
 
 inline float dot(const csVector3& v0, const csVector3& v1) { return v0 * v1; }
 
-/*
-inline void PointTriangleDistance26(float aa, float bb, float cc, float dd, float ee, float ff, float& ss, float& tt, float& dd2)
-{
-  float tmp0 = bb+dd;
-  float tmp1 = cc+ee;
-  if (tmp1 > tmp0)
-  {
-    float numer = tmp1-tmp0;
-    float denom = aa - 2.0*bb + cc;
-    if (numer >= denom)
-    {
-      ss = 1.0;
-      tt = 0.0;
-      //dd2 = aa + 2.0*bb + ff;
-      dd2 = aa + 2.0*dd + ff;
-    }
-    else
-    {
-      ss = numer/denom;
-      tt = 1.0-ss;
-      dd2 = ss*(aa*ss + bb*tt + 2.0*dd) + tt*(bb*ss + cc*tt + 2.0*ee) + ff;
-    }
-  }
-  else
-  {
-    ss = 0.0;
-    if (tmp1 <= 0.0)
-    {
-      tt = 1.0;
-      dd2 = cc + 2.0*ee + ff;
-    }
-    else
-    {
-      if (ee >= 0.0)
-      {
-        tt = 0.0;
-        dd2 = ff;
-      }
-      else
-      {
-        tt = -ee/cc;
-        dd2 = ee*tt + ff;
-      }
-    }
-  }  
-}
-
-void PointTriangleDistance(const csVector3& P, const csVector3& P0, const csVector3& P1, const csVector3& P2, float& s, float& t, float& d2)
-{
-  const csVector3& B = P0;
-  csVector3 E0 = P1 - P0;
-  csVector3 E1 = P2 - P0;
-  csVector3 D = B - P;
-  float a = dot(E0, E0);
-  float b = dot(E0, E1);
-  float c = dot(E1, E1);
-  float d = dot(E0, D);  
-  float e = dot(E1, D);
-  float f = dot(D, D);
-  
-  float det = a*c - b*b;
-  s = b*e - c*d;
-  t = b*d - a*e;
-  
-  if (s+t <= det)
-  {
-    if (s < 0.0)
-    {
-      if (t < 0.0)
-      {
-        // region 4
-        if (d < 0.0)
-        {
-          t = 0.0;
-          if (-d >= a)
-          {
-            s = 1.0;
-            d2 = a + 2.0*d + f;
-            return;
-          }
-          else
-          {
-            s = -d/a;
-            d2 = d*s + f;
-            return;
-          }
-        }
-        else
-        {
-          s = 0.0;
-          if (e >= 0.0)
-          {
-            t = 0.0;
-            d2 = f;
-            return;
-          }
-          else
-          {
-            if (-e >= c)
-            {
-              t = 1.0;
-              d2 = c + 2.0*e + f;
-              return;
-            }
-            else
-            {
-              t = -e/c;
-              d2 = e*t + f;
-              return;
-            }
-          }
-        }
-      }
-      else 
-      { 
-        // region 3
-        s = 0.0;
-        if (e >= 0.0)
-        {
-          t = 0.0;
-          d2 = f;
-          return;
-        }
-        else
-        {
-          if (-e >= c)
-          {
-            t = 1.0;
-            d2 = c + 2.0*e + f;
-            return;
-          }
-          else
-          {
-            t = -e/c;
-            d2 = e*t + f;
-            return;
-          }
-        }
-      }
-    }
-    else if (t < 0.0) 
-    {
-      // region 5
-      t = 0.0;
-      if (d >= 0.0)
-      {
-        s = 0.0;
-        d2 = f;
-        return;
-      }
-      else
-      {
-        if (-d >= a)
-        {
-          s = 1.0;
-          d2 = a + d*s + f;
-          return;
-        }
-        else
-        {
-          s = -d/a;
-          d2 = d*s + f;
-          return;
-        }
-      }
-    }
-    else 
-    {
-      // region 0
-      float invdet = 1.0 / det;
-      s *= invdet;
-      t *= invdet;
-      d2 = s*(a*s + b*t + 2.0*d) + t*(b*s + c*t + 2.0*e) + f;
-      return;
-    }
-  }
-  else
-  {
-    if (s < 0.0)
-    {      
-      // region 2
-      PointTriangleDistance26(a, b, c, d, e, f, s, t, d2);
-      return;
-    }
-    else if (t < 0.0)
-    {
-      // region 6
-      PointTriangleDistance26(c, b, a, e, d, f, t, s, d2);
-      return;
-    }
-    else 
-    {
-      // region 1
-      float numer = c+e-b-d;
-      if (numer <= 0.0)
-      {
-        s = 0.0;
-        t = 1.0;
-        d2 = c + 2.0*e + f;
-      }
-      else
-      {
-        float denom = a - 2.0*b + c;
-        if (numer >= denom)
-        {
-          s = 1.0;
-          t = 0.0;
-          d2 = a + 2.0*d + f;
-        }
-        else
-        {
-          s = numer/denom;
-          t = 1.0 - s;
-          d2 = s*(a*s + b*t + 2.0*d) + t*(b*s + c*t + 2.0*e) + f;
-        }
-      }
-    }
-  }
-}
-
-*/
-
 void PointTriangleDistance(const csVector3& P, const csVector3& P0, const csVector3& P1, const csVector3& P2, float& s, float& t, float& d2)
 {
   // From http://www.geometrictools.com/Documentation/DistancePoint3Triangle3.pdf
@@ -670,8 +448,6 @@ struct MeshVerification
 {
   Edge e;
   int num_t;
-  //int t0;
-  //int t1;
   bool operator==(const MeshVerification& m) const { return e == m.e; }
 };
 
@@ -712,10 +488,12 @@ void LodGen::VerifyMesh(WorkMesh& k)
       }
     }
   }
+  /*
   for (unsigned int i = 0; i < mvs.GetSize(); i++)
   {
-    //assert(mvs[i].num_t == 2);
+    assert(mvs[i].num_t == 2);
   }
+  */
 }
 
 void LodGen::GenerateLODs()

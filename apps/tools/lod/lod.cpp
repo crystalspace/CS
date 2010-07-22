@@ -356,19 +356,6 @@ void Lod::CreateLODs(const char* filename)
   for (unsigned int i = 0; i < m.vertices.GetSize(); i++)
     fstate->AddVertex(m.vertices[i], m.attr[i].uv, m.attr[i].normal, m.attr[i].color);
   
-  /*
-  // Test by rendering level 1
-  fstate->SetTriangleCount(0);  
-  assert(lodgen.GetSlidingWindowCount() >= 2);
-  int start_index = lodgen.GetSlidingWindow(18).start_index;
-  int end_index = lodgen.GetSlidingWindow(18).end_index;
-  for (int i = start_index; i < end_index; i++)
-  {
-    cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
-    fstate->AddTriangle(lodgen.GetTriangle(i));
-  }
-   */
-
   fstate->SetTriangleCount(0);
   assert(lodgen.GetSlidingWindowCount() >= 2);
   for (int i = 0; i < lodgen.GetTriangleCount(); i++)
@@ -382,13 +369,6 @@ void Lod::CreateLODs(const char* filename)
   {
     fstate->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
   }
-   /*
-  for (int i = 0; i < nt; i++)
-  {
-    cout << triangles[i][0] << " " << triangles[i][1] << " " << triangles[i][2] << endl;
-    fstate->AddTriangle(triangles[i]);
-  }
-   */
   
   loading.Invalidate();
 }
