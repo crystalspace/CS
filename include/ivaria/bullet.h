@@ -54,10 +54,10 @@ struct iTerrainCollider;
  */
 enum BodyType
 {
-  CS_BULLET_UNDEFINED_BODY = 0,     /*!< Undefined body type. */
-  CS_BULLET_RIGID_BODY,             /*!< The body is a rigid body. */
-  CS_BULLET_SOFT_BODY,              /*!< The body is a soft body. */
-  CS_BULLET_TERRAIN                 /*!< The body is a terrain collider. */
+  UNDEFINED_BODY = 0,     /*!< Undefined body type. */
+  RIGID_BODY,             /*!< The body is a rigid body. */
+  SOFT_BODY,              /*!< The body is a soft body. */
+  TERRAIN                 /*!< The body is a terrain collider. */
 };
 
 /**
@@ -72,19 +72,19 @@ struct iBody : public virtual iBase
 
   /**
    * Query the iRigidBody interface of this body. It returns null if the
-   * interface is not valid, ie GetType() is not CS::Physics::Bullet::CS_BULLET_RIGID_BODY.
+   * interface is not valid, ie GetType() is not CS::Physics::Bullet::RIGID_BODY.
    */
   virtual ::iRigidBody* QueryRigidBody () = 0;
 
   /**
    * Query the iBulletSoftBody interface of this body. It returns null if the
-   * interface is not valid, ie GetType() is not CS::Physics::Bullet::CS_BULLET_SOFT_BODY.
+   * interface is not valid, ie GetType() is not CS::Physics::Bullet::SOFT_BODY.
    */
   virtual iSoftBody* QuerySoftBody () = 0;
 
   /**
    * Query the iBulletTerrainCollider interface of this body. It returns null if the
-   * interface is not valid, ie GetType() is not CS::Physics::Bullet::CS_BULLET_TERRAIN.
+   * interface is not valid, ie GetType() is not CS::Physics::Bullet::TERRAIN.
    */
   virtual iTerrainCollider* QueryTerrainCollider () = 0;
 };
@@ -111,24 +111,6 @@ struct HitBeamResult
   iBody* body;
 
   /**
-<<<<<<< .mine
-   * The resulting rigid body that was hit, or 0 if no rigid body was hit.
-   */
-  iRigidBody* rigidBody;
-
-  /**
-   * The resulting soft body that was hit, or 0 if no soft body was hit.
-   */
-  iSoftBody* softBody;
-
-  /**
-   * The resulting terrain collider that was hit, or 0 if no terrain collider was hit.
-   */
-  iTerrainCollider* terrain;
-
-  /**
-=======
->>>>>>> .r34546
    * Intersection point in world space.
    */
   csVector3 isect;
@@ -150,10 +132,10 @@ struct HitBeamResult
  */
 enum DebugMode
 {
-  CS_BULLET_DEBUG_NOTHING = 0,     /*!< Nothing will be displayed. */
-  CS_BULLET_DEBUG_COLLIDERS = 1,   /*!< Display the colliders of the bodies. */
-  CS_BULLET_DEBUG_AABB = 2,        /*!< Display the axis aligned bounding boxes of the bodies. */
-  CS_BULLET_DEBUG_JOINTS = 4       /*!< Display the joint positions and limits. */
+  DEBUG_NOTHING = 0,     /*!< Nothing will be displayed. */
+  DEBUG_COLLIDERS = 1,   /*!< Display the colliders of the bodies. */
+  DEBUG_AABB = 2,        /*!< Display the axis aligned bounding boxes of the bodies. */
+  DEBUG_JOINTS = 4       /*!< Display the joint positions and limits. */
 };
 
 /**
@@ -215,7 +197,7 @@ struct iDynamicSystem : public virtual iBase
 
   /**
    * Set the mode to be used when displaying debug informations. The default value
-   * is 'CS::Physics::Bullet::CS_BULLET_DEBUG_COLLIDERS | CS::Physics::Bullet::CS_BULLET_DEBUG_JOINTS'.
+   * is 'CS::Physics::Bullet::DEBUG_COLLIDERS | CS::Physics::Bullet::DEBUG_JOINTS'.
    * \remark Don't forget to call DebugDraw() at each frame to effectively display
    * the debug informations.
    */
@@ -545,13 +527,13 @@ struct SoftBodyHelper
  */
 enum BodyState
 {
-  CS_BULLET_STATE_STATIC = 0,     /*!< The body is static, ie this body won't move
-				    anymore but dynamic objects will still collide with it. */
-  CS_BULLET_STATE_DYNAMIC,        /*!< The body is dynamic, ie the motion of 
-				    the body is controlled by the dynamic simulation. */
-  CS_BULLET_STATE_KINEMATIC       /*!< The body is kinematic, ie the motion 
-				    of the body is controlled by the animation system,
-				    but it interacts with the dynamic simulation. */
+  STATE_STATIC = 0,     /*!< The body is static, ie this body won't move
+			  anymore but dynamic objects will still collide with it. */
+  STATE_DYNAMIC,        /*!< The body is dynamic, ie the motion of 
+			  the body is controlled by the dynamic simulation. */
+  STATE_KINEMATIC       /*!< The body is kinematic, ie the motion 
+			  of the body is controlled by the animation system,
+			  but it interacts with the dynamic simulation. */
 };
 
 /**

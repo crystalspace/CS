@@ -518,7 +518,7 @@ bool Simple::OnKeyboard (iEvent &ev)
       CS::Physics::Bullet::HitBeamResult hitResult =
 	bulletDynamicSystem->HitBeam (startBeam, endBeam);
       if (hitResult.hasHit
-	  && hitResult.body->GetType () == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
+	  && hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
       {
 	// Remove the body and the mesh from the simulation, and put them in the clipboard
 	clipboardBody = hitResult.body->QueryRigidBody ();
@@ -613,7 +613,7 @@ bool Simple::OnMouseDown (iEvent& ev)
       return false;
 
     // Add a force at the point clicked
-    if (hitResult.body->GetType () == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
+    if (hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
@@ -622,7 +622,7 @@ bool Simple::OnMouseDown (iEvent& ev)
       // Check if the body hit is not static or kinematic
       csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
 	scfQueryInterface<CS::Physics::Bullet::iRigidBody> (hitResult.body->QueryRigidBody ());
-      if (bulletBody->GetDynamicState () != CS::Physics::Bullet::CS_BULLET_STATE_DYNAMIC)
+      if (bulletBody->GetDynamicState () != CS::Physics::Bullet::STATE_DYNAMIC)
 	return false;
 
       hitResult.body->QueryRigidBody ()->AddForceAtPos (force, hitResult.isect);
@@ -633,7 +633,7 @@ bool Simple::OnMouseDown (iEvent& ev)
       //hitResult.body->QueryRigidBody ()->AddForceAtRelPos (force, relativePosition);
     }
 
-    else if (hitResult.body->GetType () == CS::Physics::Bullet::CS_BULLET_SOFT_BODY)
+    else if (hitResult.body->GetType () == CS::Physics::Bullet::SOFT_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
@@ -666,7 +666,7 @@ bool Simple::OnMouseDown (iEvent& ev)
       return false;
 
     // Check if we hit a rigid body
-    if (hitResult.body->GetType () != CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
+    if (hitResult.body->GetType () != CS::Physics::Bullet::RIGID_BODY)
       return false;
 
     // Create a pivot joint at the point clicked
@@ -1593,7 +1593,7 @@ void Simple::LoadRagdoll ()
   csRef<iSkeletonRagdollNodeFactory2> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll",
 					   bodySkeleton, dynamicSystem);
-  ragdollFactory->AddBodyChain (chain, CS::Animation::CS_RAGDOLL_STATE_DYNAMIC);
+  ragdollFactory->AddBodyChain (chain, CS::Animation::STATE_DYNAMIC);
 
   // Set the ragdoll anim node as the only node of the animation tree
   animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ()
@@ -1642,9 +1642,9 @@ void Simple::SpawnRagdoll ()
   // Fling the body.
   // (start the ragdoll node before so that the rigid bodies are created)
   ragdoll->Play ();
-  for (uint i = 0; i < ragdoll->GetBoneCount (CS::Animation::CS_RAGDOLL_STATE_DYNAMIC); i++)
+  for (uint i = 0; i < ragdoll->GetBoneCount (CS::Animation::STATE_DYNAMIC); i++)
   {
-    BoneID boneID = ragdoll->GetBone (CS::Animation::CS_RAGDOLL_STATE_DYNAMIC, i);
+    BoneID boneID = ragdoll->GetBone (CS::Animation::STATE_DYNAMIC, i);
     iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
     rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
     rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));

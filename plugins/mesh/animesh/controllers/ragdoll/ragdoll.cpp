@@ -268,7 +268,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   CS::Animation::RagdollState RagdollAnimNode::GetBodyChainState (iBodyChain* chain)
   {
     if (!chains.Contains (chain->GetName ()))
-      return CS::Animation::CS_RAGDOLL_STATE_INACTIVE;
+      return CS::Animation::STATE_INACTIVE;
 
     return chains[chain->GetName ()]->state;
   }
@@ -337,7 +337,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     }
 
     // check that the chain is in dynamic state
-    if (chains[chain->GetName ()]->state != CS::Animation::CS_RAGDOLL_STATE_DYNAMIC)
+    if (chains[chain->GetName ()]->state != CS::Animation::STATE_DYNAMIC)
     {
       factory->manager->Report (CS_REPORTER_SEVERITY_WARNING,
        "Chain %s was not in dynamic state while trying to reset the chain transform",
@@ -482,7 +482,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       // TODO: test for deactivation of rigid body
 
       // check if the bone is in dynamic state
-      if (boneData.state != CS::Animation::CS_RAGDOLL_STATE_DYNAMIC)
+      if (boneData.state != CS::Animation::STATE_DYNAMIC)
         continue;
 
       // Get the bind transform of the bone
@@ -594,7 +594,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   {
     // check if this node has been stopped or if the bone is inactive
     if (!isActive
-	|| boneData->state == CS::Animation::CS_RAGDOLL_STATE_INACTIVE)
+	|| boneData->state == CS::Animation::STATE_INACTIVE)
     {
       if (boneData->joint)
       {
@@ -748,7 +748,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     }
 
     // if the bone is in dynamic state
-    if (boneData->state == CS::Animation::CS_RAGDOLL_STATE_DYNAMIC)
+    if (boneData->state == CS::Animation::STATE_DYNAMIC)
     {
       // set the rigid body in dynamic state
       boneData->rigidBody->MakeDynamic ();
@@ -823,7 +823,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     }
 
     // if the bone is in kinematic state
-    else if (boneData->state == CS::Animation::CS_RAGDOLL_STATE_KINEMATIC)
+    else if (boneData->state == CS::Animation::STATE_KINEMATIC)
     {
       // find the bullet interface of the rigid body
       csRef<CS::Physics::Bullet::iRigidBody> bulletBody =

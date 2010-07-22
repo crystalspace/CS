@@ -573,7 +573,7 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
 
 void csBulletDynamicsSystem::SetDebugMode (CS::Physics::Bullet::DebugMode mode)
 {
-  if (mode == CS::Physics::Bullet::CS_BULLET_DEBUG_NOTHING)
+  if (mode == CS::Physics::Bullet::DEBUG_NOTHING)
   {
     if (debugDraw)
     {
@@ -596,7 +596,7 @@ void csBulletDynamicsSystem::SetDebugMode (CS::Physics::Bullet::DebugMode mode)
 CS::Physics::Bullet::DebugMode csBulletDynamicsSystem::GetDebugMode ()
 {
   if (!debugDraw)
-    return CS::Physics::Bullet::CS_BULLET_DEBUG_NOTHING;
+    return CS::Physics::Bullet::DEBUG_NOTHING;
 
   return debugDraw->GetDebugMode ();
 }
@@ -618,7 +618,7 @@ CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
 
     switch (bulletBody->GetType ())
       {
-      case CS::Physics::Bullet::CS_BULLET_RIGID_BODY:
+      case CS::Physics::Bullet::RIGID_BODY:
 	{
 	  result.hasHit = true;
 	  result.body = bulletBody;
@@ -630,7 +630,7 @@ CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
 	  break;
 	}
 
-      case CS::Physics::Bullet::CS_BULLET_TERRAIN:
+      case CS::Physics::Bullet::TERRAIN:
 	{
 	  result.hasHit = true;
 	  result.body = bulletBody;
@@ -642,7 +642,7 @@ CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
 	  break;
 	}
 
-      case CS::Physics::Bullet::CS_BULLET_SOFT_BODY:
+      case CS::Physics::Bullet::SOFT_BODY:
 	{
 	btSoftBody* body = btSoftBody::upcast (rayCallback.m_collisionObject);
 	btSoftBody::sRayCast ray;

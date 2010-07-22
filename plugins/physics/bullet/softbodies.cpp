@@ -43,9 +43,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 
 csBulletSoftBody::csBulletSoftBody (csBulletDynamicsSystem* dynSys,
 				    btSoftBody* body)
-  : scfImplementationType (this), dynSys (dynSys), body (body)
+  : scfImplementationType (this), bodyType (CS::Physics::Bullet::SOFT_BODY),
+  dynSys (dynSys), body (body)
 {
-  bodyType = CS::Physics::Bullet::CS_BULLET_SOFT_BODY;
   body->setUserPointer (static_cast<iBody*> (this));
 }
 
