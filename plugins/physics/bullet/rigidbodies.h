@@ -72,7 +72,7 @@ public:
   csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic = false);
   virtual ~csBulletRigidBody ();
 
-  //-- iBulletBody
+  //-- CS::Physics::Bullet::iBody
   virtual CS::Physics::Bullet::BodyType GetType () const
   { return bodyType; }
   virtual ::iRigidBody* QueryRigidBody ()

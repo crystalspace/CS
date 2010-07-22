@@ -36,7 +36,7 @@ namespace CS
 } // namespace CS
 
 /**
- * Animation control type for a genmesh animated by a iBulletSoftBody.
+ * Animation control type for a genmesh animated by a CS::Physics::Bullet::iSoftBody.
  *
  * Main ways to get pointers to this interface:
  * - csQueryPluginClass()
@@ -51,7 +51,7 @@ struct iSoftBodyAnimationControlType : public iGenMeshAnimationControlType
 };
 
 /**
- * Animation control factory for a genmesh animated by a iBulletSoftBody.
+ * Animation control factory for a genmesh animated by a CS::Physics::Bullet::iSoftBody.
  *
  * Main creators of instances implementing this interface:
  * - iSoftBodyAnimationControlType::CreateAnimationControlFactory()
@@ -68,7 +68,7 @@ struct iSoftBodyAnimationControlFactory : public iGenMeshAnimationControlFactory
 };
 
 /**
- * Animation control for a genmesh animated by a iBulletSoftBody. This class will
+ * Animation control for a genmesh animated by a CS::Physics::Bullet::iSoftBody. This class will
  * animate the vertices of the genmesh depending on the physical simulation of the
  * soft body. It will also update automatically the position of the genmesh.
  *

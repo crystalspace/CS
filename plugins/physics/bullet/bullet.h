@@ -190,7 +190,7 @@ public:
 
   void RegisterGimpact ();
 
-  //-- iBulletDynamicSystem
+  //-- CS::Physics::Bullet::iDynamicSystem
   virtual void DebugDraw (iView* view);
   virtual void SetDebugMode (DebugMode mode);
   virtual DebugMode GetDebugMode ();

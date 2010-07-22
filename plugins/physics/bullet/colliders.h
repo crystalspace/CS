@@ -163,7 +163,7 @@ class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollide
 			   float minimumHeight, float maximumHeight);
   virtual ~csBulletTerrainCollider ();
 
-  //-- iBulletBody
+  //-- CS::Physics::Bullet::iBody
   virtual CS::Physics::Bullet::BodyType GetType () const
   { return bodyType; }
   virtual ::iRigidBody* QueryRigidBody ()

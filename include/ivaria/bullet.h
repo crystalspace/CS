@@ -77,20 +77,20 @@ struct iBody : public virtual iBase
   virtual ::iRigidBody* QueryRigidBody () = 0;
 
   /**
-   * Query the iBulletSoftBody interface of this body. It returns null if the
+   * Query the CS::Physics::Bullet::iSoftBody interface of this body. It returns null if the
    * interface is not valid, ie GetType() is not CS::Physics::Bullet::SOFT_BODY.
    */
   virtual iSoftBody* QuerySoftBody () = 0;
 
   /**
-   * Query the iBulletTerrainCollider interface of this body. It returns null if the
+   * Query the CS::Physics::Bullet::iTerrainCollider interface of this body. It returns null if the
    * interface is not valid, ie GetType() is not CS::Physics::Bullet::TERRAIN.
    */
   virtual iTerrainCollider* QueryTerrainCollider () = 0;
 };
 
 /**
- * Return structure for the iBulletDynamicSystem::HitBeam() routine. It returns
+ * Return structure for the CS::Physics::Bullet::iDynamicSystem::HitBeam() routine. It returns
  * whether a rigid body, a soft body or a physical terrain collider has been hit.
  * \sa csHitBeamResult csSectorHitBeamResult
  */
@@ -128,7 +128,7 @@ struct HitBeamResult
 };
 
 /**
- * The debug modes to be used with iBulletDynamicSystem::DebugDraw().
+ * The debug modes to be used with CS::Physics::Bullet::iDynamicSystem::DebugDraw().
  */
 enum DebugMode
 {
@@ -362,7 +362,7 @@ struct iDynamicSystem : public virtual iBase
  * position of every vertex of the body can be queried through GetVertexPosition().
  *
  * A soft body can neither be static or kinematic, it is always dynamic.
- * \sa iRigidBody iBulletRigidBody iSoftBodyAnimationControl
+ * \sa iRigidBody CS::Physics::Bullet::iRigidBody iSoftBodyAnimationControl
  * CS::Physics::Bullet::SoftBodyHelper
  */
 struct iSoftBody : public iBody
@@ -459,7 +459,7 @@ struct iSoftBody : public iBody
 };
 
 /**
- * General helper class for iBulletSoftBody.
+ * General helper class for CS::Physics::Bullet::iSoftBody.
  */
 struct SoftBodyHelper
 {
@@ -539,7 +539,7 @@ enum BodyState
 /**
  * The Bullet implementation of iRigidBody also implements this
  * interface.
- * \sa iRigidBody iBulletSoftBody
+ * \sa iRigidBody CS::Physics::Bullet::iSoftBody
  */
 struct iRigidBody : public iBody
 {
@@ -616,7 +616,7 @@ struct iRigidBody : public iBody
  * will update the transform of the body from the position of the attached
  * mesh, body or camera (see iRigidBody::AttachMesh(),
  * iRigidBody::AttachLight(), iRigidBody::AttachCamera()).
- * \sa iBulletRigidBody::SetKinematicCallback()
+ * \sa CS::Physics::Bullet::iRigidBody::SetKinematicCallback()
  */
 struct iKinematicCallback : public virtual iBase
 {
