@@ -182,11 +182,14 @@ namespace RenderManager
 	  bool draw;
 	  // Volume (in post-project light space)
 	  csBox3 volumePP;
-	  csShaderVariable* shadowMapProjectSV;
-	  csShaderVariable* shadowMapUnscaleSV;
-	  csShaderVariable* shadowMapDimSV;
-	  csShaderVariable* shadowClipSV;
-	  csShaderVariable* textureSVs[rtaNumAttachments];
+	  /* @@@ FIXME: res thinks: shouldn't be csRef<>s - pointers should
+	     suffice as cached Frustums are supposedly cleaned up between
+	     frames (and hence no SV pointers should dangle) */
+	  csRef<csShaderVariable> shadowMapProjectSV;
+	  csRef<csShaderVariable> shadowMapUnscaleSV;
+	  csRef<csShaderVariable> shadowMapDimSV;
+	  csRef<csShaderVariable> shadowClipSV;
+	  csRef<csShaderVariable> textureSVs[rtaNumAttachments];
 	  
 	  // Object bboxes in post-project light space
 	  csBox3 receivingObjectsBBoxPP;
