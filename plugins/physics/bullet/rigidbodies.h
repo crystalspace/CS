@@ -73,8 +73,14 @@ public:
   virtual ~csBulletRigidBody ();
 
   //-- iBulletBody
-  virtual CS::Physics::Bullet::BodyType GetType ()
+  virtual CS::Physics::Bullet::BodyType GetType () const
   { return bodyType; }
+  virtual iRigidBody* QueryRigidBody ()
+  { return this; }
+  virtual iBulletSoftBody* QuerySoftBody ()
+  { return 0; }
+  virtual iBulletTerrainCollider* QueryTerrainCollider ()
+  { return 0; }
 
   //-- iRigidBody
   virtual iObject* QueryObject (void) { return (iObject*) this; }

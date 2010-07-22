@@ -518,12 +518,12 @@ bool Simple::OnKeyboard (iEvent &ev)
       CS::Physics::Bullet::HitBeamResult hitResult =
 	bulletDynamicSystem->HitBeam (startBeam, endBeam);
       if (hitResult.hasHit
-	  && hitResult.bodyType == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
+	  && hitResult.body->GetType () == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
       {
 	// Remove the body and the mesh from the simulation, and put them in the clipboard
-	clipboardBody = hitResult.rigidBody;
+	clipboardBody = hitResult.body->QueryRigidBody ();
 	dynamicSystem->RemoveBody (clipboardBody);
-	clipboardMesh = hitResult.rigidBody->GetAttachedMesh ();
+	clipboardMesh = hitResult.body->QueryRigidBody ()->GetAttachedMesh ();
 	if (clipboardMesh)
 	  room->GetMeshes ()->Remove (clipboardMesh);
 
@@ -613,7 +613,7 @@ bool Simple::OnMouseDown (iEvent& ev)
       return false;
 
     // Add a force at the point clicked
-    if (hitResult.bodyType == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
+    if (hitResult.body->GetType () == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
@@ -621,24 +621,24 @@ bool Simple::OnMouseDown (iEvent& ev)
 
       // Check if the body hit is not static or kinematic
       csRef<iBulletRigidBody> bulletBody =
-	scfQueryInterface<iBulletRigidBody> (hitResult.rigidBody);
+	scfQueryInterface<iBulletRigidBody> (hitResult.body->QueryRigidBody ());
       if (bulletBody->GetDynamicState () != CS::Physics::Bullet::CS_BULLET_STATE_DYNAMIC)
 	return false;
 
-      hitResult.rigidBody->AddForceAtPos (force, hitResult.isect);
+      hitResult.body->QueryRigidBody ()->AddForceAtPos (force, hitResult.isect);
 
       // This would work too
-      //csOrthoTransform transform (hitResult.rigidBody->GetTransform ());
+      //csOrthoTransform transform (hitResult.body->QueryRigidBody ()->GetTransform ());
       //csVector3 relativePosition = transform.Other2This (hitResult.isect);
-      //hitResult.rigidBody->AddForceAtRelPos (force, relativePosition);
+      //hitResult.body->QueryRigidBody ()->AddForceAtRelPos (force, relativePosition);
     }
 
-    else if (hitResult.bodyType == CS::Physics::Bullet::CS_BULLET_SOFT_BODY)
+    else if (hitResult.body->GetType () == CS::Physics::Bullet::CS_BULLET_SOFT_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
       force *= 2.0f;
-      hitResult.softBody->AddForce (force, hitResult.vertexIndex);
+      hitResult.body->QuerySoftBody ()->AddForce (force, hitResult.vertexIndex);
     }
 
     return true;
@@ -666,19 +666,19 @@ bool Simple::OnMouseDown (iEvent& ev)
       return false;
 
     // Check if we hit a rigid body
-    if (hitResult.bodyType != CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
+    if (hitResult.body->GetType () != CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
       return false;
 
     // Create a pivot joint at the point clicked
     dragJoint = bulletDynamicSystem->CreatePivotJoint ();
-    dragJoint->Attach (hitResult.rigidBody, hitResult.isect);
+    dragJoint->Attach (hitResult.body->QueryRigidBody (), hitResult.isect);
 
     dragging = true;
     dragDistance = (hitResult.isect - startBeam).Norm ();
 
     // Set some dampening on the rigid body to have a more stable dragging
     csRef<iBulletRigidBody> bulletBody =
-      scfQueryInterface<iBulletRigidBody> (hitResult.rigidBody);
+      scfQueryInterface<iBulletRigidBody> (hitResult.body->QueryRigidBody ());
     linearDampening = bulletBody->GetLinearDampener ();
     angularDampening = bulletBody->GetRollingDampener ();
     bulletBody->SetLinearDampener (0.9f);

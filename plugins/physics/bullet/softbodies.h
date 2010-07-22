@@ -38,8 +38,14 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   ~csBulletSoftBody ();
 
   //-- iBulletBody
-  virtual CS::Physics::Bullet::BodyType GetType ()
+  virtual CS::Physics::Bullet::BodyType GetType () const
   { return bodyType; }
+  virtual iRigidBody* QueryRigidBody ()
+  { return 0; }
+  virtual iBulletSoftBody* QuerySoftBody ()
+  { return this; }
+  virtual iBulletTerrainCollider* QueryTerrainCollider ()
+  { return 0; }
 
   //-- iBulletSoftBody
   virtual void DebugDraw (iView* rview);

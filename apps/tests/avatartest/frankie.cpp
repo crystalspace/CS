@@ -254,12 +254,12 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
       CS::Physics::Bullet::HitBeamResult hitResult =
 	avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
       if (hitResult.hasHit
-	  && hitResult.bodyType == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
+	  && hitResult.body->GetType () == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
       {
 	// Apply a big force at the point clicked by the mouse
 	csVector3 force = endBeam - startBeam;
 	force.Normalize ();
-	hitResult.rigidBody->AddForceAtPos (hitResult.isect, force * 10.0f);
+	hitResult.body->QueryRigidBody ()->AddForceAtPos (hitResult.isect, force * 10.0f);
       }
 
       return true;
@@ -309,14 +309,14 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     CS::Physics::Bullet::HitBeamResult hitResult =
       avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
     if (hitResult.hasHit
-	&& hitResult.bodyType == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
+	&& hitResult.body->GetType () == CS::Physics::Bullet::CS_BULLET_RIGID_BODY)
     {
       // Apply a big force at the point clicked by the mouse
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
-      hitResult.rigidBody->AddForceAtPos (hitResult.isect, force * 1.0f);
-      hitResult.rigidBody->SetLinearVelocity (tc.GetT2O ()
-					      * csVector3 (0.0f, 0.0f, 1.0f));
+      hitResult.body->QueryRigidBody ()->AddForceAtPos (hitResult.isect, force * 1.0f);
+      hitResult.body->QueryRigidBody ()->SetLinearVelocity
+	(tc.GetT2O () * csVector3 (0.0f, 0.0f, 1.0f));
     }
 
     return true;

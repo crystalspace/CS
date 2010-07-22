@@ -621,9 +621,7 @@ CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
       case CS::Physics::Bullet::CS_BULLET_RIGID_BODY:
 	{
 	  result.hasHit = true;
-	  result.bodyType = CS::Physics::Bullet::CS_BULLET_RIGID_BODY;
 	  result.body = bulletBody;
-	  result.rigidBody = dynamic_cast<csBulletRigidBody*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
 				     inverseInternalScale);
 	  result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
@@ -635,9 +633,7 @@ CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
       case CS::Physics::Bullet::CS_BULLET_TERRAIN:
 	{
 	  result.hasHit = true;
-	  result.bodyType = CS::Physics::Bullet::CS_BULLET_TERRAIN;
 	  result.body = bulletBody;
-	  result.terrain = dynamic_cast<iBulletTerrainCollider*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
 				     inverseInternalScale);
 	  result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
@@ -653,9 +649,7 @@ CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
 	if (body->rayTest (rayFrom, rayTo, ray))
 	{
 	  result.hasHit = true;
-	  result.bodyType = CS::Physics::Bullet::CS_BULLET_SOFT_BODY;
 	  result.body = bulletBody;
-	  result.softBody = dynamic_cast<csBulletSoftBody*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
 				     inverseInternalScale);
 	  result.normal = BulletToCS (rayCallback.m_hitNormalWorld,

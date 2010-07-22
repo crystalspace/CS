@@ -70,7 +70,26 @@ struct iBulletBody : public virtual iBase
 {
   SCF_INTERFACE(iBulletBody, 1, 0, 0);
 
-  virtual CS::Physics::Bullet::BodyType GetType () = 0;
+  /// Return the type of this body
+  virtual CS::Physics::Bullet::BodyType GetType () const = 0;
+
+  /**
+   * Query the iRigidBody interface of this body. It returns null if the
+   * interface is not valid, ie GetType() is not CS::Physics::Bullet::CS_BULLET_RIGID_BODY.
+   */
+  virtual iRigidBody* QueryRigidBody () = 0;
+
+  /**
+   * Query the iBulletSoftBody interface of this body. It returns null if the
+   * interface is not valid, ie GetType() is not CS::Physics::Bullet::CS_BULLET_SOFT_BODY.
+   */
+  virtual iBulletSoftBody* QuerySoftBody () = 0;
+
+  /**
+   * Query the iBulletTerrainCollider interface of this body. It returns null if the
+   * interface is not valid, ie GetType() is not CS::Physics::Bullet::CS_BULLET_TERRAIN.
+   */
+  virtual iBulletTerrainCollider* QueryTerrainCollider () = 0;
 };
 
 namespace CS
@@ -88,9 +107,7 @@ namespace Bullet
 struct HitBeamResult
 {
   HitBeamResult ()
-  : hasHit (false), bodyType (CS::Physics::Bullet::CS_BULLET_UNDEFINED_BODY),
-    rigidBody (0), softBody (0), terrain (0), isect (0.0f), normal (0.0f),
-    vertexIndex (0)
+  : hasHit (false), body (0), isect (0.0f), normal (0.0f), vertexIndex (0)
   {}
 
   /**
@@ -99,29 +116,9 @@ struct HitBeamResult
   bool hasHit;
 
   /**
-   * The type of the body that was hit.
-   */
-  CS::Physics::Bullet::BodyType bodyType;
-
-  /**
    * The resulting body that was hit, or 0 if no body was hit.
    */
   iBulletBody* body;
-
-  /**
-   * The resulting rigid body that was hit, or 0 if no rigid body was hit.
-   */
-  iRigidBody* rigidBody;
-
-  /**
-   * The resulting soft body that was hit, or 0 if no soft body was hit.
-   */
-  iBulletSoftBody* softBody;
-
-  /**
-   * The resulting terrain collider that was hit, or 0 if no terrain collider was hit.
-   */
-  iBulletTerrainCollider* terrain;
 
   /**
    * Intersection point in world space.
@@ -135,8 +132,7 @@ struct HitBeamResult
 
   /**
    * The index of the closest vertex of the soft body to be hit. This is only valid
-   * if it is a soft body which is hit (ie softBody is different than 0 and bodyType
-   * is equal to CS_BULLET_SOFT_BODY).
+   * if it is a soft body which is hit.
    */
   size_t vertexIndex;
 };
@@ -215,7 +211,7 @@ struct iBulletDynamicSystem : public virtual iBase
 
   /**
    * Set the mode to be used when displaying debug informations. The default value
-   * is 'CS_BULLET_DEBUG_COLLIDERS | CS_BULLET_DEBUG_JOINTS'.
+   * is 'CS::Physics::Bullet::CS_BULLET_DEBUG_COLLIDERS | CS::Physics::Bullet::CS_BULLET_DEBUG_JOINTS'.
    * \remark Don't forget to call DebugDraw() at each frame to effectively display
    * the debug informations.
    */

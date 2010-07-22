@@ -141,8 +141,14 @@ class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCel
   virtual ~csBulletTerrainCellCollider ();
 
   //-- iBulletBody
-  virtual CS::Physics::Bullet::BodyType GetType ()
+  virtual CS::Physics::Bullet::BodyType GetType () const
   { return bodyType; }
+  virtual iRigidBody* QueryRigidBody ()
+  { return 0; }
+  virtual iBulletSoftBody* QuerySoftBody ()
+  { return 0; }
+  virtual iBulletTerrainCollider* QueryTerrainCollider ()
+  { return this; }
 
  private:
   CS::Physics::Bullet::BodyType bodyType;
@@ -158,8 +164,14 @@ class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollide
   virtual ~csBulletTerrainCollider ();
 
   //-- iBulletBody
-  virtual CS::Physics::Bullet::BodyType GetType ()
+  virtual CS::Physics::Bullet::BodyType GetType () const
   { return bodyType; }
+  virtual iRigidBody* QueryRigidBody ()
+  { return 0; }
+  virtual iBulletSoftBody* QuerySoftBody ()
+  { return 0; }
+  virtual iBulletTerrainCollider* QueryTerrainCollider ()
+  { return this; }
 
   //-- iTerrainCellLoadCallback
   virtual void OnCellLoad (iTerrainCell *cell);
