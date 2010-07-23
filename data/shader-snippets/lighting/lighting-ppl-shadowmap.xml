@@ -17,14 +17,14 @@
 -->
 <snippet type="compound">
   <technique priority="100">
-    <snippet id="eyeVec" file="/shader-snippets/eye-direction-tangent.xml" />
+    <snippet id="eyeVec" file="/shader-snippets/eye-direction-world.xml" />
     
     <snippet id="forward_normal">
       <technique priority="100">
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
 	<!-- Surface normal -->
-	<input name="i_normal" type="normal_tangent" />
+	<input name="i_normal" type="normal_tangent" default="value" defval="0,0,1"/>
 	<output name="o_normal" type="normal_tangent" />
 	
 	<block location="cg:vertexMain">
@@ -41,10 +41,10 @@
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
 	<!-- Vector from eye to position -->
-	<input name="eyeToSurf" type="direction_tangent" />
+	<input name="eyeToSurf" type="direction_world" />
 	<input name="positionW" type="position4_world" />
 	<!-- Surface normal -->
-	<input name="normal" type="normal_tangent" />
+	<input name="normal" type="normal_world" />
 	<input name="shadow" type="ShadowShadowMap" default="complex">
 	  <block location="cg:vertexMain">
 	    ShadowShadowMapNone noShadow;
@@ -56,85 +56,8 @@
 	  </block>
 	</input>
 	
-	<input name="objectToWorld" type="float4x4" default="complex" private="yes">
-	  <block location="cg:vertexIn">
-	    <uniform type="float4x4" name="objectToWorld" />
-	  </block>
-	  
-	  <block location="cg:vertexMain">
-	    objectToWorldInv = vertexIn.objectToWorld;
-	  </block>
-	  
-	  <block location="cg:variablemap">
-	    <variablemap variable="object2world transform" 
-			 destination="vertexIn.objectToWorld" />
-	  </block>
-	</input>
-	<input name="objectToWorldInv" type="float4x4" default="complex" private="yes">
-	  <block location="cg:vertexIn">
-	    <uniform type="float4x4" name="objectToWorldInv" />
-	  </block>
-	  
-	  <block location="cg:vertexMain">
-	    objectToWorldInv = vertexIn.objectToWorldInv;
-	  </block>
-	  
-	  <block location="cg:variablemap">
-	    <variablemap variable="object2world transform inverse" 
-			 destination="vertexIn.objectToWorldInv" />
-	  </block>
-	</input>
-	<input name="Bitangent" type="normal" default="complex" private="yes">
-	  <block location="cg:vertexIn">
-	    <varying type="normal" name="Bitangent" />
-	  </block>
-	  
-	  <block location="pass">
-	    <buffer source="binormal" destination="vertexIn.Bitangent" />
-	  </block>
-	  
-	  <block location="cg:vertexToFragment">
-	    <varying type="normal" name="Bitangent" />
-	  </block>
-	  
-	  <block location="cg:vertexMain">
-	    Bitangent = vertexIn.Bitangent;
-	  </block>
-	</input>
-	<input name="Normal" type="normal" default="complex" private="yes">
-	  <block location="cg:vertexIn">
-	    <varying type="normal" name="Normal" />
-	  </block>
-	  
-	  <block location="pass">
-	    <buffer source="normal" destination="vertexIn.Normal" />
-	  </block>
-	  
-	  <block location="cg:vertexToFragment">
-	    <varying type="normal" name="Normal" />
-	  </block>
-	  
-	  <block location="cg:vertexMain">
-	    Normal = vertexIn.Normal;
-	  </block>
-	</input>
-	<input name="Tangent" type="normal" default="complex" private="yes">
-	  <block location="cg:vertexIn">
-	    <varying type="normal" name="Tangent" />
-	  </block>
-	  
-	  <block location="pass">
-	    <buffer source="tangent" destination="vertexIn.Tangent" />
-	  </block>
-	  
-	  <block location="cg:vertexToFragment">
-	    <varying type="normal" name="Tangent" />
-	  </block>
-	  
-	  <block location="cg:vertexMain">
-	    Tangent = vertexIn.Tangent;
-	  </block>
-	</input>
+	<block location="cg:clips"
+	       file="/shader-snippets/lighting/shadowclip.block" />
 	
 	<input name="lightOffset" type="int" default="value" defval="0"/>
 	<input name="maxLights" type="int" default="value" defval="3"/>
@@ -152,11 +75,8 @@
 	  <?Include /shader-snippets/lighting/lightfuncs.cginc ?>
 	</block>
 	
-	<block location="cg:clips"
-	       file="/shader-snippets/lighting/shadowclip.block" />
-	
 	<block location="cg:vertexToFragment">
-	  <varying type="float4" name="surfToLight[8]" />
+	  <!--varying type="float4" name="surfToLight[8]" /-->
 	  <varying type="float4" name="lightDir[8]" />
 	  <varying type="float4" name="shadowMapCoords[8]" />
 	</block>
@@ -165,14 +85,6 @@
 	  diffuseColor = float3(0);
 	  specularColor = float3(0);
 	  
-	  float4x4 obj2tang;
-	  obj2tang[0] = float4 (Tangent, 0);
-	  obj2tang[1] = float4 (Bitangent, 0);
-	  obj2tang[2] = float4 (Normal, 0);
-	  obj2tang[3] = float4 (0, 0, 0, 1);
-	  float4x4 world2tang = mul (obj2tang, objectToWorldInv);
-	  
-	  LightSpaceTangent lspace;
 	  <![CDATA[
           for (int l = 0; l < maxLights; l++)
 	  {
@@ -180,16 +92,9 @@
 	    if ((i >= minLights) && (i >= lightProps.count)) break;
 	  ]]>
 	    
-	    half3 vp_dir;
-	    float3 vp_surfToLight;
-	    lspace.InitVP (i, world2tang, positionW, vp_dir, vp_surfToLight);
-	    lightDir[l].xyz = vp_dir;
-	    surfToLight[l].xyz = vp_surfToLight;
-	    
 	    float4 vp_shadowMapCoords;
 	    float vp_gradient;
-	    float3 normW = mul (objectToWorld, float4 (Normal, 0)).xyz;
-	    shadow.InitVP (i, positionW, normW , vp_shadowMapCoords, vp_gradient);
+	    shadow.InitVP (i, positionW, normal, vp_shadowMapCoords, vp_gradient);
 	    shadowMapCoords[l] = vp_shadowMapCoords;
 	    lightDir[l].w = vp_gradient;
 	  }
@@ -208,14 +113,14 @@
 	    int i = lightOffset + l;
 	    if ((i >= minLights) && (i >= lightProps.count)) break;
 	  ]]>
-	    LightSpaceTangent lightSpace;
-	    lightSpace.Init (lightDir[l].xyz, surfToLight[l].xyz);
+	    LightSpaceWorld lightSpace;
+	    lightSpace.Init (i, positionW);
 	    
 	    shadow.Init (l, shadowMapCoords[l], lightDir[l].w);
 	    
 	    float3 lightDiffuse = lightProps.colorDiffuse[i];
 	    #if 0
-	    // Force light color. Can be useful when  debugginh point
+	    // Force light color. Can be useful when  debugging point
 	    // light shadow frustums.
 	    if (i == 0)
 	      lightDiffuse = float3 (1, 1, 0);
@@ -257,7 +162,7 @@
       <explicit from="o_normal" to="normal" />
     </connection>
     <connection from="eyeVec" to="lighting">
-      <explicit from="eyeDirectionTangent" to="eyeToSurf" />
+      <explicit from="eyeDirectionWorld" to="eyeToSurf" />
     </connection>
   </technique>
 </snippet>

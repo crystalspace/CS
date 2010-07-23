@@ -35,7 +35,9 @@
     <alias name="normalmap" weak="yes" file="/shader-snippets/surface/normalmap.xml" />
     <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-classic.xml" />
     <alias name="specular" weak="yes" file="/shader-snippets/surface/specular-weirdold.xml" />
+    <alias name="staticspecular" weak="yes" file="/shader-snippets/lighting/staticspec-default.xml" />
     <alias name="glow" weak="yes" file="/shader/lighting/glow.xml" />
+    <alias name="lightmaptc" weak="yes" file="/shader-snippets/texcoord-lightmap.xml" />
 
     <!--
 	Snippets - the building blocks of this shader.
@@ -47,7 +49,9 @@
 	important than a parallax effect.
     -->
     <snippet id="position" filealias="position" />
+    <snippet id="specular" filealias="specular" />
     <snippet id="normalmap" filealias="normalmap" />
+    <snippet id="ambient_lightmaptc" filealias="lightmaptc" />
     <snippet id="ambient" filealias="ambient" />
     <snippet id="staticspecular" filealias="staticspecular" />
     <snippet id="parallax" filealias="parallax" />
@@ -56,7 +60,7 @@
     <snippet id="apply_alpha" filealias="apply_alpha" />
     <snippet id="shadow" filealias="shadow" />
     <snippet id="lighting" filealias="lighting" />
-    <snippet id="specular" filealias="specular" />
+    <snippet id="add_specular" file="/shader-snippets/add.xml" />
     <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
     <snippet id="glow" filealias="glow" />
     <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
@@ -68,8 +72,12 @@
     <connection from="position" to="lighting" />
     <connection from="parallax" to="surface" />
     <connection from="parallax" to="normalmap" />
+    <connection from="ambient_lightmaptc" to="ambient">
+      <explicit from="result" to="texCoordLM" />
+    </connection>
     <connection from="normalmap" to="ambient" />
     <connection from="normalmap" to="lighting" />
+    <connection from="normalmap" to="staticspecular" />
     <connection from="surface" to="apply_mixmode_alpha" />
     <connection from="surface" to="specular" />
     <connection from="apply_mixmode_alpha" to="apply_alpha" />
@@ -79,7 +87,15 @@
     <connection from="shadow" to="lighting" />
     <connection from="lighting" to="apply_lighting">
       <explicit from="diffuseColor" to="lightDiffuse" />
-      <explicit from="specularColor" to="lightSpecular" />
+    </connection>
+    <connection from="lighting" to="add_specular">
+      <explicit from="specularColor" to="a" />
+    </connection>
+    <connection from="staticspecular" to="add_specular">
+      <explicit from="specular" to="b" />
+    </connection>
+    <connection from="add_specular" to="apply_lighting">
+      <explicit from="result" to="lightSpecular" />
     </connection>
     <connection from="ambient" to="apply_lighting">
       <explicit from="ambient" to="ambient" />
