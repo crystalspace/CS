@@ -395,7 +395,14 @@ public:
    */
   inline int GetEstimatedObjectCount () const { return estimate_total_objects; }
 
-  inline bool IsLeaf() const { return !GetChild1 (); }
+  /*
+   * Check if given node is a leaf. It's a leaf if it has no children
+   */
+  inline bool IsLeaf() const { return (!GetChild1 () || !GetChild2 ()); }
+
+  inline int GetSplitAxis() const { return split_axis; }
+
+  inline int GetSplitLocation() const { return split_location; }
 
   /**
    * Return the array of objects in this node.
