@@ -141,8 +141,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     factoryState = scfQueryInterface<iGeneralFactoryState> (
       factory->GetMeshObjectFactory ());
-// factoryState->SetShadowCasting(true);
-// factoryState->SetShadowReceiving(true);
 
     factoryState -> SetVertexCount ( 2 * controlPointsCount );
     factoryState -> SetTriangleCount ( 2 * ( controlPointsCount - numberOfStrains ) );
@@ -189,9 +187,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iMeshWrapper> meshWrapper =
       engine->CreateMeshWrapper (factory, "hair", room, csVector3 (0, 0, 0));
 
+    meshWrapper->SetFlagsRecursive(CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
+
     csRef<iMaterialWrapper> materialWrapper = 
       CS::Material::MaterialBuilder::CreateColorMaterial
       (object_reg,"hairDummyMaterial",csColor(1,0,0));
+
+    csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+      (object_reg, "crystalspace.shared.stringset");
+    if (!strings) csPrintfErr("No string set!");
+
+    csStringID sID = strings->Request("shadow");
+
+    csPrintf("%u\n", materialWrapper->GetMaterial()->GetShaders().GetSize());
+    csRef<iShader> iS = materialWrapper->GetMaterial()->GetShader(sID);
+    if(iS) csPrintf("%s\n", iS->GetFileName() );
+    else csPrintf("Nothing\n");
+
+    csPrintf("%u\n", hairStrandGenerator->GetMaterial()->GetShaders().GetSize());
+    iS = hairStrandGenerator->GetMaterial()->GetShader(sID);
+    if(iS) csPrintf("%s\n", iS->GetFileName() );
+    else csPrintf("Nothing\n");
 
     if (hairStrandGenerator && hairStrandGenerator->GetMaterial())
       materialWrapper->SetMaterial(hairStrandGenerator->GetMaterial());
@@ -220,21 +236,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     {
       CS::TriangleT<size_t> tri (tris.Next ());
 
-      if(uniqueIndices.Contains(tri.a) == csArrayItemNotFound)
-        uniqueIndices.Push(tri.a);
-      if(uniqueIndices.Contains(tri.b) == csArrayItemNotFound)
-        uniqueIndices.Push(tri.b);
-      if(uniqueIndices.Contains(tri.c) == csArrayItemNotFound)
-        uniqueIndices.Push(tri.c);
+//       if (rng->Get() >= 0.75f)
+      {
+        if(uniqueIndices.Contains(tri.a) == csArrayItemNotFound)
+          uniqueIndices.Push(tri.a);
+        if(uniqueIndices.Contains(tri.b) == csArrayItemNotFound)
+          uniqueIndices.Push(tri.b);
+        if(uniqueIndices.Contains(tri.c) == csArrayItemNotFound)
+          uniqueIndices.Push(tri.c);
 
-      csTriangle triangleNew = csTriangle(uniqueIndices.Contains(tri.a),
-        uniqueIndices.Contains(tri.b), uniqueIndices.Contains(tri.c));
-      guideHairsTriangles.Push(triangleNew);
+//         csTriangle triangleNew = csTriangle(uniqueIndices.Contains(tri.a),
+//           uniqueIndices.Contains(tri.b), uniqueIndices.Contains(tri.c));
+//         guideHairsTriangles.Push(triangleNew);
+      }
     }
 
     // generate the guide hairs
     for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
     {
+      if ( i % 5 )
+        continue;
+
       csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
         displaceDistance * norms.Get(uniqueIndices.Get(i));
 
@@ -258,6 +280,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       guideHairs.Push(guideHair);
     }
+
+    // generate triangles
+    for (size_t i = 0; i < guideHairs.GetSize() - 2; i ++)
+    {
+      csTriangle triangleNew = csTriangle(i, i + 1, i + 2);
+      guideHairsTriangles.Push(triangleNew);
+    }
+
   }
 
   float FurMaterial::TriangleDensity(csGuideHair A, csGuideHair B, csGuideHair C)
@@ -492,7 +522,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   //       csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
 
         // how many new guide hairs are needed
-        if ( den < 5 * (density * area * densityFactor))
+        if ( den < 20 * (density * area * densityFactor))
         {
           change = 1;
           csHairStrand hairStrand;
@@ -698,6 +728,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         (int)(uv.y * densitymap.height) * densitymap.width ) + 2 ] = 255;
     }
 
+    csPrintf("Synchronized ropes: %d\n", guideHairs.GetSize());
     csPrintf("Total guide ropes: %d\n", guideHairsLOD.GetSize() + guideHairs.GetSize());
 
     SaveImage(densitymap.data, "/data/krystal/krystal_skull_densitymap_debug.png",
@@ -1101,7 +1132,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     furMaterial->factoryState->GetSubMesh(0)->SetIndexRange(0, 3 * triangleCount);
 
 //     furMaterial->factoryState->CalculateNormals();
-    furMaterial->factoryState->Invalidate();
+//     furMaterial->factoryState->Invalidate();
 // 
 //     furMaterial->factoryState->AddRenderBuffer(CS_BUFFER_TANGENT, 
 //       furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT));

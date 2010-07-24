@@ -47,7 +47,7 @@
 	  <shadervar type="float" name="width">0.0015</shadervar>
 	  <shadervar type="float" name="displaceDistance">0.02</shadervar>
 	  <shadervar type="texture" name="density map">krystal_skull_densitymap</shadervar>
-	  <shadervar type="float" name="densityFactor">20</shadervar>
+	  <shadervar type="float" name="densityFactor">5</shadervar>
       <shadervar type="texture" name="height map">krystal_skull_heightmap</shadervar>
 	  <shadervar type="float" name="heightFactor">0.5</shadervar>
 	  <shadervar type="float" name="controlPointsDistance">0.05</shadervar>
