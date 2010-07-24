@@ -107,7 +107,7 @@ namespace RenderManager
    * Render mesh nodes within one context.
    * Does not handle setting render targets or camera transform.
    */
-  template<typename RenderTree, bool occlusionQueries = false>
+  template<typename RenderTree>
   class SimpleContextRender
   {
   public:
@@ -187,17 +187,7 @@ namespace RenderManager
           if (!shader->SetupPass (ticket, mesh.renderMesh, modes, svStack)) continue;
           modes.z_buf_mode = mesh.zmode;
 
-	  /*if (occlusionQueries)
-          {
-            g3d->BeginOcclusionQuery(*mesh.occlusionQuery);
-          }*/
-
           g3d->DrawMesh (mesh.renderMesh, modes, svStack);
-
-	  /*if (occlusionQueries)
-          {
-            g3d->EndOcclusionQuery();
-          }*/
 
           shader->TeardownPass (ticket);
         }
