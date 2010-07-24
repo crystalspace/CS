@@ -18,11 +18,6 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 
-<!--
-	The main difference between this shader and the early_z shader is the fact that
-	we enable colors in this one. Without setting all color channels to true the occlusion
-	queries don't seem to want to work.
--->
 <shader compiler="shaderweaver" name="occ_queries">
   <technique priority="200">
     <pass>
@@ -31,7 +26,7 @@
       <mixmode>
 	  <alphatest>disable</alphatest>
       </mixmode>
-      <writemask r="true" g="true" b="true" a="true" />
+      <writemask r="false" g="false" b="false" a="false" />
 
       <snippet id="position" file="/shader-snippets/position.xml" />
       <snippet id="rgbaout" file="/shader-snippets/shadow/fragment-depth.xml" />
