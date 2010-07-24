@@ -8,6 +8,7 @@
 #include "csplugincommon/rendermanager/shadersetup.h"
 #include "csplugincommon/rendermanager/standardsorter.h"
 #include "csplugincommon/rendermanager/svsetup.h"
+#include <csutil/list.h>
 
 using namespace CS::RenderManager;
 
@@ -16,6 +17,8 @@ CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
 
 // empirically robust constant (might need tweaking)
 #define PREV_INV_BATCH_SIZE 25
+// visibility threshold parameter
+#define VISIBILITY_THRESHOLD 0
 
 /*  A small implementation of a list based on the csList class.
  * the main difference between CHCList and csList is that CHCList
@@ -88,14 +91,16 @@ class csVisibilityObjectHistory :
 {
 public:
   bool bVisible;
+  //unsigned int qID;
 
-  csVisibilityObjectHistory () : scfImplementationType (this), bVisible(false)
+  csVisibilityObjectHistory () : scfImplementationType (this), bVisible(false)//, qID(0)
   {
   }
 
-  csVisibilityObjectHistory (bool bV) : scfImplementationType (this)
+  csVisibilityObjectHistory (const bool bV/*,const unsigned int ID*/) : scfImplementationType (this)
   {
     bVisible=bV;
+    //qID=ID;
   }
 
   virtual ~csVisibilityObjectHistory()
@@ -107,10 +112,20 @@ public:
     return bVisible;
   }
 
+  /*unsigned int GetID() const
+  {
+    return qID;
+  }*/
+
   void SetVisibility(const bool bV)
   {
     bVisible=bV;
   }
+
+  /*void SetID(const unsigned int ID)
+  {
+    qID=ID;
+  }*/
 };
 
 #endif

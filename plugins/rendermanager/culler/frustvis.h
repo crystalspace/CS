@@ -109,6 +109,24 @@ struct NodeTraverseData
     return GetVisibilityObjectHistory()->GetVisibility();
   }
 
+  /*unsigned int GetID() const
+  {
+    if(!kdtNode) return false;
+    return GetVisibilityObjectHistory()->GetID();
+  }*/
+
+  int GetSplitAxis() const
+  {
+    if(!kdtNode) return 0;
+    return kdtNode->GetSplitAxis();
+  }
+
+  int GetSplitLocation() const
+  {
+    if(!kdtNode) return 0;
+    return kdtNode->GetSplitLocation();
+  }
+
   uint32 GetFrustumMask() const
   {
     return u32Frustum_Mask;
@@ -124,6 +142,12 @@ struct NodeTraverseData
     if(!kdtNode) return ;
     GetVisibilityObjectHistory()->SetVisibility(bV);
   }
+
+  /*void SetID(const unsigned int ID) const
+  {
+    if(!kdtNode) return ;
+    GetVisibilityObjectHistory()->SetID(ID);
+  }*/
 
   void SetFrustumMask(uint32 frust_mask)
   {
@@ -142,6 +166,25 @@ struct NodeTraverseData
 
   ~NodeTraverseData()
   {
+  }
+};
+
+/**
+ * Occlusion query record.
+ */
+struct OccQuery
+{
+  OccQuery() : qID(0), numQueries(0), ntdNode()
+  {
+  }
+
+  unsigned int *qID;
+  unsigned int numQueries;
+  NodeTraverseData ntdNode;
+
+  bool IsMultiQuery() const
+  {
+    return (numQueries>1);
   }
 };
 
@@ -225,32 +268,36 @@ private:
   CHCList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
   CHCList<NodeTraverseData> I_Queue; // I queue (invisible queue)
   CHCList<NodeTraverseData> V_Queue; // V queue (nodes that are scheduled for testing in the current frame)
-  CHCList<NodeTraverseData> Q_Queue; // Q queue (query queue)
+  CHCList<OccQuery> Q_Queue; // Q queue (query queue)
 
   // Frustum data (front to back)
   FrustTest_Front2BackData f2bData;
-  // Render context.
-  RenderTreeType::ContextNode* OQContext;
+  
   // Render tree.
   RenderTreeType* rtRenderTree;
   // Persistent Data
   RenderTreeType::PersistentData pdTreePersistent;
 
-  void SetupContext(RenderTreeType::ContextNode& context, iShaderManager* shaderManager);
-
   bool WasVisible(NodeTraverseData &ntdNode,const int cur_timestamp) const;
   void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
-  void PullUpVisibility(NodeTraverseData &ntdNode);
-  void TraverseNode(iRenderView* rview,NodeTraverseData &ntdNode,const int cur_timestamp);
+  void PullUpVisibility(const NodeTraverseData &ntdNode);
+  void TraverseNode(iRenderView* rview,NodeTraverseData &ntdNode,
+                    const csVector3& pos,const int cur_timestamp);
 
-  void IssueQueries(iRenderView* rview, csKDTreeChild **objects, int num_obj);
+  void IssueQueries(iRenderView* rview, csKDTreeChild **objects,const int num_obj);
+
+  /**
+   *  Gets the first finished query from the query list.
+   * Return true if a finished query is found, else false
+   */
+  bool GetFinishedQuery(OccQuery &oq);
 
 public:
   csFrustumVis ();
   virtual ~csFrustumVis ();
   virtual bool Initialize (iObjectRegistry *object_reg);
 
-  void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
+  void CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
 	FrustTest_Front2BackData* data, uint32 cur_timestamp);
 
   // Test visibility for the given node. Returns 2 if camera is inside node,

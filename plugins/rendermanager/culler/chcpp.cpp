@@ -50,80 +50,65 @@
 #include "frustvis.h"
 #include "chcpp.h"
 
-void csFrustumVis::SetupContext(RenderTreeType::ContextNode& context, iShaderManager* shaderManager)
+bool csFrustumVis::GetFinishedQuery(OccQuery &oq)
 {
-  CS::RenderManager::RenderView* rview = context.renderView;
+  unsigned int i;
+  CHCList<OccQuery>::Iterator it;
 
-  SingleMeshContextNumbering<RenderTreeType> numbering;
-  ForEachMeshNode (context, numbering);
-
-  csRef<iStringSet> strSet = csQueryRegistryTagInterface<iStringSet> 
-    (csFrustumVis::object_reg, "crystalspace.shared.stringset");
-
-  csStringID shaderType = strSet->Request("depthwrite");
-  SingleRenderLayer renderLayer(shaderType, shaderManager->GetShader("z_only"), 0, 0);
-  renderLayer.SetAmbient(true);
-  SetupStandardSVs (context, renderLayer, shaderManager, rview->GetThisSector ());
-
-  SetupStandardShader (context, shaderManager, renderLayer);
-  SetupStandardTicket (context, shaderManager, renderLayer);
-}
-
-void csFrustumVis::IssueQueries(iRenderView* rview, csKDTreeChild **objects, int num_obj)
-{
-  int numMeshes;
-  if (!OQContext)
+  for(it=CHCList<OccQuery>::Iterator(Q_Queue);it.HasNext();++it)
   {
-    RenderView* renderView = (RenderView*)rview;
-    OQContext = rtRenderTree->CreateContext(renderView);
-  }
-
-  for(int i=0 ; i<num_obj ; i++)
-  {
-    numMeshes=0;
-    iMeshWrapper* mw=static_cast<csFrustVisObjectWrapper*>(objects[i]->GetObject())->mesh;
-    uint32 frust_mask=rview->GetRenderContext ()->clip_planes_mask;
-
-    csSectorVisibleRenderMeshes* meshList = rview->GetThisSector()->GetVisibleRenderMeshes (
-    numMeshes, mw, rview, frust_mask);
-
-    for (int m = 0; m < numMeshes; m++)
+    for(i=0;i<it->numQueries;i++)
     {
-      RenderTreeType::MeshNode::SingleMesh sm;
-      sm.meshWrapper = meshList[m].imesh;
-      sm.meshObjSVs = meshList[m].imesh->GetSVContext();
-      sm.zmode = meshList[m].imesh->GetZBufMode ();
-      sm.meshFlags = meshList[m].imesh->GetFlags();
-
-      CS::Graphics::RenderPriority rp;
-      rp=meshList[m].imesh->GetRenderPriority ();
-
-      for (int j = 0; j < meshList[m].num; ++j)
+      if(g3d->OQIsVisible(it->qID[i],VISIBILITY_THRESHOLD))
       {
-        csRenderMesh* rm = meshList[m].rmeshes[j];
-        if (rm->portal)
-	{
-          //ContextNodeType::PortalHolder h = {rm->portal, imesh};
-	  //OQContext->allPortals.Push (h);
-        }
-        else
-	  OQContext->AddRenderMesh (rm, rp, sm);
-        //g3d->DrawMeshBasic(rm,*rm);
+        oq=*it;
+        return true;
       }
     }
   }
 
-  SetupContext (*OQContext, smShaderManager);
+  return false;
+}
 
-  // Render the stuff
-  g3d->SetZMode (CS_ZBUF_MESH);
+void csFrustumVis::IssueQueries(iRenderView* rview, csKDTreeChild **objects,const int num_obj)
+{
+  int numq=1;
+
+  for(int i=0 ; i<num_obj ; i++)
   {
-    SimpleTreeRenderer<RenderTreeType> render (g3d, smShaderManager);
-    ForEachContextReverse (*rtRenderTree, render);
-  }
+    int numMeshes=0;
+    iMeshWrapper* const mw=static_cast<csFrustVisObjectWrapper*>(objects[i]->GetObject())->mesh;
+    const uint32 frust_mask=rview->GetRenderContext ()->clip_planes_mask;
 
-  rtRenderTree->DestroyContext(OQContext);
-  OQContext = 0;
+    unsigned int queries;
+    g3d->OQInitQueries(&queries,numq);
+    g3d->OQBeginQuery(queries);
+    
+    csRenderMesh **rmeshes=mw->GetRenderMeshes(numMeshes,rview,0);
+    for (int m = 0; m < numMeshes; m++)
+    {
+      if (!rmeshes[m]->portal)
+      {
+        csVertexAttrib vA=CS_VATTRIB_POSITION;
+        iRenderBuffer *rB=rmeshes[m]->buffers->GetRenderBuffer(CS_BUFFER_POSITION);
+        g3d->ActivateBuffers(&vA,&rB,1);
+        g3d->DrawMeshBasic(rmeshes[m],*rmeshes[m]);
+        //g3d->DeactivateBuffers(&vA,1);
+      }
+    }
+    g3d->OQEndQuery();
+
+    while(!g3d->OQueryFinished(queries)) 1;
+    if(g3d->OQIsVisible(queries,0))
+    {
+      printf("visible\n");
+    }
+    else
+    {
+      printf("not visible\n");
+    }
+    g3d->OQDelQueries(&queries,numq);
+  }
 }
 
 void csFrustumVis::QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode)
@@ -136,7 +121,7 @@ void csFrustumVis::QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode)
 }
 
 /* Pulls up the visibility */
-void csFrustumVis::PullUpVisibility(NodeTraverseData &ntdNode)
+void csFrustumVis::PullUpVisibility(const NodeTraverseData &ntdNode)
 {
   NodeTraverseData ntdAux=ntdNode;
   while(ntdAux.kdtParent && !ntdAux.GetVisibility())
@@ -147,7 +132,8 @@ void csFrustumVis::PullUpVisibility(NodeTraverseData &ntdNode)
   }
 }
 
-void csFrustumVis::TraverseNode(iRenderView* rview,NodeTraverseData &ntdNode,const int cur_timestamp)
+void csFrustumVis::TraverseNode(iRenderView* rview, NodeTraverseData &ntdNode,
+                                const csVector3& pos, const int cur_timestamp)
 {
   ntdNode.SetTimestamp(cur_timestamp);
   if (ntdNode.IsLeaf()) // if node is leaf we render it
@@ -155,24 +141,7 @@ void csFrustumVis::TraverseNode(iRenderView* rview,NodeTraverseData &ntdNode,con
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
     csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
 
-    unsigned int *queries;
-    int numq=1,oldq=0;
-    g3d->OQInitQueries(queries,oldq,numq);
-
-    g3d->OQBeginQuery(queries[0]);
     IssueQueries(rview,objects,num_objects);
-    g3d->OQEndQuery();
-
-    while(!g3d->OQueryFinished(queries[0])) 1;
-    printf("occ finished for %d...",num_objects);
-    if(g3d->OQIsVisible(queries[0],0))
-    {
-      printf("visible\n");
-    }
-    else
-      printf("not visible\n");
-    g3d->OQDelQueries(queries,numq);
-    delete [] queries;
 
     for (int i = 0 ; i < num_objects ; i++)
     {
@@ -189,9 +158,21 @@ void csFrustumVis::TraverseNode(iRenderView* rview,NodeTraverseData &ntdNode,con
   {
     ntdNode.SetVisibility(false);
     csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
-    T_Queue.PushBack(NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
-    T_Queue.PushBack(NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
+    if (pos[ntdNode.GetSplitAxis()] <= ntdNode.GetSplitLocation())
+    {
+      if(child1)
+        T_Queue.PushBack(NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
+      if(child2)
+        T_Queue.PushBack(NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
+    }
+    else
+    {
+      if(child2)
+        T_Queue.PushBack(NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
+      if(child1)
+        T_Queue.PushBack(NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
+    }
   }
 }
 
