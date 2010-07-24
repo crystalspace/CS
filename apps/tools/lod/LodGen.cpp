@@ -10,7 +10,7 @@
 #include <iostream>
 using namespace std;
 
-#include "csgeom.h"
+#include <crystalspace.h>
 #include "LodGen.h"
 
 inline float dot(const csVector3& v0, const csVector3& v1) { return v0 * v1; }
@@ -284,6 +284,18 @@ void PointTriangleDistanceUnitTests()
 {
   unittests(0.0);
   unittests(1.0);
+}
+
+void LodGen::init(iGeneralFactoryState* fstate)
+{
+  const csVector3* fstate_vertices = fstate->GetVertices();
+  for (int i = 0; i < fstate->GetVertexCount(); i++)
+    vertices.Push(fstate_vertices[i]);
+  csTriangle* fstate_triangles = fstate->GetTriangles();
+  for (int i = 0; i < fstate->GetTriangleCount(); i++)
+    triangles.Push(fstate_triangles[i]);
+  num_vertices = vertices.GetSize();
+  num_triangles = triangles.GetSize();
 }
 
 float LodGen::SumOfSquareDist(const WorkMesh& k) const

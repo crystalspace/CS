@@ -42,8 +42,8 @@ struct WorkMesh
 class LodGen
 {
 protected:
-  const csArray<csVector3>& vertices;
-  const csArray<csTriangle>& triangles;
+  csArray<csVector3> vertices;
+  csArray<csTriangle> triangles;
   int num_vertices;
   int num_triangles;
   
@@ -52,8 +52,7 @@ protected:
   int top_limit;
 
 public:
-  LodGen(const csArray<csVector3>& v, const csArray<csTriangle>& t): 
-    vertices(v), triangles(t), num_vertices(v.GetSize()), num_triangles(t.GetSize()) {}
+  void init(iGeneralFactoryState* fstate);
   void GenerateLODs();
   int GetTriangleCount() const { return ordered_tris.GetSize(); }
   const csTriangle& GetTriangle(int i) const { return ordered_tris[i]; }

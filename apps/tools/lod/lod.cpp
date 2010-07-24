@@ -337,6 +337,7 @@ void Lod::CreateLODs(const char* filename)
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
   assert(fstate);
 
+  /*
   int nv = fstate->GetVertexCount();
   UniqueVertMesh m;
   const csVector3* fstate_vertices = fstate->GetVertices();
@@ -355,6 +356,11 @@ void Lod::CreateLODs(const char* filename)
   fstate->SetVertexCount(0);
   for (unsigned int i = 0; i < m.vertices.GetSize(); i++)
     fstate->AddVertex(m.vertices[i], m.attr[i].uv, m.attr[i].normal, m.attr[i].color);
+  */
+  
+  LodGen lodgen;
+  lodgen.init(fstate);
+  lodgen.GenerateLODs();
   
   fstate->SetTriangleCount(0);
   assert(lodgen.GetSlidingWindowCount() >= 2);

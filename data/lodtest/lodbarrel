@@ -4,6 +4,7 @@
         <priority>object</priority>
         <zuse />
         <params>
+            <compress />
             <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
             <v x="0.098196" y="-0.469000" z="0.237062" u="0.595319" v="-0.730120" nx="0.000000" ny="-1.000000" nz="0.000000" />
             <v x="0.181440" y="-0.469000" z="0.181440" u="0.676126" v="-0.676127" nx="0.000000" ny="-1.000000" nz="0.000000" />
