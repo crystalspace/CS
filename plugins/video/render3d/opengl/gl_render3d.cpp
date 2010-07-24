@@ -3938,22 +3938,15 @@ bool csGLGraphics3D::PerformExtension (char const* command, ...)
   return rc;
 }
 
-void csGLGraphics3D::OQInitQueries(unsigned int*& queries, int& old_num_queries, int& num_queries)
+void csGLGraphics3D::OQInitQueries(unsigned int* queries,int num_queries)
 {
   if (num_queries != 0)
   {
-    if (queries != 0 && old_num_queries != 0)
-    {
-      ext->glDeleteQueriesARB(old_num_queries, (GLuint*)queries);
-      delete[] queries;
-    }
-    queries = new GLuint[num_queries];
+    ext->glGenQueriesARB((GLsizei)num_queries, (GLuint*)queries);
   }
-
-  ext->glGenQueriesARB((GLsizei)num_queries, (GLuint*)queries);
 }
 
-void csGLGraphics3D::OQDelQueries(unsigned int*& queries, int& num_queries)
+void csGLGraphics3D::OQDelQueries(unsigned int* queries, int num_queries)
 {
   if(num_queries != 0 && queries != 0)
   {
@@ -3961,21 +3954,21 @@ void csGLGraphics3D::OQDelQueries(unsigned int*& queries, int& num_queries)
   }
 }
 
-bool csGLGraphics3D::OQueryFinished(unsigned int& occlusion_query)
+bool csGLGraphics3D::OQueryFinished(unsigned int occlusion_query)
 {
   GLint available;
   ext->glGetQueryObjectivARB((GLuint)occlusion_query, GL_QUERY_RESULT_AVAILABLE_ARB, &available);
   return (available != 0);
 }
 
-bool csGLGraphics3D::OQIsVisible(unsigned int& occlusion_query, unsigned int sampleLimit)
+bool csGLGraphics3D::OQIsVisible(unsigned int occlusion_query, unsigned int sampleLimit)
 {
   GLuint sampleCount;
   ext->glGetQueryObjectuivARB((GLuint)occlusion_query, GL_QUERY_RESULT_ARB, &sampleCount);
   return (sampleCount > (GLuint)sampleLimit);
 }
 
-void csGLGraphics3D::OQBeginQuery (unsigned int& occlusion_query)
+void csGLGraphics3D::OQBeginQuery (unsigned int occlusion_query)
 {
   ext->glBeginQueryARB(GL_SAMPLES_PASSED_ARB, (GLuint)occlusion_query);
 }

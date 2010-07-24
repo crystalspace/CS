@@ -181,22 +181,24 @@ public:
   /**
    * Initialise a set of occlusion queries.
    */
-  void OQInitQueries (unsigned int*& queries, int& old_num_queries,
-    int& num_queries) {}
+  void OQInitQueries (unsigned int *queries, int num_queries) {}
 
-  void OQDelQueries (unsigned int*& queries, int& num_queries) {}
+  void OQDelQueries (unsigned int *queries, int num_queries) {}
 
   /**
    * Returns whether an occlusion query has finished.
    */
-  bool OQueryFinished (unsigned int& occlusion_query) {}
+  bool OQueryFinished (unsigned int occlusion_query) { return true; }
 
   /**
    * Check via occlusion query whether a mesh is visible.
    */
-  bool OQIsVisible (unsigned int& occlusion_query, unsigned int sampleLimit) { return true; }
-  void OQBeginQuery (unsigned int& occlusion_query) {}
+  bool OQIsVisible (unsigned int occlusion_query, unsigned int sampleLimit) { return true; }
+  void OQBeginQuery (unsigned int occlusion_query) {}
   void OQEndQuery () {}
+
+  void DrawMeshBasic(const CS::Graphics::CoreRenderMesh* mymesh,
+    const CS::Graphics::RenderMeshModes& modes) {}
 
 private:
   iObjectRegistry* object_reg;
