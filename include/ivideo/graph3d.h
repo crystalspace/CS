@@ -1201,28 +1201,25 @@ struct iGraphics3D : public virtual iBase
   virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
     size_t numMeshes, uint flags = 0) = 0;
 
-    /**
+  /**
    * Initialise a set of occlusion queries.
    */
-  virtual void OQInitQueries (unsigned int*& queries, int& old_num_queries,
-    int& num_queries) = 0;
+  virtual void OQInitQueries (unsigned int* queries, int num_queries) = 0;
 
-  virtual void OQDelQueries (unsigned int*& queries, int& num_queries) = 0;
+  virtual void OQDelQueries (unsigned int* queries, int num_queries) = 0;
 
   /**
    * Returns whether an occlusion query has finished.
    */
-  virtual bool OQueryFinished (unsigned int& occlusion_query) = 0;
+  virtual bool OQueryFinished (unsigned int occlusion_query) = 0;
 
   /**
    * Check via occlusion query whether a mesh is visible.
    */
-  virtual bool OQIsVisible (unsigned int& occlusion_query, unsigned int sampleLimit) = 0;
+  virtual bool OQIsVisible (unsigned int occlusion_query, unsigned int sampleLimit) = 0;
 
-  virtual void OQBeginQuery (unsigned int& occlusion_query) = 0;
+  virtual void OQBeginQuery (unsigned int occlusion_query) = 0;
   virtual void OQEndQuery () = 0;
-
-  virtual void DrawQuad() = 0;
 
   virtual void DrawMeshBasic(const CS::Graphics::CoreRenderMesh* mymesh,
 							const CS::Graphics::RenderMeshModes& modes) = 0;
