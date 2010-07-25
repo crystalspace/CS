@@ -286,7 +286,7 @@ void PointTriangleDistanceUnitTests()
   unittests(1.0);
 }
 
-void LodGen::init(iGeneralFactoryState* fstate)
+void LodGen::Init(iGeneralFactoryState* fstate)
 {
   const csVector3* fstate_vertices = fstate->GetVertices();
   for (int i = 0; i < fstate->GetVertexCount(); i++)
@@ -302,7 +302,7 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
 {
   float s, t, d2;
   float sum = 0.0;
-  const SlidingWindow& sw = k.sliding_windows[k.sliding_windows.GetSize()-1];
+  const SlidingWindow& sw = k.GetLastWindow();
   // Vertex-to-mesh
   for (int i = 0; i < num_vertices; i++)
   {
@@ -350,15 +350,6 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
     sum += min_d2;
   }
   return sum;
-}
-
-void LodGen::AddTriangle(WorkMesh& k, int itri)
-{
-  csTriangle& tri = k.tri_buffer[itri];
-  assert(k.tri_indices.Find(itri) == csArrayItemNotFound);
-  k.tri_indices.Push(itri);
-  for (int i = 0; i < 3; i++)
-    k.incident_tris[tri[i]].PushSmart(itri);
 }
 
 void LodGen::RemoveTriangleFromIncidentTris(WorkMesh& k, int itri)
@@ -417,7 +408,7 @@ void LodGen::SwapIndex(WorkMesh& k, int i0, int i1)
 
 bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
 {
-  SlidingWindow sw = k.sliding_windows[k.sliding_windows.GetSize()-1]; // copy
+  SlidingWindow sw = k.GetLastWindow(); // copy
   
   IncidentTris incident = k.incident_tris[v0]; // copy
   for (unsigned int i = 0; i < incident.GetSize(); i++)
@@ -440,8 +431,7 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
         new_tri[j] = v1;
     if (!IsDegenerate(new_tri) && !IsCoincident(k, new_tri))
     {
-      k.tri_buffer.Push(new_tri);
-      AddTriangle(k, k.tri_buffer.GetSize()-1);
+      k.AddTriangle(new_tri);
       //cout << "Add " << k.tri_buffer.GetSize()-1 << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
       sw.end_index++;
     }
@@ -467,7 +457,7 @@ void LodGen::VerifyMesh(WorkMesh& k)
 {
   return;
   csArray<MeshVerification> mvs;
-  SlidingWindow& sw = k.sliding_windows[k.sliding_windows.GetSize()-1];
+  const SlidingWindow& sw = k.GetLastWindow();
   for (int i = sw.start_index; i < sw.end_index; i++)
   {
     csTriangle& tri = k.tri_buffer[k.tri_indices[i]];
@@ -514,8 +504,7 @@ void LodGen::GenerateLODs()
   for (int i = 0; i < num_triangles; i++)
   {
     const csTriangle& tri = triangles[i];
-    k.tri_buffer.Push(tri);
-    AddTriangle(k, i);
+    k.AddTriangle(tri);
     for (int j = 0; j < 3; j++)
     {
       Edge e(tri[j], tri[(j+1)%3]);
@@ -580,7 +569,7 @@ void LodGen::GenerateLODs()
         break;
       bool result = Collapse(k, min_v0, min_v1);
       assert(result);
-      SlidingWindow& sw = k.sliding_windows[k.sliding_windows.GetSize()-1];
+      const SlidingWindow& sw = k.GetLastWindow();
       cout << "t: " << sw.end_index-sw.start_index << " e: " << k.edges.GetSize() << " d: " << min_d << " v: " << min_v0 << "->" << min_v1 << endl;
       VerifyMesh(k);
       collapse_counter++;
@@ -594,7 +583,7 @@ void LodGen::GenerateLODs()
       cout << endl << "Top limit = " << top_limit << endl;
       */
     }
-    SlidingWindow& sw = k.sliding_windows[k.sliding_windows.GetSize()-1];
+    SlidingWindow sw = k.GetLastWindow();
     int curr_num_triangles = sw.end_index - sw.start_index;
     if (curr_num_triangles < min_num_triangles)
       break;
@@ -604,6 +593,7 @@ void LodGen::GenerateLODs()
     k.edges.SetSize(0);
     sw.start_index += curr_num_triangles;
     sw.end_index += curr_num_triangles;
+    k.SetLastWindow(sw);
     top_limit = sw.end_index;
     for (int i = sw.start_index; i < sw.end_index; i++)
     {

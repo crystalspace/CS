@@ -359,7 +359,7 @@ void Lod::CreateLODs(const char* filename)
   */
   
   LodGen lodgen;
-  lodgen.init(fstate);
+  lodgen.Init(fstate);
   lodgen.GenerateLODs();
   
   fstate->SetTriangleCount(0);

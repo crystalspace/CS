@@ -37,6 +37,17 @@ struct WorkMesh
   csArray<IncidentTris> incident_tris; // map from vertices to incident triangles
   csArray<Edge> edges;
   csArray<SlidingWindow> sliding_windows;
+  void AddTriangle(const csTriangle& tri)
+  {
+    tri_buffer.Push(tri);
+    int itri = tri_buffer.GetSize()-1;
+    assert(tri_indices.Find(itri) == csArrayItemNotFound);
+    tri_indices.Push(itri);
+    for (int i = 0; i < 3; i++)
+      incident_tris[tri[i]].PushSmart(itri);
+  }
+  const SlidingWindow& GetLastWindow() const { return sliding_windows[sliding_windows.GetSize()-1]; }
+  void SetLastWindow(const SlidingWindow& sw) { sliding_windows[sliding_windows.GetSize()-1] = sw; }
 };
 
 class LodGen
@@ -52,7 +63,7 @@ protected:
   int top_limit;
 
 public:
-  void init(iGeneralFactoryState* fstate);
+  void Init(iGeneralFactoryState* fstate);
   void GenerateLODs();
   int GetTriangleCount() const { return ordered_tris.GetSize(); }
   const csTriangle& GetTriangle(int i) const { return ordered_tris[i]; }
@@ -61,7 +72,6 @@ public:
   
 protected:
   bool IsDegenerate(const csTriangle& tri) const;
-  void AddTriangle(WorkMesh& k, int itri);
   void RemoveTriangleFromIncidentTris(WorkMesh& k, int itri);
   bool Collapse(WorkMesh& k, int v0, int v1);
   float SumOfSquareDist(const WorkMesh& k) const;
