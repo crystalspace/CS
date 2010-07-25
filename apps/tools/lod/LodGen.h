@@ -16,10 +16,9 @@ struct Edge
   int v0;
   int v1;
   Edge() {}
-  Edge(int a, int b) { assert(a != b); if (a < b) { v0 = a; v1 = b; } else { v0 = b; v1 = a; } }
+  Edge(int a, int b): v0(a), v1(b) { assert(a != b); }
   inline bool operator==(const Edge& e1) const
   {
-    assert(v0 < v1 && e1.v0 < e1.v1);
     return (v0 == e1.v0 && v1 == e1.v1);
   }
 };
@@ -35,7 +34,6 @@ struct WorkMesh
   csArray<csTriangle> tri_buffer;
   csArray<int> tri_indices;
   csArray<IncidentTris> incident_tris; // map from vertices to incident triangles
-  csArray<Edge> edges;
   csArray<SlidingWindow> sliding_windows;
   void AddTriangle(const csTriangle& tri)
   {
@@ -48,13 +46,17 @@ struct WorkMesh
   }
   const SlidingWindow& GetLastWindow() const { return sliding_windows[sliding_windows.GetSize()-1]; }
   void SetLastWindow(const SlidingWindow& sw) { sliding_windows[sliding_windows.GetSize()-1] = sw; }
+  const csTriangle& GetTriangle(int idx) const { return tri_buffer[tri_indices[idx]]; }
 };
+
+typedef csArray<int> VertexIndexList;
 
 class LodGen
 {
 protected:
   csArray<csVector3> vertices;
   csArray<csTriangle> triangles;
+  csArray<VertexIndexList> coincident_vertices;
   
   WorkMesh k;
   csArray<csTriangle> ordered_tris;
@@ -69,6 +71,7 @@ public:
   const SlidingWindow& GetSlidingWindow(int i) const { return k.sliding_windows[i]; }
   
 protected:
+  void InitCoincidentVertices();
   bool IsDegenerate(const csTriangle& tri) const;
   void RemoveTriangleFromIncidentTris(WorkMesh& k, int itri);
   bool Collapse(WorkMesh& k, int v0, int v1);

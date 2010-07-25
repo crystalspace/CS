@@ -294,6 +294,24 @@ void LodGen::Init(iGeneralFactoryState* fstate)
   csTriangle* fstate_triangles = fstate->GetTriangles();
   for (int i = 0; i < fstate->GetTriangleCount(); i++)
     triangles.Push(fstate_triangles[i]);
+  InitCoincidentVertices();
+}
+
+void LodGen::InitCoincidentVertices()
+{
+  coincident_vertices.SetSize(vertices.GetSize());
+  static const float epsilon = 0.00001; 
+  for (unsigned int i = 0; i < vertices.GetSize(); i++)
+  {
+    const csVector3& v = vertices[i]; 
+    for (unsigned int j = 0; j < vertices.GetSize(); j++)
+    {
+      if (i == j)
+        continue;
+      if (fabs(v[0] - vertices[j][0]) < epsilon && fabs(v[1] - vertices[j][1]) < epsilon && fabs(v[2] - vertices[j][2]) < epsilon)
+        coincident_vertices[i].Push(j);
+    }
+  }
 }
 
 float LodGen::SumOfSquareDist(const WorkMesh& k) const
@@ -308,7 +326,7 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
     float min_d2 = FLT_MAX;
     for (int j = sw.start_index; j < sw.end_index; j++)
     {
-      const csTriangle& tri = k.tri_buffer[k.tri_indices[j]];
+      const csTriangle& tri = k.GetTriangle(j);
       const csVector3& p0 = vertices[tri[0]];
       const csVector3& p1 = vertices[tri[1]];
       const csVector3& p2 = vertices[tri[2]];
@@ -327,12 +345,12 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
   const SlidingWindow& sw0 = k.sliding_windows[0];  
   for (int i = sw0.start_index; i < sw0.end_index; i++)
   {
-    const csTriangle& tri = k.tri_buffer[k.tri_indices[i]];
+    const csTriangle& tri = k.GetTriangle(i);
     csVector3 b = (vertices[tri[0]] + vertices[tri[1]] + vertices[tri[2]]) / 3.0;
     float min_d2 = FLT_MAX;
     for (int j = sw.start_index; j < sw.end_index; j++)
     {
-      const csTriangle& tri0 = k.tri_buffer[k.tri_indices[j]];
+      const csTriangle& tri0 = k.GetTriangle(j);
       const csVector3& p0 = vertices[tri0[0]];
       const csVector3& p1 = vertices[tri0[1]];
       const csVector3& p2 = vertices[tri0[2]];
@@ -417,9 +435,7 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
       return false;
     csTriangle new_tri = k.tri_buffer[itri]; // copy
     RemoveTriangleFromIncidentTris(k, itri);
-    SwapIndex(k, sw.start_index, h);
-    for (int j = 0; j < 3; j++)
-      k.edges.Delete(Edge(new_tri[j], new_tri[(j+1)%3]));
+    SwapIndex(k, sw.start_index, h);    
     //cout << "Rem " << itri << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
     sw.start_index++;
 
@@ -439,7 +455,7 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
   /*
   for (int i = sw.start_index; i < sw.end_index; i++)
     for (int j = 0; j < 3; j++)
-      assert(k.tri_buffer[k.tri_indices[i]][j] != v0);
+      assert(k.GetTriangle(i)[j] != v0);
   */
   return true;
 }
@@ -458,19 +474,20 @@ void LodGen::VerifyMesh(WorkMesh& k)
   const SlidingWindow& sw = k.GetLastWindow();
   for (int i = sw.start_index; i < sw.end_index; i++)
   {
-    csTriangle& tri = k.tri_buffer[k.tri_indices[i]];
+    const csTriangle& tri = k.GetTriangle(i);
     for (int j = sw.start_index; j < sw.end_index; j++)
     {
       if (i == j)
         continue;
-      csTriangle& tri2 = k.tri_buffer[k.tri_indices[j]];
+      const csTriangle& tri2 = k.GetTriangle(j);
       if (IsTriangleCoincident(tri, tri2))
         assert(0);
     }
   }
+  /*
   for (int i = sw.start_index; i < sw.end_index; i++)
   {
-    csTriangle& tri = k.tri_buffer[k.tri_indices[i]];
+    const csTriangle& tri = k.GetTriangle(i);
     for (int j = 0; j < 3; j++)
     {
       Edge e(tri[j], tri[(j+1)%3]);
@@ -488,7 +505,6 @@ void LodGen::VerifyMesh(WorkMesh& k)
       }
     }
   }
-  /*
   for (unsigned int i = 0; i < mvs.GetSize(); i++)
   {
     assert(mvs[i].num_t == 2);
@@ -500,77 +516,64 @@ void LodGen::GenerateLODs()
 {
   k.incident_tris.SetSize(vertices.GetSize());
   for (unsigned int i = 0; i < triangles.GetSize(); i++)
-  {
-    const csTriangle& tri = triangles[i];
-    k.AddTriangle(tri);
-    for (int j = 0; j < 3; j++)
-    {
-      Edge e(tri[j], tri[(j+1)%3]);
-      k.edges.PushSmart(e);
-    }
-  }
+    k.AddTriangle(triangles[i]);
   
-  SlidingWindow sw;
-  sw.start_index = 0;
-  sw.end_index = triangles.GetSize();
-  top_limit = sw.end_index;
-  k.sliding_windows.Push(sw);
+  SlidingWindow sw_initial;
+  sw_initial.start_index = 0;
+  sw_initial.end_index = triangles.GetSize();
+  top_limit = sw_initial.end_index;
+  k.sliding_windows.Push(sw_initial);
   int collapse_counter = 0;
   int min_num_triangles = triangles.GetSize() / 6;
-  int edge_start = 0;
-  int edge_step = 64;
+  int min_triangles_for_replication = triangles.GetSize() / 2;
+  csArray<Edge> edges;
+  bool could_not_collapse = false;
   
   while (1)
   {
-    unsigned int min_size = k.edges.GetSize() / 2;
-    
-    while (k.edges.GetSize() > min_size)
+    float min_d = FLT_MAX;
+    int min_v0, min_v1;    
+    SlidingWindow sw = k.GetLastWindow();
+    edges.SetSize(0);
+    for (int itri = sw.start_index; itri < top_limit; itri++)
     {
-      float min_d = FLT_MAX;
-      int min_v0, min_v1;
+      const csTriangle& tri = k.GetTriangle(itri);
+      for (int iv = 0; iv < 3; iv++)
+        if (coincident_vertices[tri[iv]].GetSize() == 0)
+          edges.PushSmart(Edge(tri[iv], tri[(iv+1)%3]));
+    }
+    for (unsigned int i = 0; i < edges.GetSize(); i++)
+    {
+      int v0 = edges[i].v0;
+      int v1 = edges[i].v1;
       
-      for (unsigned int i = edge_start; i < k.edges.GetSize(); i += edge_step)
+      WorkMesh k_prime = k;
+      bool result = Collapse(k_prime, v0, v1);
+      if (result)
       {
-        int v0 = k.edges[i].v0;
-        int v1 = k.edges[i].v1;
-        WorkMesh k_prime = k;
-        bool result = Collapse(k_prime, v0, v1);
-        if (result)
+        //VerifyMesh(k_prime);
+        float d = SumOfSquareDist(k_prime);
+        if (d < min_d)
         {
-          //VerifyMesh(k_prime);
-          float d = SumOfSquareDist(k_prime);
-          if (d < min_d)
-          {
-            min_d = d;
-            min_v0 = v0;
-            min_v1 = v1;
-          }
+          min_d = d;
+          min_v0 = v0;
+          min_v1 = v1;
         }
-        k_prime = k;
-        result = Collapse(k_prime, v1, v0);
-        if (result)
-        {
-          //VerifyMesh(k_prime);
-          float d = SumOfSquareDist(k_prime);
-          if (d < min_d)
-          {
-            min_d = d;
-            min_v0 = v1;
-            min_v1 = v0;
-          }
-        }
-        if (min_d == 0.0)
-          break;
       }
-      edge_start = (edge_start + 1) % edge_step;
-      if (min_d == FLT_MAX)
+      if (min_d == 0.0)
         break;
+    }
+    if (min_d == FLT_MAX && could_not_collapse)
+      break;
+    if (min_d != FLT_MAX)
+    {
       bool result = Collapse(k, min_v0, min_v1);
       assert(result);
-      const SlidingWindow& sw = k.GetLastWindow();
-      cout << "t: " << sw.end_index-sw.start_index << " e: " << k.edges.GetSize() << " d: " << min_d << " v: " << min_v0 << "->" << min_v1 << endl;
+      sw = k.GetLastWindow();
+      cout << "t: " << sw.end_index-sw.start_index << " d: " << min_d << " v: " << min_v0 << "->" << min_v1 << endl;
       VerifyMesh(k);
       collapse_counter++;
+      could_not_collapse = false;
       /*
       cout << "T: ";
       for (unsigned int i = 0; i < k.tri_indices.GetSize(); i++)
@@ -581,33 +584,29 @@ void LodGen::GenerateLODs()
       cout << endl << "Top limit = " << top_limit << endl;
       */
     }
-    SlidingWindow sw = k.GetLastWindow();
+    
     int curr_num_triangles = sw.end_index - sw.start_index;
     if (curr_num_triangles < min_num_triangles)
       break;
-    
-    // Replicate index buffer
-    cout << "Replicating: " << curr_num_triangles << endl;
-    k.edges.SetSize(0);
-    sw.start_index += curr_num_triangles;
-    sw.end_index += curr_num_triangles;
-    k.SetLastWindow(sw);
-    top_limit = sw.end_index;
-    for (int i = sw.start_index; i < sw.end_index; i++)
+    if (curr_num_triangles < min_triangles_for_replication || min_d == FLT_MAX)
     {
-      int itri = k.tri_indices[i-curr_num_triangles];
-      k.tri_indices.Push(itri);
-      const csTriangle& tri = k.tri_buffer[itri];
-      for (int j = 0; j < 3; j++)
-      {
-        Edge e(tri[j], tri[(j+1)%3]);
-        k.edges.PushSmart(e);
-      }
+      if (min_d == FLT_MAX)
+        could_not_collapse = true;
+      // Replicate index buffer
+      cout << "Replicating: " << curr_num_triangles << endl;
+      //k.edges.SetSize(0);
+      sw.start_index += curr_num_triangles;
+      sw.end_index += curr_num_triangles;
+      k.SetLastWindow(sw);
+      top_limit = sw.end_index;
+      for (int i = sw.start_index; i < sw.end_index; i++)
+        k.tri_indices.Push(k.tri_indices[i-curr_num_triangles]);
+      VerifyMesh(k);
+      min_triangles_for_replication = (sw.end_index - sw.start_index) / 2;
     }
-    VerifyMesh(k);    
   }
   for (unsigned int i = 0; i < k.tri_indices.GetSize(); i++)
-    ordered_tris.Push(k.tri_buffer[k.tri_indices[i]]);
+    ordered_tris.Push(k.GetTriangle(i));
   for (unsigned int i = 0; i < ordered_tris.GetSize(); i++)
     for (unsigned int j = 0; j < 3; j++)
       assert(ordered_tris[i][j] >= 0 && ordered_tris[i][j] < (int)vertices.GetSize());

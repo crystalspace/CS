@@ -362,8 +362,8 @@ void Lod::CreateLODs(const char* filename)
   lodgen.Init(fstate);
   lodgen.GenerateLODs();
   
-  fstate->SetTriangleCount(0);
   assert(lodgen.GetSlidingWindowCount() >= 2);
+  fstate->SetTriangleCount(0);
   for (int i = 0; i < lodgen.GetTriangleCount(); i++)
   {
     cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
@@ -411,12 +411,12 @@ bool Lod::SetupModules ()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
  
-  CreateLODs("lodbarrel");
+  //CreateLODs("lodbarrel");
   //CreateLODs("genMesh.002");
   //CreateLODs("lodbox");
   //CreateLODs("genbment2_tables");
   //CreateLODs("simple");
-  //CreateLODs("kwartz.lib");
+  CreateLODs("kwartz.lib");
 
   // Here we create our world.
   CreateRoom ();
