@@ -368,6 +368,112 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
   return sum;
 }
 
+float LodGen::SumOfSquareDist(const WorkMesh& k, int start_index) const
+{
+  float s, t, d2;
+  float sum = 0.0;
+  const SlidingWindow& sw = k.GetLastWindow();
+  const SlidingWindow& sw0 = k.sliding_windows[0];
+  int samples_per_triangle = 20 / (sw.end_index - start_index);
+  if (samples_per_triangle == 0)
+    samples_per_triangle = 1;
+
+  for (int i = start_index; i < sw.end_index; i++)
+  {
+    const csTriangle& tri = k.GetTriangle(i);
+    const csVector3& q0 = vertices[tri[0]];
+    const csVector3& q1 = vertices[tri[1]];
+    const csVector3& q2 = vertices[tri[2]];
+    for (int m = 0; m < samples_per_triangle; m++)
+    {
+      float r0, r1;
+      do
+      {
+        r0 = (float)rand() / RAND_MAX;
+        r1 = (float)rand() / RAND_MAX;
+      }
+      while (r0 + r1 > 1.0);
+      float r2 = 1.0 - r0 - r1;
+      assert(r0 + r1 + r2 == 1.0);
+      csVector3 b = r0 * q0 + r1 * q1 + r2 * q2;
+      float min_d2 = FLT_MAX;
+      for (int j = sw0.start_index; j < sw0.end_index; j++)
+      {
+        const csTriangle& tri0 = k.GetTriangle(j);
+        const csVector3& p0 = vertices[tri0[0]];
+        const csVector3& p1 = vertices[tri0[1]];
+        const csVector3& p2 = vertices[tri0[2]];
+        PointTriangleDistance(b, p0, p1, p2, s, t, d2);
+        if (d2 < min_d2)
+        {
+          min_d2 = d2;
+          if (min_d2 == 0.0)
+            break;
+        }
+      }
+      assert(min_d2 < FLT_MAX);
+      sum += min_d2;
+    }
+  }
+  return sum;
+}
+
+/*
+// TODO
+float LodGen::SumOfSquareDist(const WorkMesh& k, int start_index) const
+{
+  float s, t, d2;
+  float sum = 0.0;
+  const SlidingWindow& sw = k.GetLastWindow();
+  const SlidingWindow& sw2 = k.sliding_windows[k.sliding_windows.GetSize()-2];
+  const SlidingWindow& sw0 = k.sliding_windows[0];
+  assert(start_index == sw2.end_index);
+  csArray<csVector3> verts;
+  csVector3 c(0.0, 0.0, 0.0);
+  if (sw2.end_index < sw.end_index)
+  {
+    for (int i = sw2.end_index; i < sw.end_index; i++)
+    {
+      const csTriangle& tri = k.GetTriangle(i);
+      for (int j = 0; j < 3; j++)
+        verts.Push(vertices[tri[j]]);
+    }
+  }
+  else
+  {
+    assert(sw2.start_index < sw.start_index);
+    for (int i = sw2.start_index; i < sw.start_index; i++)
+    {
+      const csTriangle& tri = k.GetTriangle(i);
+      for (int j = 0; j < 3; j++)
+        verts.Push(vertices[tri[j]]);
+    }
+  }
+  
+  for (int i = 0; i < verts.GetSize(); i++)
+    c += verts[i];
+  c /= (float)verts.GetSize();
+  float r2 = 0.0;
+  for (int i = 0; i < verts.GetSize(); i++)
+  {
+    float r2b = (verts[i]-c).SquaredNorm();
+    if (r2b > r2)
+      r2 = r2b;
+  }
+    
+  csArray<int> ntris;
+  for (int i = sw0.start_index; i < sw0.end_index; i++)
+  {
+    const csTriangle& tri = k.GetTriangle(i);
+    csVector3 b = (vertices[tri[0]] + vertices[tri[1]] + vertices[tri[2]]) / 3.0;
+    if ((b-c).SquaredNorm() <= r2)
+      ntris.Push(i);
+  }
+  
+  for (int i = 0; i < ntris.
+}
+*/    
+
 void LodGen::RemoveTriangleFromIncidentTris(WorkMesh& k, int itri)
 {
   csTriangle& tri = k.tri_buffer[itri];
@@ -528,6 +634,7 @@ void LodGen::GenerateLODs()
   int min_triangles_for_replication = triangles.GetSize() / 2;
   csArray<Edge> edges;
   bool could_not_collapse = false;
+  int edge_start = -1;
   
   while (1)
   {
@@ -542,7 +649,10 @@ void LodGen::GenerateLODs()
         if (coincident_vertices[tri[iv]].GetSize() == 0)
           edges.PushSmart(Edge(tri[iv], tri[(iv+1)%3]));
     }
-    for (unsigned int i = 0; i < edges.GetSize(); i++)
+    int edge_step = edges.GetSize() / 5 + 1;
+    edge_start = (edge_start + 1) % edge_step;
+      
+    for (unsigned int i = 0; i < edges.GetSize(); i += edge_step)
     {
       int v0 = edges[i].v0;
       int v1 = edges[i].v1;

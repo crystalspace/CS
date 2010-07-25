@@ -76,6 +76,7 @@ protected:
   void RemoveTriangleFromIncidentTris(WorkMesh& k, int itri);
   bool Collapse(WorkMesh& k, int v0, int v1);
   float SumOfSquareDist(const WorkMesh& k) const;
+  float SumOfSquareDist(const WorkMesh& k, int start_index) const;
   int FindInWindow(const WorkMesh& k, const SlidingWindow& sw, int itri) const;
   void SwapIndex(WorkMesh& k, int i0, int i1);
   void VerifyMesh(WorkMesh& k);
