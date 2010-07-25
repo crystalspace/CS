@@ -222,6 +222,7 @@ bool Lod::Application ()
   return true;
 }
 
+/*
 struct VertexAttributes
 {
   csVector2 uv;
@@ -271,6 +272,7 @@ public:
     triangles.Push(new_tri);
   }  
 };
+*/
 
 void Lod::CreateLODs(const char* filename)
 {
