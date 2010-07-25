@@ -55,8 +55,6 @@ class LodGen
 protected:
   csArray<csVector3> vertices;
   csArray<csTriangle> triangles;
-  int num_vertices;
-  int num_triangles;
   
   WorkMesh k;
   csArray<csTriangle> ordered_tris;

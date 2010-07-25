@@ -294,8 +294,6 @@ void LodGen::Init(iGeneralFactoryState* fstate)
   csTriangle* fstate_triangles = fstate->GetTriangles();
   for (int i = 0; i < fstate->GetTriangleCount(); i++)
     triangles.Push(fstate_triangles[i]);
-  num_vertices = vertices.GetSize();
-  num_triangles = triangles.GetSize();
 }
 
 float LodGen::SumOfSquareDist(const WorkMesh& k) const
@@ -304,7 +302,7 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
   float sum = 0.0;
   const SlidingWindow& sw = k.GetLastWindow();
   // Vertex-to-mesh
-  for (int i = 0; i < num_vertices; i++)
+  for (unsigned int i = 0; i < vertices.GetSize(); i++)
   {
     const csVector3& v = vertices[i];
     float min_d2 = FLT_MAX;
@@ -500,8 +498,8 @@ void LodGen::VerifyMesh(WorkMesh& k)
 
 void LodGen::GenerateLODs()
 {
-  k.incident_tris.SetSize(num_vertices);
-  for (int i = 0; i < num_triangles; i++)
+  k.incident_tris.SetSize(vertices.GetSize());
+  for (unsigned int i = 0; i < triangles.GetSize(); i++)
   {
     const csTriangle& tri = triangles[i];
     k.AddTriangle(tri);
@@ -514,11 +512,11 @@ void LodGen::GenerateLODs()
   
   SlidingWindow sw;
   sw.start_index = 0;
-  sw.end_index = num_triangles;
+  sw.end_index = triangles.GetSize();
   top_limit = sw.end_index;
   k.sliding_windows.Push(sw);
   int collapse_counter = 0;
-  int min_num_triangles = num_triangles / 6;
+  int min_num_triangles = triangles.GetSize() / 6;
   int edge_start = 0;
   int edge_step = 64;
   
