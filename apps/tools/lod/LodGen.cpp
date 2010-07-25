@@ -652,7 +652,7 @@ void LodGen::GenerateLODs()
     int edge_step = edges.GetSize() / 5 + 1;
     edge_start = (edge_start + 1) % edge_step;
       
-    for (unsigned int i = 0; i < edges.GetSize(); i += edge_step)
+    for (unsigned int i = edge_start; i < edges.GetSize(); i += edge_step)
     {
       int v0 = edges[i].v0;
       int v1 = edges[i].v1;
@@ -704,7 +704,6 @@ void LodGen::GenerateLODs()
         could_not_collapse = true;
       // Replicate index buffer
       cout << "Replicating: " << curr_num_triangles << endl;
-      //k.edges.SetSize(0);
       sw.start_index += curr_num_triangles;
       sw.end_index += curr_num_triangles;
       k.SetLastWindow(sw);
