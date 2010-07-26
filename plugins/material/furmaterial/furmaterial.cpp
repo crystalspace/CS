@@ -193,22 +193,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       CS::Material::MaterialBuilder::CreateColorMaterial
       (object_reg,"hairDummyMaterial",csColor(1,0,0));
 
-    csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
-      (object_reg, "crystalspace.shared.stringset");
-    if (!strings) csPrintfErr("No string set!");
-
-    csStringID sID = strings->Request("shadow");
-
-    csPrintf("%u\n", materialWrapper->GetMaterial()->GetShaders().GetSize());
-    csRef<iShader> iS = materialWrapper->GetMaterial()->GetShader(sID);
-    if(iS) csPrintf("%s\n", iS->GetFileName() );
-    else csPrintf("Nothing\n");
-
-    csPrintf("%u\n", hairStrandGenerator->GetMaterial()->GetShaders().GetSize());
-    iS = hairStrandGenerator->GetMaterial()->GetShader(sID);
-    if(iS) csPrintf("%s\n", iS->GetFileName() );
-    else csPrintf("Nothing\n");
-
     if (hairStrandGenerator && hairStrandGenerator->GetMaterial())
       materialWrapper->SetMaterial(hairStrandGenerator->GetMaterial());
 
@@ -228,16 +212,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRenderBufferLock<csVector3> positions (vertexes, CS_BUF_LOCK_READ);
     csRenderBufferLock<csVector2> UV (texCoords, CS_BUF_LOCK_READ);
     csRenderBufferLock<csVector3> norms (normals, CS_BUF_LOCK_READ);
-    CS::TriangleIndicesStream<size_t> tris1 (indices, CS_MESHTYPE_TRIANGLES);    
-    CS::TriangleIndicesStream<size_t> tris2 (indices, CS_MESHTYPE_TRIANGLES);    
+    CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);    
     csArray<int> uniqueIndices;
-    csArray<int> uniqueIndicesLOD;
-    csArray<int> uniqueIndicesRopes;
 
     // choose unique indices
-    while (tris1.HasNext())
+    while (tris.HasNext())
     {
-      CS::TriangleT<size_t> tri (tris1.Next ());
+      CS::TriangleT<size_t> tri (tris.Next ());
 
       if(uniqueIndices.Contains(tri.a) == csArrayItemNotFound)
         uniqueIndices.Push(tri.a);
@@ -245,182 +226,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         uniqueIndices.Push(tri.b);
       if(uniqueIndices.Contains(tri.c) == csArrayItemNotFound)
         uniqueIndices.Push(tri.c);
+
+      csTriangle triangleNew = csTriangle(uniqueIndices.Contains(tri.a),
+        uniqueIndices.Contains(tri.b), uniqueIndices.Contains(tri.c));
+      guideHairsTriangles.Push(triangleNew);
     }
 
     // generate the guide hairs
     for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
     {
-      if ( i % 5 )
-      {
-        csGuideHairLOD guideHairLOD;
-        csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
-          displaceDistance * norms.Get(uniqueIndices.Get(i));
+      csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
+        displaceDistance * norms.Get(uniqueIndices.Get(i));
 
-        guideHairLOD.controlPointsCount = 1;
+      csGuideHair guideHair;
+      guideHair.uv = UV.Get(uniqueIndices.Get(i));
 
-        guideHairLOD.controlPoints = new csVector3[ guideHairLOD.controlPointsCount ];
-        guideHairLOD.controlPoints[0] = pos;
-          
-        guideHairLOD.uv = UV.Get(uniqueIndices.Get(i));
-
-        guideHairsLOD.Push(guideHairLOD);
-        uniqueIndicesLOD.Push(uniqueIndices.Get(i));
-      }
-      else
-      {
-        csVector3 pos = positions.Get(uniqueIndices.Get(i)) + 
-          displaceDistance * norms.Get(uniqueIndices.Get(i));
-
-        csGuideHair guideHair;
-        guideHair.uv = UV.Get(uniqueIndices.Get(i));
-
-        // based on heightmap
-        // point heightmap - modify to use convolution matrix or such
-        float height = heightmap.data[ 4 * ((int)(guideHair.uv.x * heightmap.width) + 
-          (int)(guideHair.uv.y * heightmap.height) * heightmap.width )] / 255.0f;
+      // based on heightmap
+      // point heightmap - modify to use convolution matrix or such
+      float height = heightmap.data[ 4 * ((int)(guideHair.uv.x * heightmap.width) + 
+        (int)(guideHair.uv.y * heightmap.height) * heightmap.width )] / 255.0f;
 
 //       csPrintf("%f\t%f\t%f\t", height, heightFactor, controlPointsDistance );
 //       csPrintf("%d\n", (int)( (height * heightFactor) / controlPointsDistance) );
 
-        guideHair.controlPointsCount = (int)( (height * heightFactor) / controlPointsDistance);
-        guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
+      guideHair.controlPointsCount = (int)( (height * heightFactor) / controlPointsDistance);
+      guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 
-        for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
-          guideHair.controlPoints[j] = pos + j * controlPointsDistance * 
-            norms.Get(uniqueIndices.Get(i));
+      for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
+        guideHair.controlPoints[j] = pos + j * controlPointsDistance * 
+          norms.Get(uniqueIndices.Get(i));
 
-        guideHairs.Push(guideHair);
-
-        uniqueIndicesRopes.Push(uniqueIndices.Get(i));
-      }
-    }
-
-    // generate triangles
-    while(tris2.HasNext())
-    {
-      CS::TriangleT<size_t> tri (tris2.Next ());
-
-      int indexA = uniqueIndices.Contains(tri.a);
-      int indexB = uniqueIndices.Contains(tri.b);
-      int indexC = uniqueIndices.Contains(tri.c);
-
-      if (indexA % 5) //  guide hair LOD
-        indexA = uniqueIndicesLOD.Contains(tri.a) + guideHairs.GetSize();
-      else
-        indexA = uniqueIndicesRopes.Contains(tri.a);
-      if (indexB % 5) //  guide hair LOD
-        indexB = uniqueIndicesLOD.Contains(tri.b) + guideHairs.GetSize();
-      else
-        indexB = uniqueIndicesRopes.Contains(tri.b);
-      if (indexC % 5) //  guide hair LOD
-        indexC = uniqueIndicesLOD.Contains(tri.c) + guideHairs.GetSize();
-      else
-        indexC = uniqueIndicesRopes.Contains(tri.c);
-
-      csTriangle triangleNew = csTriangle(indexA, indexB, indexC);        
-      guideHairsTriangles.Push(triangleNew);
-    }
-
-    // put barycentric coordinates for guide ropes LOD
-    for ( size_t i = 0 ; i < guideHairsLOD.GetSize() ; i ++ )
-    {
-      csGuideHairLOD *guideHairLOD = &guideHairsLOD.Get(i);
-
-      // choose 3 close guide hairs
-      float min = 100000000;
-      int indexA = -1;
-      for (size_t j = 0 ; j < guideHairs.GetSize() ; j ++ )
-        if ( csVector2::Norm(guideHairLOD->uv - guideHairs.Get(j).uv) < min )
-        {
-          min = csVector2::Norm(guideHairLOD->uv - guideHairs.Get(j).uv);
-          indexA = j;
-        }
-      
-      min = 100000000;
-      int indexB = -1;
-      for (size_t j = 0 ; j < guideHairs.GetSize() ; j ++ )
-        if ( csVector2::Norm(guideHairLOD->uv - guideHairs.Get(j).uv) < min &&
-          (int)j != indexA)
-        {
-          min = csVector2::Norm(guideHairLOD->uv - guideHairs.Get(j).uv);
-          indexB = j;
-        }
-
-      min = 100000000;
-      int indexC = -1;
-      for (size_t j = 0 ; j < guideHairs.GetSize() ; j ++ )
-        if ( csVector2::Norm(guideHairLOD->uv - guideHairs.Get(j).uv) < min &&
-          (int)j != indexA && (int)j != indexB)
-        {
-          min = csVector2::Norm(guideHairLOD->uv - guideHairs.Get(j).uv);
-          indexC = j;
-        }
-
-      csGuideHair A = guideHairs.Get( indexA );
-      csGuideHair B = guideHairs.Get( indexB );
-      csGuideHair C = guideHairs.Get( indexC );
-
-      guideHairLOD->guideHairs[0].index = indexA;
-      guideHairLOD->guideHairs[1].index = indexB;
-      guideHairLOD->guideHairs[2].index = indexC;
-      
-      if ( A.controlPointsCount )
-      {
-        guideHairLOD->guideHairs[0].direction = guideHairLOD->controlPoints[0] -  A.controlPoints[0];
-        guideHairLOD->guideHairs[0].distance = csVector3::Norm(guideHairLOD->guideHairs[0].direction);
-        guideHairLOD->guideHairs[0].direction.Normalize();
-      }
-      else
-      {
-        guideHairLOD->guideHairs[0].direction = csVector3(0, 0, 0);
-        guideHairLOD->guideHairs[0].distance = 0;
-      }
-
-      if ( B.controlPointsCount )
-      {
-        guideHairLOD->guideHairs[1].direction = guideHairLOD->controlPoints[0] -  B.controlPoints[0];
-        guideHairLOD->guideHairs[1].distance = csVector3::Norm(guideHairLOD->guideHairs[1].direction);
-        guideHairLOD->guideHairs[1].direction.Normalize();
-      }
-      else
-      {
-        guideHairLOD->guideHairs[1].direction = csVector3(0, 0, 0);
-        guideHairLOD->guideHairs[1].distance = 0;
-      }
-
-      if ( C.controlPointsCount )
-      {
-        guideHairLOD->guideHairs[2].direction = guideHairLOD->controlPoints[0] -  C.controlPoints[0];
-        guideHairLOD->guideHairs[2].distance = csVector3::Norm(guideHairLOD->guideHairs[2].direction);
-        guideHairLOD->guideHairs[2].direction.Normalize();
-      }
-      else
-      {
-        guideHairLOD->guideHairs[2].direction = csVector3(0, 0, 0);
-        guideHairLOD->guideHairs[2].distance = 0;
-      }
-
-      // generate control points
-      guideHairLOD->controlPointsCount = csMin(  A.controlPointsCount , 
-        csMin( B.controlPointsCount , C.controlPointsCount ));
-
-      delete guideHairLOD->controlPoints; 
-      guideHairLOD->controlPoints = new csVector3[ guideHairLOD->controlPointsCount ];
-
-      for ( size_t j = 0 ; j < guideHairLOD->controlPointsCount ; j ++ )
-      {
-        guideHairLOD->controlPoints[j] = csVector3(0);
-
-        for (size_t k = 0 ; k < GUIDE_HAIRS_COUNT ; k ++)
-        {
-          csGuideHair guideHair = guideHairs.Get(guideHairLOD->guideHairs[k].index);
-
-          guideHairLOD->controlPoints[j] += 1.0f / GUIDE_HAIRS_COUNT * (guideHair.controlPoints[j] +
-            guideHairLOD->guideHairs[k].direction * guideHairLOD->guideHairs[k].distance); 
-        }
-      }
-
-      guideHairLOD->isActive = false;
+      guideHairs.Push(guideHair);
     }
   }
 
@@ -487,110 +323,110 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::GenerateGuideHairsLOD()
   {
-//     // generate guide hairs for LOD
-//     for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
-//     {
-//       csTriangle currentTriangle = guideHairsTriangles.Get(iter);
-// 
-//       size_t indexA = currentTriangle.a;
-//       size_t indexB = currentTriangle.b;
-//       size_t indexC = currentTriangle.c;
-// 
-//       csGuideHair A, B, C;
-//       
-//       if ( indexA < guideHairs.GetSize())
-//         A = guideHairs.Get(indexA);
-//       else
-//         A = guideHairsLOD.Get(indexA - guideHairs.GetSize());
-// 
-//       if ( indexB < guideHairs.GetSize())
-//         B = guideHairs.Get(indexB);
-//       else
-//         B = guideHairsLOD.Get(indexB - guideHairs.GetSize());
-// 
-//       if ( indexC < guideHairs.GetSize())
-//         C = guideHairs.Get(indexC);
-//       else
-//         C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
-// 
-//       // triangle area
-//       if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
-//         ( C.controlPointsCount == 0 ) )
-//         continue;
-// 
-//       float a, b, c;
-//       a = csVector3::Norm(B.controlPoints[0] - C.controlPoints[0]);
-//       b = csVector3::Norm(A.controlPoints[0] - C.controlPoints[0]);
-//       c = csVector3::Norm(B.controlPoints[0] - A.controlPoints[0]);
-// 
-//       // just for debug
-// //       a = csVector2::Norm(B.uv - C.uv);
-// //       b = csVector2::Norm(A.uv - C.uv);
-// //       c = csVector2::Norm(B.uv - A.uv);
-// 
-//       float s = (a + b + c) / 2.0f;
-//       float area = sqrt(s * (s - a) * (s - b) * (s - c));
-// 
-//       // average density - modify to use convolution matrix or such
-//       float density = TriangleDensity(A, B, C);
-// 
-//       //csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
-// 
-//       // if a new guide hair is needed
-//       if ( (density * area * densityFactor) < 1)
-//         continue;
-// 
-//       // make new guide hair
-//       csGuideHairLOD guideHairLOD;
-//       float bA, bB, bC; // barycentric coefficients
-// 
-//       bA = rng->Get();
-//       bB = rng->Get() * (1 - bA);
-//       bC = 1 - bA - bB;
-// 
-//       guideHairLOD.guideHairs[0].distance = bA;
-//       guideHairLOD.guideHairs[0].index = indexA;
-//       guideHairLOD.guideHairs[1].distance = bB;
-//       guideHairLOD.guideHairs[1].index = indexB;
-//       guideHairLOD.guideHairs[2].distance = bC;
-//       guideHairLOD.guideHairs[2].index = indexC;
-// 
-//       guideHairLOD.isActive = false;
-// 
-//       guideHairLOD.uv = A.uv * bA + B.uv * bB + C.uv * bC;
-// 
-//       // generate control points
-//       guideHairLOD.controlPointsCount = csMin( (csMin( A.controlPointsCount,
-//         B.controlPointsCount) ), C.controlPointsCount);
-// 
-//       guideHairLOD.controlPoints = new csVector3[ guideHairLOD.controlPointsCount ];
-// 
-//       for ( size_t i = 0 ; i < guideHairLOD.controlPointsCount ; i ++ )
-//       {
-//         guideHairLOD.controlPoints[i] = csVector3(0);
-//         for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-//           if ( guideHairLOD.guideHairs[j].index < guideHairs.GetSize() )
-//             guideHairLOD.controlPoints[i] += guideHairLOD.guideHairs[j].distance *
-//               guideHairs.Get(guideHairLOD.guideHairs[j].index).controlPoints[i];
-//           else
-//             guideHairLOD.controlPoints[i] += guideHairLOD.guideHairs[j].distance *
-//               guideHairsLOD.Get(guideHairLOD.guideHairs[j].index - 
-//               guideHairs.GetSize()).controlPoints[i];
-//       }
-// 
-//       // add new triangles
-//       guideHairsLOD.Push(guideHairLOD);
-//       size_t indexD = guideHairsLOD.GetSize() - 1 + guideHairs.GetSize();
-//       csTriangle ADC = csTriangle(indexA, indexD, indexC);
-//       csTriangle ADB = csTriangle(indexA, indexD, indexB);
-//       csTriangle BDC = csTriangle(indexB, indexD, indexC);
-// 
-//       guideHairsTriangles.Push(ADC);
-//       guideHairsTriangles.Push(ADB);
-//       guideHairsTriangles.Push(BDC);
-//     }    
-// 
-//     //csPrintf("end generate guide hairs LOD\n");
+    // generate guide hairs for LOD
+    for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
+    {
+      csTriangle currentTriangle = guideHairsTriangles.Get(iter);
+
+      size_t indexA = currentTriangle.a;
+      size_t indexB = currentTriangle.b;
+      size_t indexC = currentTriangle.c;
+
+      csGuideHair A, B, C;
+      
+      if ( indexA < guideHairs.GetSize())
+        A = guideHairs.Get(indexA);
+      else
+        A = guideHairsLOD.Get(indexA - guideHairs.GetSize());
+
+      if ( indexB < guideHairs.GetSize())
+        B = guideHairs.Get(indexB);
+      else
+        B = guideHairsLOD.Get(indexB - guideHairs.GetSize());
+
+      if ( indexC < guideHairs.GetSize())
+        C = guideHairs.Get(indexC);
+      else
+        C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
+
+      // triangle area
+      if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
+        ( C.controlPointsCount == 0 ) )
+        continue;
+
+      float a, b, c;
+      a = csVector3::Norm(B.controlPoints[0] - C.controlPoints[0]);
+      b = csVector3::Norm(A.controlPoints[0] - C.controlPoints[0]);
+      c = csVector3::Norm(B.controlPoints[0] - A.controlPoints[0]);
+
+      // just for debug
+//       a = csVector2::Norm(B.uv - C.uv);
+//       b = csVector2::Norm(A.uv - C.uv);
+//       c = csVector2::Norm(B.uv - A.uv);
+
+      float s = (a + b + c) / 2.0f;
+      float area = sqrt(s * (s - a) * (s - b) * (s - c));
+
+      // average density - modify to use convolution matrix or such
+      float density = TriangleDensity(A, B, C);
+
+      //csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
+
+      // if a new guide hair is needed
+      if ( (density * area * densityFactor) < 1)
+        continue;
+
+      // make new guide hair
+      csGuideHairLOD guideHairLOD;
+      float bA, bB, bC; // barycentric coefficients
+
+      bA = rng->Get();
+      bB = rng->Get() * (1 - bA);
+      bC = 1 - bA - bB;
+
+      guideHairLOD.guideHairs[0].distance = bA;
+      guideHairLOD.guideHairs[0].index = indexA;
+      guideHairLOD.guideHairs[1].distance = bB;
+      guideHairLOD.guideHairs[1].index = indexB;
+      guideHairLOD.guideHairs[2].distance = bC;
+      guideHairLOD.guideHairs[2].index = indexC;
+
+      guideHairLOD.isActive = false;
+
+      guideHairLOD.uv = A.uv * bA + B.uv * bB + C.uv * bC;
+
+      // generate control points
+      guideHairLOD.controlPointsCount = csMin( (csMin( A.controlPointsCount,
+        B.controlPointsCount) ), C.controlPointsCount);
+
+      guideHairLOD.controlPoints = new csVector3[ guideHairLOD.controlPointsCount ];
+
+      for ( size_t i = 0 ; i < guideHairLOD.controlPointsCount ; i ++ )
+      {
+        guideHairLOD.controlPoints[i] = csVector3(0);
+        for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
+          if ( guideHairLOD.guideHairs[j].index < guideHairs.GetSize() )
+            guideHairLOD.controlPoints[i] += guideHairLOD.guideHairs[j].distance *
+              guideHairs.Get(guideHairLOD.guideHairs[j].index).controlPoints[i];
+          else
+            guideHairLOD.controlPoints[i] += guideHairLOD.guideHairs[j].distance *
+              guideHairsLOD.Get(guideHairLOD.guideHairs[j].index - 
+              guideHairs.GetSize()).controlPoints[i];
+      }
+
+      // add new triangles
+      guideHairsLOD.Push(guideHairLOD);
+      size_t indexD = guideHairsLOD.GetSize() - 1 + guideHairs.GetSize();
+      csTriangle ADC = csTriangle(indexA, indexD, indexC);
+      csTriangle ADB = csTriangle(indexA, indexD, indexB);
+      csTriangle BDC = csTriangle(indexB, indexD, indexC);
+
+      guideHairsTriangles.Push(ADC);
+      guideHairsTriangles.Push(ADB);
+      guideHairsTriangles.Push(BDC);
+    }    
+
+    //csPrintf("end generate guide hairs LOD\n");
   }
 
   void FurMaterial::SynchronizeGuideHairs ()
@@ -605,11 +441,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::GenerateHairStrands ()
   {
-    csPrintf("Enter\n");
     float bA, bB, bC; // barycentric coefficients
 
     // density
-    for (int den = 0 , change = 1 ; change; den ++)
+    for (int den = 0 , change = 1 ; change ; den ++)
     {
       change = 0;
       // for every triangle
@@ -657,7 +492,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   //       csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
 
         // how many new guide hairs are needed
-        if ( den < 20 * (density * area * densityFactor))
+        if ( den < 5 * (density * area * densityFactor))
         {
           change = 1;
           csHairStrand hairStrand;
@@ -726,7 +561,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         }
       }
     }
-    csPrintf("end\n");
+    //csPrintf("end\n");
   }
 
   void FurMaterial::SetGuideLOD(float guideLOD)
@@ -863,7 +698,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         (int)(uv.y * densitymap.height) * densitymap.width ) + 2 ] = 255;
     }
 
-    csPrintf("Synchronized ropes: %d\n", guideHairs.GetSize());
+    csPrintf("Pure guide ropes: %d\n", guideHairs.GetSize());
     csPrintf("Total guide ropes: %d\n", guideHairsLOD.GetSize() + guideHairs.GetSize());
 
     SaveImage(densitymap.data, "/data/krystal/krystal_skull_densitymap_debug.png",
@@ -1130,32 +965,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     // update guide ropes LOD
     for (size_t i = 0 ; i < furMaterial->guideHairsLOD.GetSize(); i ++)
-    { 
-      csGuideHairLOD guideHairLOD = furMaterial->guideHairsLOD.Get(i);
-
       if ( furMaterial->guideHairsLOD.Get(i).isActive )
         furMaterial->physicsControl->AnimateStrand(i + furMaterial->guideHairs.GetSize(),
           furMaterial->guideHairsLOD.Get(i).controlPoints,
           furMaterial->guideHairsLOD.Get(i).controlPointsCount);        
       else
-//         UpdateControlPoints(furMaterial->guideHairsLOD.Get(i).controlPoints,
-//           furMaterial->guideHairsLOD.Get(i).controlPointsCount,
-//           furMaterial->guideHairsLOD.Get(i).guideHairs);      
-      {
-        for ( size_t j = 0 ; j < guideHairLOD.controlPointsCount ; j ++ )
-        {
-          guideHairLOD.controlPoints[j] = csVector3(0);
-
-          for (size_t k = 0 ; k < GUIDE_HAIRS_COUNT ; k ++)
-          {
-            csGuideHair guideHair = furMaterial->guideHairs.Get(guideHairLOD.guideHairs[k].index);
-
-            guideHairLOD.controlPoints[j] += 1.0f / GUIDE_HAIRS_COUNT * (guideHair.controlPoints[j] +
-              guideHairLOD.guideHairs[k].direction * guideHairLOD.guideHairs[k].distance); 
-          }
-        }
-      }
-    }
+        UpdateControlPoints(furMaterial->guideHairsLOD.Get(i).controlPoints,
+          furMaterial->guideHairsLOD.Get(i).controlPointsCount,
+          furMaterial->guideHairsLOD.Get(i).guideHairs);      
   }
 
   void FurAnimationControl::UpdateControlPoints(csVector3 *controlPoints,

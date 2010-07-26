@@ -62,7 +62,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   {
     size_t index;
     float distance;
-    csVector3 direction;
   };
 
   struct csHairStrand
