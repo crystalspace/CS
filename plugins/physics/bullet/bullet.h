@@ -209,6 +209,7 @@ public:
 
   virtual iSoftBody* CreateRope (csVector3 start, csVector3 end,
 				 uint segmentCount);
+  virtual iSoftBody* CreateRope (csVector3* vertices, size_t vertexCount);
   virtual iSoftBody* CreateCloth (csVector3 corner1, csVector3 corner2,
 				  csVector3 corner3, csVector3 corner4,
 				  uint segmentCount1, uint segmentCount2,

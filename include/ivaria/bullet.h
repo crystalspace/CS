@@ -241,6 +241,14 @@ struct iDynamicSystem : public virtual iBase
 				 uint segmentCount) = 0;
 
   /**
+   * Create a soft body rope with explicit positions of the vertices.
+   * \param vertices The array of positions to use for the vertices.
+   * \param vertexCount The amount of vertices for the rope.
+   * \remark You must call SetSoftBodyWorld() prior to this.
+   */
+  virtual iSoftBody* CreateRope (csVector3* vertices, size_t vertexCount) = 0;
+
+  /**
    * Create a soft body cloth.
    * \param corner1 The position of the top left corner.
    * \param corner2 The position of the top right corner.

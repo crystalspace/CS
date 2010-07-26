@@ -835,6 +835,36 @@ iSoftBody* csBulletDynamicsSystem::CreateRope
   return csBody;
 }
 
+iSoftBody* csBulletDynamicsSystem::CreateRope (csVector3* vertices, size_t vertexCount)
+{
+  CS_ASSERT(isSoftWorld);
+
+  // Create the nodes
+  CS_ALLOC_STACK_ARRAY(btVector3, nodes, vertexCount);
+  CS_ALLOC_STACK_ARRAY(btScalar, materials, vertexCount);
+  for (size_t i = 0; i < vertexCount; i++)
+  {
+    nodes[i] = CSToBullet (vertices[i], internalScale);
+    materials[i] = 1;
+  }
+
+  btSoftBody* body = new btSoftBody(softWorldInfo, vertexCount, &nodes[0], &materials[0]);
+
+  // Create the links between the nodes
+  for (size_t i = 1; i < vertexCount; i++)
+    body->appendLink (i - 1, i);
+
+  btSoftRigidDynamicsWorld* softWorld =
+    static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+  softWorld->addSoftBody (body);
+
+  csRef<csBulletSoftBody> csBody;
+  csBody.AttachNew (new csBulletSoftBody (this, body));
+
+  softBodies.Push (csBody);
+  return csBody; 
+}
+
 iSoftBody* csBulletDynamicsSystem::CreateCloth
 (csVector3 corner1, csVector3 corner2, csVector3 corner3, csVector3 corner4,
  uint segmentCount1, uint segmentCount2, bool withDiagonals)
