@@ -7,29 +7,29 @@ n>
   </plugins>
 	
   <textures>
-    <texture name='kwarz_diffuse2.jpg'>
+    <texture name='kwarz02_diffuse.jpg'>
       <file>textures/kwarz_diffuse2.jpg</file>
     </texture>
     
-    <texture name='kwarz_ice.png'>
+    <texture name='kwarz02_ice.png'>
           <file>textures/ice.png</file>
     </texture>
     
-    <texture name='BUMPkwarz_normals.jpg'>
+    <texture name='BUMPkwarz02_normals.jpg'>
       <file>textures/kwarz_normals.jpg</file>
       <class>normalmap</class>
     </texture>
   </textures>
   
   <materials>
-    <material name='kwartz-parallax2'>
-      <texture>kwarz_diffuse2.jpg</texture>
-      <shadervar type='texture' name='tex normal'>BUMPkwarz_normals.jpg</shadervar>
+    <material name='kwartz02-parallax'>
+      <texture>kwarz02_diffuse.jpg</texture>
+      <shadervar type='texture' name='tex normal'>BUMPkwarz02_normals.jpg</shadervar>
     </material>
     
-    <material name='kwartz-ice'>
-          <texture>kwarz_ice.png</texture>
-          <shadervar type='texture' name='tex normal'>BUMPkwarz_normals.jpg</shadervar>
+    <material name='kwartz02-ice'>
+          <texture>kwarz02_ice.png</texture>
+          <shadervar type='texture' name='tex normal'>BUMPkwarz02_normals.jpg</shadervar>
           <shadervar name="specular" type="vector4">0.9, 0.9, 1, 1</shadervar>
           <shadervar name="light 0 diffuse" type="vector4">0.9, 0.9, 1, 1</shadervar>
     </material>

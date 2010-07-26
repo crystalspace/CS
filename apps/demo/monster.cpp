@@ -70,6 +70,8 @@ bool Monster::Initialize(iMeshWrapper* spawn)
   path += "/";
   path += filename;
 
+  factoryName = filename.c_str ();
+
   mesh = LoadMesh(object_reg, filename.c_str(), path.c_str());
   if (!mesh)
   {
@@ -286,7 +288,8 @@ void Monster::ChangeMaterial()
 {
   // Get the new material.
   csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
-  iMaterialWrapper* newmatw = engine->FindMaterial("kwartz-ice");
+  csString materialName = factoryName + "-ice";
+  iMaterialWrapper* newmatw = engine->FindMaterial(materialName);
   if (!newmatw) return;
 
   // Get MeshObject.

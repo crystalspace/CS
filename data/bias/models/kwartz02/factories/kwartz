@@ -2,7 +2,7 @@
   <meshfact name='kwartz02'>
     <plugin>crystalspace.mesh.loader.factory.animesh</plugin>
  <params>
-  <material>kwartz-parallax2</material>
+  <material>kwartz02-parallax</material>
    <vertex type="float" components="3">
      <e c0="-0.00000021" c2="0.06407219" c1="1.47717176" />
      <e c0="0.10961154" c2="-0.04113391" c1="1.49655750" />
@@ -10164,7 +10164,7 @@
        <e c0="517" /> <e c0="584" /> <e c0="0" />
        <e c0="2" /> <e c0="517" /> <e c0="0" />
      </index>
-     <material>kwartz-parallax2</material>
+     <material>kwartz02-parallax</material>
    </submesh>
    <skeleton>Armature</skeleton>
  </params>

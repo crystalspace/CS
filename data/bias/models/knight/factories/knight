@@ -2,7 +2,7 @@
   <meshfact name='knight'>
     <plugin>crystalspace.mesh.loader.factory.animesh</plugin>
  <params>
-  <material>Hair</material>
+  <material>knight_hair</material>
    <vertex type="float" components="3">
      <e c0="0.44387279" c2="0.05943071" c1="1.40605533" />
      <e c0="0.43740641" c2="0.07278060" c1="1.36946814" />
@@ -28653,7 +28653,7 @@
        <e c0="1825" /> <e c0="1815" /> <e c0="1826" />
        <e c0="1828" /> <e c0="1817" /> <e c0="1829" />
      </index>
-     <material>Armor</material>
+     <material>knight_armor</material>
    </submesh>
    <submesh>
      <index type="uint" components="1" indices="yes">
@@ -30041,7 +30041,7 @@
        <e c0="1884" /> <e c0="2813" /> <e c0="2814" />
        <e c0="2813" /> <e c0="2812" /> <e c0="2814" />
      </index>
-     <material>Skin</material>
+     <material>knight_skin</material>
    </submesh>
    <submesh>
      <index type="uint" components="1" indices="yes">
@@ -30070,7 +30070,7 @@
        <e c0="2870" /> <e c0="2867" /> <e c0="2882" />
        <e c0="2864" /> <e c0="2883" /> <e c0="2862" />
      </index>
-     <material>Hair</material>
+     <material>knight_hair</material>
    </submesh>
    <skeleton>Armature</skeleton>
    <morphtarget name="Basis">

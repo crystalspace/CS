@@ -28,6 +28,7 @@ class Monster : public Entity
 private:
   void Behaviour();
 
+  csString factoryName;
   csRef<iMeshWrapper> mesh;
 
   iSkeletonFSMNode2* fsmNode;

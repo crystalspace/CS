@@ -10,7 +10,7 @@
       <file>textures/cat_diffuse.jpg</file>
     </texture>
     
-    <texture name='kwarz_ice.png'>
+    <texture name='catscratch_ice.png'>
           <file>textures/ice.png</file>
     </texture>
     
@@ -26,9 +26,9 @@
         <shadervar type='texture' name='tex normal'>BUMPcat_normals.jpg</shadervar>
     </material>
     
-    <material name='kwartz-ice'>
-          <texture>kwarz_ice.png</texture>
-          <shadervar type='texture' name='tex normal'>BUMPkwarz_normals.jpg</shadervar>
+    <material name='catscratch-ice'>
+          <texture>catscratch_ice.png</texture>
+          <shadervar type='texture' name='tex normal'>BUMPcat_normals.jpg</shadervar>
           <shadervar name="specular" type="vector4">0.9, 0.9, 1, 1</shadervar>
           <shadervar name="light 0 diffuse" type="vector4">0.9, 0.9, 1, 1</shadervar>
     </material>
