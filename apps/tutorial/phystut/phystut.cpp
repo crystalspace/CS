@@ -1662,6 +1662,8 @@ void Simple::SpawnRope ()
   // Spawn a box
   iRigidBody* box = SpawnBox ();
 
+  // First example using ropes defined by their extremities
+#if 1
   // Spawn a first rope and attach it to the box
   CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateRope
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0),
@@ -1679,6 +1681,49 @@ void Simple::SpawnRope ()
   body->SetRigidity (0.95f);
   body->AnchorVertex (0);
   body->AnchorVertex (body->GetVertexCount () - 1, box);
+
+  // Second example using ropes defined by the position of each of their vertices
+#else
+  // Spawn a first rope and attach it to the box
+  {
+    // Define the positions of the vertices
+    size_t vertexCount = 10;
+    CS_ALLOC_STACK_ARRAY(csVector3, nodes, vertexCount);
+    nodes[0] = tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0);
+    csVector3 step = (tc.GetT2O () * csVector3 (-0.2f, 0, 1) -
+		      tc.GetT2O () * csVector3 (-2, 2, 0)) / (((float) vertexCount) - 1);
+    for (size_t i = 1; i < vertexCount; i++)
+      nodes[i] = nodes[0] + ((int) (i % 2)) * csVector3 (-0.2f, 0, 0) + ((int) i) * step;
+
+    // Create the soft body
+    CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateRope
+      (nodes, vertexCount);
+    body->SetMass (2.0f);
+    body->SetRigidity (0.95f);
+    body->AnchorVertex (0);
+    body->AnchorVertex (body->GetVertexCount () - 1, box);
+  }
+
+  // Spawn a second rope and attach it to the box
+  {
+    // Define the positions of the vertices
+    size_t vertexCount = 10;
+    CS_ALLOC_STACK_ARRAY(csVector3, nodes, vertexCount);
+    nodes[0] = tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 0);
+    csVector3 step = (tc.GetT2O () * csVector3 (0.2f, 0, 1) -
+		      tc.GetT2O () * csVector3 (2, 2, 0)) / (((float) vertexCount) - 1);
+    for (size_t i = 1; i < vertexCount; i++)
+      nodes[i] = nodes[0] + ((int) (i % 2)) * csVector3 (0.2f, 0, 0) + ((int) i) * step;
+
+    // Create the soft body
+    CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateRope
+      (nodes, vertexCount);
+    body->SetMass (2.0f);
+    body->SetRigidity (0.95f);
+    body->AnchorVertex (0);
+    body->AnchorVertex (body->GetVertexCount () - 1, box);
+  }
+#endif
 }
 
 void Simple::SpawnCloth ()
