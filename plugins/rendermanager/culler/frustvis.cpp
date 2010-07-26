@@ -327,6 +327,7 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
 void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
 	FrustTest_Front2BackData* data, uint32 cur_timestamp)
 {
+  ntdNode.SetTimestamp(cur_timestamp);
   if(ntdNode.IsLeaf())
   {
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
@@ -351,8 +352,8 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
         }
       }
     }
-    if(objArray.GetSize())
-      IssueQueries(data->rview,objArray);
+    if(!objArray.IsEmpty())
+      IssueQueries(ntdNode,objArray);
   }
   else
   {
@@ -380,6 +381,15 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   if (viscallback == 0)
     return false;
 
+  csRenderContext* ctxt = rview->GetRenderContext ();
+  f2bData.frustum = ctxt->clip_planes;
+  uint32 frustum_mask = ctxt->clip_planes_mask;
+  const uint32 cur_timestamp = kdtree->NewTraversal ();
+
+  f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  f2bData.rview = rview;
+  f2bData.viscallback = viscallback;
+
   g3d=rview->GetGraphics3D();
 
   if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
@@ -395,7 +405,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
     const int rez=GetFinishedQuery(oc);
     if(rez==1) // object was visible last fram,e
     {
-      printf("visible\n");
+      printf("visibl\n");
     }
     else if(rez==-1) // object was occluded last frame
     {
@@ -425,18 +435,10 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   g3d->SetWriteMask(false,false,false,false);
 
   smShaderManager = smShaderMan;
-
-  csRenderContext* ctxt = rview->GetRenderContext ();
-  f2bData.frustum = ctxt->clip_planes;
-  uint32 frustum_mask = ctxt->clip_planes_mask;
-  const uint32 cur_timestamp = kdtree->NewTraversal ();
+  NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
-  f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
-  f2bData.rview = rview;
-  f2bData.viscallback = viscallback;
-  NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
   T_Queue.PushBack(ntdRoot);
 
   while(!T_Queue.IsEmpty())// || !Q_Queue.IsEmpty())
@@ -458,7 +460,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
     // unless the node is fully visible, in which case it doesn't matter
     ntdAux.kdtNode->Distribute ();
 
-    TraverseNode(rview,ntdAux,rview->GetCamera()->GetTransform().GetOrigin(),cur_timestamp);
+    TraverseNode(ntdAux,rview->GetCamera()->GetTransform().GetOrigin(),cur_timestamp);
   }
   
 
@@ -502,12 +504,13 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   uint32 frustum_mask = ctxt->clip_planes_mask;
   uint32 cur_timestamp = kdtree->NewTraversal ();
 
-  // The big routine: traverse from front to back and mark all objects
-  // visible that are visible.
   f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   f2bData.rview = rview;
   f2bData.viscallback = viscallback;
   NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
+
+  // The big routine: traverse from front to back and mark all objects
+  // visible that are visible.
   T_Queue.PushBack(ntdRoot);
 
   while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
@@ -529,7 +532,7 @@ bool csFrustumVis::VisTest (iRenderView* rview,
     // unless the node is fully visible, in which case it doesn't matter
     ntdAux.kdtNode->Distribute ();
 
-    TraverseNode(rview,ntdAux,rview->GetCamera()->GetTransform().GetOrigin(),cur_timestamp);
+    TraverseNode(ntdAux,rview->GetCamera()->GetTransform().GetOrigin(),cur_timestamp);
   }
 
   return true;

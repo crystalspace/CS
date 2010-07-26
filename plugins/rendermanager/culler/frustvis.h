@@ -109,12 +109,6 @@ struct NodeTraverseData
     return GetVisibilityObjectHistory()->GetVisibility();
   }
 
-  /*unsigned int GetID() const
-  {
-    if(!kdtNode) return false;
-    return GetVisibilityObjectHistory()->GetID();
-  }*/
-
   int GetSplitAxis() const
   {
     if(!kdtNode) return 0;
@@ -142,12 +136,6 @@ struct NodeTraverseData
     if(!kdtNode) return ;
     GetVisibilityObjectHistory()->SetVisibility(bV);
   }
-
-  /*void SetID(const unsigned int ID) const
-  {
-    if(!kdtNode) return ;
-    GetVisibilityObjectHistory()->SetID(ID);
-  }*/
 
   void SetFrustumMask(uint32 frust_mask)
   {
@@ -292,10 +280,10 @@ private:
   bool WasVisible(NodeTraverseData &ntdNode,const int cur_timestamp) const;
   void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
   void PullUpVisibility(const NodeTraverseData &ntdNode);
-  void TraverseNode(iRenderView* rview,NodeTraverseData &ntdNode,
+  void TraverseNode(NodeTraverseData &ntdNode,
                     const csVector3& pos,const int cur_timestamp);
 
-  void IssueQueries(iRenderView* rview, csArray<csKDTreeChild*> &objArray);
+  void IssueQueries(NodeTraverseData &ntdNode, csArray<csKDTreeChild*> &objArray);
 
   /**
    *  Gets the first finished query from the query list.
