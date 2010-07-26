@@ -361,7 +361,7 @@ void Demo::CreateRoom ()
 
     // Now we make a factory and a mesh at once.
     csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "entity_kwartz02.001", "monster_factory2", &box);
+      engine, room, "entity_kwartz02.002", "monster_factory2", &box);
     m->GetMeshObject ()->SetMaterialWrapper (tm);
     m->GetMovable()->SetPosition(room, csVector3(-5,1,-5));
     m->GetMovable()->UpdateMove();
