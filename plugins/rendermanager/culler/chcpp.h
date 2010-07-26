@@ -80,6 +80,16 @@ public:
   {
     return n;
   }
+
+  void DecSize()
+  {
+    n--;
+  }
+
+  void IncSize()
+  {
+    n++;
+  }
 };
 
 /*  Class to hold the visibility information of a kdtree node.

@@ -76,7 +76,6 @@ csFrustumVis::csFrustumVis () : scfImplementationType (this),
   current_vistest_nr = 1;
   vistest_objects_inuse = false;
   updating = false;
-  rtRenderTree = 0;
 }
 
 csFrustumVis::~csFrustumVis ()
@@ -332,9 +331,9 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
   {
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
     csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
+    csArray<csKDTreeChild*> objArray(10);
 
     //printf("Object count: %d\n",num_objects);
-    IssueQueries(data->rview,objects,num_objects);
 
     for (int i = 0 ; i < num_objects ; i++)
     {
@@ -344,10 +343,16 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
         csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
       	  objects[i]->GetObject ();
         iMeshWrapper* mesh = visobj_wrap->mesh;
+        // only test an element via occlusion if it first passes frustum testing
         if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
+        {
           data->viscallback->ObjectVisible (visobj_wrap->visobj, mesh, 0);
+          objArray.Push(objects[i]);
+        }
       }
     }
+    if(objArray.GetSize())
+      IssueQueries(data->rview,objArray);
   }
   else
   {
@@ -379,10 +384,33 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
 
   if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
-	printf("Cannot prepare renderer for 3D drawing\n");
+	      csPrintf("Cannot prepare renderer for 3D drawing\n");
         return false;
   }
   g3d->FinishDraw();
+
+  while(Q_Queue.Size())
+  {
+    OccQuery oc;
+    const int rez=GetFinishedQuery(oc);
+    if(rez==1) // object was visible last fram,e
+    {
+      printf("visible\n");
+    }
+    else if(rez==-1) // object was occluded last frame
+    {
+      printf("not visible\n");
+    }
+    if(rez) // if we found a finished query than cleanup memory
+    {
+      g3d->OQDelQueries(oc.qID,oc.numQueries);
+      if(oc.IsMultiQuery())
+        delete [] oc.qID;
+      else
+        delete oc.qID;
+    }
+  }
+  printf("\n");
 
   const csReversibleTransform& camt = rview->GetCamera()->GetTransform ();
   g3d->SetClipper (rview->GetClipper(), CS_CLIPPER_TOPLEVEL);  // We are at top-level.
@@ -390,15 +418,13 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   g3d->SetProjectionMatrix (rview->GetCamera()->GetProjectionMatrix ());
   if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
-    printf("Cannot prepare renderer for 3D drawing\n");
+    csPrintf("Cannot prepare renderer for 3D drawing\n");
   }
   g3d->SetWorldToCamera (camt.GetInverse ());
   g3d->SetZMode(CS_ZBUF_USE);
   g3d->SetWriteMask(false,false,false,false);
 
   smShaderManager = smShaderMan;
-  //pdTreePersistent.Initialize(smShaderManager);
-  //rtRenderTree = new RenderTreeType (pdTreePersistent);
 
   csRenderContext* ctxt = rview->GetRenderContext ();
   f2bData.frustum = ctxt->clip_planes;
@@ -413,9 +439,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
   T_Queue.PushBack(ntdRoot);
 
-  //printf("Node vis: %d\n",ntdRoot.GetID());
-
-  while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
+  while(!T_Queue.IsEmpty())// || !Q_Queue.IsEmpty())
   {
     NodeTraverseData ntdAux=T_Queue.Front();
     T_Queue.PopFront();
@@ -436,6 +460,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
 
     TraverseNode(rview,ntdAux,rview->GetCamera()->GetTransform().GetOrigin(),cur_timestamp);
   }
+  
 
   // here we should process the remaining nodes in the multi query
 
@@ -443,11 +468,6 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   g3d->SetClipper (0, CS_CLIPPER_NONE);
   rview->GetEngine()->UpdateNewFrame();
   g3d->FinishDraw();
-
-  printf("\n");
-  //delete rtRenderTree;
-  //rtRenderTree = 0;
-  //ntdRoot.SetID(ntdRoot.GetID()+1);
 
   return true;
 }
@@ -475,8 +495,6 @@ bool csFrustumVis::VisTest (iRenderView* rview,
     return false;
   }
   g3d->FinishDraw();
-
-  rtRenderTree = new RenderTreeType (pdTreePersistent);
 
   // First get the current view frustum from the rview.
   csRenderContext* ctxt = rview->GetRenderContext ();
@@ -514,11 +532,6 @@ bool csFrustumVis::VisTest (iRenderView* rview,
     TraverseNode(rview,ntdAux,rview->GetCamera()->GetTransform().GetOrigin(),cur_timestamp);
   }
 
-  if(rtRenderTree)
-  {
-    delete rtRenderTree;
-    rtRenderTree = 0;
-  }
   return true;
 }
 

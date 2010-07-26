@@ -159,6 +159,14 @@ struct NodeTraverseData
     u32Timestamp=timestamp;
   }
 
+  bool operator == (const NodeTraverseData & ntd) const
+  {
+    return (kdtParent==ntd.kdtParent
+            && kdtNode==ntd.kdtNode
+            && u32Frustum_Mask==ntd.u32Frustum_Mask
+            && u32Timestamp==ntd.u32Timestamp);
+  }
+
   csKDTree* kdtParent;
   csKDTree* kdtNode;
   uint32 u32Frustum_Mask;
@@ -185,6 +193,15 @@ struct OccQuery
   bool IsMultiQuery() const
   {
     return (numQueries>1);
+  }
+
+  bool operator == (const OccQuery &oq) const
+  {
+    return (qID==oq.qID && numQueries==oq.numQueries && ntdNode==oq.ntdNode);
+  }
+
+  ~OccQuery()
+  {
   }
 };
 
@@ -263,7 +280,6 @@ private:
 
   iGraphics3D* g3d;
   iShaderManager* smShaderManager;
-  //csRef<iShaderManager> smShaderManager;
 
   CHCList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
   CHCList<NodeTraverseData> I_Queue; // I queue (invisible queue)
@@ -272,11 +288,6 @@ private:
 
   // Frustum data (front to back)
   FrustTest_Front2BackData f2bData;
-  
-  // Render tree.
-  RenderTreeType* rtRenderTree;
-  // Persistent Data
-  RenderTreeType::PersistentData pdTreePersistent;
 
   bool WasVisible(NodeTraverseData &ntdNode,const int cur_timestamp) const;
   void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
@@ -284,13 +295,14 @@ private:
   void TraverseNode(iRenderView* rview,NodeTraverseData &ntdNode,
                     const csVector3& pos,const int cur_timestamp);
 
-  void IssueQueries(iRenderView* rview, csKDTreeChild **objects,const int num_obj);
+  void IssueQueries(iRenderView* rview, csArray<csKDTreeChild*> objArray);
 
   /**
    *  Gets the first finished query from the query list.
-   * Return true if a finished query is found, else false
+   * Return 1 if visible -1 if not or 0 if no finished 
+   * queries are located.
    */
-  bool GetFinishedQuery(OccQuery &oq);
+  int GetFinishedQuery(OccQuery &oq);
 
 public:
   csFrustumVis ();

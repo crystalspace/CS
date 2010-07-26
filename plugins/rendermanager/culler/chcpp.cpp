@@ -50,41 +50,57 @@
 #include "frustvis.h"
 #include "chcpp.h"
 
-bool csFrustumVis::GetFinishedQuery(OccQuery &oq)
+int csFrustumVis::GetFinishedQuery(OccQuery &oq)
 {
   unsigned int i;
+  int q=0;
   CHCList<OccQuery>::Iterator it;
+  OccQuery oc;
 
-  for(it=CHCList<OccQuery>::Iterator(Q_Queue);it.HasNext();++it)
+  it=CHCList<OccQuery>::Iterator(Q_Queue);
+  for(q=0;q<Q_Queue.Size();++q,++it)
   {
-    for(i=0;i<it->numQueries;i++)
+    if(it.HasCurrent()) oc=it.FetchCurrent();
+    for(i=0;i<(*it).numQueries;i++)
     {
-      if(g3d->OQIsVisible(it->qID[i],VISIBILITY_THRESHOLD))
+      if(g3d->OQueryFinished((*it).qID[i]))
       {
-        oq=*it;
-        return true;
+        if(g3d->OQIsVisible((*it).qID[i],VISIBILITY_THRESHOLD))
+        {
+          oq=*it;
+          if(Q_Queue.Delete(oq))
+            Q_Queue.DecSize();
+          return 1; // return visible result from query
+        }
+        else
+        {
+          oq=*it;
+          if(Q_Queue.Delete(oq))
+            Q_Queue.DecSize();
+          return -1; // return non visible result from query
+        }
       }
     }
   }
-
-  return false;
+  return 0; // no queries were found while searching
 }
 
-void csFrustumVis::IssueQueries(iRenderView* rview, csKDTreeChild **objects,const int num_obj)
+void csFrustumVis::IssueQueries(iRenderView* rview,csArray<csKDTreeChild*> objArray)
 {
   int numq=1;
-
-  for(int i=0 ; i<num_obj ; i++)
+  //printf("Start\n");
+  for(unsigned int i=0 ; i<objArray.GetSize() ; i++)
   {
     int numMeshes=0;
-    iMeshWrapper* const mw=static_cast<csFrustVisObjectWrapper*>(objects[i]->GetObject())->mesh;
+    iMeshWrapper* const mw=static_cast<csFrustVisObjectWrapper*>(objArray.Get(i)->GetObject())->mesh;
     const uint32 frust_mask=rview->GetRenderContext ()->clip_planes_mask;
 
-    unsigned int queries;
-    g3d->OQInitQueries(&queries,numq);
-    g3d->OQBeginQuery(queries);
+    unsigned int *queries;
+    queries=new unsigned int;
+    g3d->OQInitQueries(queries,numq);
+    g3d->OQBeginQuery(*queries);
     
-    csRenderMesh **rmeshes=mw->GetRenderMeshes(numMeshes,rview,0);
+    csRenderMesh **rmeshes=mw->GetRenderMeshes(numMeshes,rview,frust_mask);
     for (int m = 0; m < numMeshes; m++)
     {
       if (!rmeshes[m]->portal)
@@ -93,21 +109,15 @@ void csFrustumVis::IssueQueries(iRenderView* rview, csKDTreeChild **objects,cons
         iRenderBuffer *rB=rmeshes[m]->buffers->GetRenderBuffer(CS_BUFFER_POSITION);
         g3d->ActivateBuffers(&vA,&rB,1);
         g3d->DrawMeshBasic(rmeshes[m],*rmeshes[m]);
-        //g3d->DeactivateBuffers(&vA,1);
+        g3d->DeactivateBuffers(&vA,1);
       }
     }
     g3d->OQEndQuery();
 
-    while(!g3d->OQueryFinished(queries)) 1;
-    if(g3d->OQIsVisible(queries,0))
-    {
-      printf("visible\n");
-    }
-    else
-    {
-      printf("not visible\n");
-    }
-    g3d->OQDelQueries(&queries,numq);
+    OccQuery oc;
+    oc.qID=queries;
+    oc.numQueries=1;
+    Q_Queue.PushBack(oc);
   }
 }
 
@@ -140,8 +150,7 @@ void csFrustumVis::TraverseNode(iRenderView* rview, NodeTraverseData &ntdNode,
   {
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
     csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
-
-    IssueQueries(rview,objects,num_objects);
+    csArray<csKDTreeChild*> objArray(10);
 
     for (int i = 0 ; i < num_objects ; i++)
     {
@@ -150,9 +159,15 @@ void csFrustumVis::TraverseNode(iRenderView* rview, NodeTraverseData &ntdNode,
         objects[i]->timestamp = cur_timestamp;
         csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
       	  objects[i]->GetObject ();
-        TestObjectVisibility (visobj_wrap, &f2bData, ntdNode.GetFrustumMask());
+        // only test an element via occlusion if it first passes frustum testing
+        if(TestObjectVisibility (visobj_wrap, &f2bData, ntdNode.GetFrustumMask()))
+        {
+          objArray.Push(objects[i]);
+        }
       }
     }
+    if(objArray.GetSize())
+      IssueQueries(rview,objArray);
   }
   else // else we queue its children on to the traverse queue
   {
