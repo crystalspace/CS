@@ -295,7 +295,7 @@ private:
   void TraverseNode(iRenderView* rview,NodeTraverseData &ntdNode,
                     const csVector3& pos,const int cur_timestamp);
 
-  void IssueQueries(iRenderView* rview, csArray<csKDTreeChild*> objArray);
+  void IssueQueries(iRenderView* rview, csArray<csKDTreeChild*> &objArray);
 
   /**
    *  Gets the first finished query from the query list.

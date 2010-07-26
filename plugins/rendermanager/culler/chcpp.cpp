@@ -85,7 +85,7 @@ int csFrustumVis::GetFinishedQuery(OccQuery &oq)
   return 0; // no queries were found while searching
 }
 
-void csFrustumVis::IssueQueries(iRenderView* rview,csArray<csKDTreeChild*> objArray)
+void csFrustumVis::IssueQueries(iRenderView* rview,csArray<csKDTreeChild*> &objArray)
 {
   int numq=1;
   //printf("Start\n");
