@@ -431,7 +431,6 @@ void Demo::CreateRoom ()
       monster.AttachNew(new Monster(object_reg));
       if (monster->Initialize (mesh))
 	monsters.Push(monster);
-      else printf("not adding entity\n");
       index.Push(i);
     }
   }
