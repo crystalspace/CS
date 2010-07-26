@@ -703,9 +703,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       // Restores old transforms.
       graphics3D->SetWorldToCamera (oldView);
       graphics3D->SetProjectionMatrix (oldProj);
-
-      // Needed for the change in projection matrix to take effect. 
-      graphics3D->BeginDraw (CSDRAW_3DGRAPHICS);
     }
 
     iGraphics3D *graphics3D;

@@ -359,24 +359,18 @@ private:
 };
 
 /**
- * Renderer for multiple contexts where all objects are drawn
- * to a single render target.
- *
- * Usage: 
- *  1. Attach desired render targets.
- *  2. Using a reverse iterator, iterate over all contexts.
- *  3. Call FinishDraw()
+ * Deferred renderer for multiple contexts.
  *
  * Example:
  * \code
  * // ... contexts setup etc. ...
  *
  * {
- *   DeferredTreeRenderer<RenderTree, UpdateFunctor> 
- *     render (renderView->GetGraphics3D (), shaderManager);
+ *   DeferredTreeRenderer<RenderTree> 
+ *     render (graphics3D, shaderManager, stringSet, 
+ *             gbuffer, lightRenderPersistent, deferredLayer);
  *
  *   ForEachContextReverse (renderTree, render);
- *   g3d->FinishDraw();
  * }
  *
  * // ... apply post processing ...
@@ -400,16 +394,46 @@ public:
   stringSet(stringSet),
   gbuffer(gbuffer),
   lightRenderPersistent(lightRenderPersistent),
-  deferredLayer(deferredLayer)
+  deferredLayer(deferredLayer),
+  lastAccumBuf(nullptr),
+  lastSubTex(-1),
+  lastRenderView(nullptr)
   {}
 
-  ~DeferredTreeRenderer() {}
+  ~DeferredTreeRenderer() 
+  {
+    RenderContextStack ();
+  }
 
   /**
    * Render all contexts.
    */
   void operator()(typename RenderTree::ContextNode *context)
   {
+    if (IsNew (*context))
+    {
+      // New context, render out the old ones
+      RenderContextStack ();
+
+      lastAccumBuf = context->renderTargets[rtaColor0].texHandle;
+      lastSubTex = context->renderTargets[rtaColor0].subtexture;
+      lastRenderView = context->renderView;
+    }
+    
+    contextStack.Push (context);
+  }
+
+protected:
+
+  void RenderContextStack()
+  {
+    const size_t ctxCount = contextStack.GetSize ();
+
+    if (ctxCount == 0)
+      return;
+
+    typename RenderTree::ContextNode *context = contextStack[0];
+
     RenderView *rview = context->renderView;
 
     iEngine *engine = rview->GetEngine ();
@@ -423,7 +447,7 @@ public:
     {
       graphics3D->SetZMode (CS_ZBUF_MESH);
 
-      // Setup the camera etc.. @@should be delayed as well
+      // Setup the camera etc.
       graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
       graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
@@ -431,9 +455,14 @@ public:
       graphics3D->BeginDraw (drawFlags);
       graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
 
-      meshRender.SetLayer (deferredLayer);
-      ForEachDeferredMeshNode (*context, meshRender);
+      for (size_t i = 0; i < ctxCount; i++)
+      {
+        typename RenderTree::ContextNode *context = contextStack[i];
 
+        meshRender.SetLayer (deferredLayer);
+        ForEachDeferredMeshNode (*context, meshRender);
+      }
+      
       graphics3D->FinishDraw ();
     }
     gbuffer.Detach ();
@@ -458,7 +487,13 @@ public:
                                     lightRenderPersistent);
 
       render.OutputAmbientLight ();
-      ForEachLight (*context, render);
+
+      for (size_t i = 0; i < ctxCount; i++)
+      {
+        typename RenderTree::ContextNode *context = contextStack[i];
+
+        ForEachLight (*context, render);
+      }
     }
     DetachAccumBuffer ();
 
@@ -467,35 +502,50 @@ public:
     {
       graphics3D->SetZMode (CS_ZBUF_MESH);
 
-      ForwardMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderMgr, deferredLayer);
-      render (context);
+      for (size_t i = 0; i < ctxCount; i++)
+      {
+        typename RenderTree::ContextNode *context = contextStack[i];
+
+        ForwardMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderMgr, deferredLayer);
+        render (context);
+      }
 
       graphics3D->FinishDraw ();
     }
     DetachAccumBuffer ();
+
+    contextStack.Empty ();
   }
- 
-protected:
 
+  /**
+   * Attaches the accumulation buffer stored with the given context.
+   */
   bool AttachAccumBuffer(typename RenderTree::ContextNode *context, bool useGbufferDepth)
-  { 
-    iTextureHandle *buf = context->renderTargets[rtaColor0].texHandle;
-    int subTex = context->renderTargets[rtaColor0].subtexture;
+  {
+    int subTex;
+    iTextureHandle *buf = GetAccumBuffer (context, subTex);
+    
+    CS_ASSERT (buf);
 
-    if (!buf)
-    {
-      // TODO: Add proper support for simple portals.
-      CS_ASSERT (false);
-      return false;
-    }
+    return AttachAccumBuffer (buf, subTex, useGbufferDepth);
+  }
 
-    // Assume that the portal texture matches the gbuffer dimensions.
+  /**
+   * Attaches the given accumulation buffer and uses the gbuffers depth if requested.
+   */
+  bool AttachAccumBuffer(iTextureHandle *buf, int subTex, bool useGbufferDepth)
+  {
+    CS_ASSERT (buf);
+
+    // Assume that the accumulation texture matches the gbuffer dimensions.
+#if CS_DEBUG
     int w, h;
     int bufW, bufH;
     gbuffer.GetDimensions (w, h);
     buf->GetRendererDimensions (bufW, bufH);
 
     CS_ASSERT (w == bufW && h == bufH);
+#endif
 
     if (!graphics3D->SetRenderTarget (buf, false, subTex, rtaColor0))
       return false;
@@ -508,13 +558,64 @@ protected:
 
     if (!graphics3D->ValidateRenderTargets ())
       return false;
-    
+
     return true;
   }
 
+  /**
+   * Detaches the accumulation buffer.
+   */
   void DetachAccumBuffer()
   {
     graphics3D->UnsetRenderTargets ();
+  }
+
+   /**
+    * Returns the contexts accumulation buffer or NULL if no such buffer exists.
+    */
+  iTextureHandle *GetAccumBuffer(typename RenderTree::ContextNode *context, int &subTex)
+  {
+    subTex = context->renderTargets[rtaColor0].subtexture;
+    return context->renderTargets[rtaColor0].texHandle;
+  }
+
+  /**
+   * Returns true if the given context has a valid accumulation buffer.
+   */
+  bool HasAccumBuffer(typename RenderTree::ContextNode *context)
+  {
+    int subTex;
+    iTextureHandle *buf = GetAccumBuffer (context, subTex);
+    return buf != nullptr; 
+  }
+
+  /**
+   * Returns true if the given context has the same accumulation buffer 
+   * as the last context.
+   */
+  bool HasSameAccumBuffer(typename RenderTree::ContextNode &context)
+  {
+    int subTex;
+    iTextureHandle *buf = GetAccumBuffer (&context, subTex);
+
+    return buf == lastAccumBuf && subTex == lastSubTex;
+  }
+
+  /**
+   * Returns true if the given context has the same render view as the 
+   * last context.
+   */
+  bool HasSameRenderView(typename RenderTree::ContextNode &context)
+  {
+    return context.renderView == lastRenderView;
+  }
+
+  /**
+   * Returns true if the given context is different from the last context.
+   */
+  bool IsNew(typename RenderTree::ContextNode &context)
+  {
+    return !HasSameAccumBuffer (context) || !HasSameRenderView (context);
   }
 
 private:
@@ -528,7 +629,13 @@ private:
   GBuffer &gbuffer;
   DeferredLightRenderer::PersistentData &lightRenderPersistent;
 
+  csArray<typename RenderTree::ContextNode*> contextStack;
+
   int deferredLayer;
+
+  iTextureHandle *lastAccumBuf;
+  int lastSubTex;
+  RenderView *lastRenderView;
 };
 
 //----------------------------------------------------------------------
@@ -685,7 +792,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     }
     else
     {
-       // Locates the deferred shading layer.
+      // Locates the deferred shading layer.
       deferredLayer = LocateDeferredLayer (renderLayer);
       if (deferredLayer <= 0)
       {
@@ -717,16 +824,18 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   // Creates the accumulation buffer.
   int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
   
+  scfString errStr;
   accumBuffer = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
     graphics2D->GetHeight (),
     csimg2D,
     "rgb16_f",
     flags,
-    nullptr);
+    &errStr);
 
   if (!accumBuffer)
   {
-    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, "Could not create accumulation buffer!");
+    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, 
+      "Could not create accumulation buffer: %s!", errStr);
     return false;
   }
 
@@ -805,12 +914,12 @@ bool RMDeferred::RenderView(iView *view)
     ContextSetupType contextSetup (this, renderLayer);
     ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
 
+    startContext->renderTargets[rtaColor0].texHandle = accumBuffer;
+
     contextSetup (*startContext, portalData);
   }
 
   {
-    startContext->renderTargets[rtaColor0].texHandle = accumBuffer;
-
     DeferredTreeRenderer<RenderTreeType> render (graphics3D,
                                                  shaderManager,
                                                  stringSet,
