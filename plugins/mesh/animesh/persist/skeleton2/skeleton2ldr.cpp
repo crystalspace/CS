@@ -711,6 +711,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
           {
             factnode->SetTransitionCrossfade (fromState, toState, time1, time2);
           }
+
+          bool automatic = child->GetAttributeValueAsBool ("automatic", false);
+	  if (automatic)
+	    factnode->SetAutomaticTransition (fromState, toState, true);
         }
         break;
       default:

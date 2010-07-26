@@ -43,13 +43,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   void AnimationFifo::PushAnimation (iSkeletonAnimNode2* node, bool directSwitch,
     float blendInTime, size_t cbData)
   {
-    AnimationInstruction newInstr = {node, cbData, blendInTime, directSwitch};    
+    AnimationInstruction newInstr = {node, cbData, blendInTime, directSwitch};
     instructions.Push (newInstr);
 
     if (currentState == STATE_STOPPED)
     {
       currentState = STATE_PLAYING;
+      currentAnimation = instructions.PopTop ();
+      currentAnimation.node->Play ();
     }
+  }
+
+  void AnimationFifo::RemoveAnimations (size_t cbData)
+  {
+    AnimationInstruction instruction;
+    instruction.cbData = cbData;
+
+    // There can be at most two animations
+    instructions.Delete (instruction);
+    instructions.Delete (instruction);
   }
 
   void AnimationFifo::BlendState (csSkeletalState2* state, float baseWeight /* = 1.0f */)
@@ -94,9 +106,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         {
           AnimationInstruction& top = instructions.Top ();
 
-          if (top.directSwitch || 
-            currentAnimation.node->GetPlaybackPosition() + dt + top.blendInTime >
-            currentAnimation.node->GetDuration ())
+          if (top.directSwitch ||
+	      currentAnimation.node->GetPlaybackPosition() + dt + top.blendInTime >
+	      currentAnimation.node->GetDuration ())
           {
             if (top.blendInTime > 0.0f)
             {
@@ -108,6 +120,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
             else
             {
               // Switch
+	      if (currentAnimation.node)
+		currentAnimation.node->Stop ();
               currentAnimation = instructions.PopTop ();
               currentAnimation.node->Play ();
 
@@ -117,7 +131,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
               }
             }
           }
-        }        
+        }
 
         currentAnimation.node->TickAnimation (dt);        
       }
@@ -131,6 +145,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
           // Blend over, finalize switch
           currentAnimation.node->TickAnimation (dt);
 
+	  if (currentAnimation.node)
+	    currentAnimation.node->Stop ();
           currentAnimation = instructions.PopTop ();
           if (cb)
           {
@@ -150,6 +166,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
       break;
     }
+
+    if (cb && !instructions.GetSize ())
+      cb->InstructionQueueEmpty (currentAnimation.cbData);
   }
 
   void AnimationFifo::Stop ()
@@ -280,7 +299,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
           info.nodeFactory->CreateInstance (packet, skeleton) : 0;
         childInfo.time1 = info.time1;
         childInfo.time2 = info.time2;
-        childInfo.directSwitch = info.directSwitch;
+        //childInfo.directSwitch = info.directSwitch;
+      }
+    }
+
+    // Setup all the automatic transitions
+    {
+      csHash<CS::Animation::StateID, CS::Animation::StateID>::GlobalIterator it = 
+        automaticTransitions.GetIterator ();
+
+      while (it.HasNext ())
+      {
+	CS::Animation::StateID fromState;
+	CS::Animation::StateID toState = it.Next (fromState);
+
+	if (toState != CS::Animation::InvalidStateID)
+	  newn->automaticTransitions.Put (fromState, toState);
       }
     }
 
@@ -331,6 +365,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     info.time2 = time2;
   }
 
+  void FSMNodeFactory::SetAutomaticTransition (CS::Animation::StateID fromState, 
+					       CS::Animation::StateID toState,
+					       bool automatic)
+  {
+    if (automaticTransitions.Contains (fromState))
+    {
+      if (*automaticTransitions[fromState] == toState)
+      {
+	if (!automatic)
+	  automaticTransitions.DeleteAll (fromState);
+      }
+
+      else
+	*automaticTransitions[fromState] = CS::Animation::InvalidStateID;
+    }
+    else if (automatic)
+      automaticTransitions.Put (fromState, toState);
+  }
 
   //----------------------------------------
 
@@ -338,13 +390,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   FSMNode::FSMNode (FSMNodeFactory* factory)
     : scfImplementationType (this), BaseNodeSingle (this), factory (factory),
-    currentState (factory->startState), playbackSpeed (1.0f), isActive (false),
-    blendFifo (this)
+    currentState (factory->startState), automaticState (CS::Animation::InvalidStateID),
+    playbackSpeed (1.0f), isActive (false), blendFifo (this)
   {}
 
   void FSMNode::SwitchToState (CS::Animation::StateID newState)
   {
+    if (automaticState != CS::Animation::InvalidStateID)
+      blendFifo.RemoveAnimations (automaticState);
+    SwitchToState (newState, true);
+  }
+
+  void FSMNode::SwitchToState (CS::Animation::StateID newState, bool directSwitch)
+  {
     CS_ASSERT(newState < stateList.GetSize ());
+
+    if (currentState == newState)
+      return;
 
     if (isActive)
     {
@@ -357,17 +419,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         if (info->transitionNode)
         {
           // Use transition animation
-          blendFifo.PushAnimation (info->transitionNode, info->directSwitch, info->time1);
+          blendFifo.PushAnimation (info->transitionNode, directSwitch, info->time1, newState);
           blendFifo.PushAnimation (stateList[newState].stateNode, false, info->time2, newState);
         }
         else
         {          
-          blendFifo.PushAnimation (stateList[newState].stateNode, info->directSwitch, info->time1, newState);
+          blendFifo.PushAnimation (stateList[newState].stateNode, directSwitch, info->time1, newState);
         }        
       }
       else
       {
-        blendFifo.PushAnimation (stateList[newState].stateNode, true, 0, newState);
+         blendFifo.PushAnimation (stateList[newState].stateNode, directSwitch, 0, newState);
       }      
     }
     else
@@ -492,9 +554,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void FSMNode::NewAnimation (size_t data)
   {
-    if (data != CS::Animation::InvalidStateID)
+    currentState = (CS::Animation::StateID) data;
+
+    // The automatic state has been accepted as the new state
+    if (automaticState == (CS::Animation::StateID) data)
+      automaticState = CS::Animation::InvalidStateID;
+  }
+
+  void FSMNode::InstructionQueueEmpty (size_t data)
+  {
+    // Find if we can find an automatic transition to add to the queue
+    if (automaticTransitions.Contains ((CS::Animation::StateID) data))
     {
-      currentState = (CS::Animation::StateID)data;
+      automaticState = (CS::Animation::StateID) data;
+      SwitchToState (*automaticTransitions[(CS::Animation::StateID) data], false);
     }
   }
 }
