@@ -43,9 +43,17 @@ static float Matrix2YRot (const csMatrix3& mat)
   return GetAngle (vec.z, vec.x);
 }
 
-Monster::Monster(iObjectRegistry* obj_reg, iMeshWrapper* spawn) : Entity(obj_reg)
+Monster::Monster(iObjectRegistry* obj_reg) : Entity(obj_reg)
 {
-  csRef<iView> view (csQueryRegistry<iView> (object_reg));
+  //csRef<iView> view (csQueryRegistry<iView> (object_reg));
+}
+
+Monster::~Monster()
+{
+}
+
+bool Monster::Initialize(iMeshWrapper* spawn)
+{
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
 
   //Replace spawn mesh with real mesh.
@@ -62,10 +70,12 @@ Monster::Monster(iObjectRegistry* obj_reg, iMeshWrapper* spawn) : Entity(obj_reg
   path += "/";
   path += filename;
 
-  std::string factname = "gen";
-  factname += filename; 
-
-  mesh = LoadMesh(factname.c_str(), path.c_str());
+  mesh = LoadMesh(object_reg, filename.c_str(), path.c_str());
+  if (!mesh)
+  {
+    eventQueue->RemoveListener (this);
+    return false;
+  }
 
   csVector3 pos = spawn->GetMovable()->GetPosition();
   iSector* sector = spawn->GetMovable()->GetSectors()->Get(0);
@@ -76,7 +86,20 @@ Monster::Monster(iObjectRegistry* obj_reg, iMeshWrapper* spawn) : Entity(obj_reg
 
   weapon->mesh = mesh;
 
+  csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (mesh->GetMeshObject ());
+  if (animesh)
+  {
+    // Start the root animation node
+    iSkeletonAnimNode2* rootNode =
+      animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+    rootNode->Play ();
 
+    // Find the FSM animation node
+    weapon->fsmNode = fsmNode = (iSkeletonFSMNode2*) rootNode->FindNode ("fsm");
+    weapon->fsmNodeFactory = fsmNodeFactory = fsmNode ? (iSkeletonFSMNodeFactory2*) fsmNode->GetFactory () : 0;
+  }
+
+  // Initialize collision detection
   float cfg_body_height = cfg->GetFloat ("Walktest.CollDet.BodyHeight", 0.5f);
   float cfg_body_width = cfg->GetFloat ("Walktest.CollDet.BodyWidth", 0.5f);
   float cfg_body_depth = cfg->GetFloat ("Walktest.CollDet.BodyDepth", 0.5f);
@@ -93,10 +116,8 @@ Monster::Monster(iObjectRegistry* obj_reg, iMeshWrapper* spawn) : Entity(obj_reg
 
 
   awareRadius = curAwareRadius = 10.0f;
-}
 
-Monster::~Monster()
-{
+  return true;
 }
 
 void Monster::Behaviour()
@@ -146,6 +167,14 @@ void Monster::Behaviour()
     {
       Step(0);
       angleToReachFlag = false;
+
+      // Switch animation to idle state
+      if (fsmNode)
+      {
+	CS::Animation::StateID runState = fsmNodeFactory->FindState ("idle");
+	if (runState != fsmNode->GetCurrentState ())
+	  fsmNode->SwitchToState (runState);
+      }
     }
   }
   
@@ -171,11 +200,19 @@ void Monster::Behaviour()
         //desired_angle_velocity = 0;
         angleToReachFlag = false;
         desiredAngle = currentAngle;
-        printf("angle reached!\n");
+        //printf("angle reached!\n");
       }
 
       csYRotMatrix3 rotMat (angle);
       mesh->GetMovable()->SetTransform (mesh->GetMovable()->GetTransform().GetT2O() * rotMat);
+
+      // Switch animation to run state
+      if (fsmNode)
+      {
+	CS::Animation::StateID runState = fsmNodeFactory->FindState ("run");
+	if (runState != fsmNode->GetCurrentState ())
+	  fsmNode->SwitchToState (runState);
+      }
     }
   }
 }
@@ -187,23 +224,8 @@ csVector3 Monster::GetPosition()
 
 void Monster::PlayAnimation (const char* script, bool lock)
 {
-  csRef<iGeneralMeshState> spstate (scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ()));
-  csRef<iGenMeshSkeletonControlState> animcontrol (scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
-  iSkeleton* skeleton = animcontrol->GetSkeleton ();
-
-  skeleton->StopAll();
-  skeleton->ClearPendingAnimations();
-
-  if (script)
-  {
-    if(lock)
-      skeleton->Append(script);
-    else
-    {
-      skeleton->Execute(script);
-      skeleton->Append("idle");
-    }
-  }
+  if (fsmNode)
+    fsmNode->SwitchToState (fsmNodeFactory->FindState (script));
 }
 
 void Monster::Explode()
@@ -219,33 +241,45 @@ void Monster::Explode()
   engine->WantToDie(mesh);
 
   // Change the mesh.
-  mesh = LoadMesh("gengibs", "/data/bias/models/iceblocks/gibs");
+  mesh = LoadMesh(object_reg, "gibs", "/data/bias/models/iceblocks/gibs");
+  if (!mesh) return;
   mesh->GetMovable()->SetPosition(sector, pos);
   mesh->GetMovable()->UpdateMove();
 
   collider_actor.InitializeColliders (mesh, csVector3(0), csVector3(0), csVector3(0));
 
   // Add more gibs
-  iMeshFactoryWrapper* fact = engine->FindMeshFactory("gengibs");
+  iMeshFactoryWrapper* fact = engine->FindMeshFactory("gibs_piece");
+  if (!fact) return;
   csRef<iMeshWrapper> meshexplo;
+  csRef<iAnimatedMesh> animesh;
 
   //1
   meshexplo = fact->CreateMeshWrapper();
   meshexplo->GetMovable()->Transform(csYRotMatrix3(0));
   meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
   meshexplo->GetMovable()->UpdateMove();
+  animesh = scfQueryInterface<iAnimatedMesh> (meshexplo->GetMeshObject ());
+  if (animesh)
+    animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ()->Play ();
 
   //2
   meshexplo = fact->CreateMeshWrapper();
   meshexplo->GetMovable()->Transform(csYRotMatrix3(-1.97051f));
   meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
   meshexplo->GetMovable()->UpdateMove();
+  animesh = scfQueryInterface<iAnimatedMesh> (meshexplo->GetMeshObject ());
+  if (animesh)
+    animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ()->Play ();
 
   //3
   meshexplo = fact->CreateMeshWrapper();
   meshexplo->GetMovable()->Transform(csYRotMatrix3(2.9665f));
   meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
   meshexplo->GetMovable()->UpdateMove();
+  animesh = scfQueryInterface<iAnimatedMesh> (meshexplo->GetMeshObject ());
+  if (animesh)
+    animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ()->Play ();
 }
 
 void Monster::ChangeMaterial()
@@ -259,6 +293,11 @@ void Monster::ChangeMaterial()
   iMeshObject* meshobj = mesh->GetMeshObject();
   if (!meshobj) return;
 
+  // Get the animated mesh.
+  csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (meshobj);
+  if (!animesh) return;
+
   // Change the material.
-  meshobj->SetMaterialWrapper(newmatw);
+  for (size_t i = 0; i < animesh->GetSubMeshCount (); i++)
+    animesh->GetSubMesh (i)->SetMaterial (newmatw);
 }

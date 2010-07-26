@@ -2,20 +2,9 @@
 
 
   <plugins>
-    <plugin name='armaturefact'>crystalspace.mesh.loader.factory.armature</plugin>
-    <plugin name='genmesh'>crystalspace.mesh.loader.genmesh</plugin>
-    <plugin name='genmeshfact'>crystalspace.mesh.loader.factory.genmesh</plugin>
+    <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
+    <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
   </plugins>
-  
-  
-  <shaders>
-    <shader>
-      <file>/shader/character/character_bump2.xml</file>
-    </shader>
-    <shader>
-      <file>/shader/character/character2.xml</file>
-    </shader>
-  </shaders>
   
   
   <textures>
@@ -33,16 +22,12 @@
   <materials>
     <material name='crossbowcrossbow6mi9.png'>
       <texture>crossbow.png</texture>
-      <shader type='depthwrite'>*null</shader>
-      <shader type='diffuse'>character_bump2</shader>
-      <shader type='ambient'>character2</shader>
       <shadervar type='texture' name='tex normal'>BUMPnormalmap.png</shadervar>
     </material>
   </materials>
 
 
-  
-  
-   <library>factories/gencrossbow</library>
+  <library>factories/skelArmature</library>
+  <library>factories/crossbow</library>
 
 </library>

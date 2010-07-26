@@ -51,8 +51,9 @@ private:
 
 public:
   csRef<iMeshWrapper> mesh;
+  iSkeletonFSMNode2* fsmNode;
+  iSkeletonFSMNodeFactory2* fsmNodeFactory;
   csString attackAnimation;
-  csString reloadAnimation;
 
 public:
   Weapon(iObjectRegistry*);

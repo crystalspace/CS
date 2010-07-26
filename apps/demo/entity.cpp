@@ -20,7 +20,7 @@
 
 #include <string>
 
-iMeshWrapper* Entity::LoadMesh(const char* name, const char* file)
+iMeshWrapper* LoadMesh(iObjectRegistry* object_reg, const char* name, const char* file)
 {
   csRef<iVFS> vfs (csQueryRegistry<iVFS> (object_reg));
   csRef<iLoader> loader (csQueryRegistry<iLoader> (object_reg));
@@ -32,9 +32,18 @@ iMeshWrapper* Entity::LoadMesh(const char* name, const char* file)
 
   vfs->ChDir (s.c_str());
   bool l = loader->LoadLibraryFile(file);
-  if (!l) printf("LoadMesh failed!\n");
+  if (!l)
+  {
+    printf("Error: Could not load mesh factory '%s' from file '%s'!\n", name, file);
+    return nullptr;
+  }
 
   iMeshFactoryWrapper* mf = engine->FindMeshFactory(name);
+  if (!mf)
+  {
+    printf("Error: Could not find mesh factory '%s' in file '%s'!\n", name, file);
+    return nullptr;
+  }
 
   csRef<iMeshWrapper> m = engine->CreateMeshWrapper(mf, name);
 

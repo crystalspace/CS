@@ -30,12 +30,17 @@ private:
 
   csRef<iMeshWrapper> mesh;
 
+  iSkeletonFSMNode2* fsmNode;
+  iSkeletonFSMNodeFactory2* fsmNodeFactory;
+
 public:
   float awareRadius, curAwareRadius;
 
 public:
-  Monster(iObjectRegistry*, iMeshWrapper*);
+  Monster(iObjectRegistry*);
   ~Monster();
+
+  virtual bool Initialize (iMeshWrapper*);
 
   virtual void PlayAnimation(const char*, bool);
 

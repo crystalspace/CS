@@ -23,6 +23,8 @@
 
 #include "weapon.h"
 
+iMeshWrapper* LoadMesh(iObjectRegistry* object_reg, const char* name, const char* file);
+
 class Entity :  public scfImplementation2<Entity,iEventHandler, iObject> 
 {
 protected:
@@ -70,9 +72,7 @@ private:
 
 public:
   Entity(iObjectRegistry*);
-  ~Entity();
-
-  iMeshWrapper* LoadMesh(const char* name, const char* file);
+  virtual ~Entity();
 
   virtual void Strafe(float speed);
   virtual void Step(float speed);
