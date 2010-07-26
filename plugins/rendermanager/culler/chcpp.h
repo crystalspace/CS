@@ -81,14 +81,12 @@ public:
     return n;
   }
 
-  void DecSize()
+  bool Delete(const T& item)
   {
-    n--;
-  }
-
-  void IncSize()
-  {
-    n++;
+    const bool rez=csList::Delete(item);
+    if(rez)
+      n--;
+    return rez;
   }
 };
 

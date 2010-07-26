@@ -68,15 +68,13 @@ int csFrustumVis::GetFinishedQuery(OccQuery &oq)
         if(g3d->OQIsVisible((*it).qID[i],VISIBILITY_THRESHOLD))
         {
           oq=*it;
-          if(Q_Queue.Delete(oq))
-            Q_Queue.DecSize();
+          Q_Queue.Delete(oq);
           return 1; // return visible result from query
         }
         else
         {
           oq=*it;
-          if(Q_Queue.Delete(oq))
-            Q_Queue.DecSize();
+          Q_Queue.Delete(oq);;
           return -1; // return non visible result from query
         }
       }
