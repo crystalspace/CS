@@ -26,19 +26,25 @@ iMeshWrapper* LoadMesh(iObjectRegistry* object_reg, const char* name, const char
   csRef<iLoader> loader (csQueryRegistry<iLoader> (object_reg));
   csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
 
-  std::string s(file);
-  size_t pos = s.find_last_of("/");
-  s = s.substr(0, pos+1);
-
-  vfs->ChDir (s.c_str());
-  bool l = loader->LoadLibraryFile(file);
-  if (!l)
+  // Check if the factory still needs to be loaded
+  iMeshFactoryWrapper* mf = engine->FindMeshFactory(name);
+  if (!mf)
   {
-    printf("Error: Could not load mesh factory '%s' from file '%s'!\n", name, file);
-    return nullptr;
+    std::string s(file);
+    size_t pos = s.find_last_of("/");
+    s = s.substr(0, pos+1);
+
+    vfs->ChDir (s.c_str());
+    bool l = loader->LoadLibraryFile(file);
+    if (!l)
+    {
+      printf("Error: Could not load mesh factory '%s' from file '%s'!\n", name, file);
+      return nullptr;
+    }
+
+    mf = engine->FindMeshFactory(name);
   }
 
-  iMeshFactoryWrapper* mf = engine->FindMeshFactory(name);
   if (!mf)
   {
     printf("Error: Could not find mesh factory '%s' in file '%s'!\n", name, file);
