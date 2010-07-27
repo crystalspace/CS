@@ -359,21 +359,29 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
     if (f2bData.pos[ntdNode.GetSplitAxis()] <= ntdNode.GetSplitLocation())
     {
-      if (child1) 
-        CallVisibilityCallbacksForSubtree
-              (NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()), cur_timestamp);
-      if (child2) 
-        CallVisibilityCallbacksForSubtree
-              (NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()), cur_timestamp);
+      if (child1)
+      {
+	NodeTraverseData ntd (child1,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        CallVisibilityCallbacksForSubtree (ntd, cur_timestamp);
+      }
+      if (child2)
+      {
+	NodeTraverseData ntd (child2,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        CallVisibilityCallbacksForSubtree (ntd, cur_timestamp);
+      }
     }
     else
     {
-      if (child2) 
-        CallVisibilityCallbacksForSubtree
-              (NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()), cur_timestamp);
-      if (child1) 
-        CallVisibilityCallbacksForSubtree
-              (NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()), cur_timestamp);
+      if (child2)
+      {
+	NodeTraverseData ntd (child2,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        CallVisibilityCallbacksForSubtree (ntd, cur_timestamp);
+      }
+      if (child1)
+      {
+	NodeTraverseData ntd (child1,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        CallVisibilityCallbacksForSubtree (ntd, cur_timestamp);
+      }
     }
   }
 }
