@@ -296,7 +296,7 @@ void DeferredSetupShader(ContextNodeType &context,
   // Shader setup
   typedef typename ContextNodeType::TreeType Tree;
   
-  typename DeferredShaderSetup<Tree, LayerConfigType>
+  DeferredShaderSetup<Tree, LayerConfigType>
     shaderSetup (context.shaderArray, layerConfig, deferredLayer);
 
   ForEachMeshNode (context, shaderSetup);
