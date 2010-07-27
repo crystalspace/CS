@@ -98,7 +98,6 @@ class csVisibilityObjectHistory :
 {
 public:
   bool bVisible;
-  //unsigned int qID;
 
   csVisibilityObjectHistory () : scfImplementationType (this), bVisible(false)//, qID(0)
   {
@@ -107,7 +106,6 @@ public:
   csVisibilityObjectHistory (const bool bV/*,const unsigned int ID*/) : scfImplementationType (this)
   {
     bVisible=bV;
-    //qID=ID;
   }
 
   virtual ~csVisibilityObjectHistory()
@@ -119,20 +117,12 @@ public:
     return bVisible;
   }
 
-  /*unsigned int GetID() const
-  {
-    return qID;
-  }*/
-
   void SetVisibility(const bool bV)
   {
     bVisible=bV;
   }
-
-  /*void SetID(const unsigned int ID)
-  {
-    qID=ID;
-  }*/
 };
+
+
 
 #endif

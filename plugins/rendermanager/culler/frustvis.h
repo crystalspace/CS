@@ -280,8 +280,7 @@ private:
   bool WasVisible(NodeTraverseData &ntdNode,const int cur_timestamp) const;
   void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
   void PullUpVisibility(const NodeTraverseData &ntdNode);
-  void TraverseNode(NodeTraverseData &ntdNode,
-                    const csVector3& pos,const int cur_timestamp);
+  void TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp);
 
   void IssueQueries(NodeTraverseData &ntdNode, csArray<csKDTreeChild*> &objArray);
 
@@ -298,7 +297,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   void CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
-	FrustTest_Front2BackData* data, uint32 cur_timestamp);
+	    const uint32 cur_timestamp);
 
   // Test visibility for the given node. Returns 2 if camera is inside node,
   // 1 if visible normally, or 0 if not visible.

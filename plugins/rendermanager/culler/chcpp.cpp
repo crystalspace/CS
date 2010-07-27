@@ -138,8 +138,7 @@ void csFrustumVis::PullUpVisibility(const NodeTraverseData &ntdNode)
   }
 }
 
-void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode,
-                                const csVector3& pos, const int cur_timestamp)
+void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp)
 {
   ntdNode.SetTimestamp(cur_timestamp);
   if (ntdNode.IsLeaf()) // if node is leaf we render it
@@ -170,7 +169,7 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode,
     ntdNode.SetVisibility(false);
     csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
-    if (pos[ntdNode.GetSplitAxis()] <= ntdNode.GetSplitLocation())
+    if (f2bData.pos[ntdNode.GetSplitAxis()] <= ntdNode.GetSplitLocation())
     {
       if(child1)
         T_Queue.PushBack(NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()));

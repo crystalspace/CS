@@ -325,7 +325,7 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
 //======== VisTest =========================================================
 
 void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
-	FrustTest_Front2BackData* data, uint32 cur_timestamp)
+	const uint32 cur_timestamp)
 {
   ntdNode.SetTimestamp(cur_timestamp);
   if(ntdNode.IsLeaf())
@@ -333,8 +333,6 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
     csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
     csArray<csKDTreeChild*> objArray(10);
-
-    //printf("Object count: %d\n",num_objects);
 
     for (int i = 0 ; i < num_objects ; i++)
     {
@@ -347,7 +345,7 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
         // only test an element via occlusion if it first passes frustum testing
         if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
         {
-          data->viscallback->ObjectVisible (visobj_wrap->visobj, mesh, 0);
+          f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, mesh, 0);
           objArray.Push(objects[i]);
         }
       }
@@ -358,17 +356,41 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
   else
   {
     csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
+<<<<<<< .mine
+=======
     if (child1) 
     {
       NodeTraverseData ntd (child1, ntdNode.kdtNode, ntdNode.GetFrustumMask());
       CallVisibilityCallbacksForSubtree (ntd, data, cur_timestamp);
     }
+>>>>>>> .r34595
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
+<<<<<<< .mine
+    if (f2bData.pos[ntdNode.GetSplitAxis()] <= ntdNode.GetSplitLocation())
+    {
+      if (child1) 
+        CallVisibilityCallbacksForSubtree
+              (NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()), cur_timestamp);
+      if (child2) 
+        CallVisibilityCallbacksForSubtree
+              (NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()), cur_timestamp);
+    }
+    else
+    {
+      if (child2) 
+        CallVisibilityCallbacksForSubtree
+              (NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()), cur_timestamp);
+      if (child1) 
+        CallVisibilityCallbacksForSubtree
+              (NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()), cur_timestamp);
+    }
+=======
     if (child2) 
     {
       NodeTraverseData ntd (child2, ntdNode.kdtNode, ntdNode.GetFrustumMask());
       CallVisibilityCallbacksForSubtree (ntd, data, cur_timestamp);
     }
+>>>>>>> .r34595
   }
 }
 
@@ -409,7 +431,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
     const int rez=GetFinishedQuery(oc);
     if(rez==1) // object was visible last fram,e
     {
-      printf("visibl\n");
+      printf("visible\n");
     }
     else if(rez==-1) // object was occluded last frame
     {
@@ -450,13 +472,13 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
     NodeTraverseData ntdAux=T_Queue.Front();
     T_Queue.PopFront();
 
-    int nodevis = TestNodeVisibility (ntdAux.kdtNode, &f2bData,frustum_mask);
+    int nodevis = TestNodeVisibility (ntdAux.kdtNode, &f2bData,ntdAux.u32Frustum_Mask);
     if (nodevis == NODE_INVISIBLE)
       continue;
 
     if (nodevis == NODE_VISIBLE && frustum_mask == 0)
     {
-      CallVisibilityCallbacksForSubtree (ntdAux, &f2bData, cur_timestamp);
+      CallVisibilityCallbacksForSubtree (ntdAux, cur_timestamp);
       continue;
     }
 
@@ -464,7 +486,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
     // unless the node is fully visible, in which case it doesn't matter
     ntdAux.kdtNode->Distribute ();
 
-    TraverseNode(ntdAux,rview->GetCamera()->GetTransform().GetOrigin(),cur_timestamp);
+    TraverseNode(ntdAux,cur_timestamp);
   }
   
 
@@ -472,7 +494,6 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
 
   g3d->SetWriteMask(true,true,true,true);
   g3d->SetClipper (0, CS_CLIPPER_NONE);
-  rview->GetEngine()->UpdateNewFrame();
   g3d->FinishDraw();
 
   return true;
@@ -528,7 +549,7 @@ bool csFrustumVis::VisTest (iRenderView* rview,
 
     if (nodevis == NODE_VISIBLE && frustum_mask == 0)
     {
-      CallVisibilityCallbacksForSubtree (ntdAux, &f2bData, cur_timestamp);
+      CallVisibilityCallbacksForSubtree (ntdAux, cur_timestamp);
       continue;
     }
 
@@ -536,7 +557,7 @@ bool csFrustumVis::VisTest (iRenderView* rview,
     // unless the node is fully visible, in which case it doesn't matter
     ntdAux.kdtNode->Distribute ();
 
-    TraverseNode(ntdAux,rview->GetCamera()->GetTransform().GetOrigin(),cur_timestamp);
+    TraverseNode(ntdAux, cur_timestamp);
   }
 
   return true;
