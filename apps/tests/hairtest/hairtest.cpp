@@ -32,7 +32,8 @@ HairTest::HairTest ()
 : DemoApplication ("CrystalSpace.HairTest", "hairtest",
                      "hairtest <OPTIONS>",
                      "Tests on the animation of objects iAnimatedMesh."),
-                     avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
+                     avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE) ,
+                     furPhysicsEnabled (true)
 {
   // We manage the camera by ourselves
   cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
@@ -75,9 +76,6 @@ void HairTest::Frame ()
 
   // Now rotate the camera according to keyboard state
   const float speed = elapsedTime / 1000.0f;
-
-  // Rotate by angle
-  const float angle = 4 * speed;
 
   // Step the dynamic simulation (we slow down artificially the simulation in
   // order to achieve a 'slow motion' effect)
@@ -257,6 +255,26 @@ bool HairTest::OnEventThumbTrackEndedOverallLOD (const CEGUI::EventArgs&)
   return true;
 }
 
+bool HairTest::OnPhysicsButtonClicked (const CEGUI::EventArgs&)
+{
+  if (!avatarScene->furMaterial)
+    return false;
+
+  if (furPhysicsEnabled)
+  {
+    furPhysicsEnabled = false;
+    avatarScene->furMaterial->StopPhysicsControl();
+  }
+  else
+  {
+    furPhysicsEnabled = true;
+    avatarScene->furMaterial->StartPhysicsControl();
+  }
+
+  return true;
+}
+
+
 void HairTest::SwitchDynamics()
 {
   csRef<iMeshObject> animeshObject = 
@@ -306,6 +324,25 @@ bool HairTest::OnKeyboard (iEvent &ev)
       SwitchDynamics();
       return true;
     }
+
+    // Toggle physics control
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'e'
+      && physicsEnabled && avatarScene->HasPhysicalObjects () &&
+      avatarScene -> furMaterial)
+    {
+      if (furPhysicsEnabled)
+      {
+        avatarScene->furMaterial->StopPhysicsControl();
+        furPhysicsEnabled = false;
+      }
+      else 
+      {
+        avatarScene->furMaterial->StartPhysicsControl();
+        furPhysicsEnabled = true;
+      }
+
+      return true;
+    }
   }
   return false;
 }
@@ -313,8 +350,8 @@ bool HairTest::OnKeyboard (iEvent &ev)
 bool HairTest::OnMouseDown (iEvent& ev)
 {
   // Default behavior from csDemoApplication
-  if (DemoApplication::OnMouseDown (ev))
-    return true;
+//   if (DemoApplication::OnMouseDown (ev))
+//     return true;
 
   return false;
 }
@@ -453,6 +490,11 @@ bool HairTest::Application ()
   winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Colliders") 
     -> subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&HairTest::OnCollidersButtonClicked, this));
+
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page3/Physics") 
+    -> subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&HairTest::OnPhysicsButtonClicked, this));
+
 
   // Default behavior from csDemoApplication for the creation of the scene
   if (!DemoApplication::CreateRoom ())

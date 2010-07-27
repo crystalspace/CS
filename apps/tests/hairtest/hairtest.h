@@ -89,6 +89,7 @@ private:
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
+  bool furPhysicsEnabled;
 
   // Animation node plugin managers
   csRef<iSkeletonLookAtManager2> lookAtManager;
@@ -146,6 +147,7 @@ public:
   bool OnEventThumbTrackEndedGuideLOD (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedStrandLOD (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedOverallLOD (const CEGUI::EventArgs& e);
+  bool OnPhysicsButtonClicked (const CEGUI::EventArgs& e);
 
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);

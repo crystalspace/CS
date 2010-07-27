@@ -32,10 +32,13 @@ KrystalScene::KrystalScene (HairTest* hairTest)
   hairTest->hudHelper.keyDescriptions.DeleteAll ();
   hairTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
   hairTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  
   if (hairTest->physicsEnabled)
   {
     hairTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
   }
+
+  hairTest->hudHelper.keyDescriptions.Push ("e: stop/start fur physics");
 }
 
 KrystalScene::~KrystalScene ()
@@ -388,9 +391,47 @@ bool KrystalScene::CreateAvatar ()
 
   // This light is for the background
   csRef<iLight> light = 
-    hairTest->engine->CreateLight(0, csVector3(10,10, 0), 9000, csColor (1));
+    hairTest->engine->CreateLight(0, csVector3(10, 10, 0), 9000, csColor (1));
   light->SetAttenuationMode (CS_ATTN_NONE);
+  light->SetType(CS_LIGHT_DIRECTIONAL);
+  csMatrix3 matrixY (cos(PI/2), 0, -sin(PI/2), 0, 1, 0, sin(PI/2), 0, cos(PI/2)); // PI/4
+  csMatrix3 matrixX (1, 0, 0, 0, cos(PI/2), -sin(PI/2), 0, sin(PI/2), cos(PI/2));
+  light->GetMovable()->Transform(matrixY);
   hairTest->room->GetLights()->Add (light);
+
+  // Add plane
+//   csRef<iMeshFactoryWrapper> planeFactory = hairTest->engine->CreateMeshFactory (
+//     "crystalspace.mesh.object.genmesh", "planeFactory");
+// 
+//   csRef<iGeneralFactoryState> planeFactoryState = 
+//     scfQueryInterface<iGeneralFactoryState> ( planeFactory->GetMeshObjectFactory ());
+// 
+//   planeFactoryState -> SetVertexCount ( 4 );
+//   planeFactoryState -> SetTriangleCount ( 2 );
+// 
+//   csVector3 *vbuf = planeFactoryState->GetVertices (); 
+//   csTriangle *ibuf = planeFactoryState->GetTriangles ();
+// 
+//   vbuf[0] = csVector3(-10, 0, -10);
+//   vbuf[1] = csVector3(10, 0, -10);
+//   vbuf[2] = csVector3(10, 0, 10);
+//   vbuf[3] = csVector3(-10, 0, 10);
+// 
+//   ibuf[0] = csTriangle(0, 2, 1);
+//   ibuf[1] = csTriangle(3, 2, 0);
+// 
+//   planeFactoryState -> CalculateNormals();
+//   planeFactoryState -> Invalidate();
+// 
+//   // Make a material
+//   csRef<iMeshWrapper> planeMeshWrapper = hairTest->engine->CreateMeshWrapper 
+//     (planeFactory, "plane", hairTest->room, csVector3 (0, 0, 0));
+// 
+//   csRef<iMaterialWrapper> planeMaterialWrapper = 
+//     CS::Material::MaterialBuilder::CreateColorMaterial
+//     (hairTest->object_reg,"planeMaterial",csColor(0,0,1));
+// 
+//   planeMeshWrapper->GetMeshObject()->SetMaterialWrapper(planeMaterialWrapper);
 
   // Start animation
   rootNode->Play ();
