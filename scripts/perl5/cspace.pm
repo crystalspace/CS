@@ -16411,6 +16411,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetStateTransition = *cspacec::iSkeletonFSMNodeFactory2_SetStateTransition;
 *SetTransitionCrossfade = *cspacec::iSkeletonFSMNodeFactory2_SetTransitionCrossfade;
 *AddState = *cspacec::iSkeletonFSMNodeFactory2_AddState;
+*SetAutomaticTransition = *cspacec::iSkeletonFSMNodeFactory2_SetAutomaticTransition;
 *scfGetVersion = *cspacec::iSkeletonFSMNodeFactory2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

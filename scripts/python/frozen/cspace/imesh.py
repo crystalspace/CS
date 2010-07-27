@@ -1129,6 +1129,7 @@ class iSkeletonFSMNodeFactory2(iSkeletonAnimNodeFactory2):
     def SetStateTransition(*args): return _imesh.iSkeletonFSMNodeFactory2_SetStateTransition(*args)
     def SetTransitionCrossfade(*args): return _imesh.iSkeletonFSMNodeFactory2_SetTransitionCrossfade(*args)
     def AddState(*args): return _imesh.iSkeletonFSMNodeFactory2_AddState(*args)
+    def SetAutomaticTransition(*args): return _imesh.iSkeletonFSMNodeFactory2_SetAutomaticTransition(*args)
     scfGetVersion = staticmethod(_imesh.iSkeletonFSMNodeFactory2_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonFSMNodeFactory2
     __del__ = lambda self : None;
