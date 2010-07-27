@@ -826,6 +826,12 @@ iSoftBody* csBulletDynamicsSystem::CreateRope
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+
+  //hard-coded parameters for ropes
+  body->m_cfg.kDP = 0.08f; // no elasticity
+  body->m_cfg.piterations = 16; // no white zone
+  body->m_cfg.timescale = 2;
+
   softWorld->addSoftBody (body);
 
   csRef<csBulletSoftBody> csBody;
