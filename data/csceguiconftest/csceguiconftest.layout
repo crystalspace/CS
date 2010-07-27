@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+    <Window Type="DefaultWindow" Name="root">
+        <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property Name="MousePassThroughEnabled" Value="True" />
+
+        <Window Type='ice/FrameWindow' Name='Options/Frame'>
+          <Property Name='UnifiedSize' Value='{{0.0,530.0},{0.0,330.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.5,-215.0},{0.5,-165.0}}'/>
+          <Property Name='UnifiedMinSize' Value='{{0.0,530.0},{0.0,330.0}}'/>
+          <Property Name='CaptionColour' Value='00FFFFFF'/>
+          <Property Name='TitlebarEnabled' Value='True'/>
+          <Property Name='SizingEnabled' Value='True'/>
+          <Property Name='Alpha' Value='1.0'/>
+
+          <Window Type='ice/Listbox' Name='Options/List'>
+            <Property Name='UnifiedSize' Value='{{0.0,110.0},{1.0,-10.0}}'/>
+            <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,5.0}}'/>
+            <Property Name='ClippedByParent' Value='True'/>
+          </Window>
+
+          <Window Type='ice/Listbox' Name='Options/Info'>
+            <Property Name='UnifiedSize' Value='{{1.0,-115.0},{1.0,-10.0}}'/>
+            <Property Name='UnifiedPosition' Value='{{0.0,115.0},{0.0,5.0}}'/>
+            <Property Name='ClippedByParent' Value='True'/>
+          </Window>
+
+        </Window>
+
+    </Window>
+</GUILayout>

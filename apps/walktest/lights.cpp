@@ -152,8 +152,65 @@ csRef<iLight> WalkTestLights::CreateRandomLight (const csVector3& pos, iSector* 
   return dyn;
 }
 
+csReversibleTransform WalkTestLights::FlashlightShift (const csReversibleTransform& tf)
+{
+  csReversibleTransform newTF (tf);
+  // Tilt flashlight a bit down
+  csMatrix3 newmat (tf.GetT2O());
+  newmat *= csXRotMatrix3 ((10.0/180.0)*PI);
+  newTF.SetT2O (newmat);
+  return newTF;
+}
+
+void WalkTestLights::EnableFlashlight (bool enable)
+{
+  if (enable && !flashlight)
+  {
+    static const float flashlightIntensity = 5.0f;
+    
+    flashlight = walktest->Engine->CreateLight ("flashlight",
+      csVector3 (0),
+      flashlightIntensity*256,
+      csColor (flashlightIntensity),
+      CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+    flashlight->SetType (CS_LIGHT_SPOTLIGHT);
+    flashlight->SetAttenuationMode (CS_ATTN_INVERSE);
+    flashlight->SetSpotLightFalloff (1, cosf ((25.0/180.0)*PI));
+      
+    iLightList* ll = walktest->views->GetCamera ()->GetSector ()->GetLights ();
+    ll->Add (flashlight);
+    
+    flashlight->GetMovable()->SetTransform (FlashlightShift (walktest->views->GetCamera ()->GetTransform ()));
+    flashlight->GetMovable()->UpdateMove();
+  }
+  else if (!enable && flashlight)
+  {
+    iLightList* ll = flashlight->GetMovable()->GetSectors()->Get (0)->GetLights ();
+    ll->Remove (flashlight);
+    flashlight.Invalidate();
+  }
+}
+
 void WalkTestLights::HandleDynLights ()
 {
+  if (flashlight)
+  {
+    iSector* oldsector = flashlight->GetMovable()->GetSectors()->Get (0);
+    iSector* newSector = walktest->views->GetCamera ()->GetSector();
+    if (oldsector != newSector)
+    {
+      iLightList* ll = oldsector->GetLights();
+      ll->Remove (flashlight);
+    }
+    if (oldsector != newSector)
+    {
+      iLightList* ll = walktest->views->GetCamera ()->GetSector ()->GetLights ();
+      ll->Add (flashlight);
+    }
+    flashlight->GetMovable()->SetTransform (FlashlightShift (walktest->views->GetCamera ()->GetTransform ()));
+    flashlight->GetMovable()->UpdateMove();
+  }
+  
   size_t i;
   for (i = 0 ; i < dynamic_lights.GetSize () ; i++)
   {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+    <Window Type="DefaultWindow" Name="root">
+        <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property Name="MousePassThroughEnabled" Value="True" />
+      
+        <Window Type="ice/FrameWindow" Name="Bias/Inventory" >
+            <Property Name="Text" Value="Inventory" />
+            <Property Name="UnifiedMaxSize" Value="{{0.4,0},{1.0,0}}" />
+            <Property Name="UnifiedMinSize" Value="{{0.4,0},{1.0,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.6,0},{0.0,0},{1.0,0},{1.0,0}}" />
+            <Property Name="CloseButtonEnabled" Value="False" />
+            <Window Type="ice/Button" Name="Bias/Inventory/Quit" >
+                <Property Name="Text" Value="Exit Demo" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                <Property Name="UnifiedAreaRect" Value="{{0.02,0},{0.1,0},{0.27,0},{0.2,0}}" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

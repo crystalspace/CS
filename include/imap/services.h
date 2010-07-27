@@ -94,7 +94,7 @@ namespace CS
  */
 struct iSyntaxService : public virtual iBase
 {
-  SCF_INTERFACE (iSyntaxService, 2, 2, 0);
+  SCF_INTERFACE (iSyntaxService, 3, 0, 0);
   
   /**\name Parse reporting helpers
    * @{ */
@@ -273,25 +273,6 @@ struct iSyntaxService : public virtual iBase
     bool allowFxMesh) = 0;
 
   /**
-   * Handles a common portal parameter.
-   * flags: contains all flags found in the description.
-   * Returns false on failure. Returns false in 'handled' if it couldn't
-   * understand the token.
-   * \deprecated Deprecated in 1.3. Use bool HandlePortalParameter
-   *    (iDocumentNode*, iLoaderContext*, 
-   *     CS::Utility::PortalParametersParseState&, 
-   *     CS::Utility::PortalParameters&) instead
-   */
-  CS_DEPRECATED_METHOD_MSG("Use bool HandlePortalParameter "
-    "(iDocumentNode*, iLoaderContext*, csRef<csRefCount>&, "
-    "CS::Utility::PortalParameters&, bool&) instead ")
-  virtual bool HandlePortalParameter (
-	iDocumentNode* child, iLoaderContext* ldr_context,
-	uint32 &flags, bool &mirror, bool &warp, int& msv,
-	csMatrix3 &m, csVector3 &before, csVector3 &after,
-	iString* destSector, bool& handled, bool& autoresolve) = 0;
-
-  /**
    * Parse a color gradient.
    * \param node Document node containing the gradient data.
    * \param gradient Valid pointer to a gradient interface which is filled 
@@ -357,12 +338,10 @@ struct iSyntaxService : public virtual iBase
 
   /**
    * Parse a key definition. A iKeyValuePair instance is
-   * return in "keyvalue", with refcount 1
-   * Returns true if successful.
+   * returned if successful.
    */
-  CS_DEPRECATED_METHOD_MSG("Use the csRef<iKeyValuePair> version instead")
-  virtual bool ParseKey (iDocumentNode* node, iKeyValuePair*& keyvalue) = 0;
-
+  virtual csPtr<iKeyValuePair> ParseKey (iDocumentNode* node) = 0;
+  
   /**
    * Write a key definition and add the key to the given object, 
    * Returns true if successful.
@@ -375,6 +354,13 @@ struct iSyntaxService : public virtual iBase
   virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node) = 0;
 
   /**
+   * Parse into a given render buffer.
+   * \a buffer must have the correct component type and must be large enough
+   *  to hold all read elements.
+   */
+  virtual bool ParseRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer) = 0;
+
+  /**
    * Write a render buffer.
    * When the render buffer exhibits an iRenderBufferPersistence interface,
    * the render buffer data may not be stored inline in the document but in
@@ -383,6 +369,19 @@ struct iSyntaxService : public virtual iBase
    * return a filename.
    */
   virtual bool WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer) = 0;
+  
+  /**
+   * Read a render buffer from a data buffer. Usually the buffer comes from
+   * a persistent storage (e.g. disk). It must have been written with 
+   * StoreRenderBuffer().   
+   */
+  virtual csRef<iRenderBuffer> ReadRenderBuffer (iDataBuffer* buf) = 0;
+  
+  /**
+   * Store a render buffer to a data buffer. Usually this buffer is then 
+   * stored to a persistent storage (e.g. disk).
+   */
+  virtual csRef<iDataBuffer> StoreRenderBuffer (iRenderBuffer* rbuf) = 0;
   
   /**
    * Parse a node that is a reference to a shader. Those nodes look like 
@@ -398,24 +397,12 @@ struct iSyntaxService : public virtual iBase
       iDocumentNode* node) = 0;
 
   /**
-   * Parse a key definition. A iKeyValuePair instance is
-   * returned if successful.
+   * Parse a <tt>&lt;<i>shader</i>&gt;<tt> node (as found in shader XML files
+   * or possibly world files. 
    */
-  virtual csPtr<iKeyValuePair> ParseKey (iDocumentNode* node) = 0;
-  
-  /**
-   * Read a render buffer from a data buffer. Usually the buffer comes from
-   * a persistent storage (e.g. disk). It must have been written with 
-   * StoreRenderBuffer().   
-   */
-  virtual csRef<iRenderBuffer> ReadRenderBuffer (iDataBuffer* buf) = 0;
-  
-  /**
-   * Store a render buffer to a data buffer. Usually this buffer is then 
-   * stored to a persistent storage (e.g. disk).
-   */
-  virtual csRef<iDataBuffer> StoreRenderBuffer (iRenderBuffer* rbuf) = 0;
-  
+  virtual csRef<iShader> ParseShader (iLoaderContext* ldr_context,
+      iDocumentNode* node) = 0;
+
   /**
    * Handles a common portal parameter.
    * Returns false on failure. Returns false in 'handled' if it couldn't
@@ -432,18 +419,6 @@ struct iSyntaxService : public virtual iBase
     iDocumentNode* child, iLoaderContext* ldr_context,
     csRef<csRefCount>& parseState, CS::Utility::PortalParameters& params,
     bool& handled) = 0;
-
-  /**
-   * Parse a user render buffer.
-   */
-  virtual bool ParseRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer) = 0;
-
-  /**
-   * Parse a <tt>&lt;<i>shader</i>&gt;<tt> node (as found in shader XML files
-   * or possibly world files. 
-   */
-  virtual csRef<iShader> ParseShader (iLoaderContext* ldr_context,
-      iDocumentNode* node) = 0;
 
 };
 

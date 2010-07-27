@@ -158,8 +158,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
       // Put back the kinematic callback
       if (meshData.callback && meshData.rigidBody)
       {
-	csRef<iBulletRigidBody> bulletBody =
-	  scfQueryInterface<iBulletRigidBody> (meshData.rigidBody);
+	csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	  scfQueryInterface<CS::Physics::Bullet::iRigidBody> (meshData.rigidBody);
 	bulletBody->SetKinematicCallback (meshData.callback->callback);
       }
     }
@@ -177,15 +177,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
       iRigidBody* body = system->GetBody (bodyIndex);
 
       // Search the bullet interface of the rigid body
-      csRef<iBulletRigidBody> bulletBody =
-	scfQueryInterface<iBulletRigidBody> (body);
+      csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	scfQueryInterface<CS::Physics::Bullet::iRigidBody> (body);
 
       // Find the material to be used for this object
-      csBulletState state = CS_BULLET_STATE_DYNAMIC;
+      CS::Physics::Bullet::BodyState state =
+	CS::Physics::Bullet::STATE_DYNAMIC;
       if (bulletBody)
 	state = bulletBody->GetDynamicState ();
       else if (body->IsStatic ())
-	state = CS_BULLET_STATE_STATIC;
+	state = CS::Physics::Bullet::STATE_STATIC;
 
       iMaterialWrapper* material = materials[state];
       if (!material)
@@ -228,7 +229,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 	}
 
 	// If the body is kinematic then create a new kinematic callback
-	if (mesh && state == CS_BULLET_STATE_KINEMATIC)
+	if (mesh && state == CS::Physics::Bullet::STATE_KINEMATIC)
 	{
 	  meshData.callback.AttachNew
 	    (new BoneKinematicCallback (mesh, bulletBody->GetKinematicCallback ()));
@@ -248,9 +249,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
       iDynamicsSystemCollider* collider = system->GetCollider (colliderIndex);
 
       // Find the material to be used for this object
-      csBulletState state = CS_BULLET_STATE_DYNAMIC;
+      CS::Physics::Bullet::BodyState state =
+	CS::Physics::Bullet::STATE_DYNAMIC;
       if (collider->IsStatic ())
-	state = CS_BULLET_STATE_STATIC;
+	state = CS::Physics::Bullet::STATE_STATIC;
 
       iMaterialWrapper* material = materials[state];
       if (!material)
@@ -275,7 +277,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
     materials[1] = material;
   }
 
-  void DynamicsDebugger::SetBodyStateMaterial (csBulletState state,
+  void DynamicsDebugger::SetBodyStateMaterial (CS::Physics::Bullet::BodyState state,
 					       iMaterialWrapper* material)
   {
     materials[state] = material;
@@ -581,7 +583,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
   }
 
   BoneKinematicCallback::BoneKinematicCallback (iMeshWrapper* mesh,
-			   iBulletKinematicCallback* callback)
+			   CS::Physics::Bullet::iKinematicCallback* callback)
     : scfImplementationType (this), mesh (mesh), callback (callback)
   {
   }

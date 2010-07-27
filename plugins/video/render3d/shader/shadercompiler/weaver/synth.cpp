@@ -401,6 +401,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  "Could not get combiner from '%s'", comb->classId.GetData());
 	return false;
       }
+      combiner->SetDescription (synth->shaderName);
       combiners.Add (loader);
     }
     

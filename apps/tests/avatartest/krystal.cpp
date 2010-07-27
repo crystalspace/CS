@@ -29,16 +29,16 @@ KrystalScene::KrystalScene (AvatarTest* avatarTest)
   : avatarTest (avatarTest)
 {
   // Define the available keys
-  avatarTest->keyDescriptions.DeleteAll ();
-  avatarTest->keyDescriptions.Push ("arrow keys: move camera");
-  avatarTest->keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->hudHelper.keyDescriptions.DeleteAll ();
+  avatarTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
+  avatarTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
   if (avatarTest->physicsEnabled)
   {
-    avatarTest->keyDescriptions.Push ("d: display active colliders");
-    avatarTest->keyDescriptions.Push ("left mouse: kill Krystal");
+    avatarTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
+    avatarTest->hudHelper.keyDescriptions.Push ("left mouse: kill Krystal");
   }
-  avatarTest->keyDescriptions.Push ("r: reset scene");
-  avatarTest->keyDescriptions.Push ("n: switch to next scene");
+  avatarTest->hudHelper.keyDescriptions.Push ("r: reset scene");
+  avatarTest->hudHelper.keyDescriptions.Push ("n: switch to next scene");
 }
 
 KrystalScene::~KrystalScene ()
@@ -174,15 +174,15 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     if (krystalDead)
     {
       // Trace a physical beam to find if a rigid body was hit
-      csBulletHitBeamResult hitResult =
+      CS::Physics::Bullet::HitBeamResult hitResult =
 	avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
       if (hitResult.hasHit
-	  && hitResult.bodyType == CS_BULLET_RIGID_BODY)
+	  && hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
       {
 	// Apply a big force at the point clicked by the mouse
 	csVector3 force = endBeam - startBeam;
 	force.Normalize ();
-	hitResult.rigidBody->AddForceAtPos (hitResult.isect, force * 5.0f);
+	hitResult.body->QueryRigidBody ()->AddForceAtPos (hitResult.isect, force * 5.0f);
       }
 
       return true;
@@ -209,7 +209,7 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
 
     // Set the ragdoll state of the iBodyChain of the whole body as dynamic
     // (hairs are already in the good state)
-    ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_DYNAMIC);
+    ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_DYNAMIC);
 
     // Update the display of the dynamics debugger
     if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
@@ -218,25 +218,25 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
 
     // Fling the body a bit
     const csOrthoTransform& tc = avatarTest->view->GetCamera ()->GetTransform ();
-    uint boneCount = ragdollNode->GetBoneCount (CS_RAGDOLL_STATE_DYNAMIC);
+    uint boneCount = ragdollNode->GetBoneCount (CS::Animation::STATE_DYNAMIC);
     for (uint i = 0; i < boneCount; i++)
     {
-      BoneID boneID = ragdollNode->GetBone (CS_RAGDOLL_STATE_DYNAMIC, i);
+      BoneID boneID = ragdollNode->GetBone (CS::Animation::STATE_DYNAMIC, i);
       iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
       rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 0.1f));
     }
 
     // Trace a physical beam to find which rigid body was hit
-    csBulletHitBeamResult hitResult =
+    CS::Physics::Bullet::HitBeamResult hitResult =
       avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
     if (hitResult.hasHit
-	&& hitResult.bodyType == CS_BULLET_RIGID_BODY)
+	&& hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
     {
       // Apply a big force at the point clicked by the mouse
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
-      hitResult.rigidBody->AddForceAtPos (hitResult.isect, force * 5.0f);
-      hitResult.rigidBody->SetLinearVelocity (tc.GetT2O ()
+      hitResult.body->QueryRigidBody ()->AddForceAtPos (hitResult.isect, force * 5.0f);
+      hitResult.body->QueryRigidBody ()->SetLinearVelocity (tc.GetT2O ()
 					      * csVector3 (0.0f, 0.0f, 5.0f));
     }
 
@@ -393,7 +393,7 @@ bool KrystalScene::CreateAvatar ()
        animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
-    ragdollNodeFactory->AddBodyChain (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
+    ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
 
     if (avatarTest->softBodiesEnabled)
     {
@@ -520,7 +520,7 @@ void KrystalScene::ResetScene ()
     krystalDead = false;
 
     // Set the ragdoll state of the 'body' chain as kinematic
-    ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
+    ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_KINEMATIC);
 
     // Update the display of the dynamics debugger
     if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
@@ -536,5 +536,5 @@ void KrystalScene::ResetScene ()
 
 void KrystalScene::UpdateStateDescription ()
 {
-  avatarTest->stateDescriptions.DeleteAll ();
+  avatarTest->hudHelper.stateDescriptions.DeleteAll ();
 }

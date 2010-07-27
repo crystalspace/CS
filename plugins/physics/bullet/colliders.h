@@ -111,7 +111,7 @@ class HeightMapCollider
 {
  public:
   HeightMapCollider (csBulletDynamicsSystem* dynSys,
-		     BulletBody* csBody,
+		     iBody* csBody,
 		     csLockedHeightData gridData,
 		     int gridWidth, int gridHeight,
 		     csVector3 gridSize,
@@ -127,7 +127,7 @@ class HeightMapCollider
 };
 
 class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCellCollider,
-  iBulletTerrainCollider>, public BulletBody
+  iTerrainCollider>
 {
  public:
   csBulletTerrainCellCollider (csBulletDynamicsSystem* dynSys,
@@ -140,17 +140,38 @@ class csBulletTerrainCellCollider : public scfImplementation1<csBulletTerrainCel
 			       float minimumHeight, float maximumHeight);
   virtual ~csBulletTerrainCellCollider ();
 
+  //-- iBody
+  virtual CS::Physics::Bullet::BodyType GetType () const
+  { return bodyType; }
+  virtual ::iRigidBody* QueryRigidBody ()
+  { return 0; }
+  virtual CS::Physics::Bullet::iSoftBody* QuerySoftBody ()
+  { return 0; }
+  virtual CS::Physics::Bullet::iTerrainCollider* QueryTerrainCollider ()
+  { return this; }
+
  private:
+  CS::Physics::Bullet::BodyType bodyType;
   HeightMapCollider* collider;
 };
 
 class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollider,
-  iBulletTerrainCollider, iTerrainCellLoadCallback>, public BulletBody
+  iTerrainCollider, iTerrainCellLoadCallback>
 {
  public:
   csBulletTerrainCollider (csBulletDynamicsSystem* dynSys, iTerrainSystem* terrain,
 			   float minimumHeight, float maximumHeight);
   virtual ~csBulletTerrainCollider ();
+
+  //-- CS::Physics::Bullet::iBody
+  virtual CS::Physics::Bullet::BodyType GetType () const
+  { return bodyType; }
+  virtual ::iRigidBody* QueryRigidBody ()
+  { return 0; }
+  virtual CS::Physics::Bullet::iSoftBody* QuerySoftBody ()
+  { return 0; }
+  virtual CS::Physics::Bullet::iTerrainCollider* QueryTerrainCollider ()
+  { return this; }
 
   //-- iTerrainCellLoadCallback
   virtual void OnCellLoad (iTerrainCell *cell);
@@ -158,6 +179,8 @@ class csBulletTerrainCollider : public scfImplementation2<csBulletTerrainCollide
   virtual void OnCellUnload (iTerrainCell *cell);
 
  private:
+  CS::Physics::Bullet::BodyType bodyType;
+
   struct ColliderData
   {
     iTerrainCell* cell;

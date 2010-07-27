@@ -28,7 +28,7 @@
 #include "imesh/animesh.h"
 #include "imesh/ragdoll.h"
 
-class Simple : public csDemoApplication
+class Simple : public CS::Demo::DemoApplication
 {
 private:
   // Physics related
@@ -74,7 +74,7 @@ private:
 
   // Dragging related
   bool dragging;
-  csRef<iBulletPivotJoint> dragJoint;
+  csRef<CS::Physics::Bullet::iPivotJoint> dragJoint;
   float dragDistance;
   float linearDampening, angularDampening;
   int mouseX, mouseY;
