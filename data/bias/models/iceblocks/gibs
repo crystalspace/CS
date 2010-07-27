@@ -1,10 +1,18 @@
 <library>
 
   <plugins>
-    <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
-    <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
-n>
+    <plugin name='armaturefact'>crystalspace.mesh.loader.factory.armature</plugin>
+    <plugin name='genmesh'>crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name='genmeshfact'>crystalspace.mesh.loader.factory.genmesh</plugin>
   </plugins>
+  <shaders>
+    <shader>
+      <file>/shader/character/character_bump2.xml</file>
+    </shader>
+    <shader>
+      <file>/shader/character/character2.xml</file>
+    </shader>
+  </shaders>
   
   <textures>
     <texture name='icegibsice.png'>
@@ -23,8 +31,11 @@ n>
   
   
   <materials>
-    <material name='icegibs'>
+    <material name='icegibsice.png'>
       <texture>icegibsice.png</texture>
+      <shader type='depthwrite'>*null</shader>
+      <shader type='diffuse'>character_bump2</shader>
+      <shader type='ambient'>character2</shader>
       <shadervar type='texture' name='tex normal'>BUMPnormalmap.png</shadervar>
       <shadervar name="light 0 diffuse" type="vector4">0.9, 0.9, 1, 1</shadervar>
       <shadervar name="specular" type="vector4">0.9, 0.9, 1, 1</shadervar>
@@ -37,8 +48,7 @@ n>
     
   </materials>
   
-  <library>factories/skelArmature.001</library>
-  <library>factories/gibs</library>
+  <library>factories/gengibs</library>
   
   
     <meshfact name="gibs">
