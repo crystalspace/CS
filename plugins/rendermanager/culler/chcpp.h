@@ -33,47 +33,46 @@ class CHCList : public csList<T>
 public:
   CHCList() : n(0)
   {
-    csList<T>::csList();
   }
   typename csList<T>::Iterator PushFront(const T& elem)
   {
     ++n;
-    return csList::PushFront(elem);
+    return csList<T>::PushFront(elem);
   }
 
   typename csList<T>::Iterator PushBack(const T& elem)
   {
     ++n;
-    return csList::PushBack(elem);
+    return csList<T>::PushBack(elem);
   }
 
   bool PopFront()
   {
-    if(csList::IsEmpty()) return false;
+    if(csList<T>::IsEmpty()) return false;
     --n;
-    return csList::PopFront();
+    return csList<T>::PopFront();
   }
 
   bool PopBack()
   {
-    if(csList::IsEmpty()) return false;
+    if(csList<T>::IsEmpty()) return false;
     --n;
-    return csList::PopBack();
+    return csList<T>::PopBack();
   }
   
   bool IsEmpty()
   {
-    return csList::IsEmpty();
+    return csList<T>::IsEmpty();
   }
 
   T & Front()
   {
-    return csList::Front();
+    return csList<T>::Front();
   }
 
   T & Back()
   {
-    return csList::Back();
+    return csList<T>::Back();
   }
 
   int Size() const
@@ -83,7 +82,7 @@ public:
 
   bool Delete(const T& item)
   {
-    const bool rez=csList::Delete(item);
+    const bool rez=csList<T>::Delete(item);
     if(rez)
       n--;
     return rez;

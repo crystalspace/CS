@@ -359,12 +359,16 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
   {
     csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
     if (child1) 
-      CallVisibilityCallbacksForSubtree
-            (NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()), data, cur_timestamp);
+    {
+      NodeTraverseData ntd (child1, ntdNode.kdtNode, ntdNode.GetFrustumMask());
+      CallVisibilityCallbacksForSubtree (ntd, data, cur_timestamp);
+    }
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
     if (child2) 
-      CallVisibilityCallbacksForSubtree
-            (NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()), data, cur_timestamp);
+    {
+      NodeTraverseData ntd (child2, ntdNode.kdtNode, ntdNode.GetFrustumMask());
+      CallVisibilityCallbacksForSubtree (ntd, data, cur_timestamp);
+    }
   }
 }
 
