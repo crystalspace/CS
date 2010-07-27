@@ -59,7 +59,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   private:
     iObjectRegistry* object_reg;
-    csHash<csRef<iBulletSoftBody>, size_t > guideRopes;
+    csHash<csRef<CS::Physics::Bullet::iSoftBody>, size_t > guideRopes;
     csRef<iRigidBody> rigidBody;
     csRef<iBulletDynamicSystem> bulletDynamicSystem;
   };

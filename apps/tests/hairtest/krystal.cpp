@@ -29,12 +29,12 @@ KrystalScene::KrystalScene (HairTest* hairTest)
 : hairTest (hairTest)
 {
   // Define the available keys
-  hairTest->keyDescriptions.DeleteAll ();
-  hairTest->keyDescriptions.Push ("arrow keys: move camera");
-  hairTest->keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  hairTest->hudHelper.keyDescriptions.DeleteAll ();
+  hairTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
+  hairTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
   if (hairTest->physicsEnabled)
   {
-    hairTest->keyDescriptions.Push ("d: display active colliders");
+    hairTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
   }
 }
 
@@ -305,7 +305,7 @@ bool KrystalScene::CreateAvatar ()
       animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
-    ragdollNodeFactory->AddBodyChain (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
+    ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
 
     // Create the mesh of the skirt
     skirtMesh = hairTest->engine->CreateMeshWrapper
@@ -414,7 +414,7 @@ void KrystalScene::ResetScene ()
     krystalDead = false;
 
     // Set the ragdoll state of the 'body' chain as kinematic
-    ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
+    ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_KINEMATIC);
 
     // Update the display of the dynamics debugger
     if (hairTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
@@ -430,5 +430,5 @@ void KrystalScene::ResetScene ()
 
 void KrystalScene::UpdateStateDescription ()
 {
-  hairTest->stateDescriptions.DeleteAll ();
+  hairTest->hudHelper.stateDescriptions.DeleteAll ();
 }

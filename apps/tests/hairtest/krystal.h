@@ -59,8 +59,8 @@ private:
   // Krystal's hairs & skirt (soft bodies)
   csRef<iMeshWrapper> hairsMesh;
   csRef<iMeshWrapper> skirtMesh;
-  csRef<iBulletSoftBody> hairsBody;
-  csRef<iBulletSoftBody> skirtBody;
+  csRef<CS::Physics::Bullet::iSoftBody> hairsBody;
+  csRef<CS::Physics::Bullet::iSoftBody> skirtBody;
 };
 
 #endif // __KRYSTAL_H__

@@ -75,7 +75,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csVector3 first = coordinates[0];
     csVector3 last = coordinates[coordinatesCount - 1];
 
-    iBulletSoftBody* bulletBody = bulletDynamicSystem->
+    CS::Physics::Bullet::iSoftBody* bulletBody = bulletDynamicSystem->
       CreateRope(first, first + csVector3(0, 1, 0) * (last - first).Norm() , 
       coordinatesCount - 1);	//	replace with -1
     bulletBody->SetMass (0.1f);
@@ -89,7 +89,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void HairPhysicsControl::AnimateStrand (size_t strandID, csVector3* 
     coordinates, size_t coordinatesCount)
   {
-    csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
+    csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get (strandID, 0);
 
     if(!bulletBody)
       return;
@@ -117,7 +117,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void HairPhysicsControl::RemoveStrand (size_t strandID)
   {
-    csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
+    csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get (strandID, 0);
     if(!bulletBody)
       return;
 

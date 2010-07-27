@@ -29,19 +29,43 @@
 #include "krystal.h"
 
 HairTest::HairTest ()
-: csDemoApplication ("CrystalSpace.HairTest", "hairtest",
+: DemoApplication ("CrystalSpace.HairTest", "hairtest",
                      "hairtest <OPTIONS>",
                      "Tests on the animation of objects iAnimatedMesh."),
                      avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // We manage the camera by ourselves
-  SetCameraMode (CSDEMO_CAMERA_NONE);
-  SetGUIDisplayed(false);
+  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
+  SetHUDDisplayed(false);
 }
 
 HairTest::~HairTest ()
 {
   delete avatarScene;
+}
+
+csVector3 HairTest::GetCameraStart ()
+{
+  if (avatarScene)
+    return avatarScene->GetCameraStart ();
+
+  return csVector3 (0.0f);
+}
+
+csVector3 HairTest::GetCameraTarget ()
+{
+  if (avatarScene)
+    return avatarScene->GetCameraTarget ();
+
+  return csVector3 (0.0f);
+}
+
+float HairTest::GetCameraMinimumDistance ()
+{
+  if (avatarScene)
+    return avatarScene->GetCameraMinimumDistance ();
+
+  return 0.1f;
 }
 
 void HairTest::Frame ()
@@ -55,65 +79,6 @@ void HairTest::Frame ()
   // Rotate by angle
   const float angle = 4 * speed;
 
-  // Compute camera and animesh position
-  iCamera* camera = view->GetCamera ();
-  csVector3 cameraPosition = camera->GetTransform ().GetOrigin ();
-  csVector3 cameraTarget = avatarScene->GetCameraTarget ();
-  float minimumDistance = avatarScene->GetCameraMinimumDistance ();
-
-  float radius = sqrt ( ( cameraTarget.x - cameraPosition.x ) * ( cameraTarget.x - cameraPosition.x ) + 
-    ( cameraTarget.y - cameraPosition.y ) * ( cameraTarget.y - cameraPosition.y ) + 
-    ( cameraTarget.z - cameraPosition.z ) * ( cameraTarget.z - cameraPosition.z ));
-  float lateral = sin(angle) * radius;
-  float straight = cos(angle) * radius;
-
-  // Move camera
-  if (kbd->GetKeyState (CSKEY_SHIFT))
-  {
-    // If the user is holding down shift, the Up/Down arrow keys will cause
-    // the camera to go forwards and backwards (forward only allowed if camera 
-    // not too close). Left/Right arrows work also when shift is hold.
-    if (kbd->GetKeyState (CSKEY_UP)
-      && (cameraPosition - cameraTarget).Norm () > minimumDistance)
-      camera->Move (CS_VEC_FORWARD * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_DOWN))
-      camera->Move (CS_VEC_BACKWARD * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-      camera->Move (CS_VEC_RIGHT * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_LEFT))
-      camera->Move (CS_VEC_LEFT * 4 * speed);
-  }
-  else
-  {
-    // Left and right arrows cause the camera to strafe on the X axis; up and 
-    // down arrows cause the camera to strafe on the Y axis
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-    {
-      camera ->GetTransform().SetOrigin(csVector3(cameraTarget));
-      camera ->Move(CS_VEC_BACKWARD * straight);
-      camera ->Move(CS_VEC_RIGHT * lateral);
-    }
-    if (kbd->GetKeyState (CSKEY_LEFT))
-    {
-      camera ->GetTransform().SetOrigin(csVector3(cameraTarget));
-      camera ->Move(CS_VEC_BACKWARD * straight);
-      camera ->Move(CS_VEC_LEFT * lateral);
-    }
-    // Avoid gimbal lock of camera
-    cameraPosition.Normalize ();
-    float cameraDot = cameraPosition * csVector3 (0.0f, 1.0f, 0.0f);
-    if (kbd->GetKeyState (CSKEY_UP)
-      && cameraDot < 0.98f)
-      camera->Move (CS_VEC_UP * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_DOWN)
-      && cameraDot > -0.98f)
-      camera->Move (CS_VEC_DOWN * 4 * speed);
-  }
-
-  // Make the camera look at the animesh
-  camera->GetTransform ().LookAt (cameraTarget - camera->GetTransform ().GetOrigin (),
-    csVector3 (0.0f, 1.0f, 0.0f) );
-
   // Step the dynamic simulation (we slow down artificially the simulation in
   // order to achieve a 'slow motion' effect)
   if (physicsEnabled)
@@ -123,7 +88,7 @@ void HairTest::Frame ()
   avatarScene->UpdateStateDescription ();
 
   // Default behavior from csDemoApplication
-  csDemoApplication::Frame ();
+  DemoApplication::Frame ();
 
   // Display the Bullet debug information
   if (avatarScene->HasPhysicalObjects ()
@@ -329,7 +294,7 @@ void HairTest::SwitchDynamics()
 bool HairTest::OnKeyboard (iEvent &ev)
 {
   // Default behavior from csDemoApplication
-  csDemoApplication::OnKeyboard (ev);
+  DemoApplication::OnKeyboard (ev);
 
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
@@ -342,6 +307,14 @@ bool HairTest::OnKeyboard (iEvent &ev)
       return true;
     }
   }
+  return false;
+}
+
+bool HairTest::OnMouseDown (iEvent& ev)
+{
+  // Default behavior from csDemoApplication
+  if (DemoApplication::OnMouseDown (ev))
+    return true;
 
   return false;
 }
@@ -349,7 +322,7 @@ bool HairTest::OnKeyboard (iEvent &ev)
 bool HairTest::OnInitialize (int argc, char* argv[])
 {
   // Default behavior from csDemoApplication
-  if (!csDemoApplication::OnInitialize (argc, argv))
+  if (!DemoApplication::OnInitialize (argc, argv))
     return false;
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
@@ -431,7 +404,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
 bool HairTest::Application ()
 {
   // Default behavior from csDemoApplication
-  if (!csDemoApplication::Application ())
+  if (!DemoApplication::Application ())
     return false;
 
   // Find references to the plugins of the animation nodes
@@ -482,7 +455,7 @@ bool HairTest::Application ()
     CEGUI::Event::Subscriber(&HairTest::OnCollidersButtonClicked, this));
 
   // Default behavior from csDemoApplication for the creation of the scene
-  if (!csDemoApplication::CreateRoom ())
+  if (!DemoApplication::CreateRoom ())
     return false;
 
   // Create the dynamic system
@@ -635,7 +608,7 @@ bool HairTest::Application ()
     CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedOverallLOD, this)); 
 
   // Initialize camera position
-  view->GetCamera ()->GetTransform ().SetOrigin (avatarScene->GetCameraStart ());
+  cameraHelper.ResetCamera ();
 
   // Run the application
   Run();

@@ -74,7 +74,7 @@ public:
 
 };
 
-class HairTest : public csDemoApplication
+class HairTest : public CS::Demo::DemoApplication
 {
   friend class KrystalScene;
 
@@ -116,9 +116,16 @@ private:
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
+  bool OnMouseDown (iEvent &event);
 
   // Switch Active Colliders displayed
   void SwitchDynamics();
+
+  //-- csDemoApplication
+  csVector3 GetCameraStart ();
+  float GetCameraMinimumDistance ();
+  csVector3 GetCameraTarget ();
+
 public:
   HairTest ();
   ~HairTest ();
