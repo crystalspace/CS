@@ -101,7 +101,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices,
+  CS::Mesh::iAnimatedMeshSubMeshFactory* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices,
     const char* name, bool visible)
   {
     csRef<FactorySubmesh> newSubmesh;
@@ -114,7 +114,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return newSubmesh;
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (
+  CS::Mesh::iAnimatedMeshSubMeshFactory* AnimeshObjectFactory::CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
     const csArray<csArray<unsigned int> >& boneIndices,
     const char* name,
@@ -143,7 +143,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return newSubmesh;
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::GetSubMesh (size_t index) const
+  CS::Mesh::iAnimatedMeshSubMeshFactory* AnimeshObjectFactory::GetSubMesh (size_t index) const
   {
     CS_ASSERT (index < submeshes.GetSize ());
     return submeshes[index];
@@ -171,7 +171,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return submeshes.GetSize ();
   }
 
-  void AnimeshObjectFactory::DeleteSubMesh (iAnimatedMeshFactorySubMesh* mesh)
+  void AnimeshObjectFactory::DeleteSubMesh (CS::Mesh::iAnimatedMeshSubMeshFactory* mesh)
   {
     submeshes.Delete (static_cast<FactorySubmesh*> (mesh));
     Invalidate ();
@@ -382,12 +382,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return 4;
   }
 
-  csAnimatedMeshBoneInfluence* AnimeshObjectFactory::GetBoneInfluences ()
+  CS::Mesh::csAnimatedMeshBoneInfluence* AnimeshObjectFactory::GetBoneInfluences ()
   {
     return boneInfluences.GetArray ();
   }
 
-  iAnimatedMeshMorphTarget* AnimeshObjectFactory::CreateMorphTarget (
+  CS::Mesh::iAnimatedMeshMorphTarget* AnimeshObjectFactory::CreateMorphTarget (
     const char* name)
   {
     csRef<MorphTarget> newTarget;
@@ -397,7 +397,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return newTarget;
   }
 
-  iAnimatedMeshMorphTarget* AnimeshObjectFactory::GetMorphTarget (uint target)
+  CS::Mesh::iAnimatedMeshMorphTarget* AnimeshObjectFactory::GetMorphTarget (uint target)
   {
     CS_ASSERT (target < morphTargets.GetSize ());
     return morphTargets[target];
@@ -433,7 +433,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return sockets.GetSize ();
   }
 
-  iAnimatedMeshSocketFactory* AnimeshObjectFactory::GetSocket (size_t index) const
+  CS::Mesh::iAnimatedMeshSocketFactory* AnimeshObjectFactory::GetSocket (size_t index) const
   {
     CS_ASSERT (index < sockets.GetSize ());
     return sockets[index];
@@ -555,7 +555,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     this->bone = bone;
   }
 
-  iAnimatedMeshFactory* FactorySocket::GetFactory ()
+  CS::Mesh::iAnimatedMeshFactory* FactorySocket::GetFactory ()
   {
     return factory;
   }
@@ -597,7 +597,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return skeleton;
   }
 
-  iAnimatedMeshSubMesh* AnimeshObject::GetSubMesh (size_t index) const
+  CS::Mesh::iAnimatedMeshSubMesh* AnimeshObject::GetSubMesh (size_t index) const
   {
     CS_ASSERT (index < submeshes.GetSize ());
     return submeshes[index];
@@ -636,7 +636,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return sockets.GetSize ();
   }
 
-  iAnimatedMeshSocket* AnimeshObject::GetSocket (size_t index) const
+  CS::Mesh::iAnimatedMeshSocket* AnimeshObject::GetSocket (size_t index) const
   {
     CS_ASSERT (index < sockets.GetSize ());
     return sockets[index];
@@ -1254,7 +1254,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return factorySocket->GetName ();
   }
 
-  iAnimatedMeshSocketFactory* AnimeshObject::Socket::GetFactory ()
+  CS::Mesh::iAnimatedMeshSocketFactory* AnimeshObject::Socket::GetFactory ()
   {
     return factorySocket;
   }
@@ -1279,7 +1279,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return bone;
   }
 
-  iAnimatedMesh* AnimeshObject::Socket::GetMesh () const
+  CS::Mesh::iAnimatedMesh* AnimeshObject::Socket::GetMesh () const
   {
     return object;
   }

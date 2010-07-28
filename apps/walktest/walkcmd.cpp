@@ -1621,7 +1621,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       csRef<iMeshWrapper> sprite = Sys->Engine->CreateMeshWrapper (meshfact, "Frankie",
 	    Sys->views->GetCamera ()->GetSector (),
 	    Sys->views->GetCamera ()->GetTransform ().GetOrigin ());
-      csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (sprite->GetMeshObject ());
+      csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (sprite->GetMeshObject ());
       iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
       csRef<iSkeletonAnimNode2> anim;
        
@@ -1975,7 +1975,8 @@ bool CommandHandler (const char *cmd, const char *arg)
 
     // Get the data
     csRef<iMeshWrapper> mesh = Sys->Engine->FindMeshObject (meshName);   
-    csRef<iAnimatedMesh> animesh = scfQueryInterfaceSafe<iAnimatedMesh> (mesh->GetMeshObject ());
+    csRef<CS::Mesh::iAnimatedMesh> animesh =
+      scfQueryInterfaceSafe<CS::Mesh::iAnimatedMesh> (mesh->GetMeshObject ());
     
     if (!animesh)
       return true;

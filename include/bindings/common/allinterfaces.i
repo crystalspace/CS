@@ -62,11 +62,13 @@
 %enddef
 
 %define IMESH_APPLY_FOR_EACH_INTERFACE
-  INTERFACE_APPLY(iAnimatedMeshFactory)
-  INTERFACE_APPLY(iAnimatedMeshFactorySubMesh)
-  INTERFACE_APPLY(iAnimatedMesh)
-  INTERFACE_APPLY(iAnimatedMeshSubMesh)
-  INTERFACE_APPLY(iAnimatedMeshMorphTarget)
+  INTERFACE_APPLY(CS::Mesh::iAnimatedMeshFactory)
+  INTERFACE_APPLY(CS::Mesh::iAnimatedMeshSubMeshFactory)
+  INTERFACE_APPLY(CS::Mesh::iAnimatedMesh)
+  INTERFACE_APPLY(CS::Mesh::iAnimatedMeshSubMesh)
+  INTERFACE_APPLY(CS::Mesh::iAnimatedMeshMorphTarget)
+  INTERFACE_APPLY(CS::Mesh::iAnimatedMeshSocket)
+  INTERFACE_APPLY(CS::Mesh::iAnimatedMeshSocketFactory)
   INTERFACE_APPLY(iGeneralFactoryState)
   INTERFACE_APPLY(iGeneralMeshState)
   INTERFACE_APPLY(iParticleEmitter)

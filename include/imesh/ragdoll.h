@@ -32,7 +32,16 @@
 /**\addtogroup meshplugins
  * @{ */
 
+namespace CS
+{
+namespace Mesh
+{
+
 struct iAnimatedMesh;
+
+} // namespace Mesh
+} // namespace CS
+
 struct iSkeletonRagdollNodeFactory2;
 
 /**
@@ -139,7 +148,7 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
   /**
    * Set the animated mesh associated with this animation node.
    */
-  virtual void SetAnimatedMesh (iAnimatedMesh* mesh) = 0;
+  virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* mesh) = 0;
 
   /**
    * Set the body chain in the specified physical state.

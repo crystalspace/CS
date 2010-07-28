@@ -34,10 +34,20 @@
 
 struct iSkeletonLookAtNodeFactory2;
 struct iBodySkeleton;
-struct iAnimatedMesh;
 struct iMovable;
 struct iCamera;
 struct iSkeletonLookAtListener2;
+
+namespace CS
+{
+namespace Mesh
+{
+
+  struct iAnimatedMesh;
+
+} // namespace Mesh
+} // namespace CS
+
 
 /**
  * A class to manage the creation and deletion of 'LookAt' animation 
@@ -115,7 +125,7 @@ struct iSkeletonLookAtNode2 : public iSkeletonAnimNode2
   /**
    * Set the animated mesh associated with this animation node.
    */
-  virtual void SetAnimatedMesh (iAnimatedMesh* mesh) = 0;
+  virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* mesh) = 0;
 
   /**
    * Set the bone controlled by this controller.

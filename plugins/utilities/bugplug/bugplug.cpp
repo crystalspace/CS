@@ -1818,7 +1818,7 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
       {
         int bone_color = G3D->GetDriver2D ()->FindRGB (255, 0, 255);
 
-        csRef<iAnimatedMesh> aniMesh = scfQueryInterfaceSafe<iAnimatedMesh> (
+        csRef<CS::Mesh::iAnimatedMesh> aniMesh = scfQueryInterfaceSafe<CS::Mesh::iAnimatedMesh> (
           selected_meshes[k]->GetMeshObject ());
         if (!aniMesh)
           continue;

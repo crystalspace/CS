@@ -25,15 +25,24 @@
 
 #include "assetbase.h"
 
+namespace CS
+{
+namespace Mesh
+{
+
 struct iAnimatedMesh;
 struct iAnimatedMeshFactory;
+
+} // namespace Mesh
+} // namespace CS
+
 struct iSkeletonAnimNode2;
 
 class AnimeshAsset : public AssetBase
 {
 private:
-  csRef<iAnimatedMesh> animeshstate;
-  csRef<iAnimatedMeshFactory> animeshsprite;
+  csRef<CS::Mesh::iAnimatedMesh> animeshstate;
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshsprite;
   bool reverseAction;
 
 private:

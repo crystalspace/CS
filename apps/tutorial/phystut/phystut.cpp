@@ -1559,7 +1559,8 @@ void Simple::LoadRagdoll ()
   if (!meshfact)
     return;
 
-  csRef<iAnimatedMeshFactory> animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory =
+    scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
   if (!animeshFactory)
   {
@@ -1617,11 +1618,12 @@ void Simple::SpawnRagdoll ()
   // Create animesh
   ragdollMesh = engine->CreateMeshWrapper (meshfact, "Frankie",
 					   room, csVector3 (0, -4, 0));
-  csRef<iAnimatedMesh> animesh =
-    scfQueryInterface<iAnimatedMesh> (ragdollMesh->GetMeshObject ());
+  csRef<CS::Mesh::iAnimatedMesh> animesh =
+    scfQueryInterface<CS::Mesh::iAnimatedMesh> (ragdollMesh->GetMeshObject ());
 
   // Close the eyes of Frankie as he is dead
-  csRef<iAnimatedMeshFactory> animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory =
+    scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
 
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);

@@ -177,7 +177,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   {
   }
 
-  void LookAtAnimNode::SetAnimatedMesh (iAnimatedMesh* mesh)
+  void LookAtAnimNode::SetAnimatedMesh (CS::Mesh::iAnimatedMesh* mesh)
   {
     CS_ASSERT (mesh);
     csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (mesh);

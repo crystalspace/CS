@@ -66,8 +66,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
     // Create a factory
     csRef<iMeshObjectFactory> fact = type->NewFactory ();
-    csRef<iAnimatedMeshFactory> amfact = 
-      scfQueryInterfaceSafe<iAnimatedMeshFactory> (fact);
+    csRef<CS::Mesh::iAnimatedMeshFactory> amfact = 
+      scfQueryInterfaceSafe<CS::Mesh::iAnimatedMeshFactory> (fact);
 
     if (!amfact)
     {
@@ -182,7 +182,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           int numVerts = amfact->GetVertexCount ();
           int currInfl = 0;
 
-          csAnimatedMeshBoneInfluence* bi = amfact->GetBoneInfluences ();
+          CS::Mesh::csAnimatedMeshBoneInfluence* bi = amfact->GetBoneInfluences ();
 
           csRef<iDocumentNodeIterator> it = child->GetNodes ();
           while (it->HasNext ())
@@ -260,7 +260,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
           if (indexBuffer)
           {
-            iAnimatedMeshFactorySubMesh* smf = amfact->CreateSubMesh (indexBuffer,
+            CS::Mesh::iAnimatedMeshSubMeshFactory* smf = amfact->CreateSubMesh (indexBuffer,
               child->GetAttributeValue("name"), child->GetAttributeValueAsBool("visible", true));
             smf->SetMaterial(material);
           }
@@ -336,7 +336,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
   }
 
   bool AnimeshFactoryLoader::ParseMorphTarget (iDocumentNode* child,
-					       iAnimatedMeshFactory* amfact)
+					       CS::Mesh::iAnimatedMeshFactory* amfact)
   {
     const char* name = child->GetAttributeValue ("name");
 
@@ -367,7 +367,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       }
     }
 
-    iAnimatedMeshMorphTarget* morphTarget = amfact->CreateMorphTarget (name);
+    CS::Mesh::iAnimatedMeshMorphTarget* morphTarget = amfact->CreateMorphTarget (name);
     morphTarget->SetVertexOffsets (offsetsBuffer);
     morphTarget->Invalidate();
     return true;
@@ -414,7 +414,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     static const char* msgid = "crystalspace.animeshloader";
 
     csRef<iMeshObject> mesh;
-    csRef<iAnimatedMesh> ammesh;
+    csRef<CS::Mesh::iAnimatedMesh> ammesh;
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
@@ -437,8 +437,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
             return 0;
           }
 
-          csRef<iAnimatedMeshFactory> amfact = 
-            scfQueryInterface<iAnimatedMeshFactory> (fact->GetMeshObjectFactory ());
+          csRef<CS::Mesh::iAnimatedMeshFactory> amfact = 
+            scfQueryInterface<CS::Mesh::iAnimatedMeshFactory> (fact->GetMeshObjectFactory ());
           if (!amfact)
           {
             synldr->ReportError (msgid, child, 
@@ -447,7 +447,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           }
 
           mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          ammesh = scfQueryInterface<iAnimatedMesh> (mesh);
+          ammesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (mesh);
           if (!ammesh)
           {
             synldr->ReportError (msgid, child, 

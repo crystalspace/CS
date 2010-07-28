@@ -32,15 +32,15 @@
 
 bool AnimeshAsset::Support(iMeshWrapper* mesh)
 {
-  csRef<iAnimatedMesh> x = scfQueryInterface<iAnimatedMesh> (mesh->GetMeshObject());
+  csRef<CS::Mesh::iAnimatedMesh> x = scfQueryInterface<CS::Mesh::iAnimatedMesh> (mesh->GetMeshObject());
   return x.IsValid();
 }
 
 AnimeshAsset::AnimeshAsset(iObjectRegistry* obj_reg, iMeshWrapper* mesh)
   : AssetBase(obj_reg, mesh), reverseAction (false)
 {
-  animeshstate = scfQueryInterface<iAnimatedMesh> (mesh->GetMeshObject());
-  animeshsprite = scfQueryInterface<iAnimatedMeshFactory> (mesh->GetFactory()->GetMeshObjectFactory());
+  animeshstate = scfQueryInterface<CS::Mesh::iAnimatedMesh> (mesh->GetMeshObject());
+  animeshsprite = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory> (mesh->GetFactory()->GetMeshObjectFactory());
 
   // create a new animation tree
   iSkeletonAnimPacketFactory2* packetFactory = animeshsprite->GetSkeletonFactory()->GetAnimationPacket();
@@ -169,7 +169,7 @@ csPtr<iStringArray> AnimeshAsset::GetSockets()
   scfStringArray* arr = new scfStringArray;
   for (uint i = 0; i < animeshsprite->GetSocketCount(); i++)
   {
-    iAnimatedMeshSocketFactory* v = animeshsprite->GetSocket(i);
+    CS::Mesh::iAnimatedMeshSocketFactory* v = animeshsprite->GetSocket(i);
     if (!v) continue;
 
     csString s = v->GetName();
@@ -181,7 +181,7 @@ csPtr<iStringArray> AnimeshAsset::GetSockets()
 
 bool AnimeshAsset::AttachMesh(const char* socketName, iMeshWrapper* mesh)
 {
-  iAnimatedMeshSocket* sock = animeshstate->GetSocket(animeshsprite->FindSocket(socketName));
+  CS::Mesh::iAnimatedMeshSocket* sock = animeshstate->GetSocket(animeshsprite->FindSocket(socketName));
   if (!sock) return false;
 
   if (mesh)
@@ -223,7 +223,7 @@ SocketDescriptor AnimeshAsset::GetSocketTransform(const char* socketName)
 
   uint sockf = animeshsprite->FindSocket(socketName);
   if (sockf == (uint)~0) return desc;
-  iAnimatedMeshSocket* sock = animeshstate->GetSocket(sockf);
+  CS::Mesh::iAnimatedMeshSocket* sock = animeshstate->GetSocket(sockf);
   if (!sock) return desc;
 
   csString str;
@@ -246,7 +246,7 @@ bool AnimeshAsset::SetSocketTransform(const char* socketName, const SocketDescri
 {
   uint sockf = animeshsprite->FindSocket(socketName);
   if (sockf == (uint)~0) return false;
-  iAnimatedMeshSocket* sock = animeshstate->GetSocket(sockf);
+  CS::Mesh::iAnimatedMeshSocket* sock = animeshstate->GetSocket(sockf);
   if (!sock) return false;
 
   sock->GetFactory()->SetName(desc.find("Name")->second.second.c_str());
@@ -284,7 +284,7 @@ bool AnimeshAsset::DetachAll()
 {
   for (size_t i = 0; i < animeshsprite->GetSocketCount(); i++)
   {
-    iAnimatedMeshSocketFactory* v = animeshsprite->GetSocket(i);
+    CS::Mesh::iAnimatedMeshSocketFactory* v = animeshsprite->GetSocket(i);
     if (!v) continue;
 
     AttachMesh(v->GetName(), 0);
@@ -305,7 +305,7 @@ csPtr<iStringArray> AnimeshAsset::GetSubMeshes()
   scfStringArray* arr = new scfStringArray;
   for (uint i = 0; i < animeshsprite->GetSubMeshCount(); i++)
   {
-    iAnimatedMeshFactorySubMesh* v = animeshsprite->GetSubMesh(i);
+    CS::Mesh::iAnimatedMeshSubMeshFactory* v = animeshsprite->GetSubMesh(i);
     if (!v) continue;
 
     csString s = v->GetName();
@@ -349,7 +349,7 @@ csPtr<iStringArray> AnimeshAsset::GetMorphTargets()
   scfStringArray* arr = new scfStringArray;
   for (uint i = 0; i < animeshsprite->GetMorphTargetCount(); i++)
   {
-    iAnimatedMeshMorphTarget* v = animeshsprite->GetMorphTarget(i);
+    CS::Mesh::iAnimatedMeshMorphTarget* v = animeshsprite->GetMorphTarget(i);
     if (!v) continue;
 
     csString s = v->GetName();

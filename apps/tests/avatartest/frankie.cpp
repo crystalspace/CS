@@ -271,8 +271,8 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     if (!sectorResult.mesh)
       return false;
 
-    csRef<iAnimatedMesh> animesh =
-      scfQueryInterface<iAnimatedMesh> (sectorResult.mesh->GetMeshObject ());
+    csRef<CS::Mesh::iAnimatedMesh> animesh =
+      scfQueryInterface<CS::Mesh::iAnimatedMesh> (sectorResult.mesh->GetMeshObject ());
     if (!animesh)
       return false;
 
@@ -339,7 +339,7 @@ bool FrankieScene::CreateAvatar ()
   if (!meshfact)
     return avatarTest->ReportError ("Can't find Frankie's mesh factory!");
 
-  animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  animeshFactory = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
   if (!animeshFactory)
     return avatarTest->ReportError ("Can't find Frankie's animesh factory!");
@@ -472,7 +472,7 @@ bool FrankieScene::CreateAvatar ()
   csRef<iMeshWrapper> avatarMesh =
     avatarTest->engine->CreateMeshWrapper (meshfact, "Frankie",
 					   avatarTest->room, csVector3 (0.0f));
-  animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
+  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
   // When the animated mesh is created, the animation nodes are created too.
   // We can therefore set them up now.

@@ -220,7 +220,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       CreateBoneData (chainNode->GetChild (i), state);
   }
 
-  void RagdollAnimNode::SetAnimatedMesh (iAnimatedMesh* mesh)
+  void RagdollAnimNode::SetAnimatedMesh (CS::Mesh::iAnimatedMesh* mesh)
   {
     csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (mesh);
     sceneNode = animeshObject->GetMeshWrapper ()->QuerySceneNode ();

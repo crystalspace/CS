@@ -215,13 +215,13 @@ bool Demo::OnKeyboard(iEvent& ev)
       if (do_freelook)
       {
         cegui->EnableMouseCapture();
-        //cegui->GetMouseCursorPtr()->show(); TODO: Why doesn't this work?
+        cegui->GetMouseCursorPtr()->show(); //TODO: Why doesn't this work?
         do_freelook = false;
       }
       else
       {
         cegui->DisableMouseCapture();
-        //cegui->GetMouseCursorPtr()->hide(); TODO: Why doesn't this work?
+        cegui->GetMouseCursorPtr()->hide(); //TODO: Why doesn't this work?
         do_freelook = true;
       }
     }

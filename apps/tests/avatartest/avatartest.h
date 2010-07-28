@@ -66,8 +66,8 @@ class AvatarScene
   virtual void UpdateStateDescription () = 0;
 
   // Animesh objects
-  csRef<iAnimatedMeshFactory> animeshFactory;
-  csRef<iAnimatedMesh> animesh;
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory;
+  csRef<CS::Mesh::iAnimatedMesh> animesh;
 };
 
 class AvatarTest : public CS::Demo::DemoApplication

@@ -266,7 +266,7 @@ bool SintelScene::CreateAvatar ()
   if (!meshFact)
     return avatarTest->ReportError ("Can't find Sintel's mesh factory!");
 
-  animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  animeshFactory = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshFact->GetMeshObjectFactory ());
   if (!animeshFactory)
     return avatarTest->ReportError ("Can't find Sintel's animesh factory!");
@@ -459,7 +459,7 @@ bool SintelScene::CreateAvatar ()
   csRef<iMeshWrapper> avatarMesh =
     avatarTest->engine->CreateMeshWrapper (meshFact, "sintel",
 					   avatarTest->room, csVector3 (0.0f));
-  animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
+  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
   // Create the hairs
   hairsMesh = avatarTest->engine->CreateMeshWrapper (hairsMeshfact, "sintel_hairs",

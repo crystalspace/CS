@@ -194,8 +194,8 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     if (!sectorResult.mesh)
       return false;
 
-    csRef<iAnimatedMesh> animesh =
-      scfQueryInterface<iAnimatedMesh> (sectorResult.mesh->GetMeshObject ());
+    csRef<CS::Mesh::iAnimatedMesh> animesh =
+      scfQueryInterface<CS::Mesh::iAnimatedMesh> (sectorResult.mesh->GetMeshObject ());
     if (!animesh)
       return false;
 
@@ -260,7 +260,7 @@ bool KrystalScene::CreateAvatar ()
   if (!meshfact)
     return avatarTest->ReportError ("Can't find Krystal's mesh factory!");
 
-  animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  animeshFactory = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
   if (!animeshFactory)
     return avatarTest->ReportError ("Can't find Krystal's animesh factory!");
@@ -446,7 +446,7 @@ bool KrystalScene::CreateAvatar ()
   csRef<iMeshWrapper> avatarMesh =
     avatarTest->engine->CreateMeshWrapper (meshfact, "krystal",
 					   avatarTest->room, csVector3 (0.0f));
-  animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
+  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
   // When the animated mesh is created, the animation nodes are created too.
   // We can therefore set them up now.

@@ -32,7 +32,7 @@
  * @{ */
 
 struct iSkeletonSpeedNodeFactory2;
-struct iAnimatedMesh;
+//struct iAnimatedMesh;
 
 /**
  * A class to manage the creation and deletion of basic animation 

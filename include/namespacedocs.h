@@ -66,7 +66,7 @@ namespace CS
   {}
 
   /**
-   * Geometry and mesh related classes.
+   * Geometry and mesh tools related classes.
    */
   namespace Geometry
   {}
@@ -87,6 +87,12 @@ namespace CS
    * Memory allocation
    */
   namespace Memory
+  {}
+
+  /**
+   * Meshes
+   */
+  namespace Mesh
   {}
 
   /**

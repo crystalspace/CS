@@ -43,7 +43,7 @@ Player::Player(iObjectRegistry* obj_reg) : Entity(obj_reg)
   {
     weapon->attackAnimation = "shoot";
 
-    csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (weapon->mesh->GetMeshObject ());
+    csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (weapon->mesh->GetMeshObject ());
     if (animesh)
     {
       // Start the root animation node
