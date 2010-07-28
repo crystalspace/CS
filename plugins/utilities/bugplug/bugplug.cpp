@@ -1823,28 +1823,28 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
         if (!aniMesh)
           continue;
 
-        iSkeleton2* skeleton = aniMesh->GetSkeleton ();
+	CS::Animation::iSkeleton2* skeleton = aniMesh->GetSkeleton ();
         if (!skeleton)
           continue;
 
 
-        iSkeletonFactory2* fact = skeleton->GetFactory ();
+        CS::Animation::iSkeletonFactory2* fact = skeleton->GetFactory ();
 
         // Setup the "end" positions of all bones
-        const BoneID lastId = fact->GetTopBoneID ();
+        const CS::Animation::BoneID lastId = fact->GetTopBoneID ();
         csArray<csVector3> childPos;
         csArray<int> numChild;
 
         childPos.SetSize (lastId+1, csVector3 (0));
         numChild.SetSize (lastId+1, 0);
 
-        for (BoneID i = 0; i < lastId+1; ++i)
+        for (CS::Animation::BoneID i = 0; i < lastId+1; ++i)
         {
           if (!fact->HasBone (i))
             continue;
 
-          BoneID parent = fact->GetBoneParent (i);
-          if (parent != InvalidBoneID)
+          CS::Animation::BoneID parent = fact->GetBoneParent (i);
+          if (parent != CS::Animation::InvalidBoneID)
           {
             csQuaternion q;
             csVector3 v;
@@ -1856,7 +1856,7 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
         }
 
         // Now draw the bones
-        for (BoneID i = 0; i < lastId+1; ++i)
+        for (CS::Animation::BoneID i = 0; i < lastId+1; ++i)
         {
           if (!fact->HasBone (i))
             continue;

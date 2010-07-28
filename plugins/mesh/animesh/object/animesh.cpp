@@ -362,12 +362,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  void AnimeshObjectFactory::SetSkeletonFactory (iSkeletonFactory2* skeletonFactory)
+  void AnimeshObjectFactory::SetSkeletonFactory (CS::Animation::iSkeletonFactory2* skeletonFactory)
   {
     this->skeletonFactory = skeletonFactory;
   }
 
-  iSkeletonFactory2* AnimeshObjectFactory::GetSkeletonFactory () const
+  CS::Animation::iSkeletonFactory2* AnimeshObjectFactory::GetSkeletonFactory () const
   {
     return skeletonFactory;
   }
@@ -419,7 +419,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return morphTargetNames.Get (name, (uint)~0);
   }
 
-  void AnimeshObjectFactory::CreateSocket (BoneID bone, 
+  void AnimeshObjectFactory::CreateSocket (CS::Animation::BoneID bone, 
     const csReversibleTransform& transform, const char* name)
   {
     csRef<FactorySocket> socket;
@@ -519,7 +519,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return mixMode;
   }
 
-  FactorySocket::FactorySocket (AnimeshObjectFactory* factory, BoneID bone, 
+  FactorySocket::FactorySocket (AnimeshObjectFactory* factory, CS::Animation::BoneID bone, 
     const char* name, csReversibleTransform transform)
     : scfImplementationType (this), factory (factory), bone (bone), name (name),
     transform (transform)
@@ -545,12 +545,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     transform = tf;
   }
 
-  BoneID FactorySocket::GetBone () const
+  CS::Animation::BoneID FactorySocket::GetBone () const
   {
     return bone;
   }
   
-  void FactorySocket::SetBone (BoneID bone)
+  void FactorySocket::SetBone (CS::Animation::BoneID bone)
   {
     this->bone = bone;
   }
@@ -579,7 +579,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  void AnimeshObject::SetSkeleton (iSkeleton2* newskel)
+  void AnimeshObject::SetSkeleton (CS::Animation::iSkeleton2* newskel)
   {
     skeleton = newskel;
     if (skeleton)
@@ -592,7 +592,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  iSkeleton2* AnimeshObject::GetSkeleton () const
+  CS::Animation::iSkeleton2* AnimeshObject::GetSkeleton () const
   {
     return skeleton;
   }
@@ -1052,7 +1052,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     for (size_t i = 0; i < sockets.GetSize (); ++i)
     {
-      BoneID bone = sockets[i]->bone;
+      CS::Animation::BoneID bone = sockets[i]->bone;
 
       csQuaternion q;
       csVector3 v;
@@ -1274,7 +1274,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return socketBoneTransform*transform;
   }
 
-  BoneID AnimeshObject::Socket::GetBone () const
+  CS::Animation::BoneID AnimeshObject::Socket::GetBone () const
   {
     return bone;
   }

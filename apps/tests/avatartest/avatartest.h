@@ -95,9 +95,9 @@ private:
   bool softBodiesEnabled;
 
   // Animation node plugin managers
-  csRef<iSkeletonLookAtManager2> lookAtManager;
-  csRef<iSkeletonBasicNodesManager2> basicNodesManager;
-  csRef<iSkeletonRagdollManager2> ragdollManager;
+  csRef<CS::Animation::iSkeletonLookAtManager2> lookAtManager;
+  csRef<CS::Animation::iSkeletonBasicNodesManager2> basicNodesManager;
+  csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;
 
   //-- csBaseEventHandler
   void Frame ();

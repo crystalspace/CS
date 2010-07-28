@@ -732,7 +732,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug",
 		       iDynamicsDebuggerManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll",
-		       iSkeletonRagdollManager2),
+		       CS::Animation::iSkeletonRagdollManager2),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -856,7 +856,7 @@ bool Simple::Application ()
     return ReportError ("Failed to locate dynamic's debug manager!");
 
   ragdollManager =
-    csQueryRegistry<iSkeletonRagdollManager2> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonRagdollManager2> (GetObjectRegistry ());
   if (!ragdollManager)
     return ReportError ("Failed to locate ragdoll manager!");
 
@@ -1576,8 +1576,9 @@ void Simple::LoadRagdoll ()
     return;
   }
 
-  csRef<iBodyManager> bodyManager = csQueryRegistry<iBodyManager> (GetObjectRegistry ());
-  iBodySkeleton* bodySkeleton = bodyManager->FindBodySkeleton ("frankie_body");
+  csRef<CS::Animation::iBodyManager> bodyManager =
+    csQueryRegistry<CS::Animation::iBodyManager> (GetObjectRegistry ());
+  CS::Animation::iBodySkeleton* bodySkeleton = bodyManager->FindBodySkeleton ("frankie_body");
   if (!bodySkeleton)
   {
     ReportError ("Can't find Frankie's body description!");
@@ -1585,13 +1586,13 @@ void Simple::LoadRagdoll ()
   }
 
   // Create bone chain
-  iBodyChain* chain = bodySkeleton->CreateBodyChain
+  CS::Animation::iBodyChain* chain = bodySkeleton->CreateBodyChain
     ("chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"),
      animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"),
      animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"), 0);
 
   // Create ragdoll animation node factory
-  csRef<iSkeletonRagdollNodeFactory2> ragdollFactory =
+  csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll",
 					   bodySkeleton, dynamicSystem);
   ragdollFactory->AddBodyChain (chain, CS::Animation::STATE_DYNAMIC);
@@ -1634,11 +1635,11 @@ void Simple::SpawnRagdoll ()
                   tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
 
   // Start the ragdoll anim node
-  iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
+  CS::Animation::iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
     GetAnimationRoot ();
 
-  csRef<iSkeletonRagdollNode2> ragdoll =
-    scfQueryInterfaceSafe<iSkeletonRagdollNode2> (root);
+  csRef<CS::Animation::iSkeletonRagdollNode2> ragdoll =
+    scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode2> (root);
   ragdoll->SetAnimatedMesh (animesh);
 
   // Fling the body.
@@ -1646,7 +1647,7 @@ void Simple::SpawnRagdoll ()
   ragdoll->Play ();
   for (uint i = 0; i < ragdoll->GetBoneCount (CS::Animation::STATE_DYNAMIC); i++)
   {
-    BoneID boneID = ragdoll->GetBone (CS::Animation::STATE_DYNAMIC, i);
+    CS::Animation::BoneID boneID = ragdoll->GetBone (CS::Animation::STATE_DYNAMIC, i);
     iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
     rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
     rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));

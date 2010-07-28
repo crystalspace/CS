@@ -32,11 +32,8 @@
 /**\addtogroup meshplugins
  * @{ */
 
-struct iSkeletonLookAtNodeFactory2;
-struct iBodySkeleton;
 struct iMovable;
 struct iCamera;
-struct iSkeletonLookAtListener2;
 
 namespace CS
 {
@@ -49,20 +46,29 @@ namespace Mesh
 } // namespace CS
 
 
+namespace CS
+{
+namespace Animation
+{
+
+struct iBodySkeleton;
+struct iSkeletonLookAtNodeFactory2;
+struct iSkeletonLookAtListener2;
+
 /**
  * A class to manage the creation and deletion of 'LookAt' animation 
  * node factories.
  */
 struct iSkeletonLookAtManager2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeletonLookAtManager2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonLookAtManager2, 1, 0, 0);
 
   /**
    * Create a new 'LookAt' animation node factory.
    * \param name The name of the new factory.
-   * \param skeleton A iBodySkeleton specifying the geometrical constraints of the bone. A 
-   * iBodyBone and a iBodyBoneJoint must be defined for the bone animated by the 'LookAt' 
-   * controller. If skeleton is 0 or if there is no iBodyBoneJoint defined, then the
+   * \param skeleton A CS::Animation::iBodySkeleton specifying the geometrical constraints of the bone. A 
+   * CS::Animation::iBodyBone and a CS::Animation::iBodyBoneJoint must be defined for the bone animated by the 'LookAt' 
+   * controller. If skeleton is 0 or if there is no CS::Animation::iBodyBoneJoint defined, then the
    * animation won't have any geometrical constraints.
    */
   virtual iSkeletonLookAtNodeFactory2* CreateAnimNodeFactory (const char *name,
@@ -84,7 +90,7 @@ struct iSkeletonLookAtManager2 : public virtual iBase
  */
 struct iSkeletonLookAtNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
-  SCF_INTERFACE(iSkeletonLookAtNodeFactory2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNodeFactory2, 1, 0, 0);
 
   /**
    * Set the child animation node of this node. The 'Lookat' controller will
@@ -109,7 +115,7 @@ struct iSkeletonLookAtNodeFactory2 : public iSkeletonAnimNodeFactory2
  * An animation node that controls a bone of an animesh in order to make it look
  * at a target.
  * There are three types of constraints that will modify the 'LookAt' control:
- * - Whether or not a iBodyBoneJoint for the bone controlled has been defined while
+ * - Whether or not a CS::Animation::iBodyBoneJoint for the bone controlled has been defined while
  * creating the 'LookAt' factory (see iLookAtManager::CreateAnimNodeFactory()).
  * - Whether or not SetAlwaysRotate() has been set.
  * - The maximum rotation speed allowed through SetMaximumSpeed().
@@ -119,9 +125,9 @@ struct iSkeletonLookAtNodeFactory2 : public iSkeletonAnimNodeFactory2
  */
 struct iSkeletonLookAtNode2 : public iSkeletonAnimNode2
 {
-  SCF_INTERFACE(iSkeletonLookAtNode2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNode2, 1, 0, 0);
 
-  // TODO: remove this function and implement iSkeleton2::GetSceneNode ()
+  // TODO: remove this function and implement CS::Animation::iSkeleton2::GetSceneNode ()
   /**
    * Set the animated mesh associated with this animation node.
    */
@@ -206,7 +212,7 @@ struct iSkeletonLookAtNode2 : public iSkeletonAnimNode2
  */
 struct iSkeletonLookAtListener2 : public virtual iBase
 {
-  SCF_INTERFACE (iSkeletonLookAtListener2, 1, 0, 0);
+  SCF_INTERFACE (CS::Animation::iSkeletonLookAtListener2, 1, 0, 0);
 
   /**
    * The target is now looked at.
@@ -218,6 +224,9 @@ struct iSkeletonLookAtListener2 : public virtual iBase
    */
   virtual void TargetLost () = 0;
 };
+
+} // namespace Animation
+} // namespace CS
 
 /** @} */
 

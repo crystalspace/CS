@@ -53,7 +53,7 @@ struct iAnimatedMeshMorphTarget;
 struct csAnimatedMeshBoneInfluence
 {
   /// The id of the bone
-  BoneID bone;
+  CS::Animation::BoneID bone;
 
   /**
    * The relative influence of the bone. Does technically not have to be
@@ -93,12 +93,12 @@ public:
   /**
    * Get the ID of the bone associated with the socket
    */
-  virtual BoneID GetBone () const = 0;
+  virtual CS::Animation::BoneID GetBone () const = 0;
 
   /**
    * Set the bone associated with the socket
    */
-  virtual void SetBone (BoneID boneID) = 0;
+  virtual void SetBone (CS::Animation::BoneID boneID) = 0;
 
   /**
    * Get the associated animated mesh factory
@@ -143,7 +143,7 @@ public:
   /**
    * Get the ID of the bone associated with the socket
    */
-  virtual BoneID GetBone () const = 0;
+  virtual CS::Animation::BoneID GetBone () const = 0;
 
   /**
    * Get the associated animated mesh
@@ -330,12 +330,12 @@ struct iAnimatedMeshFactory : public virtual iBase
    * When a mesh is instanced it will by default get a skeleton from this
    * skeleton factory.
    */
-  virtual void SetSkeletonFactory (iSkeletonFactory2* skeletonFactory) = 0;
+  virtual void SetSkeletonFactory (CS::Animation::iSkeletonFactory2* skeletonFactory) = 0;
 
   /**
    * Get the skeleton factory associated with the mesh factory.
    */
-  virtual iSkeletonFactory2* GetSkeletonFactory () const = 0;
+  virtual CS::Animation::iSkeletonFactory2* GetSkeletonFactory () const = 0;
 
   /**
    * Set the requested number of bone influences per vertex.
@@ -400,7 +400,7 @@ struct iAnimatedMeshFactory : public virtual iBase
    * \param transform Initial transform
    * \param name Name of the socket, optional
    */
-  virtual void CreateSocket (BoneID bone, 
+  virtual void CreateSocket (CS::Animation::BoneID bone, 
     const csReversibleTransform& transform, const char* name) = 0;
 
   /**
@@ -503,12 +503,12 @@ struct iAnimatedMesh : public virtual iBase
    * to it in the vertex influences.
    * \param skeleton
    */
-  virtual void SetSkeleton (iSkeleton2* skeleton) = 0;
+  virtual void SetSkeleton (CS::Animation::iSkeleton2* skeleton) = 0;
 
   /**
    * Get the skeleton to use for this mesh.
    */
-  virtual iSkeleton2* GetSkeleton () const = 0;
+  virtual CS::Animation::iSkeleton2* GetSkeleton () const = 0;
 
   /**
    * Get a submesh by index.

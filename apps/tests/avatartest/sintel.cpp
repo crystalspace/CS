@@ -293,11 +293,11 @@ bool SintelScene::CreateAvatar ()
 
   // Create a new animation tree. The structure of the tree is:
   //   + idle animation node (root and only node)
-  csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
+  csRef<CS::Animation::iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create the 'open_mouth' animation node
-  csRef<iSkeletonAnimationNodeFactory2> openMouthNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> openMouthNodeFactory =
     animPacketFactory->CreateAnimationNode ("open_mouth");
   openMouthNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("open_mouth"));
@@ -470,7 +470,7 @@ bool SintelScene::CreateAvatar ()
 						    avatarTest->room, csVector3 (0.0f));
 
   // Start animation
-  //iSkeletonAnimNode2* rootNode =
+  //CS::Animation::iSkeletonAnimNode2* rootNode =
   //  animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
   //rootNode->Play ();
 

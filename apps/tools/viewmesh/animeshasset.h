@@ -36,7 +36,16 @@ struct iAnimatedMeshFactory;
 } // namespace Mesh
 } // namespace CS
 
+namespace CS
+{
+namespace Animation
+{
+
 struct iSkeletonAnimNode2;
+
+} // namespace Animation
+} // namespace CS
+
 
 class AnimeshAsset : public AssetBase
 {
@@ -46,7 +55,7 @@ private:
   bool reverseAction;
 
 private:
-  bool HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, bool start);
+  bool HandleSkel2Node (const char* animName, CS::Animation::iSkeletonAnimNode2* node, bool start);
 
 public:
   static bool Support(iMeshWrapper* mesh);

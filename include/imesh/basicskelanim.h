@@ -31,6 +31,11 @@
 /**\addtogroup meshplugins
  * @{ */
 
+namespace CS
+{
+namespace Animation
+{
+
 struct iSkeletonSpeedNodeFactory2;
 
 /**
@@ -39,7 +44,7 @@ struct iSkeletonSpeedNodeFactory2;
  */
 struct iSkeletonBasicNodesManager2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeletonBasicNodesManager2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonBasicNodesManager2, 1, 0, 0);
 
   /**
    * Create a 'speed' animation node factory of the given name.
@@ -62,15 +67,15 @@ struct iSkeletonBasicNodesManager2 : public virtual iBase
  */
 struct iSkeletonSpeedNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
-  SCF_INTERFACE(iSkeletonSpeedNodeFactory2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonSpeedNodeFactory2, 1, 0, 0);
 
   /**
    * Add a child animation node to this controller. This child node should provide the
    * animation of the animesh moving at the given speed.
    * 
    * The factory node should have been made cyclic, otherwise the 'speed' controller will not
-   * work properly. However, as a user help, if the node is a iSkeletonAnimationNodeFactory2,
-   * then the call to iSkeletonAnimationNodeFactory2::SetCyclic() is made automatically.
+   * work properly. However, as a user help, if the node is a CS::Animation::iSkeletonAnimationNodeFactory2,
+   * then the call to CS::Animation::iSkeletonAnimationNodeFactory2::SetCyclic() is made automatically.
    * 
    * Also, all animations that are added must be synchronized on their first frame, eg all
    * animations starting when the left foot touches the ground. The animations can have
@@ -90,7 +95,7 @@ struct iSkeletonSpeedNodeFactory2 : public iSkeletonAnimNodeFactory2
  */
 struct iSkeletonSpeedNode2 : public iSkeletonAnimNode2
 {
-  SCF_INTERFACE(iSkeletonSpeedNode2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonSpeedNode2, 1, 0, 0);
 
   /**
    * Set the desired custom speed. The value should be between the slowest and the quickest
@@ -98,6 +103,9 @@ struct iSkeletonSpeedNode2 : public iSkeletonAnimNode2
    */
   virtual void SetSpeed (float speed) = 0;
 };
+
+} // namespace Animation
+} // namespace CS
 
 /** @} */
 

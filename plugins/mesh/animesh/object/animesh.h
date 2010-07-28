@@ -96,8 +96,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     virtual void Invalidate ();
 
-    virtual void SetSkeletonFactory (iSkeletonFactory2* skeletonFactory);
-    virtual iSkeletonFactory2* GetSkeletonFactory () const;
+    virtual void SetSkeletonFactory (CS::Animation::iSkeletonFactory2* skeletonFactory);
+    virtual CS::Animation::iSkeletonFactory2* GetSkeletonFactory () const;
     virtual void SetBoneInfluencesPerVertex (uint num);
     virtual uint GetBoneInfluencesPerVertex () const;
     virtual CS::Mesh::csAnimatedMeshBoneInfluence* GetBoneInfluences ();
@@ -108,7 +108,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void ClearMorphTargets ();
     virtual uint FindMorphTarget (const char* name) const;
 
-    virtual void CreateSocket (BoneID bone, 
+    virtual void CreateSocket (CS::Animation::BoneID bone, 
       const csReversibleTransform& transform, const char* name);
     virtual size_t GetSocketCount () const;
     virtual CS::Mesh::iAnimatedMeshSocketFactory* GetSocket (size_t index) const;
@@ -165,7 +165,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRef<iRenderBuffer> masterBWBuffer;
     csRef<iRenderBuffer> boneWeightAndIndexBuffer[2];
 
-    csRef<iSkeletonFactory2> skeletonFactory;
+    csRef<CS::Animation::iSkeletonFactory2> skeletonFactory;
 
     // Submeshes
     csRefArray<FactorySubmesh> submeshes;
@@ -263,7 +263,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
                               CS::Mesh::iAnimatedMeshSocketFactory>
   {
   public:
-    FactorySocket (AnimeshObjectFactory* factory, BoneID bone, const char* name,
+    FactorySocket (AnimeshObjectFactory* factory, CS::Animation::BoneID bone, const char* name,
                    csReversibleTransform transform);
 
     //-- CS::Mesh::iAnimatedMeshSocketFactory
@@ -271,12 +271,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void SetName (const char*);
     virtual const csReversibleTransform& GetTransform () const;
     virtual void SetTransform (csReversibleTransform& tf);
-    virtual BoneID GetBone () const;
-    virtual void SetBone (BoneID bone);
+    virtual CS::Animation::BoneID GetBone () const;
+    virtual void SetBone (CS::Animation::BoneID bone);
     virtual CS::Mesh::iAnimatedMeshFactory* GetFactory ();
 
     AnimeshObjectFactory* factory;
-    BoneID bone;
+    CS::Animation::BoneID bone;
     csString name;
     csReversibleTransform transform;        
   };
@@ -292,8 +292,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     AnimeshObject (AnimeshObjectFactory* factory);
 
     //-- CS::Mesh::iAnimatedMesh
-    virtual void SetSkeleton (iSkeleton2* skeleton);
-    virtual iSkeleton2* GetSkeleton () const;
+    virtual void SetSkeleton (CS::Animation::iSkeleton2* skeleton);
+    virtual CS::Animation::iSkeleton2* GetSkeleton () const;
 
     virtual CS::Mesh::iAnimatedMeshSubMesh* GetSubMesh (size_t index) const;
     virtual size_t GetSubMeshCount () const;
@@ -456,7 +456,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       virtual const csReversibleTransform& GetTransform () const;
       virtual void SetTransform (csReversibleTransform& tf);
       virtual const csReversibleTransform GetFullTransform () const;     
-      virtual BoneID GetBone () const;
+      virtual CS::Animation::BoneID GetBone () const;
       virtual CS::Mesh::iAnimatedMesh* GetMesh () const;
       virtual iSceneNode* GetSceneNode () const;
       virtual void SetSceneNode (iSceneNode* sn);
@@ -465,7 +465,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       AnimeshObject* object;
       FactorySocket* factorySocket;
-      BoneID bone;      
+      CS::Animation::BoneID bone;      
       csReversibleTransform transform;      
       csReversibleTransform socketBoneTransform;
       iSceneNode* sceneNode;
@@ -477,13 +477,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     uint mixMode;
     csFlags meshObjectFlags;
 
-    csRef<iSkeleton2> skeleton;
+    csRef<CS::Animation::iSkeleton2> skeleton;
     unsigned int skeletonVersion;
     csTicks lastTick;
 
     // Hold the bone transforms
     csRef<csShaderVariable> boneTransformArray;
-    csRef<csSkeletalState2> lastSkeletonState;
+    csRef<CS::Animation::csSkeletalState2> lastSkeletonState;
 
     csRenderMeshHolder rmHolder;
     csDirtyAccessArray<CS::Graphics::RenderMesh*> renderMeshList;

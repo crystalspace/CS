@@ -60,16 +60,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   {
   }
 
-  iSkeletonLookAtNodeFactory2* LookAtManager::CreateAnimNodeFactory
-    (const char *name, iBodySkeleton* skeleton)
+  CS::Animation::iSkeletonLookAtNodeFactory2* LookAtManager::CreateAnimNodeFactory
+    (const char *name, CS::Animation::iBodySkeleton* skeleton)
   {
-    csRef<iSkeletonLookAtNodeFactory2> newFact;
+    csRef<CS::Animation::iSkeletonLookAtNodeFactory2> newFact;
     newFact.AttachNew (new LookAtAnimNodeFactory (this, name, skeleton));
 
     return factoryHash.PutUnique (name, newFact);
   }
 
-  iSkeletonLookAtNodeFactory2* LookAtManager::FindAnimNodeFactory
+  CS::Animation::iSkeletonLookAtNodeFactory2* LookAtManager::FindAnimNodeFactory
     (const char* name) const
   {
     return factoryHash.Get (name, 0);
@@ -111,18 +111,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   LookAtAnimNodeFactory::LookAtAnimNodeFactory (LookAtManager* manager,
 						const char *name,
-						iBodySkeleton* skeleton)
+						CS::Animation::iBodySkeleton* skeleton)
     : scfImplementationType (this), manager (manager), name (name),
     skeleton (skeleton)
   {
   }
 
-  void LookAtAnimNodeFactory::SetChildNode (iSkeletonAnimNodeFactory2* node)
+  void LookAtAnimNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory2* node)
   {
     childNode = node;
   }
 
-  iSkeletonAnimNodeFactory2* LookAtAnimNodeFactory::GetChildNode ()
+  CS::Animation::iSkeletonAnimNodeFactory2* LookAtAnimNodeFactory::GetChildNode ()
   {
     return childNode;
   }
@@ -132,16 +132,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     childNode = 0;
   }
 
-  csPtr<iSkeletonAnimNode2> LookAtAnimNodeFactory::CreateInstance (
-               iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
+  csPtr<CS::Animation::iSkeletonAnimNode2> LookAtAnimNodeFactory::CreateInstance (
+               CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton)
   {
-    csRef<iSkeletonAnimNode2> child;
+    csRef<CS::Animation::iSkeletonAnimNode2> child;
     if (childNode)
       child = childNode->CreateInstance (packet, skeleton);
 
-    csRef<iSkeletonAnimNode2> newP;
+    csRef<CS::Animation::iSkeletonAnimNode2> newP;
     newP.AttachNew (new LookAtAnimNode (this, skeleton, child));
-    return csPtr<iSkeletonAnimNode2> (newP);
+    return csPtr<CS::Animation::iSkeletonAnimNode2> (newP);
   }
 
   const char* LookAtAnimNodeFactory::GetNodeName () const
@@ -149,7 +149,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     return name;
   }
 
-  iSkeletonAnimNodeFactory2* LookAtAnimNodeFactory::FindNode
+  CS::Animation::iSkeletonAnimNodeFactory2* LookAtAnimNodeFactory::FindNode
     (const char* name)
   {
     if (this->name == name)
@@ -168,10 +168,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   CS_LEAKGUARD_IMPLEMENT(LookAtAnimNode);
 
   LookAtAnimNode::LookAtAnimNode (LookAtAnimNodeFactory* factory, 
-				  iSkeleton2* skeleton,
-				  iSkeletonAnimNode2* childNode)
+				  CS::Animation::iSkeleton2* skeleton,
+				  CS::Animation::iSkeletonAnimNode2* childNode)
     : scfImplementationType (this), factory (factory), skeleton (skeleton),
-    childNode (childNode), boneID (InvalidBoneID), targetMode (TARGET_NONE),
+    childNode (childNode), boneID (CS::Animation::InvalidBoneID), targetMode (TARGET_NONE),
     isPlaying (false), maximumSpeed (PI), alwaysRotate (false),
     trackingInitialized (true), listenerMinimumDelay (0.1f)
   {
@@ -184,9 +184,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     sceneNode = animeshObject->GetMeshWrapper ()->QuerySceneNode ();
   }
 
-  void LookAtAnimNode::SetBone (BoneID boneID)
+  void LookAtAnimNode::SetBone (CS::Animation::BoneID boneID)
   {
-    CS_ASSERT (boneID != InvalidBoneID
+    CS_ASSERT (boneID != CS::Animation::InvalidBoneID
 	       && skeleton
 	       && skeleton->GetFactory ()->HasBone (boneID));
 
@@ -200,10 +200,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     trackingStatus = STATUS_HEADING_TARGET;
     listenerStatus = STATUS_HEADING_TARGET;
 
-    // check for a iBodyBoneJoint
+    // check for a CS::Animation::iBodyBoneJoint
     if (factory->skeleton)
     {
-      iBodyBone* bodyBone = factory->skeleton->FindBodyBone (boneID);
+      CS::Animation::iBodyBone* bodyBone = factory->skeleton->FindBodyBone (boneID);
       if (bodyBone)
 	bodyJoint = bodyBone->GetBoneJoint ();
       else
@@ -305,19 +305,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     listenerMinimumDelay = delay;
   }
 
-  void LookAtAnimNode::AddListener (iSkeletonLookAtListener2* listener)
+  void LookAtAnimNode::AddListener (CS::Animation::iSkeletonLookAtListener2* listener)
   {
     listeners.PushSmart (listener);
   }
 
-  void LookAtAnimNode::RemoveListener (iSkeletonLookAtListener2* listener)
+  void LookAtAnimNode::RemoveListener (CS::Animation::iSkeletonLookAtListener2* listener)
   {
     listeners.Delete (listener);
   }
 
   void LookAtAnimNode::Play ()
   {
-    CS_ASSERT (boneID != InvalidBoneID);
+    CS_ASSERT (boneID != CS::Animation::InvalidBoneID);
 
     // init tracking
     isPlaying = true;
@@ -366,7 +366,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     return 1.0f;
   }
 
-  void LookAtAnimNode::BlendState (csSkeletalState2* state, float baseWeight)
+  void LookAtAnimNode::BlendState (CS::Animation::csSkeletalState2* state, float baseWeight)
   {
     // check that this node is active
     if (!isPlaying)
@@ -411,10 +411,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     }
 
     // compute parent bone transform
-    BoneID parentBoneID = skeleton->GetFactory ()->GetBoneParent (boneID);
+    CS::Animation::BoneID parentBoneID = skeleton->GetFactory ()->GetBoneParent (boneID);
     csOrthoTransform parentTransform (sceneNode->GetMovable ()->GetTransform ());
 
-    if (parentBoneID != InvalidBoneID)
+    if (parentBoneID != CS::Animation::InvalidBoneID)
     {
       csQuaternion rotation;
       csVector3 offset;
@@ -689,12 +689,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     return isPlaying;
   }
 
-  iSkeletonAnimNodeFactory2* LookAtAnimNode::GetFactory () const
+  CS::Animation::iSkeletonAnimNodeFactory2* LookAtAnimNode::GetFactory () const
   {
     return factory;
   }
 
-  iSkeletonAnimNode2* LookAtAnimNode::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNode2* LookAtAnimNode::FindNode (const char* name)
   {
     if (factory->name == name)
       return this;
@@ -706,13 +706,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   }
 
   void LookAtAnimNode::AddAnimationCallback
-    (iSkeletonAnimCallback2* callback)
+    (CS::Animation::iSkeletonAnimCallback2* callback)
   {
     // TODO
   }
 
   void LookAtAnimNode::RemoveAnimationCallback
-    (iSkeletonAnimCallback2* callback)
+    (CS::Animation::iSkeletonAnimCallback2* callback)
   {
     // TODO
   }

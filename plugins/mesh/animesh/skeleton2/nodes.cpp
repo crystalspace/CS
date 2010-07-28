@@ -29,7 +29,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS_LEAKGUARD_IMPLEMENT(BaseFactoryChildren);
   CS_LEAKGUARD_IMPLEMENT(BaseNodeChildren);
 
-  void BaseNodeChildren::AddAnimationCallback (iSkeletonAnimCallback2* callback)
+  void BaseNodeChildren::AddAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback)
   {
     // First CB, install sub-callback
     InstallInnerCb (false);
@@ -37,7 +37,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     BaseNodeSingle::AddAnimationCallback (callback);
   }
 
-  void BaseNodeChildren::RemoveAnimationCallback (iSkeletonAnimCallback2* callback)
+  void BaseNodeChildren::RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback)
   {
     BaseNodeSingle::RemoveAnimationCallback (callback);
 
@@ -72,7 +72,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
-  void BaseNodeChildren::AnimationFinished (iSkeletonAnimNode2* node)
+  void BaseNodeChildren::AnimationFinished (CS::Animation::iSkeletonAnimNode2* node)
   {
     // If all subnodes are inactive, call the upper CBs
     for (size_t i = 0; i < subNodes.GetSize (); ++i)
@@ -84,38 +84,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     BaseNodeSingle::FireAnimationFinishedCb ();
   }
 
-  void BaseNodeChildren::AnimationCycled (iSkeletonAnimNode2* node)
+  void BaseNodeChildren::AnimationCycled (CS::Animation::iSkeletonAnimNode2* node)
   {
     BaseNodeSingle::FireAnimationCycleCb ();
   }
 
-  void BaseNodeChildren::PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying)
+  void BaseNodeChildren::PlayStateChanged (CS::Animation::iSkeletonAnimNode2* node, bool isPlaying)
   {}
 
-  void BaseNodeChildren::DurationChanged (iSkeletonAnimNode2* node)
+  void BaseNodeChildren::DurationChanged (CS::Animation::iSkeletonAnimNode2* node)
   {}
 
   BaseNodeChildren::InnerCallback::InnerCallback (BaseNodeChildren* parent)
     : scfImplementationType (this), parent (parent)
   {}
 
-  void BaseNodeChildren::InnerCallback::AnimationFinished (iSkeletonAnimNode2* node)
+  void BaseNodeChildren::InnerCallback::AnimationFinished (CS::Animation::iSkeletonAnimNode2* node)
   {
     parent->AnimationFinished (node);
   }
 
-  void BaseNodeChildren::InnerCallback::AnimationCycled (iSkeletonAnimNode2* node)
+  void BaseNodeChildren::InnerCallback::AnimationCycled (CS::Animation::iSkeletonAnimNode2* node)
   {
     parent->AnimationCycled (node);
   }
 
   void BaseNodeChildren::InnerCallback::PlayStateChanged (
-    iSkeletonAnimNode2* node, bool isPlaying)
+    CS::Animation::iSkeletonAnimNode2* node, bool isPlaying)
   {
     parent->PlayStateChanged (node, isPlaying);
   }
 
-  void BaseNodeChildren::InnerCallback::DurationChanged (iSkeletonAnimNode2* node)
+  void BaseNodeChildren::InnerCallback::DurationChanged (CS::Animation::iSkeletonAnimNode2* node)
   {
     parent->DurationChanged (node);
   }
@@ -133,14 +133,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     animationDuration (0.0f)
   {}
 
-  void AnimationNodeFactory::SetAnimation (iSkeletonAnimation2* animation)
+  void AnimationNodeFactory::SetAnimation (CS::Animation::iSkeletonAnimation2* animation)
   {
     this->animation = animation;
     if (animation)
       animationDuration = animation->GetDuration ();
   }
   
-  iSkeletonAnimation2* AnimationNodeFactory::GetAnimation () const
+  CS::Animation::iSkeletonAnimation2* AnimationNodeFactory::GetAnimation () const
   {
     return animation;
   }
@@ -185,10 +185,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return automaticStop; 
   }
 
-  csPtr<iSkeletonAnimNode2> AnimationNodeFactory::CreateInstance (
-    iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
+  csPtr<CS::Animation::iSkeletonAnimNode2> AnimationNodeFactory::CreateInstance (
+    CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton)
   {
-    csRef<iSkeletonAnimNode2> ref;
+    csRef<CS::Animation::iSkeletonAnimNode2> ref;
     ref.AttachNew (new AnimationNode (this));
 
     // Convert the animation data to bind space if it was not yet made.
@@ -198,7 +198,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 	   channel++)
       {
 	// Get the bind transform of the bone
-	BoneID boneID = animation->GetChannelBone (channel);
+	CS::Animation::BoneID boneID = animation->GetChannelBone (channel);
 	csQuaternion skeletonRotation;
 	csVector3 skeletonOffset;
 	skeleton->GetFactory ()->GetTransformBoneSpace (boneID, skeletonRotation,
@@ -223,7 +223,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       animation->SetFramesInBindSpace (true);
     }
 
-    return csPtr<iSkeletonAnimNode2> (ref);
+    return csPtr<CS::Animation::iSkeletonAnimNode2> (ref);
   }
 
   const char* AnimationNodeFactory::GetNodeName () const
@@ -231,7 +231,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return name;
   }
 
-  iSkeletonAnimNodeFactory2* AnimationNodeFactory::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNodeFactory2* AnimationNodeFactory::FindNode (const char* name)
   {
     if (this->name == name)
       return this;
@@ -289,7 +289,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return playbackSpeed;
   }
 
-  void AnimationNode::BlendState (csSkeletalState2* state, float baseWeight)
+  void AnimationNode::BlendState (CS::Animation::csSkeletalState2* state, float baseWeight)
   {
     factory->animation->BlendState (state, baseWeight, playbackPosition, factory->cyclic);
   }
@@ -348,12 +348,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return isPlaying;
   }
 
-  iSkeletonAnimNodeFactory2* AnimationNode::GetFactory () const
+  CS::Animation::iSkeletonAnimNodeFactory2* AnimationNode::GetFactory () const
   {
     return factory;
   }
 
-  iSkeletonAnimNode2* AnimationNode::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNode2* AnimationNode::FindNode (const char* name)
   {
     if (factory->name == name)
       return this;
@@ -361,12 +361,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       return 0;
   }
 
-  void AnimationNode::AddAnimationCallback (iSkeletonAnimCallback2* callback)
+  void AnimationNode::AddAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback)
   {
     BaseNodeSingle::AddAnimationCallback (callback);
   }
 
-  void AnimationNode::RemoveAnimationCallback (iSkeletonAnimCallback2* callback)
+  void AnimationNode::RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback)
   {
     BaseNodeSingle::RemoveAnimationCallback (callback);
   }

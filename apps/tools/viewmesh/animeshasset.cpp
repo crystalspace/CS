@@ -43,25 +43,25 @@ AnimeshAsset::AnimeshAsset(iObjectRegistry* obj_reg, iMeshWrapper* mesh)
   animeshsprite = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory> (mesh->GetFactory()->GetMeshObjectFactory());
 
   // create a new animation tree
-  iSkeletonAnimPacketFactory2* packetFactory = animeshsprite->GetSkeletonFactory()->GetAnimationPacket();
+  CS::Animation::iSkeletonAnimPacketFactory2* packetFactory = animeshsprite->GetSkeletonFactory()->GetAnimationPacket();
   if (!packetFactory)
     return;
 
-  csRef<iSkeletonFSMNodeFactory2> fsmNodeFactory = packetFactory->CreateFSMNode ("fsm");
+  csRef<CS::Animation::iSkeletonFSMNodeFactory2> fsmNodeFactory = packetFactory->CreateFSMNode ("fsm");
   packetFactory->SetAnimationRoot (fsmNodeFactory);
 
   // create animation nodes
   for (size_t i = 0; i < packetFactory->GetAnimationCount (); i++)
   {
     csString name = packetFactory->GetAnimation (i)->GetName ();
-    csRef<iSkeletonAnimationNodeFactory2> animationNode = packetFactory->CreateAnimationNode (name);
+    csRef<CS::Animation::iSkeletonAnimationNodeFactory2> animationNode = packetFactory->CreateAnimationNode (name);
     animationNode->SetAnimation (packetFactory->GetAnimation (i));
     animationNode->SetCyclic (true);
     fsmNodeFactory->AddState (name, animationNode);
   }
 
   // set new anim tree
-  csRef<iSkeletonAnimPacket2> packet = packetFactory->CreateInstance (animeshstate->GetSkeleton ());
+  csRef<CS::Animation::iSkeletonAnimPacket2> packet = packetFactory->CreateInstance (animeshstate->GetSkeleton ());
   animeshstate->GetSkeleton ()->SetAnimationPacket (packet);
 }
 
@@ -87,7 +87,7 @@ csPtr<iStringArray> AnimeshAsset::GetAnimations()
 {
   scfStringArray* arr = new scfStringArray;
 
-  iSkeletonAnimPacketFactory2* packetFactory = animeshsprite->GetSkeletonFactory()->GetAnimationPacket();
+  CS::Animation::iSkeletonAnimPacketFactory2* packetFactory = animeshsprite->GetSkeletonFactory()->GetAnimationPacket();
   if (packetFactory)
     for (size_t i = 0; i < packetFactory->GetAnimationCount (); i++)
     {
@@ -100,13 +100,13 @@ csPtr<iStringArray> AnimeshAsset::GetAnimations()
 
 bool AnimeshAsset::PlayAnimation(const char* animationName, bool cycle)
 {
-  iSkeletonAnimPacket2* packet = animeshstate->GetSkeleton()->GetAnimationPacket();
+  CS::Animation::iSkeletonAnimPacket2* packet = animeshstate->GetSkeleton()->GetAnimationPacket();
   if (!packet)
     return false;
 
-  csRef<iSkeletonFSMNode2> node = scfQueryInterfaceSafe<iSkeletonFSMNode2>
+  csRef<CS::Animation::iSkeletonFSMNode2> node = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode2>
     (packet->GetAnimationRoot()->FindNode ("fsm"));
-  csRef<iSkeletonFSMNodeFactory2> factory = scfQueryInterfaceSafe<iSkeletonFSMNodeFactory2>
+  csRef<CS::Animation::iSkeletonFSMNodeFactory2> factory = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNodeFactory2>
     (node->GetFactory ());
   
   CS::Animation::StateID id = factory->FindState (animationName);
@@ -116,7 +116,7 @@ bool AnimeshAsset::PlayAnimation(const char* animationName, bool cycle)
   if (node->IsActive ())
     node->Stop ();
   node->SwitchToState (id);
-  csRef<iSkeletonAnimationNodeFactory2> animfactory = scfQueryInterfaceSafe<iSkeletonAnimationNodeFactory2>
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> animfactory = scfQueryInterfaceSafe<CS::Animation::iSkeletonAnimationNodeFactory2>
     (node->GetStateNode (id)->GetFactory ());
   animfactory->SetCyclic (cycle);
   node->GetStateNode (id)->SetPlaybackSpeed (reverseAction ? -1.00f : 1.00f);
@@ -127,11 +127,11 @@ bool AnimeshAsset::PlayAnimation(const char* animationName, bool cycle)
 
 bool AnimeshAsset::StopAnimation(const char* animationName)
 {
-  iSkeletonAnimPacket2* packet = animeshstate->GetSkeleton()->GetAnimationPacket();
+  CS::Animation::iSkeletonAnimPacket2* packet = animeshstate->GetSkeleton()->GetAnimationPacket();
   if (!packet)
     return false;
 
-  csRef<iSkeletonFSMNode2> node = scfQueryInterfaceSafe<iSkeletonFSMNode2>
+  csRef<CS::Animation::iSkeletonFSMNode2> node = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode2>
     (packet->GetAnimationRoot()->FindNode ("fsm"));
   if (node->IsActive ())
     node->Stop ();
@@ -148,11 +148,11 @@ void AnimeshAsset::SetReverseAction(bool value)
 {
   reverseAction = value;
 
-  iSkeletonAnimPacket2* packet = animeshstate->GetSkeleton()->GetAnimationPacket();
+  CS::Animation::iSkeletonAnimPacket2* packet = animeshstate->GetSkeleton()->GetAnimationPacket();
   if (!packet)
     return;
 
-  csRef<iSkeletonFSMNode2> node = scfQueryInterfaceSafe<iSkeletonFSMNode2>
+  csRef<CS::Animation::iSkeletonFSMNode2> node = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode2>
     (packet->GetAnimationRoot()->FindNode ("fsm"));
   node->GetStateNode (node->GetCurrentState ())->SetPlaybackSpeed (reverseAction ? -1.00f : 1.00f);
 }

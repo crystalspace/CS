@@ -34,6 +34,11 @@ class csDualQuaternion;
 
 struct iSceneNode;
 
+namespace CS
+{
+namespace Animation
+{
+
 struct iSkeletonFactory2;
 struct iSkeleton2;
 
@@ -61,7 +66,7 @@ static const BoneID InvalidBoneID = (BoneID)~0;
  */
 struct iSkeletonManager2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeletonManager2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonManager2, 1, 0, 0);
 
   /**
    * Create a new empty skeleton factory
@@ -112,7 +117,7 @@ struct iSkeletonManager2 : public virtual iBase
  */
 struct iSkeletonFactory2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeletonFactory2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonFactory2, 1, 0, 0);
 
   /**\name Bone handling
    * @{ */
@@ -226,11 +231,11 @@ struct iSkeletonFactory2 : public virtual iBase
  * Bind space is defined by the skeleton factory, so bind space is relative
  * transform compared to the default orientation.
  *
- * \sa iSkeletonFactory2 for more information on coordinate spaces
+ * \sa CS::Animation::iSkeletonFactory2 for more information on coordinate spaces
  */
 struct iSkeleton2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeleton2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeleton2, 1, 0, 0);
 
   /**
    * Get the scene node associated with the skeleton
@@ -457,6 +462,8 @@ protected:
 };
 
 
+} // namespace Animation
+} // namespace CS
 
 /** @} */
 

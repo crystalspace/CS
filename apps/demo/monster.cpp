@@ -92,13 +92,14 @@ bool Monster::Initialize(iMeshWrapper* spawn)
   if (animesh)
   {
     // Start the root animation node
-    iSkeletonAnimNode2* rootNode =
+    CS::Animation::iSkeletonAnimNode2* rootNode =
       animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
     rootNode->Play ();
 
     // Find the FSM animation node
-    weapon->fsmNode = fsmNode = (iSkeletonFSMNode2*) rootNode->FindNode ("fsm");
-    weapon->fsmNodeFactory = fsmNodeFactory = fsmNode ? (iSkeletonFSMNodeFactory2*) fsmNode->GetFactory () : 0;
+    weapon->fsmNode = fsmNode = (CS::Animation::iSkeletonFSMNode2*) rootNode->FindNode ("fsm");
+    weapon->fsmNodeFactory =
+      fsmNodeFactory = fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory2*) fsmNode->GetFactory () : 0;
   }
 
   // Initialize collision detection
