@@ -356,7 +356,7 @@ bool AvatarTest::Application ()
 
       // Find the Bullet interface of the dynamic system
       bulletDynamicSystem =
-	scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
+	scfQueryInterface<CS::Physics::Bullet::iDynamicSystem> (dynamicSystem);
 
       // We have some objects of size smaller than 0.035 units, so we scale up the
       // whole world for a better behavior of the dynamic simulation.

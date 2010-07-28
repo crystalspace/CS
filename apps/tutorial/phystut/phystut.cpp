@@ -879,7 +879,7 @@ bool Simple::Application ()
   }
   else
   {
-    bulletDynamicSystem = scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
+    bulletDynamicSystem = scfQueryInterface<CS::Physics::Bullet::iDynamicSystem> (dynamicSystem);
 
     // We have some objects of size smaller than 0.035 units, so we scale up the
     // whole world for a better behavior of the dynamic simulation.
