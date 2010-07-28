@@ -161,12 +161,12 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
   /**
    * Get the rigid body of the specified bone.
    */
-  virtual iRigidBody* GetBoneRigidBody (CS::Animation::BoneID bone) = 0;
+  virtual iRigidBody* GetBoneRigidBody (BoneID bone) = 0;
 
   /**
    * Get the joint of the specified bone.
    */
-  virtual iJoint* GetBoneJoint (const CS::Animation::BoneID bone) = 0;
+  virtual iJoint* GetBoneJoint (const BoneID bone) = 0;
 
   /**
    * Get the count of bones in the specified physical state.
@@ -176,7 +176,7 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
   /**
    * Get a bone from its index.
    */
-  virtual CS::Animation::BoneID GetBone (RagdollState state, uint index) const = 0;
+  virtual BoneID GetBone (RagdollState state, uint index) const = 0;
 
   /**
    * Reset the transform of each rigid body of the chain to the initial 'bind'
