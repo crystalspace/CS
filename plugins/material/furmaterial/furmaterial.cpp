@@ -258,8 +258,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 
+      float realDistance = (height * heightFactor) / guideHair.controlPointsCount;
+
       for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
-        guideHair.controlPoints[j] = pos + j * controlPointsDistance * 
+        guideHair.controlPoints[j] = pos + j * realDistance * 
           norms.Get(uniqueIndices.Get(i));
 
       guideHairs.Push(guideHair);
@@ -549,18 +551,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
                 hairStrand.controlPoints[i] += hairStrand.guideHairs[j].distance *
                   guideHairsLOD.Get(hairStrand.guideHairs[j].index - 
                   guideHairs.GetSize()).controlPoints[i];
-          }
-
-          if ( strictHeightmap && hairStrand.controlPointsCount > 1 )
-          {
-            csVector3 direction = hairStrand.controlPoints[hairStrand.controlPointsCount - 1] - 
-              hairStrand.controlPoints[hairStrand.controlPointsCount - 2];
-            float distance = csVector3::Norm(direction);
-            direction.Normalize();
-
-            hairStrand.controlPoints[hairStrand.controlPointsCount - 1] =
-              hairStrand.controlPoints[hairStrand.controlPointsCount - 2] +
-              direction * distance * hairStrand.tipRatio;
           }
 
           hairStrands.Push(hairStrand);		
@@ -865,9 +855,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     CS::ShaderVarName heightFactorName (svStrings, "heightFactor");	
     material->GetVariable(heightFactorName)->GetValue(heightFactor);
 
-    CS::ShaderVarName strictHeightmapName (svStrings, "strictHeightmap");	
-    material->GetVariable(strictHeightmapName)->GetValue(strictHeightmap);
-
     // height map
     CS::StructuredTextureFormat readbackFmt 
       (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
@@ -1040,18 +1027,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
         UpdateControlPoints(hairStrand.controlPoints,
           hairStrand.controlPointsCount, hairStrand.guideHairs);
-
-        if ( furMaterial->strictHeightmap && hairStrand.controlPointsCount > 1 )
-        {
-          csVector3 direction = hairStrand.controlPoints[hairStrand.controlPointsCount - 1] - 
-            hairStrand.controlPoints[hairStrand.controlPointsCount - 2];
-          float distance = csVector3::Norm(direction);
-          direction.Normalize();
-
-          hairStrand.controlPoints[hairStrand.controlPointsCount - 1] =
-            hairStrand.controlPoints[hairStrand.controlPointsCount - 2] +
-            direction * distance * hairStrand.tipRatio;
-        }
       }
 
     const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();

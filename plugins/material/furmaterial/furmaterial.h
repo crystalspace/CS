@@ -178,7 +178,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float strandWidth;
     float strandWidthLOD;
     float controlPointsDistance;
-    int strictHeightmap;
     /// Model
     csRef<iEngine> engine;
     csRef<iLoader> loader;
