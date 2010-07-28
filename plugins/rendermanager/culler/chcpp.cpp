@@ -83,16 +83,32 @@ int csFrustumVis::GetFinishedQuery(OccQuery &oq)
   return 0; // no queries were found while searching
 }
 
-void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<csKDTreeChild*> &objArray)
+void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord> &objArray)
 {
   int numq=1;
   unsigned int *queries;
   queries=new unsigned int;
   g3d->OQInitQueries(queries,numq);
   g3d->OQBeginQuery(*queries);
-  for(unsigned int i=0 ; i<objArray.GetSize() ; i++)
+  for(unsigned int j=0 ; j<objArray.GetSize() ; j++)
   {
-    int numMeshes=0;
+    ObjectRecord obj=static_cast<ObjectRecord>(objArray.Get(j));
+    for (int m = 0; m < obj.numMeshes; ++m)
+    {
+      for (int i = 0; i < obj.meshList[m].num; ++i)
+	    {
+        csRenderMesh* rm = obj.meshList[m].rmeshes[i];
+        if(!rm->portal)
+        {
+          csVertexAttrib vA=CS_VATTRIB_POSITION;
+          iRenderBuffer *rB=rm->buffers->GetRenderBuffer(CS_BUFFER_POSITION);
+          g3d->ActivateBuffers(&vA,&rB,1);
+          g3d->DrawMeshBasic(rm,*rm);
+          g3d->DeactivateBuffers(&vA,1);
+        }
+      }
+    }
+    /*int numMeshes=0;
     iMeshWrapper* const mw=static_cast<csFrustVisObjectWrapper*>(objArray.Get(i)->GetObject())->mesh;
     const uint32 frust_mask=f2bData.rview->GetRenderContext ()->clip_planes_mask;
     
@@ -107,7 +123,7 @@ void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<csKDTreeChild
         g3d->DrawMeshBasic(rmeshes[m],*rmeshes[m]);
         g3d->DeactivateBuffers(&vA,1);
       }
-    }
+    }*/
   }
   g3d->OQEndQuery();
   OccQuery oc;
@@ -145,7 +161,7 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
   {
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
     csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
-    csArray<csKDTreeChild*> objArray(10);
+    csArray<ObjectRecord> objArray(10);
 
     for (int i = 0 ; i < num_objects ; i++)
     {
@@ -154,10 +170,12 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
         objects[i]->timestamp = cur_timestamp;
         csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
       	  objects[i]->GetObject ();
+        ObjectRecord obj;
         // only test an element via occlusion if it first passes frustum testing
-        if(TestObjectVisibility (visobj_wrap, &f2bData, ntdNode.GetFrustumMask()))
+        if(TestObjectVisibility (visobj_wrap, &f2bData, ntdNode.GetFrustumMask(),obj))
         {
-          objArray.Push(objects[i]);
+          if(obj.numMeshes) // don't add records that don't have anything to draw
+            objArray.Push(obj);
         }
       }
     }
@@ -169,24 +187,37 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
     ntdNode.SetVisibility(false);
     csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
+    NodeTraverseData ntd;
     if (f2bData.pos[ntdNode.GetSplitAxis()] <= ntdNode.GetSplitLocation())
     {
       if(child1)
-        T_Queue.PushBack(NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
+      {
+        ntd=NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        T_Queue.PushBack(ntd);
+      }
       if(child2)
-        T_Queue.PushBack(NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
+      {
+        ntd=NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        T_Queue.PushBack(ntd);
+      }
     }
     else
     {
       if(child2)
-        T_Queue.PushBack(NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
+      {
+        ntd=NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        T_Queue.PushBack(ntd);
+      }
       if(child1)
-        T_Queue.PushBack(NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask()));
+      {
+        ntd=NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        T_Queue.PushBack(ntd);
+      }
     }
   }
 }
 
-bool csFrustumVis::WasVisible(NodeTraverseData &ntdNode,const int cur_timestamp) const
+bool csFrustumVis::WasVisible(const NodeTraverseData &ntdNode,const int cur_timestamp) const
 {
   return (ntdNode.GetVisibility() && ntdNode.GetTimestamp()!=cur_timestamp);
 }

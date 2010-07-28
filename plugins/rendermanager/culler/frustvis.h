@@ -193,6 +193,19 @@ struct OccQuery
   }
 };
 
+struct ObjectRecord
+{
+  ObjectRecord() : obj(0) ,meshList(0), numMeshes(0)
+  {}
+  ObjectRecord (csKDTreeChild* o,csSectorVisibleRenderMeshes* mL,const int nM)
+    : obj(o),meshList(mL),numMeshes(nM)
+  {
+  }
+  int numMeshes;
+  csKDTreeChild* obj;
+  csSectorVisibleRenderMeshes* meshList;
+};
+
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
  */
@@ -277,12 +290,12 @@ private:
   // Frustum data (front to back)
   FrustTest_Front2BackData f2bData;
 
-  bool WasVisible(NodeTraverseData &ntdNode,const int cur_timestamp) const;
+  bool WasVisible(const NodeTraverseData &ntdNode,const int cur_timestamp) const;
   void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
   void PullUpVisibility(const NodeTraverseData &ntdNode);
   void TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp);
 
-  void IssueQueries(NodeTraverseData &ntdNode, csArray<csKDTreeChild*> &objArray);
+  void IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord> &objArray);
 
   /**
    *  Gets the first finished query from the query list.
@@ -308,7 +321,7 @@ public:
 
   // Test visibility for the given object. Returns true if visible.
   bool TestObjectVisibility (csFrustVisObjectWrapper* obj,
-  	FrustTest_Front2BackData* data, uint32 frustum_mask);
+  	FrustTest_Front2BackData* data, uint32 frustum_mask,ObjectRecord &objrec);
 
   // Add an object to the update queue. That way it will be updated
   // in the kdtree later when needed.
@@ -323,7 +336,7 @@ public:
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview, 
     iVisibilityCullerListener* viscallback, int w = 0, int h = 0);
-  virtual bool VisTest (iRenderView* rview, 
+  virtual bool csFrustumVis::VisTest (iRenderView* rview, 
     iVisibilityCullerListener* viscallback,iShaderManager* smShaderMan, int w=0, int h=0);
   virtual void PrecacheCulling () { VisTest ((iRenderView*)0, 0); }
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);

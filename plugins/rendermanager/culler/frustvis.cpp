@@ -49,6 +49,7 @@
 #include "iutil/object.h"
 #include "imap/loader.h"
 #include "ivaria/reporter.h"
+#include "csplugincommon/rendermanager/viscull.h"
 #include "frustvis.h"
 #include "chcpp.h"
 
@@ -298,7 +299,7 @@ int csFrustumVis::TestNodeVisibility (csKDTree* treenode,
 }
 
 bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
-  	FrustTest_Front2BackData* data, uint32 frustum_mask)
+  	FrustTest_Front2BackData* data, uint32 frustum_mask,ObjectRecord &objrec)
 {
   if (obj->mesh && obj->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
     return false;
@@ -306,18 +307,32 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
   const csBox3& obj_bbox = obj->child->GetBBox ();
   if (obj_bbox.Contains (data->pos))
   {
-    data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
+    csSectorVisibleRenderMeshes* meshList;
+    const int nM=static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
+              (f2bData.viscallback)->MarkVisible(obj->mesh, frustum_mask,meshList);
+    if(nM) // don't add records that don't have anything to draw
+    {
+      objrec=ObjectRecord(0,meshList,nM);
+    }
+    //data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
     return true;
   }
   
   uint32 new_mask;
-  if (!csIntersect3::BoxFrustum (obj_bbox, data->frustum,
-		frustum_mask, new_mask))
+  if (!csIntersect3::BoxFrustum (obj_bbox, data->frustum, frustum_mask, new_mask))
   {
     return false;
   }
 
-  data->viscallback->ObjectVisible (obj->visobj, obj->mesh, new_mask);
+  csSectorVisibleRenderMeshes* meshList;
+  const int nM=static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
+        (data->viscallback)->MarkVisible(obj->mesh, new_mask, meshList);
+  if(nM) // don't add records that don't have anything to draw
+  {
+    objrec=ObjectRecord(0,meshList,nM);
+  }
+  //static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
+  //(data->viscallback)->ObjectVisible (obj->visobj, obj->mesh, new_mask);
 
   return true;
 }
@@ -328,59 +343,74 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
 	const uint32 cur_timestamp)
 {
   ntdNode.SetTimestamp(cur_timestamp);
-  if(ntdNode.IsLeaf())
-  {
-    const int num_objects = ntdNode.kdtNode->GetObjectCount ();
-    csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
-    csArray<csKDTreeChild*> objArray(10);
+  CHCList<NodeTraverseData> T_LocalQueue;
+  T_LocalQueue.PushBack(ntdNode);
+  NodeTraverseData ntdAux;
 
-    for (int i = 0 ; i < num_objects ; i++)
+  while(!T_LocalQueue.IsEmpty())
+  {
+    ntdAux=T_LocalQueue.Front();
+    T_LocalQueue.PopFront();
+    if(ntdAux.IsLeaf())
     {
-      if (objects[i]->timestamp != cur_timestamp)
+      const int num_objects = ntdAux.kdtNode->GetObjectCount ();
+      csKDTreeChild** objects = ntdAux.kdtNode->GetObjects ();
+      csArray<ObjectRecord> objArray(10);
+
+      for (int i = 0 ; i < num_objects ; i++)
       {
-        objects[i]->timestamp = cur_timestamp;
-        csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-      	  objects[i]->GetObject ();
-        iMeshWrapper* mesh = visobj_wrap->mesh;
-        // only test an element via occlusion if it first passes frustum testing
-        if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
+        if (objects[i]->timestamp != cur_timestamp)
         {
-          f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, mesh, 0);
-          objArray.Push(objects[i]);
+          objects[i]->timestamp = cur_timestamp;
+          csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	    objects[i]->GetObject ();
+          iMeshWrapper* mesh = visobj_wrap->mesh;
+          // only test an element via occlusion if it first passes frustum testing
+          if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
+          {
+            csSectorVisibleRenderMeshes* meshList;
+            const int nM=static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
+              (f2bData.viscallback)->MarkVisible(mesh,0,meshList);
+            if(nM)
+            {
+              objArray.Push(ObjectRecord(objects[i],meshList,nM));
+            }
+          }
         }
       }
-    }
-    if(!objArray.IsEmpty())
-      IssueQueries(ntdNode,objArray);
-  }
-  else
-  {
-    csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
-    csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
-    if (f2bData.pos[ntdNode.GetSplitAxis()] <= ntdNode.GetSplitLocation())
-    {
-      if (child1)
-      {
-	NodeTraverseData ntd (child1,ntdNode.kdtNode,ntdNode.GetFrustumMask());
-        CallVisibilityCallbacksForSubtree (ntd, cur_timestamp);
-      }
-      if (child2)
-      {
-	NodeTraverseData ntd (child2,ntdNode.kdtNode,ntdNode.GetFrustumMask());
-        CallVisibilityCallbacksForSubtree (ntd, cur_timestamp);
-      }
+      if(!objArray.IsEmpty())
+        IssueQueries(ntdAux,objArray);
     }
     else
     {
-      if (child2)
+      csKDTree* child1 = ntdAux.kdtNode->GetChild1 ();
+      csKDTree* child2 = ntdAux.kdtNode->GetChild2 ();
+      NodeTraverseData ntd;
+      if (f2bData.pos[ntdAux.GetSplitAxis()] <= ntdAux.GetSplitLocation())
       {
-	NodeTraverseData ntd (child2,ntdNode.kdtNode,ntdNode.GetFrustumMask());
-        CallVisibilityCallbacksForSubtree (ntd, cur_timestamp);
+        if (child1)
+        {
+          ntd=NodeTraverseData(child1,ntdAux.kdtNode,ntdAux.GetFrustumMask());
+          T_LocalQueue.PushBack(ntd);
+        }
+        if (child2)
+        {
+          ntd=NodeTraverseData(child2,ntdAux.kdtNode,ntdAux.GetFrustumMask());
+          T_LocalQueue.PushBack(ntd);
+        }
       }
-      if (child1)
+      else
       {
-	NodeTraverseData ntd (child1,ntdNode.kdtNode,ntdNode.GetFrustumMask());
-        CallVisibilityCallbacksForSubtree (ntd, cur_timestamp);
+        if (child2) 
+        {
+          ntd=NodeTraverseData(child2,ntdAux.kdtNode,ntdAux.GetFrustumMask());
+          T_LocalQueue.PushBack(ntd);
+        }
+        if (child1) 
+        {
+          ntd=NodeTraverseData(child1,ntdAux.kdtNode,ntdAux.GetFrustumMask());
+          T_LocalQueue.PushBack(ntd);
+        }
       }
     }
   }
