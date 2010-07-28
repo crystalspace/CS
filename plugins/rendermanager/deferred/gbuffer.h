@@ -80,8 +80,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                  CS_REPORTER_SEVERITY_ERROR, 
                  messageID, 
                  "Too many color buffers requested (%d requested, device supports %d)!", 
-                 desc.colorBufferCount, 
-                 caps->MaxRTColorAttachments);
+                 (int)desc.colorBufferCount, 
+                 (int)caps->MaxRTColorAttachments);
         return false;
       }
 
@@ -96,12 +96,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         if (!colorBuffer)
         {
           csReport(registry, CS_REPORTER_SEVERITY_ERROR, messageID, 
-            "Could not create color buffer %d! %s", i, errString.GetCsString ().GetDataSafe ());
+            "Could not create color buffer %d! %s", (int)i, errString.GetCsString ().GetDataSafe ());
           return false;
         }
 
         csString svName;
-        svName.Format ("tex gbuffer %d", i);
+        svName.Format ("tex gbuffer %d", (int)i);
 
         colorBuffers.Push (colorBuffer);
         colorBufferSVNames.Push (stringSet->Request (svName.GetDataSafe ()));

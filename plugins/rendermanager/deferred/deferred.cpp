@@ -211,7 +211,7 @@ public:
       const size_t layerCount = layerConfig.GetLayerCount ();
       for (size_t layer = 0; layer < layerCount; layer++)
       {
-        if (layer == deferredLayer)
+        if ((int)layer == deferredLayer)
           continue;
 
         size_t layerOffset = layer * totalMeshes;
@@ -267,7 +267,7 @@ public:
       const size_t layerCount = layerConfig.GetLayerCount ();
       for (size_t layer = 0; layer < layerCount; layer++)
       {
-        if (layer == deferredLayer)
+        if ((int)layer == deferredLayer)
           continue;
 
         size_t layerOffset = layer * totalMeshes;
@@ -327,7 +327,6 @@ public:
   {
     RenderView *rview = context->renderView;
     
-    iEngine *engine = rview->GetEngine ();
     iCamera *cam = rview->GetCamera ();
     iClipper2D *clipper = rview->GetClipper ();
     
@@ -340,7 +339,7 @@ public:
     size_t layerCount = context->svArrays.GetNumLayers ();
     for (size_t layer = 0; layer < layerCount; ++layer)
     {
-      if (layer == deferredLayer)
+      if ((int)layer == deferredLayer)
         continue;
 
       meshRender.SetLayer (layer);
@@ -651,17 +650,17 @@ public:
   rmanager(rmanager), 
   layerConfig(layerConfig),
   recurseCount(0), 
-  maxPortalRecurse(rmanager->maxPortalRecurse),
-  deferredLayer(rmanager->deferredLayer)
+  deferredLayer(rmanager->deferredLayer),
+  maxPortalRecurse(rmanager->maxPortalRecurse)
   {}
-
+  
   StandardContextSetup (const StandardContextSetup &other, const LayerConfigType &layerConfig)
     :
   rmanager(other.rmanager), 
   layerConfig(layerConfig),
   recurseCount(other.recurseCount),
-  maxPortalRecurse(other.maxPortalRecurse),
-  deferredLayer(other.deferredLayer)
+  deferredLayer(other.deferredLayer),
+  maxPortalRecurse(other.maxPortalRecurse)
   {}
 
   void operator()(typename RenderTreeType::ContextNode &context, 
@@ -835,7 +834,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   if (!accumBuffer)
   {
     csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, 
-      "Could not create accumulation buffer: %s!", errStr);
+      "Could not create accumulation buffer: %s!", errStr.GetCsString ().GetDataSafe ());
     return false;
   }
 
@@ -870,7 +869,6 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
 bool RMDeferred::RenderView(iView *view)
 {
   iGraphics3D *graphics3D = view->GetContext ();
-  iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
 
   view->UpdateClipper ();
 
@@ -962,7 +960,6 @@ void RMDeferred::AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers
       messageID, "Could not load fill_gbuffer shader");
   }
 
-  iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
   iShader *shader = shaderManager->GetShader ("fill_gbuffer");
 
   SingleRenderLayer baseLayer (shader, 0, 0);
