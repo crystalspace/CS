@@ -1,5 +1,8 @@
 #include "testcull.h"
 
+typedef CS::RenderManager::RenderTree<
+CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
+
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
@@ -105,6 +108,29 @@ void Testcull::SortByDepth()
   }while(ord);
 }
 
+void Testcull::SetupContext(RenderTreeType::ContextNode& context, iShaderManager* shaderManager)
+{
+  CS::RenderManager::RenderView* rview = context.renderView;
+
+  StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine ());
+  mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
+  ForEachMeshNode (context, mySorter);
+
+  SingleMeshContextNumbering<RenderTreeType> numbering;
+  ForEachMeshNode (context, numbering);
+
+  csRef<iStringSet> strSet = csQueryRegistryTagInterface<iStringSet> 
+    (GetObjectRegistry (), "crystalspace.shared.stringset");
+
+  csStringID shaderType = strSet->Request("depthwrite");
+  SingleRenderLayer renderLayer(shaderType, shaderManager->GetShader("occ_queries"), 0, 0);
+  renderLayer.SetAmbient(true);
+  SetupStandardSVs (context, renderLayer, shaderManager, room);
+
+  SetupStandardShader (context, shaderManager, renderLayer);
+  SetupStandardTicket (context, shaderManager, renderLayer);
+}
+
 void Testcull::Frame ()
 {
   // First get elapsed time from the virtual clock.
@@ -159,76 +185,65 @@ void Testcull::Frame ()
   csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
   csOrthoTransform ot (rot, c->GetTransform ().GetOrigin ());
   c->SetTransform (ot);
-  //rmanager->RenderView(view);
+  rmanager->RenderView(view);
+
+  /*if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+  {
+    printf("Cannot prepare renderer for 3D drawing\n");
+  }
+  g3d->FinishDraw();
 
   c->SetViewportSize (g3d->GetWidth(), g3d->GetHeight());
-  g3d->SetClipper (view->GetClipper(), CS_CLIPPER_TOPLEVEL);  // We are at top-level.
-  g3d->ResetNearPlane ();
-  g3d->SetProjectionMatrix (c->GetProjectionMatrix ());
   const csReversibleTransform& camt = c->GetTransform ();
-  g3d->SetWorldToCamera (camt.GetInverse ());
-  float leftx = -c->GetShiftX () * c->GetInvFOV ();
-  float rightx = (g3d->GetWidth () - c->GetShiftX ()) * c->GetInvFOV ();
-  float topy = -c->GetShiftY () * c->GetInvFOV ();
-  float boty = (g3d->GetHeight () - c->GetShiftY ()) * c->GetInvFOV ();
+  const float leftx = (float)(-c->GetShiftX () * c->GetInvFOV ());
+  const float rightx = (float)((g3d->GetWidth () - c->GetShiftX ()) * c->GetInvFOV ());
+  const float topy = (float)(-c->GetShiftY () * c->GetInvFOV ());
+  const float boty = (float)((g3d->GetHeight () - c->GetShiftY ()) * c->GetInvFOV ());
   CS::RenderManager::RenderView rview(c,view->GetClipper(),g3d,g2d);
   rview.SetEngine(engine);
   rview.SetOriginalCamera(c);
   rview.SetFrustum (leftx, rightx, topy, boty);
-  
+  rview.GetClipPlane ().Set (0, 0, -1, 0);
+  g3d->SetClipper (view->GetClipper(), CS_CLIPPER_TOPLEVEL);  // We are at top-level.
+  g3d->ResetNearPlane ();
+  g3d->SetProjectionMatrix (c->GetProjectionMatrix ());
+
   if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
     printf("Cannot prepare renderer for 3D drawing\n");
   }
-  g3d->SetZMode(CS_ZBUF_NONE);
+  g3d->SetWorldToCamera (camt.GetInverse ());
+  g3d->SetZMode(CS_ZBUF_USE);
 
   //engine->Draw(c,view->GetClipper(),house[1]);
+  SortByDepth();
+
+  unsigned int *queries;
+  int numq=numHouses,oldq=0;
+  g3d->OQInitQueries(queries,oldq,numq);
+  bool IsVis[100]={0};
+
   int k=0;
   for(int i=0;i<sqrtl(numHouses);i++)
   {
     for(int j=0;j<sqrtl(numHouses);j++)
     {
       int numRMeshes=0;
-      csShaderVariableStack sv(0,0);
       csRenderMesh **rmeshes=house[vIndexes[k]]->GetRenderMeshes(numRMeshes,&rview,0);
+      g3d->OQBeginQuery(queries[vIndexes[k]]);
       for(int q=0;q<numRMeshes;q++)
       {
-        //printf("Render Mesh Pos %f %f %f\n",rmeshes[q]->worldspace_origin.x,rmeshes[q]->worldspace_origin.y,rmeshes[q]->worldspace_origin.z);
-        //g3d->DrawMesh(rmeshes[q],*rmeshes[q],sv);
+        csVertexAttrib vA=CS_VATTRIB_POSITION;
+        iRenderBuffer *rB=rmeshes[q]->buffers->GetRenderBuffer(CS_BUFFER_POSITION);
+        g3d->ActivateBuffers(&vA,&rB,1);
         g3d->DrawMeshBasic(rmeshes[q],*rmeshes[q]);
+        //g3d->DeactivateBuffers(&vA,1);
       }
-      k++;
-    }
-  }
-  g3d->FinishDraw();
-
-  //bool IsVis[100]={0};
-  /*k=0;
-  SortByDepth();
-  if (!g3d->BeginDraw(g3d->GetCurrentDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
-  {
-    //ReportError("Cannot prepare renderer for 3D drawing.");
-	printf("Cannot prepare renderer for 3D drawing\n");
-        //return false;
-  }
-
-  unsigned int *queries;
-  int numq=numHouses,oldq=0;
-  g3d->OQInitQueries(queries,oldq,numq);
-
-  g3d->SetWriteMask(false,false,false,false);
-  for(int i=0;i<sqrtl(numHouses);i++)
-  {
-    for(int j=0;j<sqrtl(numHouses);j++)
-    {
-      g3d->OQBeginQuery(queries[vIndexes[k]]);
-      engine->Draw(c,view->GetClipper(),house[vIndexes[k]]);
       g3d->OQEndQuery();
       k++;
     }
   }
-  g3d->SetWriteMask(true,true,true,true);
-
+  g3d->SetClipper (0, CS_CLIPPER_NONE);
   g3d->FinishDraw();
 
   k=0;
@@ -250,27 +265,11 @@ void Testcull::Frame ()
       k++;
     }
   }
-  delete [] queries;
 
-  if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
-  {
-    //ReportError("Cannot prepare renderer for 3D drawing.");
-	printf("Cannot prepare renderer for 3D drawing\n");
-        //return false;
-  }
+  g3d->OQDelQueries(queries,numq);
+  rview.GetEngine()->UpdateNewFrame();
 
-  k=0;
-  for(int i=0;i<sqrtl(numHouses);i++)
-  {
-    for(int j=0;j<sqrtl(numHouses);j++)
-    {
-      if(IsVis[vIndexes[k]])
-        engine->Draw(c,view->GetClipper(),house[vIndexes[k]]);
-      k++;
-    }
-  }
-
-  g3d->FinishDraw();*/
+  printf("\n");*/
 }
 
 bool Testcull::OnKeyboard (iEvent& ev)
@@ -383,6 +382,10 @@ bool Testcull::SetupModules ()
   loader = csQueryRegistry<iLoader> (GetObjectRegistry ());
   if (!loader) return ReportError ("Failed to locate Loader!");
 
+  smShaderManager = csQueryRegistry<iShaderManager>(GetObjectRegistry ());
+  pdTreePersistent.Initialize(smShaderManager);
+  loader->LoadShader("/shader/occlusion_queries/occ_queries.xml");
+
   // We need a View to the virtual world.
   view.AttachNew (new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -391,9 +394,6 @@ bool Testcull::SetupModules ()
 
   // Here we create our world.
   CreateRoom ();
-
-  // Here we create our world.
-  CreateSprites ();
 
   // Let the engine prepare all lightmaps for use and also free all images 
   // that were loaded for the texture manager.
@@ -525,38 +525,6 @@ void Testcull::CreateRoom ()
 
   light = engine->CreateLight (0, csVector3 (0, 45, 0), 120, csColor (0, 1, 0));
   ll->Add (light);
-}
-
-void Testcull::CreateSprites ()
-{
-  // Load a texture for our sprite.
-  /*iTextureWrapper* txt = loader->LoadTexture ("spark", "/lib/std/spark.png");
-  if (txt == 0)
-    ReportError("Error loading texture!");
-
-  // Load a sprite template from disk.
-  csRef<iMeshFactoryWrapper> imeshfact (
-    loader->LoadMeshObjectFactory ("/lib/std/sprite1"));
-  if (imeshfact == 0)
-    ReportError("Error loading mesh object factory!");
-
-  // Create the sprite and add it to the engine.
-  csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
-    imeshfact, "MySprite", room,
-    csVector3 (-3, 5, 3)));
-  csMatrix3 m; m.Identity ();
-  sprite->GetMovable ()->SetTransform (m);
-  sprite->GetMovable ()->UpdateMove ();
-  csRef<iSprite3DState> spstate (
-    scfQueryInterface<iSprite3DState> (sprite->GetMeshObject ()));
-  spstate->SetAction ("default");
-  //spstate->SetMixMode (CS_FX_SETALPHA (.5));
-
-  // The following two calls are not needed since CS_ZBUF_USE and
-  // Object render priority are the default but they show how you
-  // can do this.
-  sprite->SetZBufMode (CS_ZBUF_USE);
-  sprite->SetRenderPriority (engine->GetObjectRenderPriority ());*/
 }
 
 /*-------------------------------------------------------------------------*

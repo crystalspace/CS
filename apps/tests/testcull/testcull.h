@@ -1,7 +1,25 @@
 #ifndef __TESTCULL_H__
 #define __TESTCULL_H__
 
+
 #include <crystalspace.h>
+#include "csplugincommon/rendermanager/operations.h"
+#include "csplugincommon/rendermanager/posteffects.h"
+#include "csplugincommon/rendermanager/render.h"
+#include "csplugincommon/rendermanager/renderlayers.h"
+#include "csplugincommon/rendermanager/shadersetup.h"
+#include "csplugincommon/rendermanager/standardsorter.h"
+#include "csplugincommon/rendermanager/svsetup.h"
+#include "csplugincommon/rendermanager/renderview.h"
+#include "csplugincommon/rendermanager/rendertree.h"
+#include "csplugincommon/rendermanager/render.h"
+#include "plugins/engine/3d/sector.h"
+#include <ivideo/rndbuf.h>
+
+using namespace CS::RenderManager;
+
+typedef CS::RenderManager::RenderTree<
+CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
 
 class Testcull : public csApplicationFramework, public csBaseEventHandler
 {
@@ -29,10 +47,17 @@ private:
   csRef<iView> view;
 
   /// The render manager, cares about selecting lights+meshes to render
-  csRef<iRenderManager> rm;
+  csRef<iRenderManager> rmanager;
 
   /// A pointer to the sector the camera will be in.
   iSector* room;
+
+  /// A pointer to the shader manager
+  csRef<iShaderManager> smShaderManager;
+  // Render tree.
+  RenderTreeType* rtRenderTree;
+  // Persistent Data
+  RenderTreeType::PersistentData pdTreePersistent;
 
   float rotX, rotY;
 
@@ -40,11 +65,13 @@ private:
 
   bool bUseBB;
   bool bShowBB;
+  int vIndexes[100];
   int oldNum,newNum,numHouses,numVisible;
   unsigned int *queries;
-  csRef<iMeshWrapper> house[100];
+  iMeshWrapper* house[100];
   csBox3 bboxes[100];
   bool invisible[100];
+  bool occluder[100];
 
   /**
    * Handle keyboard events - ie key presses and releases.
@@ -63,10 +90,11 @@ private:
   /// Here we will create our little, simple world.
   void CreateRoom ();
 
-  /// Here we will create our sprites.
-  void CreateSprites();
-
   bool SetupModules ();
+
+  void SortByDepth();
+
+  void Testcull::SetupContext(RenderTreeType::ContextNode& context, iShaderManager* shaderManager);
 
 public:
 

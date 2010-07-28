@@ -89,14 +89,20 @@ void Tri3DTest::Frame()
   // individual rotations on each axis together to get a single
   // rotation matrix.  The rotations are applied in right to left
   // order .
-  csMatrix3 rot = csXRotMatrix3 (rotX + 90) * csYRotMatrix3 (rotY);
-  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  //csMatrix3 rot = csXRotMatrix3 (rotX + 90) * csYRotMatrix3 (rotY);
+  //csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+ // rMeshObj.object2world *= ot;
+
+  csMatrix3 rot = csXRotMatrix3 (rotX+90) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform ().GetOrigin ());
+  //c->SetTransform (ot);
+
   rMeshObj.object2world *= ot;
+
+  rm->RenderView (view);
 
   //c->SetTransform (ot);
   //g3d->SetWorldToCamera(csReversibleTransform());
-
-  rm->RenderView (view);
 
   // if the user wants the item to be displayed triangulated, 
   // then do so
@@ -208,7 +214,8 @@ bool Tri3DTest::Application()
 
     // camera at 0.00000, -1.5, 15.225 initially
     csOrthoTransform camTransf = c->GetTransform();
-    camTransf.SetOrigin(csVector3(0.0f, -1.5f, 15.225f));
+    camTransf.SetOrigin(csVector3(0.0f, 0.0f, 17.0f));
+	camTransf.LookAt(csVector3(0.0f,0.0f,0.0f),csVector3(0.0f,1.0f,0.0f));
     c->SetTransform(camTransf);
 
     // This calls the default runloop. This will basically just keep
@@ -224,6 +231,10 @@ bool Tri3DTest::SetupModules ()
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
+
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+  if(!vfs) return ReportError("Failed to locate Virtual File System!");
+
   g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
@@ -238,6 +249,8 @@ bool Tri3DTest::SetupModules ()
 
   loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
+
+  //loader->Load("/lib/
 
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
@@ -269,7 +282,7 @@ bool Tri3DTest::SetupModules ()
   
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 4));
 
   // We use some other "helper" event handlers to handle 
   // pushing our work into the 3D engine and rendering it
@@ -280,6 +293,33 @@ bool Tri3DTest::SetupModules ()
   // create our simple box
   CreateBox(untrimesh);
 
+  if(!vfs->Mount("/modelpath/","G:\\Programare\\GSoC\\CS\\"))
+  {
+	  return ReportError("Failed to mount specified location!");
+  }
+
+  loader->Load("/modelpath/house.xml");
+  csRef<iMeshFactoryWrapper> meshFactW=engine->FindMeshFactory("House");
+  
+  if(meshFactW==NULL)
+  {
+	  return ReportError("Failed to find mesh factory!");
+  }
+  csRef<iMeshWrapper> house (engine->CreateMeshWrapper (
+    meshFactW, "MyHouse", room,
+    csVector3 (0, 0, 0),true));
+
+  if(house==NULL)
+  {
+	  return ReportError("Failed to create mesh wrapper!");
+  }
+
+  csMatrix3 m; m.Identity ();
+  house->GetMovable ()->SetTransform (m);
+
+  house->SetZBufMode (CS_ZBUF_USE);
+  house->SetRenderPriority (engine->GetObjectRenderPriority ());
+  //house->
   return true;
 }
 
@@ -326,7 +366,7 @@ csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csTriangleMesh& t)
   rendMesh.colors = 0;
 
 
-  verts = new csVector3[tm.GetTriangleCount() * 3];
+  /*verts = new csVector3[tm.GetTriangleCount() * 3];
   tmVerts = tm.GetVertices();
 
   csArray<csVector4> availableColors;
@@ -360,13 +400,44 @@ csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csTriangleMesh& t)
   rendMesh.vertexCount = (uint)(3 * tm.GetTriangleCount());
   rendMesh.vertices = verts;
 
-  rendMesh.colors = cols;
+  //rendMesh.
+
+  rendMesh.colors = cols;*/
+
+  //csRef<iMeshFactoryWrapper> ff;
+  //csPtr<iMeshWrapper> meshWrapper=ff->CreateMeshWrapper();
+
+  //((csRef<iMeshWrapper>)meshWrapper)->GetRenderMeshes();
+
+  //factstate->
+
+
+
+  rendMesh.vertexCount=3;
+  
+  verts=new csVector3[4];
+  cols=new csVector4[4];
+  cols[0]=csVector4(1.0f, 0.0f, 0.0f, 1.0f);
+  cols[1]=csVector4(0.0f, 1.0f, 0.0f, 1.0f);
+  cols[2]=csVector4(0.0f, 0.0f, 1.0f, 1.0f);
+
+  verts[0]=csVector3(-3.0f,0.0f,-3.0f);
+  verts[1]=csVector3(-3.0f,0.0f,0.0f);
+  verts[2]=csVector3(0.0f,0.0f,0.0f);
+
+
+  rendMesh.vertices=verts;
+  rendMesh.colors=cols;
 
   rendMesh.meshtype = CS_MESHTYPE_TRIANGLES;
   csAlphaMode alf;
   alf.alphaType = alf.alphaSmooth;
   alf.autoAlphaMode = false;
   rendMesh.alphaType = alf;
+
+  //rendMesh.
+
+  //rendMesh.
 
   return rendMesh;
 }
@@ -381,7 +452,7 @@ csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csContour3& c)
   rendMesh.vertices = 0;
   rendMesh.colors = 0;
 
-  verts = new csVector3[c.GetSize()];
+  /*verts = new csVector3[c.GetSize()];
   cols = new csVector4[c.GetSize()];
 
   for (size_t i = 0; i < c.GetSize(); i++)
@@ -399,7 +470,7 @@ csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csContour3& c)
   csAlphaMode alf;
   alf.alphaType = alf.alphaSmooth;
   alf.autoAlphaMode = false;
-  rendMesh.alphaType = alf;
+  rendMesh.alphaType = alf;*/
 
   return rendMesh;
 }

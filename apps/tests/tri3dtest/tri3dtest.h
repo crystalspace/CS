@@ -21,6 +21,9 @@
 
 #include <crystalspace.h>
 #include "csgeom/triangulate3d.h"
+#include "imap/loader.h"
+//#include "g:\Programare\GSoC\CS\culling\plugins\filesys\vfs\vfs.h"
+
 
 /**
  * This is the main class for the application.  It is copied almost entirely
@@ -30,6 +33,10 @@
 class Tri3DTest : public csApplicationFramework, public csBaseEventHandler
 {
  private:
+
+  //iObjectRegistry* object_reg;
+
+  csRef<iVFS> vfs;
   /// A pointer to the 3D engine.
   csRef<iEngine> engine;
    
@@ -38,7 +45,7 @@ class Tri3DTest : public csApplicationFramework, public csBaseEventHandler
      
   /// A pointer to the 3D renderer plugin.
   csRef<iGraphics3D> g3d;
-	
+
   /// A pointer to the keyboard driver.
   csRef<iKeyboardDriver> kbd;
 	  

@@ -87,6 +87,7 @@ void Simple::Frame ()
   c->SetTransform (ot);
 
   rm->RenderView (view);
+  //engine->Draw(c,view->GetClipper());
 }
 
 bool Simple::OnKeyboard (iEvent& ev)
@@ -208,7 +209,7 @@ bool Simple::SetupModules ()
   CreateRoom ();
 
   // Here we create our world.
-  CreateSprites ();
+  //CreateSprites ();
 
   // Let the engine prepare all lightmaps for use and also free all images 
   // that were loaded for the texture manager.
@@ -225,7 +226,7 @@ bool Simple::SetupModules ()
 
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 15, -3));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -40));
 
   // We use some other "helper" event handlers to handle 
   // pushing our work into the 3D engine and rendering it
@@ -258,9 +259,9 @@ void Simple::CreateRoom ()
   box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
 
   // Now we make a factory and a mesh at once.
-  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+  /*csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
     engine, room, "walls", "walls_factory", &box);
-  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);*/
 
   if(!vfs->Mount("/modelpath/","G:\\Programare\\GSoC\\CS\\"))
   {
@@ -278,7 +279,7 @@ void Simple::CreateRoom ()
   }
   csRef<iMeshWrapper> house (engine->CreateMeshWrapper (
     meshFactW, "MyHouse", room,
-    csVector3 (0, 0, 0),true));
+    csVector3 (2, 0, 0),true));
 
   if(house==NULL)
   {
@@ -286,24 +287,22 @@ void Simple::CreateRoom ()
 	  return;
   }
 
-  csMatrix3 m; m.Identity ();
-  m*=0.1f;
-  house->GetMovable ()->SetTransform (m);
-
-  house->SetZBufMode (CS_ZBUF_USE);
-  house->SetRenderPriority (engine->GetObjectRenderPriority ());
+  //house->SetZBufMode (CS_ZBUF_MESH);
 
   // Now we need light to see something.
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10, csColor (1, 0, 0));
+  light = engine->CreateLight (0, csVector3 (-43, 5, 0), 120, csColor (1, 0, 0));
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10, csColor (0, 0, 1));
+  light = engine->CreateLight (0, csVector3 (43, 5,  0), 120, csColor (0, 0, 1));
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10, csColor (0, 1, 0));
+  light = engine->CreateLight (0, csVector3 (0, 45, -3), 120, csColor (0, 1, 0));
+  ll->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (0, 45, 0), 120, csColor (0, 1, 0));
   ll->Add (light);
 }
 
