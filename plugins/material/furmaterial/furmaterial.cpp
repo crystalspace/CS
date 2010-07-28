@@ -150,6 +150,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
       controlPointSum += hairStrands.Get(x).controlPointsCount, x++ )
+      
+      if (hairStrands.Get(x).controlPointsCount >= 2)
     {
       for ( size_t y = 0 ; y < hairStrands.Get(x).controlPointsCount ; y ++ )
       {
@@ -250,6 +252,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 //       csPrintf("%d\n", (int)( (height * heightFactor) / controlPointsDistance) );
 
       guideHair.controlPointsCount = (int)( (height * heightFactor) / controlPointsDistance);
+      
+      if (guideHair.controlPointsCount < 3 && guideHair.controlPointsCount > 0)
+        guideHair.controlPointsCount = 3;
+
       guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 
       for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
@@ -1100,7 +1106,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         (*(tangentBuffer + 1)) = tangent;
       }
 
-      if (controlPointsCount >= 1)
+      if (controlPointsCount >= 2)
       {
         (*vbuf) = *controlPoints;
         (*(vbuf + 1)) = *controlPoints + strip;
