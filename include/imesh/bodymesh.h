@@ -34,7 +34,6 @@
  * @{ */
 
 struct iSkeletonFactory2;
-//struct iAnimatedMesh;
 struct iBodySkeleton;
 struct iBodyBone;
 struct iBodyChain;
