@@ -336,7 +336,7 @@ public:
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview, 
     iVisibilityCullerListener* viscallback, int w = 0, int h = 0);
-  virtual bool csFrustumVis::VisTest (iRenderView* rview, 
+  virtual bool VisTest (iRenderView* rview, 
     iVisibilityCullerListener* viscallback,iShaderManager* smShaderMan, int w=0, int h=0);
   virtual void PrecacheCulling () { VisTest ((iRenderView*)0, 0); }
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
