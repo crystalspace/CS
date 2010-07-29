@@ -85,10 +85,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csReversibleTransform currentTransform = 
       initialTransform * rigidBody->GetTransform();
 
-    csGuideHairAnimation *guideHairAnimation = guideRopes.Get(strandID, guideHairAnimation);
+    csGuideHairAnimation *guideHairAnimation = guideRopes.Get(strandID, 0);
 
-    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
-      coordinates[i] = guideHairAnimation->controlPoints[i] * currentTransform.GetInverse();
+    if (guideHairAnimation)
+    {
+      for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
+        coordinates[i] = guideHairAnimation->controlPoints[i] * currentTransform.GetInverse();
+    }
   }
 
   void AnimationPhysicsControl::RemoveStrand (size_t strandID)
