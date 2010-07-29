@@ -8,8 +8,8 @@
          lighting from static lights, but lighter2 can provide
          data for that, too -->
   </staticlights>
-  <layer config="RenderManager.ZOnly.Enabled">
-    <defaultshader name="z_only" file="/shader/early_z/z_only.xml" />
+  <layer>
+    <defaultshader name="depthwrite" file="/shader/deferred/depthwrite.xml" />
     <ambient />
     <shadertype>depthwrite</shadertype>
   </layer>

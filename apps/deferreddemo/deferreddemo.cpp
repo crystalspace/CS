@@ -132,6 +132,11 @@ bool DeferredDemo::SetupModules()
   if (!loader) 
     return ReportError("Failed to locate Loader!");
 
+  /* NOTE: Config settings for render managers are stored in 'engine.cfg' 
+   * and are needed when loading a render manager. Normally these settings 
+   * are added by the engine when it loads a render manager. However, since
+   * we are loading the deferred render manager manually we must also manually
+   * add the proper config file. */
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   cfg->AddDomain ("/config/engine.cfg", vfs, iConfigManager::ConfigPriorityPlugin);

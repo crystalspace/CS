@@ -92,7 +92,7 @@ fragmentOutput main(vertex2fragment IN,
   <?if vars."tex normal".texture || (vars."tex height".texture && vars."tex diffuse".texture) ?>
     float3 N = normalize (IN.ViewNormal);
     float3 T = normalize (IN.ViewTangent);
-    float3 B = normalize (cross (IN.ViewTangent, IN.ViewNormal));//normalize (IN.ViewBiNormal);
+    float3 B = normalize (IN.ViewBiNormal);
 
     float3x3 view2tan = float3x3 (T, B, N);
     float3x3 tan2view = transpose (float3x3 (T, B, N));

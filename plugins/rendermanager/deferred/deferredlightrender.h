@@ -469,6 +469,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
      */
     void operator()(iLight *light)
     {
+      //if (light->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_STATIC)
+      //  return;
+
       switch (light->GetType ())
       {
       case CS_LIGHT_POINTLIGHT:

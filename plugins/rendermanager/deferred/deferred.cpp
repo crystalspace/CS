@@ -174,11 +174,13 @@ class DeferredShaderSetup
 public:
   DeferredShaderSetup(ShaderArrayType &shaderArray, 
                       const LayerConfigType &layerConfig,
-                      int deferredLayer)
+                      int deferredLayer,
+                      int zonlyLayer)
     : 
   shaderArray(shaderArray), 
   layerConfig(layerConfig), 
-  deferredLayer(deferredLayer)
+  deferredLayer(deferredLayer),
+  zonlyLayer(zonlyLayer)
   {}
 
   void operator() (typename RenderTree::MeshNode *node)
@@ -189,7 +191,7 @@ public:
       DeferredSetup (node);
   }
 
-   /**
+  /**
    * Sets up a mesh node to not use the deferred layer.
    */
   void ForwardSetup(typename RenderTree::MeshNode *node)
@@ -214,8 +216,6 @@ public:
         if ((int)layer == deferredLayer)
           continue;
 
-        size_t layerOffset = layer * totalMeshes;
-
         iShader *shader = nullptr;
         if (rm->material)
         {
@@ -225,6 +225,7 @@ public:
           shader = rm->material->GetMaterial ()->GetFirstShader (layerShaders, layerShaderNum);
         }
         
+        size_t layerOffset = layer * totalMeshes;
         if (shader)
           shaderArray[mesh.contextLocalId + layerOffset] = shader;
         else
@@ -247,27 +248,34 @@ public:
       typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
       csRenderMesh *rm = mesh.renderMesh;
 
-      // Setup the deferred layer.
-      iShader *shader = nullptr;
-      if (rm->material)
+      // Setup the deferred and zonly layers.
+      size_t layers[2] = { deferredLayer, zonlyLayer };
+      const size_t count = sizeof(layers) / sizeof(size_t);
+      for (size_t k = 0; k < count; k++)
       {
-        size_t layerShaderNum;
-        const csStringID* layerShaders = layerConfig.GetShaderTypes (deferredLayer, layerShaderNum);
+        size_t layer = layers[k];
 
-        shader = rm->material->GetMaterial ()->GetFirstShader (layerShaders, layerShaderNum);
+        iShader *shader = nullptr;
+        if (rm->material)
+        {
+          size_t layerShaderNum;
+          const csStringID* layerShaders = layerConfig.GetShaderTypes (layer, layerShaderNum);
+
+          shader = rm->material->GetMaterial ()->GetFirstShader (layerShaders, layerShaderNum);
+        }
+
+        size_t layerOffset = layer * totalMeshes;
+        if (shader)
+          shaderArray[mesh.contextLocalId + layerOffset] = shader;
+        else
+          shaderArray[mesh.contextLocalId + layerOffset] = layerConfig.GetDefaultShader (layer);
       }
-
-      size_t layerOffset = deferredLayer * totalMeshes;
-      if (shader)
-        shaderArray[mesh.contextLocalId + layerOffset] = shader;
-      else
-        shaderArray[mesh.contextLocalId + layerOffset] = layerConfig.GetDefaultShader (deferredLayer);
 
       // Setup the forward rendering layers.
       const size_t layerCount = layerConfig.GetLayerCount ();
       for (size_t layer = 0; layer < layerCount; layer++)
       {
-        if ((int)layer == deferredLayer)
+        if ((int)layer == deferredLayer || (int)layer == zonlyLayer)
           continue;
 
         size_t layerOffset = layer * totalMeshes;
@@ -280,6 +288,7 @@ private:
   ShaderArrayType &shaderArray;
   const LayerConfigType &layerConfig;
   int deferredLayer;
+  int zonlyLayer;
 };
 
 /**
@@ -289,7 +298,8 @@ template<typename ContextNodeType, typename LayerConfigType>
 void DeferredSetupShader(ContextNodeType &context, 
                          iShaderManager *shaderManager,
                          const LayerConfigType &layerConfig,
-                         int deferredLayer)
+                         int deferredLayer,
+                         int zonlyLayer)
 {
   context.shaderArray.SetSize (context.totalRenderMeshes * layerConfig.GetLayerCount ());
 
@@ -297,7 +307,7 @@ void DeferredSetupShader(ContextNodeType &context,
   typedef typename ContextNodeType::TreeType Tree;
   
   DeferredShaderSetup<Tree, LayerConfigType>
-    shaderSetup (context.shaderArray, layerConfig, deferredLayer);
+    shaderSetup (context.shaderArray, layerConfig, deferredLayer, zonlyLayer);
 
   ForEachMeshNode (context, shaderSetup);
 }
@@ -385,7 +395,8 @@ public:
                        iStringSet *stringSet,
                        GBuffer &gbuffer,
                        DeferredLightRenderer::PersistentData &lightRenderPersistent,
-                       int deferredLayer)
+                       int deferredLayer,
+                       int zonlyLayer)
     : 
   meshRender(g3d, shaderMgr),
   graphics3D(g3d),
@@ -394,6 +405,7 @@ public:
   gbuffer(gbuffer),
   lightRenderPersistent(lightRenderPersistent),
   deferredLayer(deferredLayer),
+  zonlyLayer(zonlyLayer),
   lastAccumBuf(nullptr),
   lastSubTex(-1),
   lastRenderView(nullptr)
@@ -427,12 +439,7 @@ protected:
   void RenderContextStack()
   {
     const size_t ctxCount = contextStack.GetSize ();
-/*
-    for (size_t i = 0; i < ctxCount; i++)
-    {
-      Render (contextStack[i], i == 0);
-    }*/
-    
+
     if (ctxCount == 0)
       return;
     
@@ -444,87 +451,6 @@ protected:
     iCamera *cam = rview->GetCamera ();
     iClipper2D *clipper = rview->GetClipper ();
 
-    iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
-
-    for (size_t i = 0; i < ctxCount; i++)
-    {
-      typename RenderTree::ContextNode *context = contextStack[i];
-
-      // Fill the gbuffer
-      gbuffer.Attach ();
-      {
-        graphics3D->SetZMode (CS_ZBUF_MESH);
-
-        // Setup the camera etc.
-        graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
-        graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
-
-        int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
-        graphics3D->BeginDraw (drawFlags);
-        graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
-
-        meshRender.SetLayer (deferredLayer);
-        ForEachDeferredMeshNode (*context, meshRender);
-        
-        graphics3D->FinishDraw ();
-      }
-      gbuffer.Detach ();
-
-      // Fills the accumulation buffer
-      AttachAccumBuffer (context, false);
-      {
-        int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
-        drawFlags &= ~CSDRAW_CLEARSCREEN;
-
-        if (i == 0)
-          graphics2D->Clear (graphics2D->FindRGB (0, 0, 0));
-
-        graphics3D->BeginDraw (drawFlags);
-        graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
-
-        // Iterate through lights adding results into accumulation buffer.
-        DeferredLightRenderer render (graphics3D,
-                                      shaderMgr,
-                                      stringSet,
-                                      rview,
-                                      gbuffer,
-                                      lightRenderPersistent);
-
-        ForEachLight (*context, render);
-      }
-      DetachAccumBuffer ();
-    }
-
-    // Draws the forward shaded objects.
-    AttachAccumBuffer (context, true);
-    {
-      graphics3D->SetZMode (CS_ZBUF_MESH);
-
-      for (size_t i = 0; i < ctxCount; i++)
-      {
-        typename RenderTree::ContextNode *context = contextStack[i];
-
-        ForwardMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderMgr, deferredLayer);
-        render (context);
-      }
-
-      graphics3D->FinishDraw ();
-    }
-    DetachAccumBuffer ();
-
-    contextStack.Empty ();
-  }
-
-  void Render(typename RenderTree::ContextNode *context, bool first)
-  {
-    RenderView *rview = context->renderView;
-
-    iEngine *engine = rview->GetEngine ();
-    iCamera *cam = rview->GetCamera ();
-    iClipper2D *clipper = rview->GetClipper ();
-
-    iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
-
     // Fill the gbuffer
     gbuffer.Attach ();
     {
@@ -535,16 +461,19 @@ protected:
       graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
       int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
-
-      if (!first)
-        drawFlags &= ~CSDRAW_CLEARSCREEN;
-      
+      drawFlags |= CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
       graphics3D->BeginDraw (drawFlags);
       graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
 
       meshRender.SetLayer (deferredLayer);
-      ForEachDeferredMeshNode (*context, meshRender);
 
+      for (size_t i = 0; i < ctxCount; i++)
+      {
+        typename RenderTree::ContextNode *context = contextStack[i];
+        
+        ForEachDeferredMeshNode (*context, meshRender);
+      }
+      
       graphics3D->FinishDraw ();
     }
     gbuffer.Detach ();
@@ -552,11 +481,10 @@ protected:
     // Fills the accumulation buffer
     AttachAccumBuffer (context, false);
     {
-      int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
-      drawFlags &= ~CSDRAW_CLEARSCREEN;
+      graphics3D->SetZMode (CS_ZBUF_MESH);
 
-      if (first)
-        graphics2D->Clear (graphics2D->FindRGB (0, 0, 0));
+      int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
+      drawFlags |= CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 
       graphics3D->BeginDraw (drawFlags);
       graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
@@ -571,7 +499,12 @@ protected:
 
       //render.OutputAmbientLight ();
 
-      ForEachLight (*context, render);
+      for (size_t i = 0; i < ctxCount; i++)
+      {
+        typename RenderTree::ContextNode *context = contextStack[i];
+
+        ForEachLight (*context, render);
+      }
     }
     DetachAccumBuffer ();
 
@@ -581,11 +514,19 @@ protected:
       graphics3D->SetZMode (CS_ZBUF_MESH);
 
       ForwardMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderMgr, deferredLayer);
-      render (context);
+
+      for (size_t i = 0; i < ctxCount; i++)
+      {
+        typename RenderTree::ContextNode *context = contextStack[i];
+
+        render (context);
+      }
 
       graphics3D->FinishDraw ();
     }
     DetachAccumBuffer ();
+
+    contextStack.Empty ();
   }
 
   /**
@@ -703,6 +644,7 @@ private:
   csArray<typename RenderTree::ContextNode*> contextStack;
 
   int deferredLayer;
+  int zonlyLayer;
 
   iTextureHandle *lastAccumBuf;
   int lastSubTex;
@@ -723,6 +665,7 @@ public:
   layerConfig(layerConfig),
   recurseCount(0), 
   deferredLayer(rmanager->deferredLayer),
+  zonlyLayer(rmanager->zonlyLayer),
   maxPortalRecurse(rmanager->maxPortalRecurse)
   {}
   
@@ -732,6 +675,7 @@ public:
   layerConfig(layerConfig),
   recurseCount(other.recurseCount),
   deferredLayer(other.deferredLayer),
+  zonlyLayer(other.zonlyLayer),
   maxPortalRecurse(other.maxPortalRecurse)
   {}
 
@@ -786,7 +730,7 @@ public:
     }
 
     // Setup shaders and tickets
-    DeferredSetupShader (context, shaderManager, layerConfig, deferredLayer);
+    DeferredSetupShader (context, shaderManager, layerConfig, deferredLayer, zonlyLayer);
 
     // Setup lighting (only needed for transparent objects)
     RMDeferred::LightSetupType::ShadowParamType shadowParam;
@@ -809,6 +753,7 @@ private:
 
   int recurseCount;
   int deferredLayer;
+  int zonlyLayer;
   int maxPortalRecurse;
 };
 
@@ -865,12 +810,22 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     {
       // Locates the deferred shading layer.
       deferredLayer = LocateDeferredLayer (renderLayer);
-      if (deferredLayer <= 0)
+      if (deferredLayer < 0)
       {
         csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
           messageID, "The render layers file '%s' does not contain a 'gbuffer fill' layer.", layersFile);
 
         AddDeferredLayer (renderLayer, deferredLayer);
+      }
+
+      // Locates the zonly shading layer.
+      zonlyLayer = LocateZOnlyLayer (renderLayer);
+      if (zonlyLayer < 0)
+      {
+        csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+          messageID, "The render layers file '%s' does not contain a 'depthwrite' layer.", layersFile);
+
+        AddZOnlyLayer (renderLayer, zonlyLayer);
       }
     }
   }
@@ -881,6 +836,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     csReport (objRegistry, CS_REPORTER_SEVERITY_NOTIFY, messageID,
       "Using default render layers");
 
+    AddZOnlyLayer (renderLayer, zonlyLayer);
     AddDeferredLayer (renderLayer, deferredLayer);
 
     if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
@@ -997,7 +953,9 @@ bool RMDeferred::RenderView(iView *view)
                                                  stringSet,
                                                  gbuffer,
                                                  lightRenderPersistent,
-                                                 deferredLayer);
+                                                 deferredLayer,
+                                                 zonlyLayer);
+
     ForEachContextReverse (renderTree, render);
   }
 
@@ -1043,10 +1001,44 @@ void RMDeferred::AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers
 }
 
 //----------------------------------------------------------------------
+void RMDeferred::AddZOnlyLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer)
+{
+  const char *messageID = "crystalspace.rendermanager.deferred";
+
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
+
+  if (!loader->LoadShader ("/shader/early_z/z_only.xml"))
+  {
+    csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+      messageID, "Could not load z_only shader");
+  }
+
+  iShader *shader = shaderManager->GetShader ("z_only");
+
+  SingleRenderLayer baseLayer (shader, 0, 0);
+  baseLayer.AddShaderType (stringSet->Request("depthwrite"));
+
+  renderLayer.AddLayers (baseLayer);
+
+  addedLayer = renderLayer.GetLayerCount () - 1;
+}
+
+//----------------------------------------------------------------------
 int RMDeferred::LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer &layers)
 {
-  csStringID deferredShaderType = stringSet->Request("gbuffer fill");
+  return LocateLayer (layers, stringSet->Request("gbuffer fill"));
+}
 
+//----------------------------------------------------------------------
+int RMDeferred::LocateZOnlyLayer(const CS::RenderManager::MultipleRenderLayer &layers)
+{
+  return LocateLayer (layers, stringSet->Request("depthwrite"));
+}
+
+//----------------------------------------------------------------------
+int RMDeferred::LocateLayer(const CS::RenderManager::MultipleRenderLayer &layers,
+                            csStringID shaderType)
+{
   size_t count = renderLayer.GetLayerCount ();
   for (size_t i = 0; i < count; i++)
   {
@@ -1054,7 +1046,7 @@ int RMDeferred::LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer
     const csStringID *strID = renderLayer.GetShaderTypes (i, num);
     for (size_t j = 0; j < num; j++)
     {
-      if (strID[j] == deferredShaderType)
+      if (strID[j] == shaderType)
       {
         return i;
       }

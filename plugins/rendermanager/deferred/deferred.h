@@ -77,7 +77,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
   public:
 
     void AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
+    void AddZOnlyLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
+
     int LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer &layers);
+    int LocateZOnlyLayer(const CS::RenderManager::MultipleRenderLayer &layers);
+    int LocateLayer(const CS::RenderManager::MultipleRenderLayer &layers,
+                    csStringID shaderType);
 
     void ShowGBuffer(RenderTreeType &tree);
 
@@ -99,6 +104,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     GBuffer gbuffer;
 
     int deferredLayer;
+    int zonlyLayer;
     int maxPortalRecurse;
 
     bool showGBuffer;
