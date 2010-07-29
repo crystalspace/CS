@@ -84,7 +84,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     iObjectRegistry* object_reg) :
   scfImplementationType (this), manager (manager), name (name), 
     object_reg(object_reg), physicsControl(0), hairStrandGenerator(0), rng(0),
-    guideLOD(0), strandLOD(0), hairStrandsLODSize(0), physicsControlEnabled(0)
+    guideLOD(0), strandLOD(0), hairStrandsLODSize(0), physicsControlEnabled(true)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -104,11 +104,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   FurMaterial::~FurMaterial ()
   {
     delete rng;
-  }
-
-  void FurMaterial::SetRigidBody(iRigidBody* rigidBody)
-  {
-    this->rigidBody = rigidBody;
   }
 
   void FurMaterial::GenerateGeometry (iView* view, iSector *room)
@@ -202,8 +197,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     if (hairStrandGenerator && hairStrandGenerator->GetMaterial())
       materialWrapper->SetMaterial(hairStrandGenerator->GetMaterial());
-
-    initialTransform = rigidBody->GetTransform().GetInverse();
 
     meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
 
@@ -756,7 +749,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurMaterial::SetPhysicsControl (iFurPhysicsControl* physicsControl)
   {
     this->physicsControl = physicsControl;
-    physicsControlEnabled = true;
   }
 
   void FurMaterial::StartPhysicsControl()
@@ -1013,9 +1005,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurAnimationControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
-    csReversibleTransform currentTransform = 
-      furMaterial->initialTransform * furMaterial->rigidBody->GetTransform();
-
     // update shader
     if (furMaterial->hairStrandGenerator)
       furMaterial->hairStrandGenerator->Update();
@@ -1030,7 +1019,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       return;
 
     // then update the hair strands
-//     if (furMaterial->physicsControlEnabled)
+    if (furMaterial->physicsControlEnabled)
       for (size_t i = 0 ; i < numberOfStrains; i ++)
       {
         csHairStrand hairStrand = furMaterial->hairStrands.Get(i);
@@ -1038,15 +1027,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         UpdateControlPoints(hairStrand.controlPoints,
           hairStrand.controlPointsCount, hairStrand.guideHairs);
       }
-
-    for(size_t i = 0 ; i < numberOfStrains ; i ++)
-    {
-      csHairStrand hairStrand = furMaterial->hairStrands.Get(i);
-
-      for(size_t j = 0 ; j < hairStrand.controlPointsCount ; j ++)
-        hairStrand.controlPoints[j] = hairStrand.controlPoints[j] * 
-          currentTransform.GetInverse();
-    }
 
     const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
 

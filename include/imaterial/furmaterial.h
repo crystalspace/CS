@@ -82,9 +82,6 @@ struct iFurMaterial : public virtual iMaterial
   SCF_INTERFACE (iFurMaterial, 1, 0, 0);
   /// Generate geometry
   virtual void GenerateGeometry (iView* view, iSector* room) = 0;
-  
-  virtual void SetRigidBody (iRigidBody* rigidBody) = 0;
-
   virtual void SetGuideLOD(float guideLOD) = 0; 
   virtual void SetStrandLOD(float strandLOD) = 0; 
 

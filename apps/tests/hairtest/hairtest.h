@@ -66,12 +66,14 @@ public:
   // Display of information on the state of the scene
   virtual void UpdateStateDescription () = 0;
 
+  // Switch fur dynamics
+  virtual void SwitchFurPhysics() = 0;
+
   // Animesh
   csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
   // Fur material
   csRef<iFurMaterial> furMaterial;
-
 };
 
 class HairTest : public CS::Demo::DemoApplication
@@ -89,7 +91,6 @@ private:
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
-  bool furPhysicsEnabled;
 
   // Animation node plugin managers
   csRef<iSkeletonLookAtManager2> lookAtManager;

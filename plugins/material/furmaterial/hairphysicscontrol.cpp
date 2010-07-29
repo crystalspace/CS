@@ -38,7 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   HairPhysicsControl::~HairPhysicsControl ()
   {
-    guideRopes.DeleteAll();
+    RemoveAllStrands();
   }
 
   // From iComponent
@@ -99,20 +99,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
       coordinates[i] = bulletBody->GetVertexPosition(i);
-    /*
-    if (strandID % 3 == 0)
-    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
-    coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
-    csVector3(1,0,0);
-    else if (strandID % 3 == 1)
-    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
-    coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
-    csVector3(0,1,0);
-    else
-    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
-    coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
-    csVector3(0,0,1);
-    */
   }
 
   void HairPhysicsControl::RemoveStrand (size_t strandID)
@@ -129,8 +115,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void HairPhysicsControl::RemoveAllStrands ()
   {
     for (size_t i = 0 ; i < guideRopes.GetSize(); i ++)
-      bulletDynamicSystem->RemoveSoftBody( guideRopes.Get(i, 0) );
-
+    {
+      csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get(i, 0);
+      if (bulletBody)
+        bulletDynamicSystem->RemoveSoftBody( bulletBody );
+    }
     guideRopes.DeleteAll();
   }
 

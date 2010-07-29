@@ -32,8 +32,7 @@ HairTest::HairTest ()
 : DemoApplication ("CrystalSpace.HairTest", "hairtest",
                      "hairtest <OPTIONS>",
                      "Tests on the animation of objects iAnimatedMesh."),
-                     avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE) ,
-                     furPhysicsEnabled (true)
+                     avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // We manage the camera by ourselves
   cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
@@ -257,19 +256,7 @@ bool HairTest::OnEventThumbTrackEndedOverallLOD (const CEGUI::EventArgs&)
 
 bool HairTest::OnPhysicsButtonClicked (const CEGUI::EventArgs&)
 {
-  if (!avatarScene->furMaterial)
-    return false;
-
-  if (furPhysicsEnabled)
-  {
-    furPhysicsEnabled = false;
-    avatarScene->furMaterial->StopPhysicsControl();
-  }
-  else
-  {
-    furPhysicsEnabled = true;
-    avatarScene->furMaterial->StartPhysicsControl();
-  }
+  avatarScene->SwitchFurPhysics();
 
   return true;
 }
@@ -327,19 +314,9 @@ bool HairTest::OnKeyboard (iEvent &ev)
 
     // Toggle physics control
     if (csKeyEventHelper::GetCookedCode (&ev) == 'e'
-      && physicsEnabled && avatarScene->HasPhysicalObjects () &&
-      avatarScene -> furMaterial)
+      && physicsEnabled && avatarScene->HasPhysicalObjects ())
     {
-      if (furPhysicsEnabled)
-      {
-        avatarScene->furMaterial->StopPhysicsControl();
-        furPhysicsEnabled = false;
-      }
-      else 
-      {
-        avatarScene->furMaterial->StartPhysicsControl();
-        furPhysicsEnabled = true;
-      }
+      avatarScene->SwitchFurPhysics();
 
       return true;
     }
@@ -368,8 +345,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
     iSkeletonBasicNodesManager2),
     CS_REQUEST_PLUGIN("crystalspace.material.furmaterial", iFurMaterialType),
-    CS_REQUEST_PLUGIN("crystalspace.physics.furphysics", iFurPhysicsControl),
-    CS_REQUEST_PLUGIN("crystalspace.material.furstrandmaterial", iFurStrandGenerator),
+    CS_REQUEST_PLUGIN("crystalspace.material.hairstrandmaterial", iFurStrandGenerator),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");

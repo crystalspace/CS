@@ -26,7 +26,7 @@
 #define CAMERA_HIPS_DISTANCE 3.0f
 
 KrystalScene::KrystalScene (HairTest* hairTest)
-: hairTest (hairTest)
+: hairTest (hairTest), hairPhysicsEnabled(true)
 {
   // Define the available keys
   hairTest->hudHelper.keyDescriptions.DeleteAll ();
@@ -138,6 +138,28 @@ bool KrystalScene::HasPhysicalObjects ()
   return true;
 }
 
+void KrystalScene::SwitchFurPhysics()
+{
+  if (!furMaterial)
+    return;
+
+  if (hairPhysicsEnabled)
+  {
+    furMaterial->StopPhysicsControl();
+    animationPhysicsControl->SetRigidBody(headBody);
+    furMaterial->SetPhysicsControl(animationPhysicsControl);
+    furMaterial->StartPhysicsControl();
+    hairPhysicsEnabled = false;
+  }
+  else 
+  {
+    furMaterial->StopPhysicsControl();
+    furMaterial->SetPhysicsControl(hairPhysicsControl);
+    furMaterial->StartPhysicsControl();
+    hairPhysicsEnabled = true;
+  }
+}
+
 bool KrystalScene::CreateAvatar ()
 {
   printf ("Loading Krystal...\n");
@@ -193,10 +215,22 @@ bool KrystalScene::CreateAvatar ()
   if (!skirtMeshFact)
     return hairTest->ReportError ("Can't find Krystal's skirt mesh factory!");
 
+  // Get plugin manager
+  csRef<iPluginManager> plugmgr = 
+    csQueryRegistry<iPluginManager> (hairTest->object_reg);
+  if (!plugmgr)
+    return hairTest->ReportError("Failed to locate Plugin Manager!");
+
   // Load hairPhysicsControl
-  csRef<iFurPhysicsControl> hairPhysicsControl = csQueryRegistry<iFurPhysicsControl> 
-    (hairTest->object_reg);
+  hairPhysicsControl = csLoadPlugin<iFurPhysicsControl>
+    (plugmgr, "crystalspace.physics.hairphysics");
   if (!hairPhysicsControl)
+    return hairTest->ReportError("Failed to locate iFurPhysicsControl plugin!");
+
+  // Load animationPhysicsControl
+  animationPhysicsControl = csLoadPlugin<iFurPhysicsControl>
+    (plugmgr, "crystalspace.physics.animationphysics");
+  if (!animationPhysicsControl)
     return hairTest->ReportError("Failed to locate iFurPhysicsControl plugin!");
 
   // Load hairStrandGenerator
@@ -348,7 +382,7 @@ bool KrystalScene::CreateAvatar ()
     ragdollNode->Play ();
   }
 
-  iRigidBody* headBody = ragdollNode->GetBoneRigidBody
+  headBody = ragdollNode->GetBoneRigidBody
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
 
   rc = hairTest-> loader ->Load ("/hairtest/fur_material.xml");
@@ -365,11 +399,12 @@ bool KrystalScene::CreateAvatar ()
   hairPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
   hairPhysicsControl->SetRigidBody(headBody);
 
+  animationPhysicsControl->SetRigidBody(headBody);
+
   // Initialize fur material
   furMaterial = furMaterialType->CreateFurMaterial("hair");
-//   furMaterial->SetPhysicsControl(hairPhysicsControl);
+  furMaterial->SetPhysicsControl(hairPhysicsControl);
   furMaterial->SetFurStrandGenerator(hairStrandGenerator);
-  furMaterial->SetRigidBody(headBody);
 
   furMaterial->SetMeshFactory(animeshFactory);
   furMaterial->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
