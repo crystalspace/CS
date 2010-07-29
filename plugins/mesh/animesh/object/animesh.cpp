@@ -575,6 +575,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     if (factory->skeletonFactory)
     {
       skeleton = factory->skeletonFactory->CreateSkeleton ();
+      skeleton->SetAnimatedMesh (this);
       skeletonVersion = skeleton->GetSkeletonStateVersion() - 1;
     }
   }
@@ -584,6 +585,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     skeleton = newskel;
     if (skeleton)
     {
+      skeleton->SetAnimatedMesh (this);
       skeletonVersion = skeleton->GetSkeletonStateVersion() - 1;
     }
     else

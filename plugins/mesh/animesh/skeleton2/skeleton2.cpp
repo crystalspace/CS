@@ -25,6 +25,9 @@
 #include "animation.h"
 #include "nodes.h"
 #include "utilities.h"
+#include "imesh/animesh.h"
+#include "imesh/object.h"
+#include "iengine/mesh.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
@@ -340,7 +343,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   Skeleton::Skeleton (SkeletonFactory* factory)
     : scfImplementationType (this, factory), factory (factory), 
-    cachedTransformsDirty (true), version (0), versionLastReset (0)
+    cachedTransformsDirty (true), version (0), versionLastReset (0), animesh (nullptr)
   {
     // Setup the bones from the parent setup
     RecreateSkeletonP ();
@@ -349,7 +352,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   iSceneNode* Skeleton::GetSceneNode ()
   {
-    return 0;
+    if (!animesh)
+      return 0;
+
+    csRef<iMeshObject> object = scfQueryInterface<iMeshObject> (animesh);
+    return object->GetMeshWrapper ()->QuerySceneNode ();
+  }
+
+  void Skeleton::SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh)
+  {
+    this->animesh = animesh;
+  }
+
+  CS::Mesh::iAnimatedMesh* Skeleton::GetAnimatedMesh ()
+  {
+    return animesh;
   }
 
   void Skeleton::GetTransformBoneSpace (CS::Animation::BoneID bone, csQuaternion& rot, 

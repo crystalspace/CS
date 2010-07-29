@@ -36,6 +36,16 @@ struct iSceneNode;
 
 namespace CS
 {
+namespace Mesh
+{
+
+struct iAnimatedMesh;
+
+} // namespace Mesh
+} // namespace CS
+
+namespace CS
+{
 namespace Animation
 {
 
@@ -235,10 +245,10 @@ struct iSkeletonFactory2 : public virtual iBase
  */
 struct iSkeleton2 : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeleton2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeleton2, 1, 0, 1);
 
   /**
-   * Get the scene node associated with the skeleton
+   * Get the scene node associated with this skeleton
    */
   virtual iSceneNode* GetSceneNode () = 0;
 
@@ -348,6 +358,16 @@ struct iSkeleton2 : public virtual iBase
    * Get skeleton update version number
    */
   virtual unsigned int GetSkeletonStateVersion () const = 0;
+
+  /**
+   * Set the animated mesh associated with this skeleton
+   */
+  virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
+
+  /**
+   * Get the animated mesh associated with this skeleton
+   */
+  virtual CS::Mesh::iAnimatedMesh* GetAnimatedMesh () = 0;
 };
 
 /**

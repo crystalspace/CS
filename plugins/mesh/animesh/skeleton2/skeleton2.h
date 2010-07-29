@@ -27,6 +27,7 @@
 #include "csgeom/quaternion.h"
 #include "csutil/hash.h"
 #include "csutil/leakguard.h"
+#include "csutil/weakref.h"
 #include "csutil/csstring.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
@@ -147,6 +148,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     //-- CS::Animation::iSkeleton2
     virtual iSceneNode* GetSceneNode ();
+    virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh);
+    virtual CS::Mesh::iAnimatedMesh* GetAnimatedMesh ();
 
     virtual void GetTransformBoneSpace (CS::Animation::BoneID bone, csQuaternion& rot, 
       csVector3& offset) const;
@@ -210,6 +213,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     csRef<CS::Animation::iSkeletonAnimPacket2> animationPacket;
     bool cachedTransformsDirty;
     unsigned int version, versionLastReset;
+    csWeakRef<CS::Mesh::iAnimatedMesh> animesh;
   };
 
 }
