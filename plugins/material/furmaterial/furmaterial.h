@@ -159,6 +159,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csArray<csGuideHairLOD> guideHairsLOD;
     csRef<iFurPhysicsControl> physicsControl;
     csRef<iFurStrandGenerator> hairStrandGenerator;
+    csRef<iRigidBody> rigidBody;
+    csReversibleTransform initialTransform;
     csRandomGen *rng;
     float guideLOD;
     float strandLOD;
@@ -182,6 +184,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iEngine> engine;
     csRef<iLoader> loader;
     /// functions
+    void SetRigidBody (iRigidBody* rigidBody);
     void GenerateGuideHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
       iRenderBuffer* normals, iRenderBuffer* texCoords);
     void SynchronizeGuideHairs();

@@ -317,12 +317,10 @@ bool KrystalScene::CreateAvatar ()
     // Create the geometry for the hairs
     csRef<iGeneralFactoryState> hairsFactoryState =
       scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
-    /*
+    
     // Create the mesh of the hairs
-    hairsMesh = hairTest->engine->CreateMeshWrapper
-    (hairsMeshFact, "krystal_hairs", hairTest->room, csVector3 (0.0f));
-    */
-
+//     hairsMesh = hairTest->engine->CreateMeshWrapper
+//     (hairsMeshFact, "krystal_hairs", hairTest->room, csVector3 (0.0f));
   }
 
   else
@@ -369,8 +367,9 @@ bool KrystalScene::CreateAvatar ()
 
   // Initialize fur material
   furMaterial = furMaterialType->CreateFurMaterial("hair");
-  furMaterial->SetPhysicsControl(hairPhysicsControl);
+//   furMaterial->SetPhysicsControl(hairPhysicsControl);
   furMaterial->SetFurStrandGenerator(hairStrandGenerator);
+  furMaterial->SetRigidBody(headBody);
 
   furMaterial->SetMeshFactory(animeshFactory);
   furMaterial->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
