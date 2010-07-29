@@ -92,6 +92,8 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
   csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   cfg->AddDomain ("/config/deferreddemo.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
 
+  csRef<iBugPlug> bugPlug = csQueryRegistry<iBugPlug> (GetObjectRegistry());
+
   return true;
 }
 
@@ -130,9 +132,15 @@ bool DeferredDemo::SetupModules()
   if (!loader) 
     return ReportError("Failed to locate Loader!");
 
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
+  cfg->AddDomain ("/config/engine.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
+
   rm = csLoadPlugin<iRenderManager> (GetObjectRegistry(), "crystalspace.rendermanager.deferred");
   if (!rm)
     return ReportError("Failed to load deferred Render Manager!");
+
+  cfg->RemoveDomain ("/config/engine.cfg");
 
   rm_default = engine->GetRenderManager ();
 

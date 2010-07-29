@@ -488,7 +488,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
   private:
 
     /**
-     * Sets shader variables spacific to the given light.
+     * Sets shader variables specific to the given light.
      */
     void SetupLightShaderVars(iLight *light)
     {

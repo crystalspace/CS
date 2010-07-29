@@ -71,13 +71,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     typedef CS::RenderManager::LightSetup<RenderTreeType, CS::RenderManager::MultipleRenderLayer> 
       LightSetupType;
 
+    //---- iDebugHelper Interface ----
+    virtual bool DebugCommand(const char *cmd);
+
   public:
 
     void AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
     int LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer &layers);
-
-    bool AttachAccumBuffer(iGraphics3D *graphics3D, bool useGbufferDepth = false);
-    bool DetachAccumBuffer(iGraphics3D *graphics3D);
 
     void ShowGBuffer(RenderTreeType &tree);
 

@@ -25,19 +25,33 @@
 
   <technique priority="200" lights="0">
     <pass>
+
+      <!-- Makes sure no blending occures. -->
+      <mixmode>
+        <blendop src="one" dst="zero" />
+        <alphatest>disable</alphatest>
+      </mixmode>
       
       <buffer source="normal" destination="normal" />
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="texture coordinates lightmap" destination="texture coordinate 1" />
       <buffer source="tangent" destination="texture coordinate 2" />
       <buffer source="binormal" destination="texture coordinate 3" />
-      <vp plugin="glcg" file="/shader/deferred/fill_gbuffer.cgvp" />
+      <vp plugin="glcg">
+        <cgvp>
+          <?Include fill_gbuffer.cgvp ?>
+        </cgvp>
+      </vp>
 
       <texture destination="TexDiffuse" name="tex diffuse" />
       <texture destination="TexSpecular" name="tex specular" fallback="tex diffuse" />
       <texture destination="TexHeight" name="tex height" />
       <texture destination="TexNormal" name="tex normal" />
+      <texture destination="TexNormalCompressed" name="tex normal compressed" />
       <texture destination="TexLightMap" name="tex lightmap" />
+      <texture destination="TexLightMapDir1" name="tex lightmap dir 1" />
+      <texture destination="TexLightMapDir2" name="tex lightmap dir 2" />
+      <texture destination="TexLightMapDir3" name="tex lightmap dir 3" />
       <fp plugin="glcg">
         <cgfp>
           <?Include fill_gbuffer.cgfp ?>

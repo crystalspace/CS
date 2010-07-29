@@ -427,10 +427,15 @@ protected:
   void RenderContextStack()
   {
     const size_t ctxCount = contextStack.GetSize ();
-
+/*
+    for (size_t i = 0; i < ctxCount; i++)
+    {
+      Render (contextStack[i], i == 0);
+    }*/
+    
     if (ctxCount == 0)
       return;
-
+    
     typename RenderTree::ContextNode *context = contextStack[0];
 
     RenderView *rview = context->renderView;
@@ -441,60 +446,54 @@ protected:
 
     iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
 
-    // Fill the gbuffer
-    gbuffer.Attach ();
+    for (size_t i = 0; i < ctxCount; i++)
     {
-      graphics3D->SetZMode (CS_ZBUF_MESH);
+      typename RenderTree::ContextNode *context = contextStack[i];
 
-      // Setup the camera etc.
-      graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
-      graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
-
-      int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
-      graphics3D->BeginDraw (drawFlags);
-      graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
-
-      for (size_t i = 0; i < ctxCount; i++)
+      // Fill the gbuffer
+      gbuffer.Attach ();
       {
-        typename RenderTree::ContextNode *context = contextStack[i];
+        graphics3D->SetZMode (CS_ZBUF_MESH);
+
+        // Setup the camera etc.
+        graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
+        graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
+
+        int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
+        graphics3D->BeginDraw (drawFlags);
+        graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
 
         meshRender.SetLayer (deferredLayer);
         ForEachDeferredMeshNode (*context, meshRender);
+        
+        graphics3D->FinishDraw ();
       }
-      
-      graphics3D->FinishDraw ();
-    }
-    gbuffer.Detach ();
+      gbuffer.Detach ();
 
-    // Fills the accumulation buffer
-    AttachAccumBuffer (context, false);
-    {
-      int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
-      drawFlags &= ~CSDRAW_CLEARSCREEN;
-
-      graphics2D->Clear (graphics2D->FindRGB (0, 0, 0));
-
-      graphics3D->BeginDraw (drawFlags);
-      graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
-
-      // Iterate through lights adding results into accumulation buffer.
-      DeferredLightRenderer render (graphics3D,
-                                    shaderMgr,
-                                    stringSet,
-                                    rview,
-                                    gbuffer,
-                                    lightRenderPersistent);
-
-      render.OutputAmbientLight ();
-
-      for (size_t i = 0; i < ctxCount; i++)
+      // Fills the accumulation buffer
+      AttachAccumBuffer (context, false);
       {
-        typename RenderTree::ContextNode *context = contextStack[i];
+        int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
+        drawFlags &= ~CSDRAW_CLEARSCREEN;
+
+        if (i == 0)
+          graphics2D->Clear (graphics2D->FindRGB (0, 0, 0));
+
+        graphics3D->BeginDraw (drawFlags);
+        graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
+
+        // Iterate through lights adding results into accumulation buffer.
+        DeferredLightRenderer render (graphics3D,
+                                      shaderMgr,
+                                      stringSet,
+                                      rview,
+                                      gbuffer,
+                                      lightRenderPersistent);
 
         ForEachLight (*context, render);
       }
+      DetachAccumBuffer ();
     }
-    DetachAccumBuffer ();
 
     // Draws the forward shaded objects.
     AttachAccumBuffer (context, true);
@@ -514,6 +513,79 @@ protected:
     DetachAccumBuffer ();
 
     contextStack.Empty ();
+  }
+
+  void Render(typename RenderTree::ContextNode *context, bool first)
+  {
+    RenderView *rview = context->renderView;
+
+    iEngine *engine = rview->GetEngine ();
+    iCamera *cam = rview->GetCamera ();
+    iClipper2D *clipper = rview->GetClipper ();
+
+    iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
+
+    // Fill the gbuffer
+    gbuffer.Attach ();
+    {
+      graphics3D->SetZMode (CS_ZBUF_MESH);
+
+      // Setup the camera etc.
+      graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
+      graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
+
+      int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
+
+      if (!first)
+        drawFlags &= ~CSDRAW_CLEARSCREEN;
+      
+      graphics3D->BeginDraw (drawFlags);
+      graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
+
+      meshRender.SetLayer (deferredLayer);
+      ForEachDeferredMeshNode (*context, meshRender);
+
+      graphics3D->FinishDraw ();
+    }
+    gbuffer.Detach ();
+
+    // Fills the accumulation buffer
+    AttachAccumBuffer (context, false);
+    {
+      int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
+      drawFlags &= ~CSDRAW_CLEARSCREEN;
+
+      if (first)
+        graphics2D->Clear (graphics2D->FindRGB (0, 0, 0));
+
+      graphics3D->BeginDraw (drawFlags);
+      graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
+
+      // Iterate through lights adding results into accumulation buffer.
+      DeferredLightRenderer render (graphics3D,
+                                    shaderMgr,
+                                    stringSet,
+                                    rview,
+                                    gbuffer,
+                                    lightRenderPersistent);
+
+      //render.OutputAmbientLight ();
+
+      ForEachLight (*context, render);
+    }
+    DetachAccumBuffer ();
+
+    // Draws the forward shaded objects.
+    AttachAccumBuffer (context, true);
+    {
+      graphics3D->SetZMode (CS_ZBUF_MESH);
+
+      ForwardMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderMgr, deferredLayer);
+      render (context);
+
+      graphics3D->FinishDraw ();
+    }
+    DetachAccumBuffer ();
   }
 
   /**
@@ -774,7 +846,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   // Read Config settings.
   csConfigAccess cfg (objRegistry);
   maxPortalRecurse = cfg->GetInt ("RenderManager.Deferred.MaxPortalRecurse", 30);
-  showGBuffer = cfg->GetBool ("RenderManager.Deferred.VisualizeGBuffer", false);
+  showGBuffer = true;
 
   bool layersValid = false;
   const char *layersFile = cfg->GetStr ("RenderManager.Deferred.Layers", nullptr);
@@ -913,10 +985,12 @@ bool RMDeferred::RenderView(iView *view)
     ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
 
     startContext->renderTargets[rtaColor0].texHandle = accumBuffer;
+    startContext->renderTargets[rtaColor0].subtexture = 0;
 
     contextSetup (*startContext, portalData);
   }
 
+  // Render all contexts.
   {
     DeferredTreeRenderer<RenderTreeType> render (graphics3D,
                                                  shaderManager,
@@ -935,8 +1009,6 @@ bool RMDeferred::RenderView(iView *view)
   }
 
   DebugFrameRender (rview, renderTree);
-
-  renderTree.RenderDebugTextures (graphics3D);
 
   return true;
 }
@@ -993,31 +1065,6 @@ int RMDeferred::LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer
 }
 
 //----------------------------------------------------------------------
-bool RMDeferred::AttachAccumBuffer(iGraphics3D *graphics3D, bool useGbufferDepth)
-{
-  if (!graphics3D->SetRenderTarget (accumBuffer, false, 0, rtaColor0))
-    return false;
-
-  if (useGbufferDepth && gbuffer.HasDepthBuffer ())
-  {
-    if (!graphics3D->SetRenderTarget (gbuffer.GetDepthBuffer (), false, 0, rtaDepth))
-      return false; 
-  }
-  
-  if (!graphics3D->ValidateRenderTargets ())
-    return false;
-
-  return true;
-}
-
-//----------------------------------------------------------------------
-bool RMDeferred::DetachAccumBuffer(iGraphics3D *graphics3D)
-{
-  graphics3D->UnsetRenderTargets ();
-  return true;
-}
-
-//----------------------------------------------------------------------
 void RMDeferred::ShowGBuffer(RenderTreeType &tree)
 {
   size_t count = gbuffer.GetColorBufferCount ();
@@ -1037,6 +1084,18 @@ void RMDeferred::ShowGBuffer(RenderTreeType &tree)
       tree.AddDebugTexture (gbuffer.GetDepthBuffer (), aspect);
     }
   }
+}
+
+//----------------------------------------------------------------------
+bool RMDeferred::DebugCommand(const char *cmd)
+{
+  if (strcmp (cmd, "toggle_visualize_gbuffer") == 0)
+  {
+    showGBuffer = !showGBuffer;
+    return true;
+  }
+
+  return false;
 }
 
 }

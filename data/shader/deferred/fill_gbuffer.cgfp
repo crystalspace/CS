@@ -2,11 +2,13 @@
 
 <variablemap variable="mat flatcolor" destination="FlatColor" />
 <variablemap variable="specular" destination="ConstSpecular" />
+<variablemap variable="dynamic ambient" destination="DynamicAmbient" />
 <variablemap variable="combined ambient" destination="CombinedAmbient" />
 
 <program>
 
-<?Include /shader-snippets/cg-common.cginc?>
+<?Include /shader-snippets/lighting/directional_lms.cginc ?>
+<?Include /shader-snippets/cg-common.cginc ?>
  
 struct vertex2fragment 
 { 
@@ -75,17 +77,22 @@ float2 ComputeParallaxOcclusion(sampler2D texHeight,
 fragmentOutput main(vertex2fragment IN,
                     uniform float3 FlatColor,
                     uniform float3 ConstSpecular,
+                    uniform float3 DynamicAmbient,
                     uniform float3 CombinedAmbient,
                     uniform sampler2D TexDiffuse,
                     uniform sampler2D TexNormal,
+                    uniform sampler2D TexNormalCompressed,
                     uniform sampler2D TexSpecular,
                     uniform sampler2D TexHeight,
-                    uniform sampler2D TexLightMap)
+                    uniform sampler2D TexLightMap, 
+                    uniform sampler2D TexLightMapDir1,
+                    uniform sampler2D TexLightMapDir2,
+                    uniform sampler2D TexLightMapDir3)
 { 
   <?if vars."tex normal".texture || (vars."tex height".texture && vars."tex diffuse".texture) ?>
     float3 N = normalize (IN.ViewNormal);
     float3 T = normalize (IN.ViewTangent);
-    float3 B = normalize (IN.ViewBiNormal);
+    float3 B = normalize (cross (IN.ViewTangent, IN.ViewNormal));//normalize (IN.ViewBiNormal);
 
     float3x3 view2tan = float3x3 (T, B, N);
     float3x3 tan2view = transpose (float3x3 (T, B, N));
@@ -116,18 +123,27 @@ fragmentOutput main(vertex2fragment IN,
   float3 specular = tex2D (TexSpecular, TexCoord).rgb;
   specular = specular * ConstSpecular;
 
-  <?if vars."tex lightmap".texture ?>
-    float3 ambient = tex2D (TexLightMap, IN.TexCoordLM).rgb;
-  <?else?>
-    float3 ambient = CombinedAmbient;
-  <?endif?>
-
-  <?if vars."tex normal".texture ?>
-    // Transform normal from tangent space to view space.
+  <?if vars."tex normal compressed".texture ?>
+    float3 normal = float3 (tex2D (TexNormalCompressed, texCoord).wy * 2 - 1, 0);
+    normal.z = sqrt (1 - dot (normal.xy, normal.xy));
+    normal = mul (tan2view, normal);
+  <?elsif vars."tex normal".texture ?>
     float3 normal = tex2D (TexNormal, TexCoord).rgb * 2 - 1;
     normal = mul (tan2view, normal);
   <?else?>
     float3 normal = IN.ViewNormal;
+  <?endif?>
+
+  <?if vars."tex lightmap dir 1".texture ?>
+    float3 baseLit[3];
+    baseLit[0] = tex2D (TexLightMapDir1, IN.TexCoordLM).rgb;
+    baseLit[1] = tex2D (TexLightMapDir2, IN.TexCoordLM).rgb;
+    baseLit[2] = tex2D (TexLightMapDir3, IN.TexCoordLM).rgb;
+    float3 ambient = DynamicAmbient + 2 * ComputeDLMColor (normal, baseLit);
+  <?elsif vars."tex lightmap".texture ?>
+    float3 ambient = DynamicAmbient + tex2D (TexLightMap, IN.TexCoordLM).rgb;
+  <?else?>
+    float3 ambient = CombinedAmbient;
   <?endif?>
 
   // Normalize and map into the range [0,1].
