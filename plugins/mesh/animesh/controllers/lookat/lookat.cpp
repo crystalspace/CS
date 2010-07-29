@@ -170,18 +170,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   LookAtAnimNode::LookAtAnimNode (LookAtAnimNodeFactory* factory, 
 				  CS::Animation::iSkeleton2* skeleton,
 				  CS::Animation::iSkeletonAnimNode2* childNode)
-    : scfImplementationType (this), factory (factory), skeleton (skeleton),
+    : scfImplementationType (this), factory (factory), sceneNode (nullptr), skeleton (skeleton),
     childNode (childNode), boneID (CS::Animation::InvalidBoneID), targetMode (TARGET_NONE),
     isPlaying (false), maximumSpeed (PI), alwaysRotate (false),
     trackingInitialized (true), listenerMinimumDelay (0.1f)
   {
-  }
-
-  void LookAtAnimNode::SetAnimatedMesh (CS::Mesh::iAnimatedMesh* mesh)
-  {
-    CS_ASSERT (mesh);
-    csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (mesh);
-    sceneNode = animeshObject->GetMeshWrapper ()->QuerySceneNode ();
   }
 
   void LookAtAnimNode::SetBone (CS::Animation::BoneID boneID)
@@ -317,7 +310,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   void LookAtAnimNode::Play ()
   {
-    CS_ASSERT (boneID != CS::Animation::InvalidBoneID);
+    CS_ASSERT (boneID != CS::Animation::InvalidBoneID
+	       && skeleton->GetSceneNode ());
+
+    if (!sceneNode)
+      sceneNode = skeleton->GetSceneNode ();
 
     // init tracking
     isPlaying = true;

@@ -482,7 +482,6 @@ bool FrankieScene::CreateAvatar ()
   // Setup of the LookAt controller
   lookAtNode = scfQueryInterface<CS::Animation::iSkeletonLookAtNode2> (rootNode->FindNode ("lookat"));
   lookAtNode->AddListener (&lookAtListener);
-  lookAtNode->SetAnimatedMesh (animesh);
   lookAtNode->SetBone (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
   lookAtNode->SetListenerDelay (0.6f);
 
@@ -491,11 +490,8 @@ bool FrankieScene::CreateAvatar ()
 
   // Setup of the ragdoll controller
   if (avatarTest->physicsEnabled)
-  {
     ragdollNode =
       scfQueryInterface<CS::Animation::iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
-    ragdollNode->SetAnimatedMesh (animesh);
-  }
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();

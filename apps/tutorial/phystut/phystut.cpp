@@ -157,6 +157,14 @@ void Simple::Frame ()
   // Step the dynamic simulation
   if (!pauseDynamic)
   {
+    /*
+    for (int i = 0; i < dynamicSystem->GetBodysCount (); i++)
+    {
+      iRigidBody* body = dynamicSystem->GetBody (i);
+      body->SetLinearVelocity (csVector3 (0.0f));
+      body->SetAngularVelocity (csVector3 (0.0f));
+    }
+    */
     // If the physics engine is ODE, then we have to take care of calling
     // the update of the dynamic simulation with a constant step time.
     if (phys_engine_id == ODE_ID)
@@ -1640,7 +1648,6 @@ void Simple::SpawnRagdoll ()
 
   csRef<CS::Animation::iSkeletonRagdollNode2> ragdoll =
     scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode2> (root);
-  ragdoll->SetAnimatedMesh (animesh);
 
   // Fling the body.
   // (start the ragdoll node before so that the rigid bodies are created)

@@ -141,12 +141,6 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
 {
   SCF_INTERFACE(CS::Animation::iSkeletonRagdollNode2, 1, 0, 1);
 
-  // TODO: remove this function and implement iSkeleton2::GetSceneNode ()
-  /**
-   * Set the animated mesh associated with this animation node.
-   */
-  virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* mesh) = 0;
-
   /**
    * Set the body chain in the specified physical state.
    */

@@ -114,8 +114,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     ~RagdollAnimNode ();
 
     //-- CS::Animation::iSkeletonRagdollNode2
-    virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* mesh);
-
     virtual void SetBodyChainState (CS::Animation::iBodyChain* chain, CS::Animation::RagdollState state);
     virtual CS::Animation::RagdollState GetBodyChainState (CS::Animation::iBodyChain* chain);
 

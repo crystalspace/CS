@@ -109,7 +109,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 		    CS::Animation::iSkeletonAnimNode2* childNode);
 
     //-- CS::Animation::iSkeletonLookAtNode2
-    virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* mesh);
     virtual void SetBone (CS::Animation::BoneID boneID);
 
     virtual void SetTarget (csVector3 target);

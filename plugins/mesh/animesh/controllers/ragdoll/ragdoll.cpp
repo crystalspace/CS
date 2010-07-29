@@ -175,7 +175,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   RagdollAnimNode::RagdollAnimNode (RagdollAnimNodeFactory* factory, 
 				    CS::Animation::iSkeleton2* skeleton,
 				    CS::Animation::iSkeletonAnimNode2* childNode)
-    : scfImplementationType (this), factory (factory), skeleton (skeleton),
+    : scfImplementationType (this), factory (factory), sceneNode (nullptr), skeleton (skeleton),
     childNode (childNode), isActive (false), maxBoneID (0)
   {
     // copy body chains
@@ -218,12 +218,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     // update state of children nodes
     for (uint i = 0; i < chainNode->GetChildCount (); i++)
       CreateBoneData (chainNode->GetChild (i), state);
-  }
-
-  void RagdollAnimNode::SetAnimatedMesh (CS::Mesh::iAnimatedMesh* mesh)
-  {
-    csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (mesh);
-    sceneNode = animeshObject->GetMeshWrapper ()->QuerySceneNode ();
   }
 
   void RagdollAnimNode::SetBodyChainState (CS::Animation::iBodyChain* chain,
@@ -357,13 +351,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   void RagdollAnimNode::Play ()
   {
+    CS_ASSERT (skeleton->GetSceneNode ());
+
     // check availability of animated mesh
     if (!sceneNode)
-    {
-      factory->manager->Report (CS_REPORTER_SEVERITY_ERROR,
-	       "No animesh defined while starting the ragdoll node.\n");
-      return;
-    }
+      sceneNode = skeleton->GetSceneNode ();
 
     // check for the dynamic system
     if (!factory->dynSys)

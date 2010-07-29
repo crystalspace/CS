@@ -458,7 +458,6 @@ bool KrystalScene::CreateAvatar ()
   {
     ragdollNode =
       scfQueryInterface<CS::Animation::iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
-    ragdollNode->SetAnimatedMesh (animesh);
 
     // Start the ragdoll animation node in order to have the rigid bodies created
     ragdollNode->Play ();

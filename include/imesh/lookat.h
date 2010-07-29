@@ -127,12 +127,6 @@ struct iSkeletonLookAtNode2 : public iSkeletonAnimNode2
 {
   SCF_INTERFACE(CS::Animation::iSkeletonLookAtNode2, 1, 0, 0);
 
-  // TODO: remove this function and implement CS::Animation::iSkeleton2::GetSceneNode ()
-  /**
-   * Set the animated mesh associated with this animation node.
-   */
-  virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* mesh) = 0;
-
   /**
    * Set the bone controlled by this controller.
    */
