@@ -378,8 +378,9 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
           }
         }
       }
-      if(!objArray.IsEmpty())
-        IssueQueries(ntdAux,objArray);
+      //if(!objArray.IsEmpty())
+      //  IssueQueries(ntdAux,objArray);
+      //IssueSingleQuery(ntdAux);
     }
     else
     {
@@ -447,17 +448,18 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   }
   g3d->FinishDraw();
 
+  /*printf("%d\n",cur_timestamp);
   while(Q_Queue.Size())
   {
     OccQuery oc;
     const int rez=GetFinishedQuery(oc);
     if(rez==1) // object was visible last fram,e
     {
-      printf("visible\n");
+      printf("visible %d\n",oc.ntdNode.GetTimestamp());
     }
     else if(rez==-1) // object was occluded last frame
     {
-      printf("not visible\n");
+      printf("not visible %d\n",oc.ntdNode.GetTimestamp());
     }
     if(rez) // if we found a finished query than cleanup memory
     {
@@ -468,7 +470,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
         delete oc.qID;
     }
   }
-  printf("\n");
+  printf("\n");*/
 
   const csReversibleTransform& camt = rview->GetCamera()->GetTransform ();
   g3d->SetClipper (rview->GetClipper(), CS_CLIPPER_TOPLEVEL);  // We are at top-level.
@@ -483,36 +485,122 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   g3d->SetWriteMask(false,false,false,false);
 
   smShaderManager = smShaderMan;
-  NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
+  NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
+  ntdRoot.SetVisibility(true);
   T_Queue.PushBack(ntdRoot);
 
-  while(!T_Queue.IsEmpty())// || !Q_Queue.IsEmpty())
+  while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
   {
-    NodeTraverseData ntdAux=T_Queue.Front();
-    T_Queue.PopFront();
-
-    int nodevis = TestNodeVisibility (ntdAux.kdtNode, &f2bData,ntdAux.u32Frustum_Mask);
-    if (nodevis == NODE_INVISIBLE)
-      continue;
-
-    if (nodevis == NODE_VISIBLE && frustum_mask == 0)
+    int res;
+    OccQuery oc;
+    while(!Q_Queue.IsEmpty() && ( (res=GetFinishedQuery(oc)) || T_Queue.IsEmpty()))
     {
-      CallVisibilityCallbacksForSubtree (ntdAux, cur_timestamp);
-      continue;
+      if(res==1)
+      {
+        PullUpVisibility(oc.ntdNode);
+        TraverseNode(oc.ntdNode,cur_timestamp);
+      }
+      if(res)
+      {
+        //printf("Cleaning up query...\n");
+        g3d->OQDelQueries(oc.qID,oc.numQueries);
+        if(oc.IsMultiQuery())
+          delete [] oc.qID;
+        else
+          delete oc.qID;
+        oc=OccQuery();
+      }
     }
+    if(!T_Queue.IsEmpty())
+    {
+      NodeTraverseData ntdCurrent=T_Queue.Front();
+      T_Queue.PopFront();
 
-    // important...never try and traverse before doing a distribute
-    // unless the node is fully visible, in which case it doesn't matter
-    ntdAux.kdtNode->Distribute ();
+      if(!ntdCurrent.IsCompletelyVisible())
+      {
+        int nodevis = TestNodeVisibility (ntdCurrent.kdtNode, &f2bData,ntdCurrent.u32Frustum_Mask);
+        if (nodevis == NODE_INVISIBLE)
+        {
+          continue;
+        }
 
-    TraverseNode(ntdAux,cur_timestamp);
+        if (nodevis == NODE_VISIBLE && frustum_mask == 0)
+        {
+          ntdCurrent.SetCompletelyVisible(true);
+        }
+      }
+
+      //check to see if the node was last visible
+      const bool bWasVisible=WasVisible(ntdCurrent,cur_timestamp);
+      bWasVisible?printf("Was visible\n"):printf("Was NOT visible\n");
+
+      // identify nodes that we cannot skip queries for
+      const bool bLeafOrWasInvisible=( !bWasVisible || ntdCurrent.IsLeaf() );
+      if(!bWasVisible && !ntdCurrent.IsLeaf()) printf("wasn't visible and isn't leaf\n");
+
+      // reset node's visibility classification
+      ntdCurrent.SetVisibility(false);
+
+      // update the timestamp flag
+      ntdCurrent.SetTimestamp(cur_timestamp);
+
+      if(bLeafOrWasInvisible)
+      {
+        csBox3 bb=ntdCurrent.kdtNode->GetNodeBBox();
+        printf("Issuing query (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bb.MinX(),bb.MinY(),bb.MinZ(),
+          bb.MaxX(),bb.MaxY(),bb.MaxZ());
+        if(ntdCurrent.IsLeaf())
+          IssueSingleQuery(ntdCurrent,false);
+        else
+          IssueSingleQuery(ntdCurrent,true);
+      }
+
+      // important...never try and traverse before doing a distribute
+      // unless the node is fully visible, in which case it doesn't matter
+      ntdCurrent.kdtNode->Distribute ();
+      if(bWasVisible)
+        TraverseNode(ntdCurrent,cur_timestamp);
+    }
   }
-  
+
+  /*while(!T_Queue.IsEmpty())
+  {
+    if(!T_Queue.IsEmpty())
+    {
+      NodeTraverseData ntdCurrent=T_Queue.Front();
+      T_Queue.PopFront();
+
+      if(!ntdCurrent.IsCompletelyVisible())
+      {
+        int nodevis = TestNodeVisibility (ntdCurrent.kdtNode, &f2bData,ntdCurrent.u32Frustum_Mask);
+        if (nodevis == NODE_INVISIBLE)
+          continue;
+
+        if (nodevis == NODE_VISIBLE && frustum_mask == 0)
+        {
+          ntdCurrent.SetCompletelyVisible(true);
+          //CallVisibilityCallbacksForSubtree (ntdAux, cur_timestamp);
+          //continue;
+        }
+      }
+      ntdCurrent.SetVisibility(false);
+
+      // update the timestamp flag
+      ntdCurrent.SetTimestamp(cur_timestamp);
+
+      // important...never try and traverse before doing a distribute
+      // unless the node is fully visible, in which case it doesn't matter
+      ntdCurrent.kdtNode->Distribute ();
+      TraverseNode(ntdCurrent,cur_timestamp);
+    }
+  }*/
 
   // here we should process the remaining nodes in the multi query
+
+  printf("\n\n");
 
   g3d->SetWriteMask(true,true,true,true);
   g3d->SetClipper (0, CS_CLIPPER_NONE);

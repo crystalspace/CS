@@ -50,6 +50,76 @@
 #include "frustvis.h"
 #include "chcpp.h"
 
+static void ConstructBBoxMesh(csBox3 &box,csSimpleRenderMesh &srm,csRenderMeshType rmtype,csZBufMode zbuf)
+{
+  csVector3* verts = 0;
+  csVector4* cols = 0;
+
+  verts=new csVector3[25];
+  cols=new csVector4[25];
+
+  verts[0]=csVector3(box.MinX(),box.MinY(),box.MaxZ());
+  verts[1]=csVector3(box.MaxX(),box.MinY(),box.MaxZ());
+  verts[2]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
+  verts[3]=csVector3(box.MinX(),box.MaxY(),box.MaxZ());
+
+  verts[4]=csVector3(box.MaxX(),box.MinY(),box.MinZ());
+  verts[5]=csVector3(box.MinX(),box.MinY(),box.MinZ());
+  verts[6]=csVector3(box.MinX(),box.MaxY(),box.MinZ());
+  verts[7]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
+
+  verts[8]=csVector3(box.MinX(),box.MinY(),box.MinZ());
+  verts[9]=csVector3(box.MinX(),box.MinY(),box.MaxZ());
+  verts[10]=csVector3(box.MinX(),box.MaxY(),box.MaxZ());
+  verts[11]=csVector3(box.MinX(),box.MaxY(),box.MinZ());
+
+  verts[12]=csVector3(box.MaxX(),box.MinY(),box.MaxZ());
+  verts[13]=csVector3(box.MaxX(),box.MinY(),box.MinZ());
+  verts[14]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
+  verts[15]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
+
+  if(rmtype==CS_MESHTYPE_QUADS)
+  {
+    verts[16]=csVector3(box.MinX(),box.MaxY(),box.MinZ());
+    verts[17]=csVector3(box.MinX(),box.MaxY(),box.MaxZ());
+    verts[18]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
+    verts[19]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
+
+    verts[20]=csVector3(box.MaxX(),box.MinY(),box.MinZ());
+    verts[21]=csVector3(box.MaxX(),box.MinY(),box.MaxZ());
+    verts[22]=csVector3(box.MinX(),box.MinY(),box.MaxZ());
+    verts[23]=csVector3(box.MinX(),box.MinY(),box.MinZ());
+  }
+  else
+  {
+    verts[16]=csVector3(box.MinX(),box.MinY(),box.MinZ());
+    verts[17]=csVector3(box.MinX(),box.MaxY(),box.MinZ());
+    verts[18]=csVector3(box.MinX(),box.MinY(),box.MaxZ());
+    verts[19]=csVector3(box.MinX(),box.MaxY(),box.MaxZ());
+
+    verts[20]=csVector3(box.MaxX(),box.MinY(),box.MinZ());
+    verts[21]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
+    verts[22]=csVector3(box.MaxX(),box.MinY(),box.MaxZ());
+    verts[23]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
+  }
+  cols[0]=csVector4(0.0f,1.0f,0.0f);
+  for(int i=1;i<24; ++i)
+  {
+    cols[i]=cols[0];
+  }
+
+  srm.vertices=verts;
+  srm.colors=cols;
+  srm.vertexCount=24;
+
+  srm.meshtype = rmtype;
+  csAlphaMode alf;
+  alf.alphaType = alf.alphaSmooth;
+  alf.autoAlphaMode = false;
+  srm.alphaType = alf;
+  srm.z_buf_mode=zbuf;
+}
+
 int csFrustumVis::GetFinishedQuery(OccQuery &oq)
 {
   unsigned int i;
@@ -133,6 +203,84 @@ void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord>
   Q_Queue.PushBack(oc);
 }
 
+void csFrustumVis::RenderQuery(NodeTraverseData &ntdNode,bool bUseBB)
+{
+  if(ntdNode.IsLeaf())
+  {
+    int num_objects=ntdNode.kdtNode->GetObjectCount();
+    csKDTreeChild **objects=ntdNode.kdtNode->GetObjects();
+    for(int i=0;i<num_objects;i++)
+    {
+      iMeshWrapper* const mw=static_cast<csFrustVisObjectWrapper*>(objects[i]->GetObject())->mesh;
+      /*if(bUseBB)
+      {
+        csSimpleRenderMesh srm;
+        csBox3 bbox=mw->GetWorldBoundingBox();
+        ConstructBBoxMesh(bbox,srm,CS_MESHTYPE_QUADS,CS_ZBUF_USE);
+        g3d->DrawSimpleMesh(srm);
+      }
+      else*/
+      {
+        int numMeshes=0;
+        const uint32 frust_mask=f2bData.rview->GetRenderContext ()->clip_planes_mask;
+    
+        csRenderMesh **rmeshes=mw->GetRenderMeshes(numMeshes,f2bData.rview,frust_mask);
+        for (int m = 0; m < numMeshes; m++)
+        {
+          if (!rmeshes[m]->portal)
+          {
+            csVertexAttrib vA=CS_VATTRIB_POSITION;
+            iRenderBuffer *rB=rmeshes[m]->buffers->GetRenderBuffer(CS_BUFFER_POSITION);
+            g3d->ActivateBuffers(&vA,&rB,1);
+            g3d->DrawMeshBasic(rmeshes[m],*rmeshes[m]);
+            g3d->DeactivateBuffers(&vA,1);
+          }
+        }
+      }
+    }
+  }
+  else
+  {
+    csSimpleRenderMesh srm;
+    csBox3 bbox=ntdNode.kdtNode->GetNodeBBox();
+    ConstructBBoxMesh(bbox,srm,CS_MESHTYPE_QUADS,CS_ZBUF_USE);
+    g3d->DrawSimpleMesh(srm);
+    /*csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
+    csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
+    NodeTraverseData ntd;
+    if(child2)
+    {
+      ntd=NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask(),
+                             ntdNode.IsCompletelyVisible());
+      RenderQuery(ntd,bUseBB);
+    }
+    if(child1)
+    {
+      ntd=NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask(),
+                             ntdNode.IsCompletelyVisible());
+      RenderQuery(ntd,bUseBB);
+    }*/
+  }
+}
+
+void csFrustumVis::IssueSingleQuery(NodeTraverseData &ntdNode,bool bUseBB)
+{
+  int numq=1;
+  unsigned int *queries;
+  queries=new unsigned int;
+  g3d->OQInitQueries(queries,numq);
+  g3d->OQBeginQuery(*queries);
+
+  RenderQuery(ntdNode,bUseBB);
+  
+  g3d->OQEndQuery();
+  OccQuery oc;
+  oc.qID=queries;
+  oc.numQueries=1;
+  oc.ntdNode=ntdNode;
+  Q_Queue.PushBack(oc);
+}
+
 void csFrustumVis::QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode)
 {
   I_Queue.PushBack(ntdNode);
@@ -156,7 +304,6 @@ void csFrustumVis::PullUpVisibility(const NodeTraverseData &ntdNode)
 
 void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp)
 {
-  ntdNode.SetTimestamp(cur_timestamp);
   if (ntdNode.IsLeaf()) // if node is leaf we render it
   {
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
@@ -179,12 +326,12 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
         }
       }
     }
-    if(!objArray.IsEmpty())
-      IssueQueries(ntdNode, objArray);
+    //if(!objArray.IsEmpty())
+    //  IssueQueries(ntdNode, objArray);
+    //IssueSingleQuery(ntdNode);
   }
   else // else we queue its children on to the traverse queue
   {
-    ntdNode.SetVisibility(false);
     csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
     NodeTraverseData ntd;
@@ -192,12 +339,14 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
     {
       if(child1)
       {
-        ntd=NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        ntd=NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask(),
+                             ntdNode.IsCompletelyVisible());
         T_Queue.PushBack(ntd);
       }
       if(child2)
       {
-        ntd=NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        ntd=NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask(),
+                              ntdNode.IsCompletelyVisible());
         T_Queue.PushBack(ntd);
       }
     }
@@ -205,12 +354,14 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
     {
       if(child2)
       {
-        ntd=NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        ntd=NodeTraverseData(child2,ntdNode.kdtNode,ntdNode.GetFrustumMask(),
+                             ntdNode.IsCompletelyVisible());
         T_Queue.PushBack(ntd);
       }
       if(child1)
       {
-        ntd=NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask());
+        ntd=NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask(),
+                             ntdNode.IsCompletelyVisible());
         T_Queue.PushBack(ntd);
       }
     }

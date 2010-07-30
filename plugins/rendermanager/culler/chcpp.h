@@ -33,46 +33,47 @@ class CHCList : public csList<T>
 public:
   CHCList() : n(0)
   {
+    csList<T>::csList();
   }
   typename csList<T>::Iterator PushFront(const T& elem)
   {
     ++n;
-    return csList<T>::PushFront(elem);
+    return csList::PushFront(elem);
   }
 
   typename csList<T>::Iterator PushBack(const T& elem)
   {
     ++n;
-    return csList<T>::PushBack(elem);
+    return csList::PushBack(elem);
   }
 
   bool PopFront()
   {
-    if(csList<T>::IsEmpty()) return false;
+    if(csList::IsEmpty()) return false;
     --n;
-    return csList<T>::PopFront();
+    return csList::PopFront();
   }
 
   bool PopBack()
   {
-    if(csList<T>::IsEmpty()) return false;
+    if(csList::IsEmpty()) return false;
     --n;
-    return csList<T>::PopBack();
+    return csList::PopBack();
   }
   
   bool IsEmpty()
   {
-    return csList<T>::IsEmpty();
+    return csList::IsEmpty();
   }
 
   T & Front()
   {
-    return csList<T>::Front();
+    return csList::Front();
   }
 
   T & Back()
   {
-    return csList<T>::Back();
+    return csList::Back();
   }
 
   int Size() const
@@ -82,7 +83,7 @@ public:
 
   bool Delete(const T& item)
   {
-    const bool rez=csList<T>::Delete(item);
+    const bool rez=csList::Delete(item);
     if(rez)
       n--;
     return rez;
@@ -98,14 +99,16 @@ class csVisibilityObjectHistory :
 {
 public:
   bool bVisible;
+  uint32 u32Timestamp;
 
-  csVisibilityObjectHistory () : scfImplementationType (this), bVisible(false)//, qID(0)
+  csVisibilityObjectHistory () : scfImplementationType (this), bVisible(false), u32Timestamp(0)
   {
   }
 
-  csVisibilityObjectHistory (const bool bV/*,const unsigned int ID*/) : scfImplementationType (this)
+  csVisibilityObjectHistory (const bool bV,const uint32 u32TS) : scfImplementationType (this)
   {
     bVisible=bV;
+    u32Timestamp=u32TS;
   }
 
   virtual ~csVisibilityObjectHistory()
@@ -117,9 +120,19 @@ public:
     return bVisible;
   }
 
+  uint32 GetTimestamp() const
+  {
+    return u32Timestamp;
+  }
+
   void SetVisibility(const bool bV)
   {
     bVisible=bV;
+  }
+
+  void SetTimestamp(uint32 u32TS)
+  {
+    u32Timestamp=u32TS;
   }
 };
 

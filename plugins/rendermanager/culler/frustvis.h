@@ -68,19 +68,9 @@ struct FrustTest_Front2BackData
 
 struct NodeTraverseData
 {
-  NodeTraverseData() : kdtParent(0), kdtNode(0), u32Frustum_Mask(0), u32Timestamp(0)
-  {
-  }
-  /*NodeTraverseData(NodeTraverseData &ntd)
-  {
-    kdtParent=ntd.kdtParent;
-    kdtNode=ntd.kdtNode;
-    // add a new user object only if there's none
-    if(kdtNode && !kdtNode->GetUserObject())
-      kdtNode->SetUserObject(new csVisibilityObjectHistory());
-    u32Frustum_Mast=ntd.u32Frustum_Mast;
-  }*/
-  NodeTraverseData(csKDTree* kdtN, csKDTree* kdtP, const uint32 frustum_mask,const uint32 timestamp=0)
+  NodeTraverseData() : kdtParent(0), kdtNode(0), u32Frustum_Mask(0), bCompletelyVisible(false)
+  {}
+  NodeTraverseData(csKDTree* kdtN, csKDTree* kdtP, const uint32 frustum_mask,const bool bCV=0)
   {
     kdtParent=kdtP;
     kdtNode=kdtN;
@@ -88,7 +78,7 @@ struct NodeTraverseData
     if(kdtNode && !kdtNode->GetUserObject())
       kdtNode->SetUserObject(new csVisibilityObjectHistory());
     u32Frustum_Mask=frustum_mask;
-    u32Timestamp=timestamp;
+    bCompletelyVisible=bCV;
   }
 
   csVisibilityObjectHistory* GetVisibilityObjectHistory() const
@@ -128,7 +118,13 @@ struct NodeTraverseData
 
   uint32 GetTimestamp() const
   {
-    return u32Timestamp;
+    if(!kdtNode) return false;
+    return GetVisibilityObjectHistory()->GetTimestamp();
+  }
+
+  bool IsCompletelyVisible() const
+  {
+    return bCompletelyVisible;
   }
 
   void SetVisibility(const bool bV) const
@@ -137,14 +133,20 @@ struct NodeTraverseData
     GetVisibilityObjectHistory()->SetVisibility(bV);
   }
 
-  void SetFrustumMask(uint32 frust_mask)
+  void SetFrustumMask(const uint32 frust_mask)
   {
     u32Frustum_Mask=frust_mask;
   }
 
-  void SetTimestamp(uint32 timestamp)
+  void SetTimestamp(const uint32 timestamp)
   {
-    u32Timestamp=timestamp;
+    if(!kdtNode) return ;
+    GetVisibilityObjectHistory()->SetTimestamp(timestamp);
+  }
+
+  void SetCompletelyVisible(const bool bCV)
+  {
+    bCompletelyVisible=bCV;
   }
 
   bool operator == (const NodeTraverseData & ntd) const
@@ -152,13 +154,14 @@ struct NodeTraverseData
     return (kdtParent==ntd.kdtParent
             && kdtNode==ntd.kdtNode
             && u32Frustum_Mask==ntd.u32Frustum_Mask
-            && u32Timestamp==ntd.u32Timestamp);
+            &&  bCompletelyVisible==ntd.bCompletelyVisible);
   }
 
+  bool bCompletelyVisible;
   csKDTree* kdtParent;
   csKDTree* kdtNode;
   uint32 u32Frustum_Mask;
-  uint32 u32Timestamp;
+  //uint32 u32Timestamp;
 
   ~NodeTraverseData()
   {
@@ -295,7 +298,9 @@ private:
   void PullUpVisibility(const NodeTraverseData &ntdNode);
   void TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp);
 
+  void RenderQuery(NodeTraverseData &ntdNode,bool bUseBB);
   void IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord> &objArray);
+  void IssueSingleQuery(NodeTraverseData &ntdNode,bool bUseBB);
 
   /**
    *  Gets the first finished query from the query list.
