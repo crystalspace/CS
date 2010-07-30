@@ -644,8 +644,6 @@ class iAnimatedMeshSocketFactory(core.iBase):
     def GetBone(*args): return _imesh.iAnimatedMeshSocketFactory_GetBone(*args)
     def SetBone(*args): return _imesh.iAnimatedMeshSocketFactory_SetBone(*args)
     def GetFactory(*args): return _imesh.iAnimatedMeshSocketFactory_GetFactory(*args)
-    __swig_destroy__ = _imesh.delete_iAnimatedMeshSocketFactory
-    __del__ = lambda self : None;
 iAnimatedMeshSocketFactory_swigregister = _imesh.iAnimatedMeshSocketFactory_swigregister
 iAnimatedMeshSocketFactory_swigregister(iAnimatedMeshSocketFactory)
 
@@ -662,8 +660,6 @@ class iAnimatedMeshSocket(core.iBase):
     def GetMesh(*args): return _imesh.iAnimatedMeshSocket_GetMesh(*args)
     def GetSceneNode(*args): return _imesh.iAnimatedMeshSocket_GetSceneNode(*args)
     def SetSceneNode(*args): return _imesh.iAnimatedMeshSocket_SetSceneNode(*args)
-    __swig_destroy__ = _imesh.delete_iAnimatedMeshSocket
-    __del__ = lambda self : None;
 iAnimatedMeshSocket_swigregister = _imesh.iAnimatedMeshSocket_swigregister
 iAnimatedMeshSocket_swigregister(iAnimatedMeshSocket)
 
@@ -704,35 +700,27 @@ class iAnimatedMeshFactory(core.iBase):
     def GetSocketCount(*args): return _imesh.iAnimatedMeshFactory_GetSocketCount(*args)
     def GetSocket(*args): return _imesh.iAnimatedMeshFactory_GetSocket(*args)
     def FindSocket(*args): return _imesh.iAnimatedMeshFactory_FindSocket(*args)
-    scfGetVersion = staticmethod(_imesh.iAnimatedMeshFactory_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iAnimatedMeshFactory
-    __del__ = lambda self : None;
 iAnimatedMeshFactory_swigregister = _imesh.iAnimatedMeshFactory_swigregister
 iAnimatedMeshFactory_swigregister(iAnimatedMeshFactory)
-iAnimatedMeshFactory_scfGetVersion = _imesh.iAnimatedMeshFactory_scfGetVersion
 
-class iAnimatedMeshFactorySubMesh(core.iBase):
+class iAnimatedMeshSubMeshFactory(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def GetIndices(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetIndices(*args)
-    def GetIndexSetCount(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetIndexSetCount(*args)
-    def GetBoneIndices(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetBoneIndices(*args)
-    def GetMaterial(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetMaterial(*args)
-    def SetMaterial(*args): return _imesh.iAnimatedMeshFactorySubMesh_SetMaterial(*args)
-    def GetName(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetName(*args)
-    def SetRendering(*args): return _imesh.iAnimatedMeshFactorySubMesh_SetRendering(*args)
-    def IsRendering(*args): return _imesh.iAnimatedMeshFactorySubMesh_IsRendering(*args)
-    def SetRenderPriority(*args): return _imesh.iAnimatedMeshFactorySubMesh_SetRenderPriority(*args)
-    def GetRenderPriority(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetRenderPriority(*args)
-    def SetZBufMode(*args): return _imesh.iAnimatedMeshFactorySubMesh_SetZBufMode(*args)
-    def GetZBufMode(*args): return _imesh.iAnimatedMeshFactorySubMesh_GetZBufMode(*args)
-    scfGetVersion = staticmethod(_imesh.iAnimatedMeshFactorySubMesh_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iAnimatedMeshFactorySubMesh
-    __del__ = lambda self : None;
-iAnimatedMeshFactorySubMesh_swigregister = _imesh.iAnimatedMeshFactorySubMesh_swigregister
-iAnimatedMeshFactorySubMesh_swigregister(iAnimatedMeshFactorySubMesh)
-iAnimatedMeshFactorySubMesh_scfGetVersion = _imesh.iAnimatedMeshFactorySubMesh_scfGetVersion
+    def GetIndices(*args): return _imesh.iAnimatedMeshSubMeshFactory_GetIndices(*args)
+    def GetIndexSetCount(*args): return _imesh.iAnimatedMeshSubMeshFactory_GetIndexSetCount(*args)
+    def GetBoneIndices(*args): return _imesh.iAnimatedMeshSubMeshFactory_GetBoneIndices(*args)
+    def GetMaterial(*args): return _imesh.iAnimatedMeshSubMeshFactory_GetMaterial(*args)
+    def SetMaterial(*args): return _imesh.iAnimatedMeshSubMeshFactory_SetMaterial(*args)
+    def GetName(*args): return _imesh.iAnimatedMeshSubMeshFactory_GetName(*args)
+    def SetRendering(*args): return _imesh.iAnimatedMeshSubMeshFactory_SetRendering(*args)
+    def IsRendering(*args): return _imesh.iAnimatedMeshSubMeshFactory_IsRendering(*args)
+    def SetRenderPriority(*args): return _imesh.iAnimatedMeshSubMeshFactory_SetRenderPriority(*args)
+    def GetRenderPriority(*args): return _imesh.iAnimatedMeshSubMeshFactory_GetRenderPriority(*args)
+    def SetZBufMode(*args): return _imesh.iAnimatedMeshSubMeshFactory_SetZBufMode(*args)
+    def GetZBufMode(*args): return _imesh.iAnimatedMeshSubMeshFactory_GetZBufMode(*args)
+iAnimatedMeshSubMeshFactory_swigregister = _imesh.iAnimatedMeshSubMeshFactory_swigregister
+iAnimatedMeshSubMeshFactory_swigregister(iAnimatedMeshSubMeshFactory)
 
 class iAnimatedMesh(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -746,12 +734,8 @@ class iAnimatedMesh(core.iBase):
     def GetMorphTargetWeight(*args): return _imesh.iAnimatedMesh_GetMorphTargetWeight(*args)
     def GetSocketCount(*args): return _imesh.iAnimatedMesh_GetSocketCount(*args)
     def GetSocket(*args): return _imesh.iAnimatedMesh_GetSocket(*args)
-    scfGetVersion = staticmethod(_imesh.iAnimatedMesh_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iAnimatedMesh
-    __del__ = lambda self : None;
 iAnimatedMesh_swigregister = _imesh.iAnimatedMesh_swigregister
 iAnimatedMesh_swigregister(iAnimatedMesh)
-iAnimatedMesh_scfGetVersion = _imesh.iAnimatedMesh_scfGetVersion
 
 class iAnimatedMeshSubMesh(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -763,12 +747,8 @@ class iAnimatedMeshSubMesh(core.iBase):
     def GetShaderVariableContext(*args): return _imesh.iAnimatedMeshSubMesh_GetShaderVariableContext(*args)
     def GetMaterial(*args): return _imesh.iAnimatedMeshSubMesh_GetMaterial(*args)
     def SetMaterial(*args): return _imesh.iAnimatedMeshSubMesh_SetMaterial(*args)
-    scfGetVersion = staticmethod(_imesh.iAnimatedMeshSubMesh_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iAnimatedMeshSubMesh
-    __del__ = lambda self : None;
 iAnimatedMeshSubMesh_swigregister = _imesh.iAnimatedMeshSubMesh_swigregister
 iAnimatedMeshSubMesh_swigregister(iAnimatedMeshSubMesh)
-iAnimatedMeshSubMesh_scfGetVersion = _imesh.iAnimatedMeshSubMesh_scfGetVersion
 
 class iAnimatedMeshMorphTarget(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -778,12 +758,8 @@ class iAnimatedMeshMorphTarget(core.iBase):
     def GetVertexOffsets(*args): return _imesh.iAnimatedMeshMorphTarget_GetVertexOffsets(*args)
     def Invalidate(*args): return _imesh.iAnimatedMeshMorphTarget_Invalidate(*args)
     def GetName(*args): return _imesh.iAnimatedMeshMorphTarget_GetName(*args)
-    scfGetVersion = staticmethod(_imesh.iAnimatedMeshMorphTarget_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iAnimatedMeshMorphTarget
-    __del__ = lambda self : None;
 iAnimatedMeshMorphTarget_swigregister = _imesh.iAnimatedMeshMorphTarget_swigregister
 iAnimatedMeshMorphTarget_swigregister(iAnimatedMeshMorphTarget)
-iAnimatedMeshMorphTarget_scfGetVersion = _imesh.iAnimatedMeshMorphTarget_scfGetVersion
 
 class iSkeletonManager2(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -796,14 +772,10 @@ class iSkeletonManager2(core.iBase):
     def FindAnimPacketFactory(*args): return _imesh.iSkeletonManager2_FindAnimPacketFactory(*args)
     def ClearAnimPacketFactories(*args): return _imesh.iSkeletonManager2_ClearAnimPacketFactories(*args)
     def ClearAll(*args): return _imesh.iSkeletonManager2_ClearAll(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonManager2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonManager2
-    __del__ = lambda self : None;
 iSkeletonManager2_swigregister = _imesh.iSkeletonManager2_swigregister
 iSkeletonManager2_swigregister(iSkeletonManager2)
 cvar = _imesh.cvar
 InvalidBoneID = cvar.InvalidBoneID
-iSkeletonManager2_scfGetVersion = _imesh.iSkeletonManager2_scfGetVersion
 
 class iSkeletonFactory2(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -824,12 +796,8 @@ class iSkeletonFactory2(core.iBase):
     def CreateSkeleton(*args): return _imesh.iSkeletonFactory2_CreateSkeleton(*args)
     def GetAnimationPacket(*args): return _imesh.iSkeletonFactory2_GetAnimationPacket(*args)
     def SetAnimationPacket(*args): return _imesh.iSkeletonFactory2_SetAnimationPacket(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonFactory2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonFactory2
-    __del__ = lambda self : None;
 iSkeletonFactory2_swigregister = _imesh.iSkeletonFactory2_swigregister
 iSkeletonFactory2_swigregister(iSkeletonFactory2)
-iSkeletonFactory2_scfGetVersion = _imesh.iSkeletonFactory2_scfGetVersion
 
 class iSkeleton2(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -851,12 +819,10 @@ class iSkeleton2(core.iBase):
     def RecreateSkeleton(*args): return _imesh.iSkeleton2_RecreateSkeleton(*args)
     def UpdateSkeleton(*args): return _imesh.iSkeleton2_UpdateSkeleton(*args)
     def GetSkeletonStateVersion(*args): return _imesh.iSkeleton2_GetSkeletonStateVersion(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeleton2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeleton2
-    __del__ = lambda self : None;
+    def SetAnimatedMesh(*args): return _imesh.iSkeleton2_SetAnimatedMesh(*args)
+    def GetAnimatedMesh(*args): return _imesh.iSkeleton2_GetAnimatedMesh(*args)
 iSkeleton2_swigregister = _imesh.iSkeleton2_swigregister
 iSkeleton2_swigregister(iSkeleton2)
-iSkeleton2_scfGetVersion = _imesh.iSkeleton2_scfGetVersion
 
 class csSkeletalState2(core.csRefCount):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -895,15 +861,11 @@ class iSkeletonAnimPacketFactory2(core.iBase):
     def CreatePriorityNode(*args): return _imesh.iSkeletonAnimPacketFactory2_CreatePriorityNode(*args)
     def CreateRandomNode(*args): return _imesh.iSkeletonAnimPacketFactory2_CreateRandomNode(*args)
     def CreateFSMNode(*args): return _imesh.iSkeletonAnimPacketFactory2_CreateFSMNode(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonAnimPacketFactory2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonAnimPacketFactory2
-    __del__ = lambda self : None;
 iSkeletonAnimPacketFactory2_swigregister = _imesh.iSkeletonAnimPacketFactory2_swigregister
 iSkeletonAnimPacketFactory2_swigregister(iSkeletonAnimPacketFactory2)
 InvalidChannelID = cvar.InvalidChannelID
 InvalidKeyframeID = cvar.InvalidKeyframeID
 InvalidStateID = cvar.InvalidStateID
-iSkeletonAnimPacketFactory2_scfGetVersion = _imesh.iSkeletonAnimPacketFactory2_scfGetVersion
 
 class iSkeletonAnimPacket2(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -911,12 +873,8 @@ class iSkeletonAnimPacket2(core.iBase):
     __repr__ = _swig_repr
     def GetFactory(*args): return _imesh.iSkeletonAnimPacket2_GetFactory(*args)
     def GetAnimationRoot(*args): return _imesh.iSkeletonAnimPacket2_GetAnimationRoot(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonAnimPacket2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonAnimPacket2
-    __del__ = lambda self : None;
 iSkeletonAnimPacket2_swigregister = _imesh.iSkeletonAnimPacket2_swigregister
 iSkeletonAnimPacket2_swigregister(iSkeletonAnimPacket2)
-iSkeletonAnimPacket2_scfGetVersion = _imesh.iSkeletonAnimPacket2_scfGetVersion
 
 class iSkeletonAnimation2(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -936,12 +894,8 @@ class iSkeletonAnimation2(core.iBase):
     def GetFramesInBindSpace(*args): return _imesh.iSkeletonAnimation2_GetFramesInBindSpace(*args)
     def GetChannelCount(*args): return _imesh.iSkeletonAnimation2_GetChannelCount(*args)
     def GetChannelBone(*args): return _imesh.iSkeletonAnimation2_GetChannelBone(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonAnimation2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonAnimation2
-    __del__ = lambda self : None;
 iSkeletonAnimation2_swigregister = _imesh.iSkeletonAnimation2_swigregister
 iSkeletonAnimation2_swigregister(iSkeletonAnimation2)
-iSkeletonAnimation2_scfGetVersion = _imesh.iSkeletonAnimation2_scfGetVersion
 
 class iSkeletonAnimCallback2(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -963,12 +917,8 @@ class iSkeletonAnimNodeFactory2(core.iBase):
     def CreateInstance(*args): return _imesh.iSkeletonAnimNodeFactory2_CreateInstance(*args)
     def GetNodeName(*args): return _imesh.iSkeletonAnimNodeFactory2_GetNodeName(*args)
     def FindNode(*args): return _imesh.iSkeletonAnimNodeFactory2_FindNode(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonAnimNodeFactory2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonAnimNodeFactory2
-    __del__ = lambda self : None;
 iSkeletonAnimNodeFactory2_swigregister = _imesh.iSkeletonAnimNodeFactory2_swigregister
 iSkeletonAnimNodeFactory2_swigregister(iSkeletonAnimNodeFactory2)
-iSkeletonAnimNodeFactory2_scfGetVersion = _imesh.iSkeletonAnimNodeFactory2_scfGetVersion
 
 class iSkeletonAnimNode2(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -988,12 +938,8 @@ class iSkeletonAnimNode2(core.iBase):
     def FindNode(*args): return _imesh.iSkeletonAnimNode2_FindNode(*args)
     def AddAnimationCallback(*args): return _imesh.iSkeletonAnimNode2_AddAnimationCallback(*args)
     def RemoveAnimationCallback(*args): return _imesh.iSkeletonAnimNode2_RemoveAnimationCallback(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonAnimNode2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonAnimNode2
-    __del__ = lambda self : None;
 iSkeletonAnimNode2_swigregister = _imesh.iSkeletonAnimNode2_swigregister
 iSkeletonAnimNode2_swigregister(iSkeletonAnimNode2)
-iSkeletonAnimNode2_scfGetVersion = _imesh.iSkeletonAnimNode2_scfGetVersion
 
 class iSkeletonAnimationNodeFactory2(iSkeletonAnimNodeFactory2):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1009,23 +955,15 @@ class iSkeletonAnimationNodeFactory2(iSkeletonAnimNodeFactory2):
     def GetAutomaticReset(*args): return _imesh.iSkeletonAnimationNodeFactory2_GetAutomaticReset(*args)
     def SetAutomaticStop(*args): return _imesh.iSkeletonAnimationNodeFactory2_SetAutomaticStop(*args)
     def GetAutomaticStop(*args): return _imesh.iSkeletonAnimationNodeFactory2_GetAutomaticStop(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonAnimationNodeFactory2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonAnimationNodeFactory2
-    __del__ = lambda self : None;
 iSkeletonAnimationNodeFactory2_swigregister = _imesh.iSkeletonAnimationNodeFactory2_swigregister
 iSkeletonAnimationNodeFactory2_swigregister(iSkeletonAnimationNodeFactory2)
-iSkeletonAnimationNodeFactory2_scfGetVersion = _imesh.iSkeletonAnimationNodeFactory2_scfGetVersion
 
 class iSkeletonAnimationNode2(iSkeletonAnimNode2):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    scfGetVersion = staticmethod(_imesh.iSkeletonAnimationNode2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonAnimationNode2
-    __del__ = lambda self : None;
 iSkeletonAnimationNode2_swigregister = _imesh.iSkeletonAnimationNode2_swigregister
 iSkeletonAnimationNode2_swigregister(iSkeletonAnimationNode2)
-iSkeletonAnimationNode2_scfGetVersion = _imesh.iSkeletonAnimationNode2_scfGetVersion
 
 class iSkeletonBlendNodeFactory2(iSkeletonAnimNodeFactory2):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1039,12 +977,8 @@ class iSkeletonBlendNodeFactory2(iSkeletonAnimNodeFactory2):
     def ClearNodes(*args): return _imesh.iSkeletonBlendNodeFactory2_ClearNodes(*args)
     def SetSynchronizationMode(*args): return _imesh.iSkeletonBlendNodeFactory2_SetSynchronizationMode(*args)
     def GetSynchronizationMode(*args): return _imesh.iSkeletonBlendNodeFactory2_GetSynchronizationMode(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonBlendNodeFactory2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonBlendNodeFactory2
-    __del__ = lambda self : None;
 iSkeletonBlendNodeFactory2_swigregister = _imesh.iSkeletonBlendNodeFactory2_swigregister
 iSkeletonBlendNodeFactory2_swigregister(iSkeletonBlendNodeFactory2)
-iSkeletonBlendNodeFactory2_scfGetVersion = _imesh.iSkeletonBlendNodeFactory2_scfGetVersion
 
 class iSkeletonBlendNode2(iSkeletonAnimNode2):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1052,12 +986,8 @@ class iSkeletonBlendNode2(iSkeletonAnimNode2):
     __repr__ = _swig_repr
     def SetNodeWeight(*args): return _imesh.iSkeletonBlendNode2_SetNodeWeight(*args)
     def NormalizeWeights(*args): return _imesh.iSkeletonBlendNode2_NormalizeWeights(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonBlendNode2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonBlendNode2
-    __del__ = lambda self : None;
 iSkeletonBlendNode2_swigregister = _imesh.iSkeletonBlendNode2_swigregister
 iSkeletonBlendNode2_swigregister(iSkeletonBlendNode2)
-iSkeletonBlendNode2_scfGetVersion = _imesh.iSkeletonBlendNode2_scfGetVersion
 
 class iSkeletonPriorityNodeFactory2(iSkeletonAnimNodeFactory2):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1068,24 +998,16 @@ class iSkeletonPriorityNodeFactory2(iSkeletonAnimNodeFactory2):
     def GetNode(*args): return _imesh.iSkeletonPriorityNodeFactory2_GetNode(*args)
     def GetNodeCount(*args): return _imesh.iSkeletonPriorityNodeFactory2_GetNodeCount(*args)
     def ClearNodes(*args): return _imesh.iSkeletonPriorityNodeFactory2_ClearNodes(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonPriorityNodeFactory2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonPriorityNodeFactory2
-    __del__ = lambda self : None;
 iSkeletonPriorityNodeFactory2_swigregister = _imesh.iSkeletonPriorityNodeFactory2_swigregister
 iSkeletonPriorityNodeFactory2_swigregister(iSkeletonPriorityNodeFactory2)
-iSkeletonPriorityNodeFactory2_scfGetVersion = _imesh.iSkeletonPriorityNodeFactory2_scfGetVersion
 
 class iSkeletonPriorityNode2(iSkeletonAnimNode2):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetNodePriority(*args): return _imesh.iSkeletonPriorityNode2_SetNodePriority(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonPriorityNode2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonPriorityNode2
-    __del__ = lambda self : None;
 iSkeletonPriorityNode2_swigregister = _imesh.iSkeletonPriorityNode2_swigregister
 iSkeletonPriorityNode2_swigregister(iSkeletonPriorityNode2)
-iSkeletonPriorityNode2_scfGetVersion = _imesh.iSkeletonPriorityNode2_scfGetVersion
 
 class iSkeletonRandomNodeFactory2(iSkeletonAnimNodeFactory2):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1130,12 +1052,8 @@ class iSkeletonFSMNodeFactory2(iSkeletonAnimNodeFactory2):
     def SetTransitionCrossfade(*args): return _imesh.iSkeletonFSMNodeFactory2_SetTransitionCrossfade(*args)
     def AddState(*args): return _imesh.iSkeletonFSMNodeFactory2_AddState(*args)
     def SetAutomaticTransition(*args): return _imesh.iSkeletonFSMNodeFactory2_SetAutomaticTransition(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonFSMNodeFactory2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonFSMNodeFactory2
-    __del__ = lambda self : None;
 iSkeletonFSMNodeFactory2_swigregister = _imesh.iSkeletonFSMNodeFactory2_swigregister
 iSkeletonFSMNodeFactory2_swigregister(iSkeletonFSMNodeFactory2)
-iSkeletonFSMNodeFactory2_scfGetVersion = _imesh.iSkeletonFSMNodeFactory2_scfGetVersion
 
 class iSkeletonFSMNode2(iSkeletonAnimNode2):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1144,12 +1062,266 @@ class iSkeletonFSMNode2(iSkeletonAnimNode2):
     def SwitchToState(*args): return _imesh.iSkeletonFSMNode2_SwitchToState(*args)
     def GetCurrentState(*args): return _imesh.iSkeletonFSMNode2_GetCurrentState(*args)
     def GetStateNode(*args): return _imesh.iSkeletonFSMNode2_GetStateNode(*args)
-    scfGetVersion = staticmethod(_imesh.iSkeletonFSMNode2_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iSkeletonFSMNode2
-    __del__ = lambda self : None;
 iSkeletonFSMNode2_swigregister = _imesh.iSkeletonFSMNode2_swigregister
 iSkeletonFSMNode2_swigregister(iSkeletonFSMNode2)
-iSkeletonFSMNode2_scfGetVersion = _imesh.iSkeletonFSMNode2_scfGetVersion
+
+class iBodyManager(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateBodySkeleton(*args): return _imesh.iBodyManager_CreateBodySkeleton(*args)
+    def FindBodySkeleton(*args): return _imesh.iBodyManager_FindBodySkeleton(*args)
+    def ClearBodySkeletons(*args): return _imesh.iBodyManager_ClearBodySkeletons(*args)
+    __swig_destroy__ = _imesh.delete_iBodyManager
+    __del__ = lambda self : None;
+iBodyManager_swigregister = _imesh.iBodyManager_swigregister
+iBodyManager_swigregister(iBodyManager)
+
+class iBodySkeleton(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _imesh.iBodySkeleton_GetName(*args)
+    def GetSkeletonFactory(*args): return _imesh.iBodySkeleton_GetSkeletonFactory(*args)
+    def ClearAll(*args): return _imesh.iBodySkeleton_ClearAll(*args)
+    def CreateBodyBone(*args): return _imesh.iBodySkeleton_CreateBodyBone(*args)
+    def ClearBodyBones(*args): return _imesh.iBodySkeleton_ClearBodyBones(*args)
+    def CreateBodyChain(*args): return _imesh.iBodySkeleton_CreateBodyChain(*args)
+    def FindBodyChain(*args): return _imesh.iBodySkeleton_FindBodyChain(*args)
+    def ClearBodyChains(*args): return _imesh.iBodySkeleton_ClearBodyChains(*args)
+    def FindBodyBone(*args): return _imesh.iBodySkeleton_FindBodyBone(*args)
+    __swig_destroy__ = _imesh.delete_iBodySkeleton
+    __del__ = lambda self : None;
+iBodySkeleton_swigregister = _imesh.iBodySkeleton_swigregister
+iBodySkeleton_swigregister(iBodySkeleton)
+
+class iBodyBone(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetAnimeshBone(*args): return _imesh.iBodyBone_GetAnimeshBone(*args)
+    def CreateBoneProperties(*args): return _imesh.iBodyBone_CreateBoneProperties(*args)
+    def GetBoneProperties(*args): return _imesh.iBodyBone_GetBoneProperties(*args)
+    def CreateBoneJoint(*args): return _imesh.iBodyBone_CreateBoneJoint(*args)
+    def GetBoneJoint(*args): return _imesh.iBodyBone_GetBoneJoint(*args)
+    def CreateBoneCollider(*args): return _imesh.iBodyBone_CreateBoneCollider(*args)
+    def GetBoneColliderCount(*args): return _imesh.iBodyBone_GetBoneColliderCount(*args)
+    def GetBoneCollider(*args): return _imesh.iBodyBone_GetBoneCollider(*args)
+    __swig_destroy__ = _imesh.delete_iBodyBone
+    __del__ = lambda self : None;
+iBodyBone_swigregister = _imesh.iBodyBone_swigregister
+iBodyBone_swigregister(iBodyBone)
+
+class iBodyChain(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _imesh.iBodyChain_GetName(*args)
+    def GetRootNode(*args): return _imesh.iBodyChain_GetRootNode(*args)
+    __swig_destroy__ = _imesh.delete_iBodyChain
+    __del__ = lambda self : None;
+iBodyChain_swigregister = _imesh.iBodyChain_swigregister
+iBodyChain_swigregister(iBodyChain)
+
+class iBodyChainNode(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetBodyBone(*args): return _imesh.iBodyChainNode_GetBodyBone(*args)
+    def GetChildCount(*args): return _imesh.iBodyChainNode_GetChildCount(*args)
+    def GetChild(*args): return _imesh.iBodyChainNode_GetChild(*args)
+    def GetParent(*args): return _imesh.iBodyChainNode_GetParent(*args)
+    __swig_destroy__ = _imesh.delete_iBodyChainNode
+    __del__ = lambda self : None;
+iBodyChainNode_swigregister = _imesh.iBodyChainNode_swigregister
+iBodyChainNode_swigregister(iBodyChainNode)
+
+class iBodyBoneProperties(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetMass(*args): return _imesh.iBodyBoneProperties_SetMass(*args)
+    def GetMass(*args): return _imesh.iBodyBoneProperties_GetMass(*args)
+    def SetCenter(*args): return _imesh.iBodyBoneProperties_SetCenter(*args)
+    def GetCenter(*args): return _imesh.iBodyBoneProperties_GetCenter(*args)
+    def SetInertia(*args): return _imesh.iBodyBoneProperties_SetInertia(*args)
+    def GetInertia(*args): return _imesh.iBodyBoneProperties_GetInertia(*args)
+    __swig_destroy__ = _imesh.delete_iBodyBoneProperties
+    __del__ = lambda self : None;
+iBodyBoneProperties_swigregister = _imesh.iBodyBoneProperties_swigregister
+iBodyBoneProperties_swigregister(iBodyBoneProperties)
+
+class iBodyBoneJoint(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetBounce(*args): return _imesh.iBodyBoneJoint_SetBounce(*args)
+    def SetMaximumAngle(*args): return _imesh.iBodyBoneJoint_SetMaximumAngle(*args)
+    def SetMaximumDistance(*args): return _imesh.iBodyBoneJoint_SetMaximumDistance(*args)
+    def SetMinimumAngle(*args): return _imesh.iBodyBoneJoint_SetMinimumAngle(*args)
+    def SetMinimumDistance(*args): return _imesh.iBodyBoneJoint_SetMinimumDistance(*args)
+    def SetRotConstraints(*args): return _imesh.iBodyBoneJoint_SetRotConstraints(*args)
+    def SetTransConstraints(*args): return _imesh.iBodyBoneJoint_SetTransConstraints(*args)
+    def GetBounce(*args): return _imesh.iBodyBoneJoint_GetBounce(*args)
+    def GetMaximumAngle(*args): return _imesh.iBodyBoneJoint_GetMaximumAngle(*args)
+    def GetMaximumDistance(*args): return _imesh.iBodyBoneJoint_GetMaximumDistance(*args)
+    def GetMinimumAngle(*args): return _imesh.iBodyBoneJoint_GetMinimumAngle(*args)
+    def GetMinimumDistance(*args): return _imesh.iBodyBoneJoint_GetMinimumDistance(*args)
+    def IsXRotConstrained(*args): return _imesh.iBodyBoneJoint_IsXRotConstrained(*args)
+    def IsXTransConstrained(*args): return _imesh.iBodyBoneJoint_IsXTransConstrained(*args)
+    def IsYRotConstrained(*args): return _imesh.iBodyBoneJoint_IsYRotConstrained(*args)
+    def IsYTransConstrained(*args): return _imesh.iBodyBoneJoint_IsYTransConstrained(*args)
+    def IsZRotConstrained(*args): return _imesh.iBodyBoneJoint_IsZRotConstrained(*args)
+    def IsZTransConstrained(*args): return _imesh.iBodyBoneJoint_IsZTransConstrained(*args)
+    __swig_destroy__ = _imesh.delete_iBodyBoneJoint
+    __del__ = lambda self : None;
+iBodyBoneJoint_swigregister = _imesh.iBodyBoneJoint_swigregister
+iBodyBoneJoint_swigregister(iBodyBoneJoint)
+
+class iBodyBoneCollider(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetBoxGeometry(*args): return _imesh.iBodyBoneCollider_SetBoxGeometry(*args)
+    def SetCapsuleGeometry(*args): return _imesh.iBodyBoneCollider_SetCapsuleGeometry(*args)
+    def SetConvexMeshGeometry(*args): return _imesh.iBodyBoneCollider_SetConvexMeshGeometry(*args)
+    def SetCylinderGeometry(*args): return _imesh.iBodyBoneCollider_SetCylinderGeometry(*args)
+    def SetMeshGeometry(*args): return _imesh.iBodyBoneCollider_SetMeshGeometry(*args)
+    def SetPlaneGeometry(*args): return _imesh.iBodyBoneCollider_SetPlaneGeometry(*args)
+    def SetSphereGeometry(*args): return _imesh.iBodyBoneCollider_SetSphereGeometry(*args)
+    def GetGeometryType(*args): return _imesh.iBodyBoneCollider_GetGeometryType(*args)
+    def GetBoxGeometry(*args): return _imesh.iBodyBoneCollider_GetBoxGeometry(*args)
+    def GetCapsuleGeometry(*args): return _imesh.iBodyBoneCollider_GetCapsuleGeometry(*args)
+    def GetConvexMeshGeometry(*args): return _imesh.iBodyBoneCollider_GetConvexMeshGeometry(*args)
+    def GetCylinderGeometry(*args): return _imesh.iBodyBoneCollider_GetCylinderGeometry(*args)
+    def GetMeshGeometry(*args): return _imesh.iBodyBoneCollider_GetMeshGeometry(*args)
+    def GetPlaneGeometry(*args): return _imesh.iBodyBoneCollider_GetPlaneGeometry(*args)
+    def GetSphereGeometry(*args): return _imesh.iBodyBoneCollider_GetSphereGeometry(*args)
+    def SetTransform(*args): return _imesh.iBodyBoneCollider_SetTransform(*args)
+    def GetTransform(*args): return _imesh.iBodyBoneCollider_GetTransform(*args)
+    def SetFriction(*args): return _imesh.iBodyBoneCollider_SetFriction(*args)
+    def GetFriction(*args): return _imesh.iBodyBoneCollider_GetFriction(*args)
+    def SetSoftness(*args): return _imesh.iBodyBoneCollider_SetSoftness(*args)
+    def GetSoftness(*args): return _imesh.iBodyBoneCollider_GetSoftness(*args)
+    def SetElasticity(*args): return _imesh.iBodyBoneCollider_SetElasticity(*args)
+    def GetElasticity(*args): return _imesh.iBodyBoneCollider_GetElasticity(*args)
+    def SetDensity(*args): return _imesh.iBodyBoneCollider_SetDensity(*args)
+    def GetDensity(*args): return _imesh.iBodyBoneCollider_GetDensity(*args)
+    __swig_destroy__ = _imesh.delete_iBodyBoneCollider
+    __del__ = lambda self : None;
+iBodyBoneCollider_swigregister = _imesh.iBodyBoneCollider_swigregister
+iBodyBoneCollider_swigregister(iBodyBoneCollider)
+
+class iSkeletonRagdollManager2(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateAnimNodeFactory(*args): return _imesh.iSkeletonRagdollManager2_CreateAnimNodeFactory(*args)
+    def FindAnimNodeFactory(*args): return _imesh.iSkeletonRagdollManager2_FindAnimNodeFactory(*args)
+    def ClearAnimNodeFactories(*args): return _imesh.iSkeletonRagdollManager2_ClearAnimNodeFactories(*args)
+iSkeletonRagdollManager2_swigregister = _imesh.iSkeletonRagdollManager2_swigregister
+iSkeletonRagdollManager2_swigregister(iSkeletonRagdollManager2)
+
+STATE_INACTIVE = _imesh.STATE_INACTIVE
+STATE_DYNAMIC = _imesh.STATE_DYNAMIC
+STATE_KINEMATIC = _imesh.STATE_KINEMATIC
+class iSkeletonRagdollNodeFactory2(iSkeletonAnimNodeFactory2):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def AddBodyChain(*args): return _imesh.iSkeletonRagdollNodeFactory2_AddBodyChain(*args)
+    def RemoveBodyChain(*args): return _imesh.iSkeletonRagdollNodeFactory2_RemoveBodyChain(*args)
+    def SetChildNode(*args): return _imesh.iSkeletonRagdollNodeFactory2_SetChildNode(*args)
+    def GetChildNode(*args): return _imesh.iSkeletonRagdollNodeFactory2_GetChildNode(*args)
+    def ClearChildNode(*args): return _imesh.iSkeletonRagdollNodeFactory2_ClearChildNode(*args)
+iSkeletonRagdollNodeFactory2_swigregister = _imesh.iSkeletonRagdollNodeFactory2_swigregister
+iSkeletonRagdollNodeFactory2_swigregister(iSkeletonRagdollNodeFactory2)
+
+class iSkeletonRagdollNode2(iSkeletonAnimNode2):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetBodyChainState(*args): return _imesh.iSkeletonRagdollNode2_SetBodyChainState(*args)
+    def GetBodyChainState(*args): return _imesh.iSkeletonRagdollNode2_GetBodyChainState(*args)
+    def GetBoneRigidBody(*args): return _imesh.iSkeletonRagdollNode2_GetBoneRigidBody(*args)
+    def GetBoneJoint(*args): return _imesh.iSkeletonRagdollNode2_GetBoneJoint(*args)
+    def GetBoneCount(*args): return _imesh.iSkeletonRagdollNode2_GetBoneCount(*args)
+    def GetBone(*args): return _imesh.iSkeletonRagdollNode2_GetBone(*args)
+    def ResetChainTransform(*args): return _imesh.iSkeletonRagdollNode2_ResetChainTransform(*args)
+iSkeletonRagdollNode2_swigregister = _imesh.iSkeletonRagdollNode2_swigregister
+iSkeletonRagdollNode2_swigregister(iSkeletonRagdollNode2)
+
+class iSkeletonLookAtManager2(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateAnimNodeFactory(*args): return _imesh.iSkeletonLookAtManager2_CreateAnimNodeFactory(*args)
+    def FindAnimNodeFactory(*args): return _imesh.iSkeletonLookAtManager2_FindAnimNodeFactory(*args)
+    def ClearAnimNodeFactories(*args): return _imesh.iSkeletonLookAtManager2_ClearAnimNodeFactories(*args)
+iSkeletonLookAtManager2_swigregister = _imesh.iSkeletonLookAtManager2_swigregister
+iSkeletonLookAtManager2_swigregister(iSkeletonLookAtManager2)
+
+class iSkeletonLookAtNodeFactory2(iSkeletonAnimNodeFactory2):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetChildNode(*args): return _imesh.iSkeletonLookAtNodeFactory2_SetChildNode(*args)
+    def GetChildNode(*args): return _imesh.iSkeletonLookAtNodeFactory2_GetChildNode(*args)
+    def ClearChildNode(*args): return _imesh.iSkeletonLookAtNodeFactory2_ClearChildNode(*args)
+iSkeletonLookAtNodeFactory2_swigregister = _imesh.iSkeletonLookAtNodeFactory2_swigregister
+iSkeletonLookAtNodeFactory2_swigregister(iSkeletonLookAtNodeFactory2)
+
+class iSkeletonLookAtNode2(iSkeletonAnimNode2):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetBone(*args): return _imesh.iSkeletonLookAtNode2_SetBone(*args)
+    def SetTarget(*args): return _imesh.iSkeletonLookAtNode2_SetTarget(*args)
+    def RemoveTarget(*args): return _imesh.iSkeletonLookAtNode2_RemoveTarget(*args)
+    def SetMaximumSpeed(*args): return _imesh.iSkeletonLookAtNode2_SetMaximumSpeed(*args)
+    def SetAlwaysRotate(*args): return _imesh.iSkeletonLookAtNode2_SetAlwaysRotate(*args)
+    def SetListenerDelay(*args): return _imesh.iSkeletonLookAtNode2_SetListenerDelay(*args)
+    def AddListener(*args): return _imesh.iSkeletonLookAtNode2_AddListener(*args)
+    def RemoveListener(*args): return _imesh.iSkeletonLookAtNode2_RemoveListener(*args)
+iSkeletonLookAtNode2_swigregister = _imesh.iSkeletonLookAtNode2_swigregister
+iSkeletonLookAtNode2_swigregister(iSkeletonLookAtNode2)
+
+class iSkeletonLookAtListener2(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def TargetReached(*args): return _imesh.iSkeletonLookAtListener2_TargetReached(*args)
+    def TargetLost(*args): return _imesh.iSkeletonLookAtListener2_TargetLost(*args)
+    __swig_destroy__ = _imesh.delete_iSkeletonLookAtListener2
+    __del__ = lambda self : None;
+iSkeletonLookAtListener2_swigregister = _imesh.iSkeletonLookAtListener2_swigregister
+iSkeletonLookAtListener2_swigregister(iSkeletonLookAtListener2)
+
+class iSkeletonBasicNodesManager2(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateSpeedNodeFactory(*args): return _imesh.iSkeletonBasicNodesManager2_CreateSpeedNodeFactory(*args)
+    def FindSpeedNodeFactory(*args): return _imesh.iSkeletonBasicNodesManager2_FindSpeedNodeFactory(*args)
+    def ClearSpeedNodeFactories(*args): return _imesh.iSkeletonBasicNodesManager2_ClearSpeedNodeFactories(*args)
+iSkeletonBasicNodesManager2_swigregister = _imesh.iSkeletonBasicNodesManager2_swigregister
+iSkeletonBasicNodesManager2_swigregister(iSkeletonBasicNodesManager2)
+
+class iSkeletonSpeedNodeFactory2(iSkeletonAnimNodeFactory2):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def AddNode(*args): return _imesh.iSkeletonSpeedNodeFactory2_AddNode(*args)
+iSkeletonSpeedNodeFactory2_swigregister = _imesh.iSkeletonSpeedNodeFactory2_swigregister
+iSkeletonSpeedNodeFactory2_swigregister(iSkeletonSpeedNodeFactory2)
+
+class iSkeletonSpeedNode2(iSkeletonAnimNode2):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetSpeed(*args): return _imesh.iSkeletonSpeedNode2_SetSpeed(*args)
+iSkeletonSpeedNode2_swigregister = _imesh.iSkeletonSpeedNode2_swigregister
+iSkeletonSpeedNode2_swigregister(iSkeletonSpeedNode2)
 
 class csSprite2DVertexArrayReadOnly(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
