@@ -403,7 +403,7 @@ bool KrystalScene::CreateAvatar ()
 
   // Initialize fur material
   furMaterial = furMaterialType->CreateFurMaterial("hair");
-  furMaterial->SetPhysicsControl(hairPhysicsControl);
+  furMaterial->SetPhysicsControl(animationPhysicsControl);
   furMaterial->SetFurStrandGenerator(hairStrandGenerator);
 
   furMaterial->SetMeshFactory(animeshFactory);

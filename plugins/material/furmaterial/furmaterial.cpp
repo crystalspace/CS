@@ -217,6 +217,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);    
     csArray<int> uniqueIndices;
 
+    csVector3 *tangentsArray = new csVector3[positions.GetSize()];
+    csVector3 *binormalArray = new csVector3[positions.GetSize()];
+
+    for ( size_t i = 0 ; i < positions.GetSize() ; i ++ ) 
+    {
+      tangentsArray[i] = csVector3(0);
+      binormalArray[i] = csVector3(0);
+    }
+
     // choose unique indices
     while (tris.HasNext())
     {
@@ -232,6 +241,54 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       csTriangle triangleNew = csTriangle(uniqueIndices.Contains(tri.a),
         uniqueIndices.Contains(tri.b), uniqueIndices.Contains(tri.c));
       guideHairsTriangles.Push(triangleNew);
+  
+      // generate tangents 
+      size_t i1 = tri.a;
+      size_t i2 = tri.b;
+      size_t i3 = tri.c;
+
+      const csVector3& v1 = positions.Get(i1);
+      const csVector3& v2 = positions.Get(i2);
+      const csVector3& v3 = positions.Get(i3);
+
+      const csVector2& w1 = UV.Get(i1);
+      const csVector2& w2 = UV.Get(i2);
+      const csVector2& w3 = UV.Get(i3);
+
+      const csVector3 p21 = v2 - v1;
+      const csVector3 p31 = v3 - v1;
+      const csVector2 uv21 = w2 - w1;
+      const csVector2 uv31 = w3 - w1;
+
+      const csVector3 sdir = p21 * uv31.y - p31 * uv21.y;
+      const csVector3 tdir = p31 * uv21.x - p21 * uv31.y;
+
+      tangentsArray[i1] += sdir;
+      tangentsArray[i2] += sdir;
+      tangentsArray[i3] += sdir;
+
+      binormalArray[i1] += tdir;
+      binormalArray[i2] += tdir;
+      binormalArray[i3] += tdir;
+    }
+
+    for ( size_t i = 0 ; i < positions.GetSize() ; i ++ )
+    {
+      const csVector3& n = norms.Get( i );
+      const csVector3& t = tangentsArray[ i ];
+
+      // Gram-Schmidt orthogonalize
+      tangentsArray[ i ] = (t - n * (n * t));
+      tangentsArray[ i ].Normalize();
+
+      // Calculate handedness
+      binormalArray[i].Normalize();
+
+      csVector3 tb;
+      tb.Cross(tangentsArray[ i ], binormalArray[ i ]);
+      float direction = tb * n >= 0.0f ? -1.0f : 1.0f;
+  
+      tangentsArray[ i ] = tangentsArray[ i ] * direction;
     }
 
     // generate the guide hairs
@@ -248,9 +305,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       float height = heightmap.data[ 4 * ((int)(guideHair.uv.x * heightmap.width) + 
         (int)(guideHair.uv.y * heightmap.height) * heightmap.width )] / 255.0f;
 
-//       csPrintf("%f\t%f\t%f\t", height, heightFactor, controlPointsDistance );
-//       csPrintf("%d\n", (int)( (height * heightFactor) / controlPointsDistance) );
-
       guideHair.controlPointsCount = (int)( (height * heightFactor) / controlPointsDistance);
       
       if (guideHair.controlPointsCount < 3 && guideHair.controlPointsCount > 0)
@@ -262,7 +316,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
         guideHair.controlPoints[j] = pos + j * realDistance * 
-          norms.Get(uniqueIndices.Get(i));
+          tangentsArray[uniqueIndices.Get(i)];
 
       guideHairs.Push(guideHair);
     }
