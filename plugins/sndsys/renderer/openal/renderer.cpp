@@ -358,6 +358,11 @@ void csSndSysRendererOpenAL::Release()
   m_ContextLock.Unlock();
 }
 
+bool csSndSysRendererOpenAL::SupportsALExt (const char* pszALExtName)
+{
+  return hSupportedALExts.Get (pszALExtName, false);
+}
+
 /*
  * csSndSysRendererOpenAL implementation
  */
@@ -433,6 +438,8 @@ void csSndSysRendererOpenAL::Open()
   {
     ALC_REFRESH,   m_Config->GetInt ("SndSys.OpenALRefresh", 10),    // How often do we update the mixahead buffer (hz).
     ALC_SYNC,      AL_FALSE,                                         // We want an asynchronous context.
+    ALC_STEREO_SOURCES, 12,
+    ALC_MONO_SOURCES, 120,
     0
   };
   // Note: If the sound is choppy, it may be because your OpenAL
@@ -463,6 +470,9 @@ void csSndSysRendererOpenAL::Open()
     Report (CS_REPORTER_SEVERITY_ERROR, "An OpenAL error occured: %s", alcGetString (m_Device, err));
     CS_ASSERT (err == ALC_NO_ERROR);
   }
+
+  // Query available extensions
+  QueryExtensions ();
 
   // Create a listener
   m_Listener.AttachNew(new SndSysListenerOpenAL());
@@ -505,5 +515,29 @@ void csSndSysRendererOpenAL::Close()
   {
     alcCloseDevice (m_Device);
     m_Device = 0;
+  }
+}
+
+void csSndSysRendererOpenAL::QueryExtensions ()
+{
+  const char* asExtsToQuery[] =
+  {
+    "AL_EXT_MCFORMATS",
+    0
+  };
+  
+  for (size_t i = 0; asExtsToQuery[i] != 0; ++i)
+  {
+    bool bExtSupported = (alIsExtensionPresent(asExtsToQuery[i]) == AL_TRUE);
+    hSupportedALExts.Put (asExtsToQuery[i], bExtSupported);
+
+    if (bExtSupported)
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "OpenAL: Found extension: '%s'\n", asExtsToQuery[i]);
+    }
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "OpenAL: Did not find extension: '%s'\n", asExtsToQuery[i]);
+    }
   }
 }
