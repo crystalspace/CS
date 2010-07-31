@@ -84,7 +84,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     iObjectRegistry* object_reg) :
   scfImplementationType (this), manager (manager), name (name), 
     object_reg(object_reg), physicsControl(0), hairStrandGenerator(0), rng(0),
-    guideLOD(0), strandLOD(0), hairStrandsLODSize(0)
+    guideLOD(0), strandLOD(0), hairStrandsLODSize(0), physicsControlEnabled(true)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -150,6 +150,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
       controlPointSum += hairStrands.Get(x).controlPointsCount, x++ )
+      
+      if (hairStrands.Get(x).controlPointsCount >= 2)
     {
       for ( size_t y = 0 ; y < hairStrands.Get(x).controlPointsCount ; y ++ )
       {
@@ -215,6 +217,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);    
     csArray<int> uniqueIndices;
 
+    csVector3 *tangentsArray = new csVector3[positions.GetSize()];
+    csVector3 *binormalArray = new csVector3[positions.GetSize()];
+
+    for ( size_t i = 0 ; i < positions.GetSize() ; i ++ ) 
+    {
+      tangentsArray[i] = csVector3(0);
+      binormalArray[i] = csVector3(0);
+    }
+
     // choose unique indices
     while (tris.HasNext())
     {
@@ -230,6 +241,54 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       csTriangle triangleNew = csTriangle(uniqueIndices.Contains(tri.a),
         uniqueIndices.Contains(tri.b), uniqueIndices.Contains(tri.c));
       guideHairsTriangles.Push(triangleNew);
+  
+      // generate tangents 
+      size_t i1 = tri.a;
+      size_t i2 = tri.b;
+      size_t i3 = tri.c;
+
+      const csVector3& v1 = positions.Get(i1);
+      const csVector3& v2 = positions.Get(i2);
+      const csVector3& v3 = positions.Get(i3);
+
+      const csVector2& w1 = UV.Get(i1);
+      const csVector2& w2 = UV.Get(i2);
+      const csVector2& w3 = UV.Get(i3);
+
+      const csVector3 p21 = v2 - v1;
+      const csVector3 p31 = v3 - v1;
+      const csVector2 uv21 = w2 - w1;
+      const csVector2 uv31 = w3 - w1;
+
+      const csVector3 sdir = p21 * uv31.y - p31 * uv21.y;
+      const csVector3 tdir = p31 * uv21.x - p21 * uv31.y;
+
+      tangentsArray[i1] += sdir;
+      tangentsArray[i2] += sdir;
+      tangentsArray[i3] += sdir;
+
+      binormalArray[i1] += tdir;
+      binormalArray[i2] += tdir;
+      binormalArray[i3] += tdir;
+    }
+
+    for ( size_t i = 0 ; i < positions.GetSize() ; i ++ )
+    {
+      const csVector3& n = norms.Get( i );
+      const csVector3& t = tangentsArray[ i ];
+
+      // Gram-Schmidt orthogonalize
+      tangentsArray[ i ] = (t - n * (n * t));
+      tangentsArray[ i ].Normalize();
+
+      // Calculate handedness
+      binormalArray[i].Normalize();
+
+      csVector3 tb;
+      tb.Cross(tangentsArray[ i ], binormalArray[ i ]);
+      float direction = tb * n >= 0.0f ? -1.0f : 1.0f;
+  
+      tangentsArray[ i ] = tangentsArray[ i ] * direction;
     }
 
     // generate the guide hairs
@@ -246,15 +305,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       float height = heightmap.data[ 4 * ((int)(guideHair.uv.x * heightmap.width) + 
         (int)(guideHair.uv.y * heightmap.height) * heightmap.width )] / 255.0f;
 
-//       csPrintf("%f\t%f\t%f\t", height, heightFactor, controlPointsDistance );
-//       csPrintf("%d\n", (int)( (height * heightFactor) / controlPointsDistance) );
-
       guideHair.controlPointsCount = (int)( (height * heightFactor) / controlPointsDistance);
+      
+      if (guideHair.controlPointsCount < 3 && guideHair.controlPointsCount > 0)
+        guideHair.controlPointsCount = 3;
+
       guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 
+      float realDistance = (height * heightFactor) / guideHair.controlPointsCount;
+
       for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
-        guideHair.controlPoints[j] = pos + j * controlPointsDistance * 
-          norms.Get(uniqueIndices.Get(i));
+        guideHair.controlPoints[j] = pos + j * realDistance * 
+          tangentsArray[uniqueIndices.Get(i)];
 
       guideHairs.Push(guideHair);
     }
@@ -431,7 +493,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void FurMaterial::SynchronizeGuideHairs ()
   {
-    if (!physicsControl) // no physics support
+    if (!physicsControlEnabled) // no physics support
       return;
 
     for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
@@ -545,18 +607,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
                   guideHairs.GetSize()).controlPoints[i];
           }
 
-          if ( strictHeightmap && hairStrand.controlPointsCount > 1 )
-          {
-            csVector3 direction = hairStrand.controlPoints[hairStrand.controlPointsCount - 1] - 
-              hairStrand.controlPoints[hairStrand.controlPointsCount - 2];
-            float distance = csVector3::Norm(direction);
-            direction.Normalize();
-
-            hairStrand.controlPoints[hairStrand.controlPointsCount - 1] =
-              hairStrand.controlPoints[hairStrand.controlPointsCount - 2] +
-              direction * distance * hairStrand.tipRatio;
-          }
-
           hairStrands.Push(hairStrand);		
         }
       }
@@ -571,7 +621,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     this->guideLOD = guideLOD;
 
-    if (!physicsControl) // no physics support
+    if (!physicsControlEnabled) // no physics support
       return;
 
     // deactivate all
@@ -755,6 +805,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     this->physicsControl = physicsControl;
   }
 
+  void FurMaterial::StartPhysicsControl()
+  {
+    if (!physicsControlEnabled)
+    {
+      physicsControlEnabled = true;
+      SynchronizeGuideHairs();
+    }
+  }
+
+  void FurMaterial::StopPhysicsControl()
+  {
+    if (physicsControlEnabled)
+    {
+      physicsControlEnabled = false;
+      physicsControl->RemoveAllStrands();
+    }
+  }
+
   void FurMaterial::SetMeshFactory ( iAnimatedMeshFactory* meshFactory)
   {
     this->meshFactory = meshFactory;
@@ -839,9 +907,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     CS::ShaderVarName heightFactorName (svStrings, "heightFactor");	
     material->GetVariable(heightFactorName)->GetValue(heightFactor);
-
-    CS::ShaderVarName strictHeightmapName (svStrings, "strictHeightmap");	
-    material->GetVariable(strictHeightmapName)->GetValue(strictHeightmap);
 
     // height map
     CS::StructuredTextureFormat readbackFmt 
@@ -999,7 +1064,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       furMaterial->hairStrandGenerator->Update();
 
     // first update the control points
-    if (furMaterial->physicsControl)
+    if (furMaterial->physicsControlEnabled)
       UpdateGuideHairs();
 
     size_t numberOfStrains = furMaterial->hairStrandsLODSize;
@@ -1008,25 +1073,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       return;
 
     // then update the hair strands
-    if (furMaterial->physicsControl)
+    if (furMaterial->physicsControlEnabled)
       for (size_t i = 0 ; i < numberOfStrains; i ++)
       {
         csHairStrand hairStrand = furMaterial->hairStrands.Get(i);
 
         UpdateControlPoints(hairStrand.controlPoints,
           hairStrand.controlPointsCount, hairStrand.guideHairs);
-
-        if ( furMaterial->strictHeightmap && hairStrand.controlPointsCount > 1 )
-        {
-          csVector3 direction = hairStrand.controlPoints[hairStrand.controlPointsCount - 1] - 
-            hairStrand.controlPoints[hairStrand.controlPointsCount - 2];
-          float distance = csVector3::Norm(direction);
-          direction.Normalize();
-
-          hairStrand.controlPoints[hairStrand.controlPointsCount - 1] =
-            hairStrand.controlPoints[hairStrand.controlPointsCount - 2] +
-            direction * distance * hairStrand.tipRatio;
-        }
       }
 
     const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
@@ -1081,7 +1134,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         (*(tangentBuffer + 1)) = tangent;
       }
 
-      if (controlPointsCount >= 1)
+      if (controlPointsCount >= 2)
       {
         (*vbuf) = *controlPoints;
         (*(vbuf + 1)) = *controlPoints + strip;

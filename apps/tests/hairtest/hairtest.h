@@ -66,15 +66,17 @@ public:
   // Display of information on the state of the scene
   virtual void UpdateStateDescription () = 0;
 
+  // Switch fur dynamics
+  virtual void SwitchFurPhysics() = 0;
+
   // Animesh
   csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
   // Fur material
   csRef<iFurMaterial> furMaterial;
-
 };
 
-class HairTest : public csDemoApplication
+class HairTest : public CS::Demo::DemoApplication
 {
   friend class KrystalScene;
 
@@ -116,9 +118,16 @@ private:
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
+  bool OnMouseDown (iEvent &event);
 
   // Switch Active Colliders displayed
   void SwitchDynamics();
+
+  //-- csDemoApplication
+  csVector3 GetCameraStart ();
+  float GetCameraMinimumDistance ();
+  csVector3 GetCameraTarget ();
+
 public:
   HairTest ();
   ~HairTest ();
@@ -139,6 +148,7 @@ public:
   bool OnEventThumbTrackEndedGuideLOD (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedStrandLOD (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedOverallLOD (const CEGUI::EventArgs& e);
+  bool OnPhysicsButtonClicked (const CEGUI::EventArgs& e);
 
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);
