@@ -461,8 +461,11 @@ iVisibilityCuller* RMCuller::GetVisCuller ()
 {
   csFrustumVis* fvCuller = new csFrustumVis();
   fvCuller->Initialize (objectReg);
-  visCullers.AddNoTest (fvCuller);
-  return fvCuller;
+
+  csRef<iVisibilityCuller> psVisCuller;
+  psVisCuller.AttachNew (fvCuller);
+  visCullers.AddNoTest (psVisCuller);
+  return psVisCuller;
 }
 
 }

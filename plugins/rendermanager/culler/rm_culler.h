@@ -143,7 +143,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMCuller)
     uint dbgFlagClipPlanes;
 
     /// Set of our cullers.
-    csSet<iVisibilityCuller*> visCullers;
+    csSet<csRef<iVisibilityCuller> > visCullers;
   };
 }
 CS_PLUGIN_NAMESPACE_END(RMCuller)

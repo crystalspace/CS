@@ -74,9 +74,15 @@ struct NodeTraverseData
   {
     kdtParent=kdtP;
     kdtNode=kdtN;
+
     // add a new user object only if there's none
     if(kdtNode && !kdtNode->GetUserObject())
-      kdtNode->SetUserObject(new csVisibilityObjectHistory());
+    {
+      csRef<iKDTreeUserData> psVOH;
+      psVOH.AttachNew (new csVisibilityObjectHistory());
+      kdtNode->SetUserObject(psVOH);
+    }
+
     u32Frustum_Mask=frustum_mask;
     bCompletelyVisible=bCV;
   }
