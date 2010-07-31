@@ -29,7 +29,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
 class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
-    csObject, ::iRigidBody, iRigidBody>
+  csObject, iRigidBody, iBulletRigidBody>, public BulletBody
 {
   friend class csBulletMotionState;
   friend class csBulletKinematicMotionState;
@@ -39,8 +39,6 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
   friend class csBulletPivotJoint;
   friend class csBulletSoftBody;
 
-  CS::Physics::Bullet::BodyType bodyType;
-
   csBulletDynamicsSystem* dynSys;
   btRigidBody* body;
   csBulletMotionState* motionState;
@@ -48,10 +46,10 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
 
   csRef<iDynamicsMoveCallback> moveCb;
   csRef<iDynamicsCollisionCallback> collCb;
-  csRef<iKinematicCallback> kinematicCb;
+  csRef<iBulletKinematicCallback> kinematicCb;
 
   btCompoundShape* compoundShape;
-  CS::Physics::Bullet::BodyState dynamicState;
+  csBulletState dynamicState;
   bool customMass;
   float mass;
   bool compoundChanged;
@@ -71,16 +69,6 @@ class csBulletRigidBody : public scfImplementationExt2<csBulletRigidBody,
 public: 
   csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic = false);
   virtual ~csBulletRigidBody ();
-
-  //-- CS::Physics::Bullet::iBody
-  virtual CS::Physics::Bullet::BodyType GetType () const
-  { return bodyType; }
-  virtual ::iRigidBody* QueryRigidBody ()
-  { return this; }
-  virtual CS::Physics::Bullet::iSoftBody* QuerySoftBody ()
-  { return 0; }
-  virtual CS::Physics::Bullet::iTerrainCollider* QueryTerrainCollider ()
-  { return 0; }
 
   //-- iRigidBody
   virtual iObject* QueryObject (void) { return (iObject*) this; }
@@ -174,18 +162,18 @@ public:
 
   virtual void SetMoveCallback (iDynamicsMoveCallback* cb);
   virtual void SetCollisionCallback (iDynamicsCollisionCallback* cb);
-  virtual void Collision (::iRigidBody *other, const csVector3& pos,
+  virtual void Collision (iRigidBody *other, const csVector3& pos,
       const csVector3& normal, float depth);
   virtual csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
   virtual int GetColliderCount ();
 
-  //-- CS::Physics::Bullet::iRigidBody
+  //-- iBulletRigidBody
   virtual void MakeKinematic ();
-  virtual CS::Physics::Bullet::BodyState GetDynamicState () const;
-  virtual void SetDynamicState (CS::Physics::Bullet::BodyState state);
+  virtual csBulletState GetDynamicState () const;
+  virtual void SetDynamicState (csBulletState state);
 
-  virtual void SetKinematicCallback (iKinematicCallback* callback);
-  virtual iKinematicCallback* GetKinematicCallback ();
+  virtual void SetKinematicCallback (iBulletKinematicCallback* callback);
+  virtual iBulletKinematicCallback* GetKinematicCallback ();
 
   virtual void SetLinearDampener (float d);
   virtual float GetLinearDampener () const;
@@ -217,13 +205,13 @@ public:
  * attached mesh, light or camera.
  */
 class csBulletDefaultKinematicCallback : public scfImplementation1<
-  csBulletDefaultKinematicCallback, iKinematicCallback>
+  csBulletDefaultKinematicCallback, iBulletKinematicCallback>
 {
 public:
   csBulletDefaultKinematicCallback ();
   virtual ~csBulletDefaultKinematicCallback ();
 
-  virtual void GetBodyTransform (::iRigidBody* body, csOrthoTransform& transform) const;
+  virtual void GetBodyTransform (iRigidBody* body, csOrthoTransform& transform) const;
 };
 
 }

@@ -64,8 +64,8 @@ class KrystalScene : public AvatarScene
   // Krystal's hairs & skirt (soft bodies)
   csRef<iMeshWrapper> hairsMesh;
   csRef<iMeshWrapper> skirtMesh;
-  csRef<CS::Physics::Bullet::iSoftBody> hairsBody;
-  csRef<CS::Physics::Bullet::iSoftBody> skirtBody;
+  csRef<iBulletSoftBody> hairsBody;
+  csRef<iBulletSoftBody> skirtBody;
 };
 
 #endif // __KRYSTAL_H__

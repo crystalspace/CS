@@ -1184,13 +1184,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
       csRef<iDocumentNode> cgvpNode = vpNode->CreateNodeBefore (CS_NODE_ELEMENT);
       cgvpNode->SetValue ("cgvp");
-      if (!description.IsEmpty())
-      {
-	csRef<iDocumentNode> descrNode = cgvpNode->CreateNodeBefore (CS_NODE_ELEMENT);
-	descrNode->SetValue ("description");
-	csRef<iDocumentNode> descrValue = descrNode->CreateNodeBefore (CS_NODE_TEXT);
-	descrValue->SetValue (csString().Format ("%s VP", description.GetData()));
-      }
       
       csRef<iDocumentNode> entryNode = cgvpNode->CreateNodeBefore (CS_NODE_ELEMENT);
       entryNode->SetValue ("entry");
@@ -1290,13 +1283,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
       csRef<iDocumentNode> cgfpNode = fpNode->CreateNodeBefore (CS_NODE_ELEMENT);
       cgfpNode->SetValue ("cgfp");
-      if (!description.IsEmpty())
-      {
-	csRef<iDocumentNode> descrNode = cgfpNode->CreateNodeBefore (CS_NODE_ELEMENT);
-	descrNode->SetValue ("description");
-	csRef<iDocumentNode> descrValue = descrNode->CreateNodeBefore (CS_NODE_TEXT);
-	descrValue->SetValue (csString().Format ("%s FP", description.GetData()));
-      }
       
       csRef<iDocumentNode> entryNode = cgfpNode->CreateNodeBefore (CS_NODE_ELEMENT);
       entryNode->SetValue ("entry");

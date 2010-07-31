@@ -47,9 +47,6 @@ public:
   // Display of information on the state of the scene
   void UpdateStateDescription ();
 
-  // Switch Fur Physics
-  void SwitchFurPhysics();
-
 private:
   HairTest* hairTest;
 
@@ -62,14 +59,8 @@ private:
   // Krystal's hairs & skirt (soft bodies)
   csRef<iMeshWrapper> hairsMesh;
   csRef<iMeshWrapper> skirtMesh;
-  csRef<CS::Physics::Bullet::iSoftBody> hairsBody;
-  csRef<CS::Physics::Bullet::iSoftBody> skirtBody;
-
-  // Hair physics
-  bool hairPhysicsEnabled;
-  csRef<iFurPhysicsControl> hairPhysicsControl;
-  csRef<iFurPhysicsControl> animationPhysicsControl;
-  csRef<iRigidBody> headBody;
+  csRef<iBulletSoftBody> hairsBody;
+  csRef<iBulletSoftBody> skirtBody;
 };
 
 #endif // __KRYSTAL_H__

@@ -86,9 +86,7 @@ struct iFurMaterial : public virtual iMaterial
   virtual void SetStrandLOD(float strandLOD) = 0; 
 
   virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl) = 0;
-  virtual void StartPhysicsControl ( ) = 0;
-  virtual void StopPhysicsControl ( ) = 0;
- 
+
   virtual void SetFurStrandGenerator( iFurStrandGenerator* furStrandMaterial) = 0;
   virtual iFurStrandGenerator* GetFurStrandGenerator( ) = 0;
 

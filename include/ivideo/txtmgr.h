@@ -115,18 +115,6 @@ struct iString;
  * It only has an effect when used with iTextureManager::CreateTexture().
  */
 #define CS_TEXTURE_CREATE_CLEAR		0x00000200
-/**
- * Disable filtering across edges for a cubemap.
- * By default, cubemaps are seamless (when filtering near an edge of a face,
- * pixels from neighboring faces are sampled as well). However, this may be
- * undesireable in certain cases (e.g. lookup textures). In that case,
- * seamless filtering can be selectively disabled.
- * \remarks Seamless filtering is subject to hardware/driver support.
- *   On some hardware/drivers, seamless filtering is a global flag. "Disable
- *   seamless" takes precedence, so if one texture with seamless disabled
- *   is used, seamless filtering is disabled globally.
- */
-#define CS_TEXTURE_CUBEMAP_DISABLE_SEAMLESS	0x00000400
 /** @} */
 
 /**

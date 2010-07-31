@@ -259,9 +259,6 @@ public:
   bool IsInFBO() const { return texFlags.Check (flagInFBO); }
   void SetInFBO (bool b) { texFlags.SetBool (flagInFBO, b); }
   
-  bool IsSeamlessCubemapDisabled () const
-  { return texFlags.Check (CS_TEXTURE_CUBEMAP_DISABLE_SEAMLESS); }
-  
   void ReadbackFramebuffer ();
   
   /// Create a texture with given dimensions

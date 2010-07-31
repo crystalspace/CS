@@ -176,7 +176,7 @@ struct iMeshDrawCallback : public virtual iBase
 
 /**
  * Return structure for the iMeshWrapper::HitBeam() routines.
- * \sa csSectorHitBeamResult CS::Physics::Bullet::HitBeamResult
+ * \sa csSectorHitBeamResult csBulletHitBeamResult
  */
 struct csHitBeamResult
 {
@@ -366,7 +366,7 @@ struct iMeshWrapper : public virtual iBase
    * only happen if 'do_material' is true). This is not
    * supported by all meshes so this can return 0 even if there was a hit.
    * \sa csHitBeamResult iSector::HitBeam() iSector::HitBeamPortals()
-   * CS::Physics::Bullet::iDynamicSystem::HitBeam()
+   * iBulletDynamicSystem::HitBeam()
    */
   virtual csHitBeamResult HitBeam (const csVector3& start,
   	const csVector3& end, bool do_material = false) = 0;

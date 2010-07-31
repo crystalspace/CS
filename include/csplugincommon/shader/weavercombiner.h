@@ -54,7 +54,7 @@ namespace CS
     
       struct iCombiner : public virtual iBase
       {
-        SCF_INTERFACE (iCombiner, 1, 0, 1);
+        SCF_INTERFACE (iCombiner, 1, 0, 0);
         
         /// Start addition of a new snippet.
         virtual void BeginSnippet (const char* annotation = 0) = 0;
@@ -134,12 +134,6 @@ namespace CS
          */
         virtual csRef<iString> QueryInputTag (const char* location, 
           iDocumentNode* blockNodes) = 0;
-	  
-	/**
-	 * Set a descriptive name of the program to be combined.
-	 * Emitted to the output, can be used to identify generated programs.
-	 */
-	virtual void SetDescription (const char* descr) = 0;
       };
       
       struct iCombinerLoader : public virtual iBase

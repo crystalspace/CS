@@ -67,7 +67,8 @@ csEventQueue::~csEventQueue ()
     EventPool->Free();
     EventPool = e;
   }
-  RemoveAllListeners (false);
+  RemoveAllListeners();
+  EventTree = 0;
 }
 
 uint32 csEventQueue::CountPool()
@@ -411,11 +412,6 @@ void csEventQueue::RemoveListener (iEventHandler* listener)
 
 void csEventQueue::RemoveAllListeners ()
 {
-  RemoveAllListeners (true);
-}
-
-void csEventQueue::RemoveAllListeners (bool recreateEventTree)
-{
 #ifdef ADB_DEBUG
   std::cerr << "Unregistering all listeners" << std::endl;
 #endif
@@ -432,10 +428,7 @@ void csEventQueue::RemoveAllListeners (bool recreateEventTree)
   mutex.WriteUnlock();
   CS::Threading::ScopedWriteLock lock(etreeMutex);
   csEventTree::DeleteRootNode (EventTree); // Magic!
-  if (recreateEventTree)
-    EventTree = csEventTree::CreateRootNode (HandlerRegistry, NameRegistry, this);
-  else
-    EventTree = nullptr;
+  EventTree = csEventTree::CreateRootNode (HandlerRegistry, NameRegistry, this);
 }
 
 csPtr<iEventOutlet> csEventQueue::CreateEventOutlet (iEventPlug* plug)

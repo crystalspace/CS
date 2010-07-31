@@ -38,7 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   HairPhysicsControl::~HairPhysicsControl ()
   {
-    RemoveAllStrands();
+    guideRopes.DeleteAll();
   }
 
   // From iComponent
@@ -75,7 +75,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csVector3 first = coordinates[0];
     csVector3 last = coordinates[coordinatesCount - 1];
 
-    CS::Physics::Bullet::iSoftBody* bulletBody = bulletDynamicSystem->
+    iBulletSoftBody* bulletBody = bulletDynamicSystem->
       CreateRope(first, first + csVector3(0, 1, 0) * (last - first).Norm() , 
       coordinatesCount - 1);	//	replace with -1
     bulletBody->SetMass (0.1f);
@@ -89,7 +89,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void HairPhysicsControl::AnimateStrand (size_t strandID, csVector3* 
     coordinates, size_t coordinatesCount)
   {
-    csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get (strandID, 0);
+    csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
 
     if(!bulletBody)
       return;
@@ -99,11 +99,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
       coordinates[i] = bulletBody->GetVertexPosition(i);
+    /*
+    if (strandID % 3 == 0)
+    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
+    coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
+    csVector3(1,0,0);
+    else if (strandID % 3 == 1)
+    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
+    coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
+    csVector3(0,1,0);
+    else
+    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
+    coordinates[i] = bulletBody->GetVertexPosition(0)+ i*0.05 *
+    csVector3(0,0,1);
+    */
   }
 
   void HairPhysicsControl::RemoveStrand (size_t strandID)
   {
-    csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get (strandID, 0);
+    csRef<iBulletSoftBody> bulletBody = guideRopes.Get (strandID, 0);
     if(!bulletBody)
       return;
 
@@ -114,12 +128,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   void HairPhysicsControl::RemoveAllStrands ()
   {
-    for (size_t i = 0 ; i < guideRopes.GetSize(); i ++)
-    {
-      csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get(i, 0);
-      if (bulletBody)
-        bulletDynamicSystem->RemoveSoftBody( bulletBody );
-    }
     guideRopes.DeleteAll();
   }
 

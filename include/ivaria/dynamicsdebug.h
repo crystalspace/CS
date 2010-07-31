@@ -31,19 +31,7 @@ struct iDynamicSystemDebugger;
 struct iDynamicSystem;
 struct iSector;
 struct iMaterialWrapper;
-
-namespace CS
-{
-namespace Physics
-{
-namespace Bullet
-{
-
-enum BodyState;
-
-}
-}
-}
+enum csBulletState;
 
 /**
  * Creation of dynamic system debuggers.
@@ -116,12 +104,8 @@ struct iDynamicSystemDebugger : public virtual iBase
    * won't be displayed. If this method is not used, then a default blue colored
    * material will be used.
    */
-  virtual void SetBodyStateMaterial (CS::Physics::Bullet::BodyState state,
+  virtual void SetBodyStateMaterial (csBulletState state,
 				     iMaterialWrapper* material) = 0;
 };
 
-/*
-} //namespace Bullet
-} //namespace Physics
-*/
 #endif // __CS_IVARIA_DYNAMICSDEBUG_H__

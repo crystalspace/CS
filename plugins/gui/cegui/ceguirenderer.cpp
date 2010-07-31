@@ -252,12 +252,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
       CEGUI::System::create (*this, rp, 0, ic);
     }
 
-    settingsSliderFact.obj_reg = obj_reg;
-    CEGUI::WindowFactoryManager::getSingletonPtr()->addFactory(&settingsSliderFact);
-
-    settingComboBoxFact.obj_reg = obj_reg;
-    CEGUI::WindowFactoryManager::getSingletonPtr()->addFactory(&settingComboBoxFact);
-
     g2d->SetMouseCursor (csmcNone);
     events = new CEGUIEventHandler (obj_reg, this);
     events->Initialize ();

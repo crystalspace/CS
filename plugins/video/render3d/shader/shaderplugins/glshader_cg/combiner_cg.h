@@ -146,7 +146,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 			      CS::PluginCommon::ShaderWeaver::iCombiner>
   {
     csRef<ShaderCombinerLoaderCg> loader;
-    csString description;
     bool writeVP, writeFP;
     
     struct Attribute
@@ -223,8 +222,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
     csRef<iString> QueryInputTag (const char* location, 
       iDocumentNode* blockNodes);
-      
-    virtual void SetDescription (const char* descr) { description = descr; }
   private:
     class DocNodeCgAppender;
     class V2FAutoSematicsHelper;

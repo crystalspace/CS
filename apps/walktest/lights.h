@@ -49,13 +49,8 @@ private:
   WalkTest* walktest;
   csRefArray<iLight> dynamic_lights;
 
-  csRef<iLight> flashlight;
-  csReversibleTransform FlashlightShift (const csReversibleTransform& tf);
 public:
   WalkTestLights (WalkTest* walktest);
-  
-  void EnableFlashlight (bool enable);
-  bool IsFlashlightEnabled () const { return flashlight; }
 
   bool HandleDynLight (iLight* dyn);
   void HandleDynLights ();

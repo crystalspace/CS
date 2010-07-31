@@ -339,10 +339,12 @@ public:
 
 bool csThingLoader::ParsePortal (
 	iDocumentNode* node, iLoaderContext* ldr_context,
-	CS::Utility::PortalParameters& params)
+	uint32 &flags, bool &mirror, bool &warp, int& msv,
+	csMatrix3 &m, csVector3 &before, csVector3 &after,
+	iString* destSector, bool& autoresolve)
 {
+  destSector->Empty ();
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  csRef<csRefCount> portalParseState;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
@@ -351,7 +353,8 @@ bool csThingLoader::ParsePortal (
     //csStringID id = xmltokens.Request (value);
     bool handled;
     if (!synldr->HandlePortalParameter (child, ldr_context,
-	portalParseState, params, handled))
+        flags, mirror, warp, msv, m, before, after, destSector, handled,
+	autoresolve))
     {
       return false;
     }
@@ -361,7 +364,7 @@ bool csThingLoader::ParsePortal (
       return false;
     }
   }
-  if (params.destSector->Length () == 0)
+  if (destSector->Length () == 0)
   {
     synldr->ReportError ("crystalspace.thingldr.portal", node,
       "Missing sector in portal!");
@@ -748,19 +751,25 @@ bool csThingLoader::ParsePoly3d (
 
   if (portal_node)
   {
-    CS::Utility::PortalParameters portalParams;
-    portalParams.m.Identity();
+    csMatrix3 m_w; m_w.Identity ();
+    csVector3 v_w_before (0, 0, 0);
+    csVector3 v_w_after (0, 0, 0);
+    uint32 flags = 0;
+    bool do_warp = false;
+    bool do_mirror = false;
+    int msv = -1;
     csRef<scfString> destSectorName;
     destSectorName.AttachNew (new scfString);
-    portalParams.destSector = destSectorName;
 
     bool autoresolve = false;
-    if (ParsePortal (portal_node, ldr_context, portalParams))
+    if (ParsePortal (portal_node, ldr_context,
+	      flags, do_mirror, do_warp, msv,
+	      m_w, v_w_before, v_w_after, destSectorName, autoresolve))
     {
       iSector* destSector;
       // If autoresolve is true we clear the sector since we want the callback
       // to be used.
-      if (portalParams.autoresolve)
+      if (autoresolve)
         destSector = 0;
       else
         destSector = ldr_context->FindSector (destSectorName->GetData ());
@@ -812,22 +821,22 @@ bool csThingLoader::ParsePoly3d (
         poly_delete = if_portal_delete_polygon;
       }
 
-      portal->GetFlags ().Set (portalParams.flags);
+      portal->GetFlags ().Set (flags);
 
-      if (portalParams.mirror)
+      if (do_mirror)
       {
         if (!set_colldet) set_colldet = 1;
         portal->SetWarp (csTransform::GetReflect (
 		thing_fact_state->GetPolygonObjectPlane (CS_POLYINDEX_LAST)));
       }
-      else if (portalParams.warp)
+      else if (do_warp)
       {
-        portal->SetWarp (portalParams.m, portalParams.before, portalParams.after);
+        portal->SetWarp (m_w, v_w_before, v_w_after);
       }
 
-      if (portalParams.msv != -1)
+      if (msv != -1)
       {
-        portal->SetMaximumSectorVisit (portalParams.msv);
+        portal->SetMaximumSectorVisit (msv);
       }
     }
   }

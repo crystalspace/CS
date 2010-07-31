@@ -186,10 +186,6 @@ public:
     UpdateTime ();
     CS_ASSERT(RefCount >= 0);
   }
-  int GetRefCount () const
-  {
-    return CS::Threading::AtomicOperations::Read (&RefCount);
-  }
   bool CheckUp ()
   {
     return (RefCount == 0) &&

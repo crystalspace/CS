@@ -124,7 +124,7 @@ struct iDynamicsSystemCollider;
  * Main ways to get pointers to this interface:
  * - iDynamics::FindSystem()
  *
- * \sa CS::Physics::Bullet::iDynamicSystem iODEDynamicSystemState
+ * \sa iBulletDynamicSystem iODEDynamicSystemState
  */
 struct iDynamicSystem : public virtual iBase
 {
@@ -144,7 +144,7 @@ struct iDynamicSystem : public virtual iBase
    * in one second. 0 means that the movement will not be reduced, while
    * 1 means that the object will not move.
    * The default value is 0.
-   * \sa CS::Physics::Bullet::iRigidBody::SetLinearDampener()
+   * \sa iBulletRigidBody::SetLinearDampener()
    */
   virtual void SetLinearDampener (float d) = 0;
 
@@ -158,7 +158,7 @@ struct iDynamicSystem : public virtual iBase
    * in one second. 0 means that the movement will not be reduced, while
    * 1 means that the object will not move.
    * The default value is 0.
-   * \sa CS::Physics::Bullet::iRigidBody::SetRollingDampener()
+   * \sa iBulletRigidBody::SetRollingDampener()
    */
   virtual void SetRollingDampener (float d) = 0;
 
@@ -375,7 +375,7 @@ struct iDynamicSystem : public virtual iBase
    * Add a rigid body to this dynamic system after having removed it frome another
    * one with RemoveBody().
    * \warning For the Bullet plugin, it won't work if you use dynamic systems which
-   * have different internal scales set through CS::Physics::Bullet::iDynamicSystem::SetInternalScale().
+   * have different internal scales set through iBulletDynamicSystem::SetInternalScale().
    */
   virtual void AddBody (iRigidBody* body) = 0;
 };
@@ -482,7 +482,7 @@ struct iBodyGroup : public virtual iBase
  * Main users of this interface:
  * - iDynamicSystem
  *
- * \sa CS::Physics::Bullet::iRigidBody CS::Physics::Bullet::iSoftBody
+ * \sa iBulletRigidBody iBulletSoftBody
  */
 struct iRigidBody : public virtual iBase
 {
@@ -494,7 +494,7 @@ struct iRigidBody : public virtual iBase
    * Make the body static, ie this body won't move anymore but dynamic
    * objects will still collide with it. This is especially useful
    * for environmental objects.
-   * \sa MakeDynamic() CS::Physics::Bullet::iRigidBody::MakeKinematic()
+   * \sa MakeDynamic() iBulletRigidBody::MakeKinematic()
    */
   virtual bool MakeStatic (void) = 0;
   /**
@@ -502,15 +502,15 @@ struct iRigidBody : public virtual iBase
    * the dynamic simulation. It will collide and react to any other
    * bodies, whatever they are static or dynamic (or kinematic if you
    * are using the bullet plugin).
-   * \sa MakeStatic() CS::Physics::Bullet::iRigidBody::MakeKinematic()
+   * \sa MakeStatic() iBulletRigidBody::MakeKinematic()
    */
   virtual bool MakeDynamic (void) = 0;
   /**
    * Tell whether a body has been made static or not.
    * \warning If you are using the Bullet plugin, a 'false' value
    * returned by this method doesn't mean that the body is dynamic, it can
-   * also have been made kinematic through CS::Physics::Bullet::iRigidBody::MakeKinematic()
-   * \sa CS::Physics::Bullet::iRigidBody::GetDynamicState()
+   * also have been made kinematic through iBulletRigidBody::MakeKinematic()
+   * \sa iBulletRigidBody::GetDynamicState()
    */
   virtual bool IsStatic (void) = 0;
   /**

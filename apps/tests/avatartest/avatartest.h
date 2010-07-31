@@ -36,7 +36,7 @@
 #define DYNDEBUG_COLLIDER 3
 #define DYNDEBUG_BULLET 4
 
-// Base class to be implemented for all different scenes
+// Base class to be implemented for all different models
 class AvatarScene
 {
  public:
@@ -70,7 +70,7 @@ class AvatarScene
   csRef<iAnimatedMesh> animesh;
 };
 
-class AvatarTest : public CS::Demo::DemoApplication
+class AvatarTest : public csDemoApplication
 {
   friend class FrankieScene;
   friend class KrystalScene;
@@ -103,11 +103,6 @@ private:
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
-
-  //-- CS::Demo::CameraManager
-  csVector3 GetCameraStart ();
-  float GetCameraMinimumDistance ();
-  csVector3 GetCameraTarget ();
 
  public:
   AvatarTest ();

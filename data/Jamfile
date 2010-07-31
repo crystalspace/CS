@@ -3,11 +3,9 @@ SubDir TOP data ;
 RUNTIME_DATA = 
   castle-tex.zip
   fancycon.zip
-  shadermgr-defaults.zip
   standard.zip
   ttf-dejavu.zip
-  unifont.zip
-  ;
+  unifont.zip ;
 DEMO_DATA =
   startme.zip
   teapot.zip

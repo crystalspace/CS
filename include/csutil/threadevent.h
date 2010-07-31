@@ -36,373 +36,439 @@ public:
   virtual ~ThreadedCallable() {}
   
   virtual iObjectRegistry* GetObjectRegistry() const = 0;
-  
-  template<typename A1>
-  struct Args1 { A1* a1; };
-  template<typename A1, typename A2>
-  struct Args2 : public Args1<A1> { A2* a2; };
-  template<typename A1, typename A2, typename A3>
-  struct Args3 : public Args2<A1, A2> { A3* a3; };
-  template<typename A1, typename A2, typename A3, typename A4>
-  struct Args4 : public Args3<A1, A2, A3> { A4* a4; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5>
-  struct Args5 : public Args4<A1, A2, A3, A4> { A5* a5; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-  struct Args6 : public Args5<A1, A2, A3, A4, A5> { A6* a6; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-  struct Args7 : public Args6<A1, A2, A3, A4, A5, A6> { A7* a7; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-  struct Args8 : public Args7<A1, A2, A3, A4, A5, A6, A7> { A8* a8; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-  struct Args9 : public Args8<A1, A2, A3, A4, A5, A6, A7, A8> { A9* a9; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10>
-  struct Args10 : public Args9<A1, A2, A3, A4, A5, A6, A7, A8, A9> { A10* a10; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11>
-  struct Args11 : public Args10<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10> { A11* a11; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12>
-  struct Args12 : public Args11<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11> { A12* a12; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13>
-  struct Args13 : public Args12<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12> { A13* a13; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14>
-  struct Args14 : public Args13<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13> { A14* a14; };
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14, typename A15>
-  struct Args15 : public Args14<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14> { A15* a15; };
-  
-  template<typename A1>
-  static void FetchArgs1 (void const** inArgs, Args1<A1>& outArgs)
-  {
-    outArgs.a1 = (A1*)(inArgs[1]);
-  }
-  template<typename A1, typename A2>
-  static void FetchArgs2 (void const** inArgs, Args2<A1, A2>& outArgs)
-  {
-    outArgs.a2 = (A2*)(inArgs[2]);
-    FetchArgs1<A1> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3>
-  static void FetchArgs3 (void const** inArgs, Args3<A1, A2, A3>& outArgs)
-  {
-    outArgs.a3 = (A3*)(inArgs[3]);
-    FetchArgs2<A1, A2> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4>
-  static void FetchArgs4 (void const** inArgs, Args4<A1, A2, A3, A4>& outArgs)
-  {
-    outArgs.a4 = (A4*)(inArgs[4]);
-    FetchArgs3<A1, A2, A3> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5>
-  static void FetchArgs5 (void const** inArgs, Args5<A1, A2, A3, A4, A5>& outArgs)
-  {
-    outArgs.a5 = (A5*)(inArgs[5]);
-    FetchArgs4<A1, A2, A3, A4> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-  static void FetchArgs6 (void const** inArgs, Args6<A1, A2, A3, A4, A5, A6>& outArgs)
-  {
-    outArgs.a6 = (A6*)(inArgs[6]);
-    FetchArgs5<A1, A2, A3, A4, A5> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-  static void FetchArgs7 (void const** inArgs, Args7<A1, A2, A3, A4, A5, A6, A7>& outArgs)
-  {
-    outArgs.a7 = (A7*)(inArgs[7]);
-    FetchArgs6<A1, A2, A3, A4, A5, A6> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-  static void FetchArgs8 (void const** inArgs, Args8<A1, A2, A3, A4, A5, A6, A7, A8>& outArgs)
-  {
-    outArgs.a8 = (A8*)(inArgs[8]);
-    FetchArgs7<A1, A2, A3, A4, A5, A6, A7> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-  static void FetchArgs9 (void const** inArgs, Args9<A1, A2, A3, A4, A5, A6, A7, A8, A9>& outArgs)
-  {
-    outArgs.a9 = (A9*)(inArgs[9]);
-    FetchArgs8<A1, A2, A3, A4, A5, A6, A7, A8> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10>
-  static void FetchArgs10 (void const** inArgs, Args10<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10>& outArgs)
-  {
-    outArgs.a10 = (A10*)(inArgs[10]);
-    FetchArgs9<A1, A2, A3, A4, A5, A6, A7, A8, A9> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11>
-  static void FetchArgs11 (void const** inArgs, Args11<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11>& outArgs)
-  {
-    outArgs.a11 = (A11*)(inArgs[11]);
-    FetchArgs10<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12>
-  static void FetchArgs12 (void const** inArgs, Args12<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12>& outArgs)
-  {
-    outArgs.a12 = (A12*)(inArgs[12]);
-    FetchArgs11<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13>
-  static void FetchArgs13 (void const** inArgs, Args13<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13>& outArgs)
-  {
-    outArgs.a13 = (A13*)(inArgs[13]);
-    FetchArgs12<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14>
-  static void FetchArgs14 (void const** inArgs, Args14<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14>& outArgs)
-  {
-    outArgs.a14 = (A14*)(inArgs[14]);
-    FetchArgs13<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13> (inArgs, outArgs);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14, typename A15>
-  static void FetchArgs15 (void const** inArgs, Args15<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15>& outArgs)
-  {
-    outArgs.a15 = (A15*)(inArgs[15]);
-    FetchArgs14<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14> (inArgs, outArgs);
-  }
-  
-  template<typename A1>
-  static void FreeArgs1 (void const** args, const Args1<A1>& A)
-  {
-    TEventMemPool* mempool = (TEventMemPool*)args[0];
-    A.a1->Invalidate();
-    delete mempool;
-    delete[] args;
-  }
-  template<typename A1, typename A2>
-  static void FreeArgs2 (void const** args, const Args2<A1, A2>& A)
-  {
-    A.a2->~A2();
-    FreeArgs1<A1> (args, A);
-  }
-  template<typename A1, typename A2, typename A3>
-  static void FreeArgs3 (void const** args, const Args3<A1, A2, A3>& A)
-  {
-    A.a3->~A3();
-    FreeArgs2<A1, A2> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4>
-  static void FreeArgs4 (void const** args, const Args4<A1, A2, A3, A4>& A)
-  {
-    A.a4->~A4();
-    FreeArgs3<A1, A2, A3> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5>
-  static void FreeArgs5 (void const** args, const Args5<A1, A2, A3, A4, A5>& A)
-  {
-    A.a5->~A5();
-    FreeArgs4<A1, A2, A3, A4> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-  static void FreeArgs6 (void const** args, const Args6<A1, A2, A3, A4, A5, A6>& A)
-  {
-    A.a6->~A6();
-    FreeArgs5<A1, A2, A3, A4, A5> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-  static void FreeArgs7 (void const** args, const Args7<A1, A2, A3, A4, A5, A6, A7>& A)
-  {
-    A.a7->~A7();
-    FreeArgs6<A1, A2, A3, A4, A5, A6> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-  static void FreeArgs8 (void const** args, const Args8<A1, A2, A3, A4, A5, A6, A7, A8>& A)
-  {
-    A.a8->~A8();
-    FreeArgs7<A1, A2, A3, A4, A5, A6, A7> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-  static void FreeArgs9 (void const** args, const Args9<A1, A2, A3, A4, A5, A6, A7, A8, A9>& A)
-  {
-    A.a9->~A9();
-    FreeArgs8<A1, A2, A3, A4, A5, A6, A7, A8> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10>
-  static void FreeArgs10 (void const** args, const Args10<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10>& A)
-  {
-    A.a10->~A10();
-    FreeArgs9<A1, A2, A3, A4, A5, A6, A7, A8, A9> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11>
-  static void FreeArgs11 (void const** args, const Args11<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11>& A)
-  {
-    A.a11->~A11();
-    FreeArgs10<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12>
-  static void FreeArgs12 (void const** args, const Args12<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12>& A)
-  {
-    A.a12->~A12();
-    FreeArgs11<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13>
-  static void FreeArgs13 (void const** args, const Args13<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13>& A)
-  {
-    A.a13->~A13();
-    FreeArgs12<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14>
-  static void FreeArgs14 (void const** args, const Args14<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14>& A)
-  {
-    A.a14->~A14();
-    FreeArgs13<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13> (args, A);
-  }
-  template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14, typename A15>
-  static void FreeArgs15 (void const** args, const Args15<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15>& A)
-  {
-    A.a15->~A15();
-    FreeArgs14<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14> (args, A);
-  }
 
   template<typename A1, typename A2>
-  void RunMethod (bool (T::*method)(A1, A2), const Args2<A1, A2>& A)
+  void RunMethod2(bool (T::*method)(A1, A2), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2))
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3>
-  void RunMethod (bool (T::*method)(A1, A2, A3), const Args3<A1, A2, A3>& A)
+  void RunMethod3(bool (T::*method)(A1, A2, A3), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3))
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4), const Args4<A1, A2, A3, A4>& A)
+  void RunMethod4(bool (T::*method)(A1, A2, A3, A4), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4))
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5), const Args5<A1, A2, A3, A4, A5>& A)
+  void RunMethod5(bool (T::*method)(A1, A2, A3, A4, A5), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5))
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5, A6), const Args6<A1, A2, A3, A4, A5, A6>& A)
+  void RunMethod6(bool (T::*method)(A1, A2, A3, A4, A5, A6), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5, *A.a6))
+      A6* a6 = (A6*)args[6];
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5, A6, A7), const Args7<A1, A2, A3, A4, A5, A6, A7>& A)
+  void RunMethod7(bool (T::*method)(A1, A2, A3, A4, A5, A6, A7), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5, *A.a6, *A.a7))
+      A7* a7 = (A7*)args[7];
+      A6* a6 = (A6*)args[6];
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8), const Args8<A1, A2, A3, A4, A5, A6, A7, A8>& A)
+  void RunMethod8(bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5, *A.a6, *A.a7, *A.a8))
+      A8* a8 = (A8*)args[8];
+      A7* a7 = (A7*)args[7];
+      A6* a6 = (A6*)args[6];
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9), const Args9<A1, A2, A3, A4, A5, A6, A7, A8, A9>& A)
+  void RunMethod9(bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5, *A.a6, *A.a7, *A.a8, *A.a9))
+      A9* a9 = (A9*)args[9];
+      A8* a8 = (A8*)args[8];
+      A7* a7 = (A7*)args[7];
+      A6* a6 = (A6*)args[6];
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), const Args10<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10>& A)
+  void RunMethod10(bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5, *A.a6, *A.a7, *A.a8, *A.a9, *A.a10))
+      A10* a10 = (A10*)args[10];
+      A9* a9 = (A9*)args[9];
+      A8* a8 = (A8*)args[8];
+      A7* a7 = (A7*)args[7];
+      A6* a6 = (A6*)args[6];
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11), const Args11<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11>& A)
+  void RunMethod11(bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5, *A.a6, *A.a7, *A.a8, *A.a9, *A.a10, *A.a11))
+      A11* a11 = (A11*)args[11];
+      A10* a10 = (A10*)args[10];
+      A9* a9 = (A9*)args[9];
+      A8* a8 = (A8*)args[8];
+      A7* a7 = (A7*)args[7];
+      A6* a6 = (A6*)args[6];
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a11->~A11();
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12), const Args12<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12>& A)
+  void RunMethod12(bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5, *A.a6, *A.a7, *A.a8, *A.a9, *A.a10, *A.a11, *A.a12))
+      A12* a12 = (A12*)args[12];
+      A11* a11 = (A11*)args[11];
+      A10* a10 = (A10*)args[10];
+      A9* a9 = (A9*)args[9];
+      A8* a8 = (A8*)args[8];
+      A7* a7 = (A7*)args[7];
+      A6* a6 = (A6*)args[6];
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a12->~A12();
+      a11->~A11();
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13), const Args13<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13>& A)
+  void RunMethod13(bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5, *A.a6, *A.a7, *A.a8, *A.a9, *A.a10, *A.a11, *A.a12, *A.a13))
+      A13* a13 = (A13*)args[13];
+      A12* a12 = (A12*)args[12];
+      A11* a11 = (A11*)args[11];
+      A10* a10 = (A10*)args[10];
+      A9* a9 = (A9*)args[9];
+      A8* a8 = (A8*)args[8];
+      A7* a7 = (A7*)args[7];
+      A6* a6 = (A6*)args[6];
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a13->~A13();
+      a12->~A12();
+      a11->~A11();
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14), const Args14<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14>& A)
+  void RunMethod14(bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5, *A.a6, *A.a7, *A.a8, *A.a9, *A.a10, *A.a11, *A.a12, *A.a13, *A.a14))
+      A14* a14 = (A14*)args[14];
+      A13* a13 = (A13*)args[13];
+      A12* a12 = (A12*)args[12];
+      A11* a11 = (A11*)args[11];
+      A10* a10 = (A10*)args[10];
+      A9* a9 = (A9*)args[9];
+      A8* a8 = (A8*)args[8];
+      A7* a7 = (A7*)args[7];
+      A6* a6 = (A6*)args[6];
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13, *a14))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a14->~A14();
+      a13->~A13();
+      a12->~A12();
+      a11->~A11();
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14, typename A15>
-  void RunMethod (bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15), const Args15<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15>& A)
+  void RunMethod15(bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15), void const** &args)
   {
       T* mySelf = (T*)this;
-      if((mySelf->*method)(*A.a1, *A.a2, *A.a3, *A.a4, *A.a5, *A.a6, *A.a7, *A.a8, *A.a9, *A.a10, *A.a11, *A.a12, *A.a13, *A.a14, *A.a15))
+      A15* a15 = (A15*)args[15];
+      A14* a14 = (A14*)args[14];
+      A13* a13 = (A13*)args[13];
+      A12* a12 = (A12*)args[12];
+      A11* a11 = (A11*)args[11];
+      A10* a10 = (A10*)args[10];
+      A9* a9 = (A9*)args[9];
+      A8* a8 = (A8*)args[8];
+      A7* a7 = (A7*)args[7];
+      A6* a6 = (A6*)args[6];
+      A5* a5 = (A5*)args[5];
+      A4* a4 = (A4*)args[4];
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13, *a14, *a15))
       {
-        (*A.a1)->MarkSuccessful();
+        (*a1)->MarkSuccessful();
       }
-      (*A.a1)->MarkFinished();
+      (*a1)->MarkFinished();
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a15->~A15();
+      a14->~A14();
+      a13->~A13();
+      a12->~A12();
+      a11->~A11();
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
+      a1->Invalidate();
+      delete mempool;
+      delete[] args;
   }
 };
 
@@ -414,23 +480,10 @@ public:
     : scfImplementation1<ThreadEvent1<T, A1>, iJob> (this), object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent1()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args1<A1> A;
-      ThreadedCallable<T>::FetchArgs1 (args, A);
-      ThreadedCallable<T>::FreeArgs1 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args1<A1> A;
-    ThreadedCallable<T>::FetchArgs1 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs1 (args, A);
-    args = nullptr;
+    object->RunMethod1 (method, args);
   }
 
 private:
@@ -448,23 +501,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent2()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args2<A1, A2> A;
-      ThreadedCallable<T>::FetchArgs2 (args, A);
-      ThreadedCallable<T>::FreeArgs2 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args2<A1, A2> A;
-    ThreadedCallable<T>::FetchArgs2 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs2 (args, A);
-    args = nullptr;
+    object->RunMethod2 (method, args);
   }
 
 private:
@@ -482,23 +522,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent3()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args3<A1, A2, A3> A;
-      ThreadedCallable<T>::FetchArgs3 (args, A);
-      ThreadedCallable<T>::FreeArgs3 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args3<A1, A2, A3> A;
-    ThreadedCallable<T>::FetchArgs3 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs3 (args, A);
-    args = nullptr;
+    object->RunMethod3 (method, args);
   }
 
 private:
@@ -516,23 +543,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent4()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args4<A1, A2, A3, A4> A;
-      ThreadedCallable<T>::FetchArgs4 (args, A);
-      ThreadedCallable<T>::FreeArgs4 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args4<A1, A2, A3, A4> A;
-    ThreadedCallable<T>::FetchArgs4 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs4 (args, A);
-    args = nullptr;
+    object->RunMethod4 (method, args);
   }
 
 private:
@@ -550,23 +564,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent5()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args5<A1, A2, A3, A4, A5> A;
-      ThreadedCallable<T>::FetchArgs5 (args, A);
-      ThreadedCallable<T>::FreeArgs5 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args5<A1, A2, A3, A4, A5> A;
-    ThreadedCallable<T>::FetchArgs5 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs5 (args, A);
-    args = nullptr;
+    object->RunMethod5 (method, args);
   }
 
 private:
@@ -584,23 +585,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent6()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args6<A1, A2, A3, A4, A5, A6> A;
-      ThreadedCallable<T>::FetchArgs6 (args, A);
-      ThreadedCallable<T>::FreeArgs6 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args6<A1, A2, A3, A4, A5, A6> A;
-    ThreadedCallable<T>::FetchArgs6 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs6 (args, A);
-    args = nullptr;
+    object->RunMethod6 (method, args);
   }
 
 private:
@@ -618,23 +606,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent7()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args7<A1, A2, A3, A4, A5, A6, A7> A;
-      ThreadedCallable<T>::FetchArgs7 (args, A);
-      ThreadedCallable<T>::FreeArgs7 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args7<A1, A2, A3, A4, A5, A6, A7> A;
-    ThreadedCallable<T>::FetchArgs7 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs7 (args, A);
-    args = nullptr;
+    object->RunMethod7 (method, args);
   }
 
 private:
@@ -652,23 +627,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent8()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args8<A1, A2, A3, A4, A5, A6, A7, A8> A;
-      ThreadedCallable<T>::FetchArgs8 (args, A);
-      ThreadedCallable<T>::FreeArgs8 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args8<A1, A2, A3, A4, A5, A6, A7, A8> A;
-    ThreadedCallable<T>::FetchArgs8 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs8 (args, A);
-    args = nullptr;
+    object->RunMethod8 (method, args);
   }
 
 private:
@@ -686,23 +648,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent9()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args9<A1, A2, A3, A4, A5, A6, A7, A8, A9> A;
-      ThreadedCallable<T>::FetchArgs9 (args, A);
-      ThreadedCallable<T>::FreeArgs9 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args9<A1, A2, A3, A4, A5, A6, A7, A8, A9> A;
-    ThreadedCallable<T>::FetchArgs9 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs9 (args, A);
-    args = nullptr;
+    object->RunMethod9 (method, args);
   }
 
 private:
@@ -720,23 +669,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent10()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args10<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10> A;
-      ThreadedCallable<T>::FetchArgs10 (args, A);
-      ThreadedCallable<T>::FreeArgs10 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args10<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10> A;
-    ThreadedCallable<T>::FetchArgs10 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs10 (args, A);
-    args = nullptr;
+    object->RunMethod10 (method, args);
   }
 
 private:
@@ -754,23 +690,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent11()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args11<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11> A;
-      ThreadedCallable<T>::FetchArgs11 (args, A);
-      ThreadedCallable<T>::FreeArgs11 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args11<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11> A;
-    ThreadedCallable<T>::FetchArgs11 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs11 (args, A);
-    args = nullptr;
+    object->RunMethod11 (method, args);
   }
 
 private:
@@ -788,23 +711,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent12()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args12<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12> A;
-      ThreadedCallable<T>::FetchArgs12 (args, A);
-      ThreadedCallable<T>::FreeArgs12 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args12<A1, A2, A3, A4, A5, A6, A7, A8, A9, A11, A12> A;
-    ThreadedCallable<T>::FetchArgs12 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs12 (args, A);
-    args = nullptr;
+    object->RunMethod12 (method, args);
   }
 
 private:
@@ -822,23 +732,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent13()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args13<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13> A;
-      ThreadedCallable<T>::FetchArgs13 (args, A);
-      ThreadedCallable<T>::FreeArgs13 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args13<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13> A;
-    ThreadedCallable<T>::FetchArgs13 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs13 (args, A);
-    args = nullptr;
+    object->RunMethod13 (method, args);
   }
 
 private:
@@ -856,23 +753,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent14()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args14<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14> A;
-      ThreadedCallable<T>::FetchArgs14 (args, A);
-      ThreadedCallable<T>::FreeArgs14 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args14<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14> A;
-    ThreadedCallable<T>::FetchArgs14 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs14 (args, A);
-    args = nullptr;
+    object->RunMethod14 (method, args);
   }
 
 private:
@@ -890,23 +774,10 @@ public:
       object(object), method(method), args(args)
   {
   }
-  ~ThreadEvent15()
-  {
-    if (args)
-    {
-      typename ThreadedCallable<T>::template Args15<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15> A;
-      ThreadedCallable<T>::FetchArgs15 (args, A);
-      ThreadedCallable<T>::FreeArgs15 (args, A);
-    }
-  }
 
   void Run()
   {
-    typename ThreadedCallable<T>::template Args15<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15> A;
-    ThreadedCallable<T>::FetchArgs15 (args, A);
-    object->RunMethod (method, A);
-    ThreadedCallable<T>::FreeArgs15 (args, A);
-    args = nullptr;
+    object->RunMethod15 (method, args);
   }
 
 private:

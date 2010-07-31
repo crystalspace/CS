@@ -112,7 +112,9 @@ public:
 	const char *polyname);
   bool ParsePortal (
 	iDocumentNode* node, iLoaderContext* ldr_context,
-	CS::Utility::PortalParameters& params);
+	uint32 &flags, bool &mirror, bool &warp, int& msv,
+	csMatrix3 &m, csVector3 &before, csVector3 &after,
+	iString* destSector, bool& autoresolve);
   // Parse a polygon. If 'poly_delete' is set to true the caller must delete
   // the polygon. This is used in case the polygon is only a portal.
   bool ParsePoly3d (iDocumentNode* node,

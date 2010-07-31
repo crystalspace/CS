@@ -72,16 +72,16 @@ bool csBulletDynamics::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr< ::iDynamicSystem> csBulletDynamics::CreateSystem ()
+csPtr<iDynamicSystem> csBulletDynamics::CreateSystem ()
 {
   csRef<csBulletDynamicsSystem> system;
   system.AttachNew (new csBulletDynamicsSystem (object_reg));
   systems.Push (system);
 
-  return csPtr< ::iDynamicSystem> (system);
+  return csPtr<iDynamicSystem> (system);
 }
 
-void csBulletDynamics::RemoveSystem (::iDynamicSystem* system)
+void csBulletDynamics::RemoveSystem (iDynamicSystem* system)
 {
   systems.Delete (system);
 }
@@ -91,7 +91,7 @@ void csBulletDynamics::RemoveSystems ()
   systems.DeleteAll ();
 }
 
-::iDynamicSystem* csBulletDynamics::FindSystem (const char *name)
+iDynamicSystem* csBulletDynamics::FindSystem (const char *name)
 {
   return systems.FindByName (name);
 }
@@ -285,12 +285,12 @@ void csBulletDynamicsSystem::CheckCollisions ()
     if (contactManifold->getNumContacts ())
     {
       csBulletRigidBody *cs_obA =
-	static_cast<csBulletRigidBody*> (reinterpret_cast<iBody*> (obA->getUserPointer ()));
+	dynamic_cast<csBulletRigidBody*> ((BulletBody*) obA->getUserPointer ());
       if (cs_obA)
 	CheckCollision(*cs_obA, obB, *contactManifold);
 
       csBulletRigidBody *cs_obB =
-	static_cast<csBulletRigidBody*> (reinterpret_cast<iBody*> (obB->getUserPointer ()));
+	dynamic_cast<csBulletRigidBody*> ((BulletBody*) obB->getUserPointer ());
       if (cs_obB)
 	CheckCollision(*cs_obB, obA, *contactManifold);
     }
@@ -303,18 +303,18 @@ void csBulletDynamicsSystem::Step (float stepsize)
   CheckCollisions();
 }
 
-csPtr< ::iRigidBody> csBulletDynamicsSystem::CreateBody ()
+csPtr<iRigidBody> csBulletDynamicsSystem::CreateBody ()
 {
   csRef<csBulletRigidBody> body;
   body.AttachNew (new csBulletRigidBody (this));
 
   dynamicBodies.Push (body);
-  return csPtr< ::iRigidBody> (body);
+  return csPtr<iRigidBody> (body);
 }
 
-void csBulletDynamicsSystem::AddBody (::iRigidBody* body)
+void csBulletDynamicsSystem::AddBody (iRigidBody* body)
 {
-  csBulletRigidBody* csBody = static_cast<csBulletRigidBody*> (body);
+  csBulletRigidBody* csBody = dynamic_cast<csBulletRigidBody*> (body);
   CS_ASSERT (csBody);
   if (csBody->body)
   {
@@ -331,9 +331,9 @@ void csBulletDynamicsSystem::AddBody (::iRigidBody* body)
   dynamicBodies.Push (csBody);
 }
 
-void csBulletDynamicsSystem::RemoveBody (::iRigidBody* body)
+void csBulletDynamicsSystem::RemoveBody (iRigidBody* body)
 {
-  csBulletRigidBody* csBody = static_cast<csBulletRigidBody*> (body);
+  csBulletRigidBody* csBody = dynamic_cast<csBulletRigidBody*> (body);
   CS_ASSERT (csBody);
   if (csBody->body)
   {
@@ -349,12 +349,12 @@ void csBulletDynamicsSystem::RemoveBody (::iRigidBody* body)
   dynamicBodies.Delete (body);
 }
 
-::iRigidBody* csBulletDynamicsSystem::FindBody (const char* name)
+iRigidBody* csBulletDynamicsSystem::FindBody (const char* name)
 {
   return dynamicBodies.FindByName (name);
 }
 
-::iRigidBody* csBulletDynamicsSystem::GetBody (unsigned int index)
+iRigidBody* csBulletDynamicsSystem::GetBody (unsigned int index)
 {
   CS_ASSERT(index < dynamicBodies.GetSize ());
   return dynamicBodies[index];
@@ -571,9 +571,9 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
   debugDraw->DebugDraw (view);
 }
 
-void csBulletDynamicsSystem::SetDebugMode (CS::Physics::Bullet::DebugMode mode)
+void csBulletDynamicsSystem::SetDebugMode (csBulletDebugMode mode)
 {
-  if (mode == CS::Physics::Bullet::DEBUG_NOTHING)
+  if (mode == CS_BULLET_DEBUG_NOTHING)
   {
     if (debugDraw)
     {
@@ -593,15 +593,15 @@ void csBulletDynamicsSystem::SetDebugMode (CS::Physics::Bullet::DebugMode mode)
   debugDraw->SetDebugMode (mode);
 }
 
-CS::Physics::Bullet::DebugMode csBulletDynamicsSystem::GetDebugMode ()
+csBulletDebugMode csBulletDynamicsSystem::GetDebugMode ()
 {
   if (!debugDraw)
-    return CS::Physics::Bullet::DEBUG_NOTHING;
+    return CS_BULLET_DEBUG_NOTHING;
 
   return debugDraw->GetDebugMode ();
 }
 
-CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
+csBulletHitBeamResult csBulletDynamicsSystem::HitBeam
 (const csVector3 &start, const csVector3 &end)
 {
   btVector3 rayFrom = CSToBullet (start, internalScale);
@@ -609,19 +609,20 @@ CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
   btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
   bulletWorld->rayTest (rayFrom, rayTo, rayCallback);
 
-  CS::Physics::Bullet::HitBeamResult result;
+  csBulletHitBeamResult result;
 
   if (rayCallback.hasHit())
   {
-    iBody* bulletBody =
-      static_cast<iBody*> (rayCallback.m_collisionObject->getUserPointer ());
+    BulletBody* bulletBody =
+      static_cast<BulletBody*> (rayCallback.m_collisionObject->getUserPointer ());
 
-    switch (bulletBody->GetType ())
+    switch (bulletBody->bodyType)
       {
-      case CS::Physics::Bullet::RIGID_BODY:
+      case CS_BULLET_RIGID_BODY:
 	{
 	  result.hasHit = true;
-	  result.body = bulletBody;
+	  result.bodyType = CS_BULLET_RIGID_BODY;
+	  result.rigidBody = dynamic_cast<csBulletRigidBody*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
 				     inverseInternalScale);
 	  result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
@@ -630,10 +631,11 @@ CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
 	  break;
 	}
 
-      case CS::Physics::Bullet::TERRAIN:
+      case CS_BULLET_TERRAIN:
 	{
 	  result.hasHit = true;
-	  result.body = bulletBody;
+	  result.bodyType = CS_BULLET_TERRAIN;
+	  result.terrain = dynamic_cast<iBulletTerrainCollider*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
 				     inverseInternalScale);
 	  result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
@@ -642,14 +644,15 @@ CS::Physics::Bullet::HitBeamResult csBulletDynamicsSystem::HitBeam
 	  break;
 	}
 
-      case CS::Physics::Bullet::SOFT_BODY:
+      case CS_BULLET_SOFT_BODY:
 	{
 	btSoftBody* body = btSoftBody::upcast (rayCallback.m_collisionObject);
 	btSoftBody::sRayCast ray;
 	if (body->rayTest (rayFrom, rayTo, ray))
 	{
 	  result.hasHit = true;
-	  result.body = bulletBody;
+	  result.bodyType = CS_BULLET_SOFT_BODY;
+	  result.softBody = dynamic_cast<csBulletSoftBody*> (bulletBody);
 	  result.isect = BulletToCS (rayCallback.m_hitPointWorld,
 				     inverseInternalScale);
 	  result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
@@ -803,7 +806,7 @@ size_t csBulletDynamicsSystem::GetSoftBodyCount ()
   return softWorld->getSoftBodyArray ().size ();
 }
 
-iSoftBody* csBulletDynamicsSystem::GetSoftBody (size_t index)
+iBulletSoftBody* csBulletDynamicsSystem::GetSoftBody (size_t index)
 {
   CS_ASSERT(isSoftWorld && index < softBodies.GetSize ());
   return softBodies[index];
@@ -814,7 +817,7 @@ bool csBulletDynamicsSystem::GetSoftBodyWorld ()
   return isSoftWorld;
 }
 
-iSoftBody* csBulletDynamicsSystem::CreateRope
+iBulletSoftBody* csBulletDynamicsSystem::CreateRope
 (csVector3 start, csVector3 end, uint segmentCount)
 {
   CS_ASSERT(isSoftWorld
@@ -826,12 +829,6 @@ iSoftBody* csBulletDynamicsSystem::CreateRope
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
-
-  //hard-coded parameters for ropes
-  body->m_cfg.kDP = 0.08f; // no elasticity
-  body->m_cfg.piterations = 16; // no white zone
-  body->m_cfg.timescale = 2;
-
   softWorld->addSoftBody (body);
 
   csRef<csBulletSoftBody> csBody;
@@ -841,7 +838,7 @@ iSoftBody* csBulletDynamicsSystem::CreateRope
   return csBody;
 }
 
-iSoftBody* csBulletDynamicsSystem::CreateCloth
+iBulletSoftBody* csBulletDynamicsSystem::CreateCloth
 (csVector3 corner1, csVector3 corner2, csVector3 corner3, csVector3 corner4,
  uint segmentCount1, uint segmentCount2, bool withDiagonals)
 {
@@ -865,7 +862,7 @@ iSoftBody* csBulletDynamicsSystem::CreateCloth
   return csBody;
 }
 
-iSoftBody* csBulletDynamicsSystem::CreateSoftBody
+iBulletSoftBody* csBulletDynamicsSystem::CreateSoftBody
 (iGeneralFactoryState* genmeshFactory, const csOrthoTransform& bodyTransform)
 {
   CS_ASSERT(isSoftWorld);
@@ -908,7 +905,7 @@ iSoftBody* csBulletDynamicsSystem::CreateSoftBody
   return csBody;
 }
 
-iSoftBody* csBulletDynamicsSystem::CreateSoftBody
+iBulletSoftBody* csBulletDynamicsSystem::CreateSoftBody
 (csVector3* vertices, size_t vertexCount,
  csTriangle* triangles, size_t triangleCount)
 {
@@ -954,9 +951,9 @@ iSoftBody* csBulletDynamicsSystem::CreateSoftBody
   return csBody;
 }
 
-void csBulletDynamicsSystem::RemoveSoftBody (iSoftBody* body)
+void csBulletDynamicsSystem::RemoveSoftBody (iBulletSoftBody* body)
 {
-  csBulletSoftBody* csBody = static_cast<csBulletSoftBody*> (body);
+  csBulletSoftBody* csBody = dynamic_cast<csBulletSoftBody*> (body);
   CS_ASSERT (csBody);
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
@@ -965,15 +962,15 @@ void csBulletDynamicsSystem::RemoveSoftBody (iSoftBody* body)
   softBodies.Delete (body);
 }
 
-csPtr<iPivotJoint> csBulletDynamicsSystem::CreatePivotJoint ()
+csPtr<iBulletPivotJoint> csBulletDynamicsSystem::CreatePivotJoint ()
 {
   csRef<csBulletPivotJoint> joint;
   joint.AttachNew (new csBulletPivotJoint (this));
   pivotJoints.Push (joint);
-  return csPtr<iPivotJoint> (joint);
+  return csPtr<iBulletPivotJoint> (joint);
 }
 
-void csBulletDynamicsSystem::RemovePivotJoint (iPivotJoint* joint)
+void csBulletDynamicsSystem::RemovePivotJoint (iBulletPivotJoint* joint)
 {
   pivotJoints.Delete (joint);
 }
@@ -1004,7 +1001,7 @@ bool csBulletDynamicsSystem::SaveBulletWorld (const char* filename)
 #endif
 }
 
-iTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
+iBulletTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
 (csLockedHeightData& heightData, int gridWidth, int gridHeight,
  csVector3 gridSize, csOrthoTransform& transform,
  float minimumHeight, float maximumHeight)
@@ -1017,7 +1014,7 @@ iTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
   return terrain;
 }
 
-iTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
+iBulletTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
 (iTerrainCell* cell, float minimumHeight, float maximumHeight)
 {
   csRef<csBulletTerrainCellCollider> terrain;
@@ -1027,7 +1024,7 @@ iTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
   return terrain;
 }
 
-iTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
+iBulletTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
 (iTerrainSystem* system, float minimumHeight, float maximumHeight)
 {
   csRef<csBulletTerrainCollider> terrain;
@@ -1037,7 +1034,7 @@ iTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
   return terrain;
 }
 
-void csBulletDynamicsSystem::DestroyCollider (iTerrainCollider* collider)
+void csBulletDynamicsSystem::DestroyCollider (iBulletTerrainCollider* collider)
 {
   terrainColliders.Delete (collider);
 }

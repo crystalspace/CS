@@ -386,8 +386,8 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, scfFactoryFunc iCreate, const char *iDescription,
   const char *iDepend, csStringID context)
 {
-  csRefTrackerAccess::TrackConstruction (this);  
   csRefTrackerAccess::SetDescription (this, CS_TYPENAME(*this));
+  csRefTrackerAccess::TrackConstruction (this);  
   scfWeakRefOwners = 0;
   scfRefCount = 0;
 #ifdef CS_REF_TRACKER

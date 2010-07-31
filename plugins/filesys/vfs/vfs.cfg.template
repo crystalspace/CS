@@ -49,7 +49,6 @@ VFS.Mount.lev/r3dsmtest = $(CS_MAPDIR)$/r3dsmtest$/
 VFS.Mount.lev/castle   = $(CS_MAPDIR)$/castle$/
 VFS.Mount.lev/castle-staticlit = $(CS_MAPDIR)$/castle-staticlit$/
 VFS.Mount.lev/castle-staticlit/bindata = $(CS_MAPDIR)$/castle-staticlit$/bindata.zip
-VFS.Mount.lev/bias = $(CS_MAPDIR)$/bias$/world.zip
 
 ; Mount all libraries under the /lib/ directory
 VFS.Mount.lib/shadermgr-defaults = $(CS_DATADIR)$/shadermgr-defaults.zip

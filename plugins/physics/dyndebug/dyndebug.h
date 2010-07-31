@@ -83,7 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 
     virtual void SetStaticBodyMaterial (iMaterialWrapper* material);
     virtual void SetDynamicBodyMaterial (iMaterialWrapper* material);
-    virtual void SetBodyStateMaterial (CS::Physics::Bullet::BodyState state,
+    virtual void SetBodyStateMaterial (csBulletState state,
 				       iMaterialWrapper* material);
 
   private:
@@ -135,18 +135,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 
 
   class BoneKinematicCallback : public scfImplementation1
-    <BoneKinematicCallback, CS::Physics::Bullet::iKinematicCallback>
+    <BoneKinematicCallback, iBulletKinematicCallback>
   {
   public:
     BoneKinematicCallback (iMeshWrapper* mesh,
-			   CS::Physics::Bullet::iKinematicCallback* callback);
+			   iBulletKinematicCallback* callback);
     ~BoneKinematicCallback ();
 
     void GetBodyTransform (iRigidBody* body, csOrthoTransform& transform) const;
 
   private:
     csWeakRef<iMeshWrapper> mesh;
-    csRef<CS::Physics::Bullet::iKinematicCallback> callback;
+    csRef<iBulletKinematicCallback> callback;
 
     friend class DynamicsDebugger;
   };

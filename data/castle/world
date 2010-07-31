@@ -7,13 +7,24 @@
         <plugin name="particles">crystalspace.mesh.loader.particles</plugin>
         <plugin name="particlesfact">crystalspace.mesh.loader.factory.particles</plugin>
     </plugins>
+    <shaders>
+        <shader>
+            <file>/shader/parallaxAtt/parallaxAtt.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/ambient.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/std_lighting.xml</file>
+        </shader>
+    </shaders>
     <textures>
         <texture name="castle-detail1_d.jpg">
             <file>/lib/std/castle/castle-detail1_d.jpg</file>
         </texture>
         <texture name="BUMPcastle-detail1_h.jpg">
             <file>/lib/std/castle/castle-detail1_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPcastle-detail1_n.jpg">
             <file>/lib/std/castle/castle-detail1_n.jpg</file>
@@ -27,7 +38,7 @@
         </texture>
         <texture name="BUMPcobblestone_h.jpg">
             <file>/lib/std/castle/cobblestone_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPcobblestone_n.jpg">
             <file>/lib/std/castle/cobblestone_n.jpg</file>
@@ -35,7 +46,7 @@
         </texture>
         <texture name="BUMPwall-stone2_h.jpg">
             <file>/lib/std/castle/wall-stone2_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPwall-stone2_n.jpg">
             <file>/lib/std/castle/wall-stone2_n.jpg</file>
@@ -49,7 +60,7 @@
         </texture>
         <texture name="BUMPwood_barrel_h.jpg">
             <file>/lib/std/castle/wood_barrel_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPwood_barrel_n.png">
             <file>/lib/std/castle/wood_barrel_n.png</file>
@@ -60,7 +71,7 @@
         </texture>
         <texture name="BUMPwood2_h.jpg">
             <file>/lib/std/castle/wood2_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPwood2_n.jpg">
             <file>/lib/std/castle/wood2_n.jpg</file>
@@ -71,7 +82,7 @@
         </texture>
         <texture name="BUMPmetal_pipes1_h.jpg">
             <file>/lib/std/castle/metal_pipes1_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPmetal_pipes1_n.png">
             <file>/lib/std/castle/metal_pipes1_n.png</file>
@@ -79,6 +90,10 @@
         </texture>
         <texture name="castle-detail3_d.jpg">
             <file>/lib/std/castle/castle-detail3_d.jpg</file>
+        </texture>
+        <texture name="BUMPcastle-detail3_h.jpg">
+            <file>/lib/std/castle/castle-detail3_h.jpg</file>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPcastle-detail3_n.jpg">
             <file>/lib/std/castle/castle-detail3_n.jpg</file>
@@ -89,7 +104,7 @@
         </texture>
         <texture name="BUMPwood_h.jpg">
             <file>/lib/std/castle/wood_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPwood_n.jpg">
             <file>/lib/std/castle/wood_n.jpg</file>
@@ -100,7 +115,7 @@
         </texture>
         <texture name="BUMPconcrete_floor4_3_h.jpg">
             <file>/lib/std/castle/concrete_floor4_3_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPconcrete_floor4_3_n.jpg">
             <file>/lib/std/castle/concrete_floor4_3_n.jpg</file>
@@ -111,7 +126,7 @@
         </texture>
         <texture name="BUMPcastle-detail2_h.jpg">
             <file>/lib/std/castle/castle-detail2_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPcastle-detail2_n.jpg">
             <file>/lib/std/castle/castle-detail2_n.jpg</file>
@@ -122,7 +137,7 @@
         </texture>
         <texture name="BUMPbrick1_h.png">
             <file>/lib/std/castle/brick1_h.png</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPbrick1_n.jpg">
             <file>/lib/std/castle/brick1_n.jpg</file>
@@ -136,7 +151,7 @@
         </texture>
         <texture name="BUMPconcrete_floor6_h.jpg">
             <file>/lib/std/castle/concrete_floor6_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPconcrete_floor6_n.jpg">
             <file>/lib/std/castle/concrete_floor6_n.jpg</file>
@@ -147,7 +162,7 @@
         </texture>
         <texture name="BUMPpowder_h.jpg">
             <file>/lib/std/castle/powder_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPpowder_n.jpg">
             <file>/lib/std/castle/powder_n.jpg</file>
@@ -161,7 +176,7 @@
         </texture>
         <texture name="BUMPcastle-brick1_h.jpg">
             <file>/lib/std/castle/castle-brick1_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPcastle-brick1_n.jpg">
             <file>/lib/std/castle/castle-brick1_n.jpg</file>
@@ -169,7 +184,7 @@
         </texture>
         <texture name="BUMPcastle-window-h.jpg">
             <file>/lib/std/castle/castle-window-h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPcastle-window-n.png">
             <file>/lib/std/castle/castle-window-n.png</file>
@@ -183,7 +198,7 @@
         </texture>
         <texture name="BUMPcredits_h.jpg">
             <file>/lib/std/castle/credits_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPcredits_n.jpg">
             <file>/lib/std/castle/credits_n.jpg</file>
@@ -194,7 +209,7 @@
         </texture>
         <texture name="BUMPcrystal_h.jpg">
             <file>/lib/std/castle/crystal_h.jpg</file>
-            <class>heightmap</class>
+            <class>normalmap</class>
         </texture>
         <texture name="BUMPcrystal_n.png">
             <file>/lib/std/castle/crystal_n.png</file>
@@ -209,9 +224,6 @@
         <texture name="marble_blue.jpg">
             <file>/lib/std/castle/marble_blue.jpg</file>
         </texture>
-        <texture name="white">
-            <file>/lib/std/white.gif</file>
-        </texture>
         <texture name="lightmap_interior_Cube.012_0">
             <file>lightmaps/lightmap_interior_Cube.012_0.png</file>
             <class>lightmap</class>
@@ -220,145 +232,172 @@
     <materials>
         <material name="parallaxAtt_detail1-parallaxcastle-detail1_d.jpg">
             <texture>castle-detail1_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPcastle-detail1_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPcastle-detail1_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
         </material>
         <material name="parallaxAtt_wall-stone-parallaxwall-stone_2_d.jpg">
             <texture>wall-stone_2_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPcobblestone_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPcobblestone_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.1</shadervar>
         </material>
         <material name="parallaxAtt_wall-stone2-parallawall-stone2_2_d.jpg">
             <texture>wall-stone2_2_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPwall-stone2_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPwall-stone2_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.1</shadervar>
         </material>
         <material name="std_lighting_explo_firefire1.png">
             <texture>fire1.png</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">std_lighting</shader>
         </material>
         <material name="parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg">
             <texture>wood_barrel2_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPwood_barrel_n.png</shadervar>
             <shadervar type="texture" name="tex height">BUMPwood_barrel_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">0.3,0.3,0.3,0.3</shadervar>
         </material>
         <material name="parallaxAtt_wood2-parallaxwood_d.jpg">
             <texture>wood_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPwood2_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPwood2_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.1</shadervar>
         </material>
         <material name="parallaxAtt_plain_metal-parallacastle-metal_d.jpg">
             <texture>castle-metal_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPmetal_pipes1_n.png</shadervar>
             <shadervar type="texture" name="tex height">BUMPmetal_pipes1_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
         </material>
         <material name="parallaxAtt_detail3-parallaxcastle-detail3_d.jpg">
             <texture>castle-detail3_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPcastle-detail3_n.jpg</shadervar>
+            <shadervar type="texture" name="tex height">BUMPcastle-detail3_h.jpg</shadervar>
             <shadervar type="vector4" name="specular">0.2,0.2,0.2,0.2</shadervar>
         </material>
         <material name="parallaxAtt_wood_parallaxwood.png">
             <texture>wood.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPwood_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPwood_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.2</shadervar>
         </material>
         <material name="parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png">
             <texture>concrete_floor4_3.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPconcrete_floor4_3_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPconcrete_floor4_3_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.1</shadervar>
         </material>
         <material name="parallaxAtt_detail2-parallaxcastle-detail2_d.jpg">
             <texture>castle-detail2_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPcastle-detail2_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPcastle-detail2_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
-            <shadervar type="vector4" name="specular">0,0,0,0</shadervar>
         </material>
         <material name="parallaxAtt_brick1-parallaxbrick1_d.jpg">
             <texture>brick1_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPbrick1_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPbrick1_h.png</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">0.13,0.15,0.17,0.1</shadervar>
         </material>
         <material name="parallaxAtt_barrel-parallaxwood_barrel_d.jpg">
             <texture>wood_barrel_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPwood_barrel_n.png</shadervar>
             <shadervar type="texture" name="tex height">BUMPwood_barrel_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">0.5,0.5,0.5,0.5</shadervar>
         </material>
         <material name="parallaxAtt_concrete6-parallaxconcrete_floor6_d.jpg">
             <texture>concrete_floor6_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPconcrete_floor6_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPconcrete_floor6_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.1</shadervar>
         </material>
         <material name="parallaxAtt_powder-parallaxpowder.png">
             <texture>powder.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPpowder_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPpowder_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
-            <shadervar type="vector4" name="specular">0,0,0,0</shadervar>
         </material>
         <material name="parallaxAtt_brick3-parallaxcastle-brick3_d.jpg">
             <texture>castle-brick3_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPcastle-brick1_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPcastle-brick1_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">0.3,0.3,0.3,0.3</shadervar>
         </material>
         <material name="parallaxAtt_window-parallaxcastle-window_d.jpg">
             <texture>castle-window_d.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPcastle-window-n.png</shadervar>
             <shadervar type="texture" name="tex height">BUMPcastle-window-h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
         </material>
         <material name="std_lighting_rayscastle_ray.png">
             <texture>castle_ray.png</texture>
+            <shader type="diffuse">std_lighting</shader>
+            <shader type="ambient">*null</shader>
         </material>
         <material name="parallaxAtt_creditscredits.jpg">
             <texture>credits.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPcredits_n.jpg</shadervar>
             <shadervar type="texture" name="tex height">BUMPcredits_h.jpg</shadervar>
             <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
         </material>
         <material name="parallaxAtt_crystalcrystal.png">
             <texture>crystal.png</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPcrystal_n.png</shadervar>
             <shadervar type="texture" name="tex height">BUMPcrystal_h.jpg</shadervar>
             <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
         </material>
         <material name="std_lighting_flagCS-flag.png">
             <texture>CS-flag.png</texture>
+            <shader type="diffuse">std_lighting</shader>
+            <shader type="ambient">*null</shader>
         </material>
         <material name="std_lighting_starstar.png">
             <texture>star.png</texture>
+            <shader type="standard">std_lighting</shader>
+            <shader type="ambient">*null</shader>
         </material>
         <material name="parallaxAtt_marble-parallaxmarble_blue.jpg">
             <texture>marble_blue.jpg</texture>
+            <shader type="diffuse">parallaxAtt</shader>
+            <shader type="ambient">ambient</shader>
             <shadervar type="texture" name="tex normal">BUMPcrystal_n.png</shadervar>
             <shadervar type="texture" name="tex height">BUMPcrystal_h.jpg</shadervar>
-            <shadervar type="texture" name="tex specular">white</shadervar>
             <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
         </material>
     </materials>
@@ -527,6 +566,10 @@
             <fire sequence="LaIpoLamp.028" />
         </trigger>
     </triggers>
+    <addon>
+        <plugin>crystalspace.renderloop.loop.loader</plugin>
+        <paramsfile>/shader/std_rloop_diffuse.xml</paramsfile>
+    </addon>
     <meshfact name="parttorch.041">
         <plugin>crystalspace.mesh.loader.factory.particles</plugin>
         <priority>transp</priority>
@@ -633,6 +676,7 @@
                 </matrix>
             </hardmove>
         </portals>
+        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="Cube.582">
@@ -1023,6 +1067,7 @@
                 </matrix>
             </hardmove>
         </portals>
+        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.011">
@@ -1303,6 +1348,7 @@
                 </matrix>
             </hardmove>
         </portals>
+        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.013">
@@ -1618,6 +1664,7 @@
                 </matrix>
             </hardmove>
         </portals>
+        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.006">
@@ -2204,6 +2251,7 @@
                 </matrix>
             </hardmove>
         </portals>
+        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.001">
@@ -2622,6 +2670,7 @@
                 </matrix>
             </hardmove>
         </portals>
+        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.010">
@@ -2792,6 +2841,7 @@
                 </matrix>
             </hardmove>
         </portals>
+        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.002">
@@ -3586,6 +3636,7 @@
                 </matrix>
             </hardmove>
         </portals>
+        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.015">
@@ -4075,6 +4126,7 @@
                 </matrix>
             </hardmove>
         </portals>
+        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.009">

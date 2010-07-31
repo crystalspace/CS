@@ -1297,6 +1297,15 @@ csPtr<iKeyValuePair> csTextSyntaxService::ParseKey (iDocumentNode* node)
   return scfQueryInterface<iKeyValuePair> (cskvp);
 }
 
+bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalue)
+{
+  csRef<iKeyValuePair> kvp = ParseKey (node);
+  if (!kvp.IsValid()) return false;
+  keyvalue = kvp;
+  keyvalue->IncRef();
+  return true;
+}
+
 bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue)
 {
   node->SetAttribute ("name", keyvalue->GetKey ());

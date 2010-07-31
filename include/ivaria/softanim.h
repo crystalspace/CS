@@ -24,19 +24,10 @@
 #include "csutil/scf_interface.h"
 #include "imesh/genmesh.h"
 
-namespace CS
-{
-  namespace Physics
-  {
-    namespace Bullet
-    {
-      struct iSoftBody;
-    } // namespace Bullet
-  } // namespace Physics
-} // namespace CS
+struct iBulletSoftBody;
 
 /**
- * Animation control type for a genmesh animated by a CS::Physics::Bullet::iSoftBody.
+ * Animation control type for a genmesh animated by a iBulletSoftBody.
  *
  * Main ways to get pointers to this interface:
  * - csQueryPluginClass()
@@ -51,7 +42,7 @@ struct iSoftBodyAnimationControlType : public iGenMeshAnimationControlType
 };
 
 /**
- * Animation control factory for a genmesh animated by a CS::Physics::Bullet::iSoftBody.
+ * Animation control factory for a genmesh animated by a iBulletSoftBody.
  *
  * Main creators of instances implementing this interface:
  * - iSoftBodyAnimationControlType::CreateAnimationControlFactory()
@@ -68,7 +59,7 @@ struct iSoftBodyAnimationControlFactory : public iGenMeshAnimationControlFactory
 };
 
 /**
- * Animation control for a genmesh animated by a CS::Physics::Bullet::iSoftBody. This class will
+ * Animation control for a genmesh animated by a iBulletSoftBody. This class will
  * animate the vertices of the genmesh depending on the physical simulation of the
  * soft body. It will also update automatically the position of the genmesh.
  *
@@ -93,12 +84,12 @@ struct iSoftBodyAnimationControl : public iGenMeshAnimationControl
    * vertices must be added at the end of the vertex array, so that a vertex of index
    * 'i' is duplicated at index 'i + body->GetVertexCount ()'.
    */
-  virtual void SetSoftBody (CS::Physics::Bullet::iSoftBody* body, bool doubleSided = false) = 0;
+  virtual void SetSoftBody (iBulletSoftBody* body, bool doubleSided = false) = 0;
 
   /**
    * Get the soft body used to animate the genmesh.
    */
-  virtual CS::Physics::Bullet::iSoftBody* GetSoftBody () = 0;
+  virtual iBulletSoftBody* GetSoftBody () = 0;
 };
 
 #endif // __CS_IVARIA_SOFTBODYANIM_H__

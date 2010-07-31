@@ -47,12 +47,6 @@ namespace CS
   {}
 
   /**
-   * Tools for demo, test and tutorial applications
-   */
-  namespace Demo
-  {}
-
-  /**
    * Contains deprecated code that will be removed after next stable release.
    * Do not use of any members.
    */
@@ -134,19 +128,6 @@ namespace CS
      */
     namespace ShaderWeaver
     {}
-  }
-
-  /**
-   * Objects of a dynamic simulation
-   */
-  namespace Physics
-  {
-    /**
-     * Objects of a dynamic simulation with the Bullet plugin
-     */
-    namespace Bullet
-    {
-    }
   }
 
   /**

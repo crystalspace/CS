@@ -43,10 +43,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 
 csBulletSoftBody::csBulletSoftBody (csBulletDynamicsSystem* dynSys,
 				    btSoftBody* body)
-  : scfImplementationType (this), bodyType (CS::Physics::Bullet::SOFT_BODY),
-  dynSys (dynSys), body (body)
+  : scfImplementationType (this), dynSys (dynSys), body (body)
 {
-  body->setUserPointer (static_cast<iBody*> (this));
+  bodyType = CS_BULLET_SOFT_BODY;
+  body->setUserPointer ((BulletBody*) this);
 }
 
 csBulletSoftBody::~csBulletSoftBody ()
@@ -114,9 +114,9 @@ void csBulletSoftBody::AnchorVertex (size_t vertexIndex)
   body->setMass (vertexIndex, 0.0f);
 }
 
-void csBulletSoftBody::AnchorVertex (size_t vertexIndex, ::iRigidBody* body)
+void csBulletSoftBody::AnchorVertex (size_t vertexIndex, iRigidBody* body)
 {
-  csBulletRigidBody* rigidBody = static_cast<csBulletRigidBody*> (body);
+  csBulletRigidBody* rigidBody = dynamic_cast<csBulletRigidBody*> (body);
   CS_ASSERT(rigidBody
 	    && vertexIndex < (size_t) this->body->m_nodes.size ()
 	    && rigidBody->body);

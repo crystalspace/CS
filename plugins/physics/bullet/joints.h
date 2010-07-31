@@ -79,9 +79,9 @@ public:
  
   virtual bool RebuildJoint ();
 
-  virtual void Attach (::iRigidBody* body1, ::iRigidBody* body2,
+  virtual void Attach (iRigidBody* body1, iRigidBody* body2,
 		       bool force_update = true);
-  virtual csRef< ::iRigidBody> GetAttachedBody (int body)
+  virtual csRef<iRigidBody> GetAttachedBody (int body)
   {
     CS_ASSERT (body >= 0 && body <= 1);
     return bodies[body];
@@ -132,7 +132,7 @@ public:
 
 
 class csBulletPivotJoint : public scfImplementation1<csBulletPivotJoint,
-  iPivotJoint>
+  iBulletPivotJoint>
 {
   friend class csBulletDynamicsSystem;
 
@@ -140,8 +140,8 @@ class csBulletPivotJoint : public scfImplementation1<csBulletPivotJoint,
   csBulletPivotJoint (csBulletDynamicsSystem* dynSys);
   ~csBulletPivotJoint ();
 
-  //-- iPivotJoint
-  virtual void Attach (::iRigidBody* body, const csVector3& position);
+  //-- iBulletPivotJoint
+  virtual void Attach (iRigidBody* body, const csVector3& position);
   virtual iRigidBody* GetAttachedBody () const;
   virtual void SetPosition (const csVector3& position);
   virtual csVector3 GetPosition () const;

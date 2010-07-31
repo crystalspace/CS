@@ -109,11 +109,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     virtual void GenerateGeometry (iView* view, iSector *room);
     virtual void SetGuideLOD(float guideLOD);
     virtual void SetStrandLOD(float strandLOD);
-
     virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl);
-    virtual void StartPhysicsControl ( );
-    virtual void StopPhysicsControl ( );
-
     // Temporary - Set Mesh and Submesh
     virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory);
     virtual void SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
@@ -163,7 +159,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float guideLOD;
     float strandLOD;
     size_t hairStrandsLODSize;
-    bool physicsControlEnabled;
     /// Temp fur geometry
     csRef<iAnimatedMeshFactory> meshFactory;
     csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
@@ -178,11 +173,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float strandWidth;
     float strandWidthLOD;
     float controlPointsDistance;
+    int strictHeightmap;
     /// Model
     csRef<iEngine> engine;
     csRef<iLoader> loader;
     /// functions
-    void SetRigidBody (iRigidBody* rigidBody);
     void GenerateGuideHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
       iRenderBuffer* normals, iRenderBuffer* texCoords);
     void SynchronizeGuideHairs();

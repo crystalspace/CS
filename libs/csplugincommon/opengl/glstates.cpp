@@ -200,11 +200,6 @@ void csGLStateCacheContext::InitCache()
       (glIsEnabled (GL_POINT_SPRITE_ARB) == GL_TRUE);
   else
     enabled_GL_POINT_SPRITE_ARB = false;
-  if (extmgr->CS_GL_ARB_seamless_cube_map)
-    enabled_GL_TEXTURE_CUBE_MAP_SEAMLESS =
-      (glIsEnabled (GL_TEXTURE_CUBE_MAP_SEAMLESS) == GL_TRUE);
-  else
-    enabled_GL_TEXTURE_CUBE_MAP_SEAMLESS = false;
 
   memset (currentBufferID, 0, sizeof (currentBufferID));
   {

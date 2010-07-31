@@ -160,11 +160,6 @@
                     <Window Type="ice/StaticImage" Name="HairTest/MainWindow/Tab/Page3/Image" >
                         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
 
-                        <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page3/Physics" >
-                            <Property Name="Text" Value="Physics" />
-                            <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.1,0},{0.99,0},{0.3,0}}" />
-                        </Window>						
-						
 						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page3/StaticText1" >
 							<Property Name="Text" Value="Guide LOD:" />
 							<Property Name="BackgroundEnabled" Value="False" />

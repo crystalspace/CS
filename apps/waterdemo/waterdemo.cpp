@@ -498,7 +498,7 @@ bool csWaterDemo::Initialize ()
   //setup a material
   csRef<iMaterial> mat = engine->CreateBaseMaterial (0);
 
-  mat->SetShader (strings->Request ("base"), shader);
+  mat->SetShader (strings->Request ("general"), shader);
 
   csRef<iMaterialWrapper> matW = engine->GetMaterialList ()->NewMaterial (mat,
   	"waterMaterial");

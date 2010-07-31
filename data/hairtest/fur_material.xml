@@ -4,9 +4,6 @@
     <shader>
       <file>/shader/fur/marschner_lookup_cg.xml</file>
     </shader>		
-    <shader>
-      <file>/shader/lighting/lighting_default_shadowmap.xml</file>
-    </shader>		
   </shaders>
   <textures>
     <texture name='M'>
@@ -19,8 +16,6 @@
   <materials>
     <material name='marschner_material'>
       <shader type='standard'>marschner_lookup_cg</shader>
-
-      <shader type='shadow'>lighting_default_shadowmap</shader>
 	  
 	  <shadervar type="int" name="diffuse type">4</shadervar>
 	  <shadervar type="vector3" name="hair color">0.51, 0.34, 0.25</shadervar>

@@ -2,18 +2,22 @@
 /*
     Crystal Space Shared Class Facility (SCF)
     Copyright (C) 2005 by Marten Svanfeldt and Michael D. Adams
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 /*
  * This header have been generated from scf_implgen.h by using
  * bin/gen-scf_impl.sh. Rerun this script if you wish to apply changes made
@@ -23,14 +27,18 @@
  * is devoid of comments - check the original scf_impl* files for possible
  * notes and comments.
  */
+
 #if !defined(SCF_IN_IMPLEMENTATION_H)
 #error Do not include this file directly. Included from scf_implementation.h
 #endif
+
 // This is a big header, so help MSVC a bit
 #ifdef CS_COMPILER_MSVC 
 #pragma once
 #endif
+
 #include "csutil/deprecated_warn_off.h"
+
 /* Pre-preprocessed code starts here */
 template<class Class >
 class scfImplementation0 :
@@ -337,10 +345,7 @@ private:
   void AddReftrackerAliases ()
   {
     AddReftrackerAlias<iBase>(this->GetSCFObject());
-
-
     AddReftrackerAlias<I1>(this->GetSCFObject());
-
 
     AddReftrackerAlias<I2>(this->GetSCFObject());
 
@@ -836,50 +841,50 @@ protected:
   scfImplementationExt0(Class_ *object)
     : Super()
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1>
   scfImplementationExt0(Class *object, T1 t1)
     : Super(t1)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2>
   scfImplementationExt0(Class *object, T1 t1, T2 t2)
     : Super(t1, t2)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3>
   scfImplementationExt0(Class *object, T1 t1, T2 t2, T3 t3)
     : Super(t1, t2, t3)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4>
   scfImplementationExt0(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
     : Super(t1, t2, t3, t4)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5>
   scfImplementationExt0(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
     : Super(t1, t2, t3, t4, t5)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5, class T6>
   scfImplementationExt0(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
     : Super(t1, t2, t3, t4, t5, t6)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   Class* GetSCFObject() { return static_cast<Class*> (this); }
   const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
@@ -900,13 +905,9 @@ protected:
 private:
   void AddReftrackerAliases ()
   {
-    csRefTrackerAccess::AddAlias(this->GetSCFObject(),
-     static_cast<Super*> (this->GetSCFObject()));
   }
   void RemoveReftrackerAliases ()
   {
-    csRefTrackerAccess::RemoveAlias(this->GetSCFObject(),
-        static_cast<Super*> (this->GetSCFObject()));
   }
   template<typename I>
   CS_FORCEINLINE_TEMPLATEMETHOD static void* GetInterface (
@@ -968,50 +969,50 @@ protected:
   scfImplementationExt1(Class_ *object)
     : Super()
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1>
   scfImplementationExt1(Class *object, T1 t1)
     : Super(t1)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2>
   scfImplementationExt1(Class *object, T1 t1, T2 t2)
     : Super(t1, t2)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3>
   scfImplementationExt1(Class *object, T1 t1, T2 t2, T3 t3)
     : Super(t1, t2, t3)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4>
   scfImplementationExt1(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
     : Super(t1, t2, t3, t4)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5>
   scfImplementationExt1(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
     : Super(t1, t2, t3, t4, t5)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5, class T6>
   scfImplementationExt1(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
     : Super(t1, t2, t3, t4, t5, t6)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   Class* GetSCFObject() { return static_cast<Class*> (this); }
   const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
@@ -1033,14 +1034,10 @@ protected:
 private:
   void AddReftrackerAliases ()
   {
-    csRefTrackerAccess::AddAlias(this->GetSCFObject(),
-     static_cast<Super*> (this->GetSCFObject()));
     AddReftrackerAlias<I1>(this->GetSCFObject());
   }
   void RemoveReftrackerAliases ()
   {
-    csRefTrackerAccess::RemoveAlias(this->GetSCFObject(),
-        static_cast<Super*> (this->GetSCFObject()));
     RemoveReftrackerAlias<I1>(this->GetSCFObject());
   }
   template<typename I>
@@ -1104,50 +1101,50 @@ protected:
   scfImplementationExt2(Class_ *object)
     : Super()
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1>
   scfImplementationExt2(Class *object, T1 t1)
     : Super(t1)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2>
   scfImplementationExt2(Class *object, T1 t1, T2 t2)
     : Super(t1, t2)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3>
   scfImplementationExt2(Class *object, T1 t1, T2 t2, T3 t3)
     : Super(t1, t2, t3)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4>
   scfImplementationExt2(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
     : Super(t1, t2, t3, t4)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5>
   scfImplementationExt2(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
     : Super(t1, t2, t3, t4, t5)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5, class T6>
   scfImplementationExt2(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
     : Super(t1, t2, t3, t4, t5, t6)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   Class* GetSCFObject() { return static_cast<Class*> (this); }
   const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
@@ -1170,15 +1167,11 @@ protected:
 private:
   void AddReftrackerAliases ()
   {
-    csRefTrackerAccess::AddAlias(this->GetSCFObject(),
-     static_cast<Super*> (this->GetSCFObject()));
     AddReftrackerAlias<I1>(this->GetSCFObject());
     AddReftrackerAlias<I2>(this->GetSCFObject());
   }
   void RemoveReftrackerAliases ()
   {
-    csRefTrackerAccess::RemoveAlias(this->GetSCFObject(),
-        static_cast<Super*> (this->GetSCFObject()));
     RemoveReftrackerAlias<I1>(this->GetSCFObject());
     RemoveReftrackerAlias<I2>(this->GetSCFObject());
   }
@@ -1244,50 +1237,50 @@ protected:
   scfImplementationExt3(Class_ *object)
     : Super()
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1>
   scfImplementationExt3(Class *object, T1 t1)
     : Super(t1)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2>
   scfImplementationExt3(Class *object, T1 t1, T2 t2)
     : Super(t1, t2)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3>
   scfImplementationExt3(Class *object, T1 t1, T2 t2, T3 t3)
     : Super(t1, t2, t3)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4>
   scfImplementationExt3(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
     : Super(t1, t2, t3, t4)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5>
   scfImplementationExt3(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
     : Super(t1, t2, t3, t4, t5)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5, class T6>
   scfImplementationExt3(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
     : Super(t1, t2, t3, t4, t5, t6)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   Class* GetSCFObject() { return static_cast<Class*> (this); }
   const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
@@ -1311,16 +1304,12 @@ protected:
 private:
   void AddReftrackerAliases ()
   {
-    csRefTrackerAccess::AddAlias(this->GetSCFObject(),
-     static_cast<Super*> (this->GetSCFObject()));
     AddReftrackerAlias<I1>(this->GetSCFObject());
     AddReftrackerAlias<I2>(this->GetSCFObject());
     AddReftrackerAlias<I3>(this->GetSCFObject());
   }
   void RemoveReftrackerAliases ()
   {
-    csRefTrackerAccess::RemoveAlias(this->GetSCFObject(),
-        static_cast<Super*> (this->GetSCFObject()));
     RemoveReftrackerAlias<I1>(this->GetSCFObject());
     RemoveReftrackerAlias<I2>(this->GetSCFObject());
     RemoveReftrackerAlias<I3>(this->GetSCFObject());
@@ -1388,50 +1377,50 @@ protected:
   scfImplementationExt4(Class_ *object)
     : Super()
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1>
   scfImplementationExt4(Class *object, T1 t1)
     : Super(t1)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2>
   scfImplementationExt4(Class *object, T1 t1, T2 t2)
     : Super(t1, t2)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3>
   scfImplementationExt4(Class *object, T1 t1, T2 t2, T3 t3)
     : Super(t1, t2, t3)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4>
   scfImplementationExt4(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
     : Super(t1, t2, t3, t4)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5>
   scfImplementationExt4(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
     : Super(t1, t2, t3, t4, t5)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5, class T6>
   scfImplementationExt4(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
     : Super(t1, t2, t3, t4, t5, t6)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   Class* GetSCFObject() { return static_cast<Class*> (this); }
   const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
@@ -1456,8 +1445,6 @@ protected:
 private:
   void AddReftrackerAliases ()
   {
-    csRefTrackerAccess::AddAlias(this->GetSCFObject(),
-     static_cast<Super*> (this->GetSCFObject()));
     AddReftrackerAlias<I1>(this->GetSCFObject());
     AddReftrackerAlias<I2>(this->GetSCFObject());
     AddReftrackerAlias<I3>(this->GetSCFObject());
@@ -1465,8 +1452,6 @@ private:
   }
   void RemoveReftrackerAliases ()
   {
-    csRefTrackerAccess::RemoveAlias(this->GetSCFObject(),
-        static_cast<Super*> (this->GetSCFObject()));
     RemoveReftrackerAlias<I1>(this->GetSCFObject());
     RemoveReftrackerAlias<I2>(this->GetSCFObject());
     RemoveReftrackerAlias<I3>(this->GetSCFObject());
@@ -1536,50 +1521,50 @@ protected:
   scfImplementationExt5(Class_ *object)
     : Super()
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1>
   scfImplementationExt5(Class *object, T1 t1)
     : Super(t1)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2>
   scfImplementationExt5(Class *object, T1 t1, T2 t2)
     : Super(t1, t2)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3>
   scfImplementationExt5(Class *object, T1 t1, T2 t2, T3 t3)
     : Super(t1, t2, t3)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4>
   scfImplementationExt5(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
     : Super(t1, t2, t3, t4)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5>
   scfImplementationExt5(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
     : Super(t1, t2, t3, t4, t5)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5, class T6>
   scfImplementationExt5(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
     : Super(t1, t2, t3, t4, t5, t6)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   Class* GetSCFObject() { return static_cast<Class*> (this); }
   const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
@@ -1605,8 +1590,6 @@ protected:
 private:
   void AddReftrackerAliases ()
   {
-    csRefTrackerAccess::AddAlias(this->GetSCFObject(),
-     static_cast<Super*> (this->GetSCFObject()));
     AddReftrackerAlias<I1>(this->GetSCFObject());
     AddReftrackerAlias<I2>(this->GetSCFObject());
     AddReftrackerAlias<I3>(this->GetSCFObject());
@@ -1615,8 +1598,6 @@ private:
   }
   void RemoveReftrackerAliases ()
   {
-    csRefTrackerAccess::RemoveAlias(this->GetSCFObject(),
-        static_cast<Super*> (this->GetSCFObject()));
     RemoveReftrackerAlias<I1>(this->GetSCFObject());
     RemoveReftrackerAlias<I2>(this->GetSCFObject());
     RemoveReftrackerAlias<I3>(this->GetSCFObject());
@@ -1688,50 +1669,50 @@ protected:
   scfImplementationExt6(Class_ *object)
     : Super()
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1>
   scfImplementationExt6(Class *object, T1 t1)
     : Super(t1)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2>
   scfImplementationExt6(Class *object, T1 t1, T2 t2)
     : Super(t1, t2)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3>
   scfImplementationExt6(Class *object, T1 t1, T2 t2, T3 t3)
     : Super(t1, t2, t3)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4>
   scfImplementationExt6(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
     : Super(t1, t2, t3, t4)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5>
   scfImplementationExt6(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
     : Super(t1, t2, t3, t4, t5)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5, class T6>
   scfImplementationExt6(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
     : Super(t1, t2, t3, t4, t5, t6)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   Class* GetSCFObject() { return static_cast<Class*> (this); }
   const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
@@ -1758,8 +1739,6 @@ protected:
 private:
   void AddReftrackerAliases ()
   {
-    csRefTrackerAccess::AddAlias(this->GetSCFObject(),
-     static_cast<Super*> (this->GetSCFObject()));
     AddReftrackerAlias<I1>(this->GetSCFObject());
     AddReftrackerAlias<I2>(this->GetSCFObject());
     AddReftrackerAlias<I3>(this->GetSCFObject());
@@ -1769,8 +1748,6 @@ private:
   }
   void RemoveReftrackerAliases ()
   {
-    csRefTrackerAccess::RemoveAlias(this->GetSCFObject(),
-        static_cast<Super*> (this->GetSCFObject()));
     RemoveReftrackerAlias<I1>(this->GetSCFObject());
     RemoveReftrackerAlias<I2>(this->GetSCFObject());
     RemoveReftrackerAlias<I3>(this->GetSCFObject());
@@ -1844,50 +1821,50 @@ protected:
   scfImplementationExt7(Class_ *object)
     : Super()
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1>
   scfImplementationExt7(Class *object, T1 t1)
     : Super(t1)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2>
   scfImplementationExt7(Class *object, T1 t1, T2 t2)
     : Super(t1, t2)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3>
   scfImplementationExt7(Class *object, T1 t1, T2 t2, T3 t3)
     : Super(t1, t2, t3)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4>
   scfImplementationExt7(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
     : Super(t1, t2, t3, t4)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5>
   scfImplementationExt7(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
     : Super(t1, t2, t3, t4, t5)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   template<class T1, class T2, class T3, class T4, class T5, class T6>
   scfImplementationExt7(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
     : Super(t1, t2, t3, t4, t5, t6)
   {
-    AddReftrackerAliases();
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases();
   }
   Class* GetSCFObject() { return static_cast<Class*> (this); }
   const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
@@ -1915,8 +1892,6 @@ protected:
 private:
   void AddReftrackerAliases ()
   {
-    csRefTrackerAccess::AddAlias(this->GetSCFObject(),
-     static_cast<Super*> (this->GetSCFObject()));
     AddReftrackerAlias<I1>(this->GetSCFObject());
     AddReftrackerAlias<I2>(this->GetSCFObject());
     AddReftrackerAlias<I3>(this->GetSCFObject());
@@ -1927,8 +1902,6 @@ private:
   }
   void RemoveReftrackerAliases ()
   {
-    csRefTrackerAccess::RemoveAlias(this->GetSCFObject(),
-        static_cast<Super*> (this->GetSCFObject()));
     RemoveReftrackerAlias<I1>(this->GetSCFObject());
     RemoveReftrackerAlias<I2>(this->GetSCFObject());
     RemoveReftrackerAlias<I3>(this->GetSCFObject());
@@ -1981,4 +1954,6 @@ private:
   }
 };
 /* Pre-preprocessed code ends here */
+
 #include "csutil/deprecated_warn_on.h"
+

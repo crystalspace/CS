@@ -38,12 +38,7 @@ csRefTracker::~csRefTracker ()
 
 csRefTracker::RefInfo& csRefTracker::GetObjRefInfo (void* obj)
 {
-  while (true)
-  {
-    void* newAlias = aliases.Get (obj, nullptr);
-    if (!newAlias) break;
-    obj = newAlias;
-  }
+  obj = aliases.Get (obj, obj);
   RefInfo* info = trackedRefs.Get (obj, 0);
   if (info == 0)
   {
