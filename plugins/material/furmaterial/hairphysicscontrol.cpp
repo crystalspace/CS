@@ -76,8 +76,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csVector3 last = coordinates[coordinatesCount - 1];
 
     CS::Physics::Bullet::iSoftBody* bulletBody = bulletDynamicSystem->
-      CreateRope(first, first + csVector3(0, 1, 0) * (last - first).Norm() , 
-      coordinatesCount - 1);	//	replace with -1
+      CreateRope(coordinates, coordinatesCount);
+
     bulletBody->SetMass (0.1f);
     bulletBody->SetRigidity (0.99f);
     bulletBody->AnchorVertex (0, rigidBody);
