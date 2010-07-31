@@ -1,0 +1,43 @@
+<library>
+
+  <plugins>
+    <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
+    <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
+n>
+  </plugins>
+	
+  <textures>
+    <texture name='kwarz_diffuse.jpg'>
+      <file>textures/kwarz_diffuse.jpg</file>
+    </texture>
+    
+    <texture name='kwarz01_ice.png'>
+          <file>textures/ice.png</file>
+    </texture>
+    
+    <texture name='BUMPkwarz01_normals.jpg'>
+      <file>textures/kwarz_normals.jpg</file>
+      <class>normalmap</class>
+    </texture>
+  </textures>
+  
+  <materials>
+    <material name='kwartz-parallax'>
+      <texture>kwarz_diffuse.jpg</texture>
+      <shadervar type='texture' name='tex normal'>BUMPkwarz01_normals.jpg</shadervar>
+    </material>
+    
+    <material name='kwartz01-ice'>
+          <texture>kwarz01_ice.png</texture>
+          <shadervar type='texture' name='tex normal'>BUMPkwarz01_normals.jpg</shadervar>
+          <shadervar name="specular" type="vector4">0.9, 0.9, 1, 1</shadervar>
+          <shadervar name="light 0 diffuse" type="vector4">0.9, 0.9, 1, 1</shadervar>
+    </material>
+    
+  </materials>
+  
+  
+  <library>factories/skelArmature</library>
+  <library>factories/kwartz</library>
+
+</library>

@@ -35,29 +35,26 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define ENVIRONMENT_TERRAIN 2
 
 Simple::Simple ()
-  : csDemoApplication ("CrystalSpace.PhysTut", "phystut",
-		       "phystut <OPTIONS>",
-		       "Physics tutorial for Crystal Space."),
+  : DemoApplication ("CrystalSpace.PhysTut", "phystut",
+		     "phystut <OPTIONS>",
+		     "Physics tutorial for Crystal Space."),
     isSoftBodyWorld (false), environment (ENVIRONMENT_WALLS), solver (0),
     autodisable (false), do_bullet_debug (false), remainingStepDuration (0.0f),
     debugMode (false), allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
     physicalCameraMode (CAMERA_DYNAMIC), dragging (false)
 {
-  // Configure the options for csDemoApplication
+  // Configure the options for DemoApplication
 
   // We manage the camera by ourselves
-  SetCameraMode (CSDEMO_CAMERA_NONE);
+  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_NONE);
 
   // Command line options
-  commandLineHelper.commandOptions.Push
-    (csDemoCommandLineHelper::CommandOption
-     ("phys_engine=<name>", "Specify which physics plugin to use (ode, bullet)"));
-  commandLineHelper.commandOptions.Push
-    (csDemoCommandLineHelper::CommandOption
-     ("disable_soft", "Disable the soft bodies"));
-  commandLineHelper.commandOptions.Push
-    (csDemoCommandLineHelper::CommandOption
-     ("terrain", "Start with the terrain environment"));
+  commandLineHelper.AddCommandLineOption
+    ("phys_engine=<name>", "Specify which physics plugin to use (ode, bullet)");
+  commandLineHelper.AddCommandLineOption
+    ("disable_soft", "Disable the soft bodies");
+  commandLineHelper.AddCommandLineOption
+    ("terrain", "Start with the terrain environment");
 }
 
 Simple::~Simple ()
@@ -189,55 +186,55 @@ void Simple::Frame ()
       (cameraBody->GetTransform ().GetOrigin ());
 
   // Update the demo's state information
-  stateDescriptions.DeleteAll ();
+  hudHelper.stateDescriptions.DeleteAll ();
   csString txt;
 
-  stateDescriptions.Push (csString ("Physics engine: ") + phys_engine_name);
+  hudHelper.stateDescriptions.Push (csString ("Physics engine: ") + phys_engine_name);
 
   txt.Format ("Rigid bodies count: %d", dynamicSystem->GetBodysCount ());
-  stateDescriptions.Push (txt);
+  hudHelper.stateDescriptions.Push (txt);
 
   if (isSoftBodyWorld)
   {
     txt.Format ("Soft bodies count: %d", (int) bulletDynamicSystem->GetSoftBodyCount ());
-    stateDescriptions.Push (txt);
+    hudHelper.stateDescriptions.Push (txt);
   }
 
   if (phys_engine_id == ODE_ID)
   {
     if (solver==0)
-      stateDescriptions.Push (csString ("Solver: WorldStep"));
+      hudHelper.stateDescriptions.Push (csString ("Solver: WorldStep"));
     else if (solver==1)
-      stateDescriptions.Push (csString ("Solver: StepFast"));
+      hudHelper.stateDescriptions.Push (csString ("Solver: StepFast"));
     else if (solver==2)
-      stateDescriptions.Push (csString ("Solver: QuickStep"));
+      hudHelper.stateDescriptions.Push (csString ("Solver: QuickStep"));
   }
 
   if (autodisable)
-    stateDescriptions.Push (csString ("AutoDisable: ON"));
+    hudHelper.stateDescriptions.Push (csString ("AutoDisable: ON"));
   else
-    stateDescriptions.Push (csString ("AutoDisable: OFF"));
+    hudHelper.stateDescriptions.Push (csString ("AutoDisable: OFF"));
 
   switch (physicalCameraMode)
     {
     case CAMERA_DYNAMIC:
-      stateDescriptions.Push (csString ("Camera mode: dynamic"));
+      hudHelper.stateDescriptions.Push (csString ("Camera mode: dynamic"));
       break;
 
     case CAMERA_FREE:
-      stateDescriptions.Push (csString ("Camera mode: free"));
+      hudHelper.stateDescriptions.Push (csString ("Camera mode: free"));
       break;
 
     case CAMERA_KINEMATIC:
-      stateDescriptions.Push (csString ("Camera mode: kinematic"));
+      hudHelper.stateDescriptions.Push (csString ("Camera mode: kinematic"));
       break;
 
     default:
       break;
     }
 
-  // Default behavior from csDemoApplication
-  csDemoApplication::Frame ();
+  // Default behavior from DemoApplication
+  DemoApplication::Frame ();
 
   // Display debug informations
   if (do_bullet_debug)
@@ -247,7 +244,7 @@ void Simple::Frame ()
   else if (isSoftBodyWorld)
     for (size_t i = 0; i < bulletDynamicSystem->GetSoftBodyCount (); i++)
     {
-      iBulletSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
+      CS::Physics::Bullet::iSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
       if (!softBody->GetTriangleCount ())
 	softBody->DebugDraw (view);
     }
@@ -255,8 +252,8 @@ void Simple::Frame ()
 
 bool Simple::OnKeyboard (iEvent &ev)
 {
-  // Default behavior from csDemoApplication
-  csDemoApplication::OnKeyboard (ev);
+  // Default behavior from DemoApplication
+  DemoApplication::OnKeyboard (ev);
 
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
@@ -518,14 +515,15 @@ bool Simple::OnKeyboard (iEvent &ev)
       csVector3 startBeam = camera->GetTransform ().GetOrigin ();
       csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
-      csBulletHitBeamResult hitResult = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+      CS::Physics::Bullet::HitBeamResult hitResult =
+	bulletDynamicSystem->HitBeam (startBeam, endBeam);
       if (hitResult.hasHit
-	  && hitResult.bodyType == CS_BULLET_RIGID_BODY)
+	  && hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
       {
 	// Remove the body and the mesh from the simulation, and put them in the clipboard
-	clipboardBody = hitResult.rigidBody;
+	clipboardBody = hitResult.body->QueryRigidBody ();
 	dynamicSystem->RemoveBody (clipboardBody);
-	clipboardMesh = hitResult.rigidBody->GetAttachedMesh ();
+	clipboardMesh = hitResult.body->QueryRigidBody ()->GetAttachedMesh ();
 	if (clipboardMesh)
 	  room->GetMeshes ()->Remove (clipboardMesh);
 
@@ -609,38 +607,38 @@ bool Simple::OnMouseDown (iEvent& ev)
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
     // Trace the physical beam
-    csBulletHitBeamResult hitResult =
+    CS::Physics::Bullet::HitBeamResult hitResult =
       bulletDynamicSystem->HitBeam (startBeam, endBeam);
     if (!hitResult.hasHit)
       return false;
 
     // Add a force at the point clicked
-    if (hitResult.bodyType == CS_BULLET_RIGID_BODY)
+    if (hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
       force *= 2.0f;
 
       // Check if the body hit is not static or kinematic
-      csRef<iBulletRigidBody> bulletBody =
-	scfQueryInterface<iBulletRigidBody> (hitResult.rigidBody);
-      if (bulletBody->GetDynamicState () != CS_BULLET_STATE_DYNAMIC)
+      csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	scfQueryInterface<CS::Physics::Bullet::iRigidBody> (hitResult.body->QueryRigidBody ());
+      if (bulletBody->GetDynamicState () != CS::Physics::Bullet::STATE_DYNAMIC)
 	return false;
 
-      hitResult.rigidBody->AddForceAtPos (force, hitResult.isect);
+      hitResult.body->QueryRigidBody ()->AddForceAtPos (force, hitResult.isect);
 
       // This would work too
-      //csOrthoTransform transform (hitResult.rigidBody->GetTransform ());
+      //csOrthoTransform transform (hitResult.body->QueryRigidBody ()->GetTransform ());
       //csVector3 relativePosition = transform.Other2This (hitResult.isect);
-      //hitResult.rigidBody->AddForceAtRelPos (force, relativePosition);
+      //hitResult.body->QueryRigidBody ()->AddForceAtRelPos (force, relativePosition);
     }
 
-    else if (hitResult.bodyType == CS_BULLET_SOFT_BODY)
+    else if (hitResult.body->GetType () == CS::Physics::Bullet::SOFT_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
       force *= 2.0f;
-      hitResult.softBody->AddForce (force, hitResult.vertexIndex);
+      hitResult.body->QuerySoftBody ()->AddForce (force, hitResult.vertexIndex);
     }
 
     return true;
@@ -662,24 +660,25 @@ bool Simple::OnMouseDown (iEvent& ev)
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
     // Trace the physical beam
-    csBulletHitBeamResult hitResult = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+    CS::Physics::Bullet::HitBeamResult hitResult =
+      bulletDynamicSystem->HitBeam (startBeam, endBeam);
     if (!hitResult.hasHit)
       return false;
 
     // Check if we hit a rigid body
-    if (hitResult.bodyType != CS_BULLET_RIGID_BODY)
+    if (hitResult.body->GetType () != CS::Physics::Bullet::RIGID_BODY)
       return false;
 
     // Create a pivot joint at the point clicked
     dragJoint = bulletDynamicSystem->CreatePivotJoint ();
-    dragJoint->Attach (hitResult.rigidBody, hitResult.isect);
+    dragJoint->Attach (hitResult.body->QueryRigidBody (), hitResult.isect);
 
     dragging = true;
     dragDistance = (hitResult.isect - startBeam).Norm ();
 
     // Set some dampening on the rigid body to have a more stable dragging
-    csRef<iBulletRigidBody> bulletBody =
-      scfQueryInterface<iBulletRigidBody> (hitResult.rigidBody);
+    csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+      scfQueryInterface<CS::Physics::Bullet::iRigidBody> (hitResult.body->QueryRigidBody ());
     linearDampening = bulletBody->GetLinearDampener ();
     angularDampening = bulletBody->GetRollingDampener ();
     bulletBody->SetLinearDampener (0.9f);
@@ -698,8 +697,8 @@ bool Simple::OnMouseUp (iEvent& ev)
     dragging = false;
 
     // Put back the original dampening on the rigid body
-    csRef<iBulletRigidBody> bulletBody =
-      scfQueryInterface<iBulletRigidBody> (dragJoint->GetAttachedBody ());
+    csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+      scfQueryInterface<CS::Physics::Bullet::iRigidBody> (dragJoint->GetAttachedBody ());
     bulletBody->SetLinearDampener (linearDampening);
     bulletBody->SetRollingDampener (angularDampening);
 
@@ -724,8 +723,8 @@ bool Simple::OnMouseMove (iEvent& ev)
 
 bool Simple::OnInitialize (int argc, char* argv[])
 {
-  // Default behavior from csDemoApplication
-  if (!csDemoApplication::OnInitialize (argc, argv))
+  // Default behavior from DemoApplication
+  if (!DemoApplication::OnInitialize (argc, argv))
     return false;
 
   // Request plugins
@@ -785,69 +784,69 @@ bool Simple::OnInitialize (int argc, char* argv[])
     return ReportError ("No iDynamics plugin!");
 
   // Now that we know the physical plugin in use, we can define the available keys
-  keyDescriptions.DeleteAll ();
-  keyDescriptions.Push ("b: spawn a box");
-  keyDescriptions.Push ("s: spawn a sphere");
+  hudHelper.keyDescriptions.DeleteAll ();
+  hudHelper.keyDescriptions.Push ("b: spawn a box");
+  hudHelper.keyDescriptions.Push ("s: spawn a sphere");
   if (phys_engine_id == BULLET_ID)
   {
-    keyDescriptions.Push ("c: spawn a cylinder");
-    keyDescriptions.Push ("a: spawn a capsule");
+    hudHelper.keyDescriptions.Push ("c: spawn a cylinder");
+    hudHelper.keyDescriptions.Push ("a: spawn a capsule");
   }
-  keyDescriptions.Push ("v: spawn a convex mesh");
-  keyDescriptions.Push ("m: spawn a concave mesh");
-  keyDescriptions.Push ("*: spawn a static concave mesh");
+  hudHelper.keyDescriptions.Push ("v: spawn a convex mesh");
+  hudHelper.keyDescriptions.Push ("m: spawn a concave mesh");
+  hudHelper.keyDescriptions.Push ("*: spawn a static concave mesh");
   if (phys_engine_id == BULLET_ID)
-    keyDescriptions.Push ("q: spawn a compound body");
-  keyDescriptions.Push ("j: spawn two jointed bodies");
+    hudHelper.keyDescriptions.Push ("q: spawn a compound body");
+  hudHelper.keyDescriptions.Push ("j: spawn two jointed bodies");
   if (phys_engine_id == BULLET_ID)
   {
-    keyDescriptions.Push ("h: spawn a chain");
-    keyDescriptions.Push ("r: spawn a Frankie's ragdoll");
+    hudHelper.keyDescriptions.Push ("h: spawn a chain");
+    hudHelper.keyDescriptions.Push ("r: spawn a Frankie's ragdoll");
   }
   if (isSoftBodyWorld)
   {
-    keyDescriptions.Push ("y: spawn a rope");
-    keyDescriptions.Push ("u: spawn a cloth");
-    keyDescriptions.Push ("i: spawn a soft body");
+    hudHelper.keyDescriptions.Push ("y: spawn a rope");
+    hudHelper.keyDescriptions.Push ("u: spawn a cloth");
+    hudHelper.keyDescriptions.Push ("i: spawn a soft body");
   }
-  keyDescriptions.Push ("SPACE: spawn random object");
+  hudHelper.keyDescriptions.Push ("SPACE: spawn random object");
   if (phys_engine_id == BULLET_ID)
   {
-    keyDescriptions.Push ("left mouse: fire!");
-    keyDescriptions.Push ("right mouse: drag object");
-    keyDescriptions.Push ("CTRL-x: cut selected object");
-    keyDescriptions.Push ("CTRL-v: paste object");
+    hudHelper.keyDescriptions.Push ("left mouse: fire!");
+    hudHelper.keyDescriptions.Push ("right mouse: drag object");
+    hudHelper.keyDescriptions.Push ("CTRL-x: cut selected object");
+    hudHelper.keyDescriptions.Push ("CTRL-v: paste object");
   }
-  keyDescriptions.Push ("f: toggle camera modes");
-  keyDescriptions.Push ("t: toggle all bodies dynamic/static");
-  keyDescriptions.Push ("p: pause the simulation");
-  keyDescriptions.Push ("o: toggle speed of simulation");
-  keyDescriptions.Push ("d: toggle display of colliders");
+  hudHelper.keyDescriptions.Push ("f: toggle camera modes");
+  hudHelper.keyDescriptions.Push ("t: toggle all bodies dynamic/static");
+  hudHelper.keyDescriptions.Push ("p: pause the simulation");
+  hudHelper.keyDescriptions.Push ("o: toggle speed of simulation");
+  hudHelper.keyDescriptions.Push ("d: toggle display of colliders");
   if (phys_engine_id == BULLET_ID)
-    keyDescriptions.Push ("?: toggle display of collisions");
-  keyDescriptions.Push ("g: toggle gravity");
-  keyDescriptions.Push ("I: toggle autodisable");
+    hudHelper.keyDescriptions.Push ("?: toggle display of collisions");
+  hudHelper.keyDescriptions.Push ("g: toggle gravity");
+  hudHelper.keyDescriptions.Push ("I: toggle autodisable");
   if (phys_engine_id == ODE_ID)
   {
-    keyDescriptions.Push ("1: enable StepFast solver");
-    keyDescriptions.Push ("2: disable StepFast solver");
-    keyDescriptions.Push ("3: enable QuickStep solver");
+    hudHelper.keyDescriptions.Push ("1: enable StepFast solver");
+    hudHelper.keyDescriptions.Push ("2: disable StepFast solver");
+    hudHelper.keyDescriptions.Push ("3: enable QuickStep solver");
   }
 #ifdef CS_HAVE_BULLET_SERIALIZER
   if (phys_engine_id == BULLET_ID)
-    keyDescriptions.Push ("CTRL-s: save the dynamic world");
+    hudHelper.keyDescriptions.Push ("CTRL-s: save the dynamic world");
 #endif
   /*
   if (phys_engine_id == BULLET_ID)
-    keyDescriptions.Push ("CTRL-n: next environment");
+    hudHelper.keyDescriptions.Push ("CTRL-n: next environment");
   */
   return true;
 }
 
 bool Simple::Application ()
 {
-  // Default behavior from csDemoApplication
-  if (!csDemoApplication::Application ())
+  // Default behavior from DemoApplication
+  if (!DemoApplication::Application ())
     return false;
 
   // Find references to main objects
@@ -1008,8 +1007,8 @@ void Simple::UpdateCameraMode ()
 	  (0.8f, csVector3 (0.0f), 10.0f, 1.0f, 0.8f);
 
 	// Make it kinematic
-	csRef<iBulletRigidBody> bulletBody =
-	  scfQueryInterface<iBulletRigidBody> (cameraBody);
+	csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	  scfQueryInterface<CS::Physics::Bullet::iRigidBody> (cameraBody);
 	bulletBody->MakeKinematic ();
 
 	// Attach the camera to the body so as to benefit of the default
@@ -1594,7 +1593,7 @@ void Simple::LoadRagdoll ()
   csRef<iSkeletonRagdollNodeFactory2> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll",
 					   bodySkeleton, dynamicSystem);
-  ragdollFactory->AddBodyChain (chain, CS_RAGDOLL_STATE_DYNAMIC);
+  ragdollFactory->AddBodyChain (chain, CS::Animation::STATE_DYNAMIC);
 
   // Set the ragdoll anim node as the only node of the animation tree
   animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ()
@@ -1643,9 +1642,9 @@ void Simple::SpawnRagdoll ()
   // Fling the body.
   // (start the ragdoll node before so that the rigid bodies are created)
   ragdoll->Play ();
-  for (uint i = 0; i < ragdoll->GetBoneCount (CS_RAGDOLL_STATE_DYNAMIC); i++)
+  for (uint i = 0; i < ragdoll->GetBoneCount (CS::Animation::STATE_DYNAMIC); i++)
   {
-    BoneID boneID = ragdoll->GetBone (CS_RAGDOLL_STATE_DYNAMIC, i);
+    BoneID boneID = ragdoll->GetBone (CS::Animation::STATE_DYNAMIC, i);
     iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
     rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
     rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));
@@ -1663,8 +1662,10 @@ void Simple::SpawnRope ()
   // Spawn a box
   iRigidBody* box = SpawnBox ();
 
+  // First example using ropes defined by their extremities
+#if 1
   // Spawn a first rope and attach it to the box
-  iBulletSoftBody* body = bulletDynamicSystem->CreateRope
+  CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateRope
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (-0.2f, 0, 1), 20);
   body->SetMass (2.0f);
@@ -1680,6 +1681,49 @@ void Simple::SpawnRope ()
   body->SetRigidity (0.95f);
   body->AnchorVertex (0);
   body->AnchorVertex (body->GetVertexCount () - 1, box);
+
+  // Second example using ropes defined by the position of each of their vertices
+#else
+  // Spawn a first rope and attach it to the box
+  {
+    // Define the positions of the vertices
+    size_t vertexCount = 10;
+    CS_ALLOC_STACK_ARRAY(csVector3, nodes, vertexCount);
+    nodes[0] = tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0);
+    csVector3 step = (tc.GetT2O () * csVector3 (-0.2f, 0, 1) -
+		      tc.GetT2O () * csVector3 (-2, 2, 0)) / (((float) vertexCount) - 1);
+    for (size_t i = 1; i < vertexCount; i++)
+      nodes[i] = nodes[0] + ((int) (i % 2)) * csVector3 (-0.2f, 0, 0) + ((int) i) * step;
+
+    // Create the soft body
+    CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateRope
+      (nodes, vertexCount);
+    body->SetMass (2.0f);
+    body->SetRigidity (0.95f);
+    body->AnchorVertex (0);
+    body->AnchorVertex (body->GetVertexCount () - 1, box);
+  }
+
+  // Spawn a second rope and attach it to the box
+  {
+    // Define the positions of the vertices
+    size_t vertexCount = 10;
+    CS_ALLOC_STACK_ARRAY(csVector3, nodes, vertexCount);
+    nodes[0] = tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 0);
+    csVector3 step = (tc.GetT2O () * csVector3 (0.2f, 0, 1) -
+		      tc.GetT2O () * csVector3 (2, 2, 0)) / (((float) vertexCount) - 1);
+    for (size_t i = 1; i < vertexCount; i++)
+      nodes[i] = nodes[0] + ((int) (i % 2)) * csVector3 (0.2f, 0, 0) + ((int) i) * step;
+
+    // Create the soft body
+    CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateRope
+      (nodes, vertexCount);
+    body->SetMass (2.0f);
+    body->SetRigidity (0.95f);
+    body->AnchorVertex (0);
+    body->AnchorVertex (body->GetVertexCount () - 1, box);
+  }
+#endif
 }
 
 void Simple::SpawnCloth ()
@@ -1688,7 +1732,7 @@ void Simple::SpawnCloth ()
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the cloth
-  iBulletSoftBody* body = bulletDynamicSystem->CreateCloth
+  CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateCloth
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 1),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 1),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 0, 1),
@@ -1702,7 +1746,7 @@ void Simple::SpawnCloth ()
 
   // Create the cloth mesh factory
   csRef<iMeshFactoryWrapper> clothFact =
-    csBulletSoftBodyHelper::CreateClothGenMeshFactory
+    CS::Physics::Bullet::SoftBodyHelper::CreateClothGenMeshFactory
     (GetObjectRegistry (), "clothFact", body);
   csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
     (clothFact->GetMeshObjectFactory ());
@@ -1745,7 +1789,7 @@ void Simple::SpawnSoftBody ()
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the soft body
-  iBulletSoftBody* body = bulletDynamicSystem->CreateSoftBody
+  CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateSoftBody
     (gmstate, csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, 1.0f)) * tc);
   // This would have worked too
   //iBulletSoftBody* body = bulletDynamicSystem->CreateSoftBody
@@ -1777,8 +1821,8 @@ void Simple::SpawnSoftBody ()
 
 void Simple::CreateWalls (const csVector3& /*radius*/)
 {
-  // Default behavior from csDemoApplication for the creation of the scene
-  if (!csDemoApplication::CreateRoom ())
+  // Default behavior from DemoApplication for the creation of the scene
+  if (!DemoApplication::CreateRoom ())
     return;
 
   // First we make a primitive for our geometry.

@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csgfx/packrgb.h"
 #include "csplugincommon/imageloader/commonimagefile.h"
+#include "csutil/scopedlock.h"
 #include "csutil/threadjobqueue.h"
 #include "iutil/objreg.h"
 
@@ -90,12 +91,25 @@ void csCommonImageFile::LoaderJob::Run()
 {
   csRef<iImageFileLoader> currentLoader;
   {
-    csRef<csCommonImageFile> fileToLoad (this->fileToLoad);
-    if (!fileToLoad.IsValid()) return;
+    csRef<csCommonImageFile> fileToLoad;
+    {
+      CS::Threading::MutexScopedLock lock (fileToLoadLock);
+      if (!this->fileToLoad) return;
+      /* Catch possibility that Run() is executed just while fileToLoad is
+         destructed */
+      if (this->fileToLoad->GetRefCount() == 0) return;
+      fileToLoad = this->fileToLoad;
+    }
     currentLoader = fileToLoad->currentLoader;
     if (!currentLoader.IsValid()) return;
   }
   loadResult = currentLoader->LoadData ();
+}
+
+void csCommonImageFile::LoaderJob::ClearFileToLoad ()
+{
+  CS::Threading::MutexScopedLock lock (fileToLoadLock);
+  fileToLoad = nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -121,7 +135,10 @@ csCommonImageFile::~csCommonImageFile()
 {
 #ifdef CSCOMMONIMAGEFILE_THREADED_LOADING
   if (loadJob.IsValid())
+  {
+    loadJob->ClearFileToLoad ();
     jobQueue->Dequeue (loadJob, true);
+  }
 #endif
 }
 

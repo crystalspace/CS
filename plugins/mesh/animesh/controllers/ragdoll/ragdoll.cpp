@@ -137,7 +137,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   }
 
   void RagdollAnimNodeFactory::AddBodyChain (iBodyChain* chain,
-					     csSkeletonRagdollState state)
+					     CS::Animation::RagdollState state)
   {
     ChainData data;
     data.chain = chain;
@@ -196,7 +196,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   }
 
   void RagdollAnimNode::CreateBoneData (iBodyChainNode* chainNode,
-					csSkeletonRagdollState state)
+					CS::Animation::RagdollState state)
   {
     iBodyBone* bodyBone = chainNode->GetBodyBone ();
 
@@ -227,7 +227,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   }
 
   void RagdollAnimNode::SetBodyChainState (iBodyChain* chain,
-					   csSkeletonRagdollState state)
+					   CS::Animation::RagdollState state)
   {
 #ifdef CS_DEBUG
     // check that the chain is registered
@@ -248,7 +248,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   }
 
   void RagdollAnimNode::SetChainNodeState (iBodyChainNode* node,
-					   csSkeletonRagdollState state)
+					   CS::Animation::RagdollState state)
   {
     // find the associated bone data
     BoneData nullBone;
@@ -265,10 +265,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       SetChainNodeState (node->GetChild (i), state);
   }
 
-  csSkeletonRagdollState RagdollAnimNode::GetBodyChainState (iBodyChain* chain)
+  CS::Animation::RagdollState RagdollAnimNode::GetBodyChainState (iBodyChain* chain)
   {
     if (!chains.Contains (chain->GetName ()))
-      return CS_RAGDOLL_STATE_INACTIVE;
+      return CS::Animation::STATE_INACTIVE;
 
     return chains[chain->GetName ()]->state;
   }
@@ -289,7 +289,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     return bones[bone]->joint;
   }
 
-  uint RagdollAnimNode::GetBoneCount (csSkeletonRagdollState state) const
+  uint RagdollAnimNode::GetBoneCount (CS::Animation::RagdollState state) const
   {
     uint count = 0;
     for (csHash<BoneData, BoneID>::ConstGlobalIterator it = bones.GetIterator ();
@@ -304,7 +304,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     return count;
   }
 
-  BoneID RagdollAnimNode::GetBone (csSkeletonRagdollState state, uint index) const
+  BoneID RagdollAnimNode::GetBone (CS::Animation::RagdollState state, uint index) const
   {
     uint count = 0;
     for (csHash<BoneData, BoneID>::ConstGlobalIterator it = bones.GetIterator ();
@@ -337,7 +337,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     }
 
     // check that the chain is in dynamic state
-    if (chains[chain->GetName ()]->state != CS_RAGDOLL_STATE_DYNAMIC)
+    if (chains[chain->GetName ()]->state != CS::Animation::STATE_DYNAMIC)
     {
       factory->manager->Report (CS_REPORTER_SEVERITY_WARNING,
        "Chain %s was not in dynamic state while trying to reset the chain transform",
@@ -482,7 +482,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       // TODO: test for deactivation of rigid body
 
       // check if the bone is in dynamic state
-      if (boneData.state != CS_RAGDOLL_STATE_DYNAMIC)
+      if (boneData.state != CS::Animation::STATE_DYNAMIC)
         continue;
 
       // Get the bind transform of the bone
@@ -594,7 +594,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   {
     // check if this node has been stopped or if the bone is inactive
     if (!isActive
-	|| boneData->state == CS_RAGDOLL_STATE_INACTIVE)
+	|| boneData->state == CS::Animation::STATE_INACTIVE)
     {
       if (boneData->joint)
       {
@@ -748,7 +748,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     }
 
     // if the bone is in dynamic state
-    if (boneData->state == CS_RAGDOLL_STATE_DYNAMIC)
+    if (boneData->state == CS::Animation::STATE_DYNAMIC)
     {
       // set the rigid body in dynamic state
       boneData->rigidBody->MakeDynamic ();
@@ -823,11 +823,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     }
 
     // if the bone is in kinematic state
-    else if (boneData->state == CS_RAGDOLL_STATE_KINEMATIC)
+    else if (boneData->state == CS::Animation::STATE_KINEMATIC)
     {
       // find the bullet interface of the rigid body
-      csRef<iBulletRigidBody> bulletBody =
-	scfQueryInterface<iBulletRigidBody> (boneData->rigidBody);
+      csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	scfQueryInterface<CS::Physics::Bullet::iRigidBody> (boneData->rigidBody);
 
       if (!bulletBody)
       {

@@ -877,6 +877,13 @@ struct iSkeletonRandomNode2 : public iSkeletonAnimNode2
  * Factory for Finite State Machine (FSM) animation nodes.
  * It defines instances of iSkeletonFSMNode2.
  *
+ * Each state of the FSM corresponds to an animation sub-node. A crossfade
+ * and a transition sub-node can also be defined between the states of the FSM.
+ * They will be used when the FSM is switched between the two states. Automatic
+ * transitions can also be defined, they will be followed automatically at the
+ * end of the current playing state if no other state has been asked by the user
+ * to switch to.
+ *
  * Main creators of instances implementing this interface:
  * - iSkeletonAnimPacketFactory2::CreateFSMNode()
  *
@@ -889,7 +896,7 @@ struct iSkeletonRandomNode2 : public iSkeletonAnimNode2
  */
 struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
-  SCF_INTERFACE(iSkeletonFSMNodeFactory2, 1, 0, 1);
+  SCF_INTERFACE(iSkeletonFSMNodeFactory2, 1, 0, 2);
 
   /**
    * Add a new state to the FSM and return the state identifier
@@ -973,6 +980,17 @@ struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
    */
   virtual CS::Animation::StateID AddState (const char* name,
     iSkeletonAnimNodeFactory2 *nodeFact) = 0; 
+
+  /**
+   * The transition between the two states will be followed automatically
+   * if there are no other target state to switch to when it is the end of
+   * the animation played by the state with ID fromState. If there are more than
+   * one automatic transition defined from this state, then no transition will be
+   * followed.
+   */
+  virtual void SetAutomaticTransition (CS::Animation::StateID fromState, 
+				       CS::Animation::StateID toState,
+				       bool automatic) = 0;
 };
 
 
@@ -995,7 +1013,14 @@ struct iSkeletonFSMNode2 : public iSkeletonAnimNode2
   SCF_INTERFACE(iSkeletonFSMNode2, 1, 0, 1);
 
   /**
-   * Switch to a new state.
+   * Switch to a new state. If there are some crossfade or transition sub-node
+   * defined for the transition between the current state and the new state, then
+   * they will be used. If no successive call to SwitchToState() is made by the user,
+   * then the FSM will follow any automatic transitions from the new state at the
+   * end of its animation.
+   *
+   * Note that you can switch with this method from any state to any other state
+   * without the need to have defined a transition in the iSkeletonFSMNodeFactory2.
    */
   virtual void SwitchToState (CS::Animation::StateID newState) = 0;
 

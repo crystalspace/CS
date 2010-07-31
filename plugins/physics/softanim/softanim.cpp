@@ -109,7 +109,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
   {
   }
 
-  void SoftBodyControl::SetSoftBody (iBulletSoftBody* body, bool doubleSided)
+  void SoftBodyControl::SetSoftBody (CS::Physics::Bullet::iSoftBody* body, bool doubleSided)
   {
     softBody = body;
     this->doubleSided = doubleSided;
@@ -125,7 +125,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     Update (0, 0, 0);
   }
 
-  iBulletSoftBody* SoftBodyControl::GetSoftBody ()
+  CS::Physics::Bullet::iSoftBody* SoftBodyControl::GetSoftBody ()
   {
     return softBody;
   }

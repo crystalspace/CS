@@ -331,7 +331,7 @@ namespace CS
 	    {
 	      /* Guess reflection plane from mesh bbox:
 		Take smallest dimension of object space bounding box, make that
-		the durection of reflect plane */
+		the direction of reflect plane */
 	      const csBox3& objBB =
 		mesh.meshWrapper->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox();
 	      const csVector3& bbSize = objBB.GetSize();

@@ -789,13 +789,10 @@ namespace CS
 
 /**
  * This is the standard 3D graphics interface.
- * All 3D graphics rasterizer servers for Crystal Space should implement this
- * interface, as well as the iGraphics2D interface.  The standard
- * implementation is csGraphics3DSoftware.
+ * All 3D renderers for Crystal Space implement this interface.
  *
  * Main creators of instances implementing this interface:
  * - OpenGL Renderer plugin (crystalspace.graphics3d.opengl)
- * - Software Renderer plugin (crystalspace.graphics3d.software)
  * - Null 3D Renderer plugin (crystalspace.graphics3d.null)
  *
  * Main ways to get pointers to this interface:

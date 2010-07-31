@@ -61,18 +61,26 @@ struct iSkeletonRagdollManager2 : public virtual iBase
   virtual void ClearAnimNodeFactories () = 0;
 };
 
+namespace CS
+{
+namespace Animation
+{
+
 /**
  * The physical state of a body chain.
  */
-enum csSkeletonRagdollState
+enum RagdollState
 {
-  CS_RAGDOLL_STATE_INACTIVE = 0,   /*!< The chain is physically inactive. */
-  CS_RAGDOLL_STATE_DYNAMIC,        /*!< The chain is dynamic, ie the motion of 
-				  the chain is controlled by the dynamic simulation. */
-  CS_RAGDOLL_STATE_KINEMATIC       /*!< The chain is kinematic, ie the motion 
-				  of the chain is controlled by the animation system,
-				  but its bones do interact with the dynamic simulation. */
+  STATE_INACTIVE = 0,   /*!< The chain is physically inactive. */
+  STATE_DYNAMIC,        /*!< The chain is dynamic, ie the motion of 
+			  the chain is controlled by the dynamic simulation. */
+  STATE_KINEMATIC       /*!< The chain is kinematic, ie the motion 
+			  of the chain is controlled by the animation system,
+			  but its bones do interact with the dynamic simulation. */
 };
+
+} // namespace CS
+} // namespace Animation
 
 /**
  * Factory for the ragdoll animation node.
@@ -86,8 +94,9 @@ struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
    * one body chain is not yet supported.
    * \param state The initial state of the body chain.
    */
-  virtual void AddBodyChain (iBodyChain* chain,
-                  csSkeletonRagdollState state = CS_RAGDOLL_STATE_INACTIVE) = 0;
+  virtual void AddBodyChain
+    (iBodyChain* chain,
+     CS::Animation::RagdollState state = CS::Animation::STATE_INACTIVE) = 0;
 
   /**
    * Remove the chain from the ragdoll animation node.
@@ -100,9 +109,9 @@ struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
    * node is not mandatory.
    *
    * The orientation/position values of the bones that are in state
-   * CS_RAGDOLL_STATE_INACTIVE or CS_RAGDOLL_STATE_KINEMATIC will be read from the
-   * child node, while the bones in state CS_RAGDOLL_STATE_DYNAMIC will be
-   * overwriten by this node.
+   * CS::Animation::STATE_INACTIVE or CS::Animation::STATE_KINEMATIC
+   * will be read from the child node, while the bones in state
+   * CS::Animation::STATE_DYNAMIC will be overwriten by this node.
    */
   virtual void SetChildNode (iSkeletonAnimNodeFactory2* node) = 0;
 
@@ -136,12 +145,12 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
    * Set the body chain in the specified physical state.
    */
   virtual void SetBodyChainState (iBodyChain* chain,
-				  csSkeletonRagdollState state) = 0;
+				  CS::Animation::RagdollState state) = 0;
 
   /**
    * Get the physical state of the body chain specified.
    */
-  virtual csSkeletonRagdollState GetBodyChainState (iBodyChain* chain) = 0;
+  virtual CS::Animation::RagdollState GetBodyChainState (iBodyChain* chain) = 0;
 
   /**
    * Get the rigid body of the specified bone.
@@ -156,12 +165,12 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
   /**
    * Get the count of bones in the specified physical state.
    */
-  virtual uint GetBoneCount (csSkeletonRagdollState state) const = 0;
+  virtual uint GetBoneCount (CS::Animation::RagdollState state) const = 0;
 
   /**
    * Get a bone from its index.
    */
-  virtual BoneID GetBone (csSkeletonRagdollState state, uint index) const = 0;
+  virtual BoneID GetBone (CS::Animation::RagdollState state, uint index) const = 0;
 
   /**
    * Reset the transform of each rigid body of the chain to the initial 'bind'

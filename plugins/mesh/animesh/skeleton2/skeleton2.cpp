@@ -320,15 +320,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     for (size_t i = 0; i < allBones.GetSize (); ++i)
     {
-      if (allBones[i].created && 
-          allBones[i].parent != InvalidBoneID)
+      if (allBones[i].created)
       {
-        CS::Utility::GraphEdge edge (allBones[i].parent, i);
+	CS::Utility::GraphEdge edge (allBones[i].parent, i);
         graph.Push (edge);
       }      
     }
 
     boneOrderList = CS::Utility::TopologicalSort (graph);
+    boneOrderList.Delete (InvalidBoneID);
 
     orderListDirty = false;
   }
@@ -415,6 +415,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     {
       boneRef.boneRotation = rot;
       boneRef.boneOffset = offset;
+      // TODO: no need for cachedTransformsDirty = true; ?
       return;
     }
 

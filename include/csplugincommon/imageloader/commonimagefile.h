@@ -150,9 +150,10 @@ protected:
   class CS_CRYSTALSPACE_EXPORT LoaderJob : 
     public scfImplementation1<LoaderJob, iJob>
   {
-  public:
     /// The actual image loader.
-    csWeakRef<csCommonImageFile> fileToLoad;
+    CS::Threading::Mutex fileToLoadLock;
+    csCommonImageFile* fileToLoad;
+  public:
     /// Result of the iImageFileLoader::LoadData() call.
     bool loadResult;
     /// Create new instance with a given image loader.
@@ -160,6 +161,8 @@ protected:
     virtual ~LoaderJob();
 
     virtual void Run();
+    
+    void ClearFileToLoad ();
   };
 
 #ifdef CSCOMMONIMAGEFILE_THREADED_LOADING

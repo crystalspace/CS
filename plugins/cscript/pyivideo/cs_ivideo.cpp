@@ -26309,6 +26309,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_TEXTURE_SCALE_UP",SWIG_From_int(static_cast< int >(0x00000080)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_SCALE_DOWN",SWIG_From_int(static_cast< int >(0x00000100)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_CREATE_CLEAR",SWIG_From_int(static_cast< int >(0x00000200)));
+  SWIG_Python_SetConstant(d, "CS_TEXTURE_CUBEMAP_DISABLE_SEAMLESS",SWIG_From_int(static_cast< int >(0x00000400)));
   SWIG_Python_SetConstant(d, "CS_MATERIAL_VARNAME_FLATCOLOR",SWIG_FromCharPtr("mat flatcolor"));
   SWIG_Python_SetConstant(d, "CS_MATERIAL_TEXTURE_DIFFUSE",SWIG_FromCharPtr("tex diffuse"));
 }

@@ -29,7 +29,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
 class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
-    iBulletSoftBody>, public BulletBody
+    iSoftBody>
 {
   friend class csBulletDynamicsSystem;
 
@@ -37,7 +37,17 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   csBulletSoftBody (csBulletDynamicsSystem* dynSys, btSoftBody* body);
   ~csBulletSoftBody ();
 
-  //-- iBulletSoftBody
+  //-- CS::Physics::Bullet::iBody
+  virtual CS::Physics::Bullet::BodyType GetType () const
+  { return bodyType; }
+  virtual ::iRigidBody* QueryRigidBody ()
+  { return 0; }
+  virtual CS::Physics::Bullet::iSoftBody* QuerySoftBody ()
+  { return this; }
+  virtual CS::Physics::Bullet::iTerrainCollider* QueryTerrainCollider ()
+  { return 0; }
+
+  //-- CS::Physics::Bullet::iSoftBody
   virtual void DebugDraw (iView* rview);
   virtual void SetMass (float mass);
   virtual float GetMass () const;
@@ -45,7 +55,7 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   virtual csVector3 GetVertexPosition (size_t index) const;
   virtual csVector3 GetVertexNormal (size_t index) const;
   virtual void AnchorVertex (size_t vertexIndex);
-  virtual void AnchorVertex (size_t vertexIndex, iRigidBody* body);
+  virtual void AnchorVertex (size_t vertexIndex, ::iRigidBody* body);
   virtual void SetRigidity (float rigidity);
   virtual float GetRigidity () const;
   virtual void SetLinearVelocity (csVector3 velocity);
@@ -57,6 +67,7 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   virtual csTriangle GetTriangle (size_t index) const;
 
  private:
+  CS::Physics::Bullet::BodyType bodyType;
   csBulletDynamicsSystem* dynSys;
   btSoftBody* body;
 };

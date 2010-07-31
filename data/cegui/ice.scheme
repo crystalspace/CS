@@ -42,4 +42,12 @@
 	<FalagardMapping WindowType="ice/Tooltip" TargetType="CEGUI/Tooltip" Renderer="Falagard/Tooltip" LookNFeel="ice/Tooltip" />
 	<FalagardMapping WindowType="ice/StaticImage" TargetType="DefaultWindow" Renderer="Falagard/StaticImage" LookNFeel="ice/StaticImage" />
 	<FalagardMapping WindowType="ice/StaticText"  TargetType="DefaultWindow" Renderer="Falagard/StaticText"  LookNFeel="ice/StaticText" />
+
+  <FalagardMapping WindowType="ice/HorzSlider"      TargetType="CEGUI/Slider" Renderer="Falagard/Slider"  LookNFeel="ice/HorzSlider" />
+  <FalagardMapping WindowType="ice/HorzSliderThumb" TargetType="CEGUI/Thumb"  Renderer="Falagard/Button"  LookNFeel="ice/HorzSliderThumb" />
+
+
+  <FalagardMapping WindowType="ice/SettingSlider"  TargetType="CEGUI/SettingSlider" Renderer="Falagard/Default"  LookNFeel="ice/SettingSlider" />
+  <FalagardMapping WindowType="ice/SettingComboBox"  TargetType="CEGUI/SettingComboBox" Renderer="Falagard/Default"  LookNFeel="ice/SettingComboBox" />
+  
 </GUIScheme>

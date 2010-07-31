@@ -38,6 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
   public:
     virtual void NewAnimation (size_t data) = 0;
+    virtual void InstructionQueueEmpty (size_t data) = 0;
   protected:
     virtual ~AnimationFifoCb() {}
   };
@@ -49,6 +50,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     void PushAnimation (iSkeletonAnimNode2* node, bool directSwitch,
       float blendInTime = 0.0f, size_t cbData = ~0);
+    void RemoveAnimations (size_t cbData);
 
     void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
     void TickAnimation (float dt);
@@ -62,6 +64,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       size_t cbData;
       float blendInTime;
       bool directSwitch;
+
+      bool operator== (const AnimationInstruction& other) const
+      {
+        return cbData == other.cbData;
+      }
     };
 
     enum
@@ -106,6 +113,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       CS::Animation::StateID toState, iSkeletonAnimNodeFactory2* fact);
     virtual void SetTransitionCrossfade (CS::Animation::StateID fromState, 
       CS::Animation::StateID toState, float time1, float time2);
+    virtual void SetAutomaticTransition (CS::Animation::StateID fromState, 
+      CS::Animation::StateID toState, bool automatic);
 
     //-- iSkeletonAnimationNodeFactory2
     virtual csPtr<iSkeletonAnimNode2> CreateInstance (
@@ -133,12 +142,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     struct StateTransitionInfo
     {
       StateTransitionInfo ()
-        : time1 (0.0f), time2 (0.0f), directSwitch (true)
+      : time1 (0.0f), time2 (0.0f)//, directSwitch (true)
       {}
 
       csRef<iSkeletonAnimNodeFactory2> nodeFactory;
       float time1, time2;
-      bool directSwitch;
+      //bool directSwitch;
     };
 
   private:
@@ -146,6 +155,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     csString name;
     csArray<State> stateList;
     csHash<StateTransitionInfo, StateTransitionKey> transitions;
+    csHash<CS::Animation::StateID, CS::Animation::StateID> automaticTransitions;
 
     CS::Animation::StateID startState;
 
@@ -166,6 +176,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     //-- iSkeletonFSMNode2
     virtual void SwitchToState (CS::Animation::StateID newState);
+    void SwitchToState (CS::Animation::StateID newState, bool directSwitch);
     virtual CS::Animation::StateID GetCurrentState () const;
     virtual iSkeletonAnimNode2* GetStateNode (CS::Animation::StateID state) const;
 
@@ -187,6 +198,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     //-- AnimationFifoCb
     virtual void NewAnimation (size_t data);
+    virtual void InstructionQueueEmpty (size_t data);
   private:
     struct State
     {
@@ -196,24 +208,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     struct StateTransitionInfo
     {
       StateTransitionInfo ()
-        : time1 (0.0f), time2 (0.0f), directSwitch (true)
+      : time1 (0.0f), time2 (0.0f)//, directSwitch (true)
       {}      
 
       csRef<iSkeletonAnimNode2> transitionNode;
       float time1, time2;
-      bool directSwitch;
+      //bool directSwitch;
     };
 
     csRef<FSMNodeFactory> factory;
     csArray<State> stateList;
     csHash<StateTransitionInfo, FSMNodeFactory::StateTransitionKey> transitions;
+    csHash<CS::Animation::StateID, CS::Animation::StateID> automaticTransitions;
 
     CS::Animation::StateID currentState;    
+    CS::Animation::StateID automaticState;    
     float playbackSpeed;
 
     bool isActive;   
     AnimationFifo blendFifo;
-
 
     friend class FSMNodeFactory;
   };
