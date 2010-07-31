@@ -1900,8 +1900,8 @@ void csGLGraphics3D::SetTextureComparisonModes (int* units,
       
       if (ext->CS_GL_ARB_multitexture)
       {
-	statecache->SetCurrentImageUnit (unit);
-	statecache->ActivateImageUnit ();
+	      statecache->SetCurrentImageUnit (unit);
+	      statecache->ActivateImageUnit ();
       }
       else if (unit != 0) continue;
       
@@ -1917,8 +1917,8 @@ void csGLGraphics3D::SetTextureComparisonModes (int* units,
       
       if (ext->CS_GL_ARB_multitexture)
       {
-	statecache->SetCurrentImageUnit (unit);
-	statecache->ActivateImageUnit ();
+	      statecache->SetCurrentImageUnit (unit);
+	      statecache->ActivateImageUnit ();
       }
       else if (unit != 0) continue;
       
@@ -2113,7 +2113,8 @@ void csGLGraphics3D::DrawQuad()
 
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
-    const csShaderVariableStack& stacks)
+    const csShaderVariableStack& stacks,
+    bool bDisableCulling)
 {
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
@@ -2273,26 +2274,32 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     mirrorflag = !mymesh->do_mirror;
   else
     mirrorflag = mymesh->do_mirror;
-    
+
   GLenum cullFace;
   statecache->GetCullFace (cullFace);
-    
+
   CS::Graphics::MeshCullMode cullMode = modes.cullMode;
   // Flip face culling if we do mirroring
   if (mirrorflag)
     cullMode = CS::Graphics::GetFlippedCullMode (cullMode);
-  
-  if (cullMode == CS::Graphics::cullDisabled)
+  if(bDisableCulling)
   {
     statecache->Disable_GL_CULL_FACE ();
   }
   else
   {
-    statecache->Enable_GL_CULL_FACE ();
+    if (cullMode == CS::Graphics::cullDisabled)
+    {
+      statecache->Disable_GL_CULL_FACE ();
+    }
+    else
+    {
+      statecache->Enable_GL_CULL_FACE ();
     
-    // Flip culling if shader wants it
-    if (cullMode == CS::Graphics::cullFlipped)
-      statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
+      // Flip culling if shader wants it
+      if (cullMode == CS::Graphics::cullFlipped)
+        statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
+    }
   }
 
   const uint mixmode = modes.mixmode;
@@ -2387,6 +2394,11 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     glPopMatrix ();
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
+
+  if(bDisableCulling)
+  {
+    statecache->Enable_GL_CULL_FACE ();
+  }
   // Restore cull mode
   if (cullMode == CS::Graphics::cullFlipped) statecache->SetCullFace (cullFace);
   //statecache->Disable_GL_POLYGON_OFFSET_FILL ();
@@ -3610,13 +3622,13 @@ bool csGLGraphics3D::SetOption (const char* name, const char* value)
 }
 
 void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
-				     uint flags)
+				     uint flags, const bool bDisableCulling)
 {
-  csGLGraphics3D::DrawSimpleMeshes (&mesh, 1, flags);
+  csGLGraphics3D::DrawSimpleMeshes (&mesh, 1, flags, bDisableCulling);
 }
 
 void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
-				       size_t numMeshes, uint flags)
+				       size_t numMeshes, uint flags, bool bDisableCulling)
 {  
   
   if (current_drawflags & CSDRAW_2DGRAPHICS)
@@ -3675,20 +3687,20 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
     {
       if (scrapIndicesSize < indexCount)
       {
-	scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
-	  CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
-	scrapIndicesSize = indexCount;
+	      scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
+	        CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
+	      scrapIndicesSize = indexCount;
       }
       if (scrapVerticesSize < mesh.vertexCount)
       {
-	scrapVertices = csRenderBuffer::CreateRenderBuffer (
-	  mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-	scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
-	  mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
-	scrapColors = csRenderBuffer::CreateRenderBuffer (
-	  mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
+	      scrapVertices = csRenderBuffer::CreateRenderBuffer (
+	        mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+	      scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
+	        mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
+	      scrapColors = csRenderBuffer::CreateRenderBuffer (
+	        mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
     
-	scrapVerticesSize = mesh.vertexCount;
+	      scrapVerticesSize = mesh.vertexCount;
       }
     }
 
@@ -3698,13 +3710,13 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
       sv = scrapContext.GetVariableAdd (string_indices);
       if (mesh.indices)
       {
-	scrapIndices->CopyInto (mesh.indices, indexCount);
+	      scrapIndices->CopyInto (mesh.indices, indexCount);
       }
       else
       {
-	csRenderBufferLock<uint> indexLock (scrapIndices);
-	for (uint i = 0; i < mesh.vertexCount; i++)
-	  indexLock[(size_t)i] = i;
+	      csRenderBufferLock<uint> indexLock (scrapIndices);
+	      for (uint i = 0; i < mesh.vertexCount; i++)
+	        indexLock[(size_t)i] = i;
       }
       sv->SetValue (scrapIndices);
       scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
@@ -3712,44 +3724,44 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
       sv = scrapContext.GetVariableAdd (string_vertices);
       if (mesh.vertices)
       {
-	scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
-	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
-	if (useShader)
-	  sv->SetValue (scrapVertices);
+	      scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
+	      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
+	      if (useShader)
+	        sv->SetValue (scrapVertices);
       }
       else
       {
-	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
-	if (useShader)
-	  sv->SetValue (0);
+	      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
+	      if (useShader)
+	        sv->SetValue (0);
       }
       sv = scrapContext.GetVariableAdd (string_texture_coordinates);
       if (mesh.texcoords)
       {
-	scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
-	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
-	if (useShader)
-	  sv->SetValue (scrapTexcoords);
+	      scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
+	      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
+	      if (useShader)
+	        sv->SetValue (scrapTexcoords);
       }
       else
       {
-	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
-	if (useShader)
-	  sv->SetValue (0);
+	      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
+	      if (useShader)
+	        sv->SetValue (0);
       }
       sv = scrapContext.GetVariableAdd (string_colors);
       if (mesh.colors)
       {
-	scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
-	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
-	if (useShader)
-	  sv->SetValue (scrapColors);
+	      scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
+	      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
+	      if (useShader)
+	        sv->SetValue (scrapColors);
       }
       else
       {
-	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
-	if (useShader)
-	  sv->SetValue (0);
+	      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
+	      if (useShader)
+	        sv->SetValue (0);
       }
     }
     if (useShader)
@@ -3762,29 +3774,29 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
     {
       if (fixedFunctionForcefulEnable)
       {
-	const GLenum state = GL_LIGHTING;
-	GLboolean s = glIsEnabled (state);
-	if (s) glDisable (state); else glEnable (state);
-	glBegin (GL_TRIANGLES);  glEnd ();
-	if (s) glEnable (state); else glDisable (state);
+	      const GLenum state = GL_LIGHTING;
+	      GLboolean s = glIsEnabled (state);
+	      if (s) glDisable (state); else glEnable (state);
+	      glBegin (GL_TRIANGLES);  glEnd ();
+	      if (s) glEnable (state); else glDisable (state);
       }
       if (ext->CS_GL_ARB_multitexture)
       {
-	statecache->SetCurrentImageUnit (0);
-	statecache->ActivateImageUnit ();
-	statecache->SetCurrentTCUnit (0);
-	statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
+	      statecache->SetCurrentImageUnit (0);
+	      statecache->ActivateImageUnit ();
+	      statecache->SetCurrentTCUnit (0);
+	      statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
       }
       if (mesh.texture)
       {
-	ActivateTexture (mesh.texture);
-	imageUnits[0].texture->ChangeTextureCompareMode (
-	  CS::Graphics::TextureComparisonMode ());
+	      ActivateTexture (mesh.texture);
+	      imageUnits[0].texture->ChangeTextureCompareMode (
+	        CS::Graphics::TextureComparisonMode ());
       }
       else
       {
-	DeactivateTexture ();
-	needDisableTexture = false;
+	      DeactivateTexture ();
+	      needDisableTexture = false;
       }
     }
 
@@ -3830,14 +3842,14 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
 
       iTextureHandle* tex = 0;
       csShaderVariable *texVar = csGetShaderVariableFromStack (stack, 
-		mesh.alphaType.autoModeTexture);
+		  mesh.alphaType.autoModeTexture);
       if (texVar)
-		texVar->GetValue (tex);
+		    texVar->GetValue (tex);
 
       if (tex == 0)
-		tex = mesh.texture;
+		    tex = mesh.texture;
       if (tex != 0)
-	autoMode = tex->GetAlphaType ();
+	      autoMode = tex->GetAlphaType ();
 
       rmesh.alphaType = autoMode;
     }
@@ -3861,34 +3873,34 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
     {
       if (mesh.shader != 0)
       {
-		mesh.shader->ActivatePass (shaderTicket, p);
-		mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stack);
+		    mesh.shader->ActivatePass (shaderTicket, p);
+		    mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stack);
       }
       else if (mesh.renderBuffers)
       {
-		ActivateBuffers (mesh.renderBuffers, defaultBufferMapping);
+		    ActivateBuffers (mesh.renderBuffers, defaultBufferMapping);
       }
       else
       {
-		ActivateBuffers (scrapBufferHolder, defaultBufferMapping);
+		    ActivateBuffers (scrapBufferHolder, defaultBufferMapping);
       }
-      DrawMesh (&rmesh, modes, stack);
+      DrawMesh (&rmesh, modes, stack,bDisableCulling);
       if (mesh.shader != 0)
       {
-		mesh.shader->TeardownPass (shaderTicket);
-		mesh.shader->DeactivatePass (shaderTicket);
-		needDisableBuffers = false;
+		    mesh.shader->TeardownPass (shaderTicket);
+		    mesh.shader->DeactivatePass (shaderTicket);
+		    needDisableBuffers = false;
       }
       else
       {
-		needDisableBuffers = true;
+		    needDisableBuffers = true;
       }
     }
 
     if (!useShader)
     {
       if (mesh.texture)
-	needDisableTexture = true;
+	      needDisableTexture = true;
     }
   }
 

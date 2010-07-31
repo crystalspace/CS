@@ -60,6 +60,8 @@ namespace CS
   {
     struct CoreRenderMesh;
     struct RenderMeshModes;
+
+    enum MeshCullMode;
   } // namespace Graphics
 } // namespace CS
 class csRenderBufferHolder;
@@ -724,6 +726,8 @@ struct csSimpleRenderMesh
   csZBufMode z_buf_mode;
   /// (Optional) Mix mode. Defaults to CS_FX_COPY.
   uint mixmode;
+
+  //CS::Graphics::MeshCullMode cullMode;
   /**
    * (Optional) Transform to apply to the mesh.
    * \remark This transform is initialized to an identity transform.
@@ -745,6 +749,7 @@ struct csSimpleRenderMesh
   {  
     alphaType.autoAlphaMode = true;
     alphaType.autoModeTexture = csInvalidStringID;
+    //cullMode=CS::Graphics::MeshCullMode::cullDisabled;
   };
 };
 
@@ -957,7 +962,8 @@ struct iGraphics3D : public virtual iBase
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
                          const CS::Graphics::RenderMeshModes& modes,
-                         const csShaderVariableStack& stack) = 0;
+                         const csShaderVariableStack& stack, 
+                         bool bDisableCulling=false) = 0;
 
   /**
   * Draw a csSimpleRenderMesh on the screen.
@@ -976,7 +982,7 @@ struct iGraphics3D : public virtual iBase
   *  case, you are responsible for the mess that is likely created.
   */
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh,
-    uint flags = 0) = 0;
+    uint flags = 0, bool bDisableCulling=false) = 0;
 
   /**
    * Draw a pixmap using a rectangle from given texture.
@@ -1199,7 +1205,7 @@ struct iGraphics3D : public virtual iBase
    * \sa DrawSimpleMesh
    */
   virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
-    size_t numMeshes, uint flags = 0) = 0;
+    size_t numMeshes, uint flags = 0, bool bDisableCulling=false) = 0;
 
   /**
    * Initialise a set of occlusion queries.

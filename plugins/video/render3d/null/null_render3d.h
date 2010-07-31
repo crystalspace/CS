@@ -151,7 +151,7 @@ public:
     int) {}
   void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
     const CS::Graphics::RenderMeshModes& modes,
-    const csShaderVariableStack& stack);
+    const csShaderVariableStack& stack,bool bDisableCulling = false);
   void SetWriteMask (bool red, bool green, bool blue, bool alpha);
   void GetWriteMask (bool& red, bool& green, bool& blue, bool& alpha) const;
   void SetZMode (csZBufMode mode) { zmode = mode; }
@@ -170,9 +170,9 @@ public:
 
   void SetWorldToCamera (const csReversibleTransform& w2c) { this->w2c = w2c; }
   const csReversibleTransform& GetWorldToCamera () { return w2c; }
-  void DrawSimpleMesh (const csSimpleRenderMesh& /*mesh*/, uint /*flags*/ = 0) { }
+  void DrawSimpleMesh (const csSimpleRenderMesh& /*mesh*/, uint /*flags*/ = 0, bool = false) { }
   void DrawSimpleMeshes (const csSimpleRenderMesh* /*meshes*/,
-    size_t /*numMeshes*/, uint /*flags*/ = 0) { }
+    size_t /*numMeshes*/, uint /*flags*/ = 0, bool = false) { }
 
   bool PerformExtension (char const* /*command*/, ...) { return false; }
   bool PerformExtensionV (char const* /*command*/, va_list /*args*/)

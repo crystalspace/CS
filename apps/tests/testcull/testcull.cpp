@@ -492,7 +492,7 @@ void Testcull::CreateRoom ()
   int k=0;
   char aux[100],name[]="MyHouse";
 
-  numVisible=numHouses=4;
+  numVisible=numHouses=36;
 
   for(int i=0;i<numHouses;i++)
   {

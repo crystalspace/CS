@@ -50,7 +50,7 @@
 #include "gl_txtmgr.h"
 #include "gl_renderbuffer.h"
 #include "gl_r2t_backend.h"
-
+#include "ivideo/rendermesh.h"
 struct csGLExtensionManager;
 
 struct iBugPlug;
@@ -702,7 +702,8 @@ public:
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
     const CS::Graphics::RenderMeshModes& modes,
-    const csShaderVariableStack& stack);
+    const csShaderVariableStack& stack,
+    bool bDisableCulling=false);
 
   /// Draw a 2D sprite
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
@@ -778,9 +779,9 @@ public:
   virtual bool SetOption (const char*, const char*);
 
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
-    uint flags = 0);
+    uint flags = 0, bool bDisableCulling=false);
   virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
-    size_t numMeshes, uint flags = 0);
+    size_t numMeshes, uint flags = 0, bool bDisableCulling=false);
 
   //virtual void DrawSimpleMaskedMeshes (const csSimpleRenderMesh* meshes,
 	//			       size_t numMeshes, uint flags);

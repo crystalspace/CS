@@ -122,12 +122,27 @@ static void ConstructBBoxMesh(csBox3 &box,csSimpleRenderMesh &srm,csRenderMeshTy
 
 int csFrustumVis::GetFinishedQuery(OccQuery &oq)
 {
-  unsigned int i;
+  unsigned int i=0;
   int q=0;
   CHCList<OccQuery>::Iterator it;
   OccQuery oc;
 
-  it=CHCList<OccQuery>::Iterator(Q_Queue);
+  oc=Q_Queue.Front();
+  if(g3d->OQueryFinished(oc.qID[0]))
+  {
+    Q_Queue.PopFront();
+    if(g3d->OQIsVisible(oc.qID[0],VISIBILITY_THRESHOLD))
+    {
+      oq=oc;
+      return 1; // return visible result from query
+    }
+    else
+    {
+      oq=oc;
+      return -1; // return non visible result from query
+    }
+  }
+  /*it=CHCList<OccQuery>::Iterator(Q_Queue);
   for(q=0;q<Q_Queue.Size();++q,++it)
   {
     if(it.HasCurrent()) oc=it.FetchCurrent();
@@ -144,12 +159,12 @@ int csFrustumVis::GetFinishedQuery(OccQuery &oq)
         else
         {
           oq=*it;
-          Q_Queue.Delete(oq);;
+          Q_Queue.Delete(oq);
           return -1; // return non visible result from query
         }
       }
     }
-  }
+  }*/
   return 0; // no queries were found while searching
 }
 
@@ -244,7 +259,8 @@ void csFrustumVis::RenderQuery(NodeTraverseData &ntdNode,bool bUseBB)
     csSimpleRenderMesh srm;
     csBox3 bbox=ntdNode.kdtNode->GetNodeBBox();
     ConstructBBoxMesh(bbox,srm,CS_MESHTYPE_QUADS,CS_ZBUF_USE);
-    g3d->DrawSimpleMesh(srm);
+    g3d->DrawSimpleMesh(srm,0,true);
+    //g3d->EnableCullFace();
     /*csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
     NodeTraverseData ntd;
@@ -263,7 +279,7 @@ void csFrustumVis::RenderQuery(NodeTraverseData &ntdNode,bool bUseBB)
   }
 }
 
-void csFrustumVis::IssueSingleQuery(NodeTraverseData &ntdNode,bool bUseBB)
+unsigned int csFrustumVis::IssueSingleQuery(NodeTraverseData &ntdNode,bool bUseBB)
 {
   int numq=1;
   unsigned int *queries;
@@ -279,6 +295,7 @@ void csFrustumVis::IssueSingleQuery(NodeTraverseData &ntdNode,bool bUseBB)
   oc.numQueries=1;
   oc.ntdNode=ntdNode;
   Q_Queue.PushBack(oc);
+  return *oc.qID;
 }
 
 void csFrustumVis::QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode)

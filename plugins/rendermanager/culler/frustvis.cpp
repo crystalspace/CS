@@ -505,6 +505,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
       }
       if(res)
       {
+        //printf("Query Done %x %d %d\n",oc.ntdNode.kdtNode,*oc.qID,res);
         //printf("Cleaning up query...\n");
         g3d->OQDelQueries(oc.qID,oc.numQueries);
         if(oc.IsMultiQuery())
@@ -535,11 +536,11 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
 
       //check to see if the node was last visible
       const bool bWasVisible=WasVisible(ntdCurrent,cur_timestamp);
-      bWasVisible?printf("Was visible\n"):printf("Was NOT visible\n");
+      //bWasVisible?printf("%x Was visible\n",ntdCurrent.kdtNode):printf("%x Was NOT visible\n",ntdCurrent.kdtNode);
 
       // identify nodes that we cannot skip queries for
       const bool bLeafOrWasInvisible=( !bWasVisible || ntdCurrent.IsLeaf() );
-      if(!bWasVisible && !ntdCurrent.IsLeaf()) printf("wasn't visible and isn't leaf\n");
+      //if(!bWasVisible && !ntdCurrent.IsLeaf()) printf("wasn't visible and isn't leaf\n");
 
       // reset node's visibility classification
       ntdCurrent.SetVisibility(false);
@@ -547,20 +548,24 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
       // update the timestamp flag
       ntdCurrent.SetTimestamp(cur_timestamp);
 
+      ntdCurrent.kdtNode->Distribute ();
       if(bLeafOrWasInvisible)
       {
         csBox3 bb=ntdCurrent.kdtNode->GetNodeBBox();
-        printf("Issuing query (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bb.MinX(),bb.MinY(),bb.MinZ(),
-          bb.MaxX(),bb.MaxY(),bb.MaxZ());
+        //printf("Issuing query (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bb.MinX(),bb.MinY(),bb.MinZ(),
+        //  bb.MaxX(),bb.MaxY(),bb.MaxZ());
         if(ntdCurrent.IsLeaf())
           IssueSingleQuery(ntdCurrent,false);
         else
           IssueSingleQuery(ntdCurrent,true);
+        /*if(ntdCurrent.IsLeaf())
+          printf("Issuing query %x %d\n",ntdCurrent.kdtNode,IssueSingleQuery(ntdCurrent,false));
+        else
+          printf("Issuing query %x %d\n",ntdCurrent.kdtNode,IssueSingleQuery(ntdCurrent,true));*/
       }
 
       // important...never try and traverse before doing a distribute
       // unless the node is fully visible, in which case it doesn't matter
-      ntdCurrent.kdtNode->Distribute ();
       if(bWasVisible)
         TraverseNode(ntdCurrent,cur_timestamp);
     }
@@ -600,7 +605,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
 
   // here we should process the remaining nodes in the multi query
 
-  printf("\n\n");
+  //printf("\n\n");
 
   g3d->SetWriteMask(true,true,true,true);
   g3d->SetClipper (0, CS_CLIPPER_NONE);

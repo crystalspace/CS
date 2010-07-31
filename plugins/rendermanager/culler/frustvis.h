@@ -306,7 +306,7 @@ private:
 
   void RenderQuery(NodeTraverseData &ntdNode,bool bUseBB);
   void IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord> &objArray);
-  void IssueSingleQuery(NodeTraverseData &ntdNode,bool bUseBB);
+  unsigned int IssueSingleQuery(NodeTraverseData &ntdNode,bool bUseBB);
 
   /**
    *  Gets the first finished query from the query list.
