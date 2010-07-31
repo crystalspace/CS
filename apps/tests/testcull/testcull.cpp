@@ -191,6 +191,22 @@ void Testcull::Frame ()
   {
     printf("Cannot prepare renderer for 3D drawing\n");
   }
+
+  const csReversibleTransform& camt = c->GetTransform ();
+  g3d->SetWorldToCamera (camt.GetInverse ());
+
+  csSimpleRenderMesh srm;
+  csBox3 bb=house[0]->GetWorldBoundingBox();
+  srm=ConstructBBoxMesh(bb,CS_MESHTYPE_QUADS,CS_ZBUF_USE);
+  g3d->DrawSimpleMesh(srm);
+
+  g3d->FinishDraw();*/
+
+
+  /*if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+  {
+    printf("Cannot prepare renderer for 3D drawing\n");
+  }
   g3d->FinishDraw();
 
   c->SetViewportSize (g3d->GetWidth(), g3d->GetHeight());
