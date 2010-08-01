@@ -481,6 +481,61 @@ void Lod::Save(const char* filename)
   vfs->Sync();
 }
 
+#if 0
+// TODO
+void Lod::Save(const char* filename)
+{
+  csRef<iVFS> vfs;
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+  if (!vfs)
+  {
+    cout << "No iVFS!" << endl;
+    return;
+  }
+  csRef<iFile> file = vfs->Open(filename, VFS_FILE_READ);
+  
+  
+  csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
+  csRef<iDocument> doc = xml->CreateDocument();
+  const char* result = doc->Parse(file);
+  if (result)
+  {
+    cout << "Error parsing file: " << result << endl;
+    return;
+  }
+  
+  // ...
+  
+  scfString str;
+  doc->Write(&str);
+  vfs->WriteFile(filename, str.GetData(), str.Length());
+  vfs->Sync();
+}
+#endif
+
+void Lod::CloneNode (iDocumentNode* from, iDocumentNode* to)
+{
+  to->SetValue (from->GetValue ());
+  csRef<iDocumentNodeIterator> it = from->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    csRef<iDocumentNode> child_clone = to->CreateNodeBefore (child->GetType (), 0);
+    CloneNode (child, child_clone);
+  }
+  CloneAttributes (from, to);
+}
+
+void Lod::CloneAttributes (iDocumentNode* from, iDocumentNode* to)
+{
+  csRef<iDocumentAttributeIterator> atit = from->GetAttributes ();
+  while (atit->HasNext ())
+  {
+    csRef<iDocumentAttribute> attr = atit->Next ();
+    to->SetAttribute (attr->GetName (), attr->GetValue ());
+  }
+}
+
 bool Lod::SetupModules ()
 {
   // Now get the pointer to various modules we need. We fetch them

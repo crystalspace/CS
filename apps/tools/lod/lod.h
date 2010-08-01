@@ -83,6 +83,9 @@ private:
   csRef<iThreadReturn> loading;
   void CreateLODs(const char* filename_in, const char* filename_out);
   void Save(const char* filename);
+  void CloneNode (iDocumentNode* from, iDocumentNode* to);
+  void CloneAttributes (iDocumentNode* from, iDocumentNode* to);
+  
   
   /// Here we will create our little, simple world.
   void CreateRoom ();
