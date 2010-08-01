@@ -85,6 +85,7 @@ struct iFurMaterial : public virtual iMaterial
   virtual void GenerateGeometry (iView* view, iSector* room) = 0;
   virtual void SetGuideLOD(float guideLOD) = 0; 
   virtual void SetStrandLOD(float strandLOD) = 0; 
+  virtual void SetLOD(float lod) = 0;
 
   virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl) = 0;
   virtual void StartPhysicsControl ( ) = 0;

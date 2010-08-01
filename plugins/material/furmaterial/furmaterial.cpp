@@ -626,6 +626,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     strandWidthLOD = 1 / ( strandLOD * 0.75f + 0.25f ) * strandWidth;
   }
 
+  void FurMaterial::SetLOD(float lod)
+  {
+    SetGuideLOD(lod);
+    SetStrandLOD(lod);
+  }
+
   void FurMaterial::GaussianBlur(TextureData texture)
   {
     CS::StructuredTextureFormat readbackFmt 

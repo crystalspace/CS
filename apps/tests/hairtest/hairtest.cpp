@@ -251,6 +251,8 @@ bool HairTest::OnEventThumbTrackEndedStrandLOD (const CEGUI::EventArgs&)
 
 bool HairTest::OnEventThumbTrackEndedOverallLOD (const CEGUI::EventArgs&)
 {
+  avatarScene->furMaterial->SetLOD(sliderOverallLOD->getScrollPosition());
+
   return true;
 }
 

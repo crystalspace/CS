@@ -109,6 +109,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     virtual void GenerateGeometry (iView* view, iSector *room);
     virtual void SetGuideLOD(float guideLOD);
     virtual void SetStrandLOD(float strandLOD);
+    virtual void SetLOD(float lod);
 
     virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl);
     virtual void StartPhysicsControl ( );
