@@ -68,7 +68,7 @@
 
     <input name="texDiffuse1" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse" destination="fragmentIn.texDiffuse1" fallback="tex diffuse 1" />
+	  <texture name="tex diffuse 1" destination="fragmentIn.texDiffuse1" fallback="tex diffuse" />
       </block>
       
       <block location="cg:fragmentIn">
