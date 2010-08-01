@@ -120,6 +120,12 @@ static void ConstructBBoxMesh(csBox3 &box,csSimpleRenderMesh &srm,csRenderMeshTy
   srm.z_buf_mode=zbuf;
 }
 
+static void ReleaseBBoxMesh(csSimpleRenderMesh &srm)
+{
+  delete [] srm.vertices;
+  delete [] srm.colors;
+}
+
 int csFrustumVis::GetFinishedQuery(OccQuery &oq)
 {
   unsigned int i=0;
@@ -227,14 +233,15 @@ void csFrustumVis::RenderQuery(NodeTraverseData &ntdNode,bool bUseBB)
     for(int i=0;i<num_objects;i++)
     {
       iMeshWrapper* const mw=static_cast<csFrustVisObjectWrapper*>(objects[i]->GetObject())->mesh;
-      /*if(bUseBB)
+      if(bUseBB)
       {
         csSimpleRenderMesh srm;
         csBox3 bbox=mw->GetWorldBoundingBox();
         ConstructBBoxMesh(bbox,srm,CS_MESHTYPE_QUADS,CS_ZBUF_USE);
         g3d->DrawSimpleMesh(srm);
+        ReleaseBBoxMesh(srm);
       }
-      else*/
+      else
       {
         int numMeshes=0;
         const uint32 frust_mask=f2bData.rview->GetRenderContext ()->clip_planes_mask;
@@ -256,12 +263,12 @@ void csFrustumVis::RenderQuery(NodeTraverseData &ntdNode,bool bUseBB)
   }
   else
   {
-    csSimpleRenderMesh srm;
+    /*csSimpleRenderMesh srm;
     csBox3 bbox=ntdNode.kdtNode->GetNodeBBox();
     ConstructBBoxMesh(bbox,srm,CS_MESHTYPE_QUADS,CS_ZBUF_USE);
     g3d->DrawSimpleMesh(srm,0,true);
-    //g3d->EnableCullFace();
-    /*csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
+    ReleaseBBoxMesh(srm);*/
+    csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
     NodeTraverseData ntd;
     if(child2)
@@ -275,7 +282,7 @@ void csFrustumVis::RenderQuery(NodeTraverseData &ntdNode,bool bUseBB)
       ntd=NodeTraverseData(child1,ntdNode.kdtNode,ntdNode.GetFrustumMask(),
                              ntdNode.IsCompletelyVisible());
       RenderQuery(ntd,bUseBB);
-    }*/
+    }
   }
 }
 
