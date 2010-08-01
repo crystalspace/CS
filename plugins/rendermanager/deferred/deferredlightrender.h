@@ -298,8 +298,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       /* Mesh and material used for drawing ambient light. Assumed to be in the
        * xy plane with the bottom left corner at the origin with a width and 
-       * height of 1 along the positive x and y axes. */
-      csRef<iMeshWrapper> quadMesh;
+       * height equal to the screens width and height. */
+      csSimpleRenderMesh quadMesh;
 
       /* Materials used for computing lighting results. */
       csRef<iMaterialWrapper> pointMaterial;
@@ -319,6 +319,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         csRef<iEngine> engine = csQueryRegistry<iEngine> (objRegistry);
         csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
+        csRef<iGraphics3D> graphics3D = csQueryRegistry<iGraphics3D> (objRegistry);
         csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager> (objRegistry);
         csRef<iStringSet> stringSet = csQueryRegistryTagInterface<iStringSet> (objRegistry, 
           "crystalspace.shared.stringset");
@@ -409,22 +410,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
           directionalLightShader);
 
         // Builds the quad.
-        CS::Geometry::TesselatedQuad quadPrim (csVector3 (0.0f, 0.0f, 0.0f), 
-                                               csVector3 (0.0f, 1.0f, 0.0f),
-                                               csVector3 (1.0f, 0.0f, 0.0f));
+        float w = graphics3D->GetDriver2D ()->GetWidth ();
+        float h = graphics3D->GetDriver2D ()->GetHeight ();
 
-        csRef<iMeshFactoryWrapper> quadFactory = GeneralMeshBuilder::CreateFactory (engine, 
-          "crystalspace.rendermanager.deferred.lightrender.quad", 
-          &quadPrim);
+        quadVerts[0] = csVector3 (0.0f, 0.0f, 0.0f);
+        quadVerts[1] = csVector3 (0.0f,    h, 0.0f);
+        quadVerts[2] = csVector3 (   w,    h, 0.0f);
+        quadVerts[3] = csVector3 (   w, 0.0f, 0.0f);
 
-        quadMesh = quadFactory->CreateMeshWrapper ();
+        quadMesh.meshtype = CS_MESHTYPE_TRIANGLEFAN;
+        quadMesh.vertices = quadVerts;
+        quadMesh.vertexCount = 4;
+        quadMesh.z_buf_mode = CS_ZBUF_NONE;
+        quadMesh.mixmode = CS_FX_ADD;
+        quadMesh.alphaType.autoAlphaMode = false;
+        quadMesh.alphaType.alphaType = csAlphaMode::alphaNone;
 
         // Creates the ambient material.
         ambientMaterial = engine->CreateMaterial (
           "crystalspace.rendermanager.deferred.lightrender.ambient", 
           NULL);
-
-        quadMesh->GetMeshObject ()->SetMaterialWrapper (ambientMaterial);
 
         if (!loader->LoadShader ("/shader/deferred/ambient_light.xml"))
         {
@@ -436,6 +441,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         ambientMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), ambientLightShader);
       }
 
+      private:
+        csVector3 quadVerts[4];
     };
 
     DeferredLightRenderer(iGraphics3D *g3d, 
@@ -546,16 +553,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     void RenderAmbientLight()
     {
       iMaterial *mat = persistentData.ambientMaterial->GetMaterial ();
-
-      // Update shader stack.
-      csShaderVariableStack svStack = shaderMgr->GetShaderVariableStack ();
       iShader *shader = mat->GetShader (stringSet->Request ("gbuffer use"));
 
-      svStack.Clear ();
-      shaderMgr->PushVariables (svStack);
-      shader->PushVariables (svStack);
-
-      DrawFullscreenQuad (shader, svStack, CS_ZBUF_NONE);
+      DrawFullscreenQuad (shader, CS_ZBUF_NONE);
     }
 
     /**
@@ -644,62 +644,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /**
      * Draws a fullscreen quad using the supplied shader.
      */
-    void DrawFullscreenQuad(iShader *shader,
-                            csShaderVariableStack &svStack,
-                            csZBufMode zmode)
+    void DrawFullscreenQuad(iShader *shader, csZBufMode zmode)
     {
-      iMeshObject *obj = persistentData.quadMesh->GetMeshObject ();
-
-      int num = 0;
-      csRenderMesh **meshes = obj->GetRenderMeshes (num, rview, 
-        persistentData.quadMesh->GetMovable (), 0);
-
-      if (num <= 0)
-        return;
-
       // Switches to using orthographic projection. 
       csReversibleTransform oldView = graphics3D->GetWorldToCamera ();
       CS::Math::Matrix4 oldProj = graphics3D->GetProjectionMatrix ();
 
       graphics3D->SetWorldToCamera (csReversibleTransform ());
       graphics3D->SetProjectionMatrix (CreateOrthoProj (graphics3D));
-
-      // Create quad transform.
-      float w = graphics3D->GetDriver2D ()->GetWidth ();
-      float h = graphics3D->GetDriver2D ()->GetHeight ();
-
-      csMatrix3 S (w, 0, 0,
-                   0, h, 0,
-                   0, 0, 1);
-
-      csReversibleTransform T (S, csVector3 (0.0f, 0.0f, 0.0f));
-
-      const size_t ticket = shader->GetTicket (*meshes[0], svStack);
-      const size_t numPasses = shader->GetNumberOfPasses (ticket);
-
-      for (size_t p = 0; p < numPasses; p++)
-      {
-        if (!shader->ActivatePass (ticket, p)) 
-          continue;
-
-        for (int i = 0; i < num; i++)
-        {
-          csRenderMesh *m = meshes[i];
-
-          if (!shader->SetupPass (ticket, m, *m, svStack))
-            continue;
-
-          // Use additive blending so we do not loose the contributions from other lights.
-          m->mixmode = CS_FX_ADD;
-          m->z_buf_mode = zmode;
-          m->object2world = T;
-
-          graphics3D->DrawMesh (m, *m, svStack);
-
-          shader->TeardownPass (ticket);
-        }
-        shader->DeactivatePass (ticket);
-      }
+      
+      persistentData.quadMesh.shader = shader;
+      persistentData.quadMesh.z_buf_mode = zmode;
+      
+      graphics3D->DrawSimpleMesh (persistentData.quadMesh, 0);
 
       // Restores old transforms.
       graphics3D->SetWorldToCamera (oldView);
