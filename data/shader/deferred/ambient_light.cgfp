@@ -8,15 +8,17 @@ struct vertex2fragment
 };
  
 float4 main(vertex2fragment IN,
+            uniform sampler2D gBuffer0,
             uniform sampler2D gBuffer2) : COLOR
 {
   // Do the perspective divide and convert to texture space.
   float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
   float2 screenUV = screenXY * 0.5 + 0.5;
   
+  float4 diffuse = tex2D (gBuffer0, screenUV);
   float4 ambient = tex2D (gBuffer2, screenUV);
 
-  return float4 (ambient.rgb, 1.0);
+  return float4 (ambient.rgb * diffuse.rgb, 1.0);
 }
 
 ]]>

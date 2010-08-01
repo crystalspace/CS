@@ -469,9 +469,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
      */
     void operator()(iLight *light)
     {
-      //if (light->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_STATIC)
-      //  return;
-
       switch (light->GetType ())
       {
       case CS_LIGHT_POINTLIGHT:
@@ -693,6 +690,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
             continue;
 
           // Use additive blending so we do not loose the contributions from other lights.
+          m->mixmode = CS_FX_ADD;
           m->z_buf_mode = zmode;
           m->object2world = T;
 

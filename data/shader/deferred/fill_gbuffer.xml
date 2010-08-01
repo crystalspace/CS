@@ -39,7 +39,7 @@
       <buffer source="binormal" destination="texture coordinate 3" />
       <vp plugin="glcg">
         <cgvp>
-          <?Include fill_gbuffer.cgvp ?>
+          <?Include fill_gbuffer_vp.inc ?>
         </cgvp>
       </vp>
 
@@ -54,7 +54,7 @@
       <texture destination="TexLightMapDir3" name="tex lightmap dir 3" />
       <fp plugin="glcg">
         <cgfp>
-          <?Include fill_gbuffer.cgfp ?>
+          <?Include fill_gbuffer_fp.inc ?>
         </cgfp>
       </fp>
       

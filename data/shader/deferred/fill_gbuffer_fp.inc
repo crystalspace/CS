@@ -143,7 +143,7 @@ fragmentOutput main(vertex2fragment IN,
   <?elsif vars."tex lightmap".texture ?>
     float3 ambient = DynamicAmbient + tex2D (TexLightMap, IN.TexCoordLM).rgb;
   <?else?>
-    float3 ambient = CombinedAmbient;
+    float3 ambient = DynamicAmbient;
   <?endif?>
 
   // Normalize and map into the range [0,1].

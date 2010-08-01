@@ -497,7 +497,7 @@ protected:
                                     gbuffer,
                                     lightRenderPersistent);
 
-      //render.OutputAmbientLight ();
+      render.OutputAmbientLight ();
 
       for (size_t i = 0; i < ctxCount; i++)
       {
@@ -850,12 +850,13 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
 
   // Creates the accumulation buffer.
   int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
-  
+  const char *accumFmt = cfg->GetStr ("RenderManager.Deferred.AccumBufferFormat", "rgb16_f");
+
   scfString errStr;
   accumBuffer = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
     graphics2D->GetHeight (),
     csimg2D,
-    "rgb16_f",
+    accumFmt,
     flags,
     &errStr);
 
@@ -867,12 +868,16 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   }
 
   // Create GBuffer
+  const char *gbufferFmt = cfg->GetStr ("RenderManager.Deferred.GBuffer.BufferFormat", "rgba16_f");
+  int bufferCount = cfg->GetInt ("RenderManager.Deferred.GBuffer.BufferCount", 3);
+  bool hasDepthBuffer = cfg->GetBool ("RenderManager.Deferred.GBuffer.DepthBuffer", true);
+
   GBuffer::Description desc;
-  desc.colorBufferCount = 3;
-  desc.hasDepthBuffer = true;
+  desc.colorBufferCount = bufferCount;
+  desc.hasDepthBuffer = hasDepthBuffer;
   desc.width = graphics2D->GetWidth ();
   desc.height = graphics2D->GetHeight ();
-  desc.colorBufferFormat = nullptr;
+  desc.colorBufferFormat = gbufferFmt;
 
   if (!gbuffer.Initialize (desc, 
                            graphics3D, 
@@ -887,7 +892,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   portalPersistent.fixedTexCacheHeight = desc.height;
 
   // Make sure the texture cache creates matching texture buffers.
-  portalPersistent.texCache.SetFormat ("rgb16_f");
+  portalPersistent.texCache.SetFormat (accumFmt);
   portalPersistent.texCache.SetFlags (flags);
 
   return true;

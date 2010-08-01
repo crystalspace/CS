@@ -453,6 +453,10 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     {
       cfgUseDeferredShading = false;
     }
+    else if (code == 'l')
+    {
+      cfgDrawLogo = false;
+    }
   }
 
   return false;
