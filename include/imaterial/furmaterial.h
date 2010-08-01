@@ -36,6 +36,7 @@ struct iFurPhysicsControl : public virtual iBase
 {
   SCF_INTERFACE (iFurPhysicsControl, 1, 0, 0);
 
+  virtual void SetInitialTransform(csReversibleTransform initialTransform) = 0;
   virtual void SetRigidBody (iRigidBody* rigidBody) = 0;
   virtual void SetBulletDynamicSystem (iBulletDynamicSystem* 
     bulletDynamicSystem) = 0;

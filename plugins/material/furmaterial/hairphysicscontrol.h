@@ -46,6 +46,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     virtual bool Initialize (iObjectRegistry*);
 
     //-- iFurPhysicsControl
+    virtual void SetInitialTransform(csReversibleTransform initialTransform);
     virtual void SetRigidBody (iRigidBody* rigidBody);
     virtual void SetBulletDynamicSystem (iBulletDynamicSystem* bulletDynamicSystem);
     // Initialize the strand with the given ID

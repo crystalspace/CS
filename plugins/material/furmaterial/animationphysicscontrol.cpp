@@ -44,16 +44,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   // From iComponent
   bool AnimationPhysicsControl::Initialize (iObjectRegistry* r)
   {
+    initialTransform.Identity();
     object_reg = r;
     return true;
   }
 
   //-- iFurPhysicsControl
 
+  void AnimationPhysicsControl::SetInitialTransform(csReversibleTransform initialTransform)
+  {
+    this->initialTransform = initialTransform;
+  }
+
   void AnimationPhysicsControl::SetRigidBody (iRigidBody* rigidBody)
   {
     this->rigidBody = rigidBody;
-    initialTransform = rigidBody->GetTransform().GetInverse();
   }
 
   void AnimationPhysicsControl::SetBulletDynamicSystem (iBulletDynamicSystem* 

@@ -147,7 +147,8 @@ void KrystalScene::SwitchFurPhysics()
   {
     furMaterial->SetGuideLOD(0.0f);
     furMaterial->StopPhysicsControl();
-    animationPhysicsControl->SetRigidBody(headBody);
+    animationPhysicsControl->
+      SetInitialTransform(headBody->GetTransform().GetInverse());
     furMaterial->SetPhysicsControl(animationPhysicsControl);
     furMaterial->StartPhysicsControl();
     hairPhysicsEnabled = false;
@@ -402,6 +403,7 @@ bool KrystalScene::CreateAvatar ()
   hairPhysicsControl->SetRigidBody(headBody);
 
   animationPhysicsControl->SetRigidBody(headBody);
+  animationPhysicsControl->SetInitialTransform(headBody->GetTransform().GetInverse());
 
   // Initialize fur material
   furMaterial = furMaterialType->CreateFurMaterial("hair");

@@ -50,6 +50,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   //-- iFurPhysicsControl
 
+  void HairPhysicsControl::SetInitialTransform(csReversibleTransform initialTransform)
+  {
+  }
+
   void HairPhysicsControl::SetRigidBody (iRigidBody* rigidBody)
   {
     this->rigidBody = rigidBody;
