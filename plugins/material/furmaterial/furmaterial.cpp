@@ -219,7 +219,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csVector3 *tangentsArray = new csVector3[positions.GetSize()];
     csVector3 *binormalArray = new csVector3[positions.GetSize()];
     
-    csTriangle *triangles = new csTriangle[indices->GetSize() / (3 * sizeof(size_t))];
+    csTriangle *triangles = new csTriangle[indices->GetSize() / sizeof(csTriangle)];
     csVector3 *vertices = new csVector3[positions.GetSize()];
     csVector3 *normals = new csVector3[positions.GetSize()];
     csVector2 *texcoords = new csVector2[positions.GetSize()];
@@ -252,7 +252,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       triangles[i] = csTriangle(tri.a, tri.b, tri.c);
     }
 
-    csNormalMappingTools::CalculateTangents(indices->GetSize() / (3 * sizeof(size_t)), triangles, 
+    csNormalMappingTools::CalculateTangents(indices->GetSize() / sizeof(csTriangle), triangles, 
       positions.GetSize(), vertices, normals, texcoords, tangentsArray, binormalArray);
 
     // generate the guide hairs
