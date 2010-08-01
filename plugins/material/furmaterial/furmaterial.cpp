@@ -208,25 +208,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   }
 
   void FurMaterial::GenerateGuideHairs(iRenderBuffer* indices, 
-    iRenderBuffer* vertexes, iRenderBuffer* normals, iRenderBuffer* texCoords)
+    iRenderBuffer* vertexes, iRenderBuffer* nrmls, iRenderBuffer* texCoords)
   {
     csRenderBufferLock<csVector3> positions (vertexes, CS_BUF_LOCK_READ);
     csRenderBufferLock<csVector2> UV (texCoords, CS_BUF_LOCK_READ);
-    csRenderBufferLock<csVector3> norms (normals, CS_BUF_LOCK_READ);
+    csRenderBufferLock<csVector3> norms (nrmls, CS_BUF_LOCK_READ);
     CS::TriangleIndicesStream<size_t> tris (indices, CS_MESHTYPE_TRIANGLES);    
     csArray<int> uniqueIndices;
 
     csVector3 *tangentsArray = new csVector3[positions.GetSize()];
     csVector3 *binormalArray = new csVector3[positions.GetSize()];
+    
+    csTriangle *triangles = new csTriangle[indices->GetSize() / (3 * sizeof(size_t))];
+    csVector3 *vertices = new csVector3[positions.GetSize()];
+    csVector3 *normals = new csVector3[positions.GetSize()];
+    csVector2 *texcoords = new csVector2[positions.GetSize()];
 
     for ( size_t i = 0 ; i < positions.GetSize() ; i ++ ) 
     {
       tangentsArray[i] = csVector3(0);
       binormalArray[i] = csVector3(0);
+      vertices[i] = csVector3( positions.Get(i) ); 
+      normals[i] = csVector3( norms.Get(i) );
+      texcoords[i] = csVector2( UV.Get(i) ); 
     }
 
     // choose unique indices
-    while (tris.HasNext())
+    for ( size_t i = 0 ; tris.HasNext() ; i ++)
     {
       CS::TriangleT<size_t> tri (tris.Next ());
 
@@ -241,54 +249,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         uniqueIndices.Contains(tri.b), uniqueIndices.Contains(tri.c));
       guideHairsTriangles.Push(triangleNew);
   
-      // generate tangents 
-      size_t i1 = tri.a;
-      size_t i2 = tri.b;
-      size_t i3 = tri.c;
-
-      const csVector3& v1 = positions.Get(i1);
-      const csVector3& v2 = positions.Get(i2);
-      const csVector3& v3 = positions.Get(i3);
-
-      const csVector2& w1 = UV.Get(i1);
-      const csVector2& w2 = UV.Get(i2);
-      const csVector2& w3 = UV.Get(i3);
-
-      const csVector3 p21 = v2 - v1;
-      const csVector3 p31 = v3 - v1;
-      const csVector2 uv21 = w2 - w1;
-      const csVector2 uv31 = w3 - w1;
-
-      const csVector3 sdir = p21 * uv31.y - p31 * uv21.y;
-      const csVector3 tdir = p31 * uv21.x - p21 * uv31.y;
-
-      tangentsArray[i1] += sdir;
-      tangentsArray[i2] += sdir;
-      tangentsArray[i3] += sdir;
-
-      binormalArray[i1] += tdir;
-      binormalArray[i2] += tdir;
-      binormalArray[i3] += tdir;
+      triangles[i] = csTriangle(tri.a, tri.b, tri.c);
     }
 
-    for ( size_t i = 0 ; i < positions.GetSize() ; i ++ )
-    {
-      const csVector3& n = norms.Get( i );
-      const csVector3& t = tangentsArray[ i ];
-
-      // Gram-Schmidt orthogonalize
-      tangentsArray[ i ] = (t - n * (n * t));
-      tangentsArray[ i ].Normalize();
-
-      // Calculate handedness
-      binormalArray[i].Normalize();
-
-      csVector3 tb;
-      tb.Cross(tangentsArray[ i ], binormalArray[ i ]);
-      float direction = tb * n >= 0.0f ? -1.0f : 1.0f;
-  
-      tangentsArray[ i ] = tangentsArray[ i ] * direction;
-    }
+    csNormalMappingTools::CalculateTangents(indices->GetSize() / (3 * sizeof(size_t)), triangles, 
+      positions.GetSize(), vertices, normals, texcoords, tangentsArray, binormalArray);
 
     // generate the guide hairs
     for (size_t i = 0; i < uniqueIndices.GetSize(); i ++)
