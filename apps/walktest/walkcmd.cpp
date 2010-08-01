@@ -1621,18 +1621,18 @@ bool CommandHandler (const char *cmd, const char *arg)
       csRef<iMeshWrapper> sprite = Sys->Engine->CreateMeshWrapper (meshfact, "Frankie",
 	    Sys->views->GetCamera ()->GetSector (),
 	    Sys->views->GetCamera ()->GetTransform ().GetOrigin ());
-      csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (sprite->GetMeshObject ());
-      iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
-      csRef<iSkeletonAnimNode2> anim;
+      csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (sprite->GetMeshObject ());
+      CS::Animation::iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+      csRef<CS::Animation::iSkeletonAnimNode2> anim;
        
       if (root)
       {
         anim = root->FindNode("standard");
 
-        csRef<iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<iSkeletonFSMNode2> (anim);
+        csRef<CS::Animation::iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode2> (anim);
         if (fsm)
         {
-          csRef<iSkeletonFSMNodeFactory2> fsmfact = scfQueryInterface<iSkeletonFSMNodeFactory2>(anim->GetFactory());
+          csRef<CS::Animation::iSkeletonFSMNodeFactory2> fsmfact = scfQueryInterface<CS::Animation::iSkeletonFSMNodeFactory2>(anim->GetFactory());
           CS::Animation::StateID wanted_state = fsmfact->FindState("walk");
           if (wanted_state != CS::Animation::InvalidStateID)            
             fsm->SwitchToState(wanted_state);
@@ -1975,16 +1975,17 @@ bool CommandHandler (const char *cmd, const char *arg)
 
     // Get the data
     csRef<iMeshWrapper> mesh = Sys->Engine->FindMeshObject (meshName);   
-    csRef<iAnimatedMesh> animesh = scfQueryInterfaceSafe<iAnimatedMesh> (mesh->GetMeshObject ());
+    csRef<CS::Mesh::iAnimatedMesh> animesh =
+      scfQueryInterfaceSafe<CS::Mesh::iAnimatedMesh> (mesh->GetMeshObject ());
     
     if (!animesh)
       return true;
   
-    csRef<iSkeleton2> skel = animesh->GetSkeleton ();
+    csRef<CS::Animation::iSkeleton2> skel = animesh->GetSkeleton ();
     if (!skel)
       return true;
 
-    csRef<iSkeletonAnimNode2> node = skel->GetAnimationPacket ()->GetAnimationRoot ();
+    csRef<CS::Animation::iSkeletonAnimNode2> node = skel->GetAnimationPacket ()->GetAnimationRoot ();
     if (!node)
       return true;
 
@@ -2002,7 +2003,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else if (!csStrCaseCmp (action, "state"))
     {
-      csRef<iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<iSkeletonFSMNode2> (node);
+      csRef<CS::Animation::iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode2> (node);
       if (!fsm)
         return true;
 

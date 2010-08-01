@@ -204,13 +204,13 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
     {
       // If the tail is animated by the classical animation then put the tail chain
       // in kinematic state
-      if (ragdollNode->GetBodyChainState (tailChain) == CS_RAGDOLL_STATE_DYNAMIC)
-	ragdollNode->SetBodyChainState (tailChain, CS_RAGDOLL_STATE_KINEMATIC);
+      if (ragdollNode->GetBodyChainState (tailChain) == CS::Animation::STATE_DYNAMIC)
+	ragdollNode->SetBodyChainState (tailChain, CS::Animation::STATE_KINEMATIC);
 
       // If the tail is animated by the physical simulation then put the tail chain
       // in dynamic state
       else
-	ragdollNode->SetBodyChainState (tailChain, CS_RAGDOLL_STATE_DYNAMIC);
+	ragdollNode->SetBodyChainState (tailChain, CS::Animation::STATE_DYNAMIC);
 
       // Update the display of the dynamics debugger
       if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
@@ -251,15 +251,15 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     if (frankieDead)
     {
       // Trace a physical beam to find if a rigid body was hit
-      csBulletHitBeamResult hitResult =
+      CS::Physics::Bullet::HitBeamResult hitResult =
 	avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
       if (hitResult.hasHit
-	  && hitResult.bodyType == CS_BULLET_RIGID_BODY)
+	  && hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
       {
 	// Apply a big force at the point clicked by the mouse
 	csVector3 force = endBeam - startBeam;
 	force.Normalize ();
-	hitResult.rigidBody->AddForceAtPos (hitResult.isect, force * 10.0f);
+	hitResult.body->QueryRigidBody ()->AddForceAtPos (hitResult.isect, force * 10.0f);
       }
 
       return true;
@@ -271,8 +271,8 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     if (!sectorResult.mesh)
       return false;
 
-    csRef<iAnimatedMesh> animesh =
-      scfQueryInterface<iAnimatedMesh> (sectorResult.mesh->GetMeshObject ());
+    csRef<CS::Mesh::iAnimatedMesh> animesh =
+      scfQueryInterface<CS::Mesh::iAnimatedMesh> (sectorResult.mesh->GetMeshObject ());
     if (!animesh)
       return false;
 
@@ -283,9 +283,12 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     animesh->SetMorphTargetWeight
       (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
 
-    // Set the ragdoll state of the iBodyChain of the body and the tail as dynamic
-    ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_DYNAMIC);
-    ragdollNode->SetBodyChainState (tailChain, CS_RAGDOLL_STATE_DYNAMIC);
+    // Stop the child animations, there is only the ragdoll controller which is active
+    lookAtNode->Stop ();
+
+    // Set the ragdoll state of the CS::Animation::iBodyChain of the body and the tail as dynamic
+    ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_DYNAMIC);
+    ragdollNode->SetBodyChainState (tailChain, CS::Animation::STATE_DYNAMIC);
 
     // Update the display of the dynamics debugger
     if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
@@ -294,26 +297,26 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
 
     // Fling the body a bit
     const csOrthoTransform& tc = avatarTest->view->GetCamera ()->GetTransform ();
-    uint boneCount = ragdollNode->GetBoneCount (CS_RAGDOLL_STATE_DYNAMIC);
+    uint boneCount = ragdollNode->GetBoneCount (CS::Animation::STATE_DYNAMIC);
     for (uint i = 0; i < boneCount; i++)
     {
-      BoneID boneID = ragdollNode->GetBone (CS_RAGDOLL_STATE_DYNAMIC, i);
+      CS::Animation::BoneID boneID = ragdollNode->GetBone (CS::Animation::STATE_DYNAMIC, i);
       iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
       rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 0.1f));
     }
 
     // Trace a physical beam to find which rigid body was hit
-    csBulletHitBeamResult hitResult =
+    CS::Physics::Bullet::HitBeamResult hitResult =
       avatarTest->bulletDynamicSystem->HitBeam (startBeam, endBeam);
     if (hitResult.hasHit
-	&& hitResult.bodyType == CS_BULLET_RIGID_BODY)
+	&& hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
     {
       // Apply a big force at the point clicked by the mouse
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
-      hitResult.rigidBody->AddForceAtPos (hitResult.isect, force * 1.0f);
-      hitResult.rigidBody->SetLinearVelocity (tc.GetT2O ()
-					      * csVector3 (0.0f, 0.0f, 1.0f));
+      hitResult.body->QueryRigidBody ()->AddForceAtPos (hitResult.isect, force * 1.0f);
+      hitResult.body->QueryRigidBody ()->SetLinearVelocity
+	(tc.GetT2O () * csVector3 (0.0f, 0.0f, 1.0f));
     }
 
     return true;
@@ -336,7 +339,7 @@ bool FrankieScene::CreateAvatar ()
   if (!meshfact)
     return avatarTest->ReportError ("Can't find Frankie's mesh factory!");
 
-  animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  animeshFactory = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
   if (!animeshFactory)
     return avatarTest->ReportError ("Can't find Frankie's animesh factory!");
@@ -346,9 +349,9 @@ bool FrankieScene::CreateAvatar ()
   if (!rc.success)
     return avatarTest->ReportError ("Can't load Frankie's body mesh file!");
 
-  csRef<iBodyManager> bodyManager =
-    csQueryRegistry<iBodyManager> (avatarTest->GetObjectRegistry ());
-  csRef<iBodySkeleton> bodySkeleton = bodyManager->FindBodySkeleton ("frankie_body");
+  csRef<CS::Animation::iBodyManager> bodyManager =
+    csQueryRegistry<CS::Animation::iBodyManager> (avatarTest->GetObjectRegistry ());
+  csRef<CS::Animation::iBodySkeleton> bodySkeleton = bodyManager->FindBodySkeleton ("frankie_body");
   if (!bodySkeleton)
     return avatarTest->ReportError ("Can't find Frankie's body mesh description!");
 
@@ -357,63 +360,63 @@ bool FrankieScene::CreateAvatar ()
   //     + 'LookAt' controller node
   //       + 'speed' controller node
   //         + animation nodes for all speeds
-  csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
+  csRef<CS::Animation::iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create the 'LookAt' controller
-  csRef<iSkeletonLookAtNodeFactory2> lookAtNodeFactory =
+  csRef<CS::Animation::iSkeletonLookAtNodeFactory2> lookAtNodeFactory =
     avatarTest->lookAtManager->CreateAnimNodeFactory ("lookat", bodySkeleton);
 
   // Create the 'idle' animation node
-  csRef<iSkeletonAnimationNodeFactory2> idleNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idleNodeFactory =
     animPacketFactory->CreateAnimationNode ("idle");
   idleNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Idle1"));
 
   // Create the 'walk_slow' animation node
-  csRef<iSkeletonAnimationNodeFactory2> walkSlowNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> walkSlowNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk_slow");
   walkSlowNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_WalkSlow"));
 
   // Create the 'walk' animation node
-  csRef<iSkeletonAnimationNodeFactory2> walkNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> walkNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk");
   walkNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Walk"));
 
   // Create the 'walk_fast' animation node
-  csRef<iSkeletonAnimationNodeFactory2> walkFastNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> walkFastNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk_fast");
   walkFastNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_WalkFast"));
 
   // Create the 'footing' animation node
-  csRef<iSkeletonAnimationNodeFactory2> footingNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> footingNodeFactory =
     animPacketFactory->CreateAnimationNode ("footing");
   footingNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Runs"));
 
   // Create the 'run_slow' animation node
-  csRef<iSkeletonAnimationNodeFactory2> runSlowNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runSlowNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_slow");
   runSlowNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunSlow"));
 
   // Create the 'run' animation node
-  csRef<iSkeletonAnimationNodeFactory2> runNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runNodeFactory =
     animPacketFactory->CreateAnimationNode ("run");
   runNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Run"));
 
   // Create the 'run_fast' animation node
-  csRef<iSkeletonAnimationNodeFactory2> runFastNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runFastNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_fast");
   runFastNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunFaster"));
 
   // Create the 'run_jump' animation node
-  csRef<iSkeletonAnimationNodeFactory2> runJumpNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runJumpNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_jump");
   runJumpNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunFast2Jump"));
@@ -421,7 +424,7 @@ bool FrankieScene::CreateAvatar ()
   // Create the 'speed' controller (and add all animations of Frankie moving at different speeds)
   // Unfortunately, the Frankie animations from 'walk fast' to 'footing'
   // do not blend well together, but this is just an example...
-  csRef<iSkeletonSpeedNodeFactory2> speedNodeFactory =
+  csRef<CS::Animation::iSkeletonSpeedNodeFactory2> speedNodeFactory =
     avatarTest->basicNodesManager->CreateSpeedNodeFactory ("speed");
   speedNodeFactory->AddNode (idleNodeFactory, 0.0f);
   speedNodeFactory->AddNode (walkSlowNodeFactory, 0.4f);
@@ -438,7 +441,7 @@ bool FrankieScene::CreateAvatar ()
   if (avatarTest->physicsEnabled)
   {
     // Create the ragdoll controller
-    csRef<iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
+    csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
       avatarTest->ragdollManager->CreateAnimNodeFactory ("ragdoll",
 					     bodySkeleton, avatarTest->dynamicSystem);
     animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
@@ -451,7 +454,7 @@ bool FrankieScene::CreateAvatar ()
       ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Pelvis"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"), 0);
-    ragdollNodeFactory->AddBodyChain (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
+    ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
 
     // Create a bone chain for the tail of Frankie and add it to the ragdoll controller.
     // The chain will be in kinematic mode most of the time, and in dynamic mode when the
@@ -459,7 +462,7 @@ bool FrankieScene::CreateAvatar ()
     tailChain = bodySkeleton->CreateBodyChain
       ("tail_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_1"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"), 0);
-    ragdollNodeFactory->AddBodyChain (tailChain, CS_RAGDOLL_STATE_KINEMATIC);
+    ragdollNodeFactory->AddBodyChain (tailChain, CS::Animation::STATE_KINEMATIC);
   }
 
   else
@@ -469,30 +472,26 @@ bool FrankieScene::CreateAvatar ()
   csRef<iMeshWrapper> avatarMesh =
     avatarTest->engine->CreateMeshWrapper (meshfact, "Frankie",
 					   avatarTest->room, csVector3 (0.0f));
-  animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
+  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
   // When the animated mesh is created, the animation nodes are created too.
   // We can therefore set them up now.
-  iSkeletonAnimNode2* rootNode =
+  CS::Animation::iSkeletonAnimNode2* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
   // Setup of the LookAt controller
-  lookAtNode = scfQueryInterface<iSkeletonLookAtNode2> (rootNode->FindNode ("lookat"));
+  lookAtNode = scfQueryInterface<CS::Animation::iSkeletonLookAtNode2> (rootNode->FindNode ("lookat"));
   lookAtNode->AddListener (&lookAtListener);
-  lookAtNode->SetAnimatedMesh (animesh);
   lookAtNode->SetBone (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
   lookAtNode->SetListenerDelay (0.6f);
 
   // Setup of the speed controller
-  speedNode = scfQueryInterface<iSkeletonSpeedNode2> (rootNode->FindNode ("speed"));
+  speedNode = scfQueryInterface<CS::Animation::iSkeletonSpeedNode2> (rootNode->FindNode ("speed"));
 
   // Setup of the ragdoll controller
   if (avatarTest->physicsEnabled)
-  {
     ragdollNode =
-      scfQueryInterface<iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
-    ragdollNode->SetAnimatedMesh (animesh);
-  }
+      scfQueryInterface<CS::Animation::iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
@@ -528,8 +527,8 @@ void FrankieScene::ResetScene ()
   if (avatarTest->physicsEnabled)
   {
     // Set the ragdoll state of the 'body' and 'tail' chains as kinematic
-    ragdollNode->SetBodyChainState (bodyChain, CS_RAGDOLL_STATE_KINEMATIC);
-    ragdollNode->SetBodyChainState (tailChain, CS_RAGDOLL_STATE_KINEMATIC);
+    ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_KINEMATIC);
+    ragdollNode->SetBodyChainState (tailChain, CS::Animation::STATE_KINEMATIC);
 
     // Update the display of the dynamics debugger
     if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
@@ -544,6 +543,7 @@ void FrankieScene::ResetScene ()
   lookAtNode->SetTarget (avatarTest->view->GetCamera(), csVector3 (0.0f));
   rotationSpeed = ROTATION_NORMAL;
   lookAtNode->SetMaximumSpeed (5.0f);
+  lookAtNode->Play ();
 
   // Reset 'speed' controller
   currentSpeed = 0;

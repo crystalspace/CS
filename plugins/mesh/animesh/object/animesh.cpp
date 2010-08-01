@@ -101,7 +101,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices,
+  CS::Mesh::iAnimatedMeshSubMeshFactory* AnimeshObjectFactory::CreateSubMesh (iRenderBuffer* indices,
     const char* name, bool visible)
   {
     csRef<FactorySubmesh> newSubmesh;
@@ -114,7 +114,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return newSubmesh;
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::CreateSubMesh (
+  CS::Mesh::iAnimatedMeshSubMeshFactory* AnimeshObjectFactory::CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
     const csArray<csArray<unsigned int> >& boneIndices,
     const char* name,
@@ -143,7 +143,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return newSubmesh;
   }
 
-  iAnimatedMeshFactorySubMesh* AnimeshObjectFactory::GetSubMesh (size_t index) const
+  CS::Mesh::iAnimatedMeshSubMeshFactory* AnimeshObjectFactory::GetSubMesh (size_t index) const
   {
     CS_ASSERT (index < submeshes.GetSize ());
     return submeshes[index];
@@ -171,7 +171,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return submeshes.GetSize ();
   }
 
-  void AnimeshObjectFactory::DeleteSubMesh (iAnimatedMeshFactorySubMesh* mesh)
+  void AnimeshObjectFactory::DeleteSubMesh (CS::Mesh::iAnimatedMeshSubMeshFactory* mesh)
   {
     submeshes.Delete (static_cast<FactorySubmesh*> (mesh));
     Invalidate ();
@@ -362,12 +362,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  void AnimeshObjectFactory::SetSkeletonFactory (iSkeletonFactory2* skeletonFactory)
+  void AnimeshObjectFactory::SetSkeletonFactory (CS::Animation::iSkeletonFactory2* skeletonFactory)
   {
     this->skeletonFactory = skeletonFactory;
   }
 
-  iSkeletonFactory2* AnimeshObjectFactory::GetSkeletonFactory () const
+  CS::Animation::iSkeletonFactory2* AnimeshObjectFactory::GetSkeletonFactory () const
   {
     return skeletonFactory;
   }
@@ -382,12 +382,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return 4;
   }
 
-  csAnimatedMeshBoneInfluence* AnimeshObjectFactory::GetBoneInfluences ()
+  CS::Mesh::csAnimatedMeshBoneInfluence* AnimeshObjectFactory::GetBoneInfluences ()
   {
     return boneInfluences.GetArray ();
   }
 
-  iAnimatedMeshMorphTarget* AnimeshObjectFactory::CreateMorphTarget (
+  CS::Mesh::iAnimatedMeshMorphTarget* AnimeshObjectFactory::CreateMorphTarget (
     const char* name)
   {
     csRef<MorphTarget> newTarget;
@@ -397,7 +397,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return newTarget;
   }
 
-  iAnimatedMeshMorphTarget* AnimeshObjectFactory::GetMorphTarget (uint target)
+  CS::Mesh::iAnimatedMeshMorphTarget* AnimeshObjectFactory::GetMorphTarget (uint target)
   {
     CS_ASSERT (target < morphTargets.GetSize ());
     return morphTargets[target];
@@ -419,7 +419,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return morphTargetNames.Get (name, (uint)~0);
   }
 
-  void AnimeshObjectFactory::CreateSocket (BoneID bone, 
+  void AnimeshObjectFactory::CreateSocket (CS::Animation::BoneID bone, 
     const csReversibleTransform& transform, const char* name)
   {
     csRef<FactorySocket> socket;
@@ -433,7 +433,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return sockets.GetSize ();
   }
 
-  iAnimatedMeshSocketFactory* AnimeshObjectFactory::GetSocket (size_t index) const
+  CS::Mesh::iAnimatedMeshSocketFactory* AnimeshObjectFactory::GetSocket (size_t index) const
   {
     CS_ASSERT (index < sockets.GetSize ());
     return sockets[index];
@@ -519,7 +519,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return mixMode;
   }
 
-  FactorySocket::FactorySocket (AnimeshObjectFactory* factory, BoneID bone, 
+  FactorySocket::FactorySocket (AnimeshObjectFactory* factory, CS::Animation::BoneID bone, 
     const char* name, csReversibleTransform transform)
     : scfImplementationType (this), factory (factory), bone (bone), name (name),
     transform (transform)
@@ -545,17 +545,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     transform = tf;
   }
 
-  BoneID FactorySocket::GetBone () const
+  CS::Animation::BoneID FactorySocket::GetBone () const
   {
     return bone;
   }
   
-  void FactorySocket::SetBone (BoneID bone)
+  void FactorySocket::SetBone (CS::Animation::BoneID bone)
   {
     this->bone = bone;
   }
 
-  iAnimatedMeshFactory* FactorySocket::GetFactory ()
+  CS::Mesh::iAnimatedMeshFactory* FactorySocket::GetFactory ()
   {
     return factory;
   }
@@ -575,15 +575,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     if (factory->skeletonFactory)
     {
       skeleton = factory->skeletonFactory->CreateSkeleton ();
+      skeleton->SetAnimatedMesh (this);
       skeletonVersion = skeleton->GetSkeletonStateVersion() - 1;
     }
   }
 
-  void AnimeshObject::SetSkeleton (iSkeleton2* newskel)
+  void AnimeshObject::SetSkeleton (CS::Animation::iSkeleton2* newskel)
   {
     skeleton = newskel;
     if (skeleton)
     {
+      skeleton->SetAnimatedMesh (this);
       skeletonVersion = skeleton->GetSkeletonStateVersion() - 1;
     }
     else
@@ -592,12 +594,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  iSkeleton2* AnimeshObject::GetSkeleton () const
+  CS::Animation::iSkeleton2* AnimeshObject::GetSkeleton () const
   {
     return skeleton;
   }
 
-  iAnimatedMeshSubMesh* AnimeshObject::GetSubMesh (size_t index) const
+  CS::Mesh::iAnimatedMeshSubMesh* AnimeshObject::GetSubMesh (size_t index) const
   {
     CS_ASSERT (index < submeshes.GetSize ());
     return submeshes[index];
@@ -636,7 +638,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return sockets.GetSize ();
   }
 
-  iAnimatedMeshSocket* AnimeshObject::GetSocket (size_t index) const
+  CS::Mesh::iAnimatedMeshSocket* AnimeshObject::GetSocket (size_t index) const
   {
     CS_ASSERT (index < sockets.GetSize ());
     return sockets[index];
@@ -1052,7 +1054,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     for (size_t i = 0; i < sockets.GetSize (); ++i)
     {
-      BoneID bone = sockets[i]->bone;
+      CS::Animation::BoneID bone = sockets[i]->bone;
 
       csQuaternion q;
       csVector3 v;
@@ -1254,7 +1256,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return factorySocket->GetName ();
   }
 
-  iAnimatedMeshSocketFactory* AnimeshObject::Socket::GetFactory ()
+  CS::Mesh::iAnimatedMeshSocketFactory* AnimeshObject::Socket::GetFactory ()
   {
     return factorySocket;
   }
@@ -1274,12 +1276,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return socketBoneTransform*transform;
   }
 
-  BoneID AnimeshObject::Socket::GetBone () const
+  CS::Animation::BoneID AnimeshObject::Socket::GetBone () const
   {
     return bone;
   }
 
-  iAnimatedMesh* AnimeshObject::Socket::GetMesh () const
+  CS::Mesh::iAnimatedMesh* AnimeshObject::Socket::GetMesh () const
   {
     return object;
   }

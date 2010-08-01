@@ -235,7 +235,7 @@ public:
     ConsecutiveDelimiterMode delimMode = delimSplitEach)
   {
     size_t num = 0;
-    csString currentString;
+    csString currentString = "";
     int lastDelim = -1;
 
     const char* p = str;

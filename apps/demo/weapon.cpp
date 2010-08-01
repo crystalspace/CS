@@ -34,7 +34,6 @@ Weapon::Weapon(iObjectRegistry* obj_reg) : scfImplementationType(this), object_r
   reloadingtime = 0;
 
   attackAnimation = "attack";
-  reloadAnimation = "";
 }
 
 void Weapon::Register()
@@ -87,16 +86,9 @@ bool Weapon::Fire()
 {
   if (reloading) return false;
 
-  if (mesh)
-  {
-    csRef<iGeneralMeshState> spstate (scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ()));
-    csRef<iGenMeshSkeletonControlState> animcontrol (scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
-    iSkeleton* skeleton = animcontrol->GetSkeleton ();
-
-    skeleton->StopAll();
-    skeleton->Execute(attackAnimation.GetData());
-    if (!reloadAnimation.IsEmpty())skeleton->Append(reloadAnimation.GetData());
-  }
+  // Play the fire animation
+  if (fsmNode)
+    fsmNode->SwitchToState (fsmNodeFactory->FindState (attackAnimation.GetData ()));
 
   /*
   if (arrowsound)

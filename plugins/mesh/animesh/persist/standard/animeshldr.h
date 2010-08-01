@@ -46,7 +46,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     virtual bool IsThreadSafe() { return true; }
 
     bool ParseMorphTarget (iDocumentNode* child,
-      iAnimatedMeshFactory* amfact);
+      CS::Mesh::iAnimatedMeshFactory* amfact);
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);
@@ -55,7 +55,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     iObjectRegistry* object_reg;
 
     csRef<iSyntaxService> synldr;
-    csRef<iSkeletonManager2> skelMgr;
+    csRef<CS::Animation::iSkeletonManager2> skelMgr;
 
     csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \
@@ -103,7 +103,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
   private: 
     iObjectRegistry* object_reg;
     csRef<iSyntaxService> synldr;
-    csRef<iSkeletonManager2> skelMgr;
+    csRef<CS::Animation::iSkeletonManager2> skelMgr;
 
     csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \

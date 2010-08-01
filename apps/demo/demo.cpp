@@ -215,13 +215,13 @@ bool Demo::OnKeyboard(iEvent& ev)
       if (do_freelook)
       {
         cegui->EnableMouseCapture();
-        //cegui->GetMouseCursorPtr()->show(); TODO: Why doesn't this work?
+        cegui->GetMouseCursorPtr()->show(); //TODO: Why doesn't this work?
         do_freelook = false;
       }
       else
       {
         cegui->DisableMouseCapture();
-        //cegui->GetMouseCursorPtr()->hide(); TODO: Why doesn't this work?
+        cegui->GetMouseCursorPtr()->hide(); //TODO: Why doesn't this work?
         do_freelook = true;
       }
     }
@@ -288,9 +288,20 @@ void Demo::CreateRoom ()
   room = engine->CreateSector ("room");
 
 #if 1
-  bool succ= vfs->Mount("/bias/", "$@data$/bias$/world.zip");
+  bool suc = vfs->Mount("/bias/", "$@data$/bias$/world.zip");
+  if (!suc)
+  {
+    ReportError ("Error: could not mount VFS path '$@data$/bias$/world.zip'\n");
+    return;
+  }
+
   vfs->ChDir("/bias/");
-  bool suc = loader->LoadMapFile("/bias/world", false);
+  suc = loader->LoadMapFile("/bias/world", false);
+  if (!suc)
+  {
+    ReportError ("Error: could not load map file\n");
+    return;
+  }
 
   if (engine->GetCameraPositions ()->GetCount () > 0)
   {
@@ -335,7 +346,7 @@ void Demo::CreateRoom ()
 
     // Now we make a factory and a mesh at once.
     csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "entity_kwartz02.001", "monster_factory1", &box);
+      engine, room, "entity_kwartz01.001", "monster_factory1", &box);
     m->GetMeshObject ()->SetMaterialWrapper (tm);
     m->GetMovable()->SetPosition(room, csVector3(5,1,5));
     m->GetMovable()->UpdateMove();
@@ -350,7 +361,7 @@ void Demo::CreateRoom ()
 
     // Now we make a factory and a mesh at once.
     csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "entity_kwartz01.002", "monster_factory2", &box);
+      engine, room, "entity_kwartz02.002", "monster_factory2", &box);
     m->GetMeshObject ()->SetMaterialWrapper (tm);
     m->GetMovable()->SetPosition(room, csVector3(-5,1,-5));
     m->GetMovable()->UpdateMove();
@@ -407,6 +418,7 @@ void Demo::CreateRoom ()
   SimpleStaticLighter::ShineLights (room, engine, 4);
 #endif
 
+  // Create the monsters
   csArray<int> index;
   csRef<iMeshList> list = engine->GetMeshes();
   for (int i = 0; i < list->GetCount(); i++)
@@ -414,10 +426,11 @@ void Demo::CreateRoom ()
     csRef<iMeshWrapper> mesh = list->Get(i);
     if (strncmp (mesh->QueryObject()->GetName(), "entity", 6) == 0)
     {
-      printf("creating entity\n");
+      printf("creating entity %s\n", mesh->QueryObject()->GetName());
       csRef<Monster> monster;
-      monster.AttachNew(new Monster(object_reg, mesh));
-      monsters.Push(monster);
+      monster.AttachNew(new Monster(object_reg));
+      if (monster->Initialize (mesh))
+	monsters.Push(monster);
       index.Push(i);
     }
   }
@@ -426,6 +439,13 @@ void Demo::CreateRoom ()
     list->Remove(index.Pop());
   }
 
+  // Pre-load the 'gibs' mesh
+  LoadMesh(GetObjectRegistry (), "gibs", "/data/bias/models/iceblocks/gibs");
+
+  // Initialize the mouse position
+  int FRAME_HEIGHT = g3d->GetDriver2D()->GetHeight();
+  int FRAME_WIDTH = g3d->GetDriver2D()->GetWidth();
+  g3d->GetDriver2D()->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
 }
 
 

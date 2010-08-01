@@ -157,6 +157,14 @@ void Simple::Frame ()
   // Step the dynamic simulation
   if (!pauseDynamic)
   {
+    /*
+    for (int i = 0; i < dynamicSystem->GetBodysCount (); i++)
+    {
+      iRigidBody* body = dynamicSystem->GetBody (i);
+      body->SetLinearVelocity (csVector3 (0.0f));
+      body->SetAngularVelocity (csVector3 (0.0f));
+    }
+    */
     // If the physics engine is ODE, then we have to take care of calling
     // the update of the dynamic simulation with a constant step time.
     if (phys_engine_id == ODE_ID)
@@ -244,7 +252,7 @@ void Simple::Frame ()
   else if (isSoftBodyWorld)
     for (size_t i = 0; i < bulletDynamicSystem->GetSoftBodyCount (); i++)
     {
-      iBulletSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
+      CS::Physics::Bullet::iSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
       if (!softBody->GetTriangleCount ())
 	softBody->DebugDraw (view);
     }
@@ -515,14 +523,15 @@ bool Simple::OnKeyboard (iEvent &ev)
       csVector3 startBeam = camera->GetTransform ().GetOrigin ();
       csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
-      csBulletHitBeamResult hitResult = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+      CS::Physics::Bullet::HitBeamResult hitResult =
+	bulletDynamicSystem->HitBeam (startBeam, endBeam);
       if (hitResult.hasHit
-	  && hitResult.bodyType == CS_BULLET_RIGID_BODY)
+	  && hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
       {
 	// Remove the body and the mesh from the simulation, and put them in the clipboard
-	clipboardBody = hitResult.rigidBody;
+	clipboardBody = hitResult.body->QueryRigidBody ();
 	dynamicSystem->RemoveBody (clipboardBody);
-	clipboardMesh = hitResult.rigidBody->GetAttachedMesh ();
+	clipboardMesh = hitResult.body->QueryRigidBody ()->GetAttachedMesh ();
 	if (clipboardMesh)
 	  room->GetMeshes ()->Remove (clipboardMesh);
 
@@ -606,38 +615,38 @@ bool Simple::OnMouseDown (iEvent& ev)
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
     // Trace the physical beam
-    csBulletHitBeamResult hitResult =
+    CS::Physics::Bullet::HitBeamResult hitResult =
       bulletDynamicSystem->HitBeam (startBeam, endBeam);
     if (!hitResult.hasHit)
       return false;
 
     // Add a force at the point clicked
-    if (hitResult.bodyType == CS_BULLET_RIGID_BODY)
+    if (hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
       force *= 2.0f;
 
       // Check if the body hit is not static or kinematic
-      csRef<iBulletRigidBody> bulletBody =
-	scfQueryInterface<iBulletRigidBody> (hitResult.rigidBody);
-      if (bulletBody->GetDynamicState () != CS_BULLET_STATE_DYNAMIC)
+      csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	scfQueryInterface<CS::Physics::Bullet::iRigidBody> (hitResult.body->QueryRigidBody ());
+      if (bulletBody->GetDynamicState () != CS::Physics::Bullet::STATE_DYNAMIC)
 	return false;
 
-      hitResult.rigidBody->AddForceAtPos (force, hitResult.isect);
+      hitResult.body->QueryRigidBody ()->AddForceAtPos (force, hitResult.isect);
 
       // This would work too
-      //csOrthoTransform transform (hitResult.rigidBody->GetTransform ());
+      //csOrthoTransform transform (hitResult.body->QueryRigidBody ()->GetTransform ());
       //csVector3 relativePosition = transform.Other2This (hitResult.isect);
-      //hitResult.rigidBody->AddForceAtRelPos (force, relativePosition);
+      //hitResult.body->QueryRigidBody ()->AddForceAtRelPos (force, relativePosition);
     }
 
-    else if (hitResult.bodyType == CS_BULLET_SOFT_BODY)
+    else if (hitResult.body->GetType () == CS::Physics::Bullet::SOFT_BODY)
     {
       csVector3 force = endBeam - startBeam;
       force.Normalize ();
       force *= 2.0f;
-      hitResult.softBody->AddForce (force, hitResult.vertexIndex);
+      hitResult.body->QuerySoftBody ()->AddForce (force, hitResult.vertexIndex);
     }
 
     return true;
@@ -659,24 +668,25 @@ bool Simple::OnMouseDown (iEvent& ev)
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
 
     // Trace the physical beam
-    csBulletHitBeamResult hitResult = bulletDynamicSystem->HitBeam (startBeam, endBeam);
+    CS::Physics::Bullet::HitBeamResult hitResult =
+      bulletDynamicSystem->HitBeam (startBeam, endBeam);
     if (!hitResult.hasHit)
       return false;
 
     // Check if we hit a rigid body
-    if (hitResult.bodyType != CS_BULLET_RIGID_BODY)
+    if (hitResult.body->GetType () != CS::Physics::Bullet::RIGID_BODY)
       return false;
 
     // Create a pivot joint at the point clicked
     dragJoint = bulletDynamicSystem->CreatePivotJoint ();
-    dragJoint->Attach (hitResult.rigidBody, hitResult.isect);
+    dragJoint->Attach (hitResult.body->QueryRigidBody (), hitResult.isect);
 
     dragging = true;
     dragDistance = (hitResult.isect - startBeam).Norm ();
 
     // Set some dampening on the rigid body to have a more stable dragging
-    csRef<iBulletRigidBody> bulletBody =
-      scfQueryInterface<iBulletRigidBody> (hitResult.rigidBody);
+    csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+      scfQueryInterface<CS::Physics::Bullet::iRigidBody> (hitResult.body->QueryRigidBody ());
     linearDampening = bulletBody->GetLinearDampener ();
     angularDampening = bulletBody->GetRollingDampener ();
     bulletBody->SetLinearDampener (0.9f);
@@ -695,8 +705,8 @@ bool Simple::OnMouseUp (iEvent& ev)
     dragging = false;
 
     // Put back the original dampening on the rigid body
-    csRef<iBulletRigidBody> bulletBody =
-      scfQueryInterface<iBulletRigidBody> (dragJoint->GetAttachedBody ());
+    csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+      scfQueryInterface<CS::Physics::Bullet::iRigidBody> (dragJoint->GetAttachedBody ());
     bulletBody->SetLinearDampener (linearDampening);
     bulletBody->SetRollingDampener (angularDampening);
 
@@ -730,7 +740,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug",
 		       iDynamicsDebuggerManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll",
-		       iSkeletonRagdollManager2),
+		       CS::Animation::iSkeletonRagdollManager2),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -854,7 +864,7 @@ bool Simple::Application ()
     return ReportError ("Failed to locate dynamic's debug manager!");
 
   ragdollManager =
-    csQueryRegistry<iSkeletonRagdollManager2> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonRagdollManager2> (GetObjectRegistry ());
   if (!ragdollManager)
     return ReportError ("Failed to locate ragdoll manager!");
 
@@ -877,7 +887,7 @@ bool Simple::Application ()
   }
   else
   {
-    bulletDynamicSystem = scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
+    bulletDynamicSystem = scfQueryInterface<CS::Physics::Bullet::iDynamicSystem> (dynamicSystem);
 
     // We have some objects of size smaller than 0.035 units, so we scale up the
     // whole world for a better behavior of the dynamic simulation.
@@ -1005,8 +1015,8 @@ void Simple::UpdateCameraMode ()
 	  (0.8f, csVector3 (0.0f), 10.0f, 1.0f, 0.8f);
 
 	// Make it kinematic
-	csRef<iBulletRigidBody> bulletBody =
-	  scfQueryInterface<iBulletRigidBody> (cameraBody);
+	csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	  scfQueryInterface<CS::Physics::Bullet::iRigidBody> (cameraBody);
 	bulletBody->MakeKinematic ();
 
 	// Attach the camera to the body so as to benefit of the default
@@ -1557,7 +1567,8 @@ void Simple::LoadRagdoll ()
   if (!meshfact)
     return;
 
-  csRef<iAnimatedMeshFactory> animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory =
+    scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
   if (!animeshFactory)
   {
@@ -1573,8 +1584,9 @@ void Simple::LoadRagdoll ()
     return;
   }
 
-  csRef<iBodyManager> bodyManager = csQueryRegistry<iBodyManager> (GetObjectRegistry ());
-  iBodySkeleton* bodySkeleton = bodyManager->FindBodySkeleton ("frankie_body");
+  csRef<CS::Animation::iBodyManager> bodyManager =
+    csQueryRegistry<CS::Animation::iBodyManager> (GetObjectRegistry ());
+  CS::Animation::iBodySkeleton* bodySkeleton = bodyManager->FindBodySkeleton ("frankie_body");
   if (!bodySkeleton)
   {
     ReportError ("Can't find Frankie's body description!");
@@ -1582,16 +1594,16 @@ void Simple::LoadRagdoll ()
   }
 
   // Create bone chain
-  iBodyChain* chain = bodySkeleton->CreateBodyChain
+  CS::Animation::iBodyChain* chain = bodySkeleton->CreateBodyChain
     ("chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"),
      animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"),
      animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"), 0);
 
   // Create ragdoll animation node factory
-  csRef<iSkeletonRagdollNodeFactory2> ragdollFactory =
+  csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll",
 					   bodySkeleton, dynamicSystem);
-  ragdollFactory->AddBodyChain (chain, CS_RAGDOLL_STATE_DYNAMIC);
+  ragdollFactory->AddBodyChain (chain, CS::Animation::STATE_DYNAMIC);
 
   // Set the ragdoll anim node as the only node of the animation tree
   animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ()
@@ -1615,11 +1627,12 @@ void Simple::SpawnRagdoll ()
   // Create animesh
   ragdollMesh = engine->CreateMeshWrapper (meshfact, "Frankie",
 					   room, csVector3 (0, -4, 0));
-  csRef<iAnimatedMesh> animesh =
-    scfQueryInterface<iAnimatedMesh> (ragdollMesh->GetMeshObject ());
+  csRef<CS::Mesh::iAnimatedMesh> animesh =
+    scfQueryInterface<CS::Mesh::iAnimatedMesh> (ragdollMesh->GetMeshObject ());
 
   // Close the eyes of Frankie as he is dead
-  csRef<iAnimatedMeshFactory> animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory =
+    scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
 
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
@@ -1630,19 +1643,18 @@ void Simple::SpawnRagdoll ()
                   tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
 
   // Start the ragdoll anim node
-  iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
+  CS::Animation::iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
     GetAnimationRoot ();
 
-  csRef<iSkeletonRagdollNode2> ragdoll =
-    scfQueryInterfaceSafe<iSkeletonRagdollNode2> (root);
-  ragdoll->SetAnimatedMesh (animesh);
+  csRef<CS::Animation::iSkeletonRagdollNode2> ragdoll =
+    scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode2> (root);
 
   // Fling the body.
   // (start the ragdoll node before so that the rigid bodies are created)
   ragdoll->Play ();
-  for (uint i = 0; i < ragdoll->GetBoneCount (CS_RAGDOLL_STATE_DYNAMIC); i++)
+  for (uint i = 0; i < ragdoll->GetBoneCount (CS::Animation::STATE_DYNAMIC); i++)
   {
-    BoneID boneID = ragdoll->GetBone (CS_RAGDOLL_STATE_DYNAMIC, i);
+    CS::Animation::BoneID boneID = ragdoll->GetBone (CS::Animation::STATE_DYNAMIC, i);
     iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
     rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
     rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));
@@ -1660,8 +1672,10 @@ void Simple::SpawnRope ()
   // Spawn a box
   iRigidBody* box = SpawnBox ();
 
+  // First example using ropes defined by their extremities
+#if 1
   // Spawn a first rope and attach it to the box
-  iBulletSoftBody* body = bulletDynamicSystem->CreateRope
+  CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateRope
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (-0.2f, 0, 1), 20);
   body->SetMass (2.0f);
@@ -1677,6 +1691,49 @@ void Simple::SpawnRope ()
   body->SetRigidity (0.95f);
   body->AnchorVertex (0);
   body->AnchorVertex (body->GetVertexCount () - 1, box);
+
+  // Second example using ropes defined by the position of each of their vertices
+#else
+  // Spawn a first rope and attach it to the box
+  {
+    // Define the positions of the vertices
+    size_t vertexCount = 10;
+    CS_ALLOC_STACK_ARRAY(csVector3, nodes, vertexCount);
+    nodes[0] = tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0);
+    csVector3 step = (tc.GetT2O () * csVector3 (-0.2f, 0, 1) -
+		      tc.GetT2O () * csVector3 (-2, 2, 0)) / (((float) vertexCount) - 1);
+    for (size_t i = 1; i < vertexCount; i++)
+      nodes[i] = nodes[0] + ((int) (i % 2)) * csVector3 (-0.2f, 0, 0) + ((int) i) * step;
+
+    // Create the soft body
+    CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateRope
+      (nodes, vertexCount);
+    body->SetMass (2.0f);
+    body->SetRigidity (0.95f);
+    body->AnchorVertex (0);
+    body->AnchorVertex (body->GetVertexCount () - 1, box);
+  }
+
+  // Spawn a second rope and attach it to the box
+  {
+    // Define the positions of the vertices
+    size_t vertexCount = 10;
+    CS_ALLOC_STACK_ARRAY(csVector3, nodes, vertexCount);
+    nodes[0] = tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 0);
+    csVector3 step = (tc.GetT2O () * csVector3 (0.2f, 0, 1) -
+		      tc.GetT2O () * csVector3 (2, 2, 0)) / (((float) vertexCount) - 1);
+    for (size_t i = 1; i < vertexCount; i++)
+      nodes[i] = nodes[0] + ((int) (i % 2)) * csVector3 (0.2f, 0, 0) + ((int) i) * step;
+
+    // Create the soft body
+    CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateRope
+      (nodes, vertexCount);
+    body->SetMass (2.0f);
+    body->SetRigidity (0.95f);
+    body->AnchorVertex (0);
+    body->AnchorVertex (body->GetVertexCount () - 1, box);
+  }
+#endif
 }
 
 void Simple::SpawnCloth ()
@@ -1685,7 +1742,7 @@ void Simple::SpawnCloth ()
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the cloth
-  iBulletSoftBody* body = bulletDynamicSystem->CreateCloth
+  CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateCloth
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 1),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 1),
      tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 0, 1),
@@ -1699,7 +1756,7 @@ void Simple::SpawnCloth ()
 
   // Create the cloth mesh factory
   csRef<iMeshFactoryWrapper> clothFact =
-    csBulletSoftBodyHelper::CreateClothGenMeshFactory
+    CS::Physics::Bullet::SoftBodyHelper::CreateClothGenMeshFactory
     (GetObjectRegistry (), "clothFact", body);
   csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
     (clothFact->GetMeshObjectFactory ());
@@ -1742,7 +1799,7 @@ void Simple::SpawnSoftBody ()
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the soft body
-  iBulletSoftBody* body = bulletDynamicSystem->CreateSoftBody
+  CS::Physics::Bullet::iSoftBody* body = bulletDynamicSystem->CreateSoftBody
     (gmstate, csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, 1.0f)) * tc);
   // This would have worked too
   //iBulletSoftBody* body = bulletDynamicSystem->CreateSoftBody

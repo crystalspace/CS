@@ -29,24 +29,32 @@
 #include "csutil/csstring.h"
 #include "imesh/lookat.h"
 
+namespace CS
+{
+namespace Animation
+{
+
 struct iBodyBoneJoint;
+
+}
+}
 
 CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 {
 
   class LookAtManager : public scfImplementation2<LookAtManager,
-    iSkeletonLookAtManager2, iComponent>
+    CS::Animation::iSkeletonLookAtManager2, iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(LookAtManager);
 
     LookAtManager (iBase* parent);
 
-    //-- iSkeletonLookAtManager2
-    virtual iSkeletonLookAtNodeFactory2* CreateAnimNodeFactory (const char *name,
-							   iBodySkeleton* skeleton);
+    //-- CS::Animation::iSkeletonLookAtManager2
+    virtual CS::Animation::iSkeletonLookAtNodeFactory2* CreateAnimNodeFactory (const char *name,
+							   CS::Animation::iBodySkeleton* skeleton);
 
-    virtual iSkeletonLookAtNodeFactory2* FindAnimNodeFactory (const char* name) const;
+    virtual CS::Animation::iSkeletonLookAtNodeFactory2* FindAnimNodeFactory (const char* name) const;
     virtual void ClearAnimNodeFactories ();
 
     //-- iComponent
@@ -57,11 +65,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   private:
     iObjectRegistry* object_reg;
-    csHash<csRef<iSkeletonLookAtNodeFactory2>, csString> factoryHash;
+    csHash<csRef<CS::Animation::iSkeletonLookAtNodeFactory2>, csString> factoryHash;
   };
 
   class LookAtAnimNodeFactory : public scfImplementation2<LookAtAnimNodeFactory, 
-    scfFakeInterface<iSkeletonAnimNodeFactory2>, iSkeletonLookAtNodeFactory2>
+    scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory2>, CS::Animation::iSkeletonLookAtNodeFactory2>
   {
     friend class LookAtAnimNode;
 
@@ -69,40 +77,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     CS_LEAKGUARD_DECLARE(LookAtAnimNodeFactory);
 
     LookAtAnimNodeFactory (LookAtManager* manager, const char *name,
-			   iBodySkeleton* skeleton);
+			   CS::Animation::iBodySkeleton* skeleton);
 
-    //-- iSkeletonLookAtNodeFactory2
-    virtual void SetChildNode (iSkeletonAnimNodeFactory2* node);
-    virtual iSkeletonAnimNodeFactory2* GetChildNode ();
+    //-- CS::Animation::iSkeletonLookAtNodeFactory2
+    virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory2* node);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetChildNode ();
     virtual void ClearChildNode ();
 
-    //-- iSkeletonAnimNodeFactory2
-    virtual csPtr<iSkeletonAnimNode2> CreateInstance (
-	       iSkeletonAnimPacket2* packet, iSkeleton2* skeleton);
+    //-- CS::Animation::iSkeletonAnimNodeFactory2
+    virtual csPtr<CS::Animation::iSkeletonAnimNode2> CreateInstance (
+	       CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton);
 
     virtual const char* GetNodeName () const;
 
-    virtual iSkeletonAnimNodeFactory2* FindNode (const char* name);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* FindNode (const char* name);
 
   protected:
     LookAtManager* manager;
     csString name;
-    csRef<iBodySkeleton> skeleton;
-    csRef<iSkeletonAnimNodeFactory2> childNode;
+    csRef<CS::Animation::iBodySkeleton> skeleton;
+    csRef<CS::Animation::iSkeletonAnimNodeFactory2> childNode;
   };
 
   class LookAtAnimNode : public scfImplementation2<LookAtAnimNode, 
-    scfFakeInterface<iSkeletonAnimNode2>, iSkeletonLookAtNode2>
+    scfFakeInterface<CS::Animation::iSkeletonAnimNode2>, CS::Animation::iSkeletonLookAtNode2>
   {
   public:
     CS_LEAKGUARD_DECLARE(LookAtAnimNode);
 
-    LookAtAnimNode (LookAtAnimNodeFactory* factory, iSkeleton2* skeleton,
-		    iSkeletonAnimNode2* childNode);
+    LookAtAnimNode (LookAtAnimNodeFactory* factory, CS::Animation::iSkeleton2* skeleton,
+		    CS::Animation::iSkeletonAnimNode2* childNode);
 
-    //-- iSkeletonLookAtNode2
-    virtual void SetAnimatedMesh (iAnimatedMesh* mesh);
-    virtual void SetBone (BoneID boneID);
+    //-- CS::Animation::iSkeletonLookAtNode2
+    virtual void SetBone (CS::Animation::BoneID boneID);
 
     virtual void SetTarget (csVector3 target);
     virtual void SetTarget (iMovable* target, const csVector3& offset);
@@ -113,10 +120,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     virtual void SetAlwaysRotate (bool alwaysRotate);
 
     virtual void SetListenerDelay (float delay);
-    virtual void AddListener (iSkeletonLookAtListener2* listener);
-    virtual void RemoveListener (iSkeletonLookAtListener2* listener);
+    virtual void AddListener (CS::Animation::iSkeletonLookAtListener2* listener);
+    virtual void RemoveListener (CS::Animation::iSkeletonLookAtListener2* listener);
 
-    //-- iSkeletonAnimPacket2
+    //-- CS::Animation::iSkeletonAnimPacket2
     virtual void Play ();
     virtual void Stop ();
 
@@ -127,24 +134,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     virtual void SetPlaybackSpeed (float speed);
     virtual float GetPlaybackSpeed () const;
 
-    virtual void BlendState (csSkeletalState2* state,
+    virtual void BlendState (CS::Animation::csSkeletalState2* state,
 			     float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
 
     virtual bool IsActive () const;
-    virtual iSkeletonAnimNodeFactory2* GetFactory () const;
-    virtual iSkeletonAnimNode2* FindNode (const char* name);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetFactory () const;
+    virtual CS::Animation::iSkeletonAnimNode2* FindNode (const char* name);
 
-    virtual void AddAnimationCallback (iSkeletonAnimCallback2* callback);
-    virtual void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
+    virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
+    virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
 
   private:
     LookAtAnimNodeFactory* factory;
     csWeakRef<iSceneNode> sceneNode;
-    csWeakRef<iSkeleton2> skeleton;
-    csRef<iSkeletonAnimNode2> childNode;
-    BoneID boneID;
-    csRef<iBodyBoneJoint> bodyJoint;
+    csWeakRef<CS::Animation::iSkeleton2> skeleton;
+    csRef<CS::Animation::iSkeletonAnimNode2> childNode;
+    CS::Animation::BoneID boneID;
+    csRef<CS::Animation::iBodyBoneJoint> bodyJoint;
     char targetMode;
     char trackingStatus;
     csVector3 targetPosition;
@@ -160,7 +167,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     char listenerStatus;
     float listenerMinimumDelay;
     float listenerDelay;
-    csRefArray<iSkeletonLookAtListener2> listeners;
+    csRefArray<CS::Animation::iSkeletonLookAtListener2> listeners;
   };
 
 }

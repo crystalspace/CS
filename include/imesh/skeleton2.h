@@ -34,6 +34,21 @@ class csDualQuaternion;
 
 struct iSceneNode;
 
+namespace CS
+{
+namespace Mesh
+{
+
+struct iAnimatedMesh;
+
+} // namespace Mesh
+} // namespace CS
+
+namespace CS
+{
+namespace Animation
+{
+
 struct iSkeletonFactory2;
 struct iSkeleton2;
 
@@ -61,7 +76,7 @@ static const BoneID InvalidBoneID = (BoneID)~0;
  */
 struct iSkeletonManager2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeletonManager2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonManager2, 1, 0, 0);
 
   /**
    * Create a new empty skeleton factory
@@ -112,7 +127,7 @@ struct iSkeletonManager2 : public virtual iBase
  */
 struct iSkeletonFactory2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeletonFactory2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonFactory2, 1, 0, 0);
 
   /**\name Bone handling
    * @{ */
@@ -226,14 +241,14 @@ struct iSkeletonFactory2 : public virtual iBase
  * Bind space is defined by the skeleton factory, so bind space is relative
  * transform compared to the default orientation.
  *
- * \sa iSkeletonFactory2 for more information on coordinate spaces
+ * \sa CS::Animation::iSkeletonFactory2 for more information on coordinate spaces
  */
 struct iSkeleton2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeleton2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeleton2, 1, 0, 1);
 
   /**
-   * Get the scene node associated with the skeleton
+   * Get the scene node associated with this skeleton
    */
   virtual iSceneNode* GetSceneNode () = 0;
 
@@ -343,6 +358,16 @@ struct iSkeleton2 : public virtual iBase
    * Get skeleton update version number
    */
   virtual unsigned int GetSkeletonStateVersion () const = 0;
+
+  /**
+   * Set the animated mesh associated with this skeleton
+   */
+  virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
+
+  /**
+   * Get the animated mesh associated with this skeleton
+   */
+  virtual CS::Mesh::iAnimatedMesh* GetAnimatedMesh () = 0;
 };
 
 /**
@@ -457,6 +482,8 @@ protected:
 };
 
 
+} // namespace Animation
+} // namespace CS
 
 /** @} */
 

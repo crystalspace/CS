@@ -36,12 +36,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 //-------------------- csBulletRigidBody -----------------------------------
 
 csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynSys, bool isStatic)
-  : scfImplementationType (this), dynSys (dynSys), body (0),
-    dynamicState (isStatic? CS_BULLET_STATE_STATIC : CS_BULLET_STATE_DYNAMIC),
-    customMass (false), mass (1.0f), compoundChanged (false), insideWorld (false),
-    linearDampening (dynSys->linearDampening), angularDampening (dynSys->angularDampening)
+  : scfImplementationType (this), bodyType (CS::Physics::Bullet::RIGID_BODY), dynSys (dynSys),
+  body (0), dynamicState (isStatic? CS::Physics::Bullet::STATE_STATIC
+			  : CS::Physics::Bullet::STATE_DYNAMIC),
+  customMass (false), mass (1.0f), compoundChanged (false), insideWorld (false),
+  linearDampening (dynSys->linearDampening), angularDampening (dynSys->angularDampening)
 {
-  bodyType = CS_BULLET_RIGID_BODY;
   btTransform identity;
   identity.setIdentity ();
   motionState = new csBulletMotionState (this, identity, identity);
@@ -101,7 +101,7 @@ void csBulletRigidBody::RebuildBody ()
     int shapeCount = compoundShape->getNumChildShapes ();
 
     // compute new principal axis
-    if (dynamicState == CS_BULLET_STATE_DYNAMIC)
+    if (dynamicState == CS::Physics::Bullet::STATE_DYNAMIC)
     {
       // compute the masses of the shapes
       CS_ALLOC_STACK_ARRAY(btScalar, masses, shapeCount); 
@@ -173,7 +173,7 @@ void csBulletRigidBody::RebuildBody ()
     }
   }
 
-  else if (dynamicState == CS_BULLET_STATE_DYNAMIC)
+  else if (dynamicState == CS::Physics::Bullet::STATE_DYNAMIC)
   {
     // compound hasn't been changed
     bodyMass = mass;
@@ -197,7 +197,7 @@ void csBulletRigidBody::RebuildBody ()
 
   // create new rigid body
   body = new btRigidBody (infos);
-  body->setUserPointer ((iBulletBody*) this);
+  body->setUserPointer (static_cast<iBody*> (this));
   dynSys->bulletWorld->addRigidBody (body);
   insideWorld = true;
 
@@ -220,9 +220,9 @@ void csBulletRigidBody::RebuildBody ()
 
 bool csBulletRigidBody::MakeStatic (void)
 {
-  if (body && dynamicState != CS_BULLET_STATE_STATIC)
+  if (body && dynamicState != CS::Physics::Bullet::STATE_STATIC)
   {
-    csBulletState previousState = dynamicState;
+    CS::Physics::Bullet::BodyState previousState = dynamicState;
 
     // rebuild body if a child collider was a concave mesh
     bool hasTrimesh = false;
@@ -230,7 +230,7 @@ bool csBulletRigidBody::MakeStatic (void)
       if (colliders[i]->shape
 	  && colliders[i]->geomType == TRIMESH_COLLIDER_GEOMETRY)
       {
-	dynamicState = CS_BULLET_STATE_STATIC;
+	dynamicState = CS::Physics::Bullet::STATE_STATIC;
 	colliders[i]->RebuildMeshGeometry ();
 	hasTrimesh = true;
       }
@@ -249,7 +249,7 @@ bool csBulletRigidBody::MakeStatic (void)
     body->updateInertiaTensor ();
 
     // reverse kinematic state
-    if (previousState == CS_BULLET_STATE_KINEMATIC)
+    if (previousState == CS::Physics::Bullet::STATE_KINEMATIC)
     {
       body->setCollisionFlags (body->getCollisionFlags()
 			       & ~btCollisionObject::CF_KINEMATIC_OBJECT);
@@ -270,26 +270,26 @@ bool csBulletRigidBody::MakeStatic (void)
       dynSys->bulletWorld->addRigidBody (body);
   }
 
-  dynamicState = CS_BULLET_STATE_STATIC;
+  dynamicState = CS::Physics::Bullet::STATE_STATIC;
 
   return true;
 }
 
 bool csBulletRigidBody::MakeDynamic (void)
 {
-  if (body && dynamicState != CS_BULLET_STATE_DYNAMIC)
+  if (body && dynamicState != CS::Physics::Bullet::STATE_DYNAMIC)
   {
-    csBulletState previousState = dynamicState;
+    CS::Physics::Bullet::BodyState previousState = dynamicState;
 
     // rebuild body if a child collider was a concave mesh
-    if (previousState == CS_BULLET_STATE_STATIC)
+    if (previousState == CS::Physics::Bullet::STATE_STATIC)
     {
       bool hasTrimesh = false;
       for (unsigned int i = 0; i < colliders.GetSize (); i++)
 	if (colliders[i]->shape
 	    && colliders[i]->geomType == TRIMESH_COLLIDER_GEOMETRY)
 	{
-	  dynamicState = CS_BULLET_STATE_DYNAMIC;
+	  dynamicState = CS::Physics::Bullet::STATE_DYNAMIC;
 	  colliders[i]->RebuildMeshGeometry ();
 	  hasTrimesh = true;
 	}
@@ -310,7 +310,7 @@ bool csBulletRigidBody::MakeDynamic (void)
     btVector3 angularVelocity (0.0f, 0.0f, 0.0f);
 
     // reverse kinematic state
-    if (previousState == CS_BULLET_STATE_KINEMATIC)
+    if (previousState == CS::Physics::Bullet::STATE_KINEMATIC)
     {
       body->setCollisionFlags (body->getCollisionFlags()
 			       & ~btCollisionObject::CF_KINEMATIC_OBJECT);
@@ -348,26 +348,26 @@ bool csBulletRigidBody::MakeDynamic (void)
       dynSys->bulletWorld->addRigidBody (body);
   }
 
-  dynamicState = CS_BULLET_STATE_DYNAMIC;
+  dynamicState = CS::Physics::Bullet::STATE_DYNAMIC;
 
   return true;
 }
 
 void csBulletRigidBody::MakeKinematic ()
 {
-  if (body && dynamicState != CS_BULLET_STATE_KINEMATIC)
+  if (body && dynamicState != CS::Physics::Bullet::STATE_KINEMATIC)
   {
-    csBulletState previousState = dynamicState;
+    CS::Physics::Bullet::BodyState previousState = dynamicState;
 
     // rebuild body if a child collider was a concave mesh
-    if (previousState == CS_BULLET_STATE_STATIC)
+    if (previousState == CS::Physics::Bullet::STATE_STATIC)
     {
       bool hasTrimesh = false;
       for (unsigned int i = 0; i < colliders.GetSize (); i++)
 	if (colliders[i]->shape
 	    && colliders[i]->geomType == TRIMESH_COLLIDER_GEOMETRY)
 	{
-	  dynamicState = CS_BULLET_STATE_KINEMATIC;
+	  dynamicState = CS::Physics::Bullet::STATE_KINEMATIC;
 	  colliders[i]->RebuildMeshGeometry ();
 	  hasTrimesh = true;
 	}
@@ -409,34 +409,34 @@ void csBulletRigidBody::MakeKinematic ()
       dynSys->bulletWorld->addRigidBody (body);
   }
 
-  dynamicState = CS_BULLET_STATE_KINEMATIC;
+  dynamicState = CS::Physics::Bullet::STATE_KINEMATIC;
 
   return;
 }
 
 bool csBulletRigidBody::IsStatic (void)
 {
-  return dynamicState == CS_BULLET_STATE_STATIC;
+  return dynamicState == CS::Physics::Bullet::STATE_STATIC;
 }
 
-csBulletState csBulletRigidBody::GetDynamicState () const
+CS::Physics::Bullet::BodyState csBulletRigidBody::GetDynamicState () const
 {
   return dynamicState;
 }
 
-void csBulletRigidBody::SetDynamicState (csBulletState state)
+void csBulletRigidBody::SetDynamicState (CS::Physics::Bullet::BodyState state)
 {
   switch (state)
     {
-    case CS_BULLET_STATE_STATIC:
+    case CS::Physics::Bullet::STATE_STATIC:
       MakeStatic ();
       break;
 
-    case CS_BULLET_STATE_DYNAMIC:
+    case CS::Physics::Bullet::STATE_DYNAMIC:
       MakeDynamic ();
       break;
 
-    case CS_BULLET_STATE_KINEMATIC:
+    case CS::Physics::Bullet::STATE_KINEMATIC:
       MakeKinematic ();
       break;
 
@@ -445,12 +445,12 @@ void csBulletRigidBody::SetDynamicState (csBulletState state)
     }
 }
 
-void csBulletRigidBody::SetKinematicCallback (iBulletKinematicCallback* callback)
+void csBulletRigidBody::SetKinematicCallback (iKinematicCallback* callback)
 {
   kinematicCb = callback;
 }
 
-iBulletKinematicCallback* csBulletRigidBody::GetKinematicCallback ()
+iKinematicCallback* csBulletRigidBody::GetKinematicCallback ()
 {
   return kinematicCb;
 }
@@ -843,7 +843,7 @@ void csBulletRigidBody::SetLinearVelocity (const csVector3& vel)
 {
   CS_ASSERT (body);
 
-  if (dynamicState == CS_BULLET_STATE_DYNAMIC)
+  if (dynamicState == CS::Physics::Bullet::STATE_DYNAMIC)
   {
     body->setLinearVelocity (CSToBullet (vel, dynSys->internalScale));
     body->activate ();
@@ -862,7 +862,7 @@ void csBulletRigidBody::SetAngularVelocity (const csVector3& vel)
 {
   CS_ASSERT (body);
 
-  if (dynamicState == CS_BULLET_STATE_DYNAMIC)
+  if (dynamicState == CS::Physics::Bullet::STATE_DYNAMIC)
   {
     body->setAngularVelocity (btVector3 (vel.x, vel.y, vel.z));
     body->activate ();
@@ -911,7 +911,7 @@ void csBulletRigidBody::GetProperties (float* mass, csVector3* center,
 
 float csBulletRigidBody::GetMass ()
 {
-  if (dynamicState != CS_BULLET_STATE_DYNAMIC)
+  if (dynamicState != CS::Physics::Bullet::STATE_DYNAMIC)
     return 0.0f;
 
   if (body)
@@ -1160,7 +1160,7 @@ void csBulletRigidBody::SetCollisionCallback (iDynamicsCollisionCallback* cb)
   collCb = cb;
 }
 
-void csBulletRigidBody::Collision (iRigidBody * other, const csVector3& pos,
+void csBulletRigidBody::Collision (::iRigidBody * other, const csVector3& pos,
       const csVector3& normal, float depth)
 {
   if (collCb)
@@ -1282,7 +1282,7 @@ csBulletDefaultKinematicCallback::~csBulletDefaultKinematicCallback ()
 }
 
 void csBulletDefaultKinematicCallback::GetBodyTransform
-(iRigidBody* body, csOrthoTransform& transform) const
+(::iRigidBody* body, csOrthoTransform& transform) const
 {
   iMeshWrapper* mesh = body->GetAttachedMesh ();
   if (mesh)

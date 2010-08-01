@@ -216,9 +216,9 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
-		       iSkeletonLookAtManager2),
+		       CS::Animation::iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
-		       iSkeletonBasicNodesManager2),
+		       CS::Animation::iSkeletonBasicNodesManager2),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -259,7 +259,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     }
 
     // Load the ragdoll plugin
-    ragdollManager = csLoadPlugin<iSkeletonRagdollManager2>
+    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager2>
       (plugmgr, "crystalspace.mesh.animesh.controllers.ragdoll");
 
     if (!ragdollManager)
@@ -324,13 +324,13 @@ bool AvatarTest::Application ()
     return false;
 
   // Find references to the plugins of the animation nodes
-  lookAtManager = csQueryRegistry<iSkeletonLookAtManager2> (GetObjectRegistry ());
+  lookAtManager = csQueryRegistry<CS::Animation::iSkeletonLookAtManager2> (GetObjectRegistry ());
   if (!lookAtManager) return ReportError("Failed to locate iLookAtManager plugin!");
 
   basicNodesManager =
-    csQueryRegistry<iSkeletonBasicNodesManager2> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonBasicNodesManager2> (GetObjectRegistry ());
   if (!basicNodesManager)
-    return ReportError("Failed to locate iSkeletonBasicNodesManager2 plugin!");
+    return ReportError("Failed to locate CS::Animation::iSkeletonBasicNodesManager2 plugin!");
 
   // Default behavior from DemoApplication for the creation of the scene
   if (!DemoApplication::CreateRoom ())
@@ -356,7 +356,7 @@ bool AvatarTest::Application ()
 
       // Find the Bullet interface of the dynamic system
       bulletDynamicSystem =
-	scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
+	scfQueryInterface<CS::Physics::Bullet::iDynamicSystem> (dynamicSystem);
 
       // We have some objects of size smaller than 0.035 units, so we scale up the
       // whole world for a better behavior of the dynamic simulation.

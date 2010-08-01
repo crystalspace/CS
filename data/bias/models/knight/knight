@@ -1,24 +1,13 @@
 <library>
 
   <plugins>
-    <plugin name='genmesh'>crystalspace.mesh.loader.genmesh</plugin>
-    <plugin name='genmeshfact'>crystalspace.mesh.loader.factory.genmesh</plugin>
-    <plugin name='armaturefact'>crystalspace.mesh.loader.factory.armature</plugin>
+    <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
+    <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
   </plugins>
 	
-  <shaders>
-    <shader>
-      <file>/shader/character/character_bump2.xml</file>
-    </shader>
-    <shader>
-      <file>/shader/character/character2.xml</file>
-    </shader>
-  </shaders>
-	
-
   <textures>
 
-    <texture name='kwarz_ice.png'>
+    <texture name='knight_ice.png'>
           <file>textures/ice.png</file>
     </texture>
 
@@ -35,7 +24,7 @@
     <texture name='sword.jpg'>
       <file>textures/sword.jpg</file>
     </texture>
-    <texture name='BUMPnormalmap.png'>
+    <texture name='BUMPknight_normalmap.png'>
       <file>textures/normalmap.png</file>
       <class>normalmap</class>
     </texture>
@@ -43,49 +32,31 @@
   
   <materials>
 
-	  <material name='Armoruvmap1.jpg'>
+	  <material name='knight_armor'>
 		  <texture>uvmap1.jpg</texture>
-		  <shader type='ambient'>character2</shader>
-		  <shader type='diffuse'>character_bump2</shader>
-		  <shader type='depthwrite'>*null</shader>
-		  <shadervar type='texture' name='tex normal'>BUMPnormalmap.png</shadervar>
+		  <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
 	  </material>
-	  <material name='SkinMaleCol1.png'>
+	  <material name='knight_skin'>
 		  <texture>MaleCol1.png</texture>
-		  <shader type='ambient'>character2</shader>
-		  <shader type='diffuse'>character_bump2</shader>
-		  <shader type='depthwrite'>*null</shader>
-		  <shadervar type='texture' name='tex normal'>BUMPnormalmap.png</shadervar>
+		  <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
 	  </material>
-	  <material name='Hairstrands.png.001'>
+	  <material name='knight_hair'>
 		  <texture>strands.png.001</texture>
-		  <shader type='ambient'>character2</shader>
-		  <shader type='diffuse'>character_bump2</shader>
-		  <shader type='depthwrite'>*null</shader>
-		  <shadervar type='texture' name='tex normal'>BUMPnormalmap.png</shadervar>
+		  <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
 	  </material>
-	  <material name='eyeuvmap1.jpg'>
+	  <material name='knight_eye'>
 		  <texture>uvmap1.jpg</texture>
-		  <shader type='ambient'>character2</shader>
-		  <shader type='diffuse'>character_bump2</shader>
-		  <shader type='depthwrite'>*null</shader>
-		  <shadervar type='texture' name='tex normal'>BUMPnormalmap.png</shadervar>
+		  <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
 	  </material>
-	  <material name='swordsword.jpg'>
+	  <material name='knight_sword'>
 		  <texture>sword.jpg</texture>
-		  <shader type='ambient'>character2</shader>
-		  <shader type='diffuse'>character_bump2</shader>
-		  <shader type='depthwrite'>*null</shader>
-		  <shadervar type='texture' name='tex normal'>BUMPnormalmap.png</shadervar>
+		  <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
 	  </material>
 
     
-    <material name='kwartz-ice'>
-          <texture>uvmap1.jpg</texture>
-          <shader type='depthwrite'>*null</shader>
-          <shader type='diffuse'>character_bump2</shader>
-          <shader type='ambient'>character2</shader>
-          <shadervar type='texture' name='tex normal'>BUMPnormalmap.png</shadervar>
+    <material name='knight-ice'>
+          <texture>knight_ice.png</texture>
+          <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
           <shadervar name="specular" type="vector4">0.9, 0.9, 1, 1</shadervar>
           <shadervar name="light 0 diffuse" type="vector4">0.9, 0.9, 1, 1</shadervar>
     </material>
@@ -93,6 +64,7 @@
   </materials>
   
   
-   <library>factories/genknight</library>
+  <library>factories/skelArmature</library>
+  <library>factories/knight</library>
 
 </library>

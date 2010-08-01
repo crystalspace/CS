@@ -28,14 +28,20 @@ class Monster : public Entity
 private:
   void Behaviour();
 
+  csString factoryName;
   csRef<iMeshWrapper> mesh;
+
+  CS::Animation::iSkeletonFSMNode2* fsmNode;
+  CS::Animation::iSkeletonFSMNodeFactory2* fsmNodeFactory;
 
 public:
   float awareRadius, curAwareRadius;
 
 public:
-  Monster(iObjectRegistry*, iMeshWrapper*);
+  Monster(iObjectRegistry*);
   ~Monster();
+
+  virtual bool Initialize (iMeshWrapper*);
 
   virtual void PlayAnimation(const char*, bool);
 

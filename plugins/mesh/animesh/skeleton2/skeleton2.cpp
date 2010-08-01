@@ -25,6 +25,9 @@
 #include "animation.h"
 #include "nodes.h"
 #include "utilities.h"
+#include "imesh/animesh.h"
+#include "imesh/object.h"
+#include "iengine/mesh.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
@@ -37,15 +40,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     : scfImplementationType (this, parent)
   {}
 
-  iSkeletonFactory2* SkeletonSystem::CreateSkeletonFactory (const char* name)
+  CS::Animation::iSkeletonFactory2* SkeletonSystem::CreateSkeletonFactory (const char* name)
   {
     // Check name uniqueness
-    csRef<iSkeletonFactory2> newFact = csPtr<iSkeletonFactory2> (new SkeletonFactory);
+    csRef<CS::Animation::iSkeletonFactory2> newFact = csPtr<CS::Animation::iSkeletonFactory2> (new SkeletonFactory);
 
     return factoryHash.PutUnique (name, newFact);
   }
 
-  iSkeletonFactory2* SkeletonSystem::FindSkeletonFactory (const char* name)
+  CS::Animation::iSkeletonFactory2* SkeletonSystem::FindSkeletonFactory (const char* name)
   {
     return factoryHash.Get (name, 0);
   }
@@ -55,16 +58,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     factoryHash.DeleteAll ();
   }
 
-  iSkeletonAnimPacketFactory2* SkeletonSystem::CreateAnimPacketFactory (const char* name)
+  CS::Animation::iSkeletonAnimPacketFactory2* SkeletonSystem::CreateAnimPacketFactory (const char* name)
   {
     // Check name uniqueness
-    csRef<iSkeletonAnimPacketFactory2> newFact = 
-      csPtr<iSkeletonAnimPacketFactory2> (new AnimationPacketFactory);
+    csRef<CS::Animation::iSkeletonAnimPacketFactory2> newFact = 
+      csPtr<CS::Animation::iSkeletonAnimPacketFactory2> (new AnimationPacketFactory);
 
     return animPackets.PutUnique (name, newFact);
   }
 
-  iSkeletonAnimPacketFactory2* SkeletonSystem::FindAnimPacketFactory (const char* name)
+  CS::Animation::iSkeletonAnimPacketFactory2* SkeletonSystem::FindAnimPacketFactory (const char* name)
   {
     return animPackets.Get (name, 0);
   }
@@ -94,17 +97,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     orderListDirty (true)
   {}
 
-  BoneID SkeletonFactory::FindBone (const char *name) const
+  CS::Animation::BoneID SkeletonFactory::FindBone (const char *name) const
   {
     for (size_t i = 0; i < boneNames.GetSize (); i++)
     {
       if (!strcmp(name,boneNames[i]))
-        return (BoneID)i;
+        return (CS::Animation::BoneID)i;
     }
-    return InvalidBoneID;
+    return CS::Animation::InvalidBoneID;
   }
 
-  BoneID SkeletonFactory::CreateBone (BoneID parent)
+  CS::Animation::BoneID SkeletonFactory::CreateBone (CS::Animation::BoneID parent)
   {
     cachedTransformsDirty = true;
     orderListDirty = true;
@@ -120,7 +123,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
         boneNames[i] = "NEWBONE";
 
-        return (BoneID)i;
+        return (CS::Animation::BoneID)i;
       }
     }
 
@@ -129,10 +132,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     newBone.created = true;
 
     boneNames.Push ("NEWBONE");
-    return (BoneID)allBones.Push (newBone);
+    return (CS::Animation::BoneID)allBones.Push (newBone);
   }
 
-  void SkeletonFactory::RemoveBone (BoneID bone)
+  void SkeletonFactory::RemoveBone (CS::Animation::BoneID bone)
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
 
@@ -152,39 +155,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     orderListDirty = true;
   }
 
-  BoneID SkeletonFactory::GetBoneParent (BoneID bone) const
+  CS::Animation::BoneID SkeletonFactory::GetBoneParent (CS::Animation::BoneID bone) const
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
 
     return allBones[bone].parent;
   }
 
-  bool SkeletonFactory::HasBone (BoneID bone) const
+  bool SkeletonFactory::HasBone (CS::Animation::BoneID bone) const
   {
     return (bone < allBones.GetSize ()) && 
            allBones[bone].created;
   }
 
-  void SkeletonFactory::SetBoneName (BoneID bone, const char* name)
+  void SkeletonFactory::SetBoneName (CS::Animation::BoneID bone, const char* name)
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
 
     boneNames[bone] = name;
   }
 
-  const char* SkeletonFactory::GetBoneName (BoneID bone) const
+  const char* SkeletonFactory::GetBoneName (CS::Animation::BoneID bone) const
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
 
     return boneNames[bone];
   }
 
-  BoneID SkeletonFactory::GetTopBoneID () const
+  CS::Animation::BoneID SkeletonFactory::GetTopBoneID () const
   {
-    return (BoneID)(allBones.GetSize () - 1);
+    return (CS::Animation::BoneID)(allBones.GetSize () - 1);
   }
 
-  void SkeletonFactory::GetTransformBoneSpace (BoneID bone, csQuaternion& rot, 
+  void SkeletonFactory::GetTransformBoneSpace (CS::Animation::BoneID bone, csQuaternion& rot, 
     csVector3& offset) const
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
@@ -194,7 +197,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     offset = boneRef.boneOffset;
   }
 
-  void SkeletonFactory::SetTransformBoneSpace (BoneID bone, const csQuaternion& rot, 
+  void SkeletonFactory::SetTransformBoneSpace (CS::Animation::BoneID bone, const csQuaternion& rot, 
     const csVector3& offset)
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
@@ -206,14 +209,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     boneRef.boneOffset = offset;
   }
 
-  void SkeletonFactory::GetTransformAbsSpace (BoneID bone, csQuaternion& rot, 
+  void SkeletonFactory::GetTransformAbsSpace (CS::Animation::BoneID bone, csQuaternion& rot, 
     csVector3& offset) const
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
     
     const Bone& boneRef = allBones[bone];
     
-    if (boneRef.parent == InvalidBoneID)
+    if (boneRef.parent == CS::Animation::InvalidBoneID)
     {
       rot = boneRef.boneRotation;
       offset = boneRef.boneOffset;
@@ -236,14 +239,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
-  void SkeletonFactory::SetTransformAbsSpace (BoneID bone, const csQuaternion& rot, 
+  void SkeletonFactory::SetTransformAbsSpace (CS::Animation::BoneID bone, const csQuaternion& rot, 
     const csVector3& offset)
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
 
     Bone& boneRef = allBones[bone];
 
-    if (boneRef.parent == InvalidBoneID)
+    if (boneRef.parent == CS::Animation::InvalidBoneID)
     {
       boneRef.boneRotation = rot;
       boneRef.boneOffset = offset;
@@ -260,19 +263,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     cachedTransformsDirty = true;
   }
 
-  csPtr<iSkeleton2> SkeletonFactory::CreateSkeleton ()
+  csPtr<CS::Animation::iSkeleton2> SkeletonFactory::CreateSkeleton ()
   {
-    csRef<iSkeleton2> ref;
+    csRef<CS::Animation::iSkeleton2> ref;
     ref.AttachNew (new Skeleton (this));
-    return csPtr<iSkeleton2> (ref);
+    return csPtr<CS::Animation::iSkeleton2> (ref);
   }
 
-  iSkeletonAnimPacketFactory2* SkeletonFactory::GetAnimationPacket () const
+  CS::Animation::iSkeletonAnimPacketFactory2* SkeletonFactory::GetAnimationPacket () const
   {
     return animationPacket;
   }
 
-  void SkeletonFactory::SetAnimationPacket (iSkeletonAnimPacketFactory2* fact)
+  void SkeletonFactory::SetAnimationPacket (CS::Animation::iSkeletonAnimPacketFactory2* fact)
   {
     animationPacket = fact;
   }
@@ -292,7 +295,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       if (!boneRef.created)
         continue;
 
-      if (boneRef.parent == InvalidBoneID)
+      if (boneRef.parent == CS::Animation::InvalidBoneID)
       {
         boneRef.absOffset = boneRef.boneOffset;
         boneRef.absRotation = boneRef.boneRotation;
@@ -320,15 +323,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     for (size_t i = 0; i < allBones.GetSize (); ++i)
     {
-      if (allBones[i].created && 
-          allBones[i].parent != InvalidBoneID)
+      if (allBones[i].created)
       {
-        CS::Utility::GraphEdge edge (allBones[i].parent, i);
+	CS::Utility::GraphEdge edge (allBones[i].parent, i);
         graph.Push (edge);
       }      
     }
 
     boneOrderList = CS::Utility::TopologicalSort (graph);
+    boneOrderList.Delete (CS::Animation::InvalidBoneID);
 
     orderListDirty = false;
   }
@@ -340,7 +343,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   Skeleton::Skeleton (SkeletonFactory* factory)
     : scfImplementationType (this, factory), factory (factory), 
-    cachedTransformsDirty (true), version (0), versionLastReset (0)
+    cachedTransformsDirty (true), version (0), versionLastReset (0), animesh (nullptr)
   {
     // Setup the bones from the parent setup
     RecreateSkeletonP ();
@@ -349,10 +352,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   iSceneNode* Skeleton::GetSceneNode ()
   {
-    return 0;
+    if (!animesh)
+      return 0;
+
+    csRef<iMeshObject> object = scfQueryInterface<iMeshObject> (animesh);
+    return object->GetMeshWrapper ()->QuerySceneNode ();
   }
 
-  void Skeleton::GetTransformBoneSpace (BoneID bone, csQuaternion& rot, 
+  void Skeleton::SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh)
+  {
+    this->animesh = animesh;
+  }
+
+  CS::Mesh::iAnimatedMesh* Skeleton::GetAnimatedMesh ()
+  {
+    return animesh;
+  }
+
+  void Skeleton::GetTransformBoneSpace (CS::Animation::BoneID bone, csQuaternion& rot, 
     csVector3& offset) const
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
@@ -362,7 +379,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     offset = boneRef.boneOffset;
   }
 
-  void Skeleton::SetTransformBoneSpace (BoneID bone, const csQuaternion& rot, 
+  void Skeleton::SetTransformBoneSpace (CS::Animation::BoneID bone, const csQuaternion& rot, 
     const csVector3& offset)
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
@@ -374,14 +391,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     boneRef.boneOffset = offset;
   }
 
-  void Skeleton::GetTransformAbsSpace (BoneID bone, csQuaternion& rot, 
+  void Skeleton::GetTransformAbsSpace (CS::Animation::BoneID bone, csQuaternion& rot, 
     csVector3& offset) const
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
 
     const Bone& boneRef = allBones[bone];
 
-    if (boneRef.parent == InvalidBoneID)
+    if (boneRef.parent == CS::Animation::InvalidBoneID)
     {
       rot = boneRef.boneRotation;
       offset = boneRef.boneOffset;
@@ -404,17 +421,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
-  void Skeleton::SetTransformAbsSpace (BoneID bone, const csQuaternion& rot, 
+  void Skeleton::SetTransformAbsSpace (CS::Animation::BoneID bone, const csQuaternion& rot, 
     const csVector3& offset)
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);    
 
     Bone& boneRef = allBones[bone];
 
-    if (boneRef.parent == InvalidBoneID)
+    if (boneRef.parent == CS::Animation::InvalidBoneID)
     {
       boneRef.boneRotation = rot;
       boneRef.boneOffset = offset;
+      // TODO: no need for cachedTransformsDirty = true; ?
       return;
     }
 
@@ -428,7 +446,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     cachedTransformsDirty = true;
   }
 
-  void Skeleton::GetTransformBindSpace (BoneID bone, csQuaternion& rot, 
+  void Skeleton::GetTransformBindSpace (CS::Animation::BoneID bone, csQuaternion& rot, 
     csVector3& offset) const
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);    
@@ -456,7 +474,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
-  void Skeleton::SetTransformBindSpace (BoneID bone, const csQuaternion& rot, 
+  void Skeleton::SetTransformBindSpace (CS::Animation::BoneID bone, const csQuaternion& rot, 
     const csVector3& offset)
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
@@ -472,16 +490,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     SetTransformAbsSpace (bone, newAbsRot, newAbsOffset);
   }
 
-  csPtr<csSkeletalState2> Skeleton::GetStateAbsSpace ()
+  csPtr<CS::Animation::csSkeletalState2> Skeleton::GetStateAbsSpace ()
   {
     UpdateCachedTransforms ();
 
     // Use a pool for these...
-    csRef<csSkeletalState2> currState;
-    currState.AttachNew (new csSkeletalState2);
+    csRef<CS::Animation::csSkeletalState2> currState;
+    currState.AttachNew (new CS::Animation::csSkeletalState2);
     currState->Setup (allBones.GetSize ());
 
-    for (BoneID i = 0; i < allBones.GetSize (); ++i)
+    for (CS::Animation::BoneID i = 0; i < allBones.GetSize (); ++i)
     {
       if (allBones[i].created)
       {
@@ -491,14 +509,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    return csPtr<csSkeletalState2> (currState);
+    return csPtr<CS::Animation::csSkeletalState2> (currState);
   }
 
-  csPtr<csSkeletalState2> Skeleton::GetStateBoneSpace ()
+  csPtr<CS::Animation::csSkeletalState2> Skeleton::GetStateBoneSpace ()
   {
     // Use a pool for these...
-    csRef<csSkeletalState2> currState;
-    currState.AttachNew (new csSkeletalState2);
+    csRef<CS::Animation::csSkeletalState2> currState;
+    currState.AttachNew (new CS::Animation::csSkeletalState2);
     currState->Setup (allBones.GetSize ());
 
     for (size_t i = 0; i < allBones.GetSize (); ++i)
@@ -507,20 +525,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       {
         currState->GetQuaternion (i) = allBones[i].boneRotation;
         currState->GetVector (i) = allBones[i].boneOffset;
-        currState->SetBoneUsed ((BoneID)i);
+        currState->SetBoneUsed ((CS::Animation::BoneID)i);
       }
     }
 
-    return csPtr<csSkeletalState2> (currState);
+    return csPtr<CS::Animation::csSkeletalState2> (currState);
   }
 
-  csPtr<csSkeletalState2> Skeleton::GetStateBindSpace ()
+  csPtr<CS::Animation::csSkeletalState2> Skeleton::GetStateBindSpace ()
   {
     UpdateCachedTransforms ();
 
     // Use a pool for these...
-    csRef<csSkeletalState2> currState;
-    currState.AttachNew (new csSkeletalState2);
+    csRef<CS::Animation::csSkeletalState2> currState;
+    currState.AttachNew (new CS::Animation::csSkeletalState2);
     currState->Setup (allBones.GetSize ());
 
     for (size_t i = 0; i < allBones.GetSize (); ++i)
@@ -529,25 +547,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       {        
         currState->GetQuaternion (i) = allBones[i].bindRotation;
         currState->GetVector (i) = allBones[i].bindOffset;
-        currState->SetBoneUsed ((BoneID)i);
+        currState->SetBoneUsed ((CS::Animation::BoneID)i);
       }
     }
 
-    return csPtr<csSkeletalState2> (currState);
+    return csPtr<CS::Animation::csSkeletalState2> (currState);
   }
 
-  iSkeletonFactory2* Skeleton::GetFactory () const
+  CS::Animation::iSkeletonFactory2* Skeleton::GetFactory () const
   {
     return factory;
   }
 
 
-  iSkeletonAnimPacket2* Skeleton::GetAnimationPacket () const
+  CS::Animation::iSkeletonAnimPacket2* Skeleton::GetAnimationPacket () const
   {
     return animationPacket;
   }
 
-  void Skeleton::SetAnimationPacket (iSkeletonAnimPacket2* packet)
+  void Skeleton::SetAnimationPacket (CS::Animation::iSkeletonAnimPacket2* packet)
   {
     animationPacket = packet;
   }
@@ -564,15 +582,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       return;
 
     // Update the root node
-    iSkeletonAnimNode2* rootNode = animationPacket->GetAnimationRoot ();
+    CS::Animation::iSkeletonAnimNode2* rootNode = animationPacket->GetAnimationRoot ();
     rootNode->TickAnimation (dt);
    
     // If the root node is active then update the skeleton
     if (rootNode->IsActive ())
     {
       // TODO: Use a pool for these...
-      csRef<csSkeletalState2> finalState;
-      finalState.AttachNew (new csSkeletalState2);
+      csRef<CS::Animation::csSkeletalState2> finalState;
+      finalState.AttachNew (new CS::Animation::csSkeletalState2);
       finalState->Setup (allBones.GetSize ());
 
       // Blend the root node into the skeleton state
@@ -584,11 +602,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         Bone& boneRef = allBones[i];
 
 	// Apply the bone state
-        if (boneRef.created && finalState->IsBoneUsed ((BoneID) i))
+        if (boneRef.created && finalState->IsBoneUsed ((CS::Animation::BoneID) i))
         {
 	  csQuaternion skeletonRotation;
 	  csVector3 skeletonOffset;
-	  factory->GetTransformBoneSpace ((BoneID) i, skeletonRotation,
+	  factory->GetTransformBoneSpace ((CS::Animation::BoneID) i, skeletonRotation,
 					 skeletonOffset);
 
 
@@ -688,7 +706,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       if (!boneRef.created)
         continue;
 
-      if (boneRef.parent == InvalidBoneID)
+      if (boneRef.parent == CS::Animation::InvalidBoneID)
       {
         boneRef.absOffset = boneRef.boneOffset;
         boneRef.absRotation = boneRef.boneRotation;

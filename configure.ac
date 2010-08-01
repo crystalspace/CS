@@ -1453,7 +1453,7 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
 
 CS_CHECK_LIBOPENAL
 
-
+AC_CHECK_HEADERS([AL/alext.h], [CS_HEADER_PROPERTY([CS_HAVE_ALEXT_H])])
 
 #------------------------------------------------------------------------------
 # Check for FreeType2. Note that on MacOS/X, Fink strangely installs

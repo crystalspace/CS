@@ -25,19 +25,37 @@
 
 #include "assetbase.h"
 
+namespace CS
+{
+namespace Mesh
+{
+
 struct iAnimatedMesh;
 struct iAnimatedMeshFactory;
+
+} // namespace Mesh
+} // namespace CS
+
+namespace CS
+{
+namespace Animation
+{
+
 struct iSkeletonAnimNode2;
+
+} // namespace Animation
+} // namespace CS
+
 
 class AnimeshAsset : public AssetBase
 {
 private:
-  csRef<iAnimatedMesh> animeshstate;
-  csRef<iAnimatedMeshFactory> animeshsprite;
+  csRef<CS::Mesh::iAnimatedMesh> animeshstate;
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshsprite;
   bool reverseAction;
 
 private:
-  bool HandleSkel2Node (const char* animName, iSkeletonAnimNode2* node, bool start);
+  bool HandleSkel2Node (const char* animName, CS::Animation::iSkeletonAnimNode2* node, bool start);
 
 public:
   static bool Support(iMeshWrapper* mesh);

@@ -66,7 +66,7 @@ namespace CS
   {}
 
   /**
-   * Geometry and mesh related classes.
+   * Geometry and mesh tools related classes.
    */
   namespace Geometry
   {}
@@ -87,6 +87,12 @@ namespace CS
    * Memory allocation
    */
   namespace Memory
+  {}
+
+  /**
+   * Meshes
+   */
+  namespace Mesh
   {}
 
   /**
@@ -134,6 +140,19 @@ namespace CS
      */
     namespace ShaderWeaver
     {}
+  }
+
+  /**
+   * Objects of a dynamic simulation
+   */
+  namespace Physics
+  {
+    /**
+     * Objects of a dynamic simulation with the Bullet plugin
+     */
+    namespace Bullet
+    {
+    }
   }
 
   /**
