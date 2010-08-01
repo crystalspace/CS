@@ -51,6 +51,7 @@
       <shadervar type="texture" name="height map">krystal_skull_heightmap</shadervar>
 	  <shadervar type="float" name="heightFactor">0.5</shadervar>
 	  <shadervar type="float" name="controlPointsDistance">0.05</shadervar>
+	  <shadervar type="int" name="growTangents">1</shadervar>
     </material>
   </materials>
   <sounds/>

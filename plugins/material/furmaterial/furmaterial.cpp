@@ -84,7 +84,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     iObjectRegistry* object_reg) :
   scfImplementationType (this), manager (manager), name (name), 
     object_reg(object_reg), physicsControl(0), hairStrandGenerator(0), rng(0),
-    guideLOD(0), strandLOD(0), hairStrandsLODSize(0), physicsControlEnabled(true)
+    guideLOD(0), strandLOD(0), hairStrandsLODSize(0), physicsControlEnabled(true),
+    growTangents(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -150,8 +151,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
       controlPointSum += hairStrands.Get(x).controlPointsCount, x++ )
-      
-      if (hairStrands.Get(x).controlPointsCount >= 2)
     {
       for ( size_t y = 0 ; y < hairStrands.Get(x).controlPointsCount ; y ++ )
       {
@@ -307,17 +306,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       guideHair.controlPointsCount = (int)( (height * heightFactor) / controlPointsDistance);
       
-      if (guideHair.controlPointsCount < 3 && guideHair.controlPointsCount > 0)
-        guideHair.controlPointsCount = 3;
+      if (guideHair.controlPointsCount == 1)
+        guideHair.controlPointsCount = 2;
 
       guideHair.controlPoints = new csVector3[ guideHair.controlPointsCount ];
 
       float realDistance = (height * heightFactor) / guideHair.controlPointsCount;
 
-      for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
-        guideHair.controlPoints[j] = pos + j * realDistance * 
-          tangentsArray[uniqueIndices.Get(i)];
-
+      if (growTangents)
+        for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
+          guideHair.controlPoints[j] = pos + j * realDistance * 
+            tangentsArray[uniqueIndices.Get(i)];
+      else
+        for ( size_t j = 0 ; j < guideHair.controlPointsCount ; j ++ )
+          guideHair.controlPoints[j] = pos + j * realDistance * 
+            norms.Get(uniqueIndices.Get(i));
+        
       guideHairs.Push(guideHair);
     }
   }
@@ -849,10 +853,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     this->material = material;
 
     SetColor(csColor(1,1,0));
+    SetGrowTangents();
     SetDensitymap();
     SetHeightmap();
     SetStrandWidth();
     SetDisplaceDistance();
+  }
+
+  void FurMaterial::SetGrowTangents()
+  {
+    CS::ShaderVarName growTangentsName (svStrings, "growTangents");	
+    csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(growTangentsName);
+
+    shaderVariable->GetValue(growTangents);
   }
 
   void FurMaterial::SetColor(csColor color)
@@ -1134,7 +1147,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         (*(tangentBuffer + 1)) = tangent;
       }
 
-      if (controlPointsCount >= 2)
+      if (controlPointsCount)
       {
         (*vbuf) = *controlPoints;
         (*(vbuf + 1)) = *controlPoints + strip;

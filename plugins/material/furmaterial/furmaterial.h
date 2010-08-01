@@ -178,6 +178,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float strandWidth;
     float strandWidthLOD;
     float controlPointsDistance;
+    int growTangents;
     /// Model
     csRef<iEngine> engine;
     csRef<iLoader> loader;
@@ -194,6 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     void SaveUVImage();
     void SaveImage(uint8* buf, const char* texname,int width, int height);
     /// setters
+    void SetGrowTangents();
     void SetDensitymap();
     void SetHeightmap();
     void SetStrandWidth();
