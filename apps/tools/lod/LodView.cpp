@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2010 by Eduardo Poyart
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,22 +22,22 @@ using namespace std;
 
 #include <crystalspace.h>
 #include "LodGen.h"
-#include "lod.h"
+#include "LodView.h"
 
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-Lod::Lod (): lod_level(0)
+LodView::LodView (): lod_level(0)
 {
   SetApplicationName ("CrystalSpace.Lod");
 }
 
-Lod::~Lod ()
+LodView::~LodView ()
 {
 }
 
-void Lod::Frame ()
+void LodView::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -95,7 +95,7 @@ void Lod::Frame ()
   rm->RenderView (view);
 }
 
-void Lod::UpdateLODLevel()
+void LodView::UpdateLODLevel()
 {
   csRef<iMeshWrapper> sprite = engine->FindMeshObject("MySprite");
   csRef<iMeshObject> mobj = sprite->GetMeshObject();
@@ -114,7 +114,7 @@ void Lod::UpdateLODLevel()
   cout << "Level: " << lod_level << " Triangles: " << (e-s)/3 << endl;
 }
 
-bool Lod::OnKeyboard (iEvent& ev)
+bool LodView::OnKeyboard (iEvent& ev)
 {
   // We got a keyboard event.
   csKeyEventType eventtype = csKeyEventHelper::GetEventType (&ev);
@@ -157,7 +157,7 @@ bool Lod::OnKeyboard (iEvent& ev)
 
 
 // 1
-bool Lod::OnInitialize (int /*argc*/, char* /*argv*/ [])
+bool LodView::OnInitialize (int /*argc*/, char* /*argv*/ [])
 {
   //PointTriangleDistanceUnitTests();
   
@@ -167,8 +167,6 @@ bool Lod::OnInitialize (int /*argc*/, char* /*argv*/ [])
   // global configs). In addition it also supports specifying plugins
   // on the commandline.
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
-    CS_REQUEST_PLUGIN("crystalspace.documentsystem.multiplexer", iDocumentSystem),
-    CS_REQUEST_PLUGIN_TAG("crystalspace.documentsystem.tinyxml", iDocumentSystem, "iDocumentSystem.1"),
     CS_REQUEST_VFS,
     CS_REQUEST_OPENGL3D,
     CS_REQUEST_ENGINE,
@@ -177,7 +175,6 @@ bool Lod::OnInitialize (int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
-    CS_REQUEST_VFS,
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -201,14 +198,14 @@ bool Lod::OnInitialize (int /*argc*/, char* /*argv*/ [])
   return true;
 }
 
-void Lod::OnExit ()
+void LodView::OnExit ()
 {
   // Shut down the event handlers we spawned earlier.
   printer.Invalidate ();
 }
 
 // 2
-bool Lod::Application ()
+bool LodView::Application ()
 {
   // Open the main system. This will open all the previously loaded plug-ins.
   // i.e. all windows will be opened.
@@ -277,9 +274,9 @@ public:
 };
 */
 
-void Lod::CreateLODs(const char* filename_in, const char* filename_out)
+void LodView::CreateLODs(const char* filename)
 {
-  loading = tloader->LoadFileWait("/lev/lodtest/", filename_in);
+  loading = tloader->LoadFileWait("/lev/lodtest/", filename);
   
   if (!loading->WasSuccessful())
   {
@@ -381,107 +378,11 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
   {
     fstate->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
   }
-  
-  fstate->Invalidate();
   */
-  
-  string path_filename_out = string("/lev/lodtest/") + filename_out;
-  Save(path_filename_out.c_str());
-  
   loading.Invalidate();
 }
 
-void Lod::Save(const char* filename)
-{
-  csRef<iVFS> vfs;
-  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
-  if (!vfs)
-  {
-    cout << "No iVFS!" << endl;
-    return;
-  }
-  
-  csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
-  csRef<iDocument> doc = xml->CreateDocument();
-  csRef<iDocumentNode> root = doc->CreateRoot();
-  
-  iMeshObjectFactory* meshfact = imeshfactw->GetMeshObjectFactory();
-  
-  //Create the Tag for the MeshObj
-  csRef<iDocumentNode> factNode = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  factNode->SetValue("meshfact");
-  
-  //Add the mesh's name to the MeshObj tag
-  const char* name = imeshfactw->QueryObject()->GetName();
-  if (name && *name)
-    factNode->SetAttribute("name", name);
-  
-  csRef<iFactory> factory = scfQueryInterface<iFactory> (meshfact->GetMeshObjectType());
-  
-  const char* pluginname = factory->QueryClassID();
-  
-  if (!(pluginname && *pluginname)) return;
-  
-  csRef<iDocumentNode> pluginNode = factNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  pluginNode->SetValue("plugin");
-  
-  //Add the plugin tag
-  char loadername[128] = "";
-  csReplaceAll(loadername, pluginname, ".object.", ".loader.factory.", sizeof(loadername));
-  
-  /*
-  if (binary)
-    strcat(loadername, ".binary");
-  */
-  
-  pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
-  csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (GetObjectRegistry ());
-  
-  char savername[128] = "";
-  
-  csReplaceAll(savername, pluginname, ".object.", ".saver.factory.", sizeof(savername));
-  
-  /*
-  if (binary)
-    strcat(savername, ".binary");
-  */
-  
-  //Invoke the iSaverPlugin::WriteDown
-  /*
-  if (binary)
-  {
-    csRef<iString> fname (new scfString(filename));
-    fname->Append(".binary", 7);
-    
-    csRef<iFile> file (vfs->Open(*fname, VFS_FILE_WRITE));
-    
-    csRef<iDocumentNode> paramsNode = 
-    factNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    paramsNode->SetValue("paramsfile");
-    
-    csRef<iDocumentNode> paramsdataNode = 
-    paramsNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-    
-    paramsdataNode->SetValue(*fname);
-    
-    csRef<iBinarySaverPlugin> saver = csLoadPluginCheck<iBinarySaverPlugin> (plugin_mgr, savername);
-    if (saver)
-      saver->WriteDown(meshfact, file, 0);
-  }
-  else
-  {
-  */
-    csRef<iSaverPlugin> saver =  csLoadPluginCheck<iSaverPlugin> (plugin_mgr, savername);
-    if (saver) 
-      saver->WriteDown(meshfact, factNode, 0/*ssource*/);
-  //}
-  scfString str;
-  doc->Write(&str);
-  vfs->WriteFile(filename, str.GetData(), str.Length());
-  vfs->Sync();
-}
-
-bool Lod::SetupModules ()
+bool LodView::SetupModules ()
 {
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
@@ -513,12 +414,12 @@ bool Lod::SetupModules ()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
  
-  CreateLODs("lodbarrel", "lodbarrel_lod");
-  //CreateLODs("genMesh.002", "genMesh.002_lod");
-  //CreateLODs("lodbox", "lodbox_lod");
-  //CreateLODs("genbment2_tables", "genbment2_tables_lod");
-  //CreateLODs("simple", "simple_lod");
-  //CreateLODs("kwartz.lib", "kwartz_lod.lib");
+  //CreateLODs("lodbarrel");
+  //CreateLODs("genMesh.002");
+  //CreateLODs("lodbox");
+  //CreateLODs("genbment2_tables");
+  //CreateLODs("simple");
+  CreateLODs("kwartz.lib");
 
   // Here we create our world.
   CreateRoom ();
@@ -551,7 +452,7 @@ bool Lod::SetupModules ()
   return true;
 }
 
-void Lod::CreateRoom ()
+void LodView::CreateRoom ()
 {
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
@@ -594,7 +495,7 @@ void Lod::CreateRoom ()
   ll->Add (light);
 }
 
-void Lod::CreateSprites ()
+void LodView::CreateSprites ()
 {
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark", "/lib/std/spark.png");
@@ -642,5 +543,5 @@ int main (int argc, char* argv[])
    * again). Simple1 does not use that functionality itself, however, it
    * allows you to later use "Simple.Restart();" and it'll just work.
    */
-  return csApplicationRunner<Lod>::Run (argc, argv);
+  return csApplicationRunner<LodView>::Run (argc, argv);
 }

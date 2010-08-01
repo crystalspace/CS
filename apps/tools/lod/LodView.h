@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2010 by Eduardo Poyart
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __LOD_H__
-#define __LOD_H__
+#ifndef __LODVIEW_H__
+#define __LODVIEW_H__
 
 /**
  * This is the main class of this Tutorial. It contains the
@@ -29,7 +29,7 @@
  * csBaseEventHandler provides a base object which does absolutely nothing
  * with the events that are sent to it.
  */
-class Lod : public csApplicationFramework, public csBaseEventHandler
+class LodView : public csApplicationFramework, public csBaseEventHandler
 {
 private:
   /// A pointer to the 3D engine.
@@ -81,8 +81,7 @@ private:
   void Frame ();
   
   csRef<iThreadReturn> loading;
-  void CreateLODs(const char* filename_in, const char* filename_out);
-  void Save(const char* filename);
+  void CreateLODs(const char* filename);
   
   /// Here we will create our little, simple world.
   void CreateRoom ();
@@ -96,10 +95,10 @@ private:
 public:
 
   /// Construct our game. This will just set the application ID for now.
-  Lod ();
+  LodView ();
 
   /// Destructor.
-  ~Lod ();
+  ~LodView ();
 
   /// Final cleanup.
   void OnExit ();

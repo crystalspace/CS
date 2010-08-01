@@ -4547,6 +4547,8 @@
 		37045D1D11BB720E00EAFC31 /* lod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lod.cpp; sourceTree = "<group>"; };
 		37045D1E11BB720E00EAFC31 /* lod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lod.h; sourceTree = "<group>"; };
 		372CD44211CA14070000724A /* Jamfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.jam; path = Jamfile; sourceTree = "<group>"; };
+		377C89171203C8CC00CAB9D7 /* LodView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LodView.cpp; sourceTree = "<group>"; };
+		377C89181203C8CC00CAB9D7 /* LodView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LodView.h; sourceTree = "<group>"; };
 		37A6F7FA11C6BB52000541E7 /* LodGen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LodGen.h; sourceTree = "<group>"; };
 		37A6F7FB11C6BB52000541E7 /* LodGen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LodGen.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -13878,6 +13880,8 @@
 		37045C8311BB4AE600EAFC31 /* lod */ = {
 			isa = PBXGroup;
 			children = (
+				377C89171203C8CC00CAB9D7 /* LodView.cpp */,
+				377C89181203C8CC00CAB9D7 /* LodView.h */,
 				372CD44211CA14070000724A /* Jamfile */,
 				37045D1E11BB720E00EAFC31 /* lod.h */,
 				37045D1D11BB720E00EAFC31 /* lod.cpp */,
