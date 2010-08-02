@@ -358,11 +358,6 @@ void csSndSysRendererOpenAL::Release()
   m_ContextLock.Unlock();
 }
 
-bool csSndSysRendererOpenAL::SupportsALExt (const char* pszALExtName)
-{
-  return hSupportedALExts.Get (pszALExtName, false);
-}
-
 /*
  * csSndSysRendererOpenAL implementation
  */
@@ -520,24 +515,26 @@ void csSndSysRendererOpenAL::Close()
 
 void csSndSysRendererOpenAL::QueryExtensions ()
 {
-  const char* asExtsToQuery[] =
-  {
-    "AL_EXT_MCFORMATS",
-    0
-  };
+#define EXTS_TO_QUERY	\
+    EXT(AL_EXT_MCFORMATS)
   
-  for (size_t i = 0; asExtsToQuery[i] != 0; ++i)
-  {
-    bool bExtSupported = (alIsExtensionPresent(asExtsToQuery[i]) == AL_TRUE);
-    hSupportedALExts.Put (asExtsToQuery[i], bExtSupported);
-
-    if (bExtSupported)
-    {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "OpenAL: Found extension: '%s'\n", asExtsToQuery[i]);
-    }
-    else
-    {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "OpenAL: Did not find extension: '%s'\n", asExtsToQuery[i]);
-    }
+#define EXT(Ext)					\
+  {			 				\
+    ext##Ext =(alIsExtensionPresent(#Ext) == AL_TRUE);	\
+    if (ext##Ext)					\
+    {							\
+      Report (CS_REPORTER_SEVERITY_NOTIFY, 		\
+	"Found extension: '%s'", #Ext);			\
+    }							\
+    else						\
+    {							\
+      Report (CS_REPORTER_SEVERITY_NOTIFY,		\
+	"Did not find extension: '%s'", #Ext);		\
+    }							\
   }
+  
+  EXTS_TO_QUERY
+  
+#undef EXT
+#undef EXTS_TO_QUERY
 }
