@@ -225,58 +225,6 @@ bool Lod::Application ()
   return true;
 }
 
-/*
-struct VertexAttributes
-{
-  csVector2 uv;
-  csVector3 normal;
-  csColor4 color;
-  VertexAttributes(const csVector2& u, const csVector3& n, const csColor4& c): uv(u), normal(n), color(c) {}
-};
-
-class UniqueVertMesh
-{
-public:
-  csArray<csVector3> vertices;
-  csArray<csTriangle> triangles;
-  csArray<VertexAttributes> attr;
-protected:
-  csArray<int> vert_map;
-public:
-  void AddVertUnique(const csVector3& v, const VertexAttributes& a)
-  {
-    static const float epsilon = 0.00001;
-    int vindex = -1;
-    for (unsigned int i = 0; i < vertices.GetSize(); i++)
-    {
-      if (fabs(v[0] - vertices[i][0]) < epsilon && fabs(v[1] - vertices[i][1]) < epsilon && fabs(v[2] - vertices[i][2]) < epsilon)
-      {
-        vindex = i;
-        break;
-      }
-    }
-    if (vindex == -1)
-    {
-      vertices.Push(v);
-      attr.Push(a);
-      vert_map.Push(vertices.GetSize() - 1);
-    }
-    else
-    {
-      vert_map.Push(vindex);
-    }
-  }
-  
-  void AddTriangleMapped(const csTriangle& t)
-  {
-    csTriangle new_tri;
-    for (int i = 0; i < 3; i++)
-      new_tri[i] = vert_map[t[i]];
-    triangles.Push(new_tri);
-  }  
-};
-*/
-
 void Lod::CreateLODs(const char* filename_in, const char* filename_out)
 {
   loading = tloader->LoadFileWait("", filename_in);
@@ -287,9 +235,7 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     loading.Invalidate();
     return;
   }
-  
-  csRef<iMeshWrapper> spritewrapper;
-  
+    
   if (!loading->GetResultRefPtr().IsValid())
   {
     // Library file. Find the first factory in our region.
@@ -299,27 +245,14 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
       cout << "No factories in file" << endl;
       return;
     }
-    iMeshFactoryWrapper* f = factories->Get (0);
-    imeshfactw = f;
-    /*
-    int i;
-    for (i = 0 ; i < factories->GetCount () ; i++)
-    {
-      iMeshFactoryWrapper* f = factories->Get (i);
-      if (collection->IsParentOf (f->QueryObject ()))
-      {
-        imeshfactw = f;
-        break;
-      }
-    }
-    */
+    imeshfactw = factories->Get (0);
   }
   else
   {
     imeshfactw = scfQueryInterface<iMeshFactoryWrapper> (loading->GetResultRefPtr());
     if(!imeshfactw)
     {
-      spritewrapper = scfQueryInterface<iMeshWrapper> (loading->GetResultRefPtr());
+      csRef<iMeshWrapper> spritewrapper = scfQueryInterface<iMeshWrapper> (loading->GetResultRefPtr());
       if (spritewrapper)
         imeshfactw = spritewrapper->GetFactory();
     }
@@ -330,38 +263,12 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     cout << "Could not find loaded mesh" << endl;
     return;
   }
-  
-  /*
-  if (!loader->LoadLibraryFile(filename))
-    cout << "Error loading library file " << filename << endl;
-  */
-  
+    
   csRef<iMeshObjectFactory> fact = imeshfactw->GetMeshObjectFactory();
   assert(fact);
   
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
   assert(fstate);
-
-  /*
-  int nv = fstate->GetVertexCount();
-  UniqueVertMesh m;
-  const csVector3* fstate_vertices = fstate->GetVertices();
-  const csVector2* fstate_uv = fstate->GetTexels();
-  const csVector3* fstate_normals = fstate->GetNormals();
-  const csColor4*  fstate_colors = fstate->GetColors();
-  for (int i = 0; i < nv; i++)
-    m.AddVertUnique(fstate_vertices[i], VertexAttributes(fstate_uv[i], fstate_normals[i], fstate_colors[i]));
-  int nt = fstate->GetTriangleCount();
-  csTriangle* fstate_triangles = fstate->GetTriangles();
-  for (int i = 0; i < nt; i++)
-    m.AddTriangleMapped(fstate_triangles[i]);
-  LodGen lodgen(m.vertices, m.triangles);
-  lodgen.GenerateLODs();
-  
-  fstate->SetVertexCount(0);
-  for (unsigned int i = 0; i < m.vertices.GetSize(); i++)
-    fstate->AddVertex(m.vertices[i], m.attr[i].uv, m.attr[i].normal, m.attr[i].color);
-  */
   
   LodGen lodgen;
   lodgen.Init(fstate);
