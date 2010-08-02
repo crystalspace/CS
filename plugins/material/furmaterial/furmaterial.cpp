@@ -147,17 +147,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     factoryState -> SetTriangleCount ( 2 * ( controlPointsCount - numberOfStrains ) );
 
     csVector3 *vbuf = factoryState->GetVertices (); 
+    csVector2 *uv = factoryState->GetTexels();
     csTriangle *ibuf = factoryState->GetTriangles ();
 
     for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
       controlPointSum += hairStrands.Get(x).controlPointsCount, x++ )
     {
+      csVector2 strandUV(0);
+      csHairStrand hairStrand = hairStrands.Get(x);
+
+      for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
+        if (hairStrand.guideHairs[j].index < guideHairs.GetSize() )
+          strandUV += hairStrand.guideHairs[j].distance * 
+            guideHairs.Get(hairStrand.guideHairs[j].index).uv;
+        else
+          strandUV += hairStrand.guideHairs[j].distance * 
+            guideHairsLOD.Get(hairStrand.guideHairs[j].index - 
+              guideHairs.GetSize()).uv;
+
       for ( size_t y = 0 ; y < hairStrands.Get(x).controlPointsCount ; y ++ )
       {
         vbuf[ 2 * controlPointSum + 2 * y].Set
           ( hairStrands.Get(x).controlPoints[y] );
         vbuf[ 2 * controlPointSum + 2 * y + 1].Set
           ( hairStrands.Get(x).controlPoints[y] + csVector3(-0.01f,0,0) );
+        uv[ 2 * controlPointSum + 2 * y].Set( strandUV );
+        uv[ 2 * controlPointSum + 2 * y + 1].Set( strandUV );
       }
 
       for ( size_t y = 0 ; y < 2 * (hairStrands.Get(x).controlPointsCount - 1) ; y ++ )

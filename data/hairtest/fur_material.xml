@@ -15,6 +15,9 @@
     <texture name='N'>
       <file>/hairtest/N.png</file>
     </texture>
+    <texture name='krystal_skull_diffusemap'>
+      <file>/lib/krystal/krystal_skull_diffusemap.png</file>
+    </texture>	
   </textures>
   <materials>
     <material name='marschner_material'>
@@ -24,6 +27,8 @@
 	  
 	  <shadervar type="int" name="diffuse type">4</shadervar>
 	  <shadervar type="vector3" name="hair color">0.51, 0.34, 0.25</shadervar>
+	  <shadervar type="texture" name="diffuse map">krystal_skull_diffusemap</shadervar>
+	  
 <!-- Uncomment the following line for red hair -->	  
 <!--	  
 	  <shadervar type="vector3" name="light 0 position">1,0,0</shadervar>

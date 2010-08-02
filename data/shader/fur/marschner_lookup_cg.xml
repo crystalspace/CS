@@ -1,13 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <shader compiler="xmlshader" name="marschner_lookup_cg" lights="1">
     <technique priority="200">
-    <pass>
-      <buffer source="normal" destination="normal" />
-      <buffer source="tangent" destination="texture coordinate 0" />
-      <buffer source="binormal" destination="texture coordinate 1" />	  
-      <vp plugin="glcg" file="/shader/fur/marschner_lookup_cg.cgvp" />
-      <texture name="tex M" destination="lookup1fixed" />
-      <texture name="tex N" destination="lookup2fixed" />	  	  
-      <fp plugin="glcg" file="/shader/fur/marschner_lookup_cg.cgfp" />
-    </pass>
+		<pass>
+		  <buffer source="normal" destination="normal" />
+		  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+		  <buffer source="tangent" destination="texture coordinate 1" />
+		  <buffer source="binormal" destination="texture coordinate 2" />	  
+		  <vp plugin="glcg" file="/shader/fur/marschner_lookup_cg.cgvp" />
+		  <texture name="tex M" destination="lookup1fixed" />
+		  <texture name="tex N" destination="lookup2fixed" />	  	  
+		  <texture name="diffuse map" destination="TexDiffuse" />
+		  <fp plugin="glcg">
+			<cgfp>
+				<?Include /shader/fur/marschner_lookup_cg.cgfp ?>
+		    </cgfp>
+		  </fp>		  
+		</pass>
     </technique>
 </shader>

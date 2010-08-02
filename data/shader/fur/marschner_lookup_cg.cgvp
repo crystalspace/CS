@@ -6,8 +6,9 @@
 struct app2vertex {
 	float4 Position : POSITION;
 	float3 Normal : NORMAL;
-	float3 Tangent : TEXCOORD0;
-	float3 Binormal : TEXCOORD1;	
+	float3 Tangent : TEXCOORD1;
+	float3 Binormal : TEXCOORD2;
+	float2 TexCoord : TEXCOORD0;
 };
 
 struct vertex2fragment { 
@@ -17,6 +18,7 @@ struct vertex2fragment {
 	float3 WorldTangent : TEXCOORD2;	
 	float3 WorldView: TEXCOORD3;
 	float3 TangentShift : TEXCOORD4;
+	float2 TexCoord : TEXCOORD5;
 };
 
 // main function
@@ -41,6 +43,10 @@ vertex2fragment main (app2vertex IN,
 
 	// view vector in world coords:
 	OUT.WorldView = normalize(ModelViewIT[3].xyz - Pw);
+	
+	// uv mapping
+	OUT.TexCoord = IN.TexCoord;
+	
 	// pos in clip coords:
 	OUT.HPosition = mul(ModelViewProj, Po);
 	  

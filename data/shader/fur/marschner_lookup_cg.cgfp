@@ -1,11 +1,10 @@
-<cgfp>
+<include>
   <variablemap variable="light diffuse[0]" destination="LightColor" />
   <variablemap variable="light ambient" destination="AmbientColor" />
   <variablemap variable="diffuse type" destination="DiffuseType" />
   <variablemap variable="hair color" destination="HairColor" />
   <variablemap variable="constants M" destination="constantsM" />  
   <program>
-        <![CDATA[
 
 struct vertex2fragment { 
 	float4 HPosition : POSITION;
@@ -14,12 +13,14 @@ struct vertex2fragment {
 	float3 WorldTangent : TEXCOORD2;
 	float3 WorldView: TEXCOORD3;
 	float3 TangentShift : TEXCOORD4;	
+	float2 TexCoord : TEXCOORD5;	
 };
 
 float4 main (vertex2fragment IN,
 			// Lookup tables for the hair model (fixed point)
 			uniform sampler2D lookup1fixed,
 			uniform sampler2D lookup2fixed,
+			uniform sampler2D TexDiffuse,
 			uniform int DiffuseType,
 			uniform float3 AmbientColor,
 			uniform float3 LightColor,
@@ -27,7 +28,10 @@ float4 main (vertex2fragment IN,
 			uniform float3 constantsM) : COLOR
 {
 	float4 OUT = float4(0, 0, 0, 1);
-	
+
+<?if vars."diffuse map"?>
+	HairColor = tex2D(TexDiffuse, IN.TexCoord);
+<?endif?>
 	float MR_ct = constantsM.x;
 	float MTT_ct = constantsM.y;
 	float MTRT_ct = constantsM.z;
@@ -85,9 +89,9 @@ float4 main (vertex2fragment IN,
 	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd) + HairColor.xyz;
 	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / max(0.2, cos_qd * cos_qd);
 	//OUT.xyz = N.a;
+	//OUT.xyz = tex2D(TexDiffuse, IN.TexCoord);
 	return OUT;
 }
 
-        ]]>
     </program>
-</cgfp>
+</include>
