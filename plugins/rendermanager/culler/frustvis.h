@@ -150,11 +150,6 @@ struct NodeTraverseData
     return u32Timestamp;
   }
 
-  void SetFrustumMask(uint32 frust_mask)
-  {
-    u32Frustum_Mask = frust_mask;
-  }
-
   void SetTimestamp(uint32 timestamp)
   {
     u32Timestamp = timestamp;

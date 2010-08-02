@@ -29,6 +29,7 @@
  
 #include "csutil/scf_interface.h"
 
+struct csSectorVisibleRenderMeshes;
 struct iDocumentNode;
 struct iMeshWrapper;
 struct iMovable;

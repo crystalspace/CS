@@ -290,6 +290,7 @@ int csFrustumVis::TestNodeVisibility (csKDTree* treenode,
   {
     return NODE_INVISIBLE;
   }
+
   frustum_mask = new_mask;
   return NODE_VISIBLE;
 }
@@ -387,12 +388,12 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
       {
         if (child1)
         {
-          T_LocalQueue.Push (NodeTraverseData (g3d, child1,ntdAux.kdtNode,ntdAux.GetFrustumMask (), cur_timestamp));
+          T_LocalQueue.Push (NodeTraverseData (g3d, child1, ntdAux.kdtNode, ntdAux.GetFrustumMask (), cur_timestamp));
         }
 
         if (child2)
         {
-          T_LocalQueue.Push (NodeTraverseData (g3d, child2,ntdAux.kdtNode,ntdAux.GetFrustumMask (), cur_timestamp));
+          T_LocalQueue.Push (NodeTraverseData (g3d, child2, ntdAux.kdtNode, ntdAux.GetFrustumMask (), cur_timestamp));
         }
       }
       else
