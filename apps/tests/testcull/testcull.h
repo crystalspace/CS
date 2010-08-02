@@ -94,7 +94,7 @@ private:
 
   void SortByDepth();
 
-  void Testcull::SetupContext(RenderTreeType::ContextNode& context, iShaderManager* shaderManager);
+  void SetupContext(RenderTreeType::ContextNode& context, iShaderManager* shaderManager);
 
 public:
 

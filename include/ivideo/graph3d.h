@@ -60,10 +60,9 @@ namespace CS
   {
     struct CoreRenderMesh;
     struct RenderMeshModes;
-
-    enum MeshCullMode;
   } // namespace Graphics
 } // namespace CS
+
 class csRenderBufferHolder;
 class csShaderVariableStack;
 
