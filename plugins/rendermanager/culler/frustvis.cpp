@@ -352,7 +352,6 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
         {
           csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*) objects[i]->GetObject ();
           iMeshWrapper* mesh = visobj_wrap->mesh;
-          objects[i]->timestamp = cur_timestamp;
 
           // Only test an element via occlusion if it first passes frustum testing
           if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
@@ -367,6 +366,7 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
               // If occlusion checks also passed, mark the mesh visible.
               if (eOccVis == VISIBLE)
               {
+                objects[i]->timestamp = cur_timestamp;
                 f2bData.viscallback->MarkVisible (mesh, numMeshes, meshList);
               }
             }

@@ -103,14 +103,12 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
       {
         uint32 frustum_mask = ntdNode.GetFrustumMask();
         csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*) objects[i]->GetObject ();
-        objects[i]->timestamp = cur_timestamp;
 
         // Only test an element via occlusion if it first passes frustum testing
         if(TestObjectVisibility (visobj_wrap, &f2bData, frustum_mask))
         {
           csSectorVisibleRenderMeshes* meshList;
-          const int numMeshes = static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
-            (f2bData.viscallback)->GetVisibleMeshes (visobj_wrap->mesh, frustum_mask, meshList);
+          const int numMeshes = f2bData.viscallback->GetVisibleMeshes (visobj_wrap->mesh, frustum_mask, meshList);
 
           if(numMeshes) // don't add records that don't have anything to draw
           {
@@ -119,8 +117,8 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
             // If occlusion checks also passed, mark the mesh visible.
             if (eOccVis == VISIBLE)
             {
-              static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
-                (f2bData.viscallback)->MarkVisible(visobj_wrap->mesh, numMeshes, meshList);
+              objects[i]->timestamp = cur_timestamp;
+              f2bData.viscallback->MarkVisible(visobj_wrap->mesh, numMeshes, meshList);
             }
           }
         }
