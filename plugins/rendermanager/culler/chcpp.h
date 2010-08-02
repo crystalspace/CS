@@ -15,82 +15,19 @@ using namespace CS::RenderManager;
 typedef CS::RenderManager::RenderTree<
 CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
 
-// empirically robust constant (might need tweaking)
-#define PREV_INV_BATCH_SIZE 25
-// visibility threshold parameter
+// Visibility threshold parameter
 #define VISIBILITY_THRESHOLD 0
 
-/*  A small implementation of a list based on the csList class.
- * the main difference between CHCList and csList is that CHCList
- * keeps track of how many elements the list has. This is strictly
- * for convenience is the CHCList is mostly limited in use to this
- * particular implementation of the CHC++ algorithm
- */
-template <class T>
-class CHCList : public csList<T>
+enum OcclusionVisibility
 {
-  int n;
-public:
-  CHCList() : n(0)
-  {
-    csList<T>();
-  }
-  typename csList<T>::Iterator PushFront(const T& elem)
-  {
-    ++n;
-    return csList<T>::PushFront(elem);
-  }
-
-  typename csList<T>::Iterator PushBack(const T& elem)
-  {
-    ++n;
-    return csList<T>::PushBack(elem);
-  }
-
-  bool PopFront()
-  {
-    if(csList<T>::IsEmpty()) return false;
-    --n;
-    return csList<T>::PopFront();
-  }
-
-  bool PopBack()
-  {
-    if(csList<T>::IsEmpty()) return false;
-    --n;
-    return csList<T>::PopBack();
-  }
-  
-  bool IsEmpty()
-  {
-    return csList<T>::IsEmpty();
-  }
-
-  T & Front()
-  {
-    return csList<T>::Front();
-  }
-
-  T & Back()
-  {
-    return csList<T>::Back();
-  }
-
-  int Size() const
-  {
-    return n;
-  }
-
-  bool Delete(const T& item)
-  {
-    const bool rez=csList<T>::Delete(item);
-    if(rez)
-      n--;
-    return rez;
-  }
+  VISIBLE,
+  UNKNOWN,
+  INVISIBLE,
+  INVALID
 };
 
-/*  Class to hold the visibility information of a kdtree node.
+/**
+ * Class to hold the visibility information of a kdtree node.
  * The implementation is one that facilitates the use of the  
  * iKDTreeUserData mechanism for storing this information.
  */
@@ -98,44 +35,55 @@ class csVisibilityObjectHistory :
     public scfImplementation1<csVisibilityObjectHistory, iKDTreeUserData>
 {
 public:
-  bool bVisible;
-  uint32 u32Timestamp;
-
-  csVisibilityObjectHistory () : scfImplementationType (this), bVisible(false), u32Timestamp(0)
+  csVisibilityObjectHistory (iGraphics3D* g3d, uint32 uTimeStamp)
+    : scfImplementationType (this), uQueryTimestamp (uTimeStamp), g3d (g3d), eResult(INVALID)
   {
-  }
-
-  csVisibilityObjectHistory (const bool bV,const uint32 u32TS) : scfImplementationType (this)
-  {
-    bVisible=bV;
-    u32Timestamp=u32TS;
+    g3d->OQInitQueries(&uOQuery, 1);
   }
 
   virtual ~csVisibilityObjectHistory()
   {
+    g3d->OQDelQueries (&uOQuery, 1);
   }
 
-  bool GetVisibility() const
+  OcclusionVisibility WasVisible (unsigned int uTimeStamp)
   {
-    return bVisible;
+    if (eResult == INVALID || uTimeStamp != uQueryTimestamp + 1)
+    {
+      return VISIBLE;
+    }
+
+    if (eResult != UNKNOWN)
+    {
+      return eResult;
+    }
+
+    if (g3d->OQueryFinished (uOQuery))
+    {
+      eResult = g3d->OQIsVisible (uOQuery, VISIBILITY_THRESHOLD) ? VISIBLE : INVISIBLE;
+    }
+
+    return eResult;
   }
 
-  uint32 GetTimestamp() const
+  void BeginQuery (uint32 uTimeStamp)
   {
-    return u32Timestamp;
+    eResult = UNKNOWN;
+    uQueryTimestamp = uTimeStamp;
+
+    g3d->OQBeginQuery (uOQuery);
   }
 
-  void SetVisibility(const bool bV)
+  void EndQuery ()
   {
-    bVisible=bV;
+    g3d->OQEndQuery ();
   }
 
-  void SetTimestamp(uint32 u32TS)
-  {
-    u32Timestamp=u32TS;
-  }
+private:
+  iGraphics3D* g3d;
+  unsigned int uOQuery;
+  uint32 uQueryTimestamp;
+  OcclusionVisibility eResult;
 };
-
-
 
 #endif

@@ -38,6 +38,7 @@
 #include "iengine/movable.h"
 #include "iengine/mesh.h"
 #include "chcpp.h"
+#include "csutil/weakrefarr.h"
 
 //typedef CS::RenderManager::RenderTree<
 //CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
@@ -68,23 +69,29 @@ struct FrustTest_Front2BackData
 
 struct NodeTraverseData
 {
-  NodeTraverseData() : kdtParent(0), kdtNode(0), u32Frustum_Mask(0), bCompletelyVisible(false)
-  {}
-  NodeTraverseData(csKDTree* kdtN, csKDTree* kdtP, const uint32 frustum_mask,const bool bCV=0)
+  NodeTraverseData () : kdtParent(0), kdtNode(0), u32Frustum_Mask(0), u32Timestamp(0)
   {
-    kdtParent=kdtP;
-    kdtNode=kdtN;
+  }
 
-    // add a new user object only if there's none
+  NodeTraverseData (csKDTree* kdtN) : kdtNode (kdtN)
+  {
+  }
+
+  NodeTraverseData (iGraphics3D* g3d, csKDTree* kdtN, csKDTree* kdtP, const uint32 frustum_mask, const uint32 timestamp)
+  {
+    kdtParent = kdtP;
+    kdtNode = kdtN;
+
+    // Add a new visibility history user object if one doesn't already exist.
     if(kdtNode && !kdtNode->GetUserObject())
     {
-      csRef<iKDTreeUserData> psVOH;
-      psVOH.AttachNew (new csVisibilityObjectHistory());
-      kdtNode->SetUserObject(psVOH);
+      csRef<iKDTreeUserData> pHistory;
+      pHistory.AttachNew (new csVisibilityObjectHistory(g3d, timestamp));
+      kdtNode->SetUserObject(pHistory);
     }
 
-    u32Frustum_Mask=frustum_mask;
-    bCompletelyVisible=bCV;
+    u32Frustum_Mask = frustum_mask;
+    u32Timestamp = timestamp;
   }
 
   csVisibilityObjectHistory* GetVisibilityObjectHistory() const
@@ -99,10 +106,26 @@ struct NodeTraverseData
     return kdtNode->IsLeaf();
   }
 
-  bool GetVisibility() const
+  OcclusionVisibility GetVisibility() const
   {
-    if(!kdtNode) return false;
-    return GetVisibilityObjectHistory()->GetVisibility();
+    if(!kdtNode) return INVISIBLE;
+    return GetVisibilityObjectHistory()->WasVisible (u32Timestamp);
+  }
+
+  OcclusionVisibility GetVisibility(uint32 uCurrTimeStamp) const
+  {
+    if(!kdtNode) return INVISIBLE;
+    return GetVisibilityObjectHistory()->WasVisible (uCurrTimeStamp);
+  }
+
+  void BeginQuery ()
+  {
+    GetVisibilityObjectHistory()->BeginQuery (u32Timestamp);
+  }
+
+  void EndQuery ()
+  {
+    GetVisibilityObjectHistory ()->EndQuery ();
   }
 
   int GetSplitAxis() const
@@ -124,35 +147,17 @@ struct NodeTraverseData
 
   uint32 GetTimestamp() const
   {
-    if(!kdtNode) return false;
-    return GetVisibilityObjectHistory()->GetTimestamp();
+    return u32Timestamp;
   }
 
-  bool IsCompletelyVisible() const
+  void SetFrustumMask(uint32 frust_mask)
   {
-    return bCompletelyVisible;
+    u32Frustum_Mask = frust_mask;
   }
 
-  void SetVisibility(const bool bV) const
+  void SetTimestamp(uint32 timestamp)
   {
-    if(!kdtNode) return ;
-    GetVisibilityObjectHistory()->SetVisibility(bV);
-  }
-
-  void SetFrustumMask(const uint32 frust_mask)
-  {
-    u32Frustum_Mask=frust_mask;
-  }
-
-  void SetTimestamp(const uint32 timestamp)
-  {
-    if(!kdtNode) return ;
-    GetVisibilityObjectHistory()->SetTimestamp(timestamp);
-  }
-
-  void SetCompletelyVisible(const bool bCV)
-  {
-    bCompletelyVisible=bCV;
+    u32Timestamp = timestamp;
   }
 
   bool operator == (const NodeTraverseData & ntd) const
@@ -160,14 +165,13 @@ struct NodeTraverseData
     return (kdtParent==ntd.kdtParent
             && kdtNode==ntd.kdtNode
             && u32Frustum_Mask==ntd.u32Frustum_Mask
-            &&  bCompletelyVisible==ntd.bCompletelyVisible);
+            && u32Timestamp==ntd.u32Timestamp);
   }
 
-  bool bCompletelyVisible;
   csKDTree* kdtParent;
   csKDTree* kdtNode;
   uint32 u32Frustum_Mask;
-  //uint32 u32Timestamp;
+  uint32 u32Timestamp;
 
   ~NodeTraverseData()
   {
@@ -261,6 +265,8 @@ public:
   bool vistest_objects_inuse;	// If true the vector is in use.
 
 private:
+  bool bAllVisible;
+
   iObjectRegistry *object_reg;
   csEventID CanvasResize;
   csRef<iEventHandler> weakEventHandler;
@@ -288,32 +294,26 @@ private:
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
-  iGraphics3D* g3d;
-  iShaderManager* smShaderManager;
+  csRef<iGraphics3D> g3d;
 
-  CHCList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
-  CHCList<NodeTraverseData> I_Queue; // I queue (invisible queue)
-  CHCList<NodeTraverseData> V_Queue; // V queue (nodes that are scheduled for testing in the current frame)
-  CHCList<OccQuery> Q_Queue; // Q queue (query queue)
+  csArray<NodeTraverseData> T_Queue; // Traversal Queue
 
   // Frustum data (front to back)
   FrustTest_Front2BackData f2bData;
 
-  bool WasVisible(const NodeTraverseData &ntdNode,const int cur_timestamp) const;
-  void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
-  void PullUpVisibility(const NodeTraverseData &ntdNode);
+  //bool WasVisible(const NodeTraverseData &ntdNode,const int cur_timestamp) const;
+  //void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
+  //void PullUpVisibility(const NodeTraverseData &ntdNode);
   void TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp);
 
-  void RenderQuery(NodeTraverseData &ntdNode,bool bUseBB);
   void IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord> &objArray);
-  unsigned int IssueSingleQuery(NodeTraverseData &ntdNode,bool bUseBB);
 
   /**
    *  Gets the first finished query from the query list.
    * Return 1 if visible -1 if not or 0 if no finished 
    * queries are located.
    */
-  int GetFinishedQuery(OccQuery &oq);
+  //int GetFinishedQuery(OccQuery &oq);
 
 public:
   csFrustumVis ();
@@ -322,6 +322,8 @@ public:
 
   void CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
 	    const uint32 cur_timestamp);
+
+  void MarkAllVisible (csKDTree* treenode);
 
   // Test visibility for the given node. Returns 2 if camera is inside node,
   // 1 if visible normally, or 0 if not visible.
@@ -332,7 +334,7 @@ public:
 
   // Test visibility for the given object. Returns true if visible.
   bool TestObjectVisibility (csFrustVisObjectWrapper* obj,
-  	FrustTest_Front2BackData* data, uint32 frustum_mask,ObjectRecord &objrec);
+  	FrustTest_Front2BackData* data, uint32& frustum_mask);
 
   // Add an object to the update queue. That way it will be updated
   // in the kdtree later when needed.
@@ -347,9 +349,7 @@ public:
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview, 
     iVisibilityCullerListener* viscallback, int w = 0, int h = 0);
-  virtual bool VisTest (iRenderView* rview, 
-    iVisibilityCullerListener* viscallback,iShaderManager* smShaderMan, int w=0, int h=0);
-  virtual void PrecacheCulling () { VisTest ((iRenderView*)0, 0); }
+  virtual void PrecacheCulling () { bAllVisible = true; }
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
   virtual void VisTest (const csSphere& sphere, 

@@ -100,7 +100,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
-  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -118,11 +118,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   desc.AttachNew (new csFrustVisObjectDescriptor ());
   kdtree->SetObjectDescriptor (desc);
 
-  //smShaderManager = csQueryRegistry<iShaderManager>(object_reg);
-  //pdTreePersistent.Initialize(smShaderManager);
-
-  csRef<iLoader> loader = csQueryRegistry<iLoader>(object_reg);
-  loader->LoadShader("/shader/occlusion_queries/occ_queries.xml");
+  bAllVisible = false;
 
   return true;
 }
@@ -299,7 +295,7 @@ int csFrustumVis::TestNodeVisibility (csKDTree* treenode,
 }
 
 bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
-  	FrustTest_Front2BackData* data, uint32 frustum_mask,ObjectRecord &objrec)
+  	FrustTest_Front2BackData* data, uint32& frustum_mask)
 {
   if (obj->mesh && obj->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
     return false;
@@ -307,14 +303,6 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
   const csBox3& obj_bbox = obj->child->GetBBox ();
   if (obj_bbox.Contains (data->pos))
   {
-    csSectorVisibleRenderMeshes* meshList;
-    const int nM=static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
-              (f2bData.viscallback)->MarkVisible(obj->mesh, frustum_mask,meshList);
-    if(nM) // don't add records that don't have anything to draw
-    {
-      objrec=ObjectRecord(0,meshList,nM);
-    }
-    //data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
     return true;
   }
   
@@ -324,16 +312,7 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
     return false;
   }
 
-  csSectorVisibleRenderMeshes* meshList;
-  const int nM=static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
-        (data->viscallback)->MarkVisible(obj->mesh, new_mask, meshList);
-  if(nM) // don't add records that don't have anything to draw
-  {
-    objrec=ObjectRecord(0,meshList,nM);
-  }
-  //static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
-  //(data->viscallback)->ObjectVisible (obj->visobj, obj->mesh, new_mask);
-
+  frustum_mask = new_mask;
   return true;
 }
 
@@ -342,93 +321,132 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
 void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
 	const uint32 cur_timestamp)
 {
-  ntdNode.SetTimestamp(cur_timestamp);
-  CHCList<NodeTraverseData> T_LocalQueue;
-  T_LocalQueue.PushBack(ntdNode);
-  NodeTraverseData ntdAux;
+  csArray<NodeTraverseData> T_LocalQueue;
+  T_LocalQueue.Push (ntdNode);
 
-  while(!T_LocalQueue.IsEmpty())
+  for(size_t i = 0; i < T_LocalQueue.GetSize (); ++i)
   {
-    ntdAux=T_LocalQueue.Front();
-    T_LocalQueue.PopFront();
+    NodeTraverseData& ntdAux = T_LocalQueue[i];
+
+    ntdAux.SetTimestamp(cur_timestamp);
+
     if(ntdAux.IsLeaf())
     {
+      OcclusionVisibility eOccVis = ntdAux.GetVisibility ();
+
+      // FIXME
+      while (eOccVis == UNKNOWN)
+      {
+        eOccVis = ntdAux.GetVisibility ();
+      }
+     
       const int num_objects = ntdAux.kdtNode->GetObjectCount ();
       csKDTreeChild** objects = ntdAux.kdtNode->GetObjects ();
       csArray<ObjectRecord> objArray(10);
 
+      // Continue with frustum and other checks.
       for (int i = 0 ; i < num_objects ; i++)
       {
         if (objects[i]->timestamp != cur_timestamp)
         {
-          objects[i]->timestamp = cur_timestamp;
-          csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-      	    objects[i]->GetObject ();
+          csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*) objects[i]->GetObject ();
           iMeshWrapper* mesh = visobj_wrap->mesh;
-          // only test an element via occlusion if it first passes frustum testing
+          objects[i]->timestamp = cur_timestamp;
+
+          // Only test an element via occlusion if it first passes frustum testing
           if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
           {
             csSectorVisibleRenderMeshes* meshList;
-            const int nM=static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
-              (f2bData.viscallback)->MarkVisible(mesh,0,meshList);
-            if(nM)
+            const int numMeshes = f2bData.viscallback->GetVisibleMeshes (mesh, ntdAux.GetFrustumMask (), meshList);
+
+            if(numMeshes > 0)
             {
-              objArray.Push(ObjectRecord(objects[i],meshList,nM));
+              objArray.Push (ObjectRecord (objects[i], meshList, numMeshes));
+
+              // If occlusion checks also passed, mark the mesh visible.
+              if (eOccVis == VISIBLE)
+              {
+                f2bData.viscallback->MarkVisible (mesh, numMeshes, meshList);
+              }
             }
           }
         }
       }
-      //if(!objArray.IsEmpty())
-      //  IssueQueries(ntdAux,objArray);
-      //IssueSingleQuery(ntdAux);
+
+      if(!objArray.IsEmpty ())
+      {
+        IssueQueries (ntdAux, objArray);
+      }
     }
     else
     {
       csKDTree* child1 = ntdAux.kdtNode->GetChild1 ();
       csKDTree* child2 = ntdAux.kdtNode->GetChild2 ();
-      NodeTraverseData ntd;
-      if (f2bData.pos[ntdAux.GetSplitAxis()] <= ntdAux.GetSplitLocation())
+
+      if (f2bData.pos[ntdAux.GetSplitAxis ()] <= ntdAux.GetSplitLocation ())
       {
         if (child1)
         {
-          ntd=NodeTraverseData(child1,ntdAux.kdtNode,ntdAux.GetFrustumMask());
-          T_LocalQueue.PushBack(ntd);
+          T_LocalQueue.Push (NodeTraverseData (g3d, child1,ntdAux.kdtNode,ntdAux.GetFrustumMask (), cur_timestamp));
         }
+
         if (child2)
         {
-          ntd=NodeTraverseData(child2,ntdAux.kdtNode,ntdAux.GetFrustumMask());
-          T_LocalQueue.PushBack(ntd);
+          T_LocalQueue.Push (NodeTraverseData (g3d, child2,ntdAux.kdtNode,ntdAux.GetFrustumMask (), cur_timestamp));
         }
       }
       else
       {
         if (child2) 
         {
-          ntd=NodeTraverseData(child2,ntdAux.kdtNode,ntdAux.GetFrustumMask());
-          T_LocalQueue.PushBack(ntd);
+          T_LocalQueue.Push (NodeTraverseData (g3d, child2, ntdAux.kdtNode, ntdAux.GetFrustumMask (), cur_timestamp));
         }
+
         if (child1) 
         {
-          ntd=NodeTraverseData(child1,ntdAux.kdtNode,ntdAux.GetFrustumMask());
-          T_LocalQueue.PushBack(ntd);
+          T_LocalQueue.Push (NodeTraverseData (g3d, child1, ntdAux.kdtNode, ntdAux.GetFrustumMask (), cur_timestamp));
         }
       }
     }
   }
 }
 
+void csFrustumVis::MarkAllVisible (csKDTree* treenode)
+{
+  if (treenode->IsLeaf ())
+  {
+    const int num_objects = treenode->GetObjectCount ();
+    csKDTreeChild** objects = treenode->GetObjects ();
+
+    // Continue with frustum and other checks.
+    for (int i = 0 ; i < num_objects ; i++)
+    {
+      csFrustVisObjectWrapper* obj = (csFrustVisObjectWrapper*)objects[i]->GetObject ();
+      static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
+        (f2bData.viscallback)->ObjectVisible (obj->visobj, obj->mesh, 0);
+    }
+  }
+  else
+  {
+    csKDTree* child1 = treenode->GetChild1 ();
+    csKDTree* child2 = treenode->GetChild2 ();
+
+    if (child1) MarkAllVisible (child1);
+    if (child2) MarkAllVisible (child2);
+  }
+}
+
 /*------------------------------------------------------------------*/
 /*--------------------------- MAIN DADDY ---------------------------*/
 /*------------------------------------------------------------------*/
-bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscallback,
-                            iShaderManager* smShaderMan, int, int)
+bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscallback, int, int)
 {
-  UpdateObjects ();
-  current_vistest_nr++;
-
   // just make sure we have a callback
   if (viscallback == 0)
     return false;
+
+  UpdateObjects ();
+  current_vistest_nr++;
 
   csRenderContext* ctxt = rview->GetRenderContext ();
   f2bData.frustum = ctxt->clip_planes;
@@ -439,38 +457,14 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   f2bData.rview = rview;
   f2bData.viscallback = viscallback;
 
-  g3d=rview->GetGraphics3D();
-
-  if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+  // Check for the 'all visible' flag
+  if (bAllVisible)
   {
-	      csPrintf("Cannot prepare renderer for 3D drawing\n");
-        return false;
+    // Mark all visible.
+    MarkAllVisible (kdtree);
+    bAllVisible = false;
+    return true;
   }
-  g3d->FinishDraw();
-
-  /*printf("%d\n",cur_timestamp);
-  while(Q_Queue.Size())
-  {
-    OccQuery oc;
-    const int rez=GetFinishedQuery(oc);
-    if(rez==1) // object was visible last fram,e
-    {
-      printf("visible %d\n",oc.ntdNode.GetTimestamp());
-    }
-    else if(rez==-1) // object was occluded last frame
-    {
-      printf("not visible %d\n",oc.ntdNode.GetTimestamp());
-    }
-    if(rez) // if we found a finished query than cleanup memory
-    {
-      g3d->OQDelQueries(oc.qID,oc.numQueries);
-      if(oc.IsMultiQuery())
-        delete [] oc.qID;
-      else
-        delete oc.qID;
-    }
-  }
-  printf("\n");*/
 
   const csReversibleTransform& camt = rview->GetCamera()->GetTransform ();
   g3d->SetClipper (rview->GetClipper(), CS_CLIPPER_TOPLEVEL);  // We are at top-level.
@@ -484,181 +478,15 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   g3d->SetZMode(CS_ZBUF_USE);
   g3d->SetWriteMask(false,false,false,false);
 
-  smShaderManager = smShaderMan;
-
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
-  NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
-  ntdRoot.SetVisibility(true);
-  T_Queue.PushBack(ntdRoot);
+  T_Queue.Push (NodeTraverseData (g3d, kdtree, 0, frustum_mask, cur_timestamp));
 
-  while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
+  for(size_t i = 0; i < T_Queue.GetSize (); ++i)
   {
-    int res;
-    OccQuery oc;
-    while(!Q_Queue.IsEmpty() && ( (res=GetFinishedQuery(oc)) || T_Queue.IsEmpty()))
-    {
-      if(res==1)
-      {
-        PullUpVisibility(oc.ntdNode);
-        TraverseNode(oc.ntdNode,cur_timestamp);
-      }
-      if(res)
-      {
-        //printf("Query Done %x %d %d\n",oc.ntdNode.kdtNode,*oc.qID,res);
-        //printf("Cleaning up query...\n");
-        g3d->OQDelQueries(oc.qID,oc.numQueries);
-        if(oc.IsMultiQuery())
-          delete [] oc.qID;
-        else
-          delete oc.qID;
-        oc=OccQuery();
-      }
-    }
-    if(!T_Queue.IsEmpty())
-    {
-      NodeTraverseData ntdCurrent=T_Queue.Front();
-      T_Queue.PopFront();
+    NodeTraverseData& ntdAux = T_Queue[i];
 
-      if(!ntdCurrent.IsCompletelyVisible())
-      {
-        int nodevis = TestNodeVisibility (ntdCurrent.kdtNode, &f2bData,ntdCurrent.u32Frustum_Mask);
-        if (nodevis == NODE_INVISIBLE)
-        {
-          continue;
-        }
-
-        if (nodevis == NODE_VISIBLE && frustum_mask == 0)
-        {
-          ntdCurrent.SetCompletelyVisible(true);
-        }
-      }
-
-      //check to see if the node was last visible
-      const bool bWasVisible=WasVisible(ntdCurrent,cur_timestamp);
-      //bWasVisible?printf("%x Was visible\n",ntdCurrent.kdtNode):printf("%x Was NOT visible\n",ntdCurrent.kdtNode);
-
-      // identify nodes that we cannot skip queries for
-      const bool bLeafOrWasInvisible=( !bWasVisible || ntdCurrent.IsLeaf() );
-      //if(!bWasVisible && !ntdCurrent.IsLeaf()) printf("wasn't visible and isn't leaf\n");
-
-      // reset node's visibility classification
-      ntdCurrent.SetVisibility(false);
-
-      // update the timestamp flag
-      ntdCurrent.SetTimestamp(cur_timestamp);
-
-      ntdCurrent.kdtNode->Distribute ();
-      if(bLeafOrWasInvisible)
-      {
-        csBox3 bb=ntdCurrent.kdtNode->GetNodeBBox();
-        //printf("Issuing query (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bb.MinX(),bb.MinY(),bb.MinZ(),
-        //  bb.MaxX(),bb.MaxY(),bb.MaxZ());
-        if(ntdCurrent.IsLeaf())
-          IssueSingleQuery(ntdCurrent,false);
-        else
-          IssueSingleQuery(ntdCurrent,true);
-        /*if(ntdCurrent.IsLeaf())
-          printf("Issuing query %x %d\n",ntdCurrent.kdtNode,IssueSingleQuery(ntdCurrent,false));
-        else
-          printf("Issuing query %x %d\n",ntdCurrent.kdtNode,IssueSingleQuery(ntdCurrent,true));*/
-      }
-
-      // important...never try and traverse before doing a distribute
-      // unless the node is fully visible, in which case it doesn't matter
-      if(bWasVisible)
-        TraverseNode(ntdCurrent,cur_timestamp);
-    }
-  }
-
-  /*while(!T_Queue.IsEmpty())
-  {
-    if(!T_Queue.IsEmpty())
-    {
-      NodeTraverseData ntdCurrent=T_Queue.Front();
-      T_Queue.PopFront();
-
-      if(!ntdCurrent.IsCompletelyVisible())
-      {
-        int nodevis = TestNodeVisibility (ntdCurrent.kdtNode, &f2bData,ntdCurrent.u32Frustum_Mask);
-        if (nodevis == NODE_INVISIBLE)
-          continue;
-
-        if (nodevis == NODE_VISIBLE && frustum_mask == 0)
-        {
-          ntdCurrent.SetCompletelyVisible(true);
-          //CallVisibilityCallbacksForSubtree (ntdAux, cur_timestamp);
-          //continue;
-        }
-      }
-      ntdCurrent.SetVisibility(false);
-
-      // update the timestamp flag
-      ntdCurrent.SetTimestamp(cur_timestamp);
-
-      // important...never try and traverse before doing a distribute
-      // unless the node is fully visible, in which case it doesn't matter
-      ntdCurrent.kdtNode->Distribute ();
-      TraverseNode(ntdCurrent,cur_timestamp);
-    }
-  }*/
-
-  // here we should process the remaining nodes in the multi query
-
-  //printf("\n\n");
-
-  g3d->SetWriteMask(true,true,true,true);
-  g3d->SetClipper (0, CS_CLIPPER_NONE);
-  g3d->FinishDraw();
-
-  return true;
-}
-
-/*-------------------------------------------------------------------------------------*/
-
-bool csFrustumVis::VisTest (iRenderView* rview, 
-                            iVisibilityCullerListener* viscallback, int, int)
-{
-  // We update the objects before testing the callback so that
-  // we can use this VisTest() call to make sure the objects in the
-  // culler are precached.
-  UpdateObjects ();
-  current_vistest_nr++;
-
-  // just make sure we have a callback
-  if (viscallback == 0)
-    return false;
-
-  g3d=rview->GetGraphics3D();
-
-  if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
-  {
-    csPrintf("Cannot prepare renderer for 3D drawing\n");
-    return false;
-  }
-  g3d->FinishDraw();
-
-  // First get the current view frustum from the rview.
-  csRenderContext* ctxt = rview->GetRenderContext ();
-  f2bData.frustum = ctxt->clip_planes;
-  uint32 frustum_mask = ctxt->clip_planes_mask;
-  uint32 cur_timestamp = kdtree->NewTraversal ();
-
-  f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
-  f2bData.rview = rview;
-  f2bData.viscallback = viscallback;
-  NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
-
-  // The big routine: traverse from front to back and mark all objects
-  // visible that are visible.
-  T_Queue.PushBack(ntdRoot);
-
-  while(!T_Queue.IsEmpty() || !Q_Queue.IsEmpty())
-  {
-    NodeTraverseData ntdAux=T_Queue.Front();
-    T_Queue.PopFront();
-
-    int nodevis = TestNodeVisibility (ntdAux.kdtNode, &f2bData,frustum_mask);
+    int nodevis = TestNodeVisibility (ntdAux.kdtNode, &f2bData, ntdAux.u32Frustum_Mask);
     if (nodevis == NODE_INVISIBLE)
       continue;
 
@@ -674,6 +502,12 @@ bool csFrustumVis::VisTest (iRenderView* rview,
 
     TraverseNode(ntdAux, cur_timestamp);
   }
+
+  T_Queue.Empty ();
+
+  g3d->SetWriteMask(true,true,true,true);
+  g3d->SetClipper (0, CS_CLIPPER_NONE);
+  g3d->FinishDraw();
 
   return true;
 }
