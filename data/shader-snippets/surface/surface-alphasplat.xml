@@ -264,21 +264,21 @@
         tex2D (texDiffuse2, scaledTexCoord),
         tex2D (texDiffuse3, scaledTexCoord),
         tex2D (texDiffuse4, scaledTexCoord));
-      surfaceColor = mul(transpose(texValues), tex2D (texAlpha1, texCoord));
+      surfaceColor = mul(tex2D (texAlpha1, texCoord), texValues);
       <?if vars."tex alpha 2".texture ?>
         texValues = float4x4(
           tex2D (texDiffuse5, scaledTexCoord),
           tex2D (texDiffuse6, scaledTexCoord),
           tex2D (texDiffuse7, scaledTexCoord),
           tex2D (texDiffuse8, scaledTexCoord));
-        surfaceColor += mul(transpose(texValues), tex2D (texAlpha2, texCoord));
+        surfaceColor+ = mul(tex2D (texAlpha2, texCoord), texValues);
       <?if vars."tex alpha 3".texture ?>
         texValues = float4x4(
           tex2D (texDiffuse9, scaledTexCoord),
           tex2D (texDiffuse10, scaledTexCoord),
           tex2D (texDiffuse11, scaledTexCoord),
           tex2D (texDiffuse12, scaledTexCoord));
-        surfaceColor += mul(transpose(texValues), tex2D (texAlpha3, texCoord));
+        surfaceColor+ = mul(tex2D (texAlpha3, texCoord), texValues);
       <?endif?><?! vars."tex alpha 3".texture ?>
       <?endif?><?! vars."tex alpha 2".texture ?>
 
