@@ -1424,7 +1424,7 @@ Optional Features:
   --enable-relaytool      enable use of relaytool for some libraries (default
                           YES)
   --enable-static-baselibs
-                          Link statically againts libgcc and libstdc++. Use
+                          Link statically against libgcc and libstdc++. Use
                           with caution; enabling this option may cause issues
                           when dynamically linking against other C++ modules.
                           (default NO)
@@ -47399,6 +47399,18 @@ else
 
 fi
 
+for ac_header in AL/alext.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "AL/alext.h" "ac_cv_header_AL_alext_h" "$ac_includes_default"
+if test "x$ac_cv_header_AL_alext_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_AL_ALEXT_H 1
+_ACEOF
+ cs_header_text="${cs_header_text}#define CS_HAVE_ALEXT_H
+"
+fi
+
+done
 
 
 #------------------------------------------------------------------------------
