@@ -279,7 +279,7 @@ public:
 
 void Lod::CreateLODs(const char* filename_in, const char* filename_out)
 {
-  loading = tloader->LoadFileWait("/lev/lodtest/", filename_in);
+  loading = tloader->LoadFileWait("", filename_in);
   
   if (!loading->WasSuccessful())
   {
@@ -363,7 +363,6 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     fstate->AddVertex(m.vertices[i], m.attr[i].uv, m.attr[i].normal, m.attr[i].color);
   */
   
-  /*
   LodGen lodgen;
   lodgen.Init(fstate);
   lodgen.GenerateLODs();
@@ -383,10 +382,8 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
   }
   
   fstate->Invalidate();
-  */
   
-  string path_filename_out = string("/lev/lodtest/") + filename_out;
-  Save(path_filename_out.c_str());
+  Save(filename_out);
   
   loading.Invalidate();
 }
@@ -568,12 +565,12 @@ bool Lod::SetupModules ()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
  
-  CreateLODs("lodbarrel", "lodbarrel_lod");
-  //CreateLODs("genMesh.002", "genMesh.002_lod");
-  //CreateLODs("lodbox", "lodbox_lod");
-  //CreateLODs("genbment2_tables", "genbment2_tables_lod");
-  //CreateLODs("simple", "simple_lod");
-  //CreateLODs("kwartz.lib", "kwartz_lod.lib");
+  CreateLODs("/lev/lodtest/lodbarrel", "/lev/lodtest/lodbarrel_lod");
+  //CreateLODs("/lev/lodtest/genMesh.002", "/lev/lodtest/genMesh.002_lod");
+  //CreateLODs("/lev/lodtest/lodbox", "/lev/lodtest/lodbox_lod");
+  //CreateLODs("/lev/lodtest/genbment2_tables", "/lev/lodtest/genbment2_tables_lod");
+  //CreateLODs("/lev/lodtest/simple", "/lev/lodtest/simple_lod");
+  //CreateLODs("/lev/lodtest/kwartz.lib", "/lev/lodtest/kwartz_lod.lib");
 
   // Here we create our world.
   CreateRoom ();
