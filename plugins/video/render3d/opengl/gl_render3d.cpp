@@ -910,6 +910,7 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_EXT_secondary_color ();
   ext->InitGL_EXT_blend_func_separate ();
   ext->InitGL_ARB_occlusion_query ();
+  ext->InitGL_ARB_occlusion_query2 ();
   ext->InitGL_GREMEDY_string_marker ();
   
   // Some 'assumed state' is for extensions, so set again
@@ -3975,19 +3976,42 @@ bool csGLGraphics3D::OQueryFinished(unsigned int occlusion_query)
 
 bool csGLGraphics3D::OQIsVisible(unsigned int occlusion_query, unsigned int sampleLimit)
 {
-  GLuint sampleCount;
-  ext->glGetQueryObjectuivARB((GLuint)occlusion_query, GL_QUERY_RESULT_ARB, &sampleCount);
-  return (sampleCount > (GLuint)sampleLimit);
+  if (ext->CS_GL_ARB_occlusion_query2)
+  {
+    GLuint sampleBoolean;
+    ext->glGetQueryObjectuivARB((GLuint)occlusion_query, GL_QUERY_RESULT_ARB, &sampleBoolean);
+    return (sampleBoolean != 0);
+  }
+  else
+  {
+    GLuint sampleCount;
+    ext->glGetQueryObjectuivARB((GLuint)occlusion_query, GL_QUERY_RESULT_ARB, &sampleCount);
+    return (sampleCount > (GLuint)sampleLimit);
+  }
 }
 
 void csGLGraphics3D::OQBeginQuery (unsigned int occlusion_query)
 {
-  ext->glBeginQueryARB(GL_SAMPLES_PASSED_ARB, (GLuint)occlusion_query);
+  if (ext->CS_GL_ARB_occlusion_query2)
+  {
+    ext->glBeginQueryARB(GL_ANY_SAMPLES_PASSED_ARB, (GLuint)occlusion_query);
+  }
+  else
+  {
+    ext->glBeginQueryARB(GL_SAMPLES_PASSED_ARB, (GLuint)occlusion_query);
+  }
 }
 
 void csGLGraphics3D::OQEndQuery ()
 {
-  ext->glEndQueryARB(GL_SAMPLES_PASSED_ARB);
+  if (ext->CS_GL_ARB_occlusion_query2)
+  {
+    ext->glEndQueryARB(GL_ANY_SAMPLES_PASSED_ARB);
+  }
+  else
+  {
+    ext->glEndQueryARB(GL_SAMPLES_PASSED_ARB);
+  }
 }
 
 csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,

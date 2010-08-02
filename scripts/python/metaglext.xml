@@ -763,6 +763,8 @@
       <arg name="pname" type="GLenum" const="false" pointer="false" />
       <arg name="params" type="GLuint" const="false" pointer="true" />
     </function>
+    <!-- Promoted: ARB_occlusion_query2 -->
+    <token name="GL_ANY_SAMPLES_PASSED" value="0x8C2F" />
     <!-- Promoted: EXT_shadow_funcs -->
     <!-- Renamed tokens -->
     <token name="GL_FOG_COORD_SOURCE" value="GL_FOG_COORDINATE_SOURCE" />
@@ -7362,6 +7364,9 @@
       <arg name="pname" type="GLenum" const="false" pointer="false" />
       <arg name="params" type="GLuint" const="false" pointer="true" />
     </function>
+  </extension>
+  <extension name="GL_ARB_occlusion_query2" type="GL">
+    <token name="GL_ANY_SAMPLES_PASSED_ARB" value="0x8C2F" />
   </extension>
   <extension name="GL_ARB_draw_buffers" type="GL">
     <token name="GL_MAX_DRAW_BUFFERS_ARB" value="0x8824" />
