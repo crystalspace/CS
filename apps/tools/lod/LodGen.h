@@ -63,7 +63,8 @@ protected:
   int top_limit;
 
 public:
-  void Init(iGeneralFactoryState* fstate, int submesh_index);
+  void AddVertex(const csVector3& v) { vertices.Push(v); }
+  void AddTriangle(const csTriangle& t) { triangles.Push(t); }
   void GenerateLODs();
   int GetTriangleCount() const { return ordered_tris.GetSize(); }
   const csTriangle& GetTriangle(int i) const { return ordered_tris[i]; }

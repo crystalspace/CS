@@ -10,7 +10,7 @@
 #include <iostream>
 using namespace std;
 
-#include <crystalspace.h>
+#include "csgeom.h"
 #include "LodGen.h"
 
 inline float dot(const csVector3& v0, const csVector3& v1) { return v0 * v1; }
@@ -284,32 +284,6 @@ void PointTriangleDistanceUnitTests()
 {
   unittests(0.0);
   unittests(1.0);
-}
-
-void LodGen::Init(iGeneralFactoryState* fstate, int submesh_index)
-{
-  csVertexListWalker<float, csVector3> fstate_vertices(fstate->GetRenderBuffer(CS_BUFFER_POSITION));
-  for (unsigned int i = 0; i < fstate_vertices.GetSize(); i++)
-  {
-    vertices.Push(*fstate_vertices);
-    ++fstate_vertices;
-  }
-
-  csRef<iGeneralMeshSubMesh> submesh = fstate->GetSubMesh(submesh_index);
-  assert(submesh);
-  csRef<iRenderBuffer> index_buffer = submesh->GetIndices();
-  assert(index_buffer);
-  CS::TriangleIndicesStream<size_t> fstate_triangles(index_buffer, CS_MESHTYPE_TRIANGLES);
-  
-  while(fstate_triangles.HasNext())
-  {
-    const CS::TriangleT<size_t> ttri(fstate_triangles.Next());
-    csTriangle tri;
-    for (int i = 0; i < 3; i++)
-      tri[i] = ttri[i];
-    triangles.Push(tri);
-  }
-  InitCoincidentVertices();
 }
 
 void LodGen::InitCoincidentVertices()
@@ -635,6 +609,7 @@ void LodGen::VerifyMesh(WorkMesh& k)
 
 void LodGen::GenerateLODs()
 {
+  InitCoincidentVertices();
   k.incident_tris.SetSize(vertices.GetSize());
   for (unsigned int i = 0; i < triangles.GetSize(); i++)
     k.AddTriangle(triangles[i]);
