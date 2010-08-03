@@ -520,7 +520,7 @@ void Lod::CreateRoom ()
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
     ReportError ("Error loading 'stone4' texture!");
-  //iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   // We create a new sector called "room".
   room = engine->CreateSector ("room");
@@ -529,18 +529,16 @@ void Lod::CreateRoom ()
 
   // First we make a primitive for our geometry.
   using namespace CS::Geometry;
-  DensityTextureMapper mapper (0.3f);
+  //DensityTextureMapper mapper (0.3f);
   TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
   box.SetLevel (3);
-  box.SetMapper (&mapper);
+  //box.SetMapper (&mapper);
   box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
 
   // Now we make a factory and a mesh at once.
-  /*
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
     engine, room, "walls", "walls_factory", &box);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
-   */
 
   // Now we need light to see something.
   csRef<iLight> light;
