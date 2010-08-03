@@ -89,12 +89,6 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
   {
     OcclusionVisibility eOccVis = ntdNode.GetVisibility ();
 
-    // FIXME
-    while (eOccVis == UNKNOWN)
-    {
-      eOccVis = ntdNode.GetVisibility ();
-    }
-
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
     csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
     csArray<MeshList*> objArray;

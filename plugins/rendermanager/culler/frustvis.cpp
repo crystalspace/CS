@@ -324,12 +324,6 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
     if(ntdAux.IsLeaf())
     {
       OcclusionVisibility eOccVis = ntdAux.GetVisibility ();
-
-      // FIXME
-      while (eOccVis == UNKNOWN)
-      {
-        eOccVis = ntdAux.GetVisibility ();
-      }
      
       const int num_objects = ntdAux.kdtNode->GetObjectCount ();
       csKDTreeChild** objects = ntdAux.kdtNode->GetObjects ();

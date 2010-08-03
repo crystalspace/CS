@@ -58,10 +58,7 @@ public:
       return eResult;
     }
 
-    if (g3d->OQueryFinished (uOQuery))
-    {
-      eResult = g3d->OQIsVisible (uOQuery, VISIBILITY_THRESHOLD) ? VISIBLE : INVISIBLE;
-    }
+    eResult = g3d->OQIsVisible (uOQuery, VISIBILITY_THRESHOLD) ? VISIBLE : INVISIBLE;
 
     return eResult;
   }
