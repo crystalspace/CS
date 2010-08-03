@@ -53,10 +53,10 @@
 #include "chcpp.h"
 
 void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<MeshList*> &objArray)
-{ 
+{
   ntdNode.BeginQuery ();
 
-  for(unsigned int j=0 ; j<objArray.GetSize() ; j++)
+  for(unsigned int j=0 ; j < objArray.GetSize() ; ++j)
   {
     MeshList& obj = *objArray.Get(j);
     for (int m = 0; m < obj.numMeshes; ++m)
@@ -103,6 +103,7 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
     {
       if (objects[i]->timestamp != cur_timestamp)
       {
+        objects[i]->timestamp = cur_timestamp;
         uint32 frustum_mask = ntdNode.GetFrustumMask();
         csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*) objects[i]->GetObject ();
 
@@ -119,7 +120,6 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
             // If occlusion checks also passed, mark the mesh visible.
             if (eOccVis == VISIBLE)
             {
-              objects[i]->timestamp = cur_timestamp;
               f2bData.viscallback->MarkVisible(visobj_wrap->mesh, numMeshes, meshList);
             }
           }
