@@ -108,6 +108,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     int maxPortalRecurse;
 
     bool showGBuffer;
+    bool drawLightVolumes;
   };
 }
 CS_PLUGIN_NAMESPACE_END(RMDeferred)

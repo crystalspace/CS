@@ -396,7 +396,8 @@ public:
                        GBuffer &gbuffer,
                        DeferredLightRenderer::PersistentData &lightRenderPersistent,
                        int deferredLayer,
-                       int zonlyLayer)
+                       int zonlyLayer,
+                       bool drawLightVolumes)
     : 
   meshRender(g3d, shaderMgr),
   graphics3D(g3d),
@@ -408,7 +409,8 @@ public:
   zonlyLayer(zonlyLayer),
   lastAccumBuf(nullptr),
   lastSubTex(-1),
-  lastRenderView(nullptr)
+  lastRenderView(nullptr),
+  drawLightVolumes(drawLightVolumes)
   {}
 
   ~DeferredTreeRenderer() 
@@ -451,6 +453,14 @@ protected:
     iCamera *cam = rview->GetCamera ();
     iClipper2D *clipper = rview->GetClipper ();
 
+    // Create the light renderer here so we do not needlessly recreate it latter.
+    DeferredLightRenderer lightRender (graphics3D,
+                                       shaderMgr,
+                                       stringSet,
+                                       rview,
+                                       gbuffer,
+                                       lightRenderPersistent);
+
     // Fill the gbuffer
     gbuffer.Attach ();
     {
@@ -488,22 +498,15 @@ protected:
 
       graphics3D->BeginDraw (drawFlags);
       graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
+      
+      lightRender.OutputAmbientLight ();
 
       // Iterate through lights adding results into accumulation buffer.
-      DeferredLightRenderer render (graphics3D,
-                                    shaderMgr,
-                                    stringSet,
-                                    rview,
-                                    gbuffer,
-                                    lightRenderPersistent);
-
-      render.OutputAmbientLight ();
-
       for (size_t i = 0; i < ctxCount; i++)
       {
         typename RenderTree::ContextNode *context = contextStack[i];
 
-        ForEachLight (*context, render);
+        ForEachLight (*context, lightRender);
       }
     }
     DetachAccumBuffer ();
@@ -514,12 +517,17 @@ protected:
       graphics3D->SetZMode (CS_ZBUF_MESH);
 
       ForwardMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderMgr, deferredLayer);
+      LightVolumeRenderer lightVolumeRender (lightRender, true, 0.2f);
 
       for (size_t i = 0; i < ctxCount; i++)
       {
         typename RenderTree::ContextNode *context = contextStack[i];
 
         render (context);
+
+        // Output light volumes.
+        if (drawLightVolumes)
+          ForEachLight (*context, lightVolumeRender);
       }
 
       graphics3D->FinishDraw ();
@@ -649,6 +657,8 @@ private:
   iTextureHandle *lastAccumBuf;
   int lastSubTex;
   RenderView *lastRenderView;
+
+  bool drawLightVolumes;
 };
 
 //----------------------------------------------------------------------
@@ -792,6 +802,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   csConfigAccess cfg (objRegistry);
   maxPortalRecurse = cfg->GetInt ("RenderManager.Deferred.MaxPortalRecurse", 30);
   showGBuffer = true;
+  drawLightVolumes = false;
 
   bool layersValid = false;
   const char *layersFile = cfg->GetStr ("RenderManager.Deferred.Layers", nullptr);
@@ -959,7 +970,8 @@ bool RMDeferred::RenderView(iView *view)
                                                  gbuffer,
                                                  lightRenderPersistent,
                                                  deferredLayer,
-                                                 zonlyLayer);
+                                                 zonlyLayer,
+                                                 drawLightVolumes);
 
     ForEachContextReverse (renderTree, render);
   }
@@ -1089,6 +1101,11 @@ bool RMDeferred::DebugCommand(const char *cmd)
   if (strcmp (cmd, "toggle_visualize_gbuffer") == 0)
   {
     showGBuffer = !showGBuffer;
+    return true;
+  }
+  else if (strcmp (cmd, "toggle_visualize_lightvolumes") == 0)
+  {
+    drawLightVolumes = !drawLightVolumes;
     return true;
   }
 

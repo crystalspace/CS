@@ -43,9 +43,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     return sqrt ((1 + c) / 2.0f);
   }
 
-   /**
-    * Returns the given lights direction (only valid for spot and directional lights).
-    */
+  /**
+   * Returns the given lights direction (only valid for spot and directional lights).
+   */
   inline csVector3 GetLightDir(iLight *light)
   {
     iMovable *mov = light->GetMovable ();
@@ -307,6 +307,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       csRef<iMaterialWrapper> directionalMaterial;
       csRef<iMaterialWrapper> ambientMaterial;
 
+      /* Shader for drawing light volumes. */
+      csRef<iShader> lightVolumeShader;
+      csRef<csShaderVariable> lightVolumeColorSV;
+
       /**
        * Initialize persistent data, must be called once before using the
        * light renderer.
@@ -328,7 +332,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         // Builds the sphere.
         csEllipsoid ellipsoid(csVector3 (0.0f, 0.0f, 0.0f), csVector3 (1.0f, 1.0f, 1.0f));
-        int sphereDetail = cfg->GetInt ("RenderManager.Deferred.SphereDetail", 32);
+        int sphereDetail = cfg->GetInt ("RenderManager.Deferred.SphereDetail", 16);
 
         CS::Geometry::Sphere spherePrim (ellipsoid, sphereDetail);
 
@@ -355,7 +359,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         pointMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), pointLightShader);
 
         // Builds the cone.
-        int coneDetail = cfg->GetInt ("RenderManager.Deferred.ConeDetail", 32);
+        int coneDetail = cfg->GetInt ("RenderManager.Deferred.ConeDetail", 16);
         CS::Geometry::Cone conePrim (1.0f, 1.0f, coneDetail);
 
         csRef<iMeshFactoryWrapper> coneFactory = GeneralMeshBuilder::CreateFactory (engine, 
@@ -439,6 +443,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         iShader *ambientLightShader = shaderManager->GetShader ("deferred_ambient_light");
         ambientMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), ambientLightShader);
+
+        // Loads the light volume shader.
+        if (!loader->LoadShader ("/shader/deferred/dbg_light_volume.xml"))
+        {
+          csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+            messageID, "Could not load deferred_dbg_light_volume shader");
+        }
+
+        lightVolumeShader = shaderManager->GetShader ("deferred_dbg_light_volume");
+
+        iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
+        lightVolumeColorSV = lightVolumeShader->GetVariableAdd (svStringSet->Request("static color"));
       }
 
       private:
@@ -472,6 +488,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     }
 
     /**
+     * Renders a single light volume.
+     */
+    void OutputLightVolume(iLight *light, bool wireframe = true, float alpha = 0.5f)
+    {
+      iMeshObject *obj = nullptr;
+
+      switch (light->GetType ())
+      {
+      case CS_LIGHT_POINTLIGHT:
+        obj = persistentData.sphereMesh->GetMeshObject ();
+        break;
+      case CS_LIGHT_DIRECTIONAL:
+        obj = persistentData.boxMesh->GetMeshObject ();
+        break;
+      case CS_LIGHT_SPOTLIGHT:
+        obj = persistentData.coneMesh->GetMeshObject ();
+        break;
+      default:
+        CS_ASSERT(false);
+      };
+
+      csColor4 color (light->GetColor ());
+      color.alpha = alpha;
+
+      if (wireframe)
+        graphics3D->SetRenderState (G3DRENDERSTATE_EDGES, 1);
+
+      RenderLightVolume (light, obj, color);
+
+      if (wireframe)
+        graphics3D->SetRenderState (G3DRENDERSTATE_EDGES, 0);
+    }
+
+    /**
      * Renders a single light.
      */
     void operator()(iLight *light)
@@ -482,7 +532,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         RenderPointLight (light);
         break;
       case CS_LIGHT_DIRECTIONAL:
-        RenderDirectionalLight(light);
+        RenderDirectionalLight (light);
         break;
       case CS_LIGHT_SPOTLIGHT:
         RenderSpotLight (light);
@@ -559,7 +609,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     }
 
     /**
-     * Renders a light mesh.
+     * Renders a light volume.
+     */
+    void RenderLightVolume(iLight *light, iMeshObject *obj, const csColor4 &color)
+    {
+      int num = 0;
+      csRenderMesh **meshes = obj->GetRenderMeshes (num, rview, 
+        persistentData.sphereMesh->GetMovable (), 0);
+
+      if (num <= 0)
+        return;
+
+      // Update shader stack.
+      csShaderVariableStack svStack = shaderMgr->GetShaderVariableStack ();
+      iShader *shader = persistentData.lightVolumeShader;
+
+      persistentData.lightVolumeColorSV->SetValue (color);
+
+      svStack.Clear ();
+      shaderMgr->PushVariables (svStack);
+      shader->PushVariables (svStack);
+
+      // Draw the light mesh.
+      iCamera *cam = rview->GetCamera ();
+      csVector3 camPos = cam->GetTransform ().This2Other (csVector3 (0.0f, 0.0f, 1.0f));
+
+      DrawLightMesh (meshes, 
+                     num,
+                     CreateLightTransform (light), 
+                     shader, 
+                     svStack,
+                     CS_FX_ALPHA,
+                     IsPointInsideLight (camPos, light));
+    }
+
+    /**
+     * Renders a light mesh using the materials 'gbuffer fill' shader.
      */
     void RenderLight(iLight *light, 
                      iMeshObject *obj, 
@@ -594,6 +679,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                      CreateLightTransform (light), 
                      shader, 
                      svStack,
+                     CS_FX_ADD,
                      IsPointInsideLight (camPos, light));
     }
 
@@ -605,6 +691,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                        const csReversibleTransform &transform,
                        iShader *shader,
                        csShaderVariableStack &svStack,
+                       uint mixmode,
                        bool insideLight)
     {
       CS_ASSERT (n > 0);
@@ -628,8 +715,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
           if (!shader->SetupPass (ticket, m, *m, svStack))
             continue;
 
-          // Use additive blending so we do not loose the contributions from other lights.
-          m->mixmode = CS_FX_ADD;
+          m->mixmode = mixmode;
           m->cullMode = cullMode;
           m->object2world = transform;
 
@@ -669,6 +755,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     CS::RenderManager::RenderView *rview;
 
     PersistentData &persistentData;
+  };
+
+  /**
+   * A helper functor that will draw the light volume for each given light.
+   */
+  class LightVolumeRenderer
+  {
+  public:
+
+    LightVolumeRenderer(DeferredLightRenderer &render, bool wireframe, float alpha)
+      :
+    render(render),
+    wireframe(wireframe),
+    alpha(alpha)
+    {}
+
+    void operator()(iLight *light)
+    {
+      render.OutputLightVolume (light, wireframe, alpha);
+    }
+
+    DeferredLightRenderer &render;
+    bool wireframe;
+    float alpha;
   };
 
 }
