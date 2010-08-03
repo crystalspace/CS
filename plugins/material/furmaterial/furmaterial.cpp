@@ -437,10 +437,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       // average density - modify to use convolution matrix or such
       float density = TriangleDensity(A, B, C);
 
-      //csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
+      //csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactorGuideHairs);
 
       // if a new guide hair is needed
-      if ( (density * area * densityFactor) < 1)
+      if ( (density * area * densityFactorGuideHairs) < 1)
         continue;
 
       // make new guide hair
@@ -511,7 +511,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float bA, bB, bC; // barycentric coefficients
 
     // density
-    for (int den = 0 , change = 1 ; change ; den ++)
+    for (int den = 0 , change = 1 ; change && den < 100 ; den ++)
     {
       change = 0;
       // for every triangle
@@ -556,10 +556,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         // average density - modify to use convolution matrix or such
         float density = TriangleDensity(A, B, C);
 
-  //       csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactor);
+  //       csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactorHairStrands);
 
         // how many new guide hairs are needed
-        if ( den < 5 * (density * area * densityFactor))
+        if ( den < (density * area * densityFactorHairStrands))
         {
           change = 1;
           csHairStrand hairStrand;
@@ -903,8 +903,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     shaderVariable->GetValue(densitymap.handle);
 
-    CS::ShaderVarName densityFactorName (svStrings, "densityFactor");	
-    material->GetVariable(densityFactorName)->GetValue(densityFactor);
+    CS::ShaderVarName densityFactorGuideHairsName (svStrings, "densityFactorGuideHairs");	
+    material->GetVariable(densityFactorGuideHairsName)->GetValue(densityFactorGuideHairs);
+
+    CS::ShaderVarName densityFactorHairStrandsName (svStrings, "densityFactorHairStrands");	
+    material->GetVariable(densityFactorHairStrandsName)->GetValue(densityFactorHairStrands);    
 
     // density map
     CS::StructuredTextureFormat readbackFmt 

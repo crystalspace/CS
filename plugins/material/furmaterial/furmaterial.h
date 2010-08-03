@@ -172,7 +172,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iShaderVarStringSet> svStrings;
     /// Density & Height maps
     TextureData densitymap;
-    float densityFactor;
+    float densityFactorGuideHairs;
+    float densityFactorHairStrands;
     TextureData heightmap;
     float heightFactor;
     float displaceDistance;
