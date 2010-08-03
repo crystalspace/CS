@@ -199,6 +199,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     factoryState -> CalculateNormals();
     factoryState -> Invalidate();
 
+    iRenderBuffer *binormals = factoryState->GetRenderBuffer(CS_BUFFER_BINORMAL);
+    csRenderBufferLock<csVector3> bin (binormals, CS_BUF_LOCK_NORMAL);
+
+    for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
+      controlPointSum += hairStrands.Get(x).controlPointsCount, x++ )
+    {
+      float len = csVector3::Norm(
+        hairStrands.Get(x).controlPoints[ hairStrands.Get(x).controlPointsCount - 1 ] - 
+        hairStrands.Get(x).controlPoints[ 0 ]);
+
+      for ( size_t y = 0 ; y < hairStrands.Get(x).controlPointsCount ; y ++ )
+      {
+        float sum = csVector3::Norm(
+          hairStrands.Get(x).controlPoints[ y ] - 
+          hairStrands.Get(x).controlPoints[ 0 ]);
+
+        bin[ 2 * controlPointSum + 2 * y].Set( csVector3( rng->Get(), sum/len, 0 ) );
+        bin[ 2 * controlPointSum + 2 * y + 1].Set( bin[ 2 * controlPointSum + 2 * y] );
+      }
+    }
+
     // Make a ball using the genmesh plug-in.
     csRef<iMeshWrapper> meshWrapper =
       engine->CreateMeshWrapper (factory, "hair", room, csVector3 (0, 0, 0));
@@ -970,33 +991,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   FurAnimationControl::FurAnimationControl (FurMaterial* furMaterial)
     : scfImplementationType (this), lastTicks (0), furMaterial(furMaterial)
   {
-    size_t numberOfStrains = furMaterial->hairStrands.GetSize();
-    
-    if( !numberOfStrains ) 
-      return;
-
-    size_t controlPointsCount = 0;
-
-    for ( size_t i = 0 ; i < numberOfStrains ; i ++ )
-      controlPointsCount += furMaterial->hairStrands.Get(i).controlPointsCount;
-
-    tangentShift = new csVector3 [ controlPointsCount ];
-
-    for ( size_t i = 0 ; i < controlPointsCount ; i ++)
-      tangentShift[i] = csVector3(furMaterial->rng->Get(), furMaterial->rng->Get(), 
-        furMaterial->rng->Get()) * 0.01f;
-
-    iRenderBuffer *binormals = furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_BINORMAL);
-    csRenderBufferLock<csVector3> bin (binormals, CS_BUF_LOCK_NORMAL);
-
-    for ( size_t i = 0 ; i < 2 * controlPointsCount ; i ++)
-      bin[i] = csVector3(furMaterial->rng->Get(), furMaterial->rng->Get(), 
-        furMaterial->rng->Get());
   }
 
   FurAnimationControl::~FurAnimationControl ()
   {
-    delete tangentShift;
   }  
 
   bool FurAnimationControl::AnimatesColors () const
@@ -1093,7 +1091,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     cameraOrigin = tc.GetOrigin();
     csVector3 *tangentBuffer = tan;
-    csVector3 *tanShift = tangentShift;
 
     size_t triangleCount = 0;
 
@@ -1108,7 +1105,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       triangleCount += 2 * controlPointsCount - 2;
 
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
-        vbuf += 2, tangentBuffer += 2, tanShift ++, normals += 2 )
+        vbuf += 2, tangentBuffer += 2, normals += 2 )
       {
         firstPoint = *controlPoints;
         secondPoint = *(controlPoints + 1);
@@ -1126,8 +1123,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         
         (*normals) = normal;
         (*(normals + 1)) = normal;
-
-        tangent += (*tanShift);
 
         (*tangentBuffer) = tangent;
         (*(tangentBuffer + 1)) = tangent;
@@ -1147,7 +1142,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         vbuf += 2;
         tangentBuffer += 2;
         normals += 2;
-        tanShift ++;
       }
     }
 

@@ -20,7 +20,9 @@ float4 main (vertex2fragment IN,
 			// Lookup tables for the hair model (fixed point)
 			uniform sampler2D lookup1fixed,
 			uniform sampler2D lookup2fixed,
-			uniform sampler2D TexDiffuse,
+			uniform sampler2D DiffuseMap,
+			uniform sampler2D ColorMap,
+			uniform sampler2D TextureMap,			
 			uniform int DiffuseType,
 			uniform float3 AmbientColor,
 			uniform float3 LightColor,
@@ -29,8 +31,13 @@ float4 main (vertex2fragment IN,
 {
 	float4 OUT = float4(0, 0, 0, 1);
 
-<?if vars."diffuse map"?>
-	HairColor = tex2D(TexDiffuse, IN.TexCoord);
+<?if (vars."color map") && (vars."texture map")?>
+	float2 uv = float2(clamp(tex2D(ColorMap, IN.TexCoord).x, 0.01, 0.99), clamp(IN.TangentShift.y, 0.01, 0.99));
+	HairColor = tex2D(TextureMap, uv);
+<?else?>
+	<?if vars."diffuse map"?>
+		HairColor = tex2D(DiffuseMap, IN.TexCoord);
+	<?endif?>	
 <?endif?>
 	float MR_ct = constantsM.x;
 	float MTT_ct = constantsM.y;
@@ -89,7 +96,7 @@ float4 main (vertex2fragment IN,
 	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd) + HairColor.xyz;
 	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / max(0.2, cos_qd * cos_qd);
 	//OUT.xyz = N.a;
-	//OUT.xyz = tex2D(TexDiffuse, IN.TexCoord);
+	//OUT.xyz = HairColor;
 	return OUT;
 }
 

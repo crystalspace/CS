@@ -9,7 +9,9 @@
 		  <vp plugin="glcg" file="/shader/fur/marschner_lookup_cg.cgvp" />
 		  <texture name="tex M" destination="lookup1fixed" />
 		  <texture name="tex N" destination="lookup2fixed" />	  	  
-		  <texture name="diffuse map" destination="TexDiffuse" />
+		  <texture name="diffuse map" destination="DiffuseMap" />
+		  <texture name="color map" destination="ColorMap" />
+		  <texture name="texture map" destination="TextureMap" />
 		  <fp plugin="glcg">
 			<cgfp>
 				<?Include /shader/fur/marschner_lookup_cg.cgfp ?>

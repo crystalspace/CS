@@ -18,6 +18,12 @@
     <texture name='krystal_skull_diffusemap'>
       <file>/lib/krystal/krystal_skull_diffusemap.png</file>
     </texture>	
+    <texture name='krystal_skull_colormap'>
+      <file>/lib/krystal/krystal_skull_colormap.png</file>
+    </texture>	
+    <texture name='krystal_skull_texturemap'>
+      <file>/lib/krystal/krystal_skull_texturemap.png</file>
+    </texture>	
   </textures>
   <materials>
     <material name='marschner_material'>
@@ -28,6 +34,8 @@
 	  <shadervar type="int" name="diffuse type">4</shadervar>
 	  <shadervar type="vector3" name="hair color">0.51, 0.34, 0.25</shadervar>
 	  <shadervar type="texture" name="diffuse map">krystal_skull_diffusemap</shadervar>
+	  <shadervar type="texture" name="color map">krystal_skull_colormap</shadervar>
+	  <shadervar type="texture" name="texture map">krystal_skull_texturemap</shadervar>	  
 	  
 <!-- Uncomment the following line for red hair -->	  
 <!--	  
