@@ -33,14 +33,14 @@
 #include "csutil/weakref.h"
 #include "csgeom/plane3.h"
 #include "csgeom/kdtree.h"
+#include "csgeom/aabbtree.h"
 #include "imesh/objmodel.h"
 #include "iengine/viscull.h"
 #include "iengine/movable.h"
 #include "iengine/mesh.h"
 #include "chcpp.h"
 
-//typedef CS::RenderManager::RenderTree<
-//CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
+using CS::Geometry::AABBTree;
 
 enum NodeVisibility
 {
@@ -229,10 +229,13 @@ public:
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
 
-  bool bVisible;
+  // Bounding box used to insert the object into the AABB tree
+  csBox3 bbox;
 
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
+
+  virtual const csBox3& GetBBox() const { return bbox; }
 
   csFrustVisObjectWrapper (csFrustumVis* frustvis) :
     scfImplementationType(this), frustvis(frustvis) { }
@@ -288,8 +291,9 @@ private:
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
+  AABBTree<csFrustVisObjectWrapper> aabbTree;
+
   iGraphics3D* g3d;
-  iShaderManager* smShaderManager;
 
   CHCList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
   CHCList<NodeTraverseData> I_Queue; // I queue (invisible queue)
@@ -305,7 +309,6 @@ private:
   void TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp);
 
   void RenderQuery(NodeTraverseData &ntdNode,bool bUseBB);
-  void IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord> &objArray);
   unsigned int IssueSingleQuery(NodeTraverseData &ntdNode,bool bUseBB);
 
   /**
@@ -319,9 +322,6 @@ public:
   csFrustumVis ();
   virtual ~csFrustumVis ();
   virtual bool Initialize (iObjectRegistry *object_reg);
-
-  void CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
-	    const uint32 cur_timestamp);
 
   // Test visibility for the given node. Returns 2 if camera is inside node,
   // 1 if visible normally, or 0 if not visible.
@@ -347,8 +347,6 @@ public:
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview, 
     iVisibilityCullerListener* viscallback, int w = 0, int h = 0);
-  virtual bool VisTest (iRenderView* rview, 
-    iVisibilityCullerListener* viscallback,iShaderManager* smShaderMan, int w=0, int h=0);
   virtual void PrecacheCulling () { VisTest ((iRenderView*)0, 0); }
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);

@@ -33,7 +33,6 @@ class CHCList : public csList<T>
 public:
   CHCList() : n(0)
   {
-    csList<T>();
   }
   typename csList<T>::Iterator PushFront(const T& elem)
   {
@@ -100,6 +99,7 @@ class csVisibilityObjectHistory :
 public:
   bool bVisible;
   uint32 u32Timestamp;
+  csArray<csSimpleRenderMesh> bboxArray;
 
   csVisibilityObjectHistory () : scfImplementationType (this), bVisible(false), u32Timestamp(0)
   {
@@ -133,6 +133,11 @@ public:
   void SetTimestamp(uint32 u32TS)
   {
     u32Timestamp=u32TS;
+  }
+
+  void AddBBoxMesh(csSimpleRenderMesh &srm)
+  {
+    bboxArray.Push(srm);
   }
 };
 

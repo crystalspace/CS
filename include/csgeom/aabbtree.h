@@ -555,9 +555,7 @@ namespace Geometry //@@Right?
           BuildTree (right, objects, median + 1, objectEnd);
           static_cast<NodeExtraData*> (root)->NodeUpdate (*left, *right);
         }
-
       }
-
     }
 
     /**
@@ -680,9 +678,9 @@ namespace Geometry //@@Right?
                 }
               }
               node->SetBBox (newNodeBB);
-	      node->RemoveLeafData (i);
-	      static_cast<NodeExtraData*> (node)->LeafUpdateObjects (
-	        node->GetLeafObjects(), node->GetObjectCount());
+	            node->RemoveLeafData (i);
+	            static_cast<NodeExtraData*> (node)->LeafUpdateObjects (
+	              node->GetLeafObjects(), node->GetObjectCount());
 
               return true; // Found it
             }
@@ -710,24 +708,23 @@ namespace Geometry //@@Right?
             }
             else
             {
-	      // We have to delete the left node. We do that by moving the children
-	      // of the right node down.
-	      if (right)
-	      {
-	        node->Copy (right);
-		nodeAllocator.Free (left);
-		nodeAllocator.Free (right);
-                newNodeBB = node->GetBBox ();
-	      }
-	      else
-	      {
-                node->SetChild1 (0);
-		node->SetLeaf (true);
-                static_cast<NodeExtraData*> (node)->LeafUpdateObjects (0, 0);
-		nodeAllocator.Free (left);
-	      }
+	              // We have to delete the left node. We do that by moving the children
+	              // of the right node down.
+	              if (right)
+	              {
+	                node->Copy (right);
+		              nodeAllocator.Free (left);
+		              nodeAllocator.Free (right);
+                  newNodeBB = node->GetBBox ();
+	              }
+	              else
+	              {
+                  node->SetChild1 (0);
+		              node->SetLeaf (true);
+                  static_cast<NodeExtraData*> (node)->LeafUpdateObjects (0, 0);
+		              nodeAllocator.Free (left);
+	              }
             }
-
             node->SetBBox (newNodeBB);
 
             return true;
@@ -750,24 +747,23 @@ namespace Geometry //@@Right?
             }
             else
             {
-	      // We have to delete the right node. We do that by moving the children
-	      // of the left node down.
-	      if (left)
-	      {
-		node->Copy (left);
-		nodeAllocator.Free (left);
-		nodeAllocator.Free (right);
+	            // We have to delete the right node. We do that by moving the children
+	            // of the left node down.
+	            if (left)
+	            {
+		            node->Copy (left);
+		            nodeAllocator.Free (left);
+		            nodeAllocator.Free (right);
                 newNodeBB = node->GetBBox ();
-	      }
-	      else
-	      {
+	            }
+	            else
+	            {
                 node->SetChild2 (0);
-		node->SetLeaf (true);
+		            node->SetLeaf (true);
                 static_cast<NodeExtraData*> (node)->LeafUpdateObjects (0, 0);
-		nodeAllocator.Free (right);
-	      }
+		            nodeAllocator.Free (right);
+	            }
             }
-
             node->SetBBox (newNodeBB);
 
             return true;
@@ -849,9 +845,9 @@ namespace Geometry //@@Right?
       if (isLeaf && !IsLeaf ())
       {
         typeAndFlags |= AABB_NODE_LEAF;
-	// Ensure no children are 'lost'
-	CS_ASSERT(children[0] == 0);
-	CS_ASSERT(children[1] == 0);
+	      // Ensure no children are 'lost'
+	      CS_ASSERT(children[0] == 0);
+	      CS_ASSERT(children[1] == 0);
         leafObjCount = 0;
       }
       else if (!isLeaf && IsLeaf ())
@@ -949,7 +945,7 @@ namespace Geometry //@@Right?
       typeAndFlags = source->typeAndFlags;
       if (IsLeaf ())
       {
-	memcpy (leafStorage, source->leafStorage, sizeof (ObjectType*) * objectsPerLeaf);
+	      memcpy (leafStorage, source->leafStorage, sizeof (ObjectType*) * objectsPerLeaf);
       }
       else
       {

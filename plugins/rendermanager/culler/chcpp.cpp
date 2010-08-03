@@ -174,56 +174,6 @@ int csFrustumVis::GetFinishedQuery(OccQuery &oq)
   return 0; // no queries were found while searching
 }
 
-void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord> &objArray)
-{
-  int numq=1;
-  unsigned int *queries;
-  queries=new unsigned int;
-  g3d->OQInitQueries(queries,numq);
-  g3d->OQBeginQuery(*queries);
-  for(unsigned int j=0 ; j<objArray.GetSize() ; j++)
-  {
-    ObjectRecord obj=static_cast<ObjectRecord>(objArray.Get(j));
-    for (int m = 0; m < obj.numMeshes; ++m)
-    {
-      for (int i = 0; i < obj.meshList[m].num; ++i)
-	    {
-        csRenderMesh* rm = obj.meshList[m].rmeshes[i];
-        if(!rm->portal)
-        {
-          csVertexAttrib vA=CS_VATTRIB_POSITION;
-          iRenderBuffer *rB=rm->buffers->GetRenderBuffer(CS_BUFFER_POSITION);
-          g3d->ActivateBuffers(&vA,&rB,1);
-          g3d->DrawMeshBasic(rm,*rm);
-          g3d->DeactivateBuffers(&vA,1);
-        }
-      }
-    }
-    /*int numMeshes=0;
-    iMeshWrapper* const mw=static_cast<csFrustVisObjectWrapper*>(objArray.Get(i)->GetObject())->mesh;
-    const uint32 frust_mask=f2bData.rview->GetRenderContext ()->clip_planes_mask;
-    
-    csRenderMesh **rmeshes=mw->GetRenderMeshes(numMeshes,f2bData.rview,frust_mask);
-    for (int m = 0; m < numMeshes; m++)
-    {
-      if (!rmeshes[m]->portal)
-      {
-        csVertexAttrib vA=CS_VATTRIB_POSITION;
-        iRenderBuffer *rB=rmeshes[m]->buffers->GetRenderBuffer(CS_BUFFER_POSITION);
-        g3d->ActivateBuffers(&vA,&rB,1);
-        g3d->DrawMeshBasic(rmeshes[m],*rmeshes[m]);
-        g3d->DeactivateBuffers(&vA,1);
-      }
-    }*/
-  }
-  g3d->OQEndQuery();
-  OccQuery oc;
-  oc.qID=queries;
-  oc.numQueries=1;
-  oc.ntdNode=ntdNode;
-  Q_Queue.PushBack(oc);
-}
-
 void csFrustumVis::RenderQuery(NodeTraverseData &ntdNode,bool bUseBB)
 {
   if(ntdNode.IsLeaf())
@@ -266,7 +216,7 @@ void csFrustumVis::RenderQuery(NodeTraverseData &ntdNode,bool bUseBB)
     /*csSimpleRenderMesh srm;
     csBox3 bbox=ntdNode.kdtNode->GetNodeBBox();
     ConstructBBoxMesh(bbox,srm,CS_MESHTYPE_QUADS,CS_ZBUF_USE);
-    g3d->DrawSimpleMesh(srm,0,true);
+    g3d->DrawSimpleMesh(srm);
     ReleaseBBoxMesh(srm);*/
     csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
     csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();

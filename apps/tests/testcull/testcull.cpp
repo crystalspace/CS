@@ -398,10 +398,6 @@ bool Testcull::SetupModules ()
   loader = csQueryRegistry<iLoader> (GetObjectRegistry ());
   if (!loader) return ReportError ("Failed to locate Loader!");
 
-  smShaderManager = csQueryRegistry<iShaderManager>(GetObjectRegistry ());
-  pdTreePersistent.Initialize(smShaderManager);
-  loader->LoadShader("/shader/occlusion_queries/occ_queries.xml");
-
   // We need a View to the virtual world.
   view.AttachNew (new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();

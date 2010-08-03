@@ -113,7 +113,7 @@ public:
 
       int renderW = 0, renderH = 0;
       context.GetTargetDimensions (renderW, renderH);
-      visCuller->VisTest (rview, &cb, shaderManager , renderW, renderH);
+      visCuller->VisTest (rview, &cb, renderW, renderH);
     }
     else
     {
