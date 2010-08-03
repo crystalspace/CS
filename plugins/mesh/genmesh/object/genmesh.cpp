@@ -113,7 +113,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   g3d = csQueryRegistry<iGraphics3D> (factory->object_reg);
   buffers_version = (uint)-1;
   mesh_colors_dirty_flag = true;
-  forced_prog_lod_level = -1;
 }
 
 csGenmeshMeshObject::~csGenmeshMeshObject ()
@@ -397,19 +396,18 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     meshPtr->do_mirror = camera->IsMirrored ();
     meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
     int start_index, end_index;
-    if (factory->GetSlidingWindowSize() == 0)
+    if (subMesh.GetSlidingWindowSize() == 0)
     {
       start_index = 0;
       end_index = (uint)index_buffer->GetElementCount();
     }
     else
     {
-      int prog_lod_level;
-      if (forced_prog_lod_level == -1)
-        prog_lod_level = ComputeProgLODLevel();
-      else
-        prog_lod_level = forced_prog_lod_level;
-      factory->GetSlidingWindow(prog_lod_level, start_index, end_index);
+      iRenderBuffer* rbindices = subMesh.GetIndices();
+      int rbindices_count = rbindices->GetElementCount(); 
+
+      int prog_lod_level = (subMesh.GetForcedProgLODLevel() == -1) ? ComputeProgLODLevel() : subMesh.GetForcedProgLODLevel();
+      subMesh.GetSlidingWindow(prog_lod_level, start_index, end_index);
     }
     meshPtr->indexstart = start_index;
     meshPtr->indexend = end_index;
@@ -451,7 +449,7 @@ void csGenmeshMeshObject::GetRadius (float& rad, csVector3& cent)
   rad = factory->GetRadius ();
   cent = factory->GetObjectBoundingBox ().GetCenter ();
 }
-
+  
 bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
@@ -676,6 +674,17 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
 
   factory->PreGetBuffer (holder, buffer);
 }
+  
+void csGenmeshMeshObject::ForceProgLODLevel(int level)
+{
+  for (size_t s = 0; s < subMeshes.GetSize(); s++)
+  {
+    int the_level = level;
+    if (level >= subMeshes[s]->GetSlidingWindowSize())
+      the_level = subMeshes[s]->GetSlidingWindowSize() - 1;
+    subMeshes[s]->ForceProgLODLevel(the_level);
+  }
+}
 
 iGeneralMeshSubMesh* csGenmeshMeshObject::FindSubMesh (const char* name) const
 {
@@ -899,7 +908,18 @@ float csGenmeshMeshObjectFactory::GetRadius ()
   if (!object_bbox_valid) CalculateBBoxRadius ();
   return radius;
 }
-
+  
+int csGenmeshMeshObjectFactory::GetSlidingWindowSize() const
+{
+  int max_size = 0;
+  for (size_t s = 0; s < subMeshes.GetSize(); s++)
+  {
+    if (max_size < subMeshes[s]->GetSlidingWindowSize())
+      max_size = subMeshes[s]->GetSlidingWindowSize();
+  }
+  return max_size;
+}
+  
 const csBox3& csGenmeshMeshObjectFactory::GetObjectBoundingBox ()
 {
   SetupFactory ();

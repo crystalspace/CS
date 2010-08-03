@@ -161,7 +161,6 @@ private:
   float current_lod;
   uint32 current_features;
   csFlags flags;
-  int forced_prog_lod_level;
 
   struct LegacyLightingData
   {
@@ -343,6 +342,8 @@ public:
   friend class RenderBufferAccessor;
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
+  
+  virtual void ForceProgLODLevel(int level);
 
   //------------------ iShaderVariableAccessor implementation ------------
   class ShaderVariableAccessor : 
@@ -365,11 +366,6 @@ public:
   friend class ShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-  
-  virtual void ForceProgLODLevel(int level)
-  {
-    forced_prog_lod_level = level;
-  }
 };
 
 /**
@@ -423,15 +419,6 @@ public:
   void CreateLegacyBuffers();
   void ClearLegacyBuffers (uint mask = (uint)CS_BUFFER_ALL_MASK);
   void UpdateFromLegacyBuffers();
-  
-  struct SlidingWindow
-  {
-    int start_index;
-    int end_index;
-    SlidingWindow() {}
-    SlidingWindow(int s, int e): start_index(s), end_index(e) {}
-  };
-  csArray<SlidingWindow> sliding_windows;
   
   SubMeshesContainer subMeshes;
 
@@ -661,28 +648,8 @@ public:
     return autonormals;
   }
   
-  virtual void ClearSlidingWindows()
-  {
-    sliding_windows.SetSize(0);
-  }
-  
-  virtual int GetSlidingWindowSize() const
-  {
-    return sliding_windows.GetSize();
-  }
-  
-  virtual void AddSlidingWindow(int start_index, int end_index)
-  {
-    sliding_windows.Push(SlidingWindow(start_index, end_index));
-  }
-  
-  virtual void GetSlidingWindow(int index, int& out_start_index, int& out_end_index) const
-  {
-    CS_ASSERT(index >= 0 && index < sliding_windows.GetSize());
-    out_start_index = sliding_windows[index].start_index;
-    out_end_index = sliding_windows[index].end_index;
-  }
-  
+  virtual int GetSlidingWindowSize() const;
+    
   //------------------------ iMeshObjectFactory implementation --------------
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();

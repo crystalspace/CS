@@ -90,6 +90,27 @@ struct iGeneralMeshSubMesh : public virtual iBase
   
   /// Get back-to-front sorting for submesh.
   virtual bool GetBack2Front () const = 0;
+  
+  /// Set the index renderbuffer
+  virtual void SetIndices(iRenderBuffer* newIndices) = 0;
+  
+  /// Clear progressive LOD sliding windows
+  virtual void ClearSlidingWindows() = 0;
+  
+  /// Get the number of LOD sliding windows for progressive LODs
+  virtual int GetSlidingWindowSize() const = 0;
+  
+  /// Add a sliding window for progressive LODs
+  virtual void AddSlidingWindow(int start_index, int end_index) = 0;
+  
+  /// Return the start index and end index of the sliding window indicated by index.
+  virtual void GetSlidingWindow(unsigned int index, int& out_start_index, int& out_end_index) const = 0;
+  
+  /// Force the progressive LOD level. Set to -1 to use auto LODs.
+  virtual void ForceProgLODLevel(int level) = 0;
+
+  /// Get the current forced progressive LOD level. If it's -1, auto LODs are in effect.
+  virtual int GetForcedProgLODLevel() = 0;
 };
 
 /**
@@ -495,10 +516,7 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    */
   virtual void GenerateCylinder (float l, float r, uint sides) = 0;
   
-  virtual void ClearSlidingWindows() = 0;
   virtual int GetSlidingWindowSize() const = 0;
-  virtual void AddSlidingWindow(int start_index, int end_index) = 0;
-  virtual void GetSlidingWindow(int index, int& out_start_index, int& out_end_index) const = 0;
 };
 
 /**

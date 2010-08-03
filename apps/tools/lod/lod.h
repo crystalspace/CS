@@ -86,7 +86,6 @@ private:
   void CloneNode (iDocumentNode* from, iDocumentNode* to);
   void CloneAttributes (iDocumentNode* from, iDocumentNode* to);
   
-  
   /// Here we will create our little, simple world.
   void CreateRoom ();
 

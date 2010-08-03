@@ -110,8 +110,8 @@ void LodView::UpdateLODLevel()
   csRef<iMeshObjectFactory> fobj = fact->GetMeshObjectFactory();
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fobj);
   int s, e;
-  fstate->GetSlidingWindow(lod_level, s, e);
-  cout << "Level: " << lod_level << " Triangles: " << (e-s)/3 << endl;
+  //fstate->GetSlidingWindow(lod_level, s, e);
+  //cout << "Level: " << lod_level << " Triangles: " << (e-s)/3 << endl;
 }
 
 bool LodView::OnKeyboard (iEvent& ev)

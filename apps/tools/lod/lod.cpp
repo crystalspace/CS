@@ -106,12 +106,16 @@ void Lod::UpdateLODLevel()
 
   mstate->ForceProgLODLevel(lod_level);
   
+  cout << "Level: " << lod_level;
+  /*
   csRef<iMeshFactoryWrapper> fact = sprite->GetFactory();
   csRef<iMeshObjectFactory> fobj = fact->GetMeshObjectFactory();
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fobj);
   int s, e;
   fstate->GetSlidingWindow(lod_level, s, e);
-  cout << "Level: " << lod_level << " Triangles: " << (e-s)/3 << endl;
+  cout << " Triangles: " << (e-s)/3;
+  */
+  cout << endl;
 }
 
 bool Lod::OnKeyboard (iEvent& ev)
@@ -299,21 +303,36 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     lodgen.GenerateLODs();
   
     assert(lodgen.GetSlidingWindowCount() >= 2);
-    fstate->SetTriangleCount(0);
+    
+    iRenderBuffer* rbindices = submesh->GetIndices();
+    assert(rbindices);
+    cout << "rbindices orig " << rbindices->GetElementCount() << endl; 
+    csRef<iRenderBuffer> rbindices_new = csRenderBuffer::CreateIndexRenderBuffer(
+      lodgen.GetTriangleCount() * 3, rbindices->GetBufferType(), rbindices->GetComponentType(), 0, fstate_vertices.GetSize()-1);
+    
+    // TODO: deal with buffer not being unsigned int
+    unsigned int* data = new unsigned int[lodgen.GetTriangleCount() * 3];
+    unsigned int* pdata = data;
     for (int i = 0; i < lodgen.GetTriangleCount(); i++)
     {
-      cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
-      fstate->AddTriangle(lodgen.GetTriangle(i));
+      //cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
+      *pdata++ = lodgen.GetTriangle(i)[0];
+      *pdata++ = lodgen.GetTriangle(i)[1];
+      *pdata++ = lodgen.GetTriangle(i)[2];
     }
+    rbindices_new->CopyInto(data, lodgen.GetTriangleCount() * 3);
+    cout << "rbindices " << lodgen.GetTriangleCount() * 3 << endl;
+    submesh->SetIndices(rbindices_new);
+    delete[] data;
     
-    fstate->ClearSlidingWindows();
+    submesh->ClearSlidingWindows();
     for (int i = 0; i < lodgen.GetSlidingWindowCount(); i++)
     {
-      fstate->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
+      submesh->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
     }
   }
   
-  fstate->Invalidate();
+  //fstate->Invalidate();
   
   Save(filename_out);
   
@@ -365,7 +384,7 @@ void Lod::Save(const char* filename)
   
   csReplaceAll(savername, pluginname, ".object.", ".saver.factory.", sizeof(savername));
   
-  csRef<iSaverPlugin> saver =  csLoadPluginCheck<iSaverPlugin> (plugin_mgr, savername);
+  csRef<iSaverPlugin> saver = csLoadPluginCheck<iSaverPlugin> (plugin_mgr, savername);
   if (saver) 
     saver->WriteDown(meshfact, factNode, 0/*ssource*/);
   
@@ -430,12 +449,12 @@ bool Lod::SetupModules ()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
  
-  CreateLODs("/lev/lodtest/lodbarrel", "/lev/lodtest/lodbarrel_lod");
+  //CreateLODs("/lev/lodtest/lodbarrel", "/lev/lodtest/lodbarrel_lod");
   //CreateLODs("/lev/lodtest/genMesh.002", "/lev/lodtest/genMesh.002_lod");
   //CreateLODs("/lev/lodtest/lodbox", "/lev/lodtest/lodbox_lod");
   //CreateLODs("/lev/lodtest/genbment2_tables", "/lev/lodtest/genbment2_tables_lod");
   //CreateLODs("/lev/lodtest/simple", "/lev/lodtest/simple_lod");
-  //CreateLODs("/lev/lodtest/kwartz.lib", "/lev/lodtest/kwartz_lod.lib");
+  CreateLODs("/lev/lodtest/kwartz.lib", "/lev/lodtest/kwartz_lod.lib");
 
   // Here we create our world.
   CreateRoom ();
