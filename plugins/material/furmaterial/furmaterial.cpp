@@ -105,6 +105,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   FurMaterial::~FurMaterial ()
   {
     delete rng;
+    delete positionShift;
   }
 
   void FurMaterial::GenerateGeometry (iView* view, iSector *room)
@@ -199,6 +200,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     factoryState -> CalculateNormals();
     factoryState -> Invalidate();
 
+    // generate color deviation and UV 
     iRenderBuffer *binormals = factoryState->GetRenderBuffer(CS_BUFFER_BINORMAL);
     csRenderBufferLock<csVector3> bin (binormals, CS_BUF_LOCK_NORMAL);
 
@@ -219,6 +221,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         bin[ 2 * controlPointSum + 2 * y + 1].Set( bin[ 2 * controlPointSum + 2 * y] );
       }
     }
+
+    // geneate position deviation
+    positionShift = new csVector3 [ controlPointsCount ];
+
+    for ( size_t i = 0 ; i < controlPointsCount ; i ++)
+      positionShift[i] = csVector3(rng->Get() * 2 - 1, rng->Get() * 2 - 1, 
+        rng->Get() * 2 - 1) * positionDeviation;
 
     // Make a ball using the genmesh plug-in.
     csRef<iMeshWrapper> meshWrapper =
@@ -873,6 +882,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(growTangentsName);
 
     shaderVariable->GetValue(growTangents);
+
+    CS::ShaderVarName positionDeviationName (svStrings, "positionDeviation");	
+    shaderVariable = material->GetVariableAdd(positionDeviationName);
+
+    shaderVariable->GetValue(positionDeviation);
   }
 
   void FurMaterial::SetColor(csColor color)
@@ -1094,6 +1108,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     cameraOrigin = tc.GetOrigin();
     csVector3 *tangentBuffer = tan;
+    csVector3 *posShift = furMaterial->positionShift;
 
     size_t triangleCount = 0;
 
@@ -1108,10 +1123,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       triangleCount += 2 * controlPointsCount - 2;
 
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
-        vbuf += 2, tangentBuffer += 2, normals += 2 )
+        vbuf += 2, tangentBuffer += 2, posShift ++, normals += 2 )
       {
-        firstPoint = *controlPoints;
-        secondPoint = *(controlPoints + 1);
+        firstPoint = *controlPoints + (*posShift);
+        secondPoint = *(controlPoints + 1) + (*posShift);
         
         csMath3::CalcNormal(binormal, firstPoint, secondPoint, cameraOrigin);
         binormal.Normalize();
@@ -1133,8 +1148,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
       if (controlPointsCount)
       {
-        (*vbuf) = *controlPoints;
-        (*(vbuf + 1)) = *controlPoints + strip;
+        (*vbuf) = *controlPoints + (*posShift);
+        (*(vbuf + 1)) = *controlPoints + strip + (*posShift);
 
         (*tangentBuffer) = tangent;
         (*(tangentBuffer + 1)) = tangent;
@@ -1145,6 +1160,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         vbuf += 2;
         tangentBuffer += 2;
         normals += 2;
+        posShift ++;
       }
     }
 

@@ -160,6 +160,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csArray<csGuideHairLOD> guideHairsLOD;
     csRef<iFurPhysicsControl> physicsControl;
     csRef<iFurStrandGenerator> hairStrandGenerator;
+    csVector3* positionShift;
     csRandomGen *rng;
     float guideLOD;
     float strandLOD;
@@ -180,6 +181,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     float strandWidth;
     float strandWidthLOD;
     float controlPointsDistance;
+    float positionDeviation;
     int growTangents;
     /// Model
     csRef<iEngine> engine;
