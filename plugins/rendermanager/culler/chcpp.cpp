@@ -52,13 +52,13 @@
 #include "frustvis.h"
 #include "chcpp.h"
 
-void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord> &objArray)
+void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<MeshList*> &objArray)
 { 
   ntdNode.BeginQuery ();
 
   for(unsigned int j=0 ; j<objArray.GetSize() ; j++)
   {
-    ObjectRecord obj=static_cast<ObjectRecord>(objArray.Get(j));
+    MeshList& obj = *objArray.Get(j);
     for (int m = 0; m < obj.numMeshes; ++m)
     {
       for (int i = 0; i < obj.meshList[m].num; ++i)
@@ -74,6 +74,8 @@ void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord>
         }
       }
     }
+
+    delete &obj;
   }
 
   ntdNode.EndQuery ();
@@ -95,7 +97,7 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
 
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
     csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
-    csArray<ObjectRecord> objArray(10);
+    csArray<MeshList*> objArray;
 
     for (int i = 0; i < num_objects; ++i)
     {
@@ -110,9 +112,9 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
           csSectorVisibleRenderMeshes* meshList;
           const int numMeshes = f2bData.viscallback->GetVisibleMeshes (visobj_wrap->mesh, frustum_mask, meshList);
 
-          if(numMeshes) // don't add records that don't have anything to draw
+          if (numMeshes > 0)
           {
-            objArray.Push(ObjectRecord(0, meshList, numMeshes));
+            objArray.Push(new MeshList(meshList, numMeshes));
 
             // If occlusion checks also passed, mark the mesh visible.
             if (eOccVis == VISIBLE)

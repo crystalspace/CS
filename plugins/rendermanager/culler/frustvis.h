@@ -112,12 +112,6 @@ struct NodeTraverseData
     return GetVisibilityObjectHistory()->WasVisible (u32Timestamp);
   }
 
-  OcclusionVisibility GetVisibility(uint32 uCurrTimeStamp) const
-  {
-    if(!kdtNode) return INVISIBLE;
-    return GetVisibilityObjectHistory()->WasVisible (uCurrTimeStamp);
-  }
-
   void BeginQuery ()
   {
     GetVisibilityObjectHistory()->BeginQuery (u32Timestamp);
@@ -201,16 +195,24 @@ struct OccQuery
   }
 };
 
-struct ObjectRecord
+struct MeshList
 {
-  ObjectRecord() : obj(0) ,meshList(0), numMeshes(0)
-  {}
-  ObjectRecord (csKDTreeChild* o,csSectorVisibleRenderMeshes* mL,const int nM)
-    : obj(o),meshList(mL),numMeshes(nM)
+  MeshList (csSectorVisibleRenderMeshes* mL, const int nM) : numMeshes(nM)
   {
+    meshList = new csSectorVisibleRenderMeshes[numMeshes];
+
+    for (int m = 0; m < numMeshes; ++m)
+    {
+      meshList[m] = mL[m];
+    }
   }
+
+  ~MeshList ()
+  {
+    delete[] meshList;
+  }
+
   int numMeshes;
-  csKDTreeChild* obj;
   csSectorVisibleRenderMeshes* meshList;
 };
 
@@ -296,19 +298,8 @@ private:
   // Frustum data (front to back)
   FrustTest_Front2BackData f2bData;
 
-  //bool WasVisible(const NodeTraverseData &ntdNode,const int cur_timestamp) const;
-  //void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
-  //void PullUpVisibility(const NodeTraverseData &ntdNode);
   void TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp);
-
-  void IssueQueries(NodeTraverseData &ntdNode, csArray<ObjectRecord> &objArray);
-
-  /**
-   *  Gets the first finished query from the query list.
-   * Return 1 if visible -1 if not or 0 if no finished 
-   * queries are located.
-   */
-  //int GetFinishedQuery(OccQuery &oq);
+  void IssueQueries(NodeTraverseData &ntdNode, csArray<MeshList*> &objArray);
 
 public:
   csFrustumVis ();

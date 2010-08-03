@@ -343,7 +343,7 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
      
       const int num_objects = ntdAux.kdtNode->GetObjectCount ();
       csKDTreeChild** objects = ntdAux.kdtNode->GetObjects ();
-      csArray<ObjectRecord> objArray(10);
+      csArray<MeshList*> objArray;
 
       // Continue with frustum and other checks.
       for (int i = 0 ; i < num_objects ; i++)
@@ -361,7 +361,7 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
 
             if(numMeshes > 0)
             {
-              objArray.Push (ObjectRecord (objects[i], meshList, numMeshes));
+              objArray.Push (new MeshList (meshList, numMeshes));
 
               // If occlusion checks also passed, mark the mesh visible.
               if (eOccVis == VISIBLE)
