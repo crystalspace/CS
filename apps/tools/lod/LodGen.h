@@ -63,7 +63,7 @@ protected:
   int top_limit;
 
 public:
-  void Init(iGeneralFactoryState* fstate);
+  void Init(iGeneralFactoryState* fstate, int submesh_index);
   void GenerateLODs();
   int GetTriangleCount() const { return ordered_tris.GetSize(); }
   const csTriangle& GetTriangle(int i) const { return ordered_tris[i]; }

@@ -270,22 +270,25 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
   assert(fstate);
   
-  LodGen lodgen;
-  lodgen.Init(fstate);
-  lodgen.GenerateLODs();
-  
-  assert(lodgen.GetSlidingWindowCount() >= 2);
-  fstate->SetTriangleCount(0);
-  for (int i = 0; i < lodgen.GetTriangleCount(); i++)
+  for (unsigned int i = 0; i < fstate->GetSubMeshCount(); i++)
   {
-    cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
-    fstate->AddTriangle(lodgen.GetTriangle(i));
-  }
+    LodGen lodgen;
+    lodgen.Init(fstate, i);
+    lodgen.GenerateLODs();
   
-  fstate->ClearSlidingWindows();
-  for (int i = 0; i < lodgen.GetSlidingWindowCount(); i++)
-  {
-    fstate->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
+    assert(lodgen.GetSlidingWindowCount() >= 2);
+    fstate->SetTriangleCount(0);
+    for (int i = 0; i < lodgen.GetTriangleCount(); i++)
+    {
+      cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
+      fstate->AddTriangle(lodgen.GetTriangle(i));
+    }
+    
+    fstate->ClearSlidingWindows();
+    for (int i = 0; i < lodgen.GetSlidingWindowCount(); i++)
+    {
+      fstate->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
+    }
   }
   
   fstate->Invalidate();

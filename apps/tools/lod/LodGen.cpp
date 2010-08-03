@@ -286,14 +286,29 @@ void PointTriangleDistanceUnitTests()
   unittests(1.0);
 }
 
-void LodGen::Init(iGeneralFactoryState* fstate)
+void LodGen::Init(iGeneralFactoryState* fstate, int submesh_index)
 {
-  const csVector3* fstate_vertices = fstate->GetVertices();
-  for (int i = 0; i < fstate->GetVertexCount(); i++)
-    vertices.Push(fstate_vertices[i]);
-  csTriangle* fstate_triangles = fstate->GetTriangles();
-  for (int i = 0; i < fstate->GetTriangleCount(); i++)
-    triangles.Push(fstate_triangles[i]);
+  csVertexListWalker<float, csVector3> fstate_vertices(fstate->GetRenderBuffer(CS_BUFFER_POSITION));
+  for (unsigned int i = 0; i < fstate_vertices.GetSize(); i++)
+  {
+    vertices.Push(*fstate_vertices);
+    ++fstate_vertices;
+  }
+
+  csRef<iGeneralMeshSubMesh> submesh = fstate->GetSubMesh(submesh_index);
+  assert(submesh);
+  csRef<iRenderBuffer> index_buffer = submesh->GetIndices();
+  assert(index_buffer);
+  CS::TriangleIndicesStream<size_t> fstate_triangles(index_buffer, CS_MESHTYPE_TRIANGLES);
+  
+  while(fstate_triangles.HasNext())
+  {
+    const CS::TriangleT<size_t> ttri(fstate_triangles.Next());
+    csTriangle tri;
+    for (int i = 0; i < 3; i++)
+      tri[i] = ttri[i];
+    triangles.Push(tri);
+  }
   InitCoincidentVertices();
 }
 
@@ -674,7 +689,10 @@ void LodGen::GenerateLODs()
         break;
     }
     if (min_d == FLT_MAX && could_not_collapse)
+    {
+      cout << "No more triangles to collapse" << endl;
       break;
+    }
     if (min_d != FLT_MAX)
     {
       bool result = Collapse(k, min_v0, min_v1);
@@ -697,7 +715,10 @@ void LodGen::GenerateLODs()
     
     int curr_num_triangles = sw.end_index - sw.start_index;
     if (curr_num_triangles < min_num_triangles)
+    {
+      cout << "Reached minimum number of triangles" << endl;
       break;
+    }
     if (curr_num_triangles < min_triangles_for_replication || min_d == FLT_MAX)
     {
       if (min_d == FLT_MAX)
