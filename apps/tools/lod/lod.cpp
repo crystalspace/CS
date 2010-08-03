@@ -336,11 +336,6 @@ void Lod::Save(const char* filename)
   char loadername[128] = "";
   csReplaceAll(loadername, pluginname, ".object.", ".loader.factory.", sizeof(loadername));
   
-  /*
-  if (binary)
-    strcat(loadername, ".binary");
-  */
-  
   pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
   csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (GetObjectRegistry ());
   
@@ -348,77 +343,15 @@ void Lod::Save(const char* filename)
   
   csReplaceAll(savername, pluginname, ".object.", ".saver.factory.", sizeof(savername));
   
-  /*
-  if (binary)
-    strcat(savername, ".binary");
-  */
-  
-  //Invoke the iSaverPlugin::WriteDown
-  /*
-  if (binary)
-  {
-    csRef<iString> fname (new scfString(filename));
-    fname->Append(".binary", 7);
-    
-    csRef<iFile> file (vfs->Open(*fname, VFS_FILE_WRITE));
-    
-    csRef<iDocumentNode> paramsNode = 
-    factNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    paramsNode->SetValue("paramsfile");
-    
-    csRef<iDocumentNode> paramsdataNode = 
-    paramsNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-    
-    paramsdataNode->SetValue(*fname);
-    
-    csRef<iBinarySaverPlugin> saver = csLoadPluginCheck<iBinarySaverPlugin> (plugin_mgr, savername);
-    if (saver)
-      saver->WriteDown(meshfact, file, 0);
-  }
-  else
-  {
-  */
-    csRef<iSaverPlugin> saver =  csLoadPluginCheck<iSaverPlugin> (plugin_mgr, savername);
-    if (saver) 
-      saver->WriteDown(meshfact, factNode, 0/*ssource*/);
-  //}
-  scfString str;
-  doc->Write(&str);
-  vfs->WriteFile(filename, str.GetData(), str.Length());
-  vfs->Sync();
-}
-
-#if 0
-// TODO
-void Lod::Save(const char* filename)
-{
-  csRef<iVFS> vfs;
-  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
-  if (!vfs)
-  {
-    cout << "No iVFS!" << endl;
-    return;
-  }
-  csRef<iFile> file = vfs->Open(filename, VFS_FILE_READ);
-  
-  
-  csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
-  csRef<iDocument> doc = xml->CreateDocument();
-  const char* result = doc->Parse(file);
-  if (result)
-  {
-    cout << "Error parsing file: " << result << endl;
-    return;
-  }
-  
-  // ...
+  csRef<iSaverPlugin> saver =  csLoadPluginCheck<iSaverPlugin> (plugin_mgr, savername);
+  if (saver) 
+    saver->WriteDown(meshfact, factNode, 0/*ssource*/);
   
   scfString str;
   doc->Write(&str);
   vfs->WriteFile(filename, str.GetData(), str.Length());
   vfs->Sync();
 }
-#endif
 
 void Lod::CloneNode (iDocumentNode* from, iDocumentNode* to)
 {
