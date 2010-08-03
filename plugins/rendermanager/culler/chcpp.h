@@ -35,8 +35,8 @@ class csVisibilityObjectHistory :
     public scfImplementation1<csVisibilityObjectHistory, iKDTreeUserData>
 {
 public:
-  csVisibilityObjectHistory (iGraphics3D* g3d, uint32 uTimeStamp)
-    : scfImplementationType (this), uQueryTimestamp (uTimeStamp), g3d (g3d), eResult(INVALID)
+  csVisibilityObjectHistory (iGraphics3D* g3d, uint32 uFrame)
+    : scfImplementationType (this), uQueryFrame (uFrame), g3d (g3d), eResult(INVALID)
   {
     g3d->OQInitQueries(&uOQuery, 1);
   }
@@ -46,9 +46,9 @@ public:
     g3d->OQDelQueries (&uOQuery, 1);
   }
 
-  OcclusionVisibility WasVisible (unsigned int uTimeStamp)
+  OcclusionVisibility WasVisible (unsigned int uFrame)
   {
-    if (eResult == INVALID || uTimeStamp != uQueryTimestamp + 1)
+    if (eResult == INVALID || uFrame != uQueryFrame + 1)
     {
       return VISIBLE;
     }
@@ -66,10 +66,10 @@ public:
     return eResult;
   }
 
-  void BeginQuery (uint32 uTimeStamp)
+  void BeginQuery (uint32 uFrame)
   {
     eResult = UNKNOWN;
-    uQueryTimestamp = uTimeStamp;
+    uQueryFrame = uFrame;
 
     g3d->OQBeginQuery (uOQuery);
   }
@@ -82,7 +82,7 @@ public:
 private:
   iGraphics3D* g3d;
   unsigned int uOQuery;
-  uint32 uQueryTimestamp;
+  uint32 uQueryFrame;
   OcclusionVisibility eResult;
 };
 

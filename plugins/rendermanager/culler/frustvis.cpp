@@ -101,17 +101,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   delete kdtree;
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  if (g3d)
-  {
-    scr_width = g3d->GetWidth ();
-    scr_height = g3d->GetHeight ();
-  }
-  else
-  {
-    // If there is no g3d we currently assume we are testing.
-    scr_width = 640;
-    scr_height = 480;
-  }
+  engine = csQueryRegistry<iEngine> (object_reg);
 
   kdtree = new csKDTree ();
   csRef<csFrustVisObjectDescriptor> desc;
@@ -329,7 +319,7 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
   {
     NodeTraverseData& ntdAux = T_LocalQueue[i];
 
-    ntdAux.SetTimestamp(cur_timestamp);
+    ntdAux.SetFrame (engine->GetCurrentFrameNumber ());
 
     if(ntdAux.IsLeaf())
     {
@@ -388,24 +378,24 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
       {
         if (child1)
         {
-          T_LocalQueue.Push (NodeTraverseData (g3d, child1, ntdAux.kdtNode, ntdAux.GetFrustumMask (), cur_timestamp));
+          T_LocalQueue.Push (NodeTraverseData (g3d, child1, ntdAux.kdtNode, ntdAux.GetFrustumMask (), engine->GetCurrentFrameNumber ()));
         }
 
         if (child2)
         {
-          T_LocalQueue.Push (NodeTraverseData (g3d, child2, ntdAux.kdtNode, ntdAux.GetFrustumMask (), cur_timestamp));
+          T_LocalQueue.Push (NodeTraverseData (g3d, child2, ntdAux.kdtNode, ntdAux.GetFrustumMask (), engine->GetCurrentFrameNumber ()));
         }
       }
       else
       {
         if (child2) 
         {
-          T_LocalQueue.Push (NodeTraverseData (g3d, child2, ntdAux.kdtNode, ntdAux.GetFrustumMask (), cur_timestamp));
+          T_LocalQueue.Push (NodeTraverseData (g3d, child2, ntdAux.kdtNode, ntdAux.GetFrustumMask (), engine->GetCurrentFrameNumber ()));
         }
 
         if (child1) 
         {
-          T_LocalQueue.Push (NodeTraverseData (g3d, child1, ntdAux.kdtNode, ntdAux.GetFrustumMask (), cur_timestamp));
+          T_LocalQueue.Push (NodeTraverseData (g3d, child1, ntdAux.kdtNode, ntdAux.GetFrustumMask (), engine->GetCurrentFrameNumber ()));
         }
       }
     }
@@ -447,7 +437,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
     return false;
 
   UpdateObjects ();
-  current_vistest_nr++;
+  ++current_vistest_nr;
 
   csRenderContext* ctxt = rview->GetRenderContext ();
   f2bData.frustum = ctxt->clip_planes;
@@ -481,7 +471,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
-  T_Queue.Push (NodeTraverseData (g3d, kdtree, 0, frustum_mask, cur_timestamp));
+  T_Queue.Push (NodeTraverseData (g3d, kdtree, 0, frustum_mask, engine->GetCurrentFrameNumber ()));
 
   for(size_t i = 0; i < T_Queue.GetSize (); ++i)
   {

@@ -69,15 +69,11 @@ struct FrustTest_Front2BackData
 
 struct NodeTraverseData
 {
-  NodeTraverseData () : kdtParent(0), kdtNode(0), u32Frustum_Mask(0), u32Timestamp(0)
+  NodeTraverseData ()
   {
   }
 
-  NodeTraverseData (csKDTree* kdtN) : kdtNode (kdtN)
-  {
-  }
-
-  NodeTraverseData (iGraphics3D* g3d, csKDTree* kdtN, csKDTree* kdtP, const uint32 frustum_mask, const uint32 timestamp)
+  NodeTraverseData (iGraphics3D* g3d, csKDTree* kdtN, csKDTree* kdtP, const uint32 frustum_mask, const uint32 uCurrFrame)
   {
     kdtParent = kdtP;
     kdtNode = kdtN;
@@ -86,12 +82,12 @@ struct NodeTraverseData
     if(kdtNode && !kdtNode->GetUserObject())
     {
       csRef<iKDTreeUserData> pHistory;
-      pHistory.AttachNew (new csVisibilityObjectHistory(g3d, timestamp));
+      pHistory.AttachNew (new csVisibilityObjectHistory(g3d, uFrame));
       kdtNode->SetUserObject(pHistory);
     }
 
     u32Frustum_Mask = frustum_mask;
-    u32Timestamp = timestamp;
+    uFrame = uCurrFrame;
   }
 
   csVisibilityObjectHistory* GetVisibilityObjectHistory() const
@@ -109,12 +105,12 @@ struct NodeTraverseData
   OcclusionVisibility GetVisibility() const
   {
     if(!kdtNode) return INVISIBLE;
-    return GetVisibilityObjectHistory()->WasVisible (u32Timestamp);
+    return GetVisibilityObjectHistory()->WasVisible (uFrame);
   }
 
   void BeginQuery ()
   {
-    GetVisibilityObjectHistory()->BeginQuery (u32Timestamp);
+    GetVisibilityObjectHistory()->BeginQuery (uFrame);
   }
 
   void EndQuery ()
@@ -139,58 +135,17 @@ struct NodeTraverseData
     return u32Frustum_Mask;
   }
 
-  uint32 GetTimestamp() const
+  void SetFrame (uint32 uCurrFrame)
   {
-    return u32Timestamp;
-  }
-
-  void SetTimestamp(uint32 timestamp)
-  {
-    u32Timestamp = timestamp;
-  }
-
-  bool operator == (const NodeTraverseData & ntd) const
-  {
-    return (kdtParent==ntd.kdtParent
-            && kdtNode==ntd.kdtNode
-            && u32Frustum_Mask==ntd.u32Frustum_Mask
-            && u32Timestamp==ntd.u32Timestamp);
+    uFrame = uCurrFrame;
   }
 
   csKDTree* kdtParent;
   csKDTree* kdtNode;
   uint32 u32Frustum_Mask;
-  uint32 u32Timestamp;
+  uint32 uFrame;
 
   ~NodeTraverseData()
-  {
-  }
-};
-
-/**
- * Occlusion query record.
- */
-struct OccQuery
-{
-  OccQuery() : qID(0), numQueries(0), ntdNode()
-  {
-  }
-
-  unsigned int *qID;
-  unsigned int numQueries;
-  NodeTraverseData ntdNode;
-
-  bool IsMultiQuery() const
-  {
-    return (numQueries>1);
-  }
-
-  bool operator == (const OccQuery &oq) const
-  {
-    return (qID==oq.qID && numQueries==oq.numQueries && ntdNode==oq.ntdNode);
-  }
-
-  ~OccQuery()
   {
   }
 };
@@ -274,7 +229,6 @@ private:
   csBox3 kdtree_box;
   csRefArray<csFrustVisObjectWrapper, CS::Container::ArrayAllocDefault, 
     csArrayCapacityFixedGrow<256> > visobj_vector;
-  int scr_width, scr_height;	// Screen dimensions.
   uint32 current_vistest_nr;
 
   // This hash set holds references to csFrustVisObjectWrapper instances
@@ -292,6 +246,7 @@ private:
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
   csRef<iGraphics3D> g3d;
+  csRef<iEngine> engine;
 
   csArray<NodeTraverseData> T_Queue; // Traversal Queue
 

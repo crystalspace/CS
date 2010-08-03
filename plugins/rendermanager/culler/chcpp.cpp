@@ -83,7 +83,7 @@ void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<MeshList*> &o
 
 void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp)
 {
-  ntdNode.SetTimestamp(cur_timestamp);
+  ntdNode.SetFrame (engine->GetCurrentFrameNumber ());
 
   if (ntdNode.IsLeaf())
   {
@@ -142,24 +142,24 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
     {
       if(child1)
       {
-        T_Queue.Push (NodeTraverseData (g3d, child1, ntdNode.kdtNode, ntdNode.GetFrustumMask(), cur_timestamp));
+        T_Queue.Push (NodeTraverseData (g3d, child1, ntdNode.kdtNode, ntdNode.GetFrustumMask(), engine->GetCurrentFrameNumber ()));
       }
 
       if(child2)
       {
-        T_Queue.Push (NodeTraverseData (g3d, child2, ntdNode.kdtNode, ntdNode.GetFrustumMask(), cur_timestamp));
+        T_Queue.Push (NodeTraverseData (g3d, child2, ntdNode.kdtNode, ntdNode.GetFrustumMask(), engine->GetCurrentFrameNumber ()));
       }
     }
     else
     {
       if(child2)
       {
-        T_Queue.Push (NodeTraverseData (g3d, child2, ntdNode.kdtNode, ntdNode.GetFrustumMask(), cur_timestamp));
+        T_Queue.Push (NodeTraverseData (g3d, child2, ntdNode.kdtNode, ntdNode.GetFrustumMask(), engine->GetCurrentFrameNumber ()));
       }
 
       if(child1)
       {
-        T_Queue.Push (NodeTraverseData (g3d, child1, ntdNode.kdtNode, ntdNode.GetFrustumMask(), cur_timestamp));
+        T_Queue.Push (NodeTraverseData (g3d, child1, ntdNode.kdtNode, ntdNode.GetFrustumMask(), engine->GetCurrentFrameNumber ()));
       }
     }
   }
