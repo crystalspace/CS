@@ -52,9 +52,13 @@
 #include "frustvis.h"
 #include "chcpp.h"
 
-void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<MeshList*> &objArray)
+template<bool bQueryVisibility>
+void csFrustumVis::RenderMeshes(NodeTraverseData &ntdNode, csArray<MeshList*> &objArray)
 {
-  ntdNode.BeginQuery ();
+  if (bQueryVisibility)
+  {
+    ntdNode.BeginQuery ();
+  }
 
   for(unsigned int j=0 ; j < objArray.GetSize() ; ++j)
   {
@@ -78,7 +82,10 @@ void csFrustumVis::IssueQueries(NodeTraverseData &ntdNode, csArray<MeshList*> &o
     delete &obj;
   }
 
-  ntdNode.EndQuery ();
+  if (bQueryVisibility)
+  {
+    ntdNode.EndQuery ();
+  }
 }
 
 void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp)
@@ -109,7 +116,7 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
 
           if (numMeshes > 0)
           {
-            objArray.Push(new MeshList(meshList, numMeshes));
+            objArray.Push (new MeshList (meshList, numMeshes));
 
             // If occlusion checks also passed, mark the mesh visible.
             if (eOccVis == VISIBLE)
@@ -123,7 +130,14 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
 
     if (!objArray.IsEmpty())
     {
-      IssueQueries(ntdNode, objArray);
+      if (ntdNode.CheckVisibility ())
+      {
+        RenderMeshes<true> (ntdNode, objArray);
+      }
+      else
+      {
+        RenderMeshes<false> (ntdNode, objArray);
+      }
     }
   }
   else // else we queue its children on to the traverse queue

@@ -360,7 +360,14 @@ void csFrustumVis::CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
 
       if(!objArray.IsEmpty ())
       {
-        IssueQueries (ntdAux, objArray);
+        if (ntdNode.CheckVisibility ())
+        {
+          RenderMeshes<true> (ntdNode, objArray);
+        }
+        else
+        {
+          RenderMeshes<false> (ntdNode, objArray);
+        }
       }
     }
     else

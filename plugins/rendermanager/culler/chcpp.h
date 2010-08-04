@@ -18,6 +18,9 @@ CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
 // Visibility threshold parameter
 #define VISIBILITY_THRESHOLD 0
 
+// Frame skip parameter
+#define VISIBILITY_SKIP_FRAMES 10
+
 enum OcclusionVisibility
 {
   VISIBLE,
@@ -36,7 +39,8 @@ class csVisibilityObjectHistory :
 {
 public:
   csVisibilityObjectHistory (iGraphics3D* g3d, uint32 uFrame)
-    : scfImplementationType (this), uQueryFrame (uFrame), g3d (g3d), eResult(INVALID)
+    : scfImplementationType (this), uQueryFrame (uFrame), uNextCheck (uFrame),
+      g3d (g3d), eResult(INVALID)
   {
     g3d->OQInitQueries(&uOQuery, 1);
   }
@@ -48,6 +52,11 @@ public:
 
   OcclusionVisibility WasVisible (unsigned int uFrame)
   {
+    if (uFrame >= uNextCheck)
+    {
+      uNextCheck = uFrame;
+    }
+
     if (eResult == INVALID || uFrame != uQueryFrame + 1)
     {
       return VISIBLE;
@@ -59,6 +68,11 @@ public:
     }
 
     eResult = g3d->OQIsVisible (uOQuery, VISIBILITY_THRESHOLD) ? VISIBLE : INVISIBLE;
+
+    if (eResult == VISIBLE)
+    {
+      uNextCheck += VISIBILITY_SKIP_FRAMES;
+    }
 
     return eResult;
   }
@@ -76,10 +90,21 @@ public:
     g3d->OQEndQuery ();
   }
 
+  bool CheckVisibility (uint32 uFrame)
+  {
+    if (uFrame >= uNextCheck)
+    {
+      return true;
+    }
+
+    return false;
+  }
+
 private:
   iGraphics3D* g3d;
   unsigned int uOQuery;
   uint32 uQueryFrame;
+  uint32 uNextCheck;
   OcclusionVisibility eResult;
 };
 

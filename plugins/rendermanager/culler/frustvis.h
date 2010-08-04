@@ -108,6 +108,12 @@ struct NodeTraverseData
     return GetVisibilityObjectHistory()->WasVisible (uFrame);
   }
 
+  bool CheckVisibility () const
+  {
+    if(!kdtNode) return false;
+    return GetVisibilityObjectHistory()->CheckVisibility (uFrame); 
+  }
+
   void BeginQuery ()
   {
     GetVisibilityObjectHistory()->BeginQuery (uFrame);
@@ -254,7 +260,9 @@ private:
   FrustTest_Front2BackData f2bData;
 
   void TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp);
-  void IssueQueries(NodeTraverseData &ntdNode, csArray<MeshList*> &objArray);
+
+  template<bool bQueryVisibility>
+  void RenderMeshes(NodeTraverseData &ntdNode, csArray<MeshList*> &objArray);
 
 public:
   csFrustumVis ();
