@@ -311,6 +311,7 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
       lodgen.GetTriangleCount() * 3, rbindices->GetBufferType(), rbindices->GetComponentType(), 0, fstate_vertices.GetSize()-1);
     
     // TODO: deal with buffer not being unsigned int
+    // see renderbuffer.cpp:659
     unsigned int* data = new unsigned int[lodgen.GetTriangleCount() * 3];
     unsigned int* pdata = data;
     for (int i = 0; i < lodgen.GetTriangleCount(); i++)
@@ -335,7 +336,7 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
   //fstate->Invalidate();
   
   Save(filename_out);
-  
+
   loading.Invalidate();
 }
 
@@ -449,12 +450,13 @@ bool Lod::SetupModules ()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
  
-  //CreateLODs("/lev/lodtest/lodbarrel", "/lev/lodtest/lodbarrel_lod");
+  CreateLODs("/lev/lodtest/lodbarrel", "/lev/lodtest/lodbarrel_lod");
   //CreateLODs("/lev/lodtest/genMesh.002", "/lev/lodtest/genMesh.002_lod");
   //CreateLODs("/lev/lodtest/lodbox", "/lev/lodtest/lodbox_lod");
   //CreateLODs("/lev/lodtest/genbment2_tables", "/lev/lodtest/genbment2_tables_lod");
   //CreateLODs("/lev/lodtest/simple", "/lev/lodtest/simple_lod");
-  CreateLODs("/lev/lodtest/kwartz.lib", "/lev/lodtest/kwartz_lod.lib");
+  //CreateLODs("/lev/lodtest/kwartz.lib", "/lev/lodtest/kwartz_lod.lib");
+  //CreateLODs("/lev/lodtest/submeshtest", "/lev/lodtest/submeshtest_lod");
 
   // Here we create our world.
   CreateRoom ();

@@ -403,9 +403,6 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     }
     else
     {
-      iRenderBuffer* rbindices = subMesh.GetIndices();
-      int rbindices_count = rbindices->GetElementCount(); 
-
       int prog_lod_level = (subMesh.GetForcedProgLODLevel() == -1) ? ComputeProgLODLevel() : subMesh.GetForcedProgLODLevel();
       subMesh.GetSlidingWindow(prog_lod_level, start_index, end_index);
     }

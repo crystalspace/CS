@@ -626,8 +626,13 @@ void LodGen::GenerateLODs()
   bool could_not_collapse = false;
   int edge_start = -1;
   
+  int counter = 0;
+  
   while (1)
   {
+    if (counter == 10)
+      break;
+    counter++;
     float min_d = FLT_MAX;
     int min_v0, min_v1;    
     SlidingWindow sw = k.GetLastWindow();
