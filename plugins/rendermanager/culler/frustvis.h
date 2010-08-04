@@ -33,14 +33,12 @@
 #include "csutil/weakref.h"
 #include "csgeom/plane3.h"
 #include "csgeom/kdtree.h"
-#include "csgeom/aabbtree.h"
 #include "imesh/objmodel.h"
 #include "iengine/viscull.h"
 #include "iengine/movable.h"
 #include "iengine/mesh.h"
 #include "chcpp.h"
-
-using CS::Geometry::AABBTree;
+#include "aabbtree.h"
 
 enum NodeVisibility
 {
@@ -60,6 +58,7 @@ struct FrustTest_Front2BackData
   csVector3 pos;
   iRenderView* rview;
   csPlane3* frustum;
+  csBox3 global_bbox;
   // this is the callback to call when we discover a visible node
   iVisibilityCullerListener* viscallback;
 };

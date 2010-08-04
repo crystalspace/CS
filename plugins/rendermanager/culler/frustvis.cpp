@@ -55,6 +55,38 @@
 
 //----------------------------------------------------------------------
 
+struct InnerNodeTraversalOP
+{
+  bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n)
+  {
+    CS_ASSERT_MSG("Invalid AABB-tree", !n->IsLeaf ());
+    csBox3 bbox=n->GetBBox();
+    //csPrintf("Inner...%d\n",n->GetObjectCount());
+    //csPrintf("Inner: (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bbox.MinX(),bbox.MinY(),bbox.MinZ(),
+    //        bbox.MaxX(),bbox.MaxY(),bbox.MaxZ());
+    return true;
+  }
+};
+
+struct LeafNodeTraversalOP
+{
+  bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n)
+  { 
+    CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
+    int num_objects=n->GetObjectCount();
+    
+    for(int i=0;i<num_objects; ++i)
+    {
+      csBox3 bbox=n->GetLeafData(i)->GetBBox();
+      //csPrintf("Leaf: (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bbox.MinX(),bbox.MinY(),bbox.MinZ(),
+      //      bbox.MaxX(),bbox.MaxY(),bbox.MaxZ());
+    }
+    return true;
+  }
+};
+
+//----------------------------------------------------------------------
+
 void csFrustVisObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
 {
   frustvis->AddObjectToUpdateQueue (this);
@@ -197,10 +229,6 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
   kdtree_box += bbox;
   visobj_wrap->bbox=bbox;
 
-  printf("Inserting into aabb (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bbox.MinX(),bbox.MinY(),bbox.MinZ(),
-          bbox.MaxX(),bbox.MaxY(),bbox.MaxZ());
-  aabbTree.AddObject(visobj_wrap);
-
   iMeshWrapper* mesh = visobj->GetMeshWrapper ();
   visobj_wrap->mesh = mesh;
 
@@ -212,6 +240,10 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 		  (iObjectModelListener*)visobj_wrap);
 
   visobj_vector.Push (visobj_wrap);
+
+  printf("Inserting into aabb (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bbox.MinX(),bbox.MinY(),bbox.MinZ(),
+          bbox.MaxX(),bbox.MaxY(),bbox.MaxZ());
+  aabbTree.AddObject(visobj_wrap);
 }
 
 void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
@@ -232,11 +264,13 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
           visobj_wrap->bbox.MinX(),visobj_wrap->bbox.MinY(),visobj_wrap->bbox.MinZ(),
           visobj_wrap->bbox.MaxX(),visobj_wrap->bbox.MaxY(),visobj_wrap->bbox.MaxZ());
       aabbTree.RemoveObject(visobj_wrap);
+
 #ifdef CS_DEBUG
       // To easily recognize that the vis wrapper has been deleted:
       visobj_wrap->frustvis = (csFrustumVis*)0xdeadbeef;
 #endif
       visobj_vector.DeleteIndexFast (i);
+
       return;
     }
   }
@@ -341,6 +375,96 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
   return true;
 }
 
+struct InnerNodeProcessOP
+{
+  InnerNodeProcessOP()
+  {
+  }
+  InnerNodeProcessOP(FrustTest_Front2BackData &data)
+  {
+    f2bData=data;
+  }
+
+  FrustTest_Front2BackData f2bData;
+
+  const bool operator() (AABBTree<csFrustVisObjectWrapper>::Node* n) const
+  {
+    //CS_ASSERT_MSG("Invalid AABB-tree", !n->IsLeaf ());
+
+    csBox3 node_bbox = n->GetBBox();
+    node_bbox *= f2bData.global_bbox;
+
+    if (node_bbox.Contains (f2bData.pos))
+    {
+      return true; // node completely visible
+    }
+
+    uint32 new_mask;
+    if (!csIntersect3::BoxFrustum (node_bbox,
+                                   f2bData.frustum,
+                                   n->GetFrustumMask(),
+  	                               new_mask))
+    {
+      return false; //node invisible
+    }
+
+    n->SetFrustumMask(new_mask);
+    //if we have children update them with the parent's frustum mask
+    if(n->GetChild1())
+    {
+      n->GetChild1()->SetFrustumMask(new_mask);
+    }
+    if(n->GetChild2())
+    {
+      n->GetChild2()->SetFrustumMask(new_mask);
+    }
+    return true; // node visible
+  }
+};
+
+struct LeafNodeProcessOP
+{
+  LeafNodeProcessOP()
+  {
+  }
+  LeafNodeProcessOP(FrustTest_Front2BackData &data)
+  {
+    f2bData=data;
+  }
+
+  FrustTest_Front2BackData f2bData;
+
+  const bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n) const
+  { 
+    //CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
+    const int num_objects=n->GetObjectCount();
+    const uint32 frustum_mask=n->GetFrustumMask();
+    
+    for(int i=0;i<num_objects; ++i)
+    {
+      const csFrustVisObjectWrapper* visobj_wrap = n->GetLeafData(i);
+
+      if (visobj_wrap->mesh && visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
+        return true;
+
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      if (obj_bbox.Contains (f2bData.pos))
+      {
+        f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
+        return true;
+      }
+  
+      uint32 new_mask;
+      if (!csIntersect3::BoxFrustum (obj_bbox, f2bData.frustum, frustum_mask, new_mask))
+      {
+        return true;
+      }
+      f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, new_mask);
+    }
+    return true;
+  }
+};
+
 /*------------------------------------------------------------------*/
 /*--------------------------- MAIN DADDY ---------------------------*/
 /*------------------------------------------------------------------*/
@@ -362,9 +486,9 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   f2bData.rview = rview;
   f2bData.viscallback = viscallback;
+  f2bData.global_bbox=kdtree_box;
 
   g3d=rview->GetGraphics3D();
-
   if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
 	      csPrintf("Cannot prepare renderer for 3D drawing\n");
@@ -372,29 +496,6 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   }
   g3d->FinishDraw();
 
-  /*printf("%d\n",cur_timestamp);
-  while(Q_Queue.Size())
-  {
-    OccQuery oc;
-    const int rez=GetFinishedQuery(oc);
-    if(rez==1) // object was visible last fram,e
-    {
-      printf("visible %d\n",oc.ntdNode.GetTimestamp());
-    }
-    else if(rez==-1) // object was occluded last frame
-    {
-      printf("not visible %d\n",oc.ntdNode.GetTimestamp());
-    }
-    if(rez) // if we found a finished query than cleanup memory
-    {
-      g3d->OQDelQueries(oc.qID,oc.numQueries);
-      if(oc.IsMultiQuery())
-        delete [] oc.qID;
-      else
-        delete oc.qID;
-    }
-  }
-  printf("\n");*/
 
   const csReversibleTransform& camt = rview->GetCamera()->GetTransform ();
   g3d->SetClipper (rview->GetClipper(), CS_CLIPPER_TOPLEVEL);  // We are at top-level.
@@ -408,9 +509,15 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   g3d->SetZMode(CS_ZBUF_USE);
   g3d->SetWriteMask(false,false,false,false);
 
+  InnerNodeProcessOP opIN(f2bData);
+  LeafNodeProcessOP opLN(f2bData);
+  csVector3 dir=rview->GetCamera ()->GetTransform ().GetFront()-rview->GetCamera ()->GetTransform ().GetOrigin ();
+  aabbTree.SetRootFrustumMask(frustum_mask);
+  aabbTree.TraverseF2B(opIN,opLN,dir);
+
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
-  NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
+  /*NodeTraverseData ntdRoot(kdtree,0,frustum_mask);
   ntdRoot.SetVisibility(true);
   T_Queue.PushBack(ntdRoot);
 
@@ -444,7 +551,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
       ntdCurrent.kdtNode->Distribute ();
       TraverseNode(ntdCurrent,cur_timestamp);
     }
-  }
+  }*/
 
   // here we should process the remaining nodes in the multi query
 
@@ -509,17 +616,17 @@ static bool FrustTestPlanes_Front2Back (csKDTree* treenode,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       uint32 new_mask2;
       if (csIntersect3::BoxFrustum (obj_bbox, data->frustum,
-		frustum_mask, new_mask2))
+		        frustum_mask, new_mask2))
       {
-	if (data->viscallback)
-	{
-	  data->viscallback->ObjectVisible (visobj_wrap->visobj, 
-	      visobj_wrap->mesh, new_mask2);
-	}
-	else
-	{
-	  data->vistest_objects->Push (visobj_wrap->visobj);
-	}
+	      if (data->viscallback)
+	      {
+	        data->viscallback->ObjectVisible (visobj_wrap->visobj, 
+	            visobj_wrap->mesh, new_mask2);
+	      }
+	      else
+	      {
+	        data->vistest_objects->Push (visobj_wrap->visobj);
+	      }
       }
     }
   }
@@ -619,7 +726,7 @@ static bool FrustTestBox_Front2Back (csKDTree* treenode, void* userdata,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (obj_bbox.TestIntersect (data->box))
       {
-	data->vistest_objects->Push (visobj_wrap->visobj);
+	      data->vistest_objects->Push (visobj_wrap->visobj);
       }
     }
   }
@@ -715,7 +822,6 @@ static bool FrustTestSphere_Front2Back (csKDTree* treenode,
       }
     }
   }
-
   return true;
 }
 
@@ -766,7 +872,7 @@ void csFrustumVis::VisTest (const csSphere& sphere,
   	0);
 }
 
-//======== IntersectSegment ================================================
+//============================ Segment intersection code =======================================
 
 struct IntersectSegment_Front2BackData
 {
@@ -936,6 +1042,24 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
   return true;
 }
 
+struct InnerNodeIntersectSegment
+{
+  IntersectSegment_Front2BackData data;
+  bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n)
+  {
+    return true;
+  }
+};
+
+struct LeafNodeIntersectSegment
+{
+  IntersectSegment_Front2BackData data;
+  bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n)
+  {
+    return true;
+  }
+};
+
 bool csFrustumVis::IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
     iMeshWrapper** p_mesh, int* poly_idx, bool accurate)
@@ -953,6 +1077,13 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
   data.accurate = accurate;
   data.isect = 0;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
+
+  InnerNodeIntersectSegment isIN;
+  isIN.data=data;
+  LeafNodeIntersectSegment isLN;
+  isLN.data=data;
+
+  //aabbTree.TraverseF2B(isIN,isLN
 
   if (p_mesh) *p_mesh = data.mesh;
   if (pr) *pr = data.r;
@@ -977,6 +1108,11 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
+  InnerNodeIntersectSegment isIN;
+  isIN.data=data;
+  LeafNodeIntersectSegment isLN;
+  isLN.data=data;
+
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (data.vector, 0);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
@@ -992,7 +1128,13 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegmentSloppy (
   kdtree->Front2Back (start, IntersectSegmentSloppy_Front2Back,
   	(void*)&data, 0);
 
+  InnerNodeIntersectSegment isIN;
+  isIN.data=data;
+  LeafNodeIntersectSegment isLN;
+  isLN.data=data;
+
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (data.vector, 0);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
+//============================ End segment intersection code ===================================

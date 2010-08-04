@@ -16,17 +16,13 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSGEOM_AABBTREE_H__
-#define __CS_CSGEOM_AABBTREE_H__
+#ifndef __CS_AABBTREE_H__
+#define __CS_AABBTREE_H__
 
 #include "csutil/blockallocator.h"
 #include "csgeom/box.h"
 #include "csutil/dirtyaccessarray.h"
 
-namespace CS
-{
-namespace Geometry //@@Right?
-{
   template<typename ObjectType>
   struct AABBTreeNodeExtraDataNone
   {
@@ -79,6 +75,14 @@ namespace Geometry //@@Right?
       // Don't bother with tree traversal, just free all nodes
       nodeAllocator.DeleteAll ();
     #endif
+    }
+
+    /*
+     *
+     */
+    void SetRootFrustumMask(uint32 frustum_mask)
+    {
+      rootNode->SetFrustumMask(frustum_mask);
     }
 
     /**
@@ -263,7 +267,6 @@ namespace Geometry //@@Right?
       {
         if (node->IsObjectSlotFree ())
         {
-          
           node->AddLeafData (object);
           static_cast<NodeExtraData*> (node)->LeafAddObject (object);
         }
@@ -828,7 +831,7 @@ namespace Geometry //@@Right?
   {
   public:
     Node ()
-      : typeAndFlags (AABB_NODE_INNER), leafObjCount (0)  
+      : typeAndFlags (AABB_NODE_INNER), leafObjCount (0)  , frustum_mask(0)
     {
       children[0] = children[1] = 0;
     }
@@ -857,6 +860,18 @@ namespace Geometry //@@Right?
         leafObjCount = 0;
         children[0] = children[1] = 0;
       }
+    }
+
+    ///
+    uint32 GetFrustumMask() const
+    {
+      return frustum_mask;
+    }
+
+    ///
+    void SetFrustumMask(uint32 fm)
+    {
+      frustum_mask=fm;
     }
 
     ///
@@ -999,6 +1014,9 @@ namespace Geometry //@@Right?
     uint16 leafObjCount;
 
     ///
+    uint32 frustum_mask;
+
+    ///
     csBox3 boundingBox;
 
     ///
@@ -1008,9 +1026,5 @@ namespace Geometry //@@Right?
       Node* children[2];
     };
   };
-
-
-}
-}
 
 #endif
