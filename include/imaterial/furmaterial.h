@@ -27,7 +27,7 @@
 
 #include "crystalspace.h"
 
-struct iFurMaterial;
+struct iFurMesh;
 
 class csVector3;
 class csColor4;
@@ -63,14 +63,14 @@ struct iFurStrandGenerator : public virtual iBase
   virtual void Update() = 0;
 };
 
-struct iFurMaterialType : public virtual iBase
+struct iFurMeshType : public virtual iBase
 {
-  SCF_INTERFACE (iFurMaterialType, 1, 0, 0);
+  SCF_INTERFACE (iFurMeshType, 1, 0, 0);
 
-  virtual void ClearFurMaterials () = 0;
-  virtual void RemoveFurMaterial (const char* name,iFurMaterial* furMaterial) = 0;
-  virtual iFurMaterial* CreateFurMaterial (const char* name) = 0;
-  virtual iFurMaterial* FindFurMaterial (const char* name) const = 0;
+  virtual void ClearFurMeshes () = 0;
+  virtual void RemoveFurMesh (const char* name,iFurMesh* furMesh) = 0;
+  virtual iFurMesh* CreateFurMesh (const char* name) = 0;
+  virtual iFurMesh* FindFurMesh (const char* name) const = 0;
 };
 
 /**
@@ -78,9 +78,9 @@ struct iFurMaterialType : public virtual iBase
 * that you use better comments than this one in a
 * real situation.
 */
-struct iFurMaterial : public virtual iMaterial 
+struct iFurMesh : public virtual iBase 
 {
-  SCF_INTERFACE (iFurMaterial, 1, 0, 0);
+  SCF_INTERFACE (iFurMesh, 1, 0, 0);
   /// Generate geometry
   virtual void GenerateGeometry (iView* view, iSector* room) = 0;
   virtual void SetGuideLOD(float guideLOD) = 0; 
@@ -91,7 +91,7 @@ struct iFurMaterial : public virtual iMaterial
   virtual void StartPhysicsControl ( ) = 0;
   virtual void StopPhysicsControl ( ) = 0;
  
-  virtual void SetFurStrandGenerator( iFurStrandGenerator* furStrandMaterial) = 0;
+  virtual void SetFurStrandGenerator( iFurStrandGenerator* furStrandGenerator) = 0;
   virtual iFurStrandGenerator* GetFurStrandGenerator( ) = 0;
 
   virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory ) = 0;

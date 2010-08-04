@@ -140,25 +140,25 @@ bool KrystalScene::HasPhysicalObjects ()
 
 void KrystalScene::SwitchFurPhysics()
 {
-  if (!furMaterial)
+  if (!furMesh)
     return;
 
   if (hairPhysicsEnabled)
   {
-    furMaterial->SetGuideLOD(0.0f);
-    furMaterial->StopPhysicsControl();
+    furMesh->SetGuideLOD(0.0f);
+    furMesh->StopPhysicsControl();
     animationPhysicsControl->
       SetInitialTransform(headBody->GetTransform().GetInverse());
-    furMaterial->SetPhysicsControl(animationPhysicsControl);
-    furMaterial->StartPhysicsControl();
+    furMesh->SetPhysicsControl(animationPhysicsControl);
+    furMesh->StartPhysicsControl();
     hairPhysicsEnabled = false;
   }
   else 
   {
-    furMaterial->SetGuideLOD(0.0f);
-    furMaterial->StopPhysicsControl();
-    furMaterial->SetPhysicsControl(hairPhysicsControl);
-    furMaterial->StartPhysicsControl();
+    furMesh->SetGuideLOD(0.0f);
+    furMesh->StopPhysicsControl();
+    furMesh->SetPhysicsControl(hairPhysicsControl);
+    furMesh->StartPhysicsControl();
     hairPhysicsEnabled = true;
   }
 }
@@ -242,11 +242,11 @@ bool KrystalScene::CreateAvatar ()
   if (!hairStrandGenerator)
     return hairTest->ReportError("Failed to locate iFurStrandGenerator plugin!");
 
-  // Load furMaterial
-  csRef<iFurMaterialType> furMaterialType = csQueryRegistry<iFurMaterialType> 
+  // Load furMesh
+  csRef<iFurMeshType> furMeshType = csQueryRegistry<iFurMeshType> 
     (hairTest->object_reg);
-  if (!furMaterialType)
-    return hairTest->ReportError("Failed to locate iFurMaterialType plugin!");
+  if (!furMeshType)
+    return hairTest->ReportError("Failed to locate iFurMeshType plugin!");
 
   // Create a new animation tree. The structure of the tree is:
   //   + ragdoll controller node (root node - only if physics are enabled)
@@ -406,16 +406,16 @@ bool KrystalScene::CreateAvatar ()
   animationPhysicsControl->SetInitialTransform(headBody->GetTransform().GetInverse());
 
   // Initialize fur material
-  furMaterial = furMaterialType->CreateFurMaterial("hair");
-  furMaterial->SetPhysicsControl(animationPhysicsControl);
-  furMaterial->SetFurStrandGenerator(hairStrandGenerator);
+  furMesh = furMeshType->CreateFurMesh("hair");
+  furMesh->SetPhysicsControl(animationPhysicsControl);
+  furMesh->SetFurStrandGenerator(hairStrandGenerator);
 
-  furMaterial->SetMeshFactory(animeshFactory);
-  furMaterial->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
-  furMaterial->SetMaterial(skullMaterial->GetMaterial());
-  furMaterial->GenerateGeometry(hairTest->view, hairTest->room);
-  furMaterial->SetGuideLOD(0);
-  furMaterial->SetStrandLOD(1);
+  furMesh->SetMeshFactory(animeshFactory);
+  furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
+  furMesh->SetMaterial(skullMaterial->GetMaterial());
+  furMesh->GenerateGeometry(hairTest->view, hairTest->room);
+  furMesh->SetGuideLOD(0);
+  furMesh->SetStrandLOD(1);
 
   // add light info for marschner
   csRef<iShaderVarStringSet> svStrings = 

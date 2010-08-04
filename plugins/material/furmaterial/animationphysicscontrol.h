@@ -31,7 +31,7 @@
 
 struct iObjectRegistry;
 
-CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
+CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   struct csGuideHairAnimation
   {
@@ -71,6 +71,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csReversibleTransform initialTransform;
   };
 }
-CS_PLUGIN_NAMESPACE_END(FurMaterial)
+CS_PLUGIN_NAMESPACE_END(FurMesh)
 
 #endif // __ANIMATION_PHYSICS_CONTROL_H__

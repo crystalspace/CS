@@ -23,64 +23,64 @@
 #include "hairphysicscontrol.h"
 #include "hairstrandgenerator.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
+CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   /********************
-  *  FurMaterialType
+  *  FurMeshType
   ********************/
 
-  SCF_IMPLEMENT_FACTORY (FurMaterialType)
+  SCF_IMPLEMENT_FACTORY (FurMeshType)
 
-    CS_LEAKGUARD_IMPLEMENT(FurMaterialType);
+    CS_LEAKGUARD_IMPLEMENT(FurMeshType);
 
-  FurMaterialType::FurMaterialType (iBase* parent) :
+  FurMeshType::FurMeshType (iBase* parent) :
   scfImplementationType (this, parent),
     object_reg(0)
   {
   }
 
-  FurMaterialType::~FurMaterialType ()
+  FurMeshType::~FurMeshType ()
   {
-    furMaterialHash.DeleteAll();
+    furMeshHash.DeleteAll();
   }
 
   // From iComponent
-  bool FurMaterialType::Initialize (iObjectRegistry* r)
+  bool FurMeshType::Initialize (iObjectRegistry* r)
   {
     object_reg = r;
     return true;
   }
 
-  // From iFurMaterialType
-  void FurMaterialType::ClearFurMaterials ()
+  // From iFurMeshType
+  void FurMeshType::ClearFurMeshes ()
   {
-    furMaterialHash.DeleteAll ();
+    furMeshHash.DeleteAll ();
   }
 
-  void FurMaterialType::RemoveFurMaterial (const char *name, iFurMaterial* furMaterial)
+  void FurMeshType::RemoveFurMesh (const char *name, iFurMesh* furMesh)
   {
-    furMaterialHash.Delete (name, furMaterial);
+    furMeshHash.Delete (name, furMesh);
   }
 
-  iFurMaterial* FurMaterialType::CreateFurMaterial (const char *name)
+  iFurMesh* FurMeshType::CreateFurMesh (const char *name)
   {
-    csRef<iFurMaterial> newFur;
-    newFur.AttachNew(new FurMaterial (this, name, object_reg));
-    return furMaterialHash.PutUnique (name, newFur);
+    csRef<iFurMesh> newFur;
+    newFur.AttachNew(new FurMesh (this, name, object_reg));
+    return furMeshHash.PutUnique (name, newFur);
   }
 
-  iFurMaterial* FurMaterialType::FindFurMaterial (const char *name) const
+  iFurMesh* FurMeshType::FindFurMesh (const char *name) const
   {
-    return furMaterialHash.Get (name, 0);
+    return furMeshHash.Get (name, 0);
   }
 
   /********************
-  *  FurMaterial
+  *  FurMesh
   ********************/
 
-  CS_LEAKGUARD_IMPLEMENT(FurMaterial);
+  CS_LEAKGUARD_IMPLEMENT(FurMesh);
 
-  FurMaterial::FurMaterial (FurMaterialType* manager, const char *name, 
+  FurMesh::FurMesh (FurMeshType* manager, const char *name, 
     iObjectRegistry* object_reg) :
   scfImplementationType (this), manager (manager), name (name), 
     object_reg(object_reg), physicsControl(0), hairStrandGenerator(0), rng(0),
@@ -102,13 +102,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     rng = new csRandomGen(csGetTicks());
   }
 
-  FurMaterial::~FurMaterial ()
+  FurMesh::~FurMesh ()
   {
     delete rng;
     delete positionShift;
   }
 
-  void FurMaterial::GenerateGeometry (iView* view, iSector *room)
+  void FurMesh::GenerateGeometry (iView* view, iSector *room)
   {
     iRenderBuffer* vertexes = meshFactory->GetVertices();
     iRenderBuffer* normals = meshFactory->GetNormals();
@@ -252,7 +252,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     meshState -> SetAnimationControl(animationControl);
   }
 
-  void FurMaterial::GenerateGuideHairs(iRenderBuffer* indices, 
+  void FurMesh::GenerateGuideHairs(iRenderBuffer* indices, 
     iRenderBuffer* vertexes, iRenderBuffer* nrmls, iRenderBuffer* texCoords)
   {
     csRenderBufferLock<csVector3> positions (vertexes, CS_BUF_LOCK_READ);
@@ -336,7 +336,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     }
   }
 
-  float FurMaterial::TriangleDensity(csGuideHair A, csGuideHair B, csGuideHair C)
+  float FurMesh::TriangleDensity(csGuideHair A, csGuideHair B, csGuideHair C)
   {
     csVector2 a = csVector2(A.uv.x * densitymap.width, A.uv.y * densitymap.height);
     csVector2 b = csVector2(B.uv.x * densitymap.width, B.uv.y * densitymap.height);
@@ -397,7 +397,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     return density;
   }
 
-  void FurMaterial::GenerateGuideHairsLOD()
+  void FurMesh::GenerateGuideHairsLOD()
   {
     // generate guide hairs for LOD
     for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
@@ -505,7 +505,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     //csPrintf("end generate guide hairs LOD\n");
   }
 
-  void FurMaterial::SynchronizeGuideHairs ()
+  void FurMesh::SynchronizeGuideHairs ()
   {
     if (!physicsControlEnabled) // no physics support
       return;
@@ -515,7 +515,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         guideHairs.Get(i).controlPointsCount);
   }
 
-  void FurMaterial::GenerateHairStrands ()
+  void FurMesh::GenerateHairStrands ()
   {
     float bA, bB, bC; // barycentric coefficients
 
@@ -628,7 +628,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     //csPrintf("end\n");
   }
 
-  void FurMaterial::SetGuideLOD(float guideLOD)
+  void FurMesh::SetGuideLOD(float guideLOD)
   {
     if ( fabs( this->guideLOD - guideLOD ) < EPSILON )
       return;
@@ -661,7 +661,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csPrintf("Active LOD ropes: %d\n",count);
   }
 
-  void FurMaterial::SetStrandLOD(float strandLOD)
+  void FurMesh::SetStrandLOD(float strandLOD)
   {
     this->strandLOD = strandLOD;
     size_t totalGuideHairsCount = guideHairs.GetSize() + guideHairsLOD.GetSize();
@@ -671,13 +671,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     strandWidthLOD = 1 / ( strandLOD * 0.75f + 0.25f ) * strandWidth;
   }
 
-  void FurMaterial::SetLOD(float lod)
+  void FurMesh::SetLOD(float lod)
   {
     SetGuideLOD(lod);
     SetStrandLOD(lod);
   }
 
-  void FurMaterial::GaussianBlur(TextureData texture)
+  void FurMesh::GaussianBlur(TextureData texture)
   {
     CS::StructuredTextureFormat readbackFmt 
       (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
@@ -724,7 +724,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       delete dest;
   }
 
-  void FurMaterial::SaveUVImage()
+  void FurMesh::SaveUVImage()
   {
     //csPrintf("%s\n", densitymap->GetImageName());
 
@@ -779,7 +779,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
   }
 
-  void FurMaterial::SaveImage(uint8* buf, const char* texname, 
+  void FurMesh::SaveImage(uint8* buf, const char* texname, 
     int width, int height)
   {
     csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
@@ -820,12 +820,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     }	    
   }
 
-  void FurMaterial::SetPhysicsControl (iFurPhysicsControl* physicsControl)
+  void FurMesh::SetPhysicsControl (iFurPhysicsControl* physicsControl)
   {
     this->physicsControl = physicsControl;
   }
 
-  void FurMaterial::StartPhysicsControl()
+  void FurMesh::StartPhysicsControl()
   {
     if (!physicsControlEnabled)
     {
@@ -834,7 +834,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     }
   }
 
-  void FurMaterial::StopPhysicsControl()
+  void FurMesh::StopPhysicsControl()
   {
     if (physicsControlEnabled)
     {
@@ -843,28 +843,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     }
   }
 
-  void FurMaterial::SetMeshFactory ( iAnimatedMeshFactory* meshFactory)
+  void FurMesh::SetMeshFactory ( iAnimatedMeshFactory* meshFactory)
   {
     this->meshFactory = meshFactory;
   }
 
-  void FurMaterial::SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
+  void FurMesh::SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
     meshFactorySubMesh )
   { 
     this->meshFactorySubMesh = meshFactorySubMesh;
   }
 
-  void FurMaterial::SetFurStrandGenerator( iFurStrandGenerator* hairStrandGenerator)
+  void FurMesh::SetFurStrandGenerator( iFurStrandGenerator* hairStrandGenerator)
   {
     this->hairStrandGenerator = hairStrandGenerator;
   }
 
-  iFurStrandGenerator* FurMaterial::GetFurStrandGenerator( )
+  iFurStrandGenerator* FurMesh::GetFurStrandGenerator( )
   {
     return hairStrandGenerator;
   }
 
-  void FurMaterial::SetMaterial ( iMaterial* material )
+  void FurMesh::SetMaterial ( iMaterial* material )
   {
     this->material = material;
 
@@ -876,7 +876,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     SetDisplaceDistance();
   }
 
-  void FurMaterial::SetGrowTangents()
+  void FurMesh::SetGrowTangents()
   {
     CS::ShaderVarName growTangentsName (svStrings, "growTangents");	
     csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(growTangentsName);
@@ -889,7 +889,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     shaderVariable->GetValue(positionDeviation);
   }
 
-  void FurMaterial::SetColor(csColor color)
+  void FurMesh::SetColor(csColor color)
   {
     CS::ShaderVarName furColorName (svStrings, "mat furcolor");	
     csRef<csShaderVariable> shaderVariable = 
@@ -901,7 +901,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     }
   }
 
-  void FurMaterial::SetStrandWidth()
+  void FurMesh::SetStrandWidth()
   {
     CS::ShaderVarName strandWidthName (svStrings, "width");	
     csRef<csShaderVariable> shaderVariable = material->GetVariable(strandWidthName);
@@ -910,7 +910,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     strandWidthLOD = strandWidth;
   }
 
-  void FurMaterial::SetDensitymap ()
+  void FurMesh::SetDensitymap ()
   {
     CS::ShaderVarName densitymapName (svStrings, "density map");	
     csRef<csShaderVariable> shaderVariable = material->GetVariable(densitymapName);
@@ -935,7 +935,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     GaussianBlur(densitymap);
   }
 
-  void FurMaterial::SetHeightmap ()
+  void FurMesh::SetHeightmap ()
   {
     CS::ShaderVarName heightmapName (svStrings, "height map");	
     csRef<csShaderVariable> shaderVariable = material->GetVariable(heightmapName);
@@ -954,7 +954,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     heightmap.data = heightmapDB->GetUint8();
   }
 
-  void FurMaterial::SetDisplaceDistance()
+  void FurMesh::SetDisplaceDistance()
   {
     displaceDistance = 0.02f;
 
@@ -967,46 +967,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     material->GetVariableAdd(controlPointsDistanceName)->GetValue(controlPointsDistance);
   }
 
-  void FurMaterial::SetShader (csStringID type, iShader* shd)
-  {
-    shaders.PutUnique (type, shd);
-  }
-
-  iShader* FurMaterial::GetShader(csStringID type)
-  {
-    return shaders.Get (type, (iShader*)0);
-  }
-
-  iShader* FurMaterial::GetFirstShader (const csStringID* types,
-    size_t numTypes)
-  {
-    iShader* s = 0;
-    for (size_t i = 0; i < numTypes; i++)
-    {
-      s = shaders.Get (types[i], (iShader*)0);
-      if (s != 0) break;
-    }
-    return s;
-  }
-
-  iTextureHandle *FurMaterial::GetTexture ()
-  {
-    return 0;
-  }
-
-  iTextureHandle* FurMaterial::GetTexture (CS::ShaderVarStringID name)
-  {
-    return 0;
-  }  
-
   /********************
   *  FurAnimationControl
   ********************/
 
   CS_LEAKGUARD_IMPLEMENT(FurAnimationControl);
 
-  FurAnimationControl::FurAnimationControl (FurMaterial* furMaterial)
-    : scfImplementationType (this), lastTicks (0), furMaterial(furMaterial)
+  FurAnimationControl::FurAnimationControl (FurMesh* furMesh)
+    : scfImplementationType (this), lastTicks (0), furMesh(furMesh)
   {
   }
 
@@ -1037,21 +1005,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   void FurAnimationControl::UpdateGuideHairs()
   {
     // update guide ropes
-    for (size_t i = 0 ; i < furMaterial->guideHairs.GetSize(); i ++)
-      furMaterial->physicsControl->AnimateStrand(i,
-        furMaterial->guideHairs.Get(i).controlPoints,
-        furMaterial->guideHairs.Get(i).controlPointsCount);
+    for (size_t i = 0 ; i < furMesh->guideHairs.GetSize(); i ++)
+      furMesh->physicsControl->AnimateStrand(i,
+        furMesh->guideHairs.Get(i).controlPoints,
+        furMesh->guideHairs.Get(i).controlPointsCount);
 
     // update guide ropes LOD
-    for (size_t i = 0 ; i < furMaterial->guideHairsLOD.GetSize(); i ++)
-      if ( furMaterial->guideHairsLOD.Get(i).isActive )
-        furMaterial->physicsControl->AnimateStrand(i + furMaterial->guideHairs.GetSize(),
-          furMaterial->guideHairsLOD.Get(i).controlPoints,
-          furMaterial->guideHairsLOD.Get(i).controlPointsCount);        
+    for (size_t i = 0 ; i < furMesh->guideHairsLOD.GetSize(); i ++)
+      if ( furMesh->guideHairsLOD.Get(i).isActive )
+        furMesh->physicsControl->AnimateStrand(i + furMesh->guideHairs.GetSize(),
+          furMesh->guideHairsLOD.Get(i).controlPoints,
+          furMesh->guideHairsLOD.Get(i).controlPointsCount);        
       else
-        UpdateControlPoints(furMaterial->guideHairsLOD.Get(i).controlPoints,
-          furMaterial->guideHairsLOD.Get(i).controlPointsCount,
-          furMaterial->guideHairsLOD.Get(i).guideHairs);      
+        UpdateControlPoints(furMesh->guideHairsLOD.Get(i).controlPoints,
+          furMesh->guideHairsLOD.Get(i).controlPointsCount,
+          furMesh->guideHairsLOD.Get(i).guideHairs);      
   }
 
   void FurAnimationControl::UpdateControlPoints(csVector3 *controlPoints,
@@ -1061,46 +1029,46 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     {
       controlPoints[i] = csVector3(0);
       for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-        if ( guideHairs[j].index < furMaterial->guideHairs.GetSize() )
+        if ( guideHairs[j].index < furMesh->guideHairs.GetSize() )
           controlPoints[i] += guideHairs[j].distance * 
-            (furMaterial->guideHairs.Get(guideHairs[j].index).controlPoints[i]);
+            (furMesh->guideHairs.Get(guideHairs[j].index).controlPoints[i]);
         else
           controlPoints[i] += guideHairs[j].distance * 
-            (furMaterial->guideHairsLOD.Get(guideHairs[j].index - 
-            furMaterial->guideHairs.GetSize()).controlPoints[i]);
+            (furMesh->guideHairsLOD.Get(guideHairs[j].index - 
+            furMesh->guideHairs.GetSize()).controlPoints[i]);
     }
   }
 
   void FurAnimationControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
     // update shader
-    if (furMaterial->hairStrandGenerator)
-      furMaterial->hairStrandGenerator->Update();
+    if (furMesh->hairStrandGenerator)
+      furMesh->hairStrandGenerator->Update();
 
     // first update the control points
-    if (furMaterial->physicsControlEnabled)
+    if (furMesh->physicsControlEnabled)
       UpdateGuideHairs();
 
-    size_t numberOfStrains = furMaterial->hairStrandsLODSize;
+    size_t numberOfStrains = furMesh->hairStrandsLODSize;
 
     if (!numberOfStrains)
       return;
 
     // then update the hair strands
-    if (furMaterial->physicsControlEnabled)
+    if (furMesh->physicsControlEnabled)
       for (size_t i = 0 ; i < numberOfStrains; i ++)
       {
-        csHairStrand hairStrand = furMaterial->hairStrands.Get(i);
+        csHairStrand hairStrand = furMesh->hairStrands.Get(i);
 
         UpdateControlPoints(hairStrand.controlPoints,
           hairStrand.controlPointsCount, hairStrand.guideHairs);
       }
 
-    const csOrthoTransform& tc = furMaterial->view -> GetCamera() ->GetTransform ();
+    const csOrthoTransform& tc = furMesh->view -> GetCamera() ->GetTransform ();
 
-    csVector3 *vbuf = furMaterial->factoryState->GetVertices(); 
-    csVector3 *normals = furMaterial->factoryState->GetNormals(); 
-    iRenderBuffer *tangents = furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT);
+    csVector3 *vbuf = furMesh->factoryState->GetVertices(); 
+    csVector3 *normals = furMesh->factoryState->GetNormals(); 
+    iRenderBuffer *tangents = furMesh->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT);
     csRenderBufferLock<csVector3> tan (tangents, CS_BUF_LOCK_NORMAL);
 
     csVector3 normal, tangent, binormal, cameraOrigin;
@@ -1108,7 +1076,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
 
     cameraOrigin = tc.GetOrigin();
     csVector3 *tangentBuffer = tan;
-    csVector3 *posShift = furMaterial->positionShift;
+    csVector3 *posShift = furMesh->positionShift;
 
     size_t triangleCount = 0;
 
@@ -1118,8 +1086,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       tangent = csVector3(0);
       strip = csVector3(0);
 
-      csVector3 *controlPoints = furMaterial->hairStrands.Get(x).controlPoints;
-      int controlPointsCount = furMaterial->hairStrands.Get(x).controlPointsCount;
+      csVector3 *controlPoints = furMesh->hairStrands.Get(x).controlPoints;
+      int controlPointsCount = furMesh->hairStrands.Get(x).controlPointsCount;
       triangleCount += 2 * controlPointsCount - 2;
 
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
@@ -1130,7 +1098,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
         
         csMath3::CalcNormal(binormal, firstPoint, secondPoint, cameraOrigin);
         binormal.Normalize();
-        strip = furMaterial->strandWidthLOD * binormal;
+        strip = furMesh->strandWidthLOD * binormal;
 
         (*vbuf) = firstPoint;
         (*(vbuf + 1)) = firstPoint + strip;
@@ -1164,14 +1132,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
       }
     }
 
-    furMaterial->factoryState->GetSubMesh(0)->SetIndexRange(0, 3 * triangleCount);
+    furMesh->factoryState->GetSubMesh(0)->SetIndexRange(0, 3 * triangleCount);
 
-//     furMaterial->factoryState->CalculateNormals();
-//     furMaterial->factoryState->Invalidate();
+//     furMesh->factoryState->CalculateNormals();
+//     furMesh->factoryState->Invalidate();
 // 
-//     furMaterial->factoryState->AddRenderBuffer(CS_BUFFER_TANGENT, 
-//       furMaterial->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT));
-//     furMaterial->factoryState->RemoveRenderBuffer(CS_BUFFER_TANGENT);
+//     furMesh->factoryState->AddRenderBuffer(CS_BUFFER_TANGENT, 
+//       furMesh->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT));
+//     furMesh->factoryState->RemoveRenderBuffer(CS_BUFFER_TANGENT);
 
   }
 
@@ -1200,5 +1168,5 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   }
 
 }
-CS_PLUGIN_NAMESPACE_END(FurMaterial)
+CS_PLUGIN_NAMESPACE_END(FurMesh)
 

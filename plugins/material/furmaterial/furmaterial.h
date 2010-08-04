@@ -16,8 +16,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __FUR_MATERIAL_H__
-#define __FUR_MATERIAL_H__
+#ifndef __FUR_MESH_H__
+#define __FUR_MESH_H__
 
 #include <iutil/comp.h>
 #include <csgeom/vector3.h>
@@ -33,29 +33,29 @@ struct iObjectRegistry;
 
 #define GUIDE_HAIRS_COUNT 3
 
-CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
+CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
-  class FurMaterialType : public 
-    scfImplementation2<FurMaterialType,iFurMaterialType,iComponent>
+  class FurMeshType : public 
+    scfImplementation2<FurMeshType,iFurMeshType,iComponent>
   {
   public:
-    CS_LEAKGUARD_DECLARE(FurMaterialType);
+    CS_LEAKGUARD_DECLARE(FurMeshType);
 
-    FurMaterialType (iBase* parent);
-    virtual ~FurMaterialType ();
+    FurMeshType (iBase* parent);
+    virtual ~FurMeshType ();
 
     // From iComponent	
     virtual bool Initialize (iObjectRegistry*);
 
-    // From iFurMaterialType
-    virtual void ClearFurMaterials ();
-    virtual void RemoveFurMaterial (const char *name, iFurMaterial* furMaterial);
-    virtual iFurMaterial* CreateFurMaterial (const char *name);
-    virtual iFurMaterial* FindFurMaterial (const char *name) const;
+    // From iFurMeshType
+    virtual void ClearFurMeshes ();
+    virtual void RemoveFurMesh (const char *name, iFurMesh* furMesh);
+    virtual iFurMesh* CreateFurMesh (const char *name);
+    virtual iFurMesh* FindFurMesh (const char *name) const;
 
   private:
     iObjectRegistry* object_reg;
-    csHash<csRef<iFurMaterial>, csString> furMaterialHash;
+    csHash<csRef<iFurMesh>, csString> furMeshHash;
   };
 
   struct csGuideHairReference
@@ -93,19 +93,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     uint8* data;
   };
 
-  class FurMaterial : public scfImplementation2<FurMaterial,
-    scfFakeInterface<iShaderVariableContext>,
-    iFurMaterial>, public CS::ShaderVariableContextImpl
+  class FurMesh : public scfImplementation1<FurMesh, iFurMesh>
   {
     friend class FurAnimationControl;
 
   public:
-    CS_LEAKGUARD_DECLARE(FurMaterial);
-    FurMaterial (FurMaterialType* manager, const char *name,
+    CS_LEAKGUARD_DECLARE(FurMesh);
+    FurMesh (FurMeshType* manager, const char *name,
       iObjectRegistry* object_reg);
-    virtual ~FurMaterial ();
+    virtual ~FurMesh ();
 
-    // From iFurMaterial
+    // From iFurMesh
     virtual void GenerateGeometry (iView* view, iSector *room);
     virtual void SetGuideLOD(float guideLOD);
     virtual void SetStrandLOD(float strandLOD);
@@ -126,31 +124,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     // Get HairStrandGenerator
     virtual iFurStrandGenerator* GetFurStrandGenerator( );
 
-    // From iMaterial
-    /// Associate a shader with a shader type
-    virtual void SetShader (csStringID type, iShader* shader);
-    /// Get shader associated with a shader type
-    virtual iShader* GetShader (csStringID type);
-
-    /// Get all Shaders
-    const csHash<csRef<iShader>, csStringID>& GetShaders() const
-    { return shaders; }
-
-    /// Get texture.
-    virtual iTextureHandle* GetTexture ();
-    /// Get a texture from the material.
-    virtual iTextureHandle* GetTexture (CS::ShaderVarStringID name);
-
-    virtual iShader* GetFirstShader (const csStringID* types, size_t numTypes);
-
   protected:
-    FurMaterialType* manager;
+    FurMeshType* manager;
     csString name;
 
   private:
     iObjectRegistry* object_reg;
-    /// Shader associated with material
-    csHash<csRef<iShader>, csStringID> shaders;
     /// Fur geometry
     csRef<iGeneralFactoryState> factoryState;
     csRef<iView> view;
@@ -213,7 +192,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   public:
     CS_LEAKGUARD_DECLARE(FurAnimationControl);
 
-    FurAnimationControl (FurMaterial* furMaterial);
+    FurAnimationControl (FurMesh* furMesh);
     virtual ~FurAnimationControl ();
 
     //-- iGenMeshAnimationControl
@@ -234,7 +213,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   private:
     csWeakRef<iMeshObject> mesh;
     csTicks lastTicks;
-    FurMaterial* furMaterial;
+    FurMesh* furMesh;
     // functions
     void UpdateGuideHairs();
     void UpdateControlPoints(csVector3 *controlPoints, size_t controlPointsCount, 
@@ -242,6 +221,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
   };
 
 }
-CS_PLUGIN_NAMESPACE_END(FurMaterial)
+CS_PLUGIN_NAMESPACE_END(FurMesh)
 
-#endif // __FUR_MATERIAL_H__
+#endif // __FUR_MESH_H__

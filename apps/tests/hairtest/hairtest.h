@@ -73,7 +73,7 @@ public:
   csRef<iAnimatedMeshFactory> animeshFactory;
   csRef<iAnimatedMesh> animesh;
   // Fur material
-  csRef<iFurMaterial> furMaterial;
+  csRef<iFurMesh> furMesh;
 };
 
 class HairTest : public CS::Demo::DemoApplication

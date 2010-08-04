@@ -31,7 +31,7 @@
 
 struct iObjectRegistry;
 
-CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
+CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   class HairPhysicsControl : public scfImplementation2 <HairPhysicsControl, 
     iFurPhysicsControl, iComponent>
@@ -65,6 +65,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     csRef<iBulletDynamicSystem> bulletDynamicSystem;
   };
 }
-CS_PLUGIN_NAMESPACE_END(FurMaterial)
+CS_PLUGIN_NAMESPACE_END(FurMesh)
 
 #endif // __HAIR_PHYSICS_CONTROL_H__

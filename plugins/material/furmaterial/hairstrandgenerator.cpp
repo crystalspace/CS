@@ -23,7 +23,7 @@
 #include "hairphysicscontrol.h"
 #include "hairstrandgenerator.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
+CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   /************************
   *  HairStrandGenerator
@@ -456,7 +456,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMaterial)
     DhM = 0.5;
   }
 }
-CS_PLUGIN_NAMESPACE_END(FurMaterial)
+CS_PLUGIN_NAMESPACE_END(FurMesh)
 
 /*******************
 *  MarschnerHelper
