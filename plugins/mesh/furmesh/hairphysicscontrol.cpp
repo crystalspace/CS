@@ -19,7 +19,7 @@
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
 
-#include "furmaterial.h"
+#include "furmesh.h"
 #include "hairphysicscontrol.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)

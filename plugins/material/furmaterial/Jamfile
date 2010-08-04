@@ -1,8 +1,0 @@
-SubDir TOP plugins material furmaterial ;
-
-Description furmaterial : "Fur Material Manager plugin" ;
-
-Plugin furmaterial
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith furmaterial : crystalspace ;

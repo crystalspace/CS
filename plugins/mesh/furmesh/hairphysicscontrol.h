@@ -16,12 +16,12 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ANIMATION_PHYSICS_CONTROL_H__
-#define __ANIMATION_PHYSICS_CONTROL_H__
+#ifndef __HAIR_PHYSICS_CONTROL_H__
+#define __HAIR_PHYSICS_CONTROL_H__
 
 #include <iutil/comp.h>
 #include <csgeom/vector3.h>
-#include <imaterial/furmaterial.h>
+#include <imesh/furmesh.h>
 #include <csgfx/shadervarcontext.h>
 #include <imesh/genmesh.h>
 
@@ -33,20 +33,14 @@ struct iObjectRegistry;
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
-  struct csGuideHairAnimation
-  {
-    csVector3 *controlPoints;
-    size_t controlPointsCount;
-  };
-
-  class AnimationPhysicsControl : public scfImplementation2 <AnimationPhysicsControl, 
+  class HairPhysicsControl : public scfImplementation2 <HairPhysicsControl, 
     iFurPhysicsControl, iComponent>
   {
   public:
-    CS_LEAKGUARD_DECLARE(AnimationPhysicsControl);
+    CS_LEAKGUARD_DECLARE(HairPhysicsControl);
 
-    AnimationPhysicsControl (iBase* parent);
-    virtual ~AnimationPhysicsControl ();
+    HairPhysicsControl (iBase* parent);
+    virtual ~HairPhysicsControl ();
 
     // From iComponent	
     virtual bool Initialize (iObjectRegistry*);
@@ -66,11 +60,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   private:
     iObjectRegistry* object_reg;
-    csHash<csGuideHairAnimation*, size_t> guideRopes;
+    csHash<csRef<CS::Physics::Bullet::iSoftBody>, size_t > guideRopes;
     csRef<iRigidBody> rigidBody;
-    csReversibleTransform initialTransform;
+    csRef<iBulletDynamicSystem> bulletDynamicSystem;
   };
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)
 
-#endif // __ANIMATION_PHYSICS_CONTROL_H__
+#endif // __HAIR_PHYSICS_CONTROL_H__

@@ -33,7 +33,7 @@
 #include "ivaria/bullet.h"
 #include "ivaria/dynamicsdebug.h"
 
-#include "imaterial/furmaterial.h"
+#include "imesh/furmesh.h"
 
 #include "ivaria/icegui.h"
 

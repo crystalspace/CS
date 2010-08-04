@@ -21,7 +21,7 @@
 
 #include <iutil/comp.h>
 #include <csgeom/vector3.h>
-#include <imaterial/furmaterial.h>
+#include <imesh/furmesh.h>
 #include <csgfx/shadervarcontext.h>
 #include <imesh/genmesh.h>
 

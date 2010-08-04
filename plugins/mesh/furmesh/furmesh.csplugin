@@ -4,7 +4,7 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.material.furmaterial</name>
+        <name>crystalspace.mesh.furmesh</name>
         <implementation>FurMeshType</implementation>
         <description>Fur Mesh Type Plugin</description>
         <requires>
@@ -28,7 +28,7 @@
         </requires>
       </class> 
       <class>
-        <name>crystalspace.material.hairstrandmaterial</name>
+        <name>crystalspace.mesh.hairstrandmaterial</name>
         <implementation>HairStrandGenerator</implementation>
         <description>Fur Strand MaterialPlugin</description>
         <requires>

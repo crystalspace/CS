@@ -346,8 +346,8 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
     iSkeletonBasicNodesManager2),
-    CS_REQUEST_PLUGIN("crystalspace.material.furmaterial", iFurMeshType),
-    CS_REQUEST_PLUGIN("crystalspace.material.hairstrandmaterial", iFurStrandGenerator),
+    CS_REQUEST_PLUGIN("crystalspace.mesh.furmesh", iFurMeshType),
+    CS_REQUEST_PLUGIN("crystalspace.mesh.hairstrandmaterial", iFurStrandGenerator),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");

@@ -14,7 +14,6 @@ SubInclude TOP plugins engseq ;
 SubInclude TOP plugins filesys ;
 SubInclude TOP plugins font ;
 SubInclude TOP plugins gui ;
-SubInclude TOP plugins material ;
 SubInclude TOP plugins mesh ;
 SubInclude TOP plugins misc ;
 SubInclude TOP plugins physics ;
