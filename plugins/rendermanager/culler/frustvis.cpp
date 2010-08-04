@@ -387,7 +387,7 @@ struct InnerNodeProcessOP
 
   FrustTest_Front2BackData f2bData;
 
-  const bool operator() (AABBTree<csFrustVisObjectWrapper>::Node* n) const
+  /*const bool operator() (AABBTree<csFrustVisObjectWrapper>::Node* n) const
   {
     //CS_ASSERT_MSG("Invalid AABB-tree", !n->IsLeaf ());
 
@@ -419,6 +419,31 @@ struct InnerNodeProcessOP
       n->GetChild2()->SetFrustumMask(new_mask);
     }
     return true; // node visible
+  }*/
+
+  const bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n, uint32 &frustum_mask) const
+  {
+    //CS_ASSERT_MSG("Invalid AABB-tree", !n->IsLeaf ());
+
+    csBox3 node_bbox = n->GetBBox();
+    node_bbox *= f2bData.global_bbox;
+
+    if (node_bbox.Contains (f2bData.pos))
+    {
+      return true; // node completely visible
+    }
+
+    uint32 new_mask;
+    if (!csIntersect3::BoxFrustum (node_bbox,
+                                   f2bData.frustum,
+                                   frustum_mask,
+  	                               new_mask))
+    {
+      return false; //node invisible
+    }
+
+    frustum_mask=new_mask;
+    return true; // node visible
   }
 };
 
@@ -434,11 +459,40 @@ struct LeafNodeProcessOP
 
   FrustTest_Front2BackData f2bData;
 
-  const bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n) const
+  /*const bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n) const
   { 
     //CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
     const int num_objects=n->GetObjectCount();
     const uint32 frustum_mask=n->GetFrustumMask();
+    
+    for(int i=0;i<num_objects; ++i)
+    {
+      const csFrustVisObjectWrapper* visobj_wrap = n->GetLeafData(i);
+
+      if (visobj_wrap->mesh && visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
+        return true;
+
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      if (obj_bbox.Contains (f2bData.pos))
+      {
+        f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
+        return true;
+      }
+  
+      uint32 new_mask;
+      if (!csIntersect3::BoxFrustum (obj_bbox, f2bData.frustum, frustum_mask, new_mask))
+      {
+        return true;
+      }
+      f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, new_mask);
+    }
+    return true;
+  }*/
+
+  const bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n, const uint32 frustum_mask) const
+  { 
+    //CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
+    const int num_objects=n->GetObjectCount();
     
     for(int i=0;i<num_objects; ++i)
     {
@@ -512,8 +566,9 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   InnerNodeProcessOP opIN(f2bData);
   LeafNodeProcessOP opLN(f2bData);
   csVector3 dir=rview->GetCamera ()->GetTransform ().GetFront()-rview->GetCamera ()->GetTransform ().GetOrigin ();
-  aabbTree.SetRootFrustumMask(frustum_mask);
-  aabbTree.TraverseF2B(opIN,opLN,dir);
+  //aabbTree.SetRootFrustumMask(frustum_mask);
+  //aabbTree.TraverseF2B(opIN,opLN,dir);
+  aabbTree.TraverseF2B_FM(opIN,opLN,frustum_mask,dir);
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.

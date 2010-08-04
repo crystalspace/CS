@@ -80,10 +80,10 @@
     /*
      *
      */
-    void SetRootFrustumMask(uint32 frustum_mask)
+    /*void SetRootFrustumMask(uint32 frustum_mask)
     {
       rootNode->SetFrustumMask(frustum_mask);
-    }
+    }*/
 
     /**
      * 
@@ -170,6 +170,26 @@
     {
       if (rootNode)
         TraverseRecF2B (inner, leaf, direction, rootNode);
+    }
+
+    /**
+     * 
+     */
+    template<typename InnerFn, typename LeafFn, typename T>
+    void TraverseF2B_FM (InnerFn& inner, LeafFn& leaf, T frustum_mask, const csVector3& direction)
+    {
+      if (rootNode)
+        TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, rootNode);
+    }
+
+    /**
+     * 
+     */
+    template<typename InnerFn, typename LeafFn, typename T>
+    void TraverseF2B_FM (InnerFn& inner, LeafFn& leaf, T frustum_mask, const csVector3& direction) const
+    {
+      if (rootNode)
+        TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, rootNode);
     }
 
     /**
@@ -448,6 +468,66 @@
 
           ret = TraverseRecF2B (inner, leaf, direction, node->GetChild (firstIdx));
           if (ret) ret = TraverseRecF2B (inner, leaf, direction, node->GetChild (1-firstIdx));
+        }
+      }
+      return ret;
+    }
+
+    /**
+     * 
+     */
+    template<typename InnerFn, typename LeafFn, typename T>
+    bool TraverseRecF2B_FM (InnerFn& inner, LeafFn& leaf, T frustum_mask, const csVector3& direction, Node* node)
+    {
+      bool ret = true;
+      if (!node) 
+        return ret;
+
+      if (node->IsLeaf ())
+      {
+        ret = leaf (node, frustum_mask);
+      }
+      else
+      {
+        if (inner (node, frustum_mask))
+        {
+          const csVector3 centerDiff = node->GetChild2 ()->GetBBox ().GetCenter () -
+            node->GetChild1 ()->GetBBox ().GetCenter ();
+
+          const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
+
+          ret = TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, node->GetChild (firstIdx));
+          if (ret) ret = TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, node->GetChild (1-firstIdx));
+        }
+      }
+      return ret;
+    }
+
+    /**
+     * 
+     */
+    template<typename InnerFn, typename LeafFn, typename T>
+    bool TraverseRecF2B_FM (InnerFn& inner, LeafFn& leaf, T frustum_mask, const csVector3& direction, const Node* node) const
+    {
+      bool ret = true;
+      if (!node) 
+        return ret;
+
+      if (node->IsLeaf ())
+      {
+        ret = leaf (node, frustum_mask);
+      }
+      else
+      {
+        if (inner (node, frustum_mask))
+        {
+          const csVector3 centerDiff = node->GetChild2 ()->GetBBox ().GetCenter () -
+            node->GetChild1 ()->GetBBox ().GetCenter ();
+
+          const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
+
+          ret = TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, node->GetChild (firstIdx));
+          if (ret) ret = TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, node->GetChild (1-firstIdx));
         }
       }
       return ret;
@@ -831,7 +911,7 @@
   {
   public:
     Node ()
-      : typeAndFlags (AABB_NODE_INNER), leafObjCount (0)  , frustum_mask(0)
+      : typeAndFlags (AABB_NODE_INNER), leafObjCount (0)  //, frustum_mask(0)
     {
       children[0] = children[1] = 0;
     }
@@ -862,7 +942,7 @@
       }
     }
 
-    ///
+    /*///
     uint32 GetFrustumMask() const
     {
       return frustum_mask;
@@ -872,7 +952,7 @@
     void SetFrustumMask(uint32 fm)
     {
       frustum_mask=fm;
-    }
+    }*/
 
     ///
     uint GetFlags () const
@@ -1014,7 +1094,7 @@
     uint16 leafObjCount;
 
     ///
-    uint32 frustum_mask;
+    //uint32 frustum_mask;
 
     ///
     csBox3 boundingBox;
