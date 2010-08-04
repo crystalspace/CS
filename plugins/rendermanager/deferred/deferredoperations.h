@@ -62,7 +62,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     CS::RenderManager::Implementation::OperationCaller<
       Fn, 
       noBlockType,
-      typename OperationTraits<Fn>::Ordering
+      typename CS::RenderManager::OperationTraits<Fn>::Ordering
     > caller (fn, noBlock);
 
     while (it.HasNext ())
@@ -94,7 +94,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     CS::RenderManager::Implementation::OperationCaller<
       Fn, 
       noBlockType,
-      typename OperationTraits<Fn>::Ordering
+      typename CS::RenderManager::OperationTraits<Fn>::Ordering
     > caller (fn, noBlock);
 
     while (it.HasNext ())

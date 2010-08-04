@@ -53,7 +53,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
      */
     void operator()(typename RenderTree::ContextNode *context)
     {
-      RenderView *rview = context->renderView;
+      CS::RenderManager::RenderView *rview = context->renderView;
       
       iCamera *cam = rview->GetCamera ();
       iClipper2D *clipper = rview->GetClipper ();
@@ -165,7 +165,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       
       typename RenderTree::ContextNode *context = contextStack[0];
 
-      RenderView *rview = context->renderView;
+      CS::RenderManager::RenderView *rview = context->renderView;
 
       iEngine *engine = rview->GetEngine ();
       iCamera *cam = rview->GetCamera ();
@@ -234,7 +234,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       {
         graphics3D->SetZMode (CS_ZBUF_MESH);
 
-        ForwardMeshTreeRenderer<RenderTreeType> render (graphics3D, shaderMgr, deferredLayer);
+        ForwardMeshTreeRenderer<RenderTree> render (graphics3D, shaderMgr, deferredLayer);
         LightVolumeRenderer lightVolumeRender (lightRender, true, 0.2f);
 
         for (size_t i = 0; i < ctxCount; i++)
