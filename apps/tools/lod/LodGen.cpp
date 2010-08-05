@@ -15,6 +15,10 @@ using namespace std;
 
 inline float dot(const csVector3& v0, const csVector3& v1) { return v0 * v1; }
 
+/**
+ * Returns the squared distance between point P and triangle P0, P1, P2. Squared distance is returned in d2.
+ * s and t returns the closest point in parametric form in terms of edges P0P1 and P0P2.
+ */
 void PointTriangleDistance(const csVector3& P, const csVector3& P0, const csVector3& P1, const csVector3& P2, float& s, float& t, float& d2)
 {
   // From http://www.geometrictools.com/Documentation/DistancePoint3Triangle3.pdf
@@ -236,7 +240,8 @@ void PointTriangleDistance(const csVector3& P, const csVector3& P0, const csVect
     d2 = 0.0;
   }
 }
-
+// ----------------------------------------------------------------
+// Unit tests for point-triangle distance
 void unittest1(const csVector3& p0, const csVector3& p1, const csVector3& p2, const csVector3& p, float expected)
 {
   printf("p = %6.4g, %6.4g, %6.4g        ", p.x, p.y, p.z);
@@ -286,6 +291,13 @@ void PointTriangleDistanceUnitTests()
   unittests(1.0);
 }
 
+// ----------------------------------------------------------------
+// LodGen
+
+/** 
+ * Initialize array of coincident vertices.
+ * For each vertex, create a list of all other vertices that share the same position.
+ */
 void LodGen::InitCoincidentVertices()
 {
   coincident_vertices.SetSize(vertices.GetSize());
@@ -303,12 +315,16 @@ void LodGen::InitCoincidentVertices()
   }
 }
 
+/** 
+ * Error metric.
+ */
 float LodGen::SumOfSquareDist(const WorkMesh& k) const
 {
   float s, t, d2;
   float sum = 0.0;
   const SlidingWindow& sw = k.GetLastWindow();
-  // Vertex-to-mesh
+  // Sum all vertex-to-mesh distances, from vertices of the original mesh
+  // to triangles of the LOD mesh.
   for (unsigned int i = 0; i < vertices.GetSize(); i++)
   {
     const csVector3& v = vertices[i];
@@ -330,7 +346,8 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
     assert(min_d2 < FLT_MAX);
     sum += min_d2;
   }
-  // Barycenter-to-mesh
+  // Sum all barycenter-to-mesh distances, from barycenters of the original mesh
+  // to triangles of the LOD mesh.
   const SlidingWindow& sw0 = k.sliding_windows[0];  
   for (int i = sw0.start_index; i < sw0.end_index; i++)
   {
@@ -357,6 +374,9 @@ float LodGen::SumOfSquareDist(const WorkMesh& k) const
   return sum;
 }
 
+/** 
+ * Quicker and less precise error metric.
+ */
 float LodGen::SumOfSquareDist(const WorkMesh& k, int start_index) const
 {
   float s, t, d2;
@@ -367,6 +387,7 @@ float LodGen::SumOfSquareDist(const WorkMesh& k, int start_index) const
   if (samples_per_triangle == 0)
     samples_per_triangle = 1;
 
+  // Loop through the modified triangles, sampling a number of points inside them
   for (int i = start_index; i < sw.end_index; i++)
   {
     const csTriangle& tri = k.GetTriangle(i);
@@ -375,6 +396,7 @@ float LodGen::SumOfSquareDist(const WorkMesh& k, int start_index) const
     const csVector3& q2 = vertices[tri[2]];
     for (int m = 0; m < samples_per_triangle; m++)
     {
+      // Find a sample point inside the triangle with an uniform distribution
       float r0, r1;
       do
       {
@@ -386,6 +408,8 @@ float LodGen::SumOfSquareDist(const WorkMesh& k, int start_index) const
       assert(r0 + r1 + r2 == 1.0);
       csVector3 b = r0 * q0 + r1 * q1 + r2 * q2;
       float min_d2 = FLT_MAX;
+      // Find the smallest distance between the sample point and all triangles
+      // of the original mesh
       for (int j = sw0.start_index; j < sw0.end_index; j++)
       {
         const csTriangle& tri0 = k.GetTriangle(j);
@@ -463,6 +487,9 @@ float LodGen::SumOfSquareDist(const WorkMesh& k, int start_index) const
 }
 */    
 
+/**
+ * Remove a triangle from the list of incident triangles of each of its 3 vertices.
+ */
 void LodGen::RemoveTriangleFromIncidentTris(WorkMesh& k, int itri)
 {
   csTriangle& tri = k.tri_buffer[itri];
@@ -473,11 +500,17 @@ void LodGen::RemoveTriangleFromIncidentTris(WorkMesh& k, int itri)
   }
 }
 
+/**
+ * Checks if a triangle is degenerate through identical indices.
+ */
 inline bool LodGen::IsDegenerate(const csTriangle& tri) const
 {
   return tri[0] == tri[1] || tri[0] == tri[2] || tri[1] == tri[2];
 }
 
+/**
+ * Checks if a triangle is coincident with another through comparison of their indices.
+ */
 bool LodGen::IsTriangleCoincident(const csTriangle& t0, const csTriangle& t1) const
 {
   for (int i = 0; i < 3; i++)
@@ -486,6 +519,9 @@ bool LodGen::IsTriangleCoincident(const csTriangle& t0, const csTriangle& t1) co
   return true;
 }
 
+/**
+ * Checks if a triangle is coincident with any of its neighboring triangles
+ */
 bool LodGen::IsCoincident(const WorkMesh& k, const csTriangle& tri) const
 {
   assert(!IsDegenerate(tri));
@@ -502,6 +538,9 @@ bool LodGen::IsCoincident(const WorkMesh& k, const csTriangle& tri) const
   return false;
 }
 
+/**
+ * Finds a triangle in the sliding window and returns its position in the triangle buffer
+ */
 int LodGen::FindInWindow(const WorkMesh& k, const SlidingWindow& sw, int itri) const
 {
   for (int i = sw.start_index; i < sw.end_index; i++)
@@ -510,6 +549,9 @@ int LodGen::FindInWindow(const WorkMesh& k, const SlidingWindow& sw, int itri) c
   assert(0);
 }
 
+/**
+ * Swaps two triangles.
+ */
 void LodGen::SwapIndex(WorkMesh& k, int i0, int i1)
 {
   int temp = k.tri_indices[i0];
@@ -517,27 +559,42 @@ void LodGen::SwapIndex(WorkMesh& k, int i0, int i1)
   k.tri_indices[i1] = temp;
 }
 
+/**
+ * Perform edge collapse from v0 to v1.
+ */
 bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
 {
   SlidingWindow sw = k.GetLastWindow(); // copy
   
+  // For each incident triangle to the disappearing vertex (v0)
   IncidentTris incident = k.incident_tris[v0]; // copy
   for (unsigned int i = 0; i < incident.GetSize(); i++)
   {
     int itri = incident[i];
+    // Make sure it's within our work limit
+    // (meaning, it's not a triangle that was added before)
     int h = FindInWindow(k, sw, itri);
     if (h >= top_limit)
       return false;
+    // Copy this triangle to a new one
     csTriangle new_tri = k.tri_buffer[itri]; // copy
+    // This is a triangle that will disappear.
+    // Remove from the incident lists of all its vertices
     RemoveTriangleFromIncidentTris(k, itri);
-    SwapIndex(k, sw.start_index, h);    
+    // Make this triangle be the first in the window,
+    // i.e. it will disappear on the next window shift
+    SwapIndex(k, sw.start_index, h);
     //cout << "Rem " << itri << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
+    // Shift the window
     sw.start_index++;
 
     assert(incident.GetSize() > k.incident_tris[v0].GetSize());
+    // Change vertex v0 in the new triangle to beccome v1
     for (int j = 0; j < 3; j++)
       if (new_tri[j] == v0)
         new_tri[j] = v1;
+    // If this doesn't result in a degenerate triangle, or a triangle coincident with an existing one
+    // (yes, it can happen), add it to the end of the sliding window
     if (!IsDegenerate(new_tri) && !IsCoincident(k, new_tri))
     {
       k.AddTriangle(new_tri);
