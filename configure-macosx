@@ -1,3 +1,3 @@
 # remove "-bundle" from configure, cs-config-1.9, 
 # scripts/cs-config/makevar.macosx, mk/jam/macosx.jam
-./configure --disable-universal-binary --without-ode --enable-debug --disable-relaytool 2>&1 | tee configure.out
+./configure --disable-universal-binary --without-ode --enable-debug --disable-relaytool --with-CEGUI=/Library/Frameworks/CEGUIBase.framework/Headers --without-java CFLAGS="-arch i386" 2>&1 | tee configure.out
