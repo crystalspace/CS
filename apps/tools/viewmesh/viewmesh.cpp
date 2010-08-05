@@ -29,6 +29,7 @@
 #include "imesh/animesh.h"
 #include "imesh/object.h"
 #include "imesh/skeleton2anim.h"
+#include "imesh/genmesh.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"
 #include "iutil/stringarray.h"
@@ -66,7 +67,7 @@ CS_IMPLEMENT_APPLICATION
 //---------------------------------------------------------------------------
 
 ViewMesh::ViewMesh () : 
-  camMode(rotateorigin), roomsize(5), scale(1), move_sprite_speed(0)
+  camMode(rotateorigin), roomsize(5), scale(1), move_sprite_speed(0), lod_level(0), max_lod_level(0), auto_lod(false)
   {
     SetApplicationName ("CrystalSpace.ViewMesh");
   }
@@ -169,6 +170,29 @@ ViewMesh::ViewMesh () :
         }
       default:
         break;
+      }
+
+	    if (kbd->GetKeyState ('['))
+	    {
+        if (lod_level < max_lod_level)
+          lod_level += 1;
+      }
+	    if (kbd->GetKeyState (']'))
+      {
+        if (lod_level > 0)
+          lod_level -= 1;
+      }
+      
+      if (!auto_lod)
+      {
+        csRef<iMeshObject> mobj = asset->GetMesh()->GetMeshObject();
+        assert(mobj);
+
+        csRef<iGeneralMeshState> mstate = scfQueryInterface<iGeneralMeshState>(mobj);
+        if (mstate)
+        {
+            mstate->ForceProgLODLevel(lod_level);
+        }
       }
 
       csRef<iMovable> mov = asset->GetMesh()->GetMovable();
@@ -651,6 +675,9 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
     materialTab.Invalidate();
     UnRegisterTabs ();
     asset.Invalidate();
+    lod_level = 0;
+    max_lod_level = 0;
+    auto_lod = false;
   }
 
   if (!loading)
@@ -730,6 +757,12 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
       spritewrapper->GetMovable()->SetSector(room);
       spritewrapper->GetMovable()->SetPosition(v);
       spritewrapper->GetMovable()->UpdateMove();
+    }
+
+    csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(factwrap->GetMeshObjectFactory());
+    if (fstate)
+    {
+      max_lod_level = fstate->GetNumProgLODLevels();
     }
 
     if (AnimeshAsset::Support(spritewrapper))

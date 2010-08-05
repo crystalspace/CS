@@ -671,7 +671,7 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
 
   factory->PreGetBuffer (holder, buffer);
 }
-  
+
 void csGenmeshMeshObject::ForceProgLODLevel(int level)
 {
   for (size_t s = 0; s < subMeshes.GetSize(); s++)
@@ -906,7 +906,7 @@ float csGenmeshMeshObjectFactory::GetRadius ()
   return radius;
 }
   
-int csGenmeshMeshObjectFactory::GetSlidingWindowSize() const
+int csGenmeshMeshObjectFactory::GetNumProgLODLevels() const
 {
   int max_size = 0;
   for (size_t s = 0; s < subMeshes.GetSize(); s++)

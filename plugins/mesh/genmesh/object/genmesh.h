@@ -648,7 +648,7 @@ public:
     return autonormals;
   }
   
-  virtual int GetSlidingWindowSize() const;
+  virtual int GetNumProgLODLevels() const;
     
   //------------------------ iMeshObjectFactory implementation --------------
   virtual csFlags& GetFlags () { return flags; }

@@ -265,6 +265,10 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
   virtual iGeneralMeshSubMesh* FindSubMesh (const char* name) const = 0;
   /** @} */
   
+  /** 
+   * Set the progressive LOD level on all submeshes.
+   * If a submesh's max prog LOD level is less than level, set it to its maximum.
+   */
   virtual void ForceProgLODLevel(int level) = 0;
 };
 
@@ -515,8 +519,11 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    * \param sides Number of sides.
    */
   virtual void GenerateCylinder (float l, float r, uint sides) = 0;
-  
-  virtual int GetSlidingWindowSize() const = 0;
+
+  /**
+   * Get the maximum between all submeshes' progressive LOD levels.
+   */
+  virtual int GetNumProgLODLevels() const = 0;
 };
 
 /**
