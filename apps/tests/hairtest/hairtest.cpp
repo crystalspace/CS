@@ -530,7 +530,7 @@ bool HairTest::Application ()
   CS::ShaderVarName objColor (svStrings, "hair color");	
 
   csVector3 color; 
-  if (avatarScene->furMesh->GetFurStrandGenerator() && 
+  if (avatarScene->furMesh && avatarScene->furMesh->GetFurStrandGenerator() && 
       avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial())
   {
 

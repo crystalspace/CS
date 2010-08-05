@@ -24,6 +24,7 @@
 #include <ivideo/material.h>
 #include <ivaria/view.h>
 #include <iengine/sector.h>
+#include "imesh/object.h"
 
 #include "crystalspace.h"
 
@@ -63,14 +64,14 @@ struct iFurStrandGenerator : public virtual iBase
   virtual void Update() = 0;
 };
 
-struct iFurMeshType : public virtual iBase
+struct iFurMeshFactory : public virtual iBase
+{
+  SCF_INTERFACE (iFurMeshFactory, 1, 0, 0);
+};
+
+struct iFurMeshType : public virtual iMeshObjectType
 {
   SCF_INTERFACE (iFurMeshType, 1, 0, 0);
-
-  virtual void ClearFurMeshes () = 0;
-  virtual void RemoveFurMesh (const char* name,iFurMesh* furMesh) = 0;
-  virtual iFurMesh* CreateFurMesh (const char* name) = 0;
-  virtual iFurMesh* FindFurMesh (const char* name) const = 0;
 };
 
 /**
@@ -81,6 +82,7 @@ struct iFurMeshType : public virtual iBase
 struct iFurMesh : public virtual iBase 
 {
   SCF_INTERFACE (iFurMesh, 1, 0, 0);
+
   /// Generate geometry
   virtual void GenerateGeometry (iView* view, iSector* room) = 0;
   virtual void SetGuideLOD(float guideLOD) = 0; 

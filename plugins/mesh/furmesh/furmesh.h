@@ -35,6 +35,19 @@ struct iObjectRegistry;
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
+  class FurMeshFactory : public scfImplementationExt1<FurMeshFactory, 
+    csMeshFactory, iFurMeshFactory>
+  {
+  public:
+    CS_LEAKGUARD_DECLARE(FurMeshFactory);
+
+    FurMeshFactory (iEngine *e, iObjectRegistry* reg, iMeshObjectType* type);
+    virtual ~FurMeshFactory ();
+
+    virtual csPtr<iMeshObject> NewInstance ();
+    virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
+  };
+
   class FurMeshType : public 
     scfImplementation2<FurMeshType,iFurMeshType,iComponent>
   {
@@ -47,15 +60,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // From iComponent	
     virtual bool Initialize (iObjectRegistry*);
 
-    // From iFurMeshType
-    virtual void ClearFurMeshes ();
-    virtual void RemoveFurMesh (const char *name, iFurMesh* furMesh);
-    virtual iFurMesh* CreateFurMesh (const char *name);
-    virtual iFurMesh* FindFurMesh (const char *name) const;
+    // From iMeshObjectType
+    virtual csPtr<iMeshObjectFactory> NewFactory ();
 
   private:
     iObjectRegistry* object_reg;
-    csHash<csRef<iFurMesh>, csString> furMeshHash;
+    /// pointer to the engine if available.
+    iEngine *Engine;
   };
 
   struct csGuideHairReference
@@ -93,15 +104,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     uint8* data;
   };
 
-  class FurMesh : public scfImplementation1<FurMesh, iFurMesh>
+  class FurMesh : public scfImplementationExt1<FurMesh, csMeshObject, iFurMesh>
   {
     friend class FurAnimationControl;
 
   public:
     CS_LEAKGUARD_DECLARE(FurMesh);
-    FurMesh (FurMeshType* manager, const char *name,
-      iObjectRegistry* object_reg);
+    FurMesh (iObjectRegistry* object_reg);
     virtual ~FurMesh ();
+
+    virtual iMeshObjectFactory* GetFactory () const {return 0;}
+    virtual CS::Graphics::RenderMesh** GetRenderMeshes (
+      int& num, iRenderView* rview, iMovable* movable,
+      uint32 frustum_mask) {return 0;}
+
+    virtual bool HitBeamOutline (const csVector3& start,
+      const csVector3& end, csVector3& isect, float* pr) {return false;}
+
+    virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+      csVector3& isect, float* pr, int* polygon_idx,
+      iMaterialWrapper** material, iMaterialArray* materials) {return false;}
 
     // From iFurMesh
     virtual void GenerateGeometry (iView* view, iSector *room);

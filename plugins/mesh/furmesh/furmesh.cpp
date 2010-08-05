@@ -23,8 +23,29 @@
 #include "hairphysicscontrol.h"
 #include "hairstrandgenerator.h"
 
+
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
+  /********************
+  *  FurMeshFactory
+  ********************/
+
+  CS_LEAKGUARD_IMPLEMENT(FurMeshFactory);
+
+  FurMeshFactory::FurMeshFactory (iEngine *e, iObjectRegistry* reg, iMeshObjectType* type)
+    : scfImplementationType(this, e, reg, type)
+  {
+  }
+
+  FurMeshFactory::~FurMeshFactory ()
+  {
+  }
+
+  csPtr<iMeshObject> FurMeshFactory::NewInstance ()
+  {
+    return new FurMesh(object_reg);
+  }
+
   /********************
   *  FurMeshType
   ********************/
@@ -41,37 +62,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   FurMeshType::~FurMeshType ()
   {
-    furMeshHash.DeleteAll();
   }
 
   // From iComponent
   bool FurMeshType::Initialize (iObjectRegistry* r)
   {
+    csRef<iEngine> e = csQueryRegistry<iEngine> (r);
+    Engine = e;
     object_reg = r;
     return true;
   }
 
-  // From iFurMeshType
-  void FurMeshType::ClearFurMeshes ()
+  csPtr<iMeshObjectFactory> FurMeshType::NewFactory ()
   {
-    furMeshHash.DeleteAll ();
-  }
-
-  void FurMeshType::RemoveFurMesh (const char *name, iFurMesh* furMesh)
-  {
-    furMeshHash.Delete (name, furMesh);
-  }
-
-  iFurMesh* FurMeshType::CreateFurMesh (const char *name)
-  {
-    csRef<iFurMesh> newFur;
-    newFur.AttachNew(new FurMesh (this, name, object_reg));
-    return furMeshHash.PutUnique (name, newFur);
-  }
-
-  iFurMesh* FurMeshType::FindFurMesh (const char *name) const
-  {
-    return furMeshHash.Get (name, 0);
+    return new FurMeshFactory(Engine, object_reg, this);
   }
 
   /********************
@@ -80,12 +84,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   CS_LEAKGUARD_IMPLEMENT(FurMesh);
 
-  FurMesh::FurMesh (FurMeshType* manager, const char *name, 
-    iObjectRegistry* object_reg) :
-  scfImplementationType (this), manager (manager), name (name), 
-    object_reg(object_reg), physicsControl(0), hairStrandGenerator(0), rng(0),
-    guideLOD(0), strandLOD(0), hairStrandsLODSize(0), physicsControlEnabled(true),
-    growTangents(0)
+  FurMesh::FurMesh (iObjectRegistry* object_reg) :
+  scfImplementationType (this, (iEngine*) 0), object_reg(object_reg), 
+    physicsControl(0), hairStrandGenerator(0), rng(0), guideLOD(0), strandLOD(0), 
+    hairStrandsLODSize(0), physicsControlEnabled(true), growTangents(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");

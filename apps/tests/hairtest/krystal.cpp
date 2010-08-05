@@ -405,8 +405,10 @@ bool KrystalScene::CreateAvatar ()
   animationPhysicsControl->SetRigidBody(headBody);
   animationPhysicsControl->SetInitialTransform(headBody->GetTransform().GetInverse());
 
-  // Initialize fur material
-  furMesh = furMeshType->CreateFurMesh("hair");
+  csRef<iMeshObjectFactory> imof = furMeshType->NewFactory();
+  csRef<iMeshObject> imo = imof->NewInstance();
+
+  furMesh = scfQueryInterface<iFurMesh>(imo);
   furMesh->SetPhysicsControl(animationPhysicsControl);
   furMesh->SetFurStrandGenerator(hairStrandGenerator);
 
