@@ -21,6 +21,8 @@
 #include "csgeom/math3d.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/vertexlistwalker.h"
+#include "csgfx/trianglestream.h"
+#include "cstool/rbuflock.h"
 #include "cstool/rviewclipper.h"
 #include "csutil/objreg.h"
 #include "csutil/scf.h"
@@ -773,6 +775,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   bool AnimeshObject::HitBeamOutline (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr)
   {
+    // TODO: use a pre-test on the collision boxes of each bones
+
+    csSegment3 seg (start, end);
+    csRenderBufferLock<csVector3> vrt (skeleton ? skinnedVertices : postMorphVertices);
+
+    // Iterate all submeshes...
+    for (size_t i = 0; i < submeshes.GetSize (); ++i)
+    {
+      if (!submeshes[i]->isRendering)
+        continue;
+
+      FactorySubmesh* fsm = factory->submeshes[i];
+      for (size_t j = 0; j < fsm->indexBuffers.GetSize (); ++j)
+      {
+	iRenderBuffer* indexBuffer = submeshes[i]->GetFactorySubMesh ()->GetIndices (j);
+	CS::TriangleIndicesStream<uint> triangles (indexBuffer,
+						   CS_MESHTYPE_TRIANGLES);
+	while (triangles.HasNext())
+	{
+	  CS::TriangleT<uint> t (triangles.Next());
+	  if (csIntersect3::SegmentTriangle (seg, 
+					     vrt[t.a], vrt[t.b], vrt[t.c], 
+					     isect))
+	  {
+	    if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
+				   csSquaredDist::PointPoint (start, end));
+	    return true;
+	  }
+	}
+      }
+    }
+
     return false;
   }
 
@@ -780,8 +814,57 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csVector3& isect, float* pr, int* polygon_idx,
     iMaterialWrapper** material, iMaterialArray* materials)
   {
-    return csIntersect3::BoxSegment (factory->factoryBB, csSegment3 (start, end),
-      isect, pr) != 0;
+    // TODO: use a pre-test on the collision boxes of each bones
+
+    csSegment3 seg (start, end);
+    float tot_dist = csSquaredDist::PointPoint (start, end);
+    float dist, temp;
+    float itot_dist = 1 / tot_dist;
+    dist = temp = tot_dist;
+    csVector3 tmp;
+    iMaterialWrapper* mat = 0;
+    csRenderBufferLock<csVector3> vrt (skeleton ? skinnedVertices : postMorphVertices);
+
+    // Iterate all submeshes...
+    for (size_t i = 0; i < submeshes.GetSize (); ++i)
+    {
+      if (!submeshes[i]->isRendering)
+        continue;
+
+      FactorySubmesh* fsm = factory->submeshes[i];
+      for (size_t j = 0; j < fsm->indexBuffers.GetSize (); ++j)
+      {
+	iRenderBuffer* indexBuffer = submeshes[i]->GetFactorySubMesh ()->GetIndices (j);
+	CS::TriangleIndicesStream<uint> triangles (indexBuffer,
+						   CS_MESHTYPE_TRIANGLES);
+	while (triangles.HasNext())
+	{
+	  CS::TriangleT<uint> t (triangles.Next());
+	  if (csIntersect3::SegmentTriangle (seg, 
+					     vrt[t.a], vrt[t.b], vrt[t.c], 
+					     isect))
+	  {
+	    temp = csSquaredDist::PointPoint (start, tmp);
+	    if (temp < dist)
+	    {
+	      isect = tmp;
+	      dist = temp;
+	      //if (polygon_idx) *polygon_idx = i; // @@@ Uh, how to handle?
+	      mat = submeshes[i]->GetMaterial ();
+	    }
+	  }
+	}
+      }
+    }
+
+    if (pr) *pr = csQsqrt (dist * itot_dist);
+    if (dist >= tot_dist)
+      return false;
+
+    if (material) *material = mat;
+    if (materials) materials->Push (mat);
+
+    return true;
   }
 
   void AnimeshObject::SetMeshWrapper (iMeshWrapper* lp)
