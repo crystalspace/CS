@@ -41,59 +41,17 @@ private:
   csRef<iCollection> collection;
   csRef<iMeshFactoryWrapper> imeshfactw;
 
-  /// A pointer to the 3D renderer plugin.
-  csRef<iGraphics3D> g3d;
-
-  /// A pointer to the keyboard driver.
   csRef<iKeyboardDriver> kbd;
-
-  /// A pointer to the virtual clock.
   csRef<iVirtualClock> vc;
-
-  /// A pointer to the view which contains the camera.
   csRef<iView> view;
-
-  /// The render manager, cares about selecting lights+meshes to render
   csRef<iRenderManager> rm;
-  
-  /// A pointer to the sector the camera will be in.
   iSector* room;
-
-  float rotX, rotY;
-
-  csRef<FramePrinter> printer;
-  
-  int num_lod_levels;
-  int lod_level;
-
-  /**
-   * Handle keyboard events - ie key presses and releases.
-   * This routine is called from the event handler in response to a 
-   * csevKeyboard event.
-   */
-  bool OnKeyboard (iEvent&);
-
-  /**
-   * Setup everything that needs to be rendered on screen. This routine
-   * is called from the event handler in response to a csevFrame
-   * broadcast message.
-   */
-  void Frame ();
-  
+    
   csRef<iThreadReturn> loading;
   void CreateLODs(const char* filename_in, const char* filename_out);
   void Save(const char* filename);
-  void CloneNode (iDocumentNode* from, iDocumentNode* to);
-  void CloneAttributes (iDocumentNode* from, iDocumentNode* to);
   
-  /// Here we will create our little, simple world.
-  void CreateRoom ();
-
-  /// Here we will create our sprites.
-  void CreateSprites();
-
   bool SetupModules ();
-  void UpdateLODLevel();
 
 public:
 

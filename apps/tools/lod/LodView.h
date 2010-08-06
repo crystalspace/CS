@@ -122,4 +122,4 @@ public:
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
-#endif // __LOD_H__
+#endif // __LODVIEW_H__

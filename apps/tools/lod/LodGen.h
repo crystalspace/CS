@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _LODGEN_H_
-#define _LODGEN_H_
+#ifndef __LODGEN_H__
+#define __LODGEN_H__
 
 void PointTriangleDistanceUnitTests();
 
@@ -97,4 +97,4 @@ protected:
   bool IsCoincident(const WorkMesh& k, const csTriangle& tri) const;
 };
 
-#endif // _LODGEN_H_
+#endif // __LODGEN_H__
