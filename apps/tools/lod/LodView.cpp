@@ -99,7 +99,7 @@ void LodView::UpdateLODLevel()
     {
       int num_sw = submesh->GetSlidingWindowSize();
       int s, e;
-      submesh->GetSlidingWindow((lod_level > num_sw) ? num_sw : lod_level, s, e);
+      submesh->GetSlidingWindow((lod_level > num_sw-1) ? num_sw-1 : lod_level, s, e);
       tris += (e - s) / 3;
     }
   }
