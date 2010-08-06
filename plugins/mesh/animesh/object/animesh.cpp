@@ -842,7 +842,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 	  CS::TriangleT<uint> t (triangles.Next());
 	  if (csIntersect3::SegmentTriangle (seg, 
 					     vrt[t.a], vrt[t.b], vrt[t.c], 
-					     isect))
+					     tmp))
 	  {
 	    temp = csSquaredDist::PointPoint (start, tmp);
 	    if (temp < dist)
