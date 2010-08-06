@@ -673,27 +673,38 @@ void LodGen::VerifyMesh(WorkMesh& k)
   */
 }
 
+/**
+ * Main LOD generation method.
+ */
 void LodGen::GenerateLODs()
 {
   InitCoincidentVertices();
   k.incident_tris.SetSize(vertices.GetSize());
+  // Add all triangles from input array 'triangles' to work mesh 'k'.
   for (unsigned int i = 0; i < triangles.GetSize(); i++)
     k.AddTriangle(triangles[i]);
-  
+ 
+  // The initial window is the original mesh.
   SlidingWindow sw_initial;
   sw_initial.start_index = 0;
   sw_initial.end_index = triangles.GetSize();
+  // Top limit - we never change a triangle that was added above it.
+  // The top limit gets bumped up when we replicate indices.
   top_limit = sw_initial.end_index;
   k.sliding_windows.Push(sw_initial);
   int collapse_counter = 0;
+  // When to absolutely end the collapses
   int min_num_triangles = triangles.GetSize() / 6;
+  // When to perform a replication
   int min_triangles_for_replication = triangles.GetSize() / 2;
+  // 'edges' will hold our list of edges to walk through.
   csArray<Edge> edges;
   bool could_not_collapse = false;
   int edge_start = -1;
   
   //int counter = 0;
   
+  // Each loop is one collapse. In some cases, it replicates indices too.
   while (1)
   {
     //if (counter == 10)
@@ -703,6 +714,7 @@ void LodGen::GenerateLODs()
     int min_v0, min_v1;    
     SlidingWindow sw = k.GetLastWindow();
     edges.SetSize(0);
+    // Add to 'edges' all edges whose origin vertex is not coincident with another one
     for (int itri = sw.start_index; itri < top_limit; itri++)
     {
       const csTriangle& tri = k.GetTriangle(itri);
@@ -710,20 +722,25 @@ void LodGen::GenerateLODs()
         if (coincident_vertices[tri[iv]].GetSize() == 0)
           edges.PushSmart(Edge(tri[iv], tri[(iv+1)%3]));
     }
+    // This speeds up the algorithm
     int edge_step = edges.GetSize() / 5 + 1;
     edge_start = (edge_start + 1) % edge_step;
-      
+    
+    // For each edge
     for (unsigned int i = edge_start; i < edges.GetSize(); i += edge_step)
     {
       int v0 = edges[i].v0;
       int v1 = edges[i].v1;
       
       WorkMesh k_prime = k;
+      // Attempt to collapse v0 to v1
       bool result = Collapse(k_prime, v0, v1);
       if (result)
       {
         //VerifyMesh(k_prime);
+        // Compute error metric of this collapse
         float d = SumOfSquareDist(k_prime);
+        // Update minimum
         if (d < min_d)
         {
           min_d = d;
@@ -731,20 +748,25 @@ void LodGen::GenerateLODs()
           min_v1 = v1;
         }
       }
+      // Nothing can be better than this.
       if (min_d == 0.0)
         break;
     }
     if (min_d == FLT_MAX && could_not_collapse)
     {
+      // If we couldn't collapse now and couldn't collapse last time either, end.
       cout << "No more triangles to collapse" << endl;
       break;
     }
     if (min_d != FLT_MAX)
     {
+      // Found the best vertices to collapse: 'min_v0', 'min_v1'.
+      // Collapse them.
       bool result = Collapse(k, min_v0, min_v1);
       assert(result);
       sw = k.GetLastWindow();
       cout << "t: " << sw.end_index-sw.start_index << " d: " << min_d << " v: " << min_v0 << "->" << min_v1 << endl;
+      // For debug purposes
       VerifyMesh(k);
       collapse_counter++;
       could_not_collapse = false;
@@ -765,11 +787,12 @@ void LodGen::GenerateLODs()
       cout << "Reached minimum number of triangles" << endl;
       break;
     }
+    // Is it time to replicate?
     if (curr_num_triangles < min_triangles_for_replication || min_d == FLT_MAX)
     {
+      // Replicate index buffer
       if (min_d == FLT_MAX)
         could_not_collapse = true;
-      // Replicate index buffer
       cout << "Replicating: " << curr_num_triangles << endl;
       sw.start_index += curr_num_triangles;
       sw.end_index += curr_num_triangles;
@@ -781,6 +804,7 @@ void LodGen::GenerateLODs()
       min_triangles_for_replication = (sw.end_index - sw.start_index) / 2;
     }
   }
+  // Copy work mesh to output
   for (unsigned int i = 0; i < k.tri_indices.GetSize(); i++)
     ordered_tris.Push(k.GetTriangle(i));
   for (unsigned int i = 0; i < ordered_tris.GetSize(); i++)
