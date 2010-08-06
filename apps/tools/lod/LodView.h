@@ -19,16 +19,6 @@
 #ifndef __LODVIEW_H__
 #define __LODVIEW_H__
 
-/**
- * This is the main class of this Tutorial. It contains the
- * basic initialization code and the main event handler.
- *
- * csApplicationFramework provides a handy object-oriented wrapper around the
- * Crystal Space initialization and start-up functions.
- *
- * csBaseEventHandler provides a base object which does absolutely nothing
- * with the events that are sent to it.
- */
 class LodView : public csApplicationFramework, public csBaseEventHandler
 {
 private:
@@ -38,7 +28,6 @@ private:
   /// A pointer to the map loader plugin.
   csRef<iLoader> loader;
   csRef<iThreadedLoader> tloader;
-  csRef<iCollection> collection;
   csRef<iMeshFactoryWrapper> imeshfactw;
 
   /// A pointer to the 3D renderer plugin.
@@ -65,6 +54,7 @@ private:
   
   int num_lod_levels;
   int lod_level;
+  csString filename;
 
   /**
    * Handle keyboard events - ie key presses and releases.
@@ -81,7 +71,12 @@ private:
   void Frame ();
   
   csRef<iThreadReturn> loading;
-  void CreateLODs(const char* filename);
+  
+  /// Load the file specified in filename
+  void LoadLODs(const char* filename);
+  
+  /// Print out usage instructions to the console
+  void Usage();
   
   /// Here we will create our little, simple world.
   void CreateRoom ();
@@ -90,6 +85,8 @@ private:
   void CreateSprites();
 
   bool SetupModules ();
+  
+  /// Tell the mesh factory to force a new LOD level
   void UpdateLODLevel();
 
 public:
