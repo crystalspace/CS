@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 by Eduardo Poyart
+    Copyright (C) 2010 by Jorrit Tyberghein, Eduardo Poyart
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,7 +21,6 @@
 using namespace std;
 
 #include <crystalspace.h>
-#include "LodGen.h"
 #include "LodView.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -104,7 +103,7 @@ void LodView::UpdateLODLevel()
       tris += (e - s) / 3;
     }
   }
-  cout << "Level: " << lod_level << " Triangles: " << tris << endl;
+  csPrintf("Level: %d Triangles: %d\n", lod_level, tris);
 }
 
 bool LodView::OnKeyboard (iEvent& ev)
@@ -120,7 +119,7 @@ bool LodView::OnKeyboard (iEvent& ev)
       if (q.IsValid ()) q->GetEventOutlet ()->Broadcast (
         csevQuit (GetObjectRegistry ()));
     }
-    else if (code == CSKEY_PGDN)
+    else if (code == 'l')
     {
       if (lod_level < num_lod_levels - 1)
       {
@@ -128,7 +127,7 @@ bool LodView::OnKeyboard (iEvent& ev)
         UpdateLODLevel();
       }
     }
-    else if (code == CSKEY_PGUP)
+    else if (code == 'k')
     {
       if (lod_level > 0)
       {
@@ -143,10 +142,10 @@ bool LodView::OnKeyboard (iEvent& ev)
 
 void LodView::Usage()
 {
-  cout << "LOD viewer" << endl;
-  cout << "Usage:" << endl;
-  cout << "lodview <filename>" << endl;
-  cout << "When viewing the model: k reduces LOD level; l increases it." << endl; 
+  csPrintf("LOD viewer\n");
+  csPrintf("Usage:\n");
+  csPrintf("lodview <filename>\n");
+  csPrintf("When viewing the model: 'k' increases LOD resolution; 'l' reduces it.\n"); 
 }
 
 bool LodView::OnInitialize (int argc, char* argv [])
@@ -219,7 +218,7 @@ void LodView::LoadLODs(const char* filename)
     iMeshFactoryList* factories = engine->GetMeshFactories ();
     if (factories->GetCount() == 0)
     {
-      cout << "No factories in file" << endl;
+      csPrintf("No factories in file.\n");
       return;
     }
     iMeshFactoryWrapper* f = factories->Get (0);
@@ -238,7 +237,7 @@ void LodView::LoadLODs(const char* filename)
   
   if (!imeshfactw)
   {
-    cout << "Could not find loaded mesh" << endl;
+    csPrintf("Could not find loaded mesh.\n");
     return;
   }
   

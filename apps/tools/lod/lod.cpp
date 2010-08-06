@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2010 by Jorrit Tyberghein, Eduardo Poyart
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -235,7 +235,7 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
   
   if (!loading->WasSuccessful())
   {
-    printf("Loading not successful\n");
+    csPrintf("Loading not successful - file: %s\n", filename_in);
     loading.Invalidate();
     return;
   }
@@ -246,7 +246,7 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     iMeshFactoryList* factories = engine->GetMeshFactories ();
     if (factories->GetCount() == 0)
     {
-      cout << "No factories in file" << endl;
+      csPrintf("No factories in file.\n");
       return;
     }
     imeshfactw = factories->Get (0);
@@ -264,7 +264,7 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
   
   if (!imeshfactw)
   {
-    cout << "Could not find loaded mesh" << endl;
+    csPrintf("Could not find loaded mesh.\n");
     return;
   }
     
@@ -306,7 +306,6 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     
     iRenderBuffer* rbindices = submesh->GetIndices();
     assert(rbindices);
-    cout << "rbindices orig " << rbindices->GetElementCount() << endl; 
     csRef<iRenderBuffer> rbindices_new = csRenderBuffer::CreateIndexRenderBuffer(
       lodgen.GetTriangleCount() * 3, rbindices->GetBufferType(), rbindices->GetComponentType(), 0, fstate_vertices.GetSize()-1);
     
@@ -316,13 +315,12 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     unsigned int* pdata = data;
     for (int i = 0; i < lodgen.GetTriangleCount(); i++)
     {
-      //cout << lodgen.GetTriangle(i)[0] << " " << lodgen.GetTriangle(i)[1] << " " << lodgen.GetTriangle(i)[2] << endl;
+      //csPrintf("%d %d %d\n", lodgen.GetTriangle(i)[0], lodgen.GetTriangle(i)[1], lodgen.GetTriangle(i)[2]);
       *pdata++ = lodgen.GetTriangle(i)[0];
       *pdata++ = lodgen.GetTriangle(i)[1];
       *pdata++ = lodgen.GetTriangle(i)[2];
     }
     rbindices_new->CopyInto(data, lodgen.GetTriangleCount() * 3);
-    cout << "rbindices " << lodgen.GetTriangleCount() * 3 << endl;
     submesh->SetIndices(rbindices_new);
     delete[] data;
     
@@ -346,7 +344,7 @@ void Lod::Save(const char* filename)
   vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs)
   {
-    cout << "No iVFS!" << endl;
+    csPrintf("Error: No iVFS!\n");
     return;
   }
   
