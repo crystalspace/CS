@@ -575,13 +575,13 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
 {
   SlidingWindow sw = k.GetLastWindow(); // copy
   
-  // For each incident triangle to the disappearing vertex (v0)
+  // For each triangle that is incident to the vertex that will disappear (v0)
   IncidentTris incident = k.incident_tris[v0]; // copy
   for (unsigned int i = 0; i < incident.GetSize(); i++)
   {
     int itri = incident[i];
     // Make sure it's within our work limit
-    // (meaning, it's not a triangle that was added before)
+    // (not a triangle that was added before)
     int h = FindInWindow(k, sw, itri);
     if (h >= top_limit)
       return false;
@@ -598,7 +598,7 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
     sw.start_index++;
 
     assert(incident.GetSize() > k.incident_tris[v0].GetSize());
-    // Change vertex v0 in the new triangle to beccome v1
+    // Change vertex v0 in the new triangle to become v1
     for (int j = 0; j < 3; j++)
       if (new_tri[j] == v0)
         new_tri[j] = v1;
