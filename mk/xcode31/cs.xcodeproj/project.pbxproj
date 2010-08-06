@@ -13931,7 +13931,7 @@
 		};
 		D28A88AD04BDD90700651E21 /* cs */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "-d x $(ACTION)";
+			buildArgumentsString = "$(ACTION)";
 			buildConfigurationList = 1DEB918F08733D9F0010E9CD /* Build configuration list for PBXLegacyTarget "cs" */;
 			buildPhases = (
 			);

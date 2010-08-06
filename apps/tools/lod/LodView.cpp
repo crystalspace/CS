@@ -528,7 +528,7 @@ void LodView::CreateSprites ()
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
   assert(fstate);
   
-  num_lod_levels = fstate->GetSlidingWindowSize();
+  num_lod_levels = fstate->GetNumProgLODLevels();
 }
 
 /*-------------------------------------------------------------------------*

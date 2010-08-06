@@ -172,12 +172,12 @@ ViewMesh::ViewMesh () :
         break;
       }
 
-	    if (kbd->GetKeyState ('['))
-	    {
+      if (kbd->GetKeyState (CSKEY_PGDN))
+      {
         if (lod_level < max_lod_level)
           lod_level += 1;
       }
-	    if (kbd->GetKeyState (']'))
+	    if (kbd->GetKeyState (CSKEY_PGUP))
       {
         if (lod_level > 0)
           lod_level -= 1;
