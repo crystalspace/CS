@@ -66,7 +66,7 @@ struct iGeneralFactorySubMesh : public virtual iBase
 };
 
 /**
- * A proxy of a submesh of a genmesh factory.
+ * An instance of a submesh of a genmesh factory.
  */
 struct iGeneralFactorySubMeshObject : public virtual iBase
 {
