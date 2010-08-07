@@ -19,6 +19,12 @@
 #ifndef __LOD_H__
 #define __LOD_H__
 
+struct Params
+{
+  csString input_file;
+  csString output_file;
+};
+
 /**
  * This is the main class of this Tutorial. It contains the
  * basic initialization code and the main event handler.
@@ -46,8 +52,12 @@ private:
   csRef<iView> view;
   csRef<iRenderManager> rm;
   iSector* room;
-    
   csRef<iThreadReturn> loading;
+
+  Params params;
+
+  void Usage();
+  bool ParseParams(int argc, char* argv[]);
   void CreateLODs(const char* filename_in, const char* filename_out);
   void Save(const char* filename);
   

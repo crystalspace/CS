@@ -37,10 +37,47 @@ Lod::~Lod ()
 {
 }
 
+void Lod::Usage()
+{
+  csPrintf("Usage:\n");
+  csPrintf("lod -i <input_file> -o <output_file>\n");
+}
+
+bool Lod::ParseParams(int argc, char* argv[])
+{
+  if (argc < 5)
+    Usage();
+  for (int i = 1; i < argc; i++)
+  {
+    csString s(argv[i]);
+    if (s == "-i" && i < argc-1)
+      params.input_file = argv[++i];
+    else if (s == "-o" && i < argc-1)
+      params.output_file = argv[++i];
+  }
+
+  if (params.input_file == "")
+  {
+    ReportError("Input file not specified.");
+    Usage();
+    return false;
+  }
+  if (params.output_file == "")
+  {
+    ReportError("Output file not specified.");
+    Usage();
+    return false;
+  }
+
+  return true;
+}
+
 bool Lod::OnInitialize (int argc, char* argv[])
 {
   //PointTriangleDistanceUnitTests();
-  
+
+  if (!ParseParams(argc, argv))
+    return false;
   // RequestPlugins() will load all plugins we specify. In addition
   // it will also check if there are plugins that need to be loaded
   // from the config system (both the application config and CS or
@@ -183,8 +220,6 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     }
   }
   
-  //fstate->Invalidate();
-  
   Save(filename_out);
 
   loading.Invalidate();
@@ -264,13 +299,7 @@ bool Lod::SetupModules ()
   
   collection = engine->CreateCollection ("lod_region");
    
-  CreateLODs("/lev/lodtest/lodbarrel", "/lev/lodtest/lodbarrel_lod");
-  //CreateLODs("/lev/lodtest/genMesh.002", "/lev/lodtest/genMesh.002_lod");
-  //CreateLODs("/lev/lodtest/lodbox", "/lev/lodtest/lodbox_lod");
-  //CreateLODs("/lev/lodtest/genbment2_tables", "/lev/lodtest/genbment2_tables_lod");
-  //CreateLODs("/lev/lodtest/simple", "/lev/lodtest/simple_lod");
-  //CreateLODs("/lev/lodtest/kwartz.lib", "/lev/lodtest/kwartz_lod.lib");
-  //CreateLODs("/lev/lodtest/submeshtest", "/lev/lodtest/submeshtest_lod");
+  CreateLODs(params.input_file, params.output_file);
 
   Quit();
   return true;
