@@ -358,12 +358,11 @@ struct InnerNodeProcessOP
 
   FrustTest_Front2BackData f2bData;
 
-  void DrawQuery(AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* n) const
+  void DrawQuery(NodePtr n) const
   {
     n->GetGraphics3D()->OQBeginQuery(n->GetQueryID());
     n->GetGraphics3D()->DrawSimpleMesh(n->srmSimpRendMesh);
     n->GetGraphics3D()->OQEndQuery();
-    while(!n->GetGraphics3D()->OQueryFinished(n->GetQueryID())) 1;
     csBox3 box=n->GetBBox();
     if(n->GetGraphics3D()->OQIsVisible(n->GetQueryID(),0))
     {
@@ -381,7 +380,14 @@ struct InnerNodeProcessOP
     }
   }
 
-  bool operator() (AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* n, uint32 &frustum_mask) const
+  inline void NodeVisible(NodePtr n) const
+  {
+    n->SetCameraTimestamp(f2bData.rview->GetCamera(),f2bData.current_timestamp);
+    n->SetVisibilityForCamera(f2bData.rview->GetCamera(),false);
+    //DrawQuery(n);
+  }
+
+  bool operator() (NodePtr n, uint32 &frustum_mask) const
   {
     CS_ASSERT_MSG("Invalid AABB-tree", !n->IsLeaf ());
     csBox3 node_bbox = n->GetBBox();
@@ -389,8 +395,8 @@ struct InnerNodeProcessOP
 
     if (node_bbox.Contains (f2bData.pos))
     {
-      goto nodevisible;
-      //return true; // node completely visible
+      NodeVisible(n);
+      return true; // node completely visible
     }
     uint32 new_mask;
     if (!csIntersect3::BoxFrustum (node_bbox,
@@ -402,10 +408,7 @@ struct InnerNodeProcessOP
     }
     frustum_mask=new_mask;
 
-nodevisible:  // node passed frustum culling
-    n->SetCameraTimestamp(f2bData.rview->GetCamera(),f2bData.current_timestamp);
-    n->SetVisibilityForCamera(f2bData.rview->GetCamera(),false);
-    //DrawQuery(n);
+    NodeVisible(n);
     return true; // node visible
   }
 };
@@ -422,7 +425,7 @@ struct LeafNodeProcessOP
 
   FrustTest_Front2BackData f2bData;
 
-  void DrawQuery(AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* n) const
+  void DrawQuery(NodePtr n) const
   {
     n->GetGraphics3D()->OQBeginQuery(n->GetQueryID());
     iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
@@ -442,7 +445,6 @@ struct LeafNodeProcessOP
       }
     }
     n->GetGraphics3D()->OQEndQuery();
-    while(!n->GetGraphics3D()->OQueryFinished(n->GetQueryID())) 1;
     csBox3 box=n->GetLeafData(0)->GetBBox();
     if(n->GetGraphics3D()->OQIsVisible(n->GetQueryID(),0))
     {
@@ -460,7 +462,14 @@ struct LeafNodeProcessOP
     }
   }
 
-  bool operator() (AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* n, const uint32 frustum_mask) const
+  inline void NodeVisible(NodePtr n) const
+  {
+    n->SetCameraTimestamp(f2bData.rview->GetCamera(),f2bData.current_timestamp);
+    n->SetVisibilityForCamera(f2bData.rview->GetCamera(),false);
+    //DrawQuery(n);
+  }
+
+  bool operator() (NodePtr n, const uint32 frustum_mask) const
   { 
     CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
     const int num_objects=n->GetObjectCount();
@@ -475,8 +484,8 @@ struct LeafNodeProcessOP
     if (obj_bbox.Contains (f2bData.pos))
     {
       f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
-      goto nodevisible;
-      //return true;
+      NodeVisible(n);
+      return true;
     }
   
     uint32 new_mask;
@@ -486,11 +495,7 @@ struct LeafNodeProcessOP
     }
     f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, new_mask);
 
-nodevisible:
-    n->SetCameraTimestamp(f2bData.rview->GetCamera(),f2bData.current_timestamp);
-    n->SetVisibilityForCamera(f2bData.rview->GetCamera(),false);
-
-    //DrawQuery(n);
+    NodeVisible(n);
     return true;
   }
 };

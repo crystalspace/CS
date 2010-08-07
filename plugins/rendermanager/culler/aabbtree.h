@@ -562,11 +562,11 @@
     bool TraverseIterativeF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction, Node* node) const
     {
       bool ret = true;
-      Node* n;
       std::queue<Node*> Q;
       Q.push(node);
       while(!Q.empty())
       {
+        Node* n;
         n=Q.front();
         Q.pop();
         if (n->IsLeaf ())

@@ -382,6 +382,8 @@ public:
   }
 };
 
+typedef AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* NodePtr;
+
 /**
  * A simple frustum based visibility culling system.
  */
