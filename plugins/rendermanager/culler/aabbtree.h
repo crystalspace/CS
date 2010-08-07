@@ -22,14 +22,17 @@
 #include "csutil/blockallocator.h"
 #include "csgeom/box.h"
 #include "csutil/dirtyaccessarray.h"
-
+#include <queue>
+  
   template<typename ObjectType>
   struct AABBTreeNodeExtraDataNone
   {
     void LeafAddObject (ObjectType*) {}
+    void NodeRemove() {}
     void LeafUpdateObjects (ObjectType**, uint) {}
     void NodeUpdate (const AABBTreeNodeExtraDataNone& child1,
-      const AABBTreeNodeExtraDataNone& child2) {}
+                     const AABBTreeNodeExtraDataNone& child2,
+                     const csBox3& node_bbox) {}
   };
 
   /**
@@ -76,14 +79,6 @@
       nodeAllocator.DeleteAll ();
     #endif
     }
-
-    /*
-     *
-     */
-    /*void SetRootFrustumMask(uint32 frustum_mask)
-    {
-      rootNode->SetFrustumMask(frustum_mask);
-    }*/
 
     /**
      * 
@@ -176,20 +171,40 @@
      * 
      */
     template<typename InnerFn, typename LeafFn, typename T>
-    void TraverseF2B_FM (InnerFn& inner, LeafFn& leaf, T frustum_mask, const csVector3& direction)
+    void TraverseF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction)
     {
       if (rootNode)
-        TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, rootNode);
+        TraverseRecF2BWithData (inner, leaf, traverseData, direction, rootNode);
     }
 
     /**
      * 
      */
     template<typename InnerFn, typename LeafFn, typename T>
-    void TraverseF2B_FM (InnerFn& inner, LeafFn& leaf, T frustum_mask, const csVector3& direction) const
+    void TraverseF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction) const
     {
       if (rootNode)
-        TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, rootNode);
+        TraverseRecF2BWithData (inner, leaf, traverseData, direction, rootNode);
+    }
+
+    /**
+     * Iterative traversal with data
+     */
+    template<typename InnerFn, typename LeafFn, typename T>
+    void TraverseIterF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction)
+    {
+      if (rootNode)
+        TraverseIterativeF2BWithData (inner, leaf, traverseData, direction, rootNode);
+    }
+
+    /**
+     * Iterative traversal with data
+     */
+    template<typename InnerFn, typename LeafFn, typename T>
+    void TraverseIterF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction) const
+    {
+      if (rootNode)
+        TraverseIterativeF2BWithData (inner, leaf, traverseData, direction, rootNode);
     }
 
     /**
@@ -336,10 +351,12 @@
           node->SetLeaf (false);
           node->SetChild1 (node1);
           node->SetChild2 (node2);
-          static_cast<NodeExtraData*> (node)->NodeUpdate (*node1, *node2);
-          
+
           // update bbox
           node->GetBBox() += object->GetBBox();
+
+          static_cast<NodeExtraData*> (node)->NodeUpdate (*node1, *node2, node->GetBBox());
+          
         }
       }
       else
@@ -358,7 +375,7 @@
           AddObjectRecursive (node->GetChild2 (), object);
           node->GetBBox ().AddBoundingBox (node->GetChild2 ()->GetBBox ());
         }
-        static_cast<NodeExtraData*> (node)->NodeUpdate (*node->GetChild1(), *node->GetChild2());
+        static_cast<NodeExtraData*> (node)->NodeUpdate (*node->GetChild1(), *node->GetChild2(), node->GetBBox());
       }
     }
 
@@ -477,7 +494,7 @@
      * 
      */
     template<typename InnerFn, typename LeafFn, typename T>
-    bool TraverseRecF2B_FM (InnerFn& inner, LeafFn& leaf, T frustum_mask, const csVector3& direction, Node* node)
+    bool TraverseRecF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction, Node* node)
     {
       bool ret = true;
       if (!node) 
@@ -485,19 +502,89 @@
 
       if (node->IsLeaf ())
       {
-        ret = leaf (node, frustum_mask);
+        ret = leaf (node, traverseData);
       }
       else
       {
-        if (inner (node, frustum_mask))
+        if (inner (node, traverseData))
         {
           const csVector3 centerDiff = node->GetChild2 ()->GetBBox ().GetCenter () -
             node->GetChild1 ()->GetBBox ().GetCenter ();
 
           const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
 
-          ret = TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, node->GetChild (firstIdx));
-          if (ret) ret = TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, node->GetChild (1-firstIdx));
+          ret = TraverseRecF2BWithData (inner, leaf, traverseData, direction, node->GetChild (firstIdx));
+          if (ret) ret = TraverseRecF2BWithData (inner, leaf, traverseData, direction, node->GetChild (1-firstIdx));
+        }
+      }
+      return ret;
+    }
+
+    /**
+     * Iterative traversal
+     */
+    template<typename InnerFn, typename LeafFn, typename T>
+    bool TraverseIterativeF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction, Node* node)
+    {
+      bool ret = true;
+      Node* n;
+      std::queue<Node*> Q;
+      Q.push(node);
+      while(!Q.empty())
+      {
+        n=Q.front();
+        Q.pop();
+        if (n->IsLeaf ())
+        {
+          ret = leaf (n, traverseData);
+        }
+        else
+        {
+          if (inner (n, traverseData))
+          {
+            const csVector3 centerDiff = n->GetChild2 ()->GetBBox ().GetCenter () -
+              n->GetChild1 ()->GetBBox ().GetCenter ();
+
+            const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
+
+            Q.push(n->GetChild (firstIdx));
+            Q.push(n->GetChild (1-firstIdx));
+          }
+        }
+      }
+      return ret;
+    }
+
+    /**
+     * Iterative traversal
+     */
+    template<typename InnerFn, typename LeafFn, typename T>
+    bool TraverseIterativeF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction, Node* node) const
+    {
+      bool ret = true;
+      Node* n;
+      std::queue<Node*> Q;
+      Q.push(node);
+      while(!Q.empty())
+      {
+        n=Q.front();
+        Q.pop();
+        if (n->IsLeaf ())
+        {
+          ret = leaf (n, traverseData);
+        }
+        else
+        {
+          if (inner (n, traverseData))
+          {
+            const csVector3 centerDiff = n->GetChild2 ()->GetBBox ().GetCenter () -
+              n->GetChild1 ()->GetBBox ().GetCenter ();
+
+            const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
+
+            Q.push(n->GetChild (firstIdx));
+            Q.push(n->GetChild (1-firstIdx));
+          }
         }
       }
       return ret;
@@ -507,7 +594,7 @@
      * 
      */
     template<typename InnerFn, typename LeafFn, typename T>
-    bool TraverseRecF2B_FM (InnerFn& inner, LeafFn& leaf, T frustum_mask, const csVector3& direction, const Node* node) const
+    bool TraverseRecF2BWithData (InnerFn& inner, LeafFn& leaf, T frustum_mask, const csVector3& direction, const Node* node) const
     {
       bool ret = true;
       if (!node) 
@@ -526,8 +613,8 @@
 
           const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
 
-          ret = TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, node->GetChild (firstIdx));
-          if (ret) ret = TraverseRecF2B_FM (inner, leaf, frustum_mask, direction, node->GetChild (1-firstIdx));
+          ret = TraverseRecF2BWithData (inner, leaf, frustum_mask, direction, node->GetChild (firstIdx));
+          if (ret) ret = TraverseRecF2BWithData (inner, leaf, frustum_mask, direction, node->GetChild (1-firstIdx));
         }
       }
       return ret;
@@ -788,7 +875,7 @@
             if (!left->IsLeaf() || left->GetObjectCount () > 0)
             {
               newNodeBB += left->GetBBox ();
-              static_cast<NodeExtraData*> (node)->NodeUpdate (*left, *right);
+              static_cast<NodeExtraData*> (node)->NodeUpdate (*left, *right, newNodeBB);
             }
             else
             {
@@ -827,7 +914,7 @@
             if (!right->IsLeaf() || right->GetObjectCount () > 0)
             {
               newNodeBB += right->GetBBox ();
-              static_cast<NodeExtraData*> (node)->NodeUpdate (*left, *right);
+              static_cast<NodeExtraData*> (node)->NodeUpdate (*left, *right, newNodeBB);
             }
             else
             {
@@ -941,18 +1028,6 @@
         children[0] = children[1] = 0;
       }
     }
-
-    /*///
-    uint32 GetFrustumMask() const
-    {
-      return frustum_mask;
-    }
-
-    ///
-    void SetFrustumMask(uint32 fm)
-    {
-      frustum_mask=fm;
-    }*/
 
     ///
     uint GetFlags () const
@@ -1092,9 +1167,6 @@
 
     ///
     uint16 leafObjCount;
-
-    ///
-    //uint32 frustum_mask;
 
     ///
     csBox3 boundingBox;

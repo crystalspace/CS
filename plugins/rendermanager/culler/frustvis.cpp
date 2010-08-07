@@ -55,38 +55,6 @@
 
 //----------------------------------------------------------------------
 
-struct InnerNodeTraversalOP
-{
-  bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n)
-  {
-    CS_ASSERT_MSG("Invalid AABB-tree", !n->IsLeaf ());
-    csBox3 bbox=n->GetBBox();
-    //csPrintf("Inner...%d\n",n->GetObjectCount());
-    //csPrintf("Inner: (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bbox.MinX(),bbox.MinY(),bbox.MinZ(),
-    //        bbox.MaxX(),bbox.MaxY(),bbox.MaxZ());
-    return true;
-  }
-};
-
-struct LeafNodeTraversalOP
-{
-  bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n)
-  { 
-    CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
-    int num_objects=n->GetObjectCount();
-    
-    for(int i=0;i<num_objects; ++i)
-    {
-      csBox3 bbox=n->GetLeafData(i)->GetBBox();
-      //csPrintf("Leaf: (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bbox.MinX(),bbox.MinY(),bbox.MinZ(),
-      //      bbox.MaxX(),bbox.MaxY(),bbox.MaxZ());
-    }
-    return true;
-  }
-};
-
-//----------------------------------------------------------------------
-
 void csFrustVisObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
 {
   frustvis->AddObjectToUpdateQueue (this);
@@ -132,7 +100,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
-  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -231,6 +199,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 
   iMeshWrapper* mesh = visobj->GetMeshWrapper ();
   visobj_wrap->mesh = mesh;
+  visobj_wrap->g3d=g3d;
 
   // Only add the listeners at the very last moment to prevent them to
   // be called by the calls above (i.e. especially the calculation of
@@ -243,6 +212,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 
   printf("Inserting into aabb (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bbox.MinX(),bbox.MinY(),bbox.MinZ(),
           bbox.MaxX(),bbox.MaxY(),bbox.MaxZ());
+
   aabbTree.AddObject(visobj_wrap);
 }
 
@@ -264,6 +234,7 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
           visobj_wrap->bbox.MinX(),visobj_wrap->bbox.MinY(),visobj_wrap->bbox.MinZ(),
           visobj_wrap->bbox.MaxX(),visobj_wrap->bbox.MaxY(),visobj_wrap->bbox.MaxZ());
       aabbTree.RemoveObject(visobj_wrap);
+      visobj_wrap->g3d=0;
 
 #ifdef CS_DEBUG
       // To easily recognize that the vis wrapper has been deleted:
@@ -387,62 +358,54 @@ struct InnerNodeProcessOP
 
   FrustTest_Front2BackData f2bData;
 
-  /*const bool operator() (AABBTree<csFrustVisObjectWrapper>::Node* n) const
+  void DrawQuery(AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* n) const
   {
-    //CS_ASSERT_MSG("Invalid AABB-tree", !n->IsLeaf ());
+    n->GetGraphics3D()->OQBeginQuery(n->GetQueryID());
+    n->GetGraphics3D()->DrawSimpleMesh(n->srmSimpRendMesh);
+    n->GetGraphics3D()->OQEndQuery();
+    while(!n->GetGraphics3D()->OQueryFinished(n->GetQueryID())) 1;
+    csBox3 box=n->GetBBox();
+    if(n->GetGraphics3D()->OQIsVisible(n->GetQueryID(),0))
+    {
+      csPrintf("BB Visible (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
+          box.MinX(),box.MinY(),box.MinZ(),
+          box.MaxX(),box.MaxY(),box.MaxZ());
+      //csPrintf("BB Visible\n");
+    }
+    else
+    {
+      csPrintf("BB Not visible (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
+          box.MinX(),box.MinY(),box.MinZ(),
+          box.MaxX(),box.MaxY(),box.MaxZ());
+      //csPrintf("BB Not visible\n");
+    }
+  }
 
+  bool operator() (AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* n, uint32 &frustum_mask) const
+  {
+    CS_ASSERT_MSG("Invalid AABB-tree", !n->IsLeaf ());
     csBox3 node_bbox = n->GetBBox();
     node_bbox *= f2bData.global_bbox;
 
     if (node_bbox.Contains (f2bData.pos))
     {
-      return true; // node completely visible
+      goto nodevisible;
+      //return true; // node completely visible
     }
-
-    uint32 new_mask;
-    if (!csIntersect3::BoxFrustum (node_bbox,
-                                   f2bData.frustum,
-                                   n->GetFrustumMask(),
-  	                               new_mask))
-    {
-      return false; //node invisible
-    }
-
-    n->SetFrustumMask(new_mask);
-    //if we have children update them with the parent's frustum mask
-    if(n->GetChild1())
-    {
-      n->GetChild1()->SetFrustumMask(new_mask);
-    }
-    if(n->GetChild2())
-    {
-      n->GetChild2()->SetFrustumMask(new_mask);
-    }
-    return true; // node visible
-  }*/
-
-  const bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n, uint32 &frustum_mask) const
-  {
-    //CS_ASSERT_MSG("Invalid AABB-tree", !n->IsLeaf ());
-
-    csBox3 node_bbox = n->GetBBox();
-    node_bbox *= f2bData.global_bbox;
-
-    if (node_bbox.Contains (f2bData.pos))
-    {
-      return true; // node completely visible
-    }
-
     uint32 new_mask;
     if (!csIntersect3::BoxFrustum (node_bbox,
                                    f2bData.frustum,
                                    frustum_mask,
   	                               new_mask))
     {
-      return false; //node invisible
+      return false; //node invisible so discontinue traversal for this subtree
     }
-
     frustum_mask=new_mask;
+
+nodevisible:  // node passed frustum culling
+    n->SetCameraTimestamp(f2bData.rview->GetCamera(),f2bData.current_timestamp);
+    n->SetVisibilityForCamera(f2bData.rview->GetCamera(),false);
+    //DrawQuery(n);
     return true; // node visible
   }
 };
@@ -459,62 +422,75 @@ struct LeafNodeProcessOP
 
   FrustTest_Front2BackData f2bData;
 
-  /*const bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n) const
-  { 
-    //CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
-    const int num_objects=n->GetObjectCount();
-    const uint32 frustum_mask=n->GetFrustumMask();
+  void DrawQuery(AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* n) const
+  {
+    n->GetGraphics3D()->OQBeginQuery(n->GetQueryID());
+    iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
+    int numMeshes=0;
+    const uint32 frust_mask=f2bData.rview->GetRenderContext ()->clip_planes_mask;
     
-    for(int i=0;i<num_objects; ++i)
+    csRenderMesh **rmeshes=mw->GetRenderMeshes(numMeshes,f2bData.rview,frust_mask);
+    for (int m = 0; m < numMeshes; m++)
     {
-      const csFrustVisObjectWrapper* visobj_wrap = n->GetLeafData(i);
-
-      if (visobj_wrap->mesh && visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
-        return true;
-
-      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
-      if (obj_bbox.Contains (f2bData.pos))
+      if (!rmeshes[m]->portal)
       {
-        f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
-        return true;
+        csVertexAttrib vA=CS_VATTRIB_POSITION;
+        iRenderBuffer *rB=rmeshes[m]->buffers->GetRenderBuffer(CS_BUFFER_POSITION);
+        n->GetGraphics3D()->ActivateBuffers(&vA,&rB,1);
+        n->GetGraphics3D()->DrawMeshBasic(rmeshes[m],*rmeshes[m]);
+        n->GetGraphics3D()->DeactivateBuffers(&vA,1);
       }
-  
-      uint32 new_mask;
-      if (!csIntersect3::BoxFrustum (obj_bbox, f2bData.frustum, frustum_mask, new_mask))
-      {
-        return true;
-      }
-      f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, new_mask);
     }
-    return true;
-  }*/
+    n->GetGraphics3D()->OQEndQuery();
+    while(!n->GetGraphics3D()->OQueryFinished(n->GetQueryID())) 1;
+    csBox3 box=n->GetLeafData(0)->GetBBox();
+    if(n->GetGraphics3D()->OQIsVisible(n->GetQueryID(),0))
+    {
+      csPrintf("Visible (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
+          box.MinX(),box.MinY(),box.MinZ(),
+          box.MaxX(),box.MaxY(),box.MaxZ());
+      //csPrintf("Visible\n");
+    }
+    else
+    {
+      csPrintf("Not visible (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
+          box.MinX(),box.MinY(),box.MinZ(),
+          box.MaxX(),box.MaxY(),box.MaxZ());
+      //csPrintf("Not visible\n");
+    }
+  }
 
-  const bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n, const uint32 frustum_mask) const
+  bool operator() (AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* n, const uint32 frustum_mask) const
   { 
-    //CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
+    CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
     const int num_objects=n->GetObjectCount();
-    
-    for(int i=0;i<num_objects; ++i)
+    const csFrustVisObjectWrapper* visobj_wrap = n->GetLeafData(0);
+
+    if (visobj_wrap->mesh && visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
     {
-      const csFrustVisObjectWrapper* visobj_wrap = n->GetLeafData(i);
-
-      if (visobj_wrap->mesh && visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
-        return true;
-
-      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
-      if (obj_bbox.Contains (f2bData.pos))
-      {
-        f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
-        return true;
-      }
-  
-      uint32 new_mask;
-      if (!csIntersect3::BoxFrustum (obj_bbox, f2bData.frustum, frustum_mask, new_mask))
-      {
-        return true;
-      }
-      f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, new_mask);
+      return true; // node invisible, but continue traversal
     }
+
+    const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+    if (obj_bbox.Contains (f2bData.pos))
+    {
+      f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
+      goto nodevisible;
+      //return true;
+    }
+  
+    uint32 new_mask;
+    if (!csIntersect3::BoxFrustum (obj_bbox, f2bData.frustum, frustum_mask, new_mask))
+    {
+      return true; // node invisible, but continue traversal
+    }
+    f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, new_mask);
+
+nodevisible:
+    n->SetCameraTimestamp(f2bData.rview->GetCamera(),f2bData.current_timestamp);
+    n->SetVisibilityForCamera(f2bData.rview->GetCamera(),false);
+
+    //DrawQuery(n);
     return true;
   }
 };
@@ -541,8 +517,9 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   f2bData.rview = rview;
   f2bData.viscallback = viscallback;
   f2bData.global_bbox=kdtree_box;
+  f2bData.current_timestamp=cur_timestamp;
 
-  g3d=rview->GetGraphics3D();
+  //g3d=rview->GetGraphics3D();
   if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
 	      csPrintf("Cannot prepare renderer for 3D drawing\n");
@@ -568,7 +545,8 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   csVector3 dir=rview->GetCamera ()->GetTransform ().GetFront()-rview->GetCamera ()->GetTransform ().GetOrigin ();
   //aabbTree.SetRootFrustumMask(frustum_mask);
   //aabbTree.TraverseF2B(opIN,opLN,dir);
-  aabbTree.TraverseF2B_FM(opIN,opLN,frustum_mask,dir);
+  //aabbTree.TraverseF2BWithData(opIN,opLN,frustum_mask,dir);
+  aabbTree.TraverseIterF2BWithData(opIN,opLN,frustum_mask,dir);
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
@@ -1100,8 +1078,29 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
 struct InnerNodeIntersectSegment
 {
   IntersectSegment_Front2BackData data;
-  bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n)
+  bool operator() (AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* n)
   {
+    const csBox3& node_bbox = n->GetBBox ();
+
+    // If mesh != 0 then we have already found our mesh. In that
+    // case we will compare the distance of the origin with the the
+    // box of the treenode and the already found shortest distance to
+    // see if we have to proceed.
+    if (data.mesh)
+    {
+      csBox3 b (node_bbox.Min ()-data.seg.Start (),
+    	        node_bbox.Max ()-data.seg.Start ());
+      if (b.SquaredOriginDist () > data.sqdist) return false;
+    }
+
+    // In the first part of this test we are going to test if the
+    // start-end vector intersects with the node. If not then we don't
+    // need to continue.
+    csVector3 box_isect;
+    if (csIntersect3::BoxSegment (node_bbox, data.seg, box_isect) == -1)
+    {
+      return false;
+    }
     return true;
   }
 };
@@ -1109,7 +1108,7 @@ struct InnerNodeIntersectSegment
 struct LeafNodeIntersectSegment
 {
   IntersectSegment_Front2BackData data;
-  bool operator() (const AABBTree<csFrustVisObjectWrapper>::Node* n)
+  bool operator() (AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* n)
   {
     return true;
   }

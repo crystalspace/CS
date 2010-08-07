@@ -39,6 +39,7 @@
 #include "iengine/mesh.h"
 #include "chcpp.h"
 #include "aabbtree.h"
+#include <map>
 
 enum NodeVisibility
 {
@@ -59,6 +60,7 @@ struct FrustTest_Front2BackData
   iRenderView* rview;
   csPlane3* frustum;
   csBox3 global_bbox;
+  uint32 current_timestamp;
   // this is the callback to call when we discover a visible node
   iVisibilityCullerListener* viscallback;
 };
@@ -230,6 +232,7 @@ public:
 
   // Bounding box used to insert the object into the AABB tree
   csBox3 bbox;
+  iGraphics3D *g3d;
 
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
@@ -246,6 +249,137 @@ public:
   virtual void MovableChanged (iMovable* movable);
   /// The movable is about to be destroyed.
   virtual void MovableDestroyed (iMovable*) { }
+
+};
+
+class NodeData
+{
+  csVector3 vertices[25];
+  csVector4 colors[25];
+public:
+  NodeData()
+  {
+    srmSimpRendMesh.vertices=vertices;
+    srmSimpRendMesh.colors=colors;
+    OCQueryID=0;
+    g3d=0;
+  }
+  
+  iGraphics3D* g3d;
+  unsigned int OCQueryID;
+  csSimpleRenderMesh srmSimpRendMesh;
+  std::map<iCamera*,uint32> mapCameraTimestamp;
+  std::map<iCamera*,bool> mapCameraVisibility;
+
+  uint32 GetCameraTimestamp(iCamera* cam) const
+  {
+    return mapCameraTimestamp.find(cam)->second;
+  }
+
+  bool GetVisibilityForCamera(iCamera* cam) const
+  {
+    return mapCameraVisibility.find(cam)->second;
+  }
+
+  unsigned int GetQueryID() const
+  {
+     return OCQueryID;
+  }
+
+  iGraphics3D* GetGraphics3D() const
+  {
+    return g3d;
+  }
+
+  void SetCameraTimestamp(iCamera* cam, const uint32 timestamp)
+  {
+    mapCameraTimestamp[cam]=timestamp;
+  }
+
+  void SetVisibilityForCamera(iCamera* cam, bool bVisibility)
+  {
+    mapCameraVisibility[cam]=bVisibility;
+  }
+
+  void SetQueryID(unsigned int ocq)
+  {
+    OCQueryID=ocq;
+  }
+
+  void LeafAddObject (csFrustVisObjectWrapper* data)
+  {
+    if(!g3d)
+    {
+      g3d=data->g3d;
+      g3d->OQInitQueries(&OCQueryID,1);
+    }
+  }
+  void LeafUpdateObjects (csFrustVisObjectWrapper**, uint)
+  {
+  }
+  void NodeUpdate (const NodeData& child1, 
+                   const NodeData& child2,
+                   const csBox3& box)
+  {
+    vertices[0]=csVector3(box.MinX(),box.MinY(),box.MaxZ());
+    vertices[1]=csVector3(box.MaxX(),box.MinY(),box.MaxZ());
+    vertices[2]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
+    vertices[3]=csVector3(box.MinX(),box.MaxY(),box.MaxZ());
+
+    vertices[4]=csVector3(box.MaxX(),box.MinY(),box.MinZ());
+    vertices[5]=csVector3(box.MinX(),box.MinY(),box.MinZ());
+    vertices[6]=csVector3(box.MinX(),box.MaxY(),box.MinZ());
+    vertices[7]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
+
+    vertices[8]=csVector3(box.MinX(),box.MinY(),box.MinZ());
+    vertices[9]=csVector3(box.MinX(),box.MinY(),box.MaxZ());
+    vertices[10]=csVector3(box.MinX(),box.MaxY(),box.MaxZ());
+    vertices[11]=csVector3(box.MinX(),box.MaxY(),box.MinZ());
+
+    vertices[12]=csVector3(box.MaxX(),box.MinY(),box.MaxZ());
+    vertices[13]=csVector3(box.MaxX(),box.MinY(),box.MinZ());
+    vertices[14]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
+    vertices[15]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
+
+    vertices[16]=csVector3(box.MinX(),box.MaxY(),box.MinZ());
+    vertices[17]=csVector3(box.MinX(),box.MaxY(),box.MaxZ());
+    vertices[18]=csVector3(box.MaxX(),box.MaxY(),box.MaxZ());
+    vertices[19]=csVector3(box.MaxX(),box.MaxY(),box.MinZ());
+
+    vertices[20]=csVector3(box.MaxX(),box.MinY(),box.MinZ());
+    vertices[21]=csVector3(box.MaxX(),box.MinY(),box.MaxZ());
+    vertices[22]=csVector3(box.MinX(),box.MinY(),box.MaxZ());
+    vertices[23]=csVector3(box.MinX(),box.MinY(),box.MinZ());
+
+    colors[0]=csVector4(1.0f,1.0f,1.0f);
+    for(int i=1;i<24; ++i)
+    {
+      colors[i]=colors[0];
+    }
+
+    srmSimpRendMesh.vertices=vertices;
+    srmSimpRendMesh.colors=colors;
+    srmSimpRendMesh.vertexCount=24;
+
+    srmSimpRendMesh.meshtype = CS_MESHTYPE_QUADS;
+    csAlphaMode alf;
+    alf.alphaType = alf.alphaSmooth;
+    alf.autoAlphaMode = false;
+    srmSimpRendMesh.alphaType = alf;
+    srmSimpRendMesh.z_buf_mode=CS_ZBUF_MESH;
+
+    /*csPrintf("Updated aabb (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
+          box.MinX(),box.MinY(),box.MinZ(),
+          box.MaxX(),box.MaxY(),box.MaxZ());*/
+  }
+
+  ~NodeData()
+  {
+    if(g3d && OCQueryID)
+    {
+      g3d->OQDelQueries(&OCQueryID,1);
+    }
+  }
 };
 
 /**
@@ -290,9 +424,8 @@ private:
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
-  AABBTree<csFrustVisObjectWrapper> aabbTree;
-
-  iGraphics3D* g3d;
+  csRef<iGraphics3D> g3d;
+  AABBTree<csFrustVisObjectWrapper,1,NodeData > aabbTree;
 
   CHCList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
   CHCList<NodeTraverseData> I_Queue; // I queue (invisible queue)
@@ -302,13 +435,8 @@ private:
   // Frustum data (front to back)
   FrustTest_Front2BackData f2bData;
 
-  bool WasVisible(const NodeTraverseData &ntdNode,const int cur_timestamp) const;
-  void QueryPreviouslyInvisibleNode(NodeTraverseData &ntdNode);
   void PullUpVisibility(const NodeTraverseData &ntdNode);
   void TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp);
-
-  void RenderQuery(NodeTraverseData &ntdNode,bool bUseBB);
-  unsigned int IssueSingleQuery(NodeTraverseData &ntdNode,bool bUseBB);
 
   /**
    *  Gets the first finished query from the query list.
@@ -336,6 +464,11 @@ public:
   // Add an object to the update queue. That way it will be updated
   // in the kdtree later when needed.
   void AddObjectToUpdateQueue (csFrustVisObjectWrapper* visobj_wrap);
+
+  virtual iGraphics3D* GetGraphics3D() const
+  {
+    return g3d;
+  }
 
   // Update one object in FrustVis. This is called whenever the movable
   //   or object model changes.
