@@ -97,9 +97,10 @@ void LodView::UpdateLODLevel()
     csRef<iGeneralMeshSubMesh> submesh = fstate->GetSubMesh(submesh_index);
     if (submesh)
     {
-      int num_sw = submesh->GetSlidingWindowSize();
+      csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
+      int num_sw = fsm->GetSlidingWindowSize();
       int s, e;
-      submesh->GetSlidingWindow((lod_level > num_sw-1) ? num_sw-1 : lod_level, s, e);
+      fsm->GetSlidingWindow((lod_level > num_sw-1) ? num_sw-1 : lod_level, s, e);
       tris += (e - s) / 3;
     }
   }

@@ -213,10 +213,11 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     submesh->SetIndices(rbindices_new);
     delete[] data;
     
-    submesh->ClearSlidingWindows();
+    csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
+    fsm->ClearSlidingWindows();
     for (int i = 0; i < lodgen.GetSlidingWindowCount(); i++)
     {
-      submesh->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
+      fsm->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
     }
   }
   

@@ -205,9 +205,10 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
   {
     svc->AddVariable (shadervars[i]);
   }
+  csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
   for (size_t i = 0; i < sliding_windows.GetSize(); i++)
   {
-    submesh->AddSlidingWindow(sliding_windows[i].start, sliding_windows[i].end);
+    fsm->AddSlidingWindow(sliding_windows[i].start, sliding_windows[i].end);
   }
   return true;
 }
@@ -872,12 +873,13 @@ void csGeneralFactorySaver::WriteSubMeshLOD(iGeneralMeshSubMesh* submesh, iDocum
   node_lod->SetValue("lod");
   csRef<iDocumentNode> node_sw = node_lod->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   node_sw->SetValue("sliding_windows");
-  for (int i = 0; i < submesh->GetSlidingWindowSize(); i++)
+  csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
+  for (int i = 0; i < fsm->GetSlidingWindowSize(); i++)
   {
     csRef<iDocumentNode> node_e = node_sw->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node_e->SetValue("e");
     int start_index, end_index;
-    submesh->GetSlidingWindow(i, start_index, end_index);
+    fsm->GetSlidingWindow(i, start_index, end_index);
     node_e->SetAttributeAsInt("c0", start_index);
     node_e->SetAttributeAsInt("c1", end_index);
   }
@@ -940,7 +942,8 @@ void csGeneralFactorySaver::WriteSubMesh (iGeneralMeshSubMesh* submesh,
   synldr->WriteRenderBuffer (indexBufferNode, 
     submesh->GetIndices());
   
-  if (submesh->GetSlidingWindowSize() > 0)
+  csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
+  if (fsm->GetSlidingWindowSize() > 0)
     WriteSubMeshLOD(submesh, submeshNode);
 
   csRef<iShaderVariableContext> svc = 

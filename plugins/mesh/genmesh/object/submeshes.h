@@ -43,8 +43,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
   class csGenmeshMeshObject;
 
   class SubMesh : 
-    public scfImplementation2<SubMesh, 
-                              iGeneralMeshSubMesh, 
+    public scfImplementation3<SubMesh,
+                              iGeneralMeshSubMesh,
+                              iGeneralFactorySubMesh,
                               scfFakeInterface<iShaderVariableContext> >,
     public CS::ShaderVariableContextImpl
   {
@@ -164,15 +165,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       out_start_index = sliding_windows[index].start_index;
       out_end_index = sliding_windows[index].end_index;
     }
-    
-    virtual void ForceProgLODLevel(int)
-    {
-    }
-    
-    virtual int GetForcedProgLODLevel()
-    {
-      return -1;
-    }
   };
 
   class SubMeshesContainer
@@ -216,8 +208,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
    * local override values.
    */
   class SubMeshProxy : 
-    public scfImplementation2<SubMeshProxy, 
-                              iGeneralMeshSubMesh, 
+    public scfImplementation3<SubMeshProxy,
+                              iGeneralMeshSubMesh,
+                              iGeneralFactorySubMeshObject,
                               scfFakeInterface<iShaderVariableContext> >,
     public CS::ShaderVariableContextImpl
   {
