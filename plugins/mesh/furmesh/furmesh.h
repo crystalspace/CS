@@ -46,6 +46,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     virtual csPtr<iMeshObject> NewInstance ();
     virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
+  
+    /// geometry access
+    virtual void SetVertexCount (uint n);
+    virtual void SetTriangleCount (uint n);
+  
+    virtual uint GetVertexCount();
+    virtual uint GetIndexCount();
+
+    virtual iRenderBuffer* GetIndices ();
+    virtual bool SetIndices (iRenderBuffer* renderBuffer);
+    virtual iRenderBuffer* GetVertices ();
+    virtual bool SetVertices (iRenderBuffer* renderBuffer);
+    virtual iRenderBuffer* GetTexCoords ();
+    virtual bool SetTexCoords (iRenderBuffer* renderBuffer);
+    virtual iRenderBuffer* GetNormals ();
+    virtual bool SetNormals (iRenderBuffer* renderBuffer);
+    virtual iRenderBuffer* GetTangents ();
+    virtual bool SetTangents (iRenderBuffer* renderBuffer);
+    virtual iRenderBuffer* GetBinormals ();
+    virtual bool SetBinormals (iRenderBuffer* renderBuffer);
+
+  protected:
+    uint indexCount;
+    uint vertexCount;
+    csRef<iRenderBuffer> indexBuffer;
+    csRef<iRenderBuffer> vertexBuffer;
+    csRef<iRenderBuffer> texcoordBuffer;
+    csRef<iRenderBuffer> normalBuffer;
+    csRef<iRenderBuffer> tangentBuffer;
+    csRef<iRenderBuffer> binormalBuffer;
   };
 
   class FurMeshType : public 
@@ -106,24 +136,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   class FurMesh : public scfImplementationExt1<FurMesh, csMeshObject, iFurMesh>
   {
-    friend class FurAnimationControl;
-
   public:
     CS_LEAKGUARD_DECLARE(FurMesh);
-    FurMesh (iObjectRegistry* object_reg);
+    FurMesh (iEngine* engine, iObjectRegistry* object_reg, 
+      iMeshObjectFactory* object_factory);
     virtual ~FurMesh ();
 
-    virtual iMeshObjectFactory* GetFactory () const {return 0;}
-    virtual CS::Graphics::RenderMesh** GetRenderMeshes (
-      int& num, iRenderView* rview, iMovable* movable,
-      uint32 frustum_mask) {return 0;}
-
-    virtual bool HitBeamOutline (const csVector3& start,
-      const csVector3& end, csVector3& isect, float* pr) {return false;}
+    // From iMeshObject
+    virtual iMeshObjectFactory* GetFactory () const;
 
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
       csVector3& isect, float* pr, int* polygon_idx,
-      iMaterialWrapper** material, iMaterialArray* materials) {return false;}
+      iMaterialWrapper** material, iMaterialArray* materials);
+
+    virtual void NextFrame (csTicks current_time,const csVector3& pos,
+      uint currentFrame);
+    
+    virtual bool SetMaterialWrapper (iMaterialWrapper* );
+
+    virtual iMaterialWrapper* GetMaterialWrapper () const;
+
+    virtual void UpdateObjectBoundingBox();
+
+    virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& num, iRenderView*, 
+      iMovable*, uint32);
+
+    /// From iRenderBufferAccessor
+    virtual void PreGetBuffer(csRenderBufferHolder* holder, 
+      csRenderBufferName buffer);
 
     // From iFurMesh
     virtual void GenerateGeometry (iView* view, iSector *room);
@@ -146,12 +186,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Get HairStrandGenerator
     virtual iFurStrandGenerator* GetFurStrandGenerator( );
 
-  protected:
-    FurMeshType* manager;
-    csString name;
-
   private:
+    csRef<iMaterialWrapper> materialWrapper;
+    csDirtyAccessArray<csRenderMesh*> renderMeshes;
     iObjectRegistry* object_reg;
+    iMeshObjectFactory* object_factory;
+    csRef<iFurMeshFactory> factory;
+    /// Model
+    iEngine* engine;
+    csRef<iLoader> loader;
     /// Fur geometry
     csRef<iGeneralFactoryState> factoryState;
     csRef<iView> view;
@@ -184,9 +227,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float controlPointsDistance;
     float positionDeviation;
     int growTangents;
-    /// Model
-    csRef<iEngine> engine;
-    csRef<iLoader> loader;
     /// functions
     void SetRigidBody (iRigidBody* rigidBody);
     void GenerateGuideHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
@@ -206,37 +246,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     void SetStrandWidth();
     void SetColor(csColor color);
     void SetDisplaceDistance();
-  };
-
-  class FurAnimationControl : public scfImplementation1 
-    <FurAnimationControl, iGenMeshAnimationControl>
-  {
-  public:
-    CS_LEAKGUARD_DECLARE(FurAnimationControl);
-
-    FurAnimationControl (FurMesh* furMesh);
-    virtual ~FurAnimationControl ();
-
-    //-- iGenMeshAnimationControl
-    virtual bool AnimatesColors () const;
-    virtual bool AnimatesNormals () const;
-    virtual bool AnimatesTexels () const;
-    virtual bool AnimatesVertices () const;
-    virtual void Update (csTicks current, int num_verts, uint32 version_id);
-    virtual const csColor4* UpdateColors (csTicks current, const csColor4* colors,
-      int num_colors, uint32 version_id);
-    virtual const csVector3* UpdateNormals (csTicks current, const csVector3* normals,
-      int num_normals, uint32 version_id);
-    virtual const csVector2* UpdateTexels (csTicks current, const csVector2* texels,
-      int num_texels, uint32 version_id);
-    virtual const csVector3* UpdateVertices (csTicks current, const csVector3* verts,
-      int num_verts, uint32 version_id);
-
-  private:
-    csWeakRef<iMeshObject> mesh;
-    csTicks lastTicks;
-    FurMesh* furMesh;
-    // functions
+    /// update
+    void Update();
     void UpdateGuideHairs();
     void UpdateControlPoints(csVector3 *controlPoints, size_t controlPointsCount, 
       csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT]);

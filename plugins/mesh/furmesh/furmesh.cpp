@@ -33,7 +33,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   CS_LEAKGUARD_IMPLEMENT(FurMeshFactory);
 
   FurMeshFactory::FurMeshFactory (iEngine *e, iObjectRegistry* reg, iMeshObjectType* type)
-    : scfImplementationType(this, e, reg, type)
+    : scfImplementationType(this, e, reg, type), indexCount(0), vertexCount(0), 
+    indexBuffer(0), vertexBuffer(0), texcoordBuffer(0), tangentBuffer(0), binormalBuffer(0)
   {
   }
 
@@ -43,7 +44,132 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   csPtr<iMeshObject> FurMeshFactory::NewInstance ()
   {
-    return new FurMesh(object_reg);
+    csRef<iMeshObject> ref;
+    ref.AttachNew (new FurMesh(Engine, object_reg, this));
+    return csPtr<iMeshObject> (ref);
+  }
+
+  /// geometry access
+  void FurMeshFactory::SetVertexCount (uint n)
+  {
+    vertexCount = n;
+
+    vertexBuffer = csRenderBuffer::CreateRenderBuffer (n, 
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+
+    texcoordBuffer = csRenderBuffer::CreateRenderBuffer (n, 
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
+
+    normalBuffer = csRenderBuffer::CreateRenderBuffer (n, 
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+
+    binormalBuffer = csRenderBuffer::CreateRenderBuffer (n, 
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+
+    tangentBuffer = csRenderBuffer::CreateRenderBuffer (n, 
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+  }
+
+  void FurMeshFactory::SetTriangleCount (uint n)
+  {
+    indexCount = n;
+
+    indexBuffer = csRenderBuffer::CreateIndexRenderBuffer (3 * n, 
+      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, vertexCount - 1);
+  }
+
+  uint FurMeshFactory::GetVertexCount()
+  {
+    return vertexCount;
+  }
+
+  uint FurMeshFactory::GetIndexCount()
+  {
+    return indexCount;
+  }
+
+  iRenderBuffer* FurMeshFactory::GetIndices ()
+  {
+    return indexBuffer;
+  }
+
+  bool FurMeshFactory::SetIndices (iRenderBuffer* renderBuffer)
+  {
+    indexBuffer = renderBuffer;
+    indexCount = (uint)indexBuffer->GetElementCount ();
+    return true;
+  }
+
+  iRenderBuffer* FurMeshFactory::GetVertices ()
+  {
+    return vertexBuffer;
+  }
+
+  bool FurMeshFactory::SetVertices (iRenderBuffer* renderBuffer)
+  {
+    if (renderBuffer->GetComponentCount () < 3)
+      return false;
+
+    vertexBuffer = renderBuffer;
+    vertexCount = (uint)vertexBuffer->GetElementCount ();
+
+    return true;
+  }
+
+  iRenderBuffer* FurMeshFactory::GetTexCoords ()
+  {
+    return texcoordBuffer;
+  }
+
+  bool FurMeshFactory::SetTexCoords (iRenderBuffer* renderBuffer)
+  {
+    if (renderBuffer->GetElementCount () < vertexCount)
+      return false;
+
+    texcoordBuffer = renderBuffer;    
+    return true;
+  }
+
+  iRenderBuffer* FurMeshFactory::GetNormals ()
+  {
+    return normalBuffer;
+  }
+
+  bool FurMeshFactory::SetNormals (iRenderBuffer* renderBuffer)
+  {
+    if (renderBuffer->GetElementCount () < vertexCount)
+      return false;
+
+    normalBuffer = renderBuffer;    
+    return true;
+  }
+
+  iRenderBuffer* FurMeshFactory::GetTangents ()
+  {
+    return tangentBuffer;
+  }
+
+  bool FurMeshFactory::SetTangents (iRenderBuffer* renderBuffer)
+  {
+    if (renderBuffer->GetElementCount () < vertexCount)
+      return false;
+
+    tangentBuffer = renderBuffer;    
+    return true;
+  }
+
+  iRenderBuffer* FurMeshFactory::GetBinormals ()
+  {
+    return binormalBuffer;
+  }
+
+  bool FurMeshFactory::SetBinormals (iRenderBuffer* renderBuffer)
+  { 
+    if (renderBuffer->GetElementCount () < vertexCount)
+      return false;
+
+    binormalBuffer = renderBuffer;    
+    return true;
   }
 
   /********************
@@ -75,7 +201,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   csPtr<iMeshObjectFactory> FurMeshType::NewFactory ()
   {
-    return new FurMeshFactory(Engine, object_reg, this);
+    csRef<iMeshObjectFactory> ref;
+    ref.AttachNew (new FurMeshFactory(Engine, object_reg, this));
+    return csPtr<iMeshObjectFactory> (ref);
   }
 
   /********************
@@ -84,10 +212,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   CS_LEAKGUARD_IMPLEMENT(FurMesh);
 
-  FurMesh::FurMesh (iObjectRegistry* object_reg) :
-  scfImplementationType (this, (iEngine*) 0), object_reg(object_reg), 
-    physicsControl(0), hairStrandGenerator(0), rng(0), guideLOD(0), strandLOD(0), 
-    hairStrandsLODSize(0), physicsControlEnabled(true), growTangents(0)
+  FurMesh::FurMesh (iEngine* engine, iObjectRegistry* object_reg, 
+    iMeshObjectFactory* object_factory) : scfImplementationType (this, engine), 
+    materialWrapper(0), object_reg(object_reg), object_factory(object_factory), 
+    engine(engine), physicsControl(0), hairStrandGenerator(0), rng(0), guideLOD(0), 
+    strandLOD(0), hairStrandsLODSize(0), physicsControlEnabled(true), growTangents(0),
+    positionShift(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -95,19 +225,173 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if (!svStrings) 
       printf ("No SV names string set!");
 
-    engine = csQueryRegistry<iEngine> (object_reg);
     if (!engine) printf ("Failed to locate 3D engine!");
 
     loader = csQueryRegistry<iLoader> (object_reg);
     if (!loader) printf ("Failed to locate Loader!");
 
     rng = new csRandomGen(csGetTicks());
+
+    factory = scfQueryInterface<iFurMeshFactory>(object_factory);
   }
 
   FurMesh::~FurMesh ()
   {
     delete rng;
-    delete positionShift;
+    if (positionShift)
+      delete positionShift;
+  }
+
+  iMeshObjectFactory* FurMesh::GetFactory () const
+  {
+    return object_factory;
+  }
+
+  bool FurMesh::HitBeamObject (const csVector3& start, const csVector3& end,
+    csVector3& isect, float* pr, int* polygon_idx,
+    iMaterialWrapper** material, iMaterialArray* materials)
+  {
+    return csIntersect3::BoxSegment (GetObjectBoundingBox(), csSegment3 (start, end),
+      isect, pr) != 0;
+  }
+
+  void FurMesh::NextFrame (csTicks current_time, const csVector3& pos,
+    uint currentFrame)
+  {
+    Update();
+    UpdateObjectBoundingBox();
+  }
+
+  bool FurMesh::SetMaterialWrapper (iMaterialWrapper* mat)
+  {
+    materialWrapper = mat;
+    return true;
+  }
+
+  iMaterialWrapper* FurMesh::GetMaterialWrapper () const
+  {
+    return materialWrapper;
+  }
+
+  void FurMesh::UpdateObjectBoundingBox ()
+  {
+    boundingbox.StartBoundingBox();
+    
+    csVector3* vertex_buffer = (csVector3*)factory->GetVertices()->Lock (CS_BUF_LOCK_READ);
+
+    for (size_t i = 0 ; i < factory->GetVertexCount(); i ++)
+      boundingbox.AddBoundingVertex(vertex_buffer[i]);
+
+    factory->GetVertices()->Release();
+  }
+
+  CS::Graphics::RenderMesh** FurMesh::GetRenderMeshes (int& num, 
+    iRenderView* rview, iMovable* movable, uint32 frustum_mask)
+  {
+    renderMeshes.Empty();
+
+    // Boiler-plate stuff...
+    iCamera* camera = rview->GetCamera ();
+
+    int clip_portal, clip_plane, clip_z_plane;
+    CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
+
+    const csReversibleTransform o2wt = movable->GetFullTransform ();
+
+    if (!materialWrapper)
+    {
+      csPrintf ("INTERNAL ERROR: mesh used without material!\n");
+      num = 0;
+      return 0;
+    }
+
+    if (materialWrapper->IsVisitRequired ()) 
+      materialWrapper->Visit ();
+
+    csRenderMesh *meshPtr = new csRenderMesh;
+
+    // Setup the render mesh
+    meshPtr->clip_portal = clip_portal;
+    meshPtr->clip_plane = clip_plane;
+    meshPtr->clip_z_plane = clip_z_plane;
+    meshPtr->do_mirror = camera->IsMirrored ();
+    meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+    meshPtr->indexstart = 0;
+    meshPtr->indexend = (unsigned int)factory->GetIndices()->GetElementCount ();
+    meshPtr->material = materialWrapper;
+
+    meshPtr->mixmode = 0; //  mixmode
+
+    csRef<csRenderBufferHolder> bufferholder;
+    bufferholder.AttachNew (new csRenderBufferHolder);
+    bufferholder->SetRenderBuffer (CS_BUFFER_INDEX, factory->GetIndices());
+    bufferholder->SetRenderBuffer (CS_BUFFER_POSITION, factory->GetVertices());
+    bufferholder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->GetTexCoords());
+    bufferholder->SetRenderBuffer (CS_BUFFER_NORMAL, factory->GetNormals());
+    bufferholder->SetRenderBuffer (CS_BUFFER_BINORMAL, factory->GetBinormals());
+    bufferholder->SetRenderBuffer (CS_BUFFER_TANGENT, factory->GetTangents());
+
+    meshPtr->buffers = bufferholder;
+    meshPtr->renderPrio = 7; // renderpriority
+    meshPtr->z_buf_mode = CS_ZBUF_USE; // zbufMode;
+
+    meshPtr->object2world = o2wt;
+    meshPtr->bbox = GetObjectBoundingBox();
+    meshPtr->geometryInstance = factory;
+
+    csRef<csShaderVariableContext> svContext;
+    svContext.AttachNew (new csShaderVariableContext);
+    csShaderVariable* sv;
+
+    // Get the SV names
+    sv = svContext->GetVariableAdd (svStrings->Request ("position"));
+    sv->SetValue (factory->GetVertices());
+
+    sv = svContext->GetVariableAdd (svStrings->Request ("normal"));
+    sv->SetValue (factory->GetNormals());
+
+    sv = svContext->GetVariableAdd (svStrings->Request ("texture coordinate 0"));
+    sv->SetValue (factory->GetTexCoords());
+
+    sv = svContext->GetVariableAdd (svStrings->Request ("tangent"));
+    sv->SetValue (factory->GetTangents());
+
+    sv = svContext->GetVariableAdd (svStrings->Request ("binormal"));
+    sv->SetValue (factory->GetBinormals());
+
+    meshPtr->variablecontext = svContext;
+
+    renderMeshes.Push (meshPtr);    
+
+    num = (int)renderMeshes.GetSize ();
+    return renderMeshes.GetArray ();
+  }
+
+  void FurMesh::PreGetBuffer(csRenderBufferHolder* holder, 
+    csRenderBufferName buffer)
+  {
+    csPrintf("test");
+    switch (buffer)
+    {
+      // Vertices render buffer
+      case CS_BUFFER_POSITION:
+        holder->SetRenderBuffer (CS_BUFFER_POSITION, factory->GetIndices());
+        return;
+      case CS_BUFFER_NORMAL:
+        holder->SetRenderBuffer (CS_BUFFER_NORMAL, factory->GetNormals());
+        return;
+      case CS_BUFFER_TANGENT:
+        holder->SetRenderBuffer (CS_BUFFER_TANGENT, factory->GetTangents());
+        return;
+      case CS_BUFFER_BINORMAL:
+        holder->SetRenderBuffer (CS_BUFFER_BINORMAL, factory->GetBinormals());
+        return;
+      case CS_BUFFER_TEXCOORD0:
+        holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->GetTexCoords());
+        return;
+      default: return;
+    }
   }
 
   void FurMesh::GenerateGeometry (iView* view, iSector *room)
@@ -136,22 +420,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     for ( size_t i = 0 ; i < numberOfStrains ; i ++ )
       controlPointsCount += hairStrands.Get(i).controlPointsCount;
 
-    csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
-    if (!engine) csApplicationFramework::ReportError("Failed to locate iEngine plugin!");
-
     // First create the factory:
-    csRef<iMeshFactoryWrapper> factory = engine->CreateMeshFactory (
-      "crystalspace.mesh.object.genmesh", "hairFactory");
+    factory->SetVertexCount ( 2 * controlPointsCount );
+    factory->SetTriangleCount( 2 * ( controlPointsCount - numberOfStrains ) );
 
-    factoryState = scfQueryInterface<iGeneralFactoryState> (
-      factory->GetMeshObjectFactory ());
-
-    factoryState -> SetVertexCount ( 2 * controlPointsCount );
-    factoryState -> SetTriangleCount ( 2 * ( controlPointsCount - numberOfStrains ) );
-
-    csVector3 *vbuf = factoryState->GetVertices (); 
-    csVector2 *uv = factoryState->GetTexels();
-    csTriangle *ibuf = factoryState->GetTriangles ();
+    csVector3* vbuf = (csVector3*)factory->GetVertices()->Lock (CS_BUF_LOCK_NORMAL);
+    csVector2* uv = (csVector2*)factory->GetTexCoords()->Lock (CS_BUF_LOCK_NORMAL);
+    csTriangle* ibuf = (csTriangle*)factory->GetIndices()->Lock (CS_BUF_LOCK_NORMAL);
 
     for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
       controlPointSum += hairStrands.Get(x).controlPointsCount, x++ )
@@ -199,12 +474,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       }
     }
 
-    factoryState -> CalculateNormals();
-    factoryState -> Invalidate();
+    factory->GetVertices()->Release();
+    factory->GetTexCoords()->Release();
+    factory->GetIndices()->Release();
 
     // generate color deviation and UV 
-    iRenderBuffer *binormals = factoryState->GetRenderBuffer(CS_BUFFER_BINORMAL);
-    csRenderBufferLock<csVector3> bin (binormals, CS_BUF_LOCK_NORMAL);
+    csVector3* bin = (csVector3*) factory->GetBinormals()->Lock(CS_BUF_LOCK_NORMAL);
 
     for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
       controlPointSum += hairStrands.Get(x).controlPointsCount, x++ )
@@ -224,6 +499,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       }
     }
 
+    factory->GetBinormals()->Release();
+
     // geneate position deviation
     positionShift = new csVector3 [ controlPointsCount ];
 
@@ -231,12 +508,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       positionShift[i] = csVector3(rng->Get() * 2 - 1, rng->Get() * 2 - 1, 
         rng->Get() * 2 - 1) * positionDeviation;
 
-    // Make a ball using the genmesh plug-in.
-    csRef<iMeshWrapper> meshWrapper =
-      engine->CreateMeshWrapper (factory, "hair", room, csVector3 (0, 0, 0));
-
-    meshWrapper->SetFlagsRecursive(CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
-
+    // Default material
     csRef<iMaterialWrapper> materialWrapper = 
       CS::Material::MaterialBuilder::CreateColorMaterial
       (object_reg,"hairDummyMaterial",csColor(1,0,0));
@@ -244,14 +516,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if (hairStrandGenerator && hairStrandGenerator->GetMaterial())
       materialWrapper->SetMaterial(hairStrandGenerator->GetMaterial());
 
-    meshWrapper -> GetMeshObject() -> SetMaterialWrapper(materialWrapper);
+    GetMeshWrapper()->SetFlagsRecursive(CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
+    SetMaterialWrapper(materialWrapper);
 
-    csRef<iGeneralMeshState> meshState =
-      scfQueryInterface<iGeneralMeshState> (meshWrapper->GetMeshObject ());
-
-    csRef<FurAnimationControl> animationControl;
-    animationControl.AttachNew(new FurAnimationControl(this));
-    meshState -> SetAnimationControl(animationControl);
   }
 
   void FurMesh::GenerateGuideHairs(iRenderBuffer* indices, 
@@ -266,6 +533,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csVector3 *tangentsArray = new csVector3[positions.GetSize()];
     csVector3 *binormalArray = new csVector3[positions.GetSize()];
     
+    // TODO use getelementcount
     csTriangle *triangles = new csTriangle[indices->GetSize() / sizeof(csTriangle)];
     csVector3 *vertices = new csVector3[positions.GetSize()];
     csVector3 *normals = new csVector3[positions.GetSize()];
@@ -969,116 +1237,78 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     material->GetVariableAdd(controlPointsDistanceName)->GetValue(controlPointsDistance);
   }
 
-  /********************
-  *  FurAnimationControl
-  ********************/
-
-  CS_LEAKGUARD_IMPLEMENT(FurAnimationControl);
-
-  FurAnimationControl::FurAnimationControl (FurMesh* furMesh)
-    : scfImplementationType (this), lastTicks (0), furMesh(furMesh)
-  {
-  }
-
-  FurAnimationControl::~FurAnimationControl ()
-  {
-  }  
-
-  bool FurAnimationControl::AnimatesColors () const
-  {
-    return false;
-  }
-
-  bool FurAnimationControl::AnimatesNormals () const
-  {
-    return false;
-  }
-
-  bool FurAnimationControl::AnimatesTexels () const
-  {
-    return false;
-  }
-
-  bool FurAnimationControl::AnimatesVertices () const
-  {
-    return true;
-  }
-
-  void FurAnimationControl::UpdateGuideHairs()
+  void FurMesh::UpdateGuideHairs()
   {
     // update guide ropes
-    for (size_t i = 0 ; i < furMesh->guideHairs.GetSize(); i ++)
-      furMesh->physicsControl->AnimateStrand(i,
-        furMesh->guideHairs.Get(i).controlPoints,
-        furMesh->guideHairs.Get(i).controlPointsCount);
+    for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
+      physicsControl->AnimateStrand(i,  guideHairs.Get(i).controlPoints,
+        guideHairs.Get(i).controlPointsCount);
 
     // update guide ropes LOD
-    for (size_t i = 0 ; i < furMesh->guideHairsLOD.GetSize(); i ++)
-      if ( furMesh->guideHairsLOD.Get(i).isActive )
-        furMesh->physicsControl->AnimateStrand(i + furMesh->guideHairs.GetSize(),
-          furMesh->guideHairsLOD.Get(i).controlPoints,
-          furMesh->guideHairsLOD.Get(i).controlPointsCount);        
+    for (size_t i = 0 ; i < guideHairsLOD.GetSize(); i ++)
+      if ( guideHairsLOD.Get(i).isActive )
+        physicsControl->AnimateStrand(i + guideHairs.GetSize(),
+          guideHairsLOD.Get(i).controlPoints, guideHairsLOD.Get(i).controlPointsCount);        
       else
-        UpdateControlPoints(furMesh->guideHairsLOD.Get(i).controlPoints,
-          furMesh->guideHairsLOD.Get(i).controlPointsCount,
-          furMesh->guideHairsLOD.Get(i).guideHairs);      
+        UpdateControlPoints(guideHairsLOD.Get(i).controlPoints,
+          guideHairsLOD.Get(i).controlPointsCount, guideHairsLOD.Get(i).guideHairs);      
   }
 
-  void FurAnimationControl::UpdateControlPoints(csVector3 *controlPoints,
-    size_t controlPointsCount, csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT])
+  void FurMesh::UpdateControlPoints(csVector3 *controlPoints,
+    size_t controlPointsCount, csGuideHairReference guideHairReference[GUIDE_HAIRS_COUNT])
   {
     for ( size_t i = 0 ; i < controlPointsCount; i++ )
     {
       controlPoints[i] = csVector3(0);
       for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-        if ( guideHairs[j].index < furMesh->guideHairs.GetSize() )
-          controlPoints[i] += guideHairs[j].distance * 
-            (furMesh->guideHairs.Get(guideHairs[j].index).controlPoints[i]);
+        if ( guideHairReference[j].index < guideHairs.GetSize() )
+          controlPoints[i] += guideHairReference[j].distance * 
+          (guideHairs.Get(guideHairReference[j].index).controlPoints[i]);
         else
-          controlPoints[i] += guideHairs[j].distance * 
-            (furMesh->guideHairsLOD.Get(guideHairs[j].index - 
-            furMesh->guideHairs.GetSize()).controlPoints[i]);
+          controlPoints[i] += guideHairReference[j].distance * (guideHairsLOD.Get
+          (guideHairReference[j].index - guideHairs.GetSize()).controlPoints[i]);
     }
   }
 
-  void FurAnimationControl::Update (csTicks current, int num_verts, uint32 version_id)
+  void FurMesh::Update()
   {
     // update shader
-    if (furMesh->hairStrandGenerator)
-      furMesh->hairStrandGenerator->Update();
+    if (hairStrandGenerator)
+      hairStrandGenerator->Update();
 
     // first update the control points
-    if (furMesh->physicsControlEnabled)
+    if (physicsControlEnabled)
       UpdateGuideHairs();
 
-    size_t numberOfStrains = furMesh->hairStrandsLODSize;
+    size_t numberOfStrains = hairStrands.GetSize();
+
+//     csPrintf("%d %d %d\n", hairStrands.GetSize(), guideHairs.GetSize(), guideHairsLOD.GetSize());
 
     if (!numberOfStrains)
       return;
 
     // then update the hair strands
-    if (furMesh->physicsControlEnabled)
+    if (physicsControlEnabled)
       for (size_t i = 0 ; i < numberOfStrains; i ++)
       {
-        csHairStrand hairStrand = furMesh->hairStrands.Get(i);
+        csHairStrand hairStrand = hairStrands.Get(i);
 
         UpdateControlPoints(hairStrand.controlPoints,
           hairStrand.controlPointsCount, hairStrand.guideHairs);
       }
 
-    const csOrthoTransform& tc = furMesh->view -> GetCamera() ->GetTransform ();
+    const csOrthoTransform& tc = view -> GetCamera() ->GetTransform ();
 
-    csVector3 *vbuf = furMesh->factoryState->GetVertices(); 
-    csVector3 *normals = furMesh->factoryState->GetNormals(); 
-    iRenderBuffer *tangents = furMesh->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT);
-    csRenderBufferLock<csVector3> tan (tangents, CS_BUF_LOCK_NORMAL);
+    csVector3* vbuf = (csVector3*)factory->GetVertices()->Lock(CS_BUF_LOCK_NORMAL);
+    csVector3* normals = (csVector3*)factory->GetNormals()->Lock(CS_BUF_LOCK_NORMAL); 
+    csVector3* tan = (csVector3*)factory->GetTangents()->Lock(CS_BUF_LOCK_NORMAL);
 
     csVector3 normal, tangent, binormal, cameraOrigin;
     csVector3 strip, firstPoint, secondPoint;
 
     cameraOrigin = tc.GetOrigin();
     csVector3 *tangentBuffer = tan;
-    csVector3 *posShift = furMesh->positionShift;
+    csVector3 *posShift = positionShift;
 
     size_t triangleCount = 0;
 
@@ -1088,8 +1318,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       tangent = csVector3(0);
       strip = csVector3(0);
 
-      csVector3 *controlPoints = furMesh->hairStrands.Get(x).controlPoints;
-      int controlPointsCount = furMesh->hairStrands.Get(x).controlPointsCount;
+      csVector3 *controlPoints = hairStrands.Get(x).controlPoints;
+      int controlPointsCount = hairStrands.Get(x).controlPointsCount;
       triangleCount += 2 * controlPointsCount - 2;
 
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
@@ -1097,10 +1327,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       {
         firstPoint = *controlPoints + (*posShift);
         secondPoint = *(controlPoints + 1) + (*posShift);
-        
+
         csMath3::CalcNormal(binormal, firstPoint, secondPoint, cameraOrigin);
         binormal.Normalize();
-        strip = furMesh->strandWidthLOD * binormal;
+        strip = strandWidthLOD * binormal;
 
         (*vbuf) = firstPoint;
         (*(vbuf + 1)) = firstPoint + strip;
@@ -1108,7 +1338,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         tangent = firstPoint - secondPoint;
         tangent.Normalize();
         normal.Cross(tangent, binormal);
-        
+
         (*normals) = normal;
         (*(normals + 1)) = normal;
 
@@ -1134,41 +1364,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       }
     }
 
-    furMesh->factoryState->GetSubMesh(0)->SetIndexRange(0, 3 * triangleCount);
+    factory->GetVertices()->Release();
+    factory->GetNormals()->Release();
+    factory->GetTangents()->Release();
 
-//     furMesh->factoryState->CalculateNormals();
-//     furMesh->factoryState->Invalidate();
-// 
-//     furMesh->factoryState->AddRenderBuffer(CS_BUFFER_TANGENT, 
-//       furMesh->factoryState->GetRenderBuffer(CS_BUFFER_TANGENT));
-//     furMesh->factoryState->RemoveRenderBuffer(CS_BUFFER_TANGENT);
-
+//       furMesh->factoryState->GetSubMesh(0)->SetIndexRange(0, 3 * triangleCount);
   }
-
-  const csColor4* FurAnimationControl::UpdateColors (csTicks current, 
-    const csColor4* colors, int num_colors, uint32 version_id)
-  {
-    return colors;
-  }
-
-  const csVector3* FurAnimationControl::UpdateNormals (csTicks current, 
-    const csVector3* normals, int num_normals, uint32 version_id)
-  {
-    return normals;
-  }
-
-  const csVector2* FurAnimationControl::UpdateTexels (csTicks current, 
-    const csVector2* texels, int num_texels, uint32 version_id)
-  {
-    return texels;
-  }
-
-  const csVector3* FurAnimationControl::UpdateVertices (csTicks current, 
-    const csVector3* verts, int num_verts, uint32 version_id)
-  {
-    return 0;
-  }
-
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)
 

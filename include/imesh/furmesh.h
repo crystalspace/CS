@@ -67,6 +67,26 @@ struct iFurStrandGenerator : public virtual iBase
 struct iFurMeshFactory : public virtual iBase
 {
   SCF_INTERFACE (iFurMeshFactory, 1, 0, 0);
+
+  /// geometry access
+  virtual void SetVertexCount (uint n) = 0;
+  virtual void SetTriangleCount (uint n) = 0;
+
+  virtual uint GetVertexCount() = 0;
+  virtual uint GetIndexCount() = 0;
+  
+  virtual iRenderBuffer* GetIndices () = 0;
+  virtual bool SetIndices (iRenderBuffer* renderBuffer) = 0;
+  virtual iRenderBuffer* GetVertices () = 0;
+  virtual bool SetVertices (iRenderBuffer* renderBuffer) = 0;
+  virtual iRenderBuffer* GetTexCoords () = 0;
+  virtual bool SetTexCoords (iRenderBuffer* renderBuffer) = 0;
+  virtual iRenderBuffer* GetNormals () = 0;
+  virtual bool SetNormals (iRenderBuffer* renderBuffer) = 0;
+  virtual iRenderBuffer* GetTangents () = 0;
+  virtual bool SetTangents (iRenderBuffer* renderBuffer) = 0;
+  virtual iRenderBuffer* GetBinormals () = 0;
+  virtual bool SetBinormals (iRenderBuffer* renderBuffer) = 0;
 };
 
 struct iFurMeshType : public virtual iMeshObjectType
@@ -79,7 +99,7 @@ struct iFurMeshType : public virtual iMeshObjectType
 * that you use better comments than this one in a
 * real situation.
 */
-struct iFurMesh : public virtual iBase 
+struct iFurMesh : public virtual iRenderBufferAccessor  
 {
   SCF_INTERFACE (iFurMesh, 1, 0, 0);
 

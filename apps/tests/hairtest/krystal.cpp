@@ -406,7 +406,13 @@ bool KrystalScene::CreateAvatar ()
   animationPhysicsControl->SetInitialTransform(headBody->GetTransform().GetInverse());
 
   csRef<iMeshObjectFactory> imof = furMeshType->NewFactory();
-  csRef<iMeshObject> imo = imof->NewInstance();
+
+  csRef<iMeshFactoryWrapper> imfw = hairTest->engine->CreateMeshFactory(imof,"hair_factory");
+
+  csRef<iMeshWrapper> hairMesh =
+    hairTest->engine->CreateMeshWrapper (imfw, "hair_mesh_wrapper", hairTest->room, csVector3 (0.0f));
+
+  csRef<iMeshObject> imo = hairMesh->GetMeshObject();
 
   furMesh = scfQueryInterface<iFurMesh>(imo);
   furMesh->SetPhysicsControl(animationPhysicsControl);
