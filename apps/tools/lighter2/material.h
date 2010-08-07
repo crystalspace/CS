@@ -99,19 +99,22 @@ namespace lighter
 
   struct RadMaterial
   {
-    csRef<MaterialImage<csColor> > filterImage;
-	
-	  // The original texture image
-    CS::ImageAutoConvert * textureImg;
-     
-    RadMaterial() {}
     
+    // The original texture image
+    CS::ImageAutoConvert * textureImg;
+    csRef<MaterialImage<csColor> > filterImage;
+	  float refractiveIndex;
+    bool isTexImageValid;
+    bool produceCaustic;
+	   
+    RadMaterial() {refractiveIndex = 1; isTexImageValid=false; produceCaustic= false;}
     bool IsTransparent () const { return filterImage.IsValid(); }
     void ComputeFilterImage (iImage* img);
-    
     void SetTextureImage (iImage * img);
-	  
-    //Returns the color at uv coordinates in original texture
+    void SetRefractiveIndex(float refrIndex) {refractiveIndex = refrIndex;}
+    bool IsTextureValid() const {return isTexImageValid;}
+    float GetRefractiveIndex(){return refractiveIndex;}
+	  //Returns the color at uv coordinates in original texture
 	  csColor GetTextureValue(csVector2 uv) const;
 
   };

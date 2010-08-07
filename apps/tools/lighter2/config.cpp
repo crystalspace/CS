@@ -57,6 +57,8 @@ namespace lighter
     diProperties.areaLightMultiplier = 1.0f;
 		
     indtLightProperties.numPhotons = 500;
+    indtLightProperties.caustics = false;
+    indtLightProperties.numCausticPhotons = 0;
     indtLightProperties.maxRecursionDepth = 10;
     indtLightProperties.maxDensitySamples = 50;
     indtLightProperties.sampleDistance = 1.0f;
@@ -159,6 +161,10 @@ namespace lighter
 		
     indtLightProperties.numPhotons = cfgFile->GetInt("lighter2.numPhotons",
       indtLightProperties.numPhotons);
+    indtLightProperties.numCausticPhotons = cfgFile->GetInt("lighter2.numCausticPhotons",
+      indtLightProperties.numCausticPhotons);
+    indtLightProperties.caustics = cfgFile->GetBool("lighter2.caustics",
+      indtLightProperties.caustics);
     indtLightProperties.maxRecursionDepth = cfgFile->GetInt("lighter2.maxRecursionDepth",
       indtLightProperties.maxRecursionDepth);
     indtLightProperties.maxDensitySamples = cfgFile->GetInt("lighter2.maxDensitySamples",

@@ -128,6 +128,10 @@ namespace lighter
     {
       // Number of photons to emit
       int numPhotons;
+      // Number of photons for Caustic 
+      int numCausticPhotons;
+      // Enable Caustic
+      bool caustics;
       // Maximum photon recursion depth
       int maxRecursionDepth;
       // Maximum number of samples for density estimation

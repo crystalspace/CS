@@ -40,6 +40,9 @@ namespace lighter
 
     RayType type;
 
+    // Refractive index of the material the photon is currently travelling in
+    float refrIndex;
+
     lighter::Ray getRay() const
     {
       lighter::Ray asRay;
@@ -91,6 +94,14 @@ namespace lighter
     */
     void BalancePhotons(Sector *sect, Statistics::Progress& progress);
 
+    /**
+    * ParseSector
+    * Parse the sector for meshes which can produce caustics add them to a list
+    * returns whether to emit caustic photons or not
+    * /param sect - the sector to be parsed
+    */
+    bool ParseSector(Sector *sect);
+
   private:
    /**
     * Emit Photon
@@ -104,7 +115,7 @@ namespace lighter
     * /param ignoreDirect - weather or not to store direct photons (depth=0)
     */
     static void EmitPhoton(Sector* &sect, const PhotonRay &photon,
-      const size_t &maxDepth, const size_t &depth, const bool &ignoreDirect);
+      const size_t &maxDepth, const size_t &depth, const bool &ignoreDirect, bool produceCaustic );
 
     /**
      * SpotlightDir
@@ -164,7 +175,9 @@ namespace lighter
 
     // These values all come from the lighter2 global settings
     int numPhotonsPerSector;  ///< Number of photons to emit in each sector of the world
+    int numCausticPhotonsPerSector;  ///< Number of Caustic photons to emit in each sector of the world
 
+    csArray <csSphere> causticList;
     bool directLightEnabled;   ///< Should direct photons be stored (first hit after emission)
     bool indirectLightEnabled; ///< Should photons be scattered to estimate indirect lighting
 

@@ -29,6 +29,7 @@ namespace lighter
     // Cache global photon map settings
     searchRadius =         globalConfig.GetIndirectProperties() .sampleDistance;
     numPhotonsPerSector =  globalConfig.GetIndirectProperties() .numPhotons;
+    numCausticPhotonsPerSector = globalConfig.GetIndirectProperties() .numCausticPhotons;
     numSamplesForDensity = globalConfig.GetIndirectProperties() .maxDensitySamples;
 
     // Cache global final gather settings
@@ -37,11 +38,11 @@ namespace lighter
     numFinalGatherNSubdivs  = globalConfig.GetIndirectProperties() .numFinalGatherRays;
 
     // Determine which bounces should be stored
-    directLightEnabled = 
+    directLightEnabled =
       (globalConfig.GetLighterProperties ().directLightEngine ==
           LIGHT_ENGINE_PHOTONMAPPER);
 
-    indirectLightEnabled = 
+    indirectLightEnabled =
       (globalConfig.GetLighterProperties ().indirectLightEngine ==
           LIGHT_ENGINE_PHOTONMAPPER);
 
@@ -72,8 +73,8 @@ namespace lighter
     return ComputePointLightingComponent(sector, obj, pos, normal, lightSampler);
   }
 
-  csColor PhotonmapperLighting::ComputePointLightingComponent(Sector* sector, 
-        Object* obj, const csVector3& point, const csVector3& normal, 
+  csColor PhotonmapperLighting::ComputePointLightingComponent(Sector* sector,
+        Object* obj, const csVector3& point, const csVector3& normal,
         SamplerSequence<2>& lightSampler)
   {
     // Color to return
@@ -156,7 +157,7 @@ namespace lighter
       // Just lookup irradiance in the photon map (no raytracing)
       c = sector->SamplePhoton(point, normal, searchRadius);
     }
-    
+
     return c;
   }
 
@@ -181,10 +182,43 @@ namespace lighter
     }
   }
 
+  bool PhotonmapperLighting::ParseSector(Sector *sect)
+  {
+
+    bool causticSector = false;
+    
+    ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
+    while (objIt.HasNext ())
+    {
+
+      bool produceCaustic = false;
+      csRef<Object> obj = objIt.Next ();
+      csString matName = obj->materialName;
+      Scene * curScene = sect->scene;
+      lighter::RadMaterial * radMat = curScene->radMaterials[matName];
+      
+      if (radMat)
+      {
+        if (radMat->produceCaustic)
+        {
+          produceCaustic = true;
+          causticSector = true;
+        }
+      }
+      if (produceCaustic)
+      {
+        csSphere const boundingSphere = obj->GetBoundingSphere();
+        causticList.Push(boundingSphere);
+      }
+    }
+    return causticSector;
+  }
+
   void PhotonmapperLighting::EmitPhotons(Sector *sect, Statistics::Progress& progress)
   {
     progress.SetProgress(0.0f);
 
+    
     // Determine maximum allowed photon recursion
     size_t maxDepth = 0;
     if(indirectLightEnabled)
@@ -207,6 +241,21 @@ namespace lighter
       sectorLumenPower += (pow.red + pow.green + pow.blue)/3.0;
     }
 
+    
+    // Check if caustics are enabled
+    bool enableCaustics = false;
+
+    if (globalConfig.GetIndirectProperties().caustics)
+    {
+      enableCaustics = true;
+      if (!ParseSector(sect))
+      {
+        numCausticPhotonsPerSector = 0;
+        enableCaustics = false;
+      }
+    }
+
+
     for (size_t lightIdx = 0; lightIdx < allNonPDLights.GetSize(); ++lightIdx)
     {
       // Get the position, color and power for this light source
@@ -228,6 +277,13 @@ namespace lighter
       double powerScale = ((pow.red + pow.green + pow.blue)/3.0)/sectorLumenPower;
       size_t photonsForCurLight = floor(powerScale*numPhotonsPerSector + 0.5);
 
+      size_t causticPhotonsForCurLight = 0;
+      
+      if (enableCaustics)
+      {
+        causticPhotonsForCurLight = floor(powerScale*numCausticPhotonsPerSector + 0.5);
+      }
+
       // Loop to generate the requested number of photons for this light source
       bool warning = false, stop = false;
       for (size_t num = 0; num < photonsForCurLight && !stop; ++num)
@@ -235,7 +291,8 @@ namespace lighter
         // Get direction to emit the photon
         csVector3 dir;
 
-        switch (curLightType) {
+        switch (curLightType) 
+        {
 
           // directional light
           case CS_LIGHT_DIRECTIONAL:
@@ -273,38 +330,118 @@ namespace lighter
           case CS_LIGHT_POINTLIGHT:
           default:
             {
-              // Genrate a random direction vector for uniform light source sampling
+              // Generate a random direction vector for uniform light source sampling
               dir = randVect.Get();
             }
             break;
         }
 
         // Emit a single photon into the sector containing this light
-        const PhotonRay newPhoton = { pos, dir, color, power, curLight, RAY_TYPE_OTHER1 };
-        EmitPhoton(sect, newPhoton, maxDepth, 0, !directLightEnabled);
+        const PhotonRay newPhoton = { pos, dir, color, power, curLight, RAY_TYPE_OTHER1, 1.0f };
+        EmitPhoton(sect, newPhoton, maxDepth, 0, !directLightEnabled, false);
         progressState.Advance();
       }
 
-      // Scale the photons for this light
-      sect->ScalePhotons(1.0/photonsForCurLight);
+      if (enableCaustics)
+      {
+
+        // Calculate volume ratio for caustic objects
+
+        float totalVolume = 1.0;
+
+        csArray<csSphere>::Iterator itr = causticList.GetIterator();
+        for (; itr.HasNext();)
+        {
+          csSphere sphere = itr.Next();
+          float radius = 0;
+          radius = sphere.GetRadius();
+          totalVolume += radius*radius*radius;
+        }
+
+        itr = causticList.GetIterator();
+
+        for (;itr.HasNext();)
+        {
+          csSphere sphere = itr.Next();
+          float radius = 0;
+          radius = sphere.GetRadius();
+          size_t causticPhotonsForMesh = floor(causticPhotonsForCurLight*(radius*radius*radius/totalVolume) + 0.5);
+
+          // Emit caustic photons for the current light
+
+          for (size_t cnum = 0; cnum < causticPhotonsForMesh && !stop; ++cnum)
+          {
+            // Get direction to emit the photon
+            csVector3 dir;
+
+            switch (curLightType)
+            {
+
+              // directional light
+              case CS_LIGHT_DIRECTIONAL:
+                {
+                  if(!warning)
+                  {
+                    globalLighter->Report (
+                      "Directional lights are ignored for indirect light calculation");
+                    warning = true; stop = true; continue;
+                  }
+                }
+                break;
+
+              // spotlight
+              //TODO :think about how to enable spotlight
+              /*
+              case CS_LIGHT_SPOTLIGHT:
+              */
+              // Default behavior is to treat a light like a point light
+              case CS_LIGHT_POINTLIGHT:
+              default:
+                {
+                  // Get the direction of the caustic object w.r.t the light
+                  // dir = randVect.Get();
+				          csVector3 objDir = sphere.GetCenter() - pos;
+                  float spanAngle = atan(radius/objDir.SquaredNorm());
+                  objDir.Normalize();
+                  dir = SpotlightDir(objDir,spanAngle);
+                }
+                break;
+            }
+
+            // Emit a single photon into the sector containing this light
+            const PhotonRay newPhoton = { pos, dir, color, power, curLight, RAY_TYPE_OTHER1, 1.0f };
+            EmitPhoton(sect, newPhoton, maxDepth, 0, !directLightEnabled,true);
+            
+          }
+        }
+      }
+
+    }
+
+    // Scale the photons for this light
+    sect->ScalePhotons(1.0/numPhotonsPerSector);
+    if (enableCaustics)
+    {
+      sect->ScaleCausticPhotons(1.0/numCausticPhotonsPerSector);
     }
 
     progress.SetProgress(1.0f);
   }
 
   void PhotonmapperLighting::EmitPhoton(Sector* &sect, const PhotonRay &photon,
-    const size_t &maxDepth, const size_t &depth, const bool &ignoreDirect)
-  {    
+    const size_t &maxDepth, const size_t &depth, const bool &ignoreDirect,bool produceCaustic = false)
+  {
     // Check recursion depth
     if(depth > maxDepth)
     {
       return;
     }
 
+    
     // Trace this photon using the standard raytracer
     lighter::HitPoint hit;
     hit.distance = FLT_MAX*0.9f;
-    lighter::Ray ray = photon.getRay();    
+    lighter::Ray ray = photon.getRay();
     if (lighter::Raytracer::TraceClosestHit(sect->kdTree, ray, hit))
     {
       // TODO: Why would a hit be returned and 'hit.primitive' be NULL?
@@ -315,54 +452,82 @@ namespace lighter
       csVector3 L = photon.direction;
       N.Normalize(); L.Normalize();
 
-      // Compute reflection direction (not used anymore)
-//      float dot = N*L;
-//      csVector3 reflDir = L;
-//      reflDir -= N*2*dot;
+      
+      // Compute reflected color intensity (lambertian)
+	    // Compute the UV coordinates for the hit point for the primitive
+	    csVector2 uvCordOnPrimitive = hit.primitive->ComputeUV(hit.hitPoint);
 
-    // Compute reflected color intensity (lambertian)
-	  // Compute the UV coordinates for the hit point for the primitive 
-	  csVector2 uvCordOnPrimitive = hit.primitive->ComputeUV(hit.hitPoint);
-	  
-	  // Get the color of the primitive at that point
-    const lighter::RadMaterial * hitPtMaterial = hit.primitive->GetMaterial();
-	  csColor hitPtColor (1,1,1);
-    hitPtColor = hitPtMaterial->GetTextureValue(uvCordOnPrimitive);
-	  float dot = MAX(0.0, (-L)*N);
-	  //csColor Pd = dot * csColor(1,1,1);
-    csColor Pd = hitPtColor;
-    csColor reflColor = photon.color*photon.power*dot*hitPtColor;
-    //csVector3 reflDir = 2*N*dot + L;
+	    // Get the color of the primitive at that point
+      const lighter::RadMaterial * hitPtMaterial = hit.primitive->GetMaterial();
+	    static csColor hitPtColor (1,1,1);
+      if(hitPtMaterial->IsTextureValid())
+      {
+        hitPtColor = hitPtMaterial->GetTextureValue(uvCordOnPrimitive);
+      }
+	    float dot = ABS((-L)*N);
+	    csColor reflColor = photon.color*photon.power*dot*hitPtColor;
+      float refrIndex  =  hitPtMaterial->refractiveIndex;
 
       // Record photon based on enabled options
       if((depth == 0 && !ignoreDirect) || depth > 0)
       {
-        sect->AddPhoton(reflColor, hit.hitPoint, L);
+        if(!produceCaustic)
+        {
+          sect->AddPhoton(reflColor, hit.hitPoint, L);
+        }
+        else if (!hitPtMaterial->produceCaustic)
+        {
+          // Add the photon to the caustic photon map
+          sect->AddCausticPhoton(reflColor, hit.hitPoint, L);
+          return;
+        }
       }
 
-      // If indirect lighting is enabled, scatter the photon
-      if(maxDepth > 0)
+        // If indirect lighting is enabled, scatter the photon
+      static csColor blackColor (0,0,0);
+      if(maxDepth > 0 && reflColor!=blackColor )
       {
-        // Russian roulette to cut off recursion depth early
-        float avgRefl = (Pd.red + Pd.green + Pd.blue)/3.0;
-        csRandomFloatGen randGen;
-        float rand = randGen.Get();
-
-        if(avgRefl > rand)
+        if (!produceCaustic)
         {
-          // Determine color and power of scattered light
-          // Due to russian roulette, no power is lost but color should
-          // change according to surface reflectivity.
-          
+          // Russian roulette to cut off recursion depth early
+          //float avgRefl = (Pd.red + Pd.green + Pd.blue)/3.0;
+          csRandomFloatGen randGen;
+          float rand = randGen.Get();
+
+          if(dot > rand)
+          {
+            // Determine color and power of scattered light
+            // Due to russian roulette, no power is lost but color should
+            // change according to surface reflectivity.
+
+            csColor newColor = photon.color*hitPtColor*dot;
+            csColor newPower = photon.power;
+
+            // Generate a scattering direction in the hemisphere around the normal
+
+            csVector3 scatterDir = DiffuseScatter(N);
+
+
+            // Emit a new Photon
+            const PhotonRay newPhoton = { hit.hitPoint, scatterDir, newColor, newPower, photon.source, RAY_TYPE_REFLECT, refrIndex };
+            EmitPhoton(sect, newPhoton, maxDepth, depth+1, ignoreDirect, produceCaustic);
+          }
+        }
+        else
+        {
           csColor newColor = photon.color*hitPtColor*dot;
           csColor newPower = photon.power;
-          
-          // Generate a scattering direction in the hemisphere around the normal
-          csVector3 scatterDir = DiffuseScatter(N);
+
+          // Compute the refracted ray direction
+
+          float ratio = photon.refrIndex/refrIndex;
+          float cos1 = dot;
+          float cos2 = sqrt(1.0-((ratio*ratio)*(1-cos1*cos1)));
+          csVector3 scatterDir = ratio*L + (ratio*cos1 - cos2)*N;
 
           // Emit a new Photon
-          const PhotonRay newPhoton = { hit.hitPoint, scatterDir, newColor, newPower, photon.source, RAY_TYPE_REFLECT };
-          EmitPhoton(sect, newPhoton, maxDepth, depth+1, ignoreDirect);
+          const PhotonRay newPhoton = { hit.hitPoint, scatterDir, newColor, newPower, photon.source, RAY_TYPE_REFLECT, refrIndex };
+          EmitPhoton(sect, newPhoton, maxDepth, depth+1, ignoreDirect, produceCaustic);
         }
       }
     }

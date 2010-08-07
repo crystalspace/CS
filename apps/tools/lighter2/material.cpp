@@ -25,11 +25,10 @@ namespace lighter
   void RadMaterial::SetTextureImage(iImage * img)
   {
     textureImg = new CS::ImageAutoConvert (img,CS_IMGFMT_TRUECOLOR);
+    isTexImageValid = true;
   }
   csColor RadMaterial::GetTextureValue(csVector2 uv) const
   {
-    //TODO : Check once again
-    //TODO : Call this in photonmapperlighting.cpp
     csRGBpixel * imgPtr = (csRGBpixel*)((*textureImg)->GetImageData());
     imgPtr = imgPtr + (((*textureImg)->GetWidth())*(int)uv.y + (int)uv.x);
     const float ub2f = 1.0f/255.0f;

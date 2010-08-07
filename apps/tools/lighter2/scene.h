@@ -51,7 +51,7 @@ namespace lighter
   {
   public:
     Sector (Scene* scene)
-      : kdTree (0), scene (scene), photonMap(NULL), irradianceCache(NULL)
+      : kdTree (0), scene (scene), photonMap(NULL), causticPhotonMap(NULL), irradianceCache(NULL)
     {}
 
     ~Sector ();
@@ -66,12 +66,21 @@ namespace lighter
 
     void SavePhotonMap(const char* filename);
 
+    void SaveCausticPhotonMap(const char* filename);
+
     void InitPhotonMap();
+
+    void InitCausticPhotonMap();
 
     void AddPhoton(const csColor power, const csVector3 pos,
       const csVector3 dir );
 
+    void AddCausticPhoton(const csColor power, const csVector3 pos,
+      const csVector3 dir );
+
     void ScalePhotons(const float scale);
+
+    void ScaleCausticPhotons(const float scale);
 
     size_t GetPhotonCount();
     
@@ -86,6 +95,9 @@ namespace lighter
     void AddToIRCache(const csVector3 point, const csVector3 normal,
                       const csColor irrad, const float mean);
 
+    // Hash of all mesh names and materials
+
+    //csHash <csString,csRef<RadMaterial>> materialHash;
     // All objects in sector
     ObjectHash allObjects;
 
@@ -109,6 +121,10 @@ namespace lighter
   protected:
     // Photon map for indirect lighting
     PhotonMap *photonMap;
+
+    // Caustic Photon Map
+
+    PhotonMap *causticPhotonMap;
 
     // Irradiance cache to speed up photon mapping
     IrradianceCache *irradianceCache;
@@ -197,6 +213,7 @@ namespace lighter
       void ApplyExposure (csColor* colors, size_t numColors);
       //@}
 
+      
       //@{
       /**
        * Apply ambient term.
@@ -215,14 +232,15 @@ namespace lighter
       csSet<csPtrKey<Portal> > seenPortals;
     };
     void PropagateLights (Sector* sector);
+
+    // Materials
+    MaterialHash radMaterials;
+
   protected:
     
     //  factories
     ObjectFactoryHash radFactories;
     
-    // Materials
-    MaterialHash radMaterials;
- 
     // All sectors
     SectorHash sectors;
     typedef csHash<Sector*, csPtrKey<iSector> > SectorOrigSectorHash;

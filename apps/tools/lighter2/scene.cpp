@@ -114,8 +114,17 @@ namespace lighter
     }
   }
 
+  void Sector::InitCausticPhotonMap()
+  { 
+    if(causticPhotonMap == NULL)
+    {
+      causticPhotonMap = new PhotonMap(
+        2 * globalConfig.GetIndirectProperties().numCausticPhotons);
+    }
+  }
+
   void Sector::AddPhoton(const csColor power, const csVector3 pos,
-      const csVector3 dir )
+    const csVector3 dir )
   {
     if(photonMap == NULL)
     {
@@ -130,9 +139,30 @@ namespace lighter
     photonMap->Store(fPower, fPos, fDir);
   }
 
+  void Sector::AddCausticPhoton(const csColor power, const csVector3 pos,
+    const csVector3 dir )
+  {
+    if(causticPhotonMap == NULL)
+    {
+      causticPhotonMap = new PhotonMap(
+        2 * globalConfig.GetIndirectProperties ().numCausticPhotons);
+    }
+
+    const float fPower[3] = { power.red, power.green, power.blue };
+    const float fPos[3] = { pos.x, pos.y, pos.z };
+    const float fDir[3] = { dir.x, dir.y, dir.z };
+
+    causticPhotonMap->Store(fPower, fPos, fDir);
+  }
+
   void Sector::ScalePhotons(const float scale)
   {
     if(photonMap != NULL) photonMap->ScalePhotonPower(scale);
+  }
+
+  void Sector::ScaleCausticPhotons(const float scale)
+  {
+    if(causticPhotonMap != NULL) causticPhotonMap->ScalePhotonPower(scale);
   }
 
   size_t Sector::GetPhotonCount()
@@ -153,6 +183,10 @@ namespace lighter
       // Balance the photons
       photonMap->Balance(prog);
     }
+    if(causticPhotonMap != NULL)
+    {
+      causticPhotonMap->Balance(prog);
+    }    
   }
 
   bool Sector::SampleIRCache(const csVector3 point, const csVector3 normal,
@@ -189,7 +223,16 @@ namespace lighter
     float fPos[3] = { point.x, point.y, point.z };
     float fNorm[3] = { normal.x, normal.y, normal.z };
     photonMap->IrradianceEstimate(result, fPos, fNorm, searchRad, densitySamples);
-
+    
+    if (causticPhotonMap != NULL)
+    {
+      float causticIrradiance[3] = {0,0,0};
+      causticPhotonMap->IrradianceEstimate(causticIrradiance,fPos,fNorm,searchRad,densitySamples);
+      result [0] += causticIrradiance[0];
+      result [1] += causticIrradiance[1];
+      result [2] += causticIrradiance[2];
+    }
+    
     // Return result as a csColor
     return csColor(result[0], result[1], result[2]);
   }
@@ -214,6 +257,11 @@ namespace lighter
   void Sector::SavePhotonMap(const char* filename)
   {
     if(photonMap != NULL) photonMap->SaveToFile(filename);
+  }
+
+  void Sector::SaveCausticPhotonMap(const char* filename)
+  {
+    if(causticPhotonMap != NULL) causticPhotonMap->SaveToFile(filename);
   }
 
   //-------------------------------------------------------------------------
@@ -1275,6 +1323,11 @@ namespace lighter
     obj->ParseMesh (mesh);
     obj->StripLightmaps (fileInfo->texturesToClean);
 
+    // Save material name in Object
+    iMeshObject * meshObject = mesh->GetMeshObject();
+    iMaterialWrapper * material = meshObject->GetMaterialWrapper();
+    obj->materialName = material->QueryObject()->GetName();
+
     // Save it
     sector->allObjects.Put (obj->meshName, obj);
 
@@ -1327,8 +1380,9 @@ namespace lighter
   {
     RadMaterial radMat;
     
-    // No material properties from key-value-pairs yet
-#if 0
+    // Material properties from key-value-pairs
+    // Right now the only key value pair used is for caustics
+
     csRef<iObjectIterator> objiter = 
       material->QueryObject ()->GetIterator();
     while (objiter->HasNext())
@@ -1338,14 +1392,29 @@ namespace lighter
         scfQueryInterface<iKeyValuePair> (obj);
       if (kvp.IsValid() && (strcmp (kvp->GetKey(), "lighter2") == 0))
       {
+        if(strcmp (kvp->GetValue(),"produce caustic")==0)
+        {
+          radMat.produceCaustic=true;
+        }
       }
     }
-#endif
+
     
     csRef<iShaderVariableContext> matSVC = 
       scfQueryInterface<iShaderVariableContext> (material->GetMaterial());
     csRef<csShaderVariable> svTex =
       matSVC->GetVariable (globalLighter->svStrings->Request ("tex diffuse"));
+    
+    //Try to extract refractive index of the material if given used for caustics in photon mapping
+    csRef<csShaderVariable> svRefrIndex =
+      matSVC->GetVariable (globalLighter->svStrings->Request ("refractive index"));
+    //If it is present store it in the radMat structure so that it can be used later
+    if(svRefrIndex.IsValid())
+    {
+      float refrIndex = 0.0f;
+      svRefrIndex->GetValue(refrIndex);
+      radMat.SetRefractiveIndex(refrIndex);
+    }
     if (svTex.IsValid())
     {
       iTextureWrapper* texwrap = 0;
@@ -1361,8 +1430,8 @@ namespace lighter
         }
       }
     }
-    
-    radMaterials.Put (material->QueryObject()->GetName(), radMat);
+    const char * objName = material->QueryObject()->GetName();
+    radMaterials.Put (objName, radMat);
     return true;
   }
 
