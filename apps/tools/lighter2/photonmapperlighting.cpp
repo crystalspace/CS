@@ -390,11 +390,39 @@ namespace lighter
                 break;
 
               // spotlight
-              //TODO :think about how to enable spotlight
-              /*
+              
               case CS_LIGHT_SPOTLIGHT:
-              */
-              // Default behavior is to treat a light like a point light
+                {
+                  if(!warning)
+                  {
+                    globalLighter->Report (
+                      "Spotlight falloff is ignored for indirect light calculation");
+                    warning = true;
+                  }
+
+                  // Get spotlight properties
+                  float innerFalloff, outterFalloff;
+                  csVector3 lightDir = ((SpotLight*)curLight)->GetDirection();
+                  ((SpotLight*)curLight)->GetFalloff(innerFalloff, outterFalloff);
+
+                  csVector3 objDir = sphere.GetCenter() - pos;
+                  float spanAngle = ABS(atan(radius/objDir.SquaredNorm()));
+
+                  objDir.Normalize();
+                  lightDir.Normalize();
+                  float angleDir = ABS(lightDir*objDir);
+
+                  if ( ((spanAngle/2.0) +angleDir) > ABS(outterFalloff))
+                  {
+                    stop = true;
+                    continue;
+                  }
+                  // Generate a random direction within the spotlight cone towards the caustic
+                  dir = SpotlightDir(objDir, spanAngle);
+                }
+                break;
+              
+              // point light
               case CS_LIGHT_POINTLIGHT:
               default:
                 {
