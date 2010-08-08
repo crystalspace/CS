@@ -161,6 +161,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           amfact->SetBinormals (rb);
         }
         break;
+      case XMLTOKEN_TANGENTS:
+        {
+	  bool automatic = child->GetAttributeValueAsBool ("automatic", false);
+	  if (automatic)
+	    amfact->ComputeTangents ();
+        }
+        break;
       case XMLTOKEN_COLOR:
         {
           csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
