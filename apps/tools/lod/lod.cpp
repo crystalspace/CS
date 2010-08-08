@@ -59,9 +59,8 @@ bool Lod::ParseParams(int argc, char* argv[])
   }
   if (params.output_file == "")
   {
-    ReportError("Output file not specified.");
-    Usage();
-    return false;
+    csString outfile = params.input_file + "_lod";
+    ReportInfo ("Output file not specified. Using '%s'\n", outfile.GetData ());
   }
 
   csString em = cmdline->GetOption("em");
@@ -138,85 +137,128 @@ void WriteTriangles(const LodGen& lodgen)
 
 void Lod::CreateLODs(const char* filename_in, const char* filename_out)
 {
-  csRef<iFile> file = vfs->Open(filename_in, VFS_FILE_READ);
+  bool bIsZip = false;
+  csString filenameIn = filename_in;
+  csString filenameOut = filename_out;
+
+  // Check for a zip file.
+  if (filenameIn.Find (".zip", filenameIn.Length () - 4) != (size_t)-1)
+  {
+    bIsZip = true;
+    vfs->Mount ("/this/lodzip/", filenameIn);
+    filenameIn = "/this/lodzip/world";
+    filenameOut = "/this/lodzip/world";
+  }
+
+  if (filenameOut.IsEmpty ())
+  {
+    filenameOut = filenameIn + "_lod";
+  }
+
+  csRef<iDataBuffer> buf = vfs->ReadFile (filenameIn);
+  if (!buf.IsValid ())
+  {
+    // Try /this/filename_in
+    csString fname = "/this/";
+    fname.Append (filenameIn);
+    buf = vfs->ReadFile (fname);
+
+    if (!buf.IsValid ())
+    {
+      ReportError ("Error opening file '%s'!", filenameIn);
+      return;
+    }
+
+    filenameIn = fname;
+  }
+
+  // Parse the xml document.
+  csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (object_reg);
+  csRef<iDocument> doc = docsys->CreateDocument ();
+  doc->Parse(buf);
+
+  // Create a copy of the document in tiny xml format (we can't write to binary xml files).
   csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
-  csRef<iDocument> doc = xml->CreateDocument ();
-  doc->Parse(file);
-  csRef<iDocumentNode> root = doc->GetRoot();
-  CreateLODsRecursive(filename_in, filename_out, root);
-  Save(doc, filename_out);
+  csRef<iDocument> outDoc = xml->CreateDocument ();
+  outDoc->CreateRoot ();
+  CS::DocSystem::CloneNode (doc->GetRoot (), outDoc->GetRoot ());
+
+  // Chdir to the file directory.
+  csString dir = filenameIn;
+  size_t pos = filenameIn.FindLast ('/');
+  if (pos != (size_t)-1)
+  {
+    dir = dir.Truncate (pos + 1);
+  }
+  vfs->ChDir (dir);
+
+  // Process the mesh factories.
+  csRef<iDocumentNode> root = outDoc->GetRoot();
+  CreateLODsRecursive(root);
+
+  // Create a backup.
+  vfs->WriteFile (filenameIn + ".bak", **buf, buf->GetSize ());
+  vfs->Sync ();
+
+  // Save the output file.
+  Save(outDoc, filenameOut);
+
+  if (bIsZip)
+  {
+    // Unmount the zip file if there is one.
+    vfs->Unmount ("/this/lodzip/", filename_in);
+  }
 }
 
-void Lod::CreateLODsRecursive(const char* filename_in, const char* filename_out, csRef<iDocumentNode> node)
+void Lod::CreateLODsRecursive(csRef<iDocumentNode> node)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
     csRef<iDocumentNode> node = it->Next ();
     csString value(node->GetValue ());
+
     if (value == "meshfact")
+    {
       CreateLODWithMeshFact(node);
+    }
+    else if (value == "plugins")
+    {
+      csString cwd = vfs->GetCwd ();
+      csRef<iThreadReturn> itr = tloader->LoadNodeWait(cwd, node);
+      if (!itr->WasSuccessful())
+      {
+        ReportError("Error parsing node '%s' in input file.", value.GetData ());
+      }
+    }
     else
-      CreateLODsRecursive(filename_in, filename_out, node);
+    {
+      CreateLODsRecursive(node);
+    }
   }
 }
 
 void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
 {
-
-  /*
-  loading = tloader->LoadFileWait("", filename_in);
-  
-  if (!loading->WasSuccessful())
-  {
-    csPrintf("Loading not successful - file: %s\n", filename_in);
-    loading.Invalidate();
-    return;
-  }
-    
-  if (!loading->GetResultRefPtr().IsValid())
-  {
-    // Library file. Find the first factory in our region.
-    iMeshFactoryList* factories = engine->GetMeshFactories ();
-    if (factories->GetCount() == 0)
-    {
-      csPrintf("No factories in file.\n");
-      return;
-    }
-    imeshfactw = factories->Get (0);
-  }
-  else
-  {
-    imeshfactw = scfQueryInterface<iMeshFactoryWrapper> (loading->GetResultRefPtr());
-    if(!imeshfactw)
-    {
-      csRef<iMeshWrapper> spritewrapper = scfQueryInterface<iMeshWrapper> (loading->GetResultRefPtr());
-      if (spritewrapper)
-        imeshfactw = spritewrapper->GetFactory();
-    }
-  }
-  
-  if (!imeshfactw)
-  {
-    csPrintf("Could not find loaded mesh.\n");
-    return;
-  }
-  */
   csString cwd = vfs->GetCwd ();
   csRef<iThreadReturn> itr = tloader->LoadNodeWait(cwd, node);
   if (!itr->WasSuccessful())
   {
-    ReportError("Error parsing node in input file.");
+    csString name = node->GetAttributeValue ("name");
+    ReportError("Error parsing meshfact '%s' in input file.", name.GetData ());
     return;
   }
 
   imeshfactw = scfQueryInterface<iMeshFactoryWrapper>(itr->GetResultRefPtr());
     
   csRef<iMeshObjectFactory> fact = imeshfactw->GetMeshObjectFactory();
-  assert(fact);
+  CS_ASSERT (fact.IsValid ());
   
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
-  assert(fstate);
+
+  // Only process genmesh factories.
+  if (!fstate)
+    return;
   
   for (unsigned int submesh_index = 0; submesh_index < fstate->GetSubMeshCount(); submesh_index++)
   {
@@ -242,7 +284,7 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
       const CS::TriangleT<size_t> ttri(fstate_triangles.Next());
       csTriangle tri;
       for (int i = 0; i < 3; i++)
-        tri[i] = ttri[i];
+        tri[i] = (int)ttri[i];
       lodgen.AddTriangle(tri);
     }
     
@@ -313,17 +355,6 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
 
 void Lod::SaveToNode(csRef<iDocumentNode> factNode)
 {
-  /*
-  csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
-  csRef<iDocument> doc = xml->CreateDocument();
-  csRef<iDocumentNode> root = doc->CreateRoot();
-  
-  iMeshObjectFactory* meshfact = imeshfactw->GetMeshObjectFactory();
-  
-  //Create the Tag for the MeshObj
-  csRef<iDocumentNode> factNode = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  */
-
   factNode->SetValue("meshfact");
   factNode->RemoveNodes();
   
@@ -339,7 +370,7 @@ void Lod::SaveToNode(csRef<iDocumentNode> factNode)
   
   if (!(pluginname && *pluginname)) return;
   
-  csRef<iDocumentNode> pluginNode = factNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> pluginNode = factNode->CreateNodeBefore(CS_NODE_ELEMENT);
   pluginNode->SetValue("plugin");
   
   //Add the plugin tag
@@ -362,7 +393,19 @@ void Lod::Save(csRef<iDocument> doc, const char* filename)
 {
   scfString str;
   doc->Write(&str);
-  vfs->WriteFile(filename, str.GetData(), str.Length());
+
+  if (!vfs->WriteFile(filename, str.GetData(), str.Length()))
+  {
+    // Try writing to /this/filename
+    csString fname = "/this/";
+    fname.Append (filename);
+
+    if (!vfs->WriteFile(fname, str.GetData(), str.Length()))
+    {
+      ReportError ("Failed to write to output file '%s'!", filename);
+    }
+  }
+
   vfs->Sync();
 }
 

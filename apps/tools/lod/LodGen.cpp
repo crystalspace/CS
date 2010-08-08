@@ -284,9 +284,9 @@ void unittests(float z)
   unittest1(p0, p1, p2, csVector3(0.0, 1.0, z), 1.0); 
   unittest1(p0, p1, p2, csVector3(0.5, 1.0, z), 0.5);  
   unittest1(p0, p1, p2, csVector3(1.5, 1.5, z), 0.0); 
-  unittest1(p0, p1, p2, csVector3(1.5, 2.0, z), 0.3536); 
+  unittest1(p0, p1, p2, csVector3(1.5, 2.0, z), 0.3536f); 
   unittest1(p0, p1, p2, csVector3(2.0, 3.0, z), 1.0); 
-  unittest1(p0, p1, p2, csVector3(2.5, 2.0, z), 0.3536); 
+  unittest1(p0, p1, p2, csVector3(2.5, 2.0, z), 0.3536f); 
   unittest1(p0, p1, p2, csVector3(2.5, 1.5, z), 0.0); 
   unittest1(p0, p1, p2, csVector3(3.5, 1.0, z), 0.5);  
   unittest1(p0, p1, p2, csVector3(4.0, 1.0, z), 1.0); 
@@ -313,7 +313,7 @@ void PointTriangleDistanceUnitTests()
 void LodGen::InitCoincidentVertices()
 {
   coincident_vertices.SetSize(vertices.GetSize());
-  static const float epsilon = 0.00001; 
+  static const float epsilon = 0.00001f; 
   for (unsigned int i = 0; i < vertices.GetSize(); i++)
   {
     const csVector3& v = vertices[i]; 
@@ -513,7 +513,7 @@ float LodGen::SumOfSquareDist(const WorkMesh& k, int start_index) const
 }
 */    
 
-void LodGen::RemoveTriangleFromIncidentTris(WorkMesh& k, int itri)
+void LodGen::RemoveTriangleFromIncidentTris(WorkMesh& k, size_t itri)
 {
   csTriangle& tri = k.tri_buffer[itri];
   for (int i = 0; i < 3; i++)
@@ -552,17 +552,19 @@ bool LodGen::IsCoincident(const WorkMesh& k, const csTriangle& tri) const
   return false;
 }
 
-int LodGen::FindInWindow(const WorkMesh& k, const SlidingWindow& sw, int itri) const
+int LodGen::FindInWindow(const WorkMesh& k, const SlidingWindow& sw, size_t itri) const
 {
   for (int i = sw.start_index; i < sw.end_index; i++)
     if (k.tri_indices[i] == itri)
       return i;
-  assert(0);
+
+  CS_ASSERT (false);
+  return 0;
 }
 
 void LodGen::SwapIndex(WorkMesh& k, int i0, int i1)
 {
-  int temp = k.tri_indices[i0];
+  size_t temp = k.tri_indices[i0];
   k.tri_indices[i0] = k.tri_indices[i1];
   k.tri_indices[i1] = temp;
 }
@@ -575,7 +577,7 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
   IncidentTris incident = k.incident_tris[v0]; // copy
   for (unsigned int i = 0; i < incident.GetSize(); i++)
   {
-    int itri = incident[i];
+    size_t itri = incident[i];
     // Make sure it's within our work limit
     // (not a triangle that was added before)
     int h = FindInWindow(k, sw, itri);
@@ -680,16 +682,16 @@ void LodGen::GenerateLODs()
   // The initial window is the original mesh.
   SlidingWindow sw_initial;
   sw_initial.start_index = 0;
-  sw_initial.end_index = triangles.GetSize();
+  sw_initial.end_index = (int)triangles.GetSize();
   // Top limit - we never change a triangle that was added above it.
   // The top limit gets bumped up when we replicate indices.
   top_limit = sw_initial.end_index;
   k.sliding_windows.Push(sw_initial);
   int collapse_counter = 0;
   // When to absolutely end the collapses
-  int min_num_triangles = triangles.GetSize() / 6;
+  size_t min_num_triangles = triangles.GetSize() / 6;
   // When to perform a replication
-  int min_triangles_for_replication = triangles.GetSize() / 2;
+  size_t min_triangles_for_replication = triangles.GetSize() / 2;
   // 'edges' will hold our list of edges to walk through.
   csArray<Edge> edges;
   bool could_not_collapse = false;
@@ -716,11 +718,11 @@ void LodGen::GenerateLODs()
           edges.PushSmart(Edge(tri[iv], tri[(iv+1)%3]));
     }
     // This speeds up the algorithm
-    int edge_step = edges.GetSize() / 5 + 1;
+    size_t edge_step = edges.GetSize() / 5 + 1;
     edge_start = (edge_start + 1) % edge_step;
     
     // For each edge
-    for (unsigned int i = edge_start; i < edges.GetSize(); i += edge_step)
+    for (size_t i = edge_start; i < edges.GetSize(); i += edge_step)
     {
       int v0 = edges[i].v0;
       int v1 = edges[i].v1;

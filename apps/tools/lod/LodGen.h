@@ -21,7 +21,7 @@
 
 void PointTriangleDistanceUnitTests();
 
-typedef csArray<int> IncidentTris;
+typedef csArray<size_t> IncidentTris;
 
 struct Edge
 {
@@ -44,13 +44,13 @@ struct SlidingWindow
 struct WorkMesh
 {
   csArray<csTriangle> tri_buffer;
-  csArray<int> tri_indices;
+  csArray<size_t> tri_indices;
   csArray<IncidentTris> incident_tris; // map from vertices to incident triangles
   csArray<SlidingWindow> sliding_windows;
   void AddTriangle(const csTriangle& tri)
   {
     tri_buffer.Push(tri);
-    int itri = tri_buffer.GetSize()-1;
+    size_t itri = tri_buffer.GetSize()-1;
     assert(tri_indices.Find(itri) == csArrayItemNotFound);
     tri_indices.Push(itri);
     for (int i = 0; i < 3; i++)
@@ -101,13 +101,13 @@ public:
   // The methods below allow retrieval of results.
 
   /// Get the number of triangles in the processed mesh
-  int GetTriangleCount() const { return ordered_tris.GetSize(); }
+  size_t GetTriangleCount() const { return ordered_tris.GetSize(); }
 
   /// Get a triangle from the processed mesh
   const csTriangle& GetTriangle(int i) const { return ordered_tris[i]; }
 
   /// Get the number of sliding windows in the processed mesh
-  int GetSlidingWindowCount() const { return k.sliding_windows.GetSize(); }
+  size_t GetSlidingWindowCount() const { return k.sliding_windows.GetSize(); }
 
   /// Get a sliding window from the processed mesh
   const SlidingWindow& GetSlidingWindow(int i) const { return k.sliding_windows[i]; }
@@ -127,7 +127,7 @@ protected:
   /**
    * Remove a triangle from the list of incident triangles of each of its 3 vertices.
    */
-  void RemoveTriangleFromIncidentTris(WorkMesh& k, int itri);
+  void RemoveTriangleFromIncidentTris(WorkMesh& k, size_t itri);
 
   /**
    * Perform edge collapse from v0 to v1.
@@ -154,7 +154,7 @@ protected:
   /**
    * Finds a triangle in the sliding window and returns its position in the triangle buffer
    */
-  int FindInWindow(const WorkMesh& k, const SlidingWindow& sw, int itri) const;
+  int FindInWindow(const WorkMesh& k, const SlidingWindow& sw, size_t itri) const;
 
   /**
    * Swaps two triangles.

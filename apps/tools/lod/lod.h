@@ -67,7 +67,7 @@ private:
   void Usage();
   bool ParseParams(int argc, char* argv[]);
   void CreateLODs(const char* filename_in, const char* filename_out);
-  void CreateLODsRecursive(const char* filename_in, const char* filename_out, csRef<iDocumentNode> node);
+  void CreateLODsRecursive(csRef<iDocumentNode> node);
   void CreateLODWithMeshFact(csRef<iDocumentNode> node);
   void Save(csRef<iDocument> doc, const char* filename);
   void SaveToNode(csRef<iDocumentNode> factNode);
