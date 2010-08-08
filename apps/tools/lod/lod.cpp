@@ -268,9 +268,11 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
     }
     
     csRef<iGeneralMeshSubMesh> submesh = fstate->GetSubMesh(submesh_index);
-    assert(submesh);
+    CS_ASSERT (submesh);
+
     csRef<iRenderBuffer> index_buffer = submesh->GetIndices();
-    assert(index_buffer);
+    CS_ASSERT (index_buffer);
+
     CS::TriangleIndicesStream<size_t> fstate_triangles(index_buffer, CS_MESHTYPE_TRIANGLES);
     
     while(fstate_triangles.HasNext())
@@ -284,10 +286,11 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
     
     lodgen.GenerateLODs();
   
-    assert(lodgen.GetSlidingWindowCount() >= 2);
+    CS_ASSERT (lodgen.GetSlidingWindowCount() >= 2);
     
     iRenderBuffer* rbindices = submesh->GetIndices();
-    assert(rbindices);
+    CS_ASSERT (rbindices);
+
     csRef<iRenderBuffer> rbindices_new = csRenderBuffer::CreateIndexRenderBuffer(
       lodgen.GetTriangleCount() * 3, rbindices->GetBufferType(), rbindices->GetComponentType(), 0, fstate_vertices.GetSize()-1);
     
