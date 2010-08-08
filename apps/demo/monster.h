@@ -30,6 +30,7 @@ private:
 
   csString factoryName;
   csRef<iMeshWrapper> mesh;
+  csRef<iMeshWrapper> sword;
 
   CS::Animation::iSkeletonFSMNode2* fsmNode;
   CS::Animation::iSkeletonFSMNodeFactory2* fsmNodeFactory;

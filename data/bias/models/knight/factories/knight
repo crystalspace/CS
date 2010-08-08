@@ -35851,11 +35851,11 @@
    </morphtarget>
 <socket name="righthand" bone="Hand.R">
   <transform>
-  <vector x="-0.00570959780683" y="-0.0288947267022" z="0.0819187092153" />
+  <vector x="-0.0317152116774" y="-0.0263199919961" z="0.0718066513314" />
   <matrix>
-  <rotx>-0.740841947043</rotx>
-  <rotz>1.26746147969</rotz>
-  <roty>-2.31788039054</roty>
+  <rotx>1.48181851688</rotx>
+  <rotz>1.82605658885</rotz>
+  <roty>0.17612115125</roty>
   </matrix>
   </transform>
 </socket>
