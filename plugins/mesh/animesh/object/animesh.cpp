@@ -522,6 +522,75 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return mixMode;
   }
 
+  void AnimeshObjectFactory::ComputeTangents ()
+  {
+    // Create the buffers if not already made
+    if (!tangentBuffer)
+      tangentBuffer =
+	csRenderBuffer::CreateRenderBuffer (GetVertexCountP (),
+					    CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+    if (!binormalBuffer)
+      binormalBuffer =
+	csRenderBuffer::CreateRenderBuffer (GetVertexCountP (),
+					    CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+
+    // Create an array of all the triangles
+    size_t triNum;
+    const csTriangle* tris;
+    csDirtyAccessArray<csTriangle> triangleScratch;
+    for (size_t i = 0; i < submeshes.GetSize(); i++)
+    {
+      FactorySubmesh* fsm = submeshes[i];
+      for (size_t j = 0; j < fsm->indexBuffers.GetSize (); ++j)
+      {
+	// TODO: not 0 param
+	iRenderBuffer* indexBuffer = submeshes[i]->GetIndices (j);
+	size_t scratchPos = triangleScratch.GetSize();
+	size_t indexTris = indexBuffer->GetElementCount() / 3;
+	if ((indexBuffer->GetComponentType() == CS_BUFCOMP_INT)
+	    || (indexBuffer->GetComponentType() == CS_BUFCOMP_UNSIGNED_INT))
+	{
+	  triangleScratch.SetSize (scratchPos + indexTris);
+	  csRenderBufferLock<uint8> indexLock (indexBuffer, CS_BUF_LOCK_READ);
+	  memcpy (triangleScratch.GetArray() + scratchPos,
+		  indexLock.Lock(), indexTris * sizeof (csTriangle));
+	}
+	else
+	{
+	  triangleScratch.SetCapacity (scratchPos + indexTris);
+	  CS::TriangleIndicesStream<int> triangles (indexBuffer,
+						    CS_MESHTYPE_TRIANGLES);
+	  while (triangles.HasNext())
+	    triangleScratch.Push (triangles.Next());
+	}
+      }
+    }
+    triNum = triangleScratch.GetSize ();
+    tris = triangleScratch.GetArray ();
+
+    // Compute the tangents
+    int vertCount = GetVertexCount();
+    csVector3* tangentData = (csVector3*)cs_malloc (
+      sizeof (csVector3) * vertCount * 2);
+    csVector3* bitangentData = tangentData + vertCount;
+
+    csNormalMappingTools::CalculateTangents
+      (triNum, tris, vertCount,
+       (csVector3*) vertexBuffer->Lock (CS_BUF_LOCK_READ), 
+       (csVector3*) normalBuffer->Lock (CS_BUF_LOCK_READ),
+       (csVector2*) texcoordBuffer->Lock (CS_BUF_LOCK_READ),
+       tangentData, bitangentData);
+  
+    vertexBuffer->Release ();
+    normalBuffer->Release ();
+    texcoordBuffer->Release ();
+
+    tangentBuffer->CopyInto (tangentData, vertCount);
+    binormalBuffer->CopyInto (bitangentData, vertCount);
+  
+    cs_free (tangentData);
+  }
+
   FactorySocket::FactorySocket (AnimeshObjectFactory* factory, CS::Animation::BoneID bone, 
     const char* name, csReversibleTransform transform)
     : scfImplementationType (this), factory (factory), bone (bone), name (name),
@@ -644,6 +713,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     CS_ASSERT (index < sockets.GetSize ());
     return sockets[index];
+  }
+
+  CS::Mesh::iAnimatedMeshFactory* AnimeshObject::GetAnimatedMeshFactory () const
+  {
+    return factory;
   }
 
   iMeshObjectFactory* AnimeshObject::GetFactory () const
@@ -1226,6 +1300,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     case CS_BUFFER_TANGENT:
     case CS_BUFFER_BINORMAL:
       {
+	// Check if the factory's tangents don't need to be initialized
+	if (!factory->tangentBuffer || !factory->binormalBuffer)
+	  factory->ComputeTangents ();
+
 	// If there is no skeleton then simply use the factory's buffers
         if (!skeleton)
         {

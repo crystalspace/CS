@@ -146,6 +146,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       return vertexCount;
     }
 
+    void ComputeTangents ();
+  
   private: 
 
     // required but stupid stuff..
@@ -306,6 +308,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     virtual size_t GetSocketCount () const;
     virtual CS::Mesh::iAnimatedMeshSocket* GetSocket (size_t index) const;
+
+    virtual CS::Mesh::iAnimatedMeshFactory* GetAnimatedMeshFactory () const;
 
     //-- iMeshObject
     virtual iMeshObjectFactory* GetFactory () const;
