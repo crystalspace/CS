@@ -116,7 +116,7 @@ public:
   SCF_INTERFACE(CS::Mesh::iAnimatedMeshSocket, 1, 0, 0);
 
   /**
-   * Get the name of the socket
+   * Get the name of this socket
    */
   virtual const char* GetName () const = 0;
 
@@ -126,22 +126,22 @@ public:
   virtual iAnimatedMeshSocketFactory* GetFactory () = 0;
 
   /**
-   * Get the 'bone to socket transform' of the socket
+   * Get the 'bone to socket transform' of this socket
    */
   virtual const csReversibleTransform& GetTransform () const = 0;
 
   /**
-   * Set the 'bone to socket transform' of the socket
+   * Set the 'bone to socket transform' of this socket
    */
   virtual void SetTransform (csReversibleTransform& tf) = 0;
 
   /**
-   * Get the full transform of the socket, in world coordinate
+   * Get the full transform of this socket, in world coordinate
    */
   virtual const csReversibleTransform GetFullTransform () const = 0;
 
   /**
-   * Get the ID of the bone associated with the socket
+   * Get the ID of the bone associated with this socket
    */
   virtual CS::Animation::BoneID GetBone () const = 0;
 
@@ -151,12 +151,12 @@ public:
   virtual iAnimatedMesh* GetMesh () const = 0;
 
   /**
-   * Get the scene node associated with the socket
+   * Get the scene node associated with this socket
    */
   virtual iSceneNode* GetSceneNode () const = 0;
 
   /**
-   * Set the scene node associated with the socket
+   * Set the scene node associated with this socket
    */
   virtual void SetSceneNode (iSceneNode* sn) = 0;
 };
