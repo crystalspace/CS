@@ -55,6 +55,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);
+
+  private:
+    iObjectRegistry* object_reg;
   };
 
 
@@ -142,7 +145,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     {
       return vertexCount;
     }
-  
+
   private: 
 
     // required but stupid stuff..
@@ -465,8 +468,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       AnimeshObject* object;
       FactorySocket* factorySocket;
-      CS::Animation::BoneID bone;      
-      csReversibleTransform transform;      
+      CS::Animation::BoneID bone;
+      csReversibleTransform transform;
       csReversibleTransform socketBoneTransform;
       iSceneNode* sceneNode;
     };

@@ -19,10 +19,11 @@
 #include "cssysdef.h"
 
 #include "csgeom/math3d.h"
+#include "csgeom/tri.h"
+#include "csgfx/normalmaptools.h"
 #include "csgfx/renderbuffer.h"
-#include "csgfx/vertexlistwalker.h"
 #include "csgfx/trianglestream.h"
-#include "cstool/rbuflock.h"
+#include "csgfx/vertexlistwalker.h"
 #include "cstool/rviewclipper.h"
 #include "csutil/objreg.h"
 #include "csutil/scf.h"
@@ -30,6 +31,7 @@
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/material.h"
+#include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "imesh/skeleton2.h"
@@ -38,8 +40,6 @@
 #include "ivideo/rendermesh.h"
 
 #include "animesh.h"
-
-
 
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
@@ -73,6 +73,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   bool AnimeshObjectType::Initialize (iObjectRegistry* object_reg)
   {
+    this->object_reg = object_reg;
+
     csRef<iShaderVarStringSet> strset =
       csQueryRegistryTagInterface<iShaderVarStringSet> (
         object_reg, "crystalspace.shader.variablenameset");
@@ -89,7 +91,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     svNameBoneTransforms = strset->Request ("bone transform real");
     svNameBoneTransforms = strset->Request ("bone transform dual");
-
 
     return true;
   }
@@ -213,7 +214,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     if (renderBuffer->GetElementCount () < vertexCount)
       return false;
 
-    texcoordBuffer = renderBuffer;    
+    texcoordBuffer = renderBuffer;
     return true;
   }
 
@@ -227,7 +228,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     if (renderBuffer->GetElementCount () < vertexCount)
       return false;
 
-    normalBuffer = renderBuffer;    
+    normalBuffer = renderBuffer;
     return true;
   }
 
@@ -241,7 +242,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     if (renderBuffer->GetElementCount () < vertexCount)
       return false;
 
-    tangentBuffer = renderBuffer;    
+    tangentBuffer = renderBuffer;
     return true;
   }
 
@@ -472,7 +473,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   }
 
   void AnimeshObjectFactory::HardTransform (const csReversibleTransform& t)
-  {    
+  {
   }
 
   bool AnimeshObjectFactory::SupportsHardTransform () const
@@ -561,7 +562,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     return factory;
   }
-
 
 
   AnimeshObject::AnimeshObject (AnimeshObjectFactory* factory)
@@ -937,7 +937,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   void AnimeshObject::GetRadius (float& radius, csVector3& center)
   {
     center = factory->factoryBB.GetCenter ();
-    radius = factory->factoryBB.GetSize ().Norm ();
+    radius = factory->factoryBB.GetSize ().Norm () * 0.5f;
   }
 
   void AnimeshObject::SetupSubmeshes ()
@@ -1022,7 +1022,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         // Setup the accessor to this mesh
         bufferHolder->SetAccessor (rba, 
           CS_BUFFER_POSITION_MASK | CS_BUFFER_NORMAL_MASK | 
-          CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);
+	  CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);
 
         sm->bufferHolders.Push (bufferHolder);
       }
@@ -1050,6 +1050,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     lastSkeletonState = skeleton->GetStateBindSpace ();
     skeletonVersion = skeleton->GetSkeletonStateVersion ();
 
+    // Update the array of bone transforms
     if (boneTransformArray)
     {
       // Update the global one
@@ -1077,11 +1078,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           sv.AttachNew (new csShaderVariable (svNameBoneTransformsDual));
           boneTransformArray->SetArrayElement (j+1, sv);
         }
+
         sv->SetValue (dq.dual);
       }
     }
 
-    // Iterate all submeshes...
+    // Update the bone transforms of all submeshes
     for (size_t i = 0; i < submeshes.GetSize (); ++i)
     {
       Submesh* sm = submeshes[i];
@@ -1126,7 +1128,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           sv->SetValue (dq.dual);
         }
       }
-
     }
   }
 
@@ -1144,7 +1145,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       skeleton->GetTransformAbsSpace(bone, q, v);
 
-      sockets[i]->socketBoneTransform.SetO2T (csMatrix3 (q));
+      sockets[i]->socketBoneTransform.SetO2T (csMatrix3 (q.GetConjugate ()));
       sockets[i]->socketBoneTransform.SetOrigin (v);
       sockets[i]->UpdateSceneNode ();
     }
@@ -1356,7 +1357,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   const csReversibleTransform AnimeshObject::Socket::GetFullTransform () const
   {
-    return socketBoneTransform*transform;
+    return transform * socketBoneTransform;
   }
 
   CS::Animation::BoneID AnimeshObject::Socket::GetBone () const
@@ -1376,7 +1377,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::Socket::SetSceneNode (iSceneNode* sn)
   {
+    if (sceneNode)
+      sceneNode->SetParent (nullptr);
     sceneNode = sn;
+    sceneNode->SetParent (object->GetMeshWrapper ()->QuerySceneNode ());
   }
 
   void AnimeshObject::Socket::UpdateSceneNode ()
