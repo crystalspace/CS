@@ -1337,7 +1337,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
         csMath3::CalcNormal(binormal, firstPoint, secondPoint, cameraOrigin);
         binormal.Normalize();
-        strip = strandWidthLOD * binormal * ((*bin).z + 1.0f) * (1.5f - (*bin).y);
+        strip = strandWidthLOD * binormal * ((*bin).z + 1.0f) * 
+          (0.5f * (1.0f - (*bin).y) + 0.75f );
 
         (*vbuf) = firstPoint;
         (*(vbuf + 1)) = firstPoint + strip;
