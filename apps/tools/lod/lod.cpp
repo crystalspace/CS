@@ -134,6 +134,33 @@ void WriteTriangles(const LodGen& lodgen)
 
 void Lod::CreateLODs(const char* filename_in, const char* filename_out)
 {
+  csRef<iFile> file = vfs->Open(filename_in, VFS_FILE_READ);
+  csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
+  csRef<iDocument> doc = xml->CreateDocument ();
+  doc->Parse(file);
+  csRef<iDocumentNode> root = doc->GetRoot();
+  CreateLODsRecursive(filename_in, filename_out, root);
+  Save(doc, filename_out);
+}
+
+void Lod::CreateLODsRecursive(const char* filename_in, const char* filename_out, csRef<iDocumentNode> node)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> node = it->Next ();
+    csString value(node->GetValue ());
+    if (value == "meshfact")
+      CreateLODWithMeshFact(node);
+    else
+      CreateLODsRecursive(filename_in, filename_out, node);
+  }
+}
+
+void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
+{
+
+  /*
   loading = tloader->LoadFileWait("", filename_in);
   
   if (!loading->WasSuccessful())
@@ -170,6 +197,16 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     csPrintf("Could not find loaded mesh.\n");
     return;
   }
+  */
+  csString cwd = vfs->GetCwd ();
+  csRef<iThreadReturn> itr = tloader->LoadNodeWait(cwd, node);
+  if (!itr->WasSuccessful())
+  {
+    ReportError("Error parsing node in input file.");
+    return;
+  }
+
+  imeshfactw = scfQueryInterface<iMeshFactoryWrapper>(itr->GetResultRefPtr());
     
   csRef<iMeshObjectFactory> fact = imeshfactw->GetMeshObjectFactory();
   assert(fact);
@@ -265,22 +302,12 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
       fsm->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
     }
   }
-  
-  Save(filename_out);
-
-  loading.Invalidate();
+  SaveToNode(node);
 }
 
-void Lod::Save(const char* filename)
+void Lod::SaveToNode(csRef<iDocumentNode> factNode)
 {
-  csRef<iVFS> vfs;
-  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
-  if (!vfs)
-  {
-    csPrintf("Error: No iVFS!\n");
-    return;
-  }
-  
+  /*
   csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
   csRef<iDocumentNode> root = doc->CreateRoot();
@@ -289,13 +316,17 @@ void Lod::Save(const char* filename)
   
   //Create the Tag for the MeshObj
   csRef<iDocumentNode> factNode = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  */
+
   factNode->SetValue("meshfact");
+  factNode->RemoveNodes();
   
   //Add the mesh's name to the MeshObj tag
   const char* name = imeshfactw->QueryObject()->GetName();
   if (name && *name)
     factNode->SetAttribute("name", name);
   
+  csRef<iMeshObjectFactory> meshfact = imeshfactw->GetMeshObjectFactory();
   csRef<iFactory> factory = scfQueryInterface<iFactory> (meshfact->GetMeshObjectType());
   
   const char* pluginname = factory->QueryClassID();
@@ -319,7 +350,10 @@ void Lod::Save(const char* filename)
   csRef<iSaverPlugin> saver = csLoadPluginCheck<iSaverPlugin> (plugin_mgr, savername);
   if (saver) 
     saver->WriteDown(meshfact, factNode, 0/*ssource*/);
-  
+}
+
+void Lod::Save(csRef<iDocument> doc, const char* filename)
+{
   scfString str;
   doc->Write(&str);
   vfs->WriteFile(filename, str.GetData(), str.Length());
@@ -330,6 +364,9 @@ bool Lod::SetupModules ()
 {
   engine = csQueryRegistry<iEngine> (GetObjectRegistry ());
   if (!engine) return ReportError ("Failed to locate 3D engine!");
+
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+  if (!vfs) return ReportError("No VFS.\n");
 
   vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry ());
   if (!vc) return ReportError ("Failed to locate Virtual Clock!");

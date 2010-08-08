@@ -53,13 +53,17 @@ private:
   csRef<iRenderManager> rm;
   iSector* room;
   csRef<iThreadReturn> loading;
+  csRef<iVFS> vfs;
 
   Params params;
 
   void Usage();
   bool ParseParams(int argc, char* argv[]);
   void CreateLODs(const char* filename_in, const char* filename_out);
-  void Save(const char* filename);
+  void CreateLODsRecursive(const char* filename_in, const char* filename_out, csRef<iDocumentNode> node);
+  void CreateLODWithMeshFact(csRef<iDocumentNode> node);
+  void Save(csRef<iDocument> doc, const char* filename);
+  void SaveToNode(csRef<iDocumentNode> factNode);
   
   bool SetupModules ();
 
