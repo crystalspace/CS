@@ -118,6 +118,20 @@ bool Lod::Application ()
   return true;
 }
 
+template<typename T>
+void WriteTriangles(const LodGen& lodgen)
+{
+  T* data = new T[lodgen.GetTriangleCount() * 3];
+  T* pdata = data;
+  for (int i = 0; i < lodgen.GetTriangleCount(); i++)
+  {
+    //csPrintf("%d %d %d\n", lodgen.GetTriangle(i)[0], lodgen.GetTriangle(i)[1], lodgen.GetTriangle(i)[2]);
+    *pdata++ = (T)lodgen.GetTriangle(i)[0];
+    *pdata++ = (T)lodgen.GetTriangle(i)[1];
+    *pdata++ = (T)lodgen.GetTriangle(i)[2];
+  }
+}
+
 void Lod::CreateLODs(const char* filename_in, const char* filename_out)
 {
   loading = tloader->LoadFileWait("", filename_in);
@@ -198,8 +212,39 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
     csRef<iRenderBuffer> rbindices_new = csRenderBuffer::CreateIndexRenderBuffer(
       lodgen.GetTriangleCount() * 3, rbindices->GetBufferType(), rbindices->GetComponentType(), 0, fstate_vertices.GetSize()-1);
     
-    // TODO: deal with buffer not being unsigned int
-    // see renderbuffer.cpp:659
+    csRenderBufferComponentType compType = rbindices->GetComponentType ();
+
+    switch (compType & ~CS_BUFCOMP_NORMALIZED)
+    {
+    case CS_BUFCOMP_BYTE:
+      WriteTriangles<int8>(lodgen);
+      break;
+    case CS_BUFCOMP_UNSIGNED_BYTE:
+      WriteTriangles<uint8>(lodgen);
+      break;
+    case CS_BUFCOMP_SHORT:
+      WriteTriangles<int16>(lodgen);
+      break;
+    case CS_BUFCOMP_UNSIGNED_SHORT:
+      WriteTriangles<uint16>(lodgen);
+      break;
+    case CS_BUFCOMP_INT:
+      WriteTriangles<int32>(lodgen);
+      break;
+    case CS_BUFCOMP_UNSIGNED_INT:
+      WriteTriangles<uint32>(lodgen);
+      break;
+    case CS_BUFCOMP_FLOAT:
+      WriteTriangles<float>(lodgen);
+      break;
+    case CS_BUFCOMP_DOUBLE:
+      WriteTriangles<double>(lodgen);
+      break;
+    default:
+      csPrintf("Bad index buffer type.\n");
+      return;
+    }
+
     unsigned int* data = new unsigned int[lodgen.GetTriangleCount() * 3];
     unsigned int* pdata = data;
     for (int i = 0; i < lodgen.GetTriangleCount(); i++)
