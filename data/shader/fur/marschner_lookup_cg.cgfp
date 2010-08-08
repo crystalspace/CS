@@ -31,6 +31,9 @@ float4 main (vertex2fragment IN,
 {
 	float4 OUT = float4(0, 0, 0, 1);
 
+	if (DiffuseType > 4)
+		IN.TangentShift.y = 0.01;
+	
 <?if (vars."color map") && (vars."texture map")?>
 	float2 uv = float2(clamp(tex2D(ColorMap, IN.TexCoord).x, 0.01, 0.99), clamp(IN.TangentShift.y, 0.01, 0.99));
 	HairColor = tex2D(TextureMap, uv);
@@ -84,9 +87,8 @@ float4 main (vertex2fragment IN,
 		diffuseColor.rgb = LightColor * HairColor.xyz * HairColor.xyz;
 	else if (DiffuseType == 4)	//	Kajiya and Kay diffuse
 		diffuseColor.rgb = 0.2 * sin(acos(sin_qi)) * LightColor;
-	else	//	ambiental instead of diffuse
+	else // ambiental instead of diffuse
 		diffuseColor.rgb = 0.2 * LightColor;
-		
 
 	float3 specularColor = ( M.r * N.r + M.g * N.g + M.b * N.b ) /  max(0.2, cos_qd * cos_qd);
 	specularColor *= LightColor;

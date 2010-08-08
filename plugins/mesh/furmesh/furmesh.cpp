@@ -276,6 +276,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::UpdateObjectBoundingBox ()
   {
+    if (!factory->GetVertexCount())
+      return;
+
     boundingbox.StartBoundingBox();
     
     csVector3* vertex_buffer = (csVector3*)factory->GetVertices()->Lock (CS_BUF_LOCK_READ);
@@ -299,6 +302,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
     const csReversibleTransform o2wt = movable->GetFullTransform ();
+
+    if (indexstart == indexend)
+    {
+      num = 0;
+      return 0;
+    }
 
     if (!materialWrapper)
     {
