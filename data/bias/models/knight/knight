@@ -10,8 +10,6 @@
     <texture name='knight_ice.png'>
           <file>textures/ice.png</file>
     </texture>
-
-
     <texture name='uvmap1.jpg'>
       <file>textures/uvmap1.jpg</file>
     </texture>
