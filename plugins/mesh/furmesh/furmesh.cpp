@@ -475,7 +475,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
           hairStrands.Get(x).controlPoints[ y ] - 
           hairStrands.Get(x).controlPoints[ 0 ]);
 
-        bin[ 2 * controlPointSum + 2 * y].Set( csVector3( rng->Get(), sum/len, 0 ) );
+        bin[ 2 * controlPointSum + 2 * y].Set( csVector3( rng->Get(), sum/len, rng->Get() ) );
         bin[ 2 * controlPointSum + 2 * y + 1].Set( bin[ 2 * controlPointSum + 2 * y] );
       }
     }
@@ -1308,6 +1308,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csVector3* vbuf = (csVector3*)factory->GetVertices()->Lock(CS_BUF_LOCK_NORMAL);
     csVector3* normals = (csVector3*)factory->GetNormals()->Lock(CS_BUF_LOCK_NORMAL); 
     csVector3* tan = (csVector3*)factory->GetTangents()->Lock(CS_BUF_LOCK_NORMAL);
+    csVector3* bin = (csVector3*)factory->GetBinormals()->Lock(CS_BUF_LOCK_READ);
 
     csVector3 normal, tangent, binormal, cameraOrigin;
     csVector3 strip, firstPoint, secondPoint;
@@ -1329,14 +1330,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       triangleCount += 2 * controlPointsCount - 2;
 
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
-        vbuf += 2, tangentBuffer += 2, posShift ++, normals += 2 )
+        vbuf += 2, tangentBuffer += 2, bin += 2, posShift ++, normals += 2 )
       {
         firstPoint = *controlPoints + (*posShift);
         secondPoint = *(controlPoints + 1) + (*posShift);
 
         csMath3::CalcNormal(binormal, firstPoint, secondPoint, cameraOrigin);
         binormal.Normalize();
-        strip = strandWidthLOD * binormal;
+        strip = strandWidthLOD * binormal * ((*bin).z + 1.0f) * (1.5f - (*bin).y);
 
         (*vbuf) = firstPoint;
         (*(vbuf + 1)) = firstPoint + strip;
@@ -1365,6 +1366,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
         vbuf += 2;
         tangentBuffer += 2;
+        bin += 2;
         normals += 2;
         posShift ++;
       }
@@ -1373,6 +1375,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     factory->GetVertices()->Release();
     factory->GetNormals()->Release();
     factory->GetTangents()->Release();
+    factory->GetBinormals()->Release();
 
     SetIndexRange(0, 3 * triangleCount);
   }
