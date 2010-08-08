@@ -296,9 +296,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	break;
       case XMLTOKEN_SOCKET:
         {
-          csReversibleTransform transform;
-          CS::Animation::BoneID bone = child->GetAttributeValueAsInt ("bone");
+	  CS::Animation::iSkeletonFactory2* skelFact = amfact->GetSkeletonFactory ();
+          if (!skelFact)
+          {
+            synldr->ReportError (msgidFactory, child, "No skeleton defined while creating socket");
+            return 0;
+          }
+
+          const char* boneName = child->GetAttributeValue ("bone");
+	  CS::Animation::BoneID bone = skelFact->FindBone (boneName);
+          if (bone == CS::Animation::InvalidBoneID)
+          {
+            synldr->ReportError (msgidFactory, child, "Could not find bone %s in skeleton", boneName);
+            return 0;
+          }
+
           const char* name = child->GetAttributeValue ("name");
+          csReversibleTransform transform;
 
           csRef<iDocumentNode> tnode = child->GetNode ("transform");
           if (tnode)
