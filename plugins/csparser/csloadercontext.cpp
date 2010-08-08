@@ -112,11 +112,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       mat = Engine->FindMaterial(name);
     }
     
-    if(doLoad)
+    if(doLoad && !mat.IsValid())
     {
-      // *** This is deprecated behaviour ***
-      if(!mat.IsValid())
+      if (loader->GetFlags () & CS_LOADER_CREATE_DUMMY_MATS)
       {
+        // Silently create a dummy material.
+        csRef<iMaterial> material = Engine->CreateBaseMaterial (0);
+        csRef<iMaterialWrapper> mat = Engine->GetMaterialList()->CreateMaterial (material, name);
+        loader->AddMaterialToList(mat);
+
+        if(collection)
+        {
+          collection->Add(mat->QueryObject());
+        }
+
+        return mat;
+      }
+      else
+      {
+        // *** This is deprecated behaviour ***
         ReportWarning("Could not find material '%s'. Creating material. This behaviour is deprecated.", name);
         if(missingdata)
         {
@@ -150,7 +164,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       /// ***
 
-      if(!mat.IsValid() && do_verbose)
+      if(do_verbose)
       {
         ReportNotify("Could not find material '%s'.", name);
       }

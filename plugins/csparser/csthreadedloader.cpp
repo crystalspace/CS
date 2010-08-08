@@ -85,7 +85,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   SCF_IMPLEMENT_FACTORY(csThreadedLoader)
 
   csThreadedLoader::csThreadedLoader(iBase *p)
-  : scfImplementationType (this, p), listSync(false)
+  : scfImplementationType (this, p), loaderFlags (CS_LOADER_NONE), listSync(false)
   {
   }
 

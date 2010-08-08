@@ -59,8 +59,12 @@ bool Lod::ParseParams(int argc, char* argv[])
   }
   if (params.output_file == "")
   {
-    csString outfile = params.input_file + "_lod";
-    ReportInfo ("Output file not specified. Using '%s'\n", outfile.GetData ());
+    csString outfile = params.input_file;
+    if (outfile.Find (".zip", outfile.Length () - 4) == (size_t)-1)
+    {
+      outfile += "_lod";
+      ReportInfo ("Output file not specified. Using '%s'\n", outfile.GetData ());
+    }
   }
 
   csString em = cmdline->GetOption("em");
@@ -425,6 +429,7 @@ bool Lod::SetupModules ()
 
   tloader = csQueryRegistry<iThreadedLoader> (GetObjectRegistry());
   if (!tloader) return ReportError("Failed to locate threaded Loader!");
+  tloader->SetFlags (CS_LOADER_CREATE_DUMMY_MATS);
   
   collection = engine->CreateCollection ("lod_region");
    
