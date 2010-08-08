@@ -184,13 +184,7 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
   CS::DocSystem::CloneNode (doc->GetRoot (), outDoc->GetRoot ());
 
   // Chdir to the file directory.
-  csString dir = filenameIn;
-  size_t pos = filenameIn.FindLast ('/');
-  if (pos != (size_t)-1)
-  {
-    dir = dir.Truncate (pos + 1);
-  }
-  vfs->ChDir (dir);
+  CS::Utility::SmartChDir (vfs, filenameIn);
 
   // Process the mesh factories.
   csRef<iDocumentNode> root = outDoc->GetRoot();
