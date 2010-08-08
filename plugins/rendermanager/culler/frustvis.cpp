@@ -351,12 +351,12 @@ struct InnerNodeProcessOP
   InnerNodeProcessOP()
   {
   }
-  InnerNodeProcessOP(FrustTest_Front2BackData &data)
+  InnerNodeProcessOP(const FrustTest_Front2BackData *data)
   {
     f2bData=data;
   }
 
-  FrustTest_Front2BackData f2bData;
+  const FrustTest_Front2BackData *f2bData;
 
   void DrawQuery(NodePtr n) const
   {
@@ -380,10 +380,10 @@ struct InnerNodeProcessOP
     }
   }
 
-  inline void NodeVisible(NodePtr n) const
+  void NodeVisible(NodePtr n) const
   {
-    n->SetCameraTimestamp(f2bData.rview->GetCamera(),f2bData.current_timestamp);
-    n->SetVisibilityForCamera(f2bData.rview->GetCamera(),false);
+    n->SetCameraTimestamp(f2bData->rview->GetCamera(),f2bData->current_timestamp);
+    n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
     //DrawQuery(n);
   }
 
@@ -391,16 +391,16 @@ struct InnerNodeProcessOP
   {
     CS_ASSERT_MSG("Invalid AABB-tree", !n->IsLeaf ());
     csBox3 node_bbox = n->GetBBox();
-    node_bbox *= f2bData.global_bbox;
+    node_bbox *= f2bData->global_bbox;
 
-    if (node_bbox.Contains (f2bData.pos))
+    if (node_bbox.Contains (f2bData->pos))
     {
       NodeVisible(n);
       return true; // node completely visible
     }
     uint32 new_mask;
     if (!csIntersect3::BoxFrustum (node_bbox,
-                                   f2bData.frustum,
+                                   f2bData->frustum,
                                    frustum_mask,
   	                               new_mask))
     {
@@ -413,26 +413,27 @@ struct InnerNodeProcessOP
   }
 };
 
+
 struct LeafNodeProcessOP
 {
   LeafNodeProcessOP()
   {
   }
-  LeafNodeProcessOP(FrustTest_Front2BackData &data)
+  LeafNodeProcessOP(const FrustTest_Front2BackData *data)
   {
     f2bData=data;
   }
 
-  FrustTest_Front2BackData f2bData;
+  const FrustTest_Front2BackData *f2bData;
 
   void DrawQuery(NodePtr n) const
   {
     n->GetGraphics3D()->OQBeginQuery(n->GetQueryID());
     iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
     int numMeshes=0;
-    const uint32 frust_mask=f2bData.rview->GetRenderContext ()->clip_planes_mask;
+    const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
     
-    csRenderMesh **rmeshes=mw->GetRenderMeshes(numMeshes,f2bData.rview,frust_mask);
+    csRenderMesh **rmeshes=mw->GetRenderMeshes(numMeshes,f2bData->rview,frust_mask);
     for (int m = 0; m < numMeshes; m++)
     {
       if (!rmeshes[m]->portal)
@@ -464,8 +465,8 @@ struct LeafNodeProcessOP
 
   inline void NodeVisible(NodePtr n) const
   {
-    n->SetCameraTimestamp(f2bData.rview->GetCamera(),f2bData.current_timestamp);
-    n->SetVisibilityForCamera(f2bData.rview->GetCamera(),false);
+    n->SetCameraTimestamp(f2bData->rview->GetCamera(),f2bData->current_timestamp);
+    n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
     //DrawQuery(n);
   }
 
@@ -481,19 +482,19 @@ struct LeafNodeProcessOP
     }
 
     const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
-    if (obj_bbox.Contains (f2bData.pos))
+    if (obj_bbox.Contains (f2bData->pos))
     {
-      f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
+      f2bData->viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
       NodeVisible(n);
       return true;
     }
   
     uint32 new_mask;
-    if (!csIntersect3::BoxFrustum (obj_bbox, f2bData.frustum, frustum_mask, new_mask))
+    if (!csIntersect3::BoxFrustum (obj_bbox, f2bData->frustum, frustum_mask, new_mask))
     {
       return true; // node invisible, but continue traversal
     }
-    f2bData.viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, new_mask);
+    f2bData->viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, new_mask);
 
     NodeVisible(n);
     return true;
@@ -545,9 +546,9 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   g3d->SetZMode(CS_ZBUF_USE);
   g3d->SetWriteMask(false,false,false,false);
 
-  InnerNodeProcessOP opIN(f2bData);
-  LeafNodeProcessOP opLN(f2bData);
-  csVector3 dir=rview->GetCamera ()->GetTransform ().GetFront()-rview->GetCamera ()->GetTransform ().GetOrigin ();
+  const InnerNodeProcessOP opIN(&f2bData);
+  const LeafNodeProcessOP opLN(&f2bData);
+  const csVector3 dir=rview->GetCamera ()->GetTransform ().GetFront()-rview->GetCamera ()->GetTransform ().GetOrigin ();
   //aabbTree.SetRootFrustumMask(frustum_mask);
   //aabbTree.TraverseF2B(opIN,opLN,dir);
   //aabbTree.TraverseF2BWithData(opIN,opLN,frustum_mask,dir);

@@ -191,7 +191,7 @@
      * Iterative traversal with data
      */
     template<typename InnerFn, typename LeafFn, typename T>
-    void TraverseIterF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction)
+    void TraverseIterF2BWithData (const InnerFn& inner,const LeafFn& leaf, T traverseData, const csVector3& direction)
     {
       if (rootNode)
         TraverseIterativeF2BWithData (inner, leaf, traverseData, direction, rootNode);
@@ -201,7 +201,7 @@
      * Iterative traversal with data
      */
     template<typename InnerFn, typename LeafFn, typename T>
-    void TraverseIterF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction) const
+    void TraverseIterF2BWithData (const InnerFn& inner,const LeafFn& leaf, T traverseData, const csVector3& direction) const
     {
       if (rootNode)
         TraverseIterativeF2BWithData (inner, leaf, traverseData, direction, rootNode);
@@ -524,14 +524,14 @@
      * Iterative traversal
      */
     template<typename InnerFn, typename LeafFn, typename T>
-    bool TraverseIterativeF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction, Node* node)
+    bool TraverseIterativeF2BWithData (const InnerFn& inner, const LeafFn& leaf, T traverseData, const csVector3& direction, Node* node)
     {
       bool ret = true;
-      Node* n;
       std::queue<Node*> Q;
       Q.push(node);
       while(!Q.empty())
       {
+        Node* n;
         n=Q.front();
         Q.pop();
         if (n->IsLeaf ())
@@ -559,7 +559,7 @@
      * Iterative traversal
      */
     template<typename InnerFn, typename LeafFn, typename T>
-    bool TraverseIterativeF2BWithData (InnerFn& inner, LeafFn& leaf, T traverseData, const csVector3& direction, Node* node) const
+    bool TraverseIterativeF2BWithData (const InnerFn& inner,const LeafFn& leaf, T traverseData, const csVector3& direction, Node* node) const
     {
       bool ret = true;
       std::queue<Node*> Q;
@@ -1161,6 +1161,10 @@
       leafStorage[index] = leafStorage[--leafObjCount];
     }
 
+    ~Node()
+    {
+    }
+
   private:
     ///
     uint16 typeAndFlags;
@@ -1177,6 +1181,7 @@
       ObjectType* leafStorage[objectsPerLeaf];
       Node* children[2];
     };
+
   };
 
 #endif
