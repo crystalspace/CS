@@ -1,0 +1,9 @@
+SubDir TOP plugins utilities visualdebug ;
+
+Description visualdebug : "visual debug plugin" ;
+
+Plugin visualdebug
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith visualdebug : crystalspace ;
+
