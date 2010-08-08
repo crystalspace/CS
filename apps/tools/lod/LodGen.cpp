@@ -408,6 +408,7 @@ float LodGen::ErrorMetricFast(const WorkMesh& k, int start_index) const
   int samples_per_triangle = 20 / (sw.end_index - start_index);
   if (samples_per_triangle == 0)
     samples_per_triangle = 1;
+  int count = 0;
 
   // Loop through the modified triangles, sampling a number of points inside them
   for (int i = start_index; i < sw.end_index; i++)
@@ -448,8 +449,11 @@ float LodGen::ErrorMetricFast(const WorkMesh& k, int start_index) const
       }
       assert(min_d2 < FLT_MAX);
       sum += min_d2;
+      count++;
     }
   }
+  assert(count == (sw.end_index - start_index) * samples_per_triangle);
+  sum /= count;
   return sum;
 }
 
