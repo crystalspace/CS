@@ -99,7 +99,7 @@ struct iFurMeshType : public virtual iMeshObjectType
 * that you use better comments than this one in a
 * real situation.
 */
-struct iFurMesh : public virtual iRenderBufferAccessor  
+struct iFurMesh : public virtual iBase  
 {
   SCF_INTERFACE (iFurMesh, 1, 0, 0);
 

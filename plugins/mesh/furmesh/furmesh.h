@@ -161,10 +161,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& num, iRenderView*, 
       iMovable*, uint32);
 
-    /// From iRenderBufferAccessor
-    virtual void PreGetBuffer(csRenderBufferHolder* holder, 
-      csRenderBufferName buffer);
-
+    /// some mesh properties
+    virtual void SetMixMode (uint mode);
+    virtual uint GetMixMode () const;
+    virtual void SetPriority (uint priority);
+    virtual uint GetPriority () const;
+    virtual void SetZBufMode (csZBufMode z_buf_mode);
+    virtual csZBufMode GetZBufMode () const;
+    virtual void SetIndexRange (uint indexstart, uint indexend);
+    
     // From iFurMesh
     virtual void GenerateGeometry (iView* view, iSector *room);
     virtual void SetGuideLOD(float guideLOD);
@@ -196,7 +201,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     iEngine* engine;
     csRef<iLoader> loader;
     /// Fur geometry
-    csRef<iGeneralFactoryState> factoryState;
     csRef<iView> view;
     csArray<csHairStrand> hairStrands;
     csArray<csGuideHair> guideHairs;
@@ -227,6 +231,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float controlPointsDistance;
     float positionDeviation;
     int growTangents;
+    /// render mesh data
+    csRef<csRenderBufferHolder> bufferholder;
+    csRef<csShaderVariableContext> svContext;
+    uint mixmode;
+    uint priority;
+    csZBufMode z_buf_mode;
+    uint indexstart, indexend;
     /// functions
     void SetRigidBody (iRigidBody* rigidBody);
     void GenerateGuideHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,

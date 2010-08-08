@@ -215,9 +215,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   FurMesh::FurMesh (iEngine* engine, iObjectRegistry* object_reg, 
     iMeshObjectFactory* object_factory) : scfImplementationType (this, engine), 
     materialWrapper(0), object_reg(object_reg), object_factory(object_factory), 
-    engine(engine), physicsControl(0), hairStrandGenerator(0), rng(0), guideLOD(0), 
-    strandLOD(0), hairStrandsLODSize(0), physicsControlEnabled(true), growTangents(0),
-    positionShift(0)
+    engine(engine), physicsControl(0), hairStrandGenerator(0), positionShift(0),
+    rng(0), guideLOD(0),strandLOD(0), hairStrandsLODSize(0), 
+    physicsControlEnabled(true), growTangents(0), mixmode(0), priority(7),
+    z_buf_mode(CS_ZBUF_USE), indexstart(0), indexend(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -317,49 +318,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     meshPtr->clip_z_plane = clip_z_plane;
     meshPtr->do_mirror = camera->IsMirrored ();
     meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
-    meshPtr->indexstart = 0;
-    meshPtr->indexend = (unsigned int)factory->GetIndices()->GetElementCount ();
+    meshPtr->indexstart = indexstart;
+    meshPtr->indexend = indexend;
     meshPtr->material = materialWrapper;
 
-    meshPtr->mixmode = 0; //  mixmode
-
-    csRef<csRenderBufferHolder> bufferholder;
-    bufferholder.AttachNew (new csRenderBufferHolder);
-    bufferholder->SetRenderBuffer (CS_BUFFER_INDEX, factory->GetIndices());
-    bufferholder->SetRenderBuffer (CS_BUFFER_POSITION, factory->GetVertices());
-    bufferholder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->GetTexCoords());
-    bufferholder->SetRenderBuffer (CS_BUFFER_NORMAL, factory->GetNormals());
-    bufferholder->SetRenderBuffer (CS_BUFFER_BINORMAL, factory->GetBinormals());
-    bufferholder->SetRenderBuffer (CS_BUFFER_TANGENT, factory->GetTangents());
+    meshPtr->mixmode = mixmode; //  mixmode
 
     meshPtr->buffers = bufferholder;
-    meshPtr->renderPrio = 7; // renderpriority
-    meshPtr->z_buf_mode = CS_ZBUF_USE; // zbufMode;
+    meshPtr->renderPrio = priority; // renderpriority
+    meshPtr->z_buf_mode = z_buf_mode; // zbufMode;
 
     meshPtr->object2world = o2wt;
     meshPtr->bbox = GetObjectBoundingBox();
     meshPtr->geometryInstance = factory;
-
-    csRef<csShaderVariableContext> svContext;
-    svContext.AttachNew (new csShaderVariableContext);
-    csShaderVariable* sv;
-
-    // Get the SV names
-    sv = svContext->GetVariableAdd (svStrings->Request ("position"));
-    sv->SetValue (factory->GetVertices());
-
-    sv = svContext->GetVariableAdd (svStrings->Request ("normal"));
-    sv->SetValue (factory->GetNormals());
-
-    sv = svContext->GetVariableAdd (svStrings->Request ("texture coordinate 0"));
-    sv->SetValue (factory->GetTexCoords());
-
-    sv = svContext->GetVariableAdd (svStrings->Request ("tangent"));
-    sv->SetValue (factory->GetTangents());
-
-    sv = svContext->GetVariableAdd (svStrings->Request ("binormal"));
-    sv->SetValue (factory->GetBinormals());
-
     meshPtr->variablecontext = svContext;
 
     renderMeshes.Push (meshPtr);    
@@ -368,30 +339,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return renderMeshes.GetArray ();
   }
 
-  void FurMesh::PreGetBuffer(csRenderBufferHolder* holder, 
-    csRenderBufferName buffer)
+  void FurMesh::SetMixMode (uint mode)
   {
-    csPrintf("test");
-    switch (buffer)
-    {
-      // Vertices render buffer
-      case CS_BUFFER_POSITION:
-        holder->SetRenderBuffer (CS_BUFFER_POSITION, factory->GetIndices());
-        return;
-      case CS_BUFFER_NORMAL:
-        holder->SetRenderBuffer (CS_BUFFER_NORMAL, factory->GetNormals());
-        return;
-      case CS_BUFFER_TANGENT:
-        holder->SetRenderBuffer (CS_BUFFER_TANGENT, factory->GetTangents());
-        return;
-      case CS_BUFFER_BINORMAL:
-        holder->SetRenderBuffer (CS_BUFFER_BINORMAL, factory->GetBinormals());
-        return;
-      case CS_BUFFER_TEXCOORD0:
-        holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->GetTexCoords());
-        return;
-      default: return;
-    }
+    mixmode = mode;
+  }
+
+  uint FurMesh::GetMixMode () const
+  {
+    return mixmode;
+  }
+
+  void FurMesh::SetPriority (uint priority)
+  {
+    this->priority = priority;
+  }
+
+  uint FurMesh::GetPriority () const
+  {
+    return priority;
+  }
+
+  void FurMesh::SetZBufMode(csZBufMode z_buf_mode)
+  {
+    this->z_buf_mode = z_buf_mode;
+  }
+
+  csZBufMode FurMesh::GetZBufMode() const
+  {
+    return z_buf_mode;
+  }
+
+  void FurMesh::SetIndexRange (uint indexstart, uint indexend)
+  {
+    this->indexstart = indexstart;
+    this->indexend = indexend;
   }
 
   void FurMesh::GenerateGeometry (iView* view, iSector *room)
@@ -519,6 +500,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     GetMeshWrapper()->SetFlagsRecursive(CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
     SetMaterialWrapper(materialWrapper);
 
+    bufferholder.AttachNew (new csRenderBufferHolder);
+    bufferholder->SetRenderBuffer (CS_BUFFER_INDEX, factory->GetIndices());
+    bufferholder->SetRenderBuffer (CS_BUFFER_POSITION, factory->GetVertices());
+    bufferholder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->GetTexCoords());
+    bufferholder->SetRenderBuffer (CS_BUFFER_NORMAL, factory->GetNormals());
+    bufferholder->SetRenderBuffer (CS_BUFFER_BINORMAL, factory->GetBinormals());
+    bufferholder->SetRenderBuffer (CS_BUFFER_TANGENT, factory->GetTangents());
+
+    svContext.AttachNew (new csShaderVariableContext);
+    csShaderVariable* sv;
+
+    // Get the SV names
+    sv = svContext->GetVariableAdd (svStrings->Request ("position"));
+    sv->SetValue (factory->GetVertices());
+
+    sv = svContext->GetVariableAdd (svStrings->Request ("normal"));
+    sv->SetValue (factory->GetNormals());
+
+    sv = svContext->GetVariableAdd (svStrings->Request ("texture coordinate 0"));
+    sv->SetValue (factory->GetTexCoords());
+
+    sv = svContext->GetVariableAdd (svStrings->Request ("tangent"));
+    sv->SetValue (factory->GetTangents());
+
+    sv = svContext->GetVariableAdd (svStrings->Request ("binormal"));
+    sv->SetValue (factory->GetBinormals());
+
+    SetIndexRange(0, (uint)factory->GetIndices()->GetElementCount());
   }
 
   void FurMesh::GenerateGuideHairs(iRenderBuffer* indices, 
@@ -533,7 +542,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csVector3 *tangentsArray = new csVector3[positions.GetSize()];
     csVector3 *binormalArray = new csVector3[positions.GetSize()];
     
-    // TODO use getelementcount
     csTriangle *triangles = new csTriangle[indices->GetSize() / sizeof(csTriangle)];
     csVector3 *vertices = new csVector3[positions.GetSize()];
     csVector3 *normals = new csVector3[positions.GetSize()];
@@ -1280,9 +1288,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if (physicsControlEnabled)
       UpdateGuideHairs();
 
-    size_t numberOfStrains = hairStrands.GetSize();
-
-//     csPrintf("%d %d %d\n", hairStrands.GetSize(), guideHairs.GetSize(), guideHairsLOD.GetSize());
+    size_t numberOfStrains = hairStrandsLODSize;
 
     if (!numberOfStrains)
       return;
@@ -1368,7 +1374,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     factory->GetNormals()->Release();
     factory->GetTangents()->Release();
 
-//       furMesh->factoryState->GetSubMesh(0)->SetIndexRange(0, 3 * triangleCount);
+    SetIndexRange(0, 3 * triangleCount);
   }
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)
