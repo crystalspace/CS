@@ -253,23 +253,6 @@ public:
   virtual void MovableDestroyed (iMovable*) { }
 };
 
-class NodeLeafData
-{
-public:
-  NodeLeafData()
-  {
-    g3d=0;
-    mesh=0;
-  }
-
-  csBox3 bbox;
-  iGraphics3D *g3d;
-  csRef<iMeshWrapper> mesh;
-
-  const csBox3& GetBBox() const { return bbox; }
-  iGraphics3D* GetGraphics3D() const { return g3d; }
-};
-
 class NodeData
 {
   csVector3 vertices[25];

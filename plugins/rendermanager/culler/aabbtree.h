@@ -66,6 +66,7 @@
     {
       rootNode = AllocNode ();
       rootNode->SetLeaf (true);
+      rootNode->SetParent(0);
     }
 
     ///
@@ -113,6 +114,7 @@
       // New root
       rootNode = AllocNode ();
       rootNode->SetLeaf (true);
+      rootNode->SetParent(0);
 
       // Build
       BuildTree (rootNode, objects, 0, objects.GetSize ());
@@ -165,6 +167,27 @@
     {
       if (rootNode)
         TraverseRecF2B (inner, leaf, direction, rootNode);
+    }
+
+    /**
+     * Iterative traversal
+     */
+
+    template<typename InnerFn, typename LeafFn>
+    void TraverseIterF2B (InnerFn& inner, LeafFn& leaf, const csVector3& direction)
+    {
+      if (rootNode)
+        TraverseIterativeF2B (inner, leaf, direction, rootNode);
+    }
+
+    /**
+     * Iterative traversal
+     */
+    template<typename InnerFn, typename LeafFn>
+    void TraverseIterF2B (InnerFn& inner, LeafFn& leaf, const csVector3& direction) const
+    {
+      if (rootNode)
+        TraverseIterativeF2B (inner, leaf, direction, rootNode);
     }
 
     /**
@@ -330,8 +353,10 @@
         
           Node* node1 = AllocNode ();
           node1->SetLeaf (true);
+          node1->SetParent(node);
           Node* node2 = AllocNode ();
           node2->SetLeaf (true);
+          node2->SetParent(node);
 
           // Assign first
           {
@@ -521,10 +546,11 @@
     }
 
     /**
-     * Iterative traversal
+     * Iterative traversal with data
      */
     template<typename InnerFn, typename LeafFn, typename T>
-    bool TraverseIterativeF2BWithData (const InnerFn& inner, const LeafFn& leaf, T traverseData, const csVector3& direction, Node* node)
+    bool TraverseIterativeF2BWithData (const InnerFn& inner, const LeafFn& leaf, T traverseData, 
+      const csVector3& direction, Node* node)
     {
       bool ret = true;
       std::queue<Node*> Q;
@@ -556,10 +582,11 @@
     }
 
     /**
-     * Iterative traversal
+     * Iterative traversal with data
      */
     template<typename InnerFn, typename LeafFn, typename T>
-    bool TraverseIterativeF2BWithData (const InnerFn& inner,const LeafFn& leaf, T traverseData, const csVector3& direction, Node* node) const
+    bool TraverseIterativeF2BWithData (const InnerFn& inner,const LeafFn& leaf, T traverseData, 
+      const csVector3& direction, Node* node) const
     {
       bool ret = true;
       std::queue<Node*> Q;
@@ -576,6 +603,76 @@
         else
         {
           if (inner (n, traverseData))
+          {
+            const csVector3 centerDiff = n->GetChild2 ()->GetBBox ().GetCenter () -
+              n->GetChild1 ()->GetBBox ().GetCenter ();
+
+            const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
+
+            Q.push(n->GetChild (firstIdx));
+            Q.push(n->GetChild (1-firstIdx));
+          }
+        }
+      }
+      return ret;
+    }
+
+    /**
+     * Iterative traversal without data
+     */
+    template<typename InnerFn, typename LeafFn>
+    bool TraverseIterativeF2B (const InnerFn& inner, const LeafFn& leaf, const csVector3& direction, Node* node)
+    {
+      bool ret = true;
+      std::queue<Node*> Q;
+      Q.push(node);
+      while(!Q.empty())
+      {
+        Node* n;
+        n=Q.front();
+        Q.pop();
+        if (n->IsLeaf ())
+        {
+          ret = leaf (n);
+        }
+        else
+        {
+          if (inner (n))
+          {
+            const csVector3 centerDiff = n->GetChild2 ()->GetBBox ().GetCenter () -
+              n->GetChild1 ()->GetBBox ().GetCenter ();
+
+            const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
+
+            Q.push(n->GetChild (firstIdx));
+            Q.push(n->GetChild (1-firstIdx));
+          }
+        }
+      }
+      return ret;
+    }
+
+    /**
+     * Iterative traversal without data
+     */
+    template<typename InnerFn, typename LeafFn>
+    bool TraverseIterativeF2B (const InnerFn& inner,const LeafFn& leaf, const csVector3& direction, Node* node) const
+    {
+      bool ret = true;
+      std::queue<Node*> Q;
+      Q.push(node);
+      while(!Q.empty())
+      {
+        Node* n;
+        n=Q.front();
+        Q.pop();
+        if (n->IsLeaf ())
+        {
+          ret = leaf (n);
+        }
+        else
+        {
+          if (inner (n))
           {
             const csVector3 centerDiff = n->GetChild2 ()->GetBBox ().GetCenter () -
               n->GetChild1 ()->GetBBox ().GetCenter ();
@@ -696,6 +793,7 @@
       if (fewEnough)
       {
         // Assign to a leaf
+        root->SetParent(0);
         root->SetLeaf (true);
         for (size_t i = objectStart; i < objectEnd; ++i)
         {
@@ -718,6 +816,9 @@
 
           Node* left = AllocNode ();
           Node* right = AllocNode ();
+
+          left->SetParent(root);
+          right->SetParent(root);
 
           root->SetChild1 (left);
           root->SetChild2 (right);
@@ -998,7 +1099,7 @@
   {
   public:
     Node ()
-      : typeAndFlags (AABB_NODE_INNER), leafObjCount (0)  //, frustum_mask(0)
+      : typeAndFlags (AABB_NODE_INNER), leafObjCount (0)
     {
       children[0] = children[1] = 0;
     }
@@ -1082,6 +1183,11 @@
       return children[0];
     }
 
+    Node* GetParent() const
+    {
+      return parent;
+    }
+
     /// 
     Node* GetChild2 () const
     {
@@ -1094,6 +1200,11 @@
     {
       CS_ASSERT(!IsLeaf () && i < 2);
       return children[i];
+    }
+
+    void SetParent(Node* parent)
+    {
+      this->parent=parent;
     }
 
     /// 
@@ -1174,6 +1285,8 @@
 
     ///
     csBox3 boundingBox;
+
+    Node* parent;
 
     ///
     union

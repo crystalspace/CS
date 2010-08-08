@@ -463,11 +463,23 @@ struct LeafNodeProcessOP
     }
   }
 
-  inline void NodeVisible(NodePtr n) const
+  void NodeVisible(NodePtr n) const
   {
     n->SetCameraTimestamp(f2bData->rview->GetCamera(),f2bData->current_timestamp);
     n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
     //DrawQuery(n);
+  }
+
+  int Count(NodePtr n) const
+  {
+    int i=0;
+    NodePtr aux=n;
+    while(aux->GetParent())
+    {
+      aux=aux->GetParent();
+      i++;
+    }
+    return i;
   }
 
   bool operator() (NodePtr n, const uint32 frustum_mask) const
@@ -475,6 +487,7 @@ struct LeafNodeProcessOP
     CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
     const int num_objects=n->GetObjectCount();
     const csFrustVisObjectWrapper* visobj_wrap = n->GetLeafData(0);
+    //csPrintf("%d ",Count(n));
 
     if (visobj_wrap->mesh && visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
     {
