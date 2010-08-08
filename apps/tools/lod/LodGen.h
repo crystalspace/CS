@@ -63,6 +63,8 @@ struct WorkMesh
 
 typedef csArray<int> VertexIndexList;
 
+enum ErrorMetricType { ERROR_METRIC_FAST, ERROR_METRIC_PRECISE };
+
 class LodGen
 {
 protected:
@@ -73,27 +75,101 @@ protected:
   WorkMesh k;
   csArray<csTriangle> ordered_tris;
   int top_limit;
+  ErrorMetricType error_metric_type;
+  bool verbose;
 
 public:
+  LodGen(): error_metric_type(ERROR_METRIC_FAST), verbose(false) {}
+
+  /// Set an error metric to be used when generating LODs
+  void SetErrorMetricType(ErrorMetricType em) { error_metric_type = em; }
+
+  /// Set verbose mode
+  void SetVerbose(bool v) { verbose = v; }
+
+  /// Add a vertex to the mesh
   void AddVertex(const csVector3& v) { vertices.Push(v); }
+
+  /// Add a triangle to the mesh
   void AddTriangle(const csTriangle& t) { triangles.Push(t); }
+
+  /**
+   * Main LOD generation method.
+   */
   void GenerateLODs();
+
+  // The methods below allow retrieval of results.
+
+  /// Get the number of triangles in the processed mesh
   int GetTriangleCount() const { return ordered_tris.GetSize(); }
+
+  /// Get a triangle from the processed mesh
   const csTriangle& GetTriangle(int i) const { return ordered_tris[i]; }
+
+  /// Get the number of sliding windows in the processed mesh
   int GetSlidingWindowCount() const { return k.sliding_windows.GetSize(); }
+
+  /// Get a sliding window from the processed mesh
   const SlidingWindow& GetSlidingWindow(int i) const { return k.sliding_windows[i]; }
   
 protected:
+  /**
+   * Initialize array of coincident vertices.
+   * For each vertex, create a list of all other vertices that share the same position.
+   */
   void InitCoincidentVertices();
+
+  /**
+   * Checks if a triangle is degenerate through identical indices.
+   */
   bool IsDegenerate(const csTriangle& tri) const;
+
+  /**
+   * Remove a triangle from the list of incident triangles of each of its 3 vertices.
+   */
   void RemoveTriangleFromIncidentTris(WorkMesh& k, int itri);
+
+  /**
+   * Perform edge collapse from v0 to v1.
+   */
   bool Collapse(WorkMesh& k, int v0, int v1);
-  float SumOfSquareDist(const WorkMesh& k) const;
-  float SumOfSquareDist(const WorkMesh& k, int start_index) const;
+
+  /**
+   * Compute an error metric for the difference between two meshes.
+   */
+  float ErrorMetric(const WorkMesh& k, int start_index) const;
+
+  /**
+   * Slower and more precise error metric.
+   * Examines all triangles at each step.
+   */
+  float ErrorMetricPrecise(const WorkMesh& k) const;
+
+  /**
+   * Quicker and less precise error metric.
+   * Examines only modified triangles at each step.
+   */
+  float ErrorMetricFast(const WorkMesh& k, int start_index) const;
+
+  /**
+   * Finds a triangle in the sliding window and returns its position in the triangle buffer
+   */
   int FindInWindow(const WorkMesh& k, const SlidingWindow& sw, int itri) const;
+
+  /**
+   * Swaps two triangles.
+   */
   void SwapIndex(WorkMesh& k, int i0, int i1);
   void VerifyMesh(WorkMesh& k);
+
+  /**
+   * Checks if a triangle is coincident with another through comparison of their indices.
+   */
   bool IsTriangleCoincident(const csTriangle& t0, const csTriangle& t1) const;
+
+  /**
+   * Checks if a triangle is coincident with any of its neighboring triangles
+   */
   bool IsCoincident(const WorkMesh& k, const csTriangle& tri) const;
 };
 

@@ -40,21 +40,16 @@ Lod::~Lod ()
 void Lod::Usage()
 {
   csPrintf("Usage:\n");
-  csPrintf("lod -i <input_file> -o <output_file>\n");
+  csPrintf("lod -i=<input_file> -o=<output_file> [-em=<fast|precise>] [-v]\n");
+  csPrintf("-em:  error metric (fast or precise)\n");
+  csPrintf("-v:   verbose\n");
 }
 
 bool Lod::ParseParams(int argc, char* argv[])
 {
-  if (argc < 5)
-    Usage();
-  for (int i = 1; i < argc; i++)
-  {
-    csString s(argv[i]);
-    if (s == "-i" && i < argc-1)
-      params.input_file = argv[++i];
-    else if (s == "-o" && i < argc-1)
-      params.output_file = argv[++i];
-  }
+  csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser>(GetObjectRegistry());
+  params.input_file = csString(cmdline->GetOption("i"));
+  params.output_file = csString(cmdline->GetOption("o"));
 
   if (params.input_file == "")
   {
@@ -68,6 +63,15 @@ bool Lod::ParseParams(int argc, char* argv[])
     Usage();
     return false;
   }
+
+  csString em = cmdline->GetOption("em");
+  if (em == "fast")
+    params.error_metric_type = ERROR_METRIC_FAST;
+  else if (em == "precise")
+    params.error_metric_type = ERROR_METRIC_PRECISE;
+
+  if (cmdline->GetOption("v") != 0)
+    params.verbose = true;
 
   return true;
 }
@@ -217,6 +221,8 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
   for (unsigned int submesh_index = 0; submesh_index < fstate->GetSubMeshCount(); submesh_index++)
   {
     LodGen lodgen;
+    lodgen.SetErrorMetricType(params.error_metric_type);
+    lodgen.SetVerbose(params.verbose);
     
     csVertexListWalker<float, csVector3> fstate_vertices(fstate->GetRenderBuffer(CS_BUFFER_POSITION));
     for (unsigned int i = 0; i < fstate_vertices.GetSize(); i++)

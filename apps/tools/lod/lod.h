@@ -23,6 +23,13 @@ struct Params
 {
   csString input_file;
   csString output_file;
+  ErrorMetricType error_metric_type;
+  bool verbose;
+  
+  Params():
+    error_metric_type(ERROR_METRIC_FAST),
+    verbose(false)
+    {}
 };
 
 /**
