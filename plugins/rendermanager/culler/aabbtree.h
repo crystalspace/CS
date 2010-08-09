@@ -23,6 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/dirtyaccessarray.h"
 #include <queue>
+#include <stack>
   
   template<typename ObjectType>
   struct AABBTreeNodeExtraDataNone
@@ -553,12 +554,14 @@
       const csVector3& direction, Node* node)
     {
       bool ret = true;
-      std::queue<Node*> Q;
+      if (!node) 
+        return ret;
+      std::stack<Node*> Q;
       Q.push(node);
       while(!Q.empty())
       {
         Node* n;
-        n=Q.front();
+        n=Q.top();
         Q.pop();
         if (n->IsLeaf ())
         {
@@ -573,8 +576,8 @@
 
             const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
 
-            Q.push(n->GetChild (firstIdx));
             Q.push(n->GetChild (1-firstIdx));
+            Q.push(n->GetChild (firstIdx));
           }
         }
       }
@@ -589,12 +592,14 @@
       const csVector3& direction, Node* node) const
     {
       bool ret = true;
-      std::queue<Node*> Q;
+      if (!node) 
+        return ret;
+      std::stack<Node*> Q;
       Q.push(node);
       while(!Q.empty())
       {
         Node* n;
-        n=Q.front();
+        n=Q.top();
         Q.pop();
         if (n->IsLeaf ())
         {
@@ -609,8 +614,8 @@
 
             const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
 
-            Q.push(n->GetChild (firstIdx));
             Q.push(n->GetChild (1-firstIdx));
+            Q.push(n->GetChild (firstIdx));
           }
         }
       }
@@ -624,6 +629,8 @@
     bool TraverseIterativeF2B (const InnerFn& inner, const LeafFn& leaf, const csVector3& direction, Node* node)
     {
       bool ret = true;
+      if (!node) 
+        return ret;
       std::queue<Node*> Q;
       Q.push(node);
       while(!Q.empty())
@@ -659,6 +666,8 @@
     bool TraverseIterativeF2B (const InnerFn& inner,const LeafFn& leaf, const csVector3& direction, Node* node) const
     {
       bool ret = true;
+      if (!node) 
+        return ret;
       std::queue<Node*> Q;
       Q.push(node);
       while(!Q.empty())

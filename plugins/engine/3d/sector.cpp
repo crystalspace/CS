@@ -502,6 +502,15 @@ public:
     }
   }
 
+  virtual int GetVisibleMeshes (iMeshWrapper* mw, uint32 frustum_mask, csSectorVisibleRenderMeshes*& meshList)
+  {
+    return 0;
+  }
+
+  virtual void MarkVisible (iMeshWrapper *mw, int numMeshes, csSectorVisibleRenderMeshes*& meshList)
+  {
+  }
+
 private:
   csRenderMeshList *privMeshlist;
   iRenderView *rview;

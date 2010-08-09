@@ -316,14 +316,7 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
   const csBox3& obj_bbox = obj->child->GetBBox ();
   if (obj_bbox.Contains (data->pos))
   {
-    csSectorVisibleRenderMeshes* meshList;
-    const int nM=static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
-              (f2bData.viscallback)->MarkVisible(obj->mesh, frustum_mask,meshList);
-    if(nM) // don't add records that don't have anything to draw
-    {
-      objrec=ObjectRecord(0,meshList,nM);
-    }
-    //data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
+    data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
     return true;
   }
   
@@ -333,15 +326,9 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
     return false;
   }
 
-  csSectorVisibleRenderMeshes* meshList;
-  const int nM=static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
-        (data->viscallback)->MarkVisible(obj->mesh, new_mask, meshList);
-  if(nM) // don't add records that don't have anything to draw
-  {
-    objrec=ObjectRecord(0,meshList,nM);
-  }
-  //static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
-  //(data->viscallback)->ObjectVisible (obj->visobj, obj->mesh, new_mask);
+  csSectorVisibleRenderMeshes* meshList=0;
+  static_cast<CS::RenderManager::Implementation::ViscullCallback<RenderTreeType>*>
+    (data->viscallback)->ObjectVisible (obj->visobj, obj->mesh, new_mask);
 
   return true;
 }
@@ -426,23 +413,22 @@ struct LeafNodeProcessOP
 
   const FrustTest_Front2BackData *f2bData;
 
-  void DrawQuery(NodePtr n) const
+  void DrawQuery(NodePtr n, csSectorVisibleRenderMeshes* meshList, int numMeshes) const
   {
     n->GetGraphics3D()->OQBeginQuery(n->GetQueryID());
-    iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
-    int numMeshes=0;
-    const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
-    
-    csRenderMesh **rmeshes=mw->GetRenderMeshes(numMeshes,f2bData->rview,frust_mask);
-    for (int m = 0; m < numMeshes; m++)
+    for (int m = 0; m < numMeshes; ++m)
     {
-      if (!rmeshes[m]->portal)
-      {
-        csVertexAttrib vA=CS_VATTRIB_POSITION;
-        iRenderBuffer *rB=rmeshes[m]->buffers->GetRenderBuffer(CS_BUFFER_POSITION);
-        n->GetGraphics3D()->ActivateBuffers(&vA,&rB,1);
-        n->GetGraphics3D()->DrawMeshBasic(rmeshes[m],*rmeshes[m]);
-        n->GetGraphics3D()->DeactivateBuffers(&vA,1);
+      for (int i = 0; i < meshList[m].num; ++i)
+	    {
+        csRenderMesh* rm = meshList[m].rmeshes[i];
+        if(!rm->portal)
+        {
+          csVertexAttrib vA = CS_VATTRIB_POSITION;
+          iRenderBuffer *rB = rm->buffers->GetRenderBuffer (CS_BUFFER_POSITION);
+          n->GetGraphics3D()->ActivateBuffers (&vA, &rB, 1);
+          n->GetGraphics3D()->DrawMeshBasic (rm, *rm);
+          n->GetGraphics3D()->DeactivateBuffers (&vA, 1);
+        }
       }
     }
     n->GetGraphics3D()->OQEndQuery();
@@ -463,11 +449,21 @@ struct LeafNodeProcessOP
     }
   }
 
-  void NodeVisible(NodePtr n) const
+  void NodeVisible(NodePtr n,uint32 frustum_mask) const
   {
     n->SetCameraTimestamp(f2bData->rview->GetCamera(),f2bData->current_timestamp);
     n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
-    //DrawQuery(n);
+
+    iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
+    const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
+    csSectorVisibleRenderMeshes* meshList;
+    const int numMeshes = f2bData->viscallback->GetVisibleMeshes(mw,frustum_mask,meshList);
+    if(numMeshes > 0)
+    {
+      f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
+    }
+
+    DrawQuery(n,meshList,numMeshes);
   }
 
   int Count(NodePtr n) const
@@ -482,7 +478,7 @@ struct LeafNodeProcessOP
     return i;
   }
 
-  bool operator() (NodePtr n, const uint32 frustum_mask) const
+  bool operator() (NodePtr n,const uint32 frustum_mask) const
   { 
     CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
     const int num_objects=n->GetObjectCount();
@@ -497,8 +493,7 @@ struct LeafNodeProcessOP
     const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
     if (obj_bbox.Contains (f2bData->pos))
     {
-      f2bData->viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, frustum_mask);
-      NodeVisible(n);
+      NodeVisible(n,frustum_mask);
       return true;
     }
   
@@ -507,9 +502,8 @@ struct LeafNodeProcessOP
     {
       return true; // node invisible, but continue traversal
     }
-    f2bData->viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh, new_mask);
 
-    NodeVisible(n);
+    NodeVisible(n,new_mask);
     return true;
   }
 };
@@ -607,7 +601,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
 
   // here we should process the remaining nodes in the multi query
 
-  //printf("\n\n");
+  printf("\n\n");
 
   g3d->SetWriteMask(true,true,true,true);
   g3d->SetClipper (0, CS_CLIPPER_NONE);
