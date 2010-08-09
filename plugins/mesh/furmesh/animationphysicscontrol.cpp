@@ -70,9 +70,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void AnimationPhysicsControl::InitializeStrand (size_t strandID, csVector3* 
     coordinates, size_t coordinatesCount)
   {
-    csGuideHairAnimation* guideHairAnimation;
+    csHairData* guideHairAnimation;
 
-    guideHairAnimation = new csGuideHairAnimation;
+    guideHairAnimation = new csHairData;
 
     guideHairAnimation->controlPointsCount = coordinatesCount;
     guideHairAnimation->controlPoints = new csVector3[coordinatesCount];
@@ -90,7 +90,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csReversibleTransform currentTransform = 
       initialTransform * rigidBody->GetTransform();
 
-    csGuideHairAnimation *guideHairAnimation = guideRopes.Get(strandID, 0);
+    csHairData *guideHairAnimation = guideRopes.Get(strandID, 0);
 
     if (guideHairAnimation)
     {
@@ -101,7 +101,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void AnimationPhysicsControl::RemoveStrand (size_t strandID)
   {
-    csGuideHairAnimation* guideHairAnimation = guideRopes.Get(strandID, 0);
+    csHairData* guideHairAnimation = guideRopes.Get(strandID, 0);
 
     if (guideHairAnimation)
     {
@@ -118,7 +118,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     for (size_t i = 0 ; i < guideRopes.GetSize(); i ++)
     {
-      csGuideHairAnimation* guideHairAnimation = guideRopes.Get(i, 0);
+      csHairData* guideHairAnimation = guideRopes.Get(i, 0);
 
       if (guideHairAnimation)
       {

@@ -26,43 +26,14 @@
 #include <imesh/genmesh.h>
 
 #include "furmeshfactory.h"
+#include "furdata.h"
 #include "crystalspace.h"
 #include "csutil/scf_implementation.h"
 
 struct iObjectRegistry;
 
-#define GUIDE_HAIRS_COUNT 3
-
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
-  struct csGuideHairReference
-  {
-    size_t index;
-    float distance;
-  };
-
-  struct csHairStrand
-  {
-    csVector3 *controlPoints;
-    size_t controlPointsCount;
-    float tipRatio;
-
-    csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT];
-  };
-
-  struct csGuideHair
-  {
-    csVector3 *controlPoints;
-    size_t controlPointsCount;
-    csVector2 uv;
-  };
-
-  struct csGuideHairLOD : csGuideHair
-  {
-    csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT];
-    bool isActive;  //  ropes vs interpolate
-  };
-
   struct TextureData
   {
     iTextureHandle* handle;
@@ -176,14 +147,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     uint indexstart, indexend;
     /// functions
     void SetRigidBody (iRigidBody* rigidBody);
-    void GenerateGuideHairs(iRenderBuffer* indices, iRenderBuffer* vertexes,
-      iRenderBuffer* normals, iRenderBuffer* texCoords);
+    void GenerateGuideHairs();
     void SynchronizeGuideHairs();
     void GenerateGuideHairsLOD();
     void GenerateHairStrands();
     float TriangleDensity(csGuideHair A, csGuideHair B, csGuideHair C);
     /// debug
-    void GaussianBlur(TextureData texture);
     void SaveUVImage();
     void SaveImage(uint8* buf, const char* texname,int width, int height);
     /// setters
@@ -191,7 +160,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     void SetDensitymap();
     void SetHeightmap();
     void SetStrandWidth();
-    void SetColor(csColor color);
+    void SetColor();
     void SetDisplaceDistance();
     /// update
     void Update();

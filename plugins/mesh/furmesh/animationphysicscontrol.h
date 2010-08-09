@@ -33,12 +33,6 @@ struct iObjectRegistry;
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
-  struct csGuideHairAnimation
-  {
-    csVector3 *controlPoints;
-    size_t controlPointsCount;
-  };
-
   class AnimationPhysicsControl : public scfImplementation2 <AnimationPhysicsControl, 
     iFurPhysicsControl, iComponent>
   {
@@ -66,7 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   private:
     iObjectRegistry* object_reg;
-    csHash<csGuideHairAnimation*, size_t> guideRopes;
+    csHash<csHairData*, size_t> guideRopes;
     csRef<iRigidBody> rigidBody;
     csReversibleTransform initialTransform;
   };
