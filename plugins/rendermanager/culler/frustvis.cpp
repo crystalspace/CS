@@ -413,7 +413,23 @@ struct LeafNodeProcessOP
 
   const FrustTest_Front2BackData *f2bData;
 
-  void DrawQuery(NodePtr n, csSectorVisibleRenderMeshes* meshList, int numMeshes) const
+  bool IsRMPortal(const NodePtr n,const csSectorVisibleRenderMeshes* meshList,const int numMeshes) const
+  {
+    for (int m = 0; m < numMeshes; ++m)
+    {
+      for (int i = 0; i < meshList[m].num; ++i)
+	    {
+        csRenderMesh* rm = meshList[m].rmeshes[i];
+        if(rm->portal)
+        {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  void DrawQuery(const NodePtr n,const csSectorVisibleRenderMeshes* meshList,const int numMeshes) const
   {
     n->GetGraphics3D()->OQBeginQuery(n->GetQueryID());
     for (int m = 0; m < numMeshes; ++m)
@@ -432,23 +448,6 @@ struct LeafNodeProcessOP
       }
     }
     n->GetGraphics3D()->OQEndQuery();
-
-    /*const bool ret=n->GetGraphics3D()->OQIsVisible(n->GetQueryID(),0);
-    csBox3 box=n->GetLeafData(0)->GetBBox();
-    if(ret)
-    {
-      csPrintf("Visible (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
-          box.MinX(),box.MinY(),box.MinZ(),
-          box.MaxX(),box.MaxY(),box.MaxZ());
-      //csPrintf("Visible\n");
-    }
-    else
-    {
-      csPrintf("Not visible (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
-          box.MinX(),box.MinY(),box.MinZ(),
-          box.MaxX(),box.MaxY(),box.MaxZ());
-      //csPrintf("Not visible\n");
-    }*/
   }
 
   bool CheckOQ(const NodePtr n) const
@@ -461,7 +460,7 @@ struct LeafNodeProcessOP
     return true;
   }
 
-  void NodeVisible(NodePtr n,uint32 frustum_mask) const
+  void NodeVisible(const NodePtr n,uint32 frustum_mask) const
   {
     n->SetCameraTimestamp(f2bData->rview->GetCamera(),f2bData->current_timestamp);
     n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
@@ -470,12 +469,14 @@ struct LeafNodeProcessOP
     const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
     csSectorVisibleRenderMeshes* meshList;
     const int numMeshes = f2bData->viscallback->GetVisibleMeshes(mw,frustum_mask,meshList);
-    if(numMeshes > 0 && CheckOQ(n))
+    if(numMeshes > 0 )
     {
-      f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
+      const bool isp=IsRMPortal(n,meshList,numMeshes);
+      if(isp || CheckOQ(n))
+        f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
+      if(!isp)
+        DrawQuery(n,meshList,numMeshes);
     }
-    //else printf("Not visible\n");
-    DrawQuery(n,meshList,numMeshes);
   }
 
   bool operator() (NodePtr n,const uint32 frustum_mask) const
