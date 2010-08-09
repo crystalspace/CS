@@ -177,7 +177,7 @@ bool KrystalScene::CreateAvatar ()
   if (!meshfact)
     return hairTest->ReportError ("Can't find Krystal's mesh factory!");
 
-  animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  animeshFactory = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshfact->GetMeshObjectFactory ());
   if (!animeshFactory)
     return hairTest->ReportError ("Can't find Krystal's animesh factory!");
@@ -192,9 +192,9 @@ bool KrystalScene::CreateAvatar ()
   if (!rc.success)
     return hairTest->ReportError ("Can't load Krystal's body mesh file!");
 
-  csRef<iBodyManager> bodyManager =
-    csQueryRegistry<iBodyManager> (hairTest->GetObjectRegistry ());
-  csRef<iBodySkeleton> bodySkeleton = bodyManager->FindBodySkeleton ("krystal_body");
+  csRef<CS::Animation::iBodyManager> bodyManager =
+    csQueryRegistry<CS::Animation::iBodyManager> (hairTest->GetObjectRegistry ());
+  csRef<CS::Animation::iBodySkeleton> bodySkeleton = bodyManager->FindBodySkeleton ("krystal_body");
   if (!bodySkeleton)
     return hairTest->ReportError ("Can't find Krystal's body mesh description!");
 
@@ -252,52 +252,52 @@ bool KrystalScene::CreateAvatar ()
   //   + ragdoll controller node (root node - only if physics are enabled)
   //     + Random node
   //       + idle animation nodes
-  csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
+  csRef<CS::Animation::iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create the 'random' node
-  csRef<iSkeletonRandomNodeFactory2> randomNodeFactory =
+  csRef<CS::Animation::iSkeletonRandomNodeFactory2> randomNodeFactory =
     animPacketFactory->CreateRandomNode ("random");
   randomNodeFactory->SetAutomaticSwitch (true);
 
   // Create the 'idle01' animation node
-  csRef<iSkeletonAnimationNodeFactory2> idle01NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle01NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle01");
   idle01NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle01"));
 
   // Create the 'idle02' animation node
-  csRef<iSkeletonAnimationNodeFactory2> idle02NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle02NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle02");
   idle02NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle02"));
 
   // Create the 'idle03' animation node
-  csRef<iSkeletonAnimationNodeFactory2> idle03NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle03NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle03");
   idle03NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle03"));
 
   // Create the 'idle04' animation node
-  csRef<iSkeletonAnimationNodeFactory2> idle04NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle04NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle04");
   idle04NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle04"));
 
   // Create the 'idle05' animation node
-  csRef<iSkeletonAnimationNodeFactory2> idle05NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle05NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle05");
   idle05NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle05"));
 
   // Create the 'idle06' animation node
-  csRef<iSkeletonAnimationNodeFactory2> idle06NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle06NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle06");
   idle06NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle06"));
 
   // Create the 'stand' animation node
-  csRef<iSkeletonAnimationNodeFactory2> standNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> standNodeFactory =
     animPacketFactory->CreateAnimationNode ("stand");
   standNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("stand"));
@@ -329,7 +329,7 @@ bool KrystalScene::CreateAvatar ()
   if (hairTest->physicsEnabled)
   {
     // Create the ragdoll controller
-    csRef<iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
+    csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
       hairTest->ragdollManager->CreateAnimNodeFactory
       ("ragdoll", bodySkeleton, hairTest->dynamicSystem);
     animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
@@ -367,19 +367,19 @@ bool KrystalScene::CreateAvatar ()
   csRef<iMeshWrapper> avatarMesh =
     hairTest->engine->CreateMeshWrapper (meshfact, "krystal",
     hairTest->room, csVector3 (0.0f));
-  animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
+  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
   // When the animated mesh is created, the animation nodes are created too.
   // We can therefore set them up now.
-  iSkeletonAnimNode2* rootNode =
+  CS::Animation::iSkeletonAnimNode2* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
   // Setup of the ragdoll controller
   if (hairTest->physicsEnabled)
   {
     ragdollNode =
-      scfQueryInterface<iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
-    ragdollNode->SetAnimatedMesh (animesh);
+      scfQueryInterface<CS::Animation::iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
+//     ragdollNode->SetAnimatedMesh (animesh);
 
     // Start the ragdoll animation node in order to have the rigid bodies created
     ragdollNode->Play ();

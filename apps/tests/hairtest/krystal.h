@@ -55,9 +55,9 @@ private:
 
   // Ragdoll node related
   bool krystalDead;
-  csRef<iSkeletonRagdollNode2> ragdollNode;
-  iBodyChain* bodyChain;
-  iBodyChain* hairChain;
+  csRef<CS::Animation::iSkeletonRagdollNode2> ragdollNode;
+  CS::Animation::iBodyChain* bodyChain;
+  CS::Animation::iBodyChain* hairChain;
 
   // Krystal's hairs & skirt (soft bodies)
   csRef<iMeshWrapper> hairsMesh;

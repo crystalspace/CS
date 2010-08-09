@@ -61,7 +61,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->rigidBody = rigidBody;
   }
 
-  void AnimationPhysicsControl::SetBulletDynamicSystem (iBulletDynamicSystem* 
+  void AnimationPhysicsControl::SetBulletDynamicSystem (CS::Physics::Bullet::iDynamicSystem* 
     bulletDynamicSystem)
   {
   }

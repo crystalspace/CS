@@ -70,8 +70,8 @@ public:
   virtual void SwitchFurPhysics() = 0;
 
   // Animesh
-  csRef<iAnimatedMeshFactory> animeshFactory;
-  csRef<iAnimatedMesh> animesh;
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory;
+  csRef<CS::Mesh::iAnimatedMesh> animesh;
   // Fur material
   csRef<iFurMesh> furMesh;
 };
@@ -87,15 +87,15 @@ private:
   bool physicsEnabled;
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
-  csRef<iBulletDynamicSystem> bulletDynamicSystem;
+  csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
 
   // Animation node plugin managers
-  csRef<iSkeletonLookAtManager2> lookAtManager;
-  csRef<iSkeletonBasicNodesManager2> basicNodesManager;
-  csRef<iSkeletonRagdollManager2> ragdollManager;
+  csRef<CS::Animation::iSkeletonLookAtManager2> lookAtManager;
+  csRef<CS::Animation::iSkeletonBasicNodesManager2> basicNodesManager;
+  csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;
 
   // GUI related
   csRef<iVFS> vfs;

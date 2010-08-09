@@ -39,7 +39,7 @@ struct iFurPhysicsControl : public virtual iBase
 
   virtual void SetInitialTransform(csReversibleTransform initialTransform) = 0;
   virtual void SetRigidBody (iRigidBody* rigidBody) = 0;
-  virtual void SetBulletDynamicSystem (iBulletDynamicSystem* 
+  virtual void SetBulletDynamicSystem (CS::Physics::Bullet::iDynamicSystem* 
     bulletDynamicSystem) = 0;
 
   // Initialize the strand with the given ID
@@ -116,8 +116,8 @@ struct iFurMesh : public virtual iBase
   virtual void SetFurStrandGenerator( iFurStrandGenerator* furStrandGenerator) = 0;
   virtual iFurStrandGenerator* GetFurStrandGenerator( ) = 0;
 
-  virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory ) = 0;
-  virtual void SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
+  virtual void SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory ) = 0;
+  virtual void SetMeshFactorySubMesh ( CS::Mesh::iAnimatedMeshSubMeshFactory* 
     meshFactorySubMesh ) = 0;
   virtual void SetMaterial ( iMaterial* material ) = 0;
 };

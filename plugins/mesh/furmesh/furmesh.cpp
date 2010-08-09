@@ -836,12 +836,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     }
   }
 
-  void FurMesh::SetMeshFactory ( iAnimatedMeshFactory* meshFactory)
+  void FurMesh::SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory)
   {
     this->meshFactory = meshFactory;
   }
 
-  void FurMesh::SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
+  void FurMesh::SetMeshFactorySubMesh ( CS::Mesh::iAnimatedMeshSubMeshFactory* 
     meshFactorySubMesh )
   { 
     this->meshFactorySubMesh = meshFactorySubMesh;

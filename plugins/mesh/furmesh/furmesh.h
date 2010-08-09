@@ -88,8 +88,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void StopPhysicsControl ( );
 
     // Temporary - Set Mesh and Submesh
-    virtual void SetMeshFactory ( iAnimatedMeshFactory* meshFactory);
-    virtual void SetMeshFactorySubMesh ( iAnimatedMeshFactorySubMesh* 
+    virtual void SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory);
+    virtual void SetMeshFactorySubMesh ( CS::Mesh::iAnimatedMeshSubMeshFactory* 
       meshFactorySubMesh );
     // Set Material
     virtual void SetMaterial ( iMaterial* material );
@@ -122,8 +122,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     size_t hairStrandsLODSize;
     bool physicsControlEnabled;
     /// Temp fur geometry
-    csRef<iAnimatedMeshFactory> meshFactory;
-    csRef<iAnimatedMeshFactorySubMesh> meshFactorySubMesh;
+    csRef<CS::Mesh::iAnimatedMeshFactory> meshFactory;
+    csRef<CS::Mesh::iAnimatedMeshSubMeshFactory> meshFactorySubMesh;
     csRef<iMaterial> material;
     csRef<iShaderVarStringSet> svStrings;
     /// Density & Height maps
