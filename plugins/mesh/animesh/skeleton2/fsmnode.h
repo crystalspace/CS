@@ -48,11 +48,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   public:
     AnimationFifo (AnimationFifoCb* cb);
 
-    void PushAnimation (iSkeletonAnimNode2* node, bool directSwitch,
+    void PushAnimation (CS::Animation::iSkeletonAnimNode2* node, bool directSwitch,
       float blendInTime = 0.0f, size_t cbData = ~0);
     void RemoveAnimations (size_t cbData);
 
-    void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
+    void BlendState (CS::Animation::csSkeletalState2* state, float baseWeight = 1.0f);
     void TickAnimation (float dt);
 
     void Stop ();
@@ -60,7 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   private:
     struct AnimationInstruction
     {
-      csRef<iSkeletonAnimNode2> node;
+      csRef<CS::Animation::iSkeletonAnimNode2> node;
       size_t cbData;
       float blendInTime;
       bool directSwitch;
@@ -88,20 +88,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   class FSMNodeFactory :
     public scfImplementation2<FSMNodeFactory,
-                              iSkeletonFSMNodeFactory2,
-                              scfFakeInterface<iSkeletonAnimNodeFactory2> >
+                              CS::Animation::iSkeletonFSMNodeFactory2,
+                              scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory2> >
   {
   public:
     CS_LEAKGUARD_DECLARE(FSMNodeFactory);
   
     FSMNodeFactory (const char* name);
 
-    //-- iSkeletonFSMNodeFactory2
+    //-- CS::Animation::iSkeletonFSMNodeFactory2
     virtual CS::Animation::StateID AddState (); 
-    virtual CS::Animation::StateID AddState (const char* name, iSkeletonAnimNodeFactory2 *nodeFact);
+    virtual CS::Animation::StateID AddState (const char* name, CS::Animation::iSkeletonAnimNodeFactory2 *nodeFact);
     virtual void SetStateNode (CS::Animation::StateID id, 
-      iSkeletonAnimNodeFactory2* nodeFact);
-    virtual iSkeletonAnimNodeFactory2* GetStateNode (CS::Animation::StateID id) const;
+      CS::Animation::iSkeletonAnimNodeFactory2* nodeFact);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetStateNode (CS::Animation::StateID id) const;
     virtual void SetStateName (CS::Animation::StateID id, const char* name);
     virtual const char* GetStateName (CS::Animation::StateID id) const;
     virtual CS::Animation::StateID FindState (const char* name) const;
@@ -110,21 +110,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual uint GetStateCount () const;
     virtual void ClearStates ();
     virtual void SetStateTransition (CS::Animation::StateID fromState, 
-      CS::Animation::StateID toState, iSkeletonAnimNodeFactory2* fact);
+      CS::Animation::StateID toState, CS::Animation::iSkeletonAnimNodeFactory2* fact);
     virtual void SetTransitionCrossfade (CS::Animation::StateID fromState, 
       CS::Animation::StateID toState, float time1, float time2);
     virtual void SetAutomaticTransition (CS::Animation::StateID fromState, 
       CS::Animation::StateID toState, bool automatic);
 
-    //-- iSkeletonAnimationNodeFactory2
-    virtual csPtr<iSkeletonAnimNode2> CreateInstance (
-      iSkeletonAnimPacket2* packet, iSkeleton2* skeleton);
+    //-- CS::Animation::iSkeletonAnimationNodeFactory2
+    virtual csPtr<CS::Animation::iSkeletonAnimNode2> CreateInstance (
+      CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton);
     virtual const char* GetNodeName () const;
-    virtual iSkeletonAnimNodeFactory2* FindNode (const char* name);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* FindNode (const char* name);
 
     struct State
     {
-      csRef<iSkeletonAnimNodeFactory2> nodeFactory;
+      csRef<CS::Animation::iSkeletonAnimNodeFactory2> nodeFactory;
       csString name;
     };
 
@@ -145,7 +145,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       : time1 (0.0f), time2 (0.0f)//, directSwitch (true)
       {}
 
-      csRef<iSkeletonAnimNodeFactory2> nodeFactory;
+      csRef<CS::Animation::iSkeletonAnimNodeFactory2> nodeFactory;
       float time1, time2;
       //bool directSwitch;
     };
@@ -164,8 +164,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   class FSMNode :
     public scfImplementation2<FSMNode,
-                              iSkeletonFSMNode2,
-                              scfFakeInterface<iSkeletonAnimNode2> >,
+                              CS::Animation::iSkeletonFSMNode2,
+                              scfFakeInterface<CS::Animation::iSkeletonAnimNode2> >,
     public BaseNodeSingle,
     public AnimationFifoCb
   {
@@ -174,13 +174,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
     FSMNode (FSMNodeFactory* factory);
 
-    //-- iSkeletonFSMNode2
+    //-- CS::Animation::iSkeletonFSMNode2
     virtual void SwitchToState (CS::Animation::StateID newState);
     void SwitchToState (CS::Animation::StateID newState, bool directSwitch);
     virtual CS::Animation::StateID GetCurrentState () const;
-    virtual iSkeletonAnimNode2* GetStateNode (CS::Animation::StateID state) const;
+    virtual CS::Animation::iSkeletonAnimNode2* GetStateNode (CS::Animation::StateID state) const;
 
-    //-- iSkeletonAnimationNode2
+    //-- CS::Animation::iSkeletonAnimationNode2
     virtual void Play ();
     virtual void Stop ();
     virtual void SetPlaybackPosition (float time);
@@ -188,13 +188,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual float GetDuration () const;
     virtual void SetPlaybackSpeed (float speed);
     virtual float GetPlaybackSpeed () const;
-    virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
+    virtual void BlendState (CS::Animation::csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
-    virtual iSkeletonAnimNodeFactory2* GetFactory () const;
-    virtual iSkeletonAnimNode2* FindNode (const char* name);
-    virtual void AddAnimationCallback (iSkeletonAnimCallback2* callback);
-    virtual void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetFactory () const;
+    virtual CS::Animation::iSkeletonAnimNode2* FindNode (const char* name);
+    virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
+    virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
 
     //-- AnimationFifoCb
     virtual void NewAnimation (size_t data);
@@ -202,7 +202,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   private:
     struct State
     {
-      csRef<iSkeletonAnimNode2> stateNode;
+      csRef<CS::Animation::iSkeletonAnimNode2> stateNode;
     };
 
     struct StateTransitionInfo
@@ -211,7 +211,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       : time1 (0.0f), time2 (0.0f)//, directSwitch (true)
       {}      
 
-      csRef<iSkeletonAnimNode2> transitionNode;
+      csRef<CS::Animation::iSkeletonAnimNode2> transitionNode;
       float time1, time2;
       //bool directSwitch;
     };

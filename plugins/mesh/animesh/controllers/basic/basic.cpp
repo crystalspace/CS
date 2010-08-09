@@ -42,15 +42,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
   {
   }
 
-  iSkeletonSpeedNodeFactory2* BasicNodesManager::CreateSpeedNodeFactory (const char* name)
+  CS::Animation::iSkeletonSpeedNodeFactory2* BasicNodesManager::CreateSpeedNodeFactory (const char* name)
   {
-    csRef<iSkeletonSpeedNodeFactory2> newFact;
+    csRef<CS::Animation::iSkeletonSpeedNodeFactory2> newFact;
     newFact.AttachNew (new SpeedNodeFactory (this, name));
 
     return speedFactories.PutUnique (name, newFact);
   }
 
-  iSkeletonSpeedNodeFactory2* BasicNodesManager::FindSpeedNodeFactory (const char* name)
+  CS::Animation::iSkeletonSpeedNodeFactory2* BasicNodesManager::FindSpeedNodeFactory (const char* name)
   {
    return speedFactories.Get (name, 0);
   }
@@ -94,11 +94,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
   {
   }
 
-  void SpeedNodeFactory::AddNode (iSkeletonAnimNodeFactory2* factory, float speed)
+  void SpeedNodeFactory::AddNode (CS::Animation::iSkeletonAnimNodeFactory2* factory, float speed)
   {
     // user help: set it cyclic if it is an animnode, otherwise it has to be made by the user
-    csRef<iSkeletonAnimationNodeFactory2> fact =
-      scfQueryInterface<iSkeletonAnimationNodeFactory2> (factory);
+    csRef<CS::Animation::iSkeletonAnimationNodeFactory2> fact =
+      scfQueryInterface<CS::Animation::iSkeletonAnimationNodeFactory2> (factory);
     if (fact)
       fact->SetCyclic (true);
 
@@ -107,20 +107,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
     subFactories.Insert (index, factory);
   }
 
-  csPtr<iSkeletonAnimNode2> SpeedNodeFactory::CreateInstance (iSkeletonAnimPacket2* packet,
-							      iSkeleton2* skeleton)
+  csPtr<CS::Animation::iSkeletonAnimNode2> SpeedNodeFactory::CreateInstance (CS::Animation::iSkeletonAnimPacket2* packet,
+							      CS::Animation::iSkeleton2* skeleton)
   {
     csRef<SpeedNode> newP;
     newP.AttachNew (new SpeedNode (this, skeleton));
 
     for (size_t i = 0; i < subFactories.GetSize (); i++)
     {
-      csRef<iSkeletonAnimNode2> node = 
+      csRef<CS::Animation::iSkeletonAnimNode2> node = 
 	subFactories[i]->CreateInstance (packet, skeleton);
       newP->subNodes.Push (node);
     }
 
-    return csPtr<iSkeletonAnimNode2> (newP);
+    return csPtr<CS::Animation::iSkeletonAnimNode2> (newP);
   }
 
   const char* SpeedNodeFactory::GetNodeName () const
@@ -128,14 +128,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
     return name;
   }
 
-  iSkeletonAnimNodeFactory2* SpeedNodeFactory::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNodeFactory2* SpeedNodeFactory::FindNode (const char* name)
   {
     if (this->name == name)
       return this;
 
     for (size_t i = 0; i < subFactories.GetSize (); i++)
     {
-      iSkeletonAnimNodeFactory2* r = subFactories[i]->FindNode (name);
+      CS::Animation::iSkeletonAnimNodeFactory2* r = subFactories[i]->FindNode (name);
       if (r)
         return r;
     }
@@ -149,7 +149,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
 
   CS_LEAKGUARD_IMPLEMENT(SpeedNode);
 
-  SpeedNode::SpeedNode (SpeedNodeFactory* factory, iSkeleton2* skeleton)
+  SpeedNode::SpeedNode (SpeedNodeFactory* factory, CS::Animation::iSkeleton2* skeleton)
     : scfImplementationType (this), factory (factory), skeleton (skeleton),
     speed (0.0f), slowNode (0), fastNode (0), currentPosition (0.0f), speedRatio (1.0f),
     isPlaying (false)
@@ -334,7 +334,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
     return 0.0f;
   }
 
-  void SpeedNode::BlendState (csSkeletalState2* state, float baseWeight)
+  void SpeedNode::BlendState (CS::Animation::csSkeletalState2* state, float baseWeight)
   {
     if (!isPlaying)
       return;
@@ -377,19 +377,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
     return isPlaying;
   }
 
-  iSkeletonAnimNodeFactory2* SpeedNode::GetFactory () const
+  CS::Animation::iSkeletonAnimNodeFactory2* SpeedNode::GetFactory () const
   {
     return factory;
   }
 
-  iSkeletonAnimNode2* SpeedNode::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNode2* SpeedNode::FindNode (const char* name)
   {
     if (factory->name == name)
       return this;
 
     for (size_t i = 0; i < subNodes.GetSize (); i++)
     {
-      iSkeletonAnimNode2* r = subNodes[i]->FindNode (name);
+      CS::Animation::iSkeletonAnimNode2* r = subNodes[i]->FindNode (name);
       if (r)
         return r;
     }
@@ -397,12 +397,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
     return 0;
   }
 
-  void SpeedNode::AddAnimationCallback (iSkeletonAnimCallback2* callback)
+  void SpeedNode::AddAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback)
   {
     // TODO?
   }
 
-  void SpeedNode::RemoveAnimationCallback (iSkeletonAnimCallback2* callback)
+  void SpeedNode::RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback)
   {
     // TODO?
   }

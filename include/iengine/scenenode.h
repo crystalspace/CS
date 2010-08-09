@@ -51,6 +51,16 @@ struct iSceneNodeArray : public iArrayReadOnly<iSceneNode*>
  * represents an object, light, or camera. The scene graph is build out
  * of scene nodes and movables.
  * 
+ * When you attach a scene node to another, then the relative position
+ * of the two nodes will be kept constant. So, when you move a parent
+ * node then the position of the children will be updated automatically.
+ * If the parent node is added or removed from a sector then the children
+ * will be updated consequently too.
+ * 
+ * Once attached to a parent node, the transform of the iMovable of the
+ * node will be interpreted as the relative position bewteen the child and
+ * its parent.
+ * 
  * Main ways to get pointers to this interface:
  * - iMeshWrapper::QuerySceneNode()
  * - iLight::QuerySceneNode()
@@ -65,7 +75,9 @@ struct iSceneNode : public virtual iBase
   SCF_INTERFACE(iSceneNode, 2,0,1);
 
   /**
-   * Get the movable for this scene node.
+   * Get the movable for this scene node. The transform of the movable is
+   * defined in world coordinates if this node has not parent. Otherwise,
+   * the transform is defined relative to the parent node.
    */
   virtual iMovable* GetMovable () const = 0;
 

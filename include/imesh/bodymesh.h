@@ -33,8 +33,12 @@
 /**\addtogroup meshplugins
  * @{ */
 
+namespace CS
+{
+namespace Animation
+{
+
 struct iSkeletonFactory2;
-struct iAnimatedMesh;
 struct iBodySkeleton;
 struct iBodyBone;
 struct iBodyChain;
@@ -48,13 +52,13 @@ struct iBodyBoneCollider;
  */
 struct iBodyManager : public virtual iBase
 {
-  SCF_INTERFACE(iBodyManager, 2, 0, 0);
+  SCF_INTERFACE(CS::Animation::iBodyManager, 2, 0, 0);
 
   /**
    * Create a new body skeleton with the specified name.
    */
-  virtual iBodySkeleton* CreateBodySkeleton (const char *name,
-			      iSkeletonFactory2* skeletonFactory) = 0;
+  virtual iBodySkeleton* CreateBodySkeleton
+    (const char *name, iSkeletonFactory2* skeletonFactory) = 0;
 
   /**
    * Find a body skeleton from its name.
@@ -69,13 +73,13 @@ struct iBodyManager : public virtual iBase
 
 /**
  * This class holds the physical description of the skeleton of an animated mesh.
- * For each relevant bone of the skeleton, one has to define an iBodyBone that 
+ * For each relevant bone of the skeleton, one has to define an CS::Animation::iBodyBone that 
  * will hold the colliders, joint and properties of the bone.
- * Subtrees of the skeleton are defined through the iBodyChain object.
+ * Subtrees of the skeleton are defined through the CS::Animation::iBodyChain object.
  */
 struct iBodySkeleton : public virtual iBase
 {
-  SCF_INTERFACE(iBodySkeleton, 2, 0, 1);
+  SCF_INTERFACE(CS::Animation::iBodySkeleton, 2, 0, 1);
 
   /**
    * Return the name of the body skeleton.
@@ -116,7 +120,7 @@ struct iBodySkeleton : public virtual iBase
    * \param name The name of the body chain.
    * \param rootBone The root of the body chain. It must be followed 
    * by a list of child bones. All bones from the root bone to the child 
-   * bones will be added. All bones that are added must have a iBodyBone 
+   * bones will be added. All bones that are added must have a CS::Animation::iBodyBone 
    * defined.
    * \return The body chain upon success, 0 if there was a problem.
    */
@@ -144,7 +148,7 @@ struct iBodySkeleton : public virtual iBase
  */
 struct iBodyBone : public virtual iBase
 {
-  SCF_INTERFACE(iBodyBone, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iBodyBone, 1, 0, 0);
 
   /**
    * Return the ID of the bone of the animated mesh associated to this body bone.
@@ -152,7 +156,7 @@ struct iBodyBone : public virtual iBase
   virtual BoneID GetAnimeshBone () const = 0;
 
   /**
-   * Create physical properties for this body bone. Only one iBodyBoneProperties
+   * Create physical properties for this body bone. Only one CS::Animation::iBodyBoneProperties
    * can be created per bone. If no properties are defined then they will be
    * computed automatically by the dynamic system.
    */
@@ -165,7 +169,7 @@ struct iBodyBone : public virtual iBase
   virtual iBodyBoneProperties* GetBoneProperties () const = 0;
 
   /**
-   * Create a joint for this body bone. Only one iBodyBoneJoint
+   * Create a joint for this body bone. Only one CS::Animation::iBodyBoneJoint
    * can be created per bone.
    */
   virtual iBodyBoneJoint* CreateBoneJoint () = 0;
@@ -198,7 +202,7 @@ struct iBodyBone : public virtual iBase
  */
 struct iBodyChain : public virtual iBase
 {
-  SCF_INTERFACE(iBodyChain, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iBodyChain, 1, 0, 0);
 
   /**
    * Get the name of this body chain.
@@ -217,7 +221,7 @@ struct iBodyChain : public virtual iBase
  */
 struct iBodyChainNode : public virtual iBase
 {
-  SCF_INTERFACE(iBodyChainNode, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iBodyChainNode, 1, 0, 0);
 
   /**
    * Get the body bone associated with this node.
@@ -246,7 +250,7 @@ struct iBodyChainNode : public virtual iBase
  */
 struct iBodyBoneProperties : public virtual iBase
 {
-  SCF_INTERFACE(iBodyBoneProperties, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iBodyBoneProperties, 1, 0, 0);
 
   /**
    * Set the total mass of the rigid body of this bone.
@@ -285,7 +289,7 @@ struct iBodyBoneProperties : public virtual iBase
  */
 struct iBodyBoneJoint : public virtual iBase
 {
-  SCF_INTERFACE(iBodyBoneJoint, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iBodyBoneJoint, 1, 0, 0);
 
   /**
    * Set the restitution of the joint's stop point.
@@ -385,7 +389,7 @@ struct iBodyBoneJoint : public virtual iBase
  */
 struct iBodyBoneCollider : public virtual iBase
 {
-  SCF_INTERFACE(iBodyBoneCollider, 2, 0, 0);
+  SCF_INTERFACE(CS::Animation::iBodyBoneCollider, 2, 0, 0);
 
   /**
    * Set the collider as a box (defined by the given size).
@@ -519,6 +523,9 @@ struct iBodyBoneCollider : public virtual iBase
    */
   virtual float GetDensity () const = 0;
 };
+
+} // namespace Animation
+} // namespace CS
 
 /** @} */
 

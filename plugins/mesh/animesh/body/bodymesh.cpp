@@ -42,17 +42,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   {
   }
 
-  iBodySkeleton* BodyManager::CreateBodySkeleton (const char *name,
-			            iSkeletonFactory2* skeletonFactory)
+  CS::Animation::iBodySkeleton* BodyManager::CreateBodySkeleton (const char *name,
+			            CS::Animation::iSkeletonFactory2* skeletonFactory)
   {
     // Check name uniqueness
-    csRef<iBodySkeleton> newFact;
+    csRef<CS::Animation::iBodySkeleton> newFact;
     newFact.AttachNew (new BodySkeleton (name, this, skeletonFactory));
 
     return factoryHash.PutUnique (name, newFact);
   }
 
-  iBodySkeleton* BodyManager::FindBodySkeleton (const char *name)
+  CS::Animation::iBodySkeleton* BodyManager::FindBodySkeleton (const char *name)
   {
     return factoryHash.Get (name, 0);
   }
@@ -92,7 +92,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   CS_LEAKGUARD_IMPLEMENT(BodySkeleton);
 
   BodySkeleton::BodySkeleton (const char* name, BodyManager* manager,
-			      iSkeletonFactory2* skeletonFactory)
+			      CS::Animation::iSkeletonFactory2* skeletonFactory)
     : scfImplementationType (this), name (name), manager (manager),
     skeletonFactory (skeletonFactory)
   {
@@ -103,7 +103,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return name;
   }
 
-  iSkeletonFactory2* BodySkeleton::GetSkeletonFactory () const
+  CS::Animation::iSkeletonFactory2* BodySkeleton::GetSkeletonFactory () const
   {
     return skeletonFactory;
   }
@@ -114,9 +114,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     chainHash.DeleteAll ();
   }
 
-  iBodyBone* BodySkeleton::CreateBodyBone (BoneID boneID)
+  CS::Animation::iBodyBone* BodySkeleton::CreateBodyBone (CS::Animation::BoneID boneID)
   {
-    if (boneID == InvalidBoneID)
+    if (boneID == CS::Animation::InvalidBoneID)
     {
       manager->Report (CS_REPORTER_SEVERITY_ERROR,
 		       "Invalid bone ID while creating body bone");
@@ -140,19 +140,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     }    
 
     // check ID uniqueness
-    csRef<iBodyBone> newFact;
+    csRef<CS::Animation::iBodyBone> newFact;
     newFact.AttachNew (new BodyBone (boneID));
 
     return boneHash.PutUnique (boneID, newFact);
   }
 
-  iBodyBone* BodySkeleton::FindBodyBone (const char *name) const
+  CS::Animation::iBodyBone* BodySkeleton::FindBodyBone (const char *name) const
   {
-    BoneID boneID = skeletonFactory->FindBone (name);
+    CS::Animation::BoneID boneID = skeletonFactory->FindBone (name);
     return boneHash.Get (boneID, 0);
   }
 
-  iBodyBone* BodySkeleton::FindBodyBone (BoneID bone) const
+  CS::Animation::iBodyBone* BodySkeleton::FindBodyBone (CS::Animation::BoneID bone) const
   {
     return boneHash.Get (bone, 0);
   }
@@ -162,8 +162,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     boneHash.DeleteAll ();
   }
 
-  iBodyChain* BodySkeleton::CreateBodyChain (
-		const char *name, BoneID rootBone, ...)
+  CS::Animation::iBodyChain* BodySkeleton::CreateBodyChain (
+		const char *name, CS::Animation::BoneID rootBone, ...)
   {
     // TODO:
     //   - adding only one node: one root + one child same as root
@@ -178,7 +178,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     }
 
     // check validity of root bone
-    if (rootBone == InvalidBoneID)
+    if (rootBone == CS::Animation::InvalidBoneID)
     {
       manager->Report (CS_REPORTER_SEVERITY_ERROR,
 		       "Invalid root bone while creating body chain.");
@@ -198,13 +198,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     if (!boneHash.Contains (rootBone))
     {
       manager->Report (CS_REPORTER_SEVERITY_ERROR,
-		       "No iBodyBone defined for root bone: %i",
+		       "No CS::Animation::iBodyBone defined for root bone: %i",
 		       rootBone);
       return 0;
     }
 
     // create list of nodes, put in it the root node
-    csHash<csRef<BodyChainNode>, BoneID> nodeHash;
+    csHash<csRef<BodyChainNode>, CS::Animation::BoneID> nodeHash;
     csRef<BodyChainNode> rootNode;
     rootNode.AttachNew (new BodyChainNode (boneHash.Get (rootBone, 0)));			
     nodeHash.Put (rootBone, rootNode);
@@ -213,10 +213,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     va_list vl;
     va_start (vl, rootBone);
 
-    BoneID bone, parent;
+    CS::Animation::BoneID bone, parent;
     while (1)
     {
-      bone = va_arg (vl, BoneID);
+      bone = va_arg (vl, CS::Animation::BoneID);
       if (!bone) break;
 
       // TODO: check no repetition of child bones
@@ -224,7 +224,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 	continue;
 
       // check bone is valid
-      if (bone == InvalidBoneID)
+      if (bone == CS::Animation::InvalidBoneID)
       {
 	manager->Report (CS_REPORTER_SEVERITY_ERROR,
 			 "Invalid child bone while creating chain");
@@ -246,7 +246,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
       if (!boneHash.Contains (bone))
       {
 	manager->Report (CS_REPORTER_SEVERITY_ERROR,
-			 "No iBodyBone defined for child bone: %i (%s)",
+			 "No CS::Animation::iBodyBone defined for child bone: %i (%s)",
 			 bone, skeletonFactory->GetBoneName (bone));
 	va_end (vl);
 	return 0;
@@ -262,7 +262,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
       while (1)
       {
 	// check that the root bone of the skeleton is not reached
-	if (parent == InvalidBoneID)
+	if (parent == CS::Animation::InvalidBoneID)
 	{
 	  manager->Report (CS_REPORTER_SEVERITY_ERROR,
    "The specified child bone %i (%s) is not really a child of root bone %i (%s)",
@@ -288,7 +288,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 	if (!boneHash.Contains (parent))
 	{
 	  manager->Report (CS_REPORTER_SEVERITY_ERROR,
-	   "BodySkeleton::CreateChain: No iBodyBone defined for bone: %i (%s)",
+	   "BodySkeleton::CreateChain: No CS::Animation::iBodyBone defined for bone: %i (%s)",
 			   parent, skeletonFactory->GetBoneName (parent));
 	  va_end (vl);
 	  return 0;
@@ -315,7 +315,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return chainHash.PutUnique (name, chain);
   }
 
-  iBodyChain* BodySkeleton::FindBodyChain (const char *name) const
+  CS::Animation::iBodyChain* BodySkeleton::FindBodyChain (const char *name) const
   {
     return chainHash.Get (name, 0);
   }
@@ -332,39 +332,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   CS_LEAKGUARD_IMPLEMENT(BodyBone);
 
-  BodyBone::BodyBone (BoneID boneID)
+  BodyBone::BodyBone (CS::Animation::BoneID boneID)
     : scfImplementationType (this), animeshBone (boneID)
   {
   }
 
-  BoneID BodyBone::GetAnimeshBone () const
+  CS::Animation::BoneID BodyBone::GetAnimeshBone () const
   {
     return animeshBone;
   }
 
-  iBodyBoneProperties* BodyBone::CreateBoneProperties ()
+  CS::Animation::iBodyBoneProperties* BodyBone::CreateBoneProperties ()
   {
     properties.AttachNew (new BodyBoneProperties ());
     return properties;
   }
 
-  iBodyBoneProperties* BodyBone::GetBoneProperties () const
+  CS::Animation::iBodyBoneProperties* BodyBone::GetBoneProperties () const
   {
     return properties;
   }
 
-  iBodyBoneJoint* BodyBone::CreateBoneJoint ()
+  CS::Animation::iBodyBoneJoint* BodyBone::CreateBoneJoint ()
   {
     joint.AttachNew (new BodyBoneJoint ());
     return joint;
   }
 
-  iBodyBoneJoint* BodyBone::GetBoneJoint () const
+  CS::Animation::iBodyBoneJoint* BodyBone::GetBoneJoint () const
   {
     return joint;
   }
 
-  iBodyBoneCollider* BodyBone::CreateBoneCollider ()
+  CS::Animation::iBodyBoneCollider* BodyBone::CreateBoneCollider ()
   {
     csRef<BodyBoneCollider> collider;
     collider.AttachNew (new BodyBoneCollider ());
@@ -377,7 +377,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return (uint)colliders.GetSize ();
   }
 
-  iBodyBoneCollider* BodyBone::GetBoneCollider (uint index) const
+  CS::Animation::iBodyBoneCollider* BodyBone::GetBoneCollider (uint index) const
   {
     CS_ASSERT (index < colliders.GetSize ());
     return colliders[index];
@@ -390,7 +390,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   CS_LEAKGUARD_IMPLEMENT(BodyChain);
 
-  BodyChain::BodyChain (const char *name, iBodyChainNode* rootNode)
+  BodyChain::BodyChain (const char *name, CS::Animation::iBodyChainNode* rootNode)
     : scfImplementationType (this), name (name), rootNode (rootNode)
   {
   }
@@ -400,7 +400,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return name;
   }
 
-  iBodyChainNode* BodyChain::GetRootNode () const
+  CS::Animation::iBodyChainNode* BodyChain::GetRootNode () const
   {
     return rootNode;
   }
@@ -412,12 +412,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   CS_LEAKGUARD_IMPLEMENT(BodyChainNode);
 
-  BodyChainNode::BodyChainNode (iBodyBone* bone)
+  BodyChainNode::BodyChainNode (CS::Animation::iBodyBone* bone)
     : scfImplementationType (this), bone (bone), parent (0)
   {
   }
 
-  iBodyBone* BodyChainNode::GetBodyBone () const
+  CS::Animation::iBodyBone* BodyChainNode::GetBodyBone () const
   {
     return bone;
   }
@@ -427,12 +427,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return (uint)children.GetSize ();
   }
 
-  iBodyChainNode* BodyChainNode::GetChild (uint index) const
+  CS::Animation::iBodyChainNode* BodyChainNode::GetChild (uint index) const
   {
     return children.Get (index);
   }
 
-  iBodyChainNode* BodyChainNode::GetParent () const
+  CS::Animation::iBodyChainNode* BodyChainNode::GetParent () const
   {
     return parent;
   }

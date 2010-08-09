@@ -266,7 +266,7 @@ bool SintelScene::CreateAvatar ()
   if (!meshFact)
     return avatarTest->ReportError ("Can't find Sintel's mesh factory!");
 
-  animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  animeshFactory = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshFact->GetMeshObjectFactory ());
   if (!animeshFactory)
     return avatarTest->ReportError ("Can't find Sintel's animesh factory!");
@@ -293,11 +293,11 @@ bool SintelScene::CreateAvatar ()
 
   // Create a new animation tree. The structure of the tree is:
   //   + idle animation node (root and only node)
-  csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
+  csRef<CS::Animation::iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create the 'open_mouth' animation node
-  csRef<iSkeletonAnimationNodeFactory2> openMouthNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> openMouthNodeFactory =
     animPacketFactory->CreateAnimationNode ("open_mouth");
   openMouthNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("open_mouth"));
@@ -459,7 +459,7 @@ bool SintelScene::CreateAvatar ()
   csRef<iMeshWrapper> avatarMesh =
     avatarTest->engine->CreateMeshWrapper (meshFact, "sintel",
 					   avatarTest->room, csVector3 (0.0f));
-  animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
+  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
   // Create the hairs
   hairsMesh = avatarTest->engine->CreateMeshWrapper (hairsMeshfact, "sintel_hairs",
@@ -470,7 +470,7 @@ bool SintelScene::CreateAvatar ()
 						    avatarTest->room, csVector3 (0.0f));
 
   // Start animation
-  //iSkeletonAnimNode2* rootNode =
+  //CS::Animation::iSkeletonAnimNode2* rootNode =
   //  animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
   //rootNode->Play ();
 

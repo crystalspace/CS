@@ -43,17 +43,18 @@ Player::Player(iObjectRegistry* obj_reg) : Entity(obj_reg)
   {
     weapon->attackAnimation = "shoot";
 
-    csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (weapon->mesh->GetMeshObject ());
+    csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (weapon->mesh->GetMeshObject ());
     if (animesh)
     {
       // Start the root animation node
-      iSkeletonAnimNode2* rootNode =
+      CS::Animation::iSkeletonAnimNode2* rootNode =
 	animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
       rootNode->Play ();
 
       // Find the pointer to the FSM animation node
-      weapon->fsmNode = (iSkeletonFSMNode2*) rootNode->FindNode ("fsm");
-      weapon->fsmNodeFactory = weapon->fsmNode ? (iSkeletonFSMNodeFactory2*) weapon->fsmNode->GetFactory () : 0;
+      weapon->fsmNode = (CS::Animation::iSkeletonFSMNode2*) rootNode->FindNode ("fsm");
+      weapon->fsmNodeFactory =
+	weapon->fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory2*) weapon->fsmNode->GetFactory () : 0;
     }
 
     weapon->mesh->SetFlagsRecursive(CS_ENTITY_NOHITBEAM);

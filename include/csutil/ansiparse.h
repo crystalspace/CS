@@ -147,7 +147,7 @@ public:
    *  up.
    * \param cmdClass Returns the ANSI command class.
    * \param textLen Contains the number of chars up to the next ANSI
-   *  sequence or the end of the string of no sequence was found.
+   *  sequence or the end of the string if no sequence was found.
    * \return Whether the parsing was successful. 
    */
   static bool ParseAnsi (const char* str, size_t& ansiCommandLen, 

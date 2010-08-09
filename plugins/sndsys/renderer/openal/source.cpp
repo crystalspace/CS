@@ -16,6 +16,8 @@
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
+
 #include "source.h"
 #include "listener.h"
 #include "renderer.h"
@@ -23,9 +25,17 @@
 #include "isndsys/ss_stream.h"
 #include "ivaria/reporter.h"
 
+#if defined CS_HAVE_ALEXT_H
+#if defined(CS_OPENAL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENAL_PATH,alext.h)
+#else
+#include <AL/alext.h>
+#endif
+#endif
+
 // Sounds under this size are played using an OpenAL static buffer, not streamed
 // When streaming is used, it's the length FillBuffer() will request.
-#define ADVANCE_LENGTH 65536
+#define ADVANCE_LENGTH 65532
 
 /*
  * 2D Sound source
@@ -70,16 +80,70 @@ SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, csSndSy
   alSourcei (m_Source, AL_SOURCE_RELATIVE, AL_TRUE);
 
   // Determine the OpenAL Format
-  if (m_Stream->GetRenderedFormat()->Bits == 8)
-    if (m_Stream->GetRenderedFormat()->Channels == 1)
-      m_Format = AL_FORMAT_MONO8;
-    else
-      m_Format = AL_FORMAT_STEREO8;
-  else
-    if (m_Stream->GetRenderedFormat()->Channels == 1)
-      m_Format = AL_FORMAT_MONO16;
-    else
-      m_Format = AL_FORMAT_STEREO16;
+  switch (m_Stream->GetRenderedFormat()->Channels)
+  {
+  case 1:
+    {
+      switch (m_Stream->GetRenderedFormat()->Bits)
+      {
+      case 8:
+        m_Format = AL_FORMAT_MONO8;
+        break;
+      case 16:
+        m_Format = AL_FORMAT_MONO16;
+        break;
+      }
+    }
+    break;
+  case 2:
+    {
+      switch (m_Stream->GetRenderedFormat()->Bits)
+      {
+      case 8:
+        m_Format = AL_FORMAT_STEREO8;
+        break;
+      case 16:
+        m_Format = AL_FORMAT_STEREO16;
+        break;
+      }
+    }
+    break;
+  case 4:
+  case 6:
+  case 7:
+  case 8:
+    {
+#ifdef AL_EXT_MCFORMATS
+      if (renderer->extAL_EXT_MCFORMATS)
+      {
+	static const ALenum formats8[5] = { AL_FORMAT_QUAD8, 0,
+	  AL_FORMAT_51CHN8, AL_FORMAT_61CHN8, AL_FORMAT_71CHN8 };
+	static const ALenum formats16[5] = { AL_FORMAT_QUAD16, 0,
+	  AL_FORMAT_51CHN16, AL_FORMAT_61CHN16, AL_FORMAT_71CHN16 };
+	int fmtIndex = m_Stream->GetRenderedFormat()->Channels - 4;
+	switch(m_Stream->GetRenderedFormat()->Bits)
+	{
+	case 8:
+	  m_Format = formats8[fmtIndex];
+	  break;
+	case 16:
+	  m_Format = formats16[fmtIndex];
+	  break;
+	}
+      }
+      else
+#endif
+      {
+        // TODO: Some kind of fallback?
+      }
+    }
+    break;
+  default:
+    {
+      // Unsupported format
+      break;
+    }
+  }
 
   // Save the sample rate locally
   m_SampleRate = m_Stream->GetRenderedFormat()->Freq;

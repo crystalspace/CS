@@ -66,8 +66,8 @@ class AvatarScene
   virtual void UpdateStateDescription () = 0;
 
   // Animesh objects
-  csRef<iAnimatedMeshFactory> animeshFactory;
-  csRef<iAnimatedMesh> animesh;
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory;
+  csRef<CS::Mesh::iAnimatedMesh> animesh;
 };
 
 class AvatarTest : public CS::Demo::DemoApplication
@@ -84,7 +84,7 @@ private:
   bool physicsEnabled;
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
-  csRef<iBulletDynamicSystem> bulletDynamicSystem;
+  csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
@@ -95,9 +95,9 @@ private:
   bool softBodiesEnabled;
 
   // Animation node plugin managers
-  csRef<iSkeletonLookAtManager2> lookAtManager;
-  csRef<iSkeletonBasicNodesManager2> basicNodesManager;
-  csRef<iSkeletonRagdollManager2> ragdollManager;
+  csRef<CS::Animation::iSkeletonLookAtManager2> lookAtManager;
+  csRef<CS::Animation::iSkeletonBasicNodesManager2> basicNodesManager;
+  csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;
 
   //-- csBaseEventHandler
   void Frame ();

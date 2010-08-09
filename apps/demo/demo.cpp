@@ -148,11 +148,8 @@ bool Demo::Application()
 
   printer.AttachNew (new FramePrinter (object_reg));
 
-  CreateRoom();
-
   csRef<iPluginManager> plugin_mgr;
   csRef<iCollideSystem> collide_system;
-
   plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
 
   const char* p = "crystalspace.collisiondetection.opcode";
@@ -160,9 +157,12 @@ bool Demo::Application()
   if (!collide_system) return ReportError ("No Collision Detection plugin found!");
   object_reg->Register (collide_system, "iCollideSystem");
 
+  CreateRoom();
+
   csColliderHelper::InitializeCollisionWrappers (collide_system, engine);
 
   player.AttachNew(new Player(object_reg));
+  object_reg->Register(player, "Player");
 
   Run();
 
@@ -215,13 +215,13 @@ bool Demo::OnKeyboard(iEvent& ev)
       if (do_freelook)
       {
         cegui->EnableMouseCapture();
-        //cegui->GetMouseCursorPtr()->show(); TODO: Why doesn't this work?
+        cegui->GetMouseCursorPtr()->show(); //TODO: Why doesn't this work?
         do_freelook = false;
       }
       else
       {
         cegui->DisableMouseCapture();
-        //cegui->GetMouseCursorPtr()->hide(); TODO: Why doesn't this work?
+        cegui->GetMouseCursorPtr()->hide(); //TODO: Why doesn't this work?
         do_freelook = true;
       }
     }
@@ -285,19 +285,188 @@ bool Demo::OnMouseMove(iEvent& ev)
 
 void Demo::CreateRoom ()
 {
-  room = engine->CreateSector ("room");
+  // Read from command line which level to load
+  csRef<iCommandLineParser> clp =
+    csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
 
-  bool succ= vfs->Mount("/bias/", "$@data$/bias$/world.zip");
-  vfs->ChDir("/bias/");
-  bool suc = loader->LoadMapFile("/bias/world", false);
-
-  if (engine->GetCameraPositions ()->GetCount () > 0)
+  if (clp->GetBoolOption ("help", false))
   {
-    iCameraPosition *cp = engine->GetCameraPositions ()->Get (0);
-    cp->Load(view->GetCamera (), engine);
+
   }
 
-  engine->Prepare ();
+  csString levelName = clp->GetOption ("level");
+
+  bool castleLevel = true;
+  if (!levelName.IsEmpty () && levelName == "test")
+    castleLevel = false;
+
+  // Create the main sector
+  room = engine->CreateSector ("room");
+
+  // Load default castle level
+  if (castleLevel)
+  {
+    bool suc = vfs->Mount("/bias/", "$@data$/bias$/world.zip");
+    if (!suc)
+    {
+      ReportError ("Error: could not mount VFS path '$@data$/bias$/world.zip'\n");
+      return;
+    }
+
+    vfs->ChDir("/bias/");
+    suc = loader->LoadMapFile("/bias/world", false);
+    if (!suc)
+    {
+      ReportError ("Error: could not load map file\n");
+      return;
+    }
+
+    if (engine->GetCameraPositions ()->GetCount () > 0)
+    {
+      iCameraPosition *cp = engine->GetCameraPositions ()->Get (0);
+      cp->Load(view->GetCamera (), engine);
+    }
+    engine->Prepare ();
+  }
+
+  // Create test level
+  else
+  {
+    if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+      ReportError("Error loading 'stone4' texture!");
+
+    iMaterialWrapper* tm =
+      engine->GetMaterialList ()->FindByName ("stone");
+
+    // First we make a primitive for our geometry.
+    using namespace CS::Geometry;
+    DensityTextureMapper mapper (0.3f);
+    TesselatedBox box (csVector3 (-50, 0, -50), csVector3 (50, 20, 50));
+    box.SetLevel (3);
+    box.SetMapper (&mapper);
+    box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+    // Now we make a factory and a mesh at once.
+    csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+	engine, room, "walls", "walls_factory", &box);
+    walls->GetMeshObject ()->SetMaterialWrapper (tm);
+
+    view->GetCamera()->SetSector(room);
+    view->GetCamera()->GetTransform().SetOrigin(csVector3(0,2,0));
+
+    csRef<iCollideSystem> collide_system (csQueryRegistry<iCollideSystem> (object_reg));
+    csColliderHelper::InitializeCollisionWrappers (collide_system, engine);
+
+    //monsters
+    {
+      DensityTextureMapper mapper (0.3f);
+      TesselatedBox box (csVector3 (0, 0, 0), csVector3 (1, 2, 1));
+      box.SetLevel (3);
+      box.SetMapper (&mapper);
+      box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+      // Now we make a factory and a mesh at once.
+      csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
+	engine, room, "entity_kwartz01.001", "monster_factory1", &box);
+      m->GetMeshObject ()->SetMaterialWrapper (tm);
+      m->GetMovable()->SetPosition(room, csVector3(5,1,5));
+      m->GetMovable()->UpdateMove();
+    }
+
+    {
+      DensityTextureMapper mapper (0.3f);
+      TesselatedBox box (csVector3 (0, 0, 0), csVector3 (1, 2, 1));
+      box.SetLevel (3);
+      box.SetMapper (&mapper);
+      box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+      // Now we make a factory and a mesh at once.
+      csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
+	engine, room, "entity_kwartz02.002", "monster_factory2", &box);
+      m->GetMeshObject ()->SetMaterialWrapper (tm);
+      m->GetMovable()->SetPosition(room, csVector3(-5,1,-5));
+      m->GetMovable()->UpdateMove();
+    }
+
+    {
+      DensityTextureMapper mapper (0.3f);
+      TesselatedBox box (csVector3 (0, 0, 0), csVector3 (1, 2, 1));
+      box.SetLevel (3);
+      box.SetMapper (&mapper);
+      box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+      // Now we make a factory and a mesh at once.
+      csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
+	engine, room, "entity_knight.003", "monster_factory3", &box);
+      m->GetMeshObject ()->SetMaterialWrapper (tm);
+      m->GetMovable()->SetPosition(room, csVector3(5,1,-5));
+      m->GetMovable()->UpdateMove();
+    }
+
+    {
+      DensityTextureMapper mapper (0.3f);
+      TesselatedBox box (csVector3 (0, 0, 0), csVector3 (1, 2, 1));
+      box.SetLevel (3);
+      box.SetMapper (&mapper);
+      box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+      // Now we make a factory and a mesh at once.
+      csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
+	engine, room, "entity_catscratch.004", "monster_factory4", &box);
+      m->GetMeshObject ()->SetMaterialWrapper (tm);
+      m->GetMovable()->SetPosition(room, csVector3(-5,1,5));
+      m->GetMovable()->UpdateMove();
+    }
+
+    csRef<iLight> light;
+    iLightList* ll = room->GetLights ();
+
+    light = engine->CreateLight (0, csVector3 (-3, 5, 0), 1000,
+	csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+    ll->Add (light);
+
+    light = engine->CreateLight (0, csVector3 (3, 5,  0), 1000,
+        csColor (0, 0, 1), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+    ll->Add (light);
+
+    light = engine->CreateLight (0, csVector3 (0, 5, -3), 1000,
+        csColor (0, 1, 0), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+    ll->Add (light);
+
+    engine->Prepare ();
+
+    using namespace CS::Lighting;
+    SimpleStaticLighter::ShineLights (room, engine, 4);
+  }
+
+  // Create the monsters
+  csArray<int> index;
+  csRef<iMeshList> list = engine->GetMeshes();
+  for (int i = 0; i < list->GetCount(); i++)
+  {
+    csRef<iMeshWrapper> mesh = list->Get(i);
+    if (strncmp (mesh->QueryObject()->GetName(), "entity", 6) == 0)
+    {
+      printf("creating entity %s\n", mesh->QueryObject()->GetName());
+      csRef<Monster> monster;
+      monster.AttachNew(new Monster(object_reg));
+      if (monster->Initialize (mesh))
+	monsters.Push(monster);
+      index.Push(i);
+    }
+  }
+  while (index.GetSize() > 0)
+  {
+    list->Remove(index.Pop());
+  }
+
+  // Pre-load the 'gibs' mesh
+  LoadMesh(GetObjectRegistry (), "gibs", "/data/bias/models/iceblocks/gibs");
+
+  // Initialize the mouse position
+  int FRAME_HEIGHT = g3d->GetDriver2D()->GetHeight();
+  int FRAME_WIDTH = g3d->GetDriver2D()->GetWidth();
+  g3d->GetDriver2D()->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
 }
 
 

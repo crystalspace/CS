@@ -38,7 +38,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 {
   class BodyBoneProperties : public scfImplementation1<BodyBoneProperties,
-    iBodyBoneProperties>
+    CS::Animation::iBodyBoneProperties>
   {
   public:
     CS_LEAKGUARD_DECLARE(BodyBoneProperties);
@@ -61,7 +61,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   };
 
   class BodyBoneJoint : public scfImplementation1<BodyBoneJoint,
-    iBodyBoneJoint>
+    CS::Animation::iBodyBoneJoint>
   {
   public:
     CS_LEAKGUARD_DECLARE(BodyBoneJoint);
@@ -99,7 +99,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   };
 
   class BodyBoneCollider : public scfImplementation1<BodyBoneCollider,
-    iBodyBoneCollider>
+    CS::Animation::iBodyBoneCollider>
   {
   public:
     CS_LEAKGUARD_DECLARE(BodyBoneCollider);
@@ -155,17 +155,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   };
 
   class BodyManager : public scfImplementation2<BodyManager, 
-                                           iBodyManager, iComponent>
+                                           CS::Animation::iBodyManager, iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(BodyManager);
 
     BodyManager (iBase* parent);
 
-    //-- iBodyManager
-    virtual iBodySkeleton* CreateBodySkeleton (const char *name,
-				iSkeletonFactory2* skeletonFactory);
-    virtual iBodySkeleton* FindBodySkeleton (const char *name);
+    //-- CS::Animation::iBodyManager
+    virtual CS::Animation::iBodySkeleton* CreateBodySkeleton (const char *name,
+				CS::Animation::iSkeletonFactory2* skeletonFactory);
+    virtual CS::Animation::iBodySkeleton* FindBodySkeleton (const char *name);
     virtual void ClearBodySkeletons ();
 
     //-- iComponent
@@ -175,32 +175,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   
   private:
     iObjectRegistry* object_reg;
-    csHash<csRef<iBodySkeleton>, csString> factoryHash;
+    csHash<csRef<CS::Animation::iBodySkeleton>, csString> factoryHash;
   };
 
   class BodySkeleton : public scfImplementation1<BodySkeleton,
-                                                        iBodySkeleton>
+                                                        CS::Animation::iBodySkeleton>
   {
   public:
     CS_LEAKGUARD_DECLARE(BodySkeleton);
 
     BodySkeleton (const char* name, BodyManager* manager,
-		  iSkeletonFactory2* skeletonFactory);
+		  CS::Animation::iSkeletonFactory2* skeletonFactory);
 
     virtual const char* GetName () const;
 
-    virtual iSkeletonFactory2* GetSkeletonFactory () const;
+    virtual CS::Animation::iSkeletonFactory2* GetSkeletonFactory () const;
 
     virtual void ClearAll ();
 
-    virtual iBodyBone* CreateBodyBone (BoneID boneID);
-    virtual iBodyBone* FindBodyBone (const char *name) const;
-    virtual iBodyBone* FindBodyBone (BoneID bone) const;
+    virtual CS::Animation::iBodyBone* CreateBodyBone (CS::Animation::BoneID boneID);
+    virtual CS::Animation::iBodyBone* FindBodyBone (const char *name) const;
+    virtual CS::Animation::iBodyBone* FindBodyBone (CS::Animation::BoneID bone) const;
     virtual void ClearBodyBones ();
 
-    virtual iBodyChain* CreateBodyChain (
-              const char *name, BoneID rootBone, ...);
-    virtual iBodyChain* FindBodyChain (const char *name) const;
+    virtual CS::Animation::iBodyChain* CreateBodyChain (
+              const char *name, CS::Animation::BoneID rootBone, ...);
+    virtual CS::Animation::iBodyChain* FindBodyChain (const char *name) const;
     virtual void ClearBodyChains ();
 
   private:
@@ -208,72 +208,72 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     BodyManager* manager;
     // This is a weakref to avoid circular references between animesh,
     // body skeleton and controllers
-    csWeakRef<iSkeletonFactory2> skeletonFactory;
-    csHash<csRef<iBodyBone>, BoneID> boneHash;
-    csHash<csRef<iBodyChain>, csString> chainHash;
+    csWeakRef<CS::Animation::iSkeletonFactory2> skeletonFactory;
+    csHash<csRef<CS::Animation::iBodyBone>, CS::Animation::BoneID> boneHash;
+    csHash<csRef<CS::Animation::iBodyChain>, csString> chainHash;
   };
 
-  class BodyBone : public scfImplementation1<BodyBone, iBodyBone>
+  class BodyBone : public scfImplementation1<BodyBone, CS::Animation::iBodyBone>
   {
   public:
     CS_LEAKGUARD_DECLARE(BodyBone);
 
-    BodyBone (BoneID boneID);
+    BodyBone (CS::Animation::BoneID boneID);
 
-    virtual BoneID GetAnimeshBone () const;
+    virtual CS::Animation::BoneID GetAnimeshBone () const;
 
-    virtual iBodyBoneProperties* CreateBoneProperties ();
-    virtual iBodyBoneProperties* GetBoneProperties () const;
+    virtual CS::Animation::iBodyBoneProperties* CreateBoneProperties ();
+    virtual CS::Animation::iBodyBoneProperties* GetBoneProperties () const;
 
-    virtual iBodyBoneJoint* CreateBoneJoint ();
-    virtual iBodyBoneJoint* GetBoneJoint () const;
+    virtual CS::Animation::iBodyBoneJoint* CreateBoneJoint ();
+    virtual CS::Animation::iBodyBoneJoint* GetBoneJoint () const;
 
-    virtual iBodyBoneCollider* CreateBoneCollider ();
+    virtual CS::Animation::iBodyBoneCollider* CreateBoneCollider ();
     virtual uint GetBoneColliderCount () const;
-    virtual iBodyBoneCollider* GetBoneCollider (uint index) const;
+    virtual CS::Animation::iBodyBoneCollider* GetBoneCollider (uint index) const;
 
   private:
-    BoneID animeshBone;
+    CS::Animation::BoneID animeshBone;
     csRef<BodyBoneProperties> properties;
     csRef<BodyBoneJoint> joint;
     csRefArray<BodyBoneCollider> colliders;
   };
 
-  class BodyChain : public scfImplementation1<BodyChain, iBodyChain>
+  class BodyChain : public scfImplementation1<BodyChain, CS::Animation::iBodyChain>
   {
   public:
     CS_LEAKGUARD_DECLARE(BodyChain);
 
-    BodyChain (const char *name, iBodyChainNode* rootNode);
+    BodyChain (const char *name, CS::Animation::iBodyChainNode* rootNode);
 
     virtual const char* GetName () const;
-    virtual iBodyChainNode* GetRootNode () const;
+    virtual CS::Animation::iBodyChainNode* GetRootNode () const;
 
   private:
     csString name;
-    csRef<iBodyChainNode> rootNode;
+    csRef<CS::Animation::iBodyChainNode> rootNode;
   };
 
   class BodyChainNode : public scfImplementation1<BodyChainNode,
-    iBodyChainNode>
+    CS::Animation::iBodyChainNode>
   {
   public:
     CS_LEAKGUARD_DECLARE(BodyChainNode);
 
-    BodyChainNode (iBodyBone* bone);
+    BodyChainNode (CS::Animation::iBodyBone* bone);
 
-    virtual iBodyBone* GetBodyBone () const;
+    virtual CS::Animation::iBodyBone* GetBodyBone () const;
 
     virtual uint GetChildCount () const;
-    virtual iBodyChainNode* GetChild (uint index) const;
-    virtual iBodyChainNode* GetParent () const;
+    virtual CS::Animation::iBodyChainNode* GetChild (uint index) const;
+    virtual CS::Animation::iBodyChainNode* GetParent () const;
 
     void AddChild (BodyChainNode* node);
 
   private:
-    csRef<iBodyBone> bone;
-    csWeakRef<iBodyChainNode> parent;
-    csRefArray<iBodyChainNode> children;
+    csRef<CS::Animation::iBodyBone> bone;
+    csWeakRef<CS::Animation::iBodyChainNode> parent;
+    csRefArray<CS::Animation::iBodyChainNode> children;
   };
 
 }

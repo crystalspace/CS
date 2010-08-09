@@ -34,7 +34,7 @@ private:
   // Physics related
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynamicSystem;
-  csRef<iBulletDynamicSystem> bulletDynamicSystem;
+  csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
@@ -68,7 +68,7 @@ private:
   float rotX, rotY, rotZ;
 
   // Ragdoll related
-  csRef<iSkeletonRagdollManager2> ragdollManager;
+  csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;
   CS::Animation::StateID ragdollState;
   csRef<iMeshWrapper> ragdollMesh;
 

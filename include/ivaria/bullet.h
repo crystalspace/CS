@@ -682,6 +682,7 @@ struct iTerrainCollider : public iBody
 } //namespace Physics
 } //namespace CS
 
+CS_DEPRECATED_METHOD_MSG("Use CS::Physics::Bullet::iDynamicSystem instead")
 typedef CS::Physics::Bullet::iDynamicSystem iBulletDynamicSystem;
 
 #endif // __CS_IVARIA_BULLET_H__

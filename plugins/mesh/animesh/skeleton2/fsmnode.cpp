@@ -40,7 +40,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     : currentState (STATE_STOPPED), cb (cb)
   {}
 
-  void AnimationFifo::PushAnimation (iSkeletonAnimNode2* node, bool directSwitch,
+  void AnimationFifo::PushAnimation (CS::Animation::iSkeletonAnimNode2* node, bool directSwitch,
     float blendInTime, size_t cbData)
   {
     AnimationInstruction newInstr = {node, cbData, blendInTime, directSwitch};
@@ -64,7 +64,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     instructions.Delete (instruction);
   }
 
-  void AnimationFifo::BlendState (csSkeletalState2* state, float baseWeight /* = 1.0f */)
+  void AnimationFifo::BlendState (CS::Animation::csSkeletalState2* state, float baseWeight /* = 1.0f */)
   {
     switch (currentState)
     {
@@ -194,7 +194,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   }
 
   CS::Animation::StateID FSMNodeFactory::AddState (const char* name,
-						   iSkeletonAnimNodeFactory2 *nodeFact)
+						   CS::Animation::iSkeletonAnimNodeFactory2 *nodeFact)
   {
     State newState;
     CS::Animation::StateID id = (CS::Animation::StateID)stateList.Push (newState);
@@ -204,14 +204,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   }
 
   void FSMNodeFactory::SetStateNode (CS::Animation::StateID id, 
-    iSkeletonAnimNodeFactory2* nodeFact)
+    CS::Animation::iSkeletonAnimNodeFactory2* nodeFact)
   {
     CS_ASSERT(id < stateList.GetSize ());
 
     stateList[id].nodeFactory = nodeFact;
   }
 
-  iSkeletonAnimNodeFactory2* FSMNodeFactory::GetStateNode (CS::Animation::StateID id) const
+  CS::Animation::iSkeletonAnimNodeFactory2* FSMNodeFactory::GetStateNode (CS::Animation::StateID id) const
   {
     CS_ASSERT(id < stateList.GetSize ());
 
@@ -266,8 +266,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     stateList.DeleteAll ();
   }
 
-  csPtr<iSkeletonAnimNode2> FSMNodeFactory::CreateInstance (
-    iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
+  csPtr<CS::Animation::iSkeletonAnimNode2> FSMNodeFactory::CreateInstance (
+    CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton)
   {
     csRef<FSMNode> newn;
 
@@ -318,7 +318,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    return csPtr<iSkeletonAnimNode2> (newn);
+    return csPtr<CS::Animation::iSkeletonAnimNode2> (newn);
   }
 
   const char* FSMNodeFactory::GetNodeName () const
@@ -326,14 +326,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return name;
   }
 
-  iSkeletonAnimNodeFactory2* FSMNodeFactory::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNodeFactory2* FSMNodeFactory::FindNode (const char* name)
   {
     if (this->name == name)
       return this;
 
     for (size_t i = 0; i < stateList.GetSize (); ++i)
     {
-      iSkeletonAnimNodeFactory2* r = stateList[i].nodeFactory;
+      CS::Animation::iSkeletonAnimNodeFactory2* r = stateList[i].nodeFactory;
       if (r)
       {
         r = r->FindNode (name);
@@ -347,7 +347,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   }
 
   void FSMNodeFactory::SetStateTransition (CS::Animation::StateID fromState, 
-    CS::Animation::StateID toState, iSkeletonAnimNodeFactory2* fact)
+    CS::Animation::StateID toState, CS::Animation::iSkeletonAnimNodeFactory2* fact)
   {
     StateTransitionKey key = {fromState, toState};
     StateTransitionInfo& info = transitions.GetOrCreate (key);
@@ -443,7 +443,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return currentState;
   }
 
-  iSkeletonAnimNode2* FSMNode::GetStateNode (CS::Animation::StateID state) const
+  CS::Animation::iSkeletonAnimNode2* FSMNode::GetStateNode (CS::Animation::StateID state) const
   {
     CS_ASSERT(state < stateList.GetSize ());
     return stateList[state].stateNode;
@@ -496,7 +496,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return playbackSpeed;
   }
 
-  void FSMNode::BlendState (csSkeletalState2* state, float baseWeight)
+  void FSMNode::BlendState (CS::Animation::csSkeletalState2* state, float baseWeight)
   {
     if (!isActive)
       return;
@@ -517,19 +517,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return isActive;
   }
 
-  iSkeletonAnimNodeFactory2* FSMNode::GetFactory () const
+  CS::Animation::iSkeletonAnimNodeFactory2* FSMNode::GetFactory () const
   {
     return factory;
   }
 
-  iSkeletonAnimNode2* FSMNode::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNode2* FSMNode::FindNode (const char* name)
   {
     if (factory->name == name)
       return this;
 
     for (size_t i = 0; i < stateList.GetSize (); ++i)
     {
-      iSkeletonAnimNode2* r = stateList[i].stateNode;
+      CS::Animation::iSkeletonAnimNode2* r = stateList[i].stateNode;
       if (r)
       {
         r = r->FindNode (name);
@@ -542,12 +542,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return 0;
   }
 
-  void FSMNode::AddAnimationCallback (iSkeletonAnimCallback2* callback)
+  void FSMNode::AddAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback)
   {
     BaseNodeSingle::AddAnimationCallback (callback);
   }
 
-  void FSMNode::RemoveAnimationCallback (iSkeletonAnimCallback2* callback)
+  void FSMNode::RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback)
   {
     BaseNodeSingle::AddAnimationCallback (callback);
   }

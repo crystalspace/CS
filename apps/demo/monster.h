@@ -30,9 +30,10 @@ private:
 
   csString factoryName;
   csRef<iMeshWrapper> mesh;
+  csRef<iMeshWrapper> sword;
 
-  iSkeletonFSMNode2* fsmNode;
-  iSkeletonFSMNodeFactory2* fsmNodeFactory;
+  CS::Animation::iSkeletonFSMNode2* fsmNode;
+  CS::Animation::iSkeletonFSMNodeFactory2* fsmNodeFactory;
 
 public:
   float awareRadius, curAwareRadius;

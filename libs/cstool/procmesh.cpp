@@ -103,7 +103,7 @@ void csMeshOnTexture::UpdateView (int w, int h)
   {
     view->SetAutoResize(false);
     view->SetWidth(w);
-    view->SetWidth(h);
+    view->SetHeight(h);
     view->SetRectangle (0, 0, w, h, false);
     view->GetCamera ()->SetViewportSize (w, h);
     view->GetPerspectiveCamera ()->SetFOV (1, 1);

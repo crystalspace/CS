@@ -433,6 +433,8 @@ void csSndSysRendererOpenAL::Open()
   {
     ALC_REFRESH,   m_Config->GetInt ("SndSys.OpenALRefresh", 10),    // How often do we update the mixahead buffer (hz).
     ALC_SYNC,      AL_FALSE,                                         // We want an asynchronous context.
+    ALC_STEREO_SOURCES, 12,
+    ALC_MONO_SOURCES, 120,
     0
   };
   // Note: If the sound is choppy, it may be because your OpenAL
@@ -463,6 +465,9 @@ void csSndSysRendererOpenAL::Open()
     Report (CS_REPORTER_SEVERITY_ERROR, "An OpenAL error occured: %s", alcGetString (m_Device, err));
     CS_ASSERT (err == ALC_NO_ERROR);
   }
+
+  // Query available extensions
+  QueryExtensions ();
 
   // Create a listener
   m_Listener.AttachNew(new SndSysListenerOpenAL());
@@ -506,4 +511,30 @@ void csSndSysRendererOpenAL::Close()
     alcCloseDevice (m_Device);
     m_Device = 0;
   }
+}
+
+void csSndSysRendererOpenAL::QueryExtensions ()
+{
+#define EXTS_TO_QUERY	\
+    EXT(AL_EXT_MCFORMATS)
+  
+#define EXT(Ext)					\
+  {			 				\
+    ext##Ext =(alIsExtensionPresent(#Ext) == AL_TRUE);	\
+    if (ext##Ext)					\
+    {							\
+      Report (CS_REPORTER_SEVERITY_NOTIFY, 		\
+	"Found extension: '%s'", #Ext);			\
+    }							\
+    else						\
+    {							\
+      Report (CS_REPORTER_SEVERITY_NOTIFY,		\
+	"Did not find extension: '%s'", #Ext);		\
+    }							\
+  }
+  
+  EXTS_TO_QUERY
+  
+#undef EXT
+#undef EXTS_TO_QUERY
 }

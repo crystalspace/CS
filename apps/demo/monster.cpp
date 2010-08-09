@@ -88,17 +88,33 @@ bool Monster::Initialize(iMeshWrapper* spawn)
 
   weapon->mesh = mesh;
 
-  csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (mesh->GetMeshObject ());
+  csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (mesh->GetMeshObject ());
   if (animesh)
   {
     // Start the root animation node
-    iSkeletonAnimNode2* rootNode =
+    CS::Animation::iSkeletonAnimNode2* rootNode =
       animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
     rootNode->Play ();
 
     // Find the FSM animation node
-    weapon->fsmNode = fsmNode = (iSkeletonFSMNode2*) rootNode->FindNode ("fsm");
-    weapon->fsmNodeFactory = fsmNodeFactory = fsmNode ? (iSkeletonFSMNodeFactory2*) fsmNode->GetFactory () : 0;
+    weapon->fsmNode = fsmNode = (CS::Animation::iSkeletonFSMNode2*) rootNode->FindNode ("fsm");
+    weapon->fsmNodeFactory =
+      fsmNodeFactory = fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory2*) fsmNode->GetFactory () : 0;
+  }
+
+  // If this is the 'knight' monster then create and attach a sword in his hand
+  if (factoryName == "knight")
+  {
+    // Create the mesh
+    sword = LoadMesh (object_reg, "sword", "/data/bias/models/knight/factories/sword");
+    if (!sword)
+    {
+      eventQueue->RemoveListener (this);
+      return false;
+    }
+
+    // Put the mesh in the good sector and attach it to the animesh's socket
+    animesh->GetSocket (0)->SetSceneNode (sword->QuerySceneNode());
   }
 
   // Initialize collision detection
@@ -115,7 +131,6 @@ bool Monster::Initialize(iMeshWrapper* spawn)
   csVector3 shift (0, cfg_legs_offset, 0);
 
   collider_actor.InitializeColliders (mesh, legs, body, shift);
-
 
   awareRadius = curAwareRadius = 10.0f;
 
@@ -238,9 +253,11 @@ void Monster::Explode()
   csVector3 pos = mesh->GetMovable()->GetPosition();
   iSector* sector = mesh->GetMovable()->GetSectors()->Get(0);
 
-  //Remove old mesh.
+  //Remove old meshes.
   csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
   engine->WantToDie(mesh);
+  if (factoryName == "knight" && sword)
+    engine->WantToDie(sword);
 
   // Change the mesh.
   mesh = LoadMesh(object_reg, "gibs", "/data/bias/models/iceblocks/gibs");
@@ -254,14 +271,14 @@ void Monster::Explode()
   iMeshFactoryWrapper* fact = engine->FindMeshFactory("gibs_piece");
   if (!fact) return;
   csRef<iMeshWrapper> meshexplo;
-  csRef<iAnimatedMesh> animesh;
+  csRef<CS::Mesh::iAnimatedMesh> animesh;
 
   //1
   meshexplo = fact->CreateMeshWrapper();
   meshexplo->GetMovable()->Transform(csYRotMatrix3(0));
   meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
   meshexplo->GetMovable()->UpdateMove();
-  animesh = scfQueryInterface<iAnimatedMesh> (meshexplo->GetMeshObject ());
+  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (meshexplo->GetMeshObject ());
   if (animesh)
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ()->Play ();
 
@@ -270,7 +287,7 @@ void Monster::Explode()
   meshexplo->GetMovable()->Transform(csYRotMatrix3(-1.97051f));
   meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
   meshexplo->GetMovable()->UpdateMove();
-  animesh = scfQueryInterface<iAnimatedMesh> (meshexplo->GetMeshObject ());
+  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (meshexplo->GetMeshObject ());
   if (animesh)
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ()->Play ();
 
@@ -279,7 +296,7 @@ void Monster::Explode()
   meshexplo->GetMovable()->Transform(csYRotMatrix3(2.9665f));
   meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
   meshexplo->GetMovable()->UpdateMove();
-  animesh = scfQueryInterface<iAnimatedMesh> (meshexplo->GetMeshObject ());
+  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (meshexplo->GetMeshObject ());
   if (animesh)
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ()->Play ();
 }
@@ -297,7 +314,7 @@ void Monster::ChangeMaterial()
   if (!meshobj) return;
 
   // Get the animated mesh.
-  csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (meshobj);
+  csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (meshobj);
   if (!animesh) return;
 
   // Change the material.

@@ -363,7 +363,8 @@
 
     <node type="fsm" name="fsm" start="0">
    <state name="explode">
-      <node type="animation" animation="explode" cyclic="false"/>
+      <!--node type="animation" animation="explode" cyclic="false"/-->
+      <node type="animation" animation="explode"/>
    </state>
     </node>
  </animationpacket>
