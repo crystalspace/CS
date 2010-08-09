@@ -540,6 +540,19 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    * Get the maximum between all submeshes' progressive LOD levels.
    */
   virtual int GetNumProgLODLevels() const = 0;
+
+  /**
+   * Get distances where progressive LOD will be in effect.
+   * See SetProgLODDistances for parameter details.
+   */
+  virtual void GetProgLODDistances(float& out_min, float& out_max) const = 0;
+
+  /**
+   * Set distances where progressive LOD will be in effect.
+   * \param min Minimum distance - starting from this distance, the model will begin to become less detailed.
+   * \param max Maximum distance - at this distance, the model will be at its minimum LOD.
+   */
+  virtual void SetProgLODDistances(float min, float max) = 0;
 };
 
 /**

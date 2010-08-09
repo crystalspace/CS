@@ -311,14 +311,26 @@ iRenderBuffer* csGenmeshMeshObject::GetPositions()
   
   return factory->GetPositions ();
 }
-  
-#include "csutil/custom_new_disable.h"
 
 #include "csutil/custom_new_disable.h"
 
-int csGenmeshMeshObject::ComputeProgLODLevel()
+int csGenmeshMeshObject::ComputeProgLODLevel(const csVector3& camera_pos)
 {
-  return 0;
+  float min, max;
+  factory->GetProgLODDistances(min, max);
+  if (min >= max)
+    return 0;
+  csVector3 pos = logparent->GetMovable()->GetPosition();
+  float dist = (camera_pos-pos).Norm();
+  csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(factory);
+  int nlod = fstate->GetNumProgLODLevels() - 1;
+  // Linear function
+  float t = (dist - min) / (max - min);
+  if (t > 1.0f)
+    t = 1.0f;
+  else if (t < 0.0f)
+    t = 0.0f;
+  return (int)(sqrtf(t) * nlod);
 }  
 
 csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
@@ -403,7 +415,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     }
     else
     {
-      int prog_lod_level = (subMesh.GetForcedProgLODLevel() == -1) ? ComputeProgLODLevel() : subMesh.GetForcedProgLODLevel();
+      int prog_lod_level = (subMesh.GetForcedProgLODLevel() == -1)
+        ? ComputeProgLODLevel(camera->GetTransform().GetOrigin())
+        : subMesh.GetForcedProgLODLevel();
       subMesh.GetSlidingWindow(prog_lod_level, start_index, end_index);
     }
     meshPtr->indexstart = start_index;
@@ -812,6 +826,9 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   csRef<iCommandLineParser> cmdline = 
   	csQueryRegistry<iCommandLineParser> (object_reg);
   do_fullbright = (cmdline->GetOption ("fullbright") != 0);
+
+  prog_lod_min_dist = 0.0;
+  prog_lod_max_dist = 0.0;
 }
 
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
@@ -905,7 +922,8 @@ float csGenmeshMeshObjectFactory::GetRadius ()
   if (!object_bbox_valid) CalculateBBoxRadius ();
   return radius;
 }
-  
+
+// TODO: Optimize. Cache this value in the class.
 int csGenmeshMeshObjectFactory::GetNumProgLODLevels() const
 {
   int max_size = 0;

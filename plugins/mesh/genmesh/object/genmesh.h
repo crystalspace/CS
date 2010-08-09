@@ -191,7 +191,7 @@ private:
   /// Get positions buffer
   iRenderBuffer* GetPositions();
   
-  int ComputeProgLODLevel();
+  int ComputeProgLODLevel(const csVector3& camera_pos);
   
 public:
   /// Constructor.
@@ -435,6 +435,9 @@ public:
   bool object_bbox_valid;
   bool initialized;
 
+  float prog_lod_min_dist;
+  float prog_lod_max_dist;
+
   // For animation control.
   csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact;
   void SetAnimationControlFactory (iGenMeshAnimationControlFactory*
@@ -649,6 +652,18 @@ public:
   }
   
   virtual int GetNumProgLODLevels() const;
+
+  virtual void GetProgLODDistances(float& out_min, float& out_max) const
+  {
+    out_min = prog_lod_min_dist;
+    out_max = prog_lod_max_dist;
+  }
+
+  virtual void SetProgLODDistances(float min, float max)
+  {
+    prog_lod_min_dist = min;
+    prog_lod_max_dist = max;
+  }
     
   //------------------------ iMeshObjectFactory implementation --------------
   virtual csFlags& GetFlags () { return flags; }

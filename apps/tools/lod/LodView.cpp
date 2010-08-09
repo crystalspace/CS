@@ -327,6 +327,7 @@ void LodView::CreateSprites ()
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
   assert(fstate);
   num_lod_levels = fstate->GetNumProgLODLevels();
+  fstate->SetProgLODDistances(5.0f, 50.0f);
 }
 
 int main (int argc, char* argv[])
