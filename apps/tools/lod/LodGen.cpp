@@ -305,7 +305,18 @@ void PointTriangleDistanceUnitTests()
 
 // ----------------------------------------------------------------
 
-#define Message(...) { if (verbose) csPrintf(__VA_ARGS__); }
+int LodGen::Message(const char* format, ...)
+{
+  if (verbose)
+  {
+    char buf[256];
+    va_list args;
+    va_start (args, format);
+    int rc = snprintf(buf, 256, format, args);
+    va_end (args);
+    return rc;
+  }
+}
 
 // ----------------------------------------------------------------
 // LodGen

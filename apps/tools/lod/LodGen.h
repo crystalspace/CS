@@ -160,6 +160,10 @@ protected:
    * Swaps two triangles.
    */
   void SwapIndex(WorkMesh& k, int i0, int i1);
+
+  /**
+   * Verifies if a mesh is consistent, for debugging purposes.
+   */
   void VerifyMesh(WorkMesh& k);
 
   /**
@@ -171,6 +175,11 @@ protected:
    * Checks if a triangle is coincident with any of its neighboring triangles
    */
   bool IsCoincident(const WorkMesh& k, const csTriangle& tri) const;
+
+  /**
+   * Utility function - prints out a message when in verbose mode
+   */
+  int Message(const char* format, ...);
 };
 
 #endif // __LODGEN_H__
