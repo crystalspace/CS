@@ -432,8 +432,10 @@ struct LeafNodeProcessOP
       }
     }
     n->GetGraphics3D()->OQEndQuery();
+
+    /*const bool ret=n->GetGraphics3D()->OQIsVisible(n->GetQueryID(),0);
     csBox3 box=n->GetLeafData(0)->GetBBox();
-    if(n->GetGraphics3D()->OQIsVisible(n->GetQueryID(),0))
+    if(ret)
     {
       csPrintf("Visible (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
           box.MinX(),box.MinY(),box.MinZ(),
@@ -446,7 +448,17 @@ struct LeafNodeProcessOP
           box.MinX(),box.MinY(),box.MinZ(),
           box.MaxX(),box.MaxY(),box.MaxZ());
       //csPrintf("Not visible\n");
+    }*/
+  }
+
+  bool CheckOQ(const NodePtr n) const
+  {
+    const unsigned int oqID=n->GetQueryID();
+    if(oqID)
+    {
+      return n->GetGraphics3D()->OQIsVisible(n->GetQueryID(),0);
     }
+    return true;
   }
 
   void NodeVisible(NodePtr n,uint32 frustum_mask) const
@@ -458,24 +470,12 @@ struct LeafNodeProcessOP
     const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
     csSectorVisibleRenderMeshes* meshList;
     const int numMeshes = f2bData->viscallback->GetVisibleMeshes(mw,frustum_mask,meshList);
-    if(numMeshes > 0)
+    if(numMeshes > 0 && CheckOQ(n))
     {
       f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
     }
-
+    //else printf("Not visible\n");
     DrawQuery(n,meshList,numMeshes);
-  }
-
-  int Count(NodePtr n) const
-  {
-    int i=0;
-    NodePtr aux=n;
-    while(aux->GetParent())
-    {
-      aux=aux->GetParent();
-      i++;
-    }
-    return i;
   }
 
   bool operator() (NodePtr n,const uint32 frustum_mask) const
@@ -483,7 +483,6 @@ struct LeafNodeProcessOP
     CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
     const int num_objects=n->GetObjectCount();
     const csFrustVisObjectWrapper* visobj_wrap = n->GetLeafData(0);
-    //csPrintf("%d ",Count(n));
 
     if (visobj_wrap->mesh && visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
     {
@@ -601,7 +600,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
 
   // here we should process the remaining nodes in the multi query
 
-  printf("\n\n");
+  //printf("\n\n");
 
   g3d->SetWriteMask(true,true,true,true);
   g3d->SetClipper (0, CS_CLIPPER_NONE);
