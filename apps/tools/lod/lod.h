@@ -25,6 +25,8 @@ struct Params
   csString output_file;
   ErrorMetricType error_metric_type;
   bool verbose;
+  float min_dist;
+  float max_dist;
   
   Params():
     error_metric_type(ERROR_METRIC_FAST),

@@ -814,6 +814,20 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         }
         ParseSubMesh (child, state, ldr_context);
         break;
+      case XMLTOKEN_PROG_LOD_DISTANCES:
+        {
+          float min_dist, max_dist;
+          csString mind = child->GetAttributeValue ("min");
+          csScanStr(mind, "%f", &min_dist);
+          if (min_dist < 0.0f)
+            min_dist = 0.0f;
+          csString maxd = child->GetAttributeValue ("max");
+          csScanStr(maxd, "%f", &max_dist);
+          if (max_dist < 0.0f)
+            max_dist = 0.0f;
+          state->SetProgLODDistances(min_dist, max_dist);
+        }
+        break;
       default:
 	synldr->ReportBadToken (child);
 	return 0;
@@ -975,6 +989,19 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       scfQueryInterface<iMeshObjectFactory> (obj);
     if (!gfact) return false;
     if (!meshfact) return false;
+
+    // Write progressive LOD distances, if needed
+    {
+      float mind, maxd;
+      gfact->GetProgLODDistances(mind, maxd);
+      if (mind != 0.0f || maxd != 0.0f)
+      {
+        csRef<iDocumentNode> distancesNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT);
+        distancesNode->SetValue("prog_lod_distances");
+        distancesNode->SetAttributeAsFloat("min", mind);
+        distancesNode->SetAttributeAsFloat("max", maxd);
+      }
+    }
 
     // Write render buffers
     {

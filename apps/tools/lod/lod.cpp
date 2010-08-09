@@ -40,9 +40,12 @@ Lod::~Lod ()
 void Lod::Usage()
 {
   csPrintf("Usage:\n");
-  csPrintf("lod -i=<input_file> -o=<output_file> [-em=<fast|precise>] [-v]\n");
-  csPrintf("-em:  error metric (fast or precise)\n");
-  csPrintf("-v:   verbose\n");
+  csPrintf("lod -i=<input_file> -o=<output_file> -mindist=d -maxdist=d [-em=<fast|precise>] [-v]\n");
+  csPrintf("-em:        error metric (fast or precise)\n");
+  csPrintf("-v:         verbose\n");
+  csPrintf("-mindist:   minimum LOD distance\n");
+  csPrintf("-maxdist:   maximum LOD distance\n");
+  csPrintf("For medium-sized objects, try -mindist=5.0 -maxdist=50.0\n");
 }
 
 bool Lod::ParseParams(int argc, char* argv[])
@@ -75,6 +78,27 @@ bool Lod::ParseParams(int argc, char* argv[])
 
   if (cmdline->GetOption("v") != 0)
     params.verbose = true;
+
+  csString mind = cmdline->GetOption("mindist");
+  if (mind == "")
+  {
+    ReportError("Minimum and maximum distances should be specified.");
+    Usage();
+    return false;
+  }
+  csScanStr(mind, "%f", &params.min_dist);
+  if (params.min_dist < 0.0f)
+    params.min_dist = 0.0f;
+  csString maxd = cmdline->GetOption("maxdist");
+  if (maxd == "")
+  {
+    ReportError("Minimum and maximum distances should be specified.");
+    Usage();
+    return false;
+  }
+  csScanStr(maxd, "%f", &params.max_dist);
+  if (params.max_dist < 0.0f)
+    params.max_dist = 0.0f;
 
   return true;
 }
@@ -126,17 +150,19 @@ bool Lod::Application ()
 }
 
 template<typename T>
-void WriteTriangles(const LodGen& lodgen)
+void WriteTriangles(const LodGen& lodgen, csRef<iRenderBuffer> rbindices)
 {
   T* data = new T[lodgen.GetTriangleCount() * 3];
   T* pdata = data;
-  for (int i = 0; i < lodgen.GetTriangleCount(); i++)
+  for (size_t i = 0; i < lodgen.GetTriangleCount(); i++)
   {
     //csPrintf("%d %d %d\n", lodgen.GetTriangle(i)[0], lodgen.GetTriangle(i)[1], lodgen.GetTriangle(i)[2]);
     *pdata++ = (T)lodgen.GetTriangle(i)[0];
     *pdata++ = (T)lodgen.GetTriangle(i)[1];
     *pdata++ = (T)lodgen.GetTriangle(i)[2];
   }
+  rbindices->CopyInto(data, lodgen.GetTriangleCount() * 3);
+  delete[] data;
 }
 
 void Lod::CreateLODs(const char* filename_in, const char* filename_out)
@@ -169,7 +195,7 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
 
     if (!buf.IsValid ())
     {
-      ReportError ("Error opening file '%s'!", filenameIn);
+      ReportError ("Error opening file '%s'!", filenameIn.GetData());
       return;
     }
 
@@ -303,54 +329,45 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
     switch (compType & ~CS_BUFCOMP_NORMALIZED)
     {
     case CS_BUFCOMP_BYTE:
-      WriteTriangles<int8>(lodgen);
+      WriteTriangles<int8>(lodgen, rbindices_new);
       break;
     case CS_BUFCOMP_UNSIGNED_BYTE:
-      WriteTriangles<uint8>(lodgen);
+      WriteTriangles<uint8>(lodgen, rbindices_new);
       break;
     case CS_BUFCOMP_SHORT:
-      WriteTriangles<int16>(lodgen);
+      WriteTriangles<int16>(lodgen, rbindices_new);
       break;
     case CS_BUFCOMP_UNSIGNED_SHORT:
-      WriteTriangles<uint16>(lodgen);
+      WriteTriangles<uint16>(lodgen, rbindices_new);
       break;
     case CS_BUFCOMP_INT:
-      WriteTriangles<int32>(lodgen);
+      WriteTriangles<int32>(lodgen, rbindices_new);
       break;
     case CS_BUFCOMP_UNSIGNED_INT:
-      WriteTriangles<uint32>(lodgen);
+      WriteTriangles<uint32>(lodgen, rbindices_new);
       break;
     case CS_BUFCOMP_FLOAT:
-      WriteTriangles<float>(lodgen);
+      WriteTriangles<float>(lodgen, rbindices_new);
       break;
     case CS_BUFCOMP_DOUBLE:
-      WriteTriangles<double>(lodgen);
+      WriteTriangles<double>(lodgen, rbindices_new);
       break;
     default:
       csPrintf("Bad index buffer type.\n");
       return;
     }
 
-    unsigned int* data = new unsigned int[lodgen.GetTriangleCount() * 3];
-    unsigned int* pdata = data;
-    for (int i = 0; i < lodgen.GetTriangleCount(); i++)
-    {
-      //csPrintf("%d %d %d\n", lodgen.GetTriangle(i)[0], lodgen.GetTriangle(i)[1], lodgen.GetTriangle(i)[2]);
-      *pdata++ = lodgen.GetTriangle(i)[0];
-      *pdata++ = lodgen.GetTriangle(i)[1];
-      *pdata++ = lodgen.GetTriangle(i)[2];
-    }
-    rbindices_new->CopyInto(data, lodgen.GetTriangleCount() * 3);
     submesh->SetIndices(rbindices_new);
-    delete[] data;
-    
     csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
     fsm->ClearSlidingWindows();
-    for (int i = 0; i < lodgen.GetSlidingWindowCount(); i++)
+    for (size_t i = 0; i < lodgen.GetSlidingWindowCount(); i++)
     {
       fsm->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
     }
   }
+
+  fstate->SetProgLODDistances(params.min_dist, params.max_dist);
+
   SaveToNode(node);
 }
 
@@ -384,7 +401,7 @@ void Lod::SaveToNode(csRef<iDocumentNode> factNode)
   char savername[128] = "";
   
   csReplaceAll(savername, pluginname, ".object.", ".saver.factory.", sizeof(savername));
-  
+
   csRef<iSaverPlugin> saver = csLoadPluginCheck<iSaverPlugin> (plugin_mgr, savername);
   if (saver) 
     saver->WriteDown(meshfact, factNode, 0/*ssource*/);

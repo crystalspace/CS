@@ -309,13 +309,13 @@ int LodGen::Message(const char* format, ...)
 {
   if (verbose)
   {
-    char buf[256];
     va_list args;
     va_start (args, format);
-    int rc = snprintf(buf, 256, format, args);
+    int rc = csPrintfV(format, args);
     va_end (args);
     return rc;
   }
+  return 0;
 }
 
 // ----------------------------------------------------------------
@@ -787,7 +787,7 @@ void LodGen::GenerateLODs()
       */
     }
     
-    int curr_num_triangles = sw.end_index - sw.start_index;
+    size_t curr_num_triangles = sw.end_index - sw.start_index;
     if (curr_num_triangles < min_num_triangles)
     {
       Message("Reached minimum number of triangles\n");

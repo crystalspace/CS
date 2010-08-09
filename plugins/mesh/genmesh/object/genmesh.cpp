@@ -324,7 +324,7 @@ int csGenmeshMeshObject::ComputeProgLODLevel(const csVector3& camera_pos)
   float dist = (camera_pos-pos).Norm();
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(factory);
   int nlod = fstate->GetNumProgLODLevels() - 1;
-  // Linear function
+  // Function of square root of distance
   float t = (dist - min) / (max - min);
   if (t > 1.0f)
     t = 1.0f;

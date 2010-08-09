@@ -12,6 +12,7 @@
     <meshfact name="lodbarrel">
         <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
         <params>
+            <prog_lod_distances min="5" max="50" />
             <renderbuffer name="position" checkelementcount="no" components="3" type="float">
                 <e c0="-0.347227" c1="-0.07" c2="-0" />
                 <e c0="-0.347227" c1="0.07" c2="-0" />
