@@ -15,9 +15,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include <cssysdef.h>
-#include <iutil/objreg.h>
-#include <iutil/plugin.h>
 
 #include "furmesh.h"
 #include "animationphysicscontrol.h"
@@ -27,12 +26,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   /*************************
   *  AnimationPhysicsControl
   **************************/
+
   SCF_IMPLEMENT_FACTORY (AnimationPhysicsControl)
 
-    CS_LEAKGUARD_IMPLEMENT(AnimationPhysicsControl);	
+  CS_LEAKGUARD_IMPLEMENT(AnimationPhysicsControl);	
 
   AnimationPhysicsControl::AnimationPhysicsControl (iBase* parent)
-    : scfImplementationType (this, parent), object_reg(0)
+    : scfImplementationType (this, parent), object_reg(0), rigidBody(0)
   {
   }
 
@@ -70,9 +70,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void AnimationPhysicsControl::InitializeStrand (size_t strandID, csVector3* 
     coordinates, size_t coordinatesCount)
   {
-    csHairData* guideHairAnimation;
-
-    guideHairAnimation = new csHairData;
+    csHairData* guideHairAnimation = new csHairData;
 
     guideHairAnimation->controlPointsCount = coordinatesCount;
     guideHairAnimation->controlPoints = new csVector3[coordinatesCount];
@@ -85,18 +83,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   // Animate the strand with the given ID
   void AnimationPhysicsControl::AnimateStrand (size_t strandID, csVector3* 
-    coordinates, size_t coordinatesCount)
+    coordinates, size_t coordinatesCount) const
   {
+    if (!rigidBody)
+      return;
+
     csReversibleTransform currentTransform = 
       initialTransform * rigidBody->GetTransform();
 
     csHairData *guideHairAnimation = guideRopes.Get(strandID, 0);
 
     if (guideHairAnimation)
-    {
       for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
         coordinates[i] = guideHairAnimation->controlPoints[i] * currentTransform.GetInverse();
-    }
   }
 
   void AnimationPhysicsControl::RemoveStrand (size_t strandID)

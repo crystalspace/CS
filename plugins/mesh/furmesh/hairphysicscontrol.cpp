@@ -15,9 +15,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include <cssysdef.h>
-#include <iutil/objreg.h>
-#include <iutil/plugin.h>
 
 #include "furmesh.h"
 #include "hairphysicscontrol.h"
@@ -27,12 +26,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   /********************
   *  HairPhysicsControl
   ********************/
+
   SCF_IMPLEMENT_FACTORY (HairPhysicsControl)
 
-    CS_LEAKGUARD_IMPLEMENT(HairPhysicsControl);	
+  CS_LEAKGUARD_IMPLEMENT(HairPhysicsControl);	
 
   HairPhysicsControl::HairPhysicsControl (iBase* parent)
-    : scfImplementationType (this, parent), object_reg(0)
+    : scfImplementationType (this, parent), object_reg(0), rigidBody(0),
+    bulletDynamicSystem(0)
   {
   }
 
@@ -69,6 +70,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void HairPhysicsControl::InitializeStrand (size_t strandID, csVector3* 
     coordinates, size_t coordinatesCount)
   {
+    if (!rigidBody || !bulletDynamicSystem)
+      return;
+
     CS::Physics::Bullet::iSoftBody* bulletBody = bulletDynamicSystem->
       CreateRope(coordinates, coordinatesCount);
 
@@ -81,7 +85,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   // Animate the strand with the given ID
   void HairPhysicsControl::AnimateStrand (size_t strandID, csVector3* 
-    coordinates, size_t coordinatesCount)
+    coordinates, size_t coordinatesCount) const
   {
     csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get (strandID, 0);
 
@@ -89,7 +93,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       return;
 
     CS_ASSERT(coordinatesCount == bulletBody->GetVertexCount());
-    //printf("%d\t%d\n", coordinatesCount, bulletBody->GetVertexCount());
 
     for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
       coordinates[i] = bulletBody->GetVertexPosition(i);

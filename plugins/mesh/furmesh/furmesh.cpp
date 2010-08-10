@@ -847,9 +847,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return hairStrandGenerator;
   }
 
-  void FurMesh::SetMaterial ( iMaterial* material )
+  void FurMesh::SetBaseMaterial ( iMaterial* baseMaterial )
   {
-    this->material = material;
+    this->baseMaterial = baseMaterial;
 
     SetColor();
     SetGrowTangents();
@@ -862,12 +862,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void FurMesh::SetGrowTangents()
   {
     CS::ShaderVarName growTangentsName (svStrings, "growTangents");	
-    csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(growTangentsName);
+    csRef<csShaderVariable> shaderVariable = baseMaterial->GetVariableAdd(growTangentsName);
 
     shaderVariable->GetValue(growTangents);
 
     CS::ShaderVarName positionDeviationName (svStrings, "positionDeviation");	
-    shaderVariable = material->GetVariableAdd(positionDeviationName);
+    shaderVariable = baseMaterial->GetVariableAdd(positionDeviationName);
 
     shaderVariable->GetValue(positionDeviation);
   }
@@ -878,7 +878,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     CS::ShaderVarName furColorName (svStrings, "mat furcolor");	
     csRef<csShaderVariable> shaderVariable = 
-      material->GetVariableAdd(furColorName);
+      baseMaterial->GetVariableAdd(furColorName);
     
     shaderVariable->SetValue(color);	
   }
@@ -886,7 +886,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void FurMesh::SetStrandWidth()
   {
     CS::ShaderVarName strandWidthName (svStrings, "width");	
-    csRef<csShaderVariable> shaderVariable = material->GetVariable(strandWidthName);
+    csRef<csShaderVariable> shaderVariable = baseMaterial->GetVariable(strandWidthName);
 
     shaderVariable->GetValue(strandWidth);
     strandWidthLOD = strandWidth;
@@ -895,15 +895,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void FurMesh::SetDensitymap ()
   {
     CS::ShaderVarName densitymapName (svStrings, "density map");	
-    csRef<csShaderVariable> shaderVariable = material->GetVariable(densitymapName);
+    csRef<csShaderVariable> shaderVariable = baseMaterial->GetVariable(densitymapName);
 
     shaderVariable->GetValue(densitymap.handle);
 
     CS::ShaderVarName densityFactorGuideHairsName (svStrings, "densityFactorGuideHairs");	
-    material->GetVariable(densityFactorGuideHairsName)->GetValue(densityFactorGuideHairs);
+    baseMaterial->GetVariable(densityFactorGuideHairsName)->GetValue(densityFactorGuideHairs);
 
     CS::ShaderVarName densityFactorHairStrandsName (svStrings, "densityFactorHairStrands");	
-    material->GetVariable(densityFactorHairStrandsName)->GetValue(densityFactorHairStrands);    
+    baseMaterial->GetVariable(densityFactorHairStrandsName)->GetValue(densityFactorHairStrands);    
 
     // density map
     CS::StructuredTextureFormat readbackFmt 
@@ -917,12 +917,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void FurMesh::SetHeightmap ()
   {
     CS::ShaderVarName heightmapName (svStrings, "height map");	
-    csRef<csShaderVariable> shaderVariable = material->GetVariable(heightmapName);
+    csRef<csShaderVariable> shaderVariable = baseMaterial->GetVariable(heightmapName);
 
     shaderVariable->GetValue(heightmap.handle);
 
     CS::ShaderVarName heightFactorName (svStrings, "heightFactor");	
-    material->GetVariable(heightFactorName)->GetValue(heightFactor);
+    baseMaterial->GetVariable(heightFactorName)->GetValue(heightFactor);
 
     // height map
     CS::StructuredTextureFormat readbackFmt 
@@ -938,12 +938,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     displaceDistance = 0.02f;
 
     CS::ShaderVarName displaceDistanceName (svStrings, "displaceDistance");	
-    material->GetVariableAdd(displaceDistanceName)->GetValue(displaceDistance);
+    baseMaterial->GetVariableAdd(displaceDistanceName)->GetValue(displaceDistance);
 
     controlPointsDistance = 0.05f;
 
     CS::ShaderVarName controlPointsDistanceName (svStrings, "controlPointsDistance");	
-    material->GetVariableAdd(controlPointsDistanceName)->GetValue(controlPointsDistance);
+    baseMaterial->GetVariableAdd(controlPointsDistanceName)->GetValue(controlPointsDistance);
   }
 
   void FurMesh::UpdateGuideHairs()

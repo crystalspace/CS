@@ -19,17 +19,9 @@
 #ifndef __ANIMATION_PHYSICS_CONTROL_H__
 #define __ANIMATION_PHYSICS_CONTROL_H__
 
-#include <iutil/comp.h>
-#include <csgeom/vector3.h>
-#include <imesh/furmesh.h>
-#include <csgfx/shadervarcontext.h>
-#include <imesh/genmesh.h>
-
 #include "crystalspace.h"
 
 #include "csutil/scf_implementation.h"
-
-struct iObjectRegistry;
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
@@ -54,7 +46,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       size_t coordinatesCount);
     // Animate the strand with the given ID
     virtual void AnimateStrand (size_t strandID, csVector3* coordinates, size_t
-      coordinatesCount);
+      coordinatesCount) const;
     virtual void RemoveStrand (size_t strandID);
     virtual void RemoveAllStrands ();
 

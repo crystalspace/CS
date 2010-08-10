@@ -420,7 +420,7 @@ bool KrystalScene::CreateAvatar ()
 
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
-  furMesh->SetMaterial(skullMaterial->GetMaterial());
+  furMesh->SetBaseMaterial(skullMaterial->GetMaterial());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);

@@ -21,15 +21,7 @@
 
 #include <csutil/scf.h>
 
-#include <ivideo/material.h>
-#include <ivaria/view.h>
-#include <iengine/sector.h>
-#include "imesh/object.h"
-
 #include "crystalspace.h"
-
-class csVector3;
-class csColor4;
 
 namespace CS
 {
@@ -57,7 +49,7 @@ struct iFurPhysicsControl : public virtual iBase
 
   // Animate the strand with the given ID
   virtual void AnimateStrand (size_t strandID, csVector3* coordinates, size_t
-    coordinatesCount) = 0;
+    coordinatesCount) const = 0;
 
   virtual void RemoveStrand (size_t strandID) = 0;
   virtual void RemoveAllStrands () = 0;
@@ -128,7 +120,7 @@ struct iFurMesh : public virtual iBase
   virtual void SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory ) = 0;
   virtual void SetMeshFactorySubMesh ( CS::Mesh::iAnimatedMeshSubMeshFactory* 
     meshFactorySubMesh ) = 0;
-  virtual void SetMaterial ( iMaterial* material ) = 0;
+  virtual void SetBaseMaterial ( iMaterial* baseMaterial ) = 0;
 };
 
   } // namespace Mesh

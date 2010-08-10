@@ -54,7 +54,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
       csVector3& isect, float* pr, int* polygon_idx,
-      iMaterialWrapper** material, iMaterialArray* materials);
+      iMaterialWrapper** baseMaterial, iMaterialArray* materials);
 
     virtual void NextFrame (csTicks current_time,const csVector3& pos,
       uint currentFrame);
@@ -92,7 +92,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetMeshFactorySubMesh ( CS::Mesh::iAnimatedMeshSubMeshFactory* 
       meshFactorySubMesh );
     // Set Material
-    virtual void SetMaterial ( iMaterial* material );
+    virtual void SetBaseMaterial ( iMaterial* baseMaterial );
     // Set HairStrandGenerator
     virtual void SetFurStrandGenerator( CS::Mesh::iFurStrandGenerator* hairStrandGenerator);
     // Get HairStrandGenerator
@@ -124,7 +124,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     /// Temp fur geometry
     csRef<CS::Mesh::iAnimatedMeshFactory> meshFactory;
     csRef<CS::Mesh::iAnimatedMeshSubMeshFactory> meshFactorySubMesh;
-    csRef<iMaterial> material;
+    csRef<iMaterial> baseMaterial;
     csRef<iShaderVarStringSet> svStrings;
     /// Density & Height maps
     TextureData densitymap;
