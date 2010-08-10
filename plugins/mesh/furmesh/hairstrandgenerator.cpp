@@ -445,15 +445,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     bTRT = 2 * (5);
 
     // Fiber properties
-    eta = 1.55;
-    absorption = 0.2;
-    eccentricity = 0.85;
+    eta = 1.55f;
+    absorption = 0.2f;
+    eccentricity = 0.85f;
 
     // Glints
-    kG = 0.5;
+    kG = 0.5f;
     wc = 10;
-    Dh0 = 0.2;
-    DhM = 0.5;
+    Dh0 = 0.2f;
+    DhM = 0.5f;
   }
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)
