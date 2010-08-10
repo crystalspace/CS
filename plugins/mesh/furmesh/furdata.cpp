@@ -146,7 +146,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void csHairData::Clear()
   {
-    delete controlPoints;
+    if (controlPointsCount)
+      delete controlPoints;
   }
 
   /********************

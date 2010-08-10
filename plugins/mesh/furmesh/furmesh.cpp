@@ -57,8 +57,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   FurMesh::~FurMesh ()
   {
     delete rng;
+    
     if (positionShift)
       delete positionShift;
+
+    // delete hairs
+    for (size_t i = 0 ; i < guideHairs.GetSize() ; i ++)
+      guideHairs.Get(i).Clear();
+
+    for (size_t i = 0 ; i < guideHairsLOD.GetSize() ; i ++)
+      guideHairsLOD.Get(i).Clear();
+
+    for (size_t i = 0 ; i < hairStrands.GetSize() ; i ++)
+      hairStrands.Get(i).Clear();
   }
 
   iMeshObjectFactory* FurMesh::GetFactory () const
