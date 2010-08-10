@@ -41,7 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     uint8* data;
   };
 
-  class FurMesh : public scfImplementationExt1<FurMesh, csMeshObject, iFurMesh>
+  class FurMesh : public scfImplementationExt1<FurMesh, csMeshObject, CS::Mesh::iFurMesh>
   {
   public:
     CS_LEAKGUARD_DECLARE(FurMesh);
@@ -83,7 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetStrandLOD(float strandLOD);
     virtual void SetLOD(float lod);
 
-    virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl);
+    virtual void SetPhysicsControl (CS::Mesh::iFurPhysicsControl* physicsControl);
     virtual void StartPhysicsControl ( );
     virtual void StopPhysicsControl ( );
 
@@ -94,16 +94,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Set Material
     virtual void SetMaterial ( iMaterial* material );
     // Set HairStrandGenerator
-    virtual void SetFurStrandGenerator( iFurStrandGenerator* hairStrandGenerator);
+    virtual void SetFurStrandGenerator( CS::Mesh::iFurStrandGenerator* hairStrandGenerator);
     // Get HairStrandGenerator
-    virtual iFurStrandGenerator* GetFurStrandGenerator( );
+    virtual CS::Mesh::iFurStrandGenerator* GetFurStrandGenerator( );
 
   private:
     csRef<iMaterialWrapper> materialWrapper;
     csDirtyAccessArray<csRenderMesh*> renderMeshes;
     iObjectRegistry* object_reg;
     iMeshObjectFactory* object_factory;
-    csRef<iFurMeshFactory> factory;
+    csRef<CS::Mesh::iFurMeshFactory> factory;
     /// Model
     iEngine* engine;
     csRef<iLoader> loader;
@@ -113,8 +113,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csArray<csGuideHair> guideHairs;
     csArray<csTriangle> guideHairsTriangles;
     csArray<csGuideHairLOD> guideHairsLOD;
-    csRef<iFurPhysicsControl> physicsControl;
-    csRef<iFurStrandGenerator> hairStrandGenerator;
+    csRef<CS::Mesh::iFurPhysicsControl> physicsControl;
+    csRef<CS::Mesh::iFurStrandGenerator> hairStrandGenerator;
     csVector3* positionShift;
     csRandomGen *rng;
     float guideLOD;

@@ -225,28 +225,28 @@ bool KrystalScene::CreateAvatar ()
     return hairTest->ReportError("Failed to locate Plugin Manager!");
 
   // Load hairPhysicsControl
-  hairPhysicsControl = csLoadPlugin<iFurPhysicsControl>
-    (plugmgr, "crystalspace.physics.hairphysics");
+  hairPhysicsControl = csLoadPlugin<CS::Mesh::iFurPhysicsControl>
+    (plugmgr, "crystalspace.physics.fur.hair");
   if (!hairPhysicsControl)
-    return hairTest->ReportError("Failed to locate iFurPhysicsControl plugin!");
+    return hairTest->ReportError("Failed to locate CS::Mesh::iFurPhysicsControl plugin!");
 
   // Load animationPhysicsControl
-  animationPhysicsControl = csLoadPlugin<iFurPhysicsControl>
-    (plugmgr, "crystalspace.physics.animationphysics");
+  animationPhysicsControl = csLoadPlugin<CS::Mesh::iFurPhysicsControl>
+    (plugmgr, "crystalspace.physics.fur.animation");
   if (!animationPhysicsControl)
-    return hairTest->ReportError("Failed to locate iFurPhysicsControl plugin!");
+    return hairTest->ReportError("Failed to locate CS::Mesh::iFurPhysicsControl plugin!");
 
   // Load hairStrandGenerator
-  csRef<iFurStrandGenerator> hairStrandGenerator = csQueryRegistry<iFurStrandGenerator> 
+  csRef<CS::Mesh::iFurStrandGenerator> hairStrandGenerator = csQueryRegistry<CS::Mesh::iFurStrandGenerator> 
     (hairTest->object_reg);
   if (!hairStrandGenerator)
-    return hairTest->ReportError("Failed to locate iFurStrandGenerator plugin!");
+    return hairTest->ReportError("Failed to locate CS::Mesh::iFurStrandGenerator plugin!");
 
   // Load furMesh
-  csRef<iFurMeshType> furMeshType = csQueryRegistry<iFurMeshType> 
+  csRef<CS::Mesh::iFurMeshType> furMeshType = csQueryRegistry<CS::Mesh::iFurMeshType> 
     (hairTest->object_reg);
   if (!furMeshType)
-    return hairTest->ReportError("Failed to locate iFurMeshType plugin!");
+    return hairTest->ReportError("Failed to locate CS::Mesh::iFurMeshType plugin!");
 
   // Create a new animation tree. The structure of the tree is:
   //   + ragdoll controller node (root node - only if physics are enabled)
@@ -414,7 +414,7 @@ bool KrystalScene::CreateAvatar ()
 
   csRef<iMeshObject> imo = hairMesh->GetMeshObject();
 
-  furMesh = scfQueryInterface<iFurMesh>(imo);
+  furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
   furMesh->SetPhysicsControl(animationPhysicsControl);
   furMesh->SetFurStrandGenerator(hairStrandGenerator);
 

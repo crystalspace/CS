@@ -33,7 +33,7 @@ struct iObjectRegistry;
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   class FurMeshFactory : public scfImplementationExt1<FurMeshFactory, 
-    csMeshFactory, iFurMeshFactory>
+    csMeshFactory, CS::Mesh::iFurMeshFactory>
   {
   public:
     CS_LEAKGUARD_DECLARE(FurMeshFactory);
@@ -76,7 +76,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   };
 
   class FurMeshType : public 
-    scfImplementation2<FurMeshType,iFurMeshType,iComponent>
+    scfImplementation2<FurMeshType,CS::Mesh::iFurMeshType,iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(FurMeshType);

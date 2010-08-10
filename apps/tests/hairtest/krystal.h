@@ -67,8 +67,8 @@ private:
 
   // Hair physics
   bool hairPhysicsEnabled;
-  csRef<iFurPhysicsControl> hairPhysicsControl;
-  csRef<iFurPhysicsControl> animationPhysicsControl;
+  csRef<CS::Mesh::iFurPhysicsControl> hairPhysicsControl;
+  csRef<CS::Mesh::iFurPhysicsControl> animationPhysicsControl;
   csRef<iRigidBody> headBody;
 };
 

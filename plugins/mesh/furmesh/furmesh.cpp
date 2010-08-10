@@ -53,7 +53,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     rng = new csRandomGen(csGetTicks());
 
-    factory = scfQueryInterface<iFurMeshFactory>(object_factory);
+    factory = scfQueryInterface<CS::Mesh::iFurMeshFactory>(object_factory);
   }
 
   FurMesh::~FurMesh ()
@@ -803,7 +803,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     }	    
   }
 
-  void FurMesh::SetPhysicsControl (iFurPhysicsControl* physicsControl)
+  void FurMesh::SetPhysicsControl (CS::Mesh::iFurPhysicsControl* physicsControl)
   {
     this->physicsControl = physicsControl;
   }
@@ -837,12 +837,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->meshFactorySubMesh = meshFactorySubMesh;
   }
 
-  void FurMesh::SetFurStrandGenerator( iFurStrandGenerator* hairStrandGenerator)
+  void FurMesh::SetFurStrandGenerator( CS::Mesh::iFurStrandGenerator* hairStrandGenerator)
   {
     this->hairStrandGenerator = hairStrandGenerator;
   }
 
-  iFurStrandGenerator* FurMesh::GetFurStrandGenerator( )
+  CS::Mesh::iFurStrandGenerator* FurMesh::GetFurStrandGenerator( )
   {
     return hairStrandGenerator;
   }

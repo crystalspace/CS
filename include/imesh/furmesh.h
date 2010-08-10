@@ -28,14 +28,23 @@
 
 #include "crystalspace.h"
 
-struct iFurMesh;
-
 class csVector3;
 class csColor4;
 
+namespace CS
+{
+  namespace Mesh
+  {
+
+    struct iFurPhysicsControl;
+    struct iFurStrandGenerator;
+    struct iFurMeshFactory;
+    struct iFurMeshType;
+    struct iFurMesh;
+
 struct iFurPhysicsControl : public virtual iBase
 {
-  SCF_INTERFACE (iFurPhysicsControl, 1, 0, 0);
+  SCF_INTERFACE (CS::Mesh::iFurPhysicsControl, 1, 0, 0);
 
   virtual void SetInitialTransform(csReversibleTransform initialTransform) = 0;
   virtual void SetRigidBody (iRigidBody* rigidBody) = 0;
@@ -56,7 +65,7 @@ struct iFurPhysicsControl : public virtual iBase
 
 struct iFurStrandGenerator : public virtual iBase
 {
-  SCF_INTERFACE (iFurStrandGenerator, 1, 0, 0);
+  SCF_INTERFACE (CS::Mesh::iFurStrandGenerator, 1, 0, 0);
 
   virtual iMaterial* GetMaterial() = 0;
   virtual void SetMaterial(iMaterial* material) = 0;
@@ -66,7 +75,7 @@ struct iFurStrandGenerator : public virtual iBase
 
 struct iFurMeshFactory : public virtual iBase
 {
-  SCF_INTERFACE (iFurMeshFactory, 1, 0, 0);
+  SCF_INTERFACE (CS::Mesh::iFurMeshFactory, 1, 0, 0);
 
   /// geometry access
   virtual void SetVertexCount (uint n) = 0;
@@ -91,7 +100,7 @@ struct iFurMeshFactory : public virtual iBase
 
 struct iFurMeshType : public virtual iMeshObjectType
 {
-  SCF_INTERFACE (iFurMeshType, 1, 0, 0);
+  SCF_INTERFACE (CS::Mesh::iFurMeshType, 1, 0, 0);
 };
 
 /**
@@ -101,7 +110,7 @@ struct iFurMeshType : public virtual iMeshObjectType
 */
 struct iFurMesh : public virtual iBase  
 {
-  SCF_INTERFACE (iFurMesh, 1, 0, 0);
+  SCF_INTERFACE (CS::Mesh::iFurMesh, 1, 0, 0);
 
   /// Generate geometry
   virtual void GenerateGeometry (iView* view, iSector* room) = 0;
@@ -121,5 +130,8 @@ struct iFurMesh : public virtual iBase
     meshFactorySubMesh ) = 0;
   virtual void SetMaterial ( iMaterial* material ) = 0;
 };
+
+  } // namespace Mesh
+} // namespace CS
 
 #endif // __FUR_INTERF_H__

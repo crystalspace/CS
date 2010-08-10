@@ -83,7 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   };
 
   class HairStrandGenerator : public scfImplementation2 <HairStrandGenerator, 
-    iFurStrandGenerator, iComponent> 
+    CS::Mesh::iFurStrandGenerator, iComponent> 
   {
   public:
     CS_LEAKGUARD_DECLARE(HairStrandGenerator);

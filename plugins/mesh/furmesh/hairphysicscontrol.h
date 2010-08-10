@@ -34,7 +34,7 @@ struct iObjectRegistry;
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   class HairPhysicsControl : public scfImplementation2 <HairPhysicsControl, 
-    iFurPhysicsControl, iComponent>
+    CS::Mesh::iFurPhysicsControl, iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(HairPhysicsControl);
