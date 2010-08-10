@@ -353,8 +353,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     size_t indexCount = 
       meshFactorySubMesh->GetIndices(0)->GetSize() / sizeof(csTriangle);
 
-    size_t vertexCount = meshFactory->GetVertices()->GetElementCount();
-
     csVector3* vertex_buffer = 
       (csVector3*)meshFactory->GetVertices()->Lock(CS_BUF_LOCK_READ);
     csVector3* normal_buffer = 
@@ -363,11 +361,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       (csTriangle*)meshFactorySubMesh->GetIndices(0)->Lock(CS_BUF_LOCK_READ);
     csVector2* texcoord_buffer = 
       (csVector2*)meshFactory->GetTexCoords()->Lock(CS_BUF_LOCK_READ);
-
     csVector3* tangent_buffer = 
-      (csVector3*)meshFactory->GetTangents()->Lock(CS_BUF_LOCK_NORMAL);
-    csVector3* binormal_buffer = 
-      (csVector3*)meshFactory->GetBinormals()->Lock(CS_BUF_LOCK_NORMAL);    
+      (csVector3*)meshFactory->GetTangents()->Lock(CS_BUF_LOCK_READ);
 
     // choose unique indices
     for ( size_t i = 0 ; i < indexCount ; i ++)
@@ -377,9 +372,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         tri.b - indexstart, tri.c - indexstart);
       guideHairsTriangles.Push(triangleNew);
     }
-
-    csNormalMappingTools::CalculateTangents(indexCount, index_buffer, vertexCount, 
-      vertex_buffer, normal_buffer, texcoord_buffer, tangent_buffer, binormal_buffer);
 
     // generate the guide hairs
     for (size_t i = indexstart; i < indexend; i ++)
@@ -414,9 +406,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     meshFactory->GetNormals()->Release();
     meshFactorySubMesh->GetIndices(0)->Release();
     meshFactory->GetTexCoords()->Release();
-
     meshFactory->GetTangents()->Release();
-    meshFactory->GetBinormals()->Release();
   }
 
   float FurMesh::TriangleDensity(csGuideHair A, csGuideHair B, csGuideHair C)
