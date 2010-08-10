@@ -168,52 +168,10 @@ struct NodeTraverseData
   csKDTree* kdtParent;
   csKDTree* kdtNode;
   uint32 u32Frustum_Mask;
-  //uint32 u32Timestamp;
 
   ~NodeTraverseData()
   {
   }
-};
-
-/**
- * Occlusion query record.
- */
-struct OccQuery
-{
-  OccQuery() : qID(0), numQueries(0), ntdNode()
-  {
-  }
-
-  unsigned int *qID;
-  unsigned int numQueries;
-  NodeTraverseData ntdNode;
-
-  bool IsMultiQuery() const
-  {
-    return (numQueries>1);
-  }
-
-  bool operator == (const OccQuery &oq) const
-  {
-    return (qID==oq.qID && numQueries==oq.numQueries && ntdNode==oq.ntdNode);
-  }
-
-  ~OccQuery()
-  {
-  }
-};
-
-struct ObjectRecord
-{
-  ObjectRecord() : obj(0) ,meshList(0), numMeshes(0)
-  {}
-  ObjectRecord (csKDTreeChild* o,csSectorVisibleRenderMeshes* mL,const int nM)
-    : obj(o),meshList(mL),numMeshes(nM)
-  {
-  }
-  int numMeshes;
-  csKDTreeChild* obj;
-  csSectorVisibleRenderMeshes* meshList;
 };
 
 /**
@@ -224,26 +182,19 @@ class csFrustVisObjectWrapper :
     iObjectModelListener, iMovableListener>
 {
 public:
+  csFrustVisObjectWrapper (csFrustumVis* frustvis) :
+    scfImplementationType(this), frustvis(frustvis) 
+  {
+  }
+
   csFrustumVis* frustvis;
   csRef<iVisibilityObject> visobj;
   csKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
 
-  // Bounding box used to insert the object into the AABB tree
-  csBox3 bbox;
-  iGraphics3D *g3d;
-
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
-
-  virtual const csBox3& GetBBox() const { return bbox; }
-
-  csFrustVisObjectWrapper (csFrustumVis* frustvis) :
-    scfImplementationType(this), frustvis(frustvis) 
-  {
-  }
-  virtual ~csFrustVisObjectWrapper () { }
 
   /// The object model has changed.
   virtual void ObjectModelChanged (iObjectModel* model);
@@ -251,6 +202,34 @@ public:
   virtual void MovableChanged (iMovable* movable);
   /// The movable is about to be destroyed.
   virtual void MovableDestroyed (iMovable*) { }
+
+  virtual ~csFrustVisObjectWrapper () { }
+};
+
+class NodeLeafData
+{
+public:
+  NodeLeafData() : g3d(0)
+  {
+  }
+  NodeLeafData(iGraphics3D* g3d,csRef<iMeshWrapper> mesh,csBox3 &bbox)
+  {
+    this->g3d=g3d;
+    this->mesh=mesh;
+    this->bbox=bbox;
+  }
+
+  iGraphics3D* g3d;
+  csBox3 bbox;
+  csRef<iMeshWrapper> mesh;
+
+  const csBox3& GetBBox() const { return bbox; }
+
+  ~NodeLeafData()
+  {
+    g3d=0;
+    mesh=0;
+  }
 };
 
 class NodeData
@@ -307,7 +286,7 @@ public:
     OCQueryID=ocq;
   }
 
-  void LeafAddObject (csFrustVisObjectWrapper* data)
+  void LeafAddObject (NodeLeafData* data)
   {
     if(!g3d)
     {
@@ -315,7 +294,8 @@ public:
       g3d->OQInitQueries(&OCQueryID,1);
     }
   }
-  void LeafUpdateObjects (csFrustVisObjectWrapper**, uint)
+
+  void LeafUpdateObjects (NodeLeafData**, uint)
   {
   }
   void NodeUpdate (const NodeData& child1, 
@@ -383,7 +363,7 @@ public:
   }
 };
 
-typedef AABBTree<csFrustVisObjectWrapper,1,NodeData>::Node* NodePtr;
+typedef AABBTree<NodeLeafData,1,NodeData>::Node* NodePtr;
 
 /**
  * A simple frustum based visibility culling system.
@@ -410,6 +390,8 @@ private:
   csBox3 kdtree_box;
   csRefArray<csFrustVisObjectWrapper, CS::Container::ArrayAllocDefault, 
     csArrayCapacityFixedGrow<256> > visobj_vector;
+  std::map<csRef<iMeshWrapper>,NodeLeafData*> mapNodeLeafData;
+
   int scr_width, scr_height;	// Screen dimensions.
   uint32 current_vistest_nr;
 
@@ -428,25 +410,17 @@ private:
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
   csRef<iGraphics3D> g3d;
-  AABBTree<csFrustVisObjectWrapper,1,NodeData > aabbTree;
+  AABBTree<NodeLeafData,1,NodeData > aabbTree;
 
   CHCList<NodeTraverseData> T_Queue; // Traversal Queue (aka DistanceQueue)
   CHCList<NodeTraverseData> I_Queue; // I queue (invisible queue)
   CHCList<NodeTraverseData> V_Queue; // V queue (nodes that are scheduled for testing in the current frame)
-  CHCList<OccQuery> Q_Queue; // Q queue (query queue)
 
   // Frustum data (front to back)
   FrustTest_Front2BackData f2bData;
 
   void PullUpVisibility(const NodeTraverseData &ntdNode);
   void TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp);
-
-  /**
-   *  Gets the first finished query from the query list.
-   * Return 1 if visible -1 if not or 0 if no finished 
-   * queries are located.
-   */
-  int GetFinishedQuery(OccQuery &oq);
 
 public:
   csFrustumVis ();
@@ -462,7 +436,7 @@ public:
 
   // Test visibility for the given object. Returns true if visible.
   bool TestObjectVisibility (csFrustVisObjectWrapper* obj,
-  	FrustTest_Front2BackData* data, uint32 frustum_mask,ObjectRecord &objrec);
+  	FrustTest_Front2BackData* data, uint32 frustum_mask);
 
   // Add an object to the update queue. That way it will be updated
   // in the kdtree later when needed.

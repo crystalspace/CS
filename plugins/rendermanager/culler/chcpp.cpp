@@ -144,7 +144,6 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
   {
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
     csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
-    csArray<ObjectRecord> objArray(10);
 
     for (int i = 0 ; i < num_objects ; i++)
     {
@@ -153,18 +152,12 @@ void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timesta
         objects[i]->timestamp = cur_timestamp;
         csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
       	  objects[i]->GetObject ();
-        ObjectRecord obj;
         // only test an element via occlusion if it first passes frustum testing
-        if(TestObjectVisibility (visobj_wrap, &f2bData, ntdNode.GetFrustumMask(),obj))
+        if(TestObjectVisibility (visobj_wrap, &f2bData, ntdNode.GetFrustumMask()))
         {
-          if(obj.numMeshes) // don't add records that don't have anything to draw
-            objArray.Push(obj);
         }
       }
     }
-    //if(!objArray.IsEmpty())
-    //  IssueQueries(ntdNode, objArray);
-    //IssueSingleQuery(ntdNode);
   }
   else // else we queue its children on to the traverse queue
   {

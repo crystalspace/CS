@@ -195,11 +195,9 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
   CalculateVisObjBBox (visobj, bbox);
   visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
   kdtree_box += bbox;
-  visobj_wrap->bbox=bbox;
 
   iMeshWrapper* mesh = visobj->GetMeshWrapper ();
   visobj_wrap->mesh = mesh;
-  visobj_wrap->g3d=g3d;
 
   // Only add the listeners at the very last moment to prevent them to
   // be called by the calls above (i.e. especially the calculation of
@@ -210,10 +208,13 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 
   visobj_vector.Push (visobj_wrap);
 
+
   printf("Inserting into aabb (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",bbox.MinX(),bbox.MinY(),bbox.MinZ(),
           bbox.MaxX(),bbox.MaxY(),bbox.MaxZ());
 
-  aabbTree.AddObject(visobj_wrap);
+  NodeLeafData *nld=new NodeLeafData(g3d,mesh,bbox);
+  mapNodeLeafData[mesh]=nld;
+  aabbTree.AddObject(nld);
 }
 
 void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
@@ -230,11 +231,15 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
       objmodel->RemoveListener ( (iObjectModelListener*)visobj_wrap );
       kdtree->RemoveObject (visobj_wrap->child);
 
+      iMeshWrapper* mesh = visobj->GetMeshWrapper ();
+
       printf("Deleting aabb (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
-          visobj_wrap->bbox.MinX(),visobj_wrap->bbox.MinY(),visobj_wrap->bbox.MinZ(),
-          visobj_wrap->bbox.MaxX(),visobj_wrap->bbox.MaxY(),visobj_wrap->bbox.MaxZ());
-      aabbTree.RemoveObject(visobj_wrap);
-      visobj_wrap->g3d=0;
+          mapNodeLeafData[mesh]->bbox.MinX(),mapNodeLeafData[mesh]->bbox.MinY(),mapNodeLeafData[mesh]->bbox.MinZ(),
+          mapNodeLeafData[mesh]->bbox.MaxX(),mapNodeLeafData[mesh]->bbox.MaxY(),mapNodeLeafData[mesh]->bbox.MaxZ());
+
+      aabbTree.RemoveObject(mapNodeLeafData[mesh]);
+      delete mapNodeLeafData[mesh];
+      mapNodeLeafData.erase(mesh);
 
 #ifdef CS_DEBUG
       // To easily recognize that the vis wrapper has been deleted:
@@ -308,7 +313,7 @@ int csFrustumVis::TestNodeVisibility (csKDTree* treenode,
 }
 
 bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
-  	FrustTest_Front2BackData* data, uint32 frustum_mask,ObjectRecord &objrec)
+  	FrustTest_Front2BackData* data, uint32 frustum_mask)
 {
   if (obj->mesh && obj->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
     return false;
@@ -483,14 +488,14 @@ struct LeafNodeProcessOP
   { 
     CS_ASSERT_MSG("Invalid AABB-tree", n->IsLeaf ());
     const int num_objects=n->GetObjectCount();
-    const csFrustVisObjectWrapper* visobj_wrap = n->GetLeafData(0);
+    const NodeLeafData* visobj_wrap = n->GetLeafData(0);
 
     if (visobj_wrap->mesh && visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
     {
       return true; // node invisible, but continue traversal
     }
 
-    const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+    const csBox3& obj_bbox = visobj_wrap->GetBBox ();
     if (obj_bbox.Contains (f2bData->pos))
     {
       NodeVisible(n,frustum_mask);
