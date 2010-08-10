@@ -314,7 +314,7 @@ iRenderBuffer* csGenmeshMeshObject::GetPositions()
 
 #include "csutil/custom_new_disable.h"
 
-int csGenmeshMeshObject::ComputeProgLODLevel(const csVector3& camera_pos)
+int csGenmeshMeshObject::ComputeProgLODLevel(const SubMeshProxy& subMesh, const csVector3& camera_pos)
 {
   float min, max;
   factory->GetProgLODDistances(min, max);
@@ -323,7 +323,7 @@ int csGenmeshMeshObject::ComputeProgLODLevel(const csVector3& camera_pos)
   csVector3 pos = logparent->GetMovable()->GetPosition();
   float dist = (camera_pos-pos).Norm();
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(factory);
-  int nlod = fstate->GetNumProgLODLevels() - 1;
+  int nlod = subMesh.GetSlidingWindowSize() - 1;
   // Function of square root of distance
   float t = (dist - min) / (max - min);
   if (t > 1.0f)
@@ -416,7 +416,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     else
     {
       int prog_lod_level = (subMesh.GetForcedProgLODLevel() == -1)
-        ? ComputeProgLODLevel(camera->GetTransform().GetOrigin())
+        ? ComputeProgLODLevel(subMesh, camera->GetTransform().GetOrigin())
         : subMesh.GetForcedProgLODLevel();
       subMesh.GetSlidingWindow(prog_lod_level, start_index, end_index);
     }

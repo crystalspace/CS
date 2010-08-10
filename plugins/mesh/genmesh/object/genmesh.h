@@ -191,7 +191,7 @@ private:
   /// Get positions buffer
   iRenderBuffer* GetPositions();
   
-  int ComputeProgLODLevel(const csVector3& camera_pos);
+  int ComputeProgLODLevel(const SubMeshProxy& subMesh, const csVector3& camera_pos);
   
 public:
   /// Constructor.

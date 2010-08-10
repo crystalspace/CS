@@ -316,8 +316,6 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
     
     lodgen.GenerateLODs();
   
-    CS_ASSERT (lodgen.GetSlidingWindowCount() >= 2);
-    
     iRenderBuffer* rbindices = submesh->GetIndices();
     CS_ASSERT (rbindices);
 
