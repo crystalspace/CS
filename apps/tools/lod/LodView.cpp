@@ -27,7 +27,7 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-LodView::LodView (): lod_level(0)
+LodView::LodView (): lod_level(-1), prev_lod_level(0)
 {
   SetApplicationName ("CrystalSpace.Lod");
 }
@@ -79,32 +79,40 @@ void LodView::Frame ()
 
 void LodView::UpdateLODLevel()
 {
-  csRef<iMeshWrapper> sprite = engine->FindMeshObject("MySprite");
-  csRef<iMeshObject> mobj = sprite->GetMeshObject();
-  assert(mobj);
-
-  csRef<iGeneralMeshState> mstate = scfQueryInterface<iGeneralMeshState>(mobj);
-  assert(mstate);
-
-  mstate->ForceProgLODLevel(lod_level);
-  
-  csRef<iMeshFactoryWrapper> fact = sprite->GetFactory();
-  csRef<iMeshObjectFactory> fobj = fact->GetMeshObjectFactory();
-  csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fobj);
   int tris = 0;
-  for (unsigned int submesh_index = 0; submesh_index < fstate->GetSubMeshCount(); submesh_index++)
+  for (size_t i = 0; i < sprites.GetSize(); i++)
   {
-    csRef<iGeneralMeshSubMesh> submesh = fstate->GetSubMesh(submesh_index);
-    if (submesh)
+    csRef<iMeshObject> mobj = sprites[i]->GetMeshObject();
+    assert(mobj);
+
+    csRef<iGeneralMeshState> mstate = scfQueryInterface<iGeneralMeshState>(mobj);
+    assert(mstate);
+
+    mstate->ForceProgLODLevel(lod_level);
+
+    if (lod_level > -1)
     {
-      csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
-      int num_sw = fsm->GetSlidingWindowSize();
-      int s, e;
-      fsm->GetSlidingWindow((lod_level > num_sw-1) ? num_sw-1 : lod_level, s, e);
-      tris += (e - s) / 3;
+      csRef<iMeshFactoryWrapper> fact = sprites[i]->GetFactory();
+      csRef<iMeshObjectFactory> fobj = fact->GetMeshObjectFactory();
+      csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fobj);
+      for (unsigned int submesh_index = 0; submesh_index < fstate->GetSubMeshCount(); submesh_index++)
+      {
+        csRef<iGeneralMeshSubMesh> submesh = fstate->GetSubMesh(submesh_index);
+        if (submesh)
+        {
+          csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
+          int num_sw = fsm->GetSlidingWindowSize();
+          int s, e;
+          fsm->GetSlidingWindow((lod_level > num_sw-1) ? num_sw-1 : lod_level, s, e);
+          tris += (e - s) / 3;
+        }
+      }
     }
   }
-  csPrintf("Level: %d Triangles: %d\n", lod_level, tris);
+  if (lod_level > -1)
+    csPrintf("Level: %d Triangles: %d\n", lod_level, tris);
+  else
+    csPrintf("Level: auto\n");
 }
 
 bool LodView::OnKeyboard (iEvent& ev)
@@ -136,6 +144,20 @@ bool LodView::OnKeyboard (iEvent& ev)
         UpdateLODLevel();
       }
     }
+    else if (code == 'a')
+    {
+      if (lod_level >= 0)
+      {
+        prev_lod_level = lod_level;
+        lod_level = -1;
+        UpdateLODLevel();
+      }
+      else
+      {
+        lod_level = prev_lod_level;
+        UpdateLODLevel();
+      }
+    }
   }
   
   return false;
@@ -145,19 +167,35 @@ void LodView::Usage()
 {
   csPrintf("LOD viewer\n");
   csPrintf("Usage:\n");
-  csPrintf("lodview <filename>\n");
-  csPrintf("When viewing the model: 'k' increases LOD resolution; 'l' reduces it.\n"); 
+  csPrintf("lodview <filename> [-m=<num>]\n");
+  csPrintf("  -m:   multiple sprites, large room (will show num^2 sprites)\n");
+  csPrintf("When viewing the model:\n");
+  csPrintf("  'k' / 'l':  increase/reduce LOD resolution\n");
+  csPrintf("  'a':        switch to auto LOD\n");
 }
 
 bool LodView::OnInitialize (int argc, char* argv [])
 {
-  if (argc < 2)
+  csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser>(GetObjectRegistry());
+  filename = csString(cmdline->GetName());
+  if (filename == "")
   {
     Usage();
     exit(1);
   }
   
-  filename = argv[1];
+  csString smultiple = cmdline->GetOption("m");
+  if (smultiple == "")
+  {
+    use_multiple_sprites = false;
+  }
+  else
+  {
+    use_multiple_sprites = true;
+    csScanStr(smultiple, "%d", &num_multiple);
+    if (num_multiple < 1)
+      num_multiple = 1;
+  }
   
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_VFS,
@@ -273,6 +311,13 @@ bool LodView::SetupModules ()
 
   CreateRoom ();
   CreateSprites ();
+
+  csRef<iMeshObjectFactory> fact = imeshfactw->GetMeshObjectFactory();
+  assert(fact);
+  csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
+  assert(fstate);
+  num_lod_levels = fstate->GetNumProgLODLevels();
+
   engine->Prepare ();
   using namespace CS::Lighting;
   SimpleStaticLighter::ShineLights (room, engine, 4);
@@ -285,6 +330,14 @@ bool LodView::SetupModules ()
 }
 
 void LodView::CreateRoom ()
+{
+  if (use_multiple_sprites)
+    CreateLargeRoom();
+  else
+    CreateSmallRoom();
+}
+
+void LodView::CreateSmallRoom()
 {
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
     ReportError ("Error loading 'stone4' texture!");
@@ -309,24 +362,57 @@ void LodView::CreateRoom ()
   ll->Add (light);
 }
 
+void LodView::CreateLargeRoom()
+{
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+    ReportError ("Error loading 'stone4' texture!");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  room = engine->CreateSector ("room");
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-50, 0, -50), csVector3 (50, 20, 50));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+    engine, room, "walls", "walls_factory", &box);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+  csRef<iLight> light;
+  iLightList* ll = room->GetLights ();
+  light = engine->CreateLight (0, csVector3 (-10, 10, 0), 40, csColor (1, 1, 1));
+  ll->Add (light);
+  light = engine->CreateLight (0, csVector3 (10, 10, 0), 40, csColor (1, 1, 1));
+  ll->Add (light);
+  light = engine->CreateLight (0, csVector3 (0, 10, -10), 40, csColor (1, 1, 1));
+  ll->Add (light);
+  room->SetDynamicAmbientLight(csColor(0.5, 0.5, 0.5));
+}
+
 void LodView::CreateSprites ()
 {
-  iTextureWrapper* txt = loader->LoadTexture ("spark", "/lib/std/spark.png");
-  if (txt == 0)
-    ReportError("Error loading texture!");
-  
-  csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
-    imeshfactw, "MySprite", room,
-    csVector3 (-3, 5, 3)));
+  if (use_multiple_sprites)
+    CreateManySprites(num_multiple, num_multiple);
+  else
+    CreateManySprites(1, 1);
+}
+
+void LodView::CreateOneSprite(const csVector3& pos)
+{
+  int id = sprites.GetSize();
+  char name[50];
+  snprintf(name, 50, "MySprite%d", id);
+  csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (imeshfactw, name, room, pos));
   csMatrix3 m; m.Identity ();
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
+  sprites.Push(sprite);
+}
 
-  csRef<iMeshObjectFactory> fact = imeshfactw->GetMeshObjectFactory();
-  assert(fact);
-  csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(fact);
-  assert(fstate);
-  num_lod_levels = fstate->GetNumProgLODLevels();
+void LodView::CreateManySprites(int rows, int cols)
+{
+  for (int j = -cols/2; j < (cols+1)/2; j++)
+    for (int i = -rows/2; i < (rows+1)/2; i++)
+      CreateOneSprite(csVector3(i*100.0/rows, 3.0, j*100.0/cols));
 }
 
 int main (int argc, char* argv[])

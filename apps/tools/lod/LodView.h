@@ -51,10 +51,15 @@ private:
   float rotX, rotY;
 
   csRef<FramePrinter> printer;
-  
+
+  csArray<csRef<iMeshWrapper> > sprites;
   int num_lod_levels;
   int lod_level;
+  int prev_lod_level;
   csString filename;
+  int num_sprites;
+  bool use_multiple_sprites;
+  int num_multiple;
 
   /**
    * Handle keyboard events - ie key presses and releases.
@@ -80,9 +85,13 @@ private:
   
   /// Here we will create our little, simple world.
   void CreateRoom ();
+  void CreateSmallRoom();
+  void CreateLargeRoom();
 
   /// Here we will create our sprites.
   void CreateSprites();
+  void CreateOneSprite(const csVector3& pos);
+  void CreateManySprites(int rows, int cols);
 
   bool SetupModules ();
   
