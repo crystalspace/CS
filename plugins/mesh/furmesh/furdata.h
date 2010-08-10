@@ -27,6 +27,25 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
+  struct csTextureRGBA
+  {
+    csRef<iTextureHandle> handle;
+    int width, height;
+    uint8* data;
+
+    csTextureRGBA ();
+    csTextureRGBA (int width, int height);
+
+    uint8 Get(int x, int y, int channel) const;
+    void Set(int x, int y, int channel, uint8 value) ;
+
+    bool Read();
+    void Write();
+
+    bool Create(iGraphics3D* g3d);
+    void SaveImage(iObjectRegistry* object_reg, const char* texname) const;
+  };
+
   struct csGuideHair;
   struct csGuideHairLOD;
 

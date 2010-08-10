@@ -21,6 +21,7 @@
 
 #include "crystalspace.h"
 
+#include "furdata.h"
 #include "csutil/scf_implementation.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
@@ -99,26 +100,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Shader
     csRef<iGraphics3D> g3d;
     csRef<iShaderVarStringSet> svStrings;
-    int width, height;
-    csRef<iTextureHandle> M;
-    uint8* m_buf;
+    csTextureRGBA M;
+    csTextureRGBA N;
     float* gauss_matrix;
-    csRef<iTextureHandle> N;
-    uint8* n_buf;
     // Marschner constants functions
     MarschnerConstants* mc;
     void UpdateConstans();
     // Marschner specific functions
     void UpdateM();
-    float ComputeM(float a, float b, int channel) const;
+    float ComputeM(float a, float b, int channel);
     void UpdateN();
     float SimpleNP(float phi, float thD ) const;
     float ComputeT(float absorption, float gammaT, int p) const;
     float ComputeA(float absorption, int p, float h, float refraction, 
       float etaPerpendicular, float etaParallel) const;
     float ComputeNP(int p, float phiD, float thD) const;
-    // Marschner temp functions
-    void SaveImage(uint8 *buf, const char* texname) const;
   };
 
 }

@@ -33,8 +33,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   HairStrandGenerator::HairStrandGenerator (iBase* parent)
     : scfImplementationType (this, parent), object_reg(0), material(0), 
-    valid(false), g3d(0), svStrings(0), width(256), height(256), M(0), 
-    m_buf(0), gauss_matrix(0), N(0), n_buf(0), mc(0)
+    valid(false), g3d(0), svStrings(0), M(256, 256), N(256, 256),
+    gauss_matrix(0), mc(0)
   {
   }
 
@@ -42,12 +42,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     if (mc)
       delete mc;
-    if (m_buf)
-      delete m_buf;
+    if (M.data)
+      delete M.data;
     if (gauss_matrix)
       delete gauss_matrix;
-    if (n_buf)
-      delete n_buf;
+    if (N.data)
+      delete N.data;
   }
 
   // From iComponent
@@ -112,7 +112,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void HairStrandGenerator::UpdateConstans()
   {
-    if(!M)
+    if(!M.handle)
     {
       // Surface properties
       CS::ShaderVarName aR (svStrings, "aR");	
@@ -171,32 +171,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   // Marschner specific methods
   void HairStrandGenerator::UpdateM()
   {
-    if(!M)
+    if(!M.handle)
     {
       CS::ShaderVarName strandWidthName (svStrings, "tex M");	
       csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(strandWidthName);
 
-      M = g3d->GetTextureManager()->CreateTexture(width, height, csimg2D, "abgr8", 
-        CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
-
-      if(!M)
+      if(!M.Create(g3d))
       {
         csPrintfErr ("Failed to create M texture!\n");
         return;
       }
 
-      shaderVariable->SetValue(M);
+      shaderVariable->SetValue(M.handle);
 
-      m_buf = new uint8 [width * height * 4];
-      gauss_matrix = new float [width * height];
+      M.data = new uint8 [M.width * M.height * 4];
+      gauss_matrix = new float [M.width * M.height];
 
-      for( int x = 0 ; x < width ; x ++ )
-        for (int y = 0 ; y < height; y ++)
+      for( int x = 0 ; x < M.width ; x ++ )
+        for (int y = 0 ; y < M.height; y ++)
         {
-          m_buf[ 4 * (x + y * width ) ] = 255; // red
-          m_buf[ 4 * (x + y * width ) + 1 ] = 0; // green
-          m_buf[ 4 * (x + y * width ) + 2 ] = 0; // blue
-          m_buf[ 4 * (x + y * width ) + 3 ] = 255; // alpha
+          M.Set(x, y, 0, 255); // red
+          M.Set(x, y, 1, 0); // green
+          M.Set(x, y, 2, 0); // blue
+          M.Set(x, y, 3, 255); // alpha
         }
     }
 
@@ -206,61 +203,58 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     constantsM.z = ComputeM(mc->aTRT, mc->bTRT, 2) / 255.0f;
 
     // alpha is qd
-    for( int x = 0 ; x < width ; x ++ )
-      for (int y = 0 ; y < height; y ++)
+    for( int x = 0 ; x < M.width ; x ++ )
+      for (int y = 0 ; y < M.width; y ++)
       {
-        float sin_thI = -1.0f + (x * 2.0f) / (width - 1);
-        float sin_thR = -1.0f + (y * 2.0f) / (height - 1);
+        float sin_thI = -1.0f + (x * 2.0f) / (M.width - 1);
+        float sin_thR = -1.0f + (y * 2.0f) / (M.width - 1);
         float thI = asin(sin_thI);
         float thR = asin(sin_thR);
         float cos_thD = cos( (thI - thR) / 2.0f );
-        m_buf[ 4 * (x + y * width ) + 3 ] = 
-          (uint8)( ( 255.0f * (cos_thD + 1.0f) ) / 2.0f);
+        M.Set(x, y, 3, (uint8)( ( 255.0f * (cos_thD + 1.0f) ) / 2.0f) );
       }
 
     CS::ShaderVarName constantsMName (svStrings, "constants M");	
     material->GetVariableAdd(constantsMName)->SetValue(constantsM);
 
     // send buffer to texture
-    M->Blit(0, 0, width, height / 2, m_buf);
-    M->Blit(0, height / 2, width, height / 2, m_buf + (width * height * 2));
+    M.Write();
 
     // test new texture
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+//     if (!M.Read())
+//       csPrintfErr("Could not read M texture!\n");
 
-    csRef<iDataBuffer> db = M->Readback(readbackFmt);
-    SaveImage(db->GetUint8(), "/data/hairtest/debug/M_debug.png");
+    M.SaveImage(object_reg, "/data/hairtest/debug/M_debug.png");
   }
 
-  float HairStrandGenerator::ComputeM(float a, float b, int channel) const
+  float HairStrandGenerator::ComputeM(float a, float b, int channel)
   {
     float max = 0;
     
     // find max
-    for (int x = 0; x < width; x++)
-      for (int y = 0; y < height; y++)    
+    for (int x = 0; x < M.width; x++)
+      for (int y = 0; y < M.height; y++)    
       {
-        float sin_thI = -1.0f + (x * 2.0f) / (width - 1);
-        float sin_thR = -1.0f + (y * 2.0f) / (height - 1);
+        float sin_thI = -1.0f + (x * 2.0f) / (M.width - 1);
+        float sin_thR = -1.0f + (y * 2.0f) / (M.height - 1);
         float thI = (180 * asin(sin_thI) / PI);
         float thR = (180 * asin(sin_thR) / PI);
         float thH = (thR + thI) / 2;
         float thH_a = thH - a;
 
         float gauss = MarschnerHelper::GaussianDistribution(b, thH_a);
-        gauss_matrix[x + y * width] = gauss;
+        gauss_matrix[x + y * M.width] = gauss;
 
         if (255 * gauss > max)
           max = 255 * gauss;
       }
 
     // normalize
-    for (int x = 0; x < width; x++)
-      for (int y = 0; y < height; y++)
+    for (int x = 0; x < M.width; x++)
+      for (int y = 0; y < M.height; y++)
       {
-        float gauss = gauss_matrix[x + y * width];
-        m_buf[4 * (x + y * width) + channel] = (uint8)(255 * 255 * gauss / max);
+        float gauss = gauss_matrix[x + y * M.width];
+        M.Set(x, y, channel, (uint8)(255 * 255 * gauss / max) );
       }
 
     return max;
@@ -268,56 +262,53 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void HairStrandGenerator::UpdateN()
   {
-    if(!N)
+    if(!N.handle)
     {
       CS::ShaderVarName strandWidthName (svStrings, "tex N");	
       csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(strandWidthName);
 
-       N = g3d->GetTextureManager()->CreateTexture(width, height, csimg2D, "abgr8", 
-         CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
+       N.Create(g3d);
 
-      if(!N)
+      if(!N.handle)
       {
         csPrintfErr ("Failed to create N texture!\n");
         return;
       }
 
-      shaderVariable->SetValue(N);
+      shaderVariable->SetValue(N.handle);
 
-      n_buf = new uint8 [width * height * 4];
+      N.data = new uint8 [N.width * N.height * 4];
 
-      for( int x = 0 ; x < width ; x ++ )
-        for (int y = 0 ; y < height; y ++)
+      for( int x = 0 ; x < N.width ; x ++ )
+        for (int y = 0 ; y < N.height; y ++)
         {
-          n_buf[ 4 * (x + y * width ) ] = 0; // red
-          n_buf[ 4 * (x + y * width ) + 1 ] = 0; // green
-          n_buf[ 4 * (x + y * width ) + 2 ] = 0; // blue
-          n_buf[ 4 * (x + y * width ) + 3 ] = 255; // alpha
+          N.Set(x, y, 0, 0); // red
+          N.Set(x, y, 1, 0); // green
+          N.Set(x, y, 2, 0); // blue
+          N.Set(x, y, 3, 255); // alpha
         }
     }
 
-    for( int x = 0 ; x < width ; x ++ )
-      for (int y = 0 ; y < height; y ++)
+    for( int x = 0 ; x < N.width ; x ++ )
+      for (int y = 0 ; y < N.height; y ++)
       {
-        float cos_phiD = -1.0f + (x * 2.0f) / (width - 1);
-        float cos_thD = -1.0f + (y * 2.0f) / (height - 1);
+        float cos_phiD = -1.0f + (x * 2.0f) / (N.width - 1);
+        float cos_thD = -1.0f + (y * 2.0f) / (N.height - 1);
         float phiD = acos(cos_phiD);
         float thD = acos(cos_thD);
-        n_buf[ 4 * (x + y * width ) ] = (uint8)(255 * ComputeNP(0, phiD, thD)); // red
-        n_buf[ 4 * (x + y * width ) + 1 ] = (uint8)(255 * ComputeNP(1, phiD, thD)); // green
-        n_buf[ 4 * (x + y * width ) + 2 ] = (uint8)(255 * ComputeNP(2, phiD, thD)); // blue
+        N.Set(x, y, 0, (uint8)(255 * ComputeNP(0, phiD, thD)) ); // red
+        N.Set(x, y, 1, (uint8)(255 * ComputeNP(1, phiD, thD)) ); // green
+        N.Set(x, y, 2, (uint8)(255 * ComputeNP(2, phiD, thD)) ); // blue
       }
 
     // send buffer to texture
-    N->Blit(0, 0, width, height / 2, n_buf);
-    N->Blit(0, height / 2, width, height / 2, n_buf + (width * height * 2));
+    N.Write();
 
     // test new texture
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+//     if (!N.Read())
+//       csPrintfErr("Could not read N texture!\n");
 
-    csRef<iDataBuffer> db = N->Readback(readbackFmt);
-    SaveImage(db->GetUint8(), "/data/hairtest/debug/N_debug.png");
+    N.SaveImage(object_reg, "/data/hairtest/debug/N_debug.png");
   }
 
   float HairStrandGenerator::ComputeT(float absorption, float gammaT, int p) const
@@ -397,46 +388,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     result *= MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
 
     return csMin(1.0f, result);
-  }
-
-  void HairStrandGenerator::SaveImage(uint8* buf, const char* texname) const
-  {
-    csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
-    csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
-
-    if(!buf)
-    {
-      csPrintfErr ("Bad data buffer!\n");
-      return;
-    }
-
-    csRef<iImage> image;
-    image.AttachNew(new csImageMemory (width, height, buf,false,
-      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-
-    if(!image.IsValid())
-    {
-      csPrintfErr ("Error creating image\n");
-      return;
-    }
-
-    csPrintf ("Saving %zu KB of data.\n", 
-      csImageTools::ComputeDataSize (image)/1024);
-
-    csRef<iDataBuffer> db = imageio->Save (image, "image/png", "progressive");
-    if (db)
-    {
-      if (!VFS->WriteFile (texname, (const char*)db->GetData (), db->GetSize ()))
-      {
-        csPrintfErr ("Failed to write file '%s'!", texname);
-        return;
-      }
-    }
-    else
-    {
-      csPrintfErr ("Failed to save png image for basemap!");
-      return;
-    }	    
   }
 
   /************************

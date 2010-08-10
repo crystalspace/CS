@@ -17,8 +17,6 @@
 */
 
 #include <cssysdef.h>
-#include <iutil/objreg.h>
-#include <iutil/plugin.h>
 
 #include "furmesh.h"
 #include "hairphysicscontrol.h"
@@ -387,8 +385,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
       // based on heightmap
       // point heightmap - modify to use convolution matrix or such
-      float height = heightmap.data[ 4 * ((int)(guideHair.uv.x * heightmap.width) + 
-        (int)(guideHair.uv.y * heightmap.height) * heightmap.width )] / 255.0f;
+      float height = heightmap.Get((int)(guideHair.uv.x * heightmap.width),  
+        (int)(guideHair.uv.y * heightmap.height), 0) / 255.0f;
 
       size_t controlPointsCount = (int)( (height * heightFactor) / controlPointsDistance);
       
@@ -441,7 +439,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         count++;
         float bC = 1 - bA - bB;
         csVector2 newPoint = a * bA + b * bB + c * bC;
-        density += densitymap.data[4 * ((int)newPoint.x + (int)newPoint.y * densitymap.width )];
+        density += densitymap.Get((int)newPoint.x, (int)newPoint.y, 0);
       }
 
     for( float bB = 0.0; bB <= 1.0; bB += 1 / hB )
@@ -450,7 +448,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         count++;
         float bC = 1 - bA - bB;
         csVector2 newPoint = a * bA + b * bB + c * bC;
-        density += densitymap.data[4 * ((int)newPoint.x + (int)newPoint.y * densitymap.width )];
+        density += densitymap.Get((int)newPoint.x, (int)newPoint.y, 0);
       }
 
     for( float bC = 0.0; bC <= 1.0; bC += 1 / hC )
@@ -459,7 +457,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         count++;
         float bB = 1 - bA - bC;
         csVector2 newPoint = a * bA + b * bB + c * bC;
-        density += densitymap.data[4 * ((int)newPoint.x + (int)newPoint.y * densitymap.width )];
+        density += densitymap.Get((int)newPoint.x, (int)newPoint.y, 0);
       }
 
     if (count != 0)
@@ -719,11 +717,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     {
       csVector2 uv = guideHairs.Get(i).uv;
 
-      densitymap.data[ 4 * ((int)(uv.x * densitymap.width) + 
-        (int)(uv.y * densitymap.height) * densitymap.width ) + 1 ] = 255;
+      densitymap.Set( (int)(uv.x * densitymap.width), 
+        (int)(uv.y * densitymap.height), 1, 255);
 
-      heightmap.data[ 4 * ((int)(uv.x * heightmap.width) + 
-        (int)(uv.y * heightmap.height) * heightmap.width ) + 1 ] = 255;
+      heightmap.Set( (int)(uv.x * heightmap.width),  
+        (int)(uv.y * heightmap.height), 1, 255);
 
     }
 
@@ -732,8 +730,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     {
       csVector2 uv = guideHairsLOD.Get(i).uv;
 
-      densitymap.data[ 4 * ((int)(uv.x * densitymap.width) + 
-        (int)(uv.y * densitymap.height) * densitymap.width ) ] = 255;
+      densitymap.Set( (int)(uv.x * densitymap.width),
+        (int)(uv.y * densitymap.height), 0, 255);
     }
 
     // from hair strands
@@ -750,60 +748,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
           uv += guideHairReference[j].distance * (guideHairsLOD.Get(
             guideHairReference[j].index - guideHairs.GetSize()).uv);
 
-      densitymap.data[ 4 * ((int)(uv.x * densitymap.width) + 
-        (int)(uv.y * densitymap.height) * densitymap.width ) + 2 ] = 255;
+      densitymap.Set( (int)(uv.x * densitymap.width),
+        (int)(uv.y * densitymap.height), 2, 255);
     }
 
     csPrintf("Pure guide ropes: %d\n", guideHairs.GetSize());
     csPrintf("Total guide ropes: %d\n", guideHairsLOD.GetSize() + guideHairs.GetSize());
 
-    SaveImage(densitymap.data, "/data/krystal/krystal_skull_densitymap_debug.png",
-      densitymap.width, densitymap.height);
+    densitymap.SaveImage(object_reg, "/data/krystal/krystal_skull_densitymap_debug.png");
 
-    SaveImage(heightmap.data, "/data/krystal/krystal_skull_heightmap_debug.png",
-      heightmap.width, heightmap.height);
-
-  }
-
-  void FurMesh::SaveImage(uint8* buf, const char* texname, 
-    int width, int height)
-  {
-    csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
-    csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
-
-    if(!buf)
-    {
-      printf("Bad data buffer!\n");
-      return;
-    }
-
-    csRef<iImage> image;
-    image.AttachNew(new csImageMemory (width, height, buf,false,
-      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-
-    if(!image.IsValid())
-    {
-      printf("Error loading image\n");
-      return;
-    }
-
-    csPrintf ("Saving %zu KB of data.\n", 
-      csImageTools::ComputeDataSize (image)/1024);
-
-    csRef<iDataBuffer> db = imageio->Save (image, "image/png", "progressive");
-    if (db)
-    {
-      if (!VFS->WriteFile (texname, (const char*)db->GetData (), db->GetSize ()))
-      {
-        printf("Failed to write file '%s'!", texname);
-        return;
-      }
-    }
-    else
-    {
-      printf("Failed to save png image for basemap!");
-      return;
-    }	    
+    heightmap.SaveImage(object_reg, "/data/krystal/krystal_skull_heightmap_debug.png");
   }
 
   void FurMesh::SetPhysicsControl (CS::Mesh::iFurPhysicsControl* physicsControl)
@@ -900,7 +854,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     CS::ShaderVarName densitymapName (svStrings, "density map");	
     csRef<csShaderVariable> shaderVariable = baseMaterial->GetVariable(densitymapName);
 
-    shaderVariable->GetValue(densitymap.handle);
+    iTextureHandle* tex;
+    shaderVariable->GetValue(tex);
+    densitymap.handle = tex;
 
     CS::ShaderVarName densityFactorGuideHairsName (svStrings, "densityFactorGuideHairs");	
     baseMaterial->GetVariable(densityFactorGuideHairsName)->GetValue(densityFactorGuideHairs);
@@ -909,12 +865,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     baseMaterial->GetVariable(densityFactorHairStrandsName)->GetValue(densityFactorHairStrands);    
 
     // density map
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-
-    csRef<iDataBuffer> densitymapDB = densitymap.handle->Readback(readbackFmt);
-    densitymap.handle->GetOriginalDimensions(densitymap.width, densitymap.height);
-    densitymap.data = densitymapDB->GetUint8();
+    if ( !densitymap.Read() )
+      csPrintfErr( "Error reading densitymap texture!\n" );
   }
 
   void FurMesh::SetHeightmap ()
@@ -922,18 +874,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     CS::ShaderVarName heightmapName (svStrings, "height map");	
     csRef<csShaderVariable> shaderVariable = baseMaterial->GetVariable(heightmapName);
 
-    shaderVariable->GetValue(heightmap.handle);
+    iTextureHandle *tex;
+    shaderVariable->GetValue(tex);
+    heightmap.handle = tex;
 
     CS::ShaderVarName heightFactorName (svStrings, "heightFactor");	
     baseMaterial->GetVariable(heightFactorName)->GetValue(heightFactor);
 
     // height map
-    CS::StructuredTextureFormat readbackFmt 
-      (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-
-    csRef<iDataBuffer> heightmapDB = heightmap.handle->Readback(readbackFmt);
-    heightmap.handle->GetOriginalDimensions(heightmap.width, heightmap.height);
-    heightmap.data = heightmapDB->GetUint8();
+    if ( !heightmap.Read() )
+      csPrintfErr( "Error reading heightmap texture!\n" );
   }
 
   void FurMesh::SetDisplaceDistance()

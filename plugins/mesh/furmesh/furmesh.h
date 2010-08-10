@@ -19,28 +19,16 @@
 #ifndef __FUR_MESH_H__
 #define __FUR_MESH_H__
 
-#include <iutil/comp.h>
-#include <csgeom/vector3.h>
 #include <imesh/furmesh.h>
-#include <csgfx/shadervarcontext.h>
-#include <imesh/genmesh.h>
 
 #include "furmeshfactory.h"
 #include "furdata.h"
+
 #include "crystalspace.h"
 #include "csutil/scf_implementation.h"
 
-struct iObjectRegistry;
-
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
-  struct TextureData
-  {
-    iTextureHandle* handle;
-    int width, height;
-    uint8* data;
-  };
-
   class FurMesh : public scfImplementationExt1<FurMesh, csMeshObject, CS::Mesh::iFurMesh>
   {
   public:
@@ -127,10 +115,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csRef<iMaterial> baseMaterial;
     csRef<iShaderVarStringSet> svStrings;
     /// Density & Height maps
-    TextureData densitymap;
+    csTextureRGBA densitymap;
     float densityFactorGuideHairs;
     float densityFactorHairStrands;
-    TextureData heightmap;
+    csTextureRGBA heightmap;
     float heightFactor;
     float displaceDistance;
     float strandWidth;
@@ -154,7 +142,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float TriangleDensity(csGuideHair A, csGuideHair B, csGuideHair C);
     /// debug
     void SaveUVImage();
-    void SaveImage(uint8* buf, const char* texname,int width, int height);
     /// setters
     void SetGrowTangents();
     void SetDensitymap();
