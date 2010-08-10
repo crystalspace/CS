@@ -35,7 +35,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csVector3 *controlPoints;
     size_t controlPointsCount;
 
-    ~csHairData();
+    void Clear();
   };
 
   struct csGuideHairReference
