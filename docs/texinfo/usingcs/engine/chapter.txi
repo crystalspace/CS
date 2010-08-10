@@ -17,6 +17,7 @@ Everything about the 3D Engine. The core of Crystal Space.
 * Dynamic Worlds::
 * Level of Detail::
 * Decals::
+* Deferred Shading::
 @end menu
 
 @importss{usingcs,engine,worldcmp.txi}
@@ -30,4 +31,5 @@ Everything about the 3D Engine. The core of Crystal Space.
 @importss{usingcs,engine,dynworld.txi}
 @importss{usingcs,engine,lod.txi}
 @importss{usingcs,engine,decals.txi}
+@importsss{usingcs,engine,deferred,chapter.txi}
 

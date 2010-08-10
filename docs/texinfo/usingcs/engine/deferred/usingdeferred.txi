@@ -1,0 +1,162 @@
+@c -*-texinfo-*-
+@node Using Deferred, , About Deferred, Deferred Shading
+@subsubsection Using the Deferred Shading Render Manager
+@cindex usingdeferred
+
+@subsubheading Selecting the Deferred Render Manager
+
+The simplest method to select the deferred render manager is to use the
+following configuration option:
+@example
+Engine.RenderManager.Default = crystalspace.rendermanager.deferred
+@end example
+
+Alternately, the deferred render manager can also be loaded manually as follows:
+@example
+rm = csLoadPlugin<iRenderManager> (GetObjectRegistry(),
+"crystalspace.rendermanager.deferred");
+@end example
+
+@emph{Note}: When loading the deferred render manager manually the
+'CS/data/config/engine.cfg' configuration file will not, by default, be present
+in the configuration manager. This file specifies configuration options used by
+the deferred render manager. Be sure to define these configurations option prior
+to loading the deferred render manager. 
+
+After being loaded the engine must be instructed to use the deferred render
+manager as follows:
+@example
+engine->SetRenderManager (rm);
+@end example
+
+@subsubheading Filling the GBuffer
+
+Before lighting can be computed the deferred render manager will fill the
+GBuffer with the current sectors geometry information using the @samp{gbuffer
+fill} shader type. Each material can specify its own @samp{gbuffer fill} shader
+type that will be used by the deferred render manager. If no such shader type is
+specified then a default shader
+(@samp{CS/data/shader/deferred/fill_gbuffer.xml}) will be used.
+
+@subsubheading Using the GBuffer
+
+Once the GBuffer has been filled with the relevant information the deferred
+render manager will compute lighting information. To do this the render manager
+will iterate through all visible lights in the sector and draws proxy geometry
+that approximates the size and shape of the light source. Each light proxy is
+drawn using a shader that reads data from the GBuffer, computes the lighting
+equation, and adds it to the accumulation buffer.
+
+The following types of light sources are supported: 
+
+@table @code
+@item point light
+Represented as a sphere. The detail of the sphere can be controlled using the
+@samp{RenderManager.Deferred.SphereDetail} configuration option (defaults to
+16). The proxy geometry is drawn using the
+@samp{CS/data/shader/deferred/point_light.xml} shader.
+
+@item spot light
+Represented as a cone. The detail of the sphere can be controlled using the
+@samp{RenderManager.Deferred.ConeDetail} configuration option (defaults to 16).
+The proxy geometry is drawn using the
+@samp{CS/data/shader/deferred/spot_light.xml} shader.
+
+@item directional light
+Represented as a cube. The proxy geometry is drawn using the
+@samp{CS/data/shader/deferred/directional_light.xml} shader.
+
+@end table
+
+@emph{Note}: The shader include
+@samp{CS/data/shader/deferred/light_common.cginc} file contains a number of
+useful functions for use with light proxy shaders.
+
+@subsubheading Default GBuffer Layout
+
+The default GBuffer consists of three 16-bit floating-point RGBA color buffers
+along with one 32-bit depth and stencil buffer.
+
+@emph{Note}: Depending on hardware support the depth buffer might not contain
+any stencil bits.
+
+The default data layout is presented in the following table:
+
+@example
+               +-----+-------+------+--------------+
+               | Red | Green | Blue |    Alpha     |
++--------------+-----+-------+------+--------------+
+| buffer 0     |   diffuse (RGB)    | specular (R) |
++--------------+--------------------+--------------+
+| buffer 1     |   normal (XYZ)     | specular (G) |
++--------------+--------------------+--------------+
+| buffer 2     |   ambient (RGB)    | specular (B) |
++--------------+--------------------+--------------+
+| depth buffer |      depth and stencil value      |
++--------------+-----------------------------------+
+@end example
+
+The data stored in the GBuffer is described below:
+
+@table @code
+@item @code{diffuse (RGB)}
+The red, green, and blue components of the geometries diffuse color.
+@item @code{specular (RGB)}
+The red, green, and blue components of the geometries specular color.
+@item @code{diffuse (RGB)}
+The red, green, and blue components of the geometries ambient color.
+@item @code{normal (XYZ)}
+The xyz components of the geometries normal vector in view space. Normalized and
+mapped into the range [0,1]. 
+@end table
+
+@subsubheading Changing the GBuffer Layout
+
+The layout of the GBuffer can be changed using the following configuration
+options: 
+
+@table @code
+@item RenderManager.Deferred.GBuffer.BufferCount
+Controls the number of color buffers present in the GBuffer (defaults to 3).
+The maximum number of color buffers can be queried from the @code{iGraphics3D}
+device as follows:
+@example
+const csGraphics3DCaps *caps = G3D->GetCaps ();
+int maxColorBuffers = caps->MaxRTColorAttachments;
+@end example
+
+@item RenderManager.Deferred.GBuffer.BufferFormat
+Controls the format of the color buffers (defaults to rbga16_f).
+
+@emph{Note}: Using 8-bits per color channel to store the view space normals can
+cause noticeable banding.
+
+@item RenderManager.Deferred.GBuffer.DepthBuffer
+Controls if the GBuffers depth buffer is present (defaults to true).
+@end table
+
+@emph{Note}: It is the responsibility of the 'gbuffer fill' and light proxy
+shaders to account for changes in the GBuffer layout.
+
+@subsubheading Light Proxy Shader Variables
+
+The deferred render manager provides additional shader variables that are only
+available to the light proxy shaders:
+
+@table @code
+@item tex gbuffer N
+Specifies the Nth color buffer where N is between 0 and
+@code{RenderManager.Deferred.GBuffer.BufferCount - 1}.
+
+@item tex gbuffer depth
+Specifies the GBuffers depth buffer. Only available if the GBuffer has a depth
+buffer.
+
+@item light position view
+The position of the light in view space. Only available for point lights and
+spot lights.
+
+@item light direction view
+The direction of the light in view space. Only available for spot lights and
+directional lights.
+@end table

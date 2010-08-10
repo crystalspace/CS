@@ -1,0 +1,16 @@
+@c -*-texinfo-*-
+@node About Deferred, Using Deferred, Deferred Shading, Deferred Shading
+@subsubsection About Deferred Shading
+@cindex aboutdeferred
+
+@subsubheading What is Deferred Shading?
+
+Deferred shading is a rasterization based rendering method that separates the
+rendering of geometry from the process of lighting that geometry. In the
+traditional approach to rasterization (commonly referred to as forward shading)
+the rendering and lighting of geometry are done in tandem. As a result, using
+forward shading tends to limit the number of light sources that can affect a
+single object. However, with deferred shading the cost of adding a light to a
+scene is independent of the number of objects in that scene. 
+
+TODO
