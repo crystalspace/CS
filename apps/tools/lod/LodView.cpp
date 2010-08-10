@@ -240,7 +240,8 @@ bool LodView::Application ()
 
 void LodView::LoadLODs(const char* filename)
 {
-  loading = tloader->LoadFileWait("", filename);
+  CS::Utility::SmartChDir (vfs, filename);
+  loading = tloader->LoadFileWait(vfs->GetCwd (), filename);
   
   if (!loading->WasSuccessful())
   {
@@ -285,6 +286,9 @@ void LodView::LoadLODs(const char* filename)
 
 bool LodView::SetupModules ()
 {
+  vfs = csQueryRegistry<iVFS> (object_reg);
+  if (!vfs) return ReportError("Failed to locate VFS!");
+
   g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry ());
   if (!g3d) return ReportError ("Failed to locate 3D renderer!");
 

@@ -30,6 +30,9 @@ private:
   csRef<iThreadedLoader> tloader;
   csRef<iMeshFactoryWrapper> imeshfactw;
 
+  /// A pointer to the VFS.
+  csRef<iVFS> vfs;
+
   /// A pointer to the 3D renderer plugin.
   csRef<iGraphics3D> g3d;
 
