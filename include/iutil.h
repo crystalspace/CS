@@ -59,5 +59,6 @@
 #include "iutil/verbositymanager.h"
 #include "iutil/vfs.h"
 #include "iutil/virtclk.h"
+#include "iutil/visualdebug.h"
 #endif /* __IUTIL_H__ */
 

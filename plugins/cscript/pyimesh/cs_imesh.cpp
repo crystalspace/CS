@@ -15274,6 +15274,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_ComputeTangents(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Mesh::iAnimatedMeshFactory *arg1 = (CS::Mesh::iAnimatedMeshFactory *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactory_ComputeTangents",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactory_ComputeTangents" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMeshFactory *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshFactory * >(argp1);
+  (arg1)->ComputeTangents();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *iAnimatedMeshFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
@@ -15827,6 +15848,28 @@ SWIGINTERN PyObject *_wrap_iAnimatedMesh_GetSocket(PyObject *SWIGUNUSEDPARM(self
   arg2 = static_cast< size_t >(val2);
   result = (CS::Mesh::iAnimatedMeshSocket *)((CS::Mesh::iAnimatedMesh const *)arg1)->GetSocket(arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Mesh__iAnimatedMeshSocket, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMesh_GetAnimatedMeshFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Mesh::iAnimatedMesh *arg1 = (CS::Mesh::iAnimatedMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  CS::Mesh::iAnimatedMeshFactory *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMesh_GetAnimatedMeshFactory",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMesh_GetAnimatedMeshFactory" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMesh const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Mesh::iAnimatedMesh * >(argp1);
+  result = (CS::Mesh::iAnimatedMeshFactory *)((CS::Mesh::iAnimatedMesh const *)arg1)->GetAnimatedMeshFactory();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -53108,6 +53151,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iAnimatedMeshFactory_GetSocketCount", _wrap_iAnimatedMeshFactory_GetSocketCount, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_GetSocket", _wrap_iAnimatedMeshFactory_GetSocket, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_FindSocket", _wrap_iAnimatedMeshFactory_FindSocket, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactory_ComputeTangents", _wrap_iAnimatedMeshFactory_ComputeTangents, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_swigregister", iAnimatedMeshFactory_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMeshFactory_GetIndices", _wrap_iAnimatedMeshSubMeshFactory_GetIndices, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMeshFactory_GetIndexSetCount", _wrap_iAnimatedMeshSubMeshFactory_GetIndexSetCount, METH_VARARGS, NULL},
@@ -53130,6 +53174,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iAnimatedMesh_GetMorphTargetWeight", _wrap_iAnimatedMesh_GetMorphTargetWeight, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMesh_GetSocketCount", _wrap_iAnimatedMesh_GetSocketCount, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMesh_GetSocket", _wrap_iAnimatedMesh_GetSocket, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMesh_GetAnimatedMeshFactory", _wrap_iAnimatedMesh_GetAnimatedMeshFactory, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMesh_swigregister", iAnimatedMesh_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMesh_GetFactorySubMesh", _wrap_iAnimatedMeshSubMesh_GetFactorySubMesh, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMesh_SetRendering", _wrap_iAnimatedMeshSubMesh_SetRendering, METH_VARARGS, NULL},
