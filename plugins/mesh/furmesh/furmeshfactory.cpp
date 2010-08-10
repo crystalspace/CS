@@ -17,8 +17,6 @@
 */
 
 #include <cssysdef.h>
-#include <iutil/objreg.h>
-#include <iutil/plugin.h>
 
 #include "furmesh.h"
 #include "furmeshfactory.h"
@@ -56,56 +54,86 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     vertexBuffer = csRenderBuffer::CreateRenderBuffer (n, 
       CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
+    if (!vertexBuffer)
+      csPrintfErr("Could not create vertex buffer!\n");
+
     texcoordBuffer = csRenderBuffer::CreateRenderBuffer (n, 
       CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
+
+    if (!texcoordBuffer)
+      csPrintfErr("Could not create texcoord buffer!\n");
 
     normalBuffer = csRenderBuffer::CreateRenderBuffer (n, 
       CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
+    if (!normalBuffer)
+      csPrintfErr("Could not create normal buffer!\n");
+
     binormalBuffer = csRenderBuffer::CreateRenderBuffer (n, 
       CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
+    if (!binormalBuffer)
+      csPrintfErr("Could not create binormal buffer!\n");
+
     tangentBuffer = csRenderBuffer::CreateRenderBuffer (n, 
       CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+
+    if (!tangentBuffer)
+      csPrintfErr("Could not create tangent buffer!\n");
   }
 
   void FurMeshFactory::SetTriangleCount (uint n)
   {
+    if (!vertexCount)
+      return;
+
     indexCount = n;
 
     indexBuffer = csRenderBuffer::CreateIndexRenderBuffer (3 * n, 
       CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, vertexCount - 1);
+
+    if (!indexBuffer)
+      csPrintfErr("Could not create index buffer!\n");
   }
 
-  uint FurMeshFactory::GetVertexCount()
+  uint FurMeshFactory::GetVertexCount() const
   {
     return vertexCount;
   }
 
-  uint FurMeshFactory::GetIndexCount()
+  uint FurMeshFactory::GetIndexCount() const
   {
     return indexCount;
   }
 
-  iRenderBuffer* FurMeshFactory::GetIndices ()
+  iRenderBuffer* FurMeshFactory::GetIndices () const
   {
     return indexBuffer;
   }
 
   bool FurMeshFactory::SetIndices (iRenderBuffer* renderBuffer)
   {
+    if (!renderBuffer)
+      return false;
+
+    if (renderBuffer->GetComponentCount () < 3)
+      return false;
+
     indexBuffer = renderBuffer;
     indexCount = (uint)indexBuffer->GetElementCount ();
     return true;
   }
 
-  iRenderBuffer* FurMeshFactory::GetVertices ()
+  iRenderBuffer* FurMeshFactory::GetVertices () const
   {
     return vertexBuffer;
   }
 
   bool FurMeshFactory::SetVertices (iRenderBuffer* renderBuffer)
   {
+    if (!renderBuffer)
+      return false;
+
     if (renderBuffer->GetComponentCount () < 3)
       return false;
 
@@ -115,13 +143,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  iRenderBuffer* FurMeshFactory::GetTexCoords ()
+  iRenderBuffer* FurMeshFactory::GetTexCoords () const
   {
     return texcoordBuffer;
   }
 
   bool FurMeshFactory::SetTexCoords (iRenderBuffer* renderBuffer)
   {
+    if (!renderBuffer)
+      return false;
+
     if (renderBuffer->GetElementCount () < vertexCount)
       return false;
 
@@ -129,13 +160,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  iRenderBuffer* FurMeshFactory::GetNormals ()
+  iRenderBuffer* FurMeshFactory::GetNormals () const
   {
     return normalBuffer;
   }
 
   bool FurMeshFactory::SetNormals (iRenderBuffer* renderBuffer)
   {
+    if (!renderBuffer)
+      return false;
+
     if (renderBuffer->GetElementCount () < vertexCount)
       return false;
 
@@ -143,13 +177,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  iRenderBuffer* FurMeshFactory::GetTangents ()
+  iRenderBuffer* FurMeshFactory::GetTangents () const
   {
     return tangentBuffer;
   }
 
   bool FurMeshFactory::SetTangents (iRenderBuffer* renderBuffer)
   {
+    if (!renderBuffer)
+      return false;
+
     if (renderBuffer->GetElementCount () < vertexCount)
       return false;
 
@@ -157,13 +194,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  iRenderBuffer* FurMeshFactory::GetBinormals ()
+  iRenderBuffer* FurMeshFactory::GetBinormals () const
   {
     return binormalBuffer;
   }
 
   bool FurMeshFactory::SetBinormals (iRenderBuffer* renderBuffer)
   { 
+    if (!renderBuffer)
+      return false;
+
     if (renderBuffer->GetElementCount () < vertexCount)
       return false;
 
@@ -181,7 +221,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   FurMeshType::FurMeshType (iBase* parent) :
   scfImplementationType (this, parent),
-    object_reg(0)
+    object_reg(0), Engine(0)
   {
   }
 
@@ -194,6 +234,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     csRef<iEngine> e = csQueryRegistry<iEngine> (r);
     Engine = e;
+
+    if (!e)
+    {
+      csPrintfErr("Could not find engine!\n");
+      return false;
+    }
+
     object_reg = r;
     return true;
   }

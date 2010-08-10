@@ -15,12 +15,10 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include <cssysdef.h>
-#include <iutil/objreg.h>
-#include <iutil/plugin.h>
 
 #include "furmesh.h"
-#include "hairphysicscontrol.h"
 #include "hairstrandgenerator.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
@@ -28,19 +26,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   /************************
   *  HairStrandGenerator
   ************************/  
+
   SCF_IMPLEMENT_FACTORY (HairStrandGenerator)
 
     CS_LEAKGUARD_IMPLEMENT(HairStrandGenerator);	
 
   HairStrandGenerator::HairStrandGenerator (iBase* parent)
     : scfImplementationType (this, parent), object_reg(0), material(0), 
-    valid(false), width(256), height(256), M(0), m_buf(0), gauss_matrix(0),
-    N(0), n_buf(0)
+    valid(false), g3d(0), svStrings(0), width(256), height(256), M(0), 
+    m_buf(0), gauss_matrix(0), N(0), n_buf(0), mc(0)
   {
   }
 
   HairStrandGenerator::~HairStrandGenerator ()
   {
+    if (mc)
+      delete mc;
+    if (m_buf)
+      delete m_buf;
+    if (gauss_matrix)
+      delete gauss_matrix;
+    if (n_buf)
+      delete n_buf;
   }
 
   // From iComponent
@@ -53,7 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   
     if (!svStrings) 
     {
-      printf ("No SV names string set!\n");
+      csPrintfErr ("No SV names string set!\n");
       return false;
     }
 
@@ -61,17 +68,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     
     if (!g3d) 
     {
-      printf("No g3d found!\n");
+      csPrintfErr ("No g3d found!\n");
       return false;
     }
 
     mc = new MarschnerConstants();
 
+    if (!mc) 
+    {
+      csPrintfErr ("No MarschnerConstants found!\n");
+      return false;
+    }
+
     return true;
   }
 
   // From iFurStrandGenerator
-  iMaterial* HairStrandGenerator::GetMaterial()
+  iMaterial* HairStrandGenerator::GetMaterial() const
   {
     return material;
   }
@@ -168,7 +181,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
       if(!M)
       {
-        printf ("Failed to load M texture!\n");
+        csPrintfErr ("Failed to create M texture!\n");
         return;
       }
 
@@ -220,7 +233,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     SaveImage(db->GetUint8(), "/data/hairtest/debug/M_debug.png");
   }
 
-  float HairStrandGenerator::ComputeM(float a, float b, int channel)
+  float HairStrandGenerator::ComputeM(float a, float b, int channel) const
   {
     float max = 0;
     
@@ -265,7 +278,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
       if(!N)
       {
-        printf ("Failed to load N texture!\n");
+        csPrintfErr ("Failed to create N texture!\n");
         return;
       }
 
@@ -290,7 +303,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         float cos_thD = -1.0f + (y * 2.0f) / (height - 1);
         float phiD = acos(cos_phiD);
         float thD = acos(cos_thD);
-        n_buf[ 4 * (x + y * width ) ] = (uint8)(255 * SimpleNP(phiD, thD)); // red
         n_buf[ 4 * (x + y * width ) ] = (uint8)(255 * ComputeNP(0, phiD, thD)); // red
         n_buf[ 4 * (x + y * width ) + 1 ] = (uint8)(255 * ComputeNP(1, phiD, thD)); // green
         n_buf[ 4 * (x + y * width ) + 2 ] = (uint8)(255 * ComputeNP(2, phiD, thD)); // blue
@@ -308,14 +320,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     SaveImage(db->GetUint8(), "/data/hairtest/debug/N_debug.png");
   }
 
-  float HairStrandGenerator::ComputeT(float absorption, float gammaT, int p)
+  float HairStrandGenerator::ComputeT(float absorption, float gammaT, int p) const
   {
     float l = 2 * cos(gammaT);	// l = ls / cos qt = 2r cos h0t / cos qt
     return exp(absorption * l * p);
   }
 
   float HairStrandGenerator::ComputeA(float absorption, int p, float h, 
-    float refraction, float etaPerpendicular, float etaParallel)
+    float refraction, float etaPerpendicular, float etaParallel) const
   {
     float gammaI = asin(h);
 
@@ -337,7 +349,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return fresnel * t;
   }
 
-  float HairStrandGenerator::ComputeNP(int p, float phi, float thD)
+  float HairStrandGenerator::ComputeNP(int p, float phi, float thD) const
   {
     float refraction = mc->eta;
     float absorption = mc->absorption;
@@ -370,7 +382,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return csMin(1.0f, result);
   }
 
-  float HairStrandGenerator::SimpleNP(float phi, float thD )
+  float HairStrandGenerator::SimpleNP(float phi, float thD ) const
   {
     float refraction = mc->eta;
 
@@ -387,14 +399,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return csMin(1.0f, result);
   }
 
-  void HairStrandGenerator::SaveImage(uint8* buf, const char* texname)
+  void HairStrandGenerator::SaveImage(uint8* buf, const char* texname) const
   {
     csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
     csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
 
     if(!buf)
     {
-      printf("Bad data buffer!\n");
+      csPrintfErr ("Bad data buffer!\n");
       return;
     }
 
@@ -404,7 +416,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     if(!image.IsValid())
     {
-      printf("Error loading image\n");
+      csPrintfErr ("Error creating image\n");
       return;
     }
 
@@ -416,13 +428,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     {
       if (!VFS->WriteFile (texname, (const char*)db->GetData (), db->GetSize ()))
       {
-        printf("Failed to write file '%s'!", texname);
+        csPrintfErr ("Failed to write file '%s'!", texname);
         return;
       }
     }
     else
     {
-      printf("Failed to save png image for basemap!");
+      csPrintfErr ("Failed to save png image for basemap!");
       return;
     }	    
   }
@@ -437,12 +449,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     // Surface properties
     aR = -5;
-    aTT = - (-5) / 2;
-    aTRT = - 3 * (-5) / 2;
+    aTT = - aR / 2;
+    aTRT = - 3 * aR / 2;
 
     bR = 5;
-    bTT = (5) / 2;
-    bTRT = 2 * (5);
+    bTT = bTT / 2;
+    bTRT = 2 * bTT;
 
     // Fiber properties
     eta = 1.55f;
@@ -535,7 +547,7 @@ CubicSolution EquationsSolver::LinearSolver(float a, float b)
 {
   CubicSolution roots;
 
-  if (fabs(a) > EPSILON)
+  if (fabs(a) > SMALL_EPSILON)
   {
     roots.X1 = -b / a;
     roots.count = 1;
@@ -549,14 +561,14 @@ CubicSolution EquationsSolver::LinearSolver(float a, float b)
 // Solve a * x ^ 2 + b * x + c = 0
 CubicSolution EquationsSolver::QuadraticSolver(float a, float b, float c)
 {
-  if (fabs(a) < EPSILON)
+  if (fabs(a) < SMALL_EPSILON)
     return LinearSolver(b, c);
 
   CubicSolution roots;
 
   float D = b * b - 4 * a * c;
 
-  if (fabs(D) < EPSILON)
+  if (fabs(D) < SMALL_EPSILON)
   {
     roots.X1 = -b / (2 * a);
     roots.X2 = roots.X1;
@@ -581,7 +593,7 @@ CubicSolution EquationsSolver::NormalizedCubicSolver(float A, float B, float C)
 {
   CubicSolution roots;
 
-  if (fabs(C) < EPSILON)	//	x = 0 solution
+  if (fabs(C) < SMALL_EPSILON)	//	x = 0 solution
   {
     roots = QuadraticSolver(1, A, B);
     roots[ roots.count ] = 0;
@@ -622,7 +634,7 @@ CubicSolution EquationsSolver::CubicSolver(float a, float b, float c, float d)
 {
   CubicSolution roots;
 
-  if (fabs(a) < EPSILON)
+  if (fabs(a) < SMALL_EPSILON)
     roots = QuadraticSolver(b, c, d);
   else
     roots = NormalizedCubicSolver(b / a, c / a, d / a);
@@ -633,7 +645,6 @@ CubicSolution EquationsSolver::CubicSolver(float a, float b, float c, float d)
 // Solve o(p,y) - phi = 0
 CubicSolution EquationsSolver::Roots(float p, float etaPerpendicular, float phi)
 {
-
   float c = asin(1 / etaPerpendicular);
   return CubicSolver(-8 * (p * c / (PI * PI * PI)), 0, 
     (6 * p * c / PI - 2), p * PI - phi);

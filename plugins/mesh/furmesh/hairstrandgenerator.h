@@ -19,17 +19,9 @@
 #ifndef __HAIR_STRAND_GENERATOR_H__
 #define __HAIR_STRAND_GENERATOR_H__
 
-#include <iutil/comp.h>
-#include <csgeom/vector3.h>
-#include <imesh/furmesh.h>
-#include <csgfx/shadervarcontext.h>
-#include <imesh/genmesh.h>
-
 #include "crystalspace.h"
 
 #include "csutil/scf_implementation.h"
-
-struct iObjectRegistry;
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
@@ -95,7 +87,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual bool Initialize (iObjectRegistry*);
 
     // From iFurStrandGenerator
-    virtual iMaterial* GetMaterial();
+    virtual iMaterial* GetMaterial() const;
     virtual void SetMaterial(iMaterial* material);
     virtual void Invalidate();
     virtual void Update();
@@ -118,15 +110,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     void UpdateConstans();
     // Marschner specific functions
     void UpdateM();
-    float ComputeM(float a, float b, int channel);
+    float ComputeM(float a, float b, int channel) const;
     void UpdateN();
-    float SimpleNP(float phi, float thD );
-    float ComputeT(float absorption, float gammaT, int p);
+    float SimpleNP(float phi, float thD ) const;
+    float ComputeT(float absorption, float gammaT, int p) const;
     float ComputeA(float absorption, int p, float h, float refraction, 
-      float etaPerpendicular, float etaParallel);
-    float ComputeNP(int p, float phiD, float thD);
+      float etaPerpendicular, float etaParallel) const;
+    float ComputeNP(int p, float phiD, float thD) const;
     // Marschner temp functions
-    void SaveImage(uint8 *buf, const char* texname);
+    void SaveImage(uint8 *buf, const char* texname) const;
   };
 
 }

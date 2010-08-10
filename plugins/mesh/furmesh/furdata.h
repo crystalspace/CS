@@ -19,19 +19,11 @@
 #ifndef __FURDATA_H__
 #define __FURDATA_H__
 
-#include <iutil/comp.h>
-#include <csgeom/vector3.h>
-#include <imesh/furmesh.h>
-#include <csgfx/shadervarcontext.h>
-#include <imesh/genmesh.h>
-
 #include "crystalspace.h"
 
 #include "csutil/scf_implementation.h"
 
 #define GUIDE_HAIRS_COUNT 3
-
-struct iObjectRegistry;
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
@@ -42,6 +34,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     csVector3 *controlPoints;
     size_t controlPointsCount;
+
+    ~csHairData();
   };
 
   struct csGuideHairReference

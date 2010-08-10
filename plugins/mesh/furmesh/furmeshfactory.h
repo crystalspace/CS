@@ -19,16 +19,8 @@
 #ifndef __FUR_MESHFACTORY_H__
 #define __FUR_MESHFACTORY_H__
 
-#include <iutil/comp.h>
-#include <csgeom/vector3.h>
-#include <imesh/furmesh.h>
-#include <csgfx/shadervarcontext.h>
-#include <imesh/genmesh.h>
-
 #include "crystalspace.h"
 #include "csutil/scf_implementation.h"
-
-struct iObjectRegistry;
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
@@ -48,20 +40,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetVertexCount (uint n);
     virtual void SetTriangleCount (uint n);
 
-    virtual uint GetVertexCount();
-    virtual uint GetIndexCount();
+    virtual uint GetVertexCount() const;
+    virtual uint GetIndexCount() const;
 
-    virtual iRenderBuffer* GetIndices ();
+    virtual iRenderBuffer* GetIndices () const;
     virtual bool SetIndices (iRenderBuffer* renderBuffer);
-    virtual iRenderBuffer* GetVertices ();
+    virtual iRenderBuffer* GetVertices () const;
     virtual bool SetVertices (iRenderBuffer* renderBuffer);
-    virtual iRenderBuffer* GetTexCoords ();
+    virtual iRenderBuffer* GetTexCoords () const;
     virtual bool SetTexCoords (iRenderBuffer* renderBuffer);
-    virtual iRenderBuffer* GetNormals ();
+    virtual iRenderBuffer* GetNormals () const;
     virtual bool SetNormals (iRenderBuffer* renderBuffer);
-    virtual iRenderBuffer* GetTangents ();
+    virtual iRenderBuffer* GetTangents () const;
     virtual bool SetTangents (iRenderBuffer* renderBuffer);
-    virtual iRenderBuffer* GetBinormals ();
+    virtual iRenderBuffer* GetBinormals () const;
     virtual bool SetBinormals (iRenderBuffer* renderBuffer);
 
   protected:

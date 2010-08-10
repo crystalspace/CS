@@ -59,7 +59,7 @@ struct iFurStrandGenerator : public virtual iBase
 {
   SCF_INTERFACE (CS::Mesh::iFurStrandGenerator, 1, 0, 0);
 
-  virtual iMaterial* GetMaterial() = 0;
+  virtual iMaterial* GetMaterial() const = 0;
   virtual void SetMaterial(iMaterial* material) = 0;
   virtual void Invalidate() = 0;
   virtual void Update() = 0;
@@ -73,20 +73,20 @@ struct iFurMeshFactory : public virtual iBase
   virtual void SetVertexCount (uint n) = 0;
   virtual void SetTriangleCount (uint n) = 0;
 
-  virtual uint GetVertexCount() = 0;
-  virtual uint GetIndexCount() = 0;
+  virtual uint GetVertexCount() const = 0;
+  virtual uint GetIndexCount() const = 0;
   
-  virtual iRenderBuffer* GetIndices () = 0;
+  virtual iRenderBuffer* GetIndices () const = 0;
   virtual bool SetIndices (iRenderBuffer* renderBuffer) = 0;
-  virtual iRenderBuffer* GetVertices () = 0;
+  virtual iRenderBuffer* GetVertices () const = 0;
   virtual bool SetVertices (iRenderBuffer* renderBuffer) = 0;
-  virtual iRenderBuffer* GetTexCoords () = 0;
+  virtual iRenderBuffer* GetTexCoords () const = 0;
   virtual bool SetTexCoords (iRenderBuffer* renderBuffer) = 0;
-  virtual iRenderBuffer* GetNormals () = 0;
+  virtual iRenderBuffer* GetNormals () const = 0;
   virtual bool SetNormals (iRenderBuffer* renderBuffer) = 0;
-  virtual iRenderBuffer* GetTangents () = 0;
+  virtual iRenderBuffer* GetTangents () const = 0;
   virtual bool SetTangents (iRenderBuffer* renderBuffer) = 0;
-  virtual iRenderBuffer* GetBinormals () = 0;
+  virtual iRenderBuffer* GetBinormals () const = 0;
   virtual bool SetBinormals (iRenderBuffer* renderBuffer) = 0;
 };
 

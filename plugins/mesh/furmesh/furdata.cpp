@@ -17,14 +17,22 @@
 */
 
 #include <cssysdef.h>
-#include <iutil/objreg.h>
-#include <iutil/plugin.h>
 
 #include "furmesh.h"
 #include "furdata.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
+  /********************
+  *  csHairData
+  ********************/
+
+  csHairData::~csHairData ()
+  {
+//     if (controlPointsCount)
+//       delete controlPoints;
+  }
+
   /********************
   *  csHairStrand
   ********************/

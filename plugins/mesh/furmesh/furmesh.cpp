@@ -112,6 +112,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   CS::Graphics::RenderMesh** FurMesh::GetRenderMeshes (int& num, 
     iRenderView* rview, iMovable* movable, uint32 frustum_mask)
   {
+    for (size_t i = 0 ; i < renderMeshes.GetSize() ; i ++)
+      delete renderMeshes.Get(i);
+
     renderMeshes.Empty();
 
     // Boiler-plate stuff...
@@ -139,7 +142,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if (materialWrapper->IsVisitRequired ()) 
       materialWrapper->Visit ();
 
-    csRenderMesh *meshPtr = new csRenderMesh;
+    csRenderMesh* meshPtr = new csRenderMesh;
 
     // Setup the render mesh
     meshPtr->clip_portal = clip_portal;
