@@ -6,6 +6,7 @@ gcc -E -x c -P -DSCF_IN_IMPLEMENTATION_H -Iinclude/ include/csutil/scf_implgen.h
 
 echo "" > include/csutil/scf_implgen_p.h
 IFS=$'\n'
+set -f
 for l in $(cat include/csutil/scf_implgen_p_template.h) ; do
   if echo "$l" | grep "** INSERT OUTPUT FROM GCC HERE **" > /dev/null ; then
     cat $TMPFILE >> include/csutil/scf_implgen_p.h

@@ -38,7 +38,6 @@
 #include "csgeom/projections.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
-#include "csgfx/vertexlistwalker.h"
 #include "csplugincommon/opengl/assumedstate.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csplugincommon/opengl/glstates.h"
@@ -65,54 +64,6 @@ const int CS_CLIPPER_EMPTY = 0xf008412;
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
-
-void csGLGraphics3D::BufferShadowDataHelper::RenderBufferDestroyed (
-  iRenderBuffer* buffer)
-{
-  shadowedBuffers.DeleteAll (buffer);
-}
-    
-iRenderBuffer* csGLGraphics3D::BufferShadowDataHelper::GetSupportedRenderBuffer (
-  iRenderBuffer* originalBuffer)
-{
-  CS_ASSERT(!originalBuffer->IsIndexBuffer());
-
-  ShadowedBuffer& shadowData = shadowedBuffers.GetOrCreate (originalBuffer);
-  if (!shadowData.shadowBuffer
-      || (shadowData.originalBufferVersion != originalBuffer->GetVersion()))
-  {
-    if (shadowData.IsNew())
-      originalBuffer->SetCallback (this);
-  
-    if (!shadowData.shadowBuffer
-        || (shadowData.shadowBuffer->GetComponentCount()
-	  != originalBuffer->GetComponentCount())
-	|| (shadowData.shadowBuffer->GetElementCount()
-	  != originalBuffer->GetElementCount()))
-    {
-      shadowData.shadowBuffer = csRenderBuffer::CreateRenderBuffer (
-        originalBuffer->GetElementCount(),
-        originalBuffer->GetBufferType(),
-        CS_BUFCOMP_FLOAT,
-        originalBuffer->GetComponentCount());
-    }
-    shadowData.originalBufferVersion = originalBuffer->GetVersion();
-    
-    // The vertex list walker actually already does all the conversion we need
-    csVertexListWalker<float> src (originalBuffer);
-    csRenderBufferLock<float> dst (shadowData.shadowBuffer);
-    size_t copySize = sizeof(float) * shadowData.shadowBuffer->GetComponentCount();
-    for (size_t i = 0; i < dst.GetSize(); i++)
-    {
-      memcpy ((float*)(dst++), (const float*)src, copySize);
-      ++src;
-    }
-  }
-  
-  return shadowData.shadowBuffer;
-}
-
-//---------------------------------------------------------------------------
 
 CS_DECLARE_PROFILER
 CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
@@ -180,7 +131,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   cliptype = CS_CLIPPER_NONE;
 
   r2tbackend = 0;
-  bufferShadowDataHelper.AttachNew (new BufferShadowDataHelper);
+  bufferShadowDataHelper.AttachNew (new BufferShadowingHelper);
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -911,6 +862,8 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_EXT_blend_func_separate ();
   ext->InitGL_ARB_occlusion_query ();
   ext->InitGL_GREMEDY_string_marker ();
+  ext->InitGL_ARB_seamless_cube_map ();
+  ext->InitGL_AMD_seamless_cubemap_per_texture ();
   
   // Some 'assumed state' is for extensions, so set again
   CS::PluginCommon::GL::SetAssumedState (statecache, ext);
@@ -2137,6 +2090,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   }
 
   ApplyBufferChanges();
+  SetSeamlessCubemapFlag ();
 
   iRenderBuffer* iIndexbuf = (modes.buffers
   	? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX)
@@ -2749,7 +2703,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	    || (((1 << compTypeBase) & wants_short_int) == 0)))
         {
           // Set up shadow buffer
-          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
           compType = buffer->GetComponentType();
         }
         break;
@@ -2758,7 +2712,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	    || (((1 << compTypeBase) & wants_byte_short_int) == 0)))
         {
           // Set up shadow buffer
-          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
           compType = buffer->GetComponentType();
         }
         break;
@@ -2766,7 +2720,7 @@ void csGLGraphics3D::ApplyBufferChanges()
         if (!isFloat && !normalized)
         {
           // Set up shadow buffer
-          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
           compType = buffer->GetComponentType();
         }
         break;
@@ -2776,7 +2730,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  if (!isFloat && !normalized)
 	  {
 	    // Set up shadow buffer
-	    buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+	    buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
 	    compType = buffer->GetComponentType();
 	  }
         }
@@ -2788,7 +2742,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	    || (((1 << compTypeBase) & wants_short_int) == 0)))
 	  {
 	    // Set up shadow buffer
-	    buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+	    buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
 	    compType = buffer->GetComponentType();
 	  }
         }
@@ -2926,6 +2880,35 @@ void csGLGraphics3D::ApplyBufferChanges()
     }
   }
   changeQueue.Empty();
+}
+
+void csGLGraphics3D::SetSeamlessCubemapFlag ()
+{
+  if (ext->CS_GL_AMD_seamless_cubemap_per_texture
+      || !ext->CS_GL_ARB_seamless_cube_map)
+    return;
+  
+  bool hasCube = false;
+  bool seamlessFlag = true;
+  for (int unit = 0; unit < numImageUnits; unit++)
+  {
+    if (!imageUnits[unit].texture) continue;
+    if (imageUnits[unit].texture->texType != iTextureHandle::texTypeCube) continue;
+    hasCube = true;
+    if (imageUnits[unit].texture->IsSeamlessCubemapDisabled ())
+    {
+      seamlessFlag = false;
+      break;
+    }
+  }
+  
+  if (hasCube)
+  {
+    if (seamlessFlag)
+      statecache->Enable_GL_TEXTURE_CUBE_MAP_SEAMLESS ();
+    else
+      statecache->Disable_GL_TEXTURE_CUBE_MAP_SEAMLESS ();
+  }
 }
 
 void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,

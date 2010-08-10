@@ -40,6 +40,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     LIMIT(MaxInstructions, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 1024, 4096) \
     LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 96, UNLIMITED) \
     LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32, 32)  \
+    USESEXT(ARB_color_buffer_float, false) \
   PROFILE_END(ARBVP1) \
   \
   PROFILE_BEGIN(ARBFP1) \
@@ -49,6 +50,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     LIMIT(NumMathInstructionSlots, MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB, 1024, UNLIMITED) \
     LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32, UNLIMITED) \
     LIMIT(NumTexInstructionSlots, MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB, 1024, UNLIMITED) \
+    USESEXT(ARB_color_buffer_float, false) \
   PROFILE_END(ARBFP1) \
   \
   PROFILE_BEGIN(VP40) \
@@ -61,6 +63,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   PROFILE_BEGIN(FP30) \
     LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 256, UNLIMITED) \
     LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32, 32) \
+    USESEXT(ARB_color_buffer_float, false) \
   PROFILE_END(FP30) \
   \
   PROFILE_BEGIN(FP40) \
@@ -68,6 +71,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 4096, UNLIMITED) \
     LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32, UNLIMITED) \
   PROFILE_END(FP40)
+
+  // Extensions that influence profile behaviour - bit mask
+  enum
+  {
+    extARB_color_buffer_float = 1
+  };
 
   ProfileLimits::ProfileLimits (
     CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendor,
@@ -80,7 +89,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
      NumInstructionSlots (0),
      NumMathInstructionSlots (0),
      NumTemps (0),
-     NumTexInstructionSlots (0)
+     NumTexInstructionSlots (0),
+     extensions (0)
   {
     FixupVendor();
   }
@@ -119,6 +129,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
   void ProfileLimits::SetDefaults ()
   {
+    extensions = 0;
 #define PROFILE_BEGIN(PROFILE)  \
   case CG_PROFILE_ ## PROFILE:  \
     {
@@ -127,6 +138,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     break;
 #define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       Limit = cgDefault;
+#define USESEXT(X, defaultPresent)   \
+      if (defaultPresent) extensions |= ext ## X;
   
     switch (profile)
     {
@@ -138,6 +151,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_BEGIN
 #undef PROFILE_END
 #undef LIMIT
+#undef USESEXT
   }
 
   const char* ProfileLimits::GetProfileString (CGprofile p)
@@ -179,6 +193,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       Limit = (GL_ ## glLimit != GL_NONE)	\
 	? glGetProgramInteger (ext, target, GL_ ## glLimit) : cgDefault; \
       if (Limit > cgMax) Limit = cgMax;
+#define USESEXT(X, defaultPresent)   \
+      if (ext->CS_GL_##X) extensions |= ext ## X;
   
     switch (profile)
     {
@@ -190,6 +206,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_BEGIN
 #undef PROFILE_END
 #undef LIMIT
+#undef USESEXT
   }
 
   void ProfileLimits::ReadFromConfig (iConfigFile* cfg, const char* _prefix)
@@ -210,11 +227,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     READ (NumMathInstructionSlots);
     READ (NumTemps);
     READ (NumTexInstructionSlots);
+#define READEXT(Ext) \
+    {	\
+      bool b = cfg->GetBool (prefix + ".Ext." #Ext, false); \
+      if (b) extensions |= ext##Ext; else extensions &= ~(ext##Ext); \
+    }
+    READEXT (ARB_color_buffer_float);
 #undef READ
+#undef READEXT
   }
   
   void ProfileLimits::GetCgDefaults ()
   {
+    extensions = 0;
 #define PROFILE_BEGIN(PROFILE)  \
   case CG_PROFILE_ ## PROFILE:  \
     {
@@ -223,6 +248,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     break;
 #define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       Limit = cgDefault;
+#define USESEXT(X, defaultPresent)   \
+      if (defaultPresent) extensions |= ext ## X;
   
     switch (profile)
     {
@@ -234,6 +261,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_BEGIN
 #undef PROFILE_END
 #undef LIMIT
+#undef USESEXT
   }
   
   enum
@@ -266,6 +294,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       return false;
     
     uint usedLimits = 0;
+    uint usedExts = 0;
   
 #define PROFILE_BEGIN(PROFILE)  \
   case CG_PROFILE_ ## PROFILE:  \
@@ -275,6 +304,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     break;
 #define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       usedLimits |= 1 << lim ## Limit;
+#define USESEXT(X, defaultPresent)   \
+      usedExts |= ext ## X;
   
     switch (profile)
     {
@@ -286,7 +317,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_BEGIN
 #undef PROFILE_END
 #undef LIMIT
+#undef USESEXT
 
+    if (usedExts != 0)
+    {
+      if (i >= components.GetSize()) return false;
+      uint v;
+      char dummy;
+      if (sscanf (components[i++], "%u%c", &v, &dummy) != 1) return false;
+      extensions = v;
+    }
 #define EMIT(Limit) \
   if (usedLimits & (1 << lim ## Limit)) \
   { \
@@ -311,6 +351,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   csString ProfileLimits::ToString () const
   {
     uint usedLimits = 0;
+    uint usedExts = 0;
   
 #define PROFILE_BEGIN(PROFILE)  \
   case CG_PROFILE_ ## PROFILE:  \
@@ -320,6 +361,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     break;
 #define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       usedLimits |= 1 << lim ## Limit;
+#define USESEXT(X, defaultPresent)   \
+      usedExts |= ext ## X;
   
     switch (profile)
     {
@@ -331,10 +374,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_BEGIN
 #undef PROFILE_END
 #undef LIMIT
+#undef USESEXT
 
     csString ret (GetProfileString (profile));
     ret.AppendFmt (".%s",
       CS::PluginCommon::ShaderProgramPluginGL::VendorToString (vendor));
+    if (usedExts != 0)
+    {
+      ret.AppendFmt (".%u", extensions);
+    }
 #define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) ret.AppendFmt (".%u", Limit);
     EMIT (MaxInstructions);
     EMIT (NumInstructionSlots);
@@ -351,6 +399,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   csString ProfileLimits::ToStringForPunyHumans () const
   {
     uint usedLimits = 0;
+    uint usedExts = 0;
   
 #define PROFILE_BEGIN(PROFILE)  \
   case CG_PROFILE_ ## PROFILE:  \
@@ -360,6 +409,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     break;
 #define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       usedLimits |= 1 << lim ## Limit;
+#define USESEXT(X, defaultPresent)   \
+      usedExts |= ext ## X;
   
     switch (profile)
     {
@@ -371,10 +422,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_BEGIN
 #undef PROFILE_END
 #undef LIMIT
+#undef USESEXT
 
     csString ret (GetProfileString (profile));
     ret.AppendFmt (" %s",
       CS::PluginCommon::ShaderProgramPluginGL::VendorToString (vendor));
+      
+#define EXT(X)	\
+    if (usedExts & ext##X)\
+      ret.AppendFmt (" " #X "=%s", extensions & ext##X ? "y" : "n")
+    EXT(ARB_color_buffer_float);
+#undef EXT
+      
 #define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) \
       ret.AppendFmt (" " #Limit "=%u", Limit);
     EMIT (MaxInstructions);
@@ -400,6 +459,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       args.Push ("-po"); \
       args.Push (csString().Format (#Limit "=%u", Limit));
+#define USESEXT(X, defaultPresent)   \
+      if (extensions & ext##X)	\
+	args.Push (csString().Format ("-DHAVE_" #X));
   
     switch (profile)
     {
@@ -411,6 +473,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef PROFILE_BEGIN
 #undef PROFILE_END
 #undef LIMIT
+#undef USESEXT
   }
     
   bool ProfileLimits::Write (iFile* file) const
@@ -426,6 +489,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       if (file->Write ((char*)&diskVal, sizeof (diskVal)) != sizeof (diskVal)) \
         return false; \
     }
+    WRITE (extensions);
     WRITE (MaxAddressRegs);
     WRITE (MaxInstructions);
     WRITE (MaxLocalParams);
@@ -456,6 +520,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         return false; \
       Limit = csLittleEndian::UInt32 (diskVal); \
     }
+    READ (extensions);
     READ (MaxAddressRegs);
     READ (MaxInstructions);
     READ (MaxLocalParams);
@@ -504,6 +569,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define COMPARE(Limit) \
     if (Limit < other.Limit) return true; \
     if (Limit > other.Limit) return false;
+    COMPARE (extensions); // @@@ Right?
     COMPARE (MaxInstructions);
     COMPARE (NumInstructionSlots);
     COMPARE (NumMathInstructionSlots);
@@ -529,6 +595,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define COMPARE(Limit) \
     if (Limit > other.Limit) return true; \
     if (Limit < other.Limit) return false;
+    COMPARE (extensions); // @@@ Right?
     COMPARE (MaxInstructions);
     COMPARE (NumInstructionSlots);
     COMPARE (NumMathInstructionSlots);
@@ -551,6 +618,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
 #define COMPARE(Limit) \
     if (Limit != other.Limit) return false;
+    COMPARE (extensions);
     COMPARE (MaxInstructions);
     COMPARE (NumInstructionSlots);
     COMPARE (NumMathInstructionSlots);

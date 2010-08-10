@@ -24,12 +24,9 @@
 // Bullet includes.
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
-#include "BulletCollision/Gimpact/btGImpactShape.h"
-#include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
-
-struct btSoftBodyWorldInfo;
 
 #include "joints.h"
+#include "rigidbodies.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
@@ -215,10 +212,10 @@ bool csBulletJoint::RebuildJoint ()
   return false;
 }
  
-void csBulletJoint::Attach (iRigidBody* body1, iRigidBody* body2, bool force_update)
+void csBulletJoint::Attach (::iRigidBody* body1, ::iRigidBody* body2, bool force_update)
 {
-  bodies[0] = static_cast<csBulletRigidBody*> ((csBulletRigidBody*) body1);
-  bodies[1] = static_cast<csBulletRigidBody*> ((csBulletRigidBody*) body2);
+  bodies[0] = static_cast<csBulletRigidBody*> (body1);
+  bodies[1] = static_cast<csBulletRigidBody*> (body2);
   CS_ASSERT(bodies[0] && bodies[1]);
   if (force_update)
     RebuildJoint ();
@@ -329,7 +326,7 @@ csBulletPivotJoint::~csBulletPivotJoint ()
   }
 }
 
-void csBulletPivotJoint::Attach (iRigidBody* body,
+void csBulletPivotJoint::Attach (::iRigidBody* body,
 				 const csVector3& position)
 {
   CS_ASSERT (body);

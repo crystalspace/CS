@@ -24,10 +24,19 @@
 #include "csutil/scf_interface.h"
 #include "imesh/genmesh.h"
 
-struct iBulletSoftBody;
+namespace CS
+{
+  namespace Physics
+  {
+    namespace Bullet
+    {
+      struct iSoftBody;
+    } // namespace Bullet
+  } // namespace Physics
+} // namespace CS
 
 /**
- * Animation control type for a genmesh animated by a iBulletSoftBody.
+ * Animation control type for a genmesh animated by a CS::Physics::Bullet::iSoftBody.
  *
  * Main ways to get pointers to this interface:
  * - csQueryPluginClass()
@@ -42,7 +51,7 @@ struct iSoftBodyAnimationControlType : public iGenMeshAnimationControlType
 };
 
 /**
- * Animation control factory for a genmesh animated by a iBulletSoftBody.
+ * Animation control factory for a genmesh animated by a CS::Physics::Bullet::iSoftBody.
  *
  * Main creators of instances implementing this interface:
  * - iSoftBodyAnimationControlType::CreateAnimationControlFactory()
@@ -59,7 +68,7 @@ struct iSoftBodyAnimationControlFactory : public iGenMeshAnimationControlFactory
 };
 
 /**
- * Animation control for a genmesh animated by a iBulletSoftBody. This class will
+ * Animation control for a genmesh animated by a CS::Physics::Bullet::iSoftBody. This class will
  * animate the vertices of the genmesh depending on the physical simulation of the
  * soft body. It will also update automatically the position of the genmesh.
  *
@@ -74,17 +83,22 @@ struct iSoftBodyAnimationControlFactory : public iGenMeshAnimationControlFactory
  */
 struct iSoftBodyAnimationControl : public iGenMeshAnimationControl
 {
-  SCF_INTERFACE (iSoftBodyAnimationControl, 1, 0, 0);
+  SCF_INTERFACE (iSoftBodyAnimationControl, 2, 0, 0);
 
   /**
    * Set the soft body to be used to animate the genmesh.
+   * \param body The soft body that will be used to animate this genmesh.
+   * \param doubleSided True if the genmesh is double-sided (ie this is a cloth
+   * soft body), false otherwise. If the genmesh is double-sided, then the duplicated
+   * vertices must be added at the end of the vertex array, so that a vertex of index
+   * 'i' is duplicated at index 'i + body->GetVertexCount ()'.
    */
-  virtual void SetSoftBody (iBulletSoftBody* body) = 0;
+  virtual void SetSoftBody (CS::Physics::Bullet::iSoftBody* body, bool doubleSided = false) = 0;
 
   /**
    * Get the soft body used to animate the genmesh.
    */
-  virtual iBulletSoftBody* GetSoftBody () = 0;
+  virtual CS::Physics::Bullet::iSoftBody* GetSoftBody () = 0;
 };
 
 #endif // __CS_IVARIA_SOFTBODYANIM_H__

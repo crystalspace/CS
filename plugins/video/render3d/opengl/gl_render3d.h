@@ -47,6 +47,7 @@
 #include "csplugincommon/opengl/glextmanager.h"
 #include "csplugincommon/opengl/glstates.h"
 
+#include "buffershadowing.h"
 #include "gl_txtmgr.h"
 #include "gl_renderbuffer.h"
 #include "gl_r2t_backend.h"
@@ -433,14 +434,14 @@ private:
 
   struct ImageUnit : public CS::Memory::CustomAllocated
   {
-    GLuint target;    
     csGLBasicTextureHandle* texture;
     
-    ImageUnit (): target (0), texture (0) {}
+    ImageUnit (): texture (0) {}
   };
   GLint numImageUnits;
   ImageUnit* imageUnits;
   GLint numTCUnits;
+  void SetSeamlessCubemapFlag ();
 
   //@{
   /**
@@ -457,41 +458,7 @@ private:
   void ApplyBufferChanges();
   //@}
 
-  /**
-   * Helper class for render buffer shadow data (ie when the buffer actually
-   * used is different from the originally provided one, usually do data
-   * conversion).
-   */
-  class BufferShadowDataHelper :
-    public scfImplementation1<BufferShadowDataHelper,
-                              iRenderBufferCallback>
-  {
-    struct ShadowedBuffer
-    {
-      csRef<iRenderBuffer> shadowBuffer;
-      uint originalBufferVersion;
-      
-      ShadowedBuffer() : originalBufferVersion(~0) {}
-      bool IsNew() const { return originalBufferVersion == uint (~0); }
-    };
-    typedef csHash<ShadowedBuffer, csPtrKey<iRenderBuffer>,
-      CS::Memory::AllocatorMalloc,
-      csArraySafeCopyElementHandler<
-        CS::Container::HashElement<ShadowedBuffer, csPtrKey<iRenderBuffer> > >
-      > ShadowedBuffersHash;
-    ShadowedBuffersHash shadowedBuffers;
-  public:
-    BufferShadowDataHelper() : scfImplementationType (this) {}
-    
-    /**\name iRenderBufferCallback implementation
-     * @{ */
-    virtual void RenderBufferDestroyed (iRenderBuffer* buffer);
-    /** @} */
-    
-    iRenderBuffer* GetSupportedRenderBuffer (
-      iRenderBuffer* originalBuffer);
-  };
-  csRef<BufferShadowDataHelper> bufferShadowDataHelper;
+  csRef<BufferShadowingHelper> bufferShadowDataHelper;
 
   // Minimal float depth(z) difference to store
   // different values in depth buffer. Of course, for standard depth

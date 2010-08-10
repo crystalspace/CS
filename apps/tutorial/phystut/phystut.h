@@ -28,13 +28,13 @@
 #include "imesh/animesh.h"
 #include "imesh/ragdoll.h"
 
-class Simple : public csDemoApplication
+class Simple : public CS::Demo::DemoApplication
 {
 private:
   // Physics related
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynamicSystem;
-  csRef<iBulletDynamicSystem> bulletDynamicSystem;
+  csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
@@ -43,6 +43,9 @@ private:
   // Meshes
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
+
+  // Environments
+  int environment;
   csRef<iMeshWrapper> walls;
 
   // Configuration related
@@ -65,13 +68,13 @@ private:
   float rotX, rotY, rotZ;
 
   // Ragdoll related
-  csRef<iSkeletonRagdollManager2> ragdollManager;
+  csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;
   CS::Animation::StateID ragdollState;
   csRef<iMeshWrapper> ragdollMesh;
 
   // Dragging related
   bool dragging;
-  csRef<iBulletPivotJoint> dragJoint;
+  csRef<CS::Physics::Bullet::iPivotJoint> dragJoint;
   float dragDistance;
   float linearDampening, angularDampening;
   int mouseX, mouseY;
@@ -106,7 +109,9 @@ private:
   void SpawnRope ();
   void SpawnCloth ();
   void SpawnSoftBody ();
+
   void CreateWalls (const csVector3& radius);
+  void CreateTerrain ();
 
 public:
   Simple ();

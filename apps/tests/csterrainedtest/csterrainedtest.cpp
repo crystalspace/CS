@@ -162,13 +162,14 @@ bool TerrainEd::OnKeyboard (iEvent& ev)
 void TerrainEd::UpdateModifier(iEvent& ev)
 {
   csScreenTargetResult result = csEngineTools::FindScreenTarget (
-    csVector2 (mouse_x, mouse_y), 300.0f, view->GetCamera ());
+    csVector2 (mouse_x, mouse_y), 10000.0f, view->GetCamera ());
 
   if (result.mesh)
   {
       csRef<iModifiableDataFeeder> feeder = scfQueryInterface<iModifiableDataFeeder> (factory->GetFeeder());
       if (mod) feeder->RemoveModifier(mod);
-      mod = feeder->AddModifier(csVector3(result.isect.x, rectHeight, result.isect.z), rectSize, rectSize);    
+      //TODO: why this minus on Z???
+      mod = feeder->AddModifier(csVector3(result.isect.x, rectHeight, -result.isect.z), rectSize, rectSize);    
   }
 }
 

@@ -137,9 +137,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csVertexListWalker<float, csVector3> srcBinormals (factory->binormalBuffer);
     csRenderBufferLock<csVector3> dstBinormals (skinnedBinormals);
 
-    csSkeletalState2* skeletonState = lastSkeletonState;
+    CS::Animation::csSkeletalState2* skeletonState = lastSkeletonState;
 
-    csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
+    CS::Mesh::csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
 
     for (size_t i = 0; i < factory->vertexCount; ++i)
     {

@@ -1,0 +1,12 @@
+SubDir TOP apps tests csceguiconftest ;
+
+if $(CEGUI.AVAILABLE) = "yes"
+{
+Description csceguiconftest : "CS Configuration CEGUI Frontend Test Application" ;
+Application csceguiconftest :
+  [ Wildcard *.h *.cpp ] ;
+CFlags csceguiconftest : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+LinkWith csceguiconftest : crystalspace ;
+ExternalLibs csceguiconftest : CEGUI ;
+FileListEntryApplications csceguiconftest : app-demo ;
+}

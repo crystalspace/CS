@@ -30,17 +30,22 @@ struct iRenderBuffer;
 struct iMaterialWrapper;
 struct iShaderVariableContext;
 
-struct iAnimatedMeshFactory;
-struct iAnimatedMeshFactorySubMesh;
-struct iAnimatedMesh;
-struct iAnimatedMeshSubMesh;
-struct iAnimatedMeshMorphTarget;
-
 class csReversibleTransform;
 
 /**\file
  * Animated mesh interface files
  */
+
+namespace CS
+{
+namespace Mesh
+{
+
+struct iAnimatedMeshFactory;
+struct iAnimatedMeshSubMeshFactory;
+struct iAnimatedMesh;
+struct iAnimatedMeshSubMesh;
+struct iAnimatedMeshMorphTarget;
 
 /**
  * Represent a single influence of a bone on a single vertex
@@ -48,7 +53,7 @@ class csReversibleTransform;
 struct csAnimatedMeshBoneInfluence
 {
   /// The id of the bone
-  BoneID bone;
+  CS::Animation::BoneID bone;
 
   /**
    * The relative influence of the bone. Does technically not have to be
@@ -63,7 +68,7 @@ struct csAnimatedMeshBoneInfluence
 struct iAnimatedMeshSocketFactory : public virtual iBase
 {
 public:
-  SCF_INTERFACE(iAnimatedMeshSocketFactory, 2, 0, 0);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMeshSocketFactory, 2, 0, 0);
 
   /**
    * Get the name of the socket
@@ -88,12 +93,12 @@ public:
   /**
    * Get the ID of the bone associated with the socket
    */
-  virtual BoneID GetBone () const = 0;
+  virtual CS::Animation::BoneID GetBone () const = 0;
 
   /**
    * Set the bone associated with the socket
    */
-  virtual void SetBone (BoneID boneID) = 0;
+  virtual void SetBone (CS::Animation::BoneID boneID) = 0;
 
   /**
    * Get the associated animated mesh factory
@@ -108,10 +113,10 @@ public:
 struct iAnimatedMeshSocket : public virtual iBase
 {
 public:
-  SCF_INTERFACE(iAnimatedMeshSocket, 1, 0, 0);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMeshSocket, 1, 0, 0);
 
   /**
-   * Get the name of the socket
+   * Get the name of this socket
    */
   virtual const char* GetName () const = 0;
 
@@ -121,24 +126,24 @@ public:
   virtual iAnimatedMeshSocketFactory* GetFactory () = 0;
 
   /**
-   * Get the 'bone to socket transform' of the socket
+   * Get the 'bone to socket transform' of this socket
    */
   virtual const csReversibleTransform& GetTransform () const = 0;
 
   /**
-   * Set the 'bone to socket transform' of the socket
+   * Set the 'bone to socket transform' of this socket
    */
   virtual void SetTransform (csReversibleTransform& tf) = 0;
 
   /**
-   * Get the full transform of the socket, in world coordinate
+   * Get the full transform of this socket, in world coordinate
    */
   virtual const csReversibleTransform GetFullTransform () const = 0;
 
   /**
-   * Get the ID of the bone associated with the socket
+   * Get the ID of the bone associated with this socket
    */
-  virtual BoneID GetBone () const = 0;
+  virtual CS::Animation::BoneID GetBone () const = 0;
 
   /**
    * Get the associated animated mesh
@@ -146,12 +151,12 @@ public:
   virtual iAnimatedMesh* GetMesh () const = 0;
 
   /**
-   * Get the scene node associated with the socket
+   * Get the scene node associated with this socket
    */
   virtual iSceneNode* GetSceneNode () const = 0;
 
   /**
-   * Set the scene node associated with the socket
+   * Set the scene node associated with this socket
    */
   virtual void SetSceneNode (iSceneNode* sn) = 0;
 };
@@ -168,7 +173,7 @@ public:
  */
 struct iAnimatedMeshFactory : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshFactory, 2, 2, 0);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMeshFactory, 2, 2, 1);
 
   /**\name SubMesh handling
    * @{ */
@@ -179,7 +184,7 @@ struct iAnimatedMeshFactory : public virtual iBase
    * The newly created submesh will use all bones.
    * \param indices Index buffer to use for the newly created submesh.
    */
-  virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices,
+  virtual iAnimatedMeshSubMeshFactory* CreateSubMesh (iRenderBuffer* indices,
     const char* name, bool visible) = 0;
 
   /**
@@ -190,7 +195,7 @@ struct iAnimatedMeshFactory : public virtual iBase
    * \param indices Array of index buffers to use per part
    * \param boneIndices Array of indices of bones to use for bone mappings
    */
-  virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (
+  virtual iAnimatedMeshSubMeshFactory* CreateSubMesh (
     const csArray<iRenderBuffer*>& indices, 
     const csArray<csArray<unsigned int> >& boneIndices,
     const char* name, bool visible) = 0;
@@ -198,7 +203,7 @@ struct iAnimatedMeshFactory : public virtual iBase
   /**
    * Get a submesh by index.
    */
-  virtual iAnimatedMeshFactorySubMesh* GetSubMesh (size_t index) const = 0;
+  virtual iAnimatedMeshSubMeshFactory* GetSubMesh (size_t index) const = 0;
 
   /**
    * Find a submesh index by name, returns (size_t)-1 if not found.
@@ -213,7 +218,7 @@ struct iAnimatedMeshFactory : public virtual iBase
   /**
    * Remove a submesh from this factory.
    */
-  virtual void DeleteSubMesh (iAnimatedMeshFactorySubMesh* mesh) = 0;
+  virtual void DeleteSubMesh (iAnimatedMeshSubMeshFactory* mesh) = 0;
 
   /** @} */
 
@@ -325,12 +330,12 @@ struct iAnimatedMeshFactory : public virtual iBase
    * When a mesh is instanced it will by default get a skeleton from this
    * skeleton factory.
    */
-  virtual void SetSkeletonFactory (iSkeletonFactory2* skeletonFactory) = 0;
+  virtual void SetSkeletonFactory (CS::Animation::iSkeletonFactory2* skeletonFactory) = 0;
 
   /**
    * Get the skeleton factory associated with the mesh factory.
    */
-  virtual iSkeletonFactory2* GetSkeletonFactory () const = 0;
+  virtual CS::Animation::iSkeletonFactory2* GetSkeletonFactory () const = 0;
 
   /**
    * Set the requested number of bone influences per vertex.
@@ -395,7 +400,7 @@ struct iAnimatedMeshFactory : public virtual iBase
    * \param transform Initial transform
    * \param name Name of the socket, optional
    */
-  virtual void CreateSocket (BoneID bone, 
+  virtual void CreateSocket (CS::Animation::BoneID bone, 
     const csReversibleTransform& transform, const char* name) = 0;
 
   /**
@@ -414,15 +419,21 @@ struct iAnimatedMeshFactory : public virtual iBase
   */
   virtual uint FindSocket (const char* name) const = 0;
   /** @} */
+
+  /**
+   * Compute the tangents and binormals from the current vertices, normals and texels.
+   * The current content of the tangent and binormal buffers will be overwritten.
+   */
+  virtual void ComputeTangents () = 0;
 };
 
 /**
  * Sub mesh (part) of an animated mesh factory. It can be used to apply
  * various materials and rendering parameters on sub-parts of the animated mesh.
  */
-struct iAnimatedMeshFactorySubMesh : public virtual iBase
+struct iAnimatedMeshSubMeshFactory : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshFactorySubMesh, 1, 2, 1);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMeshSubMeshFactory, 1, 2, 1);
 
   /**
    * Get the index buffer for this submesh. Defines a triangle list.
@@ -490,7 +501,7 @@ struct iAnimatedMeshFactorySubMesh : public virtual iBase
  */
 struct iAnimatedMesh : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMesh, 1, 0, 0);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMesh, 1, 0, 1);
 
   /**
    * Set the skeleton to use for this mesh.
@@ -498,12 +509,12 @@ struct iAnimatedMesh : public virtual iBase
    * to it in the vertex influences.
    * \param skeleton
    */
-  virtual void SetSkeleton (iSkeleton2* skeleton) = 0;
+  virtual void SetSkeleton (CS::Animation::iSkeleton2* skeleton) = 0;
 
   /**
    * Get the skeleton to use for this mesh.
    */
-  virtual iSkeleton2* GetSkeleton () const = 0;
+  virtual CS::Animation::iSkeleton2* GetSkeleton () const = 0;
 
   /**
    * Get a submesh by index.
@@ -538,6 +549,11 @@ struct iAnimatedMesh : public virtual iBase
    */
   virtual iAnimatedMeshSocket* GetSocket (size_t index) const = 0;
   /** @} */
+
+  /**
+   * Convenient accessor method for the CS::Mesh::iAnimatedMeshFactory of this animesh.
+   */
+  virtual iAnimatedMeshFactory* GetAnimatedMeshFactory () const = 0;
 };
 
 /**
@@ -546,12 +562,12 @@ struct iAnimatedMesh : public virtual iBase
  */
 struct iAnimatedMeshSubMesh : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshSubMesh, 1, 2, 0);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMeshSubMesh, 1, 2, 0);
 
   /**
    * Get the factory of this submesh
    */
-  virtual iAnimatedMeshFactorySubMesh* GetFactorySubMesh () = 0;
+  virtual iAnimatedMeshSubMeshFactory* GetFactorySubMesh () = 0;
 
   /**
    * Set whether or not this submesh has to be rendered.
@@ -585,7 +601,7 @@ struct iAnimatedMeshSubMesh : public virtual iBase
  */
 struct iAnimatedMeshMorphTarget : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshMorphTarget, 2, 0, 0);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMeshMorphTarget, 2, 0, 0);
 
   /**
    * Set the render buffer to use for the vertex offsets.   
@@ -615,6 +631,11 @@ struct iAnimatedMeshMorphTarget : public virtual iBase
 
 /** @} */
 
+} // namespace Mesh
+} // namespace CS
+
+CS_DEPRECATED_METHOD_MSG("Use CS::Mesh::iAnimatedMeshSubMeshFactory instead")
+typedef CS::Mesh::iAnimatedMeshSubMeshFactory iAnimatedMeshFactorySubMesh;
 
 #endif // __CS_IMESH_ANIMESH_H__
 

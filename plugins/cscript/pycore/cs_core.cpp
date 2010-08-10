@@ -31956,7 +31956,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_0(PyObject *SWIGUNU
   int arg5 ;
   int arg6 ;
   uint32 arg7 ;
-  uint arg8 ;
+  int arg8 ;
   bool arg9 ;
   uint32 arg10 ;
   csKeyModifiers *arg11 = 0 ;
@@ -31972,7 +31972,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_0(PyObject *SWIGUNU
   int ecode6 = 0 ;
   unsigned long val7 ;
   int ecode7 = 0 ;
-  unsigned long val8 ;
+  int val8 ;
   int ecode8 = 0 ;
   bool val9 ;
   int ecode9 = 0 ;
@@ -32030,11 +32030,11 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_0(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
   } 
   arg7 = static_cast< uint32 >(val7);
-  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
+  ecode8 = SWIG_AsVal_int(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "int""'");
   } 
-  arg8 = static_cast< uint >(val8);
+  arg8 = static_cast< int >(val8);
   ecode9 = SWIG_AsVal_bool(obj8, &val9);
   if (!SWIG_IsOK(ecode9)) {
     SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "bool""'");
@@ -32066,7 +32066,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNU
   int arg6 ;
   int arg7 ;
   uint32 arg8 ;
-  uint arg9 ;
+  int arg9 ;
   bool arg10 ;
   uint32 arg11 ;
   csKeyModifiers *arg12 = 0 ;
@@ -32084,7 +32084,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNU
   int ecode7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
-  unsigned long val9 ;
+  int val9 ;
   int ecode9 = 0 ;
   bool val10 ;
   int ecode10 = 0 ;
@@ -32156,11 +32156,11 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
   } 
   arg8 = static_cast< uint32 >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_long(obj8, &val9);
+  ecode9 = SWIG_AsVal_int(obj8, &val9);
   if (!SWIG_IsOK(ecode9)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "int""'");
   } 
-  arg9 = static_cast< uint >(val9);
+  arg9 = static_cast< int >(val9);
   ecode10 = SWIG_AsVal_bool(obj9, &val10);
   if (!SWIG_IsOK(ecode10)) {
     SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "csMouseEventHelper_NewEvent" "', argument " "10"" of type '" "bool""'");
@@ -32192,7 +32192,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNU
   int32 *arg6 = (int32 *) 0 ;
   uint8 arg7 ;
   uint32 arg8 ;
-  uint arg9 ;
+  int arg9 ;
   bool arg10 ;
   uint32 arg11 ;
   csKeyModifiers *arg12 = 0 ;
@@ -32210,7 +32210,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNU
   int res7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
-  unsigned long val9 ;
+  int val9 ;
   int ecode9 = 0 ;
   bool val10 ;
   int ecode10 = 0 ;
@@ -32290,11 +32290,11 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
   } 
   arg8 = static_cast< uint32 >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_long(obj8, &val9);
+  ecode9 = SWIG_AsVal_int(obj8, &val9);
   if (!SWIG_IsOK(ecode9)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "int""'");
   } 
-  arg9 = static_cast< uint >(val9);
+  arg9 = static_cast< int >(val9);
   ecode10 = SWIG_AsVal_bool(obj9, &val10);
   if (!SWIG_IsOK(ecode10)) {
     SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "csMouseEventHelper_NewEvent" "', argument " "10"" of type '" "bool""'");
@@ -32325,7 +32325,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_3(PyObject *SWIGUNU
   int arg5 ;
   int arg6 ;
   uint32 arg7 ;
-  uint arg8 ;
+  int arg8 ;
   bool arg9 ;
   uint32 arg10 ;
   uint32 arg11 ;
@@ -32341,7 +32341,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_3(PyObject *SWIGUNU
   int ecode6 = 0 ;
   unsigned long val7 ;
   int ecode7 = 0 ;
-  unsigned long val8 ;
+  int val8 ;
   int ecode8 = 0 ;
   bool val9 ;
   int ecode9 = 0 ;
@@ -32399,11 +32399,11 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_3(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
   } 
   arg7 = static_cast< uint32 >(val7);
-  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
+  ecode8 = SWIG_AsVal_int(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "int""'");
   } 
-  arg8 = static_cast< uint >(val8);
+  arg8 = static_cast< int >(val8);
   ecode9 = SWIG_AsVal_bool(obj8, &val9);
   if (!SWIG_IsOK(ecode9)) {
     SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "bool""'");
@@ -32437,7 +32437,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_4(PyObject *SWIGUNU
   int arg6 ;
   int arg7 ;
   uint32 arg8 ;
-  uint arg9 ;
+  int arg9 ;
   bool arg10 ;
   uint32 arg11 ;
   uint32 arg12 ;
@@ -32455,7 +32455,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_4(PyObject *SWIGUNU
   int ecode7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
-  unsigned long val9 ;
+  int val9 ;
   int ecode9 = 0 ;
   bool val10 ;
   int ecode10 = 0 ;
@@ -32527,11 +32527,11 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_4(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
   } 
   arg8 = static_cast< uint32 >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_long(obj8, &val9);
+  ecode9 = SWIG_AsVal_int(obj8, &val9);
   if (!SWIG_IsOK(ecode9)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "int""'");
   } 
-  arg9 = static_cast< uint >(val9);
+  arg9 = static_cast< int >(val9);
   ecode10 = SWIG_AsVal_bool(obj9, &val10);
   if (!SWIG_IsOK(ecode10)) {
     SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "csMouseEventHelper_NewEvent" "', argument " "10"" of type '" "bool""'");
@@ -32565,7 +32565,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_5(PyObject *SWIGUNU
   int32 *arg6 = (int32 *) 0 ;
   uint8 arg7 ;
   uint32 arg8 ;
-  uint arg9 ;
+  int arg9 ;
   bool arg10 ;
   uint32 arg11 ;
   uint32 arg12 ;
@@ -32583,7 +32583,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_5(PyObject *SWIGUNU
   int res7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
-  unsigned long val9 ;
+  int val9 ;
   int ecode9 = 0 ;
   bool val10 ;
   int ecode10 = 0 ;
@@ -32663,11 +32663,11 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_5(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
   } 
   arg8 = static_cast< uint32 >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_long(obj8, &val9);
+  ecode9 = SWIG_AsVal_int(obj8, &val9);
   if (!SWIG_IsOK(ecode9)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "int""'");
   } 
-  arg9 = static_cast< uint >(val9);
+  arg9 = static_cast< int >(val9);
   ecode10 = SWIG_AsVal_bool(obj9, &val10);
   if (!SWIG_IsOK(ecode10)) {
     SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "csMouseEventHelper_NewEvent" "', argument " "10"" of type '" "bool""'");
@@ -32737,7 +32737,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                 }
                 if (_v) {
                   {
-                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
+                    int res = SWIG_AsVal_int(argv[7], NULL);
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
@@ -32802,7 +32802,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                   }
                   if (_v) {
                     {
-                      int res = SWIG_AsVal_unsigned_SS_long(argv[8], NULL);
+                      int res = SWIG_AsVal_int(argv[8], NULL);
                       _v = SWIG_CheckState(res);
                     }
                     if (_v) {
@@ -32865,7 +32865,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                   }
                   if (_v) {
                     {
-                      int res = SWIG_AsVal_unsigned_SS_long(argv[8], NULL);
+                      int res = SWIG_AsVal_int(argv[8], NULL);
                       _v = SWIG_CheckState(res);
                     }
                     if (_v) {
@@ -32928,7 +32928,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                 }
                 if (_v) {
                   {
-                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
+                    int res = SWIG_AsVal_int(argv[7], NULL);
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
@@ -32999,7 +32999,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                   }
                   if (_v) {
                     {
-                      int res = SWIG_AsVal_unsigned_SS_long(argv[8], NULL);
+                      int res = SWIG_AsVal_int(argv[8], NULL);
                       _v = SWIG_CheckState(res);
                     }
                     if (_v) {
@@ -33068,7 +33068,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                   }
                   if (_v) {
                     {
-                      int res = SWIG_AsVal_unsigned_SS_long(argv[8], NULL);
+                      int res = SWIG_AsVal_int(argv[8], NULL);
                       _v = SWIG_CheckState(res);
                     }
                     if (_v) {
@@ -33105,12 +33105,12 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csMouseEventHelper_NewEvent'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,csMouseEventType,int,int,uint32,uint,bool,uint32,csKeyModifiers const &)\n"
-    "    NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int,int,uint32,uint,bool,uint32,csKeyModifiers const &)\n"
-    "    NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int32 const *,uint8,uint32,uint,bool,uint32,csKeyModifiers const &)\n"
-    "    NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,csMouseEventType,int,int,uint32,uint,bool,uint32,uint32)\n"
-    "    NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int,int,uint32,uint,bool,uint32,uint32)\n"
-    "    csMouseEventHelper::NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int32 const *,uint8,uint32,uint,bool,uint32,uint32)\n");
+    "    NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,csMouseEventType,int,int,uint32,int,bool,uint32,csKeyModifiers const &)\n"
+    "    NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int,int,uint32,int,bool,uint32,csKeyModifiers const &)\n"
+    "    NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int32 const *,uint8,uint32,int,bool,uint32,csKeyModifiers const &)\n"
+    "    NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,csMouseEventType,int,int,uint32,int,bool,uint32,uint32)\n"
+    "    NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int,int,uint32,int,bool,uint32,uint32)\n"
+    "    csMouseEventHelper::NewEvent(csRef< iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int32 const *,uint8,uint32,int,bool,uint32,uint32)\n");
   return NULL;
 }
 
@@ -33262,7 +33262,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_GetButton(PyObject *SWIGUNUSEDPARM
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  uint result;
+  int result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csMouseEventHelper_GetButton",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
@@ -33270,8 +33270,8 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_GetButton(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMouseEventHelper_GetButton" "', argument " "1"" of type '" "iEvent const *""'"); 
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
-  result = (uint)csMouseEventHelper::GetButton((iEvent const *)arg1);
-  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
+  result = (int)csMouseEventHelper::GetButton((iEvent const *)arg1);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -62268,6 +62268,8 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "csmbWheelDown",SWIG_From_int(static_cast< int >(csmbWheelDown)));
   SWIG_Python_SetConstant(d, "csmbExtra1",SWIG_From_int(static_cast< int >(csmbExtra1)));
   SWIG_Python_SetConstant(d, "csmbExtra2",SWIG_From_int(static_cast< int >(csmbExtra2)));
+  SWIG_Python_SetConstant(d, "csmbHWheelLeft",SWIG_From_int(static_cast< int >(csmbHWheelLeft)));
+  SWIG_Python_SetConstant(d, "csmbHWheelRight",SWIG_From_int(static_cast< int >(csmbHWheelRight)));
   SWIG_Python_SetConstant(d, "csKeyModifierTypeShift",SWIG_From_int(static_cast< int >(csKeyModifierTypeShift)));
   SWIG_Python_SetConstant(d, "csKeyModifierTypeCtrl",SWIG_From_int(static_cast< int >(csKeyModifierTypeCtrl)));
   SWIG_Python_SetConstant(d, "csKeyModifierTypeAlt",SWIG_From_int(static_cast< int >(csKeyModifierTypeAlt)));

@@ -37,8 +37,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
   }
 
-  csPtr<iSkeletonAnimPacket2> AnimationPacketFactory::CreateInstance (
-    iSkeleton2* skeleton)
+  csPtr<CS::Animation::iSkeletonAnimPacket2> AnimationPacketFactory::CreateInstance (
+    CS::Animation::iSkeleton2* skeleton)
   {
     csRef<AnimationPacket> newP;
     newP.AttachNew (new AnimationPacket (this));
@@ -47,10 +47,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     if (animRoot)
       newP->animRoot = animRoot->CreateInstance (newP, skeleton);
 
-    return csPtr<iSkeletonAnimPacket2> (newP);
+    return csPtr<CS::Animation::iSkeletonAnimPacket2> (newP);
   }
 
-  iSkeletonAnimation2* AnimationPacketFactory::CreateAnimation (
+  CS::Animation::iSkeletonAnimation2* AnimationPacketFactory::CreateAnimation (
     const char* name)
   {
     csRef<Animation> newFact;
@@ -61,7 +61,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return newFact;
   }
 
-  iSkeletonAnimation2* AnimationPacketFactory::FindAnimation (
+  CS::Animation::iSkeletonAnimation2* AnimationPacketFactory::FindAnimation (
     const char* name)
   {
     for (size_t i = 0; i < animationList.GetSize (); ++i)
@@ -78,7 +78,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     animationList.DeleteAll ();
   }
 
-  iSkeletonAnimation2* AnimationPacketFactory::GetAnimation (size_t index)
+  CS::Animation::iSkeletonAnimation2* AnimationPacketFactory::GetAnimation (size_t index)
   {
     return animationList[index];
   }
@@ -88,54 +88,54 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return animationList.GetSize ();
   }
 
-  void AnimationPacketFactory::SetAnimationRoot (iSkeletonAnimNodeFactory2* root)
+  void AnimationPacketFactory::SetAnimationRoot (CS::Animation::iSkeletonAnimNodeFactory2* root)
   {
     animRoot = root;
   }
 
-  iSkeletonAnimNodeFactory2* AnimationPacketFactory::GetAnimationRoot () const
+  CS::Animation::iSkeletonAnimNodeFactory2* AnimationPacketFactory::GetAnimationRoot () const
   {
     return animRoot;
   }
 
-  csPtr<iSkeletonAnimationNodeFactory2> AnimationPacketFactory::CreateAnimationNode (
+  csPtr<CS::Animation::iSkeletonAnimationNodeFactory2> AnimationPacketFactory::CreateAnimationNode (
     const char* name)
   {
-    csRef<iSkeletonAnimationNodeFactory2> ref;
+    csRef<CS::Animation::iSkeletonAnimationNodeFactory2> ref;
     ref.AttachNew (new AnimationNodeFactory (name));
-    return csPtr<iSkeletonAnimationNodeFactory2> (ref);
+    return csPtr<CS::Animation::iSkeletonAnimationNodeFactory2> (ref);
   }
   
-  csPtr<iSkeletonBlendNodeFactory2> AnimationPacketFactory::CreateBlendNode (
+  csPtr<CS::Animation::iSkeletonBlendNodeFactory2> AnimationPacketFactory::CreateBlendNode (
     const char* name)
   {
-    csRef<iSkeletonBlendNodeFactory2> ref;
+    csRef<CS::Animation::iSkeletonBlendNodeFactory2> ref;
     ref.AttachNew (new BlendNodeFactory (name));
-    return csPtr<iSkeletonBlendNodeFactory2> (ref);
+    return csPtr<CS::Animation::iSkeletonBlendNodeFactory2> (ref);
   }
 
-  csPtr<iSkeletonPriorityNodeFactory2> AnimationPacketFactory::CreatePriorityNode (
+  csPtr<CS::Animation::iSkeletonPriorityNodeFactory2> AnimationPacketFactory::CreatePriorityNode (
     const char* name)
   {
-    csRef<iSkeletonPriorityNodeFactory2> ref;
+    csRef<CS::Animation::iSkeletonPriorityNodeFactory2> ref;
     ref.AttachNew (new PriorityNodeFactory (name));
-    return csPtr<iSkeletonPriorityNodeFactory2> (ref);
+    return csPtr<CS::Animation::iSkeletonPriorityNodeFactory2> (ref);
   }
 
-  csPtr<iSkeletonRandomNodeFactory2> AnimationPacketFactory::CreateRandomNode (
+  csPtr<CS::Animation::iSkeletonRandomNodeFactory2> AnimationPacketFactory::CreateRandomNode (
     const char* name)
   {
-    csRef<iSkeletonRandomNodeFactory2> ref;
+    csRef<CS::Animation::iSkeletonRandomNodeFactory2> ref;
     ref.AttachNew (new RandomNodeFactory (name));
-    return csPtr<iSkeletonRandomNodeFactory2> (ref);
+    return csPtr<CS::Animation::iSkeletonRandomNodeFactory2> (ref);
   }
 
-  csPtr<iSkeletonFSMNodeFactory2> AnimationPacketFactory::CreateFSMNode (
+  csPtr<CS::Animation::iSkeletonFSMNodeFactory2> AnimationPacketFactory::CreateFSMNode (
     const char* name)
   {
-    csRef<iSkeletonFSMNodeFactory2> ref;
+    csRef<CS::Animation::iSkeletonFSMNodeFactory2> ref;
     ref.AttachNew (new FSMNodeFactory (name));
-    return csPtr<iSkeletonFSMNodeFactory2> (ref);
+    return csPtr<CS::Animation::iSkeletonFSMNodeFactory2> (ref);
   }
 
 
@@ -146,12 +146,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {    
   }
   
-  iSkeletonAnimPacketFactory2* AnimationPacket::GetFactory () const
+  CS::Animation::iSkeletonAnimPacketFactory2* AnimationPacket::GetFactory () const
   {
     return factory;
   }
 
-  iSkeletonAnimNode2* AnimationPacket::GetAnimationRoot () const
+  CS::Animation::iSkeletonAnimNode2* AnimationPacket::GetAnimationRoot () const
   {
     return animRoot;
   }
@@ -161,7 +161,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS_LEAKGUARD_IMPLEMENT(Animation);
 
   Animation::Animation (const char* name)
-    : scfImplementationType (this), name (name), duration (0)
+    : scfImplementationType (this), name (name), duration (0),
+    isBindSpace (false)
   {
   }
 
@@ -170,7 +171,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return name;
   }
 
-  ChannelID Animation::AddChannel (BoneID bone)
+  ChannelID Animation::AddChannel (CS::Animation::BoneID bone)
   {
     // Check if there is any channel with this bone before
     ChannelID channelId = FindChannel (bone);
@@ -185,7 +186,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return channelId;
   }
 
-  ChannelID Animation::FindChannel (BoneID bone) const
+  ChannelID Animation::FindChannel (CS::Animation::BoneID bone) const
   {
     for (size_t i = 0; i < channels.GetSize (); ++i)
     {
@@ -194,6 +195,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
 
     return InvalidChannelID;
+  }
+
+  size_t Animation::GetChannelCount () const
+  {
+    return channels.GetSize ();
+  }
+
+  CS::Animation::BoneID Animation::GetChannelBone (CS::Animation::ChannelID channel) const
+  {
+    CS_ASSERT(channel < channels.GetSize ());
+
+    AnimationChannel* ch = channels[channel];
+    return ch->bone;
   }
 
   void Animation::AddKeyFrame (ChannelID channel, float time, 
@@ -214,6 +228,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     ch->keyFrames.InsertSorted (k, KeyFrameCompare);
   }
 
+  void Animation::SetKeyFrame (CS::Animation::ChannelID channel, 
+			       CS::Animation::KeyFrameID keyframe,
+			       const csQuaternion& rotation,
+			       const csVector3& offset)
+  {
+    CS_ASSERT(channel < channels.GetSize ());
+
+    AnimationChannel* ch = channels[channel];
+
+    CS_ASSERT(keyframe < ch->keyFrames.GetSize ());
+
+    KeyFrame& k = ch->keyFrames[keyframe];
+    k.rotation = rotation;
+    k.offset = offset;
+  }
+
   size_t Animation::GetKeyFrameCount (ChannelID channel) const
   {
     CS_ASSERT(channel < channels.GetSize ());
@@ -221,7 +251,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return channels[channel]->keyFrames.GetSize ();
   }
 
-  void Animation::GetKeyFrame (ChannelID channel, KeyFrameID keyframe, BoneID& bone,
+  void Animation::GetKeyFrame (ChannelID channel, KeyFrameID keyframe, CS::Animation::BoneID& bone,
     float& time, csQuaternion& rotation, csVector3& offset)
   {
     CS_ASSERT(channel < channels.GetSize ());
@@ -237,7 +267,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     offset = k.offset;
   }
 
-  void Animation::GetTwoKeyFrames (ChannelID channel, float time, BoneID& bone,
+  void Animation::GetTwoKeyFrames (ChannelID channel, float time, CS::Animation::BoneID& bone,
     float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
     float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset)
   {
@@ -276,7 +306,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     afterOffset = k2.offset;
   }  
 
-  void Animation::BlendState (csSkeletalState2* state, 
+  void Animation::BlendState (CS::Animation::csSkeletalState2* state, 
     float baseWeight, float playbackTime, bool isPlayingCyclic) const
   {
     csArrayCmp<KeyFrame, float> cmp (playbackTime, KeyFrameTimeCompare);
@@ -355,6 +385,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   float Animation::GetDuration () const
   {
     return duration;
+  }
+
+  void Animation::SetFramesInBindSpace (bool isBindSpace)
+  {
+    this->isBindSpace = isBindSpace;
+  }
+
+  bool Animation::GetFramesInBindSpace () const
+  {
+    return isBindSpace;
   }
 
   int Animation::KeyFrameCompare (KeyFrame const& k1, KeyFrame const& k2)

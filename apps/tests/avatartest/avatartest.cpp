@@ -32,26 +32,23 @@
 #define MODEL_SINTEL 3
 
 AvatarTest::AvatarTest ()
-  : csDemoApplication ("CrystalSpace.AvatarTest", "avatartest",
-		       "avatartest <OPTIONS>",
-		       "Tests on the animation of objects iAnimatedMesh."),
+  : DemoApplication ("CrystalSpace.AvatarTest", "avatartest",
+		     "avatartest <OPTIONS>",
+		     "Tests on the animation of objects iAnimatedMesh."),
     avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
 {
-  // Configure the options for csDemoApplication
+  // Configure the options for DemoApplication
 
-  // We manage the camera by ourselves
-  SetCameraMode (CSDEMO_CAMERA_NONE);
+  // Set the camera mode
+  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
 
   // Command line options
-  commandLineHelper.commandOptions.Push
-    (csDemoCommandLineHelper::CommandOption
-     ("scene=<name>", "Set the starting scene (frankie, krystal, sintel)"));
-  commandLineHelper.commandOptions.Push
-    (csDemoCommandLineHelper::CommandOption
-     ("no_physics", "Disable the physical animations"));
-  commandLineHelper.commandOptions.Push
-    (csDemoCommandLineHelper::CommandOption
-     ("disable_soft", "Disable the soft bodies"));
+  commandLineHelper.AddCommandLineOption
+    ("scene=<name>", "Set the starting scene (frankie, krystal, sintel)");
+  commandLineHelper.AddCommandLineOption
+    ("disable-physics", "Disable the physical animations");
+  commandLineHelper.AddCommandLineOption
+    ("disable-soft", "Disable the soft bodies");
 }
 
 AvatarTest::~AvatarTest ()
@@ -59,62 +56,37 @@ AvatarTest::~AvatarTest ()
   delete avatarScene;
 }
 
+csVector3 AvatarTest::GetCameraStart ()
+{
+  if (avatarScene)
+    return avatarScene->GetCameraStart ();
+
+  return csVector3 (0.0f);
+}
+
+csVector3 AvatarTest::GetCameraTarget ()
+{
+  if (avatarScene)
+    return avatarScene->GetCameraTarget ();
+
+  return csVector3 (0.0f);
+}
+
+float AvatarTest::GetCameraMinimumDistance ()
+{
+  if (avatarScene)
+    return avatarScene->GetCameraMinimumDistance ();
+
+  return 0.1f;
+}
+
 void AvatarTest::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsedTime = vc->GetElapsedTicks ();
-
-  // Now rotate the camera according to keyboard state
   const float speed = elapsedTime / 1000.0f;
 
-  // Compute camera and animesh position
-  iCamera* camera = view->GetCamera ();
-  csVector3 cameraPosition = camera->GetTransform ().GetOrigin ();
-  csVector3 cameraTarget = avatarScene->GetCameraTarget ();
-  float minimumDistance = avatarScene->GetCameraMinimumDistance ();
-
-  // Move camera
-  if (kbd->GetKeyState (CSKEY_SHIFT))
-  {
-    // If the user is holding down shift, the Up/Down arrow keys will cause
-    // the camera to go forwards and backwards (forward only allowed if camera 
-    // not too close). Left/Right arrows work also when shift is hold.
-    if (kbd->GetKeyState (CSKEY_UP)
-	&& (cameraPosition - cameraTarget).Norm () > minimumDistance)
-      camera->Move (CS_VEC_FORWARD * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_DOWN))
-      camera->Move (CS_VEC_BACKWARD * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-      camera->Move (CS_VEC_RIGHT * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_LEFT))
-      camera->Move (CS_VEC_LEFT * 4 * speed);
-  }
-  else
-  {
-    // Left and right arrows cause the camera to strafe on the X axis; up and 
-    // down arrows cause the camera to strafe on the Y axis
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-      camera->Move (CS_VEC_RIGHT * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_LEFT))
-      camera->Move (CS_VEC_LEFT * 4 * speed);
-
-    // Avoid gimbal lock of camera
-    cameraPosition.Normalize ();
-    float cameraDot = cameraPosition * csVector3 (0.0f, 1.0f, 0.0f);
-    if (kbd->GetKeyState (CSKEY_UP)
-	&& cameraDot < 0.98f)
-      camera->Move (CS_VEC_UP * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_DOWN)
-	&& cameraDot > -0.98f)
-      camera->Move (CS_VEC_DOWN * 4 * speed);
-  }
-
-  // Make the camera look at the animesh
-  camera->GetTransform ().LookAt (cameraTarget - camera->GetTransform ().GetOrigin (),
-				  csVector3 (0.0f, 1.0f, 0.0f) );
-
-  // Step the dynamic simulation (we slow down artificially the simulation in
-  // order to achieve a 'slow motion' effect)
+  // Step the dynamic simulation
   if (physicsEnabled)
     dynamics->Step (speed * avatarScene->GetSimulationSpeed ());
 
@@ -124,8 +96,8 @@ void AvatarTest::Frame ()
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
 
-  // Default behavior from csDemoApplication
-  csDemoApplication::Frame ();
+  // Default behavior from DemoApplication
+  DemoApplication::Frame ();
 
   // Display the Bullet debug information
   if (avatarScene->HasPhysicalObjects ()
@@ -135,8 +107,8 @@ void AvatarTest::Frame ()
 
 bool AvatarTest::OnKeyboard (iEvent &ev)
 {
-  // Default behavior from csDemoApplication
-  csDemoApplication::OnKeyboard (ev);
+  // Default behavior from DemoApplication
+  DemoApplication::OnKeyboard (ev);
 
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
@@ -173,7 +145,7 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
       }
 
       // Re-initialize camera position
-      view->GetCamera ()->GetTransform ().SetOrigin (avatarScene->GetCameraStart ());
+      cameraHelper.ResetCamera ();
 
       // Toggle the debug mode of the dynamic system
       if (physicsEnabled)
@@ -229,20 +201,24 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
 
 bool AvatarTest::OnMouseDown (iEvent& ev)
 {
+  // Default behavior from DemoApplication
+  if (DemoApplication::OnMouseDown (ev))
+    return true;
+
   return avatarScene->OnMouseDown (ev);
 }
 
 bool AvatarTest::OnInitialize (int argc, char* argv[])
 {
-  // Default behavior from csDemoApplication
-  if (!csDemoApplication::OnInitialize (argc, argv))
+  // Default behavior from DemoApplication
+  if (!DemoApplication::OnInitialize (argc, argv))
     return false;
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
-		       iSkeletonLookAtManager2),
+		       CS::Animation::iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
-		       iSkeletonBasicNodesManager2),
+		       CS::Animation::iSkeletonBasicNodesManager2),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -253,7 +229,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
   // Check if physical effects are enabled
   csRef<iCommandLineParser> clp =
     csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
-  physicsEnabled = !clp->GetBoolOption ("no_physics", false);
+  physicsEnabled = !clp->GetBoolOption ("disable-physics", false);
 
   while (physicsEnabled)
   {
@@ -283,7 +259,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     }
 
     // Load the ragdoll plugin
-    ragdollManager = csLoadPlugin<iSkeletonRagdollManager2>
+    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager2>
       (plugmgr, "crystalspace.mesh.animesh.controllers.ragdoll");
 
     if (!ragdollManager)
@@ -295,7 +271,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     }
 
     // Check whether the soft bodies are enabled or not
-    softBodiesEnabled = !clp->GetBoolOption ("disable_soft", false);
+    softBodiesEnabled = !clp->GetBoolOption ("disable-soft", false);
 
     // Load the soft body animation control plugin & factory
     if (softBodiesEnabled)
@@ -343,21 +319,21 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
 
 bool AvatarTest::Application ()
 {
-  // Default behavior from csDemoApplication
-  if (!csDemoApplication::Application ())
+  // Default behavior from DemoApplication
+  if (!DemoApplication::Application ())
     return false;
 
   // Find references to the plugins of the animation nodes
-  lookAtManager = csQueryRegistry<iSkeletonLookAtManager2> (GetObjectRegistry ());
+  lookAtManager = csQueryRegistry<CS::Animation::iSkeletonLookAtManager2> (GetObjectRegistry ());
   if (!lookAtManager) return ReportError("Failed to locate iLookAtManager plugin!");
 
   basicNodesManager =
-    csQueryRegistry<iSkeletonBasicNodesManager2> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonBasicNodesManager2> (GetObjectRegistry ());
   if (!basicNodesManager)
-    return ReportError("Failed to locate iSkeletonBasicNodesManager2 plugin!");
+    return ReportError("Failed to locate CS::Animation::iSkeletonBasicNodesManager2 plugin!");
 
-  // Default behavior from csDemoApplication for the creation of the scene
-  if (!csDemoApplication::CreateRoom ())
+  // Default behavior from DemoApplication for the creation of the scene
+  if (!DemoApplication::CreateRoom ())
     return false;
 
   // Create the dynamic system
@@ -380,7 +356,7 @@ bool AvatarTest::Application ()
 
       // Find the Bullet interface of the dynamic system
       bulletDynamicSystem =
-	scfQueryInterface<iBulletDynamicSystem> (dynamicSystem);
+	scfQueryInterface<CS::Physics::Bullet::iDynamicSystem> (dynamicSystem);
 
       // We have some objects of size smaller than 0.035 units, so we scale up the
       // whole world for a better behavior of the dynamic simulation.
@@ -434,7 +410,7 @@ bool AvatarTest::Application ()
     return false;
 
   // Initialize camera position
-  view->GetCamera ()->GetTransform ().SetOrigin (avatarScene->GetCameraStart ());
+  cameraHelper.ResetCamera ();
 
   // Run the application
   Run();

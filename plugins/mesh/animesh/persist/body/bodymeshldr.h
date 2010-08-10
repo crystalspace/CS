@@ -53,19 +53,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
   private: 
     bool ParseSkeleton (iDocumentNode* node, iLoaderContext* ldr_context);
     bool ParseBone (iDocumentNode* node, iLoaderContext* ldr_context,
-		    iBodySkeleton* skeleton);
-    bool ParseProperties (iDocumentNode* node, iBodyBone* bone);
+		    CS::Animation::iBodySkeleton* skeleton);
+    bool ParseProperties (iDocumentNode* node, CS::Animation::iBodyBone* bone);
     bool ParseColliders (iDocumentNode* node, iLoaderContext* ldr_context,
-			 iBodyBone* bone);
-    bool ParseColliderParams (iDocumentNode* node, iBodyBoneCollider* collider);
-    bool ParseJoint (iDocumentNode* node, iBodyBone* bone);
+			 CS::Animation::iBodyBone* bone);
+    bool ParseColliderParams (iDocumentNode* node, CS::Animation::iBodyBoneCollider* collider);
+    bool ParseJoint (iDocumentNode* node, CS::Animation::iBodyBone* bone);
     bool ParseConstraint (iDocumentNode *node, bool &x, bool &y, bool &z,
 			  csVector3 &min, csVector3 &max);
-    bool ParseChain (iDocumentNode* node, iBodySkeleton* skeleton);
+    bool ParseChain (iDocumentNode* node, CS::Animation::iBodySkeleton* skeleton);
 
     iObjectRegistry* object_reg;
     csRef<iSyntaxService> synldr;
-    csRef<iBodyManager> bodyManager;
+    csRef<CS::Animation::iBodyManager> bodyManager;
 
     csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \

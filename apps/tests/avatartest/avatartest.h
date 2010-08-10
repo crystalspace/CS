@@ -36,7 +36,7 @@
 #define DYNDEBUG_COLLIDER 3
 #define DYNDEBUG_BULLET 4
 
-// Base class to be implemented for all different models
+// Base class to be implemented for all different scenes
 class AvatarScene
 {
  public:
@@ -66,11 +66,11 @@ class AvatarScene
   virtual void UpdateStateDescription () = 0;
 
   // Animesh objects
-  csRef<iAnimatedMeshFactory> animeshFactory;
-  csRef<iAnimatedMesh> animesh;
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory;
+  csRef<CS::Mesh::iAnimatedMesh> animesh;
 };
 
-class AvatarTest : public csDemoApplication
+class AvatarTest : public CS::Demo::DemoApplication
 {
   friend class FrankieScene;
   friend class KrystalScene;
@@ -84,7 +84,7 @@ private:
   bool physicsEnabled;
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
-  csRef<iBulletDynamicSystem> bulletDynamicSystem;
+  csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
@@ -95,14 +95,19 @@ private:
   bool softBodiesEnabled;
 
   // Animation node plugin managers
-  csRef<iSkeletonLookAtManager2> lookAtManager;
-  csRef<iSkeletonBasicNodesManager2> basicNodesManager;
-  csRef<iSkeletonRagdollManager2> ragdollManager;
+  csRef<CS::Animation::iSkeletonLookAtManager2> lookAtManager;
+  csRef<CS::Animation::iSkeletonBasicNodesManager2> basicNodesManager;
+  csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;
 
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
+
+  //-- CS::Demo::CameraManager
+  csVector3 GetCameraStart ();
+  float GetCameraMinimumDistance ();
+  csVector3 GetCameraTarget ();
 
  public:
   AvatarTest ();

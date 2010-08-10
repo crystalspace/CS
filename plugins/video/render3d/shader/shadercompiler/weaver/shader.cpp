@@ -286,7 +286,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
       csRef<WeaverCommon::iCombinerLoader> loader = 
 	csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
-	  combinerID);
+	  combinerID, false);
       if (!loader.IsValid())
       {
 	cacheFailReason = "Failed to load combiner";
@@ -470,10 +470,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
 
     csRefArray<iDocumentNode> techniqueNodes;
-    //for (size_t t = 0; t < techniques.GetSize(); t++)
-    for (size_t t = 0; t < 1; t++)
+    if (techniques.GetSize() > 0)
     {
-      iDocumentNode* techSource = techniques[t].node;
+      iDocumentNode* techSource = techniques[0].node;
       
       csRef<iDocumentNodeIterator> it = techSource->GetNodes();
     

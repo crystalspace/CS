@@ -387,7 +387,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       
       csRef<WeaverCommon::iCombinerLoader> loader = 
 	csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
-	  comb->classId);
+	  comb->classId, false);
       if (!loader.IsValid())
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
@@ -401,6 +401,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  "Could not get combiner from '%s'", comb->classId.GetData());
 	return false;
       }
+      combiner->SetDescription (synth->shaderName);
       combiners.Add (loader);
     }
     

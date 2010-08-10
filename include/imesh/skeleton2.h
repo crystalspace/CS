@@ -34,6 +34,21 @@ class csDualQuaternion;
 
 struct iSceneNode;
 
+namespace CS
+{
+namespace Mesh
+{
+
+struct iAnimatedMesh;
+
+} // namespace Mesh
+} // namespace CS
+
+namespace CS
+{
+namespace Animation
+{
+
 struct iSkeletonFactory2;
 struct iSkeleton2;
 
@@ -61,7 +76,7 @@ static const BoneID InvalidBoneID = (BoneID)~0;
  */
 struct iSkeletonManager2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeletonManager2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonManager2, 1, 0, 0);
 
   /**
    * Create a new empty skeleton factory
@@ -112,7 +127,7 @@ struct iSkeletonManager2 : public virtual iBase
  */
 struct iSkeletonFactory2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeletonFactory2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonFactory2, 1, 0, 0);
 
   /**\name Bone handling
    * @{ */
@@ -226,14 +241,14 @@ struct iSkeletonFactory2 : public virtual iBase
  * Bind space is defined by the skeleton factory, so bind space is relative
  * transform compared to the default orientation.
  *
- * \sa iSkeletonFactory2 for more information on coordinate spaces
+ * \sa CS::Animation::iSkeletonFactory2 for more information on coordinate spaces
  */
 struct iSkeleton2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeleton2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeleton2, 1, 0, 1);
 
   /**
-   * Get the scene node associated with the skeleton
+   * Get the scene node associated with this skeleton
    */
   virtual iSceneNode* GetSceneNode () = 0;
 
@@ -343,17 +358,28 @@ struct iSkeleton2 : public virtual iBase
    * Get skeleton update version number
    */
   virtual unsigned int GetSkeletonStateVersion () const = 0;
+
+  /**
+   * Set the animated mesh associated with this skeleton
+   */
+  virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
+
+  /**
+   * Get the animated mesh associated with this skeleton
+   */
+  virtual CS::Mesh::iAnimatedMesh* GetAnimatedMesh () = 0;
 };
 
 /**
  * Holds the state of an animesh skeleton for a frame, ie the position
- * and rotation of each bone of the skeleton.
+ * and rotation of each bone of the skeleton. These transforms are in
+ * bind space.
  */
 class csSkeletalState2 : public csRefCount
 {
 public:
 
-  ///
+  /// Constructor
   csSkeletalState2 ()
     : boneVecs (0), boneQuats (0), numberOfBones (0)
   {}
@@ -366,8 +392,8 @@ public:
   }
 
   /**
-   * Return the position vector of the specified bone.
-   * \param i the BoneID of the bone.
+   * Return the position vector of the specified bone, in bone space.
+   * \param i The BoneID of the bone.
    */
   inline const csVector3& GetVector (size_t i) const
   {
@@ -375,8 +401,8 @@ public:
   }
 
   /**
-   * Return the position vector of the specified bone.
-   * \param i the BoneID of the bone.
+   * Return the position vector of the specified bone, in bone space.
+   * \param i The BoneID of the bone.
    */
   inline csVector3& GetVector (size_t i) 
   {
@@ -385,8 +411,8 @@ public:
 
 
   /**
-   * Return the rotation quaternion of the specified bone.
-   * \param i the BoneID of the bone.
+   * Return the rotation quaternion of the specified bone, in bone space.
+   * \param i The BoneID of the bone.
    */
   inline const csQuaternion& GetQuaternion (size_t i) const
   {
@@ -394,8 +420,8 @@ public:
   }
 
   /**
-   * Return the rotation quaternion of the specified bone.
-   * \param i the BoneID of the bone.
+   * Return the rotation quaternion of the specified bone, in bone space.
+   * \param i The BoneID of the bone.
    */
   inline csQuaternion& GetQuaternion (size_t i) 
   {
@@ -404,8 +430,8 @@ public:
 
   /**
    * Return true if the position and rotation values have been set for
-   * the specified bone, false otherwise (default values will therefore
-   * be used).
+   * the specified bone, false otherwise (last position and rotation values
+   * which have been set for this bone will therefore be kept).
    */
   inline bool IsBoneUsed (BoneID bone) const
   {
@@ -456,6 +482,8 @@ protected:
 };
 
 
+} // namespace Animation
+} // namespace CS
 
 /** @} */
 

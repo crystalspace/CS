@@ -81,7 +81,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 
     synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
-    bodyManager = csQueryRegistryOrLoad<iBodyManager> (object_reg,
+    bodyManager = csQueryRegistryOrLoad<CS::Animation::iBodyManager> (object_reg,
       "crystalspace.mesh.animesh.body");
 
     InitTokenTable (xmltokens);
@@ -107,15 +107,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
       return false;
     }
 
-    csRef<iSkeletonManager2> skeletonManager =
-      csQueryRegistry<iSkeletonManager2> (object_reg);
+    csRef<CS::Animation::iSkeletonManager2> skeletonManager =
+      csQueryRegistry<CS::Animation::iSkeletonManager2> (object_reg);
     if (!skeletonManager)
     {
       synldr->ReportError (msgid, node, "No animesh skeleton manager");
       return false;
     }
 
-    iSkeletonFactory2* skeletonFactory =
+    CS::Animation::iSkeletonFactory2* skeletonFactory =
       skeletonManager->FindSkeletonFactory (factoryName);
     if (!skeletonFactory)
     {
@@ -125,7 +125,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
     }
 
     // create skeleton
-    iBodySkeleton* skeleton = bodyManager->CreateBodySkeleton (name, skeletonFactory);
+    CS::Animation::iBodySkeleton* skeleton = bodyManager->CreateBodySkeleton (name, skeletonFactory);
 
     // parse child nodes
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -157,7 +157,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
   }
 
   bool BodyMeshLoader::ParseBone (iDocumentNode* node, iLoaderContext* ldr_context,
-				  iBodySkeleton* skeleton)
+				  CS::Animation::iBodySkeleton* skeleton)
   {
     // parse bone name
     const char* name = node->GetAttributeValue ("name");
@@ -167,8 +167,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
       return false;
     }
 
-    BoneID id = skeleton->GetSkeletonFactory ()->FindBone (name);
-    if (id == InvalidBoneID)
+    CS::Animation::BoneID id = skeleton->GetSkeletonFactory ()->FindBone (name);
+    if (id == CS::Animation::InvalidBoneID)
     {
       synldr->ReportError (msgid, node, "No bone with name %s in skeleton factory",
 			   name);
@@ -176,7 +176,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
     }
 
     // create body bone
-    iBodyBone* bone = skeleton->CreateBodyBone (id);
+    CS::Animation::iBodyBone* bone = skeleton->CreateBodyBone (id);
 
     // parse child nodes
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -212,9 +212,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
     return true;
   }
 
-  bool BodyMeshLoader::ParseProperties (iDocumentNode* node, iBodyBone* bone)
+  bool BodyMeshLoader::ParseProperties (iDocumentNode* node, CS::Animation::iBodyBone* bone)
   {
-    iBodyBoneProperties* properties = bone->CreateBoneProperties ();
+    CS::Animation::iBodyBoneProperties* properties = bone->CreateBoneProperties ();
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
@@ -267,7 +267,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
   }
 
   bool BodyMeshLoader::ParseColliders (iDocumentNode* node,
-				       iLoaderContext* ldr_context, iBodyBone* bone)
+				       iLoaderContext* ldr_context, CS::Animation::iBodyBone* bone)
   {
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
@@ -309,7 +309,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	    }
 
 	    // create collider
-	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
+	    CS::Animation::iBodyBoneCollider* collider = bone->CreateBoneCollider ();
 	    if (id == XMLTOKEN_COLLIDERMESH)
 	      collider->SetMeshGeometry (mesh);
 	    else
@@ -330,7 +330,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	      return false;
 	    }
 
-	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
+	    CS::Animation::iBodyBoneCollider* collider = bone->CreateBoneCollider ();
 	    collider->SetBoxGeometry (v);
 	    ParseColliderParams (child, collider);
 
@@ -347,7 +347,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	      return false;
 	    }
 
-	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
+	    CS::Animation::iBodyBoneCollider* collider = bone->CreateBoneCollider ();
 	    collider->SetSphereGeometry (csSphere (v, r));
 	    ParseColliderParams (child, collider);
 
@@ -359,7 +359,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	    float l = child->GetAttributeValueAsFloat ("length");
 	    float r = child->GetAttributeValueAsFloat ("radius");
 
-	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
+	    CS::Animation::iBodyBoneCollider* collider = bone->CreateBoneCollider ();
 	    collider->SetCylinderGeometry (l, r);
 	    ParseColliderParams (child, collider);
 
@@ -371,7 +371,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	    float l = child->GetAttributeValueAsFloat ("length");
 	    float r = child->GetAttributeValueAsFloat ("radius");
 
-	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
+	    CS::Animation::iBodyBoneCollider* collider = bone->CreateBoneCollider ();
 	    collider->SetCapsuleGeometry (l, r);
 	    ParseColliderParams (child, collider);
 
@@ -383,7 +383,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	    csPlane3 plane;
 	    synldr->ParsePlane (node, plane);
 
-	    iBodyBoneCollider* collider = bone->CreateBoneCollider ();
+	    CS::Animation::iBodyBoneCollider* collider = bone->CreateBoneCollider ();
 	    collider->SetPlaneGeometry (plane);
 	    ParseColliderParams (child, collider);
 
@@ -400,7 +400,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
   }
 
   bool BodyMeshLoader::ParseColliderParams (iDocumentNode* node,
-					    iBodyBoneCollider* collider)
+					    CS::Animation::iBodyBoneCollider* collider)
   {
     if (node->GetAttribute ("density"))
       collider->SetDensity (node->GetAttributeValueAsFloat ("density"));
@@ -448,9 +448,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
     return true;
   }
 
-  bool BodyMeshLoader::ParseJoint (iDocumentNode* node, iBodyBone* bone)
+  bool BodyMeshLoader::ParseJoint (iDocumentNode* node, CS::Animation::iBodyBone* bone)
   {
-    iBodyBoneJoint* joint = bone->CreateBoneJoint ();
+    CS::Animation::iBodyBoneJoint* joint = bone->CreateBoneJoint ();
 
     csOrthoTransform t;
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -537,7 +537,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	}
     }
 
-    // TODO: add transform in iBodyBoneJoint
+    // TODO: add transform in CS::Animation::iBodyBoneJoint
     //joint->SetTransform (t);
 
     return true;
@@ -576,7 +576,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
     return true;
   }
 
-  bool BodyMeshLoader::ParseChain (iDocumentNode* node, iBodySkeleton* skeleton)
+  bool BodyMeshLoader::ParseChain (iDocumentNode* node, CS::Animation::iBodySkeleton* skeleton)
   {
     // TODO
     return true;

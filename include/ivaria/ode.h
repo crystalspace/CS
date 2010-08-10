@@ -129,7 +129,7 @@ struct iODESliderJoint;
  * This class exposes parameters specific to odedynam as an implementation
  * of iDynamicsSystem. In most cases SystemState should not be modified directly
  * unless you want the behavior of a specific system different from others.
- * \sa iDynamicSystem iBulletDynamicSystem
+ * \sa iDynamicSystem CS::Physics::Bullet::iDynamicSystem
  */
 struct iODEDynamicSystemState : public virtual iBase
 {

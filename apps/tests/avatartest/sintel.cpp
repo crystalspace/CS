@@ -29,14 +29,14 @@ SintelScene::SintelScene (AvatarTest* avatarTest)
     currentExpressionIndex (0), activeFacialTransition (false)
 {
   // Define the available keys
-  avatarTest->keyDescriptions.DeleteAll ();
-  avatarTest->keyDescriptions.Push ("arrow keys: move camera");
-  avatarTest->keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
-  avatarTest->keyDescriptions.Push ("1: neutral");
-  avatarTest->keyDescriptions.Push ("2: smiling");
-  avatarTest->keyDescriptions.Push ("3: angry");
-  avatarTest->keyDescriptions.Push ("4: sad");
-  avatarTest->keyDescriptions.Push ("n: switch to next scene");
+  avatarTest->hudHelper.keyDescriptions.DeleteAll ();
+  avatarTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
+  avatarTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->hudHelper.keyDescriptions.Push ("1: neutral");
+  avatarTest->hudHelper.keyDescriptions.Push ("2: smiling");
+  avatarTest->hudHelper.keyDescriptions.Push ("3: angry");
+  avatarTest->hudHelper.keyDescriptions.Push ("4: sad");
+  avatarTest->hudHelper.keyDescriptions.Push ("n: switch to next scene");
 }
 
 SintelScene::~SintelScene ()
@@ -266,7 +266,7 @@ bool SintelScene::CreateAvatar ()
   if (!meshFact)
     return avatarTest->ReportError ("Can't find Sintel's mesh factory!");
 
-  animeshFactory = scfQueryInterface<iAnimatedMeshFactory>
+  animeshFactory = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
     (meshFact->GetMeshObjectFactory ());
   if (!animeshFactory)
     return avatarTest->ReportError ("Can't find Sintel's animesh factory!");
@@ -293,11 +293,11 @@ bool SintelScene::CreateAvatar ()
 
   // Create a new animation tree. The structure of the tree is:
   //   + idle animation node (root and only node)
-  csRef<iSkeletonAnimPacketFactory2> animPacketFactory =
+  csRef<CS::Animation::iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create the 'open_mouth' animation node
-  csRef<iSkeletonAnimationNodeFactory2> openMouthNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> openMouthNodeFactory =
     animPacketFactory->CreateAnimationNode ("open_mouth");
   openMouthNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("open_mouth"));
@@ -459,7 +459,7 @@ bool SintelScene::CreateAvatar ()
   csRef<iMeshWrapper> avatarMesh =
     avatarTest->engine->CreateMeshWrapper (meshFact, "sintel",
 					   avatarTest->room, csVector3 (0.0f));
-  animesh = scfQueryInterface<iAnimatedMesh> (avatarMesh->GetMeshObject ());
+  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (avatarMesh->GetMeshObject ());
 
   // Create the hairs
   hairsMesh = avatarTest->engine->CreateMeshWrapper (hairsMeshfact, "sintel_hairs",
@@ -470,7 +470,7 @@ bool SintelScene::CreateAvatar ()
 						    avatarTest->room, csVector3 (0.0f));
 
   // Start animation
-  //iSkeletonAnimNode2* rootNode =
+  //CS::Animation::iSkeletonAnimNode2* rootNode =
   //  animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
   //rootNode->Play ();
 
@@ -486,5 +486,5 @@ void SintelScene::ResetScene ()
 
 void SintelScene::UpdateStateDescription ()
 {
-  avatarTest->stateDescriptions.DeleteAll ();
+  avatarTest->hudHelper.stateDescriptions.DeleteAll ();
 }

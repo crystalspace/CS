@@ -35,7 +35,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
-//---------------------------------------------------------------------------
+//----------------------- Bullet-CS matrices and vectors conversion ----------------------------
 
 static inline csReversibleTransform BulletToCS (const btTransform& trans,
 						float inverseInternalScale)
@@ -140,26 +140,30 @@ public:
   virtual void draw3dText (const btVector3 &location, const char *textString)
   {}
 
-  void SetDebugMode (csBulletDebugMode mode)
+  void SetDebugMode (CS::Physics::Bullet::DebugMode mode)
   {
     this->mode = 0;
-    if (mode & CS_BULLET_DEBUG_COLLIDERS)
+    if (mode & CS::Physics::Bullet::DEBUG_COLLIDERS)
       this->mode |= DBG_DrawWireframe;
-    if (mode & CS_BULLET_DEBUG_AABB)
+    if (mode & CS::Physics::Bullet::DEBUG_AABB)
       this->mode |= DBG_DrawAabb;
-    if (mode & CS_BULLET_DEBUG_JOINTS)
+    if (mode & CS::Physics::Bullet::DEBUG_JOINTS)
       this->mode |= DBG_DrawConstraints | DBG_DrawConstraintLimits;
   }
 
-  csBulletDebugMode GetDebugMode ()
+  CS::Physics::Bullet::DebugMode GetDebugMode ()
   {
-    csBulletDebugMode mode = CS_BULLET_DEBUG_NOTHING;
+    CS::Physics::Bullet::DebugMode mode =
+      CS::Physics::Bullet::DEBUG_NOTHING;
     if (this->mode & DBG_DrawWireframe)
-      mode = (csBulletDebugMode) (mode | CS_BULLET_DEBUG_COLLIDERS);
+      mode = (CS::Physics::Bullet::DebugMode)
+	(mode | CS::Physics::Bullet::DEBUG_COLLIDERS);
     if (this->mode & DBG_DrawAabb)
-      mode = (csBulletDebugMode) (mode | CS_BULLET_DEBUG_AABB);
+      mode = (CS::Physics::Bullet::DebugMode)
+	(mode | CS::Physics::Bullet::DEBUG_AABB);
     if (this->mode & DBG_DrawConstraints)
-      mode = (csBulletDebugMode) (mode | CS_BULLET_DEBUG_JOINTS);
+      mode = (CS::Physics::Bullet::DebugMode)
+	(mode | CS::Physics::Bullet::DEBUG_JOINTS);
     return mode;
   }
 
@@ -208,46 +212,9 @@ public:
 public:
   csBulletMotionState (csBulletRigidBody* body,
 		       const btTransform& initialTransform,
-		       const btTransform& principalAxis)
-    : btDefaultMotionState (initialTransform), body (body),
-      inversePrincipalAxis (principalAxis.inverse ())
-  {
-    if (body->body)
-      body->body->setInterpolationWorldTransform (initialTransform);
+		       const btTransform& principalAxis);
 
-    // update attached object
-    if (!body->moveCb)
-      return;
-
-    csOrthoTransform tr = BulletToCS (initialTransform * inversePrincipalAxis,
-				      body->dynSys->inverseInternalScale);
-
-    if (body->mesh)
-      body->moveCb->Execute (body->mesh, tr);
-    if (body->light)
-      body->moveCb->Execute (body->light, tr);
-    if (body->camera)
-      body->moveCb->Execute (body->camera, tr);
-  }
-
-  virtual void setWorldTransform (const btTransform& trans)
-  {
-    btDefaultMotionState::setWorldTransform (trans);
-
-    // update attached object
-    if (!body->moveCb)
-      return;
-
-    csOrthoTransform tr = BulletToCS (trans * inversePrincipalAxis,
-				      body->dynSys->inverseInternalScale);
-
-    if (body->mesh)
-      body->moveCb->Execute (body->mesh, tr);
-    if (body->light)
-      body->moveCb->Execute (body->light, tr);
-    if (body->camera)
-      body->moveCb->Execute (body->camera, tr);
-  }
+  virtual void setWorldTransform (const btTransform& trans);
 };
 
 
@@ -260,22 +227,9 @@ class csBulletKinematicMotionState : public csBulletMotionState
 public:
   csBulletKinematicMotionState (csBulletRigidBody* body,
 		       const btTransform& initialTransform,
-		       const btTransform& principalAxis)
-    : csBulletMotionState (body, initialTransform, principalAxis),
-    principalAxis (BulletToCS (principalAxis, body->dynSys->inverseInternalScale))
-  {
-  }
+				const btTransform& principalAxis);
 
-  virtual void getWorldTransform (btTransform& trans) const
-  {
-    if (!body->kinematicCb)
-      return;
-
-    // get the body transform from the callback
-    csOrthoTransform transform;
-    body->kinematicCb->GetBodyTransform (body, transform);
-    trans = CSToBullet (principalAxis * transform, body->dynSys->internalScale);
-  }
+  virtual void getWorldTransform (btTransform& trans) const;
 };
 
 }

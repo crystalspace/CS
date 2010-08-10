@@ -11507,6 +11507,32 @@ typedef GLvoid (csAPIENTRY* csGLFLUSHMAPPEDBUFFERRANGE) (GLenum target, GLintptr
  * @{ */
 
 /** @} */
+/**\name GL_ARB_seamless_cube_map constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/seamless_cube_map.txt">http://www.opengl.org/registry/specs/ARB/seamless_cube_map.txt</a>.
+ * @{ */
+#ifndef GL_TEXTURE_CUBE_MAP_SEAMLESS
+#define GL_TEXTURE_CUBE_MAP_SEAMLESS                                 0x884F
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_seamless_cube_map functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/seamless_cube_map.txt">http://www.opengl.org/registry/specs/ARB/seamless_cube_map.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_AMD_seamless_cubemap_per_texture constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt">http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt</a>.
+ * @{ */
+
+/** @} */
+
+/**\name GL_AMD_seamless_cubemap_per_texture functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt">http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt</a>.
+ * @{ */
+
+/** @} */
 
 
 // end of definitions
@@ -17467,6 +17493,16 @@ public:
    * @{ */
 
   /** @} */
+  /**\name GL_ARB_seamless_cube_map functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/seamless_cube_map.txt">http://www.opengl.org/registry/specs/ARB/seamless_cube_map.txt</a>.
+   * @{ */
+
+  /** @} */
+  /**\name GL_AMD_seamless_cubemap_per_texture functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt">http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt</a>.
+   * @{ */
+
+  /** @} */
 
 // end of functions
 };
@@ -18030,6 +18066,12 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">GL_ARB_texture_rg</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_texture_rg(). */
   bool CS_GL_ARB_texture_rg;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/seamless_cube_map.txt">GL_ARB_seamless_cube_map</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_seamless_cube_map(). */
+  bool CS_GL_ARB_seamless_cube_map;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt">GL_AMD_seamless_cubemap_per_texture</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_AMD_seamless_cubemap_per_texture(). */
+  bool CS_GL_AMD_seamless_cubemap_per_texture;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -18219,6 +18261,8 @@ protected:
   bool tested_CS_GL_ARB_map_buffer_range;
   bool tested_CS_GL_ARB_texture_compression_rgtc;
   bool tested_CS_GL_ARB_texture_rg;
+  bool tested_CS_GL_ARB_seamless_cube_map;
+  bool tested_CS_GL_AMD_seamless_cubemap_per_texture;
 
 };
 
@@ -24940,6 +24984,64 @@ public:
     {
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_rg)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/seamless_cube_map.txt">GL_ARB_seamless_cube_map</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_seamless_cube_map. */
+  void InitGL_ARB_seamless_cube_map ()
+  {
+    if (tested_CS_GL_ARB_seamless_cube_map) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_seamless_cube_map = true;
+    const char* ext = "GL_ARB_seamless_cube_map";
+
+    char cfgkey[26 + 24 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_seamless_cube_map = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_seamless_cube_map;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_seamless_cube_map)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt">GL_AMD_seamless_cubemap_per_texture</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_AMD_seamless_cubemap_per_texture. */
+  void InitGL_AMD_seamless_cubemap_per_texture ()
+  {
+    if (tested_CS_GL_AMD_seamless_cubemap_per_texture) return;
+    if (!extstrGL) return;
+    tested_CS_GL_AMD_seamless_cubemap_per_texture = true;
+    const char* ext = "GL_AMD_seamless_cubemap_per_texture";
+
+    char cfgkey[26 + 35 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_AMD_seamless_cubemap_per_texture = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_AMD_seamless_cubemap_per_texture;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_AMD_seamless_cubemap_per_texture)
     }
     else
     {

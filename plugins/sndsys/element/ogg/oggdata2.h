@@ -67,21 +67,13 @@ struct OggStreamData
   size_t position;
 };
 
-/// A structure describing the list of callbacks used for various ogg functionality
-struct cs_ov_callbacks
-{
-  cs_ov_callbacks ();
-  size_t (*read_func) (void *ptr, size_t sz, size_t nmemb, void *datasource);
-  int    (*seek_func) (void *datasource, ogg_int64_t offset, int whence);
-  int    (*close_func)(void *datasource);
-  long   (*tell_func) (void *datasource);
-};
-
-
 /// The implementation of iSndSysData for Ogg Vorbis audio
 class SndSysOggSoundData : public SndSysBasicData
 {
 public:
+  /// A structure describing the list of callbacks used for various ogg functionality
+  static const ov_callbacks ogg_callbacks;
+  
   /// Construction requires passing an iDataBuffer which references encoded ogg vorbis audio
   SndSysOggSoundData (iBase *pParent, iDataBuffer* pDataBuffer);
   virtual ~SndSysOggSoundData ();

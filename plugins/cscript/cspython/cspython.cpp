@@ -552,9 +552,13 @@ csPtr<iScriptValue> csPython::CallBody (PyObject *py_func,
   // call function
   PyObject *py_result = PyObject_CallObject(py_func,py_args);
   if (bound_func)
+  {
     Py_DECREF(py_func);
+  }
   if (py_args)
+  {
     Py_DECREF(py_args);
+  }
   // check result and return
   if (py_result)
     return csPtr<iScriptValue>(new Value (this, py_result, false));

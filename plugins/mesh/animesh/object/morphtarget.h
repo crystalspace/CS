@@ -32,7 +32,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   class MorphTarget :
     public scfImplementation1<MorphTarget,
-			      iAnimatedMeshMorphTarget>
+			      CS::Mesh::iAnimatedMeshMorphTarget>
   {
     friend class AnimeshObject;
 

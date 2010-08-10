@@ -66,8 +66,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
     // Create a factory
     csRef<iMeshObjectFactory> fact = type->NewFactory ();
-    csRef<iAnimatedMeshFactory> amfact = 
-      scfQueryInterfaceSafe<iAnimatedMeshFactory> (fact);
+    csRef<CS::Mesh::iAnimatedMeshFactory> amfact = 
+      scfQueryInterfaceSafe<CS::Mesh::iAnimatedMeshFactory> (fact);
 
     if (!amfact)
     {
@@ -161,6 +161,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           amfact->SetBinormals (rb);
         }
         break;
+      case XMLTOKEN_TANGENTS:
+        {
+	  bool automatic = child->GetAttributeValueAsBool ("automatic", false);
+	  if (automatic)
+	    amfact->ComputeTangents ();
+        }
+        break;
       case XMLTOKEN_COLOR:
         {
           csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
@@ -182,7 +189,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           int numVerts = amfact->GetVertexCount ();
           int currInfl = 0;
 
-          csAnimatedMeshBoneInfluence* bi = amfact->GetBoneInfluences ();
+          CS::Mesh::csAnimatedMeshBoneInfluence* bi = amfact->GetBoneInfluences ();
 
           csRef<iDocumentNodeIterator> it = child->GetNodes ();
           while (it->HasNext ())
@@ -260,7 +267,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
           if (indexBuffer)
           {
-            iAnimatedMeshFactorySubMesh* smf = amfact->CreateSubMesh (indexBuffer,
+            CS::Mesh::iAnimatedMeshSubMeshFactory* smf = amfact->CreateSubMesh (indexBuffer,
               child->GetAttributeValue("name"), child->GetAttributeValueAsBool("visible", true));
             smf->SetMaterial(material);
           }
@@ -270,7 +277,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
         {
           if (!skelMgr)
           {
-            skelMgr = csQueryRegistry<iSkeletonManager2> (object_reg);
+            skelMgr = csQueryRegistry<CS::Animation::iSkeletonManager2> (object_reg);
 
             if (!skelMgr)
             {
@@ -280,7 +287,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           }
           
           const char* skelName = child->GetContentsValue ();
-          iSkeletonFactory2* skelFact = skelMgr->FindSkeletonFactory (skelName);
+          CS::Animation::iSkeletonFactory2* skelFact = skelMgr->FindSkeletonFactory (skelName);
           if (!skelFact)
           {
             synldr->ReportError (msgidFactory, child, "Could not find skeleton %s", skelName);
@@ -296,9 +303,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	break;
       case XMLTOKEN_SOCKET:
         {
-          csReversibleTransform transform;
-          BoneID bone = child->GetAttributeValueAsInt ("bone");
+	  CS::Animation::iSkeletonFactory2* skelFact = amfact->GetSkeletonFactory ();
+          if (!skelFact)
+          {
+            synldr->ReportError (msgidFactory, child, "No skeleton defined while creating socket");
+            return 0;
+          }
+
+          const char* boneName = child->GetAttributeValue ("bone");
+	  CS::Animation::BoneID bone = skelFact->FindBone (boneName);
+          if (bone == CS::Animation::InvalidBoneID)
+          {
+            synldr->ReportError (msgidFactory, child, "Could not find bone %s in skeleton", boneName);
+            return 0;
+          }
+
           const char* name = child->GetAttributeValue ("name");
+          csReversibleTransform transform;
 
           csRef<iDocumentNode> tnode = child->GetNode ("transform");
           if (tnode)
@@ -336,7 +357,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
   }
 
   bool AnimeshFactoryLoader::ParseMorphTarget (iDocumentNode* child,
-					       iAnimatedMeshFactory* amfact)
+					       CS::Mesh::iAnimatedMeshFactory* amfact)
   {
     const char* name = child->GetAttributeValue ("name");
 
@@ -367,7 +388,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       }
     }
 
-    iAnimatedMeshMorphTarget* morphTarget = amfact->CreateMorphTarget (name);
+    CS::Mesh::iAnimatedMeshMorphTarget* morphTarget = amfact->CreateMorphTarget (name);
     morphTarget->SetVertexOffsets (offsetsBuffer);
     morphTarget->Invalidate();
     return true;
@@ -414,7 +435,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     static const char* msgid = "crystalspace.animeshloader";
 
     csRef<iMeshObject> mesh;
-    csRef<iAnimatedMesh> ammesh;
+    csRef<CS::Mesh::iAnimatedMesh> ammesh;
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
@@ -437,8 +458,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
             return 0;
           }
 
-          csRef<iAnimatedMeshFactory> amfact = 
-            scfQueryInterface<iAnimatedMeshFactory> (fact->GetMeshObjectFactory ());
+          csRef<CS::Mesh::iAnimatedMeshFactory> amfact = 
+            scfQueryInterface<CS::Mesh::iAnimatedMeshFactory> (fact->GetMeshObjectFactory ());
           if (!amfact)
           {
             synldr->ReportError (msgid, child, 
@@ -447,7 +468,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           }
 
           mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          ammesh = scfQueryInterface<iAnimatedMesh> (mesh);
+          ammesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (mesh);
           if (!ammesh)
           {
             synldr->ReportError (msgid, child, 
@@ -481,7 +502,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
         {
           if (!skelMgr)
           {
-            skelMgr = csQueryRegistry<iSkeletonManager2> (object_reg);
+            skelMgr = csQueryRegistry<CS::Animation::iSkeletonManager2> (object_reg);
 
             if (!skelMgr)
             {
@@ -491,14 +512,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           }      
 
           const char* skelName = child->GetContentsValue ();
-          iSkeletonFactory2* skelFact = skelMgr->FindSkeletonFactory (skelName);
+          CS::Animation::iSkeletonFactory2* skelFact = skelMgr->FindSkeletonFactory (skelName);
           if (!skelFact)
           {
             synldr->ReportError (msgid, child, "Could not find skeleton %s", skelName);
             return 0;
           }
 
-          csRef<iSkeleton2> skeleton = skelFact->CreateSkeleton ();
+          csRef<CS::Animation::iSkeleton2> skeleton = skelFact->CreateSkeleton ();
           ammesh->SetSkeleton (skeleton);
         }
         break;
@@ -506,7 +527,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
         {
           if (!skelMgr)
           {
-            skelMgr = csQueryRegistry<iSkeletonManager2> (object_reg);
+            skelMgr = csQueryRegistry<CS::Animation::iSkeletonManager2> (object_reg);
 
             if (!skelMgr)
             {
@@ -515,7 +536,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
             }
           }
 
-          iSkeleton2* skeleton = ammesh->GetSkeleton ();
+          CS::Animation::iSkeleton2* skeleton = ammesh->GetSkeleton ();
           if (!skeleton)
           {
             synldr->ReportError (msgid, child, "Mesh does not have a skeleton");
@@ -523,14 +544,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           }
 
           const char* packetName = child->GetContentsValue ();
-          iSkeletonAnimPacketFactory2* packetFact = skelMgr->FindAnimPacketFactory (packetName);
+          CS::Animation::iSkeletonAnimPacketFactory2* packetFact = skelMgr->FindAnimPacketFactory (packetName);
           if (!packetFact)
           {
             synldr->ReportError (msgid, child, "Could not find animation packet %s", packetName);
             return 0;
           }
 
-          csRef<iSkeletonAnimPacket2> packet = packetFact->CreateInstance (skeleton);
+          csRef<CS::Animation::iSkeletonAnimPacket2> packet = packetFact->CreateInstance (skeleton);
           skeleton->SetAnimationPacket (packet);
         }
         break;

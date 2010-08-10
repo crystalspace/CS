@@ -32,8 +32,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
   class PriorityNodeFactory :
     public scfImplementation2<PriorityNodeFactory,
-                              iSkeletonPriorityNodeFactory2,
-                              scfFakeInterface<iSkeletonAnimNodeFactory2> >,
+                              CS::Animation::iSkeletonPriorityNodeFactory2,
+                              scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory2> >,
     public BaseFactoryChildren
   {
   public:
@@ -41,18 +41,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
     PriorityNodeFactory (const char* name);
 
-    //-- iSkeletonPriorityNodeFactory2
-    virtual void AddNode (iSkeletonAnimNodeFactory2* node, unsigned int priority);
+    //-- CS::Animation::iSkeletonPriorityNodeFactory2
+    virtual void AddNode (CS::Animation::iSkeletonAnimNodeFactory2* node, unsigned int priority);
     virtual void SetNodePriority (uint node, unsigned int priority);  
-    virtual iSkeletonAnimNodeFactory2* GetNode (uint node);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetNode (uint node);
     virtual uint GetNodeCount () const;
     virtual void ClearNodes ();
 
-    //-- iSkeletonAnimationNodeFactory2
-    virtual csPtr<iSkeletonAnimNode2> CreateInstance (
-      iSkeletonAnimPacket2* packet, iSkeleton2* skeleton);
+    //-- CS::Animation::iSkeletonAnimationNodeFactory2
+    virtual csPtr<CS::Animation::iSkeletonAnimNode2> CreateInstance (
+      CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton);
     virtual const char* GetNodeName () const;
-    virtual iSkeletonAnimNodeFactory2* FindNode (const char* name);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* FindNode (const char* name);
 
   private:
     csString name;
@@ -63,8 +63,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   class PriorityNode :
     public scfImplementation2<PriorityNode,
-                              iSkeletonPriorityNode2,
-                              scfFakeInterface<iSkeletonAnimNode2> >,
+                              CS::Animation::iSkeletonPriorityNode2,
+                              scfFakeInterface<CS::Animation::iSkeletonAnimNode2> >,
     public BaseNodeChildren
   {
   public:
@@ -72,10 +72,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
     PriorityNode (PriorityNodeFactory* factory);
 
-    //-- iSkeletonPriorityNode2
+    //-- CS::Animation::iSkeletonPriorityNode2
     virtual void SetNodePriority (uint node, unsigned int priority);  
 
-    //-- iSkeletonAnimationNode2
+    //-- CS::Animation::iSkeletonAnimationNode2
     virtual void Play ();
     virtual void Stop ();
     virtual void SetPlaybackPosition (float time);
@@ -83,13 +83,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual float GetDuration () const;
     virtual void SetPlaybackSpeed (float speed);
     virtual float GetPlaybackSpeed () const;
-    virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
+    virtual void BlendState (CS::Animation::csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
-    virtual iSkeletonAnimNodeFactory2* GetFactory () const;
-    virtual iSkeletonAnimNode2* FindNode (const char* name);
-    virtual void AddAnimationCallback (iSkeletonAnimCallback2* callback);
-    virtual void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetFactory () const;
+    virtual CS::Animation::iSkeletonAnimNode2* FindNode (const char* name);
+    virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
+    virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
 
   private:
     void UpdateIndexList ();
@@ -104,8 +104,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   //----------------------------------------
   class RandomNodeFactory :
     public scfImplementation2<RandomNodeFactory,
-                              iSkeletonRandomNodeFactory2,
-                              scfFakeInterface<iSkeletonAnimNodeFactory2> >,
+                              CS::Animation::iSkeletonRandomNodeFactory2,
+                              scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory2> >,
     public BaseFactoryChildren
   {
   public:
@@ -113,19 +113,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
     RandomNodeFactory (const char* name);
 
-    //-- iSkeletonPriorityNodeFactory2
-    virtual void AddNode (iSkeletonAnimNodeFactory2* node, float probability);
+    //-- CS::Animation::iSkeletonPriorityNodeFactory2
+    virtual void AddNode (CS::Animation::iSkeletonAnimNodeFactory2* node, float probability);
     virtual void SetNodeProbability (uint node, float probability);  
     virtual void SetAutomaticSwitch (bool automatic);
-    virtual iSkeletonAnimNodeFactory2* GetNode (uint node);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetNode (uint node);
     virtual uint GetNodeCount () const;
     virtual void ClearNodes ();
 
-    //-- iSkeletonAnimationNodeFactory2
-    virtual csPtr<iSkeletonAnimNode2> CreateInstance (
-      iSkeletonAnimPacket2* packet, iSkeleton2* skeleton);
+    //-- CS::Animation::iSkeletonAnimationNodeFactory2
+    virtual csPtr<CS::Animation::iSkeletonAnimNode2> CreateInstance (
+      CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton);
     virtual const char* GetNodeName () const;
-    virtual iSkeletonAnimNodeFactory2* FindNode (const char* name);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* FindNode (const char* name);
 
   private:
     void BuildAccumList ();
@@ -141,8 +141,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   class RandomNode :
     public scfImplementation2<RandomNode,
-                              iSkeletonRandomNode2,
-                              scfFakeInterface<iSkeletonAnimNode2> >,
+                              CS::Animation::iSkeletonRandomNode2,
+                              scfFakeInterface<CS::Animation::iSkeletonAnimNode2> >,
     public BaseNodeChildren
   {
   public:
@@ -150,11 +150,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
     RandomNode (RandomNodeFactory* factory);
 
-    //-- iSkeletonPriorityNode2
+    //-- CS::Animation::iSkeletonPriorityNode2
     virtual void Switch ();
-    virtual iSkeletonAnimNode2* GetCurrentNode () const;
+    virtual CS::Animation::iSkeletonAnimNode2* GetCurrentNode () const;
 
-    //-- iSkeletonAnimationNode2
+    //-- CS::Animation::iSkeletonAnimationNode2
     virtual void Play ();
     virtual void Stop ();
     virtual void SetPlaybackPosition (float time);
@@ -162,18 +162,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual float GetDuration () const;
     virtual void SetPlaybackSpeed (float speed);
     virtual float GetPlaybackSpeed () const;
-    virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
+    virtual void BlendState (CS::Animation::csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
-    virtual iSkeletonAnimNodeFactory2* GetFactory () const;
-    virtual iSkeletonAnimNode2* FindNode (const char* name);
-    virtual void AddAnimationCallback (iSkeletonAnimCallback2* callback);
-    virtual void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetFactory () const;
+    virtual CS::Animation::iSkeletonAnimNode2* FindNode (const char* name);
+    virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
+    virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
 
     //-- BaseNodeChildren
-    virtual void AnimationFinished (iSkeletonAnimNode2* node);
-    virtual void PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying);
-    virtual void DurationChanged (iSkeletonAnimNode2* node);
+    virtual void AnimationFinished (CS::Animation::iSkeletonAnimNode2* node);
+    virtual void PlayStateChanged (CS::Animation::iSkeletonAnimNode2* node, bool isPlaying);
+    virtual void DurationChanged (CS::Animation::iSkeletonAnimNode2* node);
 
   private:
     size_t currentNode;

@@ -1,7 +1,6 @@
 SubDir TOP scripts ;
 
 SubInclude TOP scripts cs-config ;
-SubInclude TOP scripts hammer ;
 SubInclude TOP scripts jamtemplate ;
 SubInclude TOP scripts java ;
 SubInclude TOP scripts maketemplate ;

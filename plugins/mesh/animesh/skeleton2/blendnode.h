@@ -33,8 +33,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
   class BlendNodeFactory :
     public scfImplementation2<BlendNodeFactory,
-                              iSkeletonBlendNodeFactory2,
-                              scfFakeInterface<iSkeletonAnimNodeFactory2> >,
+                              CS::Animation::iSkeletonBlendNodeFactory2,
+                              scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory2> >,
     public BaseFactoryChildren
   {
   public:
@@ -42,21 +42,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
     BlendNodeFactory (const char* name);
 
-    //-- iSkeletonBlendNodeFactory2
-    virtual void AddNode (iSkeletonAnimNodeFactory2* node, float weight);
+    //-- CS::Animation::iSkeletonBlendNodeFactory2
+    virtual void AddNode (CS::Animation::iSkeletonAnimNodeFactory2* node, float weight);
     virtual void SetNodeWeight (uint node, float weight);
     virtual void NormalizeWeights ();
-    virtual iSkeletonAnimNodeFactory2* GetNode (uint node);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetNode (uint node);
     virtual uint GetNodeCount () const;
     virtual void ClearNodes ();
     virtual void SetSynchronizationMode (CS::Animation::SynchronizationMode mode);
     virtual CS::Animation::SynchronizationMode GetSynchronizationMode () const;
 
-    //-- iSkeletonAnimationNodeFactory2
-    virtual csPtr<iSkeletonAnimNode2> CreateInstance (
-      iSkeletonAnimPacket2* packet, iSkeleton2* skeleton);
+    //-- CS::Animation::iSkeletonAnimationNodeFactory2
+    virtual csPtr<CS::Animation::iSkeletonAnimNode2> CreateInstance (
+      CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton);
     virtual const char* GetNodeName () const;
-    virtual iSkeletonAnimNodeFactory2* FindNode (const char* name);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* FindNode (const char* name);
 
   private:    
     csString name;
@@ -67,8 +67,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   class BlendNode : 
     public scfImplementation2<BlendNode,
-                              iSkeletonBlendNode2,
-                              scfFakeInterface<iSkeletonAnimNode2> >,
+                              CS::Animation::iSkeletonBlendNode2,
+                              scfFakeInterface<CS::Animation::iSkeletonAnimNode2> >,
     public BaseNodeChildren
   {
   public:
@@ -76,11 +76,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
     BlendNode (BlendNodeFactory* factory);
 
-    //-- iSkeletonBlendNode2
+    //-- CS::Animation::iSkeletonBlendNode2
     virtual void SetNodeWeight (uint node, float weight);
     virtual void NormalizeWeights ();
 
-    //-- iSkeletonAnimationNode2
+    //-- CS::Animation::iSkeletonAnimationNode2
     virtual void Play ();
     virtual void Stop ();
     virtual void SetPlaybackPosition (float time);
@@ -88,17 +88,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual float GetDuration () const;
     virtual void SetPlaybackSpeed (float speed);
     virtual float GetPlaybackSpeed () const;
-    virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
+    virtual void BlendState (CS::Animation::csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
-    virtual iSkeletonAnimNodeFactory2* GetFactory () const;
-    virtual iSkeletonAnimNode2* FindNode (const char* name);
-    virtual void AddAnimationCallback (iSkeletonAnimCallback2* callback);
-    virtual void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
+    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetFactory () const;
+    virtual CS::Animation::iSkeletonAnimNode2* FindNode (const char* name);
+    virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
+    virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
   
     //-- BaseNodeChildren
-    virtual void PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying);
-    virtual void DurationChanged (iSkeletonAnimNode2* node);
+    virtual void PlayStateChanged (CS::Animation::iSkeletonAnimNode2* node, bool isPlaying);
+    virtual void DurationChanged (CS::Animation::iSkeletonAnimNode2* node);
 
   private:    
     void SynchronizeSubnodes ();

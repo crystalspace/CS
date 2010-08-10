@@ -71,6 +71,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     bool CompatibleParams (iDocumentNode* params);
     csRef<iString> QueryInputTag (const char* location, 
       iDocumentNode* blockNodes);
+    void SetDescription (const char*) {}
   };
 
 }
