@@ -798,8 +798,12 @@ bool csGLGraphics3D::Open ()
 
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));
-  if (verbosemgr) verbose = verbosemgr->Enabled ("renderer");
-  if (!verbose) bugplug = 0;
+
+  if (verbosemgr)
+    verbose = verbosemgr->Enabled ("renderer");
+
+  if (verbose)
+    bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
   textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias", 0.0f);
   if (verbose)
@@ -3886,8 +3890,6 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
     q->RegisterListener (eventHandler2, events2);
   }
   // We subscribe to csevCanvasResize after G2D has been created
-  
-  bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
   strings = csQueryRegistryTagInterface<iShaderVarStringSet> (
     object_reg, "crystalspace.shader.variablenameset");
