@@ -4,12 +4,14 @@
     <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
     <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
   </plugins>
-  <shaders/>
   <textures>
     <texture name='krystal_body_h'>
       <file>/lib/krystal/krystal_body_h.png</file>
     </texture>
-    <texture name='krystal_spec'>
+    <texture name='krystal_body_nor'>
+      <file>/lib/krystal/krystal_body_nor.png</file>
+    </texture>
+    <texture name='krystal_body_spec'>
       <file>/lib/krystal/krystal_body_spec.png</file>
     </texture>
     <texture name='krystal_skull'>
@@ -19,7 +21,8 @@
   <materials>
     <material name='krystal_material'>
       <texture>krystal_body_h</texture>
-      <shadervar type="texture" name="tex specular">krystal_spec</shadervar>
+      <shadervar type="texture" name="tex normal">krystal_body_nor</shadervar>
+      <shadervar type="texture" name="tex specular">krystal_body_spec</shadervar>
     </material>
     <material name='skull_material'>
       <texture>krystal_skull</texture>
