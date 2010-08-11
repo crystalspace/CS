@@ -18,6 +18,7 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #ifndef __KRYSTAL_H__
 #define __KRYSTAL_H__
 
@@ -54,16 +55,11 @@ private:
   HairTest* hairTest;
 
   // Ragdoll node related
-  bool krystalDead;
   csRef<CS::Animation::iSkeletonRagdollNode2> ragdollNode;
   CS::Animation::iBodyChain* bodyChain;
-  CS::Animation::iBodyChain* hairChain;
 
   // Krystal's hairs & skirt (soft bodies)
-  csRef<iMeshWrapper> hairsMesh;
   csRef<iMeshWrapper> skirtMesh;
-  csRef<CS::Physics::Bullet::iSoftBody> hairsBody;
-  csRef<CS::Physics::Bullet::iSoftBody> skirtBody;
 
   // Hair physics
   bool hairPhysicsEnabled;

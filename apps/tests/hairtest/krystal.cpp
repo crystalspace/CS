@@ -34,9 +34,7 @@ KrystalScene::KrystalScene (HairTest* hairTest)
   hairTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
   
   if (hairTest->physicsEnabled)
-  {
     hairTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
-  }
 
   hairTest->hudHelper.keyDescriptions.Push ("e: stop/start fur physics");
 }
@@ -49,24 +47,9 @@ KrystalScene::~KrystalScene ()
     csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
     hairTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
   }
-  /*
-  for (size_t i = 0; i < hairsBody.GetSize(); i ++)
-  hairTest->bulletDynamicSystem->RemoveSoftBody (hairsBody.Get(i));
-
-  hairsBody.DeleteAll();
-  */
-
-  if (hairsMesh)
-    hairTest->engine->RemoveObject (hairsMesh);
-
-  if (hairsBody)
-    hairTest->bulletDynamicSystem->RemoveSoftBody (hairsBody);
 
   if (skirtMesh)
     hairTest->engine->RemoveObject (skirtMesh);
-
-  if (skirtBody)
-    hairTest->bulletDynamicSystem->RemoveSoftBody (skirtBody);
 }
 
 csVector3 KrystalScene::GetCameraStart ()
@@ -127,9 +110,6 @@ csVector3 KrystalScene::GetCameraTarget ()
 
 float KrystalScene::GetSimulationSpeed ()
 {
-  if (krystalDead)
-    return 0.3f;
-
   return 1.0f;
 }
 
@@ -202,11 +182,6 @@ bool KrystalScene::CreateAvatar ()
   rc = hairTest->loader->Load ("/lib/krystal/krystal_hairs.xml");
   if (!rc.success)
     return hairTest->ReportError ("Can't load Krystal's hairs library file!");
-
-  csRef<iMeshFactoryWrapper> hairsMeshFact =
-    hairTest->engine->FindMeshFactory ("krystal_hairs");
-  if (!hairsMeshFact)
-    return hairTest->ReportError ("Can't find Krystal's hairs mesh factory!");  
 
   // Load Krystal's skirt
   rc = hairTest->loader->Load ("/lib/krystal/krystal_skirt.xml");
@@ -320,9 +295,9 @@ bool KrystalScene::CreateAvatar ()
   
   randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
-  //randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
+  randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle04NodeFactory, 1.0f);
-  //randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
+  randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
   randomNodeFactory->AddNode (standNodeFactory, 1.0f);
   
@@ -350,14 +325,6 @@ bool KrystalScene::CreateAvatar ()
     // Create the mesh of the skirt
     skirtMesh = hairTest->engine->CreateMeshWrapper
       (skirtMeshFact, "krystal_skirt", hairTest->room, csVector3 (0.0f));
-
-    // Create the geometry for the hairs
-    csRef<iGeneralFactoryState> hairsFactoryState =
-      scfQueryInterface<iGeneralFactoryState> (hairsMeshFact->GetMeshObjectFactory ());
-    
-    // Create the mesh of the hairs
-//     hairsMesh = hairTest->engine->CreateMeshWrapper
-//     (hairsMeshFact, "krystal_hairs", hairTest->room, csVector3 (0.0f));
   }
 
   else
@@ -379,7 +346,6 @@ bool KrystalScene::CreateAvatar ()
   {
     ragdollNode =
       scfQueryInterface<CS::Animation::iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
-//     ragdollNode->SetAnimatedMesh (animesh);
 
     // Start the ragdoll animation node in order to have the rigid bodies created
     ragdollNode->Play ();
@@ -445,40 +411,6 @@ bool KrystalScene::CreateAvatar ()
   light->GetMovable()->Transform(matrixY);
   hairTest->room->GetLights()->Add (light);
 
-  // Add plane
-//   csRef<iMeshFactoryWrapper> planeFactory = hairTest->engine->CreateMeshFactory (
-//     "crystalspace.mesh.object.genmesh", "planeFactory");
-// 
-//   csRef<iGeneralFactoryState> planeFactoryState = 
-//     scfQueryInterface<iGeneralFactoryState> ( planeFactory->GetMeshObjectFactory ());
-// 
-//   planeFactoryState -> SetVertexCount ( 4 );
-//   planeFactoryState -> SetTriangleCount ( 2 );
-// 
-//   csVector3 *vbuf = planeFactoryState->GetVertices (); 
-//   csTriangle *ibuf = planeFactoryState->GetTriangles ();
-// 
-//   vbuf[0] = csVector3(-10, 0, -10);
-//   vbuf[1] = csVector3(10, 0, -10);
-//   vbuf[2] = csVector3(10, 0, 10);
-//   vbuf[3] = csVector3(-10, 0, 10);
-// 
-//   ibuf[0] = csTriangle(0, 2, 1);
-//   ibuf[1] = csTriangle(3, 2, 0);
-// 
-//   planeFactoryState -> CalculateNormals();
-//   planeFactoryState -> Invalidate();
-// 
-//   // Make a material
-//   csRef<iMeshWrapper> planeMeshWrapper = hairTest->engine->CreateMeshWrapper 
-//     (planeFactory, "plane", hairTest->room, csVector3 (0, 0, 0));
-// 
-//   csRef<iMaterialWrapper> planeMaterialWrapper = 
-//     CS::Material::MaterialBuilder::CreateColorMaterial
-//     (hairTest->object_reg,"planeMaterial",csColor(0,0,1));
-// 
-//   planeMeshWrapper->GetMeshObject()->SetMaterialWrapper(planeMaterialWrapper);
-
   // Start animation
   rootNode->Play ();
 
@@ -497,8 +429,6 @@ void KrystalScene::ResetScene ()
     animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->SetTransform
       (csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
     animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->UpdateMove ();
-
-    krystalDead = false;
 
     // Set the ragdoll state of the 'body' chain as kinematic
     ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_KINEMATIC);

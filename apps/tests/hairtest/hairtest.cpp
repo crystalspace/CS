@@ -17,13 +17,6 @@
 */
 
 #include "cssysdef.h"
-#include "csgeom/plane3.h"
-
-#include "csutil/custom_new_disable.h"
-#include <CEGUI.h>
-#include <CEGUIWindowManager.h>
-#include <CEGUILogger.h>
-#include "csutil/custom_new_enable.h"
 
 #include "hairtest.h"
 #include "krystal.h"
@@ -91,15 +84,7 @@ void HairTest::Frame ()
   if (avatarScene->HasPhysicalObjects ()
     && dynamicsDebugMode == DYNDEBUG_BULLET)
     bulletDynamicSystem->DebugDraw (view);
-  /*
-  for (size_t i = 0; i < bulletDynamicSystem->GetSoftBodyCount (); i++)
-  {
-  iBulletSoftBody* softBody = bulletDynamicSystem->GetSoftBody (i);
-  // Ropes are characterized by the fact that they have no triangle
-  if (!softBody->GetTriangleCount ())
-  softBody->DebugDraw (view);
-  }
-  */
+
   cegui->Render ();
 }
 
@@ -362,7 +347,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
 
   if (!svStrings) 
   {
-    printf ("No SV names string set!\n");
+    ReportError ("No SV names string set!\n");
     return false;
   }
 

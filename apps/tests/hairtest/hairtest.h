@@ -15,26 +15,13 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #ifndef __HAIRTEST_H__
 #define __HAIRTEST_H__
 
 #include "crystalspace.h"
 
-#include "csutil/custom_new_disable.h"
-#include <CEGUI.h>
-#include "csutil/custom_new_enable.h"
-
-#include "cstool/csdemoapplication.h"
-#include "imesh/animesh.h"
-#include "imesh/ragdoll.h"
-#include "imesh/lookat.h"
-#include "imesh/basicskelanim.h"
-#include "ivaria/dynamics.h"
-#include "ivaria/bullet.h"
-#include "ivaria/dynamicsdebug.h"
-
 #include "imesh/furmesh.h"
-
 #include "ivaria/icegui.h"
 
 #define DYNDEBUG_NONE 1
@@ -157,9 +144,9 @@ public:
   // Declare the name of this event handler.
   CS_EVENTHANDLER_NAMES("application.hairtest")
 
-    /* Declare that we're not terribly interested in having events
-    delivered to us before or after other modules, plugins, etc. */
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
+  /* Declare that we're not terribly interested in having events
+  delivered to us before or after other modules, plugins, etc. */
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __HAIRTEST_H__
