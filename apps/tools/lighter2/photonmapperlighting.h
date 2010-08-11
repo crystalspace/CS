@@ -125,13 +125,19 @@ namespace lighter
     static csVector3 SpotlightDir(const csVector3 &dir, const float cosTheta);
 
     /**
+     *DirectionalLightScatter
+     *     Generate a point from a circular plane around the position of 
+     * spotlight from where to emit the photon
+     **/
+    static csVector3 DirectionalLightScatter(const csVector3 &dir, const float spRadius,const csVector3 pos);
+    /**
      * EqualScatter
-     *    This funciton will compute a random direction in the hemisphere
+     *    This function will compute a random direction in the hemisphere
      * around the vector n (which should be the surface normal at the hit
      * point).  The photon should be reflected in this direction to continue
      * photon tracing.  There is no weighting and all directions around
      * the hemisphere have an equal chance of occuring.
-     * /param n - The surface normal at the phontons hit point
+     * /param n - The surface normal at the photons hit point
      **/
     static csVector3 EqualScatter(const csVector3 &n);
 
