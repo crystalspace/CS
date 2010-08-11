@@ -410,7 +410,7 @@ float LodGen::ErrorMetricPrecise(const WorkMesh& k) const
   return sum;
 }
 
-float LodGen::ErrorMetricFast(const WorkMesh& k, int start_index) const
+float LodGen::ErrorMetricFastOld(const WorkMesh& k, int start_index) const
 {
   float s, t, d2;
   float sum = 0.0;
@@ -468,61 +468,136 @@ float LodGen::ErrorMetricFast(const WorkMesh& k, int start_index) const
   return sum;
 }
 
-/*
-// TODO
-float LodGen::SumOfSquareDist(const WorkMesh& k, int start_index) const
+float LodGen::ErrorMetricFast(const WorkMesh& k, int start_index) const
 {
   float s, t, d2;
   float sum = 0.0;
+  // Current window
   const SlidingWindow& sw = k.GetLastWindow();
+  // Window before the collapse
   const SlidingWindow& sw2 = k.sliding_windows[k.sliding_windows.GetSize()-2];
+  // First window
   const SlidingWindow& sw0 = k.sliding_windows[0];
-  assert(start_index == sw2.end_index);
-  csArray<csVector3> verts;
-  csVector3 c(0.0, 0.0, 0.0);
-  if (sw2.end_index < sw.end_index)
+  // Sanity check
+  CS_ASSERT(start_index == sw2.start_index);
+  // Put all vertices of the new and collapsed triangles in vert_idxs
+  csArray<int> vert_idxs;
+  for (int i = sw2.end_index; i < sw.end_index; i++) // new triangles
   {
-    for (int i = sw2.end_index; i < sw.end_index; i++)
-    {
-      const csTriangle& tri = k.GetTriangle(i);
-      for (int j = 0; j < 3; j++)
-        verts.Push(vertices[tri[j]]);
-    }
+    const csTriangle& tri = k.GetTriangle(i);
+    for (int j = 0; j < 3; j++)
+      vert_idxs.PushSmart(tri[j]);
   }
-  else
+  for (int i = sw2.start_index; i < sw.start_index; i++) // collapsed triangles
   {
-    assert(sw2.start_index < sw.start_index);
-    for (int i = sw2.start_index; i < sw.start_index; i++)
-    {
-      const csTriangle& tri = k.GetTriangle(i);
-      for (int j = 0; j < 3; j++)
-        verts.Push(vertices[tri[j]]);
-    }
+    const csTriangle& tri = k.GetTriangle(i);
+    for (int j = 0; j < 3; j++)
+      vert_idxs.PushSmart(tri[j]);
   }
   
-  for (int i = 0; i < verts.GetSize(); i++)
-    c += verts[i];
-  c /= (float)verts.GetSize();
+  // Find the center of the point cloud (c) and its radius (r2)
+  csVector3 c(0.0, 0.0, 0.0);
+  for (size_t i = 0; i < vert_idxs.GetSize(); i++)
+    c += vertices[vert_idxs[i]];
+  c /= (float)vert_idxs.GetSize();
   float r2 = 0.0;
-  for (int i = 0; i < verts.GetSize(); i++)
+  for (size_t i = 0; i < vert_idxs.GetSize(); i++)
   {
-    float r2b = (verts[i]-c).SquaredNorm();
+    float r2b = (vertices[vert_idxs[i]]-c).SquaredNorm();
     if (r2b > r2)
       r2 = r2b;
   }
-    
-  csArray<int> ntris;
+  
+  // Increase the radius to catch more triangles. Improves quality.
+  r2 *= 2.0; // equivalent to multiplying r by sqrt(2)
+
+  // Put all triangles of the original mesh that fall inside the radius
+  // in the list of triangles to test (test_tris0)
+  csArray<int> test_tris0;
   for (int i = sw0.start_index; i < sw0.end_index; i++)
   {
     const csTriangle& tri = k.GetTriangle(i);
-    csVector3 b = (vertices[tri[0]] + vertices[tri[1]] + vertices[tri[2]]) / 3.0;
-    if ((b-c).SquaredNorm() <= r2)
-      ntris.Push(i);
+    for (int j = 0; j < 3; j++)
+    {
+      if ((vertices[tri[j]]-c).SquaredNorm() <= r2)
+      {
+        test_tris0.Push(i);
+        break;
+      }
+    }
+  }
+
+  // Same for the current mesh (test_tris)
+  csArray<int> test_tris;
+  for (int i = sw.start_index; i < sw.end_index; i++)
+  {
+    const csTriangle& tri = k.GetTriangle(i);
+    for (int j = 0; j < 3; j++)
+    {
+      if ((vertices[tri[j]]-c).SquaredNorm() <= r2)
+      {
+        test_tris.Push(i);
+        break;
+      }
+    }
   }
   
-  for (int i = 0; i < ntris.
+  // If there are no triangles in either the original or current mesh
+  // that falls into the radius, we can't compute a distance metric.
+  // Assume it is equal to the radius and return that value.
+  if (test_tris0.GetSize() == 0 || test_tris.GetSize() == 0)
+    return sqrtf(r2);
+
+  int samples_per_triangle = 10;
+  int count = 0;
+  
+  srand(test_tris.GetSize()+test_tris0.GetSize());
+
+  // For each triangle in test_tris0, test its distance to all triangles
+  // in test_tris
+  for (size_t i = 0; i < test_tris0.GetSize(); i++)
+  {
+    const csTriangle& tri0 = k.GetTriangle(test_tris0[i]);
+    const csVector3& q0 = vertices[tri0[0]];
+    const csVector3& q1 = vertices[tri0[1]];
+    const csVector3& q2 = vertices[tri0[2]];
+    for (int m = 0; m < samples_per_triangle; m++)
+    {
+      // Find a sample point inside the triangle with an uniform distribution
+      float r0, r1;
+      do
+      {
+        r0 = (float)rand() / RAND_MAX;
+        r1 = (float)rand() / RAND_MAX;
+      }
+      while (r0 + r1 > 1.0);
+      float r2 = 1.0 - r0 - r1;
+      assert(r0 + r1 + r2 == 1.0);
+      csVector3 b = r0 * q0 + r1 * q1 + r2 * q2;
+      float min_d2 = FLT_MAX;
+      // Find the smallest distance between the sample point and triangles in test_tris
+      for (size_t j = 0; j < test_tris.GetSize(); j++)
+      {
+        const csTriangle& tri = k.GetTriangle(test_tris[j]);
+        const csVector3& p0 = vertices[tri[0]];
+        const csVector3& p1 = vertices[tri[1]];
+        const csVector3& p2 = vertices[tri[2]];
+        PointTriangleDistance(b, p0, p1, p2, s, t, d2);
+        if (d2 < min_d2)
+        {
+          min_d2 = d2;
+          if (min_d2 == 0.0)
+            break;
+        }
+      }
+      assert(min_d2 < FLT_MAX);
+      sum += min_d2;
+      count++;
+    }
+  }
+  sum /= count;
+  return sum;
 }
-*/    
 
 void LodGen::RemoveTriangleFromIncidentTris(WorkMesh& k, size_t itri)
 {
@@ -700,7 +775,7 @@ void LodGen::GenerateLODs()
   k.sliding_windows.Push(sw_initial);
   int collapse_counter = 0;
   // When to absolutely end the collapses
-  size_t min_num_triangles = triangles.GetSize() / 6;
+  size_t min_num_triangles = triangles.GetSize() / 5;
   // When to perform a replication
   size_t min_triangles_for_replication = triangles.GetSize() / 2;
   // 'edges' will hold our list of edges to walk through.
@@ -717,7 +792,8 @@ void LodGen::GenerateLODs()
     //  break;
     //counter++;
     float min_d = FLT_MAX;
-    int min_v0, min_v1;    
+    int min_v0 = -1;
+    int min_v1 = -1;    
     SlidingWindow sw = k.GetLastWindow();
     edges.SetSize(0);
     // Add to 'edges' all edges whose origin vertex is not coincident with another one
@@ -729,7 +805,11 @@ void LodGen::GenerateLODs()
           edges.PushSmart(Edge(tri[iv], tri[(iv+1)%3]));
     }
     // This speeds up the algorithm
-    size_t edge_step = edges.GetSize() / 5 + 1;
+    size_t edge_step;
+    if (error_metric_type == ERROR_METRIC_FAST)
+      edge_step = edges.GetSize() / 20 + 1; // Test ~20 edges out of the set
+    else
+      edge_step = edges.GetSize() / 5 + 1; // Test ~5 edges out of the set
     edge_start = (edge_start + 1) % edge_step;
     
     // For each edge
@@ -762,14 +842,16 @@ void LodGen::GenerateLODs()
     {
       // If we couldn't collapse now and couldn't collapse last time either, end.
       Message("No more triangles to collapse\n");
+      // TODO: Undo last replication
       break;
     }
     if (min_d != FLT_MAX)
     {
       // Found the best vertices to collapse: 'min_v0', 'min_v1'.
       // Collapse them.
+      CS_ASSERT(min_v0 != -1 && min_v1 != -1);
       bool result = Collapse(k, min_v0, min_v1);
-      assert(result);
+      CS_ASSERT(result);
       sw = k.GetLastWindow();
       Message("t: %d d: %g v: %d -> %d\n", sw.end_index-sw.start_index, min_d, min_v0, min_v1);
       // For debug purposes
@@ -793,13 +875,25 @@ void LodGen::GenerateLODs()
       Message("Reached minimum number of triangles\n");
       break;
     }
+    
     // Is it time to replicate?
-    if (curr_num_triangles < min_triangles_for_replication || min_d == FLT_MAX)
+    bool replicate = false;
+    if (curr_num_triangles < min_triangles_for_replication)
+    {
+      Message("Replicating (reached minimum): tris=%d\n", curr_num_triangles);
+      replicate = true;
+    }
+    if (min_d == FLT_MAX)
+    {
+      Message("Replicating (no more collapses): tris=%d\n", curr_num_triangles);
+      replicate = true;
+    }
+
+    if (replicate)
     {
       // Replicate index buffer
       if (min_d == FLT_MAX)
         could_not_collapse = true;
-      Message("Replicating: %d\n", curr_num_triangles);
       sw.start_index += curr_num_triangles;
       sw.end_index += curr_num_triangles;
       k.SetLastWindow(sw);
@@ -815,6 +909,6 @@ void LodGen::GenerateLODs()
     ordered_tris.Push(k.GetTriangle(i));
   for (unsigned int i = 0; i < ordered_tris.GetSize(); i++)
     for (unsigned int j = 0; j < 3; j++)
-      assert(ordered_tris[i][j] >= 0 && ordered_tris[i][j] < (int)vertices.GetSize());
+      CS_ASSERT(ordered_tris[i][j] >= 0 && ordered_tris[i][j] < (int)vertices.GetSize());
   Message("End\n");
 }

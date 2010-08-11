@@ -149,6 +149,8 @@ protected:
    * Quicker and less precise error metric.
    * Examines only modified triangles at each step.
    */
+  float ErrorMetricFastOld(const WorkMesh& k, int start_index) const;
+
   float ErrorMetricFast(const WorkMesh& k, int start_index) const;
 
   /**
