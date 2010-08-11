@@ -35,8 +35,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     materialWrapper(0), object_reg(object_reg), object_factory(object_factory), 
     engine(engine), physicsControl(0), hairStrandGenerator(0), positionShift(0),
     rng(0), guideLOD(0),strandLOD(0), hairStrandsLODSize(0), 
-    physicsControlEnabled(true), growTangents(0), mixmode(0), priority(7),
-    z_buf_mode(CS_ZBUF_USE), indexstart(0), indexend(0)
+    physicsControlEnabled(true), 
+    densityFactorGuideHairs(10), densityFactorHairStrands(100),
+    heightFactor(0.5f), displaceDistance(0.02f), strandWidth(0.0015f), 
+    controlPointsDistance(0.05f), positionDeviation(0.01f), growTangents(0), 
+    mixmode(0), priority(7), z_buf_mode(CS_ZBUF_USE), indexstart(0), indexend(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -45,9 +48,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       printf ("No SV names string set!");
 
     if (!engine) printf ("Failed to locate 3D engine!");
-
-    loader = csQueryRegistry<iLoader> (object_reg);
-    if (!loader) printf ("Failed to locate Loader!");
 
     rng = new csRandomGen(csGetTicks());
 
@@ -65,11 +65,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     for (size_t i = 0 ; i < guideHairs.GetSize() ; i ++)
       guideHairs.Get(i).Clear();
 
+    guideHairs.DeleteAll();
+
     for (size_t i = 0 ; i < guideHairsLOD.GetSize() ; i ++)
       guideHairsLOD.Get(i).Clear();
 
+    guideHairsLOD.DeleteAll();
+
     for (size_t i = 0 ; i < hairStrands.GetSize() ; i ++)
       hairStrands.Get(i).Clear();
+
+    hairStrands.DeleteAll();
+
+    guideHairsTriangles.DeleteAll();
   }
 
   iMeshObjectFactory* FurMesh::GetFactory () const
@@ -249,36 +257,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       controlPointSum += hairStrands.Get(x).controlPointsCount, x++ )
     {
       csHairStrand hairStrand = hairStrands.Get(x);
-      csVector2 strandUV = hairStrand.GetUV(guideHairs, guideHairsLOD);
+      csVector2 strandUV = hairStrand.uv;
 
       for ( size_t y = 0 ; y < hairStrand.controlPointsCount ; y ++ )
       {
-        vbuf[ 2 * controlPointSum + 2 * y].Set
-          ( hairStrand.controlPoints[y] );
-        vbuf[ 2 * controlPointSum + 2 * y + 1].Set
-          ( hairStrand.controlPoints[y] + csVector3(-0.01f,0,0) );
-        uv[ 2 * controlPointSum + 2 * y].Set( strandUV );
-        uv[ 2 * controlPointSum + 2 * y + 1].Set( strandUV );
+        vbuf[ 2 * controlPointSum + 2 * y] = hairStrand.controlPoints[y];
+        vbuf[ 2 * controlPointSum + 2 * y + 1] = 
+          hairStrand.controlPoints[y] + csVector3(-0.01f,0,0);
+        uv[ 2 * controlPointSum + 2 * y] = strandUV;
+        uv[ 2 * controlPointSum + 2 * y + 1] = strandUV;
       }
 
-      for ( size_t y = 0 ; y < 2 * (hairStrands.Get(x).controlPointsCount - 1) ; y ++ )
+      for ( size_t y = 0 ; y < 2 * (hairStrand.controlPointsCount - 1) ; y ++ )
       {
         if (y % 2 == 0)
-        {
-          ibuf[ 2 * (controlPointSum - x) + y ].Set
-            ( 2 * controlPointSum + y , 
-            2 * controlPointSum + y + 1 , 
-            2 * controlPointSum + y + 2 );
-          //printf("%d %d %d\n", 2 * x + y , 2 * x + y + 3 , 2 * x + y + 1);
-        }
+          ibuf[ 2 * (controlPointSum - x) + y ] = csTriangle( 2 * controlPointSum + y , 
+            2 * controlPointSum + y + 1 , 2 * controlPointSum + y + 2 );
         else
-        {
-          ibuf[ 2 * (controlPointSum - x) + y ].Set
-            ( 2 * controlPointSum + y , 
-            2 * controlPointSum + y + 2 , 
-            2 * controlPointSum + y + 1 );
-          //printf("%d %d %d\n", 2 * x + y + 1 , 2 * x + y + 2 , 2 * x + y - 1);
-        }
+          ibuf[ 2 * (controlPointSum - x) + y ] = csTriangle( 2 * controlPointSum + y , 
+            2 * controlPointSum + y + 2 , 2 * controlPointSum + y + 1 );
       }
     }
 
@@ -292,18 +289,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
       controlPointSum += hairStrands.Get(x).controlPointsCount, x++ )
     {
+      csHairStrand hairStrand = hairStrands.Get(x);
+
       float len = csVector3::Norm(
-        hairStrands.Get(x).controlPoints[ hairStrands.Get(x).controlPointsCount - 1 ] - 
-        hairStrands.Get(x).controlPoints[ 0 ]);
+        hairStrand.controlPoints[ hairStrand.controlPointsCount - 1 ] - 
+        hairStrand.controlPoints[ 0 ]);
 
-      for ( size_t y = 0 ; y < hairStrands.Get(x).controlPointsCount ; y ++ )
+      for ( size_t y = 0 ; y < hairStrand.controlPointsCount ; y ++ )
       {
-        float sum = csVector3::Norm(
-          hairStrands.Get(x).controlPoints[ y ] - 
-          hairStrands.Get(x).controlPoints[ 0 ]);
+        float sum = csVector3::Norm( hairStrand.controlPoints[ y ] - 
+          hairStrand.controlPoints[ 0 ]);
 
-        bin[ 2 * controlPointSum + 2 * y].Set( csVector3( rng->Get(), sum/len, rng->Get() ) );
-        bin[ 2 * controlPointSum + 2 * y + 1].Set( bin[ 2 * controlPointSum + 2 * y] );
+        bin[ 2 * controlPointSum + 2 * y] = csVector3( rng->Get(), sum/len, rng->Get() );
+        bin[ 2 * controlPointSum + 2 * y + 1] = bin[ 2 * controlPointSum + 2 * y];
       }
     }
 
@@ -421,8 +419,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     meshFactory->GetTangents()->Release();
   }
 
-  float FurMesh::TriangleDensity(csGuideHair A, csGuideHair B, csGuideHair C)
+  void FurMesh::TriangleAreaDensity(const csTriangle& triangle, float &area, float &density,
+    csGuideHair& A, csGuideHair& B, csGuideHair& C)
   {
+    size_t indexA = triangle.a;
+    size_t indexB = triangle.b;
+    size_t indexC = triangle.c;
+
+    if ( indexA < guideHairs.GetSize())
+      A = guideHairs.Get(indexA);
+    else
+      A = guideHairsLOD.Get(indexA - guideHairs.GetSize());
+
+    if ( indexB < guideHairs.GetSize())
+      B = guideHairs.Get(indexB);
+    else
+      B = guideHairsLOD.Get(indexB - guideHairs.GetSize());
+
+    if ( indexC < guideHairs.GetSize())
+      C = guideHairs.Get(indexC);
+    else
+      C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
+
+    // triangle area
+    if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
+      ( C.controlPointsCount == 0 ) )
+    {
+      area = density = 0;
+      return;
+    }
+
+    float bA = csVector3::Norm(B.controlPoints[0] - C.controlPoints[0]);
+    float bB = csVector3::Norm(A.controlPoints[0] - C.controlPoints[0]);
+    float bC = csVector3::Norm(B.controlPoints[0] - A.controlPoints[0]);    
+
+    float s = (bA + bB + bC) / 2.0f;
+    area = sqrt(s * (s - bA) * (s - bB) * (s - bC));
+
+    float area2d;
+
     csVector2 a = csVector2(A.uv.x * densitymap.width, A.uv.y * densitymap.height);
     csVector2 b = csVector2(B.uv.x * densitymap.width, B.uv.y * densitymap.height);
     csVector2 c = csVector2(C.uv.x * densitymap.width, C.uv.y * densitymap.height);
@@ -431,17 +466,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float baseB = csVector2::Norm(a - c);
     float baseC = csVector2::Norm(b - a);
 
-    float s = (baseA + baseB + baseC) / 2.0f;
-    float area = sqrt(s * (s - baseA) * (s - baseB) * (s - baseC));
+    s = (baseA + baseB + baseC) / 2.0f;
+    area2d = sqrt(s * (s - baseA) * (s - baseB) * (s - baseC));
 
-    if (area < EPSILON)
-      return 0;
+    if (area2d < EPSILON)
+    {
+      area = density = 0;
+      return;
+    }
 
-    float hA = (2 * area) / baseA;
-    float hB = (2 * area) / baseB;
-    float hC = (2 * area) / baseC;
+    float hA = (2 * area2d) / baseA;
+    float hB = (2 * area2d) / baseB;
+    float hC = (2 * area2d) / baseC;
 
-    float density = 0;
+    density = 0;
     int count = 0;
 
     for( float bA = 0.0; bA <= 1.0; bA += 1 / hA )
@@ -473,65 +511,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     if (count != 0)
       density /= count;
-
-    // the old method based on average mean
-//     density = (densitymap.data[ 4 * ((int)a.x + (int)a.y * densitymap.width )] + 
-//       densitymap.data[ 4 * ((int)b.x + (int)b.y * densitymap.width )] + 
-//       densitymap.data[ 4 * ((int)c.x + (int)c.y * densitymap.width )] ) / (3.0f);
-
-    return density;
   }
 
   void FurMesh::GenerateGuideHairsLOD()
   {
+    float density, area;
+    csGuideHair A, B, C;
+
     // generate guide hairs for LOD
     for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
     {
-      csTriangle currentTriangle = guideHairsTriangles.Get(iter);
-
-      size_t indexA = currentTriangle.a;
-      size_t indexB = currentTriangle.b;
-      size_t indexC = currentTriangle.c;
-
-      csGuideHair A, B, C;
-      
-      if ( indexA < guideHairs.GetSize())
-        A = guideHairs.Get(indexA);
-      else
-        A = guideHairsLOD.Get(indexA - guideHairs.GetSize());
-
-      if ( indexB < guideHairs.GetSize())
-        B = guideHairs.Get(indexB);
-      else
-        B = guideHairsLOD.Get(indexB - guideHairs.GetSize());
-
-      if ( indexC < guideHairs.GetSize())
-        C = guideHairs.Get(indexC);
-      else
-        C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
-
-      // triangle area
-      if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
-        ( C.controlPointsCount == 0 ) )
-        continue;
-
-      float a, b, c;
-      a = csVector3::Norm(B.controlPoints[0] - C.controlPoints[0]);
-      b = csVector3::Norm(A.controlPoints[0] - C.controlPoints[0]);
-      c = csVector3::Norm(B.controlPoints[0] - A.controlPoints[0]);
-
-      // just for debug
-//       a = csVector2::Norm(B.uv - C.uv);
-//       b = csVector2::Norm(A.uv - C.uv);
-//       c = csVector2::Norm(B.uv - A.uv);
-
-      float s = (a + b + c) / 2.0f;
-      float area = sqrt(s * (s - a) * (s - b) * (s - c));
-
-      // average density - modify to use convolution matrix or such
-      float density = TriangleDensity(A, B, C);
-
-      //csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactorGuideHairs);
+      csTriangle triangle = guideHairsTriangles.Get(iter);
+      TriangleAreaDensity(triangle, area, density, A, B, C);
 
       // if a new guide hair is needed
       if ( (density * area * densityFactorGuideHairs) < 1)
@@ -539,22 +530,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
       // make new guide hair
       csGuideHairLOD guideHairLOD;
-      float bA, bB, bC; // barycentric coefficients
-
-      bA = rng->Get();
-      bB = rng->Get() * (1 - bA);
-      bC = 1 - bA - bB;
-
-      guideHairLOD.guideHairsRef[0].distance = bA;
-      guideHairLOD.guideHairsRef[0].index = indexA;
-      guideHairLOD.guideHairsRef[1].distance = bB;
-      guideHairLOD.guideHairsRef[1].index = indexB;
-      guideHairLOD.guideHairsRef[2].distance = bC;
-      guideHairLOD.guideHairsRef[2].index = indexC;
+      guideHairLOD.SetGuideHairsRefs(triangle, rng);
 
       guideHairLOD.isActive = false;
 
-      guideHairLOD.uv = A.uv * bA + B.uv * bB + C.uv * bC;
+      guideHairLOD.SetUV(guideHairs, guideHairsLOD);
 
       // generate control points
       size_t controlPointsCount = csMin( (csMin( A.controlPointsCount,
@@ -565,16 +545,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       // add new triangles
       guideHairsLOD.Push(guideHairLOD);
       size_t indexD = guideHairsLOD.GetSize() - 1 + guideHairs.GetSize();
-      csTriangle ADC = csTriangle(indexA, indexD, indexC);
-      csTriangle ADB = csTriangle(indexA, indexD, indexB);
-      csTriangle BDC = csTriangle(indexB, indexD, indexC);
+      csTriangle ADC = csTriangle(triangle.a, indexD, triangle.c);
+      csTriangle ADB = csTriangle(triangle.a, indexD, triangle.b);
+      csTriangle BDC = csTriangle(triangle.b, indexD, triangle.c);
 
       guideHairsTriangles.Push(ADC);
       guideHairsTriangles.Push(ADB);
       guideHairsTriangles.Push(BDC);
     }    
-
-    //csPrintf("end generate guide hairs LOD\n");
   }
 
   void FurMesh::SynchronizeGuideHairs ()
@@ -589,7 +567,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::GenerateHairStrands ()
   {
-    float bA, bB, bC; // barycentric coefficients
+    float area, density;
+    csGuideHair A, B, C;
 
     // density
     for (int den = 0 , change = 1 ; change && den < 100 ; den ++)
@@ -598,76 +577,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       // for every triangle
       for (size_t iter = 0 ; iter < guideHairsTriangles.GetSize(); iter ++)
       {
-        csTriangle currentTriangle = guideHairsTriangles.Get(iter);
-
-        size_t indexA = currentTriangle.a;
-        size_t indexB = currentTriangle.b;
-        size_t indexC = currentTriangle.c;
-
-        csGuideHair A, B, C;
-
-        if ( indexA < guideHairs.GetSize())
-          A = guideHairs.Get(indexA);
-        else
-          A = guideHairsLOD.Get(indexA - guideHairs.GetSize());
-
-        if ( indexB < guideHairs.GetSize())
-          B = guideHairs.Get(indexB);
-        else
-          B = guideHairsLOD.Get(indexB - guideHairs.GetSize());
-
-        if ( indexC < guideHairs.GetSize())
-          C = guideHairs.Get(indexC);
-        else
-          C = guideHairsLOD.Get(indexC - guideHairs.GetSize());
-
-        // triangle area
-        if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
-          ( C.controlPointsCount == 0 ) )
-          continue;
-
-        float a, b, c;
-        a = csVector3::Norm(B.controlPoints[0] - C.controlPoints[0]);
-        b = csVector3::Norm(A.controlPoints[0] - C.controlPoints[0]);
-        c = csVector3::Norm(B.controlPoints[0] - A.controlPoints[0]);
-
-        float s = (a + b + c) / 2.0f;
-        float area = sqrt(s * (s - a) * (s - b) * (s - c));
-
-        // average density - modify to use convolution matrix or such
-        float density = TriangleDensity(A, B, C);
-
-  //       csPrintf("%f\t%f\t%f\t%f\n", density, area, density * area, densityFactorHairStrands);
+        csTriangle triangle = guideHairsTriangles.Get(iter);
+        TriangleAreaDensity(triangle, area, density, A, B, C);
 
         // how many new guide hairs are needed
         if ( den < (density * area * densityFactorHairStrands))
         {
           change = 1;
           csHairStrand hairStrand;
-
-          bA = rng->Get();
-          bB = rng->Get() * (1 - bA);
-          bC = 1 - bA - bB;
-
-          //csPrintf("%d\t%d\t%d\n", indexA, indexB, indexC);
-
-          hairStrand.guideHairsRef[0].distance = bA;
-          hairStrand.guideHairsRef[0].index = indexA;
-          hairStrand.guideHairsRef[1].distance = bB;
-          hairStrand.guideHairsRef[1].index = indexB;
-          hairStrand.guideHairsRef[2].distance = bC;
-          hairStrand.guideHairsRef[2].index = indexC;
+          hairStrand.SetGuideHairsRefs(triangle, rng);
 
           size_t controlPointsCount = csMin( (csMin( A.controlPointsCount,
             B.controlPointsCount) ), C.controlPointsCount);
 
           hairStrand.Generate(controlPointsCount, guideHairs, guideHairsLOD);
 
+          hairStrand.SetUV(guideHairs, guideHairsLOD);
+
           hairStrands.Push(hairStrand);		
         }
       }
     }
-    //csPrintf("end\n");
   }
 
   void FurMesh::SetGuideLOD(float guideLOD)
@@ -721,8 +651,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::SaveUVImage()
   {
-    //csPrintf("%s\n", densitymap->GetImageName());
-
     // from normal guide ropes
     for (size_t i = 0 ; i < guideHairs.GetSize() ; i ++)
     {
@@ -748,16 +676,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // from hair strands
     for (size_t i = 0 ; i < hairStrands.GetSize() ; i ++)
     {
-      csVector2 uv = csVector2(0);
-      csGuideHairReference *guideHairReference = hairStrands.Get(i).guideHairsRef;
-      
-      for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-        if ( guideHairReference[j].index < guideHairs.GetSize() )
-          uv += guideHairReference[j].distance * 
-            (guideHairs.Get(guideHairReference[j].index).uv);
-        else
-          uv += guideHairReference[j].distance * (guideHairsLOD.Get(
-            guideHairReference[j].index - guideHairs.GetSize()).uv);
+      csVector2 uv = hairStrands.Get(i).uv;
 
       densitymap.Set( (int)(uv.x * densitymap.width),
         (int)(uv.y * densitymap.height), 2, 255);
@@ -767,7 +686,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csPrintf("Total guide ropes: %d\n", guideHairsLOD.GetSize() + guideHairs.GetSize());
 
     densitymap.SaveImage(object_reg, "/data/krystal/krystal_skull_densitymap_debug.png");
-
     heightmap.SaveImage(object_reg, "/data/krystal/krystal_skull_heightmap_debug.png");
   }
 
@@ -810,7 +728,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->hairStrandGenerator = hairStrandGenerator;
   }
 
-  CS::Mesh::iFurStrandGenerator* FurMesh::GetFurStrandGenerator( )
+  CS::Mesh::iFurStrandGenerator* FurMesh::GetFurStrandGenerator( ) const
   {
     return hairStrandGenerator;
   }
@@ -819,92 +737,73 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     this->baseMaterial = baseMaterial;
 
-    SetColor();
-    SetGrowTangents();
-    SetDensitymap();
-    SetHeightmap();
-    SetStrandWidth();
-    SetDisplaceDistance();
+    SetBaseMaterialProperties();
   }
 
-  void FurMesh::SetGrowTangents()
+  void FurMesh::SetBaseMaterialProperties()
   {
+    // set grow tangents
     CS::ShaderVarName growTangentsName (svStrings, "growTangents");	
-    csRef<csShaderVariable> shaderVariable = baseMaterial->GetVariableAdd(growTangentsName);
+    baseMaterial->GetVariableAdd(growTangentsName)->GetValue(growTangents);
 
-    shaderVariable->GetValue(growTangents);
-
+    // set position deviation
     CS::ShaderVarName positionDeviationName (svStrings, "positionDeviation");	
-    shaderVariable = baseMaterial->GetVariableAdd(positionDeviationName);
+    baseMaterial->GetVariableAdd(positionDeviationName)->GetValue(positionDeviation);
 
-    shaderVariable->GetValue(positionDeviation);
-  }
-
-  void FurMesh::SetColor()
-  {
-    csColor color (1,1,0);
-
-    CS::ShaderVarName furColorName (svStrings, "mat furcolor");	
-    csRef<csShaderVariable> shaderVariable = 
-      baseMaterial->GetVariableAdd(furColorName);
-    
-    shaderVariable->SetValue(color);	
-  }
-
-  void FurMesh::SetStrandWidth()
-  {
+    // set strand width
     CS::ShaderVarName strandWidthName (svStrings, "width");	
-    csRef<csShaderVariable> shaderVariable = baseMaterial->GetVariable(strandWidthName);
+    baseMaterial->GetVariableAdd(strandWidthName)->GetValue(strandWidth);
+    strandWidthLOD = strandWidth;    
 
-    shaderVariable->GetValue(strandWidth);
-    strandWidthLOD = strandWidth;
-  }
-
-  void FurMesh::SetDensitymap ()
-  {
-    CS::ShaderVarName densitymapName (svStrings, "density map");	
-    csRef<csShaderVariable> shaderVariable = baseMaterial->GetVariable(densitymapName);
-
+    // set denstiy map
     iTextureHandle* tex;
+    csRef<csShaderVariable> shaderVariable;
+    
+    CS::ShaderVarName densitymapName (svStrings, "density map");	
+    shaderVariable = baseMaterial->GetVariable(densitymapName);
+      
+    if (!shaderVariable)  
+    {
+      csPrintfErr ("Density map not specified!\n");
+      return;
+    }
+
     shaderVariable->GetValue(tex);
     densitymap.handle = tex;
 
     CS::ShaderVarName densityFactorGuideHairsName (svStrings, "densityFactorGuideHairs");	
-    baseMaterial->GetVariable(densityFactorGuideHairsName)->GetValue(densityFactorGuideHairs);
+    baseMaterial->GetVariableAdd(densityFactorGuideHairsName)->GetValue(densityFactorGuideHairs);
 
     CS::ShaderVarName densityFactorHairStrandsName (svStrings, "densityFactorHairStrands");	
-    baseMaterial->GetVariable(densityFactorHairStrandsName)->GetValue(densityFactorHairStrands);    
+    baseMaterial->GetVariableAdd(densityFactorHairStrandsName)->GetValue(densityFactorHairStrands);    
 
     // density map
     if ( !densitymap.Read() )
       csPrintfErr( "Error reading densitymap texture!\n" );
-  }
 
-  void FurMesh::SetHeightmap ()
-  {
+    // set height map
     CS::ShaderVarName heightmapName (svStrings, "height map");	
-    csRef<csShaderVariable> shaderVariable = baseMaterial->GetVariable(heightmapName);
+    shaderVariable = baseMaterial->GetVariable(heightmapName);
+      
+    if (!shaderVariable)  
+    {
+      csPrintfErr ("Height map not specified!\n");
+      return;
+    }      
 
-    iTextureHandle *tex;
     shaderVariable->GetValue(tex);
     heightmap.handle = tex;
 
     CS::ShaderVarName heightFactorName (svStrings, "heightFactor");	
-    baseMaterial->GetVariable(heightFactorName)->GetValue(heightFactor);
+    baseMaterial->GetVariableAdd(heightFactorName)->GetValue(heightFactor);
 
     // height map
     if ( !heightmap.Read() )
       csPrintfErr( "Error reading heightmap texture!\n" );
-  }
 
-  void FurMesh::SetDisplaceDistance()
-  {
-    displaceDistance = 0.02f;
-
+    // set displace distance
     CS::ShaderVarName displaceDistanceName (svStrings, "displaceDistance");	
     baseMaterial->GetVariableAdd(displaceDistanceName)->GetValue(displaceDistance);
-
-    controlPointsDistance = 0.05f;
 
     CS::ShaderVarName controlPointsDistanceName (svStrings, "controlPointsDistance");	
     baseMaterial->GetVariableAdd(controlPointsDistanceName)->GetValue(controlPointsDistance);
@@ -914,7 +813,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     // update guide ropes
     for (size_t i = 0 ; i < guideHairs.GetSize(); i ++)
-      physicsControl->AnimateStrand(i,  guideHairs.Get(i).controlPoints,
+      physicsControl->AnimateStrand(i, guideHairs.Get(i).controlPoints,
         guideHairs.Get(i).controlPointsCount);
 
     // update guide ropes LOD
@@ -950,14 +849,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     csVector3* vbuf = (csVector3*)factory->GetVertices()->Lock(CS_BUF_LOCK_NORMAL);
     csVector3* normals = (csVector3*)factory->GetNormals()->Lock(CS_BUF_LOCK_NORMAL); 
-    csVector3* tan = (csVector3*)factory->GetTangents()->Lock(CS_BUF_LOCK_NORMAL);
-    csVector3* bin = (csVector3*)factory->GetBinormals()->Lock(CS_BUF_LOCK_READ);
+    csVector3* tangents = (csVector3*)factory->GetTangents()->Lock(CS_BUF_LOCK_NORMAL);
+    csVector3* binormals = (csVector3*)factory->GetBinormals()->Lock(CS_BUF_LOCK_READ);
 
     csVector3 normal, tangent, binormal, cameraOrigin;
     csVector3 strip, firstPoint, secondPoint;
 
     cameraOrigin = tc.GetOrigin();
-    csVector3 *tangentBuffer = tan;
     csVector3 *posShift = positionShift;
 
     size_t triangleCount = 0;
@@ -973,15 +871,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       triangleCount += 2 * controlPointsCount - 2;
 
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
-        vbuf += 2, tangentBuffer += 2, bin += 2, posShift ++, normals += 2 )
+        vbuf += 2, tangents += 2, binormals += 2, posShift ++, normals += 2 )
       {
         firstPoint = *controlPoints + (*posShift);
         secondPoint = *(controlPoints + 1) + (*posShift);
 
         csMath3::CalcNormal(binormal, firstPoint, secondPoint, cameraOrigin);
         binormal.Normalize();
-        strip = strandWidthLOD * binormal * ((*bin).z + 1.0f) * 
-          (0.5f * (1.0f - (*bin).y) + 0.75f );
+        strip = strandWidthLOD * binormal * ((*binormals).z + 1.0f) * 
+          (0.5f * (1.0f - (*binormals).y) + 0.75f );
 
         (*vbuf) = firstPoint;
         (*(vbuf + 1)) = firstPoint + strip;
@@ -993,8 +891,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         (*normals) = normal;
         (*(normals + 1)) = normal;
 
-        (*tangentBuffer) = tangent;
-        (*(tangentBuffer + 1)) = tangent;
+        (*tangents) = tangent;
+        (*(tangents + 1)) = tangent;
       }
 
       if (controlPointsCount)
@@ -1002,15 +900,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         (*vbuf) = *controlPoints + (*posShift);
         (*(vbuf + 1)) = *controlPoints + strip + (*posShift);
 
-        (*tangentBuffer) = tangent;
-        (*(tangentBuffer + 1)) = tangent;
+        (*tangents) = tangent;
+        (*(tangents + 1)) = tangent;
 
         (*normals) = normal;
         (*(normals + 1)) = normal;
 
         vbuf += 2;
-        tangentBuffer += 2;
-        bin += 2;
+        tangents += 2;
+        binormals += 2;
         normals += 2;
         posShift ++;
       }
@@ -1025,4 +923,3 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)
-

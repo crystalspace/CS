@@ -154,8 +154,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   *  csHairStrand
   ********************/
 
-  csVector2 csHairStrand::GetUV( const csArray<csGuideHair> &guideHairs,
-    const csArray<csGuideHairLOD> &guideHairsLOD ) const
+  void csHairStrand::SetUV( const csArray<csGuideHair> &guideHairs,
+    const csArray<csGuideHairLOD> &guideHairsLOD )
   {
     csVector2 strandUV(0);
 
@@ -167,7 +167,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         strandUV += guideHairsRef[j].distance * 
         guideHairsLOD.Get(guideHairsRef[j].index - guideHairs.GetSize()).uv;
 
-    return strandUV;
+    uv = strandUV;
   }
 
   void csHairStrand::Generate( size_t controlPointsCount,
@@ -210,6 +210,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     }
   }
 
+  void csHairStrand::SetGuideHairsRefs(const csTriangle& triangle, csRandomGen *rng)
+  {
+    float bA, bB, bC; // barycentric coefficients
+
+    bA = rng->Get();
+    bB = rng->Get() * (1 - bA);
+    bC = 1 - bA - bB;
+
+    guideHairsRef[0].distance = bA;
+    guideHairsRef[0].index = triangle.a;
+    guideHairsRef[1].distance = bB;
+    guideHairsRef[1].index = triangle.b;
+    guideHairsRef[2].distance = bC;
+    guideHairsRef[2].index = triangle.c;
+  }
+
   /********************
   *  csGuideHair
   ********************/
@@ -225,49 +241,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       controlPoints[j] = pos + j * distance * direction;
   }
 
-  /********************
-  *  csGuideHairLOD
-  ********************/
-
-  void csGuideHairLOD::Generate( size_t controlPointsCount,
-    const csArray<csGuideHair> &guideHairs, 
-    const csArray<csGuideHairLOD> &guideHairsLOD )
-  {
-    // generate control points
-    this -> controlPointsCount = controlPointsCount;
-
-    controlPoints = new csVector3[ controlPointsCount ];
-
-    for ( size_t i = 0 ; i < controlPointsCount ; i ++ )
-    {
-      controlPoints[i] = csVector3(0);
-      
-      for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-        if ( guideHairsRef[j].index < guideHairs.GetSize() )
-          controlPoints[i] += guideHairsRef[j].distance *
-          guideHairs.Get(guideHairsRef[j].index).controlPoints[i];
-        else
-          controlPoints[i] += guideHairsRef[j].distance *
-          guideHairsLOD.Get(guideHairsRef[j].index - 
-          guideHairs.GetSize()).controlPoints[i];
-    }
-  }
-
-  void csGuideHairLOD::Update( const csArray<csGuideHair> &guideHairs,
-    const csArray<csGuideHairLOD> &guideHairsLOD )
-  {
-    for ( size_t i = 0 ; i < controlPointsCount; i++ )
-    {
-      controlPoints[i] = csVector3(0);
-      for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-        if ( guideHairsRef[j].index < guideHairs.GetSize() )
-          controlPoints[i] += guideHairsRef[j].distance * 
-          (guideHairs.Get(guideHairsRef[j].index).controlPoints[i]);
-        else
-          controlPoints[i] += guideHairsRef[j].distance * (guideHairsLOD.Get
-          (guideHairsRef[j].index - guideHairs.GetSize()).controlPoints[i]);
-    }
-  }
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)
 

@@ -84,7 +84,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Set HairStrandGenerator
     virtual void SetFurStrandGenerator( CS::Mesh::iFurStrandGenerator* hairStrandGenerator);
     // Get HairStrandGenerator
-    virtual CS::Mesh::iFurStrandGenerator* GetFurStrandGenerator( );
+    virtual CS::Mesh::iFurStrandGenerator* GetFurStrandGenerator( ) const;
 
   private:
     csRef<iMaterialWrapper> materialWrapper;
@@ -94,7 +94,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csRef<CS::Mesh::iFurMeshFactory> factory;
     /// Model
     iEngine* engine;
-    csRef<iLoader> loader;
     /// Fur geometry
     csRef<iView> view;
     csArray<csHairStrand> hairStrands;
@@ -139,21 +138,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     void SynchronizeGuideHairs();
     void GenerateGuideHairsLOD();
     void GenerateHairStrands();
-    float TriangleDensity(csGuideHair A, csGuideHair B, csGuideHair C);
+    void TriangleAreaDensity(const csTriangle& triangle, float &area, float &density,
+      csGuideHair& A, csGuideHair& B, csGuideHair& C);
     /// debug
     void SaveUVImage();
     /// setters
-    void SetGrowTangents();
-    void SetDensitymap();
-    void SetHeightmap();
-    void SetStrandWidth();
-    void SetColor();
-    void SetDisplaceDistance();
+    void SetBaseMaterialProperties();
     /// update
     void Update();
     void UpdateGuideHairs();
-    void UpdateControlPoints(csVector3 *controlPoints, size_t controlPointsCount, 
-      csGuideHairReference guideHairs[GUIDE_HAIRS_COUNT]);
   };
 
 }

@@ -63,21 +63,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float distance;
   };
 
-  struct csHairStrand : csHairData
-  {
-    csVector2 GetUV( const csArray<csGuideHair> &guideHairs,
-      const csArray<csGuideHairLOD> &guideHairsLOD ) const;
-
-    //Generate & Update
-    void Generate( size_t controlPointsCount, const csArray<csGuideHair> &guideHairs,
-      const csArray<csGuideHairLOD> &guideHairsLOD );
-
-    void Update( const csArray<csGuideHair> &guideHairs,
-      const csArray<csGuideHairLOD> &guideHairsLOD );
-
-    csGuideHairReference guideHairsRef[GUIDE_HAIRS_COUNT];
-  };
-
   struct csGuideHair : csHairData
   {
     void Generate(size_t controlPointsCount, float distance,
@@ -86,15 +71,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csVector2 uv;
   };
 
-  struct csGuideHairLOD : csGuideHair
+  struct csHairStrand : csGuideHair
   {
+    void SetUV( const csArray<csGuideHair> &guideHairs,
+      const csArray<csGuideHairLOD> &guideHairsLOD );
+
+    //Generate & Update
     void Generate( size_t controlPointsCount, const csArray<csGuideHair> &guideHairs,
       const csArray<csGuideHairLOD> &guideHairsLOD );
 
     void Update( const csArray<csGuideHair> &guideHairs,
       const csArray<csGuideHairLOD> &guideHairsLOD );
 
+    void SetGuideHairsRefs(const csTriangle& triangle, csRandomGen *rng);
+
     csGuideHairReference guideHairsRef[GUIDE_HAIRS_COUNT];
+  };
+
+  struct csGuideHairLOD : csHairStrand
+  {
     bool isActive;  //  ropes vs interpolate
   };
 

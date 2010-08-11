@@ -115,7 +115,7 @@ struct iFurMesh : public virtual iBase
   virtual void StopPhysicsControl ( ) = 0;
  
   virtual void SetFurStrandGenerator( iFurStrandGenerator* furStrandGenerator) = 0;
-  virtual iFurStrandGenerator* GetFurStrandGenerator( ) = 0;
+  virtual iFurStrandGenerator* GetFurStrandGenerator( ) const = 0;
 
   virtual void SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory ) = 0;
   virtual void SetMeshFactorySubMesh ( CS::Mesh::iAnimatedMeshSubMeshFactory* 
