@@ -751,7 +751,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     baseMaterial->GetVariableAdd(positionDeviationName)->GetValue(positionDeviation);
 
     // set strand width
-    CS::ShaderVarName strandWidthName (svStrings, "width");	
+    CS::ShaderVarName strandWidthName (svStrings, "strandWidth");	
     baseMaterial->GetVariableAdd(strandWidthName)->GetValue(strandWidth);
     strandWidthLOD = strandWidth;    
 

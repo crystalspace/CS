@@ -443,7 +443,7 @@ bool HairTest::Application ()
 
   // Load layout and set as root
   vfs->ChDir ("/hairtest/");
-  cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("ice.layout"));
+  cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("hairtest.layout"));
 
   // Subscribe to the clicked event for the exit button
   CEGUI::Window* btn = winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Quit");
