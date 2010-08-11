@@ -181,7 +181,7 @@ protected:
   /**
    * Utility function - prints out a message when in verbose mode
    */
-  int Message(const char* format, ...);
+  int Message(const char* format, ...) const;
 };
 
 #endif // __LODGEN_H__

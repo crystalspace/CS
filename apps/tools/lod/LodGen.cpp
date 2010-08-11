@@ -305,7 +305,7 @@ void PointTriangleDistanceUnitTests()
 
 // ----------------------------------------------------------------
 
-int LodGen::Message(const char* format, ...)
+int LodGen::Message(const char* format, ...) const
 {
   if (verbose)
   {
@@ -510,7 +510,7 @@ float LodGen::ErrorMetricFast(const WorkMesh& k, int start_index) const
   
   // Increase the radius to catch more triangles. Improves quality.
   r2 *= 2.0; // equivalent to multiplying r by sqrt(2)
-
+  
   // Put all triangles of the original mesh that fall inside the radius
   // in the list of triangles to test (test_tris0)
   csArray<int> test_tris0;
@@ -582,6 +582,9 @@ float LodGen::ErrorMetricFast(const WorkMesh& k, int start_index) const
         const csVector3& p0 = vertices[tri[0]];
         const csVector3& p1 = vertices[tri[1]];
         const csVector3& p2 = vertices[tri[2]];
+        //assert(p0 != p1 && p0 != p2 && p1 != p2);
+        //  Message("Degenerate p0=(%g %g %g) p1=(%g %g %g) p2=(%g %g %g)\ni=%d m=%d j=%d tri=%d %d %d\n", 
+        //          p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, i, m, j, tri[0], tri[1], tri[2]);
         PointTriangleDistance(b, p0, p1, p2, s, t, d2);
         if (d2 < min_d2)
         {
@@ -595,7 +598,7 @@ float LodGen::ErrorMetricFast(const WorkMesh& k, int start_index) const
       count++;
     }
   }
-  sum /= count;
+  sum /= (float)count;
   return sum;
 }
 
@@ -611,7 +614,7 @@ void LodGen::RemoveTriangleFromIncidentTris(WorkMesh& k, size_t itri)
 
 inline bool LodGen::IsDegenerate(const csTriangle& tri) const
 {
-  return tri[0] == tri[1] || tri[0] == tri[2] || tri[1] == tri[2];
+  return vertices[tri[0]] == vertices[tri[1]] || vertices[tri[0]] == vertices[tri[2]] || vertices[tri[1]] == vertices[tri[2]];
 }
 
 bool LodGen::IsTriangleCoincident(const csTriangle& t0, const csTriangle& t1) const
@@ -677,7 +680,7 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
     // Make this triangle be the first in the window,
     // i.e. it will disappear on the next window shift
     SwapIndex(k, sw.start_index, h);
-    //cout << "Rem " << itri << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
+    //Message("Rem %d = %d %d %d\n", itri, new_tri[0], new_tri[1], new_tri[2]);
     // Shift the window
     sw.start_index++;
 
@@ -691,7 +694,7 @@ bool LodGen::Collapse(WorkMesh& k, int v0, int v1)
     if (!IsDegenerate(new_tri) && !IsCoincident(k, new_tri))
     {
       k.AddTriangle(new_tri);
-      //cout << "Add " << k.tri_buffer.GetSize()-1 << " = " << new_tri[0] << " " << new_tri[1] << " " << new_tri[2] << endl;
+      //Message("Add %d = %d %d %d\n", k.tri_buffer.GetSize()-1, new_tri[0], new_tri[1], new_tri[2]);
       sw.end_index++;
     }
   }
@@ -761,6 +764,18 @@ void LodGen::GenerateLODs()
 {
   InitCoincidentVertices();
   k.incident_tris.SetSize(vertices.GetSize());
+
+  /*
+  for (unsigned int i = 0; i < triangles.GetSize(); i++)
+  {
+    const csTriangle& tri = triangles[i];
+    const csVector3& v0 = vertices[tri[0]];
+    const csVector3& v1 = vertices[tri[1]];
+    const csVector3& v2 = vertices[tri[2]];
+    assert(v0 != v1 && v0 != v2 && v1 != v2);
+  }
+  */
+  
   // Add all triangles from input array 'triangles' to work mesh 'k'.
   for (unsigned int i = 0; i < triangles.GetSize(); i++)
     k.AddTriangle(triangles[i]);
