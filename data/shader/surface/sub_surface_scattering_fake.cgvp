@@ -1,0 +1,58 @@
+<cgvp>
+<program>
+<![CDATA[
+
+struct app2vertex {
+   	float4 position : POSITION;
+	float2 texCoord : TEXCOORD0;
+	//float3 normal : NORMAL;
+	float4 normal : NORMAL;
+	float3 tangent : TEXCOORD1;
+	float3 binormal : TEXCOORD2;
+};
+
+struct vertex2fragment { 
+	float4 position : POSITION;
+	float2 texCoord : TEXCOORD0;
+	float3 worldNormal : TEXCOORD1;
+	float3 eyeVec : TEXCOORD2;
+	float3 lightVec : TEXCOORD3;
+	float3 worldTangent : TEXCOORD4;
+	float3 worldBinormal : TEXCOORD5;
+	float3 vertPos : TEXCOORD6;
+
+	//float4 LightPosition1 : TEXCOORD7;
+};
+
+// main function
+vertex2fragment main (app2vertex IN,
+//	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,
+	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
+	uniform float4x4 ModelViewProj : state.matrix.mvp,
+	uniform float4x4 ModelToWorld : state.matrix.mvw)
+	//uniform float4x4 ModelToWorld : state.matrix.world)
+{
+	// the light position should be read from CS
+	float3 lightPosition = float3(3.0f, 3.0f, 3.0f);
+	vertex2fragment OUT;
+
+	float3x3 mv = float3x3(glstate.matrix.modelview[0]);
+
+	// all these matrix space conversions are probably wrong
+	OUT.worldNormal = normalize(mul(ModelViewIT, IN.normal));
+	OUT.worldTangent = IN.tangent;
+	OUT.worldBinormal = IN.binormal;
+	 
+	float3 worldSpacePos = mul(ModelViewProj, IN.position);
+	OUT.lightVec = lightPosition - worldSpacePos;
+	OUT.texCoord = IN.texCoord;
+	OUT.eyeVec = - worldSpacePos;
+	OUT.position = mul(ModelViewProj, IN.position);
+	OUT.vertPos = worldSpacePos;
+
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>
