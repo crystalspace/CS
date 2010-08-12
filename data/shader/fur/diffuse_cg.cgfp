@@ -1,16 +1,18 @@
 <cgfp>
-    <program>
-        <![CDATA[
+<program>
+<![CDATA[
+
 struct vertex2fragment { 
 float4 Hposition : POSITION;
 float2 TexCoord : TEXCOORD0;
 };
 
 float4 main (vertex2fragment IN,
-uniform sampler2D TexDiffuse) : COLOR
+	uniform sampler2D TexDiffuse) : COLOR
 {
-return tex2D (TexDiffuse, IN.TexCoord);
+	return tex2D (TexDiffuse, IN.TexCoord);
 }
-        ]]>
-    </program>
+
+]]>
+</program>
 </cgfp>

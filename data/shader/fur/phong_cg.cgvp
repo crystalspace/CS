@@ -1,12 +1,10 @@
 <cgvp>
-	<program>
-		<![CDATA[
+<program>
+<![CDATA[
 		
 struct app2vertex {
 	float4 Position : POSITION;
 	float3 Normal : NORMAL;
-	float3 Tangent : TEXCOORD0;
-	float3 Binormal : TEXCOORD1;	
 };
 
 struct vertex2fragment { 
@@ -22,7 +20,7 @@ vertex2fragment main (app2vertex IN,
 	uniform float4x4 ModelViewProj : state.matrix.mvp,
 	uniform float3 LightPos)
 {
-	LightPos = float3(0, 0, 9000);
+	LightPos = float3(9000, 0, 0);
 	vertex2fragment OUT;
 
 	OUT.WorldNormal = IN.Normal;
@@ -43,6 +41,6 @@ vertex2fragment main (app2vertex IN,
 	return OUT;	// output of vertex shader
 }
 
-		]]>
-	</program>
+]]>
+</program>
 </cgvp>

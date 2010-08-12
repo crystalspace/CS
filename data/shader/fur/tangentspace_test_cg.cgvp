@@ -16,9 +16,6 @@ struct vertex2fragment {
 
 vertex2fragment main (app2vertex IN,
 	uniform float4x4 ModelView : state.matrix.modelview,
-	  /* The matrices are bound with the state.matrix.... semantics.
-	     For more info see the Cg and ARB_vertex_program docs.
-	     */
 	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
 	uniform float4x4 ModelViewProj : state.matrix.mvp,
 	uniform float4 LightPos,
@@ -30,6 +27,7 @@ vertex2fragment main (app2vertex IN,
 
 	float3 eyeNormal = normalize( IN.Normal.xyz );
 	float3 eyeTangent = normalize( IN.Tangent.xyz );
+	float3 eyeBinormal = normalize( IN.Binormal.xyz );
 	
 	float3 camera = ModelViewIT[3].xyz;
 	// for camera
@@ -42,8 +40,8 @@ vertex2fragment main (app2vertex IN,
 	OUT.Hposition = mul (ModelViewProj, IN.Position);
 	OUT.Color.b = max(dot (eyeNormal, vertToLight),0);
 	OUT.Color.r = max(dot (eyeTangent, vertToLight),0);
-	OUT.Color.g = 0;
-	OUT.Color.rgb = OUT.Color.r;
+	OUT.Color.g = max(dot (eyeTangent, vertToLight),0);
+	//OUT.Color.rgb = OUT.Color.r;
 	//OUT.Color.rgb = LightColor * max(dot (eyeNormal, vertToLight), 0);
 	return OUT;
 }

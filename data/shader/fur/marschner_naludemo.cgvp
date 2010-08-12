@@ -1,7 +1,7 @@
 <cgvp>
-  <variablemap variable="objEyePos" destination="objEyePos" />
 <program>
 <![CDATA[
+
 struct a2vConnector {
   float4 objCoord : POSITION;
   float3 objNormal : NORMAL;
@@ -18,10 +18,6 @@ struct v2fConnector {
 v2fConnector main(a2vConnector a2v,
                   uniform float4x4 modelViewProj : state.matrix.mvp,
 
-                  // Light and eye directions in object space
-                  uniform float3 objLightDir,
-                  uniform float3 objEyePos,
-
                   // Reflectance model parameters
                   uniform float DiffuseCol,
                   uniform float AmbientCol,
@@ -34,17 +30,17 @@ v2fConnector main(a2vConnector a2v,
   
   float4 LightPos = float4 (9000, 0, 0, 0);
 
-  objLightDir = normalize(LightPos.xyz -  a2v.objCoord.xyz);
-  objEyePos = ModelViewIT[3].xyz;
+  float3 objLightDir = normalize(a2v.objCoord.xyz - LightPos.xyz);
+  float3 objEyePos = ModelViewIT[3].xyz;
 	
   AmbientCol = 0;
   DiffuseCol = 0.75;
   PointLightColor = 1;
   worldPointLight0Pos = LightPos.xyz;  
-  float4 objColor = float4(1,0,0,1);
+  float4 objColor = float4(0.51, 0.34, 0.25,1);
   
   /* Compute the tangent from adjacent vertices */
-  float3 objTangent = normalize(a2v.Tangent - a2v.objCoord.xyz );
+  float3 objTangent = normalize(a2v.Tangent);
   
   /* Project */
   float4 objCoord = a2v.objCoord;    
@@ -66,18 +62,15 @@ v2fConnector main(a2vConnector a2v,
   v2f.angles.z = 0.5*cosPhi + 0.5;
 
   /* Compute diffuse lighting with phi-dependent component */
-  float diffuse = sqrt(max(0, 1 - uv1.x*uv1.x));
+  float diffuse = sqrt(max(0.1, 1 - uv1.x * uv1.x));
 
   /* Pass colors */
-  v2f.diffuseColor.rgb = diffuse*objColor.rgb * DiffuseCol;
+  v2f.diffuseColor.rgb = diffuse * objColor.rgb * DiffuseCol;
   v2f.diffuseColor.a = objColor.a;
   v2f.ambientColor = objColor.rgb * AmbientCol;
 
-
   // compute point light lighting  
   float3 Delta = worldPointLight0Pos-a2v.objCoord;
-  float3 pointLightDir = normalize(Delta);
-  float NDL = dot(objTangent, pointLightDir);
 
   float pointLightDist = sqrt(dot(Delta,Delta)) * (1.0/400.0);
   float att = min(1,max(0,pointLightDist));

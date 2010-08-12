@@ -1,6 +1,6 @@
 <cgfp>
-	<program>
-		<![CDATA[
+<program>
+<![CDATA[
 		
 struct vertex2fragment { 
 	float4 HPosition : POSITION;
@@ -18,8 +18,8 @@ float4 main (vertex2fragment IN,
 	float4 OUT = float4(0, 0, 0, 1);
 	SpecExpon = 180;
 	AmbiColor = 0.5;
-	SurfColor = float4(0, 1, 0, 1);
-	LightColor = 1;
+	SurfColor = float4(0.51, 0.34, 0.25, 1);
+	LightColor = 0.2;
 	
 	float3 Ln = normalize(IN.LightVec);
 	float3 Nn = normalize(IN.WorldNormal);
@@ -46,6 +46,6 @@ float4 main (vertex2fragment IN,
 	
 }
 
-		]]>
-	</program>
+]]>
+</program>
 </cgfp>

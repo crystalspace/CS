@@ -2,11 +2,7 @@
     <technique priority="200">
     <pass>
       <buffer source="normal" destination="normal" />
-      <buffer source="tangent" destination="texture coordinate 0" />
-      <buffer source="binormal" destination="texture coordinate 1" />	  
       <vp plugin="glcg" file="/shader/fur/phong_cg.cgvp" />
-      <texture name="tex lookup1" destination="lookup1fixed" />
-      <texture name="tex lookup2" destination="lookup2fixed" />	  	  
       <fp plugin="glcg" file="/shader/fur/phong_cg.cgfp" />
     </pass>
     </technique>
