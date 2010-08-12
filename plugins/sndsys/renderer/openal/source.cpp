@@ -108,67 +108,39 @@ SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, csSndSy
       }
     }
     break;
-#ifdef AL_EXT_MCFORMATS
   case 4:
-    {
-      switch(m_Stream->GetRenderedFormat()->Bits)
-      {
-      case 8:
-        m_Format = AL_FORMAT_QUAD8;
-        break;
-      case 16:
-        m_Format = AL_FORMAT_QUAD16;
-        break;
-      }
-    }
-    break;
   case 6:
-    {
-      switch(m_Stream->GetRenderedFormat()->Bits)
-      {
-      case 8:
-        m_Format = AL_FORMAT_51CHN8;
-        break;
-      case 16:
-        m_Format = AL_FORMAT_51CHN16;
-        break;
-      }
-    }
-    break;
   case 7:
-    {
-      switch(m_Stream->GetRenderedFormat()->Bits)
-      {
-      case 8:
-        m_Format = AL_FORMAT_61CHN8;
-        break;
-      case 16:
-        m_Format = AL_FORMAT_61CHN16;
-        break;
-      }
-    }
-    break;
   case 8:
     {
-      switch(m_Stream->GetRenderedFormat()->Bits)
+#ifdef AL_EXT_MCFORMATS
+      if (renderer->extAL_EXT_MCFORMATS)
       {
-      case 8:
-        m_Format = AL_FORMAT_71CHN8;
-        break;
-      case 16:
-        m_Format = AL_FORMAT_71CHN16;
-        break;
+	static const ALenum formats8[5] = { AL_FORMAT_QUAD8, 0,
+	  AL_FORMAT_51CHN8, AL_FORMAT_61CHN8, AL_FORMAT_71CHN8 };
+	static const ALenum formats16[5] = { AL_FORMAT_QUAD16, 0,
+	  AL_FORMAT_51CHN16, AL_FORMAT_61CHN16, AL_FORMAT_71CHN16 };
+	int fmtIndex = m_Stream->GetRenderedFormat()->Channels - 4;
+	switch(m_Stream->GetRenderedFormat()->Bits)
+	{
+	case 8:
+	  m_Format = formats8[fmtIndex];
+	  break;
+	case 16:
+	  m_Format = formats16[fmtIndex];
+	  break;
+	}
       }
-    }
-    break;
+      else
 #endif
-  default:
-    {
-      if (!renderer->SupportsALExt ("AL_EXT_MCFORMATS"))
       {
         // TODO: Some kind of fallback?
       }
-
+    }
+    break;
+  default:
+    {
+      // Unsupported format
       break;
     }
   }

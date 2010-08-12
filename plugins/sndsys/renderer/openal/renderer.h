@@ -116,10 +116,10 @@ public:
    */
   virtual void Release();
 
-  /**
-   * OpenAL extension support.
-   */
-  bool SupportsALExt (const char* pszAlExtName);
+  /** \name * OpenAL extension support.
+   * @{ */
+  bool extAL_EXT_MCFORMATS;
+  /** @} */
 
   /*
    * csSndSysRendererOpenAL implementation
@@ -154,9 +154,6 @@ private:
   csRefArray<SndSysSourceOpenAL2D> m_Sources;
   /// Array of attached callbacks
   csRefArray<iSndSysRendererCallback> m_Callback;
-
-  /// Hash of supported AL extensions.
-  csHash<bool, const char*> hSupportedALExts;
 
   // Helper functions
   /// Reporting helper function

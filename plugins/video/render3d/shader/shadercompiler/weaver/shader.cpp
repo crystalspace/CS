@@ -286,7 +286,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
       csRef<WeaverCommon::iCombinerLoader> loader = 
 	csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
-	  combinerID);
+	  combinerID, false);
       if (!loader.IsValid())
       {
 	cacheFailReason = "Failed to load combiner";

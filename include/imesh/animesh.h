@@ -116,7 +116,7 @@ public:
   SCF_INTERFACE(CS::Mesh::iAnimatedMeshSocket, 1, 0, 0);
 
   /**
-   * Get the name of the socket
+   * Get the name of this socket
    */
   virtual const char* GetName () const = 0;
 
@@ -126,22 +126,22 @@ public:
   virtual iAnimatedMeshSocketFactory* GetFactory () = 0;
 
   /**
-   * Get the 'bone to socket transform' of the socket
+   * Get the 'bone to socket transform' of this socket
    */
   virtual const csReversibleTransform& GetTransform () const = 0;
 
   /**
-   * Set the 'bone to socket transform' of the socket
+   * Set the 'bone to socket transform' of this socket
    */
   virtual void SetTransform (csReversibleTransform& tf) = 0;
 
   /**
-   * Get the full transform of the socket, in world coordinate
+   * Get the full transform of this socket, in world coordinate
    */
   virtual const csReversibleTransform GetFullTransform () const = 0;
 
   /**
-   * Get the ID of the bone associated with the socket
+   * Get the ID of the bone associated with this socket
    */
   virtual CS::Animation::BoneID GetBone () const = 0;
 
@@ -151,12 +151,12 @@ public:
   virtual iAnimatedMesh* GetMesh () const = 0;
 
   /**
-   * Get the scene node associated with the socket
+   * Get the scene node associated with this socket
    */
   virtual iSceneNode* GetSceneNode () const = 0;
 
   /**
-   * Set the scene node associated with the socket
+   * Set the scene node associated with this socket
    */
   virtual void SetSceneNode (iSceneNode* sn) = 0;
 };
@@ -173,7 +173,7 @@ public:
  */
 struct iAnimatedMeshFactory : public virtual iBase
 {
-  SCF_INTERFACE(CS::Mesh::iAnimatedMeshFactory, 2, 2, 0);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMeshFactory, 2, 2, 1);
 
   /**\name SubMesh handling
    * @{ */
@@ -419,6 +419,12 @@ struct iAnimatedMeshFactory : public virtual iBase
   */
   virtual uint FindSocket (const char* name) const = 0;
   /** @} */
+
+  /**
+   * Compute the tangents and binormals from the current vertices, normals and texels.
+   * The current content of the tangent and binormal buffers will be overwritten.
+   */
+  virtual void ComputeTangents () = 0;
 };
 
 /**
@@ -495,7 +501,7 @@ struct iAnimatedMeshSubMeshFactory : public virtual iBase
  */
 struct iAnimatedMesh : public virtual iBase
 {
-  SCF_INTERFACE(CS::Mesh::iAnimatedMesh, 1, 0, 0);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMesh, 1, 0, 1);
 
   /**
    * Set the skeleton to use for this mesh.
@@ -543,6 +549,11 @@ struct iAnimatedMesh : public virtual iBase
    */
   virtual iAnimatedMeshSocket* GetSocket (size_t index) const = 0;
   /** @} */
+
+  /**
+   * Convenient accessor method for the CS::Mesh::iAnimatedMeshFactory of this animesh.
+   */
+  virtual iAnimatedMeshFactory* GetAnimatedMeshFactory () const = 0;
 };
 
 /**

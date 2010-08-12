@@ -102,6 +102,21 @@ bool Monster::Initialize(iMeshWrapper* spawn)
       fsmNodeFactory = fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory2*) fsmNode->GetFactory () : 0;
   }
 
+  // If this is the 'knight' monster then create and attach a sword in his hand
+  if (factoryName == "knight")
+  {
+    // Create the mesh
+    sword = LoadMesh (object_reg, "sword", "/data/bias/models/knight/factories/sword");
+    if (!sword)
+    {
+      eventQueue->RemoveListener (this);
+      return false;
+    }
+
+    // Put the mesh in the good sector and attach it to the animesh's socket
+    animesh->GetSocket (0)->SetSceneNode (sword->QuerySceneNode());
+  }
+
   // Initialize collision detection
   float cfg_body_height = cfg->GetFloat ("Walktest.CollDet.BodyHeight", 0.5f);
   float cfg_body_width = cfg->GetFloat ("Walktest.CollDet.BodyWidth", 0.5f);
@@ -116,7 +131,6 @@ bool Monster::Initialize(iMeshWrapper* spawn)
   csVector3 shift (0, cfg_legs_offset, 0);
 
   collider_actor.InitializeColliders (mesh, legs, body, shift);
-
 
   awareRadius = curAwareRadius = 10.0f;
 
@@ -239,9 +253,11 @@ void Monster::Explode()
   csVector3 pos = mesh->GetMovable()->GetPosition();
   iSector* sector = mesh->GetMovable()->GetSectors()->Get(0);
 
-  //Remove old mesh.
+  //Remove old meshes.
   csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
   engine->WantToDie(mesh);
+  if (factoryName == "knight" && sword)
+    engine->WantToDie(sword);
 
   // Change the mesh.
   mesh = LoadMesh(object_reg, "gibs", "/data/bias/models/iceblocks/gibs");

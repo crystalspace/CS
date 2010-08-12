@@ -19,7 +19,10 @@
 #include "cssysdef.h"
 
 #include "csgeom/math3d.h"
+#include "csgeom/tri.h"
+#include "csgfx/normalmaptools.h"
 #include "csgfx/renderbuffer.h"
+#include "csgfx/trianglestream.h"
 #include "csgfx/vertexlistwalker.h"
 #include "cstool/rviewclipper.h"
 #include "csutil/objreg.h"
@@ -28,6 +31,7 @@
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/material.h"
+#include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "imesh/skeleton2.h"
@@ -36,8 +40,6 @@
 #include "ivideo/rendermesh.h"
 
 #include "animesh.h"
-
-
 
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
@@ -71,6 +73,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   bool AnimeshObjectType::Initialize (iObjectRegistry* object_reg)
   {
+    this->object_reg = object_reg;
+
     csRef<iShaderVarStringSet> strset =
       csQueryRegistryTagInterface<iShaderVarStringSet> (
         object_reg, "crystalspace.shader.variablenameset");
@@ -87,7 +91,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     svNameBoneTransforms = strset->Request ("bone transform real");
     svNameBoneTransforms = strset->Request ("bone transform dual");
-
 
     return true;
   }
@@ -211,7 +214,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     if (renderBuffer->GetElementCount () < vertexCount)
       return false;
 
-    texcoordBuffer = renderBuffer;    
+    texcoordBuffer = renderBuffer;
     return true;
   }
 
@@ -225,7 +228,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     if (renderBuffer->GetElementCount () < vertexCount)
       return false;
 
-    normalBuffer = renderBuffer;    
+    normalBuffer = renderBuffer;
     return true;
   }
 
@@ -239,7 +242,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     if (renderBuffer->GetElementCount () < vertexCount)
       return false;
 
-    tangentBuffer = renderBuffer;    
+    tangentBuffer = renderBuffer;
     return true;
   }
 
@@ -470,7 +473,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   }
 
   void AnimeshObjectFactory::HardTransform (const csReversibleTransform& t)
-  {    
+  {
   }
 
   bool AnimeshObjectFactory::SupportsHardTransform () const
@@ -519,6 +522,75 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return mixMode;
   }
 
+  void AnimeshObjectFactory::ComputeTangents ()
+  {
+    // Create the buffers if not already made
+    if (!tangentBuffer)
+      tangentBuffer =
+	csRenderBuffer::CreateRenderBuffer (GetVertexCountP (),
+					    CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+    if (!binormalBuffer)
+      binormalBuffer =
+	csRenderBuffer::CreateRenderBuffer (GetVertexCountP (),
+					    CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+
+    // Create an array of all the triangles
+    size_t triNum;
+    const csTriangle* tris;
+    csDirtyAccessArray<csTriangle> triangleScratch;
+    for (size_t i = 0; i < submeshes.GetSize(); i++)
+    {
+      FactorySubmesh* fsm = submeshes[i];
+      for (size_t j = 0; j < fsm->indexBuffers.GetSize (); ++j)
+      {
+	// TODO: not 0 param
+	iRenderBuffer* indexBuffer = submeshes[i]->GetIndices (j);
+	size_t scratchPos = triangleScratch.GetSize();
+	size_t indexTris = indexBuffer->GetElementCount() / 3;
+	if ((indexBuffer->GetComponentType() == CS_BUFCOMP_INT)
+	    || (indexBuffer->GetComponentType() == CS_BUFCOMP_UNSIGNED_INT))
+	{
+	  triangleScratch.SetSize (scratchPos + indexTris);
+	  csRenderBufferLock<uint8> indexLock (indexBuffer, CS_BUF_LOCK_READ);
+	  memcpy (triangleScratch.GetArray() + scratchPos,
+		  indexLock.Lock(), indexTris * sizeof (csTriangle));
+	}
+	else
+	{
+	  triangleScratch.SetCapacity (scratchPos + indexTris);
+	  CS::TriangleIndicesStream<int> triangles (indexBuffer,
+						    CS_MESHTYPE_TRIANGLES);
+	  while (triangles.HasNext())
+	    triangleScratch.Push (triangles.Next());
+	}
+      }
+    }
+    triNum = triangleScratch.GetSize ();
+    tris = triangleScratch.GetArray ();
+
+    // Compute the tangents
+    int vertCount = GetVertexCount();
+    csVector3* tangentData = (csVector3*)cs_malloc (
+      sizeof (csVector3) * vertCount * 2);
+    csVector3* bitangentData = tangentData + vertCount;
+
+    csNormalMappingTools::CalculateTangents
+      (triNum, tris, vertCount,
+       (csVector3*) vertexBuffer->Lock (CS_BUF_LOCK_READ), 
+       (csVector3*) normalBuffer->Lock (CS_BUF_LOCK_READ),
+       (csVector2*) texcoordBuffer->Lock (CS_BUF_LOCK_READ),
+       tangentData, bitangentData);
+  
+    vertexBuffer->Release ();
+    normalBuffer->Release ();
+    texcoordBuffer->Release ();
+
+    tangentBuffer->CopyInto (tangentData, vertCount);
+    binormalBuffer->CopyInto (bitangentData, vertCount);
+  
+    cs_free (tangentData);
+  }
+
   FactorySocket::FactorySocket (AnimeshObjectFactory* factory, CS::Animation::BoneID bone, 
     const char* name, csReversibleTransform transform)
     : scfImplementationType (this), factory (factory), bone (bone), name (name),
@@ -559,7 +631,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     return factory;
   }
-
 
 
   AnimeshObject::AnimeshObject (AnimeshObjectFactory* factory)
@@ -642,6 +713,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     CS_ASSERT (index < sockets.GetSize ());
     return sockets[index];
+  }
+
+  CS::Mesh::iAnimatedMeshFactory* AnimeshObject::GetAnimatedMeshFactory () const
+  {
+    return factory;
   }
 
   iMeshObjectFactory* AnimeshObject::GetFactory () const
@@ -773,6 +849,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   bool AnimeshObject::HitBeamOutline (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr)
   {
+    // TODO: use a pre-test on the collision boxes of each bones
+
+    csSegment3 seg (start, end);
+    csRenderBufferLock<csVector3> vrt (skeleton ? skinnedVertices : postMorphVertices);
+
+    // Iterate all submeshes...
+    for (size_t i = 0; i < submeshes.GetSize (); ++i)
+    {
+      if (!submeshes[i]->isRendering)
+        continue;
+
+      FactorySubmesh* fsm = factory->submeshes[i];
+      for (size_t j = 0; j < fsm->indexBuffers.GetSize (); ++j)
+      {
+	iRenderBuffer* indexBuffer = submeshes[i]->GetFactorySubMesh ()->GetIndices (j);
+	CS::TriangleIndicesStream<uint> triangles (indexBuffer,
+						   CS_MESHTYPE_TRIANGLES);
+	while (triangles.HasNext())
+	{
+	  CS::TriangleT<uint> t (triangles.Next());
+	  if (csIntersect3::SegmentTriangle (seg, 
+					     vrt[t.a], vrt[t.b], vrt[t.c], 
+					     isect))
+	  {
+	    if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
+				   csSquaredDist::PointPoint (start, end));
+	    return true;
+	  }
+	}
+      }
+    }
+
     return false;
   }
 
@@ -780,8 +888,57 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csVector3& isect, float* pr, int* polygon_idx,
     iMaterialWrapper** material, iMaterialArray* materials)
   {
-    return csIntersect3::BoxSegment (factory->factoryBB, csSegment3 (start, end),
-      isect, pr) != 0;
+    // TODO: use a pre-test on the collision boxes of each bones
+
+    csSegment3 seg (start, end);
+    float tot_dist = csSquaredDist::PointPoint (start, end);
+    float dist, temp;
+    float itot_dist = 1 / tot_dist;
+    dist = temp = tot_dist;
+    csVector3 tmp;
+    iMaterialWrapper* mat = 0;
+    csRenderBufferLock<csVector3> vrt (skeleton ? skinnedVertices : postMorphVertices);
+
+    // Iterate all submeshes...
+    for (size_t i = 0; i < submeshes.GetSize (); ++i)
+    {
+      if (!submeshes[i]->isRendering)
+        continue;
+
+      FactorySubmesh* fsm = factory->submeshes[i];
+      for (size_t j = 0; j < fsm->indexBuffers.GetSize (); ++j)
+      {
+	iRenderBuffer* indexBuffer = submeshes[i]->GetFactorySubMesh ()->GetIndices (j);
+	CS::TriangleIndicesStream<uint> triangles (indexBuffer,
+						   CS_MESHTYPE_TRIANGLES);
+	while (triangles.HasNext())
+	{
+	  CS::TriangleT<uint> t (triangles.Next());
+	  if (csIntersect3::SegmentTriangle (seg, 
+					     vrt[t.a], vrt[t.b], vrt[t.c], 
+					     tmp))
+	  {
+	    temp = csSquaredDist::PointPoint (start, tmp);
+	    if (temp < dist)
+	    {
+	      isect = tmp;
+	      dist = temp;
+	      //if (polygon_idx) *polygon_idx = i; // @@@ Uh, how to handle?
+	      mat = submeshes[i]->GetMaterial ();
+	    }
+	  }
+	}
+      }
+    }
+
+    if (pr) *pr = csQsqrt (dist * itot_dist);
+    if (dist >= tot_dist)
+      return false;
+
+    if (material) *material = mat;
+    if (materials) materials->Push (mat);
+
+    return true;
   }
 
   void AnimeshObject::SetMeshWrapper (iMeshWrapper* lp)
@@ -854,7 +1011,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   void AnimeshObject::GetRadius (float& radius, csVector3& center)
   {
     center = factory->factoryBB.GetCenter ();
-    radius = factory->factoryBB.GetSize ().Norm ();
+    radius = factory->factoryBB.GetSize ().Norm () * 0.5f;
   }
 
   void AnimeshObject::SetupSubmeshes ()
@@ -939,7 +1096,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         // Setup the accessor to this mesh
         bufferHolder->SetAccessor (rba, 
           CS_BUFFER_POSITION_MASK | CS_BUFFER_NORMAL_MASK | 
-          CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);
+	  CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);
 
         sm->bufferHolders.Push (bufferHolder);
       }
@@ -967,6 +1124,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     lastSkeletonState = skeleton->GetStateBindSpace ();
     skeletonVersion = skeleton->GetSkeletonStateVersion ();
 
+    // Update the array of bone transforms
     if (boneTransformArray)
     {
       // Update the global one
@@ -994,11 +1152,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           sv.AttachNew (new csShaderVariable (svNameBoneTransformsDual));
           boneTransformArray->SetArrayElement (j+1, sv);
         }
+
         sv->SetValue (dq.dual);
       }
     }
 
-    // Iterate all submeshes...
+    // Update the bone transforms of all submeshes
     for (size_t i = 0; i < submeshes.GetSize (); ++i)
     {
       Submesh* sm = submeshes[i];
@@ -1043,7 +1202,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           sv->SetValue (dq.dual);
         }
       }
-
     }
   }
 
@@ -1061,7 +1219,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       skeleton->GetTransformAbsSpace(bone, q, v);
 
-      sockets[i]->socketBoneTransform.SetO2T (csMatrix3 (q));
+      sockets[i]->socketBoneTransform.SetO2T (csMatrix3 (q.GetConjugate ()));
       sockets[i]->socketBoneTransform.SetOrigin (v);
       sockets[i]->UpdateSceneNode ();
     }
@@ -1142,6 +1300,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     case CS_BUFFER_TANGENT:
     case CS_BUFFER_BINORMAL:
       {
+	// Check if the factory's tangents don't need to be initialized
+	if (!factory->tangentBuffer || !factory->binormalBuffer)
+	  factory->ComputeTangents ();
+
 	// If there is no skeleton then simply use the factory's buffers
         if (!skeleton)
         {
@@ -1273,7 +1435,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   const csReversibleTransform AnimeshObject::Socket::GetFullTransform () const
   {
-    return socketBoneTransform*transform;
+    return transform * socketBoneTransform;
   }
 
   CS::Animation::BoneID AnimeshObject::Socket::GetBone () const
@@ -1293,7 +1455,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::Socket::SetSceneNode (iSceneNode* sn)
   {
+    if (sceneNode)
+      sceneNode->SetParent (nullptr);
     sceneNode = sn;
+    sceneNode->SetParent (object->GetMeshWrapper ()->QuerySceneNode ());
   }
 
   void AnimeshObject::Socket::UpdateSceneNode ()

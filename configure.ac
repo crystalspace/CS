@@ -1452,8 +1452,17 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
 	[$cs_cv_sys_pthread_libs $cs_cv_libdl_libs $cs_cv_libm_libs])])
 
 CS_CHECK_LIBOPENAL
+AS_IF([test $cs_cv_libopenal = yes],
+    [CS_CHECK_BUILD([for alext.h],
+	[cs_cv_openal_alext_h],
+	[AC_LANG_PROGRAM(
+	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[al.h])
+	    CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alc.h])
+	    CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alext.h])], 
+	    [])],
+	[], [], [CS_HEADER_PROPERTY([CS_HAVE_ALEXT_H])], [], [],
+	[$cs_cv_libopenal_cflags])])
 
-AC_CHECK_HEADERS([AL/alext.h], [CS_HEADER_PROPERTY([CS_HAVE_ALEXT_H])])
 
 #------------------------------------------------------------------------------
 # Check for FreeType2. Note that on MacOS/X, Fink strangely installs

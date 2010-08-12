@@ -15478,6 +15478,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSocketCount = *cspacec::iAnimatedMeshFactory_GetSocketCount;
 *GetSocket = *cspacec::iAnimatedMeshFactory_GetSocket;
 *FindSocket = *cspacec::iAnimatedMeshFactory_FindSocket;
+*ComputeTangents = *cspacec::iAnimatedMeshFactory_ComputeTangents;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -15536,6 +15537,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMorphTargetWeight = *cspacec::iAnimatedMesh_GetMorphTargetWeight;
 *GetSocketCount = *cspacec::iAnimatedMesh_GetSocketCount;
 *GetSocket = *cspacec::iAnimatedMesh_GetSocket;
+*GetAnimatedMeshFactory = *cspacec::iAnimatedMesh_GetAnimatedMeshFactory;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

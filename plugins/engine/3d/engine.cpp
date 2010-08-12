@@ -488,6 +488,8 @@ iSector *csLightIt::GetLastSector ()
 
 THREADED_CALLABLE_IMPL1(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader)
 {
+  loader->MarkSyncDone();
+
   sectors.AddBatch(loader->GetLoaderSectors());
   meshFactories.AddBatch(loader->GetLoaderMeshFactories());
   meshes.AddBatch(loader->GetLoaderMeshes());
@@ -495,8 +497,6 @@ THREADED_CALLABLE_IMPL1(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader
   materials->AddBatch(loader->GetLoaderMaterials());
   sharedVariables->AddBatch(loader->GetLoaderSharedVariables());
   textures->AddBatch(loader->GetLoaderTextures(), precache);
-
-  loader->MarkSyncDone();
 
   return true;
 }

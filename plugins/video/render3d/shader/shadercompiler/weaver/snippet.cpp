@@ -978,7 +978,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
     csRef<WeaverCommon::iCombinerLoader> combinerLoader = 
       csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
-        tech.combiner.classId);
+        tech.combiner.classId, false);
     if (!combinerLoader.IsValid())
     {
       // Don't complain, will happen later anyway
@@ -1088,7 +1088,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
     csRef<WeaverCommon::iCombinerLoader> combinerLoader = 
       csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
-        tech.combiner.classId);
+        tech.combiner.classId, false);
     if (!combinerLoader.IsValid())
     {
       // Don't complain, will happen later anyway

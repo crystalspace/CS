@@ -55,7 +55,7 @@ public:
   WalkTestLights (WalkTest* walktest);
   
   void EnableFlashlight (bool enable);
-  bool IsFlashlightEnabled () const { return flashlight; }
+  bool IsFlashlightEnabled () const { return flashlight != 0; }
 
   bool HandleDynLight (iLight* dyn);
   void HandleDynLights ();

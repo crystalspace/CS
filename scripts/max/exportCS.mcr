@@ -2401,11 +2401,16 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					format "      <noshadows />\n" to:outFile
 
 
-				-- check if object is a range alpha trasparent
+				-- check if object is a range alpha transparent
 				rangetrasp = getUserProp obj "RANGETRASP"
 				if (rangetrasp=="yes") then (
 				  format "      <ztest/><priority>alpha</priority>\n" to:outFile
 				)
+
+				-- check if the maxrenderdist property is set
+				maxrenderdist = getUserProp obj "MAXRENDERDIST"
+				if (maxrenderdist!=undefined) then
+					format "      <maxrenderdist value=\"%\">\n" maxrenderdist to:outFile
 
 				-- check if object uses a binary alpha texture
 			    if ((classOf obj.mat)==Standardmaterial) then (

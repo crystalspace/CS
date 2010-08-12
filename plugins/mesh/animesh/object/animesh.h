@@ -55,6 +55,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);
+
+  private:
+    iObjectRegistry* object_reg;
   };
 
 
@@ -142,6 +145,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     {
       return vertexCount;
     }
+
+    void ComputeTangents ();
   
   private: 
 
@@ -304,6 +309,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual size_t GetSocketCount () const;
     virtual CS::Mesh::iAnimatedMeshSocket* GetSocket (size_t index) const;
 
+    virtual CS::Mesh::iAnimatedMeshFactory* GetAnimatedMeshFactory () const;
+
     //-- iMeshObject
     virtual iMeshObjectFactory* GetFactory () const;
 
@@ -465,8 +472,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       AnimeshObject* object;
       FactorySocket* factorySocket;
-      CS::Animation::BoneID bone;      
-      csReversibleTransform transform;      
+      CS::Animation::BoneID bone;
+      csReversibleTransform transform;
       csReversibleTransform socketBoneTransform;
       iSceneNode* sceneNode;
     };
