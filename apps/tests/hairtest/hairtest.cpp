@@ -1,5 +1,8 @@
 /*
   Copyright (C) 2010 Alexandru - Teodor Voicu
+      Faculty of Automatic Control and Computer Science of the "Politehnica"
+      University of Bucharest
+      http://csite.cs.pub.ro/index.php/en/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -27,7 +30,7 @@ HairTest::HairTest ()
                      "Tests on the animation of objects CS::Mesh::iAnimatedMesh."),
                      avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
 {
-  // We manage the camera by ourselves
+  // Use a default rotate camera
   cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
   SetHUDDisplayed(false);
 }
@@ -106,7 +109,7 @@ bool HairTest::OnEventThumbTrackEndedShiftR (const CEGUI::EventArgs&)
 {
   CS::ShaderVarName aR (svStrings, "aR");	
   avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(aR)->SetValue(-5  * ( 1 + sliderShiftR->getScrollPosition() ) );
+    ->GetVariableAdd(aR)->SetValue(-5 * ( 1 + sliderShiftR->getScrollPosition()));
   avatarScene->furMesh->GetFurStrandGenerator()->Invalidate();
 
   return true;
@@ -116,7 +119,7 @@ bool HairTest::OnEventThumbTrackEndedWidthR (const CEGUI::EventArgs&)
 {
   CS::ShaderVarName bR (svStrings, "bR");	
   avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(bR)->SetValue(5  * ( 1 + sliderWidthR->getScrollPosition() ) );
+    ->GetVariableAdd(bR)->SetValue(5 * ( 1 + sliderWidthR->getScrollPosition()));
   avatarScene->furMesh->GetFurStrandGenerator()->Invalidate();
 
   return true;
@@ -126,8 +129,9 @@ bool HairTest::OnEventThumbTrackEndedWidthR (const CEGUI::EventArgs&)
 bool HairTest::OnEventThumbTrackEndedAbsorption (const CEGUI::EventArgs&)
 {
   CS::ShaderVarName absorption (svStrings, "absorption");	
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(absorption)->SetValue(0.2f + 10 * sliderAbsorption->getScrollPosition() );
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(absorption)->
+    SetValue(0.2f + 10 * sliderAbsorption->getScrollPosition() );
   avatarScene->furMesh->GetFurStrandGenerator()->Invalidate();
 
   return true;
@@ -136,8 +140,9 @@ bool HairTest::OnEventThumbTrackEndedAbsorption (const CEGUI::EventArgs&)
 bool HairTest::OnEventThumbTrackEndedEccentricity (const CEGUI::EventArgs&)
 {
   CS::ShaderVarName eccentricity (svStrings, "eccentricity");	
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(eccentricity)->SetValue(0.85f + 0.15f * sliderEccentricity->getScrollPosition() );
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(eccentricity)->
+    SetValue(0.85f + 0.15f * sliderEccentricity->getScrollPosition() );
   avatarScene->furMesh->GetFurStrandGenerator()->Invalidate();
 
   return true;
@@ -147,8 +152,9 @@ bool HairTest::OnEventThumbTrackEndedEccentricity (const CEGUI::EventArgs&)
 bool HairTest::OnEventThumbTrackEndedGlintScale (const CEGUI::EventArgs&)
 {
   CS::ShaderVarName kG (svStrings, "kG");	
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(kG)->SetValue(0.5f + 4.5f * sliderGlintScale->getScrollPosition() );
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(kG)->
+    SetValue(0.5f + 4.5f * sliderGlintScale->getScrollPosition() );
   avatarScene->furMesh->GetFurStrandGenerator()->Invalidate();
 
   return true;
@@ -157,8 +163,9 @@ bool HairTest::OnEventThumbTrackEndedGlintScale (const CEGUI::EventArgs&)
 bool HairTest::OnEventThumbTrackEndedCausticWidth (const CEGUI::EventArgs&)
 {
   CS::ShaderVarName wc (svStrings, "wc");	
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(wc)->SetValue(10 + 15 * sliderCausticWidth->getScrollPosition() );
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(wc)->
+    SetValue(10 + 15 * sliderCausticWidth->getScrollPosition() );
   avatarScene->furMesh->GetFurStrandGenerator()->Invalidate();
 
   return true;
@@ -167,8 +174,9 @@ bool HairTest::OnEventThumbTrackEndedCausticWidth (const CEGUI::EventArgs&)
 bool HairTest::OnEventThumbTrackEndedCausticMerge (const CEGUI::EventArgs&)
 {
   CS::ShaderVarName Dh0 (svStrings, "Dh0");	
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(Dh0)->SetValue(0.2f + 0.2f * sliderCausticMerge->getScrollPosition() );
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(Dh0)->
+    SetValue(0.2f + 0.2f * sliderCausticMerge->getScrollPosition() );
   avatarScene->furMesh->GetFurStrandGenerator()->Invalidate();
 
   return true;
@@ -180,12 +188,12 @@ bool HairTest::OnEventThumbTrackEndedR (const CEGUI::EventArgs&)
   CS::ShaderVarName objColor (svStrings, "hair color");	
   
   csVector3 color; 
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(objColor)->GetValue(color);
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(objColor)->GetValue(color);
   
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(objColor)->SetValue(csVector3( 
-    sliderR->getScrollPosition(), color.y, color.z ) );
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(objColor)->
+    SetValue(csVector3( sliderR->getScrollPosition(), color.y, color.z ) );
 
   return true;
 }
@@ -195,12 +203,12 @@ bool HairTest::OnEventThumbTrackEndedG (const CEGUI::EventArgs&)
   CS::ShaderVarName objColor (svStrings, "hair color");	
 
   csVector3 color; 
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(objColor)->GetValue(color);
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(objColor)->GetValue(color);
 
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(objColor)->SetValue(csVector3( 
-    color.x, sliderG->getScrollPosition(), color.z ) );
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(objColor)->
+    SetValue(csVector3( color.x, sliderG->getScrollPosition(), color.z ) );
 
   return true;
 }
@@ -210,12 +218,12 @@ bool HairTest::OnEventThumbTrackEndedB (const CEGUI::EventArgs&)
   CS::ShaderVarName objColor (svStrings, "hair color");	
 
   csVector3 color; 
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(objColor)->GetValue(color);
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(objColor)->GetValue(color);
 
-  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()
-    ->GetVariableAdd(objColor)->SetValue(csVector3( 
-    color.x, color.y , sliderB->getScrollPosition()) );
+  avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial()->
+    GetVariableAdd(objColor)->
+    SetValue(csVector3( color.x, color.y , sliderB->getScrollPosition()) );
 
   return true;
 }
@@ -332,7 +340,8 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
     CS::Animation::iSkeletonBasicNodesManager2),
     CS_REQUEST_PLUGIN("crystalspace.mesh.furmesh", CS::Mesh::iFurMeshType),
-    CS_REQUEST_PLUGIN("crystalspace.mesh.hairstrandmaterial", CS::Mesh::iFurStrandGenerator),
+    CS_REQUEST_PLUGIN("crystalspace.mesh.hairstrandmaterial", 
+      CS::Mesh::iFurStrandGenerator),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
@@ -408,8 +417,10 @@ bool HairTest::Application ()
     return false;
 
   // Find references to the plugins of the animation nodes
-  lookAtManager = csQueryRegistry<CS::Animation::iSkeletonLookAtManager2> (GetObjectRegistry ());
-  if (!lookAtManager) return ReportError("Failed to locate iLookAtManager plugin!");
+  lookAtManager = 
+    csQueryRegistry<CS::Animation::iSkeletonLookAtManager2> (GetObjectRegistry ());
+  if (!lookAtManager) 
+    return ReportError("Failed to locate iLookAtManager plugin!");
 
   basicNodesManager =
     csQueryRegistry<CS::Animation::iSkeletonBasicNodesManager2> (GetObjectRegistry ());
@@ -437,7 +448,8 @@ bool HairTest::Application ()
 
   cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
 
-  cegui->GetFontManagerPtr ()->createFreeTypeFont("DejaVuSans", 10, true, "/fonts/ttf/DejaVuSans.ttf");
+  cegui->GetFontManagerPtr ()->
+    createFreeTypeFont("DejaVuSans", 10, true, "/fonts/ttf/DejaVuSans.ttf");
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
@@ -450,13 +462,13 @@ bool HairTest::Application ()
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&HairTest::OnExitButtonClicked, this));
 
-  winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Colliders") 
-    -> subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&HairTest::OnCollidersButtonClicked, this));
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Colliders")-> 
+    subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&HairTest::OnCollidersButtonClicked, this));
 
-  winMgr->getWindow("HairTest/MainWindow/Tab/Page3/Physics") 
-    -> subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&HairTest::OnPhysicsButtonClicked, this));
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page3/Physics")-> 
+    subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&HairTest::OnPhysicsButtonClicked, this));
 
 
   // Default behavior from csDemoApplication for the creation of the scene
@@ -518,8 +530,7 @@ bool HairTest::Application ()
   if (avatarScene->furMesh && avatarScene->furMesh->GetFurStrandGenerator() && 
       avatarScene->furMesh->GetFurStrandGenerator()->GetMaterial())
   {
-
-    // Initialized GUI for Marschner
+    // Initialize GUI for Marschner
 
     // Surface properties
     sliderShiftR = (CEGUI::Scrollbar*)winMgr->

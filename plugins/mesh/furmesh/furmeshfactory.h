@@ -1,5 +1,8 @@
 /*
   Copyright (C) 2010 Alexandru - Teodor Voicu
+      Faculty of Automatic Control and Computer Science of the "Politehnica"
+      University of Bucharest
+      http://csite.cs.pub.ro/index.php/en/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -32,11 +35,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     FurMeshFactory (iEngine *e, iObjectRegistry* reg, iMeshObjectType* type);
     virtual ~FurMeshFactory ();
-
+    
+    //-- csMeshFactory	
     virtual csPtr<iMeshObject> NewInstance ();
     virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
 
-    /// geometry access
+    // Direct geometry access
+    //-- iFurMeshFactory	
     virtual void SetVertexCount (uint n);
     virtual void SetTriangleCount (uint n);
 
@@ -56,7 +61,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual iRenderBuffer* GetBinormals () const;
     virtual bool SetBinormals (iRenderBuffer* renderBuffer);
 
-  protected:
+  private:
+    // Store geometry data
     uint indexCount;
     uint vertexCount;
     csRef<iRenderBuffer> indexBuffer;
@@ -76,15 +82,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     FurMeshType (iBase* parent);
     virtual ~FurMeshType ();
 
-    // From iComponent	
+    //-- iComponent	
     virtual bool Initialize (iObjectRegistry*);
 
-    // From iMeshObjectType
+    //-- iMeshObjectType
     virtual csPtr<iMeshObjectFactory> NewFactory ();
 
   private:
     iObjectRegistry* object_reg;
-    /// pointer to the engine if available.
+    // Pointer to the engine if available.
     iEngine *Engine;
   };
 }

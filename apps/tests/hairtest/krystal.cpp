@@ -123,6 +123,7 @@ void KrystalScene::SwitchFurPhysics()
   if (!furMesh)
     return;
 
+  // Disable ropes
   if (hairPhysicsEnabled)
   {
     furMesh->SetGuideLOD(0.0f);
@@ -174,7 +175,8 @@ bool KrystalScene::CreateAvatar ()
 
   csRef<CS::Animation::iBodyManager> bodyManager =
     csQueryRegistry<CS::Animation::iBodyManager> (hairTest->GetObjectRegistry ());
-  csRef<CS::Animation::iBodySkeleton> bodySkeleton = bodyManager->FindBodySkeleton ("krystal_body");
+  csRef<CS::Animation::iBodySkeleton> bodySkeleton = 
+    bodyManager->FindBodySkeleton ("krystal_body");
   if (!bodySkeleton)
     return hairTest->ReportError ("Can't find Krystal's body mesh description!");
 
@@ -212,14 +214,14 @@ bool KrystalScene::CreateAvatar ()
     return hairTest->ReportError("Failed to locate CS::Mesh::iFurPhysicsControl plugin!");
 
   // Load hairStrandGenerator
-  csRef<CS::Mesh::iFurStrandGenerator> hairStrandGenerator = csQueryRegistry<CS::Mesh::iFurStrandGenerator> 
-    (hairTest->object_reg);
+  csRef<CS::Mesh::iFurStrandGenerator> hairStrandGenerator = 
+    csQueryRegistry<CS::Mesh::iFurStrandGenerator> (hairTest->object_reg);
   if (!hairStrandGenerator)
     return hairTest->ReportError("Failed to locate CS::Mesh::iFurStrandGenerator plugin!");
 
   // Load furMesh
-  csRef<CS::Mesh::iFurMeshType> furMeshType = csQueryRegistry<CS::Mesh::iFurMeshType> 
-    (hairTest->object_reg);
+  csRef<CS::Mesh::iFurMeshType> furMeshType = 
+    csQueryRegistry<CS::Mesh::iFurMeshType> (hairTest->object_reg);
   if (!furMeshType)
     return hairTest->ReportError("Failed to locate CS::Mesh::iFurMeshType plugin!");
 
@@ -354,10 +356,12 @@ bool KrystalScene::CreateAvatar ()
   headBody = ragdollNode->GetBoneRigidBody
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
 
+  // Load fur material
   rc = hairTest-> loader ->Load ("/hairtest/fur_material.xml");
   if (!rc.success)
     hairTest->ReportError("Can't load Fur library file!");
 
+  // Load Marschner shader
   csRef<iMaterialWrapper> materialWrapper = 
     hairTest->engine->FindMaterial("marschner_material");
   if (!materialWrapper)
@@ -373,14 +377,17 @@ bool KrystalScene::CreateAvatar ()
 
   csRef<iMeshObjectFactory> imof = furMeshType->NewFactory();
 
-  csRef<iMeshFactoryWrapper> imfw = hairTest->engine->CreateMeshFactory(imof,"hair_factory");
+  csRef<iMeshFactoryWrapper> imfw = 
+    hairTest->engine->CreateMeshFactory(imof, "hair_factory");
 
-  csRef<iMeshWrapper> hairMesh =
-    hairTest->engine->CreateMeshWrapper (imfw, "hair_mesh_wrapper", hairTest->room, csVector3 (0.0f));
+  csRef<iMeshWrapper> hairMesh = hairTest->engine->
+    CreateMeshWrapper (imfw, "hair_mesh_wrapper", hairTest->room, csVector3 (0));
 
   csRef<iMeshObject> imo = hairMesh->GetMeshObject();
 
+  // Get reference to the iFurMesh interface
   furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
+  
   furMesh->SetPhysicsControl(animationPhysicsControl);
   furMesh->SetFurStrandGenerator(hairStrandGenerator);
 
@@ -390,14 +397,6 @@ bool KrystalScene::CreateAvatar ()
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);
-
-  // add light info for marschner
-  csRef<iShaderVarStringSet> svStrings = 
-    csQueryRegistryTagInterface<iShaderVarStringSet> (
-      hairTest->object_reg, "crystalspace.shader.variablenameset");
-
-  if (!svStrings) 
-    csPrintfErr ("No SV names string set!");
 
   hairTest->room->GetLights()->RemoveAll();
 

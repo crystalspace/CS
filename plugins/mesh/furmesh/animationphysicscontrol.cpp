@@ -1,5 +1,8 @@
 /*
   Copyright (C) 2010 Alexandru - Teodor Voicu
+      Faculty of Automatic Control and Computer Science of the "Politehnica"
+      University of Bucharest
+      http://csite.cs.pub.ro/index.php/en/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -41,17 +44,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     RemoveAllStrands();
   }
 
-  // From iComponent
   bool AnimationPhysicsControl::Initialize (iObjectRegistry* r)
   {
+    // Default initial transformation
     initialTransform.Identity();
     object_reg = r;
     return true;
   }
 
-  //-- iFurPhysicsControl
-
-  void AnimationPhysicsControl::SetInitialTransform(csReversibleTransform initialTransform)
+  void AnimationPhysicsControl::SetInitialTransform
+    (csReversibleTransform initialTransform)
   {
     this->initialTransform = initialTransform;
   }
@@ -61,16 +63,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->rigidBody = rigidBody;
   }
 
-  void AnimationPhysicsControl::SetBulletDynamicSystem (CS::Physics::Bullet::iDynamicSystem* 
-    bulletDynamicSystem)
+  // No iDynamicSystem specified / needed
+  void AnimationPhysicsControl::SetBulletDynamicSystem 
+    (CS::Physics::Bullet::iDynamicSystem* )
   {
   }
 
   // Initialize the strand with the given ID
-  void AnimationPhysicsControl::InitializeStrand (size_t strandID, csVector3* 
-    coordinates, size_t coordinatesCount)
+  void AnimationPhysicsControl::InitializeStrand (size_t strandID, 
+    csVector3* coordinates, size_t coordinatesCount)
   {
-    csHairData* guideHairAnimation = new csHairData;
+    csFurData* guideHairAnimation = new csFurData;
 
     guideHairAnimation->controlPointsCount = coordinatesCount;
     guideHairAnimation->controlPoints = new csVector3[coordinatesCount];
@@ -82,8 +85,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   // Animate the strand with the given ID
-  void AnimationPhysicsControl::AnimateStrand (size_t strandID, csVector3* 
-    coordinates, size_t coordinatesCount) const
+  void AnimationPhysicsControl::AnimateStrand (size_t strandID, 
+    csVector3* coordinates, size_t coordinatesCount) const
   {
     if (!rigidBody)
       return;
@@ -91,22 +94,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csReversibleTransform currentTransform = 
       initialTransform * rigidBody->GetTransform();
 
-    csHairData *guideHairAnimation = guideRopes.Get(strandID, 0);
+    csFurData *guideHairAnimation = guideRopes.Get(strandID, 0);
 
     if (guideHairAnimation)
       for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
-        coordinates[i] = guideHairAnimation->controlPoints[i] * currentTransform.GetInverse();
+        coordinates[i] = guideHairAnimation->controlPoints[i] * 
+          currentTransform.GetInverse();
   }
 
   void AnimationPhysicsControl::RemoveStrand (size_t strandID)
   {
-    csHairData* guideHairAnimation = guideRopes.Get(strandID, 0);
+    csFurData* guideHairAnimation = guideRopes.Get(strandID, 0);
 
     if (guideHairAnimation)
     {
       guideRopes.Delete(strandID, guideHairAnimation);
 
-      if (guideHairAnimation->controlPoints && guideHairAnimation->controlPointsCount)
+      if (guideHairAnimation->controlPoints && 
+          guideHairAnimation->controlPointsCount)
         delete guideHairAnimation->controlPoints;
 
       delete guideHairAnimation;
@@ -115,13 +120,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void AnimationPhysicsControl::RemoveAllStrands ()
   {
+    // Iterate through all ropes
     for (size_t i = 0 ; i < guideRopes.GetSize(); i ++)
     {
-      csHairData* guideHairAnimation = guideRopes.Get(i, 0);
+      csFurData* guideHairAnimation = guideRopes.Get(i, 0);
 
       if (guideHairAnimation)
       {
-        if (guideHairAnimation->controlPoints && guideHairAnimation->controlPointsCount)
+        if (guideHairAnimation->controlPoints && 
+            guideHairAnimation->controlPointsCount)
           delete guideHairAnimation->controlPoints;
       
         delete guideHairAnimation;

@@ -1,5 +1,8 @@
 /*
   Copyright (C) 2010 Alexandru - Teodor Voicu
+      Faculty of Automatic Control and Computer Science of the "Politehnica"
+      University of Bucharest
+      http://csite.cs.pub.ro/index.php/en/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -29,9 +32,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   CS_LEAKGUARD_IMPLEMENT(FurMeshFactory);
 
-  FurMeshFactory::FurMeshFactory (iEngine *e, iObjectRegistry* reg, iMeshObjectType* type)
-    : scfImplementationType(this, e, reg, type), indexCount(0), vertexCount(0), 
-    indexBuffer(0), vertexBuffer(0), texcoordBuffer(0), tangentBuffer(0), binormalBuffer(0)
+  FurMeshFactory::FurMeshFactory (iEngine *e, iObjectRegistry* reg, 
+    iMeshObjectType* type) : scfImplementationType(this, e, reg, type), 
+    indexCount(0), vertexCount(0), indexBuffer(0), vertexBuffer(0), 
+    texcoordBuffer(0), tangentBuffer(0), binormalBuffer(0)
   {
   }
 
@@ -46,7 +50,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return csPtr<iMeshObject> (ref);
   }
 
-  /// geometry access
+  // Also allocates the vertex render buffers
   void FurMeshFactory::SetVertexCount (uint n)
   {
     vertexCount = n;
@@ -82,6 +86,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       csPrintfErr("Could not create tangent buffer!\n");
   }
 
+  // Also allocates the index render buffer
+  // The index buffer will be 3 * n, set triangle count not index count
   void FurMeshFactory::SetTriangleCount (uint n)
   {
     if (!vertexCount)
@@ -229,12 +235,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
   }
 
-  // From iComponent
   bool FurMeshType::Initialize (iObjectRegistry* r)
   {
     csRef<iEngine> e = csQueryRegistry<iEngine> (r);
     Engine = e;
 
+    // This should not happen
     if (!e)
     {
       csPrintfErr("Could not find engine!\n");

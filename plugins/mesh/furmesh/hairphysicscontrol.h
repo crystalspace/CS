@@ -1,5 +1,8 @@
 /*
   Copyright (C) 2010 Alexandru - Teodor Voicu
+      Faculty of Automatic Control and Computer Science of the "Politehnica"
+      University of Bucharest
+      http://csite.cs.pub.ro/index.php/en/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -34,19 +37,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     HairPhysicsControl (iBase* parent);
     virtual ~HairPhysicsControl ();
 
-    // From iComponent	
+    //-- iComponent	
     virtual bool Initialize (iObjectRegistry*);
 
     //-- iFurPhysicsControl
     virtual void SetInitialTransform(csReversibleTransform initialTransform);
     virtual void SetRigidBody (iRigidBody* rigidBody);
-    virtual void SetBulletDynamicSystem (CS::Physics::Bullet::iDynamicSystem* bulletDynamicSystem);
-    // Initialize the strand with the given ID
+    virtual void SetBulletDynamicSystem 
+      (CS::Physics::Bullet::iDynamicSystem* bulletDynamicSystem);
     virtual void InitializeStrand (size_t strandID, csVector3* coordinates,
       size_t coordinatesCount);
-    // Animate the strand with the given ID
-    virtual void AnimateStrand (size_t strandID, csVector3* coordinates, size_t
-      coordinatesCount) const;
+    virtual void AnimateStrand (size_t strandID, csVector3* coordinates, 
+      size_t coordinatesCount) const;
     virtual void RemoveStrand (size_t strandID);
     virtual void RemoveAllStrands ();
 

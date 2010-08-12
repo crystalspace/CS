@@ -1,5 +1,8 @@
 /*
   Copyright (C) 2010 Alexandru - Teodor Voicu
+      Faculty of Automatic Control and Computer Science of the "Politehnica"
+      University of Bucharest
+      http://csite.cs.pub.ro/index.php/en/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -43,6 +46,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   uint8 csTextureRGBA::Get(int x, int y, int channel) const 
   {
+    // Compute position in a texture with 4 channels
     int pos = 4 * ( x + y * width ) + channel;
 
     if (pos >= 4 * width * height || pos < 0)
@@ -82,6 +86,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void csTextureRGBA::Write()
   {
+    // Two calls to Blit function, because he rectangle passed must lie 
+    // completely inside the texture
     handle->Blit(0, 0, width, height / 2, data);
     handle->Blit(0, height / 2, width, height / 2, data + (width * height * 2));
   }
@@ -91,8 +97,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if (!g3d)
       return false;
 
-    handle = g3d->GetTextureManager()->CreateTexture(width,height, csimg2D, "abgr8", 
-      CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
+    // Create a default texture
+    handle = g3d->GetTextureManager()->CreateTexture(width, height, csimg2D, 
+      "abgr8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
 
     if(!handle)
       return false;
@@ -100,7 +107,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  void csTextureRGBA::SaveImage(iObjectRegistry* object_reg, const char* texname) const
+  void csTextureRGBA::SaveImage
+    (iObjectRegistry* object_reg, const char* texname) const
   {
     csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
     csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
@@ -112,7 +120,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     }
 
     csRef<iImage> image;
-    image.AttachNew(new csImageMemory (width, height, data,false,
+    image.AttachNew(new csImageMemory (width, height, data, false,
       CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
 
     if(!image.IsValid())
@@ -122,9 +130,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     }
 
     csPrintf ("Saving %zu KB of data.\n", 
-      csImageTools::ComputeDataSize (image)/1024);
+      csImageTools::ComputeDataSize (image) / 1024);
 
     csRef<iDataBuffer> db = imageio->Save (image, "image/png", "progressive");
+    
     if (db)
     {
       if (!VFS->WriteFile (texname, (const char*)db->GetData (), db->GetSize ()))
@@ -141,40 +150,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   /********************
-  *  csHairData
+  *  csFurData
   ********************/
 
-  void csHairData::Clear()
+  void csFurData::Clear()
   {
+    // Free control points
     if (controlPointsCount)
       delete controlPoints;
   }
 
   /********************
-  *  csHairStrand
+  *  csFurStrand
   ********************/
 
-  void csHairStrand::SetUV( const csArray<csGuideHair> &guideHairs,
-    const csArray<csGuideHairLOD> &guideHairsLOD )
+  void csFurStrand::SetUV( const csArray<csGuideFur> &guideFurs,
+    const csArray<csGuideFurLOD> &guideFursLOD )
   {
     csVector2 strandUV(0);
 
     for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-      if (guideHairsRef[j].index < guideHairs.GetSize() )
+      if (guideHairsRef[j].index < guideFurs.GetSize() )
         strandUV += guideHairsRef[j].distance * 
-        guideHairs.Get(guideHairsRef[j].index).uv;
+          guideFurs.Get(guideHairsRef[j].index).uv;
       else
         strandUV += guideHairsRef[j].distance * 
-        guideHairsLOD.Get(guideHairsRef[j].index - guideHairs.GetSize()).uv;
+          guideFursLOD.Get(guideHairsRef[j].index - guideFurs.GetSize()).uv;
 
     uv = strandUV;
   }
 
-  void csHairStrand::Generate( size_t controlPointsCount,
-    const csArray<csGuideHair> &guideHairs, 
-    const csArray<csGuideHairLOD> &guideHairsLOD )
+  void csFurStrand::Generate( size_t controlPointsCount,
+    const csArray<csGuideFur> &guideFurs, 
+    const csArray<csGuideFurLOD> &guideFursLOD )
   {
-    // generate control points
+    // Allocate control points
     this -> controlPointsCount = controlPointsCount;
 
     controlPoints = new csVector3[ controlPointsCount ];
@@ -184,33 +194,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       controlPoints[i] = csVector3(0);
 
       for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-        if ( guideHairsRef[j].index < guideHairs.GetSize() )
+        if ( guideHairsRef[j].index < guideFurs.GetSize() )
           controlPoints[i] += guideHairsRef[j].distance *
-          guideHairs.Get(guideHairsRef[j].index).controlPoints[i];
+            guideFurs.Get(guideHairsRef[j].index).controlPoints[i];
         else
           controlPoints[i] += guideHairsRef[j].distance *
-          guideHairsLOD.Get(guideHairsRef[j].index - 
-          guideHairs.GetSize()).controlPoints[i];
+            guideFursLOD.Get(guideHairsRef[j].index - 
+            guideFurs.GetSize()).controlPoints[i];
     }
   }
 
-  void csHairStrand::Update( const csArray<csGuideHair> &guideHairs,
-    const csArray<csGuideHairLOD> &guideHairsLOD )
+  void csFurStrand::Update( const csArray<csGuideFur> &guideFurs,
+    const csArray<csGuideFurLOD> &guideFursLOD )
   {
     for ( size_t i = 0 ; i < controlPointsCount; i++ )
     {
       controlPoints[i] = csVector3(0);
+
       for ( size_t j = 0 ; j < GUIDE_HAIRS_COUNT ; j ++ )
-        if ( guideHairsRef[j].index < guideHairs.GetSize() )
+        if ( guideHairsRef[j].index < guideFurs.GetSize() )
           controlPoints[i] += guideHairsRef[j].distance * 
-          (guideHairs.Get(guideHairsRef[j].index).controlPoints[i]);
+            (guideFurs.Get(guideHairsRef[j].index).controlPoints[i]);
         else
-          controlPoints[i] += guideHairsRef[j].distance * (guideHairsLOD.Get
-          (guideHairsRef[j].index - guideHairs.GetSize()).controlPoints[i]);
+          controlPoints[i] += guideHairsRef[j].distance * (guideFursLOD.Get
+            (guideHairsRef[j].index - guideFurs.GetSize()).controlPoints[i]);
     }
   }
 
-  void csHairStrand::SetGuideHairsRefs(const csTriangle& triangle, csRandomGen *rng)
+  void csFurStrand::SetGuideHairsRefs(const csTriangle& triangle, csRandomGen *rng)
   {
     float bA, bB, bC; // barycentric coefficients
 
@@ -227,10 +238,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   /********************
-  *  csGuideHair
+  *  csGuideFur
   ********************/
 
-  void csGuideHair::Generate (size_t controlPointsCount, float distance,
+  void csGuideFur::Generate (size_t controlPointsCount, float distance,
     const csVector3& pos, const csVector3& direction)
   {
     this->controlPointsCount = controlPointsCount;

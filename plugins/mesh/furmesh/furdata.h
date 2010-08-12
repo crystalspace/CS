@@ -1,5 +1,8 @@
 /*
   Copyright (C) 2010 Alexandru - Teodor Voicu
+      Faculty of Automatic Control and Computer Science of the "Politehnica"
+      University of Bucharest
+      http://csite.cs.pub.ro/index.php/en/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -27,6 +30,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
+  // Data stored for a RGBA texture for the FurMesh plugin implementation 
   struct csTextureRGBA
   {
     csRef<iTextureHandle> handle;
@@ -39,31 +43,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     uint8 Get(int x, int y, int channel) const;
     void Set(int x, int y, int channel, uint8 value) ;
 
+    // Read data buffer from texture
     bool Read();
+    // Write data buffer to texture
     void Write();
 
+    // Create a black texture
     bool Create(iGraphics3D* g3d);
+    // Save the texture to a png file
     void SaveImage(iObjectRegistry* object_reg, const char* texname) const;
   };
 
-  struct csGuideHair;
-  struct csGuideHairLOD;
+  struct csGuideFur;
+  struct csGuideFurLOD;
 
-  struct csHairData
+  // Store control points for fur strands
+  struct csFurData
   {
     csVector3 *controlPoints;
     size_t controlPointsCount;
 
+    // Instead of ~csFurData
     void Clear();
   };
 
-  struct csGuideHairReference
+  // Reference to a fur strand
+  struct csGuideFurReference
   {
     size_t index;
     float distance;
   };
 
-  struct csGuideHair : csHairData
+  // Pure guide fur, synchronized with iFurPhysicsControl
+  struct csGuideFur : csFurData
   {
     void Generate(size_t controlPointsCount, float distance,
       const csVector3& pos, const csVector3& direction);
@@ -71,26 +83,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csVector2 uv;
   };
 
-  struct csHairStrand : csGuideHair
+  // Fur strands, geometry rendered
+  struct csFurStrand : csGuideFur
   {
-    void SetUV( const csArray<csGuideHair> &guideHairs,
-      const csArray<csGuideHairLOD> &guideHairsLOD );
+    // Automatically set the uv coordinates
+    void SetUV( const csArray<csGuideFur> &guideFurs,
+      const csArray<csGuideFurLOD> &guideFursLOD );
 
-    //Generate & Update
-    void Generate( size_t controlPointsCount, const csArray<csGuideHair> &guideHairs,
-      const csArray<csGuideHairLOD> &guideHairsLOD );
+    void Generate( size_t controlPointsCount, const csArray<csGuideFur> 
+      &guideFurs, const csArray<csGuideFurLOD> &guideFursLOD );
 
-    void Update( const csArray<csGuideHair> &guideHairs,
-      const csArray<csGuideHairLOD> &guideHairsLOD );
+    void Update( const csArray<csGuideFur> &guideFurs,
+      const csArray<csGuideFurLOD> &guideFursLOD );
 
     void SetGuideHairsRefs(const csTriangle& triangle, csRandomGen *rng);
 
-    csGuideHairReference guideHairsRef[GUIDE_HAIRS_COUNT];
+    csGuideFurReference guideHairsRef[GUIDE_HAIRS_COUNT];
   };
 
-  struct csGuideHairLOD : csHairStrand
+  // Non-pure guide ropes, can be synchronized or interpolated
+  struct csGuideFurLOD : csFurStrand
   {
-    bool isActive;  //  ropes vs interpolate
+    bool isActive;
   };
 
 }

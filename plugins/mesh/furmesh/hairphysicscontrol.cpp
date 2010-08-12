@@ -1,5 +1,8 @@
 /*
   Copyright (C) 2010 Alexandru - Teodor Voicu
+      Faculty of Automatic Control and Computer Science of the "Politehnica"
+      University of Bucharest
+      http://csite.cs.pub.ro/index.php/en/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -42,7 +45,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     RemoveAllStrands();
   }
 
-  // From iComponent
   bool HairPhysicsControl::Initialize (iObjectRegistry* r)
   {
     object_reg = r;
@@ -50,8 +52,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   //-- iFurPhysicsControl
-
-  void HairPhysicsControl::SetInitialTransform(csReversibleTransform initialTransform)
+  // No initial transformation specified / needed
+  void HairPhysicsControl::SetInitialTransform(csReversibleTransform)
   {
   }
 
@@ -76,6 +78,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     CS::Physics::Bullet::iSoftBody* bulletBody = bulletDynamicSystem->
       CreateRope(coordinates, coordinatesCount);
 
+    // Custom settings for ropes
     bulletBody->SetMass (0.1f);
     bulletBody->SetRigidity (0.99f);
     bulletBody->AnchorVertex (0, rigidBody);
@@ -111,6 +114,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void HairPhysicsControl::RemoveAllStrands ()
   {
+    // Iterate through all ropes
     for (size_t i = 0 ; i < guideRopes.GetSize(); i ++)
     {
       csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get(i, 0);

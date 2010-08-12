@@ -1,5 +1,8 @@
 /*
   Copyright (C) 2010 Alexandru - Teodor Voicu
+      Faculty of Automatic Control and Computer Science of the "Politehnica"
+      University of Bucharest
+      http://csite.cs.pub.ro/index.php/en/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -26,6 +29,8 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
+  // Light Scattering from Human Hair Fibers
+  // http://www.cs.cornell.edu/~srm/publications/SG03-hair.pdf
   class MarschnerConstants
   {
 /*
@@ -84,10 +89,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     HairStrandGenerator (iBase* parent);
     virtual ~HairStrandGenerator ();
 
-    // From iComponent	
+    //-- iComponent	
     virtual bool Initialize (iObjectRegistry*);
 
-    // From iFurStrandGenerator
+    //-- iFurStrandGenerator
     virtual iMaterial* GetMaterial() const;
     virtual void SetMaterial(iMaterial* material);
     virtual void Invalidate();
@@ -96,7 +101,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   private:
     iObjectRegistry* object_reg;
     iMaterial* material;
-    bool valid;
     // Shader
     csRef<iGraphics3D> g3d;
     csRef<iShaderVarStringSet> svStrings;
@@ -120,7 +124,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)
 
-
+// Various functions needed for the Marschner implementation
 class MarschnerHelper
 {
 public:
@@ -156,6 +160,7 @@ struct CubicSolution
   { return (n&2) ? X3 : ( (n&1) ? X2 : X1 ) ; }
 };
 
+// Solve different equations
 class EquationsSolver
 {
 public:

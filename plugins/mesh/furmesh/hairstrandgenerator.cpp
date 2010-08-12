@@ -1,5 +1,8 @@
 /*
   Copyright (C) 2010 Alexandru - Teodor Voicu
+      Faculty of Automatic Control and Computer Science of the "Politehnica"
+      University of Bucharest
+      http://csite.cs.pub.ro/index.php/en/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -33,8 +36,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   HairStrandGenerator::HairStrandGenerator (iBase* parent)
     : scfImplementationType (this, parent), object_reg(0), material(0), 
-    valid(false), g3d(0), svStrings(0), M(256, 256), N(256, 256),
-    gauss_matrix(0), mc(0)
+    g3d(0), svStrings(0), M(256, 256), N(256, 256), gauss_matrix(0), mc(0)
   {
   }
 
@@ -50,7 +52,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       delete N.data;
   }
 
-  // From iComponent
   bool HairStrandGenerator::Initialize (iObjectRegistry* r)
   {
     object_reg = r;
@@ -83,7 +84,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  // From iFurStrandGenerator
   iMaterial* HairStrandGenerator::GetMaterial() const
   {
     return material;
@@ -92,22 +92,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void HairStrandGenerator::SetMaterial(iMaterial* material)
   {
     this->material = material;
+    Invalidate();
   }
 
+  // Data need to be recomputed
   void HairStrandGenerator::Invalidate()
   {
-    valid = false;
-  }
-
-  void HairStrandGenerator::Update()
-  {
-    if(!valid && material)
-    {
       UpdateConstans();
       UpdateM();
       UpdateN();
-      valid = true;
-    }
+  }
+
+  // Nothing to be updated 
+  void HairStrandGenerator::Update()
+  {
   }
 
   void HairStrandGenerator::UpdateConstans()
@@ -174,7 +172,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if(!M.handle)
     {
       CS::ShaderVarName strandWidthName (svStrings, "tex M");	
-      csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(strandWidthName);
+      csRef<csShaderVariable> shaderVariable = 
+        material->GetVariableAdd(strandWidthName);
 
       if(!M.Create(g3d))
       {
@@ -220,10 +219,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // send buffer to texture
     M.Write();
 
-    // test new texture
-//     if (!M.Read())
-//       csPrintfErr("Could not read M texture!\n");
-
     M.SaveImage(object_reg, "/data/hairtest/debug/M_debug.png");
   }
 
@@ -265,9 +260,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if(!N.handle)
     {
       CS::ShaderVarName strandWidthName (svStrings, "tex N");	
-      csRef<csShaderVariable> shaderVariable = material->GetVariableAdd(strandWidthName);
+      csRef<csShaderVariable> shaderVariable = 
+        material->GetVariableAdd(strandWidthName);
 
-       N.Create(g3d);
+      N.Create(g3d);
 
       if(!N.handle)
       {
@@ -304,10 +300,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // send buffer to texture
     N.Write();
 
-    // test new texture
-//     if (!N.Read())
-//       csPrintfErr("Could not read N texture!\n");
-
     N.SaveImage(object_reg, "/data/hairtest/debug/N_debug.png");
   }
 
@@ -322,15 +314,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     float gammaI = asin(h);
 
-    //A(0; h) = F(h0; h00; gi)
+    // A(0; h) = F(h0; h00; gi)
     if (p == 0)
       return MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
 
-    //A(p; h) = ( (1 - F(h0; h00; gi) ) ^ 2 ) * ( F(1 / h0; 1 / h00; gi) ^ (p - 1) ) * ( T(s0a; h) ^ p )
+    // A(p; h) = ( (1 - F(h0; h00; gi) ) ^ 2 ) * 
+    //           ( F(1 / h0; 1 / h00; gi) ^ (p - 1) ) * ( T(s0a; h) ^ p )
     float gammaT = asin(h / etaPerpendicular);	// h0 sin gt = h
 
-    float fresnel = MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
-    float invFresnel = MarschnerHelper::Fresnel(1 / etaPerpendicular, 1 / etaParallel, gammaT);
+    float fresnel = 
+      MarschnerHelper::Fresnel(etaPerpendicular, etaParallel, gammaI);
+    float invFresnel = 
+      MarschnerHelper::Fresnel(1 / etaPerpendicular, 1 / etaParallel, gammaT);
     float t = ComputeT(absorption, gammaT, p);
 
     fresnel = (1 - fresnel) * (1 - invFresnel);
@@ -351,23 +346,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     CubicSolution roots = EquationsSolver::Roots(p, etaPerpendicular, phi);
     float result = 0;
 
-//     if (roots.w != int(roots.w))
-//       printf("%f\t%d\t%d\t%f\t%f\n", roots.w, int(roots.w), p, etaPerpendicular, phi);
-
     for (size_t index = 0; index < roots.count; index++ )
     {
       float gammaI = roots[index];
 
-      //if (fabs(gammaI) <= PI/2)
-      {
-        float h = sin(gammaI);
-        float finalAbsorption = ComputeA(absorption, p, h, refraction, 
-          etaPerpendicular, etaParallel);
-        float inverseDerivateAngle = 
-          EquationsSolver::InverseFirstDerivate(p, etaPerpendicular, h);
+      float h = sin(gammaI);
+      float finalAbsorption = ComputeA(absorption, p, h, refraction, 
+        etaPerpendicular, etaParallel);
+      float inverseDerivateAngle = 
+        EquationsSolver::InverseFirstDerivate(p, etaPerpendicular, h);
 
-        result += finalAbsorption * 0.5f * fabs(inverseDerivateAngle); //0.5 here
-      }
+      result += finalAbsorption * 0.5f * fabs(inverseDerivateAngle);
     }
 
     return csMin(1.0f, result);
@@ -480,7 +469,8 @@ float MarschnerHelper::FresnelPerpendicular(float n2, float angle)
 }
 
 // Fresnel Equation - http://en.wikipedia.org/wiki/Fresnel_equations
-double MarschnerHelper::Fresnel(float etaPerpendicular, float etaParallel, float angle)
+double MarschnerHelper::Fresnel
+  (float etaPerpendicular, float etaParallel, float angle)
 {
   return 0.5f * (FresnelPerpendicular(etaPerpendicular, angle) + 
     FresnelParallel(etaParallel, angle));
@@ -544,7 +534,7 @@ CubicSolution EquationsSolver::NormalizedCubicSolver(float A, float B, float C)
 {
   CubicSolution roots;
 
-  if (fabs(C) < SMALL_EPSILON)	//	x = 0 solution
+  if (fabs(C) < SMALL_EPSILON)	// + x = 0 solution
   {
     roots = QuadraticSolver(1, A, B);
     roots[ roots.count ] = 0;
@@ -556,7 +546,7 @@ CubicSolution EquationsSolver::NormalizedCubicSolver(float A, float B, float C)
     float R = (9 * A * B - 27 * C - 2 * A * A * A) / 54;
     float D = Q * Q * Q + R * R;
 
-    if (D > 0)	// 1 root
+    if (D > 0)	// 1 real root
     {
       float sqrtD = sqrt(D);
       float s = SIGN(R + sqrtD) * pow(fabs(R + sqrtD), 1.0f / 3.0f);
@@ -565,7 +555,7 @@ CubicSolution EquationsSolver::NormalizedCubicSolver(float A, float B, float C)
       roots.X1 = (-A / 3 + (s + t));
       roots.count = 1;
     }
-    else	// 3 roots
+    else	// 3 real roots
     {
       float theta = acos(R / sqrt(-(Q * Q * Q)));
       float sqrtQ = sqrt(-Q);
