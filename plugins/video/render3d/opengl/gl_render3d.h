@@ -702,8 +702,7 @@ public:
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
     const CS::Graphics::RenderMeshModes& modes,
-    const csShaderVariableStack& stack,
-    bool bDisableCulling=false);
+    const csShaderVariableStack& stack);
 
   /// Draw a 2D sprite
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
@@ -779,9 +778,9 @@ public:
   virtual bool SetOption (const char*, const char*);
 
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
-    uint flags = 0, bool bDisableCulling=false);
+    uint flags = 0);
   virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
-    size_t numMeshes, uint flags = 0, bool bDisableCulling=false);
+    size_t numMeshes, uint flags = 0);
 
   //virtual void DrawSimpleMaskedMeshes (const csSimpleRenderMesh* meshes,
 	//			       size_t numMeshes, uint flags);
@@ -794,12 +793,12 @@ public:
   virtual bool PerformExtension (char const* command, ...);
   virtual bool PerformExtensionV (char const* command, va_list args);
 
-  virtual void OQInitQueries (unsigned int* queries, int num_queries);
-  virtual void OQDelQueries (unsigned int* queries, int num_queries);
-  virtual bool OQueryFinished (unsigned int occlusion_query);
-  virtual bool OQIsVisible (unsigned int occlusion_query, unsigned int sampleLimit);
-  virtual void OQBeginQuery (unsigned int occlusion_query);
-  virtual void OQEndQuery ();
+  virtual void OQInitQueries (unsigned int* queries, int num_queries) const;
+  virtual void OQDelQueries (unsigned int* queries, int num_queries) const;
+  virtual bool OQueryFinished (unsigned int occlusion_query) const;
+  virtual bool OQIsVisible (unsigned int occlusion_query, unsigned int sampleLimit) const;
+  virtual void OQBeginQuery (unsigned int occlusion_query) const;
+  virtual void OQEndQuery () const;
 
   virtual void DrawQuad();
   virtual void DrawMeshBasic(const CS::Graphics::CoreRenderMesh* mymesh,

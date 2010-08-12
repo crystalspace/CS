@@ -384,18 +384,21 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
 
   const csVector3 dir=rview->GetCamera ()->GetTransform ().GetFront()-rview->GetCamera ()->GetTransform ().GetOrigin ();
 
+//#define USE_FRUSTVIS
 #ifdef USE_FRUSTVIS
   const InnerTraverse opIN(&f2bData);
   const LeafTraverse opLN(&f2bData);
+  aabbTree.TraverseF2BWithData(opIN,opLN,frustum_mask,dir);
 #else
-  const InnerNodeProcessOP opIN(&f2bData);
-  const LeafNodeProcessOP opLN(&f2bData);
+  const InnerNodeProcessOP opIN(&f2bData,Queries);
+  const LeafNodeProcessOP opLN(&f2bData,Queries);
+  const TraverseFunctor travfn(&f2bData,dir);
+  aabbTree.TraverseCustomWithData(travfn, frustum_mask);
 #endif
+  //aabbTree.TraverseIterF2BWithData(opIN,opLN,frustum_mask,dir);
+  //aabbTree.TraverseCustomWithData(travfn, frustum_mask);
 
-  //aabbTree.TraverseF2BWithData(opIN,opLN,frustum_mask,dir);
-  aabbTree.TraverseIterF2BWithData(opIN,opLN,frustum_mask,dir);
-
-  //printf("\n\n");
+  printf("\n\n");
 
   g3d->SetWriteMask(true,true,true,true);
   g3d->SetClipper (0, CS_CLIPPER_NONE);

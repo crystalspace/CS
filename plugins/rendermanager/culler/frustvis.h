@@ -39,6 +39,7 @@
 #include "iengine/mesh.h"
 #include "aabbtree.h"
 #include <map>
+#include <queue>
 
 enum NodeVisibility
 {
@@ -104,7 +105,7 @@ public:
   NodeLeafData() : g3d(0), mesh(0), OCQueryLeafID(0)
   {
   }
-  NodeLeafData(iGraphics3D* g3d,csRef<iMeshWrapper> mesh,csBox3 &bbox)
+  NodeLeafData(iGraphics3D* g3d,iMeshWrapper* mesh,const csBox3 &bbox)
   {
     this->g3d=g3d;
     this->mesh=mesh;
@@ -117,13 +118,18 @@ public:
 
   unsigned int OCQueryLeafID; 
   iGraphics3D* g3d;
+  iMeshWrapper* mesh;
   csBox3 bbox;
-  csRef<iMeshWrapper> mesh;
 
   const csBox3& GetBBox() const { return bbox; }
   unsigned int GetQueryLeafID() const
   {
      return OCQueryLeafID;
+  }
+
+  bool LeafQueryFinished() const
+  {
+    return g3d->OQueryFinished(OCQueryLeafID);
   }
 
   ~NodeLeafData()
@@ -171,6 +177,11 @@ public:
      return OCQueryID;
   }
 
+  bool InnerQueryFinished() const
+  {
+    return g3d->OQueryFinished(OCQueryID);
+  }
+
   iGraphics3D* GetGraphics3D() const
   {
     return g3d;
@@ -199,9 +210,6 @@ public:
       g3d->OQInitQueries(&OCQueryID,1);
     }
     CreateBBoxMesh(data->bbox);
-    /*csPrintf("Created aabb (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
-          data->bbox.MinX(),data->bbox.MinY(),data->bbox.MinZ(),
-          data->bbox.MaxX(),data->bbox.MaxY(),data->bbox.MaxZ());*/
   }
 
   void LeafUpdateObjects (NodeLeafData**, uint)
@@ -276,6 +284,32 @@ public:
 
 typedef AABBTree<NodeLeafData,1,NodeData>::Node* NodePtr;
 
+/*struct OccQuery
+{
+  OccQuery() : oqID(0), n(0)
+  {
+  }
+
+  OccQuery(const unsigned int oqID,const NodePtr n)
+  {
+    this->oqID=oqID;
+    this->n=n;
+  }
+
+  unsigned int oqID;
+  NodePtr n;
+
+  unsigned int GetQueryID() const
+  {
+    return oqID;
+  }
+
+  NodePtr GetNode() const
+  {
+    return n;
+  }
+};*/
+
 /**
  * A simple frustum based visibility culling system.
  */
@@ -301,7 +335,7 @@ private:
   csBox3 kdtree_box;
   csRefArray<csFrustVisObjectWrapper, CS::Container::ArrayAllocDefault, 
     csArrayCapacityFixedGrow<256> > visobj_vector;
-  std::map<csRef<iMeshWrapper>,NodeLeafData*> mapNodeLeafData;
+  std::map<iMeshWrapper*,NodeLeafData*> mapNodeLeafData;
 
   int scr_width, scr_height;	// Screen dimensions.
   uint32 current_vistest_nr;
@@ -321,6 +355,8 @@ private:
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
   csRef<iGraphics3D> g3d;
+
+  std::queue<const NodePtr> Queries;
   AABBTree<NodeLeafData,1,NodeData > aabbTree;
 
   // Frustum data (front to back)

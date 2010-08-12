@@ -131,6 +131,46 @@
     }
 
     /**
+     * Custom Traversal function; use only in extreme cases
+     */
+    template<typename TravFn>
+    void TraverseCustom(const TravFn& travfn)
+    {
+      if (rootNode)
+        travfn(rootNode);
+    }
+
+    /**
+     * Custom Traversal function; use only in extreme cases
+     */
+    template<typename TravFn>
+    void TraverseCustom(const TravFn& travfn) const
+    {
+      if (rootNode)
+        travfn(rootNode);
+    }
+
+    /**
+     * Custom Traversal function WITH data; use only in extreme cases
+     */
+    template<typename TravFn, typename T>
+    void TraverseCustomWithData(TravFn& travfn, const T &traverseData)
+    {
+      if (rootNode)
+        travfn(rootNode, traverseData);
+    }
+
+    /**
+     * Custom Traversal function WITH data; use only in extreme cases
+     */
+    template<typename TravFn, typename T>
+    void TraverseCustomWithData(const TravFn& travfn, const T &traverseData) const
+    {
+      if (rootNode)
+        travfn(rootNode, traverseData);
+    }
+
+    /**
      * 
      */
     template<typename InnerFn, typename LeafFn>
