@@ -853,8 +853,6 @@ THREADED_CALLABLE_IMPL(csEngine, DeleteAll)
     // Register it.
     renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
       defaultRenderLoop);
-
-    csEngine::ReloadRenderManager();
   }
 
   return true;
@@ -1092,6 +1090,12 @@ void csEngine::StartEngine ()
   for (int p = 0; p < csLightShaderVarCache::_varCount; p++)
   {
     lightSvNames.GetDefaultSVId (csLightShaderVarCache::DefaultSV (p));
+  }
+
+  if (G3D)
+  {
+    // Create the render manager after the engine has been initialized.
+    csEngine::ReloadRenderManager();
   }
 }
 
