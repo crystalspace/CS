@@ -228,7 +228,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   // Read Config settings.
   csConfigAccess cfg (objRegistry);
   maxPortalRecurse = cfg->GetInt ("RenderManager.Deferred.MaxPortalRecurse", 30);
-  showGBuffer = true;
+  showGBuffer = false;
   drawLightVolumes = false;
 
   bool layersValid = false;
