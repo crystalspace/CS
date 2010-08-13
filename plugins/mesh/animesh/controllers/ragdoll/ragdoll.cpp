@@ -165,6 +165,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     childNode = 0;
   }
 
+  iDynamicSystem* RagdollAnimNodeFactory::GetDynamicSystem () const
+  {
+    return dynSys;
+  }
 
   /********************
    *  RagdollAnimNode
@@ -353,21 +357,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   {
     CS_ASSERT (skeleton->GetSceneNode ());
 
-    // check availability of animated mesh
+    if (isActive)
+      return;
+
+    // Find the scene node
     if (!sceneNode)
       sceneNode = skeleton->GetSceneNode ();
 
-    // check for the dynamic system
+    // Check for the dynamic system
     if (!factory->dynSys)
     {
       factory->manager->Report (CS_REPORTER_SEVERITY_ERROR,
-        "No dynamic system defined while starting the ragdoll node.\n");
+        "No dynamic system defined while starting the ragdoll animation node.\n");
       return;
     }
 
     isActive = true;
 
-    // update state of all bones (iterate in increasing order of the bone ID's
+    // Update the state of all bones (iterate in increasing order of the bone ID's
     // so that the parent bones are always updated before their children)
     for (size_t i = 0; i <= maxBoneID; i++)
     {
@@ -379,7 +386,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       UpdateBoneState (&boneData);
     }
 
-    // start child node
+    // Start the child node
     if (childNode)
       childNode->Play ();
   }
