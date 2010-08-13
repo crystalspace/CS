@@ -633,7 +633,6 @@ bool LodGen::IsCoincident(const WorkMesh& k, const csTriangle& tri) const
     const IncidentTris& incident = k.incident_tris[tri[i]];
     for (unsigned int j = 0; j < incident.GetSize(); j++)
     {
-      assert(!IsDegenerate(k.tri_buffer[incident[j]]));
       if (IsTriangleCoincident(k.tri_buffer[incident[j]], tri))
         return true;
     }
