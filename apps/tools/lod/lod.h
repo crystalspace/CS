@@ -27,6 +27,8 @@ struct Params
   bool verbose;
   float min_dist;
   float max_dist;
+  bool override_dist;
+  bool dist_specified;
   
   Params():
     error_metric_type(ERROR_METRIC_FAST),

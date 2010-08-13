@@ -39,13 +39,18 @@ Lod::~Lod ()
 
 void Lod::Usage()
 {
-  csPrintf("Usage:\n");
-  csPrintf("lod -i=<input_file> -o=<output_file> -mindist=d -maxdist=d [-em=<fast|precise>] [-v]\n");
-  csPrintf("-em:        error metric (fast or precise)\n");
-  csPrintf("-v:         verbose\n");
-  csPrintf("-mindist:   minimum LOD distance\n");
-  csPrintf("-maxdist:   maximum LOD distance\n");
-  csPrintf("For medium-sized objects, try -mindist=5.0 -maxdist=50.0\n");
+  //        ---------+---------+---------+---------+---------+---------+---------+-------80+
+  csPrintf("Usage:\n\n");
+  csPrintf("lod -i=<input_file> -o=<output_file> -mindist=d -maxdist=d [-em=<fast|precise>]\n");
+  csPrintf("    [-v]\n\n");
+  csPrintf("-em       Error metric (fast or precise).\n");
+  csPrintf("-v        Verbose.\n");
+  csPrintf("-mindist  Minimum LOD distance.\n");
+  csPrintf("-maxdist  Maximum LOD distance.\n");
+  csPrintf("          For medium-sized objects, try -mindist=5 -maxdist=50.\n");
+  csPrintf("          Existing values in input file take precedence, unless -force is used.\n");
+  csPrintf("-force    Force use of cmdline-specified mindist and maxdist.\n");
+  csPrintf("          Mindist and maxdist *need* to be either in cmdline or input file.\n");
 }
 
 bool Lod::ParseParams(int argc, char* argv[])
@@ -80,25 +85,30 @@ bool Lod::ParseParams(int argc, char* argv[])
     params.verbose = true;
 
   csString mind = cmdline->GetOption("mindist");
+  csString maxd = cmdline->GetOption("maxdist");
+  if ((mind == "" && maxd != "") || (mind != "" && maxd == ""))
+  {
+    ReportError("mindist and maxdist have to be specified together.");
+    Usage();
+    return false;
+  }
+  
   if (mind == "")
   {
-    ReportError("Minimum and maximum distances should be specified.");
-    Usage();
-    return false;
+    params.dist_specified = false;
   }
-  csScanStr(mind, "%f", &params.min_dist);
-  if (params.min_dist < 0.0f)
-    params.min_dist = 0.0f;
-  csString maxd = cmdline->GetOption("maxdist");
-  if (maxd == "")
+  else
   {
-    ReportError("Minimum and maximum distances should be specified.");
-    Usage();
-    return false;
+    params.dist_specified = true;    
+    csScanStr(mind, "%f", &params.min_dist);
+    if (params.min_dist < 0.0f)
+      params.min_dist = 0.0f;
+    csScanStr(maxd, "%f", &params.max_dist);
+    if (params.max_dist < 0.0f)
+      params.max_dist = 0.0f;
   }
-  csScanStr(maxd, "%f", &params.max_dist);
-  if (params.max_dist < 0.0f)
-    params.max_dist = 0.0f;
+  
+  params.override_dist = cmdline->GetBoolOption("force", false);
 
   return true;
 }
@@ -266,12 +276,14 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
 {
   csString cwd = vfs->GetCwd ();
   csRef<iThreadReturn> itr = tloader->LoadNodeWait(cwd, node);
+  csString name = node->GetAttributeValue ("name");
   if (!itr->WasSuccessful())
   {
-    csString name = node->GetAttributeValue ("name");
     ReportError("Error parsing meshfact '%s' in input file.", name.GetData ());
     return;
   }
+
+  ReportInfo("Processing factory %s.", name.GetData());
 
   imeshfactw = scfQueryInterface<iMeshFactoryWrapper>(itr->GetResultRefPtr());
     
@@ -284,6 +296,20 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
   if (!fstate)
     return;
   
+  float mindist_file, maxdist_file;
+  fstate->GetProgLODDistances(mindist_file, maxdist_file);
+  bool b_have_file_dist = !(mindist_file == 0.0 && maxdist_file == 0.0);
+  bool b_have_cmdline_dist = params.dist_specified;
+  if (!b_have_file_dist && !b_have_cmdline_dist)
+  {
+    ReportInfo("Factory %s ignored. Distances not set on command line and not present on file.",
+      name.GetData());
+    return;
+  }
+
+  if (!b_have_file_dist || params.override_dist)
+    fstate->SetProgLODDistances(params.min_dist, params.max_dist);
+
   for (unsigned int submesh_index = 0; submesh_index < fstate->GetSubMeshCount(); submesh_index++)
   {
     LodGen lodgen;
@@ -363,8 +389,6 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
       fsm->AddSlidingWindow(lodgen.GetSlidingWindow(i).start_index*3, lodgen.GetSlidingWindow(i).end_index*3);
     }
   }
-
-  fstate->SetProgLODDistances(params.min_dist, params.max_dist);
 
   SaveToNode(node);
 }
