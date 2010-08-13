@@ -341,6 +341,8 @@ void csBulletDynamicsSystem::RemoveBody (::iRigidBody* body)
     for (size_t i = 0; i < csBody->contactObjects.GetSize (); i++)
       csBody->contactObjects[i]->activate ();
 
+    // TODO: remove any connected joint
+
     // remove the body from the world
     bulletWorld->removeRigidBody (csBody->body);
   }
@@ -1008,7 +1010,7 @@ bool csBulletDynamicsSystem::SaveBulletWorld (const char* filename)
   return false;
 #else
 
-  //create a large enough buffer. There is no method to pre-calculate the buffer size yet.
+  // create a large enough buffer
   int maxSerializeBufferSize = 1024 * 1024 * 5;
  
   btDefaultSerializer* serializer = new btDefaultSerializer (maxSerializeBufferSize);
@@ -1033,6 +1035,12 @@ iTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
  csVector3 gridSize, csOrthoTransform& transform,
  float minimumHeight, float maximumHeight)
 {
+  CS_ASSERT(gridWidth > 1
+	    && gridHeight > 1
+	    && gridSize[0] > 0.0f
+	    && gridSize[1] > 0.0f
+	    && gridSize[2] > 0.0f);
+
   csRef<csBulletTerrainCellCollider> terrain;
   terrain.AttachNew
     (new csBulletTerrainCellCollider (this, heightData, gridWidth, gridHeight,
