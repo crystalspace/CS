@@ -103,7 +103,10 @@ void LodView::UpdateLODLevel()
           csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
           int num_sw = fsm->GetSlidingWindowSize();
           int s, e;
-          fsm->GetSlidingWindow((lod_level > num_sw-1) ? num_sw-1 : lod_level, s, e);
+          if (num_sw == 0)
+            s = e = 0;
+          else
+            fsm->GetSlidingWindow((lod_level > num_sw-1) ? num_sw-1 : lod_level, s, e);
           tris += (e - s) / 3;
         }
       }
@@ -328,7 +331,10 @@ bool LodView::SetupModules ()
   rm = engine->GetRenderManager ();
   rotY = rotX = 0;
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  if (use_multiple_sprites)
+    view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  else
+    view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 3, -3));
   printer.AttachNew (new FramePrinter (object_reg));
   return true;
 }

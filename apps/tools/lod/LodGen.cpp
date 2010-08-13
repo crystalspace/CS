@@ -439,7 +439,6 @@ float LodGen::ErrorMetricFastOld(const WorkMesh& k, int start_index) const
       }
       while (r0 + r1 > 1.0);
       float r2 = 1.0 - r0 - r1;
-      assert(r0 + r1 + r2 == 1.0);
       csVector3 b = r0 * q0 + r1 * q1 + r2 * q2;
       float min_d2 = FLT_MAX;
       // Find the smallest distance between the sample point and all triangles
@@ -572,7 +571,6 @@ float LodGen::ErrorMetricFast(const WorkMesh& k, int start_index) const
       }
       while (r0 + r1 > 1.0);
       float r2 = 1.0 - r0 - r1;
-      assert(r0 + r1 + r2 == 1.0);
       csVector3 b = r0 * q0 + r1 * q1 + r2 * q2;
       float min_d2 = FLT_MAX;
       // Find the smallest distance between the sample point and triangles in test_tris
