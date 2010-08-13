@@ -961,8 +961,7 @@ struct iGraphics3D : public virtual iBase
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
                          const CS::Graphics::RenderMeshModes& modes,
-                         const csShaderVariableStack& stack, 
-                         bool bDisableCulling=false) = 0;
+                         const csShaderVariableStack& stack) = 0;
 
   /**
   * Draw a csSimpleRenderMesh on the screen.
@@ -981,7 +980,7 @@ struct iGraphics3D : public virtual iBase
   *  case, you are responsible for the mess that is likely created.
   */
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh,
-    uint flags = 0, bool bDisableCulling=false) = 0;
+    uint flags = 0) = 0;
 
   /**
    * Draw a pixmap using a rectangle from given texture.

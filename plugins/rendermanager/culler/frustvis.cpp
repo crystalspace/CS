@@ -361,7 +361,6 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   f2bData.global_bbox=kdtree_box;
   f2bData.current_timestamp=cur_timestamp;
 
-  //g3d=rview->GetGraphics3D();
   if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
 	      csPrintf("Cannot prepare renderer for 3D drawing\n");
@@ -398,7 +397,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   //aabbTree.TraverseIterF2BWithData(opIN,opLN,frustum_mask,dir);
   //aabbTree.TraverseCustomWithData(travfn, frustum_mask);
 
-  printf("\n\n");
+  //printf("\n\n");
 
   g3d->SetWriteMask(true,true,true,true);
   g3d->SetClipper (0, CS_CLIPPER_NONE);

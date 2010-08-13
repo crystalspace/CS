@@ -440,7 +440,7 @@ struct TraverseFunctor : Common
     return n->GetGraphics3D()->OQueryFinished(oqID);
   }
 
-  bool CheckOQ(const NodePtr n,const unsigned int oqID) const
+  inline bool CheckOQ(const NodePtr n,const unsigned int oqID) const
   {
     if(oqID)
     {
@@ -566,8 +566,11 @@ struct TraverseFunctor : Common
     bool ret = true;
     if (!rootNode) 
       return ret;
+
     std::stack<const NodePtr> Q;
     std::queue<const NodePtr> OccQueries;
+    csSectorVisibleRenderMeshes* meshList;
+
     Q.push(rootNode);
     while(!Q.empty() || !OccQueries.empty())
     {
@@ -583,7 +586,6 @@ struct TraverseFunctor : Common
           if(n->IsLeaf())
           {
             iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
-            csSectorVisibleRenderMeshes* meshList;
             const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
             const int numMeshes = f2bData->viscallback->GetVisibleMeshes(mw,frustum_mask,meshList);
             if(numMeshes > 0 )
@@ -596,6 +598,7 @@ struct TraverseFunctor : Common
             TraverseInner(n,direction,Q);
           }
         }
+        //else printf("Wasn't visible\n");
       }
       
       while(!Q.empty())
@@ -617,7 +620,6 @@ struct TraverseFunctor : Common
           if (bIsLeaf)
           {
             iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
-            csSectorVisibleRenderMeshes* meshList;
             const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
             const int numMeshes = f2bData->viscallback->GetVisibleMeshes(mw,frust_mask,meshList);
             if(numMeshes > 0 )
@@ -641,18 +643,22 @@ struct TraverseFunctor : Common
           }
           else
           {
-            if(!bWasVisible)
+            if(bWasVisible)
             {
-              const csBox3 box=n->GetBBox();
-              csPrintf("Issuing BB (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
+              /*const csBox3 box=n->GetBBox();
+              csPrintf("Traversing BB (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
                 box.MinX(),box.MinY(),box.MinZ(),
-                box.MaxX(),box.MaxY(),box.MaxZ());
-              DrawBBoxQuery(n);
-              OccQueries.push(n);
+                box.MaxX(),box.MaxY(),box.MaxZ());*/
+              TraverseInner(n,direction,Q);
             }
             else
             {
-              TraverseInner(n,direction,Q);
+              /*const csBox3 box=n->GetBBox();
+              csPrintf("Issuing BB (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
+                box.MinX(),box.MinY(),box.MinZ(),
+                box.MaxX(),box.MaxY(),box.MaxZ());*/
+              DrawBBoxQuery(n);
+              OccQueries.push(n);
             }
           }
         }

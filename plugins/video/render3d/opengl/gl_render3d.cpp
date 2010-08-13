@@ -2113,8 +2113,7 @@ void csGLGraphics3D::DrawQuad()
 
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
-    const csShaderVariableStack& stacks,
-    bool bDisableCulling)
+    const csShaderVariableStack& stacks)
 {
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
@@ -2282,24 +2281,17 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   // Flip face culling if we do mirroring
   if (mirrorflag)
     cullMode = CS::Graphics::GetFlippedCullMode (cullMode);
-  if(bDisableCulling)
+  if (cullMode == CS::Graphics::cullDisabled)
   {
     statecache->Disable_GL_CULL_FACE ();
   }
   else
   {
-    if (cullMode == CS::Graphics::cullDisabled)
-    {
-      statecache->Disable_GL_CULL_FACE ();
-    }
-    else
-    {
-      statecache->Enable_GL_CULL_FACE ();
+    statecache->Enable_GL_CULL_FACE ();
     
-      // Flip culling if shader wants it
-      if (cullMode == CS::Graphics::cullFlipped)
-        statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
-    }
+    // Flip culling if shader wants it
+    if (cullMode == CS::Graphics::cullFlipped)
+      statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
   }
 
   const uint mixmode = modes.mixmode;
@@ -2395,10 +2387,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
 
-  if(bDisableCulling)
-  {
-    statecache->Enable_GL_CULL_FACE ();
-  }
   // Restore cull mode
   if (cullMode == CS::Graphics::cullFlipped) statecache->SetCullFace (cullFace);
   //statecache->Disable_GL_POLYGON_OFFSET_FILL ();
@@ -3622,13 +3610,13 @@ bool csGLGraphics3D::SetOption (const char* name, const char* value)
 }
 
 void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
-				     uint flags, const bool bDisableCulling)
+				     uint flags)
 {
-  csGLGraphics3D::DrawSimpleMeshes (&mesh, 1, flags, bDisableCulling);
+  csGLGraphics3D::DrawSimpleMeshes (&mesh, 1, flags);
 }
 
 void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
-				       size_t numMeshes, uint flags, bool bDisableCulling)
+				       size_t numMeshes, uint flags)
 {  
   
   if (current_drawflags & CSDRAW_2DGRAPHICS)
@@ -3884,7 +3872,7 @@ void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
       {
 		    ActivateBuffers (scrapBufferHolder, defaultBufferMapping);
       }
-      DrawMesh (&rmesh, modes, stack,bDisableCulling);
+      DrawMesh (&rmesh, modes, stack);
       if (mesh.shader != 0)
       {
 		    mesh.shader->TeardownPass (shaderTicket);
