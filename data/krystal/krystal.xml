@@ -57,15 +57,15 @@
 	  <shadervar type="texture" name="color map">krystal_skull_colormap</shadervar>
 	  <shadervar type="texture" name="texture map">krystal_skull_texturemap</shadervar>
 
-	  <shadervar type="float" name="strandWidth">0.0015</shadervar>
+	  <shadervar type="float" name="strandWidth">0.001</shadervar>
 	  <shadervar type="float" name="displaceDistance">0.02</shadervar>
 	  <shadervar type="texture" name="density map">krystal_skull_densitymap</shadervar>
 	  <shadervar type="float" name="densityFactorGuideHairs">10</shadervar>
-	  <shadervar type="float" name="densityFactorHairStrands">100</shadervar>
+	  <shadervar type="float" name="densityFactorHairStrands">120</shadervar>
       <shadervar type="texture" name="height map">krystal_skull_heightmap</shadervar>
-	  <shadervar type="float" name="heightFactor">0.5</shadervar>
+	  <shadervar type="float" name="heightFactor">0.4</shadervar>
 	  <shadervar type="float" name="controlPointsDistance">0.05</shadervar>
-	  <shadervar type="float" name="positionDeviation">0.01</shadervar>	  
+	  <shadervar type="float" name="positionDeviation">0.005</shadervar>	  
 	  <shadervar type="int" name="growTangents">1</shadervar>
     </material>
   </materials>

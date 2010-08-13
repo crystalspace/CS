@@ -304,9 +304,9 @@ bool KrystalScene::CreateAvatar ()
   
   randomNodeFactory->AddNode (idle01NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle02NodeFactory, 1.0f);
-  randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
+//   randomNodeFactory->AddNode (idle03NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle04NodeFactory, 1.0f);
-  randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
+//   randomNodeFactory->AddNode (idle05NodeFactory, 1.0f);
   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
   randomNodeFactory->AddNode (standNodeFactory, 1.0f);
   

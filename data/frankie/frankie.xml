@@ -35,12 +35,12 @@
 	  <shadervar type="float" name="strandWidth">0.001</shadervar>
 	  <shadervar type="float" name="displaceDistance">0.0</shadervar>
 	  <shadervar type="texture" name="density map">frankie_densitymap</shadervar>
-	  <shadervar type="float" name="densityFactorGuideHairs">50</shadervar>
-	  <shadervar type="float" name="densityFactorHairStrands">75</shadervar>
+	  <shadervar type="float" name="densityFactorGuideHairs">100</shadervar>
+	  <shadervar type="float" name="densityFactorHairStrands">100</shadervar>
       <shadervar type="texture" name="height map">frankie_densitymap</shadervar>
 	  <shadervar type="float" name="heightFactor">0.1</shadervar>
 	  <shadervar type="float" name="controlPointsDistance">0.025</shadervar>
-	  <shadervar type="float" name="positionDeviation">0.005</shadervar>	  
+	  <shadervar type="float" name="positionDeviation">0.002</shadervar>	  
 	  <shadervar type="int" name="growTangents">0</shadervar>
     </material>	
   </materials>
