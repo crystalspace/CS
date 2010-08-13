@@ -392,7 +392,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   const InnerNodeProcessOP opIN(&f2bData,Queries);
   const LeafNodeProcessOP opLN(&f2bData,Queries);
   const TraverseFunctor travfn(&f2bData,dir);
-  aabbTree.TraverseCustomWithData(travfn, frustum_mask);
+  aabbTree.TraverseCustomWithData(travfn, Queries);
 #endif
   //aabbTree.TraverseIterF2BWithData(opIN,opLN,frustum_mask,dir);
   //aabbTree.TraverseCustomWithData(travfn, frustum_mask);

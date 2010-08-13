@@ -363,7 +363,7 @@ struct LeafNodeProcessOP : public Common
 };
 
 
-struct TraverseFunctor : Common
+struct TraverseFunctor
 {
   TraverseFunctor()
   {
@@ -375,6 +375,18 @@ struct TraverseFunctor : Common
   }
 
   csVector3 direction;
+  const FrustTest_Front2BackData *f2bData;
+
+  void PullUpVisibility(const NodePtr n) const
+  {
+    NodePtr naux=n;
+    while(naux->GetParent())
+    {
+      naux->SetVisibilityForCamera(f2bData->rview->GetCamera(),true);
+      naux=naux->GetParent();
+    }
+    naux->SetVisibilityForCamera(f2bData->rview->GetCamera(),true);
+  }
 
   void DrawBBoxQuery(const NodePtr n) const
   {
@@ -435,7 +447,7 @@ struct TraverseFunctor : Common
     return false;
   }
 
-  bool IsQueryFinished(const NodePtr n,const unsigned int oqID) const
+  inline bool IsQueryFinished(const NodePtr n,const unsigned int oqID) const
   {
     return n->GetGraphics3D()->OQueryFinished(oqID);
   }
@@ -561,22 +573,52 @@ struct TraverseFunctor : Common
     Q.push(n->GetChild (firstIdx));
   }
 
-  bool operator() (const NodePtr rootNode,uint32 frustum_mask) const
+  bool operator() (const NodePtr rootNode, std::queue<const NodePtr>& OccQueries) const
   {
     bool ret = true;
     if (!rootNode) 
       return ret;
 
     std::stack<const NodePtr> Q;
-    std::queue<const NodePtr> OccQueries;
     csSectorVisibleRenderMeshes* meshList;
+    uint32 frustum_mask=f2bData->rview->GetRenderContext()->clip_planes_mask;
 
     Q.push(rootNode);
-    while(!Q.empty() || !OccQueries.empty())
+
+    while(!OccQueries.empty())
+    {
+      if(ResultAvailable(OccQueries.front()))
+      {
+        const NodePtr n=OccQueries.front();
+        OccQueries.pop();
+        const unsigned int oqID=n->IsLeaf()?n->GetLeafData(0)->GetQueryLeafID():n->GetQueryID();
+        if(CheckOQ(n,oqID))
+        {
+          PullUpVisibility(n);
+          if(n->IsLeaf())
+          {
+            iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
+            const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
+            const int numMeshes = f2bData->viscallback->GetVisibleMeshes(mw,frustum_mask,meshList);
+            if(numMeshes > 0 )
+            {
+              f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
+            }
+          }
+          else
+          {
+            TraverseInner(n,direction,Q);
+          }
+        }
+      }
+    }
+    //printf("Size when entering %d\n",OccQueries.size());
+    while(!Q.empty() )//|| !OccQueries.empty())
     {
       while(!OccQueries.empty() && 
-            (ResultAvailable(OccQueries.front()) || Q.empty()) )
+            (ResultAvailable(OccQueries.front()) ))//|| Q.empty()) )
       {
+        //printf("Query done\n");
         const NodePtr n=OccQueries.front();
         OccQueries.pop();
         const unsigned int oqID=n->IsLeaf()?n->GetLeafData(0)->GetQueryLeafID():n->GetQueryID();
@@ -653,17 +695,28 @@ struct TraverseFunctor : Common
             }
             else
             {
-              /*const csBox3 box=n->GetBBox();
-              csPrintf("Issuing BB (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
+              const csBox3 box=n->GetBBox();
+              /*csPrintf("Issuing BB (%.2f %.2f %.2f) (%.2f %.2f %.2f)\n",
                 box.MinX(),box.MinY(),box.MinZ(),
                 box.MaxX(),box.MaxY(),box.MaxZ());*/
-              DrawBBoxQuery(n);
-              OccQueries.push(n);
+
+              if(box.In(f2bData->pos))
+              {
+                PullUpVisibility(n);
+                TraverseInner(n,direction,Q);
+              }
+              else
+              {
+                DrawBBoxQuery(n);
+                OccQueries.push(n);
+              }
             }
           }
         }
       }
     }
+    
+    //printf("Size when leaving is: %d\n\n",OccQueries.size());
     return ret;
   }
 

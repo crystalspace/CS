@@ -154,7 +154,7 @@
      * Custom Traversal function WITH data; use only in extreme cases
      */
     template<typename TravFn, typename T>
-    void TraverseCustomWithData(TravFn& travfn, const T &traverseData)
+    void TraverseCustomWithData(TravFn& travfn, T &traverseData)
     {
       if (rootNode)
         travfn(rootNode, traverseData);
@@ -164,7 +164,7 @@
      * Custom Traversal function WITH data; use only in extreme cases
      */
     template<typename TravFn, typename T>
-    void TraverseCustomWithData(const TravFn& travfn, const T &traverseData) const
+    void TraverseCustomWithData(const TravFn& travfn, T &traverseData) const
     {
       if (rootNode)
         travfn(rootNode, traverseData);

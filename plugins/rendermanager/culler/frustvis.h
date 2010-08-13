@@ -284,32 +284,6 @@ public:
 
 typedef AABBTree<NodeLeafData,1,NodeData>::Node* NodePtr;
 
-/*struct OccQuery
-{
-  OccQuery() : oqID(0), n(0)
-  {
-  }
-
-  OccQuery(const unsigned int oqID,const NodePtr n)
-  {
-    this->oqID=oqID;
-    this->n=n;
-  }
-
-  unsigned int oqID;
-  NodePtr n;
-
-  unsigned int GetQueryID() const
-  {
-    return oqID;
-  }
-
-  NodePtr GetNode() const
-  {
-    return n;
-  }
-};*/
-
 /**
  * A simple frustum based visibility culling system.
  */
