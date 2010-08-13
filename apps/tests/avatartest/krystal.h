@@ -55,13 +55,20 @@ class KrystalScene : public AvatarScene
  private:
   AvatarTest* avatarTest;
 
-  // Ragdoll node related
+  // Body chains
+  CS::Animation::iBodyChain* bodyChain;
+  CS::Animation::iBodyChain* armChain;
+
+  // Ragdoll management related
   bool krystalDead;
   csRef<CS::Animation::iSkeletonRagdollNode2> ragdollNode;
-  CS::Animation::iBodyChain* bodyChain;
-  CS::Animation::iBodyChain* hairChain;
 
-  // Krystal's hairs & skirt (soft bodies)
+  // Inverse Kinematics management related
+  bool IKenabled;
+  csRef<CS::Animation::iSkeletonIKNode2> IKNode;
+  CS::Animation::EffectorID handEffector;
+
+  // Krystal's hairs & skirt (and their soft bodies)
   csRef<iMeshWrapper> hairsMesh;
   csRef<iMeshWrapper> skirtMesh;
   csRef<CS::Physics::Bullet::iSoftBody> hairsBody;
