@@ -69,9 +69,11 @@ public:
 class HairTest : public CS::Demo::DemoApplication
 {
   friend class KrystalScene;
+  friend class FrankieScene;
 
 private:
   AvatarScene* avatarScene;
+  int avatarSceneType;
 
   // Physics related
   bool physicsEnabled;
@@ -125,6 +127,7 @@ public:
   // Handle exit button clicked event
   bool OnExitButtonClicked (const CEGUI::EventArgs& e);
   bool OnCollidersButtonClicked (const CEGUI::EventArgs& e);
+  bool OnSceneButtonClicked (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedShiftR (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedWidthR (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedAbsorption (const CEGUI::EventArgs& e);
@@ -150,6 +153,9 @@ public:
   /* Declare that we're not terribly interested in having events
   delivered to us before or after other modules, plugins, etc. */
   CS_EVENTHANDLER_NIL_CONSTRAINTS
+
+private:
+  void SwitchScenes();
 };
 
 #endif // __HAIRTEST_H__

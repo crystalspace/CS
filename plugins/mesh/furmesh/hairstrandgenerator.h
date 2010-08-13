@@ -57,7 +57,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   public:         
     CS_LEAKGUARD_DECLARE(MarschnerConstants);
     // Synchronized shader variables with this class
-    MarschnerConstants();
+    void Initialize();
 
     // Surface properties
     float aR;
@@ -108,7 +108,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csTextureRGBA N;
     float* gauss_matrix;
     // Marschner constants functions
-    MarschnerConstants* mc;
+    MarschnerConstants mc;
     void UpdateConstans();
     // Marschner specific functions
     void UpdateM();

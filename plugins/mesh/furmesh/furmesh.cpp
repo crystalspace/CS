@@ -394,7 +394,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     }
 
     // Generate the guide furs
-    for (size_t i = indexstart; i < indexend; i ++)
+    for (size_t i = indexstart; i <= indexend; i ++)
     {
       csVector3 pos = vertex_buffer[i] + 
         displaceDistance * normal_buffer[i];

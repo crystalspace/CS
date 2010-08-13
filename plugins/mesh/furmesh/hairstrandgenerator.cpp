@@ -32,18 +32,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   SCF_IMPLEMENT_FACTORY (HairStrandGenerator)
 
-    CS_LEAKGUARD_IMPLEMENT(HairStrandGenerator);	
+  CS_LEAKGUARD_IMPLEMENT(HairStrandGenerator);	
 
   HairStrandGenerator::HairStrandGenerator (iBase* parent)
     : scfImplementationType (this, parent), object_reg(0), material(0), 
-    g3d(0), svStrings(0), M(256, 256), N(256, 256), gauss_matrix(0), mc(0)
+    g3d(0), svStrings(0), M(256, 256), N(256, 256), gauss_matrix(0)
   {
   }
 
   HairStrandGenerator::~HairStrandGenerator ()
   {
-    if (mc)
-      delete mc;
     if (M.data)
       delete M.data;
     if (gauss_matrix)
@@ -73,13 +71,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       return false;
     }
 
-    mc = new MarschnerConstants();
-
-    if (!mc) 
-    {
-      csPrintfErr ("No MarschnerConstants found!\n");
-      return false;
-    }
+    mc.Initialize();
 
     return true;
   }
@@ -92,15 +84,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void HairStrandGenerator::SetMaterial(iMaterial* material)
   {
     this->material = material;
+    
+    M = csTextureRGBA(256, 256);
+    N = csTextureRGBA(256, 256);
+    mc.Initialize();
+
     Invalidate();
   }
 
   // Data need to be recomputed
   void HairStrandGenerator::Invalidate()
   {
-      UpdateConstans();
-      UpdateM();
-      UpdateN();
+    UpdateConstans();
+    UpdateM();
+    UpdateN();
   }
 
   // Nothing to be updated 
@@ -114,56 +111,56 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     {
       // Surface properties
       CS::ShaderVarName aR (svStrings, "aR");	
-      material->GetVariableAdd(aR)->SetValue(mc->aR);
+      material->GetVariableAdd(aR)->SetValue(mc.aR);
 
       CS::ShaderVarName bR (svStrings, "bR");	
-      material->GetVariableAdd(bR)->SetValue(mc->bR);
+      material->GetVariableAdd(bR)->SetValue(mc.bR);
 
       // Fiber properties
       CS::ShaderVarName absorption (svStrings, "absorption");	
-      material->GetVariableAdd(absorption)->SetValue(mc->absorption);
+      material->GetVariableAdd(absorption)->SetValue(mc.absorption);
 
       CS::ShaderVarName eccentricity (svStrings, "eccentricity");	
-      material->GetVariableAdd(eccentricity)->SetValue(mc->eccentricity);
+      material->GetVariableAdd(eccentricity)->SetValue(mc.eccentricity);
 
       // Glints
       CS::ShaderVarName kG (svStrings, "kG");	
-      material->GetVariableAdd(kG)->SetValue(mc->kG);
+      material->GetVariableAdd(kG)->SetValue(mc.kG);
 
       CS::ShaderVarName wc (svStrings, "wc");	
-      material->GetVariableAdd(wc)->SetValue(mc->wc);
+      material->GetVariableAdd(wc)->SetValue(mc.wc);
 
       CS::ShaderVarName Dh0 (svStrings, "Dh0");	
-      material->GetVariableAdd(Dh0)->SetValue(mc->Dh0);
+      material->GetVariableAdd(Dh0)->SetValue(mc.Dh0);
     }
 
     // Surface properties
     CS::ShaderVarName aR (svStrings, "aR");	
-    material->GetVariableAdd(aR)->GetValue(mc->aR);
-    mc->aTT = -mc->aR/2;
-    mc->aTRT = -3 * mc->aR/2;
+    material->GetVariableAdd(aR)->GetValue(mc.aR);
+    mc.aTT = -mc.aR/2;
+    mc.aTRT = -3 * mc.aR/2;
 
     CS::ShaderVarName bR (svStrings, "bR");	
-    material->GetVariableAdd(bR)->GetValue(mc->bR);
-    mc->bTT = mc->bR/2;
-    mc->bTRT = 2 * mc->bR;
+    material->GetVariableAdd(bR)->GetValue(mc.bR);
+    mc.bTT = mc.bR/2;
+    mc.bTRT = 2 * mc.bR;
 
     // Fiber properties
     CS::ShaderVarName absorption (svStrings, "absorption");	
-    material->GetVariableAdd(absorption)->GetValue(mc->absorption);
+    material->GetVariableAdd(absorption)->GetValue(mc.absorption);
 
     CS::ShaderVarName eccentricity (svStrings, "eccentricity");	
-    material->GetVariableAdd(eccentricity)->GetValue(mc->eccentricity);
+    material->GetVariableAdd(eccentricity)->GetValue(mc.eccentricity);
 
     // Glints
     CS::ShaderVarName kG (svStrings, "kG");	
-    material->GetVariableAdd(kG)->GetValue(mc->kG);
+    material->GetVariableAdd(kG)->GetValue(mc.kG);
 
     CS::ShaderVarName wc (svStrings, "wc");	
-    material->GetVariableAdd(wc)->GetValue(mc->wc);
+    material->GetVariableAdd(wc)->GetValue(mc.wc);
 
     CS::ShaderVarName Dh0 (svStrings, "Dh0");	
-    material->GetVariableAdd(Dh0)->GetValue(mc->Dh0);
+    material->GetVariableAdd(Dh0)->GetValue(mc.Dh0);
   }
 
   // Marschner specific methods
@@ -197,9 +194,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     }
 
     csVector3 constantsM;
-    constantsM.x = ComputeM(mc->aR, mc->bR, 0) / 255.0f;
-    constantsM.y = ComputeM(mc->aTT, mc->bTT, 1) / 255.0f;
-    constantsM.z = ComputeM(mc->aTRT, mc->bTRT, 2) / 255.0f;
+    constantsM.x = ComputeM(mc.aR, mc.bR, 0) / 255.0f;
+    constantsM.y = ComputeM(mc.aTT, mc.bTT, 1) / 255.0f;
+    constantsM.z = ComputeM(mc.aTRT, mc.bTRT, 2) / 255.0f;
 
     // alpha is qd
     for( int x = 0 ; x < M.width ; x ++ )
@@ -337,8 +334,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   float HairStrandGenerator::ComputeNP(int p, float phi, float thD) const
   {
-    float refraction = mc->eta;
-    float absorption = mc->absorption;
+    float refraction = mc.eta;
+    float absorption = mc.absorption;
 
     float etaPerpendicular = MarschnerHelper::BravaisIndex(thD, refraction);
     float etaParallel = (refraction * refraction) / etaPerpendicular;
@@ -364,7 +361,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   float HairStrandGenerator::SimpleNP(float phi, float thD ) const
   {
-    float refraction = mc->eta;
+    float refraction = mc.eta;
 
     float etaPerpendicular = MarschnerHelper::BravaisIndex(thD, refraction);
     float etaParallel = (refraction * refraction) / etaPerpendicular;
@@ -385,7 +382,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   CS_LEAKGUARD_IMPLEMENT(MarschnerConstants);	
   
-  MarschnerConstants::MarschnerConstants()
+  void MarschnerConstants::Initialize()
   {
     // Surface properties
     aR = -5;

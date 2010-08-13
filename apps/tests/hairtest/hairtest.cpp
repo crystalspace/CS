@@ -23,12 +23,17 @@
 
 #include "hairtest.h"
 #include "krystal.h"
+#include "frankie.h"
+
+#define MODEL_FRANKIE 1
+#define MODEL_KRYSTAL 2
 
 HairTest::HairTest ()
 : DemoApplication ("CrystalSpace.HairTest", "hairtest",
                      "hairtest <OPTIONS>",
                      "Tests on the animation of objects CS::Mesh::iAnimatedMesh."),
-                     avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
+                     avatarScene (0), avatarSceneType(MODEL_KRYSTAL),
+                     dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // Use a default rotate camera
   cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
@@ -101,6 +106,12 @@ bool HairTest::OnExitButtonClicked (const CEGUI::EventArgs&)
 bool HairTest::OnCollidersButtonClicked (const CEGUI::EventArgs&)
 {
   SwitchDynamics();
+  return true;
+}
+
+bool HairTest::OnSceneButtonClicked (const CEGUI::EventArgs&)
+{
+  SwitchScenes();
   return true;
 }
 
@@ -291,6 +302,34 @@ void HairTest::SwitchDynamics()
   }
 }
 
+void HairTest::SwitchScenes()
+{
+  delete avatarScene;
+
+  if (avatarSceneType == MODEL_FRANKIE)
+  {
+    avatarSceneType = MODEL_KRYSTAL;
+    avatarScene = new KrystalScene (this);
+  }
+
+  else if (avatarSceneType == MODEL_KRYSTAL)
+  {
+    avatarSceneType = MODEL_FRANKIE;
+    avatarScene = new FrankieScene (this);
+  }
+
+  if (!avatarScene->CreateAvatar ())
+  {
+    csPrintfErr ("Problem loading scene. Exiting.\n");
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (GetObjectRegistry ()));
+    if (q) q->GetEventOutlet()->Broadcast (csevQuit (GetObjectRegistry ()));
+    return;
+  }
+
+  // Re-initialize camera position
+  cameraHelper.ResetCamera ();
+};
+
 bool HairTest::OnKeyboard (iEvent &ev)
 {
   // Default behavior from csDemoApplication
@@ -312,7 +351,13 @@ bool HairTest::OnKeyboard (iEvent &ev)
       && physicsEnabled && avatarScene->HasPhysicalObjects ())
     {
       avatarScene->SwitchFurPhysics();
+      return true;
+    }
 
+    // Check for switching of scene
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'n')
+    {
+      SwitchScenes();
       return true;
     }
   }
@@ -466,6 +511,10 @@ bool HairTest::Application ()
     subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&HairTest::OnCollidersButtonClicked, this));
 
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Scene")-> 
+    subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&HairTest::OnSceneButtonClicked, this));
+
   winMgr->getWindow("HairTest/MainWindow/Tab/Page3/Physics")-> 
     subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&HairTest::OnPhysicsButtonClicked, this));
@@ -517,9 +566,21 @@ bool HairTest::Application ()
     }
   }
 
-  // Create avatar
-  avatarScene = new KrystalScene (this);
+  // Set lights
+  room->GetLights()->RemoveAll();
 
+  // This light is for the background
+  csRef<iLight> light = 
+    engine->CreateLight(0, csVector3(10, 10, 0), 9000, csColor (1));
+  light->SetAttenuationMode (CS_ATTN_NONE);
+  room->GetLights()->Add (light);
+
+  // Create avatar
+  if (avatarSceneType == MODEL_KRYSTAL)
+    avatarScene = new KrystalScene (this);
+  else if (avatarSceneType == MODEL_FRANKIE)
+    avatarScene = new FrankieScene (this);
+  
   if (!avatarScene->CreateAvatar ())
     return false;
 

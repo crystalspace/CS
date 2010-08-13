@@ -50,6 +50,13 @@ KrystalScene::~KrystalScene ()
 
   if (skirtMesh)
     hairTest->engine->RemoveObject (skirtMesh);
+
+  if (furMesh)
+  {
+    // Remove the fur mesh from the scene
+    csRef<iMeshObject> furMeshObject = scfQueryInterface<iMeshObject> (furMesh);
+    hairTest->engine->RemoveObject (furMeshObject->GetMeshWrapper ());
+  }
 }
 
 csVector3 KrystalScene::GetCameraStart ()
@@ -397,18 +404,6 @@ bool KrystalScene::CreateAvatar ()
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);
-
-  hairTest->room->GetLights()->RemoveAll();
-
-  // This light is for the background
-  csRef<iLight> light = 
-    hairTest->engine->CreateLight(0, csVector3(10, 10, 0), 9000, csColor (1));
-  light->SetAttenuationMode (CS_ATTN_NONE);
-  light->SetType(CS_LIGHT_DIRECTIONAL);
-  csMatrix3 matrixY (cos(PI/2), 0, -sin(PI/2), 0, 1, 0, sin(PI/2), 0, cos(PI/2)); // PI/4
-  csMatrix3 matrixX (1, 0, 0, 0, cos(PI/2), -sin(PI/2), 0, sin(PI/2), cos(PI/2));
-  light->GetMovable()->Transform(matrixY);
-  hairTest->room->GetLights()->Add (light);
 
   // Start animation
   rootNode->Play ();
