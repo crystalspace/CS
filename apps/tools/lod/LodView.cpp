@@ -343,7 +343,7 @@ void LodView::CreateRoom ()
 
 void LodView::CreateSmallRoom()
 {
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+  if (!loader->LoadTexture ("stone", "/lib/std/mystone2.gif"))
     ReportError ("Error loading 'stone4' texture!");
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   room = engine->CreateSector ("room");
@@ -368,7 +368,7 @@ void LodView::CreateSmallRoom()
 
 void LodView::CreateLargeRoom()
 {
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+  if (!loader->LoadTexture ("stone", "/lib/std/mystone2.gif"))
     ReportError ("Error loading 'stone4' texture!");
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   room = engine->CreateSector ("room");
