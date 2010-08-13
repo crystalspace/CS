@@ -320,8 +320,10 @@ int csGenmeshMeshObject::ComputeProgLODLevel(const SubMeshProxy& subMesh, const 
   factory->GetProgLODDistances(min, max);
   if (min >= max)
     return 0;
-  csVector3 pos = logparent->GetMovable()->GetPosition();
-  float dist = (camera_pos-pos).Norm();
+  csVector3 objpos = logparent->GetMovable()->GetPosition();
+  const csBox3& bbox = GetObjectBoundingBox ();
+  csVector3 bbpos = bbox.GetCenter();
+  float dist = (camera_pos - (objpos + bbpos)).Norm();
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(factory);
   int nlod = subMesh.GetSlidingWindowSize() - 1;
   // Function of square root of distance
