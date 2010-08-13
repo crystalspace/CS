@@ -185,9 +185,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     struct ConstraintData
     {
       ConstraintData ()
-      : movable (0), camera (0) {printf ("ConstraintData constructor\n");}
-      ~ConstraintData ()
-      {printf ("ConstraintData destructor\n");}
+      : movable (0), camera (0) {}
+
       ConstraintType type;
       iMovable* movable;
       iCamera* camera;
