@@ -80,9 +80,11 @@ static const GLenum VBO_BUFFER_GL_USAGE[] = {
 
 csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext, 
                                             csGLStateCache *state,
-                                            size_t maxAllocation)                                            
+                                            size_t maxAllocation,
+					    bool forceSeparateVBOs)                                            
   : scfImplementationType (this), extensionManager (ext), stateCache (state),
-  currentVBOAllocation (0), maxVBOAllocation (maxAllocation)
+  currentVBOAllocation (0), maxVBOAllocation (maxAllocation),
+  forceSeparateVBOs (forceSeparateVBOs)
 {
   memset (&vboBufferList, 0, sizeof(vboBufferList));
 }
@@ -264,7 +266,7 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetFreeVBOSlot (
   size_t slotSizePO2, size_t slotType)
 {
   // We don't cache and reuse big buffers, so theres never any free slots
-  if (slotSizePO2 > VBO_MAX_SLOT_SIZE_PO2)
+  if (!IsSizePO2Slotted  (slotSizePO2))
     return 0;
 
   // Scan VBO buffers of given type for one with free slots
@@ -301,7 +303,7 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::TryFreeVBOSlot (
   size_t slotSizePO2, size_t slotType)
 {
   // We don't cache and reuse big buffers, so theres never any free slots
-  if (slotSizePO2 > VBO_MAX_SLOT_SIZE_PO2)
+  if (!IsSizePO2Slotted (slotSizePO2))
     return 0;
 
   const size_t slotSizeIdx = slotSizePO2 - VBO_MIN_SLOT_SIZE_PO2;
@@ -352,7 +354,7 @@ void csGLVBOBufferManager::ReleaseVBOSlot (VBOSlot* slot, bool deallocate /* = t
 
   // Deallocate it
   const size_t buffSizePO2 = GetSlotSizePO2 (buffer->slotSize);
-  if (buffSizePO2 > VBO_MAX_SLOT_SIZE_PO2)
+  if (!IsSizePO2Slotted (buffSizePO2))
   {
     // Big buffer
     vboBigBuffers[buffer->bufferType].DeleteIndexFast ((size_t)buffer->nextBuffer);
@@ -408,7 +410,7 @@ csGLVBOBufferManager::VBOBuffer* csGLVBOBufferManager::GetNewVBOBuffer (
   bool bigBuffer = false;
 
   const size_t slotSizeIdx = slotSizePO2 - VBO_MIN_SLOT_SIZE_PO2;
-  if (slotSizePO2 <= VBO_MAX_SLOT_SIZE_PO2)
+  if (IsSizePO2Slotted (slotSizePO2))
   {    
     numSlots = VBO_SLOT_PER_BUFFER[slotSizeIdx];
     numSlotBitmap = (numSlots + 31) / 32;
