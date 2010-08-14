@@ -34,6 +34,7 @@ KrystalScene::KrystalScene (AvatarTest* avatarTest)
   avatarTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
   if (avatarTest->physicsEnabled)
   {
+    avatarTest->hudHelper.keyDescriptions.Push ("i: toggle Inverse Kinematics");
     avatarTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
     avatarTest->hudHelper.keyDescriptions.Push ("left mouse: kill Krystal");
   }
@@ -141,8 +142,26 @@ bool KrystalScene::OnKeyboard (iEvent &ev)
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
   {
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'i'
+	&& avatarTest->physicsEnabled)
+    {
+      // Toggle the Inverse Kinematic mode
+      IKenabled = !IKenabled;
+
+      if (IKenabled)
+      {
+	csOrthoTransform transform (csMatrix3 (), csVector3 (-0.3f, 1.2f, -0.4f));
+	IKNode->AddConstraint (handEffector, transform);
+      }
+
+      else
+	IKNode->RemoveConstraint (handEffector);
+
+      return true;
+    }
+
     // Reset of the scene
-    if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
     {
       ResetScene ();
       return true;
@@ -202,6 +221,13 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     // OK, it's an animesh, it must be Krystal, let's kill her
     krystalDead = true;
 
+    // Disable the Inverse Kinematics animation node
+    if (IKenabled)
+    {
+      IKNode->RemoveConstraint (handEffector);
+      IKenabled = false;
+    }
+
     // The ragdoll model of Krystal is rather complex. We therefore use high
     // accuracy/low performance parameters for a better behavior of the dynamic
     // simulation.
@@ -210,6 +236,7 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     // Set the ragdoll state of the CS::Animation::iBodyChain of the whole body as dynamic
     // (hairs are already in the good state)
     ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_DYNAMIC);
+    ragdollNode->SetBodyChainState (armChain, CS::Animation::STATE_DYNAMIC);
 
     // Update the display of the dynamics debugger
     if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
@@ -297,9 +324,10 @@ bool KrystalScene::CreateAvatar ()
     return avatarTest->ReportError ("Can't find Krystal's skirt mesh factory!");
 
   // Create a new animation tree. The structure of the tree is:
-  //   + ragdoll controller node (root node - only if physics are enabled)
-  //     + Random node
-  //       + idle animation nodes
+  //   + Ragdoll node (root node - only if physics are enabled)
+  //     + Inverse Kinematics node (only if physics are enabled)
+  //       + Random node
+  //         + idle animation nodes
   csRef<CS::Animation::iSkeletonAnimPacketFactory2> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
@@ -376,13 +404,6 @@ bool KrystalScene::CreateAvatar ()
 
   if (avatarTest->physicsEnabled)
   {
-    // Create the ragdoll controller
-    csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
-      avatarTest->ragdollManager->CreateAnimNodeFactory
-      ("ragdoll", bodySkeleton, avatarTest->dynamicSystem);
-    animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
-    ragdollNodeFactory->SetChildNode (randomNodeFactory);
-
     // Create a bone chain for the whole body and add it to the ragdoll controller.
     // The chain will be in kinematic mode when Krystal is alive, and in dynamic state
     // when Krystal has been killed.
@@ -390,11 +411,40 @@ bool KrystalScene::CreateAvatar ()
       ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("Head"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
-    ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
 
+    armChain = bodySkeleton->CreateBodyChain
+      ("arm_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("RightShoulder"),
+       animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"), 0);
+
+    // Create the ragdoll controller
+    csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
+      avatarTest->ragdollManager->CreateAnimNodeFactory
+      ("ragdoll", bodySkeleton, avatarTest->dynamicSystem);
+    animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
+    ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
+    ragdollNodeFactory->AddBodyChain (armChain, CS::Animation::STATE_KINEMATIC);
+
+    // Create the 'ik' node
+    csRef<CS::Animation::iSkeletonIKNodeFactory2> IKNodeFactory =
+      avatarTest->IKManager->CreateAnimNodeFactory ("IK", bodySkeleton);
+    ragdollNodeFactory->SetChildNode (IKNodeFactory);
+
+    // Create the IK hand effector
+    csOrthoTransform handOffset (csMatrix3 (), csVector3 (0.0f, 0.0f, 0.1f));
+    CS::Animation::BoneID handBone =
+      animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand");
+    handEffector = IKNodeFactory->AddEffector (armChain, handBone, handOffset);
+
+    // Setup the IKPhysical interface
+    csRef<CS::Animation::iSkeletonIKPhysicalNodeFactory2> IKPhysicalNodeFactory =
+      scfQueryInterface<CS::Animation::iSkeletonIKPhysicalNodeFactory2> (IKNodeFactory);
+    if (!IKPhysicalNodeFactory)
+      return avatarTest->ReportError ("Can't find the IKPhysical interface of the IK plugin!");
+    IKPhysicalNodeFactory->SetChildNode (randomNodeFactory);
+
+    // Setup of the soft bodies
     if (avatarTest->softBodiesEnabled)
     {
       // Create the soft body for the hairs
@@ -456,8 +506,16 @@ bool KrystalScene::CreateAvatar ()
   // Setup of the ragdoll controller
   if (avatarTest->physicsEnabled)
   {
+    // Find references to the animation nodes
     ragdollNode =
       scfQueryInterface<CS::Animation::iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
+    IKNode =
+      scfQueryInterface<CS::Animation::iSkeletonIKNode2> (rootNode->FindNode ("IK"));
+
+    // Setup the IKPhysical interface
+    csRef<CS::Animation::iSkeletonIKPhysicalNode2> IKPhysicalNode =
+      scfQueryInterface<CS::Animation::iSkeletonIKPhysicalNode2> (IKNode);
+    IKPhysicalNode->SetRagdollNode (ragdollNode);
 
     // Start the ragdoll animation node in order to have the rigid bodies created
     ragdollNode->Play ();
@@ -518,8 +576,13 @@ void KrystalScene::ResetScene ()
 
     krystalDead = false;
 
-    // Set the ragdoll state of the 'body' chain as kinematic
+    // Reset the Inverse Kinematic node
+    IKenabled = false;
+    IKNode->RemoveConstraint (handEffector);
+
+    // Set the ragdoll state of the 'body' and 'arm' chains as kinematic
     ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_KINEMATIC);
+    ragdollNode->SetBodyChainState (armChain, CS::Animation::STATE_KINEMATIC);
 
     // Update the display of the dynamics debugger
     if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER

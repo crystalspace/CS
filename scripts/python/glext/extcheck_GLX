@@ -1,3 +1,0 @@
-    SetupGLXextStr (glxDisplay, glxScreen);
-    if (!extstrGLX) return;
-    CS_%Name% = CheckExtension (extstrGLX, ext);

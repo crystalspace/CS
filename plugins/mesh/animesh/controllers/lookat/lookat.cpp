@@ -313,6 +313,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     CS_ASSERT (boneID != CS::Animation::InvalidBoneID
 	       && skeleton->GetSceneNode ());
 
+    if (isPlaying)
+      return;
+
     if (!sceneNode)
       sceneNode = skeleton->GetSceneNode ();
 

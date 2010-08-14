@@ -1,3 +1,0 @@
-  /** Whether the <a href="%Name:url%">%Name%</a> extension was found. 
-   * Set by csGLExtensionManager::Init%Name%(). */
-  bool CS_%Name%;

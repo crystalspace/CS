@@ -1236,6 +1236,7 @@ class iSkeletonRagdollNodeFactory2(iSkeletonAnimNodeFactory2):
     def SetChildNode(*args): return _imesh.iSkeletonRagdollNodeFactory2_SetChildNode(*args)
     def GetChildNode(*args): return _imesh.iSkeletonRagdollNodeFactory2_GetChildNode(*args)
     def ClearChildNode(*args): return _imesh.iSkeletonRagdollNodeFactory2_ClearChildNode(*args)
+    def GetDynamicSystem(*args): return _imesh.iSkeletonRagdollNodeFactory2_GetDynamicSystem(*args)
 iSkeletonRagdollNodeFactory2_swigregister = _imesh.iSkeletonRagdollNodeFactory2_swigregister
 iSkeletonRagdollNodeFactory2_swigregister(iSkeletonRagdollNodeFactory2)
 

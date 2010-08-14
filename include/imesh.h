@@ -30,6 +30,7 @@
 #include "imesh/gmeshanim.h"
 #include "imesh/gmeshskel2.h"
 #include "imesh/haze.h"
+#include "imesh/ik.h"
 #include "imesh/lghtng.h"
 #include "imesh/lookat.h"
 #include "imesh/modifiableterrain.h"
