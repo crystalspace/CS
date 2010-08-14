@@ -127,8 +127,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       return false;
     }
 
-    // Enable/disables
-
     /**\name Standard functions
      * @{ */
     /// Given a iMeshWrapper and a csRenderMesh, get the correct mesh node index

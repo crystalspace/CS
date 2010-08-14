@@ -21,6 +21,8 @@
 
 #include "crystalspace.h"
 
+#include "ivaria/icegui.h"
+
 struct iEngine;
 struct iObjectRegistry;
 struct iGraphics3D;
@@ -45,7 +47,7 @@ public:
   /// Main entry point to the application.
   virtual bool Application();
 
-  /// Returns true if the application sould shutdown after the current frame.
+  /// Returns true if the application should shutdown after the current frame.
   bool ShouldShutdown() const { return shouldShutdown; }
 
   /// Prints help text for the demo app.
@@ -80,6 +82,12 @@ protected:
   /// Setup the demo scene.
   bool SetupScene();
 
+  /// Sets up the demo GUI.
+  bool SetupGui(bool reload = false);
+
+  /// Updates the GUI.
+  void UpdateGui();
+
   /// Handles an event not being Handled by csBaseEventHandler.
   virtual bool OnUnhandledEvent(iEvent &event);
 
@@ -103,6 +111,7 @@ protected:
 
   csRef<iRenderManager> rm;
   csRef<iRenderManager> rm_default;
+  csRef<iDebugHelper> rm_debug;
 
   csRef<iLoader> loader;
 
@@ -112,6 +121,8 @@ protected:
   csRef<iVirtualClock> vc;
 
   csRef<FramePrinter> printer;
+
+  csRef<iCEGUI> cegui;
 
   // Cache event names.
   csEventID quitEventID;
@@ -126,12 +137,26 @@ protected:
 
 protected:
 
+  CEGUI::Window *guiRoot;
+  CEGUI::RadioButton *guiDeferred;
+  CEGUI::RadioButton *guiForward;
+  CEGUI::Checkbox *guiShowGBuffer;
+  CEGUI::Checkbox *guiDrawLightVolumes;
+  CEGUI::Checkbox *guiDrawLogo;
+
+  bool showGBuffer;
+  bool drawLightVolumes;
+
+protected:
+
   csString cfgWorldDir;
   csString cfgWorldFile;
   csString cfgLogoFile;
 
   bool cfgDrawLogo;
   bool cfgUseDeferredShading;
+
+  bool cfgShowGui;
 
   // The logo texture.
   csRef<iTextureHandle> logoTex;

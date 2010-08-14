@@ -18,6 +18,12 @@
 
 #include "deferreddemo.h"
 
+#include "csutil/custom_new_disable.h"
+#include <CEGUI.h>
+#include <CEGUIWindowManager.h>
+#include <CEGUILogger.h>
+#include "csutil/custom_new_enable.h"
+
 const char *DEFAULT_CFG_WORLDDIR = "/lev/castle";
 const char *DEFAULT_CFG_LOGOFILE = "/lib/std/cslogo2.png";
 
@@ -54,6 +60,7 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
       CS_REQUEST_LEVELLOADER,
       CS_REQUEST_REPORTER,
       CS_REQUEST_REPORTERLISTENER,
+      CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
       CS_REQUEST_END))
   {
     return ReportError("Failed to initialize plugins!");
@@ -132,6 +139,10 @@ bool DeferredDemo::SetupModules()
   if (!loader) 
     return ReportError("Failed to locate Loader!");
 
+  cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
+  if (!loader) 
+    return ReportError("Failed to locate CEGUI!");
+
   /* NOTE: Config settings for render managers are stored in 'engine.cfg' 
    * and are needed when loading a render manager. Normally these settings 
    * are added by the engine when it loads a render manager. However, since
@@ -146,6 +157,10 @@ bool DeferredDemo::SetupModules()
     return ReportError("Failed to load deferred Render Manager!");
 
   cfg->RemoveDomain ("/config/engine.cfg");
+
+  rm_debug = scfQueryInterface<iDebugHelper> (rm);
+  if (!rm_debug)
+    return ReportError("Failed to query the deferred Render Manager debug helper!");
 
   rm_default = engine->GetRenderManager ();
 
@@ -201,6 +216,69 @@ bool DeferredDemo::LoadSettings()
   else
     cfgUseDeferredShading = !cfg->GetBool ("Deferreddemo.Settings.UseForward", false);
 
+  cfgShowGui = cfg->GetBool ("Deferreddemo.Settings.ShowGui", true);
+
+  return true;
+}
+
+//----------------------------------------------------------------------
+bool DeferredDemo::SetupGui(bool reload)
+{
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+
+  if (!reload)
+  {
+    cegui->Initialize ();
+    cegui->GetLoggerPtr ()->setLoggingLevel (CEGUI::Informative);
+
+    // Load the ice skin.
+    vfs->ChDir ("/cegui/");
+    cegui->GetSchemeManagerPtr ()->create ("ice.scheme");
+    cegui->GetSystemPtr ()->setDefaultMouseCursor ("ice", "MouseArrow");
+
+    cegui->GetFontManagerPtr ()->createFreeTypeFont ("DejaVuSans", 10, true, "/fonts/ttf/DejaVuSans.ttf");
+  }
+
+  // Load layout and set as root
+  CEGUI::WindowManager *winMgr = cegui->GetWindowManagerPtr ();
+
+  if (reload)
+  {
+    winMgr->getWindow ("root")->destroy ();
+  }
+  
+  vfs->ChDir ("/data/deferreddemo/");
+  cegui->GetSystemPtr ()->setGUISheet (winMgr->loadWindowLayout("deferreddemo.layout"));
+
+  guiRoot             = winMgr->getWindow ("root");
+  guiDeferred         = static_cast<CEGUI::RadioButton*>(winMgr->getWindow ("Deferred"));
+  guiForward          = static_cast<CEGUI::RadioButton*>(winMgr->getWindow ("Forward"));
+  guiShowGBuffer      = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("ShowGBuffer"));
+  guiDrawLightVolumes = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("DrawLightVolumes"));
+  guiDrawLogo         = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("DrawLogo"));
+
+  if (!guiRoot || 
+      !guiDeferred || 
+      !guiForward || 
+      !guiShowGBuffer || 
+      !guiDrawLightVolumes || 
+      !guiDrawLogo)
+  {
+    return ReportError("Could not load GUI!");
+  }
+
+  if (cfgUseDeferredShading)
+    guiDeferred->setSelected (true);
+  else
+    guiForward->setSelected (true);
+
+  guiShowGBuffer->setSelected (false);
+  guiDrawLightVolumes->setSelected (false);
+  guiDrawLogo->setSelected (cfgDrawLogo);
+
+  showGBuffer = false;
+  drawLightVolumes = false;
+
   return true;
 }
 
@@ -226,7 +304,7 @@ bool DeferredDemo::SetupScene()
   if (!room)
     return ReportError("Can't find a valid starting position!");
 
-  view.AttachNew( new csView (engine, graphics3D) );
+  view.AttachNew ( new csView (engine, graphics3D) );
   view->SetRectangle (0, 0, graphics2D->GetWidth (), graphics2D->GetHeight ());
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
@@ -276,6 +354,7 @@ bool DeferredDemo::Application()
       LoadSettings() && 
       LoadAppData() &&
       LoadScene() &&
+      SetupGui() &&
       SetupScene())
   {
     RunDemo();
@@ -314,7 +393,7 @@ void DeferredDemo::UpdateCamera()
 
   float dt = (float)(vc->GetElapsedTicks () / 1000.0f);
 
-  // Handles camera movment.
+  // Handles camera movement.
   iCamera *c = view->GetCamera ();
   if (kbd->GetKeyState (CSKEY_SHIFT))
   {
@@ -348,6 +427,31 @@ void DeferredDemo::UpdateCamera()
   csOrthoTransform V (Rx * Ry, c->GetTransform ().GetOrigin ());
 
   c->SetTransform (V);
+}
+
+//----------------------------------------------------------------------
+void DeferredDemo::UpdateGui()
+{
+  guiRoot->setVisible (cfgShowGui);
+
+  cfgDrawLogo = guiDrawLogo->isSelected ();
+
+  if (showGBuffer != guiShowGBuffer->isSelected ())
+  {
+    showGBuffer = !showGBuffer;
+    rm_debug->DebugCommand ("toggle_visualize_gbuffer");
+  }
+
+  if (drawLightVolumes != guiDrawLightVolumes->isSelected ())
+  {
+    drawLightVolumes = !drawLightVolumes;
+    rm_debug->DebugCommand ("toggle_visualize_lightvolumes");
+  }
+
+  if (cfgUseDeferredShading != guiDeferred->isSelected ())
+  {
+     cfgUseDeferredShading = guiDeferred->isSelected ();
+  } 
 }
 
 //----------------------------------------------------------------------
@@ -400,6 +504,7 @@ void DeferredDemo::DrawLogo()
 void DeferredDemo::Frame ()
 {
   UpdateCamera ();
+  UpdateGui ();
 
   if (cfgUseDeferredShading)
     engine->SetRenderManager (rm);
@@ -407,6 +512,8 @@ void DeferredDemo::Frame ()
     engine->SetRenderManager (rm_default);
 
   view->Draw ();
+
+  cegui->Render ();
 
   DrawLogo ();
 
@@ -445,18 +552,26 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
         return true;
       }
     }
-    else if (code == 'd')
-    {
-      cfgUseDeferredShading = true;
-    }
     else if (code == 'f')
     {
       cfgUseDeferredShading = false;
+      guiForward->setSelected (true);
     }
-    else if (code == 'l')
+    else if (code == 'd')
     {
-      cfgDrawLogo = false;
+      cfgUseDeferredShading = true;
+      guiDeferred->setSelected (true);
     }
+    else if (code == 'g')
+    {
+      cfgShowGui = !cfgShowGui;
+    }
+#ifdef CS_DEBUG
+    else if (code == 'r')
+    {
+      SetupGui (true);
+    }
+#endif
   }
 
   return false;

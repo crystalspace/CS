@@ -95,7 +95,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
    * {
    *   DeferredTreeRenderer<RenderTree> 
    *     render (graphics3D, shaderManager, stringSet, 
-   *             gbuffer, lightRenderPersistent, deferredLayer);
+   *             gbuffer, lightRenderPersistent, deferredLayer, 
+   *             zonlyLayer, drawLightVolumes);
    *
    *   ForEachContextReverse (renderTree, render);
    * }
