@@ -16535,6 +16535,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetChildNode = *cspacec::iSkeletonRagdollNodeFactory2_SetChildNode;
 *GetChildNode = *cspacec::iSkeletonRagdollNodeFactory2_GetChildNode;
 *ClearChildNode = *cspacec::iSkeletonRagdollNodeFactory2_ClearChildNode;
+*GetDynamicSystem = *cspacec::iSkeletonRagdollNodeFactory2_GetDynamicSystem;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

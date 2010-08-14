@@ -24221,6 +24221,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonRagdollNodeFactory2_GetDynamicSystem(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonRagdollNodeFactory2 *arg1 = (CS::Animation::iSkeletonRagdollNodeFactory2 *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  iDynamicSystem *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonRagdollNodeFactory2_GetDynamicSystem",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonRagdollNodeFactory2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonRagdollNodeFactory2_GetDynamicSystem" "', argument " "1"" of type '" "CS::Animation::iSkeletonRagdollNodeFactory2 const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonRagdollNodeFactory2 * >(argp1);
+  result = (iDynamicSystem *)((CS::Animation::iSkeletonRagdollNodeFactory2 const *)arg1)->GetDynamicSystem();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iDynamicSystem, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *iSkeletonRagdollNodeFactory2_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
@@ -53459,6 +53481,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonRagdollNodeFactory2_SetChildNode", _wrap_iSkeletonRagdollNodeFactory2_SetChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory2_GetChildNode", _wrap_iSkeletonRagdollNodeFactory2_GetChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory2_ClearChildNode", _wrap_iSkeletonRagdollNodeFactory2_ClearChildNode, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonRagdollNodeFactory2_GetDynamicSystem", _wrap_iSkeletonRagdollNodeFactory2_GetDynamicSystem, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory2_swigregister", iSkeletonRagdollNodeFactory2_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNode2_SetBodyChainState", _wrap_iSkeletonRagdollNode2_SetBodyChainState, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNode2_GetBodyChainState", _wrap_iSkeletonRagdollNode2_GetBodyChainState, METH_VARARGS, NULL},
