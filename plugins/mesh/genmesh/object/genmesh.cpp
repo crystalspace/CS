@@ -328,11 +328,16 @@ int csGenmeshMeshObject::ComputeProgLODLevel(const SubMeshProxy& subMesh, const 
   int nlod = subMesh.GetSlidingWindowSize() - 1;
   // Function of square root of distance
   float t = (dist - min) / (max - min);
+
+  // Adaptive LODs
+  float mult = factory->engine->GetAdaptiveLODsMultiplier();
+  t *= mult;
+
   if (t > 1.0f)
     t = 1.0f;
   else if (t < 0.0f)
     t = 0.0f;
-  return (int)(sqrtf(t) * nlod);
+  return (sqrtf(t) * nlod);
 }  
 
 csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (

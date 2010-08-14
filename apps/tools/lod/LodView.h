@@ -63,6 +63,7 @@ private:
   int num_sprites;
   bool use_multiple_sprites;
   int num_multiple;
+  bool use_adaptive_LODs;
 
   /**
    * Handle keyboard events - ie key presses and releases.

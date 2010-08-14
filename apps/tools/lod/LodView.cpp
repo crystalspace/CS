@@ -40,7 +40,10 @@ void LodView::Frame ()
 {
   csTicks elapsed_time = vc->GetElapsedTicks ();
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
-  
+
+  if (use_adaptive_LODs)
+    engine->UpdateAdaptiveLODs();
+
   iCamera* c = view->GetCamera ();
   
   if (kbd->GetKeyState (CSKEY_SHIFT))
@@ -168,13 +171,17 @@ bool LodView::OnKeyboard (iEvent& ev)
 
 void LodView::Usage()
 {
-  csPrintf("LOD viewer\n");
+  csPrintf("LOD viewer\n\n");
+
   csPrintf("Usage:\n");
-  csPrintf("lodview <filename> [-m=<num>]\n");
-  csPrintf("  -m:   multiple sprites, large room (will show num^2 sprites)\n");
+  csPrintf("lodview <filename> [-m=<num>] -a\n\n");
+
+  csPrintf("  -m=<num>   multiple sprites, large room (will show num^2 sprites)\n");
+  csPrintf("  -adap      adaptive LODs (best if used with -m)\n\n");
+
   csPrintf("When viewing the model:\n");
-  csPrintf("  'k' / 'l':  increase/reduce LOD resolution\n");
-  csPrintf("  'a':        switch to auto LOD\n");
+  csPrintf("  'k' / 'l'  increase/reduce LOD resolution\n");
+  csPrintf("  'a'        switch to auto LOD\n");
 }
 
 bool LodView::OnInitialize (int argc, char* argv [])
@@ -199,6 +206,7 @@ bool LodView::OnInitialize (int argc, char* argv [])
     if (num_multiple < 1)
       num_multiple = 1;
   }
+  use_adaptive_LODs = cmdline->GetBoolOption("adap", false);
   
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_VFS,
@@ -313,6 +321,9 @@ bool LodView::SetupModules ()
   view.AttachNew (new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  if (use_adaptive_LODs)
+    engine->EnableAdaptiveLODs(true, 30.0f);
  
   LoadLODs(filename);
 

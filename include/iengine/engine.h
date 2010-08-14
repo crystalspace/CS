@@ -1064,8 +1064,23 @@ struct iEngine : public virtual iBase
    * Update the engine and animations etc for a new frame
    */
   virtual void UpdateNewFrame () = 0;
-  /** @} */
   
+  /**
+   * Enable adaptive LODs.
+   */
+  virtual void EnableAdaptiveLODs(bool enable, float target_fps) = 0;
+
+  /**
+   * Must be called once per frame if you use adaptive LODs.
+   */
+  virtual void UpdateAdaptiveLODs() = 0;
+
+  /**
+   * Get a multiplier based on the average elapsed time for the last n frames.
+   */
+  virtual float GetAdaptiveLODsMultiplier() const = 0;
+  /** @} */
+
   /**\name Saving/loading
    * @{ */
 
