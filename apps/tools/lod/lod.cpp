@@ -41,7 +41,7 @@ void Lod::Usage()
 {
   //        ---------+---------+---------+---------+---------+---------+---------+-------80+
   csPrintf("Usage:\n\n");
-  csPrintf("lod -i=<input_file> [-o=<output_file>] -mindist=d -maxdist=d [-v] [-force]\n");
+  csPrintf("lod -i=<input_file> [-o=<output_file>] -mindist=d -maxdist=d [-force] [-v]\n");
   csPrintf("    [-em=<fast|precise>]\n\n");
   csPrintf("-mindist  Minimum LOD distance.\n");
   csPrintf("-maxdist  Maximum LOD distance.\n");
@@ -49,8 +49,8 @@ void Lod::Usage()
   csPrintf("          Existing values in input file take precedence, unless -force is used.\n");
   csPrintf("-force    Force use of cmdline-specified mindist and maxdist.\n");
   csPrintf("          Mindist and maxdist *need* to be either in cmdline or input file.\n");
+  csPrintf("-v        Verbose console output.\n");
   csPrintf("-em       Error metric (fast or precise).\n");
-  csPrintf("-v        Verbose.\n");
 }
 
 bool Lod::ParseParams(int argc, char* argv[])
