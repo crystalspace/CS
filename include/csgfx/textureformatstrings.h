@@ -225,9 +225,9 @@ namespace CS
       {
 	const char* s1 = GetSpecial();
 	const char* s2 = GetSpecial();
-	if ((s1 == nullptr) && (s2 == nullptr)) return true;
-	if (s1 == nullptr) return false;
-	if (s1 == nullptr) return false;
+	if ((s1 == static_cast<const char*>(nullptr)) && (s2 == static_cast<const char*>(nullptr))) return true;
+	if (s1 == static_cast<const char*>(nullptr)) return false;
+	if (s1 == static_cast<const char*>(nullptr)) return false;
 	return strcmp (s1, s2) == 0;
       }
       else
@@ -243,9 +243,9 @@ namespace CS
       {
 	const char* s1 = GetSpecial();
 	const char* s2 = GetSpecial();
-	if ((s1 == nullptr) && (s2 == nullptr)) return false;
-	if (s1 == nullptr) return true;
-	if (s1 == nullptr) return true;
+	if ((s1 == static_cast<const char*>(nullptr)) && (s2 == static_cast<const char*>(nullptr))) return false;
+	if (s1 == static_cast<const char*>(nullptr)) return true;
+	if (s1 == static_cast<const char*>(nullptr)) return true;
 	return strcmp (s1, s2) != 0;
       }
       else
