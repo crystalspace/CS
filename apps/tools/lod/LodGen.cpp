@@ -550,7 +550,8 @@ float LodGen::ErrorMetricFast(const WorkMesh& k, int start_index) const
   int samples_per_triangle = 10;
   int count = 0;
   
-  srand(test_tris.GetSize()+test_tris0.GetSize());
+  unsigned int seed = (unsigned int)(test_tris.GetSize()+test_tris0.GetSize());
+  srand(seed);
 
   // For each triangle in test_tris0, test its distance to all triangles
   // in test_tris
@@ -865,8 +866,8 @@ void LodGen::GenerateLODs()
                k.GetTriangle(i)[1] == k.GetTriangle(i-curr_num_triangles)[1] &&
                k.GetTriangle(i)[2] == k.GetTriangle(i-curr_num_triangles)[2]);
       k.tri_indices.DeleteRange(sw.start_index, sw.end_index-1);
-      sw.start_index -= curr_num_triangles;
-      sw.end_index -= curr_num_triangles;
+      sw.start_index -= (int)curr_num_triangles;
+      sw.end_index -= (int)curr_num_triangles;
       k.SetLastWindow(sw);
       break;
     }
@@ -919,8 +920,8 @@ void LodGen::GenerateLODs()
       // Replicate index buffer
       if (min_d == FLT_MAX)
         could_not_collapse = true;
-      sw.start_index += curr_num_triangles;
-      sw.end_index += curr_num_triangles;
+      sw.start_index += (int)curr_num_triangles;
+      sw.end_index += (int)curr_num_triangles;
       k.SetLastWindow(sw);
       top_limit = sw.end_index;
       for (int i = sw.start_index; i < sw.end_index; i++)

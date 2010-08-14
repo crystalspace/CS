@@ -104,13 +104,13 @@ public:
   size_t GetTriangleCount() const { return ordered_tris.GetSize(); }
 
   /// Get a triangle from the processed mesh
-  const csTriangle& GetTriangle(int i) const { return ordered_tris[i]; }
+  const csTriangle& GetTriangle(size_t i) const { return ordered_tris[i]; }
 
   /// Get the number of sliding windows in the processed mesh
   size_t GetSlidingWindowCount() const { return k.sliding_windows.GetSize(); }
 
   /// Get a sliding window from the processed mesh
-  const SlidingWindow& GetSlidingWindow(int i) const { return k.sliding_windows[i]; }
+  const SlidingWindow& GetSlidingWindow(size_t i) const { return k.sliding_windows[i]; }
   
 protected:
   /**
