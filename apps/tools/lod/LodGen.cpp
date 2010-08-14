@@ -854,7 +854,20 @@ void LodGen::GenerateLODs()
     {
       // If we couldn't collapse now and couldn't collapse last time either, end.
       Message("No more triangles to collapse\n");
-      // TODO: Undo last replication
+      // We have a replicated window that wasn't touched. Undo replication by deleting
+      // indices and making sw point to the original range before replication.
+      // This avoids wasting memory.
+      CS_ASSERT(sw.start_index == k.GetLastWindow().start_index &&
+             sw.end_index == k.GetLastWindow().end_index);
+      size_t curr_num_triangles = sw.end_index - sw.start_index;
+      for (int i = sw.start_index; i < sw.end_index; i++)
+        CS_ASSERT(k.GetTriangle(i)[0] == k.GetTriangle(i-curr_num_triangles)[0] &&
+               k.GetTriangle(i)[1] == k.GetTriangle(i-curr_num_triangles)[1] &&
+               k.GetTriangle(i)[2] == k.GetTriangle(i-curr_num_triangles)[2]);
+      k.tri_indices.DeleteRange(sw.start_index, sw.end_index-1);
+      sw.start_index -= curr_num_triangles;
+      sw.end_index -= curr_num_triangles;
+      k.SetLastWindow(sw);
       break;
     }
     if (min_d != FLT_MAX)
@@ -916,6 +929,23 @@ void LodGen::GenerateLODs()
       min_triangles_for_replication = (sw.end_index - sw.start_index) / 2;
     }
   }
+
+#if 0
+  // Debugging
+  // Display last 2 sliding windows
+  SlidingWindow last = k.GetLastWindow();
+  cout << endl << last.start_index << " " << last.end_index << endl;
+  for (unsigned int i = last.start_index; i < last.end_index; i++)
+    cout << k.GetTriangle(i)[0] << " " << k.GetTriangle(i)[1] << " " << k.GetTriangle(i)[2] << " - ";
+  if (k.sliding_windows.GetSize() >= 2)
+  {
+    SlidingWindow last1 = k.sliding_windows[k.sliding_windows.GetSize()-2];
+    cout << endl << last1.start_index << " " << last1.end_index << endl;
+    for (unsigned int i = last1.start_index; i < last1.end_index; i++)
+      cout << k.GetTriangle(i)[0] << " " << k.GetTriangle(i)[1] << " " << k.GetTriangle(i)[2] << " - ";
+  }
+#endif
+
   // Copy work mesh to output
   for (unsigned int i = 0; i < k.tri_indices.GetSize(); i++)
     ordered_tris.Push(k.GetTriangle(i));
