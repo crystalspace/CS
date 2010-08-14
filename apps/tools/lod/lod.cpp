@@ -279,11 +279,11 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
   csString name = node->GetAttributeValue ("name");
   if (!itr->WasSuccessful())
   {
-    ReportError("Error parsing meshfact '%s' in input file.", name.GetData ());
+    ReportError("Error parsing meshfact '%s' in input file.\n", name.GetData ());
     return;
   }
 
-  csPrintf("Processing factory %s.", name.GetData());
+  csPrintf("Processing factory: %s\n", name.GetData());
 
   imeshfactw = scfQueryInterface<iMeshFactoryWrapper>(itr->GetResultRefPtr());
     
@@ -302,7 +302,7 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
   bool b_have_cmdline_dist = params.dist_specified;
   if (!b_have_file_dist && !b_have_cmdline_dist)
   {
-    csPrintf("Factory %s ignored. Distances not set on command line and not present on file.",
+    csPrintf("Factory '%s' ignored. Distances not specified via the command line or in the factory.\n",
       name.GetData());
     return;
   }
