@@ -38,9 +38,9 @@ class csVisibilityObjectHistory :
     public scfImplementation1<csVisibilityObjectHistory, iKDTreeUserData>
 {
 public:
-  csVisibilityObjectHistory (iGraphics3D* g3d, uint32 uFrame)
+  csVisibilityObjectHistory (iGraphics3D* g3d, uint32 uFrame, csKDTree* node)
     : scfImplementationType (this), uQueryFrame (uFrame), uNextCheck (uFrame),
-      g3d (g3d), eResult(INVALID)
+      g3d (g3d), eResult(INVALID), child1 (node->GetChild1 ()), child2 (node->GetChild2 ())
   {
     g3d->OQInitQueries(&uOQuery, 1);
   }
@@ -100,12 +100,33 @@ public:
     return false;
   }
 
+  bool MatchChildren (csKDTree* thisNode)
+  {
+    csKDTree* newChild1 = thisNode->GetChild1 ();
+    csKDTree* newChild2 = thisNode->GetChild2 ();
+
+    bool matching = (newChild1 == child1 && newChild2 == child2) ||
+                    (newChild1 == child2 && newChild2 == child1);
+
+    child1 = newChild1;
+    child2 = newChild2;
+
+    return matching;
+  }
+
+  void ResetVisibility ()
+  {
+    eResult = INVALID;
+  }
+
 private:
   iGraphics3D* g3d;
   unsigned int uOQuery;
   uint32 uQueryFrame;
   uint32 uNextCheck;
   OcclusionVisibility eResult;
+  csKDTree* child1;
+  csKDTree* child2;
 };
 
 #endif

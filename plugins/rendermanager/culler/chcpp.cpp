@@ -53,16 +53,16 @@
 #include "chcpp.h"
 
 template<bool bQueryVisibility>
-void csFrustumVis::RenderMeshes(NodeTraverseData &ntdNode, csArray<MeshList*> &objArray)
+void csFrustumVis::RenderMeshes(NodeTraverseData &ntdNode, csArray<MeshList*> &meshList)
 {
   if (bQueryVisibility)
   {
     ntdNode.BeginQuery ();
   }
 
-  for(unsigned int j=0 ; j < objArray.GetSize() ; ++j)
+  for(unsigned int j=0 ; j < meshList.GetSize() ; ++j)
   {
-    MeshList& obj = *objArray.Get(j);
+    MeshList& obj = *meshList.Get(j);
     for (int m = 0; m < obj.numMeshes; ++m)
     {
       for (int i = 0; i < obj.meshList[m].num; ++i)
@@ -88,87 +88,155 @@ void csFrustumVis::RenderMeshes(NodeTraverseData &ntdNode, csArray<MeshList*> &o
   }
 }
 
-void csFrustumVis::TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp)
+void csFrustumVis::TraverseNodeF2B(NodeTraverseData &ntdNode,
+                                   csArray<MeshList*>& meshList,
+                                   bool parentVisible,
+                                   bool bDoFrustumCulling)
 {
-  ntdNode.SetFrame (engine->GetCurrentFrameNumber ());
+  if (bDoFrustumCulling)
+  {
+    NodeVisibility nodevis = TestNodeVisibility (ntdNode.kdtNode, &f2bData, ntdNode.u32Frustum_Mask);
 
-  if (ntdNode.IsLeaf())
+    if (nodevis == NODE_INVISIBLE)
+      return;
+
+    if (nodevis == NODE_VISIBLE && frustum_mask == 0)
+    {
+      TraverseNodeF2B (ntdNode, meshList, parentVisible, false);
+      return;
+    }
+
+    ntdNode.Distribute ();
+  }
+
+  if (!ntdNode.IsLeaf())
+  {
+    csKDTree *firstNode, *secondNode;
+    csArray<MeshList*> firstMeshList, secondMeshList;
+    bool visible = parentVisible && (ntdNode.GetVisibility () == VISIBLE);
+
+    if (f2bData.pos[ntdNode.GetSplitAxis()] <= ntdNode.GetSplitLocation())
+    {
+      firstNode = ntdNode.kdtNode->GetChild1 ();
+      secondNode = ntdNode.kdtNode->GetChild2 ();
+    }
+    else
+    {
+      firstNode = ntdNode.kdtNode->GetChild2 ();
+      secondNode = ntdNode.kdtNode->GetChild1 ();
+    }
+
+    NodeTraverseData& ntd1 = NodeTraverseData (g3d, firstNode, ntdNode.GetFrustumMask(), ntdNode.GetFrame ());
+    NodeTraverseData& ntd2 = NodeTraverseData (g3d, secondNode, ntdNode.GetFrustumMask(), ntdNode.GetFrame ());
+
+    if(firstNode)
+    {
+      TraverseNodeF2B (ntd1, firstMeshList, visible, bDoFrustumCulling);
+
+      if (!firstMeshList.IsEmpty () && ntd2.GetVisibility () == VISIBLE)
+      {
+        ++numQueries;
+        ++numNormQueries;
+        RenderMeshes<true> (ntd1, firstMeshList);
+        firstMeshList.Empty ();
+      }
+    }
+
+    if(secondNode)
+    {
+      TraverseNodeF2B (ntd2, secondMeshList, visible, bDoFrustumCulling);
+
+      if (!secondMeshList.IsEmpty () && ntd1.GetVisibility () == VISIBLE)
+      {
+        ++numQueries;
+        ++numNormQueries;
+        RenderMeshes<true> (ntd2, secondMeshList);
+        secondMeshList.Empty ();
+      }
+    }
+
+    if (visible)
+    {
+      if (!firstMeshList.IsEmpty () || !secondMeshList.IsEmpty ())
+      {
+        ++numQueries;
+        ++numPullUpQueries;
+        ntdNode.BeginQuery ();
+
+        RenderMeshes<false> (ntd1, firstMeshList);
+        RenderMeshes<false> (ntd2, secondMeshList);
+
+        ntdNode.EndQuery ();
+      }
+    }
+    else
+    {
+      for (size_t i = 0; i < firstMeshList.GetSize (); ++i)
+      {
+        meshList.Push (firstMeshList[i]);
+      }
+
+      for (size_t i = 0; i < secondMeshList.GetSize (); ++i)
+      {
+        meshList.Push (secondMeshList[i]);
+      }
+    }
+  }
+  else
   {
     OcclusionVisibility eOccVis = ntdNode.GetVisibility ();
 
     const int num_objects = ntdNode.kdtNode->GetObjectCount ();
     csKDTreeChild** objects = ntdNode.kdtNode->GetObjects ();
-    csArray<MeshList*> objArray;
 
     for (int i = 0; i < num_objects; ++i)
     {
       if (objects[i]->timestamp != cur_timestamp)
       {
-        objects[i]->timestamp = cur_timestamp;
+        if (eOccVis == VISIBLE)
+        {
+          objects[i]->timestamp = cur_timestamp;
+        }
+
         uint32 frustum_mask = ntdNode.GetFrustumMask();
         csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*) objects[i]->GetObject ();
 
         // Only test an element via occlusion if it first passes frustum testing
-        if(TestObjectVisibility (visobj_wrap, &f2bData, frustum_mask))
+        if((!bDoFrustumCulling && !(visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
+          || TestObjectVisibility (visobj_wrap, &f2bData, frustum_mask))
         {
-          csSectorVisibleRenderMeshes* meshList;
-          const int numMeshes = f2bData.viscallback->GetVisibleMeshes (visobj_wrap->mesh, frustum_mask, meshList);
+          csSectorVisibleRenderMeshes* sectorMeshList;
+          const int numMeshes = f2bData.viscallback->GetVisibleMeshes (visobj_wrap->mesh, frustum_mask, sectorMeshList);
 
           if (numMeshes > 0)
           {
-            objArray.Push (new MeshList (meshList, numMeshes));
+            meshList.Push (new MeshList (sectorMeshList, numMeshes));
 
             // If occlusion checks also passed, mark the mesh visible.
-            if (eOccVis == VISIBLE)
+            if (parentVisible && eOccVis == VISIBLE)
             {
-              f2bData.viscallback->MarkVisible(visobj_wrap->mesh, numMeshes, meshList);
+              ++visible;
+              f2bData.viscallback->MarkVisible(visobj_wrap->mesh, numMeshes, sectorMeshList);
             }
           }
         }
       }
     }
 
-    if (!objArray.IsEmpty())
+    if (!meshList.IsEmpty () && eOccVis == VISIBLE)
     {
       if (ntdNode.CheckVisibility ())
       {
-        RenderMeshes<true> (ntdNode, objArray);
+        ++numQueries;
+        ++numNormQueries;
+        RenderMeshes<true> (ntdNode, meshList);
       }
       else
       {
-        RenderMeshes<false> (ntdNode, objArray);
-      }
-    }
-  }
-  else // else we queue its children on to the traverse queue
-  {
-    NodeTraverseData ntd;
-    csKDTree* child1 = ntdNode.kdtNode->GetChild1 ();
-    csKDTree* child2 = ntdNode.kdtNode->GetChild2 ();
-    
-    if (f2bData.pos[ntdNode.GetSplitAxis()] <= ntdNode.GetSplitLocation())
-    {
-      if(child1)
-      {
-        T_Queue.Push (NodeTraverseData (g3d, child1, ntdNode.kdtNode, ntdNode.GetFrustumMask(), engine->GetCurrentFrameNumber ()));
+        RenderMeshes<false> (ntdNode, meshList);
       }
 
-      if(child2)
-      {
-        T_Queue.Push (NodeTraverseData (g3d, child2, ntdNode.kdtNode, ntdNode.GetFrustumMask(), engine->GetCurrentFrameNumber ()));
-      }
-    }
-    else
-    {
-      if(child2)
-      {
-        T_Queue.Push (NodeTraverseData (g3d, child2, ntdNode.kdtNode, ntdNode.GetFrustumMask(), engine->GetCurrentFrameNumber ()));
-      }
-
-      if(child1)
-      {
-        T_Queue.Push (NodeTraverseData (g3d, child1, ntdNode.kdtNode, ntdNode.GetFrustumMask(), engine->GetCurrentFrameNumber ()));
-      }
+      meshList.Empty ();
     }
   }
 }

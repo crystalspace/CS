@@ -69,20 +69,15 @@ struct FrustTest_Front2BackData
 
 struct NodeTraverseData
 {
-  NodeTraverseData ()
+  NodeTraverseData (iGraphics3D* g3d, csKDTree* kdtN, const uint32 frustum_mask, const uint32 uCurrFrame)
   {
-  }
-
-  NodeTraverseData (iGraphics3D* g3d, csKDTree* kdtN, csKDTree* kdtP, const uint32 frustum_mask, const uint32 uCurrFrame)
-  {
-    kdtParent = kdtP;
     kdtNode = kdtN;
 
     // Add a new visibility history user object if one doesn't already exist.
     if(kdtNode && !kdtNode->GetUserObject())
     {
       csRef<iKDTreeUserData> pHistory;
-      pHistory.AttachNew (new csVisibilityObjectHistory(g3d, uFrame));
+      pHistory.AttachNew (new csVisibilityObjectHistory(g3d, uFrame, kdtNode));
       kdtNode->SetUserObject(pHistory);
     }
 
@@ -90,70 +85,86 @@ struct NodeTraverseData
     uFrame = uCurrFrame;
   }
 
-  csVisibilityObjectHistory* GetVisibilityObjectHistory() const
+  inline csVisibilityObjectHistory* GetVisibilityObjectHistory() const
   {
-    if(!kdtNode) return 0;
     return static_cast<csVisibilityObjectHistory*>(kdtNode->GetUserObject());
   }
 
-  bool IsLeaf() const
+  inline bool IsLeaf() const
   {
-    if(!kdtNode) return false;
     return kdtNode->IsLeaf();
   }
 
-  OcclusionVisibility GetVisibility() const
+  inline OcclusionVisibility GetVisibility() const
   {
-    if(!kdtNode) return INVISIBLE;
-    return GetVisibilityObjectHistory()->WasVisible (uFrame);
+    if (GetVisibilityObjectHistory ()->MatchChildren (kdtNode))
+    {
+      return GetVisibilityObjectHistory()->WasVisible (uFrame);
+    }
+
+    // If the child objects no longer match, reset visibility.
+    GetVisibilityObjectHistory ()->ResetVisibility ();
+
+    // Reset all parent nodes.
+    csKDTree* parentNode = kdtNode->GetParent ();
+    while (parentNode != 0)
+    {
+      csVisibilityObjectHistory* pVOH = static_cast<csVisibilityObjectHistory*>(parentNode->GetUserObject());
+      pVOH->ResetVisibility ();
+      parentNode = parentNode->GetParent ();
+    }
+
+    return VISIBLE;
   }
 
-  bool CheckVisibility () const
+  inline bool CheckVisibility () const
   {
-    if(!kdtNode) return false;
     return GetVisibilityObjectHistory()->CheckVisibility (uFrame); 
   }
 
-  void BeginQuery ()
+  inline void BeginQuery ()
   {
     GetVisibilityObjectHistory()->BeginQuery (uFrame);
   }
 
-  void EndQuery ()
+  inline void EndQuery ()
   {
     GetVisibilityObjectHistory ()->EndQuery ();
   }
 
-  int GetSplitAxis() const
+  inline int GetSplitAxis() const
   {
-    if(!kdtNode) return 0;
     return kdtNode->GetSplitAxis();
   }
 
-  int GetSplitLocation() const
+  inline int GetSplitLocation() const
   {
-    if(!kdtNode) return 0;
     return kdtNode->GetSplitLocation();
   }
 
-  uint32 GetFrustumMask() const
+  inline uint32 GetFrustumMask() const
   {
     return u32Frustum_Mask;
   }
 
-  void SetFrame (uint32 uCurrFrame)
+  inline void SetFrame (uint32 uCurrFrame)
   {
     uFrame = uCurrFrame;
   }
 
-  csKDTree* kdtParent;
+  inline uint32 GetFrame () const
+  {
+    return uFrame;
+  }
+
+  inline void Distribute ()
+  {
+    kdtNode->Distribute ();
+  }
+
   csKDTree* kdtNode;
   uint32 u32Frustum_Mask;
   uint32 uFrame;
-
-  ~NodeTraverseData()
-  {
-  }
 };
 
 struct MeshList
@@ -254,23 +265,26 @@ private:
   csRef<iGraphics3D> g3d;
   csRef<iEngine> engine;
 
-  csArray<NodeTraverseData> T_Queue; // Traversal Queue
+  unsigned numQueries;
+  unsigned numNormQueries;
+  unsigned numPullUpQueries;
+  unsigned visible;
 
   // Frustum data (front to back)
+  uint32 frustum_mask;
+  int cur_timestamp;
   FrustTest_Front2BackData f2bData;
-
-  void TraverseNode(NodeTraverseData &ntdNode, const int cur_timestamp);
 
   template<bool bQueryVisibility>
   void RenderMeshes(NodeTraverseData &ntdNode, csArray<MeshList*> &objArray);
+
+  void TraverseNodeF2B(NodeTraverseData &ntdNode,csArray<MeshList*>& meshList,
+    bool parentVisible, bool bDoFrustumCulling);
 
 public:
   csFrustumVis ();
   virtual ~csFrustumVis ();
   virtual bool Initialize (iObjectRegistry *object_reg);
-
-  void CallVisibilityCallbacksForSubtree (NodeTraverseData &ntdNode,
-	    const uint32 cur_timestamp);
 
   void MarkAllVisible (csKDTree* treenode);
 
@@ -278,7 +292,7 @@ public:
   // 1 if visible normally, or 0 if not visible.
   // This function will also modify the frustum_mask in 'data'. So
   // take care to restore this later if you recurse down.
-  int TestNodeVisibility (csKDTree* treenode,
+  NodeVisibility TestNodeVisibility (csKDTree* treenode,
   	FrustTest_Front2BackData* data, uint32& frustum_mask);
 
   // Test visibility for the given object. Returns true if visible.
