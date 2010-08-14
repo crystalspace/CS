@@ -283,7 +283,7 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
     return;
   }
 
-  ReportInfo("Processing factory %s.", name.GetData());
+  csPrintf("Processing factory %s.", name.GetData());
 
   imeshfactw = scfQueryInterface<iMeshFactoryWrapper>(itr->GetResultRefPtr());
     
@@ -302,7 +302,7 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
   bool b_have_cmdline_dist = params.dist_specified;
   if (!b_have_file_dist && !b_have_cmdline_dist)
   {
-    ReportInfo("Factory %s ignored. Distances not set on command line and not present on file.",
+    csPrintf("Factory %s ignored. Distances not set on command line and not present on file.",
       name.GetData());
     return;
   }
