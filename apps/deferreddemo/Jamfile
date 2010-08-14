@@ -3,4 +3,5 @@ SubDir TOP apps deferreddemo ;
 Description deferreddemo : "Demonstrates the use of Deferred Shading." ;
 Application deferreddemo : [ Wildcard *.cpp *.h ] ;
 LinkWith deferreddemo : crystalspace ;
+ExternalLibs csceguiconftest : CEGUI ;
 FileListEntryApplications deferreddemo : app-demo ;
