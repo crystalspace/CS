@@ -1,0 +1,7 @@
+SubDir TOP plugins mesh furmesh persist standard ;
+
+Description furmeshldr : "Fur mesh object loader" ;
+Plugin furmeshldr : [ Wildcard *.cpp *.h ] ;
+Includes furmeshldr.h : $(SUBDIR)/furmeshldr.tok ;
+LinkWith furmeshldr : crystalspace ;
+CompileGroups furmeshldr : meshes ;
