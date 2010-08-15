@@ -158,7 +158,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 6, 2, 0);
+  SCF_INTERFACE(iEngine, 6, 3, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1064,7 +1064,11 @@ struct iEngine : public virtual iBase
    * Update the engine and animations etc for a new frame
    */
   virtual void UpdateNewFrame () = 0;
-  
+  /** @} */
+
+  /**\name Adaptive progressive LODs
+   * @{ */
+
   /**
    * Enable adaptive LODs.
    */

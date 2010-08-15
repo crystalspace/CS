@@ -254,7 +254,7 @@ struct iGeneralMeshCommonState : public virtual iBase
  */
 struct iGeneralMeshState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralMeshState, 2, 0, 0);
+  SCF_INTERFACE (iGeneralMeshState, 2, 0, 1);
   
   /**
    * Set the animation control to use for this mesh object.
@@ -312,7 +312,7 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
  */
 struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralFactoryState, 2, 0, 1);
+  SCF_INTERFACE (iGeneralFactoryState, 2, 0, 2);
   
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
@@ -536,6 +536,9 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    */
   virtual void GenerateCylinder (float l, float r, uint sides) = 0;
 
+  /**\name Progressive LODs
+   * @{ */
+
   /**
    * Get the maximum between all submeshes' progressive LOD levels.
    */
@@ -553,6 +556,7 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    * \param max Maximum distance - at this distance, the model will be at its minimum LOD.
    */
   virtual void SetProgLODDistances(float min, float max) = 0;
+  /** @} */
 };
 
 /**
