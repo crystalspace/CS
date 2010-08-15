@@ -617,7 +617,6 @@ struct InnerNodeProcessOP : public Common
         if(numMeshes > 0 )
         {
           DrawMeshes(n,meshList,numMeshes);
-          //f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
         }
       }
     }
@@ -660,7 +659,6 @@ struct InnerNodeProcessOP : public Common
     {
       if(n->GetVisibilityForCamera(f2bData->rview->GetCamera())==false)
       {
-        //printf("Issuing inner query\n");
         n->SetQueryStatus(QS_PENDING_RESULT);
         n->BeginQuery();
         RenderChildren(n, frustum_mask);
@@ -670,22 +668,19 @@ struct InnerNodeProcessOP : public Common
       else
       {
         n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
-        //printf("Proceeding\n");
         return true;
       }
     }
-    else if(n->InnerQueryFinished())
+    else //if(n->InnerQueryFinished())
     {
       if(CheckOQ(n))
       {
-        //printf("Inner node is visible\n");
         n->SetQueryStatus(QS_NOQUERY_ISSUED);
         return true;
       }
       else
       {
         n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
-        //printf("Nope\n");
         n->SetQueryStatus(QS_PENDING_RESULT);
         n->BeginQuery();
         RenderChildren(n, frustum_mask);
@@ -694,8 +689,7 @@ struct InnerNodeProcessOP : public Common
       }
     }
     
-    // query result not available so use previous frame's result
-    return n->GetVisibilityForCamera(f2bData->rview->GetCamera());
+    return true;
   }
 
   bool operator() (NodePtr n, uint32 &frustum_mask) const
@@ -757,7 +751,7 @@ struct LeafNodeProcessOP : public Common
         PullUpVisibility(n);
         f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
       }
-      /*else if(f2bData->current_timestamp - n->GetCameraTimestamp(cam) <= 10 
+      else if(f2bData->current_timestamp - n->GetCameraTimestamp(cam) <= 10
             && n->GetVisibilityForCamera(cam))
       {
           if(n->GetVisibilityForCamera(cam))
@@ -766,8 +760,8 @@ struct LeafNodeProcessOP : public Common
             PullUpVisibility(n);
             f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
           }
-      }*/
-      else if(IsQueryFinished(n,oqID))
+      }
+      else //if(IsQueryFinished(n,oqID))
       {
         if(CheckOQ(n,oqID))
         {
@@ -787,7 +781,7 @@ struct LeafNodeProcessOP : public Common
         n->SetQueryStatus(QS_PENDING_RESULT); // not really used, just here for completeness
         n->SetCameraTimestamp(cam, f2bData->current_timestamp);
       }
-      else // if we didn't get a result yet use previous result; important, it avoids flickering
+      /*else // if we didn't get a result yet use previous result; important, it avoids flickering
       {
         if(n->GetVisibilityForCamera(cam))
         {
@@ -798,7 +792,7 @@ struct LeafNodeProcessOP : public Common
         {
         }
         n->SetCameraTimestamp(cam, f2bData->current_timestamp);
-      }
+      }*/
     }
   }
 
