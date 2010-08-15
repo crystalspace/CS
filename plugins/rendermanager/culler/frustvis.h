@@ -370,7 +370,7 @@ private:
 
   csRef<iGraphics3D> g3d;
 
-  std::queue<const NodePtr> Queries;
+  std::queue<NodePtr> Queries;
   AABBTree<NodeLeafData,1,NodeData > aabbTree;
 
   // Frustum data (front to back)

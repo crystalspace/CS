@@ -313,7 +313,7 @@ struct TraverseFunctor
     }
   }
 
-  inline void TraverseInner(const NodePtr n, const csVector3& direction, std::stack<const NodePtr>& Q) const
+  inline void TraverseInner(const NodePtr n, const csVector3& direction, std::stack<NodePtr>& Q) const
   {
     const csVector3 centerDiff = n->GetChild2 ()->GetBBox ().GetCenter () -
       n->GetChild1 ()->GetBBox ().GetCenter ();
@@ -342,13 +342,13 @@ struct TraverseFunctor
     Q.push(n->GetChild (firstIdx));
   }
 
-  bool operator() (const NodePtr rootNode, std::queue<const NodePtr>& OccQueries) const
+  bool operator() (const NodePtr rootNode, std::queue<NodePtr>& OccQueries) const
   {
     bool ret = true;
     if (!rootNode) 
       return ret;
 
-    std::stack<const NodePtr> Q;
+    std::stack<NodePtr> Q;
     csSectorVisibleRenderMeshes* meshList;
     uint32 frustum_mask=f2bData->rview->GetRenderContext()->clip_planes_mask;
 
@@ -470,7 +470,7 @@ struct TraverseFunctor
 
 struct Common
 {
-  std::queue<const NodePtr> Queries;
+  std::queue<NodePtr> Queries;
   const FrustTest_Front2BackData *f2bData;
 
   bool IsInnerInFrustum(const NodePtr n, uint32 &frustum_mask) const
@@ -598,7 +598,7 @@ struct InnerNodeProcessOP : public Common
   InnerNodeProcessOP()
   {
   }
-  InnerNodeProcessOP(const FrustTest_Front2BackData *data,const std::queue<const NodePtr> &Queries)
+  InnerNodeProcessOP(const FrustTest_Front2BackData *data,const std::queue<NodePtr> &Queries)
   {
     f2bData=data;
     this->Queries=Queries;
@@ -709,7 +709,7 @@ struct LeafNodeProcessOP : public Common
   LeafNodeProcessOP()
   {
   }
-  LeafNodeProcessOP(const FrustTest_Front2BackData *data,const std::queue<const NodePtr> &Queries)
+  LeafNodeProcessOP(const FrustTest_Front2BackData *data,const std::queue<NodePtr> &Queries)
   {
     f2bData=data;
     this->Queries=Queries;
