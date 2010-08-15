@@ -1,8 +1,3 @@
 SubDir TOP plugins mesh furmesh ;
 
-Description furmesh : "Fur Mesh Manager plugin" ;
-
-Plugin furmesh
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith furmesh : crystalspace ;
+SubInclude TOP plugins mesh furmesh object ;
