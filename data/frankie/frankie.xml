@@ -36,7 +36,7 @@
 	  <shadervar type="float" name="displaceDistance">0.0</shadervar>
 	  <shadervar type="texture" name="density map">frankie_densitymap</shadervar>
 	  <shadervar type="float" name="densityFactorGuideFurs">100</shadervar>
-	  <shadervar type="float" name="densityFactorFurStrands">100</shadervar>
+	  <shadervar type="float" name="densityFactorFurStrands">150</shadervar>
       <shadervar type="texture" name="height map">frankie_densitymap</shadervar>
 	  <shadervar type="float" name="heightFactor">0.1</shadervar>
 	  <shadervar type="float" name="controlPointsDistance">0.025</shadervar>

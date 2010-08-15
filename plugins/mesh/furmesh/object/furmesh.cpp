@@ -25,6 +25,9 @@
 #include "hairphysicscontrol.h"
 #include "hairmeshproperties.h"
 
+#define MAX_GUIDE_FURS 10000
+#define MAX_FUR_STRAND_DENSITY 100
+
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   /********************
@@ -475,6 +478,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float baseB = csVector2::Norm(a - c);
     float baseC = csVector2::Norm(b - a);
 
+    if (baseA < EPSILON)
+      baseA = EPSILON;
+
+    if (baseB < EPSILON)
+      baseB = EPSILON;
+
+    if (baseC < EPSILON)
+      baseC = EPSILON;
+
     s = (baseA + baseB + baseC) / 2.0f;
     area2d = sqrt(s * (s - baseA) * (s - baseB) * (s - baseC));
 
@@ -529,7 +541,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csGuideFur A, B, C;
 
     // Generate guide hairs for LOD
-    for (size_t iter = 0 ; iter < guideFursTriangles.GetSize(); iter ++)
+    for (size_t iter = 0 ; iter < guideFursTriangles.GetSize() && iter < MAX_GUIDE_FURS; iter ++)
     {
       csTriangle triangle = guideFursTriangles.Get(iter);
       TriangleAreaDensity(triangle, area, density, A, B, C);
@@ -581,7 +593,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csGuideFur A, B, C;
 
     // Generated based on density
-    for (int den = 0 , change = 1 ; change && den < 100 ; den ++)
+    for (int den = 0 , change = 1 ; change && den < MAX_FUR_STRAND_DENSITY ; den ++)
     {
       change = 0;
       // For every triangle
