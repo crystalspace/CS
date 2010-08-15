@@ -8,7 +8,7 @@
 @email{joe@@joeforte.net}.}
 
 The deferred shading documentation is split into two parts. The first part
-provides an overview of the deferred shading technique along with a discussion
+provides an overview of the deferred shading algorithm along with a discussion
 of its benefits and drawbacks. The second part focuses on using and extending
 the Crystal Space implementation of the deferred shading technique.
 

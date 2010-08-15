@@ -214,3 +214,21 @@ shading.
 @emph{Note}: If no render layer is specified with a @samp{gbuffer fill} shader
 type then a defualt layer will be added that uses the
 @samp{CS/data/shader/deferred/fill_gbuffer.xml} shader.
+
+@subsubheading Debug Commands
+
+The deferred render manager implements the @code{iDebugHelper} interface and
+responds to the following debug commands:
+
+@table @code
+@item toggle_visualize_gbuffer
+Toggles a display of the GBuffer at the bottom of the screen. The GBuffers color
+buffers will be displayed in order from left to right followed by the GBuffers
+depth buffer. The debug command can be activated through BugPlug using the
+command @code{ctrl+d, ctrl+shift+alt+g}.
+
+@item toggle_visualize_lightvolumes
+Toggles a display of the light proxy geometry drawn for each light. The debug
+command can be activated through BugPlug using the command @code{ctrl+d,
+ctrl+shift+alt+l}.
+@end table

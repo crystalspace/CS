@@ -11,6 +11,36 @@ traditional approach to rasterization (commonly referred to as forward shading)
 the rendering and lighting of geometry are done in tandem. As a result, using
 forward shading tends to limit the number of light sources that can affect a
 single object. However, with deferred shading the cost of adding a light to a
-scene is independent of the number of objects in that scene. 
+scene is independent of the number of objects in a scene. This property allows for a scene to contain significantly more dynamic light sources before performance becomes an issue.
+
+@subsubheading Implementing Deferred Shading
+
+From a high-level deferred shading works in two main passes. In the first pass
+all geometry in a scene is drawn to a set of buffers referred to collectively as
+the @emph{GBuffer} (short for Geometry Buffer). During this pass the
+@emph{GBuffer} is filled with the information needed to evaluate the lighting
+equation. This information includes, but is not limited to, diffuse and specular
+color, surface normal, and surface position (often stored as depth and
+reconstructed when needed). In the second pass the filled @emph{GBuffer} is used
+to evaluate the lighting equation for each light in the scene. The contribution
+from each light is added to, what is commonly referred to as, the accumulation
+buffer. At the start of the second pass the accumulation buffer is initialized
+to all black. During the pass the accumulation buffer will be filled with
+lighting information from each light. By the end of the pass the accumulation
+buffer will contain the final image of the lit scene.
+
+To compute the lighting equation for a light source we must determine what
+pixels in the final image are affected by that light. To do this we take
+advantage of the rasterization capabilities of the GPU by rendering light proxy
+geometry. This proxy geometry is a mesh that approximates the size, shape, and
+position of the light source we are considering. As an example, we might use a
+cone mesh to approximate a spot light or a sphere mesh to approximate a point
+light. Ideally we want the proxy geometries approximation be as tight as
+possible so we do not needlessly consider pixels that are not affected by the
+light. The light proxy geometry is rendered using a shader (@pxref{Shaders})
+that reads data from the @emph{GBuffer}, computes the lighting equation, and
+outputs the result to the accumulation buffer at each pixel.
+
+@subsubheading Considerations when Using Deferred Shading
 
 TODO
