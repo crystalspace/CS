@@ -1203,7 +1203,7 @@ struct iGraphics3D : public virtual iBase
    * \sa DrawSimpleMesh
    */
   virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
-    size_t numMeshes, uint flags = 0, bool bDisableCulling=false) = 0;
+    size_t numMeshes, uint flags = 0) = 0;
 
   /**
    * Initialise a set of occlusion queries.
