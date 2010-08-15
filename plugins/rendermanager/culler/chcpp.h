@@ -653,6 +653,8 @@ struct InnerNodeProcessOP : public Common
 
   bool NodeVisible(NodePtr n, uint32 &frustum_mask) const
   {
+    if(!n->GetParent())
+      n->SetVisibilityForCamera(f2bData->rview->GetCamera(),true);
     n->SetCameraTimestamp(f2bData->rview->GetCamera(),f2bData->current_timestamp);
     if(n->GetQueryStatus()==QS_NOQUERY_ISSUED)
     {
@@ -674,7 +676,6 @@ struct InnerNodeProcessOP : public Common
     }
     else if(n->InnerQueryFinished())
     {
-      //n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
       if(CheckOQ(n))
       {
         //printf("Inner node is visible\n");
@@ -692,9 +693,9 @@ struct InnerNodeProcessOP : public Common
         return false;
       }
     }
-    //n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
     
-    return true;//n->GetVisibilityForCamera(f2bData->rview->GetCamera());
+    // query result not available so use previous frame's result
+    return n->GetVisibilityForCamera(f2bData->rview->GetCamera());
   }
 
   bool operator() (NodePtr n, uint32 &frustum_mask) const
@@ -736,60 +737,67 @@ struct LeafNodeProcessOP : public Common
 
   void NodeVisible(const NodePtr n,uint32 frustum_mask) const
   {
-    n->SetCameraTimestamp(f2bData->rview->GetCamera(),f2bData->current_timestamp);
-
-    csBox3 box=n->GetBBox();
     iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
+
+    if(mw->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
+      return;
     csSectorVisibleRenderMeshes* meshList;
     const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
     const int numMeshes = f2bData->viscallback->GetVisibleMeshes(mw,frustum_mask,meshList);
-    //printf("Reached leaf\n");
+    iCamera* cam=f2bData->rview->GetCamera();
+
+ 
     if(numMeshes > 0 )
     {
-      //printf("Reached leaf\n");
-      const iCamera* cam=f2bData->rview->GetCamera();
       const bool isp=IsRMPortal(n,meshList,numMeshes); // see if it's a portal
       const unsigned int oqID=n->GetLeafData(0)->GetQueryLeafID();
       if(isp)
       {
-        n->SetVisibilityForCamera(const_cast<iCamera*>(cam),true);
+        n->SetVisibilityForCamera(cam,true);
         PullUpVisibility(n);
         f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
       }
+      /*else if(f2bData->current_timestamp - n->GetCameraTimestamp(cam) <= 10 
+            && n->GetVisibilityForCamera(cam))
+      {
+          if(n->GetVisibilityForCamera(cam))
+          {
+            n->SetVisibilityForCamera(cam,true);
+            PullUpVisibility(n);
+            f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
+          }
+      }*/
       else if(IsQueryFinished(n,oqID))
       {
-        //printf("Query done\n");
         if(CheckOQ(n,oqID))
         {
           n->SetQueryStatus(QS_NOQUERY_ISSUED); // not really used, just here for completeness
-          n->SetVisibilityForCamera(const_cast<iCamera*>(cam),true);
+          n->SetVisibilityForCamera(cam,true);
           PullUpVisibility(n);
           f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
-          //printf("visible\n");
         }
         else
         {
-          n->SetVisibilityForCamera(const_cast<iCamera*>(cam),false);
-          //printf("not visible\n");
+          n->SetVisibilityForCamera(cam,false);
         }
         // draw the query
         n->GetLeafData(0)->BeginLeafQuery();
         DrawMeshes(n,meshList,numMeshes);
         n->GetLeafData(0)->EndLeafQuery();
         n->SetQueryStatus(QS_PENDING_RESULT); // not really used, just here for completeness
+        n->SetCameraTimestamp(cam, f2bData->current_timestamp);
       }
       else // if we didn't get a result yet use previous result; important, it avoids flickering
       {
-        if(n->GetVisibilityForCamera(const_cast<iCamera*>(cam)))
+        if(n->GetVisibilityForCamera(cam))
         {
-          //printf("Was visible last frame\n");
           PullUpVisibility(n);
           f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
         }
         else
         {
-          //printf("Was NOT visible last frame\n");
         }
+        n->SetCameraTimestamp(cam, f2bData->current_timestamp);
       }
     }
   }

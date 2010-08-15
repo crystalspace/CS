@@ -353,7 +353,7 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   csRenderContext* ctxt = rview->GetRenderContext ();
   f2bData.frustum = ctxt->clip_planes;
   uint32 frustum_mask = ctxt->clip_planes_mask;
-  const uint32 cur_timestamp = kdtree->NewTraversal ();
+  const uint32 cur_timestamp = rview->GetEngine()->GetCurrentFrameNumber();
 
   f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   f2bData.rview = rview;
