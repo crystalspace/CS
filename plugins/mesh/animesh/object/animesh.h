@@ -288,8 +288,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 
   class AnimeshObject :
-    public scfImplementationExt2<AnimeshObject,
+    public scfImplementationExt3<AnimeshObject,
                                  csObjectModel,
+                                 iRenderBufferAccessor,
                                  CS::Mesh::iAnimatedMesh,
                                  iMeshObject>
   {
@@ -384,22 +385,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void MorphVertices ();
 
     void PreskinLF ();
-
-    class RenderBufferAccessor :
-      public scfImplementation1<RenderBufferAccessor, 
-                                iRenderBufferAccessor>
-    {
-    public:
-      RenderBufferAccessor (AnimeshObject* meshObject)
-        : scfImplementationType (this), meshObject (meshObject)
-      {}
-
-      void PreGetBuffer (csRenderBufferHolder* holder, 
-	csRenderBufferName buffer)
-      { meshObject->PreGetBuffer (holder, buffer); }
-      
-      AnimeshObject* meshObject;
-    };
 
     class Submesh : 
       public scfImplementation1<Submesh, 

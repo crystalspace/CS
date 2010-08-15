@@ -647,6 +647,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     {
       skeleton = factory->skeletonFactory->CreateSkeleton ();
       skeleton->SetAnimatedMesh (this);
+      lastSkeletonState = skeleton->GetStateBindSpace ();
       skeletonVersion = skeleton->GetSkeletonStateVersion() - 1;
     }
   }
@@ -1086,15 +1087,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         sm->svContexts.Push (svContext);
       }
 
-      csRef<RenderBufferAccessor> rba;
-      rba.AttachNew (new RenderBufferAccessor (this));
       for (size_t j = 0; j < fsm->bufferHolders.GetSize (); ++j)
       {
         csRef<csRenderBufferHolder> bufferHolder;
         bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[j]));
 
         // Setup the accessor to this mesh
-        bufferHolder->SetAccessor (rba, 
+        bufferHolder->SetAccessor (this, 
           CS_BUFFER_POSITION_MASK | CS_BUFFER_NORMAL_MASK | 
 	  CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);
 
