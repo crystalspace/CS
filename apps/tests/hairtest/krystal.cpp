@@ -402,6 +402,9 @@ bool KrystalScene::CreateAvatar ()
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
   furMesh->SetBaseMaterial(skullMaterial->GetMaterial());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
+
+  furMesh->StartPhysicsControl();
+
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);
 

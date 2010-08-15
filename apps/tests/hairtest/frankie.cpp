@@ -321,7 +321,7 @@ bool FrankieScene::CreateAvatar ()
   // Get reference to the iFurMesh interface
   furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
 
-  furMesh->SetPhysicsControl(animationPhysicsControl);
+//   furMesh->SetPhysicsControl(animationPhysicsControl);
   furMesh->SetFurStrandGenerator(hairStrandGenerator);
 
   furMesh->SetMeshFactory(animeshFactory);

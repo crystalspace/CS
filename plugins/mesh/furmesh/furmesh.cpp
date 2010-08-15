@@ -38,7 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     materialWrapper(0), object_reg(object_reg), object_factory(object_factory), 
     engine(engine), physicsControl(0), hairStrandGenerator(0), positionShift(0),
     rng(0), guideLOD(0),strandLOD(0), hairStrandsLODSize(0), 
-    physicsControlEnabled(true), 
+    physicsControlEnabled(false), 
     densityFactorGuideHairs(10), densityFactorHairStrands(100),
     heightFactor(0.5f), displaceDistance(0.02f), strandWidth(0.0015f), 
     controlPointsDistance(0.05f), positionDeviation(0.01f), growTangents(0), 
@@ -232,7 +232,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     GenerateGuideHairs();
     GenerateGuideHairsLOD();
-    SynchronizeGuideHairs();
+    //SynchronizeGuideHairs();
     GenerateHairStrands();
 
     SaveUVImage();
