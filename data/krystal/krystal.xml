@@ -60,8 +60,8 @@
 	  <shadervar type="float" name="strandWidth">0.001</shadervar>
 	  <shadervar type="float" name="displaceDistance">0.02</shadervar>
 	  <shadervar type="texture" name="density map">krystal_skull_densitymap</shadervar>
-	  <shadervar type="float" name="densityFactorGuideHairs">10</shadervar>
-	  <shadervar type="float" name="densityFactorHairStrands">120</shadervar>
+	  <shadervar type="float" name="densityFactorGuideFurs">10</shadervar>
+	  <shadervar type="float" name="densityFactorFurStrands">120</shadervar>
       <shadervar type="texture" name="height map">krystal_skull_heightmap</shadervar>
 	  <shadervar type="float" name="heightFactor">0.4</shadervar>
 	  <shadervar type="float" name="controlPointsDistance">0.05</shadervar>

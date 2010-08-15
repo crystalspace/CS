@@ -84,8 +84,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetBaseMaterial ( iMaterial* baseMaterial );
 
     virtual void SetFurStrandGenerator
-      ( CS::Mesh::iFurStrandGenerator* hairStrandGenerator);
-    virtual CS::Mesh::iFurStrandGenerator* GetFurStrandGenerator( ) const;
+      ( CS::Mesh::iFurMeshProperties* hairMeshProperties);
+    virtual CS::Mesh::iFurMeshProperties* GetFurStrandGenerator( ) const;
 
   private:
     // Common data
@@ -102,7 +102,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csArray<csTriangle> guideFursTriangles;
     csArray<csGuideFurLOD> guideFursLOD;
     csRef<CS::Mesh::iFurPhysicsControl> physicsControl;
-    csRef<CS::Mesh::iFurStrandGenerator> hairStrandGenerator;
+    csRef<CS::Mesh::iFurMeshProperties> hairMeshProperties;
     csVector3* positionShift;
     csRandomGen *rng;
     float guideLOD;
@@ -116,8 +116,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csRef<iShaderVarStringSet> svStrings;
     // Density and height maps
     csTextureRGBA densitymap;
-    float densityFactorGuideHairs;
-    float densityFactorHairStrands;
+    float densityFactorGuideFurs;
+    float densityFactorFurStrands;
     csTextureRGBA heightmap;
     float heightFactor;
     float displaceDistance;

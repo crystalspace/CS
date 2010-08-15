@@ -29,7 +29,7 @@
       </class> 
       <class>
         <name>crystalspace.mesh.hairstrandmaterial</name>
-        <implementation>HairStrandGenerator</implementation>
+        <implementation>HairMeshProperties</implementation>
         <description>Fur Strand MaterialPlugin</description>
         <requires>
           <class>crystalspace.graphics3d.</class>

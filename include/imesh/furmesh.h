@@ -36,7 +36,7 @@ namespace Mesh
 {
 
   struct iFurPhysicsControl;
-  struct iFurStrandGenerator;
+  struct iFurMeshProperties;
   struct iFurMeshFactory;
   struct iFurMeshType;
   struct iFurMesh;
@@ -101,10 +101,10 @@ public:
  * Store the material used for the iFurMesh.
  * Material variables can be updated each frame via the Update function.
  */
-struct iFurStrandGenerator : public virtual iBase
+struct iFurMeshProperties : public virtual iBase
 {
 public:
-  SCF_INTERFACE (CS::Mesh::iFurStrandGenerator, 1, 0, 0);
+  SCF_INTERFACE (CS::Mesh::iFurMeshProperties, 1, 0, 0);
 
   /**
    * Get the material used
@@ -302,15 +302,15 @@ struct iFurMesh : public virtual iBase
   virtual void StopPhysicsControl ( ) = 0;
  
   /**
-   * Set the associated iFurStrandGenerator
+   * Set the associated iFurMeshProperties
    */
-  virtual void SetFurStrandGenerator( iFurStrandGenerator* furStrandGenerator) = 0;
+  virtual void SetFurStrandGenerator( iFurMeshProperties* furMeshProperties) = 0;
 
   /**
-   * Get the associated iFurStrandGenerator.
-   * Shader variables can be obtained via the material of the iFurStrandGenerator
+   * Get the associated iFurMeshProperties.
+   * Shader variables can be obtained via the material of the iFurMeshProperties
    */
-  virtual iFurStrandGenerator* GetFurStrandGenerator( ) const = 0;
+  virtual iFurMeshProperties* GetFurStrandGenerator( ) const = 0;
 
   /**
    * Set an iAnimatedMeshFactory corresponding to the iAnimatedMeshSubMeshFactory

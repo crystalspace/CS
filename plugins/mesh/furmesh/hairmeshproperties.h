@@ -80,19 +80,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float DhM;
   };
 
-  class HairStrandGenerator : public scfImplementation2 <HairStrandGenerator, 
-    CS::Mesh::iFurStrandGenerator, iComponent> 
+  class HairMeshProperties : public scfImplementation2 <HairMeshProperties, 
+    CS::Mesh::iFurMeshProperties, iComponent> 
   {
   public:
-    CS_LEAKGUARD_DECLARE(HairStrandGenerator);
+    CS_LEAKGUARD_DECLARE(HairMeshProperties);
 
-    HairStrandGenerator (iBase* parent);
-    virtual ~HairStrandGenerator ();
+    HairMeshProperties (iBase* parent);
+    virtual ~HairMeshProperties ();
 
     //-- iComponent	
     virtual bool Initialize (iObjectRegistry*);
 
-    //-- iFurStrandGenerator
+    //-- iFurMeshProperties
     virtual iMaterial* GetMaterial() const;
     virtual void SetMaterial(iMaterial* material);
     virtual void Invalidate();

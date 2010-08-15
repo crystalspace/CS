@@ -282,11 +282,11 @@ bool FrankieScene::CreateAvatar ()
   if (!animationPhysicsControl)
     return hairTest->ReportError("Failed to locate CS::Mesh::iFurPhysicsControl plugin!");
 
-  // Load hairStrandGenerator
-  csRef<CS::Mesh::iFurStrandGenerator> hairStrandGenerator = 
-    csQueryRegistry<CS::Mesh::iFurStrandGenerator> (hairTest->object_reg);
-  if (!hairStrandGenerator)
-    return hairTest->ReportError("Failed to locate CS::Mesh::iFurStrandGenerator plugin!");
+  // Load hairMeshProperties
+  csRef<CS::Mesh::iFurMeshProperties> hairMeshProperties = 
+    csQueryRegistry<CS::Mesh::iFurMeshProperties> (hairTest->object_reg);
+  if (!hairMeshProperties)
+    return hairTest->ReportError("Failed to locate CS::Mesh::iFurMeshProperties plugin!");
 
   // Load base material
   csRef<iMaterialWrapper> baseMaterial = 
@@ -306,7 +306,7 @@ bool FrankieScene::CreateAvatar ()
   animationPhysicsControl->SetRigidBody(mainBody);
   animationPhysicsControl->SetInitialTransform(mainBody->GetTransform().GetInverse());
 
-  hairStrandGenerator->SetMaterial(materialWrapper->GetMaterial());
+  hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
 
   csRef<iMeshObjectFactory> imof = furMeshType->NewFactory();
 
@@ -321,13 +321,16 @@ bool FrankieScene::CreateAvatar ()
   // Get reference to the iFurMesh interface
   furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
 
-//   furMesh->SetPhysicsControl(animationPhysicsControl);
-  furMesh->SetFurStrandGenerator(hairStrandGenerator);
+  furMesh->SetPhysicsControl(animationPhysicsControl);
+  furMesh->SetFurStrandGenerator(hairMeshProperties);
 
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(0)->GetFactorySubMesh());
   furMesh->SetBaseMaterial(baseMaterial->GetMaterial());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
+
+//   furMesh->StartPhysicsControl();
+
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);
 

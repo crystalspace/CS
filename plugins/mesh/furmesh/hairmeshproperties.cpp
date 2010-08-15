@@ -22,25 +22,25 @@
 #include <cssysdef.h>
 
 #include "furmesh.h"
-#include "hairstrandgenerator.h"
+#include "hairmeshproperties.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   /************************
-  *  HairStrandGenerator
+  *  HairMeshProperties
   ************************/  
 
-  SCF_IMPLEMENT_FACTORY (HairStrandGenerator)
+  SCF_IMPLEMENT_FACTORY (HairMeshProperties)
 
-  CS_LEAKGUARD_IMPLEMENT(HairStrandGenerator);	
+  CS_LEAKGUARD_IMPLEMENT(HairMeshProperties);	
 
-  HairStrandGenerator::HairStrandGenerator (iBase* parent)
+  HairMeshProperties::HairMeshProperties (iBase* parent)
     : scfImplementationType (this, parent), object_reg(0), material(0), 
     g3d(0), svStrings(0), M(256, 256), N(256, 256), gauss_matrix(0)
   {
   }
 
-  HairStrandGenerator::~HairStrandGenerator ()
+  HairMeshProperties::~HairMeshProperties ()
   {
     if (M.data)
       delete M.data;
@@ -50,7 +50,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       delete N.data;
   }
 
-  bool HairStrandGenerator::Initialize (iObjectRegistry* r)
+  bool HairMeshProperties::Initialize (iObjectRegistry* r)
   {
     object_reg = r;
 
@@ -76,12 +76,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  iMaterial* HairStrandGenerator::GetMaterial() const
+  iMaterial* HairMeshProperties::GetMaterial() const
   {
     return material;
   }
 
-  void HairStrandGenerator::SetMaterial(iMaterial* material)
+  void HairMeshProperties::SetMaterial(iMaterial* material)
   {
     this->material = material;
     
@@ -93,7 +93,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   // Data need to be recomputed
-  void HairStrandGenerator::Invalidate()
+  void HairMeshProperties::Invalidate()
   {
     UpdateConstans();
     UpdateM();
@@ -101,11 +101,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   // Nothing to be updated 
-  void HairStrandGenerator::Update()
+  void HairMeshProperties::Update()
   {
   }
 
-  void HairStrandGenerator::UpdateConstans()
+  void HairMeshProperties::UpdateConstans()
   {
     if(!M.handle)
     {
@@ -164,13 +164,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   // Marschner specific methods
-  void HairStrandGenerator::UpdateM()
+  void HairMeshProperties::UpdateM()
   {
     if(!M.handle)
     {
-      CS::ShaderVarName strandWidthName (svStrings, "tex M");	
+      CS::ShaderVarName textureName (svStrings, "tex M");	
       csRef<csShaderVariable> shaderVariable = 
-        material->GetVariableAdd(strandWidthName);
+        material->GetVariableAdd(textureName);
 
       if(!M.Create(g3d))
       {
@@ -219,7 +219,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     M.SaveImage(object_reg, "/data/hairtest/debug/M_debug.png");
   }
 
-  float HairStrandGenerator::ComputeM(float a, float b, int channel)
+  float HairMeshProperties::ComputeM(float a, float b, int channel)
   {
     float max = 0;
     
@@ -252,13 +252,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return max;
   }
 
-  void HairStrandGenerator::UpdateN()
+  void HairMeshProperties::UpdateN()
   {
     if(!N.handle)
     {
-      CS::ShaderVarName strandWidthName (svStrings, "tex N");	
+      CS::ShaderVarName textureName (svStrings, "tex N");	
       csRef<csShaderVariable> shaderVariable = 
-        material->GetVariableAdd(strandWidthName);
+        material->GetVariableAdd(textureName);
 
       N.Create(g3d);
 
@@ -300,13 +300,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     N.SaveImage(object_reg, "/data/hairtest/debug/N_debug.png");
   }
 
-  float HairStrandGenerator::ComputeT(float absorption, float gammaT, int p) const
+  float HairMeshProperties::ComputeT(float absorption, float gammaT, int p) const
   {
     float l = 2 * cos(gammaT);	// l = ls / cos qt = 2r cos h0t / cos qt
     return exp(absorption * l * p);
   }
 
-  float HairStrandGenerator::ComputeA(float absorption, int p, float h, 
+  float HairMeshProperties::ComputeA(float absorption, int p, float h, 
     float refraction, float etaPerpendicular, float etaParallel) const
   {
     float gammaI = asin(h);
@@ -332,7 +332,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return fresnel * t;
   }
 
-  float HairStrandGenerator::ComputeNP(int p, float phi, float thD) const
+  float HairMeshProperties::ComputeNP(int p, float phi, float thD) const
   {
     float refraction = mc.eta;
     float absorption = mc.absorption;
@@ -359,7 +359,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return csMin(1.0f, result);
   }
 
-  float HairStrandGenerator::SimpleNP(float phi, float thD ) const
+  float HairMeshProperties::SimpleNP(float phi, float thD ) const
   {
     float refraction = mc.eta;
 

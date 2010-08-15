@@ -23,7 +23,7 @@
 
 #include "furmesh.h"
 #include "hairphysicscontrol.h"
-#include "hairstrandgenerator.h"
+#include "hairmeshproperties.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
@@ -36,10 +36,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   FurMesh::FurMesh (iEngine* engine, iObjectRegistry* object_reg, 
     iMeshObjectFactory* object_factory) : scfImplementationType (this, engine), 
     materialWrapper(0), object_reg(object_reg), object_factory(object_factory), 
-    engine(engine), physicsControl(0), hairStrandGenerator(0), positionShift(0),
+    engine(engine), physicsControl(0), hairMeshProperties(0), positionShift(0),
     rng(0), guideLOD(0),strandLOD(0), hairStrandsLODSize(0), 
     physicsControlEnabled(false), 
-    densityFactorGuideHairs(10), densityFactorHairStrands(100),
+    densityFactorGuideFurs(10), densityFactorFurStrands(100),
     heightFactor(0.5f), displaceDistance(0.02f), strandWidth(0.0015f), 
     controlPointsDistance(0.05f), positionDeviation(0.01f), growTangents(0), 
     mixmode(0), priority(7), z_buf_mode(CS_ZBUF_USE), indexstart(0), indexend(0)
@@ -328,8 +328,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       CS::Material::MaterialBuilder::CreateColorMaterial
       (object_reg,"hairDummyMaterial",csColor(1,0,0));
 
-    if (hairStrandGenerator && hairStrandGenerator->GetMaterial())
-      materialWrapper->SetMaterial(hairStrandGenerator->GetMaterial());
+    if (hairMeshProperties && hairMeshProperties->GetMaterial())
+      materialWrapper->SetMaterial(hairMeshProperties->GetMaterial());
 
     GetMeshWrapper()->SetFlagsRecursive(CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
     SetMaterialWrapper(materialWrapper);
@@ -535,7 +535,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       TriangleAreaDensity(triangle, area, density, A, B, C);
 
       // If a new guide fur is needed
-      if ( (density * area * densityFactorGuideHairs) < 1)
+      if ( (density * area * densityFactorGuideFurs) < 1)
         continue;
 
       // Make new guide fur
@@ -591,7 +591,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         TriangleAreaDensity(triangle, area, density, A, B, C);
 
         // How many new guide fur are needed
-        if ( den < (density * area * densityFactorHairStrands))
+        if ( den < (density * area * densityFactorFurStrands))
         {
           change = 1;
           csFurStrand furStrand;
@@ -736,14 +736,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   void FurMesh::SetFurStrandGenerator
-    ( CS::Mesh::iFurStrandGenerator* hairStrandGenerator)
+    ( CS::Mesh::iFurMeshProperties* hairMeshProperties)
   {
-    this->hairStrandGenerator = hairStrandGenerator;
+    this->hairMeshProperties = hairMeshProperties;
   }
 
-  CS::Mesh::iFurStrandGenerator* FurMesh::GetFurStrandGenerator( ) const
+  CS::Mesh::iFurMeshProperties* FurMesh::GetFurStrandGenerator( ) const
   {
-    return hairStrandGenerator;
+    return hairMeshProperties;
   }
 
   void FurMesh::SetBaseMaterial ( iMaterial* baseMaterial )
@@ -785,15 +785,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     shaderVariable->GetValue(tex);
     densitymap.handle = tex;
 
-    CS::ShaderVarName densityFactorGuideHairsName 
-      (svStrings, "densityFactorGuideHairs");	
-    baseMaterial->GetVariableAdd(densityFactorGuideHairsName)->
-      GetValue(densityFactorGuideHairs);
+    CS::ShaderVarName densityFactorGuideFursName 
+      (svStrings, "densityFactorGuideFurs");	
+    baseMaterial->GetVariableAdd(densityFactorGuideFursName)->
+      GetValue(densityFactorGuideFurs);
 
-    CS::ShaderVarName densityFactorHairStrandsName 
-      (svStrings, "densityFactorHairStrands");	
-    baseMaterial->GetVariableAdd(densityFactorHairStrandsName)->
-      GetValue(densityFactorHairStrands);    
+    CS::ShaderVarName densityFactorFurStrandsName 
+      (svStrings, "densityFactorFurStrands");	
+    baseMaterial->GetVariableAdd(densityFactorFurStrandsName)->
+      GetValue(densityFactorFurStrands);    
 
     // Density map
     if ( !densitymap.Read() )
@@ -850,8 +850,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void FurMesh::Update()
   {
     // Update shader
-    if (hairStrandGenerator)
-      hairStrandGenerator->Update();
+    if (hairMeshProperties)
+      hairMeshProperties->Update();
 
     // First update the control points
     if (physicsControlEnabled)

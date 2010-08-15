@@ -220,11 +220,11 @@ bool KrystalScene::CreateAvatar ()
   if (!animationPhysicsControl)
     return hairTest->ReportError("Failed to locate CS::Mesh::iFurPhysicsControl plugin!");
 
-  // Load hairStrandGenerator
-  csRef<CS::Mesh::iFurStrandGenerator> hairStrandGenerator = 
-    csQueryRegistry<CS::Mesh::iFurStrandGenerator> (hairTest->object_reg);
-  if (!hairStrandGenerator)
-    return hairTest->ReportError("Failed to locate CS::Mesh::iFurStrandGenerator plugin!");
+  // Load hairMeshProperties
+  csRef<CS::Mesh::iFurMeshProperties> hairMeshProperties = 
+    csQueryRegistry<CS::Mesh::iFurMeshProperties> (hairTest->object_reg);
+  if (!hairMeshProperties)
+    return hairTest->ReportError("Failed to locate CS::Mesh::iFurMeshProperties plugin!");
 
   // Load furMesh
   csRef<CS::Mesh::iFurMeshType> furMeshType = 
@@ -374,7 +374,7 @@ bool KrystalScene::CreateAvatar ()
   if (!materialWrapper)
     hairTest->ReportError("Can't find marschner material!");
 
-  hairStrandGenerator->SetMaterial(materialWrapper->GetMaterial());
+  hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
 
   hairPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
   hairPhysicsControl->SetRigidBody(headBody);
@@ -396,7 +396,7 @@ bool KrystalScene::CreateAvatar ()
   furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
   
   furMesh->SetPhysicsControl(animationPhysicsControl);
-  furMesh->SetFurStrandGenerator(hairStrandGenerator);
+  furMesh->SetFurStrandGenerator(hairMeshProperties);
 
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
