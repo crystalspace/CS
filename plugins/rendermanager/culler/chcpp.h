@@ -540,9 +540,9 @@ struct Common
 
   void DrawbBox(const NodePtr n) const
   {
-    n->GetGraphics3D()->OQBeginQuery(n->GetQueryID());
+    n->BeginQuery();
     n->GetGraphics3D()->DrawSimpleMesh(n->srmSimpRendMesh);
-    n->GetGraphics3D()->OQEndQuery();
+    n->EndQuery();
     /*csBox3 box=n->GetBBox();
     if(box.In(f2bData->pos) || n->GetGraphics3D()->OQIsVisible(n->GetQueryID(),0))
     {
@@ -604,12 +604,36 @@ struct InnerNodeProcessOP : public Common
     this->Queries=Queries;
   }
 
-  void RenderChildren(const NodePtr n) const
+  void RenderChildren(const NodePtr n, uint32 &frustum_mask) const
   {
-    const csVector3 centerDiff = n->GetChild2 ()->GetBBox ().GetCenter () -
-            n->GetChild1 ()->GetBBox ().GetCenter ();
-    const csVector3 direction = f2bData->rview->GetCamera()->GetTransform().GetFront();
-    const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
+    if(n->IsLeaf())
+    {
+      if(IsLeafInFrustum(n, frustum_mask))
+      {
+        csSectorVisibleRenderMeshes* meshList;
+        iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
+        const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
+        const int numMeshes = f2bData->viscallback->GetVisibleMeshes(mw,frust_mask,meshList);
+        if(numMeshes > 0 )
+        {
+          DrawMeshes(n,meshList,numMeshes);
+          //f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
+        }
+      }
+    }
+    else
+    {
+      if(IsInnerInFrustum(n, frustum_mask))
+      {
+        const csVector3 centerDiff = n->GetChild2 ()->GetBBox ().GetCenter () -
+                n->GetChild1 ()->GetBBox ().GetCenter ();
+        const csVector3 direction = f2bData->rview->GetCamera()->GetTransform().GetFront();
+        const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
+
+        RenderChildren( n->GetChild (firstIdx), frustum_mask);
+        RenderChildren( n->GetChild (1-firstIdx), frustum_mask);
+      }
+    }
   }
 
   bool IsQueryFinished(const NodePtr n) const
@@ -627,19 +651,57 @@ struct InnerNodeProcessOP : public Common
     return true;
   }
 
-  bool NodeVisible(NodePtr n) const
+  bool NodeVisible(NodePtr n, uint32 &frustum_mask) const
   {
     n->SetCameraTimestamp(f2bData->rview->GetCamera(),f2bData->current_timestamp);
-    n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
-    csBox3 box=n->GetBBox();
-    return true;
+    if(n->GetQueryStatus()==QS_NOQUERY_ISSUED)
+    {
+      if(n->GetVisibilityForCamera(f2bData->rview->GetCamera())==false)
+      {
+        //printf("Issuing inner query\n");
+        n->SetQueryStatus(QS_PENDING_RESULT);
+        n->BeginQuery();
+        RenderChildren(n, frustum_mask);
+        n->EndQuery();
+        return false;
+      }
+      else
+      {
+        n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
+        //printf("Proceeding\n");
+        return true;
+      }
+    }
+    else if(n->InnerQueryFinished())
+    {
+      //n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
+      if(CheckOQ(n))
+      {
+        //printf("Inner node is visible\n");
+        n->SetQueryStatus(QS_NOQUERY_ISSUED);
+        return true;
+      }
+      else
+      {
+        n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
+        //printf("Nope\n");
+        n->SetQueryStatus(QS_PENDING_RESULT);
+        n->BeginQuery();
+        RenderChildren(n, frustum_mask);
+        n->EndQuery();
+        return false;
+      }
+    }
+    //n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
+    
+    return true;//n->GetVisibilityForCamera(f2bData->rview->GetCamera());
   }
 
   bool operator() (NodePtr n, uint32 &frustum_mask) const
   {
-    if(IsInnerInFrustum(n,frustum_mask))
+    if(IsInnerInFrustum(n, frustum_mask))
     {
-      return NodeVisible(n);
+      return NodeVisible(n, frustum_mask);
     }
     return false;
   }
@@ -681,36 +743,52 @@ struct LeafNodeProcessOP : public Common
     csSectorVisibleRenderMeshes* meshList;
     const uint32 frust_mask=f2bData->rview->GetRenderContext ()->clip_planes_mask;
     const int numMeshes = f2bData->viscallback->GetVisibleMeshes(mw,frustum_mask,meshList);
+    //printf("Reached leaf\n");
     if(numMeshes > 0 )
     {
+      //printf("Reached leaf\n");
       const iCamera* cam=f2bData->rview->GetCamera();
       const bool isp=IsRMPortal(n,meshList,numMeshes); // see if it's a portal
       const unsigned int oqID=n->GetLeafData(0)->GetQueryLeafID();
       if(isp)
       {
+        n->SetVisibilityForCamera(const_cast<iCamera*>(cam),true);
+        PullUpVisibility(n);
         f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
       }
       else if(IsQueryFinished(n,oqID))
       {
+        //printf("Query done\n");
         if(CheckOQ(n,oqID))
         {
+          n->SetQueryStatus(QS_NOQUERY_ISSUED); // not really used, just here for completeness
           n->SetVisibilityForCamera(const_cast<iCamera*>(cam),true);
+          PullUpVisibility(n);
+          f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
+          //printf("visible\n");
+        }
+        else
+        {
+          n->SetVisibilityForCamera(const_cast<iCamera*>(cam),false);
+          //printf("not visible\n");
+        }
+        // draw the query
+        n->GetLeafData(0)->BeginLeafQuery();
+        DrawMeshes(n,meshList,numMeshes);
+        n->GetLeafData(0)->EndLeafQuery();
+        n->SetQueryStatus(QS_PENDING_RESULT); // not really used, just here for completeness
+      }
+      else // if we didn't get a result yet use previous result; important, it avoids flickering
+      {
+        if(n->GetVisibilityForCamera(const_cast<iCamera*>(cam)))
+        {
+          //printf("Was visible last frame\n");
           PullUpVisibility(n);
           f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
         }
         else
-          n->SetVisibilityForCamera(const_cast<iCamera*>(cam),false);
-        // draw the query
-        n->GetGraphics3D()->OQBeginQuery(n->GetLeafData(0)->GetQueryLeafID());
-        DrawMeshes(n,meshList,numMeshes);
-        n->GetGraphics3D()->OQEndQuery();
-      }
-      else // if we didn't get a result yet use previous result
-      {
-        if(n->GetVisibilityForCamera(const_cast<iCamera*>(cam)))
         {
-          PullUpVisibility(n);
-          f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
+          //printf("Was NOT visible last frame\n");
         }
       }
     }

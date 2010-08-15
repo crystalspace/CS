@@ -99,6 +99,12 @@ public:
   virtual ~csFrustVisObjectWrapper () { }
 };
 
+enum QUERY_STATUS
+{
+  QS_NOQUERY_ISSUED,
+  QS_PENDING_RESULT
+};
+
 class NodeLeafData
 {
 public:
@@ -127,6 +133,16 @@ public:
      return OCQueryLeafID;
   }
 
+  void BeginLeafQuery() const
+  {
+    g3d->OQBeginQuery(OCQueryLeafID);
+  }
+
+  void EndLeafQuery() const
+  {
+    g3d->OQEndQuery();
+  }
+
   bool LeafQueryFinished() const
   {
     return g3d->OQueryFinished(OCQueryLeafID);
@@ -148,24 +164,42 @@ class NodeData
   csVector3 vertices[25];
   csVector4 colors[25];
 public:
-  NodeData()
+  NodeData() : OCQueryID(0), qsQueryStatus(QS_NOQUERY_ISSUED), g3d(NULL)
   {
     srmSimpRendMesh.vertices=vertices;
     srmSimpRendMesh.colors=colors;
-    OCQueryID=0;
-    g3d=0;
   }
   
+  QUERY_STATUS qsQueryStatus;
   iGraphics3D* g3d;
   unsigned int OCQueryID;
   csSimpleRenderMesh srmSimpRendMesh;
   std::map<iCamera*,uint32> mapCameraTimestamp;
   std::map<iCamera*,bool> mapCameraVisibility;
-  //std::map<iCamera*,bool[2]> mapCameraChildrenVisibility;
+
+  void BeginQuery() const
+  {
+    g3d->OQBeginQuery(OCQueryID);
+  }
+
+  void EndQuery() const
+  {
+    g3d->OQEndQuery();
+  }
+
+  bool QueryFinished() const
+  {
+    return g3d->OQueryFinished(OCQueryID);
+  }
 
   uint32 GetCameraTimestamp(iCamera* cam) const
   {
     return mapCameraTimestamp.find(cam)->second;
+  }
+
+  QUERY_STATUS GetQueryStatus() const
+  {
+    return qsQueryStatus;
   }
 
   bool GetVisibilityForCamera(iCamera* cam) const
@@ -186,6 +220,11 @@ public:
   iGraphics3D* GetGraphics3D() const
   {
     return g3d;
+  }
+
+  void SetQueryStatus(const QUERY_STATUS qstat)
+  {
+    qsQueryStatus=qstat;
   }
 
   void SetCameraTimestamp(iCamera* cam, const uint32 timestamp)
