@@ -161,6 +161,7 @@ public:
   csSimpleRenderMesh srmSimpRendMesh;
   std::map<iCamera*,uint32> mapCameraTimestamp;
   std::map<iCamera*,bool> mapCameraVisibility;
+  //std::map<iCamera*,bool[2]> mapCameraChildrenVisibility;
 
   uint32 GetCameraTimestamp(iCamera* cam) const
   {
