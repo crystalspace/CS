@@ -639,6 +639,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     skinVertexVersion (~0), skinNormalVersion (~0), skinTangentBinormalVersion (~0),
     morphVertexVersion (0), skinVertexLF (false), skinNormalLF (false), skinTangentBinormalLF (false)
   {
+    bufferAccessor.AttachNew (new RenderBufferAccessor (this));
     postMorphVertices = factory->vertexBuffer;
     SetupSubmeshes ();
     SetupSockets ();
@@ -719,6 +720,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   CS::Mesh::iAnimatedMeshFactory* AnimeshObject::GetAnimatedMeshFactory () const
   {
     return factory;
+  }
+
+  iRenderBufferAccessor* AnimeshObject::GetRenderBufferAccessor () const
+  {
+    return bufferAccessor;
   }
 
   iMeshObjectFactory* AnimeshObject::GetFactory () const
@@ -1093,7 +1099,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[j]));
 
         // Setup the accessor to this mesh
-        bufferHolder->SetAccessor (this, 
+        bufferHolder->SetAccessor (bufferAccessor,
           CS_BUFFER_POSITION_MASK | CS_BUFFER_NORMAL_MASK | 
 	  CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);
 

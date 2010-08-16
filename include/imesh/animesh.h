@@ -554,6 +554,11 @@ struct iAnimatedMesh : public virtual iBase
    * Convenient accessor method for the CS::Mesh::iAnimatedMeshFactory of this animesh.
    */
   virtual iAnimatedMeshFactory* GetAnimatedMeshFactory () const = 0;
+
+  /**
+   * Get the render buffer accessor of this mesh
+   */
+  virtual iRenderBufferAccessor* GetRenderBufferAccessor () const = 0;
 };
 
 /**

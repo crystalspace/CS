@@ -152,10 +152,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 	mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
 
       // Create a walker for the position buffer of the animesh
-      csRef<iRenderBufferAccessor> accessor =
-	scfQueryInterface<iRenderBufferAccessor> (animesh);
       csRenderBufferHolder holder;
-      accessor->PreGetBuffer (&holder, CS_BUFFER_POSITION);
+      animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
       iRenderBuffer* positions = holder.GetRenderBuffer (CS_BUFFER_POSITION);
       csVertexListWalker<float, csVector3> positionWalker (positions);
 
@@ -281,10 +279,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
       Anchor& anchor = it.Next ();
 
       // Create a walker for the position buffer of the animesh
-      csRef<iRenderBufferAccessor> accessor =
-	scfQueryInterface<iRenderBufferAccessor> (anchor.animesh);
       csRenderBufferHolder holder;
-      accessor->PreGetBuffer (&holder, CS_BUFFER_POSITION);
+      anchor.animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
       csRenderBufferLock<csVector3> positions (holder.GetRenderBuffer (CS_BUFFER_POSITION));
 
       // Compute the new position of the anchor
