@@ -123,7 +123,7 @@ struct iSoftBodyAnimationControl : public iGenMeshAnimationControl
    * efficient to simply use CS::Physics::Bullet::iSoftBody::AnchorVertex (size_t,iRigidBody*).
    *
    * You have to provide a rigid body attached to the animesh as a main physical anchor
-   * point. The may way to do that is to use a CS::Animation::iSkeletonRagdollNode2
+   * point. The main way to do that is to use a CS::Animation::iSkeletonRagdollNode2
    * animation node.
    *
    * Note also that you may anchor a same soft body to different animeshes, for example
