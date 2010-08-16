@@ -15538,6 +15538,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSocketCount = *cspacec::iAnimatedMesh_GetSocketCount;
 *GetSocket = *cspacec::iAnimatedMesh_GetSocket;
 *GetAnimatedMeshFactory = *cspacec::iAnimatedMesh_GetAnimatedMeshFactory;
+*GetRenderBufferAccessor = *cspacec::iAnimatedMesh_GetRenderBufferAccessor;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
