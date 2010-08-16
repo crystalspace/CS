@@ -516,13 +516,18 @@ void Testcull::CreateRoom ()
   engine, room, "walls", "walls_factory", &box);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);*/
 
-  if(!vfs->Mount("/modelpath/","data\\culltest\\"))
+  if(!vfs->Mount("/modelpath/","$@data$/culltest$/"))
   {
     ReportError("Failed to mount specified location!");
     return;
   }
 
-  loader->Load("/modelpath/house.xml");
+  csLoadResult result = loader->Load("/modelpath/house.xml");
+  if(!result.success)
+  {
+    ReportError("Failed to load mesh file!");
+    return;
+  }
   csRef<iMeshFactoryWrapper> meshFactW=engine->FindMeshFactory("House");
 
   csMatrix3 m;
