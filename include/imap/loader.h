@@ -345,11 +345,17 @@ struct iSharedVarLoaderIterator : public virtual iBase
 };
 
 /**
+ * Loader flags
+ */
+#define CS_LOADER_NONE 0
+#define CS_LOADER_CREATE_DUMMY_MATS 1
+
+/**
 * This interface represents the threaded map loader methods.
 */
 struct iThreadedLoader : public virtual iBase
 {
-  SCF_INTERFACE (iThreadedLoader, 2, 2, 0);
+  SCF_INTERFACE (iThreadedLoader, 2, 3, 0);
 
  /**
   * Get the loader sector list.
@@ -842,6 +848,10 @@ struct iThreadedLoader : public virtual iBase
   virtual void AddSharedVarToList(iSharedVariable* obj) = 0;
 
   virtual void MarkSyncDone() = 0;
+
+  // Get/Set loader flags.
+  virtual const int& GetFlags () const = 0;
+  virtual void SetFlags (int flags) = 0;
 };
 
 /**

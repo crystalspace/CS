@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Level of Detail, Decals, Dynamic Worlds, Engine
+@node Level of Detail, Progressive Level of Detail, Dynamic Worlds, Engine
 @subsection Level of Detail
 @cindex Level of Detail
 @cindex static lod

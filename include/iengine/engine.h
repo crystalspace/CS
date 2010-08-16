@@ -158,7 +158,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 6, 2, 0);
+  SCF_INTERFACE(iEngine, 6, 3, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1065,7 +1065,26 @@ struct iEngine : public virtual iBase
    */
   virtual void UpdateNewFrame () = 0;
   /** @} */
-  
+
+  /**\name Adaptive progressive LODs
+   * @{ */
+
+  /**
+   * Enable adaptive LODs.
+   */
+  virtual void EnableAdaptiveLODs(bool enable, float target_fps) = 0;
+
+  /**
+   * Must be called once per frame if you use adaptive LODs.
+   */
+  virtual void UpdateAdaptiveLODs() = 0;
+
+  /**
+   * Get a multiplier based on the average elapsed time for the last n frames.
+   */
+  virtual float GetAdaptiveLODsMultiplier() const = 0;
+  /** @} */
+
   /**\name Saving/loading
    * @{ */
 

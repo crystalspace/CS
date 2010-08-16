@@ -1,0 +1,10 @@
+#!/bin/sh
+if [ "$PRODUCT_NAME" = "cs-debug" ]
+then
+	echo "$1 debug"
+else
+	echo "$1 release"
+	cd ../cs-release
+fi
+pwd
+./jam $1

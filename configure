@@ -13339,9 +13339,9 @@ fi
 	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_sysprefix_lflags -l$cs_pywinlib | sed 'y% %#%'`"
 	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags_ext -l$cs_pywinlib | sed 'y% %#%'`"
 
-	    cs_pyflags="$cs_pyflags `echo @@-bundle -flat_namespace -undefined suppress@$cs_cv_pybase_lflags_base | sed 'y% %#%'`"
-	    cs_pyflags="$cs_pyflags `echo @@-bundle -flat_namespace -undefined suppress@$cs_cv_pybase_sysprefix_lflags | sed 'y% %#%'`"
-	    cs_pyflags="$cs_pyflags `echo @@-bundle -flat_namespace -undefined suppress@$cs_cv_pybase_lflags_ext | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@-flat_namespace -undefined suppress@$cs_cv_pybase_lflags_base | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@-flat_namespace -undefined suppress@$cs_cv_pybase_sysprefix_lflags | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@-flat_namespace -undefined suppress@$cs_cv_pybase_lflags_ext | sed 'y% %#%'`"
 
 	    if test "" != yes; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking if python SDK is usable" >&5
