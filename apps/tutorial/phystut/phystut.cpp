@@ -41,7 +41,7 @@ Simple::Simple ()
     isSoftBodyWorld (false), environment (ENVIRONMENT_WALLS), solver (0),
     autodisable (false), do_bullet_debug (false), remainingStepDuration (0.0f),
     debugMode (false), allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
-    physicalCameraMode (CAMERA_DYNAMIC), dragging (false)
+    physicalCameraMode (CAMERA_DYNAMIC), dragging (false), softDragging (false)
 {
   // Configure the options for DemoApplication
 
@@ -597,6 +597,22 @@ bool Simple::OnKeyboard (iEvent &ev)
   return false;
 }
 
+// This method updates the position of the dragging for soft bodies
+csVector3 MouseAnchorAnimationControl::GetAnchorPosition () const
+{
+  // Keep the drag joint at the same distance to the camera
+  csRef<iCamera> camera = simple->view->GetCamera ();
+  csVector2 v2d (simple->mouseX, simple->g2d->GetHeight () - simple->mouseY);
+  csVector3 v3d = camera->InvPerspective (v2d, 10000);
+  csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+  csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+  csVector3 newPosition = endBeam - startBeam;
+  newPosition.Normalize ();
+  newPosition = camera->GetTransform ().GetOrigin () + newPosition * simple->dragDistance;
+  return newPosition;  
+}
+
 bool Simple::OnMouseDown (iEvent& ev)
 {
   // Left mouse button: Shoot!
@@ -674,23 +690,35 @@ bool Simple::OnMouseDown (iEvent& ev)
       return false;
 
     // Check if we hit a rigid body
-    if (hitResult.body->GetType () != CS::Physics::Bullet::RIGID_BODY)
-      return false;
+    if (hitResult.body->GetType () == CS::Physics::Bullet::RIGID_BODY)
+    {
+      // Create a pivot joint at the point clicked
+      dragJoint = bulletDynamicSystem->CreatePivotJoint ();
+      dragJoint->Attach (hitResult.body->QueryRigidBody (), hitResult.isect);
 
-    // Create a pivot joint at the point clicked
-    dragJoint = bulletDynamicSystem->CreatePivotJoint ();
-    dragJoint->Attach (hitResult.body->QueryRigidBody (), hitResult.isect);
+      dragging = true;
+      dragDistance = (hitResult.isect - startBeam).Norm ();
 
-    dragging = true;
-    dragDistance = (hitResult.isect - startBeam).Norm ();
+      // Set some dampening on the rigid body to have a more stable dragging
+      csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
+	scfQueryInterface<CS::Physics::Bullet::iRigidBody> (hitResult.body->QueryRigidBody ());
+      linearDampening = bulletBody->GetLinearDampener ();
+      angularDampening = bulletBody->GetRollingDampener ();
+      bulletBody->SetLinearDampener (0.9f);
+      bulletBody->SetRollingDampener (0.9f);
+    }
 
-    // Set some dampening on the rigid body to have a more stable dragging
-    csRef<CS::Physics::Bullet::iRigidBody> bulletBody =
-      scfQueryInterface<CS::Physics::Bullet::iRigidBody> (hitResult.body->QueryRigidBody ());
-    linearDampening = bulletBody->GetLinearDampener ();
-    angularDampening = bulletBody->GetRollingDampener ();
-    bulletBody->SetLinearDampener (0.9f);
-    bulletBody->SetRollingDampener (0.9f);
+    else if (hitResult.body->GetType () == CS::Physics::Bullet::SOFT_BODY)
+    {
+      softDragging = true;
+      draggedBody = hitResult.body->QuerySoftBody ();
+      draggedVertex = hitResult.vertexIndex;
+      dragDistance = (hitResult.isect - startBeam).Norm ();
+      grabAnimationControl.AttachNew (new MouseAnchorAnimationControl (this));
+      hitResult.body->QuerySoftBody ()->AnchorVertex (hitResult.vertexIndex, grabAnimationControl);
+    }
+
+    else return false;
 
     return true;
   }
@@ -715,6 +743,13 @@ bool Simple::OnMouseUp (iEvent& ev)
     dragJoint = 0;
 
     return true;
+  }
+
+  if (softDragging)
+  {
+    softDragging = false;
+    draggedBody->RemoveAnchor (draggedVertex);
+    draggedBody = 0;
   }
 
   return false;
