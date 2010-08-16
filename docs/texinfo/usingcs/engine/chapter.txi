@@ -16,6 +16,7 @@ Everything about the 3D Engine. The core of Crystal Space.
 * Visibility Culling:: Visibility Culling In Detail
 * Dynamic Worlds::
 * Level of Detail::
+* Progressive Level of Detail::
 * Decals::
 @end menu
 
@@ -29,5 +30,6 @@ Everything about the 3D Engine. The core of Crystal Space.
 @importss{usingcs,engine,viscull.txi}
 @importss{usingcs,engine,dynworld.txi}
 @importss{usingcs,engine,lod.txi}
+@importss{usingcs,engine,proglod.txi}
 @importss{usingcs,engine,decals.txi}
 
