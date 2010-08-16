@@ -174,7 +174,7 @@ void LodView::Usage()
   csPrintf("LOD viewer\n\n");
 
   csPrintf("Usage:\n");
-  csPrintf("lodview <filename> [-m=<num>] -a\n\n");
+  csPrintf("lodview <filename> [-m=<num>] -adap\n\n");
 
   csPrintf("  -m=<num>   multiple sprites, large room (will show num^2 sprites)\n");
   csPrintf("  -adap      adaptive LODs (best if used with -m)\n\n");
