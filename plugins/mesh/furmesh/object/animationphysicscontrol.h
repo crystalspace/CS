@@ -41,11 +41,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual bool Initialize (iObjectRegistry*);
 
     //-- iFurPhysicsControl
-    virtual void SetInitialTransform(csReversibleTransform initialTransform);
-    virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* ) {}
-    virtual void SetRigidBody (iRigidBody* rigidBody);
+    virtual void SetInitialTransform(csReversibleTransform ){}
+    virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh);
+    virtual void SetRigidBody (iRigidBody* ){}
     virtual void SetBulletDynamicSystem 
-      (CS::Physics::Bullet::iDynamicSystem* bulletDynamicSystem);
+      (CS::Physics::Bullet::iDynamicSystem* ){}
     virtual void InitializeStrand (size_t strandID, csVector3* coordinates,
       size_t coordinatesCount);
     virtual void AnimateStrand (size_t strandID, csVector3* coordinates, 
@@ -54,10 +54,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void RemoveAllStrands ();
 
   private:
+    struct Anchor
+    {
+      size_t animeshVertexIndex;
+      csFurData* furData;
+    };
+
     iObjectRegistry* object_reg;
-    csHash<csFurData*, size_t> guideRopes;
-    csRef<iRigidBody> rigidBody;
-    csReversibleTransform initialTransform;
+    csHash<Anchor*, size_t> guideRopes;
+    CS::Mesh::iAnimatedMesh* animesh; // use csRef here
   };
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)

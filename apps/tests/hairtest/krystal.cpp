@@ -380,8 +380,7 @@ bool KrystalScene::CreateAvatar ()
   hairPhysicsControl->SetRigidBody(headBody);
 //   hairPhysicsControl->SetAnimesh(animesh);
 
-  animationPhysicsControl->SetRigidBody(headBody);
-  animationPhysicsControl->SetInitialTransform(headBody->GetTransform().GetInverse());
+  animationPhysicsControl->SetAnimesh(animesh);
 
   csRef<iMeshObjectFactory> imof = furMeshType->NewFactory();
 

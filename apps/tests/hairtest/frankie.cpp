@@ -197,15 +197,15 @@ bool FrankieScene::CreateAvatar ()
   runFastNodeFactory->SetAutomaticStop (false);
   runJumpNodeFactory->SetAutomaticStop (false);
 
-//   randomNodeFactory->AddNode (idleNodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (walkSlowNodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (walkNodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (walkFastNodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (footingNodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (runSlowNodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (runNodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (runFastNodeFactory, 1.0f);
-//   randomNodeFactory->AddNode (runJumpNodeFactory, 1.0f);
+  randomNodeFactory->AddNode (idleNodeFactory, 1.0f);
+  randomNodeFactory->AddNode (walkSlowNodeFactory, 1.0f);
+  randomNodeFactory->AddNode (walkNodeFactory, 1.0f);
+  randomNodeFactory->AddNode (walkFastNodeFactory, 1.0f);
+  randomNodeFactory->AddNode (footingNodeFactory, 1.0f);
+  randomNodeFactory->AddNode (runSlowNodeFactory, 1.0f);
+  randomNodeFactory->AddNode (runNodeFactory, 1.0f);
+  randomNodeFactory->AddNode (runFastNodeFactory, 1.0f);
+  randomNodeFactory->AddNode (runJumpNodeFactory, 1.0f);
 
   if (hairTest->physicsEnabled)
   {
@@ -303,8 +303,7 @@ bool FrankieScene::CreateAvatar ()
   csRef<iRigidBody> mainBody = ragdollNode->GetBoneRigidBody
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"));
 
-  animationPhysicsControl->SetRigidBody(mainBody);
-  animationPhysicsControl->SetInitialTransform(mainBody->GetTransform().GetInverse());
+  animationPhysicsControl->SetAnimesh(animesh);
 
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
 
@@ -329,7 +328,7 @@ bool FrankieScene::CreateAvatar ()
   furMesh->SetBaseMaterial(baseMaterial->GetMaterial());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
-//   furMesh->StartPhysicsControl();
+  furMesh->StartPhysicsControl();
 
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);

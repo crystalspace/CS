@@ -171,6 +171,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     guideRopes.Delete(strandID, anchor);
     
     bulletDynamicSystem->RemoveSoftBody(bulletBody);
+
+    delete anchor;
   }
 
   void HairPhysicsControl::RemoveAllStrands ()
