@@ -299,7 +299,17 @@ void csBulletDynamicsSystem::CheckCollisions ()
 
 void csBulletDynamicsSystem::Step (float stepsize)
 {
+  // Update the soft body anchors
+  for (csRefArrayObject<iSoftBody>::Iterator it = softBodies.GetIterator (); it.HasNext (); )
+  {
+    csBulletSoftBody* body = static_cast<csBulletSoftBody*> (it.Next ());
+    body->UpdateAnchorPositions ();
+  }
+
+  // Step the simulation
   bulletWorld->stepSimulation (stepsize, (int)worldMaxSteps, worldTimeStep);
+
+  // Check for collisions
   CheckCollisions();
 }
 
@@ -748,6 +758,12 @@ void csBulletDynamicsSystem::SetStepParameters (float timeStep, size_t maxSteps,
   info.m_numIterations = (int)iterations;
 }
 
+void PreTickCallback (btDynamicsWorld* world, btScalar timeStep)
+{
+  csBulletDynamicsSystem* system = (csBulletDynamicsSystem*) world->getWorldUserInfo ();
+  system->UpdateSoftBodies (timeStep);
+}
+
 void csBulletDynamicsSystem::SetSoftBodyWorld (bool isSoftBodyWorld)
 {
   CS_ASSERT(!dynamicBodies.GetSize ()
@@ -793,6 +809,9 @@ void csBulletDynamicsSystem::SetSoftBodyWorld (bool isSoftBodyWorld)
   }
 
   bulletWorld->setGravity (gravity);
+
+  // Register a pre-tick callback
+  bulletWorld->setInternalTickCallback (PreTickCallback, this, true);
 }
 
 size_t csBulletDynamicsSystem::GetSoftBodyCount ()
@@ -989,6 +1008,15 @@ void csBulletDynamicsSystem::RemoveSoftBody (iSoftBody* body)
   softWorld->removeSoftBody (csBody->body);
 
   softBodies.Delete (body);
+}
+
+void csBulletDynamicsSystem::UpdateSoftBodies (btScalar timeStep)
+{
+  for (csRefArrayObject<iSoftBody>::Iterator it = softBodies.GetIterator (); it.HasNext (); )
+  {
+    csBulletSoftBody* body = static_cast<csBulletSoftBody*> (it.Next ());
+    body->UpdateAnchorInternalTick (timeStep);
+  }
 }
 
 csPtr<iPivotJoint> csBulletDynamicsSystem::CreatePivotJoint ()

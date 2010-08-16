@@ -362,6 +362,25 @@ struct iDynamicSystem : public virtual iBase
 };
 
 /**
+ * This class can be implemented in order to update the position of an anchor of a
+ * CS::Physics::Bullet::iSoftBody. This can be used to try to control manually the
+ * position of a vertex of a soft body.
+ *
+ * \warning This feature uses a hack around the physical simulation of soft bodies
+ * and may not always be stable. Use it at your own risk.
+ * \sa CS::Physics::Bullet::iSoftBody::AnchorVertex(size_t,iAnchorAnimationControl)
+ */
+struct iAnchorAnimationControl : public virtual iBase
+{
+  SCF_INTERFACE(CS::Physics::Bullet::iAnchorAnimationControl, 1, 0, 0);
+
+  /**
+   * Return the new position of the anchor, in world coordinates.
+   */
+  virtual csVector3 GetAnchorPosition () const = 0;
+};
+
+/**
  * A soft body is a physical body that can be deformed by the physical
  * simulation. It can be used to simulate eg ropes, clothes or any soft
  * volumetric object.
@@ -413,6 +432,32 @@ struct iSoftBody : public iBody
    * vertex and the body will remain constant.
    */
   virtual void AnchorVertex (size_t vertexIndex, iRigidBody* body) = 0;
+
+  /**
+   * Anchor the given vertex to the given controller. The relative position of the
+   * vertex and the controller will remain constant.
+   */
+  virtual void AnchorVertex (size_t vertexIndex, iAnchorAnimationControl* controller) = 0;
+
+  /**
+   * Update the position of the anchor of the given vertex relatively to the anchored
+   * rigid body. This can be used to have a finer controll of the anchor position
+   * relatively to the rigid body.
+   *
+   * This would work only if you called AnchorVertex(size_t,iRigidBody*) before.
+   * The position to be provided is in world coordinates.
+   *
+   * \warning The stability of the simulation can be lost if you move the position too far
+   * from the previous position.
+   * \sa iSoftBodyAnimationControl::CreateAnimatedMeshAnchor()
+   */
+  virtual void UpdateAnchor (size_t vertexIndex, csVector3& position) = 0;
+
+  /**
+   * Remove the given anchor. This won't work if you anchored the vertex to a rigid body, due
+   * to a limitation in the Bullet library.
+   */
+  virtual void RemoveAnchor (size_t vertexIndex) = 0;
 
   /**
    * Set the rigidity of this body. The value should be in the 0 to 1 range, with
