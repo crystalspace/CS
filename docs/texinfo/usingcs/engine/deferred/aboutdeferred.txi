@@ -45,9 +45,30 @@ outputs the result to the accumulation buffer at each pixel.
 
 @subsubheading Considerations when Using Deferred Shading
 
-Despite the benefits in lighting that deferred shading provides there are multiple issues that should be considered:
+Despite the benefits in lighting that deferred shading provides there are
+multiple issues that should be considered when choosing this rendering method:
 
 @itemize @bullet
-@item The first issues to consider is the hardware requirements needed to implement deferred shading efficiently. At a minimum hardware must support programmable shaders. Although, hardware support for shader outputs to multiple buffers and enough memory to hold 3 to 4 full resolution buffers is ideal. 
-@item The second issues to consider is that deferred shading does not support semitransparent (alpha blended) objects. This is inherent to the method due to some of the data stored in the @emph{GBuffer}, like surface normal and positional data, cannot be blended in any meaningful way. 
+@item The first issue to consider is the hardware requirements necessary to
+implement deferred shading efficiently. At a minimum the hardware must support
+programmable shaders. Although, hardware support for shaders that can output to
+multiple buffers and enough memory to hold 3 to 4 full resolution buffers is
+ideal. Overtime, as hardware improves, this will become less of an issue
+However, depending on your requirements, using deferred shading may limit you
+potential target base.
+
+@item The second issues to consider is that deferred shading does not support
+semitransparent (alpha blended) objects. This is inherent to the method itself
+because of the data stored in the @emph{GBuffer}. Most notably surface normals
+and surface positions cannot be blended in any meaningful way. The most common
+solution to this problem (and the one Crystal Space takes) is to render the
+semitransparent objects using forward shading after all deferred shading is
+completed. As a result, semitransparent objects will have to use a more
+traditional lighting scheme.
+
+@item The third issues to consider is that deferred shading does not (at the
+time of this writing) have widespread support for hardware based antialiasing.
+More specifically, the Crystal Space implementation of deferred shading does not
+currently support hardware based antialiasing even if hardware support is
+present. 
 @end itemize

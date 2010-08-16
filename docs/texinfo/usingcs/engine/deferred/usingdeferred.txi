@@ -40,12 +40,12 @@ specified then a default shader
 
 @subsubheading Using the GBuffer
 
-Once the GBuffer has been filled with the relevant information the deferred
-render manager will compute lighting information. To do this the render manager
-will iterate through all visible lights in the sector and draws proxy geometry
-that approximates the size and shape of the light source. Each light proxy is
-drawn using a shader that reads data from the GBuffer, computes the lighting
-equation, and adds it to the accumulation buffer.
+After the GBuffer is filled with the relevant information the deferred render
+manager will compute lighting information. To do this the render manager will
+iterate through all visible lights in the sector and draws proxy geometry that
+approximates the size and shape of the light source. Each light proxy is drawn
+using a shader that reads data from the GBuffer, computes the lighting equation,
+and adds it to the accumulation buffer.
 
 The following types of light sources are supported: 
 
@@ -170,7 +170,8 @@ directional lights.
 
 @subsubheading The Accumulation Buffer
 
-The accumulation buffer used by the deferred render manager to store lighting results is fixed to be the same size as the GBuffer. However, the format of the
+The accumulation buffer used by the deferred render manager to store lighting
+results is fixed to be the same size as the GBuffer. However, the format of the
 accumulation buffer can be controlled through the
 @samp{RenderManager.Deferred.AccumBufferFormat} configuration options (defaults
 to @code{rgb16_f}). Using a more compact format (@code{rgb8} for instance) may
@@ -202,17 +203,17 @@ will appear as solid black polygons.
 
 In general the use of render layers is unnecessary for deferred shading because
 there is only one well defined layer. However, the deferred render manager must
-also support forward shading and as a result more complex render layers are
+also support forward shading and, as a result, more complex render layers are
 needed. The render layers can be controlled through the
 @samp{RenderManager.Deferred.Layers} configuration option (defaults to
 @samp{/data/renderlayers/lighting_default_deferred.xml}). The deferred render
 manager expects there to be one render layer that specifies the @samp{gbuffer
 fill} shader type. This layer is reserved for deferred shading and will not be
 used during forward shading. All other render layers will be used for forward
-shading.
+shading only.
 
 @emph{Note}: If no render layer is specified with a @samp{gbuffer fill} shader
-type then a defualt layer will be added that uses the
+type then a default layer will be added that uses the
 @samp{CS/data/shader/deferred/fill_gbuffer.xml} shader.
 
 @subsubheading Debug Commands
@@ -224,7 +225,7 @@ responds to the following debug commands:
 @item toggle_visualize_gbuffer
 Toggles a display of the GBuffer at the bottom of the screen. The GBuffers color
 buffers will be displayed in order from left to right followed by the GBuffers
-depth buffer. The debug command can be activated through BugPlug using the
+depth buffer. The debug command can be activated through BugPlug (@pxref{BugPlug}) using the
 command @code{ctrl+d, ctrl+shift+alt+g}.
 
 @item toggle_visualize_lightvolumes
