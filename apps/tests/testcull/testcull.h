@@ -18,6 +18,8 @@
 
 using namespace CS::RenderManager;
 
+#define NUM_HOUSES 36
+
 typedef CS::RenderManager::RenderTree<
 CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
 
@@ -67,7 +69,7 @@ private:
   bool bShowBB;
   int vIndexes[100];
   int oldNum,newNum,numHouses,numVisible;
-  unsigned int *queries;
+  unsigned int queries[100];
   iMeshWrapper* house[100];
   csBox3 bboxes[100];
   bool invisible[100];

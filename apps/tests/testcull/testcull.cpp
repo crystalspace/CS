@@ -187,20 +187,73 @@ void Testcull::Frame ()
   c->SetTransform (ot);
   rmanager->RenderView(view);
 
-  /*if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+  /*c->SetViewportSize (g3d->GetWidth(), g3d->GetHeight());
+  const csReversibleTransform& camt = c->GetTransform ();
+  const float leftx = (float)(-c->GetShiftX () * c->GetInvFOV ());
+  const float rightx = (float)((g3d->GetWidth () - c->GetShiftX ()) * c->GetInvFOV ());
+  const float topy = (float)(-c->GetShiftY () * c->GetInvFOV ());
+  const float boty = (float)((g3d->GetHeight () - c->GetShiftY ()) * c->GetInvFOV ());
+  CS::RenderManager::RenderView rview(c,view->GetClipper(),g3d,g2d);
+  rview.SetEngine(engine);
+  rview.SetOriginalCamera(c);
+  rview.SetFrustum (leftx, rightx, topy, boty);
+  rview.GetClipPlane ().Set (0, 0, -1, 0);
+  g3d->SetClipper (view->GetClipper(), CS_CLIPPER_TOPLEVEL);  // We are at top-level.
+  g3d->ResetNearPlane ();
+  g3d->SetProjectionMatrix (c->GetProjectionMatrix ());
+
+  if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
     printf("Cannot prepare renderer for 3D drawing\n");
   }
 
-  const csReversibleTransform& camt = c->GetTransform ();
   g3d->SetWorldToCamera (camt.GetInverse ());
+  g3d->SetZMode(CS_ZBUF_USE);
 
   csSimpleRenderMesh srm;
-  csBox3 bb=house[0]->GetWorldBoundingBox();
-  srm=ConstructBBoxMesh(bb,CS_MESHTYPE_QUADS,CS_ZBUF_USE);
-  g3d->DrawSimpleMesh(srm);
+  csBox3 bb;
 
-  g3d->FinishDraw();*/
+  for(int j=0;j<numHouses;j+=2)
+  {
+    int numRMeshes=0;
+    csRenderMesh **rmeshes=house[j]->GetRenderMeshes(numRMeshes,&rview,0);
+    for(int q=0;q<numRMeshes;q++)
+    {
+      csVertexAttrib vA=CS_VATTRIB_POSITION;
+      iRenderBuffer *rB=rmeshes[q]->buffers->GetRenderBuffer(CS_BUFFER_POSITION);
+      g3d->ActivateBuffers(&vA,&rB,1);
+      g3d->DrawMeshBasic(rmeshes[q],*rmeshes[q]);
+      g3d->DeactivateBuffers(&vA,1);
+    }
+  }
+
+  for(int i=1; i<numHouses; i+=2)
+  {
+    g3d->OQBeginQuery(queries[i]);
+    bb=house[i]->GetWorldBoundingBox();
+    srm=ConstructBBoxMesh(bb,CS_MESHTYPE_QUADS,CS_ZBUF_TEST);
+    g3d->DrawSimpleMesh(srm);
+    g3d->OQEndQuery();
+
+    //g3d->SetZMode(CS_ZBUF_USE);
+  }
+
+  for(int i=1; i<numHouses; i+=2)
+  {
+    if(g3d->OQIsVisible(queries[i],0))
+    {
+      printf("%d visible\n",i);
+    }
+    else
+    {
+      printf("%d NOT visible\n",i);
+    }
+  }
+
+  g3d->FinishDraw();
+
+  printf("\n\n");*/
+
 
 
   /*if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
@@ -463,7 +516,7 @@ void Testcull::CreateRoom ()
   engine, room, "walls", "walls_factory", &box);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);*/
 
-  if(!vfs->Mount("/modelpath/","G:\\Programare\\GSoC\\CS\\"))
+  if(!vfs->Mount("/modelpath/","data\\culltest\\"))
   {
     ReportError("Failed to mount specified location!");
     return;
@@ -488,7 +541,7 @@ void Testcull::CreateRoom ()
   int k=0;
   char aux[100],name[]="MyHouse";
 
-  numVisible=numHouses=36;
+  numVisible=numHouses=NUM_HOUSES;
 
   for(int i=0;i<numHouses;i++)
   {
@@ -506,6 +559,8 @@ void Testcull::CreateRoom ()
       k++;
     }
   }
+
+  g3d->OQInitQueries(queries,numHouses);
 
   /*house[1] = csRef<iMeshWrapper> (engine->CreateMeshWrapper (
                   meshFactW, "MyHouse2", room,
@@ -532,10 +587,10 @@ void Testcull::CreateRoom ()
   light = engine->CreateLight (0, csVector3 (43, 5,  0), 120, csColor (0, 0, 1));
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (0, 45, -3), 120, csColor (0, 1, 0));
+  light = engine->CreateLight (0, csVector3 (0, 43, -3), 120, csColor (0, 1, 0));
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (0, 45, 0), 120, csColor (0, 1, 0));
+  light = engine->CreateLight (0, csVector3 (0, 0, -43), 120, csColor (0, 1, 0));
   ll->Add (light);
 }
 
