@@ -125,6 +125,13 @@ namespace lighter
     static csVector3 SpotlightDir(const csVector3 &dir, const float cosTheta);
 
     /**
+     * CausticDir
+     *    Compute a random direction within the cone of the caustic spotlight with
+     * direction 'dir' and falloffOutter as 'cosTheta'.
+     **/
+    static csVector3 CausticDir(const csVector3 &dir, const float outerFalloffAngle);
+
+    /**
      *DirectionalLightScatter
      *     Generate a point from a circular plane around the position of 
      * spotlight from where to emit the photon

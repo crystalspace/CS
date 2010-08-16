@@ -285,8 +285,47 @@ namespace lighter
         causticPhotonsForCurLight = floor(powerScale*numCausticPhotonsPerSector + 0.5);
       }
 
-      // Loop to generate the requested number of photons for this light source
       bool warning = false, stop = false;
+
+      // Setting one time light properties
+
+      float spLength , spRadius, innerFalloff, outterFalloff;
+      csVector3 lightDir;
+      switch (curLightType) 
+      {
+
+        // directional light
+      case CS_LIGHT_DIRECTIONAL:
+        {
+
+          lightDir = ((DirectionalLight*)curLight)->GetDirection();
+          spLength = ((DirectionalLight*)curLight)->GetLength();
+          spRadius = ((DirectionalLight*)curLight)->GetRadius();
+        }
+        break;
+
+        // spotlight
+      case CS_LIGHT_SPOTLIGHT:
+        {
+          if(!warning)
+          {
+            globalLighter->Report (
+              "Spotlight falloff is ignored for indirect light calculation");
+            warning = true;
+          }
+
+          // Get spotlight properties
+          
+          lightDir = ((SpotLight*)curLight)->GetDirection();
+          ((SpotLight*)curLight)->GetFalloff(innerFalloff, outterFalloff);
+
+        }
+        break;
+
+      }
+
+      // Loop to generate the requested number of photons for this light source
+      
       for (size_t num = 0; num < photonsForCurLight && !stop; ++num)
       {
         // Get direction to emit the photon
@@ -298,14 +337,7 @@ namespace lighter
           // directional light
           case CS_LIGHT_DIRECTIONAL:
             {
-
-              float spLength , spRadius;
-              csVector3 lightDir = ((DirectionalLight*)curLight)->GetDirection();
-              spLength = ((DirectionalLight*)curLight)->GetLength();
-              spRadius = ((DirectionalLight*)curLight)->GetRadius();
-
-              csVector3 emitPos = DirectionalLightScatter(lightDir,spRadius,pos);
-              photonOrigin = emitPos;
+              photonOrigin = DirectionalLightScatter(lightDir,spRadius,pos);
               dir = lightDir;
             }
             break;
@@ -313,18 +345,6 @@ namespace lighter
           // spotlight
           case CS_LIGHT_SPOTLIGHT:
             {
-              if(!warning)
-              {
-                globalLighter->Report (
-                  "Spotlight falloff is ignored for indirect light calculation");
-                warning = true;
-              }
-
-              // Get spotlight properties
-              float innerFalloff, outterFalloff;
-              csVector3 lightDir = ((SpotLight*)curLight)->GetDirection();
-              ((SpotLight*)curLight)->GetFalloff(innerFalloff, outterFalloff);
-
               // Generate a random direction within the spotlight cone
               dir = SpotlightDir(lightDir, outterFalloff);
             }
@@ -371,6 +391,86 @@ namespace lighter
           radius = sphere.GetRadius();
           size_t causticPhotonsForMesh = floor(causticPhotonsForCurLight*(radius*radius*radius/totalVolume) + 0.5);
 
+          // Setting one time light properties
+      
+          float spLength , spRadius, spanAngle;
+          csVector3 lightDir, objDir, pseudoPos;
+
+          switch (curLightType)
+          {
+
+            // directional light
+          case CS_LIGHT_DIRECTIONAL:
+            {
+              lightDir = ((DirectionalLight*)curLight)->GetDirection();
+              spLength = ((DirectionalLight*)curLight)->GetLength();
+              spRadius = ((DirectionalLight*)curLight)->GetRadius();
+
+              csVector3 posDir = sphere.GetCenter()-pos;
+              csVector3 lightDirVector = posDir*lightDir;
+              csVector3 radVector = lightDirVector-posDir;
+              float parallelDist = radVector.SquaredNorm();
+              pseudoPos = pos;
+
+              if (spRadius >= parallelDist)
+              {
+                float tempDist = MAX(0,parallelDist + radius - spRadius);
+                pseudoPos = pos + radVector*(1 - tempDist/(parallelDist*2.0f));
+                spRadius = radius - tempDist/2.0f;
+              }
+              else
+              {
+                stop = true;
+                continue;
+              }
+            }
+            break;
+
+            // spotlight
+
+          case CS_LIGHT_SPOTLIGHT:
+            {
+              if(!warning)
+              {
+                globalLighter->Report (
+                  "Spotlight falloff is ignored for indirect light calculation");
+                warning = true;
+              }
+
+              // Get spotlight properties
+              float innerFalloff, outterFalloff;
+              lightDir = ((SpotLight*)curLight)->GetDirection();
+              ((SpotLight*)curLight)->GetFalloff(innerFalloff, outterFalloff);
+
+              objDir = sphere.GetCenter() - pos;
+              spanAngle = ABS(atan(radius/objDir.SquaredNorm()));
+
+              objDir.Normalize();
+              lightDir.Normalize();
+              float angleDir = ABS(lightDir*objDir);
+
+              if ( ((spanAngle/2.0) +angleDir) > ABS(acos(outterFalloff)))
+              {
+                stop = true;
+                continue;
+              }
+              
+            }
+            break;
+
+            // point light
+          case CS_LIGHT_POINTLIGHT:
+          default:
+            {
+              // Get the direction of the caustic object w.r.t the light
+              
+              objDir = sphere.GetCenter() - pos;
+              spanAngle = atan(radius/objDir.SquaredNorm());
+              objDir.Normalize();
+              
+            }
+            break;
+          }
 
           // Emit caustic photons for the current light
 
@@ -386,35 +486,10 @@ namespace lighter
               case CS_LIGHT_DIRECTIONAL:
                 {
 
-                  float spLength , spRadius;
-                  csVector3 lightDir = ((DirectionalLight*)curLight)->GetDirection();
-                  spLength = ((DirectionalLight*)curLight)->GetLength();
-                  spRadius = ((DirectionalLight*)curLight)->GetRadius();
-
-                  csVector3 posDir = sphere.GetCenter()-pos;
-                  csVector3 lightDirVector = posDir*lightDir;
-                  csVector3 radVector = lightDirVector-posDir;
-                  float parallelDist = radVector.SquaredNorm();
-                  csVector3 pseudoPos = pos;
-
-                  if (spRadius >= parallelDist)
-                  {
-                    //TODO: Emit photons
-                    float tempDist = MAX(0,parallelDist + radius - spRadius);
-                    pseudoPos = pos + radVector*(1 - tempDist/(parallelDist*2.0f));
-                    spRadius = radius - tempDist/2.0f;
-                  }
-                  else
-                  {
-                    //TODO: Continue and set stop = true
-                    stop = true;
-                    continue;
-                  }
                   csVector3 emitPos = DirectionalLightScatter(lightDir,spRadius,pseudoPos);
                   photonOrigin = emitPos;
                   dir = lightDir;
-
-                  
+                 
                 }
                 break;
 
@@ -422,33 +497,8 @@ namespace lighter
               
               case CS_LIGHT_SPOTLIGHT:
                 {
-                  if(!warning)
-                  {
-                    globalLighter->Report (
-                      "Spotlight falloff is ignored for indirect light calculation");
-                    warning = true;
-                  }
-
-                  // TODO : Make this part optimized
-                  // Get spotlight properties
-                  float innerFalloff, outterFalloff;
-                  csVector3 lightDir = ((SpotLight*)curLight)->GetDirection();
-                  ((SpotLight*)curLight)->GetFalloff(innerFalloff, outterFalloff);
-
-                  csVector3 objDir = sphere.GetCenter() - pos;
-                  float spanAngle = ABS(atan(radius/objDir.SquaredNorm()));
-
-                  objDir.Normalize();
-                  lightDir.Normalize();
-                  float angleDir = ABS(lightDir*objDir);
-
-                  if ( ((spanAngle/2.0) +angleDir) > ABS(acos(outterFalloff)))
-                  {
-                    stop = true;
-                    continue;
-                  }
                   // Generate a random direction within the spotlight cone towards the caustic
-                  dir = SpotlightDir(objDir, cos(spanAngle));
+                  dir = CausticDir(objDir, spanAngle);
                 }
                 break;
               
@@ -456,12 +506,7 @@ namespace lighter
               case CS_LIGHT_POINTLIGHT:
               default:
                 {
-                  // Get the direction of the caustic object w.r.t the light
-                  // dir = randVect.Get();
-				          csVector3 objDir = sphere.GetCenter() - pos;
-                  float spanAngle = cos(atan(radius/objDir.SquaredNorm()));
-                  objDir.Normalize();
-                  dir = SpotlightDir(objDir,spanAngle);
+                  dir = CausticDir(objDir,spanAngle);
                 }
                 break;
             }
@@ -602,6 +647,22 @@ namespace lighter
 
     // Compute the angles of rotation around the optical axis
     double theta = acos(cosTheta)*e1;
+    double phi = 2.0*PI*e2;
+
+    return RotateAroundN(dir, theta, phi);
+  }
+
+  csVector3 PhotonmapperLighting::CausticDir(const csVector3 &dir, const float outerFalloffAngle)
+  {
+    // Local, static random number generator
+    static csRandomFloatGen randGen;
+
+    // Get two uniformly distributed random numbers between 0 and 1
+    double e1 = randGen.Get();
+    double e2 = randGen.Get();
+
+    // Compute the angles of rotation around the optical axis
+    double theta = outerFalloffAngle*e1;
     double phi = 2.0*PI*e2;
 
     return RotateAroundN(dir, theta, phi);
