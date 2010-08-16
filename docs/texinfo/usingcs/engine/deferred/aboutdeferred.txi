@@ -11,7 +11,9 @@ traditional approach to rasterization (commonly referred to as forward shading)
 the rendering and lighting of geometry are done in tandem. As a result, using
 forward shading tends to limit the number of light sources that can affect a
 single object. However, with deferred shading the cost of adding a light to a
-scene is independent of the number of objects in a scene. This property allows for a scene to contain significantly more dynamic light sources before performance becomes an issue.
+scene is independent of the number of objects in a scene. This property allows
+for a scene to contain significantly more dynamic light sources before
+performance becomes an issue.
 
 @subsubheading Implementing Deferred Shading
 
@@ -43,4 +45,9 @@ outputs the result to the accumulation buffer at each pixel.
 
 @subsubheading Considerations when Using Deferred Shading
 
-TODO
+Despite the benefits in lighting that deferred shading provides there are multiple issues that should be considered:
+
+@itemize @bullet
+@item The first issues to consider is the hardware requirements needed to implement deferred shading efficiently. At a minimum hardware must support programmable shaders. Although, hardware support for shader outputs to multiple buffers and enough memory to hold 3 to 4 full resolution buffers is ideal. 
+@item The second issues to consider is that deferred shading does not support semitransparent (alpha blended) objects. This is inherent to the method due to some of the data stored in the @emph{GBuffer}, like surface normal and positional data, cannot be blended in any meaningful way. 
+@end itemize
