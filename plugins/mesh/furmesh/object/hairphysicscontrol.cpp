@@ -36,7 +36,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   HairPhysicsControl::HairPhysicsControl (iBase* parent)
     : scfImplementationType (this, parent), object_reg(0), rigidBody(0),
-    bulletDynamicSystem(0)
+    bulletDynamicSystem(0), animesh(0)
   {
   }
 
@@ -57,6 +57,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
   }
 
+  void HairPhysicsControl::SetAnimesh (CS::Mesh::iAnimatedMesh* animesh)
+  {
+    this->animesh = animesh;
+  }
+
   void HairPhysicsControl::SetRigidBody (iRigidBody* rigidBody)
   {
     this->rigidBody = rigidBody;
@@ -72,7 +77,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void HairPhysicsControl::InitializeStrand (size_t strandID, csVector3* 
     coordinates, size_t coordinatesCount)
   {
-    if (!rigidBody || !bulletDynamicSystem)
+    if (!rigidBody || !bulletDynamicSystem || !coordinatesCount)
       return;
 
     CS::Physics::Bullet::iSoftBody* bulletBody = bulletDynamicSystem->
@@ -83,19 +88,72 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     bulletBody->SetRigidity (0.99f);
     bulletBody->AnchorVertex (0, rigidBody);
 
-    guideRopes.PutUnique(strandID, bulletBody);
+    float closestDistance = 100000.0f;
+    size_t closestVertex = (size_t) ~0;
+
+    if (animesh)
+    {
+      // Find the closest vertex of the animesh if asked for
+      csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (animesh);
+      csReversibleTransform& animeshTransform =
+        mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
+
+      // Create a walker for the position buffer of the animesh
+      csRenderBufferHolder holder;
+      animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
+      iRenderBuffer* positions = holder.GetRenderBuffer (CS_BUFFER_POSITION);
+      csVertexListWalker<float, csVector3> positionWalker (positions);
+
+      // Iterate on all vertices
+      for (size_t i = 0; i < positionWalker.GetSize (); i++)
+      {
+        float distance = (coordinates[0]
+          - animeshTransform.This2Other ((*positionWalker))).Norm ();
+        
+        if (distance < closestDistance)
+        {
+          closestDistance = distance;
+          closestVertex = i;
+        }
+
+        ++positionWalker;
+      }
+    }
+
+    Anchor *anchor = new Anchor;
+    anchor->softBody = bulletBody;
+    anchor->animeshVertexIndex = closestVertex;
+
+    guideRopes.PutUnique(strandID, anchor);
   }
 
   // Animate the strand with the given ID
   void HairPhysicsControl::AnimateStrand (size_t strandID, csVector3* 
     coordinates, size_t coordinatesCount) const
   {
-    csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get (strandID, 0);
+    Anchor* anchor = guideRopes.Get (strandID, 0);
 
-    if(!bulletBody)
+    if(!anchor)
       return;
 
+    csRef<CS::Physics::Bullet::iSoftBody> bulletBody = anchor->softBody;
+
     CS_ASSERT(coordinatesCount == bulletBody->GetVertexCount());
+
+    if (animesh && anchor->animeshVertexIndex != (size_t) ~0)
+    {
+      // Create a walker for the position buffer of the animesh
+      csRenderBufferHolder holder;
+      animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
+      csRenderBufferLock<csVector3> positions (holder.GetRenderBuffer (CS_BUFFER_POSITION));
+
+      // Compute the new position of the anchor
+      csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (animesh);
+      csVector3 newPosition = mesh->GetMeshWrapper ()->GetMovable ()->
+        GetTransform ().This2Other (positions[anchor->animeshVertexIndex]);
+
+      bulletBody->UpdateAnchor (0, newPosition);
+    }
 
     for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
       coordinates[i] = bulletBody->GetVertexPosition(i);
@@ -103,11 +161,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void HairPhysicsControl::RemoveStrand (size_t strandID)
   {
-    csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get (strandID, 0);
-    if(!bulletBody)
+    Anchor* anchor = guideRopes.Get (strandID, 0);
+
+    if(!anchor)
       return;
 
-    guideRopes.Delete(strandID, bulletBody);
+    csRef<CS::Physics::Bullet::iSoftBody> bulletBody = anchor->softBody;
+
+    guideRopes.Delete(strandID, anchor);
     
     bulletDynamicSystem->RemoveSoftBody(bulletBody);
   }
@@ -117,10 +178,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Iterate through all ropes
     for (size_t i = 0 ; i < guideRopes.GetSize(); i ++)
     {
-      csRef<CS::Physics::Bullet::iSoftBody> bulletBody = guideRopes.Get(i, 0);
-      if (bulletBody)
+      Anchor* anchor = guideRopes.Get (i, 0);
+      
+      if (anchor)
+      {
+        csRef<CS::Physics::Bullet::iSoftBody> bulletBody = anchor->softBody;
         bulletDynamicSystem->RemoveSoftBody( bulletBody );
+      }
+
+      delete anchor;
     }
+
     guideRopes.DeleteAll();
   }
 

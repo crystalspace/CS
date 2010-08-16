@@ -378,6 +378,7 @@ bool KrystalScene::CreateAvatar ()
 
   hairPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
   hairPhysicsControl->SetRigidBody(headBody);
+//   hairPhysicsControl->SetAnimesh(animesh);
 
   animationPhysicsControl->SetRigidBody(headBody);
   animationPhysicsControl->SetInitialTransform(headBody->GetTransform().GetInverse());

@@ -55,6 +55,11 @@ public:
   virtual void SetInitialTransform(csReversibleTransform initialTransform) = 0;
 
   /**
+   * Set the animesh on which the iFurMesh is attached
+   */
+  virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
+
+  /**
    * Set the rigid body on which the iFurMesh is attached
    */
   virtual void SetRigidBody (iRigidBody* rigidBody) = 0;

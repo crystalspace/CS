@@ -42,6 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     //-- iFurPhysicsControl
     virtual void SetInitialTransform(csReversibleTransform initialTransform);
+    virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* ) {}
     virtual void SetRigidBody (iRigidBody* rigidBody);
     virtual void SetBulletDynamicSystem 
       (CS::Physics::Bullet::iDynamicSystem* bulletDynamicSystem);
