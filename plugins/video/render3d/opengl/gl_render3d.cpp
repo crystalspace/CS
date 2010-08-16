@@ -918,10 +918,12 @@ bool csGLGraphics3D::Open ()
 
 
     ParseByteSize (config->GetStr ("Video.OpenGL.VBO.MaxSize", "64M"), vboSize);
+    bool forceSeparateVBOs = config->GetBool ("Video.OpenGL.VBO.ForceSeparate", false);
 
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Using VBO with %d MB of VBO memory",
       vboSize / (1024*1024));
-    vboManager.AttachNew (new csGLVBOBufferManager (ext, statecache, vboSize));
+    vboManager.AttachNew (new csGLVBOBufferManager (ext, statecache, vboSize,
+      forceSeparateVBOs));
   }
 
   GLint dbits;

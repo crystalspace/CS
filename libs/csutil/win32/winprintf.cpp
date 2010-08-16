@@ -320,7 +320,7 @@ static int _cs_vfprintf (FILE* stream, const char* format, va_list args)
   if (str != localBuf) cs_free (str);
   // On success _cs_fputs() returns a value >= 0, but
   // _cs_vfprintf() should return the number of chars written.
-  return ((rc >= 0) ? newsize : -1);
+  return ((rc >= 0) ? int (newsize) : -1);
 }
 
 // Replacement for printf(); exact same prototype/functionality as printf()

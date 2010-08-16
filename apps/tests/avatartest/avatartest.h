@@ -23,11 +23,12 @@
 
 #include "cstool/csdemoapplication.h"
 #include "imesh/animesh.h"
-#include "imesh/ragdoll.h"
-#include "imesh/lookat.h"
 #include "imesh/basicskelanim.h"
-#include "ivaria/dynamics.h"
+#include "imesh/ik.h"
+#include "imesh/lookat.h"
+#include "imesh/ragdoll.h"
 #include "ivaria/bullet.h"
+#include "ivaria/dynamics.h"
 #include "ivaria/dynamicsdebug.h"
 #include "ivaria/softanim.h"
 
@@ -95,6 +96,7 @@ private:
   bool softBodiesEnabled;
 
   // Animation node plugin managers
+  csRef<CS::Animation::iSkeletonIKManager2> IKManager;
   csRef<CS::Animation::iSkeletonLookAtManager2> lookAtManager;
   csRef<CS::Animation::iSkeletonBasicNodesManager2> basicNodesManager;
   csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;

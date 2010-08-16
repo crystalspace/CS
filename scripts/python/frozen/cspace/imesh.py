@@ -736,6 +736,7 @@ class iAnimatedMesh(core.iBase):
     def GetSocketCount(*args): return _imesh.iAnimatedMesh_GetSocketCount(*args)
     def GetSocket(*args): return _imesh.iAnimatedMesh_GetSocket(*args)
     def GetAnimatedMeshFactory(*args): return _imesh.iAnimatedMesh_GetAnimatedMeshFactory(*args)
+    def GetRenderBufferAccessor(*args): return _imesh.iAnimatedMesh_GetRenderBufferAccessor(*args)
 iAnimatedMesh_swigregister = _imesh.iAnimatedMesh_swigregister
 iAnimatedMesh_swigregister(iAnimatedMesh)
 
@@ -1236,6 +1237,7 @@ class iSkeletonRagdollNodeFactory2(iSkeletonAnimNodeFactory2):
     def SetChildNode(*args): return _imesh.iSkeletonRagdollNodeFactory2_SetChildNode(*args)
     def GetChildNode(*args): return _imesh.iSkeletonRagdollNodeFactory2_GetChildNode(*args)
     def ClearChildNode(*args): return _imesh.iSkeletonRagdollNodeFactory2_ClearChildNode(*args)
+    def GetDynamicSystem(*args): return _imesh.iSkeletonRagdollNodeFactory2_GetDynamicSystem(*args)
 iSkeletonRagdollNodeFactory2_swigregister = _imesh.iSkeletonRagdollNodeFactory2_swigregister
 iSkeletonRagdollNodeFactory2_swigregister(iSkeletonRagdollNodeFactory2)
 

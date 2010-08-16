@@ -310,6 +310,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual CS::Mesh::iAnimatedMeshSocket* GetSocket (size_t index) const;
 
     virtual CS::Mesh::iAnimatedMeshFactory* GetAnimatedMeshFactory () const;
+    virtual iRenderBufferAccessor* GetRenderBufferAccessor () const;
 
     //-- iMeshObject
     virtual iMeshObjectFactory* GetFactory () const;
@@ -395,12 +396,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       {}
 
       void PreGetBuffer (csRenderBufferHolder* holder, 
-	csRenderBufferName buffer)
+        csRenderBufferName buffer)
       { meshObject->PreGetBuffer (holder, buffer); }
       
       AnimeshObject* meshObject;
     };
-
+ 
     class Submesh : 
       public scfImplementation1<Submesh, 
                                 CS::Mesh::iAnimatedMeshSubMesh>
@@ -499,6 +500,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRefArray<Socket> sockets;
 
     // Holder for skinned vertex buffers
+    csRef<RenderBufferAccessor> bufferAccessor;
     csRef<iRenderBuffer> skinnedVertices;
     csRef<iRenderBuffer> skinnedNormals;
     csRef<iRenderBuffer> skinnedTangents;

@@ -29,10 +29,8 @@
 #include "csutil/csstring.h"
 #include "imesh/lookat.h"
 
-namespace CS
-{
-namespace Animation
-{
+namespace CS {
+namespace Animation {
 
 struct iBodyBoneJoint;
 

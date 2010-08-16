@@ -15538,6 +15538,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSocketCount = *cspacec::iAnimatedMesh_GetSocketCount;
 *GetSocket = *cspacec::iAnimatedMesh_GetSocket;
 *GetAnimatedMeshFactory = *cspacec::iAnimatedMesh_GetAnimatedMeshFactory;
+*GetRenderBufferAccessor = *cspacec::iAnimatedMesh_GetRenderBufferAccessor;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -16535,6 +16536,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetChildNode = *cspacec::iSkeletonRagdollNodeFactory2_SetChildNode;
 *GetChildNode = *cspacec::iSkeletonRagdollNodeFactory2_GetChildNode;
 *ClearChildNode = *cspacec::iSkeletonRagdollNodeFactory2_ClearChildNode;
+*GetDynamicSystem = *cspacec::iSkeletonRagdollNodeFactory2_GetDynamicSystem;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

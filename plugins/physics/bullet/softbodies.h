@@ -56,6 +56,9 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   virtual csVector3 GetVertexNormal (size_t index) const;
   virtual void AnchorVertex (size_t vertexIndex);
   virtual void AnchorVertex (size_t vertexIndex, ::iRigidBody* body);
+  virtual void AnchorVertex (size_t vertexIndex, iAnchorAnimationControl* controller);
+  virtual void UpdateAnchor (size_t vertexIndex, csVector3& position);
+  virtual void RemoveAnchor (size_t vertexIndex);
   virtual void SetRigidity (float rigidity);
   virtual float GetRigidity () const;
   virtual void SetLinearVelocity (csVector3 velocity);
@@ -67,9 +70,24 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   virtual csTriangle GetTriangle (size_t index) const;
 
  private:
+  void UpdateAnchorPositions ();
+  void UpdateAnchorInternalTick (btScalar timeStep);
+
+ private:
   CS::Physics::Bullet::BodyType bodyType;
   csBulletDynamicsSystem* dynSys;
   btSoftBody* body;
+
+  struct AnimatedAnchor
+  {
+    AnimatedAnchor (size_t vertexIndex, iAnchorAnimationControl* controller)
+    : vertexIndex (vertexIndex), controller (controller) {}
+
+    size_t vertexIndex;
+    csRef<iAnchorAnimationControl> controller;
+    btVector3 position;
+  };
+  csArray<AnimatedAnchor> animatedAnchors;
 };
 
 }

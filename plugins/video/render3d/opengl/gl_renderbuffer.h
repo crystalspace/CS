@@ -57,7 +57,8 @@ class csGLVBOBufferManager : public scfImplementation1<csGLVBOBufferManager,
 public:  
   CS_LEAKGUARD_DECLARE (csGLVBOBufferManager);
   csGLVBOBufferManager (csGLExtensionManager *ext, csGLStateCache *state, 
-    size_t maxAlloction = 64*1024*1024);
+    size_t maxAlloction = 64*1024*1024,
+    bool forceSeparateVBOs = false);
   virtual ~csGLVBOBufferManager ();
 
   /**
@@ -112,6 +113,7 @@ private:
 
   size_t currentVBOAllocation;
   size_t maxVBOAllocation;
+  bool forceSeparateVBOs;
 
   struct VBOSlot;
 
@@ -179,6 +181,9 @@ private:
   {
     return csMax<size_t> (csLog2 (csFindNearestPowerOf2 ((int)size)), VBO_MIN_SLOT_SIZE_PO2);
   }
+  
+  inline bool IsSizePO2Slotted (size_t slotSizePO2) const
+  { return !forceSeparateVBOs && (slotSizePO2 <= VBO_MAX_SLOT_SIZE_PO2); }
 
   // Given a renderbuffer, get a VBO slot if possible, otherwise 0
   VBOSlot* GetVBOSlot (iRenderBuffer* buffer);

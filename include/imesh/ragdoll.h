@@ -18,8 +18,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __CS_BODYMESH_RAGDOLL_H__
-#define __CS_BODYMESH_RAGDOLL_H__
+#ifndef __CS_IMESH_RAGDOLL_H__
+#define __CS_IMESH_RAGDOLL_H__
 
 /**\file
  * Ragdoll animation node for an animated mesh.
@@ -93,7 +93,7 @@ enum RagdollState
  */
 struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeFactory2, 1, 0, 1);
+  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeFactory2, 1, 0, 2);
 
   /**
    * Add a new body chain to the ragdoll animation node. Adding more than 
@@ -130,6 +130,11 @@ struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
    * Clear the child animation node of this node.
    */
   virtual void ClearChildNode () = 0;
+
+  /**
+   * Get the dynamic system where the ragdoll bodies are evolving
+   */
+  virtual iDynamicSystem* GetDynamicSystem () const = 0;
 };
 
 /**
@@ -190,4 +195,4 @@ struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
 
 /** @} */
 
-#endif //__CS_BODYMESH_RAGDOLL_H__
+#endif //__CS_IMESH_RAGDOLL_H__

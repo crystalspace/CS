@@ -74,7 +74,10 @@ private:
 
   // Dragging related
   bool dragging;
+  bool softDragging;
   csRef<CS::Physics::Bullet::iPivotJoint> dragJoint;
+  csRef<CS::Physics::Bullet::iSoftBody> draggedBody;
+  size_t draggedVertex;
   float dragDistance;
   float linearDampening, angularDampening;
   int mouseX, mouseY;
@@ -120,6 +123,22 @@ public:
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();
+
+  friend class MouseAnchorAnimationControl;
+  csRef<CS::Physics::Bullet::iAnchorAnimationControl> grabAnimationControl;
+};
+
+class MouseAnchorAnimationControl : public scfImplementation1
+<MouseAnchorAnimationControl, CS::Physics::Bullet::iAnchorAnimationControl>
+{
+ public:
+  MouseAnchorAnimationControl (Simple* simple)
+    : scfImplementationType (this), simple (simple) {}
+
+  csVector3 GetAnchorPosition () const;
+
+ private:
+  Simple* simple;
 };
 
 #endif // __PHYSTUT_H__

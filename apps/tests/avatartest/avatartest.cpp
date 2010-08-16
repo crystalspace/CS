@@ -21,6 +21,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/plane3.h"
+#include "iutil/visualdebug.h"
 
 #include "avatartest.h"
 #include "frankie.h"
@@ -103,6 +104,9 @@ void AvatarTest::Frame ()
   if (avatarScene->HasPhysicalObjects ()
       && dynamicsDebugMode == DYNDEBUG_BULLET)
     bulletDynamicSystem->DebugDraw (view);
+
+  // Display of visual debugging informations
+  CS::Debug::VisualDebuggerHelper::Display (GetObjectRegistry (), view, 0.1f);
 }
 
 bool AvatarTest::OnKeyboard (iEvent &ev)
@@ -215,6 +219,8 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     return false;
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ik.physical",
+		       CS::Animation::iSkeletonIKManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
 		       CS::Animation::iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
@@ -324,13 +330,16 @@ bool AvatarTest::Application ()
     return false;
 
   // Find references to the plugins of the animation nodes
+  IKManager = csQueryRegistry<CS::Animation::iSkeletonIKManager2> (GetObjectRegistry ());
+  if (!IKManager) return ReportError("Failed to locate iSkeletonIKManager2 plugin!");
+
   lookAtManager = csQueryRegistry<CS::Animation::iSkeletonLookAtManager2> (GetObjectRegistry ());
-  if (!lookAtManager) return ReportError("Failed to locate iLookAtManager plugin!");
+  if (!lookAtManager) return ReportError("Failed to locate iSkeletonLookAtManager2 plugin!");
 
   basicNodesManager =
     csQueryRegistry<CS::Animation::iSkeletonBasicNodesManager2> (GetObjectRegistry ());
   if (!basicNodesManager)
-    return ReportError("Failed to locate CS::Animation::iSkeletonBasicNodesManager2 plugin!");
+    return ReportError("Failed to locate iSkeletonBasicNodesManager2 plugin!");
 
   // Default behavior from DemoApplication for the creation of the scene
   if (!DemoApplication::CreateRoom ())

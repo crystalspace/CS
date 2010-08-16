@@ -72,13 +72,13 @@ class csSkeletalState2;
 /**\name Skeletal animation
  * @{ */
 
-/// Identifier for channel within animation
+/// Identifier for a channel within an animation
 typedef unsigned int ChannelID;
 
-/// Identifier for keyframes within animation channel
+/// Identifier for a keyframe within an animation channel
 typedef unsigned int KeyFrameID;
 
-/// Identifier for state within FSM node
+/// Identifier for a state within a FSM animation node
 typedef unsigned int StateID;
 
 /// ID for an invalid channel
@@ -95,7 +95,7 @@ enum SynchronizationMode
 {
   /// No syncing at all
   SYNC_NONE,
-  /// Synchronize first frame
+  /// Synchronize on the first frame
   SYNC_FIRSTFRAME
 };
 

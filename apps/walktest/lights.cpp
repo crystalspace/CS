@@ -157,7 +157,7 @@ csReversibleTransform WalkTestLights::FlashlightShift (const csReversibleTransfo
   csReversibleTransform newTF (tf);
   // Tilt flashlight a bit down
   csMatrix3 newmat (tf.GetT2O());
-  newmat *= csXRotMatrix3 ((10.0/180.0)*PI);
+  newmat *= csXRotMatrix3 (float ((10.0/180.0)*PI));
   newTF.SetT2O (newmat);
   return newTF;
 }

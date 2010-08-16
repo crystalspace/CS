@@ -299,7 +299,17 @@ void csBulletDynamicsSystem::CheckCollisions ()
 
 void csBulletDynamicsSystem::Step (float stepsize)
 {
+  // Update the soft body anchors
+  for (csRefArrayObject<iSoftBody>::Iterator it = softBodies.GetIterator (); it.HasNext (); )
+  {
+    csBulletSoftBody* body = static_cast<csBulletSoftBody*> (it.Next ());
+    body->UpdateAnchorPositions ();
+  }
+
+  // Step the simulation
   bulletWorld->stepSimulation (stepsize, (int)worldMaxSteps, worldTimeStep);
+
+  // Check for collisions
   CheckCollisions();
 }
 
@@ -340,6 +350,8 @@ void csBulletDynamicsSystem::RemoveBody (::iRigidBody* body)
     // wake up all connected bodies
     for (size_t i = 0; i < csBody->contactObjects.GetSize (); i++)
       csBody->contactObjects[i]->activate ();
+
+    // TODO: remove any connected joint
 
     // remove the body from the world
     bulletWorld->removeRigidBody (csBody->body);
@@ -746,6 +758,12 @@ void csBulletDynamicsSystem::SetStepParameters (float timeStep, size_t maxSteps,
   info.m_numIterations = (int)iterations;
 }
 
+void PreTickCallback (btDynamicsWorld* world, btScalar timeStep)
+{
+  csBulletDynamicsSystem* system = (csBulletDynamicsSystem*) world->getWorldUserInfo ();
+  system->UpdateSoftBodies (timeStep);
+}
+
 void csBulletDynamicsSystem::SetSoftBodyWorld (bool isSoftBodyWorld)
 {
   CS_ASSERT(!dynamicBodies.GetSize ()
@@ -791,6 +809,9 @@ void csBulletDynamicsSystem::SetSoftBodyWorld (bool isSoftBodyWorld)
   }
 
   bulletWorld->setGravity (gravity);
+
+  // Register a pre-tick callback
+  bulletWorld->setInternalTickCallback (PreTickCallback, this, true);
 }
 
 size_t csBulletDynamicsSystem::GetSoftBodyCount ()
@@ -999,6 +1020,15 @@ void csBulletDynamicsSystem::RemoveSoftBody (iSoftBody* body)
   softBodies.Delete (body);
 }
 
+void csBulletDynamicsSystem::UpdateSoftBodies (btScalar timeStep)
+{
+  for (csRefArrayObject<iSoftBody>::Iterator it = softBodies.GetIterator (); it.HasNext (); )
+  {
+    csBulletSoftBody* body = static_cast<csBulletSoftBody*> (it.Next ());
+    body->UpdateAnchorInternalTick (timeStep);
+  }
+}
+
 csPtr<iPivotJoint> csBulletDynamicsSystem::CreatePivotJoint ()
 {
   csRef<csBulletPivotJoint> joint;
@@ -1018,7 +1048,7 @@ bool csBulletDynamicsSystem::SaveBulletWorld (const char* filename)
   return false;
 #else
 
-  //create a large enough buffer. There is no method to pre-calculate the buffer size yet.
+  // create a large enough buffer
   int maxSerializeBufferSize = 1024 * 1024 * 5;
  
   btDefaultSerializer* serializer = new btDefaultSerializer (maxSerializeBufferSize);
@@ -1043,6 +1073,12 @@ iTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
  csVector3 gridSize, csOrthoTransform& transform,
  float minimumHeight, float maximumHeight)
 {
+  CS_ASSERT(gridWidth > 1
+	    && gridHeight > 1
+	    && gridSize[0] > 0.0f
+	    && gridSize[1] > 0.0f
+	    && gridSize[2] > 0.0f);
+
   csRef<csBulletTerrainCellCollider> terrain;
   terrain.AttachNew
     (new csBulletTerrainCellCollider (this, heightData, gridWidth, gridHeight,

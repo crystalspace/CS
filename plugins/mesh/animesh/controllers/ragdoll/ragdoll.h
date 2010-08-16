@@ -92,6 +92,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory2* node);
     virtual CS::Animation::iSkeletonAnimNodeFactory2* GetChildNode ();
     virtual void ClearChildNode ();
+    virtual iDynamicSystem* GetDynamicSystem () const;
 
   protected:
     RagdollManager* manager;

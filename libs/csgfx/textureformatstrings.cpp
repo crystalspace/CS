@@ -33,8 +33,8 @@ csString TextureFormatStrings::ConvertCanonical (const char* in)
 
 StructuredTextureFormat::StructuredTextureFormat ()
 {
-  coded_components = CONST_UINT64 (0);
-  format = Invalid;
+  cd.coded_components = CONST_UINT64 (0);
+  cd.format = Invalid;
 }
     
 StructuredTextureFormat::StructuredTextureFormat (
@@ -42,8 +42,10 @@ StructuredTextureFormat::StructuredTextureFormat (
   char cmp2, int size2,
   char cmp3, int size3,
   char cmp4, int size4,
-  TextureFormat fmt) : coded_components (CONST_UINT64 (0)), format (fmt)
+  TextureFormat fmt)
 {
+  cd.coded_components = CONST_UINT64 (0);
+  cd.format = fmt;
   if (cmp1 != 0) 
   {
     AddComponent (cmp1, size1);
@@ -59,54 +61,99 @@ StructuredTextureFormat::StructuredTextureFormat (
   }
 }
 
+StructuredTextureFormat::StructuredTextureFormat (const StructuredTextureFormat& other)
+{
+  cd.format = Invalid;
+  TextureFormat otherFmt = other.GetFormat();
+  if (otherFmt == Special)
+  {
+    SetSpecial (other.GetSpecial());
+  }
+  else
+  {
+    cd.format = otherFmt;
+    cd.coded_components = other.cd.coded_components;
+  }
+}
+
+StructuredTextureFormat::~StructuredTextureFormat ()
+{
+  FreeSpecialStr ();
+}
+
+void StructuredTextureFormat::FreeSpecialStr ()
+{
+  if (cd.format & SpecialStrExtern)
+    cs_free (cd.specialStrPtr);
+}
+
+void StructuredTextureFormat::SetSpecial (const char* special)
+{
+  FreeSpecialStr ();
+  size_t specLen = strlen (special);
+  if (specLen+1 > SpecialStrMax)
+  {
+    cd.format = Special | SpecialStrExtern;
+    cd.specialStrPtr = CS::StrDup (special);
+  }
+  else
+  {
+    memcpy (specialStr, special, specLen+1);
+  }
+}
+
 bool StructuredTextureFormat::AddComponent (char cmp, int size)
 {
-  uint64 shifted = coded_components << 16;
-  if ((shifted >> 16) != coded_components)
+  if (GetFormat() == Special) return false;
+  uint64 shifted = cd.coded_components << 16;
+  if ((shifted >> 16) != cd.coded_components)
     return false;
-  coded_components = shifted + (CONST_UINT64 (256) * cmp) + size;
+  cd.coded_components = shifted + (CONST_UINT64 (256) * cmp) + size;
   return true;
 }
 
 void StructuredTextureFormat::FixSizes (int size)
 {
-  uint16 p1 = (coded_components >> 48) & 65535;
-  uint16 p2 = (coded_components >> 32) & 65535;
-  uint16 p3 = (coded_components >> 16) & 65535;
-  uint16 p4 = coded_components & 65535;
+  if (GetFormat() == Special) return;
+  uint16 p1 = (cd.coded_components >> 48) & 65535;
+  uint16 p2 = (cd.coded_components >> 32) & 65535;
+  uint16 p3 = (cd.coded_components >> 16) & 65535;
+  uint16 p4 = cd.coded_components & 65535;
   if (p1 != 0 && (p1 & 255) == 0) p1 += size;
   if (p2 != 0 && (p2 & 255) == 0) p2 += size;
   if (p3 != 0 && (p3 & 255) == 0) p3 += size;
   if (p4 != 0 && (p4 & 255) == 0) p4 += size;
-  coded_components = (uint64 (p1) << 48) + (uint64 (p2) << 32) + (p3 << 16) + p4;
+  cd.coded_components = (uint64 (p1) << 48) + (uint64 (p2) << 32) + (p3 << 16) + p4;
 }
 
 csString StructuredTextureFormat::GetCanonical ()
 {
-  if (format == Invalid) return csString ();
-  if (format == Special) return special;
+  if (cd.format == Invalid) return csString ();
+  if ((cd.format &  ~SpecialStrExtern) == Special) return GetSpecial();
   csString out;
-  uint16 p1 = (coded_components >> 48) & 65535;
-  uint16 p2 = (coded_components >> 32) & 65535;
-  uint16 p3 = (coded_components >> 16) & 65535;
-  uint16 p4 = coded_components & 65535;
+  uint16 p1 = (cd.coded_components >> 48) & 65535;
+  uint16 p2 = (cd.coded_components >> 32) & 65535;
+  uint16 p3 = (cd.coded_components >> 16) & 65535;
+  uint16 p4 = cd.coded_components & 65535;
   if (p1 != 0) { out += char ((p1>>8)&255); out += p1 & 255; }
   if (p2 != 0) { out += char ((p2>>8)&255); out += p2 & 255; }
   if (p3 != 0) { out += char ((p3>>8)&255); out += p3 & 255; }
   if (p4 != 0) { out += char ((p4>>8)&255); out += p4 & 255; }
   out += '_';
-  out += (char)format;
+  out += (char)cd.format;
   return out;
 }
 
 uint StructuredTextureFormat::GetComponentMask () const
 {
-  if ((format == Special) || (format == Invalid)) return 0;
+  if (((cd.format & ~SpecialStrExtern) == Special)
+      || (cd.format == Invalid))
+    return 0;
 
   uint mask = 0;
   for (int n = 0; n < 4; n++)
   {
-    char c =  (coded_components >> (16 * n + 8)) & 255;
+    char c =  (cd.coded_components >> (16 * n + 8)) & 255;
     switch (c)
     {
       case 0:   break;
