@@ -42,33 +42,12 @@ namespace Mesh
   struct iFurMesh;
 
 /**
- * Controller that updates the iFurMesh's geometry
+ * Simple Animation Controller
  */
-struct iFurPhysicsControl : public virtual iBase
+struct iFurAnimationControl : public virtual iBase
 {
 public:
-  SCF_INTERFACE (CS::Mesh::iFurPhysicsControl, 1, 0, 0);
-
-  /**
-   * Set iFurMesh's initial transform
-   */
-  virtual void SetInitialTransform(csReversibleTransform initialTransform) = 0;
-
-  /**
-   * Set the animesh on which the iFurMesh is attached
-   */
-  virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
-
-  /**
-   * Set the rigid body on which the iFurMesh is attached
-   */
-  virtual void SetRigidBody (iRigidBody* rigidBody) = 0;
-
-  /**
-   * Set the iDynamicSystem (optional)
-   */
-  virtual void SetBulletDynamicSystem (CS::Physics::Bullet::iDynamicSystem* 
-    bulletDynamicSystem) = 0;
+  SCF_INTERFACE (CS::Mesh::iFurAnimationControl, 1, 0, 0);
 
   /**
    * Initialize the fur strand with the given ID
@@ -100,6 +79,45 @@ public:
    * Remove all fur strands
    */
   virtual void RemoveAllStrands () = 0;
+};
+
+/**
+ * Controller that updates the iFurMesh's geometry
+ */
+struct iFurPhysicsControl : public virtual iFurAnimationControl
+{
+public:
+  SCF_INTERFACE (CS::Mesh::iFurPhysicsControl, 1, 0, 0);
+
+  /**
+   * Set the animesh on which the iFurMesh is attached
+   */
+  virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
+
+  /**
+   * Set the rigid body on which the iFurMesh is attached
+   */
+  virtual void SetRigidBody (iRigidBody* rigidBody) = 0;
+
+  /**
+   * Set the iDynamicSystem (optional)
+   */
+  virtual void SetBulletDynamicSystem (CS::Physics::Bullet::iDynamicSystem* 
+    bulletDynamicSystem) = 0;
+};
+
+/**
+ * Animation Controller for Animesh
+ */
+struct iFurAnimeshControl : public virtual iFurAnimationControl
+{
+public:
+  SCF_INTERFACE (CS::Mesh::iFurAnimeshControl, 1, 0, 0);
+
+  /**
+   * Set the animesh on which the iFurMesh is attached
+   */
+  virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
 };
 
 /**
@@ -155,6 +173,31 @@ struct iFurMeshType : public virtual iMeshObjectType
 {
 public:
   SCF_INTERFACE (CS::Mesh::iFurMeshType, 1, 0, 0);
+
+  /**
+   * Create a FurPhysicsControl using a cons char * as unique ID
+   */
+  virtual iFurAnimationControl* CreateFurPhysicsControl (const char* name) = 0;
+
+  /**
+   * Create a FurAnimeshControl using a cons char * as unique ID
+   */
+  virtual iFurAnimationControl* CreateFurAnimeshControl (const char* name) = 0;
+
+  /**
+   * Find iFurAnimationControl with ID name or return 0 otherwise.
+   */
+  virtual iFurAnimationControl* FindFurAnimationControl (const char* name) const = 0;
+
+  /**
+   * Remove iFurAnimationControl with ID name if exists.
+   */
+  virtual void RemoveFurAnimationControl (const char* name) = 0;
+
+  /**
+   * Remove all iFurAnimationControls.
+   */
+  virtual void ClearFurAnimationControls () = 0;
 };
 
 /**
@@ -191,24 +234,24 @@ struct iFurMesh : public virtual iBase
   /**
    * Set the associated iFurPhysicsControl
    */
-  virtual void SetPhysicsControl (iFurPhysicsControl* physicsControl) = 0;
+  virtual void SetAnimationControl (iFurAnimationControl* physicsControl) = 0;
   
   /**
    * Start the associated iFurPhysicsControl. 
    * Pure guide furs will be synchronized with the iFurPhysicsControl every frame
    */
-  virtual void StartPhysicsControl ( ) = 0;
+  virtual void StartAnimationControl ( ) = 0;
 
   /**
    * Stop the associated iFurPhysicsControl. 
    * Pure guide furs will stop being synchronized with the iFurPhysicsControl
    */
-  virtual void StopPhysicsControl ( ) = 0;
+  virtual void StopAnimationControl ( ) = 0;
  
   /**
    * Set the associated iFurMeshProperties
    */
-  virtual void SetFurStrandGenerator( iFurMeshProperties* furMeshProperties) = 0;
+  virtual void SetFurMeshProperties( iFurMeshProperties* furMeshProperties) = 0;
 
   /**
    * Get the associated iFurMeshProperties.

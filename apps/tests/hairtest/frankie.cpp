@@ -275,13 +275,6 @@ bool FrankieScene::CreateAvatar ()
   if (!plugmgr)
     return hairTest->ReportError("Failed to locate Plugin Manager!");
 
-  // Load animationPhysicsControl
-  csRef<CS::Mesh::iFurPhysicsControl> animationPhysicsControl = 
-    csLoadPlugin<CS::Mesh::iFurPhysicsControl>
-    (plugmgr, "crystalspace.physics.fur.animation");
-  if (!animationPhysicsControl)
-    return hairTest->ReportError("Failed to locate CS::Mesh::iFurPhysicsControl plugin!");
-
   // Load hairMeshProperties
   csRef<CS::Mesh::iFurMeshProperties> hairMeshProperties = 
     csQueryRegistry<CS::Mesh::iFurMeshProperties> (hairTest->object_reg);
@@ -303,6 +296,11 @@ bool FrankieScene::CreateAvatar ()
   csRef<iRigidBody> mainBody = ragdollNode->GetBoneRigidBody
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"));
 
+  // Load animationPhysicsControl
+  csRef<CS::Mesh::iFurAnimeshControl> animationPhysicsControl = 
+    scfQueryInterface<CS::Mesh::iFurAnimeshControl>
+      (furMeshType->CreateFurAnimeshControl("frankie_fur_animation"));
+
   animationPhysicsControl->SetAnimesh(animesh);
 
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
@@ -320,15 +318,15 @@ bool FrankieScene::CreateAvatar ()
   // Get reference to the iFurMesh interface
   furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
 
-  furMesh->SetPhysicsControl(animationPhysicsControl);
-  furMesh->SetFurStrandGenerator(hairMeshProperties);
+  furMesh->SetAnimationControl(animationPhysicsControl);
+  furMesh->SetFurMeshProperties(hairMeshProperties);
 
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(0)->GetFactorySubMesh());
   furMesh->SetBaseMaterial(baseMaterial->GetMaterial());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
-  furMesh->StartPhysicsControl();
+  furMesh->StartAnimationControl();
 
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);

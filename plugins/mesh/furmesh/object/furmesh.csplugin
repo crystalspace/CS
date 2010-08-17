@@ -12,22 +12,6 @@
         </requires>
       </class>
       <class>
-        <name>crystalspace.physics.fur.hair</name>
-        <implementation>HairPhysicsControl</implementation>
-        <description>Hair Physics Control Plugin</description>
-        <requires>
-          <class>crystalspace.graphics3d.</class>
-        </requires>
-      </class>
-      <class>
-        <name>crystalspace.physics.fur.animation</name>
-        <implementation>AnimationPhysicsControl</implementation>
-        <description>Animation Physics Control Plugin</description>
-        <requires>
-          <class>crystalspace.graphics3d.</class>
-        </requires>
-      </class> 
-      <class>
         <name>crystalspace.mesh.object.furmeshproperties</name>
         <implementation>HairMeshProperties</implementation>
         <description>Fur Mesh Properties Plugin</description>

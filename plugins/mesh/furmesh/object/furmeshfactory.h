@@ -56,10 +56,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     //-- iMeshObjectType
     virtual csPtr<iMeshObjectFactory> NewFactory ();
 
+    //-- iFurMeshType
+    virtual CS::Mesh::iFurAnimationControl* CreateFurPhysicsControl (const char* name);
+    virtual CS::Mesh::iFurAnimationControl* CreateFurAnimeshControl (const char* name);
+    virtual CS::Mesh::iFurAnimationControl* FindFurAnimationControl (const char* name) const;
+    virtual void RemoveFurAnimationControl (const char* name);
+    virtual void ClearFurAnimationControls ();
+
   private:
     iObjectRegistry* object_reg;
     // Pointer to the engine if available.
     iEngine *Engine;
+    csHash<csRef<CS::Mesh::iFurAnimationControl>, csString> furAnimationControlHash;
   };
 
   class FurMeshGeometry 

@@ -34,9 +34,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   CS_LEAKGUARD_IMPLEMENT(HairPhysicsControl);	
 
-  HairPhysicsControl::HairPhysicsControl (iBase* parent)
-    : scfImplementationType (this, parent), object_reg(0), rigidBody(0),
-    bulletDynamicSystem(0), animesh(0)
+  HairPhysicsControl::HairPhysicsControl (iBase *parent)
+    : scfImplementationType (this), rigidBody(0), bulletDynamicSystem(0), animesh(0)
   {
   }
 
@@ -45,17 +44,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     RemoveAllStrands();
   }
 
-  bool HairPhysicsControl::Initialize (iObjectRegistry* r)
-  {
-    object_reg = r;
-    return true;
-  }
-
   //-- iFurPhysicsControl
-  // No initial transformation specified / needed
-  void HairPhysicsControl::SetInitialTransform(csReversibleTransform)
-  {
-  }
 
   void HairPhysicsControl::SetAnimesh (CS::Mesh::iAnimatedMesh* animesh)
   {

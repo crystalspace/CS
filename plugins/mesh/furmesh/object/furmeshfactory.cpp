@@ -22,6 +22,8 @@
 #include <cssysdef.h>
 
 #include "furmesh.h"
+#include "hairphysicscontrol.h"
+#include "animationphysicscontrol.h"
 #include "furmeshfactory.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
@@ -87,6 +89,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csRef<iMeshObjectFactory> ref;
     ref.AttachNew (new FurMeshFactory(Engine, object_reg, this));
     return csPtr<iMeshObjectFactory> (ref);
+  }
+
+  CS::Mesh::iFurAnimationControl* FurMeshType::CreateFurPhysicsControl (const char* name)
+  {
+    csRef<CS::Mesh::iFurAnimationControl> newAnimationControl;
+    newAnimationControl.AttachNew(new HairPhysicsControl (this));
+    return furAnimationControlHash.PutUnique (name, newAnimationControl);
+  }
+
+  CS::Mesh::iFurAnimationControl* FurMeshType::CreateFurAnimeshControl (const char* name)
+  {
+    csRef<CS::Mesh::iFurAnimationControl> newAnimationControl;
+    newAnimationControl.AttachNew(new AnimationPhysicsControl (this));
+    return furAnimationControlHash.PutUnique (name, newAnimationControl);
+  }
+
+  CS::Mesh::iFurAnimationControl* FurMeshType::FindFurAnimationControl (const char* name) const
+  {
+    return furAnimationControlHash.Get (name, 0);
+  }
+
+  void FurMeshType::RemoveFurAnimationControl (const char* name)
+  {
+    CS::Mesh::iFurAnimationControl* newAnimationControl = FindFurAnimationControl(name);
+    
+    if (!newAnimationControl)
+      furAnimationControlHash.Delete (name, newAnimationControl);
+  }
+
+  void FurMeshType::ClearFurAnimationControls ()
+  {
+    furAnimationControlHash.DeleteAll ();
   }
 
   /********************

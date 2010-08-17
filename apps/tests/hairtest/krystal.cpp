@@ -134,19 +134,17 @@ void KrystalScene::SwitchFurPhysics()
   if (hairPhysicsEnabled)
   {
     furMesh->SetGuideLOD(0.0f);
-    furMesh->StopPhysicsControl();
-    animationPhysicsControl->
-      SetInitialTransform(headBody->GetTransform().GetInverse());
-    furMesh->SetPhysicsControl(animationPhysicsControl);
-    furMesh->StartPhysicsControl();
+    furMesh->StopAnimationControl();
+    furMesh->SetAnimationControl(animationPhysicsControl);
+    furMesh->StartAnimationControl();
     hairPhysicsEnabled = false;
   }
   else 
   {
     furMesh->SetGuideLOD(0.0f);
-    furMesh->StopPhysicsControl();
-    furMesh->SetPhysicsControl(hairPhysicsControl);
-    furMesh->StartPhysicsControl();
+    furMesh->StopAnimationControl();
+    furMesh->SetAnimationControl(hairPhysicsControl);
+    furMesh->StartAnimationControl();
     hairPhysicsEnabled = true;
   }
 }
@@ -207,18 +205,6 @@ bool KrystalScene::CreateAvatar ()
     csQueryRegistry<iPluginManager> (hairTest->object_reg);
   if (!plugmgr)
     return hairTest->ReportError("Failed to locate Plugin Manager!");
-
-  // Load hairPhysicsControl
-  hairPhysicsControl = csLoadPlugin<CS::Mesh::iFurPhysicsControl>
-    (plugmgr, "crystalspace.physics.fur.hair");
-  if (!hairPhysicsControl)
-    return hairTest->ReportError("Failed to locate CS::Mesh::iFurPhysicsControl plugin!");
-
-  // Load animationPhysicsControl
-  animationPhysicsControl = csLoadPlugin<CS::Mesh::iFurPhysicsControl>
-    (plugmgr, "crystalspace.physics.fur.animation");
-  if (!animationPhysicsControl)
-    return hairTest->ReportError("Failed to locate CS::Mesh::iFurPhysicsControl plugin!");
 
   // Load hairMeshProperties
   csRef<CS::Mesh::iFurMeshProperties> hairMeshProperties = 
@@ -376,6 +362,11 @@ bool KrystalScene::CreateAvatar ()
 
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
 
+  hairPhysicsControl = scfQueryInterface<CS::Mesh::iFurPhysicsControl>
+    (furMeshType->CreateFurPhysicsControl("krystal_hairs_physics"));
+  animationPhysicsControl = scfQueryInterface<CS::Mesh::iFurAnimeshControl>
+    (furMeshType->CreateFurAnimeshControl("krystal_hairs_animation"));
+
   hairPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
   hairPhysicsControl->SetRigidBody(headBody);
 //   hairPhysicsControl->SetAnimesh(animesh);
@@ -395,15 +386,15 @@ bool KrystalScene::CreateAvatar ()
   // Get reference to the iFurMesh interface
   furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
   
-  furMesh->SetPhysicsControl(animationPhysicsControl);
-  furMesh->SetFurStrandGenerator(hairMeshProperties);
+  furMesh->SetAnimationControl(animationPhysicsControl);
+  furMesh->SetFurMeshProperties(hairMeshProperties);
 
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
   furMesh->SetBaseMaterial(skullMaterial->GetMaterial());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
-  furMesh->StartPhysicsControl();
+  furMesh->StartAnimationControl();
 
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);

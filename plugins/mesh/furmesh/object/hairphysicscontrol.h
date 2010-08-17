@@ -28,20 +28,17 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
-  class HairPhysicsControl : public scfImplementation2 <HairPhysicsControl, 
-    CS::Mesh::iFurPhysicsControl, iComponent>
+  class HairPhysicsControl : public scfImplementation2 
+    <HairPhysicsControl, scfFakeInterface<CS::Mesh::iFurAnimationControl>, 
+    CS::Mesh::iFurPhysicsControl>
   {
   public:
     CS_LEAKGUARD_DECLARE(HairPhysicsControl);
 
-    HairPhysicsControl (iBase* parent);
+    HairPhysicsControl (iBase *parent);
     virtual ~HairPhysicsControl ();
 
-    //-- iComponent	
-    virtual bool Initialize (iObjectRegistry*);
-
     //-- iFurPhysicsControl
-    virtual void SetInitialTransform(csReversibleTransform initialTransform);
     virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh);
     virtual void SetRigidBody (iRigidBody* rigidBody);
     virtual void SetBulletDynamicSystem 
@@ -60,11 +57,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       csRef<CS::Physics::Bullet::iSoftBody> softBody;
     };
 
-    iObjectRegistry* object_reg;
     csHash<Anchor*, size_t > guideRopes;
     csRef<iRigidBody> rigidBody;
     csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
-    csRef<CS::Mesh::iAnimatedMesh> animesh;
+    CS::Mesh::iAnimatedMesh* animesh;
   };
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)

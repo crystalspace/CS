@@ -711,12 +711,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       "/data/krystal/krystal_skull_heightmap_debug.png");
   }
 
-  void FurMesh::SetPhysicsControl (CS::Mesh::iFurPhysicsControl* physicsControl)
+  void FurMesh::SetAnimationControl (CS::Mesh::iFurAnimationControl* physicsControl)
   {
     this->physicsControl = physicsControl;
   }
 
-  void FurMesh::StartPhysicsControl()
+  void FurMesh::StartAnimationControl()
   {
     if (!physicsControlEnabled)
     {
@@ -725,7 +725,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     }
   }
 
-  void FurMesh::StopPhysicsControl()
+  void FurMesh::StopAnimationControl()
   {
     if (physicsControlEnabled)
     {
@@ -745,7 +745,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->meshFactorySubMesh = meshFactorySubMesh;
   }
 
-  void FurMesh::SetFurStrandGenerator
+  void FurMesh::SetFurMeshProperties
     ( CS::Mesh::iFurMeshProperties* hairMeshProperties)
   {
     this->hairMeshProperties = hairMeshProperties;

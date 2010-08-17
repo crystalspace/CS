@@ -74,16 +74,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetStrandLOD(float strandLOD);
     virtual void SetLOD(float lod);
 
-    virtual void SetPhysicsControl (CS::Mesh::iFurPhysicsControl* physicsControl);
-    virtual void StartPhysicsControl ( );
-    virtual void StopPhysicsControl ( );
+    virtual void SetAnimationControl (CS::Mesh::iFurAnimationControl* physicsControl);
+    virtual void StartAnimationControl ( );
+    virtual void StopAnimationControl ( );
 
     virtual void SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory);
     virtual void SetMeshFactorySubMesh 
       ( CS::Mesh::iAnimatedMeshSubMeshFactory* meshFactorySubMesh );
     virtual void SetBaseMaterial ( iMaterial* baseMaterial );
 
-    virtual void SetFurStrandGenerator
+    virtual void SetFurMeshProperties
       ( CS::Mesh::iFurMeshProperties* hairMeshProperties);
     virtual CS::Mesh::iFurMeshProperties* GetFurStrandGenerator( ) const;
 
@@ -100,7 +100,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csArray<csGuideFur> guideFurs;
     csArray<csTriangle> guideFursTriangles;
     csArray<csGuideFurLOD> guideFursLOD;
-    csRef<CS::Mesh::iFurPhysicsControl> physicsControl;
+    csRef<CS::Mesh::iFurAnimationControl> physicsControl;
     csRef<CS::Mesh::iFurMeshProperties> hairMeshProperties;
     csVector3* positionShift;
     csRandomGen *rng;

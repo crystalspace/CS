@@ -29,23 +29,17 @@
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   class AnimationPhysicsControl : public scfImplementation2 
-    <AnimationPhysicsControl, CS::Mesh::iFurPhysicsControl, iComponent>
+    <AnimationPhysicsControl, scfFakeInterface<CS::Mesh::iFurAnimationControl>, 
+    CS::Mesh::iFurAnimeshControl>
   {
   public:
     CS_LEAKGUARD_DECLARE(AnimationPhysicsControl);
 
-    AnimationPhysicsControl (iBase* parent);
+    AnimationPhysicsControl (iBase *parent);
     virtual ~AnimationPhysicsControl ();
 
-    //-- iComponent
-    virtual bool Initialize (iObjectRegistry*);
-
     //-- iFurPhysicsControl
-    virtual void SetInitialTransform(csReversibleTransform ){}
     virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh);
-    virtual void SetRigidBody (iRigidBody* ){}
-    virtual void SetBulletDynamicSystem 
-      (CS::Physics::Bullet::iDynamicSystem* ){}
     virtual void InitializeStrand (size_t strandID, csVector3* coordinates,
       size_t coordinatesCount);
     virtual void AnimateStrand (size_t strandID, csVector3* coordinates, 
@@ -73,7 +67,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       Directions* direction;
     };
 
-    iObjectRegistry* object_reg;
     csHash<Anchor*, size_t> guideRopes;
     CS::Mesh::iAnimatedMesh* animesh; // use csRef here
   };

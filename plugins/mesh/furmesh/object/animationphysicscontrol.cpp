@@ -35,20 +35,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   CS_LEAKGUARD_IMPLEMENT(AnimationPhysicsControl);	
 
   AnimationPhysicsControl::AnimationPhysicsControl (iBase* parent)
-    : scfImplementationType (this, parent), object_reg(0), animesh(0)
+    : scfImplementationType (this), animesh(0)
   {
   }
 
   AnimationPhysicsControl::~AnimationPhysicsControl ()
   {
     RemoveAllStrands();
-  }
-
-  bool AnimationPhysicsControl::Initialize (iObjectRegistry* r)
-  {
-    // Default initial transformation
-    object_reg = r;
-    return true;
   }
 
   void AnimationPhysicsControl::SetAnimesh (CS::Mesh::iAnimatedMesh* animesh)
