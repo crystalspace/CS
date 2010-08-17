@@ -560,7 +560,9 @@ struct Common
     }*/
   }
 
-  void DrawMeshes(const NodePtr n,const csSectorVisibleRenderMeshes* meshList,const int numMeshes) const
+  void DrawMeshes(const NodePtr n,
+                  const csSectorVisibleRenderMeshes* meshList,
+                  const int numMeshes) const
   {
     for (int m = 0; m < numMeshes; ++m)
     {
@@ -604,7 +606,7 @@ struct InnerNodeProcessOP : public Common
     this->Queries=Queries;
   }
 
-  void RenderChildren(const NodePtr n, uint32 &frustum_mask) const
+  void RenderChildren(const NodePtr n, uint32 &frustum_mask, const bool markvisible) const
   {
     if(n->IsLeaf())
     {
@@ -617,6 +619,8 @@ struct InnerNodeProcessOP : public Common
         if(numMeshes > 0 )
         {
           DrawMeshes(n,meshList,numMeshes);
+          if(markvisible)
+            f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
         }
       }
     }
@@ -629,8 +633,8 @@ struct InnerNodeProcessOP : public Common
         const csVector3 direction = f2bData->rview->GetCamera()->GetTransform().GetFront();
         const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
 
-        RenderChildren( n->GetChild (firstIdx), frustum_mask);
-        RenderChildren( n->GetChild (1-firstIdx), frustum_mask);
+        RenderChildren( n->GetChild (firstIdx), frustum_mask, markvisible);
+        RenderChildren( n->GetChild (1-firstIdx), frustum_mask, markvisible);
       }
     }
   }
@@ -657,7 +661,7 @@ struct InnerNodeProcessOP : public Common
     n->SetCameraTimestamp(f2bData->rview->GetCamera(),f2bData->current_timestamp);
     if(n->GetQueryStatus()==QS_NOQUERY_ISSUED)
     {
-      if(n->GetVisibilityForCamera(f2bData->rview->GetCamera())==false)
+      /*if(n->GetVisibilityForCamera(f2bData->rview->GetCamera())==false)
       {
         n->SetQueryStatus(QS_PENDING_RESULT);
         n->BeginQuery();
@@ -669,21 +673,34 @@ struct InnerNodeProcessOP : public Common
       {
         n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
         return true;
+      }*/
+      if(n->GetVisibilityForCamera(f2bData->rview->GetCamera())==true)
+      {
+        n->SetQueryStatus(QS_PENDING_RESULT);
+        n->BeginQuery();
+        RenderChildren(n, frustum_mask, true);
+        n->EndQuery();
+        return false;
+      }
+      else
+      {
+        return true;
       }
     }
-    else //if(n->InnerQueryFinished())
+    else
     {
       if(CheckOQ(n))
       {
+        n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
         n->SetQueryStatus(QS_NOQUERY_ISSUED);
         return true;
       }
       else
       {
-        n->SetVisibilityForCamera(f2bData->rview->GetCamera(),false);
+        n->SetVisibilityForCamera(f2bData->rview->GetCamera(),true);
         n->SetQueryStatus(QS_PENDING_RESULT);
         n->BeginQuery();
-        RenderChildren(n, frustum_mask);
+        RenderChildren(n, frustum_mask, false);
         n->EndQuery();
         return false;
       }
@@ -732,7 +749,6 @@ struct LeafNodeProcessOP : public Common
   void NodeVisible(const NodePtr n,uint32 frustum_mask) const
   {
     iMeshWrapper* const mw=n->GetLeafData(0)->mesh;
-
     if(mw->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
       return;
     csSectorVisibleRenderMeshes* meshList;
@@ -756,12 +772,13 @@ struct LeafNodeProcessOP : public Common
       {
           if(n->GetVisibilityForCamera(cam))
           {
+            n->SetCameraTimestamp(cam, f2bData->current_timestamp);
             n->SetVisibilityForCamera(cam,true);
             PullUpVisibility(n);
             f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
           }
       }
-      else //if(IsQueryFinished(n,oqID))
+      else
       {
         if(CheckOQ(n,oqID))
         {
@@ -781,18 +798,6 @@ struct LeafNodeProcessOP : public Common
         n->SetQueryStatus(QS_PENDING_RESULT); // not really used, just here for completeness
         n->SetCameraTimestamp(cam, f2bData->current_timestamp);
       }
-      /*else // if we didn't get a result yet use previous result; important, it avoids flickering
-      {
-        if(n->GetVisibilityForCamera(cam))
-        {
-          PullUpVisibility(n);
-          f2bData->viscallback->MarkVisible(n->GetLeafData(0)->mesh, numMeshes, meshList);
-        }
-        else
-        {
-        }
-        n->SetCameraTimestamp(cam, f2bData->current_timestamp);
-      }*/
     }
   }
 
