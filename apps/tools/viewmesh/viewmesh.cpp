@@ -258,7 +258,7 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
     }
 
     bool needLODUpdate = false;
-    if (csKeyEventHelper::GetCookedCode (&ev) == '+'
+    if (csKeyEventHelper::GetCookedCode (&ev) == '-'
 	&& !auto_lod
 	&& lod_level < max_lod_level)
     {
@@ -266,7 +266,7 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
       needLODUpdate = true;
     }
 
-    else if (csKeyEventHelper::GetCookedCode (&ev) == '-'
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '+'
 	&& !auto_lod
 	&& lod_level > 0)
     {
