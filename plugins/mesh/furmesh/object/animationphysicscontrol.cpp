@@ -60,49 +60,100 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void AnimationPhysicsControl::InitializeStrand (size_t strandID, 
     csVector3* coordinates, size_t coordinatesCount)
   {
-    csFurData* guideHairAnimation = new csFurData;
-
-    guideHairAnimation->controlPointsCount = coordinatesCount;
-    guideHairAnimation->controlPoints = new csVector3[coordinatesCount];
-
-    for (size_t i = 0 ; i < coordinatesCount ; i ++)
-      guideHairAnimation->controlPoints[i] = coordinates[i];
+    if(!animesh || !coordinatesCount)
+      return;
 
     float closestDistance = 100000.0f;
     size_t closestVertex = (size_t) ~0;
 
-    if (animesh)
+    // Find the closest vertex of the animesh if asked for
+    csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (animesh);
+    csReversibleTransform& animeshTransform =
+      mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
+
+    // Create a walker for the position buffer of the animesh
+    csRenderBufferHolder holder;
+    animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
+    iRenderBuffer* positions = holder.GetRenderBuffer (CS_BUFFER_POSITION);
+    csVertexListWalker<float, csVector3> positionWalker (positions);
+
+    // Iterate on all vertices
+    for (size_t i = 0; i < positionWalker.GetSize (); i++)
     {
-      // Find the closest vertex of the animesh if asked for
-      csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (animesh);
-      csReversibleTransform& animeshTransform =
-        mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
+      float distance = (coordinates[0]
+      - animeshTransform.This2Other ((*positionWalker))).Norm ();
 
-      // Create a walker for the position buffer of the animesh
-      csRenderBufferHolder holder;
-      animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
-      iRenderBuffer* positions = holder.GetRenderBuffer (CS_BUFFER_POSITION);
-      csVertexListWalker<float, csVector3> positionWalker (positions);
-
-      // Iterate on all vertices
-      for (size_t i = 0; i < positionWalker.GetSize (); i++)
+      if (distance < closestDistance)
       {
-        float distance = (coordinates[0]
-        - animeshTransform.This2Other ((*positionWalker))).Norm ();
-
-        if (distance < closestDistance)
-        {
-          closestDistance = distance;
-          closestVertex = i;
-        }
-
-        ++positionWalker;
+        closestDistance = distance;
+        closestVertex = i;
       }
+
+      ++positionWalker;
+    }
+
+    Directions* dir = new Directions;
+    dir->count = coordinatesCount - 1;
+    SphericalCoordinates* sc = new SphericalCoordinates[coordinatesCount];
+
+    // Get spherical coordinates
+    if (closestVertex != (size_t) ~0)
+    {
+      csRenderBufferHolder holder;
+      animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_NORMAL);
+      csRenderBufferLock<csVector3> normals (holder.GetRenderBuffer (CS_BUFFER_NORMAL));
+      animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_TANGENT);
+      csRenderBufferLock<csVector3> tangents (holder.GetRenderBuffer (CS_BUFFER_TANGENT));
+      animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_BINORMAL);
+      csRenderBufferLock<csVector3> binormals (holder.GetRenderBuffer (CS_BUFFER_BINORMAL));
+
+      // Compute the new position of the anchor
+      csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (animesh);
+
+      csVector3 normal = mesh->GetMeshWrapper ()->GetMovable ()->
+        GetTransform ().This2Other (normals[closestVertex]);
+      normal.Normalize();
+      csVector3 tangent = mesh->GetMeshWrapper ()->GetMovable ()->
+        GetTransform ().This2Other (tangents[closestVertex]);
+      tangent.Normalize();
+      csVector3 binormal = mesh->GetMeshWrapper ()->GetMovable ()->
+        GetTransform ().This2Other (binormals[closestVertex]);
+      binormal.Normalize();
+
+      for (size_t i = 0 ; i < coordinatesCount - 1; i ++)
+      {
+        csVector3 direction = coordinates[i + 1] - coordinates[i];
+        float length = direction.Norm();
+        direction.Normalize();
+
+        sc[i].radius = length;
+
+        if ( fabs( normal * direction - 1 ) < EPSILON )
+          sc[i].inclination = 0;
+        else
+          sc[i].inclination = acos( normal * direction );
+
+        csVector3 projection = direction * sin ( sc[i].inclination );
+        projection.Normalize();
+
+        float sgn = acos( binormal * projection ) > PI / 2 ? -1 : 1;
+
+        if ( fabs( tangent * projection - 1 ) < EPSILON )
+          sc[i].azimuth = 0;
+        else
+          sc[i].azimuth = acos ( tangent * projection ) * sgn;
+
+//       csPrintf("%f %f \n", sc->inclination, sc->azimuth);
+//       csPrintf("%f %f %f %f %f\n", acos((float)(tangent * projection)), tangent * projection,
+//         projection.x, projection.y, projection.z);
+      }
+
+      dir->sc = sc;
     }
 
     Anchor *anchor = new Anchor;
-    anchor->furData = guideHairAnimation;
     anchor->animeshVertexIndex = closestVertex;
+    anchor->direction = dir;
 
     guideRopes.PutUnique(strandID, anchor);
   }
@@ -119,28 +170,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if (!anchor || anchor->animeshVertexIndex == (size_t) ~0)
       return;
 
+    CS_ASSERT(coordinatesCount - 1 == anchor->direction->count);
+
     // Create a walker for the position buffer of the animesh
     csRenderBufferHolder holder;
     animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
     csRenderBufferLock<csVector3> positions (holder.GetRenderBuffer (CS_BUFFER_POSITION));
+    animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_NORMAL);
+    csRenderBufferLock<csVector3> normals (holder.GetRenderBuffer (CS_BUFFER_NORMAL));
+    animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_TANGENT);
+    csRenderBufferLock<csVector3> tangents (holder.GetRenderBuffer (CS_BUFFER_TANGENT));
+    animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_BINORMAL);
+    csRenderBufferLock<csVector3> binormals (holder.GetRenderBuffer (CS_BUFFER_BINORMAL));
 
     // Compute the new position of the anchor
     csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (animesh);
-    csVector3 newPosition = mesh->GetMeshWrapper ()->GetMovable ()->
+
+    csVector3 position = mesh->GetMeshWrapper ()->GetMovable ()->
       GetTransform ().This2Other (positions[anchor->animeshVertexIndex]);
+    csVector3 normal = mesh->GetMeshWrapper ()->GetMovable ()->
+      GetTransform ().This2Other (normals[anchor->animeshVertexIndex]);
+    normal.Normalize();
+    csVector3 tangent = mesh->GetMeshWrapper ()->GetMovable ()->
+      GetTransform ().This2Other (tangents[anchor->animeshVertexIndex]);
+    tangent.Normalize();
+    csVector3 binormal = mesh->GetMeshWrapper ()->GetMovable ()->
+      GetTransform ().This2Other (binormals[anchor->animeshVertexIndex]);
+    binormal.Normalize();
 
-    csFurData *guideHairAnimation = anchor->furData;
+    coordinates[0] = position;
 
-    if (!guideHairAnimation || !guideHairAnimation->controlPointsCount)
-      return;
+    for (size_t i = 0 ; i < coordinatesCount - 1 ; i ++)
+    {
+      csVector3 direction = normal * cos (anchor->direction->sc[i].inclination) +
+        binormal * sin (anchor->direction->sc[i].inclination) *
+          sin (anchor->direction->sc[i].azimuth) + 
+        tangent * sin (anchor->direction->sc[i].inclination) * 
+          cos (anchor->direction->sc[i].azimuth);
+      direction.Normalize();
 
-    csVector3 direction = newPosition - guideHairAnimation->controlPoints[0];
-    float distance = csVector3::Norm(direction);
-    direction.Normalize();
-
-    for ( size_t i = 0 ; i < coordinatesCount ; i ++ )
-      coordinates[i] = guideHairAnimation->controlPoints[i] + 
-        distance * direction;
+      coordinates[i + 1] = coordinates[i] + 
+        direction * anchor->direction->sc[i].radius;
+    }
   }
 
   void AnimationPhysicsControl::RemoveStrand (size_t strandID)
@@ -150,16 +221,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if (!anchor)
       return;
 
-    csFurData* guideHairAnimation = anchor->furData;
-
     guideRopes.Delete(strandID, anchor);
+  
+    Directions* dir = anchor->direction;
 
-    if (guideHairAnimation->controlPoints && 
-        guideHairAnimation->controlPointsCount)
-      delete guideHairAnimation->controlPoints;
-
-    delete guideHairAnimation;
-
+    delete dir->sc;
+    
+    delete dir;
+    
     delete anchor;
   }
 
@@ -172,13 +241,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
       if (anchor)
       {
-        csFurData* guideHairAnimation = anchor->furData;
+        Directions* dir = anchor->direction;
 
-        if (guideHairAnimation->controlPoints && 
-            guideHairAnimation->controlPointsCount)
-          delete guideHairAnimation->controlPoints;
-      
-        delete guideHairAnimation;
+        delete dir->sc;
+
+        delete dir;
 
         delete anchor;
       }

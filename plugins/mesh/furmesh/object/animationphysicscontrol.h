@@ -54,10 +54,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void RemoveAllStrands ();
 
   private:
+    struct SphericalCoordinates
+    {
+      float radius;
+      float inclination;
+      float azimuth;
+    };
+
+    struct Directions
+    {
+      SphericalCoordinates *sc;
+      size_t count;
+    };
+
     struct Anchor
     {
       size_t animeshVertexIndex;
-      csFurData* furData;
+      Directions* direction;
     };
 
     iObjectRegistry* object_reg;
