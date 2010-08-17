@@ -220,6 +220,10 @@ public:
 				     csTriangle* triangles, size_t triangleCount);
   virtual void RemoveSoftBody (iSoftBody* body);
 
+ public:
+  void UpdateSoftBodies (btScalar timeStep);
+
+ private:
   virtual csPtr<iPivotJoint> CreatePivotJoint ();
   virtual void RemovePivotJoint (iPivotJoint* joint);
 

@@ -23,11 +23,13 @@
 #include "csutil/scf.h"
 #include "softanim.h"
 #include "ivaria/reporter.h"
+#include "ivaria/dynamics.h"
 #include "ivaria/bullet.h"
 #include "imesh/object.h"
 #include "imesh/objmodel.h"
 #include "iengine/mesh.h"
 #include "cstool/objmodel.h"
+#include "csgfx/vertexlistwalker.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 {
@@ -46,7 +48,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
   csPtr<iGenMeshAnimationControlFactory>
     SoftBodyControlType::CreateAnimationControlFactory ()
   {
-    SoftBodyControlFactory* control = new SoftBodyControlFactory ();
+    SoftBodyControlFactory* control = new SoftBodyControlFactory (this);
     return csPtr<iGenMeshAnimationControlFactory> (control);
   }
 
@@ -77,15 +79,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 
   CS_LEAKGUARD_IMPLEMENT(SoftBodyControlFactory);
 
-  SoftBodyControlFactory::SoftBodyControlFactory ()
-    : scfImplementationType (this)
+  SoftBodyControlFactory::SoftBodyControlFactory (SoftBodyControlType* type)
+    : scfImplementationType (this), type (type)
   {
   }
 
   csPtr<iGenMeshAnimationControl> SoftBodyControlFactory::CreateAnimationControl
     (iMeshObject* mesh)
   {
-    SoftBodyControl* control = new SoftBodyControl (mesh);
+    SoftBodyControl* control = new SoftBodyControl (this, mesh);
     return csPtr<iGenMeshAnimationControl> (control);
   }
 
@@ -103,14 +105,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 
   CS_LEAKGUARD_IMPLEMENT(SoftBodyControl);
 
-  SoftBodyControl::SoftBodyControl (iMeshObject* mesh)
-    : scfImplementationType (this), mesh (mesh), lastTicks (0),
+  SoftBodyControl::SoftBodyControl (SoftBodyControlFactory* factory, iMeshObject* mesh)
+    : scfImplementationType (this), factory (factory), mesh (mesh), lastTicks (0),
     meshPosition (0.0f)
   {
   }
 
   void SoftBodyControl::SetSoftBody (CS::Physics::Bullet::iSoftBody* body, bool doubleSided)
   {
+    CS_ASSERT (body);
+
     softBody = body;
     this->doubleSided = doubleSided;
     vertices.SetSize (softBody->GetVertexCount () * 2);
@@ -121,6 +125,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     for (size_t i = 0; i < softBody->GetVertexCount (); i++)
       meshPosition += softBody->GetVertexPosition (i);
     meshPosition /= softBody->GetVertexCount ();
+    mesh->GetMeshWrapper ()->GetMovable ()->SetTransform (csMatrix3 ());
 
     Update (0, 0, 0);
   }
@@ -128,6 +133,89 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
   CS::Physics::Bullet::iSoftBody* SoftBodyControl::GetSoftBody ()
   {
     return softBody;
+  }
+
+  void SoftBodyControl::CreateAnimatedMeshAnchor (CS::Mesh::iAnimatedMesh* animesh,
+						  iRigidBody* body,
+						  size_t bodyVertexIndex,
+						  size_t animeshVertexIndex)
+  {
+    CS_ASSERT (softBody);
+
+    RemoveAnimatedMeshAnchor (bodyVertexIndex);
+
+    // Find the closest vertex of the animesh if asked for
+    if (animeshVertexIndex == (size_t) ~0)
+    {
+      csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (animesh);
+      csReversibleTransform& animeshTransform =
+	mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
+
+      // Create a walker for the position buffer of the animesh
+      csRenderBufferHolder holder;
+      animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
+      iRenderBuffer* positions = holder.GetRenderBuffer (CS_BUFFER_POSITION);
+      csVertexListWalker<float, csVector3> positionWalker (positions);
+
+      // Iterate on all vertices
+      float closestDistance = 100000.0f;
+      size_t closestVertex = (size_t) ~0;
+      for (size_t i = 0; i < positionWalker.GetSize (); i++)
+      {
+	float distance = (softBody->GetVertexPosition (bodyVertexIndex)
+			  - animeshTransform.This2Other ((*positionWalker))).Norm ();
+	if (distance < closestDistance)
+	{
+	  closestDistance = distance;
+	  closestVertex = i;
+	}
+
+	++positionWalker;
+      }
+
+      CS_ASSERT(closestVertex != (size_t) ~0);
+      animeshVertexIndex = closestVertex;
+      printf ("closest %i\n", closestVertex);
+    }
+
+    // Save the anchor data
+    Anchor anchor;
+    anchor.animesh = animesh;
+    anchor.body = body;
+    anchor.bodyVertexIndex = bodyVertexIndex;
+    anchor.animeshVertexIndex = animeshVertexIndex;
+    anchors.Push (anchor);
+
+    // Create the soft body anchor 
+    softBody->AnchorVertex (bodyVertexIndex, body);
+
+    // TODO: move the body's vertex to the current position of the animesh vertex?
+  }
+
+  size_t SoftBodyControl::GetAnimatedMeshAnchorVertex (size_t bodyVertexIndex)
+  {
+    for (csArray<Anchor>::Iterator it = anchors.GetIterator (); it.HasNext (); )
+    {
+      Anchor& anchor = it.Next ();
+      if (anchor.bodyVertexIndex == bodyVertexIndex)
+	return anchor.animeshVertexIndex;
+    }
+    return (size_t) ~0;
+  }
+
+  void SoftBodyControl::RemoveAnimatedMeshAnchor (size_t bodyVertexIndex)
+  {
+    size_t i = 0;
+    for (csArray<Anchor>::Iterator it = anchors.GetIterator (); it.HasNext (); i++)
+    {
+      Anchor& anchor = it.Next ();
+      if (anchor.bodyVertexIndex == bodyVertexIndex)
+      {
+	anchors.DeleteIndex (i);
+	softBody->RemoveAnchor (bodyVertexIndex);
+	return;
+      }
+    }
   }
 
   bool SoftBodyControl::AnimatesColors () const
@@ -155,7 +243,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     if (!softBody)
       return;
 
-    // update the position of the vertices and compute the next position of the mesh
+    // Update the position of the vertices and compute the next position of the mesh
     csVector3 lastPosition = meshPosition;
     meshPosition.Set (0.0f);
     for (size_t i = 0; i < softBody->GetVertexCount (); i++)
@@ -174,15 +262,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     }
     meshPosition /= softBody->GetVertexCount ();
 
-    // update the position of the mesh
+    // Update the position of the mesh
     mesh->GetMeshWrapper ()->GetMovable ()->SetPosition (lastPosition);
     mesh->GetMeshWrapper ()->GetMovable ()->UpdateMove ();
 
-    // invalidate the vertices of the factory of the mesh. This will cause the genmesh
+    // Invalidate the vertices of the factory of the mesh. This will cause the genmesh
     // to recompute its bounding box.
     csRef<iGeneralFactoryState> meshState =
       scfQueryInterface<iGeneralFactoryState> (mesh->GetFactory());
     meshState->Invalidate ();
+
+    // Update the position of the anchors to the animeshes
+    for (csArray<Anchor>::Iterator it = anchors.GetIterator (); it.HasNext (); )
+    {
+      // TODO: check for changes of the animation version of the animesh
+      Anchor& anchor = it.Next ();
+
+      // Create a walker for the position buffer of the animesh
+      csRenderBufferHolder holder;
+      anchor.animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
+      csRenderBufferLock<csVector3> positions (holder.GetRenderBuffer (CS_BUFFER_POSITION));
+
+      // Compute the new position of the anchor
+      csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (anchor.animesh);
+      csVector3 newPosition =
+	mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ().This2Other
+	(positions[anchor.animeshVertexIndex]);
+      softBody->UpdateAnchor (anchor.bodyVertexIndex, newPosition);
+    }
   }
 
   const csColor4* SoftBodyControl::UpdateColors (csTicks current, const csColor4* colors,

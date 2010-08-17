@@ -402,6 +402,7 @@ bool KrystalScene::CreateAvatar ()
   randomNodeFactory->AddNode (idle06NodeFactory, 1.0f);
   randomNodeFactory->AddNode (standNodeFactory, 10.0f);
 
+  csRef<iSoftBodyAnimationControl> animationControl;
   if (avatarTest->physicsEnabled)
   {
     // Create a bone chain for the whole body and add it to the ragdoll controller.
@@ -436,13 +437,7 @@ bool KrystalScene::CreateAvatar ()
     CS::Animation::BoneID handBone =
       animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand");
     handEffector = IKNodeFactory->AddEffector (armChain, handBone, handOffset);
-
-    // Setup the IKPhysical interface
-    csRef<CS::Animation::iSkeletonIKPhysicalNodeFactory2> IKPhysicalNodeFactory =
-      scfQueryInterface<CS::Animation::iSkeletonIKPhysicalNodeFactory2> (IKNodeFactory);
-    if (!IKPhysicalNodeFactory)
-      return avatarTest->ReportError ("Can't find the IKPhysical interface of the IK plugin!");
-    IKPhysicalNodeFactory->SetChildNode (randomNodeFactory);
+    IKNodeFactory->SetChildNode (randomNodeFactory);
 
     // Setup of the soft bodies
     if (avatarTest->softBodiesEnabled)
@@ -463,7 +458,7 @@ bool KrystalScene::CreateAvatar ()
       // Init the animation control for the animation of the genmesh
       csRef<iGeneralMeshState> hairsMeshState =
 	scfQueryInterface<iGeneralMeshState> (hairsMesh->GetMeshObject ());
-      csRef<iSoftBodyAnimationControl> animationControl =
+      animationControl =
 	scfQueryInterface<iSoftBodyAnimationControl> (hairsMeshState->GetAnimationControl ());
       animationControl->SetSoftBody (hairsBody);
 
@@ -539,19 +534,19 @@ bool KrystalScene::CreateAvatar ()
       // Attach the skirt to the rigid body of the spine of Krystal.
       // The indices of the vertices have been found by a manual investigation
       // of the vertex list
-      skirtBody->AnchorVertex (7, spineBody);
-      skirtBody->AnchorVertex (8, spineBody);
-      skirtBody->AnchorVertex (10, spineBody);
-      skirtBody->AnchorVertex (67, spineBody);
-      skirtBody->AnchorVertex (68, spineBody);
-      skirtBody->AnchorVertex (69, spineBody);
-      skirtBody->AnchorVertex (70, spineBody);
-      skirtBody->AnchorVertex (71, spineBody);
-      skirtBody->AnchorVertex (76, spineBody);
-      skirtBody->AnchorVertex (77, spineBody);
-      skirtBody->AnchorVertex (78, spineBody);
-      skirtBody->AnchorVertex (79, spineBody);
-      skirtBody->AnchorVertex (80, spineBody);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 7, 5672);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 8, 5721);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 10, 5724);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 67, 4914);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 68, 4895);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 69, 8076);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 70, 5607);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 71, 5621);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 76, 4915);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 77, 4897);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 78, 5577);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 79, 5608);
+      animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 80, 4923);
     }
   }
 

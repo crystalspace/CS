@@ -107,6 +107,10 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
   csRef<AssetBase> asset;
 
+  int lod_level;
+  int max_lod_level;
+  bool auto_lod;
+
   void ResetCamera();
   void UpdateCamera();
   void FixCameraForOrigin(const csVector3 & desiredOrigin);

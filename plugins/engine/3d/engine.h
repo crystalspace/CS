@@ -188,8 +188,43 @@ public:
   virtual void FreeMesh (iMeshWrapper*);
 };
 
+/**
+ * An averaging variable. Stores the last 'bufsize' values in a circular
+ * buffer. Computes the average with method Average.
+ */
+template<typename T, int bufsize>
+class AverageVar
+{
+  T buf[bufsize];
+  int start, length;
+public:
+  AverageVar(): start(0), length(0) {}
+  void Add(T val)
+  {
+    buf[(start+length)%bufsize] = val;
+    length++;
+    if (length > bufsize)
+    {
+      length--;
+      start = (start+1)%bufsize;
+    }
+  }
+  T Average(int n) const
+  {
+    CS_ASSERT(n >= 1 && n <= bufsize);
+    T accum = 0;
+    int m = (n < length) ? n : length;
+    for (int i = 1; i <= m; i++)
+    {
+      accum += buf[(start+length-i)%bufsize];
+    }
+    return accum / m;
+  }
+};
+
 
 #include "csutil/deprecated_warn_off.h"
+
 
 using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
@@ -506,6 +541,14 @@ public:
     envTexHolder.NextFrame ();
     ControlMeshes ();
   }
+
+  //-- Adaptive LODs
+
+  virtual void EnableAdaptiveLODs(bool enable, float target_fps)
+  { bAdaptiveLODsEnabled = enable; adaptiveLODsTargetFPS = target_fps; }
+  virtual void UpdateAdaptiveLODs();
+  virtual float GetAdaptiveLODsMultiplier() const
+  { return (bAdaptiveLODsEnabled ? adaptiveLODsMultiplier : 1.0f); }
 
   //-- Saving/loading
 
@@ -1010,6 +1053,19 @@ private:
 
   /// To precache or not to precache....
   bool precache;
+
+  /// Average the elapsed time of the last 30 frames.
+  AverageVar<float, 30> virtualClockBuffer;
+
+  /// Whether to use adaptive LODs
+  bool bAdaptiveLODsEnabled;
+
+  /// User-specified target FPS for adaptive LODs
+  float adaptiveLODsTargetFPS;
+
+  /// If using adaptive LODs, this stores the computed adaptive LOD multiplier
+  float adaptiveLODsMultiplier;
+
 };
 
 #include "csutil/deprecated_warn_on.h"

@@ -26364,6 +26364,61 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iThreadedLoader_GetFlags(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iThreadedLoader *arg1 = (iThreadedLoader *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iThreadedLoader_GetFlags",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThreadedLoader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThreadedLoader_GetFlags" "', argument " "1"" of type '" "iThreadedLoader const *""'"); 
+  }
+  arg1 = reinterpret_cast< iThreadedLoader * >(argp1);
+  {
+    int const &_result_ref = ((iThreadedLoader const *)arg1)->GetFlags();
+    result = (int *) &_result_ref;
+  }
+  resultobj = SWIG_From_int(static_cast< int >(*result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iThreadedLoader_SetFlags(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iThreadedLoader *arg1 = (iThreadedLoader *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iThreadedLoader_SetFlags",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThreadedLoader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThreadedLoader_SetFlags" "', argument " "1"" of type '" "iThreadedLoader *""'"); 
+  }
+  arg1 = reinterpret_cast< iThreadedLoader * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iThreadedLoader_SetFlags" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  (arg1)->SetFlags(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iThreadedLoader(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iThreadedLoader *arg1 = (iThreadedLoader *) 0 ;
@@ -35734,6 +35789,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iThreadedLoader_AddMaterialToList", _wrap_iThreadedLoader_AddMaterialToList, METH_VARARGS, NULL},
 	 { (char *)"iThreadedLoader_AddSharedVarToList", _wrap_iThreadedLoader_AddSharedVarToList, METH_VARARGS, NULL},
 	 { (char *)"iThreadedLoader_MarkSyncDone", _wrap_iThreadedLoader_MarkSyncDone, METH_VARARGS, NULL},
+	 { (char *)"iThreadedLoader_GetFlags", _wrap_iThreadedLoader_GetFlags, METH_VARARGS, NULL},
+	 { (char *)"iThreadedLoader_SetFlags", _wrap_iThreadedLoader_SetFlags, METH_VARARGS, NULL},
 	 { (char *)"delete_iThreadedLoader", _wrap_delete_iThreadedLoader, METH_VARARGS, NULL},
 	 { (char *)"iThreadedLoader_swigregister", iThreadedLoader_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iLoader_LoadSoundSysData", _wrap_iLoader_LoadSoundSysData, METH_VARARGS, NULL},
@@ -37823,5 +37880,7 @@ SWIGEXPORT void SWIG_init(void) {
   
   SWIG_Python_SetConstant(d, "KEEP_ALL",SWIG_From_int(static_cast< int >(0)));
   SWIG_Python_SetConstant(d, "KEEP_USED",SWIG_From_int(static_cast< int >(1)));
+  SWIG_Python_SetConstant(d, "CS_LOADER_NONE",SWIG_From_int(static_cast< int >(0)));
+  SWIG_Python_SetConstant(d, "CS_LOADER_CREATE_DUMMY_MATS",SWIG_From_int(static_cast< int >(1)));
 }
 

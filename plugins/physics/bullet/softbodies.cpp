@@ -123,6 +123,62 @@ void csBulletSoftBody::AnchorVertex (size_t vertexIndex, ::iRigidBody* body)
   this->body->appendAnchor (vertexIndex, rigidBody->body);
 }
 
+void csBulletSoftBody::AnchorVertex (size_t vertexIndex,
+				     iAnchorAnimationControl* controller)
+{
+  AnimatedAnchor anchor (vertexIndex, controller);
+  animatedAnchors.Push (anchor);
+}
+
+void csBulletSoftBody::UpdateAnchor (size_t vertexIndex, csVector3& position)
+{
+  CS_ASSERT(vertexIndex < (size_t) body->m_nodes.size ());
+
+  // Update the local position of the anchor
+  for (int i = 0; i < this->body->m_anchors.size (); i++)
+    if (this->body->m_anchors[i].m_node == &this->body->m_nodes[vertexIndex])
+    {
+      this->body->m_anchors[i].m_local =
+	this->body->m_anchors[i].m_body->getInterpolationWorldTransform ().inverse ()
+	* CSToBullet (position, dynSys->internalScale);
+      return;
+    }
+}
+
+void csBulletSoftBody::RemoveAnchor (size_t vertexIndex)
+{
+  CS_ASSERT(vertexIndex < (size_t) body->m_nodes.size ());
+
+  // Check if it is a fixed anchor
+  if (body->getMass (vertexIndex) < SMALL_EPSILON)
+  {
+    body->setMass (vertexIndex, body->getTotalMass () / body->m_nodes.size ());
+    return;
+  }
+
+  // Check if it is an animated anchor
+  size_t index = 0;
+  for (csArray<AnimatedAnchor>::Iterator it = animatedAnchors.GetIterator (); it.HasNext (); index++)
+  {
+    AnimatedAnchor& anchor = it.Next ();
+    if (anchor.vertexIndex == vertexIndex)
+    {
+      animatedAnchors.DeleteIndex (index);
+      return;
+    }
+  }
+
+  // Check if it is a simple 'rigid body' anchor
+  for (int i = 0; i < this->body->m_anchors.size (); i++)
+    if (this->body->m_anchors[i].m_node == &this->body->m_nodes[vertexIndex])
+    {
+      // TODO: this is not possible within Bullet
+      //btSoftBody::Anchor* anchor = this->body->m_anchors[i];
+      //this->body->m_anchors.remove (i);
+      return;
+    }
+}
+
 void csBulletSoftBody::SetRigidity (float rigidity)
 {
   CS_ASSERT(rigidity >= 0.0f && rigidity <= 1.0f);
@@ -176,6 +232,29 @@ csTriangle csBulletSoftBody::GetTriangle (size_t index) const
   return csTriangle (face.m_n[0] - &body->m_nodes[0],
 		     face.m_n[1] - &body->m_nodes[0],
 		     face.m_n[2] - &body->m_nodes[0]);
+}
+
+void csBulletSoftBody::UpdateAnchorPositions ()
+{
+  for (csArray<AnimatedAnchor>::Iterator it = animatedAnchors.GetIterator (); it.HasNext (); )
+  {
+    AnimatedAnchor& anchor = it.Next ();
+    anchor.position = CSToBullet (anchor.controller->GetAnchorPosition (), dynSys->internalScale);
+  }
+}
+
+void csBulletSoftBody::UpdateAnchorInternalTick (btScalar timeStep)
+{
+  for (csArray<AnimatedAnchor>::Iterator it = animatedAnchors.GetIterator (); it.HasNext (); )
+  {
+    AnimatedAnchor& anchor = it.Next ();
+
+    btVector3 delta = anchor.position - body->m_nodes[anchor.vertexIndex].m_x;
+    static const btScalar maxdrag = 10;
+    if (delta.length2 () > maxdrag * maxdrag)
+      delta = delta.normalized() * maxdrag;
+    body->m_nodes[anchor.vertexIndex].m_v += delta / timeStep;
+  }  
 }
 
 }

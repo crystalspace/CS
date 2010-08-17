@@ -1,0 +1,9 @@
+SubDir TOP apps tools lod ;
+
+Description lod : "LOD tool" ;
+Application lod : lod.cpp lod.h LodGen.cpp LodGen.h : console noinstall ;
+LinkWith lod : crystalspace ;
+
+Description lodview : "LOD viewer" ;
+Application lodview : LodView.cpp LodView.h : noinstall ;
+LinkWith lodview : crystalspace ;
