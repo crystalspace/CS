@@ -62,7 +62,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     iEngine *Engine;
   };
 
-  class CS_CRYSTALSPACE_EXPORT FurMeshGeometry 
+  class FurMeshGeometry 
   {
   public:
     CS_LEAKGUARD_DECLARE(FurMeshGeometry);
