@@ -26,7 +26,7 @@
 #define CAMERA_HIPS_DISTANCE 3.0f
 
 KrystalScene::KrystalScene (HairTest* hairTest)
-: hairTest (hairTest), hairPhysicsEnabled(true)
+: hairTest (hairTest), hairPhysicsEnabled(false)
 {
   // Define the available keys
   hairTest->hudHelper.keyDescriptions.DeleteAll ();
@@ -346,7 +346,7 @@ bool KrystalScene::CreateAvatar ()
     ragdollNode->Play ();
   }
 
-  headBody = ragdollNode->GetBoneRigidBody
+  csRef<iRigidBody> headBody = ragdollNode->GetBoneRigidBody
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
 
   // Load fur material

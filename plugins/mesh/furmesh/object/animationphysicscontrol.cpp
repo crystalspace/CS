@@ -134,7 +134,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         csVector3 projection = direction * sin ( sc[i].inclination );
         projection.Normalize();
 
-        float sgn = acos( binormal * projection ) > PI / 2 ? -1 : 1;
+        float sgn;
+
+        if ( fabs( binormal * projection - 1 ) < EPSILON)
+          sgn = 1;
+        else
+          sgn = acos( binormal * projection ) > PI / 2 ? -1 : 1;
 
         if ( fabs( tangent * projection - 1 ) < EPSILON )
           sc[i].azimuth = 0;

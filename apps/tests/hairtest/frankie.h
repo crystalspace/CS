@@ -61,6 +61,11 @@ private:
   
   // Morphing related
   float smileWeight;
+
+  // Fur physics
+  bool furPhysicsEnabled;
+  csRef<CS::Mesh::iFurPhysicsControl> furPhysicsControl;
+  csRef<CS::Mesh::iFurAnimeshControl> animationPhysicsControl;
 };
 
 #endif // __FRANKIE_H__

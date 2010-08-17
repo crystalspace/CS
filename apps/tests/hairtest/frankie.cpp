@@ -23,7 +23,7 @@
 #include "frankie.h"
 
 FrankieScene::FrankieScene (HairTest* hairTest)
-  : hairTest (hairTest)
+  : hairTest (hairTest), furPhysicsEnabled(false)
 {
   // Define the available keys
   hairTest->hudHelper.keyDescriptions.DeleteAll ();
@@ -297,11 +297,17 @@ bool FrankieScene::CreateAvatar ()
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"));
 
   // Load animationPhysicsControl
-  csRef<CS::Mesh::iFurAnimeshControl> animationPhysicsControl = 
-    scfQueryInterface<CS::Mesh::iFurAnimeshControl>
+  animationPhysicsControl = scfQueryInterface<CS::Mesh::iFurAnimeshControl>
       (furMeshType->CreateFurAnimeshControl("frankie_fur_animation"));
 
   animationPhysicsControl->SetAnimesh(animesh);
+
+  furPhysicsControl = scfQueryInterface<CS::Mesh::iFurPhysicsControl>
+    (furMeshType->CreateFurPhysicsControl("frankie_fur_physics"));
+
+  furPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
+  furPhysicsControl->SetRigidBody(mainBody);
+  furPhysicsControl->SetAnimesh(animesh);
 
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
 
@@ -375,5 +381,25 @@ void FrankieScene::UpdateStateDescription ()
 
 void FrankieScene::SwitchFurPhysics()
 {
+  if (!furMesh)
+    return;
+
+  // Disable ropes
+  if (furPhysicsEnabled)
+  {
+    furMesh->SetGuideLOD(0.0f);
+    furMesh->StopAnimationControl();
+    furMesh->SetAnimationControl(animationPhysicsControl);
+    furMesh->StartAnimationControl();
+    furPhysicsEnabled = false;
+  }
+  else 
+  {
+    furMesh->SetGuideLOD(0.0f);
+    furMesh->StopAnimationControl();
+    furMesh->SetAnimationControl(furPhysicsControl);
+    furMesh->StartAnimationControl();
+    furPhysicsEnabled = true;
+  }
 }
 

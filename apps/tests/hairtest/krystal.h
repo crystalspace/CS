@@ -65,7 +65,6 @@ private:
   bool hairPhysicsEnabled;
   csRef<CS::Mesh::iFurPhysicsControl> hairPhysicsControl;
   csRef<CS::Mesh::iFurAnimeshControl> animationPhysicsControl;
-  csRef<iRigidBody> headBody;
 };
 
 #endif // __KRYSTAL_H__
