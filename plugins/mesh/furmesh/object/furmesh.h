@@ -33,7 +33,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   class FurMesh : public 
-    scfImplementationExt1<FurMesh, csMeshObject, CS::Mesh::iFurMesh>
+    scfImplementationExt1<FurMesh, csMeshObject, CS::Mesh::iFurMesh>, public FurMeshGeometry
   {
   public:
     CS_LEAKGUARD_DECLARE(FurMesh);
@@ -93,7 +93,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csDirtyAccessArray<csRenderMesh*> renderMeshes;
     iObjectRegistry* object_reg;
     iMeshObjectFactory* object_factory;
-    csRef<CS::Mesh::iFurMeshFactory> factory;
     iEngine* engine;
     // Fur data
     csRef<iView> view;

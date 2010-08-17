@@ -33,9 +33,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   CS_LEAKGUARD_IMPLEMENT(FurMeshFactory);
 
   FurMeshFactory::FurMeshFactory (iEngine *e, iObjectRegistry* reg, 
-    iMeshObjectType* type) : scfImplementationType(this, e, reg, type), 
-    indexCount(0), vertexCount(0), indexBuffer(0), vertexBuffer(0), 
-    texcoordBuffer(0), tangentBuffer(0), binormalBuffer(0)
+    iMeshObjectType* type) : scfImplementationType(this, e, reg, type)
   {
   }
 
@@ -50,8 +48,66 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return csPtr<iMeshObject> (ref);
   }
 
+  /********************
+  *  FurMeshType
+  ********************/
+
+  SCF_IMPLEMENT_FACTORY (FurMeshType)
+
+  CS_LEAKGUARD_IMPLEMENT(FurMeshType);
+
+  FurMeshType::FurMeshType (iBase* parent) :
+  scfImplementationType (this, parent),
+    object_reg(0), Engine(0)
+  {
+  }
+
+  FurMeshType::~FurMeshType ()
+  {
+  }
+
+  bool FurMeshType::Initialize (iObjectRegistry* r)
+  {
+    csRef<iEngine> e = csQueryRegistry<iEngine> (r);
+    Engine = e;
+
+    // This should not happen
+    if (!e)
+    {
+      csPrintfErr("Could not find engine!\n");
+      return false;
+    }
+
+    object_reg = r;
+    return true;
+  }
+
+  csPtr<iMeshObjectFactory> FurMeshType::NewFactory ()
+  {
+    csRef<iMeshObjectFactory> ref;
+    ref.AttachNew (new FurMeshFactory(Engine, object_reg, this));
+    return csPtr<iMeshObjectFactory> (ref);
+  }
+
+  /********************
+  *  FurMeshGeometry
+  ********************/
+
+  CS_LEAKGUARD_IMPLEMENT(FurMeshGeometry);
+
+  FurMeshGeometry::FurMeshGeometry () : 
+    indexCount(0), vertexCount(0), indexBuffer(0), vertexBuffer(0), 
+    texcoordBuffer(0), tangentBuffer(0), binormalBuffer(0)
+  {
+  }
+
+  FurMeshGeometry::~FurMeshGeometry ()
+  {
+  }
+
+
   // Also allocates the vertex render buffers
-  void FurMeshFactory::SetVertexCount (uint n)
+  void FurMeshGeometry::SetVertexCount (uint n)
   {
     vertexCount = n;
 
@@ -88,7 +144,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   // Also allocates the index render buffer
   // The index buffer will be 3 * n, set triangle count not index count
-  void FurMeshFactory::SetTriangleCount (uint n)
+  void FurMeshGeometry::SetTriangleCount (uint n)
   {
     if (!vertexCount)
       return;
@@ -102,22 +158,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       csPrintfErr("Could not create index buffer!\n");
   }
 
-  uint FurMeshFactory::GetVertexCount() const
+  uint FurMeshGeometry::GetVertexCount() const
   {
     return vertexCount;
   }
 
-  uint FurMeshFactory::GetIndexCount() const
+  uint FurMeshGeometry::GetIndexCount() const
   {
     return indexCount;
   }
 
-  iRenderBuffer* FurMeshFactory::GetIndices () const
+  iRenderBuffer* FurMeshGeometry::GetIndices () const
   {
     return indexBuffer;
   }
 
-  bool FurMeshFactory::SetIndices (iRenderBuffer* renderBuffer)
+  bool FurMeshGeometry::SetIndices (iRenderBuffer* renderBuffer)
   {
     if (!renderBuffer)
       return false;
@@ -130,12 +186,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  iRenderBuffer* FurMeshFactory::GetVertices () const
+  iRenderBuffer* FurMeshGeometry::GetVertices () const
   {
     return vertexBuffer;
   }
 
-  bool FurMeshFactory::SetVertices (iRenderBuffer* renderBuffer)
+  bool FurMeshGeometry::SetVertices (iRenderBuffer* renderBuffer)
   {
     if (!renderBuffer)
       return false;
@@ -149,12 +205,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  iRenderBuffer* FurMeshFactory::GetTexCoords () const
+  iRenderBuffer* FurMeshGeometry::GetTexCoords () const
   {
     return texcoordBuffer;
   }
 
-  bool FurMeshFactory::SetTexCoords (iRenderBuffer* renderBuffer)
+  bool FurMeshGeometry::SetTexCoords (iRenderBuffer* renderBuffer)
   {
     if (!renderBuffer)
       return false;
@@ -166,12 +222,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  iRenderBuffer* FurMeshFactory::GetNormals () const
+  iRenderBuffer* FurMeshGeometry::GetNormals () const
   {
     return normalBuffer;
   }
 
-  bool FurMeshFactory::SetNormals (iRenderBuffer* renderBuffer)
+  bool FurMeshGeometry::SetNormals (iRenderBuffer* renderBuffer)
   {
     if (!renderBuffer)
       return false;
@@ -183,12 +239,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  iRenderBuffer* FurMeshFactory::GetTangents () const
+  iRenderBuffer* FurMeshGeometry::GetTangents () const
   {
     return tangentBuffer;
   }
 
-  bool FurMeshFactory::SetTangents (iRenderBuffer* renderBuffer)
+  bool FurMeshGeometry::SetTangents (iRenderBuffer* renderBuffer)
   {
     if (!renderBuffer)
       return false;
@@ -200,12 +256,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return true;
   }
 
-  iRenderBuffer* FurMeshFactory::GetBinormals () const
+  iRenderBuffer* FurMeshGeometry::GetBinormals () const
   {
     return binormalBuffer;
   }
 
-  bool FurMeshFactory::SetBinormals (iRenderBuffer* renderBuffer)
+  bool FurMeshGeometry::SetBinormals (iRenderBuffer* renderBuffer)
   { 
     if (!renderBuffer)
       return false;
@@ -215,47 +271,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     binormalBuffer = renderBuffer;    
     return true;
-  }
-
-  /********************
-  *  FurMeshType
-  ********************/
-
-  SCF_IMPLEMENT_FACTORY (FurMeshType)
-
-    CS_LEAKGUARD_IMPLEMENT(FurMeshType);
-
-  FurMeshType::FurMeshType (iBase* parent) :
-  scfImplementationType (this, parent),
-    object_reg(0), Engine(0)
-  {
-  }
-
-  FurMeshType::~FurMeshType ()
-  {
-  }
-
-  bool FurMeshType::Initialize (iObjectRegistry* r)
-  {
-    csRef<iEngine> e = csQueryRegistry<iEngine> (r);
-    Engine = e;
-
-    // This should not happen
-    if (!e)
-    {
-      csPrintfErr("Could not find engine!\n");
-      return false;
-    }
-
-    object_reg = r;
-    return true;
-  }
-
-  csPtr<iMeshObjectFactory> FurMeshType::NewFactory ()
-  {
-    csRef<iMeshObjectFactory> ref;
-    ref.AttachNew (new FurMeshFactory(Engine, object_reg, this));
-    return csPtr<iMeshObjectFactory> (ref);
   }
 
 }

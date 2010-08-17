@@ -39,6 +39,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     //-- csMeshFactory	
     virtual csPtr<iMeshObject> NewInstance ();
     virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
+  };
+
+  class FurMeshType : public 
+    scfImplementation2<FurMeshType,CS::Mesh::iFurMeshType,iComponent>
+  {
+  public:
+    CS_LEAKGUARD_DECLARE(FurMeshType);
+
+    FurMeshType (iBase* parent);
+    virtual ~FurMeshType ();
+
+    //-- iComponent	
+    virtual bool Initialize (iObjectRegistry*);
+
+    //-- iMeshObjectType
+    virtual csPtr<iMeshObjectFactory> NewFactory ();
+
+  private:
+    iObjectRegistry* object_reg;
+    // Pointer to the engine if available.
+    iEngine *Engine;
+  };
+
+  class CS_CRYSTALSPACE_EXPORT FurMeshGeometry 
+  {
+  public:
+    CS_LEAKGUARD_DECLARE(FurMeshGeometry);
+
+    FurMeshGeometry ();
+    virtual ~FurMeshGeometry ();
 
     // Direct geometry access
     //-- iFurMeshFactory	
@@ -71,27 +101,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csRef<iRenderBuffer> normalBuffer;
     csRef<iRenderBuffer> tangentBuffer;
     csRef<iRenderBuffer> binormalBuffer;
-  };
-
-  class FurMeshType : public 
-    scfImplementation2<FurMeshType,CS::Mesh::iFurMeshType,iComponent>
-  {
-  public:
-    CS_LEAKGUARD_DECLARE(FurMeshType);
-
-    FurMeshType (iBase* parent);
-    virtual ~FurMeshType ();
-
-    //-- iComponent	
-    virtual bool Initialize (iObjectRegistry*);
-
-    //-- iMeshObjectType
-    virtual csPtr<iMeshObjectFactory> NewFactory ();
-
-  private:
-    iObjectRegistry* object_reg;
-    // Pointer to the engine if available.
-    iEngine *Engine;
   };
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)

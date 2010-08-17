@@ -56,8 +56,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if (!engine) printf ("Failed to locate 3D engine!");
 
     rng = new csRandomGen(csGetTicks());
-
-    factory = scfQueryInterface<CS::Mesh::iFurMeshFactory>(object_factory);
   }
 
   FurMesh::~FurMesh ()
@@ -119,18 +117,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::UpdateObjectBoundingBox ()
   {
-    if (!factory->GetVertexCount())
+    if (!GetVertexCount())
       return;
 
     boundingbox.StartBoundingBox();
     
     csVector3* vertex_buffer = 
-      (csVector3*)factory->GetVertices()->Lock (CS_BUF_LOCK_READ);
+      (csVector3*)GetVertices()->Lock (CS_BUF_LOCK_READ);
 
-    for (size_t i = 0 ; i < factory->GetVertexCount(); i ++)
+    for (size_t i = 0 ; i < GetVertexCount(); i ++)
       boundingbox.AddBoundingVertex(vertex_buffer[i]);
 
-    factory->GetVertices()->Release();
+    GetVertices()->Release();
   }
 
   CS::Graphics::RenderMesh** FurMesh::GetRenderMeshes (int& num, 
@@ -186,7 +184,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     meshPtr->object2world = o2wt;
     meshPtr->bbox = GetObjectBoundingBox();
-    meshPtr->geometryInstance = factory;
+    meshPtr->geometryInstance = object_factory;
     meshPtr->variablecontext = svContext;
 
     renderMeshes.Push (meshPtr);    
@@ -253,15 +251,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       controlPointsCount += furStrands.Get(i).controlPointsCount;
 
     // First create the factory
-    factory->SetVertexCount ( 2 * controlPointsCount );
-    factory->SetTriangleCount( 2 * ( controlPointsCount - numberOfStrains ) );
+    SetVertexCount ( 2 * controlPointsCount );
+    SetTriangleCount( 2 * ( controlPointsCount - numberOfStrains ) );
 
     csVector3* vbuf = 
-      (csVector3*)factory->GetVertices()->Lock (CS_BUF_LOCK_NORMAL);
+      (csVector3*)GetVertices()->Lock (CS_BUF_LOCK_NORMAL);
     csVector2* uv = 
-      (csVector2*)factory->GetTexCoords()->Lock (CS_BUF_LOCK_NORMAL);
+      (csVector2*)GetTexCoords()->Lock (CS_BUF_LOCK_NORMAL);
     csTriangle* ibuf = 
-      (csTriangle*)factory->GetIndices()->Lock (CS_BUF_LOCK_NORMAL);
+      (csTriangle*)GetIndices()->Lock (CS_BUF_LOCK_NORMAL);
 
     for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
       controlPointSum += furStrands.Get(x).controlPointsCount, x++ )
@@ -289,13 +287,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       }
     }
 
-    factory->GetVertices()->Release();
-    factory->GetTexCoords()->Release();
-    factory->GetIndices()->Release();
+    GetVertices()->Release();
+    GetTexCoords()->Release();
+    GetIndices()->Release();
 
     // Generate color deviation and UV 
     csVector3* bin = (csVector3*) 
-      factory->GetBinormals()->Lock(CS_BUF_LOCK_NORMAL);
+      GetBinormals()->Lock(CS_BUF_LOCK_NORMAL);
 
     for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
       controlPointSum += furStrands.Get(x).controlPointsCount, x++ )
@@ -317,7 +315,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       }
     }
 
-    factory->GetBinormals()->Release();
+    GetBinormals()->Release();
 
     // Generate position deviation
     positionShift = new csVector3 [ controlPointsCount ];
@@ -339,33 +337,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     // Get the buffer holder
     bufferholder.AttachNew (new csRenderBufferHolder);
-    bufferholder->SetRenderBuffer (CS_BUFFER_INDEX, factory->GetIndices());
-    bufferholder->SetRenderBuffer (CS_BUFFER_POSITION, factory->GetVertices());
-    bufferholder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->GetTexCoords());
-    bufferholder->SetRenderBuffer (CS_BUFFER_NORMAL, factory->GetNormals());
-    bufferholder->SetRenderBuffer (CS_BUFFER_BINORMAL, factory->GetBinormals());
-    bufferholder->SetRenderBuffer (CS_BUFFER_TANGENT, factory->GetTangents());
+    bufferholder->SetRenderBuffer (CS_BUFFER_INDEX, GetIndices());
+    bufferholder->SetRenderBuffer (CS_BUFFER_POSITION, GetVertices());
+    bufferholder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, GetTexCoords());
+    bufferholder->SetRenderBuffer (CS_BUFFER_NORMAL, GetNormals());
+    bufferholder->SetRenderBuffer (CS_BUFFER_BINORMAL, GetBinormals());
+    bufferholder->SetRenderBuffer (CS_BUFFER_TANGENT, GetTangents());
 
     svContext.AttachNew (new csShaderVariableContext);
     csShaderVariable* sv;
 
     // Get the SV names
     sv = svContext->GetVariableAdd (svStrings->Request ("position"));
-    sv->SetValue (factory->GetVertices());
+    sv->SetValue (GetVertices());
 
     sv = svContext->GetVariableAdd (svStrings->Request ("normal"));
-    sv->SetValue (factory->GetNormals());
+    sv->SetValue (GetNormals());
 
     sv = svContext->GetVariableAdd (svStrings->Request ("texture coordinate 0"));
-    sv->SetValue (factory->GetTexCoords());
+    sv->SetValue (GetTexCoords());
 
     sv = svContext->GetVariableAdd (svStrings->Request ("tangent"));
-    sv->SetValue (factory->GetTangents());
+    sv->SetValue (GetTangents());
 
     sv = svContext->GetVariableAdd (svStrings->Request ("binormal"));
-    sv->SetValue (factory->GetBinormals());
+    sv->SetValue (GetBinormals());
 
-    SetIndexRange(0, (uint)factory->GetIndices()->GetElementCount());
+    SetIndexRange(0, (uint)GetIndices()->GetElementCount());
   }
 
   void FurMesh::GenerateGuideHairs()
@@ -882,13 +880,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     const csOrthoTransform& tc = view -> GetCamera() ->GetTransform ();
 
     csVector3* vbuf = 
-      (csVector3*)factory->GetVertices()->Lock(CS_BUF_LOCK_NORMAL);
+      (csVector3*)GetVertices()->Lock(CS_BUF_LOCK_NORMAL);
     csVector3* normals = 
-      (csVector3*)factory->GetNormals()->Lock(CS_BUF_LOCK_NORMAL); 
+      (csVector3*)GetNormals()->Lock(CS_BUF_LOCK_NORMAL); 
     csVector3* tangents = 
-      (csVector3*)factory->GetTangents()->Lock(CS_BUF_LOCK_NORMAL);
+      (csVector3*)GetTangents()->Lock(CS_BUF_LOCK_NORMAL);
     csVector3* binormals = 
-      (csVector3*)factory->GetBinormals()->Lock(CS_BUF_LOCK_READ);
+      (csVector3*)GetBinormals()->Lock(CS_BUF_LOCK_READ);
 
     csVector3 normal, tangent, binormal, cameraOrigin;
     csVector3 strip, firstPoint, secondPoint;
@@ -952,10 +950,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       }
     }
 
-    factory->GetVertices()->Release();
-    factory->GetNormals()->Release();
-    factory->GetTangents()->Release();
-    factory->GetBinormals()->Release();
+    GetVertices()->Release();
+    GetNormals()->Release();
+    GetTangents()->Release();
+    GetBinormals()->Release();
 
     SetIndexRange(0, 3 * triangleCount);
   }
