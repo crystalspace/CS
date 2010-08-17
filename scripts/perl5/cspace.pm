@@ -5141,6 +5141,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AddMaterialToList = *cspacec::iThreadedLoader_AddMaterialToList;
 *AddSharedVarToList = *cspacec::iThreadedLoader_AddSharedVarToList;
 *MarkSyncDone = *cspacec::iThreadedLoader_MarkSyncDone;
+*GetFlags = *cspacec::iThreadedLoader_GetFlags;
+*SetFlags = *cspacec::iThreadedLoader_SetFlags;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -14402,6 +14404,74 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iGeneralFactorySubMesh ##############
+
+package cspace::iGeneralFactorySubMesh;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*ClearSlidingWindows = *cspacec::iGeneralFactorySubMesh_ClearSlidingWindows;
+*GetSlidingWindowSize = *cspacec::iGeneralFactorySubMesh_GetSlidingWindowSize;
+*AddSlidingWindow = *cspacec::iGeneralFactorySubMesh_AddSlidingWindow;
+*GetSlidingWindow = *cspacec::iGeneralFactorySubMesh_GetSlidingWindow;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iGeneralFactorySubMesh($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iGeneralFactorySubMeshObject ##############
+
+package cspace::iGeneralFactorySubMeshObject;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*ForceProgLODLevel = *cspacec::iGeneralFactorySubMeshObject_ForceProgLODLevel;
+*GetForcedProgLODLevel = *cspacec::iGeneralFactorySubMeshObject_GetForcedProgLODLevel;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iGeneralFactorySubMeshObject($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iGeneralMeshSubMesh ##############
 
 package cspace::iGeneralMeshSubMesh;
@@ -14410,6 +14480,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetIndices = *cspacec::iGeneralMeshSubMesh_GetIndices;
+*SetIndices = *cspacec::iGeneralMeshSubMesh_SetIndices;
 *GetMaterial = *cspacec::iGeneralMeshSubMesh_GetMaterial;
 *GetName = *cspacec::iGeneralMeshSubMesh_GetName;
 *GetMixmode = *cspacec::iGeneralMeshSubMesh_GetMixmode;
@@ -14499,6 +14570,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetAnimationControl = *cspacec::iGeneralMeshState_SetAnimationControl;
 *GetAnimationControl = *cspacec::iGeneralMeshState_GetAnimationControl;
 *FindSubMesh = *cspacec::iGeneralMeshState_FindSubMesh;
+*ForceProgLODLevel = *cspacec::iGeneralMeshState_ForceProgLODLevel;
 *scfGetVersion = *cspacec::iGeneralMeshState_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -14558,6 +14630,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSubMesh = *cspacec::iGeneralFactoryState_GetSubMesh;
 *DisableAutoNormals = *cspacec::iGeneralFactoryState_DisableAutoNormals;
 *GenerateCylinder = *cspacec::iGeneralFactoryState_GenerateCylinder;
+*GetNumProgLODLevels = *cspacec::iGeneralFactoryState_GetNumProgLODLevels;
+*GetProgLODDistances = *cspacec::iGeneralFactoryState_GetProgLODDistances;
+*SetProgLODDistances = *cspacec::iGeneralFactoryState_SetProgLODDistances;
 *GetVertexByIndex = *cspacec::iGeneralFactoryState_GetVertexByIndex;
 *GetTexelByIndex = *cspacec::iGeneralFactoryState_GetTexelByIndex;
 *GetNormalByIndex = *cspacec::iGeneralFactoryState_GetNormalByIndex;
@@ -20204,6 +20279,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetCurrentDefaultRenderloop = *cspacec::iEngine_SetCurrentDefaultRenderloop;
 *GetCurrentFrameNumber = *cspacec::iEngine_GetCurrentFrameNumber;
 *UpdateNewFrame = *cspacec::iEngine_UpdateNewFrame;
+*EnableAdaptiveLODs = *cspacec::iEngine_EnableAdaptiveLODs;
+*UpdateAdaptiveLODs = *cspacec::iEngine_UpdateAdaptiveLODs;
+*GetAdaptiveLODsMultiplier = *cspacec::iEngine_GetAdaptiveLODsMultiplier;
 *SetSaveableFlag = *cspacec::iEngine_SetSaveableFlag;
 *GetSaveableFlag = *cspacec::iEngine_GetSaveableFlag;
 *CreateLoaderContext = *cspacec::iEngine_CreateLoaderContext;
@@ -23546,6 +23624,8 @@ sub CS_CHANGEABLE_NEWROOT () { $cspacec::CS_CHANGEABLE_NEWROOT }
 sub CS_CHANGEABLE_YES () { $cspacec::CS_CHANGEABLE_YES }
 sub KEEP_ALL () { $cspacec::KEEP_ALL }
 sub KEEP_USED () { $cspacec::KEEP_USED }
+sub CS_LOADER_NONE () { $cspacec::CS_LOADER_NONE }
+sub CS_LOADER_CREATE_DUMMY_MATS () { $cspacec::CS_LOADER_CREATE_DUMMY_MATS }
 sub CS_SNDSYS_DATA_UNKNOWN_SIZE () { $cspacec::CS_SNDSYS_DATA_UNKNOWN_SIZE }
 sub SS_FILTER_LOC_RENDEROUT () { $cspacec::SS_FILTER_LOC_RENDEROUT }
 sub SS_FILTER_LOC_SOURCEOUT () { $cspacec::SS_FILTER_LOC_SOURCEOUT }

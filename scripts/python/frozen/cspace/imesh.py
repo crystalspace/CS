@@ -118,11 +118,36 @@ iObjectModel_swigregister = _imesh.iObjectModel_swigregister
 iObjectModel_swigregister(iObjectModel)
 iObjectModel_scfGetVersion = _imesh.iObjectModel_scfGetVersion
 
+class iGeneralFactorySubMesh(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def ClearSlidingWindows(*args): return _imesh.iGeneralFactorySubMesh_ClearSlidingWindows(*args)
+    def GetSlidingWindowSize(*args): return _imesh.iGeneralFactorySubMesh_GetSlidingWindowSize(*args)
+    def AddSlidingWindow(*args): return _imesh.iGeneralFactorySubMesh_AddSlidingWindow(*args)
+    def GetSlidingWindow(*args): return _imesh.iGeneralFactorySubMesh_GetSlidingWindow(*args)
+    __swig_destroy__ = _imesh.delete_iGeneralFactorySubMesh
+    __del__ = lambda self : None;
+iGeneralFactorySubMesh_swigregister = _imesh.iGeneralFactorySubMesh_swigregister
+iGeneralFactorySubMesh_swigregister(iGeneralFactorySubMesh)
+
+class iGeneralFactorySubMeshObject(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def ForceProgLODLevel(*args): return _imesh.iGeneralFactorySubMeshObject_ForceProgLODLevel(*args)
+    def GetForcedProgLODLevel(*args): return _imesh.iGeneralFactorySubMeshObject_GetForcedProgLODLevel(*args)
+    __swig_destroy__ = _imesh.delete_iGeneralFactorySubMeshObject
+    __del__ = lambda self : None;
+iGeneralFactorySubMeshObject_swigregister = _imesh.iGeneralFactorySubMeshObject_swigregister
+iGeneralFactorySubMeshObject_swigregister(iGeneralFactorySubMeshObject)
+
 class iGeneralMeshSubMesh(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetIndices(*args): return _imesh.iGeneralMeshSubMesh_GetIndices(*args)
+    def SetIndices(*args): return _imesh.iGeneralMeshSubMesh_SetIndices(*args)
     def GetMaterial(*args): return _imesh.iGeneralMeshSubMesh_GetMaterial(*args)
     def GetName(*args): return _imesh.iGeneralMeshSubMesh_GetName(*args)
     def GetMixmode(*args): return _imesh.iGeneralMeshSubMesh_GetMixmode(*args)
@@ -168,6 +193,7 @@ class iGeneralMeshState(iGeneralMeshCommonState):
     def SetAnimationControl(*args): return _imesh.iGeneralMeshState_SetAnimationControl(*args)
     def GetAnimationControl(*args): return _imesh.iGeneralMeshState_GetAnimationControl(*args)
     def FindSubMesh(*args): return _imesh.iGeneralMeshState_FindSubMesh(*args)
+    def ForceProgLODLevel(*args): return _imesh.iGeneralMeshState_ForceProgLODLevel(*args)
     scfGetVersion = staticmethod(_imesh.iGeneralMeshState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iGeneralMeshState
     __del__ = lambda self : None;
@@ -227,6 +253,9 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def GetSubMesh(*args): return _imesh.iGeneralFactoryState_GetSubMesh(*args)
     def DisableAutoNormals(*args): return _imesh.iGeneralFactoryState_DisableAutoNormals(*args)
     def GenerateCylinder(*args): return _imesh.iGeneralFactoryState_GenerateCylinder(*args)
+    def GetNumProgLODLevels(*args): return _imesh.iGeneralFactoryState_GetNumProgLODLevels(*args)
+    def GetProgLODDistances(*args): return _imesh.iGeneralFactoryState_GetProgLODDistances(*args)
+    def SetProgLODDistances(*args): return _imesh.iGeneralFactoryState_SetProgLODDistances(*args)
     def GetVertexByIndex(*args): return _imesh.iGeneralFactoryState_GetVertexByIndex(*args)
     def GetTexelByIndex(*args): return _imesh.iGeneralFactoryState_GetTexelByIndex(*args)
     def GetNormalByIndex(*args): return _imesh.iGeneralFactoryState_GetNormalByIndex(*args)
