@@ -40,6 +40,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     //-- iFurPhysicsControl
     virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh);
+    virtual void SetDisplacement (float displacement);
+
+    //-- iFurAnimationControl
     virtual void InitializeStrand (size_t strandID, csVector3* coordinates,
       size_t coordinatesCount);
     virtual void AnimateStrand (size_t strandID, csVector3* coordinates, 
@@ -69,6 +72,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     csHash<Anchor*, size_t> guideRopes;
     CS::Mesh::iAnimatedMesh* animesh; // use csRef here
+    float displacement;
   };
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)

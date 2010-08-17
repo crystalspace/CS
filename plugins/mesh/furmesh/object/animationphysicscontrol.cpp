@@ -35,7 +35,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   CS_LEAKGUARD_IMPLEMENT(AnimationPhysicsControl);	
 
   AnimationPhysicsControl::AnimationPhysicsControl (iBase* parent)
-    : scfImplementationType (this), animesh(0)
+    : scfImplementationType (this), animesh(0), displacement(0)
   {
   }
 
@@ -47,6 +47,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void AnimationPhysicsControl::SetAnimesh (CS::Mesh::iAnimatedMesh* animesh)
   {
     this->animesh = animesh;
+  }
+
+  void AnimationPhysicsControl::SetDisplacement (float displacement)
+  {
+    this->displacement = displacement;
   }
 
   // Initialize the strand with the given ID
@@ -191,7 +196,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       GetTransform ().This2Other (binormals[anchor->animeshVertexIndex]);
     binormal.Normalize();
 
-    coordinates[0] = position;
+    coordinates[0] = position + normal * displacement;
 
     for (size_t i = 0 ; i < coordinatesCount - 1 ; i ++)
     {

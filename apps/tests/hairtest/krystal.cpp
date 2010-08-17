@@ -372,6 +372,7 @@ bool KrystalScene::CreateAvatar ()
 //   hairPhysicsControl->SetAnimesh(animesh);
 
   animationPhysicsControl->SetAnimesh(animesh);
+  animationPhysicsControl->SetDisplacement(0.02);
 
   csRef<iMeshObjectFactory> imof = furMeshType->NewFactory();
 

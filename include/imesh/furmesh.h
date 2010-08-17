@@ -118,6 +118,11 @@ public:
    * Set the animesh on which the iFurMesh is attached
    */
   virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
+
+  /**
+   * Set displacement between fur and base mesh
+   */
+  virtual void SetDisplacement (float displacement) = 0;
 };
 
 /**
