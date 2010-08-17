@@ -172,29 +172,6 @@ ViewMesh::ViewMesh () :
         break;
       }
 
-      if (kbd->GetKeyState (CSKEY_PGDN))
-      {
-        if (lod_level < max_lod_level)
-          lod_level += 1;
-      }
-	    if (kbd->GetKeyState (CSKEY_PGUP))
-      {
-        if (lod_level > 0)
-          lod_level -= 1;
-      }
-      
-      if (!auto_lod)
-      {
-        csRef<iMeshObject> mobj = asset->GetMesh()->GetMeshObject();
-        assert(mobj);
-
-        csRef<iGeneralMeshState> mstate = scfQueryInterface<iGeneralMeshState>(mobj);
-        if (mstate)
-        {
-            mstate->ForceProgLODLevel(lod_level);
-        }
-      }
-
       csRef<iMovable> mov = asset->GetMesh()->GetMovable();
       csVector3 pos = mov->GetFullPosition();    
       mov->MovePosition(csVector3(pos.x, pos.y, -move_sprite_speed*elapsed_time/1000.0f));
@@ -277,6 +254,34 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
         csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid())
 	q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+      return false;
+    }
+
+    bool needLODUpdate = false;
+    if (csKeyEventHelper::GetCookedCode (&ev) == '+'
+	&& !auto_lod
+	&& lod_level < max_lod_level)
+    {
+      lod_level += 1;
+      needLODUpdate = true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '-'
+	&& !auto_lod
+	&& lod_level > 0)
+    {
+      lod_level -= 1;
+      needLODUpdate = true;
+    }
+
+    if (needLODUpdate)
+    {
+      csRef<iMeshObject> mobj = asset->GetMesh()->GetMeshObject();
+      csRef<iGeneralMeshState> mstate = scfQueryInterface<iGeneralMeshState>(mobj);
+      if (mstate)
+      {
+	mstate->ForceProgLODLevel(lod_level);
+      }
     }
   }
   return false;
