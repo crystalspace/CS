@@ -115,6 +115,24 @@ bool HairTest::OnSceneButtonClicked (const CEGUI::EventArgs&)
   return true;
 }
 
+bool HairTest::OnKillButtonClicked (const CEGUI::EventArgs&)
+{
+  if (!avatarScene)
+    return false;
+
+  avatarScene->KillAvatar();
+  return true;
+}
+
+bool HairTest::OnResetButtonClicked (const CEGUI::EventArgs&)
+{
+  if (!avatarScene)
+    return false;
+
+  avatarScene->ResetScene();
+  return true;
+}
+
 // Surface properties
 bool HairTest::OnEventThumbTrackEndedShiftR (const CEGUI::EventArgs&)
 {
@@ -354,6 +372,22 @@ bool HairTest::OnKeyboard (iEvent &ev)
       return true;
     }
 
+    // Kill avatar
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'k'
+      && physicsEnabled && avatarScene->HasPhysicalObjects ())
+    {
+      avatarScene->KillAvatar();
+      return true;
+    }
+
+    // Reset scene
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'r'
+      && physicsEnabled && avatarScene->HasPhysicalObjects ())
+    {
+      avatarScene->ResetScene();
+      return true;
+    }
+
     // Check for switching of scene
     if (csKeyEventHelper::GetCookedCode (&ev) == 'n')
     {
@@ -512,6 +546,14 @@ bool HairTest::Application ()
   winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Scene")-> 
     subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&HairTest::OnSceneButtonClicked, this));
+
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Kill")-> 
+    subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&HairTest::OnKillButtonClicked, this));
+
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Reset")-> 
+    subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&HairTest::OnResetButtonClicked, this));
 
   winMgr->getWindow("HairTest/MainWindow/Tab/Page3/Physics")-> 
     subscribeEvent(CEGUI::PushButton::EventClicked,

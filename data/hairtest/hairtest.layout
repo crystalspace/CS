@@ -35,6 +35,16 @@
                             <Property Name="Text" Value="Scene" />
                             <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.5,0},{0.1,0},{0.7,0}}" />
                         </Window>						
+
+                        <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Kill" >
+                            <Property Name="Text" Value="Kill" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.125,0},{0.1,0},{0.225,0},{0.3,0}}" />
+                        </Window>						
+
+                        <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Reset" >
+                            <Property Name="Text" Value="Reset" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.125,0},{0.5,0},{0.225,0},{0.7,0}}" />
+                        </Window>												
 						
 						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page1/StaticText1" >
 							<Property Name="Text" Value="R:" />

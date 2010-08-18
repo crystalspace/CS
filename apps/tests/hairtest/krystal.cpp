@@ -26,7 +26,7 @@
 #define CAMERA_HIPS_DISTANCE 3.0f
 
 KrystalScene::KrystalScene (HairTest* hairTest)
-: hairTest (hairTest), hairPhysicsEnabled(false)
+: hairTest (hairTest), hairPhysicsEnabled(false), isDead(false)
 {
   // Define the available keys
   hairTest->hudHelper.keyDescriptions.DeleteAll ();
@@ -117,6 +117,8 @@ csVector3 KrystalScene::GetCameraTarget ()
 
 float KrystalScene::GetSimulationSpeed ()
 {
+  if (isDead)
+    return 0.3f;
   return 1.0f;
 }
 
@@ -407,6 +409,29 @@ bool KrystalScene::CreateAvatar ()
   return true;
 }
 
+void KrystalScene::KillAvatar()
+{
+  ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_DYNAMIC);
+  hairTest->bulletDynamicSystem->SetStepParameters (0.008f, 150, 10);
+  
+  // Update the display of the dynamics debugger
+  if (hairTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
+    || hairTest->dynamicsDebugMode == DYNDEBUG_MIXED)
+    hairTest->dynamicsDebugger->UpdateDisplay ();
+
+  // Fling the body a bit
+  const csOrthoTransform& tc = hairTest->view->GetCamera ()->GetTransform ();
+  uint boneCount = ragdollNode->GetBoneCount (CS::Animation::STATE_DYNAMIC);
+  for (uint i = 0; i < boneCount; i++)
+  {
+    CS::Animation::BoneID boneID = ragdollNode->GetBone (CS::Animation::STATE_DYNAMIC, i);
+    iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 0.1f));
+  }  
+
+  isDead = true;
+}
+
 void KrystalScene::ResetScene ()
 {
   if (hairTest->physicsEnabled)
@@ -430,6 +455,8 @@ void KrystalScene::ResetScene ()
     // better with lower step parameters.
     hairTest->bulletDynamicSystem->SetStepParameters (0.016667f, 1, 10);
   }
+
+  isDead = false;
 }
 
 void KrystalScene::UpdateStateDescription ()

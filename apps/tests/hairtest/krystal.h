@@ -45,6 +45,9 @@ public:
   // User interaction with the scene
   void ResetScene ();
 
+  // Kill the avatar
+  void KillAvatar ();
+
   // Display of information on the state of the scene
   void UpdateStateDescription ();
 
@@ -65,6 +68,7 @@ private:
   bool hairPhysicsEnabled;
   csRef<CS::Mesh::iFurPhysicsControl> hairPhysicsControl;
   csRef<CS::Mesh::iFurAnimeshControl> animationPhysicsControl;
+  bool isDead;
 };
 
 #endif // __KRYSTAL_H__

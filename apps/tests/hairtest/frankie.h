@@ -42,6 +42,9 @@ public:
   // Creation of objects
   bool CreateAvatar ();
 
+  // Kill the avatar
+  void KillAvatar ();
+
   // User interaction with the scene
   void ResetScene ();
 

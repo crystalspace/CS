@@ -53,6 +53,9 @@ public:
   // User interaction with the scene
   virtual void ResetScene () = 0;
 
+  // Kill the avatar
+  virtual void KillAvatar () = 0;
+
   // Display of information on the state of the scene
   virtual void UpdateStateDescription () = 0;
 
@@ -128,6 +131,8 @@ public:
   bool OnExitButtonClicked (const CEGUI::EventArgs& e);
   bool OnCollidersButtonClicked (const CEGUI::EventArgs& e);
   bool OnSceneButtonClicked (const CEGUI::EventArgs& e);
+  bool OnKillButtonClicked (const CEGUI::EventArgs& e);
+  bool OnResetButtonClicked (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedShiftR (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedWidthR (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedAbsorption (const CEGUI::EventArgs& e);

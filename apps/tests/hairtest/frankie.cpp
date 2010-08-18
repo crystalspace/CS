@@ -344,6 +344,29 @@ bool FrankieScene::CreateAvatar ()
   return true;
 }
 
+// Kill the avatar
+void FrankieScene::KillAvatar ()
+{
+  // Set the ragdoll state of the CS::Animation::iBodyChain of the body and the tail as dynamic
+  ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_DYNAMIC);
+  ragdollNode->SetBodyChainState (tailChain, CS::Animation::STATE_DYNAMIC);
+
+  // Update the display of the dynamics debugger
+  if (hairTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
+    || hairTest->dynamicsDebugMode == DYNDEBUG_MIXED)
+    hairTest->dynamicsDebugger->UpdateDisplay ();
+
+  // Fling the body a bit
+  const csOrthoTransform& tc = hairTest->view->GetCamera ()->GetTransform ();
+  uint boneCount = ragdollNode->GetBoneCount (CS::Animation::STATE_DYNAMIC);
+  for (uint i = 0; i < boneCount; i++)
+  {
+    CS::Animation::BoneID boneID = ragdollNode->GetBone (CS::Animation::STATE_DYNAMIC, i);
+    iRigidBody* rb = ragdollNode->GetBoneRigidBody (boneID);
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0.0f, 0.0f, 0.1f));
+  }
+}
+
 void FrankieScene::ResetScene ()
 {
   // Reset the position of the animesh
