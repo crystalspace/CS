@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="root">
+    <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+    <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+    <Property Name="MousePassThroughEnabled" Value="True" />
+
+    <Window Type='ice/Listbox' Name='Frame'>
+      <Property Name='UnifiedSize' Value='{{0.0,240.0},{0.0,140.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,10.0}}'/>
+      <Property Name='CaptionColour' Value='00FFFFFF'/>
+
+      <Window Type='ice/StaticText' Name='RenderManager'>
+        <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,50}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,10.0}}'/>
+        <Property Name='BackgroundEnabled' Value='False'/>
+        <Property Name='FrameEnabled' Value='False'/>
+        <Property Name='HorzFormatting' Value='WordWrapCentred'/>
+        <Property Name='VertFormatting' Value='TopAligned'/>
+        <Property Name='Text' Value='Render Manager'/>
+
+        <Window Type='ice/RadioButton' Name='Deferred'>
+          <Property Name='UnifiedSize' Value='{{0.0,80.0},{0.0,10}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,30.0},{0.0,30.0}}'/>
+          <Property Name='HorizontalAlignment' Value='Left'/>
+          <Property Name='Text' Value='Deferred'/>
+        </Window>
+
+        <Window Type='ice/RadioButton' Name='Forward'>
+          <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,10}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,-30.0},{0.0,30.0}}'/>
+          <Property Name='HorizontalAlignment' Value='Right'/>
+          <Property Name='Text' Value='Forward'/>
+        </Window>
+        
+      </Window>
+
+      <Window Type='ice/Checkbox' Name='ShowGBuffer'>
+        <Property Name='UnifiedSize' Value='{{0.75,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,60.0}}'/>
+
+        <Property Name='Text' Value='Show GBuffer'/>
+      </Window>
+
+      <Window Type='ice/Checkbox' Name='DrawLightVolumes'>
+        <Property Name='UnifiedSize' Value='{{0.75,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,80.0}}'/>
+
+        <Property Name='Text' Value='Draw Light Volumes'/>
+      </Window>
+
+      <Window Type='ice/Checkbox' Name='DrawLogo'>
+        <Property Name='UnifiedSize' Value='{{0.75,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,100.0}}'/>
+
+        <Property Name='Text' Value='Draw Logo'/>
+        <Property Name='ConfigTypes' Value='bool'/>
+        <Property Name='ConfigNames' Value='Settings.DrawLogo'/>
+      </Window>
+
+    </Window>
+
+  </Window>
+
+</GUILayout>

@@ -617,6 +617,7 @@ public:
   {
     projectionMatrix = m;
     explicitProjection = true;
+    needProjectionUpdate = true;
     
     UpdateProjectionSVs ();
   }

@@ -127,13 +127,31 @@ namespace RenderManager
     #endif
 
       TextureCache texCache;
+
+      /* Set these values to a positive value to fix the width and/or height of textures
+       * queried from the texture cache. */
+      int fixedTexCacheWidth;
+      int fixedTexCacheHeight;
+
+      /// Abstracts the usage of the texture cache.
+      iTextureHandle* QueryUnusedTexture (int width, int height, 
+                                          int& real_w, int& real_h)
+      {
+        if (fixedTexCacheWidth > 0)
+          width = fixedTexCacheWidth;
+        if (fixedTexCacheHeight > 0)
+          height = fixedTexCacheHeight;
+
+        return texCache.QueryUnusedTexture (width, height,
+                                            real_w, real_h);
+      }
       
       uint dbgDrawPortalOutlines;
       uint dbgDrawPortalPlanes;
       uint dbgShowPortalTextures;
 
       /// Construct helper
-      PersistentData();
+      PersistentData(int textCachOptions = TextureCache::tcachePowerOfTwo);
 
       /**
        * Initialize helper. Fetches various required values from objects in
@@ -442,7 +460,7 @@ namespace RenderManager
       int txt_w = int (ceil (screenBox.MaxX() - screenBox.MinX()));
       int txt_h = int (ceil (screenBox.MaxY() - screenBox.MinY()));
       int real_w, real_h;
-      csRef<iTextureHandle> tex = persistentData.texCache.QueryUnusedTexture (txt_w, txt_h,
+      csRef<iTextureHandle> tex = persistentData.QueryUnusedTexture (txt_w, txt_h,
 		  real_w, real_h);
 		  
       if (renderTree.IsDebugFlagEnabled (persistentData.dbgShowPortalTextures))

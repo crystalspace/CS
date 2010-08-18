@@ -1,0 +1,80 @@
+<cgfp>
+
+<variablemap variable="projection transform inverse" destination="ProjInv" />
+<variablemap variable="light position view" destination="LightPos" />
+<variablemap variable="light direction view" destination="LightDir" />
+<variablemap variable="light outer falloff" destination="OuterFalloff" />
+<variablemap variable="light inner falloff" destination="InnerFalloff" />
+<variablemap variable="light diffuse" destination="LightDiff" />
+<variablemap variable="light specular" destination="LightSpec" />
+<variablemap variable="light attenuation" destination="AttenVec" />
+  
+<program>
+
+<?Include /shader/deferred/light_common.cginc?>
+
+<![CDATA[
+
+struct vertex2fragment 
+{
+  float4 ScreenPos : TEXCOORD0;
+};
+
+float SpotLightAttenuation(float3 surfToLight, 
+                           float3 lightDir, 
+                           float falloffInner, 
+                           float falloffOuter)
+{
+  return smoothstep (falloffOuter, falloffInner, dot (surfToLight, -lightDir));
+}
+ 
+float4 main(vertex2fragment IN,
+            uniform float4x4 ProjInv,
+            uniform float3 LightPos,
+            uniform float3 LightDir,
+            uniform float3 LightDiff,
+            uniform float3 LightSpec,
+            uniform float4 AttenVec,
+            uniform float OuterFalloff,
+            uniform float InnerFalloff,
+            uniform sampler2D gBuffer0,
+            uniform sampler2D gBuffer1,
+            uniform sampler2D gBuffer2,
+            uniform sampler2D gBufferDepth) : COLOR
+{
+  // Do the perspective divide and convert to texture space.
+  float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
+  float2 screenUV = screenXY * 0.5 + 0.5;
+  
+  float4 albedo  = tex2D (gBuffer0, screenUV);
+  float4 normal  = tex2D (gBuffer1, screenUV);
+  float4 ambient = tex2D (gBuffer2, screenUV);
+  float4 depth   = tex2D (gBufferDepth, screenUV);
+  
+  float3 screen = GetScreenPosition (screenXY, depth);
+  float3 p = ScreenToWorldPosition (screen, ProjInv);
+  float3 n = ExtractNormal (normal);
+  float3 L = LightPos - p;
+  
+  float dist = length (L);
+  L = L / dist;
+  
+  // Since we are in view space we know that the eye position is at the origin.
+  float3 V = -normalize (p); 
+  float3 H = normalize (L + V);
+  
+  float att = Attenuation (dist, AttenVec);
+  float spot = SpotLightAttenuation (L, LightDir, InnerFalloff, OuterFalloff);
+  float3 specular = float3 (albedo.a, normal.a, ambient.a);
+  
+  // Compute phong lighting.
+  float3 diff = albedo.rgb * LightDiff * saturate (dot (n, L));
+  float3 spec = LightSpec * specular * pow (saturate (dot (n, H)), 32);
+  float3 color = (diff + spec) * att * spot;
+  
+  return float4 (color, 1.0);
+}
+
+]]>
+</program>
+</cgfp>

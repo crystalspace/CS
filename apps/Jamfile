@@ -10,3 +10,4 @@ SubInclude TOP apps tutorial ;
 SubInclude TOP apps walktest ;
 SubInclude TOP apps waterdemo ;
 SubInclude TOP apps waterdemo2 ;
+SubInclude TOP apps deferreddemo ;

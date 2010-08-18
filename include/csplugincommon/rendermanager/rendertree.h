@@ -249,7 +249,8 @@ namespace RenderManager
      * Render managers must store an instance of this class and provide
      * it to the render tree upon instantiation.
      */
-    struct PersistentData
+    struct PersistentData : 
+      public CS::Meta::EBOptHelper<typename TreeTraitsType::PersistentDataExtraDataType>
     {
       /**
        * Initialize data. Fetches various required values from objects in
@@ -454,7 +455,7 @@ namespace RenderManager
 			  typename MeshNode::SingleMesh& singleMeshTemplate)
       {
 	typename TreeTraits::MeshNodeKeyType meshKey = 
-	  TreeTraits::GetMeshNodeKey (renderPrio, *rm);
+	  TreeTraits::GetMeshNodeKey (renderPrio, *rm, owner.GetPersistentData ());
 	
 	// Get the mesh node
 	MeshNode* meshNode = meshNodes.Get (meshKey, 0);
@@ -463,7 +464,8 @@ namespace RenderManager
 	  // Get a new one
 	  meshNode = owner.CreateMeshNode (*this, meshKey);
     
-	  RenderTree::TreeTraitsType::SetupMeshNode(*meshNode, renderPrio, *rm);
+	  RenderTree::TreeTraitsType::SetupMeshNode(*meshNode, renderPrio, *rm, 
+            owner.GetPersistentData ());
 	  meshNodes.Put (meshKey, meshNode);
 	}
     

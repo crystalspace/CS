@@ -233,6 +233,30 @@ void Sphere::Append (iGeneralFactoryState* state)
 
 //---------------------------------------------------------------------------
 
+Cone::Cone (float l, float r, uint sides)
+{
+  Cone::l = l;
+  Cone::r = r;
+  Cone::sides = sides;
+  mapper = 0;
+}
+
+void Cone::Append (iGeneralFactoryState* state)
+{
+  bool append = state->GetVertexCount () > 0 || state->GetTriangleCount () > 0;
+  csDirtyAccessArray<csVector3> mesh_vertices;
+  csDirtyAccessArray<csVector2> mesh_texels;
+  csDirtyAccessArray<csVector3> mesh_normals;
+  csDirtyAccessArray<csTriangle> mesh_triangles;
+  Primitives::GenerateCone (l, r, sides,
+      mesh_vertices, mesh_texels, mesh_normals,
+      mesh_triangles, mapper);
+  AppendOrSetData (state, append, mesh_vertices, mesh_texels,
+      mesh_normals, mesh_triangles);
+}
+
+//---------------------------------------------------------------------------
+
 csPtr<iMeshFactoryWrapper> GeneralMeshBuilder::CreateFactory (
 	iEngine* engine, const char* name, Primitive* primitive)
 {

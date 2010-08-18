@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2007 by Marten Svanfeldt
+    Copyright (C) 2010 by Joe Forte
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,37 +17,26 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDTREETRAITS_H__
-#define __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDTREETRAITS_H__
-
-/**\file
- * Standard render tree traits
- */
+#ifndef __CS_DEFERREDTREETRAITS_H__
+#define __CS_DEFERREDTREETRAITS_H__
 
 #include "iengine/mesh.h"
 #include "ivaria/view.h"
 #include "ivideo/rendermesh.h"
 #include "csutil/comparator.h"
 #include "csutil/compileassert.h"
+#include "csutil/stringarray.h"
+#include "csutil/cfgacc.h"
+#include "csplugincommon/rendermanager/lightsetup.h"
 #include "csplugincommon/rendermanager/renderview.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"
 
-namespace CS
-{
-
-
-namespace RenderManager
+CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
   /**
-   * Standard traits for customizing the render tree class.
-   *
-   * Render tree traits specify additional data stored with
-   * meshes, contexts and others in a render tree. 
-   * To provide custom traits, create a class and either provide a new, custom
-   * type for a trait or typedef in the respective type from
-   * RenderTreeStandardTraits.
+   * Render tree traits used by the deferred render manager.
    */
-  class RenderTreeStandardTraits
+  class RenderTreeDeferredTraits
   {
   public:
     /**\name Standard types
@@ -54,11 +44,13 @@ namespace RenderManager
     /// Any extra data that should be defined for each mesh node
     struct MeshNodeExtraDataType
     {
-      int   priority;
+      int priority;
+      bool useForwardRendering;
     };
 
     /// Any extra data that should be defined for each context node
-    struct ContextNodeExtraDataType
+    struct ContextNodeExtraDataType 
+      : public CS::RenderManager::RenderTreeLightingTraits::ContextNodeExtraDataType
     {
     };
     
@@ -70,6 +62,7 @@ namespace RenderManager
     /// Any extra data that needs to persist between frames
     struct PersistentDataExtraDataType
     {
+      csBitArray forwardPriorities;
     };
 
     /**
@@ -78,24 +71,61 @@ namespace RenderManager
      */
     struct MeshNodeKeyType
     {
-      uint8     priority    : 5;
-      uint8     isPortal    : 1;
-      uint8     meshSorting : 2;
+      uint16 priority            : 12;
+      uint16 isPortal            : 1;
+      uint16 useForwardRendering : 1;
+      uint16 meshSorting         : 2;
       
       bool operator== (const MeshNodeKeyType& other) const
       {
 	//BIG HACK
-	return (reinterpret_cast<const int8&> (*this) == reinterpret_cast<const int8&> (other));
+	return (reinterpret_cast<const int16&> (*this) == reinterpret_cast<const int16&> (other));
       }
       bool operator<= (const MeshNodeKeyType& other) const
       {
 	//BIG HACK
-	return (reinterpret_cast<const int8&> (*this) <= reinterpret_cast<const int8&> (other));
+	return (reinterpret_cast<const int16&> (*this) <= reinterpret_cast<const int16&> (other));
       }
     };
     /** @} */
 
-    // Enable/disables
+    /// Initializes the extra persistent data.
+    static void Initialize(PersistentDataExtraDataType &data, iObjectRegistry *registry)
+    {
+      const char *messageID = "crystalspace.rendermanager.deferred.treetraits";
+
+      csRef<iEngine> engine = csQueryRegistry<iEngine> (registry);
+      csConfigAccess cfg (registry);
+      
+      const char *str = cfg->GetStr ("RenderManager.Deferred.ForwardPriorities", "alpha,transp,portal");
+      csStringArray strArray;
+      strArray.SplitString (str, ",", csStringArray::delimIgnore);
+
+      for (size_t i = 0; i < strArray.GetSize (); i++)
+      {
+        long p = engine->GetRenderPriority (strArray[i]);
+        if (p <= 0)
+        {
+          csReport (registry, CS_REPORTER_SEVERITY_WARNING,
+            messageID, "Unknown render priority '%s' specified.", strArray[i]);
+        }
+        else
+        {
+          if ((long)data.forwardPriorities.GetSize() <= p)
+            data.forwardPriorities.SetSize (p + 1);
+          data.forwardPriorities.SetBit (p);
+        }
+      }
+    }
+
+    /// Returns true if a mesh in the given priority is considered transparent.
+    static bool UseForwardRendering(CS::Graphics::RenderPriority priority,
+                                    const PersistentDataExtraDataType &data)
+    {
+      if (priority < (int)data.forwardPriorities.GetSize ())
+        return data.forwardPriorities.IsBitSet (priority);
+      return false;
+    }
 
     /**\name Standard functions
      * @{ */
@@ -112,7 +142,8 @@ namespace RenderManager
       else
         result.priority = defaultPriority;
       result.isPortal = rendermesh.portal != 0;
-      
+      result.useForwardRendering = UseForwardRendering (result.priority, data);
+
       return result;
     }
 
@@ -127,32 +158,26 @@ namespace RenderManager
         meshNode.priority = rendermesh.renderPrio;
       else
         meshNode.priority = defaultPriority;
+      meshNode.useForwardRendering = UseForwardRendering (meshNode.priority, data);
     }
     /** @} */
-
-  private:
   };
-
-
- 
 }
-}
+CS_PLUGIN_NAMESPACE_END(RMDeferred)
 
 // Make sure the size matches so that we can use the comparison hack below
-CS_COMPILE_ASSERT(sizeof(CS::RenderManager::RenderTreeStandardTraits::MeshNodeKeyType) == sizeof(int8));
+CS_COMPILE_ASSERT(sizeof(CS::Plugin::RMDeferred::RenderTreeDeferredTraits::MeshNodeKeyType) == sizeof(int16));
 
 template<>
-class csComparator<CS::RenderManager::RenderTreeStandardTraits::MeshNodeKeyType>
+class csComparator<CS::Plugin::RMDeferred::RenderTreeDeferredTraits::MeshNodeKeyType>
 {
 public:
-  static int Compare (CS::RenderManager::RenderTreeStandardTraits::MeshNodeKeyType const& mk1, 
-    CS::RenderManager::RenderTreeStandardTraits::MeshNodeKeyType const& mk2)
+  static int Compare (CS::Plugin::RMDeferred::RenderTreeDeferredTraits::MeshNodeKeyType const& mk1, 
+    CS::Plugin::RMDeferred::RenderTreeDeferredTraits::MeshNodeKeyType const& mk2)
   {
     //BIG HACK
-    return (int) (reinterpret_cast<const int8&> (mk1) - reinterpret_cast<const int8&> (mk2));
+    return (int) (reinterpret_cast<const int16&> (mk1) - reinterpret_cast<const int16&> (mk2));
   }
 };
 
-
-
-#endif
+#endif // __CS_DEFERREDTREETRAITS_H__

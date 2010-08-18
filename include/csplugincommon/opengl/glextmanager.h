@@ -10672,11 +10672,11 @@ typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, co
 #endif
 
 #ifndef GL_MAX_COLOR_ATTACHMENTS_EXT
-#define GL_MAX_COLOR_ATTACHMENTS_EXT                                 0x8CA8
+#define GL_MAX_COLOR_ATTACHMENTS_EXT                                 0x8CDF
 #endif
 
-#ifndef GL_RENDERBUFFER_SIZE_EXT
-#define GL_RENDERBUFFER_SIZE_EXT                                     0x8CA9
+#ifndef GL_MAX_RENDERBUFFER_SIZE_EXT
+#define GL_MAX_RENDERBUFFER_SIZE_EXT                                 0x84E8
 #endif
 
 #ifndef GL_INVALID_FRAMEBUFFER_OPERATION_EXT
