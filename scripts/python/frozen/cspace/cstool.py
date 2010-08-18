@@ -372,6 +372,7 @@ class Primitives(object):
     GenerateCylinder = staticmethod(_cstool.Primitives_GenerateCylinder)
     GenerateCapsule = staticmethod(_cstool.Primitives_GenerateCapsule)
     GenerateSphere = staticmethod(_cstool.Primitives_GenerateSphere)
+    GenerateCone = staticmethod(_cstool.Primitives_GenerateCone)
     def __init__(self, *args): 
         this = _cstool.new_Primitives(*args)
         try: self.this.append(this)
@@ -386,6 +387,7 @@ Primitives_GenerateTesselatedQuad = _cstool.Primitives_GenerateTesselatedQuad
 Primitives_GenerateCylinder = _cstool.Primitives_GenerateCylinder
 Primitives_GenerateCapsule = _cstool.Primitives_GenerateCapsule
 Primitives_GenerateSphere = _cstool.Primitives_GenerateSphere
+Primitives_GenerateCone = _cstool.Primitives_GenerateCone
 
 class csPrimitives(Primitives):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -492,6 +494,20 @@ class Sphere(Primitive):
     def Append(*args): return _cstool.Sphere_Append(*args)
 Sphere_swigregister = _cstool.Sphere_swigregister
 Sphere_swigregister(Sphere)
+
+class Cone(Primitive):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cstool.new_Cone(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cstool.delete_Cone
+    __del__ = lambda self : None;
+    def SetMapper(*args): return _cstool.Cone_SetMapper(*args)
+    def Append(*args): return _cstool.Cone_Append(*args)
+Cone_swigregister = _cstool.Cone_swigregister
+Cone_swigregister(Cone)
 
 class GeneralMeshBuilder(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

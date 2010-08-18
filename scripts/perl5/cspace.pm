@@ -9904,6 +9904,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *swig_DestinationAlpha_set = *cspacec::csGraphics3DCaps_DestinationAlpha_set;
 *swig_StencilShadows_get = *cspacec::csGraphics3DCaps_StencilShadows_get;
 *swig_StencilShadows_set = *cspacec::csGraphics3DCaps_StencilShadows_set;
+*swig_MaxRTColorAttachments_get = *cspacec::csGraphics3DCaps_MaxRTColorAttachments_get;
+*swig_MaxRTColorAttachments_set = *cspacec::csGraphics3DCaps_MaxRTColorAttachments_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csGraphics3DCaps(@_);
@@ -22791,6 +22793,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GenerateCylinder = *cspacec::Primitives_GenerateCylinder;
 *GenerateCapsule = *cspacec::Primitives_GenerateCapsule;
 *GenerateSphere = *cspacec::Primitives_GenerateSphere;
+*GenerateCone = *cspacec::Primitives_GenerateCone;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_Primitives(@_);
@@ -23086,6 +23089,45 @@ sub DESTROY {
 *IsReversed = *cspacec::Sphere_IsReversed;
 *SetMapper = *cspacec::Sphere_SetMapper;
 *Append = *cspacec::Sphere_Append;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Cone ##############
+
+package cspace::Cone;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::Primitive cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Cone(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Cone($self);
+        delete $OWNER{$self};
+    }
+}
+
+*SetMapper = *cspacec::Cone_SetMapper;
+*Append = *cspacec::Cone_Append;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -23825,7 +23867,23 @@ sub CS_OPENPORTAL_MIRROR () { $cspacec::CS_OPENPORTAL_MIRROR }
 sub CS_OPENPORTAL_FLOAT () { $cspacec::CS_OPENPORTAL_FLOAT }
 sub rtaDepth () { $cspacec::rtaDepth }
 sub rtaColor0 () { $cspacec::rtaColor0 }
+sub rtaColor1 () { $cspacec::rtaColor1 }
+sub rtaColor2 () { $cspacec::rtaColor2 }
+sub rtaColor3 () { $cspacec::rtaColor3 }
+sub rtaColor4 () { $cspacec::rtaColor4 }
+sub rtaColor5 () { $cspacec::rtaColor5 }
+sub rtaColor6 () { $cspacec::rtaColor6 }
+sub rtaColor7 () { $cspacec::rtaColor7 }
+sub rtaColor8 () { $cspacec::rtaColor8 }
+sub rtaColor9 () { $cspacec::rtaColor9 }
+sub rtaColor10 () { $cspacec::rtaColor10 }
+sub rtaColor11 () { $cspacec::rtaColor11 }
+sub rtaColor12 () { $cspacec::rtaColor12 }
+sub rtaColor13 () { $cspacec::rtaColor13 }
+sub rtaColor14 () { $cspacec::rtaColor14 }
+sub rtaColor15 () { $cspacec::rtaColor15 }
 sub rtaNumAttachments () { $cspacec::rtaNumAttachments }
+sub rtaNumColorAttachments () { $cspacec::rtaNumColorAttachments }
 sub csmcNone () { $cspacec::csmcNone }
 sub csmcArrow () { $cspacec::csmcArrow }
 sub csmcLens () { $cspacec::csmcLens }

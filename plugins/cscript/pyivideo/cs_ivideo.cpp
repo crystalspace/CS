@@ -7022,6 +7022,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csGraphics3DCaps_MaxRTColorAttachments_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csGraphics3DCaps *arg1 = (csGraphics3DCaps *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csGraphics3DCaps_MaxRTColorAttachments_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csGraphics3DCaps, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csGraphics3DCaps_MaxRTColorAttachments_set" "', argument " "1"" of type '" "csGraphics3DCaps *""'"); 
+  }
+  arg1 = reinterpret_cast< csGraphics3DCaps * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csGraphics3DCaps_MaxRTColorAttachments_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  if (arg1) (arg1)->MaxRTColorAttachments = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csGraphics3DCaps_MaxRTColorAttachments_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csGraphics3DCaps *arg1 = (csGraphics3DCaps *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csGraphics3DCaps_MaxRTColorAttachments_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csGraphics3DCaps, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csGraphics3DCaps_MaxRTColorAttachments_get" "', argument " "1"" of type '" "csGraphics3DCaps *""'"); 
+  }
+  arg1 = reinterpret_cast< csGraphics3DCaps * >(argp1);
+  result = (int) ((arg1)->MaxRTColorAttachments);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_new_csGraphics3DCaps(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csGraphics3DCaps *result = 0 ;
@@ -24074,6 +24126,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csGraphics3DCaps_DestinationAlpha_get", _wrap_csGraphics3DCaps_DestinationAlpha_get, METH_VARARGS, NULL},
 	 { (char *)"csGraphics3DCaps_StencilShadows_set", _wrap_csGraphics3DCaps_StencilShadows_set, METH_VARARGS, NULL},
 	 { (char *)"csGraphics3DCaps_StencilShadows_get", _wrap_csGraphics3DCaps_StencilShadows_get, METH_VARARGS, NULL},
+	 { (char *)"csGraphics3DCaps_MaxRTColorAttachments_set", _wrap_csGraphics3DCaps_MaxRTColorAttachments_set, METH_VARARGS, NULL},
+	 { (char *)"csGraphics3DCaps_MaxRTColorAttachments_get", _wrap_csGraphics3DCaps_MaxRTColorAttachments_get, METH_VARARGS, NULL},
 	 { (char *)"new_csGraphics3DCaps", _wrap_new_csGraphics3DCaps, METH_VARARGS, NULL},
 	 { (char *)"delete_csGraphics3DCaps", _wrap_delete_csGraphics3DCaps, METH_VARARGS, NULL},
 	 { (char *)"csGraphics3DCaps_swigregister", csGraphics3DCaps_swigregister, METH_VARARGS, NULL},
@@ -26237,7 +26291,23 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_OPENPORTAL_FLOAT",SWIG_From_int(static_cast< int >(CS_OPENPORTAL_FLOAT)));
   SWIG_Python_SetConstant(d, "rtaDepth",SWIG_From_int(static_cast< int >(rtaDepth)));
   SWIG_Python_SetConstant(d, "rtaColor0",SWIG_From_int(static_cast< int >(rtaColor0)));
+  SWIG_Python_SetConstant(d, "rtaColor1",SWIG_From_int(static_cast< int >(rtaColor1)));
+  SWIG_Python_SetConstant(d, "rtaColor2",SWIG_From_int(static_cast< int >(rtaColor2)));
+  SWIG_Python_SetConstant(d, "rtaColor3",SWIG_From_int(static_cast< int >(rtaColor3)));
+  SWIG_Python_SetConstant(d, "rtaColor4",SWIG_From_int(static_cast< int >(rtaColor4)));
+  SWIG_Python_SetConstant(d, "rtaColor5",SWIG_From_int(static_cast< int >(rtaColor5)));
+  SWIG_Python_SetConstant(d, "rtaColor6",SWIG_From_int(static_cast< int >(rtaColor6)));
+  SWIG_Python_SetConstant(d, "rtaColor7",SWIG_From_int(static_cast< int >(rtaColor7)));
+  SWIG_Python_SetConstant(d, "rtaColor8",SWIG_From_int(static_cast< int >(rtaColor8)));
+  SWIG_Python_SetConstant(d, "rtaColor9",SWIG_From_int(static_cast< int >(rtaColor9)));
+  SWIG_Python_SetConstant(d, "rtaColor10",SWIG_From_int(static_cast< int >(rtaColor10)));
+  SWIG_Python_SetConstant(d, "rtaColor11",SWIG_From_int(static_cast< int >(rtaColor11)));
+  SWIG_Python_SetConstant(d, "rtaColor12",SWIG_From_int(static_cast< int >(rtaColor12)));
+  SWIG_Python_SetConstant(d, "rtaColor13",SWIG_From_int(static_cast< int >(rtaColor13)));
+  SWIG_Python_SetConstant(d, "rtaColor14",SWIG_From_int(static_cast< int >(rtaColor14)));
+  SWIG_Python_SetConstant(d, "rtaColor15",SWIG_From_int(static_cast< int >(rtaColor15)));
   SWIG_Python_SetConstant(d, "rtaNumAttachments",SWIG_From_int(static_cast< int >(rtaNumAttachments)));
+  SWIG_Python_SetConstant(d, "rtaNumColorAttachments",SWIG_From_int(static_cast< int >(rtaNumColorAttachments)));
   SWIG_Python_SetConstant(d, "TextureComparisonMode_compareNone",SWIG_From_int(static_cast< int >(CS::Graphics::TextureComparisonMode::compareNone)));
   SWIG_Python_SetConstant(d, "TextureComparisonMode_compareR",SWIG_From_int(static_cast< int >(CS::Graphics::TextureComparisonMode::compareR)));
   SWIG_Python_SetConstant(d, "TextureComparisonMode_funcLEqual",SWIG_From_int(static_cast< int >(CS::Graphics::TextureComparisonMode::funcLEqual)));
