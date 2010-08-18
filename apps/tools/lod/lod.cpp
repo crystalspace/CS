@@ -40,8 +40,9 @@ Lod::~Lod ()
 void Lod::Usage()
 {
   //        ---------+---------+---------+---------+---------+---------+---------+-------80+
+  csPrintf("Sliding Window LOD generation tool\n\n");
   csPrintf("Usage:\n\n");
-  csPrintf("lod -i=<input_file> [-o=<output_file>] -mindist=d -maxdist=d [-force] [-v]\n");
+  csPrintf("cslodgen -i=<input_file> [-o=<output_file>] -mindist=d -maxdist=d [-force] [-v]\n");
   csPrintf("    [-em=<fast|precise>]\n\n");
   csPrintf("-mindist  Minimum LOD distance.\n");
   csPrintf("-maxdist  Maximum LOD distance.\n");
@@ -294,7 +295,10 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
 
   // Only process genmesh factories.
   if (!fstate)
+  {
+    ReportError("Cannot handle meshes that are not genmeshes.\n");
     return;
+  }
   
   float mindist_file, maxdist_file;
   fstate->GetProgLODDistances(mindist_file, maxdist_file);
@@ -312,6 +316,8 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
 
   for (unsigned int submesh_index = 0; submesh_index < fstate->GetSubMeshCount(); submesh_index++)
   {
+    printf ("Processing submesh number %i...\n", submesh_index);
+
     LodGen lodgen;
     lodgen.SetErrorMetricType(params.error_metric_type);
     lodgen.SetVerbose(params.verbose);
@@ -390,7 +396,9 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
     }
   }
 
+  printf ("Saving new mesh...\n");
   SaveToNode(node);
+  printf ("DONE!\n");
 }
 
 void Lod::SaveToNode(csRef<iDocumentNode> factNode)
@@ -404,11 +412,8 @@ void Lod::SaveToNode(csRef<iDocumentNode> factNode)
     factNode->SetAttribute("name", name);
   
   csRef<iMeshObjectFactory> meshfact = imeshfactw->GetMeshObjectFactory();
-  csRef<iFactory> factory = scfQueryInterface<iFactory> (meshfact->GetMeshObjectType());
-  
+  csRef<iFactory> factory = scfQueryInterface<iFactory> (meshfact->GetMeshObjectType());  
   const char* pluginname = factory->QueryClassID();
-  
-  if (!(pluginname && *pluginname)) return;
   
   csRef<iDocumentNode> pluginNode = factNode->CreateNodeBefore(CS_NODE_ELEMENT);
   pluginNode->SetValue("plugin");
@@ -421,12 +426,12 @@ void Lod::SaveToNode(csRef<iDocumentNode> factNode)
   csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (GetObjectRegistry ());
   
   char savername[128] = "";
-  
   csReplaceAll(savername, pluginname, ".object.", ".saver.factory.", sizeof(savername));
 
   csRef<iSaverPlugin> saver = csLoadPluginCheck<iSaverPlugin> (plugin_mgr, savername);
   if (saver) 
     saver->WriteDown(meshfact, factNode, 0/*ssource*/);
+  else ReportError("Failed to find a valid mesh saver.\n");
 }
 
 void Lod::Save(csRef<iDocument> doc, const char* filename)

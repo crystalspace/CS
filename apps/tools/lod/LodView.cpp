@@ -171,10 +171,10 @@ bool LodView::OnKeyboard (iEvent& ev)
 
 void LodView::Usage()
 {
-  csPrintf("LOD viewer\n\n");
+  csPrintf("Sliding Window LOD viewer\n\n");
 
   csPrintf("Usage:\n");
-  csPrintf("lodview <filename> [-m=<num>] -adap\n\n");
+  csPrintf("cslodview <filename> [-m=<num>] -adap\n\n");
 
   csPrintf("  -m=<num>   multiple sprites, large room (will show num^2 sprites)\n");
   csPrintf("  -adap      adaptive LODs (best if used with -m)\n\n");
@@ -251,16 +251,22 @@ bool LodView::Application ()
 
 void LodView::LoadLODs(const char* filename)
 {
-  CS::Utility::SmartChDir (vfs, filename);
-  loading = tloader->LoadFileWait(vfs->GetCwd (), filename);
+  const char* fname = filename;
+  if (!CS::Utility::SmartChDir (vfs, filename, fname, &fname))
+  {
+    printf("Could not find path to file %s\n", filename);
+    return;
+  }
+
+  loading = tloader->LoadFileWait(vfs->GetCwd (), fname);
   
   if (!loading->WasSuccessful())
   {
-    printf("Loading not successful - file: %s\n", filename);
+    printf("Could not load file %s\n", filename);
     loading.Invalidate();
     return;
   }
-  
+
   csRef<iMeshWrapper> spritewrapper;
   
   if (!loading->GetResultRefPtr().IsValid())
