@@ -35,7 +35,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   CS_LEAKGUARD_IMPLEMENT(HairPhysicsControl);	
 
   HairPhysicsControl::HairPhysicsControl (iBase *parent)
-    : scfImplementationType (this), rigidBody(0), bulletDynamicSystem(0), animesh(0)
+    : scfImplementationType (this), rigidBody(0), bulletDynamicSystem(0), 
+    animesh(0), maxRange(0)
   {
   }
 
@@ -114,6 +115,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     anchor->animeshVertexIndex = closestVertex;
 
     guideRopes.PutUnique(strandID, anchor);
+
+    if (maxRange < strandID)
+      maxRange = strandID;
   }
 
   // Animate the strand with the given ID
@@ -167,7 +171,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void HairPhysicsControl::RemoveAllStrands ()
   {
     // Iterate through all ropes
-    for (size_t i = 0 ; i < guideRopes.GetSize(); i ++)
+    for (size_t i = 0 ; i < maxRange; i ++)
     {
       Anchor* anchor = guideRopes.Get (i, 0);
       
@@ -175,9 +179,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       {
         csRef<CS::Physics::Bullet::iSoftBody> bulletBody = anchor->softBody;
         bulletDynamicSystem->RemoveSoftBody( bulletBody );
-      }
 
-      delete anchor;
+        delete anchor;
+      }
     }
 
     guideRopes.DeleteAll();

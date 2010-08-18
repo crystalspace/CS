@@ -61,6 +61,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csRef<iRigidBody> rigidBody;
     csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
     CS::Mesh::iAnimatedMesh* animesh;
+    size_t maxRange;
   };
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)

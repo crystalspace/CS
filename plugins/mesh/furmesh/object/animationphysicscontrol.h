@@ -73,6 +73,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csHash<Anchor*, size_t> guideRopes;
     CS::Mesh::iAnimatedMesh* animesh; // use csRef here
     float displacement;
+    size_t maxRange;
   };
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)

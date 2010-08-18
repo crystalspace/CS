@@ -35,7 +35,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   CS_LEAKGUARD_IMPLEMENT(AnimationPhysicsControl);	
 
   AnimationPhysicsControl::AnimationPhysicsControl (iBase* parent)
-    : scfImplementationType (this), animesh(0), displacement(0)
+    : scfImplementationType (this), animesh(0), displacement(0), maxRange(0)
   {
   }
 
@@ -159,6 +159,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     anchor->direction = dir;
 
     guideRopes.PutUnique(strandID, anchor);
+
+    if (strandID > maxRange)
+      maxRange = strandID;
   }
 
   // Animate the strand with the given ID
@@ -238,7 +241,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void AnimationPhysicsControl::RemoveAllStrands ()
   {
     // Iterate through all ropes
-    for (size_t i = 0 ; i < guideRopes.GetSize(); i ++)
+    for (size_t i = 0 ; i < maxRange; i ++)
     {
       Anchor* anchor = guideRopes.Get(i, 0);
 
