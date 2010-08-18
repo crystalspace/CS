@@ -1673,6 +1673,7 @@ typedef GLvoid (csAPIENTRY* csGLBINDATTRIBLOCATION) (GLuint programObj, GLuint i
 typedef GLvoid (csAPIENTRY* csGLGETACTIVEATTRIB) (GLuint programObj, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLchar* name);
 typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATION) (GLuint programObj, const GLchar* name);
 typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBPOINTERV) (GLuint index, GLenum pname, GLvoid** pointer);
+typedef GLvoid (csAPIENTRY* csGLDRAWBUFFERS) (GLsizei n, const GLenum* bufs);
 typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONSEPARATE) (GLenum modeRGB, GLenum modeAlpha);
 typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATE) (GLenum face, GLenum func, GLint ref, GLuint mask);
 typedef GLvoid (csAPIENTRY* csGLSTENCILOPSEPARATE) (GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
@@ -10890,6 +10891,7 @@ typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTUIVARB) (GLuint id, GLenum pname, 
 /**\name GL_ARB_draw_buffers functions
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">http://www.opengl.org/registry/specs/ARB/draw_buffers.txt</a>.
  * @{ */
+typedef GLvoid (csAPIENTRY* csGLDRAWBUFFERSARB) (GLsizei n, const GLenum* bufs);
 
 /** @} */
 /**\name GL_EXT_blend_equation_separate constants
@@ -12576,6 +12578,11 @@ public:
   #ifndef GLGETVERTEXATTRIBPOINTERV_DECL
   #define GLGETVERTEXATTRIBPOINTERV_DECL
   csGLGETVERTEXATTRIBPOINTERV glGetVertexAttribPointerv;
+  #endif
+
+  #ifndef GLDRAWBUFFERS_DECL
+  #define GLDRAWBUFFERS_DECL
+  csGLDRAWBUFFERS glDrawBuffers;
   #endif
 
   #ifndef GLBLENDEQUATIONSEPARATE_DECL
@@ -17258,6 +17265,11 @@ public:
   /**\name GL_ARB_draw_buffers functions
    * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">http://www.opengl.org/registry/specs/ARB/draw_buffers.txt</a>.
    * @{ */
+  #ifndef GLDRAWBUFFERSARB_DECL
+  #define GLDRAWBUFFERSARB_DECL
+  csGLDRAWBUFFERSARB glDrawBuffersARB;
+  #endif
+
 
   /** @} */
   /**\name GL_EXT_blend_equation_separate functions
@@ -18744,6 +18756,7 @@ public:
       EXTMGR_FUNC_INIT(glGetActiveAttrib, GLGETACTIVEATTRIB);
       EXTMGR_FUNC_INIT(glGetAttribLocation, GLGETATTRIBLOCATION);
       EXTMGR_FUNC_INIT(glGetVertexAttribPointerv, GLGETVERTEXATTRIBPOINTERV);
+      EXTMGR_FUNC_INIT(glDrawBuffers, GLDRAWBUFFERS);
       EXTMGR_FUNC_INIT(glBlendEquationSeparate, GLBLENDEQUATIONSEPARATE);
       EXTMGR_FUNC_INIT(glStencilFuncSeparate, GLSTENCILFUNCSEPARATE);
       EXTMGR_FUNC_INIT(glStencilOpSeparate, GLSTENCILOPSEPARATE);
@@ -24412,6 +24425,7 @@ public:
     allclear = true;
     if (init)	// Don't check the functions if ext isn't reported anyway
     {
+      EXTMGR_FUNC_INIT(glDrawBuffersARB, GLDRAWBUFFERSARB);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_draw_buffers)
     }
