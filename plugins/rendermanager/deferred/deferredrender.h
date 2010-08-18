@@ -325,7 +325,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     {
       int subTex;
       iTextureHandle *buf = GetAccumBuffer (context, subTex);
-      return buf != nullptr; 
+      return buf != (iTextureHandle*) nullptr; 
     }
 
     /**
