@@ -21,7 +21,7 @@
 using namespace std;
 
 #include <crystalspace.h>
-#include "LodView.h"
+#include "lodview.h"
 
 CS_IMPLEMENT_APPLICATION
 

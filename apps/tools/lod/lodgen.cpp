@@ -21,7 +21,7 @@ using namespace std;
 
 #include "csgeom.h"
 #include "csutil/sysfunc.h"
-#include "LodGen.h"
+#include "lodgen.h"
 
 inline float dot(const csVector3& v0, const csVector3& v1) { return v0 * v1; }
 

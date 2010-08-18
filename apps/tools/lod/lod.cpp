@@ -21,7 +21,7 @@
 using namespace std;
 
 #include <crystalspace.h>
-#include "LodGen.h"
+#include "lodgen.h"
 #include "lod.h"
 
 CS_IMPLEMENT_APPLICATION
