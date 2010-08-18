@@ -36,7 +36,7 @@ namespace Mesh
 {
 
   struct iFurPhysicsControl;
-  struct iFurMeshProperties;
+  struct iFurMeshMaterialProperties;
   struct iFurMeshFactory;
   struct iFurMeshType;
   struct iFurMesh;
@@ -126,13 +126,122 @@ public:
 };
 
 /**
- * Store the material used for the iFurMesh.
- * Material variables can be updated each frame via the Update function.
+ * Access to the properties used for the iFurMesh.
  */
 struct iFurMeshProperties : public virtual iBase
 {
 public:
   SCF_INTERFACE (CS::Mesh::iFurMeshProperties, 1, 0, 0);
+
+  /**
+   * Get the width of a strand
+   */
+  virtual float GetStrandWidth() const = 0;
+
+  /**
+   * Set the width of a strand
+   */
+  virtual void SetStrandWidth(float strandWidth) = 0;
+
+  /**
+   * Get the displacement between the fur mesh and the base mesh
+   */
+  virtual float GetDisplacement() const = 0;
+
+  /**
+   * Set the displacement between the fur mesh and the base mesh
+   */
+  virtual void SetDisplacement(float displacement) = 0;
+
+  /**
+   * Get the density map texture
+   */
+  virtual iTextureHandle* GetDensityMap() const = 0;
+
+  /**
+   * Set the density map texture
+   */
+  virtual void SetDensityMap(iTextureHandle* densityMap) = 0;
+
+  /**
+   * Get the density factor for guide furs
+   */
+  virtual float GetDensityFactorGuideFurs() const = 0;
+
+  /**
+   * Set the density factor for guide furs
+   */
+  virtual void SetDensityFactorGuideFurs(float densityFactorGuideFurs) = 0;
+
+  /**
+   * Get the density factor for fur strands
+   */
+  virtual float GetDensityFactorFurStrands() const = 0;
+
+  /**
+   * Set the density factor for fur strands
+   */
+  virtual void SetDensityFactorFurStrands(float densityFactorFurStrands) = 0;
+
+  /**
+   * Get the heightmap map texture
+   */
+  virtual iTextureHandle* GetHeightMap() const = 0;
+
+  /**
+   * Set the heightmap map texture
+   */
+  virtual void SetHeightMap(iTextureHandle* heightMap) = 0;
+
+  /**
+   * Get the height factor (for guide furs)
+   */
+  virtual float GetHeightFactor() const = 0;
+
+  /**
+   * Set the height factor (for guide furs)
+   */
+  virtual void SetHeightFactor(float heightFactor) = 0;
+
+  /**
+   * Get the distance between control points on a fur
+   */
+  virtual float GetControlPointsDistance() const = 0;
+
+  /**
+   * Set the distance between control points on a fur
+   */
+  virtual void SetControlPointsDistance(float controlPointsDistance) = 0;
+
+  /**
+   * Get the position deviation of fur strands
+   */
+  virtual float GetPositionDeviation() const = 0;
+
+  /**
+   * Set the position deviation of fur strands
+   */
+  virtual void SetPositionDeviation(float positionDeviation) = 0;
+
+  /**
+   * Check if fur grows based on tangent direction
+   */
+  virtual bool GetGrowTangent() const = 0;
+
+  /**
+   * Set if fur grows based on tangent direction
+   */
+  virtual void SetGrowTangent(bool growTangent) = 0;
+};
+
+/**
+ * Store the material used for the iFurMesh.
+ * Material variables can be updated each frame via the Update function.
+ */
+struct iFurMeshMaterialProperties : public virtual iFurMeshProperties
+{
+public:
+  SCF_INTERFACE (CS::Mesh::iFurMeshMaterialProperties, 1, 0, 0);
 
   /**
    * Get the material used
@@ -178,6 +287,28 @@ struct iFurMeshType : public virtual iMeshObjectType
 {
 public:
   SCF_INTERFACE (CS::Mesh::iFurMeshType, 1, 0, 0);
+
+  /**
+   * Create a HairMeshMarschnerProperties using a cons char * as unique ID
+   */
+  virtual iFurMeshMaterialProperties* 
+    CreateHairMeshMarschnerProperties (const char* name) = 0;
+
+  /**
+   * Find iFurMeshMaterialProperties with ID name or return 0 otherwise.
+   */
+  virtual iFurMeshMaterialProperties* 
+    FindFurMeshMaterialProperites (const char* name) const = 0;
+
+  /**
+   * Remove iFurMeshMaterialProperties with ID name if exists.
+   */
+  virtual void RemoveFurMeshMaterialProperites (const char* name) = 0;
+
+  /**
+   * Remove all iFurMeshMaterialProperties.
+   */
+  virtual void ClearFurMeshMaterialProperites () = 0;
 
   /**
    * Create a FurPhysicsControl using a cons char * as unique ID
@@ -254,15 +385,15 @@ struct iFurMesh : public virtual iBase
   virtual void StopAnimationControl ( ) = 0;
  
   /**
-   * Set the associated iFurMeshProperties
+   * Set the associated iFurMeshMaterialProperties
    */
-  virtual void SetFurMeshProperties( iFurMeshProperties* furMeshProperties) = 0;
+  virtual void SetFurMeshProperties( iFurMeshMaterialProperties* furMeshProperties) = 0;
 
   /**
-   * Get the associated iFurMeshProperties.
-   * Shader variables can be obtained via the material of the iFurMeshProperties
+   * Get the associated iFurMeshMaterialProperties.
+   * Shader variables can be obtained via the material of the iFurMeshMaterialProperties
    */
-  virtual iFurMeshProperties* GetFurStrandGenerator( ) const = 0;
+  virtual iFurMeshMaterialProperties* GetFurStrandGenerator( ) const = 0;
 
   /**
    * Set an iAnimatedMeshFactory corresponding to the iAnimatedMeshSubMeshFactory

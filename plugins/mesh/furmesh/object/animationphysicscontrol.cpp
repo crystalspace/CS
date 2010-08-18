@@ -30,8 +30,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   *  AnimationPhysicsControl
   **************************/
 
-  SCF_IMPLEMENT_FACTORY (AnimationPhysicsControl)
-
   CS_LEAKGUARD_IMPLEMENT(AnimationPhysicsControl);	
 
   AnimationPhysicsControl::AnimationPhysicsControl (iBase* parent)

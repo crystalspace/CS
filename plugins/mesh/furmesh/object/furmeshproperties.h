@@ -19,8 +19,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __HAIR_STRAND_GENERATOR_H__
-#define __HAIR_STRAND_GENERATOR_H__
+#ifndef __FUR_MESH_PROPERTIES_H__
+#define __FUR_MESH_PROPERTIES_H__
 
 #include "crystalspace.h"
 
@@ -29,6 +29,48 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
+  class FurMeshProperties : public virtual CS::Mesh::iFurMeshProperties
+  {
+  public:
+    CS_LEAKGUARD_DECLARE(FurMeshProperties);
+
+    FurMeshProperties ();
+    virtual ~FurMeshProperties ();
+
+    virtual float GetStrandWidth() const;
+    virtual void SetStrandWidth(float strandWidth);
+    virtual float GetDisplacement() const;
+    virtual void SetDisplacement(float displacement);
+    virtual iTextureHandle* GetDensityMap() const;
+    virtual void SetDensityMap(iTextureHandle* densityMap);
+    virtual float GetDensityFactorGuideFurs() const;
+    virtual void SetDensityFactorGuideFurs(float densityFactorGuideFurs);
+    virtual float GetDensityFactorFurStrands() const;
+    virtual void SetDensityFactorFurStrands(float densityFactorFurStrands);
+    virtual iTextureHandle* GetHeightMap() const;
+    virtual void SetHeightMap(iTextureHandle* heightMap);
+    virtual float GetHeightFactor() const;
+    virtual void SetHeightFactor(float heightFactor);
+    virtual float GetControlPointsDistance() const;
+    virtual void SetControlPointsDistance(float controlPointsDistance);
+    virtual float GetPositionDeviation() const;
+    virtual void SetPositionDeviation(float positionDeviation);
+    virtual bool GetGrowTangent() const;
+    virtual void SetGrowTangent(bool growTangent);
+  
+  private:
+    float strandWidth;
+    float displacement;
+    iTextureHandle* densityMap;
+    float densityFactorGuideFurs;
+    float densityFactorFurStrands;
+    iTextureHandle* heightMap;
+    float heightFactor;
+    float controlPointsDistance;
+    float positionDeviation;
+    bool growTangents;
+  };
+
   // Light Scattering from Human Hair Fibers
   // http://www.cs.cornell.edu/~srm/publications/SG03-hair.pdf
   class MarschnerConstants
@@ -57,7 +99,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   public:         
     CS_LEAKGUARD_DECLARE(MarschnerConstants);
     // Synchronized shader variables with this class
-    void Initialize();
+    MarschnerConstants();
 
     // Surface properties
     float aR;
@@ -81,18 +123,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   };
 
   class HairMeshProperties : public scfImplementation2 <HairMeshProperties, 
-    CS::Mesh::iFurMeshProperties, iComponent> 
+    scfFakeInterface<CS::Mesh::iFurMeshProperties>, 
+    CS::Mesh::iFurMeshMaterialProperties> , public FurMeshProperties
   {
   public:
     CS_LEAKGUARD_DECLARE(HairMeshProperties);
 
-    HairMeshProperties (iBase* parent);
+    HairMeshProperties (iObjectRegistry* object_reg);
     virtual ~HairMeshProperties ();
 
-    //-- iComponent	
-    virtual bool Initialize (iObjectRegistry*);
-
-    //-- iFurMeshProperties
+    //-- iFurMeshMaterialProperties
     virtual iMaterial* GetMaterial() const;
     virtual void SetMaterial(iMaterial* material);
     virtual void Invalidate();
@@ -187,4 +227,4 @@ public:
 };
 
 
-#endif // __HAIR_STRAND_GENERATOR_H__
+#endif // __FUR_MESH_PROPERTIES_H__

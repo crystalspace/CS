@@ -275,12 +275,6 @@ bool FrankieScene::CreateAvatar ()
   if (!plugmgr)
     return hairTest->ReportError("Failed to locate Plugin Manager!");
 
-  // Load hairMeshProperties
-  csRef<CS::Mesh::iFurMeshProperties> hairMeshProperties = 
-    csQueryRegistry<CS::Mesh::iFurMeshProperties> (hairTest->object_reg);
-  if (!hairMeshProperties)
-    return hairTest->ReportError("Failed to locate CS::Mesh::iFurMeshProperties plugin!");
-
   // Load base material
   csRef<iMaterialWrapper> baseMaterial = 
     hairTest->engine->FindMaterial("base_material");
@@ -308,6 +302,10 @@ bool FrankieScene::CreateAvatar ()
   furPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
   furPhysicsControl->SetRigidBody(mainBody);
   furPhysicsControl->SetAnimesh(animesh);
+
+  // Create hairMeshProperties
+  csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties = 
+    furMeshType->CreateHairMeshMarschnerProperties("krsytal_marschner");
 
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
 

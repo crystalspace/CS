@@ -57,6 +57,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual csPtr<iMeshObjectFactory> NewFactory ();
 
     //-- iFurMeshType
+    virtual CS::Mesh::iFurMeshMaterialProperties* 
+      CreateHairMeshMarschnerProperties (const char* name);
+    virtual CS::Mesh::iFurMeshMaterialProperties* 
+      FindFurMeshMaterialProperites (const char* name) const;
+    virtual void RemoveFurMeshMaterialProperites (const char* name);
+    virtual void ClearFurMeshMaterialProperites ();
+
     virtual CS::Mesh::iFurAnimationControl* CreateFurPhysicsControl (const char* name);
     virtual CS::Mesh::iFurAnimationControl* CreateFurAnimeshControl (const char* name);
     virtual CS::Mesh::iFurAnimationControl* FindFurAnimationControl (const char* name) const;
@@ -68,6 +75,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Pointer to the engine if available.
     iEngine *Engine;
     csHash<csRef<CS::Mesh::iFurAnimationControl>, csString> furAnimationControlHash;
+    csHash<csRef<CS::Mesh::iFurMeshMaterialProperties>, csString> 
+      furMeshMaterialPropertiesHash;
   };
 
   class FurMeshGeometry 

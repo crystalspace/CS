@@ -22,22 +22,156 @@
 #include <cssysdef.h>
 
 #include "furmesh.h"
-#include "hairmeshproperties.h"
+#include "furmeshproperties.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   /************************
+  *  FurMeshProperties
+  ************************/  
+
+  CS_LEAKGUARD_IMPLEMENT(FurMeshProperties);	
+
+  FurMeshProperties::FurMeshProperties() : 
+    strandWidth(0.0015f), displacement(0.02f), densityMap(0), 
+    densityFactorGuideFurs(10), densityFactorFurStrands(100), heightMap(0),
+    heightFactor(0.5f), controlPointsDistance(0.05f), positionDeviation(0.01f), 
+    growTangents(false)
+  {
+  }
+
+  FurMeshProperties::~FurMeshProperties ()
+  {
+  }
+
+  float FurMeshProperties::GetStrandWidth() const
+  {
+    return strandWidth;
+  }
+
+  void FurMeshProperties::SetStrandWidth(float strandWidth)
+  {
+    this->strandWidth = strandWidth;
+  }
+
+  float FurMeshProperties::GetDisplacement() const
+  {
+    return displacement;
+  }
+
+  void FurMeshProperties::SetDisplacement(float displacement)
+  {
+    this->displacement = displacement;
+  }
+
+  iTextureHandle* FurMeshProperties::GetDensityMap() const
+  {
+    return densityMap;
+  }
+
+  void FurMeshProperties::SetDensityMap(iTextureHandle* densityMap)
+  {
+    this->densityMap = densityMap;
+  }
+
+  float FurMeshProperties::GetDensityFactorGuideFurs() const
+  {
+    return densityFactorGuideFurs;
+  }
+
+  void FurMeshProperties::SetDensityFactorGuideFurs(float densityFactorGuideFurs)
+  {
+    this->densityFactorGuideFurs = densityFactorGuideFurs;
+  }
+
+  float FurMeshProperties::GetDensityFactorFurStrands() const
+  {
+    return densityFactorFurStrands;
+  }
+
+  void FurMeshProperties::SetDensityFactorFurStrands(float densityFactorFurStrands)
+  {
+    this->densityFactorFurStrands = densityFactorFurStrands;
+  }
+
+  iTextureHandle* FurMeshProperties::GetHeightMap() const
+  {
+    return heightMap;
+  }
+
+  void FurMeshProperties::SetHeightMap(iTextureHandle* heightMap)
+  {
+    this->heightMap = heightMap;
+  }
+
+  float FurMeshProperties::GetHeightFactor() const
+  {
+    return heightFactor;
+  }
+
+  void FurMeshProperties::SetHeightFactor(float heightFactor)
+  {
+    this->heightFactor = heightFactor;
+  }
+
+  float FurMeshProperties::GetControlPointsDistance() const
+  {
+    return controlPointsDistance;
+  }
+
+  void FurMeshProperties::SetControlPointsDistance(float controlPointsDistance)
+  {
+    this->controlPointsDistance = controlPointsDistance;
+  }
+
+  float FurMeshProperties::GetPositionDeviation() const
+  {
+    return positionDeviation;
+  }
+
+  void FurMeshProperties::SetPositionDeviation(float positionDeviation)
+  {
+    this->positionDeviation = positionDeviation;
+  }
+
+  bool FurMeshProperties::GetGrowTangent() const
+  {
+    return growTangents;
+  }
+
+  void FurMeshProperties::SetGrowTangent(bool growTangent)
+  {
+    this->growTangents = growTangents;
+  }
+
+  /************************
   *  HairMeshProperties
   ************************/  
 
-  SCF_IMPLEMENT_FACTORY (HairMeshProperties)
-
   CS_LEAKGUARD_IMPLEMENT(HairMeshProperties);	
 
-  HairMeshProperties::HairMeshProperties (iBase* parent)
-    : scfImplementationType (this, parent), object_reg(0), material(0), 
-    g3d(0), svStrings(0), M(256, 256), N(256, 256), gauss_matrix(0)
+  HairMeshProperties::HairMeshProperties (iObjectRegistry* object_reg)
+    : scfImplementationType (this), object_reg(0), material(0), 
+    g3d(0), svStrings(0), M(256, 256), N(256, 256), gauss_matrix(0), mc()
   {
+    this->object_reg = object_reg;
+
+    svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+      object_reg, "crystalspace.shader.variablenameset");
+
+    if (!svStrings) 
+    {
+      csPrintfErr ("No SV names string set!\n");
+      return;
+    }
+
+    g3d = csQueryRegistry<iGraphics3D> (object_reg);
+
+    if (!g3d) 
+    {
+      csPrintfErr ("No g3d found!\n");
+      return;
+    }
   }
 
   HairMeshProperties::~HairMeshProperties ()
@@ -50,32 +184,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       delete N.data;
   }
 
-  bool HairMeshProperties::Initialize (iObjectRegistry* r)
-  {
-    object_reg = r;
-
-    svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
-      object_reg, "crystalspace.shader.variablenameset");
-  
-    if (!svStrings) 
-    {
-      csPrintfErr ("No SV names string set!\n");
-      return false;
-    }
-
-    g3d = csQueryRegistry<iGraphics3D> (object_reg);
-    
-    if (!g3d) 
-    {
-      csPrintfErr ("No g3d found!\n");
-      return false;
-    }
-
-    mc.Initialize();
-
-    return true;
-  }
-
   iMaterial* HairMeshProperties::GetMaterial() const
   {
     return material;
@@ -85,10 +193,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     this->material = material;
     
-    M = csTextureRGBA(256, 256);
-    N = csTextureRGBA(256, 256);
-    mc.Initialize();
-
     Invalidate();
   }
 
@@ -382,7 +486,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   CS_LEAKGUARD_IMPLEMENT(MarschnerConstants);	
   
-  void MarschnerConstants::Initialize()
+  MarschnerConstants::MarschnerConstants()
   {
     // Surface properties
     aR = -5;

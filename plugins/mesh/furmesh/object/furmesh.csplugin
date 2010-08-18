@@ -11,14 +11,6 @@
           <class>crystalspace.graphics3d.</class>
         </requires>
       </class>
-      <class>
-        <name>crystalspace.mesh.object.furmeshproperties</name>
-        <implementation>HairMeshProperties</implementation>
-        <description>Fur Mesh Properties Plugin</description>
-        <requires>
-          <class>crystalspace.graphics3d.</class>
-        </requires>
-      </class>
     </classes>
   </scf>
 </plugin>

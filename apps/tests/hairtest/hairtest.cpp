@@ -385,8 +385,6 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
     CS::Animation::iSkeletonBasicNodesManager2),
     CS_REQUEST_PLUGIN("crystalspace.mesh.object.furmesh", CS::Mesh::iFurMeshType),
-    CS_REQUEST_PLUGIN("crystalspace.mesh.object.furmeshproperties", 
-      CS::Mesh::iFurMeshProperties),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");

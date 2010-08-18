@@ -30,8 +30,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   *  HairPhysicsControl
   ********************/
 
-  SCF_IMPLEMENT_FACTORY (HairPhysicsControl)
-
   CS_LEAKGUARD_IMPLEMENT(HairPhysicsControl);	
 
   HairPhysicsControl::HairPhysicsControl (iBase *parent)

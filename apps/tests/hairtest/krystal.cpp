@@ -206,12 +206,6 @@ bool KrystalScene::CreateAvatar ()
   if (!plugmgr)
     return hairTest->ReportError("Failed to locate Plugin Manager!");
 
-  // Load hairMeshProperties
-  csRef<CS::Mesh::iFurMeshProperties> hairMeshProperties = 
-    csQueryRegistry<CS::Mesh::iFurMeshProperties> (hairTest->object_reg);
-  if (!hairMeshProperties)
-    return hairTest->ReportError("Failed to locate CS::Mesh::iFurMeshProperties plugin!");
-
   // Load furMesh
   csRef<CS::Mesh::iFurMeshType> furMeshType = 
     csQueryRegistry<CS::Mesh::iFurMeshType> (hairTest->object_reg);
@@ -359,6 +353,10 @@ bool KrystalScene::CreateAvatar ()
     hairTest->engine->FindMaterial("marschner_material");
   if (!materialWrapper)
     hairTest->ReportError("Can't find marschner material!");
+
+  // Create hairMeshProperties
+  csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties = 
+    furMeshType->CreateHairMeshMarschnerProperties("krsytal_marschner");
 
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
 

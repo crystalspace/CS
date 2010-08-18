@@ -23,7 +23,7 @@
 
 #include "furmesh.h"
 #include "hairphysicscontrol.h"
-#include "hairmeshproperties.h"
+#include "furmeshproperties.h"
 
 #define MAX_GUIDE_FURS 10000
 #define MAX_FUR_STRAND_DENSITY 100
@@ -746,12 +746,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   void FurMesh::SetFurMeshProperties
-    ( CS::Mesh::iFurMeshProperties* hairMeshProperties)
+    ( CS::Mesh::iFurMeshMaterialProperties* hairMeshProperties)
   {
     this->hairMeshProperties = hairMeshProperties;
   }
 
-  CS::Mesh::iFurMeshProperties* FurMesh::GetFurStrandGenerator( ) const
+  CS::Mesh::iFurMeshMaterialProperties* FurMesh::GetFurStrandGenerator( ) const
   {
     return hairMeshProperties;
   }

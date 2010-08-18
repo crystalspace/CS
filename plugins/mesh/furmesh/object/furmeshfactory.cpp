@@ -25,6 +25,7 @@
 #include "hairphysicscontrol.h"
 #include "animationphysicscontrol.h"
 #include "furmeshfactory.h"
+#include "furmeshproperties.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
@@ -89,6 +90,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csRef<iMeshObjectFactory> ref;
     ref.AttachNew (new FurMeshFactory(Engine, object_reg, this));
     return csPtr<iMeshObjectFactory> (ref);
+  }
+
+  CS::Mesh::iFurMeshMaterialProperties* FurMeshType::
+    CreateHairMeshMarschnerProperties (const char* name)
+  {
+    csRef<CS::Mesh::iFurMeshMaterialProperties> newFurMeshMaterial;
+    newFurMeshMaterial.AttachNew(new HairMeshProperties (object_reg));
+    return furMeshMaterialPropertiesHash.PutUnique (name, newFurMeshMaterial);
+  }
+
+  CS::Mesh::iFurMeshMaterialProperties* FurMeshType::
+    FindFurMeshMaterialProperites (const char* name) const
+  {
+    return furMeshMaterialPropertiesHash.Get (name, 0);
+  }
+
+  void FurMeshType::RemoveFurMeshMaterialProperites (const char* name)
+  {
+    CS::Mesh::iFurMeshMaterialProperties* newFurMeshMaterial = 
+      FindFurMeshMaterialProperites(name);
+
+    if (!newFurMeshMaterial)
+      furMeshMaterialPropertiesHash.Delete (name, newFurMeshMaterial);    
+  }
+
+  void FurMeshType::ClearFurMeshMaterialProperites ()
+  {
+    furMeshMaterialPropertiesHash.DeleteAll ();
   }
 
   CS::Mesh::iFurAnimationControl* FurMeshType::CreateFurPhysicsControl (const char* name)
