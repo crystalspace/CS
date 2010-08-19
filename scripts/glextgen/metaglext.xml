@@ -1352,6 +1352,61 @@
     <token name="GL_COMPRESSED_SLUMINANCE" value="0x8C4A" />
     <token name="GL_COMPRESSED_SLUMINANCE_ALPHA" value="0x8C4B" />
   </extension>
+  
+  <!-- Common functionality, used by multiple extensions -->
+  <extension name="Queries" type="pseudo">
+    <token name="GL_QUERY_COUNTER_BITS_ARB" value="0x8864" />
+    <token name="GL_CURRENT_QUERY_ARB" value="0x8865" />
+    <token name="GL_QUERY_RESULT_ARB" value="0x8866" />
+    <token name="GL_QUERY_RESULT_AVAILABLE_ARB" value="0x8867" />
+    <function name="glGenQueriesARB" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="ids" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glDeleteQueriesARB" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="ids" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glIsQueryARB" return="GLboolean" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glBeginQueryARB" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glEndQueryARB" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glGetQueryivARB" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetQueryObjectivARB" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetQueryObjectuivARB" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLuint" const="false" pointer="true" />
+    </function>
+  </extension>
+  <extension name="Queries64" type="pseudo">
+    <depends ext="Queries" />
+    <function name="glGetQueryObjecti64v" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint64" const="false" pointer="true" />
+    </function>
+    <function name="glGetQueryObjectui64v" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLuint64" const="false" pointer="true" />
+    </function>
+  </extension>
+  
   <extension name="GL_ARB_imaging" type="GL">
     <token name="GL_CONSTANT_COLOR" value="32769" />
     <token name="GL_ONE_MINUS_CONSTANT_COLOR" value="32770" />
@@ -7328,44 +7383,8 @@
     <token name="GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT" value="0x84F8" />
   </extension>
   <extension name="GL_ARB_occlusion_query" type="GL">
+    <depends ext="Queries" />
     <token name="GL_SAMPLES_PASSED_ARB" value="0x8914" />
-    <token name="GL_QUERY_COUNTER_BITS_ARB" value="0x8864" />
-    <token name="GL_CURRENT_QUERY_ARB" value="0x8865" />
-    <token name="GL_QUERY_RESULT_ARB" value="0x8866" />
-    <token name="GL_QUERY_RESULT_AVAILABLE_ARB" value="0x8867" />
-    <function name="glGenQueriesARB" return="GLvoid" pointer="false">
-      <arg name="n" type="GLsizei" const="false" pointer="false" />
-      <arg name="ids" type="GLuint" const="false" pointer="true" />
-    </function>
-    <function name="glDeleteQueriesARB" return="GLvoid" pointer="false">
-      <arg name="n" type="GLsizei" const="false" pointer="false" />
-      <arg name="ids" type="GLuint" const="false" pointer="true" />
-    </function>
-    <function name="glIsQueryARB" return="GLboolean" pointer="false">
-      <arg name="id" type="GLuint" const="false" pointer="false" />
-    </function>
-    <function name="glBeginQueryARB" return="GLvoid" pointer="false">
-      <arg name="target" type="GLenum" const="false" pointer="false" />
-      <arg name="id" type="GLuint" const="false" pointer="false" />
-    </function>
-    <function name="glEndQueryARB" return="GLvoid" pointer="false">
-      <arg name="target" type="GLenum" const="false" pointer="false" />
-    </function>
-    <function name="glGetQueryivARB" return="GLvoid" pointer="false">
-      <arg name="target" type="GLenum" const="false" pointer="false" />
-      <arg name="pname" type="GLenum" const="false" pointer="false" />
-      <arg name="params" type="GLint" const="false" pointer="true" />
-    </function>
-    <function name="glGetQueryObjectivARB" return="GLvoid" pointer="false">
-      <arg name="id" type="GLuint" const="false" pointer="false" />
-      <arg name="pname" type="GLenum" const="false" pointer="false" />
-      <arg name="params" type="GLint" const="false" pointer="true" />
-    </function>
-    <function name="glGetQueryObjectuivARB" return="GLvoid" pointer="false">
-      <arg name="id" type="GLuint" const="false" pointer="false" />
-      <arg name="pname" type="GLenum" const="false" pointer="false" />
-      <arg name="params" type="GLuint" const="false" pointer="true" />
-    </function>
   </extension>
   <extension name="GL_ARB_draw_buffers" type="GL">
     <token name="GL_MAX_DRAW_BUFFERS_ARB" value="0x8824" />
@@ -7670,4 +7689,17 @@
     <token name="GL_TEXTURE_CUBE_MAP_SEAMLESS" value="0x884F" />
   </extension>
   <extension name="GL_AMD_seamless_cubemap_per_texture" type="GL" />
+  <extension name="GL_ARB_timer_query" type="GL">
+    <depends ext="Queries64" />
+    <function name="glGetInteger64v" return="GLvoid" pointer="false"><!-- actually defined in OpenGL 3.2 -->
+      <arg name="value" type="GLenum" const="false" pointer="false" />
+      <arg name="data" type="GLint64" const="false" pointer="true" />
+    </function>
+    <token name="GL_TIME_ELAPSED" value="0x88BF" />
+    <token name="GL_TIMESTAMP" value="0x8E28" />
+    <function name="glQueryCounter" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+    </function>
+  </extension>
 </extensionlist>
