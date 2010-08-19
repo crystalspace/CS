@@ -1,0 +1,17 @@
+<shader compiler="xmlshader" name="lighting_fullbright_fixed">
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <!-- vp plugin="glfixed" / -->
+      <texture destination="unit 0" name="tex diffuse" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="texture" modifier="color" />
+            <coloroperation operation="replace" />
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>
