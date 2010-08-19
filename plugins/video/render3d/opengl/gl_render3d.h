@@ -51,6 +51,8 @@
 #include "gl_txtmgr.h"
 #include "gl_renderbuffer.h"
 #include "gl_r2t_backend.h"
+#include "profilinghelper.h"
+#include "querypool.h"
 
 struct csGLExtensionManager;
 
@@ -207,6 +209,21 @@ private:
   csRef<csGLVBOBufferManager> vboManager;
   bool isOpen;
   uint frameNum;
+  
+  QueryPool queryPool;
+  bool glProfiling;
+  ProfilingHelper profileHelper;
+  class ProfileScope
+  {
+    csGLGraphics3D* renderer;
+    const char* descr;
+    int64 startStamp;
+    GLuint startQuery, endQuery;
+  public:
+    ProfileScope (csGLGraphics3D* renderer, const char* descr);
+    ~ProfileScope ();
+  };
+  void RecordProfileEvent (const char* descr);
 
   csEventID SystemOpen;
   csEventID SystemClose;
@@ -524,7 +541,7 @@ public:
 
   /// Close renderer and release all resources used
   void Close ();
-
+  
   /// Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
   /// and therefore it shouldn't be decref-ed by caller.
   iGraphics2D* GetDriver2D () 
@@ -765,6 +782,7 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   bool Initialize (iObjectRegistry* reg);
+  csRef<iVFS> GetVFS();
 	
   ////////////////////////////////////////////////////////////////////
   //                         iEventHandler

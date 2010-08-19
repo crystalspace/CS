@@ -84,9 +84,9 @@ SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
   scfImplementationType (this, parent), isOpen (false), frameNum (0), 
-  explicitProjection (false), needMatrixUpdate (true), imageUnits (0),
-  activeVertexAttribs (0), wantToSwap (false), delayClearFlags (0),
-  currentAttachments (0)
+  glProfiling (false), explicitProjection (false), needMatrixUpdate (true),
+  imageUnits (0), activeVertexAttribs (0), wantToSwap (false),
+  delayClearFlags (0), currentAttachments (0)
 {
   verbose = false;
   frustum_valid = false;
@@ -161,6 +161,43 @@ void csGLGraphics3D::OutputMarkerString (const char* function,
   marker.Format ("[%ls %s():%d] %s", file, function, line, 
     message.GetStr());
   ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
+}
+
+
+csGLGraphics3D::ProfileScope::ProfileScope (csGLGraphics3D* renderer, const char* descr)
+ : renderer (renderer), descr (descr), startQuery (0)
+{
+  if (renderer->glProfiling)
+  {
+    startQuery = renderer->queryPool.AllocQuery ();
+    endQuery = renderer->queryPool.AllocQuery ();
+    csGLGraphics3D::ext->glGetInteger64v (GL_TIMESTAMP, &startStamp);
+    csGLGraphics3D::ext->glQueryCounter (startQuery, GL_TIMESTAMP);
+  }
+}
+
+csGLGraphics3D::ProfileScope::~ProfileScope ()
+{
+  if (startQuery != 0)
+  {
+    csGLGraphics3D::ext->glQueryCounter (endQuery, GL_TIMESTAMP);
+    renderer->profileHelper.RecordTimeSpan (renderer->frameNum,
+					    startStamp,
+					    startQuery, endQuery,
+					    descr);
+  }
+}
+
+void csGLGraphics3D::RecordProfileEvent (const char* descr)
+{
+  if (glProfiling)
+  {
+    GLuint query = queryPool.AllocQuery ();
+    int64 startStamp;
+    ext->glGetInteger64v (GL_TIMESTAMP, &startStamp);
+    ext->glQueryCounter (query, GL_TIMESTAMP);
+    profileHelper.RecordEvent (frameNum, startStamp, query, descr);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1139,6 +1176,41 @@ bool csGLGraphics3D::Open ()
       LQUOT "Forceful" RQUOT " fixed function enable: %s",
       fixedFunctionForcefulEnable ? "yes" : "no");
       
+  glProfiling =
+    config->GetBool ("Video.OpenGL.Profiling", false);
+  if (glProfiling)
+  {
+    ext->InitGL_ARB_timer_query();
+    if (!ext->CS_GL_ARB_timer_query)
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "GL profiling requested, but not supported");
+      glProfiling = false;
+    }
+    else
+    {
+      const char* profileFN = "/this/glprofiling.csv";
+      
+      csRef<iFile> profFile;
+      csRef<iVFS> vfs (GetVFS ());
+      if (vfs)
+      {
+	profFile = vfs->Open (profileFN, VFS_FILE_WRITE);
+      }
+      if (!profFile)
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"GL profiling requested, but could not open %s",
+		profileFN);
+	glProfiling = false;
+      }
+      else
+      {
+	profileHelper.SetFile (profFile);
+	profileHelper.ResetStampOffset();
+      }
+    }
+  }
+      
   return true;
 }
 
@@ -1255,6 +1327,13 @@ void csGLGraphics3D::Close ()
     if (halos[h]) halos[h]->DeleteTexture();
   }
   vboManager.Invalidate();
+  
+  if (glProfiling)
+  {
+    profileHelper.FlushEvents (frameNum, queryPool, 0);
+    profileHelper.SetFile (nullptr);
+  }
+  queryPool.DiscardAllQueries();
 
   if (G2D)
     G2D->Close ();
@@ -1411,6 +1490,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
                        // Avoids `symbols defined but not used' warning.
   GLRENDER3D_OUTPUT_STRING_MARKER(("drawflags = %s", 
     csBitmaskToString::GetStr (drawflags, drawflagNames)));
+    
+  ProfileScope _profile (this, "BeginDraw");
 
   SetWriteMask (true, true, true, true);
   if (ext->CS_GL_ARB_point_sprite)
@@ -1553,6 +1634,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
 void csGLGraphics3D::FinishDraw ()
 {
+  ProfileScope _profile (this, "FinishDraw");
+  
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
 
@@ -1588,9 +1671,12 @@ void csGLGraphics3D::Print (csRect const* area)
     }
     SwapIfNeeded();
   }
+  RecordProfileEvent ("frame swap");
   G2D->Print (area);
   
   //csPrintf ("frame\n");
+  if (glProfiling)
+    profileHelper.FlushEvents (frameNum, queryPool, 2);
   frameNum++;
   r2tbackend->NextFrame (frameNum);
   txtmgr->NextFrame (frameNum);
@@ -1696,6 +1782,8 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
   unsigned int i;
   if (!attribs)
   {
+    ProfileScope _profile (this, "Deactivate all buffers");
+    
     //disable all
     statecache->Disable_GL_VERTEX_ARRAY ();
     statecache->Disable_GL_NORMAL_ARRAY ();
@@ -1747,6 +1835,8 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
 
 bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 {
+  ProfileScope _profile (this, "Activate texture");
+  
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetCurrentImageUnit (unit);
@@ -1791,6 +1881,8 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 
 void csGLGraphics3D::DeactivateTexture (int unit)
 {
+  ProfileScope _profile (this, "Deactivate texture");
+  
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetCurrentImageUnit (unit);
@@ -1856,6 +1948,8 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 void csGLGraphics3D::SetTextureComparisonModes (int* units,
   CS::Graphics::TextureComparisonMode* modes, int count)
 {
+  ProfileScope _profile (this, "Set texture comparison modes");
+  
   if (modes == 0)
   {
     CS::Graphics::TextureComparisonMode modeDisabled;
@@ -1919,6 +2013,8 @@ void csGLGraphics3D::SetupInstance (size_t instParamNum,
                                     const csVertexAttrib targets[], 
                                     csShaderVariable* const params[])
 {
+  ProfileScope _profile (this, "Setup instance");
+  
   csVector4 v;
   float matrix[16];
   bool uploadMatrix;
@@ -2261,6 +2357,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
   if (bufData != (void*)-1)
   {
+    ProfileScope _profile (this, "Mesh drawing");
+  
     SetMixMode (mixmode, modes.alphaType, modes.alphaTest);
 
     if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
@@ -2671,6 +2769,8 @@ void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
 void csGLGraphics3D::ApplyBufferChanges()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  
+  ProfileScope _profile (this, "apply buffer changes");
   
   for (size_t i = 0; i < changeQueue.GetSize (); i++)
   {
@@ -3948,6 +4048,16 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 }
 
 
+csRef<iVFS> csGLGraphics3D::GetVFS ()
+{
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  if (!vfs)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+	    "Could not get VFS.");
+  }
+  return vfs;
+}
 
 
 ////////////////////////////////////////////////////////////////////
@@ -4023,11 +4133,9 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
       return false;
     }
 
-    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+    csRef<iVFS> vfs = GetVFS ();
     if (!vfs)
     {
-      Report (CS_REPORTER_SEVERITY_WARNING, 
-	      "Could not get VFS.");
       return false;
     }
 
@@ -4058,11 +4166,9 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
     return;
   }
 
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iVFS> vfs = GetVFS ();
   if (!vfs)
   {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Could not get VFS.");
     return;
   }
 
