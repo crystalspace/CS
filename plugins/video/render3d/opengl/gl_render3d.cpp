@@ -1835,8 +1835,6 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
 
 bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 {
-  ProfileScope _profile (this, "Activate texture");
-  
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetCurrentImageUnit (unit);
@@ -1848,6 +1846,8 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
     static_cast<csGLBasicTextureHandle*> (txthandle);
   GLuint texHandle = gltxthandle->GetHandle ();
 
+  ProfileScope _profile (this, "Activate texture");
+  
   switch (gltxthandle->texType)
   {
     case iTextureHandle::texType1D:
@@ -1881,8 +1881,6 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 
 void csGLGraphics3D::DeactivateTexture (int unit)
 {
-  ProfileScope _profile (this, "Deactivate texture");
-  
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetCurrentImageUnit (unit);
@@ -1891,6 +1889,8 @@ void csGLGraphics3D::DeactivateTexture (int unit)
 
   if (imageUnits[unit].texture == 0) return;
 
+  ProfileScope _profile (this, "Deactivate texture");
+  
   switch (imageUnits[unit].texture->texType)
   {
     case iTextureHandle::texType1D:
