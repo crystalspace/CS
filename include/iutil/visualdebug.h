@@ -22,8 +22,10 @@
 #define __VISUALDEBUG_H__
 
 #include "iutil/plugin.h"
+#include "csutil/cscolor.h"
 
 class csReversibleTransform;
+class csVector3;
 struct iObjectRegistry;
 struct iView;
 
@@ -42,17 +44,40 @@ struct iVisualDebugger : public virtual iBase
   SCF_INTERFACE(iVisualDebugger, 1, 0, 0);
 
   /**
-   * Add the given transform at the list of transforms to be displayed
-   * on the next call to Display().
+   * Add the given transform to the list of transforms to be displayed
+   * on the next call to Display(). Each axis of the transform will be displayed,
+   * with the X axis in red, the Y axis in green, and the Z axis in blue.
+   * \param transform The transform to be displayed
+   * \param persist Whether or not this transform has to be displayed in each
+   * future frame or only for the next one.
+   * \param size The size of the axis, in world units.
    */
-  virtual void DebugTransform (csReversibleTransform& transform) = 0;
+  virtual void DebugTransform (const csReversibleTransform& transform,
+			       bool persist = false,
+			       float size = 0.1f) = 0;
 
   /**
-   * Display all transforms defined by DebugTransform(). You have to call
-   * this at each frame, after the 3D display of the view. The list of
-   * transforms will be cleared.
+   * Add the given position to the list of positions to be displayed
+   * on the next call to Display(). A square dot will be displayed at that position.
+   * \param position The position to be debugged
+   * \param persist Whether or not this position has to be displayed in each
+   * future frame or only for the next one.
+   * \param color The color to be used when displaying the position
+   * \param size The size of the dot that will be displayed, in pixels. Pay attention
+   * that if you use an even number for this size, then the square will be shifted of
+   * an half pixel.
    */
-  virtual void Display (iView* view, float axisSize = 1.0f) = 0;
+  virtual void DebugPosition (const csVector3& position,
+			      bool persist = false,
+			      csColor color = csColor (0.0f, 1.0f, 0.0f),
+			      size_t size = 3) = 0;
+
+  /**
+   * Display all transforms and positions defined by DebugTransform() and
+   * DebugPosition(). You have to call this at each frame, after the 3D
+   * display of the view. The list of transforms will be cleared.
+   */
+  virtual void Display (iView* view) = 0;
 };
 
 /**
@@ -66,22 +91,37 @@ class VisualDebuggerHelper
    * Load the iVisualDebugger plugin and call iVisualDebugger::DebugTransform()
    */
   static void DebugTransform (iObjectRegistry* object_reg,
-			      csReversibleTransform& transform)
+			      const csReversibleTransform& transform,
+			      bool persist = false,
+			      float size = 0.1f)
   {
     csRef<iVisualDebugger> debugger = csQueryRegistryOrLoad<iVisualDebugger>
       (object_reg, "crystalspace.utilities.visualdebugger");
-    debugger->DebugTransform (transform);
+    debugger->DebugTransform (transform, persist, size);
+  }
+
+  /**
+   * Load the iVisualDebugger plugin and call iVisualDebugger::DebugPosition()
+   */
+  static void DebugPosition (iObjectRegistry* object_reg,
+			     const csVector3& position,
+			     bool persist = false,
+			     csColor color = csColor (0.0f, 1.0f, 0.0f),
+			     size_t size = 3)
+  {
+    csRef<iVisualDebugger> debugger = csQueryRegistryOrLoad<iVisualDebugger>
+      (object_reg, "crystalspace.utilities.visualdebugger");
+    debugger->DebugPosition (position, persist, color, size);
   }
 
   /**
    * Load the iVisualDebugger plugin and call iVisualDebugger::Display()
    */
-  static void Display (iObjectRegistry* object_reg,
-		       iView* view, float axisSize = 1.0f)
+  static void Display (iObjectRegistry* object_reg, iView* view)
   {
     csRef<iVisualDebugger> debugger = csQueryRegistryOrLoad<iVisualDebugger>
       (object_reg, "crystalspace.utilities.visualdebugger");
-    debugger->Display (view, axisSize);
+    debugger->Display (view);
   }
 };
 
