@@ -559,6 +559,9 @@ void DemoApplication::Frame ()
   // Tell the camera to render into the frame buffer.
   view->Draw ();
 
+  // Display of visual debugging informations
+  visualDebugger->Display (view);
+
   // Display the HUD if it is enabled
   if (hudDisplayed)
     hudHelper.DisplayHUD ();
@@ -581,19 +584,22 @@ bool DemoApplication::OnKeyboard (iEvent &event)
   return hudHelper.OnKeyboard (event);
 }
 
-bool DemoApplication::OnMouseDown (iEvent& e)
+bool DemoApplication::OnMouseDown (iEvent& event)
 {
-  return cameraHelper.OnMouseDown (e);
+  return cameraHelper.OnMouseDown (event);
 }
 
-bool DemoApplication::OnMouseUp (iEvent& e)
+bool DemoApplication::OnMouseUp (iEvent& event)
 {
-  return cameraHelper.OnMouseUp (e);
+  return cameraHelper.OnMouseUp (event);
 }
 
-bool DemoApplication::OnMouseMove (iEvent& e)
+bool DemoApplication::OnMouseMove (iEvent& event)
 {
-  return cameraHelper.OnMouseMove (e);
+  mouseX = csMouseEventHelper::GetX (&event);
+  mouseY = csMouseEventHelper::GetY (&event);
+
+  return cameraHelper.OnMouseMove (event);
 }
 
 void DemoApplication::OnExit ()
@@ -620,6 +626,8 @@ bool DemoApplication::OnInitialize (int argc, char* argv[])
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_PLUGIN ("crystalspace.utilities.visualdebugger",
+		       CS::Debug::iVisualDebugger),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -654,6 +662,9 @@ bool DemoApplication::Application ()
   g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
   if (!g2d) return ReportError("Failed to locate 2D renderer!");
 
+  visualDebugger = csQueryRegistry<CS::Debug::iVisualDebugger> (GetObjectRegistry ());
+  if (!visualDebugger) return ReportError("Failed to locate visual debugger!");
+
   printer.AttachNew (new FramePrinter (GetObjectRegistry ()));
 
   // Initialize the view
@@ -662,6 +673,10 @@ bool DemoApplication::Application ()
 
   // Initialize the HUD helper
   hudHelper.Initialize ();
+
+  // Workaround for correct initialization of mouseX and mouseY:
+  // initialize the mouse position to the center of the window
+  g2d->SetMousePosition (g2d->GetWidth () / 2, g2d->GetHeight () / 2);
 
   return true;
 }
