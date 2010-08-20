@@ -35,7 +35,6 @@
 #include "csutil/eventnames.h"
 #include "iutil/virtclk.h"
 
-#define CS_DECAL_CLIP_DECAL
 #define CS_DECAL_MAX_TRIS_PER_DECAL         64 
 #define CS_DECAL_MAX_VERTS_PER_DECAL        128 
 
@@ -99,6 +98,15 @@ private:
   size_t numClipPlanes;
   float topPlaneDist;
   float bottomPlaneDist;
+
+  struct AnimationControlData
+  {
+    iDecalAnimationControl* animationControl;
+    uint firstIndex;
+    csArray<size_t> animatedIndices;
+  };
+  csArray<AnimationControlData> animationControls;
+  AnimationControlData animationControlData;
   
 public:
   csDecal (iObjectRegistry * objectReg, csDecalManager * decalManager);
@@ -109,8 +117,10 @@ public:
     const csVector3 & right, float width, float height);
   
   void BeginMesh (iMeshWrapper * mesh);
-  virtual void AddStaticPoly (const csPoly3D & p);
+  virtual void AddStaticPoly (const csPoly3D & p, csArray<size_t>* indices = 0);
   void EndMesh ();
+
+  virtual void SetDecalAnimationControl (iDecalAnimationControl* animationControl);
 
   bool Age (csTicks ticks);
 

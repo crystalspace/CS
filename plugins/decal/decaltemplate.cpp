@@ -19,6 +19,8 @@
 #include "cssysdef.h"
 #include "decaltemplate.h"
 
+#undef CS_DECAL_CLIP_DECAL
+
 SCF_IMPLEMENT_FACTORY (csDecalTemplate)
 
 csDecalTemplate::csDecalTemplate ()
@@ -47,6 +49,11 @@ csDecalTemplate::csDecalTemplate ()
 csDecalTemplate::csDecalTemplate (iBase* parent)
   : scfImplementationType (this, parent)
 {
+#ifdef CS_DECAL_CLIP_DECAL
+  hasClipping = true;
+#else
+  hasClipping = false;
+#endif
 }
 
 csDecalTemplate::~csDecalTemplate ()
@@ -81,6 +88,11 @@ float csDecalTemplate::GetPolygonNormalThreshold () const
 float csDecalTemplate::GetDecalOffset () const
 {
   return decalOffset;
+}
+
+bool csDecalTemplate::HasClipping () const
+{
+  return hasClipping;
 }
 
 bool csDecalTemplate::HasTopClipping () const
@@ -171,6 +183,11 @@ void csDecalTemplate::SetPolygonNormalThreshold (float polygonNormalThreshold)
 void csDecalTemplate::SetDecalOffset (float decalOffset)
 {
   this->decalOffset = decalOffset;
+}
+
+void csDecalTemplate::SetClipping (bool enabled)
+{
+  hasClipping = enabled;
 }
 
 void csDecalTemplate::SetTopClipping (bool enabled, float topPlaneScale)

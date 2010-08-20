@@ -61,6 +61,10 @@ public:
   virtual iDecal* CreateDecal (iDecalTemplate* decalTemplate, 
     iSector* sector, const csVector3& pos, const csVector3& up, 
     const csVector3& normal, float width, float height, iDecal* oldDecal);
+  virtual iDecal* CreateDecal (iDecalTemplate* decalTemplate, 
+    iMeshWrapper* mesh, const csVector3& pos, const csVector3& up, 
+    const csVector3& normal, float width = 1.0f, float height = 1.0f,
+    iDecal* oldDecal = 0);
 
   virtual csRef<iDecalTemplate> CreateDecalTemplate (
     iMaterialWrapper* material);
@@ -78,9 +82,6 @@ public:
 private:
   bool EnsureEngineReference ();
 
-  void FillDecal (csDecal* decal, iMeshWrapperIterator* meshIter, 
-    const csVector3 & pos, float radius);
-      
   void RemoveDecalFromList (csDecal* decal);
 };  
 

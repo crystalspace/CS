@@ -20,14 +20,17 @@
 #define __CS_IGEOM_DECAL_H__
 
 #include <csutil/scf.h>
+#include <csutil/array.h>
 #include <ivideo/graph3d.h>
 
 struct iSector;
 struct iMaterialWrapper;
+struct iMeshWrapper;
 class csVector3;
 class csVector2;
 class csPoly3D;
 class csColor4;
+class csRenderBuffer;
 
 /**\file
  * Decal and Decal manager interfaces
@@ -52,7 +55,7 @@ struct iDecal
  */
 struct iDecalTemplate : public virtual iBase
 {
-  SCF_INTERFACE(iDecalTemplate, 1, 2, 0);
+  SCF_INTERFACE(iDecalTemplate, 1, 2, 1);
 
   /**
    * Retrieves the time the decal will have to live in seconds before it is 
@@ -73,13 +76,13 @@ struct iDecalTemplate : public virtual iBase
    */
   virtual long GetRenderPriority () const = 0;
 
-  /** 
+  /**
    * Retrieves the z-buffer mode for this decal.
    *  \return the z-buffer mode.
    */
   virtual csZBufMode GetZBufMode () const = 0;
 
-  /** 
+  /**
    * Retrieves the polygon normal threshold for this decal.  
    *
    * Values close to 1 will exclude polygons that don't match the decal's 
@@ -210,13 +213,13 @@ struct iDecalTemplate : public virtual iBase
    */
   virtual void SetRenderPriority (long renderPriority) = 0;
 
-  /** 
+  /**
    * Sets the z-buffer mode for this decal.
    *  \param mode	The z-buffer mode for the decal.
    */
   virtual void SetZBufMode (csZBufMode mode) = 0;
 
-  /** 
+  /**
    * Sets the polygon normal threshold for this decal.  
    *
    * Values close to 1 will exclude polygons that don't match the decal's 
@@ -241,14 +244,16 @@ struct iDecalTemplate : public virtual iBase
    */
   virtual void SetDecalOffset (float decalOffset) = 0;
 
-  /** Enables or disables clipping geometry above the decal.
+  /**
+   * Enables or disables clipping geometry above the decal.
    *   \param enabled		True if top clipping should be enabled.
    *   \param topPlaneScale	The distance from the decal position to the
    *                            top plane as a multiple of decal size.
    */
   virtual void SetTopClipping (bool enabled, float topPlaneScale = 0.0f) = 0;
 
-  /** Enables or disables clipping geometry below the decal.
+  /**
+   * Enables or disables clipping geometry below the decal.
    *   \param enabled		True if bottom clipping should be enabled.
    *   \param bottomPlaneScale	The distance from the decal position to the
    *                            bottom plane as a multiple of decal size.
@@ -307,6 +312,41 @@ struct iDecalTemplate : public virtual iBase
   *  \param color The top color of the decal.
   */
   virtual void SetBottomColor (const csColor4& color) = 0;
+
+  /**
+   * Set whether or not the decal will do any clipping. This has to be enabled for
+   * SetTopClipping() and SetBottomClipping() being used. Default value is true.
+   */
+  virtual void SetClipping (bool enabled) = 0;
+
+  /**
+   * Get whether or not the decal will do any clipping.
+   */
+  virtual bool HasClipping () const = 0;
+};
+
+/**
+ * A decal animation control, to be used by the iMeshObject when the vertices
+ * of the decal have to be animated.
+ */
+struct iDecalAnimationControl
+{
+  /**
+   * Update the vertices and normals of the decal.
+   * \param decalTemplate The template of the decal
+   * \param baseIndex The starting index of the vertices and normals that have
+   * to be updated in the render buffers provided.
+   * \param indices The indices of the iMeshObject corresponding to the indices
+   * of the decal. These are the list of the indices provided in
+   * iDecalBuilder::AddStaticPoly().
+   * \param vertices The vertices of the decal that need to be updated
+   * \param normals The normals of the decal that need to be updated
+   */
+  virtual void UpdateDecal (iDecalTemplate* decalTemplate,
+			    size_t baseIndex,
+			    csArray<size_t>& indices,
+			    csRenderBuffer& vertices,
+			    csRenderBuffer& normals) = 0;
 };
 
 /**
@@ -321,9 +361,17 @@ struct iDecalBuilder
    * Adds a static polygon to the decal.  The decal builder
    * will build geometry for this polygon and append it to
    * the mesh's extra rendermesh list.
-   * \param p   The polygon to add to the decal.
+   * \param polygon The polygon to add to the decal.
+   * \param indices The indices of the vertices of the iMeshObject corresponding to
+   * the vertices of the given polygon. This has to be provided only if you use an
+   * iDecalAnimationControl.
    */
-  virtual void AddStaticPoly (const csPoly3D& p) = 0;
+  virtual void AddStaticPoly (const csPoly3D& polygon, csArray<size_t>* indices = 0) = 0;
+
+  /**
+   * Set the animation controller for this decal.
+   */
+  virtual void SetDecalAnimationControl (iDecalAnimationControl* animationControl) = 0;
     
 };
 
@@ -338,10 +386,10 @@ struct iDecalBuilder
  */
 struct iDecalManager : public virtual iBase
 {
-  SCF_INTERFACE (iDecalManager, 1, 0, 0);
+  SCF_INTERFACE (iDecalManager, 1, 0, 1);
 
   /**
-   * Creates a decal.
+   * Creates a decal that can be shared among several meshes.
    * \param decalTemplate The template used to create the decal.
    * \param sector The sector to begin searching for nearby meshes.
    * \param pos The position of the decal in world coordinates.
@@ -383,6 +431,23 @@ struct iDecalManager : public virtual iBase
    *    GetDecalCount()-1
    */
   virtual iDecal* GetDecal (size_t idx) const = 0;
+
+  /**
+   * Creates a decal on a specific mesh.
+   * \param decalTemplate The template used to create the decal.
+   * \param sector The sector to begin searching for nearby meshes.
+   * \param pos The position of the decal in world coordinates.
+   * \param up The up direction of the decal.
+   * \param normal The overall normal of the decal.
+   * \param width The width of the decal.
+   * \param height The height of the decal.
+   * \param oldDecal An existing decal that can be reused for efficiency.
+   * \return True if the decal is created.
+   */
+  virtual iDecal* CreateDecal (iDecalTemplate* decalTemplate, 
+    iMeshWrapper* mesh, const csVector3& pos, const csVector3& up, 
+    const csVector3& normal, float width = 1.0f, float height = 1.0f,
+    iDecal* oldDecal = 0) = 0;
 };
 /** @} */
 

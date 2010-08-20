@@ -43,8 +43,7 @@
 
 csDecal::csDecal(iObjectRegistry * objectReg, csDecalManager * decalManager)
   : objectReg(objectReg), decalManager(decalManager),
-  indexCount(0), vertexCount(0), width(0), height(0), currMesh(0)
-	 
+    indexCount(0), vertexCount(0), width(0), height(0), currMesh(0)
 {
   engine = csQueryRegistry<iEngine> (objectReg);
 
@@ -126,41 +125,123 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
   vertOffset = localNormal * decalTemplate->GetDecalOffset ();
   relPos = trans.Other2This (pos);
 
-#ifdef CS_DECAL_CLIP_DECAL
-  // up 
-  clipPlanes[0] = csPlane3 (-localUp, -height*0.5f + localUp * relPos);
-  // down
-  clipPlanes[1] = csPlane3 (localUp, -height*0.5f - localUp * relPos);
-  // left
-  clipPlanes[2] = csPlane3 (-localRight, -width*0.5f + localRight * relPos);
-  // right
-  clipPlanes[3] = csPlane3 (localRight, -width*0.5f - localRight * relPos);
-
-  numClipPlanes = 4;
-
-  // top
-  if (decalTemplate->HasTopClipping ())
+  if (decalTemplate->HasClipping ())
   {
-    topPlaneDist = decalTemplate->GetTopClippingScale () * radius;
-    clipPlanes[numClipPlanes++] = csPlane3 (-localNormal,
-      -topPlaneDist + localNormal * relPos);
-  }
+    // up 
+    clipPlanes[0] = csPlane3 (-localUp, -height*0.5f + localUp * relPos);
+    // down
+    clipPlanes[1] = csPlane3 (localUp, -height*0.5f - localUp * relPos);
+    // left
+    clipPlanes[2] = csPlane3 (-localRight, -width*0.5f + localRight * relPos);
+    // right
+    clipPlanes[3] = csPlane3 (localRight, -width*0.5f - localRight * relPos);
 
-  // bottom
-  if (decalTemplate->HasBottomClipping ())
-  {
-    bottomPlaneDist = decalTemplate->GetBottomClippingScale () * radius;
-    clipPlanes[numClipPlanes++] = csPlane3 (localNormal,
-      -bottomPlaneDist - localNormal * relPos);
+    numClipPlanes = 4;
+
+    // top
+    if (decalTemplate->HasTopClipping ())
+    {
+      topPlaneDist = decalTemplate->GetTopClippingScale () * radius;
+      clipPlanes[numClipPlanes++] = csPlane3 (-localNormal,
+					      -topPlaneDist + localNormal * relPos);
+    }
+
+    // bottom
+    if (decalTemplate->HasBottomClipping ())
+    {
+      bottomPlaneDist = decalTemplate->GetBottomClippingScale () * radius;
+      clipPlanes[numClipPlanes++] = csPlane3 (localNormal,
+					      -bottomPlaneDist - localNormal * relPos);
+    }
   }
-#endif // CS_DECAL_CLIP_DECAL
 
   // we didn't encounter any errors, so validate the current mesh
   currMesh = mesh;
 }
 
-void csDecal::AddStaticPoly (const csPoly3D & p)
+void CutPolyToPlane (csPoly3D& poly, const csPlane3& split_plane, csArray<size_t>* indices)
 {
+  if (!indices)
+  {
+    poly.CutToPlane (split_plane);
+    return;
+  }
+
+  if (poly.GetVertexCount () < 3)
+    return; 
+
+  csPoly3D old (poly);
+  poly.MakeEmpty ();
+
+  csArray<size_t> oldIndices (*indices);
+  indices->DeleteAll ();
+
+  csVector3 ptB;
+  float sideA, sideB;
+  csVector3 ptA = old.GetVertices ()[old.GetVertexCount () - 1];
+  sideA = split_plane.Classify (ptA);
+  if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
+
+  int i;
+  for (i = -1; ++i < (int)old.GetVertexCount ();)
+  {
+    ptB = old.GetVertices ()[i];
+    sideB = split_plane.Classify (ptB);
+    if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
+    if (sideB > 0)
+    {
+      if (sideA < 0)
+      {
+        // Compute the intersection point of the line
+        // from point A to point B with the partition
+        // plane. This is a simple ray-plane intersection.
+        csVector3 v = ptB;
+        v -= ptA;
+
+        float sect = -split_plane.Classify (ptA) /
+          (split_plane.Normal () * v);
+        v *= sect;
+        v += ptA;
+        poly.AddVertex (v);
+	indices->Push (oldIndices[i]);
+      }
+    }
+    else if (sideB < 0)
+    {
+      if (sideA > 0)
+      {
+        // Compute the intersection point of the line
+        // from point A to point B with the partition
+        // plane. This is a simple ray-plane intersection.
+        csVector3 v = ptB;
+        v -= ptA;
+
+        float sect = -split_plane.Classify (ptA) /
+          (split_plane.Normal () * v);
+        v *= sect;
+        v += ptA;
+        poly.AddVertex (v);
+	indices->Push (oldIndices[i]);
+      }
+
+      poly.AddVertex (ptB);
+      indices->Push (oldIndices[i]);
+    }
+    else
+    {
+      poly.AddVertex (ptB);
+      indices->Push (oldIndices[i]);
+    }
+
+    ptA = ptB;
+    sideA = sideB;
+  }
+}
+
+void csDecal::AddStaticPoly (const csPoly3D & p, csArray<size_t>* indices)
+{
+  CS_ASSERT(animationControlData.animationControl ? indices != nullptr : 1);
+
   if (!currMesh)
     return;
 
@@ -168,11 +249,10 @@ void csDecal::AddStaticPoly (const csPoly3D & p)
   CS::TriangleT<int> tri;
   csPoly3D poly = p;
 
-#ifdef CS_DECAL_CLIP_DECAL
-  for (a = 0; a < numClipPlanes; ++a)
-    poly.CutToPlane (clipPlanes[a]);
-#endif // CS_DECAL_CLIP_DECAL
-  
+  if (decalTemplate->HasClipping ())
+    for (a = 0; a < numClipPlanes; ++a)
+      CutPolyToPlane (poly, clipPlanes[a], indices);
+
   size_t vertCount = poly.GetVertexCount ();
 
   // only support triangles and up
@@ -192,7 +272,7 @@ void csDecal::AddStaticPoly (const csPoly3D & p)
   if (vertCount < 3)
     return;
 
-  // check if we hit our maximum allowed indecies
+  // check if we hit our maximum allowed indices
   size_t idxCount = (vertCount - 2) * 3;
   if (indexCount + idxCount > CS_DECAL_MAX_TRIS_PER_DECAL * 3)
     return;
@@ -200,44 +280,45 @@ void csDecal::AddStaticPoly (const csPoly3D & p)
   // if this face is too perpendicular, then we'll need to push it out a bit
   // to avoid z-fighting.  We do this by pushing the bottom of the face out
   // more than the top of the face
-#ifdef CS_DECAL_CLIP_DECAL
   bool doFaceOffset = false;
   float faceHighDot = 0.0f;
   float invHighLowFaceDist = 0.0f;
   csVector3 faceBottomOffset;
   csVector3 faceCenter;
-  if (fabs (polyNormThresholdValue) 
-    < decalTemplate->GetPerpendicularFaceThreshold ())
+  if (decalTemplate->HasClipping () && !animationControlData.animationControl)
   {
-    doFaceOffset = true;
-
-    csVector3 faceHighVert, faceLowVert;
-    float faceLowDot;
-
-    faceLowVert = faceHighVert = *poly.GetVertex (0);
-    faceLowDot = faceHighDot = (faceLowVert - relPos) * localNormal;
-    faceCenter = faceLowVert;
-    for (a = 1; a < vertCount; ++a)
+    if (fabs (polyNormThresholdValue) 
+	< decalTemplate->GetPerpendicularFaceThreshold ())
     {
-      const csVector3 * vertPos = poly.GetVertex (a);
-      faceCenter += *vertPos;
-      float dot = (*vertPos - relPos) * localNormal;
-      if (dot > faceHighDot)
+      doFaceOffset = true;
+
+      csVector3 faceHighVert, faceLowVert;
+      float faceLowDot;
+
+      faceLowVert = faceHighVert = *poly.GetVertex (0);
+      faceLowDot = faceHighDot = (faceLowVert - relPos) * localNormal;
+      faceCenter = faceLowVert;
+      for (a = 1; a < vertCount; ++a)
       {
-        faceHighVert = *vertPos;
-        faceHighDot = dot;
+	const csVector3 * vertPos = poly.GetVertex (a);
+	faceCenter += *vertPos;
+	float dot = (*vertPos - relPos) * localNormal;
+	if (dot > faceHighDot)
+	{
+	  faceHighVert = *vertPos;
+	  faceHighDot = dot;
+	}
+	if (dot < faceLowDot)
+	{
+	  faceLowVert = *vertPos;
+	  faceLowDot = dot;
+	}
       }
-      if (dot < faceLowDot)
-      {
-        faceLowVert = *vertPos;
-        faceLowDot = dot;
-      }
+      invHighLowFaceDist = 1.0f / (faceHighDot - faceLowDot);
+      faceBottomOffset = -decalTemplate->GetPerpendicularFaceOffset () * polyNorm;
+      faceCenter /= (float)vertCount;
     }
-    invHighLowFaceDist = 1.0f / (faceHighDot - faceLowDot);
-    faceBottomOffset = -decalTemplate->GetPerpendicularFaceOffset () * polyNorm;
-    faceCenter /= (float)vertCount;
   }
-#endif // CS_DECAL_CLIP_DECAL
 
   const csVector2 & minTexCoord = decalTemplate->GetMinTexCoord ();
   csVector2 texCoordRange = decalTemplate->GetMaxTexCoord () - minTexCoord;
@@ -245,26 +326,25 @@ void csDecal::AddStaticPoly (const csPoly3D & p)
   tri[0] = (int)vertexCount;
   for (a = 0; a < vertCount; ++a)
   {
-#ifdef CS_DECAL_CLIP_DECAL
     csVector3 vertPos = *poly.GetVertex (a);
+    float distToPos = (vertPos - relPos) * localNormal;
 
-	float distToPos = (vertPos - relPos) * localNormal;
-    if (doFaceOffset)
+    if (decalTemplate->HasClipping () && !animationControlData.animationControl)
     {
-      // linear interpolation where high vert goes nowhere and low vert is
-      // full offset
-      float offsetVal = (faceHighDot - distToPos) * invHighLowFaceDist;
-      vertPos += offsetVal * faceBottomOffset;
+      if (doFaceOffset)
+      {
+	// linear interpolation where high vert goes nowhere and low vert is
+	// full offset
+	float offsetVal = (faceHighDot - distToPos) * invHighLowFaceDist;
+	vertPos += offsetVal * faceBottomOffset;
 
-      // spread out the base to avoid vertical seams
-      vertPos += (vertPos - faceCenter).Unit () 
-        * (decalTemplate->GetPerpendicularFaceOffset () * 2.0f); 
+	// spread out the base to avoid vertical seams
+	vertPos += (vertPos - faceCenter).Unit () 
+	  * (decalTemplate->GetPerpendicularFaceOffset () * 2.0f); 
+      }
     }
 
     vertPos += vertOffset;
-#else
-    csVector3 vertPos = *poly.GetVertex (a);
-#endif // CS_DECAL_CLIP_DECAL
 
     csVector3 relVert = vertPos - relPos;
     size_t vertIdx = vertexCount+a;
@@ -307,12 +387,17 @@ void csDecal::AddStaticPoly (const csPoly3D & p)
       minTexCoord.y + texCoordRange.y * 0.5f -
       texCoordRange.y * localUp * invHeight * relVert);
     texCoordBuffer->CopyInto (&texCoord, 1, vertIdx);
+
+    // TODO: compute tangents/binormals
      
     // copy over normal
     normalBuffer->CopyInto (&localNormal, 1, vertIdx);
   }
 
   vertexCount += vertCount;
+
+  if (indices)
+    animationControlData.animatedIndices.Merge (*indices);
 }
 
 void csDecal::EndMesh ()
@@ -344,10 +429,30 @@ void csDecal::EndMesh ()
   //pRenderMesh->variablecontext = variableContext;
   currMesh->AddExtraRenderMesh(pRenderMesh, decalTemplate->GetZBufMode ());
   pRenderMesh->renderPrio = decalTemplate->GetRenderPriority ();
+
+  // record the animation control data then reset it
+  if (animationControlData.animationControl)
+  {
+    animationControlData.firstIndex = firstIndex;
+    animationControls.Push (animationControlData);
+  }
+  animationControlData.animationControl = nullptr;
+  animationControlData.animatedIndices.DeleteAll ();
 }
 
 bool csDecal::Age (csTicks ticks)
 {
+  // animate the decal
+  for (csArray<AnimationControlData>::Iterator it = animationControls.GetIterator ();
+       it.HasNext (); )
+  {
+    AnimationControlData& controlData = it.Next ();
+    controlData.animationControl->UpdateDecal
+      (decalTemplate, controlData.firstIndex, controlData.animatedIndices,
+       *vertexBuffer, *normalBuffer);
+  }
+  // TODO: update tangents/binormals
+
   const float lifespan = decalTemplate->GetTimeToLive ();
   life += (float)ticks * 0.001f;
 
@@ -367,4 +472,9 @@ void csDecal::ClearRenderMeshes ()
     decalManager->renderMeshAllocator.Free (renderMeshInfos[a].pRenderMesh);
   }
   renderMeshInfos.Empty ();
+}
+
+void csDecal::SetDecalAnimationControl (iDecalAnimationControl* animationControl)
+{
+  animationControlData.animationControl = animationControl;
 }

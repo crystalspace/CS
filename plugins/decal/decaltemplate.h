@@ -25,6 +25,9 @@
 #include "csgeom/vector2.h"
 #include "csutil/cscolor.h"
 
+// Controls the default value of hasClipping
+#define CS_DECAL_CLIP_DECAL
+
 class csDecalTemplate : public scfImplementation1<csDecalTemplate,
   iDecalTemplate>
 {
@@ -35,6 +38,7 @@ private:
   csZBufMode zBufMode;
   float polygonNormalThreshold;
   float decalOffset;
+  bool hasClipping;
   bool hasTopClip;
   float topClipScale;
   bool hasBottomClip;
@@ -60,6 +64,7 @@ public:
   virtual csZBufMode GetZBufMode () const;
   virtual float GetPolygonNormalThreshold () const;
   virtual float GetDecalOffset () const;
+  virtual bool HasClipping () const;
   virtual bool HasTopClipping () const;
   virtual float GetTopClippingScale () const;
   virtual bool HasBottomClipping () const;
@@ -79,6 +84,7 @@ public:
   virtual void SetZBufMode (csZBufMode mode);
   virtual void SetPolygonNormalThreshold (float polygonNormalThreshold);
   virtual void SetDecalOffset (float decalOffset);
+  virtual void SetClipping (bool enabled);
   virtual void SetTopClipping (bool enabled, float topPlaneScale);
   virtual void SetBottomClipping (bool enabled, float bottomPlaneScale);
   virtual void SetTexCoords (const csVector2& min, const csVector2& max);
