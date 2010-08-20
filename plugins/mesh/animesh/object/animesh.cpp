@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 
 #include "csgeom/math3d.h"
+#include "csgeom/poly3d.h"
 #include "csgeom/tri.h"
 #include "csgfx/normalmaptools.h"
 #include "csgfx/renderbuffer.h"
@@ -38,6 +39,7 @@
 #include "imesh/skeleton2anim.h"
 #include "iutil/strset.h"
 #include "ivideo/rendermesh.h"
+#include "ivaria/decal.h"
 
 #include "animesh.h"
 
@@ -1002,7 +1004,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   void AnimeshObject::BuildDecal(const csVector3* pos, float decalRadius,
     iDecalBuilder* decalBuilder)
   {
-    // TODO
+    float squaredRadius = decalRadius * decalRadius;
+
+    decalBuilder->SetDecalAnimationControl (this);
+
+    csPoly3D poly;
+    poly.SetVertexCount(3);
+    csRenderBufferLock<csVector3> vertices (skeleton ? skinnedVertices : postMorphVertices);
+
+    for (size_t i = 0; i < submeshes.GetSize(); i++)
+    {
+      if (!submeshes[i]->isRendering)
+        continue;
+
+      FactorySubmesh* fsm = factory->submeshes[i];
+      for (size_t j = 0; j < fsm->indexBuffers.GetSize (); ++j)
+      {
+	iRenderBuffer* indexBuffer = submeshes[i]->GetFactorySubMesh ()->GetIndices (j);
+	CS::TriangleIndicesStream<uint> triangles (indexBuffer,
+						   CS_MESHTYPE_TRIANGLES);
+
+	while (triangles.HasNext())
+	{
+	  CS::TriangleT<uint> t (triangles.Next());
+
+	  if ((vertices[t.a] - *pos).SquaredNorm () <= squaredRadius
+	      && (vertices[t.b] - *pos).SquaredNorm () <= squaredRadius
+	      && (vertices[t.c] - *pos).SquaredNorm () <= squaredRadius)
+	    {
+	      poly[0] = vertices[t.a];
+	      poly[1] = vertices[t.b];
+	      poly[2] = vertices[t.c];
+
+	      csArray<size_t> indices;
+	      indices.Push (t.a);
+	      indices.Push (t.b);
+	      indices.Push (t.c);
+
+	      decalBuilder->AddStaticPoly(poly, &indices);
+	    }
+	}
+      }
+    }
   }
 
   const csBox3& AnimeshObject::GetObjectBoundingBox ()
@@ -1410,6 +1453,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       skinTangentBinormalVersion = skeletonVersion;
 
     skinVertexLF = skinNormalLF = skinTangentBinormalLF = false;
+  }
+
+  void AnimeshObject::UpdateDecal (iDecalTemplate* decalTemplate,
+				   size_t baseIndex,
+				   csArray<size_t>& indices,
+				   csRenderBuffer& animatedVertices,
+				   csRenderBuffer& animatedNormals)
+  {
+    csRenderBufferLock<csVector3> vertices (skeleton ? skinnedVertices : postMorphVertices);
+    csRenderBufferLock<csVector3> normals (skeleton ? skinnedNormals : factory->normalBuffer);
+    csRenderBufferLock<csVector3> animatedVerticesW (&animatedVertices);
+    csRenderBufferLock<csVector3> animatedNormalsW (&animatedNormals);
+    float offset = decalTemplate->GetDecalOffset ();
+
+    for (size_t i = 0; i < indices.GetSize (); i++)
+    {
+      animatedVerticesW[i + baseIndex] = vertices[indices[i]] + normals[indices[i]] * offset;
+      animatedNormalsW[i + baseIndex] = normals[indices[i]];
+    }
   }
 
   AnimeshObject::Socket::Socket (AnimeshObject* object, FactorySocket* factorySocket)

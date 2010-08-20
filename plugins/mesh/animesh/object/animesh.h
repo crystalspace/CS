@@ -33,6 +33,7 @@
 #include "imesh/animesh.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
+#include "ivaria/decal.h"
 
 #include "morphtarget.h"
 
@@ -291,7 +292,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     public scfImplementationExt2<AnimeshObject,
                                  csObjectModel,
                                  CS::Mesh::iAnimatedMesh,
-                                 iMeshObject>
+                                 iMeshObject>, public iDecalAnimationControl
   {
   public:
     AnimeshObject (AnimeshObjectFactory* factory);
@@ -365,6 +366,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     //-- iRenderBufferAccessor
     void PreGetBuffer (csRenderBufferHolder* holder, 
       csRenderBufferName buffer);    
+
+    //-- iDecalAnimationControl
+    virtual void UpdateDecal (iDecalTemplate* decalTemplate,
+			      size_t baseIndex,
+			      csArray<size_t>& indices,
+			      csRenderBuffer& vertices,
+			      csRenderBuffer& normals);
 
   private:
     //
