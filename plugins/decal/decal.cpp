@@ -240,7 +240,8 @@ void CutPolyToPlane (csPoly3D& poly, const csPlane3& split_plane, csArray<size_t
 
 void csDecal::AddStaticPoly (const csPoly3D & p, csArray<size_t>* indices)
 {
-  CS_ASSERT(animationControlData.animationControl ? indices != nullptr : 1);
+  CS_ASSERT(animationControlData.animationControl ?
+	    indices != (csArray<size_t>*) nullptr : 1);
 
   if (!currMesh)
     return;
