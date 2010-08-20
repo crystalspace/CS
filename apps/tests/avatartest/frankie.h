@@ -23,6 +23,8 @@
 
 #include "avatartest.h"
 
+struct iDecal;
+
 class FrankieScene : public AvatarScene
 {
  public:
@@ -90,6 +92,12 @@ class FrankieScene : public AvatarScene
 
   // Morphing related
   float smileWeight;
+
+  // Decals related
+  bool decalsEnabled;
+  csRef<iDecalTemplate> decalTemplate;
+  iDecal* decal;
+  csVector3 decalPosition;
 };
 
 #endif // __FRANKIE_H__

@@ -104,9 +104,6 @@ void AvatarTest::Frame ()
   if (avatarScene->HasPhysicalObjects ()
       && dynamicsDebugMode == DYNDEBUG_BULLET)
     bulletDynamicSystem->DebugDraw (view);
-
-  // Display of visual debugging informations
-  CS::Debug::VisualDebuggerHelper::Display (GetObjectRegistry (), view, 0.1f);
 }
 
 bool AvatarTest::OnKeyboard (iEvent &ev)
@@ -225,6 +222,8 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
 		       CS::Animation::iSkeletonLookAtManager2),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
 		       CS::Animation::iSkeletonBasicNodesManager2),
+    CS_REQUEST_PLUGIN ("crystalspace.decal.manager",
+		       iDecalManager),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -341,6 +340,9 @@ bool AvatarTest::Application ()
   if (!basicNodesManager)
     return ReportError("Failed to locate iSkeletonBasicNodesManager2 plugin!");
 
+  // Find a reference to the decal plugin
+  decalManager = csQueryRegistry<iDecalManager> (GetObjectRegistry ());
+
   // Default behavior from DemoApplication for the creation of the scene
   if (!DemoApplication::CreateRoom ())
     return false;
@@ -407,7 +409,7 @@ bool AvatarTest::Application ()
     }
   }
 
-  // Create avatar
+  // Create the avatar scene
   if (avatarSceneType == MODEL_KRYSTAL)
     avatarScene = new KrystalScene (this);
   else if (avatarSceneType == MODEL_SINTEL)
@@ -418,7 +420,7 @@ bool AvatarTest::Application ()
   if (!avatarScene->CreateAvatar ())
     return false;
 
-  // Initialize camera position
+  // Initialize the camera position
   cameraHelper.ResetCamera ();
 
   // Run the application

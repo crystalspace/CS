@@ -28,6 +28,7 @@
 #include "imesh/lookat.h"
 #include "imesh/ragdoll.h"
 #include "ivaria/bullet.h"
+#include "ivaria/decal.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/dynamicsdebug.h"
 #include "ivaria/softanim.h"
@@ -78,6 +79,7 @@ class AvatarTest : public CS::Demo::DemoApplication
   friend class SintelScene;
 
 private:
+  // Current scene
   AvatarScene* avatarScene;
   int avatarSceneType;
 
@@ -100,6 +102,9 @@ private:
   csRef<CS::Animation::iSkeletonLookAtManager2> lookAtManager;
   csRef<CS::Animation::iSkeletonBasicNodesManager2> basicNodesManager;
   csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;
+
+  // Decal textures
+  csRef<iDecalManager> decalManager;
 
   //-- csBaseEventHandler
   void Frame ();
