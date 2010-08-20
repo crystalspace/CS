@@ -116,6 +116,9 @@ private:
   float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
 
+  // HitBeam test for mouse pointing at the animesh
+  bool HitBeamAnimatedMesh (csVector3& isect, csVector3& direction, int& triangle);
+
  public:
   AvatarTest ();
   ~AvatarTest ();

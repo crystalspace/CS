@@ -129,7 +129,7 @@ void FrankieScene::Frame ()
     csVector3 isect;
     csVector3 direction;
     int triangle;
-    bool hit = HitMeshBeam (isect, direction, triangle);
+    bool hit = avatarTest->HitBeamAnimatedMesh (isect, direction, triangle);
 
     if (hit)
     {

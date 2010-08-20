@@ -209,6 +209,24 @@ bool AvatarTest::OnMouseDown (iEvent& ev)
   return avatarScene->OnMouseDown (ev);
 }
 
+bool AvatarTest::HitBeamAnimatedMesh (csVector3& isect, csVector3& direction, int& triangle)
+{
+  if (!avatarScene)
+    return false;
+
+  csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+  iCamera* camera = view->GetCamera ();
+  csVector3 v3d = camera->InvPerspective (v2d, 10000);
+  csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+  csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+  direction = endBeam - startBeam;
+  direction.Normalize ();
+
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (avatarScene->animesh);
+  return mesh->HitBeamObject (startBeam, endBeam, isect, nullptr, &triangle);
+}
+
 bool AvatarTest::OnInitialize (int argc, char* argv[])
 {
   // Default behavior from DemoApplication
