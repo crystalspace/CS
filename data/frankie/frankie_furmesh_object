@@ -12,6 +12,10 @@
 			<heightfactor>0.1</heightfactor>
 			<controlpointsdistance>0.025</controlpointsdistance>
 			<positiondeviation>0.002</positiondeviation>
+			<mixmode>
+				<copy />
+			</mixmode>
+			<priority>object</priority>			
 		</params>
 	</meshobj>
 </library>

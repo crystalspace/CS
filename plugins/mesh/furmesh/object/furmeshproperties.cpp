@@ -64,12 +64,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->displacement = displacement;
   }
 
-  iTextureHandle* FurMeshState::GetDensityMap() const
+  iTextureWrapper* FurMeshState::GetDensityMap() const
   {
     return densityMap;
   }
 
-  void FurMeshState::SetDensityMap(iTextureHandle* densityMap)
+  void FurMeshState::SetDensityMap(iTextureWrapper* densityMap)
   {
     this->densityMap = densityMap;
   }
@@ -94,12 +94,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->densityFactorFurStrands = densityFactorFurStrands;
   }
 
-  iTextureHandle* FurMeshState::GetHeightMap() const
+  iTextureWrapper* FurMeshState::GetHeightMap() const
   {
     return heightMap;
   }
 
-  void FurMeshState::SetHeightMap(iTextureHandle* heightMap)
+  void FurMeshState::SetHeightMap(iTextureWrapper* heightMap)
   {
     this->heightMap = heightMap;
   }

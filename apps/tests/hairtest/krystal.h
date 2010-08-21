@@ -54,6 +54,9 @@ public:
   // Switch Fur Physics
   void SwitchFurPhysics();
 
+  // Save fur
+  void SaveFur();
+
 private:
   HairTest* hairTest;
 

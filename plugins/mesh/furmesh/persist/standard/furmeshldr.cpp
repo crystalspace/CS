@@ -139,6 +139,7 @@ bool FurMeshLoader::Initialize (iObjectRegistry* object_reg)
 {
   FurMeshLoader::object_reg = object_reg;
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  engine = csQueryRegistry<iEngine>(object_reg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -187,6 +188,7 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
       {
         const char* densityMapName = child->GetContentsValue ();
         iTextureWrapper* tex = ldr_context->FindTexture(densityMapName);
+
         if(!tex)
         {
           synldr->ReportError (
@@ -194,17 +196,8 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
             child, "Couldn't find texture '%s'!", densityMapName);
           return 0;
         }
-
-        iTextureHandle* tex_handle = tex->GetTextureHandle();
-        if(!tex_handle)
-        {
-          synldr->ReportError (
-            "crystalspace.furmeshloader.parse.unknownfactory",
-            child, "Couldn't find texture handle for '%s'!", densityMapName);
-          return 0;
-        }
-
-        meshstate->SetDensityMap(tex_handle);
+     
+        meshstate->SetDensityMap(tex);
       }
       break;
     case XMLTOKEN_HEIGHTMAP:
@@ -219,16 +212,7 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
           return 0;
         }
 
-        iTextureHandle* tex_handle = tex->GetTextureHandle();
-        if(!tex_handle)
-        {
-          synldr->ReportError (
-            "crystalspace.furmeshloader.parse.unknownfactory",
-            child, "Couldn't find texture handle for '%s'!", heightMapName);
-          return 0;
-        }
-
-        meshstate->SetHeightMap(tex_handle);
+        meshstate->SetHeightMap(tex);
       }
       break;
     case XMLTOKEN_DENSITYFACTORGUIDEFURS:
@@ -279,24 +263,13 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
           return 0;
         CHECK_MESH(meshstate);
         meshstate->SetMixmode(mixmode);
-
-        csPrintf("%u\n", mixmode);
       }
       break;
     case XMLTOKEN_PRIORITY:
       {
-        uint priority = (uint)child->GetContentsValueAsInt();
+        uint priority = (uint)engine->GetRenderPriority (child->GetContentsValue ());
         CHECK_MESH(meshstate);
         meshstate->SetPriority(priority);
-      }
-      break;
-    case XMLTOKEN_ZBUFMODE:
-      {
-        csZBufMode z_buf_mode;
-        if (!synldr->ParseZMode(child, z_buf_mode))
-          return 0;
-        CHECK_MESH(meshstate);
-        meshstate->SetZBufMode(z_buf_mode);
       }
       break;
     case XMLTOKEN_FACTORY:
@@ -326,8 +299,13 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
       }
       break;
     default:
+      csZBufMode zbufmode;
+      if (synldr->ParseZMode (child, zbufmode)) 
+      {
+        meshstate->SetZBufMode(zbufmode);
+        break;
+      }
       synldr->ReportBadToken (child);
-      return 0;
     }
   }
 
@@ -355,6 +333,12 @@ bool FurMeshFactorySaver::Initialize (iObjectRegistry* object_reg)
 bool FurMeshFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   iStreamSource*)
 {
+  if (!parent) return false; //you never know...
+
+  csRef<iDocumentNode> paramsNode = 
+    parent->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
+
   return true;
 }
 
@@ -373,12 +357,163 @@ bool FurMeshSaver::Initialize (iObjectRegistry* object_reg)
 {
   FurMeshSaver::object_reg = object_reg;
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
+
   return true;
 }
 
 bool FurMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
 	iStreamSource*)
 {
+  if (!parent) return false; //you never know...
+
+  csRef<iDocumentNode> paramsNode = 
+    parent->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
+
+  if (obj)
+  {
+    csRef<CS::Mesh::iFurMeshState> fmesh = 
+      scfQueryInterface<CS::Mesh::iFurMeshState> (obj);
+    if (!fmesh) return false;
+    csRef<iMeshObject> mesh = 
+      scfQueryInterface<iMeshObject> (obj);
+    if (!mesh) return false;
+
+    //Writedown Factory tag
+    iMeshFactoryWrapper* fact = mesh->GetFactory()->GetMeshFactoryWrapper ();
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
+      }    
+    }
+
+    //Writedown Strand width tag
+    float strandWidth = fmesh->GetStrandWidth();
+    csRef<iDocumentNode> strandWidthNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    strandWidthNode->SetValue("strandwidth");
+    strandWidthNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsFloat(strandWidth);
+
+    //Writedown displacement tag
+    float displacement = fmesh->GetDisplacement();
+    csRef<iDocumentNode> displacementNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    displacementNode->SetValue("displacement");
+    displacementNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsFloat(displacement);
+
+    //Writedown density map tag
+    iTextureWrapper* densitymap = fmesh->GetDensityMap();
+    if(densitymap)
+    {
+      const char* densitymapName = densitymap->QueryObject()->GetName();
+      if (densitymapName && *densitymapName)
+      {
+        csRef<iDocumentNode> densitymapNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        densitymapNode->SetValue("densitymap");
+        densitymapNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+          SetValue(densitymapName);
+      }
+    }
+
+    //Writedown density factor guide furs tag
+    float densityFactorGuideFurs = fmesh->GetDensityFactorGuideFurs();
+    csRef<iDocumentNode> densityFactorGuideFursNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    densityFactorGuideFursNode->SetValue("densityfactorguidefurs");
+    densityFactorGuideFursNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsFloat(densityFactorGuideFurs);
+
+    //Writedown density factor fur strands tag
+    float densityFactorFurStrands = fmesh->GetDensityFactorFurStrands();
+    csRef<iDocumentNode> densityFactorFurStrandsNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    densityFactorFurStrandsNode->SetValue("densityfactorfurstrands");
+    densityFactorFurStrandsNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsFloat(densityFactorFurStrands);
+
+    //Writedown height map tag
+    iTextureWrapper* heightmap = fmesh->GetHeightMap();
+    if(heightmap)
+    {
+      const char* heightmapName = heightmap->QueryObject()->GetName();
+      if (heightmapName && *heightmapName)
+      {
+        csRef<iDocumentNode> heightmapNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        heightmapNode->SetValue("heightmap");
+        heightmapNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+          SetValue(heightmapName);
+      }
+    }
+
+    //Writedown height factor tag
+    float heightFactor = fmesh->GetHeightFactor();
+    csRef<iDocumentNode> heightFactorNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    heightFactorNode->SetValue("heightfactor");
+    heightFactorNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsFloat(heightFactor);
+
+    //Writedown control points disance tag
+    float controlPointsDistance = fmesh->GetControlPointsDistance();
+    csRef<iDocumentNode> controlPointsDistanceNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    controlPointsDistanceNode->SetValue("controlpointsdistance");
+    controlPointsDistanceNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsFloat(controlPointsDistance);
+
+    //Writedown control points disance tag
+    float positionDeviation = fmesh->GetPositionDeviation();
+    csRef<iDocumentNode> positionDeviationNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    positionDeviationNode->SetValue("positiondeviation");
+    positionDeviationNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsFloat(positionDeviation);
+
+    //Writedown grow tangents tag
+    bool growTangents = fmesh->GetGrowTangent();
+    if (growTangents)
+    {
+      csRef<iDocumentNode> growTangentsNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      growTangentsNode->SetValue("growtangents");
+    }
+
+    //Writedown Mixmode tag
+    int mixmode = fmesh->GetMixmode();
+    csRef<iDocumentNode> mixmodeNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+
+    //Writedown priority tag
+    int priority = fmesh->GetPriority();
+    const char* pname = engine->GetRenderPriorityName (priority);
+    if (pname && *pname)
+    {
+      csRef<iDocumentNode> priorityNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      priorityNode->SetValue("priority");
+      priorityNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+        SetValue(pname);
+    }
+
+    //Writedown ZBufmode tag
+    csZBufMode zbufmode = fmesh->GetZBufMode();
+    if (zbufmode != (csZBufMode)~0)
+      synldr->WriteZMode (paramsNode, zbufmode, false);
+  }
+
   return true;
 }
 

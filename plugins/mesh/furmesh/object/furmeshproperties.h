@@ -41,14 +41,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetStrandWidth(float strandWidth);
     virtual float GetDisplacement() const;
     virtual void SetDisplacement(float displacement);
-    virtual iTextureHandle* GetDensityMap() const;
-    virtual void SetDensityMap(iTextureHandle* densityMap);
+    virtual iTextureWrapper* GetDensityMap() const;
+    virtual void SetDensityMap(iTextureWrapper* densityMap);
     virtual float GetDensityFactorGuideFurs() const;
     virtual void SetDensityFactorGuideFurs(float densityFactorGuideFurs);
     virtual float GetDensityFactorFurStrands() const;
     virtual void SetDensityFactorFurStrands(float densityFactorFurStrands);
-    virtual iTextureHandle* GetHeightMap() const;
-    virtual void SetHeightMap(iTextureHandle* heightMap);
+    virtual iTextureWrapper* GetHeightMap() const;
+    virtual void SetHeightMap(iTextureWrapper* heightMap);
     virtual float GetHeightFactor() const;
     virtual void SetHeightFactor(float heightFactor);
     virtual float GetControlPointsDistance() const;
@@ -67,10 +67,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   private:
     float strandWidth;
     float displacement;
-    iTextureHandle* densityMap;
+    iTextureWrapper* densityMap;
     float densityFactorGuideFurs;
     float densityFactorFurStrands;
-    iTextureHandle* heightMap;
+    iTextureWrapper* heightMap;
     float heightFactor;
     float controlPointsDistance;
     float positionDeviation;

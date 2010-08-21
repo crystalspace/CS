@@ -13,6 +13,10 @@
 			<controlpointsdistance>0.05</controlpointsdistance>
 			<positiondeviation>0.005</positiondeviation>
 			<growtangents/>
+			<mixmode>
+				<copy />
+			</mixmode>			
+			<priority>object</priority>			
 		</params>
 	</meshobj>
 </library>

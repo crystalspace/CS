@@ -427,3 +427,25 @@ void FrankieScene::SwitchFurPhysics()
   }
 }
 
+void FrankieScene::SaveFur()
+{
+  iMeshFactoryWrapper* meshfactwrap = 
+    hairTest->engine->FindMeshFactory("frankie_furmesh_factory");
+  if (!meshfactwrap)
+  {
+    hairTest->ReportError("Could not find frankie mesh factory!");
+    return;
+  }
+
+  hairTest->SaveFactory(meshfactwrap, "/lib/frankie/frankie_furmesh_factory.save");
+
+  iMeshWrapper* meshwrap = 
+    hairTest->engine->FindMeshObject("frankie_furmesh_object");
+  if (!meshwrap)
+  {
+    hairTest->ReportError("Could not find frankie mesh!");
+    return;
+  }
+
+  hairTest->SaveObject(meshwrap, "/lib/frankie/frankie_furmesh_object.save");
+}

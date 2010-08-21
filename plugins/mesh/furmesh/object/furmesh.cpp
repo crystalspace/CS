@@ -197,7 +197,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::GenerateGeometry (iView* view, iSector *room)
   {
-    densitymap.handle = GetDensityMap();
+    densitymap.handle = GetDensityMap()->GetTextureHandle();
 
     if (!densitymap.handle)
     {
@@ -209,7 +209,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if ( !densitymap.Read() )
       csPrintfErr( "Error reading densitymap texture!\n" );    
 
-    heightmap.handle = GetHeightMap();
+    heightmap.handle = GetHeightMap()->GetTextureHandle();
 
     if (!heightmap.handle)
     {

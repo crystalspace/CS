@@ -21,9 +21,14 @@
                     <Window Type="ice/StaticImage" Name="HairTest/MainWindow/Tab/Page1/Image" >
                         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
 
+                        <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Save" >
+                            <Property Name="Text" Value="Save" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.75,0},{0.1,0},{0.85,0},{0.3,0}}" />
+                        </Window>						
+						
                         <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Quit" >
                             <Property Name="Text" Value="Exit" />
-                            <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.1,0},{0.99,0},{0.3,0}}" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.875,0},{0.1,0},{0.975,0},{0.3,0}}" />
                         </Window>
                       
                         <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Colliders" >
@@ -177,7 +182,7 @@
 
                         <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page3/Physics" >
                             <Property Name="Text" Value="Physics" />
-                            <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.1,0},{0.99,0},{0.3,0}}" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.875,0},{0.1,0},{0.975,0},{0.3,0}}" />
                         </Window>						
 						
 						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page3/StaticText1" >

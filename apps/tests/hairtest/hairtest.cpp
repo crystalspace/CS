@@ -103,6 +103,15 @@ bool HairTest::OnExitButtonClicked (const CEGUI::EventArgs&)
   return true;
 }
 
+bool HairTest::OnSaveButtonClicked (const CEGUI::EventArgs&)
+{
+  if (!avatarScene)
+    return false;
+
+  avatarScene->SaveFur();
+  return true;
+}
+
 bool HairTest::OnCollidersButtonClicked (const CEGUI::EventArgs&)
 {
   SwitchDynamics();
@@ -346,7 +355,115 @@ void HairTest::SwitchScenes()
 
   // Re-initialize camera position
   cameraHelper.ResetCamera ();
-};
+}
+
+void HairTest::SaveObject(iMeshWrapper* meshwrap, const char * filename)
+{
+  csPrintf("Saving object ...\n");
+
+  csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
+  csRef<iDocument> doc = xml->CreateDocument();
+  csRef<iDocumentNode> root = doc->CreateRoot();
+
+  iMeshFactoryWrapper* meshfactwrap = meshwrap->GetFactory();
+  iMeshObjectFactory*  meshfact = meshfactwrap->GetMeshObjectFactory();
+  iMeshObject* obj = meshwrap->GetMeshObject();
+
+  //Create the Tag for the MeshObj
+  csRef<iDocumentNode> factNode = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  factNode->SetValue("meshobj");
+
+  //Add the mesh's name to the MeshObj tag
+  const char* name = meshwrap->QueryObject()->GetName();
+  if (name && *name)
+    factNode->SetAttribute("name", name);
+
+  csRef<iFactory> factory = 
+    scfQueryInterface<iFactory> (meshfact->GetMeshObjectType());
+
+  const char* pluginname = factory->QueryClassID();
+
+  if (!(pluginname && *pluginname)) return;
+
+  csRef<iDocumentNode> pluginNode = factNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  pluginNode->SetValue("plugin");
+
+  //Add the plugin tag
+  char loadername[128] = "";
+  csReplaceAll(loadername, pluginname, ".object.", ".loader.",
+    sizeof(loadername));
+
+  pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
+
+  char savername[128] = "";
+
+  csReplaceAll(savername, pluginname, ".object.", ".saver.",
+    sizeof(savername));
+
+  csRef<iSaverPlugin> saver =  csLoadPluginCheck<iSaverPlugin> (
+    plugin_mgr, savername);
+  if (saver) 
+    saver->WriteDown(obj, factNode, 0/*ssource*/);
+
+  scfString str;
+  doc->Write(&str);
+  vfs->WriteFile(filename, str.GetData(), str.Length());
+}
+
+void HairTest::SaveFactory(iMeshFactoryWrapper* meshfactwrap, const char * filename)
+{
+  csPrintf("Saving factory ...\n");
+
+  csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
+  csRef<iDocument> doc = xml->CreateDocument();
+  csRef<iDocumentNode> root = doc->CreateRoot();
+
+  iMeshObjectFactory*  meshfact = meshfactwrap->GetMeshObjectFactory();
+
+  //Create the Tag for the MeshObj
+  csRef<iDocumentNode> factNode = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  factNode->SetValue("meshfact");
+
+  //Add the mesh's name to the MeshObj tag
+  const char* name = meshfactwrap->QueryObject()->GetName();
+  if (name && *name)
+    factNode->SetAttribute("name", name);
+
+  csRef<iFactory> factory = 
+    scfQueryInterface<iFactory> (meshfact->GetMeshObjectType());
+
+  const char* pluginname = factory->QueryClassID();
+
+  if (!(pluginname && *pluginname)) return;
+
+  csRef<iDocumentNode> pluginNode = factNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  pluginNode->SetValue("plugin");
+
+  //Add the plugin tag
+  char loadername[128] = "";
+  csReplaceAll(loadername, pluginname, ".object.", ".loader.factory.",
+    sizeof(loadername));
+
+  pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
+
+  char savername[128] = "";
+
+  csReplaceAll(savername, pluginname, ".object.", ".saver.factory.",
+    sizeof(savername));
+
+  csRef<iSaverPlugin> saver =  csLoadPluginCheck<iSaverPlugin> (
+    plugin_mgr, savername);
+  if (saver) 
+    saver->WriteDown(meshfact, factNode, 0/*ssource*/);
+
+  scfString str;
+  doc->Write(&str);
+  vfs->WriteFile(filename, str.GetData(), str.Length());
+}
 
 bool HairTest::OnKeyboard (iEvent &ev)
 {
@@ -388,6 +505,14 @@ bool HairTest::OnKeyboard (iEvent &ev)
       return true;
     }
 
+    // Save fur
+    if (csKeyEventHelper::GetCookedCode (&ev) == 's'
+      && physicsEnabled && avatarScene->HasPhysicalObjects ())
+    {
+      avatarScene->SaveFur();
+      return true;
+    }
+
     // Check for switching of scene
     if (csKeyEventHelper::GetCookedCode (&ev) == 'n')
     {
@@ -423,6 +548,15 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+  engine->SetSaveableFlag(true);
+
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+    CS_REQUEST_LEVELSAVER,
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
   csBaseEventHandler::Initialize (GetObjectRegistry ());
   if (!RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ())))
     return ReportError ("Failed to set up event handler!");
@@ -436,6 +570,10 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     ReportError ("No SV names string set!\n");
     return false;
   }
+
+  // Level saver
+  saver = csQueryRegistry<iSaver> (GetObjectRegistry ());
+  if (!saver) return ReportError("Failed to locate Saver!");
 
   // Check if physical effects are enabled
   csRef<iCommandLineParser> clp =
@@ -493,6 +631,10 @@ bool HairTest::Application ()
   if (!DemoApplication::Application ())
     return false;
 
+  if(!engine) return ReportError("Failed to locate Engine!");
+
+  engine->SetSaveableFlag(true);
+
   // Find references to the plugins of the animation nodes
   lookAtManager = 
     csQueryRegistry<CS::Animation::iSkeletonLookAtManager2> (GetObjectRegistry ());
@@ -538,6 +680,10 @@ bool HairTest::Application ()
   CEGUI::Window* btn = winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Quit");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&HairTest::OnExitButtonClicked, this));
+
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Save")-> 
+    subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&HairTest::OnSaveButtonClicked, this));
 
   winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Colliders")-> 
     subscribeEvent(CEGUI::PushButton::EventClicked,

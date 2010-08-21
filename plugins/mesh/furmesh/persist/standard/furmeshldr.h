@@ -109,6 +109,7 @@ class FurMeshLoader :
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
+  csRef<iEngine> engine;
 
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \
@@ -144,6 +145,7 @@ class FurMeshSaver :
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
+  csRef<iEngine> engine;
 
 public:
   /// Constructor.

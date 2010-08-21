@@ -151,6 +151,29 @@ void KrystalScene::SwitchFurPhysics()
   }
 }
 
+void KrystalScene::SaveFur()
+{
+  iMeshFactoryWrapper* meshfactwrap = 
+    hairTest->engine->FindMeshFactory("krystal_furmesh_factory");
+  if (!meshfactwrap)
+  {
+    hairTest->ReportError("Could not find krystal mesh factory!");
+    return;
+  }
+
+  hairTest->SaveFactory(meshfactwrap, "/lib/krystal/krystal_furmesh_factory.save");
+
+  iMeshWrapper* meshwrap = 
+    hairTest->engine->FindMeshObject("krystal_furmesh_object");
+  if (!meshwrap)
+  {
+    hairTest->ReportError("Could not find krystal mesh!");
+    return;
+  }
+
+  hairTest->SaveObject(meshwrap, "/lib/krystal/krystal_furmesh_object.save");
+}
+
 bool KrystalScene::CreateAvatar ()
 {
   printf ("Loading Krystal...\n");

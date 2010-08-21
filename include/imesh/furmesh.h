@@ -156,12 +156,12 @@ public:
   /**
    * Get the density map texture
    */
-  virtual iTextureHandle* GetDensityMap() const = 0;
+  virtual iTextureWrapper* GetDensityMap() const = 0;
 
   /**
    * Set the density map texture
    */
-  virtual void SetDensityMap(iTextureHandle* densityMap) = 0;
+  virtual void SetDensityMap(iTextureWrapper* densityMap) = 0;
 
   /**
    * Get the density factor for guide furs
@@ -186,12 +186,12 @@ public:
   /**
    * Get the heightmap map texture
    */
-  virtual iTextureHandle* GetHeightMap() const = 0;
+  virtual iTextureWrapper* GetHeightMap() const = 0;
 
   /**
    * Set the heightmap map texture
    */
-  virtual void SetHeightMap(iTextureHandle* heightMap) = 0;
+  virtual void SetHeightMap(iTextureWrapper* heightMap) = 0;
 
   /**
    * Get the height factor (for guide furs)

@@ -62,6 +62,9 @@ public:
   // Switch fur dynamics
   virtual void SwitchFurPhysics() = 0;
 
+  // Save fur
+  virtual void SaveFur() = 0;
+
   // Animesh
   csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory;
   csRef<CS::Mesh::iAnimatedMesh> animesh;
@@ -86,6 +89,7 @@ private:
   csRef<iDynamicsDebuggerManager> debuggerManager;
   csRef<iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
+  csRef<iSaver> saver;
 
   // Animation node plugin managers
   csRef<CS::Animation::iSkeletonLookAtManager2> lookAtManager;
@@ -127,7 +131,12 @@ public:
   HairTest ();
   ~HairTest ();
 
+  // Save fur
+  void SaveFactory(iMeshFactoryWrapper* meshfactwrap, const char * filename);
+  void SaveObject(iMeshWrapper* meshwrap, const char * filename);
+
   // Handle exit button clicked event
+  bool OnSaveButtonClicked (const CEGUI::EventArgs& e);
   bool OnExitButtonClicked (const CEGUI::EventArgs& e);
   bool OnCollidersButtonClicked (const CEGUI::EventArgs& e);
   bool OnSceneButtonClicked (const CEGUI::EventArgs& e);
