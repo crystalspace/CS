@@ -115,12 +115,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
   {
     CS_ASSERT (body);
 
+    // Reset the data
     softBody = body;
     this->doubleSided = doubleSided;
     vertices.SetSize (softBody->GetVertexCount () * 2);
     normals.SetSize (softBody->GetVertexCount () * 2);
+    anchors.DeleteAll ();
 
-    // initialize the vertices and mesh position
+    // Initialize the vertices and mesh position
     meshPosition.Set (0.0f);
     for (size_t i = 0; i < softBody->GetVertexCount (); i++)
       meshPosition += softBody->GetVertexPosition (i);
@@ -152,9 +154,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 	mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
 
       // Create a walker for the position buffer of the animesh
-      csRenderBufferHolder holder;
-      animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
-      iRenderBuffer* positions = holder.GetRenderBuffer (CS_BUFFER_POSITION);
+      iRenderBuffer* positions = animesh->GetAnimatedMeshFactory ()->GetVertices ();
       csVertexListWalker<float, csVector3> positionWalker (positions);
 
       // Iterate on all vertices
@@ -175,7 +175,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 
       CS_ASSERT(closestVertex != (size_t) ~0);
       animeshVertexIndex = closestVertex;
-      printf ("closest %i\n", closestVertex);
     }
 
     // Save the anchor data
