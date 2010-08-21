@@ -48,6 +48,7 @@ class KrystalScene : public AvatarScene
 
   // User interaction with the scene
   void ResetScene ();
+  void ResetSoftBodies ();
 
   // Display of information on the state of the scene
   void UpdateStateDescription ();
@@ -69,6 +70,8 @@ class KrystalScene : public AvatarScene
   CS::Animation::EffectorID handEffector;
 
   // Krystal's hairs & skirt (and their soft bodies)
+  csRef<iMeshFactoryWrapper> hairsMeshFact;
+  csRef<iMeshFactoryWrapper> skirtMeshFact;
   csRef<iMeshWrapper> hairsMesh;
   csRef<iMeshWrapper> skirtMesh;
   csRef<CS::Physics::Bullet::iSoftBody> hairsBody;
