@@ -4,15 +4,25 @@
   <scf>
     <classes>
       <class>
+        <name>crystalspace.mesh.loader.factory.furmesh</name>
+        <implementation>FurMeshFactoryLoader</implementation>
+        <description>Crystal Space Fur Mesh Factory Loader</description>
+      </class>
+      <class>
         <name>crystalspace.mesh.loader.furmesh</name>
         <implementation>FurMeshLoader</implementation>
         <description>Crystal Space Fur Mesh Mesh Loader</description>
       </class>
       <class>
+        <name>crystalspace.mesh.saver.factory.furmesh</name>
+        <implementation>FurMeshFactorySaver</implementation>
+        <description>Crystal Space Fur Mesh Factory Saver</description>
+      </class>
+      <class>
         <name>crystalspace.mesh.saver.furmesh</name>
         <implementation>FurMeshSaver</implementation>
         <description>Crystal Space Fur Mesh Mesh Saver</description>
-      </class>
+      </class>	  
     </classes>
   </scf>
 </plugin>

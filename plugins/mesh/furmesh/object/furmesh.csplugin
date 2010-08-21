@@ -7,9 +7,6 @@
         <name>crystalspace.mesh.object.furmesh</name>
         <implementation>FurMeshType</implementation>
         <description>Fur Mesh Type Plugin</description>
-        <requires>
-          <class>crystalspace.graphics3d.</class>
-        </requires>
       </class>
     </classes>
   </scf>

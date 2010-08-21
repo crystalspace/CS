@@ -21,9 +21,6 @@
     <texture name="frankie_spec">
       <file>/lib/frankie/frankie_spec.png</file>
     </texture>
-    <texture name="frankie_densitymap">
-      <file>/lib/frankie/frankie_densitymap.png</file>
-    </texture>
   </textures>
   <materials>
     <material name="frankie_skin">
@@ -31,18 +28,6 @@
 	  <shadervar type="int" name="diffuse type">10</shadervar>
 	  <shadervar type="texture" name="diffuse map">frankie_col</shadervar>
     </material>
-    <material name='base_material'>
-	  <shadervar type="float" name="strandWidth">0.001</shadervar>
-	  <shadervar type="float" name="displaceDistance">0.0</shadervar>
-	  <shadervar type="texture" name="density map">frankie_densitymap</shadervar>
-	  <shadervar type="float" name="densityFactorGuideFurs">100</shadervar>
-	  <shadervar type="float" name="densityFactorFurStrands">150</shadervar>
-      <shadervar type="texture" name="height map">frankie_densitymap</shadervar>
-	  <shadervar type="float" name="heightFactor">0.1</shadervar>
-	  <shadervar type="float" name="controlPointsDistance">0.025</shadervar>
-	  <shadervar type="float" name="positionDeviation">0.002</shadervar>	  
-	  <shadervar type="int" name="growTangents">0</shadervar>
-    </material>	
   </materials>
   <library>/lib/frankie/skelfrankie_rig</library>
   <library>/lib/frankie/franky_frankie</library>

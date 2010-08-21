@@ -26,6 +26,7 @@
 
 #include "furmeshfactory.h"
 #include "furdata.h"
+#include "furmeshproperties.h"
 
 #include "crystalspace.h"
 #include "csutil/scf_implementation.h"
@@ -33,7 +34,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   class FurMesh : public 
-    scfImplementationExt1<FurMesh, csMeshObject, CS::Mesh::iFurMesh>, public FurMeshGeometry
+    scfImplementationExt2<FurMesh, csMeshObject, FurMeshState, CS::Mesh::iFurMesh>, 
+    public FurMeshGeometry
   {
   public:
     CS_LEAKGUARD_DECLARE(FurMesh);
@@ -59,13 +61,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& num, iRenderView*, 
       iMovable*, uint32);
 
-    // Mesh properties
-    virtual void SetMixMode (uint mode);
-    virtual uint GetMixMode () const;
-    virtual void SetPriority (uint priority);
-    virtual uint GetPriority () const;
-    virtual void SetZBufMode (csZBufMode z_buf_mode);
-    virtual csZBufMode GetZBufMode () const;
+    // LOD function
     virtual void SetIndexRange (uint indexstart, uint indexend);
     
     //-- iFurMesh
@@ -81,7 +77,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory);
     virtual void SetMeshFactorySubMesh 
       ( CS::Mesh::iAnimatedMeshSubMeshFactory* meshFactorySubMesh );
-    virtual void SetBaseMaterial ( iMaterial* baseMaterial );
 
     virtual void SetFurMeshProperties
       ( CS::Mesh::iFurMeshMaterialProperties* hairMeshProperties);
@@ -94,6 +89,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     iObjectRegistry* object_reg;
     iMeshObjectFactory* object_factory;
     iEngine* engine;
+    csRef<CS::Mesh::iFurMeshState> state;
     // Fur data
     csRef<iView> view;
     csArray<csFurStrand> furStrands;
@@ -111,20 +107,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // External data
     csRef<CS::Mesh::iAnimatedMeshFactory> meshFactory;
     csRef<CS::Mesh::iAnimatedMeshSubMeshFactory> meshFactorySubMesh;
-    csRef<iMaterial> baseMaterial;
     csRef<iShaderVarStringSet> svStrings;
     // Density and height maps
     csTextureRGBA densitymap;
-    float densityFactorGuideFurs;
-    float densityFactorFurStrands;
     csTextureRGBA heightmap;
-    float heightFactor;
-    float displaceDistance;
-    float strandWidth;
     float strandWidthLOD;
-    float controlPointsDistance;
-    float positionDeviation;
-    int growTangents;
     // Render mesh data
     csRef<csRenderBufferHolder> bufferholder;
     csRef<csShaderVariableContext> svContext;
@@ -142,7 +129,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       float &density, csGuideFur& A, csGuideFur& B, csGuideFur& C);
     // For debug
     void SaveUVImage();
-    void SetBaseMaterialProperties();
     void Update();
     void UpdateGuideHairs();
   };

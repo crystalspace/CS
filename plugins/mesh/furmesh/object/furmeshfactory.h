@@ -42,7 +42,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   };
 
   class FurMeshType : public 
-    scfImplementation2<FurMeshType,CS::Mesh::iFurMeshType,iComponent>
+    scfImplementation3<FurMeshType,CS::Mesh::iFurMeshType,
+    scfFakeInterface<iMeshObjectType>,iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(FurMeshType);

@@ -27,121 +27,151 @@
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   /************************
-  *  FurMeshProperties
+  *  FurMeshState
   ************************/  
 
-  CS_LEAKGUARD_IMPLEMENT(FurMeshProperties);	
+  CS_LEAKGUARD_IMPLEMENT(FurMeshState);	
 
-  FurMeshProperties::FurMeshProperties() : 
+  FurMeshState::FurMeshState() : 
     strandWidth(0.0015f), displacement(0.02f), densityMap(0), 
     densityFactorGuideFurs(10), densityFactorFurStrands(100), heightMap(0),
     heightFactor(0.5f), controlPointsDistance(0.05f), positionDeviation(0.01f), 
-    growTangents(false)
+    growTangents(false), mixmode(0), priority(7), z_buf_mode(CS_ZBUF_USE)
   {
   }
 
-  FurMeshProperties::~FurMeshProperties ()
+  FurMeshState::~FurMeshState ()
   {
   }
 
-  float FurMeshProperties::GetStrandWidth() const
+  float FurMeshState::GetStrandWidth() const
   {
     return strandWidth;
   }
 
-  void FurMeshProperties::SetStrandWidth(float strandWidth)
+  void FurMeshState::SetStrandWidth(float strandWidth)
   {
     this->strandWidth = strandWidth;
   }
 
-  float FurMeshProperties::GetDisplacement() const
+  float FurMeshState::GetDisplacement() const
   {
     return displacement;
   }
 
-  void FurMeshProperties::SetDisplacement(float displacement)
+  void FurMeshState::SetDisplacement(float displacement)
   {
     this->displacement = displacement;
   }
 
-  iTextureHandle* FurMeshProperties::GetDensityMap() const
+  iTextureHandle* FurMeshState::GetDensityMap() const
   {
     return densityMap;
   }
 
-  void FurMeshProperties::SetDensityMap(iTextureHandle* densityMap)
+  void FurMeshState::SetDensityMap(iTextureHandle* densityMap)
   {
     this->densityMap = densityMap;
   }
 
-  float FurMeshProperties::GetDensityFactorGuideFurs() const
+  float FurMeshState::GetDensityFactorGuideFurs() const
   {
     return densityFactorGuideFurs;
   }
 
-  void FurMeshProperties::SetDensityFactorGuideFurs(float densityFactorGuideFurs)
+  void FurMeshState::SetDensityFactorGuideFurs(float densityFactorGuideFurs)
   {
     this->densityFactorGuideFurs = densityFactorGuideFurs;
   }
 
-  float FurMeshProperties::GetDensityFactorFurStrands() const
+  float FurMeshState::GetDensityFactorFurStrands() const
   {
     return densityFactorFurStrands;
   }
 
-  void FurMeshProperties::SetDensityFactorFurStrands(float densityFactorFurStrands)
+  void FurMeshState::SetDensityFactorFurStrands(float densityFactorFurStrands)
   {
     this->densityFactorFurStrands = densityFactorFurStrands;
   }
 
-  iTextureHandle* FurMeshProperties::GetHeightMap() const
+  iTextureHandle* FurMeshState::GetHeightMap() const
   {
     return heightMap;
   }
 
-  void FurMeshProperties::SetHeightMap(iTextureHandle* heightMap)
+  void FurMeshState::SetHeightMap(iTextureHandle* heightMap)
   {
     this->heightMap = heightMap;
   }
 
-  float FurMeshProperties::GetHeightFactor() const
+  float FurMeshState::GetHeightFactor() const
   {
     return heightFactor;
   }
 
-  void FurMeshProperties::SetHeightFactor(float heightFactor)
+  void FurMeshState::SetHeightFactor(float heightFactor)
   {
     this->heightFactor = heightFactor;
   }
 
-  float FurMeshProperties::GetControlPointsDistance() const
+  float FurMeshState::GetControlPointsDistance() const
   {
     return controlPointsDistance;
   }
 
-  void FurMeshProperties::SetControlPointsDistance(float controlPointsDistance)
+  void FurMeshState::SetControlPointsDistance(float controlPointsDistance)
   {
     this->controlPointsDistance = controlPointsDistance;
   }
 
-  float FurMeshProperties::GetPositionDeviation() const
+  float FurMeshState::GetPositionDeviation() const
   {
     return positionDeviation;
   }
 
-  void FurMeshProperties::SetPositionDeviation(float positionDeviation)
+  void FurMeshState::SetPositionDeviation(float positionDeviation)
   {
     this->positionDeviation = positionDeviation;
   }
 
-  bool FurMeshProperties::GetGrowTangent() const
+  bool FurMeshState::GetGrowTangent() const
   {
     return growTangents;
   }
 
-  void FurMeshProperties::SetGrowTangent(bool growTangent)
+  void FurMeshState::SetGrowTangent(bool growTangents)
   {
     this->growTangents = growTangents;
+  }
+
+  uint FurMeshState::GetMixmode () const
+  {
+    return mixmode;
+  }
+
+  void FurMeshState::SetMixmode (uint mode)
+  {
+    mixmode = mode;
+  }
+
+  uint FurMeshState::GetPriority () const
+  {
+    return priority;
+  }
+
+  void FurMeshState::SetPriority (uint priority)
+  {
+    this->priority = priority;
+  }
+
+  csZBufMode FurMeshState::GetZBufMode() const
+  {
+    return z_buf_mode;
+  }
+
+  void FurMeshState::SetZBufMode(csZBufMode z_buf_mode)
+  {
+    this->z_buf_mode = z_buf_mode;
   }
 
   /************************

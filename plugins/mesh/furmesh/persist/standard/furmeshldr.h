@@ -34,12 +34,70 @@ struct iPluginManager;
 struct iObjectRegistry;
 struct iSyntaxService;
 
-namespace CS
+CS_PLUGIN_NAMESPACE_BEGIN(FurMeshLoader)
 {
-namespace Plugins
+/**
+ * Fur Mesh Factory loader.
+ */
+class FurMeshFactoryLoader : 
+  public scfImplementation2<FurMeshFactoryLoader, 
+                            iLoaderPlugin,
+                            iComponent>
 {
-namespace FurMeshLoader
+private:
+  iObjectRegistry* object_reg;
+  csRef<iSyntaxService> synldr;
+
+  csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/mesh/furmesh/persist/standard/furmeshfactoryhldr.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+
+public:
+  /// Constructor.
+  FurMeshFactoryLoader (iBase*);
+
+  /// Destructor.
+  virtual ~FurMeshFactoryLoader ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iObjectRegistry *object_reg);
+
+  /// Parse a given node and return a new object for it.
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+
+  virtual bool IsThreadSafe() { return true; }
+};
+
+/**
+ * Fur Mesh Factor saver.
+ */
+class FurMeshFactorySaver :
+  public scfImplementation2<FurMeshFactorySaver,
+                            iSaverPlugin,
+                            iComponent>
 {
+private:
+  iObjectRegistry* object_reg;
+  csRef<iSyntaxService> synldr;
+
+public:
+  /// Constructor.
+  FurMeshFactorySaver (iBase*);
+
+  /// Destructor.
+  virtual ~FurMeshFactorySaver ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iObjectRegistry *object_reg);
+
+  /// Write down given object and add to iDocumentNode.
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*);
+};
+
 /**
  * Fur Mesh loader.
  */
@@ -102,9 +160,8 @@ public:
   	iStreamSource*);
 };
 
-} // namespace FurMeshLoader
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(FurMeshLoader)
 
 #endif // __FUR_MESH_LDR_H__
 

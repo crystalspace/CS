@@ -89,6 +89,16 @@ bool FrankieScene::CreateAvatar ()
   if (!rc.success)
     return hairTest->ReportError ("Can't load Frankie library file!");
 
+  // Load some fur
+  rc = hairTest->loader->Load ("/lib/frankie/frankie_furmesh.xml");
+  if (!rc.success)
+    return hairTest->ReportError ("Can't load frankie furmesh library!");
+
+  csRef<iMeshWrapper> frankieFurmeshObject = 
+    hairTest->engine->FindMeshObject("frankie_furmesh_object");
+  if (!frankieFurmeshObject)
+    return hairTest->ReportError ("Can't find fur mesh object!");
+
   csRef<iMeshFactoryWrapper> meshfact =
     hairTest->engine->FindMeshFactory ("franky_frankie");
   if (!meshfact)
@@ -275,12 +285,6 @@ bool FrankieScene::CreateAvatar ()
   if (!plugmgr)
     return hairTest->ReportError("Failed to locate Plugin Manager!");
 
-  // Load base material
-  csRef<iMaterialWrapper> baseMaterial = 
-    hairTest->engine->FindMaterial("base_material");
-  if (!baseMaterial)	
-    return hairTest->ReportError ("Can't find Frankie's base material!");
-
   // Load furMesh
   csRef<CS::Mesh::iFurMeshType> furMeshType = 
     csQueryRegistry<CS::Mesh::iFurMeshType> (hairTest->object_reg);
@@ -309,15 +313,15 @@ bool FrankieScene::CreateAvatar ()
 
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
 
-  csRef<iMeshObjectFactory> imof = furMeshType->NewFactory();
+  iSector* sector = hairTest->engine->FindSector("room");
 
-  csRef<iMeshFactoryWrapper> imfw = 
-    hairTest->engine->CreateMeshFactory(imof, "frankie_fur_factory");
+  if (!sector)
+    return hairTest->ReportError("Could not find default room!");
 
-  csRef<iMeshWrapper> hairMesh = hairTest->engine->
-    CreateMeshWrapper (imfw, "fur_mesh_wrapper", hairTest->room, csVector3 (0));
+  frankieFurmeshObject->GetMovable()->SetSector(sector);
+  frankieFurmeshObject->GetMovable()->UpdateMove();
 
-  csRef<iMeshObject> imo = hairMesh->GetMeshObject();
+  csRef<iMeshObject> imo = frankieFurmeshObject->GetMeshObject();
 
   // Get reference to the iFurMesh interface
   furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
@@ -327,7 +331,6 @@ bool FrankieScene::CreateAvatar ()
 
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(0)->GetFactorySubMesh());
-  furMesh->SetBaseMaterial(baseMaterial->GetMaterial());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
   furMesh->StartAnimationControl();

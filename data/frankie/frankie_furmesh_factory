@@ -1,0 +1,6 @@
+<library>
+	<meshfact name="frankie_furmesh_factory">
+		<plugin>crystalspace.mesh.loader.factory.furmesh</plugin>
+		<params/>
+	</meshfact>
+</library>

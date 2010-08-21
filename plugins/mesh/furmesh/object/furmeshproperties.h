@@ -29,13 +29,13 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
-  class FurMeshProperties : public virtual CS::Mesh::iFurMeshProperties
+  class FurMeshState : public virtual CS::Mesh::iFurMeshState
   {
   public:
-    CS_LEAKGUARD_DECLARE(FurMeshProperties);
+    CS_LEAKGUARD_DECLARE(FurMeshState);
 
-    FurMeshProperties ();
-    virtual ~FurMeshProperties ();
+    FurMeshState ();
+    virtual ~FurMeshState ();
 
     virtual float GetStrandWidth() const;
     virtual void SetStrandWidth(float strandWidth);
@@ -57,7 +57,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetPositionDeviation(float positionDeviation);
     virtual bool GetGrowTangent() const;
     virtual void SetGrowTangent(bool growTangent);
-  
+    virtual uint GetMixmode () const;
+    virtual void SetMixmode (uint mode);
+    virtual uint GetPriority () const;
+    virtual void SetPriority (uint priority);
+    virtual csZBufMode GetZBufMode () const;
+    virtual void SetZBufMode (csZBufMode z_buf_mode);
+
   private:
     float strandWidth;
     float displacement;
@@ -69,6 +75,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float controlPointsDistance;
     float positionDeviation;
     bool growTangents;
+    uint mixmode;
+    uint priority;
+    csZBufMode z_buf_mode;
   };
 
   // Light Scattering from Human Hair Fibers
@@ -122,9 +131,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float DhM;
   };
 
-  class HairMeshProperties : public scfImplementation2 <HairMeshProperties, 
-    scfFakeInterface<CS::Mesh::iFurMeshProperties>, 
-    CS::Mesh::iFurMeshMaterialProperties> , public FurMeshProperties
+  class HairMeshProperties : public scfImplementation1 <HairMeshProperties, 
+    CS::Mesh::iFurMeshMaterialProperties>
   {
   public:
     CS_LEAKGUARD_DECLARE(HairMeshProperties);

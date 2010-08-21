@@ -160,6 +160,16 @@ bool KrystalScene::CreateAvatar ()
   if (!rc.success)
     return hairTest->ReportError ("Can't load Krystal library file!");
 
+  // Load some fur
+  rc = hairTest->loader->Load ("/lib/krystal/krystal_furmesh.xml");
+  if (!rc.success)
+    return hairTest->ReportError ("Can't load krystal furmesh library!");
+
+  csRef<iMeshWrapper> krystalFurmeshObject = 
+    hairTest->engine->FindMeshObject("krystal_furmesh_object");
+  if (!krystalFurmeshObject)
+    return hairTest->ReportError ("Can't find fur mesh object!");
+
   csRef<iMeshFactoryWrapper> meshfact =
     hairTest->engine->FindMeshFactory ("krystal");
   if (!meshfact)
@@ -169,11 +179,6 @@ bool KrystalScene::CreateAvatar ()
     (meshfact->GetMeshObjectFactory ());
   if (!animeshFactory)
     return hairTest->ReportError ("Can't find Krystal's animesh factory!");
-
-  csRef<iMaterialWrapper> skullMaterial = 
-    hairTest->engine->FindMaterial("skull_material");
-  if (!skullMaterial)	
-    return hairTest->ReportError ("Can't find Krystal's skull material!");
 
   // Load bodymesh (animesh's physical properties)
   rc = hairTest->loader->Load ("/lib/krystal/skelkrystal_body");
@@ -374,15 +379,15 @@ bool KrystalScene::CreateAvatar ()
   animationPhysicsControl->SetAnimesh(animesh);
   animationPhysicsControl->SetDisplacement(0.02);
 
-  csRef<iMeshObjectFactory> imof = furMeshType->NewFactory();
+  iSector* sector = hairTest->engine->FindSector("room");
 
-  csRef<iMeshFactoryWrapper> imfw = 
-    hairTest->engine->CreateMeshFactory(imof, "hair_factory");
+  if (!sector)
+    return hairTest->ReportError("Could not find default room!");
 
-  csRef<iMeshWrapper> hairMesh = hairTest->engine->
-    CreateMeshWrapper (imfw, "hair_mesh_wrapper", hairTest->room, csVector3 (0));
+  krystalFurmeshObject->GetMovable()->SetSector(sector);
+  krystalFurmeshObject->GetMovable()->UpdateMove();
 
-  csRef<iMeshObject> imo = hairMesh->GetMeshObject();
+  csRef<iMeshObject> imo = krystalFurmeshObject->GetMeshObject();
 
   // Get reference to the iFurMesh interface
   furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
@@ -392,7 +397,6 @@ bool KrystalScene::CreateAvatar ()
 
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
-  furMesh->SetBaseMaterial(skullMaterial->GetMaterial());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
   furMesh->StartAnimationControl();

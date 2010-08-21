@@ -128,10 +128,10 @@ public:
 /**
  * Access to the properties used for the iFurMesh.
  */
-struct iFurMeshProperties : public virtual iBase
+struct iFurMeshState : public virtual iBase
 {
 public:
-  SCF_INTERFACE (CS::Mesh::iFurMeshProperties, 1, 0, 0);
+  SCF_INTERFACE (CS::Mesh::iFurMeshState, 1, 0, 0);
 
   /**
    * Get the width of a strand
@@ -232,13 +232,43 @@ public:
    * Set if fur grows based on tangent direction
    */
   virtual void SetGrowTangent(bool growTangent) = 0;
+
+  /**
+   * Get mixmode
+   */
+  virtual uint GetMixmode () const = 0;
+
+  /**
+   * Set mixmode
+   */
+  virtual void SetMixmode (uint mode) = 0;
+
+  /**
+   * Get render priority
+   */
+  virtual uint GetPriority () const = 0;
+
+  /**
+   * Set render priority
+   */
+  virtual void SetPriority (uint priority) = 0;
+
+  /**
+   * Get Z-buffer
+   */
+  virtual csZBufMode GetZBufMode () const = 0;
+
+  /**
+   * Set Z-buffer
+   */
+  virtual void SetZBufMode (csZBufMode z_buf_mode) = 0;
 };
 
 /**
  * Store the material used for the iFurMesh.
  * Material variables can be updated each frame via the Update function.
  */
-struct iFurMeshMaterialProperties : public virtual iFurMeshProperties
+struct iFurMeshMaterialProperties : public virtual iBase
 {
 public:
   SCF_INTERFACE (CS::Mesh::iFurMeshMaterialProperties, 1, 0, 0);
@@ -405,13 +435,6 @@ struct iFurMesh : public virtual iBase
    */
   virtual void SetMeshFactorySubMesh ( CS::Mesh::iAnimatedMeshSubMeshFactory* 
     meshFactorySubMesh ) = 0;
-
-  /**
-   * Set the material used for the iAnimatedMeshSubMeshFactory.
-   * This material should specify data such as height map or density map for 
-   * the instance of iFurMesh.
-   */
-  virtual void SetBaseMaterial ( iMaterial* baseMaterial ) = 0;
 };
 
 

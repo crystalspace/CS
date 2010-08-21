@@ -41,11 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     materialWrapper(0), object_reg(object_reg), object_factory(object_factory), 
     engine(engine), physicsControl(0), hairMeshProperties(0), positionShift(0),
     rng(0), guideLOD(0),strandLOD(0), hairStrandsLODSize(0), 
-    physicsControlEnabled(false), 
-    densityFactorGuideFurs(10), densityFactorFurStrands(100),
-    heightFactor(0.5f), displaceDistance(0.02f), strandWidth(0.0015f), 
-    controlPointsDistance(0.05f), positionDeviation(0.01f), growTangents(0), 
-    mixmode(0), priority(7), z_buf_mode(CS_ZBUF_USE), indexstart(0), indexend(0)
+    physicsControlEnabled(false), indexstart(0), indexend(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -176,11 +172,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     meshPtr->indexend = indexend;
     meshPtr->material = materialWrapper;
 
-    meshPtr->mixmode = mixmode;
+    meshPtr->mixmode = GetMixmode();
 
     meshPtr->buffers = bufferholder;
-    meshPtr->renderPrio = priority;
-    meshPtr->z_buf_mode = z_buf_mode;
+    meshPtr->renderPrio = GetPriority();
+    meshPtr->z_buf_mode = GetZBufMode();
 
     meshPtr->object2world = o2wt;
     meshPtr->bbox = GetObjectBoundingBox();
@@ -193,36 +189,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return renderMeshes.GetArray ();
   }
 
-  void FurMesh::SetMixMode (uint mode)
-  {
-    mixmode = mode;
-  }
-
-  uint FurMesh::GetMixMode () const
-  {
-    return mixmode;
-  }
-
-  void FurMesh::SetPriority (uint priority)
-  {
-    this->priority = priority;
-  }
-
-  uint FurMesh::GetPriority () const
-  {
-    return priority;
-  }
-
-  void FurMesh::SetZBufMode(csZBufMode z_buf_mode)
-  {
-    this->z_buf_mode = z_buf_mode;
-  }
-
-  csZBufMode FurMesh::GetZBufMode() const
-  {
-    return z_buf_mode;
-  }
-
   void FurMesh::SetIndexRange (uint indexstart, uint indexend)
   {
     this->indexstart = indexstart;
@@ -231,9 +197,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::GenerateGeometry (iView* view, iSector *room)
   {
+    densitymap.handle = GetDensityMap();
+
+    if (!densitymap.handle)
+    {
+      csPrintfErr( "Please specify density map texture!\n" );    
+      return;
+    }
+
+    // Density map
+    if ( !densitymap.Read() )
+      csPrintfErr( "Error reading densitymap texture!\n" );    
+
+    heightmap.handle = GetHeightMap();
+
+    if (!heightmap.handle)
+    {
+      csPrintfErr( "Please specify height map texture!\n" );
+      return;
+    }
+    // Height map
+    if ( !heightmap.Read() )
+      csPrintfErr( "Error reading heightmap texture!\n" );  
+
     GenerateGuideHairs();
     GenerateGuideHairsLOD();
-    //SynchronizeGuideHairs();
     GenerateHairStrands();
 
     SaveUVImage();
@@ -322,7 +310,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     for ( size_t i = 0 ; i < controlPointsCount ; i ++)
       positionShift[i] = csVector3(rng->Get() * 2 - 1, rng->Get() * 2 - 1, 
-        rng->Get() * 2 - 1) * positionDeviation;
+        rng->Get() * 2 - 1) * GetPositionDeviation();
 
     // Default material
     csRef<iMaterialWrapper> materialWrapper = 
@@ -398,7 +386,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     for (size_t i = indexstart; i <= indexend; i ++)
     {
       csVector3 pos = vertex_buffer[i] + 
-        displaceDistance * normal_buffer[i];
+        GetDisplacement() * normal_buffer[i];
 
       csGuideFur guideFur;
       guideFur.uv = texcoord_buffer[i];
@@ -406,15 +394,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       float height = heightmap.Get((int)(guideFur.uv.x * heightmap.width),  
         (int)(guideFur.uv.y * heightmap.height), 0) / 255.0f;
 
-      size_t controlPointsCount = (int)( (height * heightFactor) 
-        / controlPointsDistance);
+      size_t controlPointsCount = (int)( (height * GetHeightFactor()) 
+        / GetControlPointsDistance());
       
       if (controlPointsCount == 1)
         controlPointsCount++;
 
-      float realDistance = (height * heightFactor) / controlPointsCount;
+      float realDistance = (height * GetHeightFactor()) / controlPointsCount;
 
-      if (growTangents)
+      if (GetGrowTangent())
         guideFur.Generate(controlPointsCount, realDistance, pos, tangent_buffer[i]);
       else
         guideFur.Generate(controlPointsCount, realDistance, pos, normal_buffer[i]);
@@ -545,7 +533,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       TriangleAreaDensity(triangle, area, density, A, B, C);
 
       // If a new guide fur is needed
-      if ( (density * area * densityFactorGuideFurs) < 1)
+      if ( (density * area * GetDensityFactorGuideFurs()) < 1)
         continue;
 
       // Make new guide fur
@@ -601,7 +589,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         TriangleAreaDensity(triangle, area, density, A, B, C);
 
         // How many new guide fur are needed
-        if ( den < (density * area * densityFactorFurStrands))
+        if ( den < (density * area * GetDensityFactorFurStrands()))
         {
           change = 1;
           csFurStrand furStrand;
@@ -660,7 +648,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     hairStrandsLODSize = totalGuideHairsCount + 
       (size_t)(strandLOD * (furStrands.GetSize() - totalGuideHairsCount));
 
-    strandWidthLOD = 1 / ( strandLOD * 0.75f + 0.25f ) * strandWidth;
+    strandWidthLOD = 1 / ( strandLOD * 0.75f + 0.25f ) * GetStrandWidth();
   }
 
   void FurMesh::SetLOD(float lod)
@@ -754,90 +742,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   CS::Mesh::iFurMeshMaterialProperties* FurMesh::GetFurStrandGenerator( ) const
   {
     return hairMeshProperties;
-  }
-
-  void FurMesh::SetBaseMaterial ( iMaterial* baseMaterial )
-  {
-    this->baseMaterial = baseMaterial;
-
-    SetBaseMaterialProperties();
-  }
-
-  void FurMesh::SetBaseMaterialProperties()
-  {
-    // Set grow tangents
-    CS::ShaderVarName growTangentsName (svStrings, "growTangents");	
-    baseMaterial->GetVariableAdd(growTangentsName)->GetValue(growTangents);
-
-    // Set position deviation
-    CS::ShaderVarName positionDeviationName (svStrings, "positionDeviation");	
-    baseMaterial->GetVariableAdd(positionDeviationName)->
-      GetValue(positionDeviation);
-
-    // Set strand width
-    CS::ShaderVarName strandWidthName (svStrings, "strandWidth");	
-    baseMaterial->GetVariableAdd(strandWidthName)->GetValue(strandWidth);
-    strandWidthLOD = strandWidth;    
-
-    // Set density map
-    iTextureHandle* tex;
-    csRef<csShaderVariable> shaderVariable;
-    
-    CS::ShaderVarName densitymapName (svStrings, "density map");	
-    shaderVariable = baseMaterial->GetVariable(densitymapName);
-      
-    if (!shaderVariable)  
-    {
-      csPrintfErr ("Density map not specified!\n");
-      return;
-    }
-
-    shaderVariable->GetValue(tex);
-    densitymap.handle = tex;
-
-    CS::ShaderVarName densityFactorGuideFursName 
-      (svStrings, "densityFactorGuideFurs");	
-    baseMaterial->GetVariableAdd(densityFactorGuideFursName)->
-      GetValue(densityFactorGuideFurs);
-
-    CS::ShaderVarName densityFactorFurStrandsName 
-      (svStrings, "densityFactorFurStrands");	
-    baseMaterial->GetVariableAdd(densityFactorFurStrandsName)->
-      GetValue(densityFactorFurStrands);    
-
-    // Density map
-    if ( !densitymap.Read() )
-      csPrintfErr( "Error reading densitymap texture!\n" );
-
-    // Set height map
-    CS::ShaderVarName heightmapName (svStrings, "height map");	
-    shaderVariable = baseMaterial->GetVariable(heightmapName);
-      
-    if (!shaderVariable)  
-    {
-      csPrintfErr ("Height map not specified!\n");
-      return;
-    }      
-
-    shaderVariable->GetValue(tex);
-    heightmap.handle = tex;
-
-    CS::ShaderVarName heightFactorName (svStrings, "heightFactor");	
-    baseMaterial->GetVariableAdd(heightFactorName)->GetValue(heightFactor);
-
-    // Height map
-    if ( !heightmap.Read() )
-      csPrintfErr( "Error reading heightmap texture!\n" );
-
-    // Set displace distance
-    CS::ShaderVarName displaceDistanceName (svStrings, "displaceDistance");	
-    baseMaterial->GetVariableAdd(displaceDistanceName)
-      ->GetValue(displaceDistance);
-
-    CS::ShaderVarName controlPointsDistanceName 
-      (svStrings, "controlPointsDistance");	
-    baseMaterial->GetVariableAdd(controlPointsDistanceName)->
-      GetValue(controlPointsDistance);
   }
 
   void FurMesh::UpdateGuideHairs()
