@@ -114,12 +114,24 @@ class iDecalTemplate(core.iBase):
     def SetMainColor(*args): return _ivaria.iDecalTemplate_SetMainColor(*args)
     def SetTopColor(*args): return _ivaria.iDecalTemplate_SetTopColor(*args)
     def SetBottomColor(*args): return _ivaria.iDecalTemplate_SetBottomColor(*args)
+    def SetClipping(*args): return _ivaria.iDecalTemplate_SetClipping(*args)
+    def HasClipping(*args): return _ivaria.iDecalTemplate_HasClipping(*args)
     scfGetVersion = staticmethod(_ivaria.iDecalTemplate_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iDecalTemplate
     __del__ = lambda self : None;
 iDecalTemplate_swigregister = _ivaria.iDecalTemplate_swigregister
 iDecalTemplate_swigregister(iDecalTemplate)
 iDecalTemplate_scfGetVersion = _ivaria.iDecalTemplate_scfGetVersion
+
+class iDecalAnimationControl(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def UpdateDecal(*args): return _ivaria.iDecalAnimationControl_UpdateDecal(*args)
+    __swig_destroy__ = _ivaria.delete_iDecalAnimationControl
+    __del__ = lambda self : None;
+iDecalAnimationControl_swigregister = _ivaria.iDecalAnimationControl_swigregister
+iDecalAnimationControl_swigregister(iDecalAnimationControl)
 
 class iDecalBuilder(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -128,6 +140,7 @@ class iDecalBuilder(object):
     __swig_destroy__ = _ivaria.delete_iDecalBuilder
     __del__ = lambda self : None;
     def AddStaticPoly(*args): return _ivaria.iDecalBuilder_AddStaticPoly(*args)
+    def SetDecalAnimationControl(*args): return _ivaria.iDecalBuilder_SetDecalAnimationControl(*args)
 iDecalBuilder_swigregister = _ivaria.iDecalBuilder_swigregister
 iDecalBuilder_swigregister(iDecalBuilder)
 
@@ -135,11 +148,11 @@ class iDecalManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def CreateDecal(*args): return _ivaria.iDecalManager_CreateDecal(*args)
     def CreateDecalTemplate(*args): return _ivaria.iDecalManager_CreateDecalTemplate(*args)
     def DeleteDecal(*args): return _ivaria.iDecalManager_DeleteDecal(*args)
     def GetDecalCount(*args): return _ivaria.iDecalManager_GetDecalCount(*args)
     def GetDecal(*args): return _ivaria.iDecalManager_GetDecal(*args)
+    def CreateDecal(*args): return _ivaria.iDecalManager_CreateDecal(*args)
     scfGetVersion = staticmethod(_ivaria.iDecalManager_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iDecalManager
     __del__ = lambda self : None;

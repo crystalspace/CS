@@ -6306,6 +6306,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetMainColor = *cspacec::iDecalTemplate_SetMainColor;
 *SetTopColor = *cspacec::iDecalTemplate_SetTopColor;
 *SetBottomColor = *cspacec::iDecalTemplate_SetBottomColor;
+*SetClipping = *cspacec::iDecalTemplate_SetClipping;
+*HasClipping = *cspacec::iDecalTemplate_HasClipping;
 *scfGetVersion = *cspacec::iDecalTemplate_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -6314,6 +6316,38 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iDecalTemplate($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iDecalAnimationControl ##############
+
+package cspace::iDecalAnimationControl;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*UpdateDecal = *cspacec::iDecalAnimationControl_UpdateDecal;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iDecalAnimationControl($self);
         delete $OWNER{$self};
     }
 }
@@ -6350,6 +6384,7 @@ sub DESTROY {
 }
 
 *AddStaticPoly = *cspacec::iDecalBuilder_AddStaticPoly;
+*SetDecalAnimationControl = *cspacec::iDecalBuilder_SetDecalAnimationControl;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -6370,11 +6405,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-*CreateDecal = *cspacec::iDecalManager_CreateDecal;
 *CreateDecalTemplate = *cspacec::iDecalManager_CreateDecalTemplate;
 *DeleteDecal = *cspacec::iDecalManager_DeleteDecal;
 *GetDecalCount = *cspacec::iDecalManager_GetDecalCount;
 *GetDecal = *cspacec::iDecalManager_GetDecal;
+*CreateDecal = *cspacec::iDecalManager_CreateDecal;
 *scfGetVersion = *cspacec::iDecalManager_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

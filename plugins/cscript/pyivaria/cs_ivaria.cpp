@@ -2545,187 +2545,190 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_csArrayCapacityVariableGrow swig_types[22]
 #define SWIGTYPE_p_csArrayT_csIntersectingTriangle_csArrayElementHandlerT_csIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[23]
 #define SWIGTYPE_p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[24]
-#define SWIGTYPE_p_csBox2 swig_types[25]
-#define SWIGTYPE_p_csBox3 swig_types[26]
-#define SWIGTYPE_p_csCollisionPair swig_types[27]
-#define SWIGTYPE_p_csColor swig_types[28]
-#define SWIGTYPE_p_csColor4 swig_types[29]
-#define SWIGTYPE_p_csConfigFile swig_types[30]
-#define SWIGTYPE_p_csIntersectingTriangle swig_types[31]
-#define SWIGTYPE_p_csMatrix3 swig_types[32]
-#define SWIGTYPE_p_csObject swig_types[33]
-#define SWIGTYPE_p_csOrthoTransform swig_types[34]
-#define SWIGTYPE_p_csPlane3 swig_types[35]
-#define SWIGTYPE_p_csPoly3D swig_types[36]
-#define SWIGTYPE_p_csPtrT_iEngineSequenceParameters_t swig_types[37]
-#define SWIGTYPE_p_csPtrT_iParameterESM_t swig_types[38]
-#define SWIGTYPE_p_csPtrT_iRigidBody_t swig_types[39]
-#define SWIGTYPE_p_csPtrT_iScriptValue_t swig_types[40]
-#define SWIGTYPE_p_csPtrT_iSequenceTrigger_t swig_types[41]
-#define SWIGTYPE_p_csPtrT_iSequenceWrapper_t swig_types[42]
-#define SWIGTYPE_p_csRect swig_types[43]
-#define SWIGTYPE_p_csRefArrayT_iObject_t swig_types[44]
-#define SWIGTYPE_p_csRefArrayT_iScriptValue_t swig_types[45]
-#define SWIGTYPE_p_csRefT_iBase_t swig_types[46]
-#define SWIGTYPE_p_csRefT_iDynamicsSystemCollider_t swig_types[47]
-#define SWIGTYPE_p_csRefT_iGeneralFactoryState_t swig_types[48]
-#define SWIGTYPE_p_csRefT_iRigidBody_t swig_types[49]
-#define SWIGTYPE_p_csRefT_iScriptObject_t swig_types[50]
-#define SWIGTYPE_p_csRefT_iSequenceOperation_t swig_types[51]
-#define SWIGTYPE_p_csRefT_iString_t swig_types[52]
-#define SWIGTYPE_p_csReversibleTransform swig_types[53]
-#define SWIGTYPE_p_csSequenceOp swig_types[54]
-#define SWIGTYPE_p_csSphere swig_types[55]
-#define SWIGTYPE_p_csVector2 swig_types[56]
-#define SWIGTYPE_p_csVector3 swig_types[57]
-#define SWIGTYPE_p_csZBufMode swig_types[58]
-#define SWIGTYPE_p_double swig_types[59]
-#define SWIGTYPE_p_float swig_types[60]
-#define SWIGTYPE_p_iArrayChangeAllT_csCollisionPair_t swig_types[61]
-#define SWIGTYPE_p_iArrayChangeElementsT_csCollisionPair_t swig_types[62]
-#define SWIGTYPE_p_iArrayReadOnlyT_csCollisionPair_t swig_types[63]
-#define SWIGTYPE_p_iBase swig_types[64]
-#define SWIGTYPE_p_iBodyGroup swig_types[65]
-#define SWIGTYPE_p_iBugPlug swig_types[66]
-#define SWIGTYPE_p_iBugPlugRenderObject swig_types[67]
-#define SWIGTYPE_p_iCacheManager swig_types[68]
-#define SWIGTYPE_p_iCamera swig_types[69]
-#define SWIGTYPE_p_iClipper2D swig_types[70]
-#define SWIGTYPE_p_iCollideSystem swig_types[71]
-#define SWIGTYPE_p_iCollider swig_types[72]
-#define SWIGTYPE_p_iCommandLineParser swig_types[73]
-#define SWIGTYPE_p_iComponent swig_types[74]
-#define SWIGTYPE_p_iConfigFile swig_types[75]
-#define SWIGTYPE_p_iConfigIterator swig_types[76]
-#define SWIGTYPE_p_iConfigManager swig_types[77]
-#define SWIGTYPE_p_iConsoleExecCallback swig_types[78]
-#define SWIGTYPE_p_iConsoleInput swig_types[79]
-#define SWIGTYPE_p_iConsoleOutput swig_types[80]
-#define SWIGTYPE_p_iConsoleWatcher swig_types[81]
-#define SWIGTYPE_p_iCustomMatrixCamera swig_types[82]
-#define SWIGTYPE_p_iDataBuffer swig_types[83]
-#define SWIGTYPE_p_iDebugHelper swig_types[84]
-#define SWIGTYPE_p_iDecal swig_types[85]
-#define SWIGTYPE_p_iDecalBuilder swig_types[86]
-#define SWIGTYPE_p_iDecalManager swig_types[87]
-#define SWIGTYPE_p_iDecalTemplate swig_types[88]
-#define SWIGTYPE_p_iDocument swig_types[89]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[90]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[91]
-#define SWIGTYPE_p_iDocumentNode swig_types[92]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[93]
-#define SWIGTYPE_p_iDocumentSystem swig_types[94]
-#define SWIGTYPE_p_iDynamicSystem swig_types[95]
-#define SWIGTYPE_p_iDynamics swig_types[96]
-#define SWIGTYPE_p_iDynamicsColliderCollisionCallback swig_types[97]
-#define SWIGTYPE_p_iDynamicsCollisionCallback swig_types[98]
-#define SWIGTYPE_p_iDynamicsMoveCallback swig_types[99]
-#define SWIGTYPE_p_iDynamicsStepCallback swig_types[100]
-#define SWIGTYPE_p_iDynamicsSystemCollider swig_types[101]
-#define SWIGTYPE_p_iEngine swig_types[102]
-#define SWIGTYPE_p_iEngineSequenceManager swig_types[103]
-#define SWIGTYPE_p_iEngineSequenceParameters swig_types[104]
-#define SWIGTYPE_p_iEvent swig_types[105]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[106]
-#define SWIGTYPE_p_iEventCord swig_types[107]
-#define SWIGTYPE_p_iEventHandler swig_types[108]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[109]
-#define SWIGTYPE_p_iEventOutlet swig_types[110]
-#define SWIGTYPE_p_iEventPlug swig_types[111]
-#define SWIGTYPE_p_iEventQueue swig_types[112]
-#define SWIGTYPE_p_iFactory swig_types[113]
-#define SWIGTYPE_p_iFile swig_types[114]
-#define SWIGTYPE_p_iFont swig_types[115]
-#define SWIGTYPE_p_iFrameEventSignpost swig_types[116]
-#define SWIGTYPE_p_iGraphics3D swig_types[117]
-#define SWIGTYPE_p_iImage swig_types[118]
-#define SWIGTYPE_p_iJoint swig_types[119]
-#define SWIGTYPE_p_iJoystickDriver swig_types[120]
-#define SWIGTYPE_p_iKeyComposer swig_types[121]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[122]
-#define SWIGTYPE_p_iLight swig_types[123]
-#define SWIGTYPE_p_iMapNode swig_types[124]
-#define SWIGTYPE_p_iMaterialWrapper swig_types[125]
-#define SWIGTYPE_p_iMeshObject swig_types[126]
-#define SWIGTYPE_p_iMeshWrapper swig_types[127]
-#define SWIGTYPE_p_iMouseDriver swig_types[128]
-#define SWIGTYPE_p_iMovieRecorder swig_types[129]
-#define SWIGTYPE_p_iNativeWindowManager swig_types[130]
-#define SWIGTYPE_p_iODEAMotorJoint swig_types[131]
-#define SWIGTYPE_p_iODEBallJoint swig_types[132]
-#define SWIGTYPE_p_iODEDynamicState swig_types[133]
-#define SWIGTYPE_p_iODEDynamicSystemState swig_types[134]
-#define SWIGTYPE_p_iODEFrameUpdateCallback swig_types[135]
-#define SWIGTYPE_p_iODEGeneralJointState swig_types[136]
-#define SWIGTYPE_p_iODEHinge2Joint swig_types[137]
-#define SWIGTYPE_p_iODEHingeJoint swig_types[138]
-#define SWIGTYPE_p_iODEJointState swig_types[139]
-#define SWIGTYPE_p_iODESliderJoint swig_types[140]
-#define SWIGTYPE_p_iODEUniversalJoint swig_types[141]
-#define SWIGTYPE_p_iObject swig_types[142]
-#define SWIGTYPE_p_iObjectIterator swig_types[143]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[144]
-#define SWIGTYPE_p_iObjectRegistry swig_types[145]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[146]
-#define SWIGTYPE_p_iParameterESM swig_types[147]
-#define SWIGTYPE_p_iPath swig_types[148]
-#define SWIGTYPE_p_iPerspectiveCamera swig_types[149]
-#define SWIGTYPE_p_iPluginIterator swig_types[150]
-#define SWIGTYPE_p_iPluginManager swig_types[151]
-#define SWIGTYPE_p_iReporter swig_types[152]
-#define SWIGTYPE_p_iReporterIterator swig_types[153]
-#define SWIGTYPE_p_iReporterListener swig_types[154]
-#define SWIGTYPE_p_iRigidBody swig_types[155]
-#define SWIGTYPE_p_iSCF swig_types[156]
-#define SWIGTYPE_p_iScript swig_types[157]
-#define SWIGTYPE_p_iScriptObject swig_types[158]
-#define SWIGTYPE_p_iScriptValue swig_types[159]
-#define SWIGTYPE_p_iSector swig_types[160]
-#define SWIGTYPE_p_iSequence swig_types[161]
-#define SWIGTYPE_p_iSequenceCondition swig_types[162]
-#define SWIGTYPE_p_iSequenceManager swig_types[163]
-#define SWIGTYPE_p_iSequenceOperation swig_types[164]
-#define SWIGTYPE_p_iSequenceTimedOperation swig_types[165]
-#define SWIGTYPE_p_iSequenceTrigger swig_types[166]
-#define SWIGTYPE_p_iSequenceWrapper swig_types[167]
-#define SWIGTYPE_p_iSharedVariable swig_types[168]
-#define SWIGTYPE_p_iSimpleFormerState swig_types[169]
-#define SWIGTYPE_p_iStandardReporterListener swig_types[170]
-#define SWIGTYPE_p_iString swig_types[171]
-#define SWIGTYPE_p_iStringArray swig_types[172]
-#define SWIGTYPE_p_iStringSet swig_types[173]
-#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__General_t swig_types[174]
-#define SWIGTYPE_p_iTerraFormer swig_types[175]
-#define SWIGTYPE_p_iTerraSampler swig_types[176]
-#define SWIGTYPE_p_iTerrainSystem swig_types[177]
-#define SWIGTYPE_p_iThreadManager swig_types[178]
-#define SWIGTYPE_p_iThreadReturn swig_types[179]
-#define SWIGTYPE_p_iTranslator swig_types[180]
-#define SWIGTYPE_p_iTriangleMesh swig_types[181]
-#define SWIGTYPE_p_iVFS swig_types[182]
-#define SWIGTYPE_p_iView swig_types[183]
-#define SWIGTYPE_p_iVirtualClock swig_types[184]
-#define SWIGTYPE_p_int swig_types[185]
-#define SWIGTYPE_p_int16_t swig_types[186]
-#define SWIGTYPE_p_int64_t swig_types[187]
-#define SWIGTYPE_p_int8_t swig_types[188]
-#define SWIGTYPE_p_long_long swig_types[189]
-#define SWIGTYPE_p_p_csVector3 swig_types[190]
-#define SWIGTYPE_p_p_int swig_types[191]
-#define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[192]
-#define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[193]
-#define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[194]
-#define SWIGTYPE_p_size_t swig_types[195]
-#define SWIGTYPE_p_uint16_t swig_types[196]
-#define SWIGTYPE_p_uint32_t swig_types[197]
-#define SWIGTYPE_p_uint64_t swig_types[198]
-#define SWIGTYPE_p_uint8_t swig_types[199]
-#define SWIGTYPE_p_unsigned_int swig_types[200]
-#define SWIGTYPE_p_unsigned_long swig_types[201]
-#define SWIGTYPE_p_unsigned_long_long swig_types[202]
-#define SWIGTYPE_p_void swig_types[203]
-static swig_type_info *swig_types[205];
-static swig_module_info swig_module = {swig_types, 204, 0, 0, 0, 0};
+#define SWIGTYPE_p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[25]
+#define SWIGTYPE_p_csBox2 swig_types[26]
+#define SWIGTYPE_p_csBox3 swig_types[27]
+#define SWIGTYPE_p_csCollisionPair swig_types[28]
+#define SWIGTYPE_p_csColor swig_types[29]
+#define SWIGTYPE_p_csColor4 swig_types[30]
+#define SWIGTYPE_p_csConfigFile swig_types[31]
+#define SWIGTYPE_p_csIntersectingTriangle swig_types[32]
+#define SWIGTYPE_p_csMatrix3 swig_types[33]
+#define SWIGTYPE_p_csObject swig_types[34]
+#define SWIGTYPE_p_csOrthoTransform swig_types[35]
+#define SWIGTYPE_p_csPlane3 swig_types[36]
+#define SWIGTYPE_p_csPoly3D swig_types[37]
+#define SWIGTYPE_p_csPtrT_iEngineSequenceParameters_t swig_types[38]
+#define SWIGTYPE_p_csPtrT_iParameterESM_t swig_types[39]
+#define SWIGTYPE_p_csPtrT_iRigidBody_t swig_types[40]
+#define SWIGTYPE_p_csPtrT_iScriptValue_t swig_types[41]
+#define SWIGTYPE_p_csPtrT_iSequenceTrigger_t swig_types[42]
+#define SWIGTYPE_p_csPtrT_iSequenceWrapper_t swig_types[43]
+#define SWIGTYPE_p_csRect swig_types[44]
+#define SWIGTYPE_p_csRefArrayT_iObject_t swig_types[45]
+#define SWIGTYPE_p_csRefArrayT_iScriptValue_t swig_types[46]
+#define SWIGTYPE_p_csRefT_iBase_t swig_types[47]
+#define SWIGTYPE_p_csRefT_iDynamicsSystemCollider_t swig_types[48]
+#define SWIGTYPE_p_csRefT_iGeneralFactoryState_t swig_types[49]
+#define SWIGTYPE_p_csRefT_iRigidBody_t swig_types[50]
+#define SWIGTYPE_p_csRefT_iScriptObject_t swig_types[51]
+#define SWIGTYPE_p_csRefT_iSequenceOperation_t swig_types[52]
+#define SWIGTYPE_p_csRefT_iString_t swig_types[53]
+#define SWIGTYPE_p_csRenderBuffer swig_types[54]
+#define SWIGTYPE_p_csReversibleTransform swig_types[55]
+#define SWIGTYPE_p_csSequenceOp swig_types[56]
+#define SWIGTYPE_p_csSphere swig_types[57]
+#define SWIGTYPE_p_csVector2 swig_types[58]
+#define SWIGTYPE_p_csVector3 swig_types[59]
+#define SWIGTYPE_p_csZBufMode swig_types[60]
+#define SWIGTYPE_p_double swig_types[61]
+#define SWIGTYPE_p_float swig_types[62]
+#define SWIGTYPE_p_iArrayChangeAllT_csCollisionPair_t swig_types[63]
+#define SWIGTYPE_p_iArrayChangeElementsT_csCollisionPair_t swig_types[64]
+#define SWIGTYPE_p_iArrayReadOnlyT_csCollisionPair_t swig_types[65]
+#define SWIGTYPE_p_iBase swig_types[66]
+#define SWIGTYPE_p_iBodyGroup swig_types[67]
+#define SWIGTYPE_p_iBugPlug swig_types[68]
+#define SWIGTYPE_p_iBugPlugRenderObject swig_types[69]
+#define SWIGTYPE_p_iCacheManager swig_types[70]
+#define SWIGTYPE_p_iCamera swig_types[71]
+#define SWIGTYPE_p_iClipper2D swig_types[72]
+#define SWIGTYPE_p_iCollideSystem swig_types[73]
+#define SWIGTYPE_p_iCollider swig_types[74]
+#define SWIGTYPE_p_iCommandLineParser swig_types[75]
+#define SWIGTYPE_p_iComponent swig_types[76]
+#define SWIGTYPE_p_iConfigFile swig_types[77]
+#define SWIGTYPE_p_iConfigIterator swig_types[78]
+#define SWIGTYPE_p_iConfigManager swig_types[79]
+#define SWIGTYPE_p_iConsoleExecCallback swig_types[80]
+#define SWIGTYPE_p_iConsoleInput swig_types[81]
+#define SWIGTYPE_p_iConsoleOutput swig_types[82]
+#define SWIGTYPE_p_iConsoleWatcher swig_types[83]
+#define SWIGTYPE_p_iCustomMatrixCamera swig_types[84]
+#define SWIGTYPE_p_iDataBuffer swig_types[85]
+#define SWIGTYPE_p_iDebugHelper swig_types[86]
+#define SWIGTYPE_p_iDecal swig_types[87]
+#define SWIGTYPE_p_iDecalAnimationControl swig_types[88]
+#define SWIGTYPE_p_iDecalBuilder swig_types[89]
+#define SWIGTYPE_p_iDecalManager swig_types[90]
+#define SWIGTYPE_p_iDecalTemplate swig_types[91]
+#define SWIGTYPE_p_iDocument swig_types[92]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[93]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[94]
+#define SWIGTYPE_p_iDocumentNode swig_types[95]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[96]
+#define SWIGTYPE_p_iDocumentSystem swig_types[97]
+#define SWIGTYPE_p_iDynamicSystem swig_types[98]
+#define SWIGTYPE_p_iDynamics swig_types[99]
+#define SWIGTYPE_p_iDynamicsColliderCollisionCallback swig_types[100]
+#define SWIGTYPE_p_iDynamicsCollisionCallback swig_types[101]
+#define SWIGTYPE_p_iDynamicsMoveCallback swig_types[102]
+#define SWIGTYPE_p_iDynamicsStepCallback swig_types[103]
+#define SWIGTYPE_p_iDynamicsSystemCollider swig_types[104]
+#define SWIGTYPE_p_iEngine swig_types[105]
+#define SWIGTYPE_p_iEngineSequenceManager swig_types[106]
+#define SWIGTYPE_p_iEngineSequenceParameters swig_types[107]
+#define SWIGTYPE_p_iEvent swig_types[108]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[109]
+#define SWIGTYPE_p_iEventCord swig_types[110]
+#define SWIGTYPE_p_iEventHandler swig_types[111]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[112]
+#define SWIGTYPE_p_iEventOutlet swig_types[113]
+#define SWIGTYPE_p_iEventPlug swig_types[114]
+#define SWIGTYPE_p_iEventQueue swig_types[115]
+#define SWIGTYPE_p_iFactory swig_types[116]
+#define SWIGTYPE_p_iFile swig_types[117]
+#define SWIGTYPE_p_iFont swig_types[118]
+#define SWIGTYPE_p_iFrameEventSignpost swig_types[119]
+#define SWIGTYPE_p_iGraphics3D swig_types[120]
+#define SWIGTYPE_p_iImage swig_types[121]
+#define SWIGTYPE_p_iJoint swig_types[122]
+#define SWIGTYPE_p_iJoystickDriver swig_types[123]
+#define SWIGTYPE_p_iKeyComposer swig_types[124]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[125]
+#define SWIGTYPE_p_iLight swig_types[126]
+#define SWIGTYPE_p_iMapNode swig_types[127]
+#define SWIGTYPE_p_iMaterialWrapper swig_types[128]
+#define SWIGTYPE_p_iMeshObject swig_types[129]
+#define SWIGTYPE_p_iMeshWrapper swig_types[130]
+#define SWIGTYPE_p_iMouseDriver swig_types[131]
+#define SWIGTYPE_p_iMovieRecorder swig_types[132]
+#define SWIGTYPE_p_iNativeWindowManager swig_types[133]
+#define SWIGTYPE_p_iODEAMotorJoint swig_types[134]
+#define SWIGTYPE_p_iODEBallJoint swig_types[135]
+#define SWIGTYPE_p_iODEDynamicState swig_types[136]
+#define SWIGTYPE_p_iODEDynamicSystemState swig_types[137]
+#define SWIGTYPE_p_iODEFrameUpdateCallback swig_types[138]
+#define SWIGTYPE_p_iODEGeneralJointState swig_types[139]
+#define SWIGTYPE_p_iODEHinge2Joint swig_types[140]
+#define SWIGTYPE_p_iODEHingeJoint swig_types[141]
+#define SWIGTYPE_p_iODEJointState swig_types[142]
+#define SWIGTYPE_p_iODESliderJoint swig_types[143]
+#define SWIGTYPE_p_iODEUniversalJoint swig_types[144]
+#define SWIGTYPE_p_iObject swig_types[145]
+#define SWIGTYPE_p_iObjectIterator swig_types[146]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[147]
+#define SWIGTYPE_p_iObjectRegistry swig_types[148]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[149]
+#define SWIGTYPE_p_iParameterESM swig_types[150]
+#define SWIGTYPE_p_iPath swig_types[151]
+#define SWIGTYPE_p_iPerspectiveCamera swig_types[152]
+#define SWIGTYPE_p_iPluginIterator swig_types[153]
+#define SWIGTYPE_p_iPluginManager swig_types[154]
+#define SWIGTYPE_p_iReporter swig_types[155]
+#define SWIGTYPE_p_iReporterIterator swig_types[156]
+#define SWIGTYPE_p_iReporterListener swig_types[157]
+#define SWIGTYPE_p_iRigidBody swig_types[158]
+#define SWIGTYPE_p_iSCF swig_types[159]
+#define SWIGTYPE_p_iScript swig_types[160]
+#define SWIGTYPE_p_iScriptObject swig_types[161]
+#define SWIGTYPE_p_iScriptValue swig_types[162]
+#define SWIGTYPE_p_iSector swig_types[163]
+#define SWIGTYPE_p_iSequence swig_types[164]
+#define SWIGTYPE_p_iSequenceCondition swig_types[165]
+#define SWIGTYPE_p_iSequenceManager swig_types[166]
+#define SWIGTYPE_p_iSequenceOperation swig_types[167]
+#define SWIGTYPE_p_iSequenceTimedOperation swig_types[168]
+#define SWIGTYPE_p_iSequenceTrigger swig_types[169]
+#define SWIGTYPE_p_iSequenceWrapper swig_types[170]
+#define SWIGTYPE_p_iSharedVariable swig_types[171]
+#define SWIGTYPE_p_iSimpleFormerState swig_types[172]
+#define SWIGTYPE_p_iStandardReporterListener swig_types[173]
+#define SWIGTYPE_p_iString swig_types[174]
+#define SWIGTYPE_p_iStringArray swig_types[175]
+#define SWIGTYPE_p_iStringSet swig_types[176]
+#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__General_t swig_types[177]
+#define SWIGTYPE_p_iTerraFormer swig_types[178]
+#define SWIGTYPE_p_iTerraSampler swig_types[179]
+#define SWIGTYPE_p_iTerrainSystem swig_types[180]
+#define SWIGTYPE_p_iThreadManager swig_types[181]
+#define SWIGTYPE_p_iThreadReturn swig_types[182]
+#define SWIGTYPE_p_iTranslator swig_types[183]
+#define SWIGTYPE_p_iTriangleMesh swig_types[184]
+#define SWIGTYPE_p_iVFS swig_types[185]
+#define SWIGTYPE_p_iView swig_types[186]
+#define SWIGTYPE_p_iVirtualClock swig_types[187]
+#define SWIGTYPE_p_int swig_types[188]
+#define SWIGTYPE_p_int16_t swig_types[189]
+#define SWIGTYPE_p_int64_t swig_types[190]
+#define SWIGTYPE_p_int8_t swig_types[191]
+#define SWIGTYPE_p_long_long swig_types[192]
+#define SWIGTYPE_p_p_csVector3 swig_types[193]
+#define SWIGTYPE_p_p_int swig_types[194]
+#define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[195]
+#define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[196]
+#define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[197]
+#define SWIGTYPE_p_size_t swig_types[198]
+#define SWIGTYPE_p_uint16_t swig_types[199]
+#define SWIGTYPE_p_uint32_t swig_types[200]
+#define SWIGTYPE_p_uint64_t swig_types[201]
+#define SWIGTYPE_p_uint8_t swig_types[202]
+#define SWIGTYPE_p_unsigned_int swig_types[203]
+#define SWIGTYPE_p_unsigned_long swig_types[204]
+#define SWIGTYPE_p_unsigned_long_long swig_types[205]
+#define SWIGTYPE_p_void swig_types[206]
+static swig_type_info *swig_types[208];
+static swig_module_info swig_module = {swig_types, 207, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3085,13 +3088,6 @@ SWIG_From_int  (int value)
 
 SWIGINTERN void delete_iDecalTemplate(iDecalTemplate *self){ if (self) self->DecRef (); }
 
-SWIGINTERNINLINE PyObject *
-SWIG_From_size_t  (size_t value)
-{    
-  return SWIG_From_unsigned_SS_long  (static_cast< unsigned long >(value));
-}
-
-
 SWIGINTERNINLINE int
 SWIG_AsVal_size_t (PyObject * obj, size_t *val)
 {
@@ -3099,6 +3095,13 @@ SWIG_AsVal_size_t (PyObject * obj, size_t *val)
   int res = SWIG_AsVal_unsigned_SS_long (obj, val ? &v : 0);
   if (SWIG_IsOK(res) && val) *val = static_cast< size_t >(v);
   return res;
+}
+
+
+SWIGINTERNINLINE PyObject *
+SWIG_From_size_t  (size_t value)
+{    
+  return SWIG_From_unsigned_SS_long  (static_cast< unsigned long >(value));
 }
 
 SWIGINTERN int iDecalManager_scfGetVersion(){ return scfInterfaceTraits<iDecalManager>::GetVersion(); }
@@ -4388,6 +4391,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iDecalTemplate_SetClipping(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalTemplate *arg1 = (iDecalTemplate *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDecalTemplate_SetClipping",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalTemplate, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDecalTemplate_SetClipping" "', argument " "1"" of type '" "iDecalTemplate *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalTemplate * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iDecalTemplate_SetClipping" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  (arg1)->SetClipping(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDecalTemplate_HasClipping(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalTemplate *arg1 = (iDecalTemplate *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDecalTemplate_HasClipping",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalTemplate, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDecalTemplate_HasClipping" "', argument " "1"" of type '" "iDecalTemplate const *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalTemplate * >(argp1);
+  result = (bool)((iDecalTemplate const *)arg1)->HasClipping();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iDecalTemplate_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -4429,6 +4484,109 @@ SWIGINTERN PyObject *iDecalTemplate_swigregister(PyObject *SWIGUNUSEDPARM(self),
   return SWIG_Py_Void();
 }
 
+SWIGINTERN PyObject *_wrap_iDecalAnimationControl_UpdateDecal(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalAnimationControl *arg1 = (iDecalAnimationControl *) 0 ;
+  iDecalTemplate *arg2 = (iDecalTemplate *) 0 ;
+  size_t arg3 ;
+  csArray< size_t > *arg4 = 0 ;
+  csRenderBuffer *arg5 = 0 ;
+  csRenderBuffer *arg6 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  size_t val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDecalAnimationControl_UpdateDecal",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalAnimationControl, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDecalAnimationControl_UpdateDecal" "', argument " "1"" of type '" "iDecalAnimationControl *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalAnimationControl * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDecalTemplate, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDecalAnimationControl_UpdateDecal" "', argument " "2"" of type '" "iDecalTemplate *""'"); 
+  }
+  arg2 = reinterpret_cast< iDecalTemplate * >(argp2);
+  ecode3 = SWIG_AsVal_size_t(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iDecalAnimationControl_UpdateDecal" "', argument " "3"" of type '" "size_t""'");
+  } 
+  arg3 = static_cast< size_t >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iDecalAnimationControl_UpdateDecal" "', argument " "4"" of type '" "csArray< size_t > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalAnimationControl_UpdateDecal" "', argument " "4"" of type '" "csArray< size_t > &""'"); 
+  }
+  arg4 = reinterpret_cast< csArray< size_t > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csRenderBuffer,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iDecalAnimationControl_UpdateDecal" "', argument " "5"" of type '" "csRenderBuffer &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalAnimationControl_UpdateDecal" "', argument " "5"" of type '" "csRenderBuffer &""'"); 
+  }
+  arg5 = reinterpret_cast< csRenderBuffer * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csRenderBuffer,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iDecalAnimationControl_UpdateDecal" "', argument " "6"" of type '" "csRenderBuffer &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalAnimationControl_UpdateDecal" "', argument " "6"" of type '" "csRenderBuffer &""'"); 
+  }
+  arg6 = reinterpret_cast< csRenderBuffer * >(argp6);
+  (arg1)->UpdateDecal(arg2,arg3,*arg4,*arg5,*arg6);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_iDecalAnimationControl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalAnimationControl *arg1 = (iDecalAnimationControl *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iDecalAnimationControl",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalAnimationControl, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iDecalAnimationControl" "', argument " "1"" of type '" "iDecalAnimationControl *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalAnimationControl * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *iDecalAnimationControl_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_iDecalAnimationControl, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
 SWIGINTERN PyObject *_wrap_delete_iDecalBuilder(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iDecalBuilder *arg1 = (iDecalBuilder *) 0 ;
@@ -4450,7 +4608,49 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iDecalBuilder_AddStaticPoly(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iDecalBuilder_AddStaticPoly__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalBuilder *arg1 = (iDecalBuilder *) 0 ;
+  csPoly3D *arg2 = 0 ;
+  csArray< size_t > *arg3 = (csArray< size_t > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDecalBuilder_AddStaticPoly",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalBuilder, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDecalBuilder_AddStaticPoly" "', argument " "1"" of type '" "iDecalBuilder *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalBuilder * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csPoly3D,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDecalBuilder_AddStaticPoly" "', argument " "2"" of type '" "csPoly3D const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalBuilder_AddStaticPoly" "', argument " "2"" of type '" "csPoly3D const &""'"); 
+  }
+  arg2 = reinterpret_cast< csPoly3D * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iDecalBuilder_AddStaticPoly" "', argument " "3"" of type '" "csArray< size_t > *""'"); 
+  }
+  arg3 = reinterpret_cast< csArray< size_t > * >(argp3);
+  (arg1)->AddStaticPoly((csPoly3D const &)*arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDecalBuilder_AddStaticPoly__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iDecalBuilder *arg1 = (iDecalBuilder *) 0 ;
   csPoly3D *arg2 = 0 ;
@@ -4476,6 +4676,87 @@ SWIGINTERN PyObject *_wrap_iDecalBuilder_AddStaticPoly(PyObject *SWIGUNUSEDPARM(
   }
   arg2 = reinterpret_cast< csPoly3D * >(argp2);
   (arg1)->AddStaticPoly((csPoly3D const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDecalBuilder_AddStaticPoly(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[4];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalBuilder, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csPoly3D, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iDecalBuilder_AddStaticPoly__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalBuilder, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csPoly3D, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iDecalBuilder_AddStaticPoly__SWIG_0(self, args);
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iDecalBuilder_AddStaticPoly'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    AddStaticPoly(iDecalBuilder *,csPoly3D const &,csArray< size_t > *)\n"
+    "    AddStaticPoly(iDecalBuilder *,csPoly3D const &)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDecalBuilder_SetDecalAnimationControl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalBuilder *arg1 = (iDecalBuilder *) 0 ;
+  iDecalAnimationControl *arg2 = (iDecalAnimationControl *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDecalBuilder_SetDecalAnimationControl",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalBuilder, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDecalBuilder_SetDecalAnimationControl" "', argument " "1"" of type '" "iDecalBuilder *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalBuilder * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDecalAnimationControl, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDecalBuilder_SetDecalAnimationControl" "', argument " "2"" of type '" "iDecalAnimationControl *""'"); 
+  }
+  arg2 = reinterpret_cast< iDecalAnimationControl * >(argp2);
+  (arg1)->SetDecalAnimationControl(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4848,187 +5129,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iDecalManager_CreateDecal(PyObject *self, PyObject *args) {
-  int argc;
-  PyObject *argv[10];
-  int ii;
-  
-  if (!PyTuple_Check(args)) SWIG_fail;
-  argc = (int)PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 9); ii++) {
-    argv[ii] = PyTuple_GET_ITEM(args,ii);
-  }
-  if (argc == 6) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        void *vptr = 0;
-        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iSector, 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
-          _v = SWIG_CheckState(res);
-          if (_v) {
-            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
-              _v = SWIG_CheckState(res);
-              if (_v) {
-                return _wrap_iDecalManager_CreateDecal__SWIG_3(self, args);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  if (argc == 7) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        void *vptr = 0;
-        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iSector, 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
-          _v = SWIG_CheckState(res);
-          if (_v) {
-            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
-              _v = SWIG_CheckState(res);
-              if (_v) {
-                {
-                  int res = SWIG_AsVal_float(argv[6], NULL);
-                  _v = SWIG_CheckState(res);
-                }
-                if (_v) {
-                  return _wrap_iDecalManager_CreateDecal__SWIG_2(self, args);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  if (argc == 8) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        void *vptr = 0;
-        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iSector, 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
-          _v = SWIG_CheckState(res);
-          if (_v) {
-            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
-              _v = SWIG_CheckState(res);
-              if (_v) {
-                {
-                  int res = SWIG_AsVal_float(argv[6], NULL);
-                  _v = SWIG_CheckState(res);
-                }
-                if (_v) {
-                  {
-                    int res = SWIG_AsVal_float(argv[7], NULL);
-                    _v = SWIG_CheckState(res);
-                  }
-                  if (_v) {
-                    return _wrap_iDecalManager_CreateDecal__SWIG_1(self, args);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  if (argc == 9) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        void *vptr = 0;
-        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iSector, 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
-          _v = SWIG_CheckState(res);
-          if (_v) {
-            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
-              _v = SWIG_CheckState(res);
-              if (_v) {
-                {
-                  int res = SWIG_AsVal_float(argv[6], NULL);
-                  _v = SWIG_CheckState(res);
-                }
-                if (_v) {
-                  {
-                    int res = SWIG_AsVal_float(argv[7], NULL);
-                    _v = SWIG_CheckState(res);
-                  }
-                  if (_v) {
-                    void *vptr = 0;
-                    int res = SWIG_ConvertPtr(argv[8], &vptr, SWIGTYPE_p_iDecal, 0);
-                    _v = SWIG_CheckState(res);
-                    if (_v) {
-                      return _wrap_iDecalManager_CreateDecal__SWIG_0(self, args);
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  
-fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iDecalManager_CreateDecal'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    CreateDecal(iDecalManager *,iDecalTemplate *,iSector *,csVector3 const &,csVector3 const &,csVector3 const &,float,float,iDecal *)\n"
-    "    CreateDecal(iDecalManager *,iDecalTemplate *,iSector *,csVector3 const &,csVector3 const &,csVector3 const &,float,float)\n"
-    "    CreateDecal(iDecalManager *,iDecalTemplate *,iSector *,csVector3 const &,csVector3 const &,csVector3 const &,float)\n"
-    "    CreateDecal(iDecalManager *,iDecalTemplate *,iSector *,csVector3 const &,csVector3 const &,csVector3 const &)\n");
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iDecalManager_CreateDecalTemplate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iDecalManager *arg1 = (iDecalManager *) 0 ;
@@ -5149,6 +5249,708 @@ SWIGINTERN PyObject *_wrap_iDecalManager_GetDecal(PyObject *SWIGUNUSEDPARM(self)
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iDecal, 0 |  0 );
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDecalManager_CreateDecal__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalManager *arg1 = (iDecalManager *) 0 ;
+  iDecalTemplate *arg2 = (iDecalTemplate *) 0 ;
+  iMeshWrapper *arg3 = (iMeshWrapper *) 0 ;
+  csVector3 *arg4 = 0 ;
+  csVector3 *arg5 = 0 ;
+  csVector3 *arg6 = 0 ;
+  float arg7 ;
+  float arg8 ;
+  iDecal *arg9 = (iDecal *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  float val7 ;
+  int ecode7 = 0 ;
+  float val8 ;
+  int ecode8 = 0 ;
+  void *argp9 = 0 ;
+  int res9 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  iDecal *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDecalManager_CreateDecal",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDecalManager_CreateDecal" "', argument " "1"" of type '" "iDecalManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalManager * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDecalTemplate, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDecalManager_CreateDecal" "', argument " "2"" of type '" "iDecalTemplate *""'"); 
+  }
+  arg2 = reinterpret_cast< iDecalTemplate * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iDecalManager_CreateDecal" "', argument " "3"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg3 = reinterpret_cast< iMeshWrapper * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iDecalManager_CreateDecal" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iDecalManager_CreateDecal" "', argument " "5"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "5"" of type '" "csVector3 const &""'"); 
+  }
+  arg5 = reinterpret_cast< csVector3 * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iDecalManager_CreateDecal" "', argument " "6"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "6"" of type '" "csVector3 const &""'"); 
+  }
+  arg6 = reinterpret_cast< csVector3 * >(argp6);
+  ecode7 = SWIG_AsVal_float(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iDecalManager_CreateDecal" "', argument " "7"" of type '" "float""'");
+  } 
+  arg7 = static_cast< float >(val7);
+  ecode8 = SWIG_AsVal_float(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "iDecalManager_CreateDecal" "', argument " "8"" of type '" "float""'");
+  } 
+  arg8 = static_cast< float >(val8);
+  res9 = SWIG_ConvertPtr(obj8, &argp9,SWIGTYPE_p_iDecal, 0 |  0 );
+  if (!SWIG_IsOK(res9)) {
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iDecalManager_CreateDecal" "', argument " "9"" of type '" "iDecal *""'"); 
+  }
+  arg9 = reinterpret_cast< iDecal * >(argp9);
+  result = (iDecal *)(arg1)->CreateDecal(arg2,arg3,(csVector3 const &)*arg4,(csVector3 const &)*arg5,(csVector3 const &)*arg6,arg7,arg8,arg9);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iDecal, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDecalManager_CreateDecal__SWIG_5(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalManager *arg1 = (iDecalManager *) 0 ;
+  iDecalTemplate *arg2 = (iDecalTemplate *) 0 ;
+  iMeshWrapper *arg3 = (iMeshWrapper *) 0 ;
+  csVector3 *arg4 = 0 ;
+  csVector3 *arg5 = 0 ;
+  csVector3 *arg6 = 0 ;
+  float arg7 ;
+  float arg8 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  float val7 ;
+  int ecode7 = 0 ;
+  float val8 ;
+  int ecode8 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  iDecal *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDecalManager_CreateDecal",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDecalManager_CreateDecal" "', argument " "1"" of type '" "iDecalManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalManager * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDecalTemplate, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDecalManager_CreateDecal" "', argument " "2"" of type '" "iDecalTemplate *""'"); 
+  }
+  arg2 = reinterpret_cast< iDecalTemplate * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iDecalManager_CreateDecal" "', argument " "3"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg3 = reinterpret_cast< iMeshWrapper * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iDecalManager_CreateDecal" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iDecalManager_CreateDecal" "', argument " "5"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "5"" of type '" "csVector3 const &""'"); 
+  }
+  arg5 = reinterpret_cast< csVector3 * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iDecalManager_CreateDecal" "', argument " "6"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "6"" of type '" "csVector3 const &""'"); 
+  }
+  arg6 = reinterpret_cast< csVector3 * >(argp6);
+  ecode7 = SWIG_AsVal_float(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iDecalManager_CreateDecal" "', argument " "7"" of type '" "float""'");
+  } 
+  arg7 = static_cast< float >(val7);
+  ecode8 = SWIG_AsVal_float(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "iDecalManager_CreateDecal" "', argument " "8"" of type '" "float""'");
+  } 
+  arg8 = static_cast< float >(val8);
+  result = (iDecal *)(arg1)->CreateDecal(arg2,arg3,(csVector3 const &)*arg4,(csVector3 const &)*arg5,(csVector3 const &)*arg6,arg7,arg8);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iDecal, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDecalManager_CreateDecal__SWIG_6(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalManager *arg1 = (iDecalManager *) 0 ;
+  iDecalTemplate *arg2 = (iDecalTemplate *) 0 ;
+  iMeshWrapper *arg3 = (iMeshWrapper *) 0 ;
+  csVector3 *arg4 = 0 ;
+  csVector3 *arg5 = 0 ;
+  csVector3 *arg6 = 0 ;
+  float arg7 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  float val7 ;
+  int ecode7 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  iDecal *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDecalManager_CreateDecal",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDecalManager_CreateDecal" "', argument " "1"" of type '" "iDecalManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalManager * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDecalTemplate, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDecalManager_CreateDecal" "', argument " "2"" of type '" "iDecalTemplate *""'"); 
+  }
+  arg2 = reinterpret_cast< iDecalTemplate * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iDecalManager_CreateDecal" "', argument " "3"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg3 = reinterpret_cast< iMeshWrapper * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iDecalManager_CreateDecal" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iDecalManager_CreateDecal" "', argument " "5"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "5"" of type '" "csVector3 const &""'"); 
+  }
+  arg5 = reinterpret_cast< csVector3 * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iDecalManager_CreateDecal" "', argument " "6"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "6"" of type '" "csVector3 const &""'"); 
+  }
+  arg6 = reinterpret_cast< csVector3 * >(argp6);
+  ecode7 = SWIG_AsVal_float(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iDecalManager_CreateDecal" "', argument " "7"" of type '" "float""'");
+  } 
+  arg7 = static_cast< float >(val7);
+  result = (iDecal *)(arg1)->CreateDecal(arg2,arg3,(csVector3 const &)*arg4,(csVector3 const &)*arg5,(csVector3 const &)*arg6,arg7);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iDecal, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDecalManager_CreateDecal__SWIG_7(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalManager *arg1 = (iDecalManager *) 0 ;
+  iDecalTemplate *arg2 = (iDecalTemplate *) 0 ;
+  iMeshWrapper *arg3 = (iMeshWrapper *) 0 ;
+  csVector3 *arg4 = 0 ;
+  csVector3 *arg5 = 0 ;
+  csVector3 *arg6 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  iDecal *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDecalManager_CreateDecal",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDecalManager_CreateDecal" "', argument " "1"" of type '" "iDecalManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalManager * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDecalTemplate, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDecalManager_CreateDecal" "', argument " "2"" of type '" "iDecalTemplate *""'"); 
+  }
+  arg2 = reinterpret_cast< iDecalTemplate * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iDecalManager_CreateDecal" "', argument " "3"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg3 = reinterpret_cast< iMeshWrapper * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iDecalManager_CreateDecal" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iDecalManager_CreateDecal" "', argument " "5"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "5"" of type '" "csVector3 const &""'"); 
+  }
+  arg5 = reinterpret_cast< csVector3 * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iDecalManager_CreateDecal" "', argument " "6"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDecalManager_CreateDecal" "', argument " "6"" of type '" "csVector3 const &""'"); 
+  }
+  arg6 = reinterpret_cast< csVector3 * >(argp6);
+  result = (iDecal *)(arg1)->CreateDecal(arg2,arg3,(csVector3 const &)*arg4,(csVector3 const &)*arg5,(csVector3 const &)*arg6);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iDecal, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDecalManager_CreateDecal(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[10];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 9); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 6) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iSector, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                return _wrap_iDecalManager_CreateDecal__SWIG_3(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 6) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iMeshWrapper, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                return _wrap_iDecalManager_CreateDecal__SWIG_7(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 7) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iMeshWrapper, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  return _wrap_iDecalManager_CreateDecal__SWIG_6(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 7) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iSector, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  return _wrap_iDecalManager_CreateDecal__SWIG_2(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 8) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iSector, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_float(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    return _wrap_iDecalManager_CreateDecal__SWIG_1(self, args);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 8) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iMeshWrapper, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_float(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    return _wrap_iDecalManager_CreateDecal__SWIG_5(self, args);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 9) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iMeshWrapper, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_float(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    void *vptr = 0;
+                    int res = SWIG_ConvertPtr(argv[8], &vptr, SWIGTYPE_p_iDecal, 0);
+                    _v = SWIG_CheckState(res);
+                    if (_v) {
+                      return _wrap_iDecalManager_CreateDecal__SWIG_4(self, args);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 9) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDecalManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDecalTemplate, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iSector, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_csVector3, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_csVector3, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_float(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    void *vptr = 0;
+                    int res = SWIG_ConvertPtr(argv[8], &vptr, SWIGTYPE_p_iDecal, 0);
+                    _v = SWIG_CheckState(res);
+                    if (_v) {
+                      return _wrap_iDecalManager_CreateDecal__SWIG_0(self, args);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iDecalManager_CreateDecal'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    CreateDecal(iDecalManager *,iDecalTemplate *,iSector *,csVector3 const &,csVector3 const &,csVector3 const &,float,float,iDecal *)\n"
+    "    CreateDecal(iDecalManager *,iDecalTemplate *,iSector *,csVector3 const &,csVector3 const &,csVector3 const &,float,float)\n"
+    "    CreateDecal(iDecalManager *,iDecalTemplate *,iSector *,csVector3 const &,csVector3 const &,csVector3 const &,float)\n"
+    "    CreateDecal(iDecalManager *,iDecalTemplate *,iSector *,csVector3 const &,csVector3 const &,csVector3 const &)\n"
+    "    CreateDecal(iDecalManager *,iDecalTemplate *,iMeshWrapper *,csVector3 const &,csVector3 const &,csVector3 const &,float,float,iDecal *)\n"
+    "    CreateDecal(iDecalManager *,iDecalTemplate *,iMeshWrapper *,csVector3 const &,csVector3 const &,csVector3 const &,float,float)\n"
+    "    CreateDecal(iDecalManager *,iDecalTemplate *,iMeshWrapper *,csVector3 const &,csVector3 const &,csVector3 const &,float)\n"
+    "    CreateDecal(iDecalManager *,iDecalTemplate *,iMeshWrapper *,csVector3 const &,csVector3 const &,csVector3 const &)\n");
   return NULL;
 }
 
@@ -39797,17 +40599,23 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iDecalTemplate_SetMainColor", _wrap_iDecalTemplate_SetMainColor, METH_VARARGS, NULL},
 	 { (char *)"iDecalTemplate_SetTopColor", _wrap_iDecalTemplate_SetTopColor, METH_VARARGS, NULL},
 	 { (char *)"iDecalTemplate_SetBottomColor", _wrap_iDecalTemplate_SetBottomColor, METH_VARARGS, NULL},
+	 { (char *)"iDecalTemplate_SetClipping", _wrap_iDecalTemplate_SetClipping, METH_VARARGS, NULL},
+	 { (char *)"iDecalTemplate_HasClipping", _wrap_iDecalTemplate_HasClipping, METH_VARARGS, NULL},
 	 { (char *)"iDecalTemplate_scfGetVersion", _wrap_iDecalTemplate_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iDecalTemplate", _wrap_delete_iDecalTemplate, METH_VARARGS, NULL},
 	 { (char *)"iDecalTemplate_swigregister", iDecalTemplate_swigregister, METH_VARARGS, NULL},
+	 { (char *)"iDecalAnimationControl_UpdateDecal", _wrap_iDecalAnimationControl_UpdateDecal, METH_VARARGS, NULL},
+	 { (char *)"delete_iDecalAnimationControl", _wrap_delete_iDecalAnimationControl, METH_VARARGS, NULL},
+	 { (char *)"iDecalAnimationControl_swigregister", iDecalAnimationControl_swigregister, METH_VARARGS, NULL},
 	 { (char *)"delete_iDecalBuilder", _wrap_delete_iDecalBuilder, METH_VARARGS, NULL},
 	 { (char *)"iDecalBuilder_AddStaticPoly", _wrap_iDecalBuilder_AddStaticPoly, METH_VARARGS, NULL},
+	 { (char *)"iDecalBuilder_SetDecalAnimationControl", _wrap_iDecalBuilder_SetDecalAnimationControl, METH_VARARGS, NULL},
 	 { (char *)"iDecalBuilder_swigregister", iDecalBuilder_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iDecalManager_CreateDecal", _wrap_iDecalManager_CreateDecal, METH_VARARGS, NULL},
 	 { (char *)"iDecalManager_CreateDecalTemplate", _wrap_iDecalManager_CreateDecalTemplate, METH_VARARGS, NULL},
 	 { (char *)"iDecalManager_DeleteDecal", _wrap_iDecalManager_DeleteDecal, METH_VARARGS, NULL},
 	 { (char *)"iDecalManager_GetDecalCount", _wrap_iDecalManager_GetDecalCount, METH_VARARGS, NULL},
 	 { (char *)"iDecalManager_GetDecal", _wrap_iDecalManager_GetDecal, METH_VARARGS, NULL},
+	 { (char *)"iDecalManager_CreateDecal", _wrap_iDecalManager_CreateDecal, METH_VARARGS, NULL},
 	 { (char *)"iDecalManager_scfGetVersion", _wrap_iDecalManager_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iDecalManager", _wrap_delete_iDecalManager, METH_VARARGS, NULL},
 	 { (char *)"iDecalManager_swigregister", iDecalManager_swigregister, METH_VARARGS, NULL},
@@ -41020,6 +41828,7 @@ static swig_type_info _swigt__p_csArrayCapacityFixedGrowT_16_t = {"_p_csArrayCap
 static swig_type_info _swigt__p_csArrayCapacityVariableGrow = {"_p_csArrayCapacityVariableGrow", "csArrayCapacityDefault *|csArrayCapacityVariableGrow *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayT_csIntersectingTriangle_csArrayElementHandlerT_csIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csIntersectingTriangle_csArrayElementHandlerT_csIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csArray< csIntersectingTriangle,csArrayElementHandler< csIntersectingTriangle >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > *|csArray< csIntersectingTriangle > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csArray< iMaterialWrapper *,csArrayElementHandler< iMaterialWrapper * >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > *|csArray< iMaterialWrapper * > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csArray< size_t > *|csArray< size_t,csArrayElementHandler< size_t >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csBox2 = {"_p_csBox2", "csBox2 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csBox3 = {"_p_csBox3", "csBox3 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csCollisionPair = {"_p_csCollisionPair", "csCollisionPair *", 0, 0, (void*)0, 0};
@@ -41046,6 +41855,7 @@ static swig_type_info _swigt__p_csRefT_iRigidBody_t = {"_p_csRefT_iRigidBody_t",
 static swig_type_info _swigt__p_csRefT_iScriptObject_t = {"_p_csRefT_iScriptObject_t", "csRef< iScriptObject > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefT_iSequenceOperation_t = {"_p_csRefT_iSequenceOperation_t", "csRef< iSequenceOperation > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefT_iString_t = {"_p_csRefT_iString_t", "csRef< iString > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csRenderBuffer = {"_p_csRenderBuffer", "csRenderBuffer *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csReversibleTransform = {"_p_csReversibleTransform", "csReversibleTransform *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csSequenceOp = {"_p_csSequenceOp", "csSequenceOp *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csSphere = {"_p_csSphere", "csSphere *", 0, 0, (void*)0, 0};
@@ -41121,6 +41931,7 @@ static swig_type_info _swigt__p_iConsoleOutput = {"_p_iConsoleOutput", "iConsole
 static swig_type_info _swigt__p_iConsoleWatcher = {"_p_iConsoleWatcher", "iConsoleWatcher *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iCustomMatrixCamera = {"_p_iCustomMatrixCamera", "iCustomMatrixCamera *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iDecal = {"_p_iDecal", "iDecal *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_iDecalAnimationControl = {"_p_iDecalAnimationControl", "iDecalAnimationControl *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iDecalBuilder = {"_p_iDecalBuilder", "iDecalBuilder *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iDecalManager = {"_p_iDecalManager", "iDecalManager *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iDecalTemplate = {"_p_iDecalTemplate", "iDecalTemplate *", 0, 0, (void*)0, 0};
@@ -41226,6 +42037,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csArrayCapacityVariableGrow,
   &_swigt__p_csArrayT_csIntersectingTriangle_csArrayElementHandlerT_csIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   &_swigt__p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  &_swigt__p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   &_swigt__p_csBox2,
   &_swigt__p_csBox3,
   &_swigt__p_csCollisionPair,
@@ -41254,6 +42066,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csRefT_iScriptObject_t,
   &_swigt__p_csRefT_iSequenceOperation_t,
   &_swigt__p_csRefT_iString_t,
+  &_swigt__p_csRenderBuffer,
   &_swigt__p_csReversibleTransform,
   &_swigt__p_csSequenceOp,
   &_swigt__p_csSphere,
@@ -41287,6 +42100,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_iDataBuffer,
   &_swigt__p_iDebugHelper,
   &_swigt__p_iDecal,
+  &_swigt__p_iDecalAnimationControl,
   &_swigt__p_iDecalBuilder,
   &_swigt__p_iDecalManager,
   &_swigt__p_iDecalTemplate,
@@ -41432,6 +42246,7 @@ static swig_cast_info _swigc__p_csArrayCapacityFixedGrowT_16_t[] = {  {&_swigt__
 static swig_cast_info _swigc__p_csArrayCapacityVariableGrow[] = {  {&_swigt__p_csArrayCapacityVariableGrow, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayT_csIntersectingTriangle_csArrayElementHandlerT_csIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csArrayT_csIntersectingTriangle_csArrayElementHandlerT_csIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBox2[] = {  {&_swigt__p_csBox2, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBox3[] = {  {&_swigt__p_csBox3, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csCollisionPair[] = {  {&_swigt__p_csCollisionPair, 0, 0, 0},{0, 0, 0, 0}};
@@ -41458,6 +42273,7 @@ static swig_cast_info _swigc__p_csRefT_iRigidBody_t[] = {  {&_swigt__p_csRefT_iR
 static swig_cast_info _swigc__p_csRefT_iScriptObject_t[] = {  {&_swigt__p_csRefT_iScriptObject_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefT_iSequenceOperation_t[] = {  {&_swigt__p_csRefT_iSequenceOperation_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefT_iString_t[] = {  {&_swigt__p_csRefT_iString_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csRenderBuffer[] = {  {&_swigt__p_csRenderBuffer, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csReversibleTransform[] = {  {&_swigt__p_csReversibleTransform, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csSequenceOp[] = {  {&_swigt__p_csSequenceOp, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csSphere[] = {  {&_swigt__p_csSphere, 0, 0, 0},{0, 0, 0, 0}};
@@ -41533,6 +42349,7 @@ static swig_cast_info _swigc__p_iConsoleOutput[] = {  {&_swigt__p_iConsoleOutput
 static swig_cast_info _swigc__p_iConsoleWatcher[] = {  {&_swigt__p_iConsoleWatcher, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iCustomMatrixCamera[] = {  {&_swigt__p_iCustomMatrixCamera, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDecal[] = {  {&_swigt__p_iDecal, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iDecalAnimationControl[] = {  {&_swigt__p_iDecalAnimationControl, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDecalBuilder[] = {  {&_swigt__p_iDecalBuilder, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDecalManager[] = {  {&_swigt__p_iDecalManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDecalTemplate[] = {  {&_swigt__p_iDecalTemplate, 0, 0, 0},{0, 0, 0, 0}};
@@ -41638,6 +42455,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csArrayCapacityVariableGrow,
   _swigc__p_csArrayT_csIntersectingTriangle_csArrayElementHandlerT_csIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   _swigc__p_csArrayT_iMaterialWrapper_p_csArrayElementHandlerT_iMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  _swigc__p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   _swigc__p_csBox2,
   _swigc__p_csBox3,
   _swigc__p_csCollisionPair,
@@ -41666,6 +42484,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csRefT_iScriptObject_t,
   _swigc__p_csRefT_iSequenceOperation_t,
   _swigc__p_csRefT_iString_t,
+  _swigc__p_csRenderBuffer,
   _swigc__p_csReversibleTransform,
   _swigc__p_csSequenceOp,
   _swigc__p_csSphere,
@@ -41699,6 +42518,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_iDataBuffer,
   _swigc__p_iDebugHelper,
   _swigc__p_iDecal,
+  _swigc__p_iDecalAnimationControl,
   _swigc__p_iDecalBuilder,
   _swigc__p_iDecalManager,
   _swigc__p_iDecalTemplate,
