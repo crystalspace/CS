@@ -197,6 +197,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::GenerateGeometry (iView* view, iSector *room)
   {
+    if (!GetDensityMap())
+    {
+      csPrintfErr( "Please specify density map texture!\n" );    
+      return;
+    }
+
     densitymap.handle = GetDensityMap()->GetTextureHandle();
 
     if (!densitymap.handle)
@@ -208,6 +214,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Density map
     if ( !densitymap.Read() )
       csPrintfErr( "Error reading densitymap texture!\n" );    
+
+    if (!GetHeightMap())
+    {
+      csPrintfErr( "Please specify height map texture!\n" );    
+      return;
+    }
 
     heightmap.handle = GetHeightMap()->GetTextureHandle();
 
@@ -397,6 +409,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       size_t controlPointsCount = (int)( (height * GetHeightFactor()) 
         / GetControlPointsDistance());
       
+      if (controlPointsCount == 0 && height > EPSILON)
+        controlPointsCount ++;
+
       if (controlPointsCount == 1)
         controlPointsCount++;
 
@@ -694,9 +709,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       guideFursLOD.GetSize() + guideFurs.GetSize());
 
     densitymap.SaveImage(object_reg, 
-      "/data/krystal/krystal_skull_densitymap_debug.png");
+      "/data/hairtest/densitymap_debug.png");
     heightmap.SaveImage(object_reg, 
-      "/data/krystal/krystal_skull_heightmap_debug.png");
+      "/data/hairtest/heightmap_debug.png");
   }
 
   void FurMesh::SetAnimationControl (CS::Mesh::iFurAnimationControl* physicsControl)
