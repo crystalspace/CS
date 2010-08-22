@@ -1221,7 +1221,7 @@ struct iGraphics3D : public virtual iBase
   /**
    * Check via occlusion query whether a mesh is visible.
    */
-  virtual bool OQIsVisible (unsigned int occlusion_query, unsigned int sampleLimit) = 0;
+  virtual bool OQIsVisible (unsigned int occlusion_query, unsigned int sampleLimit = 0) = 0;
 
   virtual void OQBeginQuery (unsigned int occlusion_query) = 0;
   virtual void OQEndQuery () = 0;

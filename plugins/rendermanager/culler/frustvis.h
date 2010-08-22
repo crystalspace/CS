@@ -24,6 +24,7 @@
 #include "iutil/dbghelp.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/render.h"
+#include "csplugincommon/rendermanager/occluvis.h"
 #include "csutil/array.h"
 #include "csutil/list.h"
 #include "csutil/parray.h"
@@ -43,12 +44,12 @@
 //typedef CS::RenderManager::RenderTree<
 //CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
 
-enum NodeVisibility
-{
-  NODE_INVISIBLE,
-  NODE_VISIBLE,
-  NODE_INSIDE
-};
+// enum NodeVisibility
+// {
+//   NODE_INVISIBLE,
+//   NODE_VISIBLE,
+//   NODE_INSIDE
+// };
 
 class csKDTree;
 class csKDTreeChild;
@@ -281,6 +282,8 @@ private:
   void TraverseNodeF2B(NodeTraverseData &ntdNode,csArray<MeshList*>& meshList,
     bool parentVisible, bool bDoFrustumCulling);
 
+  CS::RenderManager::csOccluvis* occluvis;
+
 public:
   csFrustumVis ();
   virtual ~csFrustumVis ();
@@ -312,7 +315,7 @@ public:
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview, 
     iVisibilityCullerListener* viscallback, int w = 0, int h = 0);
-  virtual void PrecacheCulling () { bAllVisible = true; }
+  virtual void PrecacheCulling () { bAllVisible = true; occluvis->PreparePrecacheCulling (); }
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
   virtual void VisTest (const csSphere& sphere, 

@@ -252,7 +252,7 @@ struct iVisibilityCuller : public virtual iBase
  */
 struct iVisibilityObject : public virtual iBase
 {
-  SCF_INTERFACE(iVisibilityObject, 2, 0, 0);
+  SCF_INTERFACE(iVisibilityObject, 3, 0, 0);
 
   /// Get the reference to the movable from this object.
   virtual iMovable* GetMovable () const = 0;
@@ -271,6 +271,11 @@ struct iVisibilityObject : public virtual iBase
    * - #CS_CULLER_HINT_BADOCCLUDER
    */
   virtual csFlags& GetCullerFlags () = 0;
+
+  /**
+   * Get the world space bbox for this object.
+   */
+  virtual const csBox3& GetBBox () const = 0;
 };
 
 /** @} */

@@ -100,24 +100,24 @@ namespace Geometry //@@Right?
     /**
      * 
      */
-    void AddObjects (csDirtyAccessArray<ObjectType*> objects)
-    {
-      // Collect any existing objects into the objects array     
-      {
-        ObjectCollectFn collect (objects);
-        TraverseLeafs (collect);
-      }
-
-      // Build a new tree
-      DeleteNodeRecursive (rootNode);
-
-      // New root
-      rootNode = AllocNode ();
-      rootNode->SetLeaf (true);
-
-      // Build
-      BuildTree (rootNode, objects, 0, objects.GetSize ());
-    }
+//     void AddObjects (csDirtyAccessArray<ObjectType*> objects)
+//     {
+//       // Collect any existing objects into the objects array     
+//       {
+//         ObjectCollectFn collect (objects);
+//         TraverseLeafs (collect);
+//       }
+// 
+//       // Build a new tree
+//       DeleteNodeRecursive (rootNode);
+// 
+//       // New root
+//       rootNode = AllocNode ();
+//       rootNode->SetLeaf (true);
+// 
+//       // Build
+//       BuildTree (rootNode, objects, 0, objects.GetSize ());
+//     }
 
     /**
      * 
@@ -212,7 +212,7 @@ namespace Geometry //@@Right?
       }
     };
 
-  private:
+  protected:
     
     /**
      * 
@@ -297,7 +297,7 @@ namespace Geometry //@@Right?
           // Assign first
           {
             size_t i = 0;
-            for (i = 0; i < oldNodeCount/2; ++i)
+            for (i = 0; i < (oldNodeCount+1)/2; ++i)
             {
               AddObjectRecursive (node1, oldNodeI[i]);
             }
@@ -592,6 +592,8 @@ namespace Geometry //@@Right?
 
         return result;
       }
+
+      return 0;
     }
 
     /**

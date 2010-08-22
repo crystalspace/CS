@@ -77,6 +77,7 @@ csFrustumVis::csFrustumVis () : scfImplementationType (this),
   current_vistest_nr = 1;
   vistest_objects_inuse = false;
   updating = false;
+  occluvis = 0;
 }
 
 csFrustumVis::~csFrustumVis ()
@@ -92,6 +93,8 @@ csFrustumVis::~csFrustumVis ()
     kdtree->RemoveObject (visobj_wrap->child);
   }
   delete kdtree;
+
+  delete occluvis;
 }
 
 bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
@@ -109,6 +112,8 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   kdtree->SetObjectDescriptor (desc);
 
   bAllVisible = false;
+
+  occluvis = new CS::RenderManager::csOccluvis (object_reg);
 
   return true;
 }
@@ -165,6 +170,8 @@ void csFrustumVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
 
 void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 {
+  occluvis->RegisterVisObject (visobj);
+
 #ifdef CS_DEBUG
   size_t i;
   for (i = 0 ; i < visobj_vector.GetSize () ; i++)
@@ -202,6 +209,8 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 
 void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
 {
+  occluvis->UnregisterVisObject (visobj);
+
   size_t i;
   for (i = 0 ; i < visobj_vector.GetSize () ; i++)
   {
@@ -341,6 +350,9 @@ void csFrustumVis::MarkAllVisible (csKDTree* treenode)
 /*------------------------------------------------------------------*/
 bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscallback, int, int)
 {
+  occluvis->VisTest (rview, viscallback);
+  return true;
+
   // just make sure we have a callback
   if (viscallback == 0)
     return false;
@@ -394,10 +406,10 @@ bool csFrustumVis::VisTest (iRenderView* rview, iVisibilityCullerListener* visca
   g3d->SetClipper (0, CS_CLIPPER_NONE);
   g3d->FinishDraw();
 
-  printf("Num Queries: %u\n", numQueries);
-  printf("Num Norm Queries: %u\n", numNormQueries);
-  printf("Num PullUp Queries: %u\n", numPullUpQueries);
-  printf ("Visible: %u\n", visible);
+//   printf("Num Queries: %u\n", numQueries);
+//   printf("Num Norm Queries: %u\n", numNormQueries);
+//   printf("Num PullUp Queries: %u\n", numPullUpQueries);
+//   printf ("Visible: %u\n", visible);
 
   return true;
 }

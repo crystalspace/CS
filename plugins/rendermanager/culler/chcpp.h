@@ -21,13 +21,13 @@ CS::RenderManager::RenderTreeStandardTraits> RenderTreeType;
 // Frame skip parameter
 #define VISIBILITY_SKIP_FRAMES 10
 
-enum OcclusionVisibility
-{
-  VISIBLE,
-  UNKNOWN,
-  INVISIBLE,
-  INVALID
-};
+// enum OcclusionVisibility
+// {
+//   VISIBLE,
+//   UNKNOWN,
+//   INVISIBLE,
+//   INVALID
+// };
 
 /**
  * Class to hold the visibility information of a kdtree node.
