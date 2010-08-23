@@ -170,6 +170,9 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_ICONS],
     # Tools needed to generate OS/X icons.
     CS_CHECK_PROGS([MAKEICNS], [makeicns])
     CS_EMIT_BUILD_PROPERTY([CMD.MAKEICNS], [$MAKEICNS], [], [], [$1])
+    # png2icns is available for POSIX platforms and not just OS/X.
+    CS_CHECK_PROGS([PNG2ICNS], [png2icns])
+    CS_EMIT_BUILD_PROPERTY([CMD.PNG2ICNS], [$PNG2ICNS], [], [], [$1])
     ])
 
 #------------------------------------------------------------------------------
