@@ -78,7 +78,8 @@ bool csImposterManager::HandleEvent(iEvent &ev)
 
     if(!initQueue[i]->remove)
     {
-      if(initQueue[i]->init = InitialiseImposter(initQueue[i]))
+      initQueue[i]->init = InitialiseImposter(initQueue[i]);
+      if(initQueue[i]->init)
       {
         initQueue.DeleteIndex(i--);
       }      
