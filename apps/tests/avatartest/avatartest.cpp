@@ -270,7 +270,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     }
 
     // Load the dynamics debugger
-    debuggerManager = csLoadPlugin<iDynamicsDebuggerManager>
+    debuggerManager = csLoadPlugin<CS::Debug::iDynamicsDebuggerManager>
       (plugmgr, "crystalspace.dynamics.debug");
 
     if (!debuggerManager)

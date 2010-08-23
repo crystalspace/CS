@@ -124,7 +124,7 @@ struct iDynamicsSystemCollider;
  * Main ways to get pointers to this interface:
  * - iDynamics::FindSystem()
  *
- * \sa CS::Physics::Bullet::iDynamicSystem iODEDynamicSystemState
+ * \sa CS::Physics::Bullet::iDynamicSystem iODEDynamicSystemState CS::Debug::iDynamicSystemDebugger
  */
 struct iDynamicSystem : public virtual iBase
 {

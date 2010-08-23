@@ -88,8 +88,8 @@ private:
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
   csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
-  csRef<iDynamicsDebuggerManager> debuggerManager;
-  csRef<iDynamicSystemDebugger> dynamicsDebugger;
+  csRef<CS::Debug::iDynamicsDebuggerManager> debuggerManager;
+  csRef<CS::Debug::iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
 
   // Soft bodies related

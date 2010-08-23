@@ -35,8 +35,8 @@ private:
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynamicSystem;
   csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
-  csRef<iDynamicsDebuggerManager> debuggerManager;
-  csRef<iDynamicSystemDebugger> dynamicsDebugger;
+  csRef<CS::Debug::iDynamicsDebuggerManager> debuggerManager;
+  csRef<CS::Debug::iDynamicSystemDebugger> dynamicsDebugger;
   csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   bool isSoftBodyWorld;
 

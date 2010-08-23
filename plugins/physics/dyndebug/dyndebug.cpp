@@ -49,9 +49,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
   {
   }
 
-  iDynamicSystemDebugger* DebuggerManager::CreateDebugger ()
+  CS::Debug::iDynamicSystemDebugger* DebuggerManager::CreateDebugger ()
   {
-    csRef<iDynamicSystemDebugger> ref;
+    csRef<CS::Debug::iDynamicSystemDebugger> ref;
     ref.AttachNew (new DynamicsDebugger (this));
     debuggers.Push (ref);
     return ref;

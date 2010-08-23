@@ -773,7 +773,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
   // Request plugins
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug",
-		       iDynamicsDebuggerManager),
+		       CS::Debug::iDynamicsDebuggerManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll",
 		       CS::Animation::iSkeletonRagdollManager2),
     CS_REQUEST_END))
@@ -894,7 +894,7 @@ bool Simple::Application ()
 
   // Find references to main objects
   debuggerManager =
-    csQueryRegistry<iDynamicsDebuggerManager> (GetObjectRegistry ());
+    csQueryRegistry<CS::Debug::iDynamicsDebuggerManager> (GetObjectRegistry ());
   if (!debuggerManager)
     return ReportError ("Failed to locate dynamic's debug manager!");
 
