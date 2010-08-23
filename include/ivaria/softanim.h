@@ -44,6 +44,9 @@ struct iAnimatedMesh;
 } // namespace Mesh
 } // namespace CS
 
+namespace CS {
+namespace Animation {
+
 /**
  * Animation control type for a genmesh animated by a CS::Physics::Bullet::iSoftBody.
  *
@@ -56,14 +59,14 @@ struct iAnimatedMesh;
  */
 struct iSoftBodyAnimationControlType : public iGenMeshAnimationControlType
 {
-  SCF_INTERFACE (iSoftBodyAnimationControlType, 1, 0, 0);
+  SCF_INTERFACE (CS::Animation::iSoftBodyAnimationControlType, 1, 0, 0);
 };
 
 /**
  * Animation control factory for a genmesh animated by a CS::Physics::Bullet::iSoftBody.
  *
  * Main creators of instances implementing this interface:
- * - iSoftBodyAnimationControlType::CreateAnimationControlFactory()
+ * - CS::Animation::iSoftBodyAnimationControlType::CreateAnimationControlFactory()
  *
  * Main ways to get pointers to this interface:
  * - iGeneralFactoryState::GetAnimationControlFactory()
@@ -73,7 +76,7 @@ struct iSoftBodyAnimationControlType : public iGenMeshAnimationControlType
  */
 struct iSoftBodyAnimationControlFactory : public iGenMeshAnimationControlFactory
 {
-  SCF_INTERFACE (iSoftBodyAnimationControlFactory, 1, 0, 0);
+  SCF_INTERFACE (CS::Animation::iSoftBodyAnimationControlFactory, 1, 0, 0);
 };
 
 /**
@@ -86,7 +89,7 @@ struct iSoftBodyAnimationControlFactory : public iGenMeshAnimationControlFactory
  * of the animesh, even when it is deformed by the skinning and morphing processes.
  *
  * Main creators of instances implementing this interface:
- * - iSoftBodyAnimationControlFactory::CreateAnimationControl()
+ * - CS::Animation::iSoftBodyAnimationControlFactory::CreateAnimationControl()
  *
  * Main ways to get pointers to this interface:
  * - iGeneralMeshState::GetAnimationControl()
@@ -96,7 +99,7 @@ struct iSoftBodyAnimationControlFactory : public iGenMeshAnimationControlFactory
  */
 struct iSoftBodyAnimationControl : public iGenMeshAnimationControl
 {
-  SCF_INTERFACE (iSoftBodyAnimationControl, 2, 0, 0);
+  SCF_INTERFACE (CS::Animation::iSoftBodyAnimationControl, 2, 0, 0);
 
   /**
    * Set the soft body to be used to animate the genmesh. You can switch this soft body
@@ -154,5 +157,8 @@ struct iSoftBodyAnimationControl : public iGenMeshAnimationControl
    */
   virtual void RemoveAnimatedMeshAnchor (size_t bodyVertexIndex) = 0;
 };
+
+} // namespace Animation
+} // namespace CS
 
 #endif // __CS_IVARIA_SOFTBODYANIM_H__

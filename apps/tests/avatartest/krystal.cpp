@@ -554,8 +554,8 @@ void KrystalScene::ResetSoftBodies ()
   // Init the animation control for the animation of the genmesh
   csRef<iGeneralMeshState> hairsMeshState =
     scfQueryInterface<iGeneralMeshState> (hairsMesh->GetMeshObject ());
-  csRef<iSoftBodyAnimationControl> animationControl =
-    scfQueryInterface<iSoftBodyAnimationControl> (hairsMeshState->GetAnimationControl ());
+  csRef<CS::Animation::iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<CS::Animation::iSoftBodyAnimationControl> (hairsMeshState->GetAnimationControl ());
   animationControl->SetSoftBody (hairsBody);
 
   // Find the position of the 'ToSpine' bone of Krystal
@@ -578,7 +578,7 @@ void KrystalScene::ResetSoftBodies ()
   csRef<iGeneralMeshState> skirtMeshState =
     scfQueryInterface<iGeneralMeshState> (skirtMesh->GetMeshObject ());
   animationControl =
-    scfQueryInterface<iSoftBodyAnimationControl> (skirtMeshState->GetAnimationControl ());
+    scfQueryInterface<CS::Animation::iSoftBodyAnimationControl> (skirtMeshState->GetAnimationControl ());
   animationControl->SetSoftBody (skirtBody);
 
   // Find the rigid body of the head of Krystal

@@ -808,14 +808,14 @@ bool Simple::OnInitialize (int argc, char* argv[])
     // Load the soft body animation control plugin & factory
     if (isSoftBodyWorld)
     {
-      csRef<iSoftBodyAnimationControlType> softBodyAnimationType =
-	csLoadPlugin<iSoftBodyAnimationControlType>
+      csRef<CS::Animation::iSoftBodyAnimationControlType> softBodyAnimationType =
+	csLoadPlugin<CS::Animation::iSoftBodyAnimationControlType>
 	(plugmgr, "crystalspace.dynamics.softanim");
 
       csRef<iGenMeshAnimationControlFactory> animationFactory =
 	softBodyAnimationType->CreateAnimationControlFactory ();
       softBodyAnimationFactory =
-	scfQueryInterface<iSoftBodyAnimationControlFactory> (animationFactory);
+	scfQueryInterface<CS::Animation::iSoftBodyAnimationControlFactory> (animationFactory);
     }
 
     // Check which environment has to be loaded
@@ -1807,8 +1807,8 @@ void Simple::SpawnCloth ()
   // Init the animation control for the animation of the genmesh
   csRef<iGeneralMeshState> meshState =
     scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
-  csRef<iSoftBodyAnimationControl> animationControl =
-    scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  csRef<CS::Animation::iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<CS::Animation::iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
   animationControl->SetSoftBody (body, true);
 }
 
@@ -1853,8 +1853,8 @@ void Simple::SpawnSoftBody ()
   // Init the animation control for the animation of the genmesh
   csRef<iGeneralMeshState> meshState =
     scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
-  csRef<iSoftBodyAnimationControl> animationControl =
-    scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  csRef<CS::Animation::iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<CS::Animation::iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
   animationControl->SetSoftBody (body);
 
   // Fling the body.

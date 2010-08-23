@@ -389,7 +389,7 @@ struct iAnchorAnimationControl : public virtual iBase
  * position of every vertex of the body can be queried through GetVertexPosition().
  *
  * A soft body can neither be static or kinematic, it is always dynamic.
- * \sa iRigidBody CS::Physics::Bullet::iRigidBody iSoftBodyAnimationControl
+ * \sa iRigidBody CS::Physics::Bullet::iRigidBody CS::Animation::iSoftBodyAnimationControl
  * CS::Physics::Bullet::SoftBodyHelper
  */
 struct iSoftBody : public iBody
@@ -449,7 +449,7 @@ struct iSoftBody : public iBody
    *
    * \warning The stability of the simulation can be lost if you move the position too far
    * from the previous position.
-   * \sa iSoftBodyAnimationControl::CreateAnimatedMeshAnchor()
+   * \sa CS::Animation::iSoftBodyAnimationControl::CreateAnimatedMeshAnchor()
    */
   virtual void UpdateAnchor (size_t vertexIndex, csVector3& position) = 0;
 
@@ -522,7 +522,7 @@ struct SoftBodyHelper
    * sides of the cloth (ie the vertices of the soft body will be duplicated for the
    * genmesh).
    * \warning Don't forget to use doubleSided = true in
-   * iSoftBodyAnimationControl::SetSoftBody()
+   * CS::Animation::iSoftBodyAnimationControl::SetSoftBody()
    */
   static csPtr<iMeshFactoryWrapper> CreateClothGenMeshFactory
   (iObjectRegistry* object_reg, const char* factoryName, iSoftBody* cloth)

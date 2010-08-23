@@ -33,7 +33,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 {
 
 class SoftBodyControlType : public scfImplementation2<SoftBodyControlType,
-    iSoftBodyAnimationControlType, iComponent>
+    CS::Animation::iSoftBodyAnimationControlType, iComponent>
 {
   public:
     CS_LEAKGUARD_DECLARE(SoftBodyControlType);
@@ -58,10 +58,10 @@ class SoftBodyControlType : public scfImplementation2<SoftBodyControlType,
 
 class SoftBodyControlFactory : public scfImplementation2<SoftBodyControlFactory, 
     scfFakeInterface<iGenMeshAnimationControlFactory>,
-    iSoftBodyAnimationControlFactory>
+    CS::Animation::iSoftBodyAnimationControlFactory>
 {
   public:
-    CS_LEAKGUARD_DECLARE(iSoftBodyAnimationControlFactory);
+    CS_LEAKGUARD_DECLARE(CS::Animation::iSoftBodyAnimationControlFactory);
 
     SoftBodyControlFactory (SoftBodyControlType* type);
 
@@ -77,14 +77,14 @@ class SoftBodyControlFactory : public scfImplementation2<SoftBodyControlFactory,
 };
 
 class SoftBodyControl : public scfImplementation2<SoftBodyControl, 
-    scfFakeInterface<iGenMeshAnimationControl>, iSoftBodyAnimationControl>
+    scfFakeInterface<iGenMeshAnimationControl>, CS::Animation::iSoftBodyAnimationControl>
 {
   public:
-    CS_LEAKGUARD_DECLARE(iSoftBodyAnimationControl);
+    CS_LEAKGUARD_DECLARE(CS::Animation::iSoftBodyAnimationControl);
 
     SoftBodyControl (SoftBodyControlFactory* factory, iMeshObject* mesh);
 
-    //-- iSoftBodyAnimationControl
+    //-- CS::Animation::iSoftBodyAnimationControl
     virtual void SetSoftBody (CS::Physics::Bullet::iSoftBody* body, bool doubleSided = false);
     virtual CS::Physics::Bullet::iSoftBody* GetSoftBody ();
 

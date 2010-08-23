@@ -37,7 +37,7 @@ private:
   csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
   csRef<CS::Debug::iDynamicsDebuggerManager> debuggerManager;
   csRef<CS::Debug::iDynamicSystemDebugger> dynamicsDebugger;
-  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
+  csRef<CS::Animation::iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   bool isSoftBodyWorld;
 
   // Meshes

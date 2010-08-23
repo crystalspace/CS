@@ -93,8 +93,8 @@ private:
   int dynamicsDebugMode;
 
   // Soft bodies related
-  csRef<iSoftBodyAnimationControlType> softBodyAnimationType;
-  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
+  csRef<CS::Animation::iSoftBodyAnimationControlType> softBodyAnimationType;
+  csRef<CS::Animation::iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   bool softBodiesEnabled;
 
   // Animation node plugin managers

@@ -301,7 +301,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     {
       csRef<iPluginManager> plugmgr = 
 	csQueryRegistry<iPluginManager> (GetObjectRegistry ());
-      softBodyAnimationType = csLoadPlugin<iSoftBodyAnimationControlType>
+      softBodyAnimationType = csLoadPlugin<CS::Animation::iSoftBodyAnimationControlType>
 	(plugmgr, "crystalspace.dynamics.softanim");
 
       if (!softBodyAnimationType)
@@ -411,7 +411,7 @@ bool AvatarTest::Application ()
 	csRef<iGenMeshAnimationControlFactory> animationFactory =
 	  softBodyAnimationType->CreateAnimationControlFactory ();
 	softBodyAnimationFactory =
-	  scfQueryInterface<iSoftBodyAnimationControlFactory> (animationFactory);
+	  scfQueryInterface<CS::Animation::iSoftBodyAnimationControlFactory> (animationFactory);
 
 	// Set up the physical collider for the roof (soft bodies don't like plane
 	// colliders, so use a box instead)
