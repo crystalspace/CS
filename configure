@@ -615,6 +615,7 @@ ac_ct_SUBVERSION
 SUBVERSION
 BASH
 RELAYTOOL
+PNG2ICNS
 MAKEICNS
 PNGCRUSH
 CONVERT
@@ -9420,6 +9421,60 @@ done
 "
 fi
 
+    if test "$cs_prog_path_prepared" != yes; then :
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+    for ac_prog in png2icns
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_PNG2ICNS+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$PNG2ICNS"; then
+  ac_cv_prog_PNG2ICNS="$PNG2ICNS" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_PNG2ICNS="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+PNG2ICNS=$ac_cv_prog_PNG2ICNS
+if test -n "$PNG2ICNS"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PNG2ICNS" >&5
+$as_echo "$PNG2ICNS" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$PNG2ICNS" && break
+done
+
+    cs_build_prop_val="$PNG2ICNS"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.PNG2ICNS ?= $cs_build_prop_val ;
+"
+fi
+
 
 # Note that CS comes with a copy of relaytool that, compared to the
 # current (as of 2007-09-18) version from apbuild-2.0.5, has some
@@ -13339,9 +13394,9 @@ fi
 	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_sysprefix_lflags -l$cs_pywinlib | sed 'y% %#%'`"
 	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags_ext -l$cs_pywinlib | sed 'y% %#%'`"
 
-	    cs_pyflags="$cs_pyflags `echo @@-flat_namespace -undefined suppress@$cs_cv_pybase_lflags_base | sed 'y% %#%'`"
-	    cs_pyflags="$cs_pyflags `echo @@-flat_namespace -undefined suppress@$cs_cv_pybase_sysprefix_lflags | sed 'y% %#%'`"
-	    cs_pyflags="$cs_pyflags `echo @@-flat_namespace -undefined suppress@$cs_cv_pybase_lflags_ext | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@-bundle -flat_namespace -undefined suppress@$cs_cv_pybase_lflags_base | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@-bundle -flat_namespace -undefined suppress@$cs_cv_pybase_sysprefix_lflags | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@-bundle -flat_namespace -undefined suppress@$cs_cv_pybase_lflags_ext | sed 'y% %#%'`"
 
 	    if test "" != yes; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking if python SDK is usable" >&5
@@ -30387,6 +30442,550 @@ else
   cs_cv_libgl_GLsizeiptr_cflags=''
 	cs_cv_libgl_GLsizeiptr_lflags=''
 	cs_cv_libgl_GLsizeiptr_libs=''
+
+fi
+    if test "" != yes; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GLint64" >&5
+$as_echo_n "checking for GLint64... " >&6; }
+if test "${cs_cv_libgl_GLint64+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLint64 x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLint64=yes
+		cs_cv_libgl_GLint64_cflags=$cs_build_cflags
+		cs_cv_libgl_GLint64_lflags=$cs_build_lflags
+		cs_cv_libgl_GLint64_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLint64=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_libgl_GLint64" >&5
+$as_echo "$cs_cv_libgl_GLint64" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GLint64" >&5
+$as_echo_n "checking for GLint64... " >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLint64 x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLint64=yes
+		cs_cv_libgl_GLint64_cflags=$cs_build_cflags
+		cs_cv_libgl_GLint64_lflags=$cs_build_lflags
+		cs_cv_libgl_GLint64_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLint64=no
+fi
+	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_libgl_GLint64" >&5
+$as_echo "$cs_cv_libgl_GLint64" >&6; }
+fi
+    if test $cs_cv_libgl_GLint64 = yes; then :
+  cs_header_text="${cs_header_text}#define CS_HAVE_GLINT64_T
+"
+else
+  cs_cv_libgl_GLint64_cflags=''
+	cs_cv_libgl_GLint64_lflags=''
+	cs_cv_libgl_GLint64_libs=''
+
+fi
+    if test "" != yes; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GLuint64" >&5
+$as_echo_n "checking for GLuint64... " >&6; }
+if test "${cs_cv_libgl_GLuint64+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLuint64 x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLuint64=yes
+		cs_cv_libgl_GLuint64_cflags=$cs_build_cflags
+		cs_cv_libgl_GLuint64_lflags=$cs_build_lflags
+		cs_cv_libgl_GLuint64_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLuint64=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_libgl_GLuint64" >&5
+$as_echo "$cs_cv_libgl_GLuint64" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GLuint64" >&5
+$as_echo_n "checking for GLuint64... " >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLuint64 x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLuint64=yes
+		cs_cv_libgl_GLuint64_cflags=$cs_build_cflags
+		cs_cv_libgl_GLuint64_lflags=$cs_build_lflags
+		cs_cv_libgl_GLuint64_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLuint64=no
+fi
+	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_libgl_GLuint64" >&5
+$as_echo "$cs_cv_libgl_GLuint64" >&6; }
+fi
+    if test $cs_cv_libgl_GLuint64 = yes; then :
+  cs_header_text="${cs_header_text}#define CS_HAVE_GLUINT64_T
+"
+else
+  cs_cv_libgl_GLuint64_cflags=''
+	cs_cv_libgl_GLuint64_lflags=''
+	cs_cv_libgl_GLuint64_libs=''
 
 fi
 
