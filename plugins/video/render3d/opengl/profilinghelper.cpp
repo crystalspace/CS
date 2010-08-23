@@ -50,6 +50,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   void ProfilingHelper::ResetStampOffset ()
   {
     csGLGraphics3D::ext->glGetInteger64v (GL_TIMESTAMP, &stampOffset);
+    int64 wallTime = csGetMicroTicks();
+    stampOffsetWall = wallTime;
   }
   
   void ProfilingHelper::RecordEvent (uint frameNum, uint64 issued, GLuint event,
@@ -74,7 +76,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
       
       ProfileEvent event (events.PopTop());
       
-      uint64 issueTime = event.issued - stampOffset;
+      uint64 issueTime = (event.issued - stampOffsetWall)*1000;
       uint64 startTime, endTime;
       csGLGraphics3D::ext->glGetQueryObjectui64v (event.query1, GL_QUERY_RESULT, &startTime);
       queries.RecycleQuery (event.query1);

@@ -32,6 +32,8 @@ class csGLStateCache;
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
+class csGLGraphics3D;
+
 static const GLenum compGLtypes[CS_BUFCOMP_TYPECOUNT] =
 {
   GL_BYTE, GL_UNSIGNED_BYTE,
@@ -56,8 +58,8 @@ class csGLVBOBufferManager : public scfImplementation1<csGLVBOBufferManager,
 {
 public:  
   CS_LEAKGUARD_DECLARE (csGLVBOBufferManager);
-  csGLVBOBufferManager (csGLExtensionManager *ext, csGLStateCache *state, 
-    size_t maxAlloction = 64*1024*1024,
+  csGLVBOBufferManager (csGLGraphics3D* G3D, csGLExtensionManager *ext,
+    csGLStateCache *state, size_t maxAlloction = 64*1024*1024,
     bool forceSeparateVBOs = false);
   virtual ~csGLVBOBufferManager ();
 
@@ -108,6 +110,7 @@ private:
   static const size_t VBO_SLOT_PER_BUFFER[VBO_NUM_SLOT_SIZES];
 
   // Global state
+  csGLGraphics3D* G3D;
   csGLExtensionManager *extensionManager; 
   csGLStateCache *stateCache;
 

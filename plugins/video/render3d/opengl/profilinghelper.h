@@ -33,6 +33,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     csRef<iFile> outputFile;
     
     int64 stampOffset;
+    int64 stampOffsetWall;
     struct ProfileEvent
     {
       uint frame;
@@ -60,9 +61,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     void SetFile (iFile* file);
     
     void ResetStampOffset ();
-    void RecordEvent (uint frameNum, uint64 issued, GLuint event,
+    void RecordEvent (uint frameNum, uint64 issuedAtWallTime, GLuint event,
 		      const char* descr);
-    void RecordTimeSpan (uint frameNum, uint64 issued,
+    void RecordTimeSpan (uint frameNum, uint64 issuedAtWallTime,
 			 GLuint begin, GLuint end, const char* descr);
     
     void FlushEvents (uint newFrame, QueryPool& queries, uint maxDelta);

@@ -467,6 +467,8 @@ void csGLRender2TextureEXTfbo::FinishDraw (bool readbackTargets)
   
   if (readbackTargets)
   {
+    csGLGraphics3D::ProfileScope _profile (G3D, "render target readback");
+      
     for (int a = 0; a < rtaNumAttachments; a++)
     {
       const WRTAG::RTA& attachment =

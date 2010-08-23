@@ -213,16 +213,6 @@ private:
   QueryPool queryPool;
   bool glProfiling;
   ProfilingHelper profileHelper;
-  class ProfileScope
-  {
-    csGLGraphics3D* renderer;
-    const char* descr;
-    int64 startStamp;
-    GLuint startQuery, endQuery;
-  public:
-    ProfileScope (csGLGraphics3D* renderer, const char* descr);
-    ~ProfileScope ();
-  };
   void RecordProfileEvent (const char* descr);
 
   csEventID SystemOpen;
@@ -511,6 +501,17 @@ public:
   static csGLExtensionManager* ext;
   csRef<csGLTextureManager> txtmgr;
   bool verbose;
+  
+  class ProfileScope
+  {
+    csGLGraphics3D* renderer;
+    const char* descr;
+    int64 startStamp;
+    GLuint startQuery, endQuery;
+  public:
+    ProfileScope (csGLGraphics3D* renderer, const char* descr);
+    ~ProfileScope ();
+  };
 
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();

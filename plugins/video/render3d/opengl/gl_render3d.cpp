@@ -171,7 +171,7 @@ csGLGraphics3D::ProfileScope::ProfileScope (csGLGraphics3D* renderer, const char
   {
     startQuery = renderer->queryPool.AllocQuery ();
     endQuery = renderer->queryPool.AllocQuery ();
-    csGLGraphics3D::ext->glGetInteger64v (GL_TIMESTAMP, &startStamp);
+    startStamp = csGetMicroTicks();
     csGLGraphics3D::ext->glQueryCounter (startQuery, GL_TIMESTAMP);
   }
 }
@@ -193,8 +193,7 @@ void csGLGraphics3D::RecordProfileEvent (const char* descr)
   if (glProfiling)
   {
     GLuint query = queryPool.AllocQuery ();
-    int64 startStamp;
-    ext->glGetInteger64v (GL_TIMESTAMP, &startStamp);
+    int64 startStamp = csGetMicroTicks();
     ext->glQueryCounter (query, GL_TIMESTAMP);
     profileHelper.RecordEvent (frameNum, startStamp, query, descr);
   }
@@ -971,8 +970,8 @@ bool csGLGraphics3D::Open ()
 
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Using VBO with %d MB of VBO memory",
       vboSize / (1024*1024));
-    vboManager.AttachNew (new csGLVBOBufferManager (ext, statecache, vboSize,
-      forceSeparateVBOs));
+    vboManager.AttachNew (new csGLVBOBufferManager (this, ext, statecache,
+      vboSize, forceSeparateVBOs));
   }
 
   GLint dbits;
@@ -1643,6 +1642,7 @@ void csGLGraphics3D::FinishDraw ()
   
   if (currentAttachments != 0)
   {
+    RecordProfileEvent ("Unset render targets");
     r2tbackend->FinishDraw ((current_drawflags & CSDRAW_READBACK) != 0);
     UnsetRenderTargets();
     currentAttachments = 0;
@@ -1671,8 +1671,10 @@ void csGLGraphics3D::Print (csRect const* area)
     }
     SwapIfNeeded();
   }
-  RecordProfileEvent ("frame swap");
-  G2D->Print (area);
+  {
+    ProfileScope _profile (this, "frame swap");
+    G2D->Print (area);
+  }
   
   //csPrintf ("frame\n");
   if (glProfiling)
@@ -1782,8 +1784,6 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
   unsigned int i;
   if (!attribs)
   {
-    ProfileScope _profile (this, "Deactivate all buffers");
-    
     //disable all
     statecache->Disable_GL_VERTEX_ARRAY ();
     statecache->Disable_GL_NORMAL_ARRAY ();
@@ -1846,8 +1846,6 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
     static_cast<csGLBasicTextureHandle*> (txthandle);
   GLuint texHandle = gltxthandle->GetHandle ();
 
-  ProfileScope _profile (this, "Activate texture");
-  
   switch (gltxthandle->texType)
   {
     case iTextureHandle::texType1D:
@@ -1889,8 +1887,6 @@ void csGLGraphics3D::DeactivateTexture (int unit)
 
   if (imageUnits[unit].texture == 0) return;
 
-  ProfileScope _profile (this, "Deactivate texture");
-  
   switch (imageUnits[unit].texture->texType)
   {
     case iTextureHandle::texType1D:
@@ -1948,8 +1944,6 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 void csGLGraphics3D::SetTextureComparisonModes (int* units,
   CS::Graphics::TextureComparisonMode* modes, int count)
 {
-  ProfileScope _profile (this, "Set texture comparison modes");
-  
   if (modes == 0)
   {
     CS::Graphics::TextureComparisonMode modeDisabled;
@@ -2013,7 +2007,7 @@ void csGLGraphics3D::SetupInstance (size_t instParamNum,
                                     const csVertexAttrib targets[], 
                                     csShaderVariable* const params[])
 {
-  ProfileScope _profile (this, "Setup instance");
+  ProfileScope _profile (this, "Setup instance"); // @@@ Worthwhile to measure?
   
   csVector4 v;
   float matrix[16];
@@ -2769,8 +2763,6 @@ void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
 void csGLGraphics3D::ApplyBufferChanges()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
-  
-  ProfileScope _profile (this, "apply buffer changes");
   
   for (size_t i = 0; i < changeQueue.GetSize (); i++)
   {
