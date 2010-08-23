@@ -326,17 +326,18 @@ bool FrankieScene::CreateAvatar ()
   // Get reference to the iFurMesh interface
   furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
 
-  furMesh->SetAnimationControl(animationPhysicsControl);
   furMesh->SetFurMeshProperties(hairMeshProperties);
 
+  furMesh->SetAnimesh(animesh);
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(0)->GetFactorySubMesh());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
-  furMesh->StartAnimationControl();
-
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);
+
+  furMesh->SetAnimationControl(animationPhysicsControl);
+  furMesh->StartAnimationControl();
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
@@ -383,6 +384,7 @@ void FrankieScene::ResetScene ()
     // Set the ragdoll state of the 'body' and 'tail' chains as kinematic
     ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_KINEMATIC);
     ragdollNode->SetBodyChainState (tailChain, CS::Animation::STATE_KINEMATIC);
+    ragdollNode->SetPlaybackPosition(0);
 
     // Update the display of the dynamics debugger
     if (hairTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
@@ -395,6 +397,9 @@ void FrankieScene::ResetScene ()
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("wings_in"), 1.0f);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.0f);
+
+  if (furMesh)
+    furMesh->ResetMesh();
 }
 
 void FrankieScene::UpdateStateDescription ()

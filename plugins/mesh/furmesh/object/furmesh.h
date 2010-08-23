@@ -70,9 +70,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetStrandLOD(float strandLOD);
     virtual void SetLOD(float lod);
 
+    virtual void SetAnimesh(CS::Mesh::iAnimatedMesh* animesh);
     virtual void SetAnimationControl (CS::Mesh::iFurAnimationControl* physicsControl);
     virtual void StartAnimationControl ( );
     virtual void StopAnimationControl ( );
+    virtual void ResetMesh ( );
 
     virtual void SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory);
     virtual void SetMeshFactorySubMesh 
@@ -96,6 +98,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csArray<csGuideFur> guideFurs;
     csArray<csTriangle> guideFursTriangles;
     csArray<csGuideFurLOD> guideFursLOD;
+    CS::Mesh::iAnimatedMesh* animesh;
     csRef<CS::Mesh::iFurAnimationControl> physicsControl;
     csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties;
     csVector3* positionShift;
@@ -104,6 +107,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float strandLOD;
     size_t hairStrandsLODSize;
     bool physicsControlEnabled;
+    bool isReset;
+    uint startFrame;
     // External data
     csRef<CS::Mesh::iAnimatedMeshFactory> meshFactory;
     csRef<CS::Mesh::iAnimatedMeshSubMeshFactory> meshFactorySubMesh;
@@ -121,14 +126,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     uint indexstart, indexend;
     // Private functions
     void SetRigidBody (iRigidBody* rigidBody);
-    void GenerateGuideHairs();
+    void GenerateGuideFurs();
     void SynchronizeGuideHairs();
-    void GenerateGuideHairsLOD();
-    void GenerateHairStrands();
+    void GenerateGuideFursLOD();
+    void GenerateFurStrands();
     void TriangleAreaDensity(const csTriangle& triangle, float &area, 
       float &density, csGuideFur& A, csGuideFur& B, csGuideFur& C);
+    void RegenerateGeometry();
     // For debug
     void SaveUVImage();
+    // Update
     void Update();
     void UpdateGuideHairs();
   };

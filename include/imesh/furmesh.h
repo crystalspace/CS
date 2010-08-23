@@ -398,6 +398,11 @@ struct iFurMesh : public virtual iBase
   virtual void SetLOD(float lod) = 0;
 
   /**
+   * Set the animesh
+   */
+  virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
+
+  /**
    * Set the associated iFurPhysicsControl
    */
   virtual void SetAnimationControl (iFurAnimationControl* physicsControl) = 0;
@@ -414,6 +419,12 @@ struct iFurMesh : public virtual iBase
    */
   virtual void StopAnimationControl ( ) = 0;
  
+  /**
+   * Reset the position of the mesh on the base mesh.
+   * Pure guide furs will stop and start being synchronized with iFurPhysicsControl
+   */
+  virtual void ResetMesh ( ) = 0;
+
   /**
    * Set the associated iFurMeshMaterialProperties
    */

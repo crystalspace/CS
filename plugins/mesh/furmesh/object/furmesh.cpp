@@ -39,9 +39,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   FurMesh::FurMesh (iEngine* engine, iObjectRegistry* object_reg, 
     iMeshObjectFactory* object_factory) : scfImplementationType (this, engine), 
     materialWrapper(0), object_reg(object_reg), object_factory(object_factory), 
-    engine(engine), physicsControl(0), hairMeshProperties(0), positionShift(0),
-    rng(0), guideLOD(0),strandLOD(0), hairStrandsLODSize(0), 
-    physicsControlEnabled(false), indexstart(0), indexend(0)
+    engine(engine), animesh(0), physicsControl(0), hairMeshProperties(0), 
+    positionShift(0), rng(0), guideLOD(0),strandLOD(0), hairStrandsLODSize(0), 
+    physicsControlEnabled(false), isReset(false), startFrame(0), meshFactory(0), 
+    meshFactorySubMesh(0), indexstart(0), indexend(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -98,6 +99,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     Update();
     UpdateObjectBoundingBox();
+
+    if (isReset)
+    {
+      startFrame = currentFrame + 1;
+      isReset = false;
+    }
+
+    if (currentFrame == startFrame)
+    {
+      startFrame = 0;
+      RegenerateGeometry();
+    }
   }
 
   bool FurMesh::SetMaterialWrapper (iMaterialWrapper* mat)
@@ -197,6 +210,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::GenerateGeometry (iView* view, iSector *room)
   {
+    if (!animesh)
+    {
+      csPrintfErr("Please specify base animesh!\n");
+      return;
+    }
+
+    if (!meshFactory)
+    {
+      csPrintfErr("Please specify base animesh factory!\n");
+      return;
+    }
+
+    if (!meshFactorySubMesh)
+    {
+      csPrintfErr("Please specify base animesh factory sub mesh!\n");
+      return;
+    }
+
     if (!GetDensityMap())
     {
       csPrintfErr( "Please specify density map texture!\n" );    
@@ -232,9 +263,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if ( !heightmap.Read() )
       csPrintfErr( "Error reading heightmap texture!\n" );  
 
-    GenerateGuideHairs();
-    GenerateGuideHairsLOD();
-    GenerateHairStrands();
+    GenerateGuideFurs();
+    GenerateGuideFursLOD();
+    GenerateFurStrands();
 
     SaveUVImage();
 
@@ -366,7 +397,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     SetIndexRange(0, (uint)GetIndices()->GetElementCount());
   }
 
-  void FurMesh::GenerateGuideHairs()
+  void FurMesh::GenerateGuideFurs()
   {
     size_t indexstart = meshFactorySubMesh->GetIndices(0)->GetRangeStart();
     size_t indexend = meshFactorySubMesh->GetIndices(0)->GetRangeEnd();
@@ -374,16 +405,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     size_t indexCount = 
       meshFactorySubMesh->GetIndices(0)->GetSize() / sizeof(csTriangle);
 
-    csVector3* vertex_buffer = 
-      (csVector3*)meshFactory->GetVertices()->Lock(CS_BUF_LOCK_READ);
-    csVector3* normal_buffer = 
-      (csVector3*)meshFactory->GetNormals()->Lock(CS_BUF_LOCK_READ);
+    // Create a walker for the position buffer of the animesh
+    csRenderBufferHolder holder;
+    animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_POSITION);
+    csRenderBufferLock<csVector3> positions (holder.GetRenderBuffer (CS_BUFFER_POSITION));
+    animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_NORMAL);
+    csRenderBufferLock<csVector3> normals (holder.GetRenderBuffer (CS_BUFFER_NORMAL));
+    animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_TANGENT);
+    csRenderBufferLock<csVector3> tangents (holder.GetRenderBuffer (CS_BUFFER_TANGENT));
+    animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_BINORMAL);
+    csRenderBufferLock<csVector3> binormals (holder.GetRenderBuffer (CS_BUFFER_BINORMAL));
+
+    // Compute the new position of the anchor
+    csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (animesh);
+
     csTriangle* index_buffer = 
       (csTriangle*)meshFactorySubMesh->GetIndices(0)->Lock(CS_BUF_LOCK_READ);
     csVector2* texcoord_buffer = 
       (csVector2*)meshFactory->GetTexCoords()->Lock(CS_BUF_LOCK_READ);
-    csVector3* tangent_buffer = 
-      (csVector3*)meshFactory->GetTangents()->Lock(CS_BUF_LOCK_READ);
 
     // Choose unique indices
     for ( size_t i = 0 ; i < indexCount ; i ++)
@@ -397,8 +436,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Generate the guide furs
     for (size_t i = indexstart; i <= indexend; i ++)
     {
-      csVector3 pos = vertex_buffer[i] + 
-        GetDisplacement() * normal_buffer[i];
+      csVector3 position = mesh->GetMeshWrapper ()->GetMovable ()->
+        GetTransform ().This2Other (positions[i]);
+      csVector3 normal = mesh->GetMeshWrapper ()->GetMovable ()->
+        GetTransform ().This2Other (normals[i]);
+      normal.Normalize();
+      csVector3 tangent = mesh->GetMeshWrapper ()->GetMovable ()->
+        GetTransform ().This2Other (tangents[i]);
+      tangent.Normalize();
+
+      csVector3 pos = position + GetDisplacement() * normal;
 
       csGuideFur guideFur;
       guideFur.uv = texcoord_buffer[i];
@@ -413,23 +460,119 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         controlPointsCount ++;
 
       if (controlPointsCount == 1)
-        controlPointsCount++;
+        controlPointsCount ++;
 
       float realDistance = (height * GetHeightFactor()) / controlPointsCount;
 
       if (GetGrowTangent())
-        guideFur.Generate(controlPointsCount, realDistance, pos, tangent_buffer[i]);
+        guideFur.Generate(controlPointsCount, realDistance, pos, tangent);
       else
-        guideFur.Generate(controlPointsCount, realDistance, pos, normal_buffer[i]);
-        
+        guideFur.Generate(controlPointsCount, realDistance, pos, normal);
+
       guideFurs.Push(guideFur);
     }
 
-    meshFactory->GetVertices()->Release();
-    meshFactory->GetNormals()->Release();
     meshFactorySubMesh->GetIndices(0)->Release();
     meshFactory->GetTexCoords()->Release();
-    meshFactory->GetTangents()->Release();
+  }
+
+  void FurMesh::GenerateGuideFursLOD()
+  {
+    float density, area;
+    csGuideFur A, B, C;
+
+    // Generate guide hairs for LOD
+    for (size_t iter = 0 ; iter < guideFursTriangles.GetSize() && iter < MAX_GUIDE_FURS; iter ++)
+    {
+      csTriangle triangle = guideFursTriangles.Get(iter);
+      TriangleAreaDensity(triangle, area, density, A, B, C);
+
+      // If a new guide fur is needed
+      if ( (density * area * GetDensityFactorGuideFurs()) < 1)
+        continue;
+
+      // Make new guide fur
+      csGuideFurLOD guideFurLOD;
+      guideFurLOD.SetGuideHairsRefs(triangle, rng);
+
+      guideFurLOD.isActive = false;
+
+      guideFurLOD.SetUV(guideFurs, guideFursLOD);
+
+      // Generate control points
+      size_t controlPointsCount = csMin( (csMin( A.controlPointsCount,
+        B.controlPointsCount) ), C.controlPointsCount);
+
+      guideFurLOD.Generate(controlPointsCount, guideFurs, guideFursLOD);
+      
+      // Add new triangles
+      guideFursLOD.Push(guideFurLOD);
+      size_t indexD = guideFursLOD.GetSize() - 1 + guideFurs.GetSize();
+      csTriangle ADC = csTriangle(triangle.a, indexD, triangle.c);
+      csTriangle ADB = csTriangle(triangle.a, indexD, triangle.b);
+      csTriangle BDC = csTriangle(triangle.b, indexD, triangle.c);
+
+      guideFursTriangles.Push(ADC);
+      guideFursTriangles.Push(ADB);
+      guideFursTriangles.Push(BDC);
+    }    
+  }
+
+  void FurMesh::GenerateFurStrands ()
+  {
+    float area, density;
+    csGuideFur A, B, C;
+
+    // Generated based on density
+    for (int den = 0 , change = 1 ; change && den < MAX_FUR_STRAND_DENSITY ; den ++)
+    {
+      change = 0;
+      // For every triangle
+      for (size_t iter = 0 ; iter < guideFursTriangles.GetSize(); iter ++)
+      {
+        csTriangle triangle = guideFursTriangles.Get(iter);
+        TriangleAreaDensity(triangle, area, density, A, B, C);
+
+        // How many new guide fur are needed
+        if ( den < (density * area * GetDensityFactorFurStrands()))
+        {
+          change = 1;
+          csFurStrand furStrand;
+          furStrand.SetGuideHairsRefs(triangle, rng);
+
+          size_t controlPointsCount = csMin( (csMin( A.controlPointsCount,
+            B.controlPointsCount) ), C.controlPointsCount);
+
+          furStrand.Generate(controlPointsCount, guideFurs, guideFursLOD);
+          furStrand.SetUV(guideFurs, guideFursLOD);
+
+          furStrands.Push(furStrand);		
+        }
+      }
+    }
+  }
+
+  void FurMesh::RegenerateGeometry()
+  {
+    // Density map
+    if ( !densitymap.Read() )
+      csPrintfErr( "Error reading densitymap texture!\n" );    
+
+    // Height map
+    if ( !heightmap.Read() )
+      csPrintfErr( "Error reading heightmap texture!\n" );    
+
+    GenerateGuideFurs();
+
+    // Update guide ropes LOD
+    for (size_t i = 0 ; i < guideFursLOD.GetSize(); i ++)
+      guideFursLOD.Get(i).Update(guideFurs, guideFursLOD);
+
+    // Update fur strands
+    for (size_t i = 0 ; i < hairStrandsLODSize; i ++)
+      furStrands.Get(i).Update(guideFurs, guideFursLOD);
+
+    StartAnimationControl();
   }
 
   void FurMesh::TriangleAreaDensity(const csTriangle& triangle, float &area, 
@@ -536,91 +679,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       density /= count;
   }
 
-  void FurMesh::GenerateGuideHairsLOD()
-  {
-    float density, area;
-    csGuideFur A, B, C;
-
-    // Generate guide hairs for LOD
-    for (size_t iter = 0 ; iter < guideFursTriangles.GetSize() && iter < MAX_GUIDE_FURS; iter ++)
-    {
-      csTriangle triangle = guideFursTriangles.Get(iter);
-      TriangleAreaDensity(triangle, area, density, A, B, C);
-
-      // If a new guide fur is needed
-      if ( (density * area * GetDensityFactorGuideFurs()) < 1)
-        continue;
-
-      // Make new guide fur
-      csGuideFurLOD guideFurLOD;
-      guideFurLOD.SetGuideHairsRefs(triangle, rng);
-
-      guideFurLOD.isActive = false;
-
-      guideFurLOD.SetUV(guideFurs, guideFursLOD);
-
-      // Generate control points
-      size_t controlPointsCount = csMin( (csMin( A.controlPointsCount,
-        B.controlPointsCount) ), C.controlPointsCount);
-
-      guideFurLOD.Generate(controlPointsCount, guideFurs, guideFursLOD);
-      
-      // Add new triangles
-      guideFursLOD.Push(guideFurLOD);
-      size_t indexD = guideFursLOD.GetSize() - 1 + guideFurs.GetSize();
-      csTriangle ADC = csTriangle(triangle.a, indexD, triangle.c);
-      csTriangle ADB = csTriangle(triangle.a, indexD, triangle.b);
-      csTriangle BDC = csTriangle(triangle.b, indexD, triangle.c);
-
-      guideFursTriangles.Push(ADC);
-      guideFursTriangles.Push(ADB);
-      guideFursTriangles.Push(BDC);
-    }    
-  }
-
-  void FurMesh::SynchronizeGuideHairs ()
-  {
-    if (!physicsControlEnabled) // no physics support
-      return;
-
-    for (size_t i = 0 ; i < guideFurs.GetSize(); i ++)
-      physicsControl->InitializeStrand(i,guideFurs.Get(i).controlPoints, 
-        guideFurs.Get(i).controlPointsCount);
-  }
-
-  void FurMesh::GenerateHairStrands ()
-  {
-    float area, density;
-    csGuideFur A, B, C;
-
-    // Generated based on density
-    for (int den = 0 , change = 1 ; change && den < MAX_FUR_STRAND_DENSITY ; den ++)
-    {
-      change = 0;
-      // For every triangle
-      for (size_t iter = 0 ; iter < guideFursTriangles.GetSize(); iter ++)
-      {
-        csTriangle triangle = guideFursTriangles.Get(iter);
-        TriangleAreaDensity(triangle, area, density, A, B, C);
-
-        // How many new guide fur are needed
-        if ( den < (density * area * GetDensityFactorFurStrands()))
-        {
-          change = 1;
-          csFurStrand furStrand;
-          furStrand.SetGuideHairsRefs(triangle, rng);
-
-          size_t controlPointsCount = csMin( (csMin( A.controlPointsCount,
-            B.controlPointsCount) ), C.controlPointsCount);
-
-          furStrand.Generate(controlPointsCount, guideFurs, guideFursLOD);
-          furStrand.SetUV(guideFurs, guideFursLOD);
-
-          furStrands.Push(furStrand);		
-        }
-      }
-    }
-  }
 
   void FurMesh::SetGuideLOD(float guideLOD)
   {
@@ -672,48 +730,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     SetStrandLOD(lod);
   }
 
-  void FurMesh::SaveUVImage()
+  void FurMesh::SynchronizeGuideHairs ()
   {
-    // From normal guide ropes
-    for (size_t i = 0 ; i < guideFurs.GetSize() ; i ++)
-    {
-      csVector2 uv = guideFurs.Get(i).uv;
+    if (!physicsControlEnabled) // no physics support
+      return;
 
-      densitymap.Set( (int)(uv.x * densitymap.width), 
-        (int)(uv.y * densitymap.height), 1, 255);
-
-      heightmap.Set( (int)(uv.x * heightmap.width),  
-        (int)(uv.y * heightmap.height), 1, 255);
-    }
-
-    // From LOD guide ropes
-    for (size_t i = 0 ; i < guideFursLOD.GetSize() ; i ++)
-    {
-      csVector2 uv = guideFursLOD.Get(i).uv;
-
-      densitymap.Set( (int)(uv.x * densitymap.width),
-        (int)(uv.y * densitymap.height), 0, 255);
-    }
-
-    // From fur strands
-    for (size_t i = 0 ; i < furStrands.GetSize() ; i ++)
-    {
-      csVector2 uv = furStrands.Get(i).uv;
-
-      densitymap.Set( (int)(uv.x * densitymap.width),
-        (int)(uv.y * densitymap.height), 2, 255);
-    }
-
-    csPrintf("Pure guide ropes: %d\n", guideFurs.GetSize());
-    csPrintf("Total guide ropes: %d\n", 
-      guideFursLOD.GetSize() + guideFurs.GetSize());
-
-    densitymap.SaveImage(object_reg, 
-      "/data/hairtest/densitymap_debug.png");
-    heightmap.SaveImage(object_reg, 
-      "/data/hairtest/heightmap_debug.png");
+    for (size_t i = 0 ; i < guideFurs.GetSize(); i ++)
+      physicsControl->InitializeStrand(i,guideFurs.Get(i).controlPoints, 
+      guideFurs.Get(i).controlPointsCount);
   }
 
+  void FurMesh::SetAnimesh(CS::Mesh::iAnimatedMesh* animesh)
+  {
+    this->animesh = animesh;
+  }
+  
   void FurMesh::SetAnimationControl (CS::Mesh::iFurAnimationControl* physicsControl)
   {
     this->physicsControl = physicsControl;
@@ -721,6 +752,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::StartAnimationControl()
   {
+    if (!guideFurs.GetSize())
+    {
+      csPrintfErr("Geometry not generated. Animation not started!\n");
+      return;
+    }
+
+    if (!physicsControl)
+    {
+      csPrintfErr("No physics control specified!\n");
+      return;
+    }
+
     if (!physicsControlEnabled)
     {
       physicsControlEnabled = true;
@@ -730,11 +773,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::StopAnimationControl()
   {
+    if (!physicsControl)
+    {
+      csPrintfErr("No physics control specified!\n");
+      return;
+    }
+
     if (physicsControlEnabled)
     {
       physicsControlEnabled = false;
       physicsControl->RemoveAllStrands();
     }
+  }
+
+  void FurMesh::ResetMesh()
+  {
+    if (!guideFurs.GetSize())
+    {
+      csPrintfErr("Geometry not generated. Mesh not reset!\n");
+      return;
+    }
+
+    if(!physicsControlEnabled)
+      return;
+
+    SetGuideLOD(0.0);
+    StopAnimationControl();
+
+    // Delete fur geometry data
+    for (size_t i = 0 ; i < guideFurs.GetSize() ; i ++)
+      guideFurs.Get(i).Clear();
+
+    guideFurs.DeleteAll();
+
+    isReset = true;
   }
 
   void FurMesh::SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory)
@@ -875,6 +947,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     GetBinormals()->Release();
 
     SetIndexRange(0, 3 * triangleCount);
+  }
+
+  void FurMesh::SaveUVImage()
+  {
+    // From normal guide ropes
+    for (size_t i = 0 ; i < guideFurs.GetSize() ; i ++)
+    {
+      csVector2 uv = guideFurs.Get(i).uv;
+
+      densitymap.Set( (int)(uv.x * densitymap.width), 
+        (int)(uv.y * densitymap.height), 1, 255);
+
+      heightmap.Set( (int)(uv.x * heightmap.width),  
+        (int)(uv.y * heightmap.height), 1, 255);
+    }
+
+    // From LOD guide ropes
+    for (size_t i = 0 ; i < guideFursLOD.GetSize() ; i ++)
+    {
+      csVector2 uv = guideFursLOD.Get(i).uv;
+
+      densitymap.Set( (int)(uv.x * densitymap.width),
+        (int)(uv.y * densitymap.height), 0, 255);
+    }
+
+    // From fur strands
+    for (size_t i = 0 ; i < furStrands.GetSize() ; i ++)
+    {
+      csVector2 uv = furStrands.Get(i).uv;
+
+      densitymap.Set( (int)(uv.x * densitymap.width),
+        (int)(uv.y * densitymap.height), 2, 255);
+    }
+
+    csPrintf("Pure guide ropes: %d\n", guideFurs.GetSize());
+    csPrintf("Total guide ropes: %d\n", 
+      guideFursLOD.GetSize() + guideFurs.GetSize());
+
+    densitymap.SaveImage(object_reg, 
+      "/data/hairtest/densitymap_debug.png");
+    heightmap.SaveImage(object_reg, 
+      "/data/hairtest/heightmap_debug.png");
   }
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)

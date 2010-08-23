@@ -400,7 +400,6 @@ bool KrystalScene::CreateAvatar ()
 //   hairPhysicsControl->SetAnimesh(animesh);
 
   animationPhysicsControl->SetAnimesh(animesh);
-  animationPhysicsControl->SetDisplacement(0.02);
 
   iSector* sector = hairTest->engine->FindSector("room");
 
@@ -414,18 +413,24 @@ bool KrystalScene::CreateAvatar ()
 
   // Get reference to the iFurMesh interface
   furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
-  
-  furMesh->SetAnimationControl(animationPhysicsControl);
+
+  csRef<CS::Mesh::iFurMeshState> ifms = 
+    scfQueryInterface<CS::Mesh::iFurMeshState>(furMesh);
+
+  animationPhysicsControl->SetDisplacement(ifms->GetDisplacement());
+
   furMesh->SetFurMeshProperties(hairMeshProperties);
 
+  furMesh->SetAnimesh(animesh);
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
-  furMesh->StartAnimationControl();
-
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);
+
+  furMesh->SetAnimationControl(animationPhysicsControl);
+  furMesh->StartAnimationControl();
 
   // Start animation
   rootNode->Play ();
@@ -465,13 +470,14 @@ void KrystalScene::ResetScene ()
   {
     // Reset the position of the animesh
     csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
+
     animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->SetTransform
       (csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
     animeshObject->GetMeshWrapper ()->QuerySceneNode ()->GetMovable ()->UpdateMove ();
 
     // Set the ragdoll state of the 'body' chain as kinematic
     ragdollNode->SetBodyChainState (bodyChain, CS::Animation::STATE_KINEMATIC);
-
+    ragdollNode->SetPlaybackPosition(0);
     // Update the display of the dynamics debugger
     if (hairTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
       || hairTest->dynamicsDebugMode == DYNDEBUG_MIXED)
@@ -481,6 +487,9 @@ void KrystalScene::ResetScene ()
     // These gaps create a bad behavior of the simulation of the hairs, this is
     // better with lower step parameters.
     hairTest->bulletDynamicSystem->SetStepParameters (0.016667f, 1, 10);
+
+    if (furMesh)
+      furMesh->ResetMesh();
   }
 
   isDead = false;
