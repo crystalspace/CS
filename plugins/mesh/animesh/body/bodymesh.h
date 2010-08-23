@@ -164,7 +164,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
     //-- CS::Animation::iBodyManager
     virtual CS::Animation::iBodySkeleton* CreateBodySkeleton (const char *name,
-				CS::Animation::iSkeletonFactory2* skeletonFactory);
+				CS::Animation::iSkeletonFactory* skeletonFactory);
     virtual CS::Animation::iBodySkeleton* FindBodySkeleton (const char *name);
     virtual void ClearBodySkeletons ();
 
@@ -185,11 +185,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     CS_LEAKGUARD_DECLARE(BodySkeleton);
 
     BodySkeleton (const char* name, BodyManager* manager,
-		  CS::Animation::iSkeletonFactory2* skeletonFactory);
+		  CS::Animation::iSkeletonFactory* skeletonFactory);
 
     virtual const char* GetName () const;
 
-    virtual CS::Animation::iSkeletonFactory2* GetSkeletonFactory () const;
+    virtual CS::Animation::iSkeletonFactory* GetSkeletonFactory () const;
 
     virtual void ClearAll ();
 
@@ -208,7 +208,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     BodyManager* manager;
     // This is a weakref to avoid circular references between animesh,
     // body skeleton and controllers
-    csWeakRef<CS::Animation::iSkeletonFactory2> skeletonFactory;
+    csWeakRef<CS::Animation::iSkeletonFactory> skeletonFactory;
     csHash<csRef<CS::Animation::iBodyBone>, CS::Animation::BoneID> boneHash;
     csHash<csRef<CS::Animation::iBodyChain>, csString> chainHash;
   };

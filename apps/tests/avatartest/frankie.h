@@ -58,7 +58,7 @@ class FrankieScene : public AvatarScene
   AvatarTest* avatarTest;
 
   // LookAt node related
-  csRef<CS::Animation::iSkeletonLookAtNode2> lookAtNode;
+  csRef<CS::Animation::iSkeletonLookAtNode> lookAtNode;
   char targetMode;
   bool alwaysRotate;
   char rotationSpeed;
@@ -66,7 +66,7 @@ class FrankieScene : public AvatarScene
 
   // LookAt listener
   class LookAtListener : public scfImplementation1<LookAtListener,
-    CS::Animation::iSkeletonLookAtListener2>
+    CS::Animation::iSkeletonLookAtListener>
   {
     FrankieScene* frankieScene;
 
@@ -74,19 +74,19 @@ class FrankieScene : public AvatarScene
     LookAtListener (FrankieScene* frankieScene)
       : scfImplementationType (this), frankieScene (frankieScene) {}
 
-    //-- CS::Animation::iSkeletonLookAtListener2
+    //-- CS::Animation::iSkeletonLookAtListener
     void TargetReached ();
     void TargetLost ();
   } lookAtListener;
 
   // Speed node related
-  csRef<CS::Animation::iSkeletonSpeedNode2> speedNode;
+  csRef<CS::Animation::iSkeletonSpeedNode> speedNode;
   int currentSpeed; // We use a 'int' instead of a 'float' to avoid
                     // accumulated rounding errors
 
   // Ragdoll node related
   bool frankieDead;
-  csRef<CS::Animation::iSkeletonRagdollNode2> ragdollNode;
+  csRef<CS::Animation::iSkeletonRagdollNode> ragdollNode;
   CS::Animation::iBodyChain* bodyChain;
   CS::Animation::iBodyChain* tailChain;
 

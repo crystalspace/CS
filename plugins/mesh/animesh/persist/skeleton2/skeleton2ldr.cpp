@@ -89,7 +89,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 
     synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
-    skelManager = csQueryRegistryOrLoad<CS::Animation::iSkeletonManager2> (object_reg,
+    skelManager = csQueryRegistryOrLoad<CS::Animation::iSkeletonManager> (object_reg,
       "crystalspace.skeletalanimation");
 
     InitTokenTable (xmltokens);
@@ -100,7 +100,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   {
     static const char* msgid = "crystalspace.skeletonloader.parseskeleton";
 
-    CS::Animation::iSkeletonFactory2* factory = 0;
+    CS::Animation::iSkeletonFactory* factory = 0;
 
     // Get common properties
     const char* name = node->GetAttributeValue ("name");
@@ -137,7 +137,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
         break;
       case XMLTOKEN_ANIMATIONPACKET:
         {
-          csRef<CS::Animation::iSkeletonAnimPacketFactory2> packet;
+          csRef<CS::Animation::iSkeletonAnimPacketFactory> packet;
           const char* name = child->GetContentsValue ();
 
           packet = skelManager->FindAnimPacketFactory (name);
@@ -160,7 +160,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   }
 
 
-  bool SkeletonLoader::ParseBone (iDocumentNode* node, CS::Animation::iSkeletonFactory2* factory, CS::Animation::BoneID parent)
+  bool SkeletonLoader::ParseBone (iDocumentNode* node, CS::Animation::iSkeletonFactory* factory, CS::Animation::BoneID parent)
   {
     static const char* msgid = "crystalspace.skeletonloader.parsebone";
 
@@ -228,7 +228,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       return false;
     }
 
-    CS::Animation::iSkeletonAnimPacketFactory2* packet = skelManager->CreateAnimPacketFactory (name);
+    CS::Animation::iSkeletonAnimPacketFactory* packet = skelManager->CreateAnimPacketFactory (name);
     if (!packet)
     {
       synldr->ReportError (msgid, node, 
@@ -256,7 +256,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
         break;
       case XMLTOKEN_NODE:
         {
-          csRef<CS::Animation::iSkeletonAnimNodeFactory2> nodeFact = ParseAnimTreeNode (child, packet);
+          csRef<CS::Animation::iSkeletonAnimNodeFactory> nodeFact = ParseAnimTreeNode (child, packet);
 
           if (!nodeFact)
           {
@@ -276,12 +276,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     return true;
   }
 
-  csPtr<CS::Animation::iSkeletonAnimNodeFactory2> SkeletonLoader::ParseAnimTreeNode (iDocumentNode* node,
-    CS::Animation::iSkeletonAnimPacketFactory2* packet)
+  csPtr<CS::Animation::iSkeletonAnimNodeFactory> SkeletonLoader::ParseAnimTreeNode (iDocumentNode* node,
+    CS::Animation::iSkeletonAnimPacketFactory* packet)
   {
     static const char* msgid = "crystalspace.skeletonloader.parseanimtreenode";
 
-    csRef<CS::Animation::iSkeletonAnimNodeFactory2> result;
+    csRef<CS::Animation::iSkeletonAnimNodeFactory> result;
 
     const char* type = node->GetAttributeValue ("type");
 
@@ -319,11 +319,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       return 0;
     }
 
-    return csPtr<CS::Animation::iSkeletonAnimNodeFactory2> (result);    
+    return csPtr<CS::Animation::iSkeletonAnimNodeFactory> (result);    
   }
 
-  CS::Animation::iSkeletonAnimation2* SkeletonLoader::ParseAnimation (iDocumentNode* node, 
-    CS::Animation::iSkeletonAnimPacketFactory2* packet)
+  CS::Animation::iSkeletonAnimation* SkeletonLoader::ParseAnimation (iDocumentNode* node, 
+    CS::Animation::iSkeletonAnimPacketFactory* packet)
   {
     static const char* msgid = "crystalspace.skeletonloader.parseanimation";
 
@@ -331,7 +331,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     const char* ref = node->GetAttributeValue ("ref");
     if (ref)
     {
-      CS::Animation::iSkeletonAnimation2* fact = packet->FindAnimation (ref);
+      CS::Animation::iSkeletonAnimation* fact = packet->FindAnimation (ref);
       if (!fact)
       {      
         synldr->ReportError (msgid, node, "Referenced animation %s not found", ref);
@@ -348,7 +348,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       return false;
     }
 
-    CS::Animation::iSkeletonAnimation2* fact = packet->CreateAnimation (name);
+    CS::Animation::iSkeletonAnimation* fact = packet->CreateAnimation (name);
     if (!fact)
     {
       synldr->ReportError (msgid, node, 
@@ -420,12 +420,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     return fact;
   }
 
-  csPtr<CS::Animation::iSkeletonAnimNodeFactory2> SkeletonLoader::ParseAnimationNode (
-    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory2* packet)
+  csPtr<CS::Animation::iSkeletonAnimNodeFactory> SkeletonLoader::ParseAnimationNode (
+    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory* packet)
   {
     static const char* msgid = "crystalspace.skeletonloader.parseanimationnode";
 
-    csRef<CS::Animation::iSkeletonAnimationNodeFactory2> factnode;
+    csRef<CS::Animation::iSkeletonAnimationNodeFactory> factnode;
 
     const char* name = node->GetAttributeValue ("name");
 
@@ -444,7 +444,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     factnode = packet->CreateAnimationNode (name);
 
 
-    CS::Animation::iSkeletonAnimation2* anim = packet->FindAnimation (animName);
+    CS::Animation::iSkeletonAnimation* anim = packet->FindAnimation (animName);
     if (!anim)
     {
       synldr->ReportError (msgid, node, "Animation \"%s\" not found", animName);
@@ -475,15 +475,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       factnode->SetPlaybackSpeed (speed);
     }
 
-    return csPtr<CS::Animation::iSkeletonAnimNodeFactory2> (factnode);
+    return csPtr<CS::Animation::iSkeletonAnimNodeFactory> (factnode);
   }
 
-  csPtr<CS::Animation::iSkeletonAnimNodeFactory2> SkeletonLoader::ParseBlendNode (
-    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory2* packet)
+  csPtr<CS::Animation::iSkeletonAnimNodeFactory> SkeletonLoader::ParseBlendNode (
+    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory* packet)
   {
     //static const char* msgid = "crystalspace.skeletonloader.parseblendnode";
 
-    csRef<CS::Animation::iSkeletonBlendNodeFactory2> factnode;
+    csRef<CS::Animation::iSkeletonBlendNodeFactory> factnode;
 
     // Name & node creation
     const char* name = node->GetAttributeValue ("name");
@@ -520,7 +520,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       {
       case XMLTOKEN_NODE:
         {
-          csRef<CS::Animation::iSkeletonAnimNodeFactory2> childFact = 
+          csRef<CS::Animation::iSkeletonAnimNodeFactory> childFact = 
             ParseAnimTreeNode (child, packet);
 
           float weight = 1.0;
@@ -537,15 +537,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       }       
     };
 
-    return csPtr<CS::Animation::iSkeletonAnimNodeFactory2> (factnode);
+    return csPtr<CS::Animation::iSkeletonAnimNodeFactory> (factnode);
   }
 
-  csPtr<CS::Animation::iSkeletonAnimNodeFactory2> SkeletonLoader::ParsePriorityNode (
-    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory2* packet)
+  csPtr<CS::Animation::iSkeletonAnimNodeFactory> SkeletonLoader::ParsePriorityNode (
+    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory* packet)
   {
     //static const char* msgid = "crystalspace.skeletonloader.parseprioritynode";
 
-    csRef<CS::Animation::iSkeletonPriorityNodeFactory2> factnode;
+    csRef<CS::Animation::iSkeletonPriorityNodeFactory> factnode;
 
     const char* name = node->GetAttributeValue ("name");
     factnode = packet->CreatePriorityNode (name);
@@ -561,7 +561,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       {
       case XMLTOKEN_NODE:
         {
-          csRef<CS::Animation::iSkeletonAnimNodeFactory2> childFact = 
+          csRef<CS::Animation::iSkeletonAnimNodeFactory> childFact = 
             ParseAnimTreeNode (child, packet);
 
           int prio = 1;
@@ -579,15 +579,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       }       
     };
 
-    return csPtr<CS::Animation::iSkeletonAnimNodeFactory2> (factnode);
+    return csPtr<CS::Animation::iSkeletonAnimNodeFactory> (factnode);
   }
 
-  csPtr<CS::Animation::iSkeletonAnimNodeFactory2> SkeletonLoader::ParseRandomNode (
-    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory2* packet)
+  csPtr<CS::Animation::iSkeletonAnimNodeFactory> SkeletonLoader::ParseRandomNode (
+    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory* packet)
   {
     //static const char* msgid = "crystalspace.skeletonloader.parserandomnode";
 
-    csRef<CS::Animation::iSkeletonRandomNodeFactory2> factnode;
+    csRef<CS::Animation::iSkeletonRandomNodeFactory> factnode;
 
     const char* name = node->GetAttributeValue ("name");
     factnode = packet->CreateRandomNode (name);
@@ -603,7 +603,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       {
       case XMLTOKEN_NODE:
         {
-          csRef<CS::Animation::iSkeletonAnimNodeFactory2> childFact = 
+          csRef<CS::Animation::iSkeletonAnimNodeFactory> childFact = 
             ParseAnimTreeNode (child, packet);
 
           float prob = 1.0f;
@@ -621,15 +621,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       }       
     };
 
-    return csPtr<CS::Animation::iSkeletonAnimNodeFactory2> (factnode);
+    return csPtr<CS::Animation::iSkeletonAnimNodeFactory> (factnode);
   }
 
-  csPtr<CS::Animation::iSkeletonAnimNodeFactory2> SkeletonLoader::ParseFSMNode (
-    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory2* packet)
+  csPtr<CS::Animation::iSkeletonAnimNodeFactory> SkeletonLoader::ParseFSMNode (
+    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory* packet)
   {
     static const char* msgid = "crystalspace.skeletonloader.parsefsmnode";
 
-    csRef<CS::Animation::iSkeletonFSMNodeFactory2> factnode;
+    csRef<CS::Animation::iSkeletonFSMNodeFactory> factnode;
 
     const char* name = node->GetAttributeValue ("name");
     factnode = packet->CreateFSMNode (name);
@@ -661,7 +661,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
             {
             case XMLTOKEN_NODE:
               {
-                csRef<CS::Animation::iSkeletonAnimNodeFactory2> node =
+                csRef<CS::Animation::iSkeletonAnimNodeFactory> node =
                   ParseAnimTreeNode (child, packet);
 
                 factnode->SetStateNode (stateID, node);
@@ -698,7 +698,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
             xmltokens.Request (XMLTOKEN_NODE));
           if (nodedoc)
           {
-            csRef<CS::Animation::iSkeletonAnimNodeFactory2> node =
+            csRef<CS::Animation::iSkeletonAnimNodeFactory> node =
               ParseAnimTreeNode (nodedoc, packet);
 
             factnode->SetStateTransition (fromState, toState, node);
@@ -729,7 +729,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       factnode->SetStartState (start);
     }
 
-    return csPtr<CS::Animation::iSkeletonAnimNodeFactory2> (factnode);
+    return csPtr<CS::Animation::iSkeletonAnimNodeFactory> (factnode);
   }
 
 }

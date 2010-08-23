@@ -318,11 +318,11 @@ void Simple::CreateRoom ()
   mw1->SetRenderPriority (engine->GetRenderPriority ("alpha"));
 
   /// Lightning 2
-  csRef<iMeshObjectFactory> LightningObjectFactory2 = type->NewFactory();
-  csRef<iLightningFactoryState> LightningFactoryState2 = scfQueryInterface<iLightningFactoryState> (LightningObjectFactory2);
+  csRef<iMeshObjectFactory> LightningObjectFactory = type->NewFactory();
+  csRef<iLightningFactoryState> LightningFactoryState2 = scfQueryInterface<iLightningFactoryState> (LightningObjectFactory);
 
-  LightningObjectFactory2->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
-  LightningObjectFactory2->SetMixMode(CS_FX_ADD);
+  LightningObjectFactory->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
+  LightningObjectFactory->SetMixMode(CS_FX_ADD);
   LightningFactoryState2->SetOrigin(csVector3(0, 0, 0));
   LightningFactoryState2->SetPointCount(60);
   LightningFactoryState2->SetLength(5);
@@ -331,7 +331,7 @@ void Simple::CreateRoom ()
   LightningFactoryState2->SetUpdateInterval(50);
   LightningFactoryState2->SetDirectional(csVector3(0, 1, 0));  
 
-  csRef<iMeshObject> mesh2 = LightningObjectFactory2->NewInstance();    
+  csRef<iMeshObject> mesh2 = LightningObjectFactory->NewInstance();    
   csRef<iMeshWrapper> mw2 = engine->CreateMeshWrapper(mesh2, "lightning2", room, csVector3(0, 3, 4));
   mw2->SetRenderPriority (engine->GetRenderPriority ("alpha"));
 

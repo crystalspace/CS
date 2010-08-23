@@ -277,7 +277,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
         {
           if (!skelMgr)
           {
-            skelMgr = csQueryRegistry<CS::Animation::iSkeletonManager2> (object_reg);
+            skelMgr = csQueryRegistry<CS::Animation::iSkeletonManager> (object_reg);
 
             if (!skelMgr)
             {
@@ -287,7 +287,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           }
           
           const char* skelName = child->GetContentsValue ();
-          CS::Animation::iSkeletonFactory2* skelFact = skelMgr->FindSkeletonFactory (skelName);
+          CS::Animation::iSkeletonFactory* skelFact = skelMgr->FindSkeletonFactory (skelName);
           if (!skelFact)
           {
             synldr->ReportError (msgidFactory, child, "Could not find skeleton %s", skelName);
@@ -303,7 +303,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	break;
       case XMLTOKEN_SOCKET:
         {
-	  CS::Animation::iSkeletonFactory2* skelFact = amfact->GetSkeletonFactory ();
+	  CS::Animation::iSkeletonFactory* skelFact = amfact->GetSkeletonFactory ();
           if (!skelFact)
           {
             synldr->ReportError (msgidFactory, child, "No skeleton defined while creating socket");
@@ -502,7 +502,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
         {
           if (!skelMgr)
           {
-            skelMgr = csQueryRegistry<CS::Animation::iSkeletonManager2> (object_reg);
+            skelMgr = csQueryRegistry<CS::Animation::iSkeletonManager> (object_reg);
 
             if (!skelMgr)
             {
@@ -512,14 +512,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           }      
 
           const char* skelName = child->GetContentsValue ();
-          CS::Animation::iSkeletonFactory2* skelFact = skelMgr->FindSkeletonFactory (skelName);
+          CS::Animation::iSkeletonFactory* skelFact = skelMgr->FindSkeletonFactory (skelName);
           if (!skelFact)
           {
             synldr->ReportError (msgid, child, "Could not find skeleton %s", skelName);
             return 0;
           }
 
-          csRef<CS::Animation::iSkeleton2> skeleton = skelFact->CreateSkeleton ();
+          csRef<CS::Animation::iSkeleton> skeleton = skelFact->CreateSkeleton ();
           ammesh->SetSkeleton (skeleton);
         }
         break;
@@ -527,7 +527,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
         {
           if (!skelMgr)
           {
-            skelMgr = csQueryRegistry<CS::Animation::iSkeletonManager2> (object_reg);
+            skelMgr = csQueryRegistry<CS::Animation::iSkeletonManager> (object_reg);
 
             if (!skelMgr)
             {
@@ -536,7 +536,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
             }
           }
 
-          CS::Animation::iSkeleton2* skeleton = ammesh->GetSkeleton ();
+          CS::Animation::iSkeleton* skeleton = ammesh->GetSkeleton ();
           if (!skeleton)
           {
             synldr->ReportError (msgid, child, "Mesh does not have a skeleton");
@@ -544,14 +544,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           }
 
           const char* packetName = child->GetContentsValue ();
-          CS::Animation::iSkeletonAnimPacketFactory2* packetFact = skelMgr->FindAnimPacketFactory (packetName);
+          CS::Animation::iSkeletonAnimPacketFactory* packetFact = skelMgr->FindAnimPacketFactory (packetName);
           if (!packetFact)
           {
             synldr->ReportError (msgid, child, "Could not find animation packet %s", packetName);
             return 0;
           }
 
-          csRef<CS::Animation::iSkeletonAnimPacket2> packet = packetFact->CreateInstance (skeleton);
+          csRef<CS::Animation::iSkeletonAnimPacket> packet = packetFact->CreateInstance (skeleton);
           skeleton->SetAnimationPacket (packet);
         }
         break;

@@ -107,15 +107,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
       return false;
     }
 
-    csRef<CS::Animation::iSkeletonManager2> skeletonManager =
-      csQueryRegistry<CS::Animation::iSkeletonManager2> (object_reg);
+    csRef<CS::Animation::iSkeletonManager> skeletonManager =
+      csQueryRegistry<CS::Animation::iSkeletonManager> (object_reg);
     if (!skeletonManager)
     {
       synldr->ReportError (msgid, node, "No animesh skeleton manager");
       return false;
     }
 
-    CS::Animation::iSkeletonFactory2* skeletonFactory =
+    CS::Animation::iSkeletonFactory* skeletonFactory =
       skeletonManager->FindSkeletonFactory (factoryName);
     if (!skeletonFactory)
     {

@@ -35,18 +35,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 {
 
   class IKPhysicalManager : public scfImplementation2<IKPhysicalManager,
-    CS::Animation::iSkeletonIKManager2, iComponent>
+    CS::Animation::iSkeletonIKManager, iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(IKPhysicalManager);
 
     IKPhysicalManager (iBase* parent);
 
-    //-- CS::Animation::iSkeletonIKManager2
-    virtual CS::Animation::iSkeletonIKNodeFactory2* CreateAnimNodeFactory
+    //-- CS::Animation::iSkeletonIKManager
+    virtual CS::Animation::iSkeletonIKNodeFactory* CreateAnimNodeFactory
       (const char *name, CS::Animation::iBodySkeleton* skeleton);
 
-    virtual CS::Animation::iSkeletonIKNodeFactory2* FindAnimNodeFactory (const char* name) const;
+    virtual CS::Animation::iSkeletonIKNodeFactory* FindAnimNodeFactory (const char* name) const;
     virtual void ClearAnimNodeFactories ();
 
     //-- iComponent
@@ -57,7 +57,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 
   private:
     iObjectRegistry* object_reg;
-    csHash<csRef<CS::Animation::iSkeletonIKNodeFactory2>, csString> factoryHash;
+    csHash<csRef<CS::Animation::iSkeletonIKNodeFactory>, csString> factoryHash;
 
     friend class IKPhysicalAnimNodeFactory;
     friend class IKPhysicalAnimNode;
@@ -72,9 +72,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 
   class IKPhysicalAnimNodeFactory : public scfImplementation3
     <IKPhysicalAnimNodeFactory,
-    scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory2>,
-    scfFakeInterface<CS::Animation::iSkeletonIKNodeFactory2>,
-    CS::Animation::iSkeletonIKPhysicalNodeFactory2>
+    scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
+    scfFakeInterface<CS::Animation::iSkeletonIKNodeFactory>,
+    CS::Animation::iSkeletonIKPhysicalNodeFactory>
   {
     friend class IKPhysicalAnimNode;
 
@@ -84,23 +84,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     IKPhysicalAnimNodeFactory (IKPhysicalManager* manager, const char *name,
 			       CS::Animation::iBodySkeleton* skeleton);
 
-    //-- CS::Animation::iSkeletonAnimNodeFactory2
-    virtual csPtr<CS::Animation::iSkeletonAnimNode2> CreateInstance
-      (CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton);
+    //-- CS::Animation::iSkeletonAnimNodeFactory
+    virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance
+      (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
 
     virtual const char* GetNodeName () const;
 
-    virtual CS::Animation::iSkeletonAnimNodeFactory2* FindNode (const char* name);
+    virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
 
-    //-- CS::Animation::iSkeletonIKNodeFactory2
+    //-- CS::Animation::iSkeletonIKNodeFactory
     virtual CS::Animation::EffectorID AddEffector (CS::Animation::iBodyChain* chain,
 						   CS::Animation::BoneID bone,
 						   csOrthoTransform& transform);
     virtual void RemoveEffector (CS::Animation::EffectorID effector);
 
-    //-- CS::Animation::iSkeletonIKPhysicalNodeFactory2
-    virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory2* node);
-    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetChildNode () const;
+    //-- CS::Animation::iSkeletonIKPhysicalNodeFactory
+    virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node);
+    virtual CS::Animation::iSkeletonAnimNodeFactory* GetChildNode () const;
     virtual void ClearChildNode ();
 
     virtual void SetChainAutoReset (bool reset);
@@ -110,7 +110,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     IKPhysicalManager* manager;
     csString name;
     csRef<CS::Animation::iBodySkeleton> bodySkeleton;
-    csRef<CS::Animation::iSkeletonAnimNodeFactory2> childNode;
+    csRef<CS::Animation::iSkeletonAnimNodeFactory> childNode;
     csHash<EffectorData, CS::Animation::EffectorID> effectors;
     CS::Animation::EffectorID maxEffectorID;
     bool resetChain;
@@ -118,23 +118,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 
   class IKPhysicalAnimNode : public scfImplementation3
     <IKPhysicalAnimNode,
-    scfFakeInterface<CS::Animation::iSkeletonAnimNode2>,
-    scfFakeInterface<CS::Animation::iSkeletonIKNode2>,
-    CS::Animation::iSkeletonIKPhysicalNode2>
+    scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
+    scfFakeInterface<CS::Animation::iSkeletonIKNode>,
+    CS::Animation::iSkeletonIKPhysicalNode>
   {
   public:
     CS_LEAKGUARD_DECLARE(IKPhysicalAnimNode);
 
     IKPhysicalAnimNode (IKPhysicalAnimNodeFactory* factory,
-			CS::Animation::iSkeleton2* skeleton,
-			CS::Animation::iSkeletonAnimNode2* childNode);
+			CS::Animation::iSkeleton* skeleton,
+			CS::Animation::iSkeletonAnimNode* childNode);
     ~IKPhysicalAnimNode ();
 
-    //-- CS::Animation::iSkeletonIKPhysicalNode2
-    virtual void SetRagdollNode (CS::Animation::iSkeletonRagdollNode2* ragdollNode);
-    virtual CS::Animation::iSkeletonRagdollNode2* GetRagdollNode () const;
+    //-- CS::Animation::iSkeletonIKPhysicalNode
+    virtual void SetRagdollNode (CS::Animation::iSkeletonRagdollNode* ragdollNode);
+    virtual CS::Animation::iSkeletonRagdollNode* GetRagdollNode () const;
 
-    //-- CS::Animation::iSkeletonIKNode2
+    //-- CS::Animation::iSkeletonIKNode
     virtual void AddConstraint (CS::Animation::EffectorID effector,
 				csOrthoTransform& transform);
     virtual void AddConstraint (CS::Animation::EffectorID effector,
@@ -144,7 +144,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 
     virtual void RemoveConstraint (CS::Animation::EffectorID effector);
 
-    //-- CS::Animation::iSkeletonAnimPacket2
+    //-- CS::Animation::iSkeletonAnimPacket
     virtual void Play ();
 
     virtual void Stop ();
@@ -159,20 +159,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 
     virtual float GetPlaybackSpeed () const;
 
-    virtual void BlendState (CS::Animation::csSkeletalState2* state,
+    virtual void BlendState (CS::Animation::csSkeletalState* state,
 			     float baseWeight = 1.0f);
 
     virtual void TickAnimation (float dt);
 
     virtual bool IsActive () const;
 
-    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetFactory () const;
+    virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
 
-    virtual CS::Animation::iSkeletonAnimNode2* FindNode (const char* name);
+    virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
 
-    virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
+    virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback);
 
-    virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback2* callback);
+    virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback);
 
   private:
     enum ConstraintType
@@ -198,9 +198,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
   private:
     IKPhysicalAnimNodeFactory* factory;
     csWeakRef<iSceneNode> sceneNode;
-    csWeakRef<CS::Animation::iSkeleton2> skeleton;
-    csRef<CS::Animation::iSkeletonAnimNode2> childNode;
-    csWeakRef<CS::Animation::iSkeletonRagdollNode2> ragdollNode;
+    csWeakRef<CS::Animation::iSkeleton> skeleton;
+    csRef<CS::Animation::iSkeletonAnimNode> childNode;
+    csWeakRef<CS::Animation::iSkeletonRagdollNode> ragdollNode;
     bool isActive;
 
     csHash<ConstraintData, CS::Animation::EffectorID> constraints;

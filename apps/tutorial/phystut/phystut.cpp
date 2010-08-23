@@ -775,7 +775,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug",
 		       CS::Debug::iDynamicsDebuggerManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll",
-		       CS::Animation::iSkeletonRagdollManager2),
+		       CS::Animation::iSkeletonRagdollManager),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -899,7 +899,7 @@ bool Simple::Application ()
     return ReportError ("Failed to locate dynamic's debug manager!");
 
   ragdollManager =
-    csQueryRegistry<CS::Animation::iSkeletonRagdollManager2> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonRagdollManager> (GetObjectRegistry ());
   if (!ragdollManager)
     return ReportError ("Failed to locate ragdoll manager!");
 
@@ -1635,7 +1635,7 @@ void Simple::LoadRagdoll ()
      animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"), 0);
 
   // Create ragdoll animation node factory
-  csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollFactory =
+  csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll",
 					   bodySkeleton, dynamicSystem);
   ragdollFactory->AddBodyChain (chain, CS::Animation::STATE_DYNAMIC);
@@ -1678,11 +1678,11 @@ void Simple::SpawnRagdoll ()
                   tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
 
   // Start the ragdoll anim node
-  CS::Animation::iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
+  CS::Animation::iSkeletonAnimNode* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
     GetAnimationRoot ();
 
-  csRef<CS::Animation::iSkeletonRagdollNode2> ragdoll =
-    scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode2> (root);
+  csRef<CS::Animation::iSkeletonRagdollNode> ragdoll =
+    scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode> (root);
 
   // Fling the body.
   // (start the ragdoll node before so that the rigid bodies are created)

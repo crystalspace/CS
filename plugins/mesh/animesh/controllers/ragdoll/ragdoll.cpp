@@ -50,16 +50,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   {
   }
 
-  CS::Animation::iSkeletonRagdollNodeFactory2* RagdollManager::CreateAnimNodeFactory
+  CS::Animation::iSkeletonRagdollNodeFactory* RagdollManager::CreateAnimNodeFactory
     (const char *name, CS::Animation::iBodySkeleton* skeleton, iDynamicSystem* dynSys)
   {
-    csRef<CS::Animation::iSkeletonRagdollNodeFactory2> newFact;
+    csRef<CS::Animation::iSkeletonRagdollNodeFactory> newFact;
     newFact.AttachNew (new RagdollAnimNodeFactory (this, name, skeleton, dynSys));
 
     return factoryHash.PutUnique (name, newFact);
   }
 
-  CS::Animation::iSkeletonRagdollNodeFactory2* RagdollManager::FindAnimNodeFactory
+  CS::Animation::iSkeletonRagdollNodeFactory* RagdollManager::FindAnimNodeFactory
     (const char* name) const
   {
     return factoryHash.Get (name, 0);
@@ -107,16 +107,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   {
   }
 
-  csPtr<CS::Animation::iSkeletonAnimNode2> RagdollAnimNodeFactory::CreateInstance (
-               CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton)
+  csPtr<CS::Animation::iSkeletonAnimNode> RagdollAnimNodeFactory::CreateInstance (
+               CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton)
   {
-    csRef<CS::Animation::iSkeletonAnimNode2> child;
+    csRef<CS::Animation::iSkeletonAnimNode> child;
     if (childNode)
       child = childNode->CreateInstance (packet, skeleton);
 
-    csRef<CS::Animation::iSkeletonAnimNode2> newP;
+    csRef<CS::Animation::iSkeletonAnimNode> newP;
     newP.AttachNew (new RagdollAnimNode (this, skeleton, child));
-    return csPtr<CS::Animation::iSkeletonAnimNode2> (newP);
+    return csPtr<CS::Animation::iSkeletonAnimNode> (newP);
   }
 
   const char* RagdollAnimNodeFactory::GetNodeName () const
@@ -124,7 +124,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     return name;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory2* RagdollAnimNodeFactory::FindNode
+  CS::Animation::iSkeletonAnimNodeFactory* RagdollAnimNodeFactory::FindNode
     (const char* name)
   {
     if (this->name == name)
@@ -150,12 +150,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     chains.DeleteAll (chain->GetName ());
   }
 
-  void RagdollAnimNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory2* node)
+  void RagdollAnimNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node)
   {
     childNode = node;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory2* RagdollAnimNodeFactory::GetChildNode ()
+  CS::Animation::iSkeletonAnimNodeFactory* RagdollAnimNodeFactory::GetChildNode ()
   {
     return childNode;
   }
@@ -177,8 +177,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   CS_LEAKGUARD_IMPLEMENT(RagdollAnimNode);
 
   RagdollAnimNode::RagdollAnimNode (RagdollAnimNodeFactory* factory, 
-				    CS::Animation::iSkeleton2* skeleton,
-				    CS::Animation::iSkeletonAnimNode2* childNode)
+				    CS::Animation::iSkeleton* skeleton,
+				    CS::Animation::iSkeletonAnimNode* childNode)
     : scfImplementationType (this), factory (factory), sceneNode (nullptr), skeleton (skeleton),
     childNode (childNode), isActive (false), maxBoneID (0)
   {
@@ -447,7 +447,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     return 1.0;
   }
 
-  void RagdollAnimNode::BlendState (CS::Animation::csSkeletalState2* state, float baseWeight)
+  void RagdollAnimNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
   {
     // TODO: use baseWeight
 
@@ -507,6 +507,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 	csOrthoTransform newTransform = boneTransform.GetInverse () * bodyTransform;
 
 	// apply the new transform to the iMovable of the animesh
+	// TODO: this does not handle the case where the iMovable has a parent
+	// -> implement iMovable::SetFullTransform() ?
 	iMovable* movable = sceneNode->GetMovable ();
 	movable->SetTransform (newTransform);
 	movable->UpdateMove ();
@@ -529,7 +531,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 	csReversibleTransform relativeTransform =
 	  bodyTransform * parentTransform.GetInverse ();
 
-	// apply the new transform to the CS::Animation::csSkeletalState2
+	// apply the new transform to the CS::Animation::csSkeletalState
 	state->SetBoneUsed (boneData.boneID);
 	state->GetVector (boneData.boneID) = relativeTransform.GetOrigin () - skeletonOffset;
 	csQuaternion quaternion;
@@ -561,12 +563,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     return isActive;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory2* RagdollAnimNode::GetFactory () const
+  CS::Animation::iSkeletonAnimNodeFactory* RagdollAnimNode::GetFactory () const
   {
     return factory;
   }
 
-  CS::Animation::iSkeletonAnimNode2* RagdollAnimNode::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNode* RagdollAnimNode::FindNode (const char* name)
   {
     if (factory->name == name)
       return this;
@@ -578,13 +580,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   }
 
   void RagdollAnimNode::AddAnimationCallback
-    (CS::Animation::iSkeletonAnimCallback2* callback)
+    (CS::Animation::iSkeletonAnimCallback* callback)
   {
     // TODO
   }
 
   void RagdollAnimNode::RemoveAnimationCallback
-    (CS::Animation::iSkeletonAnimCallback2* callback)
+    (CS::Animation::iSkeletonAnimCallback* callback)
   {
     // TODO
   }
@@ -637,7 +639,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       skeleton->GetTransformAbsSpace (boneData->boneID, rotation, offset);
       // TODO: we shouldn't have to use the conjugate of the quaternion, isn't it?
       csOrthoTransform boneTransform (csMatrix3 (rotation.GetConjugate ()), offset);
-      csOrthoTransform animeshTransform = sceneNode->GetMovable ()->GetTransform ();
+      csOrthoTransform animeshTransform = sceneNode->GetMovable ()->GetFullTransform ();
       csOrthoTransform bodyTransform = boneTransform * animeshTransform;
       boneData->rigidBody->SetTransform (bodyTransform);
 
@@ -759,7 +761,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 	csVector3 offset;
 	skeleton->GetTransformAbsSpace (boneData->boneID, rotation, offset);
 	csOrthoTransform boneTransform (csMatrix3 (rotation.GetConjugate ()), offset);
-	csOrthoTransform animeshTransform = sceneNode->GetMovable ()->GetTransform ();
+	csOrthoTransform animeshTransform = sceneNode->GetMovable ()->GetFullTransform ();
 	csOrthoTransform bodyTransform = boneTransform * animeshTransform;
 	boneData->rigidBody->SetTransform (bodyTransform);
 
@@ -888,7 +890,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 					boneOffset);
 
       bodyTransform = bodyTransform * parentTransform
-	* sceneNode->GetMovable ()->GetTransform ();
+	* sceneNode->GetMovable ()->GetFullTransform ();
     }
 
     // apply the transform to the rigid body
@@ -925,7 +927,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     transform.SetO2T (csMatrix3 (boneRotation.GetConjugate ()));
     transform.SetOrigin (boneOffset);
     csOrthoTransform animeshTransform =
-      ragdollNode->sceneNode->GetMovable ()->GetTransform ();
+      ragdollNode->sceneNode->GetMovable ()->GetFullTransform ();
     transform = transform * animeshTransform;
   }
 

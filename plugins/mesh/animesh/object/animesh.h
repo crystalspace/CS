@@ -100,8 +100,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     virtual void Invalidate ();
 
-    virtual void SetSkeletonFactory (CS::Animation::iSkeletonFactory2* skeletonFactory);
-    virtual CS::Animation::iSkeletonFactory2* GetSkeletonFactory () const;
+    virtual void SetSkeletonFactory (CS::Animation::iSkeletonFactory* skeletonFactory);
+    virtual CS::Animation::iSkeletonFactory* GetSkeletonFactory () const;
     virtual void SetBoneInfluencesPerVertex (uint num);
     virtual uint GetBoneInfluencesPerVertex () const;
     virtual CS::Mesh::csAnimatedMeshBoneInfluence* GetBoneInfluences ();
@@ -171,7 +171,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRef<iRenderBuffer> masterBWBuffer;
     csRef<iRenderBuffer> boneWeightAndIndexBuffer[2];
 
-    csRef<CS::Animation::iSkeletonFactory2> skeletonFactory;
+    csRef<CS::Animation::iSkeletonFactory> skeletonFactory;
 
     // Submeshes
     csRefArray<FactorySubmesh> submeshes;
@@ -298,8 +298,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     AnimeshObject (AnimeshObjectFactory* factory);
 
     //-- CS::Mesh::iAnimatedMesh
-    virtual void SetSkeleton (CS::Animation::iSkeleton2* skeleton);
-    virtual CS::Animation::iSkeleton2* GetSkeleton () const;
+    virtual void SetSkeleton (CS::Animation::iSkeleton* skeleton);
+    virtual CS::Animation::iSkeleton* GetSkeleton () const;
 
     virtual CS::Mesh::iAnimatedMeshSubMesh* GetSubMesh (size_t index) const;
     virtual size_t GetSubMeshCount () const;
@@ -493,13 +493,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     uint mixMode;
     csFlags meshObjectFlags;
 
-    csRef<CS::Animation::iSkeleton2> skeleton;
+    csRef<CS::Animation::iSkeleton> skeleton;
     unsigned int skeletonVersion;
     csTicks lastTick;
 
     // Hold the bone transforms
     csRef<csShaderVariable> boneTransformArray;
-    csRef<CS::Animation::csSkeletalState2> lastSkeletonState;
+    csRef<CS::Animation::csSkeletalState> lastSkeletonState;
 
     csRenderMeshHolder rmHolder;
     csDirtyAccessArray<CS::Graphics::RenderMesh*> renderMeshList;

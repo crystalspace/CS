@@ -47,14 +47,14 @@ Player::Player(iObjectRegistry* obj_reg) : Entity(obj_reg)
     if (animesh)
     {
       // Start the root animation node
-      CS::Animation::iSkeletonAnimNode2* rootNode =
+      CS::Animation::iSkeletonAnimNode* rootNode =
 	animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
       rootNode->Play ();
 
       // Find the pointer to the FSM animation node
-      weapon->fsmNode = (CS::Animation::iSkeletonFSMNode2*) rootNode->FindNode ("fsm");
+      weapon->fsmNode = (CS::Animation::iSkeletonFSMNode*) rootNode->FindNode ("fsm");
       weapon->fsmNodeFactory =
-	weapon->fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory2*) weapon->fsmNode->GetFactory () : 0;
+	weapon->fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory*) weapon->fsmNode->GetFactory () : 0;
     }
 
     weapon->mesh->SetFlagsRecursive(CS_ENTITY_NOHITBEAM);

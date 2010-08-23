@@ -367,12 +367,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  void AnimeshObjectFactory::SetSkeletonFactory (CS::Animation::iSkeletonFactory2* skeletonFactory)
+  void AnimeshObjectFactory::SetSkeletonFactory (CS::Animation::iSkeletonFactory* skeletonFactory)
   {
     this->skeletonFactory = skeletonFactory;
   }
 
-  CS::Animation::iSkeletonFactory2* AnimeshObjectFactory::GetSkeletonFactory () const
+  CS::Animation::iSkeletonFactory* AnimeshObjectFactory::GetSkeletonFactory () const
   {
     return skeletonFactory;
   }
@@ -655,7 +655,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  void AnimeshObject::SetSkeleton (CS::Animation::iSkeleton2* newskel)
+  void AnimeshObject::SetSkeleton (CS::Animation::iSkeleton* newskel)
   {
     skeleton = newskel;
     if (skeleton)
@@ -669,7 +669,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  CS::Animation::iSkeleton2* AnimeshObject::GetSkeleton () const
+  CS::Animation::iSkeleton* AnimeshObject::GetSkeleton () const
   {
     return skeleton;
   }

@@ -1622,17 +1622,17 @@ bool CommandHandler (const char *cmd, const char *arg)
 	    Sys->views->GetCamera ()->GetSector (),
 	    Sys->views->GetCamera ()->GetTransform ().GetOrigin ());
       csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (sprite->GetMeshObject ());
-      CS::Animation::iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
-      csRef<CS::Animation::iSkeletonAnimNode2> anim;
+      CS::Animation::iSkeletonAnimNode* root = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+      csRef<CS::Animation::iSkeletonAnimNode> anim;
        
       if (root)
       {
         anim = root->FindNode("standard");
 
-        csRef<CS::Animation::iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode2> (anim);
+        csRef<CS::Animation::iSkeletonFSMNode> fsm = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode> (anim);
         if (fsm)
         {
-          csRef<CS::Animation::iSkeletonFSMNodeFactory2> fsmfact = scfQueryInterface<CS::Animation::iSkeletonFSMNodeFactory2>(anim->GetFactory());
+          csRef<CS::Animation::iSkeletonFSMNodeFactory> fsmfact = scfQueryInterface<CS::Animation::iSkeletonFSMNodeFactory>(anim->GetFactory());
           CS::Animation::StateID wanted_state = fsmfact->FindState("walk");
           if (wanted_state != CS::Animation::InvalidStateID)            
             fsm->SwitchToState(wanted_state);
@@ -1981,11 +1981,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (!animesh)
       return true;
   
-    csRef<CS::Animation::iSkeleton2> skel = animesh->GetSkeleton ();
+    csRef<CS::Animation::iSkeleton> skel = animesh->GetSkeleton ();
     if (!skel)
       return true;
 
-    csRef<CS::Animation::iSkeletonAnimNode2> node = skel->GetAnimationPacket ()->GetAnimationRoot ();
+    csRef<CS::Animation::iSkeletonAnimNode> node = skel->GetAnimationPacket ()->GetAnimationRoot ();
     if (!node)
       return true;
 
@@ -2003,7 +2003,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else if (!csStrCaseCmp (action, "state"))
     {
-      csRef<CS::Animation::iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode2> (node);
+      csRef<CS::Animation::iSkeletonFSMNode> fsm = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode> (node);
       if (!fsm)
         return true;
 

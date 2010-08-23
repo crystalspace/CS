@@ -38,7 +38,7 @@ namespace CS
 namespace Animation
 {
 
-struct iSkeletonFactory2;
+struct iSkeletonFactory;
 struct iBodySkeleton;
 struct iBodyBone;
 struct iBodyChain;
@@ -58,7 +58,7 @@ struct iBodyManager : public virtual iBase
    * Create a new body skeleton with the specified name.
    */
   virtual iBodySkeleton* CreateBodySkeleton
-    (const char *name, iSkeletonFactory2* skeletonFactory) = 0;
+    (const char *name, iSkeletonFactory* skeletonFactory) = 0;
 
   /**
    * Find a body skeleton from its name.
@@ -89,7 +89,7 @@ struct iBodySkeleton : public virtual iBase
   /**
    * Get the skeleton factory associated with this body skeleton.
    */
-  virtual iSkeletonFactory2* GetSkeletonFactory () const = 0;
+  virtual iSkeletonFactory* GetSkeletonFactory () const = 0;
 
   /**
    * Delete all body bones and all body chains.

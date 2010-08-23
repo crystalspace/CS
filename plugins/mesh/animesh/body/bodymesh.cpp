@@ -43,7 +43,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   }
 
   CS::Animation::iBodySkeleton* BodyManager::CreateBodySkeleton (const char *name,
-			            CS::Animation::iSkeletonFactory2* skeletonFactory)
+			            CS::Animation::iSkeletonFactory* skeletonFactory)
   {
     // Check name uniqueness
     csRef<CS::Animation::iBodySkeleton> newFact;
@@ -92,7 +92,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   CS_LEAKGUARD_IMPLEMENT(BodySkeleton);
 
   BodySkeleton::BodySkeleton (const char* name, BodyManager* manager,
-			      CS::Animation::iSkeletonFactory2* skeletonFactory)
+			      CS::Animation::iSkeletonFactory* skeletonFactory)
     : scfImplementationType (this), name (name), manager (manager),
     skeletonFactory (skeletonFactory)
   {
@@ -103,7 +103,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return name;
   }
 
-  CS::Animation::iSkeletonFactory2* BodySkeleton::GetSkeletonFactory () const
+  CS::Animation::iSkeletonFactory* BodySkeleton::GetSkeletonFactory () const
   {
     return skeletonFactory;
   }

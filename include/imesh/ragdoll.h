@@ -47,26 +47,26 @@ namespace CS
 namespace Animation
 {
 
-struct iSkeletonRagdollNodeFactory2;
+struct iSkeletonRagdollNodeFactory;
 
 /**
  * A class to manage the creation and deletion of ragdoll animation 
  * node factories.
  */
-struct iSkeletonRagdollManager2 : public virtual iBase
+struct iSkeletonRagdollManager : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRagdollManager2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonRagdollManager, 1, 0, 0);
 
   /**
    * Create a new ragdoll animation node factory.
    */
-  virtual iSkeletonRagdollNodeFactory2* CreateAnimNodeFactory (const char *name,
+  virtual iSkeletonRagdollNodeFactory* CreateAnimNodeFactory (const char *name,
 		  iBodySkeleton* skeleton, iDynamicSystem* dynSys) = 0;
 
   /**
    * Find the ragdoll animation node factory with the given name.
    */
-  virtual iSkeletonRagdollNodeFactory2* FindAnimNodeFactory
+  virtual iSkeletonRagdollNodeFactory* FindAnimNodeFactory
     (const char* name) const = 0;
 
   /**
@@ -91,9 +91,9 @@ enum RagdollState
 /**
  * Factory for the ragdoll animation node.
  */
-struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
+struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeFactory2, 1, 0, 2);
+  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeFactory, 1, 0, 2);
 
   /**
    * Add a new body chain to the ragdoll animation node. Adding more than 
@@ -119,12 +119,12 @@ struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
    * will be read from the child node, while the bones in state
    * CS::Animation::STATE_DYNAMIC will be overwriten by this node.
    */
-  virtual void SetChildNode (iSkeletonAnimNodeFactory2* node) = 0;
+  virtual void SetChildNode (iSkeletonAnimNodeFactory* node) = 0;
 
   /**
    * Return the child animation node of this node.
    */
-  virtual iSkeletonAnimNodeFactory2* GetChildNode () = 0;
+  virtual iSkeletonAnimNodeFactory* GetChildNode () = 0;
 
   /**
    * Clear the child animation node of this node.
@@ -142,9 +142,9 @@ struct iSkeletonRagdollNodeFactory2 : public iSkeletonAnimNodeFactory2
  * control the animation of the animated mesh, and/or in order to make the mesh
  * collide with the rigid bodies of the simulation.
  */
-struct iSkeletonRagdollNode2 : public iSkeletonAnimNode2
+struct iSkeletonRagdollNode : public iSkeletonAnimNode
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNode2, 1, 0, 1);
+  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNode, 1, 0, 1);
 
   /**
    * Set the body chain in the specified physical state.

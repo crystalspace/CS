@@ -41,7 +41,7 @@ namespace CS
 namespace Animation
 {
 
-struct iSkeletonAnimNode2;
+struct iSkeletonAnimNode;
 
 } // namespace Animation
 } // namespace CS
@@ -55,7 +55,7 @@ private:
   bool reverseAction;
 
 private:
-  bool HandleSkel2Node (const char* animName, CS::Animation::iSkeletonAnimNode2* node, bool start);
+  bool HandleSkel2Node (const char* animName, CS::Animation::iSkeletonAnimNode* node, bool start);
 
 public:
   static bool Support(iMeshWrapper* mesh);
