@@ -15712,19 +15712,31 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonManager2 ##############
+############# Class : cspace::iSkeletonManager ##############
 
-package cspace::iSkeletonManager2;
+package cspace::iSkeletonManager;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
-*CreateSkeletonFactory = *cspacec::iSkeletonManager2_CreateSkeletonFactory;
-*FindSkeletonFactory = *cspacec::iSkeletonManager2_FindSkeletonFactory;
-*ClearSkeletonFactories = *cspacec::iSkeletonManager2_ClearSkeletonFactories;
-*CreateAnimPacketFactory = *cspacec::iSkeletonManager2_CreateAnimPacketFactory;
-*FindAnimPacketFactory = *cspacec::iSkeletonManager2_FindAnimPacketFactory;
-*ClearAnimPacketFactories = *cspacec::iSkeletonManager2_ClearAnimPacketFactories;
-*ClearAll = *cspacec::iSkeletonManager2_ClearAll;
+%ITERATORS = ();
+*CreateSkeletonFactory = *cspacec::iSkeletonManager_CreateSkeletonFactory;
+*FindSkeletonFactory = *cspacec::iSkeletonManager_FindSkeletonFactory;
+*ClearSkeletonFactories = *cspacec::iSkeletonManager_ClearSkeletonFactories;
+*CreateAnimPacketFactory = *cspacec::iSkeletonManager_CreateAnimPacketFactory;
+*FindAnimPacketFactory = *cspacec::iSkeletonManager_FindAnimPacketFactory;
+*ClearAnimPacketFactories = *cspacec::iSkeletonManager_ClearAnimPacketFactories;
+*ClearAll = *cspacec::iSkeletonManager_ClearAll;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonManager($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -15738,87 +15750,16 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonFactory2 ##############
+############# Class : cspace::csSkeletalState ##############
 
-package cspace::iSkeletonFactory2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-*CreateBone = *cspacec::iSkeletonFactory2_CreateBone;
-*FindBone = *cspacec::iSkeletonFactory2_FindBone;
-*RemoveBone = *cspacec::iSkeletonFactory2_RemoveBone;
-*GetBoneParent = *cspacec::iSkeletonFactory2_GetBoneParent;
-*HasBone = *cspacec::iSkeletonFactory2_HasBone;
-*SetBoneName = *cspacec::iSkeletonFactory2_SetBoneName;
-*GetBoneName = *cspacec::iSkeletonFactory2_GetBoneName;
-*GetTopBoneID = *cspacec::iSkeletonFactory2_GetTopBoneID;
-*GetTransformBoneSpace = *cspacec::iSkeletonFactory2_GetTransformBoneSpace;
-*SetTransformBoneSpace = *cspacec::iSkeletonFactory2_SetTransformBoneSpace;
-*GetTransformAbsSpace = *cspacec::iSkeletonFactory2_GetTransformAbsSpace;
-*SetTransformAbsSpace = *cspacec::iSkeletonFactory2_SetTransformAbsSpace;
-*CreateSkeleton = *cspacec::iSkeletonFactory2_CreateSkeleton;
-*GetAnimationPacket = *cspacec::iSkeletonFactory2_GetAnimationPacket;
-*SetAnimationPacket = *cspacec::iSkeletonFactory2_SetAnimationPacket;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeleton2 ##############
-
-package cspace::iSkeleton2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-*GetSceneNode = *cspacec::iSkeleton2_GetSceneNode;
-*GetTransformBoneSpace = *cspacec::iSkeleton2_GetTransformBoneSpace;
-*SetTransformBoneSpace = *cspacec::iSkeleton2_SetTransformBoneSpace;
-*GetTransformAbsSpace = *cspacec::iSkeleton2_GetTransformAbsSpace;
-*SetTransformAbsSpace = *cspacec::iSkeleton2_SetTransformAbsSpace;
-*GetTransformBindSpace = *cspacec::iSkeleton2_GetTransformBindSpace;
-*SetTransformBindSpace = *cspacec::iSkeleton2_SetTransformBindSpace;
-*GetStateAbsSpace = *cspacec::iSkeleton2_GetStateAbsSpace;
-*GetStateBoneSpace = *cspacec::iSkeleton2_GetStateBoneSpace;
-*GetStateBindSpace = *cspacec::iSkeleton2_GetStateBindSpace;
-*GetFactory = *cspacec::iSkeleton2_GetFactory;
-*GetAnimationPacket = *cspacec::iSkeleton2_GetAnimationPacket;
-*SetAnimationPacket = *cspacec::iSkeleton2_SetAnimationPacket;
-*RecreateSkeleton = *cspacec::iSkeleton2_RecreateSkeleton;
-*UpdateSkeleton = *cspacec::iSkeleton2_UpdateSkeleton;
-*GetSkeletonStateVersion = *cspacec::iSkeleton2_GetSkeletonStateVersion;
-*SetAnimatedMesh = *cspacec::iSkeleton2_SetAnimatedMesh;
-*GetAnimatedMesh = *cspacec::iSkeleton2_GetAnimatedMesh;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::csSkeletalState2 ##############
-
-package cspace::csSkeletalState2;
+package cspace::csSkeletalState;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::csRefCount cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
     my $pkg = shift;
-    my $self = cspacec::new_csSkeletalState2(@_);
+    my $self = cspacec::new_csSkeletalState(@_);
     bless $self, $pkg if defined($self);
 }
 
@@ -15828,17 +15769,17 @@ sub DESTROY {
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_csSkeletalState2($self);
+        cspacec::delete_csSkeletalState($self);
         delete $OWNER{$self};
     }
 }
 
-*GetVector = *cspacec::csSkeletalState2_GetVector;
-*GetQuaternion = *cspacec::csSkeletalState2_GetQuaternion;
-*IsBoneUsed = *cspacec::csSkeletalState2_IsBoneUsed;
-*SetBoneUsed = *cspacec::csSkeletalState2_SetBoneUsed;
-*GetBoneCount = *cspacec::csSkeletalState2_GetBoneCount;
-*Setup = *cspacec::csSkeletalState2_Setup;
+*GetVector = *cspacec::csSkeletalState_GetVector;
+*GetQuaternion = *cspacec::csSkeletalState_GetQuaternion;
+*IsBoneUsed = *cspacec::csSkeletalState_IsBoneUsed;
+*SetBoneUsed = *cspacec::csSkeletalState_SetBoneUsed;
+*GetBoneCount = *cspacec::csSkeletalState_GetBoneCount;
+*Setup = *cspacec::csSkeletalState_Setup;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -15852,110 +15793,33 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonAnimPacketFactory2 ##############
+############# Class : cspace::iSkeletonAnimPacketFactory ##############
 
-package cspace::iSkeletonAnimPacketFactory2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-*CreateInstance = *cspacec::iSkeletonAnimPacketFactory2_CreateInstance;
-*CreateAnimation = *cspacec::iSkeletonAnimPacketFactory2_CreateAnimation;
-*FindAnimation = *cspacec::iSkeletonAnimPacketFactory2_FindAnimation;
-*ClearAnimations = *cspacec::iSkeletonAnimPacketFactory2_ClearAnimations;
-*GetAnimation = *cspacec::iSkeletonAnimPacketFactory2_GetAnimation;
-*GetAnimationCount = *cspacec::iSkeletonAnimPacketFactory2_GetAnimationCount;
-*SetAnimationRoot = *cspacec::iSkeletonAnimPacketFactory2_SetAnimationRoot;
-*GetAnimationRoot = *cspacec::iSkeletonAnimPacketFactory2_GetAnimationRoot;
-*CreateAnimationNode = *cspacec::iSkeletonAnimPacketFactory2_CreateAnimationNode;
-*CreateBlendNode = *cspacec::iSkeletonAnimPacketFactory2_CreateBlendNode;
-*CreatePriorityNode = *cspacec::iSkeletonAnimPacketFactory2_CreatePriorityNode;
-*CreateRandomNode = *cspacec::iSkeletonAnimPacketFactory2_CreateRandomNode;
-*CreateFSMNode = *cspacec::iSkeletonAnimPacketFactory2_CreateFSMNode;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonAnimPacket2 ##############
-
-package cspace::iSkeletonAnimPacket2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-*GetFactory = *cspacec::iSkeletonAnimPacket2_GetFactory;
-*GetAnimationRoot = *cspacec::iSkeletonAnimPacket2_GetAnimationRoot;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonAnimation2 ##############
-
-package cspace::iSkeletonAnimation2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-*GetName = *cspacec::iSkeletonAnimation2_GetName;
-*AddChannel = *cspacec::iSkeletonAnimation2_AddChannel;
-*FindChannel = *cspacec::iSkeletonAnimation2_FindChannel;
-*AddKeyFrame = *cspacec::iSkeletonAnimation2_AddKeyFrame;
-*GetKeyFrameCount = *cspacec::iSkeletonAnimation2_GetKeyFrameCount;
-*GetKeyFrame = *cspacec::iSkeletonAnimation2_GetKeyFrame;
-*GetTwoKeyFrames = *cspacec::iSkeletonAnimation2_GetTwoKeyFrames;
-*BlendState = *cspacec::iSkeletonAnimation2_BlendState;
-*GetDuration = *cspacec::iSkeletonAnimation2_GetDuration;
-*SetKeyFrame = *cspacec::iSkeletonAnimation2_SetKeyFrame;
-*SetFramesInBindSpace = *cspacec::iSkeletonAnimation2_SetFramesInBindSpace;
-*GetFramesInBindSpace = *cspacec::iSkeletonAnimation2_GetFramesInBindSpace;
-*GetChannelCount = *cspacec::iSkeletonAnimation2_GetChannelCount;
-*GetChannelBone = *cspacec::iSkeletonAnimation2_GetChannelBone;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonAnimCallback2 ##############
-
-package cspace::iSkeletonAnimCallback2;
+package cspace::iSkeletonAnimPacketFactory;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-*AnimationFinished = *cspacec::iSkeletonAnimCallback2_AnimationFinished;
-*AnimationCycled = *cspacec::iSkeletonAnimCallback2_AnimationCycled;
-*PlayStateChanged = *cspacec::iSkeletonAnimCallback2_PlayStateChanged;
-*DurationChanged = *cspacec::iSkeletonAnimCallback2_DurationChanged;
+*CreateInstance = *cspacec::iSkeletonAnimPacketFactory_CreateInstance;
+*CreateAnimation = *cspacec::iSkeletonAnimPacketFactory_CreateAnimation;
+*FindAnimation = *cspacec::iSkeletonAnimPacketFactory_FindAnimation;
+*ClearAnimations = *cspacec::iSkeletonAnimPacketFactory_ClearAnimations;
+*GetAnimation = *cspacec::iSkeletonAnimPacketFactory_GetAnimation;
+*GetAnimationCount = *cspacec::iSkeletonAnimPacketFactory_GetAnimationCount;
+*SetAnimationRoot = *cspacec::iSkeletonAnimPacketFactory_SetAnimationRoot;
+*GetAnimationRoot = *cspacec::iSkeletonAnimPacketFactory_GetAnimationRoot;
+*CreateAnimationNode = *cspacec::iSkeletonAnimPacketFactory_CreateAnimationNode;
+*CreateBlendNode = *cspacec::iSkeletonAnimPacketFactory_CreateBlendNode;
+*CreatePriorityNode = *cspacec::iSkeletonAnimPacketFactory_CreatePriorityNode;
+*CreateRandomNode = *cspacec::iSkeletonAnimPacketFactory_CreateRandomNode;
+*CreateFSMNode = *cspacec::iSkeletonAnimPacketFactory_CreateFSMNode;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iSkeletonAnimCallback2($self);
+        cspacec::delete_iSkeletonAnimPacketFactory($self);
         delete $OWNER{$self};
     }
 }
@@ -15973,221 +15837,22 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonAnimNodeFactory2 ##############
+############# Class : cspace::iSkeletonAnimPacket ##############
 
-package cspace::iSkeletonAnimNodeFactory2;
+package cspace::iSkeletonAnimPacket;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-*CreateInstance = *cspacec::iSkeletonAnimNodeFactory2_CreateInstance;
-*GetNodeName = *cspacec::iSkeletonAnimNodeFactory2_GetNodeName;
-*FindNode = *cspacec::iSkeletonAnimNodeFactory2_FindNode;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonAnimNode2 ##############
-
-package cspace::iSkeletonAnimNode2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-*Play = *cspacec::iSkeletonAnimNode2_Play;
-*Stop = *cspacec::iSkeletonAnimNode2_Stop;
-*SetPlaybackPosition = *cspacec::iSkeletonAnimNode2_SetPlaybackPosition;
-*GetPlaybackPosition = *cspacec::iSkeletonAnimNode2_GetPlaybackPosition;
-*GetDuration = *cspacec::iSkeletonAnimNode2_GetDuration;
-*SetPlaybackSpeed = *cspacec::iSkeletonAnimNode2_SetPlaybackSpeed;
-*GetPlaybackSpeed = *cspacec::iSkeletonAnimNode2_GetPlaybackSpeed;
-*BlendState = *cspacec::iSkeletonAnimNode2_BlendState;
-*TickAnimation = *cspacec::iSkeletonAnimNode2_TickAnimation;
-*IsActive = *cspacec::iSkeletonAnimNode2_IsActive;
-*GetFactory = *cspacec::iSkeletonAnimNode2_GetFactory;
-*FindNode = *cspacec::iSkeletonAnimNode2_FindNode;
-*AddAnimationCallback = *cspacec::iSkeletonAnimNode2_AddAnimationCallback;
-*RemoveAnimationCallback = *cspacec::iSkeletonAnimNode2_RemoveAnimationCallback;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonAnimationNodeFactory2 ##############
-
-package cspace::iSkeletonAnimationNodeFactory2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
-%OWNER = ();
-*SetAnimation = *cspacec::iSkeletonAnimationNodeFactory2_SetAnimation;
-*GetAnimation = *cspacec::iSkeletonAnimationNodeFactory2_GetAnimation;
-*SetCyclic = *cspacec::iSkeletonAnimationNodeFactory2_SetCyclic;
-*IsCyclic = *cspacec::iSkeletonAnimationNodeFactory2_IsCyclic;
-*SetPlaybackSpeed = *cspacec::iSkeletonAnimationNodeFactory2_SetPlaybackSpeed;
-*GetPlaybackSpeed = *cspacec::iSkeletonAnimationNodeFactory2_GetPlaybackSpeed;
-*SetAutomaticReset = *cspacec::iSkeletonAnimationNodeFactory2_SetAutomaticReset;
-*GetAutomaticReset = *cspacec::iSkeletonAnimationNodeFactory2_GetAutomaticReset;
-*SetAutomaticStop = *cspacec::iSkeletonAnimationNodeFactory2_SetAutomaticStop;
-*GetAutomaticStop = *cspacec::iSkeletonAnimationNodeFactory2_GetAutomaticStop;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonAnimationNode2 ##############
-
-package cspace::iSkeletonAnimationNode2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNode2 cspace );
-%OWNER = ();
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonBlendNodeFactory2 ##############
-
-package cspace::iSkeletonBlendNodeFactory2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
-%OWNER = ();
-*AddNode = *cspacec::iSkeletonBlendNodeFactory2_AddNode;
-*SetNodeWeight = *cspacec::iSkeletonBlendNodeFactory2_SetNodeWeight;
-*NormalizeWeights = *cspacec::iSkeletonBlendNodeFactory2_NormalizeWeights;
-*GetNode = *cspacec::iSkeletonBlendNodeFactory2_GetNode;
-*GetNodeCount = *cspacec::iSkeletonBlendNodeFactory2_GetNodeCount;
-*ClearNodes = *cspacec::iSkeletonBlendNodeFactory2_ClearNodes;
-*SetSynchronizationMode = *cspacec::iSkeletonBlendNodeFactory2_SetSynchronizationMode;
-*GetSynchronizationMode = *cspacec::iSkeletonBlendNodeFactory2_GetSynchronizationMode;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonBlendNode2 ##############
-
-package cspace::iSkeletonBlendNode2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNode2 cspace );
-%OWNER = ();
-*SetNodeWeight = *cspacec::iSkeletonBlendNode2_SetNodeWeight;
-*NormalizeWeights = *cspacec::iSkeletonBlendNode2_NormalizeWeights;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonPriorityNodeFactory2 ##############
-
-package cspace::iSkeletonPriorityNodeFactory2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
-%OWNER = ();
-*AddNode = *cspacec::iSkeletonPriorityNodeFactory2_AddNode;
-*SetNodePriority = *cspacec::iSkeletonPriorityNodeFactory2_SetNodePriority;
-*GetNode = *cspacec::iSkeletonPriorityNodeFactory2_GetNode;
-*GetNodeCount = *cspacec::iSkeletonPriorityNodeFactory2_GetNodeCount;
-*ClearNodes = *cspacec::iSkeletonPriorityNodeFactory2_ClearNodes;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonPriorityNode2 ##############
-
-package cspace::iSkeletonPriorityNode2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNode2 cspace );
-%OWNER = ();
-*SetNodePriority = *cspacec::iSkeletonPriorityNode2_SetNodePriority;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonRandomNodeFactory2 ##############
-
-package cspace::iSkeletonRandomNodeFactory2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
 %OWNER = ();
 %ITERATORS = ();
-*AddNode = *cspacec::iSkeletonRandomNodeFactory2_AddNode;
-*SetNodeProbability = *cspacec::iSkeletonRandomNodeFactory2_SetNodeProbability;
-*SetAutomaticSwitch = *cspacec::iSkeletonRandomNodeFactory2_SetAutomaticSwitch;
-*GetNode = *cspacec::iSkeletonRandomNodeFactory2_GetNode;
-*GetNodeCount = *cspacec::iSkeletonRandomNodeFactory2_GetNodeCount;
-*ClearNodes = *cspacec::iSkeletonRandomNodeFactory2_ClearNodes;
+*GetFactory = *cspacec::iSkeletonAnimPacket_GetFactory;
+*GetAnimationRoot = *cspacec::iSkeletonAnimPacket_GetAnimationRoot;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iSkeletonRandomNodeFactory2($self);
+        cspacec::delete_iSkeletonAnimPacket($self);
         delete $OWNER{$self};
     }
 }
@@ -16205,22 +15870,24 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonRandomNode2 ##############
+############# Class : cspace::iSkeletonAnimCallback ##############
 
-package cspace::iSkeletonRandomNode2;
+package cspace::iSkeletonAnimCallback;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNode2 cspace );
+@ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-*Switch = *cspacec::iSkeletonRandomNode2_Switch;
-*GetCurrentNode = *cspacec::iSkeletonRandomNode2_GetCurrentNode;
+*AnimationFinished = *cspacec::iSkeletonAnimCallback_AnimationFinished;
+*AnimationCycled = *cspacec::iSkeletonAnimCallback_AnimationCycled;
+*PlayStateChanged = *cspacec::iSkeletonAnimCallback_PlayStateChanged;
+*DurationChanged = *cspacec::iSkeletonAnimCallback_DurationChanged;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iSkeletonRandomNode2($self);
+        cspacec::delete_iSkeletonAnimCallback($self);
         delete $OWNER{$self};
     }
 }
@@ -16238,25 +15905,27 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonFSMNodeFactory2 ##############
+############# Class : cspace::iSkeletonAnimNodeFactory ##############
 
-package cspace::iSkeletonFSMNodeFactory2;
+package cspace::iSkeletonAnimNodeFactory;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
+@ISA = qw( cspace::iBase cspace );
 %OWNER = ();
-*SetStateNode = *cspacec::iSkeletonFSMNodeFactory2_SetStateNode;
-*GetStateNode = *cspacec::iSkeletonFSMNodeFactory2_GetStateNode;
-*SetStateName = *cspacec::iSkeletonFSMNodeFactory2_SetStateName;
-*GetStateName = *cspacec::iSkeletonFSMNodeFactory2_GetStateName;
-*FindState = *cspacec::iSkeletonFSMNodeFactory2_FindState;
-*SetStartState = *cspacec::iSkeletonFSMNodeFactory2_SetStartState;
-*GetStartState = *cspacec::iSkeletonFSMNodeFactory2_GetStartState;
-*GetStateCount = *cspacec::iSkeletonFSMNodeFactory2_GetStateCount;
-*ClearStates = *cspacec::iSkeletonFSMNodeFactory2_ClearStates;
-*SetStateTransition = *cspacec::iSkeletonFSMNodeFactory2_SetStateTransition;
-*SetTransitionCrossfade = *cspacec::iSkeletonFSMNodeFactory2_SetTransitionCrossfade;
-*AddState = *cspacec::iSkeletonFSMNodeFactory2_AddState;
-*SetAutomaticTransition = *cspacec::iSkeletonFSMNodeFactory2_SetAutomaticTransition;
+%ITERATORS = ();
+*CreateInstance = *cspacec::iSkeletonAnimNodeFactory_CreateInstance;
+*GetNodeName = *cspacec::iSkeletonAnimNodeFactory_GetNodeName;
+*FindNode = *cspacec::iSkeletonAnimNodeFactory_FindNode;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimNodeFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -16270,15 +15939,398 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonFSMNode2 ##############
+############# Class : cspace::iSkeletonAnimNode ##############
 
-package cspace::iSkeletonFSMNode2;
+package cspace::iSkeletonAnimNode;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNode2 cspace );
+@ISA = qw( cspace::iBase cspace );
 %OWNER = ();
-*SwitchToState = *cspacec::iSkeletonFSMNode2_SwitchToState;
-*GetCurrentState = *cspacec::iSkeletonFSMNode2_GetCurrentState;
-*GetStateNode = *cspacec::iSkeletonFSMNode2_GetStateNode;
+%ITERATORS = ();
+*Play = *cspacec::iSkeletonAnimNode_Play;
+*Stop = *cspacec::iSkeletonAnimNode_Stop;
+*SetPlaybackPosition = *cspacec::iSkeletonAnimNode_SetPlaybackPosition;
+*GetPlaybackPosition = *cspacec::iSkeletonAnimNode_GetPlaybackPosition;
+*GetDuration = *cspacec::iSkeletonAnimNode_GetDuration;
+*SetPlaybackSpeed = *cspacec::iSkeletonAnimNode_SetPlaybackSpeed;
+*GetPlaybackSpeed = *cspacec::iSkeletonAnimNode_GetPlaybackSpeed;
+*BlendState = *cspacec::iSkeletonAnimNode_BlendState;
+*TickAnimation = *cspacec::iSkeletonAnimNode_TickAnimation;
+*IsActive = *cspacec::iSkeletonAnimNode_IsActive;
+*GetFactory = *cspacec::iSkeletonAnimNode_GetFactory;
+*FindNode = *cspacec::iSkeletonAnimNode_FindNode;
+*AddAnimationCallback = *cspacec::iSkeletonAnimNode_AddAnimationCallback;
+*RemoveAnimationCallback = *cspacec::iSkeletonAnimNode_RemoveAnimationCallback;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimNode($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonAnimationNodeFactory ##############
+
+package cspace::iSkeletonAnimationNodeFactory;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNodeFactory cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetAnimation = *cspacec::iSkeletonAnimationNodeFactory_SetAnimation;
+*GetAnimation = *cspacec::iSkeletonAnimationNodeFactory_GetAnimation;
+*SetCyclic = *cspacec::iSkeletonAnimationNodeFactory_SetCyclic;
+*IsCyclic = *cspacec::iSkeletonAnimationNodeFactory_IsCyclic;
+*SetPlaybackSpeed = *cspacec::iSkeletonAnimationNodeFactory_SetPlaybackSpeed;
+*GetPlaybackSpeed = *cspacec::iSkeletonAnimationNodeFactory_GetPlaybackSpeed;
+*SetAutomaticReset = *cspacec::iSkeletonAnimationNodeFactory_SetAutomaticReset;
+*GetAutomaticReset = *cspacec::iSkeletonAnimationNodeFactory_GetAutomaticReset;
+*SetAutomaticStop = *cspacec::iSkeletonAnimationNodeFactory_SetAutomaticStop;
+*GetAutomaticStop = *cspacec::iSkeletonAnimationNodeFactory_GetAutomaticStop;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimationNodeFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonAnimationNode ##############
+
+package cspace::iSkeletonAnimationNode;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNode cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimationNode($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonBlendNodeFactory ##############
+
+package cspace::iSkeletonBlendNodeFactory;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNodeFactory cspace );
+%OWNER = ();
+%ITERATORS = ();
+*AddNode = *cspacec::iSkeletonBlendNodeFactory_AddNode;
+*SetNodeWeight = *cspacec::iSkeletonBlendNodeFactory_SetNodeWeight;
+*NormalizeWeights = *cspacec::iSkeletonBlendNodeFactory_NormalizeWeights;
+*GetNode = *cspacec::iSkeletonBlendNodeFactory_GetNode;
+*GetNodeCount = *cspacec::iSkeletonBlendNodeFactory_GetNodeCount;
+*ClearNodes = *cspacec::iSkeletonBlendNodeFactory_ClearNodes;
+*SetSynchronizationMode = *cspacec::iSkeletonBlendNodeFactory_SetSynchronizationMode;
+*GetSynchronizationMode = *cspacec::iSkeletonBlendNodeFactory_GetSynchronizationMode;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonBlendNodeFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonBlendNode ##############
+
+package cspace::iSkeletonBlendNode;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNode cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetNodeWeight = *cspacec::iSkeletonBlendNode_SetNodeWeight;
+*NormalizeWeights = *cspacec::iSkeletonBlendNode_NormalizeWeights;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonBlendNode($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonPriorityNodeFactory ##############
+
+package cspace::iSkeletonPriorityNodeFactory;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNodeFactory cspace );
+%OWNER = ();
+%ITERATORS = ();
+*AddNode = *cspacec::iSkeletonPriorityNodeFactory_AddNode;
+*SetNodePriority = *cspacec::iSkeletonPriorityNodeFactory_SetNodePriority;
+*GetNode = *cspacec::iSkeletonPriorityNodeFactory_GetNode;
+*GetNodeCount = *cspacec::iSkeletonPriorityNodeFactory_GetNodeCount;
+*ClearNodes = *cspacec::iSkeletonPriorityNodeFactory_ClearNodes;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonPriorityNodeFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonPriorityNode ##############
+
+package cspace::iSkeletonPriorityNode;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNode cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetNodePriority = *cspacec::iSkeletonPriorityNode_SetNodePriority;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonPriorityNode($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonRandomNodeFactory ##############
+
+package cspace::iSkeletonRandomNodeFactory;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNodeFactory cspace );
+%OWNER = ();
+%ITERATORS = ();
+*AddNode = *cspacec::iSkeletonRandomNodeFactory_AddNode;
+*SetNodeProbability = *cspacec::iSkeletonRandomNodeFactory_SetNodeProbability;
+*SetAutomaticSwitch = *cspacec::iSkeletonRandomNodeFactory_SetAutomaticSwitch;
+*GetNode = *cspacec::iSkeletonRandomNodeFactory_GetNode;
+*GetNodeCount = *cspacec::iSkeletonRandomNodeFactory_GetNodeCount;
+*ClearNodes = *cspacec::iSkeletonRandomNodeFactory_ClearNodes;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonRandomNodeFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonRandomNode ##############
+
+package cspace::iSkeletonRandomNode;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNode cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Switch = *cspacec::iSkeletonRandomNode_Switch;
+*GetCurrentNode = *cspacec::iSkeletonRandomNode_GetCurrentNode;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonRandomNode($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonFSMNodeFactory ##############
+
+package cspace::iSkeletonFSMNodeFactory;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNodeFactory cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetStateNode = *cspacec::iSkeletonFSMNodeFactory_SetStateNode;
+*GetStateNode = *cspacec::iSkeletonFSMNodeFactory_GetStateNode;
+*SetStateName = *cspacec::iSkeletonFSMNodeFactory_SetStateName;
+*GetStateName = *cspacec::iSkeletonFSMNodeFactory_GetStateName;
+*FindState = *cspacec::iSkeletonFSMNodeFactory_FindState;
+*SetStartState = *cspacec::iSkeletonFSMNodeFactory_SetStartState;
+*GetStartState = *cspacec::iSkeletonFSMNodeFactory_GetStartState;
+*GetStateCount = *cspacec::iSkeletonFSMNodeFactory_GetStateCount;
+*ClearStates = *cspacec::iSkeletonFSMNodeFactory_ClearStates;
+*SetStateTransition = *cspacec::iSkeletonFSMNodeFactory_SetStateTransition;
+*SetTransitionCrossfade = *cspacec::iSkeletonFSMNodeFactory_SetTransitionCrossfade;
+*AddState = *cspacec::iSkeletonFSMNodeFactory_AddState;
+*SetAutomaticTransition = *cspacec::iSkeletonFSMNodeFactory_SetAutomaticTransition;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonFSMNodeFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonFSMNode ##############
+
+package cspace::iSkeletonFSMNode;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNode cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SwitchToState = *cspacec::iSkeletonFSMNode_SwitchToState;
+*GetCurrentState = *cspacec::iSkeletonFSMNode_GetCurrentState;
+*GetStateNode = *cspacec::iSkeletonFSMNode_GetStateNode;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonFSMNode($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -16615,166 +16667,23 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonRagdollManager2 ##############
+############# Class : cspace::iSkeletonRagdollManager ##############
 
-package cspace::iSkeletonRagdollManager2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-*CreateAnimNodeFactory = *cspacec::iSkeletonRagdollManager2_CreateAnimNodeFactory;
-*FindAnimNodeFactory = *cspacec::iSkeletonRagdollManager2_FindAnimNodeFactory;
-*ClearAnimNodeFactories = *cspacec::iSkeletonRagdollManager2_ClearAnimNodeFactories;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonRagdollNodeFactory2 ##############
-
-package cspace::iSkeletonRagdollNodeFactory2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
-%OWNER = ();
-*AddBodyChain = *cspacec::iSkeletonRagdollNodeFactory2_AddBodyChain;
-*RemoveBodyChain = *cspacec::iSkeletonRagdollNodeFactory2_RemoveBodyChain;
-*SetChildNode = *cspacec::iSkeletonRagdollNodeFactory2_SetChildNode;
-*GetChildNode = *cspacec::iSkeletonRagdollNodeFactory2_GetChildNode;
-*ClearChildNode = *cspacec::iSkeletonRagdollNodeFactory2_ClearChildNode;
-*GetDynamicSystem = *cspacec::iSkeletonRagdollNodeFactory2_GetDynamicSystem;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonRagdollNode2 ##############
-
-package cspace::iSkeletonRagdollNode2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNode2 cspace );
-%OWNER = ();
-*SetBodyChainState = *cspacec::iSkeletonRagdollNode2_SetBodyChainState;
-*GetBodyChainState = *cspacec::iSkeletonRagdollNode2_GetBodyChainState;
-*GetBoneRigidBody = *cspacec::iSkeletonRagdollNode2_GetBoneRigidBody;
-*GetBoneJoint = *cspacec::iSkeletonRagdollNode2_GetBoneJoint;
-*GetBoneCount = *cspacec::iSkeletonRagdollNode2_GetBoneCount;
-*GetBone = *cspacec::iSkeletonRagdollNode2_GetBone;
-*ResetChainTransform = *cspacec::iSkeletonRagdollNode2_ResetChainTransform;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonLookAtManager2 ##############
-
-package cspace::iSkeletonLookAtManager2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-*CreateAnimNodeFactory = *cspacec::iSkeletonLookAtManager2_CreateAnimNodeFactory;
-*FindAnimNodeFactory = *cspacec::iSkeletonLookAtManager2_FindAnimNodeFactory;
-*ClearAnimNodeFactories = *cspacec::iSkeletonLookAtManager2_ClearAnimNodeFactories;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonLookAtNodeFactory2 ##############
-
-package cspace::iSkeletonLookAtNodeFactory2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
-%OWNER = ();
-*SetChildNode = *cspacec::iSkeletonLookAtNodeFactory2_SetChildNode;
-*GetChildNode = *cspacec::iSkeletonLookAtNodeFactory2_GetChildNode;
-*ClearChildNode = *cspacec::iSkeletonLookAtNodeFactory2_ClearChildNode;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonLookAtNode2 ##############
-
-package cspace::iSkeletonLookAtNode2;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNode2 cspace );
-%OWNER = ();
-*SetBone = *cspacec::iSkeletonLookAtNode2_SetBone;
-*SetTarget = *cspacec::iSkeletonLookAtNode2_SetTarget;
-*RemoveTarget = *cspacec::iSkeletonLookAtNode2_RemoveTarget;
-*SetMaximumSpeed = *cspacec::iSkeletonLookAtNode2_SetMaximumSpeed;
-*SetAlwaysRotate = *cspacec::iSkeletonLookAtNode2_SetAlwaysRotate;
-*SetListenerDelay = *cspacec::iSkeletonLookAtNode2_SetListenerDelay;
-*AddListener = *cspacec::iSkeletonLookAtNode2_AddListener;
-*RemoveListener = *cspacec::iSkeletonLookAtNode2_RemoveListener;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iSkeletonLookAtListener2 ##############
-
-package cspace::iSkeletonLookAtListener2;
+package cspace::iSkeletonRagdollManager;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-*TargetReached = *cspacec::iSkeletonLookAtListener2_TargetReached;
-*TargetLost = *cspacec::iSkeletonLookAtListener2_TargetLost;
+*CreateAnimNodeFactory = *cspacec::iSkeletonRagdollManager_CreateAnimNodeFactory;
+*FindAnimNodeFactory = *cspacec::iSkeletonRagdollManager_FindAnimNodeFactory;
+*ClearAnimNodeFactories = *cspacec::iSkeletonRagdollManager_ClearAnimNodeFactories;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iSkeletonLookAtListener2($self);
+        cspacec::delete_iSkeletonRagdollManager($self);
         delete $OWNER{$self};
     }
 }
@@ -16792,15 +16701,102 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonBasicNodesManager2 ##############
+############# Class : cspace::iSkeletonRagdollNodeFactory ##############
 
-package cspace::iSkeletonBasicNodesManager2;
+package cspace::iSkeletonRagdollNodeFactory;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNodeFactory cspace );
+%OWNER = ();
+%ITERATORS = ();
+*AddBodyChain = *cspacec::iSkeletonRagdollNodeFactory_AddBodyChain;
+*RemoveBodyChain = *cspacec::iSkeletonRagdollNodeFactory_RemoveBodyChain;
+*SetChildNode = *cspacec::iSkeletonRagdollNodeFactory_SetChildNode;
+*GetChildNode = *cspacec::iSkeletonRagdollNodeFactory_GetChildNode;
+*ClearChildNode = *cspacec::iSkeletonRagdollNodeFactory_ClearChildNode;
+*GetDynamicSystem = *cspacec::iSkeletonRagdollNodeFactory_GetDynamicSystem;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonRagdollNodeFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonRagdollNode ##############
+
+package cspace::iSkeletonRagdollNode;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNode cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetBodyChainState = *cspacec::iSkeletonRagdollNode_SetBodyChainState;
+*GetBodyChainState = *cspacec::iSkeletonRagdollNode_GetBodyChainState;
+*GetBoneRigidBody = *cspacec::iSkeletonRagdollNode_GetBoneRigidBody;
+*GetBoneJoint = *cspacec::iSkeletonRagdollNode_GetBoneJoint;
+*GetBoneCount = *cspacec::iSkeletonRagdollNode_GetBoneCount;
+*GetBone = *cspacec::iSkeletonRagdollNode_GetBone;
+*ResetChainTransform = *cspacec::iSkeletonRagdollNode_ResetChainTransform;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonRagdollNode($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonLookAtManager ##############
+
+package cspace::iSkeletonLookAtManager;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
-*CreateSpeedNodeFactory = *cspacec::iSkeletonBasicNodesManager2_CreateSpeedNodeFactory;
-*FindSpeedNodeFactory = *cspacec::iSkeletonBasicNodesManager2_FindSpeedNodeFactory;
-*ClearSpeedNodeFactories = *cspacec::iSkeletonBasicNodesManager2_ClearSpeedNodeFactories;
+%ITERATORS = ();
+*CreateAnimNodeFactory = *cspacec::iSkeletonLookAtManager_CreateAnimNodeFactory;
+*FindAnimNodeFactory = *cspacec::iSkeletonLookAtManager_FindAnimNodeFactory;
+*ClearAnimNodeFactories = *cspacec::iSkeletonLookAtManager_ClearAnimNodeFactories;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonLookAtManager($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -16814,13 +16810,27 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonSpeedNodeFactory2 ##############
+############# Class : cspace::iSkeletonLookAtNodeFactory ##############
 
-package cspace::iSkeletonSpeedNodeFactory2;
+package cspace::iSkeletonLookAtNodeFactory;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
+@ISA = qw( cspace::iSkeletonAnimNodeFactory cspace );
 %OWNER = ();
-*AddNode = *cspacec::iSkeletonSpeedNodeFactory2_AddNode;
+%ITERATORS = ();
+*SetChildNode = *cspacec::iSkeletonLookAtNodeFactory_SetChildNode;
+*GetChildNode = *cspacec::iSkeletonLookAtNodeFactory_GetChildNode;
+*ClearChildNode = *cspacec::iSkeletonLookAtNodeFactory_ClearChildNode;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonLookAtNodeFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -16834,13 +16844,163 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonSpeedNode2 ##############
+############# Class : cspace::iSkeletonLookAtNode ##############
 
-package cspace::iSkeletonSpeedNode2;
+package cspace::iSkeletonLookAtNode;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSkeletonAnimNode2 cspace );
+@ISA = qw( cspace::iSkeletonAnimNode cspace );
 %OWNER = ();
-*SetSpeed = *cspacec::iSkeletonSpeedNode2_SetSpeed;
+%ITERATORS = ();
+*SetBone = *cspacec::iSkeletonLookAtNode_SetBone;
+*SetTarget = *cspacec::iSkeletonLookAtNode_SetTarget;
+*RemoveTarget = *cspacec::iSkeletonLookAtNode_RemoveTarget;
+*SetMaximumSpeed = *cspacec::iSkeletonLookAtNode_SetMaximumSpeed;
+*SetAlwaysRotate = *cspacec::iSkeletonLookAtNode_SetAlwaysRotate;
+*SetListenerDelay = *cspacec::iSkeletonLookAtNode_SetListenerDelay;
+*AddListener = *cspacec::iSkeletonLookAtNode_AddListener;
+*RemoveListener = *cspacec::iSkeletonLookAtNode_RemoveListener;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonLookAtNode($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonLookAtListener ##############
+
+package cspace::iSkeletonLookAtListener;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*TargetReached = *cspacec::iSkeletonLookAtListener_TargetReached;
+*TargetLost = *cspacec::iSkeletonLookAtListener_TargetLost;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonLookAtListener($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonBasicNodesManager ##############
+
+package cspace::iSkeletonBasicNodesManager;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*CreateSpeedNodeFactory = *cspacec::iSkeletonBasicNodesManager_CreateSpeedNodeFactory;
+*FindSpeedNodeFactory = *cspacec::iSkeletonBasicNodesManager_FindSpeedNodeFactory;
+*ClearSpeedNodeFactories = *cspacec::iSkeletonBasicNodesManager_ClearSpeedNodeFactories;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonBasicNodesManager($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonSpeedNodeFactory ##############
+
+package cspace::iSkeletonSpeedNodeFactory;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNodeFactory cspace );
+%OWNER = ();
+%ITERATORS = ();
+*AddNode = *cspacec::iSkeletonSpeedNodeFactory_AddNode;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonSpeedNodeFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonSpeedNode ##############
+
+package cspace::iSkeletonSpeedNode;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNode cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetSpeed = *cspacec::iSkeletonSpeedNode_SetSpeed;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonSpeedNode($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
