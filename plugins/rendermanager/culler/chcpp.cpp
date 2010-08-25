@@ -66,7 +66,7 @@ void csFrustumVis::RenderMeshes(NodeTraverseData &ntdNode, csArray<MeshList*> &m
     for (int m = 0; m < obj.numMeshes; ++m)
     {
       for (int i = 0; i < obj.meshList[m].num; ++i)
-	    {
+	  {
         csRenderMesh* rm = obj.meshList[m].rmeshes[i];
         if(!rm->portal)
         {

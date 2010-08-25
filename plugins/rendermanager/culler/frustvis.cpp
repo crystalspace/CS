@@ -897,6 +897,9 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
     iMeshWrapper** p_mesh, int* poly_idx, bool accurate)
 {
+  return occluvis->IntersectSegment(start, end, isect, pr, p_mesh, poly_idx, accurate);
+
+
   UpdateObjects ();
   current_vistest_nr++;
   IntersectSegment_Front2BackData data;
@@ -922,6 +925,9 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
 csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
     const csVector3& start, const csVector3& end, bool accurate)
 {
+  return occluvis->IntersectSegment(start, end, accurate);
+
+
   UpdateObjects ();
   current_vistest_nr++;
   IntersectSegment_Front2BackData data;
@@ -941,6 +947,9 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
 csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegmentSloppy (
     const csVector3& start, const csVector3& end)
 {
+  return occluvis->IntersectSegmentSloppy(start,end);
+
+
   UpdateObjects ();
   current_vistest_nr++;
   IntersectSegment_Front2BackData data;

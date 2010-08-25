@@ -54,6 +54,22 @@ namespace CS
       INVALID
     };
 
+    typedef csArray<iVisibilityObject*, csArrayElementHandler<iVisibilityObject*>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<256> >
+    VistestObjectsArray;
+
+    struct IntersectSegmentFront2BackData
+    {
+      csSegment3 seg;
+      csVector3 isect;
+      float sqdist;		// Squared distance between seg.start and isect.
+      float r;
+      iMeshWrapper* mesh;
+      int polygon_idx;
+      VistestObjectsArray* vector;	// If not-null we need all objects.
+      bool accurate;
+    };
+
     struct QueryData : public csRefCount
     {
       unsigned int uOQuery;
@@ -289,12 +305,82 @@ namespace CS
       */
       virtual void VisTest (iRenderView* rview, iVisibilityCullerListener* viscallback);
 
+      /*virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
+      virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
+      virtual void VisTest (const csSphere& sphere, 
+        iVisibilityCullerListener* viscallback);
+      virtual csPtr<iVisibilityObjectIterator> VisTest (csPlane3* planes,
+  	    int num_planes);
+      virtual void VisTest (csPlane3* planes,
+  	    int num_planes, iVisibilityCullerListener* viscallback);*/
+      virtual csPtr<iVisibilityObjectIterator> IntersectSegmentSloppy (
+        const csVector3& start, const csVector3& end);
+      virtual csPtr<iVisibilityObjectIterator> IntersectSegment (
+        const csVector3& start, const csVector3& end, bool accurate = false);
+      virtual bool IntersectSegment (const csVector3& start,
+        const csVector3& end, csVector3& isect, float* pr = 0,
+        iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
+        bool accurate = true);
+
      /**
       * Mark that we're about to perform precache visibility culling.
       */
       virtual void PreparePrecacheCulling ()
       {
         bAllVisible = true;
+      }
+    };
+
+    class csOccluvisObjIt :
+      public scfImplementation1<csOccluvisObjIt, iVisibilityObjectIterator>
+    {
+    private:
+      VistestObjectsArray* vector;
+      size_t position;
+      bool* vistest_objects_inuse;
+
+    public:
+      csOccluvisObjIt (VistestObjectsArray* vector,
+        bool* vistest_objects_inuse) :
+        scfImplementationType(this)
+      {
+        csOccluvisObjIt::vector = vector;
+        csOccluvisObjIt::vistest_objects_inuse = vistest_objects_inuse;
+        if (vistest_objects_inuse) *vistest_objects_inuse = true;
+        Reset ();
+      }
+      virtual ~csOccluvisObjIt ()
+      {
+        // If the vistest_objects_inuse pointer is not 0 we set the
+        // bool to false to indicate we're no longer using the base
+        // vector. Otherwise we delete the vector.
+        if (vistest_objects_inuse)
+          *vistest_objects_inuse = false;
+        else
+          delete vector;
+      }
+
+      virtual iVisibilityObject* Next()
+      {
+        if (position == (size_t)-1) return 0;
+        iVisibilityObject* vo = vector->Get (position);
+        position++;
+        if (position == vector->GetSize ())
+          position = (size_t)-1;
+        return vo;
+      }
+
+      virtual void Reset()
+      {
+        if (vector == 0 || vector->GetSize () < 1)
+          position = (size_t)-1;
+        else
+          position = 0;
+      }
+
+      virtual bool HasNext () const
+      {
+        return ((position != (size_t)-1) && position <= vector->GetSize ());
       }
     };
   }
