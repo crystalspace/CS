@@ -1301,7 +1301,7 @@ iRigidBody* Simple::SpawnCylinder ()
   return rb;
 }
 
-iRigidBody* Simple::SpawnCapsule ()
+iRigidBody* Simple::SpawnCapsule (float length, float radius)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -1317,8 +1317,6 @@ iRigidBody* Simple::SpawnCapsule ()
 
   csRef<iGeneralFactoryState> gmstate =
     scfQueryInterface<iGeneralFactoryState> (capsuleFact->GetMeshObjectFactory ());
-  const float radius (rand() % 10 / 50. + .2);
-  const float length (rand() % 3 / 50. + .7);
   gmstate->GenerateCapsule (length, radius, 10);
   capsuleFact->HardTransform (
         csReversibleTransform (csYRotMatrix3 (PI/2), csVector3 (0)));
@@ -1521,12 +1519,10 @@ iJoint* Simple::SpawnJointed ()
 
 void ConstraintJoint (iJoint* joint)
 {
-  // Constrain translation.
-  joint->SetMinimumDistance (csVector3 (-1, -1, -1), false);
-  joint->SetMaximumDistance (csVector3 (1, 1, 1), false);
+  // The translations are fully constrained.
   joint->SetTransConstraints (true, true, true, false);
 
-  // Constrain rotation.
+  // The rotations are bounded
   joint->SetMinimumAngle (csVector3 (-PI/4.0, -PI/6.0, -PI/6.0), false);
   joint->SetMaximumAngle (csVector3 (PI/4.0, PI/6.0, PI/6.0), false);
   joint->SetRotConstraints (false, false, false, false);
@@ -1534,52 +1530,71 @@ void ConstraintJoint (iJoint* joint)
 
 void Simple::SpawnChain ()
 {
-  iRigidBody* rb1 = SpawnBox();
+  iRigidBody* rb1 = SpawnBox ();
   csVector3 initPos = rb1->GetPosition () + csVector3 (0.0f, 5.0f, 0.0f);
   rb1->MakeStatic ();
   rb1->SetPosition (initPos);
 
   csVector3 offset (0.0f, 1.3f, 0.0f);
 
-  iRigidBody* rb2 = SpawnCapsule();
+  iRigidBody* rb2 = SpawnCapsule (0.4f, 0.3f);
   rb2->SetLinearVelocity (csVector3 (0.0f));
   rb2->SetAngularVelocity (csVector3 (0.0f));
   rb2->SetPosition (initPos - offset);
   rb2->SetOrientation (csXRotMatrix3 (PI / 2.0f));
 
-  iRigidBody* rb3 = SpawnBox();
+  iRigidBody* rb3 = SpawnBox ();
   rb3->SetLinearVelocity (csVector3 (0.0f));
   rb3->SetAngularVelocity (csVector3 (0.0f));
   rb3->SetPosition (initPos - 2.0f * offset);
 
-  iRigidBody* rb4 = SpawnCapsule();
+  iRigidBody* rb4 = SpawnCapsule (0.4f, 0.3f);
   rb4->SetLinearVelocity (csVector3 (0.0f));
   rb4->SetAngularVelocity (csVector3 (0.0f));
   rb4->SetPosition (initPos - 3.0f * offset);
   rb4->SetOrientation (csXRotMatrix3 (PI / 2.0f));
 
-  iRigidBody* rb5 = SpawnBox();
+  iRigidBody* rb5 = SpawnBox ();
   rb5->SetLinearVelocity (csVector3 (0.0f));
   rb5->SetAngularVelocity (csVector3 (0.0f));
   rb5->SetPosition (initPos - 4.0f * offset);
 
   // Create joints and attach bodies.
-  csRef<iJoint> joint = dynamicSystem->CreateJoint ();
+  csOrthoTransform jointTransform;
+  csRef<iJoint> joint;
+
+  joint = dynamicSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f));
+  jointTransform = jointTransform * rb2->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
   joint->Attach (rb1, rb2, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
 
   joint = dynamicSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - offset);
+  jointTransform = jointTransform * rb3->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
   joint->Attach (rb2, rb3, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
 
   joint = dynamicSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - 2.0f * offset);
+  jointTransform = jointTransform * rb4->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
   joint->Attach (rb3, rb4, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
 
   joint = dynamicSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - 3.0f * offset);
+  jointTransform = jointTransform * rb5->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
   joint->Attach (rb4, rb5, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();

@@ -101,7 +101,8 @@ private:
   iRigidBody* SpawnBox ();
   iRigidBody* SpawnSphere ();
   iRigidBody* SpawnCylinder ();
-  iRigidBody* SpawnCapsule ();
+  iRigidBody* SpawnCapsule (float length = rand() % 3 / 50.f + .7f,
+			    float radius = rand() % 10 / 50.f + .2f);
   iRigidBody* SpawnMesh ();
   iRigidBody* SpawnConvexMesh ();
   iRigidBody* SpawnCompound ();
