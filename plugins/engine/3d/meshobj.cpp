@@ -515,6 +515,19 @@ void csMeshWrapper::SetRenderPriority (CS::Graphics::RenderPriority rp)
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
+  if (DoInstancing())
+  {
+    /* If instancing is enabled, but instance count is 0, simply return 0
+       render meshes as well */
+    csRef<csShaderVariable>& transformVars = instancing->transformVars;
+    CS_ASSERT (transformVars->GetType() == csShaderVariable::ARRAY);
+    size_t numInst = transformVars->GetArraySize ();
+    if (numInst == 0)
+    {
+      n = 0;
+      return nullptr;
+    }
+  }
 
   if (factory && drawing_imposter != rview->GetCamera())
   {
