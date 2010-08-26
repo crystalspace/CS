@@ -93,6 +93,8 @@ protected:
   csRef<iShaderProgramCG> cgResolve;
   csSet<csString> unusedParams;
   
+  csSafeCopyArray<VariableMapEntry> variablemapConstants;
+  
   struct Clip
   {
     ShaderProgramPluginGL::ClipPlanes::ClipSpace space;
@@ -118,6 +120,8 @@ protected:
   csString debugFN;
   void EnsureDumpFile();
 
+  /// Extract 'constant' variable map values, copy them into their own arrays
+  void ExtractVmapConstants ();
   void FreeShaderParam (ShaderParameter* sparam);
   void FillShaderParam (ShaderParameter* sparam, CGparameter param);
   void GetShaderParamSlot (ShaderParameter* sparam);
@@ -125,6 +129,10 @@ protected:
    * Go over variablemaps and fetch Cg parameters for them
    */
   void GetParamsFromVmap();
+  /**
+   * Go over variablemaps for constants and set Cg parameters for them
+   */
+  void GetParamsFromVmapConstants();
   //@{
   /**
    * Set properties for a mapped parameter which can only be determined
