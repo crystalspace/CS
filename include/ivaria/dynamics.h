@@ -1061,11 +1061,10 @@ struct iDynamicsSystemCollider : public virtual iBase
 };
 
 /**
- * This is the interface for a joint. It works by constraining
- * the relative motion between the two bodies attached. For
- * instance if all motion in along the local X axis is constrained
+ * A joint that can constrain the relative motion between two iRigidBody.
+ * For instance if all motion in along the local X axis is constrained
  * then the bodies will stay motionless relative to each other
- * along an x axis rotated and positioned by the Joint's transform.
+ * along an x axis rotated and positioned by the joint's transform.
  *
  * Main creators of instances implementing this interface:
  * - iDynamicSystem::CreateJoint()
@@ -1085,13 +1084,15 @@ struct iJoint : public virtual iBase
   /// Get an attached body (valid values for body are 0 and 1).
   virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
   /**
-   * Set the local transformation of the joint. This transform
-   * sets the position of the constraining axes in the world
-   * not relative to the attached bodies. Set force_update to true if 
-   * you want to apply changes right away.
+   * Set the local transformation of the joint, relative to the second body attached.
+   * The position of the constraining axes will be moved to this transform. The default
+   * value is the identity matrix, ie the joint placed at the same position than the
+   * second body attached.
+   *
+   * Set force_update to true if you want to apply changes right away.
    */
   virtual void SetTransform (const csOrthoTransform &trans, bool force_update = true) = 0;
-  /// Get the local transformation of the joint.
+  /// Get the local transformation of the joint, relative to the second body attached.
   virtual csOrthoTransform GetTransform () = 0;
   /**
    * Set the translation constraints on the 3 axes. If true is

@@ -35,11 +35,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 
 csBulletJoint::csBulletJoint (csBulletDynamicsSystem* dynsys)
   : scfImplementationType (this), dynSys (dynsys), jointType (BULLET_JOINT_NONE),
-    constraint (0), trans_constraint_x (false), trans_constraint_y (false),
-    trans_constraint_z (false), min_dist (1000.0f), max_dist (-1000.0f),
-    rot_constraint_x (false), rot_constraint_y (false), rot_constraint_z (false),
-    min_angle (PI / 2.0f), max_angle (- PI / 2.0f), bounce (0.0f),
-    desired_velocity (0.0f), maxforce (0.0f)
+  constraint (0), trans_constraint_x (false), trans_constraint_y (false),
+  trans_constraint_z (false), min_dist (1000.0f), max_dist (-1000.0f),
+  rot_constraint_x (false), rot_constraint_y (false), rot_constraint_z (false),
+  min_angle (PI / 2.0f), max_angle (- PI / 2.0f), bounce (0.0f),
+  desired_velocity (0.0f), maxforce (0.0f)
 {
   angular_constraints_axis[0].Set (0.0f, 1.0f, 0.0f);
   angular_constraints_axis[1].Set (0.0f, 0.0f, 1.0f);
@@ -78,7 +78,7 @@ int csBulletJoint::ComputeBestBulletJointType ()
 
 bool csBulletJoint::RebuildJoint ()
 {
-  // TODO: use transform, bounce, desired_velocity, maxforce, angular_constraints_axis
+  // TODO: use bounce, desired_velocity, maxforce, angular_constraints_axis
   // TODO: use btGeneric6DofSpringConstraint if there is some stiffness/damping
 
   if (constraint)
@@ -97,16 +97,17 @@ bool csBulletJoint::RebuildJoint ()
     case BULLET_JOINT_6DOF:
       {
 	// compute local transforms of the joint
+	btTransform jointTransform =
+	  CSToBullet (transform * bodies[1]->GetTransform (), dynSys->internalScale);
+
 	btTransform frA;
-	btTransform frB;
-
-	btTransform jointTransform = CSToBullet (bodies[1]->GetTransform (),
-						 dynSys->internalScale);
-
 	bodies[0]->motionState->getWorldTransform (frA);
-        frA = frA.inverse () * jointTransform;
+	frA = bodies[0]->body->getCenterOfMassTransform().inverse() * jointTransform;
+	// TODO: for some reason, the joint will be misplaced if some of the bodies are static
+
+	btTransform frB;
 	bodies[1]->motionState->getWorldTransform (frB);
-        frB = frB.inverse () * jointTransform;
+	frB = bodies[1]->body->getCenterOfMassTransform().inverse() * jointTransform;
 
 	// create joint
 	btGeneric6DofConstraint* dof6 =
