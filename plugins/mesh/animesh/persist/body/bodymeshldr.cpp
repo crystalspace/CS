@@ -537,8 +537,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	}
     }
 
-    // TODO: add transform in CS::Animation::iBodyBoneJoint
-    //joint->SetTransform (t);
+    joint->SetTransform (t);
 
     return true;
   }

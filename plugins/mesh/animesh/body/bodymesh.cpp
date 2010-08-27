@@ -544,61 +544,70 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     transConstraints[2] = Z;
   }
  
-  csVector3 BodyBoneJoint::GetBounce ()
+  void BodyBoneJoint::SetTransform (const csOrthoTransform &transform)
+  {
+    this->transform = transform;
+  }
+
+  csVector3 BodyBoneJoint::GetBounce () const
   {
     return bounce;
   }
 
-  csVector3 BodyBoneJoint::GetMaximumAngle ()
+  csVector3 BodyBoneJoint::GetMaximumAngle () const
   {
     return maxAngle;
   }
 
-  csVector3 BodyBoneJoint::GetMaximumDistance ()
+  csVector3 BodyBoneJoint::GetMaximumDistance () const
   {
     return maxDistance;
   }
 
-  csVector3 BodyBoneJoint::GetMinimumAngle ()
+  csVector3 BodyBoneJoint::GetMinimumAngle () const
   {
     return minAngle;
   }
 
-  csVector3 BodyBoneJoint::GetMinimumDistance ()
+  csVector3 BodyBoneJoint::GetMinimumDistance () const
   {
     return minDistance;
   }
 
-  bool BodyBoneJoint::IsXRotConstrained ()
+  bool BodyBoneJoint::IsXRotConstrained () const
   {
     return rotConstraints[0];
   }
 
-  bool BodyBoneJoint::IsXTransConstrained ()
+  bool BodyBoneJoint::IsXTransConstrained () const
   {
     return transConstraints[0];
   }
 
-  bool BodyBoneJoint::IsYRotConstrained ()
+  bool BodyBoneJoint::IsYRotConstrained () const
   {
     return rotConstraints[1];
   }
 
-  bool BodyBoneJoint::IsYTransConstrained ()
+  bool BodyBoneJoint::IsYTransConstrained () const
   {
     return transConstraints[1];
   }
 
-  bool BodyBoneJoint::IsZRotConstrained ()
+  bool BodyBoneJoint::IsZRotConstrained () const
   {
     return rotConstraints[2];
   }
 
-  bool BodyBoneJoint::IsZTransConstrained ()
+  bool BodyBoneJoint::IsZTransConstrained () const
   {
     return transConstraints[2];
   }
 
+  csOrthoTransform BodyBoneJoint::GetTransform () const
+  {
+    return transform;
+  }
 
   /********************
    *  BodyBoneCollider
@@ -664,12 +673,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return true;
   }
  
-  csColliderGeometryType BodyBoneCollider::GetGeometryType ()
+  csColliderGeometryType BodyBoneCollider::GetGeometryType () const
   {
     return geometryType;
   }
 
-  bool BodyBoneCollider::GetBoxGeometry (csVector3 &box_size)
+  bool BodyBoneCollider::GetBoxGeometry (csVector3 &box_size) const
   {
     if (geometryType != BOX_COLLIDER_GEOMETRY)
       return false;
@@ -678,7 +687,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return true;
   }
 
-  bool BodyBoneCollider::GetCapsuleGeometry (float &length, float &radius)
+  bool BodyBoneCollider::GetCapsuleGeometry (float &length, float &radius) const
   {
     if (geometryType != CAPSULE_COLLIDER_GEOMETRY)
       return false;
@@ -688,7 +697,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return true;
   }
 
-  bool BodyBoneCollider::GetConvexMeshGeometry (iMeshWrapper *&mesh)
+  bool BodyBoneCollider::GetConvexMeshGeometry (iMeshWrapper *&mesh) const
   {
     if (geometryType != CONVEXMESH_COLLIDER_GEOMETRY)
       return false;
@@ -697,7 +706,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return true;
   }
 
-  bool BodyBoneCollider::GetCylinderGeometry (float &length, float &radius)
+  bool BodyBoneCollider::GetCylinderGeometry (float &length, float &radius) const
   {
     if (geometryType != CYLINDER_COLLIDER_GEOMETRY)
       return false;
@@ -707,7 +716,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return true;
   }
 
-  bool BodyBoneCollider::GetMeshGeometry (iMeshWrapper *&mesh)
+  bool BodyBoneCollider::GetMeshGeometry (iMeshWrapper *&mesh) const
   {
     if (geometryType != TRIMESH_COLLIDER_GEOMETRY)
       return false;
@@ -716,7 +725,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return true;
   }
 
-  bool BodyBoneCollider::GetPlaneGeometry (csPlane3 &plane)
+  bool BodyBoneCollider::GetPlaneGeometry (csPlane3 &plane) const
   {
     if (geometryType != PLANE_COLLIDER_GEOMETRY)
       return false;
@@ -725,7 +734,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return true;
   }
 
-  bool BodyBoneCollider::GetSphereGeometry (csSphere &sphere)
+  bool BodyBoneCollider::GetSphereGeometry (csSphere &sphere) const
   {
     if (geometryType != SPHERE_COLLIDER_GEOMETRY)
       return false;
@@ -739,7 +748,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     this->transform = transform;
   }
 
-  csOrthoTransform BodyBoneCollider::GetTransform ()
+  csOrthoTransform BodyBoneCollider::GetTransform () const
   {
     return transform;
   }

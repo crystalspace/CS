@@ -75,18 +75,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     virtual void SetMinimumDistance (const csVector3 &min);
     virtual void SetRotConstraints (bool X, bool Y, bool Z);
     virtual void SetTransConstraints (bool X, bool Y, bool Z);
+    virtual void SetTransform (const csOrthoTransform &transform);
  
-    virtual csVector3 GetBounce ();
-    virtual csVector3 GetMaximumAngle ();
-    virtual csVector3 GetMaximumDistance ();
-    virtual csVector3 GetMinimumAngle ();
-    virtual csVector3 GetMinimumDistance ();
-    virtual bool IsXRotConstrained ();
-    virtual bool IsXTransConstrained ();
-    virtual bool IsYRotConstrained ();
-    virtual bool IsYTransConstrained ();
-    virtual bool IsZRotConstrained ();
-    virtual bool IsZTransConstrained ();
+    virtual csVector3 GetBounce () const;
+    virtual csVector3 GetMaximumAngle () const;
+    virtual csVector3 GetMaximumDistance () const;
+    virtual csVector3 GetMinimumAngle () const;
+    virtual csVector3 GetMinimumDistance () const;
+    virtual bool IsXRotConstrained () const;
+    virtual bool IsXTransConstrained () const;
+    virtual bool IsYRotConstrained () const;
+    virtual bool IsYTransConstrained () const;
+    virtual bool IsZRotConstrained () const;
+    virtual bool IsZTransConstrained () const;
+    virtual csOrthoTransform GetTransform () const;
 
   private:
     csVector3 bounce;
@@ -96,6 +98,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     csVector3 minDistance;
     bool rotConstraints[3];
     bool transConstraints[3];
+    csOrthoTransform transform;
   };
 
   class BodyBoneCollider : public scfImplementation1<BodyBoneCollider,
@@ -114,18 +117,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     virtual bool SetPlaneGeometry (const csPlane3 &plane);
     virtual bool SetSphereGeometry (const csSphere &sphere);
  
-    virtual csColliderGeometryType GetGeometryType ();
+    virtual csColliderGeometryType GetGeometryType () const;
 
-    virtual bool GetBoxGeometry (csVector3 &box_size);
-    virtual bool GetCapsuleGeometry (float &length, float &radius);
-    virtual bool GetConvexMeshGeometry (iMeshWrapper *&mesh);
-    virtual bool GetCylinderGeometry (float &length, float &radius);
-    virtual bool GetMeshGeometry (iMeshWrapper *&mesh);
-    virtual bool GetPlaneGeometry (csPlane3 &plane);
-    virtual bool GetSphereGeometry (csSphere &sphere);
+    virtual bool GetBoxGeometry (csVector3 &box_size) const;
+    virtual bool GetCapsuleGeometry (float &length, float &radius) const;
+    virtual bool GetConvexMeshGeometry (iMeshWrapper *&mesh) const;
+    virtual bool GetCylinderGeometry (float &length, float &radius) const;
+    virtual bool GetMeshGeometry (iMeshWrapper *&mesh) const;
+    virtual bool GetPlaneGeometry (csPlane3 &plane) const;
+    virtual bool GetSphereGeometry (csSphere &sphere) const;
 
     virtual void SetTransform (const csOrthoTransform &transform);
-    virtual csOrthoTransform GetTransform ();
+    virtual csOrthoTransform GetTransform () const;
 
     virtual void SetFriction (float friction);
     virtual float GetFriction () const;
