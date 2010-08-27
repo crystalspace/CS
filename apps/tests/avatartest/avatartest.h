@@ -28,6 +28,7 @@
 #include "imesh/lookat.h"
 #include "imesh/ragdoll.h"
 #include "ivaria/bullet.h"
+#include "ivaria/decal.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/dynamicsdebug.h"
 #include "ivaria/softanim.h"
@@ -78,6 +79,7 @@ class AvatarTest : public CS::Demo::DemoApplication
   friend class SintelScene;
 
 private:
+  // Current scene
   AvatarScene* avatarScene;
   int avatarSceneType;
 
@@ -86,20 +88,23 @@ private:
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
   csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
-  csRef<iDynamicsDebuggerManager> debuggerManager;
-  csRef<iDynamicSystemDebugger> dynamicsDebugger;
+  csRef<CS::Debug::iDynamicsDebuggerManager> debuggerManager;
+  csRef<CS::Debug::iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
 
   // Soft bodies related
-  csRef<iSoftBodyAnimationControlType> softBodyAnimationType;
-  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
+  csRef<CS::Animation::iSoftBodyAnimationControlType> softBodyAnimationType;
+  csRef<CS::Animation::iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   bool softBodiesEnabled;
 
   // Animation node plugin managers
-  csRef<CS::Animation::iSkeletonIKManager2> IKManager;
-  csRef<CS::Animation::iSkeletonLookAtManager2> lookAtManager;
-  csRef<CS::Animation::iSkeletonBasicNodesManager2> basicNodesManager;
-  csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;
+  csRef<CS::Animation::iSkeletonIKManager> IKManager;
+  csRef<CS::Animation::iSkeletonLookAtManager> lookAtManager;
+  csRef<CS::Animation::iSkeletonBasicNodesManager> basicNodesManager;
+  csRef<CS::Animation::iSkeletonRagdollManager> ragdollManager;
+
+  // Decal textures
+  csRef<iDecalManager> decalManager;
 
   //-- csBaseEventHandler
   void Frame ();
@@ -110,6 +115,9 @@ private:
   csVector3 GetCameraStart ();
   float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
+
+  // HitBeam test for mouse pointing at the animesh
+  bool HitBeamAnimatedMesh (csVector3& isect, csVector3& direction, int& triangle);
 
  public:
   AvatarTest ();

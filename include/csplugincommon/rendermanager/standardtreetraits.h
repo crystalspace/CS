@@ -67,6 +67,11 @@ namespace RenderManager
     {
     };
 
+    /// Any extra data that needs to persist between frames
+    struct PersistentDataExtraDataType
+    {
+    };
+
     /**
      * The data type to use as node key for mesh nodes.
      * The type must implement operator==() and operator<=().
@@ -97,7 +102,8 @@ namespace RenderManager
     /// Given a iMeshWrapper and a csRenderMesh, get the correct mesh node index
     static CS_FORCEINLINE 
     MeshNodeKeyType GetMeshNodeKey (CS::Graphics::RenderPriority defaultPriority, 
-				    const csRenderMesh& rendermesh)
+                                    const csRenderMesh& rendermesh,
+                                    const PersistentDataExtraDataType& data)
     {
       MeshNodeKeyType result = {0};
 
@@ -114,7 +120,8 @@ namespace RenderManager
     template<typename T>
     static CS_FORCEINLINE_TEMPLATEMETHOD 
     void SetupMeshNode (T& meshNode, CS::Graphics::RenderPriority defaultPriority, 
-                        const csRenderMesh& rendermesh)
+                        const csRenderMesh& rendermesh,
+                        const PersistentDataExtraDataType& data)
     {
       if (rendermesh.renderPrio >= 0)
         meshNode.priority = rendermesh.renderPrio;

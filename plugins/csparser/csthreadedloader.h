@@ -305,6 +305,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     iVFS* GetVFS() const { return vfs; }
 
+    const int& GetFlags () const
+    {
+      return loaderFlags;
+    }
+
+    void SetFlags (int flags)
+    {
+      loaderFlags = flags;
+    }
+
   protected:
 
     friend class csLoaderContext;
@@ -467,6 +477,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iSndSysManager> SndSysManager;
     // Sound renderer
     csRef<iSndSysRenderer> SndSysRenderer;
+    // Flags
+    int loaderFlags;
 
     // For checking whether to schedule a engine list sync.
     CS::Threading::ReadWriteMutex listSyncLock;

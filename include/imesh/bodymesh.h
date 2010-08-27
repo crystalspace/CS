@@ -38,7 +38,7 @@ namespace CS
 namespace Animation
 {
 
-struct iSkeletonFactory2;
+struct iSkeletonFactory;
 struct iBodySkeleton;
 struct iBodyBone;
 struct iBodyChain;
@@ -58,7 +58,7 @@ struct iBodyManager : public virtual iBase
    * Create a new body skeleton with the specified name.
    */
   virtual iBodySkeleton* CreateBodySkeleton
-    (const char *name, iSkeletonFactory2* skeletonFactory) = 0;
+    (const char *name, iSkeletonFactory* skeletonFactory) = 0;
 
   /**
    * Find a body skeleton from its name.
@@ -89,7 +89,7 @@ struct iBodySkeleton : public virtual iBase
   /**
    * Get the skeleton factory associated with this body skeleton.
    */
-  virtual iSkeletonFactory2* GetSkeletonFactory () const = 0;
+  virtual iSkeletonFactory* GetSkeletonFactory () const = 0;
 
   /**
    * Delete all body bones and all body chains.
@@ -327,59 +327,69 @@ struct iBodyBoneJoint : public virtual iBase
   virtual void SetTransConstraints (bool X, bool Y, bool Z) = 0;
  
   /**
+   * Set the transform of the joint relatively to this bone.
+   */
+  virtual void SetTransform (const csOrthoTransform &transform) = 0;
+ 
+  /**
    * Get the restitution of the joint's stop point.
    */
-  virtual csVector3 GetBounce () = 0;
+  virtual csVector3 GetBounce () const = 0;
 
   /**
    * Get the maximum constrained angle between bodies (in radian).
    */
-  virtual csVector3 GetMaximumAngle () = 0;
+  virtual csVector3 GetMaximumAngle () const = 0;
 
   /**
    * Get the maximum constrained distance between bodies.
    */
-  virtual csVector3 GetMaximumDistance () = 0;
+  virtual csVector3 GetMaximumDistance () const = 0;
 
   /**
    * Get the minimum constrained angle between bodies (in radian).
    */
-  virtual csVector3 GetMinimumAngle () = 0;
+  virtual csVector3 GetMinimumAngle () const = 0;
 
   /**
    * Get the minimum constrained distance between bodies.
    */
-  virtual csVector3 GetMinimumDistance () = 0;
+  virtual csVector3 GetMinimumDistance () const = 0;
 
   /**
    * True if this axis' rotation is constrained.
    */
-  virtual bool IsXRotConstrained () = 0;
+  virtual bool IsXRotConstrained () const = 0;
 
   /**
    * True if this axis' translation is constrained.
    */
-  virtual bool IsXTransConstrained () = 0;
+  virtual bool IsXTransConstrained () const = 0;
 
   /**
    * True if this axis' rotation is constrained.
    */
-  virtual bool IsYRotConstrained () = 0;
+  virtual bool IsYRotConstrained () const = 0;
 
   /**
    * True if this axis' translation is constrained.
    */
-  virtual bool IsYTransConstrained () = 0;
+  virtual bool IsYTransConstrained () const = 0;
 
   /**
    * True if this axis' rotation is constrained.
    */
-  virtual bool IsZRotConstrained () = 0;
+  virtual bool IsZRotConstrained () const = 0;
 
   /**
    * True if this axis' translation is constrained.
    */
-  virtual bool IsZTransConstrained () = 0;
+  virtual bool IsZTransConstrained () const = 0;
+
+  /**
+   * Get the transform of the joint relatively to this bone.
+   */
+  virtual csOrthoTransform GetTransform () const = 0;
 };
 
 /**
@@ -429,49 +439,49 @@ struct iBodyBoneCollider : public virtual iBase
   /**
    * Get the type of the collider geometry.
    */
-  virtual csColliderGeometryType GetGeometryType () = 0;
+  virtual csColliderGeometryType GetGeometryType () const = 0;
 
   /**
    * If this collider has a box geometry then the method will return true and the 
    * size of the box, otherwise it will return false.
    */
-  virtual bool GetBoxGeometry (csVector3 &box_size) = 0;
+  virtual bool GetBoxGeometry (csVector3 &box_size) const = 0;
 
   /**
    * If this collider has a capsule geometry then the method will return true and
    * the capsule's length and radius, otherwise it will return false.
    */
-  virtual bool GetCapsuleGeometry (float &length, float &radius) = 0;
+  virtual bool GetCapsuleGeometry (float &length, float &radius) const = 0;
 
   /**
    * If this collider has a convex mesh geometry then the method will return true and
    * the mesh, otherwise it will return false.
    */
-  virtual bool GetConvexMeshGeometry (iMeshWrapper *&mesh) = 0;
+  virtual bool GetConvexMeshGeometry (iMeshWrapper *&mesh) const = 0;
 
   /**
    * If this collider has a cylinder geometry then the method will return true and
    * the cylinder's length and radius, otherwise it will return false.
    */
-  virtual bool GetCylinderGeometry (float &length, float &radius) = 0;
+  virtual bool GetCylinderGeometry (float &length, float &radius) const = 0;
 
   /**
    * If this collider has a mesh geometry then the method will return true and
    * the mesh, otherwise it will return false.
    */
-  virtual bool GetMeshGeometry (iMeshWrapper *&mesh) = 0;
+  virtual bool GetMeshGeometry (iMeshWrapper *&mesh) const = 0;
 
   /**
    * If this collider has a plane geometry then the method will return true and 
    * the plane, otherwise it will return false.
    */
-  virtual bool GetPlaneGeometry (csPlane3 &plane) = 0;
+  virtual bool GetPlaneGeometry (csPlane3 &plane) const = 0;
 
   /**
    * If this collider has a sphere geometry then the method will return true and
    * the sphere, otherwise it will return false.
    */
-  virtual bool GetSphereGeometry (csSphere &sphere) = 0;
+  virtual bool GetSphereGeometry (csSphere &sphere) const = 0;
  
   /**
    * Set the local transform of this collider.
@@ -481,7 +491,7 @@ struct iBodyBoneCollider : public virtual iBase
   /**
    * Get the local transform of this collider.
    */
-  virtual csOrthoTransform GetTransform () = 0;
+  virtual csOrthoTransform GetTransform () const = 0;
 
   /**
    * Set the friction of the collider surface.

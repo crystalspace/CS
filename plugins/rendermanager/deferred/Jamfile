@@ -1,0 +1,10 @@
+SubDir TOP plugins rendermanager deferred ;
+
+Description rm_deferred : "Rendermanager (deferred)" ;
+
+Plugin rm_deferred : 
+  [ Wildcard *.cpp *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include csplugincommon rendermanager ] : *.h ]
+;
+CompileGroups rm_deferred : rendermanagers ;
+LinkWith rm_deferred : crystalspace ;

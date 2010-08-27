@@ -48,6 +48,7 @@ class KrystalScene : public AvatarScene
 
   // User interaction with the scene
   void ResetScene ();
+  void ResetSoftBodies ();
 
   // Display of information on the state of the scene
   void UpdateStateDescription ();
@@ -61,14 +62,16 @@ class KrystalScene : public AvatarScene
 
   // Ragdoll management related
   bool krystalDead;
-  csRef<CS::Animation::iSkeletonRagdollNode2> ragdollNode;
+  csRef<CS::Animation::iSkeletonRagdollNode> ragdollNode;
 
   // Inverse Kinematics management related
   bool IKenabled;
-  csRef<CS::Animation::iSkeletonIKNode2> IKNode;
+  csRef<CS::Animation::iSkeletonIKNode> IKNode;
   CS::Animation::EffectorID handEffector;
 
   // Krystal's hairs & skirt (and their soft bodies)
+  csRef<iMeshFactoryWrapper> hairsMeshFact;
+  csRef<iMeshFactoryWrapper> skirtMeshFact;
   csRef<iMeshWrapper> hairsMesh;
   csRef<iMeshWrapper> skirtMesh;
   csRef<CS::Physics::Bullet::iSoftBody> hairsBody;

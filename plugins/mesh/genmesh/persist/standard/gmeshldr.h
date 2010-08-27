@@ -75,6 +75,10 @@ public:
   virtual bool IsThreadSafe() { return true; }
 
   bool ParseRenderBuffer (iDocumentNode *node, iGeneralFactoryState* state);
+  
+protected:
+  struct SlidingWindow { int start; int end; SlidingWindow(int s, int e): start(s), end(e) {} };
+  void ParseSubMeshLOD(iDocumentNode *node, csArray<SlidingWindow>& sliding_windows);
 };
 
 /**
@@ -105,6 +109,9 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
+  
+protected:
+  void WriteSubMeshLOD(iGeneralMeshSubMesh* submesh, iDocumentNode* submeshNode);
 };
 
 /**

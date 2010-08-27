@@ -279,6 +279,7 @@ class csGraphics3DCaps(object):
     SupportsPointSprites = _swig_property(_ivideo.csGraphics3DCaps_SupportsPointSprites_get, _ivideo.csGraphics3DCaps_SupportsPointSprites_set)
     DestinationAlpha = _swig_property(_ivideo.csGraphics3DCaps_DestinationAlpha_get, _ivideo.csGraphics3DCaps_DestinationAlpha_set)
     StencilShadows = _swig_property(_ivideo.csGraphics3DCaps_StencilShadows_get, _ivideo.csGraphics3DCaps_StencilShadows_set)
+    MaxRTColorAttachments = _swig_property(_ivideo.csGraphics3DCaps_MaxRTColorAttachments_get, _ivideo.csGraphics3DCaps_MaxRTColorAttachments_set)
     def __init__(self, *args): 
         this = _ivideo.new_csGraphics3DCaps(*args)
         try: self.this.append(this)
@@ -332,7 +333,23 @@ csSimpleRenderMesh_swigregister(csSimpleRenderMesh)
 
 rtaDepth = _ivideo.rtaDepth
 rtaColor0 = _ivideo.rtaColor0
+rtaColor1 = _ivideo.rtaColor1
+rtaColor2 = _ivideo.rtaColor2
+rtaColor3 = _ivideo.rtaColor3
+rtaColor4 = _ivideo.rtaColor4
+rtaColor5 = _ivideo.rtaColor5
+rtaColor6 = _ivideo.rtaColor6
+rtaColor7 = _ivideo.rtaColor7
+rtaColor8 = _ivideo.rtaColor8
+rtaColor9 = _ivideo.rtaColor9
+rtaColor10 = _ivideo.rtaColor10
+rtaColor11 = _ivideo.rtaColor11
+rtaColor12 = _ivideo.rtaColor12
+rtaColor13 = _ivideo.rtaColor13
+rtaColor14 = _ivideo.rtaColor14
+rtaColor15 = _ivideo.rtaColor15
 rtaNumAttachments = _ivideo.rtaNumAttachments
+rtaNumColorAttachments = _ivideo.rtaNumColorAttachments
 class TextureComparisonMode(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr

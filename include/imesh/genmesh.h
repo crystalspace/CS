@@ -46,6 +46,40 @@ class csVector3;
 class csEllipsoid;
 
 /**
+ * A submesh of a genmesh factory.
+ */
+struct iGeneralFactorySubMesh : public virtual iBase
+{
+  SCF_INTERFACE (iGeneralFactorySubMesh, 1, 0, 3);
+
+  /// Clear progressive LOD sliding windows
+  virtual void ClearSlidingWindows() = 0;
+
+  /// Get the number of LOD sliding windows for progressive LODs
+  virtual int GetSlidingWindowSize() const = 0;
+
+  /// Add a sliding window for progressive LODs
+  virtual void AddSlidingWindow(int start_index, int end_index) = 0;
+
+  /// Return the start index and end index of the sliding window indicated by index.
+  virtual void GetSlidingWindow(unsigned int index, int& out_start_index, int& out_end_index) const = 0;
+};
+
+/**
+ * An instance of a submesh of a genmesh factory.
+ */
+struct iGeneralFactorySubMeshObject : public virtual iBase
+{
+  SCF_INTERFACE (iGeneralFactorySubMeshObject, 1, 0, 3);
+
+  /// Force the progressive LOD level. Set to -1 to use auto LODs.
+  virtual void ForceProgLODLevel(int level) = 0;
+
+  /// Get the current forced progressive LOD level. If it's -1, auto LODs are in effect.
+  virtual int GetForcedProgLODLevel() = 0;
+};
+
+/**
  * A submesh of a genmesh.
  */
 struct iGeneralMeshSubMesh : public virtual iBase
@@ -54,6 +88,9 @@ struct iGeneralMeshSubMesh : public virtual iBase
   
   /// Get the index render buffer
   virtual iRenderBuffer* GetIndices () = 0;
+
+  /// Set the index renderbuffer
+  virtual void SetIndices(iRenderBuffer* newIndices) = 0;
 
   /// Get the material
   virtual iMaterialWrapper* GetMaterial () const = 0;
@@ -231,7 +268,7 @@ struct iGeneralMeshCommonState : public virtual iBase
  */
 struct iGeneralMeshState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralMeshState, 2, 0, 0);
+  SCF_INTERFACE (iGeneralMeshState, 2, 0, 1);
   
   /**
    * Set the animation control to use for this mesh object.
@@ -257,6 +294,12 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
    */
   virtual iGeneralMeshSubMesh* FindSubMesh (const char* name) const = 0;
   /** @} */
+  
+  /** 
+   * Set the progressive LOD level on all submeshes.
+   * If a submesh's max prog LOD level is less than level, set it to its maximum.
+   */
+  virtual void ForceProgLODLevel(int level) = 0;
 };
 
 /**
@@ -283,7 +326,7 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
  */
 struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralFactoryState, 2, 0, 1);
+  SCF_INTERFACE (iGeneralFactoryState, 2, 0, 2);
   
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
@@ -506,6 +549,28 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    * \param sides Number of sides.
    */
   virtual void GenerateCylinder (float l, float r, uint sides) = 0;
+
+  /**\name Progressive LODs
+   * @{ */
+
+  /**
+   * Get the maximum between all submeshes' progressive LOD levels.
+   */
+  virtual int GetNumProgLODLevels() const = 0;
+
+  /**
+   * Get distances where progressive LOD will be in effect.
+   * See SetProgLODDistances for parameter details.
+   */
+  virtual void GetProgLODDistances(float& out_min, float& out_max) const = 0;
+
+  /**
+   * Set distances where progressive LOD will be in effect.
+   * \param min Minimum distance - starting from this distance, the model will begin to become less detailed.
+   * \param max Maximum distance - at this distance, the model will be at its minimum LOD.
+   */
+  virtual void SetProgLODDistances(float min, float max) = 0;
+  /** @} */
 };
 
 /**

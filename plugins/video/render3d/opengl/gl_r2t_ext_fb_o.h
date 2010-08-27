@@ -189,6 +189,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     void FreeBuffers();
     void Complete2 (bool& needsDepth, bool& needsStencil);
     void SetRBAttachment (GLenum attachment, RenderBufferWrapper* rb);
+    void SetDrawBuffers() const;
   public:
     uint32 initialAttachments;
     R2TAttachmentGroup<> attachments;

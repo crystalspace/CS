@@ -17698,6 +17698,88 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iEngine_EnableAdaptiveLODs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iEngine *arg1 = (iEngine *) 0 ;
+  bool arg2 ;
+  float arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEngine_EnableAdaptiveLODs",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEngine, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEngine_EnableAdaptiveLODs" "', argument " "1"" of type '" "iEngine *""'"); 
+  }
+  arg1 = reinterpret_cast< iEngine * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iEngine_EnableAdaptiveLODs" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iEngine_EnableAdaptiveLODs" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  (arg1)->EnableAdaptiveLODs(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iEngine_UpdateAdaptiveLODs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iEngine *arg1 = (iEngine *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEngine_UpdateAdaptiveLODs",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEngine, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEngine_UpdateAdaptiveLODs" "', argument " "1"" of type '" "iEngine *""'"); 
+  }
+  arg1 = reinterpret_cast< iEngine * >(argp1);
+  (arg1)->UpdateAdaptiveLODs();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iEngine_GetAdaptiveLODsMultiplier(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iEngine *arg1 = (iEngine *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  float result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEngine_GetAdaptiveLODsMultiplier",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEngine, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEngine_GetAdaptiveLODsMultiplier" "', argument " "1"" of type '" "iEngine const *""'"); 
+  }
+  arg1 = reinterpret_cast< iEngine * >(argp1);
+  result = (float)((iEngine const *)arg1)->GetAdaptiveLODsMultiplier();
+  resultobj = SWIG_From_float(static_cast< float >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iEngine_SetSaveableFlag(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iEngine *arg1 = (iEngine *) 0 ;
@@ -37564,6 +37646,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iEngine_SetCurrentDefaultRenderloop", _wrap_iEngine_SetCurrentDefaultRenderloop, METH_VARARGS, NULL},
 	 { (char *)"iEngine_GetCurrentFrameNumber", _wrap_iEngine_GetCurrentFrameNumber, METH_VARARGS, NULL},
 	 { (char *)"iEngine_UpdateNewFrame", _wrap_iEngine_UpdateNewFrame, METH_VARARGS, NULL},
+	 { (char *)"iEngine_EnableAdaptiveLODs", _wrap_iEngine_EnableAdaptiveLODs, METH_VARARGS, NULL},
+	 { (char *)"iEngine_UpdateAdaptiveLODs", _wrap_iEngine_UpdateAdaptiveLODs, METH_VARARGS, NULL},
+	 { (char *)"iEngine_GetAdaptiveLODsMultiplier", _wrap_iEngine_GetAdaptiveLODsMultiplier, METH_VARARGS, NULL},
 	 { (char *)"iEngine_SetSaveableFlag", _wrap_iEngine_SetSaveableFlag, METH_VARARGS, NULL},
 	 { (char *)"iEngine_GetSaveableFlag", _wrap_iEngine_GetSaveableFlag, METH_VARARGS, NULL},
 	 { (char *)"iEngine_CreateLoaderContext", _wrap_iEngine_CreateLoaderContext, METH_VARARGS, NULL},

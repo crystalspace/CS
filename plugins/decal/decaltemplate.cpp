@@ -42,11 +42,39 @@ csDecalTemplate::csDecalTemplate ()
     topColor (1, 1, 1, 1),
     bottomColor (1, 1, 1, 1)
 {
+#ifdef CS_DECAL_CLIP_DECAL
+  hasClipping = true;
+#else
+  hasClipping = false;
+#endif
 }
 
 csDecalTemplate::csDecalTemplate (iBase* parent)
-  : scfImplementationType (this, parent)
+  : scfImplementationType (this, parent),
+    timeToLive (-1.0f),
+    material (0),
+    renderPriority (0),
+    zBufMode (CS_ZBUF_TEST),
+    polygonNormalThreshold (0.01f),
+    decalOffset (0.05f),
+    hasTopClip (true), 
+    topClipScale (0.5f),
+    hasBottomClip (true), 
+    bottomClipScale (0.5f),
+    minTexCoord (0, 0),
+    maxTexCoord (1, 1),
+    mixMode (CS_FX_COPY),
+    perpendicularFaceThreshold (0.05f),
+    perpendicularFaceOffset (0.01f),
+    mainColor (1, 1, 1, 1),
+    topColor (1, 1, 1, 1),
+    bottomColor (1, 1, 1, 1)
 {
+#ifdef CS_DECAL_CLIP_DECAL
+  hasClipping = true;
+#else
+  hasClipping = false;
+#endif
 }
 
 csDecalTemplate::~csDecalTemplate ()
@@ -81,6 +109,11 @@ float csDecalTemplate::GetPolygonNormalThreshold () const
 float csDecalTemplate::GetDecalOffset () const
 {
   return decalOffset;
+}
+
+bool csDecalTemplate::HasClipping () const
+{
+  return hasClipping;
 }
 
 bool csDecalTemplate::HasTopClipping () const
@@ -171,6 +204,11 @@ void csDecalTemplate::SetPolygonNormalThreshold (float polygonNormalThreshold)
 void csDecalTemplate::SetDecalOffset (float decalOffset)
 {
   this->decalOffset = decalOffset;
+}
+
+void csDecalTemplate::SetClipping (bool enabled)
+{
+  hasClipping = enabled;
 }
 
 void csDecalTemplate::SetTopClipping (bool enabled, float topPlaneScale)

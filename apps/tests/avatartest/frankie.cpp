@@ -21,6 +21,7 @@
 
 #include "cssysdef.h"
 #include "frankie.h"
+#include "ivaria/decal.h"
 
 #define LOOKAT_CAMERA 1
 #define LOOKAT_POSITION 2
@@ -31,7 +32,8 @@
 #define ROTATION_IMMEDIATE 3
 
 FrankieScene::FrankieScene (AvatarTest* avatarTest)
-  : avatarTest (avatarTest), targetReached (false), lookAtListener (this)
+  : avatarTest (avatarTest), targetReached (false),
+    lookAtListener (this), decalsEnabled (false), decal (nullptr), decalPosition (0.0f)
 {
   // Define the available keys
   avatarTest->hudHelper.keyDescriptions.DeleteAll ();
@@ -47,6 +49,8 @@ FrankieScene::FrankieScene (AvatarTest* avatarTest)
     avatarTest->hudHelper.keyDescriptions.Push ("left mouse: kill Frankie");
     avatarTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
   }
+  if (avatarTest->decalManager)
+    avatarTest->hudHelper.keyDescriptions.Push ("c: toggle decals under the mouse");
   avatarTest->hudHelper.keyDescriptions.Push ("r: reset scene");
   avatarTest->hudHelper.keyDescriptions.Push ("n: switch to next scene");
 }
@@ -58,6 +62,10 @@ FrankieScene::~FrankieScene ()
 
   // Remove the 'lookat' listener
   lookAtNode->RemoveListener (&lookAtListener);
+
+  // Remove any active decal
+  if (decal)
+    avatarTest->decalManager->DeleteDecal (decal);
 
   // Remove the mesh from the scene
   csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
@@ -98,7 +106,7 @@ void FrankieScene::Frame ()
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = avatarTest->vc->GetElapsedTicks ();
 
-  // Update the morph state (frankie smiles sadistically if no target in view)
+  // Update the morph state (frankie smiles sadistically if there is no target in view)
   if (targetReached)
     smileWeight -= (float) elapsed_time / 250.0f;
   else 
@@ -113,6 +121,35 @@ void FrankieScene::Frame ()
 				 smileWeight);
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyebrows_down.B"),
 				 smileWeight);
+
+  // Update the decal
+  if (decalsEnabled)
+  {
+    // Check if the mouse is over the animesh
+    csVector3 isect;
+    csVector3 direction;
+    int triangle;
+    bool hit = avatarTest->HitBeamAnimatedMesh (isect, direction, triangle);
+
+    if (hit)
+    {
+      // Check if the position of the decal has changed
+      if (!decal || (decalPosition - isect).Norm () > 0.01f)
+      {
+	// Remove the previous decal
+	if (decal)
+	  avatarTest->decalManager->DeleteDecal (decal);
+
+	// Create a new decal
+	csVector3 up =
+	  avatarTest->view->GetCamera()->GetTransform ().This2OtherRelative (csVector3 (0,1,0));
+	csRef<iMeshObject> meshObject = scfQueryInterface<iMeshObject> (animesh);
+	decal = avatarTest->decalManager->CreateDecal (decalTemplate, meshObject->GetMeshWrapper (),
+						       isect, up, -direction, 0.1f, 0.1f, decal);
+	decalPosition = isect;
+      }
+    }
+  }
 }
 
 bool FrankieScene::OnKeyboard (iEvent &ev)
@@ -216,6 +253,23 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       if (avatarTest->dynamicsDebugMode == DYNDEBUG_COLLIDER
 	  || avatarTest->dynamicsDebugMode == DYNDEBUG_MIXED)
 	avatarTest->dynamicsDebugger->UpdateDisplay ();
+
+      return true;
+    }
+
+    // Toggle decals
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'c'
+	     && avatarTest->decalManager)
+    {
+      decalsEnabled = !decalsEnabled;
+
+      if (!decalsEnabled && decal)
+      {
+	avatarTest->decalManager->DeleteDecal (decal);
+	decal = nullptr;
+      }
+
+      return true;
     }
 
     // Reset of the scene
@@ -360,63 +414,63 @@ bool FrankieScene::CreateAvatar ()
   //     + 'LookAt' controller node
   //       + 'speed' controller node
   //         + animation nodes for all speeds
-  csRef<CS::Animation::iSkeletonAnimPacketFactory2> animPacketFactory =
+  csRef<CS::Animation::iSkeletonAnimPacketFactory> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create the 'LookAt' controller
-  csRef<CS::Animation::iSkeletonLookAtNodeFactory2> lookAtNodeFactory =
+  csRef<CS::Animation::iSkeletonLookAtNodeFactory> lookAtNodeFactory =
     avatarTest->lookAtManager->CreateAnimNodeFactory ("lookat", bodySkeleton);
 
   // Create the 'idle' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idleNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> idleNodeFactory =
     animPacketFactory->CreateAnimationNode ("idle");
   idleNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Idle1"));
 
   // Create the 'walk_slow' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> walkSlowNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> walkSlowNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk_slow");
   walkSlowNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_WalkSlow"));
 
   // Create the 'walk' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> walkNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> walkNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk");
   walkNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Walk"));
 
   // Create the 'walk_fast' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> walkFastNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> walkFastNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk_fast");
   walkFastNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_WalkFast"));
 
   // Create the 'footing' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> footingNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> footingNodeFactory =
     animPacketFactory->CreateAnimationNode ("footing");
   footingNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Runs"));
 
   // Create the 'run_slow' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runSlowNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> runSlowNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_slow");
   runSlowNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunSlow"));
 
   // Create the 'run' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> runNodeFactory =
     animPacketFactory->CreateAnimationNode ("run");
   runNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Run"));
 
   // Create the 'run_fast' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runFastNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> runFastNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_fast");
   runFastNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunFaster"));
 
   // Create the 'run_jump' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runJumpNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> runJumpNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_jump");
   runJumpNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunFast2Jump"));
@@ -424,7 +478,7 @@ bool FrankieScene::CreateAvatar ()
   // Create the 'speed' controller (and add all animations of Frankie moving at different speeds)
   // Unfortunately, the Frankie animations from 'walk fast' to 'footing'
   // do not blend well together, but this is just an example...
-  csRef<CS::Animation::iSkeletonSpeedNodeFactory2> speedNodeFactory =
+  csRef<CS::Animation::iSkeletonSpeedNodeFactory> speedNodeFactory =
     avatarTest->basicNodesManager->CreateSpeedNodeFactory ("speed");
   speedNodeFactory->AddNode (idleNodeFactory, 0.0f);
   speedNodeFactory->AddNode (walkSlowNodeFactory, 0.4f);
@@ -441,7 +495,7 @@ bool FrankieScene::CreateAvatar ()
   if (avatarTest->physicsEnabled)
   {
     // Create the ragdoll controller
-    csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
+    csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
       avatarTest->ragdollManager->CreateAnimNodeFactory ("ragdoll",
 					     bodySkeleton, avatarTest->dynamicSystem);
     animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
@@ -476,28 +530,54 @@ bool FrankieScene::CreateAvatar ()
 
   // When the animated mesh is created, the animation nodes are created too.
   // We can therefore set them up now.
-  CS::Animation::iSkeletonAnimNode2* rootNode =
+  CS::Animation::iSkeletonAnimNode* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
   // Setup of the LookAt controller
-  lookAtNode = scfQueryInterface<CS::Animation::iSkeletonLookAtNode2> (rootNode->FindNode ("lookat"));
+  lookAtNode = scfQueryInterface<CS::Animation::iSkeletonLookAtNode> (rootNode->FindNode ("lookat"));
   lookAtNode->AddListener (&lookAtListener);
   lookAtNode->SetBone (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
   lookAtNode->SetListenerDelay (0.6f);
 
   // Setup of the speed controller
-  speedNode = scfQueryInterface<CS::Animation::iSkeletonSpeedNode2> (rootNode->FindNode ("speed"));
+  speedNode = scfQueryInterface<CS::Animation::iSkeletonSpeedNode> (rootNode->FindNode ("speed"));
 
   // Setup of the ragdoll controller
   if (avatarTest->physicsEnabled)
     ragdollNode =
-      scfQueryInterface<CS::Animation::iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
+      scfQueryInterface<CS::Animation::iSkeletonRagdollNode> (rootNode->FindNode ("ragdoll"));
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
 
   // Start animation
   rootNode->Play ();
+
+  // Setup the decal
+  if (avatarTest->decalManager)
+  {
+    // Load the decal material
+    iMaterialWrapper * material = 
+      avatarTest->engine->GetMaterialList()->FindByName("decal");
+    if (!material)
+    {
+      if (!avatarTest->loader->LoadTexture ("decal", "/lib/std/cslogo2.png"))
+	avatarTest->ReportWarning ("Could not load the decal texture!");
+
+      material = avatarTest->engine->GetMaterialList()->FindByName("decal");
+    }
+    
+    if (!material)
+      avatarTest->ReportWarning ("Error finding decal material");
+
+    // Setup the decal template
+    else
+    {
+      decalTemplate = avatarTest->decalManager->CreateDecalTemplate (material);
+      decalTemplate->SetDecalOffset (0.001f);
+      decalTemplate->SetClipping (false);
+    }
+  }
 
   return true;
 }
@@ -583,5 +663,10 @@ void FrankieScene::UpdateStateDescription ()
   csString txt;
   txt.Format ("Walk speed: %.1f", ((float) currentSpeed) / 10.0f);
   avatarTest->hudHelper.stateDescriptions.Push (txt);
+
+  if (decalsEnabled)
+    avatarTest->hudHelper.stateDescriptions.Push ("Decal textures: ON");
+  else
+    avatarTest->hudHelper.stateDescriptions.Push ("Decal textures: OFF");
 }
 

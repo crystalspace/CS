@@ -37,8 +37,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
   }
 
-  csPtr<CS::Animation::iSkeletonAnimPacket2> AnimationPacketFactory::CreateInstance (
-    CS::Animation::iSkeleton2* skeleton)
+  csPtr<CS::Animation::iSkeletonAnimPacket> AnimationPacketFactory::CreateInstance (
+    CS::Animation::iSkeleton* skeleton)
   {
     csRef<AnimationPacket> newP;
     newP.AttachNew (new AnimationPacket (this));
@@ -47,10 +47,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     if (animRoot)
       newP->animRoot = animRoot->CreateInstance (newP, skeleton);
 
-    return csPtr<CS::Animation::iSkeletonAnimPacket2> (newP);
+    return csPtr<CS::Animation::iSkeletonAnimPacket> (newP);
   }
 
-  CS::Animation::iSkeletonAnimation2* AnimationPacketFactory::CreateAnimation (
+  CS::Animation::iSkeletonAnimation* AnimationPacketFactory::CreateAnimation (
     const char* name)
   {
     csRef<Animation> newFact;
@@ -61,7 +61,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return newFact;
   }
 
-  CS::Animation::iSkeletonAnimation2* AnimationPacketFactory::FindAnimation (
+  CS::Animation::iSkeletonAnimation* AnimationPacketFactory::FindAnimation (
     const char* name)
   {
     for (size_t i = 0; i < animationList.GetSize (); ++i)
@@ -78,7 +78,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     animationList.DeleteAll ();
   }
 
-  CS::Animation::iSkeletonAnimation2* AnimationPacketFactory::GetAnimation (size_t index)
+  CS::Animation::iSkeletonAnimation* AnimationPacketFactory::GetAnimation (size_t index)
   {
     return animationList[index];
   }
@@ -88,54 +88,54 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return animationList.GetSize ();
   }
 
-  void AnimationPacketFactory::SetAnimationRoot (CS::Animation::iSkeletonAnimNodeFactory2* root)
+  void AnimationPacketFactory::SetAnimationRoot (CS::Animation::iSkeletonAnimNodeFactory* root)
   {
     animRoot = root;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory2* AnimationPacketFactory::GetAnimationRoot () const
+  CS::Animation::iSkeletonAnimNodeFactory* AnimationPacketFactory::GetAnimationRoot () const
   {
     return animRoot;
   }
 
-  csPtr<CS::Animation::iSkeletonAnimationNodeFactory2> AnimationPacketFactory::CreateAnimationNode (
+  csPtr<CS::Animation::iSkeletonAnimationNodeFactory> AnimationPacketFactory::CreateAnimationNode (
     const char* name)
   {
-    csRef<CS::Animation::iSkeletonAnimationNodeFactory2> ref;
+    csRef<CS::Animation::iSkeletonAnimationNodeFactory> ref;
     ref.AttachNew (new AnimationNodeFactory (name));
-    return csPtr<CS::Animation::iSkeletonAnimationNodeFactory2> (ref);
+    return csPtr<CS::Animation::iSkeletonAnimationNodeFactory> (ref);
   }
   
-  csPtr<CS::Animation::iSkeletonBlendNodeFactory2> AnimationPacketFactory::CreateBlendNode (
+  csPtr<CS::Animation::iSkeletonBlendNodeFactory> AnimationPacketFactory::CreateBlendNode (
     const char* name)
   {
-    csRef<CS::Animation::iSkeletonBlendNodeFactory2> ref;
+    csRef<CS::Animation::iSkeletonBlendNodeFactory> ref;
     ref.AttachNew (new BlendNodeFactory (name));
-    return csPtr<CS::Animation::iSkeletonBlendNodeFactory2> (ref);
+    return csPtr<CS::Animation::iSkeletonBlendNodeFactory> (ref);
   }
 
-  csPtr<CS::Animation::iSkeletonPriorityNodeFactory2> AnimationPacketFactory::CreatePriorityNode (
+  csPtr<CS::Animation::iSkeletonPriorityNodeFactory> AnimationPacketFactory::CreatePriorityNode (
     const char* name)
   {
-    csRef<CS::Animation::iSkeletonPriorityNodeFactory2> ref;
+    csRef<CS::Animation::iSkeletonPriorityNodeFactory> ref;
     ref.AttachNew (new PriorityNodeFactory (name));
-    return csPtr<CS::Animation::iSkeletonPriorityNodeFactory2> (ref);
+    return csPtr<CS::Animation::iSkeletonPriorityNodeFactory> (ref);
   }
 
-  csPtr<CS::Animation::iSkeletonRandomNodeFactory2> AnimationPacketFactory::CreateRandomNode (
+  csPtr<CS::Animation::iSkeletonRandomNodeFactory> AnimationPacketFactory::CreateRandomNode (
     const char* name)
   {
-    csRef<CS::Animation::iSkeletonRandomNodeFactory2> ref;
+    csRef<CS::Animation::iSkeletonRandomNodeFactory> ref;
     ref.AttachNew (new RandomNodeFactory (name));
-    return csPtr<CS::Animation::iSkeletonRandomNodeFactory2> (ref);
+    return csPtr<CS::Animation::iSkeletonRandomNodeFactory> (ref);
   }
 
-  csPtr<CS::Animation::iSkeletonFSMNodeFactory2> AnimationPacketFactory::CreateFSMNode (
+  csPtr<CS::Animation::iSkeletonFSMNodeFactory> AnimationPacketFactory::CreateFSMNode (
     const char* name)
   {
-    csRef<CS::Animation::iSkeletonFSMNodeFactory2> ref;
+    csRef<CS::Animation::iSkeletonFSMNodeFactory> ref;
     ref.AttachNew (new FSMNodeFactory (name));
-    return csPtr<CS::Animation::iSkeletonFSMNodeFactory2> (ref);
+    return csPtr<CS::Animation::iSkeletonFSMNodeFactory> (ref);
   }
 
 
@@ -146,12 +146,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {    
   }
   
-  CS::Animation::iSkeletonAnimPacketFactory2* AnimationPacket::GetFactory () const
+  CS::Animation::iSkeletonAnimPacketFactory* AnimationPacket::GetFactory () const
   {
     return factory;
   }
 
-  CS::Animation::iSkeletonAnimNode2* AnimationPacket::GetAnimationRoot () const
+  CS::Animation::iSkeletonAnimNode* AnimationPacket::GetAnimationRoot () const
   {
     return animRoot;
   }
@@ -306,7 +306,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     afterOffset = k2.offset;
   }  
 
-  void Animation::BlendState (CS::Animation::csSkeletalState2* state, 
+  void Animation::BlendState (CS::Animation::csSkeletalState* state, 
     float baseWeight, float playbackTime, bool isPlayingCyclic) const
   {
     csArrayCmp<KeyFrame, float> cmp (playbackTime, KeyFrameTimeCompare);

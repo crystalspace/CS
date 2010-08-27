@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+            (C) 2010 by Joe Forte
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<shader compiler="xmlshader" name="deferred_dbg_light_volume" lights="0">
+
+  <technique priority="200" lights="0">
+    <pass>
+      
+      <mixmode> <alpha /> </mixmode>
+      
+      <vp plugin="glcg">
+        <cgvp>
+          <program>
+            struct app2vertex
+            {
+              float3 Position : POSITION;
+            };
+
+            struct vertex2fragment
+            {
+              float4 Position : POSITION;
+            };
+
+            vertex2fragment main(app2vertex IN,
+                                 uniform float4x4 ModelViewProj : state.matrix.mvp)
+            {
+              vertex2fragment OUT;
+              OUT.Position = mul (ModelViewProj, float4 (IN.Position, 1.0));
+              return OUT;
+            }
+          </program>
+        </cgvp>
+      </vp>
+
+      <fp plugin="glcg">
+        <cgfp>
+          <variablemap variable="static color" destination="StaticColor" />
+          <program>
+            float4 main(uniform float4 StaticColor) : COLOR
+            {
+              return StaticColor;
+            }
+          </program>
+        </cgfp>
+      </fp>
+
+    </pass>
+  </technique>
+
+</shader>

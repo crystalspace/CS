@@ -43,15 +43,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
   class BoneKinematicCallback;
 
   class DebuggerManager : public scfImplementation2<DebuggerManager,
-    iDynamicsDebuggerManager, iComponent>
+    CS::Debug::iDynamicsDebuggerManager, iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(DebuggerManager);
 
     DebuggerManager (iBase* parent);
 
-    //-- iDynamicsDebuggerManager
-    virtual iDynamicSystemDebugger* CreateDebugger ();
+    //-- CS::Debug::iDynamicsDebuggerManager
+    virtual CS::Debug::iDynamicSystemDebugger* CreateDebugger ();
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);
@@ -61,20 +61,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugDynamics)
 
   private:
     iObjectRegistry* object_reg;
-    csRefArray<iDynamicSystemDebugger> debuggers;
+    csRefArray<CS::Debug::iDynamicSystemDebugger> debuggers;
 
     friend class DynamicsDebugger;
   };
 
   class DynamicsDebugger : public scfImplementation1<DynamicsDebugger,
-    iDynamicSystemDebugger>
+    CS::Debug::iDynamicSystemDebugger>
   {
   public:
     CS_LEAKGUARD_DECLARE(DynamicsDebugger);
 
     DynamicsDebugger (DebuggerManager* manager);
 
-    //-- iDynamicSystemDebugger
+    //-- CS::Debug::iDynamicSystemDebugger
     virtual void SetDynamicSystem (iDynamicSystem* system);
     virtual void SetDebugSector (iSector* sector);
 

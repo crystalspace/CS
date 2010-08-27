@@ -40,15 +40,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     : scfImplementationType (this, parent)
   {}
 
-  CS::Animation::iSkeletonFactory2* SkeletonSystem::CreateSkeletonFactory (const char* name)
+  CS::Animation::iSkeletonFactory* SkeletonSystem::CreateSkeletonFactory (const char* name)
   {
     // Check name uniqueness
-    csRef<CS::Animation::iSkeletonFactory2> newFact = csPtr<CS::Animation::iSkeletonFactory2> (new SkeletonFactory);
+    csRef<CS::Animation::iSkeletonFactory> newFact = csPtr<CS::Animation::iSkeletonFactory> (new SkeletonFactory);
 
     return factoryHash.PutUnique (name, newFact);
   }
 
-  CS::Animation::iSkeletonFactory2* SkeletonSystem::FindSkeletonFactory (const char* name)
+  CS::Animation::iSkeletonFactory* SkeletonSystem::FindSkeletonFactory (const char* name)
   {
     return factoryHash.Get (name, 0);
   }
@@ -58,16 +58,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     factoryHash.DeleteAll ();
   }
 
-  CS::Animation::iSkeletonAnimPacketFactory2* SkeletonSystem::CreateAnimPacketFactory (const char* name)
+  CS::Animation::iSkeletonAnimPacketFactory* SkeletonSystem::CreateAnimPacketFactory (const char* name)
   {
     // Check name uniqueness
-    csRef<CS::Animation::iSkeletonAnimPacketFactory2> newFact = 
-      csPtr<CS::Animation::iSkeletonAnimPacketFactory2> (new AnimationPacketFactory);
+    csRef<CS::Animation::iSkeletonAnimPacketFactory> newFact = 
+      csPtr<CS::Animation::iSkeletonAnimPacketFactory> (new AnimationPacketFactory);
 
     return animPackets.PutUnique (name, newFact);
   }
 
-  CS::Animation::iSkeletonAnimPacketFactory2* SkeletonSystem::FindAnimPacketFactory (const char* name)
+  CS::Animation::iSkeletonAnimPacketFactory* SkeletonSystem::FindAnimPacketFactory (const char* name)
   {
     return animPackets.Get (name, 0);
   }
@@ -263,19 +263,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     cachedTransformsDirty = true;
   }
 
-  csPtr<CS::Animation::iSkeleton2> SkeletonFactory::CreateSkeleton ()
+  csPtr<CS::Animation::iSkeleton> SkeletonFactory::CreateSkeleton ()
   {
-    csRef<CS::Animation::iSkeleton2> ref;
+    csRef<CS::Animation::iSkeleton> ref;
     ref.AttachNew (new Skeleton (this));
-    return csPtr<CS::Animation::iSkeleton2> (ref);
+    return csPtr<CS::Animation::iSkeleton> (ref);
   }
 
-  CS::Animation::iSkeletonAnimPacketFactory2* SkeletonFactory::GetAnimationPacket () const
+  CS::Animation::iSkeletonAnimPacketFactory* SkeletonFactory::GetAnimationPacket () const
   {
     return animationPacket;
   }
 
-  void SkeletonFactory::SetAnimationPacket (CS::Animation::iSkeletonAnimPacketFactory2* fact)
+  void SkeletonFactory::SetAnimationPacket (CS::Animation::iSkeletonAnimPacketFactory* fact)
   {
     animationPacket = fact;
   }
@@ -490,13 +490,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     SetTransformAbsSpace (bone, newAbsRot, newAbsOffset);
   }
 
-  csPtr<CS::Animation::csSkeletalState2> Skeleton::GetStateAbsSpace ()
+  csPtr<CS::Animation::csSkeletalState> Skeleton::GetStateAbsSpace ()
   {
     UpdateCachedTransforms ();
 
     // Use a pool for these...
-    csRef<CS::Animation::csSkeletalState2> currState;
-    currState.AttachNew (new CS::Animation::csSkeletalState2);
+    csRef<CS::Animation::csSkeletalState> currState;
+    currState.AttachNew (new CS::Animation::csSkeletalState);
     currState->Setup (allBones.GetSize ());
 
     for (CS::Animation::BoneID i = 0; i < allBones.GetSize (); ++i)
@@ -509,14 +509,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    return csPtr<CS::Animation::csSkeletalState2> (currState);
+    return csPtr<CS::Animation::csSkeletalState> (currState);
   }
 
-  csPtr<CS::Animation::csSkeletalState2> Skeleton::GetStateBoneSpace ()
+  csPtr<CS::Animation::csSkeletalState> Skeleton::GetStateBoneSpace ()
   {
     // Use a pool for these...
-    csRef<CS::Animation::csSkeletalState2> currState;
-    currState.AttachNew (new CS::Animation::csSkeletalState2);
+    csRef<CS::Animation::csSkeletalState> currState;
+    currState.AttachNew (new CS::Animation::csSkeletalState);
     currState->Setup (allBones.GetSize ());
 
     for (size_t i = 0; i < allBones.GetSize (); ++i)
@@ -529,16 +529,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    return csPtr<CS::Animation::csSkeletalState2> (currState);
+    return csPtr<CS::Animation::csSkeletalState> (currState);
   }
 
-  csPtr<CS::Animation::csSkeletalState2> Skeleton::GetStateBindSpace ()
+  csPtr<CS::Animation::csSkeletalState> Skeleton::GetStateBindSpace ()
   {
     UpdateCachedTransforms ();
 
     // Use a pool for these...
-    csRef<CS::Animation::csSkeletalState2> currState;
-    currState.AttachNew (new CS::Animation::csSkeletalState2);
+    csRef<CS::Animation::csSkeletalState> currState;
+    currState.AttachNew (new CS::Animation::csSkeletalState);
     currState->Setup (allBones.GetSize ());
 
     for (size_t i = 0; i < allBones.GetSize (); ++i)
@@ -551,21 +551,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    return csPtr<CS::Animation::csSkeletalState2> (currState);
+    return csPtr<CS::Animation::csSkeletalState> (currState);
   }
 
-  CS::Animation::iSkeletonFactory2* Skeleton::GetFactory () const
+  CS::Animation::iSkeletonFactory* Skeleton::GetFactory () const
   {
     return factory;
   }
 
 
-  CS::Animation::iSkeletonAnimPacket2* Skeleton::GetAnimationPacket () const
+  CS::Animation::iSkeletonAnimPacket* Skeleton::GetAnimationPacket () const
   {
     return animationPacket;
   }
 
-  void Skeleton::SetAnimationPacket (CS::Animation::iSkeletonAnimPacket2* packet)
+  void Skeleton::SetAnimationPacket (CS::Animation::iSkeletonAnimPacket* packet)
   {
     animationPacket = packet;
   }
@@ -582,15 +582,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       return;
 
     // Update the root node
-    CS::Animation::iSkeletonAnimNode2* rootNode = animationPacket->GetAnimationRoot ();
+    CS::Animation::iSkeletonAnimNode* rootNode = animationPacket->GetAnimationRoot ();
     rootNode->TickAnimation (dt);
    
     // If the root node is active then update the skeleton
     if (rootNode->IsActive ())
     {
       // TODO: Use a pool for these...
-      csRef<CS::Animation::csSkeletalState2> finalState;
-      finalState.AttachNew (new CS::Animation::csSkeletalState2);
+      csRef<CS::Animation::csSkeletalState> finalState;
+      finalState.AttachNew (new CS::Animation::csSkeletalState);
       finalState->Setup (allBones.GetSize ());
 
       // Blend the root node into the skeleton state

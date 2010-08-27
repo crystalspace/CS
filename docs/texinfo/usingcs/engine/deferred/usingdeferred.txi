@@ -1,0 +1,235 @@
+@c -*-texinfo-*-
+@node Using Deferred, , About Deferred, Deferred Shading
+@subsubsection Using the Deferred Shading Render Manager
+@cindex usingdeferred
+
+@subsubheading Selecting the Deferred Render Manager
+
+The simplest method to select the deferred render manager is to use the
+following configuration option:
+@example
+Engine.RenderManager.Default = crystalspace.rendermanager.deferred
+@end example
+
+Alternately, the deferred render manager can also be loaded manually as follows:
+@example
+rm = csLoadPlugin<iRenderManager> (objectRegistry,
+  "crystalspace.rendermanager.deferred");
+@end example
+
+@emph{Note}: When loading the deferred render manager manually the
+'CS/data/config/engine.cfg' configuration file will not, by default, be present
+in the configuration manager. This file specifies configuration options used by
+the deferred render manager. Be sure to define these configurations option prior
+to loading the deferred render manager. 
+
+After being loaded, the engine must be instructed to use the deferred render
+manager as follows:
+@example
+engine->SetRenderManager (rm);
+@end example
+
+@subsubheading Filling the GBuffer
+
+Before lighting can be computed the deferred render manager will fill the
+GBuffer with the current sectors geometry information using the @samp{gbuffer
+fill} shader type. Each material can specify its own @samp{gbuffer fill} shader
+type that will be used by the deferred render manager. If no such shader type is
+specified then a default shader
+(@samp{CS/data/shader/deferred/fill_gbuffer.xml}) will be used.
+
+@subsubheading Using the GBuffer
+
+After the GBuffer is filled with the relevant information the deferred render
+manager will compute lighting information. To do this the render manager will
+iterate through all visible lights in the sector and draws proxy geometry that
+approximates the size and shape of the light source. Each light proxy is drawn
+using a shader that reads data from the GBuffer, computes the lighting equation,
+and adds it to the accumulation buffer.
+
+The following types of light sources are supported: 
+
+@table @code
+@item point light
+Represented as a sphere. The detail of the sphere can be controlled using the
+@samp{RenderManager.Deferred.SphereDetail} configuration option (defaults to
+16). The proxy geometry is drawn using the
+@samp{CS/data/shader/deferred/point_light.xml} shader.
+
+@item spot light
+Represented as a cone. The detail of the sphere can be controlled using the
+@samp{RenderManager.Deferred.ConeDetail} configuration option (defaults to 16).
+The proxy geometry is drawn using the
+@samp{CS/data/shader/deferred/spot_light.xml} shader.
+
+@item directional light
+Represented as a cube. The proxy geometry is drawn using the
+@samp{CS/data/shader/deferred/directional_light.xml} shader.
+
+@end table
+
+The deferred render manager will also output ambient light for the entire sector
+by drawing a single fullscreen quad with the
+@samp{CS/data/shader/deferred/ambient_light.xml} shader. This shader will
+modulate the GBuffers ambient and diffuse color at each pixel. 
+
+@emph{Note}: The shader include
+@samp{CS/data/shader/deferred/light_common.cginc} file contains a number of
+useful functions for use with light proxy shaders.
+
+@subsubheading Default GBuffer Layout
+
+The default GBuffer consists of three 16-bit floating-point RGBA color buffers
+along with one 32-bit depth and stencil buffer.
+
+@emph{Note}: Depending on hardware support the depth buffer might not contain
+any stencil bits.
+
+The default data layout is presented in the following table:
+
+@example
+               +-----+-------+------+--------------+
+               | Red | Green | Blue |    Alpha     |
++--------------+-----+-------+------+--------------+
+| buffer 0     |   diffuse (RGB)    | specular (R) |
++--------------+--------------------+--------------+
+| buffer 1     |   normal (XYZ)     | specular (G) |
++--------------+--------------------+--------------+
+| buffer 2     |   ambient (RGB)    | specular (B) |
++--------------+--------------------+--------------+
+| depth buffer |      depth and stencil value      |
++--------------+-----------------------------------+
+@end example
+
+The data stored in the GBuffer is described below:
+
+@table @code
+@item diffuse (RGB)
+The red, green, and blue components of the geometries diffuse color.
+@item specular (RGB)
+The red, green, and blue components of the geometries specular color.
+@item diffuse (RGB)
+The red, green, and blue components of the geometries ambient color.
+@item normal (XYZ)
+The xyz components of the geometries normal vector in view space. Normalized and
+mapped into the range [0,1].
+@item depth and stencil value
+The nonlinear post projection depth value and an optional stencil value. 
+@end table
+
+@subsubheading Changing the GBuffer Layout
+
+The layout of the GBuffer can be changed using the following configuration
+options: 
+
+@table @code
+@item RenderManager.Deferred.GBuffer.BufferCount
+Controls the number of color buffers present in the GBuffer (defaults to 3).
+The maximum number of color buffers can be queried from the @code{iGraphics3D}
+device as follows:
+@example
+const csGraphics3DCaps *caps = G3D->GetCaps ();
+int maxColorBuffers = caps->MaxRTColorAttachments;
+@end example
+
+@item RenderManager.Deferred.GBuffer.BufferFormat
+Controls the format of the color buffers (defaults to @code{rbga16_f}).
+
+@emph{Note}: Using 8-bits per color channel to store the view space normals can
+cause noticeable banding.
+
+@item RenderManager.Deferred.GBuffer.DepthBuffer
+Controls if the GBuffers depth buffer is present (defaults to @code{true}).
+@end table
+
+@emph{Note}: It is the responsibility of the 'gbuffer fill' and light proxy
+shaders to account for changes in the GBuffer layout.
+
+@subsubheading Light Proxy Shader Variables
+
+The deferred render manager provides additional shader variables that are only
+available to the light proxy shaders:
+
+@table @code
+@item tex gbuffer N
+Specifies the Nth color buffer where N is between 0 and
+@code{RenderManager.Deferred.GBuffer.BufferCount - 1}.
+
+@item tex gbuffer depth
+Specifies the GBuffers depth buffer. Only available if the GBuffer has a depth
+buffer.
+
+@item light position view
+The position of the light in view space. Only available for point lights and
+spot lights.
+
+@item light direction view
+The direction of the light in view space. Only available for spot lights and
+directional lights.
+@end table
+
+@subsubheading The Accumulation Buffer
+
+The accumulation buffer used by the deferred render manager to store lighting
+results is fixed to be the same size as the GBuffer. However, the format of the
+accumulation buffer can be controlled through the
+@samp{RenderManager.Deferred.AccumBufferFormat} configuration options (defaults
+to @code{rgb16_f}). Using a more compact format (@code{rgb8} for instance) may
+be useful if high precision is not needed or memory is an issue. 
+
+@emph{Note}: Each heavy portal (a portal that requires its sector to be rendered
+to an offscreen buffer) that is visible in the current frame will have its own
+accumulation buffer. Take this into consideration when choosing the accumulation
+buffer format.
+
+@subsubheading Forward Shading Fallback
+
+Due to the limitations of the deferred shading technique it is necessary for the
+deferred render manager to allow for some objects to be drawn using forward
+shading. The deferred render manager uses a meshes render priority (@pxref{HOWTO
+Render Priorities}) to determine if the mesh should be drawn using forward
+shading. The render priorities that the deferred render manager considers
+forward shading priorities can be controlled through the
+@samp{RenderManager.Deferred.ForwardPriorities} configuration option. This
+configuration option contains a comma separated list of render priority names
+(defaults to @samp{alpha,transp,portal}). Any mesh belonging to one of these
+render priorities will be drawn using forward shading.
+
+@emph{Note}: Heavy portals must belong to a render priority that will be drawn
+using forward shading. Any heavy portal that is not drawn using forward shading
+will appear as solid black polygons.
+
+@subsubheading Render Layers
+
+In general the use of render layers is unnecessary for deferred shading because
+there is only one well defined layer. However, the deferred render manager must
+also support forward shading and, as a result, more complex render layers are
+needed. The render layers can be controlled through the
+@samp{RenderManager.Deferred.Layers} configuration option (defaults to
+@samp{/data/renderlayers/lighting_default_deferred.xml}). The deferred render
+manager expects there to be one render layer that specifies the @samp{gbuffer
+fill} shader type. This layer is reserved for deferred shading and will not be
+used during forward shading. All other render layers will be used for forward
+shading only.
+
+@emph{Note}: If no render layer is specified with a @samp{gbuffer fill} shader
+type then a default layer will be added that uses the
+@samp{CS/data/shader/deferred/fill_gbuffer.xml} shader.
+
+@subsubheading Debug Commands
+
+The deferred render manager implements the @code{iDebugHelper} interface and
+responds to the following debug commands:
+
+@table @code
+@item toggle_visualize_gbuffer
+Toggles a display of the GBuffer at the bottom of the screen. The GBuffers color
+buffers will be displayed in order from left to right followed by the GBuffers
+depth buffer. The debug command can be activated through BugPlug (@pxref{BugPlug}) using the
+command @code{ctrl+d, ctrl+shift+alt+g}.
+
+@item toggle_visualize_lightvolumes
+Toggles a display of the light proxy geometry drawn for each light. The debug
+command can be activated through BugPlug using the command @code{ctrl+d,
+ctrl+shift+alt+l}.
+@end table

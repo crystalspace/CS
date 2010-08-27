@@ -1823,12 +1823,12 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
         if (!aniMesh)
           continue;
 
-	CS::Animation::iSkeleton2* skeleton = aniMesh->GetSkeleton ();
+	CS::Animation::iSkeleton* skeleton = aniMesh->GetSkeleton ();
         if (!skeleton)
           continue;
 
 
-        CS::Animation::iSkeletonFactory2* fact = skeleton->GetFactory ();
+        CS::Animation::iSkeletonFactory* fact = skeleton->GetFactory ();
 
         // Setup the "end" positions of all bones
         const CS::Animation::BoneID lastId = fact->GetTopBoneID ();

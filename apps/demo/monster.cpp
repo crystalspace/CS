@@ -92,14 +92,14 @@ bool Monster::Initialize(iMeshWrapper* spawn)
   if (animesh)
   {
     // Start the root animation node
-    CS::Animation::iSkeletonAnimNode2* rootNode =
+    CS::Animation::iSkeletonAnimNode* rootNode =
       animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
     rootNode->Play ();
 
     // Find the FSM animation node
-    weapon->fsmNode = fsmNode = (CS::Animation::iSkeletonFSMNode2*) rootNode->FindNode ("fsm");
+    weapon->fsmNode = fsmNode = (CS::Animation::iSkeletonFSMNode*) rootNode->FindNode ("fsm");
     weapon->fsmNodeFactory =
-      fsmNodeFactory = fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory2*) fsmNode->GetFactory () : 0;
+      fsmNodeFactory = fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory*) fsmNode->GetFactory () : 0;
   }
 
   // If this is the 'knight' monster then create and attach a sword in his hand

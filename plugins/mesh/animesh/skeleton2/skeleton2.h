@@ -34,7 +34,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
 
   class SkeletonSystem : public scfImplementation2<SkeletonSystem, 
-                                                   CS::Animation::iSkeletonManager2,
+                                                   CS::Animation::iSkeletonManager,
                                                    iComponent>
   {
   public:
@@ -42,13 +42,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
     SkeletonSystem (iBase* parent);
 
-    //-- CS::Animation::iSkeletonManager2
-    virtual CS::Animation::iSkeletonFactory2* CreateSkeletonFactory (const char* name);
-    virtual CS::Animation::iSkeletonFactory2* FindSkeletonFactory (const char* name);
+    //-- CS::Animation::iSkeletonManager
+    virtual CS::Animation::iSkeletonFactory* CreateSkeletonFactory (const char* name);
+    virtual CS::Animation::iSkeletonFactory* FindSkeletonFactory (const char* name);
     virtual void ClearSkeletonFactories ();
 
-    virtual CS::Animation::iSkeletonAnimPacketFactory2* CreateAnimPacketFactory (const char* name);
-    virtual CS::Animation::iSkeletonAnimPacketFactory2* FindAnimPacketFactory (const char* name);
+    virtual CS::Animation::iSkeletonAnimPacketFactory* CreateAnimPacketFactory (const char* name);
+    virtual CS::Animation::iSkeletonAnimPacketFactory* FindAnimPacketFactory (const char* name);
     virtual void ClearAnimPacketFactories ();
 
     virtual void ClearAll ();
@@ -57,22 +57,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual bool Initialize (iObjectRegistry*);
   
   private:
-    csHash<csRef<CS::Animation::iSkeletonFactory2>, csString> factoryHash;
-    csHash<csRef<CS::Animation::iSkeletonAnimPacketFactory2>, csString> animPackets;
+    csHash<csRef<CS::Animation::iSkeletonFactory>, csString> factoryHash;
+    csHash<csRef<CS::Animation::iSkeletonAnimPacketFactory>, csString> animPackets;
   };
 
 
 
 
   class SkeletonFactory : public scfImplementation1<SkeletonFactory,
-                                                    CS::Animation::iSkeletonFactory2>
+                                                    CS::Animation::iSkeletonFactory>
   {
   public:
     CS_LEAKGUARD_DECLARE(SkeletonFactory);
   
     SkeletonFactory ();
 
-    //-- CS::Animation::iSkeletonFactory2
+    //-- CS::Animation::iSkeletonFactory
     virtual CS::Animation::BoneID CreateBone (CS::Animation::BoneID parent = CS::Animation::InvalidBoneID);
     virtual CS::Animation::BoneID FindBone (const char *name) const;
     virtual void RemoveBone (CS::Animation::BoneID bone);
@@ -92,10 +92,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void SetTransformAbsSpace (CS::Animation::BoneID bone, const csQuaternion& rot, 
       const csVector3& offset);
 
-    virtual csPtr<CS::Animation::iSkeleton2> CreateSkeleton ();
+    virtual csPtr<CS::Animation::iSkeleton> CreateSkeleton ();
  
-    virtual CS::Animation::iSkeletonAnimPacketFactory2* GetAnimationPacket () const;
-    virtual void SetAnimationPacket (CS::Animation::iSkeletonAnimPacketFactory2* fact);
+    virtual CS::Animation::iSkeletonAnimPacketFactory* GetAnimationPacket () const;
+    virtual void SetAnimationPacket (CS::Animation::iSkeletonAnimPacketFactory* fact);
 
     //-- "Private"
     inline const csArray<size_t>& GetOrderList () const
@@ -130,7 +130,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     csSafeCopyArray<csString> boneNames;
 
     csArray<size_t> boneOrderList;
-    csRef<CS::Animation::iSkeletonAnimPacketFactory2> animationPacket;    
+    csRef<CS::Animation::iSkeletonAnimPacketFactory> animationPacket;    
 
     bool cachedTransformsDirty;
     bool orderListDirty;
@@ -139,14 +139,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   };
 
 
-  class Skeleton : public scfImplementation1<Skeleton, CS::Animation::iSkeleton2>
+  class Skeleton : public scfImplementation1<Skeleton, CS::Animation::iSkeleton>
   {
   public:
     CS_LEAKGUARD_DECLARE(Skeleton);
   
     Skeleton (SkeletonFactory* factory);
 
-    //-- CS::Animation::iSkeleton2
+    //-- CS::Animation::iSkeleton
     virtual iSceneNode* GetSceneNode ();
     virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh);
     virtual CS::Mesh::iAnimatedMesh* GetAnimatedMesh ();
@@ -166,14 +166,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void SetTransformBindSpace (CS::Animation::BoneID bone, const csQuaternion& rot, 
       const csVector3& offset);
 
-    virtual csPtr<CS::Animation::csSkeletalState2> GetStateAbsSpace ();
-    virtual csPtr<CS::Animation::csSkeletalState2> GetStateBoneSpace ();
-    virtual csPtr<CS::Animation::csSkeletalState2> GetStateBindSpace ();
+    virtual csPtr<CS::Animation::csSkeletalState> GetStateAbsSpace ();
+    virtual csPtr<CS::Animation::csSkeletalState> GetStateBoneSpace ();
+    virtual csPtr<CS::Animation::csSkeletalState> GetStateBindSpace ();
 
-    virtual CS::Animation::iSkeletonFactory2* GetFactory () const;
+    virtual CS::Animation::iSkeletonFactory* GetFactory () const;
 
-    virtual CS::Animation::iSkeletonAnimPacket2* GetAnimationPacket () const;
-    virtual void SetAnimationPacket (CS::Animation::iSkeletonAnimPacket2* packet);
+    virtual CS::Animation::iSkeletonAnimPacket* GetAnimationPacket () const;
+    virtual void SetAnimationPacket (CS::Animation::iSkeletonAnimPacket* packet);
 
     virtual void RecreateSkeleton ();
     virtual void UpdateSkeleton (float dt);
@@ -210,7 +210,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     csArray<Bone> allBones;
 
     SkeletonFactory* factory;
-    csRef<CS::Animation::iSkeletonAnimPacket2> animationPacket;
+    csRef<CS::Animation::iSkeletonAnimPacket> animationPacket;
     bool cachedTransformsDirty;
     unsigned int version, versionLastReset;
     csWeakRef<CS::Mesh::iAnimatedMesh> animesh;

@@ -150,6 +150,12 @@ typedef intptr_t GLintptr;
 #ifndef CS_HAVE_GLSIZEIPTR_T
 typedef uintptr_t GLsizeiptr;
 #endif
+#ifndef CS_HAVE_GLINT64_T
+typedef int64 GLint64;
+#endif
+#ifndef CS_HAVE_GLUINT64_T
+typedef uint64 GLuint64;
+#endif
 
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"

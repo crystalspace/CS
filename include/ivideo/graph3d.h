@@ -575,6 +575,11 @@ struct csGraphics3DCaps
    * Enough stencil bits for stencil shadows are available.
    */
   bool StencilShadows;
+  /**
+   * The number of supported render target color buffer attachment points.
+   * Does not include the depth/stencil attachment point.
+   */
+  int MaxRTColorAttachments;
 };
 
 /// Primitive type of a mesh
@@ -756,11 +761,50 @@ enum csRenderTargetAttachment
 {
   /// Depth
   rtaDepth,
-  /// Color
+  /// Color 0
   rtaColor0,
+  /// Color 1
+  rtaColor1,
+  /// Color 2
+  rtaColor2,
+  /// Color 3
+  rtaColor3,
+  /// Color 4
+  rtaColor4,
+  /// Color 5
+  rtaColor5,
+  /// Color 6
+  rtaColor6,
+  /// Color 7
+  rtaColor7,
+  /// Color 8
+  rtaColor8,
+  /// Color 9
+  rtaColor9,
+  /// Color 10
+  rtaColor10,
+  /// Color 11
+  rtaColor11,
+  /// Color 12
+  rtaColor12,
+  /// Color 13
+  rtaColor13,
+  /// Color 14
+  rtaColor14,
+  /// Color 15
+  rtaColor15,
+
+  /*
+   * We stop at 16 color buffer attachment points since that is the current limit placed
+   * on the OpenGL framebuffer extension (as of May 19 2010).
+   *
+   * http://www.opengl.org/registry/specs/EXT/framebuffer_object.txt
+   */
 
   /// Number of supported attachments
-  rtaNumAttachments
+  rtaNumAttachments,
+  /// Number of supported color attachment points.
+  rtaNumColorAttachments = rtaNumAttachments - 1
 };
 
 namespace CS

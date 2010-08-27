@@ -104,9 +104,6 @@ void AvatarTest::Frame ()
   if (avatarScene->HasPhysicalObjects ()
       && dynamicsDebugMode == DYNDEBUG_BULLET)
     bulletDynamicSystem->DebugDraw (view);
-
-  // Display of visual debugging informations
-  CS::Debug::VisualDebuggerHelper::Display (GetObjectRegistry (), view, 0.1f);
 }
 
 bool AvatarTest::OnKeyboard (iEvent &ev)
@@ -212,6 +209,24 @@ bool AvatarTest::OnMouseDown (iEvent& ev)
   return avatarScene->OnMouseDown (ev);
 }
 
+bool AvatarTest::HitBeamAnimatedMesh (csVector3& isect, csVector3& direction, int& triangle)
+{
+  if (!avatarScene)
+    return false;
+
+  csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+  iCamera* camera = view->GetCamera ();
+  csVector3 v3d = camera->InvPerspective (v2d, 10000);
+  csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+  csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+  direction = endBeam - startBeam;
+  direction.Normalize ();
+
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (avatarScene->animesh);
+  return mesh->HitBeamObject (startBeam, endBeam, isect, nullptr, &triangle);
+}
+
 bool AvatarTest::OnInitialize (int argc, char* argv[])
 {
   // Default behavior from DemoApplication
@@ -220,11 +235,13 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ik.physical",
-		       CS::Animation::iSkeletonIKManager2),
+		       CS::Animation::iSkeletonIKManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
-		       CS::Animation::iSkeletonLookAtManager2),
+		       CS::Animation::iSkeletonLookAtManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
-		       CS::Animation::iSkeletonBasicNodesManager2),
+		       CS::Animation::iSkeletonBasicNodesManager),
+    CS_REQUEST_PLUGIN ("crystalspace.decal.manager",
+		       iDecalManager),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -253,7 +270,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     }
 
     // Load the dynamics debugger
-    debuggerManager = csLoadPlugin<iDynamicsDebuggerManager>
+    debuggerManager = csLoadPlugin<CS::Debug::iDynamicsDebuggerManager>
       (plugmgr, "crystalspace.dynamics.debug");
 
     if (!debuggerManager)
@@ -265,7 +282,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     }
 
     // Load the ragdoll plugin
-    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager2>
+    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager>
       (plugmgr, "crystalspace.mesh.animesh.controllers.ragdoll");
 
     if (!ragdollManager)
@@ -284,7 +301,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     {
       csRef<iPluginManager> plugmgr = 
 	csQueryRegistry<iPluginManager> (GetObjectRegistry ());
-      softBodyAnimationType = csLoadPlugin<iSoftBodyAnimationControlType>
+      softBodyAnimationType = csLoadPlugin<CS::Animation::iSoftBodyAnimationControlType>
 	(plugmgr, "crystalspace.dynamics.softanim");
 
       if (!softBodyAnimationType)
@@ -330,16 +347,19 @@ bool AvatarTest::Application ()
     return false;
 
   // Find references to the plugins of the animation nodes
-  IKManager = csQueryRegistry<CS::Animation::iSkeletonIKManager2> (GetObjectRegistry ());
-  if (!IKManager) return ReportError("Failed to locate iSkeletonIKManager2 plugin!");
+  IKManager = csQueryRegistry<CS::Animation::iSkeletonIKManager> (GetObjectRegistry ());
+  if (!IKManager) return ReportError("Failed to locate iSkeletonIKManager plugin!");
 
-  lookAtManager = csQueryRegistry<CS::Animation::iSkeletonLookAtManager2> (GetObjectRegistry ());
-  if (!lookAtManager) return ReportError("Failed to locate iSkeletonLookAtManager2 plugin!");
+  lookAtManager = csQueryRegistry<CS::Animation::iSkeletonLookAtManager> (GetObjectRegistry ());
+  if (!lookAtManager) return ReportError("Failed to locate iSkeletonLookAtManager plugin!");
 
   basicNodesManager =
-    csQueryRegistry<CS::Animation::iSkeletonBasicNodesManager2> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonBasicNodesManager> (GetObjectRegistry ());
   if (!basicNodesManager)
-    return ReportError("Failed to locate iSkeletonBasicNodesManager2 plugin!");
+    return ReportError("Failed to locate iSkeletonBasicNodesManager plugin!");
+
+  // Find a reference to the decal plugin
+  decalManager = csQueryRegistry<iDecalManager> (GetObjectRegistry ());
 
   // Default behavior from DemoApplication for the creation of the scene
   if (!DemoApplication::CreateRoom ())
@@ -391,7 +411,7 @@ bool AvatarTest::Application ()
 	csRef<iGenMeshAnimationControlFactory> animationFactory =
 	  softBodyAnimationType->CreateAnimationControlFactory ();
 	softBodyAnimationFactory =
-	  scfQueryInterface<iSoftBodyAnimationControlFactory> (animationFactory);
+	  scfQueryInterface<CS::Animation::iSoftBodyAnimationControlFactory> (animationFactory);
 
 	// Set up the physical collider for the roof (soft bodies don't like plane
 	// colliders, so use a box instead)
@@ -407,7 +427,7 @@ bool AvatarTest::Application ()
     }
   }
 
-  // Create avatar
+  // Create the avatar scene
   if (avatarSceneType == MODEL_KRYSTAL)
     avatarScene = new KrystalScene (this);
   else if (avatarSceneType == MODEL_SINTEL)
@@ -418,7 +438,7 @@ bool AvatarTest::Application ()
   if (!avatarScene->CreateAvatar ())
     return false;
 
-  // Initialize camera position
+  // Initialize the camera position
   cameraHelper.ResetCamera ();
 
   // Run the application

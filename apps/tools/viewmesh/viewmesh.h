@@ -51,8 +51,8 @@
 struct iAnimatedMesh;
 struct iAnimatedMeshFactory;
 struct iAnimatedMeshSocket;
-struct iSkeletonAnimNode2;
-struct iSkeletonAnimNodeFactory2;
+struct iSkeletonAnimNode;
+struct iSkeletonAnimNodeFactory;
 
 #include "assetbase.h"
 #include "tabbase.h"
@@ -106,6 +106,10 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   float move_sprite_speed;
 
   csRef<AssetBase> asset;
+
+  int lod_level;
+  int max_lod_level;
+  bool auto_lod;
 
   void ResetCamera();
   void UpdateCamera();

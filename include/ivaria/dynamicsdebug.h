@@ -27,35 +27,36 @@
 
 #include "csutil/scf.h"
 
-struct iDynamicSystemDebugger;
 struct iDynamicSystem;
 struct iSector;
 struct iMaterialWrapper;
 
-namespace CS
-{
-namespace Physics
-{
-namespace Bullet
-{
+namespace CS {
+namespace Physics {
+namespace Bullet {
 
 enum BodyState;
 
-}
-}
-}
+} // namespace Bullet
+} // namespace Physics
+} // namespace CS
+
+namespace CS {
+namespace Debug {
+
+struct iDynamicSystemDebugger;
 
 /**
  * Creation of dynamic system debuggers.
  */
 struct iDynamicsDebuggerManager : public virtual iBase
 {
-  SCF_INTERFACE(iDynamicsDebuggerManager, 1, 0, 0);
+  SCF_INTERFACE(CS::Debug::iDynamicsDebuggerManager, 1, 0, 0);
 
   /**
    * Create a new debugger.
    */
-  virtual iDynamicSystemDebugger* CreateDebugger () = 0;
+  virtual CS::Debug::iDynamicSystemDebugger* CreateDebugger () = 0;
 };
 
 /**
@@ -64,7 +65,7 @@ struct iDynamicsDebuggerManager : public virtual iBase
  */
 struct iDynamicSystemDebugger : public virtual iBase
 {
-  SCF_INTERFACE(iDynamicSystemDebugger, 1, 0, 1);
+  SCF_INTERFACE(CS::Debug::iDynamicSystemDebugger, 1, 0, 1);
 
   /**
    * Set the dynamic system that has to be debugged.
@@ -120,8 +121,7 @@ struct iDynamicSystemDebugger : public virtual iBase
 				     iMaterialWrapper* material) = 0;
 };
 
-/*
-} //namespace Bullet
-} //namespace Physics
-*/
+} //namespace Debug
+} //namespace CS
+
 #endif // __CS_IVARIA_DYNAMICSDEBUG_H__

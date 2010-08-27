@@ -79,16 +79,18 @@ iDecal * csDecalManager::CreateDecal (iDecalTemplate * decalTemplate,
   iSector * sector, const csVector3 & pos, const csVector3 & up, 
   const csVector3 & normal, float width, float height, iDecal * oldDecal)
 {
+  CS_ASSERT(decalTemplate && sector);
+
   // compute the maximum distance the decal can reach
-  float radius = csQsqrt (width * width + height * height) * 2.0f;
+  float radius = csQsqrt (width * width + height * height) * 0.5f;
 
   if (!EnsureEngineReference ())
     return 0;
 
   // get all meshes that could be affected by this decal
-  csRef<iMeshWrapperIterator> it = engine->GetNearbyMeshes (sector, pos, 
+  csRef<iMeshWrapperIterator> meshIter = engine->GetNearbyMeshes (sector, pos, 
     radius, true);
-  if (!it->HasNext ())
+  if (!meshIter->HasNext ())
       return 0;
 
   // calculate a valid orientation for the decal
@@ -97,11 +99,10 @@ iDecal * csDecalManager::CreateDecal (iDecalTemplate * decalTemplate,
   csVector3 right = n % u;
   csVector3 correctUp = right % n;
 
-  // create the decal and fill it with mesh geometry
+  // find a reference to the previous decal or create a new one
   csDecal * decal = 0;
   if (oldDecal)
   {
-    // we must ensure that this decal is actually active
     const size_t len = decals.GetSize ();
     for (size_t a = 0; a < len; ++a)
     {
@@ -116,11 +117,75 @@ iDecal * csDecalManager::CreateDecal (iDecalTemplate * decalTemplate,
   if (!decal)
     decal = new csDecal (objectReg, this);
 
-  csVector3 relPos;
-
+  // initialize the decal
   decal->Initialize (decalTemplate, n, pos, correctUp, right, width, height);
   decals.Push (decal);
-  FillDecal (decal, it, pos, radius);
+
+  // fill the decal with the geometry of the meshes
+  while (meshIter->HasNext ())
+  {
+    iMeshWrapper* mesh = meshIter->Next ();
+    if (mesh->GetFlags ().Check (CS_ENTITY_NODECAL))
+      continue;
+
+    csVector3 relPos = 
+      mesh->GetMovable ()->GetFullTransform ().Other2This (pos);
+
+    decal->BeginMesh (mesh);
+    mesh->GetMeshObject ()->BuildDecal (&relPos, radius, (iDecalBuilder*)decal);
+    decal->EndMesh ();
+  }
+
+  return decal;
+}
+
+iDecal * csDecalManager::CreateDecal (iDecalTemplate * decalTemplate, 
+  iMeshWrapper * mesh, const csVector3 & pos, const csVector3 & up, 
+  const csVector3 & normal, float width, float height, iDecal * oldDecal)
+{
+  CS_ASSERT(decalTemplate && mesh);
+
+  if (mesh->GetFlags ().Check (CS_ENTITY_NODECAL))
+    return 0;
+
+  // compute the maximum distance the decal can reach
+  float radius = csQsqrt (width * width + height * height) * 0.5f;
+
+  // calculate a valid orientation for the decal
+  csVector3 n = normal.Unit ();
+  csVector3 u = up.Unit ();
+  csVector3 right = n % u;
+  csVector3 correctUp = right % n;
+
+  // find a reference to the previous decal or create a new one
+  csDecal * decal = 0;
+  if (oldDecal)
+  {
+    const size_t len = decals.GetSize ();
+    for (size_t a = 0; a < len; ++a)
+    {
+      if (decals[a] != oldDecal)
+	    continue;
+
+      decal = decals[a];
+      decals.DeleteIndexFast (a);
+      break;
+    }
+  }
+  if (!decal)
+    decal = new csDecal (objectReg, this);
+
+  // initialize the decal
+  decal->Initialize (decalTemplate, n, pos, correctUp, right, width, height);
+  decals.Push (decal);
+
+  // fill the decal with the geometry of the mesh
+  csVector3 relPos = 
+    mesh->GetMovable ()->GetFullTransform ().Other2This (pos);
+
+  decal->BeginMesh (mesh);
+  mesh->GetMeshObject ()->BuildDecal (&relPos, radius, (iDecalBuilder*)decal);
+  decal->EndMesh ();
 
   return decal;
 }
@@ -198,24 +263,6 @@ bool csDecalManager::EnsureEngineReference ()
     }
   }
   return true;
-}
-
-void csDecalManager::FillDecal (csDecal * decal,
-  iMeshWrapperIterator * meshIter, const csVector3 & pos, float radius)
-{
-  while (meshIter->HasNext ())
-  {
-    iMeshWrapper* mesh = meshIter->Next ();
-    if (mesh->GetFlags ().Check (CS_ENTITY_NODECAL))
-      continue;
-
-    csVector3 relPos = 
-      mesh->GetMovable ()->GetFullTransform ().Other2This (pos);
-
-    decal->BeginMesh (mesh);
-    mesh->GetMeshObject ()->BuildDecal (&relPos, radius, (iDecalBuilder*)decal);
-    decal->EndMesh ();
-  }
 }
 
 void csDecalManager::RemoveDecalFromList (csDecal * decal)

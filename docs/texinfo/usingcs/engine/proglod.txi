@@ -1,0 +1,228 @@
+@c -*-texinfo-*-
+@node Progressive Level of Detail, Decals, Level of Detail, Engine
+@subsection Progressive Level of Detail
+@cindex Progressive Level of Detail
+@cindex progressive lod
+
+@noindent
+@emph{Written by Eduardo Poyart, August 2010.}
+
+Good management of mesh LODs (levels of detail) is essential for a game engine
+or any 3D visualizer that works with complex scenes. If a very detailed mesh has
+to be rendered far away from the viewpoint, it can be replaced with a less
+detailed version without compromise on the visual quality. This lowers CPU and
+GPU costs and leads to frame rate improvements and more objects represented on
+the scene.
+
+With progressive LODs, as models move further away from the camera, their edges
+progressively collapse one by one, making smooth transitions that produce less
+visual "pops" than discrete LODs.
+
+This section is about Crystal Space's Progressive LODs support. Currently,
+Crystal Space supports progressive LODs for genmeshes.
+
+The steps to create a genmesh with progressive LOD support in Crystal Space are
+described below.
+
+@itemize
+@item
+
+Create a mesh in your favorite modeling tool and export it to Crystal Space's
+xml format.
+
+@item
+
+Use the @emph{lod} command line tool to apply LOD processing to this mesh. The
+result is typically saved into a new file. See below for details.
+
+@item
+
+Test the generated mesh in @emph{lodview}.
+
+@item
+
+Add C++ commands to your application to either enable automatic LODs or choose a
+specific LOD level according to your needs. Typically, if you just want to use
+automatic LODs, you don't need to change your source code, as all the needed
+information is loaded with your meshes.
+
+@end itemize
+
+@subsubheading The @emph{lod} tool
+
+The @emph{lod} tool processes a mesh and generates progressive LODs for it. The
+results can be saved to a new file, which will contain the original mesh and all
+low LOD representations of it.
+
+The tool works by selecting the best collapse to perform at each collapse step.
+At the end, it stores information on the mesh that defines the order of
+collapses. Selecting the best collapse is done by performing many collapses on a
+copy of the original mesh and using a heuristic to test how much different the
+collapsed mesh is from the original mesh.
+
+The @emph{lod} tool source is in @file{apps/tools/lod}. You can test it by using
+sample data in @file{/data/lodtest} (mounted in VFS in @file{/lev/lodtest}).
+
+This is a typical usage example of the @emph{lod} tool:
+
+@example
+lod -i=/lev/lodtest/lodbarrel -mindist=5 -maxdist=50
+@end example
+
+These are the command line options for the @emph{lod} tool:
+
+@example
+lod -i=<input_file> -o=<output_file> -mindist=d -maxdist=d [-em=<fast|precise>]
+    [-v] [-force]
+
+-em       Error metric (fast or precise).
+-v        Verbose.
+-mindist  Minimum LOD distance.
+-maxdist  Maximum LOD distance.
+          For medium-sized objects, try -mindist=5 -maxdist=50.
+          Existing values in input file take precedence, unless -force is used.
+-force    Force use of cmdline-specified mindist and maxdist.
+          Mindist and maxdist *need* to be either in cmdline or input file.
+
+@end example
+
+@itemize
+@item
+
+@b{<input_file>}: It can be either a Crystal Space mesh or library file, or a
+zip file containing a world file.
+
+@item
+
+@b{<output_file>}: The destination file. If not provided, the tool will append
+_lod to the name of the input file.
+
+@item
+
+@b{-em}: Select between fast and precise error metric. The error metric is a
+measurement of how different a LOD mesh is from the original mesh. Fast error
+metric employs a local heuristic to test only modified triangles. It can be used
+on very large meshes and it's the default option. Precise error metric is much
+slower, especially for meshes with a large number of triangles, but since it
+tests all triangles against all others, it can be used as a "ground truth".
+Please note that the "fast" results are usually pretty good.
+
+@item
+
+@b{-v}: Displays information about edge collapses and index buffer replication.
+
+@item
+
+@b{-mindist} and @b{-maxdist}: These options tell the tool what are the desired
+minimum and maximum distances for LODs to take effect. A mesh will begin to
+enter its LODs when it's at the minimum distance, and it will get to its most
+reduced LOD level when it's at the maximum distance. The LOD tool simply embeds
+this information into the output xml file --- it doesn't do any special
+processing with it. You can manually edit the xml file if you want to change the
+distances. See the 'XML LOD Tags' section below. If there are existing mindist
+and maxdist parameters in the input xml file, the existing parameters in the
+file will override the values on the command line parameters unless '-force' is
+used. This allows for the processing of entire worlds in zip files, with the
+modeler having the ability to specify per-mesh distance parameters.
+
+@item
+
+@b{-force}: Makes the command-line-specified mindist and maxdist override any
+existing file-specified distances.
+
+@end itemize
+
+@subsubheading The @emph{lodview} tool
+
+The @emph{lodview} tool allows visualizing and changing LOD levels in order to
+test the results. Here are the command line parameters:
+
+@example
+lodview <filename> [-m=<num>] -adap
+
+  -m=<num>   multiple sprites, large room (will show num^2 sprites)
+  -adap      adaptive LODs (best if used with -m)
+@end example
+
+If adaptive LODs are used, the system will try to keep a frame rate close to 30
+fps by biasing the LOD levels of the rendered models.
+
+When viewing the model, use the following keys:
+
+@example
+  'k' / 'l':  increase/reduce LOD resolution, to manually view LOD levels.
+  'a':  toggle auto LODs based on distance.
+@end example
+
+@subsubheading The XML LOD tags
+
+The LOD tags reside inside the <params> section of a genmesh factory. The
+example below shows a typical output file from the @emph{lod} tool.
+
+@example
+<meshfact name="@dots{}">
+  <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+  <params>
+    <prog_lod_distances min="5" max="50" />
+    @dots{}
+    <submesh>
+      @dots{}
+      <lod>
+        <sliding_windows>
+        @dots{}
+        </sliding_windows>
+      </lod>
+    </submesh>
+  </params>
+</meshfact>
+@end example
+
+The lod tool generates everything that you see inside the <lod> @dots{} </lod>
+tags.
+
+The <prog_lod_distances> tag is generated by the lod tool if it's not already
+present in the input file. If it exists there, it is preserved. A modeler can
+set this tag in order to be able to do multiple LOD conversions in one run
+without the need to specify distances on the command line each time.
+
+@subsubheading Notes
+
+The purpose of progressive LODs is to improve the frame rate of your scene
+without too much compromise on your visual quality. Try to make your models
+begin to enter LODs (mindist) when they are at a distance that makes them appear
+relatively small on the screen. The maximum LOD distance (maxdist) should be set
+to a distance in which the model is tiny on screen. If you look at the
+lowest-resolution LODs of your model up close, the results will look bad ---
+remember, it was designed to be seen from very far away.
+
+The @emph{lod} tool works on each submesh of the model separately. It can
+potentially change the bounded volume of your submesh. This means that, if you
+have a model that has two submeshes touching each other, they will probably not
+be touching each other anymore at the lowest resolutions. If this is your case
+and you want to ensure that they touch (or that there are no holes), try to turn
+them into a single submesh.
+
+@subsubheading C++ API
+
+A CS application talks with the progressive LOD system through the following
+interfaces:
+
+@itemize
+@item
+iEngine
+@item
+iGeneralFactorySubMesh
+@item
+iGeneralFactorySubMeshObject
+@item
+iGeneralMeshState
+@item
+iGeneralFactoryState
+@end itemize
+
+Please refer to the API documentation of these interfaces for details.
+
+Examining the @emph{lodview} source code in @file{apps/tools/lod/LodView.cpp|h}
+is a good way to learn the progressive LOD API.
+
+

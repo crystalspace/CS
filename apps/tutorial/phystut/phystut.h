@@ -35,9 +35,9 @@ private:
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynamicSystem;
   csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
-  csRef<iDynamicsDebuggerManager> debuggerManager;
-  csRef<iDynamicSystemDebugger> dynamicsDebugger;
-  csRef<iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
+  csRef<CS::Debug::iDynamicsDebuggerManager> debuggerManager;
+  csRef<CS::Debug::iDynamicSystemDebugger> dynamicsDebugger;
+  csRef<CS::Animation::iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   bool isSoftBodyWorld;
 
   // Meshes
@@ -68,7 +68,7 @@ private:
   float rotX, rotY, rotZ;
 
   // Ragdoll related
-  csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;
+  csRef<CS::Animation::iSkeletonRagdollManager> ragdollManager;
   CS::Animation::StateID ragdollState;
   csRef<iMeshWrapper> ragdollMesh;
 
@@ -101,7 +101,8 @@ private:
   iRigidBody* SpawnBox ();
   iRigidBody* SpawnSphere ();
   iRigidBody* SpawnCylinder ();
-  iRigidBody* SpawnCapsule ();
+  iRigidBody* SpawnCapsule (float length = rand() % 3 / 50.f + .7f,
+			    float radius = rand() % 10 / 50.f + .2f);
   iRigidBody* SpawnMesh ();
   iRigidBody* SpawnConvexMesh ();
   iRigidBody* SpawnCompound ();

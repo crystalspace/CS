@@ -224,6 +224,22 @@ public:
       bool toponly = false,
       bool reversed = false,
       TextureMapper* mapper = 0);
+
+  /**
+   * Generate a cone of given length and radius.
+   * \param l Cone length.
+   * \param r Cone radius.
+   * \param sides Number of sides.
+   * \param mapper is an optional texture mapper. If not given the
+   * default Cone texture mapping will be used (currently not
+   * implemented, you have to specify a mapper).
+   */
+  static void GenerateCone (float l, float r, uint sides,
+      csDirtyAccessArray<csVector3>& mesh_vertices,
+      csDirtyAccessArray<csVector2>& mesh_texels,
+      csDirtyAccessArray<csVector3>& mesh_normals,
+      csDirtyAccessArray<csTriangle>& mesh_triangles,
+      TextureMapper* mapper = 0);
 };
 
 } // namespace Geometry

@@ -22,8 +22,10 @@
 #define __CS_VISUALDEBUG_H__
 
 #include "csutil/scf_implementation.h"
-#include "iutil/comp.h"
 #include "csutil/leakguard.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/vector3.h"
+#include "iutil/comp.h"
 #include "iutil/visualdebug.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(VisualDebug)
@@ -41,12 +43,34 @@ class VisualDebugger : public scfImplementation2<VisualDebugger,
   virtual bool Initialize (iObjectRegistry*);
 
   //-- CS::Debug::iVisualDebugger
-  virtual void DebugTransform (csReversibleTransform& transform);
-  virtual void Display (iView* view, float axisSize = 1.0f);
+  virtual void DebugTransform (const csReversibleTransform& transform,
+			       bool persist = false,
+			       float size = 1.0f);
+  virtual void DebugPosition (const csVector3& position,
+			      bool persist = false,
+			      csColor color = csColor (0.0f, 1.0f, 0.0f),
+			      size_t size = 3);
+  virtual void Display (iView* view);
 
  private:
   iObjectRegistry* object_reg;
-  csArray<csReversibleTransform> transforms;
+
+  struct TransformData
+  {
+    csReversibleTransform transform;
+    bool persist;
+    float size;
+  };
+  csArray<TransformData> transforms;
+
+  struct PositionData
+  {
+    csVector3 position;
+    bool persist;
+    csColor color;
+    size_t size;
+  };
+  csArray<PositionData> positions;
 };
 
 }

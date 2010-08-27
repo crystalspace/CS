@@ -330,12 +330,12 @@ struct iAnimatedMeshFactory : public virtual iBase
    * When a mesh is instanced it will by default get a skeleton from this
    * skeleton factory.
    */
-  virtual void SetSkeletonFactory (CS::Animation::iSkeletonFactory2* skeletonFactory) = 0;
+  virtual void SetSkeletonFactory (CS::Animation::iSkeletonFactory* skeletonFactory) = 0;
 
   /**
    * Get the skeleton factory associated with the mesh factory.
    */
-  virtual CS::Animation::iSkeletonFactory2* GetSkeletonFactory () const = 0;
+  virtual CS::Animation::iSkeletonFactory* GetSkeletonFactory () const = 0;
 
   /**
    * Set the requested number of bone influences per vertex.
@@ -509,12 +509,12 @@ struct iAnimatedMesh : public virtual iBase
    * to it in the vertex influences.
    * \param skeleton
    */
-  virtual void SetSkeleton (CS::Animation::iSkeleton2* skeleton) = 0;
+  virtual void SetSkeleton (CS::Animation::iSkeleton* skeleton) = 0;
 
   /**
    * Get the skeleton to use for this mesh.
    */
-  virtual CS::Animation::iSkeleton2* GetSkeleton () const = 0;
+  virtual CS::Animation::iSkeleton* GetSkeleton () const = 0;
 
   /**
    * Get a submesh by index.

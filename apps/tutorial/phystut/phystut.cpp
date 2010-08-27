@@ -773,9 +773,9 @@ bool Simple::OnInitialize (int argc, char* argv[])
   // Request plugins
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug",
-		       iDynamicsDebuggerManager),
+		       CS::Debug::iDynamicsDebuggerManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll",
-		       CS::Animation::iSkeletonRagdollManager2),
+		       CS::Animation::iSkeletonRagdollManager),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -808,14 +808,14 @@ bool Simple::OnInitialize (int argc, char* argv[])
     // Load the soft body animation control plugin & factory
     if (isSoftBodyWorld)
     {
-      csRef<iSoftBodyAnimationControlType> softBodyAnimationType =
-	csLoadPlugin<iSoftBodyAnimationControlType>
+      csRef<CS::Animation::iSoftBodyAnimationControlType> softBodyAnimationType =
+	csLoadPlugin<CS::Animation::iSoftBodyAnimationControlType>
 	(plugmgr, "crystalspace.dynamics.softanim");
 
       csRef<iGenMeshAnimationControlFactory> animationFactory =
 	softBodyAnimationType->CreateAnimationControlFactory ();
       softBodyAnimationFactory =
-	scfQueryInterface<iSoftBodyAnimationControlFactory> (animationFactory);
+	scfQueryInterface<CS::Animation::iSoftBodyAnimationControlFactory> (animationFactory);
     }
 
     // Check which environment has to be loaded
@@ -894,12 +894,12 @@ bool Simple::Application ()
 
   // Find references to main objects
   debuggerManager =
-    csQueryRegistry<iDynamicsDebuggerManager> (GetObjectRegistry ());
+    csQueryRegistry<CS::Debug::iDynamicsDebuggerManager> (GetObjectRegistry ());
   if (!debuggerManager)
     return ReportError ("Failed to locate dynamic's debug manager!");
 
   ragdollManager =
-    csQueryRegistry<CS::Animation::iSkeletonRagdollManager2> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonRagdollManager> (GetObjectRegistry ());
   if (!ragdollManager)
     return ReportError ("Failed to locate ragdoll manager!");
 
@@ -1301,7 +1301,7 @@ iRigidBody* Simple::SpawnCylinder ()
   return rb;
 }
 
-iRigidBody* Simple::SpawnCapsule ()
+iRigidBody* Simple::SpawnCapsule (float length, float radius)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -1317,8 +1317,6 @@ iRigidBody* Simple::SpawnCapsule ()
 
   csRef<iGeneralFactoryState> gmstate =
     scfQueryInterface<iGeneralFactoryState> (capsuleFact->GetMeshObjectFactory ());
-  const float radius (rand() % 10 / 50. + .2);
-  const float length (rand() % 3 / 50. + .7);
   gmstate->GenerateCapsule (length, radius, 10);
   capsuleFact->HardTransform (
         csReversibleTransform (csYRotMatrix3 (PI/2), csVector3 (0)));
@@ -1521,12 +1519,10 @@ iJoint* Simple::SpawnJointed ()
 
 void ConstraintJoint (iJoint* joint)
 {
-  // Constrain translation.
-  joint->SetMinimumDistance (csVector3 (-1, -1, -1), false);
-  joint->SetMaximumDistance (csVector3 (1, 1, 1), false);
+  // The translations are fully constrained.
   joint->SetTransConstraints (true, true, true, false);
 
-  // Constrain rotation.
+  // The rotations are bounded
   joint->SetMinimumAngle (csVector3 (-PI/4.0, -PI/6.0, -PI/6.0), false);
   joint->SetMaximumAngle (csVector3 (PI/4.0, PI/6.0, PI/6.0), false);
   joint->SetRotConstraints (false, false, false, false);
@@ -1534,52 +1530,71 @@ void ConstraintJoint (iJoint* joint)
 
 void Simple::SpawnChain ()
 {
-  iRigidBody* rb1 = SpawnBox();
+  iRigidBody* rb1 = SpawnBox ();
   csVector3 initPos = rb1->GetPosition () + csVector3 (0.0f, 5.0f, 0.0f);
   rb1->MakeStatic ();
   rb1->SetPosition (initPos);
 
   csVector3 offset (0.0f, 1.3f, 0.0f);
 
-  iRigidBody* rb2 = SpawnCapsule();
+  iRigidBody* rb2 = SpawnCapsule (0.4f, 0.3f);
   rb2->SetLinearVelocity (csVector3 (0.0f));
   rb2->SetAngularVelocity (csVector3 (0.0f));
   rb2->SetPosition (initPos - offset);
   rb2->SetOrientation (csXRotMatrix3 (PI / 2.0f));
 
-  iRigidBody* rb3 = SpawnBox();
+  iRigidBody* rb3 = SpawnBox ();
   rb3->SetLinearVelocity (csVector3 (0.0f));
   rb3->SetAngularVelocity (csVector3 (0.0f));
   rb3->SetPosition (initPos - 2.0f * offset);
 
-  iRigidBody* rb4 = SpawnCapsule();
+  iRigidBody* rb4 = SpawnCapsule (0.4f, 0.3f);
   rb4->SetLinearVelocity (csVector3 (0.0f));
   rb4->SetAngularVelocity (csVector3 (0.0f));
   rb4->SetPosition (initPos - 3.0f * offset);
   rb4->SetOrientation (csXRotMatrix3 (PI / 2.0f));
 
-  iRigidBody* rb5 = SpawnBox();
+  iRigidBody* rb5 = SpawnBox ();
   rb5->SetLinearVelocity (csVector3 (0.0f));
   rb5->SetAngularVelocity (csVector3 (0.0f));
   rb5->SetPosition (initPos - 4.0f * offset);
 
   // Create joints and attach bodies.
-  csRef<iJoint> joint = dynamicSystem->CreateJoint ();
+  csOrthoTransform jointTransform;
+  csRef<iJoint> joint;
+
+  joint = dynamicSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f));
+  jointTransform = jointTransform * rb2->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
   joint->Attach (rb1, rb2, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
 
   joint = dynamicSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - offset);
+  jointTransform = jointTransform * rb3->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
   joint->Attach (rb2, rb3, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
 
   joint = dynamicSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - 2.0f * offset);
+  jointTransform = jointTransform * rb4->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
   joint->Attach (rb3, rb4, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
 
   joint = dynamicSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - 3.0f * offset);
+  jointTransform = jointTransform * rb5->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
   joint->Attach (rb4, rb5, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
@@ -1635,7 +1650,7 @@ void Simple::LoadRagdoll ()
      animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"), 0);
 
   // Create ragdoll animation node factory
-  csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollFactory =
+  csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll",
 					   bodySkeleton, dynamicSystem);
   ragdollFactory->AddBodyChain (chain, CS::Animation::STATE_DYNAMIC);
@@ -1678,11 +1693,11 @@ void Simple::SpawnRagdoll ()
                   tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
 
   // Start the ragdoll anim node
-  CS::Animation::iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
+  CS::Animation::iSkeletonAnimNode* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
     GetAnimationRoot ();
 
-  csRef<CS::Animation::iSkeletonRagdollNode2> ragdoll =
-    scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode2> (root);
+  csRef<CS::Animation::iSkeletonRagdollNode> ragdoll =
+    scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode> (root);
 
   // Fling the body.
   // (start the ragdoll node before so that the rigid bodies are created)
@@ -1807,8 +1822,8 @@ void Simple::SpawnCloth ()
   // Init the animation control for the animation of the genmesh
   csRef<iGeneralMeshState> meshState =
     scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
-  csRef<iSoftBodyAnimationControl> animationControl =
-    scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  csRef<CS::Animation::iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<CS::Animation::iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
   animationControl->SetSoftBody (body, true);
 }
 
@@ -1853,8 +1868,8 @@ void Simple::SpawnSoftBody ()
   // Init the animation control for the animation of the genmesh
   csRef<iGeneralMeshState> meshState =
     scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
-  csRef<iSoftBodyAnimationControl> animationControl =
-    scfQueryInterface<iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  csRef<CS::Animation::iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<CS::Animation::iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
   animationControl->SetSoftBody (body);
 
   // Fling the body.

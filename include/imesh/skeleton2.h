@@ -49,13 +49,13 @@ namespace CS
 namespace Animation
 {
 
-struct iSkeletonFactory2;
-struct iSkeleton2;
+struct iSkeletonFactory;
+struct iSkeleton;
 
-class csSkeletalState2;
+class csSkeletalState;
 
-struct iSkeletonAnimPacketFactory2;
-struct iSkeletonAnimPacket2;
+struct iSkeletonAnimPacketFactory;
+struct iSkeletonAnimPacket;
 
 /**\addtogroup meshplugins
  * @{ */
@@ -74,19 +74,19 @@ static const BoneID InvalidBoneID = (BoneID)~0;
  * Skeletal system base object, representing the entire skeletal and
  * skeletal animation system.
  */
-struct iSkeletonManager2 : public virtual iBase
+struct iSkeletonManager : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonManager2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonManager, 1, 0, 0);
 
   /**
    * Create a new empty skeleton factory
    */
-  virtual iSkeletonFactory2* CreateSkeletonFactory (const char* name) = 0;
+  virtual iSkeletonFactory* CreateSkeletonFactory (const char* name) = 0;
 
   /**
    * Find an already created skeleton factory
    */
-  virtual iSkeletonFactory2* FindSkeletonFactory (const char* name) = 0;
+  virtual iSkeletonFactory* FindSkeletonFactory (const char* name) = 0;
 
   /**
    * Remove all skeleton factories
@@ -96,12 +96,12 @@ struct iSkeletonManager2 : public virtual iBase
   /**
    * Create a new empty skeletal animation packet factory
    */
-  virtual iSkeletonAnimPacketFactory2* CreateAnimPacketFactory (const char* name) = 0;
+  virtual iSkeletonAnimPacketFactory* CreateAnimPacketFactory (const char* name) = 0;
 
   /**
    * Find a skeletal animation packet factory
    */
-  virtual iSkeletonAnimPacketFactory2* FindAnimPacketFactory (const char* name) = 0;
+  virtual iSkeletonAnimPacketFactory* FindAnimPacketFactory (const char* name) = 0;
 
   /**
    * Remove all animation packet factories
@@ -125,9 +125,9 @@ struct iSkeletonManager2 : public virtual iBase
  *   that is, the root bone(s) is defined in absolute space.
  * - Bone space. Bone space for every bone is defined by its parent.
  */
-struct iSkeletonFactory2 : public virtual iBase
+struct iSkeletonFactory : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonFactory2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonFactory, 1, 0, 0);
 
   /**\name Bone handling
    * @{ */
@@ -220,17 +220,17 @@ struct iSkeletonFactory2 : public virtual iBase
   /**
    * Create a skeleton instance from this skeleton factory.
    */
-  virtual csPtr<iSkeleton2> CreateSkeleton () = 0;
+  virtual csPtr<iSkeleton> CreateSkeleton () = 0;
 
   /**
    * Get the animation packet associated with this skeleton
    */
-  virtual iSkeletonAnimPacketFactory2* GetAnimationPacket () const = 0;
+  virtual iSkeletonAnimPacketFactory* GetAnimationPacket () const = 0;
 
   /**
    * Set the animation packet associated with this skeleton
    */
-  virtual void SetAnimationPacket (iSkeletonAnimPacketFactory2* fact) = 0;
+  virtual void SetAnimationPacket (iSkeletonAnimPacketFactory* fact) = 0;
 };
 
 /**
@@ -241,11 +241,11 @@ struct iSkeletonFactory2 : public virtual iBase
  * Bind space is defined by the skeleton factory, so bind space is relative
  * transform compared to the default orientation.
  *
- * \sa CS::Animation::iSkeletonFactory2 for more information on coordinate spaces
+ * \sa CS::Animation::iSkeletonFactory for more information on coordinate spaces
  */
-struct iSkeleton2 : public virtual iBase
+struct iSkeleton : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeleton2, 1, 0, 1);
+  SCF_INTERFACE(CS::Animation::iSkeleton, 1, 0, 1);
 
   /**
    * Get the scene node associated with this skeleton
@@ -313,35 +313,35 @@ struct iSkeleton2 : public virtual iBase
   /**
    * Get the entire skeleton state (all transforms) in absolute space
    */
-  virtual csPtr<csSkeletalState2> GetStateAbsSpace () = 0;
+  virtual csPtr<csSkeletalState> GetStateAbsSpace () = 0;
 
   /**
    * Get the entire skeleton state (all transforms) in bone space
    */
-  virtual csPtr<csSkeletalState2> GetStateBoneSpace () = 0;
+  virtual csPtr<csSkeletalState> GetStateBoneSpace () = 0;
 
   /**
    * Get the entire skeleton state (all transforms) in bind space
    */
-  virtual csPtr<csSkeletalState2> GetStateBindSpace () = 0;
+  virtual csPtr<csSkeletalState> GetStateBindSpace () = 0;
 
   /** @} */
 
   /**
    * Get the factory used to create this skeleton instance
    */
-  virtual iSkeletonFactory2* GetFactory () const = 0;
+  virtual iSkeletonFactory* GetFactory () const = 0;
 
 
   /**
    * Get the animation packet associated with this skeleton
    */
-  virtual iSkeletonAnimPacket2* GetAnimationPacket () const = 0;
+  virtual iSkeletonAnimPacket* GetAnimationPacket () const = 0;
 
   /**
    * Set the animation packet associated with this skeleton
    */
-  virtual void SetAnimationPacket (iSkeletonAnimPacket2* packet) = 0;
+  virtual void SetAnimationPacket (iSkeletonAnimPacket* packet) = 0;
 
 
   /**
@@ -375,17 +375,17 @@ struct iSkeleton2 : public virtual iBase
  * and rotation of each bone of the skeleton. These transforms are in
  * bind space.
  */
-class csSkeletalState2 : public csRefCount
+class csSkeletalState : public csRefCount
 {
 public:
 
   /// Constructor
-  csSkeletalState2 ()
+  csSkeletalState ()
     : boneVecs (0), boneQuats (0), numberOfBones (0)
   {}
 
   ///
-  virtual inline ~csSkeletalState2 ()
+  virtual inline ~csSkeletalState ()
   {
     delete[] boneVecs;
     delete[] boneQuats;
@@ -484,6 +484,15 @@ protected:
 
 } // namespace Animation
 } // namespace CS
+
+CS_DEPRECATED_METHOD_MSG("Use CS::Animation::csSkeletalState instead")
+typedef CS::Animation::csSkeletalState csSkeletalState2;
+CS_DEPRECATED_METHOD_MSG("Use CS::Animation::iSkeleton instead")
+typedef CS::Animation::iSkeleton iSkeleton2;
+CS_DEPRECATED_METHOD_MSG("Use CS::Animation::iSkeletonFactory instead")
+typedef CS::Animation::iSkeletonFactory iSkeletonFactory2;
+CS_DEPRECATED_METHOD_MSG("Use CS::Animation::iSkeletonManager instead")
+typedef CS::Animation::iSkeletonManager iSkeletonManager2;
 
 /** @} */
 

@@ -31,23 +31,24 @@
 
 // All these files commonly needed are already included, so that the
 // applications only need to include the files relevant for them.
-#include "iengine/sector.h"
+#include "cstool/csapplicationframework.h"
+#include "cstool/simplestaticlighter.h"
+#include "csutil/cmdhelp.h"
+#include "csutil/common_handlers.h"
+#include "csutil/csbaseeventh.h"
+#include "csutil/event.h"
+#include "csutil/stringarray.h"
 #include "iengine/camera.h"
 #include "iengine/scenenode.h"
+#include "iengine/sector.h"
 #include "iengine/movable.h"
-#include "ivideo/graph2d.h"
-#include "ivaria/view.h"
-#include "csutil/event.h"
-#include "csutil/csbaseeventh.h"
-#include "csutil/common_handlers.h"
-#include "csutil/stringarray.h"
-#include "csutil/cmdhelp.h"
+#include "imesh/object.h"
 #include "iutil/cmdline.h"
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
-#include "imesh/object.h"
-#include "cstool/csapplicationframework.h"
-#include "cstool/simplestaticlighter.h"
+#include "iutil/visualdebug.h"
+#include "ivideo/graph2d.h"
+#include "ivaria/view.h"
 
 class csPixmap;
 
@@ -76,7 +77,7 @@ class DemoApplication;
 Usage: <applicationCommandUsage>
 
 Available options:
-
+7
 Specific options for <applicationCommand>:
 <list of options>
 
@@ -429,6 +430,14 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
 
   /// Reference to the main sector
   csRef<iSector> room;
+
+  /// Current mouse cursor X's position
+  int mouseX;
+  /// Current mouse cursor Y's position
+  int mouseY;
+
+  /// Visual debugger
+  csRef<CS::Debug::iVisualDebugger> visualDebugger;
 
   /// Base implementation of the method inherited from csBaseEventHandler
   virtual void Frame ();

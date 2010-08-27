@@ -518,7 +518,8 @@ csEngine::csEngine (iBase *iParent) :
   nextframePending (0), currentFrameNumber (0), 
   clearZBuf (false), defaultClearZBuf (false), 
   clearScreen (false),  defaultClearScreen (false), 
-  currentRenderContext (0), weakEventHandler(0)
+  currentRenderContext (0), weakEventHandler(0),
+  bAdaptiveLODsEnabled(false), adaptiveLODsTargetFPS(30), adaptiveLODsMultiplier(1.0f)
 {
   ClearRenderPriorities ();
 }
@@ -853,8 +854,6 @@ THREADED_CALLABLE_IMPL(csEngine, DeleteAll)
     // Register it.
     renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
       defaultRenderLoop);
-
-    csEngine::ReloadRenderManager();
   }
 
   return true;
@@ -1092,6 +1091,12 @@ void csEngine::StartEngine ()
   for (int p = 0; p < csLightShaderVarCache::_varCount; p++)
   {
     lightSvNames.GetDefaultSVId (csLightShaderVarCache::DefaultSV (p));
+  }
+
+  if (G3D)
+  {
+    // Create the render manager after the engine has been initialized.
+    csEngine::ReloadRenderManager();
   }
 }
 
@@ -3224,6 +3229,21 @@ bool csEngine::SetCurrentDefaultRenderloop (iRenderLoop* loop)
   return true;
 }
 
+void csEngine::UpdateAdaptiveLODs()
+{
+  virtualClockBuffer.Add(virtualClock->GetElapsedTicks() / 1000.0f);
+  float average_s = virtualClockBuffer.Average(10);
+  float normalized_time = average_s * adaptiveLODsTargetFPS;
+  if (normalized_time > 0.8f && normalized_time < 1.25)
+    normalized_time = 1.0f; // slack space; avoids oscillations
+  float delta_normalized_time = 1.0f - normalized_time;
+  adaptiveLODsMultiplier -= 0.05f * delta_normalized_time; // f = -k deltax (Hooke's law)
+  if (adaptiveLODsMultiplier > 5.0f)
+    adaptiveLODsMultiplier = 5.0f;
+  else if (adaptiveLODsMultiplier < 0.2f)
+    adaptiveLODsMultiplier = 0.2f;
+  //csPrintf("%g\n", adaptiveLODsMultiplier);
+}
 
 static const csOptionDescription
   config_options[] =

@@ -68,6 +68,15 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
     
     FreeShaderParam (param);
   }
+  for(size_t i = 0; i < variablemapConstants.GetSize (); ++i)
+  {
+    VariableMapEntry& mapping = variablemapConstants[i];
+    
+    ShaderParameter* param =
+      reinterpret_cast<ShaderParameter*> (mapping.userVal);
+    
+    FreeShaderParam (param);
+  }
 }
 
 void csShaderGLCGCommon::Activate()
@@ -327,6 +336,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   }
   programProfile = cgGetProgramProfile (program);
 
+  GetParamsFromVmapConstants();
   if (flags & loadApplyVmap)
     GetParamsFromVmap();
 

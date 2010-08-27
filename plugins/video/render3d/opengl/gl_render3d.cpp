@@ -84,9 +84,9 @@ SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
   scfImplementationType (this, parent), isOpen (false), frameNum (0), 
-  explicitProjection (false), needMatrixUpdate (true), imageUnits (0),
-  activeVertexAttribs (0), wantToSwap (false), delayClearFlags (0),
-  currentAttachments (0)
+  glProfiling (false), explicitProjection (false), needMatrixUpdate (true),
+  imageUnits (0), activeVertexAttribs (0), wantToSwap (false),
+  delayClearFlags (0), currentAttachments (0)
 {
   verbose = false;
   frustum_valid = false;
@@ -161,6 +161,42 @@ void csGLGraphics3D::OutputMarkerString (const char* function,
   marker.Format ("[%ls %s():%d] %s", file, function, line, 
     message.GetStr());
   ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
+}
+
+
+csGLGraphics3D::ProfileScope::ProfileScope (csGLGraphics3D* renderer, const char* descr)
+ : renderer (renderer), descr (descr), startQuery (0)
+{
+  if (renderer->glProfiling)
+  {
+    startQuery = renderer->queryPool.AllocQuery ();
+    endQuery = renderer->queryPool.AllocQuery ();
+    startStamp = csGetMicroTicks();
+    csGLGraphics3D::ext->glQueryCounter (startQuery, GL_TIMESTAMP);
+  }
+}
+
+csGLGraphics3D::ProfileScope::~ProfileScope ()
+{
+  if (startQuery != 0)
+  {
+    csGLGraphics3D::ext->glQueryCounter (endQuery, GL_TIMESTAMP);
+    renderer->profileHelper.RecordTimeSpan (renderer->frameNum,
+					    startStamp,
+					    startQuery, endQuery,
+					    descr);
+  }
+}
+
+void csGLGraphics3D::RecordProfileEvent (const char* descr)
+{
+  if (glProfiling)
+  {
+    GLuint query = queryPool.AllocQuery ();
+    int64 startStamp = csGetMicroTicks();
+    ext->glQueryCounter (query, GL_TIMESTAMP);
+    profileHelper.RecordEvent (frameNum, startStamp, query, descr);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -798,8 +834,12 @@ bool csGLGraphics3D::Open ()
 
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));
-  if (verbosemgr) verbose = verbosemgr->Enabled ("renderer");
-  if (!verbose) bugplug = 0;
+
+  if (verbosemgr)
+    verbose = verbosemgr->Enabled ("renderer");
+
+  if (verbose)
+    bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
   textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias", 0.0f);
   if (verbose)
@@ -908,6 +948,14 @@ bool csGLGraphics3D::Open ()
     rendercaps.DestinationAlpha = abits > 0;
   }
 
+  rendercaps.MaxRTColorAttachments = 1;
+  if (ext->CS_GL_EXT_framebuffer_object)
+  {
+    GLint attachments;
+    glGetIntegerv (GL_MAX_COLOR_ATTACHMENTS_EXT, &attachments);
+    rendercaps.MaxRTColorAttachments = (int)attachments;
+  }
+
   glGetIntegerv (GL_MAX_CLIP_PLANES, &maxClipPlanes);
 
   // check for support of VBO
@@ -922,8 +970,8 @@ bool csGLGraphics3D::Open ()
 
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Using VBO with %d MB of VBO memory",
       vboSize / (1024*1024));
-    vboManager.AttachNew (new csGLVBOBufferManager (ext, statecache, vboSize,
-      forceSeparateVBOs));
+    vboManager.AttachNew (new csGLVBOBufferManager (this, ext, statecache,
+      vboSize, forceSeparateVBOs));
   }
 
   GLint dbits;
@@ -1127,6 +1175,41 @@ bool csGLGraphics3D::Open ()
       LQUOT "Forceful" RQUOT " fixed function enable: %s",
       fixedFunctionForcefulEnable ? "yes" : "no");
       
+  glProfiling =
+    config->GetBool ("Video.OpenGL.Profiling", false);
+  if (glProfiling)
+  {
+    ext->InitGL_ARB_timer_query();
+    if (!ext->CS_GL_ARB_timer_query)
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "GL profiling requested, but not supported");
+      glProfiling = false;
+    }
+    else
+    {
+      const char* profileFN = "/this/glprofiling.csv";
+      
+      csRef<iFile> profFile;
+      csRef<iVFS> vfs (GetVFS ());
+      if (vfs)
+      {
+	profFile = vfs->Open (profileFN, VFS_FILE_WRITE);
+      }
+      if (!profFile)
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"GL profiling requested, but could not open %s",
+		profileFN);
+	glProfiling = false;
+      }
+      else
+      {
+	profileHelper.SetFile (profFile);
+	profileHelper.ResetStampOffset();
+      }
+    }
+  }
+      
   return true;
 }
 
@@ -1243,6 +1326,13 @@ void csGLGraphics3D::Close ()
     if (halos[h]) halos[h]->DeleteTexture();
   }
   vboManager.Invalidate();
+  
+  if (glProfiling)
+  {
+    profileHelper.FlushEvents (frameNum, queryPool, 0);
+    profileHelper.SetFile (nullptr);
+  }
+  queryPool.DiscardAllQueries();
 
   if (G2D)
     G2D->Close ();
@@ -1399,6 +1489,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
                        // Avoids `symbols defined but not used' warning.
   GLRENDER3D_OUTPUT_STRING_MARKER(("drawflags = %s", 
     csBitmaskToString::GetStr (drawflags, drawflagNames)));
+    
+  ProfileScope _profile (this, "BeginDraw");
 
   SetWriteMask (true, true, true, true);
   if (ext->CS_GL_ARB_point_sprite)
@@ -1541,6 +1633,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
 void csGLGraphics3D::FinishDraw ()
 {
+  ProfileScope _profile (this, "FinishDraw");
+  
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
 
@@ -1548,6 +1642,7 @@ void csGLGraphics3D::FinishDraw ()
   
   if (currentAttachments != 0)
   {
+    RecordProfileEvent ("Unset render targets");
     r2tbackend->FinishDraw ((current_drawflags & CSDRAW_READBACK) != 0);
     UnsetRenderTargets();
     currentAttachments = 0;
@@ -1576,9 +1671,14 @@ void csGLGraphics3D::Print (csRect const* area)
     }
     SwapIfNeeded();
   }
-  G2D->Print (area);
+  {
+    ProfileScope _profile (this, "frame swap");
+    G2D->Print (area);
+  }
   
   //csPrintf ("frame\n");
+  if (glProfiling)
+    profileHelper.FlushEvents (frameNum, queryPool, 2);
   frameNum++;
   r2tbackend->NextFrame (frameNum);
   txtmgr->NextFrame (frameNum);
@@ -1907,6 +2007,8 @@ void csGLGraphics3D::SetupInstance (size_t instParamNum,
                                     const csVertexAttrib targets[], 
                                     csShaderVariable* const params[])
 {
+  ProfileScope _profile (this, "Setup instance"); // @@@ Worthwhile to measure?
+  
   csVector4 v;
   float matrix[16];
   bool uploadMatrix;
@@ -2249,6 +2351,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
   if (bufData != (void*)-1)
   {
+    ProfileScope _profile (this, "Mesh drawing");
+  
     SetMixMode (mixmode, modes.alphaType, modes.alphaTest);
 
     if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
@@ -3888,8 +3992,6 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
     q->RegisterListener (eventHandler2, events2);
   }
   // We subscribe to csevCanvasResize after G2D has been created
-  
-  bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
   strings = csQueryRegistryTagInterface<iShaderVarStringSet> (
     object_reg, "crystalspace.shader.variablenameset");
@@ -3938,6 +4040,16 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 }
 
 
+csRef<iVFS> csGLGraphics3D::GetVFS ()
+{
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  if (!vfs)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+	    "Could not get VFS.");
+  }
+  return vfs;
+}
 
 
 ////////////////////////////////////////////////////////////////////
@@ -4013,11 +4125,9 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
       return false;
     }
 
-    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+    csRef<iVFS> vfs = GetVFS ();
     if (!vfs)
     {
-      Report (CS_REPORTER_SEVERITY_WARNING, 
-	      "Could not get VFS.");
       return false;
     }
 
@@ -4048,11 +4158,9 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
     return;
   }
 
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iVFS> vfs = GetVFS ();
   if (!vfs)
   {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Could not get VFS.");
     return;
   }
 

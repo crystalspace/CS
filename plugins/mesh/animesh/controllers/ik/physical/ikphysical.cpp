@@ -44,18 +44,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
   {
   }
 
-  CS::Animation::iSkeletonIKNodeFactory2* IKPhysicalManager::CreateAnimNodeFactory
+  CS::Animation::iSkeletonIKNodeFactory* IKPhysicalManager::CreateAnimNodeFactory
     (const char *name, CS::Animation::iBodySkeleton* skeleton)
   {
     CS_ASSERT(skeleton);
 
-    csRef<CS::Animation::iSkeletonIKPhysicalNodeFactory2> newFact;
+    csRef<CS::Animation::iSkeletonIKPhysicalNodeFactory> newFact;
     newFact.AttachNew (new IKPhysicalAnimNodeFactory (this, name, skeleton));
 
     return factoryHash.PutUnique (name, newFact);
   }
 
-  CS::Animation::iSkeletonIKNodeFactory2* IKPhysicalManager::FindAnimNodeFactory
+  CS::Animation::iSkeletonIKNodeFactory* IKPhysicalManager::FindAnimNodeFactory
     (const char* name) const
   {
     return factoryHash.Get (name, 0);
@@ -100,16 +100,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
   {
   }
 
-  csPtr<CS::Animation::iSkeletonAnimNode2> IKPhysicalAnimNodeFactory::CreateInstance
-    (CS::Animation::iSkeletonAnimPacket2* packet, CS::Animation::iSkeleton2* skeleton)
+  csPtr<CS::Animation::iSkeletonAnimNode> IKPhysicalAnimNodeFactory::CreateInstance
+    (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton)
   {
-    csRef<CS::Animation::iSkeletonAnimNode2> child;
+    csRef<CS::Animation::iSkeletonAnimNode> child;
     if (childNode)
       child = childNode->CreateInstance (packet, skeleton);
 
-    csRef<CS::Animation::iSkeletonAnimNode2> newP;
+    csRef<CS::Animation::iSkeletonAnimNode> newP;
     newP.AttachNew (new IKPhysicalAnimNode (this, skeleton, child));
-    return csPtr<CS::Animation::iSkeletonAnimNode2> (newP);
+    return csPtr<CS::Animation::iSkeletonAnimNode> (newP);
   }
 
   const char* IKPhysicalAnimNodeFactory::GetNodeName () const
@@ -117,7 +117,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     return name;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory2* IKPhysicalAnimNodeFactory::FindNode
+  CS::Animation::iSkeletonAnimNodeFactory* IKPhysicalAnimNodeFactory::FindNode
     (const char* name)
   {
     if (this->name == name)
@@ -149,12 +149,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     effectors.DeleteAll (effector);
   }
 
-  void IKPhysicalAnimNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory2* node)
+  void IKPhysicalAnimNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node)
   {
     childNode = node;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory2* IKPhysicalAnimNodeFactory::GetChildNode () const
+  CS::Animation::iSkeletonAnimNodeFactory* IKPhysicalAnimNodeFactory::GetChildNode () const
   {
     return childNode;
   }
@@ -179,8 +179,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
   CS_LEAKGUARD_IMPLEMENT(IKPhysicalAnimNode);
 
   IKPhysicalAnimNode::IKPhysicalAnimNode (IKPhysicalAnimNodeFactory* factory, 
-					  CS::Animation::iSkeleton2* skeleton,
-					  CS::Animation::iSkeletonAnimNode2* childNode)
+					  CS::Animation::iSkeleton* skeleton,
+					  CS::Animation::iSkeletonAnimNode* childNode)
     : scfImplementationType (this), factory (factory), sceneNode (nullptr),
     skeleton (skeleton), childNode (childNode), isActive (false)
   {
@@ -191,12 +191,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     Stop ();
   }
 
-  void IKPhysicalAnimNode::SetRagdollNode (CS::Animation::iSkeletonRagdollNode2* ragdollNode)
+  void IKPhysicalAnimNode::SetRagdollNode (CS::Animation::iSkeletonRagdollNode* ragdollNode)
   {
     this->ragdollNode = ragdollNode;
   }
 
-  CS::Animation::iSkeletonRagdollNode2* IKPhysicalAnimNode::GetRagdollNode () const
+  CS::Animation::iSkeletonRagdollNode* IKPhysicalAnimNode::GetRagdollNode () const
   {
     return ragdollNode;
   }
@@ -343,8 +343,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
       sceneNode = skeleton->GetSceneNode ();
 
     // Find the Bullet dynamic system
-    csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
-      scfQueryInterface<CS::Animation::iSkeletonRagdollNodeFactory2>
+    csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
+      scfQueryInterface<CS::Animation::iSkeletonRagdollNodeFactory>
       (ragdollNode->GetFactory ());
 
     bulletDynamicSystem = scfQueryInterface<CS::Physics::Bullet::iDynamicSystem>
@@ -419,7 +419,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     return 1.0;
   }
 
-  void IKPhysicalAnimNode::BlendState (CS::Animation::csSkeletalState2* state, float baseWeight)
+  void IKPhysicalAnimNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
   {
     // Check that this node is active
     if (!isActive)
@@ -470,12 +470,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     return isActive;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory2* IKPhysicalAnimNode::GetFactory () const
+  CS::Animation::iSkeletonAnimNodeFactory* IKPhysicalAnimNode::GetFactory () const
   {
     return factory;
   }
 
-  CS::Animation::iSkeletonAnimNode2* IKPhysicalAnimNode::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNode* IKPhysicalAnimNode::FindNode (const char* name)
   {
     if (factory->name == name)
       return this;
@@ -487,13 +487,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
   }
 
   void IKPhysicalAnimNode::AddAnimationCallback
-    (CS::Animation::iSkeletonAnimCallback2* callback)
+    (CS::Animation::iSkeletonAnimCallback* callback)
   {
     // TODO
   }
 
   void IKPhysicalAnimNode::RemoveAnimationCallback
-    (CS::Animation::iSkeletonAnimCallback2* callback)
+    (CS::Animation::iSkeletonAnimCallback* callback)
   {
     // TODO
   }

@@ -78,13 +78,14 @@ static const GLenum VBO_BUFFER_GL_USAGE[] = {
   GL_STATIC_DRAW_ARB,
   GL_STATIC_DRAW_ARB};
 
-csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext, 
+csGLVBOBufferManager::csGLVBOBufferManager (csGLGraphics3D* G3D,
+					    csGLExtensionManager *ext, 
                                             csGLStateCache *state,
                                             size_t maxAllocation,
 					    bool forceSeparateVBOs)                                            
-  : scfImplementationType (this), extensionManager (ext), stateCache (state),
-  currentVBOAllocation (0), maxVBOAllocation (maxAllocation),
-  forceSeparateVBOs (forceSeparateVBOs)
+  : scfImplementationType (this), G3D (G3D), extensionManager (ext),
+    stateCache (state), currentVBOAllocation (0),
+    maxVBOAllocation (maxAllocation), forceSeparateVBOs (forceSeparateVBOs)
 {
   memset (&vboBufferList, 0, sizeof(vboBufferList));
 }
@@ -240,6 +241,8 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetVBOSlot (
 
     if (slot->bufferVersion != buffer->GetVersion ())
     {
+      csGLGraphics3D::ProfileScope _profile (G3D, "Buffer update");
+      
       GLuint vboID;
       size_t offset;
 

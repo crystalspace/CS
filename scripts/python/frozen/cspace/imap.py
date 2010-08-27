@@ -204,6 +204,8 @@ class iSharedVarLoaderIterator(core.iBase):
 iSharedVarLoaderIterator_swigregister = _imap.iSharedVarLoaderIterator_swigregister
 iSharedVarLoaderIterator_swigregister(iSharedVarLoaderIterator)
 
+CS_LOADER_NONE = _imap.CS_LOADER_NONE
+CS_LOADER_CREATE_DUMMY_MATS = _imap.CS_LOADER_CREATE_DUMMY_MATS
 class iThreadedLoader(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
@@ -253,6 +255,8 @@ class iThreadedLoader(core.iBase):
     def AddMaterialToList(*args): return _imap.iThreadedLoader_AddMaterialToList(*args)
     def AddSharedVarToList(*args): return _imap.iThreadedLoader_AddSharedVarToList(*args)
     def MarkSyncDone(*args): return _imap.iThreadedLoader_MarkSyncDone(*args)
+    def GetFlags(*args): return _imap.iThreadedLoader_GetFlags(*args)
+    def SetFlags(*args): return _imap.iThreadedLoader_SetFlags(*args)
     __swig_destroy__ = _imap.delete_iThreadedLoader
     __del__ = lambda self : None;
 iThreadedLoader_swigregister = _imap.iThreadedLoader_swigregister

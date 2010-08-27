@@ -83,7 +83,39 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   InitTokenTable (xmltokens);
   return true;
 }
-
+  
+void csGeneralFactoryLoader::ParseSubMeshLOD(iDocumentNode *node, csArray<SlidingWindow>& sliding_windows)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT)
+      continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    csRef<iDocumentNodeIterator> it_elem = child->GetNodes();
+    switch (id)
+    {
+      case XMLTOKEN_SLIDING_WINDOWS:
+        while (it_elem->HasNext ())
+        {
+          csRef<iDocumentNode> child_elem = it_elem->Next ();
+          if (child_elem->GetType () != CS_NODE_ELEMENT)
+            continue;
+          int c0 = child_elem->GetAttributeValueAsInt("c0");
+          int c1 = child_elem->GetAttributeValueAsInt("c1");
+          sliding_windows.Push(SlidingWindow(c0, c1));
+        }
+        break;
+      default:
+        synldr->ReportError ("crystalspace.genmeshloader.parse.unknownnode",
+                             node, "Unknown XML node in LOD data");
+        return;
+    }
+  }
+}
+    
 bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
                                           iGeneralFactoryState* factstate,
                                           iLoaderContext* ldr_context)
@@ -96,6 +128,7 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
   CS::Graphics::RenderPriority renderPrio = -1;
   csRef<iRenderBuffer> indexbuffer;
   csRefArray<csShaderVariable> shadervars;
+  csArray<SlidingWindow> sliding_windows;
   bool b2f = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -150,7 +183,10 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
       break;
     case XMLTOKEN_BACK2FRONT:
       if (!synldr->ParseBool (child, b2f, true))
-	return 0;
+        return 0;
+      break;
+    case XMLTOKEN_LOD:
+      ParseSubMeshLOD(child, sliding_windows);
       break;
     default:
       if (synldr->ParseZMode (child, zmode)) break;
@@ -169,7 +205,11 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
   {
     svc->AddVariable (shadervars[i]);
   }
-
+  csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
+  for (size_t i = 0; i < sliding_windows.GetSize(); i++)
+  {
+    fsm->AddSlidingWindow(sliding_windows[i].start, sliding_windows[i].end);
+  }
   return true;
 }
 
@@ -774,6 +814,20 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         }
         ParseSubMesh (child, state, ldr_context);
         break;
+      case XMLTOKEN_PROG_LOD_DISTANCES:
+        {
+          float min_dist, max_dist;
+          csString mind = child->GetAttributeValue ("min");
+          csScanStr(mind, "%f", &min_dist);
+          if (min_dist < 0.0f)
+            min_dist = 0.0f;
+          csString maxd = child->GetAttributeValue ("max");
+          csScanStr(maxd, "%f", &max_dist);
+          if (max_dist < 0.0f)
+            max_dist = 0.0f;
+          state->SetProgLODDistances(min_dist, max_dist);
+        }
+        break;
       default:
 	synldr->ReportBadToken (child);
 	return 0;
@@ -825,6 +879,24 @@ bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
   engine = csQueryRegistry<iEngine> (object_reg);
   return true;
+}
+  
+void csGeneralFactorySaver::WriteSubMeshLOD(iGeneralMeshSubMesh* submesh, iDocumentNode* submeshNode)
+{
+  csRef<iDocumentNode> node_lod = submeshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  node_lod->SetValue("lod");
+  csRef<iDocumentNode> node_sw = node_lod->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  node_sw->SetValue("sliding_windows");
+  csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
+  for (int i = 0; i < fsm->GetSlidingWindowSize(); i++)
+  {
+    csRef<iDocumentNode> node_e = node_sw->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    node_e->SetValue("e");
+    int start_index, end_index;
+    fsm->GetSlidingWindow(i, start_index, end_index);
+    node_e->SetAttributeAsInt("c0", start_index);
+    node_e->SetAttributeAsInt("c1", end_index);
+  }
 }
 
 void csGeneralFactorySaver::WriteSubMesh (iGeneralMeshSubMesh* submesh, 
@@ -883,6 +955,10 @@ void csGeneralFactorySaver::WriteSubMesh (iGeneralMeshSubMesh* submesh,
   indexBufferNode->SetValue ("indexbuffer");
   synldr->WriteRenderBuffer (indexBufferNode, 
     submesh->GetIndices());
+  
+  csRef<iGeneralFactorySubMesh> fsm = scfQueryInterface<iGeneralFactorySubMesh>(submesh);
+  if (fsm->GetSlidingWindowSize() > 0)
+    WriteSubMeshLOD(submesh, submeshNode);
 
   csRef<iShaderVariableContext> svc = 
     scfQueryInterface<iShaderVariableContext> (submesh);
@@ -913,6 +989,19 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       scfQueryInterface<iMeshObjectFactory> (obj);
     if (!gfact) return false;
     if (!meshfact) return false;
+
+    // Write progressive LOD distances, if needed
+    {
+      float mind, maxd;
+      gfact->GetProgLODDistances(mind, maxd);
+      if (mind != 0.0f || maxd != 0.0f)
+      {
+        csRef<iDocumentNode> distancesNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT);
+        distancesNode->SetValue("prog_lod_distances");
+        distancesNode->SetAttributeAsFloat("min", mind);
+        distancesNode->SetAttributeAsFloat("max", maxd);
+      }
+    }
 
     // Write render buffers
     {
@@ -1092,7 +1181,7 @@ bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
   }
   return true;
 }
-
+  
 bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
                                        iGeneralMeshState* state,
                                        iLoaderContext* ldr_context)
@@ -1164,7 +1253,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
       break;
     case XMLTOKEN_BACK2FRONT:
       if (!synldr->ParseBool (child, b2f, true))
-	return 0;
+        return 0;
       break;
     default:
       if (synldr->ParseZMode (child, zmode)) break;

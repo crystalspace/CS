@@ -43,8 +43,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
   class csGenmeshMeshObject;
 
   class SubMesh : 
-    public scfImplementation2<SubMesh, 
-                              iGeneralMeshSubMesh, 
+    public scfImplementation3<SubMesh,
+                              iGeneralMeshSubMesh,
+                              iGeneralFactorySubMesh,
                               scfFakeInterface<iShaderVariableContext> >,
     public CS::ShaderVariableContextImpl
   {
@@ -55,6 +56,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     /// Iterate over all vertices used in this submesh
     template<typename T>
     void IterateAllVertices (iRenderBuffer* positions, T& functor);
+    
+    struct SlidingWindow
+    {
+      int start_index;
+      int end_index;
+      SlidingWindow() {}
+      SlidingWindow(int s, int e): start_index(s), end_index(e) {}
+    };
+    csArray<SlidingWindow> sliding_windows;
+    
   public:
     const char* name;
     csRef<iMaterialWrapper> material;
@@ -75,21 +86,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     csZBufMode zmode;
     CS::Graphics::RenderPriority renderPrio;
     bool back2front;
-    size_t indexStart, indexEnd;
     // Cache b2f tree for rendering
     csBSPTree* b2fTree;
     csFrameDataHolder<csRef<iRenderBuffer> > b2fIndices;
 
     SubMesh () : scfImplementationType (this), bbox_valid (false), name (0), 
       MixMode ((uint)~0), zmode ((csZBufMode)~0), renderPrio (-1),
-      back2front (false), indexStart (0), indexEnd ((size_t)~0), b2fTree (0)
+      back2front (false), b2fTree (0)
     { }
     SubMesh (const SubMesh& other) : scfImplementationType (this), 
       index_buffer (other.index_buffer), bbox (other.bbox),
       bbox_valid (other.bbox_valid), name (other.name), 
       material (other.material), MixMode (other.MixMode), zmode (other.zmode),
-      renderPrio (other.renderPrio), back2front (other.back2front),
-      indexStart (other.indexStart), indexEnd (other.indexEnd), b2fTree (0)
+      renderPrio (other.renderPrio), back2front (other.back2front), b2fTree (0)
     { }
     ~SubMesh()
     {
@@ -127,17 +136,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       back2front = enable;
     }
     bool GetBack2Front () const { return back2front; }
-    void SetIndexRange (size_t start, size_t end)
-    { indexStart = start; indexEnd = end; }
-    void GetIndexRange (size_t& start, size_t& end) const
-    { start = indexStart; end = indexEnd; }
 
-    void SetIndices (iRenderBuffer* newIndices);
+    virtual void SetIndices (iRenderBuffer* newIndices);
     
     const csBox3& GetObjectBoundingBox (iRenderBuffer* positions);
     float ComputeMaxSqRadius (iRenderBuffer* positions,
       const csVector3& center);
     void InvalidateBoundingBox ();
+    
+    virtual void ClearSlidingWindows()
+    {
+      sliding_windows.SetSize(0);
+    }
+    
+    virtual int GetSlidingWindowSize() const
+    {
+      return sliding_windows.GetSize();
+    }
+    
+    virtual void AddSlidingWindow(int start_index, int end_index)
+    {
+      sliding_windows.Push(SlidingWindow(start_index, end_index));
+    }
+    
+    virtual void GetSlidingWindow(unsigned int index, int& out_start_index, int& out_end_index) const
+    {
+      CS_ASSERT(index >= 0 && index < sliding_windows.GetSize());
+      out_start_index = sliding_windows[index].start_index;
+      out_end_index = sliding_windows[index].end_index;
+    }
   };
 
   class SubMeshesContainer
@@ -181,8 +208,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
    * local override values.
    */
   class SubMeshProxy : 
-    public scfImplementation2<SubMeshProxy, 
-                              iGeneralMeshSubMesh, 
+    public scfImplementation3<SubMeshProxy,
+                              iGeneralMeshSubMesh,
+                              iGeneralFactorySubMeshObject,
                               scfFakeInterface<iShaderVariableContext> >,
     public CS::ShaderVariableContextImpl
   {
@@ -193,8 +221,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       bitMixMode,
       bitZMode,
       bitRenderPrio,
-      bitBack2Front,
-      bitIndexRange
+      bitBack2Front
     };
     csRef<iMaterialWrapper> material;
     // Override mixmode from parent.
@@ -204,7 +231,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     csFlags overrideFlags;
     csRef<csRenderBufferHolder> bufferHolder;
     bool back2front;
-    size_t indexStart, indexEnd;
+    int forced_prog_lod_level;
 
     class RenderBufferAccessor : 
       public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
@@ -229,7 +256,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     // Stuff below is used by GM for rendering
     csRenderMeshHolder rmHolder;
 
-    SubMeshProxy () : scfImplementationType (this), overrideFlags (0)
+    SubMeshProxy () : scfImplementationType (this), overrideFlags (0), forced_prog_lod_level(-1)
     { }
     ~SubMeshProxy ()
     { }
@@ -253,6 +280,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
         return parentSubMesh->SubMesh::GetIndicesB2F (pos, frameNum, vertices,
           vertNum);
       return 0;
+    }
+    virtual void SetIndices (iRenderBuffer* newIndices)
+    {
+      assert(0);
     }
     iMaterialWrapper* GetMaterial () const
     { 
@@ -304,20 +335,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       if (GetOverrideFlag (bitBack2Front)) return back2front;
       return parentSubMesh->SubMesh::GetBack2Front ();
     }
-    void SetIndexRange (size_t start, size_t end)
-    {
-      SetOverrideFlag (bitIndexRange, start != 0 && end != (size_t) ~0);
-      indexStart = start; indexEnd = end;
-    }
-    void GetIndexRange (size_t& start, size_t& end) const
-    {
-      if (GetOverrideFlag (bitIndexRange))
-      {
-	start = indexStart;
-	end = indexEnd;
-      }
-      else parentSubMesh->SubMesh::GetIndexRange (start, end);
-    }
 
     virtual csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
     {
@@ -335,7 +352,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { 
       return parentSubMesh->IsEmpty() 
         && CS::ShaderVariableContextImpl::IsEmpty ();
-    }  
+    }
+    
+    virtual void ClearSlidingWindows()
+    {
+      parentSubMesh->ClearSlidingWindows();
+    }
+    
+    virtual int GetSlidingWindowSize() const
+    {
+      return parentSubMesh->GetSlidingWindowSize();
+    }
+    
+    virtual void AddSlidingWindow(int start_index, int end_index)
+    {
+      parentSubMesh->AddSlidingWindow(start_index, end_index);
+    }
+    
+    virtual void GetSlidingWindow(unsigned int index, int& out_start_index, int& out_end_index) const
+    {
+      parentSubMesh->GetSlidingWindow(index, out_start_index, out_end_index);
+    }    
+    
+    virtual void ForceProgLODLevel(int level)
+    {
+      forced_prog_lod_level = level;
+    }
+    
+    virtual int GetForcedProgLODLevel()
+    {
+      return forced_prog_lod_level;
+    }
   };
 
   class SubMeshProxiesContainer

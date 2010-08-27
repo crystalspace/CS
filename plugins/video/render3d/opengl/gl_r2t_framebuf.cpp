@@ -596,6 +596,8 @@ void csGLRender2TextureFramebuf::FinishDraw (bool readbackTargets)
     
     if (readbackTargets)
     {
+      csGLGraphics3D::ProfileScope _profile (G3D, "render target readback");
+      
       if (colorTarget.IsValid())
       {
 	csGLBasicTextureHandle* tex_mm = 

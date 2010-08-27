@@ -43,4 +43,6 @@
     </pass>
   </technique>
   
+  <!-- fixed function fallback -->
+  <fallbackshader name="lighting_fullbright_fixed" file="/shader/lighting/fullbright_fixed.xml" />
 </shader>

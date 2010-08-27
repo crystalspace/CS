@@ -49,31 +49,31 @@ namespace Animation {
 
 struct iBodyChain;
 struct iBodySkeleton;
-struct iSkeletonRagdollNode2;
+struct iSkeletonRagdollNode;
 
 /// Identifier for an effector within an Inverse Kinematics animation node
 typedef unsigned int EffectorID;
 
-struct iSkeletonIKNodeFactory2;
+struct iSkeletonIKNodeFactory;
 
 /**
  * A class to manage the creation and deletion of Inverse Kinematics animation 
  * node factories.
  */
-struct iSkeletonIKManager2 : public virtual iBase
+struct iSkeletonIKManager : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKManager2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonIKManager, 1, 0, 0);
 
   /**
    * Create a new Inverse Kinematics animation node factory.
    */
-  virtual iSkeletonIKNodeFactory2* CreateAnimNodeFactory
+  virtual iSkeletonIKNodeFactory* CreateAnimNodeFactory
     (const char *name, CS::Animation::iBodySkeleton* skeleton) = 0;
 
   /**
    * Find the Inverse Kinematics animation node factory with the given name.
    */
-  virtual iSkeletonIKNodeFactory2* FindAnimNodeFactory
+  virtual iSkeletonIKNodeFactory* FindAnimNodeFactory
     (const char* name) const = 0;
 
   /**
@@ -90,26 +90,26 @@ struct iSkeletonIKManager2 : public virtual iBase
  * system.
  *
  * You must first define some effectors, ie some points on the skeleton. Then in the
- * CS::Animation::iSkeletonIKNode2, you will be able to define some geometric constraints
+ * CS::Animation::iSkeletonIKNode, you will be able to define some geometric constraints
  * on these effectors.
  *
- * \sa iSkeletonIKPhysicalNodeFactory2
+ * \sa iSkeletonIKPhysicalNodeFactory
  */
-struct iSkeletonIKNodeFactory2 : public iSkeletonAnimNodeFactory2
+struct iSkeletonIKNodeFactory : public iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKNodeFactory2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonIKNodeFactory, 1, 0, 0);
 
   /**
    * Set the child animation node of this node. The IK controller will
    * add its control on top of the animation of the child node. This child
    * node is not mandatory.
    */
-  virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory2* node) = 0;
+  virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node) = 0;
 
   /**
    * Return the child animation node of this node.
    */
-  virtual CS::Animation::iSkeletonAnimNodeFactory2* GetChildNode () const = 0;
+  virtual CS::Animation::iSkeletonAnimNodeFactory* GetChildNode () const = 0;
 
   /**
    * Clear the child animation node of this node.
@@ -141,13 +141,13 @@ struct iSkeletonIKNodeFactory2 : public iSkeletonAnimNodeFactory2
  * effectors placed on the skeleton.
  *
  * This node is inactive until there are some constraints on some effector. The
- * effectors are defined by iSkeletonIKNodeFactory2::AddEffector().
+ * effectors are defined by iSkeletonIKNodeFactory::AddEffector().
  *
- * \sa iSkeletonIKPhysicalNode2
+ * \sa iSkeletonIKPhysicalNode
  */
-struct iSkeletonIKNode2 : public iSkeletonAnimNode2
+struct iSkeletonIKNode : public iSkeletonAnimNode
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKNode2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonIKNode, 1, 0, 0);
 
   /**
    * Add a constraint on the given effector so that it sticks to the given world transform.
@@ -185,8 +185,8 @@ struct iSkeletonIKNode2 : public iSkeletonAnimNode2
 };
 
 /**
- * An implementation of the CS::Animation::iSkeletonIKNodeFactory2 based on physical
- * simulation. This node will use a CS::Animation::iSkeletonRagdollNode2 and apply
+ * An implementation of the CS::Animation::iSkeletonIKNodeFactory based on physical
+ * simulation. This node will use a CS::Animation::iSkeletonRagdollNode and apply
  * physical constraints on the rigid bodies created by the ragdoll node.
  *
  * This IK method has the advantage to be able to be physically accurate. It has for
@@ -198,11 +198,11 @@ struct iSkeletonIKNode2 : public iSkeletonAnimNode2
  * \warning The current implementation does not care about the rotational component
  * of the constraints.
  *
- * \sa iSkeletonIKNodeFactory2
+ * \sa iSkeletonIKNodeFactory
  */
-struct iSkeletonIKPhysicalNodeFactory2 : public iSkeletonIKNodeFactory2
+struct iSkeletonIKPhysicalNodeFactory : public iSkeletonIKNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKPhysicalNodeFactory2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonIKPhysicalNodeFactory, 1, 0, 0);
 
   /**
    * Set whether or not the CS::Animation::iBodyChain controlled by this node have to be
@@ -210,7 +210,7 @@ struct iSkeletonIKPhysicalNodeFactory2 : public iSkeletonIKNodeFactory2
    * Default value is true.
    *
    * The body chain is indeed put in the CS::Animation::STATE_DYNAMIC state when there is
-   * at least one active constraint (see CS::Animation::iSkeletonRagdollNode2::SetBodyChainState()).
+   * at least one active constraint (see CS::Animation::iSkeletonRagdollNode::SetBodyChainState()).
    */
   virtual void SetChainAutoReset (bool reset) = 0;
 
@@ -219,14 +219,14 @@ struct iSkeletonIKPhysicalNodeFactory2 : public iSkeletonIKNodeFactory2
    * reset to their previous dynamic state when there are no more constraints on the chain.
    *
    * The body chain is indeed put in the CS::Animation::STATE_DYNAMIC state when there is
-   * at least one active constraint (see CS::Animation::iSkeletonRagdollNode2::SetBodyChainState()).
+   * at least one active constraint (see CS::Animation::iSkeletonRagdollNode::SetBodyChainState()).
    */
   virtual bool GetChainAutoReset () const = 0;
 };
 
 /**
- * An implementation of the CS::Animation::iSkeletonIKNode2 based on physical
- * simulation. This node will use a CS::Animation::iSkeletonRagdollNode2 and apply
+ * An implementation of the CS::Animation::iSkeletonIKNode based on physical
+ * simulation. This node will use a CS::Animation::iSkeletonRagdollNode and apply
  * physical constraints on the rigid bodies created by the ragdoll node.
  *
  * This IK method has the advantage to be able to be physically accurate. It has for
@@ -238,22 +238,22 @@ struct iSkeletonIKPhysicalNodeFactory2 : public iSkeletonIKNodeFactory2
  * \warning The current implementation does not care about the rotational component
  * of the constraints.
  *
- * \sa iSkeletonIKNode2
+ * \sa iSkeletonIKNode
  */
-struct iSkeletonIKPhysicalNode2 : public iSkeletonIKNode2
+struct iSkeletonIKPhysicalNode : public iSkeletonIKNode
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKPhysicalNode2, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonIKPhysicalNode, 1, 0, 0);
 
   /**
    * Set the ragdoll node to be used by this node. The ragdoll node has to be active
    * somewhere inside the animation blending tree (but its effective position has no importance).
    */
-  virtual void SetRagdollNode (CS::Animation::iSkeletonRagdollNode2* ragdollNode) = 0;
+  virtual void SetRagdollNode (CS::Animation::iSkeletonRagdollNode* ragdollNode) = 0;
 
   /**
    * Get the ragdoll node to be used by this node.
    */
-  virtual CS::Animation::iSkeletonRagdollNode2* GetRagdollNode () const = 0;
+  virtual CS::Animation::iSkeletonRagdollNode* GetRagdollNode () const = 0;
 };
 
 } // namespace Animation

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Decals, , Level of Detail, Engine
+@node Decals, Deferred Shading, Progressive Level of Detail, Engine
 @subsection Decals
 @cindex Decals
 @cindex @code{iDecalManager}

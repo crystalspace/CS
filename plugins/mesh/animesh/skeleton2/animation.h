@@ -33,66 +33,66 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   class AnimationPacketFactory : 
     public scfImplementation1<AnimationPacketFactory,
-                              CS::Animation::iSkeletonAnimPacketFactory2>
+                              CS::Animation::iSkeletonAnimPacketFactory>
   {
   public:
     CS_LEAKGUARD_DECLARE(AnimationPacketFactory);
   
     AnimationPacketFactory ();
 
-    //-- CS::Animation::iSkeletonAnimPacketFactory2
-    virtual csPtr<CS::Animation::iSkeletonAnimPacket2> CreateInstance (CS::Animation::iSkeleton2* skeleton);
+    //-- CS::Animation::iSkeletonAnimPacketFactory
+    virtual csPtr<CS::Animation::iSkeletonAnimPacket> CreateInstance (CS::Animation::iSkeleton* skeleton);
 
-    virtual CS::Animation::iSkeletonAnimation2* CreateAnimation (const char* name);
-    virtual CS::Animation::iSkeletonAnimation2* FindAnimation (const char* name);
+    virtual CS::Animation::iSkeletonAnimation* CreateAnimation (const char* name);
+    virtual CS::Animation::iSkeletonAnimation* FindAnimation (const char* name);
     virtual void ClearAnimations ();
-    virtual CS::Animation::iSkeletonAnimation2* GetAnimation (size_t index);
+    virtual CS::Animation::iSkeletonAnimation* GetAnimation (size_t index);
     virtual size_t GetAnimationCount () const;
 
-    virtual void SetAnimationRoot (CS::Animation::iSkeletonAnimNodeFactory2* root);
-    virtual CS::Animation::iSkeletonAnimNodeFactory2* GetAnimationRoot () const;
+    virtual void SetAnimationRoot (CS::Animation::iSkeletonAnimNodeFactory* root);
+    virtual CS::Animation::iSkeletonAnimNodeFactory* GetAnimationRoot () const;
 
-    virtual csPtr<CS::Animation::iSkeletonAnimationNodeFactory2> CreateAnimationNode (const char* name);
-    virtual csPtr<CS::Animation::iSkeletonBlendNodeFactory2> CreateBlendNode (const char* name);
-    virtual csPtr<CS::Animation::iSkeletonPriorityNodeFactory2> CreatePriorityNode (const char* name);
-    virtual csPtr<CS::Animation::iSkeletonRandomNodeFactory2> CreateRandomNode (const char* name);
-    virtual csPtr<CS::Animation::iSkeletonFSMNodeFactory2> CreateFSMNode (const char* name);
+    virtual csPtr<CS::Animation::iSkeletonAnimationNodeFactory> CreateAnimationNode (const char* name);
+    virtual csPtr<CS::Animation::iSkeletonBlendNodeFactory> CreateBlendNode (const char* name);
+    virtual csPtr<CS::Animation::iSkeletonPriorityNodeFactory> CreatePriorityNode (const char* name);
+    virtual csPtr<CS::Animation::iSkeletonRandomNodeFactory> CreateRandomNode (const char* name);
+    virtual csPtr<CS::Animation::iSkeletonFSMNodeFactory> CreateFSMNode (const char* name);
 
   private:
     csRefArray<Animation> animationList;
-    csRef<CS::Animation::iSkeletonAnimNodeFactory2> animRoot;
+    csRef<CS::Animation::iSkeletonAnimNodeFactory> animRoot;
   };
 
   class AnimationPacket :
     public scfImplementation1<AnimationPacket,
-                              CS::Animation::iSkeletonAnimPacket2>
+                              CS::Animation::iSkeletonAnimPacket>
   {
   public:
     CS_LEAKGUARD_DECLARE(AnimationPacket);
   
     AnimationPacket (AnimationPacketFactory* factory);
 
-    //-- CS::Animation::iSkeletonAnimPacket2
-    virtual CS::Animation::iSkeletonAnimPacketFactory2* GetFactory () const;
-    virtual CS::Animation::iSkeletonAnimNode2* GetAnimationRoot () const;
+    //-- CS::Animation::iSkeletonAnimPacket
+    virtual CS::Animation::iSkeletonAnimPacketFactory* GetFactory () const;
+    virtual CS::Animation::iSkeletonAnimNode* GetAnimationRoot () const;
 
   private:
     friend class AnimationPacketFactory;
     
-    csRef<CS::Animation::iSkeletonAnimNode2> animRoot;
+    csRef<CS::Animation::iSkeletonAnimNode> animRoot;
     csRef<AnimationPacketFactory> factory;
   };
 
   class Animation : 
     public scfImplementation1<Animation,
-                              CS::Animation::iSkeletonAnimation2>
+                              CS::Animation::iSkeletonAnimation>
   {
   public:
     CS_LEAKGUARD_DECLARE(Animation);
   
     Animation (const char* name);
 
-    //-- CS::Animation::iSkeletonAnimation2
+    //-- CS::Animation::iSkeletonAnimation
     virtual const char* GetName () const;
 
     virtual CS::Animation::ChannelID AddChannel (CS::Animation::BoneID bone);
@@ -119,7 +119,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
       float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset);
 
-    virtual void BlendState (CS::Animation::csSkeletalState2* state, 
+    virtual void BlendState (CS::Animation::csSkeletalState* state, 
       float baseWeight, float playbackTime, bool isPlayingCyclic) const;
 
     virtual float GetDuration () const;

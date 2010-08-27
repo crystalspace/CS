@@ -154,6 +154,12 @@ typedef intptr_t GLintptr;
 #ifndef CS_HAVE_GLSIZEIPTR_T
 typedef uintptr_t GLsizeiptr;
 #endif
+#ifndef CS_HAVE_GLINT64_T
+typedef int64 GLint64;
+#endif
+#ifndef CS_HAVE_GLUINT64_T
+typedef uint64 GLuint64;
+#endif
 
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
@@ -1673,6 +1679,7 @@ typedef GLvoid (csAPIENTRY* csGLBINDATTRIBLOCATION) (GLuint programObj, GLuint i
 typedef GLvoid (csAPIENTRY* csGLGETACTIVEATTRIB) (GLuint programObj, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLchar* name);
 typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATION) (GLuint programObj, const GLchar* name);
 typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBPOINTERV) (GLuint index, GLenum pname, GLvoid** pointer);
+typedef GLvoid (csAPIENTRY* csGLDRAWBUFFERS) (GLsizei n, const GLenum* bufs);
 typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONSEPARATE) (GLenum modeRGB, GLenum modeAlpha);
 typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATE) (GLenum face, GLenum func, GLint ref, GLuint mask);
 typedef GLvoid (csAPIENTRY* csGLSTENCILOPSEPARATE) (GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
@@ -1759,6 +1766,50 @@ typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX2X4FV) (GLint location, GLsizei cou
 typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX4X2FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
 typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX3X4FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
 typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX4X3FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+
+/** @} */
+/**\name Queries constants
+ * @{ */
+#ifndef GL_QUERY_COUNTER_BITS_ARB
+#define GL_QUERY_COUNTER_BITS_ARB                                    0x8864
+#endif
+
+#ifndef GL_CURRENT_QUERY_ARB
+#define GL_CURRENT_QUERY_ARB                                         0x8865
+#endif
+
+#ifndef GL_QUERY_RESULT_ARB
+#define GL_QUERY_RESULT_ARB                                          0x8866
+#endif
+
+#ifndef GL_QUERY_RESULT_AVAILABLE_ARB
+#define GL_QUERY_RESULT_AVAILABLE_ARB                                0x8867
+#endif
+
+
+/** @} */
+
+/**\name Queries functions
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLGENQUERIESARB) (GLsizei n, GLuint* ids);
+typedef GLvoid (csAPIENTRY* csGLDELETEQUERIESARB) (GLsizei n, GLuint* ids);
+typedef GLboolean (csAPIENTRY* csGLISQUERYARB) (GLuint id);
+typedef GLvoid (csAPIENTRY* csGLBEGINQUERYARB) (GLenum target, GLuint id);
+typedef GLvoid (csAPIENTRY* csGLENDQUERYARB) (GLenum target);
+typedef GLvoid (csAPIENTRY* csGLGETQUERYIVARB) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTIVARB) (GLuint id, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTUIVARB) (GLuint id, GLenum pname, GLuint* params);
+
+/** @} */
+/**\name Queries64 constants
+ * @{ */
+
+/** @} */
+
+/**\name Queries64 functions
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTI64V) (GLuint id, GLenum pname, GLint64* params);
+typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTUI64V) (GLuint id, GLenum pname, GLuint64* params);
 
 /** @} */
 /**\name GL_ARB_imaging constants
@@ -10672,11 +10723,11 @@ typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, co
 #endif
 
 #ifndef GL_MAX_COLOR_ATTACHMENTS_EXT
-#define GL_MAX_COLOR_ATTACHMENTS_EXT                                 0x8CA8
+#define GL_MAX_COLOR_ATTACHMENTS_EXT                                 0x8CDF
 #endif
 
-#ifndef GL_RENDERBUFFER_SIZE_EXT
-#define GL_RENDERBUFFER_SIZE_EXT                                     0x8CA9
+#ifndef GL_MAX_RENDERBUFFER_SIZE_EXT
+#define GL_MAX_RENDERBUFFER_SIZE_EXT                                 0x84E8
 #endif
 
 #ifndef GL_INVALID_FRAMEBUFFER_OPERATION_EXT
@@ -10781,36 +10832,12 @@ typedef GLvoid (csAPIENTRY* csGLSTRINGMARKERGREMEDY) (GLsizei len, const GLvoid*
 #define GL_SAMPLES_PASSED_ARB                                        0x8914
 #endif
 
-#ifndef GL_QUERY_COUNTER_BITS_ARB
-#define GL_QUERY_COUNTER_BITS_ARB                                    0x8864
-#endif
-
-#ifndef GL_CURRENT_QUERY_ARB
-#define GL_CURRENT_QUERY_ARB                                         0x8865
-#endif
-
-#ifndef GL_QUERY_RESULT_ARB
-#define GL_QUERY_RESULT_ARB                                          0x8866
-#endif
-
-#ifndef GL_QUERY_RESULT_AVAILABLE_ARB
-#define GL_QUERY_RESULT_AVAILABLE_ARB                                0x8867
-#endif
-
 
 /** @} */
 
 /**\name GL_ARB_occlusion_query functions
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query.txt">http://www.opengl.org/registry/specs/ARB/occlusion_query.txt</a>.
  * @{ */
-typedef GLvoid (csAPIENTRY* csGLGENQUERIESARB) (GLsizei n, GLuint* ids);
-typedef GLvoid (csAPIENTRY* csGLDELETEQUERIESARB) (GLsizei n, GLuint* ids);
-typedef GLboolean (csAPIENTRY* csGLISQUERYARB) (GLuint id);
-typedef GLvoid (csAPIENTRY* csGLBEGINQUERYARB) (GLenum target, GLuint id);
-typedef GLvoid (csAPIENTRY* csGLENDQUERYARB) (GLenum target);
-typedef GLvoid (csAPIENTRY* csGLGETQUERYIVARB) (GLenum target, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTIVARB) (GLuint id, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTUIVARB) (GLuint id, GLenum pname, GLuint* params);
 
 /** @} */
 /**\name GL_ARB_draw_buffers constants
@@ -10890,6 +10917,7 @@ typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTUIVARB) (GLuint id, GLenum pname, 
 /**\name GL_ARB_draw_buffers functions
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">http://www.opengl.org/registry/specs/ARB/draw_buffers.txt</a>.
  * @{ */
+typedef GLvoid (csAPIENTRY* csGLDRAWBUFFERSARB) (GLsizei n, const GLenum* bufs);
 
 /** @} */
 /**\name GL_EXT_blend_equation_separate constants
@@ -11529,6 +11557,27 @@ typedef GLvoid (csAPIENTRY* csGLFLUSHMAPPEDBUFFERRANGE) (GLenum target, GLintptr
 /**\name GL_AMD_seamless_cubemap_per_texture functions
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt">http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt</a>.
  * @{ */
+
+/** @} */
+/**\name GL_ARB_timer_query constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/timer_query.txt">http://www.opengl.org/registry/specs/ARB/timer_query.txt</a>.
+ * @{ */
+#ifndef GL_TIME_ELAPSED
+#define GL_TIME_ELAPSED                                              0x88BF
+#endif
+
+#ifndef GL_TIMESTAMP
+#define GL_TIMESTAMP                                                 0x8E28
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_timer_query functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/timer_query.txt">http://www.opengl.org/registry/specs/ARB/timer_query.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLGETINTEGER64V) (GLenum value, GLint64* data);
+typedef GLvoid (csAPIENTRY* csGLQUERYCOUNTER) (GLuint id, GLenum target);
 
 /** @} */
 
@@ -12578,6 +12627,11 @@ public:
   csGLGETVERTEXATTRIBPOINTERV glGetVertexAttribPointerv;
   #endif
 
+  #ifndef GLDRAWBUFFERS_DECL
+  #define GLDRAWBUFFERS_DECL
+  csGLDRAWBUFFERS glDrawBuffers;
+  #endif
+
   #ifndef GLBLENDEQUATIONSEPARATE_DECL
   #define GLBLENDEQUATIONSEPARATE_DECL
   csGLBLENDEQUATIONSEPARATE glBlendEquationSeparate;
@@ -12627,6 +12681,64 @@ public:
   #ifndef GLUNIFORMMATRIX4X3FV_DECL
   #define GLUNIFORMMATRIX4X3FV_DECL
   csGLUNIFORMMATRIX4X3FV glUniformMatrix4x3fv;
+  #endif
+
+
+  /** @} */
+  /**\name Queries functions
+   * @{ */
+  #ifndef GLGENQUERIESARB_DECL
+  #define GLGENQUERIESARB_DECL
+  csGLGENQUERIESARB glGenQueriesARB;
+  #endif
+
+  #ifndef GLDELETEQUERIESARB_DECL
+  #define GLDELETEQUERIESARB_DECL
+  csGLDELETEQUERIESARB glDeleteQueriesARB;
+  #endif
+
+  #ifndef GLISQUERYARB_DECL
+  #define GLISQUERYARB_DECL
+  csGLISQUERYARB glIsQueryARB;
+  #endif
+
+  #ifndef GLBEGINQUERYARB_DECL
+  #define GLBEGINQUERYARB_DECL
+  csGLBEGINQUERYARB glBeginQueryARB;
+  #endif
+
+  #ifndef GLENDQUERYARB_DECL
+  #define GLENDQUERYARB_DECL
+  csGLENDQUERYARB glEndQueryARB;
+  #endif
+
+  #ifndef GLGETQUERYIVARB_DECL
+  #define GLGETQUERYIVARB_DECL
+  csGLGETQUERYIVARB glGetQueryivARB;
+  #endif
+
+  #ifndef GLGETQUERYOBJECTIVARB_DECL
+  #define GLGETQUERYOBJECTIVARB_DECL
+  csGLGETQUERYOBJECTIVARB glGetQueryObjectivARB;
+  #endif
+
+  #ifndef GLGETQUERYOBJECTUIVARB_DECL
+  #define GLGETQUERYOBJECTUIVARB_DECL
+  csGLGETQUERYOBJECTUIVARB glGetQueryObjectuivARB;
+  #endif
+
+
+  /** @} */
+  /**\name Queries64 functions
+   * @{ */
+  #ifndef GLGETQUERYOBJECTI64V_DECL
+  #define GLGETQUERYOBJECTI64V_DECL
+  csGLGETQUERYOBJECTI64V glGetQueryObjecti64v;
+  #endif
+
+  #ifndef GLGETQUERYOBJECTUI64V_DECL
+  #define GLGETQUERYOBJECTUI64V_DECL
+  csGLGETQUERYOBJECTUI64V glGetQueryObjectui64v;
   #endif
 
 
@@ -17213,51 +17325,16 @@ public:
   /**\name GL_ARB_occlusion_query functions
    * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query.txt">http://www.opengl.org/registry/specs/ARB/occlusion_query.txt</a>.
    * @{ */
-  #ifndef GLGENQUERIESARB_DECL
-  #define GLGENQUERIESARB_DECL
-  csGLGENQUERIESARB glGenQueriesARB;
-  #endif
-
-  #ifndef GLDELETEQUERIESARB_DECL
-  #define GLDELETEQUERIESARB_DECL
-  csGLDELETEQUERIESARB glDeleteQueriesARB;
-  #endif
-
-  #ifndef GLISQUERYARB_DECL
-  #define GLISQUERYARB_DECL
-  csGLISQUERYARB glIsQueryARB;
-  #endif
-
-  #ifndef GLBEGINQUERYARB_DECL
-  #define GLBEGINQUERYARB_DECL
-  csGLBEGINQUERYARB glBeginQueryARB;
-  #endif
-
-  #ifndef GLENDQUERYARB_DECL
-  #define GLENDQUERYARB_DECL
-  csGLENDQUERYARB glEndQueryARB;
-  #endif
-
-  #ifndef GLGETQUERYIVARB_DECL
-  #define GLGETQUERYIVARB_DECL
-  csGLGETQUERYIVARB glGetQueryivARB;
-  #endif
-
-  #ifndef GLGETQUERYOBJECTIVARB_DECL
-  #define GLGETQUERYOBJECTIVARB_DECL
-  csGLGETQUERYOBJECTIVARB glGetQueryObjectivARB;
-  #endif
-
-  #ifndef GLGETQUERYOBJECTUIVARB_DECL
-  #define GLGETQUERYOBJECTUIVARB_DECL
-  csGLGETQUERYOBJECTUIVARB glGetQueryObjectuivARB;
-  #endif
-
 
   /** @} */
   /**\name GL_ARB_draw_buffers functions
    * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">http://www.opengl.org/registry/specs/ARB/draw_buffers.txt</a>.
    * @{ */
+  #ifndef GLDRAWBUFFERSARB_DECL
+  #define GLDRAWBUFFERSARB_DECL
+  csGLDRAWBUFFERSARB glDrawBuffersARB;
+  #endif
+
 
   /** @} */
   /**\name GL_EXT_blend_equation_separate functions
@@ -17491,6 +17568,21 @@ public:
    * @{ */
 
   /** @} */
+  /**\name GL_ARB_timer_query functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/timer_query.txt">http://www.opengl.org/registry/specs/ARB/timer_query.txt</a>.
+   * @{ */
+  #ifndef GLGETINTEGER64V_DECL
+  #define GLGETINTEGER64V_DECL
+  csGLGETINTEGER64V glGetInteger64v;
+  #endif
+
+  #ifndef GLQUERYCOUNTER_DECL
+  #define GLQUERYCOUNTER_DECL
+  csGLQUERYCOUNTER glQueryCounter;
+  #endif
+
+
+  /** @} */
 
 // end of functions
 };
@@ -17511,6 +17603,12 @@ public:
   bool CS_GL_version_2_0;
   /** Whether the corresponding GL version is supported. */
   bool CS_GL_version_2_1;
+  /** Whether the "Queries" pseudo-extension was found. 
+   * Set by csGLExtensionManager::InitQueries(). */
+  bool CS_Queries;
+  /** Whether the "Queries64" pseudo-extension was found. 
+   * Set by csGLExtensionManager::InitQueries64(). */
+  bool CS_Queries64;
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/imaging.txt">GL_ARB_imaging</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_imaging(). */
   bool CS_GL_ARB_imaging;
@@ -18060,6 +18158,9 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/AMD/seamless_cubemap_per_texture.txt">GL_AMD_seamless_cubemap_per_texture</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_AMD_seamless_cubemap_per_texture(). */
   bool CS_GL_AMD_seamless_cubemap_per_texture;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/timer_query.txt">GL_ARB_timer_query</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_timer_query(). */
+  bool CS_GL_ARB_timer_query;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -18068,6 +18169,8 @@ protected:
   bool tested_CS_GL_version_1_5;
   bool tested_CS_GL_version_2_0;
   bool tested_CS_GL_version_2_1;
+  bool tested_CS_Queries;
+  bool tested_CS_Queries64;
   bool tested_CS_GL_ARB_imaging;
   bool tested_CS_GL_ARB_multitexture;
   bool tested_CS_GL_ARB_transpose_matrix;
@@ -18251,6 +18354,7 @@ protected:
   bool tested_CS_GL_ARB_texture_rg;
   bool tested_CS_GL_ARB_seamless_cube_map;
   bool tested_CS_GL_AMD_seamless_cubemap_per_texture;
+  bool tested_CS_GL_ARB_timer_query;
 
 };
 
@@ -18744,6 +18848,7 @@ public:
       EXTMGR_FUNC_INIT(glGetActiveAttrib, GLGETACTIVEATTRIB);
       EXTMGR_FUNC_INIT(glGetAttribLocation, GLGETATTRIBLOCATION);
       EXTMGR_FUNC_INIT(glGetVertexAttribPointerv, GLGETVERTEXATTRIBPOINTERV);
+      EXTMGR_FUNC_INIT(glDrawBuffers, GLDRAWBUFFERS);
       EXTMGR_FUNC_INIT(glBlendEquationSeparate, GLBLENDEQUATIONSEPARATE);
       EXTMGR_FUNC_INIT(glStencilFuncSeparate, GLSTENCILFUNCSEPARATE);
       EXTMGR_FUNC_INIT(glStencilOpSeparate, GLSTENCILOPSEPARATE);
@@ -18792,6 +18897,91 @@ public:
     else
     {
       Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize "Queries" pseudo-extension. 
+   * Check presence with csGLExtensionFlags::CS_Queries. */
+  void InitQueries ()
+  {
+    if (tested_CS_Queries) return;
+    if (!extstrGL) return;
+    tested_CS_Queries = true;
+    const char* ext = "Queries";
+
+    
+    CS_Queries = true;
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_Queries;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glGenQueriesARB, GLGENQUERIESARB);
+      EXTMGR_FUNC_INIT(glDeleteQueriesARB, GLDELETEQUERIESARB);
+      EXTMGR_FUNC_INIT(glIsQueryARB, GLISQUERYARB);
+      EXTMGR_FUNC_INIT(glBeginQueryARB, GLBEGINQUERYARB);
+      EXTMGR_FUNC_INIT(glEndQueryARB, GLENDQUERYARB);
+      EXTMGR_FUNC_INIT(glGetQueryivARB, GLGETQUERYIVARB);
+      EXTMGR_FUNC_INIT(glGetQueryObjectivARB, GLGETQUERYOBJECTIVARB);
+      EXTMGR_FUNC_INIT(glGetQueryObjectuivARB, GLGETQUERYOBJECTUIVARB);
+
+      CS_Queries = allclear;
+      if (CS_Queries)
+      {
+	Report (msgExtFoundAndUsed, "pseudo", ext);
+      }
+      else
+      {
+        Report (msgExtInitFail, "pseudo", ext);
+      }
+    }
+    else
+    {
+      Report (msgExtNotFound, "pseudo", ext);
+    }
+  }
+  
+  /** Initialize "Queries64" pseudo-extension. 
+   * Check presence with csGLExtensionFlags::CS_Queries64. */
+  void InitQueries64 ()
+  {
+    if (tested_CS_Queries64) return;
+    if (!extstrGL) return;
+    tested_CS_Queries64 = true;
+    const char* ext = "Queries64";
+    InitQueries();
+    if (!CS_Queries)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "Queries");
+      return;
+    }
+    
+    CS_Queries64 = true;
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_Queries64;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glGetQueryObjecti64v, GLGETQUERYOBJECTI64V);
+      EXTMGR_FUNC_INIT(glGetQueryObjectui64v, GLGETQUERYOBJECTUI64V);
+
+      CS_Queries64 = allclear;
+      if (CS_Queries64)
+      {
+	Report (msgExtFoundAndUsed, "pseudo", ext);
+      }
+      else
+      {
+        Report (msgExtInitFail, "pseudo", ext);
+      }
+    }
+    else
+    {
+      Report (msgExtNotFound, "pseudo", ext);
     }
   }
   
@@ -24363,7 +24553,12 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_occlusion_query = true;
     const char* ext = "GL_ARB_occlusion_query";
-
+    InitQueries();
+    if (!CS_Queries)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "Queries");
+      return;
+    }
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -24375,14 +24570,6 @@ public:
     allclear = true;
     if (init)	// Don't check the functions if ext isn't reported anyway
     {
-      EXTMGR_FUNC_INIT(glGenQueriesARB, GLGENQUERIESARB);
-      EXTMGR_FUNC_INIT(glDeleteQueriesARB, GLDELETEQUERIESARB);
-      EXTMGR_FUNC_INIT(glIsQueryARB, GLISQUERYARB);
-      EXTMGR_FUNC_INIT(glBeginQueryARB, GLBEGINQUERYARB);
-      EXTMGR_FUNC_INIT(glEndQueryARB, GLENDQUERYARB);
-      EXTMGR_FUNC_INIT(glGetQueryivARB, GLGETQUERYIVARB);
-      EXTMGR_FUNC_INIT(glGetQueryObjectivARB, GLGETQUERYOBJECTIVARB);
-      EXTMGR_FUNC_INIT(glGetQueryObjectuivARB, GLGETQUERYOBJECTUIVARB);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_occlusion_query)
     }
@@ -24412,6 +24599,7 @@ public:
     allclear = true;
     if (init)	// Don't check the functions if ext isn't reported anyway
     {
+      EXTMGR_FUNC_INIT(glDrawBuffersARB, GLDRAWBUFFERSARB);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_draw_buffers)
     }
@@ -25028,6 +25216,42 @@ public:
     {
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_AMD_seamless_cubemap_per_texture)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/timer_query.txt">GL_ARB_timer_query</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_timer_query. */
+  void InitGL_ARB_timer_query ()
+  {
+    if (tested_CS_GL_ARB_timer_query) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_timer_query = true;
+    const char* ext = "GL_ARB_timer_query";
+    InitQueries64();
+    if (!CS_Queries64)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "Queries64");
+      return;
+    }
+    char cfgkey[26 + 18 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_timer_query = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_timer_query;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glGetInteger64v, GLGETINTEGER64V);
+      EXTMGR_FUNC_INIT(glQueryCounter, GLQUERYCOUNTER);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_timer_query)
     }
     else
     {
