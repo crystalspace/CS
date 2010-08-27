@@ -125,64 +125,64 @@ bool FrankieScene::CreateAvatar ()
   //     + 'LookAt' controller node
   //       + 'speed' controller node
   //         + animation nodes for all speeds
-  csRef<CS::Animation::iSkeletonAnimPacketFactory2> animPacketFactory =
+  csRef<CS::Animation::iSkeletonAnimPacketFactory> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create the 'random' node
-  csRef<CS::Animation::iSkeletonRandomNodeFactory2> randomNodeFactory =
+  csRef<CS::Animation::iSkeletonRandomNodeFactory> randomNodeFactory =
     animPacketFactory->CreateRandomNode ("random");
   randomNodeFactory->SetAutomaticSwitch (true);
 
   // Create the 'idle' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idleNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> idleNodeFactory =
     animPacketFactory->CreateAnimationNode ("idle");
   idleNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Idle1"));
 
   // Create the 'walk_slow' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> walkSlowNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> walkSlowNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk_slow");
   walkSlowNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_WalkSlow"));
 
   // Create the 'walk' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> walkNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> walkNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk");
   walkNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Walk"));
 
   // Create the 'walk_fast' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> walkFastNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> walkFastNodeFactory =
     animPacketFactory->CreateAnimationNode ("walk_fast");
   walkFastNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_WalkFast"));
 
   // Create the 'footing' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> footingNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> footingNodeFactory =
     animPacketFactory->CreateAnimationNode ("footing");
   footingNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Runs"));
 
   // Create the 'run_slow' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runSlowNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> runSlowNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_slow");
   runSlowNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunSlow"));
 
   // Create the 'run' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> runNodeFactory =
     animPacketFactory->CreateAnimationNode ("run");
   runNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_Run"));
 
   // Create the 'run_fast' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runFastNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> runFastNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_fast");
   runFastNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunFaster"));
 
   // Create the 'run_jump' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> runJumpNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> runJumpNodeFactory =
     animPacketFactory->CreateAnimationNode ("run_jump");
   runJumpNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunFast2Jump"));
@@ -220,7 +220,7 @@ bool FrankieScene::CreateAvatar ()
   if (hairTest->physicsEnabled)
   {
     // Create the ragdoll controller
-    csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
+    csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
       hairTest->ragdollManager->CreateAnimNodeFactory ("ragdoll",
 					     bodySkeleton, hairTest->dynamicSystem);
     animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
@@ -255,14 +255,14 @@ bool FrankieScene::CreateAvatar ()
 
   // When the animated mesh is created, the animation nodes are created too.
   // We can therefore set them up now.
-  CS::Animation::iSkeletonAnimNode2* rootNode =
+  CS::Animation::iSkeletonAnimNode* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
   // Setup of the ragdoll controller
   if (hairTest->physicsEnabled)
   {
     ragdollNode =
-      scfQueryInterface<CS::Animation::iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
+      scfQueryInterface<CS::Animation::iSkeletonRagdollNode> (rootNode->FindNode ("ragdoll"));
 
     // Start the ragdoll animation node in order to have the rigid bodies created
     ragdollNode->Play ();

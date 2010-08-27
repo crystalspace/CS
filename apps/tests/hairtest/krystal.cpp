@@ -246,52 +246,52 @@ bool KrystalScene::CreateAvatar ()
   //   + ragdoll controller node (root node - only if physics are enabled)
   //     + Random node
   //       + idle animation nodes
-  csRef<CS::Animation::iSkeletonAnimPacketFactory2> animPacketFactory =
+  csRef<CS::Animation::iSkeletonAnimPacketFactory> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create the 'random' node
-  csRef<CS::Animation::iSkeletonRandomNodeFactory2> randomNodeFactory =
+  csRef<CS::Animation::iSkeletonRandomNodeFactory> randomNodeFactory =
     animPacketFactory->CreateRandomNode ("random");
   randomNodeFactory->SetAutomaticSwitch (true);
 
   // Create the 'idle01' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle01NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> idle01NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle01");
   idle01NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle01"));
 
   // Create the 'idle02' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle02NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> idle02NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle02");
   idle02NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle02"));
 
   // Create the 'idle03' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle03NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> idle03NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle03");
   idle03NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle03"));
 
   // Create the 'idle04' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle04NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> idle04NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle04");
   idle04NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle04"));
 
   // Create the 'idle05' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle05NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> idle05NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle05");
   idle05NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle05"));
 
   // Create the 'idle06' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> idle06NodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> idle06NodeFactory =
     animPacketFactory->CreateAnimationNode ("idle06");
   idle06NodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("idle06"));
 
   // Create the 'stand' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory2> standNodeFactory =
+  csRef<CS::Animation::iSkeletonAnimationNodeFactory> standNodeFactory =
     animPacketFactory->CreateAnimationNode ("stand");
   standNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("stand"));
@@ -323,7 +323,7 @@ bool KrystalScene::CreateAvatar ()
   if (hairTest->physicsEnabled)
   {
     // Create the ragdoll controller
-    csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollNodeFactory =
+    csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
       hairTest->ragdollManager->CreateAnimNodeFactory
       ("ragdoll", bodySkeleton, hairTest->dynamicSystem);
     animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
@@ -357,14 +357,14 @@ bool KrystalScene::CreateAvatar ()
 
   // When the animated mesh is created, the animation nodes are created too.
   // We can therefore set them up now.
-  CS::Animation::iSkeletonAnimNode2* rootNode =
+  CS::Animation::iSkeletonAnimNode* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
   // Setup of the ragdoll controller
   if (hairTest->physicsEnabled)
   {
     ragdollNode =
-      scfQueryInterface<CS::Animation::iSkeletonRagdollNode2> (rootNode->FindNode ("ragdoll"));
+      scfQueryInterface<CS::Animation::iSkeletonRagdollNode> (rootNode->FindNode ("ragdoll"));
 
     // Start the ragdoll animation node in order to have the rigid bodies created
     ragdollNode->Play ();

@@ -86,15 +86,15 @@ private:
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
   csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
-  csRef<iDynamicsDebuggerManager> debuggerManager;
-  csRef<iDynamicSystemDebugger> dynamicsDebugger;
+  csRef<CS::Debug::iDynamicsDebuggerManager> debuggerManager;
+  csRef<CS::Debug::iDynamicSystemDebugger> dynamicsDebugger;
   int dynamicsDebugMode;
   csRef<iSaver> saver;
 
   // Animation node plugin managers
-  csRef<CS::Animation::iSkeletonLookAtManager2> lookAtManager;
-  csRef<CS::Animation::iSkeletonBasicNodesManager2> basicNodesManager;
-  csRef<CS::Animation::iSkeletonRagdollManager2> ragdollManager;
+  csRef<CS::Animation::iSkeletonLookAtManager> lookAtManager;
+  csRef<CS::Animation::iSkeletonBasicNodesManager> basicNodesManager;
+  csRef<CS::Animation::iSkeletonRagdollManager> ragdollManager;
 
   // GUI related
   csRef<iVFS> vfs;

@@ -61,7 +61,7 @@ private:
   HairTest* hairTest;
 
   // Ragdoll node related
-  csRef<CS::Animation::iSkeletonRagdollNode2> ragdollNode;
+  csRef<CS::Animation::iSkeletonRagdollNode> ragdollNode;
   CS::Animation::iBodyChain* bodyChain;
   CS::Animation::iBodyChain* tailChain;
   

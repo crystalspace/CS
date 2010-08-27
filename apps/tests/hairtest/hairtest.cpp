@@ -540,9 +540,9 @@ bool HairTest::OnInitialize (int argc, char* argv[])
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
-    CS::Animation::iSkeletonLookAtManager2),
+    CS::Animation::iSkeletonLookAtManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
-    CS::Animation::iSkeletonBasicNodesManager2),
+    CS::Animation::iSkeletonBasicNodesManager),
     CS_REQUEST_PLUGIN("crystalspace.mesh.object.furmesh", CS::Mesh::iFurMeshType),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
@@ -596,7 +596,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     }
 
     // Load the dynamics debugger
-    debuggerManager = csLoadPlugin<iDynamicsDebuggerManager>
+    debuggerManager = csLoadPlugin<CS::Debug::iDynamicsDebuggerManager>
       (plugmgr, "crystalspace.dynamics.debug");
 
     if (!debuggerManager)
@@ -608,7 +608,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     }
 
     // Load the ragdoll plugin
-    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager2>
+    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager>
       (plugmgr, "crystalspace.mesh.animesh.controllers.ragdoll");
 
     if (!ragdollManager)
@@ -637,14 +637,14 @@ bool HairTest::Application ()
 
   // Find references to the plugins of the animation nodes
   lookAtManager = 
-    csQueryRegistry<CS::Animation::iSkeletonLookAtManager2> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonLookAtManager> (GetObjectRegistry ());
   if (!lookAtManager) 
     return ReportError("Failed to locate iLookAtManager plugin!");
 
   basicNodesManager =
-    csQueryRegistry<CS::Animation::iSkeletonBasicNodesManager2> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonBasicNodesManager> (GetObjectRegistry ());
   if (!basicNodesManager)
-    return ReportError("Failed to locate CS::Animation::iSkeletonBasicNodesManager2 plugin!");
+    return ReportError("Failed to locate CS::Animation::iSkeletonBasicNodesManager plugin!");
 
   cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!cegui) return ReportError("Failed to locate CEGUI plugin!");
