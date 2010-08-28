@@ -127,7 +127,10 @@ namespace CS
 	  return csPtr<iDataBuffer> (ret);
 	}
 	
-	bool BaseHierarchical::FindBlockSize (iShader* shader, size_t pticket,
+	bool BaseHierarchical::FindBlockSize (iShader* shader,
+					      size_t pticket,
+					      const CS::Graphics::RenderMeshModes& modes,
+					      const csShaderVariableStack& stack,
 					      int maxW, int maxH,
 					      int& blockSizeX, int& blockSizeY,
 					      csRef<iShader>* usedShader)
@@ -153,13 +156,19 @@ namespace CS
 	    if (sscanf (filterSizeYStr->GetData(), "%d%c", &h, 
 		&dummy) != 1)
 	      continue;
+	    
+	    csRef<iShader> prioShader (shader->ForceTechnique (prio));
+	    /* 'Validate' shader (ie, is there actually a technique for the
+	       priotity) */
+	    size_t ticket = prioShader->GetTicket (modes, stack);
+	    if (ticket == csArrayItemNotFound) continue;
 	      
 	    if ((w <= maxW) && (h <= maxH))
 	    {
-	    blockSizeX = w;
-	    blockSizeY = h;
-	    if (usedShader) *usedShader = shader->ForceTechnique (prio);
-	    return true;
+	      blockSizeX = w;
+	      blockSizeY = h;
+	      if (usedShader) *usedShader = prioShader;
+	      return true;
 	    }
 	  }
 	  return false;
@@ -189,6 +198,8 @@ namespace CS
 	    svNameStringSet->Request ("tex diffuse")));
 	    
 	  size_t pticket;
+	  CS::Graphics::RenderMeshModes modes; // Just keep defaults
+	  csShaderVariableStack svstack;
     
 	  {
 	    PostEffectManager::Layer* tempLayer;
@@ -197,9 +208,7 @@ namespace CS
 	    tempLayer = computeFX.AddLayer (computeShader, 1, &inputMap);
 	    
 	    // Determine 'priority ticket' for stage
-	    csShaderVariableStack svstack;
 	    svstack.Setup (shaderManager->GetSVNameStringset ()->GetSize ());
-	    CS::Graphics::RenderMeshModes modes; // Just keep defaults
 	    computeFX.GetLayerRenderSVs (tempLayer, svstack);
 	    pticket = computeShader->GetPrioritiesTicket (modes, svstack);
 	    computeFX.RemoveLayer (tempLayer);
@@ -209,7 +218,7 @@ namespace CS
 	  int maxBlockSizeY = 16;
 	  
 	  csRef<iShader> shader;
-	  FindBlockSize (computeShader, pticket,
+	  FindBlockSize (computeShader, pticket, modes, svstack,
 	    inputW, inputH,
 	    maxBlockSizeX, maxBlockSizeY, 0);
 	      
@@ -229,7 +238,7 @@ namespace CS
 	    int blockSizeY = 16;
 	    
 	    csRef<iShader> shader;
-	    FindBlockSize (computeShader, pticket,
+	    FindBlockSize (computeShader, pticket, modes, svstack,
 	      part.sourceRect.Width(), part.sourceRect.Height(),
 	      blockSizeX, blockSizeY, &shader);
 	    // @@@ Handle failure

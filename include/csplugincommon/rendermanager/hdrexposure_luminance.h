@@ -81,6 +81,8 @@ namespace CS
 	    iView* view, int& resultW, int& resultH, float& usedColorScale);
 	private:
 	  bool FindBlockSize (iShader* shader, size_t pticket,
+	    const CS::Graphics::RenderMeshModes& modes,
+	    const csShaderVariableStack& stack,
 	    int maxW, int maxH,
 	    int& blockSizeX, int& blockSizeY, csRef<iShader>* usedShader);
 	  bool SetupStage (LuminanceComputeStage& stage,
