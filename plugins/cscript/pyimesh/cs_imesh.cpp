@@ -21738,6 +21738,39 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iBodyBoneJoint_SetTransform(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iBodyBoneJoint *arg1 = (CS::Animation::iBodyBoneJoint *) 0 ;
+  csOrthoTransform *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_SetTransform",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_SetTransform" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csOrthoTransform,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iBodyBoneJoint_SetTransform" "', argument " "2"" of type '" "csOrthoTransform const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iBodyBoneJoint_SetTransform" "', argument " "2"" of type '" "csOrthoTransform const &""'"); 
+  }
+  arg2 = reinterpret_cast< csOrthoTransform * >(argp2);
+  (arg1)->SetTransform((csOrthoTransform const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iBodyBoneJoint_GetBounce(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Animation::iBodyBoneJoint *arg1 = (CS::Animation::iBodyBoneJoint *) 0 ;
@@ -21749,10 +21782,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_GetBounce(PyObject *SWIGUNUSEDPARM(sel
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_GetBounce",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetBounce" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetBounce" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (arg1)->GetBounce();
+  result = ((CS::Animation::iBodyBoneJoint const *)arg1)->GetBounce();
   resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
@@ -21771,10 +21804,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_GetMaximumAngle(PyObject *SWIGUNUSEDPA
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_GetMaximumAngle",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetMaximumAngle" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetMaximumAngle" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (arg1)->GetMaximumAngle();
+  result = ((CS::Animation::iBodyBoneJoint const *)arg1)->GetMaximumAngle();
   resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
@@ -21793,10 +21826,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_GetMaximumDistance(PyObject *SWIGUNUSE
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_GetMaximumDistance",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetMaximumDistance" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetMaximumDistance" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (arg1)->GetMaximumDistance();
+  result = ((CS::Animation::iBodyBoneJoint const *)arg1)->GetMaximumDistance();
   resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
@@ -21815,10 +21848,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_GetMinimumAngle(PyObject *SWIGUNUSEDPA
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_GetMinimumAngle",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetMinimumAngle" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetMinimumAngle" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (arg1)->GetMinimumAngle();
+  result = ((CS::Animation::iBodyBoneJoint const *)arg1)->GetMinimumAngle();
   resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
@@ -21837,10 +21870,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_GetMinimumDistance(PyObject *SWIGUNUSE
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_GetMinimumDistance",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetMinimumDistance" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetMinimumDistance" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (arg1)->GetMinimumDistance();
+  result = ((CS::Animation::iBodyBoneJoint const *)arg1)->GetMinimumDistance();
   resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
@@ -21859,10 +21892,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_IsXRotConstrained(PyObject *SWIGUNUSED
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_IsXRotConstrained",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsXRotConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsXRotConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (bool)(arg1)->IsXRotConstrained();
+  result = (bool)((CS::Animation::iBodyBoneJoint const *)arg1)->IsXRotConstrained();
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -21881,10 +21914,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_IsXTransConstrained(PyObject *SWIGUNUS
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_IsXTransConstrained",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsXTransConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsXTransConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (bool)(arg1)->IsXTransConstrained();
+  result = (bool)((CS::Animation::iBodyBoneJoint const *)arg1)->IsXTransConstrained();
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -21903,10 +21936,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_IsYRotConstrained(PyObject *SWIGUNUSED
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_IsYRotConstrained",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsYRotConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsYRotConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (bool)(arg1)->IsYRotConstrained();
+  result = (bool)((CS::Animation::iBodyBoneJoint const *)arg1)->IsYRotConstrained();
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -21925,10 +21958,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_IsYTransConstrained(PyObject *SWIGUNUS
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_IsYTransConstrained",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsYTransConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsYTransConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (bool)(arg1)->IsYTransConstrained();
+  result = (bool)((CS::Animation::iBodyBoneJoint const *)arg1)->IsYTransConstrained();
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -21947,10 +21980,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_IsZRotConstrained(PyObject *SWIGUNUSED
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_IsZRotConstrained",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsZRotConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsZRotConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (bool)(arg1)->IsZRotConstrained();
+  result = (bool)((CS::Animation::iBodyBoneJoint const *)arg1)->IsZRotConstrained();
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -21969,11 +22002,33 @@ SWIGINTERN PyObject *_wrap_iBodyBoneJoint_IsZTransConstrained(PyObject *SWIGUNUS
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_IsZTransConstrained",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsZTransConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_IsZTransConstrained" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
-  result = (bool)(arg1)->IsZTransConstrained();
+  result = (bool)((CS::Animation::iBodyBoneJoint const *)arg1)->IsZTransConstrained();
   resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iBodyBoneJoint_GetTransform(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iBodyBoneJoint *arg1 = (CS::Animation::iBodyBoneJoint *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csOrthoTransform result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneJoint_GetTransform",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneJoint, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneJoint_GetTransform" "', argument " "1"" of type '" "CS::Animation::iBodyBoneJoint const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iBodyBoneJoint * >(argp1);
+  result = ((CS::Animation::iBodyBoneJoint const *)arg1)->GetTransform();
+  resultobj = SWIG_NewPointerObj((new csOrthoTransform(static_cast< const csOrthoTransform& >(result))), SWIGTYPE_p_csOrthoTransform, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -22263,10 +22318,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetGeometryType(PyObject *SWIGUNUSE
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneCollider_GetGeometryType",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetGeometryType" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetGeometryType" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneCollider * >(argp1);
-  result = (csColliderGeometryType)(arg1)->GetGeometryType();
+  result = (csColliderGeometryType)((CS::Animation::iBodyBoneCollider const *)arg1)->GetGeometryType();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
@@ -22289,7 +22344,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetBoxGeometry(PyObject *SWIGUNUSED
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneCollider_GetBoxGeometry",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetBoxGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetBoxGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneCollider * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0 );
@@ -22300,7 +22355,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetBoxGeometry(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iBodyBoneCollider_GetBoxGeometry" "', argument " "2"" of type '" "csVector3 &""'"); 
   }
   arg2 = reinterpret_cast< csVector3 * >(argp2);
-  result = (bool)(arg1)->GetBoxGeometry(*arg2);
+  result = (bool)((CS::Animation::iBodyBoneCollider const *)arg1)->GetBoxGeometry(*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -22327,7 +22382,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetCapsuleGeometry(PyObject *SWIGUN
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneCollider_GetCapsuleGeometry",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetCapsuleGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetCapsuleGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneCollider * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_float,  0 );
@@ -22346,7 +22401,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetCapsuleGeometry(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iBodyBoneCollider_GetCapsuleGeometry" "', argument " "3"" of type '" "float &""'"); 
   }
   arg3 = reinterpret_cast< float * >(argp3);
-  result = (bool)(arg1)->GetCapsuleGeometry(*arg2,*arg3);
+  result = (bool)((CS::Animation::iBodyBoneCollider const *)arg1)->GetCapsuleGeometry(*arg2,*arg3);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -22369,7 +22424,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetConvexMeshGeometry(PyObject *SWI
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneCollider_GetConvexMeshGeometry",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetConvexMeshGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetConvexMeshGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneCollider * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_p_iMeshWrapper,  0 );
@@ -22380,7 +22435,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetConvexMeshGeometry(PyObject *SWI
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iBodyBoneCollider_GetConvexMeshGeometry" "', argument " "2"" of type '" "iMeshWrapper *&""'"); 
   }
   arg2 = reinterpret_cast< iMeshWrapper ** >(argp2);
-  result = (bool)(arg1)->GetConvexMeshGeometry(*arg2);
+  result = (bool)((CS::Animation::iBodyBoneCollider const *)arg1)->GetConvexMeshGeometry(*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -22407,7 +22462,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetCylinderGeometry(PyObject *SWIGU
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneCollider_GetCylinderGeometry",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetCylinderGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetCylinderGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneCollider * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_float,  0 );
@@ -22426,7 +22481,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetCylinderGeometry(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iBodyBoneCollider_GetCylinderGeometry" "', argument " "3"" of type '" "float &""'"); 
   }
   arg3 = reinterpret_cast< float * >(argp3);
-  result = (bool)(arg1)->GetCylinderGeometry(*arg2,*arg3);
+  result = (bool)((CS::Animation::iBodyBoneCollider const *)arg1)->GetCylinderGeometry(*arg2,*arg3);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -22449,7 +22504,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetMeshGeometry(PyObject *SWIGUNUSE
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneCollider_GetMeshGeometry",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetMeshGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetMeshGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneCollider * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_p_iMeshWrapper,  0 );
@@ -22460,7 +22515,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetMeshGeometry(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iBodyBoneCollider_GetMeshGeometry" "', argument " "2"" of type '" "iMeshWrapper *&""'"); 
   }
   arg2 = reinterpret_cast< iMeshWrapper ** >(argp2);
-  result = (bool)(arg1)->GetMeshGeometry(*arg2);
+  result = (bool)((CS::Animation::iBodyBoneCollider const *)arg1)->GetMeshGeometry(*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -22483,7 +22538,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetPlaneGeometry(PyObject *SWIGUNUS
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneCollider_GetPlaneGeometry",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetPlaneGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetPlaneGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneCollider * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csPlane3,  0 );
@@ -22494,7 +22549,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetPlaneGeometry(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iBodyBoneCollider_GetPlaneGeometry" "', argument " "2"" of type '" "csPlane3 &""'"); 
   }
   arg2 = reinterpret_cast< csPlane3 * >(argp2);
-  result = (bool)(arg1)->GetPlaneGeometry(*arg2);
+  result = (bool)((CS::Animation::iBodyBoneCollider const *)arg1)->GetPlaneGeometry(*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -22517,7 +22572,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetSphereGeometry(PyObject *SWIGUNU
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneCollider_GetSphereGeometry",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetSphereGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetSphereGeometry" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneCollider * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csSphere,  0 );
@@ -22528,7 +22583,7 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetSphereGeometry(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iBodyBoneCollider_GetSphereGeometry" "', argument " "2"" of type '" "csSphere &""'"); 
   }
   arg2 = reinterpret_cast< csSphere * >(argp2);
-  result = (bool)(arg1)->GetSphereGeometry(*arg2);
+  result = (bool)((CS::Animation::iBodyBoneCollider const *)arg1)->GetSphereGeometry(*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -22580,10 +22635,10 @@ SWIGINTERN PyObject *_wrap_iBodyBoneCollider_GetTransform(PyObject *SWIGUNUSEDPA
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBoneCollider_GetTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBoneCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetTransform" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBoneCollider_GetTransform" "', argument " "1"" of type '" "CS::Animation::iBodyBoneCollider const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBoneCollider * >(argp1);
-  result = (arg1)->GetTransform();
+  result = ((CS::Animation::iBodyBoneCollider const *)arg1)->GetTransform();
   resultobj = SWIG_NewPointerObj((new csOrthoTransform(static_cast< const csOrthoTransform& >(result))), SWIGTYPE_p_csOrthoTransform, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
@@ -52546,6 +52601,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iBodyBoneJoint_SetMinimumDistance", _wrap_iBodyBoneJoint_SetMinimumDistance, METH_VARARGS, NULL},
 	 { (char *)"iBodyBoneJoint_SetRotConstraints", _wrap_iBodyBoneJoint_SetRotConstraints, METH_VARARGS, NULL},
 	 { (char *)"iBodyBoneJoint_SetTransConstraints", _wrap_iBodyBoneJoint_SetTransConstraints, METH_VARARGS, NULL},
+	 { (char *)"iBodyBoneJoint_SetTransform", _wrap_iBodyBoneJoint_SetTransform, METH_VARARGS, NULL},
 	 { (char *)"iBodyBoneJoint_GetBounce", _wrap_iBodyBoneJoint_GetBounce, METH_VARARGS, NULL},
 	 { (char *)"iBodyBoneJoint_GetMaximumAngle", _wrap_iBodyBoneJoint_GetMaximumAngle, METH_VARARGS, NULL},
 	 { (char *)"iBodyBoneJoint_GetMaximumDistance", _wrap_iBodyBoneJoint_GetMaximumDistance, METH_VARARGS, NULL},
@@ -52557,6 +52613,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iBodyBoneJoint_IsYTransConstrained", _wrap_iBodyBoneJoint_IsYTransConstrained, METH_VARARGS, NULL},
 	 { (char *)"iBodyBoneJoint_IsZRotConstrained", _wrap_iBodyBoneJoint_IsZRotConstrained, METH_VARARGS, NULL},
 	 { (char *)"iBodyBoneJoint_IsZTransConstrained", _wrap_iBodyBoneJoint_IsZTransConstrained, METH_VARARGS, NULL},
+	 { (char *)"iBodyBoneJoint_GetTransform", _wrap_iBodyBoneJoint_GetTransform, METH_VARARGS, NULL},
 	 { (char *)"delete_iBodyBoneJoint", _wrap_delete_iBodyBoneJoint, METH_VARARGS, NULL},
 	 { (char *)"iBodyBoneJoint_swigregister", iBodyBoneJoint_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iBodyBoneCollider_SetBoxGeometry", _wrap_iBodyBoneCollider_SetBoxGeometry, METH_VARARGS, NULL},

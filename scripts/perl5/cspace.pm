@@ -16576,6 +16576,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetMinimumDistance = *cspacec::iBodyBoneJoint_SetMinimumDistance;
 *SetRotConstraints = *cspacec::iBodyBoneJoint_SetRotConstraints;
 *SetTransConstraints = *cspacec::iBodyBoneJoint_SetTransConstraints;
+*SetTransform = *cspacec::iBodyBoneJoint_SetTransform;
 *GetBounce = *cspacec::iBodyBoneJoint_GetBounce;
 *GetMaximumAngle = *cspacec::iBodyBoneJoint_GetMaximumAngle;
 *GetMaximumDistance = *cspacec::iBodyBoneJoint_GetMaximumDistance;
@@ -16587,6 +16588,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IsYTransConstrained = *cspacec::iBodyBoneJoint_IsYTransConstrained;
 *IsZRotConstrained = *cspacec::iBodyBoneJoint_IsZRotConstrained;
 *IsZTransConstrained = *cspacec::iBodyBoneJoint_IsZTransConstrained;
+*GetTransform = *cspacec::iBodyBoneJoint_GetTransform;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

@@ -1152,6 +1152,7 @@ class iBodyBoneJoint(core.iBase):
     def SetMinimumDistance(*args): return _imesh.iBodyBoneJoint_SetMinimumDistance(*args)
     def SetRotConstraints(*args): return _imesh.iBodyBoneJoint_SetRotConstraints(*args)
     def SetTransConstraints(*args): return _imesh.iBodyBoneJoint_SetTransConstraints(*args)
+    def SetTransform(*args): return _imesh.iBodyBoneJoint_SetTransform(*args)
     def GetBounce(*args): return _imesh.iBodyBoneJoint_GetBounce(*args)
     def GetMaximumAngle(*args): return _imesh.iBodyBoneJoint_GetMaximumAngle(*args)
     def GetMaximumDistance(*args): return _imesh.iBodyBoneJoint_GetMaximumDistance(*args)
@@ -1163,6 +1164,7 @@ class iBodyBoneJoint(core.iBase):
     def IsYTransConstrained(*args): return _imesh.iBodyBoneJoint_IsYTransConstrained(*args)
     def IsZRotConstrained(*args): return _imesh.iBodyBoneJoint_IsZRotConstrained(*args)
     def IsZTransConstrained(*args): return _imesh.iBodyBoneJoint_IsZTransConstrained(*args)
+    def GetTransform(*args): return _imesh.iBodyBoneJoint_GetTransform(*args)
     __swig_destroy__ = _imesh.delete_iBodyBoneJoint
     __del__ = lambda self : None;
 iBodyBoneJoint_swigregister = _imesh.iBodyBoneJoint_swigregister
