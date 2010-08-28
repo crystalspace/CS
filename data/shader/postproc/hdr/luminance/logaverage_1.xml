@@ -30,8 +30,7 @@
 		  float3 rgb2gray = float3 (0.2126, 0.7152, 0.0722);
 		  float delta = 0.001;
 		  float sum = 0;
-		  float maxLum = 0;
-		  float maxComp = 0;
+		  float4 maxima = float4 (0);
 		  for (int y = 0; y < $YSIZE$; y++)
 		  {
 		    for (int x = 0; x < $XSIZE$; x++)
@@ -41,11 +40,12 @@
 		      float gray = dot (color, rgb2gray);
 		      gray = gray*hdrScale.x + hdrScale.z;
 		      sum += log (delta+gray);
-		      maxLum = max (maxLum, gray);
-		      maxComp = max (max (maxComp, color.r), max (color.g, color.b));
+		      maxima = max (maxima, float4 (color, gray));
 		    }
 		  }
 		  
+		  float maxLum = maxima.w;
+		  float maxComp = max (maxima.r, max (maxima.g, maxima.b));
 		  return float4 (maxLum, sum, maxComp, 1);
 		}
   
