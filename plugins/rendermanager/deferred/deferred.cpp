@@ -222,6 +222,8 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   lightPersistent.Initialize (registry, treePersistent.debugPersist);
   lightRenderPersistent.Initialize (registry);
 
+  PostEffectsSupport::Initialize (registry, "RenderManager.Deferred");
+
   // Initialize the extra data in the persistent tree data.
   RenderTreeType::TreeTraitsType::Initialize (treePersistent, registry);
   
@@ -378,13 +380,26 @@ bool RMDeferred::RenderView(iView *view)
   if (showGBuffer)
     ShowGBuffer (renderTree);
 
+  CS::Math::Matrix4 perspectiveFixup;
+  postEffects.SetupView (view, perspectiveFixup);
+
+  bool hasPostEffects = (postEffects.GetScreenTarget () != nullptr);
+
   // Setup the main context
   {
     ContextSetupType contextSetup (this, renderLayer);
     ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
 
-    startContext->renderTargets[rtaColor0].texHandle = accumBuffer;
-    startContext->renderTargets[rtaColor0].subtexture = 0;
+    if (hasPostEffects)
+    {
+      startContext->renderTargets[rtaColor0].texHandle = postEffects.GetScreenTarget ();
+      startContext->perspectiveFixup = perspectiveFixup;
+    }
+    else
+    {
+      startContext->renderTargets[rtaColor0].texHandle = accumBuffer;
+      startContext->renderTargets[rtaColor0].subtexture = 0;
+    }
 
     contextSetup (*startContext, portalData);
   }
@@ -403,11 +418,14 @@ bool RMDeferred::RenderView(iView *view)
     ForEachContextReverse (renderTree, render);
   }
 
-  // Output the final result to the backbuffer.
+  if (hasPostEffects)
   {
+    postEffects.DrawPostEffects (renderTree);
+  }
+  else
+  {
+    // Output the final result to the backbuffer.
     DrawFullscreenTexture (accumBuffer, graphics3D);
-
-    graphics3D->FinishDraw ();
   }
 
   DebugFrameRender (rview, renderTree);
@@ -419,6 +437,8 @@ bool RMDeferred::RenderView(iView *view)
 bool RMDeferred::PrecacheView(iView *view)
 {
   return RenderView (view);
+
+  postEffects.ClearIntermediates ();
 }
 
 //----------------------------------------------------------------------

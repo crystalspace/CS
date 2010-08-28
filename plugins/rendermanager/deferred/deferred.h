@@ -26,6 +26,7 @@
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/debugcommon.h"
 #include "csplugincommon/rendermanager/renderlayers.h"
+#include "csplugincommon/rendermanager/posteffectssupport.h"
 
 #include "iutil/comp.h"
 #include "csutil/scf_implementation.h"
@@ -44,11 +45,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
 
-  class RMDeferred : public scfImplementation3<RMDeferred, 
-                                               iRenderManager, 
-                                               iComponent, 
+  class RMDeferred : public scfImplementation4<RMDeferred, 
+                                               iRenderManager,
+                                               iComponent,
+                                               scfFakeInterface<iRenderManagerPostEffects>,
                                                scfFakeInterface<iDebugHelper> >,
-                     public CS::RenderManager::RMDebugCommon<RenderTreeType>
+                     public CS::RenderManager::RMDebugCommon<RenderTreeType>,
+		     public CS::RenderManager::PostEffectsSupport
   {
   public:
 
