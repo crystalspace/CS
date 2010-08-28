@@ -39,6 +39,10 @@ float2 ComputeParallaxOcclusion(sampler2D texHeight,
                                 float2 sampleLimits, 
                                 float heightMapScale)
 {
+#ifndef PROFILE_GP4FP
+    // Currently gp4fp is the only profile that suppors the ddx/ddy stuff
+    return texCoord;
+#else
     float2 dx = ddx (texCoord);
     float2 dy = ddy (texCoord);
 
@@ -72,6 +76,7 @@ float2 ComputeParallaxOcclusion(sampler2D texHeight,
     }
     
     return texCoord + offset;
+#endif
 }
 
 fragmentOutput main(vertex2fragment IN,
