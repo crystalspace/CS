@@ -48,7 +48,7 @@ PostEffectManager::PostEffectManager ()
   : frameNum (0), chainedEffects (0), dbgIntermediateTextures (~0),
     dimCache (CS::Utility::ResourceCache::ReuseConditionFlagged (),
       CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (0)),
-    currentDimData (0), currentWidth (0), currentHeight (0), 
+    currentDimData (0), currentWidth (0), currentHeight (0),
     textureFmt ("argb8"), lastLayer (0), layersDirty (true)
 {
   AddLayer (0, 0, 0);
@@ -103,7 +103,8 @@ bool PostEffectManager::SetupView (uint width, uint height,
   }
   
   bool result = false;
-  if (width != currentWidth || height != currentHeight)
+  if (width != currentWidth || height != currentHeight
+      || layersDirty)
   {
     if (currentDimData != 0)
       dimCache.GetReuseAuxiliary (currentDimData)->reusable = true;
