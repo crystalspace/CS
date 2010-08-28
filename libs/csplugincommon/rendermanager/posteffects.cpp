@@ -236,6 +236,13 @@ void PostEffectManager::DrawPostEffects (RenderTreeBase& renderTree)
   {
     for (size_t layer = 0; layer < postLayers.GetSize ()-1; ++layer)
     {
+      
+      if (postLayers[layer]->options.renderOn != 0)
+	// If rendering onto another layer the bucket of that layer will be displayed.
+	continue;
+      if (postLayers[layer]->options.manualTarget.IsValid())
+	// If a manual target is given we don't display the texture here
+	continue;
       // Actual intermediate layers
       size_t bucket = GetBucketIndex (postLayers[layer]->options);
       renderTree.AddDebugTexture (
