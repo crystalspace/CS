@@ -25,6 +25,7 @@
 #include "csplugincommon/rendermanager/dependenttarget.h"
 #include "csplugincommon/rendermanager/hdrhelper.h"
 #include "csplugincommon/rendermanager/lightsetup.h"
+#include "csplugincommon/rendermanager/occluvis.h"
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/portalsetup.h"
 #include "csplugincommon/rendermanager/posteffects.h"
@@ -36,7 +37,6 @@
 #include "csplugincommon/rendermanager/svsetup.h"
 #include "csplugincommon/rendermanager/viscull.h"
 
-#include "frustvis.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/meshgen.h"
@@ -106,7 +106,7 @@ public:
     if (rmanager->visCullers.Contains (culler))
     {
       // Implement awesome culler here.
-      csFrustumVis* visCuller = static_cast<csFrustumVis*> (culler);
+      csOccluvis* visCuller = static_cast<csOccluvis*> (culler);
 
       const CS::Utility::MeshFilter* filter = &rview->GetMeshFilter();
       CS::RenderManager::Implementation::ViscullCallback<RenderTreeType> cb (context, rview, filter);
@@ -459,11 +459,8 @@ bool RMCuller::Initialize(iObjectRegistry* objectReg)
 
 iVisibilityCuller* RMCuller::GetVisCuller ()
 {
-  csFrustumVis* fvCuller = new csFrustumVis ();
-  fvCuller->Initialize (objectReg);
-
   csRef<iVisibilityCuller> psVisCuller;
-  psVisCuller.AttachNew (fvCuller);
+  psVisCuller.AttachNew (new csOccluvis (objectReg));
   visCullers.AddNoTest (psVisCuller);
   return psVisCuller;
 }

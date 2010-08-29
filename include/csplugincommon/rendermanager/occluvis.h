@@ -162,7 +162,8 @@ namespace CS
     typedef CS::Geometry::AABBTree<iVisibilityObject, 1, AABBTreeNodeVisibilityData> AABBVisTree;
     typedef AABBVisTree::Node AABBVisTreeNode;
 
-    class CS_CRYSTALSPACE_EXPORT csOccluvis : public AABBVisTree
+    class CS_CRYSTALSPACE_EXPORT csOccluvis : public AABBVisTree,
+      public scfImplementation1<csOccluvis, iVisibilityCuller>
     {
     private:
       iObjectRegistry *object_reg;
@@ -178,9 +179,11 @@ namespace CS
         iVisibilityCullerListener* viscallback;
       };
 
-      struct MeshList
+      struct NodeMeshList : public csRefCount
       {
-        MeshList (csSectorVisibleRenderMeshes* mL, const int nM) : numMeshes(nM)
+        NodeMeshList (AABBVisTreeNode*& node, const int& numMeshes,
+          csSectorVisibleRenderMeshes*& mL, uint framePassed)
+          : node (node), numMeshes(numMeshes), framePassed(framePassed)
         {
           meshList = new csSectorVisibleRenderMeshes[numMeshes];
 
@@ -190,12 +193,14 @@ namespace CS
           }
         }
 
-        ~MeshList ()
+        ~NodeMeshList ()
         {
           delete[] meshList;
         }
 
+        AABBVisTreeNode* node;
         int numMeshes;
+        uint framePassed;
         csSectorVisibleRenderMeshes* meshList;
       };
 
@@ -234,19 +239,32 @@ namespace CS
       // Frame skip parameter
       static const unsigned int visibilityFrameSkip = 10;
 
+      // Hash of mesh nodes for a render view.
+      csHash<csRefArray<NodeMeshList>*, csPtrKey<iRenderView> > nodeMeshHash;
+
+      // Hash of MeshList objects for visibility objects.
+      csHash<NodeMeshList*, csPtrKey<iVisibilityObject> > visobjMeshHash;
+
+      // Vector of vistest objects (used in the box/sphere/etc. tests).
+      VistestObjectsArray vistest_objects;
+      bool vistest_objects_inuse;
+
+      friend class F2BSorter;
+
     protected:
       /**
        * Renders the meshes in the given list.
        */
       template<bool bQueryVisibility>
-      void RenderMeshes (AABBVisTreeNode* node, Front2BackData& f2bData, csArray<MeshList*> &meshList);
+      void RenderMeshes (AABBVisTreeNode* node, Front2BackData& f2bData,
+        NodeMeshList*& nodeMeshList);
 
       /**
        * Transverses the tree from F2B.
        */
       template<bool bDoFrustumCulling>
-      void TraverseNodeF2B(AABBVisTreeNode* node, bool parentVisible,
-        uint32 frustum_mask, Front2BackData& f2bData, csArray<MeshList*>& meshList);
+      void TraverseTreeF2B(AABBVisTreeNode* node, uint32 frustum_mask,
+        Front2BackData& f2bData, csRefArray<NodeMeshList>& meshList);
 
       /**
        * Returns the visibility data of a node.
@@ -287,8 +305,52 @@ namespace CS
        */
       void MarkAllVisible (AABBVisTreeNode* node, Front2BackData& f2bData);
 
+      /**
+       * Mesh list comparison function.
+       */
+      static int NodeMeshListCompare (NodeMeshList* const& object, AABBVisTreeNode* const& key);
+
+      /**
+       * Transverses the tree checking for objects that intersect with the given box.
+       */
+      void TraverseTreeBox(AABBVisTreeNode* node,
+        VistestObjectsArray* voArray, const csBox3& box);
+
+      /**
+       * Transverses the tree checking for objects that intersect with the given sphere.
+       */
+      void TraverseTreeSphere(AABBVisTreeNode* node,
+        VistestObjectsArray* voArray, const csVector3& centre,
+        const float sqradius);
+
+      /**
+       * Transverses the tree checking for objects that intersect with the given sphere.
+       */
+      void TraverseTreeSphere(AABBVisTreeNode* node,
+        iVisibilityCullerListener* viscallback,
+        const csVector3& centre, const float sqradius);
+
+      /**
+       * Transverses the tree checking for objects that are in the volume 
+       * formed by the set of planes.
+       */
+      void TraverseTreePlanes (AABBVisTreeNode* node,
+        VistestObjectsArray* voArray, csPlane3* planes,
+        uint32 frustum_mask);
+
+      /**
+      * Transverses the tree checking for objects that are in the volume 
+      * formed by the set of planes.
+       */
+      void TraverseTreePlanes (AABBVisTreeNode* node,
+        iVisibilityCullerListener* viscallback,
+        csPlane3* planes, uint32 frustum_mask);
+
     public:
       csOccluvis (iObjectRegistry *object_reg);
+      virtual ~csOccluvis ();
+
+      virtual void Setup (const char*) {}
 
      /**
       * Register a visibility object with this culler.
@@ -303,20 +365,26 @@ namespace CS
      /**
       * Do a visibility test from a given viewpoint.
       */
-      virtual void VisTest (iRenderView* rview, iVisibilityCullerListener* viscallback);
+      virtual bool VisTest (iRenderView* rview, iVisibilityCullerListener* viscallback, int, int);
 
-      /*virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
+      virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
+
       virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
+
       virtual void VisTest (const csSphere& sphere, 
         iVisibilityCullerListener* viscallback);
-      virtual csPtr<iVisibilityObjectIterator> VisTest (csPlane3* planes,
-  	    int num_planes);
+
+      virtual csPtr<iVisibilityObjectIterator> VisTest (csPlane3* planes, int num_planes);
+
       virtual void VisTest (csPlane3* planes,
-  	    int num_planes, iVisibilityCullerListener* viscallback);*/
+        int num_planes, iVisibilityCullerListener* viscallback);
+
       virtual csPtr<iVisibilityObjectIterator> IntersectSegmentSloppy (
         const csVector3& start, const csVector3& end);
+
       virtual csPtr<iVisibilityObjectIterator> IntersectSegment (
         const csVector3& start, const csVector3& end, bool accurate = false);
+
       virtual bool IntersectSegment (const csVector3& start,
         const csVector3& end, csVector3& isect, float* pr = 0,
         iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
@@ -325,10 +393,26 @@ namespace CS
      /**
       * Mark that we're about to perform precache visibility culling.
       */
-      virtual void PreparePrecacheCulling ()
+      virtual void PrecacheCulling ()
       {
         bAllVisible = true;
       }
+
+      virtual const char* ParseCullerParameters (iDocumentNode* node) { return 0; }
+    };
+
+    class F2BSorter
+    {
+    public:
+      F2BSorter (const csVector3& cameraOrigin)
+        : cameraOrigin (cameraOrigin)
+      {}
+
+      bool operator() (csOccluvis::NodeMeshList* const& m1,
+                       csOccluvis::NodeMeshList* const& m2);
+
+    private:
+      const csVector3& cameraOrigin;
     };
 
     class csOccluvisObjIt :

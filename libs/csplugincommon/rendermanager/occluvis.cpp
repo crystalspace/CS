@@ -19,6 +19,7 @@
 #include <cssysdef.h>
 
 #include "csgeom/math3d.h"
+#include "csgeom/sphere.h"
 #include "csplugincommon/rendermanager/occluvis.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
@@ -56,37 +57,30 @@ namespace CS
     }
 
     template<bool bQueryVisibility>
-    void csOccluvis::RenderMeshes(AABBVisTreeNode* node, Front2BackData& f2bData, csArray<MeshList*> &meshList)
+    void csOccluvis::RenderMeshes(AABBVisTreeNode* node, Front2BackData& f2bData, NodeMeshList*& nodeMeshList)
     {
       if (bQueryVisibility)
       {
         BeginNodeQuery (node, f2bData.rview);
       }
 
-      for(unsigned int j=0 ; j < meshList.GetSize() ; ++j)
+      for (int m = 0; m < nodeMeshList->numMeshes; ++m)
       {
-        MeshList& obj = *meshList.Get(j);
+        iMeshWrapper* mw = nodeMeshList->meshList[m].imesh;
+        g3d->SetZMode (mw->GetZBufMode ());
 
-        for (int m = 0; m < obj.numMeshes; ++m)
+        for (int i = 0; i < nodeMeshList->meshList[m].num; ++i)
         {
-          iMeshWrapper* mw = obj.meshList[m].imesh;
-          g3d->SetZMode (mw->GetZBufMode ());
-
-          for (int i = 0; i < obj.meshList[m].num; ++i)
+          csRenderMesh* rm = nodeMeshList->meshList[m].rmeshes[i];
+          if(!rm->portal)
           {
-            csRenderMesh* rm = obj.meshList[m].rmeshes[i];
-            if(!rm->portal)
-            {
-              csVertexAttrib vA = CS_VATTRIB_POSITION;
-              iRenderBuffer *rB = rm->buffers->GetRenderBuffer (CS_BUFFER_POSITION);
-              g3d->ActivateBuffers (&vA, &rB, 1);
-              g3d->DrawMeshBasic (rm, *rm);
-              g3d->DeactivateBuffers (&vA, 1);
-            }
+            csVertexAttrib vA = CS_VATTRIB_POSITION;
+            iRenderBuffer *rB = rm->buffers->GetRenderBuffer (CS_BUFFER_POSITION);
+            g3d->ActivateBuffers (&vA, &rB, 1);
+            g3d->DrawMeshBasic (rm, *rm);
+            g3d->DeactivateBuffers (&vA, 1);
           }
         }
-
-        delete &obj;
       }
 
       if (bQueryVisibility)
@@ -96,11 +90,10 @@ namespace CS
     }
 
     template<bool bDoFrustumCulling>
-    void csOccluvis::TraverseNodeF2B(AABBVisTreeNode* node,
-                                     bool parentVisible,
+    void csOccluvis::TraverseTreeF2B(AABBVisTreeNode* node,
                                      uint32 frustum_mask,
                                      Front2BackData& f2bData,
-                                     csArray<MeshList*>& meshList)
+                                     csRefArray<NodeMeshList>& meshList)
     {
       if (bDoFrustumCulling)
       {
@@ -111,7 +104,7 @@ namespace CS
 
         if (nodevis == NODE_VISIBLE && frustum_mask == 0)
         {
-          TraverseNodeF2B<false> (node, parentVisible, frustum_mask, f2bData, meshList);
+          TraverseTreeF2B<false> (node, frustum_mask, f2bData, meshList);
           return;
         }
       }
@@ -119,62 +112,12 @@ namespace CS
       if (!node->IsLeaf())
       {
         AABBVisTreeNode* frontNode, *backNode;
-        csArray<MeshList*> firstMeshList, secondMeshList;
-        bool visible = parentVisible && (GetNodeVisibility (node, f2bData.rview) == VISIBLE);
-
         GetF2BChildren (node, f2bData, frontNode, backNode);
-
-        if(frontNode)
-        {
-          TraverseNodeF2B<bDoFrustumCulling> (frontNode, visible, frustum_mask, f2bData, firstMeshList);
-
-          if (!firstMeshList.IsEmpty () && GetNodeVisibility (backNode, f2bData.rview) == VISIBLE)
-          {
-            RenderMeshes<true> (frontNode, f2bData, firstMeshList);
-            firstMeshList.Empty ();
-          }
-        }
-
-        if(backNode)
-        {
-          TraverseNodeF2B<bDoFrustumCulling> (backNode, visible, frustum_mask, f2bData, secondMeshList);
-
-          if (!secondMeshList.IsEmpty () && GetNodeVisibility (frontNode, f2bData.rview) == VISIBLE)
-          {
-            RenderMeshes<true> (backNode, f2bData, secondMeshList);
-            secondMeshList.Empty ();
-          }
-        }
-
-        if (visible)
-        {
-          if (!firstMeshList.IsEmpty () || !secondMeshList.IsEmpty ())
-          {
-            BeginNodeQuery (node, f2bData.rview);
-
-            RenderMeshes<false> (frontNode, f2bData, firstMeshList);
-            RenderMeshes<false> (backNode, f2bData, secondMeshList);
-
-            g3d->OQEndQuery ();
-          }
-        }
-        else
-        {
-          for (size_t i = 0; i < firstMeshList.GetSize (); ++i)
-          {
-            meshList.Push (firstMeshList[i]);
-          }
-
-          for (size_t i = 0; i < secondMeshList.GetSize (); ++i)
-          {
-            meshList.Push (secondMeshList[i]);
-          }
-        }
+        TraverseTreeF2B<bDoFrustumCulling> (frontNode, frustum_mask, f2bData, meshList);
+        TraverseTreeF2B<bDoFrustumCulling> (backNode, frustum_mask, f2bData, meshList);
       }
       else
       {
-        OcclusionVisibility eOccVis = GetNodeVisibility (node, f2bData.rview);
-
         // One object only in this AABBTree
         iVisibilityObject* visobj = node->GetLeafData (0);
 
@@ -192,28 +135,28 @@ namespace CS
 
           if (hasMeshes)
           {
-            meshList.Push (new MeshList (sectorMeshList, numMeshes));
-
-            // If occlusion checks also passed, mark the mesh visible.
-            if (parentVisible && eOccVis == VISIBLE)
+            csRef<NodeMeshList> meshes = visobjMeshHash.Get (csPtrKey<iVisibilityObject> (visobj), nullptr);
+            if (meshes == nullptr)
             {
-              f2bData.viscallback->MarkVisible(visobj->GetMeshWrapper (), numMeshes, sectorMeshList);
+              meshes.AttachNew (new NodeMeshList (node, numMeshes, sectorMeshList, engine->GetCurrentFrameNumber ()));
+              visobjMeshHash.Put (visobj, meshes);
+              meshList.Push (meshes);
+            }
+            else
+            {
+              meshes->node = node;
+              meshes->numMeshes = numMeshes;
+              meshes->framePassed = engine->GetCurrentFrameNumber ();
+
+              delete[] meshes->meshList;
+              meshes->meshList = new csSectorVisibleRenderMeshes[numMeshes];
+
+              for (int m = 0; m < numMeshes; ++m)
+              {
+                meshes->meshList[m] = sectorMeshList[m];
+              }
             }
           }
-        }
-
-        if (!meshList.IsEmpty () && eOccVis == VISIBLE)
-        {
-          if (CheckNodeVisibility (node, f2bData.rview))
-          {
-            RenderMeshes<true> (node, f2bData, meshList);
-          }
-          else
-          {
-            RenderMeshes<false> (node, f2bData, meshList);
-          }
-
-          meshList.Empty ();
         }
       }
     }
@@ -284,12 +227,21 @@ namespace CS
     }
 
     csOccluvis::csOccluvis (iObjectRegistry* object_reg)
-      : object_reg (object_reg)
+      : object_reg (object_reg), scfImplementationType (this)
     {
       g3d = csQueryRegistry<iGraphics3D> (object_reg);
       engine = csQueryRegistry<iEngine> (object_reg);
 
       bAllVisible = false;
+    }
+
+    csOccluvis::~csOccluvis ()
+    {
+      csArray<csRefArray<NodeMeshList>*> nodeMeshLists = nodeMeshHash.GetAll ();
+      for (size_t i = 0; i < nodeMeshLists.GetSize (); ++i)
+      {
+        delete nodeMeshLists[i];
+      }
     }
 
     void csOccluvis::RegisterVisObject (iVisibilityObject* visobj)
@@ -326,6 +278,21 @@ namespace CS
           break;
         }
       }
+
+      visobjMeshHash.DeleteAll (csPtrKey<iVisibilityObject> (visobj));
+
+      csArray<csRefArray<NodeMeshList>*> nodeMeshLists = nodeMeshHash.GetAll ();
+      for (size_t i = 0; i < nodeMeshLists.GetSize (); ++i)
+      {
+        for (size_t j = 0; j < nodeMeshLists[i]->GetSize (); ++j)
+        {
+          if (nodeMeshLists[i]->Get (j)->node->GetLeafData(0) == visobj)
+          {
+            nodeMeshLists[i]->DeleteIndexFast (j);
+            break;
+          }
+        }
+      }      
 
       RemoveObject (visobj);
     }
@@ -380,53 +347,314 @@ namespace CS
       }
     }
 
+    int csOccluvis::NodeMeshListCompare (NodeMeshList* const& object, AABBVisTreeNode* const& key)
+    {
+      if (object->node == key)
+        return 0;
+
+      return 1;
+    }
+
     /*------------------------------------------------------------------*/
     /*--------------------------- MAIN DADDY ---------------------------*/
     /*------------------------------------------------------------------*/
-    void csOccluvis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscallback)
+    bool csOccluvis::VisTest (iRenderView* rview, iVisibilityCullerListener* viscallback, int, int)
     {
-      // just make sure we have a callback
-      if (viscallback == 0)
-        return;
-
-      Front2BackData f2bData;
       csRenderContext* ctxt = rview->GetRenderContext ();
-      f2bData.frustum = ctxt->clip_planes;
       uint32 frustum_mask = ctxt->clip_planes_mask;
 
-      f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
+      Front2BackData f2bData;
       f2bData.rview = rview;
       f2bData.viscallback = viscallback;
+      f2bData.frustum = ctxt->clip_planes;
+      f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
 
-      // Check for the 'all visible' flag
+      /**
+       * If the 'all visible' flag is set, render everything without any culling.
+       */
       if (bAllVisible)
       {
         // Mark all visible.
         MarkAllVisible (rootNode, f2bData);
         bAllVisible = false;
-        return;
+        return false;
       }
 
-      const csReversibleTransform& camt = rview->GetCamera()->GetTransform ();
-      g3d->SetClipper (rview->GetClipper(), CS_CLIPPER_TOPLEVEL);  // We are at top-level.
-      g3d->ResetNearPlane ();
-      g3d->SetProjectionMatrix (rview->GetCamera()->GetProjectionMatrix ());
-      if (!g3d->BeginDraw(rview->GetEngine()->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+      /**
+       * Look up the node mesh lists array for this render view.
+       * Create a new one if needed.
+       */
+      csRefArray<NodeMeshList>* nodeMeshListsPtr = nodeMeshHash.Get (csPtrKey<iRenderView> (rview), nullptr);
+      if (nodeMeshListsPtr == nullptr)
       {
-        csPrintf("Cannot prepare renderer for 3D drawing\n");
+        nodeMeshListsPtr = new csRefArray<NodeMeshList> ();
+        nodeMeshHash.Put (csPtrKey<iRenderView> (rview), nodeMeshListsPtr);
       }
-      g3d->SetWorldToCamera (camt.GetInverse ());
-      g3d->SetWriteMask(false,false,false,false);
 
-      // The big routine: traverse from front to back and mark all objects
-      // visible that are visible.
-      csArray<MeshList*> meshList;
-      TraverseNodeF2B<true> (rootNode, true, frustum_mask, f2bData, meshList);
-      RenderMeshes<false> (rootNode, f2bData, meshList);
+      /**
+       * Traverse the tree approximately front to back and fill the array of visible nodes.
+       */
+      csRefArray<NodeMeshList>& nodeMeshLists = *nodeMeshListsPtr;
+      TraverseTreeF2B<true> (rootNode, frustum_mask, f2bData, nodeMeshLists);
 
-      g3d->SetWriteMask(true,true,true,true);
+      /**
+       * Sort the array F2B.
+       */
+      F2BSorter sorter (f2bData.pos);
+      nodeMeshLists.Sort (sorter);
+
+      /**
+       * Iterate in reverse (B2F) over the node list marking visibility.
+       */
+      for(size_t n = nodeMeshLists.GetSize (); n > 0; --n)
+      {
+        NodeMeshList*& nodeMeshList = nodeMeshLists[n-1];
+
+        // If frustum checks passed...
+        if (nodeMeshList->framePassed == engine->GetCurrentFrameNumber ())
+        {
+          // If occlusion checks passed...
+          OcclusionVisibility eOccVis = GetNodeVisibility (nodeMeshList->node, f2bData.rview);
+          if (eOccVis == VISIBLE)
+          {
+            // mark the mesh visible.
+            iMeshWrapper* mw = nodeMeshList->node->GetLeafData (0)->GetMeshWrapper ();
+            f2bData.viscallback->MarkVisible(mw, nodeMeshList->numMeshes,
+              nodeMeshList->meshList);
+          }
+        }
+      }
+
+      // Set up g3d for rendering a z-only pass.
+      g3d->ResetNearPlane ();
+      g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN);
+      g3d->SetClipper (rview->GetClipper(), CS_CLIPPER_TOPLEVEL);
+      g3d->SetProjectionMatrix (rview->GetCamera()->GetProjectionMatrix ());
+      g3d->SetWorldToCamera (rview->GetCamera()->GetTransform ().GetInverse ());
+      g3d->SetWriteMask (false, false, false, false);
+
+      /**
+       * Iterate over the node list (F2B) rendering the z-only pass
+       * and any occlusion queries.
+       */
+      for(size_t n = 0; n < nodeMeshLists.GetSize (); ++n)
+      {
+        NodeMeshList*& nodeMeshList = nodeMeshLists[n];
+        
+        // If frustum checks passed...
+        if (nodeMeshList->framePassed == engine->GetCurrentFrameNumber ())
+        {
+          if (CheckNodeVisibility (nodeMeshList->node, f2bData.rview))
+          {
+            // Render with occlusion queries.
+            RenderMeshes<true> (nodeMeshList->node, f2bData, nodeMeshList);
+          }
+          else
+          {
+            // Render without occlusion queries.
+            RenderMeshes<false> (nodeMeshList->node, f2bData, nodeMeshList);
+          }
+        }
+      }
+
+      // Reset rendering settings.
+      g3d->SetWriteMask (true, true, true, true);
       g3d->SetClipper (0, CS_CLIPPER_NONE);
-      g3d->FinishDraw();
+
+      return true;
+    }
+
+    bool F2BSorter::operator() (csOccluvis::NodeMeshList* const& m1,
+                                csOccluvis::NodeMeshList* const& m2)
+    {
+      csBox3& m1box = m1->node->GetBBox ();
+      csBox3& m2box = m2->node->GetBBox ();
+
+      const float distSqRm1 = m1box.SquaredPosDist (cameraOrigin);
+      const float distSqRm2 = m2box.SquaredPosDist (cameraOrigin);
+
+      return distSqRm1 < distSqRm2;
+    }
+
+    //======== VisTest box =====================================================
+    void csOccluvis::TraverseTreeBox (AABBVisTreeNode* node,
+                                      VistestObjectsArray* voArray,
+                                      const csBox3& box)
+    {
+      if (!box.TestIntersect (node->GetBBox ()))
+        return;
+
+      if (!node->IsLeaf())
+      {
+        TraverseTreeBox (node->GetChild (0), voArray, box);
+        TraverseTreeBox (node->GetChild (1), voArray, box);
+      }
+      else
+      {
+        voArray->Push (node->GetLeafData (0));
+      }
+    }
+
+    csPtr<iVisibilityObjectIterator> csOccluvis::VisTest (const csBox3& box)
+    {
+      VistestObjectsArray* v;
+      if (vistest_objects_inuse)
+      {
+        // Vector is already in use by another iterator. Allocate a new vector.
+        v = new VistestObjectsArray ();
+      }
+      else
+      {
+        v = &vistest_objects;
+        vistest_objects.Empty ();
+      }
+
+      TraverseTreeBox (rootNode, v, box);
+
+      csOccluvisObjIt* vobjit = new csOccluvisObjIt (v,
+        vistest_objects_inuse ? 0 : &vistest_objects_inuse);
+
+      return csPtr<iVisibilityObjectIterator> (vobjit);
+    }
+
+    //======== VisTest sphere ==================================================
+    void csOccluvis::TraverseTreeSphere (AABBVisTreeNode* node,
+                                         VistestObjectsArray* voArray,
+                                         const csVector3& centre,
+                                         const float sqradius)
+    {
+      if (!csIntersect3::BoxSphere (node->GetBBox (), centre, sqradius))
+        return;
+
+      if (!node->IsLeaf())
+      {
+        TraverseTreeSphere (node->GetChild (0), voArray, centre, sqradius);
+        TraverseTreeSphere (node->GetChild (1), voArray, centre, sqradius);
+      }
+      else
+      {
+        voArray->Push (node->GetLeafData (0));
+      }
+    }
+
+    csPtr<iVisibilityObjectIterator> csOccluvis::VisTest (const csSphere& sphere)
+    {
+      VistestObjectsArray* v;
+      if (vistest_objects_inuse)
+      {
+        // Vector is already in use by another iterator. Allocate a new vector.
+        v = new VistestObjectsArray ();
+      }
+      else
+      {
+        v = &vistest_objects;
+        vistest_objects.Empty ();
+      }
+
+      TraverseTreeSphere (rootNode, v, sphere.GetCenter (),
+        sphere.GetRadius () * sphere.GetRadius ());
+
+      csOccluvisObjIt* vobjit = new csOccluvisObjIt (v,
+        vistest_objects_inuse ? 0 : &vistest_objects_inuse);
+
+      return csPtr<iVisibilityObjectIterator> (vobjit);
+    }
+
+    void csOccluvis::TraverseTreeSphere (AABBVisTreeNode* node,
+                                         iVisibilityCullerListener* viscallback,
+                                         const csVector3& centre,
+                                         const float sqradius)
+    {
+      if (!csIntersect3::BoxSphere (node->GetBBox (), centre, sqradius))
+        return;
+
+      if (!node->IsLeaf())
+      {
+        TraverseTreeSphere (node->GetChild (0), viscallback, centre, sqradius);
+        TraverseTreeSphere (node->GetChild (1), viscallback, centre, sqradius);
+      }
+      else
+      {
+        iVisibilityObject* visobj = node->GetLeafData (0);
+        viscallback->ObjectVisible (visobj, visobj->GetMeshWrapper (), 0);
+      }
+    }
+
+    void csOccluvis::VisTest (const csSphere& sphere, 
+                              iVisibilityCullerListener* viscallback)
+    {
+      TraverseTreeSphere (rootNode, viscallback, sphere.GetCenter (),
+        sphere.GetRadius () * sphere.GetRadius ());
+    }
+
+    //======== VisTest planes ==================================================
+    void csOccluvis::TraverseTreePlanes (AABBVisTreeNode* node,
+                                         VistestObjectsArray* voArray,
+                                         csPlane3* planes,
+                                         uint32 frustum_mask)
+    {
+      uint32 new_mask;
+      if (!csIntersect3::BoxFrustum (node->GetBBox (), planes, frustum_mask, new_mask))
+        return;
+
+      if (!node->IsLeaf())
+      {
+        TraverseTreePlanes (node->GetChild (0), voArray, planes, new_mask);
+        TraverseTreePlanes (node->GetChild (1), voArray, planes, new_mask);
+      }
+      else
+      {
+        voArray->Push (node->GetLeafData (0));
+      }
+    }
+
+    csPtr<iVisibilityObjectIterator> csOccluvis::VisTest (csPlane3* planes, int num_planes)
+    {
+      VistestObjectsArray* v;
+      if (vistest_objects_inuse)
+      {
+        // Vector is already in use by another iterator. Allocate a new vector.
+        v = new VistestObjectsArray ();
+      }
+      else
+      {
+        v = &vistest_objects;
+        vistest_objects.Empty ();
+      }
+
+      TraverseTreePlanes (rootNode, v, planes, (1 << num_planes) - 1);
+
+      csOccluvisObjIt* vobjit = new csOccluvisObjIt (v,
+        vistest_objects_inuse ? 0 : &vistest_objects_inuse);
+
+      return csPtr<iVisibilityObjectIterator> (vobjit);
+    }
+
+    void csOccluvis::TraverseTreePlanes (AABBVisTreeNode* node,
+                                         iVisibilityCullerListener* viscallback,
+                                         csPlane3* planes,
+                                         uint32 frustum_mask)
+    {
+      uint32 new_mask;
+      if (!csIntersect3::BoxFrustum (node->GetBBox (), planes, frustum_mask, new_mask))
+        return;
+
+      if (!node->IsLeaf())
+      {
+        TraverseTreePlanes (node->GetChild (0), viscallback, planes, new_mask);
+        TraverseTreePlanes (node->GetChild (1), viscallback, planes, new_mask);
+      }
+      else
+      {
+        iVisibilityObject* visobj = node->GetLeafData (0);
+        viscallback->ObjectVisible (visobj, visobj->GetMeshWrapper (), 0);
+      }
+    }
+
+    void csOccluvis::VisTest (csPlane3* planes, int num_planes,
+                              iVisibilityCullerListener* viscallback)
+    {
+      TraverseTreePlanes (rootNode, viscallback, planes, (1 << num_planes) - 1);
     }
 
     //======== IntersectSegment ================================================
