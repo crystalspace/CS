@@ -511,6 +511,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   /************************
+  *  FurMeshProperties
+  ************************/  
+
+  FurMeshProperties::FurMeshProperties (iObjectRegistry* )
+    : scfImplementationType (this)
+  {
+  }
+
+  FurMeshProperties::~FurMeshProperties ()
+  {
+  }
+
+  iMaterial* FurMeshProperties::GetMaterial() const
+  {
+    return material;
+  }
+
+  void FurMeshProperties::SetMaterial(iMaterial* material)
+  {
+    this->material = material;
+
+    Invalidate();
+  }
+
+  // Nothing to be done
+  void FurMeshProperties::Invalidate()
+  {
+  }
+
+  // Nothing to be updated 
+  void FurMeshProperties::Update()
+  {
+  }
+
+  /************************
   *  MarschnerConstants
   ************************/  
 

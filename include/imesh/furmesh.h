@@ -319,6 +319,13 @@ public:
   SCF_INTERFACE (CS::Mesh::iFurMeshType, 1, 0, 0);
 
   /**
+   * Create a FurMeshBasicProperties using a cons char * as unique ID.
+   * This iFurMeshMaterialProperties only defines set and get material
+   */
+  virtual iFurMeshMaterialProperties* 
+    CreateFurMeshBasicProperties (const char* name) = 0;
+
+  /**
    * Create a HairMeshMarschnerProperties using a cons char * as unique ID
    */
   virtual iFurMeshMaterialProperties* 

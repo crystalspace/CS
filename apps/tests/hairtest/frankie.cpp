@@ -275,9 +275,9 @@ bool FrankieScene::CreateAvatar ()
 
   // Load Marschner shader
   csRef<iMaterialWrapper> materialWrapper = 
-    hairTest->engine->FindMaterial("marschner_material_frankie");
+    hairTest->engine->FindMaterial("fur_material_frankie");
   if (!materialWrapper)
-    hairTest->ReportError("Can't find marschner material!");
+    hairTest->ReportError("Can't find fur material!");
 
   // Get plugin manager
   csRef<iPluginManager> plugmgr = 
@@ -309,7 +309,7 @@ bool FrankieScene::CreateAvatar ()
 
   // Create hairMeshProperties
   csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties = 
-    furMeshType->CreateHairMeshMarschnerProperties("krsytal_marschner");
+    furMeshType->CreateFurMeshBasicProperties("frankie_kajiya_and_kay");
 
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
 

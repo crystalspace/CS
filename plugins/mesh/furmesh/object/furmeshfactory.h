@@ -61,6 +61,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual CS::Mesh::iFurMeshMaterialProperties* 
       CreateHairMeshMarschnerProperties (const char* name);
     virtual CS::Mesh::iFurMeshMaterialProperties* 
+      CreateFurMeshBasicProperties (const char* name);
+    virtual CS::Mesh::iFurMeshMaterialProperties* 
       FindFurMeshMaterialProperites (const char* name) const;
     virtual void RemoveFurMeshMaterialProperites (const char* name);
     virtual void ClearFurMeshMaterialProperites ();

@@ -169,6 +169,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float ComputeNP(int p, float phiD, float thD) const;
   };
 
+  class FurMeshProperties : public scfImplementation1 <FurMeshProperties, 
+    CS::Mesh::iFurMeshMaterialProperties>
+  {
+  public:
+    CS_LEAKGUARD_DECLARE(FurMeshProperties);
+
+    FurMeshProperties (iObjectRegistry* object_reg);
+    virtual ~FurMeshProperties ();
+
+    //-- iFurMeshMaterialProperties
+    virtual iMaterial* GetMaterial() const;
+    virtual void SetMaterial(iMaterial* material);
+    virtual void Invalidate();
+    virtual void Update();    
+
+  private:
+    iObjectRegistry* object_reg;
+    iMaterial* material;
+  };
 }
 CS_PLUGIN_NAMESPACE_END(FurMesh)
 

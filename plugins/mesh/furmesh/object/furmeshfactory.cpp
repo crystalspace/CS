@@ -101,6 +101,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   CS::Mesh::iFurMeshMaterialProperties* FurMeshType::
+    CreateFurMeshBasicProperties (const char* name)
+  {
+    csRef<CS::Mesh::iFurMeshMaterialProperties> newFurMeshMaterial;
+    newFurMeshMaterial.AttachNew(new FurMeshProperties (object_reg));
+    return furMeshMaterialPropertiesHash.PutUnique (name, newFurMeshMaterial);
+  }
+
+  CS::Mesh::iFurMeshMaterialProperties* FurMeshType::
     FindFurMeshMaterialProperites (const char* name) const
   {
     return furMeshMaterialPropertiesHash.Get (name, 0);
