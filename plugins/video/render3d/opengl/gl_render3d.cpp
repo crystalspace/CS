@@ -165,7 +165,8 @@ void csGLGraphics3D::OutputMarkerString (const char* function,
 
 
 csGLGraphics3D::ProfileScope::ProfileScope (csGLGraphics3D* renderer, const char* descr)
- : renderer (renderer), descr (descr), startQuery (0)
+ : renderer (renderer), descr (descr), startStamp (0),
+   startQuery (0), endQuery (0)   
 {
   if (renderer->glProfiling)
   {
