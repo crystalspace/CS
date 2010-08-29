@@ -826,7 +826,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->hairMeshProperties = hairMeshProperties;
   }
 
-  CS::Mesh::iFurMeshMaterialProperties* FurMesh::GetFurStrandGenerator( ) const
+  CS::Mesh::iFurMeshMaterialProperties* FurMesh::GetFurMeshProperties( ) const
   {
     return hairMeshProperties;
   }

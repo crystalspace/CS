@@ -441,7 +441,7 @@ struct iFurMesh : public virtual iBase
    * Get the associated iFurMeshMaterialProperties.
    * Shader variables can be obtained via the material of the iFurMeshMaterialProperties
    */
-  virtual iFurMeshMaterialProperties* GetFurStrandGenerator( ) const = 0;
+  virtual iFurMeshMaterialProperties* GetFurMeshProperties( ) const = 0;
 
   /**
    * Set an iAnimatedMeshFactory corresponding to the iAnimatedMeshSubMeshFactory

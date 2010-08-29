@@ -82,7 +82,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     virtual void SetFurMeshProperties
       ( CS::Mesh::iFurMeshMaterialProperties* hairMeshProperties);
-    virtual CS::Mesh::iFurMeshMaterialProperties* GetFurStrandGenerator( ) const;
+    virtual CS::Mesh::iFurMeshMaterialProperties* GetFurMeshProperties( ) const;
 
   private:
     // Common data
