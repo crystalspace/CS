@@ -66,6 +66,7 @@ Crystal Space supports.
 * MeshObject Haze:: Haze Mesh Object
 * MeshObject Watermesh:: Watermesh Mesh Object
 * MeshObject Furmesh:: Furmesh Mesh Object
+* HOWTO Create Furmesh:: Creating a Furmesh Mesh
 @end menu
 
 @importss{usingcs,meshobj,concepts.txi}
@@ -86,3 +87,4 @@ Crystal Space supports.
 @importss{usingcs,meshobj,haze.txi}
 @importss{usingcs,meshobj,watermesh.txi}
 @importss{usingcs,meshobj,furmesh.txi}
+@importss{usingcs,meshobj,createfurmesh.txi}

@@ -15,19 +15,26 @@
 A Furmesh is a set of 3D triangles (just like a 3D sprite) that is used to 
 create both hairs and furs on base meshes (currently only animeshes are supported).
 Furmeshes can update their position based on physics or on the base mesh's 
-animation, via the Furmesh Physics Control. Defining complex shaders, that 
+animation, via the Furmesh Animation Control. Defining complex shaders, that 
 can have lookup textures, updated whenever needed, is done via the Furmesh
-Strand Generator. You can find some other info about the Furmesh plugin on 
+Material Properties. You can find some other info about the Furmesh plugin on 
 this blog: @uref{http://hairrendering.wordpress.com/}.
+
+There is also a @sc{howto} discussing the creation of furmeshes.
+@xref{HOWTO Create Furmesh}.
+
+@subsubheading Basic Structure
 
 The following @sc{scf} class names are used (for @code{csLoadPlugin}):
 
 @itemize @bullet
 @item
 Type plugin: @code{crystalspace.mesh.furmesh}
+@item
+Loader plugin: @code{crystalspace.mesh.loader.furmesh}
+@item
+Factory loader plugin: @code{crystalspace.mesh.loader.factory.furmesh}
 @end itemize
-
-@subsubheading Basic Structure
 
 Objects in this plugin implement the following @sc{scf} interfaces, which you
 can retrieve with @code{scfQueryInterface}:
@@ -57,6 +64,74 @@ Implements @samp{iMeshObjectType}
 @end itemize
 @end itemize
 
+@subsubheading Factory State Interface
+
+No attributes are specified in the current factory state implementation.
+
+@subsubheading Factory Loader
+
+No tags supported.
+
+@subsubheading Object State Interface
+
+@samp{iFurMeshState} (residing in @file{CS/include/imesh/furmesh.h}) is
+the @sc{scf} interface that you can use to manipulate settings for a furmesh
+object.  By using this interface you can access the material, blending mode
+(mixmode), and various other configuration parameters for a furmesh object.
+
+@subsubheading Object Loader
+
+Here is a list of all the tags supported by a furmesh object and their
+meaning:
+@itemize @bullet
+@item @samp{factory}
+The name of the factory to use.
+@item @samp{strandwidth}
+This is a float variable used to set the width of a fur strand:
+@samp{<strandwidth>0.001</strandwidth>}.
+@item @samp{displacement}
+This is a float variable used to set the distance between the furmesh and the base
+mesh:
+@samp{<displacement>0.02</displacement>}.
+@item @samp{densitymap}
+This is a UV greyscale texture of the base mesh, giving information about the density
+of the Furmesh, based on areas. White means the highest density, while black means no
+furs.
+@samp{<densitymap>krystal_skull_densitymap</densitymap>}.
+@item @samp{densityfactorguidefurs}
+This is a float variable used to specify what is the maximum density for LOD guide furs.
+@samp{<densityfactorguidefurs>10</densityfactorguidefurs>}.
+@item @samp{densityfactorfurstrands}
+This is a float variable used to specify what is the maximum density for fur strands.
+@samp{<densityfactorfurstrands>120</densityfactorfurstrands>}.
+@item @samp{heightmap}
+This is a UV greyscale texture of the base mesh, giving information about the height
+of the Furmesh, based on areas. White means the biggest height, while black means 0 height.
+@samp{<heightmap>krystal_skull_heightmap</heightmap>}.
+@item @samp{heightfactor}
+This is a float variable used to specify what is the maximum height for furs.
+@samp{<heightfactor>0.4</heightfactor>}.
+@item @samp{controlpointsdistance}
+This is a float variable used to set the distance between points on a fur strand. 
+@samp{<controlpointsdistance>0.05</controlpointsdistance>}.
+@item @samp{positiondeviation}
+This is a float variable used to set the percentage of the maximum deviation a fur strand
+might have. 
+@samp{<positiondeviation>0.005</positiondeviation>}.
+@item @samp{growtangents}
+This is a variable, specifying if guide furs should initially grow based on normal or
+tangent direction. While normal direction is good for small furs, tangent direction might be
+used for longer static furs.
+@samp{<growtangents/>}.
+@item @samp{mixmode}
+Control the transparency of this object. See @ref{XMLServices Mixmode} for
+a list of possibilities.
+@samp{<mixmode> <copy /> </mixmode>}.
+@item @samp{priority}
+Set the rendering priority for this furmesh object.
+@samp{<priority>object</priority>}.
+@end itemize
+
 @subsubheading Furmesh Data Structures
 
 Because a Furmesh can update its geometry by being synchronized with various
@@ -82,15 +157,15 @@ UV coordinates.
 In order to keep the number of geometry as low as possible, fur strands are 
 represented as triangle strips that always face the camera, not as very thin 
 cylinders like in reality. Because of the always facing the camera constraint,
-all the geometry related data from the Furmesh Factory can be computed more
+all the geometry related data from the Furmesh can be computed more
 efficiently, directly when updating the fur strands. This is the reason why the 
-Furmesh Factory doesn't have any methods to compute normals, tangents or binormals, 
-but only gives access to these iRenderBuffers.
+Furmesh doesn't have any methods to compute normals, tangents or binormals, 
+or gives access to the iRenderBuffers.
 
 @subsubheading Furmesh LOD System
 
-Due to the high number of fur strands a LOD system had to be used, especially when 
-the viewer was further away from the Furmesh and it could be rendered at lower 
+Due to the high number of fur strands, a LOD system had to be used, especially when 
+the viewer was further away from the Furmesh so that it could be rendered at lower 
 quality. Apart from displaying fewer fur strands, the number of guide furs vary as 
 well. In order to make this possible another type of fur structure had to be added,
 LOD guide furs, which on lower LOD settings act as normal fur strands, while on 
@@ -98,74 +173,3 @@ higher LOD act as guide furs. The methods that allow setting various LODs are:
 @code{SetGuideLOD()}, @code{SetStrandLOD()}, or  @code{SetLOD()} which acts as an
 overall LOD function, calling both previous defined methods.
 
-@subsubheading Object Loader 
-
-Here is a list of all the tags supported by a Furmesh object and their meaning 
-(these tags should be specify in a custom, base, material from the base mesh): 
-@itemize @bullet
-@item @samp{strandWidth}
-This is a float variable used to set the width of a fur strand:
-@samp{<shadervar type="float" name="strandWidth">0.001</shadervar>}.
-@item @samp{displaceDistance}
-This is a float variable used to set the distance between the Furmesh and the base
-mesh:
-@samp{<shadervar type="float" name="displaceDistance">0.02</shadervar>}.
-@item @samp{density map}
-This is a UV greyscale texture of the base mesh, giving information about the density
-of the Furmesh, based on areas. White means the highest density, while black means no
-furs.
-@samp{<shadervar type="texture" name="density map">krystal_skull_densitymap</shadervar>}.
-@item @samp{densityFactorGuideHairs}
-This is a float variable used to specify what is the maximum density for LOD guide furs.
-@samp{<shadervar type="float" name="densityFactorGuideHairs">10</shadervar>}.
-@item @samp{densityFactorHairStrands}
-This is a float variable used to specify what is the maximum density for fur strands.
-@samp{<shadervar type="float" name="densityFactorHairStrands">120</shadervar>}.
-@item @samp{height map}
-This is a UV greyscale texture of the base mesh, giving information about the height
-of the Furmesh, based on areas. White means the biggest height, while black means 0 height.
-@samp{<shadervar type="texture" name="density map">krystal_skull_heightmap</shadervar>}.
-@item @samp{heightFactor}
-This is a float variable used to specify what is the maximum height for furs.
-@samp{<shadervar type="float" name="heightFactor">0.4</shadervar>}.
-@item @samp{controlPointsDistance}
-This is a float variable used to set the distance between points on a fur strand. 
-@samp{<shadervar type="float" name="controlPointsDistance">0.05</shadervar>}.
-@item @samp{positionDeviation}
-This is a float variable used to set the percentage of the maximum deviation a fur strand
-might have. 
-@samp{<shadervar type="float" name="positionDeviation">0.005</shadervar>}.
-@item @samp{growTangents}
-This is an integer variable, specifying if guide furs should initially grow based on normal or
-tangent direction. While normal direction is good for small furs, tangent direction might be
-used for longer static furs.
-@samp{<shadervar type="int" name="growTangents">1</shadervar>}.
-@end itemize
-
-@subsubheading Creating a Furmesh
-
-A typical way of creating programmatically:
-
-@example
-// First create the factory:
-csRef<CS::Mesh::iFurMeshType> furMeshType = 
-  csQueryRegistry<CS::Mesh::iFurMeshType> (hairTest->object_reg);
-csRef<iMeshObjectFactory> imof = furMeshType->NewFactory();
-csRef<iMeshFactoryWrapper> imfw = 
-  hairTest->engine->CreateMeshFactory(imof, "hair_factory");
-csRef<iMeshWrapper> hairMesh = hairTest->engine->
-  CreateMeshWrapper (imfw, "hair_mesh_wrapper", hairTest->room, csVector3 (0));
-
-// Get reference to the iFurMesh interface
-furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
-@dots{}
-furMesh->SetPhysicsControl(animationPhysicsControl);
-furMesh->SetFurStrandGenerator(hairStrandGenerator);
-@dots{}
-furMesh->SetMeshFactory(animeshFactory);
-furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
-furMesh->SetBaseMaterial(skullMaterial->GetMaterial());
-furMesh->GenerateGeometry(hairTest->view, hairTest->room);
-furMesh->SetGuideLOD(0);
-furMesh->SetStrandLOD(1);
-@end example
