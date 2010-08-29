@@ -2,7 +2,7 @@
 <library>
   <shaders>
     <shader>
-      <file>/shader/fur/marschner_lookup_cg.xml</file>
+      <file>/shader/fur/fur_cg.xml</file>
     </shader>		
   </shaders>
   <textures>
@@ -12,9 +12,10 @@
   </textures>
   <materials>
     <material name='marschner_material_frankie'>
-      <shader type='standard'>marschner_lookup_cg</shader>
+      <shader type='standard'>fur_cg</shader>
 	  <shadervar type="int" name="diffuse type">4</shadervar>
 	  <shadervar type="texture" name="diffuse map">frankie_col</shadervar>
+	  <shadervar type="int" name="kajiya kay" />
     </material>
   </materials>
   <sounds/>

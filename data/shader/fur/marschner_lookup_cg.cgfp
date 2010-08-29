@@ -1,53 +1,29 @@
 <include>
   <variablemap variable="light diffuse[0]" destination="LightColor" />
-  <variablemap variable="light ambient" destination="AmbientColor" />
-  <variablemap variable="diffuse type" destination="DiffuseType" />
-  <variablemap variable="hair color" destination="HairColor" />
   <variablemap variable="constants M" destination="constantsM" />  
   <program>
 
 struct vertex2fragment { 
 	float4 HPosition : POSITION;
 	float3 LightVec : TEXCOORD0;	
-	float3 WorldNormal : TEXCOORD1;
-	float3 WorldTangent : TEXCOORD2;
-	float3 WorldView: TEXCOORD3;
-	float3 TangentShift : TEXCOORD4;	
-	float2 TexCoord : TEXCOORD5;	
+	float3 WorldTangent : TEXCOORD1;
+	float3 WorldView: TEXCOORD2;
 };
 
 float4 main (vertex2fragment IN,
 			// Lookup tables for the hair model (fixed point)
 			uniform sampler2D lookup1fixed,
-			uniform sampler2D lookup2fixed,
-			uniform sampler2D DiffuseMap,
-			uniform sampler2D ColorMap,
-			uniform sampler2D TextureMap,			
-			uniform int DiffuseType,
-			uniform float3 AmbientColor,
+			uniform sampler2D lookup2fixed,		
 			uniform float3 LightColor,
-			uniform float4 HairColor,
 			uniform float3 constantsM) : COLOR
 {
 	float4 OUT = float4(0, 0, 0, 1);
 
-	if (DiffuseType > 4)
-		IN.TangentShift.y = 0.01;
-	
-<?if (vars."color map") && (vars."texture map")?>
-	float2 uv = float2(clamp(tex2D(ColorMap, IN.TexCoord).x, 0.01, 0.99), clamp(IN.TangentShift.y, 0.01, 0.99));
-	HairColor = tex2D(TextureMap, uv);
-<?else?>
-	<?if vars."diffuse map"?>
-		HairColor = tex2D(DiffuseMap, IN.TexCoord);
-	<?endif?>	
-<?endif?>
 	float MR_ct = constantsM.x;
 	float MTT_ct = constantsM.y;
 	float MTRT_ct = constantsM.z;
 	
 	float3 Ln = normalize(IN.LightVec);
-	float3 Nn = normalize(IN.WorldNormal);
 	float3 Tn = normalize(IN.WorldTangent);
 	float3 Vn = normalize(IN.WorldView);
 	
@@ -72,33 +48,11 @@ float4 main (vertex2fragment IN,
     /* Compute the azimuthal reflectance component */
 	float2 uv2 = float2( cos_fd, cos_qd ) * 0.5 + 0.5;
 	float4 N = tex2D(lookup2fixed, uv2);
-	
-    /* Pass colors */
-	float4 diffuseColor;
-    diffuseColor.a = HairColor.a;
-
-	if (DiffuseType == 0)	//	no diffuse light
-		diffuseColor = 0;
-	else if (DiffuseType == 1)	//	standard diffuse light
-		diffuseColor.rgb = 0.5 * max (dot(Nn, -Ln) , 0.2) * LightColor;
-	else if (DiffuseType == 2)	//	marschner diffuse from NVIDIA Nalu
-		diffuseColor.rgb = 0.4 * sqrt(max(0.0001, 1 - sin_qi * sin_qi)) * LightColor;
-	else if (DiffuseType == 3)	//	a test diffuse that looks good on the current hair color
-		diffuseColor.rgb = LightColor * HairColor.xyz * HairColor.xyz;
-	else if (DiffuseType == 4)	//	Kajiya and Kay diffuse
-		diffuseColor.rgb = 0.2 * sin(acos(sin_qi)) * LightColor;
-	else // ambiental instead of diffuse
-		diffuseColor.rgb = 0.2 * LightColor;
 
 	float3 specularColor = ( M.r * N.r + M.g * N.g + M.b * N.b ) /  max(0.2, cos_qd * cos_qd);
 	specularColor *= LightColor;
 	
-	OUT.xyz = specularColor + (0.8 + 0.4 * IN.TangentShift.x ) * HairColor.xyz * (diffuseColor + AmbientColor);
-	//OUT.xyz = diffuseColor.rgb;
-	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / (cos_qd * cos_qd) + HairColor.xyz;
-	//OUT.xyz = ( M.r * N.r + M.g * N.g + M.b * N.b ) / max(0.2, cos_qd * cos_qd);
-	//OUT.xyz = N.a;
-	//OUT.xyz = HairColor;
+	OUT.xyz = specularColor;
 	return OUT;
 }
 

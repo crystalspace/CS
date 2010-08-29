@@ -6,7 +6,7 @@
   </plugins>
   <shaders>
 	<shader>
-      <file>/shader/fur/marschner_lookup_cg.xml</file>
+      <file>/shader/fur/fur_cg.xml</file>
     </shader>
     <shader>
       <file>/shader/surface/sub_surface_scattering_fake.xml</file>
@@ -41,7 +41,7 @@
     <material name='skull_material'>
       <texture>krystal_skull</texture>
 
-      <shader type='standard'>marschner_lookup_cg</shader>
+      <shader type='standard'>fur_cg</shader>
 
 	  <shadervar type="int" name="diffuse type">10</shadervar>
 	  <shadervar type="texture" name="color map">krystal_skull_colormap</shadervar>
