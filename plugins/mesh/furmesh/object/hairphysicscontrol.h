@@ -39,7 +39,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual ~HairPhysicsControl ();
 
     //-- iFurPhysicsControl
-    virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh);
+    virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh);
     virtual void SetRigidBody (iRigidBody* rigidBody);
     virtual void SetBulletDynamicSystem 
       (CS::Physics::Bullet::iDynamicSystem* bulletDynamicSystem);

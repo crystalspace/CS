@@ -673,7 +673,7 @@ bool HairTest::Application ()
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
   // Load layout and set as root
-  vfs->ChDir ("/hairtest/");
+  vfs->ChDir ("/lib/hairtest/");
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("hairtest.layout"));
 
   // Subscribe to the clicked event for the exit button

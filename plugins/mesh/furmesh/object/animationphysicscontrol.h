@@ -30,7 +30,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   class AnimationPhysicsControl : public scfImplementation2 
     <AnimationPhysicsControl, scfFakeInterface<CS::Mesh::iFurAnimationControl>, 
-    CS::Mesh::iFurAnimeshControl>
+    CS::Mesh::iFurAnimatedMeshControl>
   {
   public:
     CS_LEAKGUARD_DECLARE(AnimationPhysicsControl);
@@ -39,7 +39,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual ~AnimationPhysicsControl ();
 
     //-- iFurPhysicsControl
-    virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh);
+    virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh);
     virtual void SetDisplacement (float displacement);
 
     //-- iFurAnimationControl

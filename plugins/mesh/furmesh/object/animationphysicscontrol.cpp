@@ -42,7 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     RemoveAllStrands();
   }
 
-  void AnimationPhysicsControl::SetAnimesh (CS::Mesh::iAnimatedMesh* animesh)
+  void AnimationPhysicsControl::SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh)
   {
     this->animesh = animesh;
   }

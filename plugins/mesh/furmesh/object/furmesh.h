@@ -70,7 +70,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetStrandLOD(float strandLOD);
     virtual void SetLOD(float lod);
 
-    virtual void SetAnimesh(CS::Mesh::iAnimatedMesh* animesh);
+    virtual void SetAnimatedMesh(CS::Mesh::iAnimatedMesh* animesh);
     virtual void SetAnimationControl (CS::Mesh::iFurAnimationControl* physicsControl);
     virtual void StartAnimationControl ( );
     virtual void StopAnimationControl ( );

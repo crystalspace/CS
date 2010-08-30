@@ -92,7 +92,7 @@ public:
   /**
    * Set the animesh on which the iFurMesh is attached
    */
-  virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
+  virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
 
   /**
    * Set the rigid body on which the iFurMesh is attached
@@ -107,17 +107,17 @@ public:
 };
 
 /**
- * Animation Controller for Animesh
+ * Animation controller for animated mesh
  */
-struct iFurAnimeshControl : public virtual iFurAnimationControl
+struct iFurAnimatedMeshControl : public virtual iFurAnimationControl
 {
 public:
-  SCF_INTERFACE (CS::Mesh::iFurAnimeshControl, 1, 0, 0);
+  SCF_INTERFACE (CS::Mesh::iFurAnimatedMeshControl, 1, 0, 0);
 
   /**
    * Set the animesh on which the iFurMesh is attached
    */
-  virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
+  virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
 
   /**
    * Set displacement between fur and base mesh
@@ -136,102 +136,102 @@ public:
   /**
    * Get the width of a strand
    */
-  virtual float GetStrandWidth() const = 0;
+  virtual float GetStrandWidth () const = 0;
 
   /**
    * Set the width of a strand
    */
-  virtual void SetStrandWidth(float strandWidth) = 0;
+  virtual void SetStrandWidth (float strandWidth) = 0;
 
   /**
    * Get the displacement between the fur mesh and the base mesh
    */
-  virtual float GetDisplacement() const = 0;
+  virtual float GetDisplacement () const = 0;
 
   /**
    * Set the displacement between the fur mesh and the base mesh
    */
-  virtual void SetDisplacement(float displacement) = 0;
+  virtual void SetDisplacement (float displacement) = 0;
 
   /**
    * Get the density map texture
    */
-  virtual iTextureWrapper* GetDensityMap() const = 0;
+  virtual iTextureWrapper* GetDensityMap () const = 0;
 
   /**
    * Set the density map texture
    */
-  virtual void SetDensityMap(iTextureWrapper* densityMap) = 0;
+  virtual void SetDensityMap (iTextureWrapper* densityMap) = 0;
 
   /**
    * Get the density factor for guide furs
    */
-  virtual float GetDensityFactorGuideFurs() const = 0;
+  virtual float GetDensityFactorGuideFurs () const = 0;
 
   /**
    * Set the density factor for guide furs
    */
-  virtual void SetDensityFactorGuideFurs(float densityFactorGuideFurs) = 0;
+  virtual void SetDensityFactorGuideFurs (float densityFactorGuideFurs) = 0;
 
   /**
    * Get the density factor for fur strands
    */
-  virtual float GetDensityFactorFurStrands() const = 0;
+  virtual float GetDensityFactorFurStrands () const = 0;
 
   /**
    * Set the density factor for fur strands
    */
-  virtual void SetDensityFactorFurStrands(float densityFactorFurStrands) = 0;
+  virtual void SetDensityFactorFurStrands (float densityFactorFurStrands) = 0;
 
   /**
    * Get the heightmap map texture
    */
-  virtual iTextureWrapper* GetHeightMap() const = 0;
+  virtual iTextureWrapper* GetHeightMap () const = 0;
 
   /**
    * Set the heightmap map texture
    */
-  virtual void SetHeightMap(iTextureWrapper* heightMap) = 0;
+  virtual void SetHeightMap (iTextureWrapper* heightMap) = 0;
 
   /**
    * Get the height factor (for guide furs)
    */
-  virtual float GetHeightFactor() const = 0;
+  virtual float GetHeightFactor () const = 0;
 
   /**
    * Set the height factor (for guide furs)
    */
-  virtual void SetHeightFactor(float heightFactor) = 0;
+  virtual void SetHeightFactor (float heightFactor) = 0;
 
   /**
    * Get the distance between control points on a fur
    */
-  virtual float GetControlPointsDistance() const = 0;
+  virtual float GetControlPointsDistance () const = 0;
 
   /**
    * Set the distance between control points on a fur
    */
-  virtual void SetControlPointsDistance(float controlPointsDistance) = 0;
+  virtual void SetControlPointsDistance (float controlPointsDistance) = 0;
 
   /**
    * Get the position deviation of fur strands
    */
-  virtual float GetPositionDeviation() const = 0;
+  virtual float GetPositionDeviation () const = 0;
 
   /**
    * Set the position deviation of fur strands
    */
-  virtual void SetPositionDeviation(float positionDeviation) = 0;
+  virtual void SetPositionDeviation (float positionDeviation) = 0;
 
   /**
    * Check if fur grows based on tangent direction
    */
-  virtual bool GetGrowTangent() const = 0;
+  virtual bool GetGrowTangent () const = 0;
 
   /**
    * Set if fur grows based on tangent direction
    */
-  virtual void SetGrowTangent(bool growTangent) = 0;
+  virtual void SetGrowTangent (bool growTangent) = 0;
 
   /**
    * Get mixmode
@@ -276,22 +276,22 @@ public:
   /**
    * Get the material used
    */
-  virtual iMaterial* GetMaterial() const = 0;
+  virtual iMaterial* GetMaterial () const = 0;
 
   /**
    * Set the material used. Can be created externally from an XML
    */
-  virtual void SetMaterial(iMaterial* material) = 0;
+  virtual void SetMaterial (iMaterial* material) = 0;
 
   /**
    * Update the material data after modifying the material variables
    */
-  virtual void Invalidate() = 0;
+  virtual void Invalidate () = 0;
 
   /**
    * Called each frame. New material variables values can be send to the shader
    */
-  virtual void Update() = 0;
+  virtual void Update () = 0;
 };
 
 /**\addtogroup meshplugins
@@ -353,9 +353,9 @@ public:
   virtual iFurAnimationControl* CreateFurPhysicsControl (const char* name) = 0;
 
   /**
-   * Create a FurAnimeshControl using a cons char * as unique ID
+   * Create a FurAnimatedMeshControl using a cons char * as unique ID
    */
-  virtual iFurAnimationControl* CreateFurAnimeshControl (const char* name) = 0;
+  virtual iFurAnimationControl* CreateFurAnimatedMeshControl (const char* name) = 0;
 
   /**
    * Find iFurAnimationControl with ID name or return 0 otherwise.
@@ -390,24 +390,24 @@ struct iFurMesh : public virtual iBase
    * Set the LOD for the guide fur. 
    * Pure guide fur is updated via the associated iFurPhysicsControl
    */
-  virtual void SetGuideLOD(float guideLOD) = 0; 
+  virtual void SetGuideLOD (float guideLOD) = 0; 
 
   /**
    * Set the LOD for the fur strands. 
    * Fur strands are the rendered geometry.
    */
-  virtual void SetStrandLOD(float strandLOD) = 0;
+  virtual void SetStrandLOD (float strandLOD) = 0;
 
   /**
    * Set the overall LOD. Equivalent to calling SetGuidLOD and SetStrandLOD 
    * with the same parameter.
    */
-  virtual void SetLOD(float lod) = 0;
+  virtual void SetLOD (float lod) = 0;
 
   /**
    * Set the animesh
    */
-  virtual void SetAnimesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
+  virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
 
   /**
    * Set the associated iFurPhysicsControl
@@ -418,41 +418,41 @@ struct iFurMesh : public virtual iBase
    * Start the associated iFurPhysicsControl. 
    * Pure guide furs will be synchronized with the iFurPhysicsControl every frame
    */
-  virtual void StartAnimationControl ( ) = 0;
+  virtual void StartAnimationControl () = 0;
 
   /**
    * Stop the associated iFurPhysicsControl. 
    * Pure guide furs will stop being synchronized with the iFurPhysicsControl
    */
-  virtual void StopAnimationControl ( ) = 0;
+  virtual void StopAnimationControl () = 0;
  
   /**
    * Reset the position of the mesh on the base mesh.
    * Pure guide furs will stop and start being synchronized with iFurPhysicsControl
    */
-  virtual void ResetMesh ( ) = 0;
+  virtual void ResetMesh () = 0;
 
   /**
    * Set the associated iFurMeshMaterialProperties
    */
-  virtual void SetFurMeshProperties( iFurMeshMaterialProperties* furMeshProperties) = 0;
+  virtual void SetFurMeshProperties (iFurMeshMaterialProperties* furMeshProperties) = 0;
 
   /**
    * Get the associated iFurMeshMaterialProperties.
    * Shader variables can be obtained via the material of the iFurMeshMaterialProperties
    */
-  virtual iFurMeshMaterialProperties* GetFurMeshProperties( ) const = 0;
+  virtual iFurMeshMaterialProperties* GetFurMeshProperties () const = 0;
 
   /**
    * Set an iAnimatedMeshFactory corresponding to the iAnimatedMeshSubMeshFactory
    */
-  virtual void SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory ) = 0;
+  virtual void SetMeshFactory (CS::Mesh::iAnimatedMeshFactory* meshFactory) = 0;
 
   /**
    * Set iAnimatedMeshSubMeshFactory on which fur will grow
    */
-  virtual void SetMeshFactorySubMesh ( CS::Mesh::iAnimatedMeshSubMeshFactory* 
-    meshFactorySubMesh ) = 0;
+  virtual void SetMeshFactorySubMesh (CS::Mesh::iAnimatedMeshSubMeshFactory* 
+    meshFactorySubMesh) = 0;
 };
 
 

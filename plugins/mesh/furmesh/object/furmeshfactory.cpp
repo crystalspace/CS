@@ -135,7 +135,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     return furAnimationControlHash.PutUnique (name, newAnimationControl);
   }
 
-  CS::Mesh::iFurAnimationControl* FurMeshType::CreateFurAnimeshControl (const char* name)
+  CS::Mesh::iFurAnimationControl* FurMeshType::CreateFurAnimatedMeshControl (const char* name)
   {
     csRef<CS::Mesh::iFurAnimationControl> newAnimationControl;
     newAnimationControl.AttachNew(new AnimationPhysicsControl (this));

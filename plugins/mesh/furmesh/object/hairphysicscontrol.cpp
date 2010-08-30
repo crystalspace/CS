@@ -45,7 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   //-- iFurPhysicsControl
 
-  void HairPhysicsControl::SetAnimesh (CS::Mesh::iAnimatedMesh* animesh)
+  void HairPhysicsControl::SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh)
   {
     this->animesh = animesh;
   }

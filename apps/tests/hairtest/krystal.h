@@ -70,7 +70,7 @@ private:
   // Hair physics
   bool hairPhysicsEnabled;
   csRef<CS::Mesh::iFurPhysicsControl> hairPhysicsControl;
-  csRef<CS::Mesh::iFurAnimeshControl> animationPhysicsControl;
+  csRef<CS::Mesh::iFurAnimatedMeshControl> animationPhysicsControl;
   bool isDead;
 };
 

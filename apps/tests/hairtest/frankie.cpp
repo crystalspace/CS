@@ -269,7 +269,7 @@ bool FrankieScene::CreateAvatar ()
   }
 
   // Load fur material
-  rc = hairTest-> loader ->Load ("/hairtest/fur_material_frankie.xml");
+  rc = hairTest-> loader ->Load ("/lib/hairtest/fur_material_frankie.xml");
   if (!rc.success)
     hairTest->ReportError("Can't load Fur library file!");
 
@@ -295,17 +295,17 @@ bool FrankieScene::CreateAvatar ()
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"));
 
   // Load animationPhysicsControl
-  animationPhysicsControl = scfQueryInterface<CS::Mesh::iFurAnimeshControl>
-      (furMeshType->CreateFurAnimeshControl("frankie_fur_animation"));
+  animationPhysicsControl = scfQueryInterface<CS::Mesh::iFurAnimatedMeshControl>
+      (furMeshType->CreateFurAnimatedMeshControl("frankie_fur_animation"));
 
-  animationPhysicsControl->SetAnimesh(animesh);
+  animationPhysicsControl->SetAnimatedMesh(animesh);
 
   furPhysicsControl = scfQueryInterface<CS::Mesh::iFurPhysicsControl>
     (furMeshType->CreateFurPhysicsControl("frankie_fur_physics"));
 
   furPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
   furPhysicsControl->SetRigidBody(mainBody);
-  furPhysicsControl->SetAnimesh(animesh);
+  furPhysicsControl->SetAnimatedMesh(animesh);
 
   // Create hairMeshProperties
   csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties = 
@@ -328,7 +328,7 @@ bool FrankieScene::CreateAvatar ()
 
   furMesh->SetFurMeshProperties(hairMeshProperties);
 
-  furMesh->SetAnimesh(animesh);
+  furMesh->SetAnimatedMesh(animesh);
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(0)->GetFactorySubMesh());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);

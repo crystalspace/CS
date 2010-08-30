@@ -740,7 +740,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       guideFurs.Get(i).controlPointsCount);
   }
 
-  void FurMesh::SetAnimesh(CS::Mesh::iAnimatedMesh* animesh)
+  void FurMesh::SetAnimatedMesh(CS::Mesh::iAnimatedMesh* animesh)
   {
     this->animesh = animesh;
   }

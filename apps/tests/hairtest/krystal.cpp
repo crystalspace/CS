@@ -374,7 +374,7 @@ bool KrystalScene::CreateAvatar ()
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
 
   // Load fur material
-  rc = hairTest-> loader ->Load ("/hairtest/fur_material.xml");
+  rc = hairTest-> loader ->Load ("/lib/hairtest/fur_material.xml");
   if (!rc.success)
     hairTest->ReportError("Can't load Fur library file!");
 
@@ -392,14 +392,14 @@ bool KrystalScene::CreateAvatar ()
 
   hairPhysicsControl = scfQueryInterface<CS::Mesh::iFurPhysicsControl>
     (furMeshType->CreateFurPhysicsControl("krystal_hairs_physics"));
-  animationPhysicsControl = scfQueryInterface<CS::Mesh::iFurAnimeshControl>
-    (furMeshType->CreateFurAnimeshControl("krystal_hairs_animation"));
+  animationPhysicsControl = scfQueryInterface<CS::Mesh::iFurAnimatedMeshControl>
+    (furMeshType->CreateFurAnimatedMeshControl("krystal_hairs_animation"));
 
   hairPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
   hairPhysicsControl->SetRigidBody(headBody);
-//   hairPhysicsControl->SetAnimesh(animesh);
+//   hairPhysicsControl->SetAnimatedMesh(animesh);
 
-  animationPhysicsControl->SetAnimesh(animesh);
+  animationPhysicsControl->SetAnimatedMesh(animesh);
 
   iSector* sector = hairTest->engine->FindSector("room");
 
@@ -421,7 +421,7 @@ bool KrystalScene::CreateAvatar ()
 
   furMesh->SetFurMeshProperties(hairMeshProperties);
 
-  furMesh->SetAnimesh(animesh);
+  furMesh->SetAnimatedMesh(animesh);
   furMesh->SetMeshFactory(animeshFactory);
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);

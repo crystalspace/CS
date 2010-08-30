@@ -71,7 +71,7 @@ private:
   // Fur physics
   bool furPhysicsEnabled;
   csRef<CS::Mesh::iFurPhysicsControl> furPhysicsControl;
-  csRef<CS::Mesh::iFurAnimeshControl> animationPhysicsControl;
+  csRef<CS::Mesh::iFurAnimatedMeshControl> animationPhysicsControl;
 };
 
 #endif // __FRANKIE_H__
