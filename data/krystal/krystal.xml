@@ -4,6 +4,11 @@
     <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
     <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
   </plugins>
+  <shaders>
+    <shader>
+      <file>/shader/fur/fur_cg.xml</file>
+    </shader>
+  </shaders>
   <textures>
     <texture name='krystal_body_h'>
       <file>/lib/krystal/krystal_body_h.png</file>
@@ -17,6 +22,12 @@
     <texture name='krystal_skull'>
       <file>/lib/krystal/krystal_skull.png</file>
     </texture>
+    <texture name='krystal_skull_colormap'>
+      <file>/lib/krystal/krystal_skull_colormap.png</file>
+    </texture>	
+    <texture name='krystal_skull_texturemap'>
+      <file>/lib/krystal/krystal_skull_texturemap.png</file>
+    </texture>		
   </textures>
   <materials>
     <material name='krystal_material'>
@@ -25,7 +36,14 @@
       <shadervar type="texture" name="tex specular">krystal_body_spec</shadervar>
     </material>
     <material name='skull_material'>
-      <texture>krystal_skull</texture>
+      <texture>krystal_body_h</texture>
+      <shadervar type="texture" name="tex normal">krystal_body_nor</shadervar>
+      <shadervar type="texture" name="tex specular">krystal_body_spec</shadervar>
+      <!--texture>krystal_skull</texture>
+      <shader type='standard'>fur_cg</shader>
+      <shadervar type="int" name="diffuse type">10</shadervar>
+      <shadervar type="texture" name="color map">krystal_skull_colormap</shadervar>
+      <shadervar type="texture" name="texture map">krystal_skull_texturemap</shadervar-->
     </material>
   </materials>
   <sounds/>

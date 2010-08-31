@@ -11,6 +11,10 @@
     </shader>
   </shaders>
   <textures>
+    <texture name='stone'>
+      <file>/lib/std/stone4.gif</file>
+    </texture>
+
     <texture name="frankie_col">
       <file>/lib/frankie/frankie_col.png</file>
     </texture>
@@ -24,9 +28,12 @@
   </textures>
   <materials>
     <material name="frankie_skin">
-      <shader type='standard'>fur_cg</shader>
-	  <shadervar type="int" name="diffuse type">10</shadervar>
-	  <shadervar type="texture" name="diffuse map">frankie_col</shadervar>
+      <texture>frankie_col</texture> 
+      <shadervar type="texture" name="tex normal">BUMPfrankie_nor</shadervar> 
+      <shadervar type="texture" name="tex specular">frankie_spec</shadervar> 
+      <!--shader type='standard'>fur_cg</shader>
+      <shadervar type="int" name="diffuse type">10</shadervar>
+      <shadervar type="texture" name="diffuse map">frankie_col</shadervar-->
     </material>
   </materials>
   <library>/lib/frankie/skelfrankie_rig</library>

@@ -27,6 +27,7 @@
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
+    <rotate rotz="3.1415927" />
    </joint>
   </bone>
   <bone name="Spine">
@@ -46,6 +47,7 @@
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
+    <rotate rotz="3.1415927" />
    </joint>
   </bone>
   <bone name="Spine1">
@@ -64,6 +66,7 @@
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
+    <rotate rotz="3.1415927" />
    </joint>
   </bone>
   <bone name="Neck">
@@ -83,6 +86,7 @@
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
+    <rotate rotz="3.1415927" />
    </joint>
   </bone>
   <bone name="Head">
@@ -101,6 +105,7 @@
       <max x="0.83" y="0.83" z="0.83" />
      </angle>
     </constraints>
+    <rotate rotz="3.1415927" />
    </joint>
   </bone>
   <bone name="RightUpLeg">
