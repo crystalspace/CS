@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+    <Window Type="DefaultWindow" Name="HairTest">
+        <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+
+        <Window Type="ice/FrameWindow" Name="HairTest/MainWindow" >
+            <Property Name="Text" Value="HairTest - MainWindow" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{0.2,0}}" />
+            <Property Name="UnifiedMinSize" Value="{{1,0},{0.2,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+            <Property Name="SizingEnabled" Value="False"/>
+            <Property Name="CloseButtonEnabled" Value="False" />
+     
+            <Window Type="ice/TabControl" Name="HairTest/MainWindow/Tab" >
+                <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+
+                <Window Type="DefaultWindow" Name="HairTest/MainWindow/Tab/Page1">
+                    <Property Name="Text" Value="HairTest - Page1" />
+
+                    <Window Type="ice/StaticImage" Name="HairTest/MainWindow/Tab/Page1/Image" >
+                        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+
+                        <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Quit" >
+                            <Property Name="Text" Value="Exit" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.1,0},{0.99,0},{0.4,0}}" />
+                        </Window>
+                      
+                        <Window Type="ice/Button" Name="HairTest/MainWindow/Tab/Page1/Colliders" >
+                            <Property Name="Text" Value="Colliders" />
+                            <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.1,0},{0.1,0},{0.4,0}}" />
+                        </Window>
+
+                    </Window>
+                </Window>
+
+                <Window Type="DefaultWindow" Name="HairTest/MainWindow/Tab/Page2">
+                    <Property Name="Text" Value="HairTest - Page2" />
+  
+                    <Window Type="ice/StaticImage" Name="HairTest/MainWindow/Tab/Page2/Image" >
+                        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    </Window>
+
+                </Window>
+
+              </Window>
+        </Window>
+    </Window>
+</GUILayout>

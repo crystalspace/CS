@@ -845,6 +845,11 @@ iSoftBody* csBulletDynamicsSystem::CreateRope
     (*softWorldInfo, CSToBullet (start, internalScale),
      CSToBullet (end, internalScale), segmentCount - 1, 0);
 
+  //hard-coded parameters for ropes
+  body->m_cfg.kDP = 0.08f; // no elasticity
+  body->m_cfg.piterations = 16; // no white zone
+  body->m_cfg.timescale = 2;
+
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
   softWorld->addSoftBody (body);
@@ -874,6 +879,11 @@ iSoftBody* csBulletDynamicsSystem::CreateRope (csVector3* vertices, size_t verte
   // Create the links between the nodes
   for (size_t i = 1; i < vertexCount; i++)
     body->appendLink (i - 1, i);
+
+  //hard-coded parameters for ropes
+  body->m_cfg.kDP = 0.08f; // no elasticity
+  body->m_cfg.piterations = 16; // no white zone
+  body->m_cfg.timescale = 2;
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);

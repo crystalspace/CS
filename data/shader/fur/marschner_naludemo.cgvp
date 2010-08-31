@@ -1,0 +1,85 @@
+<cgvp>
+<program>
+<![CDATA[
+
+struct a2vConnector {
+  float4 objCoord : POSITION;
+  float3 objNormal : NORMAL;
+  float3 Tangent: TEXCOORD0;
+};
+
+struct v2fConnector {
+  float4 projCoord : POSITION;
+  float3 angles : TEXCOORD1;
+  half4 diffuseColor : COLOR0;
+  half3 ambientColor : COLOR1;
+};
+
+v2fConnector main(a2vConnector a2v,
+                  uniform float4x4 modelViewProj : state.matrix.mvp,
+
+                  // Reflectance model parameters
+                  uniform float DiffuseCol,
+                  uniform float AmbientCol,
+                  
+                  uniform float3 worldPointLight0Pos,
+                  uniform float3 PointLightColor,
+				  uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans)
+{
+  v2fConnector v2f;
+  
+  float4 LightPos = float4 (9000, 0, 0, 0);
+
+  float3 objLightDir = normalize(a2v.objCoord.xyz - LightPos.xyz);
+  float3 objEyePos = ModelViewIT[3].xyz;
+	
+  AmbientCol = 0;
+  DiffuseCol = 0.75;
+  PointLightColor = 1;
+  worldPointLight0Pos = LightPos.xyz;  
+  float4 objColor = float4(0.51, 0.34, 0.25,1);
+  
+  /* Compute the tangent from adjacent vertices */
+  float3 objTangent = normalize(a2v.Tangent);
+  
+  /* Project */
+  float4 objCoord = a2v.objCoord;    
+  float4 projCoord = mul(modelViewProj, objCoord);
+  v2f.projCoord = projCoord;
+
+  float3 objEyeDir = normalize(objEyePos - objCoord.xyz);  
+
+  /* Compute longitudinal angles */
+  float2 uv1;
+  uv1.x = dot(objLightDir, objTangent);
+  uv1.y = dot(objEyeDir, objTangent);
+  v2f.angles.xy = 0.5 + 0.5*uv1;
+
+  /* Compute the azimuthal angle */
+  float3 lightPerp = objLightDir - uv1.x * objTangent;  
+  float3 eyePerp = objEyeDir - uv1.y * objTangent;  
+  float cosPhi = dot(eyePerp, lightPerp) * rsqrt(dot(eyePerp, eyePerp) * dot(lightPerp, lightPerp));
+  v2f.angles.z = 0.5*cosPhi + 0.5;
+
+  /* Compute diffuse lighting with phi-dependent component */
+  float diffuse = sqrt(max(0.1, 1 - uv1.x * uv1.x));
+
+  /* Pass colors */
+  v2f.diffuseColor.rgb = diffuse * objColor.rgb * DiffuseCol;
+  v2f.diffuseColor.a = objColor.a;
+  v2f.ambientColor = objColor.rgb * AmbientCol;
+
+  // compute point light lighting  
+  float3 Delta = worldPointLight0Pos-a2v.objCoord;
+
+  float pointLightDist = sqrt(dot(Delta,Delta)) * (1.0/400.0);
+  float att = min(1,max(0,pointLightDist));
+
+  v2f.ambientColor = (1.0-att) * PointLightColor;
+
+  return v2f;
+}
+
+]]>
+</program>
+</cgvp>

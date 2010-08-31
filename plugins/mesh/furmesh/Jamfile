@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh furmesh ;
+
+SubInclude TOP plugins mesh furmesh object ;
+SubInclude TOP plugins mesh furmesh persist ;

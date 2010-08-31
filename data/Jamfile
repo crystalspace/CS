@@ -53,6 +53,7 @@ SubInclude TOP data config-plugins ;
 SubInclude TOP data cube ;
 SubInclude TOP data flarge ;
 SubInclude TOP data frankie ;
+SubInclude TOP data hairtest ;
 SubInclude TOP data krystal ;
 SubInclude TOP data posteffects ;
 SubInclude TOP data renderlayers ;

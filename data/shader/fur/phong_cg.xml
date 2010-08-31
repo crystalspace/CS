@@ -1,0 +1,9 @@
+<shader compiler="xmlshader" name="phong_cg">
+    <technique priority="200">
+    <pass>
+      <buffer source="normal" destination="normal" />
+      <vp plugin="glcg" file="/shader/fur/phong_cg.cgvp" />
+      <fp plugin="glcg" file="/shader/fur/phong_cg.cgfp" />
+    </pass>
+    </technique>
+</shader>

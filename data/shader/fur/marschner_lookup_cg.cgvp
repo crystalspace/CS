@@ -1,0 +1,47 @@
+<cgvp>
+  <variablemap variable="light position world[0]" destination="LightPos" />
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float4 Position : POSITION;
+	float3 Tangent : TEXCOORD0;
+};
+
+struct vertex2fragment { 
+	float4 HPosition : POSITION;
+	float3 LightVec : TEXCOORD0;	
+	float3 WorldTangent : TEXCOORD1;
+	float3 WorldView: TEXCOORD2;
+};
+
+// main function
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
+	uniform float4x4 ModelViewProj : state.matrix.mvp,
+	uniform float3 LightPos)
+{
+	vertex2fragment OUT;
+
+	OUT.WorldTangent = IN.Tangent;
+	
+	// position in object coords:	
+	float4 Po = float4(IN.Position.x, IN.Position.y, IN.Position.z, 1.0);
+	// pos in world coords - same the mesh is recomputed every time
+	float3 Pw = Po.xyz;
+	
+	// light vector
+	OUT.LightVec = Pw - LightPos.xyz;
+
+	// view vector in world coords:
+	OUT.WorldView = normalize(ModelViewIT[3].xyz - Pw);
+	
+	// pos in clip coords:
+	OUT.HPosition = mul(ModelViewProj, Po);
+	  
+	return OUT;	// output of vertex shader
+}
+
+]]>
+</program>
+</cgvp>

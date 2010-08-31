@@ -5,28 +5,11 @@
     <plugin name="animesh">crystalspace.mesh.loader.animesh</plugin>
     <plugin name="animeshfact">crystalspace.mesh.loader.factory.animesh</plugin>
   </plugins>
-  <!--
   <shaders>
-    <shader>
-      <file>/shader/reflect/water_plane.xml</file>
-    </shader>
-    <shader>
-      <file>/shader/apricot/terrain_blend.xml</file>
-    </shader>
-    <shader>
-      <file>/shader/speculartex/speculartex.xml</file>
-    </shader>
-    <shader>
-      <file>/shader/postproc/hdr/simple-log.xml</file>
-    </shader>
-    <shader>
-      <file>/shader/lighting/lighting_default_binalpha.xml</file>
-    </shader>
-    <shader>
-      <file>/shader/lighting/lighting_default_shadowmap_binalpha.xml</file>
+	<shader>
+      <file>/shader/fur/fur_cg.xml</file>
     </shader>
   </shaders>
-  -->
   <textures>
     <texture name="frankie_col">
       <file>/lib/frankie/frankie_col.png</file>
@@ -41,9 +24,9 @@
   </textures>
   <materials>
     <material name="frankie_skin">
-      <texture>frankie_col</texture>
-      <shadervar type="texture" name="tex normal">BUMPfrankie_nor</shadervar>
-      <shadervar type="texture" name="tex specular">frankie_spec</shadervar>
+      <shader type='standard'>fur_cg</shader>
+	  <shadervar type="int" name="diffuse type">10</shadervar>
+	  <shadervar type="texture" name="diffuse map">frankie_col</shadervar>
     </material>
   </materials>
   <library>/lib/frankie/skelfrankie_rig</library>

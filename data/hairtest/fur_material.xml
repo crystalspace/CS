@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <shaders>
+    <shader>
+      <file>/shader/fur/fur_cg.xml</file>
+    </shader>		
+    <shader>
+      <file>/shader/lighting/lighting_default_shadowmap.xml</file>
+    </shader>		
+  </shaders>
+  <textures>
+    <texture name='krystal_skull_colormap'>
+      <file>/lib/krystal/krystal_skull_colormap.png</file>
+    </texture>	
+    <texture name='krystal_skull_texturemap'>
+      <file>/lib/krystal/krystal_skull_texturemap.png</file>
+    </texture>	
+  </textures>
+  <materials>
+    <material name='marschner_material'>
+      <shader type='standard'>fur_cg</shader>
+
+      <shader type='shadow'>lighting_default_shadowmap</shader>
+	  
+	  <shadervar type="int" name="diffuse type">4</shadervar>
+	  <!-- fur color used if texture map and color map or diffuse map not specify -->
+	  <shadervar type="vector3" name="fur color">0.51, 0.34, 0.25</shadervar>
+	  <shadervar type="texture" name="texture map">krystal_skull_texturemap</shadervar>
+	  <shadervar type="texture" name="color map">krystal_skull_colormap</shadervar> 
+	  <shadervar type="int" name="marschner" /> 
+    </material>
+  </materials>
+  <sounds/>
+</library>

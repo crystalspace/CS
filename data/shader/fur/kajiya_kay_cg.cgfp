@@ -1,0 +1,34 @@
+<include>
+  <variablemap variable="light diffuse[0]" destination="LightColor" />
+  <program>
+
+struct vertex2fragment { 
+	float4 HPosition : POSITION;
+	float3 LightVec : TEXCOORD0;	
+	float3 WorldNormal : TEXCOORD1;	
+	float3 WorldTangent : TEXCOORD2;	
+	float3 WorldView: TEXCOORD3;
+};
+
+float4 main (vertex2fragment IN,
+			uniform float3 LightColor) : COLOR
+{
+	float4 OUT = float4(0, 0, 0, 1);
+	
+	float3 Ln = normalize(IN.LightVec);
+	float3 Nn = normalize(IN.WorldNormal);
+	float3 Vn = normalize(IN.WorldView);
+
+	float tangentLight = dot(Nn, -Ln);
+	float tangentEye = dot(Nn, Vn);
+	
+	float3 specularColor = 0.1 * pow( tangentLight * tangentEye + sin( acos( tangentLight ) ) * sin( acos( tangentEye ) ) , 60.0);	
+	specularColor = max(specularColor, 0.0);
+	specularColor *= LightColor;
+	
+	OUT.xyz = specularColor;
+	return OUT;
+}
+
+    </program>
+</include>

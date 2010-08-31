@@ -2,6 +2,7 @@ SubDir TOP plugins mesh ;
 
 SubInclude TOP plugins mesh animesh ;
 SubInclude TOP plugins mesh emit ;
+SubInclude TOP plugins mesh furmesh ;
 SubInclude TOP plugins mesh genmesh ;
 SubInclude TOP plugins mesh haze ;
 SubInclude TOP plugins mesh lghtng ;

@@ -1,0 +1,29 @@
+<cgvp>
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float4 Position : POSITION;
+	float2 TexCoord : TEXCOORD0;
+};
+
+struct vertex2fragment { 
+	float4 Hposition : POSITION;
+	float2 TexCoord : TEXCOORD0;
+};
+
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,
+	uniform float4x4 ModelViewProj : state.matrix.mvp)
+{
+	vertex2fragment OUT;
+
+	OUT.Hposition = mul (ModelViewProj, IN.Position);
+	OUT.TexCoord = IN.TexCoord;
+	
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>

@@ -9,6 +9,7 @@ SubInclude TOP apps tests csceguiconftest ;
 SubInclude TOP apps tests csterrainedtest ;
 SubInclude TOP apps tests eventtest ;
 SubInclude TOP apps tests g2dtest ;
+SubInclude TOP apps tests hairtest ;
 SubInclude TOP apps tests imptest ;
 SubInclude TOP apps tests jobtest ;
 SubInclude TOP apps tests joytest ;
