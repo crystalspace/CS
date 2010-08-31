@@ -1487,27 +1487,34 @@ iRigidBody* Simple::SpawnCompound ()
 
 iJoint* Simple::SpawnJointed ()
 {
-  // Create and position objects.
-  iRigidBody* rb1 = SpawnBox();
+  // Create and position two rigid bodies
+  iRigidBody* rb1 = SpawnBox ();
   rb1->SetPosition (rb1->GetPosition () +
-    rb1->GetOrientation () * csVector3 (-.5, 0, 0));
-  iRigidBody* rb2 = SpawnSphere();
+    rb1->GetOrientation () * csVector3 (-.5f, 0.0f, 0.0f));
+  iRigidBody* rb2 = SpawnSphere ();
   rb2->SetPosition (rb2->GetPosition () +
-    rb2->GetOrientation () * csVector3 (.5, 0, 0));
+    rb2->GetOrientation () * csVector3 (.5f, 0.0f, 0.0f));
 
-  // Create a joint and attach bodies.
+  // Create a joint and attach the two bodies to it.
   csRef<iJoint> joint = dynamicSystem->CreateJoint ();
-  joint->Attach (rb1, rb2);
+  joint->Attach (rb1, rb2, false);
 
-  // Constrain translation.
-  joint->SetMinimumDistance (csVector3 (-1, -1, -1), false);
-  joint->SetMaximumDistance (csVector3 (1, 1, 1), false);
+  // Set the transform of the joint at the midpoint between the two attached bodies
+  csOrthoTransform jointTransform (csMatrix3 (),
+				   rb2->GetOrientation () * csVector3 (-.6f, 0.5f, 0.0f));
+  joint->SetTransform (jointTransform);
+
+  // Constrain the translations of the joint (locked on all axis).
   joint->SetTransConstraints (true, true, true, false);
 
-  // Constrain rotation.
-  joint->SetMinimumAngle (csVector3 (-PI/4.0, -PI/6.0, -PI/6.0), false);
-  joint->SetMaximumAngle (csVector3 (PI/4.0, PI/6.0, PI/6.0), false);
+  // Constrain the rotations of the joint (free along X axis, locked for Y and Z).
+  joint->SetMinimumAngle (csVector3 (1.0f, 0.0f, 0.0f), false);
+  joint->SetMaximumAngle (csVector3 (-1.0f, 0.0f, 0.0f), false);
   joint->SetRotConstraints (false, false, false, false);
+
+  // Add a motor to the joint
+  joint->SetDesiredVelocity (csVector3 (10.0f, 0.0f, 0.0f), false);
+  joint->SetMaxForce (csVector3 (0.1f, 0.0f, 0.0f), false);
 
   joint->RebuildJoint ();
 
