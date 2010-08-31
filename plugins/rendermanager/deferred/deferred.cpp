@@ -383,7 +383,7 @@ bool RMDeferred::RenderView(iView *view)
   CS::Math::Matrix4 perspectiveFixup;
   postEffects.SetupView (view, perspectiveFixup);
 
-  bool hasPostEffects = (postEffects.GetScreenTarget () != nullptr);
+  bool hasPostEffects = (postEffects.GetScreenTarget () != (iTextureHandle*)nullptr);
 
   // Setup the main context
   {
