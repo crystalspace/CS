@@ -1077,11 +1077,11 @@ struct iJoint : public virtual iBase
   SCF_INTERFACE (iJoint, 0, 0, 1);
 
   /**
-   * Set which two bodies to be affected by this joint. Set force_update to true if 
-   * you want to apply changes right away.
+   * Set the rigid bodies that will be affected by this joint. Set force_update to true if 
+   * you want to apply the changes right away.
    */
   virtual void Attach (iRigidBody* body1, iRigidBody* body2, bool force_update = true) = 0;
-  /// Get an attached body (valid values for body are 0 and 1).
+  /// Get the attached body with the given index (valid values for body are 0 and 1).
   virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
   /**
    * Set the local transformation of the joint, relative to the second body attached.
@@ -1089,7 +1089,7 @@ struct iJoint : public virtual iBase
    * value is the identity matrix, ie the joint placed at the same position than the
    * second body attached.
    *
-   * Set force_update to true if you want to apply changes right away.
+   * Set force_update to true if you want to apply the changes right away.
    */
   virtual void SetTransform (const csOrthoTransform &trans, bool force_update = true) = 0;
   /// Get the local transformation of the joint, relative to the second body attached.
@@ -1097,60 +1097,60 @@ struct iJoint : public virtual iBase
   /**
    * Set the translation constraints on the 3 axes. If true is
    * passed for an axis then the Joint will constrain all motion along
-   * that axis. If false is passed in then all motion along that
+   * that axis (ie no motion will be allowed). If false is passed in then all motion along that
    * axis is free, but bounded by the minimum and maximum distance
-   * if set. Set force_update to true if you want to apply changes 
+   * if set. Set force_update to true if you want to apply the changes 
    * right away.
    */
   virtual void SetTransConstraints (bool X, bool Y, bool Z, bool force_update = true) = 0;
-  /// True if this axis' translation is constrained.
+  /// True if this axis' translation is constrained, ie no motion allowed.
   virtual bool IsXTransConstrained () = 0;
-  /// True if this axis' translation is constrained.
+  /// True if this axis' translation is constrained, ie no motion allowed.
   virtual bool IsYTransConstrained () = 0;
-  /// True if this axis' translation is constrained.
+  /// True if this axis' translation is constrained, ie no motion allowed.
   virtual bool IsZTransConstrained () = 0;
   /**
-   * Set the minimum constrained distance between bodies. Set force_update to true if 
-   * you want to apply changes right away.
+   * Set the minimum allowed distance between the two bodies. Set force_update to true if 
+   * you want to apply the changes right away.
    */
   virtual void SetMinimumDistance (const csVector3 &min, bool force_update = true) = 0;
-  /// Get the minimum constrained distance between bodies.
+  /// Get the minimum allowed distance between the two bodies.
   virtual csVector3 GetMinimumDistance () = 0;
   /**
-   * Set the maximum constrained distance between bodies. Set force_update to true if 
-   * you want to apply changes right away.
+   * Set the maximum allowed distance between the two bodies. Set force_update to true if 
+   * you want to apply the changes right away.
    */
   virtual void SetMaximumDistance (const csVector3 &max, bool force_update = true) = 0;
-  /// Get the maximum constrained distance between bodies.
+  /// Get the maximum allowed distance between the two bodies.
   virtual csVector3 GetMaximumDistance () = 0;
   /**
    * Set the rotational constraints on the 3 axes. If true is
    * passed for an axis then the Joint will constrain all rotation around
-   * that axis. If false is passed in then all rotation around that
-   * axis is free, but bounded by the minimum and maximum distance
-   * if set. Set force_update to true if you want to apply changes 
+   * that axis (ie no motion will be allowed). If false is passed in then all rotation around that
+   * axis is free, but bounded by the minimum and maximum angle
+   * if set. Set force_update to true if you want to apply the changes 
    * right away.
    */
   virtual void SetRotConstraints (bool X, bool Y, bool Z, bool force_update = true) = 0;
-  /// True if this axis' rotation is constrained.
+  /// True if this axis' rotation is constrained, ie no motion allowed.
   virtual bool IsXRotConstrained () = 0;
-  /// True if this axis' rotation is constrained.
+  /// True if this axis' rotation is constrained, ie no motion allowed.
   virtual bool IsYRotConstrained () = 0;
-  /// True if this axis' rotation is constrained
+  /// True if this axis' rotation is constrained, ie no motion allowed.
   virtual bool IsZRotConstrained () = 0;
   /**
-   * Set the minimum constrained angle between bodies (in radian). Set force_update to true if 
-   * you want to apply changes right away.
+   * Set the minimum allowed angle between the two bodies, in radian. Set force_update to true if 
+   * you want to apply the changes right away.
    */
   virtual void SetMinimumAngle (const csVector3 &min, bool force_update = true) = 0;
-  /// Get the minimum constrained angle between bodies (in radian).
+  /// Get the minimum allowed angle between the two bodies (in radian).
   virtual csVector3 GetMinimumAngle () = 0;
   /**
-   * Set the maximum constrained angle between bodies (in radian). Set force_update to true if 
-   * you want to apply changes right away.
+   * Set the maximum allowed angle between the two bodies (in radian). Set force_update to true if 
+   * you want to apply the changes right away.
    */
   virtual void SetMaximumAngle (const csVector3 &max, bool force_update = true) = 0;
-  /// Get the maximum constrained angle between bodies (in radian).
+  /// Get the maximum allowed angle between the two bodies (in radian).
   virtual csVector3 GetMaximumAngle () = 0;
 
   //Motor parameters
@@ -1165,26 +1165,28 @@ struct iJoint : public virtual iBase
   virtual csVector3 GetBounce () = 0;
   /**
    * Apply a motor velocity to joint (for instance on wheels). Set force_update to true if 
-   * you want to apply changes right away.
+   * you want to apply the changes right away.
    */
   virtual void SetDesiredVelocity (const csVector3 &velocity, bool force_update = true) = 0;
+  /// Get the desired velocity of the joint motor.
   virtual csVector3 GetDesiredVelocity () = 0;
   /**
-   * Set the force at which the desired velocity will be achieved. Set force_update to true if 
-   * you want to apply changes right away.
+   * Set the maximum force that can be applied by the joint motor to reach the desired velocity.
+   * Set force_update to true if  you want to apply the changes right away.
    */
   virtual void SetMaxForce (const csVector3 & maxForce, bool force_update = true) = 0;
+  /// Get the maximum force that can be applied by the joint motor to reach the desired velocity.
   virtual csVector3 GetMaxForce () = 0;
   /**
-   * Set custom angular constraint axis (have sense only with rotation free minimum along 2 axis).
-   * Set force_update to true if you want to apply changes right away.
+   * Set a custom angular constraint axis (have sense only with rotation free minimum along 2 axis).
+   * Set force_update to true if you want to apply the changes right away.
    */
   virtual void SetAngularConstraintAxis (const csVector3 &axis, int body, bool force_update = true) = 0;
-  /// Get custom angular constraint axis.
+  /// Get the custom angular constraint axis.
   virtual csVector3 GetAngularConstraintAxis (int body) = 0;
   /**
-   * Rebuild joint using current setup. Return true if rebuilding operation is successful
-   * (otherwise joint won't be active).
+   * Rebuild the joint using the current setup. Return true if the rebuilding operation was successful
+   * (otherwise the joint won't be active).
    */
   virtual bool RebuildJoint () = 0;
 

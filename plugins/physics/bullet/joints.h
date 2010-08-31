@@ -51,8 +51,8 @@ private:
   bool trans_constraint_x;
   bool trans_constraint_y;
   bool trans_constraint_z;
-  csVector3 min_dist;
-  csVector3 max_dist;
+  btVector3 min_dist;
+  btVector3 max_dist;
 
   bool rot_constraint_x;
   bool rot_constraint_y;
@@ -62,7 +62,7 @@ private:
 
   csVector3 bounce;
   csVector3 desired_velocity;
-  csVector3 maxforce;
+  btVector3 maxforce;
 
   csOrthoTransform transform;
   csVector3 angular_constraints_axis[2];
@@ -98,10 +98,12 @@ public:
   virtual bool IsZTransConstrained () { return trans_constraint_z; }
   virtual void SetMinimumDistance (const csVector3& min,
 				   bool force_update = true);
-  virtual csVector3 GetMinimumDistance () { return min_dist; }
+  virtual csVector3 GetMinimumDistance ()
+  { return BulletToCS (min_dist, dynSys->inverseInternalScale); }
   virtual void SetMaximumDistance (const csVector3& max,
 				   bool force_update = true);
-  virtual csVector3 GetMaximumDistance () { return max_dist; }
+  virtual csVector3 GetMaximumDistance ()
+  { return BulletToCS (max_dist, dynSys->inverseInternalScale); }
 
   virtual void SetRotConstraints (bool x, bool y, bool z,
 				  bool force_update = true);
@@ -122,7 +124,7 @@ public:
   virtual csVector3 GetDesiredVelocity () { return desired_velocity; }
 
   virtual void SetMaxForce (const csVector3& maxForce, bool force_update = true);
-  virtual csVector3 GetMaxForce () { return maxforce; }
+  virtual csVector3 GetMaxForce ();
 
   virtual void SetAngularConstraintAxis (const csVector3& axis, int body,
 					 bool force_update = true);

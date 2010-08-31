@@ -36,13 +36,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 csBulletJoint::csBulletJoint (csBulletDynamicsSystem* dynsys)
   : scfImplementationType (this), dynSys (dynsys), jointType (BULLET_JOINT_NONE),
   constraint (0), trans_constraint_x (false), trans_constraint_y (false),
-  trans_constraint_z (false), min_dist (1000.0f), max_dist (-1000.0f),
+  trans_constraint_z (false), min_dist (1.0f, 1.0f, 1.0f), max_dist (-1.0f, -1.0f, -1.0f),
   rot_constraint_x (false), rot_constraint_y (false), rot_constraint_z (false),
   min_angle (PI / 2.0f), max_angle (- PI / 2.0f), bounce (0.0f),
-  desired_velocity (0.0f), maxforce (0.0f)
+  desired_velocity (0.0f)
 {
   angular_constraints_axis[0].Set (0.0f, 1.0f, 0.0f);
   angular_constraints_axis[1].Set (0.0f, 0.0f, 1.0f);
+  float squaredScale = dynSys->internalScale * dynSys->internalScale;
+  maxforce = btVector3 (0.1f * squaredScale,
+			0.1f * squaredScale,
+			0.1f * squaredScale);
 }
 
 csBulletJoint::~csBulletJoint ()
@@ -78,8 +82,10 @@ int csBulletJoint::ComputeBestBulletJointType ()
 
 bool csBulletJoint::RebuildJoint ()
 {
-  // TODO: use bounce, desired_velocity, maxforce, angular_constraints_axis
-  // TODO: use btGeneric6DofSpringConstraint if there is some stiffness/damping
+  // TODO: use (or deprecate?) angular_constraints_axis
+  // TODO: use btGeneric6DofSpringConstraint if there is some stiffness
+  // TODO: use m_damping
+  // TODO:: allow setting a motor with a target velocity of 0
 
   if (constraint)
   {
@@ -101,12 +107,10 @@ bool csBulletJoint::RebuildJoint ()
 	  CSToBullet (transform * bodies[1]->GetTransform (), dynSys->internalScale);
 
 	btTransform frA;
-	bodies[0]->motionState->getWorldTransform (frA);
 	frA = bodies[0]->body->getCenterOfMassTransform().inverse() * jointTransform;
 	// TODO: for some reason, the joint will be misplaced if some of the bodies are static
 
 	btTransform frB;
-	bodies[1]->motionState->getWorldTransform (frB);
 	frB = bodies[1]->body->getCenterOfMassTransform().inverse() * jointTransform;
 
 	// create joint
@@ -158,6 +162,37 @@ bool csBulletJoint::RebuildJoint ()
 	dof6->setLinearUpperLimit (maxLinear);
 	dof6->setAngularLowerLimit (minAngular);
 	dof6->setAngularUpperLimit (maxAngular);
+
+	// apply the parameters for the motor
+	if (fabs (desired_velocity[0]) > EPSILON)
+	{
+	  btRotationalLimitMotor* motor = dof6->getRotationalLimitMotor (0);
+	  motor->m_enableMotor = true;
+	  motor->m_targetVelocity = desired_velocity[0];
+	  motor->m_maxMotorForce = maxforce[0];
+	}
+	dof6->getRotationalLimitMotor (0)->m_bounce = bounce[0];
+
+	if (fabs (desired_velocity[1]) > EPSILON)
+	{
+	  printf ("Setting motor\n");
+	  btRotationalLimitMotor* motor = dof6->getRotationalLimitMotor (1);
+	  motor->m_enableMotor = true;
+	  motor->m_targetVelocity = desired_velocity[1];
+	  motor->m_maxMotorForce = maxforce[1];
+	  motor->m_damping = 0.1f;
+	}
+	dof6->getRotationalLimitMotor (1)->m_bounce = bounce[1];
+
+	if (fabs (desired_velocity[2]) > EPSILON)
+	{
+	  btRotationalLimitMotor* motor = dof6->getRotationalLimitMotor (2);
+	  motor->m_enableMotor = true;
+	  motor->m_targetVelocity = desired_velocity[2];
+	  motor->m_maxMotorForce = maxforce[2];
+	  motor->m_damping = 0.1f;
+	}
+	dof6->getRotationalLimitMotor (2)->m_bounce = bounce[2];
 
 	constraint = dof6;
       }
@@ -240,14 +275,14 @@ void csBulletJoint::SetTransConstraints (bool x, bool y, bool z, bool force_upda
 
 void csBulletJoint::SetMinimumDistance (const csVector3& min, bool force_update) 
 {
-  min_dist = min;
+  min_dist = CSToBullet (min, dynSys->internalScale);
   if (force_update)
     RebuildJoint ();
 }
 
 void csBulletJoint::SetMaximumDistance (const csVector3& max, bool force_update)
 {
-  max_dist = max;
+  max_dist = CSToBullet (max, dynSys->internalScale);
   if (force_update)
     RebuildJoint ();
 }
@@ -291,9 +326,21 @@ void csBulletJoint::SetDesiredVelocity (const csVector3& velocity, bool force_up
 
 void csBulletJoint::SetMaxForce (const csVector3& maxForce, bool force_update)
 {
-  maxforce = maxForce;
+  float squaredScale = dynSys->internalScale * dynSys->internalScale;
+  maxforce = btVector3 (maxForce.x * squaredScale,
+			maxForce.y * squaredScale,
+			maxForce.z * squaredScale);
+
   if (force_update)
     RebuildJoint ();
+}
+
+csVector3 csBulletJoint::GetMaxForce ()
+{
+  float squaredInverseScale = dynSys->inverseInternalScale * dynSys->inverseInternalScale;
+  return csVector3 (maxforce.getX () * squaredInverseScale,
+		    maxforce.getY () * squaredInverseScale,
+		    maxforce.getZ () * squaredInverseScale);
 }
 
 void csBulletJoint::SetAngularConstraintAxis (const csVector3& axis,
