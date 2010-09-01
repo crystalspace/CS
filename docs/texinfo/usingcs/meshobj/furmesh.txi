@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Furmesh, MeshObject
+@node MeshObject Furmesh, HOWTO Create Furmesh, MeshObject Watermesh, MeshObject
 @subsection Furmesh Mesh Object
 @cindex MeshObject
 @cindex 3D Sprite

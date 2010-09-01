@@ -26,6 +26,7 @@
 #include "imesh/basicskelanim.h"
 #include "imesh/bodymesh.h"
 #include "imesh/emit.h"
+#include "imesh/furmesh.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
 #include "imesh/gmeshskel2.h"
