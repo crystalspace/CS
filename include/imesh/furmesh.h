@@ -26,6 +26,18 @@
 
 #include "crystalspace.h"
 
+namespace CS
+{
+namespace Physics
+{
+namespace Bullet
+{
+  struct iDynamicSystem;
+} // namespace Bullet
+} // namespace Physics
+} // namespace CS
+
+
 /**\file
  * Fur mesh interface files
  */

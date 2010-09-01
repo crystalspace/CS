@@ -35,7 +35,6 @@
 #include "igeom.h"
 #include "igraphic.h"
 #include "imap.h"
-#include "imaterial.h"
 #include "imesh.h"
 #include "inetwork.h"
 #include "isndsys.h"
