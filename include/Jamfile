@@ -197,7 +197,6 @@ CS_MASTER_HEADERS =
       igeom
       igraphic
       imap
-	  imaterial
       imesh
       inetwork
       isndsys
