@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node HOWTO Create Furmesh, , MeshObject Furmesh, MeshObject
-@subsection Creating a Furmesh Mesh
+@node HOWTO Create Furmesh, Furmesh Mesh
+@subsubsection Creating a Furmesh Mesh
 @cindex @code{iFurMeshFactory}
 @cindex @code{iFurMeshState}
 @cindex @samp{iLoaderPlugin}
@@ -15,8 +15,8 @@ This section describes how to create a Furmesh mesh.
 
 A @samp{Furmesh} mesh object (@pxref{MeshObject Furmesh}) is a generic
 triangle mesh object used for rendering both fur and hair. Furmeshes 
-also support animation via (@pxref{FurMesh Animation}) and advanced 
-shaders via (@pxref{FurMesh Material}).
+also support animation via (@pxref{Furmesh Animation}) and advanced 
+shaders via (@pxref{Furmesh Material}).
 
 Furmeshes have different performance when used on static objects or 
 dynamic objects, and so they can be used both for rendering long hairs 
