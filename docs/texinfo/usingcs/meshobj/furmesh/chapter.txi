@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Furmesh Mesh, MeshObject
+@node Furmesh Mesh, , MeshObject Watermesh, MeshObject
 @subsection Furmesh Mesh
 @cindex Furmesh Mesh
 

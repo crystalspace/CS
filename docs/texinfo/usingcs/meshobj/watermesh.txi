@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Watermesh, MeshObject Furmesh, MeshObject Haze, MeshObject
+@node MeshObject Watermesh, Furmesh Mesh, MeshObject Haze, MeshObject
 @subsection Watermesh Mesh Object
 @cindex MeshObject
 @cindex @code{iMeshObject}

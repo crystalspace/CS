@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Furmesh Animation, Furmesh Mesh
+@node Furmesh Animation, Furmesh Material, MeshObject Furmesh, Furmesh Mesh
 @subsubsection Furmesh Animation
 @cindex @code{iFurAnimationControl}
 @cindex @code{iFurAnimatedMeshControl}

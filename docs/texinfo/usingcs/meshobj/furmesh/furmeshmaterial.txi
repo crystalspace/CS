@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Furmesh Material, Furmesh Mesh
+@node Furmesh Material, HOWTO Create Furmesh, Furmesh Animation, Furmesh Mesh
 @subsubsection Furmesh Material
 @cindex @code{iFurMeshMaterialProperties}
 
