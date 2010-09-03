@@ -27,7 +27,7 @@
 
 #include "csutil/scf_interface.h"
 
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 #include "ivaria/dynamics.h"
 
 /**\addtogroup meshplugins

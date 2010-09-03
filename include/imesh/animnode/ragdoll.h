@@ -18,8 +18,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __CS_IMESH_RAGDOLL_H__
-#define __CS_IMESH_RAGDOLL_H__
+#ifndef __CS_IMESH_ANIMNODE_RAGDOLL_H__
+#define __CS_IMESH_ANIMNODE_RAGDOLL_H__
 
 /**\file
  * Ragdoll animation node for an animated mesh.
@@ -195,4 +195,4 @@ struct iSkeletonRagdollNode : public iSkeletonAnimNode
 
 /** @} */
 
-#endif //__CS_IMESH_RAGDOLL_H__
+#endif //__CS_IMESH_ANIMNODE_RAGDOLL_H__

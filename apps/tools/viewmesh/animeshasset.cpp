@@ -28,7 +28,7 @@
 #include "imesh/object.h"
 
 #include "imesh/animesh.h"
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 
 bool AnimeshAsset::Support(iMeshWrapper* mesh)
 {

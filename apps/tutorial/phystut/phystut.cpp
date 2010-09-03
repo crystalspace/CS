@@ -774,7 +774,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug",
 		       CS::Debug::iDynamicsDebuggerManager),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.ragdoll",
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.ragdoll",
 		       CS::Animation::iSkeletonRagdollManager),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");

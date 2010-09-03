@@ -31,7 +31,7 @@
 #include "imap/ldrctxt.h"
 #include "iengine/mesh.h"
 #include "imesh/skeleton2.h"
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 
 #include "animeshldr.h"
 

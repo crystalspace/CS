@@ -18,8 +18,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __CS_IMESH_LOOKAT_H__
-#define __CS_IMESH_LOOKAT_H__
+#ifndef __CS_IMESH_ANIMNODE_LOOKAT_H__
+#define __CS_IMESH_ANIMNODE_LOOKAT_H__
 
 /**\file
  * LookAt animation node for an animated mesh.
@@ -27,7 +27,7 @@
 
 #include "csutil/scf_interface.h"
 
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 
 /**\addtogroup meshplugins
  * @{ */
@@ -224,4 +224,4 @@ struct iSkeletonLookAtListener : public virtual iBase
 
 /** @} */
 
-#endif //__CS_IMESH_LOOKAT_H__
+#endif //__CS_IMESH_ANIMNODE_LOOKAT_H__

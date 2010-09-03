@@ -20,7 +20,7 @@
 #define __CS_ANIMATION_H__
 
 #include "csutil/scf_implementation.h"
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 #include "csutil/leakguard.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"

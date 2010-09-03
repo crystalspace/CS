@@ -4,7 +4,7 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.mesh.animesh.controllers.basic</name>
+        <name>crystalspace.mesh.animesh.animnode.basic</name>
         <implementation>BasicNodesManager</implementation>
         <description>Crystal Space basic animation nodes of an animated mesh</description>
       </class>

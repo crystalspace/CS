@@ -27,7 +27,7 @@
 #include "csutil/weakref.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"
-#include "imesh/basicskelanim.h"
+#include "imesh/animnode/basicskelanim.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
 {

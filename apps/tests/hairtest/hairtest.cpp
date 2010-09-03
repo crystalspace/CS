@@ -539,9 +539,9 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     return false;
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.lookat",
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.lookat",
     CS::Animation::iSkeletonLookAtManager),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.controllers.basic",
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.basic",
     CS::Animation::iSkeletonBasicNodesManager),
     CS_REQUEST_PLUGIN("crystalspace.mesh.object.furmesh", CS::Mesh::iFurMeshType),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
@@ -609,7 +609,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
 
     // Load the ragdoll plugin
     ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager>
-      (plugmgr, "crystalspace.mesh.animesh.controllers.ragdoll");
+      (plugmgr, "crystalspace.mesh.animesh.animnode.ragdoll");
 
     if (!ragdollManager)
     {

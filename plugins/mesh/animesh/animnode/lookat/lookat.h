@@ -27,7 +27,7 @@
 #include "csutil/weakref.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"
-#include "imesh/lookat.h"
+#include "imesh/animnode/lookat.h"
 
 namespace CS {
 namespace Animation {

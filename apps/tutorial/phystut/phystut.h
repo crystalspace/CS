@@ -26,7 +26,7 @@
 #include "ivaria/dynamicsdebug.h"
 #include "ivaria/softanim.h"
 #include "imesh/animesh.h"
-#include "imesh/ragdoll.h"
+#include "imesh/animnode/ragdoll.h"
 
 class Simple : public CS::Demo::DemoApplication
 {

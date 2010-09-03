@@ -67,7 +67,7 @@
 
 #include "imesh/animesh.h"
 #include "imesh/skeleton2.h"
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 
 #include "bot.h"
 #include "command.h"

@@ -25,7 +25,7 @@
 #include "iutil/plugin.h"
 #include "imap/ldrctxt.h"
 #include "imesh/skeleton2.h"
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 
 #include "skeleton2ldr.h"
 

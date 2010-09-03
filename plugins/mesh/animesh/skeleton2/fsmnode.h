@@ -25,7 +25,7 @@
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "imesh/skeleton2.h"
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"

@@ -36,7 +36,7 @@
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "imesh/skeleton2.h"
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 #include "iutil/strset.h"
 #include "ivideo/rendermesh.h"
 #include "ivaria/decal.h"

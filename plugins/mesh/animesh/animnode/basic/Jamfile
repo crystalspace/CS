@@ -1,4 +1,4 @@
-SubDir TOP plugins mesh animesh controllers basic ;
+SubDir TOP plugins mesh animesh animnode basic ;
 
 Description basic : "Basic animation nodes plugin for an animated mesh object" ;
 Plugin basic : [ Wildcard *.cpp *.h ] ;

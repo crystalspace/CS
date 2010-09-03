@@ -21,7 +21,7 @@
 #include "csgfx/renderbuffer.h"
 #include "csgfx/vertexlistwalker.h"
 #include "imesh/skeleton2.h"
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 
 #include "animesh.h"
 

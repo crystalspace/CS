@@ -16,8 +16,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_IMESH_SKELETON2ANIM_H__
-#define __CS_IMESH_SKELETON2ANIM_H__
+#ifndef __CS_IMESH_ANIMNODE_SKELETON2ANIM_H__
+#define __CS_IMESH_ANIMNODE_SKELETON2ANIM_H__
 
 #include "csutil/scf_interface.h"
 #include "csutil/ref.h"
@@ -1075,4 +1075,4 @@ typedef CS::Animation::iSkeletonRandomNode iSkeletonRandomNode2;
 CS_DEPRECATED_METHOD_MSG("Use CS::Animation::iSkeletonRandomNodeFactory instead")
 typedef CS::Animation::iSkeletonRandomNodeFactory iSkeletonRandomNodeFactory2;
 
-#endif // __CS_IMESH_SKELETON2ANIM_H__
+#endif // __CS_IMESH_ANIMNODE_SKELETON2ANIM_H__

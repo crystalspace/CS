@@ -26,7 +26,7 @@
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
 #include "csutil/csstring.h"
-#include "imesh/ragdoll.h"
+#include "imesh/animnode/ragdoll.h"
 #include "ivaria/bullet.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)

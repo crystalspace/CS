@@ -1,3 +1,0 @@
-SubDir TOP plugins mesh animesh controllers ik ;
-
-SubInclude TOP plugins mesh animesh controllers ik physical ;

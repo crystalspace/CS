@@ -28,7 +28,7 @@
 #include "csutil/stringconv.h"
 #include "imesh/animesh.h"
 #include "imesh/object.h"
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 #include "imesh/genmesh.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"

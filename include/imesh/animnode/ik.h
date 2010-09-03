@@ -18,8 +18,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __CS_IMESH_IK_H__
-#define __CS_IMESH_IK_H__
+#ifndef __CS_IMESH_ANIMNODE_IK_H__
+#define __CS_IMESH_ANIMNODE_IK_H__
 
 /**\file
  * Inverse Kinematics animation nodes for an animated mesh.
@@ -27,7 +27,7 @@
 
 #include "csutil/scf_interface.h"
 
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 
 struct iMovable;
 struct iCamera;
@@ -261,4 +261,4 @@ struct iSkeletonIKPhysicalNode : public iSkeletonIKNode
 
 /** @} */
 
-#endif //__CS_IMESH_IK_H__
+#endif //__CS_IMESH_ANIMNODE_IK_H__
