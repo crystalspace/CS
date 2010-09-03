@@ -27,20 +27,20 @@
 #include "csutil/weakref.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"
-#include "imesh/animnode/basicskelanim.h"
+#include "imesh/animnode/speed.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
+CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
 {
 
-  class BasicNodesManager : public scfImplementation2<BasicNodesManager,
-    CS::Animation::iSkeletonBasicNodesManager, iComponent>
+  class SpeedNodeManager : public scfImplementation2<SpeedNodeManager,
+    CS::Animation::iSkeletonSpeedNodeManager, iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(BasicManager);
 
-    BasicNodesManager (iBase* parent);
+    SpeedNodeManager (iBase* parent);
 
-    //-- CS::Animation::iSkeletonBasicNodesManager
+    //-- CS::Animation::iSkeletonSpeedNodeManager
     virtual CS::Animation::iSkeletonSpeedNodeFactory* CreateSpeedNodeFactory (const char* name);
     virtual CS::Animation::iSkeletonSpeedNodeFactory* FindSpeedNodeFactory (const char* name);
     virtual void ClearSpeedNodeFactories ();
@@ -62,7 +62,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
   public:
     CS_LEAKGUARD_DECLARE(SpeedAnimNodeFactory);
 
-    SpeedNodeFactory (BasicNodesManager* manager, const char *name);
+    SpeedNodeFactory (SpeedNodeManager* manager, const char *name);
 
     //-- CS::Animation::iSkeletonSpeedNodeFactory
     virtual void AddNode (CS::Animation::iSkeletonAnimNodeFactory* factory, float speed);
@@ -74,7 +74,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
     virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
 
   private:
-    BasicNodesManager* manager;
+    SpeedNodeManager* manager;
     csString name;
     csRefArray<CS::Animation::iSkeletonAnimNodeFactory> subFactories;
     csArray<float> speedList;
@@ -132,6 +132,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
   };
 
 }
-CS_PLUGIN_NAMESPACE_END(BasicNodes)
+CS_PLUGIN_NAMESPACE_END(SpeedNode)
 
 #endif //__CS_BASICNODES_H__

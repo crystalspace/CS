@@ -238,8 +238,8 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
 		       CS::Animation::iSkeletonIKManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.lookat",
 		       CS::Animation::iSkeletonLookAtManager),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.basic",
-		       CS::Animation::iSkeletonBasicNodesManager),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.speed",
+		       CS::Animation::iSkeletonSpeedNodeManager),
     CS_REQUEST_PLUGIN ("crystalspace.decal.manager",
 		       iDecalManager),
     CS_REQUEST_END))
@@ -354,9 +354,9 @@ bool AvatarTest::Application ()
   if (!lookAtManager) return ReportError("Failed to locate iSkeletonLookAtManager plugin!");
 
   basicNodesManager =
-    csQueryRegistry<CS::Animation::iSkeletonBasicNodesManager> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonSpeedNodeManager> (GetObjectRegistry ());
   if (!basicNodesManager)
-    return ReportError("Failed to locate iSkeletonBasicNodesManager plugin!");
+    return ReportError("Failed to locate iSkeletonSpeedNodeManager plugin!");
 
   // Find a reference to the decal plugin
   decalManager = csQueryRegistry<iDecalManager> (GetObjectRegistry ());

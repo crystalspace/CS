@@ -23,7 +23,7 @@
 
 #include "cstool/csdemoapplication.h"
 #include "imesh/animesh.h"
-#include "imesh/animnode/basicskelanim.h"
+#include "imesh/animnode/speed.h"
 #include "imesh/animnode/ik.h"
 #include "imesh/animnode/lookat.h"
 #include "imesh/animnode/ragdoll.h"
@@ -100,7 +100,7 @@ private:
   // Animation node plugin managers
   csRef<CS::Animation::iSkeletonIKManager> IKManager;
   csRef<CS::Animation::iSkeletonLookAtManager> lookAtManager;
-  csRef<CS::Animation::iSkeletonBasicNodesManager> basicNodesManager;
+  csRef<CS::Animation::iSkeletonSpeedNodeManager> basicNodesManager;
   csRef<CS::Animation::iSkeletonRagdollManager> ragdollManager;
 
   // Decal textures

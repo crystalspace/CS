@@ -18,11 +18,11 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __CS_IMESH_ANIMNODE_BASIC_H__
-#define __CS_IMESH_ANIMNODE_BASIC_H__
+#ifndef __CS_IMESH_ANIMNODE_SPEED_H__
+#define __CS_IMESH_ANIMNODE_SPEED_H__
 
 /**\file
- * Basic animation nodes for an animated mesh.
+ * Speed animation nodes for an animated mesh.
  */
 
 #include "csutil/scf_interface.h"
@@ -39,12 +39,12 @@ namespace Animation
 struct iSkeletonSpeedNodeFactory;
 
 /**
- * A class to manage the creation and deletion of basic animation 
+ * A class to manage the creation and deletion of speed animation 
  * node factories.
  */
-struct iSkeletonBasicNodesManager : public virtual iBase
+struct iSkeletonSpeedNodeManager : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonBasicNodesManager, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonSpeedNodeManager, 1, 0, 0);
 
   /**
    * Create a 'speed' animation node factory of the given name.
@@ -109,4 +109,4 @@ struct iSkeletonSpeedNode : public iSkeletonAnimNode
 
 /** @} */
 
-#endif //__CS_IMESH_ANIMNODE_BASIC_H__
+#endif //__CS_IMESH_ANIMNODE_SPEED_H__

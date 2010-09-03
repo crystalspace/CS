@@ -93,7 +93,7 @@ private:
 
   // Animation node plugin managers
   csRef<CS::Animation::iSkeletonLookAtManager> lookAtManager;
-  csRef<CS::Animation::iSkeletonBasicNodesManager> basicNodesManager;
+  csRef<CS::Animation::iSkeletonSpeedNodeManager> basicNodesManager;
   csRef<CS::Animation::iSkeletonRagdollManager> ragdollManager;
 
   // GUI related

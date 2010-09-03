@@ -22,27 +22,27 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 
-#include "basic.h"
+#include "speed.h"
 #include "ivaria/reporter.h"
 #include "csgeom/math.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
+CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
 {
 
   /********************
-   *  BasicNodesManager
+   *  SpeedNodeManager
    ********************/
 
-  SCF_IMPLEMENT_FACTORY(BasicNodesManager);
+  SCF_IMPLEMENT_FACTORY(SpeedNodeManager);
 
-  CS_LEAKGUARD_IMPLEMENT(BasicNodesManager);
+  CS_LEAKGUARD_IMPLEMENT(SpeedNodeManager);
 
-  BasicNodesManager::BasicNodesManager (iBase* parent)
+  SpeedNodeManager::SpeedNodeManager (iBase* parent)
     : scfImplementationType (this, parent)
   {
   }
 
-  CS::Animation::iSkeletonSpeedNodeFactory* BasicNodesManager::CreateSpeedNodeFactory (const char* name)
+  CS::Animation::iSkeletonSpeedNodeFactory* SpeedNodeManager::CreateSpeedNodeFactory (const char* name)
   {
     csRef<CS::Animation::iSkeletonSpeedNodeFactory> newFact;
     newFact.AttachNew (new SpeedNodeFactory (this, name));
@@ -50,23 +50,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
     return speedFactories.PutUnique (name, newFact);
   }
 
-  CS::Animation::iSkeletonSpeedNodeFactory* BasicNodesManager::FindSpeedNodeFactory (const char* name)
+  CS::Animation::iSkeletonSpeedNodeFactory* SpeedNodeManager::FindSpeedNodeFactory (const char* name)
   {
    return speedFactories.Get (name, 0);
   }
 
-  void BasicNodesManager::ClearSpeedNodeFactories ()
+  void SpeedNodeManager::ClearSpeedNodeFactories ()
   {
     speedFactories.DeleteAll ();
   }
 
-  bool BasicNodesManager::Initialize (iObjectRegistry*)
+  bool SpeedNodeManager::Initialize (iObjectRegistry*)
   {
     this->object_reg = object_reg;
     return true;
   }
 
-  void BasicNodesManager::Report (int severity, const char* msg, ...) const
+  void SpeedNodeManager::Report (int severity, const char* msg, ...) const
   {
     va_list arg;
     va_start (arg, msg);
@@ -89,7 +89,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
 
   CS_LEAKGUARD_IMPLEMENT(SpeedNodeFactory);
 
-  SpeedNodeFactory::SpeedNodeFactory (BasicNodesManager* manager, const char *name)
+  SpeedNodeFactory::SpeedNodeFactory (SpeedNodeManager* manager, const char *name)
     : scfImplementationType (this), manager (manager), name (name)
   {
   }
@@ -408,4 +408,4 @@ CS_PLUGIN_NAMESPACE_BEGIN(BasicNodes)
   }
 
 }
-CS_PLUGIN_NAMESPACE_END(BasicNodes)
+CS_PLUGIN_NAMESPACE_END(SpeedNode)

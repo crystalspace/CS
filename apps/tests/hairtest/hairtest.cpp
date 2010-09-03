@@ -541,8 +541,8 @@ bool HairTest::OnInitialize (int argc, char* argv[])
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.lookat",
     CS::Animation::iSkeletonLookAtManager),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.basic",
-    CS::Animation::iSkeletonBasicNodesManager),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.speed",
+    CS::Animation::iSkeletonSpeedNodeManager),
     CS_REQUEST_PLUGIN("crystalspace.mesh.object.furmesh", CS::Mesh::iFurMeshType),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
@@ -642,9 +642,9 @@ bool HairTest::Application ()
     return ReportError("Failed to locate iLookAtManager plugin!");
 
   basicNodesManager =
-    csQueryRegistry<CS::Animation::iSkeletonBasicNodesManager> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonSpeedNodeManager> (GetObjectRegistry ());
   if (!basicNodesManager)
-    return ReportError("Failed to locate CS::Animation::iSkeletonBasicNodesManager plugin!");
+    return ReportError("Failed to locate CS::Animation::iSkeletonSpeedNodeManager plugin!");
 
   cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!cegui) return ReportError("Failed to locate CEGUI plugin!");
