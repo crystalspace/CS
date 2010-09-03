@@ -32,7 +32,7 @@ HairTest::HairTest ()
 : DemoApplication ("CrystalSpace.HairTest", "hairtest",
                      "hairtest <OPTIONS>",
                      "Tests on the animation of objects CS::Mesh::iAnimatedMesh."),
-                     avatarScene (0), avatarSceneType(MODEL_KRYSTAL),
+                     avatarScene (0), avatarSceneType(MODEL_FRANKIE),
                      dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // Use a default rotate camera

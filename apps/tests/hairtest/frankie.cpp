@@ -279,6 +279,9 @@ bool FrankieScene::CreateAvatar ()
   if (!materialWrapper)
     hairTest->ReportError("Can't find fur material!");
 
+  // Surface properties
+  animesh->GetSubMesh(0)->SetMaterial(materialWrapper);
+
   // Get plugin manager
   csRef<iPluginManager> plugmgr = 
     csQueryRegistry<iPluginManager> (hairTest->object_reg);

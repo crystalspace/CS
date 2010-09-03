@@ -456,7 +456,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       size_t controlPointsCount = (int)( (height * GetHeightFactor()) 
         / GetControlPointsDistance());
       
-      if (controlPointsCount == 0 && height > EPSILON)
+      if (controlPointsCount == 0 && (height * GetHeightFactor()) > EPSILON)
         controlPointsCount ++;
 
       if (controlPointsCount == 1)

@@ -8,6 +8,9 @@
     <texture name="frankie_densitymap">
       <file>/lib/frankie/frankie_densitymap.png</file>
     </texture>
+    <texture name="frankie_heightmap">
+      <file>/lib/frankie/frankie_heightmap.png</file>
+    </texture>
   </textures>
   <library>/lib/frankie/frankie_furmesh_factory</library>
   <library>/lib/frankie/frankie_furmesh_object</library>

@@ -8,7 +8,7 @@
 			<densitymap>frankie_densitymap</densitymap>
 			<densityfactorguidefurs>100</densityfactorguidefurs>
 			<densityfactorfurstrands>150</densityfactorfurstrands>
-			<heightmap>frankie_densitymap</heightmap>
+			<heightmap>frankie_heightmap</heightmap>
 			<heightfactor>0.1</heightfactor>
 			<controlpointsdistance>0.025</controlpointsdistance>
 			<positiondeviation>0.002</positiondeviation>
