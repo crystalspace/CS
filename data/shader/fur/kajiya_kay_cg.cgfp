@@ -1,5 +1,5 @@
 <include>
-  <variablemap variable="light diffuse[0]" destination="LightColor" />
+  <variablemap variable="light specular[0]" destination="LightColor" />
   <program>
 
 struct vertex2fragment { 
@@ -19,7 +19,7 @@ float4 main (vertex2fragment IN,
 	float3 Nn = normalize(IN.WorldNormal);
 	float3 Vn = normalize(IN.WorldView);
 
-	float tangentLight = dot(Nn, -Ln);
+	float tangentLight = dot(Nn, Ln);
 	float tangentEye = dot(Nn, Vn);
 	
 	float3 specularColor = 0.1 * pow( tangentLight * tangentEye + sin( acos( tangentLight ) ) * sin( acos( tangentEye ) ) , 60.0);	

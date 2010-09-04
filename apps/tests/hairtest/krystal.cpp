@@ -374,7 +374,7 @@ bool KrystalScene::CreateAvatar ()
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
 
   // Load fur material
-  rc = hairTest-> loader ->Load ("/lib/hairtest/fur_material.xml");
+  rc = hairTest-> loader ->Load ("/lib/hairtest/fur_material_krystal.xml");
   if (!rc.success)
     hairTest->ReportError("Can't load Fur library file!");
 

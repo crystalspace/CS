@@ -37,7 +37,7 @@ vertex2fragment main (app2vertex IN,
 	float3 Pw = Po.xyz;
 	
 	// light vector
-	OUT.LightVec = Pw - LightPos.xyz;
+	OUT.LightVec = LightPos.xyz - Pw;
 
 	// uv mapping
 	OUT.TexCoord = IN.TexCoord;

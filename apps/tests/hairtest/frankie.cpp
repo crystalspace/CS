@@ -275,7 +275,7 @@ bool FrankieScene::CreateAvatar ()
 
   // Load Marschner shader
   csRef<iMaterialWrapper> materialWrapper = 
-    hairTest->engine->FindMaterial("fur_material_frankie");
+    hairTest->engine->FindMaterial("kajiya_and_kay_frankie");
   if (!materialWrapper)
     hairTest->ReportError("Can't find fur material!");
 

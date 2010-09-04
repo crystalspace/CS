@@ -1,5 +1,5 @@
 <include>
-  <variablemap variable="light diffuse[0]" destination="LightColor" />
+  <variablemap variable="light specular[0]" destination="LightColor" />
   <variablemap variable="constants M" destination="constantsM" />  
   <program>
 

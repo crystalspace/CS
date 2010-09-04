@@ -11,7 +11,7 @@
     </texture>
   </textures>
   <materials>
-    <material name='fur_material_frankie'>
+    <material name='kajiya_and_kay_frankie'>
       <shader type='standard'>fur_cg</shader>
 	  <shadervar type="int" name="diffuse type">4</shadervar>
 	  <shadervar type="texture" name="diffuse map">frankie_col</shadervar>
