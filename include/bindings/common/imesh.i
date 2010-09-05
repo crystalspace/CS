@@ -16,13 +16,6 @@ TYPEMAP_ARGOUT_PTR(csQuaternion)
 TYPEMAP_ARGOUT_PTR(csVector3)
 APPLY_TYPEMAP_ARGOUT_PTR(csQuaternion,csQuaternion& rot)
 APPLY_TYPEMAP_ARGOUT_PTR(csVector3,csVector3& offset)
-%include "imesh/skeleton2.h"
-%include "imesh/bodymesh.h"
-%include "imesh/animnode/skeleton2anim.h"
-%include "imesh/animnode/ik.h"
-%include "imesh/animnode/lookat.h"
-%include "imesh/animnode/ragdoll.h"
-%include "imesh/animnode/speed.h"
 %clear csVector3& offset;
 %clear csQuaternion& rot;
 

@@ -105,6 +105,7 @@ SubInclude TOP plugins cscript pyivideo ;
 SubInclude TOP plugins cscript pyimap ;
 SubInclude TOP plugins cscript pycsgfx ;
 SubInclude TOP plugins cscript pycsgeom ;
+SubInclude TOP plugins cscript pyanimation ;
 
 rule PythModDepends
 {
