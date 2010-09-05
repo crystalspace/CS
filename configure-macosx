@@ -1,3 +1,0 @@
-# remove "-bundle" from configure, cs-config-1.9, 
-# scripts/cs-config/makevar.macosx, mk/jam/macosx.jam
-./configure --disable-universal-binary --without-ode --enable-debug --disable-relaytool --without-java 2>&1 | tee configure.out
