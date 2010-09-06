@@ -32,7 +32,7 @@ HairTest::HairTest ()
 : DemoApplication ("CrystalSpace.HairTest", "hairtest",
                      "hairtest <OPTIONS>",
                      "Tests on the animation of objects CS::Mesh::iAnimatedMesh."),
-                     avatarScene (0), avatarSceneType(MODEL_FRANKIE),
+                     avatarScene (0), avatarSceneType(MODEL_KRYSTAL),
                      dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // Use a default rotate camera
@@ -276,6 +276,13 @@ bool HairTest::OnEventThumbTrackEndedGuideLOD (const CEGUI::EventArgs&)
 bool HairTest::OnEventThumbTrackEndedStrandLOD (const CEGUI::EventArgs&)
 {
   avatarScene->furMesh->SetStrandLOD(sliderStrandLOD->getScrollPosition());
+
+  return true;
+}
+
+bool HairTest::OnEventThumbTrackEndedControlPointsLOD (const CEGUI::EventArgs&)
+{
+  avatarScene->furMesh->SetControlPointsLOD(sliderControlPointsLOD->getScrollPosition());
 
   return true;
 }
@@ -864,8 +871,14 @@ bool HairTest::Application ()
 
   sliderStrandLOD->setScrollPosition(1.0f);
 
-  sliderOverallLOD = (CEGUI::Scrollbar*)winMgr->
+  sliderControlPointsLOD = (CEGUI::Scrollbar*)winMgr->
     getWindow("HairTest/MainWindow/Tab/Page3/Slider3");
+
+  sliderControlPointsLOD->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+    CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedControlPointsLOD, this)); 
+
+  sliderOverallLOD = (CEGUI::Scrollbar*)winMgr->
+    getWindow("HairTest/MainWindow/Tab/Page3/Slider4");
 
   sliderOverallLOD->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
     CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedOverallLOD, this)); 

@@ -428,6 +428,7 @@ bool KrystalScene::CreateAvatar ()
 
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);
+  furMesh->SetControlPointsLOD(0.0f);
 
   furMesh->SetAnimationControl(animationPhysicsControl);
   furMesh->StartAnimationControl();

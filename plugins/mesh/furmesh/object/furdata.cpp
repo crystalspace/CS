@@ -153,6 +153,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   *  csFurData
   ********************/
 
+  size_t csFurData::GetControlPointsCount(float controlPointsLOD) const
+  {
+    if (controlPointsCount == 0)
+      return 0;
+
+    if (0.0f <= controlPointsLOD && controlPointsLOD <= 0.33f)
+      return 2;
+    else if (controlPointsLOD < 0.67f)
+      return csMax ( (size_t)(controlPointsCount / 2), (size_t)2);
+    else if (controlPointsLOD <= 1.0f)
+      return controlPointsCount;
+
+    return 0;
+  }
+
   void csFurData::Clear()
   {
     // Free control points
@@ -205,9 +220,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   }
 
   void csFurStrand::Update( const csArray<csGuideFur> &guideFurs,
-    const csArray<csGuideFurLOD> &guideFursLOD )
+    const csArray<csGuideFurLOD> &guideFursLOD, float controlPointsLOD)
   {
-    for ( size_t i = 0 ; i < controlPointsCount; i++ )
+    for ( size_t i = 0 ; i < GetControlPointsCount(controlPointsLOD); i++ )
     {
       controlPoints[i] = csVector3(0);
 

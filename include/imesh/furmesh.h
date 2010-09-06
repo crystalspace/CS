@@ -411,6 +411,12 @@ struct iFurMesh : public virtual iBase
   virtual void SetStrandLOD (float strandLOD) = 0;
 
   /**
+   * Set the LOD for the control points. 
+   * It only has three level from 0 to 1.
+   */
+  virtual void SetControlPointsLOD(float controlPointsLOD) = 0;
+
+  /**
    * Set the overall LOD. Equivalent to calling SetGuidLOD and SetStrandLOD 
    * with the same parameter.
    */

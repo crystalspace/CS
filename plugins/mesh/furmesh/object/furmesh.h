@@ -68,6 +68,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void GenerateGeometry (iView* view, iSector *room);
     virtual void SetGuideLOD(float guideLOD);
     virtual void SetStrandLOD(float strandLOD);
+    virtual void SetControlPointsLOD(float controlPointsLOD);
     virtual void SetLOD(float lod);
 
     virtual void SetAnimatedMesh(CS::Mesh::iAnimatedMesh* animesh);
@@ -103,6 +104,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties;
     csVector3* positionShift;
     csRandomGen *rng;
+    float controlPointsLOD;
+    size_t offsetIndex;
+    size_t offsetVertex;
+    size_t endVertex;
     float guideLOD;
     float strandLOD;
     size_t hairStrandsLODSize;
@@ -125,6 +130,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csZBufMode z_buf_mode;
     uint indexstart, indexend;
     // Private functions
+    size_t GetControlPointsCount(float controlPointsLOD) const;
     void SetRigidBody (iRigidBody* rigidBody);
     void GenerateGuideFurs();
     void SynchronizeGuideHairs();

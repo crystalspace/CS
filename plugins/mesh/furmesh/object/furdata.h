@@ -60,11 +60,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   // Store control points for fur strands
   struct csFurData
   {
+    size_t GetControlPointsCount(float controlPointsLOD) const;
     csVector3 *controlPoints;
-    size_t controlPointsCount;
 
     // Instead of ~csFurData
     void Clear();
+
+  protected:
+    size_t controlPointsCount;
   };
 
   // Reference to a fur strand
@@ -94,7 +97,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       &guideFurs, const csArray<csGuideFurLOD> &guideFursLOD );
 
     void Update( const csArray<csGuideFur> &guideFurs,
-      const csArray<csGuideFurLOD> &guideFursLOD );
+      const csArray<csGuideFurLOD> &guideFursLOD, float controlPointsLOD);
 
     void SetGuideHairsRefs(const csTriangle& triangle, csRandomGen *rng);
 

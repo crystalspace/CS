@@ -40,7 +40,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     iMeshObjectFactory* object_factory) : scfImplementationType (this, engine), 
     materialWrapper(0), object_reg(object_reg), object_factory(object_factory), 
     engine(engine), animesh(0), physicsControl(0), hairMeshProperties(0), 
-    positionShift(0), rng(0), guideLOD(0),strandLOD(0), hairStrandsLODSize(0), 
+    positionShift(0), rng(0), controlPointsLOD(1), offsetIndex(0), offsetVertex(0),
+    endVertex(0), guideLOD(0), strandLOD(1), hairStrandsLODSize(0), 
     physicsControlEnabled(false), isReset(false), startFrame(0), meshFactory(0), 
     meshFactorySubMesh(0), indexstart(0), indexend(0)
   {
@@ -134,7 +135,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csVector3* vertex_buffer = 
       (csVector3*)GetVertices()->Lock (CS_BUF_LOCK_READ);
 
-    for (size_t i = 0 ; i < GetVertexCount(); i ++)
+    for (size_t i = offsetVertex ; i < endVertex ; i ++)
       boundingbox.AddBoundingVertex(vertex_buffer[i]);
 
     GetVertices()->Release();
@@ -208,6 +209,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->indexend = indexend;
   }
 
+  size_t FurMesh::GetControlPointsCount(float controlPointsLOD) const
+  {
+    size_t controlPointsCount = 0;
+
+    for ( size_t i = 0 ; i < furStrands.GetSize() ; i ++ )
+      controlPointsCount += 
+      furStrands.Get(i).GetControlPointsCount(controlPointsLOD);
+
+    return controlPointsCount;
+  }
+
   void FurMesh::GenerateGeometry (iView* view, iSector *room)
   {
     if (!animesh)
@@ -276,14 +288,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if( !numberOfStrains ) 
       return;
 
-    size_t controlPointsCount = 0;
+    size_t controlPointsCount = GetControlPointsCount(1.0f);
     
-    for ( size_t i = 0 ; i < numberOfStrains ; i ++ )
-      controlPointsCount += furStrands.Get(i).controlPointsCount;
+    endVertex = 2 * controlPointsCount;
+
+    // Generate position deviation
+    positionShift = new csVector3 [ controlPointsCount ];
+
+    for ( size_t i = 0 ; i < controlPointsCount ; i ++)
+      positionShift[i] = csVector3(rng->Get() * 2 - 1, rng->Get() * 2 - 1, 
+      rng->Get() * 2 - 1) * GetPositionDeviation();
+
+    controlPointsCount = GetControlPointsCount(1.0f) + 
+      GetControlPointsCount(0.5f) + GetControlPointsCount(0.0f);
 
     // First create the factory
     SetVertexCount ( 2 * controlPointsCount );
-    SetTriangleCount( 2 * ( controlPointsCount - numberOfStrains ) );
+    SetTriangleCount( 2 * ( controlPointsCount - 3 * numberOfStrains ) );
 
     csVector3* vbuf = 
       (csVector3*)GetVertices()->Lock (CS_BUF_LOCK_NORMAL);
@@ -291,69 +312,74 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       (csVector2*)GetTexCoords()->Lock (CS_BUF_LOCK_NORMAL);
     csTriangle* ibuf = 
       (csTriangle*)GetIndices()->Lock (CS_BUF_LOCK_NORMAL);
+    csVector3* bin = 
+      (csVector3*)GetBinormals()->Lock(CS_BUF_LOCK_NORMAL);
 
-    for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
-      controlPointSum += furStrands.Get(x).controlPointsCount, x++ )
+    size_t offsetIndex = 0;
+    size_t offsetVertex = 0;
+
+    // Generate all 3 LODs
+    for (float controlPointsLOD = 1.0f ; controlPointsLOD >= 0.0f ; 
+      controlPointsLOD -= 0.5f)
     {
-      csFurStrand furStrand = furStrands.Get(x);
-      csVector2 strandUV = furStrand.uv;
-
-      for ( size_t y = 0 ; y < furStrand.controlPointsCount ; y ++ )
+      for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
+        controlPointSum += furStrands.Get(x).GetControlPointsCount(controlPointsLOD), x++ )      
       {
-        vbuf[ 2 * controlPointSum + 2 * y] = furStrand.controlPoints[y];
-        vbuf[ 2 * controlPointSum + 2 * y + 1] = 
-          furStrand.controlPoints[y] + csVector3(-0.01f,0,0);
-        uv[ 2 * controlPointSum + 2 * y] = strandUV;
-        uv[ 2 * controlPointSum + 2 * y + 1] = strandUV;
-      }
+        csFurStrand furStrand = furStrands.Get(x);
+        csVector2 strandUV = furStrand.uv;
 
-      for ( size_t y = 0 ; y < 2 * (furStrand.controlPointsCount - 1) ; y ++ )
-      {
-        if (y % 2 == 0)
-          ibuf[ 2 * (controlPointSum - x) + y ] = csTriangle( 2 * controlPointSum 
-            + y ,   2 * controlPointSum + y + 1 , 2 * controlPointSum + y + 2 );
-        else
-          ibuf[ 2 * (controlPointSum - x) + y ] = csTriangle( 2 * controlPointSum 
-            + y , 2 * controlPointSum + y + 2 , 2 * controlPointSum + y + 1 );
-      }
-    }
+        for ( size_t y = 0 ; y < furStrand.GetControlPointsCount(controlPointsLOD) ; y ++ )
+        {
+          vbuf[ offsetVertex + 2 * controlPointSum + 2 * y] = furStrand.controlPoints[y];
+          vbuf[ offsetVertex + 2 * controlPointSum + 2 * y + 1] = 
+            furStrand.controlPoints[y] + csVector3(-0.01f,0,0);
+          uv[ offsetVertex + 2 * controlPointSum + 2 * y] = strandUV;
+          uv[ offsetVertex + 2 * controlPointSum + 2 * y + 1] = strandUV;
+        }
 
-    GetVertices()->Release();
-    GetTexCoords()->Release();
-    GetIndices()->Release();
+        for ( size_t y = 0 ; y < 2 * (furStrand.GetControlPointsCount(controlPointsLOD) - 1) ; y ++ )
+        {
+          if (y % 2 == 0)
+            ibuf[ offsetIndex + 2 * (controlPointSum - x) + y ] = 
+            csTriangle( offsetVertex + 2 * controlPointSum + y ,  
+            offsetVertex + 2 * controlPointSum + y + 1 , 
+            offsetVertex + 2 * controlPointSum + y + 2 );
+          else
+            ibuf[ offsetIndex + 2 * (controlPointSum - x) + y ] = 
+            csTriangle( offsetVertex + 2 * controlPointSum + y , 
+            offsetVertex + 2 * controlPointSum + y + 2 ,
+            offsetVertex + 2 * controlPointSum + y + 1 );
+        }
 
-    // Generate color deviation and UV 
-    csVector3* bin = (csVector3*) 
-      GetBinormals()->Lock(CS_BUF_LOCK_NORMAL);
-
-    for ( size_t x = 0, controlPointSum = 0 ; x < numberOfStrains ; 
-      controlPointSum += furStrands.Get(x).controlPointsCount, x++ )
-    {
-      csFurStrand furStrand = furStrands.Get(x);
-
-      float len = csVector3::Norm(
-        furStrand.controlPoints[ furStrand.controlPointsCount - 1 ] - 
-        furStrand.controlPoints[ 0 ]);
-
-      for ( size_t y = 0 ; y < furStrand.controlPointsCount ; y ++ )
-      {
-        float sum = csVector3::Norm( furStrand.controlPoints[ y ] - 
+        // Generate color deviation and UV 
+        float len = csVector3::Norm(
+          furStrand.controlPoints[ furStrand.GetControlPointsCount(controlPointsLOD) - 1 ] - 
           furStrand.controlPoints[ 0 ]);
 
-        bin[ 2 * controlPointSum + 2 * y] = 
-          csVector3( rng->Get(), sum/len, rng->Get() );
-        bin[ 2 * controlPointSum + 2 * y + 1] = bin[ 2 * controlPointSum + 2 * y];
+        for ( size_t y = 0 ; y < furStrand.GetControlPointsCount(controlPointsLOD) ; y ++ )
+        {
+          float sum = csVector3::Norm( furStrand.controlPoints[ y ] - 
+            furStrand.controlPoints[ 0 ]);
+
+          bin[ offsetVertex + 2 * controlPointSum + 2 * y] = 
+            csVector3( rng->Get(), sum/len, rng->Get() );
+          bin[ offsetVertex + 2 * controlPointSum + 2 * y + 1] = 
+            bin[ offsetVertex + 2 * controlPointSum + 2 * y];
+        }
       }
+
+      controlPointsCount = GetControlPointsCount(controlPointsLOD);
+
+      offsetIndex += 2 * (controlPointsCount - numberOfStrains);
+      offsetVertex += 2 * controlPointsCount;
+
+      csPrintf("oI: %u\t oV: %u\n", offsetIndex, offsetVertex);
     }
 
     GetBinormals()->Release();
-
-    // Generate position deviation
-    positionShift = new csVector3 [ controlPointsCount ];
-
-    for ( size_t i = 0 ; i < controlPointsCount ; i ++)
-      positionShift[i] = csVector3(rng->Get() * 2 - 1, rng->Get() * 2 - 1, 
-        rng->Get() * 2 - 1) * GetPositionDeviation();
+    GetVertices()->Release();
+    GetTexCoords()->Release();
+    GetIndices()->Release();
 
     // Default material
     csRef<iMaterialWrapper> materialWrapper = 
@@ -394,7 +420,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     sv = svContext->GetVariableAdd (svStrings->Request ("binormal"));
     sv->SetValue (GetBinormals());
 
-    SetIndexRange(0, (uint)GetIndices()->GetElementCount());
+    SetIndexRange(0, 3 * 2 * (GetControlPointsCount(1.0f) - numberOfStrains) );
   }
 
   void FurMesh::GenerateGuideFurs()
@@ -500,8 +526,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       guideFurLOD.SetUV(guideFurs, guideFursLOD);
 
       // Generate control points
-      size_t controlPointsCount = csMin( (csMin( A.controlPointsCount,
-        B.controlPointsCount) ), C.controlPointsCount);
+      size_t controlPointsCount = csMin( (csMin( 
+        A.GetControlPointsCount(controlPointsLOD),
+        B.GetControlPointsCount(controlPointsLOD)) ), 
+        C.GetControlPointsCount(controlPointsLOD));
 
       guideFurLOD.Generate(controlPointsCount, guideFurs, guideFursLOD);
       
@@ -540,8 +568,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
           csFurStrand furStrand;
           furStrand.SetGuideHairsRefs(triangle, rng);
 
-          size_t controlPointsCount = csMin( (csMin( A.controlPointsCount,
-            B.controlPointsCount) ), C.controlPointsCount);
+          size_t controlPointsCount = csMin( (csMin( 
+            A.GetControlPointsCount(controlPointsLOD),
+            B.GetControlPointsCount(controlPointsLOD)) ), 
+            C.GetControlPointsCount(controlPointsLOD));
 
           furStrand.Generate(controlPointsCount, guideFurs, guideFursLOD);
           furStrand.SetUV(guideFurs, guideFursLOD);
@@ -566,13 +596,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     // Update guide ropes LOD
     for (size_t i = 0 ; i < guideFursLOD.GetSize(); i ++)
-      guideFursLOD.Get(i).Update(guideFurs, guideFursLOD);
+      guideFursLOD.Get(i).Update(guideFurs, guideFursLOD, controlPointsLOD);
 
     // Update fur strands
     for (size_t i = 0 ; i < hairStrandsLODSize; i ++)
-      furStrands.Get(i).Update(guideFurs, guideFursLOD);
+      furStrands.Get(i).Update(guideFurs, guideFursLOD, controlPointsLOD);
 
     StartAnimationControl();
+
+    float oldControlPointsLOD = controlPointsLOD;
+    controlPointsLOD = 1.0f;
+    SetControlPointsLOD(oldControlPointsLOD);
   }
 
   void FurMesh::TriangleAreaDensity(const csTriangle& triangle, float &area, 
@@ -598,8 +632,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       C = guideFursLOD.Get(indexC - guideFurs.GetSize());
 
     // Triangle area
-    if ( ( A.controlPointsCount == 0 ) || ( B.controlPointsCount == 0 ) ||
-      ( C.controlPointsCount == 0 ) )
+    if ( ( A.GetControlPointsCount(controlPointsLOD) == 0 ) || 
+      ( B.GetControlPointsCount(controlPointsLOD) == 0 ) ||
+      ( C.GetControlPointsCount(controlPointsLOD) == 0 ) )
     {
       area = density = 0;
       return;
@@ -682,8 +717,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::SetGuideLOD(float guideLOD)
   {
-    if ( fabs( this->guideLOD - guideLOD ) < EPSILON )
-      return;
+    // clamp
+    guideLOD = csMin( csMax(guideLOD, 0.0f), 1.0f );
 
     this->guideLOD = guideLOD;
 
@@ -703,7 +738,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       {
         guideFursLOD.Get(i).isActive = true;
         physicsControl->InitializeStrand(i + guideFurs.GetSize(), 
-          guideFursLOD.Get(i).controlPoints, guideFursLOD.Get(i).controlPointsCount);
+          guideFursLOD.Get(i).controlPoints, 
+          guideFursLOD.Get(i).GetControlPointsCount(controlPointsLOD));
       }
 
     // Print the number of control furs
@@ -716,18 +752,109 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
   void FurMesh::SetStrandLOD(float strandLOD)
   {
+    // clamp
+    strandLOD = csMin( csMax(strandLOD, 0.0f), 1.0f );
+
     this->strandLOD = strandLOD;
     size_t totalGuideHairsCount = guideFurs.GetSize() + guideFursLOD.GetSize();
     hairStrandsLODSize = totalGuideHairsCount + 
       (size_t)(strandLOD * (furStrands.GetSize() - totalGuideHairsCount));
 
     strandWidthLOD = 1 / ( strandLOD * 0.75f + 0.25f ) * GetStrandWidth();
+
+    size_t controlPointsCount = 0;
+
+    for (size_t i = 0 ; i < hairStrandsLODSize ; i ++)
+      controlPointsCount += 
+      furStrands.Get(i).GetControlPointsCount(controlPointsLOD);
+
+    endVertex = offsetVertex + 2 * controlPointsCount;
+  }
+
+  void FurMesh::SetControlPointsLOD(float controlPointsLOD)
+  {
+    // clamp
+    controlPointsLOD = csMin( csMax(controlPointsLOD, 0.0f), 1.0f );
+
+    // No changes needed
+    if (GetControlPointsCount(controlPointsLOD) == 
+      GetControlPointsCount(this->controlPointsLOD))
+      return;
+
+    float oldControlPointsLOD = this->controlPointsLOD;
+    this->controlPointsLOD = controlPointsLOD;
+
+    // Get control points LOD
+    offsetIndex = 0;
+    offsetVertex = 0;
+
+    size_t controlPointsCount = 0;
+
+    if (0.0f <= controlPointsLOD && controlPointsLOD < 0.67f)
+      controlPointsCount += GetControlPointsCount(1.0f);
+    if (0.0f <= controlPointsLOD && controlPointsLOD <= 0.33f)
+    {
+      controlPointsCount += GetControlPointsCount(0.5f);
+      offsetIndex -= 2 * furStrands.GetSize();
+    }
+
+    if (controlPointsCount)
+    {
+      offsetIndex += 2 * (controlPointsCount - furStrands.GetSize());
+      offsetVertex += 2 * controlPointsCount;
+    }
+
+    controlPointsCount = 0;
+
+    for (size_t i = 0 ; i < hairStrandsLODSize ; i ++)
+      controlPointsCount += 
+      furStrands.Get(i).GetControlPointsCount(controlPointsLOD);
+
+    endVertex = offsetVertex + 2 * controlPointsCount;
+
+    // re-init guide furs
+    float oldGuideLOD = guideLOD;
+    SetGuideLOD(0.0);
+    StopAnimationControl();
+
+    // Update guide furs
+    for (size_t i = 0 ; i < guideFurs.GetSize() ; i ++)
+    {
+      csGuideFur guideFur = guideFurs.Get(i);
+
+      size_t controlPointsCountMax = 
+        guideFur.GetControlPointsCount(oldControlPointsLOD);
+      if (!controlPointsCountMax)
+        continue;
+
+      csVector3 direction = guideFur.controlPoints[controlPointsCountMax - 1] - 
+        guideFur.controlPoints[0];
+      float distance = csVector3::Norm(direction);
+      direction.Normalize();
+
+      size_t controlPointsCount = guideFur.GetControlPointsCount(controlPointsLOD);
+      for (size_t j = 0 ; j < controlPointsCount ; j ++ )
+        guideFur.controlPoints[j] = guideFur.controlPoints[0] + direction * 
+        (j * (distance / (controlPointsCount - 1)));
+    }
+
+    // Update guide ropes LOD
+    for (size_t i = 0 ; i < guideFursLOD.GetSize(); i ++)
+      guideFursLOD.Get(i).Update(guideFurs, guideFursLOD, controlPointsLOD);
+
+    // Update fur strands
+    for (size_t i = 0 ; i < furStrands.GetSize(); i ++)
+      furStrands.Get(i).Update(guideFurs, guideFursLOD, controlPointsLOD);    
+
+    StartAnimationControl();
+    SetGuideLOD(oldGuideLOD);
   }
 
   void FurMesh::SetLOD(float lod)
   {
     SetGuideLOD(lod);
     SetStrandLOD(lod);
+    SetControlPointsLOD(lod);
   }
 
   void FurMesh::SynchronizeGuideHairs ()
@@ -737,7 +864,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     for (size_t i = 0 ; i < guideFurs.GetSize(); i ++)
       physicsControl->InitializeStrand(i,guideFurs.Get(i).controlPoints, 
-      guideFurs.Get(i).controlPointsCount);
+      guideFurs.Get(i).GetControlPointsCount(controlPointsLOD));
   }
 
   void FurMesh::SetAnimatedMesh(CS::Mesh::iAnimatedMesh* animesh)
@@ -836,16 +963,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Update guide ropes
     for (size_t i = 0 ; i < guideFurs.GetSize(); i ++)
       physicsControl->AnimateStrand(i, guideFurs.Get(i).controlPoints,
-        guideFurs.Get(i).controlPointsCount);
+        guideFurs.Get(i).GetControlPointsCount(controlPointsLOD));
 
     // Update guide ropes LOD
     for (size_t i = 0 ; i < guideFursLOD.GetSize(); i ++)
       if ( guideFursLOD.Get(i).isActive )
         physicsControl->AnimateStrand(i + guideFurs.GetSize(),
           guideFursLOD.Get(i).controlPoints, 
-          guideFursLOD.Get(i).controlPointsCount);        
+          guideFursLOD.Get(i).GetControlPointsCount(controlPointsLOD));        
       else
-        guideFursLOD.Get(i).Update(guideFurs, guideFursLOD);
+        guideFursLOD.Get(i).Update(guideFurs, guideFursLOD, controlPointsLOD);
   }
 
   void FurMesh::Update()
@@ -866,7 +993,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Then update the hair strands
     if (physicsControlEnabled)
       for (size_t i = 0 ; i < numberOfStrains; i ++)
-        furStrands.Get(i).Update(guideFurs, guideFursLOD);
+        furStrands.Get(i).Update(guideFurs, guideFursLOD, controlPointsLOD);
 
     const csOrthoTransform& tc = view -> GetCamera() ->GetTransform ();
 
@@ -885,6 +1012,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     cameraOrigin = tc.GetOrigin();
     csVector3 *posShift = positionShift;
 
+    vbuf += offsetVertex;
+    normals += offsetVertex;
+    binormals += offsetVertex;
+    tangents += offsetVertex;
+
     size_t triangleCount = 0;
 
     for ( size_t x = 0 ; x < numberOfStrains ; x ++)
@@ -894,7 +1026,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       strip = csVector3(0);
 
       csVector3 *controlPoints = furStrands.Get(x).controlPoints;
-      int controlPointsCount = furStrands.Get(x).controlPointsCount;
+      size_t controlPointsCount = 
+        furStrands.Get(x).GetControlPointsCount(controlPointsLOD);
       triangleCount += 2 * controlPointsCount - 2;
 
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
@@ -946,7 +1079,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     GetTangents()->Release();
     GetBinormals()->Release();
 
-    SetIndexRange(0, 3 * triangleCount);
+//     csPrintf("oI: %u\t oV: %u\n", offsetIndex, offsetVertex);
+
+    SetIndexRange(3 * offsetIndex, 3 * offsetIndex + 3 * triangleCount );
   }
 
   void FurMesh::SaveUVImage()

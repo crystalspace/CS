@@ -112,6 +112,7 @@ private:
   CEGUI::Scrollbar* sliderB;
   CEGUI::Scrollbar* sliderGuideLOD;
   CEGUI::Scrollbar* sliderStrandLOD;
+  CEGUI::Scrollbar* sliderControlPointsLOD;
   CEGUI::Scrollbar* sliderOverallLOD;
 
   //-- csBaseEventHandler
@@ -154,6 +155,7 @@ public:
   bool OnEventThumbTrackEndedB (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedGuideLOD (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedStrandLOD (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedControlPointsLOD (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedOverallLOD (const CEGUI::EventArgs& e);
   bool OnPhysicsButtonClicked (const CEGUI::EventArgs& e);
 

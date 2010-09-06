@@ -10,7 +10,7 @@
 			<densityfactorfurstrands>120</densityfactorfurstrands>
 			<heightmap>krystal_skull_heightmap</heightmap>
 			<heightfactor>0.4</heightfactor>
-			<controlpointsdistance>0.05</controlpointsdistance>
+			<controlpointsdistance>0.025</controlpointsdistance>
 			<positiondeviation>0.005</positiondeviation>
 			<growtangents/>
 			<mixmode>
