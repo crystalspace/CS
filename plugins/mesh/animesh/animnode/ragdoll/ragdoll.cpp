@@ -507,10 +507,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 	csOrthoTransform newTransform = boneTransform.GetInverse () * bodyTransform;
 
 	// apply the new transform to the iMovable of the animesh
-	// TODO: this does not handle the case where the iMovable has a parent
-	// -> implement iMovable::SetFullTransform() ?
 	iMovable* movable = sceneNode->GetMovable ();
-	movable->SetTransform (newTransform);
+	movable->SetFullTransform (newTransform);
 	movable->UpdateMove ();
 
 	// reset the bone offset & rotation

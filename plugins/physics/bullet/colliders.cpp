@@ -737,7 +737,7 @@ csBulletTerrainCellCollider::csBulletTerrainCellCollider (csBulletDynamicsSystem
 
   // Find the transform of the terrain
   csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (cell->GetTerrain ());
-  csOrthoTransform terrainTransform = mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
+  csOrthoTransform terrainTransform = mesh->GetMeshWrapper ()->GetMovable ()->GetFullTransform ();
 
   // Compute the transform of the cell
   csOrthoTransform cellTransform (terrainTransform);
@@ -771,7 +771,7 @@ csBulletTerrainCollider::csBulletTerrainCollider (csBulletDynamicsSystem* dynSys
 
   // Find the transform of the terrain
   csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (terrain);
-  csOrthoTransform terrainTransform = mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
+  csOrthoTransform terrainTransform = mesh->GetMeshWrapper ()->GetMovable ()->GetFullTransform ();
 
   // Create a terrain collider for each cell of the terrain
   for (size_t i = 0; i < terrain->GetCellCount (); i++)
@@ -810,7 +810,7 @@ void csBulletTerrainCollider::OnCellLoad (iTerrainCell *cell)
 {
   // Find the transform of the terrain
   csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (cell->GetTerrain ());
-  csOrthoTransform terrainTransform = mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
+  csOrthoTransform terrainTransform = mesh->GetMeshWrapper ()->GetMovable ()->GetFullTransform ();
 
   // Compute the transform of the cell
   csOrthoTransform cellTransform (terrainTransform);

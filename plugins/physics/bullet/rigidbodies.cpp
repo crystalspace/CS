@@ -1237,7 +1237,7 @@ void csBulletDefaultMoveCallback::Execute (iMovable* movable, csOrthoTransform& 
     return;
 
   // Update movable
-  movable->SetTransform (t);
+  movable->SetFullTransform (t);
   movable->UpdateMove ();
 }
 
@@ -1287,14 +1287,14 @@ void csBulletDefaultKinematicCallback::GetBodyTransform
   iMeshWrapper* mesh = body->GetAttachedMesh ();
   if (mesh)
   {
-    transform = mesh->GetMovable ()->GetTransform ();
+    transform = mesh->GetMovable ()->GetFullTransform ();
     return;
   }
 
   iLight* light = body->GetAttachedLight ();
   if (light)
   {
-    transform = light->GetMovable ()->GetTransform ();
+    transform = light->GetMovable ()->GetFullTransform ();
     return;
   }
 

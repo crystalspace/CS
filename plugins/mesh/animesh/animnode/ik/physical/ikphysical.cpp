@@ -270,7 +270,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     skeleton->GetTransformAbsSpace (effector->bone, boneRotation, boneOffset);
     csOrthoTransform boneTransform (csMatrix3 (boneRotation.GetConjugate ()), boneOffset);
     csOrthoTransform effectorTransform =
-      effector->transform * boneTransform * sceneNode->GetMovable ()->GetTransform ();
+      effector->transform * boneTransform * sceneNode->GetMovable ()->GetFullTransform ();
 
     // Compute the world transform of the constraint target
     csOrthoTransform targetTransform;

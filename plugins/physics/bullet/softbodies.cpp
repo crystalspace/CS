@@ -24,7 +24,6 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/quaternion.h"
 #include "csgeom/vector3.h"
-#include "iengine/movable.h"
 #include "iutil/strset.h"
 
 // Bullet includes.
@@ -245,6 +244,7 @@ void csBulletSoftBody::UpdateAnchorPositions ()
 
 void csBulletSoftBody::UpdateAnchorInternalTick (btScalar timeStep)
 {
+  // TODO: only called when needed
   for (csArray<AnimatedAnchor>::Iterator it = animatedAnchors.GetIterator (); it.HasNext (); )
   {
     AnimatedAnchor& anchor = it.Next ();
