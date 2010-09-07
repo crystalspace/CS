@@ -127,6 +127,14 @@ void csMovable::SetTransform (const csMatrix3 &matrix)
   obj.SetT2O (matrix);
 }
 
+void csMovable::SetFullTransform (const csReversibleTransform& t)
+{
+  if (parent == nullptr)
+    obj = t;
+  else
+    obj = t * parent->GetFullTransform ().GetInverse ();
+}
+
 void csMovable::MovePosition (const csVector3 &rel)
 {
   obj.Translate (rel);

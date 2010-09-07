@@ -273,6 +273,11 @@ public:
   }
 
   /**
+   * Set the world to object transformation.
+   */
+  virtual void SetFullTransform (const csReversibleTransform& t);
+
+  /**
    * Relative move.
    */
   void MovePosition (const csVector3& v);

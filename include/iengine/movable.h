@@ -86,7 +86,7 @@ struct iMovableListener : public virtual iBase
  */
 struct iMovable : public virtual iBase
 {
-  SCF_INTERFACE(iMovable, 2,0,0);
+  SCF_INTERFACE(iMovable, 2,0,1);
 
   /**
    * Get the scene node that this movable belongs too.
@@ -314,6 +314,14 @@ struct iMovable : public virtual iBase
    * will only set the local transform to identity.
    */
   virtual void TransformIdentity () = 0;
+
+  /**
+   * Set the world to object transformation. If there are no parent to this
+   * movable, then this method will be equivalent to SetTransform(). Otherwise,
+   * the relative transform between this movable and its parent will be updated
+   * in accordance with the given new full transform.
+   */
+  virtual void SetFullTransform (const csReversibleTransform& t) = 0;
 };
 
 /** @} */
