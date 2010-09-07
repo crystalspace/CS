@@ -70,7 +70,7 @@
 #include "imesh/object.h"
 #include "imesh/animesh.h"
 #include "imesh/skeleton2.h"
-#include "imesh/skeleton2anim.h"
+#include "imesh/animnode/skeleton2anim.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "iutil/dbghelp.h"
