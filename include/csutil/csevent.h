@@ -62,6 +62,7 @@ private:
       double doubleVal;
       char* bufferVal;
       iBase* ibaseVal;
+      void* rawPtr;
     };
     csEventAttributeType type;
     size_t dataSize;
@@ -231,6 +232,7 @@ public:
   virtual bool Add (const char *name, bool v);
   virtual bool Add (const char *name, iEvent* v);
   virtual bool Add (const char *name, iBase* v);
+  virtual bool Add (const char *name, void *v);
 
   /// Find a named event for a given type.
 #define CS_CSEVENT_FINDINT(T)						\
@@ -285,6 +287,7 @@ public:
   virtual csEventError Retrieve (const char *name, bool &v) const;
   virtual csEventError Retrieve (const char *name, csRef<iEvent> &v) const;
   virtual csEventError Retrieve (const char *name, csRef<iBase> &v) const;
+  virtual csEventError Retrieve (const char *name, void* &v) const;
 
   virtual bool AttributeExists (const char* name);
   virtual csEventAttributeType GetAttributeType (const char* name);

@@ -207,6 +207,16 @@ bool csEvent::Add (const char *name, iBase* v)
   return false;
 }
 
+bool csEvent::Add (const char *name, void* v)
+{
+  if (attributes.In (GetKeyID (name))) return false;
+  attribute* object = new attribute (csEventAttrRawPtr);
+  object->rawPtr = v;
+  attributes.Put (GetKeyID (name), object);
+  count++;
+  return true;
+}
+
 csEventError csEvent::Retrieve (const char *name, float &v) const
 {
   attribute* object = attributes.Get (GetKeyID (name), 0);
@@ -307,6 +317,21 @@ csEventError csEvent::Retrieve (const char *name, csRef<iBase> &v) const
   if (object->type == csEventAttriBase)
   {
     v = object->ibaseVal;
+    return csEventErrNone;
+  }
+  else
+  {
+    return InternalReportMismatch (object);
+  }
+}
+
+csEventError csEvent::Retrieve (const char *name, void* &v) const
+{
+  attribute* object = attributes.Get (GetKeyID (name), 0);
+  if (!object) return csEventErrNotFound;
+  if (object->type == csEventAttrRawPtr)
+  {
+    v = object->rawPtr;
     return csEventErrNone;
   }
   else

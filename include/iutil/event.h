@@ -256,7 +256,9 @@ enum csEventAttributeType
   /// An iEvent is contained.
   csEventAttrEvent,
   /// An iBase interface is contained.
-  csEventAttriBase
+  csEventAttriBase,
+  /// A raw pointer is contained.
+  csEventAttrRawPtr
 };
 
 /**
