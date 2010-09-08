@@ -278,7 +278,7 @@ enum csEventAttributeType
  */
 struct iEvent : public virtual iBase
 {
-  SCF_INTERFACE(iEvent, 2,0,0);
+  SCF_INTERFACE(iEvent, 2,1,0);
   /// Event name
   csEventID Name;
   /// Return event name
@@ -307,6 +307,7 @@ struct iEvent : public virtual iBase
   virtual bool Add (const char *name, bool v) = 0;
   virtual bool Add (const char *name, iEvent* v) = 0;
   virtual bool Add (const char *name, iBase* v) = 0;
+  virtual bool Add (const char *name, void* v) = 0;
   //@}
 
   //@{
@@ -329,6 +330,7 @@ struct iEvent : public virtual iBase
   virtual csEventError Retrieve (const char *name, bool &v) const = 0;
   virtual csEventError Retrieve (const char *name, csRef<iEvent> &v) const = 0;
   virtual csEventError Retrieve (const char *name, csRef<iBase> &v) const = 0;
+  virtual csEventError Retrieve (const char *name, void* &v) const = 0;
   //@}
 
   /// Test whether an attribute exists.
