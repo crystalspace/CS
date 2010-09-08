@@ -1146,6 +1146,7 @@ class iMovable(core.iBase):
     def IsTransformIdentity(*args): return _iengine.iMovable_IsTransformIdentity(*args)
     def IsFullTransformIdentity(*args): return _iengine.iMovable_IsFullTransformIdentity(*args)
     def TransformIdentity(*args): return _iengine.iMovable_TransformIdentity(*args)
+    def SetFullTransform(*args): return _iengine.iMovable_SetFullTransform(*args)
     scfGetVersion = staticmethod(_iengine.iMovable_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iMovable
     __del__ = lambda self : None;

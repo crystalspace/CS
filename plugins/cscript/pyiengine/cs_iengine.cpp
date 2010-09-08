@@ -31710,6 +31710,39 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iMovable_SetFullTransform(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMovable *arg1 = (iMovable *) 0 ;
+  csReversibleTransform *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMovable_SetFullTransform",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMovable, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMovable_SetFullTransform" "', argument " "1"" of type '" "iMovable *""'"); 
+  }
+  arg1 = reinterpret_cast< iMovable * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csReversibleTransform,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iMovable_SetFullTransform" "', argument " "2"" of type '" "csReversibleTransform const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iMovable_SetFullTransform" "', argument " "2"" of type '" "csReversibleTransform const &""'"); 
+  }
+  arg2 = reinterpret_cast< csReversibleTransform * >(argp2);
+  (arg1)->SetFullTransform((csReversibleTransform const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iMovable_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -38057,6 +38090,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iMovable_IsTransformIdentity", _wrap_iMovable_IsTransformIdentity, METH_VARARGS, NULL},
 	 { (char *)"iMovable_IsFullTransformIdentity", _wrap_iMovable_IsFullTransformIdentity, METH_VARARGS, NULL},
 	 { (char *)"iMovable_TransformIdentity", _wrap_iMovable_TransformIdentity, METH_VARARGS, NULL},
+	 { (char *)"iMovable_SetFullTransform", _wrap_iMovable_SetFullTransform, METH_VARARGS, NULL},
 	 { (char *)"iMovable_scfGetVersion", _wrap_iMovable_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iMovable", _wrap_delete_iMovable, METH_VARARGS, NULL},
 	 { (char *)"iMovable_swigregister", iMovable_swigregister, METH_VARARGS, NULL},

@@ -20382,6 +20382,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IsTransformIdentity = *cspacec::iMovable_IsTransformIdentity;
 *IsFullTransformIdentity = *cspacec::iMovable_IsFullTransformIdentity;
 *TransformIdentity = *cspacec::iMovable_TransformIdentity;
+*SetFullTransform = *cspacec::iMovable_SetFullTransform;
 *scfGetVersion = *cspacec::iMovable_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
