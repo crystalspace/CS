@@ -1031,12 +1031,12 @@ rule MsvcProject
   ResponseFile $(respfile) : $(MSVC.RESPEMIT.GLOBAL) : notfile : $(respdir) ;
   
   local inckeys = "include" includedebug ;
-  local incdirs = $(MSVC.INCDIRS_LITERAL) $(MSVC.INCDIRS_LITERAL.$(rawname)) ;
+  local incdirs = $(MSVC.INCDIRS_LITERAL) ;
   ResponseFile $(respfile) : "$(inckeys)|$(incdirs)" : notfile : $(respdir) ;
   ResponseFile $(respfile) : "$(inckeys)-x64|$(incdirs)" : notfile : $(respdir) ;
-
+  
   local incdir ;
-  for incdir in $(MSVC.INCDIRS) $(MSVC.INCDIRS.$(rawname))
+  for incdir in $(MSVC.INCDIRS)
   {
     if $(incdir) = "."
     {
@@ -1050,6 +1050,8 @@ rule MsvcProject
     ResponseFile $(respfile) : "$(inckeys)-x64|$(incdir)" : notfile : $(respdir) ;
   }
   
+  # Per-project include dirs are handled in the IncludeDir rule
+
   if ! [ Property msvcgen : templatedir ]
   {
     exit "Error: You must invoke MsvcGenTemplateDir for project generation." ;
@@ -2019,24 +2021,48 @@ rule IncludeDir
 
   if ! [ IsElem transient : $(options) ]
   {
-    local tag = "INCDIRS" ;
-    if [ IsElem literal : $(options) ] { tag = "INCDIRS_LITERAL" ; }
-
-    if $(dir)
-    {
-      dir = [ ConcatDirs $(dir) ] ;
-    }
-    else
-    {
-      dir = "." ;
-    }
-
     if $(target)
     {
-      MSVC.$(tag).$(target) += $(dir) ;
+      # IncludeDir for a target must be called _after_ the target was set up,
+      # hence we can assume a project response file is present
+      local inckeys = "include" includedebug ;
+      local relpath = [ Property msvcgen : relpath$(MSVC_VERSION) ] ;
+      local respfile = $($(target)_PRJ_RESPFILE) ;
+      local respdir = $($(target)_PRJ_RESPDIR) ;
+      if [ IsElem literal : $(options) ]
+      {
+	if $(dir)
+	{
+	  dir = [ ConcatDirs $(dir) ] ;
+	}
+	else
+	{
+	  dir = "." ;
+	}
+
+	ResponseFile $(respfile) : "$(inckeys)|$(dir)" : notfile : $(respdir) ;
+	ResponseFile $(respfile) : "$(inckeys)-x64|$(dir)" : notfile : $(respdir) ;
+      }
+      else
+      {
+	if $(dir)
+	{
+	  dir = [ ConcatDirs $(relpath) $(SUBDIR_TOKENS) $(dir) ] ;
+	}
+	else
+	{
+	  dir = [ ConcatDirs $(relpath) $(SUBDIR_TOKENS) ] ;
+	}
+
+	ResponseFile $(respfile) : "$(inckeys)|$(dir)" : notfile : $(respdir) ;
+	ResponseFile $(respfile) : "$(inckeys)-x64|$(dir)" : notfile : $(respdir) ;
+      }
+      
     }
     else
     {
+      local tag = "INCDIRS" ;
+      if [ IsElem literal : $(options) ] { tag = "INCDIRS_LITERAL" ; }
       MSVC.$(tag) += $(dir) ;
     }
   }
