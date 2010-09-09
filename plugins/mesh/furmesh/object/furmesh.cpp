@@ -397,9 +397,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     bufferholder->SetRenderBuffer (CS_BUFFER_INDEX, GetIndices());
     bufferholder->SetRenderBuffer (CS_BUFFER_POSITION, GetVertices());
     bufferholder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, GetTexCoords());
-    bufferholder->SetRenderBuffer (CS_BUFFER_NORMAL, GetNormals());
     bufferholder->SetRenderBuffer (CS_BUFFER_BINORMAL, GetBinormals());
-    bufferholder->SetRenderBuffer (CS_BUFFER_TANGENT, GetTangents());
+    if (!GetSmallFur())
+    {
+      bufferholder->SetRenderBuffer (CS_BUFFER_NORMAL, GetNormals());
+      bufferholder->SetRenderBuffer (CS_BUFFER_TANGENT, GetTangents());
+    }
+    else
+    {
+      bufferholder->SetRenderBuffer (CS_BUFFER_NORMAL, GetTangents());
+      bufferholder->SetRenderBuffer (CS_BUFFER_TANGENT, GetNormals());
+    }
 
     svContext.AttachNew (new csShaderVariableContext);
     csShaderVariable* sv;
@@ -408,14 +416,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     sv = svContext->GetVariableAdd (svStrings->Request ("position"));
     sv->SetValue (GetVertices());
 
-    sv = svContext->GetVariableAdd (svStrings->Request ("normal"));
-    sv->SetValue (GetNormals());
-
     sv = svContext->GetVariableAdd (svStrings->Request ("texture coordinate 0"));
     sv->SetValue (GetTexCoords());
 
+    sv = svContext->GetVariableAdd (svStrings->Request ("normal"));
+    if (!GetSmallFur())
+      sv->SetValue (GetNormals());
+    else
+      sv->SetValue (GetTangents());
+
     sv = svContext->GetVariableAdd (svStrings->Request ("tangent"));
-    sv->SetValue (GetTangents());
+    if (!GetSmallFur())
+      sv->SetValue (GetTangents());
+    else
+      sv->SetValue (GetNormals());
 
     sv = svContext->GetVariableAdd (svStrings->Request ("binormal"));
     sv->SetValue (GetBinormals());
@@ -1021,7 +1035,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     for ( size_t x = 0 ; x < numberOfStrains ; x ++)
     {
-      int y = 0;
+      size_t y = 0;
       tangent = csVector3(0);
       strip = csVector3(0);
 
@@ -1036,15 +1050,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         firstPoint = *controlPoints + (*posShift);
         secondPoint = *(controlPoints + 1) + (*posShift);
 
-        csMath3::CalcNormal(binormal, firstPoint, secondPoint, cameraOrigin);
+        csMath3::CalcNormal(binormal, secondPoint, firstPoint, cameraOrigin);
         binormal.Normalize();
         strip = strandWidthLOD * binormal * ((*binormals).z + 1.0f) * 
           (0.5f * (1.0f - (*binormals).y) + 0.75f );
 
         (*vbuf) = firstPoint;
-        (*(vbuf + 1)) = firstPoint + strip;
+        (*(vbuf + 1)) = firstPoint - strip;
 
-        tangent = firstPoint - secondPoint;
+        tangent = secondPoint - firstPoint;
         tangent.Normalize();
         normal.Cross(tangent, binormal);
 
@@ -1058,7 +1072,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       if (controlPointsCount)
       {
         (*vbuf) = *controlPoints + (*posShift);
-        (*(vbuf + 1)) = *controlPoints + strip + (*posShift);
+        (*(vbuf + 1)) = *controlPoints - strip + (*posShift);
 
         (*tangents) = tangent;
         (*(tangents + 1)) = tangent;

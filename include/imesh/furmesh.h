@@ -246,6 +246,16 @@ public:
   virtual void SetGrowTangent (bool growTangent) = 0;
 
   /**
+   * Check if we grow small fur (tangents are reversed with normals)
+   */
+  virtual bool GetSmallFur () const = 0;
+
+  /**
+   * Set if fur grows based on tangent direction
+   */
+  virtual void SetSmallFur (bool smallFur) = 0;
+
+  /**
    * Get mixmode
    */
   virtual uint GetMixmode () const = 0;

@@ -21,7 +21,8 @@
 	  <shadervar type="vector3" name="fur color">0.51, 0.34, 0.25</shadervar -->
 	  <shadervar type="texture" name="texture map">krystal_skull_texturemap</shadervar>
 	  <shadervar type="texture" name="color map">krystal_skull_colormap</shadervar> 
-	  <shadervar type="int" name="marschner" /> 
+	  <shadervar type="float" name="Ks">0.2</shadervar>
+	  <shadervar type="int" name="kajiya kay" /> 
     </material>
   </materials>
   <sounds/>

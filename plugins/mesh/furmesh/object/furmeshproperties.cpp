@@ -36,7 +36,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     strandWidth(0.0015f), displacement(0.02f), densityMap(0), 
     densityFactorGuideFurs(10), densityFactorFurStrands(100), heightMap(0),
     heightFactor(0.5f), controlPointsDistance(0.05f), positionDeviation(0.01f), 
-    growTangents(false), mixmode(0), priority(7), z_buf_mode(CS_ZBUF_USE)
+    growTangents(false), smallFur(false), mixmode(0), priority(7), 
+    z_buf_mode(CS_ZBUF_USE)
   {
   }
 
@@ -142,6 +143,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void FurMeshState::SetGrowTangent(bool growTangents)
   {
     this->growTangents = growTangents;
+  }
+
+  bool FurMeshState::GetSmallFur() const
+  {
+    return smallFur;
+  }
+
+  void FurMeshState::SetSmallFur(bool smallFur)
+  {
+    this->smallFur = smallFur;
   }
 
   uint FurMeshState::GetMixmode () const

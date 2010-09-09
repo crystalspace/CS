@@ -273,7 +273,7 @@ bool FrankieScene::CreateAvatar ()
   if (!rc.success)
     hairTest->ReportError("Can't load Fur library file!");
 
-  // Load Marschner shader
+  // Load material shader
   csRef<iMaterialWrapper> materialWrapper = 
     hairTest->engine->FindMaterial("kajiya_and_kay_frankie");
   if (!materialWrapper)

@@ -1,5 +1,6 @@
 <include>
   <variablemap variable="light specular[0]" destination="LightColor" />
+  <variablemap variable="Ks" destination="Ks" />
   <program>
 
 struct vertex2fragment { 
@@ -11,6 +12,7 @@ struct vertex2fragment {
 };
 
 float4 main (vertex2fragment IN,
+			uniform float Ks,
 			uniform float3 LightColor) : COLOR
 {
 	float4 OUT = float4(0, 0, 0, 1);
@@ -22,9 +24,10 @@ float4 main (vertex2fragment IN,
 	float tangentLight = dot(Nn, Ln);
 	float tangentEye = dot(Nn, Vn);
 	
-	float3 specularColor = 0.1 * pow( tangentLight * tangentEye + sin( acos( tangentLight ) ) * sin( acos( tangentEye ) ) , 60.0);	
-	specularColor = max(specularColor, 0.0);
+	float3 specularColor = pow( tangentLight * tangentEye + sin( acos( tangentLight ) ) * sin( acos( tangentEye ) ) , 60.0);	
+	specularColor *= Ks;
 	specularColor *= LightColor;
+	specularColor = max (0.0, specularColor);
 	
 	OUT.xyz = specularColor;
 	return OUT;

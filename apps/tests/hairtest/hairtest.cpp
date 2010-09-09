@@ -764,7 +764,7 @@ bool HairTest::Application ()
 
   // This light is for the background
   csRef<iLight> light = 
-    engine->CreateLight(0, csVector3(10, 10, 0), 9000, csColor (1));
+    engine->CreateLight(0, csVector3(10, 10, -10), 9000, csColor (1));
   light->SetAttenuationMode (CS_ATTN_NONE);
   room->GetLights()->Add (light);
 

@@ -13,8 +13,9 @@
   <materials>
     <material name='kajiya_and_kay_frankie'>
       <shader type='standard'>fur_cg</shader>
-	  <shadervar type="int" name="diffuse type">4</shadervar>
+	  <shadervar type="int" name="diffuse type">1</shadervar>
 	  <shadervar type="texture" name="diffuse map">frankie_col</shadervar>
+	  <shadervar type="float" name="Ks">0.2</shadervar>
 	  <shadervar type="int" name="kajiya kay" />
     </material>
   </materials>

@@ -256,6 +256,12 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
         meshstate->SetGrowTangent(true);
       }
       break;
+    case XMLTOKEN_SMALLFUR:
+      {
+        CHECK_MESH(meshstate);
+        meshstate->SetSmallFur(true);
+      }
+      break;
     case XMLTOKEN_MIXMODE:
       {
         uint mixmode;

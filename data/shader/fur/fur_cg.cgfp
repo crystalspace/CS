@@ -49,15 +49,13 @@ float4 main (vertex2fragment IN,
 
 	if (DiffuseType == 0)	//	no diffuse light
 		diffuseColor = 0;
-	else if (DiffuseType == 1)	//	test diffuse light
+	else if (DiffuseType == 1)	//	normal diffuse light
 		diffuseColor.rgb = dot(Nn, Ln) * LightColor;
 	else if (DiffuseType == 2)	//	marschner diffuse from NVIDIA Nalu
 		diffuseColor.rgb = sqrt(max(0.0001, 1 - sin_qi * sin_qi)) * LightColor;
-	else if (DiffuseType == 3)	//	a test diffuse that looks good on the current hair color
-		diffuseColor.rgb = LightColor * FurColor.xyz * FurColor.xyz;
-	else if (DiffuseType == 4)	//	Kajiya and Kay diffuse
+	else if (DiffuseType == 3)	//	Kajiya and Kay diffuse
 		diffuseColor.rgb = sin(acos(sin_qi)) * LightColor;
-	else // ambiental instead of diffuse
+	else // ambient instead of diffuse
 		diffuseColor.rgb = LightColor;
 
 	// No specular color

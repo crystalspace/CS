@@ -57,6 +57,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetPositionDeviation(float positionDeviation);
     virtual bool GetGrowTangent() const;
     virtual void SetGrowTangent(bool growTangent);
+    virtual bool GetSmallFur() const;
+    virtual void SetSmallFur(bool smallFur);
     virtual uint GetMixmode () const;
     virtual void SetMixmode (uint mode);
     virtual uint GetPriority () const;
@@ -75,6 +77,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float controlPointsDistance;
     float positionDeviation;
     bool growTangents;
+    bool smallFur;
     uint mixmode;
     uint priority;
     csZBufMode z_buf_mode;
