@@ -1232,6 +1232,7 @@ csEventAttrFloat = _core.csEventAttrFloat
 csEventAttrDatabuffer = _core.csEventAttrDatabuffer
 csEventAttrEvent = _core.csEventAttrEvent
 csEventAttriBase = _core.csEventAttriBase
+csEventAttrRawPtr = _core.csEventAttrRawPtr
 class iEvent(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"

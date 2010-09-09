@@ -29497,6 +29497,47 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iEvent_Add__SWIG_6(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iEvent *arg1 = (iEvent *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *arg3 = (void *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEvent_Add",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEvent_Add" "', argument " "1"" of type '" "iEvent *""'"); 
+  }
+  arg1 = reinterpret_cast< iEvent * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iEvent_Add" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_ConvertPtr(obj2,SWIG_as_voidptrptr(&arg3), 0, 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iEvent_Add" "', argument " "3"" of type '" "void *""'"); 
+  }
+  result = (bool)(arg1)->Add((char const *)arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iEvent_Add(PyObject *self, PyObject *args) {
   int argc;
   PyObject *argv[5];
@@ -29586,6 +29627,24 @@ SWIGINTERN PyObject *_wrap_iEvent_Add(PyObject *self, PyObject *args) {
       int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
+        void *ptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &ptr, 0, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iEvent_Add__SWIG_6(self, args);
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iEvent, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
         int res = SWIG_AsCharPtrAndSize(argv[2], 0, NULL, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
@@ -29627,7 +29686,8 @@ fail:
     "    Add(iEvent *,char const *,char const *)\n"
     "    Add(iEvent *,char const *,void const *,size_t)\n"
     "    Add(iEvent *,char const *,iEvent *)\n"
-    "    Add(iEvent *,char const *,iBase *)\n");
+    "    Add(iEvent *,char const *,iBase *)\n"
+    "    Add(iEvent *,char const *,void *)\n");
   return NULL;
 }
 
@@ -30288,6 +30348,52 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iEvent_Retrieve__SWIG_5(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iEvent *arg1 = (iEvent *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void **arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  csEventError result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEvent_Retrieve",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEvent_Retrieve" "', argument " "1"" of type '" "iEvent const *""'"); 
+  }
+  arg1 = reinterpret_cast< iEvent * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iEvent_Retrieve" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_p_void,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iEvent_Retrieve" "', argument " "3"" of type '" "void *&""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iEvent_Retrieve" "', argument " "3"" of type '" "void *&""'"); 
+  }
+  arg3 = reinterpret_cast< void ** >(argp3);
+  result = (csEventError)((iEvent const *)arg1)->Retrieve((char const *)arg2,*arg3);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iEvent_Retrieve(PyObject *self, PyObject *args) {
   int argc;
   PyObject *argv[5];
@@ -30370,6 +30476,24 @@ SWIGINTERN PyObject *_wrap_iEvent_Retrieve(PyObject *self, PyObject *args) {
       }
     }
   }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iEvent, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_p_void, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iEvent_Retrieve__SWIG_5(self, args);
+        }
+      }
+    }
+  }
   if (argc == 4) {
     int _v;
     void *vptr = 0;
@@ -30401,7 +30525,8 @@ fail:
     "    Retrieve(iEvent const *,char const *,uint64 &)\n"
     "    Retrieve(iEvent const *,char const *,void const *&,size_t &)\n"
     "    Retrieve(iEvent const *,char const *,csRef< iEvent > &)\n"
-    "    Retrieve(iEvent const *,char const *,csRef< iBase > &)\n");
+    "    Retrieve(iEvent const *,char const *,csRef< iBase > &)\n"
+    "    Retrieve(iEvent const *,char const *,void *&)\n");
   return NULL;
 }
 
@@ -62253,6 +62378,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "csEventAttrDatabuffer",SWIG_From_int(static_cast< int >(csEventAttrDatabuffer)));
   SWIG_Python_SetConstant(d, "csEventAttrEvent",SWIG_From_int(static_cast< int >(csEventAttrEvent)));
   SWIG_Python_SetConstant(d, "csEventAttriBase",SWIG_From_int(static_cast< int >(csEventAttriBase)));
+  SWIG_Python_SetConstant(d, "csEventAttrRawPtr",SWIG_From_int(static_cast< int >(csEventAttrRawPtr)));
   SWIG_Python_SetConstant(d, "csKeyEventTypeUp",SWIG_From_int(static_cast< int >(csKeyEventTypeUp)));
   SWIG_Python_SetConstant(d, "csKeyEventTypeDown",SWIG_From_int(static_cast< int >(csKeyEventTypeDown)));
   SWIG_Python_SetConstant(d, "csMouseEventTypeMove",SWIG_From_int(static_cast< int >(csMouseEventTypeMove)));

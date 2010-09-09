@@ -22465,6 +22465,7 @@ sub csEventAttrFloat () { $cspacec::csEventAttrFloat }
 sub csEventAttrDatabuffer () { $cspacec::csEventAttrDatabuffer }
 sub csEventAttrEvent () { $cspacec::csEventAttrEvent }
 sub csEventAttriBase () { $cspacec::csEventAttriBase }
+sub csEventAttrRawPtr () { $cspacec::csEventAttrRawPtr }
 sub csKeyEventTypeUp () { $cspacec::csKeyEventTypeUp }
 sub csKeyEventTypeDown () { $cspacec::csKeyEventTypeDown }
 sub csMouseEventTypeMove () { $cspacec::csMouseEventTypeMove }
