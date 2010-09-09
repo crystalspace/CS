@@ -101,6 +101,7 @@ private:
   csRefArrayObject< ::iRigidBody> dynamicBodies;
   csRefArrayObject<iRigidBody> colliderBodies;
   csRefArrayObject<iSoftBody> softBodies;
+  csWeakRefArray<csBulletSoftBody> anchoredSoftBodies;
   csRefArray<iJoint> joints;
   csRefArray<iPivotJoint> pivotJoints;
   csRefArray<iTerrainCollider> terrainColliders;

@@ -54,6 +54,8 @@ csBulletSoftBody::~csBulletSoftBody ()
     static_cast<btSoftRigidDynamicsWorld*> (dynSys->bulletWorld);
   softWorld->removeSoftBody (body);
   delete body;
+
+  dynSys->anchoredSoftBodies.Delete (this);
 }
 
 void csBulletSoftBody::DebugDraw (iView* rview)
@@ -127,6 +129,7 @@ void csBulletSoftBody::AnchorVertex (size_t vertexIndex,
 {
   AnimatedAnchor anchor (vertexIndex, controller);
   animatedAnchors.Push (anchor);
+  dynSys->anchoredSoftBodies.Push (this);
 }
 
 void csBulletSoftBody::UpdateAnchor (size_t vertexIndex, csVector3& position)
@@ -163,6 +166,7 @@ void csBulletSoftBody::RemoveAnchor (size_t vertexIndex)
     if (anchor.vertexIndex == vertexIndex)
     {
       animatedAnchors.DeleteIndex (index);
+      dynSys->anchoredSoftBodies.Delete (this);
       return;
     }
   }
@@ -244,7 +248,6 @@ void csBulletSoftBody::UpdateAnchorPositions ()
 
 void csBulletSoftBody::UpdateAnchorInternalTick (btScalar timeStep)
 {
-  // TODO: only called when needed
   for (csArray<AnimatedAnchor>::Iterator it = animatedAnchors.GetIterator (); it.HasNext (); )
   {
     AnimatedAnchor& anchor = it.Next ();

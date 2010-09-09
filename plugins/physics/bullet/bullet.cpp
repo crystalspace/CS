@@ -300,7 +300,7 @@ void csBulletDynamicsSystem::CheckCollisions ()
 void csBulletDynamicsSystem::Step (float stepsize)
 {
   // Update the soft body anchors
-  for (csRefArrayObject<iSoftBody>::Iterator it = softBodies.GetIterator (); it.HasNext (); )
+  for (csWeakRefArray<csBulletSoftBody>::Iterator it = anchoredSoftBodies.GetIterator (); it.HasNext (); )
   {
     csBulletSoftBody* body = static_cast<csBulletSoftBody*> (it.Next ());
     body->UpdateAnchorPositions ();
@@ -1018,11 +1018,12 @@ void csBulletDynamicsSystem::RemoveSoftBody (iSoftBody* body)
   softWorld->removeSoftBody (csBody->body);
 
   softBodies.Delete (body);
+  anchoredSoftBodies.Delete (csBody);
 }
 
 void csBulletDynamicsSystem::UpdateSoftBodies (btScalar timeStep)
 {
-  for (csRefArrayObject<iSoftBody>::Iterator it = softBodies.GetIterator (); it.HasNext (); )
+  for (csWeakRefArray<csBulletSoftBody>::Iterator it = anchoredSoftBodies.GetIterator (); it.HasNext (); )
   {
     csBulletSoftBody* body = static_cast<csBulletSoftBody*> (it.Next ());
     body->UpdateAnchorInternalTick (timeStep);
