@@ -771,8 +771,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     this->strandLOD = strandLOD;
     size_t totalGuideHairsCount = guideFurs.GetSize() + guideFursLOD.GetSize();
-    hairStrandsLODSize = totalGuideHairsCount + 
-      (size_t)(strandLOD * (furStrands.GetSize() - totalGuideHairsCount));
+
+    size_t minFurCount = csMin(furStrands.GetSize(), totalGuideHairsCount);
+
+    hairStrandsLODSize = (size_t)(minFurCount + 
+      (int)(strandLOD * ((int)furStrands.GetSize() - (int)minFurCount)));
 
     strandWidthLOD = 1 / ( strandLOD * 0.75f + 0.25f ) * GetStrandWidth();
 
