@@ -185,13 +185,9 @@ static bool SimpleEventHandler (iEvent& ev)
 {
   if (simple)
   {
-    if (ev.Name == csevProcess(simple->object_reg))
+    if (ev.Name == csevFrame (simple->object_reg))
     {
       simple->SetupFrame ();
-      return true;
-    }
-    else if (ev.Name == csevFinalProcess(simple->object_reg))
-    {
       simple->FinishFrame ();
       return true;
     }
@@ -223,8 +219,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
+  Process = csevFrame (object_reg);
   KeyboardDown = csevKeyboardDown (object_reg);
 
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
@@ -343,13 +338,17 @@ bool Simple::Initialize ()
   {
     iSector *room = engine->GetSectors ()->FindByName ("room");
     targetView = csPtr<iView> (new csView (engine, g3d));
+    targetView->GetCamera ()->SetViewportSize (256, 256);
     targetView->GetCamera ()->GetTransform ().SetOrigin (csVector3 (-0.5,0,0));
     targetView->GetCamera ()->SetSector (room);
     targetView->SetRectangle (0, 0, 256, 256);
     targetView->GetCamera ()->SetPerspectiveCenter (128, 128);
     targetView->GetCamera ()->SetFOVAngle (targetView->GetCamera ()->GetFOVAngle(), 256);
 
-    rm->RegisterRenderTarget (targetTexture->GetTextureHandle(), targetView);
+    csRef<iRenderManagerTargets> targets =
+      scfQueryInterface<iRenderManagerTargets> (rm);
+    if (targets)
+      targets->RegisterRenderTarget (targetTexture->GetTextureHandle(), targetView);
   }
 
   /*iMaterialWrapper* ProcMat = ProcTexture->Initialize (object_reg, engine,
@@ -400,7 +399,7 @@ bool Simple::Initialize ()
 
   genmesh_resolution = 15;
   genmesh_scale.Set (6, 6, 0);
-  CreateGenMesh (ProcMat);
+  CreateGenMesh (/*ProcMat*/targetMat);
 
   csRef<iLight> light;
   light = engine->CreateLight (0, csVector3 (0, 0, 0), 20,
@@ -489,6 +488,7 @@ void Simple::FinishFrame ()
 {
   g3d->FinishDraw ();
   
+#if 0
   g3d->BeginDraw(CSDRAW_2DGRAPHICS);
   int fontHeight = font->GetTextHeight();
   int y = g3d->GetDriver2D()->GetHeight() - fontHeight;
@@ -501,6 +501,7 @@ void Simple::FinishFrame ()
     csString().Format ("current target: %s",
     ProcTexture->GetCurrentTarget()));
   g3d->FinishDraw ();
+#endif
   
   g3d->Print (0);
 }
