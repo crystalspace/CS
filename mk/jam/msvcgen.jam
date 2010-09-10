@@ -2063,6 +2063,14 @@ rule IncludeDir
     {
       local tag = "INCDIRS" ;
       if [ IsElem literal : $(options) ] { tag = "INCDIRS_LITERAL" ; }
+      if $(dir)
+      {
+	dir = [ ConcatDirs $(dir) ] ;
+      }
+      else
+      {
+	dir = "." ;
+      }
       MSVC.$(tag) += $(dir) ;
     }
   }
