@@ -87,11 +87,6 @@ SubInclude TOP libs csplugincommon ;
 
 SubDir TOP libs ;
 
-if [ Property build : projgen ] = msvc
-{
-  IncludeDir  $(CSLIB.ROOT) csutil ptmalloc sysdeps win32 : crystalspace ;
-}
-
 Description crystalspace : "Crystal Space library" ;
 Library crystalspace : $(CSLIB.SOURCES) : shared notest ;
 UnitTest crystalspace : $(CSLIB.TESTS) ;
@@ -122,6 +117,11 @@ if $(CSLIB.DEPENDS)
 if $(CSLIB.EXTERNAL_LIBS)
 {
   ExternalLibs crystalspace : $(CSLIB.EXTERNAL_LIBS) ;
+}
+
+if [ Property build : projgen ] = msvc
+{
+  IncludeDir  csutil ptmalloc sysdeps win32 : crystalspace ;
 }
 
 # NOTE: Currently shared libs require that the "Library" statements appear in
