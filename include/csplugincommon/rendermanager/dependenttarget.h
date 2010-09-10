@@ -314,8 +314,11 @@ namespace RenderManager
       RenderTargetInfo* targetInfo;
       targetInfo = targets.GetElementPointer (textureHandle);
       handleTarget = (targetInfo != 0);
-      targetInfo = oneTimeTargets.GetElementPointer (textureHandle);
-      handleTarget |= (targetInfo != 0);
+      if (!targetInfo)
+      {
+	targetInfo = oneTimeTargets.GetElementPointer (textureHandle);
+	handleTarget |= (targetInfo != 0);
+      }
 
       // Dispatch upwards
       if (!handleTarget && sv)
