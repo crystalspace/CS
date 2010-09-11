@@ -596,7 +596,7 @@ bool ParticlesAsset::GetPropValue(csArray<Property>& properties, uint indx, T& v
       }
     default:
       {
-        CS_ASSERT_MSG(false, "Unhandled property type!");
+        CS_ASSERT_MSG("Unhandled property type!", false);
         return false;
       }
     }
