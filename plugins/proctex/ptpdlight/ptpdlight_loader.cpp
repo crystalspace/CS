@@ -89,13 +89,13 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
   if (!LevelLoader) 
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 0, "No level loader");
-    return false;
+    return 0;
   }
   csRef<iSyntaxService> synsrv = csQueryRegistry<iSyntaxService> (object_reg);
   if (!synsrv) 
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 0, "No syntax services");
-    return false;
+    return 0;
   }
 
   csRef<iTextureLoaderContext> ctx;
@@ -185,7 +185,7 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
             break;
           default:
             synsrv->ReportBadToken (child);
-            return false;
+            return 0;
         }
       }
     }

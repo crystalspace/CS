@@ -60,13 +60,13 @@ static const WORD ansiToWindows[8] =
 static int WriteConsoleUTF8 (HANDLE hCon, const utf8_char* inStr, size_t inLen)
 {
   // According to MSDN, WriteConsole() takes at most 64K characters
-  static const size_t maxConsoleWrite = 64*1024;
+  static const DWORD maxConsoleWrite = 64*1024;
 
   wchar_t wideBuf[maxConsoleWrite];
   size_t remaining = inLen;
   while (remaining > 0)
   {
-    size_t wideBufRemain = maxConsoleWrite;
+    DWORD wideBufRemain = maxConsoleWrite;
     wchar_t* wideBufOut = wideBuf;
 
     while (wideBufRemain > 0)
@@ -284,7 +284,7 @@ static int _cs_fputs (const char* string, FILE* stream)
       else
       {
 	/* Not much to do - dump raw text to the stream. */
-	rc = fwrite (textPtr, 1, textLen, stream);
+	rc = int (fwrite (textPtr, 1, textLen, stream));
       }
 
       if (rc == EOF)

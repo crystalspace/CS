@@ -382,7 +382,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       case XMLTOKEN_EXTENT:
         if (!synldr->ParseVector (child, extent))
         {
-          return false;
+          return 0;
         }
         break;
       case XMLTOKEN_CONEANGLE:

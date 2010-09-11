@@ -264,7 +264,7 @@ void csDetectDriver::DetermineDriverVersion()
     {
       void* data;
       UINT dataLen;
-      if (VerQueryValueA (buffer, "\\", &data, &dataLen) && 
+      if (VerQueryValueA (buffer, const_cast<char*> ("\\"), &data, &dataLen) && 
 	(dataLen == sizeof (VS_FIXEDFILEINFO)))
       {
 	VS_FIXEDFILEINFO& ffi = *((VS_FIXEDFILEINFO*)data);
