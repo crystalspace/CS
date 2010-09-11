@@ -204,7 +204,7 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 	  csPlane3 plane (v.x, v.y, v.z, v.w);
 	  float distVal = packDist[c/4][c%4];
 	  plane.DD -= distVal / plane.Normal().Norm();
-	  shaderPlug->clipPlanes.AddClipPlane (v, clip.space);
+	  shaderPlug->clipPlanes.AddClipPlane (plane, clip.space);
 	}
       }
     }
