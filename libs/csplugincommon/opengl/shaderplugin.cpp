@@ -240,7 +240,7 @@ namespace CS
           {
             if (eyeToObjectDirty)
             {
-              eyeToObject = worldToCam.GetInverse() * worldToObject;
+	      eyeToObject = worldToObject.GetInverse() * worldToCam;
               eyeToObjectDirty = false;
             }
             planeTF = eyeToObject.Other2This (plane);
