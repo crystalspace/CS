@@ -159,8 +159,17 @@ DefaultTrigger ( OnJoystickMove )
 DefaultTrigger ( OnJoystickDown )
 DefaultTrigger ( OnJoystickUp )
 
-#define DefaultVoidTrigger(trigger)   \
-  void csBaseEventHandler::trigger () \
-  { return; }
+#include "csutil/deprecated_warn_off.h"
 
-DefaultVoidTrigger ( Frame )
+void csBaseEventHandler::Frame ()
+{
+  // Support for 'backwards' event handling methods
+  PreProcessFrame ();
+  ProcessFrame ();
+  PostProcessFrame ();
+  /* This is not entirely correct ... but a practical approximation that lets
+     things work */
+  FinishFrame ();
+}
+
+#include "csutil/deprecated_warn_on.h"

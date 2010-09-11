@@ -306,6 +306,17 @@ protected:
 
   /// Invoked by the handler for the crystalspace.frame event.
   virtual void Frame ();
+  
+  // Compatibility methods
+  CS_DEPRECATED_METHOD_MSG("Use signpost event handlers for frame preprocessing")
+  virtual void PreProcessFrame () {}
+  CS_DEPRECATED_METHOD_MSG("Use Frame() method for main frame processing")
+  virtual void ProcessFrame () {}
+  CS_DEPRECATED_METHOD_MSG("Use signpost event handlers for frame postprocessing")
+  virtual void PostProcessFrame () {}
+  CS_DEPRECATED_METHOD_MSG("Use FramePrinter for frame finishing or "
+    "signpost event handlers for frame finalization")
+  virtual void FinishFrame () {}
 };
 
 /** @} */
