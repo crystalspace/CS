@@ -35,9 +35,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   FurMeshState::FurMeshState() : 
     strandWidth(0.0015f), displacement(0.02f), densityMap(0), 
     densityFactorGuideFurs(10), densityFactorFurStrands(100), heightMap(0),
-    heightFactor(0.5f), controlPointsDistance(0.05f), positionDeviation(0.01f), 
-    growTangents(false), smallFur(false), mixmode(0), priority(7), 
-    z_buf_mode(CS_ZBUF_USE)
+    heightFactor(0.5f), averageControlPointsCount(5), 
+    controlPointsDistance(0.05f), positionDeviation(0.01f), growTangents(false), 
+    smallFur(false), mixmode(0), priority(7), z_buf_mode(CS_ZBUF_USE)
   {
   }
 
@@ -113,6 +113,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void FurMeshState::SetHeightFactor(float heightFactor)
   {
     this->heightFactor = heightFactor;
+  }
+
+  uint FurMeshState::GetAverageControlPointsCount() const
+  {
+    return averageControlPointsCount;
+  }
+
+  void FurMeshState::SetAverageControlPointsCount(uint averageControlPointsCount)
+  {
+    this->averageControlPointsCount = averageControlPointsCount;
   }
 
   float FurMeshState::GetControlPointsDistance() const

@@ -236,11 +236,11 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
         meshstate->SetHeightFactor(heightFactor);
       }
       break;
-    case XMLTOKEN_CONTROLPOINTSDISTANCE:
+    case XMLTOKEN_AVERAGECONTROLPOINTSCOUNT:
       {
-        float controlPointsDistance = child->GetContentsValueAsFloat();
+        uint averageControlPointsCount = child->GetContentsValueAsInt();
         CHECK_MESH(meshstate);
-        meshstate->SetControlPointsDistance(controlPointsDistance);
+        meshstate->SetAverageControlPointsCount(averageControlPointsCount);
       }
       break;
     case XMLTOKEN_POSITIONDEVIATION:

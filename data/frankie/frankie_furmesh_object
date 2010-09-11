@@ -9,8 +9,8 @@
 			<densityfactorguidefurs>100</densityfactorguidefurs>
 			<densityfactorfurstrands>150</densityfactorfurstrands>
 			<heightmap>frankie_heightmap</heightmap>
-			<heightfactor>0.075</heightfactor>
-			<controlpointsdistance>0.25</controlpointsdistance>
+			<heightfactor>0.05</heightfactor>
+			<averagecontrolpointscount>2</averagecontrolpointscount>
 			<positiondeviation>0.002</positiondeviation>
 			<smallfur />
 			<mixmode>

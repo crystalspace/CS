@@ -216,6 +216,16 @@ public:
   virtual void SetHeightFactor (float heightFactor) = 0;
 
   /**
+   * Get the average number of control points per fur strand
+   */
+  virtual uint GetAverageControlPointsCount () const = 0;
+
+  /**
+   * Set the average number of control points per fur strand
+   */
+  virtual void SetAverageControlPointsCount (uint averageControlPointsCount) = 0;
+
+  /**
    * Get the distance between control points on a fur
    */
   virtual float GetControlPointsDistance () const = 0;

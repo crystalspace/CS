@@ -51,6 +51,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetHeightMap(iTextureWrapper* heightMap);
     virtual float GetHeightFactor() const;
     virtual void SetHeightFactor(float heightFactor);
+    virtual uint GetAverageControlPointsCount() const;
+    virtual void SetAverageControlPointsCount(uint averageControlPointsCount);
     virtual float GetControlPointsDistance() const;
     virtual void SetControlPointsDistance(float controlPointsDistance);
     virtual float GetPositionDeviation() const;
@@ -74,6 +76,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float densityFactorFurStrands;
     iTextureWrapper* heightMap;
     float heightFactor;
+    uint averageControlPointsCount;
     float controlPointsDistance;
     float positionDeviation;
     bool growTangents;

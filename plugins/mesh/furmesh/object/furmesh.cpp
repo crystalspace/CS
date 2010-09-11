@@ -372,8 +372,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
       offsetIndex += 2 * (controlPointsCount - numberOfStrains);
       offsetVertex += 2 * controlPointsCount;
-
-      csPrintf("oI: %u\t oV: %u\n", offsetIndex, offsetVertex);
     }
 
     GetBinormals()->Release();
@@ -473,6 +471,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       guideFursTriangles.Push(triangleNew);
     }
 
+    float averageHeight = 0.0f;
+  
+    // From average control points count to control points distance
+    for (size_t i = indexstart; i <= indexend; i ++)
+    {
+      csVector2 uv = texcoord_buffer[i];
+
+      float height = heightmap.Get((int)(uv.x * heightmap.width),  
+        (int)(uv.y * heightmap.height), 0) / 255.0f;
+
+      averageHeight += height * GetHeightFactor();
+    }
+
+    averageHeight = averageHeight / (indexend - indexstart + 1);
+
+    if (GetAverageControlPointsCount() == 0 || averageHeight < EPSILON)
+      SetControlPointsDistance(FLT_MAX);
+    else
+    {
+      if (GetAverageControlPointsCount() == 1)
+        SetAverageControlPointsCount(2);
+
+      SetControlPointsDistance( averageHeight / (GetAverageControlPointsCount() - 1) );
+    }
+
     // Generate the guide furs
     for (size_t i = indexstart; i <= indexend; i ++)
     {
@@ -499,10 +522,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       if (controlPointsCount == 0 && (height * GetHeightFactor()) > EPSILON)
         controlPointsCount ++;
 
-      if (controlPointsCount == 1)
+      if ((height * GetHeightFactor()) > EPSILON)
         controlPointsCount ++;
 
-      float realDistance = (height * GetHeightFactor()) / controlPointsCount;
+      float realDistance = (height * GetHeightFactor()) / (controlPointsCount - 1);
 
       if (GetGrowTangent())
         guideFur.Generate(controlPointsCount, realDistance, pos, tangent);
@@ -834,6 +857,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     SetGuideLOD(0.0);
     StopAnimationControl();
 
+    size_t averageControlPointsCount = 0;
+
     // Update guide furs
     for (size_t i = 0 ; i < guideFurs.GetSize() ; i ++)
     {
@@ -850,10 +875,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       direction.Normalize();
 
       size_t controlPointsCount = guideFur.GetControlPointsCount(controlPointsLOD);
+      averageControlPointsCount += controlPointsCount;
+
       for (size_t j = 0 ; j < controlPointsCount ; j ++ )
         guideFur.controlPoints[j] = guideFur.controlPoints[0] + direction * 
         (j * (distance / (controlPointsCount - 1)));
     }
+
+    csPrintf( "Average Control Points Count: %f\n", 
+      (float)averageControlPointsCount / (float)guideFurs.GetSize());
 
     // Update guide ropes LOD
     for (size_t i = 0 ; i < guideFursLOD.GetSize(); i ++)
@@ -1095,8 +1125,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     GetNormals()->Release();
     GetTangents()->Release();
     GetBinormals()->Release();
-
-//     csPrintf("oI: %u\t oV: %u\n", offsetIndex, offsetVertex);
 
     SetIndexRange(3 * offsetIndex, 3 * offsetIndex + 3 * triangleCount );
   }
