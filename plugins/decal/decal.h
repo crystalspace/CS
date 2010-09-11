@@ -104,6 +104,13 @@ private:
     iDecalAnimationControl* animationControl;
     uint firstIndex;
     csArray<size_t> animatedIndices;
+
+    /// Initializes AnimationControlData structures.
+    AnimationControlData()
+    {
+      firstIndex = 0;
+      animationControl = NULL;
+    }
   };
   csArray<AnimationControlData> animationControls;
   AnimationControlData animationControlData;
