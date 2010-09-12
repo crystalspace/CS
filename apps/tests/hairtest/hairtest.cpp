@@ -380,6 +380,8 @@ void HairTest::SwitchScenes()
 
   // Re-initialize camera position
   cameraHelper.ResetCamera ();
+
+  furMeshEnabled = true;
 }
 
 void HairTest::SaveObject(iMeshWrapper* meshwrap, const char * filename)
