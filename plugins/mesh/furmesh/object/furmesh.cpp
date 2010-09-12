@@ -39,9 +39,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   FurMesh::FurMesh (iEngine* engine, iObjectRegistry* object_reg, 
     iMeshObjectFactory* object_factory) : scfImplementationType (this, engine), 
     materialWrapper(0), object_reg(object_reg), object_factory(object_factory), 
-    engine(engine), animesh(0), physicsControl(0), hairMeshProperties(0), 
-    positionShift(0), rng(0), controlPointsLOD(1), offsetIndex(0), offsetVertex(0),
-    endVertex(0), guideLOD(0), strandLOD(1), hairStrandsLODSize(0), 
+    engine(engine), isEnabled(true), animesh(0), physicsControl(0), 
+    hairMeshProperties(0), positionShift(0), rng(0), controlPointsLOD(1), 
+    offsetIndex(0), offsetVertex(0), endVertex(0), guideLOD(0), 
+    previousGuideLOD(0), strandLOD(1), hairStrandsLODSize(0), 
     physicsControlEnabled(false), isReset(false), startFrame(0), meshFactory(0), 
     meshFactorySubMesh(0), indexstart(0), indexend(0)
   {
@@ -98,6 +99,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   void FurMesh::NextFrame (csTicks current_time, const csVector3& pos,
     uint currentFrame)
   {
+    if (!isEnabled)
+      return;
+
     Update();
     UpdateObjectBoundingBox();
 
@@ -853,8 +857,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     endVertex = offsetVertex + 2 * controlPointsCount;
 
     // re-init guide furs
-    float oldGuideLOD = guideLOD;
-    SetGuideLOD(0.0);
     StopAnimationControl();
 
     size_t averageControlPointsCount = 0;
@@ -894,7 +896,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       furStrands.Get(i).Update(guideFurs, guideFursLOD, controlPointsLOD);    
 
     StartAnimationControl();
-    SetGuideLOD(oldGuideLOD);
   }
 
   void FurMesh::SetLOD(float lod)
@@ -942,6 +943,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     {
       physicsControlEnabled = true;
       SynchronizeGuideHairs();
+      SetGuideLOD(previousGuideLOD);
     }
   }
 
@@ -955,9 +957,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     if (physicsControlEnabled)
     {
+      previousGuideLOD = guideLOD;
+      SetGuideLOD(0);
       physicsControlEnabled = false;
       physicsControl->RemoveAllStrands();
     }
+  }
+
+  void FurMesh::EnableMesh()
+  {
+    if(isEnabled)
+      return;
+
+    isEnabled = true;
+    StartAnimationControl();
+    ResetMesh();
   }
 
   void FurMesh::ResetMesh()
@@ -971,7 +985,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if(!physicsControlEnabled)
       return;
 
-    SetGuideLOD(0.0);
     StopAnimationControl();
 
     // Delete fur geometry data
@@ -981,6 +994,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     guideFurs.DeleteAll();
 
     isReset = true;
+  }
+
+  void FurMesh::DisableMesh()
+  {
+    if (!isEnabled)
+      return;
+
+    isEnabled = false;
+    StopAnimationControl();
+    SetIndexRange(0, 0);
   }
 
   void FurMesh::SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory)

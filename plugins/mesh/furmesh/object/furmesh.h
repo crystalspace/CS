@@ -75,7 +75,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetAnimationControl (CS::Mesh::iFurAnimationControl* physicsControl);
     virtual void StartAnimationControl ( );
     virtual void StopAnimationControl ( );
+    virtual void EnableMesh ( );
     virtual void ResetMesh ( );
+    virtual void DisableMesh ( );
 
     virtual void SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory);
     virtual void SetMeshFactorySubMesh 
@@ -94,6 +96,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     iEngine* engine;
     csRef<CS::Mesh::iFurMeshState> state;
     // Fur data
+    bool isEnabled;
     csRef<iView> view;
     csArray<csFurStrand> furStrands;
     csArray<csGuideFur> guideFurs;
@@ -109,6 +112,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     size_t offsetVertex;
     size_t endVertex;
     float guideLOD;
+    float previousGuideLOD;
     float strandLOD;
     size_t hairStrandsLODSize;
     bool physicsControlEnabled;

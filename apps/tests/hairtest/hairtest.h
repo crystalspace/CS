@@ -83,6 +83,7 @@ private:
 
   // Physics related
   bool physicsEnabled;
+  bool furMeshEnabled;
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
   csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
@@ -158,6 +159,7 @@ public:
   bool OnEventThumbTrackEndedControlPointsLOD (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedOverallLOD (const CEGUI::EventArgs& e);
   bool OnPhysicsButtonClicked (const CEGUI::EventArgs& e);
+  bool OnEnableButtonClicked (const CEGUI::EventArgs& e);
 
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);

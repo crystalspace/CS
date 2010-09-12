@@ -448,27 +448,37 @@ struct iFurMesh : public virtual iBase
   virtual void SetAnimatedMesh (CS::Mesh::iAnimatedMesh* animesh) = 0;
 
   /**
-   * Set the associated iFurPhysicsControl
+   * Set the associated iFurAnimationControl
    */
   virtual void SetAnimationControl (iFurAnimationControl* physicsControl) = 0;
   
   /**
-   * Start the associated iFurPhysicsControl. 
-   * Pure guide furs will be synchronized with the iFurPhysicsControl every frame
+   * Start the associated iFurAnimationControl. 
+   * Pure guide furs will be synchronized with the iFurAnimationControl every frame
    */
   virtual void StartAnimationControl () = 0;
 
   /**
-   * Stop the associated iFurPhysicsControl. 
-   * Pure guide furs will stop being synchronized with the iFurPhysicsControl
+   * Stop the associated iFurAnimationControl. 
+   * Pure guide furs will stop being synchronized with the iFurAnimationControl
    */
   virtual void StopAnimationControl () = 0;
  
   /**
+   * Enable the fur mesh (by default the fur mesh is enabled)
+   */
+  virtual void EnableMesh () = 0;
+
+  /**
    * Reset the position of the mesh on the base mesh.
-   * Pure guide furs will stop and start being synchronized with iFurPhysicsControl
+   * Pure guide furs will stop and start being synchronized with iFurAnimationControl
    */
   virtual void ResetMesh () = 0;
+
+  /**
+   * Disable the fur mesh (used for small fur when camera is at a certain distance)
+   */
+  virtual void DisableMesh () = 0;
 
   /**
    * Set the associated iFurMeshMaterialProperties

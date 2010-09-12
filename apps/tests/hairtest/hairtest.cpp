@@ -32,12 +32,16 @@ HairTest::HairTest ()
 : DemoApplication ("CrystalSpace.HairTest", "hairtest",
                      "hairtest <OPTIONS>",
                      "Tests on the animation of objects CS::Mesh::iAnimatedMesh."),
-                     avatarScene (0), avatarSceneType(MODEL_KRYSTAL),
-                     dynamicsDebugMode (DYNDEBUG_NONE)
+                     avatarScene (0), avatarSceneType(MODEL_KRYSTAL), 
+                     furMeshEnabled (true), dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // Use a default rotate camera
   cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
   SetHUDDisplayed(false);
+
+  // Command line options
+  commandLineHelper.AddCommandLineOption
+    ("scene=<name>", "Set the starting scene (krystal, frankie)");
 }
 
 HairTest::~HairTest ()
@@ -301,6 +305,20 @@ bool HairTest::OnPhysicsButtonClicked (const CEGUI::EventArgs&)
   return true;
 }
 
+bool HairTest::OnEnableButtonClicked (const CEGUI::EventArgs&)
+{
+  furMeshEnabled = !furMeshEnabled;
+  
+  if (!avatarScene->furMesh)
+    return false;
+
+  if (furMeshEnabled)
+    avatarScene->furMesh->EnableMesh();
+  else
+    avatarScene->furMesh->DisableMesh();
+
+  return true;
+}
 
 void HairTest::SwitchDynamics()
 {
@@ -497,24 +515,21 @@ bool HairTest::OnKeyboard (iEvent &ev)
     }
 
     // Kill avatar
-    if (csKeyEventHelper::GetCookedCode (&ev) == 'k'
-      && physicsEnabled && avatarScene->HasPhysicalObjects ())
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'k')
     {
       avatarScene->KillAvatar();
       return true;
     }
 
     // Reset scene
-    if (csKeyEventHelper::GetCookedCode (&ev) == 'r'
-      && physicsEnabled && avatarScene->HasPhysicalObjects ())
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
     {
       avatarScene->ResetScene();
       return true;
     }
 
     // Save fur
-    if (csKeyEventHelper::GetCookedCode (&ev) == 's'
-      && physicsEnabled && avatarScene->HasPhysicalObjects ())
+    if (csKeyEventHelper::GetCookedCode (&ev) == 's')
     {
       avatarScene->SaveFur();
       return true;
@@ -526,6 +541,20 @@ bool HairTest::OnKeyboard (iEvent &ev)
       SwitchScenes();
       return true;
     }
+
+    // Enable / disable fur mesh
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'q'  && avatarScene->furMesh)
+    {
+      furMeshEnabled = !furMeshEnabled;
+
+      if (furMeshEnabled)
+        avatarScene->furMesh->EnableMesh();
+      else
+        avatarScene->furMesh->DisableMesh();
+
+      return true;
+    }
+
   }
   return false;
 }
@@ -629,6 +658,19 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     break;
   }
 
+  // Read which scene to display at first
+  csString sceneName = clp->GetOption ("scene");
+  if (!sceneName.IsEmpty ())
+  {
+    if (sceneName == "krystal")
+      avatarSceneType = MODEL_KRYSTAL;
+    else if (sceneName == "frankie")
+      avatarSceneType = MODEL_FRANKIE;
+    else
+      printf ("Given scene ('%s') is not one of {'krystal', 'frankie'}. Falling back to Krystal\n", 
+        sceneName.GetData ());
+  }
+
   return true;
 }
 
@@ -712,6 +754,9 @@ bool HairTest::Application ()
     subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&HairTest::OnPhysicsButtonClicked, this));
 
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page3/Enable")-> 
+    subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&HairTest::OnEnableButtonClicked, this));
 
   // Default behavior from csDemoApplication for the creation of the scene
   if (!DemoApplication::CreateRoom ())

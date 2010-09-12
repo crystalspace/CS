@@ -135,7 +135,6 @@ void KrystalScene::SwitchFurPhysics()
   // Disable ropes
   if (hairPhysicsEnabled)
   {
-    furMesh->SetGuideLOD(0.0f);
     furMesh->StopAnimationControl();
     furMesh->SetAnimationControl(animationPhysicsControl);
     furMesh->StartAnimationControl();
@@ -143,7 +142,6 @@ void KrystalScene::SwitchFurPhysics()
   }
   else 
   {
-    furMesh->SetGuideLOD(0.0f);
     furMesh->StopAnimationControl();
     furMesh->SetAnimationControl(hairPhysicsControl);
     furMesh->StartAnimationControl();
@@ -426,12 +424,12 @@ bool KrystalScene::CreateAvatar ()
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
+  furMesh->SetAnimationControl(animationPhysicsControl);
+  furMesh->StartAnimationControl();
+
   furMesh->SetGuideLOD(0);
   furMesh->SetStrandLOD(1);
   furMesh->SetControlPointsLOD(0.0f);
-
-  furMesh->SetAnimationControl(animationPhysicsControl);
-  furMesh->StartAnimationControl();
 
   // Start animation
   rootNode->Play ();

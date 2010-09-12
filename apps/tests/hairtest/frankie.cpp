@@ -336,11 +336,11 @@ bool FrankieScene::CreateAvatar ()
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(0)->GetFactorySubMesh());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
-  furMesh->SetGuideLOD(0);
-  furMesh->SetStrandLOD(1);
-
   furMesh->SetAnimationControl(animationPhysicsControl);
   furMesh->StartAnimationControl();
+
+  furMesh->SetGuideLOD(0);
+  furMesh->SetStrandLOD(1);
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
@@ -419,7 +419,6 @@ void FrankieScene::SwitchFurPhysics()
   // Disable ropes
   if (furPhysicsEnabled)
   {
-    furMesh->SetGuideLOD(0.0f);
     furMesh->StopAnimationControl();
     furMesh->SetAnimationControl(animationPhysicsControl);
     furMesh->StartAnimationControl();
@@ -427,7 +426,6 @@ void FrankieScene::SwitchFurPhysics()
   }
   else 
   {
-    furMesh->SetGuideLOD(0.0f);
     furMesh->StopAnimationControl();
     furMesh->SetAnimationControl(furPhysicsControl);
     furMesh->StartAnimationControl();
