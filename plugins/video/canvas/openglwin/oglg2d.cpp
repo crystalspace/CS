@@ -57,11 +57,11 @@
 # define CS_WINDOW_Z_ORDER HWND_TOPMOST
 #endif
 
-static void SystemFatalError (wchar_t* str, HRESULT hRes = ~0)
+static void SystemFatalError (const wchar_t* str, HRESULT hRes = ~0)
 {
   wchar_t* newMsg = 0;
-  wchar_t* szMsg;
-  wchar_t szStdMessage[] = L"\nLast Error: ";
+  const wchar_t* szMsg;
+  const wchar_t szStdMessage[] = L"\nLast Error: ";
 
   if (hRes != ~0)
   {
@@ -69,9 +69,9 @@ static void SystemFatalError (wchar_t* str, HRESULT hRes = ~0)
 
     szMsg = newMsg = new wchar_t[wcslen (lpMsgBuf) + wcslen (str)
       + wcslen (szStdMessage) + 1];
-    wcscpy (szMsg, str);
-    wcscat (szMsg, szStdMessage);
-    wcscat (szMsg, lpMsgBuf);
+    wcscpy (newMsg, str);
+    wcscat (newMsg, szStdMessage);
+    wcscat (newMsg, lpMsgBuf);
   
     delete[] lpMsgBuf ;
   }
