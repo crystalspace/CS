@@ -28,6 +28,7 @@
 #include "cstool/vfsdirchange.h"
 
 #include "csutil/documenthelper.h"
+#include "csutil/event.h"
 #include "csutil/eventnames.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
@@ -91,6 +92,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   csThreadedLoader::~csThreadedLoader()
   {
+    csRef<iEventQueue> queue (csQueryRegistry<iEventQueue> (object_reg));
+    if (queue)
+    {
+      CS::RemoveWeakListener (queue, eventHandler);
+    }
   }
 
   bool csThreadedLoader::Initialize(iObjectRegistry *objectreg)
@@ -157,7 +163,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         "crystalspace.sndsys.element.loader", false);
     SndSysRenderer = csQueryRegistry<iSndSysRenderer> (object_reg);
 
+    csRef<iEventQueue> queue (csQueryRegistry<iEventQueue> (object_reg));
+    if (queue)
+    {
+      CS::RegisterWeakListener (queue, this, csevSystemClose (object_reg),
+        eventHandler);
+    }
+
     return true;
+  }
+
+  bool csThreadedLoader::HandleEvent (iEvent& event)
+  {
+    // We only receive close events
+
+    /* Clear loader list when system closes, discarding anything not yet added
+       to the engine. Presumably, that stuff isn't needed anyway since we
+       close ... */
+    ClearLoaderLists ();
+
+    return false;
   }
 
   iEngineSequenceManager* csThreadedLoader::GetEngineSequenceManager ()
@@ -3237,6 +3262,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     float norm = v.Norm ();
     float desired_norm = 1.7320508f;
     return ABS (norm-desired_norm) < 0.01f;
+  }
+
+  template<typename T>
+  static void ClearList (CS::Threading::ReadWriteMutex& mutex, T& list)
+  {
+    CS::Threading::ScopedWriteLock lock (mutex);
+    list.DeleteAll ();
+  }
+
+  void csThreadedLoader::ClearLoaderLists ()
+  {
+    ClearList (sectorsLock, loaderSectors);
+    ClearList (meshfactsLock, loaderMeshFactories);
+    ClearList (meshesLock, loaderMeshes);
+    ClearList (camposLock, loaderCameraPositions);
+    ClearList (texturesLock, loaderTextures);
+    ClearList (materialsLock, loaderMaterials);
+    ClearList (sharedvarLock, loaderSharedVariables);
   }
 
   void csThreadedLoader::CollectAllChildren (iMeshWrapper* meshWrapper,

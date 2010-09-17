@@ -103,9 +103,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   };
 
   class csThreadedLoader : public ThreadedCallable<csThreadedLoader>,
-                           public scfImplementation2<csThreadedLoader,
+                           public scfImplementation3<csThreadedLoader,
                                                      iThreadedLoader,
-                                                     iComponent>
+                                                     iComponent,
+                                                     iEventHandler>
   {
   public:
     csThreadedLoader(iBase *p);
@@ -315,6 +316,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       loaderFlags = flags;
     }
 
+    /**\name iEventHandler implementation
+     * @{ */
+    bool HandleEvent (iEvent& event);
+
+    CS_EVENTHANDLER_NAMES("crystalspace.threadedloader")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
+    /** @} */
   protected:
 
     friend class csLoaderContext;
@@ -338,6 +346,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRefArray<iMaterialWrapper> loaderMaterials;
     csRefArray<iSharedVariable> loaderSharedVariables;
     csWeakRefHash<iLight, csString> loadedLights;
+
+    // Clear all of the loader lists
+    void ClearLoaderLists ();
 
     // General loading objects.
     csHash<csRef<iThreadReturn>, csString> loadingMeshObjects;
@@ -479,6 +490,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iSndSysRenderer> SndSysRenderer;
     // Flags
     int loaderFlags;
+    // Weak event handler
+    csRef<iEventHandler> eventHandler;
 
     // For checking whether to schedule a engine list sync.
     CS::Threading::ReadWriteMutex listSyncLock;
