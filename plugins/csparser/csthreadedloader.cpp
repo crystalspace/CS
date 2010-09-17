@@ -917,6 +917,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (sequencenode)
       {
           iSequenceWrapper* sw = CreateSequence(sequencenode);
+          if(!sw)
+          {
+              // fail on duplicate load
+              return false;
+          }
           LoadSequence(ldr_context, sequencenode);
           ret->SetResult(csRef<iBase>(sw));
           if(sync)
