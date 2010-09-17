@@ -651,9 +651,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool LoadTriMeshInSector (iLoaderContext* ldr_context,
       iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource);
 
-    /// Get the engine sequence manager (load it if not already present).
-    iEngineSequenceManager* GetEngineSequenceManager ();
-
     bool LoadDeferredLibs(csRefArray<iDocumentNode>& defLibs,
     iLoaderContext* ldr_context, iStreamSource* ssource, iMissingLoaderData* missingdata,
     csRefArray<iThreadReturn>& threadReturns, csRefArray<iDocumentNode>& libs,

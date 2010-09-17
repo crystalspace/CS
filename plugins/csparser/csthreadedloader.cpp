@@ -157,6 +157,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Optional
+    eseqmgr = csQueryRegistryOrLoad<iEngineSequenceManager> (object_reg,
+      "crystalspace.utilities.sequence.engine", false);
     SndSysManager = csQueryRegistryOrLoad<iSndSysManager> (object_reg,
       "crystalspace.sndsys.manager", false);
     SndSysLoader = csQueryRegistryOrLoad<iSndSysLoader> (object_reg,
@@ -183,17 +185,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     ClearLoaderLists ();
 
     return false;
-  }
-
-  iEngineSequenceManager* csThreadedLoader::GetEngineSequenceManager ()
-  {
-    if (!eseqmgr)
-    {
-      eseqmgr = csQueryRegistryOrLoad<iEngineSequenceManager> (object_reg,
-        "crystalspace.utilities.sequence.engine");
-      if (!eseqmgr) return 0;
-    }
-    return eseqmgr;
   }
 
   THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadMeshObjectFactory, const char* cwd, const char* fname,

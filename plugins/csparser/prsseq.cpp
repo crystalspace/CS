@@ -139,17 +139,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         value = ldr_context->FindSector (parname);
         break;
       case PARTYPE_TRIGGER:
-        value = FindTrigger (GetEngineSequenceManager (), parname);
+        value = FindTrigger (eseqmgr, parname);
         if (!value)
         {
-          iSequenceTrigger* trig = CreateTrigger (
-            GetEngineSequenceManager (), parname);
-          ldr_context->AddToCollection(trig->QueryObject ());
+          iSequenceTrigger* trig = CreateTrigger (eseqmgr, parname);
+          ldr_context->AddToCollection (trig->QueryObject ());
           value = trig;
         }
         break;
       case PARTYPE_SEQUENCE:
-        value = FindSequence (GetEngineSequenceManager (), parname);
+        value = FindSequence (eseqmgr, parname);
         break;
       case PARTYPE_POLYGON:
         SyntaxService->Report (
@@ -350,14 +349,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iDocumentNode* node)
   {
     const char* trigname = node->GetAttributeValue ("name");
-    // LoadTriggers() already checked for the presence of the engine
-    // sequence manager.
-
-    iSequenceTrigger* trigger = FindTrigger (
-      GetEngineSequenceManager (), trigname);
+    iSequenceTrigger* trigger = FindTrigger (eseqmgr, trigname);
     if (!trigger)
     {
-      trigger = CreateTrigger (GetEngineSequenceManager (), trigname);
+      trigger = CreateTrigger (eseqmgr, trigname);
       ldr_context->AddToCollection(trigger->QueryObject ());
     }
 
@@ -497,8 +492,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             return 0;
           }
 
-          iSequenceWrapper* sequence = FindSequence (
-            GetEngineSequenceManager (), seqname);
+          iSequenceWrapper* sequence = FindSequence (eseqmgr, seqname);
           if (!sequence)
           {
             SyntaxService->ReportError (
@@ -539,8 +533,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   bool csThreadedLoader::LoadTriggers (iLoaderContext* ldr_context, iDocumentNode* node)
   {
-    iEngineSequenceManager* sm = GetEngineSequenceManager ();
-    if (!sm) return false;
+    if (!eseqmgr)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.parse.sequence",
+        node, "No sequence manager loaded!");
+      return false;
+    }
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
@@ -567,12 +566,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iSequenceWrapper* csThreadedLoader::CreateSequence (iDocumentNode* node)
   {
     const char* seqname = node->GetAttributeValue ("name");
-    // LoadSequences() already checked for the presence of the engine
-    // sequence manager.
-
-    iSequenceWrapper* sequence = 
-      CS_PLUGIN_NAMESPACE_NAME(csparser)::CreateSequence (
-      GetEngineSequenceManager (), seqname);
+    iSequenceWrapper* sequence = CS_PLUGIN_NAMESPACE_NAME(csparser)::CreateSequence (eseqmgr, seqname);
     if (!sequence)
     {
       SyntaxService->ReportError (
@@ -617,8 +611,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // LoadSequences() already checked for the presence of the engine
     // sequence manager.
 
-    iSequenceWrapper* sequence = FindSequence (
-      GetEngineSequenceManager (), seqname);
+    iSequenceWrapper* sequence = FindSequence (eseqmgr, seqname);
     CS_ASSERT (sequence != 0);
 
     iEngineSequenceParameters* base_params = sequence->GetBaseParameterBlock ();
@@ -648,8 +641,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
               seqname);
             return 0;
           }
-          iSequenceWrapper* sequence2 = FindSequence (
-            GetEngineSequenceManager (), seqname2);
+          iSequenceWrapper* sequence2 = FindSequence (eseqmgr, seqname2);
           if (!sequence2)
           {
             SyntaxService->ReportError (
@@ -1135,8 +1127,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           const char* trueseqname = child->GetAttributeValue ("truesequence");
           if (trueseqname)
           {
-            iSequenceWrapper* trueseqwrap = FindSequence (
-              GetEngineSequenceManager (), trueseqname);
+            iSequenceWrapper* trueseqwrap = FindSequence (eseqmgr, trueseqname);
             if (!trueseqwrap)
             {
               SyntaxService->ReportError (
@@ -1151,8 +1142,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           const char* falseseqname = child->GetAttributeValue("falsesequence");
           if (falseseqname)
           {
-            iSequenceWrapper* falseseqwrap = FindSequence (
-              GetEngineSequenceManager (), falseseqname);
+            iSequenceWrapper* falseseqwrap = FindSequence (eseqmgr, falseseqname);
             if (!falseseqwrap)
             {
               SyntaxService->ReportError (
@@ -1178,8 +1168,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   bool csThreadedLoader::LoadSequences (iLoaderContext* ldr_context, iDocumentNode* node)
   {
-    iEngineSequenceManager* sm = GetEngineSequenceManager ();
-    if (!sm) return false;
+    if (!eseqmgr)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.parse.sequence",
+        node, "No sequence manager loaded!");
+      return false;
+    }
 
     // We load sequences in two passes. In the first pass we will
     // create all sequences and also create the parameter blocks.
