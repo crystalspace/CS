@@ -169,7 +169,7 @@ AS_IF([test -n "$CRYSTAL_CONFIG_TOOL"],
     # Still do cs-config version check - this one will also take the release
     # component into account. Also needed for legacy cs-config.
     CS_CHECK_PROG_VERSION([Crystal Space], ["$cfg" --version],
-	[m4_default([$1],[cs_min_version_default])], [9.9|.9],
+	m4_default([$1],[cs_min_version_default]), [9.9|.9],
 	[cs_sdk=yes], [cs_sdk=no])
 
     AS_IF([test $cs_sdk = yes],
