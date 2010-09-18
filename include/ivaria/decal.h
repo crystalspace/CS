@@ -43,7 +43,9 @@ class csRenderBuffer;
 /**\name Decals
  * @{ */
 /**
- * A decal created by the decal manager.
+ * A decal created by the iDecalManager. Decals somehow add a piece of geometry projected
+ * on a mesh or a group of mesh. It can be used to achieve effects such as bullet holes or
+ * shadows under the characters.
  */
 struct iDecal
 {
@@ -51,7 +53,7 @@ struct iDecal
 
 /**
  * Interface for a decal template which dictates the 
- * appearance of a newly created decal.
+ * appearance of a newly created iDecal.
  */
 struct iDecalTemplate : public virtual iBase
 {
@@ -378,7 +380,7 @@ struct iDecalBuilder
 /**
  * Creates and manages decals.
  *
- * To create a decal, just get access to this plugin using
+ * To create a iDecal, just get access to this plugin using
  * csLoadPluginCheck<iDecalManager>
  *
  * Then, just use one of the decal creation functions:
@@ -393,11 +395,12 @@ struct iDecalManager : public virtual iBase
    * \param decalTemplate The template used to create the decal.
    * \param sector The sector to begin searching for nearby meshes.
    * \param pos The position of the decal in world coordinates.
-   * \param up The up direction of the decal.
-   * \param normal The overall normal of the decal.
+   * \param up The up direction of the decal in world coordinates.
+   * \param normal The overall normal of the decal in world coordinates.
    * \param width The width of the decal.
    * \param height The height of the decal.
-   * \param oldDecal An existing decal that can be reused for efficiency.
+   * \param oldDecal An existing decal that can be reused for efficiency
+   * (it will therefore disappear from its previous position).
    * \return True if the decal is created.
    */
   virtual iDecal* CreateDecal (iDecalTemplate* decalTemplate, 
@@ -435,13 +438,14 @@ struct iDecalManager : public virtual iBase
   /**
    * Creates a decal on a specific mesh.
    * \param decalTemplate The template used to create the decal.
-   * \param sector The sector to begin searching for nearby meshes.
+   * \param mesh The mesh to put the decal on.
    * \param pos The position of the decal in world coordinates.
-   * \param up The up direction of the decal.
-   * \param normal The overall normal of the decal.
+   * \param up The up direction of the decal in world coordinates.
+   * \param normal The overall normal of the decal in world coordinates.
    * \param width The width of the decal.
    * \param height The height of the decal.
-   * \param oldDecal An existing decal that can be reused for efficiency.
+   * \param oldDecal An existing decal that can be reused for efficiency
+   * (it will therefore disappear from its previous position).
    * \return True if the decal is created.
    */
   virtual iDecal* CreateDecal (iDecalTemplate* decalTemplate, 

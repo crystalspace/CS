@@ -195,7 +195,12 @@ struct iMeshObject : public virtual iBase
    * This will do a test based on the outline of the object. This means
    * that it is more accurate than HitBeamBBox(). Note that this routine
    * will typically be faster than HitBeamObject(). The hit may be on the front
-   * or the back of the object, but will indicate that it iterrupts the beam.
+   * or the back of the object, but will indicate that it interrupts the beam.
+   * \param start Start of the beam to trace in object coordinate.
+   * \param end End of the beam to trace in object coordinate.
+   * \param isect Will be set to the point of the hit in object coordinate.
+   * \param pr Will be set to the position of the hit as a value between 0 and 1,
+   *   where 0 means \a start and 1 means \a end.
    */
   virtual bool HitBeamOutline (const csVector3& start,
   	const csVector3& end, csVector3& isect, float* pr) = 0;
@@ -207,10 +212,10 @@ struct iMeshObject : public virtual iBase
    * returned hit will be guaranteed to be the point closest to the
    * 'start' of the beam. If the object supports this then an index
    * of the hit polygon will be returned (or -1 if not supported or no hit).
-   * \param start Start of the beam to trace.
-   * \param end End of the beam to trace.
-   * \param isect Returns the point of the hit.
-   * \param pr Returns the position of the hit as a value between 0 and 1,
+   * \param start Start of the beam to trace in object coordinate.
+   * \param end End of the beam to trace in object coordinate.
+   * \param isect Will be set to the point of the hit in object coordinate.
+   * \param pr Will be set to the position of the hit as a value between 0 and 1,
    *   where 0 means \a start and 1 means \a end.
    * \param polygon_idx Index of the polygon hit on the mesh (or -1 if not
    *   supported).
