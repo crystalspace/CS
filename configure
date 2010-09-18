@@ -7681,6 +7681,35 @@ fi
   cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= $cs_build_prop_val ;
 "
 fi
+    if test -n "$OBJCOPY"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $OBJCOPY supports --long-section-names" >&5
+$as_echo_n "checking whether $OBJCOPY supports --long-section-names... " >&6; }
+if test "${cs_cv_objcopy_supports_long_section_names+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  cs_cv_objcopy_supports_long_section_names=no
+	    if { ac_try='$OBJCOPY --help 2>/dev/null | grep -e "--long-section-names" >/dev/null 2>&1'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }; then :
+  cs_cv_objcopy_supports_long_section_names=yes
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_objcopy_supports_long_section_names" >&5
+$as_echo "$cs_cv_objcopy_supports_long_section_names" >&6; }
+        if test "$cs_cv_objcopy_supports_long_section_names" != "no"; then :
+  cs_build_prop_val="--long-section-names=enable"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY.LONG_SECTION_NAMES_ENABLE ?= $cs_build_prop_val ;
+"
+fi
+fi
+
+fi
 
     # GNU: Search for libtool before glibtool since Fink version is likely newer.
 
@@ -9420,6 +9449,7 @@ done
   cs_jamconfig_text="${cs_jamconfig_text}CMD.MAKEICNS ?= $cs_build_prop_val ;
 "
 fi
+    # png2icns is available for POSIX platforms and not just OS/X.
 
     if test "$cs_prog_path_prepared" != yes; then :
   cs_prog_path_prepared=yes
