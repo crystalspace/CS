@@ -36,7 +36,7 @@ actions DoSplitDebugInfo
 {
   $(CMD.OBJCOPY) --only-keep-debug $(<) $(DEBUG_FILE)
   $(CMD.OBJCOPY) --strip-unneeded $(<)
-  $(CMD.OBJCOPY) --add-gnu-debuglink=$(DEBUG_FILE) $(<)
+  $(CMD.OBJCOPY) $(CMD.OBJCOPY.LONG_SECTION_NAMES_ENABLE) --add-gnu-debuglink=$(DEBUG_FILE) $(<)
   test -n "$(CHMOD)" && $(CHMOD) a-x $(DEBUG_FILE)
 }
 
