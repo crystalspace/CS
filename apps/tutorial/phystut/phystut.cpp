@@ -774,8 +774,6 @@ bool Simple::OnInitialize (int argc, char* argv[])
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug",
 		       CS::Debug::iDynamicsDebuggerManager),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.ragdoll",
-		       CS::Animation::iSkeletonRagdollManager),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -811,12 +809,20 @@ bool Simple::OnInitialize (int argc, char* argv[])
       csRef<CS::Animation::iSoftBodyAnimationControlType> softBodyAnimationType =
 	csLoadPlugin<CS::Animation::iSoftBodyAnimationControlType>
 	(plugmgr, "crystalspace.dynamics.softanim");
+      if (!softBodyAnimationType)
+	return ReportError ("Could not load soft body animation for genmeshes plugin!");
 
       csRef<iGenMeshAnimationControlFactory> animationFactory =
 	softBodyAnimationType->CreateAnimationControlFactory ();
       softBodyAnimationFactory =
 	scfQueryInterface<CS::Animation::iSoftBodyAnimationControlFactory> (animationFactory);
     }
+
+    // Load the ragdoll plugin
+    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager>
+      (plugmgr, "crystalspace.mesh.animesh.animnode.ragdoll");
+    if (!ragdollManager)
+      return ReportError ("Failed to locate ragdoll manager!");
 
     // Check which environment has to be loaded
     if (clp->GetBoolOption ("terrain", false))
@@ -897,11 +903,6 @@ bool Simple::Application ()
     csQueryRegistry<CS::Debug::iDynamicsDebuggerManager> (GetObjectRegistry ());
   if (!debuggerManager)
     return ReportError ("Failed to locate dynamic's debug manager!");
-
-  ragdollManager =
-    csQueryRegistry<CS::Animation::iSkeletonRagdollManager> (GetObjectRegistry ());
-  if (!ragdollManager)
-    return ReportError ("Failed to locate ragdoll manager!");
 
   // Create the dynamic system
   dynamicSystem = dyn->CreateSystem ();
