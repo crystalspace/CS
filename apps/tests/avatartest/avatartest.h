@@ -117,6 +117,7 @@ private:
   csVector3 GetCameraTarget ();
 
   // HitBeam test for mouse pointing at the animesh
+  // isect will be in object coordinate, direction in world coordinates
   bool HitBeamAnimatedMesh (csVector3& isect, csVector3& direction, int& triangle);
 
  public:

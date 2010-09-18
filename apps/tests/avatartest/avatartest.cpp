@@ -224,6 +224,10 @@ bool AvatarTest::HitBeamAnimatedMesh (csVector3& isect, csVector3& direction, in
   direction.Normalize ();
 
   csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (avatarScene->animesh);
+  iMovable* movable = mesh->GetMeshWrapper ()->GetMovable ();
+  startBeam = movable->GetTransform ().Other2This (startBeam);
+  endBeam = movable->GetTransform ().Other2This (endBeam);
+
   return mesh->HitBeamObject (startBeam, endBeam, isect, nullptr, &triangle);
 }
 

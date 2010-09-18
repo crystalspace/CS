@@ -144,8 +144,10 @@ void FrankieScene::Frame ()
 	csVector3 up =
 	  avatarTest->view->GetCamera()->GetTransform ().This2OtherRelative (csVector3 (0,1,0));
 	csRef<iMeshObject> meshObject = scfQueryInterface<iMeshObject> (animesh);
-	decal = avatarTest->decalManager->CreateDecal (decalTemplate, meshObject->GetMeshWrapper (),
-						       isect, up, -direction, 0.1f, 0.1f, decal);
+	decal = avatarTest->decalManager->CreateDecal
+	  (decalTemplate, meshObject->GetMeshWrapper (),
+	   meshObject->GetMeshWrapper ()->GetMovable ()->GetTransform ().This2Other (isect),
+	   up, -direction, 0.1f, 0.1f, decal);
 	decalPosition = isect;
       }
     }
