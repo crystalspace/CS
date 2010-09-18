@@ -7,11 +7,12 @@
 			<displacement>0.0</displacement>
 			<densitymap>frankie_densitymap</densitymap>
 			<densityfactorguidefurs>100</densityfactorguidefurs>
-			<densityfactorfurstrands>150</densityfactorfurstrands>
+			<densityfactorfurstrands>100</densityfactorfurstrands>
 			<heightmap>frankie_heightmap</heightmap>
 			<heightfactor>0.05</heightfactor>
 			<averagecontrolpointscount>2</averagecontrolpointscount>
-			<positiondeviation>0.002</positiondeviation>
+			<pointiness>1</pointiness>
+			<controlpointsdeviation>0.005</controlpointsdeviation>
 			<smallfur />
 			<mixmode>
 				<copy />

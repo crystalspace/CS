@@ -55,8 +55,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetAverageControlPointsCount(uint averageControlPointsCount);
     virtual float GetControlPointsDistance() const;
     virtual void SetControlPointsDistance(float controlPointsDistance);
-    virtual float GetPositionDeviation() const;
-    virtual void SetPositionDeviation(float positionDeviation);
+    virtual float GetThicknessVariation () const;
+    virtual void SetThicknessVariation (float thicknessVariation);
+    virtual float GetPointiness () const;
+    virtual void SetPointiness (float pointiness);
+    virtual float GetFurStrandDeviation () const;
+    virtual void SetFurStrandDeviation (float furStrandDeviation);
+    virtual float GetControlPointsDeviation() const;
+    virtual void SetControlPointsDeviation(float positionDeviation);
     virtual bool GetGrowTangent() const;
     virtual void SetGrowTangent(bool growTangent);
     virtual bool GetSmallFur() const;
@@ -78,6 +84,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float heightFactor;
     uint averageControlPointsCount;
     float controlPointsDistance;
+    float thicknessVariation;
+    float pointiness;
+    float furStrandDeviation;
     float positionDeviation;
     bool growTangents;
     bool smallFur;

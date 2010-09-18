@@ -11,7 +11,10 @@
 			<heightmap>krystal_skull_heightmap</heightmap>
 			<heightfactor>0.35</heightfactor>
 			<averagecontrolpointscount>10</averagecontrolpointscount>
-			<positiondeviation>0.005</positiondeviation>
+			<thicknessvariation>0.8</thicknessvariation>
+			<pointiness>0.75</pointiness>
+			<furstranddeviation>0.01</furstranddeviation>
+			<controlpointsdeviation>0.015</controlpointsdeviation>
 			<growtangents/>
 			<mixmode>
 				<copy />

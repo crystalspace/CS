@@ -236,14 +236,44 @@ public:
   virtual void SetControlPointsDistance (float controlPointsDistance) = 0;
 
   /**
-   * Get the position deviation of fur strands
+   * Get the fur strand thickness variation
    */
-  virtual float GetPositionDeviation () const = 0;
+  virtual float GetThicknessVariation () const = 0;
 
   /**
-   * Set the position deviation of fur strands
+   * Set the fur strand thickness variation
    */
-  virtual void SetPositionDeviation (float positionDeviation) = 0;
+  virtual void SetThicknessVariation (float thicknessVariation) = 0;
+
+  /**
+   * Get the pointiness of a fur strand
+   */
+  virtual float GetPointiness () const = 0;
+
+  /**
+   * Set the pointiness of a fur strand
+   */
+  virtual void SetPointiness (float pointiness) = 0;
+
+  /**
+   * Get the fur strand position deviation
+   */
+  virtual float GetFurStrandDeviation () const = 0;
+
+  /**
+   * Set the fur strand position deviation
+   */
+  virtual void SetFurStrandDeviation (float furStrandDeviation) = 0;
+
+  /**
+   * Get the control points position deviation
+   */
+  virtual float GetControlPointsDeviation () const = 0;
+
+  /**
+   * Set the control points position deviation
+   */
+  virtual void SetControlPointsDeviation (float positionDeviation) = 0;
 
   /**
    * Check if fur grows based on tangent direction

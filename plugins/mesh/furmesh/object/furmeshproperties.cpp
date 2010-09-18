@@ -36,7 +36,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     strandWidth(0.0015f), displacement(0.02f), densityMap(0), 
     densityFactorGuideFurs(10), densityFactorFurStrands(100), heightMap(0),
     heightFactor(0.5f), averageControlPointsCount(5), 
-    controlPointsDistance(0.05f), positionDeviation(0.01f), growTangents(false), 
+    controlPointsDistance(0.05f), thicknessVariation (1.0f), pointiness(0.5f),
+    furStrandDeviation(0), positionDeviation(0.01f), growTangents(false), 
     smallFur(false), mixmode(0), priority(7), z_buf_mode(CS_ZBUF_USE)
   {
   }
@@ -135,12 +136,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->controlPointsDistance = controlPointsDistance;
   }
 
-  float FurMeshState::GetPositionDeviation() const
+  float FurMeshState::GetThicknessVariation () const
+  {
+    return thicknessVariation;
+  }
+
+  void FurMeshState::SetThicknessVariation (float thicknessVariation)
+  {
+    this->thicknessVariation = thicknessVariation;
+  }
+
+  float FurMeshState::GetPointiness () const
+  {
+    return pointiness;
+  }
+
+  void FurMeshState::SetPointiness (float pointiness)
+  {
+    this->pointiness = pointiness;
+  }
+
+  float FurMeshState::GetFurStrandDeviation () const
+  {
+    return furStrandDeviation;
+  }
+
+  void FurMeshState::SetFurStrandDeviation (float furStrandDeviation)
+  {
+    this->furStrandDeviation = furStrandDeviation;
+  }
+
+  float FurMeshState::GetControlPointsDeviation( ) const
   {
     return positionDeviation;
   }
 
-  void FurMeshState::SetPositionDeviation(float positionDeviation)
+  void FurMeshState::SetControlPointsDeviation(float positionDeviation)
   {
     this->positionDeviation = positionDeviation;
   }

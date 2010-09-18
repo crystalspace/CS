@@ -40,11 +40,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     iMeshObjectFactory* object_factory) : scfImplementationType (this, engine), 
     materialWrapper(0), object_reg(object_reg), object_factory(object_factory), 
     engine(engine), isEnabled(true), animesh(0), physicsControl(0), 
-    hairMeshProperties(0), positionShift(0), rng(0), controlPointsLOD(1), 
-    offsetIndex(0), offsetVertex(0), endVertex(0), guideLOD(0), 
-    previousGuideLOD(0), strandLOD(1), hairStrandsLODSize(0), 
-    physicsControlEnabled(false), isReset(false), startFrame(0), meshFactory(0), 
-    meshFactorySubMesh(0), indexstart(0), indexend(0)
+    hairMeshProperties(0), furStrandShift(0), positionShift(0), rng(0), 
+    controlPointsLOD(1), offsetIndex(0), offsetVertex(0), endVertex(0), 
+    guideLOD(0), previousGuideLOD(0), strandLOD(1), hairStrandsLODSize(0), 
+    physicsControlEnabled(false), isReset(false), startFrame(0), 
+    meshFactory(0), meshFactorySubMesh(0), indexstart(0), indexend(0)
   {
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       object_reg, "crystalspace.shader.variablenameset");
@@ -61,6 +61,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     delete rng;
     
+    if (furStrandShift)
+      delete furStrandShift;
+
     if (positionShift)
       delete positionShift;
 
@@ -296,12 +299,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     
     endVertex = 2 * controlPointsCount;
 
+    // Generate fur strand deviation
+    furStrandShift = new csVector3 [ numberOfStrains ];
+
+    for ( size_t i = 0 ; i < numberOfStrains ; i ++)
+      furStrandShift[i] = csVector3(rng->Get() * 2 - 1, rng->Get() * 2 - 1, 
+        rng->Get() * 2 - 1) * GetFurStrandDeviation();
+
     // Generate position deviation
     positionShift = new csVector3 [ controlPointsCount ];
 
     for ( size_t i = 0 ; i < controlPointsCount ; i ++)
       positionShift[i] = csVector3(rng->Get() * 2 - 1, rng->Get() * 2 - 1, 
-      rng->Get() * 2 - 1) * GetPositionDeviation();
+        rng->Get() * 2 - 1) * GetControlPointsDeviation();
 
     controlPointsCount = GetControlPointsCount(1.0f) + 
       GetControlPointsCount(0.5f) + GetControlPointsCount(0.0f);
@@ -366,7 +376,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
             furStrand.controlPoints[ 0 ]);
 
           bin[ offsetVertex + 2 * controlPointSum + 2 * y] = 
-            csVector3( rng->Get(), sum/len, rng->Get() );
+            csVector3( rng->Get(), sum/len, rng->Get() * GetThicknessVariation());
           bin[ offsetVertex + 2 * controlPointSum + 2 * y + 1] = 
             bin[ offsetVertex + 2 * controlPointSum + 2 * y];
         }
@@ -455,8 +465,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csRenderBufferLock<csVector3> normals (holder.GetRenderBuffer (CS_BUFFER_NORMAL));
     animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_TANGENT);
     csRenderBufferLock<csVector3> tangents (holder.GetRenderBuffer (CS_BUFFER_TANGENT));
-    animesh->GetRenderBufferAccessor ()->PreGetBuffer (&holder, CS_BUFFER_BINORMAL);
-    csRenderBufferLock<csVector3> binormals (holder.GetRenderBuffer (CS_BUFFER_BINORMAL));
 
     // Compute the new position of the anchor
     csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (animesh);
@@ -1080,6 +1088,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csVector3 strip, firstPoint, secondPoint;
 
     cameraOrigin = tc.GetOrigin();
+    csVector3 *furShift = furStrandShift;
     csVector3 *posShift = positionShift;
 
     vbuf += offsetVertex;
@@ -1089,7 +1098,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     size_t triangleCount = 0;
 
-    for ( size_t x = 0 ; x < numberOfStrains ; x ++)
+    for ( size_t x = 0 ; x < numberOfStrains ; x ++ , furShift ++)
     {
       size_t y = 0;
       tangent = csVector3(0);
@@ -1103,13 +1112,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       for ( y = 0 ; y < controlPointsCount - 1; y ++, controlPoints ++, 
         vbuf += 2, tangents += 2, binormals += 2, posShift ++, normals += 2 )
       {
-        firstPoint = *controlPoints + (*posShift);
-        secondPoint = *(controlPoints + 1) + (*posShift);
+        firstPoint = *controlPoints + 
+          ( (*posShift) + (*furShift) * (*binormals).y ) * (y != 0);
+        secondPoint = *(controlPoints + 1) + 
+          ( (*posShift) + (*furShift) * (*binormals).y ) * (y != 0);
 
         csMath3::CalcNormal(binormal, secondPoint, firstPoint, cameraOrigin);
         binormal.Normalize();
         strip = strandWidthLOD * binormal * ((*binormals).z + 1.0f) * 
-          (0.5f * (1.0f - (*binormals).y) + 0.75f );
+          ( GetPointiness() * 2.0f * (1.0f - (*binormals).y) + (1.0f - GetPointiness()) );
 
         (*vbuf) = firstPoint;
         (*(vbuf + 1)) = firstPoint - strip;
@@ -1127,8 +1138,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
       if (controlPointsCount)
       {
-        (*vbuf) = *controlPoints + (*posShift);
-        (*(vbuf + 1)) = *controlPoints - strip + (*posShift);
+        firstPoint = *controlPoints + (*posShift) + (*furShift);
+        secondPoint = *(controlPoints + 1) + (*posShift) + (*furShift);
+
+        csMath3::CalcNormal(binormal, secondPoint, firstPoint, cameraOrigin);
+        binormal.Normalize();
+        strip = strandWidthLOD * binormal * ((*binormals).z + 1.0f) * 
+          ( GetPointiness() * 2.0f * (1.0f - (*binormals).y) + (1.0f - GetPointiness()) );
+
+        (*vbuf) = firstPoint;
+        (*(vbuf + 1)) = firstPoint + strip;
 
         (*tangents) = tangent;
         (*(tangents + 1)) = tangent;

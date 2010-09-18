@@ -243,11 +243,32 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
         meshstate->SetAverageControlPointsCount(averageControlPointsCount);
       }
       break;
-    case XMLTOKEN_POSITIONDEVIATION:
+    case XMLTOKEN_THICKNESSVARIATION:
+      {
+        float thicknessVariation = child->GetContentsValueAsFloat();
+        CHECK_MESH(meshstate);
+        meshstate->SetThicknessVariation(thicknessVariation);
+      }
+      break;
+    case XMLTOKEN_POINTINESS:
+      {
+        float pointiness = child->GetContentsValueAsFloat();
+        CHECK_MESH(meshstate);
+        meshstate->SetPointiness(pointiness);
+      }
+      break;
+    case XMLTOKEN_FURSTRANDDEVIATION:
+      {
+        float furStrandDeviation = child->GetContentsValueAsFloat();
+        CHECK_MESH(meshstate);
+        meshstate->SetFurStrandDeviation(furStrandDeviation);
+      }
+      break;
+    case XMLTOKEN_CONTROLPOINTSDEVIATION:
       {
         float positionDeviation = child->GetContentsValueAsFloat();
         CHECK_MESH(meshstate);
-        meshstate->SetPositionDeviation(positionDeviation);
+        meshstate->SetControlPointsDeviation(positionDeviation);
       }
       break;
     case XMLTOKEN_GROWTANGENTS:
@@ -470,19 +491,43 @@ bool FurMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     heightFactorNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
       SetValueAsFloat(heightFactor);
 
-    //Writedown control points disance tag
-    float controlPointsDistance = fmesh->GetControlPointsDistance();
-    csRef<iDocumentNode> controlPointsDistanceNode = 
+    //Writedown average control points count tag
+    int averageControlPointsCount = fmesh->GetAverageControlPointsCount();
+    csRef<iDocumentNode> averageControlPointsCountNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    controlPointsDistanceNode->SetValue("controlpointsdistance");
-    controlPointsDistanceNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
-      SetValueAsFloat(controlPointsDistance);
+    averageControlPointsCountNode->SetValue("averagecontrolpointscount");
+    averageControlPointsCountNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsInt(averageControlPointsCount);
+
+    //Writedown thickness variation tag
+    float thicknessVariation = fmesh->GetThicknessVariation();
+    csRef<iDocumentNode> thicknessVariationNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    thicknessVariationNode->SetValue("thicknessvariation");
+    thicknessVariationNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsFloat(thicknessVariation);
+
+    //Writedown pointiness tag
+    float pointiness = fmesh->GetPointiness();
+    csRef<iDocumentNode> pointinessNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    pointinessNode->SetValue("pointiness");
+    pointinessNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsFloat(pointiness);
+
+    //Writedown fur strand deviation tag
+    float furStrandDeviation = fmesh->GetFurStrandDeviation();
+    csRef<iDocumentNode> furStrandDeviationNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    furStrandDeviationNode->SetValue("furstranddeviation");
+    furStrandDeviationNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
+      SetValueAsFloat(furStrandDeviation);    
 
     //Writedown control points disance tag
-    float positionDeviation = fmesh->GetPositionDeviation();
+    float positionDeviation = fmesh->GetControlPointsDeviation();
     csRef<iDocumentNode> positionDeviationNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    positionDeviationNode->SetValue("positiondeviation");
+    positionDeviationNode->SetValue("controlpointsdeviation");
     positionDeviationNode->CreateNodeBefore(CS_NODE_TEXT, 0)->
       SetValueAsFloat(positionDeviation);
 

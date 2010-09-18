@@ -105,6 +105,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     CS::Mesh::iAnimatedMesh* animesh;
     csRef<CS::Mesh::iFurAnimationControl> physicsControl;
     csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties;
+    csVector3* furStrandShift;
     csVector3* positionShift;
     csRandomGen *rng;
     float controlPointsLOD;
