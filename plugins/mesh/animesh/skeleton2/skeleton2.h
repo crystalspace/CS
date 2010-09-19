@@ -176,6 +176,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void SetAnimationPacket (CS::Animation::iSkeletonAnimPacket* packet);
 
     virtual void RecreateSkeleton ();
+    virtual void ResetSkeletonState ();
     virtual void UpdateSkeleton (float dt);
 
     virtual unsigned int GetSkeletonStateVersion () const;
@@ -212,7 +213,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     SkeletonFactory* factory;
     csRef<CS::Animation::iSkeletonAnimPacket> animationPacket;
     bool cachedTransformsDirty;
-    unsigned int version, versionLastReset;
+    unsigned int version;
     csWeakRef<CS::Mesh::iAnimatedMesh> animesh;
   };
 

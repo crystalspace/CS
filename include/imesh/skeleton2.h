@@ -245,7 +245,7 @@ struct iSkeletonFactory : public virtual iBase
  */
 struct iSkeleton : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeleton, 1, 0, 1);
+  SCF_INTERFACE(CS::Animation::iSkeleton, 1, 0, 2);
 
   /**
    * Get the scene node associated with this skeleton
@@ -368,6 +368,12 @@ struct iSkeleton : public virtual iBase
    * Get the animated mesh associated with this skeleton
    */
   virtual CS::Mesh::iAnimatedMesh* GetAnimatedMesh () = 0;
+
+  /**
+   * Reset the transform of all the bones of the skeleton to the ones of the
+   * skeleton factory.
+   */
+  virtual void ResetSkeletonState () = 0;
 };
 
 /**

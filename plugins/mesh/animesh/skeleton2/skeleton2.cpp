@@ -343,7 +343,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   Skeleton::Skeleton (SkeletonFactory* factory)
     : scfImplementationType (this, factory), factory (factory), 
-    cachedTransformsDirty (true), version (0), versionLastReset (0), animesh (nullptr)
+    cachedTransformsDirty (true), version (0), animesh (nullptr)
   {
     // Setup the bones from the parent setup
     RecreateSkeletonP ();
@@ -576,18 +576,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     RecreateSkeletonP ();
   }
 
+  void Skeleton::ResetSkeletonState ()
+  {
+    for (size_t i = 0; i < allBones.GetSize (); ++i)
+    {
+      Bone& boneRef = allBones[i];
+
+      if (boneRef.created)
+      {
+	boneRef.boneOffset = factory->allBones[i].boneOffset;
+	boneRef.boneRotation = factory->allBones[i].boneRotation;
+      }
+    }
+
+    version++;
+
+    cachedTransformsDirty = true;    
+  }
+
   void Skeleton::UpdateSkeleton (float dt)
   {
     if (!animationPacket || !animationPacket->GetAnimationRoot ())
       return;
 
-    // Update the root node
     CS::Animation::iSkeletonAnimNode* rootNode = animationPacket->GetAnimationRoot ();
-    rootNode->TickAnimation (dt);
    
     // If the root node is active then update the skeleton
     if (rootNode->IsActive ())
     {
+      // Update the root node
+      rootNode->TickAnimation (dt);
+
       // TODO: Use a pool for these...
       csRef<CS::Animation::csSkeletalState> finalState;
       finalState.AttachNew (new CS::Animation::csSkeletalState);
@@ -626,26 +645,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
       
       version++;      
-    }
-
-    // If the root node is not active then reset the bone state.
-    else if (versionLastReset != version)
-    {      
-      for (size_t i = 0; i < allBones.GetSize (); ++i)
-      {
-        Bone& boneRef = allBones[i];
-
-        if (boneRef.created)
-        {
-          boneRef.boneOffset = factory->allBones[i].boneOffset;
-          boneRef.boneRotation = factory->allBones[i].boneRotation;
-        }
-      }
-
-      version++;
-      versionLastReset = version;
-
-      cachedTransformsDirty = true;
     }
   }
 
