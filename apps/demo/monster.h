@@ -45,6 +45,7 @@ public:
   virtual bool Initialize (iMeshWrapper*);
 
   virtual void PlayAnimation(const char*, bool);
+  virtual void StopAnimation();
 
   virtual csVector3 GetPosition();
 

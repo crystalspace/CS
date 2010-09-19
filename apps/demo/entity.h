@@ -84,9 +84,10 @@ public:
   virtual void Stop();
 
 
-  virtual void PlayAnimation(const char*, bool) {}// = 0;
-  virtual void Explode() {}// = 0;
-  virtual void ChangeMaterial() {}// = 0;
+  virtual void PlayAnimation(const char*, bool) {}
+  virtual void StopAnimation() {}
+  virtual void Explode() {}
+  virtual void ChangeMaterial() {}
 
 
   virtual csVector3 GetPosition() = 0;

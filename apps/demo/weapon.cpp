@@ -132,7 +132,7 @@ void Weapon::ApplyDamage(Entity* entity)
       entity->Step(0);
 
       entity->ChangeMaterial ();
-      entity->PlayAnimation("hit", true);
+      entity->StopAnimation();
       if (entity->HP <= 0 && !entity->frozen) // Don't explode immediatly.
         entity->HP = 1;
       entity->frozen = true;

@@ -245,6 +245,12 @@ void Monster::PlayAnimation (const char* script, bool lock)
     fsmNode->SwitchToState (fsmNodeFactory->FindState (script));
 }
 
+void Monster::StopAnimation()
+{
+  if (fsmNode)
+    fsmNode->Stop ();
+}
+
 void Monster::Explode()
 {
   // Stop all movement.
