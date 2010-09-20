@@ -133,6 +133,7 @@ class iSkeleton(core.iBase):
     def GetSkeletonStateVersion(*args): return _animation.iSkeleton_GetSkeletonStateVersion(*args)
     def SetAnimatedMesh(*args): return _animation.iSkeleton_SetAnimatedMesh(*args)
     def GetAnimatedMesh(*args): return _animation.iSkeleton_GetAnimatedMesh(*args)
+    def ResetSkeletonState(*args): return _animation.iSkeleton_ResetSkeletonState(*args)
     scfGetVersion = staticmethod(_animation.iSkeleton_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeleton
     __del__ = lambda self : None;
