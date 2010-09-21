@@ -156,7 +156,9 @@ namespace lighter
 
       // Loop through all element primitives    
       PrimitiveArray& primArray = submeshArray[submesh];
-      for (size_t pidx = 0; pidx < primArray.GetSize (); ++pidx)
+
+	  #pragma omp parallel for
+      for (int pidx = 0; pidx < primArray.GetSize (); ++pidx)
       {
         // Get next primitive
         Primitive& prim = primArray[pidx];
@@ -197,7 +199,8 @@ namespace lighter
         const size_t vOffs = size_t (floorf (minUV.y));
 
         // Iterate all primitive elements
-        for (size_t eidx = 0; eidx < numElements; ++eidx)
+		#pragma omp parallel for
+        for (int eidx = 0; eidx < numElements; ++eidx)
         {
           // Skip empty elements
           Primitive::ElementType elemType = prim.GetElementType (eidx);
@@ -234,6 +237,7 @@ namespace lighter
           }
 
           // Update the normal lightmap
+		  #pragma omp critical
           normalLM->SetAddPixel (u, v, c * pixelAreaPart);
 
           // Loop through pseudo-dynamic lights
@@ -260,6 +264,7 @@ namespace lighter
             }
 
             // Update this light's light map
+			#pragma omp critical
             lm->SetAddPixel (u, v, c * pixelAreaPart);
           }
 

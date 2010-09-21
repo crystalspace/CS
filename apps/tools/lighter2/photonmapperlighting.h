@@ -22,6 +22,7 @@
 
 #include "lightcomponent.h"
 
+
 namespace lighter
 {
   struct PhotonRay

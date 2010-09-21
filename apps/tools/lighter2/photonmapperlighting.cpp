@@ -21,6 +21,7 @@
 #include "photonmapperlighting.h"
 #include "material.h"
 #include "scene.h"
+#include "omp.h"
 
 namespace lighter
 {
@@ -218,7 +219,8 @@ namespace lighter
   {
     progress.SetProgress(0.0f);
 
-    
+    // Sleep Time
+	//Sleep(10000);
     // Determine maximum allowed photon recursion
     size_t maxDepth = 0;
     if(indirectLightEnabled)
@@ -325,46 +327,52 @@ namespace lighter
       }
 
       // Loop to generate the requested number of photons for this light source
-      
-      for (size_t num = 0; num < photonsForCurLight && !stop; ++num)
-      {
-        // Get direction to emit the photon
-        csVector3 dir;
+      omp_set_num_threads(omp_get_num_procs()*2);
 
-        switch (curLightType) 
-        {
+	  if(!stop)
+	  {
 
-          // directional light
-          case CS_LIGHT_DIRECTIONAL:
-            {
-              photonOrigin = DirectionalLightScatter(lightDir,spRadius,pos);
-              dir = lightDir;
-            }
-            break;
+		  #pragma omp parallel for
+		  for (int num = 0; num < photonsForCurLight; ++num)
+		  {
+			// Get direction to emit the photon
+			csVector3 dir;
 
-          // spotlight
-          case CS_LIGHT_SPOTLIGHT:
-            {
-              // Generate a random direction within the spotlight cone
-              dir = SpotlightDir(lightDir, outterFalloff);
-            }
-            break;
+			switch (curLightType) 
+			{
 
-          // Default behavior is to treat a light like a point light
-          case CS_LIGHT_POINTLIGHT:
-          default:
-            {
-              // Generate a random direction vector for uniform light source sampling
-              dir = randVect.Get();
-            }
-            break;
-        }
+			  // directional light
+			  case CS_LIGHT_DIRECTIONAL:
+				{
+				  photonOrigin = DirectionalLightScatter(lightDir,spRadius,pos);
+				  dir = lightDir;
+				}
+				break;
 
-        // Emit a single photon into the sector containing this light
-        const PhotonRay newPhoton = { photonOrigin, dir, color, power, curLight, RAY_TYPE_OTHER1, 1.0f };
-        EmitPhoton(sect, newPhoton, maxDepth, 0, !directLightEnabled, false);
-        progressState.Advance();
-      }
+			  // spotlight
+			  case CS_LIGHT_SPOTLIGHT:
+				{
+				  // Generate a random direction within the spotlight cone
+				  dir = SpotlightDir(lightDir, outterFalloff);
+				}
+				break;
+
+			  // Default behavior is to treat a light like a point light
+			  case CS_LIGHT_POINTLIGHT:
+			  default:
+				{
+				  // Generate a random direction vector for uniform light source sampling
+				  dir = randVect.Get();
+				}
+				break;
+			}
+
+			// Emit a single photon into the sector containing this light
+			const PhotonRay newPhoton = { photonOrigin, dir, color, power, curLight, RAY_TYPE_OTHER1, 1.0f };
+			EmitPhoton(sect, newPhoton, maxDepth, 0, !directLightEnabled, false);
+			progressState.Advance();
+		  }
+	  }
 
       if (enableCaustics)
       {
@@ -474,48 +482,52 @@ namespace lighter
 
           // Emit caustic photons for the current light
 
-          for (size_t cnum = 0; cnum < causticPhotonsForMesh && !stop; ++cnum)
-          {
-            // Get direction to emit the photon
-            csVector3 dir;
+		  if(!stop)
+		  {
+			  #pragma omp parallel for
+			  for (int cnum = 0; cnum < causticPhotonsForMesh; ++cnum)
+			  {
+				// Get direction to emit the photon
+				csVector3 dir;
 
-            switch (curLightType)
-            {
+				switch (curLightType)
+				{
 
-              // directional light
-              case CS_LIGHT_DIRECTIONAL:
-                {
+				  // directional light
+				  case CS_LIGHT_DIRECTIONAL:
+					{
 
-                  csVector3 emitPos = DirectionalLightScatter(lightDir,spRadius,pseudoPos);
-                  photonOrigin = emitPos;
-                  dir = lightDir;
-                 
-                }
-                break;
+					  csVector3 emitPos = DirectionalLightScatter(lightDir,spRadius,pseudoPos);
+					  photonOrigin = emitPos;
+					  dir = lightDir;
+	                 
+					}
+					break;
 
-              // spotlight
-              
-              case CS_LIGHT_SPOTLIGHT:
-                {
-                  // Generate a random direction within the spotlight cone towards the caustic
-                  dir = CausticDir(objDir, spanAngle);
-                }
-                break;
-              
-              // point light
-              case CS_LIGHT_POINTLIGHT:
-              default:
-                {
-                  dir = CausticDir(objDir,spanAngle);
-                }
-                break;
-            }
+				  // spotlight
+	              
+				  case CS_LIGHT_SPOTLIGHT:
+					{
+					  // Generate a random direction within the spotlight cone towards the caustic
+					  dir = CausticDir(objDir, spanAngle);
+					}
+					break;
+	              
+				  // point light
+				  case CS_LIGHT_POINTLIGHT:
+				  default:
+					{
+					  dir = CausticDir(objDir,spanAngle);
+					}
+					break;
+				}
 
-            // Emit a single photon into the sector containing this light
-            const PhotonRay newPhoton = { photonOrigin, dir, color, power, curLight, RAY_TYPE_OTHER1, 1.0f };
-            EmitPhoton(sect, newPhoton, maxDepth, 0, !directLightEnabled,true);
-            
-          }
+				// Emit a single photon into the sector containing this light
+				const PhotonRay newPhoton = { photonOrigin, dir, color, power, curLight, RAY_TYPE_OTHER1, 1.0f };
+				EmitPhoton(sect, newPhoton, maxDepth, 0, !directLightEnabled,true);
+	            
+			  }
+		  }
         }
       }
 
@@ -545,7 +557,12 @@ namespace lighter
     lighter::HitPoint hit;
     hit.distance = FLT_MAX*0.9f;
     lighter::Ray ray = photon.getRay();
-    if (lighter::Raytracer::TraceClosestHit(sect->kdTree, ray, hit))
+	bool hitResult;
+	#pragma omp critical
+		{
+			hitResult = lighter::Raytracer::TraceClosestHit(sect->kdTree, ray, hit); 
+		}
+    if (hitResult)
     {
       // TODO: Why would a hit be returned and 'hit.primitive' be NULL?
       if (!hit.primitive) { return; }
@@ -576,12 +593,14 @@ namespace lighter
       {
         if(!produceCaustic)
         {
-          sect->AddPhoton(photon.color, hit.hitPoint, L);
+		  #pragma omp critical
+          sect->AddPhoton(reflColor, hit.hitPoint, L);
         }
         else if (!hitPtMaterial->produceCaustic)
         {
           // Add the photon to the caustic photon map
-          sect->AddCausticPhoton(photon.color, hit.hitPoint, L);
+		  #pragma omp critical
+          sect->AddCausticPhoton(reflColor, hit.hitPoint, L);
           return;
         }
       }

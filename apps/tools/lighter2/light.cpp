@@ -105,8 +105,6 @@ namespace lighter
 
     bool haveAnyHit = false;
 
-    RaytraceProfiler prof(1, RAY_TYPE_SHADOW);
-
     // Start by testing if we have no hits or possibly hit a non-transparent one first
     if (globalLighter->rayDebug.IsEnabled())
     {
@@ -116,7 +114,6 @@ namespace lighter
 	Segment& s = allSegments[i];
 	s.ray.ignoreObject = ignoreObject;
 	s.ray.ignorePrimitive = ignorePrim;
-  s.ray.type = RAY_TYPE_IGNORE;
   
 	if (Raytracer::TraceAnyHit (s.tree,s.ray, &hitcb))
 	{
@@ -137,8 +134,7 @@ namespace lighter
 	Segment& s = allSegments[i];
 	s.ray.ignoreObject = ignoreObject;
 	s.ray.ignorePrimitive = ignorePrim;
-  s.ray.type = RAY_TYPE_IGNORE;
-
+  
 	HitPoint hit;
 	if (Raytracer::TraceAnyHit (s.tree,s.ray, hit))
 	{
@@ -183,8 +179,6 @@ namespace lighter
     HitCallback hitcb (*this);
     size_t lastHitCount = transparentHits.GetSize();
 
-    RaytraceProfiler prof(1, RAY_TYPE_SHADOW);
-
     bool haveAnyHit = false;
 
     // Start by testing if we have no hits or possibly hit a non-transparent one first
@@ -192,7 +186,6 @@ namespace lighter
     {
       Segment& s = allSegments[i];
       s.ray.ignoreObject = ignoreObject;
-      s.ray.type = RAY_TYPE_IGNORE;
 
       HitPoint hit;
       if (Raytracer::TraceAnyHit (s.tree,s.ray, hit, ignoreCB))
@@ -216,7 +209,6 @@ namespace lighter
     {
       Segment& s = allSegments[i];
       s.ray.ignoreObject = ignoreObject;
-      s.ray.type = RAY_TYPE_IGNORE;
 
       if (Raytracer::TraceAllHits (s.tree, s.ray, &hitcb, ignoreCB))
       {

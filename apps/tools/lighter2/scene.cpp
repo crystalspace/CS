@@ -167,8 +167,10 @@ namespace lighter
 
   size_t Sector::GetPhotonCount()
   {
-    if(photonMap != NULL) return photonMap->GetPhotonCount();
-    return 0;
+	size_t photonCount = 0;
+    if(photonMap != NULL) photonCount += photonMap->GetPhotonCount();
+	if(causticPhotonMap != NULL) photonCount += causticPhotonMap->GetPhotonCount();
+    return photonCount;
   }
 
   void Sector::BalancePhotons(Statistics::ProgressState& prog)
