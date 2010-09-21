@@ -278,21 +278,23 @@ void csBulletDynamicsSystem::CheckCollisions ()
   {
     btPersistentManifold* contactManifold =
       bulletWorld->getDispatcher ()->getManifoldByIndexInternal (i);
-    btCollisionObject* obA =
-      static_cast<btCollisionObject*> (contactManifold->getBody0 ());
-    btCollisionObject* obB =
-      static_cast<btCollisionObject*> (contactManifold->getBody1 ());
     if (contactManifold->getNumContacts ())
     {
-      csBulletRigidBody *cs_obA =
-	static_cast<csBulletRigidBody*> (reinterpret_cast<iBody*> (obA->getUserPointer ()));
-      if (cs_obA)
-	CheckCollision(*cs_obA, obB, *contactManifold);
+      btCollisionObject* obA =
+	static_cast<btCollisionObject*> (contactManifold->getBody0 ());
+      btCollisionObject* obB =
+	static_cast<btCollisionObject*> (contactManifold->getBody1 ());
 
-      csBulletRigidBody *cs_obB =
-	static_cast<csBulletRigidBody*> (reinterpret_cast<iBody*> (obB->getUserPointer ()));
-      if (cs_obB)
-	CheckCollision(*cs_obB, obA, *contactManifold);
+      iBody* cs_obA = static_cast<iBody*> (obA->getUserPointer ());
+      iBody* cs_obB = static_cast<iBody*> (obB->getUserPointer ());
+      if (cs_obA->GetType () == RIGID_BODY
+	  && cs_obB->GetType () == RIGID_BODY)
+      {
+	CheckCollision (*static_cast<csBulletRigidBody*> (cs_obA->QueryRigidBody ()),
+			obB, *contactManifold);
+	CheckCollision (*static_cast<csBulletRigidBody*> (cs_obB->QueryRigidBody ()),
+			obA, *contactManifold);
+      }
     }
   }
 }
