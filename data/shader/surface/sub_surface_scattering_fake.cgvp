@@ -1,0 +1,55 @@
+<cgvp>
+  <variablemap variable="light position world[0]" destination="LightPos" />
+  <variablemap variable="object2world transform" destination="obj_tr" />
+<program>
+<![CDATA[
+
+struct app2vertex {
+   	float4 position : POSITION;
+	float2 texCoord : TEXCOORD0;
+	//float3 normal : NORMAL;
+	float4 normal : NORMAL;
+	float4 tangent : TEXCOORD1;
+	float4 binormal : TEXCOORD2;
+};
+
+struct vertex2fragment { 
+	float4 position : POSITION;
+	float2 texCoord : TEXCOORD0;
+	float3 worldNormal : TEXCOORD1;
+	float3 eyeVec : TEXCOORD2;
+	float3 lightVec : TEXCOORD3;
+	float3 worldTangent : TEXCOORD4;
+	float3 worldBinormal : TEXCOORD5;
+	float3 vertPos : TEXCOORD6;
+
+	//float4 LightPosition1 : TEXCOORD7;
+};
+
+// main function
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 obj_tr,
+	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
+	uniform float4x4 ModelViewProj : state.matrix.mvp,	
+	uniform float3 LightPos)
+{
+	vertex2fragment OUT;
+
+	// all these matrix space conversions are probably wrong
+	OUT.worldNormal = mul(obj_tr, IN.normal);
+	OUT.worldTangent = mul(obj_tr, IN.tangent);
+	OUT.worldBinormal = mul(obj_tr, IN.binormal);
+	 
+	float3 worldSpacePos = mul(obj_tr, IN.position);
+	OUT.lightVec = LightPos - worldSpacePos;
+	OUT.texCoord = IN.texCoord;
+	OUT.eyeVec = normalize(ModelViewIT[3].xyz - IN.position.xyz);
+	OUT.position = mul(ModelViewProj, IN.position);
+	OUT.vertPos = worldSpacePos;
+
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>

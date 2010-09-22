@@ -27,8 +27,7 @@ vertex2fragment main (app2vertex IN,
 {
 	vertex2fragment OUT;
 
-	float4 obLight = mul(ModelViewI, LightPos);
-	float4 objLight = obLight - IN.Position;	
+	float4 objLight = LightPos - mul(obj_tr, IN.Position);	
 	
 	OUT.WorldNormal = mul(obj_tr, IN.Normal);
 	
