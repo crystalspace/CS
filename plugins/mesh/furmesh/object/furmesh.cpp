@@ -1011,7 +1011,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     isEnabled = false;
     StopAnimationControl();
-    SetIndexRange(0, 1);
+    
+    if (!furStrands.GetSize())
+      SetIndexRange(0, 0);
+    else
+      SetIndexRange(0, 1);
   }
 
   void FurMesh::SetMeshFactory ( CS::Mesh::iAnimatedMeshFactory* meshFactory)

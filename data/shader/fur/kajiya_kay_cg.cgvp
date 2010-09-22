@@ -1,11 +1,12 @@
 <cgvp>
   <variablemap variable="light position world[0]" destination="LightPos" />
+  <variablemap variable="object2world transform" destination="obj_tr" />    
 <program>
 <![CDATA[
 
 struct app2vertex {
 	float4 Position : POSITION;
-	float3 Normal : NORMAL;
+	float4 Normal : NORMAL;
 };
 
 struct vertex2fragment { 
@@ -18,24 +19,27 @@ struct vertex2fragment {
 
 // main function
 vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,	
 	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
 	uniform float4x4 ModelViewProj : state.matrix.mvp,
-	uniform float3 LightPos)
+	uniform float4x4 obj_tr,		
+	uniform float4 LightPos)
 {
 	vertex2fragment OUT;
 
-	OUT.WorldNormal = IN.Normal;
+	float4 obLight = mul(ModelViewI, LightPos);
+	float4 objLight = obLight - IN.Position;	
+	
+	OUT.WorldNormal = mul(obj_tr, IN.Normal);
 	
 	// position in object coords:	
 	float4 Po = float4(IN.Position.x, IN.Position.y, IN.Position.z, 1.0);
-	// pos in world coords - same the mesh is recomputed every time
-	float3 Pw = Po.xyz;
 	
 	// light vector
-	OUT.LightVec = LightPos.xyz - Pw;
+	OUT.LightVec = objLight.xyz;
 
 	// view vector in world coords:
-	OUT.WorldView = normalize(ModelViewIT[3].xyz - Pw);
+	OUT.WorldView = normalize(ModelViewIT[3].xyz - Po.xyz);
 	
 	// pos in clip coords:
 	OUT.HPosition = mul(ModelViewProj, Po);
