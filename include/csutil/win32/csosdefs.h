@@ -139,8 +139,12 @@
 #ifdef __GNUC__
 #ifndef NONAMELESSUNION
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95) 
+#ifndef _ANONYMOUS_UNION
 #define _ANONYMOUS_UNION __extension__
+#endif
+#ifndef _ANONYMOUS_STRUCT
 #define _ANONYMOUS_STRUCT __extension__
+#endif
 #else
 #if defined(__cplusplus)
 #define _ANONYMOUS_UNION __extension__
