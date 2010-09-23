@@ -30,8 +30,8 @@
  *      dynamic lib.
  * Con: Overhead.
  */
-#if defined(_MSC_VER) && defined(_M_X64)
-// MSVC on x64 needs 16-byte alignment of malloc
+#if defined (_WIN64)
+// Win64 needs 16-byte alignment of malloc
 #define MALLOC_ALIGNMENT	16
 #else
 // Default dlmalloc alignment
@@ -44,6 +44,17 @@
 #pragma warning(disable:4267)
 /* We want speed here */
 #pragma optimize("gty", on)
+#endif
+
+/* Workaround for recent ming64 releases; they define FORCEINLINE
+   to contain an 'extern', which conflicts with the 'static' they
+   declared with in dlmalloc.c and ptmalloc3.c. So provide a safe
+   definition here. */
+#if defined(WIN32) && defined (__GNUC__)
+#ifdef FORCEINLINE
+#undef FORCEINLINE
+#endif
+#define FORCEINLINE __inline __attribute__((always_inline))
 #endif
 
 /* Cygwin has funny issues with atexit() that ptmalloc seems to tickle.
