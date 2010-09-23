@@ -100,14 +100,14 @@ void csView::SetContext (iGraphics3D *ig3d)
   G3D = ig3d;
 }
 
-void csView::SetRectangle (int x, int y, int w, int h, bool restrict)
+void csView::SetRectangle (int x, int y, int w, int h, bool restrictToScreen)
 {
   OldWidth = G3D->GetWidth ();
   OldHeight = G3D->GetHeight ();
   delete PolyView; PolyView = 0;
   Clipper = 0;
 
-  if(restrict)
+  if(restrictToScreen)
   {
     // Do not allow the rectangle to go out of the screen
     if (x < 0) { w += x; x = 0; }

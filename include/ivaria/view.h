@@ -82,7 +82,7 @@ struct iView : public virtual iBase
    *   top.
    * \param restrict Restrict the rectangle to be no bigger than the screen size.
    */
-  virtual void SetRectangle (int x, int y, int w, int h, bool restrict = true) = 0;
+  virtual void SetRectangle (int x, int y, int w, int h, bool restrictToScreen = true) = 0;
   /// Clear clipper in order to start building a polygon-based clipper.
   virtual void ClearView () = 0;
   /// Add a vertex to clipping polygon (non-rectangular clipping).

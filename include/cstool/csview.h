@@ -103,7 +103,7 @@ public:
   virtual void SetContext (iGraphics3D *ig3d);
 
   /// Set clipping rectangle.
-  virtual void SetRectangle (int x, int y, int w, int h, bool restrict = true);
+  virtual void SetRectangle (int x, int y, int w, int h, bool restrictToScreen = true);
   /// Clear clipper in order to start building a polygon-based clipper.
   virtual void ClearView ();
   /// Add a vertex to clipping polygon (non-rectangular clipping).
