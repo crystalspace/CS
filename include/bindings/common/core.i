@@ -768,6 +768,8 @@ template <class T, class K = unsigned int,
 %include "igeom/path.h"
 
 %template(scfPath) scfImplementationExt1<csPath,csObject,iPath >;
+%feature("unref") csPath "$this->DecRef();"
+
 #ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
 %ignore iTriangleMesh::GetTriangles;
 %ignore iTriangleMesh::GetVertices;
