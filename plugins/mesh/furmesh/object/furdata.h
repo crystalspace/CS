@@ -35,6 +35,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   {
     csRef<iTextureHandle> handle;
     int width, height;
+    csRef<iDataBuffer> databuf;
     uint8* data;
 
     csTextureRGBA ();
