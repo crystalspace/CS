@@ -42055,7 +42055,7 @@ SWIGINTERN PyObject *_wrap_delete_csPath(PyObject *SWIGUNUSEDPARM(self), PyObjec
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csPath" "', argument " "1"" of type '" "csPath *""'"); 
   }
   arg1 = reinterpret_cast< csPath * >(argp1);
-  delete arg1;
+  arg1->DecRef();
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
