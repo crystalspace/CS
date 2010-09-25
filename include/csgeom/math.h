@@ -159,7 +159,7 @@ CS_FORCEINLINE bool csFinite (double d)
 /// Checks if a floating point value is not-a-number.
 CS_FORCEINLINE bool csNaN (float f)
 {
-#if defined (CS_HAVE_NANF)
+#if defined (CS_HAVE_ISNANF)
   return isnanf (f);
 #elif defined (CS_HAVE_STD__ISNAN)
   return std::isnan (f);
