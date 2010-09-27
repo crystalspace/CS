@@ -271,6 +271,9 @@ bool SintelScene::CreateAvatar ()
   if (!animeshFactory)
     return avatarTest->ReportError ("Can't find Sintel's animesh factory!");
 
+  // We don't want to have the skeletal animation started automatically
+  animeshFactory->GetSkeletonFactory ()->SetAutoStart (false);
+
   // Load the mesh for the hairs
   rc = avatarTest->loader->Load ("/lib/sintel/sintel_hairs");
   if (!rc.success)
@@ -468,11 +471,6 @@ bool SintelScene::CreateAvatar ()
   // Create the eyes
   eyesMesh = avatarTest->engine->CreateMeshWrapper (eyesMeshfact, "sintel_eyes",
 						    avatarTest->room, csVector3 (0.0f));
-
-  // Start animation
-  //CS::Animation::iSkeletonAnimNode* rootNode =
-  //  animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
-  //rootNode->Play ();
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();

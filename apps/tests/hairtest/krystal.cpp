@@ -431,9 +431,6 @@ bool KrystalScene::CreateAvatar ()
   furMesh->SetStrandLOD(1);
   furMesh->SetControlPointsLOD(0.0f);
 
-  // Start animation
-  rootNode->Play ();
-
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
 

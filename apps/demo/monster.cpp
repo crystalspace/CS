@@ -94,7 +94,6 @@ bool Monster::Initialize(iMeshWrapper* spawn)
     // Start the root animation node
     CS::Animation::iSkeletonAnimNode* rootNode =
       animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
-    rootNode->Play ();
 
     // Find the FSM animation node
     weapon->fsmNode = fsmNode = (CS::Animation::iSkeletonFSMNode*) rootNode->FindNode ("fsm");
@@ -277,34 +276,24 @@ void Monster::Explode()
   iMeshFactoryWrapper* fact = engine->FindMeshFactory("gibs_piece");
   if (!fact) return;
   csRef<iMeshWrapper> meshexplo;
-  csRef<CS::Mesh::iAnimatedMesh> animesh;
 
   //1
   meshexplo = fact->CreateMeshWrapper();
   meshexplo->GetMovable()->Transform(csYRotMatrix3(0));
   meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
   meshexplo->GetMovable()->UpdateMove();
-  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (meshexplo->GetMeshObject ());
-  if (animesh)
-    animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ()->Play ();
 
   //2
   meshexplo = fact->CreateMeshWrapper();
   meshexplo->GetMovable()->Transform(csYRotMatrix3(-1.97051f));
   meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
   meshexplo->GetMovable()->UpdateMove();
-  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (meshexplo->GetMeshObject ());
-  if (animesh)
-    animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ()->Play ();
 
   //3
   meshexplo = fact->CreateMeshWrapper();
   meshexplo->GetMovable()->Transform(csYRotMatrix3(2.9665f));
   meshexplo->QuerySceneNode()->SetParent(mesh->QuerySceneNode());
   meshexplo->GetMovable()->UpdateMove();
-  animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (meshexplo->GetMeshObject ());
-  if (animesh)
-    animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ()->Play ();
 }
 
 void Monster::ChangeMaterial()

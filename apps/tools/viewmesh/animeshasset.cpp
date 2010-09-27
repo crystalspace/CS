@@ -42,6 +42,9 @@ AnimeshAsset::AnimeshAsset(iObjectRegistry* obj_reg, iMeshWrapper* mesh)
   animeshstate = scfQueryInterface<CS::Mesh::iAnimatedMesh> (mesh->GetMeshObject());
   animeshsprite = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory> (mesh->GetFactory()->GetMeshObjectFactory());
 
+  // start automatically the animation
+  animeshsprite->GetSkeletonFactory()->SetAutoStart (true);
+
   // create a new animation tree
   CS::Animation::iSkeletonAnimPacketFactory* packetFactory = animeshsprite->GetSkeletonFactory()->GetAnimationPacket();
   if (!packetFactory)
@@ -113,14 +116,11 @@ bool AnimeshAsset::PlayAnimation(const char* animationName, bool cycle)
   if (id == CS::Animation::InvalidKeyframeID)
     return false;
 
-  if (node->IsActive ())
-    node->Stop ();
   node->SwitchToState (id);
   csRef<CS::Animation::iSkeletonAnimationNodeFactory> animfactory = scfQueryInterfaceSafe<CS::Animation::iSkeletonAnimationNodeFactory>
     (node->GetStateNode (id)->GetFactory ());
   animfactory->SetCyclic (cycle);
   node->GetStateNode (id)->SetPlaybackSpeed (reverseAction ? -1.00f : 1.00f);
-  node->Play ();
 
   return true;
 }

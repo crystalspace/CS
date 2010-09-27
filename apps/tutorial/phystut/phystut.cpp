@@ -1695,21 +1695,19 @@ void Simple::SpawnRagdoll ()
 
   animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
 
-  // Set initial position of the body
+  // Set the initial position of the body
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
   ragdollMesh->QuerySceneNode ()->GetMovable ()->SetPosition (
                   tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
 
-  // Start the ragdoll anim node
+  // Start the ragdoll animation node so that the rigid bodies of the bones are created
   CS::Animation::iSkeletonAnimNode* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
     GetAnimationRoot ();
-
   csRef<CS::Animation::iSkeletonRagdollNode> ragdoll =
     scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode> (root);
+  ragdoll->Play ();
 
   // Fling the body.
-  // (start the ragdoll node before so that the rigid bodies are created)
-  ragdoll->Play ();
   for (uint i = 0; i < ragdoll->GetBoneCount (CS::Animation::STATE_DYNAMIC); i++)
   {
     CS::Animation::BoneID boneID = ragdoll->GetBone (CS::Animation::STATE_DYNAMIC, i);

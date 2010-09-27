@@ -159,7 +159,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
   {
-    // Toggle the target mode of the 'LookAt' controller
+    // Toggle the target mode of the 'LookAt' animation node
     if (csKeyEventHelper::GetCookedCode (&ev) == 't')
     {
       if (targetMode == LOOKAT_CAMERA)
@@ -183,7 +183,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    // Toggle the 'always rotate' option of the 'LookAt' controller
+    // Toggle the 'always rotate' option of the 'LookAt' animation node
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
       alwaysRotate = !alwaysRotate;
@@ -191,7 +191,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    // Toggle the rotation speed of the 'LookAt' controller
+    // Toggle the rotation speed of the 'LookAt' animation node
     else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
     {
       if (rotationSpeed == ROTATION_SLOW)
@@ -215,7 +215,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       return true;
     }
 
-    // Update the walking speed of the 'speed' controller
+    // Update the walking speed of the 'speed' animation node
     else if (csKeyEventHelper::GetCookedCode (&ev) == '+')
     {
       if (currentSpeed < 58)
@@ -339,7 +339,7 @@ bool FrankieScene::OnMouseDown (iEvent &ev)
     animesh->SetMorphTargetWeight
       (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
 
-    // Stop the child animations, there is only the ragdoll controller which is active
+    // Stop the child animations, there is only the ragdoll animation node which is active
     lookAtNode->Stop ();
 
     // Set the ragdoll state of the CS::Animation::iBodyChain of the body and the tail as dynamic
@@ -412,14 +412,14 @@ bool FrankieScene::CreateAvatar ()
     return avatarTest->ReportError ("Can't find Frankie's body mesh description!");
 
   // Create a new animation tree. The structure of the tree is:
-  //   + ragdoll controller node (root node - only if physics are enabled)
-  //     + 'LookAt' controller node
-  //       + 'speed' controller node
+  //   + ragdoll animation node (root node - only if physics are enabled)
+  //     + 'LookAt' animation node
+  //       + 'speed' animation node
   //         + animation nodes for all speeds
   csRef<CS::Animation::iSkeletonAnimPacketFactory> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
-  // Create the 'LookAt' controller
+  // Create the 'LookAt' animation node
   csRef<CS::Animation::iSkeletonLookAtNodeFactory> lookAtNodeFactory =
     avatarTest->lookAtManager->CreateAnimNodeFactory ("lookat", bodySkeleton);
 
@@ -477,7 +477,7 @@ bool FrankieScene::CreateAvatar ()
   runJumpNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunFast2Jump"));
 
-  // Create the 'speed' controller (and add all animations of Frankie moving at different speeds)
+  // Create the 'speed' animation node (and add all animations of Frankie moving at different speeds)
   // Unfortunately, the Frankie animations from 'walk fast' to 'footing'
   // do not blend well together, but this is just an example...
   csRef<CS::Animation::iSkeletonSpeedNodeFactory> speedNodeFactory =
@@ -496,14 +496,14 @@ bool FrankieScene::CreateAvatar ()
 
   if (avatarTest->physicsEnabled)
   {
-    // Create the ragdoll controller
+    // Create the ragdoll animation node
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
       avatarTest->ragdollManager->CreateAnimNodeFactory ("ragdoll",
 					     bodySkeleton, avatarTest->dynamicSystem);
     animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
     ragdollNodeFactory->SetChildNode (lookAtNodeFactory);
 
-    // Create a bone chain for the whole body and add it to the ragdoll controller.
+    // Create a bone chain for the whole body and add it to the ragdoll animation node.
     // The chain will be in kinematic mode when Frankie is alive, and in dynamic state
     // when Frankie has been killed.
     bodyChain = bodySkeleton->CreateBodyChain
@@ -512,7 +512,7 @@ bool FrankieScene::CreateAvatar ()
        animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"), 0);
     ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
 
-    // Create a bone chain for the tail of Frankie and add it to the ragdoll controller.
+    // Create a bone chain for the tail of Frankie and add it to the ragdoll animation node.
     // The chain will be in kinematic mode most of the time, and in dynamic mode when the
     // user ask for it with the 'f' key or when Frankie has been killed.
     tailChain = bodySkeleton->CreateBodyChain
@@ -535,25 +535,22 @@ bool FrankieScene::CreateAvatar ()
   CS::Animation::iSkeletonAnimNode* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
-  // Setup of the LookAt controller
+  // Setup of the LookAt animation node
   lookAtNode = scfQueryInterface<CS::Animation::iSkeletonLookAtNode> (rootNode->FindNode ("lookat"));
   lookAtNode->AddListener (&lookAtListener);
   lookAtNode->SetBone (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
   lookAtNode->SetListenerDelay (0.6f);
 
-  // Setup of the speed controller
+  // Setup of the speed animation node
   speedNode = scfQueryInterface<CS::Animation::iSkeletonSpeedNode> (rootNode->FindNode ("speed"));
 
-  // Setup of the ragdoll controller
+  // Setup of the ragdoll animation node
   if (avatarTest->physicsEnabled)
     ragdollNode =
       scfQueryInterface<CS::Animation::iSkeletonRagdollNode> (rootNode->FindNode ("ragdoll"));
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
-
-  // Start animation
-  rootNode->Play ();
 
   // Setup the decal
   if (avatarTest->decalManager)
@@ -618,7 +615,7 @@ void FrankieScene::ResetScene ()
       avatarTest->dynamicsDebugger->UpdateDisplay ();
   }
 
-  // Reset 'LookAt' controller
+  // Reset the 'LookAt' animation node
   alwaysRotate = false;
   lookAtNode->SetAlwaysRotate (alwaysRotate);
   targetMode = LOOKAT_CAMERA;
@@ -627,7 +624,7 @@ void FrankieScene::ResetScene ()
   lookAtNode->SetMaximumSpeed (5.0f);
   lookAtNode->Play ();
 
-  // Reset 'speed' controller
+  // Reset the 'speed' animation node
   currentSpeed = 0;
   speedNode->SetSpeed (((float) currentSpeed) / 10.0f);
 

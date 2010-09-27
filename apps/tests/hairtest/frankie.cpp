@@ -345,9 +345,6 @@ bool FrankieScene::CreateAvatar ()
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
 
-  // Start animation
-  rootNode->Play ();
-
   return true;
 }
 

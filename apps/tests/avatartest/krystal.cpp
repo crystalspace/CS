@@ -402,7 +402,7 @@ bool KrystalScene::CreateAvatar ()
 
   if (avatarTest->physicsEnabled)
   {
-    // Create a bone chain for the whole body and add it to the ragdoll controller.
+    // Create a bone chain for the whole body and add it to the ragdoll animation node.
     // The chain will be in kinematic mode when Krystal is alive, and in dynamic state
     // when Krystal has been killed.
     bodyChain = bodySkeleton->CreateBodyChain
@@ -416,7 +416,7 @@ bool KrystalScene::CreateAvatar ()
       ("arm_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("RightShoulder"),
        animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"), 0);
 
-    // Create the ragdoll controller
+    // Create the ragdoll animation node
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
       avatarTest->ragdollManager->CreateAnimNodeFactory
       ("ragdoll", bodySkeleton, avatarTest->dynamicSystem);
@@ -469,7 +469,7 @@ bool KrystalScene::CreateAvatar ()
   CS::Animation::iSkeletonAnimNode* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
-  // Setup of the ragdoll controller
+  // Setup of the ragdoll animation node
   if (avatarTest->physicsEnabled)
   {
     // Find references to the animation nodes
@@ -486,9 +486,6 @@ bool KrystalScene::CreateAvatar ()
     // Start the ragdoll animation node in order to have the rigid bodies created
     ragdollNode->Play ();
   }
-
-  // Start animation
-  rootNode->Play ();
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();

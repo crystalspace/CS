@@ -49,7 +49,6 @@ Player::Player(iObjectRegistry* obj_reg) : Entity(obj_reg)
       // Start the root animation node
       CS::Animation::iSkeletonAnimNode* rootNode =
 	animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
-      rootNode->Play ();
 
       // Find the pointer to the FSM animation node
       weapon->fsmNode = (CS::Animation::iSkeletonFSMNode*) rootNode->FindNode ("fsm");
