@@ -150,6 +150,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
           factory->SetAnimationPacket (packet);
         }
         break;
+      case XMLTOKEN_STARTANIMATION:
+        {
+	  bool automatic = child->GetAttributeValueAsBool ("automatic", true);
+	  if (!automatic)
+	    factory->SetAutoStart (false);
+        }
+        break;
       default:
         synldr->ReportBadToken (child);
         return false;
