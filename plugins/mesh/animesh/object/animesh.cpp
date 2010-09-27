@@ -637,7 +637,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   AnimeshObject::AnimeshObject (AnimeshObjectFactory* factory)
     : scfImplementationType (this), factory (factory), logParent (0),
-    material (0), mixMode (0), skeleton (0), lastTick (~0), morphVersion (0), morphStateChanged (false),
+    material (0), mixMode (0), skeleton (0), initialized (false), morphVersion (0), morphStateChanged (false),
     skinVertexVersion (~0), skinNormalVersion (~0), skinTangentBinormalVersion (~0),
     morphVertexVersion (0), skinVertexLF (false), skinNormalLF (false), skinTangentBinormalLF (false)
   {
@@ -837,9 +837,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     if (skeleton)
     {
-      if (lastTick == ~0)
+      if (!initialized)
+      {
+	initialized = true;
 	lastTick = current_time;
 
+	// Check if we need to start automatically the animation
+	if (skeleton->GetFactory ()->GetAutoStart ())
+	{
+	  CS::Animation::iSkeletonAnimPacket* packet = skeleton->GetAnimationPacket ();
+	  if (packet)
+	  {
+	    CS::Animation::iSkeletonAnimNode* node = packet->GetAnimationRoot ();
+	    if (node)
+	      node->Play ();
+	  }
+	}
+      }
+
+      // Update the skeleton
       skeleton->UpdateSkeleton ((current_time - lastTick) / 1000.0f);
 
       // Copy the skeletal state into our buffers

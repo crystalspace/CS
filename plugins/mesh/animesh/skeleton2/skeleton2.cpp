@@ -93,7 +93,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS_LEAKGUARD_IMPLEMENT(SkeletonFactory);
 
   SkeletonFactory::SkeletonFactory ()
-    : scfImplementationType (this), cachedTransformsDirty (true), 
+    : scfImplementationType (this), autostart (true), cachedTransformsDirty (true), 
     orderListDirty (true)
   {}
 
@@ -278,6 +278,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   void SkeletonFactory::SetAnimationPacket (CS::Animation::iSkeletonAnimPacketFactory* fact)
   {
     animationPacket = fact;
+  }
+
+  void SkeletonFactory::SetAutoStart (bool autostart)
+  {
+    this->autostart = autostart;
+  }
+
+  bool SkeletonFactory::GetAutoStart ()
+  {
+    return autostart;
   }
 
   void SkeletonFactory::UpdateCachedTransforms ()

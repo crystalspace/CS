@@ -127,7 +127,7 @@ struct iSkeletonManager : public virtual iBase
  */
 struct iSkeletonFactory : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonFactory, 1, 0, 1);
 
   /**\name Bone handling
    * @{ */
@@ -231,6 +231,22 @@ struct iSkeletonFactory : public virtual iBase
    * Set the animation packet associated with this skeleton
    */
   virtual void SetAnimationPacket (iSkeletonAnimPacketFactory* fact) = 0;
+
+  /**
+   * Set whether or not the skeleton should start its animation automatically
+   * after its initialization. Default value is true.
+   * \remarks The animation will be effectively started at the first frame
+   * subsequent to the creation of the CS::Mesh::iAnimatedMesh. You may therefore 
+   * still need to start manually the animation nodes, eg if you want to have the
+   * rigid bodies created directly by the ragdoll animation node.
+   */
+  virtual void SetAutoStart (bool autostart) = 0;
+
+  /**
+   * Set whether or not the skeleton should start its animation automatically
+   * after its initialization.
+   */
+  virtual bool GetAutoStart () = 0;
 };
 
 /**

@@ -496,6 +496,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRef<CS::Animation::iSkeleton> skeleton;
     unsigned int skeletonVersion;
     csTicks lastTick;
+    bool initialized;
 
     // Hold the bone transforms
     csRef<csShaderVariable> boneTransformArray;

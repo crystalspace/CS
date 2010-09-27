@@ -97,6 +97,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual CS::Animation::iSkeletonAnimPacketFactory* GetAnimationPacket () const;
     virtual void SetAnimationPacket (CS::Animation::iSkeletonAnimPacketFactory* fact);
 
+    virtual void SetAutoStart (bool autostart);
+    virtual bool GetAutoStart ();
+
     //-- "Private"
     inline const csArray<size_t>& GetOrderList () const
     {
@@ -131,6 +134,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     csArray<size_t> boneOrderList;
     csRef<CS::Animation::iSkeletonAnimPacketFactory> animationPacket;    
+
+    bool autostart;
 
     bool cachedTransformsDirty;
     bool orderListDirty;
