@@ -637,7 +637,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   AnimeshObject::AnimeshObject (AnimeshObjectFactory* factory)
     : scfImplementationType (this), factory (factory), logParent (0),
-    material (0), mixMode (0), skeleton (0), morphVersion (0), morphStateChanged (false),
+    material (0), mixMode (0), skeleton (0), lastTick (~0), morphVersion (0), morphStateChanged (false),
     skinVertexVersion (~0), skinNormalVersion (~0), skinTangentBinormalVersion (~0),
     morphVertexVersion (0), skinVertexLF (false), skinNormalLF (false), skinTangentBinormalLF (false)
   {
@@ -832,11 +832,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return 0;
   }
 
-  void AnimeshObject::NextFrame (csTicks current_time,const csVector3& pos,
+  void AnimeshObject::NextFrame (csTicks current_time, const csVector3& pos,
     uint currentFrame)
   {
     if (skeleton)
     {
+      if (lastTick == ~0)
+	lastTick = current_time;
+
       skeleton->UpdateSkeleton ((current_time - lastTick) / 1000.0f);
 
       // Copy the skeletal state into our buffers
