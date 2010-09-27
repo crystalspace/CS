@@ -418,13 +418,21 @@ struct iAnimatedMeshFactory : public virtual iBase
   * socket with that name exists).
   */
   virtual uint FindSocket (const char* name) const = 0;
+
   /** @} */
 
+  /**\name Vertex data definition and handling
+   * @{ */
   /**
    * Compute the tangents and binormals from the current vertices, normals and texels.
    * The current content of the tangent and binormal buffers will be overwritten.
    */
   virtual void ComputeTangents () = 0;
+
+  /** @} */
+
+  /**\name Bone interface and influence
+  * @{ */
 };
 
 /**
