@@ -42,6 +42,7 @@ class KrystalScene : public AvatarScene
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
+  bool OnMouseUp (iEvent &event);
 
   // Creation of objects
   bool CreateAvatar ();
@@ -68,6 +69,10 @@ class KrystalScene : public AvatarScene
   bool IKenabled;
   csRef<CS::Animation::iSkeletonIKNode> IKNode;
   CS::Animation::EffectorID handEffector;
+  csRef<iMeshWrapper> IKMesh;
+  bool IKdragging;
+  float IKDragDistance;
+  csVector3 IKDragOffset;
 
   // Krystal's hairs & skirt (and their soft bodies)
   csRef<iMeshFactoryWrapper> hairsMeshFact;

@@ -202,11 +202,20 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
 
 bool AvatarTest::OnMouseDown (iEvent& ev)
 {
-  // Default behavior from DemoApplication
-  if (DemoApplication::OnMouseDown (ev))
+  if (avatarScene->OnMouseDown (ev))
     return true;
 
-  return avatarScene->OnMouseDown (ev);
+  // Default behavior from DemoApplication
+  return DemoApplication::OnMouseDown (ev);
+}
+
+bool AvatarTest::OnMouseUp (iEvent& ev)
+{
+  if (avatarScene->OnMouseUp (ev))
+    return true;
+
+  // Default behavior from DemoApplication
+  return DemoApplication::OnMouseUp (ev);
 }
 
 bool AvatarTest::HitBeamAnimatedMesh (csVector3& isect, csVector3& direction, int& triangle)

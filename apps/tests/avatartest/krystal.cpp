@@ -21,6 +21,7 @@
 
 #include "cssysdef.h"
 #include "krystal.h"
+#include "csgeom/sphere.h"
 
 #define CAMERA_MINIMUM_DISTANCE 0.75f
 #define CAMERA_HIPS_DISTANCE 3.0f
@@ -135,6 +136,22 @@ bool KrystalScene::HasPhysicalObjects ()
 
 void KrystalScene::Frame ()
 {
+  // Dragging the Inverse Kinematics target
+  if (IKdragging)
+  {
+    // Keep the 'IKMesh' mesh at the same distance to the camera
+    csRef<iCamera> camera = avatarTest->view->GetCamera ();
+    csVector2 v2d (avatarTest->mouseX, avatarTest->g2d->GetHeight () - avatarTest->mouseY);
+    csVector3 v3d = camera->InvPerspective (v2d, 10000);
+    csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+    csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+
+    csVector3 newPosition = endBeam - startBeam;
+    newPosition.Normalize ();
+    newPosition = camera->GetTransform ().GetOrigin () + newPosition * IKDragDistance;
+    IKMesh->GetMovable ()->SetPosition (newPosition - IKDragOffset);
+    IKMesh->GetMovable ()->UpdateMove ();
+  }
 }
 
 bool KrystalScene::OnKeyboard (iEvent &ev)
@@ -150,12 +167,17 @@ bool KrystalScene::OnKeyboard (iEvent &ev)
 
       if (IKenabled)
       {
-	csOrthoTransform transform (csMatrix3 (), csVector3 (-0.3f, 1.2f, -0.4f));
-	IKNode->AddConstraint (handEffector, transform);
+	IKMesh->GetMovable ()->SetTransform (csOrthoTransform (csMatrix3 (), csVector3 (-0.3f, 1.2f, -0.4f)));
+	avatarTest->room->GetMeshes ()->Add (IKMesh);
+	csOrthoTransform transform;
+	IKNode->AddConstraint (handEffector, IKMesh->GetMovable (), transform);
       }
 
       else
+      {
 	IKNode->RemoveConstraint (handEffector);
+	avatarTest->room->GetMeshes ()->Remove (IKMesh);
+      }
 
       return true;
     }
@@ -173,6 +195,7 @@ bool KrystalScene::OnKeyboard (iEvent &ev)
 
 bool KrystalScene::OnMouseDown (iEvent &ev)
 {
+  // Left mouse button: Shoot!
   if (csMouseEventHelper::GetButton (&ev) == 0
       && avatarTest->physicsEnabled)
   {
@@ -224,6 +247,7 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     // Disable the Inverse Kinematics animation node
     if (IKenabled)
     {
+      avatarTest->room->GetMeshes ()->Remove (IKMesh);
       IKNode->RemoveConstraint (handEffector);
       IKenabled = false;
     }
@@ -267,6 +291,43 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
 					      * csVector3 (0.0f, 0.0f, 5.0f));
     }
 
+    return true;
+  }
+
+  // Right mouse button: dragging the Inverse Kinematic target
+  else if (csMouseEventHelper::GetButton (&ev) == 1
+	   && IKenabled)
+  {
+    // Trace a beam to see if the IK box was really clicked
+    // Compute the end beam points
+    csRef<iCamera> camera = avatarTest->view->GetCamera ();
+    csVector2 v2d (avatarTest->mouseX, avatarTest->g2d->GetHeight () - avatarTest->mouseY);
+    csVector3 v3d = camera->InvPerspective (v2d, 10000);
+    csVector3 startBeam = camera->GetTransform ().GetOrigin ();
+    csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
+    startBeam = IKMesh->GetMovable ()->GetTransform ().Other2This (startBeam);
+    endBeam = IKMesh->GetMovable ()->GetTransform ().Other2This (endBeam);
+
+    csVector3 isect;
+    if (IKMesh->GetMeshObject ()->HitBeamOutline (startBeam, endBeam, isect, 0))
+    {
+      IKdragging = true;
+      IKDragOffset = isect;
+      IKDragDistance = (IKMesh->GetMovable ()->GetPosition () - camera->GetTransform ().GetOrigin ()).Norm ();
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool KrystalScene::OnMouseUp (iEvent& ev)
+{
+  if (csMouseEventHelper::GetButton (&ev) == 1
+      && IKdragging)
+  {
+    IKdragging = false;
     return true;
   }
 
@@ -490,6 +551,28 @@ bool KrystalScene::CreateAvatar ()
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
 
+  //if (!avatarTest->loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+  //avatarTest->ReportWarning ("Could not load texture 'stone'");
+
+  // Create a box mesh for the target of the Inverse Kinematics
+  csRef<iMeshFactoryWrapper> boxFact = avatarTest->engine->CreateMeshFactory
+    ("crystalspace.mesh.object.genmesh", "boxFact");
+  if (!boxFact) return avatarTest->ReportError ("Error creating mesh object factory!");
+
+  csRef<iGeneralFactoryState> gmstate =
+    scfQueryInterface<iGeneralFactoryState> (boxFact->GetMeshObjectFactory ());
+  //gmstate->GenerateBox (csBox3 (10.0f));
+  gmstate->GenerateSphere (csEllipsoid (csVector3 (0.0f), csVector3 (0.05f)), 6);
+  //gmstate->GenerateSphere (csEllipsoid (csVector3 (0.0f), csVector3 (0.2f)), 6);
+
+  iTextureWrapper* txt = avatarTest->loader->LoadTexture ("spark", "/lib/std/spark.png");
+  if (!txt) return avatarTest->ReportError ("Error loading texture!");
+
+  // Create the mesh.
+  IKMesh = avatarTest->engine->CreateMeshWrapper (boxFact, "IKmesh"/*, avatarTest->room*/);
+  iMaterialWrapper* mat = avatarTest->engine->GetMaterialList ()->FindByName ("spark");
+  IKMesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
   return true;
 }
 
@@ -506,7 +589,10 @@ void KrystalScene::ResetScene ()
     krystalDead = false;
 
     // Reset the Inverse Kinematic node
+    if (IKenabled)
+      avatarTest->room->GetMeshes ()->Remove (IKMesh);
     IKenabled = false;
+    IKdragging = false;
     IKNode->RemoveConstraint (handEffector);
 
     // Set the ragdoll state of the 'body' and 'arm' chains as kinematic

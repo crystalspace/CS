@@ -57,6 +57,7 @@ class AvatarScene
   virtual void Frame () = 0;
   virtual bool OnKeyboard (iEvent &event) = 0;
   virtual bool OnMouseDown (iEvent &event) = 0;
+  virtual bool OnMouseUp (iEvent &event) { return false; }
 
   // Creation of objects
   virtual bool CreateAvatar () = 0;
@@ -110,6 +111,7 @@ private:
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
+  bool OnMouseUp (iEvent &event);
 
   //-- CS::Demo::CameraManager
   csVector3 GetCameraStart ();

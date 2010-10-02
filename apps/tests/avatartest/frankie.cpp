@@ -218,7 +218,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
     // Update the walking speed of the 'speed' animation node
     else if (csKeyEventHelper::GetCookedCode (&ev) == '+')
     {
-      if (currentSpeed < 58)
+      if (currentSpeed < 50)
       {
 	currentSpeed += 1;
 	speedNode->SetSpeed (((float) currentSpeed) / 10.0f);
@@ -471,12 +471,6 @@ bool FrankieScene::CreateAvatar ()
   runFastNodeFactory->SetAnimation
     (animPacketFactory->FindAnimation ("Frankie_RunFaster"));
 
-  // Create the 'run_jump' animation node
-  csRef<CS::Animation::iSkeletonAnimationNodeFactory> runJumpNodeFactory =
-    animPacketFactory->CreateAnimationNode ("run_jump");
-  runJumpNodeFactory->SetAnimation
-    (animPacketFactory->FindAnimation ("Frankie_RunFast2Jump"));
-
   // Create the 'speed' animation node (and add all animations of Frankie moving at different speeds)
   // Unfortunately, the Frankie animations from 'walk fast' to 'footing'
   // do not blend well together, but this is just an example...
@@ -490,7 +484,6 @@ bool FrankieScene::CreateAvatar ()
   speedNodeFactory->AddNode (runSlowNodeFactory, 2.6f);
   speedNodeFactory->AddNode (runNodeFactory, 3.4f);
   speedNodeFactory->AddNode (runFastNodeFactory, 5.0f);
-  speedNodeFactory->AddNode (runJumpNodeFactory, 5.8f);
 
   lookAtNodeFactory->SetChildNode (speedNodeFactory);
 
