@@ -125,6 +125,37 @@
 
 
 
+#ifdef SCF_IMPL_EXT
+/**
+ * Base class to extend the SCF class \c Super with additional interfaces.
+ * \c Super itself must be derived from one of the scfImplementation* classes.
+ * \c Class is the declared class. 
+ *
+ * Typical usage:
+ * \code
+ * class MyPath : public scfImplementationExt1<MyPath, csPath, iMyPath>
+ * {
+ * public:
+ *   // ... iMyPath methods ... 
+ * };
+ * \endcode
+ */
+#else
+/**
+ * Base class for an SCF class implementation with the given number of interfaces.
+ * iBase is implicitly implemented and available.
+ * \c Class is the declared class. 
+ *
+ * Typical usage:
+ * \code
+ * class MyPlugin : public scfImplementation1<MyPlugin, iComponent>
+ * {
+ * public:
+ *   // ... iComponent methods ... 
+ * };
+ * \endcode
+ */
+#endif
 template<class Class SCF_IMPL_TYPES>
 class SCF_IMPL_NAME :
   public SCF_IMPL_SUPER

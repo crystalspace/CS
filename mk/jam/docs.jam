@@ -353,7 +353,7 @@ rule Doxygen
   if $(CMD.C++CPP)
   {
     doxycpp = [ GenerateDoxygenCppWrapper $(outfile) : 
-      $(CMD.C++CPP) [ FDefines DOXYGEN_RUN ] ] ;
+      $(CMD.C++CPP) "-C" [ FDefines DOXYGEN_RUN ] ] ;
   }
   
   local have_dot = "NO" ;

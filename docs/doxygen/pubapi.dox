@@ -333,6 +333,7 @@ EXCLUDE                =
 
 EXCLUDE_PATTERNS       = \
 	*/include/csutil/scf_impl.h \
+	*/include/csutil/scf_implgen_p.h \
 	*/include/csutil/generic/regex.h
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
