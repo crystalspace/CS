@@ -551,9 +551,6 @@ bool KrystalScene::CreateAvatar ()
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
 
-  //if (!avatarTest->loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-  //avatarTest->ReportWarning ("Could not load texture 'stone'");
-
   // Create a box mesh for the target of the Inverse Kinematics
   csRef<iMeshFactoryWrapper> boxFact = avatarTest->engine->CreateMeshFactory
     ("crystalspace.mesh.object.genmesh", "boxFact");
@@ -561,15 +558,13 @@ bool KrystalScene::CreateAvatar ()
 
   csRef<iGeneralFactoryState> gmstate =
     scfQueryInterface<iGeneralFactoryState> (boxFact->GetMeshObjectFactory ());
-  //gmstate->GenerateBox (csBox3 (10.0f));
   gmstate->GenerateSphere (csEllipsoid (csVector3 (0.0f), csVector3 (0.05f)), 6);
-  //gmstate->GenerateSphere (csEllipsoid (csVector3 (0.0f), csVector3 (0.2f)), 6);
 
   iTextureWrapper* txt = avatarTest->loader->LoadTexture ("spark", "/lib/std/spark.png");
   if (!txt) return avatarTest->ReportError ("Error loading texture!");
 
   // Create the mesh.
-  IKMesh = avatarTest->engine->CreateMeshWrapper (boxFact, "IKmesh"/*, avatarTest->room*/);
+  IKMesh = avatarTest->engine->CreateMeshWrapper (boxFact, "IKmesh");
   iMaterialWrapper* mat = avatarTest->engine->GetMaterialList ()->FindByName ("spark");
   IKMesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
