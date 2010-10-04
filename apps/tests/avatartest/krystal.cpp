@@ -27,7 +27,7 @@
 #define CAMERA_HIPS_DISTANCE 3.0f
 
 KrystalScene::KrystalScene (AvatarTest* avatarTest)
-  : avatarTest (avatarTest)
+  : avatarTest (avatarTest), IKenabled (false)
 {
   // Define the available keys
   avatarTest->hudHelper.keyDescriptions.DeleteAll ();
