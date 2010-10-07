@@ -41,6 +41,193 @@ class csInputBinder;
 /**
  * This class holds a description of a physical source of input events, such
  * as a keyboard key, mouse or joystick button, or a mouse or joystick axis.
+ *
+ * \par Input string syntax
+ * The general syntax for an input description string is:
+ * <pre>[ Modifiers ] [ DeviceNumber ] DeviceAspect</pre>
+ *
+ * \par Devices, device aspect
+ * Input devices supported by CrystalSpace are joysticks (or more generally,
+ * game controllers), mice and the keyboard. In principle, multiple mice
+ * and joysticks are supported, hence the optional \c DeviceNumber to
+ * distinguish between devices. If omitted, the first device (number 0)
+ * is assumed. The device number is ignored for keyboard input.
+ *
+ * \par
+ * The "device aspect" identifies what can actually produce input.
+ * For the keyboard, these are the keys. For mice and joysticks, these
+ * are buttons and axes.
+ *
+ * \par Modifiers
+ * Modifiers are combinations of certain keys that need to be pressed down
+ * together with the actual "input aspect".
+ *
+ * \par
+ * The modifier string consists of one or more modifier names, listed below.
+ * After each name, a <tt>'+'</tt> or <tt>'-'</tt> must follow.
+ * <table>
+ * <tr><th>Modifier name</th><th>Key</th></tr>
+ * <tr><td>LCtrl</td><td>Left "Control"</td></tr>
+ * <tr><td>RCtrl</td><td>Right "Control"</td></tr>
+ * <tr><td>Ctrl</td><td>Any "Control"</td></tr>
+ * <tr><td>LAlt</td><td>Left "Alt"</td></tr>
+ * <tr><td>RAlt</td><td>Right "Alt"</td></tr>
+ * <tr><td>Alt</td><td>Any "Alt"</td></tr>
+ * <tr><td>LShift</td><td>Left "Shift"</td></tr>
+ * <tr><td>RShift</td><td>Right "Shift"</td></tr>
+ * <tr><td>Shift</td><td>Any "Shift"</td></tr>
+ * <tr><td>Num</td><td>Num Lock</td></tr>
+ * <tr><td>Scroll</td><td>Scroll Lock</td></tr>
+ * <tr><td>Caps</td><td>Caps Lock</td></tr>
+ * </table>
+ * The difference between "left" resp. "right" and "any" modifiers is that,
+ * for "left" or "right", only <em>exactly</em> that modifier key is matched.
+ * For "any", either of the left or right modifier matches.
+ *
+ * \par
+ * Examples with modifiers: <tt>Shift+A</tt>, <tt>LAlt+MouseButtonLeft</tt>.
+ *
+ * \par Keyboard keys
+ * A keyboard key can be classified as a "normal" or "special" key.
+ *
+ * \par
+ * Normal keys are basically those that result in a character to be entered,
+ * such as <tt>'A'</tt>, <tt>'1'</tt>, <tt>'.'</tt> etc. The input string is
+ * a UTF-8 encoded string, and non-ASCII characters are accepted as keys as
+ * well (e.g. <tt>'&Auml;'</tt> which could be found on a German keyboard).
+ * Case does not matter, <tt>'A'</tt> and <tt>'a'</tt> is the same.
+ *
+ * \par
+ * Since <tt>'+'</tt> and <tt>'-'</tt> could be confused with the characters
+ * used for modifier specification these two "normal" keys can also be
+ * specified with the strings <tt>"Plus"</tt> and <tt>"Minus"</tt>.
+ *
+ * \par
+ * Special keys are the other keys. They include keys such as the cursor keys,
+ * num pad keys, etc.
+ *
+ * \par
+ * Available special key strings (in some cases, multiple strings are accepted
+ * for the same key):
+ * - Esc
+ * - Enter
+ * - Return
+ * - Tab
+ * - Back, BackSpace
+ * - Space
+ * - Up (cursor key)
+ * - Down (cursor key)
+ * - Left (cursor key)
+ * - Right (cursor key)
+ * - PgUp, PageUp
+ * - PgDn, PageDown
+ * - Home
+ * - End
+ * - Ins, Insert
+ * - Del, Delete
+ * - F1
+ * - F2
+ * - F3
+ * - F4
+ * - F5
+ * - F6
+ * - F7
+ * - F8
+ * - F9
+ * - F10
+ * - F11
+ * - F12
+ * - Print, PrntScrn
+ * - Pause
+ * - PadPlus
+ * - PadMinus
+ * - PadMult
+ * - PadDiv
+ * - Pad0
+ * - Pad1
+ * - Pad2
+ * - Pad3
+ * - Pad4
+ * - Pad5 (Numlock on), Center (Numlock off)
+ * - Pad6
+ * - Pad7
+ * - Pad8
+ * - Pad9
+ * - PadDecimal
+ * - PadEnter
+ * - Shift
+ * - LShift
+ * - RShift
+ * - Ctrl
+ * - LCtrl
+ * - RCtrl
+ * - Alt
+ * - LAlt
+ * - RAlt
+ * - Num
+ * - Caps
+ * - Scroll
+ *
+ * \par
+ * <em>Note 1:</em> The modifier keys can also be used for "regular" input keys.<br/>
+ * <em>Note 2:</em> In cooked mode, "Pad*" keys will not be recognised - 
+ *   the CrystalSpace input system converts them to the characters
+ *   they represent (numbers etc.) resp. their associated "navigation" key
+ *   (cursor keys etc.). For Pad5, the "cooked" key is Center.
+ *
+ * \par Mouse input
+ * Mice have buttons and axes.
+ * 
+ * \par
+ * The two mice axes are identified with <tt>MouseX</tt> and
+ * <tt>MouseY</tt>.
+ *
+ * \par
+ * Buttons are identified by <tt>Mouse</tt> or <tt>MouseButton</tt> followed
+ * by either a name or a number.
+ * <table>
+ * <tr><th>Button name</th><th>Number</th></tr>
+ * <tr><td>MouseButtonLeft</td><td>0</td></tr>
+ * <tr><td>MouseButtonRight</td><td>1</td></tr>
+ * <tr><td>MouseButtonMiddle</td><td>2</td></tr>
+ * <tr><td>MouseWheelUp</td><td>3</td></tr>
+ * <tr><td>MouseWheelDown</td><td>4</td></tr>
+ * <tr><td>MouseButtonExtra1</td><td>5</td></tr>
+ * <tr><td>MouseButtonExtra2</td><td>6</td></tr>
+ * <tr><td>MouseHWheelLeft</td><td>7</td></tr>
+ * <tr><td>MouseHWheelRight</td><td>8</td></tr>
+ * </table>
+ * Buttons beyond that can be accessed by number: <tt>MouseButton9</tt>,
+ * <tt>MouseButton10</tt>, and so on.
+ * 
+ * \par Joystick input
+ * Joysticks have buttons and axes.
+ * 
+ * \par
+ * The joystick axes are identified by <tt>JoystickAxis</tt>
+ * followed by a number, such as <tt>JoystickAxis0</tt> for 
+ * the first axis.
+ *
+ * \par
+ * Buttons are identified by <tt>Joystick</tt> or <tt>JoystickButton</tt> followed
+ * by the button number, such as <tt>JoystickButton3</tt> for the
+ * fourth button.
+ * 
+ * \par Distinguishing devices
+ * Especially in the case of joysticks multiple devices can usually be found
+ * attached to a computer. To distinguish between these prefix the device
+ * number to the input string, but after the modifiers.
+ *
+ * \par
+ * Note that the numbering is totally arbitrary. Device 0 is probably some
+ * user-selected, "primary" input device. However, in general, you should
+ * allow some degree of user configurability when supporting multiple input
+ * devices is desired.
+ *
+ * \par
+ * E.g. the fourth axis of the third joystick is <tt>2JoystickAxis3</tt>, and its 
+ * first button is <tt>2JoystickButton0</tt>. Combined with modifiers you would
+ * get strings such as <tt>Ctrl+2JoystickButton0</tt>.
  */
 class CS_CRYSTALSPACE_EXPORT csInputDefinition
 {
@@ -110,13 +297,6 @@ public:
    * \param honorModifiers A bitmask of modifier keys that will be recognised.
    * \param useCookedCode If true, will use the cooked key code instead of raw.
    * More precisely, the syntax for <tt>string</tt> is (in EBNF):
-   * <pre>
-   * [ mod ("+"|"-") ]* ( ( devNumber? ("mouse" | "joystick") ( "X" | "Y" | ("Axis" axisNumber) | ("Button" buttonNumber) | buttonNumber ) ) | key )
-   * </pre>
-   * So the fourth axis of the third joystick is "2JoystickAxis3", and its 
-   * first button is "2JoystickButton0" or "2Joystick0".  The leading number
-   * must be omitted for the first (primary) input device, e.g.,
-   * "MouseAxis0" or "JoystickButton3".
    */
   csInputDefinition (iEventNameRegistry* name_reg, const char *string,
 		     uint32 honorModifiers = 0, bool useCookedCode = false);
@@ -202,7 +382,7 @@ public:
 			utf32_char *oCookedCode, csKeyModifiers *oModifiers);
 
   /**
-   * Helper function to parse a string (eg. "MouseX", "Alt+Mouse1") into
+   * Helper function to parse a string (eg "MouseX", "Alt+Mouse1") into
    * values describing a non-keyboard event.
    * \param reg A pointer to the event name registry.
    * \param iStr The string to parse.
@@ -222,7 +402,7 @@ public:
 			  int *oNumeric, csKeyModifiers *oModifiers);
 
   /**
-   * Helper function to return a string (eg. "Ctrl+A") from values
+   * Helper function to return a string (eg "Ctrl+A") from values
    * describing a keyboard event.
    * \param reg A pointer to the event name registry.
    * \param code The key code, treated as a raw code although raw vs. cooked
@@ -237,7 +417,7 @@ public:
 				bool distinguishModifiers = true);
 
   /**
-   * Helper function to return a string (eg. "MouseX", "Alt+Mouse1") from
+   * Helper function to return a string (eg "MouseX", "Alt+Mouse1") from
    * values describing a non-keyboard event.
    * \param reg A pointer to the event name registry.
    * \param type The event type of the description (a csev... identifier).
