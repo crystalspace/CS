@@ -57,19 +57,22 @@ namespace CS
 	 * size.
 	 *
 	 * \param id Icon ID to load. Must be one of the default Win32
-	 *   IDI_something constants-
+	 *   IDI_something constants
+	 *   (see http://msdn.microsoft.com/en-us/library/ms648072%28VS.85%29.aspx).
 	 * \param desiredSize Desired size of the icon.
 	 * \return An icon with a size that Windows deems closest to
-	 *   \a desiredSize.
+	 *   \a desiredSize, or 0 in case of error.
 	 */
 	static inline HICON LoadStockIconSize (LPCSTR id, int desiredSize)
 	{ return LoadStockIconSize (uintptr_t (id), desiredSize); }
 	static inline HICON LoadStockIconSize (LPCWSTR id, int desiredSize)
 	{ return LoadStockIconSize (uintptr_t (id), desiredSize); }
+	//@}
 	/**
 	 * Create a CS image from a Windows icon.
 	 * Useful when drawing an icon (stock or from somewhere else) inside CS is
 	 * desired.
+	 * \param icon Icon to create image from.
 	 */
 	static csPtr<iImage> CS_CSPLUGINCOMMON_WIN_EXPORT IconToImage (HICON icon);
 	/**

@@ -313,12 +313,11 @@ struct iDynamicSystem : public virtual iBase
    * from the current state of the cell.
    * \param heightData The height map of the terrain
    * \param gridWidth The width of the height map data
-   * \param gridWidth The height of the height map data
+   * \param gridHeight The height of the height map data
    * \param gridSize The size of the terrain, in world units
    * \param transform The position of the terrain
    * \param minimumHeight The minimum height that will ever be contained in the height map
    * \param maximumHeight The maximum height that will ever be contained in the height map
-   * \param 
    */
   virtual iTerrainCollider* AttachColliderTerrain (csLockedHeightData& heightData,
 						   int gridWidth, int gridHeight,
@@ -348,7 +347,7 @@ struct iDynamicSystem : public virtual iBase
    * the terrain must be kept between minimumHeight and maximumHeight, even when the
    * terrain is deformed. If these values are not provided then they will be computed
    * from the current state of the cell.
-   * \param cell The terrain from which the colliders will be created
+   * \param terrain The terrain from which the colliders will be created
    * \param minimumHeight The minimum height that will ever be contained in the height map
    * \param maximumHeight The maximum height that will ever be contained in the height map
    */

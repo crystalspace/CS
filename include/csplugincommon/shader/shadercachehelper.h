@@ -201,7 +201,7 @@ namespace CS
       public:
         /**
          * Construct.
-         * \param paramCache The cache in which the archive will be stored
+         * \param parentCache The cache in which the archive will be stored
          * \param cacheItem The path of the cache item for the archive
          */
         MicroArchiveCache (iHierarchicalCache* parentCache,
