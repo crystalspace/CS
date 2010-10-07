@@ -351,18 +351,36 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
       if (endp != str.GetData ()) containedName = csevMouseMove(
       	name_reg, deviceNumber);
     }
-    else if (str.StartsWith ("Button", true))
-    {
-      str.DeleteAt (0, 6);
-      mouseButton = (int) strtoul (str.GetData (), & endp, 10);
-      if (endp != str.GetData ()) containedName = csevMouseButton(
-      	name_reg, deviceNumber);
-    }
     else
     {
-      mouseButton = (int) strtoul (str.GetData (), & endp, 10);
-      if (endp != str.GetData ()) containedName = csevMouseButton(
-      	name_reg, deviceNumber);
+      if (str.StartsWith ("Button", true))
+	str.DeleteAt (0, 6);
+      bool valid = true;
+      if (str.CompareNoCase ("Left"))
+	mouseButton = csmbLeft;
+      else if (str.CompareNoCase ("Right"))
+	mouseButton = csmbRight;
+      else if (str.CompareNoCase ("Middle"))
+	mouseButton = csmbMiddle;
+      else if (str.CompareNoCase ("Extra1"))
+	mouseButton = csmbExtra1;
+      else if (str.CompareNoCase ("Extra2"))
+	mouseButton = csmbExtra2;
+      else if (str.CompareNoCase ("WheelUp"))
+	mouseButton = csmbWheelUp;
+      else if (str.CompareNoCase ("WheelDown"))
+	mouseButton = csmbWheelDown;
+      else if (str.CompareNoCase ("HWheelLeft"))
+	mouseButton = csmbHWheelLeft;
+      else if (str.CompareNoCase ("HWheelRight"))
+	mouseButton = csmbHWheelRight;
+      else
+      {
+	mouseButton = (int) strtoul (str.GetData (), & endp, 10);
+	valid = endp != str.GetData ();
+      }
+      if (valid)
+	containedName = csevMouseButton (name_reg, deviceNumber);
     }
   }
   else if (str.StartsWith ("Joystick", true))
@@ -441,6 +459,24 @@ bool csInputDefinition::IsValid () const
     	csevInput(name_reg)));
 }
 
+static void AppendMouseButton (csString& str, int mouseButton)
+{
+  switch (mouseButton)
+  {
+  case csmbLeft:		str.Append ("Left");		break;
+  case csmbRight:		str.Append ("Right");		break;
+  case csmbMiddle:		str.Append ("Middle");		break;
+  case csmbExtra1:		str.Append ("Extra1");		break;
+  case csmbExtra2:		str.Append ("Extra2");		break;
+  case csmbWheelUp:		str.Append ("WheelUp");		break;
+  case csmbWheelDown:		str.Append ("WheelDown");	break;
+  case csmbHWheelLeft:	str.Append ("HWheelLeft");	break;
+  case csmbHWheelRight:	str.Append ("HWheelRight");	break;
+  default:
+    str.Append (mouseButton);
+  }
+}
+
 csString csInputDefinition::ToString (bool distinguishMods) const
 {
   csString str;
@@ -498,32 +534,39 @@ csString csInputDefinition::ToString (bool distinguishMods) const
   else if (containedName == csevMouseDown(name_reg, deviceNumber))
   {
     str.Append ("MouseButton");
-    str.Append (mouseButton);
+    AppendMouseButton (str, mouseButton);
   }
   else if (containedName == csevMouseUp(name_reg, deviceNumber))
   {
     str.Append ("MouseButton");
-    str.Append (mouseButton);
+    AppendMouseButton (str, mouseButton);
   }
   else if (containedName == csevMouseClick(name_reg, deviceNumber))
   {
     str.Append ("MouseButton");
-    str.Append (mouseButton);
+    AppendMouseButton (str, mouseButton);
   }
   else if (containedName == csevMouseDoubleClick(name_reg, deviceNumber))
   {
     str.Append ("MouseButton");
-    str.Append (mouseButton);
+    AppendMouseButton (str, mouseButton);
   }
   else if (containedName == csevMouseButton(name_reg, deviceNumber))
   {
     str.Append ("MouseButton");
-    str.Append (mouseButton);
+    AppendMouseButton (str, mouseButton);
   }
   else if (containedName == csevMouseMove(name_reg, deviceNumber))
   {
-    str.Append ("MouseAxis");
-    str.Append (mouseAxis);
+    str.Append ("Mouse");
+    switch (mouseAxis)
+    {
+    case 0: str.Append ("X"); break;
+    case 1: str.Append ("Y"); break;
+    default:
+      str.Append ("Axis");
+      str.Append (mouseAxis);
+    }
   }
   else if (containedName == csevJoystickButton(name_reg, deviceNumber))
   {
