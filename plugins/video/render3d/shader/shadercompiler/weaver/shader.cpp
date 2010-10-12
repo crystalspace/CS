@@ -313,6 +313,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     csString cacheFileName;
     cacheFileName.Format ("/%s/%s",
       ci.shaderName.GetData(), cacheID_header.GetData());
+    
+    if (!cacheTo)
+    {
+      // No cache given - just synthesize; cache tag can be dummy value
+      csString cacheTag;
+      CombinerLoaderSet combiners;
+      csRef<iDocument> synthShader (SynthesizeShader (techniques, aliases,
+	source, ci.cacheID_base, cacheTag, cacheTag, combiners));
+      
+      CS_ASSERT (synthShader.IsValid());
+      DumpWeaved (ci, synthShader);
+      return synthShader;
+    }
 
     csRef<iString> cacheState;
 
