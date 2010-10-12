@@ -158,7 +158,7 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 	m4_foreach([cs_check_lib_alias], 
 	    [m4_ifval([$10], [$1, $10], [$1])],
 	    [_CS_CHECK_LIB_CREATE_FLAGS([cs_check_lib_flags],
-		cs_check_lib_alias, [$cs_check_lib_paths])
+		cs_check_lib_alias, [$cs_check_lib_paths], [$1])
 	    ])
 
 	CS_CHECK_BUILD([for lib$1], [_CS_CLW_LIB_CVAR([$1])], [$2],
@@ -286,7 +286,7 @@ AC_DEFUN([_CS_CLCPF_CVAR], [AS_TR_SH([cs_cv_prog_$1_flags])])
 
 
 #------------------------------------------------------------------------------
-# _CS_CHECK_LIB_CREATE_FLAGS(VARIABLE, LIBRARY, PATHS)
+# _CS_CHECK_LIB_CREATE_FLAGS(VARIABLE, LIBRARY, PATHS, UNALIASEDLIB)
 #	Helper macro for CS_CHECK_LIB_WITH().  Constructs a list of build
 #	tuples suitable for CS_CHECK_BUILD() and appends the tuple list to the
 #	shell variable VARIABLE.  LIBRARY and PATHS have the same meanings as
@@ -299,12 +299,12 @@ AC_DEFUN([_CS_CHECK_LIB_CREATE_FLAGS],
 	    *\|*) CS_SPLIT(
 		    [$cs_lib_item], [cs_check_incdir,cs_check_libdir], [|])
 		_CS_CHECK_LIB_CREATE_FLAG([$1],
-		    [$cs_check_incdir], [$cs_check_libdir], [$2])
+		    [$cs_check_incdir], [$cs_check_libdir], [$2], [$4])
 		;;
 	    *)  _CS_CHECK_LIB_CREATE_FLAG([$1],
-		    [$cs_lib_item/include], [$cs_lib_item/lib], [$2])
+		    [$cs_lib_item/include], [$cs_lib_item/lib], [$2], [$4])
 		_CS_CHECK_LIB_CREATE_FLAG(
-		    [$1], [$cs_lib_item], [$cs_lib_item], [$2])
+		    [$1], [$cs_lib_item], [$cs_lib_item], [$2], [$4])
 		;;
 	esac
     done])
@@ -312,24 +312,38 @@ AC_DEFUN([_CS_CHECK_LIB_CREATE_FLAGS],
 
 
 #------------------------------------------------------------------------------
-# _CS_CHECK_LIB_CREATE_FLAG(VARIABLE, HEADER-DIR, LIBRARY-DIR, LIBRARY)
+# _CS_CHECK_LIB_CREATE_FLAG(VARIABLE, HEADER-DIR, LIBRARY-DIR, LIBRARY,
+#                           UNALIASEDLIB)
 #	Helper macro for _CS_CHECK_LIB_CREATE_FLAGS().  Constructs build tuples
 #	suitable for CS_CHECK_BUILD() for given header and library directories,
 #	and appends the tuples to the shell variable VARIABLE. Synthesizes
 #	tuples which check for LIBRARY as a MacOS/X framework, and a standard
-#	link library.
+#	link library. For MacOS/X framework, also #defines a preprocessor macro
+#	CS_{UNALIASED_LIBRARY}_PATH with value LIBRARY, where UNALIASED_LIBRARY
+#	is the primary name by which the library is known, even if searching
+#	for one of its aliases. This macro is useful when the framework name
+#	differs from the typical directory name in which header files reside
+#	for a particular package. As an example, on most platforms, OpenGL
+#	headers normally are #included as <GL/foo.h>, but the MacOS/X framework
+#	is named OpenGL.framework, which requires #include <OpenGL/foo.h>.
+#	Clients can take this difference into account by checking if
+#	CS_{UNALIASED_LIBRARY}_PATH is #defined. If so, compose an #include
+#	using its value, which will be the name of the framework. If not,
+#	#include the header from its normal non-framework location.
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_CHECK_LIB_CREATE_FLAG],
    [AS_IF([test -n "$2"], [cs_check_lib_cflag="-I$2"], [cs_check_lib_cflag=''])
     AS_IF([test -n "$3"], [cs_check_lib_lflag="-L$3"], [cs_check_lib_lflag=''])
     AS_IF([test -n "$4"],
 	[cs_check_lib_libs="-l$4"
-	cs_check_lib_framework="-framework $4"],
+	cs_check_lib_framework="-framework $4"
+	cs_check_lib_framework_define="[-DCS_]AS_TR_CPP([$5])_PATH=$4"],
 	[cs_check_lib_libs=''
-	cs_check_lib_framework=''])
+	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''])
     $1="$$1
 	CS_CREATE_TUPLE(
-	    [$cs_check_lib_cflag],
+	    [$cs_check_lib_cflag $cs_check_lib_framework_define],
 	    [$cs_check_lib_lflag],
 	    [$cs_check_lib_framework])
 	CS_CREATE_TUPLE(
