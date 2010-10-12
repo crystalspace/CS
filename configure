@@ -24835,12 +24835,14 @@ fi
     if test -n "x11"; then :
   cs_check_lib_libs="-lx11"
 	cs_check_lib_framework="-framework x11"
+	cs_check_lib_framework_define="-DCS_X11_PATH=x11"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -24856,12 +24858,14 @@ fi
     if test -n "x11"; then :
   cs_check_lib_libs="-lx11"
 	cs_check_lib_framework="-framework x11"
+	cs_check_lib_framework_define="-DCS_X11_PATH=x11"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -24876,12 +24880,14 @@ fi
     if test -n "x11"; then :
   cs_check_lib_libs="-lx11"
 	cs_check_lib_framework="-framework x11"
+	cs_check_lib_framework_define="-DCS_X11_PATH=x11"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -25523,12 +25529,14 @@ fi
     if test -n "xext"; then :
   cs_check_lib_libs="-lxext"
 	cs_check_lib_framework="-framework xext"
+	cs_check_lib_framework_define="-DCS_XEXT_PATH=xext"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -25544,12 +25552,14 @@ fi
     if test -n "xext"; then :
   cs_check_lib_libs="-lxext"
 	cs_check_lib_framework="-framework xext"
+	cs_check_lib_framework_define="-DCS_XEXT_PATH=xext"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -25564,12 +25574,14 @@ fi
     if test -n "xext"; then :
   cs_check_lib_libs="-lxext"
 	cs_check_lib_framework="-framework xext"
+	cs_check_lib_framework_define="-DCS_XEXT_PATH=xext"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -27215,12 +27227,14 @@ fi
     if test -n "xxf86vm"; then :
   cs_check_lib_libs="-lxxf86vm"
 	cs_check_lib_framework="-framework xxf86vm"
+	cs_check_lib_framework_define="-DCS_XXF86VM_PATH=xxf86vm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -27236,12 +27250,14 @@ fi
     if test -n "xxf86vm"; then :
   cs_check_lib_libs="-lxxf86vm"
 	cs_check_lib_framework="-framework xxf86vm"
+	cs_check_lib_framework_define="-DCS_XXF86VM_PATH=xxf86vm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -27256,12 +27272,14 @@ fi
     if test -n "xxf86vm"; then :
   cs_check_lib_libs="-lxxf86vm"
 	cs_check_lib_framework="-framework xxf86vm"
+	cs_check_lib_framework_define="-DCS_XXF86VM_PATH=xxf86vm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -27308,12 +27326,14 @@ fi
     if test -n "Xxf86vm"; then :
   cs_check_lib_libs="-lXxf86vm"
 	cs_check_lib_framework="-framework Xxf86vm"
+	cs_check_lib_framework_define="-DCS_XXF86VM_PATH=Xxf86vm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -27329,12 +27349,14 @@ fi
     if test -n "Xxf86vm"; then :
   cs_check_lib_libs="-lXxf86vm"
 	cs_check_lib_framework="-framework Xxf86vm"
+	cs_check_lib_framework_define="-DCS_XXF86VM_PATH=Xxf86vm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -27349,12 +27371,14 @@ fi
     if test -n "Xxf86vm"; then :
   cs_check_lib_libs="-lXxf86vm"
 	cs_check_lib_framework="-framework Xxf86vm"
+	cs_check_lib_framework_define="-DCS_XXF86VM_PATH=Xxf86vm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -28298,12 +28322,14 @@ fi
     if test -n "xaw7"; then :
   cs_check_lib_libs="-lxaw7"
 	cs_check_lib_framework="-framework xaw7"
+	cs_check_lib_framework_define="-DCS_XAW7_PATH=xaw7"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -28319,12 +28345,14 @@ fi
     if test -n "xaw7"; then :
   cs_check_lib_libs="-lxaw7"
 	cs_check_lib_framework="-framework xaw7"
+	cs_check_lib_framework_define="-DCS_XAW7_PATH=xaw7"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -28339,12 +28367,14 @@ fi
     if test -n "xaw7"; then :
   cs_check_lib_libs="-lxaw7"
 	cs_check_lib_framework="-framework xaw7"
+	cs_check_lib_framework_define="-DCS_XAW7_PATH=xaw7"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -28391,12 +28421,14 @@ fi
     if test -n "Xaw"; then :
   cs_check_lib_libs="-lXaw"
 	cs_check_lib_framework="-framework Xaw"
+	cs_check_lib_framework_define="-DCS_XAW7_PATH=Xaw"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -28412,12 +28444,14 @@ fi
     if test -n "Xaw"; then :
   cs_check_lib_libs="-lXaw"
 	cs_check_lib_framework="-framework Xaw"
+	cs_check_lib_framework_define="-DCS_XAW7_PATH=Xaw"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -28432,12 +28466,14 @@ fi
     if test -n "Xaw"; then :
   cs_check_lib_libs="-lXaw"
 	cs_check_lib_framework="-framework Xaw"
+	cs_check_lib_framework_define="-DCS_XAW7_PATH=Xaw"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -33099,12 +33135,14 @@ fi
     if test -n "z"; then :
   cs_check_lib_libs="-lz"
 	cs_check_lib_framework="-framework z"
+	cs_check_lib_framework_define="-DCS_Z_PATH=z"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -33120,12 +33158,14 @@ fi
     if test -n "z"; then :
   cs_check_lib_libs="-lz"
 	cs_check_lib_framework="-framework z"
+	cs_check_lib_framework_define="-DCS_Z_PATH=z"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -33140,12 +33180,14 @@ fi
     if test -n "z"; then :
   cs_check_lib_libs="-lz"
 	cs_check_lib_framework="-framework z"
+	cs_check_lib_framework_define="-DCS_Z_PATH=z"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -33192,12 +33234,14 @@ fi
     if test -n "zlib"; then :
   cs_check_lib_libs="-lzlib"
 	cs_check_lib_framework="-framework zlib"
+	cs_check_lib_framework_define="-DCS_Z_PATH=zlib"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -33213,12 +33257,14 @@ fi
     if test -n "zlib"; then :
   cs_check_lib_libs="-lzlib"
 	cs_check_lib_framework="-framework zlib"
+	cs_check_lib_framework_define="-DCS_Z_PATH=zlib"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -33233,12 +33279,14 @@ fi
     if test -n "zlib"; then :
   cs_check_lib_libs="-lzlib"
 	cs_check_lib_framework="-framework zlib"
+	cs_check_lib_framework_define="-DCS_Z_PATH=zlib"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -34190,12 +34238,14 @@ fi
     if test -n "png"; then :
   cs_check_lib_libs="-lpng"
 	cs_check_lib_framework="-framework png"
+	cs_check_lib_framework_define="-DCS_PNG_PATH=png"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -34211,12 +34261,14 @@ fi
     if test -n "png"; then :
   cs_check_lib_libs="-lpng"
 	cs_check_lib_framework="-framework png"
+	cs_check_lib_framework_define="-DCS_PNG_PATH=png"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -34231,12 +34283,14 @@ fi
     if test -n "png"; then :
   cs_check_lib_libs="-lpng"
 	cs_check_lib_framework="-framework png"
+	cs_check_lib_framework_define="-DCS_PNG_PATH=png"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -34283,12 +34337,14 @@ fi
     if test -n "libpng"; then :
   cs_check_lib_libs="-llibpng"
 	cs_check_lib_framework="-framework libpng"
+	cs_check_lib_framework_define="-DCS_PNG_PATH=libpng"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -34304,12 +34360,14 @@ fi
     if test -n "libpng"; then :
   cs_check_lib_libs="-llibpng"
 	cs_check_lib_framework="-framework libpng"
+	cs_check_lib_framework_define="-DCS_PNG_PATH=libpng"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -34324,12 +34382,14 @@ fi
     if test -n "libpng"; then :
   cs_check_lib_libs="-llibpng"
 	cs_check_lib_framework="-framework libpng"
+	cs_check_lib_framework_define="-DCS_PNG_PATH=libpng"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -35274,12 +35334,14 @@ fi
     if test -n "jpeg"; then :
   cs_check_lib_libs="-ljpeg"
 	cs_check_lib_framework="-framework jpeg"
+	cs_check_lib_framework_define="-DCS_JPEG_PATH=jpeg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -35295,12 +35357,14 @@ fi
     if test -n "jpeg"; then :
   cs_check_lib_libs="-ljpeg"
 	cs_check_lib_framework="-framework jpeg"
+	cs_check_lib_framework_define="-DCS_JPEG_PATH=jpeg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -35315,12 +35379,14 @@ fi
     if test -n "jpeg"; then :
   cs_check_lib_libs="-ljpeg"
 	cs_check_lib_framework="-framework jpeg"
+	cs_check_lib_framework_define="-DCS_JPEG_PATH=jpeg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -35367,12 +35433,14 @@ fi
     if test -n "libjpeg"; then :
   cs_check_lib_libs="-llibjpeg"
 	cs_check_lib_framework="-framework libjpeg"
+	cs_check_lib_framework_define="-DCS_JPEG_PATH=libjpeg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -35388,12 +35456,14 @@ fi
     if test -n "libjpeg"; then :
   cs_check_lib_libs="-llibjpeg"
 	cs_check_lib_framework="-framework libjpeg"
+	cs_check_lib_framework_define="-DCS_JPEG_PATH=libjpeg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -35408,12 +35478,14 @@ fi
     if test -n "libjpeg"; then :
   cs_check_lib_libs="-llibjpeg"
 	cs_check_lib_framework="-framework libjpeg"
+	cs_check_lib_framework_define="-DCS_JPEG_PATH=libjpeg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -36081,12 +36153,14 @@ fi
     if test -n "lcms"; then :
   cs_check_lib_libs="-llcms"
 	cs_check_lib_framework="-framework lcms"
+	cs_check_lib_framework_define="-DCS_LCMS_PATH=lcms"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -36102,12 +36176,14 @@ fi
     if test -n "lcms"; then :
   cs_check_lib_libs="-llcms"
 	cs_check_lib_framework="-framework lcms"
+	cs_check_lib_framework_define="-DCS_LCMS_PATH=lcms"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -36122,12 +36198,14 @@ fi
     if test -n "lcms"; then :
   cs_check_lib_libs="-llcms"
 	cs_check_lib_framework="-framework lcms"
+	cs_check_lib_framework_define="-DCS_LCMS_PATH=lcms"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -37046,12 +37124,14 @@ fi
     if test -n "mng"; then :
   cs_check_lib_libs="-lmng"
 	cs_check_lib_framework="-framework mng"
+	cs_check_lib_framework_define="-DCS_MNG_PATH=mng"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -37067,12 +37147,14 @@ fi
     if test -n "mng"; then :
   cs_check_lib_libs="-lmng"
 	cs_check_lib_framework="-framework mng"
+	cs_check_lib_framework_define="-DCS_MNG_PATH=mng"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -37087,12 +37169,14 @@ fi
     if test -n "mng"; then :
   cs_check_lib_libs="-lmng"
 	cs_check_lib_framework="-framework mng"
+	cs_check_lib_framework_define="-DCS_MNG_PATH=mng"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -37139,12 +37223,14 @@ fi
     if test -n "libmng"; then :
   cs_check_lib_libs="-llibmng"
 	cs_check_lib_framework="-framework libmng"
+	cs_check_lib_framework_define="-DCS_MNG_PATH=libmng"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -37160,12 +37246,14 @@ fi
     if test -n "libmng"; then :
   cs_check_lib_libs="-llibmng"
 	cs_check_lib_framework="-framework libmng"
+	cs_check_lib_framework_define="-DCS_MNG_PATH=libmng"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -37180,12 +37268,14 @@ fi
     if test -n "libmng"; then :
   cs_check_lib_libs="-llibmng"
 	cs_check_lib_framework="-framework libmng"
+	cs_check_lib_framework_define="-DCS_MNG_PATH=libmng"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -37846,12 +37936,14 @@ fi
     if test -n "cairo"; then :
   cs_check_lib_libs="-lcairo"
 	cs_check_lib_framework="-framework cairo"
+	cs_check_lib_framework_define="-DCS_CAIRO_PATH=cairo"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -37867,12 +37959,14 @@ fi
     if test -n "cairo"; then :
   cs_check_lib_libs="-lcairo"
 	cs_check_lib_framework="-framework cairo"
+	cs_check_lib_framework_define="-DCS_CAIRO_PATH=cairo"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -37887,12 +37981,14 @@ fi
     if test -n "cairo"; then :
   cs_check_lib_libs="-lcairo"
 	cs_check_lib_framework="-framework cairo"
+	cs_check_lib_framework_define="-DCS_CAIRO_PATH=cairo"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -39112,12 +39208,14 @@ fi
     if test -n "cairomm"; then :
   cs_check_lib_libs="-lcairomm"
 	cs_check_lib_framework="-framework cairomm"
+	cs_check_lib_framework_define="-DCS_CAIROMM_PATH=cairomm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -39133,12 +39231,14 @@ fi
     if test -n "cairomm"; then :
   cs_check_lib_libs="-lcairomm"
 	cs_check_lib_framework="-framework cairomm"
+	cs_check_lib_framework_define="-DCS_CAIROMM_PATH=cairomm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -39153,12 +39253,14 @@ fi
     if test -n "cairomm"; then :
   cs_check_lib_libs="-lcairomm"
 	cs_check_lib_framework="-framework cairomm"
+	cs_check_lib_framework_define="-DCS_CAIROMM_PATH=cairomm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -39205,12 +39307,14 @@ fi
     if test -n "cairomm-1"; then :
   cs_check_lib_libs="-lcairomm-1"
 	cs_check_lib_framework="-framework cairomm-1"
+	cs_check_lib_framework_define="-DCS_CAIROMM_PATH=cairomm-1"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -39226,12 +39330,14 @@ fi
     if test -n "cairomm-1"; then :
   cs_check_lib_libs="-lcairomm-1"
 	cs_check_lib_framework="-framework cairomm-1"
+	cs_check_lib_framework_define="-DCS_CAIROMM_PATH=cairomm-1"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -39246,12 +39352,14 @@ fi
     if test -n "cairomm-1"; then :
   cs_check_lib_libs="-lcairomm-1"
 	cs_check_lib_framework="-framework cairomm-1"
+	cs_check_lib_framework_define="-DCS_CAIROMM_PATH=cairomm-1"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -39298,12 +39406,14 @@ fi
     if test -n "cairomm-1.0"; then :
   cs_check_lib_libs="-lcairomm-1.0"
 	cs_check_lib_framework="-framework cairomm-1.0"
+	cs_check_lib_framework_define="-DCS_CAIROMM_PATH=cairomm-1.0"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -39319,12 +39429,14 @@ fi
     if test -n "cairomm-1.0"; then :
   cs_check_lib_libs="-lcairomm-1.0"
 	cs_check_lib_framework="-framework cairomm-1.0"
+	cs_check_lib_framework_define="-DCS_CAIROMM_PATH=cairomm-1.0"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -39339,12 +39451,14 @@ fi
     if test -n "cairomm-1.0"; then :
   cs_check_lib_libs="-lcairomm-1.0"
 	cs_check_lib_framework="-framework cairomm-1.0"
+	cs_check_lib_framework_define="-DCS_CAIROMM_PATH=cairomm-1.0"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -40000,12 +40114,14 @@ fi
     if test -n "vgvm"; then :
   cs_check_lib_libs="-lvgvm"
 	cs_check_lib_framework="-framework vgvm"
+	cs_check_lib_framework_define="-DCS_VGVM_PATH=vgvm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -40021,12 +40137,14 @@ fi
     if test -n "vgvm"; then :
   cs_check_lib_libs="-lvgvm"
 	cs_check_lib_framework="-framework vgvm"
+	cs_check_lib_framework_define="-DCS_VGVM_PATH=vgvm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -40041,12 +40159,14 @@ fi
     if test -n "vgvm"; then :
   cs_check_lib_libs="-lvgvm"
 	cs_check_lib_framework="-framework vgvm"
+	cs_check_lib_framework_define="-DCS_VGVM_PATH=vgvm"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -40708,12 +40828,14 @@ fi
     if test -n "ogg"; then :
   cs_check_lib_libs="-logg"
 	cs_check_lib_framework="-framework ogg"
+	cs_check_lib_framework_define="-DCS_OGG_PATH=ogg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -40729,12 +40851,14 @@ fi
     if test -n "ogg"; then :
   cs_check_lib_libs="-logg"
 	cs_check_lib_framework="-framework ogg"
+	cs_check_lib_framework_define="-DCS_OGG_PATH=ogg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -40749,12 +40873,14 @@ fi
     if test -n "ogg"; then :
   cs_check_lib_libs="-logg"
 	cs_check_lib_framework="-framework ogg"
+	cs_check_lib_framework_define="-DCS_OGG_PATH=ogg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -41411,12 +41537,14 @@ fi
     if test -n "vorbis"; then :
   cs_check_lib_libs="-lvorbis"
 	cs_check_lib_framework="-framework vorbis"
+	cs_check_lib_framework_define="-DCS_VORBIS_PATH=vorbis"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -41432,12 +41560,14 @@ fi
     if test -n "vorbis"; then :
   cs_check_lib_libs="-lvorbis"
 	cs_check_lib_framework="-framework vorbis"
+	cs_check_lib_framework_define="-DCS_VORBIS_PATH=vorbis"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -41452,12 +41582,14 @@ fi
     if test -n "vorbis"; then :
   cs_check_lib_libs="-lvorbis"
 	cs_check_lib_framework="-framework vorbis"
+	cs_check_lib_framework_define="-DCS_VORBIS_PATH=vorbis"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -42115,12 +42247,14 @@ fi
     if test -n "vorbisfile"; then :
   cs_check_lib_libs="-lvorbisfile"
 	cs_check_lib_framework="-framework vorbisfile"
+	cs_check_lib_framework_define="-DCS_VORBISFILE_PATH=vorbisfile"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -42136,12 +42270,14 @@ fi
     if test -n "vorbisfile"; then :
   cs_check_lib_libs="-lvorbisfile"
 	cs_check_lib_framework="-framework vorbisfile"
+	cs_check_lib_framework_define="-DCS_VORBISFILE_PATH=vorbisfile"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -42156,12 +42292,14 @@ fi
     if test -n "vorbisfile"; then :
   cs_check_lib_libs="-lvorbisfile"
 	cs_check_lib_framework="-framework vorbisfile"
+	cs_check_lib_framework_define="-DCS_VORBISFILE_PATH=vorbisfile"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -42827,12 +42965,14 @@ fi
     if test -n "speex"; then :
   cs_check_lib_libs="-lspeex"
 	cs_check_lib_framework="-framework speex"
+	cs_check_lib_framework_define="-DCS_SPEEX_PATH=speex"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -42848,12 +42988,14 @@ fi
     if test -n "speex"; then :
   cs_check_lib_libs="-lspeex"
 	cs_check_lib_framework="-framework speex"
+	cs_check_lib_framework_define="-DCS_SPEEX_PATH=speex"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -42868,12 +43010,14 @@ fi
     if test -n "speex"; then :
   cs_check_lib_libs="-lspeex"
 	cs_check_lib_framework="-framework speex"
+	cs_check_lib_framework_define="-DCS_SPEEX_PATH=speex"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -44351,12 +44495,14 @@ fi
     if test -n "3ds"; then :
   cs_check_lib_libs="-l3ds"
 	cs_check_lib_framework="-framework 3ds"
+	cs_check_lib_framework_define="-DCS_3DS_PATH=3ds"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -44372,12 +44518,14 @@ fi
     if test -n "3ds"; then :
   cs_check_lib_libs="-l3ds"
 	cs_check_lib_framework="-framework 3ds"
+	cs_check_lib_framework_define="-DCS_3DS_PATH=3ds"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -44392,12 +44540,14 @@ fi
     if test -n "3ds"; then :
   cs_check_lib_libs="-l3ds"
 	cs_check_lib_framework="-framework 3ds"
+	cs_check_lib_framework_define="-DCS_3DS_PATH=3ds"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -44444,12 +44594,14 @@ fi
     if test -n "lib3ds"; then :
   cs_check_lib_libs="-llib3ds"
 	cs_check_lib_framework="-framework lib3ds"
+	cs_check_lib_framework_define="-DCS_3DS_PATH=lib3ds"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -44465,12 +44617,14 @@ fi
     if test -n "lib3ds"; then :
   cs_check_lib_libs="-llib3ds"
 	cs_check_lib_framework="-framework lib3ds"
+	cs_check_lib_framework_define="-DCS_3DS_PATH=lib3ds"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -44485,12 +44639,14 @@ fi
     if test -n "lib3ds"; then :
   cs_check_lib_libs="-llib3ds"
 	cs_check_lib_framework="-framework lib3ds"
+	cs_check_lib_framework_define="-DCS_3DS_PATH=lib3ds"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -44537,12 +44693,14 @@ fi
     if test -n "lib3ds-120"; then :
   cs_check_lib_libs="-llib3ds-120"
 	cs_check_lib_framework="-framework lib3ds-120"
+	cs_check_lib_framework_define="-DCS_3DS_PATH=lib3ds-120"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -44558,12 +44716,14 @@ fi
     if test -n "lib3ds-120"; then :
   cs_check_lib_libs="-llib3ds-120"
 	cs_check_lib_framework="-framework lib3ds-120"
+	cs_check_lib_framework_define="-DCS_3DS_PATH=lib3ds-120"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -44578,12 +44738,14 @@ fi
     if test -n "lib3ds-120"; then :
   cs_check_lib_libs="-llib3ds-120"
 	cs_check_lib_framework="-framework lib3ds-120"
+	cs_check_lib_framework_define="-DCS_3DS_PATH=lib3ds-120"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -45743,12 +45905,14 @@ fi
     if test -n "ode"; then :
   cs_check_lib_libs="-lode"
 	cs_check_lib_framework="-framework ode"
+	cs_check_lib_framework_define="-DCS_ODE_PATH=ode"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -45764,12 +45928,14 @@ fi
     if test -n "ode"; then :
   cs_check_lib_libs="-lode"
 	cs_check_lib_framework="-framework ode"
+	cs_check_lib_framework_define="-DCS_ODE_PATH=ode"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -45784,12 +45950,14 @@ fi
     if test -n "ode"; then :
   cs_check_lib_libs="-lode"
 	cs_check_lib_framework="-framework ode"
+	cs_check_lib_framework_define="-DCS_ODE_PATH=ode"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -48988,12 +49156,14 @@ fi
     if test -n "freetype2"; then :
   cs_check_lib_libs="-lfreetype2"
 	cs_check_lib_framework="-framework freetype2"
+	cs_check_lib_framework_define="-DCS_FREETYPE2_PATH=freetype2"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -49009,12 +49179,14 @@ fi
     if test -n "freetype2"; then :
   cs_check_lib_libs="-lfreetype2"
 	cs_check_lib_framework="-framework freetype2"
+	cs_check_lib_framework_define="-DCS_FREETYPE2_PATH=freetype2"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -49029,12 +49201,14 @@ fi
     if test -n "freetype2"; then :
   cs_check_lib_libs="-lfreetype2"
 	cs_check_lib_framework="-framework freetype2"
+	cs_check_lib_framework_define="-DCS_FREETYPE2_PATH=freetype2"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -49081,12 +49255,14 @@ fi
     if test -n "freetype"; then :
   cs_check_lib_libs="-lfreetype"
 	cs_check_lib_framework="-framework freetype"
+	cs_check_lib_framework_define="-DCS_FREETYPE2_PATH=freetype"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -49102,12 +49278,14 @@ fi
     if test -n "freetype"; then :
   cs_check_lib_libs="-lfreetype"
 	cs_check_lib_framework="-framework freetype"
+	cs_check_lib_framework_define="-DCS_FREETYPE2_PATH=freetype"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -49122,12 +49300,14 @@ fi
     if test -n "freetype"; then :
   cs_check_lib_libs="-lfreetype"
 	cs_check_lib_framework="-framework freetype"
+	cs_check_lib_framework_define="-DCS_FREETYPE2_PATH=freetype"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -50190,12 +50370,14 @@ fi
     if test -n "cal3d"; then :
   cs_check_lib_libs="-lcal3d"
 	cs_check_lib_framework="-framework cal3d"
+	cs_check_lib_framework_define="-DCS_CAL3D_PATH=cal3d"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -50211,12 +50393,14 @@ fi
     if test -n "cal3d"; then :
   cs_check_lib_libs="-lcal3d"
 	cs_check_lib_framework="-framework cal3d"
+	cs_check_lib_framework_define="-DCS_CAL3D_PATH=cal3d"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -50231,12 +50415,14 @@ fi
     if test -n "cal3d"; then :
   cs_check_lib_libs="-lcal3d"
 	cs_check_lib_framework="-framework cal3d"
+	cs_check_lib_framework_define="-DCS_CAL3D_PATH=cal3d"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -51153,12 +51339,14 @@ fi
     if test -n "wx"; then :
   cs_check_lib_libs="-lwx"
 	cs_check_lib_framework="-framework wx"
+	cs_check_lib_framework_define="-DCS_WX_PATH=wx"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -51174,12 +51362,14 @@ fi
     if test -n "wx"; then :
   cs_check_lib_libs="-lwx"
 	cs_check_lib_framework="-framework wx"
+	cs_check_lib_framework_define="-DCS_WX_PATH=wx"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -51194,12 +51384,14 @@ fi
     if test -n "wx"; then :
   cs_check_lib_libs="-lwx"
 	cs_check_lib_framework="-framework wx"
+	cs_check_lib_framework_define="-DCS_WX_PATH=wx"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -51915,9 +52107,12 @@ fi
 
 #----------------------------------------------------------------------------
 # Check for CEGUI.
-#----------------------------------------------------------------------------
 # The check fails on some distros with missing references to libdl
 # (eg on OpenSUSE), so pass -ldl along as well
+#----------------------------------------------------------------------------
+# CS_CEGUI_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
+
+
 
 # Check whether --with-CEGUI was given.
 if test "${with_CEGUI+set}" = set; then :
@@ -52571,12 +52766,14 @@ fi
     if test -n "CEGUI"; then :
   cs_check_lib_libs="-lCEGUI"
 	cs_check_lib_framework="-framework CEGUI"
+	cs_check_lib_framework_define="-DCS_CEGUI_PATH=CEGUI"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -52592,12 +52789,14 @@ fi
     if test -n "CEGUI"; then :
   cs_check_lib_libs="-lCEGUI"
 	cs_check_lib_framework="-framework CEGUI"
+	cs_check_lib_framework_define="-DCS_CEGUI_PATH=CEGUI"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -52612,12 +52811,14 @@ fi
     if test -n "CEGUI"; then :
   cs_check_lib_libs="-lCEGUI"
 	cs_check_lib_framework="-framework CEGUI"
+	cs_check_lib_framework_define="-DCS_CEGUI_PATH=CEGUI"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -52664,12 +52865,14 @@ fi
     if test -n "CEGUIBase"; then :
   cs_check_lib_libs="-lCEGUIBase"
 	cs_check_lib_framework="-framework CEGUIBase"
+	cs_check_lib_framework_define="-DCS_CEGUI_PATH=CEGUIBase"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -52685,12 +52888,14 @@ fi
     if test -n "CEGUIBase"; then :
   cs_check_lib_libs="-lCEGUIBase"
 	cs_check_lib_framework="-framework CEGUIBase"
+	cs_check_lib_framework_define="-DCS_CEGUI_PATH=CEGUIBase"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -52705,12 +52910,14 @@ fi
     if test -n "CEGUIBase"; then :
   cs_check_lib_libs="-lCEGUIBase"
 	cs_check_lib_framework="-framework CEGUIBase"
+	cs_check_lib_framework_define="-DCS_CEGUI_PATH=CEGUIBase"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -52792,7 +52999,16 @@ fi
 	LIBS="$cs_libs_test $cs_cv_libdl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <CEGUI.h>
+#ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_CEGUI_PATH
+    #include <CoreFoundation/CFBundle.h>
+    #include CS_HEADER_GLOBAL(CS_CEGUI_PATH,CEGUI.h)
+    #else
+    #include <CEGUI/CEGUI.h>
+    #endif
 int
 main ()
 {
@@ -52908,7 +53124,16 @@ fi
 	LIBS="$cs_libs_test $cs_cv_libdl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <CEGUI.h>
+#ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_CEGUI_PATH
+    #include <CoreFoundation/CFBundle.h>
+    #include CS_HEADER_GLOBAL(CS_CEGUI_PATH,CEGUI.h)
+    #else
+    #include <CEGUI/CEGUI.h>
+    #endif
 int
 main ()
 {
@@ -53907,12 +54132,14 @@ fi
     if test -n "GTK"; then :
   cs_check_lib_libs="-lGTK"
 	cs_check_lib_framework="-framework GTK"
+	cs_check_lib_framework_define="-DCS_GTK_PATH=GTK"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -53928,12 +54155,14 @@ fi
     if test -n "GTK"; then :
   cs_check_lib_libs="-lGTK"
 	cs_check_lib_framework="-framework GTK"
+	cs_check_lib_framework_define="-DCS_GTK_PATH=GTK"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -53948,12 +54177,14 @@ fi
     if test -n "GTK"; then :
   cs_check_lib_libs="-lGTK"
 	cs_check_lib_framework="-framework GTK"
+	cs_check_lib_framework_define="-DCS_GTK_PATH=GTK"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -54000,12 +54231,14 @@ fi
     if test -n "gtk+-2.0"; then :
   cs_check_lib_libs="-lgtk+-2.0"
 	cs_check_lib_framework="-framework gtk+-2.0"
+	cs_check_lib_framework_define="-DCS_GTK_PATH=gtk+-2.0"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -54021,12 +54254,14 @@ fi
     if test -n "gtk+-2.0"; then :
   cs_check_lib_libs="-lgtk+-2.0"
 	cs_check_lib_framework="-framework gtk+-2.0"
+	cs_check_lib_framework_define="-DCS_GTK_PATH=gtk+-2.0"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -54041,12 +54276,14 @@ fi
     if test -n "gtk+-2.0"; then :
   cs_check_lib_libs="-lgtk+-2.0"
 	cs_check_lib_framework="-framework gtk+-2.0"
+	cs_check_lib_framework_define="-DCS_GTK_PATH=gtk+-2.0"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -55820,12 +56057,14 @@ fi
     if test -n "Cg"; then :
   cs_check_lib_libs="-lCg"
 	cs_check_lib_framework="-framework Cg"
+	cs_check_lib_framework_define="-DCS_CG_PATH=Cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -55841,12 +56080,14 @@ fi
     if test -n "Cg"; then :
   cs_check_lib_libs="-lCg"
 	cs_check_lib_framework="-framework Cg"
+	cs_check_lib_framework_define="-DCS_CG_PATH=Cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -55861,12 +56102,14 @@ fi
     if test -n "Cg"; then :
   cs_check_lib_libs="-lCg"
 	cs_check_lib_framework="-framework Cg"
+	cs_check_lib_framework_define="-DCS_CG_PATH=Cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -55913,12 +56156,14 @@ fi
     if test -n "cg"; then :
   cs_check_lib_libs="-lcg"
 	cs_check_lib_framework="-framework cg"
+	cs_check_lib_framework_define="-DCS_CG_PATH=cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -55934,12 +56179,14 @@ fi
     if test -n "cg"; then :
   cs_check_lib_libs="-lcg"
 	cs_check_lib_framework="-framework cg"
+	cs_check_lib_framework_define="-DCS_CG_PATH=cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -55954,12 +56201,14 @@ fi
     if test -n "cg"; then :
   cs_check_lib_libs="-lcg"
 	cs_check_lib_framework="-framework cg"
+	cs_check_lib_framework_define="-DCS_CG_PATH=cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -56006,12 +56255,14 @@ fi
     if test -n "CG"; then :
   cs_check_lib_libs="-lCG"
 	cs_check_lib_framework="-framework CG"
+	cs_check_lib_framework_define="-DCS_CG_PATH=CG"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -56027,12 +56278,14 @@ fi
     if test -n "CG"; then :
   cs_check_lib_libs="-lCG"
 	cs_check_lib_framework="-framework CG"
+	cs_check_lib_framework_define="-DCS_CG_PATH=CG"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -56047,12 +56300,14 @@ fi
     if test -n "CG"; then :
   cs_check_lib_libs="-lCG"
 	cs_check_lib_framework="-framework CG"
+	cs_check_lib_framework_define="-DCS_CG_PATH=CG"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -58632,12 +58887,14 @@ fi
     if test -n "CgGL"; then :
   cs_check_lib_libs="-lCgGL"
 	cs_check_lib_framework="-framework CgGL"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=CgGL"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -58653,12 +58910,14 @@ fi
     if test -n "CgGL"; then :
   cs_check_lib_libs="-lCgGL"
 	cs_check_lib_framework="-framework CgGL"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=CgGL"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -58673,12 +58932,14 @@ fi
     if test -n "CgGL"; then :
   cs_check_lib_libs="-lCgGL"
 	cs_check_lib_framework="-framework CgGL"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=CgGL"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -58725,12 +58986,14 @@ fi
     if test -n "cggl"; then :
   cs_check_lib_libs="-lcggl"
 	cs_check_lib_framework="-framework cggl"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=cggl"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -58746,12 +59009,14 @@ fi
     if test -n "cggl"; then :
   cs_check_lib_libs="-lcggl"
 	cs_check_lib_framework="-framework cggl"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=cggl"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -58766,12 +59031,14 @@ fi
     if test -n "cggl"; then :
   cs_check_lib_libs="-lcggl"
 	cs_check_lib_framework="-framework cggl"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=cggl"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -58818,12 +59085,14 @@ fi
     if test -n "cgGL"; then :
   cs_check_lib_libs="-lcgGL"
 	cs_check_lib_framework="-framework cgGL"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=cgGL"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -58839,12 +59108,14 @@ fi
     if test -n "cgGL"; then :
   cs_check_lib_libs="-lcgGL"
 	cs_check_lib_framework="-framework cgGL"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=cgGL"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -58859,12 +59130,14 @@ fi
     if test -n "cgGL"; then :
   cs_check_lib_libs="-lcgGL"
 	cs_check_lib_framework="-framework cgGL"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=cgGL"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -58911,12 +59184,14 @@ fi
     if test -n "CGGL"; then :
   cs_check_lib_libs="-lCGGL"
 	cs_check_lib_framework="-framework CGGL"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=CGGL"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -58932,12 +59207,14 @@ fi
     if test -n "CGGL"; then :
   cs_check_lib_libs="-lCGGL"
 	cs_check_lib_framework="-framework CGGL"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=CGGL"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -58952,12 +59229,14 @@ fi
     if test -n "CGGL"; then :
   cs_check_lib_libs="-lCGGL"
 	cs_check_lib_framework="-framework CGGL"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=CGGL"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -59004,12 +59283,14 @@ fi
     if test -n "Cg"; then :
   cs_check_lib_libs="-lCg"
 	cs_check_lib_framework="-framework Cg"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=Cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -59025,12 +59306,14 @@ fi
     if test -n "Cg"; then :
   cs_check_lib_libs="-lCg"
 	cs_check_lib_framework="-framework Cg"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=Cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -59045,12 +59328,14 @@ fi
     if test -n "Cg"; then :
   cs_check_lib_libs="-lCg"
 	cs_check_lib_framework="-framework Cg"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=Cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -59097,12 +59382,14 @@ fi
     if test -n "cg"; then :
   cs_check_lib_libs="-lcg"
 	cs_check_lib_framework="-framework cg"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -59118,12 +59405,14 @@ fi
     if test -n "cg"; then :
   cs_check_lib_libs="-lcg"
 	cs_check_lib_framework="-framework cg"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -59138,12 +59427,14 @@ fi
     if test -n "cg"; then :
   cs_check_lib_libs="-lcg"
 	cs_check_lib_framework="-framework cg"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=cg"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -59190,12 +59481,14 @@ fi
     if test -n "CG"; then :
   cs_check_lib_libs="-lCG"
 	cs_check_lib_framework="-framework CG"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=CG"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -59211,12 +59504,14 @@ fi
     if test -n "CG"; then :
   cs_check_lib_libs="-lCG"
 	cs_check_lib_framework="-framework CG"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=CG"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -59231,12 +59526,14 @@ fi
     if test -n "CG"; then :
   cs_check_lib_libs="-lCG"
 	cs_check_lib_framework="-framework CG"
+	cs_check_lib_framework_define="-DCS_CGGL_PATH=CG"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -59948,12 +60245,14 @@ fi
     if test -n "jackasyn"; then :
   cs_check_lib_libs="-ljackasyn"
 	cs_check_lib_framework="-framework jackasyn"
+	cs_check_lib_framework_define="-DCS_JACKASYN_PATH=jackasyn"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -59969,12 +60268,14 @@ fi
     if test -n "jackasyn"; then :
   cs_check_lib_libs="-ljackasyn"
 	cs_check_lib_framework="-framework jackasyn"
+	cs_check_lib_framework_define="-DCS_JACKASYN_PATH=jackasyn"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -59989,12 +60290,14 @@ fi
     if test -n "jackasyn"; then :
   cs_check_lib_libs="-ljackasyn"
 	cs_check_lib_framework="-framework jackasyn"
+	cs_check_lib_framework_define="-DCS_JACKASYN_PATH=jackasyn"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -60659,12 +60962,14 @@ fi
     if test -n "asound"; then :
   cs_check_lib_libs="-lasound"
 	cs_check_lib_framework="-framework asound"
+	cs_check_lib_framework_define="-DCS_ASOUND_PATH=asound"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -60680,12 +60985,14 @@ fi
     if test -n "asound"; then :
   cs_check_lib_libs="-lasound"
 	cs_check_lib_framework="-framework asound"
+	cs_check_lib_framework_define="-DCS_ASOUND_PATH=asound"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -60700,12 +61007,14 @@ fi
     if test -n "asound"; then :
   cs_check_lib_libs="-lasound"
 	cs_check_lib_framework="-framework asound"
+	cs_check_lib_framework_define="-DCS_ASOUND_PATH=asound"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -64082,12 +64391,14 @@ fi
     if test -n "cppunit"; then :
   cs_check_lib_libs="-lcppunit"
 	cs_check_lib_framework="-framework cppunit"
+	cs_check_lib_framework_define="-DCS_CPPUNIT_PATH=cppunit"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -64103,12 +64414,14 @@ fi
     if test -n "cppunit"; then :
   cs_check_lib_libs="-lcppunit"
 	cs_check_lib_framework="-framework cppunit"
+	cs_check_lib_framework_define="-DCS_CPPUNIT_PATH=cppunit"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -64123,12 +64436,14 @@ fi
     if test -n "cppunit"; then :
   cs_check_lib_libs="-lcppunit"
 	cs_check_lib_framework="-framework cppunit"
+	cs_check_lib_framework_define="-DCS_CPPUNIT_PATH=cppunit"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -72305,12 +72620,14 @@ fi
     if test -n "bfd"; then :
   cs_check_lib_libs="-lbfd"
 	cs_check_lib_framework="-framework bfd"
+	cs_check_lib_framework_define="-DCS_BFD_PATH=bfd"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -72326,12 +72643,14 @@ fi
     if test -n "bfd"; then :
   cs_check_lib_libs="-lbfd"
 	cs_check_lib_framework="-framework bfd"
+	cs_check_lib_framework_define="-DCS_BFD_PATH=bfd"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -72346,12 +72665,14 @@ fi
     if test -n "bfd"; then :
   cs_check_lib_libs="-lbfd"
 	cs_check_lib_framework="-framework bfd"
+	cs_check_lib_framework_define="-DCS_BFD_PATH=bfd"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
@@ -73345,12 +73666,14 @@ fi
     if test -n "bfd"; then :
   cs_check_lib_libs="-lbfd"
 	cs_check_lib_framework="-framework bfd"
+	cs_check_lib_framework_define="-DCS_BFD_PATH=bfd"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	    *)  if test -n "$cs_lib_item/include"; then :
@@ -73366,12 +73689,14 @@ fi
     if test -n "bfd"; then :
   cs_check_lib_libs="-lbfd"
 	cs_check_lib_framework="-framework bfd"
+	cs_check_lib_framework_define="-DCS_BFD_PATH=bfd"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		if test -n "$cs_lib_item"; then :
   cs_check_lib_cflag="-I$cs_lib_item"
@@ -73386,12 +73711,14 @@ fi
     if test -n "bfd"; then :
   cs_check_lib_libs="-lbfd"
 	cs_check_lib_framework="-framework bfd"
+	cs_check_lib_framework_define="-DCS_BFD_PATH=bfd"
 else
   cs_check_lib_libs=''
 	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
 fi
     cs_check_lib_flags="$cs_check_lib_flags
-	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
 	esac
