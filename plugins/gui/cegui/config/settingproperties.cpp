@@ -1,9 +1,6 @@
-
 #include "settingproperties.h"
-//#include "settingbase.h"
 #include "settingslider.h"
 #include "settingcombobox.h"
-#include <CEGUIPropertyHelper.h>
 
 
 // Start of CEGUI namespace section

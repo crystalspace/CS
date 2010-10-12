@@ -17,12 +17,11 @@
 */
 
 #include "cssysdef.h"
-
 #include "csgfx/imagememory.h"
 #include "iengine/texture.h"
 #include "imap/loader.h"
 #include "iutil/objreg.h"
-
+#include "ceguiimports.h"
 #include "ceguitexture.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)

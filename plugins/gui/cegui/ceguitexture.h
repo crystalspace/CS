@@ -26,14 +26,9 @@
 * \addtogroup CEGUI
 * @{ */
 
-// hack: work around problems caused by #defining 'new'
-#include "csutil/custom_new_disable.h"
-#include <CEGUI.h>
-#include "csutil/custom_new_enable.h"
-
 #include "csutil/ref.h"
 #include "ivideo/texture.h"
-
+#include "ceguiimports.h"
 #include "ceguirenderer.h"
 
 struct iObjectRegistry;

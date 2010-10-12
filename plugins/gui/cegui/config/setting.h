@@ -32,7 +32,7 @@
 
 #include <string>
 
-#include "CEGUIString.h"
+#include "../ceguiimports.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {

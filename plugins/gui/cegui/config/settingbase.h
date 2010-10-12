@@ -1,15 +1,9 @@
-
 #ifndef SETTINGBASE_H
 #define SETTINGBASE_H
 
 #include "cssysdef.h"
-
-#include <csutil/refarr.h>
-
-//#include <CEGUI.h>
-//#include <CEGUIBase.h>
-#include <CEGUIWindow.h>
-#include <CEGUIWindowFactory.h>
+#include "csutil/refarr.h"
+#include "../ceguiimports.h"
 
 #include <string>
 #include <vector>

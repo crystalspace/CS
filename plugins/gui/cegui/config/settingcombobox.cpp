@@ -1,12 +1,4 @@
-
 #include "settingcombobox.h"
-
-#include <elements/CEGUICombobox.h>
-#include <elements/CEGUIComboDropList.h>
-#include <elements/CEGUIEditbox.h>
-#include <elements/CEGUIListboxTextItem.h>
-#include <elements/CEGUIScrollbar.h>
-#include <CEGUIWindowManager.h>
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {

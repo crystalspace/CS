@@ -18,15 +18,13 @@
 
 #include <iostream>
 
+#include "ceguiimports.h"
 #include "ceguirenderer.h"
 #include "ceguigeometrybuffer.h"
 #include "ceguitexturetarget.h"
 #include "ceguitexture.h"
 #include "ceguiwindowtarget.h"
 #include "ceguicsimagecodec.h"
-#include "CEGUIRenderingRoot.h"
-#include "CEGUIExceptions.h"
-#include "CEGUISystem.h"
 #include "ceguiresourceprovider.h"
 
 

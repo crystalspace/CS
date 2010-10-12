@@ -25,12 +25,7 @@
 * \addtogroup CEGUI
 * @{ */
 
-// hack: work around problems caused by #defining 'new'
-#include "csutil/custom_new_disable.h"
-#include <CEGUI.h>
-#include <CEGUIScriptModule.h>
-#include "csutil/custom_new_enable.h"
-
+#include "ceguiimports.h"
 #include "csutil/ref.h"
 #include "iutil/vfs.h"
 #include "ivaria/script.h"

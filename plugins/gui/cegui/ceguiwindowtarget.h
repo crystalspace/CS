@@ -19,13 +19,7 @@
 #ifndef _CEGUIWINDOWTARGET_H_
 #define _CEGUIWINDOWTARGET_H_
 
-// hack: work around problems caused by #defining 'new'
-#include "csutil/custom_new_disable.h"
-#include <CEGUI.h>
-#include "csutil/custom_new_enable.h"
-
-#include "cssysdef.h"
-
+#include "ceguiimports.h"
 #include "ceguirendertarget.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)

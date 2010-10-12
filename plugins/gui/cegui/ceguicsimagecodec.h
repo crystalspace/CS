@@ -19,16 +19,8 @@
 #ifndef _CEGUICSIMAGECODEC_H_
 #define _CEGUICSIMAGECODEC_H_
 
-// hack: work around problems caused by #defining 'new'
-#include "csutil/custom_new_disable.h"
-#include <CEGUI.h>
-#include <CEGUIImageCodec.h>
-#include "csutil/custom_new_enable.h"
-
-#include "cssysdef.h"
-
+#include "ceguiimports.h"
 #include "ceguirenderer.h"
-
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {

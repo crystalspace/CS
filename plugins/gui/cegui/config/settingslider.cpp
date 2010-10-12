@@ -1,10 +1,4 @@
-
 #include "settingslider.h"
-
-#include <elements/CEGUICombobox.h>
-#include <elements/CEGUIEditbox.h>
-#include <elements/CEGUISlider.h>
-#include <CEGUIWindowManager.h>
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {

@@ -19,16 +19,7 @@
 #ifndef _CEGUIRENDERTARGET_H_
 #define _CEGUIRENDERTARGET_H_
 
-// hack: work around problems caused by #defining 'new'
-#include "csutil/custom_new_disable.h"
-#include <CEGUI.h>
-#include <CEGUIRenderTarget.h>
-#include <CEGUIRect.h>
-#include "csutil/custom_new_enable.h"
-
-#include "crystalspace.h"
-
-
+#include "ceguiimports.h"
 #include "ceguirenderer.h"
 
 

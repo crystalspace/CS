@@ -17,12 +17,7 @@
 */
 
 #include "crystalspace.h"
-
 #include "ceguicsimagecodec.h"
-
-#include "csutil/custom_new_disable.h"
-#include "CEGUIExceptions.h"
-#include "csutil/custom_new_enable.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {

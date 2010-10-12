@@ -21,8 +21,6 @@
 #include <iostream>
 #include <sstream>
 
-#include "CEGUIPropertyHelper.h"
-
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {
     CEGUI::String Setting::GetAsString()

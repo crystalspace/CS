@@ -17,16 +17,11 @@
 */
 
 #include "cssysdef.h"
-
 #include "iutil/objreg.h"
 #include "iutil/virtclk.h"
 #include "csutil/event.h"
 #include "csutil/csinput.h"
-
-#include "csutil/custom_new_disable.h"
-#include <CEGUI.h>
-#include "csutil/custom_new_enable.h"
-
+#include "ceguiimports.h"
 #include "ceguievthandler.h"
 #include "ceguirenderer.h"
 

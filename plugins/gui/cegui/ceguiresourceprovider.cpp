@@ -17,15 +17,11 @@
 */
 
 #include "cssysdef.h"
-
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
 
+#include "ceguiimports.h"
 #include "ceguiresourceprovider.h"
-
-#include "csutil/custom_new_disable.h"
-#include "CEGUIExceptions.h"
-#include "csutil/custom_new_enable.h"
 
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)

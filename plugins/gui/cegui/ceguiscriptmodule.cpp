@@ -17,10 +17,9 @@
 */
 
 #include "cssysdef.h"
-
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
-
+#include "ceguiimports.h"
 #include "ceguiscriptmodule.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)

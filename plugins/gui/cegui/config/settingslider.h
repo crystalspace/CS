@@ -1,9 +1,7 @@
-
 #ifndef SETTINGSLIDER_H
 #define SETTINGSLIDER_H
 
-#include "cssysdef.h"
-
+#include "../ceguiimports.h"
 #include "settingbase.h"
 
 

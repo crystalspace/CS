@@ -3,7 +3,7 @@
 #define SETTINGCOMBOBOX_H
 
 #include "settingbase.h"
-
+#include "../ceguiimports.h"
 #include <map>
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)

@@ -16,14 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "ceguiimports.h"
 #include "ceguigeometrybuffer.h"
 #include "ceguitexture.h"
-
-
-#include "csutil/custom_new_disable.h"
-#include "CEGUIVertex.h"
-#include "CEGUIRenderEffect.h"
-#include "csutil/custom_new_enable.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 {

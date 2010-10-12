@@ -25,11 +25,6 @@
 * \addtogroup CEGUI
 * @{ */
 
-// hack: work around problems caused by #defining 'new'
-#include "csutil/custom_new_disable.h"
-#include <CEGUI.h>
-#include "csutil/custom_new_enable.h"
-
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
@@ -42,6 +37,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
+#include "ceguiimports.h"
 #include "ceguievthandler.h"
 #include "ceguiresourceprovider.h"
 #include "ceguiscriptmodule.h"

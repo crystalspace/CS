@@ -1,10 +1,8 @@
-
 #ifndef SETTING_PROPERTIES_H
 #define SETTING_PROPERTIES_H
 
 #include "cssysdef.h"
-
-#include "CEGUIProperty.h"
+#include "../ceguiimports.h"
 
 
 // Start of CEGUI namespace section
