@@ -1646,11 +1646,24 @@ AS_IF([test $cs_cv_libwx_opengl = yes],
 
 #----------------------------------------------------------------------------
 # Check for CEGUI.
-#----------------------------------------------------------------------------
 # The check fails on some distros with missing references to libdl
 # (eg on OpenSUSE), so pass -ldl along as well
+#----------------------------------------------------------------------------
+# CS_CEGUI_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
+AC_DEFUN([CS_CEGUI_INCLUDE],
+    [[#ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef $1
+    #include <CoreFoundation/CFBundle.h>
+    #include CS_HEADER_GLOBAL($1,$3)
+    #else
+    #include <$2/$3>
+    #endif]])
+
 CS_CHECK_LIB_WITH([CEGUI],
-    [AC_LANG_PROGRAM([[#include <CEGUI.h>]],
+    [AC_LANG_PROGRAM([CS_CEGUI_INCLUDE([CS_CEGUI_PATH],[CEGUI],[CEGUI.h])],
     [CEGUI::WindowManager::getSingleton();])], [], [C++],
     [], [], [], [], [$cs_cv_libdl_libs], [CEGUIBase])
 
