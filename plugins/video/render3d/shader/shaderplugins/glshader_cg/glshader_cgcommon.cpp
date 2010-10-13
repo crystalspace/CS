@@ -294,12 +294,13 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   {
     if (strcmp (args[i], "-posinv") == 0)
     {
-      if (profile == CG_PROFILE_GPU_VP)
+      if (profile >= CG_PROFILE_GPU_VP)
       {
-	/* Work around Cg 2.0 bug: it emits "OPTION ARB_position_invariant;"
-	   AND computes result.position in the VP - doing both is verboten.
+	/* Work around Cg 2.0 and above (including 3.0) bug: it emits
+	   "OPTION ARB_position_invariant;" AND computes result.position in
+	   the VP - doing both is verboten.
+	   Affected are the GP4VP and higher profiles.
 	   Remedy: remove -posinv argument 
-	   (cgc version 2.0.0010)
 	 */
 	args.DeleteIndex (i);
 	continue;
