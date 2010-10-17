@@ -25,7 +25,7 @@
 #include <CoreFoundation/CFBundle.h>
 #include CS_HEADER_GLOBAL(CS_CEGUI_PATH,CEGUI.h)
 #else
-#include <CEGUI/CEGUI.h>
+#include <CEGUI.h>
 #endif
 #include "csutil/custom_new_enable.h"
 

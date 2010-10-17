@@ -1657,13 +1657,13 @@ AC_DEFUN([CS_CEGUI_INCLUDE],
     #endif
     #ifdef $1
     #include <CoreFoundation/CFBundle.h>
-    #include CS_HEADER_GLOBAL($1,$3)
+    #include CS_HEADER_GLOBAL($1,$2)
     #else
-    #include <$2/$3>
+    #include <$2>
     #endif]])
 
 CS_CHECK_LIB_WITH([CEGUI],
-    [AC_LANG_PROGRAM([CS_CEGUI_INCLUDE([CS_CEGUI_PATH],[CEGUI],[CEGUI.h])],
+    [AC_LANG_PROGRAM([CS_CEGUI_INCLUDE([CS_CEGUI_PATH],[CEGUI.h])],
     [CEGUI::WindowManager::getSingleton();])], [], [C++],
     [], [], [], [], [$cs_cv_libdl_libs], [CEGUIBase])
 
