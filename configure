@@ -53007,7 +53007,7 @@ fi
     #include <CoreFoundation/CFBundle.h>
     #include CS_HEADER_GLOBAL(CS_CEGUI_PATH,CEGUI.h)
     #else
-    #include <CEGUI/CEGUI.h>
+    #include <CEGUI.h>
     #endif
 int
 main ()
@@ -53132,7 +53132,7 @@ fi
     #include <CoreFoundation/CFBundle.h>
     #include CS_HEADER_GLOBAL(CS_CEGUI_PATH,CEGUI.h)
     #else
-    #include <CEGUI/CEGUI.h>
+    #include <CEGUI.h>
     #endif
 int
 main ()
