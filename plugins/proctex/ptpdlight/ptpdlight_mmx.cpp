@@ -25,6 +25,7 @@
 #include "csgeom/math.h"
 
 #include "ptpdlight.h"
+#include "ptpdlight_actual.h"
 
 #include <mmintrin.h>
 
@@ -126,7 +127,17 @@ struct PreApplyEMMS
   }
 };
 
-void ProctexPDLight::Animate_MMX ()
+struct ProctexPDLight_MMX : public ProctexPDLight_Actual<ProctexPDLight_MMX>
+{
+  ProctexPDLight_MMX (ProctexPDLightLoader* loader, iImage* img)
+   : ProctexPDLight_Actual<ProctexPDLight_MMX> (loader, img) {}
+  ProctexPDLight_MMX (ProctexPDLightLoader* loader, int w, int h)
+   : ProctexPDLight_Actual<ProctexPDLight_MMX> (loader, w, h) {}
+   
+  void RealAnimate ();
+};
+
+void ProctexPDLight_MMX::RealAnimate ()
 {
   BlitBufHelper<PreApplyEMMS> blitHelper (tex->GetTextureHandle ());
 
@@ -308,6 +319,16 @@ void ProctexPDLight::Animate_MMX ()
     }
   }
   _m_empty();
+}
+
+ProctexPDLight* NewProctexPDLight_MMX (ProctexPDLightLoader* loader, iImage* img)
+{
+  return new ProctexPDLight_MMX (loader, img);
+}
+
+ProctexPDLight* NewProctexPDLight_MMX (ProctexPDLightLoader* loader, int w, int h)
+{
+  return new ProctexPDLight_MMX (loader, w, h);
 }
 
 #endif // CS_SUPPORTS_MMX

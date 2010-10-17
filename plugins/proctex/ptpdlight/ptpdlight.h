@@ -220,7 +220,7 @@ public:
     }
     ~MappedLight() { delete lightId; }
   };
-private:
+protected:
   csRef<ProctexPDLightLoader> loader;
   TileHelper tiles;
   csBitArray tilesDirty;
@@ -232,9 +232,7 @@ private:
   enum
   {
     stateDirty = 1 << 0,
-    statePrepared = 1 << 1,
-
-    stateDoMMX = 1 << 31
+    statePrepared = 1 << 1
   };
   csFlags state;
   struct LightColorState
@@ -285,8 +283,6 @@ private:
       return blitBuf;
     }
   };
-  void Animate_Generic ();
-  void Animate_MMX ();
 public:
   const char* AddLight (const MappedLight& light);
   void FinishLoad()
@@ -304,14 +300,12 @@ public:
   MappedLight NewLight (iImage* img) const
   { return MappedLight (tilesDirty.GetSize(), tiles, img); }
 
-  ProctexPDLight (ProctexPDLightLoader* loader, iImage* img);
-  ProctexPDLight (ProctexPDLightLoader* loader, int w, int h);
   virtual ~ProctexPDLight ();
 
   virtual bool PrepareAnim ();
 
-  virtual void Animate (csTicks current_time);
-  void Animate ();
+  virtual void Animate (csTicks current_time) = 0;
+  virtual void Animate () = 0;
 
   /**\name iLightCallback implementation
    * @{ */
@@ -329,6 +323,9 @@ public:
     if (!PrepareAnim ()) return;
     Animate (0);
   }
+protected:
+  ProctexPDLight (ProctexPDLightLoader* loader, iImage* img);
+  ProctexPDLight (ProctexPDLightLoader* loader, int w, int h);
 };
 
 }

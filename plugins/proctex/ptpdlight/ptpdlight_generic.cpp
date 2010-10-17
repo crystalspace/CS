@@ -27,6 +27,7 @@
 #include "csgeom/math.h"
 
 #include "ptpdlight.h"
+#include "ptpdlight_actual.h"
 
 CS_DECLARE_PROFILER
 CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_generic_inner)
@@ -206,7 +207,17 @@ static const MultiplyAddProc8 maProcs8[8] = {
   MultiplyAddLumels8<6>, MultiplyAddLumels8<7>
 };
 
-void ProctexPDLight::Animate_Generic ()
+struct ProctexPDLight_Generic : public ProctexPDLight_Actual<ProctexPDLight_Generic>
+{
+  ProctexPDLight_Generic (ProctexPDLightLoader* loader, iImage* img)
+   : ProctexPDLight_Actual<ProctexPDLight_Generic> (loader, img) {}
+  ProctexPDLight_Generic (ProctexPDLightLoader* loader, int w, int h)
+   : ProctexPDLight_Actual<ProctexPDLight_Generic> (loader, w, h) {}
+   
+  void RealAnimate ();
+};
+
+void ProctexPDLight_Generic::RealAnimate ()
 {
   BlitBufHelper<> blitHelper (tex->GetTextureHandle ());
 
@@ -361,6 +372,16 @@ void ProctexPDLight::Animate_Generic ()
         scratchMax.SafeAdd (mapMax);
     }
   }
+}
+
+ProctexPDLight* NewProctexPDLight_Generic (ProctexPDLightLoader* loader, iImage* img)
+{
+  return new ProctexPDLight_Generic (loader, img);
+}
+
+ProctexPDLight* NewProctexPDLight_Generic (ProctexPDLightLoader* loader, int w, int h)
+{
+  return new ProctexPDLight_Generic (loader, w, h);
 }
 
 }

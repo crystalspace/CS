@@ -131,7 +131,7 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
 
   csRef<ProctexPDLight> pt;
   if (img.IsValid())
-    pt.AttachNew (new ProctexPDLight (this, img));
+    pt.AttachNew (NewProctexPDLight (img));
   else
   {
     if (ctx)
@@ -140,7 +140,7 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
       {
 	  int w, h;
 	  ctx->GetSize (w, h);
-        pt.AttachNew (new ProctexPDLight (this, w, h));
+        pt.AttachNew (NewProctexPDLight (w, h));
       }
     }
   }
@@ -380,6 +380,31 @@ bool ProctexPDLightLoader::HexToLightID (uint8* lightID, const char* lightIDHex)
     }
   }
   return valid;
+}
+
+extern ProctexPDLight* NewProctexPDLight_Generic (ProctexPDLightLoader* loader, iImage* img);
+extern ProctexPDLight* NewProctexPDLight_Generic (ProctexPDLightLoader* loader, int w, int h);
+extern ProctexPDLight* NewProctexPDLight_MMX (ProctexPDLightLoader* loader, iImage* img);
+extern ProctexPDLight* NewProctexPDLight_MMX (ProctexPDLightLoader* loader, int w, int h);
+  
+ProctexPDLight* ProctexPDLightLoader::NewProctexPDLight (iImage* img)
+{
+#ifdef CS_SUPPORTS_MMX
+  if (doMMX)
+    return NewProctexPDLight_MMX (this, img);
+  else
+#endif
+    return NewProctexPDLight_Generic (this, img);
+}
+
+ProctexPDLight* ProctexPDLightLoader::NewProctexPDLight (int w, int h)
+{
+#ifdef CS_SUPPORTS_MMX
+  if (doMMX)
+    return NewProctexPDLight_MMX (this, w, h);
+  else
+#endif
+    return NewProctexPDLight_Generic (this, w, h);
 }
 
 }

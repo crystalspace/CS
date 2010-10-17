@@ -365,7 +365,6 @@ ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, iImage* img) :
 {
   mat_w = img->GetWidth();
   mat_h = img->GetHeight();
-  if (loader->doMMX) state.Set ((uint32)stateDoMMX);
 }
 
 ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, int w, int h) : 
@@ -376,7 +375,6 @@ ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, int w, int h) :
 {
   mat_w = w;
   mat_h = h;
-  if (loader->doMMX) state.Set ((uint32)stateDoMMX);
 }
 
 ProctexPDLight::~ProctexPDLight ()
@@ -478,36 +476,6 @@ bool ProctexPDLight::PrepareAnim ()
   Animate();
   
   return true;
-}
-
-void ProctexPDLight::Animate (csTicks current_time)
-{
-  if (state.Check (stateDirty))
-  {
-    if (!loader->UpdatePT (this, current_time)) return;
-
-    Animate();
-  }
-}
-
-void ProctexPDLight::Animate ()
-{
-  csTicks startTime = csGetTicks();
-
-  CS_PROFILER_ZONE(ProctexPDLight_Animate)
-#ifdef CS_SUPPORTS_MMX
-  if (state.Check ((uint32)stateDoMMX))
-    Animate_MMX ();
-  else
-#endif
-    Animate_Generic ();
-
-  state.Reset (stateDirty);
-  dirtyLights.DeleteAll ();
-  tilesDirty.Clear ();
-
-  csTicks endTime = csGetTicks();
-  loader->RecordUpdateTime (endTime-startTime);
 }
 
 void ProctexPDLight::OnColorChange (iLight* light, const csColor& newcolor)
