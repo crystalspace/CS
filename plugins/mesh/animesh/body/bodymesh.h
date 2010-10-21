@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2009-10 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -37,6 +37,8 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 {
+  class BodyBone;
+
   class BodyBoneProperties : public scfImplementation1<BodyBoneProperties,
     CS::Animation::iBodyBoneProperties>
   {
@@ -212,7 +214,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     // This is a weakref to avoid circular references between animesh,
     // body skeleton and controllers
     csWeakRef<CS::Animation::iSkeletonFactory> skeletonFactory;
-    csHash<csRef<CS::Animation::iBodyBone>, CS::Animation::BoneID> boneHash;
+    csHash<csRef<BodyBone>, CS::Animation::BoneID> boneHash;
     csHash<csRef<CS::Animation::iBodyChain>, csString> chainHash;
   };
 
@@ -240,6 +242,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     csRef<BodyBoneProperties> properties;
     csRef<BodyBoneJoint> joint;
     csRefArray<BodyBoneCollider> colliders;
+
+    friend class BodyChainNode;
   };
 
   class BodyChain : public scfImplementation1<BodyChain, CS::Animation::iBodyChain>
@@ -263,20 +267,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   public:
     CS_LEAKGUARD_DECLARE(BodyChainNode);
 
-    BodyChainNode (CS::Animation::iBodyBone* bone);
+    BodyChainNode (BodyBone* bone);
 
     virtual CS::Animation::iBodyBone* GetBodyBone () const;
 
     virtual uint GetChildCount () const;
     virtual CS::Animation::iBodyChainNode* GetChild (uint index) const;
     virtual CS::Animation::iBodyChainNode* GetParent () const;
+    virtual iBodyChainNode* FindSubChild (CS::Animation::BoneID child) const;
 
     void AddChild (BodyChainNode* node);
 
   private:
-    csRef<CS::Animation::iBodyBone> bone;
-    csWeakRef<CS::Animation::iBodyChainNode> parent;
-    csRefArray<CS::Animation::iBodyChainNode> children;
+    csRef<BodyBone> bone;
+    csWeakRef<BodyChainNode> parent;
+    csRefArray<BodyChainNode> children;
   };
 
 }

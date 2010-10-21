@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2009-10 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -140,7 +140,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     }    
 
     // check ID uniqueness
-    csRef<CS::Animation::iBodyBone> newFact;
+    csRef<BodyBone> newFact;
     newFact.AttachNew (new BodyBone (boneID));
 
     return boneHash.PutUnique (boneID, newFact);
@@ -412,7 +412,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   CS_LEAKGUARD_IMPLEMENT(BodyChainNode);
 
-  BodyChainNode::BodyChainNode (CS::Animation::iBodyBone* bone)
+  BodyChainNode::BodyChainNode (BodyBone* bone)
     : scfImplementationType (this), bone (bone), parent (0)
   {
   }
@@ -443,6 +443,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     children.Push (node);
   }
 
+  CS::Animation::iBodyChainNode* BodyChainNode::FindSubChild (CS::Animation::BoneID child) const
+  {
+    if (child == bone->animeshBone)
+      return (CS::Animation::iBodyChainNode*) this;
+
+    for (csRefArray<BodyChainNode>::ConstIterator it = children.GetIterator (); it.HasNext (); )
+    {
+      csRef<BodyChainNode> node = it.Next ();
+      iBodyChainNode* result = node->FindSubChild (child);
+      if (result)
+	return result;
+    }
+
+    return nullptr;
+  }
 
   /********************
    *  BodyBoneProperties

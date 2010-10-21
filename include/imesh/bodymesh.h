@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2009-10 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -79,7 +79,7 @@ struct iBodyManager : public virtual iBase
  */
 struct iBodySkeleton : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iBodySkeleton, 2, 0, 1);
+  SCF_INTERFACE(CS::Animation::iBodySkeleton, 2, 0, 2);
 
   /**
    * Return the name of the body skeleton.
@@ -243,6 +243,12 @@ struct iBodyChainNode : public virtual iBase
    * is the root of the body chain.
    */
   virtual iBodyChainNode* GetParent () const = 0;
+
+  /**
+   * Find the node of the bone with the given BoneID in the descendent children of this node.
+   * Return 0 if the given bone was not found.
+   */
+  virtual iBodyChainNode* FindSubChild (CS::Animation::BoneID child) const = 0;
 };
 
 /**
@@ -263,22 +269,22 @@ struct iBodyBoneProperties : public virtual iBase
   virtual float GetMass () const = 0;
 
   /**
-   * Set the center of mass of the rigid body of this bone.
+   * Set the center of mass of the rigid body of this bone. This is only useful if you use the ODE physical plugin.
    */
   virtual void SetCenter (const csVector3 &center) = 0;
 
   /**
-   * Get the center of mass of the rigid body of this bone.
+   * Get the center of mass of the rigid body of this bone. This is only useful if you use the ODE physical plugin.
    */
   virtual csVector3 GetCenter () const = 0;
 
   /**
-   * Set the matrix of inertia of the rigid body of this bone.
+   * Set the matrix of inertia of the rigid body of this bone. This is only useful if you use the ODE physical plugin.
    */
   virtual void SetInertia (const csMatrix3 &inertia) = 0;
 
   /**
-   * Get the matrix of inertia of the rigid body of this bone.
+   * Get the matrix of inertia of the rigid body of this bone. This is only useful if you use the ODE physical plugin.
    */
   virtual csMatrix3 GetInertia () const = 0;
 };
