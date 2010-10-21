@@ -73,6 +73,20 @@ struct iVisualDebugger : public virtual iBase
 			      size_t size = 3) = 0;
 
   /**
+   * Add the given vector to the list of vectors to be displayed
+   * on the next call to Display().
+   * \param transform The coordinate system of the vector
+   * \param vector The vector to be debugged
+   * \param persist Whether or not this vector has to be displayed in each
+   * future frame or only for the next one.
+   * \param color The color to be used when displaying the position
+   */
+  virtual void DebugVector (const csReversibleTransform& transform,
+			    const csVector3& vector,
+			    bool persist = false,
+			    csColor color = csColor (0.0f, 1.0f, 0.0f)) = 0;
+
+  /**
    * Display all transforms and positions defined by DebugTransform() and
    * DebugPosition(). You have to call this at each frame, after the 3D
    * display of the view. The list of transforms will be cleared.
@@ -112,6 +126,20 @@ class VisualDebuggerHelper
     csRef<iVisualDebugger> debugger = csQueryRegistryOrLoad<iVisualDebugger>
       (object_reg, "crystalspace.utilities.visualdebugger");
     debugger->DebugPosition (position, persist, color, size);
+  }
+
+  /**
+   * Load the iVisualDebugger plugin and call iVisualDebugger::DebugVector()
+   */
+  static void DebugVector (iObjectRegistry* object_reg, 
+			   const csReversibleTransform& transform,
+			   const csVector3& vector,
+			   bool persist = false,
+			   csColor color = csColor (0.0f, 1.0f, 0.0f))
+  {
+    csRef<iVisualDebugger> debugger = csQueryRegistryOrLoad<iVisualDebugger>
+      (object_reg, "crystalspace.utilities.visualdebugger");
+    debugger->DebugVector (transform, vector, persist, color);
   }
 
   /**

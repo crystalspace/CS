@@ -69,6 +69,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(VisualDebug)
     positions.Push (data);
   }
 
+  void VisualDebugger::DebugVector (const csReversibleTransform& transform, const csVector3& vector,
+				    bool persist, csColor color)
+  {
+    VectorData data;
+    data.transform = transform;
+    data.vector = vector;
+    data.persist = persist;
+    data.color = color;
+    vectors.Push (data);
+  }
+
   void VisualDebugger::Display (iView* view)
   {
     iGraphics3D* g3d = view->GetContext ();
@@ -130,6 +141,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(VisualDebug)
 
       if (!positionData.persist)
 	positions.DeleteIndex (index);
+
+      index--;
+    }
+
+    // Display vectors
+    index = vectors.GetSize () - 1;
+    for (csArray<VectorData>::ReverseIterator it = vectors.GetReverseIterator ();
+	 it.HasNext (); )
+    {
+      VectorData& vectorData = it.Next ();
+      int color = g2d->FindRGB (255.0f * vectorData.color[0],
+				255.0f * vectorData.color[1],
+				255.0f * vectorData.color[2]);
+      csVector3 origin = vectorData.transform.GetOrigin ();
+      csVector3 end = origin + vectorData.transform.This2OtherRelative (vectorData.vector);
+      g3d->DrawLine (tr_w2c * origin, tr_w2c * end, fov, color);
+
+      if (!vectorData.persist)
+	vectors.DeleteIndex (index);
 
       index--;
     }

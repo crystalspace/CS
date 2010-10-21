@@ -50,6 +50,10 @@ class VisualDebugger : public scfImplementation2<VisualDebugger,
 			      bool persist = false,
 			      csColor color = csColor (0.0f, 1.0f, 0.0f),
 			      size_t size = 3);
+  virtual void DebugVector (const csReversibleTransform& transform,
+			    const csVector3& vector,
+			    bool persist = false,
+			    csColor color = csColor (0.0f, 1.0f, 0.0f));
   virtual void Display (iView* view);
 
  private:
@@ -71,6 +75,15 @@ class VisualDebugger : public scfImplementation2<VisualDebugger,
     size_t size;
   };
   csArray<PositionData> positions;
+
+  struct VectorData
+  {
+    csReversibleTransform transform;
+    csVector3 vector;
+    bool persist;
+    csColor color;
+  };
+  csArray<VectorData> vectors;
 };
 
 }
