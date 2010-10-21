@@ -247,7 +247,8 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     return false;
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
-    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.ik.physical",
+    //CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.ik.physical",
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.ik.ccd",
 		       CS::Animation::iSkeletonIKManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.lookat",
 		       CS::Animation::iSkeletonLookAtManager),

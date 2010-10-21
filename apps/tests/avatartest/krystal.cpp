@@ -384,9 +384,9 @@ bool KrystalScene::CreateAvatar ()
 
   // Create a new animation tree. The structure of the tree is:
   //   + Ragdoll node (root node - only if physics are enabled)
-  //     + Inverse Kinematics node (only if physics are enabled)
+  //     + Inverse Kinematics node
   //       + Random node
-  //         + idle animation nodes
+  //         + Idle animation nodes
   csRef<CS::Animation::iSkeletonAnimPacketFactory> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
@@ -475,7 +475,7 @@ bool KrystalScene::CreateAvatar ()
 
     armChain = bodySkeleton->CreateBodyChain
       ("arm_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("RightShoulder"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"), 0);
+      animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"), 0);
 
     // Create the ragdoll animation node
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
@@ -489,6 +489,11 @@ bool KrystalScene::CreateAvatar ()
     csRef<CS::Animation::iSkeletonIKNodeFactory> IKNodeFactory =
       avatarTest->IKManager->CreateAnimNodeFactory ("IK", bodySkeleton);
     ragdollNodeFactory->SetChildNode (IKNodeFactory);
+
+    // Setup the IKCCD node interface
+    csRef<CS::Animation::iSkeletonIKCCDNodeFactory> IKCCDNodeFactory =
+      scfQueryInterface<CS::Animation::iSkeletonIKCCDNodeFactory> (IKNodeFactory);
+    IKCCDNodeFactory->SetUpwardIterations (false);
 
     // Create the IK hand effector
     csOrthoTransform handOffset (csMatrix3 (), csVector3 (0.0f, 0.0f, 0.1f));
@@ -539,10 +544,12 @@ bool KrystalScene::CreateAvatar ()
     IKNode =
       scfQueryInterface<CS::Animation::iSkeletonIKNode> (rootNode->FindNode ("IK"));
 
+    /*
     // Setup the IKPhysical interface
     csRef<CS::Animation::iSkeletonIKPhysicalNode> IKPhysicalNode =
       scfQueryInterface<CS::Animation::iSkeletonIKPhysicalNode> (IKNode);
     IKPhysicalNode->SetRagdollNode (ragdollNode);
+    */
 
     // Start the ragdoll animation node in order to have the rigid bodies created
     ragdollNode->Play ();
@@ -613,7 +620,7 @@ void KrystalScene::ResetScene ()
 
 void KrystalScene::ResetSoftBodies ()
 {
-  // TODO: the genmeshes should be made a child node of Krystal's scene node
+  // TODO: the soft bodies genmeshes should be made as child nodes of the Krystal's iMovable scene node
 
   // Delete the current soft bodies
   if (hairsBody)
