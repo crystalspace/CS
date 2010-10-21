@@ -256,6 +256,121 @@ struct iSkeletonIKPhysicalNode : public iSkeletonIKNode
   virtual CS::Animation::iSkeletonRagdollNode* GetRagdollNode () const = 0;
 };
 
+/**
+ * An implementation of the CS::Animation::iSkeletonIKNodeFactory based on a quaternion version
+ * of the Cyclic Coordinate Descent algorithm.
+ *
+ * The general behavior of the CCD algorithm is to iterate over each bone of the
+ * chain, and apply a portion of the rotation needed to get the effector closer
+ * to the target. 
+ *
+ * The CCD algorithm is the most common algorithm for Inverse Kinematics because
+ * it is simple and rather efficient. One of the main disadvantage is that it is
+ * not stable in the sense that a small change to the configuration of the IK target
+ * can lead to a big change in the result of the algorithm.
+ *
+ * \warning The current implementation does not care about the rotational component
+ * of the constraints.
+ * \warning The current implementation does not care about the constraints of the
+ * joints of the chain.
+ *
+ * \sa iSkeletonIKNodeFactory
+ */
+struct iSkeletonIKCCDNodeFactory : public iSkeletonIKNodeFactory
+{
+  SCF_INTERFACE(CS::Animation::iSkeletonIKCCDNodeFactory, 1, 0, 0);
+
+  /**
+   * Set the maximum number of iterations that can be done before the algorithm stops.
+   * The default value is 50.
+   */
+  virtual void SetMaximumIterations (size_t max) = 0;
+
+  /**
+   * Get the maximum number of iterations that can be done before the algorithm stops.
+   */
+  virtual size_t GetMaximumIterations () = 0;
+
+  /**
+   * Set the minimum distance between the target and the effector that has to be
+   * reached before the algorithm stops. The default value is 0.001.
+   */
+  virtual void SetTargetDistance (float distance) = 0;
+
+  /**
+   * Get the minimum distance between the target and the effector that has to be
+   * reached before the algorithm stops.
+   */
+  virtual float GetTargetDistance () = 0;
+
+  /**
+   * Set the portion of the rotation that has to be applied at each joint at each
+   * iteration of the algorithm. The value should be kept bigger than 0.0, and
+   * smaller or equal to 1.0. The default value is 0.1.
+   */
+  virtual void SetMotionRatio (float ratio) = 0;
+
+  /**
+   * Get the portion of the rotation that has to be applied at each joint at each
+   * iteration of the algorithm.
+   */
+  virtual float GetMotionRatio () = 0;
+
+  /**
+   * Set whether the rotation of each joint must be initialized with the value from
+   * the child node. This can be used to achieve more realistic results by directing
+   * the motion, but it can also generate less stable results. The default value is true.
+   */
+  virtual void SetJointInitialization (bool initialized) = 0;
+
+  /**
+   * Get whether the rotation of each joint must be initialized with the value from
+   * the child node. This can be used to achieve more realistic results by directing
+   * the motion, but it can also generate less stable results.
+   */
+  virtual bool GetJointInitialization () = 0;
+
+  /**
+   * Set whether or not the joints should be iterated upward, from the leaf node to the
+   * parent node. Iterating upward favours the motion for the end nodes to the detriment
+   * of the root nodes. The default value is true.
+   */
+  virtual void SetUpwardIterations (bool upward) = 0;
+
+  /**
+   * Get whether or not the joints should be iterated upward, from the leaf node to the
+   * parent node. Iterating upward favours the motion for the end nodes to the detriment
+   * of the root nodes.
+   */
+  virtual bool GetUpwardIterations () = 0;
+};
+
+/**
+ * An implementation of the CS::Animation::iSkeletonIKNodeFactory based on a quaternion version
+ * of the Cyclic Coordinate Descent algorithm.
+ *
+ * The general behavior of the CCD algorithm is to iterate over each bone of the
+ * chain, and apply a portion of the rotation needed to get the effector closer
+ * to the target. 
+ *
+ * The CCD algorithm is the most common algorithm for Inverse Kinematics because
+ * it is simple and rather efficient. One of the main disadvantage is that it is
+ * not stable in the sense that a small change to the configuration of the IK target
+ * can lead to a big change in the result of the algorithm.
+ *
+ * \warning The current implementation does not care about the rotational component
+ * of the constraints.
+ * \warning The current implementation does not care about the constraints of the
+ * joints of the chain.
+ *
+ * \sa iSkeletonIKNode
+ */
+struct iSkeletonIKCCDNode : public iSkeletonIKNode
+{
+  SCF_INTERFACE(CS::Animation::iSkeletonIKCCDNode, 1, 0, 0);
+
+};
+
 } // namespace Animation
 } // namespace CS
 
