@@ -235,6 +235,7 @@ class iBodyChainNode(core.iBase):
     def GetChildCount(*args): return _animation.iBodyChainNode_GetChildCount(*args)
     def GetChild(*args): return _animation.iBodyChainNode_GetChild(*args)
     def GetParent(*args): return _animation.iBodyChainNode_GetParent(*args)
+    def FindSubChild(*args): return _animation.iBodyChainNode_FindSubChild(*args)
     scfGetVersion = staticmethod(_animation.iBodyChainNode_scfGetVersion)
     __swig_destroy__ = _animation.delete_iBodyChainNode
     __del__ = lambda self : None;
@@ -673,6 +674,34 @@ class iSkeletonIKPhysicalNode(iSkeletonIKNode):
 iSkeletonIKPhysicalNode_swigregister = _animation.iSkeletonIKPhysicalNode_swigregister
 iSkeletonIKPhysicalNode_swigregister(iSkeletonIKPhysicalNode)
 iSkeletonIKPhysicalNode_scfGetVersion = _animation.iSkeletonIKPhysicalNode_scfGetVersion
+
+class iSkeletonIKCCDNodeFactory(iSkeletonIKNodeFactory):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetMaximumIterations(*args): return _animation.iSkeletonIKCCDNodeFactory_SetMaximumIterations(*args)
+    def GetMaximumIterations(*args): return _animation.iSkeletonIKCCDNodeFactory_GetMaximumIterations(*args)
+    def SetTargetDistance(*args): return _animation.iSkeletonIKCCDNodeFactory_SetTargetDistance(*args)
+    def GetTargetDistance(*args): return _animation.iSkeletonIKCCDNodeFactory_GetTargetDistance(*args)
+    def SetMotionRatio(*args): return _animation.iSkeletonIKCCDNodeFactory_SetMotionRatio(*args)
+    def GetMotionRatio(*args): return _animation.iSkeletonIKCCDNodeFactory_GetMotionRatio(*args)
+    def SetJointInitialization(*args): return _animation.iSkeletonIKCCDNodeFactory_SetJointInitialization(*args)
+    def GetJointInitialization(*args): return _animation.iSkeletonIKCCDNodeFactory_GetJointInitialization(*args)
+    def SetUpwardIterations(*args): return _animation.iSkeletonIKCCDNodeFactory_SetUpwardIterations(*args)
+    def GetUpwardIterations(*args): return _animation.iSkeletonIKCCDNodeFactory_GetUpwardIterations(*args)
+    __swig_destroy__ = _animation.delete_iSkeletonIKCCDNodeFactory
+    __del__ = lambda self : None;
+iSkeletonIKCCDNodeFactory_swigregister = _animation.iSkeletonIKCCDNodeFactory_swigregister
+iSkeletonIKCCDNodeFactory_swigregister(iSkeletonIKCCDNodeFactory)
+
+class iSkeletonIKCCDNode(iSkeletonIKNode):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    __swig_destroy__ = _animation.delete_iSkeletonIKCCDNode
+    __del__ = lambda self : None;
+iSkeletonIKCCDNode_swigregister = _animation.iSkeletonIKCCDNode_swigregister
+iSkeletonIKCCDNode_swigregister(iSkeletonIKCCDNode)
 
 class iSkeletonLookAtManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
