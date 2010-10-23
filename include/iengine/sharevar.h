@@ -37,7 +37,7 @@ class csVector3;
 
 
 /**
- * iSharedVariable implements a refcounted value which can
+ * This class implements a refcounted value which can
  * be shared across many objects and updated efficiently.
  *
  * Main creators of instances implementing this interface:
@@ -86,11 +86,11 @@ struct iSharedVariable : public virtual iBase
   /// Possible types stored by this class.
   enum SharedVariableType
   {
-    SV_UNKNOWN = 0,
-    SV_FLOAT   = 1,
-    SV_COLOR   = 2,
-    SV_VECTOR  = 3,
-    SV_STRING  = 4
+    SV_UNKNOWN = 0,    /*!< Undefined variable type. */
+    SV_FLOAT   = 1,    /*!< 'float' variable type. */
+    SV_COLOR   = 2,    /*!< csColor variable type. */
+    SV_VECTOR  = 3,    /*!< csVector3 variable type. */
+    SV_STRING  = 4     /*!< 'const char*' variable type. */
   };
 
   /// Get the type currently stored by this variable.

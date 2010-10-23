@@ -120,6 +120,9 @@ struct iSkeletonLookAtNodeFactory : public iSkeletonAnimNodeFactory
  * - Whether or not SetAlwaysRotate() has been set.
  * - The maximum rotation speed allowed through SetMaximumSpeed().
  *
+ * This controller can manage by itself the transitions while changing the current 'LookAt'
+ * targets, therefore it doesn't need to be blended in and out.
+ *
  * This controller uses only the pitch and yaw (ie rotations around X and Y axis)
  * in order to achieve the look at the target, the roll is not used.
  */

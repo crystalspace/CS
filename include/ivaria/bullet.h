@@ -440,7 +440,7 @@ struct iSoftBody : public iBody
 
   /**
    * Update the position of the anchor of the given vertex relatively to the anchored
-   * rigid body. This can be used to have a finer controll of the anchor position
+   * rigid body. This can be used to have a finer control of the anchor position
    * relatively to the rigid body.
    *
    * This would work only if you called AnchorVertex(size_t,iRigidBody*) before.
