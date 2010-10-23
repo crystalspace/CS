@@ -32,7 +32,7 @@ class Simple : public CS::Demo::DemoApplication
 {
 private:
   // Physics related
-  csRef<iDynamics> dyn;
+  csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
   csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
   csRef<CS::Debug::iDynamicsDebuggerManager> debuggerManager;
@@ -80,7 +80,6 @@ private:
   size_t draggedVertex;
   float dragDistance;
   float linearDampening, angularDampening;
-  int mouseX, mouseY;
 
   // Cut & Paste related
   csRef<iRigidBody> clipboardBody;
@@ -91,7 +90,6 @@ private:
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
   bool OnMouseUp (iEvent &event);
-  bool OnMouseMove (iEvent &event);
 
   // Camera
   void UpdateCameraMode ();

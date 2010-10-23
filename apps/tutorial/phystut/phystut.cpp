@@ -47,6 +47,7 @@ Simple::Simple ()
 
   // We manage the camera by ourselves
   cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_NONE);
+  cameraHelper.SetMouseMoveEnabled (false);
 
   // Command line options
   commandLineHelper.AddCommandLineOption
@@ -157,14 +158,6 @@ void Simple::Frame ()
   // Step the dynamic simulation
   if (!pauseDynamic)
   {
-    /*
-    for (int i = 0; i < dynamicSystem->GetBodysCount (); i++)
-    {
-      iRigidBody* body = dynamicSystem->GetBody (i);
-      body->SetLinearVelocity (csVector3 (0.0f));
-      body->SetAngularVelocity (csVector3 (0.0f));
-    }
-    */
     // If the physics engine is ODE, then we have to take care of calling
     // the update of the dynamic simulation with a constant step time.
     if (phys_engine_id == ODE_ID)
@@ -173,7 +166,7 @@ void Simple::Frame ()
       float totalDuration = remainingStepDuration + speed / dynamicSpeed;
       int iterationCount = (int) (totalDuration / odeStepDuration);
       for (int i = 0; i < iterationCount; i++)
-	dyn->Step (odeStepDuration);
+	dynamics->Step (odeStepDuration);
 
       // Store the remaining step duration
       remainingStepDuration = totalDuration -
@@ -182,7 +175,7 @@ void Simple::Frame ()
 
     // The bullet plugin uses a constant step time on its own
     else
-      dyn->Step (speed / dynamicSpeed);
+      dynamics->Step (speed / dynamicSpeed);
   }
 
   // Update camera position if it is controlled by a rigid body.
@@ -610,7 +603,7 @@ csVector3 MouseAnchorAnimationControl::GetAnchorPosition () const
   csVector3 newPosition = endBeam - startBeam;
   newPosition.Normalize ();
   newPosition = camera->GetTransform ().GetOrigin () + newPosition * simple->dragDistance;
-  return newPosition;  
+  return newPosition;
 }
 
 bool Simple::OnMouseDown (iEvent& ev)
@@ -620,9 +613,6 @@ bool Simple::OnMouseDown (iEvent& ev)
       && phys_engine_id == BULLET_ID)
   {
     // Find the rigid body that was clicked on
-    int mouseX = csMouseEventHelper::GetX (&ev);
-    int mouseY = csMouseEventHelper::GetY (&ev);
-
     // Compute the end beam points
     csRef<iCamera> camera = view->GetCamera ();
     csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
@@ -673,9 +663,6 @@ bool Simple::OnMouseDown (iEvent& ev)
 	   && phys_engine_id == BULLET_ID)
   {
     // Find the rigid body that was clicked on
-    int mouseX = csMouseEventHelper::GetX (&ev);
-    int mouseY = csMouseEventHelper::GetY (&ev);
-
     // Compute the end beam points
     csRef<iCamera> camera = view->GetCamera ();
     csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
@@ -726,9 +713,10 @@ bool Simple::OnMouseDown (iEvent& ev)
   return false;
 }
 
-bool Simple::OnMouseUp (iEvent& ev)
+bool Simple::OnMouseUp (iEvent& event)
 {
-  if (dragging)
+  if (csMouseEventHelper::GetButton (&event) == 1
+      && dragging)
   {
     dragging = false;
 
@@ -745,21 +733,13 @@ bool Simple::OnMouseUp (iEvent& ev)
     return true;
   }
 
-  if (softDragging)
+  if (csMouseEventHelper::GetButton (&event) == 1
+      && softDragging)
   {
     softDragging = false;
     draggedBody->RemoveAnchor (draggedVertex);
     draggedBody = 0;
   }
-
-  return false;
-}
-
-bool Simple::OnMouseMove (iEvent& ev)
-{
-  // Save the mouse position
-  mouseX = csMouseEventHelper::GetX (&ev);
-  mouseY = csMouseEventHelper::GetY (&ev);
 
   return false;
 }
@@ -790,7 +770,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     phys_engine_id = ODE_ID;
     csRef<iPluginManager> plugmgr = 
       csQueryRegistry<iPluginManager> (GetObjectRegistry ());
-    dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.ode");
+    dynamics = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.ode");
   }
   else 
   {
@@ -798,7 +778,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     phys_engine_id = BULLET_ID;
     csRef<iPluginManager> plugmgr = 
       csQueryRegistry<iPluginManager> (GetObjectRegistry ());
-    dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
+    dynamics = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
 
     // Check whether the soft bodies are enabled or not
     isSoftBodyWorld = !clp->GetBoolOption ("disable_soft", false);
@@ -829,7 +809,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
       environment = ENVIRONMENT_TERRAIN;
   }
 
-  if (!dyn)
+  if (!dynamics)
     return ReportError ("No iDynamics plugin!");
 
   // Now that we know the physical plugin in use, we can define the available keys
@@ -846,7 +826,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
   hudHelper.keyDescriptions.Push ("*: spawn a static concave mesh");
   if (phys_engine_id == BULLET_ID)
     hudHelper.keyDescriptions.Push ("q: spawn a compound body");
-  hudHelper.keyDescriptions.Push ("j: spawn two jointed bodies");
+  hudHelper.keyDescriptions.Push ("j: spawn a joint with motor");
   if (phys_engine_id == BULLET_ID)
   {
     hudHelper.keyDescriptions.Push ("h: spawn a chain");
@@ -870,7 +850,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
   hudHelper.keyDescriptions.Push ("t: toggle all bodies dynamic/static");
   hudHelper.keyDescriptions.Push ("p: pause the simulation");
   hudHelper.keyDescriptions.Push ("o: toggle speed of simulation");
-  hudHelper.keyDescriptions.Push ("d: toggle display of colliders");
+  hudHelper.keyDescriptions.Push ("d: toggle Bullet debug display");
   if (phys_engine_id == BULLET_ID)
     hudHelper.keyDescriptions.Push ("?: toggle display of collisions");
   hudHelper.keyDescriptions.Push ("g: toggle gravity");
@@ -905,7 +885,7 @@ bool Simple::Application ()
     return ReportError ("Failed to locate dynamic's debug manager!");
 
   // Create the dynamic system
-  dynamicSystem = dyn->CreateSystem ();
+  dynamicSystem = dynamics->CreateSystem ();
   if (!dynamicSystem) return ReportError ("Error creating dynamic system!");
 
   // Set some linear and angular dampening in order to have a reduction of
@@ -978,7 +958,7 @@ bool Simple::Application ()
   // Init the camera
   UpdateCameraMode ();
 
-  // Load the animesh & ragdoll at startup
+  // Pre-load the animated mesh and the ragdoll animation node data
   if (phys_engine_id == BULLET_ID)
     LoadRagdoll ();
 
