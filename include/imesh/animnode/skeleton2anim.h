@@ -187,7 +187,7 @@ struct iSkeletonAnimPacketFactory : public virtual iBase
 };
 
 /**
- * A animation packet instance. It is defined by a CS::Animation::iSkeletonAnimPacketFactory.
+ * An animation packet instance. It is defined by a CS::Animation::iSkeletonAnimPacketFactory.
  *
  * Main creators of instances implementing this interface:
  * - CS::Animation::iSkeletonAnimPacketFactory::CreateInstance()
@@ -208,7 +208,7 @@ struct iSkeletonAnimPacket : public virtual iBase
   virtual iSkeletonAnimPacketFactory* GetFactory () const = 0;
 
   /**
-   * Get the root node for the animation mixing hierarchy
+   * Get the root node of the animation blending tree
    */
   virtual iSkeletonAnimNode* GetAnimationRoot () const = 0;
 };

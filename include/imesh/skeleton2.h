@@ -116,7 +116,7 @@ struct iSkeletonManager : public virtual iBase
 
 /**
  * A skeleton factory is an object defining the base pose and topology
- * from which skeleton instances can be created.
+ * from which CS::Animation::iSkeleton2 instances can be created.
  *
  * A note on coordinate spaces, cause there are a few to keep track of.
  * Within the skeleton factory there are two types coordinate spaces:
@@ -250,8 +250,9 @@ struct iSkeletonFactory : public virtual iBase
 };
 
 /**
- * A skeleton instance is a specific copy of a skeleton with base pose and
- * topology defined by the factory but current state internally defined. 
+ * A skeleton instance defines the state of a CS::Mesh::iAnimatedMesh. It is therefore a specific
+ * copy of a skeleton, with the base pose and topology defined by the factory, but with the current
+ * state defined internally. 
  * 
  * Skeleton instance adds one coordinate space per bone, the bind space.
  * Bind space is defined by the skeleton factory, so bind space is relative
