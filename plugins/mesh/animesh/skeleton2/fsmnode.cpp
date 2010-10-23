@@ -397,7 +397,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   void FSMNode::SwitchToState (CS::Animation::StateID newState)
   {
     if (automaticState != CS::Animation::InvalidStateID)
+    {
       blendFifo.RemoveAnimations (automaticState);
+      automaticState = CS::Animation::InvalidStateID;
+    }
     SwitchToState (newState, true);
   }
 
@@ -555,15 +558,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   void FSMNode::NewAnimation (size_t data)
   {
     currentState = (CS::Animation::StateID) data;
-
-    // The automatic state has been accepted as the new state
-    if (automaticState == (CS::Animation::StateID) data)
-      automaticState = CS::Animation::InvalidStateID;
   }
 
   void FSMNode::InstructionQueueEmpty (size_t data)
   {
-    // Find if we can find an automatic transition to add to the queue
+    // Check if we can find an automatic transition to add to the queue
     if (automaticTransitions.Contains ((CS::Animation::StateID) data))
     {
       automaticState = (CS::Animation::StateID) data;
