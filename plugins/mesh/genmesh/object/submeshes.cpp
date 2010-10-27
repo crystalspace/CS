@@ -250,11 +250,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
   static int SubmeshSubmeshCompare (SubMesh* const& A, 
                                     SubMesh* const& B)
   {
-    const char* a = A->GetName();
-    const char* b = B->GetName();
-    if (a == 0) return (b == 0) ? 0 : 1;
-    if (b == 0) return -1;
-    return strcmp (a, b);
+    if (A < B)
+    	return -1;
+    if (A > B)
+    	return 1;
+    return 0;
   }
 
   iGeneralMeshSubMesh* SubMeshesContainer::AddSubMesh (
@@ -306,6 +306,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       csArrayCmp<SubMesh*, SubMesh*> (subMesh, &SubmeshSubmeshCompare));
     if (idx == csArrayItemNotFound) return;
     subMeshes.DeleteIndex (idx);
+    changeNum++;
 
     if (subMeshes.GetSize() == 0)
       subMeshes.Push (defaultSubmesh);
