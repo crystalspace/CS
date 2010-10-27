@@ -298,12 +298,12 @@ bool FrankieScene::CreateAvatar ()
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"));
 
   // Load animationPhysicsControl
-  animationPhysicsControl = scfQueryInterface<CS::Mesh::iFurAnimatedMeshControl>
+  animationPhysicsControl = scfQueryInterface<CS::Animation::iFurAnimatedMeshControl>
       (furMeshType->CreateFurAnimatedMeshControl("frankie_fur_animation"));
 
   animationPhysicsControl->SetAnimatedMesh(animesh);
 
-  furPhysicsControl = scfQueryInterface<CS::Mesh::iFurPhysicsControl>
+  furPhysicsControl = scfQueryInterface<CS::Animation::iFurPhysicsControl>
     (furMeshType->CreateFurPhysicsControl("frankie_fur_physics"));
 
   furPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);

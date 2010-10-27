@@ -388,9 +388,9 @@ bool KrystalScene::CreateAvatar ()
 
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
 
-  hairPhysicsControl = scfQueryInterface<CS::Mesh::iFurPhysicsControl>
+  hairPhysicsControl = scfQueryInterface<CS::Animation::iFurPhysicsControl>
     (furMeshType->CreateFurPhysicsControl("krystal_hairs_physics"));
-  animationPhysicsControl = scfQueryInterface<CS::Mesh::iFurAnimatedMeshControl>
+  animationPhysicsControl = scfQueryInterface<CS::Animation::iFurAnimatedMeshControl>
     (furMeshType->CreateFurAnimatedMeshControl("krystal_hairs_animation"));
 
   hairPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);

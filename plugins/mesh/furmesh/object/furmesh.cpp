@@ -928,7 +928,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     this->animesh = animesh;
   }
   
-  void FurMesh::SetAnimationControl (CS::Mesh::iFurAnimationControl* physicsControl)
+  void FurMesh::SetAnimationControl (CS::Animation::iFurAnimationControl* physicsControl)
   {
     this->physicsControl = physicsControl;
   }
@@ -1207,9 +1207,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         (int)(uv.y * densitymap.height), 2, 255);
     }
 
-    csPrintf("Pure guide ropes: %d\n", guideFurs.GetSize());
+    csPrintf("Pure guide ropes: %d\n", (int) guideFurs.GetSize());
     csPrintf("Total guide ropes: %d\n", 
-      guideFursLOD.GetSize() + guideFurs.GetSize());
+	     (int) (guideFursLOD.GetSize() + guideFurs.GetSize()));
 
     densitymap.SaveImage(object_reg, 
       "/data/hairtest/densitymap_debug.png");

@@ -29,8 +29,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   class HairPhysicsControl : public scfImplementation2 
-    <HairPhysicsControl, scfFakeInterface<CS::Mesh::iFurAnimationControl>, 
-    CS::Mesh::iFurPhysicsControl>
+    <HairPhysicsControl, scfFakeInterface<CS::Animation::iFurAnimationControl>, 
+    CS::Animation::iFurPhysicsControl>
   {
   public:
     CS_LEAKGUARD_DECLARE(HairPhysicsControl);

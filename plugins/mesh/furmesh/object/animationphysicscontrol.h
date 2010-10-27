@@ -29,8 +29,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 {
   class AnimationPhysicsControl : public scfImplementation2 
-    <AnimationPhysicsControl, scfFakeInterface<CS::Mesh::iFurAnimationControl>, 
-    CS::Mesh::iFurAnimatedMeshControl>
+    <AnimationPhysicsControl, scfFakeInterface<CS::Animation::iFurAnimationControl>, 
+    CS::Animation::iFurAnimatedMeshControl>
   {
   public:
     CS_LEAKGUARD_DECLARE(AnimationPhysicsControl);

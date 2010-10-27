@@ -42,8 +42,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   };
 
   class FurMeshType : public 
-    scfImplementation3<FurMeshType,CS::Mesh::iFurMeshType,
-    scfFakeInterface<iMeshObjectType>,iComponent>
+    //scfImplementation3<FurMeshType, CS::Mesh::iFurMeshType,
+    //scfFakeInterface<iMeshObjectType>, iComponent>
+    scfImplementation3<FurMeshType, iMeshObjectType, iComponent, CS::Mesh::iFurMeshType>
   {
   public:
     CS_LEAKGUARD_DECLARE(FurMeshType);
@@ -67,9 +68,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void RemoveFurMeshMaterialProperites (const char* name);
     virtual void ClearFurMeshMaterialProperites ();
 
-    virtual CS::Mesh::iFurAnimationControl* CreateFurPhysicsControl (const char* name);
-    virtual CS::Mesh::iFurAnimationControl* CreateFurAnimatedMeshControl (const char* name);
-    virtual CS::Mesh::iFurAnimationControl* FindFurAnimationControl (const char* name) const;
+    virtual CS::Animation::iFurAnimationControl* CreateFurPhysicsControl (const char* name);
+    virtual CS::Animation::iFurAnimationControl* CreateFurAnimatedMeshControl (const char* name);
+    virtual CS::Animation::iFurAnimationControl* FindFurAnimationControl (const char* name) const;
     virtual void RemoveFurAnimationControl (const char* name);
     virtual void ClearFurAnimationControls ();
 
@@ -77,7 +78,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     iObjectRegistry* object_reg;
     // Pointer to the engine if available.
     iEngine *Engine;
-    csHash<csRef<CS::Mesh::iFurAnimationControl>, csString> furAnimationControlHash;
+    csHash<csRef<CS::Animation::iFurAnimationControl>, csString> furAnimationControlHash;
     csHash<csRef<CS::Mesh::iFurMeshMaterialProperties>, csString> 
       furMeshMaterialPropertiesHash;
   };

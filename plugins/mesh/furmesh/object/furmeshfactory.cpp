@@ -60,7 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
   CS_LEAKGUARD_IMPLEMENT(FurMeshType);
 
   FurMeshType::FurMeshType (iBase* parent) :
-  scfImplementationType (this, parent),
+    scfImplementationType (this, parent),
     object_reg(0), Engine(0)
   {
   }
@@ -128,28 +128,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     furMeshMaterialPropertiesHash.DeleteAll ();
   }
 
-  CS::Mesh::iFurAnimationControl* FurMeshType::CreateFurPhysicsControl (const char* name)
+  CS::Animation::iFurAnimationControl* FurMeshType::CreateFurPhysicsControl (const char* name)
   {
-    csRef<CS::Mesh::iFurAnimationControl> newAnimationControl;
+    csRef<CS::Animation::iFurAnimationControl> newAnimationControl;
     newAnimationControl.AttachNew(new HairPhysicsControl (this));
     return furAnimationControlHash.PutUnique (name, newAnimationControl);
   }
 
-  CS::Mesh::iFurAnimationControl* FurMeshType::CreateFurAnimatedMeshControl (const char* name)
+  CS::Animation::iFurAnimationControl* FurMeshType::CreateFurAnimatedMeshControl (const char* name)
   {
-    csRef<CS::Mesh::iFurAnimationControl> newAnimationControl;
+    csRef<CS::Animation::iFurAnimationControl> newAnimationControl;
     newAnimationControl.AttachNew(new AnimationPhysicsControl (this));
     return furAnimationControlHash.PutUnique (name, newAnimationControl);
   }
 
-  CS::Mesh::iFurAnimationControl* FurMeshType::FindFurAnimationControl (const char* name) const
+  CS::Animation::iFurAnimationControl* FurMeshType::FindFurAnimationControl (const char* name) const
   {
     return furAnimationControlHash.Get (name, 0);
   }
 
   void FurMeshType::RemoveFurAnimationControl (const char* name)
   {
-    CS::Mesh::iFurAnimationControl* newAnimationControl = FindFurAnimationControl(name);
+    CS::Animation::iFurAnimationControl* newAnimationControl = FindFurAnimationControl(name);
     
     if (!newAnimationControl)
       furAnimationControlHash.Delete (name, newAnimationControl);

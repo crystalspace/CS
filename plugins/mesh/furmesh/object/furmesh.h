@@ -72,7 +72,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetLOD(float lod);
 
     virtual void SetAnimatedMesh(CS::Mesh::iAnimatedMesh* animesh);
-    virtual void SetAnimationControl (CS::Mesh::iFurAnimationControl* physicsControl);
+    virtual void SetAnimationControl (CS::Animation::iFurAnimationControl* physicsControl);
     virtual void StartAnimationControl ( );
     virtual void StopAnimationControl ( );
     virtual void EnableMesh ( );
@@ -103,7 +103,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csArray<csTriangle> guideFursTriangles;
     csArray<csGuideFurLOD> guideFursLOD;
     CS::Mesh::iAnimatedMesh* animesh;
-    csRef<CS::Mesh::iFurAnimationControl> physicsControl;
+    csRef<CS::Animation::iFurAnimationControl> physicsControl;
     csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties;
     csVector3* furStrandShift;
     csVector3* positionShift;
