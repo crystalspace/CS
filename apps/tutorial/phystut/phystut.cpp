@@ -799,7 +799,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     }
 
     // Load the ragdoll plugin
-    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager>
+    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollNodeManager>
       (plugmgr, "crystalspace.mesh.animesh.animnode.ragdoll");
     if (!ragdollManager)
       return ReportError ("Failed to locate ragdoll manager!");

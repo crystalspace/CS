@@ -249,9 +249,9 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     //CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.ik.physical",
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.ik.ccd",
-		       CS::Animation::iSkeletonIKManager),
+		       CS::Animation::iSkeletonIKNodeManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.lookat",
-		       CS::Animation::iSkeletonLookAtManager),
+		       CS::Animation::iSkeletonLookAtNodeManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.speed",
 		       CS::Animation::iSkeletonSpeedNodeManager),
     CS_REQUEST_PLUGIN ("crystalspace.decal.manager",
@@ -296,7 +296,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     }
 
     // Load the ragdoll plugin
-    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager>
+    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollNodeManager>
       (plugmgr, "crystalspace.mesh.animesh.animnode.ragdoll");
 
     if (!ragdollManager)
@@ -361,11 +361,11 @@ bool AvatarTest::Application ()
     return false;
 
   // Find references to the plugins of the animation nodes
-  IKManager = csQueryRegistry<CS::Animation::iSkeletonIKManager> (GetObjectRegistry ());
-  if (!IKManager) return ReportError("Failed to locate iSkeletonIKManager plugin!");
+  IKNodeManager = csQueryRegistry<CS::Animation::iSkeletonIKNodeManager> (GetObjectRegistry ());
+  if (!IKNodeManager) return ReportError("Failed to locate iSkeletonIKNodeManager plugin!");
 
-  lookAtManager = csQueryRegistry<CS::Animation::iSkeletonLookAtManager> (GetObjectRegistry ());
-  if (!lookAtManager) return ReportError("Failed to locate iSkeletonLookAtManager plugin!");
+  lookAtManager = csQueryRegistry<CS::Animation::iSkeletonLookAtNodeManager> (GetObjectRegistry ());
+  if (!lookAtManager) return ReportError("Failed to locate iSkeletonLookAtNodeManager plugin!");
 
   basicNodesManager =
     csQueryRegistry<CS::Animation::iSkeletonSpeedNodeManager> (GetObjectRegistry ());

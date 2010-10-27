@@ -32,15 +32,15 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 {
 
-  class RagdollManager : public scfImplementation2<RagdollManager,
-    CS::Animation::iSkeletonRagdollManager, iComponent>
+  class RagdollNodeManager : public scfImplementation2<RagdollNodeManager,
+    CS::Animation::iSkeletonRagdollNodeManager, iComponent>
   {
   public:
-    CS_LEAKGUARD_DECLARE(RagdollManager);
+    CS_LEAKGUARD_DECLARE(RagdollNodeManager);
 
-    RagdollManager (iBase* parent);
+    RagdollNodeManager (iBase* parent);
 
-    //-- CS::Animation::iSkeletonRagdollManager
+    //-- CS::Animation::iSkeletonRagdollNodeManager
     virtual CS::Animation::iSkeletonRagdollNodeFactory* CreateAnimNodeFactory (const char *name, 
                CS::Animation::iBodySkeleton* skeleton, iDynamicSystem* dynSys);
 
@@ -72,7 +72,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   public:
     CS_LEAKGUARD_DECLARE(RagdollAnimNodeFactory);
 
-    RagdollAnimNodeFactory (RagdollManager* manager, const char *name,
+    RagdollAnimNodeFactory (RagdollNodeManager* manager, const char *name,
 			    CS::Animation::iBodySkeleton* skeleton, iDynamicSystem* dynSys);
 
     //-- CS::Animation::iSkeletonAnimNodeFactory
@@ -95,7 +95,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     virtual iDynamicSystem* GetDynamicSystem () const;
 
   protected:
-    RagdollManager* manager;
+    RagdollNodeManager* manager;
     csString name;
     csRef<CS::Animation::iBodySkeleton> bodySkeleton;
     csHash<ChainData, csString> chains;

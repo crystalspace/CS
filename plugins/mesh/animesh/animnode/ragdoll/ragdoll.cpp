@@ -38,19 +38,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 {
 
   /********************
-   *  RagdollManager
+   *  RagdollNodeManager
    ********************/
 
-  SCF_IMPLEMENT_FACTORY(RagdollManager);
+  SCF_IMPLEMENT_FACTORY(RagdollNodeManager);
 
-  CS_LEAKGUARD_IMPLEMENT(RagdollManager);
+  CS_LEAKGUARD_IMPLEMENT(RagdollNodeManager);
 
-  RagdollManager::RagdollManager (iBase* parent)
+  RagdollNodeManager::RagdollNodeManager (iBase* parent)
     : scfImplementationType (this, parent)
   {
   }
 
-  CS::Animation::iSkeletonRagdollNodeFactory* RagdollManager::CreateAnimNodeFactory
+  CS::Animation::iSkeletonRagdollNodeFactory* RagdollNodeManager::CreateAnimNodeFactory
     (const char *name, CS::Animation::iBodySkeleton* skeleton, iDynamicSystem* dynSys)
   {
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> newFact;
@@ -59,24 +59,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     return factoryHash.PutUnique (name, newFact);
   }
 
-  CS::Animation::iSkeletonRagdollNodeFactory* RagdollManager::FindAnimNodeFactory
+  CS::Animation::iSkeletonRagdollNodeFactory* RagdollNodeManager::FindAnimNodeFactory
     (const char* name) const
   {
     return factoryHash.Get (name, 0);
   }
 
-  void RagdollManager::ClearAnimNodeFactories ()
+  void RagdollNodeManager::ClearAnimNodeFactories ()
   {
     factoryHash.DeleteAll ();
   }
 
-  bool RagdollManager::Initialize (iObjectRegistry* object_reg)
+  bool RagdollNodeManager::Initialize (iObjectRegistry* object_reg)
   {
     this->object_reg = object_reg;
     return true;
   }
 
-  void RagdollManager::Report (int severity, const char* msg, ...) const
+  void RagdollNodeManager::Report (int severity, const char* msg, ...) const
   {
     va_list arg;
     va_start (arg, msg);
@@ -100,7 +100,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   CS_LEAKGUARD_IMPLEMENT(RagdollAnimNodeFactory);
 
-  RagdollAnimNodeFactory::RagdollAnimNodeFactory (RagdollManager* manager,
+  RagdollAnimNodeFactory::RagdollAnimNodeFactory (RagdollNodeManager* manager,
 	    const char *name, CS::Animation::iBodySkeleton* skeleton, iDynamicSystem* dynSys)
     : scfImplementationType (this), manager (manager), name (name),
     bodySkeleton (skeleton), dynSys (dynSys)

@@ -93,9 +93,9 @@ private:
   csRef<iSaver> saver;
 
   // Animation node plugin managers
-  csRef<CS::Animation::iSkeletonLookAtManager> lookAtManager;
+  csRef<CS::Animation::iSkeletonLookAtNodeManager> lookAtManager;
   csRef<CS::Animation::iSkeletonSpeedNodeManager> basicNodesManager;
-  csRef<CS::Animation::iSkeletonRagdollManager> ragdollManager;
+  csRef<CS::Animation::iSkeletonRagdollNodeManager> ragdollManager;
 
   // GUI related
   csRef<iVFS> vfs;

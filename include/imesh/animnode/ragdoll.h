@@ -53,9 +53,9 @@ struct iSkeletonRagdollNodeFactory;
  * A class to manage the creation and deletion of ragdoll animation 
  * node factories.
  */
-struct iSkeletonRagdollManager : public virtual iBase
+struct iSkeletonRagdollNodeManager : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRagdollManager, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeManager, 1, 0, 0);
 
   /**
    * Create a new ragdoll animation node factory.

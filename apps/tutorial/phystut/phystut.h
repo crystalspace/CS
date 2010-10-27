@@ -68,7 +68,7 @@ private:
   float rotX, rotY, rotZ;
 
   // Ragdoll related
-  csRef<CS::Animation::iSkeletonRagdollManager> ragdollManager;
+  csRef<CS::Animation::iSkeletonRagdollNodeManager> ragdollManager;
   CS::Animation::StateID ragdollState;
   csRef<iMeshWrapper> ragdollMesh;
 

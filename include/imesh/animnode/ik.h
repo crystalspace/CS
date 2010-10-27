@@ -60,9 +60,9 @@ struct iSkeletonIKNodeFactory;
  * A class to manage the creation and deletion of Inverse Kinematics animation 
  * node factories.
  */
-struct iSkeletonIKManager : public virtual iBase
+struct iSkeletonIKNodeManager : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKManager, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonIKNodeManager, 1, 0, 0);
 
   /**
    * Create a new Inverse Kinematics animation node factory.

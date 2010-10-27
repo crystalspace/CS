@@ -48,19 +48,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 {
 
   /********************
-   *  LookAtManager
+   *  LookAtNodeManager
    ********************/
 
-  SCF_IMPLEMENT_FACTORY(LookAtManager);
+  SCF_IMPLEMENT_FACTORY(LookAtNodeManager);
 
-  CS_LEAKGUARD_IMPLEMENT(LookAtManager);
+  CS_LEAKGUARD_IMPLEMENT(LookAtNodeManager);
 
-  LookAtManager::LookAtManager (iBase* parent)
+  LookAtNodeManager::LookAtNodeManager (iBase* parent)
     : scfImplementationType (this, parent)
   {
   }
 
-  CS::Animation::iSkeletonLookAtNodeFactory* LookAtManager::CreateAnimNodeFactory
+  CS::Animation::iSkeletonLookAtNodeFactory* LookAtNodeManager::CreateAnimNodeFactory
     (const char *name, CS::Animation::iBodySkeleton* skeleton)
   {
     csRef<CS::Animation::iSkeletonLookAtNodeFactory> newFact;
@@ -69,24 +69,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     return factoryHash.PutUnique (name, newFact);
   }
 
-  CS::Animation::iSkeletonLookAtNodeFactory* LookAtManager::FindAnimNodeFactory
+  CS::Animation::iSkeletonLookAtNodeFactory* LookAtNodeManager::FindAnimNodeFactory
     (const char* name) const
   {
     return factoryHash.Get (name, 0);
   }
 
-  void LookAtManager::ClearAnimNodeFactories ()
+  void LookAtNodeManager::ClearAnimNodeFactories ()
   {
     factoryHash.DeleteAll ();
   }
 
-  bool LookAtManager::Initialize (iObjectRegistry* object_reg)
+  bool LookAtNodeManager::Initialize (iObjectRegistry* object_reg)
   {
     this->object_reg = object_reg;
     return true;
   }
 
-  void LookAtManager::Report (int severity, const char* msg, ...) const
+  void LookAtNodeManager::Report (int severity, const char* msg, ...) const
   {
     va_list arg;
     va_start (arg, msg);
@@ -109,7 +109,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   CS_LEAKGUARD_IMPLEMENT(LookAtAnimNodeFactory);
 
-  LookAtAnimNodeFactory::LookAtAnimNodeFactory (LookAtManager* manager,
+  LookAtAnimNodeFactory::LookAtAnimNodeFactory (LookAtNodeManager* manager,
 						const char *name,
 						CS::Animation::iBodySkeleton* skeleton)
     : scfImplementationType (this), manager (manager), name (name),

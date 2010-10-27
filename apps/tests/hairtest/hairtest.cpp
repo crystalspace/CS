@@ -578,7 +578,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.lookat",
-    CS::Animation::iSkeletonLookAtManager),
+    CS::Animation::iSkeletonLookAtNodeManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.speed",
     CS::Animation::iSkeletonSpeedNodeManager),
     CS_REQUEST_PLUGIN("crystalspace.mesh.object.furmesh", CS::Mesh::iFurMeshType),
@@ -646,7 +646,7 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     }
 
     // Load the ragdoll plugin
-    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollManager>
+    ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollNodeManager>
       (plugmgr, "crystalspace.mesh.animesh.animnode.ragdoll");
 
     if (!ragdollManager)
@@ -688,9 +688,9 @@ bool HairTest::Application ()
 
   // Find references to the plugins of the animation nodes
   lookAtManager = 
-    csQueryRegistry<CS::Animation::iSkeletonLookAtManager> (GetObjectRegistry ());
+    csQueryRegistry<CS::Animation::iSkeletonLookAtNodeManager> (GetObjectRegistry ());
   if (!lookAtManager) 
-    return ReportError("Failed to locate iLookAtManager plugin!");
+    return ReportError("Failed to locate iLookAtNodeManager plugin!");
 
   basicNodesManager =
     csQueryRegistry<CS::Animation::iSkeletonSpeedNodeManager> (GetObjectRegistry ());

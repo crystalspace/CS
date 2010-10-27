@@ -35,14 +35,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 {
 
   class IKPhysicalManager : public scfImplementation2<IKPhysicalManager,
-    CS::Animation::iSkeletonIKManager, iComponent>
+    CS::Animation::iSkeletonIKNodeManager, iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(IKPhysicalManager);
 
     IKPhysicalManager (iBase* parent);
 
-    //-- CS::Animation::iSkeletonIKManager
+    //-- CS::Animation::iSkeletonIKNodeManager
     virtual CS::Animation::iSkeletonIKNodeFactory* CreateAnimNodeFactory
       (const char *name, CS::Animation::iBodySkeleton* skeleton);
 

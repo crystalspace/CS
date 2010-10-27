@@ -36,14 +36,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 {
 
   class IKCCDNodeManager : public scfImplementation2<IKCCDNodeManager,
-    CS::Animation::iSkeletonIKManager, iComponent>
+    CS::Animation::iSkeletonIKNodeManager, iComponent>
   {
   public:
     CS_LEAKGUARD_DECLARE(IKCCDNodeManager);
 
     IKCCDNodeManager (iBase* parent);
 
-    //-- CS::Animation::iSkeletonIKManager
+    //-- CS::Animation::iSkeletonIKNodeManager
     virtual CS::Animation::iSkeletonIKNodeFactory* CreateAnimNodeFactory
       (const char *name, CS::Animation::iBodySkeleton* skeleton);
 

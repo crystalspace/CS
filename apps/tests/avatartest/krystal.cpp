@@ -487,7 +487,7 @@ bool KrystalScene::CreateAvatar ()
 
     // Create the 'ik' node
     csRef<CS::Animation::iSkeletonIKNodeFactory> IKNodeFactory =
-      avatarTest->IKManager->CreateAnimNodeFactory ("IK", bodySkeleton);
+      avatarTest->IKNodeManager->CreateAnimNodeFactory ("IK", bodySkeleton);
     ragdollNodeFactory->SetChildNode (IKNodeFactory);
 
     // Setup the IKCCD node interface

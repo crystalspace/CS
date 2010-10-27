@@ -40,15 +40,15 @@ struct iBodyBoneJoint;
 CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 {
 
-  class LookAtManager : public scfImplementation2<LookAtManager,
-    CS::Animation::iSkeletonLookAtManager, iComponent>
+  class LookAtNodeManager : public scfImplementation2<LookAtNodeManager,
+    CS::Animation::iSkeletonLookAtNodeManager, iComponent>
   {
   public:
-    CS_LEAKGUARD_DECLARE(LookAtManager);
+    CS_LEAKGUARD_DECLARE(LookAtNodeManager);
 
-    LookAtManager (iBase* parent);
+    LookAtNodeManager (iBase* parent);
 
-    //-- CS::Animation::iSkeletonLookAtManager
+    //-- CS::Animation::iSkeletonLookAtNodeManager
     virtual CS::Animation::iSkeletonLookAtNodeFactory* CreateAnimNodeFactory (const char *name,
 							   CS::Animation::iBodySkeleton* skeleton);
 
@@ -74,7 +74,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   public:
     CS_LEAKGUARD_DECLARE(LookAtAnimNodeFactory);
 
-    LookAtAnimNodeFactory (LookAtManager* manager, const char *name,
+    LookAtAnimNodeFactory (LookAtNodeManager* manager, const char *name,
 			   CS::Animation::iBodySkeleton* skeleton);
 
     //-- CS::Animation::iSkeletonLookAtNodeFactory
@@ -91,7 +91,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
 
   protected:
-    LookAtManager* manager;
+    LookAtNodeManager* manager;
     csString name;
     csRef<CS::Animation::iBodySkeleton> skeleton;
     csRef<CS::Animation::iSkeletonAnimNodeFactory> childNode;

@@ -59,9 +59,9 @@ struct iSkeletonLookAtListener;
  * A class to manage the creation and deletion of 'LookAt' animation 
  * node factories.
  */
-struct iSkeletonLookAtManager : public virtual iBase
+struct iSkeletonLookAtNodeManager : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonLookAtManager, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNodeManager, 1, 0, 0);
 
   /**
    * Create a new 'LookAt' animation node factory.
@@ -116,7 +116,7 @@ struct iSkeletonLookAtNodeFactory : public iSkeletonAnimNodeFactory
  * at a target.
  * There are three types of constraints that will modify the 'LookAt' control:
  * - Whether or not a CS::Animation::iBodyBoneJoint for the bone controlled has been defined while
- * creating the 'LookAt' factory (see iLookAtManager::CreateAnimNodeFactory()).
+ * creating the 'LookAt' factory (see iLookAtNodeManager::CreateAnimNodeFactory()).
  * - Whether or not SetAlwaysRotate() has been set.
  * - The maximum rotation speed allowed through SetMaximumSpeed().
  *

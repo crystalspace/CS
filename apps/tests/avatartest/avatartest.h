@@ -99,10 +99,10 @@ private:
   bool softBodiesEnabled;
 
   // Animation node plugin managers
-  csRef<CS::Animation::iSkeletonIKManager> IKManager;
-  csRef<CS::Animation::iSkeletonLookAtManager> lookAtManager;
+  csRef<CS::Animation::iSkeletonIKNodeManager> IKNodeManager;
+  csRef<CS::Animation::iSkeletonLookAtNodeManager> lookAtManager;
   csRef<CS::Animation::iSkeletonSpeedNodeManager> basicNodesManager;
-  csRef<CS::Animation::iSkeletonRagdollManager> ragdollManager;
+  csRef<CS::Animation::iSkeletonRagdollNodeManager> ragdollManager;
 
   // Decal textures
   csRef<iDecalManager> decalManager;
