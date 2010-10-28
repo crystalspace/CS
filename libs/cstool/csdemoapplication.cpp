@@ -73,8 +73,8 @@ void CommandLineHelper::WriteHelp (iObjectRegistry* registry) const
 
 // ------------------------ HUDHelper ------------------------
 
-HUDHelper::HUDHelper (DemoApplication* demoApplication)
-  : demoApplication (demoApplication), cslogo (0),
+HUDHelper::HUDHelper ()
+  : applicationFramework (nullptr), cslogo (0),
     frameCount (0), frameTime (0), currentFPS (0.0f), currentKeyPage (0)
 {
 }
@@ -84,19 +84,41 @@ HUDHelper::~HUDHelper ()
   delete cslogo;
 }
 
-void HUDHelper::Initialize ()
+bool HUDHelper::SetContext (csApplicationFramework* applicationFramework,
+			    iGraphics3D* g3d, iGraphics2D* g2d, iLoader* loader,
+			    iVirtualClock* vc)
 {
+  // Init the application framework
+  if (!applicationFramework)
+  {
+    printf ("ERROR in HUDHelper::SetContext: No csApplicationFramework defined!\n");
+    return false;
+  }
+  this->applicationFramework = applicationFramework;
+
+  // Copy the pointers
+  if (!g3d) return applicationFramework->ReportError ("no 3D graphics!");
+  this->g3d = g3d;
+  if (!g2d) return applicationFramework->ReportError ("no 2D graphics!");
+  this->g2d = g2d;
+  if (!loader) return applicationFramework->ReportError ("no loader!");
+  //this->loader = loader;
+  if (!vc) return applicationFramework->ReportError ("no virtual clock!");
+  this->vc = vc;
+
   // Load the font
-  csRef<iFontServer> fontServer = demoApplication->g2d->GetFontServer ();
-  if (fontServer)
-    font = fontServer->LoadFont (CSFONT_COURIER);
-  else demoApplication->ReportError ("Failed to locate font server!");
+  csRef<iFontServer> fontServer = g2d->GetFontServer ();
+  if (!fontServer)
+    return applicationFramework->ReportError ("Failed to locate font server!");
+  font = fontServer->LoadFont (CSFONT_COURIER);
+  if (!font)
+    return applicationFramework->ReportError ("Failed to load font!");
 
   // Load the Crystal Space logo image
-  csRef<iTextureWrapper> texture = demoApplication->loader->LoadTexture
+  csRef<iTextureWrapper> texture = loader->LoadTexture
     ("cslogo2", "/lib/std/cslogo2.png", CS_TEXTURE_2D, 0, true, true, true);
   if (!texture.IsValid ())
-    demoApplication->ReportWarning ("Failed to load CS logo!\n");
+    applicationFramework->ReportWarning ("Failed to load CS logo!\n");
 
   else
   {
@@ -105,6 +127,8 @@ void HUDHelper::Initialize ()
     if (textureHandle)
       cslogo = new csSimplePixmap (textureHandle);
   }
+
+  return true;
 }
 
 bool HUDHelper::OnKeyboard (iEvent &event)
@@ -143,13 +167,13 @@ void HUDHelper::Write (int x, int y, int fg, int bg, const char *str,...)
   buf.FormatV (str, arg);
   va_end (arg);
 
-  demoApplication->g2d->Write (font, x, y, fg, bg, buf);
+  g2d->Write (font, x, y, fg, bg, buf);
 }
 
 void HUDHelper::DisplayHUD ()
 {
   // Get elasped time
-  csTicks elapsed_time = demoApplication->vc->GetElapsedTicks ();
+  csTicks elapsed_time = vc->GetElapsedTicks ();
 
   // Update FPS data
   frameCount++;
@@ -163,13 +187,13 @@ void HUDHelper::DisplayHUD ()
   }
 
   // Tell the 3D driver we're going to display 2D things.
-  if (!demoApplication->g3d->BeginDraw (CSDRAW_2DGRAPHICS))
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
   int margin = 15;
   int logoMargin = 5;
   int lineSize = 18;
-  int fontColor = demoApplication->g2d->FindRGB (255, 150, 100);
+  int fontColor = g2d->FindRGB (255, 150, 100);
 
   // Display available keys
   if (keyDescriptions.GetSize ())
@@ -177,7 +201,7 @@ void HUDHelper::DisplayHUD ()
     int y = margin;
 
     // Check if there is enough room to display all keys
-    maxKeys = (uint) ((demoApplication->g2d->GetHeight () - 2 * margin
+    maxKeys = (uint) ((g2d->GetHeight () - 2 * margin
 		       - (stateDescriptions.GetSize () + 5) * lineSize)
 		      / lineSize);
     if (keyDescriptions.GetSize () < maxKeys)
@@ -212,7 +236,7 @@ void HUDHelper::DisplayHUD ()
   }
 
   // Display state description
-  int y = demoApplication->g2d->GetHeight () - margin - lineSize;
+  int y = g2d->GetHeight () - margin - lineSize;
 
   WriteShadow (margin, y, fontColor, "FPS: %.2f", currentFPS);
   y -= lineSize;
@@ -226,46 +250,74 @@ void HUDHelper::DisplayHUD ()
 
   // Display Crystal Space logo
   if (cslogo)
-    cslogo->Draw (demoApplication->g3d,
-		  demoApplication->g2d->GetWidth () - cslogo->Width() - logoMargin,
+    cslogo->Draw (g3d,
+		  g2d->GetWidth () - cslogo->Width() - logoMargin,
 		  logoMargin);
 }
 
 // ------------------------ CameraHelper ------------------------
 
-CameraHelper::CameraHelper (DemoApplication* demoApplication)
-  : demoApplication (demoApplication), cameraMode (CSDEMO_CAMERA_MOVE_FREE),
-    mouseMoveEnabled (true)
+CameraHelper::CameraHelper ()
+  : cameraMode (CSDEMO_CAMERA_MOVE_FREE), mouseMoveEnabled (true)
 {
+}
+
+bool CameraHelper::SetContext (CameraManager* manager, iKeyboardDriver* kbd,
+			       iVirtualClock* vc, iCamera* camera)
+{
+  if (!manager)
+    { printf ("ERROR in CameraHelper::SetContext: no camera manager!"); return false; }
+  if (!kbd)
+    { printf ("ERROR in CameraHelper::SetContext: no keyboard driver!"); return false; }
+  if (!vc)
+    { printf ("ERROR in CameraHelper::SetContext: no virtual clock!"); return false; }
+  if (!camera)
+    { printf ("ERROR in CameraHelper::SetContext: no camera!"); return false; }
+
+  this->cameraManager = manager;
+  this->kbd = kbd;
+  this->vc = vc;
+  this->camera = camera;
+
+  if (cameraMode != CSDEMO_CAMERA_NONE)
+  {
+    ResetCamera ();
+    UpdateCamera ();
+
+    cameraModePan = false;
+    cameraModeRotate = false;
+    cameraModeZoom = false;
+  }
+
+  return true;
 }
 
 void CameraHelper::Frame ()
 {
   // Get elasped time
-  csTicks elapsed_time = demoApplication->vc->GetElapsedTicks ();
+  csTicks elapsed_time = vc->GetElapsedTicks ();
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
 
   // Update the camera
-  iCamera* camera = demoApplication->view->GetCamera ();
   csVector3 cameraOrigin = camera->GetTransform ().GetOrigin ();
-  csVector3 cameraTarget = demoApplication->GetCameraTarget ();
+  csVector3 cameraTarget = cameraManager->GetCameraTarget ();
 
   switch (cameraMode)
   {
   case CSDEMO_CAMERA_MOVE_FREE:
     {
-      if (demoApplication->kbd->GetKeyState (CSKEY_SHIFT))
+      if (kbd->GetKeyState (CSKEY_SHIFT))
       {
 	// If the user is holding down shift, the arrow keys will cause
 	// the camera to strafe up, down, left or right from it's
 	// current position.
-	if (demoApplication->kbd->GetKeyState (CSKEY_RIGHT))
+	if (kbd->GetKeyState (CSKEY_RIGHT))
 	  camera->Move (CS_VEC_RIGHT * 4 * speed);
-	if (demoApplication->kbd->GetKeyState (CSKEY_LEFT))
+	if (kbd->GetKeyState (CSKEY_LEFT))
 	  camera->Move (CS_VEC_LEFT * 4 * speed);
-	if (demoApplication->kbd->GetKeyState (CSKEY_UP))
+	if (kbd->GetKeyState (CSKEY_UP))
 	  camera->Move (CS_VEC_UP * 4 * speed);
-	if (demoApplication->kbd->GetKeyState (CSKEY_DOWN))
+	if (kbd->GetKeyState (CSKEY_DOWN))
 	  camera->Move (CS_VEC_DOWN * 4 * speed);
       }
       else
@@ -274,17 +326,17 @@ void CameraHelper::Frame ()
 	// axis; page up and page down cause the camera to rotate on the
 	// _camera's_ X axis (more on this in a second) and up and down
 	// arrows cause the camera to go forwards and backwards.
-	if (demoApplication->kbd->GetKeyState (CSKEY_RIGHT))
+	if (kbd->GetKeyState (CSKEY_RIGHT))
 	  camera->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
-	if (demoApplication->kbd->GetKeyState (CSKEY_LEFT))
+	if (kbd->GetKeyState (CSKEY_LEFT))
 	  camera->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-	if (demoApplication->kbd->GetKeyState (CSKEY_PGUP))
+	if (kbd->GetKeyState (CSKEY_PGUP))
 	  camera->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-	if (demoApplication->kbd->GetKeyState (CSKEY_PGDN))
+	if (kbd->GetKeyState (CSKEY_PGDN))
 	  camera->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-	if (demoApplication->kbd->GetKeyState (CSKEY_UP))
+	if (kbd->GetKeyState (CSKEY_UP))
 	  camera->Move (CS_VEC_FORWARD * 4 * speed);
-	if (demoApplication->kbd->GetKeyState (CSKEY_DOWN))
+	if (kbd->GetKeyState (CSKEY_DOWN))
 	  camera->Move (CS_VEC_BACKWARD * 4 * speed);
       }
 
@@ -293,17 +345,17 @@ void CameraHelper::Frame ()
 
   case CSDEMO_CAMERA_MOVE_LOOKAT:
     {
-      if (demoApplication->kbd->GetKeyState (CSKEY_DOWN))
+      if (kbd->GetKeyState (CSKEY_DOWN))
 	cameraOrigin.z -= 4 * speed;
-      if (demoApplication->kbd->GetKeyState (CSKEY_UP))
+      if (kbd->GetKeyState (CSKEY_UP))
 	cameraOrigin.z += 4 * speed;
-      if (demoApplication->kbd->GetKeyState (CSKEY_LEFT))
+      if (kbd->GetKeyState (CSKEY_LEFT))
 	cameraOrigin.x -= 4 * speed;
-      if (demoApplication->kbd->GetKeyState (CSKEY_RIGHT))
+      if (kbd->GetKeyState (CSKEY_RIGHT))
 	cameraOrigin.x += 4 * speed;
-      if (demoApplication->kbd->GetKeyState (CSKEY_PGUP))
+      if (kbd->GetKeyState (CSKEY_PGUP))
 	cameraOrigin.y += 4 * speed;
-      if (demoApplication->kbd->GetKeyState (CSKEY_PGDN))
+      if (kbd->GetKeyState (CSKEY_PGDN))
 	cameraOrigin.y -= 4 * speed;
       UpdateCameraOrigin (cameraOrigin);
       UpdateCamera ();
@@ -312,33 +364,33 @@ void CameraHelper::Frame ()
 
   case CSDEMO_CAMERA_ROTATE:
     {
-      if (demoApplication->kbd->GetKeyState (CSKEY_LEFT))
+      if (kbd->GetKeyState (CSKEY_LEFT))
 	cameraYaw += speed * 2.5f;
-      if (demoApplication->kbd->GetKeyState (CSKEY_RIGHT))
+      if (kbd->GetKeyState (CSKEY_RIGHT))
 	cameraYaw -= speed * 2.5f;
-      if (demoApplication->kbd->GetKeyState (CSKEY_UP))
+      if (kbd->GetKeyState (CSKEY_UP))
       {
-	if (demoApplication->kbd->GetKeyState (CSKEY_SHIFT))
+	if (kbd->GetKeyState (CSKEY_SHIFT))
 	  cameraDist =
-	    csMax<float> (demoApplication->GetCameraMinimumDistance (),
+	    csMax<float> (cameraManager->GetCameraMinimumDistance (),
 			  cameraDist - speed * 4);
 	else
 	  cameraPitch =
 	    csMax<float> (-3.14159f * 0.5f + 0.01f, cameraPitch - speed * 2.5f);
       }
-      if (demoApplication->kbd->GetKeyState (CSKEY_DOWN))
+      if (kbd->GetKeyState (CSKEY_DOWN))
       {
-	if (demoApplication->kbd->GetKeyState (CSKEY_SHIFT))
+	if (kbd->GetKeyState (CSKEY_SHIFT))
 	  cameraDist += speed * 4;
 	else
 	  cameraPitch =
 	    csMin<float> (3.14159f * 0.5f - 0.01f, cameraPitch + speed * 2.5f);
       }
-      if (demoApplication->kbd->GetKeyState (CSKEY_PGUP))
+      if (kbd->GetKeyState (CSKEY_PGUP))
 	cameraDist =
-	  csMax<float> (demoApplication->GetCameraMinimumDistance (),
+	  csMax<float> (cameraManager->GetCameraMinimumDistance (),
 			cameraDist - speed * 4);
-      if (demoApplication->kbd->GetKeyState (CSKEY_PGDN))
+      if (kbd->GetKeyState (CSKEY_PGDN))
 	cameraDist += speed * 4;
       UpdateCamera ();
       break;
@@ -360,7 +412,7 @@ bool CameraHelper::OnMouseDown (iEvent &event)
   {
   case 0:
     cameraModePan = true;
-    panCameraTarget = demoApplication->GetCameraTarget ();
+    panCameraTarget = cameraManager->GetCameraTarget ();
     break;
   case 1:
     cameraModeRotate = true;
@@ -369,12 +421,12 @@ bool CameraHelper::OnMouseDown (iEvent &event)
     cameraModeZoom = true;
     break;
   case 3:
-    cameraDist = csMax<float> (demoApplication->GetCameraMinimumDistance (),
+    cameraDist = csMax<float> (cameraManager->GetCameraMinimumDistance (),
 			       cameraDist - mouseWheelZoomAmount);
     UpdateCamera ();
     break;
   case 4:
-    cameraDist = csMax<float> (demoApplication->GetCameraMinimumDistance (),
+    cameraDist = csMax<float> (cameraManager->GetCameraMinimumDistance (),
 			       cameraDist + mouseWheelZoomAmount);
     UpdateCamera ();
     break;
@@ -393,7 +445,7 @@ bool CameraHelper::OnMouseUp (iEvent &event)
   case 0:
     cameraModePan = false;
     UpdateCameraOrigin
-      (demoApplication->view->GetCamera ()->GetTransform ().GetOrigin ());
+      (camera->GetTransform ().GetOrigin ());
     UpdateCamera ();
     break;
   case 1:
@@ -416,7 +468,6 @@ bool CameraHelper::OnMouseMove (iEvent &event)
   int y = csMouseEventHelper::GetY (&event);
   float dx = (float) (x - lastMouseX) * 0.02f;
   float dy = (float) (y - lastMouseY) * -0.02f;
-  iCamera* camera = demoApplication->view->GetCamera ();
 
   lastMouseX = x;
   lastMouseY = y;
@@ -436,7 +487,7 @@ bool CameraHelper::OnMouseMove (iEvent &event)
   }
   if (cameraModeZoom)
   {
-    cameraDist = csMax<float> (demoApplication->GetCameraMinimumDistance (),
+    cameraDist = csMax<float> (cameraManager->GetCameraMinimumDistance (),
 			       cameraDist - (dx + dy));
   }
 
@@ -472,28 +523,15 @@ void CameraHelper::ResetCamera ()
   cameraModeRotate = false;
   cameraModeZoom = false;
 
-  UpdateCameraOrigin (demoApplication->GetCameraStart ());
+  UpdateCameraOrigin (cameraManager->GetCameraStart ());
   UpdateCamera ();
-}
-
-void CameraHelper::Initialize ()
-{
-  if (cameraMode != CSDEMO_CAMERA_NONE)
-  {
-    ResetCamera ();
-    UpdateCamera ();
-
-    cameraModePan = false;
-    cameraModeRotate = false;
-    cameraModeZoom = false;
-  }
 }
 
 void CameraHelper::UpdateCamera ()
 {
   csVector3 cameraPos;
   csVector3 cameraTarget = cameraModePan ?
-    panCameraTarget : demoApplication->GetCameraTarget ();
+    panCameraTarget : cameraManager->GetCameraTarget ();
 
   cameraPos.x = cameraTarget.x
     - cameraDist * (float) cos (cameraPitch) * (float) sin (cameraYaw);
@@ -502,7 +540,6 @@ void CameraHelper::UpdateCamera ()
   cameraPos.z = cameraTarget.z
     - cameraDist * (float) cos (cameraPitch) * (float) cos (cameraYaw);
 
-  iCamera* camera = demoApplication->view->GetCamera ();
   camera->GetTransform ().SetOrigin (cameraPos);
   camera->GetTransform ().LookAt
     (cameraTarget - cameraPos, csVector3 (0,1,0));
@@ -511,9 +548,9 @@ void CameraHelper::UpdateCamera ()
 void CameraHelper::UpdateCameraOrigin
 (const csVector3& desiredOrigin)
 {
-  // calculate distance, yaw, and pitch values that will put the
+  // Compute distance, yaw, and pitch values that will put the
   // origin at the desired origin
-  csVector3 cameraTarget = demoApplication->GetCameraTarget ();
+  csVector3 cameraTarget = cameraManager->GetCameraTarget ();
   cameraDist = (cameraTarget - desiredOrigin).Norm ();
 
   if (fabs (cameraDist) < EPSILON)
@@ -542,7 +579,7 @@ DemoApplication::DemoApplication (const char* applicationName,
 				  const char* applicationCommandUsage,
 				  const char* applicationDescription)
   : commandLineHelper (applicationCommand, applicationCommandUsage, applicationDescription),
-    hudHelper (this), cameraHelper (this), hudDisplayed (true)
+    hudDisplayed (true)
 {
   SetApplicationName (applicationName);
 }
@@ -653,6 +690,9 @@ bool DemoApplication::Application ()
   vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry ());
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry ());
+  if (!vfs) return ReportError("Failed to locate Virtual File System!");
+
   kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry ());
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
@@ -672,7 +712,7 @@ bool DemoApplication::Application ()
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   // Initialize the HUD helper
-  hudHelper.Initialize ();
+  hudHelper.SetContext (this, g3d, g2d, loader, vc);
 
   // Workaround for correct initialization of mouseX and mouseY:
   // initialize the mouse position to the center of the window
@@ -687,8 +727,8 @@ bool DemoApplication::CreateRoom ()
   room = engine->CreateSector ("room");
   view->GetCamera ()->SetSector (room);
 
-  // Initialize the camera
-  cameraHelper.Initialize ();
+  // Initialize the camera helper
+  cameraHelper.SetContext (this, kbd, vc, view->GetCamera ());
 
   // Creating the background
   // First we make a primitive for our geometry.

@@ -57,8 +57,6 @@ namespace CS
 namespace Demo
 {
 
-class DemoApplication;
-
 // ------------------------ CommandLineHelper ------------------------
 
 /**
@@ -137,25 +135,31 @@ class CS_CRYSTALSPACE_EXPORT CommandLineHelper
 // ------------------------ HUDHelper ------------------------
 
 /**
- * A generic tool managing the display of the HUD for applications
+ * A generic tool managing the display of a HUD, eg for applications
  * implementing DemoApplication.
  * The HUD consists of the Crystal Space logo, the list of available keys
  * that can be used to interact with the demo, and a list of strings
  * describing the current state of the application.
+ * \warning SetContext() must be called before any other operation.
  */
 class CS_CRYSTALSPACE_EXPORT HUDHelper
 {
-  friend class DemoApplication;
-
  public:
   /**
    * Constructor.
    */
-  HUDHelper (DemoApplication* demoApplication);
+  HUDHelper ();
   /**
    * Destructor.
    */
   ~HUDHelper ();
+
+  /**
+   * (Re-)set the various objects of the context of this HUDHelper.
+   */
+  bool SetContext (csApplicationFramework* applicationFramework,
+		   iGraphics3D* g3d, iGraphics2D* g2d, iLoader* loader,
+		   iVirtualClock* vc);
 
   /**
    * Update the current state of the HUD depending on the keyboard events.
@@ -194,10 +198,15 @@ class CS_CRYSTALSPACE_EXPORT HUDHelper
   void DisplayHUD ();
 
  private:
-  // Initialization of the main pointers.
-  void Initialize ();
+  // Reference to the application framework
+  csApplicationFramework* applicationFramework;
+  // Reference to the 3D graphics
+  csRef<iGraphics3D> g3d;
+  // Reference to the 2D graphics
+  csRef<iGraphics2D> g2d;
+  // Reference to the virtual clock
+  csRef<iVirtualClock> vc;
 
-  DemoApplication* demoApplication;
   // Reference to the font used to display information
   csRef<iFont> font;
   // Crystal Space logo
@@ -226,6 +235,10 @@ enum CameraMode
   CSDEMO_CAMERA_ROTATE            /*!< The camera rotates around the target */
 };
 
+/**
+ * An abstract class to be implemented in order to control the movement of
+ * the camera managed by a CS::Demo::CameraHelper.
+ */
 class CS_CRYSTALSPACE_EXPORT CameraManager
 {
  public:
@@ -256,16 +269,20 @@ class CS_CRYSTALSPACE_EXPORT CameraManager
 /**
  * A generic tool managing the movements of the camera with the keyboard
  * and/or the mouse.
+ * \warning SetContext() must be called before any other operation.
  */
 class CS_CRYSTALSPACE_EXPORT CameraHelper
 {
-  friend class DemoApplication;
-
  public:
   /**
    * Constructor.
    */
-  CameraHelper (DemoApplication* demoApplication);
+  CameraHelper ();
+
+  /**
+   * (Re-)set the various objects of the context of this CameraHelper.
+   */
+  bool SetContext (CameraManager* manager, iKeyboardDriver* kbd, iVirtualClock* vc, iCamera* camera);
 
   /// Update the position of the camera. The behavior depends on the current camera mode.
   void Frame ();
@@ -288,9 +305,9 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
    * the mouse while holding one of the following button:
    * - left button: the camera is moved sideways
    * - right button: the camera is rotated around the target returned
-   * by DemoApplication::GetCameraTarget().
+   * by CameraManager::GetCameraTarget().
    * - middle button: the camera is moved forward and backward. The camera
-   * cannot get closer than DemoApplication::GetCameraMinimumDistance().
+   * cannot get closer than CameraManager::GetCameraMinimumDistance().
    */
   void SetMouseMoveEnabled (bool enabled);
   /**
@@ -300,18 +317,22 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
 
   /**
    * Reset the camera position to the position returned by
-   * DemoApplication::GetCameraStart().
+   * CameraManager::GetCameraStart().
    */
   void ResetCamera ();
 
  private:
-  // Initialization of the data
-  void Initialize ();
-
-  DemoApplication* demoApplication;
-
   void UpdateCamera ();
   void UpdateCameraOrigin (const csVector3& desiredOrigin);
+
+  // Reference to the camera manager
+  CameraManager* cameraManager;
+  // Reference to the keyboard driver
+  csRef<iKeyboardDriver> kbd;
+  // Reference to the virtual clock
+  csRef<iVirtualClock> vc;
+  // Reference to the camera
+  csRef<iCamera> camera;
 
   CameraMode cameraMode;
   bool mouseMoveEnabled;
@@ -427,6 +448,8 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
   csRef<iView> view;
   /// Reference to the frame printer
   csRef<FramePrinter> printer;
+  /// Reference to the virtual file system
+  csRef<iVFS> vfs;
 
   /// Reference to the main sector
   csRef<iSector> room;
@@ -455,34 +478,6 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
    * creates a grey uniform background far away, initializes the camera, and adds a few lights.
    */
   virtual bool CreateRoom ();
-
-  //-- CameraManager
-  /**
-   * Return the start position of the camera. This is used at start or
-   * when CameraHelper::ResetCamera() is called.
-   *
-   * This method is inherited from CameraManager.
-   */
-  virtual csVector3 GetCameraStart ()
-  { return csVector3 (0.0f, 0.0f, -3.0f); }
-  /**
-   * Return the closest distance there can be between the camera and its
-   * target. This is relevant only for the CSDEMO_CAMERA_MOVE_LOOKAT and
-   * CSDEMO_CAMERA_ROTATE camera modes.
-   *
-   * This method is inherited from CameraManager.
-   */
-  virtual float GetCameraMinimumDistance ()
-  { return 0.1f; }
-  /**
-   * Return the camera target, ie what it is looking at. This is relevant
-   * only for the CSDEMO_CAMERA_MOVE_LOOKAT and CSDEMO_CAMERA_ROTATE camera
-   * modes.
-   *
-   * This method is inherited from CameraManager.
-   */
-  virtual csVector3 GetCameraTarget ()
-  { return csVector3 (0.0f); }
 
   /// Command line helper
   CommandLineHelper commandLineHelper;
