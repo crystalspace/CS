@@ -248,7 +248,7 @@ struct iSkeletonAnimation : public virtual iBase
 
   /**
    * Find the channel associated with a specific bone, if any.
-   * \return The associated channel, or InvalidChannelID if there is none.
+   * \return The associated channel, or CS::Animation::InvalidChannelID if there is none.
    */
   virtual ChannelID FindChannel (BoneID bone) const = 0;
 
@@ -404,25 +404,25 @@ struct iSkeletonAnimNodeFactory : public virtual iBase
   SCF_INTERFACE(CS::Animation::iSkeletonAnimNodeFactory, 1, 0, 0);
 
   /**
-   * Create the contained node
+   * Create a new animation node
    */
   virtual csPtr<iSkeletonAnimNode> CreateInstance (
     iSkeletonAnimPacket* packet, iSkeleton* skeleton) = 0;
 
   /**
-   * Get the name used when creating the factory
+   * Get the name of this factory
    */
   virtual const char* GetNodeName () const = 0;
 
   /**
-   * Find a sub-node with given name
+   * Find a sub-node with the given name
    */
   virtual iSkeletonAnimNodeFactory* FindNode (const char* name) = 0;
 };
 
 /**
- * Base type for nodes in the hierarchical blending tree of the
- * skeletal animation system. It is implemented by all types of nodes.
+ * Base type for the animation nodes in the hierarchical blending tree of the
+ * skeletal animation system. This base type is implemented by all types of nodes.
  * It is defined by a CS::Animation::iSkeletonAnimNodeFactory.
  *
  * Main creators of instances implementing this interface:
@@ -535,60 +535,62 @@ struct iSkeletonAnimationNodeFactory : public iSkeletonAnimNodeFactory
   SCF_INTERFACE(CS::Animation::iSkeletonAnimationNodeFactory, 1, 0, 0);
 
   /**
-   * Set the animation containing the raw data to base this node of.
+   * Set the raw animation data to be used.
    */
   virtual void SetAnimation (iSkeletonAnimation* animation) = 0;
 
   /**
-   * Get the animation containing the raw data.
+   * Get the raw animation data in use.
    */
   virtual iSkeletonAnimation* GetAnimation () const = 0;
 
   /**
-   * Set animation to be playing cyclically (repeating until stopped).
+   * Set whether or not the animation has to be played cyclically. The default value is false.
    */
   virtual void SetCyclic (bool cyclic) = 0;
 
   /**
-   * Get if animation is cyclic.
+   * Get whether or not the animation has to be played cyclically.
    */
   virtual bool IsCyclic () const = 0;
 
   /**
-   * Set the playback speed.
+   * Set the playback speed of the animation. The default value is 1.0. Negative values are allowed.
    */
   virtual void SetPlaybackSpeed (float speed) = 0;
 
   /**
-   * Get the playback speed.
+   * Get the playback speed of the animation.
    */
   virtual float GetPlaybackSpeed () const = 0;
 
   /**
-   * Set if animation should automatically reset when stopped and start
-   * playing from the beginning.
+   * Set whether or not the playback position should be reset to the start of the animation when
+   * this node is activated with CS::Animation::iSkeletonAnimNode::Play(). The default value is false.
    */
   virtual void SetAutomaticReset (bool reset) = 0;
 
   /**
-   * Get if animation should automatically reset when stopped and start
-   * playing from the beginning. 
+   * Get whether or not the playback position should be reset to the start of the animation when
+   * this node is activated with CS::Animation::iSkeletonAnimNode::Play().
    */
   virtual bool GetAutomaticReset () const = 0;
 
   /**
-   * Set if animation should automatically stop when finishing.
+   * Set whether or not this animation node should be automatically stopped when the playback
+   * duration has been reached. The default value is true.
    */
   virtual void SetAutomaticStop (bool enabed) = 0;
 
   /**
-   * Get if animation should automatically stop when finishing.
+   * Get whether or not this animation node should be automatically stopped when the playback
+   * duration has been reached.
    */
   virtual bool GetAutomaticStop () const = 0;
 };
 
 /**
- * Raw animation node. Takes data from a raw animation, controls the playback
+ * Raw animation node. It takes the data from a raw animation, controls the playback
  * of it, and feeds it into the animation blending tree. It is defined by a
  * CS::Animation::iSkeletonAnimationNodeFactory.
  *
