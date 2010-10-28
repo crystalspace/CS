@@ -606,19 +606,19 @@ iSkeletonFSMNode_swigregister = _animation.iSkeletonFSMNode_swigregister
 iSkeletonFSMNode_swigregister(iSkeletonFSMNode)
 iSkeletonFSMNode_scfGetVersion = _animation.iSkeletonFSMNode_scfGetVersion
 
-class iSkeletonIKManager(core.iBase):
+class iSkeletonIKNodeManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def CreateAnimNodeFactory(*args): return _animation.iSkeletonIKManager_CreateAnimNodeFactory(*args)
-    def FindAnimNodeFactory(*args): return _animation.iSkeletonIKManager_FindAnimNodeFactory(*args)
-    def ClearAnimNodeFactories(*args): return _animation.iSkeletonIKManager_ClearAnimNodeFactories(*args)
-    scfGetVersion = staticmethod(_animation.iSkeletonIKManager_scfGetVersion)
-    __swig_destroy__ = _animation.delete_iSkeletonIKManager
+    def CreateAnimNodeFactory(*args): return _animation.iSkeletonIKNodeManager_CreateAnimNodeFactory(*args)
+    def FindAnimNodeFactory(*args): return _animation.iSkeletonIKNodeManager_FindAnimNodeFactory(*args)
+    def ClearAnimNodeFactories(*args): return _animation.iSkeletonIKNodeManager_ClearAnimNodeFactories(*args)
+    scfGetVersion = staticmethod(_animation.iSkeletonIKNodeManager_scfGetVersion)
+    __swig_destroy__ = _animation.delete_iSkeletonIKNodeManager
     __del__ = lambda self : None;
-iSkeletonIKManager_swigregister = _animation.iSkeletonIKManager_swigregister
-iSkeletonIKManager_swigregister(iSkeletonIKManager)
-iSkeletonIKManager_scfGetVersion = _animation.iSkeletonIKManager_scfGetVersion
+iSkeletonIKNodeManager_swigregister = _animation.iSkeletonIKNodeManager_swigregister
+iSkeletonIKNodeManager_swigregister(iSkeletonIKNodeManager)
+iSkeletonIKNodeManager_scfGetVersion = _animation.iSkeletonIKNodeManager_scfGetVersion
 
 class iSkeletonIKNodeFactory(iSkeletonAnimNodeFactory):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -703,19 +703,19 @@ class iSkeletonIKCCDNode(iSkeletonIKNode):
 iSkeletonIKCCDNode_swigregister = _animation.iSkeletonIKCCDNode_swigregister
 iSkeletonIKCCDNode_swigregister(iSkeletonIKCCDNode)
 
-class iSkeletonLookAtManager(core.iBase):
+class iSkeletonLookAtNodeManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def CreateAnimNodeFactory(*args): return _animation.iSkeletonLookAtManager_CreateAnimNodeFactory(*args)
-    def FindAnimNodeFactory(*args): return _animation.iSkeletonLookAtManager_FindAnimNodeFactory(*args)
-    def ClearAnimNodeFactories(*args): return _animation.iSkeletonLookAtManager_ClearAnimNodeFactories(*args)
-    scfGetVersion = staticmethod(_animation.iSkeletonLookAtManager_scfGetVersion)
-    __swig_destroy__ = _animation.delete_iSkeletonLookAtManager
+    def CreateAnimNodeFactory(*args): return _animation.iSkeletonLookAtNodeManager_CreateAnimNodeFactory(*args)
+    def FindAnimNodeFactory(*args): return _animation.iSkeletonLookAtNodeManager_FindAnimNodeFactory(*args)
+    def ClearAnimNodeFactories(*args): return _animation.iSkeletonLookAtNodeManager_ClearAnimNodeFactories(*args)
+    scfGetVersion = staticmethod(_animation.iSkeletonLookAtNodeManager_scfGetVersion)
+    __swig_destroy__ = _animation.delete_iSkeletonLookAtNodeManager
     __del__ = lambda self : None;
-iSkeletonLookAtManager_swigregister = _animation.iSkeletonLookAtManager_swigregister
-iSkeletonLookAtManager_swigregister(iSkeletonLookAtManager)
-iSkeletonLookAtManager_scfGetVersion = _animation.iSkeletonLookAtManager_scfGetVersion
+iSkeletonLookAtNodeManager_swigregister = _animation.iSkeletonLookAtNodeManager_swigregister
+iSkeletonLookAtNodeManager_swigregister(iSkeletonLookAtNodeManager)
+iSkeletonLookAtNodeManager_scfGetVersion = _animation.iSkeletonLookAtNodeManager_scfGetVersion
 
 class iSkeletonLookAtNodeFactory(iSkeletonAnimNodeFactory):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -763,19 +763,19 @@ iSkeletonLookAtListener_swigregister = _animation.iSkeletonLookAtListener_swigre
 iSkeletonLookAtListener_swigregister(iSkeletonLookAtListener)
 iSkeletonLookAtListener_scfGetVersion = _animation.iSkeletonLookAtListener_scfGetVersion
 
-class iSkeletonRagdollManager(core.iBase):
+class iSkeletonRagdollNodeManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def CreateAnimNodeFactory(*args): return _animation.iSkeletonRagdollManager_CreateAnimNodeFactory(*args)
-    def FindAnimNodeFactory(*args): return _animation.iSkeletonRagdollManager_FindAnimNodeFactory(*args)
-    def ClearAnimNodeFactories(*args): return _animation.iSkeletonRagdollManager_ClearAnimNodeFactories(*args)
-    scfGetVersion = staticmethod(_animation.iSkeletonRagdollManager_scfGetVersion)
-    __swig_destroy__ = _animation.delete_iSkeletonRagdollManager
+    def CreateAnimNodeFactory(*args): return _animation.iSkeletonRagdollNodeManager_CreateAnimNodeFactory(*args)
+    def FindAnimNodeFactory(*args): return _animation.iSkeletonRagdollNodeManager_FindAnimNodeFactory(*args)
+    def ClearAnimNodeFactories(*args): return _animation.iSkeletonRagdollNodeManager_ClearAnimNodeFactories(*args)
+    scfGetVersion = staticmethod(_animation.iSkeletonRagdollNodeManager_scfGetVersion)
+    __swig_destroy__ = _animation.delete_iSkeletonRagdollNodeManager
     __del__ = lambda self : None;
-iSkeletonRagdollManager_swigregister = _animation.iSkeletonRagdollManager_swigregister
-iSkeletonRagdollManager_swigregister(iSkeletonRagdollManager)
-iSkeletonRagdollManager_scfGetVersion = _animation.iSkeletonRagdollManager_scfGetVersion
+iSkeletonRagdollNodeManager_swigregister = _animation.iSkeletonRagdollNodeManager_swigregister
+iSkeletonRagdollNodeManager_swigregister(iSkeletonRagdollNodeManager)
+iSkeletonRagdollNodeManager_scfGetVersion = _animation.iSkeletonRagdollNodeManager_scfGetVersion
 
 STATE_INACTIVE = _animation.STATE_INACTIVE
 STATE_DYNAMIC = _animation.STATE_DYNAMIC
