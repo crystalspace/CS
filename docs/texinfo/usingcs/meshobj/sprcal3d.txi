@@ -203,9 +203,6 @@ describe how to do so. These include:
 @table @uref
 @item http://cal3d.sourceforge.net/modeling/tutorial.html
 Describes how to create Cal3D meshes in 3D Studio @sc{max}.
-
-@item http://www.cs.indiana.edu/~joellis/
-Describes how to create maps and Cal3D meshes in Blender.
 @end table
 
 @strong{Note}: The Crystal Space Cal3D plugin requires a skeleton system to
