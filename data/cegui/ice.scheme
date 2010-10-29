@@ -5,6 +5,7 @@
 	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
 	<FalagardMapping WindowType="ice/Button"      TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="ice/Button" />
 	<FalagardMapping WindowType="ice/Checkbox"    TargetType="CEGUI/Checkbox"    Renderer="Falagard/ToggleButton" LookNFeel="ice/Checkbox" />
+	<FalagardMapping WindowType="ice/ImageToggleButton"    TargetType="CEGUI/Checkbox"    Renderer="Falagard/ToggleButton" LookNFeel="ice/ImageToggleButton" />
 	<FalagardMapping WindowType="ice/ImageButton" TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="ice/ImageButton" />
 	<FalagardMapping WindowType="ice/RadioButton" TargetType="CEGUI/RadioButton" Renderer="Falagard/ToggleButton" LookNFeel="ice/RadioButton" />
 	<FalagardMapping WindowType="ice/FrameWindow"  TargetType="CEGUI/FrameWindow" Renderer="Falagard/FrameWindow"  LookNFeel="ice/FrameWindow" />
