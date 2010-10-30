@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2009-10 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -93,6 +93,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     va_end (arg);
   }
 
+  size_t GetChainIndex (csArray<ChainData>& chains, CS::Animation::iBodyChain*& chain)
+  {
+    size_t index = 0;
+    for (csArray<ChainData>::Iterator it = chains.GetIterator (); it.HasNext (); index++)
+    {
+      ChainData& chainData = it.Next ();
+      if (chainData.chain == chain)
+	return index;
+    }
+    return (size_t) ~0;
+  }
+
+  size_t GetChainIndex (const csArray<ChainData>& chains, CS::Animation::iBodyChain*& chain)
+  {
+    size_t index = 0;
+    for (csArray<ChainData>::ConstIterator it = chains.GetIterator (); it.HasNext (); index++)
+    {
+      const ChainData& chainData = it.Next ();
+      if (chainData.chain == chain)
+	return index;
+    }
+    return (size_t) ~0;
+  }
 
   /********************
    *  RagdollAnimNodeFactory
@@ -142,12 +165,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     ChainData data;
     data.chain = chain;
     data.state = state;
-    chains.PutUnique (chain->GetName (), data);
+    chains.Push (data);
   }
 
   void RagdollAnimNodeFactory::RemoveBodyChain (CS::Animation::iBodyChain* chain)
   {
-    chains.DeleteAll (chain->GetName ());
+    size_t index = GetChainIndex (chains, chain);
+    if (index != (size_t) ~0)
+      chains.DeleteIndexFast (index);
   }
 
   void RagdollAnimNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node)
@@ -155,7 +180,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     childNode = node;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory* RagdollAnimNodeFactory::GetChildNode ()
+  CS::Animation::iSkeletonAnimNodeFactory* RagdollAnimNodeFactory::GetChildNode () const
   {
     return childNode;
   }
@@ -183,11 +208,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     childNode (childNode), isActive (false), maxBoneID (0)
   {
     // copy body chains
-    for (csHash<ChainData, csString>::GlobalIterator it =
-	   factory->chains.GetIterator (); it.HasNext (); )
+    for (csArray<ChainData>::Iterator it = factory->chains.GetIterator (); it.HasNext (); )
     {
-      ChainData chainData = it.Next ();
-      chains.Put (chainData.chain->GetName (), chainData);
+      ChainData& chainData = it.Next ();
+      chains.Push (chainData);
 
       // Create entry for each bones of the chain
       CreateBoneData (chainData.chain->GetRootNode (), chainData.state);
@@ -229,7 +253,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   {
 #ifdef CS_DEBUG
     // check that the chain is registered
-    if (!chains.Contains (chain->GetName ()))
+    size_t index = GetChainIndex (chains, chain);
+    if (index == (size_t) ~0)
     {
       factory->manager->Report (CS_REPORTER_SEVERITY_WARNING,
        "Chain %s was not registered in the ragdoll plugin while trying to set new state",
@@ -241,7 +266,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     // TODO: if dynamic then check that there is sth to link to
 
     // Set new chain state
-    chains[chain->GetName ()]->state = state;
+    chains[index].state = state;
     SetChainNodeState (chain->GetRootNode (), state);
   }
 
@@ -263,12 +288,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       SetChainNodeState (node->GetChild (i), state);
   }
 
-  CS::Animation::RagdollState RagdollAnimNode::GetBodyChainState (CS::Animation::iBodyChain* chain)
+  CS::Animation::RagdollState RagdollAnimNode::GetBodyChainState
+    (CS::Animation::iBodyChain* chain) const
   {
-    if (!chains.Contains (chain->GetName ()))
+    size_t index = GetChainIndex (chains, chain);
+    if (index == (size_t) ~0)
       return CS::Animation::STATE_INACTIVE;
 
-    return chains[chain->GetName ()]->state;
+    return chains[index].state;
   }
 
   iRigidBody* RagdollAnimNode::GetBoneRigidBody (CS::Animation::BoneID bone)
@@ -276,7 +303,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     if (!bones.Contains (bone))
       return 0;
 
-    return bones[bone]->rigidBody;
+    const CS::Animation::BoneID bone2 = bone;
+    return bones[bone2]->rigidBody;
   }
 
   iJoint* RagdollAnimNode::GetBoneJoint (const CS::Animation::BoneID bone)
@@ -322,11 +350,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     return CS::Animation::InvalidBoneID;
   }
 
+  CS::Animation::BoneID RagdollAnimNode::GetRigidBodyBone (iRigidBody* body) const
+  {
+    for (csHash<BoneData, CS::Animation::BoneID>::ConstGlobalIterator it = bones.GetIterator ();
+	 it.HasNext (); )
+    {
+      const BoneData& boneData = it.Next ();
+
+      if (boneData.rigidBody == body)
+	return boneData.boneID;
+    }
+
+    return CS::Animation::InvalidBoneID;
+  }
+
   void RagdollAnimNode::ResetChainTransform (CS::Animation::iBodyChain* chain)
   {
 #ifdef CS_DEBUG
     // check that the chain is registered
-    if (!chains.Contains (chain->GetName ()))
+    size_t index = GetChainIndex (chains, chain);
+    if (index == (size_t) ~0)
     {
       factory->manager->Report (CS_REPORTER_SEVERITY_WARNING,
        "Chain %s was not registered in the ragdoll plugin while trying to reset the chain transform",
@@ -335,7 +378,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     }
 
     // check that the chain is in dynamic state
-    if (chains[chain->GetName ()]->state != CS::Animation::STATE_DYNAMIC)
+    if (chains[index].state != CS::Animation::STATE_DYNAMIC)
     {
       factory->manager->Report (CS_REPORTER_SEVERITY_WARNING,
        "Chain %s was not in dynamic state while trying to reset the chain transform",
@@ -507,8 +550,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 	csOrthoTransform newTransform = boneTransform.GetInverse () * bodyTransform;
 
 	// apply the new transform to the iMovable of the animesh
+	// TODO: this does not handle the case where the iMovable has a parent
+	// -> implement iMovable::SetFullTransform() ?
 	iMovable* movable = sceneNode->GetMovable ();
-	movable->SetFullTransform (newTransform);
+	movable->SetTransform (newTransform);
 	movable->UpdateMove ();
 
 	// reset the bone offset & rotation
@@ -811,20 +856,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       boneData->joint->SetMinimumDistance (bodyBone->GetBoneJoint ()->GetMinimumDistance (),
 					   false);
 
-      // setup the transform of the joint
-      csQuaternion rotation;
-      csVector3 offset;
-
-      // TODO: GetTransformBindSpace seems to return a wrong data
-      //skeleton->GetTransformBindSpace (boneData->boneID, rotation, offset);
-      //csOrthoTransform jointTransform (csMatrix3 (rotation.GetConjugate ()), offset);
-
-      skeleton->GetTransformBoneSpace (boneData->boneID, rotation, offset);
-      csOrthoTransform boneTransform (csMatrix3 (rotation.GetConjugate ()), offset);
-      skeleton->GetFactory ()->GetTransformBoneSpace (boneData->boneID, rotation, offset);
-      csOrthoTransform boneSTransform (csMatrix3 (rotation.GetConjugate ()), offset);
-      boneData->joint->SetTransform (bodyBone->GetBoneJoint ()->GetTransform () *
-				     boneSTransform * boneTransform.GetInverse());
+      // TODO: min/max angles must be set relative to the bind space,
+      //   here it will be relative to the current pose
 
       // attach the rigid bodies to the joint
       boneData->joint->Attach (parentBoneData.rigidBody, boneData->rigidBody, false);

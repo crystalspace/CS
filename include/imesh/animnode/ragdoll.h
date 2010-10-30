@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2009-10 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -96,13 +96,11 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
   SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeFactory, 1, 0, 2);
 
   /**
-   * Add a new body chain to the ragdoll animation node. Adding more than 
-   * one body chain is not yet supported.
+   * Add a new body chain to the ragdoll animation node. The dynamic state
+   * of each body chain can be set separately.
    * \param state The initial state of the body chain.
    */
-  virtual void AddBodyChain
-    (iBodyChain* chain,
-     RagdollState state = STATE_INACTIVE) = 0;
+  virtual void AddBodyChain (iBodyChain* chain, RagdollState state = STATE_INACTIVE) = 0;
 
   /**
    * Remove the chain from the ragdoll animation node.
@@ -124,7 +122,7 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
   /**
    * Return the child animation node of this node.
    */
-  virtual iSkeletonAnimNodeFactory* GetChildNode () = 0;
+  virtual iSkeletonAnimNodeFactory* GetChildNode () const = 0;
 
   /**
    * Clear the child animation node of this node.
@@ -144,31 +142,30 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
  */
 struct iSkeletonRagdollNode : public iSkeletonAnimNode
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNode, 1, 0, 1);
+  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNode, 1, 0, 2);
 
   /**
-   * Set the body chain in the specified physical state.
+   * Set the body chain in the given physical state.
    */
-  virtual void SetBodyChainState (iBodyChain* chain,
-				  RagdollState state) = 0;
+  virtual void SetBodyChainState (iBodyChain* chain, RagdollState state) = 0;
 
   /**
-   * Get the physical state of the body chain specified.
+   * Get the physical state of the given body chain.
    */
-  virtual RagdollState GetBodyChainState (iBodyChain* chain) = 0;
+  virtual RagdollState GetBodyChainState (iBodyChain* chain) const = 0;
 
   /**
-   * Get the rigid body of the specified bone.
+   * Get the rigid body of the given bone.
    */
   virtual iRigidBody* GetBoneRigidBody (BoneID bone) = 0;
 
   /**
-   * Get the joint of the specified bone.
+   * Get the joint of the given bone.
    */
   virtual iJoint* GetBoneJoint (const BoneID bone) = 0;
 
   /**
-   * Get the count of bones in the specified physical state.
+   * Get the count of bones in the given physical state.
    */
   virtual uint GetBoneCount (RagdollState state) const = 0;
 
@@ -188,6 +185,13 @@ struct iSkeletonRagdollNode : public iSkeletonAnimNode
    * behavior.
    */
   virtual void ResetChainTransform (iBodyChain* chain) = 0;
+
+  /**
+   * Get the bone associated with the given rigid body, or
+   * CS::Animation::InvalidBoneID if the given rigid body is not part of this
+   * physical body.
+   */
+  virtual BoneID GetRigidBodyBone (iRigidBody* body) const = 0;
 };
 
 } // namespace Animation

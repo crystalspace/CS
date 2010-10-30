@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2009-10 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -90,7 +90,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     virtual void RemoveBodyChain (CS::Animation::iBodyChain* chain);
 
     virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node);
-    virtual CS::Animation::iSkeletonAnimNodeFactory* GetChildNode ();
+    virtual CS::Animation::iSkeletonAnimNodeFactory* GetChildNode () const;
     virtual void ClearChildNode ();
     virtual iDynamicSystem* GetDynamicSystem () const;
 
@@ -98,7 +98,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     RagdollNodeManager* manager;
     csString name;
     csRef<CS::Animation::iBodySkeleton> bodySkeleton;
-    csHash<ChainData, csString> chains;
+    csArray<ChainData> chains;
     csWeakRef<iDynamicSystem> dynSys;
     CS::Animation::BoneID ragdollRoot;
     csRef<CS::Animation::iSkeletonAnimNodeFactory> childNode;
@@ -116,13 +116,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
     //-- CS::Animation::iSkeletonRagdollNode
     virtual void SetBodyChainState (CS::Animation::iBodyChain* chain, CS::Animation::RagdollState state);
-    virtual CS::Animation::RagdollState GetBodyChainState (CS::Animation::iBodyChain* chain);
+    virtual CS::Animation::RagdollState GetBodyChainState (CS::Animation::iBodyChain* chain) const;
 
     virtual iRigidBody* GetBoneRigidBody (CS::Animation::BoneID bone);
     virtual iJoint* GetBoneJoint (const CS::Animation::BoneID bone);
 
     virtual uint GetBoneCount (CS::Animation::RagdollState state) const;
     virtual CS::Animation::BoneID GetBone (CS::Animation::RagdollState state, uint index) const;
+
+    virtual CS::Animation::BoneID GetRigidBodyBone (iRigidBody* body) const;
 
     virtual void ResetChainTransform (CS::Animation::iBodyChain* chain);
 
@@ -182,7 +184,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     RagdollAnimNodeFactory* factory;
     csWeakRef<iSceneNode> sceneNode;
     csWeakRef<CS::Animation::iSkeleton> skeleton;
-    csHash<ChainData, csString> chains;
+    csArray<ChainData> chains;
     csRef<CS::Animation::iSkeletonAnimNode> childNode;
     csHash<BoneData, CS::Animation::BoneID> bones;
     csArray<ResetChainData> resetChains;
