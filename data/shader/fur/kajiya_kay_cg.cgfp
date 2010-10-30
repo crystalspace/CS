@@ -1,6 +1,7 @@
 <include>
   <variablemap variable="light specular[0]" destination="LightColor" />
   <variablemap variable="Ks" destination="Ks" />
+  <variablemap variable="hdr scale" destination="hdrScale" />
   <program>
 
 struct vertex2fragment { 
@@ -13,7 +14,8 @@ struct vertex2fragment {
 
 float4 main (vertex2fragment IN,
 			uniform float Ks,
-			uniform float3 LightColor) : COLOR
+			uniform float3 LightColor,
+			uniform float4 hdrScale) : COLOR
 {
 	float4 OUT = float4(0, 0, 0, 1);
 	
@@ -30,6 +32,7 @@ float4 main (vertex2fragment IN,
 	specularColor = max (0.0, specularColor);
 	
 	OUT.xyz = specularColor;
+	OUT.xyz = OUT.xyz*hdrScale.y+hdrScale.w;
 	return OUT;
 }
 

@@ -1,4 +1,5 @@
 <cgfp>
+<variablemap variable="hdr scale" destination="hdrScale" />
 <program>
 <![CDATA[
 
@@ -30,7 +31,8 @@ float blinnPhongSpecular(float3 normalVec, float3 lightVec, float specPower)
 }
 
 float4 main (vertex2fragment IN,
-       uniform sampler2D texturebase) : COLOR
+       uniform sampler2D texturebase,
+       uniform float4 hdrScale) : COLOR
 {
 	//float3 LightPosition1 = float4(3.0f, 3.0f, 3.0f);
 	float4 LightPosition1 = float4(3.0f, 3.0f, 3.0f, 1.0f);
@@ -86,7 +88,9 @@ float4 main (vertex2fragment IN,
 	finalCol.rgb += (blinnPhongSpecular(worldNormal, lightVec, specularPower) * attenuation * specColor * finalCol.a * 0.05f);
 	finalCol.rgb *= lightColor;
 
-	return dotLN;
+	finalCol.rgb = finalCol.rgb*hdrScale.y+hdrScale.w;
+	
+	return dotLN*hdrScale.y+hdrScale.w;
 }
 
 ]]>

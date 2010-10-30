@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <shader compiler="xmlshader" name="fur_cg" lights="1">
+    <shadervars>
+      <shadervar name="hdr scale" type="vector4">1,1,0,0</shadervar>
+    </shadervars>
     <technique priority="200">
 		<pass>
 		  <buffer source="normal" destination="normal" />

@@ -3,6 +3,7 @@
   <variablemap variable="light ambient" destination="AmbientColor" />
   <variablemap variable="diffuse type" destination="DiffuseType" />
   <variablemap variable="fur color" destination="FurColor" />
+  <variablemap variable="hdr scale" destination="hdrScale" />
   <program>
 
 struct vertex2fragment { 
@@ -22,7 +23,8 @@ float4 main (vertex2fragment IN,
 			uniform int DiffuseType,
 			uniform float3 AmbientColor,
 			uniform float3 LightColor,
-			uniform float4 FurColor) : COLOR
+			uniform float4 FurColor,
+			uniform float4 hdrScale) : COLOR
 {
 	float4 OUT = float4(0, 0, 0, 1);
 
@@ -60,6 +62,7 @@ float4 main (vertex2fragment IN,
 
 	// No specular color
 	OUT.xyz = /*(0.8 + 0.4 * IN.TangentShift.x ) */ FurColor.xyz * diffuseColor + AmbientColor;
+	OUT.xyz = OUT.xyz*hdrScale.y+hdrScale.w;
 	return OUT;
 }
 

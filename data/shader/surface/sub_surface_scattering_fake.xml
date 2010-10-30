@@ -1,4 +1,7 @@
 <shader compiler="xmlshader" name="sub_surface_scattering_fake" lights="1">
+    <shadervars>
+      <shadervar name="hdr scale" type="vector4">1,1,0,0</shadervar>
+    </shadervars>
     <technique priority="200">
     <pass>
       <buffer source="normal" destination="normal" />
