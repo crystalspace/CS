@@ -115,7 +115,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     float guideLOD;
     float previousGuideLOD;
     float strandLOD;
-    size_t hairStrandsLODSize;
+    size_t furStrandsLODSize;
     bool physicsControlEnabled;
     bool isReset;
     uint startFrame;

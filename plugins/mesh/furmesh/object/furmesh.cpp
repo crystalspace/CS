@@ -42,7 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     engine(engine), isEnabled(true), animesh(0), physicsControl(0), 
     hairMeshProperties(0), furStrandShift(0), positionShift(0), rng(0), 
     controlPointsLOD(1), offsetIndex(0), offsetVertex(0), endVertex(0), 
-    guideLOD(0), previousGuideLOD(0), strandLOD(1), hairStrandsLODSize(0), 
+    guideLOD(0), previousGuideLOD(0), strandLOD(1), furStrandsLODSize(0), 
     physicsControlEnabled(false), isReset(false), startFrame(0), 
     meshFactory(0), meshFactorySubMesh(0), indexstart(0), indexend(0)
   {
@@ -290,7 +290,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     this->view = view;
     size_t numberOfStrains = furStrands.GetSize();
-    hairStrandsLODSize = furStrands.GetSize();
+    furStrandsLODSize = furStrands.GetSize();
     
     if( !numberOfStrains ) 
       return;
@@ -648,7 +648,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       guideFursLOD.Get(i).Update(guideFurs, guideFursLOD, controlPointsLOD);
 
     // Update fur strands
-    for (size_t i = 0 ; i < hairStrandsLODSize; i ++)
+    for (size_t i = 0 ; i < furStrandsLODSize; i ++)
       furStrands.Get(i).Update(guideFurs, guideFursLOD, controlPointsLOD);
 
     StartAnimationControl();
@@ -790,13 +790,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
           guideFursLOD.Get(i).controlPoints, 
           guideFursLOD.Get(i).GetControlPointsCount(controlPointsLOD));
       }
-
-    // Print the number of control furs
-    int count = 0;
-    for (size_t i = 0 ; i < guideFursLOD.GetSize(); i ++)
-      if (guideFursLOD.Get(i).isActive)
-        count++;
-    csPrintf("Active LOD ropes: %d\n",count);
   }
 
   void FurMesh::SetStrandLOD(float strandLOD)
@@ -809,18 +802,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     size_t minFurCount = csMin(furStrands.GetSize(), totalGuideHairsCount);
 
-    hairStrandsLODSize = (size_t)(minFurCount + 
+    furStrandsLODSize = (size_t)(minFurCount + 
       (int)(strandLOD * ((int)furStrands.GetSize() - (int)minFurCount)));
 
     strandWidthLOD = 1 / ( strandLOD * 0.75f + 0.25f ) * GetStrandWidth();
 
     size_t controlPointsCount = 0;
 
-    for (size_t i = 0 ; i < hairStrandsLODSize ; i ++)
+    for (size_t i = 0 ; i < furStrandsLODSize ; i ++)
       controlPointsCount += 
       furStrands.Get(i).GetControlPointsCount(controlPointsLOD);
 
     endVertex = offsetVertex + 2 * controlPointsCount;
+
+    csPrintf("Fur Strands Displayed: %u\n", furStrandsLODSize);
+    csPrintf("Vertices Displayed: %u\n", endVertex - offsetVertex);
   }
 
   void FurMesh::SetControlPointsLOD(float controlPointsLOD)
@@ -858,7 +854,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     controlPointsCount = 0;
 
-    for (size_t i = 0 ; i < hairStrandsLODSize ; i ++)
+    for (size_t i = 0 ; i < furStrandsLODSize ; i ++)
       controlPointsCount += 
       furStrands.Get(i).GetControlPointsCount(controlPointsLOD);
 
@@ -892,8 +888,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
         (j * (distance / (controlPointsCount - 1)));
     }
 
-    csPrintf( "Average Control Points Count: %f\n", 
-      (float)averageControlPointsCount / (float)guideFurs.GetSize());
+//     csPrintf( "Average Control Points Count: %f\n", 
+//       (float)averageControlPointsCount / (float)guideFurs.GetSize());
 
     // Update guide ropes LOD
     for (size_t i = 0 ; i < guideFursLOD.GetSize(); i ++)
@@ -904,6 +900,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       furStrands.Get(i).Update(guideFurs, guideFursLOD, controlPointsLOD);    
 
     StartAnimationControl();
+
+    csPrintf("Vertices Displayed: %u\n", endVertex - offsetVertex);
   }
 
   void FurMesh::SetLOD(float lod)
@@ -911,6 +909,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     SetGuideLOD(lod);
     SetStrandLOD(lod);
     SetControlPointsLOD(lod);
+
+    // Print the number of control furs
+    size_t count = guideFurs.GetSize();
+    for (size_t i = 0 ; i < guideFursLOD.GetSize(); i ++)
+      if (guideFursLOD.Get(i).isActive)
+        count++;
+
+    csPrintf("Guide Strands: %u/%u\n", count, guideFurs.GetSize() + 
+      guideFursLOD.GetSize());
   }
 
   void FurMesh::SynchronizeGuideHairs ()
@@ -1067,7 +1074,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if (physicsControlEnabled)
       UpdateGuideHairs();
 
-    size_t numberOfStrains = hairStrandsLODSize;
+    size_t numberOfStrains = furStrandsLODSize;
 
     if (!numberOfStrains)
       return;
@@ -1206,10 +1213,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       densitymap.Set( (int)(uv.x * densitymap.width),
         (int)(uv.y * densitymap.height), 2, 255);
     }
-
-    csPrintf("Pure guide ropes: %d\n", (int) guideFurs.GetSize());
-    csPrintf("Total guide ropes: %d\n", 
-	     (int) (guideFursLOD.GetSize() + guideFurs.GetSize()));
 
     densitymap.SaveImage(object_reg, 
       "/data/hairtest/densitymap_debug.png");
