@@ -303,8 +303,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     if (!bones.Contains (bone))
       return 0;
 
-    const CS::Animation::BoneID bone2 = bone;
-    return bones[bone2]->rigidBody;
+    return bones[bone]->rigidBody;
   }
 
   iJoint* RagdollAnimNode::GetBoneJoint (const CS::Animation::BoneID bone)
@@ -550,10 +549,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 	csOrthoTransform newTransform = boneTransform.GetInverse () * bodyTransform;
 
 	// apply the new transform to the iMovable of the animesh
-	// TODO: this does not handle the case where the iMovable has a parent
-	// -> implement iMovable::SetFullTransform() ?
 	iMovable* movable = sceneNode->GetMovable ();
-	movable->SetTransform (newTransform);
+	movable->SetFullTransform (newTransform);
 	movable->UpdateMove ();
 
 	// reset the bone offset & rotation
@@ -856,8 +853,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       boneData->joint->SetMinimumDistance (bodyBone->GetBoneJoint ()->GetMinimumDistance (),
 					   false);
 
-      // TODO: min/max angles must be set relative to the bind space,
-      //   here it will be relative to the current pose
+      // setup the transform of the joint 
+      csQuaternion rotation; 
+      csVector3 offset; 
+
+      // TODO: GetTransformBindSpace seems to return a wrong data 
+      //skeleton->GetTransformBindSpace (boneData->boneID, rotation, offset); 
+      //csOrthoTransform jointTransform (csMatrix3 (rotation.GetConjugate ()), offset); 
+
+      skeleton->GetTransformBoneSpace (boneData->boneID, rotation, offset); 
+      csOrthoTransform boneTransform (csMatrix3 (rotation.GetConjugate ()), offset); 
+      skeleton->GetFactory ()->GetTransformBoneSpace (boneData->boneID, rotation, offset); 
+      csOrthoTransform boneSTransform (csMatrix3 (rotation.GetConjugate ()), offset); 
+      boneData->joint->SetTransform (bodyBone->GetBoneJoint ()->GetTransform () * 
+				     boneSTransform * boneTransform.GetInverse()); 
 
       // attach the rigid bodies to the joint
       boneData->joint->Attach (parentBoneData.rigidBody, boneData->rigidBody, false);
