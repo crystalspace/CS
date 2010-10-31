@@ -808,6 +808,7 @@ class iSkeletonRagdollNode(iSkeletonAnimNode):
     def GetBoneCount(*args): return _animation.iSkeletonRagdollNode_GetBoneCount(*args)
     def GetBone(*args): return _animation.iSkeletonRagdollNode_GetBone(*args)
     def ResetChainTransform(*args): return _animation.iSkeletonRagdollNode_ResetChainTransform(*args)
+    def GetRigidBodyBone(*args): return _animation.iSkeletonRagdollNode_GetRigidBodyBone(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonRagdollNode_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonRagdollNode
     __del__ = lambda self : None;
