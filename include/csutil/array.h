@@ -1168,7 +1168,7 @@ public:
     return false;
   }
 
-  /** Iterator for the Array<> class */
+  /** Iterator for the csArray class */
   class Iterator
   {
   public:
@@ -1202,7 +1202,7 @@ public:
     csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
   };
 
-  /** Iterator for the Array<> class */
+  /** Iterator for the csArray class */
   class ConstIterator
   {
   public:
@@ -1236,7 +1236,7 @@ public:
     const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
   };
 
-  /** Reverse iterator for the Array<> class */
+  /** Reverse iterator for the csArray class */
   class ReverseIterator
   {
   public:
@@ -1270,7 +1270,7 @@ public:
     csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
   };
 
-  /** Reverse iterator for the Array<> class */
+  /** Reverse iterator for the csArray class */
   class ReverseConstIterator
   {
   public:
