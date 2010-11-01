@@ -230,17 +230,17 @@ bool FrankieScene::CreateAvatar ()
     // The chain will be in kinematic mode when Frankie is alive, and in dynamic state
     // when Frankie has been killed.
     bodyChain = bodySkeleton->CreateBodyChain
-      ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Pelvis"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"), 0);
+      ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Pelvis"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
     ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
 
     // Create a bone chain for the tail of Frankie and add it to the ragdoll controller.
     // The chain will be in kinematic mode most of the time, and in dynamic mode when the
     // user ask for it with the 'f' key or when Frankie has been killed.
     tailChain = bodySkeleton->CreateBodyChain
-      ("tail_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_1"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"), 0);
+      ("tail_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_1"));
+    tailChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"));
     ragdollNodeFactory->AddBodyChain (tailChain, CS::Animation::STATE_KINEMATIC);
   }
 

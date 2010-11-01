@@ -156,7 +156,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     if (childNode)
       return childNode->FindNode (name);
 
-      return 0;
+      return nullptr;
   }
 
   void RagdollAnimNodeFactory::AddBodyChain (CS::Animation::iBodyChain* chain,
@@ -195,6 +195,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     return dynSys;
   }
 
+  CS::Animation::iBodySkeleton* RagdollAnimNodeFactory::GetBodySkeleton () const
+  {
+    return bodySkeleton;
+  }
+
   /********************
    *  RagdollAnimNode
    ********************/
@@ -226,7 +231,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   void RagdollAnimNode::CreateBoneData (CS::Animation::iBodyChainNode* chainNode,
 					CS::Animation::RagdollState state)
   {
-    CS::Animation::iBodyBone* bodyBone = chainNode->GetBodyBone ();
+    CS::Animation::iBodyBone* bodyBone =
+      factory->bodySkeleton->FindBodyBone (chainNode->GetAnimeshBone ());
+    CS_ASSERT (bodyBone);
 
     // check if the bone is already defined
     if (!bones.Contains (bodyBone->GetAnimeshBone ()))
@@ -275,8 +282,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   {
     // find the associated bone data
     BoneData nullBone;
-    BoneData& boneData = bones.Get (node->GetBodyBone ()->GetAnimeshBone (),
-				    nullBone);
+    BoneData& boneData = bones.Get (node->GetAnimeshBone (), nullBone);
     boneData.state = state;
 
     // update the state of the bone if this node is playing
@@ -301,7 +307,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   iRigidBody* RagdollAnimNode::GetBoneRigidBody (CS::Animation::BoneID bone)
   {
     if (!bones.Contains (bone))
-      return 0;
+      return nullptr;
 
     return bones[bone]->rigidBody;
   }
@@ -309,7 +315,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   iJoint* RagdollAnimNode::GetBoneJoint (const CS::Animation::BoneID bone)
   {
     if (!bones.Contains (bone))
-      return 0;
+      return nullptr;
 
     return bones[bone]->joint;
   }
@@ -616,7 +622,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     if (childNode)
       return childNode->FindNode (name);
 
-    return 0;
+    return nullptr;
   }
 
   void RagdollAnimNode::AddAnimationCallback
@@ -912,8 +918,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   {
     // find the associated bone data
     BoneData nullBone;
-    BoneData& boneData = bones.Get (node->GetBodyBone ()->GetAnimeshBone (),
-				    nullBone);
+    BoneData& boneData = bones.Get (node->GetAnimeshBone (), nullBone);
     
     // compute the bind transform of the bone
     csQuaternion boneRotation;

@@ -120,7 +120,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     {
       manager->Report (CS_REPORTER_SEVERITY_ERROR,
 		       "Invalid bone ID while creating body bone");
-      return 0;
+      return nullptr;
     }
 
     // check boneid exists in skeleton
@@ -128,7 +128,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     {
       manager->Report (CS_REPORTER_SEVERITY_ERROR,
 	       "No skeleton factory defined while creating body bone");
-      return 0;
+      return nullptr;
     }    
 
     if (!skeletonFactory->HasBone (boneID))
@@ -136,7 +136,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
       manager->Report (CS_REPORTER_SEVERITY_ERROR,
        "Bone %i doesn't exist in skeleton factory while creating body bone",
 		       boneID);
-      return 0;
+      return nullptr;
     }    
 
     // check ID uniqueness
@@ -162,155 +162,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     boneHash.DeleteAll ();
   }
 
-  CS::Animation::iBodyChain* BodySkeleton::CreateBodyChain (
-		const char *name, CS::Animation::BoneID rootBone, ...)
+  CS::Animation::iBodyChain* BodySkeleton::CreateBodyChain (const char *name,
+							    CS::Animation::BoneID rootBone)
   {
-    // TODO:
-    //   - adding only one node: one root + one child same as root
-    //   - adding all child nodes: only one root + no child
-
-    // check chain name not already given
+    // check that the chain name has not already be given
     if (chainHash.Contains (name))
     {
       manager->Report (CS_REPORTER_SEVERITY_ERROR,
 		       "Chain %s has already been defined.", name);
-      return 0;
+      return nullptr;
     }
 
-    // check validity of root bone
-    if (rootBone == CS::Animation::InvalidBoneID)
-    {
-      manager->Report (CS_REPORTER_SEVERITY_ERROR,
-		       "Invalid root bone while creating body chain.");
-      return 0;
-    }
-
-    // check if the bone exists in the skeleton
+    // check the validity of the root bone
     if (!skeletonFactory->HasBone (rootBone))
     {
       manager->Report (CS_REPORTER_SEVERITY_ERROR,
        "The root bone %i is not in the skeleton factory of the animesh",
 		       rootBone);
-      return 0;
+      return nullptr;
     }
-
-    // check if we have data on this bone
-    if (!boneHash.Contains (rootBone))
-    {
-      manager->Report (CS_REPORTER_SEVERITY_ERROR,
-		       "No CS::Animation::iBodyBone defined for root bone: %i",
-		       rootBone);
-      return 0;
-    }
-
-    // create list of nodes, put in it the root node
-    csHash<csRef<BodyChainNode>, CS::Animation::BoneID> nodeHash;
-    csRef<BodyChainNode> rootNode;
-    rootNode.AttachNew (new BodyChainNode (boneHash.Get (rootBone, 0)));			
-    nodeHash.Put (rootBone, rootNode);
-
-    // for each final child nodes, add all nodes on the path to it
-    va_list vl;
-    va_start (vl, rootBone);
-
-    CS::Animation::BoneID bone, parent;
-    while (1)
-    {
-      bone = va_arg (vl, CS::Animation::BoneID);
-      if (!bone) break;
-
-      // TODO: check no repetition of child bones
-      if (nodeHash.Contains (bone))
-	continue;
-
-      // check bone is valid
-      if (bone == CS::Animation::InvalidBoneID)
-      {
-	manager->Report (CS_REPORTER_SEVERITY_ERROR,
-			 "Invalid child bone while creating chain");
-	va_end (vl);
-	return 0;
-      }
-
-      // check if the bone exists in the skeleton
-      if (!skeletonFactory->HasBone (bone))
-      {
-	manager->Report (CS_REPORTER_SEVERITY_ERROR,
-	 "The child bone %i is not in the skeleton factory of the animesh",
-			 bone);
-	va_end (vl);
-	return 0;
-      }
-
-      // check if we have data on this bone
-      if (!boneHash.Contains (bone))
-      {
-	manager->Report (CS_REPORTER_SEVERITY_ERROR,
-			 "No CS::Animation::iBodyBone defined for child bone: %i (%s)",
-			 bone, skeletonFactory->GetBoneName (bone));
-	va_end (vl);
-	return 0;
-      }
-
-      // OK, create a chain node
-      csRef<BodyChainNode> currentNode;
-      currentNode.AttachNew (new BodyChainNode (boneHash.Get (bone, 0)));
-      nodeHash.Put (bone, currentNode);
-
-      // go up the skeleton tree until the root bone is found
-      parent = skeletonFactory->GetBoneParent (bone);
-      while (1)
-      {
-	// check that the root bone of the skeleton is not reached
-	if (parent == CS::Animation::InvalidBoneID)
-	{
-	  manager->Report (CS_REPORTER_SEVERITY_ERROR,
-   "The specified child bone %i (%s) is not really a child of root bone %i (%s)",
-			   bone, skeletonFactory->GetBoneName (bone),
-			   rootBone, skeletonFactory->GetBoneName (rootBone));
-	  va_end (vl);
-	  return 0;
-	}
-
-	// check if we already got this bone
-	if (nodeHash.Contains (parent))
-	{
-	  // add current node as a child of the node we already got
-	  if (currentNode)
-	  {
-	    csRef<BodyChainNode> node = nodeHash.Get (parent, 0);
-	    node->AddChild (currentNode);
-	  }
-	  break;
-	}
-
-	// check if we have data on this bone
-	if (!boneHash.Contains (parent))
-	{
-	  manager->Report (CS_REPORTER_SEVERITY_ERROR,
-	   "BodySkeleton::CreateChain: No CS::Animation::iBodyBone defined for bone: %i (%s)",
-			   parent, skeletonFactory->GetBoneName (parent));
-	  va_end (vl);
-	  return 0;
-	}
-
-	// OK, create a new node
-	csRef<BodyChainNode> node;
-	node.AttachNew (new BodyChainNode (boneHash.Get (parent, 0)));
-	nodeHash.Put (parent, node);
-	if (currentNode)
-	  node->AddChild (currentNode);
-	currentNode = node;
-
-	parent = skeletonFactory->GetBoneParent (parent);
-      }
-    }
-
-    va_end (vl);
 
     // chain is OK, create it
     csRef<BodyChain> chain;
-    chain.AttachNew (new BodyChain (name, rootNode));
+    chain.AttachNew (new BodyChain (this, name, rootBone));
 
     return chainHash.PutUnique (name, chain);
   }
@@ -372,12 +246,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return collider;
   }
 
-  uint BodyBone::GetBoneColliderCount () const
+  size_t BodyBone::GetBoneColliderCount () const
   {
-    return (uint)colliders.GetSize ();
+    return (size_t)colliders.GetSize ();
   }
 
-  CS::Animation::iBodyBoneCollider* BodyBone::GetBoneCollider (uint index) const
+  CS::Animation::iBodyBoneCollider* BodyBone::GetBoneCollider (size_t index) const
   {
     CS_ASSERT (index < colliders.GetSize ());
     return colliders[index];
@@ -390,9 +264,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   CS_LEAKGUARD_IMPLEMENT(BodyChain);
 
-  BodyChain::BodyChain (const char *name, CS::Animation::iBodyChainNode* rootNode)
-    : scfImplementationType (this), name (name), rootNode (rootNode)
+  BodyChain::BodyChain (BodySkeleton* bodySkeleton, const char *name,
+			CS::Animation::BoneID rootBone)
+    : scfImplementationType (this), name (name), bodySkeleton (bodySkeleton)
   {
+    rootNode.AttachNew (new BodyChainNode (rootBone));
   }
 
   const char* BodyChain::GetName () const
@@ -400,11 +276,149 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return name;
   }
 
+  CS::Animation::iBodySkeleton* BodyChain::GetBodySkeleton () const
+  {
+    return bodySkeleton;
+  }
+
   CS::Animation::iBodyChainNode* BodyChain::GetRootNode () const
   {
     return rootNode;
   }
 
+  void CollectAllNodes (csHash<csRef<BodyChainNode>, CS::Animation::BoneID>& nodeHash,
+			BodyChainNode* rootNode)
+  {
+    nodeHash.Put (rootNode->GetAnimeshBone (), rootNode);
+
+    for (size_t i = 0; i < rootNode->GetChildCount (); i++)
+      CollectAllNodes (nodeHash, (BodyChainNode*) rootNode->GetChild (i));
+  }
+
+  bool BodyChain::AddSubChain (CS::Animation::BoneID subBone)
+  {
+#ifdef CS_DEBUG
+    // check if the bone is valid
+    if (!bodySkeleton->skeletonFactory->HasBone (subBone))
+    {
+      bodySkeleton->manager->Report (CS_REPORTER_SEVERITY_ERROR,
+				     "The child bone %i is not in the skeleton factory of the animesh",
+				     subBone);
+      return false;
+    }
+#endif
+
+    // collect all nodes of this chain
+    csHash<csRef<BodyChainNode>, CS::Animation::BoneID> currentHash;
+    CollectAllNodes (currentHash, rootNode);
+
+    // check that the sub bone is not already in the chain
+    if (currentHash.Contains (subBone))
+      return true;
+
+    // store the new nodes so that they are deleted in case of error
+    csHash<csRef<BodyChainNode>, CS::Animation::BoneID> nodeHash;
+
+    // OK, create a chain node
+    csRef<BodyChainNode> currentNode;
+    currentNode.AttachNew (new BodyChainNode (subBone));
+    nodeHash.Put (subBone, currentNode);
+
+    // iterate on the parent nodes until we find a connection to the chain
+    CS::Animation::BoneID parent = bodySkeleton->skeletonFactory->GetBoneParent (subBone);
+    while (1)
+    {
+      // check that the root bone of the skeleton is not reached
+      if (parent == CS::Animation::InvalidBoneID)
+      {
+	bodySkeleton->manager->Report (CS_REPORTER_SEVERITY_ERROR,
+			 "The specified child bone %i (%s) is not really a child of root bone %i (%s)",
+			 subBone, bodySkeleton->skeletonFactory->GetBoneName (subBone),
+			 rootNode->boneID, bodySkeleton->skeletonFactory->GetBoneName (rootNode->boneID));
+	return false;
+      }
+
+      // check if we already got this bone
+      if (currentHash.Contains (parent))
+      {
+	// add the current node as a child of the node we already got
+	csRef<BodyChainNode> node = currentHash.Get (parent, 0);
+	node->AddChild (currentNode);
+	break;
+      }
+
+      // OK, create a new node
+      csRef<BodyChainNode> node;
+      node.AttachNew (new BodyChainNode (parent));
+      nodeHash.Put (parent, node);
+      node->AddChild (currentNode);
+      currentNode = node;
+
+      parent = bodySkeleton->skeletonFactory->GetBoneParent (parent);
+    }
+
+    return true;
+  }
+
+  bool BodyChain::AddAllSubChains ()
+  {
+#ifdef CS_DEBUG
+    // check if the chain is really empty
+    if (rootNode->children.GetSize ())
+    {
+      bodySkeleton->manager->Report (CS_REPORTER_SEVERITY_ERROR,
+				     "The chain %s is not empty while trying to add all sub chains",
+				     name.GetData ());
+      return false;
+    }
+#endif
+
+    // create a structure holding all the bones of the skeleton.
+    // When this method will return, all the bones that are not sub child of this chain will
+    // be decref'd and therefore deleted.
+    csHash<csRef<BodyChainNode>, CS::Animation::BoneID> nodeHash;
+    nodeHash.Put (rootNode->boneID, rootNode);
+    CS::Animation::BoneID maxBoneID = bodySkeleton->skeletonFactory->GetTopBoneID ();
+    CS::Animation::BoneID rootBoneID = 0;
+
+    for (CS::Animation::BoneID boneIt = 0; boneIt < maxBoneID; boneIt++)
+    {
+      // check if this is the root of this chain
+      if (rootNode->boneID == boneIt)
+	continue;
+
+      // find or create an entry in the node hash
+      csRef<BodyChainNode> node;
+      if (nodeHash.Contains (boneIt))
+	node = *nodeHash[boneIt];
+      else
+      {
+	node.AttachNew (new BodyChainNode (boneIt));
+	nodeHash.Put (boneIt, node);
+      }
+
+      // check if this is the root bone
+      CS::Animation::BoneID parentBone = bodySkeleton->skeletonFactory->GetBoneParent (boneIt);
+      if (parentBone == CS::Animation::InvalidBoneID)
+      {
+	rootBoneID = boneIt;
+	continue;
+      }
+
+      // find or create an entry in the node hash for the parent of this node
+      csRef<BodyChainNode> parentNode;
+      if (nodeHash.Contains (parentBone))
+	parentNode = *nodeHash[parentBone];
+      else
+      {
+	parentNode.AttachNew (new BodyChainNode (parentBone));
+	nodeHash.Put (parentBone, parentNode);
+      }
+      parentNode->AddChild (node);
+    }
+
+    return true;
+  }
 
   /********************
    *  BodyChainNode
@@ -412,22 +426,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   CS_LEAKGUARD_IMPLEMENT(BodyChainNode);
 
-  BodyChainNode::BodyChainNode (BodyBone* bone)
-    : scfImplementationType (this), bone (bone), parent (0)
+  BodyChainNode::BodyChainNode (CS::Animation::BoneID boneID)
+    : scfImplementationType (this), boneID (boneID), parent (0)
   {
   }
 
-  CS::Animation::iBodyBone* BodyChainNode::GetBodyBone () const
+  CS::Animation::BoneID BodyChainNode::GetAnimeshBone () const
   {
-    return bone;
+    return boneID;
   }
 
-  uint BodyChainNode::GetChildCount () const
+  size_t BodyChainNode::GetChildCount () const
   {
-    return (uint)children.GetSize ();
+    return (size_t)children.GetSize ();
   }
 
-  CS::Animation::iBodyChainNode* BodyChainNode::GetChild (uint index) const
+  CS::Animation::iBodyChainNode* BodyChainNode::GetChild (size_t index) const
   {
     return children.Get (index);
   }
@@ -445,7 +459,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   CS::Animation::iBodyChainNode* BodyChainNode::FindSubChild (CS::Animation::BoneID child) const
   {
-    if (child == bone->animeshBone)
+    if (child == boneID)
       return (CS::Animation::iBodyChainNode*) this;
 
     for (csRefArray<BodyChainNode>::ConstIterator it = children.GetIterator (); it.HasNext (); )

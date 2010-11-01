@@ -33,10 +33,8 @@
 /**\addtogroup meshplugins
  * @{ */
 
-namespace CS
-{
-namespace Animation
-{
+namespace CS {
+namespace Animation {
 
 struct iSkeletonFactory;
 struct iBodySkeleton;
@@ -55,7 +53,7 @@ struct iBodyManager : public virtual iBase
   SCF_INTERFACE(CS::Animation::iBodyManager, 2, 0, 0);
 
   /**
-   * Create a new body skeleton with the specified name.
+   * Create a new body skeleton with the given name.
    */
   virtual iBodySkeleton* CreateBodySkeleton
     (const char *name, iSkeletonFactory* skeletonFactory) = 0;
@@ -79,7 +77,7 @@ struct iBodyManager : public virtual iBase
  */
 struct iBodySkeleton : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iBodySkeleton, 2, 0, 2);
+  SCF_INTERFACE(CS::Animation::iBodySkeleton, 3, 0, 0);
 
   /**
    * Return the name of the body skeleton.
@@ -114,18 +112,11 @@ struct iBodySkeleton : public virtual iBase
 
   /**
    * Create a new body chain, ie a subtree of the animesh skeleton.
-   * For example, if you want to create a chain for the two legs of a human 
-   * body, you should set the pelvis as the root bone, and set two child bones
-   * with the feet.
    * \param name The name of the body chain.
-   * \param rootBone The root of the body chain. It must be followed 
-   * by a list of child bones. All bones from the root bone to the child 
-   * bones will be added. All bones that are added must have a CS::Animation::iBodyBone 
-   * defined.
-   * \return The body chain upon success, 0 if there was a problem.
+   * \param rootBone The root of the body chain.
+   * \return The body chain upon success, nullptr if there was a problem.
    */
-  virtual iBodyChain* CreateBodyChain (
-    const char *name, BoneID rootBone, ...) = 0;
+  virtual iBodyChain* CreateBodyChain (const char *name, BoneID rootBone) = 0;
 
   /**
    * Find a body chain from its name.
@@ -151,7 +142,7 @@ struct iBodyBone : public virtual iBase
   SCF_INTERFACE(CS::Animation::iBodyBone, 1, 0, 0);
 
   /**
-   * Return the ID of the bone of the animated mesh associated to this body bone.
+   * Return the ID of the bone of the animated mesh associated with this body bone.
    */
   virtual BoneID GetAnimeshBone () const = 0;
 
@@ -188,12 +179,12 @@ struct iBodyBone : public virtual iBase
   /**
    * Get the count of colliders for this body bone.
    */
-  virtual uint GetBoneColliderCount () const = 0;
+  virtual size_t GetBoneColliderCount () const = 0;
 
   /**
-   * Get the specified collider of this body bone.
+   * Get the collider of this body bone with the given index.
    */
-  virtual iBodyBoneCollider* GetBoneCollider (uint index) const = 0;
+  virtual iBodyBoneCollider* GetBoneCollider (size_t index) const = 0;
 };
 
 /**
@@ -202,7 +193,7 @@ struct iBodyBone : public virtual iBase
  */
 struct iBodyChain : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iBodyChain, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iBodyChain, 2, 0, 0);
 
   /**
    * Get the name of this body chain.
@@ -210,9 +201,30 @@ struct iBodyChain : public virtual iBase
   virtual const char* GetName () const = 0;
 
   /**
+   * Get the associated physical description of the skeleton
+   */
+  virtual iBodySkeleton* GetBodySkeleton () const = 0;
+
+  /**
    * Get the root node of this chain.
    */
   virtual iBodyChainNode* GetRootNode () const = 0;
+
+  /**
+   * Add a sub-chain to this chain, ie all nodes from the root of the chain to the given subBone.
+   *
+   * For example, if you want to create a chain for the two legs of a human 
+   * body, you should set the pelvis as the root node, and call this method once for each foot.
+   * \return True upon success, false otherwise (ie the subBone has not been found as a sub-child
+   * of the root of this chain)
+   */
+  virtual bool AddSubChain (CS::Animation::BoneID subBone) = 0;
+
+  /**
+   * Add all sub-child of the root node of this chain.
+   * \return True upon success, false otherwise (this should never happen although)
+   */
+  virtual bool AddAllSubChains () = 0;
 };
 
 /**
@@ -221,22 +233,22 @@ struct iBodyChain : public virtual iBase
  */
 struct iBodyChainNode : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iBodyChainNode, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iBodyChainNode, 2, 0, 0);
 
   /**
-   * Get the body bone associated with this node.
+   * Return the ID of the bone of the animated mesh associated with this node.
    */
-  virtual iBodyBone* GetBodyBone () const = 0;
+  virtual BoneID GetAnimeshBone () const = 0;
 
   /**
    * Get the count of children of this node.
    */
-  virtual uint GetChildCount () const = 0;
+  virtual size_t GetChildCount () const = 0;
 
   /**
-   * Get the specified child of this node.
+   * Get the given child of this node.
    */
-  virtual iBodyChainNode* GetChild (uint index) const = 0;
+  virtual iBodyChainNode* GetChild (size_t index) const = 0;
 
   /**
    * Get the parent node of this node. Returns 0 if the node 

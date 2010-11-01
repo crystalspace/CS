@@ -467,15 +467,15 @@ bool KrystalScene::CreateAvatar ()
     // The chain will be in kinematic mode when Krystal is alive, and in dynamic state
     // when Krystal has been killed.
     bodyChain = bodySkeleton->CreateBodyChain
-      ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("Head"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
-       animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
+      ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"));
 
     armChain = bodySkeleton->CreateBodyChain
-      ("arm_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("RightShoulder"),
-      animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"), 0);
+      ("arm_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("RightShoulder"));
+    armChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"));
 
     // Create the ragdoll animation node
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =

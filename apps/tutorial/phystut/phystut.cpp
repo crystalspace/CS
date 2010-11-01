@@ -1633,9 +1633,9 @@ void Simple::LoadRagdoll ()
 
   // Create bone chain
   CS::Animation::iBodyChain* chain = bodySkeleton->CreateBodyChain
-    ("chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"),
-     animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"),
-     animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"), 0);
+      ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"));
+  chain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
+  chain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"));
 
   // Create ragdoll animation node factory
   csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollFactory =

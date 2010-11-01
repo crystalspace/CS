@@ -214,7 +214,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 
     struct BoneData
     {
-      CS::Animation::iBodyBone* bodyBone;
+      CS::Animation::BoneID boneID;
       csQuaternion rotation;
       csVector3 boneOffset;
       csQuaternion boneRotation;

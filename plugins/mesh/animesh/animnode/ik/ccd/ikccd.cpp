@@ -410,7 +410,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
       csQuaternion chainRotation;
       csVector3 chainOffset (0.0f);
       CS::Animation::BoneID parentBoneID =
-	skeleton->GetFactory ()->GetBoneParent (effector->chain->GetRootNode ()->GetBodyBone ()->GetAnimeshBone ());
+	skeleton->GetFactory ()->GetBoneParent (effector->chain->GetRootNode ()->GetAnimeshBone ());
       if (parentBoneID != CS::Animation::InvalidBoneID)
 	skeleton->GetTransformAbsSpace (parentBoneID, chainRotation, chainOffset);
 
@@ -436,15 +436,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
       {
 	// Create an entry for the bone
 	BoneData bone;
-	bone.bodyBone = iteratorNode->GetBodyBone ();
+	bone.boneID = iteratorNode->GetAnimeshBone ();
 
 	// Read the bone transform of the joint
-	CS::Animation::BoneID boneID = bone.bodyBone->GetAnimeshBone ();
-	skeleton->GetFactory ()->GetTransformBoneSpace (boneID, bone.boneRotation, bone.boneOffset);
+	skeleton->GetFactory ()->GetTransformBoneSpace (bone.boneID, bone.boneRotation, bone.boneOffset);
 
 	// Check if the rotation has to be initialized with the walue from the child node
-	if (factory->jointInitialized && state->IsBoneUsed (boneID))
-	  bone.rotation = bone.boneRotation.GetConjugate () * state->GetQuaternion (boneID) * bone.boneRotation;
+	if (factory->jointInitialized && state->IsBoneUsed (bone.boneID))
+	  bone.rotation = bone.boneRotation.GetConjugate () * state->GetQuaternion (bone.boneID) * bone.boneRotation;
 
 	bones.Insert (0, bone);
 
@@ -533,10 +532,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
       for (int boneIndexI = 0; boneIndexI < (int) bones.GetSize (); boneIndexI++)
       {
 	BoneData& bone = bones[boneIndexI];
-	CS::Animation::BoneID boneID = bone.bodyBone->GetAnimeshBone ();
-	state->SetBoneUsed (boneID);
-	state->GetVector (boneID).Set (0.0f);
-	state->GetQuaternion (boneID) = bone.boneRotation * bone.rotation * bone.boneRotation.GetConjugate ();
+	state->SetBoneUsed (bone.boneID);
+	state->GetVector (bone.boneID).Set (0.0f);
+	state->GetQuaternion (bone.boneID) = bone.boneRotation * bone.rotation * bone.boneRotation.GetConjugate ();
       }
 
       // TODO: events for target lost/reached

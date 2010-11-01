@@ -331,12 +331,12 @@ bool KrystalScene::CreateAvatar ()
     // will be in kinematic mode when Krystal is alive, and in dynamic state when
     // Krystal has been killed.
     bodyChain = bodySkeleton->CreateBodyChain
-      ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"),
-      animeshFactory->GetSkeletonFactory ()->FindBone ("Head"),
-      animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"),
-      animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"),
-      animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"),
-      animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"), 0);
+      ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"));
+    bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"));
     ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
 
     // Create the mesh of the skirt
