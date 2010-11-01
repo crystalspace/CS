@@ -32,20 +32,16 @@
 /**\addtogroup meshplugins
  * @{ */
 
-namespace CS
-{
-namespace Mesh
-{
+namespace CS {
+namespace Mesh {
 
 struct iAnimatedMesh;
 
 } // namespace Mesh
 } // namespace CS
 
-namespace CS
-{
-namespace Animation
-{
+namespace CS {
+namespace Animation {
 
 struct iSkeletonRagdollNodeFactory;
 
@@ -93,7 +89,7 @@ enum RagdollState
  */
 struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeFactory, 1, 0, 2);
+  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeFactory, 1, 0, 3);
 
   /**
    * Add a new body chain to the ragdoll animation node. The dynamic state
@@ -133,6 +129,11 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
    * Get the dynamic system where the ragdoll bodies are evolving
    */
   virtual iDynamicSystem* GetDynamicSystem () const = 0;
+
+  /**
+   * Get the physical description of the skeleton.
+   */
+  virtual CS::Animation::iBodySkeleton* GetBodySkeleton () const = 0;
 };
 
 /**
