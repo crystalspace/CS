@@ -5634,12 +5634,11 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iBodySkeleton_CreateBodyChain__varargs__(PyObject *SWIGUNUSEDPARM(self), PyObject *args, PyObject *varargs) {
+SWIGINTERN PyObject *_wrap_iBodySkeleton_CreateBodyChain(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Animation::iBodySkeleton *arg1 = (CS::Animation::iBodySkeleton *) 0 ;
   char *arg2 = (char *) 0 ;
   CS::Animation::BoneID arg3 ;
-  void *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -5668,27 +5667,13 @@ SWIGINTERN PyObject *_wrap_iBodySkeleton_CreateBodyChain__varargs__(PyObject *SW
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iBodySkeleton_CreateBodyChain" "', argument " "3"" of type '" "CS::Animation::BoneID""'");
   } 
   arg3 = static_cast< CS::Animation::BoneID >(val3);
-  result = (CS::Animation::iBodyChain *)(arg1)->CreateBodyChain((char const *)arg2,arg3,arg4);
+  result = (CS::Animation::iBodyChain *)(arg1)->CreateBodyChain((char const *)arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iBodyChain, 0 |  0 );
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iBodySkeleton_CreateBodyChain(PyObject *self, PyObject *args) {
-  PyObject *resultobj;
-  PyObject *varargs;
-  PyObject *newargs;
-  
-  newargs = PyTuple_GetSlice(args,0,3);
-  varargs = PyTuple_GetSlice(args,3,PyTuple_Size(args)+1);
-  resultobj = _wrap_iBodySkeleton_CreateBodyChain__varargs__(self,newargs,varargs);
-  Py_XDECREF(newargs);
-  Py_XDECREF(varargs);
-  return resultobj;
 }
 
 
@@ -6005,7 +5990,7 @@ SWIGINTERN PyObject *_wrap_iBodyBone_GetBoneColliderCount(PyObject *SWIGUNUSEDPA
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  uint result;
+  size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iBodyBone_GetBoneColliderCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyBone, 0 |  0 );
@@ -6013,8 +5998,8 @@ SWIGINTERN PyObject *_wrap_iBodyBone_GetBoneColliderCount(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBone_GetBoneColliderCount" "', argument " "1"" of type '" "CS::Animation::iBodyBone const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBone * >(argp1);
-  result = (uint)((CS::Animation::iBodyBone const *)arg1)->GetBoneColliderCount();
-  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
+  result = ((CS::Animation::iBodyBone const *)arg1)->GetBoneColliderCount();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -6024,10 +6009,10 @@ fail:
 SWIGINTERN PyObject *_wrap_iBodyBone_GetBoneCollider(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Animation::iBodyBone *arg1 = (CS::Animation::iBodyBone *) 0 ;
-  uint arg2 ;
+  size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned long val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -6039,11 +6024,11 @@ SWIGINTERN PyObject *_wrap_iBodyBone_GetBoneCollider(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBone_GetBoneCollider" "', argument " "1"" of type '" "CS::Animation::iBodyBone const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBone * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iBodyBone_GetBoneCollider" "', argument " "2"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iBodyBone_GetBoneCollider" "', argument " "2"" of type '" "size_t""'");
   } 
-  arg2 = static_cast< uint >(val2);
+  arg2 = static_cast< size_t >(val2);
   result = (CS::Animation::iBodyBoneCollider *)((CS::Animation::iBodyBone const *)arg1)->GetBoneCollider(arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iBodyBoneCollider, 0 |  0 );
   return resultobj;
@@ -6115,6 +6100,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iBodyChain_GetBodySkeleton(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iBodyChain *arg1 = (CS::Animation::iBodyChain *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  CS::Animation::iBodySkeleton *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iBodyChain_GetBodySkeleton",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyChain, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyChain_GetBodySkeleton" "', argument " "1"" of type '" "CS::Animation::iBodyChain const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iBodyChain * >(argp1);
+  result = (CS::Animation::iBodySkeleton *)((CS::Animation::iBodyChain const *)arg1)->GetBodySkeleton();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iBodySkeleton, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iBodyChain_GetRootNode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Animation::iBodyChain *arg1 = (CS::Animation::iBodyChain *) 0 ;
@@ -6131,6 +6138,59 @@ SWIGINTERN PyObject *_wrap_iBodyChain_GetRootNode(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< CS::Animation::iBodyChain * >(argp1);
   result = (CS::Animation::iBodyChainNode *)((CS::Animation::iBodyChain const *)arg1)->GetRootNode();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iBodyChainNode, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iBodyChain_AddSubChain(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iBodyChain *arg1 = (CS::Animation::iBodyChain *) 0 ;
+  CS::Animation::BoneID arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iBodyChain_AddSubChain",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyChain, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyChain_AddSubChain" "', argument " "1"" of type '" "CS::Animation::iBodyChain *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iBodyChain * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iBodyChain_AddSubChain" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
+  } 
+  arg2 = static_cast< CS::Animation::BoneID >(val2);
+  result = (bool)(arg1)->AddSubChain(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iBodyChain_AddAllSubChains(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iBodyChain *arg1 = (CS::Animation::iBodyChain *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iBodyChain_AddAllSubChains",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyChain, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyChain_AddAllSubChains" "', argument " "1"" of type '" "CS::Animation::iBodyChain *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iBodyChain * >(argp1);
+  result = (bool)(arg1)->AddAllSubChains();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
   return NULL;
@@ -6178,22 +6238,22 @@ SWIGINTERN PyObject *iBodyChain_swigregister(PyObject *SWIGUNUSEDPARM(self), PyO
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_iBodyChainNode_GetBodyBone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iBodyChainNode_GetAnimeshBone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Animation::iBodyChainNode *arg1 = (CS::Animation::iBodyChainNode *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  CS::Animation::iBodyBone *result = 0 ;
+  CS::Animation::BoneID result;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iBodyChainNode_GetBodyBone",1,1,&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iBodyChainNode_GetAnimeshBone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyChainNode, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyChainNode_GetBodyBone" "', argument " "1"" of type '" "CS::Animation::iBodyChainNode const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyChainNode_GetAnimeshBone" "', argument " "1"" of type '" "CS::Animation::iBodyChainNode const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyChainNode * >(argp1);
-  result = (CS::Animation::iBodyBone *)((CS::Animation::iBodyChainNode const *)arg1)->GetBodyBone();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iBodyBone, 0 |  0 );
+  result = (CS::Animation::BoneID)((CS::Animation::iBodyChainNode const *)arg1)->GetAnimeshBone();
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -6206,7 +6266,7 @@ SWIGINTERN PyObject *_wrap_iBodyChainNode_GetChildCount(PyObject *SWIGUNUSEDPARM
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  uint result;
+  size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iBodyChainNode_GetChildCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iBodyChainNode, 0 |  0 );
@@ -6214,8 +6274,8 @@ SWIGINTERN PyObject *_wrap_iBodyChainNode_GetChildCount(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyChainNode_GetChildCount" "', argument " "1"" of type '" "CS::Animation::iBodyChainNode const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyChainNode * >(argp1);
-  result = (uint)((CS::Animation::iBodyChainNode const *)arg1)->GetChildCount();
-  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
+  result = ((CS::Animation::iBodyChainNode const *)arg1)->GetChildCount();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -6225,10 +6285,10 @@ fail:
 SWIGINTERN PyObject *_wrap_iBodyChainNode_GetChild(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Animation::iBodyChainNode *arg1 = (CS::Animation::iBodyChainNode *) 0 ;
-  uint arg2 ;
+  size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned long val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -6240,11 +6300,11 @@ SWIGINTERN PyObject *_wrap_iBodyChainNode_GetChild(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyChainNode_GetChild" "', argument " "1"" of type '" "CS::Animation::iBodyChainNode const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyChainNode * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iBodyChainNode_GetChild" "', argument " "2"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iBodyChainNode_GetChild" "', argument " "2"" of type '" "size_t""'");
   } 
-  arg2 = static_cast< uint >(val2);
+  arg2 = static_cast< size_t >(val2);
   result = (CS::Animation::iBodyChainNode *)((CS::Animation::iBodyChainNode const *)arg1)->GetChild(arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iBodyChainNode, 0 |  0 );
   return resultobj;
@@ -14312,6 +14372,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonRagdollNodeFactory_GetBodySkeleton(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonRagdollNodeFactory *arg1 = (CS::Animation::iSkeletonRagdollNodeFactory *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  CS::Animation::iBodySkeleton *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonRagdollNodeFactory_GetBodySkeleton",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonRagdollNodeFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonRagdollNodeFactory_GetBodySkeleton" "', argument " "1"" of type '" "CS::Animation::iSkeletonRagdollNodeFactory const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonRagdollNodeFactory * >(argp1);
+  result = (CS::Animation::iBodySkeleton *)((CS::Animation::iSkeletonRagdollNodeFactory const *)arg1)->GetBodySkeleton();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iBodySkeleton, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSkeletonRagdollNodeFactory_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -15033,11 +15115,14 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_iBodyBone", _wrap_delete_iBodyBone, METH_VARARGS, NULL},
 	 { (char *)"iBodyBone_swigregister", iBodyBone_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iBodyChain_GetName", _wrap_iBodyChain_GetName, METH_VARARGS, NULL},
+	 { (char *)"iBodyChain_GetBodySkeleton", _wrap_iBodyChain_GetBodySkeleton, METH_VARARGS, NULL},
 	 { (char *)"iBodyChain_GetRootNode", _wrap_iBodyChain_GetRootNode, METH_VARARGS, NULL},
+	 { (char *)"iBodyChain_AddSubChain", _wrap_iBodyChain_AddSubChain, METH_VARARGS, NULL},
+	 { (char *)"iBodyChain_AddAllSubChains", _wrap_iBodyChain_AddAllSubChains, METH_VARARGS, NULL},
 	 { (char *)"iBodyChain_scfGetVersion", _wrap_iBodyChain_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iBodyChain", _wrap_delete_iBodyChain, METH_VARARGS, NULL},
 	 { (char *)"iBodyChain_swigregister", iBodyChain_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iBodyChainNode_GetBodyBone", _wrap_iBodyChainNode_GetBodyBone, METH_VARARGS, NULL},
+	 { (char *)"iBodyChainNode_GetAnimeshBone", _wrap_iBodyChainNode_GetAnimeshBone, METH_VARARGS, NULL},
 	 { (char *)"iBodyChainNode_GetChildCount", _wrap_iBodyChainNode_GetChildCount, METH_VARARGS, NULL},
 	 { (char *)"iBodyChainNode_GetChild", _wrap_iBodyChainNode_GetChild, METH_VARARGS, NULL},
 	 { (char *)"iBodyChainNode_GetParent", _wrap_iBodyChainNode_GetParent, METH_VARARGS, NULL},
@@ -15335,6 +15420,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonRagdollNodeFactory_GetChildNode", _wrap_iSkeletonRagdollNodeFactory_GetChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory_ClearChildNode", _wrap_iSkeletonRagdollNodeFactory_ClearChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory_GetDynamicSystem", _wrap_iSkeletonRagdollNodeFactory_GetDynamicSystem, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonRagdollNodeFactory_GetBodySkeleton", _wrap_iSkeletonRagdollNodeFactory_GetBodySkeleton, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory_scfGetVersion", _wrap_iSkeletonRagdollNodeFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonRagdollNodeFactory", _wrap_delete_iSkeletonRagdollNodeFactory, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory_swigregister", iSkeletonRagdollNodeFactory_swigregister, METH_VARARGS, NULL},

@@ -219,7 +219,10 @@ class iBodyChain(core.iBase):
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _animation.iBodyChain_GetName(*args)
+    def GetBodySkeleton(*args): return _animation.iBodyChain_GetBodySkeleton(*args)
     def GetRootNode(*args): return _animation.iBodyChain_GetRootNode(*args)
+    def AddSubChain(*args): return _animation.iBodyChain_AddSubChain(*args)
+    def AddAllSubChains(*args): return _animation.iBodyChain_AddAllSubChains(*args)
     scfGetVersion = staticmethod(_animation.iBodyChain_scfGetVersion)
     __swig_destroy__ = _animation.delete_iBodyChain
     __del__ = lambda self : None;
@@ -231,7 +234,7 @@ class iBodyChainNode(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def GetBodyBone(*args): return _animation.iBodyChainNode_GetBodyBone(*args)
+    def GetAnimeshBone(*args): return _animation.iBodyChainNode_GetAnimeshBone(*args)
     def GetChildCount(*args): return _animation.iBodyChainNode_GetChildCount(*args)
     def GetChild(*args): return _animation.iBodyChainNode_GetChild(*args)
     def GetParent(*args): return _animation.iBodyChainNode_GetParent(*args)
@@ -790,6 +793,7 @@ class iSkeletonRagdollNodeFactory(iSkeletonAnimNodeFactory):
     def GetChildNode(*args): return _animation.iSkeletonRagdollNodeFactory_GetChildNode(*args)
     def ClearChildNode(*args): return _animation.iSkeletonRagdollNodeFactory_ClearChildNode(*args)
     def GetDynamicSystem(*args): return _animation.iSkeletonRagdollNodeFactory_GetDynamicSystem(*args)
+    def GetBodySkeleton(*args): return _animation.iSkeletonRagdollNodeFactory_GetBodySkeleton(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonRagdollNodeFactory_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonRagdollNodeFactory
     __del__ = lambda self : None;
