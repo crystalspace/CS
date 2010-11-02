@@ -37,7 +37,7 @@ struct iTextureHandle;
  */
 struct iCEGUI : public virtual iBase
 {
-  SCF_INTERFACE (iCEGUI, 3, 0, 0);
+  SCF_INTERFACE (iCEGUI, 3, 0, 1);
 
   /**
    * Initialize the plugin.
@@ -91,6 +91,16 @@ struct iCEGUI : public virtual iBase
 
   /// Create a texture from a CS texturehandle.
   virtual CEGUI::Texture& CreateTexture (iTextureHandle* htxt)= 0;
+  
+  /**
+   * Enable/disable auto rendering.
+   * Auto rendering causes the GUI to be rendered every frame, during the "2D"
+   * phase (see #CS_EVENTHANDLER_PHASE_2D). By default, auto rendering is
+   * disables.
+   */
+  virtual void SetAutoRender (bool autoRender) = 0;
+  /// Query auto rendering
+  virtual bool GetAutoRender () = 0;
 };
 
 #endif

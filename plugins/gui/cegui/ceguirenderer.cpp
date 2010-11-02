@@ -287,6 +287,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     
     delete scriptModule;
     delete events;
+    
+    RemoveAutoEventHandler ();
   }
 
   //----------------------------------------------------------------------------//
@@ -331,5 +333,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   }
 
   //----------------------------------------------------------------------------//
+  
+  void Renderer::SetAutoRender (bool autoRender)
+  {
+    if (autoRender)
+      InstallAutoEventHandler ();
+    else
+      RemoveAutoEventHandler ();
+  }
+  
+  bool Renderer::GetAutoRender ()
+  {
+    return autoRenderHandler.IsValid ();
+  }
+  
+  void Renderer::InstallAutoEventHandler ()
+  {
+    if (!autoRenderHandler.IsValid ())
+    {
+      csRef<iEventQueue> eventQueue = csQueryRegistry<iEventQueue> (obj_reg);
+      if (eventQueue)
+      {
+	autoRenderHandler.AttachNew (new AutoRenderEventHandler (this));
+	eventQueue->RegisterListener (autoRenderHandler, csevFrame (obj_reg));
+      }
+    }
+  }
+  
+  void Renderer::RemoveAutoEventHandler ()
+  {
+    if (autoRenderHandler.IsValid ())
+    {
+      csRef<iEventQueue> eventQueue = csQueryRegistry<iEventQueue> (obj_reg);
+      if (eventQueue)
+	eventQueue->RemoveListener (autoRenderHandler);
+    }
+    autoRenderHandler.Invalidate ();
+  }
 
 } CS_PLUGIN_NAMESPACE_END(cegui)

@@ -98,8 +98,9 @@ void CEGUITest::Frame()
   
   // Tell the camera to render into the frame buffer.
   view->Draw ();
-
-  cegui->Render ();
+  
+  /* CEGUI rendering is done by the CEGUI plugin itself since
+     we called SetAutoRender (true). */
 }
 
 bool CEGUITest::OnInitialize(int /*argc*/, char* /*argv*/ [])
@@ -158,6 +159,10 @@ bool CEGUITest::Application()
 
   // Initialize CEGUI wrapper
   cegui->Initialize ();
+  
+  /* Let CEGUI plugin install an event handler that takes care of rendering
+     every frame */
+  cegui->SetAutoRender (true);
   
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);

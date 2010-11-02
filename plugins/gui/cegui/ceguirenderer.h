@@ -32,6 +32,7 @@
 #include "csutil/parray.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/weakref.h"
 #include "iutil/comp.h"
 #include "ivaria/icegui.h"
 #include "ivideo/graph2d.h"
@@ -173,6 +174,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     uint getMaxTextureSize() const;
     const CEGUI::String& getIdentifierString() const;
 
+    void SetAutoRender (bool autoRender);
+    bool GetAutoRender ();
   protected:
 
     /// String holding the renderer identification text.
@@ -211,6 +214,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
 
     csWindowFactory<SettingSlider> settingsSliderFact;
     csWindowFactory<SettingComboBox> settingComboBoxFact;
+  
+    class AutoRenderEventHandler :
+      public scfImplementation1<AutoRenderEventHandler, iEventHandler>
+    {
+      csWeakRef<Renderer> renderer;
+    public:
+      AutoRenderEventHandler (Renderer* renderer)
+       : scfImplementationType (this), renderer (renderer) {}
+    
+      bool HandleEvent (iEvent& ev)
+      {
+	if (renderer) renderer->Render ();
+	return true;
+      }
+      
+      CS_EVENTHANDLER_PHASE_2D("crystalspace.cegui.autorender");
+    };
+    csRef<AutoRenderEventHandler> autoRenderHandler;
+    
+    void InstallAutoEventHandler ();
+    void RemoveAutoEventHandler ();
   };
 
 
