@@ -79,6 +79,8 @@ class iCEGUI(cspace.iBase):
     def EnableKeyboardCapture(*args): return _pycscegui.iCEGUI_EnableKeyboardCapture(*args)
     def DisableKeyboardCapture(*args): return _pycscegui.iCEGUI_DisableKeyboardCapture(*args)
     def CreateTexture(*args): return _pycscegui.iCEGUI_CreateTexture(*args)
+    def SetAutoRender(*args): return _pycscegui.iCEGUI_SetAutoRender(*args)
+    def GetAutoRender(*args): return _pycscegui.iCEGUI_GetAutoRender(*args)
     scfGetVersion = staticmethod(_pycscegui.iCEGUI_scfGetVersion)
     __swig_destroy__ = _pycscegui.delete_iCEGUI
     __del__ = lambda self : None;
