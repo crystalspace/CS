@@ -29,11 +29,8 @@
 #include "scene.h"
 #include "statistics.h"
 #include "tui.h"
-#include "lightcalculator.h"
-#include "raytracerlighting.h"
-#include "photonmapperlighting.h"
+#include "directlight.h"
 #include "sampler.h"
-#include <csutil/floatrand.h>
 
 CS_IMPLEMENT_APPLICATION
 
@@ -44,14 +41,10 @@ namespace lighter
 
   Lighter::Lighter (iObjectRegistry *objectRegistry)
     : objectRegistry (objectRegistry), swapManager (0), scene (new Scene),
-
-      // Initial stages (prior to lightmap generation) (19)
       progStartup ("Starting up", 5),
       progLoadFiles ("Loading files", 2),
       progLightmapLayout ("Lightmap layout", 5),
       progSaveFactories ("Saving mesh factories", 7),
-
-      // Generate empty light maps, KD-tree & photon maps (10)
       progInitializeMain ("Initialize objects", 10),
         progInitialize (0, 3, &progInitializeMain),
         progInitializeLightmaps ("Lightmaps", 3, &progInitializeMain),
@@ -62,27 +55,13 @@ namespace lighter
           progSaveMeshes (0, 99, &progSaveMeshesMain),
           progSaveFinish (0, 1, &progSaveMeshesMain),
         progBuildKDTree ("Building KD-Tree", 10, &progInitializeMain),
-        progPhotonEmission ("Emitting Photons", 7, &progInitializeMain),
-        progPhotonBalancing ("Balancing Photons", 3, &progInitializeMain),
-
-      // Fill the lightmaps (50)
-      progCalcLighting ("Calculating Lighting Components", 50),
-
-      // Postprocess lightmaps (10)
+      progDirectLighting ("Direct lighting", 60),
       progPostproc ("Postprocessing lightmaps", 10),
         progPostprocSector (0, 50, &progPostproc),
         progPostprocLM (0, 50, &progPostproc),
-
-      // Save meshes (1)
       progSaveMeshesPostLight ("Updating meshes", 1),
-
-      // Generate specular maps (10)
       progSpecMaps ("Generating specular direction maps", 10),
-
-      // Save lightmaps (2)
       progSaveResult ("Saving result", 2),
-
-      // Cleanup stages (3)
       progCleanLightingData ("Cleanup", 1),
       progApplyWorldChanges ("Updating world files", 1),
       progCleanup ("Cleanup", 1),
@@ -116,11 +95,7 @@ namespace lighter
     // Check for commandline help.
     if (csCommandLineHelper::CheckHelp (objectRegistry, cmdLine))
     {
-      CommandLineHelp(
-        cmdLine->GetOption ("expertoptions", 0) != 0,
-        cmdLine->GetOption ("raytraceoptions", 0) != 0,
-        cmdLine->GetOption ("pmoptions", 0) != 0
-        );
+      CommandLineHelp (cmdLine->GetOption ("expert", 0) != 0);
       return false;
     }
 
@@ -150,7 +125,7 @@ namespace lighter
           maxSwapSize = 200;
       }
       // Check for override.
-      size_t maxSwapConfig = configMgr->GetInt ("lighter2.swapcachesize", maxSwapSize);
+      size_t maxSwapConfig = configMgr->GetInt ("lighter2.swapcachesize", (int)maxSwapSize);
       if ((maxSwapConfig >= 0) && (maxSwapConfig <= SIZE_MAX / (1024 * 1024)))
         maxSwapSize = maxSwapConfig * 1024 * 1024;
       swapManager = new SwapManager (maxSwapSize);
@@ -276,29 +251,6 @@ namespace lighter
 
   bool Lighter::LightEmUp ()
   {
-    // Determine which lighting engines are needed
-    bool enablePhotonMapper = false;
-    bool enableRaytracer = false;
-
-    if(globalConfig.GetLighterProperties() .directLightEngine == LIGHT_ENGINE_RAYTRACER)
-    {
-      enableRaytracer = true;
-    }
-
-    if(globalConfig.GetLighterProperties() .directLightEngine == LIGHT_ENGINE_PHOTONMAPPER ||
-       globalConfig.GetLighterProperties() .indirectLightEngine == LIGHT_ENGINE_PHOTONMAPPER)
-    {
-      enablePhotonMapper = true;
-    }
-
-    // Check that one or more of the light engines are enabled
-    if(!enableRaytracer && !enablePhotonMapper)
-    {
-      globalLighter->Report (
-          "You must enable either direct or indirect lighting (or both).");
-      return false;
-    }
-
     // Have to load to have anything to light
     if (!LoadFiles (progLoadFiles)) 
       return false;
@@ -327,16 +279,11 @@ namespace lighter
 
     // Build the KD-trees
     BuildKDTrees ();
-
-    // Build & Balance Photon Maps if needed
-    if(enablePhotonMapper)
-    {
-      BuildPhotonMaps();
-      BalancePhotonMaps();
-    }
    
-    // Compute all lighting components (fill lightmaps)
-    ComputeLighting(enableRaytracer, enablePhotonMapper);
+    // Shoot direct lighting
+    DoDirectLighting ();   
+
+    //@@ DO OTHER LIGHTING
 
     // Postprocessing of ligthmaps
     PostprocessLightmaps ();
@@ -425,84 +372,6 @@ namespace lighter
     progLightmapLayout.SetProgress (1);
   }
 
-  void Lighter::BuildPhotonMaps()
-  {
-    // Indicate 0% progress
-    progPhotonEmission.SetProgress(0);
-
-    // Compute step size for progress updates
-    const float progressStep = 1.0f / scene->GetSectors ().GetSize();
-
-    // Create global illumination object
-    PhotonmapperLighting lighting;
-
-    // Retrieve sector iterator
-    SectorHash::GlobalIterator sectIt = 
-      scene->GetSectors ().GetIterator ();
-
-    // Iterator over all sectors
-    size_t sectorIdx = 0;
-    while (sectIt.HasNext ())
-    {
-      // Retrieve next sector
-      csRef<Sector> sect = sectIt.Next ();
-      
-      // Setup to report progress
-      Statistics::Progress* progPhoton =
-        progPhotonEmission.CreateProgress(progressStep);
-
-      // Emit photons in this sector
-      lighting.EmitPhotons(sect, *progPhoton);
-
-      // Cleanup
-      delete progPhoton;
-
-      sectorIdx++;
-    }
-
-    // Indicate 100% progress
-    progPhotonEmission.SetProgress(1);
-  }
-
-  void Lighter::BalancePhotonMaps()
-  {
-    // Indicate 0% progress
-    progPhotonBalancing.SetProgress(0);
-
-    // Compute step size for progress updates
-    const float progressStep = 1.0f / scene->GetSectors ().GetSize();
-
-    // Create global illumination object
-    PhotonmapperLighting lighting;
-
-    // Retrieve sector iterator
-    SectorHash::GlobalIterator sectIt = 
-      scene->GetSectors ().GetIterator ();
-
-    // Iterator over all sectors
-    size_t sectorIdx = 0;
-    while (sectIt.HasNext ())
-    {
-      // Retrieve next sector
-      csRef<Sector> sect = sectIt.Next ();
-      
-      // Setup to report progress
-      Statistics::Progress* progPhoton =
-        progPhotonBalancing.CreateProgress(progressStep);
-
-      // Balance this sector's photon map
-      lighting.BalancePhotons(sect, *progPhoton);
-
-      // Cleanup
-      delete progPhoton;
-
-      sectorIdx++;
-    }
-
-    // Indicate 100% progress
-    progPhotonBalancing.SetProgress(1);
-  }
-
   void Lighter::InitializeObjects ()
   {
     progInitialize.SetProgress (0);
@@ -519,34 +388,6 @@ namespace lighter
       delete progSector;
     }
     progInitialize.SetProgress (1);
-  }
-
-  void Lighter::ForceRealisticAttenuation()
-  {
-    // Iterate overl all scene sectors
-    SectorHash::GlobalIterator sectIt = 
-      scene->GetSectors ().GetIterator ();
-    while (sectIt.HasNext ())
-    {
-      // Get the next sector
-      csRef<Sector> sect = sectIt.Next ();
-
-      // Loop through non-pseudodynamic static lights
-      const LightRefArray& allNonPDLights = sect->allNonPDLights;
-      for (size_t i = 0; i < allNonPDLights.GetSize (); i++)
-      {
-        Light* npdl = allNonPDLights[i];
-        npdl->SetAttenuation( CS_ATTN_REALISTIC, csVector4(0, 0, 0, 0) );
-      }
-
-      // Loop through pseudodynamic static lights
-      const LightRefArray& allPDLights = sect->allPDLights;
-      for (size_t i = 0; i < allPDLights.GetSize (); i++)
-      {
-        Light* pdl = allPDLights[i];
-        pdl->SetAttenuation( CS_ATTN_REALISTIC, csVector4(0, 0, 0, 0) );
-      }
-    }
   }
 
   void Lighter::PrepareLighting ()
@@ -589,73 +430,39 @@ namespace lighter
     progBuildKDTree.SetProgress (1);
   }
 
-  void Lighter::ComputeLighting (bool enableRaytracer, bool enablePhotonMapper)
+  void Lighter::DoDirectLighting ()
   {
-    // Set task progress to 0%
-    progCalcLighting.SetProgress (0);
-
-    int numPasses = 
-      globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
-
-    const csVector3 bases[4] =
+    progDirectLighting.SetProgress (0);
+    if (globalConfig.GetLighterProperties ().doDirectLight)
     {
-      csVector3 (0, 0, 1),
-      csVector3 (/* -1/sqrt(6) */ -0.408248f, /* 1/sqrt(2) */ 0.707107f, /* 1/sqrt(3) */ 0.577350f),
-      csVector3 (/* sqrt(2/3) */ 0.816497f, 0, /* 1/sqrt(3) */ 0.577350f),
-      csVector3 (/* -1/sqrt(6) */ -0.408248f, /* -1/sqrt(2) */ -0.707107f, /* 1/sqrt(3) */ 0.577350f)
-    };
-
-    // What portion of main task does each sub-task complete
-    float sectorProgress = 
-      1.0f / (numPasses * scene->GetSectors ().GetSize());
-
-    // Loop through lighting calculation for directional dependencies
-    for (int p = 0; p < numPasses; p++)
-    {
-      // Construct a light calculator
-      LightCalculator lighting (bases[p], p);
-
-      // Add components to the light calculator
-      RaytracerLighting *raytracerComponent = NULL;
-      PhotonmapperLighting *photonmapperComponent = NULL;
-
-      if(enableRaytracer)
+      int numDLPasses = 
+        globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
+      const csVector3 bases[4] =
       {
-        raytracerComponent = new RaytracerLighting (bases[p], p);
-        lighting.addComponent(raytracerComponent, 1.0f, 0.0f);
-      }
-
-      if(enablePhotonMapper)
+        csVector3 (0, 0, 1),
+        csVector3 (/* -1/sqrt(6) */ -0.408248f, /* 1/sqrt(2) */ 0.707107f, /* 1/sqrt(3) */ 0.577350f),
+        csVector3 (/* sqrt(2/3) */ 0.816497f, 0, /* 1/sqrt(3) */ 0.577350f),
+        csVector3 (/* -1/sqrt(6) */ -0.408248f, /* -1/sqrt(2) */ -0.707107f, /* 1/sqrt(3) */ 0.577350f)
+      };
+      float sectorProgress = 
+        1.0f / (numDLPasses * scene->GetSectors ().GetSize());
+      for (int p = 0; p < numDLPasses; p++)
       {
-        photonmapperComponent = new PhotonmapperLighting();
-        lighting.addComponent(photonmapperComponent, 1.0f, 0.0f);
+        DirectLighting lighting (bases[p], p);
+
+        SectorHash::GlobalIterator sectIt = 
+          scene->GetSectors ().GetIterator ();
+        while (sectIt.HasNext ())
+        {
+          csRef<Sector> sect = sectIt.Next ();
+          Statistics::Progress* lightProg = 
+            progDirectLighting.CreateProgress (sectorProgress);
+          lighting.ShadeDirectLighting (sect, *lightProg);
+          delete lightProg;
+        }
       }
-
-      // Iterate overl all scene sectors
-      SectorHash::GlobalIterator sectIt = 
-        scene->GetSectors ().GetIterator ();
-      while (sectIt.HasNext ())
-      {
-        // Get the next sector
-        csRef<Sector> sect = sectIt.Next ();
-
-        // Create a sub-task progress
-        Statistics::Progress* lightProg = 
-          progCalcLighting.CreateProgress (sectorProgress);
-
-        // Compute the lighting
-        lighting.ComputeSectorStaticLighting (sect, *lightProg);
-
-        // Clean up
-        delete lightProg;
-      }
-
-      if(raytracerComponent != NULL) delete raytracerComponent;
-      if(photonmapperComponent != NULL) delete photonmapperComponent;
+      progDirectLighting.SetProgress (1);
     }
-
-    // Set task progress to 100%
-    progCalcLighting.SetProgress (1);
   }
 
   void Lighter::PostprocessLightmaps ()
@@ -772,151 +579,87 @@ namespace lighter
     configMgr->AddDomain (cmdLineConfig, iConfigManager::ConfigPriorityUserApp);
   }
 
-  void Lighter::CommandLineHelp (bool expert, bool raytraceopts, bool pmopts) const
+  void Lighter::CommandLineHelp (bool expert) const
   {
     csPrintf ("Syntax:\n");
     csPrintf ("  lighter2 [options] <file> [file] [file] ...\n\n");
-    csPrintf ("General Options:\n");
+    csPrintf ("Options:\n");
     
     csPrintf (" --[no]simpletui\n");
     csPrintf ("  Use simplified text ui for output. Recommended/needed\n"
-              "  for platforms without ANSI console handling such as msys.\n\n");
+              "  for platforms without ANSI console handling such as msys.\n");
 
     csPrintf (" --swapcachesize=<megabyte>\n");
     csPrintf ("  Set the size of the in memory swappable data cache in number "
-              "of megabytes\n");
-    csPrintf ("   Default: 200\n\n");
+      "of megabytes\n");
+    csPrintf ("   Default: 200\n");
 
-    csPrintf (" --directlight=<engine>\n");
-    csPrintf ("  Calculate direct lighting using specified engine.  Valid engines are:\n");
-    csPrintf ("    'none' - Disable direct lighting (useful for debugging)\n");
-    csPrintf ("    'raytracer' - DEFAULT, sharp shadows, no noise, faster\n");
-    csPrintf ("    'photonmapper' - Softer shadows, noisy, slower\n\n");
+    csPrintf (" --[no]directlight\n");
+    csPrintf ("  Calculate direct lighting using per lumel/vertex sampling\n");
+    csPrintf ("   Default: True\n");
 
-    csPrintf (" --indirectlight=<engine>\n");
-    csPrintf ("  Calculate indirect lighting using specified engine.  Valid engines are:\n");
-    csPrintf ("    'none' - DEFAULT, Disable indirect lighting (much faster)\n");
-    csPrintf ("    'photonmapper' - Slower but more realistic (captures color blead)\n\n");
+    csPrintf (" --[no]directlightrandom\n");
+    csPrintf ("  Use random sampling for direct lighting instead of sampling\n"
+              "  every light source.\n");
+    csPrintf ("   Default: False\n");
 
     csPrintf (" --lmdensity=<number>\n");
     csPrintf ("  Set scaling between world space units and lightmap pixels\n");
-    csPrintf ("   Default: %f\n\n", globalConfig.GetLMProperties ().lmDensity);
+    csPrintf ("   Default: %f\n", globalConfig.GetLMProperties ().lmDensity);
 
     csPrintf (" --maxlightmapu=<number>\n");
     csPrintf ("  Set maximum lightmap size in u-mapping direction\n");
-    csPrintf ("   Default: %d\n\n", globalConfig.GetLMProperties ().maxLightmapU);
+    csPrintf ("   Default: %d\n", globalConfig.GetLMProperties ().maxLightmapU);
 
     csPrintf (" --maxlightmapv=<number>\n");
     csPrintf ("  Set maximum lightmap size in v-mapping direction\n");
-    csPrintf ("   Default: %d\n\n", globalConfig.GetLMProperties ().maxLightmapV);
+    csPrintf ("   Default: %d\n", globalConfig.GetLMProperties ().maxLightmapV);
 
     csPrintf (" --blackthreshold=<threshold>\n");
     csPrintf ("  Set the normalized threshold for lightmap pixels to be "
                 "considered black.\n");
-    csPrintf ("   Default: %f\n\n", globalConfig.GetLMProperties ().blackThreshold);
-
-    csPrintf (" --lightpowerscale\n");
-    csPrintf ("  Scale the power of all light sources evenly by the indicated value.\n");
-    csPrintf ("  Note that this effects both raytracing and photonmapping (useful with 'forceRealistic').\n");
-    csPrintf ("   Default: 1.0\n\n");
+    csPrintf ("   Default: %f\n", globalConfig.GetLMProperties ().blackThreshold);
 
     csPrintf (" --normalstolerance=<angle>\n");
-    csPrintf ("  Set the angle between two normals to be considered equal by the\n");
+    csPrintf ("  Set the angle between two normals to be considered equal by "
+                "the\n");
     csPrintf ("  lightmap layouter.\n");
-    csPrintf ("   Default: 1\n\n");
+    csPrintf ("   Default: 1\n");
 
     csPrintf (" --maxterrainlightmapu=<number>\n");
     csPrintf ("  Set maximum terrain lightmap size in u-mapping direction\n");
-    csPrintf ("   Default: value for non-terrain lightmaps\n\n");
+    csPrintf ("   Default: value for non-terrain lightmaps\n");
 
     csPrintf (" --maxterrainlightmapv=<number>\n");
     csPrintf ("  Set maximum terrain lightmap size in v-mapping direction\n");
-    csPrintf ("   Default: value for non-terrain lightmaps\n\n");
+    csPrintf ("   Default: value for non-terrain lightmaps\n");
 
     csPrintf (" --bumplms\n");
     csPrintf ("  Generate directional lightmaps needed for normalmapping static\n");
     csPrintf ("  lit surfaces\n");
-    csPrintf ("   Default: False\n\n");
+    csPrintf ("   Default: False\n");
     
-    csPrintf (" --[no]specmaps\n");
-    csPrintf ("  Generate maps for specular lighting on static lit surfaces\n\n");
+    csPrintf (" --nospecmaps\n");
+    csPrintf ("  Don't generate maps for specular lighting on static lit surfaces\n");
     
-    csPrintf (" --raytraceoptions\n");
-    csPrintf ("  Display command line options specific to raytracing engine.\n\n");
-
-    csPrintf (" --pmoptions\n");
-    csPrintf ("  Display command line options specific to photon mapping engine.\n\n");
-
-    csPrintf (" --expertoptions\n");
-    csPrintf ("  Display advanced command line options\n\n");
-
-    if (raytraceopts)
-    {
-      csPrintf ("Raytracing Options:\n");
-      csPrintf (" --[no]randomlight\n");
-      csPrintf ("  Use random sampling for raytraced lights instead of sampling\n"
-                "  every light source.\n");
-      csPrintf ("   Default: False\n\n");
-
-      csPrintf (" --[no]globalambient\n");
-      csPrintf ("  Add a constant ambient value to the direct lighting component \n");
-      csPrintf ("  (ignored if indirect light is enabled)\n");
-      csPrintf ("   Default: true\n\n");
-
-      csPrintf (" --[no]forcerealistic\n");
-      csPrintf ("  Override light attenuation to be 'realistic' (important if combining with photonmapping).\n");
-      csPrintf ("   Default: false\n\n");
-    }
-
-    if (pmopts)
-    {
-      csPrintf ("Photon Mapping Options:\n");
-      csPrintf (" --numphotons=<number>\n");
-      csPrintf ("  Sets the number of photons to emit in each sector (you should change this).\n");
-      csPrintf ("   Default: %d\n\n", globalConfig.GetIndirectProperties ().numPhotons);
-
-      csPrintf (" --maxdensitysamples=<number>\n");
-      csPrintf ("  Sets the maximum number of photons to sample when estimating\n"
-                "  density using the photon map.\n");
-      csPrintf ("   Default: %d\n\n", globalConfig.GetIndirectProperties ().maxDensitySamples);
-      
-      csPrintf (" --maxrecursiondepth=<number>\n");
-      csPrintf ("  Sets the maximum number of times a photon can scatter during\n"
-                "  indirect illumination (set to -1 to use a purely random cutoff).\n");
-      csPrintf ("   Default: %d\n\n", globalConfig.GetIndirectProperties ().maxRecursionDepth);
-
-      csPrintf (" --sampledistance=<threshold>\n");
-      csPrintf ("  Sets the max distance to search for photons when estimating density\n");
-      csPrintf ("   Default: %f\n\n", globalConfig.GetIndirectProperties ().sampleDistance);
-
-      csPrintf (" --[no]finalgather\n");
-      csPrintf ("  Enable final gather to smooth noise in photon map.\n");
-      csPrintf ("   Default: %s\n\n", (globalConfig.GetIndirectProperties ().finalGather?"True":"False"));
-
-      csPrintf (" --numfgrays=<number>\n");
-      csPrintf ("  Sets the number of Final Gather rays to average from\n");
-      csPrintf ("   Default: %d\n\n", globalConfig.GetIndirectProperties ().numFinalGatherRays);
-
-      csPrintf (" --[no]savephotonmap\n");
-      csPrintf ("  Save the contents of the photon maps as in a binary file\n"
-                "  for external use. Default: False\n\n");
-    }
+    csPrintf (" --expert\n");
+    csPrintf ("  Display advanced command line options\n");
 
     if (expert)
     {
-      csPrintf ("Advanced Options:\n");
       /*
       csPrintf (" --numthreads=<N>\n");
       csPrintf ("  Number of threads to use\n");
       csPrintf ("   Default: number of processors in the system\n");
       */
-      csPrintf (" --debugocclusionrays=<regexp>\n");
-      csPrintf ("  Write a visualization of rays and their occlusions to\n"
-                "  meshes matching <regexp>\n\n");
-
+      csPrintf (" --debugOcclusionRays=<regexp>\n");
+      csPrintf ("  Write a visualization of rays and their occlusions to "
+                  "meshes matching <regexp>\n");
       csPrintf (" --[no]binary\n");
-      csPrintf ("  Whether to save buffers in binary format. Default: True\n\n");
+      csPrintf ("  Whether to save buffers in binary format. Default: True\n");
     }
+
+    csPrintf ("\n");
   }
 
 }
