@@ -98,11 +98,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 						   csOrthoTransform& transform);
     virtual void RemoveEffector (CS::Animation::EffectorID effector);
 
-    //-- CS::Animation::iSkeletonIKPhysicalNodeFactory
     virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node);
     virtual CS::Animation::iSkeletonAnimNodeFactory* GetChildNode () const;
     virtual void ClearChildNode ();
 
+    //-- CS::Animation::iSkeletonIKPhysicalNodeFactory
     virtual void SetChainAutoReset (bool reset);
     virtual bool GetChainAutoReset () const;
 

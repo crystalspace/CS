@@ -312,7 +312,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     // Remove and delete the pivot joint
     ConstraintData* constraint = constraints[effectorID];
     bulletDynamicSystem->RemovePivotJoint (constraint->dragJoint);
-    constraint->dragJoint = 0;
     constraints.DeleteAll (effectorID);
 
     // Find the effector & chain data
@@ -375,6 +374,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
       childNode->Stop ();
 
     // Remove all constraints
+    // TODO: really?
     for (csHash<ConstraintData, CS::Animation::EffectorID>::GlobalIterator it =
 	   constraints.GetIterator (); it.HasNext (); )
     {
