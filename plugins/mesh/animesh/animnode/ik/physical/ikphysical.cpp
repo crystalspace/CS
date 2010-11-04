@@ -79,7 +79,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
     if (rep)
       rep->ReportV (severity,
-		    "crystalspace.mesh.animesh.controllers.IKPhysical",
+		    "crystalspace.mesh.animesh.animnode.IKPhysical",
 		    msg, arg);
     else
       {

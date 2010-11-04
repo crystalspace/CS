@@ -73,7 +73,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
     csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
     if (rep)
       rep->ReportV (severity,
-		    "crystalspace.mesh.animesh.controllers.basic",
+		    "crystalspace.mesh.animesh.animnode.speed",
 		    msg, arg);
     else
       {

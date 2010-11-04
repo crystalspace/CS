@@ -81,7 +81,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
     if (rep)
       rep->ReportV (severity,
-		    "crystalspace.mesh.animesh.controllers.IKCCD",
+		    "crystalspace.mesh.animesh.animnode.IKCCD",
 		    msg, arg);
     else
       {

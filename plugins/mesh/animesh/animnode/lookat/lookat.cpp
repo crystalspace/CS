@@ -93,7 +93,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
     if (rep)
       rep->ReportV (severity,
-		    "crystalspace.mesh.animesh.controllers.lookat",
+		    "crystalspace.mesh.animesh.animnode.lookat",
 		    msg, arg);
     else
       {
