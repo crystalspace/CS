@@ -173,7 +173,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     if (!materialWrapper)
     {
-      csPrintf ("INTERNAL ERROR: mesh used without material!\n");
+      csPrintfErr ("INTERNAL ERROR: mesh used without material!\n");
       num = 0;
       return 0;
     }
@@ -193,10 +193,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     meshPtr->indexend = indexend;
     meshPtr->material = materialWrapper;
 
-    meshPtr->mixmode = GetMixmode();
+    meshPtr->mixmode = CS_FX_ALPHA;
 
     meshPtr->buffers = bufferholder;
-    meshPtr->renderPrio = GetPriority();
+    meshPtr->renderPrio = engine->GetRenderPriority ("alpha");
     meshPtr->z_buf_mode = GetZBufMode();
 
     meshPtr->object2world = o2wt;
@@ -286,7 +286,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     GenerateGuideFursLOD();
     GenerateFurStrands();
 
-    SaveUVImage();
+//     SaveUVImage();
 
     this->view = view;
     size_t numberOfStrains = furStrands.GetSize();
@@ -815,8 +815,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     endVertex = offsetVertex + 2 * controlPointsCount;
 
-    csPrintf("Fur Strands Displayed: %u\n", furStrandsLODSize);
-    csPrintf("Vertices Displayed: %u\n", endVertex - offsetVertex);
+//     csPrintf("Fur Strands Displayed: %u\n", furStrandsLODSize);
+//     csPrintf("Vertices Displayed: %u\n", endVertex - offsetVertex);
   }
 
   void FurMesh::SetControlPointsLOD(float controlPointsLOD)
@@ -901,7 +901,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
 
     StartAnimationControl();
 
-    csPrintf("Vertices Displayed: %u\n", endVertex - offsetVertex);
+//     csPrintf("Vertices Displayed: %u\n", endVertex - offsetVertex);
   }
 
   void FurMesh::SetLOD(float lod)
@@ -916,8 +916,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
       if (guideFursLOD.Get(i).isActive)
         count++;
 
-    csPrintf("Guide Strands: %u/%u\n", count, guideFurs.GetSize() + 
-      guideFursLOD.GetSize());
+//     csPrintf("Guide Strands: %u/%u\n", count, guideFurs.GetSize() + 
+//       guideFursLOD.GetSize());
   }
 
   void FurMesh::SynchronizeGuideHairs ()

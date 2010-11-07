@@ -402,7 +402,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // send buffer to texture
     M.Write();
 
-    M.SaveImage(object_reg, "/data/hairtest/debug/M_debug.png");
+//     M.SaveImage(object_reg, "/data/hairtest/debug/M_debug.png");
   }
 
   float HairMeshProperties::ComputeM(float a, float b, int channel)
@@ -483,7 +483,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // send buffer to texture
     N.Write();
 
-    N.SaveImage(object_reg, "/data/hairtest/debug/N_debug.png");
+//     N.SaveImage(object_reg, "/data/hairtest/debug/N_debug.png");
   }
 
   float HairMeshProperties::ComputeT(float absorption, float gammaT, int p) const

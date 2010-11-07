@@ -48,9 +48,6 @@ KrystalScene::~KrystalScene ()
     hairTest->engine->RemoveObject (animeshObject->GetMeshWrapper ());
   }
 
-  if (skirtMesh)
-    hairTest->engine->RemoveObject (skirtMesh);
-
   if (furMesh)
   {
     // Remove the fur mesh from the scene
@@ -213,21 +210,6 @@ bool KrystalScene::CreateAvatar ()
   if (!bodySkeleton)
     return hairTest->ReportError ("Can't find Krystal's body mesh description!");
 
-  // Load Krystal's hairs
-  rc = hairTest->loader->Load ("/lib/krystal/krystal_hairs.xml");
-  if (!rc.success)
-    return hairTest->ReportError ("Can't load Krystal's hairs library file!");
-
-  // Load Krystal's skirt
-  rc = hairTest->loader->Load ("/lib/krystal/krystal_skirt.xml");
-  if (!rc.success)
-    return hairTest->ReportError ("Can't load Krystal's skirt library file!");
-
-  csRef<iMeshFactoryWrapper> skirtMeshFact =
-    hairTest->engine->FindMeshFactory ("krystal_skirt");
-  if (!skirtMeshFact)
-    return hairTest->ReportError ("Can't find Krystal's skirt mesh factory!");
-
   // Get plugin manager
   csRef<iPluginManager> plugmgr = 
     csQueryRegistry<iPluginManager> (hairTest->object_reg);
@@ -339,9 +321,6 @@ bool KrystalScene::CreateAvatar ()
     bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"));
     ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
 
-    // Create the mesh of the skirt
-    skirtMesh = hairTest->engine->CreateMeshWrapper
-      (skirtMeshFact, "krystal_skirt", hairTest->room, csVector3 (0.0f));
   }
 
   else

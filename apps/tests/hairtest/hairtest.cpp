@@ -146,88 +146,10 @@ bool HairTest::OnResetButtonClicked (const CEGUI::EventArgs&)
   return true;
 }
 
-// Surface properties
-bool HairTest::OnEventThumbTrackEndedShiftR (const CEGUI::EventArgs&)
-{
-  CS::ShaderVarName aR (svStrings, "aR");	
-  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()
-    ->GetVariableAdd(aR)->SetValue(-5 * ( 1 + sliderShiftR->getScrollPosition()));
-  avatarScene->furMesh->GetFurMeshProperties()->Invalidate();
-
-  return true;
-}
-
-bool HairTest::OnEventThumbTrackEndedWidthR (const CEGUI::EventArgs&)
-{
-  CS::ShaderVarName bR (svStrings, "bR");	
-  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()
-    ->GetVariableAdd(bR)->SetValue(5 * ( 1 + sliderWidthR->getScrollPosition()));
-  avatarScene->furMesh->GetFurMeshProperties()->Invalidate();
-
-  return true;
-}
-
-// Fiber properties
-bool HairTest::OnEventThumbTrackEndedAbsorption (const CEGUI::EventArgs&)
-{
-  CS::ShaderVarName absorption (svStrings, "absorption");	
-  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
-    GetVariableAdd(absorption)->
-    SetValue(0.2f + 10 * sliderAbsorption->getScrollPosition() );
-  avatarScene->furMesh->GetFurMeshProperties()->Invalidate();
-
-  return true;
-}
-
-bool HairTest::OnEventThumbTrackEndedEccentricity (const CEGUI::EventArgs&)
-{
-  CS::ShaderVarName eccentricity (svStrings, "eccentricity");	
-  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
-    GetVariableAdd(eccentricity)->
-    SetValue(0.85f + 0.15f * sliderEccentricity->getScrollPosition() );
-  avatarScene->furMesh->GetFurMeshProperties()->Invalidate();
-
-  return true;
-}
-
-// Glints
-bool HairTest::OnEventThumbTrackEndedGlintScale (const CEGUI::EventArgs&)
-{
-  CS::ShaderVarName kG (svStrings, "kG");	
-  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
-    GetVariableAdd(kG)->
-    SetValue(0.5f + 4.5f * sliderGlintScale->getScrollPosition() );
-  avatarScene->furMesh->GetFurMeshProperties()->Invalidate();
-
-  return true;
-}
-
-bool HairTest::OnEventThumbTrackEndedCausticWidth (const CEGUI::EventArgs&)
-{
-  CS::ShaderVarName wc (svStrings, "wc");	
-  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
-    GetVariableAdd(wc)->
-    SetValue(10 + 15 * sliderCausticWidth->getScrollPosition() );
-  avatarScene->furMesh->GetFurMeshProperties()->Invalidate();
-
-  return true;
-}
-
-bool HairTest::OnEventThumbTrackEndedCausticMerge (const CEGUI::EventArgs&)
-{
-  CS::ShaderVarName Dh0 (svStrings, "Dh0");	
-  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
-    GetVariableAdd(Dh0)->
-    SetValue(0.2f + 0.2f * sliderCausticMerge->getScrollPosition() );
-  avatarScene->furMesh->GetFurMeshProperties()->Invalidate();
-
-  return true;
-}
-
 // RGB hair color
 bool HairTest::OnEventThumbTrackEndedR (const CEGUI::EventArgs&)
 {
-  CS::ShaderVarName objColor (svStrings, "hair color");	
+  CS::ShaderVarName objColor (svStrings, "fur color");	
   
   csVector3 color; 
   avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
@@ -242,7 +164,7 @@ bool HairTest::OnEventThumbTrackEndedR (const CEGUI::EventArgs&)
 
 bool HairTest::OnEventThumbTrackEndedG (const CEGUI::EventArgs&)
 {
-  CS::ShaderVarName objColor (svStrings, "hair color");	
+  CS::ShaderVarName objColor (svStrings, "fur color");	
 
   csVector3 color; 
   avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
@@ -257,7 +179,7 @@ bool HairTest::OnEventThumbTrackEndedG (const CEGUI::EventArgs&)
 
 bool HairTest::OnEventThumbTrackEndedB (const CEGUI::EventArgs&)
 {
-  CS::ShaderVarName objColor (svStrings, "hair color");	
+  CS::ShaderVarName objColor (svStrings, "fur color");	
 
   csVector3 color; 
   avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
@@ -752,11 +674,11 @@ bool HairTest::Application ()
     subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&HairTest::OnResetButtonClicked, this));
 
-  winMgr->getWindow("HairTest/MainWindow/Tab/Page3/Physics")-> 
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page2/Physics")-> 
     subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&HairTest::OnPhysicsButtonClicked, this));
 
-  winMgr->getWindow("HairTest/MainWindow/Tab/Page3/Enable")-> 
+  winMgr->getWindow("HairTest/MainWindow/Tab/Page2/Enable")-> 
     subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&HairTest::OnEnableButtonClicked, this));
 
@@ -831,53 +753,6 @@ bool HairTest::Application ()
   if (avatarScene->furMesh && avatarScene->furMesh->GetFurMeshProperties() && 
       avatarScene->furMesh->GetFurMeshProperties()->GetMaterial())
   {
-    // Initialize GUI for Marschner
-
-    // Surface properties
-    sliderShiftR = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page2/Slider1");
-
-    sliderShiftR->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
-      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedShiftR, this));
-
-    sliderWidthR = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page2/Slider2");
-
-    sliderWidthR->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
-      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedWidthR, this));
-
-    // Fiber properties
-    sliderAbsorption = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page2/Slider3");
-
-    sliderAbsorption->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
-      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedAbsorption, this));
-
-    sliderEccentricity = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page2/Slider4");
-
-    sliderEccentricity->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
-      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedEccentricity, this));  
-
-    // Glints
-    sliderGlintScale = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page2/Slider5");
-
-    sliderGlintScale->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
-      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedGlintScale, this));  
-
-    sliderCausticWidth = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page2/Slider6");
-
-    sliderCausticWidth->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
-      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedCausticWidth, this));  
-
-    sliderCausticMerge = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page2/Slider7");
-
-    sliderCausticMerge->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
-      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedCausticMerge, this));  
-
     // RGB hair color
     sliderR = (CEGUI::Scrollbar*)winMgr->
       getWindow("HairTest/MainWindow/Tab/Page1/Slider1");
@@ -905,13 +780,13 @@ bool HairTest::Application ()
   }
 
   sliderGuideLOD = (CEGUI::Scrollbar*)winMgr->
-    getWindow("HairTest/MainWindow/Tab/Page3/Slider1");
+    getWindow("HairTest/MainWindow/Tab/Page2/Slider1");
 
   sliderGuideLOD->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
     CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedGuideLOD, this));  
 
   sliderStrandLOD = (CEGUI::Scrollbar*)winMgr->
-    getWindow("HairTest/MainWindow/Tab/Page3/Slider2");
+    getWindow("HairTest/MainWindow/Tab/Page2/Slider2");
 
   sliderStrandLOD->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
     CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedStrandLOD, this));  
@@ -919,13 +794,13 @@ bool HairTest::Application ()
   sliderStrandLOD->setScrollPosition(1.0f);
 
   sliderControlPointsLOD = (CEGUI::Scrollbar*)winMgr->
-    getWindow("HairTest/MainWindow/Tab/Page3/Slider3");
+    getWindow("HairTest/MainWindow/Tab/Page2/Slider3");
 
   sliderControlPointsLOD->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
     CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedControlPointsLOD, this)); 
 
   sliderOverallLOD = (CEGUI::Scrollbar*)winMgr->
-    getWindow("HairTest/MainWindow/Tab/Page3/Slider4");
+    getWindow("HairTest/MainWindow/Tab/Page2/Slider4");
 
   sliderOverallLOD->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
     CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedOverallLOD, this)); 
