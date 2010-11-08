@@ -290,6 +290,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return autostart;
   }
 
+  csString SkeletonFactory::Description () const
+  {
+    csString s;
+    BoneDescription (CS::Animation::InvalidBoneID, s, 0);
+    return s;
+  }
+
+  void SkeletonFactory::BoneDescription (CS::Animation::BoneID boneID,
+					 csString& txt, size_t level) const
+  {
+    int count = 0;
+    for (csArray<Bone>::ConstIterator it = allBones.GetIterator (); it.HasNext (); count++)
+    {
+      const Bone& bone = it.Next ();
+
+      if (bone.parent == boneID)
+      {
+	for (size_t i = 0; i < level; i++)
+	  txt += " ";
+	txt += "+ bone ";
+	txt += count;
+	txt += ": ";
+	txt += boneNames[count];
+	txt += "\n";
+
+	BoneDescription (count, txt, level + 1);
+      }
+    }
+  }
+
   void SkeletonFactory::UpdateCachedTransforms ()
   {
     if (!cachedTransformsDirty)

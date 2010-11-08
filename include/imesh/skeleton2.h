@@ -34,20 +34,16 @@ class csDualQuaternion;
 
 struct iSceneNode;
 
-namespace CS
-{
-namespace Mesh
-{
+namespace CS {
+namespace Mesh {
 
 struct iAnimatedMesh;
 
 } // namespace Mesh
 } // namespace CS
 
-namespace CS
-{
-namespace Animation
-{
+namespace CS {
+namespace Animation {
 
 struct iSkeletonFactory;
 struct iSkeleton;
@@ -127,7 +123,7 @@ struct iSkeletonManager : public virtual iBase
  */
 struct iSkeletonFactory : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonFactory, 1, 0, 1);
+  SCF_INTERFACE(CS::Animation::iSkeletonFactory, 1, 0, 2);
 
   /**\name Bone handling
    * @{ */
@@ -247,6 +243,11 @@ struct iSkeletonFactory : public virtual iBase
    * after its initialization.
    */
   virtual bool GetAutoStart () = 0;
+
+  /**
+   * Return a textual representation of the bone tree of this skeleton factory
+   */
+  virtual csString Description () const = 0;
 };
 
 /**

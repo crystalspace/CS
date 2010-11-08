@@ -100,6 +100,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void SetAutoStart (bool autostart);
     virtual bool GetAutoStart ();
 
+    virtual csString Description () const;
+
     //-- "Private"
     inline const csArray<size_t>& GetOrderList () const
     {
@@ -109,7 +111,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     void UpdateCachedTransforms ();
     void UpdateOrderList ();
 
-  private:    
+  private:
+
+    void BoneDescription (CS::Animation::BoneID bone, csString& txt, size_t level) const;
 
     struct Bone
     {      
