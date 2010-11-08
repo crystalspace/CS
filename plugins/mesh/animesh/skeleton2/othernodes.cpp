@@ -449,7 +449,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
 
 
-    const bool nodeSwitched = newNode != currentNode;
+    const bool nodeSwitched = (newNode != currentNode
+			       || factory->probabilityList.GetSize () == 1);
     if (nodeSwitched && active)
     {
       subNodes[currentNode]->Stop ();
