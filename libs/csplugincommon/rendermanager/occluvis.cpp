@@ -128,7 +128,7 @@ namespace CS
           const int numMeshes = f2bData.viscallback->GetVisibleMeshes (visobj->GetMeshWrapper (), frustum_mask, sectorMeshList);
 
           bool hasMeshes = false;
-          for (size_t i = 0; i < numMeshes; ++i)
+          for (int i = 0; i < numMeshes; ++i)
           {
             hasMeshes |= (sectorMeshList->num > 0);
           }
@@ -427,7 +427,7 @@ namespace CS
 
       // Set up g3d for rendering a z-only pass.
       g3d->ResetNearPlane ();
-      g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN);
+      g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER);
       g3d->SetClipper (rview->GetClipper(), CS_CLIPPER_TOPLEVEL);
       g3d->SetProjectionMatrix (rview->GetCamera()->GetProjectionMatrix ());
       g3d->SetWorldToCamera (rview->GetCamera()->GetTransform ().GetInverse ());
