@@ -406,7 +406,7 @@ typedef struct _csKeyModifiers
  * Both a modifier and a keypad key.
  */
 #define CSKEY_PADNUM \
-  CSKEY_MODIFIER(csKeyModifierTypeNumLock,csKeyModifierNumAny) | CSKEY_PAD_FLAG
+  (CSKEY_MODIFIER(csKeyModifierTypeNumLock,csKeyModifierNumAny) | CSKEY_PAD_FLAG)
 /// CapsLock key
 #define CSKEY_CAPSLOCK \
   CSKEY_MODIFIER(csKeyModifierTypeCapsLock,csKeyModifierNumAny)
