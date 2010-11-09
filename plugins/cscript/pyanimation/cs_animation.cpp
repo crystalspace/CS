@@ -4240,6 +4240,31 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonFactory_Description(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonFactory *arg1 = (CS::Animation::iSkeletonFactory *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csString result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_Description",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_Description" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
+  result = ((CS::Animation::iSkeletonFactory const *)arg1)->Description();
+  {
+    const char *res = (&result)->GetData();
+    resultobj = PyString_FromString(res);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSkeletonFactory_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -15051,6 +15076,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonFactory_SetAnimationPacket", _wrap_iSkeletonFactory_SetAnimationPacket, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory_SetAutoStart", _wrap_iSkeletonFactory_SetAutoStart, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory_GetAutoStart", _wrap_iSkeletonFactory_GetAutoStart, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonFactory_Description", _wrap_iSkeletonFactory_Description, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory_scfGetVersion", _wrap_iSkeletonFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonFactory", _wrap_delete_iSkeletonFactory, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory_swigregister", iSkeletonFactory_swigregister, METH_VARARGS, NULL},

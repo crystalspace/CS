@@ -106,6 +106,7 @@ class iSkeletonFactory(core.iBase):
     def SetAnimationPacket(*args): return _animation.iSkeletonFactory_SetAnimationPacket(*args)
     def SetAutoStart(*args): return _animation.iSkeletonFactory_SetAutoStart(*args)
     def GetAutoStart(*args): return _animation.iSkeletonFactory_GetAutoStart(*args)
+    def Description(*args): return _animation.iSkeletonFactory_Description(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonFactory_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonFactory
     __del__ = lambda self : None;
