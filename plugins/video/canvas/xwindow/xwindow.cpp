@@ -741,90 +741,89 @@ bool csXWindow::HandleEvent (iEvent &Event)
     
         switch (xKey)
         {
-	        MAP_KEY (XK_Meta_L, CSKEY_ALT_LEFT, CSKEY_ALT);
-	        MAP_KEY (XK_Meta_R, CSKEY_ALT_RIGHT, CSKEY_ALT);
-	  
-	        MAP_KEY (XK_Alt_L, CSKEY_ALT_LEFT, CSKEY_ALT);
-	        MAP_KEY (XK_Alt_R, CSKEY_ALT_RIGHT, CSKEY_ALT);
-	  
-	        MAP_KEY (XK_Control_L, CSKEY_CTRL_LEFT, CSKEY_CTRL);
-	        MAP_KEY (XK_Control_R, CSKEY_CTRL_RIGHT, CSKEY_CTRL);
-	  
-	        MAP_KEY (XK_Shift_L, CSKEY_SHIFT_LEFT, CSKEY_SHIFT);
-	        MAP_KEY (XK_Shift_R, CSKEY_SHIFT_RIGHT, CSKEY_SHIFT);
-	  
-	        MAP_KEY (XK_KP_Up, CSKEY_PAD8, CSKEY_UP);
-	        MAP_KEY (XK_KP_8, CSKEY_PAD8, 0);
-	        MAP_KEY (XK_Up, CSKEY_UP, CSKEY_UP);
-	  
-	        MAP_KEY (XK_KP_Down, CSKEY_PAD2, CSKEY_DOWN);
-	        MAP_KEY (XK_KP_2, CSKEY_PAD2, 0);
-	        MAP_KEY (XK_Down, CSKEY_DOWN, CSKEY_DOWN);
-	  
-	        MAP_KEY (XK_KP_Left, CSKEY_PAD4, CSKEY_LEFT);
-	        MAP_KEY (XK_KP_4, CSKEY_PAD4, 0);
-	        MAP_KEY (XK_Left, CSKEY_LEFT, CSKEY_LEFT);
-	  
-	        MAP_KEY (XK_KP_Right, CSKEY_PAD6, CSKEY_RIGHT);
-	        MAP_KEY (XK_KP_6, CSKEY_PAD6, 0);
-	        MAP_KEY (XK_Right, CSKEY_RIGHT, CSKEY_RIGHT);
-	  
-	        MAP_KEY (XK_BackSpace, CSKEY_BACKSPACE, CSKEY_BACKSPACE);
-	  
-	        MAP_KEY (XK_KP_Insert, CSKEY_PAD0, CSKEY_INS);
-	        MAP_KEY (XK_KP_0, CSKEY_PAD0, 0);
-	        MAP_KEY (XK_Insert, CSKEY_INS, CSKEY_INS);
-	  
-	        MAP_KEY (XK_KP_Delete, CSKEY_PADDECIMAL, CSKEY_DEL);
-	        MAP_KEY (XK_KP_Decimal, CSKEY_PADDECIMAL, 0); 
-	        MAP_KEY (XK_Delete, CSKEY_DEL, CSKEY_DEL);
-	  
-	        MAP_KEY (XK_KP_Page_Up, CSKEY_PAD9, CSKEY_PGUP);
-	        MAP_KEY (XK_KP_9, CSKEY_PAD9, 0);
-	        MAP_KEY (XK_Page_Up, CSKEY_PGUP, CSKEY_PGUP);
-	  
-	        MAP_KEY (XK_KP_Page_Down, CSKEY_PAD3, CSKEY_PGDN);
-	        MAP_KEY (XK_KP_3, CSKEY_PAD3, 0);
-	        MAP_KEY (XK_Page_Down, CSKEY_PGDN, CSKEY_PGDN);
-	  
-	        MAP_KEY (XK_KP_Home, CSKEY_PAD7, CSKEY_HOME);
-	        MAP_KEY (XK_KP_7, CSKEY_PAD7, 0);
-	        MAP_KEY (XK_Home, CSKEY_HOME, CSKEY_HOME);
-	  
-	        MAP_KEY (XK_KP_End, CSKEY_PAD1, CSKEY_END);
-	        MAP_KEY (XK_KP_1, CSKEY_PAD1, 0);
-	        MAP_KEY (XK_End, CSKEY_END, CSKEY_END);
+          MAP_KEY (XK_Meta_L, CSKEY_ALT_LEFT, CSKEY_ALT);
+          MAP_KEY (XK_Meta_R, CSKEY_ALT_RIGHT, CSKEY_ALT);
+      
+          MAP_KEY (XK_Alt_L, CSKEY_ALT_LEFT, CSKEY_ALT);
+          MAP_KEY (XK_Alt_R, CSKEY_ALT_RIGHT, CSKEY_ALT);
+      
+          MAP_KEY (XK_Control_L, CSKEY_CTRL_LEFT, CSKEY_CTRL);
+          MAP_KEY (XK_Control_R, CSKEY_CTRL_RIGHT, CSKEY_CTRL);
+      
+          MAP_KEY (XK_Shift_L, CSKEY_SHIFT_LEFT, CSKEY_SHIFT);
+          MAP_KEY (XK_Shift_R, CSKEY_SHIFT_RIGHT, CSKEY_SHIFT);
+      
+          MAP_KEY (XK_KP_Up, CSKEY_PAD8, CSKEY_UP);
+          MAP_KEY (XK_KP_8, CSKEY_PAD8, 0);
+          MAP_KEY (XK_Up, CSKEY_UP, CSKEY_UP);
+      
+          MAP_KEY (XK_KP_Down, CSKEY_PAD2, CSKEY_DOWN);
+          MAP_KEY (XK_KP_2, CSKEY_PAD2, 0);
+          MAP_KEY (XK_Down, CSKEY_DOWN, CSKEY_DOWN);
+      
+          MAP_KEY (XK_KP_Left, CSKEY_PAD4, CSKEY_LEFT);
+          MAP_KEY (XK_KP_4, CSKEY_PAD4, 0);
+          MAP_KEY (XK_Left, CSKEY_LEFT, CSKEY_LEFT);
+      
+          MAP_KEY (XK_KP_Right, CSKEY_PAD6, CSKEY_RIGHT);
+          MAP_KEY (XK_KP_6, CSKEY_PAD6, 0);
+          MAP_KEY (XK_Right, CSKEY_RIGHT, CSKEY_RIGHT);
+      
+          MAP_KEY (XK_BackSpace, CSKEY_BACKSPACE, CSKEY_BACKSPACE);
+      
+          MAP_KEY (XK_KP_Insert, CSKEY_PAD0, CSKEY_INS);
+          MAP_KEY (XK_KP_0, CSKEY_PAD0, 0);
+          MAP_KEY (XK_Insert, CSKEY_INS, CSKEY_INS);
+    
+          MAP_KEY (XK_KP_Delete, CSKEY_PADDECIMAL, CSKEY_DEL);
+          MAP_KEY (XK_KP_Decimal, CSKEY_PADDECIMAL, 0); 
+          MAP_KEY (XK_Delete, CSKEY_DEL, CSKEY_DEL);
+      
+          MAP_KEY (XK_KP_Page_Up, CSKEY_PAD9, CSKEY_PGUP);
+          MAP_KEY (XK_KP_9, CSKEY_PAD9, 0);
+          MAP_KEY (XK_Page_Up, CSKEY_PGUP, CSKEY_PGUP);
+      
+          MAP_KEY (XK_KP_Page_Down, CSKEY_PAD3, CSKEY_PGDN);
+          MAP_KEY (XK_KP_3, CSKEY_PAD3, 0);
+          MAP_KEY (XK_Page_Down, CSKEY_PGDN, CSKEY_PGDN);
+      
+          MAP_KEY (XK_KP_Home, CSKEY_PAD7, CSKEY_HOME);
+          MAP_KEY (XK_KP_7, CSKEY_PAD7, 0);
+          MAP_KEY (XK_Home, CSKEY_HOME, CSKEY_HOME);
+    
+          MAP_KEY (XK_KP_End, CSKEY_PAD1, CSKEY_END);
+          MAP_KEY (XK_KP_1, CSKEY_PAD1, 0);
+          MAP_KEY (XK_End, CSKEY_END, CSKEY_END);
 
-	        MAP_KEY (XK_Escape, CSKEY_ESC, CSKEY_ESC);
+          MAP_KEY (XK_Escape, CSKEY_ESC, CSKEY_ESC);
 #ifdef XK_ISO_Left_Tab
-	        MAP_KEY (XK_ISO_Left_Tab, CSKEY_TAB, CSKEY_TAB);
+          MAP_KEY (XK_ISO_Left_Tab, CSKEY_TAB, CSKEY_TAB);
 #endif
-	        MAP_KEY (XK_KP_Tab, CSKEY_TAB, CSKEY_TAB);
-	        MAP_KEY (XK_Tab, CSKEY_TAB, CSKEY_TAB);
-	  
-	        MAP_KEY (XK_F1, CSKEY_F1, CSKEY_F1);
-	        MAP_KEY (XK_F2, CSKEY_F2, CSKEY_F2);
-	        MAP_KEY (XK_F3, CSKEY_F3, CSKEY_F3);
-	        MAP_KEY (XK_F4, CSKEY_F4, CSKEY_F4);
-	        MAP_KEY (XK_F5, CSKEY_F5, CSKEY_F5);
-	        MAP_KEY (XK_F6, CSKEY_F6, CSKEY_F6);
-	        MAP_KEY (XK_F7, CSKEY_F7, CSKEY_F7);
-	        MAP_KEY (XK_F8, CSKEY_F8, CSKEY_F8);
-	        MAP_KEY (XK_F9, CSKEY_F9, CSKEY_F9);
-	        MAP_KEY (XK_F10, CSKEY_F10, CSKEY_F10);
-	        MAP_KEY (XK_F11, CSKEY_F11, CSKEY_F11);
-	        MAP_KEY (XK_F12, CSKEY_F12, CSKEY_F12);
+          MAP_KEY (XK_KP_Tab, CSKEY_TAB, CSKEY_TAB);
+          MAP_KEY (XK_Tab, CSKEY_TAB, CSKEY_TAB);
+      
+          MAP_KEY (XK_F1, CSKEY_F1, CSKEY_F1);
+          MAP_KEY (XK_F2, CSKEY_F2, CSKEY_F2);
+          MAP_KEY (XK_F3, CSKEY_F3, CSKEY_F3);
+          MAP_KEY (XK_F4, CSKEY_F4, CSKEY_F4);
+          MAP_KEY (XK_F5, CSKEY_F5, CSKEY_F5);
+          MAP_KEY (XK_F6, CSKEY_F6, CSKEY_F6);
+          MAP_KEY (XK_F7, CSKEY_F7, CSKEY_F7);
+          MAP_KEY (XK_F8, CSKEY_F8, CSKEY_F8);
+          MAP_KEY (XK_F9, CSKEY_F9, CSKEY_F9);
+          MAP_KEY (XK_F10, CSKEY_F10, CSKEY_F10);
+          MAP_KEY (XK_F11, CSKEY_F11, CSKEY_F11);
+          MAP_KEY (XK_F12, CSKEY_F12, CSKEY_F12);
 
-            //lock keys
-            MAP_KEY (XK_Caps_Lock, CSKEY_CAPSLOCK, CSKEY_CAPSLOCK);
-            //this is a particular capslock not present in querty keyboards which
-            //acts like if you were keeping pressed shift actually (so it modifies
-            //also numbers keys and punctuation and doesn't only do uppercase).
-            //As it's not handled in cs it's mapped to the normal capslock
-            MAP_KEY (XK_Shift_Lock, CSKEY_CAPSLOCK, CSKEY_CAPSLOCK);
-            MAP_KEY (XK_Num_Lock, CSKEY_PADNUM, CSKEY_PADNUM);
-            MAP_KEY (XK_Scroll_Lock, CSKEY_SCROLLLOCK, CSKEY_SCROLLLOCK);
-
+          //lock keys
+          MAP_KEY (XK_Caps_Lock, CSKEY_CAPSLOCK, CSKEY_CAPSLOCK);
+          //this is a particular capslock not present in querty keyboards which
+          //acts like if you were keeping pressed shift actually (so it modifies
+          //also numbers keys and punctuation and doesn't only do uppercase).
+          //As it's not handled in cs it's mapped to the normal capslock
+          MAP_KEY (XK_Shift_Lock, CSKEY_CAPSLOCK, CSKEY_CAPSLOCK);
+          MAP_KEY (XK_Num_Lock, CSKEY_PADNUM, CSKEY_PADNUM);
+          MAP_KEY (XK_Scroll_Lock, CSKEY_SCROLLLOCK, CSKEY_SCROLLLOCK);
 	  
       case XK_KP_Add:
 	    {
