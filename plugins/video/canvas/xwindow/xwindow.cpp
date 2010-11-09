@@ -814,6 +814,17 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	        MAP_KEY (XK_F10, CSKEY_F10, CSKEY_F10);
 	        MAP_KEY (XK_F11, CSKEY_F11, CSKEY_F11);
 	        MAP_KEY (XK_F12, CSKEY_F12, CSKEY_F12);
+
+            //lock keys
+            MAP_KEY (XK_Caps_Lock, CSKEY_CAPSLOCK, CSKEY_CAPSLOCK);
+            //this is a particular capslock not present in querty keyboards which
+            //acts like if you were keeping pressed shift actually (so it modifies
+            //also numbers keys and punctuation and doesn't only do uppercase).
+            //As it's not handled in cs it's mapped to the normal capslock
+            MAP_KEY (XK_Shift_Lock, CSKEY_CAPSLOCK, CSKEY_CAPSLOCK);
+            MAP_KEY (XK_Num_Lock, CSKEY_PADNUM, CSKEY_PADNUM);
+            MAP_KEY (XK_Scroll_Lock, CSKEY_SCROLLLOCK, CSKEY_SCROLLLOCK);
+
 	  
       case XK_KP_Add:
 	    {
