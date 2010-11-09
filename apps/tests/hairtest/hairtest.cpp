@@ -192,6 +192,37 @@ bool HairTest::OnEventThumbTrackEndedB (const CEGUI::EventArgs&)
   return true;
 }
 
+bool HairTest::OnEventThumbTrackEndedPointiness (const CEGUI::EventArgs&)
+{
+  csRef<CS::Mesh::iFurMeshState> ifms = 
+    scfQueryInterface<CS::Mesh::iFurMeshState>(avatarScene->furMesh);
+
+  ifms->SetPointiness(sliderPointiness->getScrollPosition());
+
+  return true;
+}
+
+bool HairTest::OnEventThumbTrackEndedStrandWidth (const CEGUI::EventArgs&)
+{
+  csRef<CS::Mesh::iFurMeshState> ifms = 
+    scfQueryInterface<CS::Mesh::iFurMeshState>(avatarScene->furMesh);
+
+  ifms->SetStrandWidth(sliderStrandWidth->getScrollPosition() * 0.01f);
+
+  return true;
+}
+
+bool HairTest::OnEventThumbTrackEndedControlPointsDeviation (const CEGUI::EventArgs&)
+{
+  csRef<CS::Mesh::iFurMeshState> ifms = 
+    scfQueryInterface<CS::Mesh::iFurMeshState>(avatarScene->furMesh);
+
+  ifms->SetControlPointsDeviation
+    (sliderControlPointsDeviation->getScrollPosition() * 0.05f);
+
+  return true;
+}
+
 bool HairTest::OnEventThumbTrackEndedGuideLOD (const CEGUI::EventArgs&)
 {
   avatarScene->furMesh->SetGuideLOD(sliderGuideLOD->getScrollPosition());
@@ -771,6 +802,34 @@ bool HairTest::Application ()
 
     sliderB->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
       CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedB, this));  
+
+    sliderPointiness = (CEGUI::Scrollbar*)winMgr->
+      getWindow("HairTest/MainWindow/Tab/Page1/Slider4");
+
+    sliderPointiness->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedPointiness, this)); 
+
+    sliderStrandWidth = (CEGUI::Scrollbar*)winMgr->
+      getWindow("HairTest/MainWindow/Tab/Page1/Slider5");
+
+    sliderStrandWidth->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedStrandWidth, this)); 
+
+    sliderControlPointsDeviation = (CEGUI::Scrollbar*)winMgr->
+      getWindow("HairTest/MainWindow/Tab/Page1/Slider6");
+
+    sliderControlPointsDeviation->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedControlPointsDeviation, this)); 
+
+
+    csRef<CS::Mesh::iFurMeshState> ifms = 
+      scfQueryInterface<CS::Mesh::iFurMeshState>(avatarScene->furMesh);
+
+    sliderPointiness->setScrollPosition(ifms->GetPointiness());    
+
+    sliderStrandWidth->setScrollPosition(ifms->GetStrandWidth() * 100.0f);
+
+    sliderControlPointsDeviation->setScrollPosition(ifms->GetStrandWidth() * 50.0f);
 
     avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()
       ->GetVariableAdd(objColor)->GetValue(color);

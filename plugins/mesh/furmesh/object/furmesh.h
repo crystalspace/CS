@@ -119,6 +119,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     bool physicsControlEnabled;
     bool isReset;
     uint startFrame;
+    float controlPointsDeviation;
     // External data
     csRef<CS::Mesh::iAnimatedMeshFactory> meshFactory;
     csRef<CS::Mesh::iAnimatedMeshSubMeshFactory> meshFactorySubMesh;

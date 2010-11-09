@@ -93,6 +93,45 @@
 							<Property Name='UnifiedSize' Value='{{0.99,0.0},{0.0,20.0}}'/>
 							<Property Name='UnifiedPosition' Value='{{0.005,0.0},{0.0,200.0}}'/>
                         </Window>							
+
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page1/StaticText4" >
+							<Property Name="Text" Value="Pointiness:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+							<Property Name='UnifiedSize' Value='{{0.0,100.0},{0.0,32.0}}'/>
+							<Property Name='UnifiedPosition' Value='{{0.01,0.0},{0.0,240.0}}'/>							
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page1/Slider4" >
+							<Property Name='UnifiedSize' Value='{{0.99,0.0},{0.0,20.0}}'/>
+							<Property Name='UnifiedPosition' Value='{{0.005,0.0},{0.0,265.0}}'/>
+                        </Window>							
+						
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page1/StaticText5" >
+							<Property Name="Text" Value="Strand width:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+							<Property Name='UnifiedSize' Value='{{0.0,100.0},{0.0,32.0}}'/>
+							<Property Name='UnifiedPosition' Value='{{0.01,0.0},{0.0,285.0}}'/>							
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page1/Slider5" >
+							<Property Name='UnifiedSize' Value='{{0.99,0.0},{0.0,20.0}}'/>
+							<Property Name='UnifiedPosition' Value='{{0.005,0.0},{0.0,310.0}}'/>
+                        </Window>							
+						
+						<Window Type="ice/StaticText" Name="HairTest/MainWindow/Tab/Page1/StaticText6" >
+							<Property Name="Text" Value="Control points deviation:" />
+							<Property Name="BackgroundEnabled" Value="False" />
+							<Property Name="FrameEnabled" Value="False" />
+							<Property Name='UnifiedSize' Value='{{0.0,100.0},{0.0,32.0}}'/>
+							<Property Name='UnifiedPosition' Value='{{0.01,0.0},{0.0,330.0}}'/>
+						</Window>						
+					  
+                        <Window Type="ice/HorizontalScrollbar" Name="HairTest/MainWindow/Tab/Page1/Slider6" >
+							<Property Name='UnifiedSize' Value='{{0.99,0.0},{0.0,20.0}}'/>
+							<Property Name='UnifiedPosition' Value='{{0.005,0.0},{0.0,355.0}}'/>
+                        </Window>							
 						
                     </Window>
                 </Window>

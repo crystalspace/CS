@@ -1098,6 +1098,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     csVector3 normal, tangent, binormal, cameraOrigin;
     csVector3 strip, firstPoint, secondPoint;
 
+    // In case strand width changes real-time
+    size_t controlPointsCount = GetControlPointsCount(1.0f);
+
+    if (controlPointsDeviation != GetControlPointsDeviation())
+    {
+      for ( size_t i = 0 ; i < controlPointsCount ; i ++)
+        positionShift[i] = csVector3(rng->Get() * 2 - 1, rng->Get() * 2 - 1, 
+        rng->Get() * 2 - 1) * GetControlPointsDeviation();
+
+      controlPointsDeviation = GetControlPointsDeviation();
+    }
+
     cameraOrigin = tc.GetOrigin();
     csVector3 *furShift = furStrandShift;
     csVector3 *posShift = positionShift;
@@ -1108,6 +1120,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     tangents += offsetVertex;
 
     size_t triangleCount = 0;
+
+    // In case strand width changes real-time
+    strandWidthLOD = 1 / ( strandLOD * 0.75f + 0.25f ) * GetStrandWidth();
 
     for ( size_t x = 0 ; x < numberOfStrains ; x ++ , furShift ++)
     {
