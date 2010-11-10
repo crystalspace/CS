@@ -44,9 +44,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     DebugNodeManager (iBase* parent);
 
     //-- CS::Animation::iSkeletonDebugNodeManager
-    virtual CS::Animation::iSkeletonDebugNodeFactory* CreateDebugNodeFactory (const char* name);
-    virtual CS::Animation::iSkeletonDebugNodeFactory* FindDebugNodeFactory (const char* name);
-    virtual void ClearDebugNodeFactories ();
+    virtual CS::Animation::iSkeletonDebugNodeFactory* CreateAnimNodeFactory (const char* name);
+    virtual CS::Animation::iSkeletonDebugNodeFactory* FindAnimNodeFactory (const char* name);
+    virtual void ClearAnimNodeFactories ();
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);

@@ -49,17 +49,17 @@ struct iSkeletonSpeedNodeManager : public virtual iBase
   /**
    * Create a 'speed' animation node factory of the given name.
    */
-  virtual iSkeletonSpeedNodeFactory* CreateSpeedNodeFactory (const char* name) = 0;
+  virtual iSkeletonSpeedNodeFactory* CreateAnimNodeFactory (const char* name) = 0;
 
   /**
    * Find the 'speed' animation node factory of the given name.
    */
-  virtual iSkeletonSpeedNodeFactory* FindSpeedNodeFactory (const char* name) = 0;
+  virtual iSkeletonSpeedNodeFactory* FindAnimNodeFactory (const char* name) = 0;
 
   /**
    * Delete all 'speed' animation node factories.
    */
-  virtual void ClearSpeedNodeFactories () = 0;
+  virtual void ClearAnimNodeFactories () = 0;
 };
 
 /**

@@ -41,9 +41,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
     SpeedNodeManager (iBase* parent);
 
     //-- CS::Animation::iSkeletonSpeedNodeManager
-    virtual CS::Animation::iSkeletonSpeedNodeFactory* CreateSpeedNodeFactory (const char* name);
-    virtual CS::Animation::iSkeletonSpeedNodeFactory* FindSpeedNodeFactory (const char* name);
-    virtual void ClearSpeedNodeFactories ();
+    virtual CS::Animation::iSkeletonSpeedNodeFactory* CreateAnimNodeFactory (const char* name);
+    virtual CS::Animation::iSkeletonSpeedNodeFactory* FindAnimNodeFactory (const char* name);
+    virtual void ClearAnimNodeFactories ();
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);

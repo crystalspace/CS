@@ -54,17 +54,17 @@ struct iSkeletonDebugNodeManager : public virtual iBase
   /**
    * Create a 'debug' animation node factory of the given name.
    */
-  virtual iSkeletonDebugNodeFactory* CreateDebugNodeFactory (const char* name) = 0;
+  virtual iSkeletonDebugNodeFactory* CreateAnimNodeFactory (const char* name) = 0;
 
   /**
    * Find the 'debug' animation node factory of the given name.
    */
-  virtual iSkeletonDebugNodeFactory* FindDebugNodeFactory (const char* name) = 0;
+  virtual iSkeletonDebugNodeFactory* FindAnimNodeFactory (const char* name) = 0;
 
   /**
    * Delete all 'debug' animation node factories.
    */
-  virtual void ClearDebugNodeFactories () = 0;
+  virtual void ClearAnimNodeFactories () = 0;
 };
 
 // ----------------------------- iSkeletonDebugNode -----------------------------

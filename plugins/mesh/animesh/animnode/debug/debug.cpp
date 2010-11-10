@@ -54,7 +54,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
   {
   }
 
-  CS::Animation::iSkeletonDebugNodeFactory* DebugNodeManager::CreateDebugNodeFactory (const char* name)
+  CS::Animation::iSkeletonDebugNodeFactory* DebugNodeManager::CreateAnimNodeFactory (const char* name)
   {
     csRef<CS::Animation::iSkeletonDebugNodeFactory> newFact;
     newFact.AttachNew (new DebugNodeFactory (this, name));
@@ -62,12 +62,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     return debugFactories.PutUnique (name, newFact);
   }
 
-  CS::Animation::iSkeletonDebugNodeFactory* DebugNodeManager::FindDebugNodeFactory (const char* name)
+  CS::Animation::iSkeletonDebugNodeFactory* DebugNodeManager::FindAnimNodeFactory (const char* name)
   {
     return debugFactories.Get (name, 0);
   }
 
-  void DebugNodeManager::ClearDebugNodeFactories ()
+  void DebugNodeManager::ClearAnimNodeFactories ()
   {
     debugFactories.DeleteAll ();
   }

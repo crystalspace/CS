@@ -42,7 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
   {
   }
 
-  CS::Animation::iSkeletonSpeedNodeFactory* SpeedNodeManager::CreateSpeedNodeFactory (const char* name)
+  CS::Animation::iSkeletonSpeedNodeFactory* SpeedNodeManager::CreateAnimNodeFactory (const char* name)
   {
     csRef<CS::Animation::iSkeletonSpeedNodeFactory> newFact;
     newFact.AttachNew (new SpeedNodeFactory (this, name));
@@ -50,12 +50,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
     return speedFactories.PutUnique (name, newFact);
   }
 
-  CS::Animation::iSkeletonSpeedNodeFactory* SpeedNodeManager::FindSpeedNodeFactory (const char* name)
+  CS::Animation::iSkeletonSpeedNodeFactory* SpeedNodeManager::FindAnimNodeFactory (const char* name)
   {
    return speedFactories.Get (name, 0);
   }
 
-  void SpeedNodeManager::ClearSpeedNodeFactories ()
+  void SpeedNodeManager::ClearAnimNodeFactories ()
   {
     speedFactories.DeleteAll ();
   }
