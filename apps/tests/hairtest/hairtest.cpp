@@ -28,6 +28,9 @@
 #define MODEL_FRANKIE 1
 #define MODEL_KRYSTAL 2
 
+#define CS_EVENT_HANDLED true
+#define CS_EVENT_UNHANDLED false
+
 HairTest::HairTest ()
 : DemoApplication ("CrystalSpace.HairTest", "hairtest",
                      "hairtest <OPTIONS>",
@@ -212,7 +215,8 @@ bool HairTest::OnEventThumbTrackEndedStrandWidth (const CEGUI::EventArgs&)
   return true;
 }
 
-bool HairTest::OnEventThumbTrackEndedControlPointsDeviation (const CEGUI::EventArgs&)
+bool HairTest::OnEventThumbTrackEndedControlPointsDeviation 
+  (const CEGUI::EventArgs&)
 {
   csRef<CS::Mesh::iFurMeshState> ifms = 
     scfQueryInterface<CS::Mesh::iFurMeshState>(avatarScene->furMesh);
@@ -239,7 +243,8 @@ bool HairTest::OnEventThumbTrackEndedStrandLOD (const CEGUI::EventArgs&)
 
 bool HairTest::OnEventThumbTrackEndedControlPointsLOD (const CEGUI::EventArgs&)
 {
-  avatarScene->furMesh->SetControlPointsLOD(sliderControlPointsLOD->getScrollPosition());
+  avatarScene->furMesh->
+    SetControlPointsLOD(sliderControlPointsLOD->getScrollPosition());
 
   return true;
 }
@@ -272,6 +277,240 @@ bool HairTest::OnEnableButtonClicked (const CEGUI::EventArgs&)
 
   return true;
 }
+
+void HairTest::LoadTexture (const char* filename, const char* path, 
+                            const char* shaderVariable)
+{
+  if (path)
+    vfs->ChDir(path);
+  
+  CS::ShaderVarName objTexture (svStrings, shaderVariable);	
+
+  csRef<iTextureHandle> texture = loader->LoadTexture (filename);
+
+  if(texture)
+    avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
+    GetVariableAdd(objTexture)->SetValue(texture);
+  else 
+    csPrintfErr("Can't open file: %s\n", filename);
+}
+
+//---------------------------------------------------------------------------
+
+void HairTest::StdDlgUpdateLists(const char* filename)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* dirlist = 
+    (CEGUI::Listbox*)winMgr->getWindow("HairTest/StdDlg/DirSelect");
+  CEGUI::Listbox* filelist = 
+    (CEGUI::Listbox*)winMgr->getWindow("HairTest/StdDlg/FileSelect");
+
+  dirlist->resetList();
+  filelist->resetList();
+
+  CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem("..");
+  item->setTextColours(CEGUI::colour(0,0,0));
+  //item->setSelectionBrushImage("ice", "TextSelectionBrush");
+  //item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+  dirlist->addItem(item);
+
+  csRef<iStringArray> files = vfs->FindFiles(filename);
+  files->Sort (false);
+
+  for (size_t i = 0; i < files->GetSize(); i++)
+  {
+    char* file = (char*)files->Get(i);
+    if (!file) continue;
+
+    size_t dirlen = strlen(file);
+    if (dirlen)
+      dirlen--;
+    while (dirlen && file[dirlen-1]!= '/')
+      dirlen--;
+    file=file+dirlen;
+
+    if (file[strlen(file)-1] == '/')
+    {
+      file[strlen(file)-1]='\0';
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(file);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      //item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      //item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      dirlist->addItem(item);
+    }
+    else
+    {
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(file);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      //item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      //item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      filelist->addItem(item);
+    }
+  }
+}
+
+//---------------------------------------------------------------------------
+
+bool HairTest::StdDlgOkButton (const CEGUI::EventArgs& e)
+{
+  form->show();
+  stddlg->hide();
+
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Window* inputpath = winMgr->getWindow("HairTest/StdDlg/Path");
+  CEGUI::String path = inputpath->getProperty("Text");
+  if (path.empty()) return CS_EVENT_HANDLED;
+
+  vfs->ChDir (path.c_str());
+
+  CEGUI::Window* inputfile = winMgr->getWindow("HairTest/StdDlg/File");
+  CEGUI::String file = inputfile->getProperty("Text");
+  if (path.empty()) return CS_EVENT_HANDLED;
+
+  CEGUI::String purpose = stddlg->getUserString("Purpose");
+
+  LoadTexture(file.c_str(), path.c_str(), purpose.c_str());
+
+  return CS_EVENT_HANDLED;
+}
+
+bool HairTest::StdDlgCancleButton (const CEGUI::EventArgs& e)
+{
+  form->show();
+  stddlg->hide();
+  return CS_EVENT_HANDLED;
+}
+
+bool HairTest::StdDlgFileSelect (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* list = 
+    (CEGUI::Listbox*) winMgr->getWindow("HairTest/StdDlg/FileSelect");
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if (!item) return CS_EVENT_HANDLED;
+
+  CEGUI::String text = item->getText();
+  if (text.empty()) return CS_EVENT_HANDLED;
+
+  CEGUI::Window* file = winMgr->getWindow("HairTest/StdDlg/File");
+  file->setProperty("Text", text);
+  return CS_EVENT_HANDLED;
+}
+
+bool HairTest::StdDlgDirSelect (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Listbox* list = 
+    (CEGUI::Listbox*) winMgr->getWindow("HairTest/StdDlg/DirSelect");
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if (!item) return CS_EVENT_HANDLED;
+
+  CEGUI::String text = item->getText();
+  if (text.empty()) return CS_EVENT_HANDLED;
+
+  csPrintf("cd %s\n",text.c_str());
+
+  CEGUI::Window* inputpath = winMgr->getWindow("HairTest/StdDlg/Path");
+  CEGUI::String path = inputpath->getProperty("Text");
+  if (path.empty()) return CS_EVENT_HANDLED;
+
+  csString newpath(path.c_str());
+
+  if (csString("..") == text.c_str())
+  {
+    size_t i = newpath.Slice(0,newpath.Length()-1).FindLast('/')+1;
+    csPrintf("%zu", i);
+    newpath = newpath.Slice(0,i);
+  }
+  else
+  {
+    newpath.Append(text.c_str());
+    newpath.Append("/");
+  }
+
+  if (!newpath.GetData()) newpath.Append("/");
+  vfs->ChDir (newpath.GetData ());
+
+  inputpath->setProperty("Text", newpath.GetData());
+  StdDlgUpdateLists(newpath.GetData());
+  return CS_EVENT_HANDLED;
+}
+
+bool HairTest::StdDlgDirChange (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Window* inputpath = winMgr->getWindow("HairTest/StdDlg/Path");
+  CEGUI::String path = inputpath->getProperty("Text");
+  if (path.empty()) return CS_EVENT_HANDLED;
+
+  csPrintf("cd %s\n",path.c_str());
+
+  vfs->ChDir (path.c_str ());
+
+  inputpath->setProperty("Text", path.c_str());
+  StdDlgUpdateLists(path.c_str());
+  return CS_EVENT_HANDLED;
+}
+
+bool HairTest::LoadDiffuseMap (const CEGUI::EventArgs& e)
+{
+  form->hide();
+  stddlg->show();
+  stddlg->setUserString("Purpose", "diffuse map");
+  return true;
+}
+
+bool HairTest::UnloadDiffuseMap (const CEGUI::EventArgs& e)
+{
+  CS::ShaderVarName objTexture (svStrings, "diffuse map");	
+
+  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
+    RemoveVariable(objTexture);
+
+  return true;
+}
+
+bool HairTest::LoadTextureMap (const CEGUI::EventArgs& e)
+{
+  form->hide();
+  stddlg->show();
+  stddlg->setUserString("Purpose", "texture map");
+  return true;
+}
+
+bool HairTest::UnloadTextureMap (const CEGUI::EventArgs& e)
+{
+  CS::ShaderVarName objTexture (svStrings, "texture map");	
+
+  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
+    RemoveVariable(objTexture);
+
+  return true;
+}
+
+bool HairTest::LoadColorMap (const CEGUI::EventArgs& e)
+{
+  form->hide();
+  stddlg->show();
+  stddlg->setUserString("Purpose", "color map");
+  return true;
+}
+
+bool HairTest::UnloadColorMap (const CEGUI::EventArgs& e)
+{
+  CS::ShaderVarName objTexture (svStrings, "color map");	
+
+  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
+    RemoveVariable(objTexture);
+
+  return true;
+}
+
 
 void HairTest::SwitchDynamics()
 {
@@ -680,6 +919,10 @@ bool HairTest::Application ()
   vfs->ChDir ("/lib/hairtest/");
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("hairtest.layout"));
 
+  // Load the two windows
+  form = winMgr->getWindow("HairTest/MainWindow");
+  stddlg = winMgr->getWindow("HairTest/StdDlg");
+
   // Subscribe to the clicked event for the exit button
   CEGUI::Window* btn = winMgr->getWindow("HairTest/MainWindow/Tab/Page1/Quit");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
@@ -712,6 +955,34 @@ bool HairTest::Application ()
   winMgr->getWindow("HairTest/MainWindow/Tab/Page2/Enable")-> 
     subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&HairTest::OnEnableButtonClicked, this));
+
+  // ----[ STDDLG ]----------------------------------------------------------
+
+  btn = winMgr->getWindow("HairTest/StdDlg/OkButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&HairTest::StdDlgOkButton, this));
+
+  btn = winMgr->getWindow("HairTest/StdDlg/CancleButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&HairTest::StdDlgCancleButton, this));
+
+  btn = winMgr->getWindow("HairTest/StdDlg/FileSelect");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::Event::Subscriber(&HairTest::StdDlgFileSelect, this));
+
+  btn = winMgr->getWindow("HairTest/StdDlg/DirSelect");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::Event::Subscriber(&HairTest::StdDlgDirSelect, this));
+
+  btn = winMgr->getWindow("HairTest/StdDlg/Path");
+  btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&HairTest::StdDlgDirChange, this));
+
+  // ------------------------------------------------------------------------
+  vfs->ChDir ("/lib/krystal/");
+  btn = winMgr->getWindow("HairTest/StdDlg/Path");
+  btn->setProperty("Text", vfs->GetCwd());
+  StdDlgUpdateLists(vfs->GetCwd());
 
   // Default behavior from csDemoApplication for the creation of the scene
   if (!DemoApplication::CreateRoom ())
@@ -784,43 +1055,68 @@ bool HairTest::Application ()
   if (avatarScene->furMesh && avatarScene->furMesh->GetFurMeshProperties() && 
       avatarScene->furMesh->GetFurMeshProperties()->GetMaterial())
   {
+    
+    winMgr->getWindow("HairTest/MainWindow/Tab/Page3/LoadDiffuseMap")->
+      subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&HairTest::LoadDiffuseMap, this));
+
+    winMgr->getWindow("HairTest/MainWindow/Tab/Page3/UnloadDiffuseMap")->
+      subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&HairTest::UnloadDiffuseMap, this));    
+
+    winMgr->getWindow("HairTest/MainWindow/Tab/Page3/LoadTextureMap")->
+      subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&HairTest::LoadTextureMap, this));
+
+    winMgr->getWindow("HairTest/MainWindow/Tab/Page3/UnloadTextureMap")->
+      subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&HairTest::UnloadTextureMap, this));    
+
+    winMgr->getWindow("HairTest/MainWindow/Tab/Page3/LoadColorMap")->
+      subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&HairTest::LoadColorMap, this));
+
+    winMgr->getWindow("HairTest/MainWindow/Tab/Page3/UnloadDiffuseMap")->
+      subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&HairTest::UnloadDiffuseMap, this));    
+
+
     // RGB hair color
     sliderR = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page1/Slider1");
+      getWindow("HairTest/MainWindow/Tab/Page3/Slider1");
 
     sliderR->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
       CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedR, this));  
 
     sliderG = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page1/Slider2");
+      getWindow("HairTest/MainWindow/Tab/Page3/Slider2");
 
     sliderG->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
       CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedG, this));  
 
     sliderB = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page1/Slider3");
+      getWindow("HairTest/MainWindow/Tab/Page3/Slider3");
 
     sliderB->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
       CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedB, this));  
 
     sliderPointiness = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page1/Slider4");
+      getWindow("HairTest/MainWindow/Tab/Page1/Slider1");
 
     sliderPointiness->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
       CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedPointiness, this)); 
 
     sliderStrandWidth = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page1/Slider5");
+      getWindow("HairTest/MainWindow/Tab/Page1/Slider2");
 
     sliderStrandWidth->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
       CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedStrandWidth, this)); 
 
     sliderControlPointsDeviation = (CEGUI::Scrollbar*)winMgr->
-      getWindow("HairTest/MainWindow/Tab/Page1/Slider6");
+      getWindow("HairTest/MainWindow/Tab/Page1/Slider3");
 
     sliderControlPointsDeviation->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
       CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedControlPointsDeviation, this)); 
-
 
     csRef<CS::Mesh::iFurMeshState> ifms = 
       scfQueryInterface<CS::Mesh::iFurMeshState>(avatarScene->furMesh);

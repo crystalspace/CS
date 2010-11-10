@@ -112,6 +112,28 @@ private:
   CEGUI::Scrollbar* sliderControlPointsLOD;
   CEGUI::Scrollbar* sliderOverallLOD;
 
+  CEGUI::Window* form;
+  CEGUI::Window* stddlg;
+
+  //-- Load dialog functions
+  void LoadTexture(const char* filename, const char* path, 
+    const char* shaderVariable); 
+
+  void StdDlgUpdateLists(const char* filename);
+
+  bool StdDlgOkButton (const CEGUI::EventArgs& e);
+  bool StdDlgCancleButton (const CEGUI::EventArgs& e);
+  bool StdDlgFileSelect (const CEGUI::EventArgs& e);
+  bool StdDlgDirSelect (const CEGUI::EventArgs& e);
+  bool StdDlgDirChange (const CEGUI::EventArgs& e);
+
+  bool LoadDiffuseMap (const CEGUI::EventArgs& e);
+  bool UnloadDiffuseMap (const CEGUI::EventArgs& e);
+  bool LoadTextureMap (const CEGUI::EventArgs& e);
+  bool UnloadTextureMap (const CEGUI::EventArgs& e);
+  bool LoadColorMap (const CEGUI::EventArgs& e);
+  bool UnloadColorMap (const CEGUI::EventArgs& e);
+
   //-- csBaseEventHandler
   void Frame ();
   bool OnKeyboard (iEvent &event);
