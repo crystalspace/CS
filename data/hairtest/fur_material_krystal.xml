@@ -22,7 +22,7 @@
 	  <shadervar type="texture" name="texture map">krystal_skull_texturemap</shadervar>
 	  <shadervar type="texture" name="color map">krystal_skull_colormap</shadervar> 
 	  <shadervar type="float" name="Ks">0.2</shadervar>
-	  <shadervar type="int" name="kajiya kay" /> 
+	  <shadervar type="int" name="kajiya kay no" /> 
     </material>
   </materials>
   <sounds/>

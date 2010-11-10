@@ -5,6 +5,7 @@
     </shadervars>
     <technique priority="200">
 		<pass>
+		  <mixmode> <alpha/> </mixmode>
 		  <buffer source="normal" destination="normal" />
 		  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
 		  <buffer source="tangent" destination="texture coordinate 1" />
@@ -21,11 +22,7 @@
 		</pass>
 	<?if (vars."marschner")?>	
 		<pass>
-			<!-- Later pass: blend with add -->
-			<mixmode>
-				<blendop src="one" dst="one" />
-				<alphatest>disable</alphatest>
-			</mixmode>	
+		    <mixmode> <add/> </mixmode>
 			<buffer source="tangent" destination="texture coordinate 0" />
 			<vp plugin="glcg" file="/shader/fur/marschner_lookup_cg.cgvp" />
 			<texture name="tex M" destination="lookup1fixed" />
@@ -39,11 +36,7 @@
 	<?else?>
 	<?if (vars."kajiya kay")?>
 		<pass>
-			<!-- Later pass: blend with add -->
-			<mixmode>
-				<blendop src="one" dst="one" />
-				<alphatest>disable</alphatest>
-			</mixmode>	
+		    <mixmode> <add/> </mixmode>
 			<buffer source="normal" destination="normal" />
 			<vp plugin="glcg" file="/shader/fur/kajiya_kay_cg.cgvp" />
 			<fp plugin="glcg">
