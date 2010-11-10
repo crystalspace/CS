@@ -243,6 +243,10 @@ public:
 						   float minimumHeight = 0,
 						   float maximumHeight = 0);
   virtual void DestroyCollider (iTerrainCollider* collider);
+
+  virtual void StartProfile ();
+  virtual void StopProfile ();
+  virtual void DumpProfile (bool resetProfile = true);
 };
 
 }

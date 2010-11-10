@@ -575,6 +575,32 @@ bool Simple::OnKeyboard (iEvent &ev)
       return true;
     }
 #endif
+
+    else if (csKeyEventHelper::GetRawCode (&ev) == 'i'
+	     && kbd->GetKeyState (CSKEY_CTRL)
+	     && phys_engine_id == BULLET_ID)
+    {
+      printf ("Starting profile...\n");
+      bulletDynamicSystem->StartProfile ();
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetRawCode (&ev) == 'o'
+	     && kbd->GetKeyState (CSKEY_CTRL)
+	     && phys_engine_id == BULLET_ID)
+    {
+      printf ("Stopping profile...\n");
+      bulletDynamicSystem->StopProfile ();
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetRawCode (&ev) == 'p'
+	     && kbd->GetKeyState (CSKEY_CTRL)
+	     && phys_engine_id == BULLET_ID)
+    {
+      bulletDynamicSystem->DumpProfile ();
+      return true;
+    }
   }
 
   // Slow down the camera's body
@@ -869,6 +895,13 @@ bool Simple::OnInitialize (int argc, char* argv[])
   if (phys_engine_id == BULLET_ID)
     hudHelper.keyDescriptions.Push ("CTRL-n: next environment");
   */
+  if (phys_engine_id == BULLET_ID)
+  {
+    hudHelper.keyDescriptions.Push ("CTRL-i: start profiling");
+    hudHelper.keyDescriptions.Push ("CTRL-o: stop profiling");
+    hudHelper.keyDescriptions.Push ("CTRL-p: dump profile");
+  }
+
   return true;
 }
 

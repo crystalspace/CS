@@ -581,7 +581,7 @@ void csBulletDynamicsSystem::DebugDraw (iView* view)
     bulletWorld->setDebugDrawer (debugDraw);
   }
 
-  bulletWorld->debugDrawWorld();
+  bulletWorld->debugDrawWorld ();
   debugDraw->DebugDraw (view);
 }
 
@@ -847,7 +847,7 @@ iSoftBody* csBulletDynamicsSystem::CreateRope
     (*softWorldInfo, CSToBullet (start, internalScale),
      CSToBullet (end, internalScale), segmentCount - 1, 0);
 
-  //hard-coded parameters for ropes
+  //hard-coded parameters for hair ropes
   body->m_cfg.kDP = 0.08f; // no elasticity
   body->m_cfg.piterations = 16; // no white zone
   body->m_cfg.timescale = 2;
@@ -882,7 +882,7 @@ iSoftBody* csBulletDynamicsSystem::CreateRope (csVector3* vertices, size_t verte
   for (size_t i = 1; i < vertexCount; i++)
     body->appendLink (i - 1, i);
 
-  //hard-coded parameters for ropes
+  //hard-coded parameters for hair ropes
   body->m_cfg.kDP = 0.08f; // no elasticity
   body->m_cfg.piterations = 16; // no white zone
   body->m_cfg.timescale = 2;
@@ -1113,6 +1113,38 @@ iTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
 void csBulletDynamicsSystem::DestroyCollider (iTerrainCollider* collider)
 {
   terrainColliders.Delete (collider);
+}
+
+void csBulletDynamicsSystem::StartProfile ()
+{
+  CProfileManager::Start_Profile ("Crystal Space scene");
+
+  if (!debugDraw)
+  {
+    debugDraw = new csBulletDebugDraw (inverseInternalScale);
+    bulletWorld->setDebugDrawer (debugDraw);
+  }
+  debugDraw->StartProfile ();
+}
+
+void csBulletDynamicsSystem::StopProfile ()
+{
+  CProfileManager::Stop_Profile ();
+  debugDraw->StopProfile ();
+}
+
+void csBulletDynamicsSystem::DumpProfile (bool resetProfile)
+{
+  printf ("\n");
+  printf ("==========================================================\n");
+  printf ("====           Bullet dynamic scene profile           ====\n");
+  printf ("==========================================================\n");
+  CProfileManager::dumpAll ();
+  printf ("==========================================================\n");
+  printf ("\n");
+
+  if (resetProfile)
+    CProfileManager::Reset ();
 }
 
 }

@@ -167,6 +167,16 @@ public:
     return mode;
   }
 
+  virtual void StartProfile ()
+  {
+    this->mode |= DBG_ProfileTimings;
+  }
+
+  virtual void StopProfile ()
+  {
+    this->mode &= this->mode & ~DBG_ProfileTimings;
+  }
+
   virtual void setDebugMode (int m)
   {
     mode = m;

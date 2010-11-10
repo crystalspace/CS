@@ -145,7 +145,7 @@ enum DebugMode
  */
 struct iDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE(CS::Physics::Bullet::iDynamicSystem, 3, 0, 0);
+  SCF_INTERFACE(CS::Physics::Bullet::iDynamicSystem, 3, 0, 1);
 
   /**
    * Draw the debug informations of the dynamic system. This has to be called
@@ -358,6 +358,26 @@ struct iDynamicSystem : public virtual iBase
    * Remove the given terrain collider from the simulation.
    */
   virtual void DestroyCollider (iTerrainCollider* collider) = 0;
+
+  /**
+   * Start the profiling of the simulation. This would add an overhead to the
+   * computations, but allows to display meaningful information on the behavior
+   * of the simulation.
+   */
+  virtual void StartProfile () = 0;
+
+  /**
+   * Stop the profiling of the simulation. This would add an overhead to the
+   */
+  virtual void StopProfile () = 0;
+
+  /**
+   * Dump the profile information on the standard output. StartProfile() must
+   * have been called before.
+   * \param resetProfile Whether or not the profile data must be reset after
+   * the dumping.
+   */
+  virtual void DumpProfile (bool resetProfile = true) = 0;
 };
 
 /**
