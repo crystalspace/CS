@@ -180,6 +180,9 @@ typedef struct _csKeyModifiers
 #define CSMASK_NUMLOCK		(1 << csKeyModifierTypeNumLock)
 /// "ScrollLock" key mask
 #define CSMASK_SCROLLLOCK	(1 << csKeyModifierTypeScrollLock)
+/// All locks keys
+#define CSMASK_ALLLOCKS (CSMASK_CAPSLOCK | CSMASK_NUMLOCK | CSMASK_SCROLLLOCK)
+
 /// All modifiers, shift and lock types
 #define CSMASK_ALLMODIFIERS	(CSMASK_CAPSLOCK | CSMASK_NUMLOCK | \
 				 CSMASK_SCROLLLOCK | CSMASK_ALLSHIFTS)
