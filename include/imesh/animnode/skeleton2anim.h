@@ -33,10 +33,8 @@ class csVector3;
  * Skeleton2 animation interface files
  */
 
-namespace CS
-{
-namespace Animation
-{
+namespace CS {
+namespace Animation {
 
 struct iSkeleton;
 
@@ -231,7 +229,7 @@ struct iSkeletonAnimPacket : public virtual iBase
  */
 struct iSkeletonAnimation : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonAnimation, 2, 0, 1);
+  SCF_INTERFACE(CS::Animation::iSkeletonAnimation, 2, 0, 2);
 
   /**
    * Get the name of the animation.
@@ -352,6 +350,17 @@ struct iSkeletonAnimation : public virtual iBase
    * Get the id of the bone associated with the given channel.
    */
   virtual BoneID GetChannelBone (ChannelID channel) const = 0;
+
+  /**
+   * Set the id of the bone associated with the given channel.
+   */
+  virtual void SetChannelBone (ChannelID channel, BoneID bone) = 0;
+
+  /**
+   * Remove the given channel from this animation.
+   * \warning This will alter the ID of the successive channels.
+   */
+  virtual void RemoveChannel (ChannelID channel) = 0;
 };
 
 

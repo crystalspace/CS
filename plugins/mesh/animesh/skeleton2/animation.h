@@ -96,12 +96,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual const char* GetName () const;
 
     virtual CS::Animation::ChannelID AddChannel (CS::Animation::BoneID bone);
+    virtual void RemoveChannel (CS::Animation::ChannelID channel);
 
     virtual CS::Animation::ChannelID FindChannel (CS::Animation::BoneID bone) const;
 
     virtual size_t GetChannelCount () const;
 
     virtual CS::Animation::BoneID GetChannelBone (CS::Animation::ChannelID channel) const;
+    virtual void SetChannelBone (CS::Animation::ChannelID channel,
+				 CS::Animation::BoneID bone);
 
     virtual void AddKeyFrame (CS::Animation::ChannelID channel, float time, 
       const csQuaternion& rotation, const csVector3& offset);

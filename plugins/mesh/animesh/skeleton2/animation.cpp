@@ -186,6 +186,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return channelId;
   }
 
+  void Animation::RemoveChannel (CS::Animation::ChannelID channel)
+  {
+    CS_ASSERT(channel < channels.GetSize ());
+    printf ("Animation::RemoveChannel %i\n", channel);
+    channels.DeleteIndex (channel);
+  }
+
   ChannelID Animation::FindChannel (CS::Animation::BoneID bone) const
   {
     for (size_t i = 0; i < channels.GetSize (); ++i)
@@ -208,6 +215,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     AnimationChannel* ch = channels[channel];
     return ch->bone;
+  }
+
+  void Animation::SetChannelBone (CS::Animation::ChannelID channel,
+				  CS::Animation::BoneID bone)
+  {
+    CS_ASSERT(channel < channels.GetSize ());
+
+    AnimationChannel* ch = channels[channel];
+    ch->bone = bone;
   }
 
   void Animation::AddKeyFrame (ChannelID channel, float time, 
