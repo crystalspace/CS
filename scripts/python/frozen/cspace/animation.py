@@ -391,6 +391,8 @@ class iSkeletonAnimation(core.iBase):
     def GetFramesInBindSpace(*args): return _animation.iSkeletonAnimation_GetFramesInBindSpace(*args)
     def GetChannelCount(*args): return _animation.iSkeletonAnimation_GetChannelCount(*args)
     def GetChannelBone(*args): return _animation.iSkeletonAnimation_GetChannelBone(*args)
+    def SetChannelBone(*args): return _animation.iSkeletonAnimation_SetChannelBone(*args)
+    def RemoveChannel(*args): return _animation.iSkeletonAnimation_RemoveChannel(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonAnimation_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonAnimation
     __del__ = lambda self : None;
@@ -825,9 +827,9 @@ class iSkeletonSpeedNodeManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def CreateSpeedNodeFactory(*args): return _animation.iSkeletonSpeedNodeManager_CreateSpeedNodeFactory(*args)
-    def FindSpeedNodeFactory(*args): return _animation.iSkeletonSpeedNodeManager_FindSpeedNodeFactory(*args)
-    def ClearSpeedNodeFactories(*args): return _animation.iSkeletonSpeedNodeManager_ClearSpeedNodeFactories(*args)
+    def CreateAnimNodeFactory(*args): return _animation.iSkeletonSpeedNodeManager_CreateAnimNodeFactory(*args)
+    def FindAnimNodeFactory(*args): return _animation.iSkeletonSpeedNodeManager_FindAnimNodeFactory(*args)
+    def ClearAnimNodeFactories(*args): return _animation.iSkeletonSpeedNodeManager_ClearAnimNodeFactories(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonSpeedNodeManager_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonSpeedNodeManager
     __del__ = lambda self : None;
