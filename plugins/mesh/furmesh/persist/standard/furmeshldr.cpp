@@ -294,9 +294,9 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
       break;
     case XMLTOKEN_PRIORITY:
       {
-        uint priority = (uint)engine->GetRenderPriority (child->GetContentsValue ());
+        CS::Graphics::RenderPriority priority = engine->GetRenderPriority (child->GetContentsValue ());
         CHECK_MESH(meshstate);
-        meshstate->SetPriority(priority);
+        meshstate->SetRenderPriority(priority);
       }
       break;
     case XMLTOKEN_FACTORY:
@@ -548,7 +548,7 @@ bool FurMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteMixmode(mixmodeNode, mixmode, true);
 
     //Writedown priority tag
-    int priority = fmesh->GetPriority();
+    CS::Graphics::RenderPriority priority = fmesh->GetRenderPriority();
     const char* pname = engine->GetRenderPriorityName (priority);
     if (pname && *pname)
     {

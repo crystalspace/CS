@@ -308,12 +308,12 @@ public:
   /**
    * Get render priority
    */
-  virtual uint GetPriority () const = 0;
+  virtual CS::Graphics::RenderPriority GetRenderPriority () const = 0;
 
   /**
    * Set render priority
    */
-  virtual void SetPriority (uint priority) = 0;
+  virtual void SetRenderPriority (CS::Graphics::RenderPriority priority) = 0;
 
   /**
    * Get Z-buffer

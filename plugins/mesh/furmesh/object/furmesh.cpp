@@ -196,7 +196,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     meshPtr->mixmode = CS_FX_ALPHA;
 
     meshPtr->buffers = bufferholder;
-    meshPtr->renderPrio = engine->GetRenderPriority ("alpha");
+    meshPtr->renderPrio = GetRenderPriority ();
     meshPtr->z_buf_mode = GetZBufMode();
 
     meshPtr->object2world = o2wt;

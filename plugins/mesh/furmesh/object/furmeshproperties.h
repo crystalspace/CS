@@ -69,8 +69,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     virtual void SetSmallFur(bool smallFur);
     virtual uint GetMixmode () const;
     virtual void SetMixmode (uint mode);
-    virtual uint GetPriority () const;
-    virtual void SetPriority (uint priority);
+    virtual CS::Graphics::RenderPriority GetRenderPriority () const;
+    virtual void SetRenderPriority (CS::Graphics::RenderPriority priority);
     virtual csZBufMode GetZBufMode () const;
     virtual void SetZBufMode (csZBufMode z_buf_mode);
 
@@ -91,7 +91,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     bool growTangents;
     bool smallFur;
     uint mixmode;
-    uint priority;
+    CS::Graphics::RenderPriority priority;
     csZBufMode z_buf_mode;
   };
 

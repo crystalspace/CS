@@ -38,7 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     heightFactor(0.5f), averageControlPointsCount(5), 
     controlPointsDistance(0.05f), thicknessVariation (1.0f), pointiness(0.5f),
     furStrandDeviation(0), positionDeviation(0.01f), growTangents(false), 
-    smallFur(false), mixmode(0), priority(7), z_buf_mode(CS_ZBUF_USE)
+    smallFur(false), mixmode(0), priority(10), z_buf_mode(CS_ZBUF_TEST)
   {
   }
 
@@ -206,12 +206,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     mixmode = mode;
   }
 
-  uint FurMeshState::GetPriority () const
+  CS::Graphics::RenderPriority FurMeshState::GetRenderPriority () const
   {
     return priority;
   }
 
-  void FurMeshState::SetPriority (uint priority)
+  void FurMeshState::SetRenderPriority (CS::Graphics::RenderPriority priority)
   {
     this->priority = priority;
   }

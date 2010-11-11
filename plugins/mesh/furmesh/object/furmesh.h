@@ -131,9 +131,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     // Render mesh data
     csRef<csRenderBufferHolder> bufferholder;
     csRef<csShaderVariableContext> svContext;
-    uint mixmode;
-    uint priority;
-    csZBufMode z_buf_mode;
     uint indexstart, indexend;
     // Private functions
     size_t GetControlPointsCount(float controlPointsLOD) const;
