@@ -107,7 +107,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
   {
   }
 
-  void DebugNodeFactory::SetDebugModes (CS::Animation::csSkeletonDebugMode modes)
+  void DebugNodeFactory::SetDebugModes (CS::Animation::SkeletonDebugMode modes)
   {
     this->modes = modes;
   }
@@ -236,7 +236,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 	if (numChild[i] > 0)
 	  endLocal = childPos[i] / numChild[i];
 	else
-	  endLocal = csVector3 (0,0,1);
+	{
+	  endLocal = csVector3 (0.0f, 0.0f, 1.0f);
+
+	  CS::Animation::BoneID parent = fact->GetBoneParent (i);
+	  if (parent != CS::Animation::InvalidBoneID)
+	    endLocal *= (childPos[parent] / numChild[parent]).Norm ();
+	}
 
 	csVector3 endGlobal = position + rotation.Rotate (endLocal);
 	csVector3 boneEnd = tr_o2c * endGlobal;

@@ -72,7 +72,7 @@ struct iSkeletonDebugNodeManager : public virtual iBase
 /**
  * The visualization mode to be used by the iSkeletonDebugNode.
  */
-enum csSkeletonDebugMode
+enum SkeletonDebugMode
 {
   DEBUG_NONE = 0,             /*!< No debug shapes are displayed. */
   DEBUG_2DLINES = 1 << 1,     /*!< The debug shapes displayed are 2D lines between the bones. */
@@ -91,7 +91,7 @@ struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
    * Set the combination of visualization modes to be used for displaying the animation.
    * Default value is CS::Animation::DEBUG_SQUARES.
    */
-  virtual void SetDebugModes (csSkeletonDebugMode modes) = 0;
+  virtual void SetDebugModes (SkeletonDebugMode modes) = 0;
 
   /**
    * Set the image to be displayed when CS::Animation::DEBUG_IMAGES is used.

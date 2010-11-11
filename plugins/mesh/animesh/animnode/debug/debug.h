@@ -72,7 +72,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     ~DebugNodeFactory () {}
 
     //-- CS::Animation::iSkeletonDebugNodeFactory
-    virtual void SetDebugModes (CS::Animation::csSkeletonDebugMode modes);
+    virtual void SetDebugModes (CS::Animation::SkeletonDebugMode modes);
     virtual void SetDebugImage (csPixmap* image);
     virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory);
 
@@ -85,7 +85,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
   private:
     DebugNodeManager* manager;
     csString name;
-    CS::Animation::csSkeletonDebugMode modes;
+    CS::Animation::SkeletonDebugMode modes;
     csPixmap* image;
     csRef<CS::Animation::iSkeletonAnimNodeFactory> subFactory;
 
