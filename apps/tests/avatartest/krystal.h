@@ -53,6 +53,7 @@ class KrystalScene : public AvatarScene
 
   // Display of information on the state of the scene
   void UpdateStateDescription ();
+  void PostFrame ();
 
  private:
   AvatarTest* avatarTest;
@@ -60,6 +61,11 @@ class KrystalScene : public AvatarScene
   // Body chains
   CS::Animation::iBodyChain* bodyChain;
   CS::Animation::iBodyChain* armChain;
+
+  // Debug node related
+  bool debug;
+  csRef<CS::Animation::iSkeletonDebugNode> debugNode;
+  csRef<CS::Animation::iSkeletonDebugNodeFactory> debugNodeFactory;
 
   // Ragdoll management related
   bool krystalDead;

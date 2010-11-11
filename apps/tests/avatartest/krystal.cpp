@@ -27,7 +27,7 @@
 #define CAMERA_HIPS_DISTANCE 3.0f
 
 KrystalScene::KrystalScene (AvatarTest* avatarTest)
-  : avatarTest (avatarTest), IKenabled (false)
+  : avatarTest (avatarTest), debug (false), IKenabled (false)
 {
   // Define the available keys
   avatarTest->hudHelper.keyDescriptions.DeleteAll ();
@@ -39,6 +39,7 @@ KrystalScene::KrystalScene (AvatarTest* avatarTest)
     avatarTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
     avatarTest->hudHelper.keyDescriptions.Push ("left mouse: kill Krystal");
   }
+  avatarTest->hudHelper.keyDescriptions.Push ("a: display bone positions");
   avatarTest->hudHelper.keyDescriptions.Push ("r: reset scene");
   avatarTest->hudHelper.keyDescriptions.Push ("n: switch to next scene");
 }
@@ -154,6 +155,11 @@ void KrystalScene::Frame ()
   }
 }
 
+void KrystalScene::PostFrame ()
+{
+  debugNode->Draw (avatarTest->view->GetCamera ());
+}
+
 bool KrystalScene::OnKeyboard (iEvent &ev)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
@@ -179,6 +185,17 @@ bool KrystalScene::OnKeyboard (iEvent &ev)
 	avatarTest->room->GetMeshes ()->Remove (IKMesh);
       }
 
+      return true;
+    }
+
+    // Switching debug modes
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
+    {
+      debug = !debug;
+      debugNodeFactory->SetDebugModes (debug ?
+				       (CS::Animation::SkeletonDebugMode)
+				       (CS::Animation::DEBUG_2DLINES | CS::Animation::DEBUG_SQUARES)
+				       : CS::Animation::DEBUG_NONE);
       return true;
     }
 
@@ -383,12 +400,18 @@ bool KrystalScene::CreateAvatar ()
     return avatarTest->ReportError ("Can't find Krystal's skirt mesh factory!");
 
   // Create a new animation tree. The structure of the tree is:
-  //   + Ragdoll node (root node - only if physics are enabled)
-  //     + Inverse Kinematics node
-  //       + Random node
-  //         + Idle animation nodes
+  //   + Debug node (root node)
+  //     + Ragdoll node (only if physics are enabled)
+  //       + Inverse Kinematics node
+  //         + Random node
+  //           + Idle animation nodes
   csRef<CS::Animation::iSkeletonAnimPacketFactory> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
+
+  // Create the 'debug' node
+  debugNodeFactory = avatarTest->debugManager->CreateAnimNodeFactory ("debug");
+  debugNodeFactory->SetDebugModes (CS::Animation::DEBUG_NONE);
+  animPacketFactory->SetAnimationRoot (debugNodeFactory);
 
   // Create the 'random' node
   csRef<CS::Animation::iSkeletonRandomNodeFactory> randomNodeFactory =
@@ -481,7 +504,7 @@ bool KrystalScene::CreateAvatar ()
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
       avatarTest->ragdollManager->CreateAnimNodeFactory
       ("ragdoll", bodySkeleton, avatarTest->dynamicSystem);
-    animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
+    debugNodeFactory->SetChildNode (ragdollNodeFactory);
     ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
     ragdollNodeFactory->AddBodyChain (armChain, CS::Animation::STATE_KINEMATIC);
 
@@ -522,7 +545,7 @@ bool KrystalScene::CreateAvatar ()
   }
 
   else
-    animPacketFactory->SetAnimationRoot (randomNodeFactory);
+    debugNodeFactory->SetChildNode (randomNodeFactory);
 
   // Create the animated mesh
   csRef<iMeshWrapper> avatarMesh =
@@ -534,6 +557,9 @@ bool KrystalScene::CreateAvatar ()
   // We can therefore set them up now.
   CS::Animation::iSkeletonAnimNode* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+
+  // Find a reference to the debug node
+  debugNode = scfQueryInterface<CS::Animation::iSkeletonDebugNode> (rootNode->FindNode ("debug"));
 
   // Setup of the ragdoll animation node
   if (avatarTest->physicsEnabled)

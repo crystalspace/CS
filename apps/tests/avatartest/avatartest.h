@@ -23,10 +23,11 @@
 
 #include "cstool/csdemoapplication.h"
 #include "imesh/animesh.h"
-#include "imesh/animnode/speed.h"
+#include "imesh/animnode/debug.h"
 #include "imesh/animnode/ik.h"
 #include "imesh/animnode/lookat.h"
 #include "imesh/animnode/ragdoll.h"
+#include "imesh/animnode/speed.h"
 #include "ivaria/bullet.h"
 #include "ivaria/decal.h"
 #include "ivaria/dynamics.h"
@@ -49,7 +50,7 @@ class AvatarScene
   virtual float GetCameraMinimumDistance () = 0;
   virtual csVector3 GetCameraTarget () = 0;
 
-  // Dynamic simuation related
+  // Dynamic simulation related
   virtual float GetSimulationSpeed () = 0;
   virtual bool HasPhysicalObjects () = 0;
 
@@ -67,6 +68,7 @@ class AvatarScene
 
   // Display of information on the state of the scene
   virtual void UpdateStateDescription () = 0;
+  virtual void PostFrame () {}
 
   // Animesh objects
   csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory;
@@ -99,10 +101,11 @@ private:
   bool softBodiesEnabled;
 
   // Animation node plugin managers
+  csRef<CS::Animation::iSkeletonDebugNodeManager> debugManager;
   csRef<CS::Animation::iSkeletonIKNodeManager> IKNodeManager;
   csRef<CS::Animation::iSkeletonLookAtNodeManager> lookAtManager;
-  csRef<CS::Animation::iSkeletonSpeedNodeManager> basicNodesManager;
   csRef<CS::Animation::iSkeletonRagdollNodeManager> ragdollManager;
+  csRef<CS::Animation::iSkeletonSpeedNodeManager> speedManager;
 
   // Decal textures
   csRef<iDecalManager> decalManager;

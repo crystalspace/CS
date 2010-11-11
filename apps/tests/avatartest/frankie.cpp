@@ -475,7 +475,7 @@ bool FrankieScene::CreateAvatar ()
   // Unfortunately, the Frankie animations from 'walk fast' to 'footing'
   // do not blend well together, but this is just an example...
   csRef<CS::Animation::iSkeletonSpeedNodeFactory> speedNodeFactory =
-    avatarTest->basicNodesManager->CreateAnimNodeFactory ("speed");
+    avatarTest->speedManager->CreateAnimNodeFactory ("speed");
   speedNodeFactory->AddNode (idleNodeFactory, 0.0f);
   speedNodeFactory->AddNode (walkSlowNodeFactory, 0.4f);
   speedNodeFactory->AddNode (walkNodeFactory, 0.6f);

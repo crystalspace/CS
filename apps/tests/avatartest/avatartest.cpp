@@ -100,6 +100,9 @@ void AvatarTest::Frame ()
   // Default behavior from DemoApplication
   DemoApplication::Frame ();
 
+  // Post-frame process
+  avatarScene->PostFrame ();
+
   // Display the Bullet debug information
   if (avatarScene->HasPhysicalObjects ()
       && dynamicsDebugMode == DYNDEBUG_BULLET)
@@ -247,6 +250,8 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     return false;
 
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.debug",
+		       CS::Animation::iSkeletonDebugNodeManager),
     //CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.ik.physical",
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.ik.ccd",
 		       CS::Animation::iSkeletonIKNodeManager),
@@ -361,15 +366,18 @@ bool AvatarTest::Application ()
     return false;
 
   // Find references to the plugins of the animation nodes
+  debugManager = csQueryRegistry<CS::Animation::iSkeletonDebugNodeManager> (GetObjectRegistry ());
+  if (!debugManager) return ReportError("Failed to locate iSkeletonDebugNodeManager plugin!");
+
   IKNodeManager = csQueryRegistry<CS::Animation::iSkeletonIKNodeManager> (GetObjectRegistry ());
   if (!IKNodeManager) return ReportError("Failed to locate iSkeletonIKNodeManager plugin!");
 
   lookAtManager = csQueryRegistry<CS::Animation::iSkeletonLookAtNodeManager> (GetObjectRegistry ());
   if (!lookAtManager) return ReportError("Failed to locate iSkeletonLookAtNodeManager plugin!");
 
-  basicNodesManager =
+  speedManager =
     csQueryRegistry<CS::Animation::iSkeletonSpeedNodeManager> (GetObjectRegistry ());
-  if (!basicNodesManager)
+  if (!speedManager)
     return ReportError("Failed to locate iSkeletonSpeedNodeManager plugin!");
 
   // Find a reference to the decal plugin
