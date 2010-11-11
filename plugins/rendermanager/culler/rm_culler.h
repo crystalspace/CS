@@ -144,6 +144,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMCuller)
 
     /// Set of our cullers.
     csSet<csRef<iVisibilityCuller> > visCullers;
+
+  private:
+    struct View2RenderView : public csRefCount
+    {
+      csWeakRef<iView> view;
+      csRef<CS::RenderManager::RenderView> rview;
+
+      View2RenderView (iView* view, CS::RenderManager::RenderView* rview)
+        : view (view), rview (rview) {}
+    };
+
+    /// Mapping of iView to iRenderView
+    csRefArray<View2RenderView> renderViews;
+
+    /// Returns a renderview for the given iView.
+    CS::RenderManager::RenderView* GetRenderView (iView* view);    
   };
 }
 CS_PLUGIN_NAMESPACE_END(RMCuller)

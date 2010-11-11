@@ -140,7 +140,6 @@ namespace CS
             {
               meshes.AttachNew (new NodeMeshList (node, numMeshes, sectorMeshList, engine->GetCurrentFrameNumber ()));
               visobjMeshHash.Put (visobj, meshes);
-              meshList.Push (meshes);
             }
             else
             {
@@ -156,6 +155,8 @@ namespace CS
                 meshes->meshList[m] = sectorMeshList[m];
               }
             }
+
+            meshList.PushSmart (meshes);
           }
         }
       }
@@ -185,7 +186,7 @@ namespace CS
 
       if (queryData->eResult == VISIBLE)
       {
-        queryData->uNextCheck += visibilityFrameSkip;
+        queryData->uNextCheck += visibilityFrameSkip * nodeMeshHash.GetSize ();
       }
 
       return queryData->eResult;

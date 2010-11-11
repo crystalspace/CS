@@ -220,11 +220,8 @@ bool RMCuller::RenderView (iView* view)
 {
   // Setup a rendering view
   view->UpdateClipper ();
-  csRef<CS::RenderManager::RenderView> rview;
-#include "csutil/custom_new_disable.h"
-  rview.AttachNew (new (treePersistent.renderViewPool) 
-    CS::RenderManager::RenderView(view));
-#include "csutil/custom_new_enable.h"
+
+  csRef<CS::RenderManager::RenderView> rview = GetRenderView (view);
   iCamera* c = view->GetCamera ();
   iGraphics3D* G3D = rview->GetGraphics3D ();
   int frameWidth = G3D->GetWidth ();
@@ -463,6 +460,38 @@ iVisibilityCuller* RMCuller::GetVisCuller ()
   psVisCuller.AttachNew (new csOccluvis (objectReg));
   visCullers.AddNoTest (psVisCuller);
   return psVisCuller;
+}
+
+CS::RenderManager::RenderView* RMCuller::GetRenderView (iView* view)
+{
+  csRef<CS::RenderManager::RenderView> rview;
+  for (size_t i = 0; i < renderViews.GetSize (); ++i)
+  {
+    if (!renderViews[i]->view.IsValid ())
+    {
+      renderViews.DeleteIndex (i);
+      continue;
+    }
+
+    if (renderViews[i]->view == view)
+    {
+      rview = renderViews[i]->rview;
+    }
+  }
+
+  if (!rview.IsValid ())
+  {
+#include "csutil/custom_new_disable.h"
+    rview.AttachNew (new (treePersistent.renderViewPool) 
+      CS::RenderManager::RenderView(view));
+#include "csutil/custom_new_enable.h"
+
+    csRef<View2RenderView> psTemp;
+    psTemp.AttachNew (new View2RenderView (view, rview));
+    renderViews.Push (psTemp);
+  }
+
+  return rview;
 }
 
 }
