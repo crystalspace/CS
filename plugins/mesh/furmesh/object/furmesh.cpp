@@ -193,10 +193,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     meshPtr->indexend = indexend;
     meshPtr->material = materialWrapper;
 
-    meshPtr->mixmode = CS_FX_ALPHA;
-
     meshPtr->buffers = bufferholder;
-    meshPtr->renderPrio = GetRenderPriority ();
+    meshPtr->mixmode = GetMixMode();
+    meshPtr->renderPrio = GetRenderPriority();
     meshPtr->z_buf_mode = GetZBufMode();
 
     meshPtr->object2world = o2wt;
