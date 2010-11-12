@@ -38,9 +38,9 @@ namespace Threading
 
     inline static char Swpb(volatile char *target, char value)
     {
-       register int ret;
-       asm volatile("swpb %0 , %1, [%2]"
-                    : "=&r"(ret)
+       register char ret;
+       asm volatile("swpb %0 , %2, [%3]"
+                    : "=&r"(ret), "=m" (*target)
                     : "r"(value), "r"(target)
                     : "cc", "memory");
        return ret;
