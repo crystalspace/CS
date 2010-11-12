@@ -258,9 +258,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   void RagdollAnimNode::SetBodyChainState (CS::Animation::iBodyChain* chain,
 					   CS::Animation::RagdollState state)
   {
+    size_t index = GetChainIndex (chains, chain);
 #ifdef CS_DEBUG
     // check that the chain is registered
-    size_t index = GetChainIndex (chains, chain);
     if (index == (size_t) ~0)
     {
       factory->manager->Report (CS_REPORTER_SEVERITY_WARNING,
